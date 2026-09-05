@@ -10,7 +10,7 @@ parent-directory/
 └── foss-earth/
 ```
 
-Flight Sim originated from FOSS Earth and still contains a divergent copy of much of its globe runtime. New reusable UI is consumed through the FOSS Earth package boundary instead of being copied again.
+Flight Sim originated from FOSS Earth, but the copied globe runtime has been removed. Shared globe, rendering, map, input, and UI behavior is consumed through the FOSS Earth package boundary.
 
 ## Local Package Link
 
@@ -39,6 +39,9 @@ Flight Sim imports only public FOSS Earth package exports:
 | `foss-earth/shell.css` | Shared shell styling |
 | `foss-earth/windowing` | Panel, tab, and workspace primitives |
 | `foss-earth/windowing.css` | Shared windowing structure |
+| `foss-earth/runtime` | Babylon runtime, renderer/map types, map selection, and simulation hooks |
+| `foss-earth/cameraMath` | Shared WGS84/ECEF conversion and angle constants |
+| `foss-earth` | Root globe application and public globe APIs |
 
 The shell is adapted in `src/flight/hud/createFlightHudBar.ts`. The windowing primitives are composed with flight-specific Weather, Aircraft, Location, and Debug content in `src/flight/hud/FlightControlPanel.tsx`.
 
@@ -66,20 +69,26 @@ npm run ci
 
 If an upstream change adds a new package surface, FOSS Earth must expose it in its `package.json` `exports` map. Flight Sim should consume that public export rather than import internal paths.
 
-## Diverged Globe Code
+## Ownership Boundary
 
-Updating the linked package only updates code imported from the package exports above. It does not update inherited files under `flight-sim/src`, even when similarly named files exist in FOSS Earth.
+FOSS Earth owns:
 
-For a globe-runtime change that Flight Sim needs:
+- Babylon renderer creation and WebGPU fallback/probing.
+- Google 3D Tiles and raster basemap runtimes.
+- Globe camera and browser input handling.
+- Shared map configuration, geospatial math, layers, terrain, sprites, and globe HUD.
+- The optional simulation world root, simulated view state, and per-frame tick used by Flight Sim.
 
-1. Determine whether the behavior should become a reusable FOSS Earth export.
-2. Prefer extracting a stable package API when both applications need it.
-3. Otherwise compare and port the relevant change manually into Flight Sim.
-4. Preserve Flight Sim-specific rendering, controls, and JSBSim behavior.
-5. Run both repositories' tests after shared changes.
+Flight Sim owns:
 
-Avoid copying the complete FOSS Earth source tree over Flight Sim. The repositories have intentionally diverged, and a blanket copy can remove flight-specific behavior.
+- JSBSim setup and fixed-step physics.
+- Aircraft visuals, floating-origin application, and flight cameras.
+- Flight controls, instruments, panels, and HUD composition.
+- Product routing between the FOSS Earth globe and Flight Sim modes.
 
-## Longer-Term Direction
+For a shared-runtime change:
 
-The current arrangement shares UI primitives but still duplicates much of the globe runtime. A future package extraction could make both applications consume one rendering/globe core, leaving each repository responsible only for its product-specific composition.
+1. Implement and test it in FOSS Earth.
+2. Export it through a documented package surface when Flight Sim needs it.
+3. Consume that export from Flight Sim; do not copy the source.
+4. Run both repositories' CI checks.

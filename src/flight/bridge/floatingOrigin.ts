@@ -1,5 +1,5 @@
 import { Quaternion, TransformNode, Vector3 } from "@babylonjs/core";
-import { DEG_TO_RAD } from "../../camera/cameraMath";
+import { DEG_TO_RAD } from "foss-earth/cameraMath";
 import { buildWorldShiftMatrix } from "./enuFrame";
 import { flightAttitudeToQuaternion } from "./ecefBridge";
 import type { FlightState } from "../physics/flightState";

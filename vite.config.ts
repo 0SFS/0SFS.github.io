@@ -29,6 +29,9 @@ const sourceVersion = `${sourceCommit}${sourceDirty ? '-dirty' : ''}`
 // https://vite.dev/config/
 export default defineConfig({
   base,
+  resolve: {
+    dedupe: ['@babylonjs/core', '@babylonjs/loaders', '3d-tiles-renderer', 'react', 'react-dom'],
+  },
   optimizeDeps: {
     exclude: ['@0x62/jsbsim-wasm'],
   },

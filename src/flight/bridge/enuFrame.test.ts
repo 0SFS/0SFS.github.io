@@ -1,6 +1,6 @@
 import { Vector3 } from "@babylonjs/core";
 import { describe, expect, it } from "vitest";
-import { geodeticToEcef } from "../../camera/cameraMath";
+import { geodeticToEcef } from "foss-earth/cameraMath";
 import { buildEcefToEnuMatrix, buildWorldShiftMatrix } from "./enuFrame";
 
 describe("enuFrame", () => {

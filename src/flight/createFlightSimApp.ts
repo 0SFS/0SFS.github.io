@@ -1,13 +1,13 @@
 import "../styles/flight.css";
 
-import { createBabylonRuntime, type BabylonRuntime } from "../engine/babylon/createBabylonRuntime";
 import {
+  createBabylonRuntime,
+  RASTER_BASE_MAP_SOURCES,
   resolveMapRuntimeConfig,
   setMapSourcePreference,
-} from "../engine/babylon/resolveMapRuntimeConfig";
-import {
-  RASTER_BASE_MAP_SOURCES,
-} from "../engine/babylon/rasterBaseMaps";
+  type BabylonRuntime,
+  type RasterBaseMapSource,
+} from "foss-earth/runtime";
 import { createPlaceholderAircraft } from "./aircraft/createPlaceholderAircraft";
 import { readFlightState } from "./bridge/ecefBridge";
 import { createFloatingOrigin, type FloatingOriginHandle } from "./bridge/floatingOrigin";
@@ -22,7 +22,6 @@ import { createFlightHudBar, type FlightHudBarHandle } from "./hud/createFlightH
 import { createFlightInputManager } from "./input/flightInputManager";
 import { createJsbsimRuntime } from "./jsbsim/createJsbsimRuntime";
 import { createFixedStepPhysicsLoop } from "./physics/fixedStepLoop";
-import type { RasterBaseMapSource } from "../engine/babylon/rasterBaseMaps";
 
 export interface FlightSimAppOptions {
   googleApiKey?: string | null;

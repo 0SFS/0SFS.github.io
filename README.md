@@ -38,6 +38,8 @@ npm install
 npm run dev
 ```
 
+Vite serves source changes directly during development. Do not run `npm run build` or `npm run deploy` before starting the local server. Restart `npm run dev` after changing the FOSS Earth package manifest or exports.
+
 Open the URL printed by Vite and select flight mode:
 
 ```text
@@ -50,7 +52,7 @@ To use Google Photorealistic 3D Tiles:
 http://127.0.0.1:5173/?mode=flight&key=YOUR_GOOGLE_MAPS_API_KEY
 ```
 
-Vite may choose a different port when `5173` is occupied. Opening the app without `mode=flight` starts the inherited globe application.
+Vite may choose a different port when `5173` is occupied. Opening the app without `mode=flight` starts the current globe application exported by the linked FOSS Earth checkout.
 
 ## Controls
 
@@ -77,6 +79,15 @@ npm run build
 
 Run all three with `npm run ci`. Tests cover coordinate and attitude transforms, keyboard and throttle behavior, engine bootstrap sequencing, and real JSBSim/WASM C172 propulsion.
 
+## Deploy
+
+`npm run deploy` builds with the `/flight-sim/` GitHub Pages base and publishes `dist`. If a failed publish reports `spawn E2BIG`, clear the publisher's temporary checkout before retrying:
+
+```sh
+npx gh-pages-clean
+npm run deploy
+```
+
 ## FOSS Earth Dependency
 
 `package.json` declares FOSS Earth as a local file dependency:
@@ -93,13 +104,17 @@ import "foss-earth/shell.css";
 
 import { DockPanel, TabStrip } from "foss-earth/windowing";
 import "foss-earth/windowing.css";
+
+import { createBabylonRuntime, resolveMapRuntimeConfig } from "foss-earth/runtime";
 ```
 
 - `foss-earth/shell` provides the bottom application bar.
 - `foss-earth/windowing` provides panel, tab, and workspace primitives.
+- `foss-earth/runtime` provides Babylon rendering, Google/raster map selection, and opt-in simulation hooks.
+- The root globe route uses FOSS Earth's public `createGlobeApp` export.
 - Flight physics, aircraft rendering, controls, instruments, and flight-specific content remain in this repository.
 
-The rest of `flight-sim/src` still contains a divergent copy of older FOSS Earth globe code. Updating the package does not merge changes into those copied files.
+Flight Sim no longer contains a copied globe runtime. Compatibility subpaths such as `flight-sim/cameraMath` forward to FOSS Earth rather than maintaining separate implementations.
 
 ## Bring In FOSS Earth Changes
 
@@ -128,16 +143,13 @@ When both applications need new shared functionality:
 3. Import the public package path from Flight Sim instead of copying it.
 4. Run `npm run ci` in Flight Sim and manually verify flight mode.
 
-Changes to inherited globe files under `flight-sim/src` must still be reviewed and ported manually. Do not overwrite flight-specific changes with a blanket directory copy.
-
 See [docs/foss-earth-relationship.md](docs/foss-earth-relationship.md) for more architectural background.
 
 ## Project Layout
 
 ```text
-src/engine/         Babylon rendering and map runtimes
+src/compat/         Compatibility re-exports for existing package subpaths
 src/flight/         JSBSim runtime, physics, aircraft, input, and flight UI
-src/terrain/        Globe elevation helpers
-src/app/            Inherited globe application
+src/main.tsx        Route selection between FOSS Earth and Flight Sim
 public/jsbsim-data/ C172 aircraft, engine, and propeller definitions
 ```

@@ -3,6 +3,8 @@
 Status: Proposed  
 Date: 2026-05-18
 
+> Ownership note: the shared terrain implementation now lives in the sibling FOSS Earth repository. Paths in this historical proposal refer to FOSS Earth unless stated otherwise.
+
 ## Problem
 
 The current terrain height path is tied to loaded Google Photorealistic 3D Tiles. `src/terrain/tileHeightProvider.ts` casts local rays against visible tile meshes, and `src/terrain/anchorHeight.ts` caches and smooths those samples before the app uses them for the orbit compass and camera anchor height.

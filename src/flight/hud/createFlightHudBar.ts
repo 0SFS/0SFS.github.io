@@ -1,8 +1,7 @@
 import "foss-earth/shell.css";
 
 import { createHudBar, type HudBarHandle } from "foss-earth/shell";
-import type { BabylonRuntimeStatus, RendererMode } from "../../engine/babylon/createBabylonRuntime";
-import type { RasterBaseMapSource } from "../../engine/babylon/rasterBaseMaps";
+import type { BabylonRuntimeStatus, RasterBaseMapSource, RendererMode } from "foss-earth/runtime";
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
 
 export interface FlightHudBarOptions {

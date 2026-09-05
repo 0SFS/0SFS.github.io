@@ -1,5 +1,5 @@
 import { Matrix, Vector3 } from "@babylonjs/core";
-import { geodeticToEcef } from "../../camera/cameraMath";
+import { geodeticToEcef } from "foss-earth/cameraMath";
 
 /**
  * Maps local ENU (X=east, Y=north, Z=up) into Babylon's right-handed Y-up frame

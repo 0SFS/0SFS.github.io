@@ -21,7 +21,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { BabylonRuntimeStatus, RendererMode } from "../../engine/babylon/createBabylonRuntime";
+import type { BabylonRuntimeStatus, RendererMode } from "foss-earth/runtime";
 import type { FlightViewMode } from "../aircraft/createPlaceholderAircraft";
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
 

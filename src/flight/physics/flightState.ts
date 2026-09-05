@@ -1,4 +1,4 @@
-import { DEG_TO_RAD } from "../../camera/cameraMath";
+import { DEG_TO_RAD } from "foss-earth/cameraMath";
 
 export interface FlightState {
   latDeg: number;

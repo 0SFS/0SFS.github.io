@@ -5,9 +5,9 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./layers": "./src/layers/types.ts",
-    "./cameraMath": "./src/camera/cameraMath.ts",
-    "./smoothElevation": "./src/terrain/smoothElevation.ts",
+    "./layers": "./src/compat/layers.ts",
+    "./cameraMath": "./src/compat/cameraMath.ts",
+    "./smoothElevation": "./src/compat/smoothElevation.ts",
     "./style.css": "./src/styles/globe.css"
   },
   "scripts": {
@@ -15,7 +15,7 @@
     "build": "tsc -b && vite build",
     "ci": "npm run lint && npm run test && npm run build",
     "deploy": "npm run deploy:gh-pages",
-    "deploy:gh-pages": "npm run build -- --base=/foss-earth/ && gh-pages -d dist",
+    "deploy:gh-pages": "npm run build -- --base=/flight-sim/ && gh-pages -d dist",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run --passWithNoTests",
