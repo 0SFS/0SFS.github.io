@@ -8,6 +8,7 @@ const MAX_ACCUMULATED_SECONDS = FIXED_DT * 6;
 
 export interface FixedStepPhysicsLoop {
   update(renderDt: number, applyInputs: () => void): FlightState;
+  setPaused(paused: boolean): void;
   reset(): void;
   getLatestState(): FlightState | null;
 }
@@ -19,9 +20,12 @@ export function createFixedStepPhysicsLoop(
   let accumulator = 0;
   let prevState: FlightState | null = null;
   let currState: FlightState | null = null;
+  let paused = false;
 
   return {
     update(renderDt: number, applyInputs: () => void): FlightState {
+      if (paused) return currState ?? readFlightState(sdk);
+
       const clampedDt = Math.min(Math.max(renderDt, 0), 0.1);
       accumulator = Math.min(accumulator + clampedDt, MAX_ACCUMULATED_SECONDS);
 
@@ -38,6 +42,11 @@ export function createFixedStepPhysicsLoop(
 
       const alpha = accumulator / FIXED_DT;
       return interpolateFlightState(prevState, currState, alpha);
+    },
+    setPaused(value: boolean): void {
+      if (value === paused) return;
+      paused = value;
+      if (paused) accumulator = 0;
     },
     reset(): void {
       accumulator = 0;

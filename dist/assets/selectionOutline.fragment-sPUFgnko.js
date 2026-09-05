@@ -1,4 +1,4 @@
-import{t as e}from"./index-DK1g8m2Y.js";var t=`selectionOutlinePixelShader`,n=`uniform sampler2D maskSampler;uniform sampler2D depthSampler;varying vec2 vUV;uniform vec2 screenSize;uniform vec3 outlineColor;uniform float outlineThickness;uniform float occlusionStrength;uniform float occlusionThreshold;
+import{t as e}from"./index-DY79YLSm.js";var t=`selectionOutlinePixelShader`,n=`uniform sampler2D maskSampler;uniform sampler2D depthSampler;varying vec2 vUV;uniform vec2 screenSize;uniform vec3 outlineColor;uniform float outlineThickness;uniform float occlusionStrength;uniform float occlusionThreshold;
 #define CUSTOM_FRAGMENT_DEFINITIONS
 void main(void) {
 #define CUSTOM_FRAGMENT_MAIN_BEGIN

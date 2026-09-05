@@ -164,6 +164,11 @@ export async function createFlightSimApp(
     rendererMode: runtime.renderer.mode,
   });
 
+  const setSimulationPaused = (paused: boolean): void => {
+    inputManager.setPaused(paused);
+    physicsLoop.setPaused(paused);
+  };
+
   const applyWeather = (nextWeather: FlightWeatherState): void => {
     weather.windDirectionDeg = nextWeather.windDirectionDeg;
     weather.windSpeedKts = nextWeather.windSpeedKts;
@@ -176,7 +181,7 @@ export async function createFlightSimApp(
   controlPanel = createFlightControlPanel(panelRoot, createPanelSnapshot(), {
     initialWeather: weather,
     onWeatherChange: applyWeather,
-    onPausedChange: (paused) => inputManager.setPaused(paused),
+    onPausedChange: setSimulationPaused,
     onViewModeChange: (mode) => aircraft?.setViewMode(mode),
   });
   panelRoot.hidden = true;
@@ -189,10 +194,11 @@ export async function createFlightSimApp(
     onControlsClick: () => {
       panelRoot.hidden = !panelRoot.hidden;
     },
+    onPausedChange: setSimulationPaused,
     onRendererChange: setRendererForce,
     onMapSourceChange: setMapSourcePreference,
   });
-  hudBar.update(initialState, runtime.status, measuredFps);
+  hudBar.update(initialState, runtime.status, measuredFps, inputManager.isPaused());
 
   const ensureWorld = (): void => {
     mountFlightWorld();
@@ -212,6 +218,7 @@ export async function createFlightSimApp(
 
     ensureWorld();
 
+    physicsLoop.setPaused(inputManager.isPaused());
     const controls = inputManager.poll(deltaSeconds);
     const displayState = physicsLoop.update(deltaSeconds, () => {
       inputManager.apply(jsbsim.sdk, controls);
@@ -230,7 +237,7 @@ export async function createFlightSimApp(
     if (now - lastPanelUpdateMs >= 100) {
       lastPanelUpdateMs = now;
       controlPanel?.update(createPanelSnapshot(displayState));
-      hudBar?.update(displayState, runtime.status, measuredFps);
+      hudBar?.update(displayState, runtime.status, measuredFps, inputManager.isPaused());
     }
   });
 

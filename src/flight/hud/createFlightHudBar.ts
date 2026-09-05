@@ -11,12 +11,13 @@ export interface FlightHudBarOptions {
   runtimeStatus: BabylonRuntimeStatus;
   rasterSources: readonly RasterBaseMapSource[];
   onControlsClick(): void;
+  onPausedChange(paused: boolean): void;
   onRendererChange(mode: RendererMode | null): void;
   onMapSourceChange(sourceId: string): void;
 }
 
 export interface FlightHudBarHandle {
-  update(state: FlightState, status: BabylonRuntimeStatus, fps: number | null): void;
+  update(state: FlightState, status: BabylonRuntimeStatus, fps: number | null, paused: boolean): void;
   destroy(): void;
 }
 
@@ -42,6 +43,7 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     ariaLabel: "Flight simulator controls",
     items: [
       { kind: "button", id: "flightControlsButton", title: "Flight controls", ariaLabel: "Flight controls", className: "flight-shell-controls-button", text: "✈" },
+      { kind: "button", id: "flightPauseButton", title: "Pause simulation", ariaLabel: "Pause simulation", className: "flight-shell-pause-button", text: "Ⅱ" },
       {
         kind: "menu",
         id: "flightRendererControl",
@@ -74,12 +76,13 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
   });
 
   const controlsButton = hudBar.getElement<HTMLButtonElement>("flightControlsButton");
+  const pauseButton = hudBar.getElement<HTMLButtonElement>("flightPauseButton");
   const rendererButton = hudBar.getElement<HTMLButtonElement>("flightRendererButton");
   const rendererMenu = hudBar.getElement("flightRendererMenu");
   const mapButton = hudBar.getElement<HTMLButtonElement>("flightMapSourceButton");
   const mapMenu = hudBar.getElement("flightMapSourceMenu");
   const statusElement = hudBar.getElement("flightShellStatus");
-  if (!controlsButton || !rendererButton || !rendererMenu || !mapButton || !mapMenu || !statusElement) {
+  if (!controlsButton || !pauseButton || !rendererButton || !rendererMenu || !mapButton || !mapMenu || !statusElement) {
     hudBar.destroy();
     throw new Error("Flight HUD bar failed to mount.");
   }
@@ -100,7 +103,20 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     });
   };
 
+  let paused = false;
+  const updatePauseState = (nextPaused: boolean): void => {
+    paused = nextPaused;
+    pauseButton.textContent = paused ? "▶" : "Ⅱ";
+    pauseButton.title = paused ? "Resume simulation" : "Pause simulation";
+    pauseButton.setAttribute("aria-label", pauseButton.title);
+    pauseButton.setAttribute("aria-pressed", String(paused));
+    pauseButton.classList.toggle("is-active", paused);
+  };
   const onControlsClick = () => options.onControlsClick();
+  const onPauseClick = () => {
+    updatePauseState(!paused);
+    options.onPausedChange(paused);
+  };
   const onRendererClick = (event: MouseEvent) => {
     event.stopPropagation();
     setMenuOpen(rendererMenu, rendererButton, rendererMenu.hidden);
@@ -132,6 +148,7 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
   };
 
   controlsButton.addEventListener("click", onControlsClick);
+  pauseButton.addEventListener("click", onPauseClick);
   rendererButton.addEventListener("click", onRendererClick);
   rendererMenu.addEventListener("click", onRendererMenuClick);
   mapButton.addEventListener("click", onMapClick);
@@ -140,7 +157,8 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
   updateMapState(options.runtimeStatus);
 
   return {
-    update(state, runtimeStatus, fps): void {
+    update(state, runtimeStatus, fps, nextPaused): void {
+      updatePauseState(nextPaused);
       updateMapState(runtimeStatus);
       const heading = String(Math.round(headingDegFromRad(state.headingRad))).padStart(3, "0");
       const frameRate = fps === null ? "" : ` ${Math.round(fps)}fps`;
@@ -148,6 +166,7 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     },
     destroy(): void {
       controlsButton.removeEventListener("click", onControlsClick);
+      pauseButton.removeEventListener("click", onPauseClick);
       rendererButton.removeEventListener("click", onRendererClick);
       rendererMenu.removeEventListener("click", onRendererMenuClick);
       mapButton.removeEventListener("click", onMapClick);

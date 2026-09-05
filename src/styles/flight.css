@@ -143,6 +143,12 @@
   font-size: 16px;
 }
 
+.flight-shell-root .flight-shell-pause-button.is-active {
+  color: #11161a;
+  background: var(--flight-panel-accent);
+  border-color: var(--flight-panel-accent);
+}
+
 .flight-panel {
   overflow: visible;
   pointer-events: auto;

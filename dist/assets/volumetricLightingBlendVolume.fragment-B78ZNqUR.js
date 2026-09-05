@@ -1,4 +1,4 @@
-import{t as e}from"./index-DK1g8m2Y.js";var t=`volumetricLightingBlendVolumePixelShader`,n=`varying vUV: vec2f;var textureSamplerSampler: sampler;var textureSampler: texture_2d<f32>;var depthSampler: texture_2d<f32>;uniform invProjection: mat4x4<f32>;uniform outputTextureSize: vec2f;
+import{t as e}from"./index-DY79YLSm.js";var t=`volumetricLightingBlendVolumePixelShader`,n=`varying vUV: vec2f;var textureSamplerSampler: sampler;var textureSampler: texture_2d<f32>;var depthSampler: texture_2d<f32>;uniform invProjection: mat4x4<f32>;uniform outputTextureSize: vec2f;
 #ifdef USE_EXTINCTION
 uniform extinction: vec3f;
 #endif
