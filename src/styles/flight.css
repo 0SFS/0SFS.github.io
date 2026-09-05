@@ -1,0 +1,719 @@
+.flight-app {
+  --flight-panel-bg: rgba(13, 17, 20, 0.94);
+  --flight-panel-line: rgba(208, 220, 224, 0.15);
+  --flight-panel-muted: #91a0a6;
+  --flight-panel-text: #edf2f3;
+  --flight-panel-accent: #e8b647;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 100%;
+  overflow: hidden;
+  background: #04060a;
+}
+
+.flight-app__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+.flight-hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  color: #e8edf5;
+  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+}
+
+.flight-hud__attitude {
+  position: absolute;
+  left: 24px;
+  bottom: 24px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.flight-hud__tapes {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 18px;
+}
+
+.flight-hud__tape {
+  min-width: 88px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  text-align: center;
+}
+
+.flight-hud__label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  opacity: 0.65;
+}
+
+.flight-hud__value {
+  display: block;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.flight-hud__unit {
+  display: block;
+  font-size: 11px;
+  opacity: 0.55;
+}
+
+.flight-hud__controls {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  gap: 14px;
+  padding: 12px 10px 10px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  pointer-events: auto;
+}
+
+.flight-hud__slider-control {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 38px;
+  font-size: 12px;
+}
+
+.flight-hud__slider-control > span,
+.flight-hud__slider-control output {
+  font-size: 10px;
+  letter-spacing: 0;
+  opacity: 0.8;
+}
+
+.flight-hud__slider-control input[type="range"] {
+  width: 24px;
+  height: 132px;
+  margin: 0;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  accent-color: var(--flight-panel-accent);
+  cursor: ns-resize;
+}
+
+.flight-panel-root {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  color: var(--flight-panel-text);
+  font-family: "Avenir Next Condensed", "Helvetica Neue", sans-serif;
+  letter-spacing: 0;
+}
+
+.flight-panel-root[hidden] {
+  display: none;
+}
+
+.flight-shell-root {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.flight-shell-root .hud-bar {
+  position: absolute;
+}
+
+.flight-shell-root .flight-shell-controls-button {
+  font-size: 16px;
+}
+
+.flight-panel {
+  overflow: visible;
+  pointer-events: auto;
+  border: 1px solid var(--flight-panel-line);
+  border-radius: 6px;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px) 0 0 / 100% 28px,
+    var(--flight-panel-bg);
+  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(18px) saturate(0.8);
+}
+
+.flight-panel--expanded {
+  z-index: 40;
+}
+
+.flight-panel--raised {
+  z-index: 50;
+}
+
+.flight-panel--collapsed {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.flight-panel__header {
+  min-height: 43px;
+  border-bottom: 1px solid var(--flight-panel-line);
+}
+
+.flight-panel--collapsed .flight-panel__header {
+  border: 0;
+}
+
+.flight-panel__body {
+  height: calc(100% - 44px);
+  min-height: 0;
+  overflow: auto;
+}
+
+.foss-earth-tab-strip {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  height: 43px;
+}
+
+.foss-earth-tab-strip-list {
+  display: flex;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.foss-earth-tab-shell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid var(--flight-panel-line);
+}
+
+.foss-earth-tab-shell.is-selected::after {
+  position: absolute;
+  right: 8px;
+  bottom: -1px;
+  left: 8px;
+  height: 2px;
+  background: var(--flight-panel-accent);
+  content: "";
+}
+
+.flight-panel__tab-button,
+.flight-panel__tab-close,
+.flight-panel__add-button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.flight-panel__tab-button {
+  height: 42px;
+  padding: 0 5px 0 12px;
+  color: #b8c2c5;
+  font: 600 12px/1 "Avenir Next Condensed", "Helvetica Neue", sans-serif;
+  letter-spacing: 0;
+}
+
+.is-selected .flight-panel__tab-button {
+  color: #fff;
+}
+
+.flight-panel__tab-close {
+  display: grid;
+  width: 25px;
+  height: 42px;
+  padding: 0;
+  place-items: center;
+  color: #7e8b90;
+}
+
+.flight-panel__tab-close:hover,
+.flight-panel__add-button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.foss-earth-tab-add-wrap {
+  position: relative;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.flight-panel__add-button {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+}
+
+.flight-panel__menu {
+  top: calc(100% + 7px);
+  z-index: 70;
+  min-width: 170px;
+  padding: 5px;
+  border: 1px solid var(--flight-panel-line);
+  border-radius: 5px;
+  background: #11171a;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
+}
+
+.flight-panel__menu-item,
+.flight-panel__menu-empty {
+  display: block;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--flight-panel-text);
+  font: 600 13px/1.2 "Avenir Next Condensed", "Helvetica Neue", sans-serif;
+  letter-spacing: 0;
+  text-align: left;
+}
+
+.flight-panel__menu-item:hover {
+  background: rgba(232, 182, 71, 0.13);
+  color: #ffd97c;
+}
+
+.flight-panel__menu-empty {
+  color: var(--flight-panel-muted);
+}
+
+.flight-panel__title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 15px 18px 12px;
+  color: var(--flight-panel-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.flight-panel__title svg {
+  color: var(--flight-panel-accent);
+}
+
+.flight-panel__content {
+  display: grid;
+  gap: 18px;
+  padding: 4px 18px 22px;
+}
+
+.flight-panel__metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--flight-panel-line);
+  border-left: 1px solid var(--flight-panel-line);
+}
+
+.flight-panel__metric {
+  min-width: 0;
+  padding: 12px;
+  border-right: 1px solid var(--flight-panel-line);
+  border-bottom: 1px solid var(--flight-panel-line);
+}
+
+.flight-panel__metric span,
+.flight-panel__coordinates span,
+.flight-panel__section-heading span {
+  display: block;
+  color: var(--flight-panel-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.flight-panel__metric strong {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 16px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flight-panel__fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.flight-panel__fieldset legend {
+  margin-bottom: 8px;
+  color: var(--flight-panel-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.flight-panel__segmented {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  padding: 3px;
+  border: 1px solid var(--flight-panel-line);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.flight-panel__segmented button {
+  min-height: 34px;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--flight-panel-muted);
+  font: 600 12px/1 "Avenir Next Condensed", "Helvetica Neue", sans-serif;
+  cursor: pointer;
+}
+
+.flight-panel__segmented button.is-active {
+  background: #d7e0e2;
+  color: #101518;
+}
+
+.flight-panel__command {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid rgba(232, 182, 71, 0.4);
+  border-radius: 4px;
+  background: rgba(232, 182, 71, 0.1);
+  color: #f5d991;
+  font: 700 12px/1 "Avenir Next Condensed", "Helvetica Neue", sans-serif;
+  cursor: pointer;
+}
+
+.flight-panel__command:hover {
+  background: rgba(232, 182, 71, 0.18);
+}
+
+.flight-panel__keymap {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+  color: var(--flight-panel-muted);
+  font-size: 11px;
+}
+
+.flight-panel__keymap kbd {
+  display: inline-block;
+  min-width: 35px;
+  margin-right: 5px;
+  color: #dfe6e8;
+  font-family: "SF Mono", Menlo, monospace;
+}
+
+.flight-panel__section-heading,
+.flight-panel__coordinates,
+.flight-panel__debug-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.flight-panel__section-heading strong,
+.flight-panel__coordinates strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 16px;
+}
+
+.flight-panel__section-heading svg,
+.flight-panel__coordinates svg {
+  flex: 0 0 auto;
+  color: var(--flight-panel-accent);
+}
+
+.flight-panel__coordinates {
+  justify-content: flex-start;
+  padding: 12px;
+  border: 1px solid var(--flight-panel-line);
+}
+
+.flight-panel__field {
+  display: grid;
+  gap: 9px;
+  color: #cad3d5;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.flight-panel__field span {
+  display: flex;
+  justify-content: space-between;
+}
+
+.flight-panel__field output {
+  color: var(--flight-panel-accent);
+  font-family: "SF Mono", Menlo, monospace;
+}
+
+.flight-panel__field input[type="range"] {
+  width: 100%;
+  accent-color: var(--flight-panel-accent);
+}
+
+.flight-panel__radio-list {
+  display: grid;
+  gap: 5px;
+}
+
+.flight-panel__radio-list label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: #aeb9bc;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.flight-panel__radio-list label.is-active {
+  border-color: rgba(232, 182, 71, 0.32);
+  background: rgba(232, 182, 71, 0.08);
+  color: #fff;
+}
+
+.flight-panel__radio-list input {
+  accent-color: var(--flight-panel-accent);
+}
+
+.flight-panel__debug-status {
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 11px;
+  border-left: 2px solid var(--flight-panel-accent);
+  background: rgba(255, 255, 255, 0.035);
+  color: #bbc5c8;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.flight-panel__debug-status svg {
+  flex: 0 0 auto;
+}
+
+.flight-panel__resize {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  color: #657278;
+  cursor: nesw-resize;
+}
+
+.flight-panel__restore {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--flight-panel-line);
+  border-radius: 4px;
+  place-items: center;
+  background: var(--flight-panel-bg);
+  color: var(--flight-panel-accent);
+  cursor: pointer;
+}
+
+@media (max-width: 720px) {
+  .flight-panel {
+    top: auto !important;
+    right: 8px !important;
+    bottom: 8px;
+    left: 8px !important;
+    width: auto !important;
+    max-width: none !important;
+    height: min(46vh, 420px) !important;
+  }
+
+  .flight-panel--collapsed {
+    right: 8px !important;
+    bottom: 16px;
+    left: auto !important;
+    width: 42px !important;
+    height: 42px !important;
+  }
+
+  .flight-hud__attitude {
+    bottom: calc(min(46vh, 420px) + 18px);
+    width: 130px;
+    height: 130px;
+  }
+
+  .flight-hud__controls {
+    right: 10px;
+    bottom: 84px;
+  }
+
+  .flight-hud__slider-control input[type="range"] {
+    height: 96px;
+  }
+
+  .flight-hud__tapes {
+    top: 10px;
+    gap: 4px;
+  }
+
+  .flight-hud__tape {
+    min-width: 58px;
+    padding: 7px 5px;
+    border-radius: 4px;
+  }
+
+  .flight-hud__value {
+    font-size: 18px;
+  }
+}
+
+.flight-controls-bar {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  pointer-events: auto;
+}
+
+.flight-map-control {
+  position: relative;
+}
+
+.flight-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e8edf5;
+  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+  font-size: 12px;
+}
+
+.flight-chip-button {
+  cursor: pointer;
+}
+
+.flight-chip-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.flight-chip--google {
+  border-color: rgba(96, 165, 250, 0.45);
+}
+
+.flight-chip--raster {
+  border-color: rgba(74, 222, 128, 0.35);
+}
+
+.flight-chip--fallback {
+  border-color: rgba(251, 191, 36, 0.35);
+}
+
+.flight-map-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 30;
+  min-width: 220px;
+  padding: 8px;
+  border-radius: 12px;
+  background: rgba(8, 10, 16, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.flight-chip--active {
+  border-color: rgba(147, 197, 253, 0.55);
+  background: rgba(59, 130, 246, 0.2);
+}
+
+.flight-map-menu[hidden] {
+  display: none;
+}
+
+.flight-map-option {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #e8edf5;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.flight-map-option:hover,
+.flight-map-option.is-active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.flight-help {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  max-width: 280px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 12px;
+  line-height: 1.45;
+  pointer-events: none;
+}
+
+.flight-help strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.flight-boot {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 24px;
+  color: #e8edf5;
+  background: #04060a;
+  text-align: center;
+}
+
+.flight-boot__error {
+  color: #ff8f8f;
+}

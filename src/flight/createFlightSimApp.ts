@@ -1,0 +1,255 @@
+import "../styles/flight.css";
+
+import { createBabylonRuntime, type BabylonRuntime } from "../engine/babylon/createBabylonRuntime";
+import {
+  resolveMapRuntimeConfig,
+  setMapSourcePreference,
+} from "../engine/babylon/resolveMapRuntimeConfig";
+import {
+  RASTER_BASE_MAP_SOURCES,
+} from "../engine/babylon/rasterBaseMaps";
+import { createPlaceholderAircraft } from "./aircraft/createPlaceholderAircraft";
+import { readFlightState } from "./bridge/ecefBridge";
+import { createFloatingOrigin, type FloatingOriginHandle } from "./bridge/floatingOrigin";
+import {
+  type FlightControlPanelHandle,
+  type FlightControlPanelSnapshot,
+  type FlightWeatherState,
+} from "./hud/FlightControlPanel";
+import { createFlightControlPanel } from "./hud/createFlightControlPanel";
+import { createFlightHud, type FlightHudHandle } from "./hud/flightHud";
+import { createFlightHudBar, type FlightHudBarHandle } from "./hud/createFlightHudBar";
+import { createFlightInputManager } from "./input/flightInputManager";
+import { createJsbsimRuntime } from "./jsbsim/createJsbsimRuntime";
+import { createFixedStepPhysicsLoop } from "./physics/fixedStepLoop";
+import type { RasterBaseMapSource } from "../engine/babylon/rasterBaseMaps";
+
+export interface FlightSimAppOptions {
+  googleApiKey?: string | null;
+  baseMap?: string | RasterBaseMapSource | null;
+  preferGoogleTiles?: boolean;
+  dataBaseUrl?: string;
+}
+
+export interface FlightSimAppHandle {
+  runtime: BabylonRuntime;
+  destroy(): void;
+}
+
+type FlightRendererForce = "webgl" | "webgl2" | "webgpu";
+
+function getRendererForceFromUrl(): FlightRendererForce | null {
+  const force = new URLSearchParams(window.location.search).get("renderer");
+  if (force === "webgl" || force === "webgl2" || force === "webgpu") return force;
+  return null;
+}
+
+function setRendererForce(force: FlightRendererForce | null): void {
+  const url = new URL(window.location.href);
+  if (force) url.searchParams.set("renderer", force);
+  else url.searchParams.delete("renderer");
+  window.location.assign(url.toString());
+}
+
+function zoomMetersFromAltitude(altMeters: number): number {
+  return Math.max(250, Math.min(altMeters * 1.5, 12_000));
+}
+
+export async function createFlightSimApp(
+  rootElement: HTMLElement,
+  options: FlightSimAppOptions = {},
+): Promise<FlightSimAppHandle> {
+  const mapConfig = resolveMapRuntimeConfig({
+    googleApiKey: options.googleApiKey,
+    baseMap: options.baseMap,
+    preferGoogleTiles: options.preferGoogleTiles,
+  });
+
+  rootElement.innerHTML = `
+    <div class="flight-app">
+      <canvas class="flight-app__canvas" aria-label="Flight simulator viewport"></canvas>
+      <div class="flight-hud-root"></div>
+      <div class="flight-shell-root"></div>
+      <div class="flight-panel-root"></div>
+    </div>
+  `;
+
+  const canvas = rootElement.querySelector<HTMLCanvasElement>(".flight-app__canvas");
+  const hudRoot = rootElement.querySelector<HTMLElement>(".flight-hud-root");
+  const shellRoot = rootElement.querySelector<HTMLElement>(".flight-shell-root");
+  const panelRoot = rootElement.querySelector<HTMLElement>(".flight-panel-root");
+  if (!canvas || !hudRoot || !shellRoot || !panelRoot) {
+    throw new Error("Flight sim shell failed to mount.");
+  }
+
+  const runtime = await createBabylonRuntime(canvas, {
+    googleApiKey: mapConfig.googleApiKey,
+    rasterBaseMap: mapConfig.rasterBaseMap,
+    rendererForce: getRendererForceFromUrl(),
+    simMode: true,
+  });
+
+  if (runtime.geospatialCamera) {
+    runtime.geospatialCamera.detachControl();
+    runtime.geospatialCamera.setEnabled(false);
+  }
+
+  const jsbsim = await createJsbsimRuntime({
+    dataBaseUrl: options.dataBaseUrl,
+    onLog: (stream, message) => {
+      if (stream === "stderr") {
+        console.warn("[jsbsim]", message);
+      }
+    },
+  });
+
+  const inputManager = createFlightInputManager();
+  const detachInput = inputManager.attach(window);
+  const physicsLoop = createFixedStepPhysicsLoop(jsbsim.sdk);
+  const flightHud: FlightHudHandle = createFlightHud(hudRoot, {
+    onThrottleChange: (value) => inputManager.setThrottle(value),
+    onPitchTrimChange: (value) => inputManager.setPitchTrim(value),
+  });
+
+  let floatingOrigin: FloatingOriginHandle | null = null;
+  let aircraft: ReturnType<typeof createPlaceholderAircraft> | null = null;
+  let controlPanel: FlightControlPanelHandle | null = null;
+  let hudBar: FlightHudBarHandle | null = null;
+  let disposed = false;
+  let lastPanelUpdateMs = 0;
+  let fpsSampleStartedMs = performance.now();
+  let fpsSampleFrames = 0;
+  let measuredFps: number | null = null;
+  const weather: FlightWeatherState = { windDirectionDeg: 0, windSpeedKts: 0 };
+
+  const mountFlightWorld = (): void => {
+    const worldRoot = runtime.getWorldRoot();
+    if (!worldRoot || floatingOrigin) return;
+
+    floatingOrigin = createFloatingOrigin(runtime.scene, worldRoot);
+    aircraft = createPlaceholderAircraft(runtime.scene, floatingOrigin.aircraftRoot);
+    aircraft.setViewMode("third");
+
+    const initialState = readFlightState(jsbsim.sdk);
+    floatingOrigin.apply(initialState);
+    runtime.setSimViewState({
+      latDeg: initialState.latDeg,
+      lonDeg: initialState.lonDeg,
+      zoomMeters: zoomMetersFromAltitude(initialState.altMeters),
+      headingDeg: (initialState.headingRad * 180) / Math.PI,
+    });
+  };
+
+  const toggleCameraView = (): void => {
+    aircraft?.toggleViewMode();
+  };
+
+  const onViewKeyDown = (event: KeyboardEvent): void => {
+    if (event.code !== "KeyV" || event.repeat) return;
+    if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
+    event.preventDefault();
+    toggleCameraView();
+  };
+
+  window.addEventListener("keydown", onViewKeyDown);
+
+  mountFlightWorld();
+  const initialState = readFlightState(jsbsim.sdk);
+  const createPanelSnapshot = (flightState = initialState): FlightControlPanelSnapshot => ({
+    flightState,
+    fps: runtime.engine.getFps(),
+    paused: inputManager.isPaused(),
+    viewMode: aircraft?.getViewMode() ?? "third",
+    runtimeStatus: { ...runtime.status },
+    rendererMode: runtime.renderer.mode,
+  });
+
+  const applyWeather = (nextWeather: FlightWeatherState): void => {
+    weather.windDirectionDeg = nextWeather.windDirectionDeg;
+    weather.windSpeedKts = nextWeather.windSpeedKts;
+    const directionRad = (nextWeather.windDirectionDeg * Math.PI) / 180;
+    const speedFps = nextWeather.windSpeedKts * 1.68781;
+    jsbsim.sdk.setPropertyValue("atmosphere/wind-north-fps", -Math.cos(directionRad) * speedFps);
+    jsbsim.sdk.setPropertyValue("atmosphere/wind-east-fps", -Math.sin(directionRad) * speedFps);
+  };
+
+  controlPanel = createFlightControlPanel(panelRoot, createPanelSnapshot(), {
+    initialWeather: weather,
+    onWeatherChange: applyWeather,
+    onPausedChange: (paused) => inputManager.setPaused(paused),
+    onViewModeChange: (mode) => aircraft?.setViewMode(mode),
+  });
+  panelRoot.hidden = true;
+  const rendererForce = getRendererForceFromUrl();
+  hudBar = createFlightHudBar(shellRoot, {
+    rendererMode: runtime.renderer.mode,
+    rendererForce,
+    runtimeStatus: runtime.status,
+    rasterSources: RASTER_BASE_MAP_SOURCES,
+    onControlsClick: () => {
+      panelRoot.hidden = !panelRoot.hidden;
+    },
+    onRendererChange: setRendererForce,
+    onMapSourceChange: setMapSourcePreference,
+  });
+  hudBar.update(initialState, runtime.status, measuredFps);
+
+  const ensureWorld = (): void => {
+    mountFlightWorld();
+  };
+
+  runtime.setSimTick((deltaSeconds) => {
+    if (disposed) return;
+
+    fpsSampleFrames += 1;
+    const frameNow = performance.now();
+    const fpsSampleElapsedMs = frameNow - fpsSampleStartedMs;
+    if (fpsSampleElapsedMs >= 500) {
+      measuredFps = (fpsSampleFrames * 1000) / fpsSampleElapsedMs;
+      fpsSampleStartedMs = frameNow;
+      fpsSampleFrames = 0;
+    }
+
+    ensureWorld();
+
+    const controls = inputManager.poll(deltaSeconds);
+    const displayState = physicsLoop.update(deltaSeconds, () => {
+      inputManager.apply(jsbsim.sdk, controls);
+    });
+
+    runtime.setSimViewState({
+      latDeg: displayState.latDeg,
+      lonDeg: displayState.lonDeg,
+      zoomMeters: zoomMetersFromAltitude(displayState.altMeters),
+      headingDeg: (displayState.headingRad * 180) / Math.PI,
+    });
+
+    floatingOrigin?.apply(displayState);
+    flightHud.update(displayState, controls.pitchTrim);
+    const now = performance.now();
+    if (now - lastPanelUpdateMs >= 100) {
+      lastPanelUpdateMs = now;
+      controlPanel?.update(createPanelSnapshot(displayState));
+      hudBar?.update(displayState, runtime.status, measuredFps);
+    }
+  });
+
+  return {
+    runtime,
+    destroy(): void {
+      if (disposed) return;
+      disposed = true;
+      runtime.setSimTick(null);
+      window.removeEventListener("keydown", onViewKeyDown);
+      detachInput();
+      hudBar?.destroy();
+      controlPanel?.destroy();
+      flightHud.destroy();
+      aircraft?.dispose();
+      floatingOrigin?.dispose();
+      jsbsim.dispose();
+      runtime.destroy();
+      rootElement.innerHTML = "";
+    },
+  };
+}
