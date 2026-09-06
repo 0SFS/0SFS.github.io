@@ -17,6 +17,8 @@ export interface AircraftEntity {
   cockpit: TransformNode;
   firstPersonCamera: UniversalCamera;
   thirdPersonCamera: UniversalCamera;
+  orbitChaseCamera(yaw: number, pitch: number): void;
+  zoomChaseCamera(factor: number): void;
   setViewMode(mode: FlightViewMode): void;
   toggleViewMode(): FlightViewMode;
   getViewMode(): FlightViewMode;
@@ -75,6 +77,15 @@ export function createPlaceholderAircraft(scene: Scene, parent: TransformNode): 
   configureFlightCamera(thirdPersonCamera);
 
   let viewMode: FlightViewMode = "third";
+  let chaseYaw = 0;
+  let chasePitch = Math.atan2(THIRD_PERSON_OFFSET.y, -THIRD_PERSON_OFFSET.z);
+  let chaseDistance = THIRD_PERSON_OFFSET.length();
+  const updateChaseCamera = (): void => {
+    const horizontal = chaseDistance * Math.cos(chasePitch);
+    thirdPersonCamera.position.set(Math.sin(chaseYaw) * horizontal, Math.sin(chasePitch) * chaseDistance, -Math.cos(chaseYaw) * horizontal);
+    thirdPersonCamera.setTarget(Vector3.Zero());
+  };
+  updateChaseCamera();
 
   const setViewMode = (mode: FlightViewMode): void => {
     viewMode = mode;
@@ -91,6 +102,17 @@ export function createPlaceholderAircraft(scene: Scene, parent: TransformNode): 
     cockpit,
     firstPersonCamera,
     thirdPersonCamera,
+    orbitChaseCamera(yaw, pitch): void {
+      if (viewMode !== "third" || !Number.isFinite(yaw) || !Number.isFinite(pitch)) return;
+      chaseYaw = (chaseYaw + yaw) % (2 * Math.PI);
+      chasePitch = Math.max(-Math.PI / 3, Math.min(Math.PI * 0.45, chasePitch + pitch));
+      updateChaseCamera();
+    },
+    zoomChaseCamera(factor): void {
+      if (viewMode !== "third" || !Number.isFinite(factor) || factor <= 0) return;
+      chaseDistance = Math.max(8, Math.min(500, chaseDistance * factor));
+      updateChaseCamera();
+    },
     setViewMode,
     toggleViewMode(): FlightViewMode {
       setViewMode(viewMode === "first" ? "third" : "first");

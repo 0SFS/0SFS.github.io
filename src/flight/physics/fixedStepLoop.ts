@@ -50,8 +50,8 @@ export function createFixedStepPhysicsLoop(
     },
     reset(): void {
       accumulator = 0;
-      prevState = null;
-      currState = null;
+      currState = readFlightState(sdk);
+      prevState = currState;
     },
     getLatestState(): FlightState | null {
       return currState;

@@ -1,0 +1,75 @@
+// @vitest-environment jsdom
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { BabylonRuntimeStatus } from "foss-earth/runtime";
+import { createFlightHudBar } from "./createFlightHudBar";
+
+beforeEach(() => {
+  const values = new Map<string, string>();
+  vi.stubGlobal("localStorage", {
+    getItem: (key: string) => values.get(key) ?? null,
+    setItem: (key: string, value: string) => values.set(key, value),
+    clear: () => values.clear(),
+  });
+});
+afterEach(() => { document.body.replaceChildren(); window.localStorage.clear(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+describe("flight input method selector", () => {
+  it("loads the shared preference, offers only supported modes and persists selection", () => {
+    window.localStorage.setItem("foss-earth.inputMode", "mouse");
+    const container = document.createElement("div");
+    document.body.append(container);
+    const onInputModeChange = vi.fn();
+    let activityListener: (active: boolean) => void = () => {};
+    const unsubscribe = vi.fn();
+    const unsubscribeStreaming = vi.fn();
+    let streamingListener: (streaming: boolean) => void = () => {};
+    const hud = createFlightHudBar(container, {
+      renderActivity: {
+        getMapDownloadBytesPerSecond: () => 0,
+        onMapDownloadRateChange: () => vi.fn(),
+        isStreamingTiles: () => true,
+        onTilesStreamingChange: (listener) => { streamingListener = listener; return unsubscribeStreaming; },
+        isRendering: () => true,
+        onActiveRenderChange: (listener) => { activityListener = listener; return unsubscribe; },
+      },
+      rendererMode: "webgl2", rendererForce: null,
+      runtimeStatus: { mode: "fallback" } as BabylonRuntimeStatus, rasterSources: [],
+      onControlsClick: vi.fn(), onPausedChange: vi.fn(), onRendererChange: vi.fn(), onMapSourceChange: vi.fn(),
+      onInputModeChange, onInputSensitivityChange: vi.fn(),
+    });
+    expect(onInputModeChange).toHaveBeenLastCalledWith("mouse");
+    const button = container.querySelector<HTMLButtonElement>("#inputModeButton")!;
+    button.click();
+    expect(button.getAttribute("aria-expanded")).toBe("true");
+    expect(container.querySelectorAll("[data-mode]")).toHaveLength(2);
+    expect(container.querySelector("[data-mode=touch]")).toBeNull();
+    expect(container.querySelectorAll(".gesture-card")).toHaveLength(2);
+    container.querySelector<HTMLButtonElement>("[data-mode=trackpad]")!.click();
+    expect(onInputModeChange).toHaveBeenLastCalledWith("trackpad");
+    expect(window.localStorage.getItem("foss-earth.inputMode")).toBe("trackpad");
+    expect(button.getAttribute("aria-label")).toBe("Trackpad mode");
+    expect(container.querySelector('[aria-label="Two-finger swipe to orbit"]')).not.toBeNull();
+    document.body.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+    expect(button.getAttribute("aria-expanded")).toBe("false");
+    const rendererButton = container.querySelector<HTMLElement>("#flightRendererButton")!;
+    expect(rendererButton.classList.contains("is-rendering")).toBe(true);
+    activityListener(false);
+    expect(rendererButton.dataset.renderState).toBe("idle");
+    expect(rendererButton.classList.contains("is-rendering")).toBe(false);
+    activityListener(true);
+    expect(rendererButton.dataset.renderState).toBe("rendering");
+    const mapButton = container.querySelector<HTMLElement>("#flightMapSourceButton")!;
+    expect(mapButton.querySelector(".map-download-speed")?.textContent).toBe("000\nMB/s");
+    expect(mapButton.classList.contains("is-streaming")).toBe(true);
+    activityListener(false);
+    expect(mapButton.classList.contains("is-streaming")).toBe(true);
+    streamingListener(false);
+    expect(mapButton.classList.contains("is-streaming")).toBe(false);
+    streamingListener(true);
+    expect(mapButton.classList.contains("is-streaming")).toBe(true);
+    hud.destroy();
+    expect(unsubscribeStreaming).toHaveBeenCalledOnce();
+    expect(mapButton.classList.contains("is-streaming")).toBe(false);
+    expect(unsubscribe).toHaveBeenCalledOnce();
+    expect(container.children).toHaveLength(0);
+  });
+});

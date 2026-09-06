@@ -1,14 +1,19 @@
+import type { HudInputMode, InputSensitivitySettings } from "foss-earth/input";
 import "foss-earth/shell.css";
+import "foss-earth/input-mode.css";
 
-import { createHudBar, type HudBarHandle } from "foss-earth/shell";
+import { attachRendererActivity, attachTileStreamingActivity, attachMapDownloadSpeed, setMapSourceLabel, createInputModeHud, createHudBar, type HudBarHandle, type RenderActivitySource, type TileStreamingSource, type MapDownloadSource } from "foss-earth/shell";
 import type { BabylonRuntimeStatus, RasterBaseMapSource, RendererMode } from "foss-earth/runtime";
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
 
 export interface FlightHudBarOptions {
+  renderActivity: RenderActivitySource & TileStreamingSource & MapDownloadSource;
   rendererMode: RendererMode;
   rendererForce: RendererMode | null;
   runtimeStatus: BabylonRuntimeStatus;
   rasterSources: readonly RasterBaseMapSource[];
+  onInputModeChange(mode: HudInputMode): void;
+  onInputSensitivityChange(settings: InputSensitivitySettings): void;
   onControlsClick(): void;
   onPausedChange(paused: boolean): void;
   onRendererChange(mode: RendererMode | null): void;
@@ -86,6 +91,20 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     throw new Error("Flight HUD bar failed to mount.");
   }
 
+  const detachDownloadSpeed = attachMapDownloadSpeed(mapButton, options.renderActivity);
+  const detachTileStreaming = attachTileStreamingActivity(mapButton, options.renderActivity);
+  const detachRendererActivity = attachRendererActivity(rendererButton, options.renderActivity);
+  const inputHud = createInputModeHud(container, pauseButton, {
+    availableModes: new Set(["mouse", "trackpad"]),
+    movements: ["orbit", "zoom"],
+    trackpadOrbitGesture: "swipe",
+    gestureDescription: (mode, movement) => movement === "orbit"
+      ? (mode === "mouse" ? "Right-click drag to orbit" : "Two-finger swipe to orbit")
+      : (mode === "mouse" ? "Mouse wheel to zoom" : "Pinch to zoom"),
+    onModeChange: options.onInputModeChange,
+    onSensitivityChange: options.onInputSensitivityChange,
+  });
+
   rendererButton.classList.toggle("hud-chip--good", options.rendererMode === "webgpu");
   rendererButton.classList.toggle("hud-chip--bad", options.rendererMode !== "webgpu");
   rendererMenu.querySelectorAll<HTMLElement>("[data-renderer]").forEach((button) => {
@@ -93,7 +112,7 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
   });
 
   const updateMapState = (status: BabylonRuntimeStatus): void => {
-    mapButton.textContent = mapSourceLabel(status);
+    setMapSourceLabel(mapButton, mapSourceLabel(status));
     mapButton.classList.toggle("hud-chip--fallback", status.mode === "fallback");
     mapButton.classList.toggle("hud-chip--raster", status.mode === "raster-basemap");
     const activeSource = status.mode === "google-tiles" ? "google" : status.rasterBaseMap?.id;
@@ -171,6 +190,10 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
       mapButton.removeEventListener("click", onMapClick);
       mapMenu.removeEventListener("click", onMapMenuClick);
       document.removeEventListener("pointerdown", onDocumentPointerDown);
+      detachDownloadSpeed();
+      detachTileStreaming();
+      detachRendererActivity();
+      inputHud.destroy();
       hudBar.destroy();
     },
   };

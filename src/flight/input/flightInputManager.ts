@@ -39,7 +39,7 @@ export interface FlightInputManager {
   isPaused(): boolean;
 }
 
-export function createFlightInputManager(): FlightInputManager {
+export function createFlightInputManager(options: { onPausedChange?: (paused: boolean) => void } = {}): FlightInputManager {
   const keysDown = new Set<string>();
   let smoothed: ControlSurfaceState = {
     elevator: 0,
@@ -52,6 +52,11 @@ export function createFlightInputManager(): FlightInputManager {
   };
   let throttleTarget = INITIAL_THROTTLE;
   let paused = false;
+  const setPaused = (value: boolean): void => {
+    if (paused === value) return;
+    paused = value;
+    options.onPausedChange?.(paused);
+  };
 
   const targetFromKeyboard = (dt: number): ControlSurfaceState => {
     const target: ControlSurfaceState = {
@@ -111,7 +116,8 @@ export function createFlightInputManager(): FlightInputManager {
     attach(target: Window): () => void {
       const onKeyDown = (event: KeyboardEvent): void => {
         if (event.code === "KeyP") {
-          paused = !paused;
+          if (event.repeat) return;
+          setPaused(!paused);
           event.preventDefault();
           return;
         }
@@ -170,9 +176,7 @@ export function createFlightInputManager(): FlightInputManager {
     setPitchTrim(value: number): void {
       smoothed.pitchTrim = Math.min(1, Math.max(-1, value));
     },
-    setPaused(value: boolean): void {
-      paused = value;
-    },
+    setPaused,
     isPaused(): boolean {
       return paused;
     },

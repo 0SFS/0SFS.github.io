@@ -1,3 +1,8 @@
+import "foss-earth/shell.css";
+import "foss-earth/windowing.css";
+import type { LocationSearchProvider, GeodeticLocation } from "foss-earth/windowing";
+import { resetFlightLocation } from "./jsbsim/resetFlightLocation";
+import { loadInputModePreference, loadInputSensitivityPreference } from "foss-earth/input";
 import "../styles/flight.css";
 
 import {
@@ -19,6 +24,7 @@ import {
 import { createFlightControlPanel } from "./hud/createFlightControlPanel";
 import { createFlightHud, type FlightHudHandle } from "./hud/flightHud";
 import { createFlightHudBar, type FlightHudBarHandle } from "./hud/createFlightHudBar";
+import { attachFlightCameraInput } from "./input/flightCameraInput";
 import { createFlightInputManager } from "./input/flightInputManager";
 import { createJsbsimRuntime } from "./jsbsim/createJsbsimRuntime";
 import { createFixedStepPhysicsLoop } from "./physics/fixedStepLoop";
@@ -28,6 +34,7 @@ export interface FlightSimAppOptions {
   baseMap?: string | RasterBaseMapSource | null;
   preferGoogleTiles?: boolean;
   dataBaseUrl?: string;
+  locationSearchProvider?: LocationSearchProvider;
 }
 
 export interface FlightSimAppHandle {
@@ -102,18 +109,35 @@ export async function createFlightSimApp(
     },
   });
 
-  const inputManager = createFlightInputManager();
+  const inputManager = createFlightInputManager({ onPausedChange: (paused) => syncSimulationPaused(paused) });
   const detachInput = inputManager.attach(window);
   const physicsLoop = createFixedStepPhysicsLoop(jsbsim.sdk);
   const flightHud: FlightHudHandle = createFlightHud(hudRoot, {
-    onThrottleChange: (value) => inputManager.setThrottle(value),
-    onPitchTrimChange: (value) => inputManager.setPitchTrim(value),
+    onThrottleChange: (value) => { inputManager.setThrottle(value); runtime.requestRender(); },
+    onPitchTrimChange: (value) => { inputManager.setPitchTrim(value); runtime.requestRender(); },
   });
 
   let floatingOrigin: FloatingOriginHandle | null = null;
   let aircraft: ReturnType<typeof createPlaceholderAircraft> | null = null;
   let controlPanel: FlightControlPanelHandle | null = null;
   let hudBar: FlightHudBarHandle | null = null;
+  let inputMode = loadInputModePreference(new Set(["mouse", "trackpad"]));
+  let inputSensitivity = loadInputSensitivityPreference();
+  const detachCameraInput = attachFlightCameraInput(canvas, {
+    getMode: () => inputMode,
+    getSensitivity: () => inputSensitivity,
+    orbit: (yaw, pitch) => {
+      if (!aircraft || aircraft.getViewMode() !== "third") return;
+      aircraft.orbitChaseCamera(yaw, pitch);
+      runtime.requestRender();
+    },
+    zoom: (factor) => {
+      if (!aircraft || aircraft.getViewMode() !== "third") return;
+      aircraft.zoomChaseCamera(factor);
+      runtime.requestRender();
+    },
+  });
+  let skipResumeDelta = false;
   let disposed = false;
   let lastPanelUpdateMs = 0;
   let fpsSampleStartedMs = performance.now();
@@ -141,6 +165,7 @@ export async function createFlightSimApp(
 
   const toggleCameraView = (): void => {
     aircraft?.toggleViewMode();
+    runtime.requestRender();
   };
 
   const onViewKeyDown = (event: KeyboardEvent): void => {
@@ -163,10 +188,15 @@ export async function createFlightSimApp(
     rendererMode: runtime.renderer.mode,
   });
 
-  const setSimulationPaused = (paused: boolean): void => {
-    inputManager.setPaused(paused);
+  const syncSimulationPaused = (paused: boolean): void => {
     physicsLoop.setPaused(paused);
+    runtime.setSimRunning(!paused);
+    skipResumeDelta = !paused;
+    const state = physicsLoop.getLatestState() ?? initialState;
+    controlPanel?.update(createPanelSnapshot(state));
+    hudBar?.update(state, runtime.status, paused ? null : measuredFps, paused);
   };
+  const setSimulationPaused = (paused: boolean): void => inputManager.setPaused(paused);
 
   const applyWeather = (nextWeather: FlightWeatherState): void => {
     weather.windDirectionDeg = nextWeather.windDirectionDeg;
@@ -177,19 +207,45 @@ export async function createFlightSimApp(
     jsbsim.sdk.setPropertyValue("atmosphere/wind-east-fps", -Math.sin(directionRad) * speedFps);
   };
 
+  const teleportToLocation = (location: GeodeticLocation): void => {
+    if (disposed) return;
+    const state = resetFlightLocation(jsbsim.sdk, location);
+    physicsLoop.reset();
+    skipResumeDelta = true;
+    applyWeather(weather);
+    // Aircraft and chase camera stay at the local origin; shift the ECEF world
+    // into the new ENU frame before requesting the first destination frame.
+    mountFlightWorld();
+    floatingOrigin?.apply(state);
+    runtime.setSimViewState({
+      latDeg: state.latDeg, lonDeg: state.lonDeg,
+      zoomMeters: zoomMetersFromAltitude(state.altMeters),
+      headingDeg: state.headingRad * 180 / Math.PI,
+    });
+    flightHud.update(state, inputManager.poll(0).pitchTrim);
+    controlPanel?.update(createPanelSnapshot(state));
+    hudBar?.update(state, runtime.status, measuredFps, inputManager.isPaused());
+    runtime.requestRender();
+  };
+
   controlPanel = createFlightControlPanel(panelRoot, createPanelSnapshot(), {
     initialWeather: weather,
+    onLocationApply: teleportToLocation,
+    locationSearchProvider: options.locationSearchProvider,
     onWeatherChange: applyWeather,
     onPausedChange: setSimulationPaused,
-    onViewModeChange: (mode) => aircraft?.setViewMode(mode),
+    onViewModeChange: (mode) => { aircraft?.setViewMode(mode); runtime.requestRender(); },
   });
-  panelRoot.hidden = true;
+  panelRoot.hidden = false;
   const rendererForce = getRendererForceFromUrl();
   hudBar = createFlightHudBar(shellRoot, {
+    renderActivity: runtime,
     rendererMode: runtime.renderer.mode,
     rendererForce,
     runtimeStatus: runtime.status,
     rasterSources: RASTER_BASE_MAP_SOURCES,
+    onInputModeChange: (mode) => { inputMode = mode; },
+    onInputSensitivityChange: (settings) => { inputSensitivity = settings; },
     onControlsClick: () => {
       panelRoot.hidden = !panelRoot.hidden;
     },
@@ -205,6 +261,9 @@ export async function createFlightSimApp(
 
   runtime.setSimTick((deltaSeconds) => {
     if (disposed) return;
+    // Do not integrate the time spent idle when resuming the simulation.
+    deltaSeconds = skipResumeDelta ? 0 : Math.min(deltaSeconds, 0.1);
+    skipResumeDelta = false;
 
     fpsSampleFrames += 1;
     const frameNow = performance.now();
@@ -236,7 +295,7 @@ export async function createFlightSimApp(
     if (now - lastPanelUpdateMs >= 100) {
       lastPanelUpdateMs = now;
       controlPanel?.update(createPanelSnapshot(displayState));
-      hudBar?.update(displayState, runtime.status, measuredFps, inputManager.isPaused());
+      hudBar?.update(displayState, runtime.status, inputManager.isPaused() ? null : measuredFps, inputManager.isPaused());
     }
   });
 
@@ -247,6 +306,7 @@ export async function createFlightSimApp(
       disposed = true;
       runtime.setSimTick(null);
       window.removeEventListener("keydown", onViewKeyDown);
+      detachCameraInput();
       detachInput();
       hudBar?.destroy();
       controlPanel?.destroy();

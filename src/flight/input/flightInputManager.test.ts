@@ -66,6 +66,22 @@ describe("flightInputManager keyboard roll", () => {
     expect(input.poll(1 / 60).throttle).toBe(expected);
   });
 
+  it("notifies pause changes immediately from keyboard and UI, including when rendering is idle", () => {
+    const onPausedChange = vi.fn();
+    const input = createFlightInputManager({ onPausedChange });
+    const detach = input.attach(window);
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyP" }));
+    expect(onPausedChange).toHaveBeenLastCalledWith(true);
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyP", repeat: true }));
+    expect(onPausedChange).toHaveBeenCalledTimes(1);
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyP" }));
+    expect(onPausedChange).toHaveBeenLastCalledWith(false);
+    input.setPaused(true);
+    input.setPaused(true);
+    expect(onPausedChange).toHaveBeenCalledTimes(3);
+    detach();
+  });
+
   it("raises throttle while Shift is held", () => {
     const input = createFlightInputManager();
     const detach = input.attach(window);

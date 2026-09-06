@@ -19,3 +19,15 @@ describe("fixedStepPhysicsLoop pause", () => {
     expect(pausedState).toEqual(runningState);
   });
 });
+
+it("seeds interpolation with the new position on reset, including while paused", () => {
+  let latitude = 10;
+  const sdk = { run: () => true, getPropertyValue: (key: string) => key === "position/lat-geod-deg" ? latitude : 0 } as unknown as JSBSimSdk;
+  const loop = createFixedStepPhysicsLoop(sdk);
+  loop.update(FIXED_DT, () => {});
+  latitude = 46.7867;
+  loop.reset();
+  expect(loop.update(0, () => {}).latDeg).toBe(latitude);
+  loop.setPaused(true);
+  expect(loop.update(10, () => {}).latDeg).toBe(latitude);
+});

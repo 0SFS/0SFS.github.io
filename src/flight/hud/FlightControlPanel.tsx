@@ -1,17 +1,16 @@
 import "foss-earth/windowing.css";
 
 import {
-  availableWindowTabs,
-  DockPanel,
-  TabStrip,
+  WorkspaceDockSlot,
+  LocationPanel,
+  type GeodeticLocation,
+  type LocationSearchProvider,
   useWindowWorkspace,
   type WindowTabDefinition,
 } from "foss-earth/windowing";
 import {
   Bug,
-  ChevronLeft,
   CloudSun,
-  Crosshair,
   Gauge,
   MapPinned,
   Pause,
@@ -57,6 +56,8 @@ export interface FlightControlPanelSnapshot {
 
 export interface FlightControlPanelOptions {
   initialWeather: FlightWeatherState;
+  onLocationApply(location: GeodeticLocation): void;
+  locationSearchProvider?: LocationSearchProvider;
   onWeatherChange(weather: FlightWeatherState): void;
   onPausedChange(paused: boolean): void;
   onViewModeChange(mode: FlightViewMode): void;
@@ -165,26 +166,6 @@ function AircraftPanel({ snapshot, onPausedChange, onViewModeChange }: FlightCon
   );
 }
 
-function LocationPanel({ snapshot }: FlightControlPanelProps) {
-  return (
-    <div className="flight-panel__content">
-      <div className="flight-panel__coordinates">
-        <Crosshair size={20} aria-hidden="true" />
-        <div>
-          <strong>{snapshot.flightState.latDeg.toFixed(5)}, {snapshot.flightState.lonDeg.toFixed(5)}</strong>
-          <span>{Math.round(snapshot.flightState.altMeters)} m MSL</span>
-        </div>
-      </div>
-      <div className="flight-panel__metrics">
-        <Metric label="Latitude" value={`${Math.abs(snapshot.flightState.latDeg).toFixed(4)}°${snapshot.flightState.latDeg >= 0 ? "N" : "S"}`} />
-        <Metric label="Longitude" value={`${Math.abs(snapshot.flightState.lonDeg).toFixed(4)}°${snapshot.flightState.lonDeg >= 0 ? "E" : "W"}`} />
-        <Metric label="Altitude MSL" value={`${Math.round(snapshot.flightState.altMeters / 0.3048).toLocaleString()} ft`} />
-        <Metric label="Heading" value={`${Math.round(headingDegFromRad(snapshot.flightState.headingRad))}°`} />
-      </div>
-    </div>
-  );
-}
-
 function DebugPanel({ snapshot }: Pick<FlightControlPanelProps, "snapshot">) {
   return (
     <div className="flight-panel__content">
@@ -203,11 +184,9 @@ function DebugPanel({ snapshot }: Pick<FlightControlPanelProps, "snapshot">) {
 }
 
 export function FlightControlPanel(props: FlightControlPanelProps) {
-  const workspace = useWindowWorkspace<FlightPanelTab>({ primaryTabs: ["aircraft", "location"] });
+  const workspace = useWindowWorkspace<FlightPanelTab>({ primaryTabs: ["aircraft"] });
   const [addMenuOpen, setAddMenuOpen] = useState(false);
   const slot = workspace.state.primary;
-  const allTabs = availableWindowTabs(TAB_DEFINITIONS);
-  const availableTabs = allTabs.filter((tabId) => !workspace.allOpenTabs.includes(tabId));
   const activeTab = slot.activeTab;
 
   useEffect(() => {
@@ -221,73 +200,65 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
     : activeTab === "aircraft"
       ? <AircraftPanel {...props} />
       : activeTab === "location"
-        ? <LocationPanel {...props} />
+        ? <LocationPanel initialLocation={props.snapshot.flightState} onApply={props.onLocationApply} searchProvider={props.locationSearchProvider} />
         : activeTab === "debug"
           ? <DebugPanel snapshot={props.snapshot} />
           : null;
 
-  const header = slot.collapsed ? (
-    <button className="flight-panel__restore" type="button" title="Open flight controls" aria-label="Open flight controls" onClick={() => workspace.setCollapsed("primary", false)}>
-      <ChevronLeft size={19} />
-    </button>
-  ) : (
-    <TabStrip
-      openTabs={slot.tabs}
-      activeTab={activeTab}
-      availableTabs={availableTabs}
-      addMenuOpen={addMenuOpen}
-      side="right"
-      compact
-      onSelectTab={(tabId) => workspace.selectTab("primary", tabId)}
-      onCloseTab={(tabId) => workspace.closeTab("primary", tabId)}
-      onOpenTab={(tabId) => workspace.openTab("primary", tabId, TAB_DEFINITIONS)}
-      onAddMenuOpenChange={setAddMenuOpen}
-      getLabel={getTabLabel}
-      renderAddButtonContent={<Plus size={16} />}
-      renderCloseButtonContent={() => <X size={13} />}
-      classNames={{
-        tabButton: "flight-panel__tab-button",
-        tabShellSelected: "is-selected",
-        closeButton: "flight-panel__tab-close",
-        addButton: "flight-panel__add-button",
-        addMenu: "flight-panel__menu",
-        addMenuItem: "flight-panel__menu-item",
-        addMenuEmpty: "flight-panel__menu-empty",
-      }}
-    />
-  );
-
   const ActiveIcon = activeTab ? TAB_ICONS[activeTab] : Plane;
 
   return (
-    <DockPanel
+    <WorkspaceDockSlot
       side="right"
+      slotId="primary"
+      workspaceState={workspace.state}
+      onWorkspaceStateChange={workspace.setState}
+      tabDefinitions={TAB_DEFINITIONS}
+      getTabLabel={getTabLabel}
+      restoreOnTabSelect
+      restoreOnTabOpen
       width={slot.width ?? 380}
       maxWidth={520}
-      onWidthChange={(width) => workspace.setSize("primary", { width })}
-      collapsed={slot.collapsed}
-      onCollapsedChange={(collapsed) => workspace.setCollapsed("primary", collapsed)}
       addMenuOpen={addMenuOpen}
-      header={header}
-      topOffsetPx={18}
-      minWidth={300}
-      initialHeight={560}
+      onAddMenuOpenChange={setAddMenuOpen}
+      renderLauncherButtonContent={<Plus size={16} />}
+      renderTabAddButtonContent={<Plus size={16} />}
+      renderTabCloseButtonContent={() => <X size={13} />}
+      dockPanelProps={{ topOffsetPx: 18, minWidth: 300, initialHeight: 560 }}
       classNames={{
-        container: "flight-panel",
-        expanded: "flight-panel--expanded",
-        collapsed: "flight-panel--collapsed",
-        raisedZ: "flight-panel--raised",
-        header: "flight-panel__header",
-        body: "flight-panel__body",
-        resizeHandle: "flight-panel__resize",
-        resizeDots: "flight-panel__resize-dots",
+        dockPanel: {
+          container: "flight-panel",
+          expanded: "flight-panel--expanded",
+          collapsed: "flight-panel--collapsed",
+          raisedZ: "flight-panel--raised",
+          header: "flight-panel__header",
+          body: "flight-panel__body",
+          resizeHandle: "flight-panel__resize",
+          resizeDots: "flight-panel__resize-dots",
+        },
+        tabStrip: {
+          tabButton: "flight-panel__tab-button",
+          tabShellSelected: "is-selected",
+          closeButton: "flight-panel__tab-close",
+          addButton: "flight-panel__add-button",
+          addMenu: "flight-panel__menu",
+          addMenuItem: "flight-panel__menu-item",
+          addMenuEmpty: "flight-panel__menu-empty",
+        },
+        panelLauncher: {
+          button: "flight-panel__add-button flight-panel__launcher-button",
+          menu: "flight-panel__menu",
+          menuItem: "flight-panel__menu-item",
+          menuEmpty: "flight-panel__menu-empty",
+        },
       }}
-    >
-      <div className="flight-panel__title">
-        <ActiveIcon size={17} aria-hidden="true" />
-        <span>{activeTab ? getTabLabel(activeTab) : "Flight controls"}</span>
-      </div>
-      {content}
-    </DockPanel>
+      renderTabContent={() => <>
+        <div className="flight-panel__title">
+          <ActiveIcon size={17} aria-hidden="true" />
+          <span>{activeTab ? getTabLabel(activeTab) : "Flight controls"}</span>
+        </div>
+        {content}
+      </>}
+    />
   );
 }

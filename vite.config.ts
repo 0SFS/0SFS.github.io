@@ -29,6 +29,7 @@ const sourceVersion = `${sourceCommit}${sourceDirty ? '-dirty' : ''}`
 // https://vite.dev/config/
 export default defineConfig({
   base,
+  server: { fs: { allow: [".", "../foss-earth"] } },
   resolve: {
     dedupe: ['@babylonjs/core', '@babylonjs/loaders', '3d-tiles-renderer', 'react', 'react-dom'],
   },

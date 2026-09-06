@@ -1,4 +1,4 @@
-import{t as e}from"./index-DY79YLSm.js";var t=`selectionPixelShader`,n=`#ifdef INSTANCES
+import{Xo as e}from"./mapDownloadHud-BoTPDrPy.js";var t=`selectionPixelShader`,n=`#ifdef INSTANCES
 flat varying float vSelectionId;
 #else
 uniform float selectionId;

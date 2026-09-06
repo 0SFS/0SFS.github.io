@@ -139,6 +139,10 @@
   position: absolute;
 }
 
+.flight-shell-root .input-mode-sensitivity-panel {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .flight-shell-root .flight-shell-controls-button {
   font-size: 16px;
 }
@@ -170,9 +174,8 @@
 }
 
 .flight-panel--collapsed {
-  border: 0;
-  background: transparent;
-  box-shadow: none;
+  max-width: calc(100vw - 24px);
+  height: 44px;
 }
 
 .flight-panel__header {
@@ -541,23 +544,18 @@
   cursor: nesw-resize;
 }
 
-.flight-panel__restore {
-  display: grid;
-  width: 42px;
-  height: 42px;
+.flight-panel__launcher-button {
   border: 1px solid var(--flight-panel-line);
   border-radius: 4px;
-  place-items: center;
   background: var(--flight-panel-bg);
-  color: var(--flight-panel-accent);
-  cursor: pointer;
+  color: var(--flight-panel-text);
 }
 
 @media (max-width: 720px) {
   .flight-panel {
-    top: auto !important;
+    top: 8px !important;
     right: 8px !important;
-    bottom: 8px;
+    bottom: auto;
     left: 8px !important;
     width: auto !important;
     max-width: none !important;
@@ -566,10 +564,10 @@
 
   .flight-panel--collapsed {
     right: 8px !important;
-    bottom: 16px;
-    left: auto !important;
-    width: 42px !important;
-    height: 42px !important;
+    bottom: auto;
+    left: 8px !important;
+    width: auto !important;
+    height: 44px !important;
   }
 
   .flight-hud__attitude {

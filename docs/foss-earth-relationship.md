@@ -45,6 +45,10 @@ Flight Sim imports only public FOSS Earth package exports:
 
 The shell is adapted in `src/flight/hud/createFlightHudBar.ts`. The windowing primitives are composed with flight-specific Weather, Aircraft, Location, and Debug content in `src/flight/hud/FlightControlPanel.tsx`.
 
+Location content uses `LocationPanel` from `foss-earth/windowing`. Its structured `onApply` callback reaches Flight Sim’s `resetFlightLocation`, which resets the loaded JSBSim aircraft at geodetic coordinates while retaining altitude, airspeed, and heading. The app reseeds physics interpolation and updates the ECEF/ENU floating origin and map view immediately, including while paused.
+
+FOSS Earth currently has no place-search provider. Coordinate entry is available without an API key; hosts can supply a structured `locationSearchProvider` through `FlightSimAppOptions`. The default app honestly shows search as unavailable.
+
 Flight controls, JSBSim integration, aircraft behavior, instruments, and flight-specific UI remain local to Flight Sim.
 
 ## Updating From Upstream
