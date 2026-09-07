@@ -1,8 +1,26 @@
-import { NullEngine, Scene, TransformNode } from "@babylonjs/core";
+import { NullEngine, Scene, TransformNode, Vector3 } from "@babylonjs/core";
 import { describe, expect, it } from "vitest";
+import { flightAttitudeToQuaternion } from "../bridge/ecefBridge";
 import { createPlaceholderAircraft } from "./createPlaceholderAircraft";
 
 describe("aircraft chase camera", () => {
+  it.each([0, Math.PI / 2, Math.PI, 3 * Math.PI / 2])("keeps both cameras facing heading %s with east on the correct side", (heading) => {
+    const engine = new NullEngine();
+    const scene = new Scene(engine);
+    scene.useRightHandedSystem = true;
+    const origin = new TransformNode("origin", scene);
+    origin.rotationQuaternion = flightAttitudeToQuaternion(0, 0, heading);
+    const aircraft = createPlaceholderAircraft(scene, origin);
+    const forward = new Vector3(Math.sin(heading), 0, -Math.cos(heading));
+    const right = new Vector3(Math.cos(heading), 0, Math.sin(heading));
+    for (const camera of [aircraft.firstPersonCamera, aircraft.thirdPersonCamera]) {
+      const view = camera.getViewMatrix(true);
+      expect(Vector3.TransformNormal(forward, view).z).toBeLessThan(-0.9);
+      expect(Vector3.TransformNormal(right, view).x).toBeCloseTo(1, 5);
+    }
+    aircraft.dispose(); scene.dispose(); engine.dispose();
+  });
+
   it("orbits locally, clamps pitch/distance, and ignores gestures in cockpit view", () => {
     const engine = new NullEngine();
     const scene = new Scene(engine);

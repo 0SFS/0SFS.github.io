@@ -33,10 +33,11 @@ describe("flight input method selector", () => {
       },
       rendererMode: "webgl2", rendererForce: null,
       runtimeStatus: { mode: "fallback" } as BabylonRuntimeStatus, rasterSources: [],
-      onControlsClick: vi.fn(), onPausedChange: vi.fn(), onRendererChange: vi.fn(), onMapSourceChange: vi.fn(),
+      onPausedChange: vi.fn(), onRendererChange: vi.fn(), onMapSourceChange: vi.fn(),
       onInputModeChange, onInputSensitivityChange: vi.fn(),
     });
     expect(onInputModeChange).toHaveBeenLastCalledWith("mouse");
+    expect(container.querySelector("#flightControlsButton")).toBeNull();
     const button = container.querySelector<HTMLButtonElement>("#inputModeButton")!;
     button.click();
     expect(button.getAttribute("aria-expanded")).toBe("true");
@@ -58,7 +59,7 @@ describe("flight input method selector", () => {
     activityListener(true);
     expect(rendererButton.dataset.renderState).toBe("rendering");
     const mapButton = container.querySelector<HTMLElement>("#flightMapSourceButton")!;
-    expect(mapButton.querySelector(".map-download-speed")?.textContent).toBe("000\nMB/s");
+    expect(mapButton.querySelector(".map-download-speed")?.textContent).toBe("000MB/s");
     expect(mapButton.classList.contains("is-streaming")).toBe(true);
     activityListener(false);
     expect(mapButton.classList.contains("is-streaming")).toBe(true);

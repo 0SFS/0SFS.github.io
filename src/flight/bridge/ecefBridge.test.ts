@@ -11,7 +11,7 @@ describe("flightAttitudeToQuaternion", () => {
     const forward = Vector3.Zero();
     aircraftNose.rotateByQuaternionToRef(attitude, forward);
     expect(forward.x).toBeCloseTo(0, 5);
-    expect(forward.z).toBeCloseTo(1, 5);
+    expect(forward.z).toBeCloseTo(-1, 5);
   });
 
   it("points the aircraft nose east at a 90 degree heading", () => {
@@ -32,7 +32,7 @@ describe("flightAttitudeToQuaternion", () => {
   it("banks the model right for positive JSBSim roll", () => {
     const attitude = flightAttitudeToQuaternion(Math.PI / 6, 0, 0);
     const wingAxis = Vector3.Zero();
-    new Vector3(1, 0, 0).rotateByQuaternionToRef(attitude, wingAxis);
+    new Vector3(-1, 0, 0).rotateByQuaternionToRef(attitude, wingAxis);
     expect(wingAxis.y).toBeCloseTo(-0.5, 5);
   });
 

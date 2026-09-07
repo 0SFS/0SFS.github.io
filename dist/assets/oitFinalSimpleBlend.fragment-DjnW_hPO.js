@@ -1,3 +1,3 @@
-import{Xo as e}from"./mapDownloadHud-BoTPDrPy.js";var t=`oitFinalSimpleBlendPixelShader`,n=`var uFrontColor: texture_2d<f32>;@fragment
+import{Qo as e}from"./shell-CCQlqYO5.js";var t=`oitFinalSimpleBlendPixelShader`,n=`var uFrontColor: texture_2d<f32>;@fragment
 fn main(input: FragmentInputs)->FragmentOutputs {var fragCoord: vec2i=vec2i(fragmentInputs.position.xy);var frontColor: vec4f=textureLoad(uFrontColor,fragCoord,0);fragmentOutputs.color=frontColor;}
 `;e.ShadersStoreWGSL[t]||(e.ShadersStoreWGSL[t]=n);var r={name:t,shader:n};export{r as oitFinalSimpleBlendPixelShaderWGSL};

@@ -4,6 +4,26 @@ import { geodeticToEcef } from "foss-earth/cameraMath";
 import { buildEcefToEnuMatrix, buildWorldShiftMatrix } from "./enuFrame";
 
 describe("enuFrame", () => {
+  it.each([[0, 0], [0.7, -1.2], [-0.6, 2.4]])(
+    "preserves orientation and maps geographic directions at %s, %s",
+    (latRad, lonRad) => {
+      const east = new Vector3(-Math.sin(lonRad), Math.cos(lonRad), 0);
+      const north = new Vector3(-Math.sin(latRad) * Math.cos(lonRad), -Math.sin(latRad) * Math.sin(lonRad), Math.cos(latRad));
+      const up = new Vector3(Math.cos(latRad) * Math.cos(lonRad), Math.cos(latRad) * Math.sin(lonRad), Math.sin(latRad));
+      const enu = buildEcefToEnuMatrix(latRad, lonRad);
+      const shift = buildWorldShiftMatrix(latRad, lonRad, 3048);
+      expect(shift.determinant()).toBeCloseTo(1, 5);
+      for (const [direction, expectedEnu, expectedWorld] of [
+        [east, new Vector3(1, 0, 0), new Vector3(1, 0, 0)],
+        [north, new Vector3(0, 1, 0), new Vector3(0, 0, -1)],
+        [up, new Vector3(0, 0, 1), new Vector3(0, 1, 0)],
+      ]) {
+        expect(Vector3.Distance(Vector3.TransformNormal(direction, enu), expectedEnu)).toBeLessThan(1e-6);
+        expect(Vector3.Distance(Vector3.TransformNormal(direction, shift), expectedWorld)).toBeLessThan(1e-6);
+      }
+    },
+  );
+
   it("maps the reference ECEF position to the origin", () => {
     const latRad = (44.977753 * Math.PI) / 180;
     const lonRad = (-93.265011 * Math.PI) / 180;
@@ -36,6 +56,8 @@ describe("enuFrame", () => {
     const shift = buildWorldShiftMatrix(latRad, lonRad, altMeters);
     const ground = geodeticToEcef(latRad, lonRad, 0);
     const localGround = Vector3.TransformCoordinates(new Vector3(ground.x, ground.y, ground.z), shift);
-    expect(localGround.y).toBeLessThan(-100);
+    expect(localGround.x).toBeCloseTo(0, 0);
+    expect(localGround.y).toBeCloseTo(-altMeters, 0);
+    expect(localGround.z).toBeCloseTo(0, 0);
   });
 });

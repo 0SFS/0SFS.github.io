@@ -11,8 +11,8 @@ vi.mock("./flight/createFlightSimApp", () => ({
   createFlightSimApp: appMocks.createFlightSimApp,
 }));
 
-vi.mock("foss-earth", () => ({
-  createGlobeApp: appMocks.createGlobeApp,
+vi.mock("./compat/createGlobeModeApp", () => ({
+  createGlobeModeApp: appMocks.createGlobeApp,
 }));
 
 beforeEach(() => {

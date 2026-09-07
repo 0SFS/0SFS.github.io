@@ -18,8 +18,9 @@ export function readFlightState(sdk: JSBSimSdk): FlightState {
 
 /**
  * Convert JSBSim NED body attitude (phi, theta, psi) to a Babylon quaternion.
- * The aircraft model uses +X right, +Y up, and +Z nose-forward.
+ * The aircraft model uses +X left, +Y up, and +Z nose-forward.
+ * World axes are east/up/south, so north is -Z and headings turn toward +X.
  */
 export function flightAttitudeToQuaternion(rollRad: number, pitchRad: number, headingRad: number): Quaternion {
-  return Quaternion.RotationYawPitchRoll(headingRad, -pitchRad, -rollRad);
+  return Quaternion.RotationYawPitchRoll(Math.PI - headingRad, -pitchRad, rollRad);
 }

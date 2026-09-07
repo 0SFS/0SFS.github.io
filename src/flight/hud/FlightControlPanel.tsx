@@ -1,42 +1,35 @@
 import "foss-earth/windowing.css";
 
+import { WindowOverlay } from "foss-earth/shell";
 import {
-  WorkspaceDockSlot,
-  LocationPanel,
   type GeodeticLocation,
   type LocationSearchProvider,
-  useWindowWorkspace,
   type WindowTabDefinition,
 } from "foss-earth/windowing";
 import {
   Bug,
   CloudSun,
   Gauge,
-  MapPinned,
   Pause,
   Play,
   Plane,
-  Plus,
-  X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { BabylonRuntimeStatus, RendererMode } from "foss-earth/runtime";
 import type { FlightViewMode } from "../aircraft/createPlaceholderAircraft";
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
 
-type FlightPanelTab = "weather" | "aircraft" | "location" | "debug";
+type FlightPanelTab = "weather" | "aircraft" | "debug";
 
 const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "weather", label: "Weather" },
   { id: "aircraft", label: "Aircraft" },
-  { id: "location", label: "Location" },
   { id: "debug", label: "Debug" },
 ];
 
 const TAB_ICONS = {
   weather: CloudSun,
   aircraft: Plane,
-  location: MapPinned,
   debug: Bug,
 } satisfies Record<FlightPanelTab, typeof Plane>;
 
@@ -184,81 +177,24 @@ function DebugPanel({ snapshot }: Pick<FlightControlPanelProps, "snapshot">) {
 }
 
 export function FlightControlPanel(props: FlightControlPanelProps) {
-  const workspace = useWindowWorkspace<FlightPanelTab>({ primaryTabs: ["aircraft"] });
-  const [addMenuOpen, setAddMenuOpen] = useState(false);
-  const slot = workspace.state.primary;
-  const activeTab = slot.activeTab;
-
-  useEffect(() => {
-    const closeMenus = () => setAddMenuOpen(false);
-    document.addEventListener("pointerdown", closeMenus);
-    return () => document.removeEventListener("pointerdown", closeMenus);
-  }, []);
-
-  const content = activeTab === "weather"
-    ? <WeatherPanel initialWeather={props.initialWeather} onWeatherChange={props.onWeatherChange} />
-    : activeTab === "aircraft"
-      ? <AircraftPanel {...props} />
-      : activeTab === "location"
-        ? <LocationPanel initialLocation={props.snapshot.flightState} onApply={props.onLocationApply} searchProvider={props.locationSearchProvider} />
-        : activeTab === "debug"
-          ? <DebugPanel snapshot={props.snapshot} />
-          : null;
-
-  const ActiveIcon = activeTab ? TAB_ICONS[activeTab] : Plane;
-
   return (
-    <WorkspaceDockSlot
-      side="right"
-      slotId="primary"
-      workspaceState={workspace.state}
-      onWorkspaceStateChange={workspace.setState}
-      tabDefinitions={TAB_DEFINITIONS}
-      getTabLabel={getTabLabel}
-      restoreOnTabSelect
-      restoreOnTabOpen
-      width={slot.width ?? 380}
-      maxWidth={520}
-      addMenuOpen={addMenuOpen}
-      onAddMenuOpenChange={setAddMenuOpen}
-      renderLauncherButtonContent={<Plus size={16} />}
-      renderTabAddButtonContent={<Plus size={16} />}
-      renderTabCloseButtonContent={() => <X size={13} />}
-      dockPanelProps={{ topOffsetPx: 18, minWidth: 300, initialHeight: 560 }}
-      classNames={{
-        dockPanel: {
-          container: "flight-panel",
-          expanded: "flight-panel--expanded",
-          collapsed: "flight-panel--collapsed",
-          raisedZ: "flight-panel--raised",
-          header: "flight-panel__header",
-          body: "flight-panel__body",
-          resizeHandle: "flight-panel__resize",
-          resizeDots: "flight-panel__resize-dots",
-        },
-        tabStrip: {
-          tabButton: "flight-panel__tab-button",
-          tabShellSelected: "is-selected",
-          closeButton: "flight-panel__tab-close",
-          addButton: "flight-panel__add-button",
-          addMenu: "flight-panel__menu",
-          addMenuItem: "flight-panel__menu-item",
-          addMenuEmpty: "flight-panel__menu-empty",
-        },
-        panelLauncher: {
-          button: "flight-panel__add-button flight-panel__launcher-button",
-          menu: "flight-panel__menu",
-          menuItem: "flight-panel__menu-item",
-          menuEmpty: "flight-panel__menu-empty",
-        },
+    <WindowOverlay<FlightPanelTab>
+      getViewState={() => props.snapshot.flightState}
+      setViewState={props.onLocationApply}
+      locationSearchProvider={props.locationSearchProvider}
+      additionalTabs={TAB_DEFINITIONS}
+      renderAdditionalTab={(tabId) => {
+        const Icon = TAB_ICONS[tabId];
+        return <>
+          <div className="flight-panel__title">
+            <Icon size={17} aria-hidden="true" />
+            <span>{getTabLabel(tabId)}</span>
+          </div>
+          {tabId === "weather" ? <WeatherPanel initialWeather={props.initialWeather} onWeatherChange={props.onWeatherChange} />
+            : tabId === "aircraft" ? <AircraftPanel {...props} />
+              : <DebugPanel snapshot={props.snapshot} />}
+        </>;
       }}
-      renderTabContent={() => <>
-        <div className="flight-panel__title">
-          <ActiveIcon size={17} aria-hidden="true" />
-          <span>{activeTab ? getTabLabel(activeTab) : "Flight controls"}</span>
-        </div>
-        {content}
-      </>}
     />
   );
 }

@@ -14,7 +14,6 @@ export interface FlightHudBarOptions {
   rasterSources: readonly RasterBaseMapSource[];
   onInputModeChange(mode: HudInputMode): void;
   onInputSensitivityChange(settings: InputSensitivitySettings): void;
-  onControlsClick(): void;
   onPausedChange(paused: boolean): void;
   onRendererChange(mode: RendererMode | null): void;
   onMapSourceChange(sourceId: string): void;
@@ -46,7 +45,6 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
   const hudBar: HudBarHandle = createHudBar(container, {
     ariaLabel: "Flight simulator controls",
     items: [
-      { kind: "button", id: "flightControlsButton", title: "Flight controls", ariaLabel: "Flight controls", className: "flight-shell-controls-button", text: "✈" },
       { kind: "button", id: "flightPauseButton", title: "Pause simulation", ariaLabel: "Pause simulation", className: "flight-shell-pause-button", text: "Ⅱ" },
       {
         kind: "menu",
@@ -79,14 +77,13 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     ],
   });
 
-  const controlsButton = hudBar.getElement<HTMLButtonElement>("flightControlsButton");
   const pauseButton = hudBar.getElement<HTMLButtonElement>("flightPauseButton");
   const rendererButton = hudBar.getElement<HTMLButtonElement>("flightRendererButton");
   const rendererMenu = hudBar.getElement("flightRendererMenu");
   const mapButton = hudBar.getElement<HTMLButtonElement>("flightMapSourceButton");
   const mapMenu = hudBar.getElement("flightMapSourceMenu");
   const statusElement = hudBar.getElement("flightShellStatus");
-  if (!controlsButton || !pauseButton || !rendererButton || !rendererMenu || !mapButton || !mapMenu || !statusElement) {
+  if (!pauseButton || !rendererButton || !rendererMenu || !mapButton || !mapMenu || !statusElement) {
     hudBar.destroy();
     throw new Error("Flight HUD bar failed to mount.");
   }
@@ -130,7 +127,6 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     pauseButton.setAttribute("aria-pressed", String(paused));
     pauseButton.classList.toggle("is-active", paused);
   };
-  const onControlsClick = () => options.onControlsClick();
   const onPauseClick = () => {
     updatePauseState(!paused);
     options.onPausedChange(paused);
@@ -165,7 +161,6 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     }
   };
 
-  controlsButton.addEventListener("click", onControlsClick);
   pauseButton.addEventListener("click", onPauseClick);
   rendererButton.addEventListener("click", onRendererClick);
   rendererMenu.addEventListener("click", onRendererMenuClick);
@@ -183,7 +178,6 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
       statusElement.textContent = `${Math.abs(state.latDeg).toFixed(4)}°${state.latDeg >= 0 ? "N" : "S"} ${Math.abs(state.lonDeg).toFixed(4)}°${state.lonDeg >= 0 ? "E" : "W"} h${heading}°${frameRate}`;
     },
     destroy(): void {
-      controlsButton.removeEventListener("click", onControlsClick);
       pauseButton.removeEventListener("click", onPauseClick);
       rendererButton.removeEventListener("click", onRendererClick);
       rendererMenu.removeEventListener("click", onRendererMenuClick);

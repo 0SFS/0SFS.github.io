@@ -236,7 +236,6 @@ export async function createFlightSimApp(
     onPausedChange: setSimulationPaused,
     onViewModeChange: (mode) => { aircraft?.setViewMode(mode); runtime.requestRender(); },
   });
-  panelRoot.hidden = false;
   const rendererForce = getRendererForceFromUrl();
   hudBar = createFlightHudBar(shellRoot, {
     renderActivity: runtime,
@@ -246,9 +245,6 @@ export async function createFlightSimApp(
     rasterSources: RASTER_BASE_MAP_SOURCES,
     onInputModeChange: (mode) => { inputMode = mode; },
     onInputSensitivityChange: (settings) => { inputSensitivity = settings; },
-    onControlsClick: () => {
-      panelRoot.hidden = !panelRoot.hidden;
-    },
     onPausedChange: setSimulationPaused,
     onRendererChange: setRendererForce,
     onMapSourceChange: setMapSourcePreference,

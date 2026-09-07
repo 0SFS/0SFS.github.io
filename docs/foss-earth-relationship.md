@@ -35,7 +35,7 @@ Flight Sim imports only public FOSS Earth package exports:
 
 | Export | Purpose |
 | --- | --- |
-| `foss-earth/shell` | Configurable bottom HUD/application bar |
+| `foss-earth/shell` | Configurable bottom HUD and responsive two-sided WindowOverlay |
 | `foss-earth/shell.css` | Shared shell styling |
 | `foss-earth/windowing` | Panel, tab, and workspace primitives |
 | `foss-earth/windowing.css` | Shared windowing structure |
@@ -43,11 +43,13 @@ Flight Sim imports only public FOSS Earth package exports:
 | `foss-earth/cameraMath` | Shared WGS84/ECEF conversion and angle constants |
 | `foss-earth` | Root globe application and public globe APIs |
 
-The shell is adapted in `src/flight/hud/createFlightHudBar.ts`. The windowing primitives are composed with flight-specific Weather, Aircraft, Location, and Debug content in `src/flight/hud/FlightControlPanel.tsx`.
+The HUD is adapted in `src/flight/hud/createFlightHudBar.ts`. `FlightControlPanel.tsx` supplies Weather, Aircraft, and Debug content to the shared `WindowOverlay`. FOSS Earth owns both window slots, responsive fit, launchers, tab movement, minimize/restore behavior, and window styling.
+
+The normal globe route mounts the same overlay through `src/compat/createGlobeModeApp.tsx`, forwarding Location changes to the globe's public view API and disposing the React overlay with the globe app.
 
 Location content uses `LocationPanel` from `foss-earth/windowing`. Its structured `onApply` callback reaches Flight Sim’s `resetFlightLocation`, which resets the loaded JSBSim aircraft at geodetic coordinates while retaining altitude, airspeed, and heading. The app reseeds physics interpolation and updates the ECEF/ENU floating origin and map view immediately, including while paused.
 
-FOSS Earth currently has no place-search provider. Coordinate entry is available without an API key; hosts can supply a structured `locationSearchProvider` through `FlightSimAppOptions`. The default app honestly shows search as unavailable.
+The shared overlay supplies the Location tab with coordinate entry and its existing Nominatim place search. Hosts can override the search provider through `FlightSimAppOptions.locationSearchProvider`.
 
 Flight controls, JSBSim integration, aircraft behavior, instruments, and flight-specific UI remain local to Flight Sim.
 

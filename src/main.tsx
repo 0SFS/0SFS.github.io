@@ -10,8 +10,8 @@ async function bootApp(rootElement: HTMLElement): Promise<void> {
     return;
   }
 
-  const { createGlobeApp } = await import("foss-earth");
-  await createGlobeApp(rootElement);
+  const { createGlobeModeApp } = await import("./compat/createGlobeModeApp");
+  await createGlobeModeApp(rootElement);
 }
 
 const rootElement = document.getElementById("root");

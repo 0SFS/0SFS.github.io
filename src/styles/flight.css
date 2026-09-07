@@ -124,10 +124,6 @@
   letter-spacing: 0;
 }
 
-.flight-panel-root[hidden] {
-  display: none;
-}
-
 .flight-shell-root {
   position: absolute;
   inset: 0;
@@ -143,168 +139,10 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.flight-shell-root .flight-shell-controls-button {
-  font-size: 16px;
-}
-
 .flight-shell-root .flight-shell-pause-button.is-active {
   color: #11161a;
   background: var(--flight-panel-accent);
   border-color: var(--flight-panel-accent);
-}
-
-.flight-panel {
-  overflow: visible;
-  pointer-events: auto;
-  border: 1px solid var(--flight-panel-line);
-  border-radius: 6px;
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px) 0 0 / 100% 28px,
-    var(--flight-panel-bg);
-  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(18px) saturate(0.8);
-}
-
-.flight-panel--expanded {
-  z-index: 40;
-}
-
-.flight-panel--raised {
-  z-index: 50;
-}
-
-.flight-panel--collapsed {
-  max-width: calc(100vw - 24px);
-  height: 44px;
-}
-
-.flight-panel__header {
-  min-height: 43px;
-  border-bottom: 1px solid var(--flight-panel-line);
-}
-
-.flight-panel--collapsed .flight-panel__header {
-  border: 0;
-}
-
-.flight-panel__body {
-  height: calc(100% - 44px);
-  min-height: 0;
-  overflow: auto;
-}
-
-.foss-earth-tab-strip {
-  display: flex;
-  align-items: stretch;
-  min-width: 0;
-  height: 43px;
-}
-
-.foss-earth-tab-strip-list {
-  display: flex;
-  min-width: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.foss-earth-tab-shell {
-  position: relative;
-  display: flex;
-  align-items: center;
-  border-right: 1px solid var(--flight-panel-line);
-}
-
-.foss-earth-tab-shell.is-selected::after {
-  position: absolute;
-  right: 8px;
-  bottom: -1px;
-  left: 8px;
-  height: 2px;
-  background: var(--flight-panel-accent);
-  content: "";
-}
-
-.flight-panel__tab-button,
-.flight-panel__tab-close,
-.flight-panel__add-button {
-  border: 0;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-}
-
-.flight-panel__tab-button {
-  height: 42px;
-  padding: 0 5px 0 12px;
-  color: #b8c2c5;
-  font: 600 12px/1 "Avenir Next Condensed", "Helvetica Neue", sans-serif;
-  letter-spacing: 0;
-}
-
-.is-selected .flight-panel__tab-button {
-  color: #fff;
-}
-
-.flight-panel__tab-close {
-  display: grid;
-  width: 25px;
-  height: 42px;
-  padding: 0;
-  place-items: center;
-  color: #7e8b90;
-}
-
-.flight-panel__tab-close:hover,
-.flight-panel__add-button:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.07);
-}
-
-.foss-earth-tab-add-wrap {
-  position: relative;
-  flex: 0 0 auto;
-  margin-left: auto;
-}
-
-.flight-panel__add-button {
-  display: grid;
-  width: 42px;
-  height: 42px;
-  place-items: center;
-}
-
-.flight-panel__menu {
-  top: calc(100% + 7px);
-  z-index: 70;
-  min-width: 170px;
-  padding: 5px;
-  border: 1px solid var(--flight-panel-line);
-  border-radius: 5px;
-  background: #11171a;
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
-}
-
-.flight-panel__menu-item,
-.flight-panel__menu-empty {
-  display: block;
-  width: 100%;
-  padding: 9px 10px;
-  border: 0;
-  border-radius: 3px;
-  background: transparent;
-  color: var(--flight-panel-text);
-  font: 600 13px/1.2 "Avenir Next Condensed", "Helvetica Neue", sans-serif;
-  letter-spacing: 0;
-  text-align: left;
-}
-
-.flight-panel__menu-item:hover {
-  background: rgba(232, 182, 71, 0.13);
-  color: #ffd97c;
-}
-
-.flight-panel__menu-empty {
-  color: var(--flight-panel-muted);
 }
 
 .flight-panel__title {
@@ -532,46 +370,8 @@
   flex: 0 0 auto;
 }
 
-.flight-panel__resize {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  display: grid;
-  width: 24px;
-  height: 24px;
-  place-items: center;
-  color: #657278;
-  cursor: nesw-resize;
-}
-
-.flight-panel__launcher-button {
-  border: 1px solid var(--flight-panel-line);
-  border-radius: 4px;
-  background: var(--flight-panel-bg);
-  color: var(--flight-panel-text);
-}
-
 @media (max-width: 720px) {
-  .flight-panel {
-    top: 8px !important;
-    right: 8px !important;
-    bottom: auto;
-    left: 8px !important;
-    width: auto !important;
-    max-width: none !important;
-    height: min(46vh, 420px) !important;
-  }
-
-  .flight-panel--collapsed {
-    right: 8px !important;
-    bottom: auto;
-    left: 8px !important;
-    width: auto !important;
-    height: 44px !important;
-  }
-
   .flight-hud__attitude {
-    bottom: calc(min(46vh, 420px) + 18px);
     width: 130px;
     height: 130px;
   }

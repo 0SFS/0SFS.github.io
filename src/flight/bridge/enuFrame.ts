@@ -3,12 +3,12 @@ import { geodeticToEcef } from "foss-earth/cameraMath";
 
 /**
  * Maps local ENU (X=east, Y=north, Z=up) into Babylon's right-handed Y-up frame
- * (X=east, Y=up, Z=north).
+ * (X=east, Y=up, Z=south). Negating north preserves handedness.
  */
 export function buildEnuToBabylonMatrix(): Matrix {
   return Matrix.FromValues(
     1, 0, 0, 0,
-    0, 0, 1, 0,
+    0, 0, -1, 0,
     0, 1, 0, 0,
     0, 0, 0, 1,
   );
@@ -37,9 +37,9 @@ export function buildEcefToEnuMatrix(latRad: number, lonRad: number): Matrix {
   const upZ = sinLat;
 
   return Matrix.FromValues(
-    eastX, eastY, eastZ, 0,
-    northX, northY, northZ, 0,
-    upX, upY, upZ, 0,
+    eastX, northX, upX, 0,
+    eastY, northY, upY, 0,
+    eastZ, northZ, upZ, 0,
     0, 0, 0, 1,
   );
 }
@@ -60,11 +60,11 @@ export function ecefToEnuPosition(
 
 /**
  * Compose the world-shift matrix applied to the tile root so that the reference
- * geodetic position maps to the scene origin in ENU coordinates.
+ * geodetic position maps to the scene origin in east/up/south coordinates.
  */
 export function buildWorldShiftMatrix(latRad: number, lonRad: number, altMeters: number): Matrix {
   const ecefToEnu = buildEcefToEnuMatrix(latRad, lonRad);
-  const ecefToBabylon = buildEnuToBabylonMatrix().multiply(ecefToEnu);
+  const ecefToBabylon = ecefToEnu.multiply(buildEnuToBabylonMatrix());
   const ref = geodeticToEcef(latRad, lonRad, altMeters);
   const refVec = new Vector3(ref.x, ref.y, ref.z);
   const translation = Vector3.TransformCoordinates(refVec, ecefToBabylon).scale(-1);

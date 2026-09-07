@@ -17,8 +17,8 @@ describe("flightInputManager keyboard roll", () => {
   });
 
   it.each([
-    ["KeyA", 1],
-    ["KeyD", -1],
+    ["KeyA", -1],
+    ["KeyD", 1],
   ])("maps %s to the expected JSBSim aileron sign", (code, expectedSign) => {
     const input = createFlightInputManager();
     const detach = input.attach(window);
@@ -91,5 +91,26 @@ describe("flightInputManager keyboard roll", () => {
 
     expect(controls.throttle).toBeCloseTo(0.9);
     detach();
+  });
+
+  it("releases held controls and allows typing in the Location panel without flying or pausing", () => {
+    const input = createFlightInputManager();
+    const detach = input.attach(window);
+    const search = document.createElement("input");
+    document.body.append(search);
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyW" }));
+    expect(input.poll(1).elevator).toBe(1);
+    search.focus();
+    expect(input.poll(1).elevator).toBe(0);
+    for (const code of ["KeyW", "KeyA", "KeyP"]) {
+      const event = new KeyboardEvent("keydown", { code, bubbles: true, cancelable: true });
+      search.dispatchEvent(event);
+      expect(event.defaultPrevented).toBe(false);
+    }
+    expect(input.poll(1).aileron).toBe(0);
+    expect(input.poll(1).elevator).toBe(0);
+    expect(input.isPaused()).toBe(false);
+    detach();
+    search.remove();
   });
 });

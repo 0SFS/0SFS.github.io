@@ -83,6 +83,10 @@ it("mounts the shared + menu, opens Location, and applies coordinates to the sim
   await act(async () => { app = await createFlightSimApp(root); });
   try {
     expect(root.querySelector<HTMLElement>(".flight-panel-root")!.hidden).toBe(false);
+    expect(root.querySelector('[aria-label="Open left panel"]')).toBeNull();
+    await act(async () => root.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')!.click());
+    const aircraft = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')).find(button => button.textContent === "Aircraft")!;
+    await act(async () => aircraft.click());
     const add = root.querySelector<HTMLButtonElement>('.foss-earth-tab-strip [aria-label="Open new tab"]')!;
     expect(add).not.toBeNull();
     await act(async () => add.click());
@@ -109,7 +113,8 @@ it("mounts the shared + menu, opens Location, and applies coordinates to the sim
       await act(async () => tab.click());
       expect(panel.dataset.collapsed).toBe("false");
       expect(panel.style.height).toBe(expandedHeight);
-      expect(panel.querySelector(".flight-panel__title")!.textContent).toBe(label);
+      if (label === "Location") expect(panel.querySelector(".foss-earth-location-panel")).not.toBeNull();
+      else expect(panel.querySelector(".flight-panel__title")!.textContent).toBe(label);
     };
     await minimize();
     await select("Location"); // The already-selected tab restores too.
@@ -134,7 +139,7 @@ it("mounts the shared + menu, opens Location, and applies coordinates to the sim
       await act(async () => root.querySelector<HTMLButtonElement>(`[aria-label="Close ${label} tab"]`)!.click());
     }
     expect(root.querySelector(".foss-earth-dock-panel")).toBeNull();
-    await act(async () => root.querySelector<HTMLButtonElement>('[aria-label="Open panel tab"]')!.click());
+    await act(async () => root.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')!.click());
     const reopen = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')).find(button => button.textContent === "Location")!;
     await act(async () => reopen.click());
     expect(root.querySelector(".foss-earth-location-panel")).not.toBeNull();

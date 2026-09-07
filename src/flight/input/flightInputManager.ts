@@ -12,8 +12,8 @@ export interface ControlSurfaceState {
 const KEY_BINDINGS: Record<string, Partial<ControlSurfaceState>> = {
   KeyW: { elevator: 1 },
   KeyS: { elevator: -1 },
-  KeyA: { aileron: 1 },
-  KeyD: { aileron: -1 },
+  KeyA: { aileron: -1 },
+  KeyD: { aileron: 1 },
   KeyQ: { rudder: -1 },
   KeyE: { rudder: 1 },
   ShiftLeft: { throttle: 1 },
@@ -115,6 +115,10 @@ export function createFlightInputManager(options: { onPausedChange?: (paused: bo
   return {
     attach(target: Window): () => void {
       const onKeyDown = (event: KeyboardEvent): void => {
+        if (event.target instanceof Element && event.target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) {
+          keysDown.clear();
+          return;
+        }
         if (event.code === "KeyP") {
           if (event.repeat) return;
           setPaused(!paused);
@@ -136,11 +140,14 @@ export function createFlightInputManager(options: { onPausedChange?: (paused: bo
       target.addEventListener("keydown", onKeyDown);
       target.addEventListener("keyup", onKeyUp);
       target.addEventListener("blur", onBlur);
+      target.addEventListener("focusin", onBlur);
 
       return () => {
         target.removeEventListener("keydown", onKeyDown);
         target.removeEventListener("keyup", onKeyUp);
         target.removeEventListener("blur", onBlur);
+        target.removeEventListener("focusin", onBlur);
+        keysDown.clear();
       };
     },
     poll(dt: number): ControlSurfaceState {

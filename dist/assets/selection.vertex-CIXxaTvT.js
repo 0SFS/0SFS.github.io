@@ -1,4 +1,4 @@
-import{Xo as e}from"./mapDownloadHud-BoTPDrPy.js";var t=`selectionVertexShader`,n=`attribute position: vec3f;
+import{Qo as e}from"./shell-CCQlqYO5.js";var t=`selectionVertexShader`,n=`attribute position: vec3f;
 #ifdef INSTANCES
 attribute instanceSelectionId: f32;
 #endif
