@@ -3,8 +3,8 @@
  "objects": 2,
  "empties": 1,
  "meshes": 2,
- "triangles": 120,
- "vertices": 100,
+ "triangles": 130,
+ "vertices": 105,
  "materials": 4,
  "material_names": [
   "C172_Dark",
@@ -64,7 +64,7 @@
  "loose_vertices": 0,
  "unapplied_transforms": [],
  "symmetry_error_m": {
-  "mean": 0.006031,
+  "mean": 0.005721,
   "max": 0.14539,
   "over_1mm": 8
  },
@@ -83,8 +83,8 @@
  "per_object": [
   {
    "name": "Cessna_172_Body",
-   "tris": 116,
-   "verts": 92,
+   "tris": 126,
+   "verts": 97,
    "mats": [
     "C172_Paint",
     "C172_Glass",

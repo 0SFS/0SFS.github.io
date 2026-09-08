@@ -49,6 +49,9 @@ for o in sc.objects:
         for i in range(3):
             mins[i] = min(mins[i], p[i]); maxs[i] = max(maxs[i], p[i])
 center = (mins + maxs) / 2 if mins[0] < 1e8 else Vector((0, 0, 0))
+if "--center" in argv:
+    cy = float(argv[argv.index("--center") + 1])
+    center = Vector((0.0, cy, 1.6))
 
 # ---- render settings ----
 sc.render.engine = 'BLENDER_EEVEE' if not SIL else 'BLENDER_WORKBENCH'

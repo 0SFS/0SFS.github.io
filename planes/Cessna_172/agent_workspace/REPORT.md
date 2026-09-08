@@ -69,10 +69,10 @@ sweeping up. The blockout converged both lines symmetrically, producing a generi
 
 | LOD | triangles | vertices | meshes | draw-call groups | GLB size | target | cabin posts |
 |---|---|---|---|---|---|---|---|
-| LOD0 | **918** | 516 | 22 | 23 | 46.1 kB | 1000–1500 ✔ (under) | yes (7) |
-| LOD1 | **688** | 406 | 22 | 23 | 42.1 kB | 400–700 ✔ | yes (7) |
-| LOD2 | **294** | 190 | 16 | 17 | 24.3 kB | 150–300 ✔ | no, continuous glass |
-| LOD3 | **120** | 100 | 2 | 3 | 8.9 kB | ≤100 — 20 over | no, continuous glass |
+| LOD0 | **862** | 493 | 22 | 23 | 44.9 kB | 1000–1500 ✔ (under) | yes (7) |
+| LOD1 | **664** | 399 | 22 | 23 | 41.2 kB | 400–700 ✔ | yes (7) |
+| LOD2 | **288** | 189 | 16 | 17 | 24.0 kB | 150–300 ✔ | no, continuous glass |
+| LOD3 | **130** | 105 | 2 | 3 | 9.4 kB | ≤100 — 30 over | no, continuous glass |
 
 Draw-call groups exceed the mesh count by one because `Fuselage` carries two
 material slots (paint + glass) and so exports as two glTF primitives.
@@ -90,9 +90,10 @@ resolution → control-surface separation → part separation.
   flaps/ailerons/elevator/rudder, 8-sided wheels, 4-station gear legs, full cabin posts.
 - **LOD1** — 8-point rings, 15 stations, 6-sided wheels, 3-station gear, full cabin posts.
   Same object names as LOD0.
-- **LOD2** — 6-point rings, 6 stations, 6-point airfoils, control surfaces merged into
-  their parent surfaces, rudder merged into the fin, 4-sided wheels.
-- **LOD3** — 4-point rings, 6 stations, 4-point airfoils, flat-plate gear legs and struts,
+- **LOD2** — 6-point rings, 7 stations, 6-point airfoils, control surfaces merged into
+  their parent surfaces, rudder merged into the fin, 4-sided wheels, glazing on the
+  windshield crown, cabin sides and rear window.
+- **LOD3** — 6-point rings, 5 stations, 4-point airfoils, flat-plate gear legs and struts,
   single-quad propeller blades, and **every static part joined into one mesh**
   (`Cessna_172_Body`) so the whole aircraft is 2 draw-call groups instead of 15.
 
@@ -136,7 +137,7 @@ Bounding box (LOD0, Blender axes): min `[-5.499, -5.720, 0.000]`, max `[5.499, 2
 | degenerate faces | 0 | 0 | 0 | 0 |
 | loose vertices | 0 | 0 | 0 | 0 |
 | unapplied transforms | 0 | 0 | 0 | 0 |
-| open boundary edges | 24 | 38 | 28 | 48 |
+| open boundary edges | 20 | 34 | 24 | 40 |
 | symmetry error, mean | 2.9 mm | 2.4 mm | 3.2 mm | 6.0 mm |
 
 **The open boundary edges are intentional, not defects.** At LOD0 they are
@@ -204,32 +205,47 @@ Spinner, Propeller, Strut_Left, Strut_Right`. Names are stable between LOD0 and 
    window | C | rear window.  Each side post is a real ~70 mm fuselage segment that
    simply does not receive the glass material; the centre post is the flat-top face row
    of the rear-window segment left painted.  No overlay geometry.
-4. **Ring angles are chosen, not evenly spaced.**  Even spacing puts no vertex at the
+4. **Glazing corners are chamfered per-triangle, not per-face.** The corner pane of the
+   windshield (forward) and of the rear window (aft) is already two triangles, so the
+   material index is assigned to each triangle separately: the upper triangle stays
+   glazed and the lower one is painted. The resulting diagonal rounds the corner off
+   instead of leaving it square — and because it reuses the quad's existing diagonal it
+   costs **zero polygons**. Blanking the whole face instead (the first attempt) removed
+   far too much glazing.
+5. **The rear-window centre post is a 70 mm split of the flat top face row**, not the
+   whole row. Painting the entire row made that post ~8x thicker than the side posts;
+   splitting the face into glass | post | glass costs 2 quads and matches the others.
+6. **Spinner is a true cone from a single apex vertex** with no caps. It used to start
+   from a tiny ring plus an n-gon cap — a flat forward-facing disc on the nose tip for
+   no visual gain — and capped the base as well, a face sealed inside the cowl. LOD0
+   went 60 → 18 triangles; the propeller lost its root cap (buried in the spinner) and
+   a station, 56 → 36.
+7. **Ring angles are chosen, not evenly spaced.**  Even spacing puts no vertex at the
    window sill or head, which is what previously forced the glazing to be a separate
    offset shell.  Each ring table places vertices at the sill (the max-width line) and
    the head, so a cabin window is exactly one face row of the fuselage at a realistic
    ~0.47 m; keeps a flat top *edge* for the cabin roof; and keeps a flat bottom edge for
    the belly.  Doing this let LOD0 drop from 12-point to 10-point rings with no loss.
-5. **Level tail-cone top line with the belly sweeping up** — the signature Cessna tail
+8. **Level tail-cone top line with the belly sweeping up** — the signature Cessna tail
    cone, and the thing that most distinguishes it from a generic low-poly monoplane.
-6. **Semi-tapered wing**: constant 1.63 m chord out to 2.65 m from the centreline, then
+9. **Semi-tapered wing**: constant 1.63 m chord out to 2.65 m from the centreline, then
    tapering to 1.09 m at the tip, with a **straight trailing edge** so all the taper is
    taken on the leading edge (~9.4 deg of outer-panel LE sweep). Measured off the plan
    view; the constant-chord section is longer than wing area alone would imply.
-7. **Swept fin with a long dorsal fillet** starting 3.2 m ahead of the fin tip, and a
+10. **Swept fin with a long dorsal fillet** starting 3.2 m ahead of the fin tip, and a
    **forward-raked rudder hinge** so the rudder is wider at the base and its lower
    trailing corner is the aft-most point on the aircraft.
-8. **Horizontal stabiliser at z = 1.38 m**, just below the tail-cone top line, with a
+11. **Horizontal stabiliser at z = 1.38 m**, just below the tail-cone top line, with a
    modest 0.22 m LE sweep — measured, not assumed. My first attempt had it mid-cone.
-9. **Wraparound "Omni-Vision" rear window** — the glazing band crosses the crown behind
+12. **Wraparound "Omni-Vision" rear window** — the glazing band crosses the crown behind
    the cabin, which is a strong and often-missed C172 identifier.
-10. **1.73 deg dihedral, 1.5 deg incidence**, both to spec.
-11. **Two lift struts** from the lower fuselage to 53% semi-span, painted body colour
+13. **1.73 deg dihedral, 1.5 deg incidence**, both to spec.
+14. **Two lift struts** from the lower fuselage to 53% semi-span, painted body colour
    (they are painted on the real aircraft, not bare metal).
-12. **Propeller blade chord lies in the disc plane**, twisted 34 deg at the root to 13 deg
+15. **Propeller blade chord lies in the disc plane**, twisted 34 deg at the root to 13 deg
    at the tip. An early version had the chord running fore/aft, which made the prop
    invisible head-on — the exact opposite of how a real prop reads.
-13. **Wheelbase 1.63 m, track 2.50 m, prop ground clearance 0.285 m**, all cross-checked
+16. **Wheelbase 1.63 m, track 2.50 m, prop ground clearance 0.285 m**, all cross-checked
     against the drawing.
 
 ---
@@ -257,14 +273,18 @@ Spinner, Propeller, Strut_Left, Strut_Right`. Names are stable between LOD0 and 
 
 Being straight about these:
 
-- **LOD3 is 120 triangles against a ≤100 target (20% over).** The only remaining cuts
+- **LOD3 is 130 triangles against a ≤100 target (30% over).** 10 of those bought side
+  glazing: a 4-point ring has no face row that sits above the max-width line, so the
+  cabin sides could not be glazed at all until the ring went to 6 points. The only remaining cuts
   are the lift struts, the landing gear or the glazing — i.e. exactly the features that
   distinguish a C172 from a generic monoplane. The brief says not to destroy silhouette
   to save triangles, so I left them in. LOD2 is 304 against a 150–300 target (4 over).
 - **The cowl is slightly more conical in plan than the real one**, which has a blunter,
   more parallel-sided front. Costs a station to fix; I judged it not worth it.
-- **Leaving the fuselage top open under the wing saves 8 triangles at LOD0** (4 face
-  rows across the wing chord), 2 at the coarser LODs. The idea is right and the geometry
+- **Leaving the fuselage top open under the wing saves 6 triangles at LOD0** (3 face
+  rows). The segment that reaches the wing trailing edge is deliberately left closed:
+  the wing thins to a knife edge there and stops covering the cut-out, which showed as
+  a hole in the roof just ahead of the rear window. The idea is right and the geometry
   is now correct, but the cross-section is coarse enough that the crown is a single face
   row per segment, so the saving is small. Reported as measured rather than as a win.
 - **A ~0.08 m step at the wing tip** where the aileron ends before the tip cap. Sub-pixel

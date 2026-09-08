@@ -3,8 +3,8 @@
  "objects": 22,
  "empties": 1,
  "meshes": 22,
- "triangles": 688,
- "vertices": 406,
+ "triangles": 664,
+ "vertices": 399,
  "materials": 4,
  "material_names": [
   "C172_Dark",
@@ -49,11 +49,15 @@
   8.28,
   2.718
  ],
- "non_manifold_edges": 38,
+ "non_manifold_edges": 58,
  "open_boundary_by_object": [
   {
    "name": "Fuselage",
-   "boundary_edges": 10
+   "boundary_edges": 16
+  },
+  {
+   "name": "Propeller",
+   "boundary_edges": 8
   },
   {
    "name": "Wing_Left",
@@ -70,13 +74,17 @@
   {
    "name": "HorizontalTail_Right",
    "boundary_edges": 7
+  },
+  {
+   "name": "Spinner",
+   "boundary_edges": 6
   }
  ],
  "degenerate_faces": 0,
  "loose_vertices": 0,
  "unapplied_transforms": [],
  "symmetry_error_m": {
-  "mean": 0.00238,
+  "mean": 0.002747,
   "max": 0.108122,
   "over_1mm": 24
  },
@@ -115,8 +123,8 @@
  "per_object": [
   {
    "name": "Fuselage",
-   "tris": 228,
-   "verts": 120,
+   "tris": 234,
+   "verts": 124,
    "mats": [
     "C172_Paint",
     "C172_Glass"
@@ -128,21 +136,8 @@
    ]
   },
   {
-   "name": "Spinner",
-   "tris": 44,
-   "verts": 24,
-   "mats": [
-    "C172_Metal"
-   ],
-   "origin": [
-    0.0,
-    2.17,
-    1.25
-   ]
-  },
-  {
    "name": "Propeller",
-   "tris": 40,
+   "tris": 36,
    "verts": 24,
    "mats": [
     "C172_Dark"
@@ -307,6 +302,19 @@
     0.0,
     1.32,
     0.175
+   ]
+  },
+  {
+   "name": "Spinner",
+   "tris": 18,
+   "verts": 13,
+   "mats": [
+    "C172_Metal"
+   ],
+   "origin": [
+    0.0,
+    2.17,
+    1.25
    ]
   },
   {

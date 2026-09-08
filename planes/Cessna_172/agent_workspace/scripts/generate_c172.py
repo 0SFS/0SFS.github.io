@@ -114,22 +114,22 @@ def in_post_band(y):
 # (high wing + dihedral, struts, tricycle gear, swept fin, tail cone, prop disc)
 # survives to LOD3.
 LODP = {
-    0: dict(ring=10, st_level=2, wheel=8, spin=8, prop_st=3,
+    0: dict(ring=10, st_level=2, wheel=8, spin=6, prop_st=3,
             wing_st=(0.0, TAPER_START, 5.30, SEMI), gear_st=4, gear_n=4, strut_n=4,
             glass=True, ctrl=True, af='full', merge=False,
-            spin_rings=4, prop_flat=False, fin_pts=0, flat_gear=False, prop_2st=False,
+            spin_rings=3, prop_flat=False, fin_pts=0, flat_gear=False, prop_2st=False,
             pillars=True),
     1: dict(ring=8,  st_level=1, wheel=6, spin=6, prop_st=2,
             wing_st=(0.0, TAPER_START, SEMI), gear_st=3, gear_n=4, strut_n=4,
             glass=True, ctrl=True, af='full', merge=False,
-            spin_rings=4, prop_flat=False, fin_pts=0, flat_gear=False, prop_2st=False,
+            spin_rings=3, prop_flat=False, fin_pts=0, flat_gear=False, prop_2st=False,
             pillars=True),
     2: dict(ring=6,  st_level=-2, wheel=4, spin=4, prop_st=2,
             wing_st=(0.0, TAPER_START, SEMI), gear_st=2, gear_n=3, strut_n=3,
             glass=True, ctrl=False, af='mid', merge=False,
-            spin_rings=3, prop_flat=False, fin_pts=6, flat_gear=False, prop_2st=True,
+            spin_rings=2, prop_flat=False, fin_pts=6, flat_gear=False, prop_2st=True,
             pillars=False),
-    3: dict(ring=4,  st_level=-1, wheel=0, spin=3, prop_st=2,
+    3: dict(ring=6,  st_level=-1, wheel=0, spin=4, prop_st=2,
             wing_st=(0.0, SEMI), gear_st=2, gear_n=2, strut_n=2,
             glass=True, ctrl=False, af='low', merge=True,
             spin_rings=2, prop_flat=True, fin_pts=5, flat_gear=True, prop_2st=True,
@@ -137,8 +137,8 @@ LODP = {
 }
 P = LODP[LOD]
 # LOD3 uses an explicit reduced station subset
-LOD2_STATIONS = {1.55, 0.48, -0.10, -1.63, -3.30, -6.05}
-LOD3_STATIONS = {1.55, 0.48, -0.10, -1.63, -3.30, -6.05}
+LOD2_STATIONS = {1.55, 0.48, -0.10, -1.63, -2.10, -3.30, -6.05}
+LOD3_STATIONS = {1.55, 0.48, -0.10, -1.63, -6.05}
 
 # ----------------------------------------------------------------------------
 # scene / materials
@@ -433,12 +433,26 @@ def build_fuselage():
 
     faces, fmats = [], []
     dropped = glazed_n = 0
+
+    # which segments are the forward-most windshield / aft-most rear-window one:
+    # their outer corner faces stay painted so the glazing reads as rounded
+    # rather than square-cornered
+    ws_idx = [i for i in range(len(rings) - 1)
+              if WINDSHIELD_Y[0] <= (sts[i][0] + sts[i + 1][0]) / 2.0 <= WINDSHIELD_Y[1]]
+    rw_idx = [i for i in range(len(rings) - 1)
+              if REARWIN_Y[0] <= (sts[i][0] + sts[i + 1][0]) / 2.0 < REARWIN_Y[1]]
+    ws_front = ws_idx[0] if ws_idx else None
+    rw_back = rw_idx[-1] if rw_idx else None
+
+    def lerp3(a, b, t):
+        return tuple(a[c] + (b[c] - a[c]) * t for c in range(3))
+
     for i in range(len(rings) - 1):
         a, b = i * n, (i + 1) * n
         my = (sts[i][0] + sts[i + 1][0]) / 2.0
 
-        # which face rows are glass on this segment
         glazed = set()
+        is_rear = False
         if in_post_band(my):
             pass                                   # cabin post: painted, no glass
         elif WINDSHIELD_Y[0] <= my <= WINDSHIELD_Y[1]:
@@ -446,20 +460,67 @@ def build_fuselage():
         elif CABIN_Y[0] <= my < CABIN_Y[1]:
             glazed = set(spec["window"])
         elif REARWIN_Y[0] <= my < REARWIN_Y[1]:
+            is_rear = True
             glazed = set(spec["crown"]) | set(spec["window"])
-            if P["pillars"]:
-                glazed.discard(spec["top"])        # centreline post in the rear window
 
         # a segment lying wholly under the wing root chord: the wing closes the
-        # top there, so leave the fuselage OPEN - remove the wing and you see the
-        # cut-out the wing sits in, exactly like the real airframe
-        under_wing = (sts[i][0] <= 1e-9 and sts[i + 1][0] >= -ROOT_CHORD - 1e-9)
+        # top there, so leave the fuselage OPEN.  The segment that reaches the
+        # trailing edge is excluded - the wing thins to a knife edge there and
+        # stops covering the cut-out, which left a visible hole in the roof.
+        under_wing = (sts[i][0] <= 1e-9
+                      and sts[i + 1][0] >= -ROOT_CHORD + 0.10)
 
         for j in range(n):
+            k = (j + 1) % n
             if under_wing and j == spec["top"]:
                 dropped += 1
                 continue
-            k = (j + 1) % n
+
+            # rear-window centre post: split the flat top row into
+            # glass | 70 mm painted post | glass instead of painting the whole
+            # row, which made the centre post ~8x thicker than the side posts
+            if is_rear and P["pillars"] and j == spec["top"]:
+                a0, a1 = rings[i][j], rings[i][k]
+                b0, b1 = rings[i + 1][j], rings[i + 1][k]
+                def half(p0, p1):
+                    dx = abs(p0[0] - p1[0])
+                    return min(0.45, 0.035 / dx) if dx > 1e-6 else 0.45
+                f0, f1 = half(a0, a1), half(b0, b1)
+                ia = len(verts)
+                verts.append(lerp3(a0, a1, 0.5 - f0))
+                verts.append(lerp3(a0, a1, 0.5 + f0))
+                ib = len(verts)
+                verts.append(lerp3(b0, b1, 0.5 - f1))
+                verts.append(lerp3(b0, b1, 0.5 + f1))
+                faces.append([a + j, ia, ib, b + j]);          fmats.append(1)
+                faces.append([ia, ia + 1, ib + 1, ib]);        fmats.append(0)
+                faces.append([ia + 1, a + k, b + k, ib + 1]);  fmats.append(1)
+                glazed_n += 2
+                continue
+
+            # Corner rounding, free of charge: the corner pane is already two
+            # triangles, so paint only the OUTER-LOWER one and leave the upper
+            # one glazed.  The resulting diagonal chamfers the corner instead of
+            # leaving it square, without adding a single polygon.
+            corner = None
+            if j in glazed and j in spec["window"]:
+                if i == ws_front:
+                    corner = "front"
+                elif i == rw_back:
+                    corner = "back"
+            if corner:
+                lo_is_j = rings[i][j][2] < rings[i][k][2]
+                f_lo, f_hi = (a + j, a + k) if lo_is_j else (a + k, a + j)
+                r_lo, r_hi = (b + j, b + k) if lo_is_j else (b + k, b + j)
+                if corner == "front":
+                    faces.append([f_lo, f_hi, r_lo]);  fmats.append(0)   # front-lower: paint
+                    faces.append([f_hi, r_hi, r_lo]);  fmats.append(1)   # upper: glass
+                else:
+                    faces.append([f_lo, f_hi, r_hi]);  fmats.append(1)   # upper: glass
+                    faces.append([f_lo, r_hi, r_lo]);  fmats.append(0)   # aft-lower: paint
+                glazed_n += 1
+                continue
+
             faces.append([a + j, a + k, b + k, b + j])
             g = 1 if j in glazed else 0
             fmats.append(g)
@@ -760,19 +821,33 @@ def build_strut(side):
 # spinner + propeller
 # ----------------------------------------------------------------------------
 def build_spinner():
+    """Bullet spinner as a true cone from a single apex vertex.
+
+    It used to start from a tiny ring plus an n-gon cap, which put a flat
+    forward-facing disc on the nose tip for no visual gain, and it capped the
+    base too - a face sealed inside the cowl that can never be seen.  Apex plus
+    open base takes LOD0 from 60 triangles to 18; at LOD2/LOD3 it degenerates to
+    a 4-sided pyramid.
+    """
     n = P["spin"]
-    ys = [SPINNER_TIP_Y, SPINNER_TIP_Y - 0.11, SPINNER_TIP_Y - 0.25, COWL_FRONT_Y]
-    rs = [0.012, 0.082, 0.135, 0.155]
-    if P["spin_rings"] == 3:
-        ys, rs = [ys[0], ys[2], ys[3]], [rs[0], rs[2], rs[3]]
-    elif P["spin_rings"] <= 2:
-        ys, rs = [ys[0], ys[3]], [rs[0], rs[3]]
-    rings = []
-    for y, r in zip(ys, rs):
-        rings.append([(r * math.cos(2 * math.pi * i / n + math.pi / 2), y,
-                       THRUST_Z + r * math.sin(2 * math.pi * i / n + math.pi / 2))
-                      for i in range(n)])
-    verts, faces = loft(rings, cap_start=True, cap_end=True)
+    if P["spin_rings"] >= 3:
+        band = [(SPINNER_TIP_Y - 0.13, 0.098), (COWL_FRONT_Y, 0.155)]
+    else:
+        band = [(COWL_FRONT_Y, 0.155)]
+
+    verts = [(0.0, SPINNER_TIP_Y, THRUST_Z)]
+    for (y, r) in band:
+        for i in range(n):
+            a = 2 * math.pi * i / n + math.pi / 2
+            verts.append((r * math.cos(a), y, THRUST_Z + r * math.sin(a)))
+
+    faces = [[0, 1 + i, 1 + (i + 1) % n] for i in range(n)]      # apex fan
+    for b in range(len(band) - 1):
+        o0, o1 = 1 + b * n, 1 + (b + 1) * n
+        for i in range(n):
+            k = (i + 1) % n
+            faces.append([o0 + i, o0 + k, o1 + k, o1 + i])
+    # no base cap: it sits inside the cowl opening
     return make("Spinner", verts, faces, M_METAL,
                 origin=(0.0, COWL_FRONT_Y, THRUST_Z), smooth_angle=45.0)
 
@@ -786,13 +861,10 @@ def build_propeller():
     """
     PLANE_Y = 1.70
     stations = [(0.15, 0.130, 0.024, math.radians(34)),
-                (0.45, 0.155, 0.020, math.radians(24)),
-                (0.78, 0.140, 0.013, math.radians(16)),
+                (0.62, 0.150, 0.016, math.radians(20)),
                 (PROP_R, 0.058, 0.006, math.radians(13))]
     if P["prop_2st"]:
-        stations = [stations[0], stations[3]]
-    elif P["prop_st"] <= 2:
-        stations = [stations[0], stations[2], stations[3]]
+        stations = [stations[0], stations[2]]
     verts, faces = [], []
     for blade in (0, 1):
         rot = blade * math.pi + math.pi / 2
@@ -810,7 +882,8 @@ def build_propeller():
                 z = rad[1] * r + tan[1] * a
                 ring.append((x, PLANE_Y + b, THRUST_Z + z))
             rings.append(ring)
-        v, f = loft(rings, cap_start=True, cap_end=True)
+        # no root cap: the blade root is buried inside the spinner
+        v, f = loft(rings, cap_start=False, cap_end=True)
         o = len(verts)
         verts.extend(v)
         faces.extend([[i + o for i in ff] for ff in f])
