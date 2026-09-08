@@ -3,6 +3,7 @@ import "foss-earth/windowing.css";
 import type { LocationSearchProvider, GeodeticLocation } from "foss-earth/windowing";
 import { resetFlightLocation } from "./jsbsim/resetFlightLocation";
 import { createTerrainContact } from "./physics/terrainContact";
+import { createVisibleMeshCollision } from "./physics/visibleMeshCollision";
 import { loadInputModePreference, loadInputSensitivityPreference } from "foss-earth/input";
 import "../styles/flight.css";
 
@@ -122,6 +123,7 @@ export async function createFlightSimApp(
   const detachInput = inputManager.attach(window);
   const physicsLoop = createFixedStepPhysicsLoop(jsbsim.sdk);
   const terrainContact = createTerrainContact(jsbsim.sdk, runtime.surface);
+  const visibleMeshCollision = createVisibleMeshCollision(jsbsim.sdk, runtime.surface);
   const flightHud: FlightHudHandle = createFlightHud(hudRoot, {
     onThrottleChange: (value) => { inputManager.setThrottle(value); runtime.requestRender(); },
     onPitchTrimChange: (value) => { inputManager.setPitchTrim(value); runtime.requestRender(); },
@@ -205,6 +207,7 @@ export async function createFlightSimApp(
       // required merely to clear a transient terrain-contact fault.
       physicsLoop.reset();
       terrainContact.reset();
+      visibleMeshCollision.reset();
     }
     physicsLoop.setPaused(paused);
     runtime.setSimRunning(!paused);
@@ -229,6 +232,7 @@ export async function createFlightSimApp(
     const ground = runtime.status.mode === "raster-basemap" ? runtime.surface.sample(location.latDeg, location.lonDeg)?.heightMeters : undefined;
     const state = resetFlightLocation(jsbsim.sdk, location, ground);
     terrainContact.reset();
+    visibleMeshCollision.reset();
     if (location.flightPreset) {
       inputManager.resetControls(location.flightPreset.mode === "departure" ? 0 : 0.35);
       if (location.flightPreset.mode === "departure") setSimulationPaused(true);
@@ -319,6 +323,7 @@ export async function createFlightSimApp(
     const displayState = physicsLoop.update(deltaSeconds, () => {
       const contact = terrainContact.update(blockOnMissingSurface);
       if (contact === false) return false;
+      if (visibleMeshCollision.update()) return "reset";
       inputManager.apply(jsbsim.sdk, controls);
       return contact;
     });

@@ -1,6 +1,6 @@
 # Visible mesh flight collision
 
-Status: In progress
+Status: Stage 1 complete; Stage 2 enabled for gameplay evaluation
 Date: 2026-09-08
 Scope: Flight Sim collision, recovery, and FOSS Earth `SurfaceQuery` integration
 
@@ -120,6 +120,8 @@ trees, building walls, shallow landings and intentional high-speed crashes.
 
 ## Rollout
 
-Implement and ship Stage 1 with the existing map diagnostics. Add fault recovery
-next. Stage 2 remains behind an opt-in flag until browser traces demonstrate
-acceptable frame pacing on target hardware.
+Stage 1 and fault recovery are complete. Stage 2 is enabled as a bounded
+gameplay experiment: it uses at most five short probes and only within 150 m of
+the sampled visible surface. Retain it only after browser testing demonstrates
+acceptable frame pacing and more reliable obstacle contacts than vertical
+support alone.
