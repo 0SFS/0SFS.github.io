@@ -1,0 +1,35 @@
+import { readFileSync } from "node:fs";
+import { JSBSimSdk } from "@0x62/jsbsim-wasm";
+import { wasmBinaryUrl, wasmModuleUrl } from "@0x62/jsbsim-wasm/wasm";
+import { describe, expect, it, vi } from "vitest";
+import type { SurfaceQuery, SurfaceHit } from "foss-earth/runtime";
+import { syncTerrainContact } from "./terrainContact";
+import { createFixedStepPhysicsLoop } from "./fixedStepLoop";
+import { bootstrapC172p } from "../jsbsim/bootstrapC172";
+
+describe("displayed terrain contact", () => {
+  it("updates the real JSBSim collision elevation when the visible surface changes", async () => {
+    const sdk = await JSBSimSdk.create({ moduleUrl: wasmModuleUrl, wasmUrl: wasmBinaryUrl,
+      persistence: { enabled: false }, log: { console: false } });
+    const manifest = JSON.parse(readFileSync("public/jsbsim-data/manifest.json", "utf8")) as { files: string[] };
+    for (const file of manifest.files) sdk.writeDataFile(file, readFileSync(`public/jsbsim-data/${file}`, "utf8"));
+    await bootstrapC172p(sdk);
+    const surface: SurfaceQuery = { raycast: () => null, sample: () => ({ heightMeters: 251.9 } as SurfaceHit) };
+    expect(syncTerrainContact(sdk, surface)).toBe(true);
+    sdk.run();
+    expect(sdk.getPropertyValue("position/terrain-elevation-asl-ft") * 0.3048).toBeCloseTo(251.9, 4);
+    surface.sample = () => ({ heightMeters: 32.6 } as SurfaceHit);
+    syncTerrainContact(sdk, surface); sdk.run();
+    expect(sdk.getPropertyValue("position/terrain-elevation-asl-ft") * 0.3048).toBeCloseTo(32.6, 4);
+  });
+  it("does not advance physics through missing terrain or accumulate a catch-up jump", () => {
+    const sdk = { getPropertyValue: vi.fn((key: string) => key === "position/lat-geod-deg" ? 34 : 100), setPropertyValue: vi.fn(), run: vi.fn(() => true) };
+    const loop = createFixedStepPhysicsLoop(sdk as unknown as JSBSimSdk);
+    const surface: SurfaceQuery = { raycast: () => null, sample: () => null };
+    for (let i = 0; i < 10; i++) loop.update(0.1, () => syncTerrainContact(sdk as unknown as JSBSimSdk, surface));
+    expect(sdk.run).not.toHaveBeenCalled();
+    expect(sdk.setPropertyValue).not.toHaveBeenCalled();
+    loop.update(1 / 120, () => true);
+    expect(sdk.run).toHaveBeenCalledOnce();
+  });
+});

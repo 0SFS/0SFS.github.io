@@ -30,6 +30,20 @@ describe("flightInputManager keyboard roll", () => {
     detach();
   });
 
+  it.each([
+    [[0, 0, -1], [], 1],
+    [[0, 0, 1], [], -1],
+    [[0, 0], [1, 0], 1],
+    [[0, 0], [0, 1], -1],
+  ])("converts gamepad yaw to the C172 rudder convention", (axes, triggers, expectedRudder) => {
+    const buttons = Array.from({ length: 8 }, (_, index) => ({ value: triggers[index - 6] ?? 0, pressed: false }));
+    vi.mocked(navigator.getGamepads).mockReturnValue([{ axes, buttons } as unknown as Gamepad]);
+    const input = createFlightInputManager();
+    const setPropertyValue = vi.fn();
+    input.apply({ setPropertyValue } as unknown as JSBSimSdk, input.poll(1));
+    expect(setPropertyValue).toHaveBeenCalledWith("fcs/rudder-cmd-norm", expectedRudder);
+  });
+
   it.each(["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"])("ignores %s", (code) => {
     const input = createFlightInputManager();
     const detach = input.attach(window);

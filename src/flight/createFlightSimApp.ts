@@ -2,6 +2,7 @@ import "foss-earth/shell.css";
 import "foss-earth/windowing.css";
 import type { LocationSearchProvider, GeodeticLocation } from "foss-earth/windowing";
 import { resetFlightLocation } from "./jsbsim/resetFlightLocation";
+import { createTerrainContact } from "./physics/terrainContact";
 import { loadInputModePreference, loadInputSensitivityPreference } from "foss-earth/input";
 import "../styles/flight.css";
 
@@ -112,6 +113,7 @@ export async function createFlightSimApp(
   const inputManager = createFlightInputManager({ onPausedChange: (paused) => syncSimulationPaused(paused) });
   const detachInput = inputManager.attach(window);
   const physicsLoop = createFixedStepPhysicsLoop(jsbsim.sdk);
+  const terrainContact = createTerrainContact(jsbsim.sdk, runtime.surface);
   const flightHud: FlightHudHandle = createFlightHud(hudRoot, {
     onThrottleChange: (value) => { inputManager.setThrottle(value); runtime.requestRender(); },
     onPitchTrimChange: (value) => { inputManager.setPitchTrim(value); runtime.requestRender(); },
@@ -209,7 +211,13 @@ export async function createFlightSimApp(
 
   const teleportToLocation = (location: GeodeticLocation): void => {
     if (disposed) return;
-    const state = resetFlightLocation(jsbsim.sdk, location);
+    const ground = runtime.status.mode === "raster-basemap" ? runtime.surface.sample(location.latDeg, location.lonDeg)?.heightMeters : undefined;
+    const state = resetFlightLocation(jsbsim.sdk, location, ground);
+    terrainContact.reset();
+    if (location.flightPreset) {
+      inputManager.resetControls(location.flightPreset.mode === "departure" ? 0 : 0.35);
+      if (location.flightPreset.mode === "departure") setSimulationPaused(true);
+    }
     physicsLoop.reset();
     skipResumeDelta = true;
     applyWeather(weather);
@@ -272,16 +280,34 @@ export async function createFlightSimApp(
 
     ensureWorld();
 
+    // Refinement can arrive while paused, including when resting on a runway.
+    if (!physicsLoop.getFault() && runtime.status.mode === "raster-basemap" && terrainContact.update() === "reset") {
+      physicsLoop.reset();
+    }
+
     physicsLoop.setPaused(inputManager.isPaused());
     const controls = inputManager.poll(deltaSeconds);
     const displayState = physicsLoop.update(deltaSeconds, () => {
+      const contact = runtime.status.mode === "raster-basemap" ? terrainContact.update() : true;
+      if (contact === false) return false;
       inputManager.apply(jsbsim.sdk, controls);
+      return contact;
     });
+
+    const fault = physicsLoop.getFault();
+    if (fault) {
+      runtime.status.lastError = fault;
+      runtime.status.message = fault;
+      if (!inputManager.isPaused()) setSimulationPaused(true);
+    }
+
+    const surfaceHeight = runtime.status.mode === "raster-basemap"
+      ? runtime.surface.sample(displayState.latDeg, displayState.lonDeg)?.heightMeters ?? 0 : 0;
 
     runtime.setSimViewState({
       latDeg: displayState.latDeg,
       lonDeg: displayState.lonDeg,
-      zoomMeters: zoomMetersFromAltitude(displayState.altMeters),
+      zoomMeters: zoomMetersFromAltitude(displayState.altMeters - surfaceHeight),
       headingDeg: (displayState.headingRad * 180) / Math.PI,
     });
 

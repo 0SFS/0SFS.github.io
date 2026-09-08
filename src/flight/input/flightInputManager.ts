@@ -33,6 +33,7 @@ export interface FlightInputManager {
   attach(target: Window): () => void;
   poll(dt: number): ControlSurfaceState;
   apply(sdk: JSBSimSdk, controls: ControlSurfaceState): void;
+  resetControls(throttle: number): void;
   setThrottle(value: number): void;
   setPitchTrim(value: number): void;
   setPaused(paused: boolean): void;
@@ -99,7 +100,7 @@ export function createFlightInputManager(options: { onPausedChange?: (paused: bo
 
     target.elevator = deadzone(-pad.axes[1]);
     target.aileron = deadzone(pad.axes[0]);
-    target.rudder = deadzone(pad.axes[2] ?? (pad.buttons[6]?.value ?? 0) - (pad.buttons[7]?.value ?? 0));
+    target.rudder = deadzone(pad.axes[2] ?? (pad.buttons[7]?.value ?? 0) - (pad.buttons[6]?.value ?? 0));
 
     const throttleAxis = pad.axes[3];
     if (throttleAxis !== undefined) {
@@ -170,11 +171,20 @@ export function createFlightInputManager(options: { onPausedChange?: (paused: bo
       if (paused) return;
       sdk.setPropertyValue("fcs/elevator-cmd-norm", controls.elevator);
       sdk.setPropertyValue("fcs/aileron-cmd-norm", controls.aileron);
-      sdk.setPropertyValue("fcs/rudder-cmd-norm", controls.rudder);
+      // Controls use positive yaw-right; the C172 rudder coefficient makes
+      // positive surface deflection yaw left. Convert at the physics boundary.
+      sdk.setPropertyValue("fcs/rudder-cmd-norm", -controls.rudder);
       sdk.setPropertyValue("fcs/throttle-cmd-norm", controls.throttle);
       sdk.setPropertyValue("fcs/pitch-trim-cmd-norm", controls.pitchTrim);
       sdk.setPropertyValue("fcs/flap-cmd-norm", controls.flaps);
       sdk.setPropertyValue("fcs/brake-cmd-norm", controls.brake);
+      sdk.setPropertyValue("fcs/left-brake-cmd-norm", controls.brake);
+      sdk.setPropertyValue("fcs/right-brake-cmd-norm", controls.brake);
+    },
+    resetControls(throttle: number): void {
+      keysDown.clear();
+      throttleTarget = Math.min(1, Math.max(0, throttle));
+      smoothed = { elevator: 0, aileron: 0, rudder: 0, throttle: throttleTarget, pitchTrim: 0, flaps: 0, brake: 0 };
     },
     setThrottle(value: number): void {
       throttleTarget = Math.min(1, Math.max(0, value));

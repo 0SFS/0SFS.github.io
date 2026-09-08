@@ -18,7 +18,7 @@ const mocks = vi.hoisted(() => {
       setViewMode: vi.fn(), toggleViewMode: vi.fn(), getViewMode: () => "third",
       orbitChaseCamera: vi.fn(), zoomChaseCamera: vi.fn(), dispose: vi.fn(),
     },
-    physics: { reset: vi.fn(), setPaused: vi.fn(), update: vi.fn(() => state), getLatestState: () => state },
+    physics: { reset: vi.fn(), setPaused: vi.fn(), update: vi.fn(() => state), getLatestState: () => state, getFault: () => null },
   };
 });
 vi.mock("foss-earth/runtime", () => ({
@@ -129,7 +129,7 @@ it("mounts the shared + menu, opens Location, and applies coordinates to the sim
       }
     });
     await act(async () => inputs[0].form!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })));
-    expect(mocks.resetLocation).toHaveBeenCalledWith(expect.anything(), { latDeg: 46.7867, lonDeg: -92.1005 });
+    expect(mocks.resetLocation).toHaveBeenCalledWith(expect.anything(), { latDeg: 46.7867, lonDeg: -92.1005, altMeters: 1000 }, undefined);
     expect(mocks.physics.reset).toHaveBeenCalledOnce();
     expect(mocks.applyOrigin).toHaveBeenLastCalledWith(mocks.state);
     expect(mocks.runtime.setSimViewState).toHaveBeenLastCalledWith(expect.objectContaining({ latDeg: mocks.state.latDeg, lonDeg: mocks.state.lonDeg }));

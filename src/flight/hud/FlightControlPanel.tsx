@@ -179,6 +179,7 @@ function DebugPanel({ snapshot }: Pick<FlightControlPanelProps, "snapshot">) {
 export function FlightControlPanel(props: FlightControlPanelProps) {
   return (
     <WindowOverlay<FlightPanelTab>
+      enableAirportPresets
       getViewState={() => props.snapshot.flightState}
       setViewState={props.onLocationApply}
       locationSearchProvider={props.locationSearchProvider}

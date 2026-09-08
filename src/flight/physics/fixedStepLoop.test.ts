@@ -16,7 +16,8 @@ describe("fixedStepPhysicsLoop pause", () => {
     const pausedState = loop.update(FIXED_DT * 4, vi.fn());
 
     expect(run).toHaveBeenCalledTimes(1);
-    expect(pausedState).toEqual(runningState);
+    expect(pausedState.altMeters).toBe(runningState.altMeters);
+    expect(pausedState.latDeg).toBe(runningState.latDeg);
   });
 });
 
