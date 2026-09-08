@@ -82,7 +82,8 @@ STATIONS = [
     (-0.95, 0.65, 1.44, 1.98, 0.535, 7.0, 4.0, 1),   # cabin under the wing - flat top
     (-1.02, 0.653, 1.437, 1.98, 0.534, 6.9, 4.0, 0), # aft edge of the B post
     (-1.63, 0.66, 1.43, 1.98, 0.525, 6.0, 4.0, 0),   # wing TE root: flat top ends
-    (-1.70, 0.663, 1.425, 1.945, 0.519, 5.6, 3.9, 0),# aft edge of the C post
+    (-1.79, 0.667, 1.420, 1.900, 0.512, 5.1, 3.8, 0), # the two stations below bracket
+    (-1.95, 0.674, 1.410, 1.850, 0.498, 4.1, 3.6, 0), # the raked C pillar
     (-2.10, 0.68, 1.40, 1.80, 0.485, 3.2, 3.4, 0),   # rear window - rounding again
     (-2.60, 0.70, 1.34, 1.60, 0.435, 2.6, 3.0, 1),
     (-3.30, 0.79, 1.26, 1.470, 0.335, 2.4, 2.8, 0),  # tail cone: top nearly level,
@@ -95,13 +96,15 @@ STATIONS = [
 # Longitudinal extent of each glazed region (tested against segment midpoints).
 WINDSHIELD_Y = (0.00, 0.50)     # stops at the wing LE root: aft of that the wing
                                 # covers the crown, so glass there would be waste
-CABIN_Y      = (-1.70, 0.00)
-REARWIN_Y    = (-2.16, -1.70)
+CABIN_Y      = (-1.63, 0.00)
+REARWIN_Y    = (-2.16, -1.63)
 
 # Cabin posts are real ~70 mm fuselage segments that simply do not get the glass
 # material - no overlay geometry, nothing hidden underneath.
-POST_BANDS = [(-0.17, -0.10), (-1.02, -0.95), (-1.70, -1.63)]
-POST_STATION_YS = {-0.17, -1.02, -1.70}
+# A and B posts are vertical bands; the C post is the raked wedge formed by the
+# diagonal of the forward rear-window face (see build_fuselage).
+POST_BANDS = [(-0.17, -0.10), (-1.02, -0.95)]
+POST_STATION_YS = {-0.17, -1.02}
 
 
 def in_post_band(y):
@@ -443,6 +446,13 @@ def build_fuselage():
               if REARWIN_Y[0] <= (sts[i][0] + sts[i + 1][0]) / 2.0 < REARWIN_Y[1]]
     ws_front = ws_idx[0] if ws_idx else None
     rw_back = rw_idx[-1] if rw_idx else None
+    # C pillar: a raked band, not a vertical one.  Two adjacent segments are cut
+    # along the SAME diagonal - the forward one keeps its lower-forward triangle
+    # glazed, the aft one paints its lower-forward triangle - so the pillar comes
+    # out as a roughly constant-width strip leaning down and aft at ~35 deg,
+    # which is what the 172G side view shows.  Costs one station, no more.
+    cp_fwd = rw_idx[0] if (len(rw_idx) >= 3 and P["pillars"]) else None
+    cp_aft = rw_idx[1] if (len(rw_idx) >= 3 and P["pillars"]) else None
 
     def lerp3(a, b, t):
         return tuple(a[c] + (b[c] - a[c]) * t for c in range(3))
@@ -506,6 +516,10 @@ def build_fuselage():
             if j in glazed and j in spec["window"]:
                 if i == ws_front:
                     corner = "front"
+                elif i == cp_fwd:
+                    corner = "cpillar_fwd"
+                elif i == cp_aft:
+                    corner = "cpillar_aft"
                 elif i == rw_back:
                     corner = "back"
             if corner:
@@ -515,6 +529,12 @@ def build_fuselage():
                 if corner == "front":
                     faces.append([f_lo, f_hi, r_lo]);  fmats.append(0)   # front-lower: paint
                     faces.append([f_hi, r_hi, r_lo]);  fmats.append(1)   # upper: glass
+                elif corner == "cpillar_fwd":
+                    faces.append([f_lo, f_hi, r_lo]);  fmats.append(1)   # rear side window
+                    faces.append([f_hi, r_hi, r_lo]);  fmats.append(0)   # pillar, upper half
+                elif corner == "cpillar_aft":
+                    faces.append([f_lo, f_hi, r_lo]);  fmats.append(0)   # pillar, lower half
+                    faces.append([f_hi, r_hi, r_lo]);  fmats.append(1)   # rear window
                 else:
                     faces.append([f_lo, f_hi, r_hi]);  fmats.append(1)   # upper: glass
                     faces.append([f_lo, r_hi, r_lo]);  fmats.append(0)   # aft-lower: paint
