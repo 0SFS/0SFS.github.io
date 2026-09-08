@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => {
     runtime: {
       renderer: { mode: "webgl2" }, status: { mode: "fallback" }, scene: {},
       engine: { getFps: () => 60 }, geospatialCamera: null,
+      surface: { sample: vi.fn(() => null) },
       getWorldRoot: () => ({}), setSimViewState: vi.fn(), setSimTick: vi.fn(),
       setSimRunning: vi.fn(), requestRender: vi.fn(), setMapSource: vi.fn(), setTerrainSource: vi.fn(), setRasterQuality: vi.fn(), destroy: vi.fn(),
     },
@@ -18,7 +19,8 @@ const mocks = vi.hoisted(() => {
       setViewMode: vi.fn(), toggleViewMode: vi.fn(), getViewMode: () => "third",
       orbitChaseCamera: vi.fn(), zoomChaseCamera: vi.fn(), dispose: vi.fn(),
     },
-    physics: { reset: vi.fn(), setPaused: vi.fn(), update: vi.fn(() => state), getLatestState: () => state, getFault: () => null },
+    terrainContact: { reset: vi.fn(), update: vi.fn(() => true) },
+    physics: { reset: vi.fn(), setPaused: vi.fn(), update: vi.fn((_delta, applyInputs) => { applyInputs(); return state; }), getLatestState: () => state, getFault: () => null },
   };
 });
 vi.mock("foss-earth/runtime", () => ({
@@ -30,6 +32,7 @@ vi.mock("./bridge/ecefBridge", () => ({ readFlightState: () => mocks.state }));
 vi.mock("./bridge/floatingOrigin", () => ({ createFloatingOrigin: () => ({ aircraftRoot: {}, apply: mocks.applyOrigin, dispose: vi.fn() }) }));
 vi.mock("./aircraft/createPlaceholderAircraft", () => ({ createPlaceholderAircraft: () => mocks.aircraft }));
 vi.mock("./physics/fixedStepLoop", () => ({ createFixedStepPhysicsLoop: () => mocks.physics }));
+vi.mock("./physics/terrainContact", () => ({ createTerrainContact: () => mocks.terrainContact }));
 vi.mock("./hud/flightHud", () => ({ createFlightHud: () => ({ update: vi.fn(), destroy: vi.fn() }) }));
 vi.mock("./jsbsim/resetFlightLocation", () => ({ resetFlightLocation: mocks.resetLocation }));
 vi.mock("./hud/createFlightHudBar", () => ({ createFlightHudBar: () => ({ update: vi.fn(), destroy: vi.fn() }) }));
@@ -70,6 +73,26 @@ describe("Flight Sim render demand", () => {
     } finally { await act(async () => app.destroy()); }
     expect(mocks.runtime.setSimTick).toHaveBeenLastCalledWith(null);
   });
+});
+
+it("samples visible terrain contact in Google mode and resets a recoverable fault on Resume", async () => {
+  vi.stubGlobal("localStorage", { getItem: () => "trackpad", setItem: vi.fn() });
+  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
+  mocks.runtime.status.mode = "google-tiles";
+  mocks.physics.getFault = () => "recoverable contact fault";
+  const root = document.createElement("div");
+  document.body.append(root);
+  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
+  await act(async () => { app = await createFlightSimApp(root); });
+  try {
+    const tick = mocks.runtime.setSimTick.mock.calls.at(-1)?.[0] as (dt: number) => void;
+    tick(1 / 60);
+    expect(mocks.terrainContact.update).toHaveBeenCalled();
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyP" }));
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyP" }));
+    expect(mocks.physics.reset).toHaveBeenCalled();
+    expect(mocks.terrainContact.reset).toHaveBeenCalled();
+  } finally { await act(async () => app.destroy()); }
 });
 
 

@@ -199,6 +199,13 @@ export async function createFlightSimApp(
   });
 
   const syncSimulationPaused = (paused: boolean): void => {
+    if (!paused && physicsLoop.getFault()) {
+      // The fixed-step loop restores its last valid pre-fault state. Resume is
+      // therefore a recovery action as well as a pause toggle; teleport is not
+      // required merely to clear a transient terrain-contact fault.
+      physicsLoop.reset();
+      terrainContact.reset();
+    }
     physicsLoop.setPaused(paused);
     runtime.setSimRunning(!paused);
     skipResumeDelta = !paused;
@@ -302,14 +309,14 @@ export async function createFlightSimApp(
     ensureWorld();
 
     // Refinement can arrive while paused, including when resting on a runway.
-    if (!physicsLoop.getFault() && runtime.status.mode === "raster-basemap" && terrainContact.update() === "reset") {
+    if (!physicsLoop.getFault() && terrainContact.update() === "reset") {
       physicsLoop.reset();
     }
 
     physicsLoop.setPaused(inputManager.isPaused());
     const controls = inputManager.poll(deltaSeconds);
     const displayState = physicsLoop.update(deltaSeconds, () => {
-      const contact = runtime.status.mode === "raster-basemap" ? terrainContact.update() : true;
+      const contact = terrainContact.update();
       if (contact === false) return false;
       inputManager.apply(jsbsim.sdk, controls);
       return contact;
@@ -322,8 +329,7 @@ export async function createFlightSimApp(
       if (!inputManager.isPaused()) setSimulationPaused(true);
     }
 
-    const surfaceHeight = runtime.status.mode === "raster-basemap"
-      ? runtime.surface.sample(displayState.latDeg, displayState.lonDeg)?.heightMeters ?? 0 : 0;
+    const surfaceHeight = runtime.surface.sample(displayState.latDeg, displayState.lonDeg)?.heightMeters ?? 0;
 
     runtime.setSimViewState({
       latDeg: displayState.latDeg,
