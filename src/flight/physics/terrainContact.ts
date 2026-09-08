@@ -7,10 +7,14 @@ export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
   let placement = true;
   return {
     reset() { previous = null; placement = true; },
-    update(): boolean | "reset" {
+    update(blockOnMissingSurface = true): boolean | "reset" {
       const lat = sdk.getPropertyValue("position/lat-geod-deg"), lon = sdk.getPropertyValue("position/long-gc-deg");
       const hit = surface.sample(lat, lon);
-      if (!hit || !Number.isFinite(hit.heightMeters)) return false;
+      // Google only exposes currently visible photogrammetry, so a transient
+      // tile/query miss must not halt the simulation. Raster keeps its strict
+      // behavior: it has an independent adopted coverage index and a miss means
+      // that no terrain surface is safe to integrate against.
+      if (!hit || !Number.isFinite(hit.heightMeters)) return !blockOnMissingSurface;
       const altitude = sdk.getPropertyValue("position/h-sl-ft") * 0.3048;
       const clearance = aircraftClearanceMeters(sdk.getPropertyValue("attitude/phi-deg") * Math.PI / 180,
         sdk.getPropertyValue("attitude/theta-deg") * Math.PI / 180);

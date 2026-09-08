@@ -3,11 +3,22 @@ import { JSBSimSdk } from "@0x62/jsbsim-wasm";
 import { wasmBinaryUrl, wasmModuleUrl } from "@0x62/jsbsim-wasm/wasm";
 import { describe, expect, it, vi } from "vitest";
 import type { SurfaceQuery, SurfaceHit } from "foss-earth/runtime";
-import { syncTerrainContact } from "./terrainContact";
+import { createTerrainContact, syncTerrainContact } from "./terrainContact";
 import { createFixedStepPhysicsLoop } from "./fixedStepLoop";
 import { bootstrapC172p } from "../jsbsim/bootstrapC172";
 
 describe("displayed terrain contact", () => {
+  it("does not halt flight for a transient optional visible-mesh miss", () => {
+    const sdk = {
+      getPropertyValue: vi.fn((property: string) => property === "position/lat-geod-deg" ? 34 : property === "position/long-gc-deg" ? -118 : 0),
+      setPropertyValue: vi.fn(),
+    } as unknown as JSBSimSdk;
+    const surface: SurfaceQuery = { raycast: () => null, sample: () => null };
+    const contact = createTerrainContact(sdk, surface);
+    expect(contact.update(false)).toBe(true);
+    expect(contact.update()).toBe(false);
+  });
+
   it("updates the real JSBSim collision elevation when the visible surface changes", async () => {
     const sdk = await JSBSimSdk.create({ moduleUrl: wasmModuleUrl, wasmUrl: wasmBinaryUrl,
       persistence: { enabled: false }, log: { console: false } });

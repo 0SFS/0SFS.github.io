@@ -309,14 +309,15 @@ export async function createFlightSimApp(
     ensureWorld();
 
     // Refinement can arrive while paused, including when resting on a runway.
-    if (!physicsLoop.getFault() && terrainContact.update() === "reset") {
+    const blockOnMissingSurface = runtime.status.mode === "raster-basemap";
+    if (!physicsLoop.getFault() && terrainContact.update(blockOnMissingSurface) === "reset") {
       physicsLoop.reset();
     }
 
     physicsLoop.setPaused(inputManager.isPaused());
     const controls = inputManager.poll(deltaSeconds);
     const displayState = physicsLoop.update(deltaSeconds, () => {
-      const contact = terrainContact.update();
+      const contact = terrainContact.update(blockOnMissingSurface);
       if (contact === false) return false;
       inputManager.apply(jsbsim.sdk, controls);
       return contact;
