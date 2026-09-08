@@ -1,0 +1,113 @@
+{
+ "file": "c172_lod3.blend",
+ "objects": 2,
+ "empties": 1,
+ "meshes": 2,
+ "triangles": 120,
+ "vertices": 100,
+ "materials": 4,
+ "material_names": [
+  "C172_Dark",
+  "C172_Glass",
+  "C172_Metal",
+  "C172_Paint"
+ ],
+ "textures": 0,
+ "texture_names": [],
+ "dimensions": {
+  "length": {
+   "value": 8.28,
+   "ref": 8.28,
+   "err": 0.0,
+   "pass_": true
+  },
+  "span": {
+   "value": 10.998,
+   "ref": 10.998,
+   "err": 0.0,
+   "pass_": true
+  },
+  "height": {
+   "value": 2.718,
+   "ref": 2.718,
+   "err": -0.0,
+   "pass_": true
+  }
+ },
+ "bbox_min": [
+  -5.499,
+  -5.72,
+  0.0
+ ],
+ "bbox_max": [
+  5.499,
+  2.56,
+  2.718
+ ],
+ "size_xyz": [
+  10.998,
+  8.28,
+  2.718
+ ],
+ "non_manifold_edges": 48,
+ "open_boundary_by_object": [
+  {
+   "name": "Cessna_172_Body",
+   "boundary_edges": 40
+  },
+  {
+   "name": "Propeller",
+   "boundary_edges": 8
+  }
+ ],
+ "degenerate_faces": 0,
+ "loose_vertices": 0,
+ "unapplied_transforms": [],
+ "symmetry_error_m": {
+  "mean": 0.006031,
+  "max": 0.14539,
+  "over_1mm": 8
+ },
+ "asymmetric_objects": [
+  {
+   "name": "Propeller",
+   "max": 0.14539,
+   "over_1mm": 8
+  }
+ ],
+ "object_names": [
+  "Cessna_172",
+  "Cessna_172_Body",
+  "Propeller"
+ ],
+ "per_object": [
+  {
+   "name": "Cessna_172_Body",
+   "tris": 116,
+   "verts": 92,
+   "mats": [
+    "C172_Paint",
+    "C172_Glass",
+    "C172_Metal"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Propeller",
+   "tris": 4,
+   "verts": 8,
+   "mats": [
+    "C172_Dark"
+   ],
+   "origin": [
+    0.0,
+    2.32,
+    1.25
+   ]
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+# Regenerable scratch: `generate_c172.py --lod N --blend work/...` rebuilds these
+work/
+logs/
+# Iteration renders kept locally only; final_lod*/ and COMPARE_* are committed
+renders/iter*/
+renders/ov/
+renders/refA/
+renders/refB2/
+renders/refB3/
+renders/lod1/
+renders/lod2/
+renders/lod3/
+renders/refB/
