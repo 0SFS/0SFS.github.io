@@ -18,6 +18,9 @@ describe("flight input method selector", () => {
     const container = document.createElement("div");
     document.body.append(container);
     const onInputModeChange = vi.fn();
+    const onTerrainSourceChange = vi.fn();
+    const onQualityChange = vi.fn();
+    const onSettingsClick = vi.fn();
     let activityListener: (active: boolean) => void = () => {};
     const unsubscribe = vi.fn();
     const unsubscribeStreaming = vi.fn();
@@ -32,8 +35,14 @@ describe("flight input method selector", () => {
         onActiveRenderChange: (listener) => { activityListener = listener; return unsubscribe; },
       },
       rendererMode: "webgl2", rendererForce: null,
-      runtimeStatus: { mode: "fallback" } as BabylonRuntimeStatus, rasterSources: [],
-      onPausedChange: vi.fn(), onRendererChange: vi.fn(), onMapSourceChange: vi.fn(),
+      runtimeStatus: {
+        mode: "raster-basemap",
+        terrainSource: { id: "mapterhorn", label: "Mapterhorn Terrain" },
+        rasterQuality: { setting: "auto", activeProfile: "balanced" },
+      } as BabylonRuntimeStatus,
+      rasterSources: [],
+      terrainSources: [{ id: "mapterhorn", label: "Mapterhorn Terrain", provider: "Mapterhorn", urlTemplate: "", maxZoom: 15, attribution: "" }],
+      onPausedChange: vi.fn(), onRendererChange: vi.fn(), onMapSourceChange: vi.fn(), onTerrainSourceChange, onQualityChange, onSettingsClick,
       onInputModeChange, onInputSensitivityChange: vi.fn(),
     });
     expect(onInputModeChange).toHaveBeenLastCalledWith("mouse");
@@ -67,6 +76,20 @@ describe("flight input method selector", () => {
     expect(mapButton.classList.contains("is-streaming")).toBe(false);
     streamingListener(true);
     expect(mapButton.classList.contains("is-streaming")).toBe(true);
+    hud.update({ latDeg: 0, lonDeg: 0, headingRad: 0 } as never, {
+      mode: "raster-basemap",
+      terrainSource: { id: "mapterhorn", label: "Mapterhorn Terrain" },
+      rasterQuality: { setting: "auto", activeProfile: "balanced" },
+    } as BabylonRuntimeStatus, 59.6, false);
+    expect(container.querySelector("#flightFps")?.textContent).toBe("FPS 60");
+    container.querySelector<HTMLButtonElement>("#flightSettingsButton")!.click();
+    expect(onSettingsClick).toHaveBeenCalledOnce();
+    container.querySelector<HTMLButtonElement>("#flightTerrainSourceButton")!.click();
+    container.querySelector<HTMLButtonElement>("[data-terrain-source=mapterhorn]")!.click();
+    expect(onTerrainSourceChange).toHaveBeenCalledWith("mapterhorn");
+    container.querySelector<HTMLButtonElement>("#flightTerrainQualityButton")!.click();
+    container.querySelector<HTMLButtonElement>("[data-terrain-quality=high]")!.click();
+    expect(onQualityChange).toHaveBeenCalledWith("high");
     hud.destroy();
     expect(unsubscribeStreaming).toHaveBeenCalledOnce();
     expect(mapButton.classList.contains("is-streaming")).toBe(false);

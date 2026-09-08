@@ -12,7 +12,7 @@ const mocks = vi.hoisted(() => {
       renderer: { mode: "webgl2" }, status: { mode: "fallback" }, scene: {},
       engine: { getFps: () => 60 }, geospatialCamera: null,
       getWorldRoot: () => ({}), setSimViewState: vi.fn(), setSimTick: vi.fn(),
-      setSimRunning: vi.fn(), requestRender: vi.fn(), destroy: vi.fn(),
+      setSimRunning: vi.fn(), requestRender: vi.fn(), setMapSource: vi.fn(), setTerrainSource: vi.fn(), setRasterQuality: vi.fn(), destroy: vi.fn(),
     },
     aircraft: {
       setViewMode: vi.fn(), toggleViewMode: vi.fn(), getViewMode: () => "third",
@@ -23,7 +23,7 @@ const mocks = vi.hoisted(() => {
 });
 vi.mock("foss-earth/runtime", () => ({
   createBabylonRuntime: async () => mocks.runtime,
-  RASTER_BASE_MAP_SOURCES: [], resolveMapRuntimeConfig: () => ({}), setMapSourcePreference: vi.fn(),
+  RASTER_BASE_MAP_SOURCES: [], TERRAIN_SOURCES: [], resolveTerrainSource: vi.fn(), resolveRasterBaseMapSource: vi.fn(), resolveMapRuntimeConfig: () => ({}), setMapSourcePreference: vi.fn(), setTerrainSourcePreference: vi.fn(), setRasterQualityPreference: vi.fn(),
 }));
 vi.mock("./jsbsim/createJsbsimRuntime", () => ({ createJsbsimRuntime: async () => ({ sdk: { setPropertyValue: vi.fn() }, dispose: vi.fn() }) }));
 vi.mock("./bridge/ecefBridge", () => ({ readFlightState: () => mocks.state }));

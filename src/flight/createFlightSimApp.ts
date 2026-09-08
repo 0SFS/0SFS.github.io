@@ -9,8 +9,13 @@ import "../styles/flight.css";
 import {
   createBabylonRuntime,
   RASTER_BASE_MAP_SOURCES,
+  TERRAIN_SOURCES,
+  resolveTerrainSource,
+  resolveRasterBaseMapSource,
   resolveMapRuntimeConfig,
   setMapSourcePreference,
+  setRasterQualityPreference,
+  setTerrainSourcePreference,
   type BabylonRuntime,
   type RasterBaseMapSource,
 } from "foss-earth/runtime";
@@ -91,7 +96,10 @@ export async function createFlightSimApp(
 
   const runtime = await createBabylonRuntime(canvas, {
     googleApiKey: mapConfig.googleApiKey,
+    preferGoogleTiles: mapConfig.preferGoogleTiles,
     rasterBaseMap: mapConfig.rasterBaseMap,
+    terrainSource: mapConfig.terrainSource,
+    rasterQuality: mapConfig.rasterQuality,
     rendererForce: getRendererForceFromUrl(),
     simMode: true,
   });
@@ -251,11 +259,24 @@ export async function createFlightSimApp(
     rendererForce,
     runtimeStatus: runtime.status,
     rasterSources: RASTER_BASE_MAP_SOURCES,
+    terrainSources: TERRAIN_SOURCES,
     onInputModeChange: (mode) => { inputMode = mode; },
     onInputSensitivityChange: (settings) => { inputSensitivity = settings; },
     onPausedChange: setSimulationPaused,
     onRendererChange: setRendererForce,
-    onMapSourceChange: setMapSourcePreference,
+    onMapSourceChange: (sourceId) => {
+      runtime.setMapSource(sourceId === "google" ? "google" : resolveRasterBaseMapSource(sourceId));
+      setMapSourcePreference(sourceId);
+    },
+    onTerrainSourceChange: (sourceId) => {
+      runtime.setTerrainSource(resolveTerrainSource(sourceId));
+      setTerrainSourcePreference(sourceId);
+    },
+    onQualityChange: (setting) => {
+      runtime.setRasterQuality(setting);
+      setRasterQualityPreference(setting);
+    },
+    onSettingsClick: () => panelRoot.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')?.click(),
   });
   hudBar.update(initialState, runtime.status, measuredFps, inputManager.isPaused());
 
