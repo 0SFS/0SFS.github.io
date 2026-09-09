@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  MAX_MESSAGE_BYTES, NEUTRAL_CONTROLS, isCentered, isControls, isCounter, neutralize, parseMessage,
+  MAX_MESSAGE_BYTES, NEUTRAL_CONTROLS, isCentered, isControls, isCounter, isProtocolVersionMismatch, neutralize, parseMessage,
   type AircraftStatus, type ControlSurfaceState, type RemoteMessage,
 } from "./protocol";
 
@@ -157,5 +157,32 @@ describe("phone control helpers", () => {
     for (const value of [-1, 0.1, Infinity, NaN, Number.MAX_SAFE_INTEGER + 1, "1", null]) {
       expect(isCounter(value)).toBe(false);
     }
+  });
+});
+
+
+describe("protocol version mismatch classification", () => {
+  it("identifies incompatible bounded envelopes without accepting their authority", () => {
+    for (const message of [
+      { v: 0, type: "hello" }, { v: 2, type: "welcome" }, { ...frame, v: 2 },
+      { v: Number.MAX_SAFE_INTEGER, type: "futureMessage" },
+    ]) {
+      expect(isProtocolVersionMismatch(message)).toBe(true);
+      expect(isProtocolVersionMismatch(JSON.stringify(message))).toBe(true);
+      expect(parseMessage(message)).toBeNull();
+    }
+    expect(isProtocolVersionMismatch(frame)).toBe(false);
+  });
+
+  it("does not misclassify malformed, oversized, or nonnumeric version envelopes", () => {
+    const circular: Record<string, unknown> = { v: 2, type: "hello" };
+    circular.self = circular;
+    for (const value of [null, undefined, "{", [], 2, circular,
+      { v: "2", type: "hello" }, { v: -1, type: "hello" }, { v: 1.1, type: "hello" },
+      { v: Number.MAX_SAFE_INTEGER + 1, type: "hello" }, { v: Infinity, type: "hello" },
+      { v: 2 }, { v: 2, type: "" }, { v: 2, type: "x".repeat(65) },
+      { v: 2, type: "hello", padding: "x".repeat(MAX_MESSAGE_BYTES) },
+      { v: 2, type: "hello", padding: "😀".repeat(600) },
+    ]) expect(isProtocolVersionMismatch(value)).toBe(false);
   });
 });

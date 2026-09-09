@@ -4,7 +4,7 @@ Status: Proposal complete and ready for review; implementation not started
 
 Date: 2026-09-08
 
-Reviewed: Flight Sim `ecd30ad8`, including the working-tree README
+Reviewed: OSFS `ecd30ad8`, including the working-tree README
 
 ## Recommendation
 
@@ -24,7 +24,7 @@ Mission planning, autonomous takeoff/landing, additional aircraft and vehicle ty
 
 | Finding | Evidence | Consequence |
 | --- | --- | --- |
-| The ownership boundary is already suitable. Flight Sim owns JSBSim and flight UI; shared rendering is imported from FOSS Earth. | [Application composition](../../src/flight/createFlightSimApp.ts), [package boundary](../foss-earth-relationship.md) | Keep autopilot code in Flight Sim and its local tooling. |
+| The ownership boundary is already suitable. OSFS owns JSBSim and flight UI; shared rendering is imported from FOSS Earth. | [Application composition](../../src/flight/createFlightSimApp.ts), [package boundary](../foss-earth-relationship.md) | Keep autopilot code in OSFS and its local tooling. |
 | Manual controls are unconditionally applied before every physics step. | [createFlightSimApp.ts, lines 321–329](../../src/flight/createFlightSimApp.ts#L321), [input writer](../../src/flight/input/flightInputManager.ts#L170) | Introduce one explicit control arbiter; otherwise manual input overwrites ArduPilot. |
 | The 120 Hz integrator is driven by render callbacks, with at most six accumulated substeps. Rendering pauses when the document is hidden. | [fixedStepLoop.ts](../../src/flight/physics/fixedStepLoop.ts#L6), app `runtime.setSimTick`; sibling FOSS Earth `createBabylonRuntime.ts` | External simulation needs synchronized stepping independent of display interpolation and frame rate. |
 | `FlightState` is a display snapshot, with calibrated airspeed and vertical speed but no full velocity, gyro, accelerometer, or timestamp. | [FlightState](../../src/flight/physics/flightState.ts#L3), [readFlightState](../../src/flight/bridge/ecefBridge.ts#L5) | Add a dedicated simulator-truth adapter. Do not send interpolated HUD state. |

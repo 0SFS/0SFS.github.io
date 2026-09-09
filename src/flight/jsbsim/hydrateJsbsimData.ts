@@ -4,7 +4,9 @@ interface ManifestFileList {
   files: string[];
 }
 
-export async function hydrateJsbsimData(sdk: JSBSimSdk, baseUrl = "/jsbsim-data"): Promise<void> {
+const DEFAULT_DATA_BASE_URL = `${import.meta.env.BASE_URL}jsbsim-data`;
+
+export async function hydrateJsbsimData(sdk: JSBSimSdk, baseUrl = DEFAULT_DATA_BASE_URL): Promise<void> {
   const manifestUrl = `${baseUrl}/manifest.json`;
   const response = await fetch(manifestUrl);
   if (!response.ok) {

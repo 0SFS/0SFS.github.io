@@ -1,0 +1,95 @@
+{
+ "file": "sf50_lod3.blend",
+ "objects": 1,
+ "empties": 1,
+ "meshes": 1,
+ "triangles": 98,
+ "vertices": 74,
+ "materials": 3,
+ "material_names": [
+  "SF50_Glass",
+  "SF50_Metal",
+  "SF50_Paint"
+ ],
+ "textures": 0,
+ "texture_names": [],
+ "dimensions": {
+  "length": {
+   "value": 9.357,
+   "ref": 9.357,
+   "err": 0.0,
+   "pass_": true
+  },
+  "span": {
+   "value": 11.796,
+   "ref": 11.796,
+   "err": -0.0,
+   "pass_": true
+  },
+  "height": {
+   "value": 3.3227,
+   "ref": 3.322,
+   "err": 0.0007,
+   "pass_": true
+  }
+ },
+ "bbox_min": [
+  -5.898,
+  -5.357,
+  0.0
+ ],
+ "bbox_max": [
+  5.898,
+  4.0,
+  3.3227
+ ],
+ "size_xyz": [
+  11.796,
+  9.357,
+  3.3227
+ ],
+ "ground_contact": {
+  "lowest_z": 0.0,
+  "pass_": true,
+  "objects_on_the_ground": [
+   "Cirrus_Vision_Jet_Body"
+  ]
+ },
+ "non_manifold_edges": 36,
+ "open_boundary_by_object": [
+  {
+   "name": "Cirrus_Vision_Jet_Body",
+   "boundary_edges": 36
+  }
+ ],
+ "degenerate_faces": 0,
+ "loose_vertices": 0,
+ "unapplied_transforms": [],
+ "symmetry_error_m": {
+  "mean": 0.0,
+  "max": 0.0,
+  "over_1mm": 0
+ },
+ "asymmetric_objects": [],
+ "object_names": [
+  "Cirrus_Vision_Jet",
+  "Cirrus_Vision_Jet_Body"
+ ],
+ "per_object": [
+  {
+   "name": "Cirrus_Vision_Jet_Body",
+   "tris": 98,
+   "verts": 74,
+   "mats": [
+    "SF50_Paint",
+    "SF50_Glass",
+    "SF50_Metal"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  }
+ ]
+}

@@ -103,8 +103,9 @@ container loader is injectable so tests never touch the network.
 exposes a `modelRoot` slot. The placeholder blocks are drawn only while no real
 mesh is present, and the model follows the same cockpit/chase visibility rules.
 
-Selections persist to `localStorage` under `flight-sim.aircraft` and
-`flight-sim.aircraft-lod`.
+Selections persist to `localStorage` under `osfs.aircraft` and
+`osfs.aircraft-lod`. OSFS reads the former `flight-sim.*` keys as a migration
+fallback so existing local selections are retained.
 
 ## Control surfaces and propeller
 
@@ -209,8 +210,8 @@ console.
 3. Check the parked stance and adjust `modelOffset.y` if needed.
 
 An airframe with an empty `lods` array is still selectable; it falls back to the
-placeholder blocks and the panel explains why. That is how the Cirrus Vision Jet
-is currently wired.
+placeholder blocks and the panel explains why. That is a reasonable way to land
+a catalog entry before its mesh exists.
 
 ## Regenerating the Cessna 172
 
@@ -276,9 +277,11 @@ the wing thins to a knife edge and stops covering the opening.
 
 ## Known gaps
 
-- The Cirrus Vision Jet has no mesh and no flight model of its own; selecting it
-  swaps the visual placeholder only.
-- LOD3 is 130 triangles against a 100 target. The remaining cuts are the lift
+- The Cirrus Vision Jet has a mesh but no flight model of its own: it flies the
+  C172's, so its parked stance is that aircraft's rather than an SF50's, and
+  its V-tail does not move. See
+  `planes/Cirrus_Vision_Jet/agent_workspace/REPORT.md`.
+- The Cessna's LOD3 is 130 triangles against a 100 target. The remaining cuts are the lift
   struts, landing gear and glazing, which are what distinguish the airframe from
   a generic monoplane at any distance.
 - The models carry no panel lines, antennas, door outlines or wheel fairings.

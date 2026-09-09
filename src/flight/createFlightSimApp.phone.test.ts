@@ -116,7 +116,7 @@ function grant() {
   options.onOwnershipChange("phone", { ...mocks.phoneControls, elevator: 0, aileron: 0, rudder: 0, brake: 0 });
 }
 
-describe("Flight Sim phone integration", () => {
+describe("OSFS phone integration", () => {
   it("initializes the phone session only from the HUD button, reuses the dialog, and leaves flight unchanged", async () => {
     await mount(false);
     expect(mocks.createPhoneSession).not.toHaveBeenCalled();

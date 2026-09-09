@@ -17,7 +17,7 @@ export type AircraftLodMeshId = Exclude<AircraftLodId, "auto">;
 export interface AircraftLodDefinition {
   id: AircraftLodMeshId;
   label: string;
-  /** Triangle count as reported by scripts/validate_c172.py. */
+  /** Triangle count as reported by that airframe's validate_*.py. */
   triangles: number;
   /** Path relative to the Vite base URL. */
   path: string;
@@ -48,6 +48,13 @@ export interface AircraftDefinition {
   lods: readonly AircraftLodDefinition[];
 }
 
+const CIRRUS_LODS: readonly AircraftLodDefinition[] = [
+  { id: "lod0", label: "LOD0 — near", triangles: 1552, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD0.glb", autoFromMeters: 0 },
+  { id: "lod1", label: "LOD1 — medium", triangles: 970, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD1.glb", autoFromMeters: 65 },
+  { id: "lod2", label: "LOD2 — far", triangles: 246, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD2.glb", autoFromMeters: 170 },
+  { id: "lod3", label: "LOD3 — silhouette", triangles: 98, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD3.glb", autoFromMeters: 340 },
+];
+
 const C172_LODS: readonly AircraftLodDefinition[] = [
   { id: "lod0", label: "LOD0 — near", triangles: 1016, path: "aircraft/cessna-172/Cessna_172_LOD0.glb", autoFromMeters: 0 },
   { id: "lod1", label: "LOD1 — medium", triangles: 778, path: "aircraft/cessna-172/Cessna_172_LOD1.glb", autoFromMeters: 60 },
@@ -68,13 +75,18 @@ export const AIRCRAFT_CATALOG: readonly AircraftDefinition[] = [
   {
     id: "cirrus-vision-jet",
     label: "Cirrus Vision Jet",
-    // No mesh has been built for this airframe yet, and the flight model is
-    // still the C172's, so selecting it only swaps the visual placeholder.
-    summary: "No model built yet — falls back to the block placeholder.",
+    summary: "Single-engine V-tail jet. Visuals only — it flies the C172's model.",
     modelYawRad: Math.PI,
+    // Same -1.33 as the C172, and for the same reason rather than by
+    // coincidence: this mesh also puts its origin on the ground between the
+    // wheels, so it has to be dropped by exactly the stance the simulator
+    // holds the reference point at. That stance is the C172's, because the
+    // flight model is; a real SF50 sits lower on its own gear, so the parked
+    // attitude here is a compromise until an SF50 flight model exists.
     modelOffset: { x: 0, y: -1.33, z: 0 },
+    // A jet: the propeller-disc logic must never engage.
     propellerBlades: 0,
-    lods: [],
+    lods: CIRRUS_LODS,
   },
 ];
 

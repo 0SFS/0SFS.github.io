@@ -2,14 +2,14 @@
 
 Status: Stage 1 complete; Stage 2 enabled for gameplay evaluation
 Date: 2026-09-08
-Scope: Flight Sim collision, recovery, and FOSS Earth `SurfaceQuery` integration
+Scope: OSFS collision, recovery, and FOSS Earth `SurfaceQuery` integration
 
 ## Problem
 
-Flight Sim has two incompatible contact paths. Raster basemaps provide
+OSFS has two incompatible contact paths. Raster basemaps provide
 `SurfaceQuery.sample()` from the adopted terrain triangles, and JSBSim consumes
 that height as its gear-contact floor. Google 3D Tiles are rendered visually,
-but Flight Sim does not sample them, so JSBSim retains a previous raster floor.
+but OSFS does not sample them, so JSBSim retains a previous raster floor.
 This creates an invisible collision surface. Neither path currently tests the
 aircraft against trees or buildings; `tiles.checkCollisions` is not aircraft
 physics.

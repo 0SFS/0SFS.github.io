@@ -1,7 +1,7 @@
 import { createPeerEndpoint, type SessionTransport, type PeerEndpoint } from "../../remote/peerTransport";
 import { createJoinSecret, createPairingUrl, INVITATION_TTL_MS } from "../../remote/pairing";
 import {
-  HANDOFF_MS, HEARTBEAT_MS, STALE_MS, isCentered, neutralize, parseMessage,
+  HANDOFF_MS, HEARTBEAT_MS, STALE_MS, PROTOCOL_MISMATCH_MESSAGE, isCentered, isProtocolVersionMismatch, neutralize, parseMessage,
   type ActionMessage, type AircraftStatus, type ControlFrame, type ControlSurfaceState, type RemoteMessage,
 } from "../../remote/protocol";
 
@@ -58,6 +58,7 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
   const frameTimes: number[] = [];
   const actions = new Map<number, RemoteMessage>();
   let maxActionId = -1;
+  let pendingStatus: { epoch: number; message: string; deadline: number; attempts: number } | null = null;
 
   const publish = (patch: Partial<PhoneSessionSnapshot> = {}) => {
     snapshot = { ...snapshot, ...patch };
@@ -65,10 +66,36 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
   };
   const envelope = () => ({ v: 1 as const, session, epoch });
   const status = (): AircraftStatus => ({ ...options.getStatus(), owner: snapshot.owner });
-  const send = (message: RemoteMessage) => active?.sendReliable(message) ?? false;
+  const send = (message: RemoteMessage) => {
+    const sent = active?.sendReliable(message) ?? false;
+    // A delivered authoritative response supersedes any older status retry.
+    if (sent && ["ack", "granted", "handoff", "welcome"].includes(message.type)) pendingStatus = null;
+    return sent;
+  };
+  const retryStatus = () => {
+    const queued = pendingStatus;
+    if (!queued) return;
+    if (!active || !localReady || !remoteReady || queued.epoch !== epoch) { pendingStatus = null; return; }
+    if (now() >= queued.deadline || queued.attempts >= 8) {
+      pendingStatus = null;
+      fail("Could not synchronize phone controls. Scan a new QR to reconnect."); return;
+    }
+    queued.attempts += 1;
+    // Read the current applied state at send time; never replay an old baseline.
+    const sent = send({ ...envelope(), type: "status", message: queued.message, status: status() });
+    if (pendingStatus !== queued) return;
+    if (sent) pendingStatus = null;
+    else if (queued.attempts >= 8) {
+      pendingStatus = null;
+      fail("Could not synchronize phone controls. Scan a new QR to reconnect.");
+    }
+  };
   const publishStatus = (message: string) => {
-    if (active && localReady && remoteReady) send({ ...envelope(), type: "status", message, status: status() });
     publish({ message });
+    if (active && localReady && remoteReady) {
+      pendingStatus = { epoch, message, deadline: pendingStatus?.deadline ?? now() + 500, attempts: pendingStatus?.attempts ?? 0 };
+      retryStatus();
+    }
   };
   const freshLease = (id: number) => {
     const lease = leases.get(id);
@@ -76,7 +103,7 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
   };
   const freshInput = () => Boolean(latest && now() - latest.receivedAt <= STALE_MS && freshLease(latest.frame.lease));
   const newEpoch = () => {
-    epoch += 1; latest = null; lastSeq = -1; leases.clear(); actions.clear(); pending = null;
+    epoch += 1; latest = null; lastSeq = -1; leases.clear(); actions.clear(); pending = null; pendingStatus = null;
     maxActionId = -1; lastAppliedSeq = undefined; receiveToApplyMs = undefined; frameTimes.length = 0;
   };
   const issueLease = () => {
@@ -185,8 +212,9 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     acknowledge(message.id, true, "Applied");
     publishStatus(snapshot.owner === "phone" ? "Phone controls" : "Desktop controls");
   };
-  const onNative = (input: unknown) => {
+  const onNative = (input: unknown, rejectVersion: () => void) => {
     const message = parseMessage(input);
+    if (!message && isProtocolVersionMismatch(input)) { rejectVersion(); return; }
     if (!message || !("session" in message) || message.session !== session || message.epoch !== epoch || !localReady || !remoteReady) return;
     if (message.type === "ping") { active?.sendNative({ ...message, type: "pong" }, true); return; }
     if (message.type !== "controls" || (!pending && snapshot.owner !== "phone") || message.seq <= lastSeq || !freshLease(message.lease)) return;
@@ -213,15 +241,39 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     // `hello`. The transport already bounds that setup at 15 seconds; this
     // shorter deadline is only for an opened, unauthenticated connection.
     let helloTimer: ReturnType<typeof setTimeout> | undefined;
+    let rejectingVersion = false;
+    const rejectVersion = () => {
+      if (rejectingVersion) return;
+      rejectingVersion = true;
+      clearTimeout(helloTimer);
+      if (active === transport) {
+        revoke(PROTOCOL_MISMATCH_MESSAGE, true);
+        localReady = remoteReady = false;
+        clearTimeout(setupTimer); setupTimer = undefined;
+        publish({ phase: "error", message: PROTOCOL_MISMATCH_MESSAGE });
+      } else publish({ message: PROTOCOL_MISMATCH_MESSAGE });
+      transport.sendReliable({ v: 1, type: "reject", reason: PROTOCOL_MISMATCH_MESSAGE });
+      // Give the ordered rejection a bounded opportunity to leave the channel.
+      // Authority has already been revoked and all further input is ignored.
+      helloTimer = setTimeout(() => {
+        if (disposed || currentGeneration !== generation) return;
+        if (active === transport) fail(PROTOCOL_MISMATCH_MESSAGE);
+        else transport.close();
+      }, 100);
+    };
     const startHelloTimer = () => {
-      if (disposed || currentGeneration !== generation || !transports.has(transport) || active) return;
+      if (rejectingVersion || disposed || currentGeneration !== generation || !transports.has(transport) || active) return;
       helloTimer = setTimeout(() => transport.close(), 5000);
     };
     const detach = [
       transport.onReliable(input => {
-        if (disposed || currentGeneration !== generation) return;
+        if (rejectingVersion || disposed || currentGeneration !== generation) return;
         const message = parseMessage(input);
-        if (!message) { transport.close(); return; }
+        if (!message) {
+          if (isProtocolVersionMismatch(input)) rejectVersion();
+          else transport.close();
+          return;
+        }
         if (transport !== active) {
           if (message.type !== "hello" || !secret || message.secret !== secret || snapshot.expiresAt === null || now() >= snapshot.expiresAt) {
             transport.sendReliable({ v: 1, type: "reject", reason: "Invitation expired or unavailable. Scan a new QR." });
@@ -245,14 +297,14 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
             void ready.catch(() => {}); fail("Could not send phone connection setup. Create a new QR."); return;
           }
           void ready.then(() => {
-            if (disposed || currentGeneration !== generation || active !== transport) return;
+            if (rejectingVersion || disposed || currentGeneration !== generation || active !== transport) return;
             localReady = true;
             if (!send({ ...envelope(), type: "ready" })) { fail("Could not finish phone connection setup. Create a new QR."); return; }
             if (remoteReady) {
               clearTimeout(setupTimer); setupTimer = undefined;
               publish({ phase: "paired", message: "Phone paired · Desktop controls" });
             }
-          }).catch(() => { if (!disposed && currentGeneration === generation) fail("Could not connect directly. Try the same non-guest Wi-Fi network."); });
+          }).catch(() => { if (!rejectingVersion && !disposed && currentGeneration === generation) fail("Could not connect directly. Try the same non-guest Wi-Fi network."); });
           return;
         }
         if (!("session" in message) || message.session !== session || message.epoch !== epoch) return;
@@ -265,11 +317,17 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
         } else if (localReady && remoteReady && message.type === "action") handleAction(message);
         else if (message.type === "handoffAck" && pending?.id === message.requestId) { pending.ack = true; maybeGrant(); }
       }),
-      transport.onNative(input => { if (active === transport && currentGeneration === generation) onNative(input); }),
+      transport.onNative(input => {
+        if (rejectingVersion || disposed || active !== transport || currentGeneration !== generation) return;
+        onNative(input, rejectVersion);
+      }),
       transport.onClose(() => {
         clearTimeout(helloTimer);
         cleanup.get(transport)?.(); cleanup.delete(transport); transports.delete(transport);
-        if (!disposed && active === transport && currentGeneration === generation) disconnect("Connection lost. Scan a new QR to pair again.");
+        if (!disposed && active === transport && currentGeneration === generation) {
+          if (rejectingVersion) fail(PROTOCOL_MISMATCH_MESSAGE);
+          else disconnect("Connection lost. Scan a new QR to pair again.");
+        }
       }),
     ];
     cleanup.set(transport, () => { clearTimeout(helloTimer); detach.forEach(fn => fn()); });
@@ -285,6 +343,7 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     if (pending && (now() >= pending.deadline || handoffChanged())) revoke("Control transfer canceled. Tap Fly again.", false);
     if (snapshot.owner === "phone" && !isPageVisible()) revoke("Desktop hidden · Simulation paused", true);
     if (snapshot.owner === "phone" && !freshInput()) revoke("Phone input lost · Simulation paused", true);
+    retryStatus();
     if (!active || !localReady || !remoteReady) return;
     const lease = issueLease();
     ticks += 1;

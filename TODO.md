@@ -7,7 +7,7 @@ when hover over POI and move mouse into overlaid UI the tooltip remains active u
 
 ---
 
-# flight sim
+# OSFS
 
 ## performance
 
@@ -56,6 +56,15 @@ chase it with.
 
 ## aircraft
 
-**Cirrus Vision Jet has no mesh.** It is selectable and falls back to the
-placeholder blocks. `docs/creating-an-aircraft-model.md` is the guide for
-building one.
+**Cirrus Vision Jet flies the C172's flight model.** The mesh is built and
+wired in (1000 / 722 / 246 / 98 triangles), but the aerodynamics, gear and
+stance are still the Cessna's, so the jet sits at the C172's 1.33 m reference
+stance rather than its own.
+
+**The V-tail does not move.** `SURFACE_BINDINGS` turns one named node about one
+fixed local axis, and a V-tail's two ruddervators are not a single rigid
+rotation for either pitch or yaw. The mesh already exports
+`Ruddervator_Left` / `Ruddervator_Right` with their origins on the real hinge
+lines; the runtime needs two bindings with per-node axes and an
+elevator-plus-rudder mix. `planes/Cirrus_Vision_Jet/agent_workspace/REPORT.md`
+gives the exact change.

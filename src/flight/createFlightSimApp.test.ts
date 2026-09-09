@@ -61,7 +61,7 @@ import { createFlightSimApp } from "./createFlightSimApp";
 
 afterEach(() => { vi.clearAllMocks(); vi.unstubAllGlobals(); document.body.replaceChildren(); });
 
-describe("Flight Sim render demand", () => {
+describe("OSFS render demand", () => {
   it("pauses/resumes without a frame, wakes for camera changes, and discards idle elapsed time", async () => {
     vi.stubGlobal("localStorage", { getItem: () => "trackpad", setItem: vi.fn() });
     Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
@@ -219,11 +219,11 @@ it("selects the airframe and LOD from the Aircraft tab and persists both", async
       lodSelect.dispatchEvent(new Event("change", { bubbles: true }));
     });
     expect(mocks.aircraftModel.setLod).toHaveBeenCalledWith("lod2");
-    expect(setItem).toHaveBeenCalledWith("flight-sim.aircraft-lod", "lod2");
+    expect(setItem).toHaveBeenCalledWith("osfs.aircraft-lod", "lod2");
 
     await act(async () => radios[1].click());
     expect(mocks.aircraftModel.setAircraft).toHaveBeenCalledWith("cirrus-vision-jet");
-    expect(setItem).toHaveBeenCalledWith("flight-sim.aircraft", "cirrus-vision-jet");
+    expect(setItem).toHaveBeenCalledWith("osfs.aircraft", "cirrus-vision-jet");
   } finally { await act(async () => app.destroy()); }
 });
 

@@ -1,0 +1,7 @@
+# Regenerable scratch: `generate_sf50.py --lod N --blend work/...` rebuilds these
+work/
+logs/
+# Iteration renders kept locally only; final_lod0/ and COMPARE_* are committed
+renders/iter*/
+renders/lod*/
+renders/preview/

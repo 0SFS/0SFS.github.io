@@ -9,7 +9,7 @@ describe('phone invitation URLs', () => {
     const value = createPairingUrl('desktop-1', secret)
     const url = new URL(value)
     expect(url.origin).toBe('https://felipegalind0.io')
-    expect(url.pathname).toBe('/flight-sim/')
+    expect(url.pathname).toBe('/OSFS/')
     expect(url.search).toBe('?mode=remote')
     expect(url.search).not.toContain(secret)
     expect(parsePairingUrl(value)).toEqual({ peerId: 'desktop-1', secret })

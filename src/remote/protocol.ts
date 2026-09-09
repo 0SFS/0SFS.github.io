@@ -2,6 +2,7 @@ import type { ControlSurfaceState } from "../flight/input/flightInputManager";
 
 export type { ControlSurfaceState };
 export const PROTOCOL_VERSION = 1;
+export const PROTOCOL_MISMATCH_MESSAGE = "Unsupported phone protocol. Reload both devices.";
 export const MAX_MESSAGE_BYTES = 2048;
 export const STALE_MS = 250;
 export const HANDOFF_MS = 2000;
@@ -72,8 +73,7 @@ function status(value: unknown): value is AircraftStatus {
     && isControls(value.controls) && finite(value.airspeedKts) && finite(value.altitudeFt) && finite(value.headingDeg);
 }
 
-/** All network inputs are bounded before validation; rejected frames never refresh a lease. */
-export function parseMessage(input: unknown): RemoteMessage | null {
+function parseBoundedRecord(input: unknown): Record<string, unknown> | null {
   let value: unknown;
   try {
     const encoded = typeof input === "string" ? input : JSON.stringify(input);
@@ -81,7 +81,19 @@ export function parseMessage(input: unknown): RemoteMessage | null {
       || new TextEncoder().encode(encoded).length > MAX_MESSAGE_BYTES) return null;
     value = JSON.parse(encoded);
   } catch { return null; }
-  if (!record(value) || value.v !== PROTOCOL_VERSION) return null;
+  return record(value) ? value : null;
+}
+
+/** Classifies a bounded version envelope only; never accepts its controls or authority. */
+export function isProtocolVersionMismatch(input: unknown): boolean {
+  const value = parseBoundedRecord(input);
+  return Boolean(value && isCounter(value.v) && value.v !== PROTOCOL_VERSION && boundedString(value.type, 64));
+}
+
+/** All network inputs are bounded before validation; rejected frames never refresh a lease. */
+export function parseMessage(input: unknown): RemoteMessage | null {
+  const value = parseBoundedRecord(input);
+  if (!value || value.v !== PROTOCOL_VERSION) return null;
   if (value.type === "hello") return typeof value.secret === "string" && /^[A-Za-z0-9_-]{43}$/.test(value.secret) ? value as RemoteMessage : null;
   if (value.type === "reject") return boundedString(value.reason) ? value as RemoteMessage : null;
   if (!boundedString(value.session, 128) || !isCounter(value.epoch)) return null;

@@ -6,6 +6,7 @@ import {
   isAircraftLodId,
   resolveLod,
   selectAutoLod,
+  type AircraftDefinition,
 } from "./aircraftCatalog";
 
 const c172 = getAircraftDefinition("cessna-172");
@@ -26,10 +27,29 @@ describe("aircraft catalog", () => {
     expect(isAircraftLodId("lod9")).toBe(false);
   });
 
-  it("orders C172 levels from most to least detailed", () => {
-    const triangles = c172.lods.map((lod) => lod.triangles);
-    expect(triangles).toEqual([...triangles].sort((a, b) => b - a));
-    expect(c172.lods.map((lod) => lod.id)).toEqual(["lod0", "lod1", "lod2", "lod3"]);
+  it("orders every airframe's levels from most to least detailed", () => {
+    for (const definition of AIRCRAFT_CATALOG) {
+      const triangles = definition.lods.map((lod) => lod.triangles);
+      expect(triangles).toEqual([...triangles].sort((a, b) => b - a));
+      expect(definition.lods.map((lod) => lod.id)).toEqual(["lod0", "lod1", "lod2", "lod3"]);
+      const distances = definition.lods.map((lod) => lod.autoFromMeters);
+      expect(distances).toEqual([...distances].sort((a, b) => a - b));
+      expect(distances[0]).toBe(0);
+    }
+  });
+
+  it("keeps the jet off the propeller path", () => {
+    expect(cirrus.propellerBlades).toBe(0);
+    expect(c172.propellerBlades).toBe(2);
+  });
+
+  it("drops every model by the stance the simulator holds the aircraft at", () => {
+    // Both meshes put their origin on the ground between the wheels, so both
+    // are dropped by STATIC_STANCE_METERS. See docs/ground-contact.md.
+    for (const definition of AIRCRAFT_CATALOG) {
+      expect(definition.modelOffset).toEqual({ x: 0, y: -1.33, z: 0 });
+      expect(definition.modelYawRad).toBe(Math.PI);
+    }
   });
 
   it("picks a coarser auto level as the chase camera pulls back", () => {
@@ -45,10 +65,20 @@ describe("aircraft catalog", () => {
     expect(resolveLod(c172, "lod0", 9999)?.id).toBe("lod0");
   });
 
+  it("picks a coarser auto level for the jet as well", () => {
+    expect(selectAutoLod(cirrus, 0)?.id).toBe("lod0");
+    expect(selectAutoLod(cirrus, 64)?.id).toBe("lod0");
+    expect(selectAutoLod(cirrus, 65)?.id).toBe("lod1");
+    expect(selectAutoLod(cirrus, 200)?.id).toBe("lod2");
+    expect(selectAutoLod(cirrus, 5000)?.id).toBe("lod3");
+  });
+
   it("returns no mesh for an airframe that has none, at any level", () => {
-    expect(cirrus.lods).toHaveLength(0);
-    expect(resolveLod(cirrus, "auto", 0)).toBeNull();
-    expect(resolveLod(cirrus, "lod0", 0)).toBeNull();
-    expect(selectAutoLod(cirrus, 0)).toBeNull();
+    // Every shipped airframe now has a mesh, but the fallback is how a new
+    // entry lands before one exists, so it stays covered.
+    const meshless: AircraftDefinition = { ...cirrus, lods: [] };
+    expect(resolveLod(meshless, "auto", 0)).toBeNull();
+    expect(resolveLod(meshless, "lod0", 0)).toBeNull();
+    expect(selectAutoLod(meshless, 0)).toBeNull();
   });
 });

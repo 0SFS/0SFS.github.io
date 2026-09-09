@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPhoneControlSession } from './createPhoneControlSession'
 import { parsePairingUrl } from '../../remote/pairing'
-import type { AircraftStatus, ControlSurfaceState, RemoteMessage } from '../../remote/protocol'
+import { PROTOCOL_MISMATCH_MESSAGE, type AircraftStatus, type ControlSurfaceState, type RemoteMessage } from '../../remote/protocol'
 import type { createPeerEndpoint, SessionTransport } from '../../remote/peerTransport'
 
 function deferred<T>() {
@@ -212,7 +212,7 @@ describe('desktop phone control session', () => {
     expect(h.pause).not.toHaveBeenCalled()
   })
 
-  it.each([{ v: 1, type: 'hello', secret: 'x'.repeat(43) }, { v: 2, type: 'hello', secret: 'x'.repeat(43) }, { type: 'unknown' }])('rejects invalid authentication without modifying local flight', async (message) => {
+  it.each([{ v: 1, type: 'hello', secret: 'x'.repeat(43) }, { type: 'unknown' }])('rejects invalid authentication without modifying local flight', async (message) => {
     const h = setup()
     await h.session.startPairing()
     const transport = new Transport()
@@ -388,5 +388,156 @@ describe('desktop phone control session', () => {
     h.endpoints[0].callbacks.onSignalingState!(false)
     expect(transport.native.length).toBe(sent)
     expect(updates).toHaveBeenCalledTimes(updateCount)
+  })
+})
+
+
+describe('unsupported protocol versions', () => {
+  it('rejects an incompatible hello with reload guidance and no opportunity to authenticate afterward', async () => {
+    const h = setup()
+    await h.session.startPairing()
+    const secret = parsePairingUrl(h.session.getSnapshot().invitationUrl!)!.secret
+    const transport = new Transport()
+    h.endpoints[0].callbacks.onConnection!(transport)
+    transport.receive({ v: 2, type: 'hello', secret })
+    expect(transport.last('reject').reason).toBe(PROTOCOL_MISMATCH_MESSAGE)
+    expect(h.session.getSnapshot()).toMatchObject({ phase: 'invitation', owner: 'local', message: PROTOCOL_MISMATCH_MESSAGE })
+    transport.receive({ v: 1, type: 'hello', secret })
+    expect(transport.openNative).not.toHaveBeenCalled()
+    await h.advance(100)
+    expect(transport.closed).toBe(true)
+    expect(h.ownership).not.toHaveBeenCalled()
+    expect(h.pause).not.toHaveBeenCalled()
+  })
+
+  it.each(['reliable', 'native'] as const)('immediately revokes authority for an incompatible %s envelope and retains reload guidance after closure', async (channel) => {
+    const h = setup()
+    const transport = await h.pair()
+    const handoff = h.grant(transport)
+    const mismatch = { v: 2, type: 'controls', session: handoff.session, epoch: handoff.epoch }
+    if (channel === 'reliable') transport.receive(mismatch)
+    else transport.receiveNative(mismatch)
+    expect(h.session.getSnapshot()).toMatchObject({ phase: 'error', owner: 'local', message: PROTOCOL_MISMATCH_MESSAGE })
+    expect(h.pause).toHaveBeenCalledWith(true)
+    expect(transport.last('reject').reason).toBe(PROTOCOL_MISMATCH_MESSAGE)
+    transport.receiveNative({ v: 1, type: 'controls', session: handoff.session, epoch: handoff.epoch, seq: 100, lease: handoff.lease, controls: { ...handoff.controls, elevator: 1 } })
+    expect(h.session.beforeStep(h.state.controls)).toMatchObject({ elevator: 0 })
+    await h.advance(100)
+    expect(transport.closed).toBe(true)
+    expect(h.session.getSnapshot().message).toBe(PROTOCOL_MISMATCH_MESSAGE)
+  })
+
+  it('cancels the bounded rejection timer on teardown without later state changes', async () => {
+    const h = setup()
+    const transport = await h.pair()
+    transport.receive({ v: 2, type: 'ready' })
+    h.session.destroy()
+    const closed = h.session.getSnapshot()
+    await h.advance(200)
+    expect(h.session.getSnapshot()).toBe(closed)
+    expect(transport.closed).toBe(true)
+  })
+})
+
+
+describe('reliable authority status recovery', () => {
+  it('retries a backpressured takeover with the freshest applied state', async () => {
+    const h = setup()
+    const transport = await h.pair()
+    h.grant(transport)
+    let statusAttempts = 0
+    transport.sendReliable.mockImplementation(value => {
+      const message = value as RemoteMessage
+      if (message.type === 'status' && ++statusAttempts === 1) return false
+      transport.reliable.push(message)
+      return true
+    })
+    h.session.takeControl()
+    expect(statusAttempts).toBe(1)
+    expect(h.session.getSnapshot().owner).toBe('local')
+    h.state.controls.throttle = .91
+    await h.advance(50)
+    expect(statusAttempts).toBe(2)
+    expect(transport.last('status')).toMatchObject({ status: { owner: 'local', controls: { throttle: .91 } } })
+    await h.advance(200)
+    expect(statusAttempts).toBe(2)
+    expect(h.pause).not.toHaveBeenCalled()
+  })
+
+  it('coalesces retries and terminates a permanently blocked status with an actionable error', async () => {
+    const h = setup()
+    const transport = await h.pair()
+    h.grant(transport)
+    let statusAttempts = 0
+    transport.sendReliable.mockImplementation(value => {
+      if ((value as RemoteMessage).type === 'status') { statusAttempts += 1; return false }
+      return true
+    })
+    h.session.takeControl()
+    h.session.syncStatus()
+    await h.advance(50)
+    h.session.syncStatus()
+    for (let tick = 0; tick < 10; tick++) await h.advance(50)
+    expect(statusAttempts).toBe(8)
+    expect(transport.closed).toBe(true)
+    expect(h.session.getSnapshot()).toMatchObject({ phase: 'error', owner: 'local', message: 'Could not synchronize phone controls. Scan a new QR to reconnect.' })
+    const attempts = statusAttempts
+    await h.advance(1000)
+    expect(statusAttempts).toBe(attempts)
+  })
+
+  it('clears an older retry when the next epoch handoff is granted', async () => {
+    const h = setup()
+    const transport = await h.pair()
+    h.grant(transport)
+    transport.sendReliable.mockImplementation(value => {
+      const message = value as RemoteMessage
+      if (message.type === 'status') return false
+      transport.reliable.push(message)
+      return true
+    })
+    h.session.takeControl()
+    await h.advance(50)
+    h.grant(transport, 2)
+    expect(h.session.getSnapshot().owner).toBe('phone')
+    const statusAttempts = transport.sendReliable.mock.calls.filter(([value]) => (value as RemoteMessage).type === 'status').length
+    await h.advance(100)
+    expect(transport.sendReliable.mock.calls.filter(([value]) => (value as RemoteMessage).type === 'status')).toHaveLength(statusAttempts)
+    expect(h.session.getSnapshot().owner).toBe('phone')
+  })
+
+  it('supersedes an unsent status with a successful authoritative acknowledgement', async () => {
+    const h = setup()
+    const transport = await h.pair()
+    const handoff = h.grant(transport)
+    let failStatus = true
+    transport.sendReliable.mockImplementation(value => {
+      const message = value as RemoteMessage
+      if (message.type === 'status' && failStatus) return false
+      transport.reliable.push(message)
+      return true
+    })
+    h.session.syncStatus()
+    // An invalid lease produces a current-state acknowledgement, which replaces
+    // the earlier synchronization attempt without creating another status.
+    transport.receive({ v: 1, type: 'action', session: handoff.session, epoch: handoff.epoch, lease: 999999, id: 2, action: 'setPaused', value: true })
+    expect(transport.last('ack')).toMatchObject({ ok: false, status: { owner: 'phone' } })
+    failStatus = false
+    const sent = transport.reliable.length
+    await h.advance(50)
+    expect(transport.reliable).toHaveLength(sent)
+  })
+
+  it('cancels status retries on destroy without later sends or state changes', async () => {
+    const h = setup()
+    const transport = await h.pair()
+    transport.sendReliable.mockReturnValue(false)
+    h.session.syncStatus()
+    h.session.destroy()
+    const sent = transport.sendReliable.mock.calls.length
+    const closed = h.session.getSnapshot()
+    await h.advance(1000)
+    expect(transport.sendReliable).toHaveBeenCalledTimes(sent)
+    expect(h.session.getSnapshot()).toBe(closed)
   })
 })

@@ -82,12 +82,14 @@ function setRendererForce(force: FlightRendererForce | null): void {
   window.location.assign(url.toString());
 }
 
-const AIRCRAFT_PREFERENCE_KEY = "flight-sim.aircraft";
-const AIRCRAFT_LOD_PREFERENCE_KEY = "flight-sim.aircraft-lod";
+const AIRCRAFT_PREFERENCE_KEY = "osfs.aircraft";
+const AIRCRAFT_LOD_PREFERENCE_KEY = "osfs.aircraft-lod";
+const LEGACY_AIRCRAFT_PREFERENCE_KEY = "flight-sim.aircraft";
+const LEGACY_AIRCRAFT_LOD_PREFERENCE_KEY = "flight-sim.aircraft-lod";
 
-function readPreference<T>(key: string, isValid: (value: unknown) => value is T, fallback: T): T {
+function readPreference<T>(key: string, legacyKey: string, isValid: (value: unknown) => value is T, fallback: T): T {
   try {
-    const stored = window.localStorage.getItem(key);
+    const stored = window.localStorage.getItem(key) ?? window.localStorage.getItem(legacyKey);
     return isValid(stored) ? stored : fallback;
   } catch {
     return fallback;
@@ -180,8 +182,8 @@ export async function createFlightSimApp(
   let floatingOrigin: FloatingOriginHandle | null = null;
   let aircraft: ReturnType<typeof createPlaceholderAircraft> | null = null;
   let aircraftModel: AircraftModelHandle | null = null;
-  let aircraftId: AircraftId = readPreference(AIRCRAFT_PREFERENCE_KEY, isAircraftId, "cessna-172");
-  let aircraftLodId: AircraftLodId = readPreference(AIRCRAFT_LOD_PREFERENCE_KEY, isAircraftLodId, "auto");
+  let aircraftId: AircraftId = readPreference(AIRCRAFT_PREFERENCE_KEY, LEGACY_AIRCRAFT_PREFERENCE_KEY, isAircraftId, "cessna-172");
+  let aircraftLodId: AircraftLodId = readPreference(AIRCRAFT_LOD_PREFERENCE_KEY, LEGACY_AIRCRAFT_LOD_PREFERENCE_KEY, isAircraftLodId, "auto");
   let modelState: AircraftModelState = {
     aircraftId, lodId: aircraftLodId, activeLodId: null,
     status: "placeholder", triangles: null, error: null,

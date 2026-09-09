@@ -1,7 +1,7 @@
 import { createPeerEndpoint, type PeerEndpoint, type SessionTransport, type TransportDiagnostics } from './peerTransport'
 import {
   CONTROL_INTERVAL_MS, HANDOFF_MS, NEUTRAL_CONTROLS, STALE_MS, isCentered,
-  isControls, neutralize, parseMessage,
+  isControls, neutralize, parseMessage, isProtocolVersionMismatch, PROTOCOL_MISMATCH_MESSAGE,
   type ActionName, type AircraftStatus, type ControlSurfaceState, type RemoteMessage,
 } from './protocol'
 
@@ -52,7 +52,7 @@ export function createPhoneControllerClient(
   const win = options.window ?? (typeof window === 'undefined' ? undefined : window)
   const listeners = new Set<() => void>()
   const subscriptions: Array<() => void> = []
-  const pending = new Map<number, { action: ActionName; timer: ReturnType<typeof setTimeout> }>()
+  const pending = new Map<number, { action: ActionName; epoch: number; timer: ReturnType<typeof setTimeout> }>()
   let snapshot: PhoneControllerSnapshot = {
     phase: 'connecting', message: 'Connecting to pairing service…', status: null,
     controls: { ...NEUTRAL_CONTROLS }, canFly: false, canControl: false,
@@ -67,6 +67,7 @@ export function createPhoneControllerClient(
   let session = ''
   let epoch = -1
   let authorityEpoch = -1
+  let blockedAuthorityEpoch = -1
   let lease = -1
   let sequence = 0
   let actionId = 0
@@ -200,10 +201,13 @@ export function createPhoneControllerClient(
     const timer = setTimeout(() => {
       if (!pending.has(id) || finished) return
       clearAction(id)
-      if (requestId === id) { requestId = null; handoffEpoch = null; cancelTransientControls() }
+      if (requestId === id) {
+        blockedAuthorityEpoch = Math.max(blockedAuthorityEpoch, epoch)
+        requestId = null; handoffEpoch = null; cancelTransientControls()
+      }
       emit({ message: 'Request timed out. Check the computer before trying again.' })
     }, HANDOFF_MS)
-    pending.set(id, { action, timer })
+    pending.set(id, { action, epoch, timer })
     if (!transport?.sendReliable({ ...envelope(), type: 'action', id, lease, action, ...(value === undefined ? {} : { value }) })) {
       clearAction(id)
       if (requestId === id) requestId = null
@@ -215,7 +219,9 @@ export function createPhoneControllerClient(
   }
 
   function updateStatus(status: AircraftStatus, authoritative: boolean): void {
-    if (authoritative) authorityEpoch = status.owner === 'phone' ? epoch : -1
+    // Hiding/abandoning a handoff revokes this epoch locally. An in-flight
+    // status cannot reinstate it; the host must issue a new Fly handoff.
+    if (authoritative) authorityEpoch = status.owner === 'phone' && epoch > blockedAuthorityEpoch ? epoch : -1
     // A pre-grant heartbeat may arrive after granted on the other channel.
     // Only reliable messages transfer ownership; telemetry cannot undo a grant.
     if (!authoritative && snapshot.status) status = { ...status, owner: snapshot.status.owner }
@@ -227,7 +233,10 @@ export function createPhoneControllerClient(
   function receiveReliable(value: unknown): void {
     if (finished || destroyed) return
     const message = parseMessage(value)
-    if (!message) return
+    if (!message) {
+      if (isProtocolVersionMismatch(value)) fail(PROTOCOL_MISMATCH_MESSAGE)
+      return
+    }
     if (message.type === 'reject') { fail(message.reason); return }
     if (message.type === 'hello') return
     if (message.type === 'welcome') {
@@ -282,7 +291,10 @@ export function createPhoneControllerClient(
       hostReady = true
       checkReady()
     } else if (message.type === 'status') {
-      clearPending()
+      const request = requestId === null ? undefined : pending.get(requestId)
+      // Camera/telemetry status is not an ownership cancellation. Preserve an
+      // in-progress handoff unless a later host epoch has superseded it.
+      if (request && message.status.owner === 'local' && message.epoch !== (handoffEpoch ?? request.epoch)) clearPending()
       updateStatus(message.status, true)
       emit({ message: message.message, controls: { ...controls } })
     } else if (message.type === 'ack') {
@@ -298,7 +310,11 @@ export function createPhoneControllerClient(
   function receiveNative(value: unknown): void {
     if (finished || destroyed) return
     const message: RemoteMessage | null = parseMessage(value)
-    if (!message || !('session' in message) || message.session !== session || message.epoch < epoch) return
+    if (!message) {
+      if (isProtocolVersionMismatch(value)) fail(PROTOCOL_MISMATCH_MESSAGE)
+      return
+    }
+    if (!('session' in message) || message.session !== session || message.epoch < epoch) return
     if (message.type === 'heartbeat') {
       // New-epoch native packets can arrive before the reliable handoff; keep its request alive.
       advanceEpoch(message.epoch, true)
@@ -322,6 +338,7 @@ export function createPhoneControllerClient(
   function hide(): void {
     cancelTransientControls()
     if (snapshot.status?.owner === 'phone' || requestId !== null) sendAction('releaseControl')
+    blockedAuthorityEpoch = Math.max(blockedAuthorityEpoch, epoch)
     authorityEpoch = -1
     clearPending()
     suspended = true

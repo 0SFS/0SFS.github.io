@@ -17,6 +17,8 @@ class Link implements SessionTransport {
   reliable: RemoteMessage[] = []
   native: RemoteMessage[] = []
   holdHandoff = false
+  holdGranted = false
+  holdStatus = false
   held: RemoteMessage[] = []
   dropNative = false
   listeners = { reliable: new Set<(value: unknown) => void>(), native: new Set<(value: unknown) => void>(), close: new Set<(reason: string) => void>() }
@@ -31,7 +33,7 @@ class Link implements SessionTransport {
     if (this.closed) return false
     const message = structuredClone(value) as RemoteMessage
     this.reliable.push(message)
-    if (this.holdHandoff && message.type === 'handoff') this.held.push(message)
+    if ((this.holdHandoff && message.type === 'handoff') || (this.holdGranted && message.type === 'granted') || (this.holdStatus && message.type === 'status')) this.held.push(message)
     else queueMicrotask(() => { if (!this.closed && !this.other.closed) this.other.receiveReliable(message) })
     return true
   }
@@ -221,6 +223,81 @@ describe('phone controller', () => {
     expect(h.state.owner).toBe('local')
   })
 
+  it('keeps a pending Fly handoff through a same-epoch camera status update', async () => {
+    const h = await setup()
+    await advance(50)
+    // Keep the centered frame in flight so the host is still transferring authority.
+    h.phoneLink.dropNative = true
+    expect(h.client.requestControl()).toBe(true)
+    await flush()
+    expect(h.client.getSnapshot().requestingControl).toBe(true)
+    h.state.viewMode = 'first'
+    h.host.syncStatus()
+    await flush()
+    expect(h.client.getSnapshot()).toMatchObject({ requestingControl: true, canControl: false, status: { viewMode: 'first' } })
+    h.phoneLink.dropNative = false
+    await advance(20)
+    expect(h.state.owner).toBe('phone')
+    expect(h.client.getSnapshot()).toMatchObject({ requestingControl: false, canControl: true })
+  })
+
+  it('does not restore hidden-phone authority from a late status when best-effort release fails', async () => {
+    const h = await setup()
+    await advance(50)
+    await h.fly()
+    vi.spyOn(h.phoneLink, 'sendReliable').mockImplementationOnce(() => false)
+    h.win.dispatchEvent(new Event('pagehide'))
+    h.doc.dispatchEvent(new Event('visibilitychange'))
+    // A reliable status already in flight still describes the old phone epoch.
+    h.host.syncStatus()
+    await flush()
+    expect(h.client.getSnapshot().canControl).toBe(false)
+    h.client.updateControls({ aileron: 1 })
+    await advance(350)
+    expect(h.state).toMatchObject({ owner: 'local', paused: true })
+    expect(h.client.getSnapshot()).toMatchObject({ canFly: true, canControl: false })
+    await h.fly()
+    expect(h.state.paused).toBe(true)
+  })
+
+  it('does not reactivate a timed-out Fly request from a late granted or status message', async () => {
+    const h = await setup()
+    await advance(50)
+    h.hostLink.holdGranted = true
+    expect(h.client.requestControl()).toBe(true)
+    await flush()
+    expect(h.state.owner).toBe('phone')
+    expect(h.client.getSnapshot().requestingControl).toBe(true)
+    await advance(2005)
+    expect(h.client.getSnapshot()).toMatchObject({ requestingControl: false, canControl: false })
+    h.hostLink.flushHeld()
+    h.host.syncStatus()
+    await flush()
+    expect(h.client.getSnapshot().canControl).toBe(false)
+    await advance(300)
+    expect(h.state).toMatchObject({ owner: 'local', paused: true })
+    expect(h.client.getSnapshot().canFly).toBe(true)
+  })
+
+  it('recovers Fly after a refused takeover status and a newer heartbeat overtaking its retry', async () => {
+    const h = await setup()
+    await advance(50)
+    await h.fly()
+    vi.spyOn(h.hostLink, 'sendReliable').mockImplementationOnce(() => false)
+    h.hostLink.holdStatus = true
+    h.host.takeControl()
+    await advance(60)
+    // The new-epoch heartbeat revokes old input, but cannot grant authority.
+    expect(h.state.owner).toBe('local')
+    expect(h.client.getSnapshot()).toMatchObject({ canControl: false, canFly: false })
+    h.hostLink.holdStatus = false
+    h.hostLink.flushHeld()
+    await flush()
+    expect(h.client.getSnapshot()).toMatchObject({ canControl: false, canFly: true, status: { owner: 'local' } })
+    await h.fly()
+    expect(h.state.paused).toBe(false)
+  })
+
   it('releases on page hide, preserves pause on return, survives signaling-only loss, and tears down after closure', async () => {
     const h = await setup()
     await advance(50)
@@ -262,5 +339,17 @@ describe('phone controller', () => {
     resolve('late-peer')
     await flush()
     expect(connect).not.toHaveBeenCalled()
+  })
+
+  it.each(['reliable', 'native'] as const)('closes with an actionable error on an unsupported %s protocol', async channel => {
+    const h = await setup()
+    await advance(50)
+    await h.fly()
+    const incompatible = { ...h.envelope(), v: 2, type: 'status', status: h.state, message: 'Newer protocol' }
+    if (channel === 'reliable') h.phoneLink.receiveReliable(incompatible)
+    else h.phoneLink.receiveNative(incompatible)
+    expect(h.client.getSnapshot()).toMatchObject({ phase: 'error', canControl: false, message: 'Unsupported phone protocol. Reload both devices.' })
+    expect(h.phoneLink.closed).toBe(true)
+    expect(h.state).toMatchObject({ owner: 'local', paused: true })
   })
 })

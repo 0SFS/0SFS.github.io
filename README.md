@@ -1,8 +1,8 @@
-# ✈️ Flight Sim
+# ✈️ OSFS — Open Source Flight Simulator
 
-**Google's 3D world. JSBSim flight dynamics. Your browser.**
+**A real-world browser flight simulator built to be explored, extended, and shared.**
 
-Explore the world by flying a plane, just like in MSFS 2024—but without the 10+ GB download, the $69 price tag, or the proprietary Microsoft software. Flight Sim puts Google Photorealistic 3D Tiles beneath your wings and JSBSim in charge of the flight physics, all running locally in a browser tab with code you can explore and change.
+OSFS puts Google Photorealistic 3D Tiles beneath your wings and JSBSim in charge of flight physics, all running locally in a browser tab. It combines a streamed Earth with aircraft dynamics, instruments, controls, and an open codebase you can build on.
 
 Bank over a city you recognize. Follow the streets below. Change the wind, line up an approach, and switch to the chase camera to take it all in. This project brings a streamed Earth and a flight dynamics engine together in a simulator you can build on.
 
@@ -24,12 +24,12 @@ Future directions:
 - **ArduPilot support:** use ArduPilot as an optional autopilot when the user does not want to fly manually. The planned integration looks like this:
   1. JSBSim remains the flight dynamics model. It advances the aircraft and produces the simulated sensor state: position, attitude, velocity, airspeed, and altitude.
   2. A small local bridge connects the browser to ArduPilot Plane SITL. It sends that sensor state into the autopilot and receives its servo outputs over the [external simulator interface](https://ardupilot.org/dev/docs/sim-on-hardware.html)/MAVLink.
-  3. Flight Sim maps those outputs back to the aircraft controls—elevator, aileron, rudder, throttle, and flaps—so ArduPilot is flying the same aircraft the user sees on screen.
+  3. OSFS maps those outputs back to the aircraft controls—elevator, aileron, rudder, throttle, and flaps—so ArduPilot is flying the same aircraft the user sees on screen.
   4. The user can switch between manual control and autopilot control, monitor the autopilot state in the HUD, and take over immediately. The bridge can start as a local WebSocket-to-SITL process because browsers cannot open arbitrary UDP connections themselves.
 
 This is a planned integration, not an implemented feature yet. The first milestone is a C172P with ArduPilot Plane SITL flying through the existing JSBSim loop; later milestones can add missions, telemetry, and other ArduPilot vehicle types.
 
-Flight Sim is under active development. The world streaming and flight physics are running today; the broader simulator is still taking shape.
+OSFS is under active development. The world streaming and flight physics are running today; the broader simulator is still taking shape.
 
 ## Requirements
 
@@ -42,7 +42,7 @@ The expected directory layout is:
 
 ```text
 parent-directory/
-├── flight-sim/
+├── OSFS/
 └── foss-earth/
 ```
 
@@ -50,8 +50,8 @@ Clone both repositories when setting up a new machine:
 
 ```sh
 git clone https://github.com/Felipegalind0/foss-earth.git
-git clone https://github.com/Felipegalind0/flight-sim.git
-cd flight-sim
+git clone https://github.com/Felipegalind0/OSFS.git
+cd OSFS
 npm install
 ```
 
@@ -106,7 +106,7 @@ Run all three with `npm run ci`. Tests cover coordinate and attitude transforms,
 
 ## Deploy
 
-`npm run deploy` builds with the `/flight-sim/` GitHub Pages base and publishes `dist`. If a failed publish reports `spawn E2BIG`, clear the publisher's temporary checkout before retrying:
+`npm run deploy` builds with the `/OSFS/` GitHub Pages base and publishes `dist`. If a failed publish reports `spawn E2BIG`, clear the publisher's temporary checkout before retrying:
 
 ```sh
 npx gh-pages-clean
@@ -121,7 +121,7 @@ npm run deploy
 "foss-earth": "file:../foss-earth"
 ```
 
-The lockfile links `node_modules/foss-earth` to that sibling checkout. FOSS Earth provides the Babylon.js globe renderer, Google/raster map selection, application bar, and shared windowing and input UI. Flight Sim owns the flight physics, aircraft rendering, controls, and instruments.
+The lockfile links `node_modules/foss-earth` to that sibling checkout. FOSS Earth provides the Babylon.js globe renderer, Google/raster map selection, application bar, and shared windowing and input UI. OSFS owns the flight physics, aircraft rendering, controls, and instruments.
 
 Opening the app without `mode=flight` launches the FOSS Earth globe. Shared functionality is imported through FOSS Earth's public package exports; compatibility modules forward to that package.
 
@@ -137,10 +137,10 @@ git switch main
 git pull --ff-only
 ```
 
-Then refresh and validate Flight Sim:
+Then refresh and validate OSFS:
 
 ```sh
-cd ../flight-sim
+cd ../OSFS
 npm install
 npm run ci
 ```
@@ -151,8 +151,8 @@ When both applications need new shared functionality:
 
 1. Implement and export it from FOSS Earth through its `package.json` `exports` map.
 2. Test it in the FOSS Earth repository.
-3. Import the public package path from Flight Sim instead of copying it.
-4. Run `npm run ci` in Flight Sim and manually verify flight mode.
+3. Import the public package path from OSFS instead of copying it.
+4. Run `npm run ci` in OSFS and manually verify flight mode.
 
 ## Project Layout
 
@@ -172,6 +172,6 @@ Pairing uses PeerJS Cloud. Flight inputs travel over a direct WebRTC data channe
 
 The QR expires after two minutes and admits one phone. Closing the dialog hides it; **Disconnect** invalidates the invitation or ends the session. Desktop flight inputs or **Take control** immediately reclaim control. Lost or delayed phone inputs, a hidden desktop tab, or phone disconnection pause the simulation and return control to the desktop. Resuming or taking phone control always requires an explicit action.
 
-The QR normally opens `https://felipegalind0.io/flight-sim/?mode=remote`. To test a different static HTTPS deployment, set `VITE_PHONE_CONTROLLER_URL` to its base URL at build time. The phone and desktop must use the same protocol version; reload both after an update. The phone route loads independently of the globe renderer and JSBSim.
+The QR normally opens `https://felipegalind0.io/OSFS/?mode=remote`. To test a different static HTTPS deployment, set `VITE_PHONE_CONTROLLER_URL` to its base URL at build time. The phone and desktop must use the same protocol version; reload both after an update. The phone route loads independently of the globe renderer and JSBSim.
 
 See [the specification](docs/proposals/phone-controller.md) for the control protocol, failure behavior, and device acceptance checklist. Real iPhone/Android testing on the deployed site is still required before treating the feature as verified on those devices.

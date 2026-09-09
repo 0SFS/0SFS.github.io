@@ -27,7 +27,7 @@ beforeEach(() => {
 });
 
 describe("application route", () => {
-  it("loads only Flight Sim when mode=flight", async () => {
+  it("loads only OSFS when mode=flight", async () => {
     window.history.replaceState(null, "", "/?mode=flight&mapSource=google&key=test-key");
 
     await import("./main");
@@ -48,7 +48,7 @@ describe("application route", () => {
   });
 
   it("loads the phone controller at the production base without booting either simulator", async () => {
-    window.history.replaceState(null, "", "/flight-sim/?mode=remote#v=1&peer=desktop-id&join=invitation");
+    window.history.replaceState(null, "", "/OSFS/?mode=remote#v=1&peer=desktop-id&join=invitation");
 
     await import("./main");
     await vi.waitFor(() => expect(appMocks.createPhoneControllerApp).toHaveBeenCalledOnce());

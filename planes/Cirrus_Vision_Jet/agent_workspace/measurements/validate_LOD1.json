@@ -1,0 +1,415 @@
+{
+ "file": "sf50_lod1.blend",
+ "objects": 22,
+ "empties": 1,
+ "meshes": 22,
+ "triangles": 970,
+ "vertices": 545,
+ "materials": 4,
+ "material_names": [
+  "SF50_Dark",
+  "SF50_Glass",
+  "SF50_Metal",
+  "SF50_Paint"
+ ],
+ "textures": 0,
+ "texture_names": [],
+ "dimensions": {
+  "length": {
+   "value": 9.357,
+   "ref": 9.357,
+   "err": 0.0,
+   "pass_": true
+  },
+  "span": {
+   "value": 11.796,
+   "ref": 11.796,
+   "err": -0.0,
+   "pass_": true
+  },
+  "height": {
+   "value": 3.3227,
+   "ref": 3.322,
+   "err": 0.0007,
+   "pass_": true
+  }
+ },
+ "bbox_min": [
+  -5.898,
+  -5.357,
+  0.0
+ ],
+ "bbox_max": [
+  5.898,
+  4.0,
+  3.3227
+ ],
+ "size_xyz": [
+  11.796,
+  9.357,
+  3.3227
+ ],
+ "ground_contact": {
+  "lowest_z": 0.0,
+  "pass_": true,
+  "objects_on_the_ground": [
+   "Wheel_Left",
+   "Wheel_Nose",
+   "Wheel_Right"
+  ]
+ },
+ "non_manifold_edges": 48,
+ "open_boundary_by_object": [
+  {
+   "name": "Fuselage",
+   "boundary_edges": 8
+  },
+  {
+   "name": "Wing_Left",
+   "boundary_edges": 7
+  },
+  {
+   "name": "VTail_Left",
+   "boundary_edges": 7
+  },
+  {
+   "name": "Wing_Right",
+   "boundary_edges": 7
+  },
+  {
+   "name": "VTail_Right",
+   "boundary_edges": 7
+  },
+  {
+   "name": "Nacelle",
+   "boundary_edges": 6
+  },
+  {
+   "name": "Intake",
+   "boundary_edges": 6
+  }
+ ],
+ "degenerate_faces": 0,
+ "loose_vertices": 0,
+ "unapplied_transforms": [],
+ "symmetry_error_m": {
+  "mean": 0.0,
+  "max": 0.0,
+  "over_1mm": 0
+ },
+ "asymmetric_objects": [],
+ "object_names": [
+  "Aileron_Left",
+  "Aileron_Right",
+  "Cirrus_Vision_Jet",
+  "Flap_Left",
+  "Flap_Right",
+  "Fuselage",
+  "GearDoor_Left",
+  "GearDoor_Right",
+  "Intake",
+  "Keel",
+  "LandingGear_Left",
+  "LandingGear_Nose",
+  "LandingGear_Right",
+  "Nacelle",
+  "Ruddervator_Left",
+  "Ruddervator_Right",
+  "VTail_Left",
+  "VTail_Right",
+  "Wheel_Left",
+  "Wheel_Nose",
+  "Wheel_Right",
+  "Wing_Left",
+  "Wing_Right"
+ ],
+ "per_object": [
+  {
+   "name": "Fuselage",
+   "tris": 612,
+   "verts": 310,
+   "mats": [
+    "SF50_Paint",
+    "SF50_Glass"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Nacelle",
+   "tris": 40,
+   "verts": 24,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Wing_Left",
+   "tris": 33,
+   "verts": 21,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Wing_Right",
+   "tris": 33,
+   "verts": 21,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Keel",
+   "tris": 28,
+   "verts": 16,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Wheel_Left",
+   "tris": 20,
+   "verts": 12,
+   "mats": [
+    "SF50_Dark"
+   ],
+   "origin": [
+    -1.707,
+    -0.434,
+    0.19
+   ]
+  },
+  {
+   "name": "Wheel_Right",
+   "tris": 20,
+   "verts": 12,
+   "mats": [
+    "SF50_Dark"
+   ],
+   "origin": [
+    1.707,
+    -0.434,
+    0.19
+   ]
+  },
+  {
+   "name": "Wheel_Nose",
+   "tris": 20,
+   "verts": 12,
+   "mats": [
+    "SF50_Dark"
+   ],
+   "origin": [
+    0.0,
+    2.862,
+    0.179
+   ]
+  },
+  {
+   "name": "VTail_Left",
+   "tris": 19,
+   "verts": 14,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "VTail_Right",
+   "tris": 19,
+   "verts": 14,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Aileron_Left",
+   "tris": 14,
+   "verts": 9,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    -4.27,
+    -0.7134,
+    1.1431
+   ]
+  },
+  {
+   "name": "Aileron_Right",
+   "tris": 14,
+   "verts": 9,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    4.27,
+    -0.7134,
+    1.1431
+   ]
+  },
+  {
+   "name": "LandingGear_Left",
+   "tris": 12,
+   "verts": 8,
+   "mats": [
+    "SF50_Metal"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "GearDoor_Left",
+   "tris": 12,
+   "verts": 8,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "LandingGear_Right",
+   "tris": 12,
+   "verts": 8,
+   "mats": [
+    "SF50_Metal"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "GearDoor_Right",
+   "tris": 12,
+   "verts": 8,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "LandingGear_Nose",
+   "tris": 12,
+   "verts": 8,
+   "mats": [
+    "SF50_Metal"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Flap_Left",
+   "tris": 8,
+   "verts": 6,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    -1.585,
+    -0.7133,
+    0.9233
+   ]
+  },
+  {
+   "name": "Ruddervator_Left",
+   "tris": 8,
+   "verts": 6,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    -1.2211,
+    -4.882,
+    2.4913
+   ]
+  },
+  {
+   "name": "Flap_Right",
+   "tris": 8,
+   "verts": 6,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    1.585,
+    -0.7133,
+    0.9233
+   ]
+  },
+  {
+   "name": "Ruddervator_Right",
+   "tris": 8,
+   "verts": 6,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    1.2211,
+    -4.882,
+    2.4913
+   ]
+  },
+  {
+   "name": "Intake",
+   "tris": 6,
+   "verts": 7,
+   "mats": [
+    "SF50_Dark"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  }
+ ]
+}

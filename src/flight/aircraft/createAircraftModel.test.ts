@@ -106,20 +106,17 @@ describe("aircraft model loader", () => {
     t.teardown();
   });
 
-  it("reports placeholder without fetching for an airframe that has no mesh", async () => {
+  it("loads the jet's own levels when the airframe is switched", async () => {
     const t = setup();
     const model = createAircraftModel(t.scene, t.parent, {
-      aircraftId: "cirrus-vision-jet", lodId: "auto", loadContainer: t.loadContainer,
+      aircraftId: "cessna-172", lodId: "lod0", loadContainer: t.loadContainer,
     });
-    expect(model.getState().status).toBe("placeholder");
-    expect(t.loadContainer).not.toHaveBeenCalled();
-
-    model.setAircraft("cessna-172");
     await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
 
     model.setAircraft("cirrus-vision-jet");
-    expect(model.getState().status).toBe("placeholder");
-    expect(model.getState().triangles).toBeNull();
+    await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
+    expect(t.urls[1]).toContain("Cirrus_Vision_Jet_LOD0.glb");
+    expect(model.getState().triangles).toBe(1552);
 
     model.dispose();
     t.teardown();

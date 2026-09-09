@@ -15,7 +15,7 @@ export function PhoneController({ client }: { client: PhoneControllerClient }) {
   const heading = status ? String(Math.round(status.headingDeg) % 360).padStart(3, "0") : "—";
   return <main className="phone-app">
     <header className="phone-header">
-      <div className="phone-brand"><span className="phone-brand__mark" aria-hidden="true">✈</span><div><strong>FLIGHT SIM</strong><span>PHONE CONTROLLER</span></div></div>
+      <div className="phone-brand"><span className="phone-brand__mark" aria-hidden="true">✈</span><div><strong>OSFS</strong><span>PHONE CONTROLLER</span></div></div>
       <span className={`phone-connection${connected && state.hostFresh ? " phone-connection--online" : ""}`}><span aria-hidden="true" />{ended ? "Disconnected" : connected ? state.hostFresh ? "Connected" : "Delayed" : "Connecting"}</span>
     </header>
     <div className="phone-flight-status"><span>{status?.owner === "phone" ? "Phone controls" : "Desktop controls"}</span><span className={status?.paused ? "phone-paused" : ""}>{status ? status.paused ? "PAUSED" : "IN FLIGHT" : "PAIRING"}</span></div>

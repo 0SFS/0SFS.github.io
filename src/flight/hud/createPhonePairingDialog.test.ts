@@ -15,7 +15,7 @@ const startPairing = vi.fn();
 const disconnect = vi.fn();
 const takeControl = vi.fn();
 const drawImage = vi.fn();
-const invitationUrl = "https://felipegalind0.io/flight-sim/?mode=remote#v=1&peer=desktop&join=secret";
+const invitationUrl = "https://felipegalind0.io/OSFS/?mode=remote#v=1&peer=desktop&join=secret";
 
 function update(patch: Partial<PhoneSessionSnapshot>) {
   state = { ...state, ...patch };
