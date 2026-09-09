@@ -17,6 +17,13 @@ import {
 import { useState } from "react";
 import type { BabylonRuntimeStatus, RendererMode } from "foss-earth/runtime";
 import type { FlightViewMode } from "../aircraft/createPlaceholderAircraft";
+import {
+  AIRCRAFT_CATALOG,
+  getAircraftDefinition,
+  type AircraftId,
+  type AircraftLodId,
+} from "../aircraft/aircraftCatalog";
+import type { AircraftModelStatus } from "../aircraft/createAircraftModel";
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
 
 type FlightPanelTab = "weather" | "aircraft" | "debug";
@@ -33,6 +40,13 @@ const TAB_ICONS = {
   debug: Bug,
 } satisfies Record<FlightPanelTab, typeof Plane>;
 
+const LOD_STATUS_LABEL: Record<AircraftModelStatus, string> = {
+  placeholder: "Placeholder blocks",
+  loading: "Loading mesh…",
+  ready: "Mesh loaded",
+  error: "Load failed",
+};
+
 export interface FlightWeatherState {
   windDirectionDeg: number;
   windSpeedKts: number;
@@ -45,6 +59,13 @@ export interface FlightControlPanelSnapshot {
   viewMode: FlightViewMode;
   runtimeStatus: BabylonRuntimeStatus;
   rendererMode: RendererMode;
+  aircraftId: AircraftId;
+  lodId: AircraftLodId;
+  modelStatus: AircraftModelStatus;
+  /** Level actually in the scene; differs from lodId while "Auto" is selected. */
+  modelActiveLodId: AircraftLodId | null;
+  modelTriangles: number | null;
+  modelError: string | null;
 }
 
 export interface FlightControlPanelOptions {
@@ -54,6 +75,8 @@ export interface FlightControlPanelOptions {
   onWeatherChange(weather: FlightWeatherState): void;
   onPausedChange(paused: boolean): void;
   onViewModeChange(mode: FlightViewMode): void;
+  onAircraftChange(aircraftId: AircraftId): void;
+  onLodChange(lodId: AircraftLodId): void;
 }
 
 export interface FlightControlPanelHandle {
@@ -123,7 +146,17 @@ function WeatherPanel({
   );
 }
 
-function AircraftPanel({ snapshot, onPausedChange, onViewModeChange }: FlightControlPanelProps) {
+function AircraftPanel({
+  snapshot,
+  onPausedChange,
+  onViewModeChange,
+  onAircraftChange,
+  onLodChange,
+}: FlightControlPanelProps) {
+  const definition = getAircraftDefinition(snapshot.aircraftId);
+  const hasModel = definition.lods.length > 0;
+  const activeLod = definition.lods.find((lod) => lod.id === snapshot.modelActiveLodId);
+
   return (
     <div className="flight-panel__content">
       <div className="flight-panel__metrics">
@@ -132,6 +165,61 @@ function AircraftPanel({ snapshot, onPausedChange, onViewModeChange }: FlightCon
         <Metric label="Heading" value={`${Math.round(headingDegFromRad(snapshot.flightState.headingRad))}°`} />
         <Metric label="Throttle" value={`${Math.round(snapshot.flightState.throttleNorm * 100)}%`} />
       </div>
+      <fieldset className="flight-panel__fieldset">
+        <legend>Airframe</legend>
+        <div className="flight-panel__radio-list">
+          {AIRCRAFT_CATALOG.map((entry) => (
+            <label key={entry.id} className={entry.id === snapshot.aircraftId ? "is-active" : ""}>
+              <input
+                type="radio"
+                name="flight-aircraft"
+                value={entry.id}
+                checked={entry.id === snapshot.aircraftId}
+                onChange={() => onAircraftChange(entry.id)}
+              />
+              <span className="flight-panel__option">
+                <strong>{entry.label}</strong>
+                <em>{entry.summary}</em>
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <fieldset className="flight-panel__fieldset">
+        <legend>Model detail</legend>
+        <label className="flight-panel__field">
+          <span>Level of detail</span>
+          <select
+            className="flight-panel__select"
+            value={snapshot.lodId}
+            disabled={!hasModel}
+            onChange={(event) => onLodChange(event.target.value as AircraftLodId)}
+          >
+            <option value="auto">Auto (by chase distance)</option>
+            {definition.lods.map((lod) => (
+              <option key={lod.id} value={lod.id}>
+                {`${lod.label} — ${lod.triangles} tris`}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className="flight-panel__metrics">
+          <Metric label="Model" value={LOD_STATUS_LABEL[snapshot.modelStatus]} />
+          <Metric
+            label="Triangles"
+            value={snapshot.modelTriangles === null ? "—" : snapshot.modelTriangles.toLocaleString()}
+          />
+        </div>
+        {snapshot.lodId === "auto" && activeLod ? (
+          <p className="flight-panel__hint">Auto selected {activeLod.label}.</p>
+        ) : null}
+        {!hasModel ? (
+          <p className="flight-panel__hint">
+            No mesh exists for this airframe yet, so the block placeholder is drawn instead.
+          </p>
+        ) : null}
+        {snapshot.modelError ? <p className="flight-panel__hint is-error">{snapshot.modelError}</p> : null}
+      </fieldset>
       <fieldset className="flight-panel__fieldset">
         <legend>Camera</legend>
         <div className="flight-panel__segmented">

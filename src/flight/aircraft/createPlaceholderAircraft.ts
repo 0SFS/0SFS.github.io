@@ -15,6 +15,11 @@ export type FlightViewMode = "first" | "third";
 export interface AircraftEntity {
   root: TransformNode;
   cockpit: TransformNode;
+  /** Parent for an external aircraft mesh; hidden in cockpit view. */
+  modelRoot: TransformNode;
+  /** Hide the block placeholder once a real mesh is in `modelRoot`. */
+  setModelLoaded(loaded: boolean): void;
+  getChaseDistanceMeters(): number;
   firstPersonCamera: UniversalCamera;
   thirdPersonCamera: UniversalCamera;
   orbitChaseCamera(yaw: number, pitch: number): void;
@@ -61,6 +66,9 @@ export function createPlaceholderAircraft(scene: Scene, parent: TransformNode): 
     mesh.isVisible = false;
   }
 
+  const modelRoot = new TransformNode("aircraft-model-root", scene);
+  modelRoot.parent = root;
+
   const cockpit = new TransformNode("cockpit", scene);
   cockpit.parent = root;
   cockpit.position = new Vector3(0, 1.1, 1.8);
@@ -87,12 +95,16 @@ export function createPlaceholderAircraft(scene: Scene, parent: TransformNode): 
   };
   updateChaseCamera();
 
+  let modelLoaded = false;
   const setViewMode = (mode: FlightViewMode): void => {
     viewMode = mode;
     scene.activeCamera = mode === "first" ? firstPersonCamera : thirdPersonCamera;
+    const exterior = mode === "third";
+    // The placeholder blocks stand in only while no real mesh is loaded.
     for (const mesh of meshes) {
-      mesh.isVisible = mode === "third";
+      mesh.isVisible = exterior && !modelLoaded;
     }
+    modelRoot.setEnabled(exterior);
   };
 
   setViewMode("third");
@@ -100,6 +112,14 @@ export function createPlaceholderAircraft(scene: Scene, parent: TransformNode): 
   return {
     root,
     cockpit,
+    modelRoot,
+    setModelLoaded(loaded: boolean): void {
+      modelLoaded = loaded;
+      setViewMode(viewMode);
+    },
+    getChaseDistanceMeters(): number {
+      return chaseDistance;
+    },
     firstPersonCamera,
     thirdPersonCamera,
     orbitChaseCamera(yaw, pitch): void {
@@ -125,6 +145,7 @@ export function createPlaceholderAircraft(scene: Scene, parent: TransformNode): 
       firstPersonCamera.dispose();
       thirdPersonCamera.dispose();
       cockpit.dispose();
+      modelRoot.dispose();
       material.dispose();
       for (const mesh of meshes) mesh.dispose();
       root.dispose();

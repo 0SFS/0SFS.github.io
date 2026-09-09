@@ -21,6 +21,17 @@ import {
   type RasterBaseMapSource,
 } from "foss-earth/runtime";
 import { createPlaceholderAircraft } from "./aircraft/createPlaceholderAircraft";
+import {
+  isAircraftId,
+  isAircraftLodId,
+  type AircraftId,
+  type AircraftLodId,
+} from "./aircraft/aircraftCatalog";
+import {
+  createAircraftModel,
+  type AircraftModelHandle,
+  type AircraftModelState,
+} from "./aircraft/createAircraftModel";
 import { readFlightState } from "./bridge/ecefBridge";
 import { createFloatingOrigin, type FloatingOriginHandle } from "./bridge/floatingOrigin";
 import {
@@ -62,6 +73,26 @@ function setRendererForce(force: FlightRendererForce | null): void {
   if (force) url.searchParams.set("renderer", force);
   else url.searchParams.delete("renderer");
   window.location.assign(url.toString());
+}
+
+const AIRCRAFT_PREFERENCE_KEY = "flight-sim.aircraft";
+const AIRCRAFT_LOD_PREFERENCE_KEY = "flight-sim.aircraft-lod";
+
+function readPreference<T>(key: string, isValid: (value: unknown) => value is T, fallback: T): T {
+  try {
+    const stored = window.localStorage.getItem(key);
+    return isValid(stored) ? stored : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writePreference(key: string, value: string): void {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Preference persistence is best-effort; private mode must not break the sim.
+  }
 }
 
 function zoomMetersFromAltitude(altMeters: number): number {
@@ -131,6 +162,13 @@ export async function createFlightSimApp(
 
   let floatingOrigin: FloatingOriginHandle | null = null;
   let aircraft: ReturnType<typeof createPlaceholderAircraft> | null = null;
+  let aircraftModel: AircraftModelHandle | null = null;
+  let aircraftId: AircraftId = readPreference(AIRCRAFT_PREFERENCE_KEY, isAircraftId, "cessna-172");
+  let aircraftLodId: AircraftLodId = readPreference(AIRCRAFT_LOD_PREFERENCE_KEY, isAircraftLodId, "auto");
+  let modelState: AircraftModelState = {
+    aircraftId, lodId: aircraftLodId, activeLodId: null,
+    status: "placeholder", triangles: null, error: null,
+  };
   let controlPanel: FlightControlPanelHandle | null = null;
   let hudBar: FlightHudBarHandle | null = null;
   let inputMode = loadInputModePreference(new Set(["mouse", "trackpad"]));
@@ -146,6 +184,7 @@ export async function createFlightSimApp(
     zoom: (factor) => {
       if (!aircraft || aircraft.getViewMode() !== "third") return;
       aircraft.zoomChaseCamera(factor);
+      aircraftModel?.refreshAutoLod();
       runtime.requestRender();
     },
   });
@@ -164,6 +203,17 @@ export async function createFlightSimApp(
     floatingOrigin = createFloatingOrigin(runtime.scene, worldRoot);
     aircraft = createPlaceholderAircraft(runtime.scene, floatingOrigin.aircraftRoot);
     aircraft.setViewMode("third");
+    aircraftModel = createAircraftModel(runtime.scene, aircraft.modelRoot, {
+      aircraftId,
+      lodId: aircraftLodId,
+      getChaseDistanceMeters: () => aircraft?.getChaseDistanceMeters() ?? 0,
+      onStateChange: (state) => {
+        modelState = state;
+        aircraft?.setModelLoaded(state.status === "ready");
+        controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+        runtime.requestRender();
+      },
+    });
 
     const initialState = readFlightState(jsbsim.sdk);
     floatingOrigin.apply(initialState);
@@ -198,6 +248,12 @@ export async function createFlightSimApp(
     viewMode: aircraft?.getViewMode() ?? "third",
     runtimeStatus: { ...runtime.status },
     rendererMode: runtime.renderer.mode,
+    aircraftId,
+    lodId: aircraftLodId,
+    modelStatus: modelState.status,
+    modelActiveLodId: modelState.activeLodId,
+    modelTriangles: modelState.triangles,
+    modelError: modelState.error,
   });
 
   const syncSimulationPaused = (paused: boolean): void => {
@@ -262,6 +318,20 @@ export async function createFlightSimApp(
     onWeatherChange: applyWeather,
     onPausedChange: setSimulationPaused,
     onViewModeChange: (mode) => { aircraft?.setViewMode(mode); runtime.requestRender(); },
+    onAircraftChange: (nextId) => {
+      aircraftId = nextId;
+      writePreference(AIRCRAFT_PREFERENCE_KEY, nextId);
+      aircraftModel?.setAircraft(nextId);
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+      runtime.requestRender();
+    },
+    onLodChange: (nextLod) => {
+      aircraftLodId = nextLod;
+      writePreference(AIRCRAFT_LOD_PREFERENCE_KEY, nextLod);
+      aircraftModel?.setLod(nextLod);
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+      runtime.requestRender();
+    },
   });
   const rendererForce = getRendererForceFromUrl();
   hudBar = createFlightHudBar(shellRoot, {
@@ -366,6 +436,7 @@ export async function createFlightSimApp(
       hudBar?.destroy();
       controlPanel?.destroy();
       flightHud.destroy();
+      aircraftModel?.dispose();
       aircraft?.dispose();
       floatingOrigin?.dispose();
       jsbsim.dispose();

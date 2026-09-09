@@ -336,7 +336,7 @@
   align-items: center;
   gap: 9px;
   min-height: 36px;
-  padding: 0 10px;
+  padding: 7px 10px;
   border: 1px solid transparent;
   border-radius: 3px;
   color: #aeb9bc;
@@ -520,4 +520,59 @@
 
 .flight-boot__error {
   color: #ff8f8f;
+}
+
+.flight-panel__select {
+  width: 100%;
+  min-height: 34px;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 3px;
+  background: rgba(12, 16, 18, 0.72);
+  color: #e6edef;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.flight-panel__select:focus-visible {
+  outline: 2px solid var(--flight-panel-accent);
+  outline-offset: 1px;
+}
+
+.flight-panel__select:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.flight-panel__option {
+  display: grid;
+  gap: 1px;
+  line-height: 1.35;
+}
+
+.flight-panel__option strong {
+  color: inherit;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.flight-panel__option em {
+  color: #8d999c;
+  font-size: 11px;
+  font-style: normal;
+}
+
+.flight-panel__radio-list label.is-active .flight-panel__option em {
+  color: #b6c2c5;
+}
+
+.flight-panel__hint {
+  margin: 0;
+  color: #8d999c;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.flight-panel__hint.is-error {
+  color: #e8a0a0;
 }

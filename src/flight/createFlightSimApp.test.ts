@@ -18,6 +18,15 @@ const mocks = vi.hoisted(() => {
     aircraft: {
       setViewMode: vi.fn(), toggleViewMode: vi.fn(), getViewMode: () => "third",
       orbitChaseCamera: vi.fn(), zoomChaseCamera: vi.fn(), dispose: vi.fn(),
+      modelRoot: {}, setModelLoaded: vi.fn(), getChaseDistanceMeters: () => 14,
+    },
+    aircraftModel: {
+      root: {},
+      getState: () => ({
+        aircraftId: "cessna-172", lodId: "auto", activeLodId: "lod0",
+        status: "ready", triangles: 876, error: null,
+      }),
+      setAircraft: vi.fn(), setLod: vi.fn(), refreshAutoLod: vi.fn(), dispose: vi.fn(),
     },
     terrainContact: { reset: vi.fn(), update: vi.fn(() => true) },
     visibleMeshCollision: { reset: vi.fn(), update: vi.fn(() => false) },
@@ -32,6 +41,7 @@ vi.mock("./jsbsim/createJsbsimRuntime", () => ({ createJsbsimRuntime: async () =
 vi.mock("./bridge/ecefBridge", () => ({ readFlightState: () => mocks.state }));
 vi.mock("./bridge/floatingOrigin", () => ({ createFloatingOrigin: () => ({ aircraftRoot: {}, apply: mocks.applyOrigin, dispose: vi.fn() }) }));
 vi.mock("./aircraft/createPlaceholderAircraft", () => ({ createPlaceholderAircraft: () => mocks.aircraft }));
+vi.mock("./aircraft/createAircraftModel", () => ({ createAircraftModel: () => mocks.aircraftModel }));
 vi.mock("./physics/fixedStepLoop", () => ({ createFixedStepPhysicsLoop: () => mocks.physics }));
 vi.mock("./physics/terrainContact", () => ({ createTerrainContact: () => mocks.terrainContact }));
 vi.mock("./physics/visibleMeshCollision", () => ({ createVisibleMeshCollision: () => mocks.visibleMeshCollision }));
@@ -170,4 +180,41 @@ it("mounts the shared + menu, opens Location, and applies coordinates to the sim
     expect(root.querySelector(".foss-earth-location-panel")).not.toBeNull();
   } finally { await act(async () => app.destroy()); }
   expect(root.children).toHaveLength(0);
+});
+
+
+it("selects the airframe and LOD from the Aircraft tab and persists both", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  const setItem = vi.fn();
+  vi.stubGlobal("localStorage", { getItem: () => null, setItem });
+  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
+  const root = document.createElement("div");
+  document.body.append(root);
+  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
+  await act(async () => { app = await createFlightSimApp(root); });
+  try {
+    await act(async () => root.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')!.click());
+    const aircraftTab = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="menuitem"]'))
+      .find((button) => button.textContent === "Aircraft")!;
+    expect(aircraftTab).not.toBeUndefined();
+    await act(async () => aircraftTab.click());
+
+    // Both airframes are offered, and the C172 lists every exported level.
+    const radios = Array.from(root.querySelectorAll<HTMLInputElement>('input[name="flight-aircraft"]'));
+    expect(radios.map((input) => input.value)).toEqual(["cessna-172", "cirrus-vision-jet"]);
+    const lodSelect = root.querySelector<HTMLSelectElement>(".flight-panel__select")!;
+    expect(Array.from(lodSelect.options, (option) => option.value))
+      .toEqual(["auto", "lod0", "lod1", "lod2", "lod3"]);
+
+    await act(async () => {
+      lodSelect.value = "lod2";
+      lodSelect.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    expect(mocks.aircraftModel.setLod).toHaveBeenCalledWith("lod2");
+    expect(setItem).toHaveBeenCalledWith("flight-sim.aircraft-lod", "lod2");
+
+    await act(async () => radios[1].click());
+    expect(mocks.aircraftModel.setAircraft).toHaveBeenCalledWith("cirrus-vision-jet");
+    expect(setItem).toHaveBeenCalledWith("flight-sim.aircraft", "cirrus-vision-jet");
+  } finally { await act(async () => app.destroy()); }
 });
