@@ -5,9 +5,41 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OSFS — Open Source Flight Simulator</title>
+    <script>
+      // Keep the first-paint screen useful if the module bundle itself cannot load.
+      addEventListener("error", function (event) {
+        if (event.target !== window && !(event.target instanceof HTMLScriptElement)) return;
+        document.getElementById("app-loading-error")?.removeAttribute("hidden");
+      }, true);
+    </script>
+    <style>
+      /* Paint immediately, before the application or its styles download. */
+      html, body { margin: 0; background: #080e14; }
+      .app-loading { position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center; box-sizing: border-box; padding: 24px; background: #080e14; color: #ecf1f4; font: 15px/1.5 system-ui, sans-serif; }
+      .app-loading[hidden], .app-loading [hidden] { display: none !important; }
+      .app-loading__card { width: min(100%, 440px); }
+      .app-loading__brand { margin: 0 0 26px; color: #e8b647; font-size: 13px; font-weight: 700; letter-spacing: .2em; }
+      .app-loading h1 { margin: 0 0 10px; font-size: 28px; line-height: 1.2; font-weight: 600; }
+      .app-loading__detail { margin: 0 0 28px; color: #9aabb8; }
+      .app-loading__track { height: 4px; margin: 12px 0; overflow: hidden; border-radius: 4px; background: #25313b; }
+      .app-loading__track::before { content: ""; display: block; width: 32%; height: 100%; background: #e8b647; animation: app-loading-pulse 1.8s ease-in-out infinite alternate; }
+      .app-loading a { color: #e8b647; }
+      @keyframes app-loading-pulse { to { transform: translateX(210%); } }
+      @media (prefers-reduced-motion: reduce) { .app-loading__track::before { animation: none; } }
+    </style>
   </head>
   <body>
     <div id="root"></div>
+    <div id="app-loading" class="app-loading" role="dialog" aria-modal="true" aria-labelledby="app-loading-title" aria-describedby="app-loading-detail" tabindex="-1">
+      <div class="app-loading__card">
+        <p class="app-loading__brand">OSFS</p>
+        <h1 id="app-loading-title">Opening your world</h1>
+        <p id="app-loading-detail" class="app-loading__detail" role="status">Downloading the application. Your first visit may take a little longer.</p>
+        <div class="app-loading__track" role="progressbar" aria-label="Downloading application"></div>
+        <p id="app-loading-error" role="alert" hidden>The application could not download. Check your connection, then <a href="">reload and try again</a>.</p>
+        <noscript>OSFS needs JavaScript enabled to load the simulator.</noscript>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

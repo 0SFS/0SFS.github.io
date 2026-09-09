@@ -57,9 +57,15 @@ chase it with.
 ## aircraft
 
 **Cirrus Vision Jet flies the C172's flight model.** The mesh is built and
-wired in (1000 / 722 / 246 / 98 triangles), but the aerodynamics, gear and
+wired in (1515 / 1044 / 246 / 98 triangles), but the aerodynamics, gear and
 stance are still the Cessna's, so the jet sits at the C172's 1.33 m reference
 stance rather than its own.
+
+**The Vision Jet's opt-in HD level has no landing gear.** hilos run's Sketchfab
+model ships as the `hd` level, off by default. It is modelled gear-up, so
+parked it hovers 0.67 m over the runway with nothing underneath — right in
+flight, wrong on the ground. Either model a gear for it, hide it while the
+aircraft is on the ground, or leave it as the flight-only option it is.
 
 **The V-tail does not move.** `SURFACE_BINDINGS` turns one named node about one
 fixed local axis, and a V-tail's two ruddervators are not a single rigid

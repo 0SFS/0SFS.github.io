@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => {
     runtime: {
       renderer: { mode: "webgl2" }, status: { mode: "fallback" }, scene: {},
       engine: { getFps: () => 60 }, geospatialCamera: null,
+      prepareTerrain: vi.fn(async (request: { altitudeMeters?: number }) => ({ groundHeightMeters: 250, altitudeMeters: request.altitudeMeters ?? 1774 })),
       surface: { sample: vi.fn(() => null) },
       getWorldRoot: () => ({}), setSimViewState: vi.fn(), setSimTick: vi.fn(),
       setSimRunning: vi.fn(), requestRender: vi.fn(), setMapSource: vi.fn(), setTerrainSource: vi.fn(), setRasterQuality: vi.fn(), destroy: vi.fn(),
@@ -43,7 +44,7 @@ vi.mock("foss-earth/runtime", () => ({
 }));
 vi.mock("./jsbsim/createJsbsimRuntime", () => ({ createJsbsimRuntime: async () => ({ sdk: { setPropertyValue: vi.fn() }, dispose: vi.fn() }) }));
 vi.mock("./bridge/ecefBridge", () => ({ readFlightState: () => mocks.state }));
-vi.mock("./bridge/floatingOrigin", () => ({ createFloatingOrigin: () => ({ aircraftRoot: {}, apply: mocks.applyOrigin, dispose: vi.fn() }) }));
+vi.mock("./bridge/floatingOrigin", () => ({ createFloatingOrigin: () => ({ aircraftRoot: { setEnabled: vi.fn() }, apply: mocks.applyOrigin, dispose: vi.fn() }) }));
 vi.mock("./aircraft/createPlaceholderAircraft", () => ({ createPlaceholderAircraft: () => mocks.aircraft }));
 vi.mock("./aircraft/createAircraftModel", () => ({ createAircraftModel: () => mocks.aircraftModel }));
 vi.mock("./aircraft/aircraftAnimation", () => ({
@@ -172,8 +173,8 @@ it("mounts the shared + menu, opens Location, and applies coordinates to the sim
       }
     });
     await act(async () => inputs[0].form!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })));
-    expect(mocks.resetLocation).toHaveBeenCalledWith(expect.anything(), { latDeg: 46.7867, lonDeg: -92.1005, altMeters: 1000 }, undefined);
-    expect(mocks.physics.reset).toHaveBeenCalledOnce();
+    expect(mocks.resetLocation).toHaveBeenCalledWith(expect.anything(), { latDeg: 46.7867, lonDeg: -92.1005, altMeters: 1000 }, 250);
+    expect(mocks.physics.reset).toHaveBeenCalledTimes(2);
     expect(mocks.applyOrigin).toHaveBeenLastCalledWith(mocks.state);
     expect(mocks.runtime.setSimViewState).toHaveBeenLastCalledWith(expect.objectContaining({ latDeg: mocks.state.latDeg, lonDeg: mocks.state.lonDeg }));
     expect(mocks.runtime.requestRender).toHaveBeenCalled();

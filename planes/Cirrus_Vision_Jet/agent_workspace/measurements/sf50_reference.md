@@ -343,7 +343,7 @@ is not glazed. Vertical extents come from column scans through each pane:
 
 | pane | Y range | z range |
 |---|---|---|
-| windshield, over the crown | -2.600 .. -1.388 | wraps the top |
+| windshield | -2.600 .. -1.480 | see below |
 | cockpit side glass | -2.565 .. -2.050 (drawn to -1.50) | 1.72 .. 2.19 |
 | door window | -3.264 .. -2.774 | 1.72 .. 2.18 |
 | cabin window 3 | -3.937 .. -3.477 | 1.72 .. 2.15 |
@@ -355,6 +355,72 @@ shows the windshield's side pane, then three windows, and nothing aft of the
 last oval. An earlier pass glazed one continuous band from -4.60 to -2.80
 because the panes had been eyeballed off a low-resolution crop rather than
 measured, and it read as a single letterbox.
+
+### The windshield has two edges, not one
+
+`profile_drawing.py side runs <y>` prints every ink run in one column of the
+side view. Between the crown outline and the belly there are two of them
+through the cockpit, and both are the windshield's:
+
+| Y | sill z | roof z | note |
+|---|---|---|---|
+| -1.480 | 1.836 | — | the sill meets the crown outline: the forward corner |
+| -1.560 | 1.805 | — | |
+| -1.680 | 1.781 | — | |
+| -1.900 | 1.745 | — | |
+| -2.100 | 1.726 | — | |
+| -2.180 | 1.724 | 2.219 | the roof line leaves the crown outline here |
+| -2.260 | 1.723 | 2.197 | the sill's low point, abeam the pilot |
+| -2.400 | 1.751 | 2.187 | |
+| -2.480 | 1.798 | 2.177 | |
+| -2.540 | 1.877 | 2.162 | |
+| -2.580 | 2.000 | 2.128 | |
+| -2.600 | 2.100 | 2.100 | sill meets roof: the aft corner |
+
+Forward of Y = -2.18 there is no second line inside the crown outline, because
+there the glass really does run over the top and the crown outline IS the top
+of the glazing. Aft of it the body carries on above the glass — the drawn gap
+grows from nothing to 0.26 m by the aft corner.
+
+**This is the line an earlier pass missed**, and missing it is what put a
+bubble canopy on the aircraft: glazing everything above the sill runs the glass
+over the crown for the windshield's whole length. The reference model in
+`tests/cirrus_vision_Sf50/` agrees to within 8 mm — its GLASS submesh tops out
+at z = 2.189 against the drawing's 2.19 — which is two independent sources for
+the same line.
+
+The front view says the same thing from the other side: `profile_drawing.py
+front prof` puts the glazing's top edge at z = 2.145 on the centreline against
+a fuselage crown of 2.455, so nothing anywhere is glazed above 2.19.
+
+### Reading the reference model
+
+`tests/cirrus_vision_Sf50/cirrus_vision_Sf50.glb` carries its windscreen as a
+separate GLASS submesh, which is a better source for that outline than a three
+view — the drawing shows it only as a line. It arrives at an arbitrary scale
+and attitude; `reorient_ref.py` aligns it and prints how well:
+
+| | reference | published | note |
+|---|---|---|---|
+| span | 11.796 | 11.796 | the scale datum: wingtip to wingtip |
+| length | 9.076 | 9.357 | −3.0% once the span is right |
+| crown line | — | — | matched to **15 mm rms** over 140 stations |
+
+The crown-line residual is the number that matters, because it says the
+forward fuselage — the part the windshield sits on — lines up. Two earlier
+alignments did not, and both produced measurements that looked plausible and
+were wrong:
+
+- **Principal axes (SVD) of the vertex cloud** put the pitch out by about 13
+  degrees. PCA weights by where vertices happen to be dense, and a model
+  tessellated for looks has a fine nose and a coarse tail.
+- **Nose tip to tail tip** put it out by 5 degrees, because the aft-most point
+  of this aircraft is the V-tail tip, 1.7 m off the centreline and far above
+  the tail cone.
+
+What works is a landmark for each thing that has one — the wingtip pair is the
+lateral axis, the farthest pair near the symmetry plane is the longitudinal —
+and a least-squares fit against the drawing's own crown line for the rest.
 
 The cockpit side glass is drawn as far forward as Y = -1.50, but its sill is at
 z = 1.82 there while the ring's window row has fallen to 1.42-1.76 - the row

@@ -252,12 +252,22 @@ drawing draws, on a fuselage that looks exactly as it did before the window was
 cut into it.
 
 **Describe the pane as a shape, not as a set of faces.** Trace its outline off
-the drawing — for the SF50 the windshield's sill is a curve read column by
-column, and each cabin window is a super-ellipse whose exponent was *measured*
-by comparing the pane's width at mid-height with its width 0.13 m higher (0.46 m
-against 0.35 m, which is an ellipse and not a rounded rectangle). Ramping the
-sill curve above the crown at each end closes the windshield region off, so one
-curve defines where it starts and stops as well as its shape.
+the drawing — for the SF50 each cabin window is a super-ellipse whose exponent
+was *measured* by comparing the pane's width at mid-height with its width
+0.13 m higher (0.46 m against 0.35 m, which is an ellipse and not a rounded
+rectangle), and the windshield is a pair of curves read column by column.
+
+**Count the pane's edges on the drawing before you model it.** A windscreen
+looks like it has one long edge — the sill — with the roof "just following the
+body". It does not. Scanning the SF50's side view column by column shows *two*
+ink runs between the crown outline and the belly through the cockpit: the sill,
+and a second line that leaves the crown outline partway along and runs aft
+below it. That second line is the top of the glass, and above it the body
+carries on. Glazing everything above the sill instead — which is what "the
+windshield wraps over the crown" invites — gives the aircraft a bubble canopy
+for the windscreen's whole length. It took a rebuild to fix and the line was on
+the drawing the entire time. Where a downloaded reference model is available,
+it is a second opinion on exactly this: the SF50's agreed to 8 mm.
 
 **Choose one face row that contains every pane at every station.** On the SF50
 that row spans z = 1.71 to 2.23 at the cabin and 1.38 to 2.13 at the aft window.
@@ -295,6 +305,55 @@ fore and aft end, spiking a dark sliver the full height of the row off both ends
 of every window. The row already knows which of its sub-rows is the pane, so it
 should say so.
 
+### When a pane's edge will not stay in one row
+
+A cabin window sits in one face row for its whole length. A windscreen does
+not: the SF50's sill starts on the crown, crosses the shoulder row, and ends up
+in the window row abeam the pilot, while its roof line leaves the crown and is
+out at the shoulder 0.4 m later. Two techniques that work for a window in one
+row both fail here, and the third is the one to use.
+
+- **Cutting the edge into a row chosen in advance** clamps it onto a ring line
+  wherever the guess is wrong, so the glass gets a step.
+- **Removing the rows outright and bridging to the outline** — the cabin-window
+  technique, scaled up — leaves the bridge tiling a band 80° of section wide
+  with long thin triangles that chord straight across the curve. The SF50's
+  nose came out visibly dented either side of the glass.
+- **Ask each row what it holds.** For every row and every station gap, compute
+  where each edge falls along that row and split there. Where the edge is
+  wholly outside the row, the row is one quad as before; where it crosses, the
+  row is two or three strips. Nothing is added except the cut vertices, and
+  they are interpolations between the row's own two ring vertices, so no
+  neighbouring row learns the cut happened.
+
+Two things that technique needs to be watertight:
+
+- **A station wherever an edge crosses a ring line.** Solve for them: bisect
+  for every station where the edge's height equals the ring line's height.
+  Without one, the edge lands on the ring line at a *different station* in each
+  of the two rows, the boundary jogs back along the line by one gap, and the
+  glass gets a notch a whole row deep. This is "put the vertices where the
+  features are" applied along the body instead of around it, and on the SF50 it
+  cost three rings.
+- **A snap tolerance.** The traced curves and the section table are separate
+  measurements, so where they *should* meet exactly they meet a fraction of a
+  millimetre apart. That puts a cut vertex 3 mm from a ring vertex, on a ring
+  line the next row never split — a T-junction. Treat any cut within a few
+  millimetres of a ring vertex as being that ring vertex.
+
+**Give a divider that ends mid-body a taper to nothing.** A windscreen's centre
+post runs out where the two panes meet at the forward tip and again where the
+glass stops going over the crown; modelling it as a constant-width band that
+simply stops leaves a T-junction at each end, because its end vertices sit on
+ring lines nothing else split. Tapering the width to zero puts those vertices
+*on* the ring line instead, and it is also what the aircraft does.
+
+**Put a ring line on the crown if the glazing needs one.** It costs a vertex
+per station, and on the SF50 it paid for itself three times: the polygon's top
+lands exactly on the measured crown, the centre post has something to hang its
+edges from, and neither windscreen pane has to share a face row with the other.
+A ring line is not automatically waste — the test is whether a feature needs it.
+
 Intermediate rules that are still true when the pane is coarse:
 
 - **Assign per triangle when a whole face is too coarse.** A quad is already two
@@ -317,6 +376,18 @@ The SF50 reached 1376 triangles at LOD0 with rounder windows than it had at
 found by looking at the wireframe, not the render. Before claiming a level is
 lean, render the wires and account for every cluster of density: it should sit
 where a feature is, and nowhere else.
+
+The reverse also holds. Getting the windscreen's outline right afterwards put
+LOD0 back up to 1515 — a crown ring line, three crossing stations, and the cuts
+those allow. "No polygon is wasted" is a claim about every polygon *earning*
+its place, not about the total going down.
+
+Two mesh-health numbers say whether a cut went in cleanly, and the validator
+prints both: **boundary edges** on a surface that should be closed, and
+**faces per edge**. A T-junction shows up as three boundary edges — the whole
+ring edge on the unsplit side plus its two halves on the split side. Four faces
+on one edge means the tiling lapped itself. Neither is visible in a render at
+any angle, and both will find you later.
 
 ---
 
@@ -399,7 +470,9 @@ cross-section resolution → control-surface separation → part separation.
 Those sizes are targets, not walls. The right count is the one where the
 wireframe shows density only where a feature is; a level that is 30% over
 because its windows are round is a better level than one that hits a number
-with rectangles. The SF50 sits at 1376 / 922 / 246 / 98.
+with rectangles. The SF50 sits at 1515 / 1044 / 246 / 98 — 30% and 45% over
+the targets, both spent on window shape, and the wireframe accounts for all of
+it.
 
 **A station's level is a shape decision, not an every-other-one rule.** Mark
 the stations that carry a feature — the nose and tail points that set the
@@ -523,6 +596,53 @@ drawing's and not the maintenance manual's, and that some of the triangles
 bridging each window to the mesh around it are long and thin. None of that
 stopped either being usable, and a reader who knows the limits can decide what
 to fix next.
+
+---
+
+### Aligning a downloaded reference model
+
+A model off the internet is worth having — it answers questions a three view
+draws ambiguously, and the SF50's windscreen was one — but it arrives at an
+arbitrary scale and attitude, and nothing can be read off it until it is in the
+same frame as the drawing. Two ways of doing that both produced measurements
+that looked plausible and were wrong:
+
+- **Principal axes (SVD) of the vertex cloud** was out by 13° of pitch. PCA
+  weights by where vertices happen to be dense, and a model tessellated for
+  looks has a fine nose and a coarse tail.
+- **Nose tip to tail tip** was out by 5°, because the aft-most point of that
+  aircraft is a V-tail tip, well off the centreline and far above the tail cone.
+
+What works is a landmark for each axis that has one, then a fit for what is
+left:
+
+1. **Lateral axis:** the two surface points farthest apart are the wingtips,
+   and with equal dihedral the line between them is level. Find them by
+   iterating "farthest from the last point".
+2. **Longitudinal axis:** the farthest pair again, with the lateral component
+   projected out and *only among points near the symmetry plane* — the nose tip
+   and the tail cone tip.
+3. **Up:** the cross product, with its sign taken from a part you can identify
+   (the windscreen is forward of the centroid and above it). Guessing is how a
+   reference ends up mirrored.
+4. **Scale on the span**, the largest and most precisely published dimension.
+   What the length then comes out at is a *measurement of the model's fidelity*
+   — print it, do not correct it. The SF50's came out 3% short.
+5. **Pitch and the two in-plane offsets: fit them.** Take the topmost ink in
+   each column of the drawing's side view — that is the crown line — read the
+   same line off the model, and solve by least squares. A line running the
+   length of the aircraft pins pitch in a way no pair of points can. The SF50's
+   matched to 15 mm rms over 140 stations.
+
+Then **check it, do not assume it**: stack the aligned model on the three view
+the same way you stack your own. And sample the model's *surface*, not its
+vertices — area-weighted points on its triangles. A 2 cm slab of a downloaded
+model can hold thirty vertices in one place and none in the next, and a profile
+read off that jumps around by tens of centimetres. That single mistake is what
+made the first two alignments look acceptable.
+
+Last: the reference is a hypothesis about *shape*. Use it to place a feature
+the drawing draws ambiguously, and take dimensions from the drawing.
 
 ---
 

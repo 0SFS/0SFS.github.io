@@ -1,6 +1,6 @@
 import "foss-earth/windowing.css";
 
-import { WindowOverlay } from "foss-earth/shell";
+import { MapCachePanel, WindowOverlay } from "foss-earth/shell";
 import {
   type GeodeticLocation,
   type LocationSearchProvider,
@@ -10,6 +10,7 @@ import {
   Bug,
   CloudSun,
   Gauge,
+  Settings,
   Pause,
   Play,
   Plane,
@@ -19,26 +20,30 @@ import type { BabylonRuntimeStatus, RendererMode } from "foss-earth/runtime";
 import type { FlightViewMode } from "../aircraft/createPlaceholderAircraft";
 import {
   AIRCRAFT_CATALOG,
+  availableLods,
   getAircraftDefinition,
   type AircraftId,
+  type AircraftLodDefinition,
   type AircraftLodId,
 } from "../aircraft/aircraftCatalog";
 import type { AircraftModelStatus } from "../aircraft/createAircraftModel";
 import { flightLog, type FlightLogEntry } from "../diagnostics/flightLog";
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
 
-type FlightPanelTab = "weather" | "aircraft" | "debug";
+type FlightPanelTab = "weather" | "aircraft" | "debug" | "settings";
 
 const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "weather", label: "Weather" },
   { id: "aircraft", label: "Aircraft" },
   { id: "debug", label: "Debug" },
+  { id: "settings", label: "Settings" },
 ];
 
 const TAB_ICONS = {
   weather: CloudSun,
   aircraft: Plane,
   debug: Bug,
+  settings: Settings,
 } satisfies Record<FlightPanelTab, typeof Plane>;
 
 const LOD_STATUS_LABEL: Record<AircraftModelStatus, string> = {
@@ -62,6 +67,8 @@ export interface FlightControlPanelSnapshot {
   rendererMode: RendererMode;
   aircraftId: AircraftId;
   lodId: AircraftLodId;
+  /** Whether the opt-in levels are switched on. */
+  optInLodsEnabled: boolean;
   modelStatus: AircraftModelStatus;
   /** Level actually in the scene; differs from lodId while "Auto" is selected. */
   modelActiveLodId: AircraftLodId | null;
@@ -78,6 +85,7 @@ export interface FlightControlPanelOptions {
   onViewModeChange(mode: FlightViewMode): void;
   onAircraftChange(aircraftId: AircraftId): void;
   onLodChange(lodId: AircraftLodId): void;
+  onOptInLodsChange(enabled: boolean): void;
 }
 
 export interface FlightControlPanelHandle {
@@ -153,10 +161,18 @@ function AircraftPanel({
   onViewModeChange,
   onAircraftChange,
   onLodChange,
+  onOptInLodsChange,
 }: FlightControlPanelProps) {
   const definition = getAircraftDefinition(snapshot.aircraftId);
-  const hasModel = definition.lods.length > 0;
+  const offered = availableLods(definition, snapshot.optInLodsEnabled);
+  const hasModel = offered.length > 0;
   const activeLod = definition.lods.find((lod) => lod.id === snapshot.modelActiveLodId);
+  const optInLods = definition.lods.filter((lod) => lod.optIn);
+  // Credited once each, finest first, so a ladder by two artists says so.
+  const credited = offered.reduce<AircraftLodDefinition[]>((keep, lod) => {
+    if (!keep.some((seen) => seen.credit.artist === lod.credit.artist)) keep.push(lod);
+    return keep;
+  }, []);
 
   return (
     <div className="flight-panel__content">
@@ -197,13 +213,27 @@ function AircraftPanel({
             onChange={(event) => onLodChange(event.target.value as AircraftLodId)}
           >
             <option value="auto">Auto (by chase distance)</option>
-            {definition.lods.map((lod) => (
+            {offered.map((lod) => (
               <option key={lod.id} value={lod.id}>
-                {`${lod.label} — ${lod.triangles} tris`}
+                {`${lod.label} — ${lod.triangles.toLocaleString()} tris`}
               </option>
             ))}
           </select>
         </label>
+        {optInLods.length > 0 ? (
+          <label className="flight-panel__field flight-panel__field--inline">
+            <input
+              type="checkbox"
+              checked={snapshot.optInLodsEnabled}
+              onChange={(event) => onOptInLodsChange(event.target.checked)}
+            />
+            <span>
+              {`Higher-detail models (${optInLods
+                .map((lod) => `${lod.triangles.toLocaleString()} tris`)
+                .join(", ")})`}
+            </span>
+          </label>
+        ) : null}
         <div className="flight-panel__metrics">
           <Metric label="Model" value={LOD_STATUS_LABEL[snapshot.modelStatus]} />
           <Metric
@@ -214,6 +244,21 @@ function AircraftPanel({
         {snapshot.lodId === "auto" && activeLod ? (
           <p className="flight-panel__hint">Auto selected {activeLod.label}.</p>
         ) : null}
+        {credited.map((lod) => (
+          <p className="flight-panel__hint" key={lod.credit.artist}>
+            <strong>{lod.credit.artist}</strong>
+            {` — ${lod.credit.note}`}
+            {lod.credit.licence ? ` ${lod.credit.licence}.` : null}
+            {lod.credit.sourceUrl ? (
+              <>
+                {" "}
+                <a href={lod.credit.sourceUrl} target="_blank" rel="noreferrer noopener">
+                  Source
+                </a>
+              </>
+            ) : null}
+          </p>
+        ))}
         {!hasModel ? (
           <p className="flight-panel__hint">
             No mesh exists for this airframe yet, so the block placeholder is drawn instead.
@@ -323,7 +368,7 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
           </div>
           {tabId === "weather" ? <WeatherPanel initialWeather={props.initialWeather} onWeatherChange={props.onWeatherChange} />
             : tabId === "aircraft" ? <AircraftPanel {...props} />
-              : <DebugPanel snapshot={props.snapshot} />}
+              : tabId === "settings" ? <MapCachePanel /> : <DebugPanel snapshot={props.snapshot} />}
         </>;
       }}
     />

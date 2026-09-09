@@ -2,13 +2,13 @@
 
 A measured reconstruction of the SF50 (G2) built to
 `docs/creating-an-aircraft-model.md`, generated procedurally from a table of
-cross-section stations. Four levels of detail, 1376 / 922 / 246 / 98 triangles,
+cross-section stations. Four levels of detail, 1515 / 1044 / 246 / 98 triangles,
 wired into `AIRCRAFT_CATALOG` as `cirrus-vision-jet`.
 
 | level | triangles | vertices | objects | takes over at |
 | --- | --- | --- | --- | --- |
-| LOD0 | 1376 | 749 | 22 | 0 m |
-| LOD1 | 922 | 521 | 22 | 65 m |
+| LOD0 | 1515 | 817 | 22 | 0 m |
+| LOD1 | 1044 | 581 | 22 | 65 m |
 | LOD2 | 246 | 156 | 12 | 170 m |
 | LOD3 | 98 | 74 | 1 | 340 m |
 
@@ -164,18 +164,31 @@ Other things measurement changed from the first blockout:
   ring's first face row on each side *is* the cabin window band: the model's
   glazed band lands at z = 1.711–2.234 against the drawing's 1.70–2.20. Nothing
   had to be added to place that colour.
+- **There is a ring line on the crown, and it earns its keep three times.** It
+  puts the polygon's top exactly on the measured crown; it is where the
+  windshield's centre post hangs its two edges; and it means neither
+  windshield pane has to share a face row with the other.
 - **Corner rounding is free.** The forward-most windshield pane and the
   aft-most cabin pane are already two triangles each, so painting one of the two
   chamfers the corner with a diagonal for no extra polygons.
-- **The panes are shapes, not face rows.** The windshield is bounded below by a
-  curve traced off the side view column by column - it falls from z = 1.86 at
-  the forward tip to 1.71 abeam the pilot and rises again to 1.78 at the aft
-  post, and ramping it above the crown at each end closes the region off, so
-  one curve defines the whole windshield including where it starts and stops.
-  The three cabin windows are super-ellipses whose exponent was read off the
-  drawing rather than assumed: window 3 measures 0.46 m wide at mid-height and
-  0.35 m at 0.13 m higher, which is an ellipse, not a rounded rectangle.
-- **The ring never moves.** The fuselage carries one uniform 10-point ring at
+- **The panes are shapes, not face rows.** The three cabin windows are
+  super-ellipses whose exponent was read off the drawing rather than assumed:
+  window 3 measures 0.46 m wide at mid-height and 0.35 m at 0.13 m higher,
+  which is an ellipse, not a rounded rectangle.
+- **The windshield has two traced edges, and finding the second one is what
+  fixed its shape.** `profile_drawing.py side runs` prints every ink run in one
+  column of the side view, and through the cockpit there are two between the
+  crown outline and the belly. The lower one is the sill, which falls from
+  z = 1.836 at the forward corner to 1.723 abeam the pilot and climbs back to
+  2.100 at the aft corner. The upper one appears at Y = −2.18 and runs aft at
+  z = 2.20 down to 2.10: it is the **top** of the glazing, with body above it.
+  An earlier pass glazed everything above the sill, which runs the glass over
+  the crown for the windshield's whole length and gives the aircraft a bubble
+  canopy - the thing that prompted this rebuild. The reference model in
+  `tests/` agrees to 8 mm on that line, which is two independent sources for
+  it. Two curves and a centre post now define the whole windshield, including
+  where it starts and stops.
+- **The ring never moves.** The fuselage carries one uniform 11-point ring at
   every station, the same angles throughout, exactly as it did before there
   were any windows. An earlier pass slid the ring vertices to follow each pane,
   on the reasoning that a vertex sliding along its own section curve does not
@@ -192,7 +205,7 @@ Other things measurement changed from the first blockout:
   on the analytic section: a vertex on the true curve would stand up to 5 cm
   proud of the flat row either side of it and put a crease down the whole
   cabin.
-- **No ring line carries a pane column.** The fuselage is the uniform 10-point
+- **No ring line carries a pane column.** The fuselage is the uniform 11-point
   ring at the measured stations and nothing else. A pane is cut into the one
   face row that holds it, as a hole bridged to its own outline, and the ring
   either side of that row never learns the window is there. Two earlier passes
@@ -219,17 +232,34 @@ Other things measurement changed from the first blockout:
   cabin the mesh is exactly what it was before there were any windows. The
   entire cost of the glazing is the pane outlines plus one triangle per column
   in the two rows either side.
-- **One extra ring per pane edge and per pane centre.** Cutting only the window
-  row would have been cheaper, but it splits that row's longitudinal edges
-  while the rows either side of it stay whole: **138 T-junctions and a mesh
-  that is no longer closed.** Whole rings cost about the same once the shape
-  stations they make redundant are dropped (`PANE_EDGE_MERGE`), and the mesh
-  stays watertight.
-- **The windshield's centre post is a cut, not a station.** The ring has no
-  vertex at top dead centre by design, so the post — 62 mm on the plan view —
-  is cut laterally into the one crown row that straddles it, glass | paint |
-  glass. Consecutive windshield segments cut at the same place and the
-  duplicate vertices are welded, so this leaves only the two ends open.
+- **The windshield's edges are cut into whichever row holds them.** None of the
+  three stays in one row: the sill runs from the crown at Y = −1.48 down
+  through the shoulder row into the window row abeam the pilot; the roof line
+  leaves the crown at −2.18 and is out at the shoulder by −2.55; the centre
+  post is a lateral edge in the two rows either side of top dead centre. So the
+  row is asked what it holds rather than told in advance - cutting each edge
+  into a row picked ahead of time clamps it onto a ring line wherever the guess
+  is wrong, and the glass came out with a step in it.
+- **Where an edge crosses a ring line, there is a station.** Those stations are
+  *solved for*, not guessed: `edge_ring_crossings()` bisects for every Y where
+  the sill or the roof crosses a ring line, and `fuselage_stations()` adds
+  them. Without one, the edge lands on the ring line at a different station in
+  each of the two rows, the boundary jogs back along the line by one gap, and
+  the glass gets a notch a whole row deep. It is the C172's lesson - put the
+  vertices where the features are - applied along the fuselage instead of
+  around it, and it costs three rings at LOD0.
+- **A cut within 4 mm of a ring vertex IS that ring vertex.** The traced curves
+  and the section table are separate measurements, so where they should meet
+  exactly - the roof leaving the crown, the sill meeting it at the forward
+  corner - they meet a third of a millimetre apart. Left alone that puts a
+  vertex 3 mm from the ring's own, on a ring line the next row never split, and
+  the fuselage comes back with a T-junction. `SNAP_M` closes the gap.
+- **The centre post tapers to nothing at both ends.** 62 mm wide on the plan
+  view in the middle, zero at the windshield's forward tip - where the two
+  panes meet anyway - and zero again at Y = −2.18, where the roof line leaves
+  the crown and the panes stop being joined over the top. That is what the
+  aircraft does, and it is also what keeps the post's ends off a ring line that
+  was never split: a post that simply stopped left a T-junction at each end.
 - **The nacelle is open where the fuselage closes it.** The drawing leaves a
   7–13 cm gap between the pod and the crown, too small to be worth a pylon at
   this budget, so the pod is seated on the fuselage and the four faces that
@@ -250,7 +280,7 @@ Generated from the same parameterised script, never decimated.
 
 | dropped at | what goes |
 | --- | --- |
-| LOD1 | 9 pane columns → 5, fewer fuselage stations, coarser nacelle and wheels, the wing's mid-span station. The ring stays at 10 points: the body is the same shape, the panes are less round |
+| LOD1 | 9 pane columns → 5, fewer fuselage stations, coarser nacelle and wheels, the wing's mid-span station. The ring stays at 11 points: the body is the same shape, the panes are less round |
 | LOD2 | ring → 6 points, 9 stations, the pane-edge rings (one glazed band instead of four windows), control surfaces merged into their panels, intake, keel, gear doors |
 | LOD3 | ring → 4 points, 5 stations, 4-point aerofoils (3-point on the V-tail), tyres, everything joined into one mesh |
 
@@ -284,7 +314,7 @@ literally, and it is what let LOD3 come in under 100 triangles.
 
 | check | LOD0 | LOD1 | LOD2 | LOD3 |
 | --- | --- | --- | --- | --- |
-| triangles | 1376 | 922 | 246 | 98 |
+| triangles | 1515 | 1044 | 246 | 98 |
 | length 9.357 m | 9.357 | 9.357 | 9.357 | 9.357 |
 | span 11.796 m | 11.796 | 11.796 | 11.796 | 11.796 |
 | height 3.322 m | 3.3227 | 3.3227 | 3.3219 | 3.3227 |
@@ -305,7 +335,7 @@ the report that flag correct things:
 
 | object | edges | why it is open |
 | --- | --- | --- |
-| Fuselage | 8 | the windshield centre post's cut meets an uncut row at each end of the windshield |
+| Fuselage | 3 | one sliver at the aft cabin window's bridge — see "What is still wrong" |
 | Nacelle | 16 / 6 / 4 | the faces buried in the fuselage crown are not built |
 | Intake | 8 / 6 | the bore is a dished cap, open at its rim inside the lip |
 | Wing_Left / _Right | 7 / 6 | root ribs, uncapped inside the fuselage |
@@ -314,13 +344,57 @@ the report that flag correct things:
 
 ---
 
+## A second model, by someone else
+
+`tests/cirrus_vision_Sf50/` turned out to be hilos run's Sketchfab model — its
+root node is `Sketchfab_model` and its counts match the page. It is **CC
+Attribution**, so it can ship, and it now does: as the Vision Jet's `hd` level,
+**off by default**, switched on from the panel.
+
+| | hd (hilos run) | our LOD0 |
+| --- | --- | --- |
+| triangles | 7,294 | 1,515 |
+| vertices | 4,578 | 817 |
+| download | 3.4 MB (4096² texture) | 60 KB |
+| span | 11.796 (the scale datum) | 11.796 |
+| length | 9.075 (−3.0%) | 9.357 (exact) |
+| landing gear | **none — modelled gear-up** | modelled, on z = 0 |
+| symmetry error, max | 0.96 m | 0.0 |
+| closed | no, 1,828 boundary edges | yes apart from the three above |
+
+It is prepared, not modelled: `reorient_ref.py` aligns it to the three view and
+`prepare_third_party.py` puts its origin under the CG and exports it with the
+same `export_yup` the generator uses, so it lands exactly where ours do.
+Neither touches its geometry.
+
+What it is better at is texture and small-scale shape. What it is worse at is
+everything measurable, and one thing is not a nuance: **it has no landing
+gear**, so parked it hovers 0.67 m over the runway with nothing underneath. It
+is right in flight and wrong on the ground. That, plus 3.4 MB and the licence,
+is why it is opt-in rather than the default.
+
+The symmetry figure needs reading carefully: 0.96 m max with a 0.26 m mean over
+4,574 of 4,578 vertices means the mesh is not mirror-*tessellated*, which is
+normal for a hand-built asset — its shape looks symmetric. It is reported
+because the validator reports it, not because the model looks lopsided.
+
+---
+
 ## Wiring in
 
 `src/flight/aircraft/aircraftCatalog.ts`:
 
-- Four levels — 1376 / 922 / 246 / 98 triangles — and `autoFromMeters` of
-  0 / 65 / 170 / 340. Those are the Cessna's thresholds scaled by the span
-  ratio, so the two airframes switch at the same apparent size.
+- Four levels of ours — 1515 / 1044 / 246 / 98 triangles — at `autoFromMeters`
+  of 40 / 65 / 170 / 340, plus hilos run's opt-in `hd` at 0. The three coarse
+  thresholds are the Cessna's scaled by the span ratio, so the two airframes
+  switch at the same apparent size. LOD0's is 40 rather than 0 because `hd`
+  covers the close range when it is on; with `hd` off, `selectAutoLod` gives
+  the close range to the finest level available, so LOD0 still starts at the
+  camera. There is one threshold table, not one per setting.
+- Every level names its artist. Ours are `felipegalin0`, "measured
+  reconstruction, designed explicitly for max runtime speed"; `hd` is
+  `hilos run` with its licence and a link, which the panel shows whenever that
+  level is being offered.
 - `propellerBlades: 0`. It is a jet; the propeller-disc logic never engages and
   the mesh ships no `Propeller` or `Propeller_Disc` node for it to find.
 - `modelYawRad: Math.PI`, the standard glTF −Z nose to sim +Z nose rotation.
@@ -415,6 +489,12 @@ Read this before treating any of it as accurate.
 
 - **The V-tail span follows the callout, not two of the three views.** 8% of
   tail span is at stake. See above; this is the largest open question.
+- **The windshield's lateral wrap is not measured directly.** Its two long
+  edges are traced off the side view and its width falls out of where those
+  heights land on the section, which the front view then confirms — the panes
+  sit inside the drawn outline with the frame's thickness to spare. What is not
+  independently measured is how far around the section the glass reaches at any
+  one station.
 - **The main tyres are the drawing's 0.38 m, not the AMM's 0.457 m.** They
   cannot both be right and the drawing is self-consistent with the height.
 - **The nacelle is seated on the crown**, not standing on a pylon with the
@@ -441,6 +521,16 @@ Read this before treating any of it as accurate.
   and aft ends close at the station straddling the pane's tip.
 - **There is a faint shading seam at each pane's fore and aft end**, where the
   triangle strip joins a four-vertex chain to a two-vertex one.
+- **Three boundary edges remain in the fuselage**, at the aft cabin window.
+  Its hole runs to the nearest station either side, and the nearest aft is
+  0.4 m away, so the bridge leaves one sliver whose edges do not pair up. It is
+  down from eight, it is invisible, and closing it means a station 0.4 m from
+  where the shape needs one.
+- **The reference model is 3% short** once its span is set to the published
+  figure, and its fuselage is up to 0.24 m wider than the drawing at the cabin.
+  Nothing is taken from it in metres except the windshield's roof line, which
+  the drawing gives independently and agrees with to 8 mm; everywhere else the
+  drawing wins.
 - **Each pane's bridge fans from the few station lines around it to the many
   vertices of its outline**, so some of those triangles are long and thin -
   visible in `renders/WIREFRAME_lod0.png` around the aft window, whose nearest

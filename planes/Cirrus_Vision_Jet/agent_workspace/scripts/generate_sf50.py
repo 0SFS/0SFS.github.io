@@ -166,26 +166,41 @@ KEEL_HALF_T = 0.030
 # is as round as the mesh under it can resolve rather than as square as the
 # ring happens to be.
 #
-# The windshield's sill is a traced curve: scanning the side view column by
-# column between Y = -1.32 and -2.57 gives the lower edge of the glazing
-# directly, and it is not a straight line - it falls from z = 1.86 at the
-# forward tip to 1.71 abeam the pilot and rises again to 1.78 at the aft post.
-# Ramping the curve above the crown at each end closes the region off, so one
-# curve defines the whole windshield including where it starts and stops.
+# The windshield is bounded by TWO traced curves, not one. Scanning the side
+# view column by column shows a second line inside the crown outline from
+# Y = -2.18 aft: that is the top of the glazing, and the body carries on above
+# it. Glazing everything above the sill instead runs the glass over the crown
+# and gives the aircraft a bubble canopy - which is exactly what it looked
+# like, and the reference model in tests/ has the same two edges.
+#
+# Both are read the same way, off `profile_drawing.py side runs`, which prints
+# every ink run in one column; the windshield edges are the runs between the
+# crown outline and the belly.
 WINDSHIELD_SILL = [
-    (-1.300, 2.600),    # above the crown: nothing forward of here is glass
-    (-1.450, 1.858),
-    (-1.530, 1.814),
-    (-1.630, 1.790),
-    (-1.790, 1.764),
-    (-1.940, 1.740),
-    (-2.100, 1.727),
-    (-2.250, 1.724),
-    (-2.360, 1.737),
-    (-2.460, 1.782),
-    (-2.520, 1.910),
-    (-2.565, 2.150),
-    (-2.620, 2.600),    # above the crown again: the aft post
+    (-1.440, 2.600),    # above the crown: nothing forward of here is glass
+    (-1.480, 1.836),    # the sill meets the crown outline here
+    (-1.560, 1.805),
+    (-1.680, 1.781),
+    (-1.900, 1.745),
+    (-2.100, 1.726),
+    (-2.260, 1.723),    # the low point, abeam the pilot
+    (-2.400, 1.751),
+    (-2.480, 1.798),
+    (-2.540, 1.877),
+    (-2.580, 2.000),
+    (-2.600, 2.100),    # aft corner: sill and roof meet
+]
+# Forward of the first station the glazing simply runs over the crown, which is
+# what the drawing shows - there is no second line inside the outline there.
+WINDSHIELD_ROOF = [
+    (-2.180, 2.219),    # leaves the crown here
+    (-2.260, 2.197),
+    (-2.300, 2.195),
+    (-2.400, 2.187),
+    (-2.480, 2.177),
+    (-2.540, 2.162),
+    (-2.580, 2.128),
+    (-2.600, 2.100),
 ]
 
 # Cabin windows as super-ellipses: (centre Y, half-length, centre z, half-height,
@@ -199,19 +214,29 @@ CABIN_WINDOWS = [
     (-4.328, 0.178, 1.905, 0.175, 2.2),   # cabin window 4
 ]
 
-WINDSHIELD_Y = (-2.600, -1.388)   # forward corner of the windshield base
+WINDSHIELD_Y = (-2.600, -1.480)   # forward corner of the windshield base
 # Falls back to one plain band at the levels too coarse to resolve a shape.
 CABIN_Y = (-4.506, -2.774)
-# Half-width of the windshield's centre post, measured on the plan view.
+# Half-width of the windshield's centre post, measured on the plan view. It
+# tapers to nothing at each end of its run, which is both what the aircraft
+# does - the two panes meet at the windshield's forward tip, and again where
+# the roof line leaves the crown and the glass stops going over the top - and
+# what keeps the post's ends off a ring line that has not been split. A post
+# that just stopped left a T-junction at each end.
 WINDSHIELD_POST_HALF = 0.031
+POST_TAPER = 0.12                 # metres of run the taper is spread over
+SNAP_M = 0.004                    # a cut nearer than this to a ring vertex
+                                  # is that ring vertex
 
-# Stations the glazing needs so its shape can resolve. A pane is only as round
-# as the grid under it, so the number of columns per window is what decides
-# whether a cabin window reads as an ellipse or as an octagon.
-WINDSHIELD_CUTS = {
-    'fine': [-1.450, -1.720, -1.940, -2.180, -2.400, -2.520, -2.565, -2.620],
-    'coarse': [-1.450, -2.000, -2.450, -2.620],
-}
+
+def post_half(y):
+    """Half-width of the windshield's centre post at station y."""
+    aft = WINDSHIELD_ROOF[0][0]                # where the glass stops wrapping
+    if not (aft <= y <= WINDSHIELD_Y[1]):
+        return 0.0
+    d = min(WINDSHIELD_Y[1] - y, y - aft)
+    return WINDSHIELD_POST_HALF * min(1.0, max(0.0, d) / POST_TAPER)
+
 # Fractions of the pane half-length to put a station at. The +/-1.0 pair sits
 # just outside the pane and closes it off; the rest sample its outline.
 PANE_COLUMN_FRACTIONS = {
@@ -224,51 +249,39 @@ PANE_COLUMN_FRACTIONS = {
 }
 
 
-def glazing_cut_ys(detail):
-    out = list(WINDSHIELD_CUTS[detail])
-    for yc, a, _zc, _b, _n in CABIN_WINDOWS:
-        out += [yc + a * f for f in PANE_COLUMN_FRACTIONS[detail]]
-    return out
-
-
-def sill_z(y):
-    """Lower edge of the windshield glazing at station y."""
-    pts = WINDSHIELD_SILL
-    if y >= pts[0][0] or y <= pts[-1][0]:
-        return 1e9
+def _trace(pts, y, outside):
+    """Linear interpolation along a traced (station, height) curve."""
+    if y > pts[0][0] or y < pts[-1][0]:
+        return outside
     for (y0, z0), (y1, z1) in zip(pts, pts[1:]):
         if y1 <= y <= y0:
             t = (y0 - y) / (y0 - y1)
             return z0 + (z1 - z0) * t
-    return 1e9
+    return outside
+
+
+def sill_z(y):
+    """Lower edge of the windshield glazing at station y."""
+    return _trace(WINDSHIELD_SILL, y, 1e9)
+
+
+def roof_z(y):
+    """Upper edge of the windshield glazing at station y.
+
+    Forward of where the roof line leaves the crown there is no upper edge -
+    the glass runs over the top - so this returns a height nothing can reach.
+    """
+    return _trace(WINDSHIELD_ROOF, y, 1e9)
 
 
 def is_glass(y, z):
     """Is this point on the fuselage skin glazed?"""
-    if z > sill_z(y):
+    if sill_z(y) < z < roof_z(y):
         return True
     for yc, a, zc, b, n in CABIN_WINDOWS:
         if abs((y - yc) / a) ** n + abs((z - zc) / b) ** n <= 1.0 + 1e-6:
             return True
     return False
-
-
-def pane_cuts(y):
-    """Heights to cut into the window row at station y, or None.
-
-    For a cabin window these are the pane's own upper and lower edge, taken
-    from the measured super-ellipse; for the windshield it is the sill. They
-    are the only vertices the glazing adds, and they go on the row's chord, so
-    the fuselage outside the panes is exactly the mesh it was before.
-    """
-    for yc, a, zc, b, n in CABIN_WINDOWS:
-        if abs(y - yc) < a:
-            f = 1.0 - abs((y - yc) / a) ** n
-            h = b * (f ** (1.0 / n)) if f > 0.0 else 0.0
-            return [zc - h, zc + h]
-    if WINDSHIELD_Y[0] <= y <= WINDSHIELD_Y[1]:
-        return [sill_z(y)]      # no top edge: the windshield wraps over the crown
-    return None
 
 
 # One uniform ring for the whole fuselage, the same angles at every station.
@@ -278,9 +291,17 @@ def pane_cuts(y):
 # without the ring itself ever having to move. Moving it was what put ridges
 # down the whole cabin - a vertex slid along the section changes the CHORD
 # between two stations even though it does not change the section.
+#
+# The 90 degree line - top dead centre - is there for the windshield. Its two
+# panes are cut as holes bridged to their own outlines, the way the cabin
+# windows are, and that only works if each pane's rows belong to it alone: with
+# no line on the crown one row straddles it, both panes want it, and the second
+# one to ask finds it already gone. It pays for itself twice over - it is also
+# the only vertex that puts the polygon crown exactly on the measured crown,
+# and it is where the centre post's two edges hang from.
 RING_SPEC = {
-    10: dict(angles=[8, 48, 70, 110, 132, 172, 200, 240, 300, 340],
-             window=[0, 4], crown=[1, 2, 3], top=2),
+    11: dict(angles=[8, 48, 70, 90, 110, 132, 172, 200, 240, 300, 340],
+             window=[0, 5], crown=[1, 2, 3, 4], top=2, crown_line=3),
     8:  dict(angles=[8, 48, 132, 172, 200, 250, 290, 340],
              window=[0, 2], crown=[1], top=1),
     6:  dict(angles=[10, 60, 120, 170, 230, 310],
@@ -297,13 +318,13 @@ RING_SPEC = {
 # survives to LOD3.
 # ----------------------------------------------------------------------------
 LODP = {
-    0: dict(ring=10, st_level=2, pane_detail='fine', wheel=8,
+    0: dict(ring=11, st_level=2, pane_detail='fine', wheel=8,
             wing_st=(0.0, 1.30, 3.20, 5.60, SEMI),
             vt_st=(VT_ROOT_ETA, 0.55, 1.0), gear_n=4, gear_st=3,
             glass=True, ctrl=True, af='full', merge=False, nac_ring=8,
             pillars=True, intake=True, flat_gear=False, nac_st=5, panes=True,
             tip_cap=True, gear_cap=True),
-    1: dict(ring=10, st_level=0, pane_detail='coarse', wheel=6,
+    1: dict(ring=11, st_level=0, pane_detail='coarse', wheel=6,
             wing_st=(0.0, 1.30, SEMI),
             vt_st=(VT_ROOT_ETA, 1.0), gear_n=4, gear_st=2,
             glass=True, ctrl=True, af='full', merge=False, nac_ring=6,
@@ -490,13 +511,6 @@ def section(y, zb, zm, zt, hw, pu, pl, n, fit=True):
     return pts
 
 
-PANE_EDGE_YS = sorted(set(glazing_cut_ys(P["pane_detail"])), reverse=True)
-# A shape station this close to a pane edge is dropped in the edge's favour:
-# the edge ring carries the same interpolated shape, so keeping both would be
-# two rings doing one ring's work.
-PANE_EDGE_MERGE = 0.12
-
-
 def interpolate_station(y, base):
     """A station at y, with every shape parameter read off the measured table.
 
@@ -519,6 +533,52 @@ def pane_spans():
     return sorted(out, key=lambda p: -p[0])
 
 
+def edge_ring_crossings(base, n):
+    """Stations where a windshield edge crosses a ring line.
+
+    This is the one place the windshield needs a station of its own, and it is
+    solved for rather than guessed. An edge is cut into whichever row holds it,
+    so where it passes from one row into the next it has to land exactly on the
+    ring line between them. If there is no station there it lands on the line
+    at the wrong station in each row - the boundary jogs back along the ring
+    line by one gap, and the glass gets a notch a whole row deep. With a
+    station at the crossing both rows cut to the same vertex and the edge runs
+    straight through.
+
+    The C172's lesson, applied along the fuselage instead of around it: put the
+    vertices where the features are.
+    """
+    out = []
+    for curve in (sill_z, roof_z):
+        for j in range(n):
+            def diff(y, j=j, curve=curve):
+                st = interpolate_station(y, base)
+                if st is None:
+                    return None
+                z = curve(y)
+                return None if z > 1e8 else z - section(*st[:7], n)[j][2]
+
+            prev_y, prev_d = None, None
+            y = WINDSHIELD_Y[1]
+            while y >= WINDSHIELD_Y[0] - 1e-9:
+                d = diff(y)
+                if d is not None and prev_d is not None and d * prev_d < 0.0:
+                    lo, hi = y, prev_y
+                    for _ in range(40):
+                        mid = (lo + hi) / 2.0
+                        dm = diff(mid)
+                        if dm is None:
+                            break
+                        if dm * prev_d < 0.0:
+                            hi = mid
+                        else:
+                            lo = mid
+                    out.append((lo + hi) / 2.0)
+                prev_y, prev_d = y, d
+                y -= 0.005
+    return out
+
+
 def fuselage_stations():
     if LOD == 3:
         base = [s for s in STATIONS if s[0] in LOD3_STATIONS]
@@ -534,14 +594,22 @@ def fuselage_stations():
     # gap. The windshield's ends are stations because that is where the crown
     # rows stop being glazed; the rest are separators, added only where the
     # measured stations do not already keep two panes apart.
-    wanted = list(WINDSHIELD_Y)
+    # The windshield's two ends, and the station where its roof line leaves
+    # the crown. That last one cannot be solved for the way the ring crossings
+    # are - forward of it the roof is not a number, it is "there is no roof" -
+    # so it is named. Without it the row over the crown has the roof above it
+    # at one station and below it at the next, and the cut goes diagonally
+    # across the whole row instead of stopping.
+    wanted = list(WINDSHIELD_Y) + [WINDSHIELD_ROOF[0][0]]
     spans = pane_spans()
     for (_f0, a0), (f1, _a1) in zip(spans, spans[1:]):
         if not any(f1 < st[0] < a0 for st in base):
             wanted.append((a0 + f1) / 2.0)
+    if P["glass"]:
+        wanted += edge_ring_crossings(base, P["ring"])
     extra = []
-    for y in wanted:
-        if all(abs(y - st[0]) > 0.02 for st in base + extra):
+    for y in wanted:          # named stations first, crossings after
+        if all(abs(y - st[0]) > 0.04 for st in base + extra):
             st = interpolate_station(y, base)
             if st:
                 extra.append(st)
@@ -601,7 +669,22 @@ def build_fuselage():
         sub-millimetre float noise flips - which once left a glazed sliver
         spiking the full height of the row off each end of a cabin window.
         """
-        faces.append(list(idx))
+        idx = list(idx)
+        # A face this thin is three collinear points: it covers nothing, so
+        # dropping it leaves no hole, and keeping it would be a polygon that
+        # draws nothing.
+        p = [verts[i] for i in idx]
+        area = 0.0
+        for c in range(1, len(p) - 1):
+            u = [p[c][d] - p[0][d] for d in range(3)]
+            v = [p[c + 1][d] - p[0][d] for d in range(3)]
+            area += 0.5 * math.sqrt(
+                (u[1] * v[2] - u[2] * v[1]) ** 2
+                + (u[2] * v[0] - u[0] * v[2]) ** 2
+                + (u[0] * v[1] - u[1] * v[0]) ** 2)
+        if area < 1e-12:
+            return
+        faces.append(idx)
         fmats.append(1 if glass else 0)
         nonlocal glazed_n
         glazed_n += 1 if glass else 0
@@ -630,7 +713,14 @@ def build_fuselage():
         return lerp3(lo, hi, min(max(f, 0.0), 1.0))
 
     def bridge_loops(outer, inner):
-        """Tile the ring between two closed loops that wind the same way."""
+        """Tile the ring between two closed loops that wind the same way.
+
+        Which loop to advance is decided by index fraction, so both are walked
+        in step and each is used exactly once. Choosing by triangle area
+        instead - to dodge the one sliver this leaves - lets a loop be advanced
+        twice where the other stalls, and the walk laps itself: 5 edges came
+        back with four faces on them.
+        """
         no, ni = len(outer), len(inner)
         p = q = 0
         while p < no or q < ni:
@@ -641,7 +731,7 @@ def build_fuselage():
                 emit((outer[p % no], inner[(q + 1) % ni], inner[q % ni]), False)
                 q += 1
 
-    consumed = {j: set() for j in spec["window"]}
+    consumed = {j: set() for j in range(n)}
 
     def cut_cabin_pane(j, yc, a, zc, b, ex):
         """A cabin window: a hole in the row, bridged to its own outline."""
@@ -676,27 +766,127 @@ def build_fuselage():
             emit((lo_edge[c], lo_edge[c + 1], hi_edge[c + 1], hi_edge[c]), True)
         panes_cut += 1
 
-    def cut_windshield(j):
-        """The windshield has no upper edge - it wraps over the crown - so its
-        row is simply split along the sill."""
-        nonlocal panes_cut
-        k = (j + 1) % n
-        for g in range(len(ys) - 1):
-            if not (in_ws(ys[g]) and in_ws(ys[g + 1])):
-                continue
-            consumed[j].add(g)
-            la, ha = g * n + j, g * n + k
-            lb, hb = (g + 1) * n + j, (g + 1) * n + k
-            sa = add(row_point(ys[g], sill_z(ys[g]), j))
-            sb = add(row_point(ys[g + 1], sill_z(ys[g + 1]), j))
-            j_low = rings[g][j][2] < rings[g][k][2]
-            emit((la, lb, sb, sa), not j_low)
-            emit((sa, sb, hb, ha), j_low)
-            panes_cut += 1
+    def snap(a, b, f):
+        """A cut this near a ring vertex IS that ring vertex.
 
+        The traced curves and the section table are separate measurements, so
+        where they should meet exactly - the roof line leaving the crown, the
+        sill meeting it at the windshield's tip - they meet a fraction of a
+        millimetre apart. Left alone that puts a vertex 3 mm from the ring's
+        own, on a ring line the next row along never split, and the fuselage
+        comes back with a T-junction. Anything within SNAP is the ring vertex.
+        """
+        d = math.dist(a, b)
+        if d < 1e-9:
+            return 0.0
+        t = SNAP_M / d
+        return 0.0 if f < t else (1.0 if f > 1.0 - t else f)
+
+    def glazed(p, ym):
+        """Is this point on the skin glass? Structural, not a knife edge.
+
+        Only ever asked about the middle of a strip, never about a vertex on a
+        pane's own outline: a vertex sits exactly ON the boundary, so testing
+        one is a coin toss that float noise flips - which is how a glazed
+        sliver once ended up spiking off the end of a cabin window.
+        """
+        if P["pillars"] and abs(p[0]) <= post_half(ym):
+            return False
+        return sill_z(ym) < p[2] < roof_z(ym)
+
+    def cut_windshield():
+        """Cut the windscreen's own edges into whichever ring row holds them.
+
+        The windscreen has THREE edges, and not one of them stays in a single
+        row: the sill runs from the crown at Y = -1.48 down through the
+        shoulder row into the window row abeam the pilot; the roof line leaves
+        the crown at -2.18 and is out at the shoulder by -2.55; and the centre
+        post is a vertical edge in the two rows either side of top dead centre.
+        So each edge is cut into the row that happens to hold it at that
+        station, and where it crosses a ring line the cut lands exactly on that
+        line - which is what keeps the boundary continuous across the crossing
+        instead of stepping a whole row.
+
+        Every cut vertex is an interpolation between the row's OWN two ring
+        vertices, so it sits on the chord the surface already had: cutting the
+        glazing changes nothing about the shape of the fuselage around it, and
+        the rows either side never learn the cut happened, so there is no
+        T-junction to crack.
+        """
+        nonlocal panes_cut
+        for g in range(len(ys) - 1):
+            ya, yb = ys[g], ys[g + 1]
+            # The gap either side of the windshield is cut too, with the
+            # edges pinched onto the ring vertex. Stopping at the span's ends
+            # instead leaves the cut vertices sitting on a ring line whose
+            # other side was never subdivided - a T-junction, and the fuselage
+            # came back with 14 boundary edges across the glazing's two ends.
+            if not (in_ws(ya) or in_ws(yb)):
+                continue
+            ym = (ya + yb) / 2.0
+            for j in range(n):
+                k = (j + 1) % n
+                consumed[j].add(g)
+                pa0, pa1 = rings[g][j], rings[g][k]
+                pb0, pb1 = rings[g + 1][j], rings[g + 1][k]
+                edges = [(2, sill_z(ya), sill_z(yb)),
+                         (2, roof_z(ya), roof_z(yb))]
+                cl = spec.get("crown_line")
+                # The centre post is a vertical edge, and only in the two rows
+                # that touch top dead centre - asking for it anywhere else cuts
+                # the belly in half for nothing.
+                if P["pillars"] and cl is not None and j in (cl - 1, cl):
+                    sgn = 1.0 if j == cl - 1 else -1.0
+                    edges.append((0, sgn * post_half(ya), sgn * post_half(yb)))
+                cuts = []
+                for c, va, vb in edges:
+                    da, db = pa1[c] - pa0[c], pb1[c] - pb0[c]
+                    if abs(da) < 1e-9 or abs(db) < 1e-9:
+                        continue
+                    fa = snap(pa0, pa1, (va - pa0[c]) / da)
+                    fb = snap(pb0, pb1, (vb - pb0[c]) / db)
+                    if (fa <= 0.0 and fb <= 0.0) or (fa >= 1.0 and fb >= 1.0):
+                        continue        # wholly one side of this row
+                    cuts.append((min(max(fa, 0.0), 1.0),
+                                 min(max(fb, 0.0), 1.0)))
+                # Two edges can meet inside one row - the sill runs into the
+                # roof at the aft corner, and into the post at the forward one
+                # - and there they swap order between the two stations. Left
+                # alone that tiles the row inside out and tears it; clamping
+                # each level to the one before keeps the strips in order and
+                # the crossing collapses to a point, which is what it is.
+                cuts.sort(key=lambda t: t[0] + t[1])
+                levels = [(0.0, 0.0)]
+                for fa, fb in cuts + [(1.0, 1.0)]:
+                    levels.append((max(fa, levels[-1][0]),
+                                   max(fb, levels[-1][1])))
+                ids = []
+                for fa, fb in levels:
+                    va = g * n + j if fa <= 1e-6 else \
+                        (g * n + k if fa >= 1.0 - 1e-6 else
+                         add(lerp3(pa0, pa1, fa)))
+                    vb = (g + 1) * n + j if fb <= 1e-6 else \
+                        ((g + 1) * n + k if fb >= 1.0 - 1e-6 else
+                         add(lerp3(pb0, pb1, fb)))
+                    ids.append((va, vb))
+                for s in range(len(levels) - 1):
+                    (fa0, fb0), (fa1, fb1) = levels[s], levels[s + 1]
+                    if abs(fa1 - fa0) < 1e-6 and abs(fb1 - fb0) < 1e-6:
+                        continue
+                    (a0, b0), (a1, b1) = ids[s], ids[s + 1]
+                    mid = [(lerp3(pa0, pa1, (fa0 + fa1) / 2.0)[c]
+                            + lerp3(pb0, pb1, (fb0 + fb1) / 2.0)[c]) / 2.0
+                           for c in range(3)]
+                    quad = [a0, a1, b1, b0]
+                    quad = [v for i, v in enumerate(quad)
+                            if v != quad[(i - 1) % len(quad)]]
+                    if len(quad) >= 3:
+                        emit(quad, glazed(mid, ym))
+        panes_cut += 1
     if P["panes"]:
+        if P["glass"]:
+            cut_windshield()
         for j in spec["window"]:
-            cut_windshield(j)
             for (yc, a, zc, b, ex) in CABIN_WINDOWS:
                 cut_cabin_pane(j, yc, a, zc, b, ex)
 
@@ -709,36 +899,20 @@ def build_fuselage():
             mid = (ys[g] + ys[g + 1]) / 2.0
             a, b2 = g * n, (g + 1) * n
 
-            # The windshield's centre post: the ring has no vertex at top dead
-            # centre by design, so the post is cut into the one row that
-            # straddles it, glass | 62 mm paint | glass.
-            if j == spec["top"] and P["glass"] and P["pillars"] \
-                    and in_ws(ys[g]) and in_ws(ys[g + 1]):
-                p0, p1 = rings[g][j], rings[g][k]
-                q0, q1 = rings[g + 1][j], rings[g + 1][k]
-
-                def half(u, v):
-                    dx = abs(u[0] - v[0])
-                    return min(0.45, WINDSHIELD_POST_HALF / dx) if dx > 1e-6 else 0.45
-
-                f0, f1 = half(p0, p1), half(q0, q1)
-                ia = add(lerp3(p0, p1, 0.5 - f0))
-                ia2 = add(lerp3(p0, p1, 0.5 + f0))
-                ib = add(lerp3(q0, q1, 0.5 - f1))
-                ib2 = add(lerp3(q0, q1, 0.5 + f1))
-                emit((a + j, ia, ib, b2 + j), True)
-                emit((ia, ia2, ib2, ib), False)
-                emit((ia2, a + k, b2 + k, ib2), True)
-                continue
-
             if not P["glass"]:
                 glass = False
             elif P["panes"]:
-                glass = j in spec["crown"] and in_ws(ys[g]) and in_ws(ys[g + 1])
+                glass = False       # cut_windshield already took every glazed
+                                    # row in the windshield's span
             else:
-                # too coarse to resolve a pane shape: a plain band instead
+                # Too coarse to resolve a pane shape: a plain band instead.
+                # The roof line still applies - a level too coarse for the
+                # window shapes is not too coarse to notice a bubble canopy.
+                zmid = (rings[g][j][2] + rings[g][k][2]
+                        + rings[g + 1][j][2] + rings[g + 1][k][2]) / 4.0
                 glass = (CABIN_Y[0] <= mid <= CABIN_Y[1] and j in spec["window"]) \
-                    or (in_ws(mid) and j in set(spec["window"]) | set(spec["crown"]))
+                    or (in_ws(mid) and zmid < roof_z(mid)
+                        and j in set(spec["window"]) | set(spec["crown"]))
             emit((a + j, a + k, b2 + k, b2 + j), glass)
 
     faces.append(list(range(n - 1, -1, -1))); fmats.append(0)

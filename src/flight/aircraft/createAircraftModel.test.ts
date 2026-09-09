@@ -49,6 +49,33 @@ describe("aircraft model loader", () => {
     t.teardown();
   });
 
+  it("will not load an opt-in level until it is switched on, and swaps when it is", async () => {
+    const t = setup();
+    const model = createAircraftModel(t.scene, t.parent, {
+      aircraftId: "cirrus-vision-jet",
+      lodId: "hd",
+      loadContainer: t.loadContainer,
+    });
+    // The stored choice is a level the user has not enabled, so the finest one
+    // they have takes its place rather than the aircraft going missing.
+    await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
+    expect(model.getState().activeLodId).toBe("lod0");
+    expect(t.urls.some((url) => url.includes("HilosRun"))).toBe(false);
+
+    model.setOptInEnabled(true);
+    await vi.waitFor(() => expect(model.getState().activeLodId).toBe("hd"));
+    expect(t.urls[t.urls.length - 1]).toContain("Cirrus_Vision_Jet_HilosRun.glb");
+    expect(model.getState().triangles).toBe(7294);
+    expect(model.getState().optInEnabled).toBe(true);
+
+    // ...and switching it back off puts the cheap mesh back.
+    model.setOptInEnabled(false);
+    await vi.waitFor(() => expect(model.getState().activeLodId).toBe("lod0"));
+
+    model.dispose();
+    t.teardown();
+  });
+
   it("orients the glTF -Z nose onto the sim's +Z nose and drops it to the ground", async () => {
     const t = setup();
     const model = createAircraftModel(t.scene, t.parent, {
@@ -116,7 +143,7 @@ describe("aircraft model loader", () => {
     model.setAircraft("cirrus-vision-jet");
     await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
     expect(t.urls[1]).toContain("Cirrus_Vision_Jet_LOD0.glb");
-    expect(model.getState().triangles).toBe(1376);
+    expect(model.getState().triangles).toBe(1515);
 
     model.dispose();
     t.teardown();

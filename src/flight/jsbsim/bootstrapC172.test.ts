@@ -21,12 +21,13 @@ describe("bootstrapC172p", () => {
 
     await bootstrapC172p(sdk);
 
+    expect(sdk.setPropertyValue).toHaveBeenCalledWith("ic/h-sl-ft", 5000);
     expect(events.slice(0, 4)).toEqual([
       "runIc",
       "fcs/throttle-cmd-norm=0.65",
       "propulsion/set-running=-1",
       "propulsion/magneto_cmd=3",
     ]);
-    expect(Number(events[4]?.split("=")[1])).toBeCloseTo(0.894, 3);
+    expect(Number(events[4]?.split("=")[1])).toBeCloseTo(1, 3);
   });
 });

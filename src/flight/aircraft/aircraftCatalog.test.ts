@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   AIRCRAFT_CATALOG,
+  availableLods,
   getAircraftDefinition,
   isAircraftId,
   isAircraftLodId,
@@ -31,11 +32,59 @@ describe("aircraft catalog", () => {
     for (const definition of AIRCRAFT_CATALOG) {
       const triangles = definition.lods.map((lod) => lod.triangles);
       expect(triangles).toEqual([...triangles].sort((a, b) => b - a));
-      expect(definition.lods.map((lod) => lod.id)).toEqual(["lod0", "lod1", "lod2", "lod3"]);
       const distances = definition.lods.map((lod) => lod.autoFromMeters);
       expect(distances).toEqual([...distances].sort((a, b) => a - b));
+      // The ladder always starts at the camera, whether or not its finest
+      // level is one the user has to switch on.
       expect(distances[0]).toBe(0);
+      expect(availableLods(definition, false)[0]?.optIn).toBeUndefined();
     }
+    expect(c172.lods.map((lod) => lod.id)).toEqual(["lod0", "lod1", "lod2", "lod3"]);
+    expect(cirrus.lods.map((lod) => lod.id)).toEqual(["hd", "lod0", "lod1", "lod2", "lod3"]);
+  });
+
+  it("credits every mesh, and names a licence and a source for third-party ones", () => {
+    for (const definition of AIRCRAFT_CATALOG) {
+      for (const lod of definition.lods) {
+        expect(lod.credit.artist).toBeTruthy();
+        expect(lod.credit.note).toBeTruthy();
+        // Anything not ours ships only because its licence allows it, so the
+        // licence and a link back are not optional on those.
+        if (lod.credit.artist !== "felipegalin0") {
+          expect(lod.credit.licence).toBeTruthy();
+          expect(lod.credit.sourceUrl).toMatch(/^https:\/\//);
+        }
+      }
+    }
+    const hd = cirrus.lods.find((lod) => lod.id === "hd");
+    expect(hd?.credit.artist).toBe("hilos run");
+    expect(cirrus.lods.find((lod) => lod.id === "lod0")?.credit.artist).toBe("felipegalin0");
+  });
+
+  it("hides opt-in levels until they are switched on", () => {
+    expect(availableLods(cirrus, false).map((lod) => lod.id)).toEqual([
+      "lod0", "lod1", "lod2", "lod3",
+    ]);
+    expect(availableLods(cirrus, true).map((lod) => lod.id)).toEqual([
+      "hd", "lod0", "lod1", "lod2", "lod3",
+    ]);
+    // The C172 has none, so the flag changes nothing for it.
+    expect(availableLods(c172, true)).toEqual(availableLods(c172, false));
+  });
+
+  it("never reaches an opt-in level while it is switched off", () => {
+    expect(selectAutoLod(cirrus, 0, false)?.id).toBe("lod0");
+    // ...and a stored choice of one falls back rather than blanking the model
+    expect(resolveLod(cirrus, "hd", 0, false)?.id).toBe("lod0");
+  });
+
+  it("lets an opt-in level cover the close range once it is on", () => {
+    expect(selectAutoLod(cirrus, 0, true)?.id).toBe("hd");
+    expect(selectAutoLod(cirrus, 39, true)?.id).toBe("hd");
+    expect(selectAutoLod(cirrus, 40, true)?.id).toBe("lod0");
+    expect(selectAutoLod(cirrus, 65, true)?.id).toBe("lod1");
+    expect(selectAutoLod(cirrus, 5000, true)?.id).toBe("lod3");
+    expect(resolveLod(cirrus, "hd", 9999, true)?.id).toBe("hd");
   });
 
   it("keeps the jet off the propeller path", () => {
@@ -80,5 +129,9 @@ describe("aircraft catalog", () => {
     expect(resolveLod(meshless, "auto", 0)).toBeNull();
     expect(resolveLod(meshless, "lod0", 0)).toBeNull();
     expect(selectAutoLod(meshless, 0)).toBeNull();
+    // ...and an airframe whose only mesh is opt-in, while it is switched off
+    const optInOnly: AircraftDefinition = { ...cirrus, lods: cirrus.lods.filter((lod) => lod.optIn) };
+    expect(resolveLod(optInOnly, "auto", 0, false)).toBeNull();
+    expect(resolveLod(optInOnly, "auto", 0, true)?.id).toBe("hd");
   });
 });

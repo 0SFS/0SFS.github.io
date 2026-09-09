@@ -16,10 +16,13 @@ export interface C172BootstrapOptions {
   engineRunning?: boolean;
 }
 
+export const START_ALTITUDE_AGL_METERS = 5000 * 0.3048;
+export const DEFAULT_FLIGHT_START = { latDeg: 44.977753, lonDeg: -93.265011 };
+
 const DEFAULT_OPTIONS: Required<C172BootstrapOptions> = {
-  latDeg: 44.977753,
-  lonDeg: -93.265011,
-  altFt: 10_000,
+  ...DEFAULT_FLIGHT_START,
+  // Temporary initial state; flight placement adds the loaded ground height.
+  altFt: 5_000,
   headingDeg: 300,
   airspeedKts: 120,
   engineRunning: true,

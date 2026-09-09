@@ -321,6 +321,23 @@
   font-family: "SF Mono", Menlo, monospace;
 }
 
+/* A checkbox reads as label-then-control on one line, not as a stacked pair. */
+.flight-panel__field--inline {
+  grid-auto-flow: column;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.flight-panel__field--inline span {
+  justify-content: flex-start;
+}
+
+.flight-panel__hint a {
+  color: var(--flight-panel-accent);
+}
+
 .flight-panel__field input[type="range"] {
   width: 100%;
   accent-color: var(--flight-panel-accent);

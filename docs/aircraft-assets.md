@@ -14,7 +14,8 @@ planes/Cessna_172/
     ├── exports/                    GLB output and the master .blend
     └── REPORT.md                   modelling decisions and known compromises
 
-public/aircraft/<aircraft-id>/      meshes served to the browser
+public/aircraft/<aircraft-id>/      meshes served to the browser, ours and
+                                   any third-party ones the licence allows
 src/flight/aircraft/
 ├── aircraftCatalog.ts              selectable airframes and their LOD meshes
 ├── createAircraftModel.ts          glTF loading and LOD swapping
@@ -87,6 +88,39 @@ The UI exposes an `Auto` mode that picks a level from the chase-camera distance
 using each level's `autoFromMeters` threshold, and it only reloads when the
 chosen level actually changes.
 
+## More than one artist per airframe
+
+A ladder is per airframe and ordered finest first, but its rungs need not all
+come from the same place, so **the credit belongs to the level, not to the
+airframe**. `AircraftModelCredit` carries the artist, a line on what the mesh is
+for, and — for anything not ours — the licence and a link back. The panel shows
+one line per artist in the ladder it is offering, which is how a CC-BY
+obligation is met at the point of use rather than in a file nobody opens.
+
+Our own meshes are credited to `felipegalin0`: measured reconstructions,
+designed explicitly for max runtime speed.
+
+### Levels the user has to switch on
+
+A level marked `optIn` is off until asked for. That is for a mesh whose loading
+is a decision rather than a default — a third-party asset with a licence to
+honour, or one heavy enough that nobody should pay for it without choosing to.
+While it is off it is neither listed in the panel nor reachable from `Auto`, and
+a stored selection of one falls back to the finest level that *is* available
+rather than leaving the aircraft invisible.
+
+The Vision Jet has one: **HD, 7,294 triangles, by hilos run**, CC Attribution,
+from Sketchfab. It sits above our LOD0 and covers the close range when it is
+switched on, with our own LOD0 taking over at 40 m — so the 3.4 MB textured
+mesh is never drawn at distance.
+
+`selectAutoLod` has one rule that makes this work without rewriting thresholds
+whenever the flag changes: **the finest level available always covers the close
+range**, whatever its own `autoFromMeters` says. With HD on, LOD0 starts at its
+own 40 m; with HD off, LOD0 is the finest there is and starts at the camera.
+
+The choice persists to `localStorage` under `osfs.aircraft-opt-in-lods`.
+
 ## Runtime
 
 `aircraftCatalog.ts` is a pure data module: airframes, their LOD meshes,
@@ -103,9 +137,11 @@ container loader is injectable so tests never touch the network.
 exposes a `modelRoot` slot. The placeholder blocks are drawn only while no real
 mesh is present, and the model follows the same cockpit/chase visibility rules.
 
-Selections persist to `localStorage` under `osfs.aircraft` and
-`osfs.aircraft-lod`. OSFS reads the former `flight-sim.*` keys as a migration
-fallback so existing local selections are retained.
+Selections persist to `localStorage` under `osfs.aircraft`,
+`osfs.aircraft-lod` and `osfs.aircraft-opt-in-lods`. OSFS reads the former
+`flight-sim.*` keys as a migration fallback so existing local selections are
+retained; the opt-in flag has no legacy key because nothing before it stored
+one.
 
 ## Control surfaces and propeller
 
@@ -286,6 +322,12 @@ the wing thins to a knife edge and stops covering the opening.
   a generic monoplane at any distance.
 - The models carry no panel lines, antennas, door outlines or wheel fairings.
   They are faithful in structure and proportion, not detailed.
+- The Vision Jet's opt-in HD level is **modelled gear-up**. It is right in
+  flight and wrong parked: nothing is drawn under the belly, and the belly
+  itself sits 0.67 m above the runway where our own meshes stand on their
+  wheels. It is also 3% short on length once its span is set to the published
+  figure, and its fuselage is up to 0.24 m wider than the drawing at the cabin.
+  Those are the reasons it is an alternative rather than the default.
 
 `planes/Cessna_172/agent_workspace/REPORT.md` records the measurement sources,
 per-level statistics and the specific compromises behind the Cessna 172.

@@ -10,9 +10,21 @@
 export const AIRCRAFT_IDS = ["cessna-172", "cirrus-vision-jet"] as const;
 export type AircraftId = (typeof AIRCRAFT_IDS)[number];
 
-export const AIRCRAFT_LOD_IDS = ["auto", "lod0", "lod1", "lod2", "lod3"] as const;
+// The ladder runs finest first. "hd" sits above lod0 and is not always ours:
+// an airframe can carry a level by another artist, which is why the credit
+// belongs to the LEVEL rather than to the airframe.
+export const AIRCRAFT_LOD_IDS = ["auto", "hd", "lod0", "lod1", "lod2", "lod3"] as const;
 export type AircraftLodId = (typeof AIRCRAFT_LOD_IDS)[number];
 export type AircraftLodMeshId = Exclude<AircraftLodId, "auto">;
+
+/** Who made a mesh, and whatever its licence requires be shown with it. */
+export interface AircraftModelCredit {
+  artist: string;
+  /** One line on what this mesh is for. Shown next to it in the panel. */
+  note: string;
+  licence?: string;
+  sourceUrl?: string;
+}
 
 export interface AircraftLodDefinition {
   id: AircraftLodMeshId;
@@ -23,6 +35,15 @@ export interface AircraftLodDefinition {
   path: string;
   /** Chase-camera distance (m) at or beyond which "Auto" picks this level. */
   autoFromMeters: number;
+  credit: AircraftModelCredit;
+  /**
+   * Levels that are off until the user asks for them. A level is opt-in when
+   * loading it is a decision rather than a default - a third-party mesh whose
+   * licence has to be honoured, or one heavy enough that nobody should pay for
+   * it without choosing to. While it is off it is neither offered in the panel
+   * nor reachable from "Auto".
+   */
+  optIn?: boolean;
 }
 
 export interface AircraftDefinition {
@@ -48,18 +69,44 @@ export interface AircraftDefinition {
   lods: readonly AircraftLodDefinition[];
 }
 
+const PROCEDURAL: AircraftModelCredit = {
+  artist: "felipegalin0",
+  note: "Measured reconstruction, designed explicitly for max runtime speed.",
+};
+
+/**
+ * https://sketchfab.com/3d-models/cirrus-vision-sf50-d46dd06b4b5646acaed90993db34d639
+ * CC Attribution, so it ships with the credit shown in the panel. Aligned to
+ * the POH three view by
+ * planes/Cirrus_Vision_Jet/agent_workspace/scripts/reorient_ref.py and put
+ * into the export convention by prepare_third_party.py, which is why it lands
+ * in the same place as ours; nothing about its geometry was touched.
+ */
+const HILOS_RUN: AircraftModelCredit = {
+  artist: "hilos run",
+  note: "Sketchfab model, textured. Higher detail, but modelled gear-up.",
+  licence: "CC Attribution",
+  sourceUrl:
+    "https://sketchfab.com/3d-models/cirrus-vision-sf50-d46dd06b4b5646acaed90993db34d639",
+};
+
 const CIRRUS_LODS: readonly AircraftLodDefinition[] = [
-  { id: "lod0", label: "LOD0 — near", triangles: 1376, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD0.glb", autoFromMeters: 0 },
-  { id: "lod1", label: "LOD1 — medium", triangles: 922, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD1.glb", autoFromMeters: 65 },
-  { id: "lod2", label: "LOD2 — far", triangles: 246, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD2.glb", autoFromMeters: 170 },
-  { id: "lod3", label: "LOD3 — silhouette", triangles: 98, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD3.glb", autoFromMeters: 340 },
+  // Off by default: 3.4 MB of textured mesh, and a licence to honour.
+  { id: "hd", label: "HD — highest detail", triangles: 7294, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_HilosRun.glb", autoFromMeters: 0, credit: HILOS_RUN, optIn: true },
+  // 40 m rather than 0 because HD covers the close range when it is switched
+  // on. With it off, the finest level available always covers the close range,
+  // so this still starts at the camera - see selectAutoLod.
+  { id: "lod0", label: "LOD0 — near", triangles: 1515, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD0.glb", autoFromMeters: 40, credit: PROCEDURAL },
+  { id: "lod1", label: "LOD1 — medium", triangles: 1044, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD1.glb", autoFromMeters: 65, credit: PROCEDURAL },
+  { id: "lod2", label: "LOD2 — far", triangles: 246, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD2.glb", autoFromMeters: 170, credit: PROCEDURAL },
+  { id: "lod3", label: "LOD3 — silhouette", triangles: 98, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD3.glb", autoFromMeters: 340, credit: PROCEDURAL },
 ];
 
 const C172_LODS: readonly AircraftLodDefinition[] = [
-  { id: "lod0", label: "LOD0 — near", triangles: 1016, path: "aircraft/cessna-172/Cessna_172_LOD0.glb", autoFromMeters: 0 },
-  { id: "lod1", label: "LOD1 — medium", triangles: 778, path: "aircraft/cessna-172/Cessna_172_LOD1.glb", autoFromMeters: 60 },
-  { id: "lod2", label: "LOD2 — far", triangles: 288, path: "aircraft/cessna-172/Cessna_172_LOD2.glb", autoFromMeters: 160 },
-  { id: "lod3", label: "LOD3 — silhouette", triangles: 130, path: "aircraft/cessna-172/Cessna_172_LOD3.glb", autoFromMeters: 320 },
+  { id: "lod0", label: "LOD0 — near", triangles: 1016, path: "aircraft/cessna-172/Cessna_172_LOD0.glb", autoFromMeters: 0, credit: PROCEDURAL },
+  { id: "lod1", label: "LOD1 — medium", triangles: 778, path: "aircraft/cessna-172/Cessna_172_LOD1.glb", autoFromMeters: 60, credit: PROCEDURAL },
+  { id: "lod2", label: "LOD2 — far", triangles: 288, path: "aircraft/cessna-172/Cessna_172_LOD2.glb", autoFromMeters: 160, credit: PROCEDURAL },
+  { id: "lod3", label: "LOD3 — silhouette", triangles: 130, path: "aircraft/cessna-172/Cessna_172_LOD3.glb", autoFromMeters: 320, credit: PROCEDURAL },
 ];
 
 export const AIRCRAFT_CATALOG: readonly AircraftDefinition[] = [
@@ -102,16 +149,34 @@ export function isAircraftLodId(value: unknown): value is AircraftLodId {
   return typeof value === "string" && (AIRCRAFT_LOD_IDS as readonly string[]).includes(value);
 }
 
-/** Coarsest level whose `autoFromMeters` threshold the distance has reached. */
+/** The levels the user can actually get right now, finest first. */
+export function availableLods(
+  definition: AircraftDefinition,
+  optInEnabled: boolean,
+): readonly AircraftLodDefinition[] {
+  return optInEnabled ? definition.lods : definition.lods.filter((lod) => !lod.optIn);
+}
+
+/**
+ * Coarsest available level whose `autoFromMeters` threshold the distance has
+ * reached, and the finest available one inside that.
+ *
+ * The finest level available always covers the close range, whatever its own
+ * threshold says. That is what lets an opt-in level be switched on and off
+ * without rewriting the thresholds under it: with HD on, LOD0 starts at its
+ * own 40 m; with HD off, LOD0 is the finest there is and starts at the camera.
+ */
 export function selectAutoLod(
   definition: AircraftDefinition,
   chaseDistanceMeters: number,
+  optInEnabled = false,
 ): AircraftLodDefinition | null {
-  let selected: AircraftLodDefinition | null = null;
-  for (const lod of definition.lods) {
+  const lods = availableLods(definition, optInEnabled);
+  let selected: AircraftLodDefinition | null = lods[0] ?? null;
+  for (const lod of lods) {
     if (chaseDistanceMeters >= lod.autoFromMeters) selected = lod;
   }
-  return selected ?? definition.lods[0] ?? null;
+  return selected;
 }
 
 /** Resolve a UI selection to a concrete mesh, or null when none is available. */
@@ -119,8 +184,12 @@ export function resolveLod(
   definition: AircraftDefinition,
   lodId: AircraftLodId,
   chaseDistanceMeters: number,
+  optInEnabled = false,
 ): AircraftLodDefinition | null {
-  if (definition.lods.length === 0) return null;
-  if (lodId === "auto") return selectAutoLod(definition, chaseDistanceMeters);
-  return definition.lods.find((lod) => lod.id === lodId) ?? definition.lods[0] ?? null;
+  const lods = availableLods(definition, optInEnabled);
+  if (lods.length === 0) return null;
+  if (lodId === "auto") return selectAutoLod(definition, chaseDistanceMeters, optInEnabled);
+  // A level that was chosen and then switched off falls back to the finest one
+  // still available rather than leaving the aircraft invisible.
+  return lods.find((lod) => lod.id === lodId) ?? lods[0] ?? null;
 }

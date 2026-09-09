@@ -24,6 +24,9 @@ WINDOWS = {                      # metric window as it appears on the page
     "front": dict(h=(-6.4, 6.4), v=(3.75, -0.35), ax=(0, 2)),
 }
 W = WINDOWS[VIEW]
+if "--win" in argv:
+    h0, h1, v0, v1 = (float(v) for v in argv[argv.index("--win") + 1].split(","))
+    W = dict(W, h=(h0, h1), v=(v0, v1))
 h0, h1 = W["h"]
 v0, v1 = W["v"]
 NX = int(round(abs(h1 - h0) * PX))

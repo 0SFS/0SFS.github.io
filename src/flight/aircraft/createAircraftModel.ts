@@ -22,6 +22,8 @@ export interface AircraftModelState {
   lodId: AircraftLodId;
   /** The mesh actually in the scene, which differs from lodId under "auto". */
   activeLodId: AircraftLodId | null;
+  /** Whether opt-in levels are switched on. See `optIn` in the catalog. */
+  optInEnabled: boolean;
   status: AircraftModelStatus;
   triangles: number | null;
   error: string | null;
@@ -30,6 +32,7 @@ export interface AircraftModelState {
 export interface AircraftModelOptions {
   aircraftId: AircraftId;
   lodId: AircraftLodId;
+  optInEnabled?: boolean;
   /** Chase distance drives "auto" level selection. */
   getChaseDistanceMeters?(): number;
   onStateChange?(state: AircraftModelState): void;
@@ -44,6 +47,7 @@ export interface AircraftModelHandle {
   getRig(): AircraftRig | null;
   setAircraft(id: AircraftId): void;
   setLod(id: AircraftLodId): void;
+  setOptInEnabled(enabled: boolean): void;
   /** Re-evaluate "auto" against the current chase distance. Cheap to call. */
   refreshAutoLod(): void;
   dispose(): void;
@@ -73,6 +77,7 @@ export function createAircraftModel(
     aircraftId: options.aircraftId,
     lodId: options.lodId,
     activeLodId: null,
+    optInEnabled: options.optInEnabled ?? false,
     status: "placeholder",
     triangles: null,
     error: null,
@@ -92,7 +97,7 @@ export function createAircraftModel(
 
   const apply = (): void => {
     const definition = getAircraftDefinition(state.aircraftId);
-    const lod = resolveLod(definition, state.lodId, getChaseDistance());
+    const lod = resolveLod(definition, state.lodId, getChaseDistance(), state.optInEnabled);
 
     if (!lod) {
       loadToken += 1;
@@ -159,6 +164,11 @@ export function createAircraftModel(
     setLod(id): void {
       if (id === state.lodId) return;
       state = { ...state, lodId: id };
+      apply();
+    },
+    setOptInEnabled(enabled): void {
+      if (enabled === state.optInEnabled) return;
+      state = { ...state, optInEnabled: enabled };
       apply();
     },
     refreshAutoLod(): void {

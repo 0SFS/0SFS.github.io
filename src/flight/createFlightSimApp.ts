@@ -53,8 +53,11 @@ import type { PhonePairingDialog } from "./hud/createPhonePairingDialog";
 import { createFlightInputManager } from "./input/flightInputManager";
 import { createJsbsimRuntime } from "./jsbsim/createJsbsimRuntime";
 import { createFixedStepPhysicsLoop } from "./physics/fixedStepLoop";
+import { createFlightLoadingScreen, type FlightLoadingScreen } from "../loading/createFlightLoadingScreen";
+import { DEFAULT_FLIGHT_START, START_ALTITUDE_AGL_METERS } from "./jsbsim/bootstrapC172";
 
 export interface FlightSimAppOptions {
+  loadingScreen?: FlightLoadingScreen;
   googleApiKey?: string | null;
   baseMap?: string | RasterBaseMapSource | null;
   preferGoogleTiles?: boolean;
@@ -84,6 +87,9 @@ function setRendererForce(force: FlightRendererForce | null): void {
 
 const AIRCRAFT_PREFERENCE_KEY = "osfs.aircraft";
 const AIRCRAFT_LOD_PREFERENCE_KEY = "osfs.aircraft-lod";
+// Opt-in levels are a per-user decision, so the choice persists like the rest.
+// It has no legacy key: nothing before this stored it.
+const AIRCRAFT_OPT_IN_PREFERENCE_KEY = "osfs.aircraft-opt-in-lods";
 const LEGACY_AIRCRAFT_PREFERENCE_KEY = "flight-sim.aircraft";
 const LEGACY_AIRCRAFT_LOD_PREFERENCE_KEY = "flight-sim.aircraft-lod";
 
@@ -112,6 +118,11 @@ export async function createFlightSimApp(
   rootElement: HTMLElement,
   options: FlightSimAppOptions = {},
 ): Promise<FlightSimAppHandle> {
+  const loading = options.loadingScreen ?? createFlightLoadingScreen();
+  loading.show();
+  loading.setPhase("app", { state: "ready" });
+  loading.setPhase("world", { state: "loading", detail: "Preparing the map renderer" });
+  loading.setPhase("flight", { state: "loading", detail: "Loading flight physics" });
   const mapConfig = resolveMapRuntimeConfig({
     googleApiKey: options.googleApiKey,
     baseMap: options.baseMap,
@@ -137,7 +148,10 @@ export async function createFlightSimApp(
     throw new Error("Flight sim shell failed to mount.");
   }
 
-  const runtime = await createBabylonRuntime(canvas, {
+  let bootstrapFailed = false;
+  const bootResources: { runtime?: BabylonRuntime; jsbsim?: Awaited<ReturnType<typeof createJsbsimRuntime>> } = {};
+  const startupAbort = new AbortController();
+  const runtimePromise = createBabylonRuntime(canvas, {
     googleApiKey: mapConfig.googleApiKey,
     preferGoogleTiles: mapConfig.preferGoogleTiles,
     rasterBaseMap: mapConfig.rasterBaseMap,
@@ -145,21 +159,63 @@ export async function createFlightSimApp(
     rasterQuality: mapConfig.rasterQuality,
     rendererForce: getRendererForceFromUrl(),
     simMode: true,
+  }).then(runtime => {
+    if (bootstrapFailed) { runtime.destroy(); throw new Error("Startup cancelled."); }
+    bootResources.runtime = runtime;
+    runtime.setSimRunning(false);
+    runtime.setSimViewState({ ...DEFAULT_FLIGHT_START, zoomMeters: START_ALTITUDE_AGL_METERS * 1.5 });
+    loading.setPhase("world", { state: "ready" });
+    return runtime;
   });
-
-  if (runtime.geospatialCamera) {
-    runtime.geospatialCamera.detachControl();
-    runtime.geospatialCamera.setEnabled(false);
-  }
-
-  const jsbsim = await createJsbsimRuntime({
+  // Start local terrain selection as soon as the renderer exists. WASM and its
+  // aircraft data are loading independently; no simulator work blocks this.
+  const terrainReady = runtimePromise.then(runtime => runtime.prepareTerrain({
+    ...DEFAULT_FLIGHT_START,
+    altitudeAboveGroundMeters: START_ALTITUDE_AGL_METERS,
+    radiusMeters: 1000,
+    clearanceMeters: 1000,
+    signal: startupAbort.signal,
+    onProgress: progress => loading.setPhase("terrain", {
+      state: progress.phase === "ready" ? "ready" : "loading",
+      detail: progress.message, progress: progress.progress,
+    }),
+  }));
+  // The full readiness join happens after the visual assets have started too.
+  void terrainReady.catch(() => {});
+  const jsbsimPromise = createJsbsimRuntime({
     dataBaseUrl: options.dataBaseUrl,
+    onProgress: progress => loading.setPhase("flight", {
+      state: "loading", detail: progress.message, progress: progress.progress,
+    }),
     onLog: (stream, message) => {
       if (stream === "stderr") {
         console.warn("[jsbsim]", message);
       }
     },
+  }).then(jsbsim => {
+    if (bootstrapFailed) { jsbsim.dispose(); throw new Error("Startup cancelled."); }
+    bootResources.jsbsim = jsbsim;
+    loading.setPhase("flight", { state: "ready" });
+    return jsbsim;
   });
+  let runtime: BabylonRuntime;
+  let jsbsim: Awaited<ReturnType<typeof createJsbsimRuntime>>;
+  try {
+    [runtime, jsbsim] = await Promise.all([runtimePromise, jsbsimPromise]);
+  } catch (error) {
+    bootstrapFailed = true;
+    startupAbort.abort();
+    bootResources.runtime?.destroy();
+    bootResources.jsbsim?.dispose();
+    loading.fail("Flight could not load. Check your connection and try again.");
+    throw error;
+  }
+  if (runtime.geospatialCamera) {
+    runtime.geospatialCamera.detachControl();
+    runtime.geospatialCamera.setEnabled(false);
+  }
+  let worldLoading = true;
+  let placementAbort = startupAbort;
 
   let phoneSession: PhoneControlSession | null = null;
   let phoneDialog: PhonePairingDialog | null = null;
@@ -184,8 +240,13 @@ export async function createFlightSimApp(
   let aircraftModel: AircraftModelHandle | null = null;
   let aircraftId: AircraftId = readPreference(AIRCRAFT_PREFERENCE_KEY, LEGACY_AIRCRAFT_PREFERENCE_KEY, isAircraftId, "cessna-172");
   let aircraftLodId: AircraftLodId = readPreference(AIRCRAFT_LOD_PREFERENCE_KEY, LEGACY_AIRCRAFT_LOD_PREFERENCE_KEY, isAircraftLodId, "auto");
+  let optInLodsEnabled = readPreference(
+    AIRCRAFT_OPT_IN_PREFERENCE_KEY, AIRCRAFT_OPT_IN_PREFERENCE_KEY,
+    (value): value is "on" | "off" => value === "on" || value === "off", "off",
+  ) === "on";
   let modelState: AircraftModelState = {
     aircraftId, lodId: aircraftLodId, activeLodId: null,
+    optInEnabled: optInLodsEnabled,
     status: "placeholder", triangles: null, error: null,
   };
   let controlPanel: FlightControlPanelHandle | null = null;
@@ -219,25 +280,41 @@ export async function createFlightSimApp(
   let measuredFps: number | null = null;
   const weather: FlightWeatherState = { windDirectionDeg: 0, windSpeedKts: 0 };
 
+  loading.setPhase("assets", { state: "loading", detail: "Loading your aircraft" });
+  const onModelState = (state: AircraftModelState): void => {
+    modelState = state;
+    aircraft?.setModelLoaded(state.status === "ready");
+    if (state.status === "ready") {
+      loading.setPhase("assets", { state: "ready" });
+    } else if (state.status === "placeholder") {
+      // The placeholder is a complete, flyable aircraft. A visual mesh should
+      // never keep a safely prepared flight from starting.
+      loading.setPhase("assets", { state: "ready", detail: "Using the flight-ready fallback aircraft" });
+    } else if (state.status === "error") {
+      loading.setPhase("assets", { state: "ready", detail: "Aircraft mesh unavailable; using the flight-ready fallback" });
+    }
+  };
   const mountFlightWorld = (): void => {
     const worldRoot = runtime.getWorldRoot();
     if (!worldRoot || floatingOrigin) return;
 
     floatingOrigin = createFloatingOrigin(runtime.scene, worldRoot);
+    floatingOrigin.aircraftRoot.setEnabled(false);
     aircraft = createPlaceholderAircraft(runtime.scene, floatingOrigin.aircraftRoot);
     aircraft.setViewMode("third");
     aircraftModel = createAircraftModel(runtime.scene, aircraft.modelRoot, {
       aircraftId,
       lodId: aircraftLodId,
+      optInEnabled: optInLodsEnabled,
       getChaseDistanceMeters: () => aircraft?.getChaseDistanceMeters() ?? 0,
       onStateChange: (state) => {
-        modelState = state;
-        aircraft?.setModelLoaded(state.status === "ready");
-        controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+        onModelState(state);
+        if (controlPanel) controlPanel.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
         runtime.requestRender();
       },
     });
 
+    onModelState(aircraftModel.getState());
     const initialState = readFlightState(jsbsim.sdk);
     floatingOrigin.apply(initialState);
     runtime.setSimViewState({
@@ -274,6 +351,7 @@ export async function createFlightSimApp(
     rendererMode: runtime.renderer.mode,
     aircraftId,
     lodId: aircraftLodId,
+    optInLodsEnabled,
     modelStatus: modelState.status,
     modelActiveLodId: modelState.activeLodId,
     modelTriangles: modelState.triangles,
@@ -301,8 +379,8 @@ export async function createFlightSimApp(
       visibleMeshCollision.reset();
     }
     phoneSession?.cancelHandoff();
-    physicsLoop.setPaused(paused);
-    runtime.setSimRunning(!paused);
+    physicsLoop.setPaused(paused || worldLoading);
+    runtime.setSimRunning(!paused && !worldLoading);
     skipResumeDelta = !paused;
     const state = physicsLoop.getLatestState() ?? initialState;
     controlPanel?.update(createPanelSnapshot(state));
@@ -322,34 +400,67 @@ export async function createFlightSimApp(
 
   const teleportToLocation = (location: GeodeticLocation): void => {
     if (disposed) return;
+    placementAbort.abort();
+    const abort = placementAbort = new AbortController();
+    worldLoading = true;
+    physicsLoop.setPaused(true);
+    runtime.setSimRunning(false);
+    floatingOrigin?.aircraftRoot.setEnabled(false);
     phoneSession?.reset();
     inputManager.adoptControls(inputManager.getControls());
-    const ground = runtime.status.mode === "raster-basemap" ? runtime.surface.sample(location.latDeg, location.lonDeg)?.heightMeters : undefined;
-    const state = resetFlightLocation(jsbsim.sdk, location, ground);
-    terrainContact.reset();
-    visibleMeshCollision.reset();
-    if (location.flightPreset) {
-      inputManager.resetControls(location.flightPreset.mode === "departure" ? 0 : 0.35);
-      if (location.flightPreset.mode === "departure") setSimulationPaused(true);
-    }
-    appliedControls = inputManager.getControls();
-    phoneSession?.syncStatus();
-    physicsLoop.reset();
-    skipResumeDelta = true;
-    applyWeather(weather);
-    // Aircraft and chase camera stay at the local origin; shift the ECEF world
-    // into the new ENU frame before requesting the first destination frame.
-    mountFlightWorld();
-    floatingOrigin?.apply(state);
-    runtime.setSimViewState({
-      latDeg: state.latDeg, lonDeg: state.lonDeg,
-      zoomMeters: zoomMetersFromAltitude(state.altMeters),
-      headingDeg: state.headingRad * 180 / Math.PI,
+    loading.show({ title: "Preparing your destination", reset: true });
+    for (const phase of ["app", "world", "flight", "assets"] as const) loading.setPhase(phase, { state: "ready" });
+    const prior = physicsLoop.getLatestState() ?? initialState;
+    const preview = { ...prior, ...location, altMeters: location.altMeters ?? prior.altMeters };
+    floatingOrigin?.apply(preview);
+    runtime.setSimViewState({ ...location, zoomMeters: zoomMetersFromAltitude(preview.altMeters) });
+    void runtime.prepareTerrain({
+      latDeg: location.latDeg, lonDeg: location.lonDeg,
+      altitudeMeters: preview.altMeters,
+      radiusMeters: 1000,
+      clearanceMeters: location.flightPreset ? 0 : 1000,
+      signal: abort.signal,
+      onProgress: progress => {
+        if (!abort.signal.aborted) loading.setPhase("terrain", {
+          state: progress.phase === "ready" ? "ready" : "loading",
+          detail: progress.message, progress: progress.progress,
+        });
+      },
+    }).then(terrain => {
+      if (disposed || abort.signal.aborted) return;
+      const destination = { ...location, altMeters: terrain.altitudeMeters };
+      const state = resetFlightLocation(jsbsim.sdk, destination, terrain.groundHeightMeters);
+      terrainContact.reset();
+      visibleMeshCollision.reset();
+      if (location.flightPreset) {
+        inputManager.resetControls(location.flightPreset.mode === "departure" ? 0 : 0.35);
+        if (location.flightPreset.mode === "departure") setSimulationPaused(true);
+      }
+      appliedControls = inputManager.getControls();
+      physicsLoop.reset();
+      applyWeather(weather);
+      floatingOrigin?.apply(state);
+      runtime.setSimViewState({
+        latDeg: state.latDeg, lonDeg: state.lonDeg,
+        zoomMeters: zoomMetersFromAltitude(state.altMeters - terrain.groundHeightMeters),
+        headingDeg: state.headingRad * 180 / Math.PI,
+      });
+      worldLoading = false;
+      floatingOrigin?.aircraftRoot.setEnabled(true);
+      aircraft?.setViewMode(aircraft.getViewMode());
+      physicsLoop.setPaused(inputManager.isPaused());
+      runtime.setSimRunning(!inputManager.isPaused());
+      skipResumeDelta = true;
+      phoneSession?.syncStatus();
+      flightHud.update(state, inputManager.getControls().pitchTrim);
+      controlPanel?.update(createPanelSnapshot(state));
+      hudBar?.update(state, runtime.status, measuredFps, inputManager.isPaused());
+      loading.hide();
+      runtime.requestRender();
+    }).catch(() => {
+      if (disposed || abort.signal.aborted) return;
+      loading.fail("The destination terrain is not ready. Check your connection and map access, then retry.", () => teleportToLocation(location));
     });
-    flightHud.update(state, inputManager.getControls().pitchTrim);
-    controlPanel?.update(createPanelSnapshot(state));
-    hudBar?.update(state, runtime.status, measuredFps, inputManager.isPaused());
-    runtime.requestRender();
   };
 
   const openPhoneController = (): void => {
@@ -415,6 +526,13 @@ export async function createFlightSimApp(
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
       runtime.requestRender();
     },
+    onOptInLodsChange: (enabled) => {
+      optInLodsEnabled = enabled;
+      writePreference(AIRCRAFT_OPT_IN_PREFERENCE_KEY, enabled ? "on" : "off");
+      aircraftModel?.setOptInEnabled(enabled);
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+      runtime.requestRender();
+    },
   });
   const rendererForce = getRendererForceFromUrl();
   hudBar = createFlightHudBar(shellRoot, {
@@ -431,10 +549,12 @@ export async function createFlightSimApp(
     onMapSourceChange: (sourceId) => {
       runtime.setMapSource(sourceId === "google" ? "google" : resolveRasterBaseMapSource(sourceId));
       setMapSourcePreference(sourceId);
+      teleportToLocation(physicsLoop.getLatestState() ?? initialState);
     },
     onTerrainSourceChange: (sourceId) => {
       runtime.setTerrainSource(resolveTerrainSource(sourceId));
       setTerrainSourcePreference(sourceId);
+      teleportToLocation(physicsLoop.getLatestState() ?? initialState);
     },
     onQualityChange: (setting) => {
       runtime.setRasterQuality(setting);
@@ -478,7 +598,7 @@ export async function createFlightSimApp(
   };
 
   runtime.setSimTick((deltaSeconds) => {
-    if (disposed) return;
+    if (disposed || worldLoading) return;
     // Do not integrate the time spent idle when resuming the simulation.
     deltaSeconds = skipResumeDelta ? 0 : Math.min(deltaSeconds, 0.1);
     skipResumeDelta = false;
@@ -495,7 +615,7 @@ export async function createFlightSimApp(
     ensureWorld();
 
     // Refinement can arrive while paused, including when resting on a runway.
-    const blockOnMissingSurface = runtime.status.mode === "raster-basemap";
+    const blockOnMissingSurface = runtime.status.mode !== "fallback";
     if (!physicsLoop.getFault() && terrainContact.update(blockOnMissingSurface) === "reset") {
       physicsLoop.reset();
     }
@@ -571,11 +691,19 @@ export async function createFlightSimApp(
     }
   });
 
-  return {
+  const revealAircraft = (state: ReturnType<typeof readFlightState>): void => {
+    floatingOrigin?.apply(state);
+    floatingOrigin?.aircraftRoot.setEnabled(true);
+    aircraft?.setViewMode(aircraft.getViewMode());
+  };
+  let preserveLoadingScreen = false;
+  const app: FlightSimAppHandle = {
     runtime,
     destroy(): void {
       if (disposed) return;
       disposed = true;
+      placementAbort.abort();
+      if (!preserveLoadingScreen) loading.destroy();
       detachPhoneStatus?.();
       phoneDialog?.destroy();
       phoneSession?.destroy();
@@ -596,4 +724,26 @@ export async function createFlightSimApp(
       rootElement.innerHTML = "";
     },
   };
+  try {
+    const terrain = await terrainReady;
+    const state = resetFlightLocation(jsbsim.sdk, {
+      ...DEFAULT_FLIGHT_START, altMeters: terrain.altitudeMeters,
+    }, terrain.groundHeightMeters);
+    terrainContact.reset();
+    visibleMeshCollision.reset();
+    physicsLoop.reset();
+    revealAircraft(state);
+    runtime.setSimViewState({ ...DEFAULT_FLIGHT_START, zoomMeters: START_ALTITUDE_AGL_METERS * 1.5 });
+    worldLoading = false;
+    physicsLoop.setPaused(inputManager.isPaused());
+    runtime.setSimRunning(!inputManager.isPaused());
+    loading.hide();
+    runtime.requestRender();
+    return app;
+  } catch (error) {
+    preserveLoadingScreen = true;
+    app.destroy();
+    loading.fail("Flight could not start safely. Check your connection and map access, then retry.");
+    throw error;
+  }
 }

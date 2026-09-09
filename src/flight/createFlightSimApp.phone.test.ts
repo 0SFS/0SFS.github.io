@@ -21,7 +21,8 @@ const mocks = vi.hoisted(() => {
     sdk: { setPropertyValue: vi.fn(), run: vi.fn() }, disposeSdk: vi.fn(),
     runtime: {
       renderer: { mode: "webgl2" }, status: { mode: "fallback" }, scene: {},
-      engine: { getFps: () => 60 }, geospatialCamera: null, surface: { sample: vi.fn(() => null) },
+      engine: { getFps: () => 60 }, geospatialCamera: null, prepareTerrain: vi.fn(async (request: { altitudeMeters?: number }) => ({ groundHeightMeters: 250, altitudeMeters: request.altitudeMeters ?? 1774 })),
+      surface: { sample: vi.fn(() => null) },
       getWorldRoot: () => ({}), setSimViewState: vi.fn(), setSimTick: vi.fn(), setSimRunning: vi.fn(),
       requestRender: vi.fn(), destroy: vi.fn(),
     },
@@ -29,7 +30,7 @@ const mocks = vi.hoisted(() => {
       setViewMode: vi.fn(), getViewMode: () => "third", toggleViewMode: vi.fn(), dispose: vi.fn(),
       orbitChaseCamera: vi.fn(), zoomChaseCamera: vi.fn(), modelRoot: {}, setModelLoaded: vi.fn(), getChaseDistanceMeters: () => 14,
     },
-    aircraftModel: { getRig: () => null, setAircraft: vi.fn(), setLod: vi.fn(), refreshAutoLod: vi.fn(), dispose: vi.fn() },
+    aircraftModel: { getState: () => ({ status: "ready" }), getRig: () => null, setAircraft: vi.fn(), setLod: vi.fn(), refreshAutoLod: vi.fn(), dispose: vi.fn() },
     terrainContact: { update: vi.fn(() => true), reset: vi.fn() },
     visibleMeshCollision: { update: vi.fn(() => false), reset: vi.fn() },
     physics: {
@@ -48,7 +49,7 @@ vi.mock("foss-earth/runtime", () => ({
 vi.mock("foss-earth/input", () => ({ loadInputModePreference: () => "mouse", loadInputSensitivityPreference: () => ({}) }));
 vi.mock("./jsbsim/createJsbsimRuntime", () => ({ createJsbsimRuntime: async () => ({ sdk: mocks.sdk, dispose: mocks.disposeSdk }) }));
 vi.mock("./bridge/ecefBridge", () => ({ readFlightState: () => mocks.state }));
-vi.mock("./bridge/floatingOrigin", () => ({ createFloatingOrigin: () => ({ aircraftRoot: {}, apply: vi.fn(), dispose: vi.fn() }) }));
+vi.mock("./bridge/floatingOrigin", () => ({ createFloatingOrigin: () => ({ aircraftRoot: { setEnabled: vi.fn() }, apply: vi.fn(), dispose: vi.fn() }) }));
 vi.mock("./aircraft/createPlaceholderAircraft", () => ({ createPlaceholderAircraft: () => mocks.aircraft }));
 vi.mock("./aircraft/aircraftCatalog", () => ({ isAircraftId: () => true, isAircraftLodId: () => true }));
 vi.mock("./aircraft/createAircraftModel", () => ({ createAircraftModel: () => mocks.aircraftModel }));
@@ -127,7 +128,7 @@ describe("OSFS phone integration", () => {
     await vi.waitFor(() => expect(mocks.createPhoneSession).toHaveBeenCalledOnce());
     hudOptions.onPhoneControlClick!();
     expect(mocks.dialog.open).toHaveBeenCalledTimes(2);
-    expect(mocks.runtime.setSimRunning).not.toHaveBeenCalled();
+    expect(mocks.runtime.setSimRunning).toHaveBeenLastCalledWith(true);
   });
 
   it("selects fresh phone controls directly at the SDK boundary and keeps their applied settings for takeover", async () => {
@@ -212,7 +213,9 @@ describe("OSFS phone integration", () => {
     tick(0.1);
     expect(options.hasActiveLocalInput()).toBe(true);
     const callbacks = mocks.createPanel.mock.calls[0][2] as { onLocationApply(location: { latDeg: number; lonDeg: number }): void };
+    mocks.resetLocation.mockClear();
     callbacks.onLocationApply({ latDeg: 3, lonDeg: 4 });
+    await vi.waitFor(() => expect(mocks.resetLocation).toHaveBeenCalledOnce());
     expect(mocks.phone.reset).toHaveBeenCalledOnce();
     expect(mocks.phone.reset.mock.invocationCallOrder[0]).toBeLessThan(mocks.resetLocation.mock.invocationCallOrder[0]);
     expect(options.hasActiveLocalInput()).toBe(false);
