@@ -240,10 +240,19 @@ console.
 ## Adding an aircraft
 
 1. Export GLBs into `public/aircraft/<aircraft-id>/`, authored nose along +Y and
-   up along +Z in Blender.
-2. Add an entry to `AIRCRAFT_CATALOG` with its levels, triangle counts, and
-   auto-switch distances.
+   up along +Z in Blender, with the origin on the ground below the CG.
+2. Add an entry to `AIRCRAFT_CATALOG` with its levels, triangle counts,
+   auto-switch distances, and a `credit` on every level. Mark any level
+   `optIn` that should not load unless asked for.
 3. Check the parked stance and adjust `modelOffset.y` if needed.
+
+Adding a level by **someone else** needs three more things: its licence must
+allow redistribution and be named in the `credit` alongside a link back; it
+must be put into the export convention rather than dropped in as downloaded —
+`planes/Cirrus_Vision_Jet/agent_workspace/scripts/prepare_third_party.py` does
+that, and `compare_assets.py` next to it checks the result lands where our own
+meshes land, because that failure is otherwise silent; and it wants `optIn`
+unless it is as cheap and as correct as ours.
 
 An airframe with an empty `lods` array is still selectable; it falls back to the
 placeholder blocks and the panel explains why. That is a reasonable way to land

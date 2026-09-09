@@ -22,12 +22,15 @@ ambiguously and to check the result against a real aircraft.
    fairing, which the three view draws only as an outline. No dimension is
    taken from them: they are perspective photographs.
 3. **`tests/cirrus_vision_Sf50/cirrus_vision_Sf50.glb`** — a downloaded
-   reference model. `scripts/reorient_ref.py` puts it in this project's frame;
-   scaled to the published length its span comes out **+2.3%** and its overall
-   height **-31%** (it carries no landing gear and its V-tail is short), so it
-   is a hypothesis about shape, not a source of dimensions. Its cabin detail is
-   painted into a 4096² texture rather than modelled, so it cannot be measured
-   for window positions either.
+   reference model, which turned out to be hilos run's CC-BY Sketchfab model.
+   `scripts/reorient_ref.py` puts it in this project's frame and reports how
+   well: scaled on the published span, its crown line matches the drawing's to
+   **15 mm rms over 140 stations**, and its length then comes out **−3.0%**.
+   It carries no landing gear and its cabin windows are painted into a 4096²
+   texture rather than modelled, so it cannot be measured for those. What it
+   did settle is the windshield, which has its own submesh — see "The
+   windshield has two edges, not one" below. It is a hypothesis about shape,
+   not a source of dimensions.
 
 ### `tests/SF50-POH.pdf` — Cirrus Vision SF50 Airplane Flight Manual, P/N 31452-001,
 Revision 4 (20 Nov 2018), page 1-4, "Figure 1-1: Airplane Three View"
@@ -136,9 +139,10 @@ to get first, and the SF50's is dominated by how far aft the wing sits.
 | feature | working Y |
 |---|---|
 | nose tip | 0.000 |
-| windshield base, forward corner | -1.39 |
+| windshield, forward corner (sill meets the crown) | -1.480 |
 | nose axle | -1.138 |
-| windshield top / cabin front | -2.60 |
+| windshield roof line leaves the crown | -2.180 |
+| windshield, aft corner (sill meets roof) | -2.600 |
 | fuselage crown (highest point of the body) | -3.40 |
 | wing LE, root (centreline, extrapolated) | -3.297 |
 | wing LE at the wing/fuselage junction | -3.388 (11.1 ft callout) |

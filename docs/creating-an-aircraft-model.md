@@ -26,13 +26,11 @@ everything that does not serve them.
   shipped through four iterations with the windows in one continuous band
   because there was nothing to check the drawing reading against.
 - **An existing 3D model, if one is available**, treated as a hypothesis about
-  shape and never as a source of dimensions. `scripts/reorient_ref.py` in the
-  SF50 workspace puts one into the project's frame by principal axes, fixes the
-  signs from a known submesh and scales it to the published length; what its
-  span and height then come out at is a measurement of how faithful it is. The
-  SF50's reference was +2.3% on span and -31% on height, and its cabin detail
-  was painted into a texture rather than modelled, so it settled nothing that
-  the drawing had not already settled.
+  shape and never as a source of dimensions. Aligning one is its own job with
+  its own traps — see "Aligning a downloaded reference model" below. Done
+  properly it is worth real money: the SF50's settled the shape of a
+  windshield the drawing draws only as two lines, and it now also ships as
+  that airframe's opt-in high-detail level, because its licence allows it.
 
 Everything you generate belongs in the repository, under the aircraft's
 `agent_workspace/`. Nothing that a later reader needs — a crop you measured, a
@@ -138,6 +136,56 @@ single error — 0.8 m too much nose, 0.8 m too little tail — was what made it
 as a stubby generic high-wing. Fixing it did more than every other change
 combined.
 
+### Aligning a downloaded reference model
+
+A model off the internet is worth having — it answers questions a three view
+draws ambiguously, and the SF50's windscreen was one — but it arrives at an
+arbitrary scale and attitude, and nothing can be read off it until it is in the
+same frame as the drawing. Two ways of doing that both produced measurements
+that looked plausible and were wrong:
+
+- **Principal axes (SVD) of the vertex cloud** was out by 13° of pitch. PCA
+  weights by where vertices happen to be dense, and a model tessellated for
+  looks has a fine nose and a coarse tail.
+- **Nose tip to tail tip** was out by 5°, because the aft-most point of that
+  aircraft is a V-tail tip, well off the centreline and far above the tail cone.
+
+What works is a landmark for each axis that has one, then a fit for what is
+left:
+
+1. **Lateral axis:** the two surface points farthest apart are the wingtips,
+   and with equal dihedral the line between them is level. Find them by
+   iterating "farthest from the last point".
+2. **Longitudinal axis:** the farthest pair again, with the lateral component
+   projected out and *only among points near the symmetry plane* — the nose tip
+   and the tail cone tip.
+3. **Up:** the cross product, with its sign taken from a part you can identify
+   (the windscreen is forward of the centroid and above it). Guessing is how a
+   reference ends up mirrored.
+4. **Scale on the span**, the largest and most precisely published dimension.
+   What the length then comes out at is a *measurement of the model's fidelity*
+   — print it, do not correct it. The SF50's came out 3% short.
+5. **Pitch and the two in-plane offsets: fit them.** Take the topmost ink in
+   each column of the drawing's side view — that is the crown line — read the
+   same line off the model, and solve by least squares. A line running the
+   length of the aircraft pins pitch in a way no pair of points can. The SF50's
+   matched to 15 mm rms over 140 stations.
+
+Then **check it, do not assume it**: stack the aligned model on the three view
+the same way you stack your own. And sample the model's *surface*, not its
+vertices — area-weighted points on its triangles. A 2 cm slab of a downloaded
+model can hold thirty vertices in one place and none in the next, and a profile
+read off that jumps around by tens of centimetres. That single mistake is what
+made the first two alignments look acceptable.
+
+Last: the reference is a hypothesis about *shape*. Use it to place a feature
+the drawing draws ambiguously, and take dimensions from the drawing.
+
+A model good enough to measure against may also be good enough to *ship*, if
+its licence allows it — the SF50's reference is a CC-BY Sketchfab model and now
+also serves as that airframe's opt-in high-detail level. Aligning it is most of
+the work either way; `docs/aircraft-assets.md` covers the rest.
+
 ---
 
 ## Stage 2 — Blockout, then look at it
@@ -200,6 +248,13 @@ makes a non-uniformly scaled drawing usable — renders the model into the same
 metric window, and draws one over the other. Its `--shaded` mode keeps the
 materials instead of a silhouette, which is the only way to check that a window
 painted by material index lands where the drawing draws it.
+
+Check glazing in **two** views that way, not one. The SF50's bubble-canopy
+windshield looked acceptable in the front overlay for several iterations,
+because a front view only shows the glass's outermost extent and mine happened
+to fall inside the drawn outline. What it could not show was the glass
+continuing over the crown for a metre behind that outline. The side overlay
+showed it immediately. A projection hides whatever runs along its own axis.
 
 **Look at the wireframe, not only the render.** A shaded render hides wasted
 geometry completely; `scripts/wireframe.py` projects the edges and rasterises
@@ -326,7 +381,7 @@ row both fail here, and the third is the one to use.
   they are interpolations between the row's own two ring vertices, so no
   neighbouring row learns the cut happened.
 
-Two things that technique needs to be watertight:
+Four things that technique needs to be watertight:
 
 - **A station wherever an edge crosses a ring line.** Solve for them: bisect
   for every station where the edge's height equals the ring line's height.
@@ -340,6 +395,18 @@ Two things that technique needs to be watertight:
   millimetre apart. That puts a cut vertex 3 mm from a ring vertex, on a ring
   line the next row never split — a T-junction. Treat any cut within a few
   millimetres of a ring vertex as being that ring vertex.
+- **Keep the corner-to-corner case.** Where an edge crosses a row from one ring
+  line clean to the other inside a single station gap, the cut is a diagonal
+  between two vertices the ring already has: it adds nothing and it is exactly
+  right. It is tempting to reject it along with the "wholly outside this row"
+  case, since both have their fractions outside 0..1 — the two are told apart
+  by whether the fractions are on the *same* side or on opposite sides. Reject
+  it and the row goes wholly glass or wholly paint, which is the notch again.
+- **Watch the ends of a traced table.** The row over the crown has the roof
+  above it at one station and below it at the next, so whether the table reads
+  as "the roof is exactly on the crown here" or as "there is no roof yet here"
+  at its first station decides whether that gap gets a clean diagonal or a
+  step. An inclusive bound at the first station is what made it clean.
 
 **Give a divider that ends mid-body a taper to nothing.** A windscreen's centre
 post runs out where the two panes meet at the forward tip and again where the
@@ -388,6 +455,22 @@ prints both: **boundary edges** on a surface that should be closed, and
 ring edge on the unsplit side plus its two halves on the split side. Four faces
 on one edge means the tiling lapped itself. Neither is visible in a render at
 any angle, and both will find you later.
+
+Two ways of chasing those numbers that make things worse:
+
+- **Do not delete a face because a validator calls it degenerate.** A triangle
+  can be under an area threshold and still be holding the mesh together. One
+  sliver on the SF50 measured 0.000115 m² — well under the validator's 1e-8
+  cutoff — but its points spanned half a metre, and removing it left an 8.7 mm
+  crack. Filter only *truly* degenerate faces, where the points are collinear
+  to floating-point precision, and fix a sliver by changing how the region is
+  tiled instead.
+- **Do not make the two-loop bridge greedy.** Tiling the ring between two
+  closed loops by advancing whichever loop gives the larger triangle looks like
+  a free improvement over advancing them in index step. It is not: it lets one
+  loop be advanced twice where the other stalls, the walk laps itself, and five
+  edges came back with four faces on them. Advance by index fraction so each
+  loop is used exactly once, and accept the sliver.
 
 ---
 
@@ -596,55 +679,6 @@ drawing's and not the maintenance manual's, and that some of the triangles
 bridging each window to the mesh around it are long and thin. None of that
 stopped either being usable, and a reader who knows the limits can decide what
 to fix next.
-
----
-
-### Aligning a downloaded reference model
-
-A model off the internet is worth having — it answers questions a three view
-draws ambiguously, and the SF50's windscreen was one — but it arrives at an
-arbitrary scale and attitude, and nothing can be read off it until it is in the
-same frame as the drawing. Two ways of doing that both produced measurements
-that looked plausible and were wrong:
-
-- **Principal axes (SVD) of the vertex cloud** was out by 13° of pitch. PCA
-  weights by where vertices happen to be dense, and a model tessellated for
-  looks has a fine nose and a coarse tail.
-- **Nose tip to tail tip** was out by 5°, because the aft-most point of that
-  aircraft is a V-tail tip, well off the centreline and far above the tail cone.
-
-What works is a landmark for each axis that has one, then a fit for what is
-left:
-
-1. **Lateral axis:** the two surface points farthest apart are the wingtips,
-   and with equal dihedral the line between them is level. Find them by
-   iterating "farthest from the last point".
-2. **Longitudinal axis:** the farthest pair again, with the lateral component
-   projected out and *only among points near the symmetry plane* — the nose tip
-   and the tail cone tip.
-3. **Up:** the cross product, with its sign taken from a part you can identify
-   (the windscreen is forward of the centroid and above it). Guessing is how a
-   reference ends up mirrored.
-4. **Scale on the span**, the largest and most precisely published dimension.
-   What the length then comes out at is a *measurement of the model's fidelity*
-   — print it, do not correct it. The SF50's came out 3% short.
-5. **Pitch and the two in-plane offsets: fit them.** Take the topmost ink in
-   each column of the drawing's side view — that is the crown line — read the
-   same line off the model, and solve by least squares. A line running the
-   length of the aircraft pins pitch in a way no pair of points can. The SF50's
-   matched to 15 mm rms over 140 stations.
-
-Then **check it, do not assume it**: stack the aligned model on the three view
-the same way you stack your own. And sample the model's *surface*, not its
-vertices — area-weighted points on its triangles. A 2 cm slab of a downloaded
-model can hold thirty vertices in one place and none in the next, and a profile
-read off that jumps around by tens of centimetres. That single mistake is what
-made the first two alignments look acceptable.
-
-Last: the reference is a hypothesis about *shape*. Use it to place a feature
-the drawing draws ambiguously, and take dimensions from the drawing.
-
----
 
 ## What the two builds disagreed about
 

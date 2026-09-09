@@ -30,7 +30,8 @@
 .flight-hud__attitude {
   position: absolute;
   left: 24px;
-  bottom: 24px;
+  /* --foss-inset-bottom clears any browser toolbar overlaying the page. */
+  bottom: calc(24px + var(--foss-inset-bottom, 0px));
   width: 220px;
   height: 220px;
   border-radius: 50%;
@@ -79,7 +80,7 @@
 .flight-hud__controls {
   position: absolute;
   right: 24px;
-  bottom: 24px;
+  bottom: calc(24px + var(--foss-inset-bottom, 0px));
   display: flex;
   gap: 14px;
   padding: 12px 10px 10px;
@@ -395,7 +396,8 @@
 
   .flight-hud__controls {
     right: 10px;
-    bottom: 84px;
+    /* Sits above the wrapped HUD bar, which is itself lifted off the toolbar. */
+    bottom: calc(84px + var(--foss-inset-bottom, 0px));
   }
 
   .flight-hud__slider-control input[type="range"] {
@@ -528,7 +530,7 @@
 .flight-boot {
   display: grid;
   place-items: center;
-  min-height: 100vh;
+  min-height: 100dvh;
   padding: 24px;
   color: #e8edf5;
   background: #04060a;

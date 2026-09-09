@@ -1,3 +1,4 @@
+import { trackViewportInsets } from "foss-earth/shell";
 import { createFlightLoadingScreen, type FlightLoadingScreen } from "./loading/createFlightLoadingScreen";
 
 function isFlightMode(): boolean {
@@ -30,6 +31,10 @@ const rootElement = document.getElementById("root");
 if (!rootElement) {
   throw new Error('Expected to find a root element with id "root".');
 }
+
+// Lift the fixed HUD clear of any browser toolbar overlaying the page bottom
+// (Firefox Android's URL bar, Chrome's dynamic toolbar).
+trackViewportInsets();
 
 const loading = isFlightMode() ? createFlightLoadingScreen() : null;
 loading?.setPhase("app", { state: "loading", detail: "Downloading application code" });

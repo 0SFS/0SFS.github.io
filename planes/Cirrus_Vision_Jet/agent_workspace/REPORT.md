@@ -32,15 +32,25 @@ Wikimedia Commons. They confirmed the cabin window count and showed how large
 and smooth the wing root fairing is, which the three view draws only as an
 outline. No dimension is taken from them — they are perspective photographs.
 
-**A downloaded reference model** — `tests/cirrus_vision_Sf50/`.
-`scripts/reorient_ref.py` puts it in this project's frame by principal axes,
-fixes the signs off its windshield submesh, and scales it to the published
-length. Its span then comes out **+2.3%** and its overall height **-31%** (it
-carries no landing gear and its V-tail is short), and its cabin detail is
+**A downloaded reference model** — `tests/cirrus_vision_Sf50/`, which turned
+out to be hilos run's Sketchfab model and now ships as the opt-in `hd` level
+(see "A second model, by someone else").
+
+`scripts/reorient_ref.py` puts it in this project's frame: lateral axis from
+the wingtip pair, longitudinal from the farthest pair near the symmetry plane,
+signs off its windshield submesh, scale from the published span, and then pitch
+and the two in-plane offsets **fitted to the drawing's own crown line**. That
+fit is the number to look at — **15 mm rms over 140 stations** — because it
+says the forward fuselage lines up, which is what makes a reading of its
+windshield mean anything.
+
+Its length then comes out **−3.0%**, its fuselage up to 0.24 m wider than the
+drawing at the cabin, it carries no landing gear, and its cabin windows are
 painted into a 4096² texture rather than modelled. So it is a hypothesis about
-shape, not a source of dimensions or of window positions.
-`renders/refA/refA_vs_drawing_side.png` stacks it on the drawing, which is what
-that verdict is based on.
+shape: it settled the windshield's roof line, and nothing is taken from it in
+metres that the drawing does not give independently.
+`scripts/compare_drawing.py --nose-origin` stacks it on the drawing, which is
+what that verdict is based on.
 
 I should have pulled the photographs and the reference model at the start
 rather than after the first build. Working from the drawing alone is what let
@@ -577,6 +587,34 @@ blender -b --factory-startup --python scripts/assemble_master.py -- \
     work exports/Cirrus_Vision_Jet_master.blend
 ```
 
+Re-measuring the glazing off the reference model, and re-preparing it as the
+`hd` level:
+
+```bash
+# align it to the drawing; prints the crown-line residual it achieved
+blender -b --factory-startup --python scripts/reorient_ref.py -- \
+    ../tests/cirrus_vision_Sf50/cirrus_vision_Sf50.glb work/refA_oriented.blend
+blender -b --factory-startup --python scripts/compare_drawing.py -- \
+    work/refA_oriented.blend side renders/preview/ref_vs_drawing_side.png \
+    --px 150 --nose-origin
+
+# its windshield in metres, and on screen so the numbers can be trusted
+blender -b --factory-startup --python scripts/measure_windshield.py -- \
+    work/refA_oriented.blend
+blender -b --factory-startup --python scripts/render_ref_glazing.py -- \
+    work/refA_oriented.blend renders/preview/refglz
+
+# origin under the CG, exported the way the generator exports
+blender -b --factory-startup --python scripts/prepare_third_party.py -- \
+    work/refA_oriented.blend exports/Cirrus_Vision_Jet_HilosRun.glb
+# and check it lands where ours land - this failure is otherwise silent
+blender -b --factory-startup --python scripts/compare_assets.py -- \
+    exports/Cirrus_Vision_Jet_LOD0.glb exports/Cirrus_Vision_Jet_HilosRun.glb
+```
+
+`scripts/montage.py` tiles any set of PNGs into one sheet, which is the only
+way most of these comparisons say anything.
+
 Re-measuring the drawing:
 
 ```bash
@@ -589,7 +627,8 @@ blender -b --factory-startup --python scripts/profile_drawing.py -- \
 ```
 
 Then copy the GLBs to `public/aircraft/cirrus-vision-jet/` and update the
-triangle counts in `src/flight/aircraft/aircraftCatalog.ts`.
+triangle counts in `src/flight/aircraft/aircraftCatalog.ts`. The counts are
+asserted, so `npx vitest run` catches a forgotten one.
 
 ## Finishing check
 
