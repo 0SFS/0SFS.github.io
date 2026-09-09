@@ -1,16 +1,17 @@
 {
  "file": "c172_lod1.blend",
- "objects": 22,
+ "objects": 23,
  "empties": 1,
- "meshes": 22,
- "triangles": 678,
- "vertices": 413,
- "materials": 4,
+ "meshes": 23,
+ "triangles": 778,
+ "vertices": 473,
+ "materials": 5,
  "material_names": [
   "C172_Dark",
   "C172_Glass",
   "C172_Metal",
-  "C172_Paint"
+  "C172_Paint",
+  "C172_PropDisc"
  ],
  "textures": 0,
  "texture_names": [],
@@ -49,11 +50,15 @@
   8.28,
   2.718
  ],
- "non_manifold_edges": 86,
+ "non_manifold_edges": 106,
  "open_boundary_by_object": [
   {
    "name": "Fuselage",
    "boundary_edges": 44
+  },
+  {
+   "name": "Propeller_Disc",
+   "boundary_edges": 20
   },
   {
    "name": "Propeller",
@@ -84,14 +89,14 @@
  "loose_vertices": 0,
  "unapplied_transforms": [],
  "symmetry_error_m": {
-  "mean": 0.002654,
-  "max": 0.108122,
+  "mean": 0.001586,
+  "max": 0.06186,
   "over_1mm": 24
  },
  "asymmetric_objects": [
   {
    "name": "Propeller",
-   "max": 0.10812,
+   "max": 0.06186,
    "over_1mm": 24
   }
  ],
@@ -109,6 +114,7 @@
   "LandingGear_Nose",
   "LandingGear_Right",
   "Propeller",
+  "Propeller_Disc",
   "Rudder",
   "Spinner",
   "Strut_Left",
@@ -128,6 +134,19 @@
    "mats": [
     "C172_Paint",
     "C172_Glass"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Propeller_Disc",
+   "tris": 100,
+   "verts": 60,
+   "mats": [
+    "C172_PropDisc"
    ],
    "origin": [
     0.0,

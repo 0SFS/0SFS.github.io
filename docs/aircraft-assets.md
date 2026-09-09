@@ -60,10 +60,14 @@ cross-section resolution, then control-surface separation, then part separation.
 
 | Level | Triangles | Vertices | Meshes | Intended range |
 | --- | --- | --- | --- | --- |
-| LOD0 | 876 | 507 | 22 | Close / cockpit |
-| LOD1 | 678 | 413 | 22 | Medium |
+| LOD0 | 1016 | 591 | 23 | Close / cockpit |
+| LOD1 | 778 | 473 | 23 | Medium |
 | LOD2 | 288 | 189 | 16 | Far |
 | LOD3 | 130 | 105 | 2 | Distant silhouette |
+
+LOD0 and LOD1 carry a `Propeller_Disc` swept from the blade sections (140 and
+100 triangles). It is never drawn at the same time as the blades, so the cost is
+the larger of the two rather than the sum.
 
 Every level keeps the features that make the aircraft recognisable — high wing
 with dihedral, both lift struts, tricycle gear, swept fin, dark greenhouse,
@@ -147,10 +151,21 @@ A 144 Hz display resolves proportionally more; a four-blade propeller aliases at
 half the speed. The frame interval is smoothed and the threshold carries 20%
 hysteresis so a propeller sitting on the boundary does not flicker.
 
-The disc is built at runtime rather than shipped in the mesh: its radius comes
-from the propeller's own bounding box, so a new airframe gets one for free
-without touching its GLB. Set `propellerBlades` in the catalog — `0` for a jet,
-which suppresses the disc entirely.
+Where the disc is resolvable, the mesh ships one **swept from the blade's own
+sections** at build time, named `Propeller_Disc`. Its half-extent along the
+thrust axis at each radius is how far the rotated section reaches,
+`max(chord·sin(angle), thickness·cos(angle))`, so the result is a lens — thick at
+the hub where the blade is coarse and twisted, thin at the tip where it is fine
+and nearly flat. That stays correct when the disc is seen edge-on, which a flat
+disc does not.
+
+If a mesh ships no disc, the runtime builds a flat one sized from the
+propeller's bounding box, so an airframe gets something usable without touching
+its GLB. LOD2 and LOD3 take that path deliberately: at those distances the
+propeller is a few pixels and the swept solid is not worth carrying.
+
+Set `propellerBlades` in the catalog — `0` for a jet, which suppresses the disc
+entirely.
 
 Coarse levels merge the control surfaces into their panels and expose only the
 propeller. The rig binds whatever it finds, so this needs no special handling.

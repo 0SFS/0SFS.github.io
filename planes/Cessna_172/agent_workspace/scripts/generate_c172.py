@@ -126,22 +126,22 @@ LODP = {
             wing_st=(0.0, TAPER_START, 5.30, SEMI), gear_st=4, gear_n=4, strut_n=4,
             glass=True, ctrl=True, af='full', merge=False,
             spin_rings=3, prop_flat=False, fin_pts=0, flat_gear=False, prop_2st=False,
-            pillars=True),
+            pillars=True, disc_seg=14),
     1: dict(ring=8,  st_level=1, wheel=6, spin=6, prop_st=2,
             wing_st=(0.0, TAPER_START, SEMI), gear_st=3, gear_n=4, strut_n=4,
             glass=True, ctrl=True, af='full', merge=False,
             spin_rings=3, prop_flat=False, fin_pts=0, flat_gear=False, prop_2st=False,
-            pillars=True),
+            pillars=True, disc_seg=10),
     2: dict(ring=6,  st_level=-2, wheel=4, spin=4, prop_st=2,
             wing_st=(0.0, TAPER_START, SEMI), gear_st=2, gear_n=3, strut_n=3,
             glass=True, ctrl=False, af='mid', merge=False,
             spin_rings=2, prop_flat=False, fin_pts=6, flat_gear=False, prop_2st=True,
-            pillars=False),
+            pillars=False, disc_seg=0),
     3: dict(ring=6,  st_level=-1, wheel=0, spin=4, prop_st=2,
             wing_st=(0.0, SEMI), gear_st=2, gear_n=2, strut_n=2,
             glass=True, ctrl=False, af='low', merge=True,
             spin_rings=2, prop_flat=True, fin_pts=5, flat_gear=True, prop_2st=True,
-            pillars=False),
+            pillars=False, disc_seg=0),
 }
 P = LODP[LOD]
 # LOD3 uses an explicit reduced station subset
@@ -176,6 +176,9 @@ M_TRIM  = mat("C172_Trim",  (0.10, 0.24, 0.48, 1.0), 0.30)
 M_GLASS = mat("C172_Glass", (0.035, 0.052, 0.078, 1.0), 0.42, spec=0.12)
 M_DARK  = mat("C172_Dark",  (0.09, 0.09, 0.10, 1.0), 0.55)   # tyres, prop, antiglare
 M_METAL = mat("C172_Metal", (0.55, 0.56, 0.58, 1.0), 0.32, metal=0.85)  # gear, struts, spinner
+# Shown in place of the blades once they alias; translucent so the airframe
+# and the world behind stay visible through the disc.
+M_DISC  = mat("C172_PropDisc", (0.05, 0.055, 0.065, 1.0), 0.55, alpha=0.30)
 
 # ----------------------------------------------------------------------------
 # mesh helpers
@@ -905,6 +908,53 @@ def build_spinner():
                 origin=(0.0, COWL_FRONT_Y, THRUST_Z), smooth_angle=45.0)
 
 
+PROP_PLANE_Y = 1.70
+# (radius, half-chord, half-thickness, blade angle from the disc plane)
+PROP_STATIONS = [(0.15, 0.130, 0.024, math.radians(34)),
+                 (0.62, 0.150, 0.016, math.radians(20)),
+                 (PROP_R, 0.058, 0.006, math.radians(13))]
+
+
+def build_propeller_disc():
+    """Solid swept by the blade over one revolution.
+
+    Above roughly 900 rpm a two-blade propeller advances more than half its
+    repeat between frames and can no longer be drawn honestly, so the runtime
+    hides the blades and shows this instead. Sweeping the real sections rather
+    than drawing a flat disc keeps the shape correct when the disc is seen
+    edge-on: it is a lens, thick at the hub where the blade is coarse and
+    twisted, thin at the tip where it is fine and nearly flat.
+
+    Half-extent along the thrust axis at radius r is the furthest the rotated
+    section reaches, i.e. max(chord*sin(angle), thickness*cos(angle)).
+    """
+    n = P["disc_seg"]
+    if n <= 0:
+        return None
+
+    profile = []
+    for (r, ch, th, tw) in PROP_STATIONS:
+        profile.append((r, max(ch * math.sin(tw), th * math.cos(tw))))
+    # out along the front face, back along the rear face
+    loop = profile + [(r, -y) for (r, y) in reversed(profile)]
+
+    verts, faces = [], []
+    for i in range(n):
+        a = 2 * math.pi * i / n
+        ca, sa = math.cos(a), math.sin(a)
+        for (r, y) in loop:
+            verts.append((r * ca, PROP_PLANE_Y + y, THRUST_Z + r * sa))
+    m = len(loop)
+    for i in range(n):
+        j = (i + 1) % n
+        for k in range(m - 1):
+            faces.append([i * m + k, i * m + k + 1, j * m + k + 1, j * m + k])
+    # The inner edge is left open: it sits inside the spinner.
+    ob = make("Propeller_Disc", verts, faces, M_DISC, smooth_angle=60.0)
+    ob.hide_render = True
+    return ob
+
+
 def build_propeller():
     """Two blades in the disc plane at y = PLANE_Y, rotating about the Y axis.
 
@@ -912,10 +962,8 @@ def build_propeller():
     local blade angle; that is what makes a real prop read as a broad cross
     from dead ahead rather than as two hairlines.
     """
-    PLANE_Y = 1.70
-    stations = [(0.15, 0.130, 0.024, math.radians(34)),
-                (0.62, 0.150, 0.016, math.radians(20)),
-                (PROP_R, 0.058, 0.006, math.radians(13))]
+    PLANE_Y = PROP_PLANE_Y
+    stations = list(PROP_STATIONS)
     if P["prop_2st"]:
         stations = [stations[0], stations[2]]
     verts, faces = [], []
@@ -969,6 +1017,7 @@ build_wheel("Wheel_Right", ( GEAR_TRACK / 2.0, MAIN_AXLE_Y, MAIN_TIRE_R), MAIN_T
 build_wheel("Wheel_Nose",  (0.0, NOSE_AXLE_Y, NOSE_TIRE_R), NOSE_TIRE_R, NOSE_TIRE_W, P["wheel"])
 build_spinner()
 build_propeller()
+build_propeller_disc()
 
 # ----------------------------------------------------------------------------
 # final placement: origin on the ground under the CG

@@ -60,7 +60,7 @@ const RPM_PROPERTIES = [
   "propulsion/engine/engine-rpm",
 ] as const;
 
-let resolvedRpmProperty: string | null | undefined;
+let resolvedRpmProperty: string | null = null;
 
 function readNumber(sdk: JSBSimSdk, property: string): number {
   try {
@@ -72,25 +72,27 @@ function readNumber(sdk: JSBSimSdk, property: string): number {
 }
 
 function readPropellerRpm(sdk: JSBSimSdk): number {
-  if (resolvedRpmProperty === undefined) {
-    resolvedRpmProperty = null;
-    for (const property of RPM_PROPERTIES) {
-      try {
-        if (Number.isFinite(sdk.getPropertyValue(property))) {
-          resolvedRpmProperty = property;
-          break;
-        }
-      } catch {
-        // try the next spelling
-      }
+  if (resolvedRpmProperty) {
+    const value = readNumber(sdk, resolvedRpmProperty);
+    if (value !== 0) return value;
+  }
+  // JSBSim answers an unknown property with 0 rather than raising, so "the
+  // first one that returns a number" would happily latch onto a property that
+  // does not exist. Only a non-zero reading proves a spelling is the live one;
+  // until then, re-probe each frame. A stopped engine simply reads zero.
+  for (const property of RPM_PROPERTIES) {
+    const value = readNumber(sdk, property);
+    if (value !== 0) {
+      resolvedRpmProperty = property;
+      return value;
     }
   }
-  return resolvedRpmProperty ? readNumber(sdk, resolvedRpmProperty) : 0;
+  return 0;
 }
 
 /** Test seam: forget the cached RPM property name. */
 export function resetPropellerRpmProperty(): void {
-  resolvedRpmProperty = undefined;
+  resolvedRpmProperty = null;
 }
 
 export function readControlSurfaceState(sdk: JSBSimSdk): ControlSurfaceState {
@@ -118,7 +120,9 @@ interface Propeller {
   node: TransformNode;
   rest: Quaternion;
   /** Stand-in shown once the blades turn too fast to read. */
-  disc: Mesh | null;
+  disc: TransformNode | null;
+  /** True when the disc came from the mesh and must not be disposed here. */
+  discFromMesh: boolean;
   blades: number;
 }
 
@@ -245,14 +249,22 @@ export function bindAircraftRig(
   if (propNode) bound.push("Propeller");
 
   const blades = options.propellerBlades ?? 0;
-  const disc = propNode && options.scene && blades >= 2
-    ? buildPropellerDisc(propNode, options.scene)
-    : null;
+  // A model can ship a solid swept from its own blade sections, which stays
+  // correct edge-on. Only fall back to a flat disc when it does not.
+  const baked = byName.get("Propeller_Disc") ?? null;
+  if (baked) {
+    baked.setEnabled(false);
+    bound.push("Propeller_Disc");
+  }
+  const disc = baked
+    ?? (propNode && options.scene && blades >= 2
+      ? buildPropellerDisc(propNode, options.scene)
+      : null);
 
   return {
     parts,
     propeller: propNode
-      ? { node: propNode, rest: restRotation(propNode), disc, blades }
+      ? { node: propNode, rest: restRotation(propNode), disc, discFromMesh: baked !== null, blades }
       : null,
     propellerAngleRad: 0,
     frameSeconds: DEFAULT_FRAME_SECONDS,
@@ -261,12 +273,12 @@ export function bindAircraftRig(
   };
 }
 
-/** Free the disc; the loaded mesh itself is owned by its AssetContainer. */
+/** Free only a disc this module built; a baked one belongs to the AssetContainer. */
 export function disposeAircraftRig(rig: AircraftRig): void {
-  const disc = rig.propeller?.disc;
-  if (!disc) return;
-  disc.material?.dispose();
-  disc.dispose();
+  const propeller = rig.propeller;
+  if (!propeller?.disc || propeller.discFromMesh) return;
+  if (propeller.disc instanceof Mesh) propeller.disc.material?.dispose();
+  propeller.disc.dispose();
 }
 
 export function applyAircraftRig(

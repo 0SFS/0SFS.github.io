@@ -271,3 +271,26 @@ describe("propeller disc", () => {
     t.scene.dispose(); t.engine.dispose();
   });
 });
+
+
+describe("baked swept disc", () => {
+  it("prefers a disc swept from the blade over the flat fallback, and leaves it to the container", () => {
+    const s = scene();
+    const prop = new TransformNode("Propeller", s.scene);
+    const baked = new TransformNode("Propeller_Disc", s.scene);
+    const rig = bindAircraftRig([prop, baked], { scene: s.scene, propellerBlades: 2 });
+
+    expect(rig.propeller!.disc).toBe(baked);
+    expect(rig.propeller!.discFromMesh).toBe(true);
+    expect(baked.isEnabled()).toBe(false);
+
+    applyAircraftRig(rig, { ...NEUTRAL_CONTROL_SURFACES, propellerRadPerSec: 300 }, 1 / 60);
+    expect(baked.isEnabled()).toBe(true);
+    expect(prop.isEnabled()).toBe(false);
+
+    // The mesh owns it, so the rig must not dispose it.
+    disposeAircraftRig(rig);
+    expect(baked.isDisposed()).toBe(false);
+    s.scene.dispose(); s.engine.dispose();
+  });
+});

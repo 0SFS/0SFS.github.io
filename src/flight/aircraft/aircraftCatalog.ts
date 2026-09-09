@@ -48,8 +48,8 @@ export interface AircraftDefinition {
 }
 
 const C172_LODS: readonly AircraftLodDefinition[] = [
-  { id: "lod0", label: "LOD0 — near", triangles: 876, path: "aircraft/cessna-172/Cessna_172_LOD0.glb", autoFromMeters: 0 },
-  { id: "lod1", label: "LOD1 — medium", triangles: 678, path: "aircraft/cessna-172/Cessna_172_LOD1.glb", autoFromMeters: 60 },
+  { id: "lod0", label: "LOD0 — near", triangles: 1016, path: "aircraft/cessna-172/Cessna_172_LOD0.glb", autoFromMeters: 0 },
+  { id: "lod1", label: "LOD1 — medium", triangles: 778, path: "aircraft/cessna-172/Cessna_172_LOD1.glb", autoFromMeters: 60 },
   { id: "lod2", label: "LOD2 — far", triangles: 288, path: "aircraft/cessna-172/Cessna_172_LOD2.glb", autoFromMeters: 160 },
   { id: "lod3", label: "LOD3 — silhouette", triangles: 130, path: "aircraft/cessna-172/Cessna_172_LOD3.glb", autoFromMeters: 320 },
 ];
