@@ -31,17 +31,49 @@ const MAX_BELIEVABLE_RISE_METERS = 1000;
  */
 const MAX_BELIEVABLE_STEP_METERS = 1000;
 
+/**
+ * Height above the best known ground at which a missing sample stops mattering.
+ *
+ * Terrain only participates in the physics through the gear contacts, so an
+ * aircraft this far up integrates identically whether or not the surface under
+ * it is measurable. Holding the simulation there - as it did, for minutes at a
+ * time, whenever the raster tiles under a cruising aircraft had not been
+ * fetched - buys nothing and looks like a freeze.
+ *
+ * "Best known ground" is the last established height, or the elevation JSBSim
+ * is already holding (sea level at startup) when there has never been one.
+ */
+const SURFACE_REQUIRED_AGL_METERS = 500;
+
 export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
   let previous: { lat: number; lon: number; height: number; revision: number; clearance: number; resting: boolean } | null = null;
   let placement = true;
   let hasReference = false;
   let rejectedSamples = 0;
+  // True while the simulation is stepping without a measured surface, which is
+  // allowed only well clear of the ground. The first sample after that is
+  // trusted the way a fresh placement is, because the aircraft may have flown
+  // over a hill it could not see.
+  let blind = false;
   return {
-    reset() { previous = null; placement = true; hasReference = false; rejectedSamples = 0; },
+    reset() { previous = null; placement = true; hasReference = false; rejectedSamples = 0; blind = false; },
     update(blockOnMissingSurface = true): boolean | "reset" {
       const lat = sdk.getPropertyValue("position/lat-geod-deg"), lon = sdk.getPropertyValue("position/long-gc-deg");
       const hit = surface.sample(lat, lon);
       if (!hit || !Number.isFinite(hit.heightMeters)) {
+        const knownGround = previous?.height ?? sdk.getPropertyValue("position/terrain-elevation-asl-ft") * 0.3048;
+        const aboveGround = sdk.getPropertyValue("position/h-sl-ft") * 0.3048 - knownGround;
+        if (Number.isFinite(aboveGround) && aboveGround > SURFACE_REQUIRED_AGL_METERS) {
+          // Nothing the gear can reach; the surface is irrelevant this frame.
+          if (!blind) {
+            flightLog.info("terrain", "Flying without a measured surface", {
+              aboveGroundMeters: Number(aboveGround.toFixed(0)),
+              knownGroundMeters: Number(knownGround.toFixed(2)),
+            });
+          }
+          blind = true;
+          return true;
+        }
         // Google only exposes currently visible photogrammetry, so a transient
         // miss AFTER a height has been established must not halt the
         // simulation. Raster keeps its strict behaviour: it has an independent
@@ -54,6 +86,7 @@ export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
         // and the gear model resolves the accumulated penetration explosively
         // the moment real terrain arrives.
         if (!hasReference) return false;
+        blind = true;
         return !blockOnMissingSurface;
       }
       if (!hasReference) {
@@ -100,6 +133,8 @@ export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
         }
         rejectedSamples += 1;
         // Keep the previous terrain elevation rather than adopting this one.
+        // The aircraft is flying on a height it can no longer confirm.
+        blind = true;
         return !blockOnMissingSurface;
       }
       if (rejectedSamples > 0) {
@@ -107,12 +142,14 @@ export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
         rejectedSamples = 0;
       }
       let corrected = false;
-      // Deliberately NOT a cause: an aircraft that flew into a hill is deep
-      // below the surface too, and lifting it out would fly it through terrain.
-      // Only a world that changed under a level aircraft is repaired here.
-      const cause = (placement && altitude < support) ? "placement"
+      // Deliberately NOT a cause: an aircraft that flew into a hill in full
+      // view of the surface is deep below it too, and lifting it out would fly
+      // it through terrain. Only a world that changed under a level aircraft,
+      // or one the aircraft could not see, is repaired here.
+      const cause = ((placement || blind) && altitude < support) ? (placement ? "placement" : "surface regained below the aircraft")
         : liftedThroughPlane ? "surface lifted through the aircraft"
           : followGround ? "resting aircraft followed the ground" : null;
+      blind = false;
       if (cause) {
         const movedMeters = penetration;
         if (Math.abs(movedMeters) > 1) {

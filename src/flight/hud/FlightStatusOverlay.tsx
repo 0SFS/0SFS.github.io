@@ -5,7 +5,9 @@ import { AlertTriangle, Loader } from "lucide-react";
  *
  * A fault pauses it outright. A missing terrain sample is quieter and was the
  * more confusing of the two: the fixed-step loop declines to step at all, so
- * the aircraft simply stops moving while nothing reports a problem.
+ * the aircraft simply stops moving while nothing reports a problem. That hold
+ * now only applies within gear range of the ground - higher up the surface
+ * cannot reach the aircraft, so a missing sample is not worth stopping for.
  */
 export type FlightStatusOverlayState =
   | { kind: "fault"; message: string; failed: readonly string[] }
@@ -31,10 +33,11 @@ export function FlightStatusOverlay({ state, onResume }: FlightStatusOverlayProp
           <div>
             <strong>{state.message}</strong>
             <p>
-              The simulation only integrates against terrain it can measure, so it is
-              holding position rather than guessing a ground height.
+              The aircraft is low enough for the ground to matter, and the map has
+              not published a height here yet, so the simulation is holding rather
+              than guessing one.
               {state.heldSeconds >= 5
-                ? " Still waiting after several seconds — try repositioning if it does not clear."
+                ? " Still waiting after several seconds — climb away or reposition if it does not clear."
                 : ""}
             </p>
           </div>

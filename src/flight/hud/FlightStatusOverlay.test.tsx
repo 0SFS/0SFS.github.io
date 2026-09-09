@@ -50,13 +50,13 @@ describe("flight status overlay", () => {
     expect(card.getAttribute("role")).toBe("status");
     expect(card.textContent).toContain("Waiting for terrain height data");
     expect(card.querySelector("button")).toBeNull();
-    expect(card.textContent).not.toContain("repositioning");
+    expect(card.textContent).not.toContain("reposition");
 
     // Only suggest repositioning once it has clearly stopped being transient.
     await act(async () => t.overlay.update({
       kind: "waiting", message: "Waiting for terrain height data", heldSeconds: 7,
     }));
-    expect(t.host.querySelector(".flight-status-overlay")!.textContent).toContain("repositioning");
+    expect(t.host.querySelector(".flight-status-overlay")!.textContent).toContain("reposition");
     t.overlay.destroy();
   });
 

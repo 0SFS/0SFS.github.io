@@ -134,4 +134,43 @@ describe("displayed terrain contact", () => {
     expect(sdk.setPropertyValue).not.toHaveBeenCalledWith("position/terrain-elevation-asl-ft", 3200 / 0.3048);
     expect(sdk.runIc).not.toHaveBeenCalled();
   });
+  it("keeps flying when the surface cannot be measured but the ground is far below", () => {
+    // Terrain reaches the physics only through the gear contacts, so holding a
+    // cruising aircraft because a raster tile has not been fetched freezes the
+    // simulation for no gain - it looked like a hang for minutes at 10,000 ft.
+    const properties: Record<string, number> = {
+      "position/lat-geod-deg": 44.98, "position/long-gc-deg": -93.27, "position/h-sl-ft": 10_000,
+    };
+    const sdk = {
+      getPropertyValue: vi.fn((property: string) => properties[property] ?? 0),
+      setPropertyValue: vi.fn((property: string, value: number) => { properties[property] = value; }),
+      resetToInitialConditions: vi.fn(),
+      runIc: vi.fn(() => true),
+    } as unknown as JSBSimSdk;
+    let hit: SurfaceHit | null = { heightMeters: 250, revision: 1 } as SurfaceHit;
+    const surface: SurfaceQuery = { raycast: () => null, sample: () => hit };
+    const contact = createTerrainContact(sdk, surface);
+
+    // Establish a height on the ramp so placement is behind us.
+    properties["position/h-sl-ft"] = 300 / 0.3048;
+    expect(contact.update(true)).toBe(true);
+
+    // Climb away and lose the surface. Raster is the strict mode, and even it
+    // must not hold the simulation up here.
+    properties["position/h-sl-ft"] = 10_000;
+    hit = null;
+    expect(contact.update(true)).toBe(true);
+
+    // Descending back into gear range without a surface restores the hold.
+    properties["position/h-sl-ft"] = 400 / 0.3048;
+    expect(contact.update(true)).toBe(false);
+
+    // A surface found under a blind aircraft is trusted like a fresh
+    // placement: it may have flown over a hill it could never see, and the
+    // gear model cannot resolve that penetration.
+    properties["position/h-sl-ft"] = 200 / 0.3048;
+    hit = { heightMeters: 260, revision: 2 } as SurfaceHit;
+    expect(contact.update(true)).toBe("reset");
+    expect(sdk.setPropertyValue).toHaveBeenCalledWith("ic/h-sl-ft", expect.closeTo(261.65 / 0.3048, 1));
+  });
 });
