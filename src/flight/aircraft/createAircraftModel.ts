@@ -7,7 +7,7 @@ import {
   type AssetContainer,
   type Scene,
 } from "@babylonjs/core";
-import { bindAircraftRig, type AircraftRig } from "./aircraftAnimation";
+import { bindAircraftRig, disposeAircraftRig, type AircraftRig } from "./aircraftAnimation";
 import {
   getAircraftDefinition,
   resolveLod,
@@ -84,6 +84,7 @@ export function createAircraftModel(
   };
 
   const clearContainer = (): void => {
+    if (rig) disposeAircraftRig(rig);
     container?.dispose();
     container = null;
     rig = null;
@@ -121,7 +122,10 @@ export function createAircraftModel(
         // terrain only, and leaving these pickable would let the chase camera
         // and the visible-mesh collision probe hit the aircraft itself.
         for (const mesh of next.meshes) mesh.isPickable = false;
-        rig = bindAircraftRig(next.transformNodes.concat(next.meshes));
+        rig = bindAircraftRig(next.transformNodes.concat(next.meshes), {
+          scene,
+          propellerBlades: definition.propellerBlades,
+        });
         root.rotationQuaternion = Quaternion.RotationYawPitchRoll(definition.modelYawRad, 0, 0);
         root.position.set(definition.modelOffset.x, definition.modelOffset.y, definition.modelOffset.z);
         activeKey = key;

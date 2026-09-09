@@ -1,4 +1,14 @@
-import { Quaternion, TransformNode, Vector3 } from "@babylonjs/core";
+import {
+  AbstractMesh,
+  Color3,
+  Mesh,
+  MeshBuilder,
+  Quaternion,
+  StandardMaterial,
+  TransformNode,
+  Vector3,
+  type Scene,
+} from "@babylonjs/core";
 import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
 
 /**
@@ -104,12 +114,82 @@ interface HingedPart {
   key: SurfaceKey;
 }
 
+interface Propeller {
+  node: TransformNode;
+  rest: Quaternion;
+  /** Stand-in shown once the blades turn too fast to read. */
+  disc: Mesh | null;
+  blades: number;
+}
+
 export interface AircraftRig {
   parts: HingedPart[];
-  propeller: { node: TransformNode; rest: Quaternion } | null;
+  propeller: Propeller | null;
   propellerAngleRad: number;
+  /** Smoothed frame interval; the sampling rate the blades are judged against. */
+  frameSeconds: number;
+  discVisible: boolean;
   /** Node names present in the loaded mesh, for diagnostics. */
   bound: string[];
+}
+
+export interface BindRigOptions {
+  /** Needed only to build the propeller disc. */
+  scene?: Scene;
+  propellerBlades?: number;
+}
+
+/** Hysteresis, so a propeller sitting on the threshold does not flicker. */
+const DISC_HYSTERESIS = 0.8;
+const FRAME_SMOOTHING = 0.15;
+const DEFAULT_FRAME_SECONDS = 1 / 60;
+
+/**
+ * Fastest the blades can turn and still be readable, in rad/s.
+ *
+ * The image repeats every `2*PI / blades`, and reading a repeating signal needs
+ * two samples per repeat, so the blades may advance at most half a repeat per
+ * frame. For a two-blade propeller at 60 fps that is 90 deg per frame, about
+ * 900 rpm — below a Cessna's idle, so in practice the disc is shown almost
+ * whenever the engine is running, which is also how a real propeller looks.
+ */
+export function maxReadableRadPerSec(blades: number, frameSeconds: number): number {
+  if (blades < 2 || frameSeconds <= 0) return Number.POSITIVE_INFINITY;
+  return Math.PI / blades / frameSeconds;
+}
+
+function propellerRadius(node: TransformNode): number {
+  if (node instanceof AbstractMesh) {
+    const extend = node.getBoundingInfo().boundingBox.extendSize;
+    const radius = Math.max(extend.x, extend.y);
+    if (radius > 0.05) return radius;
+  }
+  return 1;
+}
+
+function buildPropellerDisc(node: TransformNode, scene: Scene): Mesh {
+  // The propeller turns about local Z, so a disc in the local XY plane — which
+  // is how CreateDisc is oriented — already lies in the propeller's plane.
+  const disc = MeshBuilder.CreateDisc(
+    "propeller-disc",
+    { radius: propellerRadius(node), tessellation: 24, sideOrientation: Mesh.DOUBLESIDE },
+    scene,
+  );
+  disc.parent = node.parent;
+  disc.position.copyFrom(node.position);
+  disc.rotationQuaternion = node.rotationQuaternion?.clone() ?? Quaternion.Identity();
+  disc.isPickable = false;
+
+  const material = new StandardMaterial("propeller-disc-mat", scene);
+  material.diffuseColor = Color3.Black();
+  material.specularColor = Color3.Black();
+  material.emissiveColor = new Color3(0.07, 0.08, 0.09);
+  material.disableLighting = true;
+  material.alpha = 0.28;
+  material.backFaceCulling = false;
+  disc.material = material;
+  disc.setEnabled(false);
+  return disc;
 }
 
 const SPAN_AXIS = new Vector3(1, 0, 0);
@@ -139,7 +219,10 @@ function restRotation(node: TransformNode): Quaternion {
  * the coarse levels — which merge the control surfaces into their panels and
  * keep only the propeller — bind cleanly without special cases.
  */
-export function bindAircraftRig(nodes: readonly TransformNode[]): AircraftRig {
+export function bindAircraftRig(
+  nodes: readonly TransformNode[],
+  options: BindRigOptions = {},
+): AircraftRig {
   const byName = new Map<string, TransformNode>();
   for (const node of nodes) {
     const key = baseName(node.name);
@@ -161,12 +244,29 @@ export function bindAircraftRig(nodes: readonly TransformNode[]): AircraftRig {
   const propNode = byName.get("Propeller");
   if (propNode) bound.push("Propeller");
 
+  const blades = options.propellerBlades ?? 0;
+  const disc = propNode && options.scene && blades >= 2
+    ? buildPropellerDisc(propNode, options.scene)
+    : null;
+
   return {
     parts,
-    propeller: propNode ? { node: propNode, rest: restRotation(propNode) } : null,
+    propeller: propNode
+      ? { node: propNode, rest: restRotation(propNode), disc, blades }
+      : null,
     propellerAngleRad: 0,
+    frameSeconds: DEFAULT_FRAME_SECONDS,
+    discVisible: false,
     bound,
   };
+}
+
+/** Free the disc; the loaded mesh itself is owned by its AssetContainer. */
+export function disposeAircraftRig(rig: AircraftRig): void {
+  const disc = rig.propeller?.disc;
+  if (!disc) return;
+  disc.material?.dispose();
+  disc.dispose();
 }
 
 export function applyAircraftRig(
@@ -179,15 +279,30 @@ export function applyAircraftRig(
     part.node.rotationQuaternion = part.rest.multiply(Quaternion.RotationAxis(part.axis, angle));
   }
 
-  if (!rig.propeller) return;
+  const propeller = rig.propeller;
+  if (!propeller) return;
+
   if (Number.isFinite(deltaSeconds) && deltaSeconds > 0) {
     // A Lycoming turns clockwise seen from the cockpit. Looking forward is
     // looking down -Z, and a positive rotation about +Z reads anticlockwise
     // from there, so the angle decreases.
     rig.propellerAngleRad -= state.propellerRadPerSec * deltaSeconds;
     rig.propellerAngleRad %= 2 * Math.PI;
+    rig.frameSeconds += (deltaSeconds - rig.frameSeconds) * FRAME_SMOOTHING;
   }
-  rig.propeller.node.rotationQuaternion = rig.propeller.rest.multiply(
+
+  if (propeller.disc) {
+    const limit = maxReadableRadPerSec(propeller.blades, rig.frameSeconds);
+    const rate = Math.abs(state.propellerRadPerSec);
+    // Once the blades alias there is nothing to be gained by drawing them, so
+    // swap in the disc rather than showing a strobing propeller.
+    rig.discVisible = rig.discVisible ? rate > limit * DISC_HYSTERESIS : rate > limit;
+    propeller.disc.setEnabled(rig.discVisible);
+    propeller.node.setEnabled(!rig.discVisible);
+    if (rig.discVisible) return;
+  }
+
+  propeller.node.rotationQuaternion = propeller.rest.multiply(
     Quaternion.RotationAxis(THRUST_AXIS, rig.propellerAngleRad),
   );
 }

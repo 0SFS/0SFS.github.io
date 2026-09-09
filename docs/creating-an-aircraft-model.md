@@ -203,6 +203,11 @@ on their span-wise hinges, the elevator on the hinge at the centreline, the
 rudder on its raked hinge, the propeller on the hub. Get this wrong and the
 surface swings instead of hinging.
 
+Set `propellerBlades` in the catalog entry — `0` for a jet. Above the speed at
+which the blades alias, the runtime hides them and shows a translucent disc
+sized from the propeller's own bounding box, so nothing extra is needed in the
+mesh.
+
 Export with **identity rotation on every node**. The animation code assumes a
 part's local axes are the glTF axes; a baked rotation silently breaks the sign
 of every deflection.

@@ -38,6 +38,12 @@ export interface AircraftDefinition {
    * visual is dropped by that clearance to stand on the runway.
    */
   modelOffset: { x: number; y: number; z: number };
+  /**
+   * Blades on the propeller, or 0 for a jet. Sets how fast the blades can turn
+   * before they alias and have to be swapped for a blurred disc: the image
+   * repeats every `2*PI / blades`, so two samples per repeat is the limit.
+   */
+  propellerBlades: number;
   lods: readonly AircraftLodDefinition[];
 }
 
@@ -55,6 +61,7 @@ export const AIRCRAFT_CATALOG: readonly AircraftDefinition[] = [
     summary: "High-wing trainer. Flight model and visuals both available.",
     modelYawRad: Math.PI,
     modelOffset: { x: 0, y: -1.65, z: 0 },
+    propellerBlades: 2,
     lods: C172_LODS,
   },
   {
@@ -65,6 +72,7 @@ export const AIRCRAFT_CATALOG: readonly AircraftDefinition[] = [
     summary: "No model built yet — falls back to the block placeholder.",
     modelYawRad: Math.PI,
     modelOffset: { x: 0, y: -1.65, z: 0 },
+    propellerBlades: 0,
     lods: [],
   },
 ];

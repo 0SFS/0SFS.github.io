@@ -4,6 +4,8 @@ import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
 import {
   applyAircraftRig,
   bindAircraftRig,
+  disposeAircraftRig,
+  maxReadableRadPerSec,
   NEUTRAL_CONTROL_SURFACES,
   readControlSurfaceState,
   resetPropellerRpmProperty,
@@ -174,5 +176,98 @@ describe("reading JSBSim", () => {
       getPropertyValue: () => { throw new Error("no such property"); },
     } as unknown as JSBSimSdk;
     expect(readControlSurfaceState(sdk)).toEqual(NEUTRAL_CONTROL_SURFACES);
+  });
+});
+
+describe("propeller disc", () => {
+  const RPM = (rpm: number) => (rpm * 2 * Math.PI) / 60;
+
+  function discRig(blades = 2) {
+    const s = scene();
+    const node = new TransformNode("Propeller", s.scene);
+    const rig = bindAircraftRig([node], { scene: s.scene, propellerBlades: blades });
+    return { ...s, node, rig };
+  }
+
+  it("puts the readable limit at half a blade repeat per frame", () => {
+    // Two blades at 60 fps: 90 deg per frame, about 900 rpm.
+    expect(maxReadableRadPerSec(2, 1 / 60)).toBeCloseTo(Math.PI * 30, 6);
+    expect(maxReadableRadPerSec(2, 1 / 60) * (60 / (2 * Math.PI))).toBeCloseTo(900, 3);
+    // More blades repeat sooner, so they alias earlier.
+    expect(maxReadableRadPerSec(4, 1 / 60)).toBeCloseTo(Math.PI * 15, 6);
+    // A higher refresh rate can resolve more.
+    expect(maxReadableRadPerSec(2, 1 / 120)).toBeCloseTo(Math.PI * 60, 6);
+    // A jet has no blades to alias.
+    expect(maxReadableRadPerSec(0, 1 / 60)).toBe(Number.POSITIVE_INFINITY);
+  });
+
+  it("shows the blades at idle and the disc once they alias", () => {
+    const t = discRig();
+    const disc = t.rig.propeller!.disc!;
+
+    for (let i = 0; i < 40; i += 1) {
+      applyAircraftRig(t.rig, { ...NEUTRAL_CONTROL_SURFACES, propellerRadPerSec: RPM(700) }, 1 / 60);
+    }
+    expect(t.rig.discVisible).toBe(false);
+    expect(disc.isEnabled()).toBe(false);
+    expect(t.node.isEnabled()).toBe(true);
+
+    for (let i = 0; i < 40; i += 1) {
+      applyAircraftRig(t.rig, { ...NEUTRAL_CONTROL_SURFACES, propellerRadPerSec: RPM(2300) }, 1 / 60);
+    }
+    expect(t.rig.discVisible).toBe(true);
+    expect(disc.isEnabled()).toBe(true);
+    expect(t.node.isEnabled()).toBe(false);
+
+    t.scene.dispose(); t.engine.dispose();
+  });
+
+  it("does not flicker for a propeller sitting on the threshold", () => {
+    const t = discRig();
+    const limit = maxReadableRadPerSec(2, 1 / 60);
+    for (let i = 0; i < 30; i += 1) {
+      applyAircraftRig(t.rig, { ...NEUTRAL_CONTROL_SURFACES, propellerRadPerSec: limit * 1.05 }, 1 / 60);
+    }
+    expect(t.rig.discVisible).toBe(true);
+    // Dropping just below the limit keeps the disc; hysteresis holds until 0.8x.
+    applyAircraftRig(t.rig, { ...NEUTRAL_CONTROL_SURFACES, propellerRadPerSec: limit * 0.95 }, 1 / 60);
+    expect(t.rig.discVisible).toBe(true);
+    applyAircraftRig(t.rig, { ...NEUTRAL_CONTROL_SURFACES, propellerRadPerSec: limit * 0.5 }, 1 / 60);
+    expect(t.rig.discVisible).toBe(false);
+    t.scene.dispose(); t.engine.dispose();
+  });
+
+  it("aliases sooner on a slower display", () => {
+    const t = discRig();
+    const rate = RPM(1200);
+    for (let i = 0; i < 40; i += 1) {
+      applyAircraftRig(t.rig, { ...NEUTRAL_CONTROL_SURFACES, propellerRadPerSec: rate }, 1 / 144);
+    }
+    expect(t.rig.discVisible).toBe(false);   // 144 fps still resolves 1200 rpm
+    for (let i = 0; i < 40; i += 1) {
+      applyAircraftRig(t.rig, { ...NEUTRAL_CONTROL_SURFACES, propellerRadPerSec: rate }, 1 / 30);
+    }
+    expect(t.rig.discVisible).toBe(true);    // 30 fps cannot
+    t.scene.dispose(); t.engine.dispose();
+  });
+
+  it("builds no disc for a jet or when no scene is supplied", () => {
+    const jet = discRig(0);
+    expect(jet.rig.propeller!.disc).toBeNull();
+    expect(() => applyAircraftRig(jet.rig, NEUTRAL_CONTROL_SURFACES, 1 / 60)).not.toThrow();
+    jet.scene.dispose(); jet.engine.dispose();
+
+    const s = scene();
+    const rig = bindAircraftRig([new TransformNode("Propeller", s.scene)]);
+    expect(rig.propeller!.disc).toBeNull();
+    s.scene.dispose(); s.engine.dispose();
+  });
+
+  it("disposes the disc it created", () => {
+    const t = discRig();
+    const disc = t.rig.propeller!.disc!;
+    disposeAircraftRig(t.rig);
+    expect(disc.isDisposed()).toBe(true);
+    t.scene.dispose(); t.engine.dispose();
   });
 });

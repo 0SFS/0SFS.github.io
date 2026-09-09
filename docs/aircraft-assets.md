@@ -123,8 +123,34 @@ negated.
 Engine RPM is read through a short list of the usual JSBSim property spellings,
 keeping the first that answers. The propeller angle decreases over time because
 a Lycoming turns clockwise seen from the cockpit and a positive rotation about
-+Z reads anticlockwise from behind. At cruise RPM the blades will alias badly at
-60 fps; a blurred disc is the conventional fix and is not implemented.
++Z reads anticlockwise from behind.
+
+### The blurred disc
+
+Past a certain speed the blades cannot be drawn honestly: they advance far
+enough between frames that the image aliases into a strobe. The blades are then
+hidden and a translucent disc is shown instead, which is also what a real
+propeller looks like.
+
+The switch is not a fixed RPM — it is the sampling limit for the display the
+frame is actually being drawn on. A propeller's image repeats every
+`2*PI / blades`, and reading a repeating signal needs two samples per repeat, so
+the blades may advance at most half a repeat per frame:
+
+```text
+maxReadableRadPerSec = PI / blades / frameSeconds
+```
+
+For two blades at 60 fps that is 90° per frame, about **900 rpm** — below a
+Cessna's idle, so in practice the disc is shown whenever the engine is running.
+A 144 Hz display resolves proportionally more; a four-blade propeller aliases at
+half the speed. The frame interval is smoothed and the threshold carries 20%
+hysteresis so a propeller sitting on the boundary does not flicker.
+
+The disc is built at runtime rather than shipped in the mesh: its radius comes
+from the propeller's own bounding box, so a new airframe gets one for free
+without touching its GLB. Set `propellerBlades` in the catalog — `0` for a jet,
+which suppresses the disc entirely.
 
 Coarse levels merge the control surfaces into their panels and expose only the
 propeller. The rig binds whatever it finds, so this needs no special handling.
