@@ -2,6 +2,7 @@ import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
 import type { SurfaceQuery } from "foss-earth/runtime";
 import { flightLog } from "../diagnostics/flightLog";
 import { aircraftClearanceMeters, captureSimulation, restoreSimulation } from "./safeFlightState";
+import { createWheelGroundFilter } from "./wheelGroundFilter";
 
 /**
  * A surface sample this far above a flying aircraft is not believed at all.
@@ -57,8 +58,14 @@ const SURFACE_REQUIRED_AGL_METERS = 500;
  */
 const BLIND_STEPS = 60;
 
+/** Above this the wheels cannot be touching, so the surface is adopted raw and
+ * touchdown is never met with a lagging ground height. */
+const WHEELS_CLEAR_METERS = 5;
+
 export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
-  let previous: { lat: number; lon: number; height: number; revision: number; clearance: number; resting: boolean } | null = null;
+  // `height` is the raw sample, used to detect the world changing. `ground` is
+  // what the wheels ride on and what JSBSim is given.
+  let previous: { lat: number; lon: number; height: number; ground: number; revision: number; clearance: number; resting: boolean } | null = null;
   let placement = true;
   let hasReference = false;
   let rejectedSamples = 0;
@@ -67,13 +74,14 @@ export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
   // trusted the way a fresh placement is, because the aircraft may have flown
   // over a hill it could not see.
   let blindSteps = 0;
+  const wheelGround = createWheelGroundFilter();
   return {
-    reset() { previous = null; placement = true; hasReference = false; rejectedSamples = 0; blindSteps = 0; },
+    reset() { previous = null; placement = true; hasReference = false; rejectedSamples = 0; blindSteps = 0; wheelGround.reset(); },
     update(blockOnMissingSurface = true): boolean | "reset" {
       const lat = sdk.getPropertyValue("position/lat-geod-deg"), lon = sdk.getPropertyValue("position/long-gc-deg");
       const hit = surface.sample(lat, lon);
       if (!hit || !Number.isFinite(hit.heightMeters)) {
-        const knownGround = previous?.height ?? sdk.getPropertyValue("position/terrain-elevation-asl-ft") * 0.3048;
+        const knownGround = previous?.ground ?? sdk.getPropertyValue("position/terrain-elevation-asl-ft") * 0.3048;
         const aboveGround = sdk.getPropertyValue("position/h-sl-ft") * 0.3048 - knownGround;
         if (Number.isFinite(aboveGround) && aboveGround > SURFACE_REQUIRED_AGL_METERS) {
           // Nothing the gear can reach; the surface is irrelevant this frame.
@@ -116,7 +124,13 @@ export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
         const anchor = surface.sample(previous.lat, previous.lon);
         if (anchor && Number.isFinite(anchor.heightMeters)) refinementDelta = anchor.heightMeters - previous.height;
       }
-      const support = hit.heightMeters + clearance;
+      // A wheel rides its own footprint, not the point under the axle.
+      const movedMeters = previous ? Math.hypot((lat - previous.lat) * 111320,
+        (((lon - previous.lon + 540) % 360) - 180) * Math.cos(lat * Math.PI / 180) * 111320) : 0;
+      const ground = wheelGround.height(hit.heightMeters, movedMeters,
+        placement || blindSteps > 0 || hit.revision !== previous?.revision
+        || altitude - hit.heightMeters > WHEELS_CLEAR_METERS);
+      const support = ground + clearance;
       const changedHere = Math.abs(refinementDelta) > 0.00001;
       // Only repair penetration attributable to the world change. Moving into a
       // hill while some other tile refines is still an ordinary collision.
@@ -161,7 +175,7 @@ export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
       // Regaining the surface only repairs a real penetration of the ground
       // itself, not the centimetres of oleo travel that separate a settled
       // aircraft from its nominal stance.
-      const regained = blindSteps >= BLIND_STEPS && altitude < hit.heightMeters;
+      const regained = blindSteps >= BLIND_STEPS && altitude < ground;
       const cause = (placement && altitude < support) ? "placement"
         : regained ? "surface regained above the aircraft"
           : liftedThroughPlane ? "surface lifted through the aircraft"
@@ -177,7 +191,7 @@ export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
           });
         }
         const snapshot = captureSimulation(sdk);
-        snapshot.initial["ic/terrain-elevation-ft"] = hit.heightMeters / 0.3048;
+        snapshot.initial["ic/terrain-elevation-ft"] = ground / 0.3048;
         snapshot.initial["ic/h-sl-ft"] = support / 0.3048;
         // Preserve lateral motion. JSBSim's support model uses a horizontal local
         // plane; remove only downward velocity into that plane.
@@ -185,11 +199,11 @@ export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
         restoreSimulation(sdk, snapshot);
         corrected = true;
       }
-      sdk.setPropertyValue("position/terrain-elevation-asl-ft", hit.heightMeters / 0.3048);
+      sdk.setPropertyValue("position/terrain-elevation-asl-ft", ground / 0.3048);
       const height = sdk.getPropertyValue("position/h-sl-ft") * 0.3048;
-      previous = { lat, lon, height: hit.heightMeters, revision: hit.revision,
-        clearance: height - hit.heightMeters - clearance,
-        resting: height - hit.heightMeters <= clearance + 0.25 && Math.abs(sdk.getPropertyValue("velocities/v-down-fps")) < 3 };
+      previous = { lat, lon, height: hit.heightMeters, ground, revision: hit.revision,
+        clearance: height - ground - clearance,
+        resting: height - ground <= clearance + 0.25 && Math.abs(sdk.getPropertyValue("velocities/v-down-fps")) < 3 };
       placement = false;
       return corrected ? "reset" : true;
     },

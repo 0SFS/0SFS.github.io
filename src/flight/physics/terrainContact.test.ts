@@ -201,4 +201,43 @@ describe("displayed terrain contact", () => {
     }
     expect(sdk.runIc).not.toHaveBeenCalled();
   });
+  it("gives JSBSim a ground a wheel could roll on, not the point under the axle", () => {
+    // Photogrammetry is noisy at the centimetre scale. Resampling a point at
+    // 120 Hz makes the whole ground plane twitch under the gear and keeps the
+    // oleos ringing; a real wheel bridges anything shorter than its footprint.
+    const properties: Record<string, number> = {
+      "position/lat-geod-deg": 44.98, "position/long-gc-deg": -93.27,
+      "position/h-sl-ft": 251.33 / 0.3048,
+    };
+    const elevations: number[] = [];
+    const sdk = {
+      getPropertyValue: vi.fn((property: string) => properties[property] ?? 0),
+      setPropertyValue: vi.fn((property: string, value: number) => {
+        properties[property] = value;
+        if (property === "position/terrain-elevation-asl-ft") elevations.push(value * 0.3048);
+      }),
+      resetToInitialConditions: vi.fn(),
+      runIc: vi.fn(() => true),
+    } as unknown as JSBSimSdk;
+    let hit: SurfaceHit = { heightMeters: 250, revision: 1 } as SurfaceHit;
+    const surface: SurfaceQuery = { raycast: () => null, sample: () => hit };
+    const contact = createTerrainContact(sdk, surface);
+    contact.update(false);
+
+    // Taxi at about 25 kt: 5 mm of travel per 120 Hz step.
+    const metresPerDegreeLon = 111320 * Math.cos(44.98 * Math.PI / 180);
+    for (let step = 0; step < 300; step += 1) {
+      properties["position/long-gc-deg"] += 0.005 / metresPerDegreeLon;
+      hit = { heightMeters: 250 + (step % 2 === 0 ? 0.04 : -0.04), revision: 1 } as SurfaceHit;
+      contact.update(false);
+    }
+    const settled = elevations.slice(10);
+    expect(Math.max(...settled)).toBeLessThan(250.01);
+    expect(Math.min(...settled)).toBeGreaterThan(249.99);
+
+    // A kerb is not noise: the wheel has to climb it at once.
+    hit = { heightMeters: 251, revision: 1 } as SurfaceHit;
+    contact.update(false);
+    expect(elevations.at(-1)).toBeCloseTo(251, 6);
+  });
 });
