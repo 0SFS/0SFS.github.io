@@ -28,6 +28,7 @@ import {
   type AircraftLodId,
 } from "./aircraft/aircraftCatalog";
 import { applyAircraftRig, readControlSurfaceState } from "./aircraft/aircraftAnimation";
+import { flightLog } from "./diagnostics/flightLog";
 import {
   createAircraftModel,
   type AircraftModelHandle,
@@ -258,11 +259,22 @@ export async function createFlightSimApp(
   });
 
   const syncSimulationPaused = (paused: boolean): void => {
-    if (!paused && physicsLoop.getFault()) {
+    const priorFault = physicsLoop.getFault();
+    flightLog.info("sim", paused ? "Paused" : "Resume requested",
+      priorFault ? { clearingFault: priorFault } : undefined);
+    if (!paused && priorFault) {
       // The fixed-step loop restores its last valid pre-fault state. Resume is
       // therefore a recovery action as well as a pause toggle; teleport is not
       // required merely to clear a transient terrain-contact fault.
-      physicsLoop.reset();
+      try {
+        physicsLoop.reset();
+      } catch (error) {
+        // Resume is also the recovery action, so a failed reset is exactly the
+        // case where the aircraft cannot be recovered without repositioning.
+        flightLog.error("sim", "Resume failed: physics could not be reset", {
+          reason: error instanceof Error ? error.message : String(error),
+        });
+      }
       terrainContact.reset();
       visibleMeshCollision.reset();
     }
@@ -403,7 +415,12 @@ export async function createFlightSimApp(
     if (fault) {
       runtime.status.lastError = fault;
       runtime.status.message = fault;
-      if (!inputManager.isPaused()) setSimulationPaused(true);
+      if (!inputManager.isPaused()) {
+        // The fault detail was logged where it was raised; this records that
+        // the fault is what took the simulator out of the user's hands.
+        flightLog.warn("sim", "Pausing: physics reported a fault", { fault });
+        setSimulationPaused(true);
+      }
     }
 
     const surfaceHeight = runtime.surface.sample(displayState.latDeg, displayState.lonDeg)?.heightMeters ?? 0;

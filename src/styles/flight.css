@@ -576,3 +576,54 @@
 .flight-panel__hint.is-error {
   color: #e8a0a0;
 }
+
+.flight-panel__log {
+  display: grid;
+  gap: 6px;
+  max-height: 260px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.flight-panel__log li {
+  padding: 6px 8px;
+  border-left: 2px solid rgba(255, 255, 255, 0.16);
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.flight-panel__log li[data-level="warn"] { border-left-color: var(--flight-panel-accent); }
+.flight-panel__log li[data-level="error"] { border-left-color: #e8776f; }
+
+.flight-panel__log-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  align-items: baseline;
+  color: #cad3d5;
+  font-size: 11px;
+}
+
+.flight-panel__log-head span:first-child {
+  color: #7d888b;
+  font-family: "SF Mono", Menlo, monospace;
+}
+
+.flight-panel__log-head strong {
+  color: var(--flight-panel-accent);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.flight-panel__log pre {
+  margin: 5px 0 0;
+  color: #97a3a6;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 10px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}

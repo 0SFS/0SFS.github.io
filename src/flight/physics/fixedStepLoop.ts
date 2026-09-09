@@ -1,7 +1,10 @@
 import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
 import { readFlightState } from "../bridge/ecefBridge";
 import { interpolateFlightState, type FlightState } from "./flightState";
-import { captureSimulation, restoreSimulation, validFlightState } from "./safeFlightState";
+import { flightLog } from "../diagnostics/flightLog";
+import {
+  captureSimulation, invalidFlightStateReasons, restoreSimulation,
+} from "./safeFlightState";
 
 export const PHYSICS_HZ = 120;
 export const FIXED_DT = 1 / PHYSICS_HZ;
@@ -40,8 +43,12 @@ export function createFixedStepPhysicsLoop(
           break;
         }
         const before = readFlightState(sdk);
-        if (!validFlightState(before)) {
+        const beforeReasons = invalidFlightStateReasons(before);
+        if (beforeReasons.length > 0) {
           fault = "Invalid flight state. Reposition the aircraft to reset the simulation.";
+          flightLog.error("physics", "Faulted before stepping: state is outside the envelope", {
+            failed: beforeReasons, state: before,
+          });
           accumulator = 0;
           break;
         }
@@ -53,10 +60,30 @@ export function createFixedStepPhysicsLoop(
         const deltaLon = ((candidate.lonDeg - before.lonDeg + 540) % 360) - 180;
         const distance = Math.hypot((candidate.latDeg - before.latDeg) * 111320,
           deltaLon * Math.cos(before.latDeg * Math.PI / 180) * 111320, candidate.altMeters - before.altMeters);
-        if (!success || !validFlightState(candidate) || distance > 100 || Math.abs(candidate.airspeedKts - before.airspeedKts) > 200) {
-          if (snapshot) { try { restoreSimulation(sdk, snapshot); } catch { /* Keep the last valid display, even if recovery fails. */ } }
+        const airspeedJump = Math.abs(candidate.airspeedKts - before.airspeedKts);
+        const candidateReasons = invalidFlightStateReasons(candidate);
+        // Report which guard tripped, not merely that one did: "moved 4 km in
+        // one 120 Hz step" and "airspeed is NaN" call for different fixes.
+        const tripped: string[] = [];
+        if (!success) tripped.push("JSBSim run() returned false");
+        if (candidateReasons.length > 0) tripped.push(...candidateReasons);
+        if (distance > 100) tripped.push(`moved ${distance.toFixed(1)} m in one ${(1 / FIXED_DT).toFixed(0)} Hz step (limit 100)`);
+        if (airspeedJump > 200) tripped.push(`airspeed jumped ${airspeedJump.toFixed(1)} kt in one step (limit 200)`);
+        if (tripped.length > 0) {
+          let restored: string | null = null;
+          if (snapshot) {
+            try { restoreSimulation(sdk, snapshot); }
+            catch (error) { restored = error instanceof Error ? error.message : String(error); }
+          }
           prevState = currState = before;
           fault = "Physics stopped after an unstable contact. Reposition the aircraft to reset the simulation.";
+          flightLog.error("physics", "Faulted after stepping", {
+            failed: tripped,
+            stepMeters: Number(distance.toFixed(2)),
+            airspeedJumpKts: Number(airspeedJump.toFixed(2)),
+            before, after: candidate,
+            ...(restored ? { restoreFailed: restored } : {}),
+          });
           accumulator = 0;
           break;
         }
@@ -76,7 +103,14 @@ export function createFixedStepPhysicsLoop(
     },
     reset(): void {
       const state = readFlightState(sdk);
-      if (!validFlightState(state)) throw new Error("Cannot reset physics to an invalid state");
+      const reasons = invalidFlightStateReasons(state);
+      if (reasons.length > 0) {
+        flightLog.error("physics", "Cannot reset: the simulation is still outside the envelope", {
+          failed: reasons, state,
+        });
+        throw new Error(`Cannot reset physics to an invalid state: ${reasons.join("; ")}`);
+      }
+      if (fault) flightLog.info("physics", "Fault cleared; physics resuming", { clearedFault: fault });
       fault = null;
       accumulator = 0;
       currState = state;

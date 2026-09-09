@@ -14,7 +14,7 @@ import {
   Play,
   Plane,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { BabylonRuntimeStatus, RendererMode } from "foss-earth/runtime";
 import type { FlightViewMode } from "../aircraft/createPlaceholderAircraft";
 import {
@@ -24,6 +24,7 @@ import {
   type AircraftLodId,
 } from "../aircraft/aircraftCatalog";
 import type { AircraftModelStatus } from "../aircraft/createAircraftModel";
+import { flightLog, type FlightLogEntry } from "../diagnostics/flightLog";
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
 
 type FlightPanelTab = "weather" | "aircraft" | "debug";
@@ -247,6 +248,40 @@ function AircraftPanel({
   );
 }
 
+function formatDetail(detail: Record<string, unknown>): string {
+  return Object.entries(detail)
+    .map(([key, value]) => {
+      if (Array.isArray(value)) return `${key}: ${value.join("; ")}`;
+      if (value && typeof value === "object") return `${key}: ${JSON.stringify(value)}`;
+      return `${key}: ${String(value)}`;
+    })
+    .join("\n");
+}
+
+function EventLog() {
+  const [entries, setEntries] = useState<readonly FlightLogEntry[]>(flightLog.entries());
+  useEffect(() => flightLog.subscribe(setEntries), []);
+
+  if (entries.length === 0) {
+    return <p className="flight-panel__hint">No events yet. Automatic pauses and faults appear here.</p>;
+  }
+
+  return (
+    <ol className="flight-panel__log">
+      {entries.slice(0, 40).map((entry) => (
+        <li key={entry.id} data-level={entry.level}>
+          <div className="flight-panel__log-head">
+            <span>{(entry.atMs / 1000).toFixed(1)}s</span>
+            <strong>{entry.source}</strong>
+            <span>{entry.message}</span>
+          </div>
+          {entry.detail ? <pre>{formatDetail(entry.detail)}</pre> : null}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 function DebugPanel({ snapshot }: Pick<FlightControlPanelProps, "snapshot">) {
   return (
     <div className="flight-panel__content">
@@ -260,6 +295,13 @@ function DebugPanel({ snapshot }: Pick<FlightControlPanelProps, "snapshot">) {
         <Gauge size={18} aria-hidden="true" />
         <span>{snapshot.runtimeStatus.lastError ?? snapshot.runtimeStatus.message}</span>
       </div>
+      <fieldset className="flight-panel__fieldset">
+        <legend>Event log</legend>
+        <EventLog />
+        <button className="flight-panel__command" type="button" onClick={() => flightLog.clear()}>
+          Clear log
+        </button>
+      </fieldset>
     </div>
   );
 }

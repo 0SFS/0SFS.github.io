@@ -1,10 +1,28 @@
 import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
 import type { FlightState } from "./flightState";
 
+/**
+ * Which envelope checks a state fails, as readable strings.
+ *
+ * The loop pauses the simulator on an invalid state, so the reason has to be
+ * recoverable after the fact — "invalid" alone is not actionable.
+ */
+export function invalidFlightStateReasons(state: FlightState): string[] {
+  const reasons: string[] = [];
+  for (const [key, value] of Object.entries(state)) {
+    if (!Number.isFinite(value)) reasons.push(`${key} is ${value}`);
+  }
+  if (Math.abs(state.latDeg) > 90) reasons.push(`latDeg ${state.latDeg.toFixed(4)} outside +-90`);
+  if (Math.abs(state.lonDeg) > 180) reasons.push(`lonDeg ${state.lonDeg.toFixed(4)} outside +-180`);
+  if (Math.abs(state.altMeters) >= 100000) reasons.push(`altMeters ${state.altMeters.toFixed(1)} beyond 100000`);
+  if (!(state.airspeedKts >= 0)) reasons.push(`airspeedKts ${state.airspeedKts} below 0`);
+  if (state.airspeedKts >= 1500) reasons.push(`airspeedKts ${state.airspeedKts.toFixed(1)} beyond 1500`);
+  if (Math.abs(state.verticalSpeedFps) >= 5000) reasons.push(`verticalSpeedFps ${state.verticalSpeedFps.toFixed(1)} beyond 5000`);
+  return reasons;
+}
+
 export function validFlightState(state: FlightState): boolean {
-  return Object.values(state).every(Number.isFinite) && Math.abs(state.latDeg) <= 90
-    && Math.abs(state.lonDeg) <= 180 && Math.abs(state.altMeters) < 100000
-    && state.airspeedKts >= 0 && state.airspeedKts < 1500 && Math.abs(state.verticalSpeedFps) < 5000;
+  return invalidFlightStateReasons(state).length === 0;
 }
 
 const controls = ["fcs/throttle-cmd-norm", "fcs/mixture-cmd-norm", "fcs/elevator-cmd-norm",
