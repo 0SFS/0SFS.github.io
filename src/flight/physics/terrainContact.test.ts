@@ -81,4 +81,57 @@ describe("displayed terrain contact", () => {
     loop.update(1 / 120, () => true);
     expect(sdk.run).toHaveBeenCalledOnce();
   });
+  it("ignores a surface sample a kilometre above a flying aircraft", () => {
+    const properties: Record<string, number> = {
+      "position/lat-geod-deg": 34, "position/long-gc-deg": -118, "position/h-sl-ft": 1000,
+    };
+    const sdk = {
+      getPropertyValue: vi.fn((property: string) => properties[property] ?? 0),
+      setPropertyValue: vi.fn((property: string, value: number) => { properties[property] = value; }),
+      resetToInitialConditions: vi.fn(),
+      runIc: vi.fn(() => true),
+    } as unknown as JSBSimSdk;
+    let hit: SurfaceHit = { heightMeters: 100, revision: 1 } as SurfaceHit;
+    const surface: SurfaceQuery = { raycast: () => null, sample: () => hit };
+    const contact = createTerrainContact(sdk, surface);
+    expect(contact.update(false)).toBe(true);
+
+    hit = { heightMeters: 2000, revision: 2 } as SurfaceHit;
+    expect(contact.update(false)).toBe(true);
+    // Neither adopted as the collision elevation nor used to move the aircraft.
+    expect(sdk.setPropertyValue).not.toHaveBeenCalledWith("position/terrain-elevation-asl-ft", 2000 / 0.3048);
+    expect(sdk.runIc).not.toHaveBeenCalled();
+    // Raster has no second source of truth, so it holds instead of guessing.
+    expect(contact.update(true)).toBe(false);
+
+    hit = { heightMeters: 100, revision: 3 } as SurfaceHit;
+    expect(contact.update(false)).toBe(true);
+    expect(sdk.setPropertyValue).toHaveBeenCalledWith("position/terrain-elevation-asl-ft", 100 / 0.3048);
+  });
+  it("ignores a surface that jumps a kilometre between frames even when it lands just above the aircraft", () => {
+    // The reported failure: cruising at 10,000 ft in Google tiles mode, the
+    // sampled surface arrived just above the aircraft. JSBSim's ground plane is
+    // horizontal, so the gear springs fired straight up and the whole velocity
+    // came out vertical - 36,000 kt in a single step.
+    const properties: Record<string, number> = {
+      "position/lat-geod-deg": 44.977753, "position/long-gc-deg": -93.265011,
+      "position/h-sl-ft": 10_000,
+    };
+    const sdk = {
+      getPropertyValue: vi.fn((property: string) => properties[property] ?? 0),
+      setPropertyValue: vi.fn((property: string, value: number) => { properties[property] = value; }),
+      resetToInitialConditions: vi.fn(),
+      runIc: vi.fn(() => true),
+    } as unknown as JSBSimSdk;
+    let hit: SurfaceHit = { heightMeters: 250, revision: 1 } as SurfaceHit;
+    const surface: SurfaceQuery = { raycast: () => null, sample: () => hit };
+    const contact = createTerrainContact(sdk, surface);
+    expect(contact.update(false)).toBe(true);
+
+    // Only 150 m above the aircraft, so the rise limit alone would allow it.
+    hit = { heightMeters: 3200, revision: 2 } as SurfaceHit;
+    expect(contact.update(false)).toBe(true);
+    expect(sdk.setPropertyValue).not.toHaveBeenCalledWith("position/terrain-elevation-asl-ft", 3200 / 0.3048);
+    expect(sdk.runIc).not.toHaveBeenCalled();
+  });
 });

@@ -2,6 +2,7 @@ import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
 import { readFlightState } from "../bridge/ecefBridge";
 import { interpolateFlightState, type FlightState } from "./flightState";
 import { flightLog } from "../diagnostics/flightLog";
+import { readContactDiagnostics } from "./contactDiagnostics";
 import {
   captureSimulation, invalidFlightStateReasons, restoreSimulation,
 } from "./safeFlightState";
@@ -70,6 +71,15 @@ export function createFixedStepPhysicsLoop(
         if (distance > 100) tripped.push(`moved ${distance.toFixed(1)} m in one ${(1 / FIXED_DT).toFixed(0)} Hz step (limit 100)`);
         if (airspeedJump > 200) tripped.push(`airspeed jumped ${airspeedJump.toFixed(1)} kt in one step (limit 200)`);
         if (tripped.length > 0) {
+          // Read the contact state before restoring: the restore rewinds the
+          // terrain elevation and gear compression that explain the fault.
+          const contact = readContactDiagnostics(sdk, before.altMeters, candidate.altMeters);
+          // The on-screen notice shows these reasons, and this is the one line
+          // that separates a gear-spring launch from an aerodynamic
+          // divergence, so it belongs there and not only in the console.
+          if (contact.aglBeforeMeters < -1) {
+            tripped.push(`gear was ${(-contact.aglBeforeMeters).toFixed(0)} m under the terrain JSBSim was given (${contact.terrainElevationMeters.toFixed(0)} m)`);
+          }
           let restored: string | null = null;
           if (snapshot) {
             try { restoreSimulation(sdk, snapshot); }
@@ -81,7 +91,7 @@ export function createFixedStepPhysicsLoop(
             failed: tripped,
             stepMeters: Number(distance.toFixed(2)),
             airspeedJumpKts: Number(airspeedJump.toFixed(2)),
-            before, after: candidate,
+            before, after: candidate, contact,
             ...(restored ? { restoreFailed: restored } : {}),
           });
           accumulator = 0;
