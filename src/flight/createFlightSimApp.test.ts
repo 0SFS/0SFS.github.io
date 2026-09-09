@@ -26,8 +26,12 @@ const mocks = vi.hoisted(() => {
         aircraftId: "cessna-172", lodId: "auto", activeLodId: "lod0",
         status: "ready", triangles: 876, error: null,
       }),
+      getRig: () => mocks.rig,
       setAircraft: vi.fn(), setLod: vi.fn(), refreshAutoLod: vi.fn(), dispose: vi.fn(),
     },
+    rig: { parts: [], propeller: null, propellerAngleRad: 0, bound: [] },
+    surfaceState: { elevatorRad: 0.1 },
+    applyAircraftRig: vi.fn(),
     terrainContact: { reset: vi.fn(), update: vi.fn(() => true) },
     visibleMeshCollision: { reset: vi.fn(), update: vi.fn(() => false) },
     physics: { reset: vi.fn(), setPaused: vi.fn(), update: vi.fn((_delta, applyInputs) => { applyInputs(); return state; }), getLatestState: () => state, getFault: () => null },
@@ -42,6 +46,10 @@ vi.mock("./bridge/ecefBridge", () => ({ readFlightState: () => mocks.state }));
 vi.mock("./bridge/floatingOrigin", () => ({ createFloatingOrigin: () => ({ aircraftRoot: {}, apply: mocks.applyOrigin, dispose: vi.fn() }) }));
 vi.mock("./aircraft/createPlaceholderAircraft", () => ({ createPlaceholderAircraft: () => mocks.aircraft }));
 vi.mock("./aircraft/createAircraftModel", () => ({ createAircraftModel: () => mocks.aircraftModel }));
+vi.mock("./aircraft/aircraftAnimation", () => ({
+  applyAircraftRig: mocks.applyAircraftRig,
+  readControlSurfaceState: () => mocks.surfaceState,
+}));
 vi.mock("./physics/fixedStepLoop", () => ({ createFixedStepPhysicsLoop: () => mocks.physics }));
 vi.mock("./physics/terrainContact", () => ({ createTerrainContact: () => mocks.terrainContact }));
 vi.mock("./physics/visibleMeshCollision", () => ({ createVisibleMeshCollision: () => mocks.visibleMeshCollision }));
@@ -216,5 +224,21 @@ it("selects the airframe and LOD from the Aircraft tab and persists both", async
     await act(async () => radios[1].click());
     expect(mocks.aircraftModel.setAircraft).toHaveBeenCalledWith("cirrus-vision-jet");
     expect(setItem).toHaveBeenCalledWith("flight-sim.aircraft", "cirrus-vision-jet");
+  } finally { await act(async () => app.destroy()); }
+});
+
+
+it("drives the model's control surfaces and propeller from the simulation each tick", async () => {
+  vi.stubGlobal("localStorage", { getItem: () => "trackpad", setItem: vi.fn() });
+  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
+  const root = document.createElement("div");
+  document.body.append(root);
+  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
+  await act(async () => { app = await createFlightSimApp(root); });
+  try {
+    const tick = mocks.runtime.setSimTick.mock.calls.at(-1)?.[0] as (dt: number) => void;
+    mocks.applyAircraftRig.mockClear();
+    tick(1 / 60);
+    expect(mocks.applyAircraftRig).toHaveBeenCalledWith(mocks.rig, mocks.surfaceState, 1 / 60);
   } finally { await act(async () => app.destroy()); }
 });

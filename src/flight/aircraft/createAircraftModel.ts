@@ -7,6 +7,7 @@ import {
   type AssetContainer,
   type Scene,
 } from "@babylonjs/core";
+import { bindAircraftRig, type AircraftRig } from "./aircraftAnimation";
 import {
   getAircraftDefinition,
   resolveLod,
@@ -39,6 +40,8 @@ export interface AircraftModelOptions {
 export interface AircraftModelHandle {
   root: TransformNode;
   getState(): AircraftModelState;
+  /** Moving parts of the loaded mesh, or null while none is in the scene. */
+  getRig(): AircraftRig | null;
   setAircraft(id: AircraftId): void;
   setLod(id: AircraftLodId): void;
   /** Re-evaluate "auto" against the current chase distance. Cheap to call. */
@@ -63,6 +66,7 @@ export function createAircraftModel(
   const getChaseDistance = options.getChaseDistanceMeters ?? (() => 0);
 
   let container: AssetContainer | null = null;
+  let rig: AircraftRig | null = null;
   let loadToken = 0;
   let activeKey: string | null = null;
   let state: AircraftModelState = {
@@ -82,6 +86,7 @@ export function createAircraftModel(
   const clearContainer = (): void => {
     container?.dispose();
     container = null;
+    rig = null;
   };
 
   const apply = (): void => {
@@ -116,6 +121,7 @@ export function createAircraftModel(
         // terrain only, and leaving these pickable would let the chase camera
         // and the visible-mesh collision probe hit the aircraft itself.
         for (const mesh of next.meshes) mesh.isPickable = false;
+        rig = bindAircraftRig(next.transformNodes.concat(next.meshes));
         root.rotationQuaternion = Quaternion.RotationYawPitchRoll(definition.modelYawRad, 0, 0);
         root.position.set(definition.modelOffset.x, definition.modelOffset.y, definition.modelOffset.z);
         activeKey = key;
@@ -138,6 +144,7 @@ export function createAircraftModel(
   return {
     root,
     getState: () => state,
+    getRig: () => rig,
     setAircraft(id): void {
       if (id === state.aircraftId) return;
       state = { ...state, aircraftId: id };

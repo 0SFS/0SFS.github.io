@@ -96,6 +96,39 @@ mesh is present, and the model follows the same cockpit/chase visibility rules.
 Selections persist to `localStorage` under `flight-sim.aircraft` and
 `flight-sim.aircraft-lod`.
 
+## Control surfaces and propeller
+
+`aircraftAnimation.ts` drives the moving parts from JSBSim each tick. It finds
+them by node name, so those names are an interface — see the list under
+"Adding an aircraft" in `creating-an-aircraft-model.md`.
+
+The exported nodes keep glTF's frame (+X starboard, +Y up, +Z aft), and every
+node carries an identity rotation, so a spanwise hinge is local X, the rudder
+hinge is local Y, and the propeller turns about local Z.
+
+Deflection signs are taken from the c172p aero tables rather than assumed:
+
+| Coefficient | Sign | Meaning |
+| --- | --- | --- |
+| `Cmde = -1.122 · elevator-pos-rad` | positive pitches nose down | positive is trailing edge down |
+| `Clda = +0.229 · left-aileron-pos-rad` | positive rolls right | positive is trailing edge down |
+| `Cndr = -0.043 · rudder-pos-rad` | positive yaws nose left | positive is trailing edge left |
+
+The right aileron's FCS gain is already negated, so both ailerons share one
+convention and each is read independently. A positive rotation about +X carries
+the trailing edge downward, so the pitch, roll and flap surfaces map straight
+through; a positive rotation about +Y carries it to starboard, so the rudder is
+negated.
+
+Engine RPM is read through a short list of the usual JSBSim property spellings,
+keeping the first that answers. The propeller angle decreases over time because
+a Lycoming turns clockwise seen from the cockpit and a positive rotation about
++Z reads anticlockwise from behind. At cruise RPM the blades will alias badly at
+60 fps; a blurred disc is the conventional fix and is not implemented.
+
+Coarse levels merge the control surfaces into their panels and expose only the
+propeller. The rig binds whatever it finds, so this needs no special handling.
+
 ## Adding an aircraft
 
 1. Export GLBs into `public/aircraft/<aircraft-id>/`, authored nose along +Y and
@@ -128,6 +161,9 @@ Two companion scripts are worth knowing about:
 - `render_c172_views.py` renders ten fixed orthographic views and a contact
   sheet. The camera framing is fixed rather than fitted, so successive
   iterations can be compared directly.
+- `verify_rig.py` checks an exported GLB against what the animation code
+  assumes: that every moving part is present, carries an identity rotation, and
+  has its pivot on its hinge line.
 
 Update the triangle counts in `aircraftCatalog.ts` after regenerating; they are
 shown in the UI.

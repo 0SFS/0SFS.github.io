@@ -27,6 +27,7 @@ import {
   type AircraftId,
   type AircraftLodId,
 } from "./aircraft/aircraftCatalog";
+import { applyAircraftRig, readControlSurfaceState } from "./aircraft/aircraftAnimation";
 import {
   createAircraftModel,
   type AircraftModelHandle,
@@ -415,6 +416,8 @@ export async function createFlightSimApp(
     });
 
     floatingOrigin?.apply(displayState);
+    const rig = aircraftModel?.getRig();
+    if (rig) applyAircraftRig(rig, readControlSurfaceState(jsbsim.sdk), deltaSeconds);
     flightHud.update(displayState, controls.pitchTrim);
     const now = performance.now();
     if (now - lastPanelUpdateMs >= 100) {
