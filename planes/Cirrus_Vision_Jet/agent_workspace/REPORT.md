@@ -2,13 +2,13 @@
 
 A measured reconstruction of the SF50 (G2) built to
 `docs/creating-an-aircraft-model.md`, generated procedurally from a table of
-cross-section stations. Four levels of detail, 1556 / 974 / 246 / 98 triangles,
+cross-section stations. Four levels of detail, 1376 / 922 / 246 / 98 triangles,
 wired into `AIRCRAFT_CATALOG` as `cirrus-vision-jet`.
 
 | level | triangles | vertices | objects | takes over at |
 | --- | --- | --- | --- | --- |
-| LOD0 | 1556 | 839 | 22 | 0 m |
-| LOD1 | 974 | 547 | 22 | 65 m |
+| LOD0 | 1376 | 749 | 22 | 0 m |
+| LOD1 | 922 | 521 | 22 | 65 m |
 | LOD2 | 246 | 156 | 12 | 170 m |
 | LOD3 | 98 | 74 | 1 | 340 m |
 
@@ -192,13 +192,24 @@ Other things measurement changed from the first blockout:
   on the analytic section: a vertex on the true curve would stand up to 5 cm
   proud of the flat row either side of it and put a crease down the whole
   cabin.
-- **The mesh is built as ring LINES, not as whole rings.** The panes need
-  columns, but only in one face row on each side, and a whole extra ring to
-  carry one window column is nine rows of triangles that show nothing. Only the
-  four lines bounding the two window rows carry the pane columns; the two rows
-  next to them are joined by a triangle strip, one triangle per column instead
-  of two rows' worth. That took the fuselage from 26 whole rings in the cabin
-  to 12, and LOD0 from 2344 triangles to 1552 while the windows got rounder.
+- **No ring line carries a pane column.** The fuselage is the uniform 10-point
+  ring at the measured stations and nothing else. A pane is cut into the one
+  face row that holds it, as a hole bridged to its own outline, and the ring
+  either side of that row never learns the window is there. Two earlier passes
+  did carry columns - first as whole extra rings (nine rows of triangles to
+  show one window column), then on the four lines bounding the two window rows,
+  which forced the neighbouring rows into triangle strips: one thin sliver per
+  column, about 140 of them, fanning from the window band out to the shoulder
+  and the keel and showing nothing. Both are gone. The only stations the
+  glazing adds are the windshield's two ends, where the crown rows stop being
+  glazed, and a separator wherever the measured stations do not already keep
+  two panes out of the same station gap - three rings in total.
+- **Pane vertices are placed by interpolating inside the row's own quad**, so
+  they land exactly on the ruled surface that was already there: cutting a
+  window changes nothing about the shape of the fuselage around it. Putting
+  them on the analytic section instead - which is where they mathematically
+  belong - stands them up to 5 cm proud of the flat row either side and creases
+  the whole cabin.
 - **A face's material is decided structurally, never by testing its geometry.**
   A pane's cut vertices sit exactly ON its outline, so any inside/outside test
   of them is a knife edge that sub-millimetre float noise flips - which left a
@@ -273,7 +284,7 @@ literally, and it is what let LOD3 come in under 100 triangles.
 
 | check | LOD0 | LOD1 | LOD2 | LOD3 |
 | --- | --- | --- | --- | --- |
-| triangles | 1556 | 974 | 246 | 98 |
+| triangles | 1376 | 922 | 246 | 98 |
 | length 9.357 m | 9.357 | 9.357 | 9.357 | 9.357 |
 | span 11.796 m | 11.796 | 11.796 | 11.796 | 11.796 |
 | height 3.322 m | 3.3227 | 3.3227 | 3.3219 | 3.3227 |
@@ -307,7 +318,7 @@ the report that flag correct things:
 
 `src/flight/aircraft/aircraftCatalog.ts`:
 
-- Four levels — 1556 / 974 / 246 / 98 triangles — and `autoFromMeters` of
+- Four levels — 1376 / 922 / 246 / 98 triangles — and `autoFromMeters` of
   0 / 65 / 170 / 340. Those are the Cessna's thresholds scaled by the span
   ratio, so the two airframes switch at the same apparent size.
 - `propellerBlades: 0`. It is a jet; the propeller-disc logic never engages and
@@ -425,18 +436,17 @@ Read this before treating any of it as accurate.
   wing chord plane, which is free, but a super-ellipse cannot be wide low and
   narrow high: the body ends up about 7 cm too wide at mid-height in that
   region. The plan and front outlines are right, which is the trade taken.
-- **The cabin windows are polygons of nine columns, not smooth curves.** Their
+- **The cabin windows are polygons of twelve columns, not smooth curves.** Their
   top and bottom edges follow the measured super-ellipse exactly; their fore
   and aft ends close at the station straddling the pane's tip.
 - **There is a faint shading seam at each pane's fore and aft end**, where the
   triangle strip joins a four-vertex chain to a two-vertex one.
-- **The pane columns cost one triangle each in the four rows next to the two
-  window rows** - about 140 triangles at LOD0, 9% of the level. They are the
-  long thin fans visible in `renders/WIREFRAME_lod0.png` reaching from the
-  window band to the shoulder and to the lower side, and they are the
-  structural price of a finer row inside a coarser mesh. Halving them is
-  possible - put the columns on only the lower bounding line of each window row
-  and triangulate the row as three strips instead of a grid - and is not done.
+- **Each pane's bridge fans from the few station lines around it to the many
+  vertices of its outline**, so some of those triangles are long and thin -
+  visible in `renders/WIREFRAME_lod0.png` around the aft window, whose nearest
+  station aft is 0.4 m away. The count is minimal (outer loop plus inner loop);
+  only their shape is uneven. Evening them out means a station closer to each
+  pane, which costs a whole ring to save nothing.
 - **LOD2 and LOD3 keep a plain glazed band**, not shaped panes: at 170 m and
   beyond the whole aircraft is a few tens of pixels.
 - **No panel lines, antennas, deice boots, door outline, exhaust, static ports

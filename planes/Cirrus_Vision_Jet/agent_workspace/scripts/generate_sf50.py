@@ -215,8 +215,12 @@ WINDSHIELD_CUTS = {
 # Fractions of the pane half-length to put a station at. The +/-1.0 pair sits
 # just outside the pane and closes it off; the rest sample its outline.
 PANE_COLUMN_FRACTIONS = {
-    'fine': (1.0, 0.97, 0.85, 0.60, 0.0, -0.60, -0.85, -0.97, -1.0),
-    'coarse': (1.0, 0.80, 0.0, -0.80, -1.0),
+    # The pane's outline is sampled at these fractions of its half-length.
+    # They no longer cost a fuselage station, only two vertices each, so the
+    # count is free to follow how round the window needs to look.
+    'fine': (0.99, 0.94, 0.84, 0.68, 0.45, 0.16, -0.16, -0.45, -0.68, -0.84,
+             -0.94, -0.99),
+    'coarse': (0.97, 0.80, 0.45, 0.0, -0.45, -0.80, -0.97),
 }
 
 
@@ -507,6 +511,14 @@ def interpolate_station(y, base):
     return None
 
 
+def pane_spans():
+    """Every glazed region as (fore y, aft y), fore first."""
+    out = [(WINDSHIELD_Y[1], WINDSHIELD_Y[0])]
+    for yc, a, _zc, _b, _n in CABIN_WINDOWS:
+        out.append((yc + a, yc - a))
+    return sorted(out, key=lambda p: -p[0])
+
+
 def fuselage_stations():
     if LOD == 3:
         base = [s for s in STATIONS if s[0] in LOD3_STATIONS]
@@ -516,15 +528,24 @@ def fuselage_stations():
         base = [s for s in STATIONS if s[7] <= P["st_level"]]
     if not P["panes"]:
         return base
-    # Only the windshield's two ends need to be whole rings: they are where the
-    # crown rows stop being glazed, so that material boundary has to fall on a
-    # station. Every other pane column is inserted into the window row alone -
-    # a whole ring to carry one window column is nine rows of triangles that
-    # show nothing.
-    ends = [interpolate_station(y, base) for y in WINDSHIELD_Y]
-    ends = [e for e in ends
-            if e is not None and all(abs(e[0] - b[0]) > 0.02 for b in base)]
-    return sorted(base + ends, key=lambda s: -s[0])
+
+    # Each pane is cut into the window row as a hole bounded by the stations
+    # either side of it, so two panes must never reach into the same station
+    # gap. The windshield's ends are stations because that is where the crown
+    # rows stop being glazed; the rest are separators, added only where the
+    # measured stations do not already keep two panes apart.
+    wanted = list(WINDSHIELD_Y)
+    spans = pane_spans()
+    for (_f0, a0), (f1, _a1) in zip(spans, spans[1:]):
+        if not any(f1 < st[0] < a0 for st in base):
+            wanted.append((a0 + f1) / 2.0)
+    extra = []
+    for y in wanted:
+        if all(abs(y - st[0]) > 0.02 for st in base + extra):
+            st = interpolate_station(y, base)
+            if st:
+                extra.append(st)
+    return sorted(base + extra, key=lambda s: -s[0])
 
 
 def build_fuselage():
@@ -534,30 +555,31 @@ def build_fuselage():
     overlay shell, so nothing is duplicated and nothing is permanently hidden
     underneath.  One extra submesh.
 
-    The mesh is built as ring LINES rather than as whole rings, because the
-    panes only need resolution in one face row on each side and a whole extra
-    ring to carry one window column is nine rows of triangles that show
-    nothing. Only the four lines bounding the two window rows carry the pane
-    columns; the rows next to them are joined by a triangle strip, which costs
-    one triangle per column instead of two rows' worth. Everything outside the
-    cabin is exactly the mesh it was before there were any windows.
+    **No ring line carries a pane column.** The whole fuselage is the uniform
+    ring at the measured stations and nothing else; a pane is cut into the one
+    face row that holds it, as a hole with its own outline, and the ring either
+    side of that row never learns the window is there. Earlier passes put a
+    column on the four lines bounding the two window rows, which forced the
+    rows next to them into triangle strips - one thin sliver per column, 140 of
+    them, fanning from the window band out to the shoulder and the keel and
+    showing nothing.
 
-    Pane vertices go on the CHORD between the ring vertices either side of
-    them, never on the analytic section: a vertex on the true curve would stand
-    up to 5 cm proud of the flat row either side of it and put a crease down
-    the whole cabin.
+    Pane vertices are placed by interpolating inside the row's own quad, so
+    they sit exactly on the surface that was already there: cutting a window
+    changes nothing about the shape of the fuselage around it.
     """
     n = P["ring"]
     spec = RING_SPEC[n]
     sts = fuselage_stations()
     rings = [section(*st[:7], n) for st in sts]
+    ys = [st[0] for st in sts]
 
     verts = []
     for r in rings:
         verts.extend(r)
     faces, fmats = [], []
     glazed_n = 0
-    cuts_made = 0
+    panes_cut = 0
 
     def add(v):
         verts.append(v)
@@ -566,7 +588,6 @@ def build_fuselage():
     def lerp3(a, b, t):
         return tuple(a[c] + (b[c] - a[c]) * t for c in range(3))
 
-    band_rows = set(spec["window"]) | set(spec["crown"])
     WS_LO, WS_HI = WINDSHIELD_Y
 
     def in_ws(y):
@@ -575,9 +596,9 @@ def build_fuselage():
     def emit(idx, glass):
         """One face, with its material decided structurally.
 
-        Never by testing the geometry: a pane's own cut vertices sit exactly ON
-        its outline, so any inside/outside test of them is a knife edge that
-        sub-millimetre float noise flips. That is what left a glazed sliver
+        Never by testing the geometry: a pane's own outline vertices sit
+        exactly ON it, so any inside/outside test of them is a knife edge that
+        sub-millimetre float noise flips - which once left a glazed sliver
         spiking the full height of the row off each end of a cabin window.
         """
         faces.append(list(idx))
@@ -585,129 +606,116 @@ def build_fuselage():
         nonlocal glazed_n
         glazed_n += 1 if glass else 0
 
-    def coarse_glass(cy, j):
-        """Plain band, for the levels too coarse to resolve a pane shape."""
-        return (CABIN_Y[0] <= cy <= CABIN_Y[1] and j in spec["window"]) or \
-            (in_ws(cy) and j in band_rows)
+    def gap_of(y):
+        for i in range(len(ys) - 1):
+            if ys[i + 1] - 1e-9 <= y <= ys[i] + 1e-9:
+                return i
+        return None
 
-    # ---- ring lines ---------------------------------------------------------
-    window_rows = set(spec["window"])
-    edge_lines = set()
-    for j in window_rows:
-        edge_lines.add(j)
-        edge_lines.add((j + 1) % n)
-    cols = sorted(set(PANE_EDGE_YS), reverse=True) if P["panes"] else []
+    def row_point(y, z, j):
+        """A point at station y and height z on face row j's own surface.
 
-    lines = []
-    for j in range(n):
-        pts = [(sts[i][0], i * n + j) for i in range(len(sts))]
-        if j in edge_lines and cols:
-            out = []
-            for i in range(len(sts) - 1):
-                out.append(pts[i])
-                y0, y1 = sts[i][0], sts[i + 1][0]
-                for y in cols:
-                    if y1 + 1e-6 < y < y0 - 1e-6:
-                        t = (y0 - y) / (y0 - y1)
-                        out.append((y, add(lerp3(rings[i][j], rings[i + 1][j], t))))
-                        cuts_made += 1
-            out.append(pts[-1])
-            pts = out
-        lines.append(pts)
+        Bilinear inside the row's quad, so the point lies on the ruled surface
+        the fuselage already had. Putting it on the analytic section instead
+        would stand it proud of the flat row either side and crease the cabin.
+        """
+        k = (j + 1) % n
+        i = gap_of(y)
+        span = ys[i] - ys[i + 1]
+        t = 0.0 if abs(span) < 1e-12 else (ys[i] - y) / span
+        lo = lerp3(rings[i][j], rings[i + 1][j], t)
+        hi = lerp3(rings[i][k], rings[i + 1][k], t)
+        dz = hi[2] - lo[2]
+        f = 0.0 if abs(dz) < 1e-9 else (z - lo[2]) / dz
+        return lerp3(lo, hi, min(max(f, 0.0), 1.0))
 
-    # ---- face rows ----------------------------------------------------------
+    def bridge_loops(outer, inner):
+        """Tile the ring between two closed loops that wind the same way."""
+        no, ni = len(outer), len(inner)
+        p = q = 0
+        while p < no or q < ni:
+            if q >= ni or (p < no and (p + 1) / no <= (q + 1) / ni):
+                emit((outer[p % no], outer[(p + 1) % no], inner[q % ni]), False)
+                p += 1
+            else:
+                emit((outer[p % no], inner[(q + 1) % ni], inner[q % ni]), False)
+                q += 1
+
+    consumed = {j: set() for j in spec["window"]}
+
+    def cut_cabin_pane(j, yc, a, zc, b, ex):
+        """A cabin window: a hole in the row, bridged to its own outline."""
+        nonlocal panes_cut
+        k = (j + 1) % n
+        block = [i for i in range(len(ys))
+                 if ys[i] >= yc - a - 1e-9 and ys[i] <= yc + a + 1e-9]
+        ia = max([i for i in range(len(ys)) if ys[i] >= yc + a - 1e-9] or [0])
+        ib = min([i for i in range(len(ys)) if ys[i] <= yc - a + 1e-9]
+                 or [len(ys) - 1])
+        if ib <= ia:
+            return
+        for g in range(ia, ib):
+            consumed[j].add(g)
+        outer = [i * n + j for i in range(ia, ib + 1)] + \
+                [i * n + k for i in range(ib, ia - 1, -1)]
+
+        cols = [yc + a * f for f in PANE_COLUMN_FRACTIONS[P["pane_detail"]]]
+        lo_edge, hi_edge = [], []
+        for y in cols:
+            t = 1.0 - abs((y - yc) / a) ** ex
+            h = b * (t ** (1.0 / ex)) if t > 0.0 else 0.0
+            lo_edge.append(add(row_point(y, zc - h, j)))
+            hi_edge.append(add(row_point(y, zc + h, j)))
+
+        # the loops must wind the same way, so start on whichever pane edge
+        # faces line j
+        near, far = (lo_edge, hi_edge) if rings[ia][j][2] < rings[ia][k][2] \
+            else (hi_edge, lo_edge)
+        bridge_loops(outer, near + far[::-1])
+        for c in range(len(cols) - 1):
+            emit((lo_edge[c], lo_edge[c + 1], hi_edge[c + 1], hi_edge[c]), True)
+        panes_cut += 1
+
+    def cut_windshield(j):
+        """The windshield has no upper edge - it wraps over the crown - so its
+        row is simply split along the sill."""
+        nonlocal panes_cut
+        k = (j + 1) % n
+        for g in range(len(ys) - 1):
+            if not (in_ws(ys[g]) and in_ws(ys[g + 1])):
+                continue
+            consumed[j].add(g)
+            la, ha = g * n + j, g * n + k
+            lb, hb = (g + 1) * n + j, (g + 1) * n + k
+            sa = add(row_point(ys[g], sill_z(ys[g]), j))
+            sb = add(row_point(ys[g + 1], sill_z(ys[g + 1]), j))
+            j_low = rings[g][j][2] < rings[g][k][2]
+            emit((la, lb, sb, sa), not j_low)
+            emit((sa, sb, hb, ha), j_low)
+            panes_cut += 1
+
+    if P["panes"]:
+        for j in spec["window"]:
+            cut_windshield(j)
+            for (yc, a, zc, b, ex) in CABIN_WINDOWS:
+                cut_cabin_pane(j, yc, a, zc, b, ex)
+
+    # ---- everything else is the plain uniform ring ---------------------------
     for j in range(n):
         k = (j + 1) % n
-        A, B = lines[j], lines[k]
+        for g in range(len(ys) - 1):
+            if j in consumed and g in consumed[j]:
+                continue
+            mid = (ys[g] + ys[g + 1]) / 2.0
+            a, b2 = g * n, (g + 1) * n
 
-        if j in window_rows and P["panes"]:
-            # the two bounding lines carry the same columns, so this row is a
-            # plain grid again - with the pane's own edges cut into each column
-            def chain(p):
-                """Vertices across the row at column p, and which gap is glass.
-
-                Two cuts is a cabin window - the glass is between them. One cut
-                is the windshield sill, and the glass is whichever side of it
-                is higher, which depends on which way round the ring this row
-                runs.
-                """
-                lo, hi = verts[A[p][1]], verts[B[p][1]]
-                out = [A[p][1]]
-                cut = pane_cuts(A[p][0])
-                zs = []
-                if cut:
-                    zs = [z for z in cut
-                          if min(lo[2], hi[2]) < z < max(lo[2], hi[2])]
-                    zs.sort(reverse=lo[2] > hi[2])
-                    for z in zs:
-                        t = (z - lo[2]) / (hi[2] - lo[2])
-                        out.append(add(lerp3(lo, hi, min(max(t, 0.0), 1.0))))
-                out.append(B[p][1])
-                if len(zs) == 2:
-                    gap = 1
-                elif len(zs) == 1:
-                    gap = 1 if lo[2] < hi[2] else 0
-                else:
-                    gap = None
-                return out, gap
-
-            for p in range(len(A) - 1):
-                (ca, ga), (cb, gb) = chain(p), chain(p + 1)
-                if not P["panes"]:
-                    emit((ca[0], ca[1], cb[1], cb[0]),
-                         coarse_glass((A[p][0] + A[p + 1][0]) / 2.0, j))
-                    continue
-                if len(ca) == len(cb) and ga is not None and ga == gb:
-                    # both columns are inside the same pane: a strip of
-                    # sub-rows, exactly one of which is the glass
-                    for t in range(len(ca) - 1):
-                        emit((ca[t], ca[t + 1], cb[t + 1], cb[t]), t == ga)
-                    continue
-                if len(ca) == 2 and len(cb) == 2:
-                    emit((ca[0], ca[1], cb[1], cb[0]), False)
-                    continue
-                # a pane's fore or aft end: the closing triangles are paint
-                u = v = 0
-                while u < len(ca) - 1 or v < len(cb) - 1:
-                    take = v == len(cb) - 1 or (
-                        u < len(ca) - 1
-                        and (u + 1) / (len(ca) - 1) <= (v + 1) / (len(cb) - 1))
-                    emit((ca[u], ca[u + 1], cb[v]) if take
-                         else (ca[u], cb[v + 1], cb[v]), False)
-                    if take:
-                        u += 1
-                    else:
-                        v += 1
-            continue
-
-        if len(A) != len(B):
-            # one bounding line carries pane columns and the other does not:
-            # a triangle strip, one extra triangle per column
-            u = v = 0
-            while u < len(A) - 1 or v < len(B) - 1:
-                take = v == len(B) - 1 or (u < len(A) - 1
-                                           and A[u + 1][0] >= B[v + 1][0])
-                idx = (A[u][1], A[u + 1][1], B[v][1]) if take \
-                    else (A[u][1], B[v + 1][1], B[v][1])
-                ys = [A[u][0], A[u + 1][0] if take else B[v + 1][0], B[v][0]]
-                g = j in spec["crown"] and all(in_ws(y) for y in ys) \
-                    if P["panes"] else coarse_glass(sum(ys) / 3.0, j)
-                emit(idx, P["glass"] and g)
-                if take:
-                    u += 1
-                else:
-                    v += 1
-            continue
-
-        for p in range(len(A) - 1):
-            mid = (A[p][0] + A[p + 1][0]) / 2.0
             # The windshield's centre post: the ring has no vertex at top dead
             # centre by design, so the post is cut into the one row that
             # straddles it, glass | 62 mm paint | glass.
             if j == spec["top"] and P["glass"] and P["pillars"] \
-                    and in_ws(A[p][0]) and in_ws(A[p + 1][0]):
-                p0, p1 = verts[A[p][1]], verts[B[p][1]]
-                q0, q1 = verts[A[p + 1][1]], verts[B[p + 1][1]]
+                    and in_ws(ys[g]) and in_ws(ys[g + 1]):
+                p0, p1 = rings[g][j], rings[g][k]
+                q0, q1 = rings[g + 1][j], rings[g + 1][k]
 
                 def half(u, v):
                     dx = abs(u[0] - v[0])
@@ -718,21 +726,26 @@ def build_fuselage():
                 ia2 = add(lerp3(p0, p1, 0.5 + f0))
                 ib = add(lerp3(q0, q1, 0.5 - f1))
                 ib2 = add(lerp3(q0, q1, 0.5 + f1))
-                faces.append([A[p][1], ia, ib, A[p + 1][1]]); fmats.append(1)
-                faces.append([ia, ia2, ib2, ib]); fmats.append(0)
-                faces.append([ia2, B[p][1], B[p + 1][1], ib2]); fmats.append(1)
-                glazed_n += 2
-                cuts_made += 1
+                emit((a + j, ia, ib, b2 + j), True)
+                emit((ia, ia2, ib2, ib), False)
+                emit((ia2, a + k, b2 + k, ib2), True)
                 continue
-            g = j in spec["crown"] and in_ws(A[p][0]) and in_ws(A[p + 1][0]) \
-                if P["panes"] else coarse_glass(mid, j)
-            emit((A[p][1], B[p][1], B[p + 1][1], A[p + 1][1]), P["glass"] and g)
+
+            if not P["glass"]:
+                glass = False
+            elif P["panes"]:
+                glass = j in spec["crown"] and in_ws(ys[g]) and in_ws(ys[g + 1])
+            else:
+                # too coarse to resolve a pane shape: a plain band instead
+                glass = (CABIN_Y[0] <= mid <= CABIN_Y[1] and j in spec["window"]) \
+                    or (in_ws(mid) and j in set(spec["window"]) | set(spec["crown"]))
+            emit((a + j, a + k, b2 + k, b2 + j), glass)
 
     faces.append(list(range(n - 1, -1, -1))); fmats.append(0)
     faces.append([(len(rings) - 1) * n + j for j in range(n)]); fmats.append(0)
 
     print(f"###FUSELAGE### stations={len(sts)} ring={n} glazed_faces={glazed_n} "
-          f"cuts={cuts_made} (0 duplicated, 0 occluded)")
+          f"panes={panes_cut} (0 duplicated, 0 occluded)")
     return make("Fuselage", verts, faces, M_PAINT,
                 extra_mats=[M_GLASS], face_mats=fmats)
 

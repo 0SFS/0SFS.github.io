@@ -49,8 +49,8 @@ export interface AircraftDefinition {
 }
 
 const CIRRUS_LODS: readonly AircraftLodDefinition[] = [
-  { id: "lod0", label: "LOD0 — near", triangles: 1556, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD0.glb", autoFromMeters: 0 },
-  { id: "lod1", label: "LOD1 — medium", triangles: 974, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD1.glb", autoFromMeters: 65 },
+  { id: "lod0", label: "LOD0 — near", triangles: 1376, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD0.glb", autoFromMeters: 0 },
+  { id: "lod1", label: "LOD1 — medium", triangles: 922, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD1.glb", autoFromMeters: 65 },
   { id: "lod2", label: "LOD2 — far", triangles: 246, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD2.glb", autoFromMeters: 170 },
   { id: "lod3", label: "LOD3 — silhouette", triangles: 98, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD3.glb", autoFromMeters: 340 },
 ];
