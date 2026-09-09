@@ -1,0 +1,11 @@
+.phone-pairing { color: #edf4ff; background: #132033; border: 1px solid #415773; border-radius: 18px; padding: 24px; width: min(440px, calc(100vw - 48px)); max-height: 85dvh; overflow: auto; font: 15px/1.5 system-ui, sans-serif; box-shadow: 0 20px 80px #0008; }
+.phone-pairing::backdrop { background: #020914aa; }
+.phone-pairing header { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.phone-pairing h2 { font-size: 22px; margin: 0; }
+.phone-pairing canvas { display: block; max-width: 100%; height: auto; margin: 18px auto; border-radius: 8px; }
+.phone-pairing [hidden] { display: none; }
+.phone-pairing button { color: inherit; background: #243954; border: 1px solid #6683a3; border-radius: 8px; padding: 10px 14px; font: inherit; cursor: pointer; }
+.phone-pairing button:focus-visible { outline: 3px solid #79d9ff; outline-offset: 3px; }
+.phone-pairing button:disabled { opacity: .5; cursor: wait; }
+.phone-pairing__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.phone-pairing [data-expiry], .phone-pairing [data-feedback] { color: #b5d8f7; }

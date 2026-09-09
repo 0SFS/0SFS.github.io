@@ -47,6 +47,9 @@ import { createFlightHudBar, type FlightHudBarHandle } from "./hud/createFlightH
 import { createFlightStatusOverlay, type FlightStatusOverlayHandle } from "./hud/createFlightStatusOverlay";
 import type { FlightStatusOverlayState } from "./hud/FlightStatusOverlay";
 import { attachFlightCameraInput } from "./input/flightCameraInput";
+import { applyFlightControls } from "./input/applyFlightControls";
+import type { PhoneControlSession } from "./remote/createPhoneControlSession";
+import type { PhonePairingDialog } from "./hud/createPhonePairingDialog";
 import { createFlightInputManager } from "./input/flightInputManager";
 import { createJsbsimRuntime } from "./jsbsim/createJsbsimRuntime";
 import { createFixedStepPhysicsLoop } from "./physics/fixedStepLoop";
@@ -156,7 +159,15 @@ export async function createFlightSimApp(
     },
   });
 
-  const inputManager = createFlightInputManager({ onPausedChange: (paused) => syncSimulationPaused(paused) });
+  let phoneSession: PhoneControlSession | null = null;
+  let phoneDialog: PhonePairingDialog | null = null;
+  let phoneLoading: Promise<void> | null = null;
+  let detachPhoneStatus: (() => void) | null = null;
+  const inputManager = createFlightInputManager({
+    onPausedChange: (paused) => syncSimulationPaused(paused),
+    onLocalInput: () => phoneSession?.takeControl(),
+  });
+  let appliedControls = inputManager.getControls();
   const detachInput = inputManager.attach(window);
   const physicsLoop = createFixedStepPhysicsLoop(jsbsim.sdk);
   const terrainContact = createTerrainContact(jsbsim.sdk, runtime.surface);
@@ -245,6 +256,7 @@ export async function createFlightSimApp(
     if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
     event.preventDefault();
     toggleCameraView();
+    phoneSession?.syncStatus();
   };
 
   window.addEventListener("keydown", onViewKeyDown);
@@ -286,12 +298,14 @@ export async function createFlightSimApp(
       terrainContact.reset();
       visibleMeshCollision.reset();
     }
+    phoneSession?.cancelHandoff();
     physicsLoop.setPaused(paused);
     runtime.setSimRunning(!paused);
     skipResumeDelta = !paused;
     const state = physicsLoop.getLatestState() ?? initialState;
     controlPanel?.update(createPanelSnapshot(state));
     hudBar?.update(state, runtime.status, paused ? null : measuredFps, paused);
+    phoneSession?.syncStatus();
   };
   const setSimulationPaused = (paused: boolean): void => inputManager.setPaused(paused);
 
@@ -306,6 +320,8 @@ export async function createFlightSimApp(
 
   const teleportToLocation = (location: GeodeticLocation): void => {
     if (disposed) return;
+    phoneSession?.reset();
+    inputManager.adoptControls(inputManager.getControls());
     const ground = runtime.status.mode === "raster-basemap" ? runtime.surface.sample(location.latDeg, location.lonDeg)?.heightMeters : undefined;
     const state = resetFlightLocation(jsbsim.sdk, location, ground);
     terrainContact.reset();
@@ -314,6 +330,8 @@ export async function createFlightSimApp(
       inputManager.resetControls(location.flightPreset.mode === "departure" ? 0 : 0.35);
       if (location.flightPreset.mode === "departure") setSimulationPaused(true);
     }
+    appliedControls = inputManager.getControls();
+    phoneSession?.syncStatus();
     physicsLoop.reset();
     skipResumeDelta = true;
     applyWeather(weather);
@@ -326,11 +344,53 @@ export async function createFlightSimApp(
       zoomMeters: zoomMetersFromAltitude(state.altMeters),
       headingDeg: state.headingRad * 180 / Math.PI,
     });
-    flightHud.update(state, inputManager.poll(0).pitchTrim);
+    flightHud.update(state, inputManager.getControls().pitchTrim);
     controlPanel?.update(createPanelSnapshot(state));
     hudBar?.update(state, runtime.status, measuredFps, inputManager.isPaused());
     runtime.requestRender();
   };
+
+  const openPhoneController = (): void => {
+    if (phoneDialog) { phoneDialog.open(); return; }
+    if (phoneLoading) return;
+    hudBar?.setPhoneStatus?.("Connecting phone…");
+    phoneLoading = Promise.all([
+      import("./remote/createPhoneControlSession"), import("./hud/createPhonePairingDialog"),
+    ]).then(([{ createPhoneControlSession }, { createPhonePairingDialog }]) => {
+      if (disposed) return;
+      phoneSession = createPhoneControlSession({
+        getStatus: () => {
+          const state = physicsLoop.getLatestState() ?? initialState;
+          return {
+            owner: phoneSession?.getSnapshot().owner ?? "local",
+            paused: inputManager.isPaused(), viewMode: aircraft?.getViewMode() ?? "third",
+            controls: phoneSession?.getSnapshot().owner === "phone" ? { ...appliedControls } : inputManager.getControls(),
+            airspeedKts: state.airspeedKts, altitudeFt: state.altMeters / 0.3048,
+            headingDeg: (state.headingRad * 180 / Math.PI + 360) % 360,
+          };
+        },
+        hasActiveLocalInput: () => inputManager.hasActiveFlightInput(),
+        isPageVisible: () => !document.hidden,
+        onOwnershipChange: (owner, controls) => {
+          inputManager.adoptControls(controls);
+          inputManager.setRemoteOwned(owner === "phone");
+          appliedControls = { ...controls };
+          runtime.requestRender();
+        },
+        setPaused: setSimulationPaused,
+        setViewMode: mode => { aircraft?.setViewMode(mode); runtime.requestRender(); },
+      });
+      detachPhoneStatus = phoneSession.subscribe(() => {
+        const state = phoneSession!.getSnapshot();
+        hudBar?.setPhoneStatus?.(state.owner === "phone" ? "Phone controls" : state.phase === "paired" ? "Phone paired · Desktop controls" : "Phone controller");
+      });
+      phoneDialog = createPhonePairingDialog(rootElement, phoneSession);
+      phoneDialog.open();
+    }).catch(() => { if (!disposed) hudBar?.setPhoneStatus?.("Phone unavailable · Retry"); })
+      .finally(() => { phoneLoading = null; });
+  };
+  const onVisibilityChange = () => { if (document.hidden) phoneSession?.onHidden(); };
+  document.addEventListener("visibilitychange", onVisibilityChange);
 
   controlPanel = createFlightControlPanel(panelRoot, createPanelSnapshot(), {
     initialWeather: weather,
@@ -338,7 +398,7 @@ export async function createFlightSimApp(
     locationSearchProvider: options.locationSearchProvider,
     onWeatherChange: applyWeather,
     onPausedChange: setSimulationPaused,
-    onViewModeChange: (mode) => { aircraft?.setViewMode(mode); runtime.requestRender(); },
+    onViewModeChange: (mode) => { aircraft?.setViewMode(mode); phoneSession?.syncStatus(); runtime.requestRender(); },
     onAircraftChange: (nextId) => {
       aircraftId = nextId;
       writePreference(AIRCRAFT_PREFERENCE_KEY, nextId);
@@ -378,6 +438,7 @@ export async function createFlightSimApp(
       runtime.setRasterQuality(setting);
       setRasterQualityPreference(setting);
     },
+    onPhoneControlClick: openPhoneController,
     onSettingsClick: () => panelRoot.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')?.click(),
   });
   statusOverlay = createFlightStatusOverlay(statusRoot, {
@@ -446,8 +507,14 @@ export async function createFlightSimApp(
         terrainBlocked = true;
         return false;
       }
-      if (visibleMeshCollision.update()) return "reset";
-      inputManager.apply(jsbsim.sdk, controls);
+      const collisionReset = visibleMeshCollision.update();
+      // Terrain/collision work can consume the remaining input lease. Check
+      // authority immediately before allowing this step to advance physics.
+      const selected = phoneSession?.beforeStep(controls) ?? controls;
+      if (selected === false || inputManager.isPaused()) return false;
+      if (collisionReset) return "reset";
+      applyFlightControls(jsbsim.sdk, selected);
+      appliedControls = { ...selected };
       return contact;
     });
 
@@ -493,7 +560,7 @@ export async function createFlightSimApp(
     floatingOrigin?.apply(displayState);
     const rig = aircraftModel?.getRig();
     if (rig) applyAircraftRig(rig, readControlSurfaceState(jsbsim.sdk), deltaSeconds);
-    flightHud.update(displayState, controls.pitchTrim);
+    flightHud.update(displayState, phoneSession?.getSnapshot().owner === "phone" ? appliedControls.pitchTrim : controls.pitchTrim);
     const now = performance.now();
     if (now - lastPanelUpdateMs >= 100) {
       lastPanelUpdateMs = now;
@@ -507,6 +574,10 @@ export async function createFlightSimApp(
     destroy(): void {
       if (disposed) return;
       disposed = true;
+      detachPhoneStatus?.();
+      phoneDialog?.destroy();
+      phoneSession?.destroy();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       runtime.setSimTick(null);
       window.removeEventListener("keydown", onViewKeyDown);
       detachCameraInput();

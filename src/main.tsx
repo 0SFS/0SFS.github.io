@@ -4,6 +4,12 @@ function isFlightMode(): boolean {
 }
 
 async function bootApp(rootElement: HTMLElement): Promise<void> {
+  if (new URLSearchParams(window.location.search).get("mode") === "remote") {
+    const { createPhoneControllerApp } = await import("./remote/createPhoneControllerApp");
+    await createPhoneControllerApp(rootElement);
+    return;
+  }
+
   if (isFlightMode()) {
     const { createFlightSimApp } = await import("./flight/createFlightSimApp");
     await createFlightSimApp(rootElement);

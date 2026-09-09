@@ -21,9 +21,11 @@ export interface FlightHudBarOptions {
   onTerrainSourceChange(sourceId: string): void;
   onQualityChange(setting: RasterQualitySetting): void;
   onSettingsClick(): void;
+  onPhoneControlClick?(): void;
 }
 
 export interface FlightHudBarHandle {
+  setPhoneStatus?(text: string): void;
   update(state: FlightState, status: BabylonRuntimeStatus, fps: number | null, paused: boolean): void;
   destroy(): void;
 }
@@ -49,6 +51,7 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
   const hudBar: HudBarHandle = createHudBar(container, {
     ariaLabel: "Flight simulator controls",
     items: [
+      { kind: "button", id: "flightPhoneButton", title: "Connect a phone controller", ariaLabel: "Phone controller", appearance: "chip", text: "Phone controller" },
       { kind: "button", id: "flightPauseButton", title: "Pause simulation", ariaLabel: "Pause simulation", className: "flight-shell-pause-button", text: "Ⅱ" },
       {
         kind: "menu",
@@ -110,6 +113,9 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     ],
   });
 
+  const phoneButton = hudBar.getElement<HTMLButtonElement>("flightPhoneButton");
+  const onPhoneClick = () => options.onPhoneControlClick?.();
+  phoneButton?.addEventListener("click", onPhoneClick);
   const pauseButton = hudBar.getElement<HTMLButtonElement>("flightPauseButton");
   const rendererButton = hudBar.getElement<HTMLButtonElement>("flightRendererButton");
   const rendererMenu = hudBar.getElement("flightRendererMenu");
@@ -266,6 +272,7 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
   updateTerrainState(options.runtimeStatus);
 
   return {
+    setPhoneStatus(text) { if (phoneButton) phoneButton.textContent = text; },
     update(state, runtimeStatus, fps, nextPaused): void {
       updatePauseState(nextPaused);
       updateMapState(runtimeStatus);
@@ -275,6 +282,7 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
       statusElement.textContent = `${Math.abs(state.latDeg).toFixed(4)}°${state.latDeg >= 0 ? "N" : "S"} ${Math.abs(state.lonDeg).toFixed(4)}°${state.lonDeg >= 0 ? "E" : "W"} h${heading}°`;
     },
     destroy(): void {
+      phoneButton?.removeEventListener("click", onPhoneClick);
       pauseButton.removeEventListener("click", onPauseClick);
       rendererButton.removeEventListener("click", onRendererClick);
       rendererMenu.removeEventListener("click", onRendererMenuClick);
