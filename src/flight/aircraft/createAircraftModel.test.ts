@@ -59,7 +59,7 @@ describe("aircraft model loader", () => {
     const yaw = model.root.rotationQuaternion!.toEulerAngles().y;
     expect(Math.abs(Math.sin(yaw))).toBeCloseTo(0, 6);
     expect(Math.cos(yaw)).toBeCloseTo(-1, 6);
-    expect(model.root.position.y).toBeCloseTo(-1.65, 6);
+    expect(model.root.position.y).toBeCloseTo(-1.33, 6);
 
     model.dispose();
     t.teardown();

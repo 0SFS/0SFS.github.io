@@ -45,6 +45,18 @@ const MAX_BELIEVABLE_STEP_METERS = 1000;
  */
 const SURFACE_REQUIRED_AGL_METERS = 500;
 
+/**
+ * Consecutive missing samples before the aircraft counts as having flown
+ * somewhere it could not see.
+ *
+ * Google publishes only what is currently drawn, so single-frame misses happen
+ * constantly, including while taxiing. Treating one of those as a blind
+ * stretch made every miss on the ground end in a reposition: the aircraft sank
+ * onto its springs and was teleported back up, over and over. Half a second at
+ * 120 Hz is a real gap; one frame is not.
+ */
+const BLIND_STEPS = 60;
+
 export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
   let previous: { lat: number; lon: number; height: number; revision: number; clearance: number; resting: boolean } | null = null;
   let placement = true;
@@ -54,9 +66,9 @@ export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
   // allowed only well clear of the ground. The first sample after that is
   // trusted the way a fresh placement is, because the aircraft may have flown
   // over a hill it could not see.
-  let blind = false;
+  let blindSteps = 0;
   return {
-    reset() { previous = null; placement = true; hasReference = false; rejectedSamples = 0; blind = false; },
+    reset() { previous = null; placement = true; hasReference = false; rejectedSamples = 0; blindSteps = 0; },
     update(blockOnMissingSurface = true): boolean | "reset" {
       const lat = sdk.getPropertyValue("position/lat-geod-deg"), lon = sdk.getPropertyValue("position/long-gc-deg");
       const hit = surface.sample(lat, lon);
@@ -65,13 +77,13 @@ export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
         const aboveGround = sdk.getPropertyValue("position/h-sl-ft") * 0.3048 - knownGround;
         if (Number.isFinite(aboveGround) && aboveGround > SURFACE_REQUIRED_AGL_METERS) {
           // Nothing the gear can reach; the surface is irrelevant this frame.
-          if (!blind) {
+          if (blindSteps === BLIND_STEPS) {
             flightLog.info("terrain", "Flying without a measured surface", {
               aboveGroundMeters: Number(aboveGround.toFixed(0)),
               knownGroundMeters: Number(knownGround.toFixed(2)),
             });
           }
-          blind = true;
+          blindSteps += 1;
           return true;
         }
         // Google only exposes currently visible photogrammetry, so a transient
@@ -86,7 +98,7 @@ export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
         // and the gear model resolves the accumulated penetration explosively
         // the moment real terrain arrives.
         if (!hasReference) return false;
-        blind = true;
+        blindSteps += 1;
         return !blockOnMissingSurface;
       }
       if (!hasReference) {
@@ -134,7 +146,7 @@ export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
         rejectedSamples += 1;
         // Keep the previous terrain elevation rather than adopting this one.
         // The aircraft is flying on a height it can no longer confirm.
-        blind = true;
+        blindSteps += 1;
         return !blockOnMissingSurface;
       }
       if (rejectedSamples > 0) {
@@ -146,10 +158,15 @@ export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
       // view of the surface is deep below it too, and lifting it out would fly
       // it through terrain. Only a world that changed under a level aircraft,
       // or one the aircraft could not see, is repaired here.
-      const cause = ((placement || blind) && altitude < support) ? (placement ? "placement" : "surface regained below the aircraft")
-        : liftedThroughPlane ? "surface lifted through the aircraft"
-          : followGround ? "resting aircraft followed the ground" : null;
-      blind = false;
+      // Regaining the surface only repairs a real penetration of the ground
+      // itself, not the centimetres of oleo travel that separate a settled
+      // aircraft from its nominal stance.
+      const regained = blindSteps >= BLIND_STEPS && altitude < hit.heightMeters;
+      const cause = (placement && altitude < support) ? "placement"
+        : regained ? "surface regained above the aircraft"
+          : liftedThroughPlane ? "surface lifted through the aircraft"
+            : followGround ? "resting aircraft followed the ground" : null;
+      blindSteps = 0;
       if (cause) {
         const movedMeters = penetration;
         if (Math.abs(movedMeters) > 1) {

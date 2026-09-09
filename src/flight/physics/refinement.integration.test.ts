@@ -69,12 +69,12 @@ describe("terrain refinement physics regressions", () => {
     expect(readFlightState(sdk).altMeters).toBeCloseTo(400, 3);
   });
   it("follows a downward refinement when resting on the surface", async () => {
-    const sdk = await setup(301.65); sdk.setPropertyValue("ic/vc-kts", 0); sdk.runIc();
+    const sdk = await setup(301.33); sdk.setPropertyValue("ic/vc-kts", 0); sdk.runIc();
     let height = 300, revision = 0;
     const contact = createTerrainContact(sdk, surfaceAt(() => height, () => revision));
     contact.update(); height = 200; revision++;
     expect(contact.update()).toBe("reset");
-    expect(readFlightState(sdk).altMeters).toBeCloseTo(201.65, 2);
+    expect(readFlightState(sdk).altMeters).toBeCloseTo(201.33, 2);
   });
   it("setting altitude to 500 discards a stale 1500m floor before RunIC", async () => {
     const sdk = await setup(2000, 1500);

@@ -33,9 +33,10 @@ export interface AircraftDefinition {
   modelYawRad: number;
   /**
    * Model offset in body axes. The sim keeps the aircraft reference point
-   * `aircraftClearanceMeters()` above the terrain (1.65 m level), while the
-   * exported models put their origin on the ground between the wheels, so the
-   * visual is dropped by that clearance to stand on the runway.
+   * `aircraftClearanceMeters()` above the terrain - 1.33 m level, the stance
+   * the c172p gear actually settles at - while the exported models put their
+   * origin on the ground between the wheels, so the visual is dropped by that
+   * stance to stand on the runway rather than sunk into it.
    */
   modelOffset: { x: number; y: number; z: number };
   /**
@@ -60,7 +61,7 @@ export const AIRCRAFT_CATALOG: readonly AircraftDefinition[] = [
     label: "Cessna 172 Skyhawk",
     summary: "High-wing trainer. Flight model and visuals both available.",
     modelYawRad: Math.PI,
-    modelOffset: { x: 0, y: -1.65, z: 0 },
+    modelOffset: { x: 0, y: -1.33, z: 0 },
     propellerBlades: 2,
     lods: C172_LODS,
   },
@@ -71,7 +72,7 @@ export const AIRCRAFT_CATALOG: readonly AircraftDefinition[] = [
     // still the C172's, so selecting it only swaps the visual placeholder.
     summary: "No model built yet — falls back to the block placeholder.",
     modelYawRad: Math.PI,
-    modelOffset: { x: 0, y: -1.65, z: 0 },
+    modelOffset: { x: 0, y: -1.33, z: 0 },
     propellerBlades: 0,
     lods: [],
   },

@@ -159,7 +159,7 @@ describe("displayed terrain contact", () => {
     // must not hold the simulation up here.
     properties["position/h-sl-ft"] = 10_000;
     hit = null;
-    expect(contact.update(true)).toBe(true);
+    for (let step = 0; step < 120; step += 1) expect(contact.update(true)).toBe(true);
 
     // Descending back into gear range without a surface restores the hold.
     properties["position/h-sl-ft"] = 400 / 0.3048;
@@ -171,6 +171,34 @@ describe("displayed terrain contact", () => {
     properties["position/h-sl-ft"] = 200 / 0.3048;
     hit = { heightMeters: 260, revision: 2 } as SurfaceHit;
     expect(contact.update(true)).toBe("reset");
-    expect(sdk.setPropertyValue).toHaveBeenCalledWith("ic/h-sl-ft", expect.closeTo(261.65 / 0.3048, 1));
+    expect(sdk.setPropertyValue).toHaveBeenCalledWith("ic/h-sl-ft", expect.closeTo(261.33 / 0.3048, 1));
+  });
+
+  it("does not reposition a parked aircraft when single frames of surface go missing", () => {
+    // Google publishes only what is currently drawn, so misses come and go
+    // while taxiing. Treating one as a blind stretch teleported the aircraft
+    // off its own springs every time - sinking, then popping back up.
+    const properties: Record<string, number> = {
+      "position/lat-geod-deg": 44.98, "position/long-gc-deg": -93.27,
+      "position/h-sl-ft": 251.33 / 0.3048,
+    };
+    const sdk = {
+      getPropertyValue: vi.fn((property: string) => properties[property] ?? 0),
+      setPropertyValue: vi.fn((property: string, value: number) => { properties[property] = value; }),
+      resetToInitialConditions: vi.fn(),
+      runIc: vi.fn(() => true),
+    } as unknown as JSBSimSdk;
+    let hit: SurfaceHit | null = { heightMeters: 250, revision: 1 } as SurfaceHit;
+    const surface: SurfaceQuery = { raycast: () => null, sample: () => hit };
+    const contact = createTerrainContact(sdk, surface);
+    expect(contact.update(false)).toBe(true);
+
+    for (let step = 0; step < 200; step += 1) {
+      // Settled on the springs, a few centimetres below the nominal stance.
+      properties["position/h-sl-ft"] = (250 + 1.29) / 0.3048;
+      hit = step % 7 === 0 ? null : { heightMeters: 250, revision: 1 } as SurfaceHit;
+      expect(contact.update(false)).not.toBe("reset");
+    }
+    expect(sdk.runIc).not.toHaveBeenCalled();
   });
 });

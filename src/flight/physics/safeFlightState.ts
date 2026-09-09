@@ -56,8 +56,34 @@ export function restoreSimulation(sdk: JSBSimSdk, snapshot: SimulationSnapshot):
   for (const [property, value] of Object.entries(snapshot.controls)) sdk.setPropertyValue(property, value);
 }
 
-/** Conservative C172 envelope about the CG, including wings when banked. */
+/**
+ * Height of the aircraft reference point above the ground when the gear is
+ * settled on it, measured from the c172p flight model itself: dropped onto a
+ * known terrain elevation and left to settle, it rests 1.33 m up with 4-7 cm
+ * of oleo compression at a 2.5 deg nose-high stance.
+ *
+ * Anything that places the aircraft on the ground has to use this number. A
+ * placement target even a few centimetres above it leaves the gear extended,
+ * the aircraft sinks back onto its springs, and the next placement lifts it
+ * again - which reads as sinking into quicksand and being teleported out.
+ */
+export const STATIC_STANCE_METERS = 1.33;
+
+/** The nose-high attitude that stance is measured at. */
+const STATIC_PITCH_RAD = 2.48 * Math.PI / 180;
+
+/**
+ * Conservative C172 envelope about the reference point: the stance, grown to
+ * keep the tail and wingtips clear when the aircraft is placed at an attitude
+ * the gear does not hold it at.
+ *
+ * The pitch term measures deviation from the static stance rather than
+ * absolute pitch. Absolute pitch would add 19 cm of float to an aircraft
+ * sitting on its own wheels, which is exactly the gap that made repositioning
+ * bounce it.
+ */
 export function aircraftClearanceMeters(roll: number, pitch: number): number {
-  return 0.15 + Math.abs(Math.sin(pitch)) * 4.5 + Math.abs(Math.sin(roll) * Math.cos(pitch)) * 5.5
-    + Math.abs(Math.cos(roll) * Math.cos(pitch)) * 1.5;
+  const excessPitch = Math.max(0, Math.abs(Math.sin(pitch)) - Math.sin(STATIC_PITCH_RAD));
+  return excessPitch * 4.5 + Math.abs(Math.sin(roll) * Math.cos(pitch)) * 5.5
+    + Math.abs(Math.cos(roll) * Math.cos(pitch)) * STATIC_STANCE_METERS;
 }
