@@ -292,8 +292,10 @@ values usually need attention:
   is normally `Math.PI`. It must stay a rotation; mirroring would silently
   reverse the propeller's twist.
 - `modelOffset.y` — the simulator holds the aircraft reference point
-  `aircraftClearanceMeters()` above the terrain, 1.65 m at level attitude, while
-  the model's origin is on the ground. Adjust if the parked stance looks wrong.
+  `aircraftClearanceMeters()` above the terrain, 1.33 m at level attitude for
+  the C172, while the model's origin is on the ground. That figure is the stance
+  the flight model settles at, measured rather than chosen; a different airframe
+  needs its own. Adjust if the parked stance looks wrong.
 
 `docs/aircraft-assets.md` covers the runtime side in full.
 

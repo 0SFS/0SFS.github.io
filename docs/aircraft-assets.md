@@ -47,8 +47,14 @@ worth remembering if the transform is ever reworked.
 
 The exported meshes put their origin on the ground between the wheels. The
 simulator holds the aircraft reference point `aircraftClearanceMeters()` above
-the terrain — 1.65 m at level attitude — so the model is dropped by that amount
-to stand on the runway rather than hover above it.
+the terrain — 1.33 m at level attitude, the stance the C172 gear actually
+settles at — so the model is dropped by that amount to stand on the runway
+rather than hover above it or sink into it.
+
+That number is measured from the flight model rather than chosen, and the
+physics uses the same one when it places the aircraft on the ground. If the two
+disagree, a parked aircraft sinks onto its springs and is lifted off them again
+on the next placement. See [docs/ground-contact.md](ground-contact.md).
 
 If a newly added aircraft looks sunk or floating when parked, `modelOffset.y` in
 `aircraftCatalog.ts` is the single value to adjust.
@@ -180,17 +186,14 @@ leaves the flight envelope, moves more than 100 m in a single 120 Hz step, or
 changes airspeed by more than 200 kt. It names the guard that tripped and the
 values behind it.
 
-**A missing terrain sample** is quieter. The loop declines to step at all rather
-than integrate against a ground height it cannot measure, so nothing faults and
-nothing pauses; the aircraft just holds position.
+**A missing terrain sample** is quieter. Within gear range of the ground the
+loop declines to step at all rather than integrate against a height it cannot
+measure, so nothing faults and nothing pauses; the aircraft just holds position.
+Well above the ground the sample is not needed and the simulation carries on.
 
-Once a height has been established, a later miss is treated as transient with
-Google 3D Tiles, which only publish currently visible photogrammetry. Before any
-height exists the two modes behave the same and neither may proceed: JSBSim's
-terrain elevation is still unset, so stepping would drop the aircraft toward a
-ground plane that is not there, and the gear model resolves the accumulated
-penetration explosively the moment real terrain arrives — tens of thousands of
-knots in a single step.
+The full set of rules — when the loop holds, when a sample is not believed, and
+when the aircraft is repositioned — is in
+[docs/ground-contact.md](ground-contact.md).
 
 Both now show a centre-screen notice — the fault in red with its reasons and a
 Resume button, the terrain hold as a status that clears itself. Every automatic
