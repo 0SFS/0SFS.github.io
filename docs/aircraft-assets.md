@@ -180,9 +180,17 @@ leaves the flight envelope, moves more than 100 m in a single 120 Hz step, or
 changes airspeed by more than 200 kt. It names the guard that tripped and the
 values behind it.
 
-**A missing terrain sample** is quieter. With a raster basemap the loop declines
-to step at all rather than integrate against a ground height it cannot measure,
-so nothing faults and nothing pauses; the aircraft just holds position.
+**A missing terrain sample** is quieter. The loop declines to step at all rather
+than integrate against a ground height it cannot measure, so nothing faults and
+nothing pauses; the aircraft just holds position.
+
+Once a height has been established, a later miss is treated as transient with
+Google 3D Tiles, which only publish currently visible photogrammetry. Before any
+height exists the two modes behave the same and neither may proceed: JSBSim's
+terrain elevation is still unset, so stepping would drop the aircraft toward a
+ground plane that is not there, and the gear model resolves the accumulated
+penetration explosively the moment real terrain arrives — tens of thousands of
+knots in a single step.
 
 Both now show a centre-screen notice — the fault in red with its reasons and a
 Resume button, the terrain hold as a status that clears itself. Every automatic

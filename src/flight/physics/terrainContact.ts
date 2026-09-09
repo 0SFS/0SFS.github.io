@@ -1,20 +1,38 @@
 import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
 import type { SurfaceQuery } from "foss-earth/runtime";
+import { flightLog } from "../diagnostics/flightLog";
 import { aircraftClearanceMeters, captureSimulation, restoreSimulation } from "./safeFlightState";
 
 export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
   let previous: { lat: number; lon: number; height: number; revision: number; clearance: number; resting: boolean } | null = null;
   let placement = true;
+  let hasReference = false;
   return {
-    reset() { previous = null; placement = true; },
+    reset() { previous = null; placement = true; hasReference = false; },
     update(blockOnMissingSurface = true): boolean | "reset" {
       const lat = sdk.getPropertyValue("position/lat-geod-deg"), lon = sdk.getPropertyValue("position/long-gc-deg");
       const hit = surface.sample(lat, lon);
-      // Google only exposes currently visible photogrammetry, so a transient
-      // tile/query miss must not halt the simulation. Raster keeps its strict
-      // behavior: it has an independent adopted coverage index and a miss means
-      // that no terrain surface is safe to integrate against.
-      if (!hit || !Number.isFinite(hit.heightMeters)) return !blockOnMissingSurface;
+      if (!hit || !Number.isFinite(hit.heightMeters)) {
+        // Google only exposes currently visible photogrammetry, so a transient
+        // miss AFTER a height has been established must not halt the
+        // simulation. Raster keeps its strict behaviour: it has an independent
+        // adopted coverage index and a miss means no surface is safe to
+        // integrate against.
+        //
+        // Before any height has been established the two are the same, and
+        // neither may proceed: JSBSim's terrain elevation is still unset, so
+        // stepping drops the aircraft toward a ground plane that is not there,
+        // and the gear model resolves the accumulated penetration explosively
+        // the moment real terrain arrives.
+        if (!hasReference) return false;
+        return !blockOnMissingSurface;
+      }
+      if (!hasReference) {
+        hasReference = true;
+        flightLog.info("terrain", "First terrain height established", {
+          heightMeters: Number(hit.heightMeters.toFixed(2)), latDeg: Number(lat.toFixed(5)), lonDeg: Number(lon.toFixed(5)),
+        });
+      }
       const altitude = sdk.getPropertyValue("position/h-sl-ft") * 0.3048;
       const clearance = aircraftClearanceMeters(sdk.getPropertyValue("attitude/phi-deg") * Math.PI / 180,
         sdk.getPropertyValue("attitude/theta-deg") * Math.PI / 180);
@@ -33,7 +51,18 @@ export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
       const liftedThroughPlane = refinementDelta > 0 && previous && previous.clearance >= -0.5
         && altitude < support && attributable;
       let corrected = false;
-      if ((placement && altitude < support) || liftedThroughPlane || followGround) {
+      const cause = (placement && altitude < support) ? "placement"
+        : liftedThroughPlane ? "surface lifted through the aircraft"
+          : followGround ? "resting aircraft followed the ground" : null;
+      if (cause) {
+        const movedMeters = support - altitude;
+        if (Math.abs(movedMeters) > 1) {
+          flightLog.info("terrain", `Repositioned onto the surface (${cause})`, {
+            movedMeters: Number(movedMeters.toFixed(2)),
+            refinementDeltaMeters: Number(refinementDelta.toFixed(2)),
+            terrainMeters: Number(hit.heightMeters.toFixed(2)),
+          });
+        }
         const snapshot = captureSimulation(sdk);
         snapshot.initial["ic/terrain-elevation-ft"] = hit.heightMeters / 0.3048;
         snapshot.initial["ic/h-sl-ft"] = support / 0.3048;
