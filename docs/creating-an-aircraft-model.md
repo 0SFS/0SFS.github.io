@@ -1,8 +1,10 @@
 # Creating an Aircraft Model
 
 A repeatable process for building a low-poly aircraft that reads unmistakably as
-the real thing and runs cheaply in the browser. It is written from the build of
-the Cessna 172; `planes/Cessna_172/` is the worked example to copy from.
+the real thing and runs cheaply in the browser. It was written from the build of
+the Cessna 172 and extended by the Cirrus SF50 Vision Jet;
+`planes/Cessna_172/` and `planes/Cirrus_Vision_Jet/` are the worked examples to
+copy from. Where the two disagree, the SF50 is the later thinking.
 
 The goal is not the lowest triangle count. It is the **most recognisable
 aircraft per triangle** — correct silhouette and proportion first, then cut
@@ -14,6 +16,27 @@ everything that does not serve them.
   scripted; nothing is modelled by hand.
 - Published dimensions for the aircraft.
 - A factory three-view drawing. This matters more than anything else below.
+  A manufacturer's flight manual usually has one, and rendering it from the PDF
+  at 1200 dpi gives four times the measuring resolution of a scanned image.
+- **Photographs of the real aircraft**, side-on if possible. They settle
+  questions a three view answers ambiguously — how many cabin windows there
+  are, how large a wing root fairing is — and they are how you find out that
+  what you read off the drawing is wrong. Gather them at the start. On the SF50
+  they were pulled in only after the first complete build, and the cabin
+  shipped through four iterations with the windows in one continuous band
+  because there was nothing to check the drawing reading against.
+- **An existing 3D model, if one is available**, treated as a hypothesis about
+  shape and never as a source of dimensions. `scripts/reorient_ref.py` in the
+  SF50 workspace puts one into the project's frame by principal axes, fixes the
+  signs from a known submesh and scales it to the published length; what its
+  span and height then come out at is a measurement of how faithful it is. The
+  SF50's reference was +2.3% on span and -31% on height, and its cabin detail
+  was painted into a texture rather than modelled, so it settled nothing that
+  the drawing had not already settled.
+
+Everything you generate belongs in the repository, under the aircraft's
+`agent_workspace/`. Nothing that a later reader needs — a crop you measured, a
+render you judged from — may live in a temporary directory.
 
 ## Why it is scripted
 
@@ -69,6 +92,42 @@ Reading a scanned drawing by eye is where accuracy is lost. Measure it instead:
    ink runs in any image column or row, which turns "roughly here" into a number.
 4. Write every value into `measurements/` with its source, and record the
    derivations, not just the results.
+
+### Check whether the drawing is uniformly scaled
+
+Do not assume it is. Measure every dimension line the figure carries and see
+whether they agree on a single px/m. The SF50's three view does not: each of
+its views was placed and resized independently, and it has a **different scale
+on each of the three axes** —
+
+```text
+SIDE   x = longitudinal 386.2 px/m,  y = vertical 379.6 px/m
+PLAN   y = longitudinal 386.2 px/m,  x = lateral  409.4 px/m
+FRONT  x = lateral      409.4 px/m,  y = vertical 409.4 px/m
+```
+
+The check that this is real rather than three guesses is that the two views
+sharing an axis agree on it to 0.1%. Read as one uniform scale, the drawing
+gives a span/length ratio of 1.336 against the published 1.261 — **6% too much
+wing**, on a shape that would still have looked plausible from every angle.
+
+### Confirm the scale with something you did not fit
+
+A scale derived from dimension lines is only as good as the lines. Find a
+published quantity that the scale predicts and that you did not use to derive
+it. Wing area is ideal because it is a product of two axes and so tests both at
+once: the SF50's drawn planform integrates to 18.30 m² over `386.2 × 409.4`
+against a published 18.181 — 0.6% high, where the uniform reading gives 19.8.
+A tyre diameter is a good second check, and it must come out circular.
+
+### Expect the drawing to contradict itself, and say which side you took
+
+The SF50's three view calls out a 14.7 ft V-tail span. Its front view draws
+exactly that; its plan and side views draw 13.6 ft. Two sources against two.
+Record the disagreement, say which you followed and why, and put it at the top
+of the report's list of what is still wrong — a reader who knows the model is
+8% uncertain in one dimension can decide what to do about it. Averaging it
+away silently is the one thing that must not happen.
 
 ### The measurement that matters most
 
@@ -133,8 +192,22 @@ Loop: change geometry → re-render the ten views → find the largest remaining
 mismatch → change geometry. Keep every iteration's renders; being able to compare
 back is what catches a regression.
 
-Compare against the drawing directly. Stacking your side view under the factory
-side view at matched scale exposes errors that look fine in isolation.
+Compare against the drawing directly. Stacking your render under the factory
+view at matched scale exposes errors that look fine in isolation.
+`scripts/compare_drawing.py` in the SF50 workspace does this for any of the
+three views: it resamples the drawing into a square metric grid — which is what
+makes a non-uniformly scaled drawing usable — renders the model into the same
+metric window, and draws one over the other. Its `--shaded` mode keeps the
+materials instead of a silhouette, which is the only way to check that a window
+painted by material index lands where the drawing draws it.
+
+**Look at the wireframe, not only the render.** A shaded render hides wasted
+geometry completely; `scripts/wireframe.py` projects the edges and rasterises
+them, because Blender's Workbench wireframe shading is viewport-only and comes
+out blank headless. Two separate rounds of waste on the SF50 — whole extra ring
+sections carrying one window column each, and 140 sliver triangles fanning out
+of the window band — were invisible in every shaded view and obvious the moment
+anyone looked at the wires.
 
 Fix in priority order, and do not polish anything below the first item that is
 still wrong:
@@ -152,7 +225,7 @@ still wrong:
 
 ## Stage 4 — Spend triangles where they earn recognition
 
-Rules that came out of this build and are worth applying to any airframe.
+Rules that came out of these builds and are worth applying to any airframe.
 
 **Nothing renders that cannot be seen.** Hidden geometry costs every frame. The
 Cessna 172's glazing was first built as duplicated faces offset above the
@@ -163,26 +236,87 @@ occluded beneath them, so the GPU drew 80 to show 40.
 rounded glazing corners are all a second material on faces that already exist.
 Same draw-call count, no extra vertices, nothing hidden.
 
-**Assign per triangle when a whole face is too coarse.** A quad is already two
-triangles, so painting one of them gives a diagonal edge for free — that is how
-the windshield and rear-window corners are chamfered.
-
-**Choose cross-section ring angles deliberately.** Evenly spaced vertices put
-nothing at the window sill or head, which is what forced the glazing into a
-separate shell in the first place. Placing vertices where features actually fall
-let the highest level drop from 12-point to 10-point rings with no visible loss.
-
-**Open the fuselage where another part closes it.** The roof is omitted across
-the wing chord because the wing seals it — except at the trailing edge, where the
-wing thins to a knife edge and stops covering the hole.
-
-**Watch for techniques with hidden constraints.** Putting a raked band in the
-face diagonals locks its width to its rake offset, so a thin band can only come
-out near-vertical. The rear cabin post needed an explicit cut to make width and
-rake independent — which also removed a station and ended up cheaper.
+**Open the fuselage where another part closes it.** The Cessna's roof is
+omitted across the wing chord because the wing seals it — except at the trailing
+edge, where the wing thins to a knife edge and stops covering the hole. The
+SF50's engine pod is open where it is buried in the crown.
 
 **Quote the real saving.** One of these optimisations was worth two triangles.
 Say so rather than dressing it up.
+
+### Windows: cut the pane into one face row, and leave the ring alone
+
+This took four rejected attempts on the SF50 and is the single most transferable
+thing in this document. The target is a window whose outline is the shape the
+drawing draws, on a fuselage that looks exactly as it did before the window was
+cut into it.
+
+**Describe the pane as a shape, not as a set of faces.** Trace its outline off
+the drawing — for the SF50 the windshield's sill is a curve read column by
+column, and each cabin window is a super-ellipse whose exponent was *measured*
+by comparing the pane's width at mid-height with its width 0.13 m higher (0.46 m
+against 0.35 m, which is an ellipse and not a rounded rectangle). Ramping the
+sill curve above the crown at each end closes the windshield region off, so one
+curve defines where it starts and stops as well as its shape.
+
+**Choose one face row that contains every pane at every station.** On the SF50
+that row spans z = 1.71 to 2.23 at the cabin and 1.38 to 2.13 at the aft window.
+Everything below happens inside that row.
+
+**Cut the pane as a hole in that row, bridged to its own outline.** The hole is
+bounded by the stations either side of the pane; the outline is sampled at as
+many columns as the window needs to look round; a ring of triangles joins the
+two. A cabin window costs its outline plus that ring, and nothing else.
+
+Three things that look reasonable and are not:
+
+- **Do not move the ring vertices to follow the pane.** Sliding a vertex along
+  its own section curve does not change the *section* — but the surface between
+  two stations is the **chord** between their vertices, so changing the angular
+  spacing between neighbouring stations changes the faceted surface. On the SF50
+  it put ridges down the length of the cabin and needed an 18-point ring to
+  carry, costing 600 triangles to make the model look worse.
+- **Do not give the pane its own fuselage stations.** A whole extra ring to
+  carry one window column is nine rows of triangles that show nothing. Nor is
+  the halfway house any good: putting the columns only on the lines bounding the
+  window row forces the rows next to them into triangle strips — one thin sliver
+  per column, about 140 of them, fanning out to the shoulder and the keel.
+- **Place the pane's vertices by interpolating inside the row's own quad.**
+  Bilinear on the quad puts them on the ruled surface that was already there.
+  Putting them on the analytic section instead — which is where they
+  mathematically belong — stands them up to 5 cm proud of the flat row either
+  side and creases the cabin.
+
+**Assign a face's material structurally, never by testing its geometry.** A
+pane's outline vertices sit exactly *on* the outline, so any inside/outside test
+of them is a knife edge that sub-millimetre float noise flips. Judging a face by
+its centroid instead is worse: it glazed the triangles that close each pane's
+fore and aft end, spiking a dark sliver the full height of the row off both ends
+of every window. The row already knows which of its sub-rows is the pane, so it
+should say so.
+
+Intermediate rules that are still true when the pane is coarse:
+
+- **Assign per triangle when a whole face is too coarse.** A quad is already two
+  triangles, so painting one of them gives a diagonal edge for free — that is
+  how the Cessna's windshield and rear-window corners are chamfered.
+- **Choose cross-section ring angles deliberately.** Evenly spaced vertices put
+  nothing at the window sill or head. Placing them where features actually fall
+  let the Cessna's highest level drop from 12-point to 10-point rings with no
+  visible loss.
+- **Watch for techniques with hidden constraints.** Putting a raked band in the
+  face diagonals locks its width to its rake offset, so a thin band can only
+  come out near-vertical. The Cessna's rear cabin post needed an explicit cut to
+  make width and rake independent — which also removed a station and ended up
+  cheaper.
+
+### Say "no polygon is wasted" only after looking
+
+The SF50 reached 1376 triangles at LOD0 with rounder windows than it had at
+2344, entirely by removing geometry that showed nothing. Each round of that was
+found by looking at the wireframe, not the render. Before claiming a level is
+lean, render the wires and account for every cluster of density: it should sit
+where a feature is, and nowhere else.
 
 ---
 
@@ -222,19 +356,58 @@ blender -b --factory-startup \
 Confirm all seven moving parts exist, each has an identity rotation, and each
 pivot sits at the expected station.
 
+### When the tail is not one the rig can express
+
+`SURFACE_BINDINGS` turns one named node about **one fixed local axis** driven by
+**one input**. A conventional tail fits that; a V-tail does not, for two
+independent reasons:
+
+1. Its two ruddervator hinges lie at ±Γ, so rotating both together about the
+   span axis cones each panel around its own hinge instead of turning about it.
+   Measured on the SF50 at 0.4 rad of elevator, the tip hinge point moves 0.75 m
+   — the tail visibly tears away from the fin.
+2. A real V-tail *mixes*: each surface deflects by elevator ± rudder. One `key`
+   cannot express a sum.
+
+**Do not fake it.** Binding both surfaces to `Elevator` is worse than leaving
+them still. Ship the surfaces as separate nodes under their own names, with
+identity rotation and their **origins on the real hinge lines**, so the geometry
+is ready and the runtime change is two bindings and a mix function. Then say so,
+in the report and in `TODO.md`, with the arithmetic for the axes. The SF50
+exports `Ruddervator_Left` / `Ruddervator_Right`; the runtime ignores names it
+does not know, so they sit still and nothing looks broken.
+
+Teach `verify_rig.py` about it: list which names are bound, which are present
+but deliberately unbound, and which must not exist at all — a jet has no
+`Propeller`. The SF50's also checks that the two ruddervator pivots are mirror
+images and that the line through them sits at the measured dihedral.
+
 ---
 
 ## Stage 6 — Levels of detail
 
-Four levels. Drop the cheapest-to-lose thing first, in this order: cross-section
-resolution → control-surface separation → part separation.
+Four levels. Drop the cheapest-to-lose thing first, in this order: pane shape →
+cross-section resolution → control-surface separation → part separation.
 
-| Level | Target | What it keeps |
+| Level | Rough size | What it keeps |
 | --- | --- | --- |
-| LOD0 | 1000–1500 tris | Everything, separately addressable |
-| LOD1 | 400–700 | Same names, coarser sections |
-| LOD2 | 150–300 | Control surfaces merged into their panels |
-| LOD3 | ≤100 | Static parts joined into one mesh; propeller separate |
+| LOD0 | 1000–1500 tris | Everything, separately addressable, panes shaped |
+| LOD1 | 400–1000 | Same names, coarser panes and sections |
+| LOD2 | 150–300 | Control surfaces merged; a plain glazed band, not shapes |
+| LOD3 | ≤100 | Static parts joined into one mesh |
+
+Those sizes are targets, not walls. The right count is the one where the
+wireframe shows density only where a feature is; a level that is 30% over
+because its windows are round is a better level than one that hits a number
+with rectangles. The SF50 sits at 1376 / 922 / 246 / 98.
+
+**A station's level is a shape decision, not an every-other-one rule.** Mark
+the stations that carry a feature — the nose and tail points that set the
+length, the windshield base, the belly's low point, a tail-cone pinch — as
+surviving to every level, and drop only the ones that smooth between them.
+The SF50's LOD1 first came out barely cheaper than LOD0 because every station
+had been marked as surviving; relabelling took 128 triangles off it with no
+visible change to the side profile.
 
 Generate every level from the same parameterised script — never decimate. A
 decimator does not know that the lift struts matter more than the cowl's
@@ -249,6 +422,11 @@ generic monoplane at any distance.
 
 Coarse levels legitimately lack the control-surface nodes. The runtime binds
 whatever it finds, so this needs no special handling.
+
+`scripts/lod_sheet.py` stacks the four contact sheets into one image. Look at it
+before calling the set finished: each level should still be recognisable as the
+type, and the step between consecutive levels should be a reduction in fineness,
+not a change of shape.
 
 ---
 
@@ -268,11 +446,28 @@ Two of these will flag things that are correct on purpose. Say which and why:
 
 - **Open boundaries** are expected wherever a surface is deliberately not sealed
   — the fuselage roof under the wing, uncapped wing root ribs buried inside the
-  body.
+  body, an engine pod open where the crown closes it.
 - **Symmetry error** should come only from genuinely asymmetric parts. On the
-  Cessna 172 the sole source is the propeller, whose blades are twisted.
+  Cessna 172 the sole source is the propeller, whose blades are twisted. The
+  SF50 has none, so its symmetry error is exactly zero — and that check earned
+  its keep by catching a nacelle built on an odd-numbered ring, which straddles
+  the centreline instead of mirroring across it. Ring point counts on a body of
+  revolution must be even.
 
 Anything else in those two lists is a real defect.
+
+Two more checks worth having, both of which caught real bugs on the SF50:
+
+- **The lowest vertex must be at `z = 0` at every level.** The catalog drops the
+  visual by the simulator's stance and assumes the origin is on the ground
+  between the wheels; anything else floats or sinks by exactly that much. Give
+  every wheel ring a vertex at bottom dead centre — start its angles at −90° —
+  because a coarse tyre approximated without one sits its whole bounding box
+  above the runway. That is why the Cessna's LOD2 and LOD3 floated.
+- **Overall length, span and height must be identical at every level**, not just
+  close. A station that carries an extremity — the nose cap, the tail point —
+  must survive to LOD3, or a coarse level quietly loses 0.15 m and nothing
+  else notices.
 
 ---
 
@@ -313,9 +508,34 @@ roughly the right layout?
 
 If not, the answer is more shape, not more detail.
 
+Then look at the wireframe and ask the second question: is there any cluster of
+triangles that is not sitting on a feature? If there is, it is waste, and it is
+almost certainly there because something local was solved by subdividing
+something global.
+
 Then be honest in writing about what is still wrong. The Cessna 172's report
 records that its cowl is slightly conical in plan, that the glazing band is
 shorter than the drawing's, that there are no panel lines, antennas or wheel
 fairings, and that the gear track follows the modern figure while the shape was
-measured from an older drawing. None of that stopped it being usable, and a
-reader who knows the limits can decide what to fix next.
+measured from an older drawing. The SF50's records that its V-tail span follows
+a callout that two of the three views contradict, that its main tyres are the
+drawing's and not the maintenance manual's, and that some of the triangles
+bridging each window to the mesh around it are long and thin. None of that
+stopped either being usable, and a reader who knows the limits can decide what
+to fix next.
+
+---
+
+## What the two builds disagreed about
+
+Where this document has been rewritten rather than added to, the Cessna's
+approach is the earlier one and the SF50's is what replaced it.
+
+| | Cessna 172 | Cirrus SF50 |
+| --- | --- | --- |
+| Drawing scale | one uniform px/m, cross-checked between views | one per axis; a uniform reading is 6% wrong |
+| Glazing | material index on whole face rows, corners chamfered per triangle | pane traced as a shape and cut into one face row as a hole |
+| Ring resolution | chosen so vertices land on features | uniform everywhere; features are cut inside a row instead |
+| Face material | region test on the face | decided structurally by which sub-row it is |
+| Reference material | the drawing | the drawing, plus photographs and a scaled reference model to check the reading |
+| Judging a level | the shaded contact sheet | the shaded sheet *and* the wireframe |
