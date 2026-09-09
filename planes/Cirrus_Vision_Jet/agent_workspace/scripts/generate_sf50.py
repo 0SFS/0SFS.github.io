@@ -215,7 +215,7 @@ WINDSHIELD_CUTS = {
 # Fractions of the pane half-length to put a station at. The +/-1.0 pair sits
 # just outside the pane and closes it off; the rest sample its outline.
 PANE_COLUMN_FRACTIONS = {
-    'fine': (1.0, 0.95, 0.80, 0.50, 0.0, -0.50, -0.80, -0.95, -1.0),
+    'fine': (1.0, 0.97, 0.85, 0.60, 0.0, -0.60, -0.85, -0.97, -1.0),
     'coarse': (1.0, 0.80, 0.0, -0.80, -1.0),
 }
 
@@ -244,7 +244,7 @@ def is_glass(y, z):
     if z > sill_z(y):
         return True
     for yc, a, zc, b, n in CABIN_WINDOWS:
-        if abs((y - yc) / a) ** n + abs((z - zc) / b) ** n <= 1.0:
+        if abs((y - yc) / a) ** n + abs((z - zc) / b) ** n <= 1.0 + 1e-6:
             return True
     return False
 
@@ -567,23 +567,28 @@ def build_fuselage():
         return tuple(a[c] + (b[c] - a[c]) * t for c in range(3))
 
     band_rows = set(spec["window"]) | set(spec["crown"])
+    WS_LO, WS_HI = WINDSHIELD_Y
 
-    def emit(idx, j):
-        pts = [verts[v] for v in idx]
-        cy = sum(p[1] for p in pts) / len(pts)
-        cz = sum(p[2] for p in pts) / len(pts)
-        if not P["glass"]:
-            g = False
-        elif P["panes"]:
-            g = is_glass(cy, cz)
-        else:
-            # Too coarse to resolve a pane shape: a plain band instead.
-            g = (CABIN_Y[0] <= cy <= CABIN_Y[1] and j in spec["window"]) or \
-                (WINDSHIELD_Y[0] <= cy <= WINDSHIELD_Y[1] and j in band_rows)
+    def in_ws(y):
+        return WS_LO - 1e-6 <= y <= WS_HI + 1e-6
+
+    def emit(idx, glass):
+        """One face, with its material decided structurally.
+
+        Never by testing the geometry: a pane's own cut vertices sit exactly ON
+        its outline, so any inside/outside test of them is a knife edge that
+        sub-millimetre float noise flips. That is what left a glazed sliver
+        spiking the full height of the row off each end of a cabin window.
+        """
         faces.append(list(idx))
-        fmats.append(1 if g else 0)
+        fmats.append(1 if glass else 0)
         nonlocal glazed_n
-        glazed_n += 1 if g else 0
+        glazed_n += 1 if glass else 0
+
+    def coarse_glass(cy, j):
+        """Plain band, for the levels too coarse to resolve a pane shape."""
+        return (CABIN_Y[0] <= cy <= CABIN_Y[1] and j in spec["window"]) or \
+            (in_ws(cy) and j in band_rows)
 
     # ---- ring lines ---------------------------------------------------------
     window_rows = set(spec["window"])
@@ -619,9 +624,17 @@ def build_fuselage():
             # the two bounding lines carry the same columns, so this row is a
             # plain grid again - with the pane's own edges cut into each column
             def chain(p):
+                """Vertices across the row at column p, and which gap is glass.
+
+                Two cuts is a cabin window - the glass is between them. One cut
+                is the windshield sill, and the glass is whichever side of it
+                is higher, which depends on which way round the ring this row
+                runs.
+                """
                 lo, hi = verts[A[p][1]], verts[B[p][1]]
                 out = [A[p][1]]
                 cut = pane_cuts(A[p][0])
+                zs = []
                 if cut:
                     zs = [z for z in cut
                           if min(lo[2], hi[2]) < z < max(lo[2], hi[2])]
@@ -630,20 +643,37 @@ def build_fuselage():
                         t = (z - lo[2]) / (hi[2] - lo[2])
                         out.append(add(lerp3(lo, hi, min(max(t, 0.0), 1.0))))
                 out.append(B[p][1])
-                return out
+                if len(zs) == 2:
+                    gap = 1
+                elif len(zs) == 1:
+                    gap = 1 if lo[2] < hi[2] else 0
+                else:
+                    gap = None
+                return out, gap
 
             for p in range(len(A) - 1):
-                ca, cb = chain(p), chain(p + 1)
-                if len(ca) == 2 and len(cb) == 2:
-                    emit((ca[0], ca[1], cb[1], cb[0]), j)
+                (ca, ga), (cb, gb) = chain(p), chain(p + 1)
+                if not P["panes"]:
+                    emit((ca[0], ca[1], cb[1], cb[0]),
+                         coarse_glass((A[p][0] + A[p + 1][0]) / 2.0, j))
                     continue
+                if len(ca) == len(cb) and ga is not None and ga == gb:
+                    # both columns are inside the same pane: a strip of
+                    # sub-rows, exactly one of which is the glass
+                    for t in range(len(ca) - 1):
+                        emit((ca[t], ca[t + 1], cb[t + 1], cb[t]), t == ga)
+                    continue
+                if len(ca) == 2 and len(cb) == 2:
+                    emit((ca[0], ca[1], cb[1], cb[0]), False)
+                    continue
+                # a pane's fore or aft end: the closing triangles are paint
                 u = v = 0
                 while u < len(ca) - 1 or v < len(cb) - 1:
                     take = v == len(cb) - 1 or (
                         u < len(ca) - 1
                         and (u + 1) / (len(ca) - 1) <= (v + 1) / (len(cb) - 1))
                     emit((ca[u], ca[u + 1], cb[v]) if take
-                         else (ca[u], cb[v + 1], cb[v]), j)
+                         else (ca[u], cb[v + 1], cb[v]), False)
                     if take:
                         u += 1
                     else:
@@ -657,8 +687,12 @@ def build_fuselage():
             while u < len(A) - 1 or v < len(B) - 1:
                 take = v == len(B) - 1 or (u < len(A) - 1
                                            and A[u + 1][0] >= B[v + 1][0])
-                emit((A[u][1], A[u + 1][1], B[v][1]) if take
-                     else (A[u][1], B[v + 1][1], B[v][1]), j)
+                idx = (A[u][1], A[u + 1][1], B[v][1]) if take \
+                    else (A[u][1], B[v + 1][1], B[v][1])
+                ys = [A[u][0], A[u + 1][0] if take else B[v + 1][0], B[v][0]]
+                g = j in spec["crown"] and all(in_ws(y) for y in ys) \
+                    if P["panes"] else coarse_glass(sum(ys) / 3.0, j)
+                emit(idx, P["glass"] and g)
                 if take:
                     u += 1
                 else:
@@ -671,7 +705,7 @@ def build_fuselage():
             # centre by design, so the post is cut into the one row that
             # straddles it, glass | 62 mm paint | glass.
             if j == spec["top"] and P["glass"] and P["pillars"] \
-                    and is_glass(mid, verts[A[p][1]][2]):
+                    and in_ws(A[p][0]) and in_ws(A[p + 1][0]):
                 p0, p1 = verts[A[p][1]], verts[B[p][1]]
                 q0, q1 = verts[A[p + 1][1]], verts[B[p + 1][1]]
 
@@ -690,7 +724,9 @@ def build_fuselage():
                 glazed_n += 2
                 cuts_made += 1
                 continue
-            emit((A[p][1], B[p][1], B[p + 1][1], A[p + 1][1]), j)
+            g = j in spec["crown"] and in_ws(A[p][0]) and in_ws(A[p + 1][0]) \
+                if P["panes"] else coarse_glass(mid, j)
+            emit((A[p][1], B[p][1], B[p + 1][1], A[p + 1][1]), P["glass"] and g)
 
     faces.append(list(range(n - 1, -1, -1))); fmats.append(0)
     faces.append([(len(rings) - 1) * n + j for j in range(n)]); fmats.append(0)

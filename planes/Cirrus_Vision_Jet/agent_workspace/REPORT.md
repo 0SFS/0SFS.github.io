@@ -2,13 +2,13 @@
 
 A measured reconstruction of the SF50 (G2) built to
 `docs/creating-an-aircraft-model.md`, generated procedurally from a table of
-cross-section stations. Four levels of detail, 1552 / 970 / 246 / 98 triangles,
+cross-section stations. Four levels of detail, 1556 / 974 / 246 / 98 triangles,
 wired into `AIRCRAFT_CATALOG` as `cirrus-vision-jet`.
 
 | level | triangles | vertices | objects | takes over at |
 | --- | --- | --- | --- | --- |
-| LOD0 | 1552 | 837 | 22 | 0 m |
-| LOD1 | 970 | 545 | 22 | 65 m |
+| LOD0 | 1556 | 839 | 22 | 0 m |
+| LOD1 | 974 | 547 | 22 | 65 m |
 | LOD2 | 246 | 156 | 12 | 170 m |
 | LOD3 | 98 | 74 | 1 | 340 m |
 
@@ -199,6 +199,11 @@ Other things measurement changed from the first blockout:
   next to them are joined by a triangle strip, one triangle per column instead
   of two rows' worth. That took the fuselage from 26 whole rings in the cabin
   to 12, and LOD0 from 2344 triangles to 1552 while the windows got rounder.
+- **A face's material is decided structurally, never by testing its geometry.**
+  A pane's cut vertices sit exactly ON its outline, so any inside/outside test
+  of them is a knife edge that sub-millimetre float noise flips - which left a
+  glazed sliver spiking the full height of the row off each end of a cabin
+  window. The row knows which of its sub-rows is the pane, so it says so.
 - **Everywhere outside a pane the row is still one quad**, and outside the
   cabin the mesh is exactly what it was before there were any windows. The
   entire cost of the glazing is the pane outlines plus one triangle per column
@@ -268,7 +273,7 @@ literally, and it is what let LOD3 come in under 100 triangles.
 
 | check | LOD0 | LOD1 | LOD2 | LOD3 |
 | --- | --- | --- | --- | --- |
-| triangles | 1552 | 970 | 246 | 98 |
+| triangles | 1556 | 974 | 246 | 98 |
 | length 9.357 m | 9.357 | 9.357 | 9.357 | 9.357 |
 | span 11.796 m | 11.796 | 11.796 | 11.796 | 11.796 |
 | height 3.322 m | 3.3227 | 3.3227 | 3.3219 | 3.3227 |
@@ -302,7 +307,7 @@ the report that flag correct things:
 
 `src/flight/aircraft/aircraftCatalog.ts`:
 
-- Four levels — 1552 / 970 / 246 / 98 triangles — and `autoFromMeters` of
+- Four levels — 1556 / 974 / 246 / 98 triangles — and `autoFromMeters` of
   0 / 65 / 170 / 340. Those are the Cessna's thresholds scaled by the span
   ratio, so the two airframes switch at the same apparent size.
 - `propellerBlades: 0`. It is a jet; the propeller-disc logic never engages and
@@ -425,6 +430,13 @@ Read this before treating any of it as accurate.
   and aft ends close at the station straddling the pane's tip.
 - **There is a faint shading seam at each pane's fore and aft end**, where the
   triangle strip joins a four-vertex chain to a two-vertex one.
+- **The pane columns cost one triangle each in the four rows next to the two
+  window rows** - about 140 triangles at LOD0, 9% of the level. They are the
+  long thin fans visible in `renders/WIREFRAME_lod0.png` reaching from the
+  window band to the shoulder and to the lower side, and they are the
+  structural price of a finer row inside a coarser mesh. Halving them is
+  possible - put the columns on only the lower bounding line of each window row
+  and triangulate the row as three strips instead of a grid - and is not done.
 - **LOD2 and LOD3 keep a plain glazed band**, not shaped panes: at 170 m and
   beyond the whole aircraft is a few tens of pixels.
 - **No panel lines, antennas, deice boots, door outline, exhaust, static ports
