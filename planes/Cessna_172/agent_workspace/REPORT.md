@@ -69,8 +69,8 @@ sweeping up. The blockout converged both lines symmetrically, producing a generi
 
 | LOD | triangles | vertices | meshes | draw-call groups | GLB size | target | cabin posts |
 |---|---|---|---|---|---|---|---|
-| LOD0 | **890** | 511 | 22 | 23 | 45.8 kB | 1000–1500 ✔ (under) | yes (7) |
-| LOD1 | **688** | 415 | 22 | 23 | 42.0 kB | 400–700 ✔ | yes (7) |
+| LOD0 | **876** | 507 | 22 | 23 | 45.7 kB | 1000–1500 ✔ (under) | yes (7) |
+| LOD1 | **678** | 413 | 22 | 23 | 41.9 kB | 400–700 ✔ | yes (7) |
 | LOD2 | **288** | 189 | 16 | 17 | 24.0 kB | 150–300 ✔ | no, continuous glass |
 | LOD3 | **130** | 105 | 2 | 3 | 9.4 kB | ≤100 — 30 over | no, continuous glass |
 
@@ -86,9 +86,9 @@ boundaries; that is normal and is what the GPU actually uploads.
 Each level drops the cheapest-to-lose thing first, in this order: cross-section
 resolution → control-surface separation → part separation.
 
-- **LOD0** — 10-point fuselage rings, 20 stations, 8-point cambered airfoil, separate
+- **LOD0** — 10-point fuselage rings, 19 stations, 8-point cambered airfoil, separate
   flaps/ailerons/elevator/rudder, 8-sided wheels, 4-station gear legs, full cabin posts.
-- **LOD1** — 8-point rings, 17 stations, 6-sided wheels, 3-station gear, full cabin posts.
+- **LOD1** — 8-point rings, 16 stations, 6-sided wheels, 3-station gear, full cabin posts.
   Same object names as LOD0.
 - **LOD2** — 6-point rings, 7 stations, 6-point airfoils, control surfaces merged into
   their parent surfaces, rudder merged into the fin, 4-sided wheels, glazing on the
@@ -205,12 +205,15 @@ Spinner, Propeller, Strut_Left, Strut_Right`. Names are stable between LOD0 and 
    window | C | rear window.  The A and B posts are real ~70 mm fuselage segments that
    simply do not receive the glass material; the centre post is a 70 mm split of the
    flat top face row.  No overlay geometry.
-   The **C post is raked, not vertical** — the 172G side view shows it leaning down and
-   aft at ~35 deg.  Two adjacent rear-window segments are cut along the *same* diagonal:
-   the forward one keeps its lower-forward triangle glazed, the aft one paints its
-   lower-forward triangle.  That yields a roughly constant-width band leaning down-aft,
-   with the rear side window's trailing edge parallel to it.  Cost: one extra station
-   (+24 tris at LOD0, +20 at LOD1); the per-triangle material assignment itself is free.
+   The **C post is a thin band raked down and aft**, matching the ~35 deg the 172G side
+   view shows.  It is cut explicitly across the last cabin segment and the first
+   rear-window segment (`CP_W`, `CP_TOP_AFT`, `CP_BOT_AFT`).
+   Doing it with face diagonals instead — the obvious cheap trick — locks the band's
+   width to its rake offset, so a thin band can only ever come out near-vertical;
+   cutting it properly decouples the two.  The band's top-aft corner lands exactly on
+   the wing-TE station so the rear window starts there at roof level.  Cutting it costs
+   10 triangles but removes the extra station the diagonal scheme needed, so it is a
+   **net saving of 14 triangles** at LOD0.
 4. **Glazing corners are chamfered per-triangle, not per-face.** The corner pane of the
    windshield (forward) and of the rear window (aft) is already two triangles, so the
    material index is assigned to each triangle separately: the upper triangle stays

@@ -3,8 +3,8 @@
  "objects": 22,
  "empties": 1,
  "meshes": 22,
- "triangles": 890,
- "vertices": 511,
+ "triangles": 876,
+ "vertices": 507,
  "materials": 4,
  "material_names": [
   "C172_Dark",
@@ -49,11 +49,11 @@
   8.28,
   2.718
  ],
- "non_manifold_edges": 56,
+ "non_manifold_edges": 72,
  "open_boundary_by_object": [
   {
    "name": "Fuselage",
-   "boundary_edges": 28
+   "boundary_edges": 44
   },
   {
    "name": "Propeller",
@@ -76,7 +76,7 @@
  "loose_vertices": 0,
  "unapplied_transforms": [],
  "symmetry_error_m": {
-  "mean": 0.002145,
+  "mean": 0.002162,
   "max": 0.108122,
   "over_1mm": 24
  },
@@ -115,8 +115,8 @@
  "per_object": [
   {
    "name": "Fuselage",
-   "tris": 382,
-   "verts": 202,
+   "tris": 368,
+   "verts": 198,
    "mats": [
     "C172_Paint",
     "C172_Glass"

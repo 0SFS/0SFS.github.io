@@ -82,8 +82,7 @@ STATIONS = [
     (-0.95, 0.65, 1.44, 1.98, 0.535, 7.0, 4.0, 1),   # cabin under the wing - flat top
     (-1.02, 0.653, 1.437, 1.98, 0.534, 6.9, 4.0, 0), # aft edge of the B post
     (-1.63, 0.66, 1.43, 1.98, 0.525, 6.0, 4.0, 0),   # wing TE root: flat top ends
-    (-1.79, 0.667, 1.420, 1.900, 0.512, 5.1, 3.8, 0), # the two stations below bracket
-    (-1.95, 0.674, 1.410, 1.850, 0.498, 4.1, 3.6, 0), # the raked C pillar
+    (-1.95, 0.674, 1.410, 1.850, 0.498, 4.1, 3.6, 0), # aft edge of the raked C pillar
     (-2.10, 0.68, 1.40, 1.80, 0.485, 3.2, 3.4, 0),   # rear window - rounding again
     (-2.60, 0.70, 1.34, 1.60, 0.435, 2.6, 3.0, 1),
     (-3.30, 0.79, 1.26, 1.470, 0.335, 2.4, 2.8, 0),  # tail cone: top nearly level,
@@ -104,6 +103,12 @@ REARWIN_Y    = (-2.16, -1.63)
 # A and B posts are vertical bands; the C post is the raked wedge formed by the
 # diagonal of the forward rear-window face (see build_fuselage).
 POST_BANDS = [(-0.17, -0.10), (-1.02, -0.95)]
+
+# C pillar band: width in Y, and the Y of its aft edge at the top and bottom of
+# the cabin side.  Raked ~35 deg down and aft, matching the 172G side view.
+CP_W       = 0.085
+CP_TOP_AFT = -1.63          # top of the band sits on the wing-TE station
+CP_BOT_AFT = -1.945
 POST_STATION_YS = {-0.17, -1.02}
 
 
@@ -446,13 +451,19 @@ def build_fuselage():
               if REARWIN_Y[0] <= (sts[i][0] + sts[i + 1][0]) / 2.0 < REARWIN_Y[1]]
     ws_front = ws_idx[0] if ws_idx else None
     rw_back = rw_idx[-1] if rw_idx else None
-    # C pillar: a raked band, not a vertical one.  Two adjacent segments are cut
-    # along the SAME diagonal - the forward one keeps its lower-forward triangle
-    # glazed, the aft one paints its lower-forward triangle - so the pillar comes
-    # out as a roughly constant-width strip leaning down and aft at ~35 deg,
-    # which is what the 172G side view shows.  Costs one station, no more.
-    cp_fwd = rw_idx[0] if (len(rw_idx) >= 3 and P["pillars"]) else None
-    cp_aft = rw_idx[1] if (len(rw_idx) >= 3 and P["pillars"]) else None
+    # C pillar: a THIN band raked down and aft, cut explicitly across the last
+    # cabin segment and the first rear-window segment.
+    #
+    # Using face diagonals alone (the previous approach) locks the band's width
+    # to its rake offset, so a thin band can only ever be near-vertical.  Cutting
+    # it properly decouples the two: CP_W sets the width, and the endpoints set
+    # the rake.  It also removes the station that scheme needed, so it is a net
+    # saving.  The band's TOP-AFT corner lands exactly on the wing-TE station,
+    # so the rear window starts there at roof level.
+    cab_idx = [i for i in range(len(rings) - 1)
+               if CABIN_Y[0] <= (sts[i][0] + sts[i + 1][0]) / 2.0 < CABIN_Y[1]]
+    cp_s1 = cab_idx[-1] if (cab_idx and rw_idx and P["pillars"]) else None
+    cp_s2 = rw_idx[0] if (cab_idx and rw_idx and P["pillars"]) else None
 
     def lerp3(a, b, t):
         return tuple(a[c] + (b[c] - a[c]) * t for c in range(3))
@@ -514,12 +525,12 @@ def build_fuselage():
             # leaving it square, without adding a single polygon.
             corner = None
             if j in glazed and j in spec["window"]:
-                if i == ws_front:
+                if i == cp_s1:
+                    corner = "cpillar_s1"
+                elif i == cp_s2:
+                    corner = "cpillar_s2"
+                elif i == ws_front:
                     corner = "front"
-                elif i == cp_fwd:
-                    corner = "cpillar_fwd"
-                elif i == cp_aft:
-                    corner = "cpillar_aft"
                 elif i == rw_back:
                     corner = "back"
             if corner:
@@ -529,12 +540,34 @@ def build_fuselage():
                 if corner == "front":
                     faces.append([f_lo, f_hi, r_lo]);  fmats.append(0)   # front-lower: paint
                     faces.append([f_hi, r_hi, r_lo]);  fmats.append(1)   # upper: glass
-                elif corner == "cpillar_fwd":
-                    faces.append([f_lo, f_hi, r_lo]);  fmats.append(1)   # rear side window
-                    faces.append([f_hi, r_hi, r_lo]);  fmats.append(0)   # pillar, upper half
-                elif corner == "cpillar_aft":
-                    faces.append([f_lo, f_hi, r_lo]);  fmats.append(0)   # pillar, lower half
-                    faces.append([f_hi, r_hi, r_lo]);  fmats.append(1)   # rear window
+                elif corner in ("cpillar_s1", "cpillar_s2"):
+                    yA, yB = sts[i][0], sts[i + 1][0]
+                    yTA = CP_TOP_AFT                     # band top, aft edge
+                    yTF = CP_TOP_AFT + CP_W              # band top, forward edge
+                    yBA = CP_BOT_AFT                     # band bottom, aft edge
+                    yBF = CP_BOT_AFT + CP_W              # band bottom, forward edge
+                    d1 = (yTF - yTA) / (yTF - yBF)       # depth where the forward
+                    d1 = min(max(d1, 0.02), 0.98)        # edge crosses the wing-TE station
+                    if corner == "cpillar_s1":
+                        t = (yTF - yA) / (yB - yA)
+                        p_top = lerp3(verts[f_hi], verts[r_hi], t)
+                        p_aft = lerp3(verts[r_hi], verts[r_lo], d1)
+                        i0 = len(verts); verts.append(p_top)
+                        i1 = len(verts); verts.append(p_aft)
+                        faces.append([i0, r_hi, i1]);            fmats.append(0)  # pillar
+                        faces.append([f_lo, f_hi, i0, i1, r_lo]); fmats.append(1) # rear side window
+                    else:
+                        sF = (yBF - yA) / (yB - yA)
+                        sA = (yBA - yA) / (yB - yA)
+                        p_fwd = lerp3(verts[f_hi], verts[f_lo], d1)
+                        q_fwd = lerp3(verts[f_lo], verts[r_lo], sF)
+                        q_aft = lerp3(verts[f_lo], verts[r_lo], sA)
+                        i0 = len(verts); verts.append(p_fwd)
+                        i1 = len(verts); verts.append(q_fwd)
+                        i2 = len(verts); verts.append(q_aft)
+                        faces.append([f_hi, i2, i1, i0]);        fmats.append(0)  # pillar
+                        faces.append([i0, i1, f_lo]);            fmats.append(1)  # window sliver
+                        faces.append([f_hi, r_hi, r_lo, i2]);    fmats.append(1)  # rear window
                 else:
                     faces.append([f_lo, f_hi, r_hi]);  fmats.append(1)   # upper: glass
                     faces.append([f_lo, r_hi, r_lo]);  fmats.append(0)   # aft-lower: paint
