@@ -1,3 +1,4 @@
+node_modules/
+dist/
 GOOGLE_3D_TILES.local.md
-node_modules/.cache/
 .DS_Store

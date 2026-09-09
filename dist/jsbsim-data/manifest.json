@@ -1,9 +1,0 @@
-{
-  "files": [
-    "aircraft/c172p/c172p.xml",
-    "aircraft/c172p/reset00.xml",
-    "aircraft/c172p/reset01.xml",
-    "engine/eng_io320.xml",
-    "engine/prop_75in2f.xml"
-  ]
-}

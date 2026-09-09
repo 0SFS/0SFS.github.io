@@ -11,3 +11,6 @@ renders/lod1/
 renders/lod2/
 renders/lod3/
 renders/refB/
+renders/insp*/
+renders/chk*/
+renders/dbg/
