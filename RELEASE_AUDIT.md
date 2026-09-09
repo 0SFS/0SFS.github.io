@@ -53,7 +53,7 @@ artefacts, and reference sources are tracked under `planes/`; their release
 status must be decided explicitly.
 
 `npm run deploy` invokes `gh-pages` after a Vite build with base
-`/OSFS/`. There is no checked-in CI workflow or GitHub Pages
+`/`. There is no checked-in CI workflow or GitHub Pages
 configuration. The local sibling package link is convenient for development
 but is not a reproducible release dependency: a clean CI/deployment must check
 out the exact FOSS Earth revision alongside it, or use a published/pinned
@@ -101,8 +101,9 @@ provider-account review was performed in this phase.
 * JSBSim disposal removes different callback instances and does not call the
   SDK's destroy lifecycle. Validate repeated start/stop use before public
   release.
-* GitHub Pages deployment has not been demonstrated at the new `/OSFS/` base
-  path, including JSBSim data hydration and phone pairing.
+* GitHub Pages deployment needs an interactive flight-mode and phone-pairing
+  check at the organization-site root, even though the static entry page and
+  JSBSim data manifest are reachable.
 
 ## Required next actions
 

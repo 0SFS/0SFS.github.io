@@ -1,6 +1,6 @@
 # Rename record: `flight-sim` → OSFS
 
-OSFS means **Open Source Flight Simulator**. The product and GitHub repository were renamed to OSFS on 2026-09-09. This document records the completed migration and the remaining deployment verification.
+OSFS means **Open Source Flight Simulator**. The product was renamed to OSFS on 2026-09-09. It is hosted as the 0SFS organization site so its public address is `https://0sfs.github.io/`.
 
 ## Completed changes
 
@@ -10,18 +10,18 @@ OSFS means **Open Source Flight Simulator**. The product and GitHub repository w
 | --- | --- |
 | Product labels | README, browser title, and phone controller now use OSFS. |
 | Package identity | Root package and lockfile names are `osfs`. |
-| Repository | GitHub repository is `Felipegalind0/OSFS`; the local `origin` matches it. |
-| Deployment paths | Pages and controller defaults use `/OSFS/`. |
+| Repository | GitHub repository is `0SFS/0SFS.github.io`; the local `origin` matches it. |
+| Deployment paths | Pages and controller defaults use the organization-site root `/`. |
 | Preferences | New keys use `osfs.*`; the previous `flight-sim.*` keys remain readable for migration. |
 
 ## Required verification
 
 | Area | Requirement |
 | --- | --- | --- |
-| GitHub Pages | Confirm the configured Pages source serves the renamed `/OSFS/` path. |
-| Phone controller | Test desktop-to-phone pairing on `https://felipegalind0.io/OSFS/`. |
-| JSBSim assets | Confirm the production build requests `/OSFS/jsbsim-data/manifest.json` and every listed XML file. |
-| Old public URL | Keep or configure a redirect if old links must continue to work. |
+| GitHub Pages | Complete: Pages serves the `gh-pages` branch root at `https://0sfs.github.io/`. |
+| Phone controller | Test desktop-to-phone pairing on `https://0sfs.github.io/`. |
+| JSBSim assets | Confirm the production build requests `/jsbsim-data/manifest.json` and every listed XML file. |
+| Old public URL | Configure a redirect if old links must continue to work. |
 
 ## Intentional legacy references
 

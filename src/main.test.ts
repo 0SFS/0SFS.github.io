@@ -48,7 +48,7 @@ describe("application route", () => {
   });
 
   it("loads the phone controller at the production base without booting either simulator", async () => {
-    window.history.replaceState(null, "", "/OSFS/?mode=remote#v=1&peer=desktop-id&join=invitation");
+    window.history.replaceState(null, "", "/?mode=remote#v=1&peer=desktop-id&join=invitation");
 
     await import("./main");
     await vi.waitFor(() => expect(appMocks.createPhoneControllerApp).toHaveBeenCalledOnce());

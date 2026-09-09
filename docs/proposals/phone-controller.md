@@ -6,7 +6,7 @@ Reviewed checkout: OSFS `4d54d204e584`
 
 ## Intended result
 
-A user opens **https://felipegalind0.io/OSFS/** on their computer, clicks **Phone controller**, scans a QR, and flies the simulated aircraft from a touch controller in their phone's browser.
+A user opens **https://0sfs.github.io/** on their computer, clicks **Phone controller**, scans a QR, and flies the simulated aircraft from a touch controller in their phone's browser.
 
 Both interfaces remain static files deployed to GitHub Pages. Use **free PeerJS Cloud for connection setup** and direct WebRTC for controls. Production requires no Vite process, local helper, Cloudflare Tunnel, or backend that we operate.
 
@@ -45,7 +45,7 @@ The desktop remains authoritative. Take control works immediately without waitin
 Scanning opens this route in the normal browser:
 
 ```text
-https://felipegalind0.io/OSFS/?mode=remote#v=1&peer=<desktop-id>&join=<secret>
+https://0sfs.github.io/?mode=remote#v=1&peer=<desktop-id>&join=<secret>
 ```
 
 The controller displays connection progress, then the aircraft's current settings and **Fly**. It must not offer Fly until authentication and both channels are ready.
@@ -91,7 +91,7 @@ The application remains usable with local controls if PeerJS Cloud is unavailabl
 ### Static routing and dependencies
 
 - Add a lazy `mode=remote` branch before flight/globe imports in [main.tsx](../../src/main.tsx). The phone route must not initialize or fetch Babylon, JSBSim, globe assets, terrain, or map services.
-- Build a clean URL from the configured public app base. Production default: `https://felipegalind0.io/OSFS/`. Keep `/OSFS/` and the trailing slash. Include only the controller mode and invitation fields, never desktop map keys or other query parameters.
+- Build a clean URL from the configured public app base. Production default: `https://0sfs.github.io/`. Keep the root path and trailing slash. Include only the controller mode and invitation fields, never desktop map keys or other query parameters.
 - Read and validate the fragment, retain its data in memory, then remove it with `history.replaceState`. Refreshing the phone page requires a new invitation in v1.
 - Bundle and lock the PeerJS client and QR encoder with the application. Generate QR locally; do not send its secret to a QR image service.
 - Start with **PeerJS 1.5.5 pinned exactly**, the release whose source was inspected for this design. Changes of version require repeating the transport compatibility gate below.
@@ -300,7 +300,7 @@ Keep feature code in OSFS. No FOSS Earth modification or `services/signaling/` d
 
 Implementation is complete only after these checks pass:
 
-1. **Production-only flow:** Open the deployed app and scan its QR with no local process running. The phone reloads the `/OSFS/?mode=remote` route successfully; its network requests contain no simulator/globe payloads or map keys.
+1. **Production-only flow:** Open the deployed app and scan its QR with no local process running. The phone reloads the `/?mode=remote` route successfully; its network requests contain no simulator/globe payloads or map keys.
 2. **Real devices:** Current iPhone Safari and Android Chrome pair with desktop Chromium on a home LAN; also verify desktop Safari. Record OS/browser versions, selected non-relay candidate pair, and actual channel delivery settings. Confirm PeerJS's wrapped channel remains intact.
 3. **Pairing:** Expired/reused/wrong invitations, second phone, malformed links, and version mismatch cannot control the aircraft. The secret stays out of signaling metadata, requests to static hosting, logs, and persistent storage.
 4. **Authority:** Pairing does not alter flight. Both handoffs preserve non-default throttle/trim/flaps. Idle gamepad cannot overwrite phone controls. Deliberate desktop takeover works without network acknowledgements. Old epochs cannot regain control.
@@ -327,6 +327,6 @@ The desktop and phone entry points are dynamically imported by `mode=flight` and
 
 The headless Brave verification environment reached PeerJS Cloud and exchanged ICE candidates, but the data channel stayed in ICE checking. A separate minimal native WebRTC pair in the same page, without PeerJS or application code, failed in the same way; a repeat in Chrome 153 on September 9, 2026 also stayed in ICE checking. That environment therefore could not verify an established direct connection. Production pairing, desktop Safari, physical iPhone/Android compatibility, and measured touch-to-aircraft latency remain unverified. No development server or deployment was started.
 
-The production build was checked in isolated Chrome 153 at the former `/flight-sim/` base path using intercepted static assets, without starting a server. Re-run this check at the `/OSFS/` base path before release. The phone route downloaded no globe, flight-simulation, or JSBSim chunks. Invalid invitations initialized no networking, valid invitation credentials were cleared before networking and absent from observed requests, and refreshing required a new QR. Opening another invitation in the same tab now consumes the new fragment and replaces the previous client.
+The production build was checked in isolated Chrome 153 at the former `/flight-sim/` base path using intercepted static assets, without starting a server. Re-run this check at the organization-site root before release. The phone route downloaded no globe, flight-simulation, or JSBSim chunks. Invalid invitations initialized no networking, valid invitation credentials were cleared before networking and absent from observed requests, and refreshing required a new QR. Opening another invitation in the same tab now consumes the new fragment and replaces the previous client.
 
 Additional regression coverage checks that desktop camera changes preserve a pending Fly handoff, delayed status messages cannot restore a hidden or timed-out phone's authority, and protocol-version mismatches request a reload of both devices. Desktop ownership status uses a bounded, coalesced retry when the reliable channel is busy; persistent failure closes the session instead of leaving the phone indefinitely disabled.

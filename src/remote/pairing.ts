@@ -1,6 +1,6 @@
 export const INVITATION_TTL_MS = 120_000
 
-const DEFAULT_CONTROLLER_URL = 'https://felipegalind0.io/OSFS/'
+const DEFAULT_CONTROLLER_URL = 'https://0sfs.github.io/'
 const PEER_ID = /^[A-Za-z0-9](?:[A-Za-z0-9_-]{0,126}[A-Za-z0-9])?$/
 const JOIN_SECRET = /^[A-Za-z0-9_-]{43}$/
 

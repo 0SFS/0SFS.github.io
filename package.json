@@ -16,7 +16,7 @@
     "build": "tsc -b && vite build",
     "ci": "npm run lint && npm run test && npm run build",
     "deploy": "npm run deploy:gh-pages",
-    "deploy:gh-pages": "npm run build -- --base=/OSFS/ && gh-pages -d dist",
+    "deploy:gh-pages": "npm run build -- --base=/ && gh-pages -d dist",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run --passWithNoTests",

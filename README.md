@@ -106,12 +106,22 @@ Run all three with `npm run ci`. Tests cover coordinate and attitude transforms,
 
 ## Deploy
 
-`npm run deploy` builds with the `/OSFS/` GitHub Pages base and publishes `dist`. If a failed publish reports `spawn E2BIG`, clear the publisher's temporary checkout before retrying:
+`npm run deploy` builds for the organization-site root and publishes `dist`. If a failed publish reports `spawn E2BIG`, clear the publisher's temporary checkout before retrying:
 
 ```sh
 npx gh-pages-clean
 npm run deploy
 ```
+
+GitHub Pages serves the locally built `gh-pages` branch at:
+
+```text
+https://0sfs.github.io/
+```
+
+No GitHub Actions workflow is required for this deployment method. Before a
+release, open the deployed site and verify flight mode, JSBSim loading, and
+phone pairing on the public URL.
 
 ## FOSS Earth Dependency
 
@@ -172,6 +182,6 @@ Pairing uses PeerJS Cloud. Flight inputs travel over a direct WebRTC data channe
 
 The QR expires after two minutes and admits one phone. Closing the dialog hides it; **Disconnect** invalidates the invitation or ends the session. Desktop flight inputs or **Take control** immediately reclaim control. Lost or delayed phone inputs, a hidden desktop tab, or phone disconnection pause the simulation and return control to the desktop. Resuming or taking phone control always requires an explicit action.
 
-The QR normally opens `https://felipegalind0.io/OSFS/?mode=remote`. To test a different static HTTPS deployment, set `VITE_PHONE_CONTROLLER_URL` to its base URL at build time. The phone and desktop must use the same protocol version; reload both after an update. The phone route loads independently of the globe renderer and JSBSim.
+The QR normally opens `https://0sfs.github.io/?mode=remote`. To use a different static HTTPS deployment, set `VITE_PHONE_CONTROLLER_URL` to its base URL at build time. The phone and desktop must use the same protocol version; reload both after an update. The phone route loads independently of the globe renderer and JSBSim.
 
 See [the specification](docs/proposals/phone-controller.md) for the control protocol, failure behavior, and device acceptance checklist. Real iPhone/Android testing on the deployed site is still required before treating the feature as verified on those devices.

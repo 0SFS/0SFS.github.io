@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-// @vitest-environment-options {"url":"https://felipegalind0.io/OSFS/"}
+// @vitest-environment-options {"url":"https://0sfs.github.io/"}
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({ render: vi.fn(), unmount: vi.fn(), createClient: vi.fn(), destroyClient: vi.fn() }))
 vi.mock('react-dom/client', () => ({ createRoot: () => ({ render: mocks.render, unmount: mocks.unmount }) }))
@@ -17,13 +17,13 @@ function invitationHash(peer = 'desktop', token = secret) { return `#v=1&peer=${
 beforeEach(() => {
   vi.clearAllMocks()
   mocks.createClient.mockImplementation(() => ({ destroy: mocks.destroyClient }))
-  window.history.replaceState(null, '', '/OSFS/?mode=remote')
+  window.history.replaceState(null, '', '/?mode=remote')
   document.body.innerHTML = '<div id="root"></div>'
 })
 afterEach(() => { apps.splice(0).forEach(app => app.destroy()); document.body.replaceChildren() })
 describe('phone controller application', () => {
   it('clears the URL credential before creating exactly one client and disposes both resources', async () => {
-    window.history.replaceState({ keep: true }, '', `/OSFS/?mode=remote#v=1&peer=desktop&join=${secret}`)
+    window.history.replaceState({ keep: true }, '', `/?mode=remote#v=1&peer=desktop&join=${secret}`)
     mocks.createClient.mockImplementation((invitation: { peerId: string; secret: string }) => {
       expect(window.location.hash).toBe('')
       expect(window.history.state).toEqual({ keep: true })
@@ -32,7 +32,7 @@ describe('phone controller application', () => {
     })
     const app = await mount()
     expect(mocks.createClient).toHaveBeenCalledOnce()
-    expect(window.location.pathname).toBe('/OSFS/')
+    expect(window.location.pathname).toBe('/')
     expect(window.location.search).toBe('?mode=remote')
     expect(mocks.createClient.mock.calls[0][0].secret).toBe('')
     expect(mocks.render).toHaveBeenCalledOnce()
@@ -42,7 +42,7 @@ describe('phone controller application', () => {
   })
   it('shows recovery instructions and avoids networking for invalid or refreshed links', async () => {
     for (const hash of ['', '#v=1&peer=desktop&join=invalid']) {
-      window.history.replaceState(null, '', `/OSFS/?mode=remote${hash}`)
+      window.history.replaceState(null, '', `/?mode=remote${hash}`)
       const app = await mount()
       expect(window.location.hash).toBe('')
       expect(mocks.createClient).not.toHaveBeenCalled()
@@ -65,14 +65,14 @@ describe('phone controller application', () => {
     await vi.waitFor(() => expect(mocks.createClient).toHaveBeenCalledOnce())
     expect(mocks.render.mock.calls.at(-1)![0].props.client).toBe(mocks.createClient.mock.results[0].value)
     expect(mocks.createClient.mock.calls[0][0].secret).toBe('')
-    expect(window.location.href).toBe('https://felipegalind0.io/OSFS/?mode=remote')
+    expect(window.location.href).toBe('https://0sfs.github.io/?mode=remote')
   })
 
   it('destroys the previous client before pairing a fresh QR and remounts touch state', async () => {
     const first = { destroy: vi.fn() }
     const second = { destroy: vi.fn() }
     mocks.createClient.mockReturnValueOnce(first).mockReturnValueOnce(second)
-    window.history.replaceState({ preserve: 'state' }, '', `/OSFS/?mode=remote${invitationHash()}`)
+    window.history.replaceState({ preserve: 'state' }, '', `/?mode=remote${invitationHash()}`)
     const app = await mount()
     const firstKey = mocks.render.mock.calls.at(-1)![0].key
     window.location.hash = invitationHash('other-desktop', 'b'.repeat(43))
@@ -97,7 +97,7 @@ describe('phone controller application', () => {
     window.location.hash = invitationHash('older-desktop')
     window.location.hash = invitationHash('latest-desktop', 'c'.repeat(43))
     await vi.waitFor(() => expect(mocks.createClient).toHaveBeenCalledOnce())
-    window.dispatchEvent(new HashChangeEvent('hashchange', { newURL: `https://felipegalind0.io/OSFS/?mode=remote${invitationHash('older-desktop')}` }))
+    window.dispatchEvent(new HashChangeEvent('hashchange', { newURL: `https://0sfs.github.io/?mode=remote${invitationHash('older-desktop')}` }))
     await new Promise(resolve => setTimeout(resolve, 0))
     expect(mocks.createClient).toHaveBeenCalledOnce()
     expect(mocks.createClient.mock.calls[0][0]).toEqual({ peerId: 'latest-desktop', secret: '' })
@@ -105,7 +105,7 @@ describe('phone controller application', () => {
   })
 
   it('clears invalid new fragments, closes the old client, and can recover with the next valid scan', async () => {
-    window.history.replaceState(null, '', `/OSFS/?mode=remote${invitationHash()}`)
+    window.history.replaceState(null, '', `/?mode=remote${invitationHash()}`)
     await mount()
     window.location.hash = invitationHash('desktop', 'invalid')
     await vi.waitFor(() => expect(mocks.destroyClient).toHaveBeenCalledOnce())

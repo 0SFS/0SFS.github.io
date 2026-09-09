@@ -63,9 +63,9 @@ in compiled JSBSim source in OSFS.
 
 ## Deployment requirement
 
-Hydration derives its default from Vite's `BASE_URL`. The OSFS Pages build uses
-`/OSFS/`, so it requests `/OSFS/jsbsim-data/...`; local development continues
-to use `/jsbsim-data/...`. Verify the manifest and every XML request against
+Hydration derives its default from Vite's `BASE_URL`. The OSFS organization-site
+build uses `/`, so it requests `/jsbsim-data/...`; local development also uses
+`/jsbsim-data/...`. Verify the manifest and every XML request against
 the deployed Pages URL before release.
 
 ## License and data boundary
