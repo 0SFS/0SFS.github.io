@@ -627,3 +627,72 @@
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+.flight-status-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.flight-status-overlay__card {
+  display: flex;
+  gap: 12px;
+  max-width: 460px;
+  padding: 15px 17px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 5px;
+  background: rgba(11, 15, 17, 0.9);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+  color: #e6edef;
+  pointer-events: auto;
+  backdrop-filter: blur(3px);
+}
+
+.flight-status-overlay[data-kind="fault"] .flight-status-overlay__card {
+  border-color: rgba(232, 119, 111, 0.5);
+}
+
+.flight-status-overlay[data-kind="fault"] svg { color: #e8776f; }
+.flight-status-overlay[data-kind="waiting"] svg { color: var(--flight-panel-accent); }
+
+.flight-status-overlay__card svg { flex: none; margin-top: 1px; }
+
+.flight-status-overlay__card strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+.flight-status-overlay__card p {
+  margin: 0;
+  color: #a8b3b6;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.flight-status-overlay__reasons {
+  margin: 8px 0 0;
+  padding-left: 16px;
+  color: #cad3d5;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.flight-status-overlay__card .flight-panel__command {
+  margin-top: 11px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .flight-status-overlay[data-kind="waiting"] svg {
+    animation: flight-status-spin 1.4s linear infinite;
+  }
+}
+
+@keyframes flight-status-spin {
+  to { transform: rotate(360deg); }
+}

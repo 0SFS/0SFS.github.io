@@ -170,6 +170,25 @@ entirely.
 Coarse levels merge the control surfaces into their panels and expose only the
 propeller. The rig binds whatever it finds, so this needs no special handling.
 
+## When the simulation stops
+
+Two different things stop the simulation, and they used to look identical from
+the outside — the aircraft simply stopped moving.
+
+**A physics fault** pauses it. The fixed-step loop raises one when a step fails,
+leaves the flight envelope, moves more than 100 m in a single 120 Hz step, or
+changes airspeed by more than 200 kt. It names the guard that tripped and the
+values behind it.
+
+**A missing terrain sample** is quieter. With a raster basemap the loop declines
+to step at all rather than integrate against a ground height it cannot measure,
+so nothing faults and nothing pauses; the aircraft just holds position.
+
+Both now show a centre-screen notice — the fault in red with its reasons and a
+Resume button, the terrain hold as a status that clears itself. Every automatic
+transition is also written to the event log in the Debug tab and mirrored to the
+console.
+
 ## Adding an aircraft
 
 1. Export GLBs into `public/aircraft/<aircraft-id>/`, authored nose along +Y and

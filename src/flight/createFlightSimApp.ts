@@ -44,6 +44,8 @@ import {
 import { createFlightControlPanel } from "./hud/createFlightControlPanel";
 import { createFlightHud, type FlightHudHandle } from "./hud/flightHud";
 import { createFlightHudBar, type FlightHudBarHandle } from "./hud/createFlightHudBar";
+import { createFlightStatusOverlay, type FlightStatusOverlayHandle } from "./hud/createFlightStatusOverlay";
+import type { FlightStatusOverlayState } from "./hud/FlightStatusOverlay";
 import { attachFlightCameraInput } from "./input/flightCameraInput";
 import { createFlightInputManager } from "./input/flightInputManager";
 import { createJsbsimRuntime } from "./jsbsim/createJsbsimRuntime";
@@ -115,6 +117,7 @@ export async function createFlightSimApp(
     <div class="flight-app">
       <canvas class="flight-app__canvas" aria-label="Flight simulator viewport"></canvas>
       <div class="flight-hud-root"></div>
+      <div class="flight-status-root"></div>
       <div class="flight-shell-root"></div>
       <div class="flight-panel-root"></div>
     </div>
@@ -122,9 +125,10 @@ export async function createFlightSimApp(
 
   const canvas = rootElement.querySelector<HTMLCanvasElement>(".flight-app__canvas");
   const hudRoot = rootElement.querySelector<HTMLElement>(".flight-hud-root");
+  const statusRoot = rootElement.querySelector<HTMLElement>(".flight-status-root");
   const shellRoot = rootElement.querySelector<HTMLElement>(".flight-shell-root");
   const panelRoot = rootElement.querySelector<HTMLElement>(".flight-panel-root");
-  if (!canvas || !hudRoot || !shellRoot || !panelRoot) {
+  if (!canvas || !hudRoot || !statusRoot || !shellRoot || !panelRoot) {
     throw new Error("Flight sim shell failed to mount.");
   }
 
@@ -173,6 +177,10 @@ export async function createFlightSimApp(
   };
   let controlPanel: FlightControlPanelHandle | null = null;
   let hudBar: FlightHudBarHandle | null = null;
+  let statusOverlay: FlightStatusOverlayHandle | null = null;
+  // A missing terrain sample stops the loop from stepping without raising a
+  // fault, so track how long that has been true to tell a stall from a hitch.
+  let terrainBlockedSinceMs: number | null = null;
   let inputMode = loadInputModePreference(new Set(["mouse", "trackpad"]));
   let inputSensitivity = loadInputSensitivityPreference();
   const detachCameraInput = attachFlightCameraInput(canvas, {
@@ -372,6 +380,34 @@ export async function createFlightSimApp(
     },
     onSettingsClick: () => panelRoot.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')?.click(),
   });
+  statusOverlay = createFlightStatusOverlay(statusRoot, {
+    onResume: () => setSimulationPaused(false),
+  });
+
+  /** Reasons recorded alongside the most recent physics fault. */
+  const latestFaultReasons = (): string[] => {
+    const entry = flightLog.entries().find(
+      (candidate) => candidate.level === "error" && candidate.source === "physics",
+    );
+    const failed = entry?.detail?.failed;
+    return Array.isArray(failed) ? failed.map(String) : [];
+  };
+
+  const updateStatusOverlay = (fault: string | null, nowMs: number): void => {
+    let state: FlightStatusOverlayState = null;
+    if (fault) {
+      state = { kind: "fault", message: fault, failed: latestFaultReasons() };
+    } else if (terrainBlockedSinceMs !== null) {
+      const heldSeconds = (nowMs - terrainBlockedSinceMs) / 1000;
+      // Single-frame misses are normal while tiles stream in; only say
+      // something once the aircraft has actually stopped moving.
+      if (heldSeconds >= 0.4) {
+        state = { kind: "waiting", message: "Waiting for terrain height data", heldSeconds };
+      }
+    }
+    statusOverlay?.update(state);
+  };
+
   hudBar.update(initialState, runtime.status, measuredFps, inputManager.isPaused());
 
   const ensureWorld = (): void => {
@@ -403,15 +439,37 @@ export async function createFlightSimApp(
 
     physicsLoop.setPaused(inputManager.isPaused());
     const controls = inputManager.poll(deltaSeconds);
+    let terrainBlocked = false;
     const displayState = physicsLoop.update(deltaSeconds, () => {
       const contact = terrainContact.update(blockOnMissingSurface);
-      if (contact === false) return false;
+      if (contact === false) {
+        terrainBlocked = true;
+        return false;
+      }
       if (visibleMeshCollision.update()) return "reset";
       inputManager.apply(jsbsim.sdk, controls);
       return contact;
     });
 
+    const tickNowMs = performance.now();
+    if (terrainBlocked) {
+      if (terrainBlockedSinceMs === null) {
+        terrainBlockedSinceMs = tickNowMs;
+        flightLog.warn("terrain", "Holding: no terrain height under the aircraft", {
+          latDeg: Number(displayState.latDeg.toFixed(5)),
+          lonDeg: Number(displayState.lonDeg.toFixed(5)),
+          mapMode: runtime.status.mode,
+        });
+      }
+    } else if (terrainBlockedSinceMs !== null) {
+      flightLog.info("terrain", "Terrain height available again; physics resuming", {
+        heldSeconds: Number(((tickNowMs - terrainBlockedSinceMs) / 1000).toFixed(2)),
+      });
+      terrainBlockedSinceMs = null;
+    }
+
     const fault = physicsLoop.getFault();
+    updateStatusOverlay(fault, tickNowMs);
     if (fault) {
       runtime.status.lastError = fault;
       runtime.status.message = fault;
@@ -454,6 +512,7 @@ export async function createFlightSimApp(
       detachCameraInput();
       detachInput();
       hudBar?.destroy();
+      statusOverlay?.destroy();
       controlPanel?.destroy();
       flightHud.destroy();
       aircraftModel?.dispose();
