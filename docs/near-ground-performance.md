@@ -150,3 +150,26 @@ BVH/indexing for remaining collision scans; workers and affected-neighbor seam
 updates for terrain preparation; rendering/LOD work for tile traversal or draw
 submission. Reducing contact rate or blindly caching nearby heights can miss
 obstacles and is not an equivalent-answer optimization.
+
+## Collision geometry visualization
+
+Open the right panel → **Debug → Collision geometry → Show aircraft collision
+geometry**. The overlay stays visible through the aircraft in both camera views;
+use third person and orbit the camera to inspect the complete arrangement.
+
+- **Cyan:** the five body probes swept between physics steps near the ground.
+- **Amber:** the three JSBSim wheel contacts.
+- **Purple:** the nose/tail skids and two structural wingtip contacts.
+- **White:** the aircraft centre of gravity.
+
+The marker positions come from the same definitions used by collision physics.
+Ground contacts follow the current fuel/payload centre of gravity, and the entire
+overlay follows the aircraft attitude and floating origin. Marker sizes and lines
+from the centre are visibility aids: they do not define solid surfaces, collision
+radii, or extra collision rays. The model currently uses points rather than a
+closed collision mesh, and still uses C172 physics when another visual aircraft
+is selected.
+
+This is a session-only debug option, off on reload. It allocates no overlay meshes
+or additional SDK reads before activation; disabled overlays skip updates and
+cannot be picked as terrain. Enabling it does not change the physics.

@@ -39,6 +39,7 @@ import {
   type KeyboardStickSettings,
 } from "../input/keyboardStickSettings";
 import type { OrbitInvertSettings } from "../input/orbitInvertSettings";
+import { WHEEL_SPIN_CONFIGS, type WheelSpinMode, type WheelSpinState } from "../physics/wheelSpin";
 
 type FlightPanelTab = "weather" | "aircraft" | "debug" | "settings";
 
@@ -98,6 +99,11 @@ export interface FlightControlPanelSnapshot {
   keyboardStick: KeyboardStickSettings;
   orbitInvert: OrbitInvertSettings;
   arcadeGroundLaunches: boolean;
+  collisionDebugEnabled: boolean;
+  wheelSpinMode: WheelSpinMode | "off";
+  tireSoundEnabled: boolean;
+  tireAudioStatus: string | null;
+  wheelSpinStates: readonly WheelSpinState[];
 }
 
 export interface FlightControlPanelOptions {
@@ -118,6 +124,9 @@ export interface FlightControlPanelOptions {
   onKeyboardStickSettingsChange(settings: KeyboardStickSettings): void;
   onOrbitInvertChange(settings: OrbitInvertSettings): void;
   onArcadeGroundLaunchesChange(enabled: boolean): void;
+  onCollisionDebugChange(enabled: boolean): void;
+  onWheelSpinModeChange(mode: WheelSpinMode | "off"): void;
+  onTireSoundChange(enabled: boolean): void;
 }
 
 export interface FlightControlPanelHandle {
@@ -801,7 +810,8 @@ function WorldDetailSettings({
   );
 }
 
-function DebugPanel({ snapshot }: Pick<FlightControlPanelProps, "snapshot">) {
+function DebugPanel({ snapshot, onCollisionDebugChange, onWheelSpinModeChange, onTireSoundChange }: Pick<FlightControlPanelProps,
+  "snapshot" | "onCollisionDebugChange" | "onWheelSpinModeChange" | "onTireSoundChange">) {
   return (
     <div className="flight-panel__content">
       <div className="flight-panel__metrics">
@@ -810,6 +820,68 @@ function DebugPanel({ snapshot }: Pick<FlightControlPanelProps, "snapshot">) {
         <Metric label="Map runtime" value={snapshot.runtimeStatus.mode} />
         <Metric label="Camera" value={snapshot.viewMode} />
       </div>
+      <fieldset className="flight-panel__fieldset">
+        <legend>Collision geometry</legend>
+        <label className="flight-panel__field flight-panel__field--inline">
+          <input type="checkbox" aria-label="Show aircraft collision geometry"
+            checked={snapshot.collisionDebugEnabled}
+            onChange={(event) => onCollisionDebugChange(event.target.checked)} />
+          <span>Show aircraft collision geometry</span>
+        </label>
+        <p className="flight-panel__hint">
+          Visible through the aircraft in either camera view. Off by default; resets when the game reloads.
+        </p>
+        {snapshot.collisionDebugEnabled && <>
+          <div className="flight-panel__metrics" aria-label="Collision geometry legend">
+            <Metric label="Cyan" value="5 swept body probes" />
+            <Metric label="Amber" value="3 wheel contacts" />
+            <Metric label="Purple" value="4 structural contacts" />
+            <Metric label="White" value="Centre of gravity" />
+          </div>
+          <p className="flight-panel__hint">
+            These are contact points, not a solid collision mesh. Marker sizes and lines from the centre
+            are visual guides. Body probes sweep between physics steps near the ground.
+          </p>
+          <p className="flight-panel__hint">
+            Shows the current C172 physics geometry, including when a different visual aircraft is selected.
+          </p>
+        </>}
+      </fieldset>
+      <fieldset className="flight-panel__fieldset">
+        <legend>Wheel spin experiment</legend>
+        <label className="flight-panel__field">
+          <span>Wheel response</span>
+          <select aria-label="Wheel spin experiment" value={snapshot.wheelSpinMode}
+            onChange={event => onWheelSpinModeChange(event.target.value as WheelSpinMode | "off")}>
+            <option value="off">Off</option>
+            <option value="instant">A · Instant rolling</option>
+            <option value="inertia">B · Gradual spin-up</option>
+          </select>
+        </label>
+        <p className="flight-panel__hint">
+          Compare wheel rotation and touchdown sound. Aircraft handling and braking stay the same.
+          Changing modes resets the wheels; compare from an airborne approach. Off on reload.
+        </p>
+        <label className="flight-panel__field flight-panel__field--inline">
+          <input type="checkbox" aria-label="Enable tire sound" checked={snapshot.tireSoundEnabled}
+            disabled={snapshot.wheelSpinMode === "off"}
+            onChange={event => onTireSoundChange(event.target.checked)} />
+          <span>Enable tire sound</span>
+        </label>
+        {snapshot.tireAudioStatus && <p className="flight-panel__hint" role="status">{snapshot.tireAudioStatus}</p>}
+        {snapshot.wheelSpinMode !== "off" && <>
+          <p className="flight-panel__hint">
+            Enable collision geometry above to see tire outlines and rotating spokes.
+            The outlines show estimated tire size; amber dots remain the contact references.
+            Spin-up sound fades as the tread matches ground speed.
+          </p>
+          <div className="flight-panel__metrics" aria-label="Wheel spin telemetry">
+            {snapshot.wheelSpinStates.map((wheel, index) => <Metric key={index}
+              label={WHEEL_SPIN_CONFIGS[index].name.replaceAll("_", " ")}
+              value={`${Math.round(wheel.omegaRadSec * 60 / (2 * Math.PI))} rpm · ${wheel.slipMetersSec.toFixed(1)} m/s slip${wheel.onGround ? " · contact" : " · air"}`} />)}
+          </div>
+        </>}
+      </fieldset>
       <div className="flight-panel__debug-status">
         <Gauge size={18} aria-hidden="true" />
         <span>{snapshot.runtimeStatus.lastError ?? snapshot.runtimeStatus.message}</span>
@@ -858,7 +930,8 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
                 <KeyboardStickSettingsPanel {...props} />
                 <WorldDetailSettings {...props} />
                 <MapCachePanel />
-              </> : <DebugPanel snapshot={props.snapshot} />}
+              </> : <DebugPanel snapshot={props.snapshot} onCollisionDebugChange={props.onCollisionDebugChange}
+                onWheelSpinModeChange={props.onWheelSpinModeChange} onTireSoundChange={props.onTireSoundChange} />}
         </>;
       }}
     />

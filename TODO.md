@@ -61,6 +61,12 @@ wired in (1204 / 908 / 442 triangles, LOD3 down to LOD1), but the aerodynamics,
 gear and stance are still the Cessna's, so the jet sits at the C172's 1.33 m
 reference stance rather than its own.
 
+**The main gear linkage does not articulate.** LOD3 models the trailing link as
+three members - forward leg, trailing arm, oleo - but as one rigid mesh under
+one node. The oleo does not compress and the arm does not swing on its knee,
+because each needs a node of its own and a runtime that can drive a chain
+rather than a single rotation. It is a trailing link in shape only.
+
 **The retractable gear is visual only.** `L` raises and lowers it and the rig
 runs an 8-second transit off `gear/gear-cmd-norm`, but nothing acts on that
 command: the c172p has fixed gear and no retraction system, so

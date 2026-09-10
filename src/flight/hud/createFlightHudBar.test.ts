@@ -19,6 +19,7 @@ describe("flight input method selector", () => {
     document.body.append(container);
     const onInputModeChange = vi.fn();
     const onTerrainSourceChange = vi.fn();
+    const onMapSourceChange = vi.fn();
     let terrainDetailOverride: number | null = null;
     let activeTerrainDetail = 16;
     const onTerrainDetailChange = vi.fn((errorTarget: number | null) => {
@@ -45,9 +46,16 @@ describe("flight input method selector", () => {
         terrainSource: { id: "mapterhorn", label: "Mapterhorn Terrain" },
         rasterQuality: { setting: "auto", activeProfile: "balanced" },
       } as BabylonRuntimeStatus,
-      rasterSources: [],
+      rasterSources: [{
+        id: "usgs-imagery",
+        label: "USGS Imagery",
+        provider: "USGS",
+        protocol: "xyz",
+        urlTemplate: "",
+        attribution: "",
+      }],
       terrainSources: [{ id: "mapterhorn", label: "Mapterhorn Terrain", provider: "Mapterhorn", urlTemplate: "", maxZoom: 15, attribution: "" }],
-      onPausedChange: vi.fn(), onRendererChange: vi.fn(), onMapSourceChange: vi.fn(), onTerrainSourceChange,
+      onPausedChange: vi.fn(), onRendererChange: vi.fn(), onMapSourceChange, onTerrainSourceChange,
       getTerrainDetailState: () => ({
         available: true,
         minErrorTarget: 16,
@@ -85,9 +93,26 @@ describe("flight input method selector", () => {
     const mapControl = mapButton.parentElement!;
     const mapDownloadSpeed = mapControl.querySelector(".map-download-speed")!;
     const terrainDetailControl = mapControl.querySelector(".flight-terrain-detail-control")!;
+    const mapMenu = container.querySelector<HTMLElement>("#flightMapSourceMenu")!;
+    const threeDToggle = mapMenu.querySelector<HTMLButtonElement>('[data-basemap-section="3d"]')!;
+    const twoDToggle = mapMenu.querySelector<HTMLButtonElement>('[data-basemap-section="2d"]')!;
+    const twoDContent = mapMenu.querySelector<HTMLElement>("#flightBasemap2DContent")!;
+    const elevationProviders = mapMenu.querySelector<HTMLElement>(".flight-basemap-menu__elevation-providers")!;
     expect(mapDownloadSpeed.textContent).toBe("000MB/s");
     expect(mapDownloadSpeed.parentElement).toBe(mapButton);
     expect([...mapControl.children].indexOf(terrainDetailControl)).toBeGreaterThan([...mapControl.children].indexOf(mapButton));
+    expect(container.querySelector("#flightTerrainSourceButton")).toBeNull();
+    expect(Array.from(mapMenu.querySelectorAll(".flight-basemap-menu__section-toggle .flight-basemap-menu__heading"), (heading) => heading.textContent))
+      .toEqual(["3D basemaps", "2D basemaps"]);
+    expect(mapMenu.querySelector('[data-map-source="google"]')?.textContent).toBe("Google 3D Tiles");
+    expect(mapMenu.querySelector('[data-map-source="usgs-imagery"]')?.textContent).toBe("USGS Imagery");
+    expect(threeDToggle.getAttribute("aria-expanded")).toBe("false");
+    expect(twoDToggle.getAttribute("aria-expanded")).toBe("true");
+    expect(elevationProviders.hidden).toBe(false);
+    twoDToggle.click();
+    expect(twoDContent.hidden).toBe(true);
+    twoDToggle.click();
+    expect(twoDContent.hidden).toBe(false);
     expect(mapButton.classList.contains("is-streaming")).toBe(true);
     activityListener(false);
     expect(mapButton.classList.contains("is-streaming")).toBe(true);
@@ -103,9 +128,19 @@ describe("flight input method selector", () => {
     expect(container.querySelector("#flightFps")?.textContent).toBe("FPS 60");
     container.querySelector<HTMLButtonElement>("#flightSettingsButton")!.click();
     expect(onSettingsClick).toHaveBeenCalledOnce();
-    container.querySelector<HTMLButtonElement>("#flightTerrainSourceButton")!.click();
+    container.querySelector<HTMLButtonElement>("[data-map-source=usgs-imagery]")!.click();
+    expect(onMapSourceChange).toHaveBeenCalledWith("usgs-imagery");
     container.querySelector<HTMLButtonElement>("[data-terrain-source=mapterhorn]")!.click();
     expect(onTerrainSourceChange).toHaveBeenCalledWith("mapterhorn");
+    hud.update({ latDeg: 0, lonDeg: 0, headingRad: 0 } as never, {
+      mode: "google-tiles",
+      terrainSource: { id: "mapterhorn", label: "Mapterhorn Terrain" },
+    } as BabylonRuntimeStatus, 60, false);
+    expect(elevationProviders.hidden).toBe(true);
+    expect(threeDToggle.getAttribute("aria-expanded")).toBe("true");
+    expect(twoDToggle.getAttribute("aria-expanded")).toBe("false");
+    expect(mapMenu.querySelector(".flight-basemap-menu__notice")?.textContent)
+      .toBe("Terrain is included. No elevation provider is used.");
     const terrainDetailSlider = container.querySelector<HTMLInputElement>("#flightTerrainDetailSlider")!;
     expect(terrainDetailSlider.value).toBe("12");
     const terrainDetailMarker = container.querySelector<HTMLElement>(".flight-terrain-detail-control__active-marker")!;

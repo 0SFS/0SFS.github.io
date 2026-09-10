@@ -2,21 +2,13 @@ import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
 import { DEG_TO_RAD, ecefToGeodetic, geodeticToEcef } from "foss-earth/cameraMath";
 import type { SurfaceQuery } from "foss-earth/runtime";
 import { readFlightState } from "../bridge/ecefBridge";
+import { BODY_COLLISION_PROBES, MAX_BODY_COLLISION_ALTITUDE_METERS } from "./collisionGeometry";
 import { interpolateFlightState, type FlightState } from "./flightState";
 import { captureSimulation, restoreSimulation } from "./safeFlightState";
 
-const MAX_COLLISION_ALTITUDE_METERS = 150;
 const CONTACT_CLEARANCE_METERS = 0.01;
 const RESTITUTION = 0.25;
 const FEET_PER_METER = 1 / 0.3048;
-
-const PROBES = [
-  { name: "nose", left: 0, up: 0.7, forward: 4.5 },
-  { name: "center", left: 0, up: -0.2, forward: 0 },
-  { name: "left-wing", left: 5.5, up: 0.6, forward: 0.2 },
-  { name: "right-wing", left: -5.5, up: 0.6, forward: 0.2 },
-  { name: "tail", left: 0, up: 1.4, forward: -3.8 },
-] as const;
 
 interface EcefVector { x: number; y: number; z: number }
 
@@ -34,7 +26,7 @@ function localAxes(state: FlightState): { north: EcefVector; east: EcefVector; u
   return { north, east, up };
 }
 
-function probeOffset(state: FlightState, probe: typeof PROBES[number]): EcefVector {
+function probeOffset(state: FlightState, probe: typeof BODY_COLLISION_PROBES[number]): EcefVector {
   const axes = localAxes(state);
   const levelForward = add(scale(axes.north, Math.cos(state.headingRad)), scale(axes.east, Math.sin(state.headingRad)));
   const levelRight = add(scale(axes.north, -Math.sin(state.headingRad)), scale(axes.east, Math.cos(state.headingRad)));
@@ -45,7 +37,7 @@ function probeOffset(state: FlightState, probe: typeof PROBES[number]): EcefVect
   return add(scale(left, probe.left), add(scale(up, probe.up), scale(forward, probe.forward)));
 }
 
-function probePosition(state: FlightState, probe: typeof PROBES[number]): EcefVector {
+function probePosition(state: FlightState, probe: typeof BODY_COLLISION_PROBES[number]): EcefVector {
   return add(geodeticToEcef(state.latDeg * DEG_TO_RAD, state.lonDeg * DEG_TO_RAD, state.altMeters),
     probeOffset(state, probe));
 }
@@ -63,13 +55,13 @@ export function createVisibleMeshCollision(sdk: JSBSimSdk, surface: SurfaceQuery
     update(): boolean {
       const current = readFlightState(sdk);
       const support = surface.sample(current.latDeg, current.lonDeg);
-      if (!previousState || !support || current.altMeters - support.heightMeters > MAX_COLLISION_ALTITUDE_METERS) {
+      if (!previousState || !support || current.altMeters - support.heightMeters > MAX_BODY_COLLISION_ALTITUDE_METERS) {
         previousState = current;
         return false;
       }
 
-      let impact: { fraction: number; point: EcefVector; normal: EcefVector; probe: typeof PROBES[number] } | null = null;
-      for (const probe of PROBES) {
+      let impact: { fraction: number; point: EcefVector; normal: EcefVector; probe: typeof BODY_COLLISION_PROBES[number] } | null = null;
+      for (const probe of BODY_COLLISION_PROBES) {
         const from = probePosition(previousState, probe);
         const to = probePosition(current, probe);
         const movement = subtract(to, from);

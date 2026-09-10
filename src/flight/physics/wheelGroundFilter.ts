@@ -9,11 +9,10 @@
  * oleos permanently excited - the aircraft buzzes over a surface a real
  * aeroplane would roll across smoothly.
  *
- * A real wheel does not follow that noise: it is a circle roughly 0.29 m in
- * radius, so it bridges anything shorter than its contact patch and only
- * climbs what it cannot bridge. This filters the sampled height over DISTANCE
- * TRAVELLED with that radius as the length constant, which reproduces the
- * bridging without simulating the contact patch. Filtering over distance
+ * This heuristic filters the sampled height over DISTANCE TRAVELLED with a
+ * tuned 0.29 m length constant, approximating how a tire bridges short surface
+ * noise without simulating the contact patch. It is not a measured tire radius
+ * or an exact circle-versus-ground query. Filtering over distance
  * rather than time matters: a parked aircraft must not drift, and a fast taxi
  * must not be over-smoothed.
  *
@@ -22,8 +21,8 @@
  * through it.
  */
 
-/** Main tyre radius of a C172 on 6.00-6 wheels. */
-export const WHEEL_RADIUS_METERS = 0.29;
+/** Existing terrain smoothing tune; independent of the wheel-spin tire radii. */
+export const GROUND_FILTER_LENGTH_METERS = 0.29;
 
 export interface WheelGroundFilter {
   /**
@@ -36,8 +35,8 @@ export interface WheelGroundFilter {
   reset(): void;
 }
 
-export function createWheelGroundFilter(radiusMeters = WHEEL_RADIUS_METERS): WheelGroundFilter {
-  const maxBridged = radiusMeters * 2;
+export function createWheelGroundFilter(lengthMeters = GROUND_FILTER_LENGTH_METERS): WheelGroundFilter {
+  const maxBridged = lengthMeters * 2;
   let filtered: number | null = null;
   return {
     height(rawMeters: number, movedMeters: number, snap: boolean): number {
@@ -46,7 +45,7 @@ export function createWheelGroundFilter(radiusMeters = WHEEL_RADIUS_METERS): Whe
         filtered = rawMeters;
         return filtered;
       }
-      filtered += (rawMeters - filtered) * (1 - Math.exp(-Math.max(movedMeters, 0) / radiusMeters));
+      filtered += (rawMeters - filtered) * (1 - Math.exp(-Math.max(movedMeters, 0) / lengthMeters));
       return filtered;
     },
     reset(): void { filtered = null; },

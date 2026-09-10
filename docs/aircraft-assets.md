@@ -91,8 +91,8 @@ Cirrus Vision Jet:
 
 | Level | Triangles | Vertices | Meshes | Intended range |
 | --- | --- | --- | --- | --- |
-| LOD3 | 1260 | 711 | 26 | Close / cockpit |
-| LOD2 | 880 | 496 | 21 | Medium |
+| LOD3 | 1312 | 743 | 26 | Close / cockpit |
+| LOD2 | 856 | 480 | 19 | Medium |
 | LOD1 | 442 | 254 | 12 | Far, and all the way out |
 
 LOD3 and LOD2 of the C172 carry a `Propeller_Disc` swept from the blade sections
@@ -217,9 +217,18 @@ travel rather than the legs' quarter turn, because a door that stops at 90° has
 swung through the skin. Only the finest level cuts the bay opening, so the
 coarse ones ship no doors and bind none.
 
-There is no main-gear bay door. The Vision Jet's main wheels retract into the
-wing root and stay visible from outside, and the panel beside each one is the
-strut-mounted `GearDoor_*`, which is a child of its leg and rides it.
+The legs and the doors do **not** move together. Each bound part carries the
+slice of the gear cycle it moves in — legs 0 to 0.78, doors 0.62 to 1 — so
+retracting, the leg is most of the way in before the doors shut over it, and
+extending, the doors are open before the leg comes through. Reading the same two
+windows backwards is what makes extension sequence correctly without a second
+table. Driving both off the same fraction folds and closes at once, which looks
+like the door passing through the leg.
+
+`BayDoor_Main_Left` and `_Right` are the wing bay doors and are bound the same
+way, on the mouth's outboard fore-aft edge. The Vision Jet's main wheels retract into the
+wing root and stay visible from outside - no door covers a wheel - so what these
+close is the leg bay beside it.
 
 The transit is run by the rig, at a fixed 8 seconds end to end, rather than read
 back from the flight model. `gear/gear-pos-norm` would be the right property and

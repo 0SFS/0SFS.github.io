@@ -1,10 +1,10 @@
 {
  "file": "sf50_lod2.blend",
- "objects": 21,
+ "objects": 19,
  "empties": 1,
- "meshes": 21,
- "triangles": 880,
- "vertices": 496,
+ "meshes": 19,
+ "triangles": 856,
+ "vertices": 480,
  "materials": 5,
  "material_names": [
   "SF50_Dark",
@@ -102,8 +102,6 @@
   "Flap_Left",
   "Flap_Right",
   "Fuselage",
-  "GearDoor_Left",
-  "GearDoor_Right",
   "Intake",
   "LandingGear_Left",
   "LandingGear_Nose",
@@ -373,31 +371,6 @@
    ]
   },
   {
-   "name": "GearDoor_Left",
-   "tris": 12,
-   "verts": 8,
-   "mats": [
-    "SF50_Paint"
-   ],
-   "origin": [
-    0.0,
-    0.0,
-    0.0
-   ],
-   "bbox": [
-    [
-     -1.688,
-     -0.42,
-     0.3
-    ],
-    [
-     -1.632,
-     0.05,
-     0.8
-    ]
-   ]
-  },
-  {
    "name": "LandingGear_Right",
    "tris": 12,
    "verts": 8,
@@ -419,31 +392,6 @@
      1.741,
      -0.291,
      0.88
-    ]
-   ]
-  },
-  {
-   "name": "GearDoor_Right",
-   "tris": 12,
-   "verts": 8,
-   "mats": [
-    "SF50_Paint"
-   ],
-   "origin": [
-    0.0,
-    0.0,
-    0.0
-   ],
-   "bbox": [
-    [
-     1.632,
-     -0.42,
-     0.3
-    ],
-    [
-     1.688,
-     0.05,
-     0.8
     ]
    ]
   },

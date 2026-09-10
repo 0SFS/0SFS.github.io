@@ -25,6 +25,17 @@ everything that does not serve them.
   they were pulled in only after the first complete build, and the cabin
   shipped through four iterations with the windows in one continuous band
   because there was nothing to check the drawing reading against.
+- **If the gear retracts, one photograph with it UP and one with it DOWN**, and
+  treat these as a hard requirement rather than a nice-to-have. **A three view
+  settles dimensions and says almost nothing about mechanism.** The SF50's
+  retraction was rebuilt three times and every correction came from a
+  photograph: which way the nose leg folds (read off a drag brace a few pixels
+  wide on the drawing, and wrong twice), that the main wheels stay visible in
+  the wing root, that the bay panel sits outboard of the wheel well, and that
+  the main leg is a trailing link rather than a rod. None of that is legible on
+  the drawing at any magnification. A gear-up belly shot is the single most
+  useful photograph you can have, because it shows every closed panel line at
+  once.
 - **An existing 3D model, if one is available**, treated as a hypothesis about
   shape and never as a source of dimensions. Aligning one is its own job with
   its own traps — see "Aligning a downloaded reference model" below. Done
@@ -35,6 +46,16 @@ everything that does not serve them.
 Everything you generate belongs in the repository, under the aircraft's
 `agent_workspace/`. Nothing that a later reader needs — a crop you measured, a
 render you judged from — may live in a temporary directory.
+
+**Keep a gallery.** `measurements/GALLERY.md` is one page per airframe holding
+every reference image, where it came from, its licence, and *what it settled*.
+That last column is the one that earns its keep: it is the difference between a
+folder of pictures and a record of why the model is the shape it is, and it is
+where a reader finds out that a photograph corrected something a drawing had
+led three builds astray on. `planes/Cirrus_Vision_Jet/.../GALLERY.md` is the
+worked example. The licence column matters too — `ASSET_LICENSES.md` records
+which reference files cannot be redistributed, and a gallery is where that is
+visible rather than buried.
 
 ## Why it is scripted
 
@@ -303,6 +324,15 @@ occluded beneath them, so the GPU drew 80 to show 40.
 **Reach for a material index before new geometry.** Windows, cabin posts and
 rounded glazing corners are all a second material on faces that already exist.
 Same draw-call count, no extra vertices, nothing hidden.
+
+**A feature read off an outline can be the right feature modelled as the wrong
+kind of thing.** The SF50's side view draws a main gear door, and it was built
+as what the outline literally is: a flat slab hanging below the wing at
+constant x. It is a real feature, correctly placed and correctly sized, and it
+looked like a vestige of nothing — because **a gear door is a panel IN the
+skin, not a slab beside the leg**. A silhouette tells you where an edge is, not
+what kind of thing it bounds. When an outline could be either a separate part
+or a panel line, that is a question for a photograph.
 
 **Open the fuselage where another part closes it.** The Cessna's roof is
 omitted across the wing chord because the wing seals it — except at the trailing
@@ -703,6 +733,34 @@ wing's lower surface with no door over them. A belly bay was cut for them
 anyway, on the argument that the belly was the only row wide enough. Cutting a
 hole where the aeroplane has none is a worse error than not cutting one.
 
+**A bay goes where the RETRACTED part lies, not where the extended one hangs.**
+Obvious written down, and easy to get backwards: the SF50's wing bay was first
+centred on the extended leg, which put the entire fold outside it — the gear
+swung past the hole meant to hold it. Work out the stowed position first, then
+put the mouth over that. The photograph agrees, and says so more directly than
+any reasoning: gear up, the panel is immediately outboard of the wheel well
+because that is the way the leg folds.
+
+**In a flying surface, cut a rib bay: it is one quad.** A hole bounded by the
+structure's own stations and face rows needs no pane tracing at all — add a
+spanwise station at each end of the bay and simply do not emit the face between
+them on the row that holds it. That is what a gear door is on a real wing, so
+the cheap thing and the correct thing are the same thing. On a straight-tapered
+wing the added stations are nearly free: the planform, the dihedral and the
+thickness are all linear in span, so an intermediate station is coplanar with
+its neighbours and the dissolve pass removes it — the two you add survive only
+because the cut makes them a feature. Drop any existing station that falls
+inside the bay, for the same reason, and the mouth stays one quad.
+
+**A skin is opaque, so anything behind it is behind it.** Said out loud it is
+trivial; it cost two rounds anyway. A well built as a cup with its walls going
+up inside the wing is invisible. A dish recessed inward is invisible, because
+inward is up. What shows is a dark patch lying just OUTSIDE the surface —
+2 mm proud, every vertex ray cast against the skin rather than laid on a plane,
+because a convex surface pushes a flat disc through its own rim. It has no
+depth and reads correctly only from the side it faces, which for an underside
+is the only side anyone sees it from.
+
 **Say what the pocket behind the mouth cannot be.** A hole in a closed shell
 shows the inside of the far side of the shell, so the mouth needs a pocket, in
 a dark material, with its normals facing *into* the cavity — `recalc_face_normals`
@@ -723,6 +781,19 @@ SF50's was 24 mm inside, which no render angle shows.
 an identity rotation, so the open pose lives in the vertices and the runtime
 turns the node the other way to shut it. Give each door its own travel: a door
 that stops at the legs' 90° has swung through the skin.
+
+**A door hinges about its own edge, not about a cardinal axis.** A panel let
+into a curved skin has a hinge line that is not level: the SF50's belly rises
+9.3° toward the nose, and turning its nose doors about the plain fore-aft axis
+did not hold the hinged edge still — it lifted the door off the mouth, and the
+open pair lay parallel to the GROUND while the body they hang from was pitched
+up. Measure the axis off the mouth's own chain and hand the runtime the same
+vector. Two things it then has to be, and both were wrong first: **pointing the
+right way along the line** (reversing it swings the doors the other way — up
+into the fuselage), and **in the plane of symmetry** if the mouth is on the
+centreline (the chain drifts a few millimetres laterally as the mouth narrows,
+and carrying that drift in gives the two halves hinge lines that are not mirror
+images).
 
 **A door on the centreline has to be symmetric — and a clamshell pair, not one
 panel hinged forward.** Hinging a nose-bay door on one side of the centreline
@@ -753,6 +824,36 @@ blender -b --factory-startup \
 Confirm every moving part exists, each has an identity rotation, each pivot sits
 at the expected station, and — for a retractable airframe — that each wheel and
 door is parented to its leg.
+
+Keep the rig's own constants in ONE place. `verify_rig.py` held its own copy of
+the SF50's retraction hinges, and the moment the stowed wheels moved it reported
+two broken pivots on a model that was correct. It now execs the generator's
+constant header and derives them, which is the only way a check and the thing it
+checks cannot drift apart.
+
+### Test where a part LANDS, not how far it turned
+
+The most transferable thing in this document about rigging, and it is one line:
+**a part rotated about the wrong axis still rotates the right number of
+degrees.** An angle assertion passes and the panel is somewhere else entirely.
+The SF50's nose doors shipped like that — turned a correct 88° about a wrong
+axis, hanging parallel to the ground.
+
+So carry the geometry in the test. Build the model twice, once as exported and
+once in the stowed pose (`--gear 0`), read one point per moving part relative to
+its pivot out of each, and assert that the runtime's rotation maps the first to
+the second. Those two numbers are cheap to regenerate whenever the geometry
+moves, and they catch axis, direction and sign in one check.
+
+### Parts of one mechanism need travel windows
+
+A retraction is not one motion. Give each bound part the slice of the cycle it
+moves in — the SF50's legs run 0 to 0.78 and its doors 0.62 to 1 — so
+retracting, the leg is most of the way in before the doors shut over it.
+Reading the same windows backwards is what makes extension sequence correctly
+without a second table: the doors open before the leg comes through. Driving
+everything off one fraction folds and closes at once, which looks like the door
+passing through the leg.
 
 ### When the tail is not one the rig can express
 
@@ -810,7 +911,7 @@ only if the level above it is too expensive to run all the way out.
 Those sizes are targets, not walls. The right count is the one where the
 wireframe shows density only where a feature is; a level that is 30% over
 because its windows are round is a better level than one that hits a number
-with rectangles. The SF50 sits at 1260 / 880 / 442 — over the targets at the
+with rectangles. The SF50 sits at 1312 / 856 / 442 — over the targets at the
 top and the bottom, spent on window shape, and the wireframe accounts for all
 of it.
 
@@ -885,6 +986,17 @@ Two of these will flag things that are correct on purpose. Say which and why:
   its keep by catching a nacelle built on an odd-numbered ring, which straddles
   the centreline instead of mirroring across it. Ring point counts on a body of
   revolution must be even.
+
+  **Insist on exactly zero, and note that it catches defects nowhere near the
+  edit.** Cutting a gear bay mouth into the SF50's belly brought back one
+  fuselage vertex 36 mm out of symmetry — up on the crown, a metre and a half
+  away. It was the dissolve pass: `make` dissolves the whole object after the
+  cut, and a mouth tessellated differently changes what it finds flat somewhere
+  else, on one side and not its mirror. A hinge axis measured off a chain that
+  drifted laterally did the same thing for 6 mm. Neither is visible in any
+  render, and both would have shipped. Anything that changes a cut's
+  tessellation should be followed by reading `symmetry_error_m` before
+  believing the picture.
 
 Anything else in those two lists is a real defect.
 

@@ -198,6 +198,8 @@ describe("retractable gear", () => {
     const CASES = [
       { name: "BayDoor_Nose_Left", down: [0.0165, -0.2345, 0.3705], up: [0.1716, -0.0552, 0.4000] },
       { name: "BayDoor_Nose_Right", down: [-0.0165, -0.2345, 0.3705], up: [-0.1716, -0.0552, 0.4000] },
+      { name: "BayDoor_Main_Left", down: [-0.3103, -0.6334, -0.3116], up: [0.6800, -0.0868, -0.3529] },
+      { name: "BayDoor_Main_Right", down: [0.3103, -0.6334, -0.3116], up: [-0.6800, -0.0868, -0.3529] },
     ] as const;
     const s = scene();
     for (const { name, down, up } of CASES) {
@@ -210,6 +212,35 @@ describe("retractable gear", () => {
       const got = free.computeWorldMatrix(true).getTranslation();
       expect(Vector3.Distance(got, new Vector3(...up))).toBeLessThan(2e-3);
     }
+    s.scene.dispose(); s.engine.dispose();
+  });
+
+  it("folds the leg before it shuts the doors, and opens them before it drops", () => {
+    const s = scene();
+    const leg = new TransformNode("LandingGear_Nose", s.scene);
+    const door = new TransformNode("BayDoor_Nose_Left", s.scene);
+    const rig = bindAircraftRig([leg, door]);
+    const turned = (node: TransformNode): number => 2 * Math.acos(
+      Math.min(1, Math.abs(node.rotationQuaternion!.w)));
+
+    // A third of the way up the leg is well on its way and the doors have not
+    // started: shutting them over a leg still coming through is the failure.
+    applyAircraftRig(rig, { ...NEUTRAL_CONTROL_SURFACES, gearDownNorm: 2 / 3 }, 0);
+    expect(turned(leg)).toBeGreaterThan(0.2);
+    expect(turned(door)).toBeLessThan(1e-9);
+
+    // Near the top the doors are moving and the leg is finished.
+    applyAircraftRig(rig, { ...NEUTRAL_CONTROL_SURFACES, gearDownNorm: 0.1 }, 0);
+    expect(turned(door)).toBeGreaterThan(0.2);
+    expect(turned(leg)).toBeCloseTo(Math.PI / 2, 6);
+
+    // Both ends of the cycle still land exactly where they are authored.
+    applyAircraftRig(rig, NEUTRAL_CONTROL_SURFACES, 0);
+    expect(turned(leg)).toBeLessThan(1e-9);
+    expect(turned(door)).toBeLessThan(1e-9);
+    applyAircraftRig(rig, { ...NEUTRAL_CONTROL_SURFACES, gearDownNorm: 0 }, 0);
+    expect(turned(leg)).toBeCloseTo(Math.PI / 2, 6);
+    expect(turned(door)).toBeCloseTo((88 * Math.PI) / 180, 6);
     s.scene.dispose(); s.engine.dispose();
   });
 

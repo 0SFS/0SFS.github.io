@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createWheelGroundFilter, WHEEL_RADIUS_METERS } from "./wheelGroundFilter";
+import { createWheelGroundFilter, GROUND_FILTER_LENGTH_METERS } from "./wheelGroundFilter";
 
 describe("wheel ground filter", () => {
   it("adopts the first sample outright", () => {
@@ -39,7 +39,7 @@ describe("wheel ground filter", () => {
     filter.height(100, 0, true);
     const climb = (radii: number): number => {
       let ridden = 100;
-      for (let step = 0; step < radii * 10; step += 1) ridden = filter.height(100.3, WHEEL_RADIUS_METERS / 10, false);
+      for (let step = 0; step < radii * 10; step += 1) ridden = filter.height(100.3, GROUND_FILTER_LENGTH_METERS / 10, false);
       return ridden;
     };
     // Most of the way within two radii of travel, all of it within six.

@@ -92,12 +92,44 @@ NAC_STATIONS = [
 ]
 INTAKE_INSET = 0.09                 # how far the dark bore sits inside the lip
 
-# The main gear doors hang below the wing just ahead of the wheel and are one
-# of the more recognisable things about the aircraft parked. (y, z) outline
-# measured off the side view.
-GEAR_DOOR = [(-3.95, 0.800), (-4.42, 0.795), (-4.40, 0.300), (-4.02, 0.315)]
-GEAR_DOOR_X = 1.660
-GEAR_DOOR_HALF_T = 0.028
+# The main gear bay is cut into the WING, between two spanwise stations added
+# for it, and it is one face row of the aerofoil deep. The leg comes down at
+# 48% chord, which is row 4 - the lower surface from 0.72 back to 0.35 of the
+# chord - so that is the row the mouth is taken out of.
+#
+# This replaces a flat plate at x = 1.660 that hung below the wing on the
+# drawing's side-view outline. It was the right feature read the wrong way: a
+# gear door is a panel IN the skin, not a slab beside the leg, and modelled as
+# a slab it was as wide as the linkage and read as a vestige of nothing.
+# The mouth is ONE opening covering the wheel and the leg bay together, because
+# on the aeroplane the wheel well and the leg bay are one indent at one depth,
+# and modelling them as two things at two depths - a real cut outboard and a
+# flat dark patch inboard - read as two unrelated marks on the wing.
+#
+# It runs from x = 0.60, which is inboard of the stowed wheel and behind the
+# fuselage anyway (the belly is the outer surface inboard of about 0.66), out to
+# 1.78. The bay covers where the RETRACTED leg lies, not where the extended one
+# hangs: the wheel stows at x = 0.850 and the leg runs outboard from it to 1.54.
+# It was 1.42 to 1.92 first - centred on the EXTENDED leg - which put the whole
+# fold outside it.
+#
+# photo_N914AF.jpg is what settled the outboard half: gear up, each round wheel
+# well has a rectangular panel immediately OUTBOARD of it. Scaled on the tyre in
+# the same frame (0.38 m across 110 px, so 290 px/m) that panel is 0.67 m wide
+# and starts at the well's rim.
+WING_BAY_X = (0.60, 1.78)           # spanwise edges of the mouth
+# The DOOR covers only the leg half. The wheel end stays open - the retracted
+# tyre is visible from outside and nothing closes over it.
+WING_DOOR_X = (1.10, 1.78)
+WING_BAY_ROW = 4                    # lower surface, 0.72 -> 0.35 chord
+WING_BAY_DEPTH = 0.16               # how far the pocket rises into the wing
+WING_BAY_TAPER = 0.94               # gentle: a hard taper over a 1.18 m mouth
+                                    # walls the stowed tyre off from its own bay
+# PAST vertical, so the open door leans OUTBOARD and clears the extended wheel.
+# At 82 deg it hung in the wheel's own plane - the tyre's outer face is at
+# x = 1.777 and the hinge at 1.78 - and the two z-fought. A gear door that hangs
+# outboard of its wheel is also what the photographs show.
+WING_BAY_OPEN = 112.0               # how far the door swings down and out
 
 # gear
 NOSE_AXLE_Y = -1.138
@@ -119,6 +151,28 @@ MAIN_STRUT_TOP_X = GEAR_TRACK / 2.0 - 0.070
 MAIN_STRUT_TOP_Y = -4.406
 MAIN_STRUT_TOP_Z = 0.880            # buried in the wing box; the wing chord
                                     # plane at this station is z = 0.900
+
+# ----------------------------------------------------------------------------
+# The main leg is a TRAILING LINK, not a rod with a wheel on the end.
+# measurements/crops/photo_main_gear_linkage.png shows three members:
+#
+#   - a rigid FORWARD leg down from the wing to a knee joint, which sits ahead
+#     of and above the axle;
+#   - a TRAILING ARM hinged at that knee, running aft and down to the axle;
+#   - an OLEO aft of the leg, down from the wing onto the arm near the axle.
+#     It is the one with a polished piston showing, so it is the shock and the
+#     other two are rigid.
+#
+# Scaled on the tyre in the same frame - 0.190 m of radius across 170 px, so
+# 895 px/m - the knee is 0.240 m ahead of the axle and 0.050 m above it. The
+# member tops are NOT measured: the photograph loses them in the wing shadow
+# about 0.27 m above the axle, so they keep the height the drawing already
+# fixed and only the lower geometry comes from the photograph.
+LINK_KNEE = (-4.194, 0.240)         # (Y, z) of the knee, ahead of the axle
+LINK_OLEO_F = 0.72                  # where the oleo meets the arm, knee to axle
+# (across the run, thickness), so a member can be deeper than it is wide the
+# way a real one is. Read against the tyre in the same frame.
+LINK_R = dict(leg=(0.056, 0.036), oleo=(0.050, 0.044), arm=(0.044, 0.028))
 
 # ----------------------------------------------------------------------------
 # retraction
@@ -165,10 +219,41 @@ MAIN_STRUT_TOP_Z = 0.880            # buried in the wing box; the wing chord
 # At x = 0.850 the wing's lower surface runs z = 0.745 to 0.772 across the
 # tyre's width, so a disc centred at 0.797 stands 18 to 45 mm proud of it.
 MAIN_STOWED = (0.850, 0.797)        # (x, z) of the retracted main axle
-WELL_R = 0.245                      # well rim radius; the tyre is 0.190
-WELL_LIP = 0.002                    # rim dropped clear of the wing skin
 NOSE_STOWED = (-0.750, 1.080)       # (y, z) of the retracted nose axle
 NOSE_SENSE = -1                     # forward, not aft
+
+
+def tube(p0, p1, r0, r1, n=4):
+    """A capped tube from p0 to p1, with its rings PERPENDICULAR to the run.
+
+    `diamond_ring` builds its ring in the XY plane, which is right for a member
+    that hangs vertically and degenerate for one that does not - a trailing arm
+    runs mostly fore-and-aft, and a ring in XY there lies along the arm's own
+    axis rather than across it.
+
+    `r0`/`r1` are (across, thickness) pairs, so a member can be deeper than it
+    is wide the way a real one is.
+    """
+    a, b = Vector(p0), Vector(p1)
+    d = b - a
+    length = d.length
+    if length < 1e-9:
+        return [], []
+    d /= length
+    # Any vector not along the run will do to start the frame; pick the one
+    # that is furthest from it so the cross product is well conditioned.
+    seed = Vector((0.0, 0.0, 1.0)) if abs(d.z) < 0.9 else Vector((0.0, 1.0, 0.0))
+    u = d.cross(seed).normalized()
+    v = d.cross(u).normalized()
+    rings = []
+    for p, (across, thick) in ((a, r0), (b, r1)):
+        rings.append([tuple(p + u * (thick * math.cos(t)) + v * (across * math.sin(t)))
+                      for t in (math.pi * k / 2.0 for k in range(n))]
+                     if n == 4 else
+                     [tuple(p + u * (thick * math.cos(2 * math.pi * k / n))
+                            + v * (across * math.sin(2 * math.pi * k / n)))
+                      for k in range(n)])
+    return loft(rings, cap_start=True, cap_end=True)
 
 
 def quarter_turn_hinge(extended, stowed, sense=1):
@@ -1468,10 +1553,35 @@ def af_points(af, chord, thick_scale, le_y, z0, x, incidence=0.0):
     return out
 
 
+WING_BAY_MOUTHS = {}
+WING_BAY_AXES = {}
+
+
 def build_wing(side):
+    """Wing loft, with the main gear bay mouth taken out of its lower surface.
+
+    The mouth is ONE quad: two spanwise stations are added for it, and the face
+    between them on row `WING_BAY_ROW` is simply not emitted. No pane tracing
+    is needed because the opening is a rib bay - which is what a gear door is -
+    so it is bounded by the wing's own structure on all four sides.
+
+    The two stations cost almost nothing. The planform, the dihedral and the
+    thickness are all linear in x, so an intermediate station is coplanar with
+    its neighbours and the dissolve pass takes it straight back out; these two
+    survive only because the cut makes them a feature.
+    """
     sgn = 1.0 if side == "Right" else -1.0
+    stations = list(P["wing_st"])
+    if P["bays"]:
+        # Any station INSIDE the bay is dropped, so the mouth stays one quad.
+        # It costs nothing: the planform, the dihedral and the thickness are all
+        # linear in x, so an intermediate station is coplanar with its
+        # neighbours and the dissolve pass was already taking it back out.
+        lo, hi = WING_BAY_X
+        stations = [x for x in stations if not (lo < x < hi)]
+        stations = sorted(set(stations) | set(WING_BAY_X))
     rings = []
-    for x in P["wing_st"]:
+    for x in stations:
         le_y, chord, z = wing_geom(x)
         tip_f = 1.0
         if x >= SEMI - 1e-6:                    # rounded tip cap
@@ -1484,6 +1594,13 @@ def build_wing(side):
         else:
             rings.append(pts)
     verts, faces = loft(rings, cap_start=False, cap_end=P["tip_cap"])
+    if P["bays"]:
+        n = len(rings[0])
+        ia = stations.index(WING_BAY_X[0])
+        # loft() emits segment i, row j at index i * n + j, caps after.
+        cut = ia * n + WING_BAY_ROW
+        WING_BAY_MOUTHS[side] = [verts[i] for i in faces[cut]]
+        faces = faces[:cut] + faces[cut + 1:]
     return make(f"Wing_{side}", verts, faces, M_PAINT)
 
 
@@ -1690,21 +1807,49 @@ def diamond_ring(center, hy, hx, n=4):
 
 
 def build_main_gear(side):
-    """Near-vertical oleo strut under the wing, origin on the retraction hinge.
+    """The main leg. A trailing link at the finest level, a strut below it.
 
-    Two rings, straight: the leg the front view draws is a strut, not the
-    Cessna's spring-steel bow, and a bow is what was here.  A third ring at the
-    piston shoulder was tried and the dissolve pass took it straight back out
-    again - on a straight taper it describes nothing - so it is not built.  The
-    top is buried in the wing box, so the loft can be capped without it showing.
+    LOD3 builds all three members - forward leg, trailing arm, oleo - as one
+    mesh under one node, so the retraction rig is untouched: it still turns a
+    single `LandingGear_*` and the wheel and door still ride it as children.
+    Articulating the linkage as the oleo compresses would need a node apiece
+    and a runtime that can drive them, and neither exists.
+
+    LOD2 and below keep the plain strut, which is the right thing to lose
+    first: at 65 m the three members are one grey line whichever way they are
+    built.
     """
     sgn = 1.0 if side == "Right" else -1.0
+    x = sgn * GEAR_TRACK / 2.0
     end_z = MAIN_TIRE_R if P["wheel"] else 0.0
-    path = [(sgn * MAIN_STRUT_TOP_X, MAIN_STRUT_TOP_Y, MAIN_STRUT_TOP_Z),
-            (sgn * GEAR_TRACK / 2.0, MAIN_AXLE_Y, end_z)]
-    halfs = [(0.115, 0.055), (0.070, 0.034)]
-    rings = [diamond_ring(p, hy, hx, P["gear_n"]) for p, (hy, hx) in zip(path, halfs)]
-    verts, faces = loft(rings, cap_start=P["gear_cap"], cap_end=P["gear_cap"])
+    top = (sgn * MAIN_STRUT_TOP_X, MAIN_STRUT_TOP_Y, MAIN_STRUT_TOP_Z)
+    axle = (x, MAIN_AXLE_Y, end_z)
+
+    if not P["bays"]:
+        rings = [diamond_ring(p, hy, hx, P["gear_n"])
+                 for p, (hy, hx) in zip((top, axle),
+                                        ((0.115, 0.055), (0.070, 0.034)))]
+        verts, faces = loft(rings, cap_start=P["gear_cap"], cap_end=P["gear_cap"])
+    else:
+        knee = (x, LINK_KNEE[0], LINK_KNEE[1])
+        # The oleo lands on the arm, not on the axle: that is what makes it a
+        # trailing link rather than a second leg.
+        f = LINK_OLEO_F
+        onarm = tuple(knee[c] + (axle[c] - knee[c]) * f for c in range(3))
+        members = [
+            # forward leg: down from the wing to the knee, near vertical
+            ((sgn * (MAIN_STRUT_TOP_X - 0.010), LINK_KNEE[0] + 0.014,
+              MAIN_STRUT_TOP_Z), knee, LINK_R["leg"], LINK_R["leg"]),
+            # oleo: down from the wing onto the arm, aft of the leg
+            (top, onarm, LINK_R["oleo"], (0.038, 0.034)),
+            # trailing arm: knee aft and down to the axle
+            (knee, axle, LINK_R["arm"], LINK_R["arm"]),
+        ]
+        verts, faces = [], []
+        for p0, p1, r0, r1 in members:
+            v, f2 = tube(p0, p1, r0, r1, P["gear_n"])
+            faces.extend([[i + len(verts) for i in face] for face in f2])
+            verts.extend(v)
     return make(f"LandingGear_{side}", verts, faces, M_METAL, smooth_angle=30.0,
                 origin=(sgn * MAIN_HINGE[0], MAIN_STRUT_TOP_Y, MAIN_HINGE[1]))
 
@@ -1726,19 +1871,6 @@ def build_nose_gear():
                 origin=(0.0, NOSE_HINGE[0], NOSE_HINGE[1]))
 
 
-def build_gear_door(side):
-    if not P["trim"]:
-        return None
-    sgn = 1.0 if side == "Right" else -1.0
-    n = len(GEAR_DOOR)
-    verts = [(sgn * (GEAR_DOOR_X - GEAR_DOOR_HALF_T), y, z) for (y, z) in GEAR_DOOR] + \
-            [(sgn * (GEAR_DOOR_X + GEAR_DOOR_HALF_T), y, z) for (y, z) in GEAR_DOOR]
-    faces = [[j, (j + 1) % n, n + (j + 1) % n, n + j] for j in range(n)]
-    faces.append(list(range(n - 1, -1, -1)))
-    faces.append([n + j for j in range(n)])
-    return make(f"GearDoor_{side}", verts, faces, M_PAINT, smooth_angle=20.0)
-
-
 def build_gear_bay(name):
     """The pocket behind a mouth, so the hole is a bay and not a hole.
 
@@ -1749,7 +1881,7 @@ def build_gear_bay(name):
 
     The cap ring pulls in by BAY_TAPER rather than rising straight, because the
     section is still widening at the height these caps sit at - a straight wall
-    off the outboard edge of either main mouth meets the skin about 60 mm up.
+    off the edge of a mouth meets the skin about 60 mm up.
     """
     mouth = BAY_MOUTHS.get(name)
     if not mouth:
@@ -1772,15 +1904,7 @@ def build_bay_door(name):
     triangles again as the panel itself.
 
     Each panel's origin is its hinge, so the runtime shuts it by turning this
-    node, the same way it retracts a leg. Three hinge kinds, and which one a
-    bay gets is a symmetry argument as much as an aerodynamic one:
-
-      "clam"  two doors meeting on the mouth's centreline, hinged on its two
-              long edges. The only option for a mouth that straddles the
-              centreline and the one the main bay uses.
-      "fore"  one door on the forward short edge, swinging down. Symmetric,
-              which is what the nose mouth needs.
-      "side"  one door on a long edge. For a mouth wholly off the centreline.
+    node, the same way it retracts a leg.
     """
     mouth = BAY_MOUTHS.get(name)
     if not mouth:
@@ -1789,156 +1913,108 @@ def build_bay_door(name):
     m = len(mouth) // 2
     zc = sum(p[2] for p in mouth) / len(mouth)
 
-    # Outward is away from the section's own centre line, which on the belly is
-    # down and to the side; 6 mm of it keeps the shut door off the skin.
     def lift(p):
         dx, dz = p[0], p[2] - (zc + 0.6)
         d = math.hypot(dx, dz) or 1.0
         return (p[0] + dx / d * BAY_DOOR_LIFT, p[1],
                 p[2] + dz / d * BAY_DOOR_LIFT)
 
-    def swing(pts, hinge, axis, sgn):
-        """Build the panel OPEN.
-
-        The exported model is always gear down, and every node has to export
-        with an identity rotation - a baked one silently reverses a deflection
-        and verify_rig.py fails the build for it. So the open pose lives in the
-        vertices and the runtime turns the node the other way to shut it.
-        """
+    def panel(suffix, pts, hinge, axis, sgn):
+        # Built OPEN: the exported model is always gear down, and every node has
+        # to export with an identity rotation, so the open pose lives in the
+        # vertices and the runtime turns the node the other way to shut it.
         turn = Matrix.Rotation(math.radians(bay["open"]) * sgn, 4, axis)
         h = Vector(hinge)
-        return [tuple(turn @ (Vector(q) - h) + h) for q in pts]
-
-    def panel(suffix, pts, hinge, axis, sgn):
-        pts = swing(pts, hinge, axis, sgn)
+        pts = [tuple(turn @ (Vector(q) - h) + h) for q in pts]
         n = len(pts)
-        faces = [list(range(n)), list(range(n - 1, -1, -1))]
-        return make(f"BayDoor_{name}{suffix}", pts, faces, M_PAINT,
-                    origin=hinge, smooth_angle=0.0)
+        return make(f"BayDoor_{name}{suffix}", pts,
+                    [list(range(n)), list(range(n - 1, -1, -1))],
+                    M_PAINT, origin=hinge, smooth_angle=0.0)
 
-    kind = bay["hinge"]
-    if kind == "clam":
-        spine = [lift(p) for p in BAY_SPINES[name]]
-        lo = [lift(p) for p in mouth[:m]]
-        hi = [lift(p) for p in mouth[m:]]          # already runs aft-to-fore
-        # The hinge line is the door's own long edge, and on the belly that
-        # edge is NOT horizontal: the keel rises toward the nose, about 9 deg
-        # over this mouth. Turning the door about the global fore-aft axis
-        # instead does not hold the hinged edge still - it lifts it off the
-        # mouth - and the open door ends up lying parallel to the GROUND while
-        # the body it hangs from is pitched up. Which is exactly what it looked
-        # like. So the axis is measured off the chain.
-        # In the fore-aft/vertical plane: x is dropped. The chain it is measured
-        # from drifts a few millimetres laterally, because the mouth narrows
-        # toward its ends, and carrying that drift into the axis gives the two
-        # doors hinge lines that are not mirror images - 6 mm of symmetry error
-        # on an airframe whose symmetry is otherwise exactly zero. A hinge is a
-        # straight line anyway; the slope along the belly is the part that
-        # matters and the part that x has nothing to do with.
-        axis = (Vector(lo[-1]) - Vector(lo[0]))
-        axis = Vector((0.0, axis.y, axis.z)).normalized()
-        # Oriented FORWARD (+Y), which is the handedness the two signs below
-        # were written against. Pointing it aft is just as valid a hinge line
-        # and swings both doors the other way - up into the fuselage, which is
-        # what it did once.
-        if axis.y < 0:
-            axis = -axis
-        BAY_DOOR_AXES[name] = tuple(round(c, 5) for c in axis)
-        out = []
-        # Each half is its own chain closed along the spine, and each hinges on
-        # its own long edge, so the pair opens outwards from the centreline.
-        for suffix, chain, spn, sgn in (
+    spine = [lift(p) for p in BAY_SPINES[name]]
+    lo = [lift(p) for p in mouth[:m]]
+    hi = [lift(p) for p in mouth[m:]]              # already runs aft-to-fore
+    # The hinge line is the door's own long edge, and on the belly that edge is
+    # NOT horizontal: the keel rises toward the nose, about 9 deg over this
+    # mouth. Turning the door about the global fore-aft axis instead does not
+    # hold the hinged edge still - it lifts it off the mouth - and the open door
+    # ends up lying parallel to the GROUND while the body it hangs from is
+    # pitched up. In the fore-aft/vertical plane and pointing FORWARD: x is
+    # dropped because the chain drifts a few millimetres laterally as the mouth
+    # narrows, which would give the two doors hinge lines that are not mirror
+    # images, and aft would swing them both up into the fuselage.
+    axis = Vector(lo[-1]) - Vector(lo[0])
+    axis = Vector((0.0, axis.y, axis.z)).normalized()
+    if axis.y < 0:
+        axis = -axis
+    BAY_DOOR_AXES[name] = tuple(round(c, 5) for c in axis)
+    return [panel(suffix, chain + spn, chain[len(chain) // 2], axis, sgn)
+            for suffix, chain, spn, sgn in (
                 ("_Left", lo, list(reversed(spine)), 1.0),
-                ("_Right", hi, list(spine), -1.0)):
-            pts = chain + spn
-            hinge = chain[len(chain) // 2]
-            out.append(panel(suffix, pts, hinge, axis, sgn))
-        return out
-
-    pts = [lift(p) for p in mouth]
-    if kind == "fore":
-        # The forward short edge: the mouth's two chains both start at the
-        # forward-most column, so the hinge point is the midpoint of their
-        # first and last entries, on the centreline, and the line runs
-        # laterally.
-        hinge = tuple((pts[0][c] + pts[-1][c]) / 2.0 for c in range(3))
-        return [panel("", pts, hinge, 'X', 1.0)]
-
-    # "side": the door's OUTBOARD long edge, and which of the mouth's two
-    # chains that is depends on the side. `cut_pane` traces the mouth from low
-    # coordinate to high, so on a starboard bay the high chain is outboard and
-    # on a port one it is inboard - taking "the second chain" both times hinged
-    # the two doors on opposite edges, which a symmetric model does not do.
-    far = max((pts[:m], pts[m:]),
-              key=lambda c: sum(abs(q[0]) for q in c) / len(c))
-    hinge = far[len(far) // 2]
-    return [panel("", pts, hinge, 'Y', -1.0 if hinge[0] >= 0.0 else 1.0)]
+                ("_Right", hi, list(spine), -1.0))]
 
 
-def build_gear_well(side):
-    """The well the retracted main wheel sits in, cut into the wing root.
+def build_wing_bay(side):
+    """Pocket and door for the main gear bay cut into the wing's lower surface.
 
-    The main wheels retract into the WING, not the belly, and stay visible:
-    photo_N914AF.jpg shows each one as a dark tyre face in a round well, with
-    no door over it. Without the well the tyre simply protrudes through the
-    wing's lower surface - the dark disc is there but the recess round it is
-    not, and it reads as a wheel glued on rather than stowed in.
+    Same recipe as the nose bay, and for the same reasons: a hole in a closed
+    shell shows the far side of the shell unless something dark is put behind
+    it, and the door is the mouth's own outline lifted 6 mm clear and built in
+    the OPEN pose so the exported node keeps an identity rotation.
 
-    A dished cap, not a hole - the same trick the intake bore uses. The wing is
-    never cut: it is a five-station loft on seven-point rings, nothing like as
-    amenable to `cut_pane` as the 36-station fuselage, and cutting it is a
-    second cutter's worth of work.
-
-    A cup with its walls going up INSIDE the wing was tried first and is
-    invisible, which is obvious in hindsight: the wing is opaque, so anything
-    behind its skin is behind its skin. What shows is a dish lying just OUTSIDE
-    the skin - 2 mm proud of it, dished 60 mm inward at the centre - dark, and
-    a little wider than the tyre. Gear up, the tyre sits in it and the two read
-    as a wheel stowed in a well; gear down, the dish alone reads as the empty
-    well it is.
-
-    The rim height is RAY CAST against the wing rather than computed, because
-    the surface it has to sit on is an aerofoil at a station between two of the
-    wing's own, and re-deriving that here would be a second source of truth for
-    a shape the wing already owns.
+    One door, not a pair. The nose mouth straddles the centreline and needs two
+    halves to stay symmetric; this one is wholly off it, so it hinges on its
+    outboard edge and swings down - which is also what the photograph shows.
     """
-    if not P["bays"]:
-        return None
+    mouth = WING_BAY_MOUTHS.get(side)
+    if not mouth:
+        return []
     sgn = 1.0 if side == "Right" else -1.0
-    wing = bpy.data.objects.get(f"Wing_{side}")
-    if wing is None:
-        return None
-    bpy.context.view_layer.update()
-    cx, cy = sgn * MAIN_STOWED[0], MAIN_AXLE_Y
-    n = max(6, P["wheel"])
-    m_inv = wing.matrix_world.inverted()
-    # UP from under the aeroplane, not down from above it. A ray dropped from
-    # overhead hits the wing's UPPER surface first and reports that, which put
-    # the first pair of dishes at z = 0.94 - inside the wing, invisible, and
-    # 0.19 m above the surface they were meant to lie on.
-    up = (m_inv.to_3x3() @ Vector((0.0, 0.0, 1.0))).normalized()
+    cx = sum(p[0] for p in mouth) / len(mouth)
+    cy = sum(p[1] for p in mouth) / len(mouth)
+    cap = [(cx + (p[0] - cx) * WING_BAY_TAPER, cy + (p[1] - cy) * WING_BAY_TAPER,
+            p[2] + WING_BAY_DEPTH) for p in mouth]
+    verts, faces = loft([list(mouth), cap], cap_start=False, cap_end=True)
+    bay = make(f"WingBay_{side}", verts, faces, M_DARK, smooth_angle=0.0,
+               flip_normals=True)
 
-    def wing_z(x, y):
-        ok, loc, _n, _i = wing.ray_cast(m_inv @ Vector((x, y, 0.05)), up)
-        return (wing.matrix_world @ loc).z if ok else MAIN_STOWED[1]
+    # The door is only the OUTBOARD part of the mouth: the wheel end stays open.
+    # Its corners are interpolated along the mouth's two spanwise edges, which
+    # is exact - a loft is ruled between its stations, so a point part way along
+    # one of those edges is on the surface the wing already had.
+    lo, hi = WING_BAY_X
+    def at(t, a, b):
+        return tuple(a[c] + (b[c] - a[c]) * t for c in range(3))
+    t0 = (WING_DOOR_X[0] - lo) / (hi - lo)
+    t1 = (WING_DOOR_X[1] - lo) / (hi - lo)
+    # mouth is (A, j), (A, j+1), (B, j+1), (B, j); the spanwise edges are
+    # 0->3 and 1->2, so walking t along both gives the sub-quad's corners.
+    door_quad = [at(t0, mouth[0], mouth[3]), at(t0, mouth[1], mouth[2]),
+                 at(t1, mouth[1], mouth[2]), at(t1, mouth[0], mouth[3])]
+    pts = [(p[0], p[1], p[2] - BAY_DOOR_LIFT) for p in door_quad]
 
-    # FLAT, and every vertex the same 2 mm under the local surface rather than
-    # a plane through them - the wing's lower surface is convex, so a flat disc
-    # laid on its rim stands proud in the middle. Dishing it INWARD was tried
-    # and is invisible for the same reason the cup was: inward is up, and up is
-    # inside an opaque wing. Dishing it outward would be a blister. So it hugs
-    # the surface, and what makes it read as a well is that it is dark and the
-    # tyre sits in it - not that it has depth, which at this budget it cannot.
-    verts = [(cx, cy, wing_z(cx, cy) - WELL_LIP)]
-    for i in range(n):
-        a = 2 * math.pi * i / n
-        x, y = cx + WELL_R * math.cos(a) * sgn, cy + WELL_R * math.sin(a)
-        verts.append((x, y, wing_z(x, y) - WELL_LIP))
-    # Wound so the fan faces DOWN, at the viewer, without a flip: a dish is
-    # seen from outside the aeroplane, unlike a bay pocket, which is only ever
-    # seen from inside one.
-    faces = [[0, 1 + (i + 1) % n, 1 + i] for i in range(n)]
-    return make(f"GearWell_{side}", verts, faces, M_DARK, smooth_angle=0.0)
+    # `loft` emits the mouth as (station A, row j), (A, j+1), (B, j+1), (B, j),
+    # so its two FORE-AFT edges are (0,1) and (2,3) - each at one station, one
+    # at each end - and the spanwise ones are (1,2) and (3,0). A wing gear door
+    # hinges on a fore-aft edge and falls; hinging it spanwise, which is what
+    # taking "the other pair" gives, swings it forward like a speed brake.
+    edges = ((pts[0], pts[1]), (pts[2], pts[3]))
+    out_i = 0 if abs(pts[0][0]) > abs(pts[2][0]) else 1
+    hinge_edge = edges[out_i]
+    hinge = tuple((hinge_edge[0][c] + hinge_edge[1][c]) / 2.0 for c in range(3))
+    axis = (Vector(hinge_edge[1]) - Vector(hinge_edge[0])).normalized()
+    if axis.y > 0:                       # point aft, so one sign serves both
+        axis = -axis
+    WING_BAY_AXES[side] = tuple(round(c, 5) for c in axis)
+    turn = Matrix.Rotation(math.radians(WING_BAY_OPEN) * sgn, 4, axis)
+    h = Vector(hinge)
+    # The whole quad turns; the two points on the hinge edge sit on the axis
+    # and do not move, so the winding is unchanged.
+    quad = [tuple(turn @ (Vector(q) - h) + h) for q in pts]
+    door = make(f"BayDoor_Main_{side}", quad,
+                [[0, 1, 2, 3], [3, 2, 1, 0]], M_PAINT,
+                origin=hinge, smooth_angle=0.0)
+    return [bay, door]
 
 
 def build_wheel(name, center, r, w, n):
@@ -1977,8 +2053,7 @@ for side, sgn in (("Left", -1.0), ("Right", 1.0)):
     if P["ctrl"]:
         build_ruddervator(side)
     build_main_gear(side)
-    build_gear_door(side)
-    build_gear_well(side)
+    build_wing_bay(side)
 
 
 build_nacelle()
@@ -2049,13 +2124,17 @@ if GEAR < 1.0:
     for ob in BUILT:
         if not ob.name.startswith("BayDoor_"):
             continue
-        bay = GEAR_BAYS[ob.name.split("_")[1]]
-        if bay["hinge"] == "fore":
-            axis, sgn = 'X', 1.0
-        else:
-            axis = Vector(BAY_DOOR_AXES[ob.name.split("_")[1]])
+        which = ob.name.split("_")[1]
+        if which == "Main":                       # a wing bay door
+            side = ob.name.split("_")[2]
+            axis = Vector(WING_BAY_AXES[side])
+            sgn = 1.0 if side == "Right" else -1.0
+            open_deg = WING_BAY_OPEN
+        else:                                     # the nose pair
+            axis = Vector(BAY_DOOR_AXES[which])
             sgn = -1.0 if ob.location[0] >= 0.0 else 1.0
-        shut = math.radians(bay["open"]) * sgn * (1.0 - GEAR)
+            open_deg = GEAR_BAYS[which]["open"]
+        shut = math.radians(open_deg) * sgn * (1.0 - GEAR)
         ob.rotation_mode = 'XYZ'
         ob.rotation_euler = Matrix.Rotation(-shut, 4, axis).to_euler()
     bpy.context.view_layer.update()
@@ -2077,7 +2156,7 @@ for o in BUILT:
 tris = sum(len(o.data.loop_triangles) for o in BUILT)
 verts = sum(len(o.data.vertices) for o in BUILT)
 print(f"###BUILD### lod={LOD} objects={len(BUILT)} tris={tris} verts={verts}")
-for _n, _a in BAY_DOOR_AXES.items():
+for _n, _a in list(BAY_DOOR_AXES.items()) + list(WING_BAY_AXES.items()):
     # In glTF axes, which is what SURFACE_BINDINGS is written in:
     # blender (x, y, z) -> gltf (x, z, -y).
     print(f"###DOORAXIS### {_n} blender={_a} "

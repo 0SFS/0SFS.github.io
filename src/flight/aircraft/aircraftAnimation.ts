@@ -149,6 +149,8 @@ interface RetractingGear {
   sign: number;
   /** Full travel in radians; a leg turns a quarter, a door rather less. */
   rad: number;
+  /** The slice of the gear cycle this part moves in. */
+  window: readonly [number, number];
 }
 
 interface Propeller {
@@ -264,11 +266,38 @@ const THRUST_AXIS = new Vector3(0, 0, 1);
  */
 const NOSE_DOOR_HINGE = new Vector3(0, 0.16248, -0.9867);
 
+/**
+ * The wing bay doors' hinge line: the mouth's outboard fore-aft edge, which
+ * carries the wing's dihedral. Hinging them on the spanwise edge instead - the
+ * other pair of the mouth quad - swings the panel forward like a speed brake.
+ */
+const WING_DOOR_HINGE = new Vector3(0, 0.07546, 0.99715);
+// 112 deg, not the nose pair's 88: the wing doors open PAST vertical so they
+// lean outboard and clear the extended wheel. At 82 the panel hung in the
+// tyre's own plane and the two z-fought.
+
 const GEAR_RETRACT_RAD = Math.PI / 2;
 const DOOR_RAD = (deg: number): number => (deg * Math.PI) / 180;
 
+/**
+ * Where in the gear's travel each part moves, as [start, end] fractions of it.
+ *
+ * The legs and the doors do NOT move together. Retracting, the leg has to be
+ * most of the way in before the doors can shut over it; extending, the doors
+ * have to be open before the leg comes through. Driving both off the same
+ * fraction folds and closes at once, which looks like the door passing through
+ * the leg. Overlapping the two windows slightly keeps it continuous rather
+ * than making the gear stop and wait.
+ *
+ * `travel` runs 0 (down) to 1 (up), so reading the same windows backwards is
+ * what makes extension sequence correctly without a second table.
+ */
+const LEG_WINDOW: readonly [number, number] = [0, 0.78];
+const DOOR_WINDOW: readonly [number, number] = [0.62, 1];
+
 const GEAR_BINDINGS: readonly {
   name: string; axis: Vector3; sign: number; rad?: number;
+  window?: readonly [number, number];
 }[] = [
   { name: "LandingGear_Left", axis: THRUST_AXIS, sign: 1 },
   { name: "LandingGear_Right", axis: THRUST_AXIS, sign: -1 },
@@ -287,8 +316,10 @@ const GEAR_BINDINGS: readonly {
   // they sit where they were authored and at 0 they are shut. The angle is the
   // generator's own `GEAR_BAYS[...]["open"]` and is not a quarter turn - a
   // door that stops at 90 deg has swung through the skin.
-  { name: "BayDoor_Nose_Left", axis: NOSE_DOOR_HINGE, sign: -1, rad: DOOR_RAD(88) },
-  { name: "BayDoor_Nose_Right", axis: NOSE_DOOR_HINGE, sign: 1, rad: DOOR_RAD(88) },
+  { name: "BayDoor_Nose_Left", axis: NOSE_DOOR_HINGE, sign: -1, rad: DOOR_RAD(88), window: DOOR_WINDOW },
+  { name: "BayDoor_Nose_Right", axis: NOSE_DOOR_HINGE, sign: 1, rad: DOOR_RAD(88), window: DOOR_WINDOW },
+  { name: "BayDoor_Main_Left", axis: WING_DOOR_HINGE, sign: 1, rad: DOOR_RAD(112), window: DOOR_WINDOW },
+  { name: "BayDoor_Main_Right", axis: WING_DOOR_HINGE, sign: -1, rad: DOOR_RAD(112), window: DOOR_WINDOW },
 ];
 /**
  * Seconds end to end. The SF50's AFM gives 8 s for a normal extension; nothing
@@ -349,6 +380,7 @@ export function bindAircraftRig(
     gear.push({
       node, rest: restRotation(node), axis: binding.axis, sign: binding.sign,
       rad: binding.rad ?? GEAR_RETRACT_RAD,
+      window: binding.window ?? LEG_WINDOW,
     });
     bound.push(binding.name);
   }
@@ -410,8 +442,10 @@ function applyGear(rig: AircraftRig, command: number, deltaSeconds: number): voi
   }
   const travel = 1 - rig.gearNorm;
   for (const leg of rig.gear) {
+    const [from, to] = leg.window;
+    const part = Math.min(1, Math.max(0, (travel - from) / (to - from)));
     leg.node.rotationQuaternion = leg.rest.multiply(
-      Quaternion.RotationAxis(leg.axis, travel * leg.rad * leg.sign),
+      Quaternion.RotationAxis(leg.axis, part * leg.rad * leg.sign),
     );
   }
 }

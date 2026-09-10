@@ -404,6 +404,82 @@
   opacity: 0.35;
 }
 
+.flight-basemap-menu__section {
+  display: grid;
+  gap: 3px;
+}
+
+.flight-basemap-menu__section + .flight-basemap-menu__section {
+  margin-top: 3px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.flight-basemap-menu__section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 4px 7px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.flight-basemap-menu__section-toggle:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.flight-basemap-menu__heading {
+  color: rgba(226, 232, 240, 0.58);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.flight-basemap-menu__chevron {
+  color: rgba(226, 232, 240, 0.58);
+  font-size: 12px;
+  line-height: 1;
+  transition: transform 120ms ease;
+}
+
+.flight-basemap-menu__section-toggle[aria-expanded="false"] .flight-basemap-menu__chevron {
+  transform: rotate(-90deg);
+}
+
+.flight-basemap-menu__section-content {
+  display: grid;
+  gap: 3px;
+}
+
+.flight-basemap-menu__section-content[hidden],
+.flight-basemap-menu__elevation-providers[hidden] {
+  display: none;
+}
+
+.flight-basemap-menu__elevation-providers {
+  display: grid;
+  gap: 3px;
+  margin-top: 3px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.flight-basemap-menu__elevation-providers .flight-basemap-menu__heading {
+  padding: 1px 7px 2px;
+}
+
+.flight-basemap-menu__notice {
+  margin: 1px 7px 3px;
+  color: rgba(226, 232, 240, 0.58);
+  font-size: 10px;
+  line-height: 1.35;
+}
+
 .flight-panel__title {
   display: flex;
   align-items: center;

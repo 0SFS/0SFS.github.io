@@ -78,6 +78,57 @@ function terrainDetailRangePercent(errorTarget: number, minErrorTarget: number, 
   return Math.max(0, Math.min(100, ((terrainDetailExponent(errorTarget) - minExponent) / (maxExponent - minExponent)) * 100));
 }
 
+type BasemapMenuSectionId = "3d" | "2d";
+
+interface BasemapMenuSection {
+  element: HTMLElement;
+  content: HTMLElement;
+  toggle: HTMLButtonElement;
+}
+
+function createBasemapMenuSection(id: BasemapMenuSectionId, label: string): BasemapMenuSection {
+  const section = document.createElement("div");
+  section.className = "flight-basemap-menu__section";
+  const contentId = `flightBasemap${id.toUpperCase()}Content`;
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "flight-basemap-menu__section-toggle";
+  toggle.dataset.basemapSection = id;
+  toggle.setAttribute("aria-controls", contentId);
+  const chevron = document.createElement("span");
+  chevron.className = "flight-basemap-menu__chevron";
+  chevron.setAttribute("aria-hidden", "true");
+  chevron.textContent = "▾";
+  const heading = document.createElement("span");
+  heading.className = "flight-basemap-menu__heading";
+  heading.textContent = label;
+  toggle.append(heading, chevron);
+  const content = document.createElement("div");
+  content.id = contentId;
+  content.className = "flight-basemap-menu__section-content";
+  section.append(toggle, content);
+  return { element: section, content, toggle };
+}
+
+function setBasemapMenuSectionExpanded(section: BasemapMenuSection, expanded: boolean): void {
+  section.toggle.setAttribute("aria-expanded", String(expanded));
+  section.content.hidden = !expanded;
+}
+
+function createBasemapMenuOption(
+  dataAttribute: "mapSource" | "terrainSource",
+  id: string,
+  label: string,
+): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.role = "menuitem";
+  button.className = "map-source-option";
+  button.dataset[dataAttribute] = id;
+  button.textContent = label;
+  return button;
+}
+
 export function createFlightHudBar(container: HTMLElement, options: FlightHudBarOptions): FlightHudBarHandle {
   const hudBar: HudBarHandle = createHudBar(container, {
     ariaLabel: "Flight simulator controls",
@@ -104,23 +155,12 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
         kind: "menu",
         id: "flightMapSourceControl",
         className: "map-source-control",
-        button: { kind: "button", id: "flightMapSourceButton", title: "Map data source. Click to change.", ariaLabel: "Map data source", appearance: "chip", className: "hud-chip-button hud-chip--source", text: mapSourceLabel(options.runtimeStatus) },
+        button: { kind: "button", id: "flightMapSourceButton", title: "Basemap. Click to choose a 3D or 2D basemap.", ariaLabel: "Basemap", appearance: "chip", className: "hud-chip-button hud-chip--source", text: mapSourceLabel(options.runtimeStatus) },
         menuId: "flightMapSourceMenu",
         menuClassName: "map-source-menu",
         optionClassName: "map-source-option",
         optionDataAttribute: "mapSource",
-        options: [{ id: "google", label: "Google 3D Tiles" }, ...options.rasterSources],
-      },
-      {
-        kind: "menu",
-        id: "flightTerrainSourceControl",
-        className: "map-source-control",
-        button: { kind: "button", id: "flightTerrainSourceButton", title: "Elevation data source. Click to change.", ariaLabel: "Elevation data source", appearance: "chip", className: "hud-chip-button hud-chip--source", text: "Elevation" },
-        menuId: "flightTerrainSourceMenu",
-        menuClassName: "map-source-menu",
-        optionClassName: "map-source-option",
-        optionDataAttribute: "terrainSource",
-        options: options.terrainSources,
+        options: [],
       },
       { kind: "slot", id: "flightFps", className: "hud-chip hud-status-text", ariaLive: "polite", ariaLabel: "Frame rate", title: "Rendered frames per second" },
       { kind: "button", id: "flightSettingsButton", title: "Open flight settings", ariaLabel: "Open flight settings", className: "settings-button", text: "⚙" },
@@ -136,15 +176,39 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
   const rendererMenu = hudBar.getElement("flightRendererMenu");
   const mapButton = hudBar.getElement<HTMLButtonElement>("flightMapSourceButton");
   const mapMenu = hudBar.getElement("flightMapSourceMenu");
-  const terrainSourceButton = hudBar.getElement<HTMLButtonElement>("flightTerrainSourceButton");
-  const terrainSourceMenu = hudBar.getElement("flightTerrainSourceMenu");
   const fpsElement = hudBar.getElement("flightFps");
   const settingsButton = hudBar.getElement<HTMLButtonElement>("flightSettingsButton");
   const statusElement = hudBar.getElement("flightShellStatus");
-  if (!pauseButton || !rendererButton || !rendererMenu || !mapButton || !mapMenu || !terrainSourceButton || !terrainSourceMenu || !fpsElement || !settingsButton || !statusElement) {
+  if (!pauseButton || !rendererButton || !rendererMenu || !mapButton || !mapMenu || !fpsElement || !settingsButton || !statusElement) {
     hudBar.destroy();
     throw new Error("Flight HUD bar failed to mount.");
   }
+
+  const threeDBasemaps = createBasemapMenuSection("3d", "3D basemaps");
+  threeDBasemaps.content.append(createBasemapMenuOption("mapSource", "google", "Google 3D Tiles"));
+  const threeDBasemapNotice = document.createElement("p");
+  threeDBasemapNotice.className = "flight-basemap-menu__notice";
+  threeDBasemapNotice.textContent = "Terrain is included. No elevation provider is used.";
+  threeDBasemaps.content.append(threeDBasemapNotice);
+  const twoDBasemaps = createBasemapMenuSection("2d", "2D basemaps");
+  for (const source of options.rasterSources) {
+    twoDBasemaps.content.append(createBasemapMenuOption("mapSource", source.id, source.label));
+  }
+  const elevationProviders = document.createElement("div");
+  elevationProviders.className = "flight-basemap-menu__elevation-providers";
+  elevationProviders.setAttribute("role", "group");
+  elevationProviders.setAttribute("aria-label", "Elevation provider");
+  const elevationHeading = document.createElement("span");
+  elevationHeading.className = "flight-basemap-menu__heading";
+  elevationHeading.textContent = "Elevation provider";
+  elevationProviders.append(elevationHeading);
+  for (const source of options.terrainSources) {
+    elevationProviders.append(createBasemapMenuOption("terrainSource", source.id, source.label));
+  }
+  twoDBasemaps.content.append(elevationProviders);
+  mapMenu.append(threeDBasemaps.element, twoDBasemaps.element);
+  setBasemapMenuSectionExpanded(threeDBasemaps, false);
+  setBasemapMenuSectionExpanded(twoDBasemaps, false);
 
   const terrainDetailControl = document.createElement("span");
   terrainDetailControl.className = "flight-terrain-detail-control";
@@ -195,6 +259,7 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     button.classList.toggle("is-active", (button.dataset.renderer ?? "") === (options.rendererForce ?? ""));
   });
 
+  let lastBasemapMode: BabylonRuntimeStatus["mode"] | null = null;
   const updateMapState = (status: BabylonRuntimeStatus): void => {
     setMapSourceLabel(mapButton, mapSourceLabel(status));
     mapButton.classList.toggle("hud-chip--fallback", status.mode === "fallback");
@@ -203,12 +268,20 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     mapMenu.querySelectorAll<HTMLElement>("[data-map-source]").forEach((button) => {
       button.classList.toggle("is-active", button.dataset.mapSource === activeSource);
     });
-  };
-  const updateTerrainState = (status: BabylonRuntimeStatus): void => {
+    const usesThreeDBasemap = status.mode === "google-tiles";
+    const usesRasterBasemap = status.mode === "raster-basemap";
+    if (status.mode !== lastBasemapMode && usesThreeDBasemap) {
+      setBasemapMenuSectionExpanded(threeDBasemaps, true);
+      setBasemapMenuSectionExpanded(twoDBasemaps, false);
+    } else if (status.mode !== lastBasemapMode && usesRasterBasemap) {
+      setBasemapMenuSectionExpanded(threeDBasemaps, false);
+      setBasemapMenuSectionExpanded(twoDBasemaps, true);
+    }
+    lastBasemapMode = status.mode;
+    threeDBasemapNotice.hidden = !usesThreeDBasemap;
+    elevationProviders.hidden = !usesRasterBasemap;
     const terrain = status.terrainSource;
-    terrainSourceButton.textContent = terrain ? `Elev: ${terrain.label}` : "Elevation";
-    terrainSourceButton.classList.toggle("hud-chip--fallback", status.mode !== "raster-basemap");
-    terrainSourceMenu.querySelectorAll<HTMLElement>("[data-terrain-source]").forEach((button) => {
+    mapMenu.querySelectorAll<HTMLElement>("[data-terrain-source]").forEach((button) => {
       button.classList.toggle("is-active", button.dataset.terrainSource === terrain?.id);
     });
   };
@@ -266,19 +339,11 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     event.stopPropagation();
     setMenuOpen(rendererMenu, rendererButton, rendererMenu.hidden);
     setMenuOpen(mapMenu, mapButton, false);
-    setMenuOpen(terrainSourceMenu, terrainSourceButton, false);
   };
   const onMapClick = (event: MouseEvent) => {
     event.stopPropagation();
     setMenuOpen(mapMenu, mapButton, mapMenu.hidden);
     setMenuOpen(rendererMenu, rendererButton, false);
-    setMenuOpen(terrainSourceMenu, terrainSourceButton, false);
-  };
-  const onTerrainSourceClick = (event: MouseEvent) => {
-    event.stopPropagation();
-    setMenuOpen(terrainSourceMenu, terrainSourceButton, terrainSourceMenu.hidden);
-    setMenuOpen(rendererMenu, rendererButton, false);
-    setMenuOpen(mapMenu, mapButton, false);
   };
   const onRendererMenuClick = (event: MouseEvent) => {
     const selected = (event.target as HTMLElement).closest<HTMLElement>("[data-renderer]")?.dataset.renderer ?? "";
@@ -286,16 +351,22 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     options.onRendererChange(selected === "webgpu" || selected === "webgl2" || selected === "webgl" ? selected : null);
   };
   const onMapMenuClick = (event: MouseEvent) => {
+    const sectionId = (event.target as HTMLElement).closest<HTMLElement>("[data-basemap-section]")?.dataset.basemapSection;
+    if (sectionId === "3d" || sectionId === "2d") {
+      const section = sectionId === "3d" ? threeDBasemaps : twoDBasemaps;
+      setBasemapMenuSectionExpanded(section, section.content.hidden);
+      return;
+    }
     const selected = (event.target as HTMLElement).closest<HTMLElement>("[data-map-source]")?.dataset.mapSource;
-    if (!selected) return;
+    if (selected) {
+      setMenuOpen(mapMenu, mapButton, false);
+      options.onMapSourceChange(selected);
+      return;
+    }
+    const terrainSource = (event.target as HTMLElement).closest<HTMLElement>("[data-terrain-source]")?.dataset.terrainSource;
+    if (!terrainSource) return;
     setMenuOpen(mapMenu, mapButton, false);
-    options.onMapSourceChange(selected);
-  };
-  const onTerrainSourceMenuClick = (event: MouseEvent) => {
-    const selected = (event.target as HTMLElement).closest<HTMLElement>("[data-terrain-source]")?.dataset.terrainSource;
-    if (!selected) return;
-    setMenuOpen(terrainSourceMenu, terrainSourceButton, false);
-    options.onTerrainSourceChange(selected);
+    options.onTerrainSourceChange(terrainSource);
   };
   const onTerrainDetailInput = (): void => {
     const detail = options.getTerrainDetailState();
@@ -314,9 +385,6 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     if (!mapButton.contains(event.target as Node) && !mapMenu.contains(event.target as Node)) {
       setMenuOpen(mapMenu, mapButton, false);
     }
-    if (!terrainSourceButton.contains(event.target as Node) && !terrainSourceMenu.contains(event.target as Node)) {
-      setMenuOpen(terrainSourceMenu, terrainSourceButton, false);
-    }
   };
 
   pauseButton.addEventListener("click", onPauseClick);
@@ -324,13 +392,10 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
   rendererMenu.addEventListener("click", onRendererMenuClick);
   mapButton.addEventListener("click", onMapClick);
   mapMenu.addEventListener("click", onMapMenuClick);
-  terrainSourceButton.addEventListener("click", onTerrainSourceClick);
-  terrainSourceMenu.addEventListener("click", onTerrainSourceMenuClick);
   terrainDetailSlider.addEventListener("input", onTerrainDetailInput);
   settingsButton.addEventListener("click", options.onSettingsClick);
   document.addEventListener("pointerdown", onDocumentPointerDown);
   updateMapState(options.runtimeStatus);
-  updateTerrainState(options.runtimeStatus);
   updateTerrainDetailState();
 
   return {
@@ -338,7 +403,6 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     update(state, runtimeStatus, fps, nextPaused): void {
       updatePauseState(nextPaused);
       updateMapState(runtimeStatus);
-      updateTerrainState(runtimeStatus);
       updateTerrainDetailState();
       const heading = String(Math.round(headingDegFromRad(state.headingRad))).padStart(3, "0");
       fpsElement.textContent = nextPaused ? "FPS paused" : fps === null ? "FPS —" : `FPS ${Math.round(fps)}`;
@@ -351,8 +415,6 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
       rendererMenu.removeEventListener("click", onRendererMenuClick);
       mapButton.removeEventListener("click", onMapClick);
       mapMenu.removeEventListener("click", onMapMenuClick);
-      terrainSourceButton.removeEventListener("click", onTerrainSourceClick);
-      terrainSourceMenu.removeEventListener("click", onTerrainSourceMenuClick);
       terrainDetailSlider.removeEventListener("input", onTerrainDetailInput);
       settingsButton.removeEventListener("click", options.onSettingsClick);
       document.removeEventListener("pointerdown", onDocumentPointerDown);

@@ -31,6 +31,11 @@ import {
 } from "./aircraft/aircraftCatalog";
 import { applyAircraftRig, readControlSurfaceState } from "./aircraft/aircraftAnimation";
 import { flightLog } from "./diagnostics/flightLog";
+import { createCollisionDebugOverlay } from "./diagnostics/createCollisionDebugOverlay";
+import { createWheelSpinDebugOverlay } from "./diagnostics/createWheelSpinDebugOverlay";
+import { createWheelSpinExperiment } from "./physics/createWheelSpinExperiment";
+import type { WheelSpinMode } from "./physics/wheelSpin";
+import { createTireAudio } from "./audio/createTireAudio";
 import {
   createFlightPerformanceCapture,
   isFlightPerformanceCaptureEnabled,
@@ -68,7 +73,7 @@ import {
   saveOrbitInvertSettings,
 } from "./input/orbitInvertSettings";
 import { createJsbsimRuntime } from "./jsbsim/createJsbsimRuntime";
-import { createFixedStepPhysicsLoop } from "./physics/fixedStepLoop";
+import { createFixedStepPhysicsLoop, FIXED_DT } from "./physics/fixedStepLoop";
 import { createFlightLoadingScreen, type FlightLoadingScreen } from "../loading/createFlightLoadingScreen";
 import { DEFAULT_FLIGHT_START, START_ALTITUDE_AGL_METERS } from "./jsbsim/bootstrapC172";
 
@@ -349,7 +354,24 @@ export async function createFlightSimApp(
     ARCADE_GROUND_LAUNCHES_PREFERENCE_KEY, ARCADE_GROUND_LAUNCHES_PREFERENCE_KEY,
     (value): value is "on" | "off" => value === "on" || value === "off", "off",
   ) === "on";
-  const physicsLoop = createFixedStepPhysicsLoop(jsbsim.sdk, undefined, {
+  let wheelSpinMode: WheelSpinMode | "off" = "off";
+  let tireSoundEnabled = false;
+  const wheelSpin = createWheelSpinExperiment(jsbsim.sdk);
+  const tireAudio = createTireAudio();
+  tireAudio.setPaused(true);
+  let tireSlipEnergy = 0;
+  let tireStepSeconds = 0;
+  const resetWheelSpin = (): void => {
+    wheelSpin.reset();
+    tireSlipEnergy = tireStepSeconds = 0;
+    tireAudio.update(0);
+  };
+  const physicsLoop = createFixedStepPhysicsLoop(jsbsim.sdk, () => {
+    if (wheelSpinMode === "off") return;
+    wheelSpin.step(FIXED_DT, wheelSpinMode);
+    for (const wheel of wheelSpin.getStates()) tireSlipEnergy += wheel.slipPowerWatts * FIXED_DT;
+    tireStepSeconds += FIXED_DT;
+  }, {
     getArcadeGroundLaunches: () => arcadeGroundLaunches,
   });
   const flightSurface = createFrameSurfaceQuery(runtime.surface);
@@ -375,6 +397,21 @@ export async function createFlightSimApp(
   let floatingOrigin: FloatingOriginHandle | null = null;
   let aircraft: ReturnType<typeof createPlaceholderAircraft> | null = null;
   let aircraftModel: AircraftModelHandle | null = null;
+  // Session-only debug opt-in: no overlay meshes or SDK reads until enabled.
+  let collisionDebugEnabled = false;
+  let collisionDebugOverlay: ReturnType<typeof createCollisionDebugOverlay> | null = null;
+  let wheelSpinDebugOverlay: ReturnType<typeof createWheelSpinDebugOverlay> | null = null;
+  const syncCollisionDebugOverlay = (): void => {
+    if (collisionDebugEnabled && aircraft && !collisionDebugOverlay) {
+      collisionDebugOverlay = createCollisionDebugOverlay(runtime.scene, aircraft.root, jsbsim.sdk);
+    }
+    collisionDebugOverlay?.setEnabled(collisionDebugEnabled);
+    const showWheels = collisionDebugEnabled && wheelSpinMode !== "off";
+    if (showWheels && aircraft && !wheelSpinDebugOverlay) {
+      wheelSpinDebugOverlay = createWheelSpinDebugOverlay(runtime.scene, aircraft.root, jsbsim.sdk, wheelSpin.getStates);
+    }
+    wheelSpinDebugOverlay?.setEnabled(showWheels);
+  };
   let aircraftId: AircraftId = readPreference(AIRCRAFT_PREFERENCE_KEY, LEGACY_AIRCRAFT_PREFERENCE_KEY, isAircraftId, "cessna-172");
   let aircraftLodId: AircraftLodId = readPreference(AIRCRAFT_LOD_PREFERENCE_KEY, LEGACY_AIRCRAFT_LOD_PREFERENCE_KEY, isAircraftLodId, "auto");
   let optInLodsEnabled = readPreference(
@@ -455,6 +492,7 @@ export async function createFlightSimApp(
     floatingOrigin.aircraftRoot.setEnabled(false);
     aircraft = createPlaceholderAircraft(runtime.scene, floatingOrigin.aircraftRoot);
     aircraft.setViewMode("third");
+    syncCollisionDebugOverlay();
     aircraftModel = createAircraftModel(runtime.scene, aircraft.modelRoot, {
       aircraftId,
       lodId: aircraftLodId,
@@ -527,6 +565,11 @@ export async function createFlightSimApp(
       keyboardStick: inputManager.getKeyboardStickSettings(),
       orbitInvert,
       arcadeGroundLaunches,
+      collisionDebugEnabled,
+      wheelSpinMode,
+      tireSoundEnabled,
+      tireAudioStatus: tireAudio.getStatus(),
+      wheelSpinStates: wheelSpinMode === "off" ? [] : wheelSpin.getStates().map(wheel => ({ ...wheel })),
     };
   };
 
@@ -549,9 +592,11 @@ export async function createFlightSimApp(
       }
       terrainContact.reset();
       visibleMeshCollision.reset();
+      resetWheelSpin();
     }
     phoneSession?.cancelHandoff();
     physicsLoop.setPaused(paused || worldLoading);
+    tireAudio.setPaused(paused || worldLoading);
     runtime.setSimRunning(!paused && !worldLoading);
     skipResumeDelta = !paused;
     const state = physicsLoop.getLatestState() ?? initialState;
@@ -575,6 +620,8 @@ export async function createFlightSimApp(
     placementAbort.abort();
     const abort = placementAbort = new AbortController();
     worldLoading = true;
+    tireAudio.setPaused(true);
+    resetWheelSpin();
     physicsLoop.setPaused(true);
     runtime.setSimRunning(false);
     floatingOrigin?.aircraftRoot.setEnabled(false);
@@ -621,6 +668,7 @@ export async function createFlightSimApp(
       floatingOrigin?.aircraftRoot.setEnabled(true);
       aircraft?.setViewMode(aircraft.getViewMode());
       physicsLoop.setPaused(inputManager.isPaused());
+      tireAudio.setPaused(inputManager.isPaused());
       runtime.setSimRunning(!inputManager.isPaused());
       skipResumeDelta = true;
       phoneSession?.syncStatus();
@@ -753,6 +801,29 @@ export async function createFlightSimApp(
     onOrbitInvertChange: (settings) => {
       orbitInvert = settings;
       saveOrbitInvertSettings(settings);
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+      runtime.requestRender();
+    },
+    onCollisionDebugChange: (enabled) => {
+      collisionDebugEnabled = enabled;
+      syncCollisionDebugOverlay();
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+      runtime.requestRender();
+    },
+    onWheelSpinModeChange: (mode) => {
+      wheelSpinMode = mode;
+      resetWheelSpin();
+      if (mode === "off") {
+        tireSoundEnabled = false;
+        tireAudio.setEnabled(false);
+      }
+      syncCollisionDebugOverlay();
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+      runtime.requestRender();
+    },
+    onTireSoundChange: (enabled) => {
+      tireSoundEnabled = enabled && wheelSpinMode !== "off";
+      tireAudio.setEnabled(tireSoundEnabled);
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
       runtime.requestRender();
     },
@@ -901,6 +972,7 @@ export async function createFlightSimApp(
       }
       // A terrain correction is a placement, not a swept flight trajectory.
       // Discard the old probe positions before testing the next movement.
+      // Surface refinement adjusts placement but must preserve tire momentum.
       if (contact === "reset") visibleMeshCollision.reset();
       const collisionStartedMs = flightPerformance ? performance.now() : 0;
       const collisionReset = visibleMeshCollision.update();
@@ -909,12 +981,15 @@ export async function createFlightSimApp(
       // authority immediately before allowing this step to advance physics.
       const selected = phoneSession?.beforeStep(controls) ?? controls;
       if (selected === false || inputManager.isPaused()) return false;
-      if (collisionReset) return "reset";
+      if (collisionReset) { resetWheelSpin(); return "reset"; }
       applyFlightControls(jsbsim.sdk, selected, inputManager.getGearDownNorm());
       appliedControls = { ...selected };
       return contact;
     });
     const physicsLoopCpuMs = flightPerformance ? performance.now() - physicsStartedMs : 0;
+    tireAudio.setPaused(inputManager.isPaused() || terrainBlocked || !!physicsLoop.getFault());
+    if (tireStepSeconds > 0) tireAudio.update(tireSlipEnergy / tireStepSeconds);
+    tireSlipEnergy = tireStepSeconds = 0;
 
     const tickNowMs = performance.now();
     if (terrainBlocked) {
@@ -961,6 +1036,8 @@ export async function createFlightSimApp(
     });
 
     floatingOrigin?.apply(displayState);
+    if (collisionDebugEnabled) collisionDebugOverlay?.update();
+    if (collisionDebugEnabled && wheelSpinMode !== "off") wheelSpinDebugOverlay?.update();
     const rig = aircraftModel?.getRig();
     if (rig) applyAircraftRig(rig, readControlSurfaceState(jsbsim.sdk), deltaSeconds);
     const phoneOwned = phoneSession?.getSnapshot().owner === "phone";
@@ -1013,6 +1090,9 @@ export async function createFlightSimApp(
       statusOverlay?.destroy();
       controlPanel?.destroy();
       flightHud.destroy();
+      collisionDebugOverlay?.dispose();
+      wheelSpinDebugOverlay?.dispose();
+      tireAudio.dispose();
       aircraftModel?.dispose();
       aircraft?.dispose();
       floatingOrigin?.dispose();
@@ -1033,6 +1113,7 @@ export async function createFlightSimApp(
     runtime.setSimViewState({ ...DEFAULT_FLIGHT_START, zoomMeters: START_ALTITUDE_AGL_METERS * 1.5 });
     worldLoading = false;
     physicsLoop.setPaused(inputManager.isPaused());
+    tireAudio.setPaused(inputManager.isPaused());
     runtime.setSimRunning(!inputManager.isPaused());
     loading.hide();
     runtime.requestRender();

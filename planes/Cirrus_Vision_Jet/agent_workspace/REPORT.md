@@ -2,7 +2,7 @@
 
 A measured reconstruction of the SF50 (G2) built to
 `docs/creating-an-aircraft-model.md`, generated procedurally from a table of
-cross-section stations. Three levels of detail, 1260 / 880 / 442 triangles,
+cross-section stations. Three levels of detail, 1312 / 856 / 442 triangles,
 wired into `AIRCRAFT_CATALOG` as `cirrus-vision-jet`.
 
 Levels are numbered **coarsest first**: LOD1 is the far mesh and each step up
@@ -12,8 +12,8 @@ not need one.
 
 | level | triangles | vertices | objects | takes over at |
 | --- | --- | --- | --- | --- |
-| LOD3 | 1260 | 711 | 26 | 0 m |
-| LOD2 | 880 | 496 | 21 | 65 m |
+| LOD3 | 1312 | 743 | 26 | 0 m |
+| LOD2 | 856 | 480 | 19 | 65 m |
 | LOD1 | 442 | 255 | 12 | 170 m |
 
 Overall length, wingspan and height are **identical at every level and exactly
@@ -29,6 +29,9 @@ Flight Manual, P/N 31452-001 Revision 4, page 1-4, *Figure 1-1: Airplane Three
 View* (drawing id SF50_FM01_0011B). Every dimension in this model comes from
 it; `measurements/sf50_reference.md` records each with the pixel coordinates it
 was read at and which view it came from.
+
+Every reference image, with its provenance, licence and what it settled, is
+collected in `measurements/GALLERY.md`.
 
 **Photographs of the real aircraft** — `measurements/photo_N50SF.jpg` and
 `photo_N914AF.jpg`, side-on and low-angle ramp shots of two G2 airframes from
@@ -531,6 +534,105 @@ free edge's position relative to the hinge from both builds - gear down as
 exported, gear up from `--gear 0` - and checks the runtime rotation maps one to
 the other.
 
+### The main leg is a trailing link
+
+Not a rod with a wheel on the end, which is what it was.
+`measurements/crops/photo_main_gear_linkage.png` shows three members:
+
+- a rigid **forward leg** down from the wing to a knee joint, ahead of and
+  above the axle;
+- a **trailing arm** hinged at that knee, running aft and down to the axle;
+- an **oleo** aft of the leg, down from the wing onto the arm near the axle.
+  It is the one with a polished piston showing, so it is the shock and the
+  other two are rigid.
+
+Scaled on the tyre in the same frame — 0.190 m of radius across 170 px, so
+895 px/m — the knee is 0.240 m ahead of the axle and 0.050 m above it. The
+member tops are **not** measured: the photograph loses them in the wing shadow
+about 0.27 m above the axle, so they keep the height the drawing already fixed
+and only the lower geometry comes from the photograph.
+
+All three are one mesh under one node, so the retraction rig is untouched: it
+still turns a single `LandingGear_*` and the wheel and door still ride it as
+children. **The linkage does not articulate** — the oleo does not compress and
+the arm does not swing on its knee — because that needs a node apiece and a
+runtime that can drive them. It is a trailing link in shape only.
+
+24 triangles a side, and only at the finest level: at 65 m the three members
+are one grey line whichever way they are built, so LOD2 and below keep the
+plain strut. `tube()` came out of this - `diamond_ring` builds its ring in the
+XY plane, which is right for a member that hangs vertically and degenerate for
+a trailing arm, whose ring would lie along its own axis.
+
+### The main gear bay is a rib bay in the wing
+
+What was there instead was a flat plate at x = 1.660, hanging below the wing on
+the outline the drawing's side view draws. It was the right feature read the
+wrong way: **a gear door is a panel IN the skin, not a slab beside the leg**,
+and modelled as a slab it was as wide as the linkage and read as a vestige of
+nothing. It is gone.
+
+**One opening, not two.** The wheel well and the leg bay are one indent at one
+depth, running x = 0.60 to 1.78 - inboard of the stowed wheel, out past the
+leg. They were two things at two depths first, a real cut outboard and a flat
+dark patch inboard, and they read as two unrelated marks on the wing rather
+than as the place the gear lives. The inboard end runs behind the fuselage,
+which is the outer surface inboard of about x = 0.66, so none of it is wasted.
+
+**The door covers only the leg half**, x = 1.10 to 1.78, interpolated along the
+mouth's two spanwise edges - exact, because a loft is ruled between its
+stations. The wheel end stays open: the retracted tyre is visible from outside
+and nothing closes over it, which is what the belly photograph shows.
+
+**The door opens PAST vertical, to 112 deg, so it leans outboard.** At 82 it
+hung in the extended wheel's own plane - the tyre's outer face is at x = 1.777
+and the door's hinge at 1.78 - and the two z-fought, which read as the wheel
+poking through the panel. The wheels themselves have no camber and never did;
+that was the door.
+
+**The bay covers where the RETRACTED leg lies, not where the extended one
+hangs.** The wheel stows at x = 0.850 and the leg runs outboard from it to
+1.54, so the bay starts at the wheel well's outboard rim and goes out from
+there. It was 1.42 to 1.92 first — centred on the *extended* leg — which put
+the whole fold outside it: the gear swung past the hole meant to hold it.
+`photo_N914AF.jpg` agrees and is what settled it: gear up, each round wheel
+well has a rectangular panel immediately **outboard** of it, and scaled on the
+tyre in the same frame (0.38 m across 110 px) that panel is 0.67 m wide and
+starts at the well's rim.
+
+The mouth is **one quad**. Two spanwise stations are added at x = 1.10 and 1.78
+and the face between them on row 4 - the lower surface from 0.72 back to 0.35
+of the chord, which is where the leg comes down at 48% - is simply not emitted.
+Any station falling inside the bay is dropped so the mouth stays one quad,
+which costs nothing for the same reason the two new ones are nearly free.
+No pane tracing is needed, because a gear door is a rib bay: it is bounded by
+the wing's own structure on all four sides. Behind it goes the same dark
+tapered pocket the nose bay uses, and over it one door hinged on the mouth's
+outboard fore-aft edge.
+
+The two stations cost almost nothing. The planform, the dihedral and the
+thickness are all linear in x, so an intermediate station is coplanar with its
+neighbours and the dissolve pass takes it straight back out; these two survive
+only because the cut makes them a feature.
+
+Two things to get right, both of which were wrong first:
+
+- **Hinge on a fore-aft edge.** `loft` emits the quad as (station A, row j),
+  (A, j+1), (B, j+1), (B, j), so the fore-aft edges are (0,1) and (2,3) and the
+  spanwise ones are (1,2) and (3,0). Taking "the other pair" hinges the panel
+  spanwise and swings it forward like a speed brake.
+- **One door, not a pair.** The nose mouth straddles the centreline and needs
+  two halves to stay symmetric. This one is wholly off it.
+
+### The doors do not move with the legs
+
+Each bound part carries the slice of the gear cycle it moves in — legs 0 to
+0.78, doors 0.62 to 1. Retracting, the leg is most of the way in before the
+doors shut over it; extending, the doors are open before the leg comes through.
+Reading the same two windows backwards is what makes extension sequence
+correctly without a second table. Driving both off one fraction folds and
+closes at once, which looks like the door passing through the leg.
+
 `renders/bays/BAY_COMPARE_belly.png` is the pair that matters.
 
 ---
@@ -592,7 +694,7 @@ one that did without them was the 98-triangle silhouette, and it is gone.
 
 | check | LOD3 | LOD2 | LOD1 |
 | --- | --- | --- | --- |
-| triangles | 1260 | 880 | 442 |
+| triangles | 1312 | 856 | 442 |
 | length 9.357 m | 9.357 | 9.357 | 9.357 |
 | span 11.796 m | 11.796 | 11.796 | 11.796 |
 | height 3.322 m | 3.3227 | 3.3227 | 3.3219 |
@@ -665,7 +767,7 @@ because the validator reports it, not because the model looks lopsided.
 
 `src/flight/aircraft/aircraftCatalog.ts`:
 
-- Three levels of ours — 1260 / 880 / 442 triangles — at `autoFromMeters` of
+- Three levels of ours — 1312 / 856 / 442 triangles — at `autoFromMeters` of
   40 / 65 / 170, plus hilos run's opt-in `hd` at 0. The two coarse thresholds
   are the Cessna's scaled by the span ratio, so the two airframes switch at the
   same apparent size; the fourth threshold is gone with the level it selected,

@@ -28,7 +28,12 @@ const mocks = vi.hoisted(() => {
       }),
       setSimRunning: vi.fn(), requestRender: vi.fn(), setMapSource: vi.fn(), setTerrainSource: vi.fn(), setRasterQuality: vi.fn(), destroy: vi.fn(),
     },
+    collisionOverlay: { setEnabled: vi.fn(), update: vi.fn(), dispose: vi.fn() },
+    wheelOverlay: { setEnabled: vi.fn(), update: vi.fn(), dispose: vi.fn() },
+    wheelSpin: { step: vi.fn(), reset: vi.fn(), getStates: () => [] },
+    tireAudio: { setEnabled: vi.fn(), setPaused: vi.fn(), update: vi.fn(), dispose: vi.fn(), getStatus: () => null },
     aircraft: {
+      root: {},
       setViewMode: vi.fn(), toggleViewMode: vi.fn(), getViewMode: () => "third",
       orbitChaseCamera: vi.fn(), zoomChaseCamera: vi.fn(), dispose: vi.fn(),
       modelRoot: {}, setModelLoaded: vi.fn(), getChaseDistanceMeters: () => 14,
@@ -58,12 +63,16 @@ vi.mock("./jsbsim/createJsbsimRuntime", () => ({ createJsbsimRuntime: async () =
 vi.mock("./bridge/ecefBridge", () => ({ readFlightState: () => mocks.state }));
 vi.mock("./bridge/floatingOrigin", () => ({ createFloatingOrigin: () => ({ aircraftRoot: { setEnabled: vi.fn() }, apply: mocks.applyOrigin, dispose: vi.fn() }) }));
 vi.mock("./aircraft/createPlaceholderAircraft", () => ({ createPlaceholderAircraft: () => mocks.aircraft }));
+vi.mock("./diagnostics/createCollisionDebugOverlay", () => ({ createCollisionDebugOverlay: vi.fn(() => mocks.collisionOverlay) }));
+vi.mock("./diagnostics/createWheelSpinDebugOverlay", () => ({ createWheelSpinDebugOverlay: vi.fn(() => mocks.wheelOverlay) }));
+vi.mock("./physics/createWheelSpinExperiment", () => ({ createWheelSpinExperiment: () => mocks.wheelSpin }));
+vi.mock("./audio/createTireAudio", () => ({ createTireAudio: () => mocks.tireAudio }));
 vi.mock("./aircraft/createAircraftModel", () => ({ createAircraftModel: () => mocks.aircraftModel }));
 vi.mock("./aircraft/aircraftAnimation", () => ({
   applyAircraftRig: mocks.applyAircraftRig,
   readControlSurfaceState: () => mocks.surfaceState,
 }));
-vi.mock("./physics/fixedStepLoop", () => ({ createFixedStepPhysicsLoop: vi.fn(() => mocks.physics) }));
+vi.mock("./physics/fixedStepLoop", () => ({ FIXED_DT: 1 / 120, createFixedStepPhysicsLoop: vi.fn(() => mocks.physics) }));
 vi.mock("./physics/terrainContact", () => ({ createTerrainContact: () => mocks.terrainContact }));
 vi.mock("./physics/visibleMeshCollision", () => ({ createVisibleMeshCollision: vi.fn(() => mocks.visibleMeshCollision) }));
 vi.mock("./hud/flightHud", () => ({ createFlightHud: () => ({ update: vi.fn(), destroy: vi.fn() }) }));
@@ -71,10 +80,57 @@ vi.mock("./jsbsim/resetFlightLocation", () => ({ resetFlightLocation: mocks.rese
 vi.mock("./hud/createFlightHudBar", () => ({ createFlightHudBar: () => ({ update: vi.fn(), destroy: vi.fn() }) }));
 
 import { createFlightSimApp } from "./createFlightSimApp";
+import { createCollisionDebugOverlay } from "./diagnostics/createCollisionDebugOverlay";
 import { createFixedStepPhysicsLoop } from "./physics/fixedStepLoop";
 import { createVisibleMeshCollision } from "./physics/visibleMeshCollision";
 
 afterEach(() => { vi.clearAllMocks(); vi.unstubAllGlobals(); document.body.replaceChildren(); });
+
+it("runs wheel feedback only when selected, exposes A/B while paused, and mutes on off", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  vi.stubGlobal("localStorage", { getItem: () => null, setItem: vi.fn() });
+  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
+  mocks.physics.getFault = () => null;
+  const root = document.createElement("div"); document.body.append(root);
+  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
+  await act(async () => { app = await createFlightSimApp(root); });
+  try {
+    const onStep = vi.mocked(createFixedStepPhysicsLoop).mock.calls.at(-1)![1]!;
+    onStep(mocks.state as never);
+    expect(mocks.wheelSpin.step).not.toHaveBeenCalled();
+    expect(mocks.tireAudio.setEnabled).not.toHaveBeenCalled();
+    await act(async () => window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyP" })));
+    expect(mocks.tireAudio.setPaused).toHaveBeenLastCalledWith(true);
+    await act(async () => root.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')!.click());
+    const debug = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')).find(button => button.textContent === "Debug")!;
+    await act(async () => debug.click());
+    const select = root.querySelector<HTMLSelectElement>('[aria-label="Wheel spin experiment"]')!;
+    const sound = root.querySelector<HTMLInputElement>('[aria-label="Enable tire sound"]')!;
+    expect(select.value).toBe("off");
+    expect(sound.disabled).toBe(true);
+    await act(async () => { select.value = "inertia"; select.dispatchEvent(new Event("change", { bubbles: true })); });
+    expect(mocks.wheelSpin.reset).toHaveBeenCalled();
+    expect(sound.disabled).toBe(false);
+    await act(async () => sound.click());
+    expect(mocks.tireAudio.setEnabled).toHaveBeenLastCalledWith(true);
+    onStep(mocks.state as never);
+    expect(mocks.wheelSpin.step).toHaveBeenLastCalledWith(1 / 120, "inertia");
+    await act(async () => root.querySelector<HTMLInputElement>('[aria-label="Show aircraft collision geometry"]')!.click());
+    expect(mocks.wheelOverlay.setEnabled).toHaveBeenLastCalledWith(true);
+    await act(async () => { select.value = "instant"; select.dispatchEvent(new Event("change", { bubbles: true })); });
+    onStep(mocks.state as never);
+    expect(mocks.wheelSpin.step).toHaveBeenLastCalledWith(1 / 120, "instant");
+    await act(async () => { select.value = "off"; select.dispatchEvent(new Event("change", { bubbles: true })); });
+    expect(sound.checked).toBe(false);
+    expect(mocks.tireAudio.setEnabled).toHaveBeenLastCalledWith(false);
+    expect(mocks.wheelOverlay.setEnabled).toHaveBeenLastCalledWith(false);
+    mocks.wheelSpin.step.mockClear();
+    onStep(mocks.state as never);
+    expect(mocks.wheelSpin.step).not.toHaveBeenCalled();
+  } finally { await act(async () => app.destroy()); }
+  expect(mocks.tireAudio.dispose).toHaveBeenCalledOnce();
+  expect(mocks.wheelOverlay.dispose).toHaveBeenCalledOnce();
+});
 
 it("defaults to passive impacts and applies the persistent arcade override to both contact paths", async () => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
@@ -366,5 +422,51 @@ it("saves World detail and the flight terrain requirement from Settings", async 
       .find((button) => button.textContent?.startsWith("Use automatic detail"))!;
     await act(async () => automatic.click());
     expect(setItem).toHaveBeenCalledWith("osfs.world-detail-target", "auto");
+  } finally { await act(async () => app.destroy()); }
+});
+
+it("enables collision geometry from Debug while paused, skips disabled work and disposes it", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  vi.stubGlobal("localStorage", { getItem: () => null, setItem: vi.fn() });
+  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
+  mocks.physics.getFault = () => null;
+  const root = document.createElement("div"); document.body.append(root);
+  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
+  await act(async () => { app = await createFlightSimApp(root); });
+  try {
+    expect(createCollisionDebugOverlay).not.toHaveBeenCalled();
+    await act(async () => window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyP" })));
+    await act(async () => root.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')!.click());
+    const debug = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')).find(button => button.textContent === "Debug")!;
+    await act(async () => debug.click());
+    const checkbox = root.querySelector<HTMLInputElement>('[aria-label="Show aircraft collision geometry"]')!;
+    expect(checkbox.checked).toBe(false);
+    mocks.runtime.requestRender.mockClear();
+    await act(async () => checkbox.click());
+    expect(checkbox.checked).toBe(true);
+    expect(createCollisionDebugOverlay).toHaveBeenCalledOnce();
+    expect(vi.mocked(createCollisionDebugOverlay).mock.calls[0][1]).toBe(mocks.aircraft.root);
+    expect(mocks.collisionOverlay.setEnabled).toHaveBeenLastCalledWith(true);
+    expect(mocks.collisionOverlay.update).not.toHaveBeenCalled();
+    expect(mocks.runtime.requestRender).toHaveBeenCalledOnce();
+    expect(root.textContent).toContain("5 swept body probes");
+    expect(root.textContent).toContain("not a solid collision mesh");
+
+    await act(async () => checkbox.click());
+    expect(mocks.collisionOverlay.setEnabled).toHaveBeenLastCalledWith(false);
+    mocks.collisionOverlay.update.mockClear();
+    const tick = mocks.runtime.setSimTick.mock.calls.at(-1)![0] as (dt: number) => void;
+    await act(async () => tick(1 / 60));
+    expect(mocks.collisionOverlay.update).not.toHaveBeenCalled();
+    await act(async () => checkbox.click());
+    expect(createCollisionDebugOverlay).toHaveBeenCalledOnce();
+    expect(mocks.collisionOverlay.setEnabled).toHaveBeenLastCalledWith(true);
+  } finally { await act(async () => app.destroy()); }
+  expect(mocks.collisionOverlay.dispose).toHaveBeenCalledOnce();
+
+  await act(async () => { app = await createFlightSimApp(root); });
+  try {
+    // The opt-in resets for a new session, without recreating an overlay.
+    expect(createCollisionDebugOverlay).toHaveBeenCalledOnce();
   } finally { await act(async () => app.destroy()); }
 });

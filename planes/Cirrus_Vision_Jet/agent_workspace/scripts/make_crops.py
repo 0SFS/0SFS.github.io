@@ -22,6 +22,10 @@ PHOTO2 = os.path.join(M, "photo_N914AF.jpg")
 # that shows the main gear doors open, and they are nothing like small.
 PHOTO3 = os.path.join(M, "photo_N124MW_gear_down.jpg")
 PHOTO4 = os.path.join(M, "photo_N291AH_ramp.webp")
+# N291AH on the ramp, close in on the right main gear: the only view in this
+# workspace that shows the LINKAGE rather than a silhouette of it.
+PHOTO5 = os.path.join(M, "photo_N291AH_ramp_wide.jpg")
+PHOTO6 = os.path.join(M, "photo_N291AH_main_gear.png")
 
 # (source, name, x0, y0, x1, y1, downscale) in top-down pixels
 CROPS = [
@@ -52,6 +56,8 @@ CROPS = [
     (PHOTO3, "photo_main_door_open", 950, 640, 1450, 1150, 1),
     (PHOTO3, "photo_nose_door_open", 250, 780, 620, 1120, 1),
     (PHOTO4, "photo_nose_gear_ramp", 250, 480, 750, 828, 1),
+    (PHOTO5, "photo_ramp_wide", 0, 0, 1744, 1116, 2),
+    (PHOTO6, "photo_main_gear_linkage", 0, 0, 302, 384, 1),
     (PHOTO, "photo_cabin", 400, 480, 1000, 720, 1),
     (PHOTO, "photo_aft_cabin", 700, 520, 1250, 720, 1),
 ]

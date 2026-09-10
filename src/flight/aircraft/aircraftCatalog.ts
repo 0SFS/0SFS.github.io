@@ -106,8 +106,8 @@ const CIRRUS_LODS: readonly AircraftLodDefinition[] = [
   // 40 m rather than 0 because HD covers the close range when it is switched
   // on. With it off, the finest level available always covers the close range,
   // so this still starts at the camera - see selectAutoLod.
-  { id: "lod3", label: "LOD3 — near", triangles: 1260, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD3.glb", autoFromMeters: 40, credit: PROCEDURAL },
-  { id: "lod2", label: "LOD2 — medium", triangles: 880, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD2.glb", autoFromMeters: 65, credit: PROCEDURAL },
+  { id: "lod3", label: "LOD3 — near", triangles: 1312, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD3.glb", autoFromMeters: 40, credit: PROCEDURAL },
+  { id: "lod2", label: "LOD2 — medium", triangles: 856, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD2.glb", autoFromMeters: 65, credit: PROCEDURAL },
   // The bottom of this ladder, and it runs all the way out: there is no
   // silhouette level under it. The one that used to be there was 98 triangles,
   // and the level above it was little better - both painted their glazing on
