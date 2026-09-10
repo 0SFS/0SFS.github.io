@@ -63,7 +63,57 @@ function speedSquared(sdk: ReturnType<typeof sdkAt>): number {
     .reduce((sum, property) => sum + (sdk.getPropertyValue(property) * 0.3048) ** 2, 0);
 }
 
+function worldVelocity(sdk: ReturnType<typeof sdkAt>): Vector {
+  const lat = sdk.values["position/lat-geod-deg"] * DEG_TO_RAD;
+  const lon = sdk.values["position/long-gc-deg"] * DEG_TO_RAD;
+  const north = sdk.values["velocities/v-north-fps"] * 0.3048;
+  const east = sdk.values["velocities/v-east-fps"] * 0.3048;
+  const up = -sdk.values["velocities/v-down-fps"] * 0.3048;
+  return {
+    x: -north * Math.sin(lat) * Math.cos(lon) - east * Math.sin(lon) + up * Math.cos(lat) * Math.cos(lon),
+    y: -north * Math.sin(lat) * Math.sin(lon) + east * Math.cos(lon) + up * Math.cos(lat) * Math.sin(lon),
+    z: north * Math.cos(lat) + up * Math.sin(lat),
+  };
+}
+
 describe("visible mesh body collision", () => {
+  it.each([100, 150].flatMap(speedKts => ["nose", "center", "left-wing", "right-wing", "tail"]
+    .map((probe, probeIndex) => ({ speedKts, probe, probeIndex }))))("keeps a $speedKts kt $probe wall/slope impact passive at level and banked attitudes", ({ speedKts, probeIndex }) => {
+    for (const roll of [0, 35]) for (const rawNormal of [{ x: 0, y: 0, z: -9 }, { x: 3, y: 1, z: -4 }]) {
+      const sdk = sdkAt();
+      sdk.values["attitude/phi-deg"] = roll;
+      sdk.values["attitude/theta-deg"] = -12;
+      sdk.values["attitude/psi-deg"] = 65;
+      const speed = speedKts * 1852 / 3600;
+      const north = speed / Math.sqrt(1.1);
+      sdk.values["velocities/v-north-fps"] = north / 0.3048;
+      sdk.values["velocities/v-east-fps"] = north * 0.3 / 0.3048;
+      sdk.values["velocities/v-down-fps"] = north * 0.1 / 0.3048;
+      const beforePosition = position(sdk);
+      const motion = { x: -north * 0.1 / 120, y: north * 0.3 / 120, z: north / 120 };
+      const collision = createVisibleMeshCollision(sdk as never,
+        surfaceWithHits(Array.from({ length: 5 }, (_, index) => index === probeIndex ? 0.6 : null), rawNormal));
+      collision.update();
+      move(sdk, motion);
+      const incoming = worldVelocity(sdk);
+      const beforeEnergy = speedSquared(sdk);
+      expect(collision.update()).toBe(true);
+      const outgoing = worldVelocity(sdk);
+      const normalLength = Math.hypot(rawNormal.x, rawNormal.y, rawNormal.z);
+      const normal = { x: rawNormal.x / normalLength, y: rawNormal.y / normalLength, z: rawNormal.z / normalLength };
+      const incomingNormal = incoming.x * normal.x + incoming.y * normal.y + incoming.z * normal.z;
+      const outgoingNormal = outgoing.x * normal.x + outgoing.y * normal.y + outgoing.z * normal.z;
+      expect(outgoingNormal).toBeCloseTo(-0.25 * incomingNormal, 7);
+      expect(speedSquared(sdk)).toBeLessThan(beforeEnergy);
+      const afterPosition = position(sdk);
+      for (const axis of ["x", "y", "z"] as const) {
+        expect(outgoing[axis] - outgoingNormal * normal[axis])
+          .toBeCloseTo(incoming[axis] - incomingNormal * normal[axis], 7);
+        expect(afterPosition[axis] - beforePosition[axis]).toBeCloseTo(motion[axis] * 0.6 + normal[axis] * 0.01, 5);
+      }
+    }
+  });
+
   it("resolves the earliest probe impact without moving the centre to the wing or adding a 1.5m launch", () => {
     const sdk = sdkAt();
     const before = position(sdk);

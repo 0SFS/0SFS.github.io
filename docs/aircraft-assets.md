@@ -91,8 +91,8 @@ Cirrus Vision Jet:
 
 | Level | Triangles | Vertices | Meshes | Intended range |
 | --- | --- | --- | --- | --- |
-| LOD3 | 1204 | 661 | 22 | Close / cockpit |
-| LOD2 | 908 | 512 | 22 | Medium |
+| LOD3 | 1260 | 711 | 26 | Close / cockpit |
+| LOD2 | 880 | 496 | 21 | Medium |
 | LOD1 | 442 | 254 | 12 | Far, and all the way out |
 
 LOD3 and LOD2 of the C172 carry a `Propeller_Disc` swept from the blade sections
@@ -205,9 +205,21 @@ negated.
 `LandingGear_Left`, `_Right` and `_Nose` are bound the same way as a control
 surface, but from `gear/gear-cmd-norm` (1 down, 0 up) and through a quarter turn
 rather than a few degrees. Each leg's node origin is on its retraction hinge and
-its wheel — plus, on the main legs, its door — is a **child** of it, so one
+its wheel — plus, on the main legs, its strut door — is a **child** of it, so one
 rotation per leg carries the whole assembly. An airframe whose mesh has no such
 nodes binds nothing and is unaffected.
+
+`BayDoor_Nose_Left` and `_Right` are bound from the same gear position and travel
+from the other end: the mesh always ships gear down, so the doors are exported
+**open** and the runtime turns them shut as the gear comes up. They are not
+children of anything — they hinge on the fuselage — and each carries its own
+travel rather than the legs' quarter turn, because a door that stops at 90° has
+swung through the skin. Only the finest level cuts the bay opening, so the
+coarse ones ship no doors and bind none.
+
+There is no main-gear bay door. The Vision Jet's main wheels retract into the
+wing root and stay visible from outside, and the panel beside each one is the
+strut-mounted `GearDoor_*`, which is a child of its leg and rides it.
 
 The transit is run by the rig, at a fixed 8 seconds end to end, rather than read
 back from the flight model. `gear/gear-pos-norm` would be the right property and
@@ -223,7 +235,8 @@ The lever itself is not part of `ControlSurfaceState`. That record is the
 smoothed continuous axes — every field of it is gamepad-mapped, phone-synced and
 range-checked on the wire — and the gear is a latching switch, owned by the
 input manager the way the pause key is and passed to `applyFlightControls` as
-its own argument. `L` toggles it.
+its own argument. `G` toggles it, as does the gear button in the HUD's
+instrument row; flaps retract moved off `G` to `R` to make room.
 
 Because it is visual only, the gear does not change how the aircraft flies or
 where it sits on the ground; raising it on the runway leaves the aeroplane

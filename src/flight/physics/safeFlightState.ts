@@ -29,7 +29,9 @@ const controls = ["fcs/throttle-cmd-norm", "fcs/mixture-cmd-norm", "fcs/elevator
   "fcs/aileron-cmd-norm", "fcs/rudder-cmd-norm", "fcs/pitch-trim-cmd-norm", "fcs/gear-cmd-norm",
   "fcs/flap-cmd-norm", "fcs/left-brake-cmd-norm", "fcs/right-brake-cmd-norm",
   "propulsion/tank[0]/contents-lbs", "propulsion/tank[1]/contents-lbs",
-  "propulsion/magneto_cmd", "atmosphere/wind-north-fps", "atmosphere/wind-east-fps", "atmosphere/wind-down-fps"];
+  "atmosphere/wind-north-fps", "atmosphere/wind-east-fps", "atmosphere/wind-down-fps"];
+// propulsion/magneto_cmd is write-only: reading it returns zero even when the
+// engine has ignition. Replaying that zero would kill a restored running engine.
 const initialProperties: Record<string, string> = {
   "ic/lat-geod-deg": "position/lat-geod-deg", "ic/long-gc-deg": "position/long-gc-deg",
   "ic/h-sl-ft": "position/h-sl-ft", "ic/terrain-elevation-ft": "position/terrain-elevation-asl-ft",
@@ -40,7 +42,7 @@ const initialProperties: Record<string, string> = {
 export function captureSimulation(sdk: JSBSimSdk) {
   return { initial: Object.fromEntries(Object.entries(initialProperties).map(([ic, property]) => [ic, sdk.getPropertyValue(property)])),
     controls: Object.fromEntries(controls.map(property => [property, sdk.getPropertyValue(property)])),
-    running: sdk.getPropertyValue("propulsion/engine/engine-rpm") > 100 };
+    running: sdk.getPropertyValue("propulsion/engine/set-running") > 0.5 };
 }
 export type SimulationSnapshot = ReturnType<typeof captureSimulation>;
 

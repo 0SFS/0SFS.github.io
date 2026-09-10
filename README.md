@@ -27,13 +27,14 @@ switch to the chase camera to take it all in.
 | `A` / `D` | Roll |
 | `Q` / `E` | Yaw / rudder |
 | `Shift` / `Control` | Increase / decrease throttle |
-| `F` / `G` | Extend / retract flaps |
-| `L` | Raise / lower the landing gear |
+| `F` / `R` | Extend / retract flaps |
+| `G` | Raise / lower the landing gear |
 | `B` | Brake |
 | `P` | Pause |
 | `V` | Toggle first- and third-person camera |
 
-Throttle and pitch trim are also vertical sliders in the lower-right corner. Gamepads are supported.
+Throttle and pitch trim are also vertical sliders in the lower-right corner, and the gear has a `G`
+button in the instrument row above the attitude indicator. Gamepads are supported.
 In mouse input mode, right-drag to orbit the chase camera and scroll to zoom; trackpad mode supports
 scrolling to orbit and pinching to zoom.
 

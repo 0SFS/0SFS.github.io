@@ -147,6 +147,8 @@ interface RetractingGear {
   rest: Quaternion;
   axis: Vector3;
   sign: number;
+  /** Full travel in radians; a leg turns a quarter, a door rather less. */
+  rad: number;
 }
 
 interface Propeller {
@@ -237,7 +239,7 @@ const VERTICAL_AXIS = new Vector3(0, 1, 0);
 const THRUST_AXIS = new Vector3(0, 0, 1);
 
 /**
- * Retracting gear legs. Each leg's origin is on its own retraction hinge and
+ * Retracting gear parts. Each leg's origin is on its own retraction hinge and
  * its wheel — and, on the main legs, its door — is a child of it, so one
  * rotation per leg carries the whole assembly. See
  * `planes/Cirrus_Vision_Jet/agent_workspace/scripts/generate_sf50.py`, which
@@ -249,13 +251,45 @@ const THRUST_AXIS = new Vector3(0, 0, 1);
  *
  * An airframe with fixed gear simply has no such nodes and binds nothing.
  */
-const GEAR_BINDINGS: readonly { name: string; axis: Vector3; sign: number }[] = [
-  { name: "LandingGear_Left", axis: THRUST_AXIS, sign: 1 },
-  { name: "LandingGear_Right", axis: THRUST_AXIS, sign: -1 },
-  { name: "LandingGear_Nose", axis: SPAN_AXIS, sign: -1 },
-];
+/**
+ * The nose bay doors' hinge line, which is NOT one of the three cardinal axes.
+ * Their hinged edge is the mouth's own long edge, and the mouth is on the
+ * belly, which rises about 9.3 deg toward the nose. Turning them about the
+ * plain fore-aft axis does not hold that edge still: it lifts the door off the
+ * mouth, and the open pair end up lying parallel to the GROUND while the body
+ * they hang from is pitched up.
+ *
+ * Printed by the generator as `###DOORAXIS###`, already in glTF axes, and it
+ * has to be re-read whenever the mouth moves along the belly.
+ */
+const NOSE_DOOR_HINGE = new Vector3(0, 0.16248, -0.9867);
 
 const GEAR_RETRACT_RAD = Math.PI / 2;
+const DOOR_RAD = (deg: number): number => (deg * Math.PI) / 180;
+
+const GEAR_BINDINGS: readonly {
+  name: string; axis: Vector3; sign: number; rad?: number;
+}[] = [
+  { name: "LandingGear_Left", axis: THRUST_AXIS, sign: 1 },
+  { name: "LandingGear_Right", axis: THRUST_AXIS, sign: -1 },
+  // The nose leg folds FORWARD, not aft, so its sign is the opposite of what
+  // it was: photo_N124MW_gear_down.jpg shows a 1.1 m door hanging open ahead
+  // of the leg. See the generator's NOSE_SENSE.
+  { name: "LandingGear_Nose", axis: SPAN_AXIS, sign: 1 },
+  // Nose bay doors: a pair that parts in the middle and opens sideways, so
+  // they mirror. There is no main-gear bay door - the main wheels retract into
+  // the wing root and stay visible, and the panel beside each one is the
+  // strut-mounted `GearDoor_*`, which is a child of its leg and needs no
+  // binding of its own.
+  //
+  // These are exported OPEN, because the mesh always ships gear down, so they
+  // travel the way the legs do but from the other end: at `gearDownNorm` 1
+  // they sit where they were authored and at 0 they are shut. The angle is the
+  // generator's own `GEAR_BAYS[...]["open"]` and is not a quarter turn - a
+  // door that stops at 90 deg has swung through the skin.
+  { name: "BayDoor_Nose_Left", axis: NOSE_DOOR_HINGE, sign: -1, rad: DOOR_RAD(88) },
+  { name: "BayDoor_Nose_Right", axis: NOSE_DOOR_HINGE, sign: 1, rad: DOOR_RAD(88) },
+];
 /**
  * Seconds end to end. The SF50's AFM gives 8 s for a normal extension; nothing
  * here depends on the exact figure, only on the gear not snapping between
@@ -312,7 +346,10 @@ export function bindAircraftRig(
   for (const binding of GEAR_BINDINGS) {
     const node = byName.get(binding.name);
     if (!node) continue;
-    gear.push({ node, rest: restRotation(node), axis: binding.axis, sign: binding.sign });
+    gear.push({
+      node, rest: restRotation(node), axis: binding.axis, sign: binding.sign,
+      rad: binding.rad ?? GEAR_RETRACT_RAD,
+    });
     bound.push(binding.name);
   }
 
@@ -371,10 +408,10 @@ function applyGear(rig: AircraftRig, command: number, deltaSeconds: number): voi
   } else {
     rig.gearNorm = target;
   }
-  const angle = (1 - rig.gearNorm) * GEAR_RETRACT_RAD;
+  const travel = 1 - rig.gearNorm;
   for (const leg of rig.gear) {
     leg.node.rotationQuaternion = leg.rest.multiply(
-      Quaternion.RotationAxis(leg.axis, angle * leg.sign),
+      Quaternion.RotationAxis(leg.axis, travel * leg.rad * leg.sign),
     );
   }
 }

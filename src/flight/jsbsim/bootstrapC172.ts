@@ -66,7 +66,8 @@ export async function bootstrapC172p(
   }
 
   sdk.setPropertyValue("fcs/throttle-cmd-norm", 0.65);
-  sdk.setPropertyValue("propulsion/set-running", opts.engineRunning ? -1 : 0);
+  if (opts.engineRunning) sdk.setPropertyValue("propulsion/set-running", -1);
+  else sdk.setPropertyValue("propulsion/engine/set-running", 0);
   sdk.setPropertyValue("propulsion/magneto_cmd", opts.engineRunning ? 3 : 0);
   sdk.setPropertyValue("fcs/mixture-cmd-norm", mixtureForAltitude(opts.altFt));
 }

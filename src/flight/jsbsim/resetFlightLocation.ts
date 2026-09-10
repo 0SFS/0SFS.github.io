@@ -46,7 +46,8 @@ export function resetFlightLocation(sdk: JSBSimSdk, location: GeodeticLocation, 
   }
   if (!sdk.runIc()) throw new Error("JSBSim could not apply the location.");
   if (!preset) {
-    sdk.setPropertyValue("propulsion/set-running", saved.running ? -1 : 0);
+    if (saved.running) sdk.setPropertyValue("propulsion/set-running", -1);
+    else sdk.setPropertyValue("propulsion/engine/set-running", 0);
     for (const [property, value] of Object.entries(saved.controls)) if (Number.isFinite(value)) sdk.setPropertyValue(property, value);
   }
   sdk.setPropertyValue("fcs/throttle-cmd-norm", preset ? (departure ? 0 : 0.35) : state.throttleNorm);

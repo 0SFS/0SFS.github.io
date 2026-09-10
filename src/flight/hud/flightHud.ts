@@ -4,6 +4,7 @@ const ATTITUDE_CANVAS_SIZE = 220;
 const ATTITUDE_HALF = 96;
 
 export interface FlightHudOptions {
+  onGearChange(down: boolean): void;
   onThrottleChange(value: number): void;
   onPitchTrimChange(value: number): void;
   onFlapsChange(value: number): void;
@@ -20,7 +21,14 @@ export interface FlightHudControls {
 }
 
 export interface FlightHudHandle {
-  update(state: FlightState, controls: FlightHudControls): void;
+  /**
+   * `gearDown` is passed separately rather than added to `FlightHudControls`
+   * because the gear is not one of the smoothed axes that record holds - it is
+   * a latching switch the input manager owns, like pause.
+   */
+  update(state: FlightState, controls: FlightHudControls, gearDown: boolean): void;
+  /** Repaint just the gear button, for when the key moves it between frames. */
+  setGearDown(down: boolean): void;
   destroy(): void;
 }
 
@@ -140,50 +148,65 @@ function formatAltitudeFt(altMeters: number): string {
 export function createFlightHud(root: HTMLElement, options: FlightHudOptions): FlightHudHandle {
   root.innerHTML = `
     <div class="flight-hud" aria-label="Flight instruments">
-      <canvas class="flight-hud__attitude" width="220" height="220" role="button" tabindex="0" aria-label="Attitude indicator and pitch roll control. Drag to steer."></canvas>
+      <div class="flight-hud__attitude-cluster" aria-label="Attitude and adjacent levers">
+        <label class="flight-hud__slider-control flight-hud__slider-control--trim">
+          <span>TRIM</span>
+          <output data-output="pitch-trim">0%</output>
+          <input data-control="pitch-trim" type="range" min="-1" max="1" step="0.01" value="0" aria-label="Pitch trim" />
+        </label>
+        <canvas class="flight-hud__attitude" width="220" height="220" role="button" tabindex="0" aria-label="Attitude indicator and pitch roll control. Drag to steer."></canvas>
+        <label class="flight-hud__slider-control flight-hud__slider-control--flaps">
+          <span>FLAPS</span>
+          <output data-output="flaps">0%</output>
+          <input data-control="flaps" type="range" min="0" max="1" step="0.01" value="0" aria-label="Flaps" />
+        </label>
+      </div>
       <div class="flight-hud__tapes">
         <div class="flight-hud__tape">
-          <span class="flight-hud__label">IAS</span>
+          <div class="flight-hud__tape-header">
+            <span class="flight-hud__label">IAS</span>
+            <span class="flight-hud__unit">kt</span>
+          </div>
           <span class="flight-hud__value" data-metric="ias">000</span>
-          <span class="flight-hud__unit">kt</span>
         </div>
         <div class="flight-hud__tape">
-          <span class="flight-hud__label">ALT</span>
+          <div class="flight-hud__tape-header">
+            <span class="flight-hud__label">ALT</span>
+            <span class="flight-hud__unit">ft</span>
+          </div>
           <span class="flight-hud__value" data-metric="alt">00000</span>
-          <span class="flight-hud__unit">ft</span>
         </div>
         <div class="flight-hud__tape">
-          <span class="flight-hud__label">HDG</span>
+          <div class="flight-hud__tape-header">
+            <span class="flight-hud__label">HDG</span>
+            <span class="flight-hud__unit">°</span>
+          </div>
           <span class="flight-hud__value" data-metric="hdg">000</span>
-          <span class="flight-hud__unit">°</span>
         </div>
         <div class="flight-hud__tape">
-          <span class="flight-hud__label">VS</span>
+          <div class="flight-hud__tape-header">
+            <span class="flight-hud__label">VS</span>
+            <span class="flight-hud__unit">fpm</span>
+          </div>
           <span class="flight-hud__value" data-metric="vs">+0000</span>
-          <span class="flight-hud__unit">fpm</span>
         </div>
+        <button class="flight-hud__gear" data-control="gear" type="button" aria-pressed="true">G</button>
       </div>
-      <div class="flight-hud__controls" aria-label="Engine and control surfaces">
-        <label class="flight-hud__yaw-control">
-          <span>YAW</span>
-          <input data-control="rudder" type="range" min="-1" max="1" step="0.01" value="0" aria-label="Yaw rudder. Drag left or right; releases to center." />
-          <output data-output="rudder">0%</output>
-        </label>
-        <div class="flight-hud__levers">
+      <div class="flight-hud__yaw-throttle" aria-label="Yaw and throttle">
+        <div class="flight-hud__yaw">
+          <label class="flight-hud__yaw-control">
+            <span class="flight-hud__yaw-heading">
+              <span>YAW</span>
+              <output data-output="rudder">0%</output>
+            </span>
+            <input data-control="rudder" type="range" min="-1" max="1" step="0.01" value="0" aria-label="Yaw rudder. Drag left or right; releases to center." />
+          </label>
+        </div>
+        <div class="flight-hud__throttle">
           <label class="flight-hud__slider-control">
             <span>THR</span>
-            <input data-control="throttle" type="range" min="0" max="1" step="0.01" value="0.1" aria-label="Throttle" />
             <output data-output="throttle">10%</output>
-          </label>
-          <label class="flight-hud__slider-control">
-            <span>TRIM</span>
-            <input data-control="pitch-trim" type="range" min="-1" max="1" step="0.01" value="0" aria-label="Pitch trim" />
-            <output data-output="pitch-trim">0%</output>
-          </label>
-          <label class="flight-hud__slider-control">
-            <span>FLAPS</span>
-            <input data-control="flaps" type="range" min="0" max="1" step="0.01" value="0" aria-label="Flaps" />
-            <output data-output="flaps">0%</output>
+            <input data-control="throttle" type="range" min="0" max="1" step="0.01" value="0.1" aria-label="Throttle" />
           </label>
         </div>
       </div>
@@ -203,8 +226,9 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   const trimOutput = root.querySelector<HTMLOutputElement>('[data-output="pitch-trim"]');
   const flapsOutput = root.querySelector<HTMLOutputElement>('[data-output="flaps"]');
   const rudderOutput = root.querySelector<HTMLOutputElement>('[data-output="rudder"]');
+  const gearButton = root.querySelector<HTMLButtonElement>('[data-control="gear"]');
 
-  if (!canvas || !iasEl || !altEl || !hdgEl || !vsEl
+  if (!canvas || !gearButton || !iasEl || !altEl || !hdgEl || !vsEl
     || !throttleInput || !trimInput || !flapsInput || !rudderInput
     || !throttleOutput || !trimOutput || !flapsOutput || !rudderOutput) {
     throw new Error("Flight HUD markup failed to initialize.");
@@ -214,6 +238,17 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   if (!ctx) {
     throw new Error("Flight HUD canvas context unavailable.");
   }
+
+  let gearDown = true;
+  const renderGearButton = (): void => {
+    gearButton.setAttribute("aria-pressed", String(gearDown));
+    gearButton.classList.toggle("is-down", gearDown);
+    gearButton.title = gearDown ? "Landing gear down (G) — click to raise" : "Landing gear up (G) — click to lower";
+    gearButton.setAttribute("aria-label", gearButton.title);
+  };
+  const onGearClick = (): void => options.onGearChange(!gearDown);
+  gearButton.addEventListener("click", onGearClick);
+  renderGearButton();
 
   let rudderDragging = false;
   const onThrottleInput = (): void => options.onThrottleChange(Number(throttleInput.value));
@@ -337,8 +372,16 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   window.addEventListener("resize", onBlur);
   document.addEventListener("visibilitychange", onVisibilityChange);
 
+  const setGearDown = (next: boolean): void => {
+    if (next === gearDown) return;
+    gearDown = next;
+    renderGearButton();
+  };
+
   return {
-    update(state: FlightState, controls: FlightHudControls): void {
+    setGearDown,
+    update(state: FlightState, controls: FlightHudControls, nextGearDown: boolean): void {
+      setGearDown(nextGearDown);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const center = canvas.width / 2;
       drawAttitudeIndicator(ctx, center, center, ATTITUDE_HALF, state.rollRad, state.pitchRad);
@@ -355,9 +398,12 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
       altEl.textContent = formatAltitudeFt(state.altMeters);
       hdgEl.textContent = Math.round(headingDegFromRad(state.headingRad)).toString().padStart(3, "0");
 
+      // Sign then magnitude, each fixed width: signing the padded number gave
+      // "+ 738" against "-738", so the chip changed width across zero. The
+      // instrument row is left-anchored now, and that shunts everything after
+      // it sideways.
       const vsFpm = Math.round(state.verticalSpeedFps * 60);
-      const vsSign = vsFpm >= 0 ? "+" : "";
-      vsEl.textContent = `${vsSign}${vsFpm.toString().padStart(4, " ")}`;
+      vsEl.textContent = `${vsFpm < 0 ? "-" : "+"}${Math.abs(vsFpm).toString().padStart(4, " ")}`;
       throttleInput.value = String(state.throttleNorm);
       trimInput.value = String(controls.pitchTrim);
       flapsInput.value = String(controls.flaps);
@@ -370,6 +416,7 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
     destroy(): void {
       releaseStick();
       releaseRudder();
+      gearButton.removeEventListener("click", onGearClick);
       throttleInput.removeEventListener("input", onThrottleInput);
       trimInput.removeEventListener("input", onTrimInput);
       flapsInput.removeEventListener("input", onFlapsInput);

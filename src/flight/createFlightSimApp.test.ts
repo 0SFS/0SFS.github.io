@@ -20,6 +20,8 @@ const mocks = vi.hoisted(() => {
         overrideErrorTarget: null as number | null,
       },
       getGoogleTerrainDetailState: vi.fn(() => mocks.runtime.googleTerrainDetail),
+      getGoogleTerrainDetailAnchor: vi.fn(() => "simulation-origin"),
+      setGoogleTerrainDetailAnchor: vi.fn(),
       setGoogleTerrainDetailTarget: vi.fn((errorTarget: number | null) => {
         mocks.runtime.googleTerrainDetail.errorTarget = errorTarget ?? mocks.runtime.googleTerrainDetail.defaultErrorTarget;
         mocks.runtime.googleTerrainDetail.overrideErrorTarget = errorTarget;
@@ -334,8 +336,15 @@ it("saves World detail and the flight terrain requirement from Settings", async 
     await act(async () => settings.click());
     const target = root.querySelector<HTMLInputElement>('[aria-label="World detail target"]')!;
     const requirement = root.querySelector<HTMLInputElement>('[aria-label="Minimum World detail for flight"]')!;
+    const detailAnchor = root.querySelector<HTMLElement>('[aria-label="Terrain detail follows"]')!;
     expect(target.max).toBe("19");
     expect(target.closest(".flight-panel__detail-range")).toBe(requirement.closest(".flight-panel__detail-range"));
+    expect(mocks.runtime.setGoogleTerrainDetailAnchor).toHaveBeenCalledWith("simulation-origin");
+    const camera = Array.from(detailAnchor.querySelectorAll<HTMLButtonElement>("button"))
+      .find((button) => button.textContent === "Camera")!;
+    await act(async () => camera.click());
+    expect(mocks.runtime.setGoogleTerrainDetailAnchor).toHaveBeenLastCalledWith("camera");
+    expect(setItem).toHaveBeenCalledWith("osfs.terrain-detail-anchor", "camera");
     await act(async () => {
       Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(target, "12");
       target.dispatchEvent(new Event("input", { bubbles: true }));

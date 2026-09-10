@@ -68,6 +68,8 @@ export interface FlightWeatherState {
   windSpeedKts: number;
 }
 
+export type FlightTerrainDetailAnchor = "aircraft" | "camera";
+
 export interface FlightControlPanelSnapshot {
   flightState: FlightState;
   fps: number;
@@ -83,6 +85,7 @@ export interface FlightControlPanelSnapshot {
   flightTerrainRequirement: number;
   /** A deliberately temporary waiver of the flight terrain requirement. */
   allowCoarserTerrainThisSession: boolean;
+  terrainDetailAnchor: FlightTerrainDetailAnchor;
   aircraftId: AircraftId;
   lodId: AircraftLodId;
   /** Whether the opt-in levels are switched on. */
@@ -111,6 +114,7 @@ export interface FlightControlPanelOptions {
   onAutomaticGoogleTerrainDetailChange(): void;
   onFlightTerrainRequirementChange(errorTarget: number): void;
   onTerrainDetailOverrideChange(enabled: boolean): void;
+  onTerrainDetailAnchorChange(anchor: FlightTerrainDetailAnchor): void;
   onKeyboardStickSettingsChange(settings: KeyboardStickSettings): void;
   onOrbitInvertChange(settings: OrbitInvertSettings): void;
   onArcadeGroundLaunchesChange(enabled: boolean): void;
@@ -670,9 +674,10 @@ function WorldDetailSettings({
   onAutomaticGoogleTerrainDetailChange,
   onFlightTerrainRequirementChange,
   onTerrainDetailOverrideChange,
+  onTerrainDetailAnchorChange,
 }: Pick<FlightControlPanelProps,
   "snapshot" | "onGoogleTerrainDetailChange" | "onAutomaticGoogleTerrainDetailChange"
-  | "onFlightTerrainRequirementChange" | "onTerrainDetailOverrideChange">) {
+  | "onFlightTerrainRequirementChange" | "onTerrainDetailOverrideChange" | "onTerrainDetailAnchorChange">) {
   const detail = snapshot.googleTerrainDetail;
   if (!detail || snapshot.runtimeStatus.mode !== "google-tiles") {
     return (
@@ -738,7 +743,7 @@ function WorldDetailSettings({
         </div>
       </div>
       <p className="flight-panel__hint">
-        Move the amber handle to limit renderer detail and the blue handle to set the coarsest detail that can fly without an override.
+        Move the green handle to limit renderer detail and the red handle to set the coarsest detail that can fly without an override.
       </p>
       <button
         className="flight-panel__command"
@@ -755,6 +760,30 @@ function WorldDetailSettings({
       </p>
       <p className="flight-panel__hint">
         Flight accepts displayed Google terrain at this target or any smaller target. The default, 2^12 = 4,096 px, is the level you selected as flyable.
+      </p>
+      <div className="flight-panel__section-heading">
+        <span>Terrain detail follows</span>
+      </div>
+      <div className="flight-panel__segmented" role="group" aria-label="Terrain detail follows">
+        <button
+          className={snapshot.terrainDetailAnchor === "aircraft" ? "is-active" : ""}
+          type="button"
+          aria-pressed={snapshot.terrainDetailAnchor === "aircraft"}
+          onClick={() => onTerrainDetailAnchorChange("aircraft")}
+        >
+          Aircraft
+        </button>
+        <button
+          className={snapshot.terrainDetailAnchor === "camera" ? "is-active" : ""}
+          type="button"
+          aria-pressed={snapshot.terrainDetailAnchor === "camera"}
+          onClick={() => onTerrainDetailAnchorChange("camera")}
+        >
+          Camera
+        </button>
+      </div>
+      <p className="flight-panel__hint">
+        Aircraft refines Google mesh by its distance from the aircraft. Camera uses the current view instead. The camera always determines which tiles are visible.
       </p>
       <label className="flight-panel__field flight-panel__field--inline">
         <input
@@ -816,13 +845,13 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
             : tabId === "aircraft" ? <AircraftPanel {...props} />
               : tabId === "settings" ? <>
                 <OrbitInvertSettingsPanel {...props} />
-                <fieldset className="flight-panel__content">
+                <fieldset className="flight-panel__fieldset">
                   <legend>Ground impacts</legend>
-                  <label className="flight-panel__checkbox">
+                  <label className="flight-panel__field flight-panel__field--inline">
                     <input type="checkbox" aria-label="Arcade ground launches"
                       checked={props.snapshot.arcadeGroundLaunches}
                       onChange={(event) => props.onArcadeGroundLaunchesChange(event.target.checked)} />
-                    Arcade ground launches
+                    <span>Arcade ground launches</span>
                   </label>
                   <p className="flight-panel__hint">Exaggerated bounces for fun. With this off, deep ground impacts stop the flight before the gear springs can launch it.</p>
                 </fieldset>

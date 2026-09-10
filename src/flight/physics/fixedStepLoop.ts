@@ -3,8 +3,9 @@ import { readFlightState } from "../bridge/ecefBridge";
 import { interpolateFlightState, type FlightState } from "./flightState";
 import { flightLog } from "../diagnostics/flightLog";
 import { readContactDiagnostics } from "./contactDiagnostics";
+import { groundContactClearanceMeters } from "./groundContactClearance";
 import {
-  aircraftClearanceMeters, captureSimulation, invalidFlightStateReasons, restoreSimulation,
+  captureSimulation, invalidFlightStateReasons, restoreSimulation,
 } from "./safeFlightState";
 
 export const PHYSICS_HZ = 120;
@@ -63,7 +64,7 @@ export function createFixedStepPhysicsLoop(
           break;
         }
         const terrainMeters = sdk.getPropertyValue("position/terrain-elevation-asl-ft") * 0.3048;
-        const groundPenetration = terrainMeters + aircraftClearanceMeters(before.rollRad, before.pitchRad) - before.altMeters;
+        const groundPenetration = terrainMeters + groundContactClearanceMeters(sdk, before.rollRad, before.pitchRad) - before.altMeters;
         if (!options.getArcadeGroundLaunches?.() && groundPenetration > MAX_GROUND_PENETRATION_METERS) {
           fault = "Hard ground impact. Reposition the aircraft to recover.";
           flightLog.error("physics", "Stopped a deep ground impact before loading the gear springs", {

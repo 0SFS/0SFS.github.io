@@ -127,9 +127,9 @@ describe("control surface geometry", () => {
  * stowed point the model was designed around.
  */
 const SF50_GEAR = [
-  { leg: "LandingGear_Left", pivot: [-1.4835, 1.0535, 0.406], wheel: [-1.707, 0.190, 0.434], stowed: [-0.620, 0.830, 0.434] },
-  { leg: "LandingGear_Right", pivot: [1.4835, 1.0535, 0.406], wheel: [1.707, 0.190, 0.434], stowed: [0.620, 0.830, 0.434] },
-  { leg: "LandingGear_Nose", pivot: [0, 0.9005, -2.9015], wheel: [0, 0.179, -2.862], stowed: [0, 0.940, -2.180] },
+  { leg: "LandingGear_Left", pivot: [-1.582, 0.922, 0.406], wheel: [-1.707, 0.190, 0.434], stowed: [-0.850, 0.797, 0.434] },
+  { leg: "LandingGear_Right", pivot: [1.582, 0.922, 0.406], wheel: [1.707, 0.190, 0.434], stowed: [0.850, 0.797, 0.434] },
+  { leg: "LandingGear_Nose", pivot: [0, 0.8235, -2.6055], wheel: [0, 0.179, -2.862], stowed: [0, 1.080, -3.250] },
 ] as const;
 
 function gearRig(target: Scene) {
@@ -157,6 +157,68 @@ describe("retractable gear", () => {
     const { rig } = gearRig(s.scene);
     expect(rig.gear).toHaveLength(3);
     expect(rig.gearNorm).toBe(1);
+    s.scene.dispose(); s.engine.dispose();
+  });
+
+  it("shuts the nose bay doors as the gear comes up, and only then", () => {
+    // The doors are exported OPEN, so gear-down has to leave them exactly
+    // where they were authored: any rotation at all at gearDownNorm 1 would
+    // stand them proud of a skin they are meant to be flush against.
+    const s = scene();
+    const names = ["BayDoor_Nose_Left", "BayDoor_Nose_Right"];
+    const doors = names.map((name) => new TransformNode(name, s.scene));
+    const rig = bindAircraftRig(doors);
+    expect(rig.gear).toHaveLength(2);
+
+    applyAircraftRig(rig, NEUTRAL_CONTROL_SURFACES, 0);
+    for (const door of doors) {
+      expect(Quaternion.Identity().subtract(door.rotationQuaternion!).length())
+        .toBeLessThan(1e-9);
+    }
+
+    applyAircraftRig(rig, { ...NEUTRAL_CONTROL_SURFACES, gearDownNorm: 0 }, 0);
+    // 88 deg, and mirrored: they part in the middle and open sideways. A door
+    // that turned a quarter would swing through the skin.
+    const angles = doors.map((door) => 2 * Math.acos(
+      Math.min(1, Math.abs(door.rotationQuaternion!.w))) * (180 / Math.PI));
+    expect(angles[0]).toBeCloseTo(88, 4);
+    expect(angles[1]).toBeCloseTo(88, 4);
+    expect(doors[0].rotationQuaternion!.z)
+      .toBeCloseTo(-doors[1].rotationQuaternion!.z, 6);
+    s.scene.dispose(); s.engine.dispose();
+  });
+
+  it("shuts each nose door onto the mouth the generator shuts it onto", () => {
+    // Straight out of the generator, in glTF axes: where a door's free edge
+    // sits relative to its hinge with the gear down (as exported) and with the
+    // gear up (`--gear 0`). Getting the hinge AXIS wrong still produces a door
+    // that swings the right number of degrees, so the angle check above passes
+    // and the panel still ends up somewhere else entirely. This is the check
+    // that caught it lying parallel to the ground instead of to the belly.
+    const CASES = [
+      { name: "BayDoor_Nose_Left", down: [0.0165, -0.2345, 0.3705], up: [0.1716, -0.0552, 0.4000] },
+      { name: "BayDoor_Nose_Right", down: [-0.0165, -0.2345, 0.3705], up: [-0.1716, -0.0552, 0.4000] },
+    ] as const;
+    const s = scene();
+    for (const { name, down, up } of CASES) {
+      const node = new TransformNode(name, s.scene);
+      const free = new TransformNode(`${name}_free`, s.scene);
+      free.parent = node;
+      free.position = new Vector3(...down);
+      const rig = bindAircraftRig([node]);
+      applyAircraftRig(rig, { ...NEUTRAL_CONTROL_SURFACES, gearDownNorm: 0 }, 0);
+      const got = free.computeWorldMatrix(true).getTranslation();
+      expect(Vector3.Distance(got, new Vector3(...up))).toBeLessThan(2e-3);
+    }
+    s.scene.dispose(); s.engine.dispose();
+  });
+
+  it("leaves an airframe whose level has no bays alone", () => {
+    // Only the finest level cuts the openings, so the coarse ones ship legs
+    // and no doors. Binding whatever is there is what makes that free.
+    const s = scene();
+    const { rig } = gearRig(s.scene);
+    expect(rig.bound.filter((name) => name.startsWith("BayDoor"))).toEqual([]);
     s.scene.dispose(); s.engine.dispose();
   });
 

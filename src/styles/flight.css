@@ -25,19 +25,30 @@
   pointer-events: none;
   color: #e8edf5;
   font-family: "SF Mono", "Menlo", "Consolas", monospace;
+  /* Clears the bottom button bar so attitude / levers stay readable. */
+  --flight-controls-bottom: calc(56px + var(--foss-inset-bottom, 0px));
+}
+
+.flight-hud__attitude-cluster {
+  position: absolute;
+  left: 24px;
+  bottom: var(--flight-controls-bottom);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  pointer-events: auto;
 }
 
 .flight-hud__attitude {
-  position: absolute;
-  left: 24px;
-  /* --foss-inset-bottom clears any browser toolbar overlaying the page. */
-  bottom: calc(24px + var(--foss-inset-bottom, 0px));
+  position: relative;
+  left: auto;
+  bottom: auto;
+  flex: 0 0 auto;
   width: 220px;
   height: 220px;
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  pointer-events: auto;
   touch-action: none;
   cursor: grab;
   outline: none;
@@ -53,111 +64,209 @@
   box-shadow: 0 0 0 2px rgba(255, 210, 80, 0.45);
 }
 
+/*
+ * Sits directly on top of the attitude cluster, so the numbers are read in
+ * the same glance as the horizon rather than at the other end of the screen.
+ * Anchored on `bottom` so a wrapped row grows upward and the gap to the
+ * cluster stays fixed. 220px is the attitude square; the trim/flaps levers
+ * add roughly 48px each plus gaps.
+ */
 .flight-hud__tapes {
   position: absolute;
-  top: 24px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 24px;
+  bottom: calc(var(--flight-controls-bottom) + 220px + 8px);
   display: flex;
-  gap: 18px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  /* Wide enough that the four chips and the gear button hold one row; below
+     that the row wraps, and `bottom` anchoring grows it upward. */
+  max-width: min(420px, calc(100vw - 48px));
 }
 
+/* Compact chips: code+unit on one row, value below. */
 .flight-hud__tape {
-  min-width: 88px;
-  padding: 10px 14px;
-  border-radius: 10px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  min-width: 0;
+  padding: 4px 6px;
+  border-radius: 8px;
   background: rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.12);
   text-align: center;
 }
 
+.flight-hud__tape-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+  color: rgba(180, 188, 198, 0.55);
+}
+
 .flight-hud__label {
-  display: block;
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  opacity: 0.65;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: inherit;
+  opacity: 1;
 }
 
 .flight-hud__value {
-  display: block;
-  font-size: 28px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 1.1;
+  /* The values are space-padded to a fixed width by flightHud.ts, and both
+     halves of that matter: `pre` keeps the padding HTML would otherwise
+     collapse, and tabular figures keep the glyphs an equal width. Without
+     them an altitude crossing 10,000 ft widens its chip and shunts the rest
+     of the row sideways. */
+  white-space: pre;
+  font-variant-numeric: tabular-nums;
 }
 
 .flight-hud__unit {
-  display: block;
-  font-size: 11px;
-  opacity: 0.55;
+  font-size: 9px;
+  color: inherit;
+  opacity: 1;
 }
 
-.flight-hud__controls {
-  position: absolute;
-  right: 24px;
-  bottom: calc(24px + var(--foss-inset-bottom, 0px));
-  display: grid;
-  gap: 10px;
-  padding: 12px 10px 10px;
+.flight-hud__gear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  width: 28px;
+  min-height: 0;
+  padding: 0;
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.12);
+  color: inherit;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  appearance: none;
+  cursor: pointer;
   pointer-events: auto;
+}
+
+.flight-hud__gear:hover {
+  border-color: rgba(255, 255, 255, 0.32);
+}
+
+.flight-hud__gear:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 210, 80, 0.45);
+}
+
+/* Down is the safe, powered-up state, so it is the one that lights. */
+.flight-hud__gear.is-down {
+  color: #11161a;
+  background: var(--flight-panel-accent);
+  border-color: var(--flight-panel-accent);
+}
+
+.flight-hud__yaw-throttle {
+  position: absolute;
+  right: 24px;
+  bottom: var(--flight-controls-bottom);
+  display: grid;
+  justify-items: stretch;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.flight-hud__throttle {
+  justify-self: end;
+  padding: 8px 6px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.flight-hud__yaw {
+  width: 148px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .flight-hud__yaw-control {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 8px;
-  font-size: 10px;
+  gap: 4px;
+  font-size: 9px;
   letter-spacing: 0;
   opacity: 0.9;
 }
 
+.flight-hud__yaw-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .flight-hud__yaw-control input[type="range"] {
   width: 100%;
-  min-width: 120px;
+  min-width: 0;
+  height: 18px;
   margin: 0;
   accent-color: var(--flight-panel-accent);
   cursor: ew-resize;
 }
 
 .flight-hud__yaw-control output {
-  min-width: 2.5em;
+  min-width: 2.2em;
   text-align: right;
-  font-size: 10px;
+  font-size: 9px;
   opacity: 0.8;
-}
-
-.flight-hud__levers {
-  display: flex;
-  gap: 14px;
-  justify-content: space-between;
 }
 
 .flight-hud__slider-control {
   display: grid;
   justify-items: center;
-  gap: 6px;
-  width: 38px;
-  font-size: 12px;
+  gap: 3px;
+  width: 28px;
+  padding: 4px 2px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 10px;
+  pointer-events: auto;
+}
+
+.flight-hud__throttle .flight-hud__slider-control {
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 .flight-hud__slider-control > span,
 .flight-hud__slider-control output {
-  font-size: 10px;
+  font-size: 9px;
   letter-spacing: 0;
   opacity: 0.8;
 }
 
 .flight-hud__slider-control input[type="range"] {
-  width: 24px;
-  height: 132px;
+  width: 14px;
   margin: 0;
   writing-mode: vertical-lr;
   direction: rtl;
   accent-color: var(--flight-panel-accent);
   cursor: ns-resize;
+}
+
+.flight-hud__attitude-cluster .flight-hud__slider-control input[type="range"] {
+  height: 180px;
+}
+
+.flight-hud__throttle .flight-hud__slider-control input[type="range"] {
+  height: 140px;
 }
 
 .flight-panel-root {
@@ -189,6 +298,110 @@
   color: #11161a;
   background: var(--flight-panel-accent);
   border-color: var(--flight-panel-accent);
+}
+
+.flight-terrain-detail-control {
+  flex: 0 0 41px;
+  width: 41px;
+  margin: 0 3px 0 4px;
+}
+
+.flight-terrain-detail-control__rail {
+  position: relative;
+  display: block;
+  height: 28px;
+}
+
+.flight-terrain-detail-control__valid-range {
+  position: absolute;
+  top: 12px;
+  right: 0;
+  left: 0;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #46db8f 0%, #f6d365 55%, #ff6b6b 100%);
+}
+
+.flight-terrain-detail-control__valid-range {
+  z-index: 1;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14), 0 0 8px rgba(246, 211, 101, 0.28);
+}
+
+.flight-terrain-detail-control__active-marker {
+  position: absolute;
+  z-index: 3;
+  top: 3px;
+  width: 2px;
+  height: 18px;
+  border-radius: 999px;
+  background: #4eb9ff;
+  box-shadow: 0 0 0 1px rgba(6, 20, 34, 0.82), 0 0 8px rgba(78, 185, 255, 0.9);
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.flight-terrain-detail-control__active-marker::before {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 0;
+  height: 0;
+  border-right: 3px solid transparent;
+  border-bottom: 4px solid #4eb9ff;
+  border-left: 3px solid transparent;
+  content: "";
+}
+
+.flight-terrain-detail-control__slider {
+  position: absolute;
+  z-index: 4;
+  top: 4px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  background: transparent;
+  cursor: ew-resize;
+}
+
+.flight-terrain-detail-control__slider::-webkit-slider-runnable-track {
+  height: 4px;
+  background: transparent;
+}
+
+.flight-terrain-detail-control__slider::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  margin-top: -4px;
+  border: 2px solid #f7fafc;
+  border-radius: 50%;
+  appearance: none;
+  background: #111820;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.55);
+}
+
+.flight-terrain-detail-control__slider::-moz-range-track {
+  height: 4px;
+  background: transparent;
+}
+
+.flight-terrain-detail-control__slider::-moz-range-thumb {
+  width: 8px;
+  height: 8px;
+  border: 2px solid #f7fafc;
+  border-radius: 50%;
+  background: #111820;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.55);
+}
+
+.flight-terrain-detail-control__slider:focus-visible {
+  outline: 2px solid rgba(78, 185, 255, 0.92);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.flight-terrain-detail-control.is-unavailable {
+  opacity: 0.35;
 }
 
 .flight-panel__title {
@@ -580,34 +793,71 @@
 }
 
 @media (max-width: 720px) {
+  .flight-hud {
+    /* Wrapped bottom chip row needs more clearance than the desktop single row. */
+    --flight-controls-bottom: calc(96px + var(--foss-inset-bottom, 0px));
+  }
+
+  .flight-hud__attitude-cluster {
+    left: 10px;
+    gap: 1px;
+  }
+
   .flight-hud__attitude {
     width: 130px;
     height: 130px;
   }
 
-  .flight-hud__controls {
+  .flight-hud__yaw-throttle {
     right: 10px;
-    /* Sits above the wrapped HUD bar, which is itself lifted off the toolbar. */
-    bottom: calc(84px + var(--foss-inset-bottom, 0px));
-  }
-
-  .flight-hud__slider-control input[type="range"] {
-    height: 96px;
-  }
-
-  .flight-hud__tapes {
-    top: 10px;
     gap: 4px;
   }
 
+  .flight-hud__yaw {
+    width: 110px;
+    padding: 4px 6px;
+  }
+
+  .flight-hud__throttle {
+    padding: 6px 4px;
+  }
+
+  .flight-hud__slider-control {
+    width: 24px;
+    padding: 2px 1px;
+  }
+
+  .flight-hud__slider-control input[type="range"] {
+    width: 12px;
+  }
+
+  .flight-hud__attitude-cluster .flight-hud__slider-control input[type="range"] {
+    height: 108px;
+  }
+
+  .flight-hud__throttle .flight-hud__slider-control input[type="range"] {
+    height: 100px;
+  }
+
+  .flight-hud__tapes {
+    left: 10px;
+    /* Tracks the 130px attitude square this breakpoint shrinks it to. */
+    bottom: calc(var(--flight-controls-bottom) + 130px + 8px);
+    gap: 4px;
+    max-width: calc(100vw - 20px);
+  }
+
   .flight-hud__tape {
-    min-width: 58px;
-    padding: 7px 5px;
-    border-radius: 4px;
+    padding: 3px 5px;
+  }
+
+  .flight-hud__gear {
+    width: 26px;
+    padding: 0;
   }
 
   .flight-hud__value {
-    font-size: 18px;
+    font-size: 12px;
   }
 }
 

@@ -16,9 +16,9 @@ import {
   resolveRasterBaseMapSource,
   resolveMapRuntimeConfig,
   setMapSourcePreference,
-  setRasterQualityPreference,
   setTerrainSourcePreference,
   type BabylonRuntime,
+  type GoogleTerrainDetailAnchor,
   type RasterBaseMapSource,
   type RendererMode,
 } from "foss-earth/runtime";
@@ -46,6 +46,7 @@ import { createFloatingOrigin, type FloatingOriginHandle } from "./bridge/floati
 import {
   type FlightControlPanelHandle,
   type FlightControlPanelSnapshot,
+  type FlightTerrainDetailAnchor,
   type FlightWeatherState,
 } from "./hud/FlightControlPanel";
 import { createFlightControlPanel } from "./hud/createFlightControlPanel";
@@ -109,6 +110,7 @@ const LEGACY_AIRCRAFT_PREFERENCE_KEY = "flight-sim.aircraft";
 const LEGACY_AIRCRAFT_LOD_PREFERENCE_KEY = "flight-sim.aircraft-lod";
 const WORLD_DETAIL_PREFERENCE_KEY = "osfs.world-detail-target";
 const FLIGHT_TERRAIN_REQUIREMENT_PREFERENCE_KEY = "osfs.flight-terrain-requirement";
+const TERRAIN_DETAIL_ANCHOR_PREFERENCE_KEY = "osfs.terrain-detail-anchor";
 const ARCADE_GROUND_LAUNCHES_PREFERENCE_KEY = "osfs.arcade-ground-launches";
 const MIN_WORLD_DETAIL_TARGET = 1;
 const MAX_WORLD_DETAIL_TARGET = 524_288;
@@ -154,6 +156,18 @@ function readFlightTerrainRequirementPreference(): number {
   return isWorldDetailTarget(value) ? value : DEFAULT_FLIGHT_TERRAIN_REQUIREMENT;
 }
 
+function readTerrainDetailAnchorPreference(): FlightTerrainDetailAnchor {
+  return readPreference(
+    TERRAIN_DETAIL_ANCHOR_PREFERENCE_KEY, TERRAIN_DETAIL_ANCHOR_PREFERENCE_KEY,
+    (value): value is FlightTerrainDetailAnchor => value === "aircraft" || value === "camera",
+    "aircraft",
+  );
+}
+
+function runtimeTerrainDetailAnchor(anchor: FlightTerrainDetailAnchor): GoogleTerrainDetailAnchor {
+  return anchor === "aircraft" ? "simulation-origin" : "camera";
+}
+
 /**
  * Choose a conservative first-run target without a GPU performance benchmark.
  * CPU and memory hints alone cannot prove that 1 px tile refinement is
@@ -193,6 +207,7 @@ export async function createFlightSimApp(
   let worldDetailTarget = readWorldDetailTargetPreference();
   let automaticWorldDetailTarget = 16;
   let flightTerrainRequirement = readFlightTerrainRequirementPreference();
+  let terrainDetailAnchor = readTerrainDetailAnchorPreference();
 
   async function prepareFlightTerrain(
     runtime: BabylonRuntime,
@@ -254,6 +269,7 @@ export async function createFlightSimApp(
     bootResources.runtime = runtime;
     automaticWorldDetailTarget = chooseAutomaticWorldDetailTarget(runtime.renderer.mode);
     runtime.setGoogleTerrainDetailTarget(worldDetailTarget ?? automaticWorldDetailTarget);
+    runtime.setGoogleTerrainDetailAnchor(runtimeTerrainDetailAnchor(terrainDetailAnchor));
     runtime.setSimRunning(false);
     runtime.setSimViewState({ ...DEFAULT_FLIGHT_START, zoomMeters: START_ALTITUDE_AGL_METERS * 1.5 });
     loading.setPhase("world", { state: "ready" });
@@ -315,6 +331,10 @@ export async function createFlightSimApp(
   let detachPhoneStatus: (() => void) | null = null;
   const inputManager = createFlightInputManager({
     onPausedChange: (paused) => syncSimulationPaused(paused),
+    // The HUD's gear button follows the G key. Repainting here rather than
+    // waiting for the next frame is what keeps the two in step while the
+    // simulation is paused and the render loop is idle.
+    onGearChange: (down) => { flightHud.setGearDown(down); runtime.requestRender(); },
     onLocalInput: () => phoneSession?.takeControl(),
     keyboardStickSettings: loadKeyboardStickSettings(),
     getBodyRates: () => ({
@@ -344,6 +364,7 @@ export async function createFlightSimApp(
     ? createFlightPerformanceCapture() : null;
   if (flightPerformance) setActiveFlightPerformanceCapture(flightPerformance);
   const flightHud: FlightHudHandle = createFlightHud(hudRoot, {
+    onGearChange: (down) => { inputManager.setGearDown(down); runtime.requestRender(); },
     onThrottleChange: (value) => { inputManager.setThrottle(value); runtime.requestRender(); },
     onPitchTrimChange: (value) => { inputManager.setPitchTrim(value); runtime.requestRender(); },
     onFlapsChange: (value) => { inputManager.setFlaps(value); runtime.requestRender(); },
@@ -375,6 +396,16 @@ export async function createFlightSimApp(
   // A pilot can temporarily waive their own flight requirement. This is never
   // persisted, so reopening the game returns to the selected safety policy.
   let allowCoarserTerrainThisSession = false;
+  // The HUD can temporarily choose a target inside the saved World-detail
+  // range. It deliberately never reaches local storage.
+  let flightTerrainDetailOverride: number | null = null;
+  const constrainFlightTerrainDetailOverride = (configuredTarget: number): number | null => {
+    if (flightTerrainDetailOverride === null) return null;
+    return Math.max(
+      Math.min(configuredTarget, flightTerrainRequirement),
+      Math.min(Math.max(configuredTarget, flightTerrainRequirement), flightTerrainDetailOverride),
+    );
+  };
   let inputMode = loadInputModePreference(new Set(["mouse", "trackpad"]));
   let inputSensitivity = loadInputSensitivityPreference();
   let orbitInvert = loadOrbitInvertSettings();
@@ -464,29 +495,40 @@ export async function createFlightSimApp(
 
   mountFlightWorld();
   const initialState = readFlightState(jsbsim.sdk);
-  const createPanelSnapshot = (flightState = initialState): FlightControlPanelSnapshot => ({
-    flightState,
-    fps: runtime.engine.getFps(),
-    paused: inputManager.isPaused(),
-    viewMode: aircraft?.getViewMode() ?? "third",
-    runtimeStatus: { ...runtime.status },
-    rendererMode: runtime.renderer.mode,
-    googleTerrainDetail: runtime.getGoogleTerrainDetailState(),
-    worldDetailIsAutomatic: worldDetailTarget === null,
-    automaticWorldDetailTarget,
-    flightTerrainRequirement,
-    allowCoarserTerrainThisSession,
-    aircraftId,
-    lodId: aircraftLodId,
-    optInLodsEnabled,
-    modelStatus: modelState.status,
-    modelActiveLodId: modelState.activeLodId,
-    modelTriangles: modelState.triangles,
-    modelError: modelState.error,
-    keyboardStick: inputManager.getKeyboardStickSettings(),
-    orbitInvert,
-    arcadeGroundLaunches,
-  });
+  const createPanelSnapshot = (flightState = initialState): FlightControlPanelSnapshot => {
+    const activeGoogleTerrainDetail = runtime.getGoogleTerrainDetailState();
+    // Settings edits the saved World-detail handle. The in-flight rail is a
+    // separate temporary override, so it must not make Settings appear to
+    // have saved a different target.
+    const configuredGoogleTerrainDetail = activeGoogleTerrainDetail && {
+      ...activeGoogleTerrainDetail,
+      errorTarget: worldDetailTarget ?? automaticWorldDetailTarget,
+    };
+    return {
+      flightState,
+      fps: runtime.engine.getFps(),
+      paused: inputManager.isPaused(),
+      viewMode: aircraft?.getViewMode() ?? "third",
+      runtimeStatus: { ...runtime.status },
+      rendererMode: runtime.renderer.mode,
+      googleTerrainDetail: configuredGoogleTerrainDetail,
+      worldDetailIsAutomatic: worldDetailTarget === null,
+      automaticWorldDetailTarget,
+      flightTerrainRequirement,
+      allowCoarserTerrainThisSession,
+      terrainDetailAnchor,
+      aircraftId,
+      lodId: aircraftLodId,
+      optInLodsEnabled,
+      modelStatus: modelState.status,
+      modelActiveLodId: modelState.activeLodId,
+      modelTriangles: modelState.triangles,
+      modelError: modelState.error,
+      keyboardStick: inputManager.getKeyboardStickSettings(),
+      orbitInvert,
+      arcadeGroundLaunches,
+    };
+  };
 
   const syncSimulationPaused = (paused: boolean): void => {
     const priorFault = physicsLoop.getFault();
@@ -582,7 +624,7 @@ export async function createFlightSimApp(
       runtime.setSimRunning(!inputManager.isPaused());
       skipResumeDelta = true;
       phoneSession?.syncStatus();
-      flightHud.update(state, inputManager.getControls());
+      flightHud.update(state, inputManager.getControls(), inputManager.getGearDownNorm() > 0);
       controlPanel?.update(createPanelSnapshot(state));
       hudBar?.update(state, runtime.status, measuredFps, inputManager.isPaused());
       loading.hide();
@@ -666,25 +708,39 @@ export async function createFlightSimApp(
     onGoogleTerrainDetailChange: (errorTarget) => {
       worldDetailTarget = errorTarget;
       writePreference(WORLD_DETAIL_PREFERENCE_KEY, String(errorTarget));
-      runtime.setGoogleTerrainDetailTarget(errorTarget);
+      flightTerrainDetailOverride = constrainFlightTerrainDetailOverride(errorTarget);
+      runtime.setGoogleTerrainDetailTarget(flightTerrainDetailOverride ?? errorTarget);
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
       runtime.requestRender();
     },
     onAutomaticGoogleTerrainDetailChange: () => {
       worldDetailTarget = null;
       writePreference(WORLD_DETAIL_PREFERENCE_KEY, "auto");
-      runtime.setGoogleTerrainDetailTarget(automaticWorldDetailTarget);
+      flightTerrainDetailOverride = constrainFlightTerrainDetailOverride(automaticWorldDetailTarget);
+      runtime.setGoogleTerrainDetailTarget(flightTerrainDetailOverride ?? automaticWorldDetailTarget);
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
       runtime.requestRender();
     },
     onFlightTerrainRequirementChange: (errorTarget) => {
       flightTerrainRequirement = errorTarget;
+      const configuredTarget = worldDetailTarget ?? automaticWorldDetailTarget;
+      flightTerrainDetailOverride = constrainFlightTerrainDetailOverride(configuredTarget);
+      if (flightTerrainDetailOverride !== null) {
+        runtime.setGoogleTerrainDetailTarget(flightTerrainDetailOverride);
+      }
       writePreference(FLIGHT_TERRAIN_REQUIREMENT_PREFERENCE_KEY, String(errorTarget));
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
       runtime.requestRender();
     },
     onTerrainDetailOverrideChange: (enabled) => {
       allowCoarserTerrainThisSession = enabled;
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+      runtime.requestRender();
+    },
+    onTerrainDetailAnchorChange: (anchor) => {
+      terrainDetailAnchor = anchor;
+      writePreference(TERRAIN_DETAIL_ANCHOR_PREFERENCE_KEY, anchor);
+      runtime.setGoogleTerrainDetailAnchor(runtimeTerrainDetailAnchor(anchor));
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
       runtime.requestRender();
     },
@@ -729,9 +785,27 @@ export async function createFlightSimApp(
       setTerrainSourcePreference(sourceId);
       teleportToLocation(physicsLoop.getLatestState() ?? initialState);
     },
-    onQualityChange: (setting) => {
-      runtime.setRasterQuality(setting);
-      setRasterQualityPreference(setting);
+    getTerrainDetailState: () => {
+      const configuredTarget = worldDetailTarget ?? automaticWorldDetailTarget;
+      const detail = runtime.getGoogleTerrainDetailState();
+      return {
+        available: runtime.status.mode === "google-tiles" && detail !== null,
+        minErrorTarget: Math.min(configuredTarget, flightTerrainRequirement),
+        maxErrorTarget: Math.max(configuredTarget, flightTerrainRequirement),
+        overrideErrorTarget: flightTerrainDetailOverride,
+        activeErrorTarget: detail?.errorTarget ?? null,
+      };
+    },
+    onTerrainDetailChange: (errorTarget) => {
+      const configuredTarget = worldDetailTarget ?? automaticWorldDetailTarget;
+      const minTarget = Math.min(configuredTarget, flightTerrainRequirement);
+      const maxTarget = Math.max(configuredTarget, flightTerrainRequirement);
+      flightTerrainDetailOverride = errorTarget === null
+        ? null
+        : Math.max(minTarget, Math.min(maxTarget, errorTarget));
+      runtime.setGoogleTerrainDetailTarget(flightTerrainDetailOverride ?? configuredTarget);
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+      runtime.requestRender();
     },
     onPhoneControlClick: openPhoneController,
     onSettingsClick: () => panelRoot.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')?.click(),
@@ -890,7 +964,7 @@ export async function createFlightSimApp(
     const rig = aircraftModel?.getRig();
     if (rig) applyAircraftRig(rig, readControlSurfaceState(jsbsim.sdk), deltaSeconds);
     const phoneOwned = phoneSession?.getSnapshot().owner === "phone";
-    flightHud.update(displayState, phoneOwned ? appliedControls : controls);
+    flightHud.update(displayState, phoneOwned ? appliedControls : controls, inputManager.getGearDownNorm() > 0);
     const now = performance.now();
     if (now - lastPanelUpdateMs >= 100) {
       lastPanelUpdateMs = now;

@@ -16,11 +16,22 @@ dimension comes from; the other two are used to place features it draws
 ambiguously and to check the result against a real aircraft.
 
 1. **`tests/SF50-POH.pdf`** — the factory three view. Every number in this file.
-2. **`measurements/photo_N50SF.jpg`, `photo_N914AF.jpg`** — side-on and
-   low-angle ramp photographs of G2 airframes (N50SF, N914AF), from Wikimedia
-   Commons. Used to confirm the cabin window count and to see the wing root
-   fairing, which the three view draws only as an outline. No dimension is
-   taken from them: they are perspective photographs.
+2. **Photographs of real airframes.** No dimension is taken from any of them —
+   they are perspective shots — but they settle questions the drawing answers
+   ambiguously or not at all, and each one below settled something the model
+   had wrong.
+
+   | file | what it is | what it settled |
+   |---|---|---|
+   | `photo_N50SF.jpg` | side-on ramp shot, G2 | the cabin window count |
+   | `photo_N914AF.jpg` | belly, climbing out, **gear up** | that the main wheels retract into the **wing root** and stay **visible** — two dark tyre faces, no door over them. The model had them buried 24 mm inside the wing and a bay cut into the belly that the aeroplane does not have |
+   | `photo_N124MW_gear_down.jpg` | side-on, on approach, **gear down** | the gear doors open. They are long straight-edged panels, not portholes — the nose mouth was 0.52 m of rounded rectangle and is now 0.94 m and square |
+   | `photo_N291AH_ramp.webp` | parked, nose gear close up | the nose leg and its scissor link with the doors shut |
+   | `photo_sf50_air_to_air.jpg`, `photo_sf50_air_to_air_2026.webp` | air-to-air, gear up | the clean configuration, for the silhouette |
+
+   `scripts/make_crops.py` cuts the regions each reading was taken from into
+   `measurements/crops/`, so they are reproducible from what is in the
+   repository rather than described.
 3. **`tests/cirrus_vision_Sf50/cirrus_vision_Sf50.glb`** — a downloaded
    reference model, which turned out to be hilos run's CC-BY Sketchfab model.
    `scripts/reorient_ref.py` puts it in this project's frame and reports how

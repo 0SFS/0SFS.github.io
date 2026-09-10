@@ -1,17 +1,20 @@
 import { readFileSync } from "node:fs";
 import { JSBSimSdk } from "@0x62/jsbsim-wasm";
 import { wasmBinaryUrl, wasmModuleUrl } from "@0x62/jsbsim-wasm/wasm";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import type { SurfaceHit, SurfaceQuery } from "foss-earth/runtime";
 import { createTerrainContact } from "./terrainContact";
 import { createFixedStepPhysicsLoop, FIXED_DT } from "./fixedStepLoop";
 
 const METERS_PER_FOOT = 0.3048;
 const INITIAL_GROUND_METERS = 300;
+const instances: JSBSimSdk[] = [];
+afterEach(() => { for (const sdk of instances.splice(0)) sdk.destroy(); });
 
 async function setup(altitude = 301.33, speedKts = 10, descentFps = 0) {
   const sdk = await JSBSimSdk.create({ moduleUrl: wasmModuleUrl, wasmUrl: wasmBinaryUrl,
     persistence: { enabled: false }, log: { console: false } });
+  instances.push(sdk);
   const manifest = JSON.parse(readFileSync("public/jsbsim-data/manifest.json", "utf8")) as { files: string[] };
   for (const file of manifest.files) sdk.writeDataFile(file, readFileSync(`public/jsbsim-data/${file}`, "utf8"));
   sdk.configurePaths({ rootDir: "/runtime", aircraftPath: "aircraft", enginePath: "engine", systemsPath: "systems" });
@@ -64,7 +67,9 @@ describe("ground contact energy regressions with real JSBSim", () => {
     const { state, surface } = terrain();
     const contact = createTerrainContact(sdk, surface);
     const loop = createFixedStepPhysicsLoop(sdk);
-    advance(sdk, loop, contact, 120);
+    // At 150kt a one-second roll lifts the aircraft over a 5m barrier. Establish
+    // contact immediately for fast-impact cases so the fixture actually hits it.
+    advance(sdk, loop, contact, speedKts >= 100 ? 1 : 120);
     expect(loop.getFault()).toBeNull();
     const before = telemetry(sdk);
     state.height += rise; // Same revision: terrain is an obstacle, not a refined measurement.

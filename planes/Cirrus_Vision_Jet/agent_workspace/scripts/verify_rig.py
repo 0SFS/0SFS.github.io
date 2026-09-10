@@ -12,11 +12,22 @@ Names that SURFACE_BINDINGS knows about (src/flight/aircraft/aircraftAnimation.t
     Aileron_Left  Aileron_Right  Elevator  Flap_Left  Flap_Right  Rudder
     Propeller     Propeller_Disc
     LandingGear_Nose  LandingGear_Left  LandingGear_Right
+    BayDoor_Nose_Left  BayDoor_Nose_Right
 
 The three gear legs retract, so this also checks the two things that make that
 work: each leg's pivot is on its retraction hinge, and everything that has to
-travel with a leg - its wheel, and the main legs' doors - is a CHILD of it.
-The runtime turns one node; anything left as a sibling stays behind in mid air.
+travel with a leg - its wheel, and the main legs' strut doors - is a CHILD of
+it. The runtime turns one node; anything left as a sibling stays behind in mid
+air.
+
+The nose bay doors are NOT children of anything: they hinge on the fuselage,
+and the runtime drives them from the same gear position on their own axes.
+There is no main-gear bay door - the main wheels retract into the wing root and
+stay visible, and what covers the leg is the strut-mounted GearDoor_*, which
+rides its leg. What matters
+for them is the identity rotation every node needs, because they are exported
+in the OPEN pose - the pose lives in their vertices, and a baked node rotation
+on top of it would be applied twice.
 
 This airframe deliberately ships none of Elevator, Rudder or Propeller:
     - it is a jet, so there is no propeller and propellerBlades is 0;
@@ -28,16 +39,40 @@ This airframe deliberately ships none of Elevator, Rudder or Propeller:
 import bpy, sys, math
 
 BOUND = ["Aileron_Left", "Aileron_Right", "Flap_Left", "Flap_Right",
-         "LandingGear_Nose", "LandingGear_Left", "LandingGear_Right"]
+         "LandingGear_Nose", "LandingGear_Left", "LandingGear_Right",
+         # Only the finest level cuts the bays, so these are absent below it
+         # and that is reported rather than treated as a fault.
+         "BayDoor_Nose_Left", "BayDoor_Nose_Right"]
 # who must ride with which leg.  A door only exists where the level carries trim.
 GEAR_CHILDREN = {
     "LandingGear_Nose": ["Wheel_Nose"],
     "LandingGear_Left": ["Wheel_Left", "GearDoor_Left"],
     "LandingGear_Right": ["Wheel_Right", "GearDoor_Right"],
 }
-# hinges, from generate_sf50.py's quarter_turn_hinge (working Y, world x/z)
-MAIN_HINGE = (1.4835, -4.406, 1.0535)
-NOSE_HINGE = (0.0, -1.0985, 0.9005)
+# The hinges come FROM the generator, not from a copy of them. They were
+# copied once, and moving the stowed main wheels out into the wing root left
+# this file asserting the old pair - which the check then reported as two
+# broken pivots on a model that was correct. A constant table that has to be
+# kept in step by hand is a second source of truth.
+import os
+_SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                    "generate_sf50.py")
+_HEAD = open(_SRC).read().split(
+    "# ----------------------------------------------------------------------------\n"
+    "# scene / materials")[0]
+_G = {"__name__": "verify_rig", "__file__": _SRC}
+_ARGV = sys.argv
+sys.argv = [_ARGV[0], "--", "--lod", "3"]
+exec(compile(_HEAD, _SRC, "exec"), _G)
+sys.argv = _ARGV
+
+
+_MH = _G["quarter_turn_hinge"]((_G["GEAR_TRACK"] / 2.0, _G["MAIN_TIRE_R"]),
+                               _G["MAIN_STOWED"])
+_NH = _G["quarter_turn_hinge"]((_G["NOSE_AXLE_Y"], _G["NOSE_TIRE_R"]),
+                               _G["NOSE_STOWED"], sense=_G["NOSE_SENSE"])
+MAIN_HINGE = (_MH[0], _G["MAIN_STRUT_TOP_Y"], _MH[1])
+NOSE_HINGE = (0.0, _NH[0], _NH[1])
 HINGE_TOL = 0.002
 UNBOUND = ["Ruddervator_Left", "Ruddervator_Right"]
 NOT_EXPECTED = ["Elevator", "Rudder", "Propeller"]

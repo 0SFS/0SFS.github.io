@@ -19,7 +19,12 @@ describe("flight input method selector", () => {
     document.body.append(container);
     const onInputModeChange = vi.fn();
     const onTerrainSourceChange = vi.fn();
-    const onQualityChange = vi.fn();
+    let terrainDetailOverride: number | null = null;
+    let activeTerrainDetail = 16;
+    const onTerrainDetailChange = vi.fn((errorTarget: number | null) => {
+      terrainDetailOverride = errorTarget;
+      activeTerrainDetail = errorTarget ?? 16;
+    });
     const onSettingsClick = vi.fn();
     let activityListener: (active: boolean) => void = () => {};
     const unsubscribe = vi.fn();
@@ -42,7 +47,16 @@ describe("flight input method selector", () => {
       } as BabylonRuntimeStatus,
       rasterSources: [],
       terrainSources: [{ id: "mapterhorn", label: "Mapterhorn Terrain", provider: "Mapterhorn", urlTemplate: "", maxZoom: 15, attribution: "" }],
-      onPausedChange: vi.fn(), onRendererChange: vi.fn(), onMapSourceChange: vi.fn(), onTerrainSourceChange, onQualityChange, onSettingsClick,
+      onPausedChange: vi.fn(), onRendererChange: vi.fn(), onMapSourceChange: vi.fn(), onTerrainSourceChange,
+      getTerrainDetailState: () => ({
+        available: true,
+        minErrorTarget: 16,
+        maxErrorTarget: 4096,
+        overrideErrorTarget: terrainDetailOverride,
+        activeErrorTarget: activeTerrainDetail,
+      }),
+      onTerrainDetailChange,
+      onSettingsClick,
       onInputModeChange, onInputSensitivityChange: vi.fn(),
     });
     expect(onInputModeChange).toHaveBeenLastCalledWith("mouse");
@@ -68,7 +82,12 @@ describe("flight input method selector", () => {
     activityListener(true);
     expect(rendererButton.dataset.renderState).toBe("rendering");
     const mapButton = container.querySelector<HTMLElement>("#flightMapSourceButton")!;
-    expect(mapButton.querySelector(".map-download-speed")?.textContent).toBe("000MB/s");
+    const mapControl = mapButton.parentElement!;
+    const mapDownloadSpeed = mapControl.querySelector(".map-download-speed")!;
+    const terrainDetailControl = mapControl.querySelector(".flight-terrain-detail-control")!;
+    expect(mapDownloadSpeed.textContent).toBe("000MB/s");
+    expect(mapDownloadSpeed.parentElement).toBe(mapButton);
+    expect([...mapControl.children].indexOf(terrainDetailControl)).toBeGreaterThan([...mapControl.children].indexOf(mapButton));
     expect(mapButton.classList.contains("is-streaming")).toBe(true);
     activityListener(false);
     expect(mapButton.classList.contains("is-streaming")).toBe(true);
@@ -87,9 +106,19 @@ describe("flight input method selector", () => {
     container.querySelector<HTMLButtonElement>("#flightTerrainSourceButton")!.click();
     container.querySelector<HTMLButtonElement>("[data-terrain-source=mapterhorn]")!.click();
     expect(onTerrainSourceChange).toHaveBeenCalledWith("mapterhorn");
-    container.querySelector<HTMLButtonElement>("#flightTerrainQualityButton")!.click();
-    container.querySelector<HTMLButtonElement>("[data-terrain-quality=high]")!.click();
-    expect(onQualityChange).toHaveBeenCalledWith("high");
+    const terrainDetailSlider = container.querySelector<HTMLInputElement>("#flightTerrainDetailSlider")!;
+    expect(terrainDetailSlider.value).toBe("12");
+    const terrainDetailMarker = container.querySelector<HTMLElement>(".flight-terrain-detail-control__active-marker")!;
+    expect(terrainDetailMarker.hidden).toBe(false);
+    expect(terrainDetailMarker.title).toBe("Renderer target: 2^4");
+    terrainDetailSlider.value = "10";
+    terrainDetailSlider.dispatchEvent(new Event("input"));
+    expect(onTerrainDetailChange).toHaveBeenCalledWith(1024);
+    expect(terrainDetailSlider.value).toBe("10");
+    expect(terrainDetailMarker.title).toBe("Renderer target: 2^10");
+    terrainDetailSlider.value = "12";
+    terrainDetailSlider.dispatchEvent(new Event("input"));
+    expect(onTerrainDetailChange).toHaveBeenLastCalledWith(null);
     hud.destroy();
     expect(unsubscribeStreaming).toHaveBeenCalledOnce();
     expect(mapButton.classList.contains("is-streaming")).toBe(false);

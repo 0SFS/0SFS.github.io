@@ -3,8 +3,21 @@ import "foss-earth/shell.css";
 import "foss-earth/input-mode.css";
 
 import { attachRendererActivity, attachTileStreamingActivity, attachMapDownloadSpeed, setMapSourceLabel, createInputModeHud, createHudBar, type HudBarHandle, type RenderActivitySource, type TileStreamingSource, type MapDownloadSource } from "foss-earth/shell";
-import type { BabylonRuntimeStatus, RasterBaseMapSource, RasterQualitySetting, RendererMode, TerrainSource } from "foss-earth/runtime";
+import type { BabylonRuntimeStatus, RasterBaseMapSource, RendererMode, TerrainSource } from "foss-earth/runtime";
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
+
+export interface FlightTerrainDetailState {
+  /** Google Tiles is the only map mode with a screen-space-error target. */
+  available: boolean;
+  /** Finest target included in the saved World-detail range. */
+  minErrorTarget: number;
+  /** Coarsest target included in the saved World-detail range. */
+  maxErrorTarget: number;
+  /** The session-only target selected from the HUD, if any. */
+  overrideErrorTarget: number | null;
+  /** The target currently applied to the Google Tiles renderer. */
+  activeErrorTarget: number | null;
+}
 
 export interface FlightHudBarOptions {
   renderActivity: RenderActivitySource & TileStreamingSource & MapDownloadSource;
@@ -19,7 +32,9 @@ export interface FlightHudBarOptions {
   onRendererChange(mode: RendererMode | null): void;
   onMapSourceChange(sourceId: string): void;
   onTerrainSourceChange(sourceId: string): void;
-  onQualityChange(setting: RasterQualitySetting): void;
+  getTerrainDetailState(): FlightTerrainDetailState;
+  /** Set a session-only detail target; null restores the saved World detail. */
+  onTerrainDetailChange(errorTarget: number | null): void;
   onSettingsClick(): void;
   onPhoneControlClick?(): void;
 }
@@ -45,6 +60,22 @@ function mapSourceLabel(status: BabylonRuntimeStatus): string {
 function setMenuOpen(menu: HTMLElement, button: HTMLButtonElement, open: boolean): void {
   menu.hidden = !open;
   button.setAttribute("aria-expanded", String(open));
+}
+
+function terrainDetailExponent(errorTarget: number): number {
+  return Math.log2(Math.max(1, errorTarget));
+}
+
+function formatTerrainDetailTarget(errorTarget: number): string {
+  const exponent = terrainDetailExponent(errorTarget);
+  return `2^${Number.isInteger(exponent) ? exponent : exponent.toFixed(2)}`;
+}
+
+function terrainDetailRangePercent(errorTarget: number, minErrorTarget: number, maxErrorTarget: number): number {
+  const minExponent = terrainDetailExponent(minErrorTarget);
+  const maxExponent = terrainDetailExponent(maxErrorTarget);
+  if (Math.abs(maxExponent - minExponent) < 0.001) return 50;
+  return Math.max(0, Math.min(100, ((terrainDetailExponent(errorTarget) - minExponent) / (maxExponent - minExponent)) * 100));
 }
 
 export function createFlightHudBar(container: HTMLElement, options: FlightHudBarOptions): FlightHudBarHandle {
@@ -91,22 +122,6 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
         optionDataAttribute: "terrainSource",
         options: options.terrainSources,
       },
-      {
-        kind: "menu",
-        id: "flightTerrainQualityControl",
-        className: "renderer-control",
-        button: { kind: "button", id: "flightTerrainQualityButton", title: "Terrain detail. Click to change.", ariaLabel: "Terrain detail", appearance: "chip", className: "hud-chip-button hud-chip--gpu", text: "Terrain: Auto" },
-        menuId: "flightTerrainQualityMenu",
-        menuClassName: "renderer-menu",
-        optionClassName: "renderer-option",
-        optionDataAttribute: "terrainQuality",
-        options: [
-          { id: "auto", label: "Auto" },
-          { id: "low", label: "Low" },
-          { id: "balanced", label: "Balanced" },
-          { id: "high", label: "High" },
-        ],
-      },
       { kind: "slot", id: "flightFps", className: "hud-chip hud-status-text", ariaLive: "polite", ariaLabel: "Frame rate", title: "Rendered frames per second" },
       { kind: "button", id: "flightSettingsButton", title: "Open flight settings", ariaLabel: "Open flight settings", className: "settings-button", text: "⚙" },
       { kind: "slot", id: "flightShellStatus", className: "hud-chip hud-status-text", ariaLive: "polite", ariaLabel: "Flight status" },
@@ -123,17 +138,44 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
   const mapMenu = hudBar.getElement("flightMapSourceMenu");
   const terrainSourceButton = hudBar.getElement<HTMLButtonElement>("flightTerrainSourceButton");
   const terrainSourceMenu = hudBar.getElement("flightTerrainSourceMenu");
-  const terrainQualityButton = hudBar.getElement<HTMLButtonElement>("flightTerrainQualityButton");
-  const terrainQualityMenu = hudBar.getElement("flightTerrainQualityMenu");
   const fpsElement = hudBar.getElement("flightFps");
   const settingsButton = hudBar.getElement<HTMLButtonElement>("flightSettingsButton");
   const statusElement = hudBar.getElement("flightShellStatus");
-  if (!pauseButton || !rendererButton || !rendererMenu || !mapButton || !mapMenu || !terrainSourceButton || !terrainSourceMenu || !terrainQualityButton || !terrainQualityMenu || !fpsElement || !settingsButton || !statusElement) {
+  if (!pauseButton || !rendererButton || !rendererMenu || !mapButton || !mapMenu || !terrainSourceButton || !terrainSourceMenu || !fpsElement || !settingsButton || !statusElement) {
     hudBar.destroy();
     throw new Error("Flight HUD bar failed to mount.");
   }
 
+  const terrainDetailControl = document.createElement("span");
+  terrainDetailControl.className = "flight-terrain-detail-control";
+  terrainDetailControl.setAttribute("aria-label", "World detail override");
+  const terrainDetailRail = document.createElement("span");
+  terrainDetailRail.className = "flight-terrain-detail-control__rail";
+  const terrainDetailValidRange = document.createElement("span");
+  terrainDetailValidRange.className = "flight-terrain-detail-control__valid-range";
+  terrainDetailValidRange.setAttribute("aria-hidden", "true");
+  const terrainDetailActiveMarker = document.createElement("span");
+  terrainDetailActiveMarker.className = "flight-terrain-detail-control__active-marker";
+  terrainDetailActiveMarker.setAttribute("aria-hidden", "true");
+  const terrainDetailSlider = document.createElement("input");
+  terrainDetailSlider.id = "flightTerrainDetailSlider";
+  terrainDetailSlider.className = "flight-terrain-detail-control__slider";
+  terrainDetailSlider.type = "range";
+  terrainDetailSlider.step = "0.05";
+  terrainDetailSlider.setAttribute("aria-label", "Temporary World detail override");
+  terrainDetailRail.append(terrainDetailValidRange, terrainDetailActiveMarker, terrainDetailSlider);
+  terrainDetailControl.append(terrainDetailRail);
+
   const detachDownloadSpeed = attachMapDownloadSpeed(mapButton, options.renderActivity);
+  const mapDownloadSpeed = mapButton.querySelector<HTMLElement>(".map-download-speed");
+  const mapControl = mapButton.parentElement;
+  if (!mapDownloadSpeed || !mapControl) {
+    hudBar.destroy();
+    throw new Error("Flight HUD map detail control failed to mount.");
+  }
+  // Download speed remains part of the basemap button. Only the temporary
+  // detail rail sits beside it, outside that click target.
+  mapControl.insertBefore(terrainDetailControl, mapMenu);
   const detachTileStreaming = attachTileStreamingActivity(mapButton, options.renderActivity);
   const detachRendererActivity = attachRendererActivity(rendererButton, options.renderActivity);
   const inputHud = createInputModeHud(container, pauseButton, {
@@ -169,13 +211,42 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     terrainSourceMenu.querySelectorAll<HTMLElement>("[data-terrain-source]").forEach((button) => {
       button.classList.toggle("is-active", button.dataset.terrainSource === terrain?.id);
     });
-    const quality = status.rasterQuality;
-    terrainQualityButton.textContent = quality
-      ? `Terrain: ${quality.setting === "auto" ? `Auto (${quality.activeProfile})` : quality.activeProfile}`
-      : "Terrain";
-    terrainQualityMenu.querySelectorAll<HTMLElement>("[data-terrain-quality]").forEach((button) => {
-      button.classList.toggle("is-active", button.dataset.terrainQuality === quality?.setting);
-    });
+  };
+
+  const updateTerrainDetailState = (): void => {
+    const detail = options.getTerrainDetailState();
+    const minErrorTarget = Math.min(detail.minErrorTarget, detail.maxErrorTarget);
+    const maxErrorTarget = Math.max(detail.minErrorTarget, detail.maxErrorTarget);
+    const minExponent = terrainDetailExponent(minErrorTarget);
+    const maxExponent = terrainDetailExponent(maxErrorTarget);
+    const selectedTarget = detail.overrideErrorTarget ?? maxErrorTarget;
+
+    terrainDetailControl.classList.toggle("is-unavailable", !detail.available);
+    terrainDetailSlider.disabled = !detail.available;
+    terrainDetailSlider.min = String(minExponent);
+    terrainDetailSlider.max = String(maxExponent);
+    terrainDetailSlider.value = String(Math.max(minExponent, Math.min(maxExponent, terrainDetailExponent(selectedTarget))));
+    terrainDetailSlider.style.left = "0";
+    terrainDetailSlider.style.width = "100%";
+    terrainDetailValidRange.style.left = "0";
+    terrainDetailValidRange.style.width = "100%";
+
+    const activeTarget = detail.activeErrorTarget;
+    const hasActiveTarget = detail.available && activeTarget !== null;
+    terrainDetailActiveMarker.hidden = !hasActiveTarget;
+    if (activeTarget !== null) {
+      terrainDetailActiveMarker.style.left = `${terrainDetailRangePercent(activeTarget, minErrorTarget, maxErrorTarget)}%`;
+      terrainDetailActiveMarker.title = `Renderer target: ${formatTerrainDetailTarget(activeTarget)}`;
+    }
+
+    terrainDetailSlider.title = detail.available
+      ? "Move left for more detail during this flight. Move to the far right to restore the saved World-detail setting."
+      : "World detail is available with Google 3D Tiles.";
+    terrainDetailControl.title = !detail.available
+      ? "World detail is available with Google 3D Tiles."
+      : activeTarget === null
+        ? "Blue marker: waiting for a Google renderer target."
+        : `Blue marker: renderer target ${formatTerrainDetailTarget(activeTarget)}.`;
   };
 
   let paused = false;
@@ -196,28 +267,18 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     setMenuOpen(rendererMenu, rendererButton, rendererMenu.hidden);
     setMenuOpen(mapMenu, mapButton, false);
     setMenuOpen(terrainSourceMenu, terrainSourceButton, false);
-    setMenuOpen(terrainQualityMenu, terrainQualityButton, false);
   };
   const onMapClick = (event: MouseEvent) => {
     event.stopPropagation();
     setMenuOpen(mapMenu, mapButton, mapMenu.hidden);
     setMenuOpen(rendererMenu, rendererButton, false);
     setMenuOpen(terrainSourceMenu, terrainSourceButton, false);
-    setMenuOpen(terrainQualityMenu, terrainQualityButton, false);
   };
   const onTerrainSourceClick = (event: MouseEvent) => {
     event.stopPropagation();
     setMenuOpen(terrainSourceMenu, terrainSourceButton, terrainSourceMenu.hidden);
     setMenuOpen(rendererMenu, rendererButton, false);
     setMenuOpen(mapMenu, mapButton, false);
-    setMenuOpen(terrainQualityMenu, terrainQualityButton, false);
-  };
-  const onTerrainQualityClick = (event: MouseEvent) => {
-    event.stopPropagation();
-    setMenuOpen(terrainQualityMenu, terrainQualityButton, terrainQualityMenu.hidden);
-    setMenuOpen(rendererMenu, rendererButton, false);
-    setMenuOpen(mapMenu, mapButton, false);
-    setMenuOpen(terrainSourceMenu, terrainSourceButton, false);
   };
   const onRendererMenuClick = (event: MouseEvent) => {
     const selected = (event.target as HTMLElement).closest<HTMLElement>("[data-renderer]")?.dataset.renderer ?? "";
@@ -236,11 +297,15 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     setMenuOpen(terrainSourceMenu, terrainSourceButton, false);
     options.onTerrainSourceChange(selected);
   };
-  const onTerrainQualityMenuClick = (event: MouseEvent) => {
-    const selected = (event.target as HTMLElement).closest<HTMLElement>("[data-terrain-quality]")?.dataset.terrainQuality;
-    if (selected !== "auto" && selected !== "low" && selected !== "balanced" && selected !== "high") return;
-    setMenuOpen(terrainQualityMenu, terrainQualityButton, false);
-    options.onQualityChange(selected);
+  const onTerrainDetailInput = (): void => {
+    const detail = options.getTerrainDetailState();
+    if (!detail.available) return;
+    const maxExponent = terrainDetailExponent(Math.max(detail.minErrorTarget, detail.maxErrorTarget));
+    const errorTarget = Math.round(2 ** Number(terrainDetailSlider.value));
+    // The rightmost position is deliberately a no-op override: it leaves the
+    // saved World-detail setting in charge until the pilot moves the slider.
+    options.onTerrainDetailChange(Math.abs(Number(terrainDetailSlider.value) - maxExponent) < 0.001 ? null : errorTarget);
+    updateTerrainDetailState();
   };
   const onDocumentPointerDown = (event: PointerEvent) => {
     if (!rendererButton.contains(event.target as Node) && !rendererMenu.contains(event.target as Node)) {
@@ -252,9 +317,6 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     if (!terrainSourceButton.contains(event.target as Node) && !terrainSourceMenu.contains(event.target as Node)) {
       setMenuOpen(terrainSourceMenu, terrainSourceButton, false);
     }
-    if (!terrainQualityButton.contains(event.target as Node) && !terrainQualityMenu.contains(event.target as Node)) {
-      setMenuOpen(terrainQualityMenu, terrainQualityButton, false);
-    }
   };
 
   pauseButton.addEventListener("click", onPauseClick);
@@ -264,12 +326,12 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
   mapMenu.addEventListener("click", onMapMenuClick);
   terrainSourceButton.addEventListener("click", onTerrainSourceClick);
   terrainSourceMenu.addEventListener("click", onTerrainSourceMenuClick);
-  terrainQualityButton.addEventListener("click", onTerrainQualityClick);
-  terrainQualityMenu.addEventListener("click", onTerrainQualityMenuClick);
+  terrainDetailSlider.addEventListener("input", onTerrainDetailInput);
   settingsButton.addEventListener("click", options.onSettingsClick);
   document.addEventListener("pointerdown", onDocumentPointerDown);
   updateMapState(options.runtimeStatus);
   updateTerrainState(options.runtimeStatus);
+  updateTerrainDetailState();
 
   return {
     setPhoneStatus(text) { if (phoneButton) phoneButton.textContent = text; },
@@ -277,6 +339,7 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
       updatePauseState(nextPaused);
       updateMapState(runtimeStatus);
       updateTerrainState(runtimeStatus);
+      updateTerrainDetailState();
       const heading = String(Math.round(headingDegFromRad(state.headingRad))).padStart(3, "0");
       fpsElement.textContent = nextPaused ? "FPS paused" : fps === null ? "FPS —" : `FPS ${Math.round(fps)}`;
       statusElement.textContent = `${Math.abs(state.latDeg).toFixed(4)}°${state.latDeg >= 0 ? "N" : "S"} ${Math.abs(state.lonDeg).toFixed(4)}°${state.lonDeg >= 0 ? "E" : "W"} h${heading}°`;
@@ -290,8 +353,7 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
       mapMenu.removeEventListener("click", onMapMenuClick);
       terrainSourceButton.removeEventListener("click", onTerrainSourceClick);
       terrainSourceMenu.removeEventListener("click", onTerrainSourceMenuClick);
-      terrainQualityButton.removeEventListener("click", onTerrainQualityClick);
-      terrainQualityMenu.removeEventListener("click", onTerrainQualityMenuClick);
+      terrainDetailSlider.removeEventListener("input", onTerrainDetailInput);
       settingsButton.removeEventListener("click", options.onSettingsClick);
       document.removeEventListener("pointerdown", onDocumentPointerDown);
       detachDownloadSpeed();

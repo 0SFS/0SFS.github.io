@@ -664,6 +664,76 @@ SF50's first stowed position left the door slab and a corner of the strut about
 25 mm proud of the wing lower surface — invisible in every other view, and
 obvious in that one.
 
+### Cutting the bay the gear goes into
+
+A retracting gear turns the skin under it into a place something happens, so
+the finest level should cut the openings and hang a door over each. Three
+things decide whether that works, and two of them are invisible until it is
+rendered.
+
+**Cut the mouth with the window cutter, not a new one.** A bay mouth and a
+cabin window are the same operation — an outline traced as a shape and cut into
+the one face row that holds it — and the only difference is what is put back in
+the hole. On the SF50 that was one argument. Opening a second cutter means
+paying the window's lessons again, and those cost 140 sliver triangles the
+first time.
+
+**Check which coordinate the row runs monotonically in.** A pane is traced in
+one coordinate and interpolated across the row in it. A row on the side of the
+body runs in Z; a row that straddles bottom dead centre does not — both its
+ends sit at the same height — and a mouth traced in Z there comes out as a
+zero-width slit on the centreline. Trace the keel row in X.
+
+**Find out where the belly is actually the outer surface before choosing where
+to cut.** Over the wing box the wing's lower surface drops below the
+fuselage's, so a hole cut outboard of that crossover has a wing behind it and
+reads as no hole at all. On the SF50 the crossover is at x ≈ 0.62 — barely half
+the body's half-width, and a long way inboard of where the fuselage stops.
+`scripts/belly_rows.py` reports it per station next to each row's span, and it
+was written after the first bay rendered as a light-grey panel.
+
+That constraint usually settles it: inboard of the crossover there is often only
+the keel row, and **two panes cannot share a row's station gap**.
+
+**Then check the answer against a photograph before cutting anything**, because
+the constraint above will happily produce a bay the aeroplane does not have.
+The SF50's main gear does not retract into the fuselage at all — it goes into
+the wing root, and the retracted wheels stay visible, standing proud of the
+wing's lower surface with no door over them. A belly bay was cut for them
+anyway, on the argument that the belly was the only row wide enough. Cutting a
+hole where the aeroplane has none is a worse error than not cutting one.
+
+**Say what the pocket behind the mouth cannot be.** A hole in a closed shell
+shows the inside of the far side of the shell, so the mouth needs a pocket, in
+a dark material, with its normals facing *into* the cavity — `recalc_face_normals`
+gets a closed body right and an open shell arbitrarily, and the SF50's first
+pockets lit like lumps on the belly rather than holes in it. Where the
+structure behind the mouth is already occupied — a wing carry-through — there is
+no room for a pocket at all, which is a sign the bay is in the wrong place.
+
+**A retracted wheel that is meant to show can just stand proud of the skin.**
+No cut, no pocket: it protrudes through the surface and reads as a dark tyre
+face in the wing root, which is what the photograph shows. Getting it there is
+a matter of where the stow is, and `scripts/surface_probe.py` — a ray cast
+straight down through the assembled aeroplane, listing every surface it crosses
+in order — is what says whether the wheel is inside the wing or below it. The
+SF50's was 24 mm inside, which no render angle shows.
+
+**Export the doors OPEN.** The mesh always ships gear down and every node needs
+an identity rotation, so the open pose lives in the vertices and the runtime
+turns the node the other way to shut it. Give each door its own travel: a door
+that stops at the legs' 90° has swung through the skin.
+
+**A door on the centreline has to be symmetric — and a clamshell pair, not one
+panel hinged forward.** Hinging a nose-bay door on one side of the centreline
+makes it the only asymmetric part in the aeroplane, and the validator's
+symmetry error — the check that caught a nacelle built on an odd-numbered ring
+— stops meaning anything the moment one part is allowed to be non-zero. A
+forward hinge fixes the symmetry and is still wrong: a panel that swings down
+across the whole mouth is a speed brake, and on a real aeroplane it would pitch
+the nose down hard. Two doors parting in the middle are symmetric AND what the
+aircraft has.
+
 Set `propellerBlades` in the catalog entry — `0` for a jet. Above the speed at
 which the blades alias, the runtime hides them and shows a translucent disc
 sized from the propeller's own bounding box, so nothing extra is needed in the
@@ -740,7 +810,7 @@ only if the level above it is too expensive to run all the way out.
 Those sizes are targets, not walls. The right count is the one where the
 wireframe shows density only where a feature is; a level that is 30% over
 because its windows are round is a better level than one that hits a number
-with rectangles. The SF50 sits at 1204 / 908 / 442 — over the targets at the
+with rectangles. The SF50 sits at 1260 / 880 / 442 — over the targets at the
 top and the bottom, spent on window shape, and the wireframe accounts for all
 of it.
 

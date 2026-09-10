@@ -17,6 +17,11 @@ os.makedirs(OUT, exist_ok=True)
 
 DRAWING = os.path.join(M, "ref_SF50_three_view_1200dpi.png")
 PHOTO = os.path.join(M, "photo_N50SF.jpg")
+PHOTO2 = os.path.join(M, "photo_N914AF.jpg")
+# N124MW on approach, gear DOWN and side on: the only view in this workspace
+# that shows the main gear doors open, and they are nothing like small.
+PHOTO3 = os.path.join(M, "photo_N124MW_gear_down.jpg")
+PHOTO4 = os.path.join(M, "photo_N291AH_ramp.webp")
 
 # (source, name, x0, y0, x1, y1, downscale) in top-down pixels
 CROPS = [
@@ -29,6 +34,24 @@ CROPS = [
     (DRAWING, "windshield_front", 1700, 6140, 3800, 7040, 2),
     (DRAWING, "main_gear", 2320, 1350, 2820, 1770, 1),
     (DRAWING, "nose_gear", 1130, 1420, 1410, 1770, 1),
+    # The gear crops the retraction was read off. The three views draw the leg
+    # small, so these are the regions at full 1200 dpi rather than downscaled:
+    # the main leg's rake and the two braces that say which way each leg folds
+    # are a few pixels wide on the sheet and unreadable at any reduction.
+    (DRAWING, "main_gear_front", 3260, 7180, 3520, 7800, 1),
+    (DRAWING, "nose_gear_front", 2560, 7150, 2820, 7800, 1),
+    (DRAWING, "main_gear_side", 2320, 1330, 2820, 1770, 1),
+    (DRAWING, "nose_gear_side_wide", 950, 1350, 1650, 1770, 1),
+    # Gear UP, which no drawing in the figure shows: the belly of N914AF on
+    # the climb-out. The two retracted main wheels lie flat in shallow wells
+    # either side of the keel, which is what settles the main legs as folding
+    # inboard - see REPORT.md, "Retraction".
+    (PHOTO2, "photo_belly_gear_up", 640, 500, 1200, 800, 1),
+    # The doors, open, at full resolution. The main door is a long rectangular
+    # panel hanging the full depth of the leg; the nose doors are a long pair.
+    (PHOTO3, "photo_main_door_open", 950, 640, 1450, 1150, 1),
+    (PHOTO3, "photo_nose_door_open", 250, 780, 620, 1120, 1),
+    (PHOTO4, "photo_nose_gear_ramp", 250, 480, 750, 828, 1),
     (PHOTO, "photo_cabin", 400, 480, 1000, 720, 1),
     (PHOTO, "photo_aft_cabin", 700, 520, 1250, 720, 1),
 ]

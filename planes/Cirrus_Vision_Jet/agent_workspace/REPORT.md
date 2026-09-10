@@ -2,7 +2,7 @@
 
 A measured reconstruction of the SF50 (G2) built to
 `docs/creating-an-aircraft-model.md`, generated procedurally from a table of
-cross-section stations. Three levels of detail, 1204 / 908 / 442 triangles,
+cross-section stations. Three levels of detail, 1260 / 880 / 442 triangles,
 wired into `AIRCRAFT_CATALOG` as `cirrus-vision-jet`.
 
 Levels are numbered **coarsest first**: LOD1 is the far mesh and each step up
@@ -12,8 +12,8 @@ not need one.
 
 | level | triangles | vertices | objects | takes over at |
 | --- | --- | --- | --- | --- |
-| LOD3 | 1204 | 661 | 22 | 0 m |
-| LOD2 | 908 | 513 | 22 | 65 m |
+| LOD3 | 1260 | 711 | 26 | 0 m |
+| LOD2 | 880 | 496 | 21 | 65 m |
 | LOD1 | 442 | 255 | 12 | 170 m |
 
 Overall length, wingspan and height are **identical at every level and exactly
@@ -454,15 +454,84 @@ from z = 0.730 to 0.830 buried both. `renders/gear_up/` is the check:
 and the two `GEARUP_close_*3Q.png` for the belly and the wing root at 3.4 m of
 framing, which is the only range at which 25 mm of proud door shows.
 
-What is *not* modelled is the wells. The photograph shows the real aircraft's
-retracted main wheels half exposed in shallow belly recesses; ours are fully
-inside an unbroken skin, because cutting two wells is geometry that only ever
-shows when the gear is up.
-
-The door earns its keep twice over now. Extended it hangs below the wing ahead
+The strut door earns its keep twice over. Extended it hangs below the wing ahead
 of the wheel, which is the shape a parked SF50 is recognised by; retracted it
 lies flat under the wing root, which is what the belly photograph shows a closed
 gear door looking like. Twelve triangles a side, doing two jobs.
+
+### The bays, and where the gear actually goes
+
+Three builds of this were wrong, each in a different way, and every correction
+came from a photograph rather than from reasoning about the three view. That is
+the lesson worth carrying: the drawing settles dimensions and says almost
+nothing about what the gear does.
+
+**The nose gear retracts FORWARD.** It was aft for two builds, read off a drag
+brace in the side view that is a few pixels wide.
+`measurements/photo_N124MW_gear_down.jpg` settles it and is not ambiguous: on
+approach, gear down, a long door hangs open **ahead** of the nose leg. Measured
+against the nose tyre in the same frame — 0.358 m across 85 px — it is 1.10 m
+long, which is the ventral band the side view draws at Y = −0.35 to −1.43,
+1.07 m, the same panel to within the reading.
+
+So that band is not a keel strake. **The band IS the doors.** The `Keel` object
+that stood in for it is gone: a solid plate where the aeroplane has a pair of
+doors, occupying the exact space the bay needs. The mouth now runs Y = −0.42 to
+−1.22 on the centreline, 0.34 m across, with a clamshell pair that parts in the
+middle and opens sideways, and the leg swings forward into it.
+
+**The main gear retracts into the WING, and the wheels stay visible.**
+`photo_N914AF.jpg` is a belly shot with the gear up: each main wheel is a dark
+tyre face in a round well in the wing root, with **no door over it**. The panel
+beside it covers the leg. An earlier build stowed the wheels 24 mm inside the
+wing — invisible — and cut a large bay into the belly to compensate, which is a
+bay the aeroplane does not have.
+
+| | first build | now |
+| --- | --- | --- |
+| main stow | x 0.620, z 0.830 — 24 mm inside the wing | x 0.850, z 0.797 — 18 to 45 mm proud of it |
+| main hinge | x 1.4835, z 1.0535, above the wing chord plane | x 1.582, z 0.922, inside the wing |
+| main bay | 0.92 m cut in the belly on the centreline | none; a well in the wing root |
+| nose retraction | aft | forward |
+| nose mouth | 0.52 m, rounded, aft of the leg | 0.80 m, square, ahead of it |
+
+**The wheel wells are dished caps, not holes**, the same trick the intake bore
+uses. The wing is never cut: it is a five-station loft on seven-point rings,
+nothing like as amenable to `cut_pane` as the 36-station fuselage. Two things
+were tried first and both are invisible, for the same reason once it is said
+out loud — **the wing is opaque, so anything behind its skin is behind its
+skin**. A cup with its walls going up inside the wing: invisible. A dish
+recessed inward: inward is up, so also invisible. What shows is a flat dark
+disc hugging the surface 2 mm outside it, every vertex ray cast against the
+wing rather than laid on a plane, because the lower surface is convex and a
+flat disc through its rim stands proud in the middle. Gear up the tyre sits in
+it; gear down the disc alone reads as the empty well.
+
+**A door hinges about its own edge, not about a cardinal axis.** The nose
+doors' hinged edge is the mouth's long edge, and the mouth is on the belly,
+which rises 9.3 deg toward the nose. Turned about the plain fore-aft axis they
+did not hold that edge still - it lifts off the mouth - and the open pair lay
+parallel to the GROUND while the body they hang from is pitched up. The axis is
+now measured off the chain and printed by the build as `###DOORAXIS###` for the
+runtime to use.
+
+Two things that axis has to be, and both were got wrong first:
+
+- **Pointing forward.** Aft is just as valid a hinge line and swings both doors
+  the other way - up into the fuselage.
+- **In the fore-aft/vertical plane.** The chain it is measured from drifts a
+  few millimetres laterally, because the mouth narrows toward its ends, and
+  carrying that drift in gives the two doors hinge lines that are not mirror
+  images: 6 mm of symmetry error. A hinge is a straight line anyway.
+
+A door with the wrong axis still swings the right number of degrees, so an
+angle check passes and the panel is still somewhere else entirely. What catches
+it is asserting where the door LANDS: `aircraftAnimation.test.ts` carries the
+free edge's position relative to the hinge from both builds - gear down as
+exported, gear up from `--gear 0` - and checks the runtime rotation maps one to
+the other.
+
+`renders/bays/BAY_COMPARE_belly.png` is the pair that matters.
 
 ---
 
@@ -472,7 +541,7 @@ Generated from the same parameterised script, never decimated.
 
 | dropped at | what goes |
 | --- | --- |
-| LOD2 | 7 pane columns → 5, fewer fuselage stations, coarser nacelle and wheels, the wing's mid-span station. The ring stays at 11 points: the body is the same shape, the panes are less round |
+| LOD2 | the nose gear bay - its mouth, pocket and pair of doors - 7 pane columns → 5, fewer fuselage stations, coarser nacelle and wheels, the wing's mid-span station. The ring stays at 11 points: the body is the same shape, the panes are less round |
 | LOD1 | ring → 6 points, 9 base stations, 6-point aerofoils, control surfaces merged into their panels, coarser wheels, the intake, the ventral keel and the two gear doors. **The glazing layout stays**: the windscreen and all three cabin windows are still cut as panes |
 
 The station table carries the level each one survives to, and which stations
@@ -523,7 +592,7 @@ one that did without them was the 98-triangle silhouette, and it is gone.
 
 | check | LOD3 | LOD2 | LOD1 |
 | --- | --- | --- | --- |
-| triangles | 1204 | 908 | 442 |
+| triangles | 1260 | 880 | 442 |
 | length 9.357 m | 9.357 | 9.357 | 9.357 |
 | span 11.796 m | 11.796 | 11.796 | 11.796 |
 | height 3.322 m | 3.3227 | 3.3227 | 3.3219 |
@@ -546,6 +615,9 @@ fewer than two faces.
 
 | object | edges | why it is open |
 | --- | --- | --- |
+| Fuselage | 14 / – / – | the nose bay mouth, and exactly it. Anything else here is a T-junction |
+| GearBay_Nose | 14 / – / – | a pocket is a tube, open at the mouth the fuselage opened for it |
+| BayDoor_Nose_* | 11, 11 / – / – | a door is a zero-thickness panel; every edge of it is a boundary |
 | Nacelle | 16 / 6 / 4 | the faces buried in the fuselage crown are not built |
 | Intake | 8 / 6 | the bore is a dished cap, open at its rim inside the lip |
 | Wing_Left / _Right | 7 / 6 | root ribs, uncapped inside the fuselage |
@@ -593,7 +665,7 @@ because the validator reports it, not because the model looks lopsided.
 
 `src/flight/aircraft/aircraftCatalog.ts`:
 
-- Three levels of ours — 1204 / 908 / 442 triangles — at `autoFromMeters` of
+- Three levels of ours — 1260 / 880 / 442 triangles — at `autoFromMeters` of
   40 / 65 / 170, plus hilos run's opt-in `hd` at 0. The two coarse thresholds
   are the Cessna's scaled by the span ratio, so the two airframes switch at the
   same apparent size; the fourth threshold is gone with the level it selected,
@@ -715,8 +787,18 @@ Read this before treating any of it as accurate.
   the strut shortens as it goes; the transit here is a quarter turn and only the
   two ends of it are measured. The main hinge is 0.12 m above the wing chord
   plane as a consequence, where a real trunnion would sit lower.
-- **No wheel wells.** The stowed wheels are inside an unbroken skin; the belly
-  photograph shows the real ones half exposed in shallow recesses.
+- **The wheel wells have no depth.** They are dark discs hugging the wing's
+  lower surface, not recesses: from below, which is the only place they are
+  visible, they read correctly; at a grazing angle they read as what they are.
+  A real well means a cutter for the wing.
+- **The leg panel is the strut-mounted door, and stowed it ends up inside the
+  wing rather than flush with its lower surface.** On the aeroplane that panel
+  closes the leg bay flush. Here it is carried by the leg and lands about 70 mm
+  inside the skin.
+- **Which edge the nose doors hinge on is not measured.** The three view draws
+  the panel outline but not its hinges. A clamshell pair is what the aeroplane
+  has and what keeps the model symmetric; the exact hinge lines are not read
+  off anything.
 - **Nothing stops the gear being raised on the ground.** It is visual only —
   the flight model this airframe flies has fixed gear — so a raised gear
   leaves the aeroplane standing on an invisible stance rather than settling.
@@ -804,6 +886,20 @@ blender -b --factory-startup --python scripts/render_sf50_views.py -- \
 blender -b --factory-startup --python scripts/render_sf50_views.py -- \
     work/sf50_lod3_gearup.blend renders/gear_up GEARUP_close \
     --views 06,09,10 --fit 3.4 --res 700 --keepmat
+
+# the bays, which need --center to be framed at all: each is 0.2-0.9 m across
+# on a 9 m aeroplane, and a whole-aircraft view shows one as a few grey pixels
+blender -b --factory-startup --python scripts/render_sf50_views.py -- \
+    work/sf50_lod3.blend renders/bays BAY_main --views 06,10 --fit 1.6 \
+    --res 760 --keepmat --center 0.0,-0.40,0.70
+blender -b --factory-startup --python scripts/montage.py -- \
+    renders/bays/BAY_COMPARE_belly.png 2 \
+    renders/bays/BAY_belly_down_06_Bottom.png \
+    renders/bays/BAY_belly_up_06_Bottom.png
+
+# which face row can hold an opening this wide, and how far outboard the belly
+# is still the OUTER surface - the two things a belly cut-out turns on
+blender -b --factory-startup --python scripts/belly_rows.py -- --lod 3 -4.40
 blender -b --factory-startup --python scripts/render_sf50_views.py -- \
     work/sf50_lod3.blend renders/final_lod3 final --fit 13 --res 640 --keepmat
 

@@ -4,6 +4,7 @@ Canonical multi-view renderer for SF50 validation.
 Usage:
   blender -b --factory-startup --python render_sf50_views.py -- \
       <input.blend|input.glb|EMPTY> <outdir> <prefix> [--silhouette] [--fit N] [--res N]
+      [--center Y | --center X,Y,Z] [--views 01,06,...] [--wire] [--keepmat]
 
 Renders 10 fixed orthographic views + a contact sheet.
 Aircraft convention: nose +Y, right wing +X, up +Z (Blender).
@@ -52,8 +53,18 @@ for o in sc.objects:
             mins[i] = min(mins[i], p[i]); maxs[i] = max(maxs[i], p[i])
 center = (mins + maxs) / 2 if mins[0] < 1e8 else Vector((0, 0, 0))
 if "--center" in argv:
-    cy = float(argv[argv.index("--center") + 1])
-    center = Vector((0.0, cy, 1.6))
+    # One number is a station, and frames the whole section there. Three are a
+    # point, which is the only way to frame a detail that is not on the
+    # centreline - a gear bay is 0.2 m across, 0.8 m off the axis and under the
+    # wing, so a whole-aircraft view at any fit shows it as four grey pixels.
+    #
+    # WORLD coordinates, not the working Y the reference notes and the report
+    # are written in. The model origin is under the CG, so world y = working Y
+    # + 4.00; passing the working Y frames a metre and a half off and renders
+    # a picture of blank fuselage, which is what it did the first time.
+    spec = argv[argv.index("--center") + 1].split(",")
+    center = Vector([float(v) for v in spec]) if len(spec) == 3 \
+        else Vector((0.0, float(spec[0]), 1.6))
 
 # ---- render settings ----
 sc.render.engine = 'BLENDER_EEVEE' if not (SIL or WIRE) else 'BLENDER_WORKBENCH'

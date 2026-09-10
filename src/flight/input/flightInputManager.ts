@@ -35,7 +35,9 @@ const KEY_BINDINGS: Record<string, Partial<ControlSurfaceState>> = {
   ControlLeft: { throttle: -1 },
   ControlRight: { throttle: -1 },
   KeyF: { flaps: 1 },
-  KeyG: { flaps: -1 },
+  // R, not G: G is the landing gear, which is what every other simulator binds
+  // it to and what the gear button in the HUD is labelled.
+  KeyR: { flaps: -1 },
   KeyB: { brake: 1 },
 };
 
@@ -92,6 +94,8 @@ export interface FlightInputManager {
 
 export function createFlightInputManager(options: {
   onPausedChange?: (paused: boolean) => void;
+  /** Fires on the G key so the HUD's gear button can follow it. */
+  onGearChange?: (down: boolean) => void;
   /** Runs before local input is applied, allowing synchronous authority revocation. */
   onLocalInput?: () => void;
   /** Body rates for flight-assist keyboard mode. */
@@ -179,6 +183,12 @@ export function createFlightInputManager(options: {
       activity.buttons.forEach((index) => enabledButtons.add(index));
     }
   };
+  const setGearDown = (value: boolean): void => {
+    if (value === gearDown) return;
+    gearDown = value;
+    options.onGearChange?.(gearDown);
+  };
+
   const setPaused = (value: boolean): void => {
     if (paused === value) return;
     paused = value;
@@ -270,9 +280,9 @@ export function createFlightInputManager(options: {
         // KEY_BINDINGS: it is not an axis, nothing smooths it, and it is not
         // part of the control record the phone controller owns - so a remote
         // pilot holding the stick does not stop the gear being raised here.
-        if (event.code === "KeyL") {
+        if (event.code === "KeyG") {
           if (event.repeat) return;
-          gearDown = !gearDown;
+          setGearDown(!gearDown);
           event.preventDefault();
           return;
         }
@@ -492,8 +502,6 @@ export function createFlightInputManager(options: {
     getGearDownNorm(): number {
       return gearDown ? 1 : 0;
     },
-    setGearDown(down: boolean): void {
-      gearDown = down;
-    },
+    setGearDown,
   };
 }

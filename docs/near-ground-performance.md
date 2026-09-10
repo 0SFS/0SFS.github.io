@@ -4,6 +4,11 @@ Investigation: 2026-09-10. Reported on Apple M5: about 60 FPS / 15 W aloft,
 40 FPS / 24 W near the ground, with higher CPU usage. Those are user observations;
 the automated measurements below do not measure browser FPS or power.
 
+After the finite-ray fix, the pilot reported no perceptible slowdown near or on
+the ground. That is useful in-game feedback; it is not a new instrumented FPS or
+power measurement. The follow-up [CPU/GPU comparison](collision-compute-comparison.md)
+separates algorithm choice from processor choice.
+
 ## What currently runs
 
 JSBSim runs at 120 Hz in WebAssembly. It computes the suspension, rolling and
@@ -54,8 +59,9 @@ isolates the avoided triangle work; it does not predict an FPS or wattage gain.
 Moving the five current-step rays onto the GPU is not automatically faster.
 The CPU-based flight solver needs their answers before stepping, whereas
 [WebGPU buffer mapping is asynchronous](https://gpuweb.github.io/gpuweb/#programming-model-synchronization).
-Dispatch and readback coordination may dominate such a small query batch; that
-is an architectural expectation to measure, not a measured comparison here.
+The [measured comparison](collision-compute-comparison.md#measured-cpugpu-comparison)
+now includes dispatch and readback for one, five, 128 and 1,024 rays, using the
+actual M5 hardware GPU through a terminal-only headless runner.
 GPU work is more promising for large independent batches, terrain preprocessing,
 or a simulation that already keeps its state on the GPU. A graphics backend
 switch alone does not move these JavaScript collision queries onto the GPU.
@@ -75,13 +81,54 @@ Relevant open-source implementations to benchmark before inventing one:
 | [Babylon octrees](https://github.com/BabylonJS/Documentation/blob/master/content/features/featuresDeepDive/scene/optimizeOctrees.md) | Already in the engine; benchmark its submesh picking against BVHs, including streaming maintenance. |
 | [Rapier scene queries](https://rapier.rs/docs/user_guides/javascript/scene_queries/) | Ray/shape queries become useful for convex aircraft sweeps or multiple rigid objects; a full second physics engine is unnecessary just for the current terrain height query. |
 
-The remaining realism work is separate from this performance patch. Current body
-probes account for heading but not pitch/roll, and five points do not cover the
-whole aircraft volume. Ground support is one horizontal plane rather than a
+The crash-response follow-up makes body probes account for heading, pitch and
+roll, but five points still do not cover the whole aircraft volume. Ground support
+is one horizontal plane rather than a
 normal and contact height per wheel. JSBSim's native
 [ground callback](https://jsbsim-team.github.io/jsbsim/classJSBSim_1_1FGInertial.html)
 supports contact points and normals; extending the WASM binding is worth exploring
-before replacing its gear solver. These capabilities are not implemented here.
+before replacing its gear solver. Per-wheel callback support is not implemented here.
+
+## Crash-response follow-up
+
+High-speed impacts exposed errors independent of query performance. Body response
+used to place the aircraft centre at the wing/nose/tail impact point plus 1.5 m,
+and restore an older terrain elevation. It now selects the earliest of the five
+probe impacts, accounts for the probe offset and aircraft attitude, separates by
+1 cm, and preserves the current terrain and controls. Normals are normalized;
+default restitution is 0.25, so the normal component loses energy and tangential
+velocity is preserved. Slow taxi and endpoint impacts are also checked.
+
+The scalar ground plane had a separate launch mechanism: a large penetration fed
+unbounded gear springs. A real JSBSim test at 10 kt with a sudden 5 m ground step
+reproduced about 76 m/s upward velocity without triggering the old 200 kt jump
+guard. Default mode now stops integration if any of the C172 model's seven ground
+contact points penetrates the sampled ground by more than 0.5 m. The guard transforms
+those points using the current attitude and centre of gravity; it does not use
+the more conservative clearance envelope intended for aircraft placement. This is a hard-impact fault,
+not a detailed damage/crumple simulation. Normal suspension travel and ordinary
+touchdown still use JSBSim. Terrain corrections clear body-probe history so a
+placement is never mistaken for a high-speed swept trajectory.
+
+Google tile visibility/disposal now advances the surface revision; it previously
+stayed at zero. Refinement can therefore reposition support without injecting a
+spring impulse, using the existing same-coordinate terrain-change check. Snapshot
+restoration also preserves whether the engine was actually running: the global
+start command's value 0 means engine zero, not "off", and the global magneto
+command is write-only and cannot be read back as saved state.
+
+Settings → **Ground impacts → Arcade ground launches** deliberately permits the
+historical deep-penetration spring launch and sets body restitution to 1.35.
+It defaults off and persists only when chosen. Absolute invalid-state/speed
+guards remain active. This mode intentionally adds energy; the default does not
+try to preserve that bug.
+
+Regression checks include 100/150 kt wall and oblique impacts across all five
+probes, scaled/invalid normals, banked/pitched low flight, shallow landings, hard descending impacts,
+terrain steps versus refinements, placement resets, and engine on/off recovery.
+The immovable world exchanges momentum with the aircraft; aircraft momentum
+alone is not conserved. The relevant numerical check here is that a passive
+body impact does not manufacture kinetic energy.
 
 ## Verify in the game
 

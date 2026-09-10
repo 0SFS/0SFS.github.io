@@ -55,9 +55,17 @@ for o in meshes:
     for m in me.materials:
         if m:
             mats.add(m.name)
+    # World-space extent, because "the part is in the wrong place" and "the
+    # part did not move at all" look identical in a render and are one line
+    # apart here. Origin alone does not say it: a mesh can be rotated or
+    # rebuilt around an origin that never moved.
+    pts = [o.matrix_world @ vt.co for vt in me.vertices]
+    bb = ([round(min(p[i] for p in pts), 4) for i in range(3)],
+          [round(max(p[i] for p in pts), 4) for i in range(3)]) if pts else None
     per_object.append(dict(name=o.name, tris=t, verts=v,
                            mats=[m.name for m in me.materials if m],
-                           origin=[round(c, 4) for c in o.location]))
+                           origin=[round(c, 4) for c in o.location],
+                           bbox=bb))
     for vt in me.vertices:
         all_pts.append(o.matrix_world @ vt.co)
 

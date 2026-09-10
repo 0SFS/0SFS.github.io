@@ -97,15 +97,15 @@ describe("flightInputManager keyboard roll", () => {
     detach();
   });
 
-  it("latches the gear lever on L, and ignores the auto-repeat", () => {
+  it("latches the gear lever on G, and ignores the auto-repeat", () => {
     const input = createFlightInputManager();
     const detach = input.attach(window);
     expect(input.getGearDownNorm()).toBe(1);
-    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyL" }));
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyG" }));
     expect(input.getGearDownNorm()).toBe(0);
-    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyL", repeat: true }));
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyG", repeat: true }));
     expect(input.getGearDownNorm()).toBe(0);
-    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyL" }));
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyG" }));
     expect(input.getGearDownNorm()).toBe(1);
     detach();
   });
@@ -116,8 +116,43 @@ describe("flightInputManager keyboard roll", () => {
     const input = createFlightInputManager();
     const detach = input.attach(window);
     input.setRemoteOwned(true);
-    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyL" }));
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyG" }));
     expect(input.getGearDownNorm()).toBe(0);
+    detach();
+  });
+
+  it("notifies gear changes so the HUD button can follow the key", () => {
+    const onGearChange = vi.fn();
+    const input = createFlightInputManager({ onGearChange });
+    const detach = input.attach(window);
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyG" }));
+    expect(onGearChange).toHaveBeenLastCalledWith(false);
+    input.setGearDown(true);
+    expect(onGearChange).toHaveBeenLastCalledWith(true);
+    // Setting it to where it already is is not a change.
+    input.setGearDown(true);
+    expect(onGearChange).toHaveBeenCalledTimes(2);
+    detach();
+  });
+
+  it("retracts flaps on R, leaving G to the gear", () => {
+    const input = createFlightInputManager();
+    const detach = input.attach(window);
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyF" }));
+    for (let step = 0; step < 60; step += 1) input.poll(1 / 60);
+    const extended = input.getControls().flaps;
+    expect(extended).toBeGreaterThan(0);
+    window.dispatchEvent(new KeyboardEvent("keyup", { code: "KeyF" }));
+
+    // G must move the gear and leave the flaps exactly where they were.
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyG" }));
+    for (let step = 0; step < 60; step += 1) input.poll(1 / 60);
+    expect(input.getControls().flaps).toBe(extended);
+    expect(input.getGearDownNorm()).toBe(0);
+
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyR" }));
+    for (let step = 0; step < 60; step += 1) input.poll(1 / 60);
+    expect(input.getControls().flaps).toBeLessThan(extended);
     detach();
   });
 
