@@ -1,7 +1,7 @@
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
 
 const ATTITUDE_CANVAS_SIZE = 220;
-const ATTITUDE_RADIUS = 96;
+const ATTITUDE_HALF = 96;
 
 export interface FlightHudOptions {
   onThrottleChange(value: number): void;
@@ -9,8 +9,14 @@ export interface FlightHudOptions {
   onStickChange(aileron: number, elevator: number): void;
 }
 
+export interface FlightHudControls {
+  pitchTrim: number;
+  aileron: number;
+  elevator: number;
+}
+
 export interface FlightHudHandle {
-  update(state: FlightState, pitchTrim: number): void;
+  update(state: FlightState, controls: FlightHudControls): void;
   destroy(): void;
 }
 
@@ -64,9 +70,7 @@ function drawAttitudeIndicator(
 
   ctx.strokeStyle = "rgba(255,255,255,0.7)";
   ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-  ctx.stroke();
+  ctx.strokeRect(cx - radius, cy - radius, radius * 2, radius * 2);
 }
 
 function drawStickOverlay(
@@ -104,6 +108,25 @@ function drawStickOverlay(
 
 function stickResponse(value: number): number {
   return Math.abs(value) <= 0.035 ? 0 : Math.sign(value) * (Math.abs(value) - 0.035) / 0.965;
+}
+
+function inverseStickResponse(value: number): number {
+  if (value === 0) return 0;
+  return Math.sign(value) * (Math.abs(value) * 0.965 + 0.035);
+}
+
+function clampStickSquare(x: number, y: number): { x: number; y: number } {
+  return {
+    x: Math.max(-1, Math.min(1, x)),
+    y: Math.max(-1, Math.min(1, y)),
+  };
+}
+
+function controlsToStickDisplay(aileron: number, elevator: number): { x: number; y: number } {
+  return clampStickSquare(
+    inverseStickResponse(aileron),
+    inverseStickResponse(-elevator),
+  );
 }
 
 function formatAltitudeFt(altMeters: number): string {
@@ -200,14 +223,11 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
 
   const moveStick = (clientX: number, clientY: number): void => {
     const rect = canvas.getBoundingClientRect();
-    const radius = Math.max(1, Math.min(rect.width, rect.height) * (ATTITUDE_RADIUS / ATTITUDE_CANVAS_SIZE));
-    let x = (clientX - rect.left - rect.width / 2) / radius;
-    let y = (clientY - rect.top - rect.height / 2) / radius;
-    const magnitude = Math.hypot(x, y);
-    if (magnitude > 1) {
-      x /= magnitude;
-      y /= magnitude;
-    }
+    const half = Math.max(1, Math.min(rect.width, rect.height) * (ATTITUDE_HALF / ATTITUDE_CANVAS_SIZE));
+    const { x, y } = clampStickSquare(
+      (clientX - rect.left - rect.width / 2) / half,
+      (clientY - rect.top - rect.height / 2) / half,
+    );
     applyStick(x, y);
   };
 
@@ -233,13 +253,10 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   };
 
   const applyKeyboardStick = (): void => {
-    let x = Number(stickKeys.has("ArrowRight")) - Number(stickKeys.has("ArrowLeft"));
-    let y = Number(stickKeys.has("ArrowDown")) - Number(stickKeys.has("ArrowUp"));
-    const magnitude = Math.hypot(x, y);
-    if (magnitude > 1) {
-      x /= magnitude;
-      y /= magnitude;
-    }
+    const { x, y } = clampStickSquare(
+      Number(stickKeys.has("ArrowRight")) - Number(stickKeys.has("ArrowLeft")),
+      Number(stickKeys.has("ArrowDown")) - Number(stickKeys.has("ArrowUp")),
+    );
     stickActive = x !== 0 || y !== 0;
     applyStick(x, y);
   };
@@ -279,11 +296,18 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   document.addEventListener("visibilitychange", onVisibilityChange);
 
   return {
-    update(state: FlightState, pitchTrim: number): void {
+    update(state: FlightState, controls: FlightHudControls): void {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const center = canvas.width / 2;
-      drawAttitudeIndicator(ctx, center, center, ATTITUDE_RADIUS, state.rollRad, state.pitchRad);
-      drawStickOverlay(ctx, center, center, ATTITUDE_RADIUS, stickX, stickY, stickActive);
+      drawAttitudeIndicator(ctx, center, center, ATTITUDE_HALF, state.rollRad, state.pitchRad);
+
+      const localStick = capturedPointer !== null || stickKeys.size > 0;
+      const { x: displayX, y: displayY } = localStick
+        ? clampStickSquare(stickX, stickY)
+        : controlsToStickDisplay(controls.aileron, controls.elevator);
+      const displayActive = localStick || stickActive
+        || Math.hypot(controls.aileron, controls.elevator) > 0.001;
+      drawStickOverlay(ctx, center, center, ATTITUDE_HALF, displayX, displayY, displayActive);
 
       iasEl.textContent = Math.round(state.airspeedKts).toString().padStart(3, "0");
       altEl.textContent = formatAltitudeFt(state.altMeters);
@@ -293,9 +317,9 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
       const vsSign = vsFpm >= 0 ? "+" : "";
       vsEl.textContent = `${vsSign}${vsFpm.toString().padStart(4, " ")}`;
       throttleInput.value = String(state.throttleNorm);
-      trimInput.value = String(pitchTrim);
+      trimInput.value = String(controls.pitchTrim);
       throttleOutput.value = `${Math.round(state.throttleNorm * 100)}%`;
-      trimOutput.value = `${Math.round(pitchTrim * 100)}%`;
+      trimOutput.value = `${Math.round(controls.pitchTrim * 100)}%`;
     },
     destroy(): void {
       releaseStick();

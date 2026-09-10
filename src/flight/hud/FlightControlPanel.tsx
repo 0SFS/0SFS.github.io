@@ -33,6 +33,11 @@ import {
   type FlightPerformanceSummary,
 } from "../diagnostics/flightPerformanceCapture";
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
+import {
+  DEFAULT_KEYBOARD_STICK_SETTINGS,
+  KEYBOARD_STICK_MODES,
+  type KeyboardStickSettings,
+} from "../input/keyboardStickSettings";
 
 type FlightPanelTab = "weather" | "aircraft" | "debug" | "settings";
 
@@ -86,6 +91,7 @@ export interface FlightControlPanelSnapshot {
   modelActiveLodId: AircraftLodId | null;
   modelTriangles: number | null;
   modelError: string | null;
+  keyboardStick: KeyboardStickSettings;
 }
 
 export interface FlightControlPanelOptions {
@@ -102,6 +108,7 @@ export interface FlightControlPanelOptions {
   onAutomaticGoogleTerrainDetailChange(): void;
   onFlightTerrainRequirementChange(errorTarget: number): void;
   onTerrainDetailOverrideChange(enabled: boolean): void;
+  onKeyboardStickSettingsChange(settings: KeyboardStickSettings): void;
 }
 
 export interface FlightControlPanelHandle {
@@ -398,6 +405,227 @@ function formatTerrainDetailTarget(target: number): string {
   return `2^${exponent} = ${target.toLocaleString()} px`;
 }
 
+function SettingSlider({
+  label,
+  value,
+  min,
+  max,
+  step,
+  format,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  format(value: number): string;
+  onChange(value: number): void;
+}) {
+  return (
+    <label className="flight-panel__field">
+      <span>{label}<output>{format(value)}</output></span>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value))}
+      />
+    </label>
+  );
+}
+
+function KeyboardStickSettingsPanel({
+  snapshot,
+  onKeyboardStickSettingsChange,
+}: Pick<FlightControlPanelProps, "snapshot" | "onKeyboardStickSettingsChange">) {
+  const settings = snapshot.keyboardStick;
+  const modeMeta = KEYBOARD_STICK_MODES.find((mode) => mode.id === settings.mode);
+  const patch = (partial: Partial<KeyboardStickSettings>): void => {
+    onKeyboardStickSettingsChange({ ...settings, ...partial });
+  };
+
+  return (
+    <fieldset className="flight-panel__fieldset">
+      <legend>Keyboard stick (WASD / QE)</legend>
+      <label className="flight-panel__field">
+        <span>Response mode</span>
+        <select
+          aria-label="Keyboard stick response mode"
+          value={settings.mode}
+          onChange={(event) => patch({ mode: event.target.value as KeyboardStickSettings["mode"] })}
+        >
+          {KEYBOARD_STICK_MODES.map((mode) => (
+            <option key={mode.id} value={mode.id}>{mode.label}</option>
+          ))}
+        </select>
+      </label>
+      <p className="flight-panel__hint">{modeMeta?.description}</p>
+
+      {settings.mode === "smooth" && <>
+        <SettingSlider
+          label="Response time"
+          value={settings.smoothResponseSec}
+          min={0.05}
+          max={2}
+          step={0.025}
+          format={(value) => `${value.toFixed(2)} s`}
+          onChange={(smoothResponseSec) => patch({ smoothResponseSec })}
+        />
+        <SettingSlider
+          label="Return time"
+          value={settings.smoothReturnSec}
+          min={0.05}
+          max={2}
+          step={0.025}
+          format={(value) => `${value.toFixed(2)} s`}
+          onChange={(smoothReturnSec) => patch({ smoothReturnSec })}
+        />
+        <p className="flight-panel__hint">Time to reach about 95% of a held deflection, and time to center after release.</p>
+      </>}
+
+      {settings.mode === "rate" && <>
+        <SettingSlider
+          label="Time to full"
+          value={settings.rateTimeToFull}
+          min={0.1}
+          max={3}
+          step={0.05}
+          format={(value) => `${value.toFixed(2)} s`}
+          onChange={(rateTimeToFull) => patch({ rateTimeToFull })}
+        />
+        <SettingSlider
+          label="Time to center"
+          value={settings.rateTimeToCenter}
+          min={0.05}
+          max={2}
+          step={0.05}
+          format={(value) => `${value.toFixed(2)} s`}
+          onChange={(rateTimeToCenter) => patch({ rateTimeToCenter })}
+        />
+        <SettingSlider
+          label="Accel after"
+          value={settings.rateAccelAfterSec}
+          min={0}
+          max={2}
+          step={0.05}
+          format={(value) => `${value.toFixed(2)} s`}
+          onChange={(rateAccelAfterSec) => patch({ rateAccelAfterSec })}
+        />
+        <SettingSlider
+          label="Accel multiplier"
+          value={settings.rateAccelMultiplier}
+          min={1}
+          max={6}
+          step={0.1}
+          format={(value) => `${value.toFixed(1)}×`}
+          onChange={(rateAccelMultiplier) => patch({ rateAccelMultiplier })}
+        />
+        <SettingSlider
+          label="Max deflection"
+          value={settings.rateMaxDeflection}
+          min={0.1}
+          max={1}
+          step={0.05}
+          format={(value) => `${Math.round(value * 100)}%`}
+          onChange={(rateMaxDeflection) => patch({ rateMaxDeflection })}
+        />
+      </>}
+
+      {settings.mode === "assist" && <>
+        <SettingSlider
+          label="Roll rate command"
+          value={settings.assistRollRateDeg}
+          min={5}
+          max={120}
+          step={1}
+          format={(value) => `${Math.round(value)} °/s`}
+          onChange={(assistRollRateDeg) => patch({ assistRollRateDeg })}
+        />
+        <SettingSlider
+          label="Pitch rate command"
+          value={settings.assistPitchRateDeg}
+          min={5}
+          max={60}
+          step={1}
+          format={(value) => `${Math.round(value)} °/s`}
+          onChange={(assistPitchRateDeg) => patch({ assistPitchRateDeg })}
+        />
+        <SettingSlider
+          label="Yaw rate command"
+          value={settings.assistYawRateDeg}
+          min={5}
+          max={60}
+          step={1}
+          format={(value) => `${Math.round(value)} °/s`}
+          onChange={(assistYawRateDeg) => patch({ assistYawRateDeg })}
+        />
+        <SettingSlider
+          label="PID Kp"
+          value={settings.assistKp}
+          min={0}
+          max={3}
+          step={0.05}
+          format={(value) => value.toFixed(2)}
+          onChange={(assistKp) => patch({ assistKp })}
+        />
+        <SettingSlider
+          label="PID Ki"
+          value={settings.assistKi}
+          min={0}
+          max={1}
+          step={0.01}
+          format={(value) => value.toFixed(2)}
+          onChange={(assistKi) => patch({ assistKi })}
+        />
+        <SettingSlider
+          label="PID Kd"
+          value={settings.assistKd}
+          min={0}
+          max={0.5}
+          step={0.005}
+          format={(value) => value.toFixed(3)}
+          onChange={(assistKd) => patch({ assistKd })}
+        />
+        <SettingSlider
+          label="Max deflection"
+          value={settings.assistMaxDeflection}
+          min={0.1}
+          max={1}
+          step={0.05}
+          format={(value) => `${Math.round(value * 100)}%`}
+          onChange={(assistMaxDeflection) => patch({ assistMaxDeflection })}
+        />
+        <p className="flight-panel__hint">Keys command body rates. Release holds the current attitude rate near zero.</p>
+      </>}
+
+      {settings.mode === "direct" && (
+        <p className="flight-panel__hint">No ramp — held keys are full deflection. Expo below still softens the output curve.</p>
+      )}
+
+      <SettingSlider
+        label="Expo"
+        value={settings.expo}
+        min={0}
+        max={1}
+        step={0.05}
+        format={(value) => `${Math.round(value * 100)}%`}
+        onChange={(expo) => patch({ expo })}
+      />
+      <p className="flight-panel__hint">Softens small keyboard deflections while keeping full range. HUD stick, gamepad, and phone are unchanged.</p>
+      <button
+        className="flight-panel__command"
+        type="button"
+        onClick={() => onKeyboardStickSettingsChange({ ...DEFAULT_KEYBOARD_STICK_SETTINGS })}
+      >
+        Reset keyboard stick defaults
+      </button>
+    </fieldset>
+  );
+}
+
 function WorldDetailSettings({
   snapshot,
   onGoogleTerrainDetailChange,
@@ -549,6 +777,7 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
           {tabId === "weather" ? <WeatherPanel initialWeather={props.initialWeather} onWeatherChange={props.onWeatherChange} />
             : tabId === "aircraft" ? <AircraftPanel {...props} />
               : tabId === "settings" ? <>
+                <KeyboardStickSettingsPanel {...props} />
                 <WorldDetailSettings {...props} />
                 <MapCachePanel />
               </> : <DebugPanel snapshot={props.snapshot} />}

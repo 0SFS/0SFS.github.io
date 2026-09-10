@@ -3,6 +3,7 @@ import "foss-earth/windowing.css";
 import type { LocationSearchProvider, GeodeticLocation } from "foss-earth/windowing";
 import { resetFlightLocation } from "./jsbsim/resetFlightLocation";
 import { createTerrainContact } from "./physics/terrainContact";
+import { createFrameSurfaceQuery } from "./physics/frameSurfaceQuery";
 import { createVisibleMeshCollision } from "./physics/visibleMeshCollision";
 import { loadInputModePreference, loadInputSensitivityPreference } from "foss-earth/input";
 import "../styles/flight.css";
@@ -57,6 +58,10 @@ import { applyFlightControls } from "./input/applyFlightControls";
 import type { PhoneControlSession } from "./remote/createPhoneControlSession";
 import type { PhonePairingDialog } from "./hud/createPhonePairingDialog";
 import { createFlightInputManager } from "./input/flightInputManager";
+import {
+  loadKeyboardStickSettings,
+  saveKeyboardStickSettings,
+} from "./input/keyboardStickSettings";
 import { createJsbsimRuntime } from "./jsbsim/createJsbsimRuntime";
 import { createFixedStepPhysicsLoop } from "./physics/fixedStepLoop";
 import { createFlightLoadingScreen, type FlightLoadingScreen } from "../loading/createFlightLoadingScreen";
@@ -306,12 +311,19 @@ export async function createFlightSimApp(
   const inputManager = createFlightInputManager({
     onPausedChange: (paused) => syncSimulationPaused(paused),
     onLocalInput: () => phoneSession?.takeControl(),
+    keyboardStickSettings: loadKeyboardStickSettings(),
+    getBodyRates: () => ({
+      rollRateRad: jsbsim.sdk.getPropertyValue("velocities/p-rad_sec"),
+      pitchRateRad: jsbsim.sdk.getPropertyValue("velocities/q-rad_sec"),
+      yawRateRad: jsbsim.sdk.getPropertyValue("velocities/r-rad_sec"),
+    }),
   });
   let appliedControls = inputManager.getControls();
   const detachInput = inputManager.attach(window);
   const physicsLoop = createFixedStepPhysicsLoop(jsbsim.sdk);
-  const terrainContact = createTerrainContact(jsbsim.sdk, runtime.surface);
-  const visibleMeshCollision = createVisibleMeshCollision(jsbsim.sdk, runtime.surface);
+  const flightSurface = createFrameSurfaceQuery(runtime.surface);
+  const terrainContact = createTerrainContact(jsbsim.sdk, flightSurface);
+  const visibleMeshCollision = createVisibleMeshCollision(jsbsim.sdk, flightSurface);
   // This stays completely out of the normal render loop unless someone opts
   // in through the URL. It makes a stutter reproducible with numbers instead
   // of trying to infer its source from a single FPS reading.
@@ -454,6 +466,7 @@ export async function createFlightSimApp(
     modelActiveLodId: modelState.activeLodId,
     modelTriangles: modelState.triangles,
     modelError: modelState.error,
+    keyboardStick: inputManager.getKeyboardStickSettings(),
   });
 
   const syncSimulationPaused = (paused: boolean): void => {
@@ -550,7 +563,7 @@ export async function createFlightSimApp(
       runtime.setSimRunning(!inputManager.isPaused());
       skipResumeDelta = true;
       phoneSession?.syncStatus();
-      flightHud.update(state, inputManager.getControls().pitchTrim);
+      flightHud.update(state, inputManager.getControls());
       controlPanel?.update(createPanelSnapshot(state));
       hudBar?.update(state, runtime.status, measuredFps, inputManager.isPaused());
       loading.hide();
@@ -656,6 +669,12 @@ export async function createFlightSimApp(
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
       runtime.requestRender();
     },
+    onKeyboardStickSettingsChange: (settings) => {
+      inputManager.setKeyboardStickSettings(settings);
+      saveKeyboardStickSettings(inputManager.getKeyboardStickSettings());
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+      runtime.requestRender();
+    },
   });
   const rendererForce = getRendererForceFromUrl();
   hudBar = createFlightHudBar(shellRoot, {
@@ -730,6 +749,7 @@ export async function createFlightSimApp(
 
   runtime.setSimTick((deltaSeconds) => {
     if (disposed || worldLoading) return;
+    flightSurface.beginFrame();
     const frameIntervalMs = deltaSeconds * 1000;
     const flightTickStartedMs = flightPerformance ? performance.now() : 0;
     let terrainQueryCpuMs = 0;
@@ -820,7 +840,9 @@ export async function createFlightSimApp(
       }
     }
 
-    const surfaceHeight = runtime.surface.sample(displayState.latDeg, displayState.lonDeg)?.heightMeters ?? 0;
+    const viewQueryStartedMs = flightPerformance ? performance.now() : 0;
+    const surfaceHeight = flightSurface.sample(displayState.latDeg, displayState.lonDeg)?.heightMeters ?? 0;
+    if (flightPerformance) terrainQueryCpuMs += performance.now() - viewQueryStartedMs;
 
     runtime.setSimViewState({
       latDeg: displayState.latDeg,
@@ -832,7 +854,8 @@ export async function createFlightSimApp(
     floatingOrigin?.apply(displayState);
     const rig = aircraftModel?.getRig();
     if (rig) applyAircraftRig(rig, readControlSurfaceState(jsbsim.sdk), deltaSeconds);
-    flightHud.update(displayState, phoneSession?.getSnapshot().owner === "phone" ? appliedControls.pitchTrim : controls.pitchTrim);
+    const phoneOwned = phoneSession?.getSnapshot().owner === "phone";
+    flightHud.update(displayState, phoneOwned ? appliedControls : controls);
     const now = performance.now();
     if (now - lastPanelUpdateMs >= 100) {
       lastPanelUpdateMs = now;

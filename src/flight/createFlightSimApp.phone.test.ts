@@ -18,7 +18,7 @@ const mocks = vi.hoisted(() => {
     createPhoneSession: vi.fn(() => phone),
     dialog: { open: vi.fn(), destroy: vi.fn() }, createDialog: vi.fn(),
     resetLocation: vi.fn(() => state),
-    sdk: { setPropertyValue: vi.fn(), run: vi.fn() }, disposeSdk: vi.fn(),
+    sdk: { setPropertyValue: vi.fn(), run: vi.fn(), getPropertyValue: vi.fn(() => 0) }, disposeSdk: vi.fn(),
     runtime: {
       renderer: { mode: "webgl2" }, status: { mode: "fallback" }, scene: {},
       engine: { getFps: () => 60 }, geospatialCamera: null, prepareTerrain: vi.fn(async (request: { altitudeMeters?: number }) => ({ groundHeightMeters: 250, altitudeMeters: request.altitudeMeters ?? 1774 })),

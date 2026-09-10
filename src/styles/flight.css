@@ -34,7 +34,7 @@
   bottom: calc(24px + var(--foss-inset-bottom, 0px));
   width: 220px;
   height: 220px;
-  border-radius: 50%;
+  border-radius: 10px;
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.15);
   pointer-events: auto;
@@ -356,6 +356,16 @@
 .flight-panel__field input[type="range"] {
   width: 100%;
   accent-color: var(--flight-panel-accent);
+}
+
+.flight-panel__field select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--flight-panel-line);
+  background: rgba(0, 0, 0, 0.35);
+  color: #e8edf5;
+  font: inherit;
 }
 
 .flight-panel__detail-range-control {

@@ -3,6 +3,9 @@
 How the simulator decides where the ground is, what it does when it cannot tell,
 and why the aircraft stands where it does.
 
+For collision-query costs, the current optimizations, GPU/BVH options and the
+profiling procedure, see [Near-ground CPU performance](near-ground-performance.md).
+
 ## The problem
 
 JSBSim computes gear forces against a ground plane it is told about through one

@@ -1,5 +1,18 @@
 import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
 import { applyFlightControls } from "./applyFlightControls";
+import {
+  applyStickExpo,
+  createKeyboardAxisState,
+  stepKeyboardAxis,
+  type BodyRatesRad,
+  type KeyboardAxisState,
+} from "./keyboardStickResponse";
+import {
+  DEFAULT_KEYBOARD_STICK_SETTINGS,
+  normalizeKeyboardStickSettings,
+  type KeyboardStickSettings,
+} from "./keyboardStickSettings";
+
 export interface ControlSurfaceState {
   elevator: number;
   aileron: number;
@@ -26,7 +39,7 @@ const KEY_BINDINGS: Record<string, Partial<ControlSurfaceState>> = {
   KeyB: { brake: 1 },
 };
 
-const SMOOTHING_RATE = 8;
+const GAMEPAD_SMOOTHING_RATE = 8;
 const INITIAL_THROTTLE = 0.65;
 const THROTTLE_CHANGE_RATE = 0.5;
 const TAKEOVER_DEADBAND = 0.12;
@@ -66,6 +79,8 @@ export interface FlightInputManager {
   setThrottle(value: number): void;
   setPitchTrim(value: number): void;
   setStick(aileron: number, elevator: number): void;
+  getKeyboardStickSettings(): KeyboardStickSettings;
+  setKeyboardStickSettings(settings: KeyboardStickSettings): void;
   setPaused(paused: boolean): void;
   isPaused(): boolean;
 }
@@ -74,6 +89,9 @@ export function createFlightInputManager(options: {
   onPausedChange?: (paused: boolean) => void;
   /** Runs before local input is applied, allowing synchronous authority revocation. */
   onLocalInput?: () => void;
+  /** Body rates for flight-assist keyboard mode. */
+  getBodyRates?: () => BodyRatesRad | null;
+  keyboardStickSettings?: KeyboardStickSettings;
 } = {}): FlightInputManager {
   const keysDown = new Set<string>();
   let smoothed: ControlSurfaceState = {
@@ -94,6 +112,18 @@ export function createFlightInputManager(options: {
   let previousGamepad: GamepadSnapshot | null = null;
   const enabledAxes = new Set<number>();
   const enabledButtons = new Set<number>();
+  let keyboardSettings = normalizeKeyboardStickSettings(
+    options.keyboardStickSettings ?? DEFAULT_KEYBOARD_STICK_SETTINGS,
+  );
+  let aileronAxis = createKeyboardAxisState();
+  let elevatorAxis = createKeyboardAxisState();
+  let rudderAxis = createKeyboardAxisState();
+
+  const resetKeyboardAxes = (aileron = 0, elevator = 0, rudder = 0): void => {
+    aileronAxis = createKeyboardAxisState(aileron);
+    elevatorAxis = createKeyboardAxisState(elevator);
+    rudderAxis = createKeyboardAxisState(rudder);
+  };
 
   const captureGamepadBaseline = (pad = readGamepad()): void => {
     gamepadBaseline = pad;
@@ -148,59 +178,72 @@ export function createFlightInputManager(options: {
     options.onPausedChange?.(paused);
   };
 
-  const targetFromKeyboard = (dt: number): ControlSurfaceState => {
-    const target: ControlSurfaceState = {
-      elevator: 0,
-      aileron: 0,
-      rudder: 0,
-      throttle: throttleTarget,
-      pitchTrim: smoothed.pitchTrim,
-      flaps: smoothed.flaps,
-      brake: 0,
-    };
-
+  const readKeyDirections = (): { elevator: number; aileron: number; rudder: number } => {
+    let elevator = 0;
+    let aileron = 0;
+    let rudder = 0;
     for (const key of keysDown) {
       const binding = KEY_BINDINGS[key];
       if (!binding) continue;
-      if (binding.elevator !== undefined) target.elevator = binding.elevator;
-      if (binding.aileron !== undefined) target.aileron = binding.aileron;
-      if (binding.rudder !== undefined) target.rudder = binding.rudder;
-      if (binding.throttle !== undefined) {
-        throttleTarget = Math.min(1, Math.max(0, throttleTarget + binding.throttle * THROTTLE_CHANGE_RATE * dt));
-        target.throttle = throttleTarget;
-      }
-      if (binding.flaps !== undefined) {
-        target.flaps = Math.min(1, Math.max(0, target.flaps + binding.flaps * dt * 0.5));
-      }
-      if (binding.brake !== undefined) target.brake = binding.brake;
+      if (binding.elevator !== undefined) elevator = binding.elevator;
+      if (binding.aileron !== undefined) aileron = binding.aileron;
+      if (binding.rudder !== undefined) rudder = binding.rudder;
     }
-
-    return target;
+    return { elevator, aileron, rudder };
   };
 
-  const pollGamepad = (target: ControlSurfaceState, pad: GamepadSnapshot | null): void => {
-    if (!pad) return;
-
-    const deadzone = (value: number): number => (
-      Math.abs(value) < 0.08 ? 0 : value
-    );
-
-    if (!protectGamepad || enabledAxes.has(1)) target.elevator = deadzone(-(pad.axes[1] ?? 0));
-    if (!protectGamepad || enabledAxes.has(0)) target.aileron = deadzone(pad.axes[0] ?? 0);
-    if (!protectGamepad || enabledAxes.has(2) || enabledButtons.has(6) || enabledButtons.has(7)) {
-      target.rudder = deadzone(pad.axes[2] ?? (pad.buttons[7]?.value ?? 0) - (pad.buttons[6]?.value ?? 0));
+  const integratePersistentControls = (dt: number): Pick<ControlSurfaceState, "throttle" | "pitchTrim" | "flaps" | "brake"> => {
+    let flaps = smoothed.flaps;
+    let brake = 0;
+    for (const key of keysDown) {
+      const binding = KEY_BINDINGS[key];
+      if (!binding) continue;
+      if (binding.throttle !== undefined) {
+        throttleTarget = Math.min(1, Math.max(0, throttleTarget + binding.throttle * THROTTLE_CHANGE_RATE * dt));
+      }
+      if (binding.flaps !== undefined) {
+        flaps = Math.min(1, Math.max(0, flaps + binding.flaps * dt * 0.5));
+      }
+      if (binding.brake !== undefined) brake = binding.brake;
     }
+    return { throttle: throttleTarget, pitchTrim: smoothed.pitchTrim, flaps, brake };
+  };
 
-    const throttleAxis = pad.axes[3];
-    if (throttleAxis !== undefined && (!protectGamepad || enabledAxes.has(3))) {
-      target.throttle = Math.min(1, Math.max(0, (1 - throttleAxis) * 0.5));
-      if (protectGamepad) throttleTarget = target.throttle;
+  const gamepadAxisActive = (axisIndex: number): boolean => !protectGamepad || enabledAxes.has(axisIndex);
+  const gamepadButtonActive = (...indexes: number[]): boolean => (
+    !protectGamepad || indexes.some((index) => enabledButtons.has(index))
+  );
+
+  const pollGamepadAxes = (pad: GamepadSnapshot | null): {
+    elevator: number | null;
+    aileron: number | null;
+    rudder: number | null;
+    throttle: number | null;
+    brake: number | null;
+  } => {
+    if (!pad) {
+      return { elevator: null, aileron: null, rudder: null, throttle: null, brake: null };
     }
-    if (pad.buttons[0]?.pressed && (!protectGamepad || enabledButtons.has(0))) target.brake = 1;
+    const deadzone = (value: number): number => (Math.abs(value) < 0.08 ? 0 : value);
+    return {
+      elevator: gamepadAxisActive(1) ? deadzone(-(pad.axes[1] ?? 0)) : null,
+      aileron: gamepadAxisActive(0) ? deadzone(pad.axes[0] ?? 0) : null,
+      rudder: gamepadAxisActive(2) || gamepadButtonActive(6, 7)
+        ? deadzone(pad.axes[2] ?? (pad.buttons[7]?.value ?? 0) - (pad.buttons[6]?.value ?? 0))
+        : null,
+      throttle: pad.axes[3] !== undefined && gamepadAxisActive(3)
+        ? Math.min(1, Math.max(0, (1 - pad.axes[3]) * 0.5))
+        : null,
+      brake: pad.buttons[0]?.pressed && gamepadButtonActive(0) ? 1 : null,
+    };
   };
 
   const smoothToward = (current: number, goal: number, dt: number): number => (
-    current + (goal - current) * Math.min(1, SMOOTHING_RATE * dt)
+    current + (goal - current) * Math.min(1, GAMEPAD_SMOOTHING_RATE * dt)
+  );
+
+  const outputAxis = (state: KeyboardAxisState): number => (
+    applyStickExpo(state.position, keyboardSettings.expo)
   );
 
   return {
@@ -250,25 +293,68 @@ export function createFlightInputManager(options: {
       const gamepad = readGamepad();
       sampleGamepadActivity(gamepad);
       if (remoteOwned) return { ...smoothed };
-      const keyboardTarget = targetFromKeyboard(dt);
-      pollGamepad(keyboardTarget, gamepad);
+
+      const persistent = integratePersistentControls(dt);
+      const gamepadAxes = pollGamepadAxes(gamepad);
+      if (gamepadAxes.throttle !== null) {
+        persistent.throttle = gamepadAxes.throttle;
+        if (protectGamepad) throttleTarget = gamepadAxes.throttle;
+      }
+      if (gamepadAxes.brake !== null) persistent.brake = gamepadAxes.brake;
+
       if (stickOverride) {
-        keyboardTarget.aileron = stickOverride.aileron;
-        keyboardTarget.elevator = stickOverride.elevator;
+        aileronAxis = createKeyboardAxisState(stickOverride.aileron);
+        elevatorAxis = createKeyboardAxisState(stickOverride.elevator);
+      } else if (gamepadAxes.aileron !== null || gamepadAxes.elevator !== null) {
+        if (gamepadAxes.aileron !== null) {
+          aileronAxis = createKeyboardAxisState(
+            smoothToward(aileronAxis.position, gamepadAxes.aileron, dt),
+          );
+        }
+        if (gamepadAxes.elevator !== null) {
+          elevatorAxis = createKeyboardAxisState(
+            smoothToward(elevatorAxis.position, gamepadAxes.elevator, dt),
+          );
+        }
+      } else {
+        const dirs = readKeyDirections();
+        const rates = keyboardSettings.mode === "assist"
+          ? (options.getBodyRates?.() ?? null)
+          : null;
+        aileronAxis = stepKeyboardAxis("aileron", aileronAxis, dirs.aileron, dt, keyboardSettings, rates);
+        elevatorAxis = stepKeyboardAxis("elevator", elevatorAxis, dirs.elevator, dt, keyboardSettings, rates);
       }
 
+      if (gamepadAxes.rudder !== null) {
+        rudderAxis = createKeyboardAxisState(smoothToward(rudderAxis.position, gamepadAxes.rudder, dt));
+      } else {
+        const dirs = readKeyDirections();
+        const rates = keyboardSettings.mode === "assist"
+          ? (options.getBodyRates?.() ?? null)
+          : null;
+        rudderAxis = stepKeyboardAxis("rudder", rudderAxis, dirs.rudder, dt, keyboardSettings, rates);
+      }
+
+      const aileron = stickOverride
+        ? stickOverride.aileron
+        : gamepadAxes.aileron !== null
+          ? aileronAxis.position
+          : outputAxis(aileronAxis);
+      const elevator = stickOverride
+        ? stickOverride.elevator
+        : gamepadAxes.elevator !== null
+          ? elevatorAxis.position
+          : outputAxis(elevatorAxis);
+      const rudder = gamepadAxes.rudder !== null ? rudderAxis.position : outputAxis(rudderAxis);
+
       smoothed = {
-        elevator: stickOverride
-          ? stickOverride.elevator
-          : smoothToward(smoothed.elevator, keyboardTarget.elevator, dt),
-        aileron: stickOverride
-          ? stickOverride.aileron
-          : smoothToward(smoothed.aileron, keyboardTarget.aileron, dt),
-        rudder: smoothToward(smoothed.rudder, keyboardTarget.rudder, dt),
-        throttle: smoothToward(smoothed.throttle, keyboardTarget.throttle, dt),
-        pitchTrim: keyboardTarget.pitchTrim,
-        flaps: keyboardTarget.flaps,
-        brake: keyboardTarget.brake,
+        elevator,
+        aileron,
+        rudder,
+        throttle: smoothToward(smoothed.throttle, persistent.throttle, dt),
+        pitchTrim: persistent.pitchTrim,
+        flaps: persistent.flaps,
+        brake: persistent.brake,
       };
 
       return { ...smoothed };
@@ -282,6 +368,7 @@ export function createFlightInputManager(options: {
       stickOverride = null;
       throttleTarget = controls.throttle;
       smoothed = { ...controls, elevator: 0, aileron: 0, rudder: 0, brake: 0 };
+      resetKeyboardAxes();
       protectGamepad = true;
       captureGamepadBaseline();
     },
@@ -312,6 +399,7 @@ export function createFlightInputManager(options: {
       stickOverride = null;
       throttleTarget = Math.min(1, Math.max(0, throttle));
       smoothed = { elevator: 0, aileron: 0, rudder: 0, throttle: throttleTarget, pitchTrim: 0, flaps: 0, brake: 0 };
+      resetKeyboardAxes();
       if (protectGamepad) captureGamepadBaseline();
     },
     setThrottle(value: number): void {
@@ -336,6 +424,21 @@ export function createFlightInputManager(options: {
       if (stickOverride) {
         smoothed.aileron = stickOverride.aileron;
         smoothed.elevator = stickOverride.elevator;
+        aileronAxis = createKeyboardAxisState(stickOverride.aileron);
+        elevatorAxis = createKeyboardAxisState(stickOverride.elevator);
+      } else {
+        resetKeyboardAxes(0, 0, rudderAxis.position);
+      }
+    },
+    getKeyboardStickSettings(): KeyboardStickSettings {
+      return { ...keyboardSettings };
+    },
+    setKeyboardStickSettings(settings: KeyboardStickSettings): void {
+      const next = normalizeKeyboardStickSettings(settings);
+      const modeChanged = next.mode !== keyboardSettings.mode;
+      keyboardSettings = next;
+      if (modeChanged) {
+        resetKeyboardAxes(aileronAxis.position, elevatorAxis.position, rudderAxis.position);
       }
     },
     setPaused,
