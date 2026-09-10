@@ -1232,3 +1232,20 @@
 @keyframes flight-status-spin {
   to { transform: rotate(360deg); }
 }
+
+/* Ground interaction settings: choice plus Auto lock on one row. */
+.flight-panel__ground-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 4px 10px;
+}
+
+.flight-panel__ground-row > .flight-panel__hint {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.flight-panel__ground-lock {
+  padding-bottom: 6px;
+}

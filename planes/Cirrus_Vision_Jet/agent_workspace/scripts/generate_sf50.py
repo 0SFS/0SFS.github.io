@@ -118,6 +118,13 @@ INTAKE_INSET = 0.09                 # how far the dark bore sits inside the lip
 # the same frame (0.38 m across 110 px, so 290 px/m) that panel is 0.67 m wide
 # and starts at the well's rim.
 WING_BAY_X = (0.60, 1.78)           # spanwise edges of the mouth
+# ...and it is not one rectangle. The wheel end HUGS the tyre: a circle of
+# WELL_R about the stowed axle, merged into the rectangular leg bay outboard of
+# WELL_JOIN. A rectangle wide enough to contain the wheel is a much bigger hole
+# than the aeroplane has, and it reads as a box with a tyre loose in it.
+WELL_R = 0.245                      # wheel well radius; the tyre is 0.190
+WELL_JOIN = 1.02                    # where the circle merges into the rectangle
+WELL_ARC = 9                        # points on the arc
 # The DOOR covers only the leg half. The wheel end stays open - the retracted
 # tyre is visible from outside and nothing closes over it.
 WING_DOOR_X = (1.10, 1.78)
@@ -1596,11 +1603,66 @@ def build_wing(side):
     verts, faces = loft(rings, cap_start=False, cap_end=P["tip_cap"])
     if P["bays"]:
         n = len(rings[0])
+        row, k = WING_BAY_ROW, (WING_BAY_ROW + 1) % len(rings[0])
         ia = stations.index(WING_BAY_X[0])
-        # loft() emits segment i, row j at index i * n + j, caps after.
-        cut = ia * n + WING_BAY_ROW
-        WING_BAY_MOUTHS[side] = [verts[i] for i in faces[cut]]
-        faces = faces[:cut] + faces[cut + 1:]
+        ij = stations.index(WELL_JOIN)
+        # loft() emits segment i, row j at index i * n + j, caps after. The
+        # OUTBOARD segment loses its whole face - that is the rectangular leg
+        # bay. The INBOARD one keeps a C of skin around the circular well.
+        drop = {ij * n + row, ia * n + row}
+
+        def P_(i, t):
+            """Surface point at station index i, fraction t across the row."""
+            a, b = Vector(rings[i][row]), Vector(rings[i][k])
+            return a + (b - a) * t
+
+        # The circle lives in (x, t). `t` is a fraction of the row, so the
+        # radius has to be converted into it or the well comes out elliptical.
+        row_len = (Vector(rings[ij][k]) - Vector(rings[ij][row])).length
+        cx, ct = sgn * MAIN_STOWED[0], 0.5
+        rt = WELL_R / row_len
+        rx = WELL_R
+        # Where the circle crosses the join station, and the arc between them,
+        # walked round the INBOARD side.
+        phi0 = math.acos(max(-1.0, min(1.0, (WELL_JOIN - abs(cx)) / rx)))
+        arc = [(ct + rt * math.sin(phi0 - 2 * math.pi * f * (2 * math.pi - 2 * phi0)
+                                   / (2 * math.pi)))
+               for f in ()]                      # placeholder, replaced below
+        arc = []
+        for i in range(WELL_ARC):
+            f = i / (WELL_ARC - 1)
+            phi = phi0 + f * (2 * math.pi - 2 * phi0)
+            arc.append((abs(cx) + rx * math.cos(phi), ct + rt * math.sin(phi)))
+
+        def surf(xx, tt):
+            """Point at absolute station xx, fraction tt - the loft is ruled,
+            so interpolating between the bay's own two stations is exact."""
+            f = (xx - WING_BAY_X[0]) / (WELL_JOIN - WING_BAY_X[0])
+            a, b = P_(ia, tt), P_(ij, tt)
+            return tuple(a + (b - a) * f)
+
+        def add(p):
+            verts.append(p)
+            return len(verts) - 1
+
+        # One n-gon: the quad's three closed sides, then up the join station to
+        # the arc, round it, and back. The bite is on the boundary, so the
+        # region is simply connected and the triangulator can have it whole.
+        loop = [ij * n + row, ia * n + row, ia * n + k, ij * n + k]
+        loop += [add(surf(WELL_JOIN, t)) for t in (arc[-1][1],)]
+        loop += [add(surf(*pt)) for pt in reversed(arc[1:-1])]
+        loop += [add(surf(WELL_JOIN, arc[0][1]))]
+        faces = [f for i, f in enumerate(faces) if i not in drop] + [loop]
+
+        # The pocket rim is the whole hole: the rectangle, then the arc.
+        rect = [verts[ij * n + row], verts[ij * n + k],
+                verts[(ij + 1) * n + k], verts[(ij + 1) * n + row]]
+        WING_BAY_MOUTHS[side] = dict(
+            rect=rect,
+            rim=[surf(WELL_JOIN, arc[0][1])]
+                + [surf(*pt) for pt in arc[1:-1]]
+                + [surf(WELL_JOIN, arc[-1][1])]
+                + [rect[1], rect[2], rect[3], rect[0]])
     return make(f"Wing_{side}", verts, faces, M_PAINT)
 
 

@@ -11,10 +11,16 @@ export function createFlightControlPanel(
   initialSnapshot: FlightControlPanelSnapshot,
   options: FlightControlPanelOptions,
 ): FlightControlPanelHandle {
-  const root = createRoot(container);
+  const overlayHost = document.createElement("div");
+  overlayHost.className = "flight-window-overlay-host";
+  container.append(overlayHost);
+  const root = createRoot(overlayHost);
   let snapshot = initialSnapshot;
+  const overlayApiRef: { current: WindowOverlayHandle<FlightPanelTab> | null } = { current: null };
 
-  const render = () => root.render(<FlightControlPanel {...options} snapshot={snapshot} />);
+  const render = () => root.render(
+    <FlightControlPanel {...options} snapshot={snapshot} overlayApiRef={overlayApiRef} />,
+  );
   render();
 
   return {
@@ -22,8 +28,12 @@ export function createFlightControlPanel(
       snapshot = nextSnapshot;
       render();
     },
+    openOrSelectTab(tabId): void {
+      overlayApiRef.current?.openOrSelectTab(tabId);
+    },
     destroy(): void {
       root.unmount();
+      overlayHost.remove();
     },
   };
 }

@@ -1,6 +1,6 @@
 import "foss-earth/windowing.css";
 
-import { MapCachePanel, WindowOverlay } from "foss-earth/shell";
+import { MapCachePanel, WindowOverlay, type WindowOverlayHandle } from "foss-earth/shell";
 import {
   type GeodeticLocation,
   type LocationSearchProvider,
@@ -40,8 +40,13 @@ import {
 } from "../input/keyboardStickSettings";
 import type { OrbitInvertSettings } from "../input/orbitInvertSettings";
 import { WHEEL_SPIN_CONFIGS, type WheelSpinMode, type WheelSpinState } from "../physics/wheelSpin";
+import {
+  GroundInteractionSettingsPanel,
+  type GroundInteractionAction,
+  type GroundInteractionPanelState,
+} from "./GroundInteractionSettingsPanel";
 
-type FlightPanelTab = "weather" | "aircraft" | "debug" | "settings";
+export type FlightPanelTab = "weather" | "aircraft" | "debug" | "settings";
 
 const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "weather", label: "Weather" },
@@ -104,6 +109,7 @@ export interface FlightControlPanelSnapshot {
   tireSoundEnabled: boolean;
   tireAudioStatus: string | null;
   wheelSpinStates: readonly WheelSpinState[];
+  groundInteraction: GroundInteractionPanelState;
 }
 
 export interface FlightControlPanelOptions {
@@ -127,15 +133,18 @@ export interface FlightControlPanelOptions {
   onCollisionDebugChange(enabled: boolean): void;
   onWheelSpinModeChange(mode: WheelSpinMode | "off"): void;
   onTireSoundChange(enabled: boolean): void;
+  onGroundInteractionAction(action: GroundInteractionAction): void;
 }
 
 export interface FlightControlPanelHandle {
   update(snapshot: FlightControlPanelSnapshot): void;
+  openOrSelectTab(tabId: "location" | FlightPanelTab): void;
   destroy(): void;
 }
 
 interface FlightControlPanelProps extends FlightControlPanelOptions {
   snapshot: FlightControlPanelSnapshot;
+  overlayApiRef: { current: WindowOverlayHandle<FlightPanelTab> | null };
 }
 
 function getTabLabel(tabId: FlightPanelTab): string {
@@ -860,7 +869,8 @@ function DebugPanel({ snapshot, onCollisionDebugChange, onWheelSpinModeChange, o
         </label>
         <p className="flight-panel__hint">
           Compare wheel rotation and touchdown sound. Aircraft handling and braking stay the same.
-          Changing modes resets the wheels; compare from an airborne approach. Off on reload.
+          Changing modes resets the wheels; compare from an airborne approach. These choices are a
+          session-only override of Settings → Ground interaction, which can keep them.
         </p>
         <label className="flight-panel__field flight-panel__field--inline">
           <input type="checkbox" aria-label="Enable tire sound" checked={snapshot.tireSoundEnabled}
@@ -902,6 +912,7 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
   return (
     <WindowOverlay<FlightPanelTab>
       enableAirportPresets
+      overlayApiRef={props.overlayApiRef}
       getViewState={() => props.snapshot.flightState}
       setViewState={props.onLocationApply}
       locationSearchProvider={props.locationSearchProvider}
@@ -927,6 +938,8 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
                   </label>
                   <p className="flight-panel__hint">Exaggerated bounces for fun. With this off, deep ground impacts stop the flight before the gear springs can launch it.</p>
                 </fieldset>
+                <GroundInteractionSettingsPanel state={props.snapshot.groundInteraction}
+                  onAction={props.onGroundInteractionAction} />
                 <KeyboardStickSettingsPanel {...props} />
                 <WorldDetailSettings {...props} />
                 <MapCachePanel />

@@ -39,6 +39,10 @@ export interface WheelSpinState {
   onGround: boolean;
   compressionMeters: number;
   steeringRad: number;
+  /** Bounded load estimate used this step; zero airborne. */
+  normalLoadNewtons: number;
+  /** Signed tread distance rolled during the last step (radius × rotation). */
+  treadTravelMeters: number;
 }
 
 export interface WheelSpinInput {
@@ -55,7 +59,7 @@ const AIRBORNE_COAST_SECONDS = 20;
 
 export function createWheelSpinState(): WheelSpinState {
   return { angleRad: 0, omegaRadSec: 0, slipMetersSec: 0, slipPowerWatts: 0,
-    onGround: false, compressionMeters: 0, steeringRad: 0 };
+    onGround: false, compressionMeters: 0, steeringRad: 0, normalLoadNewtons: 0, treadTravelMeters: 0 };
 }
 
 function bounded(value: number, min: number, max: number): number {
@@ -82,10 +86,12 @@ export function stepWheelSpin(
     * bounded(config.maxBrakeTorqueNewtonMeters, 0, 10_000);
   let omega = bounded(state.omegaRadSec, -20_000, 20_000);
   let angle = bounded(state.angleRad, -TWO_PI, TWO_PI);
+  const startAngle = angle;
   let heat = 0;
 
   state.onGround = input.onGround;
   state.compressionMeters = input.onGround ? bounded(input.compressionMeters, 0, 1) : 0;
+  state.normalLoadNewtons = input.onGround ? bounded(input.normalLoadNewtons, 0, 200_000) : 0;
   state.steeringRad = bounded(input.steeringRad, -Math.PI / 2, Math.PI / 2);
 
   if (!input.onGround) {
@@ -144,6 +150,7 @@ export function stepWheelSpin(
     }
   }
 
+  state.treadTravelMeters = (angle - startAngle) * radius;
   state.angleRad = ((angle % TWO_PI) + TWO_PI) % TWO_PI;
   state.omegaRadSec = omega;
   state.slipMetersSec = input.onGround && mode === "inertia" ? speed - radius * omega : 0;
