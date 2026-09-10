@@ -1,4 +1,4 @@
-import{ms as e}from"./resolveMapRuntimeConfig-CQr1gEiV.js";var t=`volumetricLightingBlendVolumePixelShader`,n=`varying vec2 vUV;uniform sampler2D textureSampler;uniform sampler2D depthSampler;uniform mat4 invProjection;uniform vec2 outputTextureSize;
+import{ps as e}from"./resolveMapRuntimeConfig-DHBvCMR0.js";var t=`volumetricLightingBlendVolumePixelShader`,n=`varying vec2 vUV;uniform sampler2D textureSampler;uniform sampler2D depthSampler;uniform mat4 invProjection;uniform vec2 outputTextureSize;
 #ifdef USE_EXTINCTION
 uniform vec3 extinction;
 #endif
