@@ -1,4 +1,4 @@
-import{ps as e}from"./resolveMapRuntimeConfig-DHBvCMR0.js";var t=`selectionVertexShader`,n=`attribute position: vec3f;
+import{ps as e}from"./resolveMapRuntimeConfig-DKAEZzov.js";var t=`selectionVertexShader`,n=`attribute position: vec3f;
 #ifdef INSTANCES
 attribute instanceSelectionId: f32;
 #endif

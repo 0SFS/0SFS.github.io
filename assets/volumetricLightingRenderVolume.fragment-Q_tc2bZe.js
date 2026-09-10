@@ -1,4 +1,4 @@
-import{ps as e}from"./resolveMapRuntimeConfig-DHBvCMR0.js";var t=`volumetricLightingRenderVolumePixelShader`,n=`#include<__decl__sceneFragment>
+import{ps as e}from"./resolveMapRuntimeConfig-DKAEZzov.js";var t=`volumetricLightingRenderVolumePixelShader`,n=`#include<__decl__sceneFragment>
 uniform mat4 invViewProjection;uniform vec3 lightDir; 
 uniform vec2 outputTextureSize;uniform vec4 extinctionPhaseG;uniform vec3 lightPower;uniform vec2 textureRatio;uniform sampler2D depthTexture;varying vec4 vWorldPos;float henyeyGreenstein(float g,float cosTheta) {float denom=1.0+g*g-2.0*g*cosTheta;return 1.0/(4.0*3.14159265)*(1.0-g*g)/(denom*sqrt(max(denom,0.0)));}
 vec3 integrateDirectional(float eyeDist,vec3 viewDir,vec3 lightDir) {float phaseG=extinctionPhaseG.w;
