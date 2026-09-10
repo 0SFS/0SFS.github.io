@@ -1,4 +1,4 @@
-import{ms as e}from"./resolveMapRuntimeConfig-SrS2BVQR.js";var t=`volumetricLightingRenderVolumePixelShader`,n=`#include<sceneUboDeclaration>
+import{ms as e}from"./resolveMapRuntimeConfig-DMxd6Xou.js";var t=`volumetricLightingRenderVolumePixelShader`,n=`#include<sceneUboDeclaration>
 #include<meshUboDeclaration>
 uniform invViewProjection: mat4x4<f32>;uniform lightDir: vec3f; 
 uniform outputTextureSize: vec2f;uniform extinctionPhaseG: vec4f;uniform lightPower: vec3f;uniform textureRatio: vec2f;var depthTexture: texture_2d<f32>;varying vWorldPos: vec4f;fn henyeyGreenstein(g: f32,cosTheta: f32)->f32 {let denom=1+g*g-2*g*cosTheta;return 1.0/(4.0*3.14159265)*(1.0-g*g)/(denom*sqrt(max(denom,0.0)));}
