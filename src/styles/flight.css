@@ -95,13 +95,44 @@
   position: absolute;
   right: 24px;
   bottom: calc(24px + var(--foss-inset-bottom, 0px));
-  display: flex;
-  gap: 14px;
+  display: grid;
+  gap: 10px;
   padding: 12px 10px 10px;
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.12);
   pointer-events: auto;
+}
+
+.flight-hud__yaw-control {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  letter-spacing: 0;
+  opacity: 0.9;
+}
+
+.flight-hud__yaw-control input[type="range"] {
+  width: 100%;
+  min-width: 120px;
+  margin: 0;
+  accent-color: var(--flight-panel-accent);
+  cursor: ew-resize;
+}
+
+.flight-hud__yaw-control output {
+  min-width: 2.5em;
+  text-align: right;
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+.flight-hud__levers {
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
 }
 
 .flight-hud__slider-control {

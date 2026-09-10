@@ -57,9 +57,18 @@ chase it with.
 ## aircraft
 
 **Cirrus Vision Jet flies the C172's flight model.** The mesh is built and
-wired in (1220 / 908 / 442 triangles, LOD3 down to LOD1), but the aerodynamics,
+wired in (1204 / 908 / 442 triangles, LOD3 down to LOD1), but the aerodynamics,
 gear and stance are still the Cessna's, so the jet sits at the C172's 1.33 m
 reference stance rather than its own.
+
+**The retractable gear is visual only.** `L` raises and lowers it and the rig
+runs an 8-second transit off `gear/gear-cmd-norm`, but nothing acts on that
+command: the c172p has fixed gear and no retraction system, so
+`gear/gear-pos-norm` never moves and neither does the drag, the stance or the
+weight-on-wheels logic. So the gear can be raised while parked, which leaves the
+aeroplane standing on an invisible stance. An SF50 flight model would pick up
+the same property with no runtime change; until then, a weight-on-wheels
+interlock would be the cheap half-measure.
 
 **The Vision Jet's opt-in HD level has no landing gear.** hilos run's Sketchfab
 model ships as the `hd` level, off by default. It is modelled gear-up, so

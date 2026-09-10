@@ -4,12 +4,20 @@ import { interpolateFlightState, type FlightState } from "./flightState";
 import { flightLog } from "../diagnostics/flightLog";
 import { readContactDiagnostics } from "./contactDiagnostics";
 import {
-  captureSimulation, invalidFlightStateReasons, restoreSimulation,
+  aircraftClearanceMeters, captureSimulation, invalidFlightStateReasons, restoreSimulation,
 } from "./safeFlightState";
 
 export const PHYSICS_HZ = 120;
 export const FIXED_DT = 1 / PHYSICS_HZ;
 const MAX_ACCUMULATED_SECONDS = FIXED_DT * 6;
+// Beyond normal suspension compression, this is a hard impact. Feeding deep
+// penetration into an unbounded spring turns a cliff into a launch pad.
+const MAX_GROUND_PENETRATION_METERS = 0.5;
+
+export interface FixedStepPhysicsOptions {
+  /** Deliberate arcade mode; numerical/absolute flight-state guards still apply. */
+  getArcadeGroundLaunches?: () => boolean;
+}
 
 export interface FixedStepPhysicsLoop {
   update(renderDt: number, applyInputs: () => void | boolean | "reset"): FlightState;
@@ -22,6 +30,7 @@ export interface FixedStepPhysicsLoop {
 export function createFixedStepPhysicsLoop(
   sdk: JSBSimSdk,
   onStep?: (state: FlightState) => void,
+  options: FixedStepPhysicsOptions = {},
 ): FixedStepPhysicsLoop {
   let accumulator = 0;
   let prevState: FlightState | null = null;
@@ -50,6 +59,18 @@ export function createFixedStepPhysicsLoop(
           flightLog.error("physics", "Faulted before stepping: state is outside the envelope", {
             failed: beforeReasons, state: before,
           });
+          accumulator = 0;
+          break;
+        }
+        const terrainMeters = sdk.getPropertyValue("position/terrain-elevation-asl-ft") * 0.3048;
+        const groundPenetration = terrainMeters + aircraftClearanceMeters(before.rollRad, before.pitchRad) - before.altMeters;
+        if (!options.getArcadeGroundLaunches?.() && groundPenetration > MAX_GROUND_PENETRATION_METERS) {
+          fault = "Hard ground impact. Reposition the aircraft to recover.";
+          flightLog.error("physics", "Stopped a deep ground impact before loading the gear springs", {
+            penetrationMeters: Number(groundPenetration.toFixed(3)),
+            terrainMeters, state: before,
+          });
+          prevState = currState = before;
           accumulator = 0;
           break;
         }

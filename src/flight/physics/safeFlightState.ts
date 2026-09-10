@@ -52,7 +52,11 @@ export function restoreSimulation(sdk: JSBSimSdk, snapshot: SimulationSnapshot):
   for (const [property, value] of Object.entries(snapshot.initial)) sdk.setPropertyValue(property, value);
   for (const [property, value] of Object.entries(snapshot.controls)) sdk.setPropertyValue(property, value);
   if (!sdk.runIc()) throw new Error("Flight state reinitialization failed");
-  sdk.setPropertyValue("propulsion/set-running", snapshot.running ? -1 : 0);
+  // The global command takes an engine INDEX: 0 starts engine zero, it does
+  // not mean false. Starting also initializes RPM, which the per-engine
+  // boolean alone does not do after a reset.
+  if (snapshot.running) sdk.setPropertyValue("propulsion/set-running", -1);
+  else sdk.setPropertyValue("propulsion/engine/set-running", 0);
   for (const [property, value] of Object.entries(snapshot.controls)) sdk.setPropertyValue(property, value);
 }
 

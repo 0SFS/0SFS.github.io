@@ -2,7 +2,7 @@
 
 A measured reconstruction of the SF50 (G2) built to
 `docs/creating-an-aircraft-model.md`, generated procedurally from a table of
-cross-section stations. Three levels of detail, 1220 / 908 / 442 triangles,
+cross-section stations. Three levels of detail, 1204 / 908 / 442 triangles,
 wired into `AIRCRAFT_CATALOG` as `cirrus-vision-jet`.
 
 Levels are numbered **coarsest first**: LOD1 is the far mesh and each step up
@@ -12,7 +12,7 @@ not need one.
 
 | level | triangles | vertices | objects | takes over at |
 | --- | --- | --- | --- | --- |
-| LOD3 | 1220 | 670 | 22 | 0 m |
+| LOD3 | 1204 | 661 | 22 | 0 m |
 | LOD2 | 908 | 513 | 22 | 65 m |
 | LOD1 | 442 | 255 | 12 | 170 m |
 
@@ -365,7 +365,104 @@ Other things measurement changed from the first blockout:
 The one thing added purely as geometry rather than material is the **ventral
 keel** under the nose gear bay and the **main gear doors** — 28 and 24
 triangles. Both are unmistakable in the side silhouette of a parked SF50, and
-neither can be a material on a face that already exists.
+neither can be a material on a face that already exists. The doors now pay for
+themselves twice: retracted, they are what closes the wing root — see
+"Landing gear".
+
+---
+
+## Landing gear
+
+### The main legs were a Cessna's, and are not any more
+
+The main gear was inherited from `generate_c172.py` and never re-measured: a
+bowed spring-steel leg that left the belly near the centreline at
+`x = ±0.60, z = 0.66` and swept 1.1 m outboard and down to the wheel. That is
+exactly right for a 172 and wrong here in the most visible way there is — the
+front view of a parked SF50 has **two vertical struts hanging off the wing**,
+and what the model drew was two long diagonal rods crossing under the wing to
+the wheels. `renders/gear_up/GEAR_before_after_front.png` is where it
+shows: stacked on the drawing, the old legs (top) cut straight across a wing the
+drawing keeps clear, and the new ones (bottom) sit on the legs it draws.
+
+Re-measured off the three view, the leg is a straight, near-vertical oleo strut:
+
+| quantity | value | read at |
+| --- | --- | --- |
+| strut top | x = ±1.637, Y = −4.406, z = 0.880 | front x 3367 px (lateral 409.4), side x 2511–2529 px |
+| axle | x = ±1.707, Y = −4.434, z = 0.190 | the 11.2 ft track callout and the side view |
+| rake from vertical | 6.3° outboard | 0.070 m over the leg's 0.69 m |
+
+The strut top sits inside the wing box — the chord plane at that station is
+z = 0.900 — so the loft is capped at both ends without the cap ever showing.
+
+Two rings, not three. A third at the piston shoulder was built and the dissolve
+pass took it straight back out: on a straight taper it lies within a degree of
+the line through the other two, so it describes nothing. The nose leg had the
+same dead station and had been carrying it since the airframe was first built —
+the dissolve report was quietly deleting it at every level. Both are now built
+with two rings, which is where the **16 triangles** LOD3 gave back came from.
+
+### Retraction
+
+The gear now retracts, and it costs nothing: no bay is cut, no second pose is
+exported and no triangle is added. The model is always built gear down and the
+runtime turns three nodes.
+
+Each leg's object **origin is on its retraction hinge**, and its wheel — plus,
+on the main legs, its door — is a **child** of the leg, so one rotation carries
+the whole assembly. `scripts/verify_rig.py` checks both, because a wheel left as
+a sibling stays hanging in the air under an aeroplane whose legs have gone.
+
+Which way each leg folds is measured, not assumed, and the drawing says it twice
+for the nose:
+
+- **Main legs fold inboard**, about a fore-aft hinge in the wing root.
+  `measurements/photo_N914AF.jpg` is a belly shot with the gear up and settles
+  it outright: the two retracted main wheels lie **flat** — the axle has turned
+  from lateral to vertical, which only an inboard swing does — in shallow wells
+  either side of the keel, far inboard of the 3.414 m track. The front view's
+  side brace runs up and inboard from the leg, which folds the same way.
+- **The nose leg folds aft**, about a lateral hinge. Its drag brace runs up and
+  **aft** (upper end at Y = −1.288 against the leg's −1.140), and a brace can
+  only fold toward its airframe attachment — retracting forward would have to
+  lengthen it. Independently, the bay panel outline in the ventral keel band
+  sits aft of the strut, at Y = −1.10 to −1.43. Two readings, same answer.
+
+A **quarter turn** pins each hinge to one point, which is how they are derived
+rather than guessed. `stowed − h = rot90(extended − h)` has exactly one
+solution, and `quarter_turn_hinge` in the generator is that solution in closed
+form. So the stowed axle is what is chosen — from where the wheel has to end up
+inside the skin — and the hinge follows:
+
+| leg | extended axle | stowed axle | hinge |
+| --- | --- | --- | --- |
+| main | x 1.707, z 0.190 | x 0.620, z 0.830 | x 1.4835, z 1.0535 |
+| nose | Y −1.138, z 0.179 | Y −1.820, z 0.940 | Y −1.0985, z 0.9005 |
+
+The main hinge lands 0.12 m above the wing chord plane at its station. That is
+a pivot, not geometry, and nothing is drawn there; a real trunnion would sit
+lower, on a folding side brace this budget cannot carry.
+
+**A gear-down render cannot show whether the stowed gear pokes out of the skin**,
+which is the one thing that can go wrong here, so the generator takes `--gear 0`
+and builds the stowed pose. The first stowed position put the door slab and a
+corner of the strut about 25 mm below the wing's lower surface — invisible in
+every view except from underneath, and obvious there. Lifting the stowed axle
+from z = 0.730 to 0.830 buried both. `renders/gear_up/` is the check:
+`GEARUP_SHEET.png` for the ten canonical views, and `GEARUP_close_06_Bottom.png`
+and the two `GEARUP_close_*3Q.png` for the belly and the wing root at 3.4 m of
+framing, which is the only range at which 25 mm of proud door shows.
+
+What is *not* modelled is the wells. The photograph shows the real aircraft's
+retracted main wheels half exposed in shallow belly recesses; ours are fully
+inside an unbroken skin, because cutting two wells is geometry that only ever
+shows when the gear is up.
+
+The door earns its keep twice over now. Extended it hangs below the wing ahead
+of the wheel, which is the shape a parked SF50 is recognised by; retracted it
+lies flat under the wing root, which is what the belly photograph shows a closed
+gear door looking like. Twelve triangles a side, doing two jobs.
 
 ---
 
@@ -426,7 +523,7 @@ one that did without them was the 98-triangle silhouette, and it is gone.
 
 | check | LOD3 | LOD2 | LOD1 |
 | --- | --- | --- | --- |
-| triangles | 1220 | 908 | 442 |
+| triangles | 1204 | 908 | 442 |
 | length 9.357 m | 9.357 | 9.357 | 9.357 |
 | span 11.796 m | 11.796 | 11.796 | 11.796 |
 | height 3.322 m | 3.3227 | 3.3227 | 3.3219 |
@@ -496,7 +593,7 @@ because the validator reports it, not because the model looks lopsided.
 
 `src/flight/aircraft/aircraftCatalog.ts`:
 
-- Three levels of ours — 1220 / 908 / 442 triangles — at `autoFromMeters` of
+- Three levels of ours — 1204 / 908 / 442 triangles — at `autoFromMeters` of
   40 / 65 / 170, plus hilos run's opt-in `hd` at 0. The two coarse thresholds
   are the Cessna's scaled by the span ratio, so the two airframes switch at the
   same apparent size; the fourth threshold is gone with the level it selected,
@@ -592,7 +689,10 @@ separate decision rather than folded into a model build; it is recorded in
 
 The wing surfaces have no such problem. `Aileron_Left`, `Aileron_Right`,
 `Flap_Left` and `Flap_Right` all bind and hinge correctly, with pivots on the
-0.72-chord hinge line at working Y = −4.713.
+0.72-chord hinge line at working Y = −4.713. So do the three gear legs, which
+`GEAR_BINDINGS` turns a quarter turn each about one axis — see "Landing gear"
+above, and `docs/aircraft-assets.md` for why the transit is run by the rig
+rather than read back from the flight model.
 
 ---
 
@@ -610,6 +710,16 @@ Read this before treating any of it as accurate.
   one station.
 - **The main tyres are the drawing's 0.38 m, not the AMM's 0.457 m.** They
   cannot both be right and the drawing is self-consistent with the height.
+- **The gear retracts as one rigid swing about one hinge**, because that is
+  what the runtime rig can drive. A real leg folds on a side or drag brace and
+  the strut shortens as it goes; the transit here is a quarter turn and only the
+  two ends of it are measured. The main hinge is 0.12 m above the wing chord
+  plane as a consequence, where a real trunnion would sit lower.
+- **No wheel wells.** The stowed wheels are inside an unbroken skin; the belly
+  photograph shows the real ones half exposed in shallow recesses.
+- **Nothing stops the gear being raised on the ground.** It is visual only —
+  the flight model this airframe flies has fixed gear — so a raised gear
+  leaves the aeroplane standing on an invisible stance rather than settling.
 - **The nacelle is seated on the crown**, not standing on a pylon with the
   7–13 cm gap the drawing shows.
 - **Wing incidence is 0°.** It is not measurable from a three view and no
@@ -684,6 +794,16 @@ blender -b --factory-startup --python scripts/verify_rig.py -- \
 # look at it, against the drawing and on its own
 blender -b --factory-startup --python scripts/compare_drawing.py -- \
     work/sf50_lod3.blend side renders/COMPARE_side_vs_drawing.png --px 150
+
+# the stowed pose, which is the only way to see whether the retracted gear
+# pokes out of the skin.  --gear never changes what is exported.
+blender -b --factory-startup --python scripts/generate_sf50.py -- \
+    --lod 3 --gear 0 --blend work/sf50_lod3_gearup.blend
+blender -b --factory-startup --python scripts/render_sf50_views.py -- \
+    work/sf50_lod3_gearup.blend renders/gear_up GEARUP --fit 13 --res 640 --keepmat
+blender -b --factory-startup --python scripts/render_sf50_views.py -- \
+    work/sf50_lod3_gearup.blend renders/gear_up GEARUP_close \
+    --views 06,09,10 --fit 3.4 --res 700 --keepmat
 blender -b --factory-startup --python scripts/render_sf50_views.py -- \
     work/sf50_lod3.blend renders/final_lod3 final --fit 13 --res 640 --keepmat
 

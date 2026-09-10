@@ -28,6 +28,7 @@ switch to the chase camera to take it all in.
 | `Q` / `E` | Yaw / rudder |
 | `Shift` / `Control` | Increase / decrease throttle |
 | `F` / `G` | Extend / retract flaps |
+| `L` | Raise / lower the landing gear |
 | `B` | Brake |
 | `P` | Pause |
 | `V` | Toggle first- and third-person camera |

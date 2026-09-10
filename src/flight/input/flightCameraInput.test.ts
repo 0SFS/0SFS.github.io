@@ -89,7 +89,7 @@ describe("flight camera gestures", () => {
     expect(s.orbit).not.toHaveBeenCalled();
     touches("touchstart", [[0, 0], [10, 0]]);
     touches("touchmove", [[10, 10], [20, 10]]);
-    expect(s.orbit).toHaveBeenCalledWith(-0.05, -0.05);
+    expect(s.orbit).toHaveBeenCalledWith(0.05, 0.05);
     touches("touchmove", [[5, 10], [25, 10]]);
     expect(s.zoom).toHaveBeenLastCalledWith(0.5);
     touches("touchcancel", []);
@@ -97,6 +97,43 @@ describe("flight camera gestures", () => {
     touches("touchmove", [[5, 10], [25, 10]]);
     expect(s.orbit).not.toHaveBeenCalled();
   });
+
+  it("ignores synthesized wheel pans while two-finger touch is active", () => {
+    const s = setup("trackpad");
+    const touches = (name: string, points: number[][]) => {
+      const event = new Event(name, { cancelable: true });
+      Object.assign(event, { touches: points.map(([clientX, clientY]) => ({ clientX, clientY })) });
+      s.canvas.dispatchEvent(event);
+    };
+    touches("touchstart", [[0, 0], [20, 0]]);
+    s.orbit.mockClear();
+    s.wheel({ deltaX: 40, deltaY: 40 });
+    expect(s.orbit).not.toHaveBeenCalled();
+    touches("touchmove", [[10, 10], [30, 10]]);
+    expect(s.orbit).toHaveBeenCalledWith(0.05, 0.05);
+  });
+
+  it("applies orbit invert settings", () => {
+    const canvas = document.createElement("canvas");
+    const orbit = vi.fn();
+    const dispose = attachFlightCameraInput(canvas, {
+      getMode: () => "mouse",
+      getSensitivity: loadInputSensitivityPreference,
+      getOrbitInvert: () => ({ invertYaw: true, invertPitch: true }),
+      orbit,
+      zoom: vi.fn(),
+    });
+    disposers.push(dispose);
+    const pointer = (target: EventTarget, name: string, button: number, x = 0, y = 0, buttons = button === 2 ? 2 : 1) => {
+      const event = new MouseEvent(name, { button, buttons, clientX: x, clientY: y, cancelable: true });
+      Object.defineProperty(event, "pointerId", { value: 1 });
+      target.dispatchEvent(event);
+    };
+    pointer(canvas, "pointerdown", 2);
+    pointer(window, "pointermove", 2, 10, 20);
+    expect(orbit).toHaveBeenCalledWith(-0.05, -0.1);
+  });
+
   it("cancels dragging on blur or mode change and disposes canvas/window listeners", () => {
     const s = setup();
     s.pointer(s.canvas, "pointerdown", 2);

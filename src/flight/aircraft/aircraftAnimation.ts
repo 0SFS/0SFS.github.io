@@ -40,11 +40,13 @@ export interface ControlSurfaceState {
   rudderRad: number;
   flapRad: number;
   propellerRadPerSec: number;
+  /** Commanded gear position: 1 is down and locked, 0 is up. */
+  gearDownNorm: number;
 }
 
 export const NEUTRAL_CONTROL_SURFACES: ControlSurfaceState = {
   aileronLeftRad: 0, aileronRightRad: 0, elevatorRad: 0,
-  rudderRad: 0, flapRad: 0, propellerRadPerSec: 0,
+  rudderRad: 0, flapRad: 0, propellerRadPerSec: 0, gearDownNorm: 1,
 };
 
 const DEG_TO_RAD = Math.PI / 180;
@@ -90,6 +92,29 @@ function readPropellerRpm(sdk: JSBSimSdk): number {
   return 0;
 }
 
+/**
+ * The gear LEVER, not the gear position.
+ *
+ * `gear/gear-pos-norm` is the one that would be right, and it is the one that
+ * never moves: it and `gear/gear-cmd-norm` are both plain FGFCS properties, and
+ * what drives one from the other is a retraction system in the aircraft
+ * config. The c172p — still the flight model every airframe here flies — has
+ * fixed gear and no such system, so `gear-pos-norm` sits at 1 for ever however
+ * the command is set. Measured against the wasm build, not assumed. So the
+ * lever is what is read, and `applyAircraftRig` runs the transit itself.
+ *
+ * An unknown or unreadable property answers "down", which is the failure worth
+ * having: gear that will not come up beats gear that is not there on landing.
+ */
+function readGearCommand(sdk: JSBSimSdk): number {
+  try {
+    const value = sdk.getPropertyValue("gear/gear-cmd-norm");
+    return Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 1;
+  } catch {
+    return 1;
+  }
+}
+
 /** Test seam: forget the cached RPM property name. */
 export function resetPropellerRpmProperty(): void {
   resolvedRpmProperty = null;
@@ -103,10 +128,11 @@ export function readControlSurfaceState(sdk: JSBSimSdk): ControlSurfaceState {
     rudderRad: readNumber(sdk, "fcs/rudder-pos-rad"),
     flapRad: readNumber(sdk, "fcs/flap-pos-deg") * DEG_TO_RAD,
     propellerRadPerSec: readPropellerRpm(sdk) * RPM_TO_RAD_PER_SEC,
+    gearDownNorm: readGearCommand(sdk),
   };
 }
 
-type SurfaceKey = keyof Omit<ControlSurfaceState, "propellerRadPerSec">;
+type SurfaceKey = keyof Omit<ControlSurfaceState, "propellerRadPerSec" | "gearDownNorm">;
 
 interface HingedPart {
   node: TransformNode;
@@ -114,6 +140,13 @@ interface HingedPart {
   axis: Vector3;
   sign: number;
   key: SurfaceKey;
+}
+
+interface RetractingGear {
+  node: TransformNode;
+  rest: Quaternion;
+  axis: Vector3;
+  sign: number;
 }
 
 interface Propeller {
@@ -128,6 +161,9 @@ interface Propeller {
 
 export interface AircraftRig {
   parts: HingedPart[];
+  gear: RetractingGear[];
+  /** Where the gear actually is, 1 down to 0 up; it chases the lever. */
+  gearNorm: number;
   propeller: Propeller | null;
   propellerAngleRad: number;
   /** Smoothed frame interval; the sampling rate the blades are judged against. */
@@ -200,6 +236,33 @@ const SPAN_AXIS = new Vector3(1, 0, 0);
 const VERTICAL_AXIS = new Vector3(0, 1, 0);
 const THRUST_AXIS = new Vector3(0, 0, 1);
 
+/**
+ * Retracting gear legs. Each leg's origin is on its own retraction hinge and
+ * its wheel — and, on the main legs, its door — is a child of it, so one
+ * rotation per leg carries the whole assembly. See
+ * `planes/Cirrus_Vision_Jet/agent_workspace/scripts/generate_sf50.py`, which
+ * places those pivots, and verify_rig.py, which checks them.
+ *
+ * The main legs fold inboard about the fore-aft axis, mirrored, so their signs
+ * are opposite; the nose leg folds aft about the span axis. All three take
+ * exactly a quarter turn, which is what pins each hinge to one point.
+ *
+ * An airframe with fixed gear simply has no such nodes and binds nothing.
+ */
+const GEAR_BINDINGS: readonly { name: string; axis: Vector3; sign: number }[] = [
+  { name: "LandingGear_Left", axis: THRUST_AXIS, sign: 1 },
+  { name: "LandingGear_Right", axis: THRUST_AXIS, sign: -1 },
+  { name: "LandingGear_Nose", axis: SPAN_AXIS, sign: -1 },
+];
+
+const GEAR_RETRACT_RAD = Math.PI / 2;
+/**
+ * Seconds end to end. The SF50's AFM gives 8 s for a normal extension; nothing
+ * here depends on the exact figure, only on the gear not snapping between
+ * states in one frame.
+ */
+const GEAR_TRANSIT_SECONDS = 8;
+
 const SURFACE_BINDINGS: readonly { name: string; key: SurfaceKey; axis: Vector3; sign: number }[] = [
   { name: "Aileron_Left", key: "aileronLeftRad", axis: SPAN_AXIS, sign: 1 },
   { name: "Aileron_Right", key: "aileronRightRad", axis: SPAN_AXIS, sign: 1 },
@@ -245,6 +308,14 @@ export function bindAircraftRig(
     bound.push(binding.name);
   }
 
+  const gear: RetractingGear[] = [];
+  for (const binding of GEAR_BINDINGS) {
+    const node = byName.get(binding.name);
+    if (!node) continue;
+    gear.push({ node, rest: restRotation(node), axis: binding.axis, sign: binding.sign });
+    bound.push(binding.name);
+  }
+
   const propNode = byName.get("Propeller");
   if (propNode) bound.push("Propeller");
 
@@ -263,6 +334,8 @@ export function bindAircraftRig(
 
   return {
     parts,
+    gear,
+    gearNorm: 1,
     propeller: propNode
       ? { node: propNode, rest: restRotation(propNode), disc, discFromMesh: baked !== null, blades }
       : null,
@@ -281,6 +354,31 @@ export function disposeAircraftRig(rig: AircraftRig): void {
   propeller.disc.dispose();
 }
 
+/**
+ * Drive the legs toward the lever at a fixed rate.
+ *
+ * The transit is run here rather than read from the flight model because no
+ * flight model in this project has a retraction system to run it — see
+ * `readGearCommand`. A zero or negative delta (a paused sim, the first frame)
+ * snaps to the commanded position rather than stalling half way.
+ */
+function applyGear(rig: AircraftRig, command: number, deltaSeconds: number): void {
+  if (rig.gear.length === 0) return;
+  const target = Number.isFinite(command) ? Math.min(1, Math.max(0, command)) : 1;
+  if (Number.isFinite(deltaSeconds) && deltaSeconds > 0) {
+    const step = deltaSeconds / GEAR_TRANSIT_SECONDS;
+    rig.gearNorm += Math.min(step, Math.max(-step, target - rig.gearNorm));
+  } else {
+    rig.gearNorm = target;
+  }
+  const angle = (1 - rig.gearNorm) * GEAR_RETRACT_RAD;
+  for (const leg of rig.gear) {
+    leg.node.rotationQuaternion = leg.rest.multiply(
+      Quaternion.RotationAxis(leg.axis, angle * leg.sign),
+    );
+  }
+}
+
 export function applyAircraftRig(
   rig: AircraftRig,
   state: ControlSurfaceState,
@@ -290,6 +388,8 @@ export function applyAircraftRig(
     const angle = state[part.key] * part.sign;
     part.node.rotationQuaternion = part.rest.multiply(Quaternion.RotationAxis(part.axis, angle));
   }
+
+  applyGear(rig, state.gearDownNorm, deltaSeconds);
 
   const propeller = rig.propeller;
   if (!propeller) return;

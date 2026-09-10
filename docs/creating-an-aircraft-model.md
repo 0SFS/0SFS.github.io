@@ -629,6 +629,41 @@ on their span-wise hinges, the elevator on the hinge at the centreline, the
 rudder on its raked hinge, the propeller on the hub. Get this wrong and the
 surface swings instead of hinging.
 
+### Retractable gear costs no triangles, and is mostly two decisions
+
+The runtime turns `LandingGear_Nose / _Left / _Right` about one local axis each,
+a quarter turn from down to up. Nothing is added to the mesh, no bay is cut and
+no second pose is exported — the model is always built gear down. What makes it
+work is where the pivot goes and what hangs off it:
+
+- **Put each leg's origin on its retraction hinge, not on the top of the leg.**
+  Those are usually different points, and only the hinge gives the right sweep.
+  A quarter turn pins it exactly: the hinge is the *one* point that carries the
+  extended axle to the stowed axle in 90°, so choose where the stowed wheel has
+  to sit and solve for the hinge rather than eyeballing a trunnion.
+  `generate_sf50.py`'s `quarter_turn_hinge` is four lines.
+- **Parent the wheel — and any door that moves with the leg — to the leg.** The
+  runtime rotates one node; a wheel left as a sibling stays hanging in the air
+  under an aircraft whose legs have gone. Set `matrix_parent_inverse` so the
+  child does not move when it is parented, and the child still exports with an
+  identity rotation of its own.
+
+Which way a leg folds is a measurement like any other, and a three view will
+usually tell you twice. A drag or side brace can only fold toward the airframe
+attachment, so the leg retracts the way the brace leans; and the bay panel
+outline sits on the side the leg goes. Both readings agreed on the SF50's nose
+leg — brace up-and-aft, panel aft of the strut — which is how it came to fold
+aft rather than forward. A photograph of the aircraft with the gear up settles
+the main legs outright: SF50 belly shots show the wheels lying **flat**, which
+only an inboard swing produces, far inboard of the track.
+
+The one thing a gear-down render cannot show is whether the stowed gear pokes
+out of the skin, so give the generator a flag that builds the stowed pose
+(`--gear 0`) and render the bottom and both 3/4 views from underneath. The
+SF50's first stowed position left the door slab and a corner of the strut about
+25 mm proud of the wing lower surface — invisible in every other view, and
+obvious in that one.
+
 Set `propellerBlades` in the catalog entry — `0` for a jet. Above the speed at
 which the blades alias, the runtime hides them and shows a translucent disc
 sized from the propeller's own bounding box, so nothing extra is needed in the
@@ -645,8 +680,9 @@ blender -b --factory-startup \
   --python planes/<Aircraft>/agent_workspace/scripts/verify_rig.py -- path/to/model.glb
 ```
 
-Confirm all seven moving parts exist, each has an identity rotation, and each
-pivot sits at the expected station.
+Confirm every moving part exists, each has an identity rotation, each pivot sits
+at the expected station, and — for a retractable airframe — that each wheel and
+door is parented to its leg.
 
 ### When the tail is not one the rig can express
 
@@ -704,7 +740,7 @@ only if the level above it is too expensive to run all the way out.
 Those sizes are targets, not walls. The right count is the one where the
 wireframe shows density only where a feature is; a level that is 30% over
 because its windows are round is a better level than one that hits a number
-with rectangles. The SF50 sits at 1220 / 908 / 442 — over the targets at the
+with rectangles. The SF50 sits at 1204 / 908 / 442 — over the targets at the
 top and the bottom, spent on window shape, and the wireframe accounts for all
 of it.
 

@@ -118,6 +118,105 @@ describe("control surface geometry", () => {
   });
 });
 
+/**
+ * The SF50's gear, in glTF axes (+X starboard, +Y up, +Z aft), straight out of
+ * generate_sf50.py: each leg's pivot, its wheel's extended centre, and where
+ * the generator's own `--gear 0` build puts that wheel once the leg has turned
+ * its quarter. Getting the axis or the sign wrong swings a leg the wrong way
+ * and is invisible in a still, so the check is that the wheel lands on the
+ * stowed point the model was designed around.
+ */
+const SF50_GEAR = [
+  { leg: "LandingGear_Left", pivot: [-1.4835, 1.0535, 0.406], wheel: [-1.707, 0.190, 0.434], stowed: [-0.620, 0.830, 0.434] },
+  { leg: "LandingGear_Right", pivot: [1.4835, 1.0535, 0.406], wheel: [1.707, 0.190, 0.434], stowed: [0.620, 0.830, 0.434] },
+  { leg: "LandingGear_Nose", pivot: [0, 0.9005, -2.9015], wheel: [0, 0.179, -2.862], stowed: [0, 0.940, -2.180] },
+] as const;
+
+function gearRig(target: Scene) {
+  const wheels: TransformNode[] = [];
+  const nodes: TransformNode[] = [];
+  for (const { leg, pivot, wheel } of SF50_GEAR) {
+    const legNode = new TransformNode(leg, target);
+    legNode.position = new Vector3(...pivot);
+    const wheelNode = new TransformNode(leg.replace("LandingGear", "Wheel"), target);
+    wheelNode.parent = legNode;
+    wheelNode.position = new Vector3(...wheel).subtract(legNode.position);
+    nodes.push(legNode);
+    wheels.push(wheelNode);
+  }
+  return { rig: bindAircraftRig(nodes), wheels };
+}
+
+function worldPositions(wheels: readonly TransformNode[]) {
+  return wheels.map((wheel) => wheel.computeWorldMatrix(true).getTranslation());
+}
+
+describe("retractable gear", () => {
+  it("binds the three legs and starts down", () => {
+    const s = scene();
+    const { rig } = gearRig(s.scene);
+    expect(rig.gear).toHaveLength(3);
+    expect(rig.gearNorm).toBe(1);
+    s.scene.dispose(); s.engine.dispose();
+  });
+
+  it("swings each leg onto its stowed position", () => {
+    const s = scene();
+    const { rig, wheels } = gearRig(s.scene);
+    applyAircraftRig(rig, { ...NEUTRAL_CONTROL_SURFACES, gearDownNorm: 0 }, 0);
+    const stowedAt = worldPositions(wheels);
+    SF50_GEAR.forEach(({ stowed, leg }, index) => {
+      const got = stowedAt[index];
+      expect(`${leg} ${got.x.toFixed(3)} ${got.y.toFixed(3)} ${got.z.toFixed(3)}`)
+        .toBe(`${leg} ${stowed[0].toFixed(3)} ${stowed[1].toFixed(3)} ${stowed[2].toFixed(3)}`);
+    });
+    s.scene.dispose(); s.engine.dispose();
+  });
+
+  it("puts the wheels back exactly where they were when it is lowered again", () => {
+    const s = scene();
+    const { rig, wheels } = gearRig(s.scene);
+    const down = worldPositions(wheels);
+    applyAircraftRig(rig, { ...NEUTRAL_CONTROL_SURFACES, gearDownNorm: 0 }, 0);
+    applyAircraftRig(rig, NEUTRAL_CONTROL_SURFACES, 0);
+    worldPositions(wheels).forEach((got, index) => {
+      expect(Vector3.Distance(got, down[index])).toBeLessThan(1e-6);
+    });
+    s.scene.dispose(); s.engine.dispose();
+  });
+
+  it("takes the transit time to travel rather than snapping", () => {
+    const s = scene();
+    const { rig } = gearRig(s.scene);
+    const up = { ...NEUTRAL_CONTROL_SURFACES, gearDownNorm: 0 };
+    applyAircraftRig(rig, up, 1);
+    expect(rig.gearNorm).toBeGreaterThan(0.8);
+    expect(rig.gearNorm).toBeLessThan(1);
+    for (let step = 0; step < 20; step += 1) applyAircraftRig(rig, up, 1);
+    expect(rig.gearNorm).toBe(0);
+    s.scene.dispose(); s.engine.dispose();
+  });
+
+  it("snaps to the commanded position when no time has passed", () => {
+    // A paused sim, or the first frame after a model swap: half-retracted gear
+    // that never finishes is worse than gear that is simply where it is told.
+    const s = scene();
+    const { rig } = gearRig(s.scene);
+    applyAircraftRig(rig, { ...NEUTRAL_CONTROL_SURFACES, gearDownNorm: 0 }, 0);
+    expect(rig.gearNorm).toBe(0);
+    s.scene.dispose(); s.engine.dispose();
+  });
+
+  it("leaves a fixed-gear airframe alone", () => {
+    const s = scene();
+    const rig = rigOf(["Propeller"], s.scene);
+    expect(rig.gear).toHaveLength(0);
+    expect(() => applyAircraftRig(rig, { ...NEUTRAL_CONTROL_SURFACES, gearDownNorm: 0 }, 1))
+      .not.toThrow();
+    s.scene.dispose(); s.engine.dispose();
+  });
+});
+
 describe("propeller", () => {
   it("advances with elapsed time and turns clockwise seen from the cockpit", () => {
     const s = scene();
@@ -154,6 +253,7 @@ describe("reading JSBSim", () => {
       "fcs/rudder-pos-rad": 0.05,
       "fcs/flap-pos-deg": 30,
       "propulsion/engine[0]/propeller-rpm": 2400,
+      "gear/gear-cmd-norm": 0,
     };
     const sdk = { getPropertyValue: (name: string) => values[name] ?? NaN } as unknown as JSBSimSdk;
     const state = readControlSurfaceState(sdk);
@@ -162,6 +262,14 @@ describe("reading JSBSim", () => {
     expect(state.elevatorRad).toBe(-0.1);
     expect(state.flapRad).toBeCloseTo(Math.PI / 6, 6);
     expect(state.propellerRadPerSec).toBeCloseTo((2400 * 2 * Math.PI) / 60, 6);
+    expect(state.gearDownNorm).toBe(0);
+  });
+
+  it("answers 'down' when the gear lever cannot be read", () => {
+    // The property is absent on some models and reads NaN; gear that will not
+    // come up is a better failure than gear that is not there on landing.
+    const sdk = { getPropertyValue: () => NaN } as unknown as JSBSimSdk;
+    expect(readControlSurfaceState(sdk).gearDownNorm).toBe(1);
   });
 
   it("falls back through the alternative rpm property spellings", () => {

@@ -11,6 +11,12 @@ reverses the sign of a deflection, which is hard to spot in a render.
 Names that SURFACE_BINDINGS knows about (src/flight/aircraft/aircraftAnimation.ts):
     Aileron_Left  Aileron_Right  Elevator  Flap_Left  Flap_Right  Rudder
     Propeller     Propeller_Disc
+    LandingGear_Nose  LandingGear_Left  LandingGear_Right
+
+The three gear legs retract, so this also checks the two things that make that
+work: each leg's pivot is on its retraction hinge, and everything that has to
+travel with a leg - its wheel, and the main legs' doors - is a CHILD of it.
+The runtime turns one node; anything left as a sibling stays behind in mid air.
 
 This airframe deliberately ships none of Elevator, Rudder or Propeller:
     - it is a jet, so there is no propeller and propellerBlades is 0;
@@ -21,7 +27,18 @@ This airframe deliberately ships none of Elevator, Rudder or Propeller:
 """
 import bpy, sys, math
 
-BOUND = ["Aileron_Left", "Aileron_Right", "Flap_Left", "Flap_Right"]
+BOUND = ["Aileron_Left", "Aileron_Right", "Flap_Left", "Flap_Right",
+         "LandingGear_Nose", "LandingGear_Left", "LandingGear_Right"]
+# who must ride with which leg.  A door only exists where the level carries trim.
+GEAR_CHILDREN = {
+    "LandingGear_Nose": ["Wheel_Nose"],
+    "LandingGear_Left": ["Wheel_Left", "GearDoor_Left"],
+    "LandingGear_Right": ["Wheel_Right", "GearDoor_Right"],
+}
+# hinges, from generate_sf50.py's quarter_turn_hinge (working Y, world x/z)
+MAIN_HINGE = (1.4835, -4.406, 1.0535)
+NOSE_HINGE = (0.0, -1.0985, 0.9005)
+HINGE_TOL = 0.002
 UNBOUND = ["Ruddervator_Left", "Ruddervator_Right"]
 NOT_EXPECTED = ["Elevator", "Rudder", "Propeller"]
 # Working Y = world Y + CG_SHIFT (CG_SHIFT is negative); the generator shifts
@@ -88,6 +105,33 @@ if lr and rr:
           f"(expected {VT_DIHEDRAL_DEG})")
     if abs(got - VT_DIHEDRAL_DEG) > 0.5:
         problems.append("ruddervator hinge line is not on the measured dihedral")
+
+# ---- the gear has to be one rigid assembly under each leg ----------------
+for leg_name, child_names in GEAR_CHILDREN.items():
+    leg = present.get(leg_name)
+    if leg is None:
+        continue
+    for child_name in child_names:
+        child = present.get(child_name)
+        if child is None:
+            continue                       # the far level ships no doors
+        if child.parent is not leg:
+            problems.append(f"{child_name} is not parented to {leg_name}; "
+                            f"it will not retract with it")
+
+# ---- and each leg's pivot has to be on its own retraction hinge ----------
+for leg_name, want in (("LandingGear_Left", (-MAIN_HINGE[0], MAIN_HINGE[1], MAIN_HINGE[2])),
+                       ("LandingGear_Right", MAIN_HINGE),
+                       ("LandingGear_Nose", NOSE_HINGE)):
+    leg = present.get(leg_name)
+    if leg is None:
+        continue
+    got = (leg.location[0], leg.location[1] + CG_SHIFT, leg.location[2])
+    off = max(abs(a - b) for a, b in zip(got, want))
+    print(f"{leg_name:20s} pivot {[round(v, 4) for v in got]} "
+          f"vs hinge {[round(v, 4) for v in want]} -> {off * 1000:.1f} mm")
+    if off > HINGE_TOL:
+        problems.append(f"{leg_name} pivot is not on its retraction hinge")
 
 for problem in problems:
     print("PROBLEM:", problem)

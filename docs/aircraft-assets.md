@@ -91,7 +91,7 @@ Cirrus Vision Jet:
 
 | Level | Triangles | Vertices | Meshes | Intended range |
 | --- | --- | --- | --- | --- |
-| LOD3 | 1220 | 669 | 22 | Close / cockpit |
+| LOD3 | 1204 | 661 | 22 | Close / cockpit |
 | LOD2 | 908 | 512 | 22 | Medium |
 | LOD1 | 442 | 254 | 12 | Far, and all the way out |
 
@@ -199,6 +199,36 @@ convention and each is read independently. A positive rotation about +X carries
 the trailing edge downward, so the pitch, roll and flap surfaces map straight
 through; a positive rotation about +Y carries it to starboard, so the rudder is
 negated.
+
+### Retractable landing gear
+
+`LandingGear_Left`, `_Right` and `_Nose` are bound the same way as a control
+surface, but from `gear/gear-cmd-norm` (1 down, 0 up) and through a quarter turn
+rather than a few degrees. Each leg's node origin is on its retraction hinge and
+its wheel — plus, on the main legs, its door — is a **child** of it, so one
+rotation per leg carries the whole assembly. An airframe whose mesh has no such
+nodes binds nothing and is unaffected.
+
+The transit is run by the rig, at a fixed 8 seconds end to end, rather than read
+back from the flight model. `gear/gear-pos-norm` would be the right property and
+is the one that never moves: it and `gear/gear-cmd-norm` are both plain FGFCS
+properties, and what drives one from the other is a retraction system in the
+aircraft config. The c172p — the flight model every airframe here still flies —
+has fixed gear and no such system, so `gear-pos-norm` sits at 1 for ever
+whatever the command is set to. That was measured against the wasm build, not
+assumed. An unreadable property answers "down": gear that will not come up is a
+better failure than gear that is not there on landing.
+
+The lever itself is not part of `ControlSurfaceState`. That record is the
+smoothed continuous axes — every field of it is gamepad-mapped, phone-synced and
+range-checked on the wire — and the gear is a latching switch, owned by the
+input manager the way the pause key is and passed to `applyFlightControls` as
+its own argument. `L` toggles it.
+
+Because it is visual only, the gear does not change how the aircraft flies or
+where it sits on the ground; raising it on the runway leaves the aeroplane
+standing on an invisible stance. A retractable flight model would pick up the
+same property with nothing here to change.
 
 Engine RPM is read through a short list of the usual JSBSim property spellings,
 keeping the first that answers. The propeller angle decreases over time because

@@ -61,16 +61,74 @@ vi.mock("./aircraft/aircraftAnimation", () => ({
   applyAircraftRig: mocks.applyAircraftRig,
   readControlSurfaceState: () => mocks.surfaceState,
 }));
-vi.mock("./physics/fixedStepLoop", () => ({ createFixedStepPhysicsLoop: () => mocks.physics }));
+vi.mock("./physics/fixedStepLoop", () => ({ createFixedStepPhysicsLoop: vi.fn(() => mocks.physics) }));
 vi.mock("./physics/terrainContact", () => ({ createTerrainContact: () => mocks.terrainContact }));
-vi.mock("./physics/visibleMeshCollision", () => ({ createVisibleMeshCollision: () => mocks.visibleMeshCollision }));
+vi.mock("./physics/visibleMeshCollision", () => ({ createVisibleMeshCollision: vi.fn(() => mocks.visibleMeshCollision) }));
 vi.mock("./hud/flightHud", () => ({ createFlightHud: () => ({ update: vi.fn(), destroy: vi.fn() }) }));
 vi.mock("./jsbsim/resetFlightLocation", () => ({ resetFlightLocation: mocks.resetLocation }));
 vi.mock("./hud/createFlightHudBar", () => ({ createFlightHudBar: () => ({ update: vi.fn(), destroy: vi.fn() }) }));
 
 import { createFlightSimApp } from "./createFlightSimApp";
+import { createFixedStepPhysicsLoop } from "./physics/fixedStepLoop";
+import { createVisibleMeshCollision } from "./physics/visibleMeshCollision";
 
 afterEach(() => { vi.clearAllMocks(); vi.unstubAllGlobals(); document.body.replaceChildren(); });
+
+it("defaults to passive impacts and applies the persistent arcade override to both contact paths", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  const storage = new Map<string, string>();
+  vi.stubGlobal("localStorage", { getItem: (key: string) => storage.get(key) ?? null,
+    setItem: (key: string, value: string) => storage.set(key, value) });
+  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
+  const root = document.createElement("div"); document.body.append(root);
+  const openSettings = async () => {
+    await act(async () => root.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')!.click());
+    const item = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')).find(button => button.textContent === "Settings")!;
+    await act(async () => item.click());
+    return root.querySelector<HTMLInputElement>('[aria-label="Arcade ground launches"]')!;
+  };
+  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
+  await act(async () => { app = await createFlightSimApp(root); });
+  try {
+    const physicsOptions = vi.mocked(createFixedStepPhysicsLoop).mock.calls.at(-1)![2]!;
+    const bodyOptions = vi.mocked(createVisibleMeshCollision).mock.calls.at(-1)![2]!;
+    expect(physicsOptions.getArcadeGroundLaunches?.()).toBe(false);
+    expect(bodyOptions.getRestitution?.()).toBe(0.25);
+    const checkbox = await openSettings();
+    expect(checkbox.checked).toBe(false);
+    await act(async () => checkbox.click());
+    expect(checkbox.checked).toBe(true);
+    expect(physicsOptions.getArcadeGroundLaunches?.()).toBe(true);
+    expect(bodyOptions.getRestitution?.()).toBe(1.35);
+    expect(storage.get("osfs.arcade-ground-launches")).toBe("on");
+  } finally { await act(async () => app.destroy()); }
+  await act(async () => { app = await createFlightSimApp(root); });
+  try {
+    expect(vi.mocked(createFixedStepPhysicsLoop).mock.calls.at(-1)![2]!.getArcadeGroundLaunches?.()).toBe(true);
+  } finally { await act(async () => app.destroy()); }
+});
+
+it.each([0, 1])("discards swept body history when terrain repositions during contact call %s", async resetCall => {
+  vi.stubGlobal("localStorage", { getItem: () => null, setItem: vi.fn() });
+  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
+  mocks.physics.getFault = () => null;
+  const root = document.createElement("div"); document.body.append(root);
+  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
+  await act(async () => { app = await createFlightSimApp(root); });
+  try {
+    mocks.visibleMeshCollision.reset.mockClear();
+    mocks.visibleMeshCollision.update.mockClear();
+    let call = 0;
+    mocks.terrainContact.update.mockImplementation(() => call++ === resetCall ? "reset" as never : true);
+    const tick = mocks.runtime.setSimTick.mock.calls.at(-1)![0] as (dt: number) => void;
+    tick(1 / 60);
+    expect(mocks.visibleMeshCollision.reset).toHaveBeenCalledOnce();
+    expect(mocks.visibleMeshCollision.reset.mock.invocationCallOrder[0]).toBeLessThan(mocks.visibleMeshCollision.update.mock.invocationCallOrder[0]);
+  } finally {
+    mocks.terrainContact.update.mockImplementation(() => true);
+    await act(async () => app.destroy());
+  }
+});
 
 describe("OSFS render demand", () => {
   it("pauses/resumes without a frame, wakes for camera changes, and discards idle elapsed time", async () => {

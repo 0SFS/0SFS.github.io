@@ -62,6 +62,10 @@ import {
   loadKeyboardStickSettings,
   saveKeyboardStickSettings,
 } from "./input/keyboardStickSettings";
+import {
+  loadOrbitInvertSettings,
+  saveOrbitInvertSettings,
+} from "./input/orbitInvertSettings";
 import { createJsbsimRuntime } from "./jsbsim/createJsbsimRuntime";
 import { createFixedStepPhysicsLoop } from "./physics/fixedStepLoop";
 import { createFlightLoadingScreen, type FlightLoadingScreen } from "../loading/createFlightLoadingScreen";
@@ -105,6 +109,7 @@ const LEGACY_AIRCRAFT_PREFERENCE_KEY = "flight-sim.aircraft";
 const LEGACY_AIRCRAFT_LOD_PREFERENCE_KEY = "flight-sim.aircraft-lod";
 const WORLD_DETAIL_PREFERENCE_KEY = "osfs.world-detail-target";
 const FLIGHT_TERRAIN_REQUIREMENT_PREFERENCE_KEY = "osfs.flight-terrain-requirement";
+const ARCADE_GROUND_LAUNCHES_PREFERENCE_KEY = "osfs.arcade-ground-launches";
 const MIN_WORLD_DETAIL_TARGET = 1;
 const MAX_WORLD_DETAIL_TARGET = 524_288;
 const DEFAULT_FLIGHT_TERRAIN_REQUIREMENT = 4_096;
@@ -320,10 +325,18 @@ export async function createFlightSimApp(
   });
   let appliedControls = inputManager.getControls();
   const detachInput = inputManager.attach(window);
-  const physicsLoop = createFixedStepPhysicsLoop(jsbsim.sdk);
+  let arcadeGroundLaunches = readPreference(
+    ARCADE_GROUND_LAUNCHES_PREFERENCE_KEY, ARCADE_GROUND_LAUNCHES_PREFERENCE_KEY,
+    (value): value is "on" | "off" => value === "on" || value === "off", "off",
+  ) === "on";
+  const physicsLoop = createFixedStepPhysicsLoop(jsbsim.sdk, undefined, {
+    getArcadeGroundLaunches: () => arcadeGroundLaunches,
+  });
   const flightSurface = createFrameSurfaceQuery(runtime.surface);
   const terrainContact = createTerrainContact(jsbsim.sdk, flightSurface);
-  const visibleMeshCollision = createVisibleMeshCollision(jsbsim.sdk, flightSurface);
+  const visibleMeshCollision = createVisibleMeshCollision(jsbsim.sdk, flightSurface, {
+    getRestitution: () => arcadeGroundLaunches ? 1.35 : 0.25,
+  });
   // This stays completely out of the normal render loop unless someone opts
   // in through the URL. It makes a stutter reproducible with numbers instead
   // of trying to infer its source from a single FPS reading.
@@ -333,6 +346,8 @@ export async function createFlightSimApp(
   const flightHud: FlightHudHandle = createFlightHud(hudRoot, {
     onThrottleChange: (value) => { inputManager.setThrottle(value); runtime.requestRender(); },
     onPitchTrimChange: (value) => { inputManager.setPitchTrim(value); runtime.requestRender(); },
+    onFlapsChange: (value) => { inputManager.setFlaps(value); runtime.requestRender(); },
+    onRudderChange: (value) => { inputManager.setRudder(value); runtime.requestRender(); },
     onStickChange: (aileron, elevator) => { inputManager.setStick(aileron, elevator); runtime.requestRender(); },
   });
 
@@ -362,9 +377,11 @@ export async function createFlightSimApp(
   let allowCoarserTerrainThisSession = false;
   let inputMode = loadInputModePreference(new Set(["mouse", "trackpad"]));
   let inputSensitivity = loadInputSensitivityPreference();
+  let orbitInvert = loadOrbitInvertSettings();
   const detachCameraInput = attachFlightCameraInput(canvas, {
     getMode: () => inputMode,
     getSensitivity: () => inputSensitivity,
+    getOrbitInvert: () => orbitInvert,
     orbit: (yaw, pitch) => {
       if (!aircraft || aircraft.getViewMode() !== "third") return;
       aircraft.orbitChaseCamera(yaw, pitch);
@@ -467,6 +484,8 @@ export async function createFlightSimApp(
     modelTriangles: modelState.triangles,
     modelError: modelState.error,
     keyboardStick: inputManager.getKeyboardStickSettings(),
+    orbitInvert,
+    arcadeGroundLaunches,
   });
 
   const syncSimulationPaused = (paused: boolean): void => {
@@ -675,6 +694,18 @@ export async function createFlightSimApp(
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
       runtime.requestRender();
     },
+    onOrbitInvertChange: (settings) => {
+      orbitInvert = settings;
+      saveOrbitInvertSettings(settings);
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+      runtime.requestRender();
+    },
+    onArcadeGroundLaunchesChange: (enabled) => {
+      arcadeGroundLaunches = enabled;
+      writePreference(ARCADE_GROUND_LAUNCHES_PREFERENCE_KEY, enabled ? "on" : "off");
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+      runtime.requestRender();
+    },
   });
   const rendererForce = getRendererForceFromUrl();
   hudBar = createFlightHudBar(shellRoot, {
@@ -777,6 +808,7 @@ export async function createFlightSimApp(
     if (!physicsLoop.getFault()
       && terrainContact.update(false, googleTiles, true, true) === "reset") {
       physicsLoop.reset();
+      visibleMeshCollision.reset();
     }
     if (flightPerformance) terrainQueryCpuMs += performance.now() - preContactStartedMs;
 
@@ -793,6 +825,9 @@ export async function createFlightSimApp(
         terrainBlockedReason = terrainContact.getBlockReason();
         return false;
       }
+      // A terrain correction is a placement, not a swept flight trajectory.
+      // Discard the old probe positions before testing the next movement.
+      if (contact === "reset") visibleMeshCollision.reset();
       const collisionStartedMs = flightPerformance ? performance.now() : 0;
       const collisionReset = visibleMeshCollision.update();
       if (flightPerformance) collisionCpuMs += performance.now() - collisionStartedMs;
@@ -801,7 +836,7 @@ export async function createFlightSimApp(
       const selected = phoneSession?.beforeStep(controls) ?? controls;
       if (selected === false || inputManager.isPaused()) return false;
       if (collisionReset) return "reset";
-      applyFlightControls(jsbsim.sdk, selected);
+      applyFlightControls(jsbsim.sdk, selected, inputManager.getGearDownNorm());
       appliedControls = { ...selected };
       return contact;
     });

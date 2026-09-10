@@ -3,8 +3,8 @@
  "objects": 22,
  "empties": 1,
  "meshes": 22,
- "triangles": 1220,
- "vertices": 669,
+ "triangles": 1204,
+ "vertices": 661,
  "materials": 5,
  "material_names": [
   "SF50_Dark",
@@ -247,28 +247,15 @@
   },
   {
    "name": "LandingGear_Left",
-   "tris": 20,
-   "verts": 12,
+   "tris": 12,
+   "verts": 8,
    "mats": [
     "SF50_Metal"
    ],
    "origin": [
-    0.0,
-    0.0,
-    0.0
-   ]
-  },
-  {
-   "name": "LandingGear_Right",
-   "tris": 20,
-   "verts": 12,
-   "mats": [
-    "SF50_Metal"
-   ],
-   "origin": [
-    0.0,
-    0.0,
-    0.0
+    -1.4835,
+    -0.406,
+    1.0535
    ]
   },
   {
@@ -282,6 +269,19 @@
     0.0,
     0.0,
     0.0
+   ]
+  },
+  {
+   "name": "LandingGear_Right",
+   "tris": 12,
+   "verts": 8,
+   "mats": [
+    "SF50_Metal"
+   ],
+   "origin": [
+    1.4835,
+    -0.406,
+    1.0535
    ]
   },
   {
@@ -306,8 +306,8 @@
    ],
    "origin": [
     0.0,
-    0.0,
-    0.0
+    2.9015,
+    0.9005
    ]
   },
   {

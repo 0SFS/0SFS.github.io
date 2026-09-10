@@ -19,6 +19,17 @@ describe("applyFlightControls", () => {
       ["fcs/brake-cmd-norm", 0.8],
       ["fcs/left-brake-cmd-norm", 0.8],
       ["fcs/right-brake-cmd-norm", 0.8],
+      ["gear/gear-cmd-norm", 1],
     ]);
+  });
+
+  it("defaults the gear lever to down, and writes it up when told to", () => {
+    const setPropertyValue = vi.fn();
+    const controls = {
+      elevator: 0, aileron: 0, rudder: 0,
+      throttle: 0, pitchTrim: 0, flaps: 0, brake: 0,
+    };
+    applyFlightControls({ setPropertyValue } as unknown as JSBSimSdk, controls, 0);
+    expect(setPropertyValue).toHaveBeenLastCalledWith("gear/gear-cmd-norm", 0);
   });
 });

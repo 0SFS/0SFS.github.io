@@ -97,6 +97,39 @@ describe("flightInputManager keyboard roll", () => {
     detach();
   });
 
+  it("latches the gear lever on L, and ignores the auto-repeat", () => {
+    const input = createFlightInputManager();
+    const detach = input.attach(window);
+    expect(input.getGearDownNorm()).toBe(1);
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyL" }));
+    expect(input.getGearDownNorm()).toBe(0);
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyL", repeat: true }));
+    expect(input.getGearDownNorm()).toBe(0);
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyL" }));
+    expect(input.getGearDownNorm()).toBe(1);
+    detach();
+  });
+
+  it("keeps the gear lever working while a remote pilot holds the stick", () => {
+    // The gear is not part of the control record the phone owns, so taking the
+    // stick away must not take the gear with it.
+    const input = createFlightInputManager();
+    const detach = input.attach(window);
+    input.setRemoteOwned(true);
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyL" }));
+    expect(input.getGearDownNorm()).toBe(0);
+    detach();
+  });
+
+  it("sends the gear lever to the physics boundary", () => {
+    const input = createFlightInputManager();
+    const setPropertyValue = vi.fn();
+    const sdk = { setPropertyValue } as unknown as JSBSimSdk;
+    input.setGearDown(false);
+    input.apply(sdk, input.getControls());
+    expect(setPropertyValue).toHaveBeenCalledWith("gear/gear-cmd-norm", 0);
+  });
+
   it("raises throttle while Shift is held", () => {
     const input = createFlightInputManager();
     const detach = input.attach(window);
@@ -220,6 +253,15 @@ describe("flightInputManager phone handoff", () => {
     input.setStick(0, 0);
     expect(input.poll(1)).toMatchObject({ aileron: 0, elevator: 0 });
     expect(input.hasActiveFlightInput()).toBe(false);
+  });
+
+  it("applies HUD flaps and spring-loaded rudder", () => {
+    const input = createFlightInputManager();
+    input.setFlaps(0.33);
+    input.setRudder(-0.5);
+    expect(input.poll(1)).toMatchObject({ flaps: 0.33, rudder: -0.5 });
+    input.setRudder(0);
+    expect(input.poll(1).rudder).toBe(0);
   });
 
   it("revokes before applying setStick", () => {

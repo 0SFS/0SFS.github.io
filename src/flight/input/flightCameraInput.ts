@@ -1,11 +1,17 @@
 import { isSafariGestureSupported, type HudInputMode, type InputSensitivitySettings } from "foss-earth/input";
+import type { OrbitInvertSettings } from "./orbitInvertSettings";
+import { DEFAULT_ORBIT_INVERT_SETTINGS } from "./orbitInvertSettings";
 
 export interface FlightCameraInputOptions {
   getMode(): HudInputMode;
   getSensitivity(): InputSensitivitySettings;
+  getOrbitInvert?(): OrbitInvertSettings;
   orbit(dx: number, dy: number): void;
   zoom(factor: number): void;
 }
+
+/** Ignore late synthesized wheel pans briefly after a touch gesture ends. */
+const TOUCH_WHEEL_COOLDOWN_MS = 180;
 
 /** Canvas gestures only; keyboard/gamepad physics input remains independent. */
 export function attachFlightCameraInput(canvas: HTMLCanvasElement, options: FlightCameraInputOptions): () => void {
@@ -16,15 +22,20 @@ export function attachFlightCameraInput(canvas: HTMLCanvasElement, options: Flig
   let drag: { id: number; x: number; y: number } | null = null;
   let gestureScale: number | null = null;
   let touch: { x: number; y: number; distance: number } | null = null;
+  let touchWheelCooldownUntil = 0;
   const listeners: Array<() => void> = [];
   function listen<E extends Event>(target: EventTarget, name: string, handler: (event: E) => void): void {
     const listener = handler as EventListener;
     target.addEventListener(name, listener, { passive: false });
     listeners.push(() => target.removeEventListener(name, listener));
   }
+  const invert = (): OrbitInvertSettings => options.getOrbitInvert?.() ?? DEFAULT_ORBIT_INVERT_SETTINGS;
   const orbit = (x: number, y: number) => {
     const sensitivity = options.getSensitivity()[options.getMode()].orbit;
-    options.orbit(x * 0.005 * sensitivity, y * 0.005 * sensitivity);
+    const signs = invert();
+    const dx = x * 0.005 * sensitivity * (signs.invertYaw ? -1 : 1);
+    const dy = y * 0.005 * sensitivity * (signs.invertPitch ? -1 : 1);
+    options.orbit(dx, dy);
   };
   const zoom = (factor: number) => options.zoom(Math.pow(factor, options.getSensitivity()[options.getMode()].zoom));
   const clearDrag = () => {
@@ -32,6 +43,9 @@ export function attachFlightCameraInput(canvas: HTMLCanvasElement, options: Flig
     drag = null;
     if (id !== undefined && canvas.hasPointerCapture?.(id)) canvas.releasePointerCapture(id);
   };
+  const touchBlocksWheel = (): boolean => (
+    touch !== null || owner.performance.now() < touchWheelCooldownUntil
+  );
   listen(canvas, "pointerdown", (event: PointerEvent) => {
     if (options.getMode() !== "mouse" || event.button !== 2) return;
     event.preventDefault();
@@ -59,7 +73,11 @@ export function attachFlightCameraInput(canvas: HTMLCanvasElement, options: Flig
     else if (event.ctrlKey) {
       // Safari emits native GestureEvents for the same pinch; never apply both streams.
       if (!safari) zoom(Math.exp(Math.max(-1, Math.min(1, event.deltaY * unit * 0.01))));
-    } else if (gestureScale === null) orbit(-event.deltaX * unit, -event.deltaY * unit);
+    } else if (gestureScale === null && !touchBlocksWheel()) {
+      // Android Firefox often synthesizes wheel pans alongside touchmove with the
+      // opposite delta sign. Prefer the touch path while fingers are down.
+      orbit(-event.deltaX * unit, -event.deltaY * unit);
+    }
   });
   listen(canvas, "gesturestart", (event: Event & { scale?: number }) => {
     event.preventDefault();
@@ -79,17 +97,30 @@ export function attachFlightCameraInput(canvas: HTMLCanvasElement, options: Flig
     const [a, b] = [event.touches[0], event.touches[1]];
     return { x: (a.clientX + b.clientX) / 2, y: (a.clientY + b.clientY) / 2, distance: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY) };
   };
-  listen(canvas, "touchstart", (event: TouchEvent) => { event.preventDefault(); touch = readTouch(event); });
+  listen(canvas, "touchstart", (event: TouchEvent) => {
+    event.preventDefault();
+    touch = readTouch(event);
+    if (touch) touchWheelCooldownUntil = 0;
+  });
   listen(canvas, "touchmove", (event: TouchEvent) => {
     event.preventDefault();
     const next = readTouch(event);
     if (options.getMode() === "trackpad" && touch && next && gestureScale === null) {
-      orbit(touch.x - next.x, touch.y - next.y);
+      // Match mouse/trackpad grab direction: finger right → positive yaw.
+      // Older code used (prev - next), which felt inverted on Android touch
+      // relative to desktop Firefox trackpad wheel pans.
+      orbit(next.x - touch.x, next.y - touch.y);
       if (touch.distance > 0 && next.distance > 0) zoom(touch.distance / next.distance);
     }
     touch = next;
   });
-  for (const name of ["touchend", "touchcancel"]) listen(canvas, name, (event: TouchEvent) => { event.preventDefault(); touch = null; });
+  for (const name of ["touchend", "touchcancel"]) {
+    listen(canvas, name, (event: TouchEvent) => {
+      event.preventDefault();
+      touch = null;
+      touchWheelCooldownUntil = owner.performance.now() + TOUCH_WHEEL_COOLDOWN_MS;
+    });
+  }
   return () => {
     clearDrag();
     listeners.forEach((remove) => remove());

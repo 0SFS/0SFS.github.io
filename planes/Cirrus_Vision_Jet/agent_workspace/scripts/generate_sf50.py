@@ -2,7 +2,7 @@
 Procedural low-poly Cirrus SF50 Vision Jet generator.
 
     blender -b --factory-startup --python generate_sf50.py -- \
-        --lod 3 --blend out.blend [--glb out.glb]
+        --lod 3 --blend out.blend [--glb out.glb] [--gear 0]
 
 The LOD ladder runs COARSEST FIRST: --lod 1 is the far mesh and every step up
 adds detail, so a bigger number is always a better mesh and the top of the
@@ -36,6 +36,11 @@ def arg(name, default=None):
 LOD = int(arg("--lod", 0))
 OUT_BLEND = arg("--blend")
 OUT_GLB = arg("--glb")
+# Gear position, 1 = down and 0 = up.  The exported model is always built gear
+# DOWN - the runtime retracts it by rotating the three LandingGear_* nodes - so
+# this exists to render the stowed state and check that nothing pokes out of
+# the skin, which is the one thing a gear-down render cannot show.
+GEAR = float(arg("--gear", 1.0))
 
 # ----------------------------------------------------------------------------
 # measured constants  (metres; working Y = 0 at the nose tip)
@@ -102,6 +107,48 @@ MAIN_TIRE_R = 0.190                 # as drawn; the AMM calls out 18 x 5.5
 GEAR_TRACK = 3.414                  # 11.2 ft
 NOSE_TIRE_W = 0.115
 MAIN_TIRE_W = 0.140
+
+# The main leg is a near-vertical oleo strut hanging off the wing at the gear
+# station.  It is NOT the Cessna's bowed spring-steel leg sweeping out from the
+# belly - that shape was carried over from generate_c172.py and does not belong
+# on this airframe.  The front view draws the leg as a straight member whose
+# top sits 0.07 m inboard of the tyre centreline (x 3367 against 3396 px,
+# lateral scale 409.4), and the side view puts it at x 2511-2529 px, i.e.
+# Y = -4.383 to -4.428, just ahead of the axle.
+MAIN_STRUT_TOP_X = GEAR_TRACK / 2.0 - 0.070
+MAIN_STRUT_TOP_Y = -4.406
+MAIN_STRUT_TOP_Z = 0.880            # buried in the wing box; the wing chord
+                                    # plane at this station is z = 0.900
+
+# ----------------------------------------------------------------------------
+# retraction
+#
+# Each leg is one rigid swing about one fixed hinge line, because that is all
+# the runtime rig can drive: one named node turning about one local axis.  The
+# leg's object ORIGIN is that hinge, and the wheel and the door are parented to
+# the leg so one rotation carries all three.
+#
+# MAIN: inboard, about a FORE-AFT hinge in the wing root.  measurements/
+# photo_N914AF.jpg is a belly shot with the gear up and settles it - the two
+# retracted main wheels lie FLAT (so the axle has turned from lateral to
+# vertical, which only an inboard swing does) in shallow wells either side of
+# the keel, far inboard of the 3.414 m track.  The front view's side brace runs
+# up and inboard from the leg, which folds the same way.
+#
+# NOSE: aft, about a LATERAL hinge at the top of the leg.  Two readings of the
+# side view agree.  The drag brace runs up and AFT from the leg (its upper end
+# is at Y = -1.288 against the leg's -1.14), so it folds aft; retracting
+# forward would have to lengthen it.  And the bay panel outline in the ventral
+# keel band sits aft of the strut, at Y = -1.10 to -1.43.
+#
+# A 90 deg swing pins each hinge exactly: it is the one point that carries the
+# extended axle to the stowed axle in a quarter turn.  Solving
+#     stowed - hinge = rot90(extended - hinge)
+# gives the closed form in `quarter_turn_hinge` below, so the stowed positions
+# are what is chosen here and the hinges follow from them.  Both were chosen to
+# bury the wheel inside the skin, which `--gear 0` renders so it can be checked.
+MAIN_STOWED = (0.620, 0.830)        # (x, z) of the retracted main axle
+NOSE_STOWED = (-1.820, 0.940)       # (y, z) of the retracted nose axle
 
 # The origin goes on the ground under the CG.  Quarter-MAC works out at
 # Y = -3.97 and the tricycle balance point at about -4.03, so:
@@ -388,19 +435,19 @@ RING_SPEC = {
 LODP = {
     1: dict(ring=6, pane_detail='coarse', wheel=4,
             wing_st=(0.0, SEMI),
-            vt_st=(VT_ROOT_ETA, 1.0), gear_n=3, gear_st=2,
+            vt_st=(VT_ROOT_ETA, 1.0), gear_n=3,
             ctrl=False, af='mid', nac_ring=4,
             pillars=False, intake=False, nac_st=3,
             tip_cap=True, gear_cap=True, trim=False),
     2: dict(ring=11, st_level=0, pane_detail='coarse', wheel=6,
             wing_st=(0.0, 1.30, SEMI),
-            vt_st=(VT_ROOT_ETA, 1.0), gear_n=4, gear_st=2,
+            vt_st=(VT_ROOT_ETA, 1.0), gear_n=4,
             ctrl=True, af='full', nac_ring=6,
             pillars=True, intake=True, nac_st=4,
             tip_cap=True, gear_cap=True, trim=True),
     3: dict(ring=11, st_level=2, pane_detail='fine', wheel=8,
             wing_st=(0.0, 1.30, 3.20, 5.60, SEMI),
-            vt_st=(VT_ROOT_ETA, 0.55, 1.0), gear_n=4, gear_st=3,
+            vt_st=(VT_ROOT_ETA, 0.55, 1.0), gear_n=4,
             ctrl=True, af='full', nac_ring=8,
             pillars=True, intake=True, nac_st=5,
             tip_cap=True, gear_cap=True, trim=True),
@@ -1450,31 +1497,58 @@ def diamond_ring(center, hy, hx, n=4):
             (cx, cy - hy, cz), (cx - hx, cy, cz)]
 
 
+def quarter_turn_hinge(extended, stowed):
+    """The one hinge point that carries `extended` to `stowed` in 90 degrees.
+
+    Both are 2-D points in the plane the leg swings in - (x, z) for a main leg
+    folding inboard, (y, z) for the nose leg folding aft - with the second axis
+    up and the first axis pointing the way the leg does NOT go.  With the
+    quarter turn written as (a, b) -> (b, -a), which sends straight down to the
+    retracting direction, `stowed - h = rot(extended - h)` has one solution.
+    """
+    (ex, ez), (sx, sz) = extended, stowed
+    return ((ex - ez + sx + sz) / 2.0, (ex + ez + sz - sx) / 2.0)
+
+
+MAIN_HINGE = quarter_turn_hinge((GEAR_TRACK / 2.0, MAIN_TIRE_R), MAIN_STOWED)
+NOSE_HINGE = quarter_turn_hinge((NOSE_AXLE_Y, NOSE_TIRE_R), NOSE_STOWED)
+
+
 def build_main_gear(side):
+    """Near-vertical oleo strut under the wing, origin on the retraction hinge.
+
+    Two rings, straight: the leg the front view draws is a strut, not the
+    Cessna's spring-steel bow, and a bow is what was here.  A third ring at the
+    piston shoulder was tried and the dissolve pass took it straight back out
+    again - on a straight taper it describes nothing - so it is not built.  The
+    top is buried in the wing box, so the loft can be capped without it showing.
+    """
     sgn = 1.0 if side == "Right" else -1.0
-    axle_x = sgn * GEAR_TRACK / 2.0
-    top = (sgn * 0.60, -4.30, 0.66)
     end_z = MAIN_TIRE_R if P["wheel"] else 0.0
-    if P["gear_st"] >= 3:
-        path = [top, (sgn * 1.30, -4.36, 0.45), (axle_x, MAIN_AXLE_Y, end_z)]
-        halfs = [(0.115, 0.055), (0.095, 0.045), (0.070, 0.034)]
-    else:
-        path = [top, (axle_x, MAIN_AXLE_Y, end_z)]
-        halfs = [(0.115, 0.055), (0.070, 0.034)]
+    path = [(sgn * MAIN_STRUT_TOP_X, MAIN_STRUT_TOP_Y, MAIN_STRUT_TOP_Z),
+            (sgn * GEAR_TRACK / 2.0, MAIN_AXLE_Y, end_z)]
+    halfs = [(0.115, 0.055), (0.070, 0.034)]
     rings = [diamond_ring(p, hy, hx, P["gear_n"]) for p, (hy, hx) in zip(path, halfs)]
     verts, faces = loft(rings, cap_start=P["gear_cap"], cap_end=P["gear_cap"])
-    return make(f"LandingGear_{side}", verts, faces, M_METAL, smooth_angle=30.0)
+    return make(f"LandingGear_{side}", verts, faces, M_METAL, smooth_angle=30.0,
+                origin=(sgn * MAIN_HINGE[0], MAIN_STRUT_TOP_Y, MAIN_HINGE[1]))
 
 
 def build_nose_gear():
+    """Straight strut, origin on its lateral retraction hinge.
+
+    Two rings for the same reason as the main leg: the mid station this used to
+    carry at the finest level was within a degree of the line through the other
+    two, and the dissolve pass had been deleting it at every level for as long
+    as it has existed.
+    """
     end_z = NOSE_TIRE_R if P["wheel"] else 0.0
-    path = [(0.0, -1.10, 0.83), (0.0, -1.12, 0.50), (0.0, NOSE_AXLE_Y, end_z)]
-    halfs = [(0.105, 0.062), (0.088, 0.052), (0.070, 0.042)]
-    if P["gear_st"] <= 2:
-        path, halfs = [path[0], path[-1]], [halfs[0], halfs[-1]]
+    path = [(0.0, -1.10, 0.83), (0.0, NOSE_AXLE_Y, end_z)]
+    halfs = [(0.105, 0.062), (0.070, 0.042)]
     rings = [diamond_ring(p, hy, hx, P["gear_n"]) for p, (hy, hx) in zip(path, halfs)]
     verts, faces = loft(rings, cap_start=P["gear_cap"], cap_end=P["gear_cap"])
-    return make("LandingGear_Nose", verts, faces, M_METAL, smooth_angle=30.0)
+    return make("LandingGear_Nose", verts, faces, M_METAL, smooth_angle=30.0,
+                origin=(0.0, NOSE_HINGE[0], NOSE_HINGE[1]))
 
 
 def build_gear_door(side):
@@ -1551,10 +1625,54 @@ for ob in BUILT:
         ob.location = ob.location + SHIFT
 bpy.context.view_layer.update()
 
+# ----------------------------------------------------------------------------
+# hang the wheels and the doors off their legs
+#
+# The runtime rig turns ONE named node about one axis, so everything that
+# retracts with a leg has to be under it.  matrix_parent_inverse holds the
+# child exactly where it was built; what the export then writes is a child
+# whose own rotation is still identity, which verify_rig.py checks.
+# ----------------------------------------------------------------------------
+GEAR_CHILDREN = {
+    "LandingGear_Nose": ["Wheel_Nose"],
+    "LandingGear_Left": ["Wheel_Left", "GearDoor_Left"],
+    "LandingGear_Right": ["Wheel_Right", "GearDoor_Right"],
+}
+by_name = {ob.name: ob for ob in BUILT}
+for leg_name, child_names in GEAR_CHILDREN.items():
+    leg = by_name.get(leg_name)
+    if leg is None:
+        continue
+    for child_name in child_names:
+        child = by_name.get(child_name)
+        if child is None:                  # the far level ships no doors
+            continue
+        child.parent = leg
+        child.matrix_parent_inverse = leg.matrix_world.inverted()
+bpy.context.view_layer.update()
+
+# Stow the gear, for a render that can show what a gear-down one cannot: that
+# nothing sticks out of the skin when it is up.  The angles are the same ones
+# GEAR_BINDINGS drives at runtime, written in Blender axes - main legs about
+# the fore-aft axis (+Y), sign by side; nose leg aft about the lateral axis.
+if GEAR < 1.0:
+    turn = math.radians(90.0) * (1.0 - GEAR)
+    for leg_name, axis, sign in (("LandingGear_Right", 'Y', 1.0),
+                                 ("LandingGear_Left", 'Y', -1.0),
+                                 ("LandingGear_Nose", 'X', -1.0)):
+        leg = by_name.get(leg_name)
+        if leg is None:
+            continue
+        leg.rotation_mode = 'XYZ'
+        leg.rotation_euler = Matrix.Rotation(turn * sign, 4, axis).to_euler()
+    bpy.context.view_layer.update()
+
 root = bpy.data.objects.new("Cirrus_Vision_Jet", None)
 SC.collection.objects.link(root)
 root.empty_display_size = 0.5
 for ob in BUILT:
+    if ob.parent is not None:
+        continue
     ob.parent = root
     ob.matrix_parent_inverse = Matrix.Identity(4)
 

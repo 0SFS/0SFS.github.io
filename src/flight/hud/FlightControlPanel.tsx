@@ -38,6 +38,7 @@ import {
   KEYBOARD_STICK_MODES,
   type KeyboardStickSettings,
 } from "../input/keyboardStickSettings";
+import type { OrbitInvertSettings } from "../input/orbitInvertSettings";
 
 type FlightPanelTab = "weather" | "aircraft" | "debug" | "settings";
 
@@ -92,6 +93,8 @@ export interface FlightControlPanelSnapshot {
   modelTriangles: number | null;
   modelError: string | null;
   keyboardStick: KeyboardStickSettings;
+  orbitInvert: OrbitInvertSettings;
+  arcadeGroundLaunches: boolean;
 }
 
 export interface FlightControlPanelOptions {
@@ -109,6 +112,8 @@ export interface FlightControlPanelOptions {
   onFlightTerrainRequirementChange(errorTarget: number): void;
   onTerrainDetailOverrideChange(enabled: boolean): void;
   onKeyboardStickSettingsChange(settings: KeyboardStickSettings): void;
+  onOrbitInvertChange(settings: OrbitInvertSettings): void;
+  onArcadeGroundLaunchesChange(enabled: boolean): void;
 }
 
 export interface FlightControlPanelHandle {
@@ -403,6 +408,39 @@ function FlightPerformancePanel() {
 function formatTerrainDetailTarget(target: number): string {
   const exponent = Math.log2(target).toFixed(Number.isInteger(Math.log2(target)) ? 0 : 2);
   return `2^${exponent} = ${target.toLocaleString()} px`;
+}
+
+function OrbitInvertSettingsPanel({
+  snapshot,
+  onOrbitInvertChange,
+}: Pick<FlightControlPanelProps, "snapshot" | "onOrbitInvertChange">) {
+  const settings = snapshot.orbitInvert;
+  return (
+    <fieldset className="flight-panel__fieldset">
+      <legend>Camera orbit</legend>
+      <label className="flight-panel__field flight-panel__field--inline">
+        <input
+          type="checkbox"
+          aria-label="Invert orbit yaw"
+          checked={settings.invertYaw}
+          onChange={(event) => onOrbitInvertChange({ ...settings, invertYaw: event.target.checked })}
+        />
+        <span>Invert yaw (left / right)</span>
+      </label>
+      <label className="flight-panel__field flight-panel__field--inline">
+        <input
+          type="checkbox"
+          aria-label="Invert orbit pitch"
+          checked={settings.invertPitch}
+          onChange={(event) => onOrbitInvertChange({ ...settings, invertPitch: event.target.checked })}
+        />
+        <span>Invert pitch (up / down)</span>
+      </label>
+      <p className="flight-panel__hint">
+        Two-finger swipe and right-drag orbit. Use these if the camera feels backwards on your device.
+      </p>
+    </fieldset>
+  );
 }
 
 function SettingSlider({
@@ -777,6 +815,17 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
           {tabId === "weather" ? <WeatherPanel initialWeather={props.initialWeather} onWeatherChange={props.onWeatherChange} />
             : tabId === "aircraft" ? <AircraftPanel {...props} />
               : tabId === "settings" ? <>
+                <OrbitInvertSettingsPanel {...props} />
+                <fieldset className="flight-panel__content">
+                  <legend>Ground impacts</legend>
+                  <label className="flight-panel__checkbox">
+                    <input type="checkbox" aria-label="Arcade ground launches"
+                      checked={props.snapshot.arcadeGroundLaunches}
+                      onChange={(event) => props.onArcadeGroundLaunchesChange(event.target.checked)} />
+                    Arcade ground launches
+                  </label>
+                  <p className="flight-panel__hint">Exaggerated bounces for fun. With this off, deep ground impacts stop the flight before the gear springs can launch it.</p>
+                </fieldset>
                 <KeyboardStickSettingsPanel {...props} />
                 <WorldDetailSettings {...props} />
                 <MapCachePanel />

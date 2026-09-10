@@ -120,7 +120,8 @@ describe("displayed terrain contact", () => {
     expect(sdk.getPropertyValue("position/terrain-elevation-asl-ft") * 0.3048).toBeCloseTo(32.6, 4);
   });
   it("does not advance physics through missing terrain or accumulate a catch-up jump", () => {
-    const sdk = { getPropertyValue: vi.fn((key: string) => key === "position/lat-geod-deg" ? 34 : 100), setPropertyValue: vi.fn(), run: vi.fn(() => true) };
+    const sdk = { getPropertyValue: vi.fn((key: string) => key === "position/lat-geod-deg" ? 34
+      : key === "position/h-sl-ft" ? 1000 : 0), setPropertyValue: vi.fn(), run: vi.fn(() => true) };
     const loop = createFixedStepPhysicsLoop(sdk as unknown as JSBSimSdk);
     const surface: SurfaceQuery = { raycast: () => null, sample: () => null };
     for (let i = 0; i < 10; i++) loop.update(0.1, () => syncTerrainContact(sdk as unknown as JSBSimSdk, surface));

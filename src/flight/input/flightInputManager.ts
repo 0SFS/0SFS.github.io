@@ -78,11 +78,16 @@ export interface FlightInputManager {
   resetControls(throttle: number): void;
   setThrottle(value: number): void;
   setPitchTrim(value: number): void;
+  setFlaps(value: number): void;
+  setRudder(value: number): void;
   setStick(aileron: number, elevator: number): void;
   getKeyboardStickSettings(): KeyboardStickSettings;
   setKeyboardStickSettings(settings: KeyboardStickSettings): void;
   setPaused(paused: boolean): void;
   isPaused(): boolean;
+  /** Landing gear lever, 1 down and 0 up. A fixed-gear airframe ignores it. */
+  getGearDownNorm(): number;
+  setGearDown(down: boolean): void;
 }
 
 export function createFlightInputManager(options: {
@@ -105,9 +110,11 @@ export function createFlightInputManager(options: {
   };
   let throttleTarget = INITIAL_THROTTLE;
   let paused = false;
+  let gearDown = true;
   let remoteOwned = false;
   let protectGamepad = false;
   let stickOverride: Pick<ControlSurfaceState, "aileron" | "elevator"> | null = null;
+  let rudderOverride: number | null = null;
   let gamepadBaseline: GamepadSnapshot | null = null;
   let previousGamepad: GamepadSnapshot | null = null;
   const enabledAxes = new Set<number>();
@@ -259,6 +266,16 @@ export function createFlightInputManager(options: {
           event.preventDefault();
           return;
         }
+        // A latching switch, handled like the pause key rather than through
+        // KEY_BINDINGS: it is not an axis, nothing smooths it, and it is not
+        // part of the control record the phone controller owns - so a remote
+        // pilot holding the stick does not stop the gear being raised here.
+        if (event.code === "KeyL") {
+          if (event.repeat) return;
+          gearDown = !gearDown;
+          event.preventDefault();
+          return;
+        }
         if (event.code in KEY_BINDINGS) {
           // Clearing held keys during adoption must also discard repeats from
           // that old keypress; a fresh press still takes over immediately.
@@ -326,7 +343,10 @@ export function createFlightInputManager(options: {
       }
 
       if (gamepadAxes.rudder !== null) {
+        rudderOverride = null;
         rudderAxis = createKeyboardAxisState(smoothToward(rudderAxis.position, gamepadAxes.rudder, dt));
+      } else if (rudderOverride !== null) {
+        rudderAxis = createKeyboardAxisState(rudderOverride);
       } else {
         const dirs = readKeyDirections();
         const rates = keyboardSettings.mode === "assist"
@@ -345,7 +365,11 @@ export function createFlightInputManager(options: {
         : gamepadAxes.elevator !== null
           ? elevatorAxis.position
           : outputAxis(elevatorAxis);
-      const rudder = gamepadAxes.rudder !== null ? rudderAxis.position : outputAxis(rudderAxis);
+      const rudder = rudderOverride !== null
+        ? rudderOverride
+        : gamepadAxes.rudder !== null
+          ? rudderAxis.position
+          : outputAxis(rudderAxis);
 
       smoothed = {
         elevator,
@@ -361,11 +385,12 @@ export function createFlightInputManager(options: {
     },
     apply(sdk: JSBSimSdk, controls: ControlSurfaceState): void {
       if (paused) return;
-      applyFlightControls(sdk, controls);
+      applyFlightControls(sdk, controls, gearDown ? 1 : 0);
     },
     adoptControls(controls: ControlSurfaceState): void {
       keysDown.clear();
       stickOverride = null;
+      rudderOverride = null;
       throttleTarget = controls.throttle;
       smoothed = { ...controls, elevator: 0, aileron: 0, rudder: 0, brake: 0 };
       resetKeyboardAxes();
@@ -379,7 +404,7 @@ export function createFlightInputManager(options: {
       captureGamepadBaseline();
     },
     hasActiveFlightInput(): boolean {
-      if (stickOverride !== null || keysDown.size > 0 || [smoothed.elevator, smoothed.aileron, smoothed.rudder, smoothed.brake]
+      if (stickOverride !== null || rudderOverride !== null || keysDown.size > 0 || [smoothed.elevator, smoothed.aileron, smoothed.rudder, smoothed.brake]
         .some((value) => Math.abs(value) > TAKEOVER_DEADBAND)) return true;
       const pad = readGamepad();
       if (!pad) return false;
@@ -397,6 +422,7 @@ export function createFlightInputManager(options: {
     resetControls(throttle: number): void {
       keysDown.clear();
       stickOverride = null;
+      rudderOverride = null;
       throttleTarget = Math.min(1, Math.max(0, throttle));
       smoothed = { elevator: 0, aileron: 0, rudder: 0, throttle: throttleTarget, pitchTrim: 0, flaps: 0, brake: 0 };
       resetKeyboardAxes();
@@ -412,6 +438,24 @@ export function createFlightInputManager(options: {
       options.onLocalInput?.();
       if (remoteOwned) return;
       smoothed.pitchTrim = Math.min(1, Math.max(-1, value));
+    },
+    setFlaps(value: number): void {
+      options.onLocalInput?.();
+      if (remoteOwned) return;
+      smoothed.flaps = Math.min(1, Math.max(0, value));
+    },
+    setRudder(value: number): void {
+      options.onLocalInput?.();
+      if (remoteOwned) return;
+      const clamped = Math.min(1, Math.max(-1, value));
+      rudderOverride = Math.abs(clamped) < 0.001 ? null : clamped;
+      if (rudderOverride !== null) {
+        smoothed.rudder = rudderOverride;
+        rudderAxis = createKeyboardAxisState(rudderOverride);
+      } else {
+        rudderAxis = createKeyboardAxisState(0);
+        smoothed.rudder = 0;
+      }
     },
     setStick(aileron: number, elevator: number): void {
       options.onLocalInput?.();
@@ -444,6 +488,12 @@ export function createFlightInputManager(options: {
     setPaused,
     isPaused(): boolean {
       return paused;
+    },
+    getGearDownNorm(): number {
+      return gearDown ? 1 : 0;
+    },
+    setGearDown(down: boolean): void {
+      gearDown = down;
     },
   };
 }

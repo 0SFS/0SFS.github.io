@@ -6,11 +6,15 @@ const ATTITUDE_HALF = 96;
 export interface FlightHudOptions {
   onThrottleChange(value: number): void;
   onPitchTrimChange(value: number): void;
+  onFlapsChange(value: number): void;
+  onRudderChange(value: number): void;
   onStickChange(aileron: number, elevator: number): void;
 }
 
 export interface FlightHudControls {
   pitchTrim: number;
+  flaps: number;
+  rudder: number;
   aileron: number;
   elevator: number;
 }
@@ -159,17 +163,29 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
           <span class="flight-hud__unit">fpm</span>
         </div>
       </div>
-      <div class="flight-hud__controls" aria-label="Engine and trim controls">
-        <label class="flight-hud__slider-control">
-          <span>THR</span>
-          <input data-control="throttle" type="range" min="0" max="1" step="0.01" value="0.1" aria-label="Throttle" />
-          <output data-output="throttle">10%</output>
+      <div class="flight-hud__controls" aria-label="Engine and control surfaces">
+        <label class="flight-hud__yaw-control">
+          <span>YAW</span>
+          <input data-control="rudder" type="range" min="-1" max="1" step="0.01" value="0" aria-label="Yaw rudder. Drag left or right; releases to center." />
+          <output data-output="rudder">0%</output>
         </label>
-        <label class="flight-hud__slider-control">
-          <span>TRIM</span>
-          <input data-control="pitch-trim" type="range" min="-1" max="1" step="0.01" value="0" aria-label="Pitch trim" />
-          <output data-output="pitch-trim">0%</output>
-        </label>
+        <div class="flight-hud__levers">
+          <label class="flight-hud__slider-control">
+            <span>THR</span>
+            <input data-control="throttle" type="range" min="0" max="1" step="0.01" value="0.1" aria-label="Throttle" />
+            <output data-output="throttle">10%</output>
+          </label>
+          <label class="flight-hud__slider-control">
+            <span>TRIM</span>
+            <input data-control="pitch-trim" type="range" min="-1" max="1" step="0.01" value="0" aria-label="Pitch trim" />
+            <output data-output="pitch-trim">0%</output>
+          </label>
+          <label class="flight-hud__slider-control">
+            <span>FLAPS</span>
+            <input data-control="flaps" type="range" min="0" max="1" step="0.01" value="0" aria-label="Flaps" />
+            <output data-output="flaps">0%</output>
+          </label>
+        </div>
       </div>
     </div>
   `;
@@ -181,10 +197,16 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   const vsEl = root.querySelector<HTMLElement>('[data-metric="vs"]');
   const throttleInput = root.querySelector<HTMLInputElement>('[data-control="throttle"]');
   const trimInput = root.querySelector<HTMLInputElement>('[data-control="pitch-trim"]');
+  const flapsInput = root.querySelector<HTMLInputElement>('[data-control="flaps"]');
+  const rudderInput = root.querySelector<HTMLInputElement>('[data-control="rudder"]');
   const throttleOutput = root.querySelector<HTMLOutputElement>('[data-output="throttle"]');
   const trimOutput = root.querySelector<HTMLOutputElement>('[data-output="pitch-trim"]');
+  const flapsOutput = root.querySelector<HTMLOutputElement>('[data-output="flaps"]');
+  const rudderOutput = root.querySelector<HTMLOutputElement>('[data-output="rudder"]');
 
-  if (!canvas || !iasEl || !altEl || !hdgEl || !vsEl || !throttleInput || !trimInput || !throttleOutput || !trimOutput) {
+  if (!canvas || !iasEl || !altEl || !hdgEl || !vsEl
+    || !throttleInput || !trimInput || !flapsInput || !rudderInput
+    || !throttleOutput || !trimOutput || !flapsOutput || !rudderOutput) {
     throw new Error("Flight HUD markup failed to initialize.");
   }
 
@@ -193,10 +215,30 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
     throw new Error("Flight HUD canvas context unavailable.");
   }
 
+  let rudderDragging = false;
   const onThrottleInput = (): void => options.onThrottleChange(Number(throttleInput.value));
   const onTrimInput = (): void => options.onPitchTrimChange(Number(trimInput.value));
+  const onFlapsInput = (): void => options.onFlapsChange(Number(flapsInput.value));
+  const onRudderInput = (): void => options.onRudderChange(Number(rudderInput.value));
+  const releaseRudder = (): void => {
+    if (!rudderDragging) return;
+    rudderDragging = false;
+    rudderInput.value = "0";
+    rudderOutput.value = "0%";
+    options.onRudderChange(0);
+  };
+  const onRudderPointerDown = (): void => { rudderDragging = true; };
+  const onRudderPointerUp = (): void => releaseRudder();
+  const onRudderBlur = (): void => releaseRudder();
   throttleInput.addEventListener("input", onThrottleInput);
   trimInput.addEventListener("input", onTrimInput);
+  flapsInput.addEventListener("input", onFlapsInput);
+  rudderInput.addEventListener("input", onRudderInput);
+  rudderInput.addEventListener("pointerdown", onRudderPointerDown);
+  rudderInput.addEventListener("pointerup", onRudderPointerUp);
+  rudderInput.addEventListener("pointercancel", onRudderPointerUp);
+  rudderInput.addEventListener("lostpointercapture", onRudderPointerUp);
+  rudderInput.addEventListener("blur", onRudderBlur);
 
   let stickX = 0;
   let stickY = 0;
@@ -318,13 +360,25 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
       vsEl.textContent = `${vsSign}${vsFpm.toString().padStart(4, " ")}`;
       throttleInput.value = String(state.throttleNorm);
       trimInput.value = String(controls.pitchTrim);
+      flapsInput.value = String(controls.flaps);
+      if (!rudderDragging) rudderInput.value = String(controls.rudder);
       throttleOutput.value = `${Math.round(state.throttleNorm * 100)}%`;
       trimOutput.value = `${Math.round(controls.pitchTrim * 100)}%`;
+      flapsOutput.value = `${Math.round(controls.flaps * 100)}%`;
+      rudderOutput.value = `${Math.round((rudderDragging ? Number(rudderInput.value) : controls.rudder) * 100)}%`;
     },
     destroy(): void {
       releaseStick();
+      releaseRudder();
       throttleInput.removeEventListener("input", onThrottleInput);
       trimInput.removeEventListener("input", onTrimInput);
+      flapsInput.removeEventListener("input", onFlapsInput);
+      rudderInput.removeEventListener("input", onRudderInput);
+      rudderInput.removeEventListener("pointerdown", onRudderPointerDown);
+      rudderInput.removeEventListener("pointerup", onRudderPointerUp);
+      rudderInput.removeEventListener("pointercancel", onRudderPointerUp);
+      rudderInput.removeEventListener("lostpointercapture", onRudderPointerUp);
+      rudderInput.removeEventListener("blur", onRudderBlur);
       canvas.removeEventListener("pointerdown", onPointerDown);
       canvas.removeEventListener("pointermove", onPointerMove);
       canvas.removeEventListener("pointerup", onPointerEnd);
