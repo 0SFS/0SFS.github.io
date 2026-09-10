@@ -1,4 +1,4 @@
-import{ms as e}from"./resolveMapRuntimeConfig-CAEM5VAl.js";var t=`selectionPixelShader`,n=`#ifdef INSTANCES
+import{ms as e}from"./resolveMapRuntimeConfig-BODiAhoi.js";var t=`selectionPixelShader`,n=`#ifdef INSTANCES
 flat varying vSelectionId: f32;
 #else
 uniform selectionId: f32;
