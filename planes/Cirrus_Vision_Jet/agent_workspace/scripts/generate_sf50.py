@@ -240,15 +240,29 @@ def post_half(y):
 # Fractions of the pane half-length to put a station at. The +/-1.0 pair sits
 # just outside the pane and closes it off; the rest sample its outline.
 PANE_COLUMN_FRACTIONS = {
-    # The pane's outline is sampled at these fractions of its half-length.
-    # Each column costs FOUR triangles, not two: one on the pane and one in
-    # the strip between the pane and the ring, top and bottom. Measured
-    # against the super-ellipse it is cut from, nine columns hold the door
-    # window's outline to 4.3 mm and the two aft ones to 3.5 mm - finer than
-    # the 11-sided ring the pane is cut into, so more columns buy nothing.
-    # Twelve columns cost twelve triangles a pane for 1.8 mm of outline.
-    'fine': (0.99, 0.90, 0.72, 0.42, 0.0, -0.42, -0.72, -0.90, -0.99),
-    'coarse': (0.97, 0.80, 0.45, 0.0, -0.45, -0.80, -0.97),
+    # The pane's outline is sampled at these fractions of its half-length, and
+    # a column is the most expensive vertex in the model: FOUR triangles, not
+    # two - one on the pane and one in the strip between the pane and the ring,
+    # top and bottom. It also decides how well those strips tile. The ring line
+    # under the window row has three vertices across a pane and the pane has
+    # these, so the strip between them can only fan, and the further apart the
+    # two counts are the longer the arms.
+    #
+    # So the count is measured, not chosen. Against the super-ellipse each pane
+    # is cut from, sampled over the same range so the blunt end is not doing
+    # the work:
+    #
+    #     columns   door     window 3   window 4   triangles per pane side
+    #        12     1.8 mm    1.7 mm     1.4 mm      52
+    #         9     4.3       4.3        3.5         40
+    #         7     6.9       6.2        5.0         32
+    #         5    18.4      16.4       13.3         24
+    #
+    # The drawing these windows were read off is good to about 10 mm, so seven
+    # is where the outline stops being the limiting error and starts being free
+    # accuracy nobody can see - and it is two arms shorter on every fan.
+    'fine': (0.97, 0.80, 0.45, 0.0, -0.45, -0.80, -0.97),
+    'coarse': (0.95, 0.70, 0.0, -0.70, -0.95),
 }
 # A column this close to a station the pane's row is already split at is moved
 # onto it instead of being kept beside it. Two vertices 5 mm apart in Y would
@@ -260,6 +274,15 @@ PANE_COLUMN_SNAP = 0.10
 # and the strip closing that block was eight splinters up to 860 mm long
 # fanning from a single station vertex - the "sun" the wireframe showed.
 PANE_MARGIN = 0.06
+# ...and no gap inside that block may hold more than this many pane columns.
+# The strip between the pane and the ring line has the pane's columns on one
+# side and the block's stations on the other, so wherever one gap faces
+# several columns it can only fan, and the strip below the aft window is
+# 0.37 m deep - a fan there is 300 mm arms. One station per gap that faces
+# three or more columns costs eight triangles and halves every fan; it is the
+# only place in this model where triangles are spent to improve SHAPE of the
+# tessellation rather than shape of the aeroplane.
+PANE_COLUMNS_PER_GAP = 2
 
 
 def _trace(pts, y, outside):
@@ -685,6 +708,31 @@ def fuselage_stations():
             if st:
                 extra.append(st)
     sts = sorted(base + extra, key=lambda s: -s[0])
+    # Ribs: split any gap inside a pane's block that faces too many of the
+    # pane's own columns, so the strip closing the block is ribbed rather than
+    # fanned. Solved against the columns themselves, not a length in metres,
+    # because it is the ratio of the two chains that decides the fan.
+    for yc, a, _zc, _b, _n in CABIN_WINDOWS:
+        cols = [yc + a * f for f in PANE_COLUMN_FRACTIONS[P["pane_detail"]]]
+        for _ in range(3):
+            ys = [st[0] for st in sts]
+            ia = max([i for i in range(len(ys)) if ys[i] >= yc + a - 1e-9]
+                     or [0])
+            ib = min([i for i in range(len(ys)) if ys[i] <= yc - a + 1e-9]
+                     or [len(ys) - 1])
+            add = []
+            for i in range(ia, ib):
+                lo, hi = ys[i + 1], ys[i]
+                if sum(1 for c in cols if lo < c < hi) > PANE_COLUMNS_PER_GAP:
+                    add.append((lo + hi) / 2.0)
+            if not add:
+                break
+            for y in add:
+                if all(abs(y - st[0]) > 0.04 for st in sts):
+                    st = interpolate_station(y, base)
+                    if st:
+                        extra.append(st)
+            sts = sorted(base + extra, key=lambda s: -s[0])
     # A margin station within 0.04 m of one the shape already asked for is
     # dropped, so check rather than assume: two panes sharing a station gap
     # would each cut the same row and the second would find it already gone.
@@ -798,33 +846,25 @@ def build_fuselage():
         f = 0.0 if abs(dz) < 1e-9 else (z - lo[2]) / dz
         return lerp3(lo, hi, min(max(f, 0.0), 1.0))
 
-    def zip_chains(oc, oy, ic, iy, glass=False):
-        """Tile the strip between two open chains that both run fore to aft.
+    def strip(oc, ic):
+        """The strip between two open chains, as ONE polygon.
 
-        Which chain to advance is decided by Y - by where the next vertex
-        actually is - so a vertex only ever joins the two vertices beside it
-        and every face is as square as the two chains allow. The pane strips
-        were tiled by index fraction instead, which pairs the FIRST of six
-        station vertices with the first of twenty-four pane vertices however
-        far apart they lie: the aft window came back as a sun, eight splinters
-        up to 860 mm long fanning from one station vertex across a pane 360 mm
-        long. Index fraction is still the right rule for two closed loops with
-        no common parameter; these two have Y.
+        Both chains run fore to aft, so oc + reversed(ic) is a simple closed
+        loop and the strip is an n-gon - which is handed to the triangulator
+        with the rest of the mesh. That matters because a strip whose two
+        chains have very different vertex counts has no good ZIP: three station
+        vertices against nine pane columns forces a fan from one apex whichever
+        rule picks the diagonals, and the strip below a pane is half a metre
+        deep, so those arms came out 300-600 mm long. An n-gon costs exactly
+        the same triangles - a polygon of V vertices is V-2 either way - and
+        lets BEAUTY choose the diagonals instead of a walk that has no choice.
+
+        Two rules the walk did have to get right, and the polygon inherits:
+        both chains run the same way (or the loop crosses itself), and the
+        pane columns include every station the block crosses (or the strip's
+        two sides disagree about where the block's corners are).
         """
-        p = q = 0
-        while p + 1 < len(oc) or q + 1 < len(ic):
-            no = oy[p + 1] if p + 1 < len(oc) else -1e9
-            ni = iy[q + 1] if q + 1 < len(ic) else -1e9
-            if no > ni + 1e-9:               # the outer vertex comes first
-                emit((oc[p], ic[q], oc[p + 1]), glass)
-                p += 1
-            elif ni > no + 1e-9:
-                emit((oc[p], ic[q], ic[q + 1]), glass)
-                q += 1
-            else:                            # they are the same station
-                emit((oc[p], ic[q], ic[q + 1], oc[p + 1]), glass)
-                p += 1
-                q += 1
+        emit(list(oc) + list(reversed(ic)), False)
 
     consumed = {j: set() for j in range(n)}
 
@@ -868,15 +908,12 @@ def build_fuselage():
             hi_edge.append(add(row_point(y, zc + h, j)))
 
         # Below the pane and above it are two separate strips, each between a
-        # ring line and the pane edge facing it, and each tiled along Y. The
-        # two ends of the block close with one face apiece.
+        # ring line and the pane edge facing it. The two ends of the block
+        # close with one face apiece.
         lo_line, hi_line = (j, k) if rings[ia][j][2] < rings[ia][k][2] \
             else (k, j)
-        sy = [ys[i] for i in range(ia, ib + 1)]
-        zip_chains([i * n + lo_line for i in range(ia, ib + 1)], sy,
-                   lo_edge, cols)
-        zip_chains([i * n + hi_line for i in range(ia, ib + 1)], sy,
-                   hi_edge, cols)
+        strip([i * n + lo_line for i in range(ia, ib + 1)], lo_edge)
+        strip([i * n + hi_line for i in range(ia, ib + 1)], hi_edge)
         emit((ia * n + lo_line, ia * n + hi_line, hi_edge[0], lo_edge[0]),
              False)
         emit((ib * n + lo_line, ib * n + hi_line, hi_edge[-1], lo_edge[-1]),
