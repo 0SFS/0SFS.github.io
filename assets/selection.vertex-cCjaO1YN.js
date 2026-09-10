@@ -1,4 +1,4 @@
-import{ms as e}from"./resolveMapRuntimeConfig-BVYC4xBU.js";var t=`selectionVertexShader`,n=`attribute vec3 position;
+import{ms as e}from"./resolveMapRuntimeConfig-Dk1W1TKO.js";var t=`selectionVertexShader`,n=`attribute vec3 position;
 #ifdef INSTANCES
 attribute float instanceSelectionId;
 #endif
