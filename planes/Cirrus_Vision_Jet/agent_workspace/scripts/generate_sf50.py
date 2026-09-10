@@ -1586,7 +1586,7 @@ def build_wing(side):
         # neighbours and the dissolve pass was already taking it back out.
         lo, hi = WING_BAY_X
         stations = [x for x in stations if not (lo < x < hi)]
-        stations = sorted(set(stations) | set(WING_BAY_X))
+        stations = sorted(set(stations) | set(WING_BAY_X) | {WELL_JOIN})
     rings = []
     for x in stations:
         le_y, chord, z = wing_geom(x)
@@ -1603,66 +1603,67 @@ def build_wing(side):
     verts, faces = loft(rings, cap_start=False, cap_end=P["tip_cap"])
     if P["bays"]:
         n = len(rings[0])
-        row, k = WING_BAY_ROW, (WING_BAY_ROW + 1) % len(rings[0])
-        ia = stations.index(WING_BAY_X[0])
-        ij = stations.index(WELL_JOIN)
+        row = WING_BAY_ROW
+        k = (row + 1) % n
+        ia = stations.index(WING_BAY_X[0])       # inboard end of the well
+        ij = stations.index(WELL_JOIN)           # where circle meets rectangle
+        ib = stations.index(WING_BAY_X[1])       # outboard end of the leg bay
+
         # loft() emits segment i, row j at index i * n + j, caps after. The
         # OUTBOARD segment loses its whole face - that is the rectangular leg
         # bay. The INBOARD one keeps a C of skin around the circular well.
-        drop = {ij * n + row, ia * n + row}
+        drop = {ia * n + row, ij * n + row}
 
-        def P_(i, t):
-            """Surface point at station index i, fraction t across the row."""
-            a, b = Vector(rings[i][row]), Vector(rings[i][k])
-            return a + (b - a) * t
-
-        # The circle lives in (x, t). `t` is a fraction of the row, so the
-        # radius has to be converted into it or the well comes out elliptical.
+        # The circle lives in (station, t) where t is a fraction ACROSS the row,
+        # so the radius has to be converted into t or the well comes out
+        # elliptical - the row is 0.68 m deep and the bay 1.18 m wide.
         row_len = (Vector(rings[ij][k]) - Vector(rings[ij][row])).length
-        cx, ct = sgn * MAIN_STOWED[0], 0.5
         rt = WELL_R / row_len
-        rx = WELL_R
-        # Where the circle crosses the join station, and the arc between them,
-        # walked round the INBOARD side.
-        phi0 = math.acos(max(-1.0, min(1.0, (WELL_JOIN - abs(cx)) / rx)))
-        arc = [(ct + rt * math.sin(phi0 - 2 * math.pi * f * (2 * math.pi - 2 * phi0)
-                                   / (2 * math.pi)))
-               for f in ()]                      # placeholder, replaced below
+        phi0 = math.acos(max(-1.0, min(1.0,
+                                       (WELL_JOIN - MAIN_STOWED[0]) / WELL_R)))
+        # phi0 -> 2*pi - phi0 walks from the upper crossing of the join station
+        # round the INBOARD side to the lower one.
         arc = []
         for i in range(WELL_ARC):
-            f = i / (WELL_ARC - 1)
-            phi = phi0 + f * (2 * math.pi - 2 * phi0)
-            arc.append((abs(cx) + rx * math.cos(phi), ct + rt * math.sin(phi)))
+            phi = phi0 + (i / (WELL_ARC - 1)) * (2 * math.pi - 2 * phi0)
+            arc.append((MAIN_STOWED[0] + WELL_R * math.cos(phi),
+                        0.5 + rt * math.sin(phi)))
 
         def surf(xx, tt):
-            """Point at absolute station xx, fraction tt - the loft is ruled,
-            so interpolating between the bay's own two stations is exact."""
+            """Point at absolute station xx, fraction tt across the row.
+
+            The loft is ruled between its stations, so interpolating between
+            the two the bay is bounded by lands exactly on the surface the wing
+            already had - no crease, and nothing for the dissolve to argue with.
+            """
             f = (xx - WING_BAY_X[0]) / (WELL_JOIN - WING_BAY_X[0])
-            a, b = P_(ia, tt), P_(ij, tt)
+            a = Vector(rings[ia][row]) + (Vector(rings[ia][k])
+                                          - Vector(rings[ia][row])) * tt
+            b = Vector(rings[ij][row]) + (Vector(rings[ij][k])
+                                          - Vector(rings[ij][row])) * tt
             return tuple(a + (b - a) * f)
 
         def add(p):
             verts.append(p)
             return len(verts) - 1
 
-        # One n-gon: the quad's three closed sides, then up the join station to
-        # the arc, round it, and back. The bite is on the boundary, so the
-        # region is simply connected and the triangulator can have it whole.
-        loop = [ij * n + row, ia * n + row, ia * n + k, ij * n + k]
-        loop += [add(surf(WELL_JOIN, t)) for t in (arc[-1][1],)]
-        loop += [add(surf(*pt)) for pt in reversed(arc[1:-1])]
-        loop += [add(surf(WELL_JOIN, arc[0][1]))]
-        faces = [f for i, f in enumerate(faces) if i not in drop] + [loop]
+        arc3 = [surf(*pt) for pt in arc]
+        arc_i = [add(p) for p in arc3]
+        # ONE n-gon: three closed sides of the inboard quad, then the arc. The
+        # bite is on the boundary rather than in the middle, so the region is
+        # simply connected and the triangulator can have it whole. Both arc ends
+        # sit on the join station's edge, which the dropped face leaves open -
+        # so they split nothing and there is no T-junction.
+        faces = [f for i, f in enumerate(faces) if i not in drop]
+        faces.append([ia * n + row, ia * n + k, ij * n + k]
+                     + arc_i + [ij * n + row])
 
-        # The pocket rim is the whole hole: the rectangle, then the arc.
-        rect = [verts[ij * n + row], verts[ij * n + k],
-                verts[(ij + 1) * n + k], verts[(ij + 1) * n + row]]
+        # The pocket rim is the whole hole: round the arc, then the rectangle.
         WING_BAY_MOUTHS[side] = dict(
-            rect=rect,
-            rim=[surf(WELL_JOIN, arc[0][1])]
-                + [surf(*pt) for pt in arc[1:-1]]
-                + [surf(WELL_JOIN, arc[-1][1])]
-                + [rect[1], rect[2], rect[3], rect[0]])
+            rect=[verts[ij * n + row], verts[ij * n + k],
+                  verts[ib * n + k], verts[ib * n + row]],
+            rim=arc3 + [verts[ij * n + row], verts[ib * n + row],
+                        verts[ib * n + k], verts[ij * n + k]])
     return make(f"Wing_{side}", verts, faces, M_PAINT)
 
 
@@ -2032,34 +2033,25 @@ def build_wing_bay(side):
     if not mouth:
         return []
     sgn = 1.0 if side == "Right" else -1.0
-    cx = sum(p[0] for p in mouth) / len(mouth)
-    cy = sum(p[1] for p in mouth) / len(mouth)
+    rim = mouth["rim"]
+    cx = sum(p[0] for p in rim) / len(rim)
+    cy = sum(p[1] for p in rim) / len(rim)
     cap = [(cx + (p[0] - cx) * WING_BAY_TAPER, cy + (p[1] - cy) * WING_BAY_TAPER,
-            p[2] + WING_BAY_DEPTH) for p in mouth]
-    verts, faces = loft([list(mouth), cap], cap_start=False, cap_end=True)
+            p[2] + WING_BAY_DEPTH) for p in rim]
+    verts, faces = loft([list(rim), cap], cap_start=False, cap_end=True)
     bay = make(f"WingBay_{side}", verts, faces, M_DARK, smooth_angle=0.0,
                flip_normals=True)
 
-    # The door is only the OUTBOARD part of the mouth: the wheel end stays open.
-    # Its corners are interpolated along the mouth's two spanwise edges, which
-    # is exact - a loft is ruled between its stations, so a point part way along
-    # one of those edges is on the surface the wing already had.
-    lo, hi = WING_BAY_X
-    def at(t, a, b):
-        return tuple(a[c] + (b[c] - a[c]) * t for c in range(3))
-    t0 = (WING_DOOR_X[0] - lo) / (hi - lo)
-    t1 = (WING_DOOR_X[1] - lo) / (hi - lo)
-    # mouth is (A, j), (A, j+1), (B, j+1), (B, j); the spanwise edges are
-    # 0->3 and 1->2, so walking t along both gives the sub-quad's corners.
-    door_quad = [at(t0, mouth[0], mouth[3]), at(t0, mouth[1], mouth[2]),
-                 at(t1, mouth[1], mouth[2]), at(t1, mouth[0], mouth[3])]
-    pts = [(p[0], p[1], p[2] - BAY_DOOR_LIFT) for p in door_quad]
+    # The door is the RECTANGLE, and only that: the wheel end of the mouth is
+    # the circular well and nothing closes over it - the retracted tyre is
+    # visible from outside, which is what the belly photograph shows.
+    pts = [(p[0], p[1], p[2] - BAY_DOOR_LIFT) for p in mouth["rect"]]
 
-    # `loft` emits the mouth as (station A, row j), (A, j+1), (B, j+1), (B, j),
-    # so its two FORE-AFT edges are (0,1) and (2,3) - each at one station, one
-    # at each end - and the spanwise ones are (1,2) and (3,0). A wing gear door
-    # hinges on a fore-aft edge and falls; hinging it spanwise, which is what
-    # taking "the other pair" gives, swings it forward like a speed brake.
+    # The rectangle is (join, row j), (join, j+1), (outboard, j+1),
+    # (outboard, j), so its two FORE-AFT edges are (0,1) and (2,3) - one at each
+    # end - and the spanwise ones are (1,2) and (3,0). A wing gear door hinges
+    # on a fore-aft edge and falls; hinging it spanwise, which is what taking
+    # "the other pair" gives, swings it forward like a speed brake.
     edges = ((pts[0], pts[1]), (pts[2], pts[3]))
     out_i = 0 if abs(pts[0][0]) > abs(pts[2][0]) else 1
     hinge_edge = edges[out_i]

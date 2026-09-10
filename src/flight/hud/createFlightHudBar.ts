@@ -37,6 +37,9 @@ export interface FlightHudBarOptions {
   onTerrainDetailChange(errorTarget: number | null): void;
   onSettingsClick(): void;
   onPhoneControlClick?(): void;
+  onDebugClick(): void;
+  /** Host for the top-right FPS chip so it can sit under the window chrome. */
+  fpsHost?: HTMLElement;
 }
 
 export interface FlightHudBarHandle {
@@ -162,7 +165,6 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
         optionDataAttribute: "mapSource",
         options: [],
       },
-      { kind: "slot", id: "flightFps", className: "hud-chip hud-status-text", ariaLive: "polite", ariaLabel: "Frame rate", title: "Rendered frames per second" },
       { kind: "button", id: "flightSettingsButton", title: "Open flight settings", ariaLabel: "Open flight settings", className: "settings-button", text: "⚙" },
       { kind: "slot", id: "flightShellStatus", className: "hud-chip hud-status-text", ariaLive: "polite", ariaLabel: "Flight status" },
     ],
@@ -176,13 +178,23 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
   const rendererMenu = hudBar.getElement("flightRendererMenu");
   const mapButton = hudBar.getElement<HTMLButtonElement>("flightMapSourceButton");
   const mapMenu = hudBar.getElement("flightMapSourceMenu");
-  const fpsElement = hudBar.getElement("flightFps");
   const settingsButton = hudBar.getElement<HTMLButtonElement>("flightSettingsButton");
   const statusElement = hudBar.getElement("flightShellStatus");
-  if (!pauseButton || !rendererButton || !rendererMenu || !mapButton || !mapMenu || !fpsElement || !settingsButton || !statusElement) {
+  if (!pauseButton || !rendererButton || !rendererMenu || !mapButton || !mapMenu || !settingsButton || !statusElement) {
     hudBar.destroy();
     throw new Error("Flight HUD bar failed to mount.");
   }
+
+  const fpsHost = options.fpsHost ?? container;
+  const fpsButton = document.createElement("button");
+  fpsButton.id = "flightFps";
+  fpsButton.type = "button";
+  fpsButton.className = "hud-chip hud-chip-button flight-fps-button";
+  fpsButton.title = "Rendered frames per second. Open Debug.";
+  fpsButton.setAttribute("aria-label", "Frame rate, open Debug");
+  fpsButton.setAttribute("aria-live", "polite");
+  fpsButton.textContent = "FPS —";
+  fpsHost.append(fpsButton);
 
   const threeDBasemaps = createBasemapMenuSection("3d", "3D basemaps");
   threeDBasemaps.content.append(createBasemapMenuOption("mapSource", "google", "Google 3D Tiles"));
@@ -234,6 +246,7 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
   const mapDownloadSpeed = mapButton.querySelector<HTMLElement>(".map-download-speed");
   const mapControl = mapButton.parentElement;
   if (!mapDownloadSpeed || !mapControl) {
+    fpsButton.remove();
     hudBar.destroy();
     throw new Error("Flight HUD map detail control failed to mount.");
   }
@@ -394,6 +407,7 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
   mapMenu.addEventListener("click", onMapMenuClick);
   terrainDetailSlider.addEventListener("input", onTerrainDetailInput);
   settingsButton.addEventListener("click", options.onSettingsClick);
+  fpsButton.addEventListener("click", options.onDebugClick);
   document.addEventListener("pointerdown", onDocumentPointerDown);
   updateMapState(options.runtimeStatus);
   updateTerrainDetailState();
@@ -405,7 +419,7 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
       updateMapState(runtimeStatus);
       updateTerrainDetailState();
       const heading = String(Math.round(headingDegFromRad(state.headingRad))).padStart(3, "0");
-      fpsElement.textContent = nextPaused ? "FPS paused" : fps === null ? "FPS —" : `FPS ${Math.round(fps)}`;
+      fpsButton.textContent = fps === null ? "FPS —" : `FPS ${Math.round(fps)}`;
       statusElement.textContent = `${Math.abs(state.latDeg).toFixed(4)}°${state.latDeg >= 0 ? "N" : "S"} ${Math.abs(state.lonDeg).toFixed(4)}°${state.lonDeg >= 0 ? "E" : "W"} h${heading}°`;
     },
     destroy(): void {
@@ -417,12 +431,14 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
       mapMenu.removeEventListener("click", onMapMenuClick);
       terrainDetailSlider.removeEventListener("input", onTerrainDetailInput);
       settingsButton.removeEventListener("click", options.onSettingsClick);
+      fpsButton.removeEventListener("click", options.onDebugClick);
       document.removeEventListener("pointerdown", onDocumentPointerDown);
       detachDownloadSpeed();
       detachTileStreaming();
       detachRendererActivity();
       inputHud.destroy();
       hudBar.destroy();
+      fpsButton.remove();
     },
   };
 }

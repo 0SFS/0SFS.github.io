@@ -279,6 +279,26 @@
   letter-spacing: 0;
 }
 
+.flight-window-overlay-host {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/*
+ * Sits under the right-side + launcher or tab strip (both 30px at 12px from
+ * the top). z-index 15 is above dock panels (10) and below the add-tab menu (20)
+ * so the chip stays visible on an open panel without covering the menu.
+ */
+.flight-fps-button {
+  position: absolute;
+  top: 48px;
+  right: 12px;
+  z-index: 15;
+  pointer-events: auto;
+  font-variant-numeric: tabular-nums;
+}
+
 .flight-shell-root {
   position: absolute;
   inset: 0;

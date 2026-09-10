@@ -39,7 +39,7 @@ const mocks = vi.hoisted(() => {
       reset: vi.fn(), setPaused: vi.fn(), update: vi.fn(), getLatestState: () => state, getFault: () => null,
     },
     createHud: vi.fn(() => ({ update: vi.fn(), destroy: vi.fn() })),
-    createPanel: vi.fn(() => ({ update: vi.fn(), destroy: vi.fn() })),
+    createPanel: vi.fn(() => ({ update: vi.fn(), openOrSelectTab: vi.fn(), destroy: vi.fn() })),
     createHudBar: vi.fn(() => ({ update: vi.fn(), setPhoneStatus: vi.fn(), destroy: vi.fn() })),
   };
 });

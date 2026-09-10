@@ -601,7 +601,7 @@ export async function createFlightSimApp(
     skipResumeDelta = !paused;
     const state = physicsLoop.getLatestState() ?? initialState;
     controlPanel?.update(createPanelSnapshot(state));
-    hudBar?.update(state, runtime.status, paused ? null : measuredFps, paused);
+    hudBar?.update(state, runtime.status, measuredFps, paused);
     phoneSession?.syncStatus();
   };
   const setSimulationPaused = (paused: boolean): void => inputManager.setPaused(paused);
@@ -880,6 +880,8 @@ export async function createFlightSimApp(
     },
     onPhoneControlClick: openPhoneController,
     onSettingsClick: () => panelRoot.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')?.click(),
+    onDebugClick: () => controlPanel?.openOrSelectTab("debug"),
+    fpsHost: panelRoot,
   });
   statusOverlay = createFlightStatusOverlay(statusRoot, {
     onResume: () => setSimulationPaused(false),
@@ -1046,7 +1048,7 @@ export async function createFlightSimApp(
     if (now - lastPanelUpdateMs >= 100) {
       lastPanelUpdateMs = now;
       controlPanel?.update(createPanelSnapshot(displayState));
-      hudBar?.update(displayState, runtime.status, inputManager.isPaused() ? null : measuredFps, inputManager.isPaused());
+      hudBar?.update(displayState, runtime.status, measuredFps, inputManager.isPaused());
     }
     if (flightPerformance) {
       const tileMetrics = runtime.getTileMetrics();

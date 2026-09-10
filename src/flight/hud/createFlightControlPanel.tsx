@@ -1,9 +1,11 @@
 import { createRoot } from "react-dom/client";
+import type { WindowOverlayHandle } from "foss-earth/shell";
 import {
   FlightControlPanel,
   type FlightControlPanelHandle,
   type FlightControlPanelOptions,
   type FlightControlPanelSnapshot,
+  type FlightPanelTab,
 } from "./FlightControlPanel";
 
 export function createFlightControlPanel(
