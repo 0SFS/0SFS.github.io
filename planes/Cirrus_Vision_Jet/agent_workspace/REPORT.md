@@ -2,13 +2,13 @@
 
 A measured reconstruction of the SF50 (G2) built to
 `docs/creating-an-aircraft-model.md`, generated procedurally from a table of
-cross-section stations. Four levels of detail, 1286 / 982 / 246 / 98 triangles,
+cross-section stations. Four levels of detail, 1212 / 900 / 246 / 98 triangles,
 wired into `AIRCRAFT_CATALOG` as `cirrus-vision-jet`.
 
 | level | triangles | vertices | objects | takes over at |
 | --- | --- | --- | --- | --- |
-| LOD0 | 1286 | 702 | 22 | 0 m |
-| LOD1 | 982 | 549 | 22 | 65 m |
+| LOD0 | 1212 | 665 | 22 | 0 m |
+| LOD1 | 900 | 508 | 22 | 65 m |
 | LOD2 | 246 | 156 | 12 | 170 m |
 | LOD3 | 98 | 74 | 1 | 340 m |
 
@@ -270,11 +270,23 @@ Other things measurement changed from the first blockout:
 - **A pane's block is the pane's own size.** The station just clear of each end
   does double duty - it keeps two panes out of one station gap, and it stops
   the hole running from 150 mm ahead of the pane to 400 mm behind it.
-- **Nine columns per pane, not twelve.** Each column costs four triangles, not
-  two: one on the pane and one in the strip, top and bottom. Measured against
-  the super-ellipse it is cut from, nine holds the door window's outline to
-  4.3 mm and the aft ones to 3.5 mm - finer than the 11-sided ring the pane is
-  cut into. Twelve bought 1.8 mm for twelve triangles a pane.
+- **Seven columns per pane, not twelve.** A column is the most expensive
+  vertex in the model: four triangles, not two - one on the pane and one in
+  the strip, top and bottom - and it also decides how well that strip tiles.
+  So the count is measured. Against the super-ellipse each pane is cut from,
+  sampled over the same range so the blunt end is not doing the work: twelve
+  columns hold the door window's outline to 1.8 mm, nine to 4.3, seven to 6.9,
+  five to 18.4. The drawing they were read off is good to about 10 mm, so
+  seven is where the outline stops being the limiting error - and it is two
+  arms shorter on every fan. Twelve cost twenty triangles a pane for accuracy
+  the source does not have.
+- **The strip closing each pane is one polygon, not a walk.** A strip whose two
+  chains have very different vertex counts has no good zip: three station
+  vertices against seven pane columns forces a fan from one apex whichever rule
+  picks the diagonals. An n-gon costs exactly the same triangles - a polygon of
+  V vertices is V-2 either way - and lets the triangulator choose. Doing that
+  also removed the last of the folded pairs, so the dissolve pass stopped
+  backing off and now takes the full 1.0 deg on the fuselage.
 - **Pane vertices are placed by interpolating inside the row's own quad**, so
   they land exactly on the ruled surface that was already there: cutting a
   window changes nothing about the shape of the fuselage around it. Putting
@@ -338,7 +350,7 @@ Generated from the same parameterised script, never decimated.
 
 | dropped at | what goes |
 | --- | --- |
-| LOD1 | 9 pane columns → 7, fewer fuselage stations, coarser nacelle and wheels, the wing's mid-span station. The ring stays at 11 points: the body is the same shape, the panes are less round |
+| LOD1 | 7 pane columns → 5, fewer fuselage stations, coarser nacelle and wheels, the wing's mid-span station. The ring stays at 11 points: the body is the same shape, the panes are less round |
 | LOD2 | ring → 6 points, 9 stations, the pane-edge rings (one glazed band instead of four windows), control surfaces merged into their panels, intake, keel, gear doors |
 | LOD3 | ring → 4 points, 5 stations, 4-point aerofoils (3-point on the V-tail), tyres, everything joined into one mesh |
 
@@ -372,7 +384,7 @@ literally, and it is what let LOD3 come in under 100 triangles.
 
 | check | LOD0 | LOD1 | LOD2 | LOD3 |
 | --- | --- | --- | --- | --- |
-| triangles | 1286 | 982 | 246 | 98 |
+| triangles | 1212 | 900 | 246 | 98 |
 | length 9.357 m | 9.357 | 9.357 | 9.357 | 9.357 |
 | span 11.796 m | 11.796 | 11.796 | 11.796 | 11.796 |
 | height 3.322 m | 3.3227 | 3.3227 | 3.3219 | 3.3227 |
@@ -412,8 +424,8 @@ Attribution**, so it can ship, and it now does: as the Vision Jet's `hd` level,
 
 | | hd (hilos run) | our LOD0 |
 | --- | --- | --- |
-| triangles | 7,294 | 1,286 |
-| vertices | 4,578 | 702 |
+| triangles | 7,294 | 1,212 |
+| vertices | 4,578 | 665 |
 | download | 3.4 MB (4096² texture) | 60 KB |
 | span | 11.796 (the scale datum) | 11.796 |
 | length | 9.075 (−3.0%) | 9.357 (exact) |
@@ -443,7 +455,7 @@ because the validator reports it, not because the model looks lopsided.
 
 `src/flight/aircraft/aircraftCatalog.ts`:
 
-- Four levels of ours — 1286 / 982 / 246 / 98 triangles — at `autoFromMeters`
+- Four levels of ours — 1212 / 900 / 246 / 98 triangles — at `autoFromMeters`
   of 40 / 65 / 170 / 340, plus hilos run's opt-in `hd` at 0. The three coarse
   thresholds are the Cessna's scaled by the span ratio, so the two airframes
   switch at the same apparent size. LOD0's is 40 rather than 0 because `hd`
@@ -583,19 +595,23 @@ Read this before treating any of it as accurate.
   Nothing is taken from it in metres except the windshield's roof line, which
   the drawing gives independently and agrees with to 8 mm; everywhere else the
   drawing wins.
-- **The strip closing each pane still fans**, because the window row is 0.9 m
-  tall at the aft cabin and the window in it is 0.35 m. The strip's count is
-  minimal — a strip between two polylines costs their two lengths less two, and
-  no tiling beats that — and it is now tiled along Y, so nothing reaches across
-  the block. What is left is long triangles over flat skin. Making them square
-  needs a ring line closer to the window's sill, which would cost 66 triangles
-  down the whole fuselage to tidy about a dozen.
-- **The dissolve pass backs off on the fuselage.** It asks for 1.0 deg and
-  settles for 0.25: at 0.5 deg it merges a pair of flat but folded triangles in
-  a pane strip, and the retriangulator can only split that quad across itself —
-  four faces on one edge. The generator checks and halves rather than trusting
-  it, so the mesh is always sound; the cost is about 40 triangles it could
-  otherwise have given back.
+- **The strip closing each pane still fans at its two ends.** Six triangles at
+  LOD0 have an aspect quality under 0.05, all of them there. The window row is
+  0.72 m tall abeam the aft window and the window in it is 0.35 m, so the wedge
+  that closes each end of the block runs from a pane tip 100 mm tall to a
+  station edge 720 mm tall. Three ways of squaring it were tried and measured,
+  and none pays:
+
+  | tried | result |
+  | --- | --- |
+  | split the block's long gaps (ribs) | five stations added, and the dissolve pass took every one back out — an interpolated station sits on the chord between its neighbours, so the fan around it is flat. Identical mesh. |
+  | beautify the edges (a flip is free) | two triangles improved at a tolerance that does not move the skin; the flips that would fix the rest cross the pane's own outline |
+  | a partial ring line under the sill | would work — the sills are level and a constant-angle ring line falls away aft, which is the root cause — and costs about 36 triangles to tidy a dozen |
+
+  At 700 px/m the skin around those windows renders perfectly smooth: the
+  slivers are flat, so their normals are the normals of the surface they lie
+  in. The count is the minimum tiling of a flat region whose two sides have
+  different vertex counts. It is left alone deliberately.
 - **LOD2 and LOD3 keep a plain glazed band**, not shaped panes: at 170 m and
   beyond the whole aircraft is a few tens of pixels.
 - **No panel lines, antennas, deice boots, door outline, exhaust, static ports

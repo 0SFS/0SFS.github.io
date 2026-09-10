@@ -274,15 +274,20 @@ PANE_COLUMN_SNAP = 0.10
 # and the strip closing that block was eight splinters up to 860 mm long
 # fanning from a single station vertex - the "sun" the wireframe showed.
 PANE_MARGIN = 0.06
-# ...and no gap inside that block may hold more than this many pane columns.
-# The strip between the pane and the ring line has the pane's columns on one
-# side and the block's stations on the other, so wherever one gap faces
-# several columns it can only fan, and the strip below the aft window is
-# 0.37 m deep - a fan there is 300 mm arms. One station per gap that faces
-# three or more columns costs eight triangles and halves every fan; it is the
-# only place in this model where triangles are spent to improve SHAPE of the
-# tessellation rather than shape of the aeroplane.
-PANE_COLUMNS_PER_GAP = 2
+# There is no rule here for RIBBING that block. The strip closing it has the
+# pane's columns on one side and the block's stations on the other, so where
+# one station gap faces several columns it can only fan - and below the aft
+# window that strip is 0.37 m deep, so the fan is 300 mm arms. Splitting those
+# gaps was tried: it added five stations, and the dissolve pass took every one
+# of them straight back out, because a station interpolated between two others
+# sits on the chord between them and the fan around it is flat. Same vertex
+# count, same triangle count, same mesh. Beautifying the edges instead (a flip
+# is free) improved two triangles at a tolerance that does not move the skin.
+# The fan is the minimum tiling of a flat strip whose two sides have different
+# vertex counts, and the only thing that squares it is a ring line under the
+# window sill - which the section cannot give, because the sills are level and
+# a constant-angle ring line falls away aft, and which as a partial line would
+# cost about 36 triangles to tidy a dozen that no render shows.
 
 
 def _trace(pts, y, outside):
@@ -708,31 +713,6 @@ def fuselage_stations():
             if st:
                 extra.append(st)
     sts = sorted(base + extra, key=lambda s: -s[0])
-    # Ribs: split any gap inside a pane's block that faces too many of the
-    # pane's own columns, so the strip closing the block is ribbed rather than
-    # fanned. Solved against the columns themselves, not a length in metres,
-    # because it is the ratio of the two chains that decides the fan.
-    for yc, a, _zc, _b, _n in CABIN_WINDOWS:
-        cols = [yc + a * f for f in PANE_COLUMN_FRACTIONS[P["pane_detail"]]]
-        for _ in range(3):
-            ys = [st[0] for st in sts]
-            ia = max([i for i in range(len(ys)) if ys[i] >= yc + a - 1e-9]
-                     or [0])
-            ib = min([i for i in range(len(ys)) if ys[i] <= yc - a + 1e-9]
-                     or [len(ys) - 1])
-            add = []
-            for i in range(ia, ib):
-                lo, hi = ys[i + 1], ys[i]
-                if sum(1 for c in cols if lo < c < hi) > PANE_COLUMNS_PER_GAP:
-                    add.append((lo + hi) / 2.0)
-            if not add:
-                break
-            for y in add:
-                if all(abs(y - st[0]) > 0.04 for st in sts):
-                    st = interpolate_station(y, base)
-                    if st:
-                        extra.append(st)
-            sts = sorted(base + extra, key=lambda s: -s[0])
     # A margin station within 0.04 m of one the shape already asked for is
     # dropped, so check rather than assume: two panes sharing a station gap
     # would each cut the same row and the second would find it already gone.
