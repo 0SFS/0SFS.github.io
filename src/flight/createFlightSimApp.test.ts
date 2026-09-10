@@ -53,6 +53,7 @@ const mocks = vi.hoisted(() => {
     terrainContact: { reset: vi.fn(), update: vi.fn(() => true) },
     visibleMeshCollision: { reset: vi.fn(), update: vi.fn(() => false) },
     physics: { reset: vi.fn(), setPaused: vi.fn(), update: vi.fn((_delta, applyInputs) => { applyInputs(); return state; }), getLatestState: () => state, getFault: () => null },
+    hudBarOptions: null as { onDebugClick(): void } | null,
   };
 });
 vi.mock("foss-earth/runtime", () => ({
@@ -77,7 +78,12 @@ vi.mock("./physics/terrainContact", () => ({ createTerrainContact: () => mocks.t
 vi.mock("./physics/visibleMeshCollision", () => ({ createVisibleMeshCollision: vi.fn(() => mocks.visibleMeshCollision) }));
 vi.mock("./hud/flightHud", () => ({ createFlightHud: () => ({ update: vi.fn(), destroy: vi.fn() }) }));
 vi.mock("./jsbsim/resetFlightLocation", () => ({ resetFlightLocation: mocks.resetLocation }));
-vi.mock("./hud/createFlightHudBar", () => ({ createFlightHudBar: () => ({ update: vi.fn(), destroy: vi.fn() }) }));
+vi.mock("./hud/createFlightHudBar", () => ({
+  createFlightHudBar: (_container: HTMLElement, options: { onDebugClick(): void }) => {
+    mocks.hudBarOptions = options;
+    return { update: vi.fn(), destroy: vi.fn() };
+  },
+}));
 
 import { createFlightSimApp } from "./createFlightSimApp";
 import { createCollisionDebugOverlay } from "./diagnostics/createCollisionDebugOverlay";
@@ -468,5 +474,26 @@ it("enables collision geometry from Debug while paused, skips disabled work and 
   try {
     // The opt-in resets for a new session, without recreating an overlay.
     expect(createCollisionDebugOverlay).toHaveBeenCalledOnce();
+  } finally { await act(async () => app.destroy()); }
+});
+
+it("opens Debug from the FPS control on the right when the left slot cannot fit", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  vi.stubGlobal("localStorage", { getItem: () => null, setItem: vi.fn() });
+  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
+  const root = document.createElement("div");
+  document.body.append(root);
+  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
+  await act(async () => { app = await createFlightSimApp(root); });
+  try {
+    expect(root.querySelector('[aria-label="Open left panel"]')).toBeNull();
+    await act(async () => mocks.hudBarOptions!.onDebugClick());
+    const right = root.querySelector<HTMLElement>('[data-side="right"]')!;
+    expect(right.querySelector(".foss-earth-tab-button")?.textContent).toBe("Debug");
+    expect(right.dataset.collapsed).toBe("false");
+    await act(async () => right.querySelector<HTMLButtonElement>(".foss-earth-tab-button")!.click());
+    expect(right.dataset.collapsed).toBe("true");
+    await act(async () => mocks.hudBarOptions!.onDebugClick());
+    expect(right.dataset.collapsed).toBe("false");
   } finally { await act(async () => app.destroy()); }
 });

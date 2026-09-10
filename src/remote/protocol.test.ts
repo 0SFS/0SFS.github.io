@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  MAX_MESSAGE_BYTES, NEUTRAL_CONTROLS, isCentered, isControls, isCounter, isProtocolVersionMismatch, neutralize, parseMessage,
+  MAX_MESSAGE_BYTES, NEUTRAL_CONTROLS, isCentered, isControls, isCounter, isHapticFeedback, isProtocolVersionMismatch, neutralize, parseMessage,
   type AircraftStatus, type ControlSurfaceState, type RemoteMessage,
 } from "./protocol";
 
@@ -184,5 +184,22 @@ describe("protocol version mismatch classification", () => {
       { v: 2, type: "hello", padding: "x".repeat(MAX_MESSAGE_BYTES) },
       { v: 2, type: "hello", padding: "😀".repeat(600) },
     ]) expect(isProtocolVersionMismatch(value)).toBe(false);
+  });
+});
+
+describe("haptic feedback field", () => {
+  const heartbeat = { v: 1, session: "s", epoch: 2, type: "heartbeat", lease: 9 };
+  it("accepts bounded latest-value feedback and drops malformed feedback without rejecting the heartbeat", () => {
+    const feedback = { v: 1, id: 3, pulseMs: 60, ttlMs: 90 };
+    expect(parseMessage({ ...heartbeat, feedback })).toEqual({ ...heartbeat, feedback });
+    expect(parseMessage({ ...heartbeat, feedback: { ...feedback, pulseMs: 0 } })).toMatchObject({ feedback: { pulseMs: 0 } });
+    for (const bad of [
+      { ...feedback, v: 2 }, { ...feedback, pulseMs: 61 }, { ...feedback, pulseMs: 1.5 }, { ...feedback, ttlMs: 0 },
+      { ...feedback, ttlMs: 100 }, { ...feedback, id: -1 }, [1, 2, 3], "buzz",
+    ]) {
+      const parsed = parseMessage({ ...heartbeat, feedback: bad });
+      expect(parsed).toEqual(heartbeat);
+    }
+    expect(isHapticFeedback(feedback)).toBe(true);
   });
 });

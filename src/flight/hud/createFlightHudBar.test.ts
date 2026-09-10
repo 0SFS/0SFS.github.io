@@ -27,6 +27,7 @@ describe("flight input method selector", () => {
       activeTerrainDetail = errorTarget ?? 16;
     });
     const onSettingsClick = vi.fn();
+    const onDebugClick = vi.fn();
     let activityListener: (active: boolean) => void = () => {};
     const unsubscribe = vi.fn();
     const unsubscribeStreaming = vi.fn();
@@ -65,6 +66,7 @@ describe("flight input method selector", () => {
       }),
       onTerrainDetailChange,
       onSettingsClick,
+      onDebugClick,
       onInputModeChange, onInputSensitivityChange: vi.fn(),
     });
     expect(onInputModeChange).toHaveBeenLastCalledWith("mouse");
@@ -126,6 +128,17 @@ describe("flight input method selector", () => {
       rasterQuality: { setting: "auto", activeProfile: "balanced" },
     } as BabylonRuntimeStatus, 59.6, false);
     expect(container.querySelector("#flightFps")?.textContent).toBe("FPS 60");
+    expect(container.querySelector("#flightFps")).toBeInstanceOf(HTMLButtonElement);
+    expect(container.querySelector("#flightFps")?.classList.contains("flight-fps-button")).toBe(true);
+    expect(container.querySelector(".hud-bar #flightFps")).toBeNull();
+    hud.update({ latDeg: 0, lonDeg: 0, headingRad: 0 } as never, {
+      mode: "raster-basemap",
+      terrainSource: { id: "mapterhorn", label: "Mapterhorn Terrain" },
+      rasterQuality: { setting: "auto", activeProfile: "balanced" },
+    } as BabylonRuntimeStatus, 59.6, true);
+    expect(container.querySelector("#flightFps")?.textContent).toBe("FPS 60");
+    container.querySelector<HTMLButtonElement>("#flightFps")!.click();
+    expect(onDebugClick).toHaveBeenCalledOnce();
     container.querySelector<HTMLButtonElement>("#flightSettingsButton")!.click();
     expect(onSettingsClick).toHaveBeenCalledOnce();
     container.querySelector<HTMLButtonElement>("[data-map-source=usgs-imagery]")!.click();

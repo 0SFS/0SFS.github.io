@@ -198,8 +198,8 @@ describe("retractable gear", () => {
     const CASES = [
       { name: "BayDoor_Nose_Left", down: [0.0165, -0.2345, 0.3705], up: [0.1716, -0.0552, 0.4000] },
       { name: "BayDoor_Nose_Right", down: [-0.0165, -0.2345, 0.3705], up: [-0.1716, -0.0552, 0.4000] },
-      { name: "BayDoor_Main_Left", down: [-0.3103, -0.6334, -0.3116], up: [0.6800, -0.0868, -0.3529] },
-      { name: "BayDoor_Main_Right", down: [0.3103, -0.6334, -0.3116], up: [-0.6800, -0.0868, -0.3529] },
+      { name: "BayDoor_Main_Left", down: [-0.3468, -0.7050, -0.3109], up: [0.7600, -0.0942, -0.3571] },
+      { name: "BayDoor_Main_Right", down: [0.3468, -0.7050, -0.3109], up: [-0.7600, -0.0942, -0.3571] },
     ] as const;
     const s = scene();
     for (const { name, down, up } of CASES) {

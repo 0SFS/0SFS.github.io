@@ -1,8 +1,8 @@
 import { createPeerEndpoint, type PeerEndpoint, type SessionTransport, type TransportDiagnostics } from './peerTransport'
 import {
-  CONTROL_INTERVAL_MS, HANDOFF_MS, NEUTRAL_CONTROLS, STALE_MS, isCentered,
+  CONTROL_INTERVAL_MS, HANDOFF_MS, MAX_HAPTIC_PULSE_MS, NEUTRAL_CONTROLS, STALE_MS, isCentered,
   isControls, neutralize, parseMessage, isProtocolVersionMismatch, PROTOCOL_MISMATCH_MESSAGE,
-  type ActionName, type AircraftStatus, type ControlSurfaceState, type RemoteMessage,
+  type ActionName, type AircraftStatus, type ControlSurfaceState, type HapticFeedbackFrame, type RemoteMessage,
 } from './protocol'
 
 export interface PhoneControllerSnapshot {
@@ -20,6 +20,9 @@ export interface PhoneControllerSnapshot {
   diagnostics: TransportDiagnostics | null
   appliedSeq: number | null
   receiveToApplyMs: number | null
+  /** navigator.vibrate exists; coarse on/off pulses only, no intensity. */
+  hapticsSupported: boolean
+  hapticsEnabled: boolean
 }
 
 export interface PhoneControllerClient {
@@ -31,8 +34,13 @@ export interface PhoneControllerClient {
   setPaused(paused: boolean): boolean
   setViewMode(mode: 'first' | 'third'): boolean
   releaseControl(): boolean
+  setHapticsEnabled(enabled: boolean): void
   destroy(): void
 }
+
+export const PHONE_HAPTICS_PREFERENCE_KEY = 'osfs.phone-haptics'
+// A new pulse may replace the running one, but not faster than the host heartbeat.
+const MIN_PULSE_INTERVAL_MS = 45
 
 interface ClientOptions {
   endpointFactory?: typeof createPeerEndpoint
@@ -40,6 +48,9 @@ interface ClientOptions {
   /** Injectable lifecycle targets keep protocol tests independent of a browser. */
   document?: Document
   window?: Window
+  /** Injectable Vibration API; null means unsupported. */
+  vibrate?: ((durationMs: number) => boolean) | null
+  storage?: Pick<Storage, 'getItem' | 'setItem'> | null
 }
 
 /** The control mailbox changes synchronously in pointer handlers, outside React. */
@@ -58,6 +69,7 @@ export function createPhoneControllerClient(
     controls: { ...NEUTRAL_CONTROLS }, canFly: false, canControl: false,
     requestingControl: false, hostFresh: false, signalingAvailable: true,
     pendingActions: 0, rttMs: null, diagnostics: null, appliedSeq: null, receiveToApplyMs: null,
+    hapticsSupported: false, hapticsEnabled: false,
   }
   let controls = { ...NEUTRAL_CONTROLS }
   let endpoint: PeerEndpoint | undefined
@@ -85,6 +97,42 @@ export function createPhoneControllerClient(
   let wakeLock: WakeLockSentinel | null = null
   let wakeLockPending = false
   let setupTimer: ReturnType<typeof setTimeout> | undefined
+  const browserNavigator = win?.navigator as (Navigator & { vibrate?: (pattern: number) => boolean }) | undefined
+  const vibrate = options.vibrate !== undefined ? options.vibrate
+    : typeof browserNavigator?.vibrate === 'function' ? (ms: number) => browserNavigator.vibrate!(ms) : null
+  const storage = options.storage !== undefined ? options.storage : (() => {
+    try { return win?.localStorage ?? null } catch { return null }
+  })()
+  let hapticsEnabled = (() => {
+    try { return vibrate !== null && storage?.getItem(PHONE_HAPTICS_PREFERENCE_KEY) === 'on' } catch { return false }
+  })()
+  let lastFeedbackId = -1
+  let lastPulseAt = -Infinity
+  let vibratingUntil = -Infinity
+  snapshot = { ...snapshot, hapticsSupported: vibrate !== null, hapticsEnabled }
+
+  function stopVibration(): void {
+    if (!vibrate || now() >= vibratingUntil) return
+    vibratingUntil = -Infinity
+    try { vibrate(0) } catch { /* Nothing else to cancel. */ }
+  }
+
+  function ownsControl(): boolean {
+    return snapshot.status?.owner === 'phone' && authorityEpoch === epoch && !snapshot.status.paused
+  }
+
+  /** Latest value only: an older or duplicate id, or any lost authority, never vibrates. */
+  function applyFeedback(frame: HapticFeedbackFrame): void {
+    if (!vibrate || frame.id <= lastFeedbackId) return
+    lastFeedbackId = frame.id
+    if (!hapticsEnabled || suspended || finished || !ownsControl() || frame.pulseMs === 0) { stopVibration(); return }
+    const time = now()
+    if (time - lastPulseAt < MIN_PULSE_INTERVAL_MS) return
+    const duration = Math.min(frame.pulseMs, frame.ttlMs, MAX_HAPTIC_PULSE_MS)
+    try {
+      if (vibrate(duration)) { lastPulseAt = time; vibratingUntil = time + duration }
+    } catch { /* Optional: control continues without vibration. */ }
+  }
 
   function emit(patch: Partial<PhoneControllerSnapshot> = {}): void {
     if (destroyed) return
@@ -125,6 +173,7 @@ export function createPhoneControllerClient(
     authorityEpoch = -1
     lastHeartbeatAt = -Infinity
     outstandingPing = null
+    stopVibration()
     clearPending(preserveRequest)
     adoptControls(controls)
   }
@@ -175,6 +224,7 @@ export function createPhoneControllerClient(
     clearTimeout(setupTimer)
     clearPending()
     authorityEpoch = -1
+    stopVibration()
     controls = neutralize(controls)
     releaseWakeLock()
     stopRuntime()
@@ -228,6 +278,7 @@ export function createPhoneControllerClient(
     // Telemetry must never drag a live slider/stick back to the previous frame.
     if (status.owner === 'local' && handoffEpoch === null) adoptControls(status.controls)
     snapshot = { ...snapshot, status }
+    if (!ownsControl()) stopVibration()
   }
 
   function receiveReliable(value: unknown): void {
@@ -322,6 +373,7 @@ export function createPhoneControllerClient(
       lease = message.lease
       lastHeartbeatAt = now()
       if (message.status) updateStatus(message.status, false)
+      if (message.feedback) applyFeedback(message.feedback)
       emit({
         appliedSeq: message.appliedSeq ?? snapshot.appliedSeq,
         receiveToApplyMs: message.receiveToApplyMs ?? snapshot.receiveToApplyMs,
@@ -340,6 +392,7 @@ export function createPhoneControllerClient(
     if (snapshot.status?.owner === 'phone' || requestId !== null) sendAction('releaseControl')
     blockedAuthorityEpoch = Math.max(blockedAuthorityEpoch, epoch)
     authorityEpoch = -1
+    stopVibration()
     clearPending()
     suspended = true
     releaseWakeLock()
@@ -358,6 +411,7 @@ export function createPhoneControllerClient(
     if (finished || destroyed) return
     const fresh = now() - lastHeartbeatAt < STALE_MS
     if (fresh !== snapshot.hostFresh) {
+      if (!fresh) stopVibration()
       cancelTransientControls()
       emit({ message: fresh ? snapshot.message : 'Connection delayed · Waiting for the computer' })
     }
@@ -425,9 +479,17 @@ export function createPhoneControllerClient(
     setPaused: value => sendAction('setPaused', value),
     setViewMode: value => sendAction('setViewMode', value),
     releaseControl() { cancelTransientControls(); return sendAction('releaseControl') },
+    setHapticsEnabled(enabled) {
+      if (destroyed) return
+      hapticsEnabled = enabled && vibrate !== null
+      if (!hapticsEnabled) stopVibration()
+      try { storage?.setItem(PHONE_HAPTICS_PREFERENCE_KEY, hapticsEnabled ? 'on' : 'off') } catch { /* Session-only. */ }
+      emit({ hapticsEnabled })
+    },
     destroy() {
       if (destroyed) return
       if (!finished) { cancelTransientControls(); sendAction('releaseControl') }
+      stopVibration()
       destroyed = true
       finished = true
       secret = ''

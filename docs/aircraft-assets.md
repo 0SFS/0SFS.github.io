@@ -91,7 +91,7 @@ Cirrus Vision Jet:
 
 | Level | Triangles | Vertices | Meshes | Intended range |
 | --- | --- | --- | --- | --- |
-| LOD3 | 1312 | 743 | 26 | Close / cockpit |
+| LOD3 | 1384 | 797 | 26 | Close / cockpit |
 | LOD2 | 856 | 480 | 19 | Medium |
 | LOD1 | 442 | 254 | 12 | Far, and all the way out |
 

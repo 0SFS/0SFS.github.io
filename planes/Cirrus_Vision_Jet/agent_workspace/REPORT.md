@@ -2,7 +2,7 @@
 
 A measured reconstruction of the SF50 (G2) built to
 `docs/creating-an-aircraft-model.md`, generated procedurally from a table of
-cross-section stations. Three levels of detail, 1312 / 856 / 442 triangles,
+cross-section stations. Three levels of detail, 1384 / 856 / 442 triangles,
 wired into `AIRCRAFT_CATALOG` as `cirrus-vision-jet`.
 
 Levels are numbered **coarsest first**: LOD1 is the far mesh and each step up
@@ -12,7 +12,7 @@ not need one.
 
 | level | triangles | vertices | objects | takes over at |
 | --- | --- | --- | --- | --- |
-| LOD3 | 1312 | 743 | 26 | 0 m |
+| LOD3 | 1384 | 797 | 26 | 0 m |
 | LOD2 | 856 | 480 | 19 | 65 m |
 | LOD1 | 442 | 255 | 12 | 170 m |
 
@@ -572,6 +572,26 @@ wrong way: **a gear door is a panel IN the skin, not a slab beside the leg**,
 and modelled as a slab it was as wide as the linkage and read as a vestige of
 nothing. It is gone.
 
+**A keyhole, not a rectangle.** The wheel end HUGS the tyre - a circle of
+0.245 m about the stowed axle, merged into the rectangular leg bay outboard of
+x = 1.02. A rectangle wide enough to contain the wheel is a much bigger hole
+than the aeroplane has, and it read as a box with a tyre loose in it.
+
+Cutting it is still not a pane trace. Adding a third station at the join splits
+the bay into two segments, and each takes a different treatment: the outboard
+one loses its whole face, which is the rectangle, and the inboard one is
+re-emitted as **one n-gon** - three closed sides of the quad, then the arc. The
+bite is on the boundary rather than in the middle, so the region is simply
+connected and the triangulator can have it whole. Both arc ends sit on the join
+station's edge, which the dropped face has already left open, so they split
+nothing and there is no T-junction.
+
+The circle has to be defined in (station, fraction-across-the-row), which means
+converting its radius into that fraction - the row is 0.68 m deep and the bay
+1.18 m wide, so a circle specified in the row's own parameter comes out an
+ellipse. 72 triangles for the shaping, and the wheel now sits in a well rather
+than in a box.
+
 **One opening, not two.** The wheel well and the leg bay are one indent at one
 depth, running x = 0.60 to 1.78 - inboard of the stowed wheel, out past the
 leg. They were two things at two depths first, a real cut outboard and a flat
@@ -694,7 +714,7 @@ one that did without them was the 98-triangle silhouette, and it is gone.
 
 | check | LOD3 | LOD2 | LOD1 |
 | --- | --- | --- | --- |
-| triangles | 1312 | 856 | 442 |
+| triangles | 1384 | 856 | 442 |
 | length 9.357 m | 9.357 | 9.357 | 9.357 |
 | span 11.796 m | 11.796 | 11.796 | 11.796 |
 | height 3.322 m | 3.3227 | 3.3227 | 3.3219 |
@@ -767,7 +787,7 @@ because the validator reports it, not because the model looks lopsided.
 
 `src/flight/aircraft/aircraftCatalog.ts`:
 
-- Three levels of ours — 1312 / 856 / 442 triangles — at `autoFromMeters` of
+- Three levels of ours — 1384 / 856 / 442 triangles — at `autoFromMeters` of
   40 / 65 / 170, plus hilos run's opt-in `hd` at 0. The two coarse thresholds
   are the Cessna's scaled by the span ratio, so the two airframes switch at the
   same apparent size; the fourth threshold is gone with the level it selected,

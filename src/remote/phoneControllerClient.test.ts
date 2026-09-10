@@ -76,7 +76,7 @@ afterEach(() => { for (const destroy of cleanup.splice(0)) destroy(); vi.useReal
 const flush = () => vi.advanceTimersByTimeAsync(0)
 const advance = (ms: number) => vi.advanceTimersByTimeAsync(ms)
 
-async function setup() {
+async function setup(clientOptions: Partial<Parameters<typeof createPhoneControllerClient>[1]> = {}) {
   const hostLink = new Link()
   const phoneLink = new Link()
   hostLink.other = phoneLink
@@ -108,7 +108,7 @@ async function setup() {
   })
   await host.startPairing()
   const invitation = parsePairingUrl(host.getSnapshot().invitationUrl!)!
-  const client = createPhoneControllerClient(invitation, { endpointFactory: clientEndpoint, now: () => Date.now(), document: doc, window: win })
+  const client = createPhoneControllerClient(invitation, { endpointFactory: clientEndpoint, now: () => Date.now(), document: doc, window: win, ...clientOptions })
   cleanup.push(() => client.destroy(), () => host.destroy())
   await flush()
   const envelope = (): Envelope => {
@@ -351,5 +351,110 @@ describe('phone controller', () => {
     expect(h.client.getSnapshot()).toMatchObject({ phase: 'error', canControl: false, message: 'Unsupported phone protocol. Reload both devices.' })
     expect(h.phoneLink.closed).toBe(true)
     expect(h.state).toMatchObject({ owner: 'local', paused: true })
+  })
+})
+
+describe('phone haptics', () => {
+  const storage = () => { const map = new Map<string, string>(); return { map, getItem: (key: string) => map.get(key) ?? null, setItem: (key: string, value: string) => { map.set(key, value) } } }
+
+  it('shows unsupported devices as unavailable and never enables vibration there', async () => {
+    const h = await setup()
+    expect(h.client.getSnapshot()).toMatchObject({ hapticsSupported: false, hapticsEnabled: false })
+    h.client.setHapticsEnabled(true)
+    expect(h.client.getSnapshot().hapticsEnabled).toBe(false)
+  })
+
+  it('delivers only the latest pulse on the next heartbeat while the phone owns an unpaused flight', async () => {
+    const vibrate = vi.fn(() => true)
+    const prefs = storage()
+    const h = await setup({ vibrate, storage: prefs })
+    await advance(50)
+    h.host.setHapticFeedback(40)
+    await advance(50)
+    expect(h.hostLink.native.some(message => message.type === 'heartbeat' && 'feedback' in message && message.feedback)).toBe(false)
+    await h.fly()
+    await advance(50)
+    h.host.setHapticFeedback(40)
+    await advance(50)
+    expect(vibrate).not.toHaveBeenCalled() // Off by default.
+    h.client.setHapticsEnabled(true)
+    expect(prefs.map.get('osfs.phone-haptics')).toBe('on')
+    h.host.setHapticFeedback(20)
+    h.host.setHapticFeedback(30)
+    await advance(50)
+    const heartbeat = h.hostLink.last('heartbeat')
+    expect(heartbeat).toMatchObject({ session: h.envelope().session, feedback: { v: 1, pulseMs: 30 } })
+    expect(heartbeat.feedback!.ttlMs).toBeLessThan(100)
+    expect(vibrate.mock.calls).toEqual([[30]])
+    // Replayed or older packets never vibrate twice.
+    h.phoneLink.receiveNative({ ...heartbeat, lease: heartbeat.lease + 1 })
+    expect(vibrate).toHaveBeenCalledTimes(1)
+    await advance(50)
+    expect(h.hostLink.last('heartbeat').feedback).toBeUndefined()
+  })
+
+  it('bounds pulses by expiry, ignores malformed or stale feedback without losing the lease', async () => {
+    const vibrate = vi.fn(() => true)
+    const h = await setup({ vibrate, storage: storage() })
+    await advance(50)
+    await h.fly()
+    h.client.setHapticsEnabled(true)
+    await advance(50)
+    const beat = h.hostLink.last('heartbeat')
+    expect(beat.epoch).toBeGreaterThan(0)
+    h.phoneLink.receiveNative({ ...beat, lease: beat.lease + 10, feedback: { v: 1, id: 1_000, pulseMs: 60, ttlMs: 12 } })
+    expect(vibrate).toHaveBeenLastCalledWith(12)
+    await advance(60)
+    h.phoneLink.receiveNative({ ...beat, lease: beat.lease + 11, feedback: { v: 2, id: 1_001, pulseMs: 60, ttlMs: 50, pattern: [1, 2] } })
+    h.phoneLink.receiveNative({ ...beat, lease: beat.lease + 12, feedback: { v: 1, id: 1_002, pulseMs: 600, ttlMs: 50 } })
+    h.phoneLink.receiveNative({ ...beat, epoch: beat.epoch - 1, lease: beat.lease + 13, feedback: { v: 1, id: 1_003, pulseMs: 60, ttlMs: 50 } })
+    h.phoneLink.receiveNative({ ...beat, lease: beat.lease + 1, feedback: { v: 1, id: 1_004, pulseMs: 60, ttlMs: 50 } })
+    expect(vibrate).toHaveBeenCalledTimes(1)
+    expect(h.client.getSnapshot()).toMatchObject({ hostFresh: true, canControl: true })
+  })
+
+  it.each([
+    ['disable', async (h: Awaited<ReturnType<typeof setup>>) => { h.client.setHapticsEnabled(false) }],
+    ['phone hidden', async (h: Awaited<ReturnType<typeof setup>>) => {
+      Object.defineProperty(h.doc, 'hidden', { value: true, writable: true }); h.doc.dispatchEvent(new Event('visibilitychange'))
+    }],
+    ['desktop retakes control', async (h: Awaited<ReturnType<typeof setup>>) => { h.host.takeControl(); await flush() }],
+    ['desktop pause', async (h: Awaited<ReturnType<typeof setup>>) => { h.client.setPaused(true); await flush(); await flush() }],
+    ['disconnect', async (h: Awaited<ReturnType<typeof setup>>) => { h.host.disconnect(); await flush() }],
+    ['destroy', async (h: Awaited<ReturnType<typeof setup>>) => { h.client.destroy() }],
+  ])('cancels a running pulse on %s and ignores later feedback', async (_name, stop) => {
+    const vibrate = vi.fn(() => true)
+    const h = await setup({ vibrate, storage: storage() })
+    await advance(50)
+    await h.fly()
+    h.client.setHapticsEnabled(true)
+    h.host.setHapticFeedback(60)
+    await advance(50)
+    expect(vibrate.mock.lastCall![0]).toBeGreaterThan(0)
+    await stop(h)
+    expect(vibrate).toHaveBeenLastCalledWith(0)
+    h.host.setHapticFeedback(60)
+    await advance(60)
+    expect(vibrate.mock.calls.filter(([ms]) => ms > 0)).toHaveLength(1)
+  })
+
+  it('lets a pulse self-expire within 60 ms rather than outliving a stale host lease', async () => {
+    const vibrate = vi.fn(() => true)
+    const h = await setup({ vibrate, storage: storage() })
+    await advance(50)
+    await h.fly()
+    h.client.setHapticsEnabled(true)
+    h.host.setHapticFeedback(60)
+    await advance(50)
+    // Clipped to the remaining validity: never scheduled beyond its expiry.
+    const [played] = vibrate.mock.lastCall as unknown as [number]
+    expect(played).toBeGreaterThan(0)
+    expect(played).toBeLessThanOrEqual(60)
+    h.hostLink.dropNative = true
+    h.host.setHapticFeedback(60)
+    await advance(300)
+    expect(h.client.getSnapshot().hostFresh).toBe(false)
+    expect(vibrate.mock.calls.every(([ms]) => ms <= 60)).toBe(true)
+    expect(vibrate).toHaveBeenCalledTimes(1)
   })
 })

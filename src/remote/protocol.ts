@@ -9,6 +9,11 @@ export const HANDOFF_MS = 2000;
 export const CONTROL_INTERVAL_MS = 1000 / 60;
 export const HEARTBEAT_MS = 50;
 export const FLAP_PRESETS = [0, 1 / 3, 2 / 3, 1] as const;
+/** Additive heartbeat field; v1 peers without it simply ignore the key. */
+export const HAPTIC_FEEDBACK_VERSION = 1;
+export const MAX_HAPTIC_PULSE_MS = 60;
+/** Feedback older than this is dropped by the host and must not be scheduled beyond it by the phone. */
+export const HAPTIC_FEEDBACK_TTL_MS = 90;
 
 export interface AircraftStatus {
   owner: "local" | "phone";
@@ -24,6 +29,8 @@ export type ActionName = "requestControl" | "releaseControl" | "setPaused" | "se
 export type ActionMessage = Envelope & {
   type: "action"; id: number; lease: number; action: ActionName; value?: boolean | "first" | "third";
 };
+/** Latest-value presentation cue; pulseMs 0 means stop now. Never a history of impacts. */
+export interface HapticFeedbackFrame { v: 1; id: number; pulseMs: number; ttlMs: number }
 export type ControlFrame = Envelope & {
   type: "controls"; seq: number; lease: number; controls: ControlSurfaceState;
 };
@@ -39,7 +46,7 @@ export type RemoteMessage =
   | ActionMessage
   | (Envelope & { type: "ack"; id: number; ok: boolean; message: string; status: AircraftStatus })
   | ControlFrame
-  | (Envelope & { type: "heartbeat"; lease: number; status?: AircraftStatus; appliedSeq?: number; receiveToApplyMs?: number })
+  | (Envelope & { type: "heartbeat"; lease: number; status?: AircraftStatus; appliedSeq?: number; receiveToApplyMs?: number; feedback?: HapticFeedbackFrame })
   | (Envelope & { type: "ping" | "pong"; id: number; sentAt: number });
 
 export const NEUTRAL_CONTROLS: ControlSurfaceState = {
@@ -66,6 +73,11 @@ export function isControls(value: unknown): value is ControlSurfaceState {
   if (!record(value)) return false;
   return ["elevator", "aileron", "rudder", "pitchTrim"].every(key => finite(value[key]) && Math.abs(value[key]) <= 1)
     && ["throttle", "flaps", "brake"].every(key => finite(value[key]) && value[key] >= 0 && value[key] <= 1);
+}
+export function isHapticFeedback(value: unknown): value is HapticFeedbackFrame {
+  return record(value) && value.v === HAPTIC_FEEDBACK_VERSION && isCounter(value.id)
+    && Number.isInteger(value.pulseMs) && (value.pulseMs as number) >= 0 && (value.pulseMs as number) <= MAX_HAPTIC_PULSE_MS
+    && Number.isInteger(value.ttlMs) && (value.ttlMs as number) > 0 && (value.ttlMs as number) <= HAPTIC_FEEDBACK_TTL_MS;
 }
 function status(value: unknown): value is AircraftStatus {
   return record(value) && (value.owner === "local" || value.owner === "phone")
@@ -109,7 +121,10 @@ export function parseMessage(input: unknown): RemoteMessage | null {
     case "controls": valid = isCounter(value.seq) && isCounter(value.lease) && isControls(value.controls); break;
     case "heartbeat": valid = isCounter(value.lease) && (value.status === undefined || status(value.status))
       && (value.appliedSeq === undefined || isCounter(value.appliedSeq))
-      && (value.receiveToApplyMs === undefined || (finite(value.receiveToApplyMs) && value.receiveToApplyMs >= 0)); break;
+      && (value.receiveToApplyMs === undefined || (finite(value.receiveToApplyMs) && value.receiveToApplyMs >= 0));
+      // Unknown or malformed feedback is presentation-only: drop it, keep the lease.
+      if (valid && value.feedback !== undefined && !isHapticFeedback(value.feedback)) delete value.feedback;
+      break;
     case "ping": case "pong": valid = isCounter(value.id) && finite(value.sentAt) && value.sentAt >= 0; break;
     case "action": valid = isCounter(value.id) && isCounter(value.lease) && (
       ((value.action === "requestControl" || value.action === "releaseControl") && value.value === undefined)

@@ -1,8 +1,9 @@
 import { createPeerEndpoint, type SessionTransport, type PeerEndpoint } from "../../remote/peerTransport";
 import { createJoinSecret, createPairingUrl, INVITATION_TTL_MS } from "../../remote/pairing";
 import {
-  HANDOFF_MS, HEARTBEAT_MS, STALE_MS, PROTOCOL_MISMATCH_MESSAGE, isCentered, isProtocolVersionMismatch, neutralize, parseMessage,
-  type ActionMessage, type AircraftStatus, type ControlFrame, type ControlSurfaceState, type RemoteMessage,
+  HANDOFF_MS, HAPTIC_FEEDBACK_TTL_MS, HAPTIC_FEEDBACK_VERSION, HEARTBEAT_MS, MAX_HAPTIC_PULSE_MS, STALE_MS,
+  PROTOCOL_MISMATCH_MESSAGE, isCentered, isProtocolVersionMismatch, neutralize, parseMessage,
+  type ActionMessage, type AircraftStatus, type ControlFrame, type ControlSurfaceState, type HapticFeedbackFrame, type RemoteMessage,
 } from "../../remote/protocol";
 
 export interface PhoneSessionSnapshot {
@@ -59,6 +60,9 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
   const actions = new Map<number, RemoteMessage>();
   let maxActionId = -1;
   let pendingStatus: { epoch: number; message: string; deadline: number; attempts: number } | null = null;
+  // One latest-value haptic slot; never a queue of impacts.
+  let feedback: { id: number; pulseMs: number; queuedAt: number; epoch: number } | null = null;
+  let feedbackId = 0;
 
   const publish = (patch: Partial<PhoneSessionSnapshot> = {}) => {
     snapshot = { ...snapshot, ...patch };
@@ -103,7 +107,7 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
   };
   const freshInput = () => Boolean(latest && now() - latest.receivedAt <= STALE_MS && freshLease(latest.frame.lease));
   const newEpoch = () => {
-    epoch += 1; latest = null; lastSeq = -1; leases.clear(); actions.clear(); pending = null; pendingStatus = null;
+    epoch += 1; latest = null; lastSeq = -1; leases.clear(); actions.clear(); pending = null; pendingStatus = null; feedback = null;
     maxActionId = -1; lastAppliedSeq = undefined; receiveToApplyMs = undefined; frameTimes.length = 0;
   };
   const issueLease = () => {
@@ -334,6 +338,14 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     void transport.ready.then(startHelloTimer).catch(() => transport.close());
   };
 
+  const takeFeedback = (): { feedback?: HapticFeedbackFrame } => {
+    const queued = feedback;
+    feedback = null;
+    if (!queued || queued.epoch !== epoch || snapshot.owner !== "phone") return {};
+    const ttlMs = Math.floor(HAPTIC_FEEDBACK_TTL_MS - (now() - queued.queuedAt));
+    return ttlMs > 0 ? { feedback: { v: HAPTIC_FEEDBACK_VERSION, id: queued.id, pulseMs: queued.pulseMs, ttlMs } } : {};
+  };
+
   const timer = setInterval(() => {
     if (disposed) return;
     if (snapshot.phase === "invitation" && snapshot.expiresAt !== null && now() >= snapshot.expiresAt) {
@@ -349,6 +361,7 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     ticks += 1;
     active.sendNative({ ...envelope(), type: "heartbeat", lease,
       ...(ticks % 2 === 0 ? { status: status(), appliedSeq: lastAppliedSeq, receiveToApplyMs } : {}),
+      ...takeFeedback(),
     }, true);
   }, HEARTBEAT_MS);
 
@@ -388,6 +401,15 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
       return { ...latest!.frame.controls };
     },
     onHidden() { revoke("Desktop hidden · Simulation paused", true); },
+    /**
+     * Presentation only. Replaces any unsent pulse; 0 asks the phone to stop.
+     * Ignored unless the phone currently owns control of this epoch.
+     */
+    setHapticFeedback(pulseMs: number) {
+      if (disposed || !active || snapshot.owner !== "phone" || !Number.isFinite(pulseMs)) { feedback = null; return; }
+      feedback = { id: ++feedbackId, epoch, queuedAt: now(),
+        pulseMs: Math.round(Math.min(MAX_HAPTIC_PULSE_MS, Math.max(0, pulseMs))) };
+    },
     destroy() {
       if (disposed) return;
       disconnect(); disposed = true; clearInterval(timer); listeners.clear();
