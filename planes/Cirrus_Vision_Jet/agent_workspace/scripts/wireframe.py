@@ -2,7 +2,7 @@
 Draw the mesh wireframe of a .blend, orthographically, into a PNG.
 
     blender -b --factory-startup --python wireframe.py -- \
-        <model.blend> <side|plan|front> <out.png> [--px 150] [--only Fuselage]
+        <model.blend> <side|plan|front> <out.png> [--px 150] [--only Fuselage] [--half] [--win h0,h1,v0,v1]
 
 Blender's Workbench wireframe shading is viewport-only and comes out blank in a
 headless render, so the edges are projected and rasterised here instead. This
@@ -16,6 +16,9 @@ argv = sys.argv[sys.argv.index("--") + 1:]
 BLEND, VIEW, OUT = argv[0], argv[1], argv[2]
 PX = float(argv[argv.index("--px") + 1]) if "--px" in argv else 150.0
 ONLY = argv[argv.index("--only") + 1] if "--only" in argv else None
+# A side view of a symmetric aeroplane draws both sides on top of each other,
+# and the tessellation is the one thing that cannot be read through itself.
+HALF = "--half" in argv
 
 WINDOWS = {                      # metric window as it appears on the page
     # h and v name which model axis runs left-to-right and top-to-bottom
@@ -64,6 +67,8 @@ for ob in bpy.context.scene.objects:
     co = [mw @ v.co for v in ob.data.vertices]
     for e in ob.data.edges:
         a, b = co[e.vertices[0]], co[e.vertices[1]]
+        if HALF and (a.x < -1e-4 or b.x < -1e-4):
+            continue
         x0, y0 = to_px(a)
         x1, y1 = to_px(b)
         line(x0, y0, x1, y1)

@@ -3,8 +3,8 @@
  "objects": 22,
  "empties": 1,
  "meshes": 22,
- "triangles": 1044,
- "vertices": 581,
+ "triangles": 982,
+ "vertices": 549,
  "materials": 4,
  "material_names": [
   "SF50_Dark",
@@ -58,7 +58,7 @@
    "Wheel_Right"
   ]
  },
- "non_manifold_edges": 46,
+ "non_manifold_edges": 40,
  "open_boundary_by_object": [
   {
    "name": "Wing_Left",
@@ -75,10 +75,6 @@
   {
    "name": "VTail_Right",
    "boundary_edges": 7
-  },
-  {
-   "name": "Fuselage",
-   "boundary_edges": 6
   },
   {
    "name": "Nacelle",
@@ -126,8 +122,8 @@
  "per_object": [
   {
    "name": "Fuselage",
-   "tris": 686,
-   "verts": 346,
+   "tris": 640,
+   "verts": 322,
    "mats": [
     "SF50_Paint",
     "SF50_Glass"
@@ -153,8 +149,8 @@
   },
   {
    "name": "Wing_Left",
-   "tris": 33,
-   "verts": 21,
+   "tris": 31,
+   "verts": 20,
    "mats": [
     "SF50_Paint"
    ],
@@ -166,8 +162,8 @@
   },
   {
    "name": "Wing_Right",
-   "tris": 33,
-   "verts": 21,
+   "tris": 31,
+   "verts": 20,
    "mats": [
     "SF50_Paint"
    ],
@@ -256,32 +252,6 @@
    ]
   },
   {
-   "name": "Aileron_Left",
-   "tris": 14,
-   "verts": 9,
-   "mats": [
-    "SF50_Paint"
-   ],
-   "origin": [
-    -4.27,
-    -0.7134,
-    1.1431
-   ]
-  },
-  {
-   "name": "Aileron_Right",
-   "tris": 14,
-   "verts": 9,
-   "mats": [
-    "SF50_Paint"
-   ],
-   "origin": [
-    4.27,
-    -0.7134,
-    1.1431
-   ]
-  },
-  {
    "name": "LandingGear_Left",
    "tris": 12,
    "verts": 8,
@@ -360,6 +330,19 @@
    ]
   },
   {
+   "name": "Aileron_Left",
+   "tris": 8,
+   "verts": 6,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    -4.27,
+    -0.7134,
+    1.1431
+   ]
+  },
+  {
    "name": "Ruddervator_Left",
    "tris": 8,
    "verts": 6,
@@ -383,6 +366,19 @@
     1.585,
     -0.7133,
     0.9233
+   ]
+  },
+  {
+   "name": "Aileron_Right",
+   "tris": 8,
+   "verts": 6,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    4.27,
+    -0.7134,
+    1.1431
    ]
   },
   {

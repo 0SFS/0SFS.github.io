@@ -3,8 +3,8 @@
  "objects": 22,
  "empties": 1,
  "meshes": 22,
- "triangles": 1515,
- "vertices": 817,
+ "triangles": 1286,
+ "vertices": 702,
  "materials": 4,
  "material_names": [
   "SF50_Dark",
@@ -58,7 +58,7 @@
    "Wheel_Right"
   ]
  },
- "non_manifold_edges": 41,
+ "non_manifold_edges": 38,
  "open_boundary_by_object": [
   {
    "name": "Nacelle",
@@ -75,10 +75,6 @@
   {
    "name": "Wing_Right",
    "boundary_edges": 7
-  },
-  {
-   "name": "Fuselage",
-   "boundary_edges": 3
   }
  ],
  "degenerate_faces": 0,
@@ -118,8 +114,8 @@
  "per_object": [
   {
    "name": "Fuselage",
-   "tris": 991,
-   "verts": 498,
+   "tris": 838,
+   "verts": 421,
    "mats": [
     "SF50_Paint",
     "SF50_Glass"
@@ -134,32 +130,6 @@
    "name": "Nacelle",
    "tris": 62,
    "verts": 40,
-   "mats": [
-    "SF50_Paint"
-   ],
-   "origin": [
-    0.0,
-    0.0,
-    0.0
-   ]
-  },
-  {
-   "name": "Wing_Left",
-   "tris": 61,
-   "verts": 35,
-   "mats": [
-    "SF50_Paint"
-   ],
-   "origin": [
-    0.0,
-    0.0,
-    0.0
-   ]
-  },
-  {
-   "name": "Wing_Right",
-   "tris": 61,
-   "verts": 35,
    "mats": [
     "SF50_Paint"
    ],
@@ -185,6 +155,32 @@
   {
    "name": "VTail_Right",
    "tris": 38,
+   "verts": 21,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Wing_Left",
+   "tris": 33,
+   "verts": 21,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Wing_Right",
+   "tris": 33,
    "verts": 21,
    "mats": [
     "SF50_Paint"
@@ -274,45 +270,6 @@
    ]
   },
   {
-   "name": "LandingGear_Nose",
-   "tris": 20,
-   "verts": 12,
-   "mats": [
-    "SF50_Metal"
-   ],
-   "origin": [
-    0.0,
-    0.0,
-    0.0
-   ]
-  },
-  {
-   "name": "Aileron_Left",
-   "tris": 14,
-   "verts": 9,
-   "mats": [
-    "SF50_Paint"
-   ],
-   "origin": [
-    -4.27,
-    -0.7134,
-    1.1431
-   ]
-  },
-  {
-   "name": "Aileron_Right",
-   "tris": 14,
-   "verts": 9,
-   "mats": [
-    "SF50_Paint"
-   ],
-   "origin": [
-    4.27,
-    -0.7134,
-    1.1431
-   ]
-  },
-  {
    "name": "GearDoor_Left",
    "tris": 12,
    "verts": 8,
@@ -339,6 +296,19 @@
    ]
   },
   {
+   "name": "LandingGear_Nose",
+   "tris": 12,
+   "verts": 8,
+   "mats": [
+    "SF50_Metal"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
    "name": "Flap_Left",
    "tris": 8,
    "verts": 6,
@@ -349,6 +319,19 @@
     -1.585,
     -0.7133,
     0.9233
+   ]
+  },
+  {
+   "name": "Aileron_Left",
+   "tris": 8,
+   "verts": 6,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    -4.27,
+    -0.7134,
+    1.1431
    ]
   },
   {
@@ -375,6 +358,19 @@
     1.585,
     -0.7133,
     0.9233
+   ]
+  },
+  {
+   "name": "Aileron_Right",
+   "tris": 8,
+   "verts": 6,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    4.27,
+    -0.7134,
+    1.1431
    ]
   },
   {

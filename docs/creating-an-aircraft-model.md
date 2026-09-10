@@ -262,7 +262,20 @@ them, because Blender's Workbench wireframe shading is viewport-only and comes
 out blank headless. Two separate rounds of waste on the SF50 — whole extra ring
 sections carrying one window column each, and 140 sliver triangles fanning out
 of the window band — were invisible in every shaded view and obvious the moment
-anyone looked at the wires.
+anyone looked at the wires. Two later rounds — a belly paying for the
+windscreen's stations, and 800 mm splinters fanning across the aft window —
+were the same story.
+
+On a symmetric aircraft a side wireframe draws both halves on top of each
+other, which is survivable for the fuselage (they project identically) and
+useless anywhere off the centreline; `wireframe.py --half` drops one side.
+
+**Back the wireframe up with numbers.** `scripts/audit_fuselage.py` prints
+triangles per 0.20 m of length, every vertex whose whole fan is within a degree
+of one plane, and the thinnest faces with where they are. Density that is not
+at a feature, a fan that is flat, and a triangle whose longest edge is longer
+than the feature it is closing are three different kinds of waste, and each one
+is a number rather than an argument.
 
 Fix in priority order, and do not polish anything below the first item that is
 still wrong:
@@ -328,10 +341,11 @@ it is a second opinion on exactly this: the SF50's agreed to 8 mm.
 that row spans z = 1.71 to 2.23 at the cabin and 1.38 to 2.13 at the aft window.
 Everything below happens inside that row.
 
-**Cut the pane as a hole in that row, bridged to its own outline.** The hole is
+**Cut the pane as a hole in that row, closed to its own outline.** The hole is
 bounded by the stations either side of the pane; the outline is sampled at as
-many columns as the window needs to look round; a ring of triangles joins the
-two. A cabin window costs its outline plus that ring, and nothing else.
+many columns as the window needs to look round — measure that, it is fewer than
+it feels like — and a strip of triangles closes the two together. A cabin window
+costs its outline plus that strip, and nothing else.
 
 Three things that look reasonable and are not:
 
@@ -341,11 +355,15 @@ Three things that look reasonable and are not:
   spacing between neighbouring stations changes the faceted surface. On the SF50
   it put ridges down the length of the cabin and needed an 18-point ring to
   carry, costing 600 triangles to make the model look worse.
-- **Do not give the pane its own fuselage stations.** A whole extra ring to
-  carry one window column is nine rows of triangles that show nothing. Nor is
-  the halfway house any good: putting the columns only on the lines bounding the
-  window row forces the rows next to them into triangle strips — one thin sliver
-  per column, about 140 of them, fanning out to the shoulder and the keel.
+- **Do not give the pane a station per column.** A whole extra ring to carry
+  one window column is nine rows of triangles that show nothing. Nor is the
+  halfway house any good: putting the columns only on the lines bounding the
+  window row forces the rows next to them into triangle strips — one thin
+  sliver per column, about 140 of them, fanning out to the shoulder and the
+  keel. Two stations per pane — one just clear of each end, so the hole is the
+  pane's own size — is a different matter and worth having; see "A station a
+  feature asked for should not be a whole ring" for how to stop those costing
+  a ring each.
 - **Place the pane's vertices by interpolating inside the row's own quad.**
   Bilinear on the quad puts them on the ruled surface that was already there.
   Putting them on the analytic section instead — which is where they
@@ -447,7 +465,90 @@ where a feature is, and nowhere else.
 The reverse also holds. Getting the windscreen's outline right afterwards put
 LOD0 back up to 1515 — a crown ring line, three crossing stations, and the cuts
 those allow. "No polygon is wasted" is a claim about every polygon *earning*
-its place, not about the total going down.
+its place, not about the total going down. Reading the wireframe again after
+that took it to 1286 without touching the shape; the three things it found are
+the three sections below.
+
+### A station a feature asked for should not be a whole ring
+
+A loft splits at stations, and the natural way to add one for a feature — a
+windscreen edge, the gap between two windows — is to add a ring. On the SF50
+that is 22 triangles, of which the eleven below the waterline show nothing:
+the belly does not know the windscreen is there. Ten of LOD0's 33 stations were
+there for the glazing.
+
+The fix is that a ring **line** carries only the stations a row beside it was
+actually cut at, and a row whose two lines disagree closes the difference with
+a triangle instead of two quads. That triangle is the whole trick — it is the
+only way a row can skip a station without leaving a T-junction on the line it
+shares with the row above. Two rules keep it honest:
+
+- **Every measured station stays on every line.** Those are the shape. Only
+  stations a feature asked for are ever skipped, and the run a row merges over
+  always stops at a measured one.
+- **Decide it from what was actually cut, not from what you expect.** Ask
+  "did anything consume the row beside this line at this station", after the
+  cuts have run. Predicting it gets the transition rows wrong.
+
+Watch the shape of what this produces. If one line ends up with five stations
+in a run and the other with two, the strip between them is a fan from a single
+vertex — long thin triangles, which is the thing you were trying to remove. It
+stays square only because the run stops at every measured station.
+
+### Tile a strip along the axis both sides share, not by index
+
+A window cut as a hole in a face row has to be closed to the row around it, and
+the closing strip runs between two chains with different vertex counts: a few
+station vertices on the ring line, many on the pane's outline. Advancing them
+by index fraction pairs the first of six with the first of twenty-four however
+far apart they lie. On the SF50's aft window that came out as a sun: eight
+splinters up to 860 mm long fanning from one station vertex across a pane
+360 mm long. Tiling by the coordinate both chains share — here Y — makes each
+pane vertex join the two beside it and nothing reach across the block.
+
+Index fraction is still the right rule for two closed loops with **no** common
+parameter, which is what it was written for. Use the parameter when there is
+one.
+
+Two more things about that strip:
+
+- **Make the block the size of the feature.** Put a station just clear of each
+  end of the pane. Without it the hole ran from a station 150 mm ahead of the
+  aft window to one 400 mm behind it, and every triangle closing it was that
+  long. The same station also keeps two panes out of one station gap, which
+  they must be.
+- **A strip between two polylines costs their lengths less two, and nothing
+  beats that.** So the only lever on the count is how many vertices the pane's
+  outline has — and each one costs *four* triangles, not two: one on the pane
+  and one in the strip, top and bottom. Measure before choosing. Nine columns
+  hold the SF50's door window to 4.3 mm against the super-ellipse it is cut
+  from, finer than the 11-sided ring it sits in; twelve bought 1.8 mm for
+  twelve triangles a pane.
+
+### Give back the triangles that describe nothing — with a number, and a check
+
+Faces that meet within a degree or so are describing one surface, and the edge
+between them is a line the eye cannot find. Dissolving those and
+retriangulating what is left is the cheapest pass in the pipeline: it gave the
+SF50 back 110 triangles at LOD0, and the biggest single win was not the
+fuselage but the wings, 61 down to 33 each, because the ruled surface between
+two aerofoil sections is flat and the loft had been splitting it anyway.
+
+Pick the angle by measuring, not by feel. Sample both meshes both ways: 1.0°
+moves the SF50's skin by at most 3.6 mm, on a 9.36 m aeroplane read off a
+drawing to about 10 mm. 2.0° gives 46 more triangles for 6.8 mm, which is a
+number the drawing would notice.
+
+Then check it, because it can break the mesh. Two triangles can be flat and
+still be *folded*, and merging those gives a quad the retriangulator can only
+split across itself — four faces on one edge. Dissolve into a copy, count the
+copy's edges against the original's, and halve the angle until the mesh is
+exactly as sound as it was. The SF50's fuselage settles for 0.25° that way
+while everything else takes the full 1.0°.
+
+Two signs the pass is behaving: the coarsest levels should give back **nothing**
+(at LOD2 and LOD3 no face pair is flat enough), and the silhouette overlay
+against the drawing should not move at all.
 
 Two mesh-health numbers say whether a cut went in cleanly, and the validator
 prints both: **boundary edges** on a surface that should be closed, and
@@ -553,9 +654,8 @@ cross-section resolution → control-surface separation → part separation.
 Those sizes are targets, not walls. The right count is the one where the
 wireframe shows density only where a feature is; a level that is 30% over
 because its windows are round is a better level than one that hits a number
-with rectangles. The SF50 sits at 1515 / 1044 / 246 / 98 — 30% and 45% over
-the targets, both spent on window shape, and the wireframe accounts for all of
-it.
+with rectangles. The SF50 sits at 1286 / 982 / 246 / 98 — over the targets at
+the top two, spent on window shape, and the wireframe accounts for all of it.
 
 **A station's level is a shape decision, not an every-other-one rule.** Mark
 the stations that carry a feature — the nose and tail points that set the

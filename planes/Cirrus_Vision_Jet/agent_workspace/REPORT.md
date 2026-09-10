@@ -2,13 +2,13 @@
 
 A measured reconstruction of the SF50 (G2) built to
 `docs/creating-an-aircraft-model.md`, generated procedurally from a table of
-cross-section stations. Four levels of detail, 1515 / 1044 / 246 / 98 triangles,
+cross-section stations. Four levels of detail, 1286 / 982 / 246 / 98 triangles,
 wired into `AIRCRAFT_CATALOG` as `cirrus-vision-jet`.
 
 | level | triangles | vertices | objects | takes over at |
 | --- | --- | --- | --- | --- |
-| LOD0 | 1515 | 817 | 22 | 0 m |
-| LOD1 | 1044 | 581 | 22 | 65 m |
+| LOD0 | 1286 | 702 | 22 | 0 m |
+| LOD1 | 982 | 549 | 22 | 65 m |
 | LOD2 | 246 | 156 | 12 | 170 m |
 | LOD3 | 98 | 74 | 1 | 340 m |
 
@@ -166,6 +166,30 @@ Other things measurement changed from the first blockout:
 
 ## Nothing renders that cannot be seen
 
+- **A last pass gives back the triangles that describe nothing, and it is
+  measured, not assumed.** Faces that meet within `DISSOLVE_DEG` are describing
+  one surface, so the edge between them is a line the eye cannot find:
+  dissolving those and retriangulating what is left handed back 110 triangles
+  at LOD0 and 16 at LOD1. Sampled both ways against the undissolved surface,
+  1.0 deg moves the skin by at most 3.6 mm — on a 9.36 m aeroplane read off a
+  drawing to about 10 mm. 2.0 deg gives 46 more for 6.8 mm, which is a number
+  the drawing would notice, so 1.0 is where it stops. LOD2 and LOD3 give back
+  nothing at all, which is the check that it is not eating shape: at those
+  levels there is no face pair flat enough to merge.
+  The biggest single win was not the fuselage but the wings, 61 triangles down
+  to 33 each — the ruled surface between two aerofoil sections is flat, and the
+  loft had been splitting it anyway.
+- **It is tried, checked, and backed off rather than trusted.** Merging two
+  triangles that are flat but *folded* gives a quad the retriangulator can only
+  split across itself, and the fuselage came back with four edges carrying four
+  faces each. So each part is dissolved into a copy, the copy's edges are
+  counted, and the angle is halved until the mesh is exactly as sound as it was
+  before. `###DISSOLVE###` prints the angle each part settled for.
+- **`scripts/audit_fuselage.py` is how a wasted triangle is found rather than
+  argued about.** It prints triangles per 0.20 m of length, every vertex whose
+  whole fan is within a degree of one plane, and the thinnest faces with where
+  they are. The two things it found — a belly paying for the windscreen's
+  stations, and 800 mm splinters fanning across the aft window — are both gone.
 - **The glazing is a material index, not geometry.** The cabin windows and the
   wraparound windshield are fuselage polygons with a second material. Zero
   duplicated triangles, zero occluded ones, one extra submesh.
@@ -223,10 +247,34 @@ Other things measurement changed from the first blockout:
   show one window column), then on the four lines bounding the two window rows,
   which forced the neighbouring rows into triangle strips: one thin sliver per
   column, about 140 of them, fanning from the window band out to the shoulder
-  and the keel and showing nothing. Both are gone. The only stations the
-  glazing adds are the windshield's two ends, where the crown rows stop being
-  glazed, and a separator wherever the measured stations do not already keep
-  two panes out of the same station gap - three rings in total.
+  and the keel and showing nothing. Both are gone. The stations the glazing
+  adds are the windshield's two ends, where the crown rows stop being glazed,
+  the crossings solved for below, and one just clear of each end of each pane.
+- **A station the glazing asked for is not a whole ring.** Ten of the 33
+  stations at LOD0 are there for the windscreen or the windows, and the belly
+  has no use for any of them: a ring is 22 triangles and eleven of them are
+  under the waterline. So each ring LINE carries only the stations a row beside
+  it was actually cut at, and a row whose two lines disagree closes the
+  difference with a triangle instead of two quads. That is the only way a row
+  can skip a station without leaving a T-junction on the line it shares - and
+  the run it merges over always stops at a measured station, because those are
+  the shape and every line keeps them.
+- **The strip that closes a pane's hole is tiled along Y.** Which side to
+  advance is decided by where the next vertex actually is, so a pane vertex
+  only ever joins the two beside it. It used to be decided by index fraction,
+  which pairs the first of six station vertices with the first of twenty-four
+  pane vertices however far apart they lie: the aft window came back as a sun,
+  eight splinters up to 860 mm long fanning from one station vertex across a
+  pane 360 mm long. Index fraction is still right for two closed loops with no
+  common parameter; these two have Y.
+- **A pane's block is the pane's own size.** The station just clear of each end
+  does double duty - it keeps two panes out of one station gap, and it stops
+  the hole running from 150 mm ahead of the pane to 400 mm behind it.
+- **Nine columns per pane, not twelve.** Each column costs four triangles, not
+  two: one on the pane and one in the strip, top and bottom. Measured against
+  the super-ellipse it is cut from, nine holds the door window's outline to
+  4.3 mm and the aft ones to 3.5 mm - finer than the 11-sided ring the pane is
+  cut into. Twelve bought 1.8 mm for twelve triangles a pane.
 - **Pane vertices are placed by interpolating inside the row's own quad**, so
   they land exactly on the ruled surface that was already there: cutting a
   window changes nothing about the shape of the fuselage around it. Putting
@@ -290,7 +338,7 @@ Generated from the same parameterised script, never decimated.
 
 | dropped at | what goes |
 | --- | --- |
-| LOD1 | 9 pane columns → 5, fewer fuselage stations, coarser nacelle and wheels, the wing's mid-span station. The ring stays at 11 points: the body is the same shape, the panes are less round |
+| LOD1 | 9 pane columns → 7, fewer fuselage stations, coarser nacelle and wheels, the wing's mid-span station. The ring stays at 11 points: the body is the same shape, the panes are less round |
 | LOD2 | ring → 6 points, 9 stations, the pane-edge rings (one glazed band instead of four windows), control surfaces merged into their panels, intake, keel, gear doors |
 | LOD3 | ring → 4 points, 5 stations, 4-point aerofoils (3-point on the V-tail), tyres, everything joined into one mesh |
 
@@ -324,7 +372,7 @@ literally, and it is what let LOD3 come in under 100 triangles.
 
 | check | LOD0 | LOD1 | LOD2 | LOD3 |
 | --- | --- | --- | --- | --- |
-| triangles | 1515 | 1044 | 246 | 98 |
+| triangles | 1286 | 982 | 246 | 98 |
 | length 9.357 m | 9.357 | 9.357 | 9.357 | 9.357 |
 | span 11.796 m | 11.796 | 11.796 | 11.796 | 11.796 |
 | height 3.322 m | 3.3227 | 3.3227 | 3.3219 | 3.3227 |
@@ -341,11 +389,12 @@ propeller, so this airframe has no genuinely asymmetric part. Anything non-zero
 here would be a real defect.
 
 **Open boundary edges are all intentional**, and they are the only two lists in
-the report that flag correct things:
+the report that flag correct things. The fuselage is no longer among them: it is
+watertight at every level, and so is every edge in it — no edge carries more or
+fewer than two faces.
 
 | object | edges | why it is open |
 | --- | --- | --- |
-| Fuselage | 3 | one sliver at the aft cabin window's bridge — see "What is still wrong" |
 | Nacelle | 16 / 6 / 4 | the faces buried in the fuselage crown are not built |
 | Intake | 8 / 6 | the bore is a dished cap, open at its rim inside the lip |
 | Wing_Left / _Right | 7 / 6 | root ribs, uncapped inside the fuselage |
@@ -363,14 +412,14 @@ Attribution**, so it can ship, and it now does: as the Vision Jet's `hd` level,
 
 | | hd (hilos run) | our LOD0 |
 | --- | --- | --- |
-| triangles | 7,294 | 1,515 |
-| vertices | 4,578 | 817 |
+| triangles | 7,294 | 1,286 |
+| vertices | 4,578 | 702 |
 | download | 3.4 MB (4096² texture) | 60 KB |
 | span | 11.796 (the scale datum) | 11.796 |
 | length | 9.075 (−3.0%) | 9.357 (exact) |
 | landing gear | **none — modelled gear-up** | modelled, on z = 0 |
 | symmetry error, max | 0.96 m | 0.0 |
-| closed | no, 1,828 boundary edges | yes apart from the three above |
+| closed | no, 1,828 boundary edges | yes — the fuselage is watertight |
 
 It is prepared, not modelled: `reorient_ref.py` aligns it to the three view and
 `prepare_third_party.py` puts its origin under the CG and exports it with the
@@ -394,7 +443,7 @@ because the validator reports it, not because the model looks lopsided.
 
 `src/flight/aircraft/aircraftCatalog.ts`:
 
-- Four levels of ours — 1515 / 1044 / 246 / 98 triangles — at `autoFromMeters`
+- Four levels of ours — 1286 / 982 / 246 / 98 triangles — at `autoFromMeters`
   of 40 / 65 / 170 / 340, plus hilos run's opt-in `hd` at 0. The three coarse
   thresholds are the Cessna's scaled by the span ratio, so the two airframes
   switch at the same apparent size. LOD0's is 40 rather than 0 because `hd`
@@ -526,27 +575,27 @@ Read this before treating any of it as accurate.
   wing chord plane, which is free, but a super-ellipse cannot be wide low and
   narrow high: the body ends up about 7 cm too wide at mid-height in that
   region. The plan and front outlines are right, which is the trade taken.
-- **The cabin windows are polygons of twelve columns, not smooth curves.** Their
-  top and bottom edges follow the measured super-ellipse exactly; their fore
-  and aft ends close at the station straddling the pane's tip.
-- **There is a faint shading seam at each pane's fore and aft end**, where the
-  triangle strip joins a four-vertex chain to a two-vertex one.
-- **Three boundary edges remain in the fuselage**, at the aft cabin window.
-  Its hole runs to the nearest station either side, and the nearest aft is
-  0.4 m away, so the bridge leaves one sliver whose edges do not pair up. It is
-  down from eight, it is invisible, and closing it means a station 0.4 m from
-  where the shape needs one.
+- **The cabin windows are polygons of nine columns, not smooth curves.** Their
+  top and bottom edges follow the measured super-ellipse to 4.3 mm; their fore
+  and aft ends close at the station just clear of the pane's tip.
 - **The reference model is 3% short** once its span is set to the published
   figure, and its fuselage is up to 0.24 m wider than the drawing at the cabin.
   Nothing is taken from it in metres except the windshield's roof line, which
   the drawing gives independently and agrees with to 8 mm; everywhere else the
   drawing wins.
-- **Each pane's bridge fans from the few station lines around it to the many
-  vertices of its outline**, so some of those triangles are long and thin -
-  visible in `renders/WIREFRAME_lod0.png` around the aft window, whose nearest
-  station aft is 0.4 m away. The count is minimal (outer loop plus inner loop);
-  only their shape is uneven. Evening them out means a station closer to each
-  pane, which costs a whole ring to save nothing.
+- **The strip closing each pane still fans**, because the window row is 0.9 m
+  tall at the aft cabin and the window in it is 0.35 m. The strip's count is
+  minimal — a strip between two polylines costs their two lengths less two, and
+  no tiling beats that — and it is now tiled along Y, so nothing reaches across
+  the block. What is left is long triangles over flat skin. Making them square
+  needs a ring line closer to the window's sill, which would cost 66 triangles
+  down the whole fuselage to tidy about a dozen.
+- **The dissolve pass backs off on the fuselage.** It asks for 1.0 deg and
+  settles for 0.25: at 0.5 deg it merges a pair of flat but folded triangles in
+  a pane strip, and the retriangulator can only split that quad across itself —
+  four faces on one edge. The generator checks and halves rather than trusting
+  it, so the mesh is always sound; the cost is about 40 triangles it could
+  otherwise have given back.
 - **LOD2 and LOD3 keep a plain glazed band**, not shaped panes: at 170 m and
   beyond the whole aircraft is a few tens of pixels.
 - **No panel lines, antennas, deice boots, door outline, exhaust, static ports
@@ -581,6 +630,15 @@ blender -b --factory-startup --python scripts/compare_drawing.py -- \
     work/sf50_lod0.blend side renders/COMPARE_side_vs_drawing.png --px 150
 blender -b --factory-startup --python scripts/render_sf50_views.py -- \
     work/sf50_lod0.blend renders/final_lod0 final --fit 13 --res 640 --keepmat
+
+# where the polygons went, and which of them show anything
+blender -b --factory-startup --python scripts/audit_fuselage.py -- \
+    work/sf50_lod0.blend
+blender -b --factory-startup --python scripts/wireframe.py -- \
+    work/sf50_lod0.blend side renders/WIREFRAME_lod0.png --px 150
+blender -b --factory-startup --python scripts/wireframe.py -- \
+    work/sf50_lod0.blend side renders/preview/WIRE_cabin_after.png \
+    --px 420 --only Fuselage --half --win 2.9,-1.5,2.6,1.2
 
 # master .blend with all four levels in their own collections
 blender -b --factory-startup --python scripts/assemble_master.py -- \

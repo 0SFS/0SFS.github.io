@@ -96,8 +96,8 @@ const CIRRUS_LODS: readonly AircraftLodDefinition[] = [
   // 40 m rather than 0 because HD covers the close range when it is switched
   // on. With it off, the finest level available always covers the close range,
   // so this still starts at the camera - see selectAutoLod.
-  { id: "lod0", label: "LOD0 — near", triangles: 1515, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD0.glb", autoFromMeters: 40, credit: PROCEDURAL },
-  { id: "lod1", label: "LOD1 — medium", triangles: 1044, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD1.glb", autoFromMeters: 65, credit: PROCEDURAL },
+  { id: "lod0", label: "LOD0 — near", triangles: 1286, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD0.glb", autoFromMeters: 40, credit: PROCEDURAL },
+  { id: "lod1", label: "LOD1 — medium", triangles: 982, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD1.glb", autoFromMeters: 65, credit: PROCEDURAL },
   { id: "lod2", label: "LOD2 — far", triangles: 246, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD2.glb", autoFromMeters: 170, credit: PROCEDURAL },
   { id: "lod3", label: "LOD3 — silhouette", triangles: 98, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD3.glb", autoFromMeters: 340, credit: PROCEDURAL },
 ];
