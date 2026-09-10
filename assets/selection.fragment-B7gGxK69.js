@@ -1,4 +1,4 @@
-import{Es as e}from"./shell-D8fHFVSJ.js";var t=`selectionPixelShader`,n=`#ifdef INSTANCES
+import{ms as e}from"./resolveMapRuntimeConfig-CAEM5VAl.js";var t=`selectionPixelShader`,n=`#ifdef INSTANCES
 flat varying float vSelectionId;
 #else
 uniform float selectionId;

@@ -1,4 +1,4 @@
-import{Es as e}from"./shell-D8fHFVSJ.js";var t=`selectionVertexShader`,n=`attribute vec3 position;
+import{ms as e}from"./resolveMapRuntimeConfig-CAEM5VAl.js";var t=`selectionVertexShader`,n=`attribute vec3 position;
 #ifdef INSTANCES
 attribute float instanceSelectionId;
 #endif
