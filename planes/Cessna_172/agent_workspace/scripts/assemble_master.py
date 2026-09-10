@@ -14,8 +14,10 @@ for lod in range(4):
     for ob in dt.objects:
         if ob is not None:
             coll.objects.link(ob)
-    coll.hide_viewport = (lod != 0)
-    coll.hide_render = (lod != 0)
+    # The ladder runs coarsest first, so LOD3 is the finest and is the one
+    # left visible.
+    coll.hide_viewport = (lod != 3)
+    coll.hide_render = (lod != 3)
     print(f"LOD{lod}: {len([o for o in coll.objects])} objects")
 
 bpy.ops.wm.save_as_mainfile(filepath=OUT)

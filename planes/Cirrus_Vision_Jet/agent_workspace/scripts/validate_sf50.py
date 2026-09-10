@@ -13,8 +13,8 @@ which:
 
 - **Open boundary edges** are expected wherever a surface is deliberately not
   sealed: the nacelle is left open where it is buried in the fuselage crown,
-  wing and V-tail roots are uncapped inside the body, and at LOD3 the gear legs
-  have no end caps because both ends are buried.
+  wing and V-tail roots are uncapped inside the body, and the gear legs have no
+  end caps because both ends are buried.
 - **Symmetry error** should be zero. This airframe has no asymmetric part -
   there is no propeller - so anything here is a real defect.
 """

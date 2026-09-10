@@ -62,6 +62,8 @@ const BLIND_STEPS = 60;
  * touchdown is never met with a lagging ground height. */
 const WHEELS_CLEAR_METERS = 5;
 
+export type TerrainBlockReason = "missing" | "coarse" | null;
+
 export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
   // `height` is the raw sample, used to detect the world changing. `ground` is
   // what the wheels ride on and what JSBSim is given.
@@ -74,10 +76,25 @@ export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
   // trusted the way a fresh placement is, because the aircraft may have flown
   // over a hill it could not see.
   let blindSteps = 0;
+  let blockReason: TerrainBlockReason = null;
   const wheelGround = createWheelGroundFilter();
   return {
-    reset() { previous = null; placement = true; hasReference = false; rejectedSamples = 0; blindSteps = 0; wheelGround.reset(); },
-    update(blockOnMissingSurface = true): boolean | "reset" {
+    reset() { previous = null; placement = true; hasReference = false; rejectedSamples = 0; blindSteps = 0; blockReason = null; wheelGround.reset(); },
+    getBlockReason: (): TerrainBlockReason => blockReason,
+    /**
+     * `allowGoogleTerrainSurface` is the caller's World-detail policy. Google
+     * `geometricError` describes tile simplification, not a measured vertical
+     * accuracy, so terrain contact deliberately does not infer a metre-level
+     * safety decision from that metadata. `allowUninitialisedSurface` is used
+     * only after spawn preparation has already placed the aircraft on known
+     * ground; it prevents streaming gaps from becoming a second readiness gate.
+     */
+    update(
+      blockOnMissingSurface = true,
+      googleTiles = false,
+      allowGoogleTerrainSurface = false,
+      allowUninitialisedSurface = false,
+    ): boolean | "reset" {
       const lat = sdk.getPropertyValue("position/lat-geod-deg"), lon = sdk.getPropertyValue("position/long-gc-deg");
       const hit = surface.sample(lat, lon);
       if (!hit || !Number.isFinite(hit.heightMeters)) {
@@ -105,10 +122,34 @@ export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
         // stepping drops the aircraft toward a ground plane that is not there,
         // and the gear model resolves the accumulated penetration explosively
         // the moment real terrain arrives.
-        if (!hasReference) return false;
+        if (!hasReference) {
+          if (allowUninitialisedSurface) {
+            blindSteps += 1;
+            blockReason = null;
+            return true;
+          }
+          blockReason = "missing";
+          return false;
+        }
+        // Google only publishes currently visible mesh. Once the selected
+        // World detail meets the flight requirement, a culling/replacement
+        // miss may continue on the previously measured floor.
+        if (googleTiles && allowGoogleTerrainSurface) {
+          blindSteps += 1;
+          return true;
+        }
         blindSteps += 1;
+        if (blockOnMissingSurface) blockReason = "missing";
         return !blockOnMissingSurface;
       }
+      if (googleTiles && !allowGoogleTerrainSurface) {
+        // The pilot selected a renderer target coarser than the flight
+        // requirement. This is a policy hold, not a claim about this tile's
+        // vertical error.
+        blockReason = "coarse";
+        return false;
+      }
+      blockReason = null;
       if (!hasReference) {
         hasReference = true;
         flightLog.info("terrain", "First terrain height established", {

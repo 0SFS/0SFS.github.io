@@ -212,6 +212,24 @@ describe("flightInputManager phone handoff", () => {
     expect(input.poll(1)).toEqual({ ...centered, ...expected });
   });
 
+  it("applies HUD stick input and clears it on release", () => {
+    const input = createFlightInputManager();
+    input.setStick(0.6, -0.4);
+    expect(input.poll(1)).toMatchObject({ aileron: 0.6, elevator: -0.4 });
+    expect(input.hasActiveFlightInput()).toBe(true);
+    input.setStick(0, 0);
+    expect(input.poll(1)).toMatchObject({ aileron: 0, elevator: 0 });
+    expect(input.hasActiveFlightInput()).toBe(false);
+  });
+
+  it("revokes before applying setStick", () => {
+    connectPad();
+    const { input, onLocalInput } = withSynchronousTakeover();
+    input.setStick(0.5, 0.25);
+    expect(onLocalInput).toHaveBeenCalledTimes(1);
+    expect(input.poll(1)).toEqual({ ...centered, aileron: 0.5, elevator: 0.25 });
+  });
+
   it("does not mistake typing, pause, camera keys, reset, or state adoption for takeover", () => {
     const { input, onLocalInput } = withSynchronousTakeover();
     const search = document.createElement("input");

@@ -39,8 +39,10 @@ describe("aircraft catalog", () => {
       expect(distances[0]).toBe(0);
       expect(availableLods(definition, false)[0]?.optIn).toBeUndefined();
     }
-    expect(c172.lods.map((lod) => lod.id)).toEqual(["lod0", "lod1", "lod2", "lod3"]);
-    expect(cirrus.lods.map((lod) => lod.id)).toEqual(["hd", "lod0", "lod1", "lod2", "lod3"]);
+    // Level numbers run the other way from the array: lod0 is the coarsest,
+    // and the jet has no lod0 at all because its coarsest level is lod1.
+    expect(c172.lods.map((lod) => lod.id)).toEqual(["lod3", "lod2", "lod1", "lod0"]);
+    expect(cirrus.lods.map((lod) => lod.id)).toEqual(["hd", "lod3", "lod2", "lod1"]);
   });
 
   it("credits every mesh, and names a licence and a source for third-party ones", () => {
@@ -58,32 +60,32 @@ describe("aircraft catalog", () => {
     }
     const hd = cirrus.lods.find((lod) => lod.id === "hd");
     expect(hd?.credit.artist).toBe("hilos run");
-    expect(cirrus.lods.find((lod) => lod.id === "lod0")?.credit.artist).toBe("felipegalin0");
+    expect(cirrus.lods.find((lod) => lod.id === "lod3")?.credit.artist).toBe("felipegalin0");
   });
 
   it("hides opt-in levels until they are switched on", () => {
     expect(availableLods(cirrus, false).map((lod) => lod.id)).toEqual([
-      "lod0", "lod1", "lod2", "lod3",
+      "lod3", "lod2", "lod1",
     ]);
     expect(availableLods(cirrus, true).map((lod) => lod.id)).toEqual([
-      "hd", "lod0", "lod1", "lod2", "lod3",
+      "hd", "lod3", "lod2", "lod1",
     ]);
     // The C172 has none, so the flag changes nothing for it.
     expect(availableLods(c172, true)).toEqual(availableLods(c172, false));
   });
 
   it("never reaches an opt-in level while it is switched off", () => {
-    expect(selectAutoLod(cirrus, 0, false)?.id).toBe("lod0");
+    expect(selectAutoLod(cirrus, 0, false)?.id).toBe("lod3");
     // ...and a stored choice of one falls back rather than blanking the model
-    expect(resolveLod(cirrus, "hd", 0, false)?.id).toBe("lod0");
+    expect(resolveLod(cirrus, "hd", 0, false)?.id).toBe("lod3");
   });
 
   it("lets an opt-in level cover the close range once it is on", () => {
     expect(selectAutoLod(cirrus, 0, true)?.id).toBe("hd");
     expect(selectAutoLod(cirrus, 39, true)?.id).toBe("hd");
-    expect(selectAutoLod(cirrus, 40, true)?.id).toBe("lod0");
-    expect(selectAutoLod(cirrus, 65, true)?.id).toBe("lod1");
-    expect(selectAutoLod(cirrus, 5000, true)?.id).toBe("lod3");
+    expect(selectAutoLod(cirrus, 40, true)?.id).toBe("lod3");
+    expect(selectAutoLod(cirrus, 65, true)?.id).toBe("lod2");
+    expect(selectAutoLod(cirrus, 5000, true)?.id).toBe("lod1");
     expect(resolveLod(cirrus, "hd", 9999, true)?.id).toBe("hd");
   });
 
@@ -102,24 +104,25 @@ describe("aircraft catalog", () => {
   });
 
   it("picks a coarser auto level as the chase camera pulls back", () => {
-    expect(selectAutoLod(c172, 0)?.id).toBe("lod0");
-    expect(selectAutoLod(c172, 59)?.id).toBe("lod0");
-    expect(selectAutoLod(c172, 60)?.id).toBe("lod1");
-    expect(selectAutoLod(c172, 200)?.id).toBe("lod2");
-    expect(selectAutoLod(c172, 5000)?.id).toBe("lod3");
+    expect(selectAutoLod(c172, 0)?.id).toBe("lod3");
+    expect(selectAutoLod(c172, 59)?.id).toBe("lod3");
+    expect(selectAutoLod(c172, 60)?.id).toBe("lod2");
+    expect(selectAutoLod(c172, 200)?.id).toBe("lod1");
+    expect(selectAutoLod(c172, 5000)?.id).toBe("lod0");
   });
 
   it("honours an explicit level regardless of distance", () => {
-    expect(resolveLod(c172, "lod3", 0)?.id).toBe("lod3");
-    expect(resolveLod(c172, "lod0", 9999)?.id).toBe("lod0");
+    expect(resolveLod(c172, "lod0", 0)?.id).toBe("lod0");
+    expect(resolveLod(c172, "lod3", 9999)?.id).toBe("lod3");
   });
 
   it("picks a coarser auto level for the jet as well", () => {
-    expect(selectAutoLod(cirrus, 0)?.id).toBe("lod0");
-    expect(selectAutoLod(cirrus, 64)?.id).toBe("lod0");
-    expect(selectAutoLod(cirrus, 65)?.id).toBe("lod1");
-    expect(selectAutoLod(cirrus, 200)?.id).toBe("lod2");
-    expect(selectAutoLod(cirrus, 5000)?.id).toBe("lod3");
+    expect(selectAutoLod(cirrus, 0)?.id).toBe("lod3");
+    expect(selectAutoLod(cirrus, 64)?.id).toBe("lod3");
+    expect(selectAutoLod(cirrus, 65)?.id).toBe("lod2");
+    expect(selectAutoLod(cirrus, 200)?.id).toBe("lod1");
+    // No silhouette level under it: the far level runs all the way out.
+    expect(selectAutoLod(cirrus, 5000)?.id).toBe("lod1");
   });
 
   it("returns no mesh for an airframe that has none, at any level", () => {
@@ -127,7 +130,7 @@ describe("aircraft catalog", () => {
     // entry lands before one exists, so it stays covered.
     const meshless: AircraftDefinition = { ...cirrus, lods: [] };
     expect(resolveLod(meshless, "auto", 0)).toBeNull();
-    expect(resolveLod(meshless, "lod0", 0)).toBeNull();
+    expect(resolveLod(meshless, "lod3", 0)).toBeNull();
     expect(selectAutoLod(meshless, 0)).toBeNull();
     // ...and an airframe whose only mesh is opt-in, while it is switched off
     const optInOnly: AircraftDefinition = { ...cirrus, lods: cirrus.lods.filter((lod) => lod.optIn) };

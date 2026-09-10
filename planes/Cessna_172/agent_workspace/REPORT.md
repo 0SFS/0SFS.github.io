@@ -67,18 +67,24 @@ sweeping up. The blockout converged both lines symmetrically, producing a generi
 
 ## 3. Final LOD statistics
 
+> **Levels were renumbered coarsest-first** so that a bigger number is always a
+> better mesh: what this report calls LOD0 is the silhouette and LOD3 the
+> finest. The meshes themselves did not change when the numbering did. The
+> counts below are from the build at the time of writing; the shipped figures
+> are in `docs/aircraft-assets.md`.
+
 | LOD | triangles | vertices | meshes | draw-call groups | GLB size | target | cabin posts |
 |---|---|---|---|---|---|---|---|
-| LOD0 | **876** | 507 | 22 | 23 | 45.7 kB | 1000–1500 ✔ (under) | yes (7) |
-| LOD1 | **678** | 413 | 22 | 23 | 41.9 kB | 400–700 ✔ | yes (7) |
-| LOD2 | **288** | 189 | 16 | 17 | 24.0 kB | 150–300 ✔ | no, continuous glass |
-| LOD3 | **130** | 105 | 2 | 3 | 9.4 kB | ≤100 — 30 over | no, continuous glass |
+| LOD3 | **876** | 507 | 22 | 23 | 45.7 kB | 1000–1500 ✔ (under) | yes (7) |
+| LOD2 | **678** | 413 | 22 | 23 | 41.9 kB | 400–700 ✔ | yes (7) |
+| LOD1 | **288** | 189 | 16 | 17 | 24.0 kB | 150–300 ✔ | no, continuous glass |
+| LOD0 | **130** | 105 | 2 | 3 | 9.4 kB | ≤100 — 30 over | no, continuous glass |
 
 Draw-call groups exceed the mesh count by one because `Fuselage` carries two
 material slots (paint + glass) and so exports as two glTF primitives.
 
 Vertex counts are Blender's shared-vertex counts. After glTF export the renderer sees
-more (LOD0: 1062) because the exporter splits vertices at material and hard-normal
+more (LOD3: 1062) because the exporter splits vertices at material and hard-normal
 boundaries; that is normal and is what the GPU actually uploads.
 
 ### LOD strategy (not blind decimation)
@@ -86,24 +92,24 @@ boundaries; that is normal and is what the GPU actually uploads.
 Each level drops the cheapest-to-lose thing first, in this order: cross-section
 resolution → control-surface separation → part separation.
 
-- **LOD0** — 10-point fuselage rings, 19 stations, 8-point cambered airfoil, separate
+- **LOD3** — 10-point fuselage rings, 19 stations, 8-point cambered airfoil, separate
   flaps/ailerons/elevator/rudder, 8-sided wheels, 4-station gear legs, full cabin posts.
-- **LOD1** — 8-point rings, 16 stations, 6-sided wheels, 3-station gear, full cabin posts.
-  Same object names as LOD0.
-- **LOD2** — 6-point rings, 7 stations, 6-point airfoils, control surfaces merged into
+- **LOD2** — 8-point rings, 16 stations, 6-sided wheels, 3-station gear, full cabin posts.
+  Same object names as LOD3.
+- **LOD1** — 6-point rings, 7 stations, 6-point airfoils, control surfaces merged into
   their parent surfaces, rudder merged into the fin, 4-sided wheels, glazing on the
   windshield crown, cabin sides and rear window.
-- **LOD3** — 6-point rings, 5 stations, 4-point airfoils, flat-plate gear legs and struts,
+- **LOD0** — 6-point rings, 5 stations, 4-point airfoils, flat-plate gear legs and struts,
   single-quad propeller blades, and **every static part joined into one mesh**
   (`Cessna_172_Body`) so the whole aircraft is 2 draw-call groups instead of 15.
 
-Every silhouette-defining feature survives to LOD3: high wing with dihedral, both lift
+Every silhouette-defining feature survives to LOD0: high wing with dihedral, both lift
 struts, tricycle gear, swept fin with dorsal fillet, long tail cone, dark greenhouse,
-two-blade prop. See `renders/final_lod3/`.
+two-blade prop. See `renders/final_lod0/`.
 
 ---
 
-## 4. Final dimensions — all four LODs
+## 4. Final dimensions — every LOD
 
 | quantity | model | reference (172S) | error |
 |---|---|---|---|
@@ -112,7 +118,7 @@ two-blade prop. See `renders/final_lod3/`.
 | height | 2.718 m | 2.718 m | 0.000 |
 | ground contact | z = 0.000 | — | wheels touch z=0 at every LOD |
 
-Bounding box (LOD0, Blender axes): min `[-5.499, -5.720, 0.000]`, max `[5.499, 2.560, 2.718]`.
+Bounding box (LOD3, Blender axes): min `[-5.499, -5.720, 0.000]`, max `[5.499, 2.560, 2.718]`.
 
 ---
 
@@ -132,7 +138,7 @@ Bounding box (LOD0, Blender axes): min `[-5.499, -5.720, 0.000]`, max `[5.499, 2
 
 ## 6. Mesh health
 
-| check | LOD0 | LOD1 | LOD2 | LOD3 |
+| check | LOD3 | LOD2 | LOD1 | LOD0 |
 |---|---|---|---|---|
 | degenerate faces | 0 | 0 | 0 | 0 |
 | loose vertices | 0 | 0 | 0 | 0 |
@@ -140,7 +146,7 @@ Bounding box (LOD0, Blender axes): min `[-5.499, -5.720, 0.000]`, max `[5.499, 2
 | open boundary edges | 20 | 34 | 24 | 40 |
 | symmetry error, mean | 2.9 mm | 2.4 mm | 3.2 mm | 6.0 mm |
 
-**The open boundary edges are intentional, not defects.** At LOD0 they are
+**The open boundary edges are intentional, not defects.** At LOD3 they are
 `Fuselage` 10 and `Wing_Left`/`Wing_Right` 7 each: the fuselage top is deliberately
 left **open over the wing root chord** (see §8.1), so removing the wing would reveal
 the rectangular cut-out it sits in, exactly as on the real airframe; and the wing root
@@ -150,7 +156,7 @@ The count dropped from 100 to 24 when the glazing stopped being a separate open 
 
 **The symmetry error is entirely the propeller** (`asymmetric_objects` in the validation
 JSON lists only `Propeller`, 32 vertices). Propeller blades are twisted, so they are
-correctly not mirror-symmetric. Every other part is symmetric to within 1 mm. At LOD3
+correctly not mirror-symmetric. Every other part is symmetric to within 1 mm. At LOD0
 the merged body inherits the same figure because the propeller-adjacent spinner joins it.
 
 ---
@@ -178,11 +184,11 @@ static parts have identity node transforms (the CG shift is baked into their mes
 | `Rudder` | raked hinge line | vertical |
 | `Propeller` | prop hub, on the thrust line | longitudinal |
 
-Names present at LOD0/LOD1: `Fuselage, Wing_Left, Wing_Right,
+Names present at LOD3/LOD2: `Fuselage, Wing_Left, Wing_Right,
 HorizontalTail_Left, HorizontalTail_Right, VerticalTail, Rudder, Elevator,
 Aileron_Left, Aileron_Right, Flap_Left, Flap_Right, LandingGear_Nose,
 LandingGear_Left, LandingGear_Right, Wheel_Nose, Wheel_Left, Wheel_Right,
-Spinner, Propeller, Strut_Left, Strut_Right`. Names are stable between LOD0 and LOD1.
+Spinner, Propeller, Strut_Left, Strut_Right`. Names are stable between LOD3 and LOD2.
 
 ---
 
@@ -193,14 +199,14 @@ Spinner, Propeller, Strut_Left, Strut_Right`. Names are stable between LOD0 and 
    this work: (a) the fuselage **top is left open** over the wing root chord, because
    the wing closes it; (b) the ring's angular phase is offset by half a step so every
    section has a flat top *edge* rather than a vertex at top dead centre — at 4 points
-   that is the difference between a flat-topped box and a diamond, which is what LOD3
+   that is the difference between a flat-topped box and a diamond, which is what LOD0
    used to be.
 2. **Cabin roof follows the wing's lower surface** over the chord rather than sitting
    at a fixed height, so there is no gap under the wing and no poke-through at the thin
    trailing edge.  `z_top` is solved *backwards* from the wanted crown height, because
    with no vertex at top dead centre the visible crown sits a few mm below the nominal
    top and would otherwise miss the wing surface.
-3. **Seven cabin posts** (LOD0/LOD1): A, B and C posts on each side plus a centre post
+3. **Seven cabin posts** (LOD3/LOD2): A, B and C posts on each side plus a centre post
    splitting the wraparound rear window — windshield | A | door window | B | rear side
    window | C | rear window.  The A and B posts are real ~70 mm fuselage segments that
    simply do not receive the glass material; the centre post is a 70 mm split of the
@@ -213,7 +219,7 @@ Spinner, Propeller, Strut_Left, Strut_Right`. Names are stable between LOD0 and 
    cutting it properly decouples the two.  The band's top-aft corner lands exactly on
    the wing-TE station so the rear window starts there at roof level.  Cutting it costs
    10 triangles but removes the extra station the diagonal scheme needed, so it is a
-   **net saving of 14 triangles** at LOD0.
+   **net saving of 14 triangles** at LOD3.
 4. **Glazing corners are chamfered per-triangle, not per-face.** The corner pane of the
    windshield (forward) and of the rear window (aft) is already two triangles, so the
    material index is assigned to each triangle separately: the upper triangle stays
@@ -226,7 +232,7 @@ Spinner, Propeller, Strut_Left, Strut_Right`. Names are stable between LOD0 and 
    splitting the face into glass | post | glass costs 2 quads and matches the others.
 6. **Spinner is a true cone from a single apex vertex** with no caps. It used to start
    from a tiny ring plus an n-gon cap — a flat forward-facing disc on the nose tip for
-   no visual gain — and capped the base as well, a face sealed inside the cowl. LOD0
+   no visual gain — and capped the base as well, a face sealed inside the cowl. LOD3
    went 60 → 18 triangles; the propeller lost its root cap (buried in the spinner) and
    a station, 56 → 36.
 7. **Ring angles are chosen, not evenly spaced.**  Even spacing puts no vertex at the
@@ -234,7 +240,7 @@ Spinner, Propeller, Strut_Left, Strut_Right`. Names are stable between LOD0 and 
    offset shell.  Each ring table places vertices at the sill (the max-width line) and
    the head, so a cabin window is exactly one face row of the fuselage at a realistic
    ~0.47 m; keeps a flat top *edge* for the cabin roof; and keeps a flat bottom edge for
-   the belly.  Doing this let LOD0 drop from 12-point to 10-point rings with no loss.
+   the belly.  Doing this let LOD3 drop from 12-point to 10-point rings with no loss.
 8. **Level tail-cone top line with the belly sweeping up** — the signature Cessna tail
    cone, and the thing that most distinguishes it from a generic low-poly monoplane.
 9. **Semi-tapered wing**: constant 1.63 m chord out to 2.65 m from the centreline, then
@@ -273,8 +279,8 @@ Spinner, Propeller, Strut_Left, Strut_Right`. Names are stable between LOD0 and 
   line. Reverted to the plain white trainer scheme; the render is in `renders/iter06/`.
 - **Control surfaces are wedges** filling 0.78→1.0 chord rather than fully-boxed
   surfaces, so their cut ends are single quads.
-- **LOD2/LOD3 merge control surfaces** into their parent panels; only the propeller stays
-  separately addressable at LOD3.
+- **LOD1/LOD0 merge control surfaces** into their parent panels; only the propeller stays
+  separately addressable at LOD0.
 
 ---
 
@@ -282,15 +288,15 @@ Spinner, Propeller, Strut_Left, Strut_Right`. Names are stable between LOD0 and 
 
 Being straight about these:
 
-- **LOD3 is 130 triangles against a ≤100 target (30% over).** 10 of those bought side
+- **LOD0 is 130 triangles against a ≤100 target (30% over).** 10 of those bought side
   glazing: a 4-point ring has no face row that sits above the max-width line, so the
   cabin sides could not be glazed at all until the ring went to 6 points. The only remaining cuts
   are the lift struts, the landing gear or the glazing — i.e. exactly the features that
   distinguish a C172 from a generic monoplane. The brief says not to destroy silhouette
-  to save triangles, so I left them in. LOD2 is 304 against a 150–300 target (4 over).
+  to save triangles, so I left them in. LOD1 is 304 against a 150–300 target (4 over).
 - **The cowl is slightly more conical in plan than the real one**, which has a blunter,
   more parallel-sided front. Costs a station to fix; I judged it not worth it.
-- **Leaving the fuselage top open under the wing saves 6 triangles at LOD0** (3 face
+- **Leaving the fuselage top open under the wing saves 6 triangles at LOD3** (3 face
   rows). The segment that reaches the wing trailing edge is deliberately left closed:
   the wing thins to a knife edge there and stops covering the cut-out, which showed as
   a hole in the roof just ahead of the rear window. The idea is right and the geometry
@@ -321,7 +327,7 @@ Root: `~/gh/Felipegalind0/flight-sim/planes/Cessna_172/agent_workspace/`
 
 **Exports** — `exports/`
 - `Cessna_172_LOD0.glb`, `Cessna_172_LOD1.glb`, `Cessna_172_LOD2.glb`, `Cessna_172_LOD3.glb`
-- `Cessna_172_master.blend` — all four LODs, one collection each, LOD0 visible
+- `Cessna_172_master.blend` — every LOD, one collection each, LOD3 visible
 
 **Scripts** — `scripts/`
 - `generate_c172.py` — the model. `--lod N --blend out.blend [--glb out.glb]`. Fully reproducible.

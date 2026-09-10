@@ -42,7 +42,8 @@ describe("aircraft rig binding", () => {
 
   it("skips absent parts, so the coarse levels bind without special cases", () => {
     const s = scene();
-    // LOD2/LOD3 merge the control surfaces into their panels and keep the prop.
+    // The coarse levels merge the control surfaces into their panels and keep
+    // the prop.
     const rig = rigOf(["Propeller"], s.scene);
     expect(rig.parts).toHaveLength(0);
     expect(rig.propeller).not.toBeNull();

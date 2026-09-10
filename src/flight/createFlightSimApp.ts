@@ -19,6 +19,7 @@ import {
   setTerrainSourcePreference,
   type BabylonRuntime,
   type RasterBaseMapSource,
+  type RendererMode,
 } from "foss-earth/runtime";
 import { createPlaceholderAircraft } from "./aircraft/createPlaceholderAircraft";
 import {
@@ -29,6 +30,11 @@ import {
 } from "./aircraft/aircraftCatalog";
 import { applyAircraftRig, readControlSurfaceState } from "./aircraft/aircraftAnimation";
 import { flightLog } from "./diagnostics/flightLog";
+import {
+  createFlightPerformanceCapture,
+  isFlightPerformanceCaptureEnabled,
+  setActiveFlightPerformanceCapture,
+} from "./diagnostics/flightPerformanceCapture";
 import {
   createAircraftModel,
   type AircraftModelHandle,
@@ -92,6 +98,11 @@ const AIRCRAFT_LOD_PREFERENCE_KEY = "osfs.aircraft-lod";
 const AIRCRAFT_OPT_IN_PREFERENCE_KEY = "osfs.aircraft-opt-in-lods";
 const LEGACY_AIRCRAFT_PREFERENCE_KEY = "flight-sim.aircraft";
 const LEGACY_AIRCRAFT_LOD_PREFERENCE_KEY = "flight-sim.aircraft-lod";
+const WORLD_DETAIL_PREFERENCE_KEY = "osfs.world-detail-target";
+const FLIGHT_TERRAIN_REQUIREMENT_PREFERENCE_KEY = "osfs.flight-terrain-requirement";
+const MIN_WORLD_DETAIL_TARGET = 1;
+const MAX_WORLD_DETAIL_TARGET = 524_288;
+const DEFAULT_FLIGHT_TERRAIN_REQUIREMENT = 4_096;
 
 function readPreference<T>(key: string, legacyKey: string, isValid: (value: unknown) => value is T, fallback: T): T {
   try {
@@ -108,6 +119,44 @@ function writePreference(key: string, value: string): void {
   } catch {
     // Preference persistence is best-effort; private mode must not break the sim.
   }
+}
+
+function isWorldDetailTarget(value: number): boolean {
+  return Number.isFinite(value) && value >= MIN_WORLD_DETAIL_TARGET && value <= MAX_WORLD_DETAIL_TARGET;
+}
+
+function readWorldDetailTargetPreference(): number | null {
+  const stored = readPreference(
+    WORLD_DETAIL_PREFERENCE_KEY, WORLD_DETAIL_PREFERENCE_KEY,
+    (value): value is string => typeof value === "string", "auto",
+  );
+  if (stored === "auto") return null;
+  const value = Number(stored);
+  return isWorldDetailTarget(value) ? value : null;
+}
+
+function readFlightTerrainRequirementPreference(): number {
+  const stored = readPreference(
+    FLIGHT_TERRAIN_REQUIREMENT_PREFERENCE_KEY, FLIGHT_TERRAIN_REQUIREMENT_PREFERENCE_KEY,
+    (value): value is string => typeof value === "string", String(DEFAULT_FLIGHT_TERRAIN_REQUIREMENT),
+  );
+  const value = Number(stored);
+  return isWorldDetailTarget(value) ? value : DEFAULT_FLIGHT_TERRAIN_REQUIREMENT;
+}
+
+/**
+ * Choose a conservative first-run target without a GPU performance benchmark.
+ * CPU and memory hints alone cannot prove that 1 px tile refinement is
+ * sustainable, so 2^0 = 1 px remains an explicit pilot choice in Settings.
+ */
+function chooseAutomaticWorldDetailTarget(rendererMode: RendererMode): number {
+  const cores = Math.max(1, navigator.hardwareConcurrency ?? 4);
+  const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+  const hasRoom = deviceMemory === undefined || deviceMemory >= 8;
+  if (rendererMode === "webgpu" && cores >= 12 && hasRoom) return 16;
+  if (cores >= 8 && hasRoom) return 32;
+  if (cores >= 4) return 64;
+  return 128;
 }
 
 function zoomMetersFromAltitude(altMeters: number): number {
@@ -128,6 +177,37 @@ export async function createFlightSimApp(
     baseMap: options.baseMap,
     preferGoogleTiles: options.preferGoogleTiles,
   });
+  // `null` means follow the local automatic recommendation. A manual target
+  // remains in local storage and is reapplied before terrain preparation
+  // starts, including when Google Tiles are selected after launch.
+  let worldDetailTarget = readWorldDetailTargetPreference();
+  let automaticWorldDetailTarget = 16;
+  let flightTerrainRequirement = readFlightTerrainRequirementPreference();
+
+  async function prepareFlightTerrain(
+    runtime: BabylonRuntime,
+    request: Parameters<BabylonRuntime["prepareTerrain"]>[0],
+    allowCoarserTerrain = false,
+  ) {
+    let terrain = await runtime.prepareTerrain(request);
+    const distanceToTerrain = terrain.altitudeMeters - terrain.groundHeightMeters;
+    const detail = runtime.getGoogleTerrainDetailState();
+    const needsFlightDetail = runtime.status.mode === "google-tiles"
+      && !allowCoarserTerrain
+      && distanceToTerrain < 100
+      && detail !== null
+      && detail.errorTarget > flightTerrainRequirement;
+    if (!needsFlightDetail) return terrain;
+
+    // A low spawn needs the pilot's selected flight minimum. Refine once
+    // during preparation, then hand the established ground height to JSBSim;
+    // no equivalent readiness gate runs while the aircraft is flying.
+    worldDetailTarget = flightTerrainRequirement;
+    writePreference(WORLD_DETAIL_PREFERENCE_KEY, String(worldDetailTarget));
+    runtime.setGoogleTerrainDetailTarget(worldDetailTarget);
+    terrain = await runtime.prepareTerrain(request);
+    return terrain;
+  }
 
   rootElement.innerHTML = `
     <div class="flight-app">
@@ -162,6 +242,8 @@ export async function createFlightSimApp(
   }).then(runtime => {
     if (bootstrapFailed) { runtime.destroy(); throw new Error("Startup cancelled."); }
     bootResources.runtime = runtime;
+    automaticWorldDetailTarget = chooseAutomaticWorldDetailTarget(runtime.renderer.mode);
+    runtime.setGoogleTerrainDetailTarget(worldDetailTarget ?? automaticWorldDetailTarget);
     runtime.setSimRunning(false);
     runtime.setSimViewState({ ...DEFAULT_FLIGHT_START, zoomMeters: START_ALTITUDE_AGL_METERS * 1.5 });
     loading.setPhase("world", { state: "ready" });
@@ -169,7 +251,7 @@ export async function createFlightSimApp(
   });
   // Start local terrain selection as soon as the renderer exists. WASM and its
   // aircraft data are loading independently; no simulator work blocks this.
-  const terrainReady = runtimePromise.then(runtime => runtime.prepareTerrain({
+  const terrainReady = runtimePromise.then(runtime => prepareFlightTerrain(runtime, {
     ...DEFAULT_FLIGHT_START,
     altitudeAboveGroundMeters: START_ALTITUDE_AGL_METERS,
     radiusMeters: 1000,
@@ -230,9 +312,16 @@ export async function createFlightSimApp(
   const physicsLoop = createFixedStepPhysicsLoop(jsbsim.sdk);
   const terrainContact = createTerrainContact(jsbsim.sdk, runtime.surface);
   const visibleMeshCollision = createVisibleMeshCollision(jsbsim.sdk, runtime.surface);
+  // This stays completely out of the normal render loop unless someone opts
+  // in through the URL. It makes a stutter reproducible with numbers instead
+  // of trying to infer its source from a single FPS reading.
+  const flightPerformance = isFlightPerformanceCaptureEnabled()
+    ? createFlightPerformanceCapture() : null;
+  if (flightPerformance) setActiveFlightPerformanceCapture(flightPerformance);
   const flightHud: FlightHudHandle = createFlightHud(hudRoot, {
     onThrottleChange: (value) => { inputManager.setThrottle(value); runtime.requestRender(); },
     onPitchTrimChange: (value) => { inputManager.setPitchTrim(value); runtime.requestRender(); },
+    onStickChange: (aileron, elevator) => { inputManager.setStick(aileron, elevator); runtime.requestRender(); },
   });
 
   let floatingOrigin: FloatingOriginHandle | null = null;
@@ -255,6 +344,10 @@ export async function createFlightSimApp(
   // A missing terrain sample stops the loop from stepping without raising a
   // fault, so track how long that has been true to tell a stall from a hitch.
   let terrainBlockedSinceMs: number | null = null;
+  let terrainBlockedReason: ReturnType<typeof terrainContact.getBlockReason> = null;
+  // A pilot can temporarily waive their own flight requirement. This is never
+  // persisted, so reopening the game returns to the selected safety policy.
+  let allowCoarserTerrainThisSession = false;
   let inputMode = loadInputModePreference(new Set(["mouse", "trackpad"]));
   let inputSensitivity = loadInputSensitivityPreference();
   const detachCameraInput = attachFlightCameraInput(canvas, {
@@ -349,6 +442,11 @@ export async function createFlightSimApp(
     viewMode: aircraft?.getViewMode() ?? "third",
     runtimeStatus: { ...runtime.status },
     rendererMode: runtime.renderer.mode,
+    googleTerrainDetail: runtime.getGoogleTerrainDetailState(),
+    worldDetailIsAutomatic: worldDetailTarget === null,
+    automaticWorldDetailTarget,
+    flightTerrainRequirement,
+    allowCoarserTerrainThisSession,
     aircraftId,
     lodId: aircraftLodId,
     optInLodsEnabled,
@@ -414,7 +512,7 @@ export async function createFlightSimApp(
     const preview = { ...prior, ...location, altMeters: location.altMeters ?? prior.altMeters };
     floatingOrigin?.apply(preview);
     runtime.setSimViewState({ ...location, zoomMeters: zoomMetersFromAltitude(preview.altMeters) });
-    void runtime.prepareTerrain({
+    void prepareFlightTerrain(runtime, {
       latDeg: location.latDeg, lonDeg: location.lonDeg,
       altitudeMeters: preview.altMeters,
       radiusMeters: 1000,
@@ -426,7 +524,7 @@ export async function createFlightSimApp(
           detail: progress.message, progress: progress.progress,
         });
       },
-    }).then(terrain => {
+    }, allowCoarserTerrainThisSession).then(terrain => {
       if (disposed || abort.signal.aborted) return;
       const destination = { ...location, altMeters: terrain.altitudeMeters };
       const state = resetFlightLocation(jsbsim.sdk, destination, terrain.groundHeightMeters);
@@ -533,6 +631,31 @@ export async function createFlightSimApp(
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
       runtime.requestRender();
     },
+    onGoogleTerrainDetailChange: (errorTarget) => {
+      worldDetailTarget = errorTarget;
+      writePreference(WORLD_DETAIL_PREFERENCE_KEY, String(errorTarget));
+      runtime.setGoogleTerrainDetailTarget(errorTarget);
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+      runtime.requestRender();
+    },
+    onAutomaticGoogleTerrainDetailChange: () => {
+      worldDetailTarget = null;
+      writePreference(WORLD_DETAIL_PREFERENCE_KEY, "auto");
+      runtime.setGoogleTerrainDetailTarget(automaticWorldDetailTarget);
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+      runtime.requestRender();
+    },
+    onFlightTerrainRequirementChange: (errorTarget) => {
+      flightTerrainRequirement = errorTarget;
+      writePreference(FLIGHT_TERRAIN_REQUIREMENT_PREFERENCE_KEY, String(errorTarget));
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+      runtime.requestRender();
+    },
+    onTerrainDetailOverrideChange: (enabled) => {
+      allowCoarserTerrainThisSession = enabled;
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+      runtime.requestRender();
+    },
   });
   const rendererForce = getRendererForceFromUrl();
   hudBar = createFlightHudBar(shellRoot, {
@@ -585,7 +708,15 @@ export async function createFlightSimApp(
       // Single-frame misses are normal while tiles stream in; only say
       // something once the aircraft has actually stopped moving.
       if (heldSeconds >= 0.4) {
-        state = { kind: "waiting", message: "Waiting for terrain height data", heldSeconds };
+        state = terrainBlockedReason === "coarse"
+          ? {
+              kind: "waiting", message: "World detail is too coarse for flight", heldSeconds,
+              detail: `Flight requires World detail 2^${Math.log2(flightTerrainRequirement).toFixed(2)} or finer. Choose a smaller World detail target, or allow coarser terrain for this session.`,
+            }
+          : {
+              kind: "waiting", message: "Waiting for terrain height data", heldSeconds,
+              detail: "No reliable terrain height is available under the aircraft yet, so the simulation is holding rather than guessing one.",
+            };
       }
     }
     statusOverlay?.update(state);
@@ -599,6 +730,10 @@ export async function createFlightSimApp(
 
   runtime.setSimTick((deltaSeconds) => {
     if (disposed || worldLoading) return;
+    const frameIntervalMs = deltaSeconds * 1000;
+    const flightTickStartedMs = flightPerformance ? performance.now() : 0;
+    let terrainQueryCpuMs = 0;
+    let collisionCpuMs = 0;
     // Do not integrate the time spent idle when resuming the simulation.
     deltaSeconds = skipResumeDelta ? 0 : Math.min(deltaSeconds, 0.1);
     skipResumeDelta = false;
@@ -614,22 +749,33 @@ export async function createFlightSimApp(
 
     ensureWorld();
 
-    // Refinement can arrive while paused, including when resting on a runway.
-    const blockOnMissingSurface = runtime.status.mode !== "fallback";
-    if (!physicsLoop.getFault() && terrainContact.update(blockOnMissingSurface) === "reset") {
+    // Spawn preparation is the only terrain-readiness gate. Once it has
+    // placed the aircraft on known ground, streaming may update contact but
+    // can never pause an already-running flight.
+    const googleTiles = runtime.status.mode === "google-tiles";
+    const preContactStartedMs = flightPerformance ? performance.now() : 0;
+    if (!physicsLoop.getFault()
+      && terrainContact.update(false, googleTiles, true, true) === "reset") {
       physicsLoop.reset();
     }
+    if (flightPerformance) terrainQueryCpuMs += performance.now() - preContactStartedMs;
 
     physicsLoop.setPaused(inputManager.isPaused());
     const controls = inputManager.poll(deltaSeconds);
     let terrainBlocked = false;
+    const physicsStartedMs = flightPerformance ? performance.now() : 0;
     const displayState = physicsLoop.update(deltaSeconds, () => {
-      const contact = terrainContact.update(blockOnMissingSurface);
+      const contactStartedMs = flightPerformance ? performance.now() : 0;
+      const contact = terrainContact.update(false, googleTiles, true, true);
+      if (flightPerformance) terrainQueryCpuMs += performance.now() - contactStartedMs;
       if (contact === false) {
         terrainBlocked = true;
+        terrainBlockedReason = terrainContact.getBlockReason();
         return false;
       }
+      const collisionStartedMs = flightPerformance ? performance.now() : 0;
       const collisionReset = visibleMeshCollision.update();
+      if (flightPerformance) collisionCpuMs += performance.now() - collisionStartedMs;
       // Terrain/collision work can consume the remaining input lease. Check
       // authority immediately before allowing this step to advance physics.
       const selected = phoneSession?.beforeStep(controls) ?? controls;
@@ -639,12 +785,15 @@ export async function createFlightSimApp(
       appliedControls = { ...selected };
       return contact;
     });
+    const physicsLoopCpuMs = flightPerformance ? performance.now() - physicsStartedMs : 0;
 
     const tickNowMs = performance.now();
     if (terrainBlocked) {
       if (terrainBlockedSinceMs === null) {
         terrainBlockedSinceMs = tickNowMs;
-        flightLog.warn("terrain", "Holding: no terrain height under the aircraft", {
+        flightLog.warn("terrain", terrainBlockedReason === "coarse"
+          ? "Holding: World detail is below the flight requirement"
+          : "Holding: no terrain height under the aircraft", {
           latDeg: Number(displayState.latDeg.toFixed(5)),
           lonDeg: Number(displayState.lonDeg.toFixed(5)),
           mapMode: runtime.status.mode,
@@ -655,6 +804,7 @@ export async function createFlightSimApp(
         heldSeconds: Number(((tickNowMs - terrainBlockedSinceMs) / 1000).toFixed(2)),
       });
       terrainBlockedSinceMs = null;
+      terrainBlockedReason = null;
     }
 
     const fault = physicsLoop.getFault();
@@ -689,6 +839,20 @@ export async function createFlightSimApp(
       controlPanel?.update(createPanelSnapshot(displayState));
       hudBar?.update(displayState, runtime.status, inputManager.isPaused() ? null : measuredFps, inputManager.isPaused());
     }
+    if (flightPerformance) {
+      const tileMetrics = runtime.getTileMetrics();
+      flightPerformance.record({
+        frameIntervalMs,
+        flightTickCpuMs: performance.now() - flightTickStartedMs,
+        terrainQueryCpuMs,
+        collisionCpuMs,
+        physicsLoopCpuMs,
+        streamingTiles: runtime.isStreamingTiles(),
+        mapDownloadBytesPerSecond: runtime.getMapDownloadBytesPerSecond(),
+        visibleTiles: tileMetrics?.visibleTiles ?? null,
+        activeTiles: tileMetrics?.activeTiles ?? null,
+      });
+    }
   });
 
   const revealAircraft = (state: ReturnType<typeof readFlightState>): void => {
@@ -712,6 +876,7 @@ export async function createFlightSimApp(
       window.removeEventListener("keydown", onViewKeyDown);
       detachCameraInput();
       detachInput();
+      if (flightPerformance) setActiveFlightPerformanceCapture(null);
       hudBar?.destroy();
       statusOverlay?.destroy();
       controlPanel?.destroy();

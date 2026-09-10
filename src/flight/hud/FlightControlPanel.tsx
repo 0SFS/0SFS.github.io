@@ -16,7 +16,7 @@ import {
   Plane,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { BabylonRuntimeStatus, RendererMode } from "foss-earth/runtime";
+import type { BabylonRuntimeStatus, GoogleTerrainDetailState, RendererMode } from "foss-earth/runtime";
 import type { FlightViewMode } from "../aircraft/createPlaceholderAircraft";
 import {
   AIRCRAFT_CATALOG,
@@ -28,6 +28,10 @@ import {
 } from "../aircraft/aircraftCatalog";
 import type { AircraftModelStatus } from "../aircraft/createAircraftModel";
 import { flightLog, type FlightLogEntry } from "../diagnostics/flightLog";
+import {
+  getActiveFlightPerformanceCapture,
+  type FlightPerformanceSummary,
+} from "../diagnostics/flightPerformanceCapture";
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
 
 type FlightPanelTab = "weather" | "aircraft" | "debug" | "settings";
@@ -65,6 +69,14 @@ export interface FlightControlPanelSnapshot {
   viewMode: FlightViewMode;
   runtimeStatus: BabylonRuntimeStatus;
   rendererMode: RendererMode;
+  googleTerrainDetail: GoogleTerrainDetailState | null;
+  /** Whether the World detail target follows this device's first-run recommendation. */
+  worldDetailIsAutomatic: boolean;
+  automaticWorldDetailTarget: number;
+  /** Maximum Google screen-space error accepted for ground contact. */
+  flightTerrainRequirement: number;
+  /** A deliberately temporary waiver of the flight terrain requirement. */
+  allowCoarserTerrainThisSession: boolean;
   aircraftId: AircraftId;
   lodId: AircraftLodId;
   /** Whether the opt-in levels are switched on. */
@@ -86,6 +98,10 @@ export interface FlightControlPanelOptions {
   onAircraftChange(aircraftId: AircraftId): void;
   onLodChange(lodId: AircraftLodId): void;
   onOptInLodsChange(enabled: boolean): void;
+  onGoogleTerrainDetailChange(errorTarget: number): void;
+  onAutomaticGoogleTerrainDetailChange(): void;
+  onFlightTerrainRequirementChange(errorTarget: number): void;
+  onTerrainDetailOverrideChange(enabled: boolean): void;
 }
 
 export interface FlightControlPanelHandle {
@@ -327,6 +343,169 @@ function EventLog() {
   );
 }
 
+function formatMilliseconds(value: number): string {
+  return `${value.toFixed(value >= 10 ? 0 : 1)} ms`;
+}
+
+function FlightPerformancePanel() {
+  const [summary, setSummary] = useState<FlightPerformanceSummary | null>(
+    () => getActiveFlightPerformanceCapture()?.snapshot() ?? null,
+  );
+  useEffect(() => {
+    const refresh = () => setSummary(getActiveFlightPerformanceCapture()?.snapshot() ?? null);
+    refresh();
+    const interval = window.setInterval(refresh, 500);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  if (!summary) {
+    return <p className="flight-panel__hint">Open the simulator with <code>flightPerf=1</code> in the URL to capture stutters.</p>;
+  }
+
+  const copyTrace = (): void => {
+    const capture = getActiveFlightPerformanceCapture();
+    if (!capture || !navigator.clipboard) return;
+    void navigator.clipboard.writeText(JSON.stringify(capture.exportTrace()));
+  };
+
+  return (
+    <fieldset className="flight-panel__fieldset">
+      <legend>Stutter trace</legend>
+      <div className="flight-panel__metrics">
+        <Metric label="Samples" value={summary.sampleCount.toLocaleString()} />
+        <Metric label="Frame p95" value={formatMilliseconds(summary.frame.p95Ms)} />
+        <Metric label="Frame p99" value={formatMilliseconds(summary.frame.p99Ms)} />
+        <Metric label="Worst frame" value={formatMilliseconds(summary.frame.maxMs)} />
+        <Metric label="Physics p95" value={formatMilliseconds(summary.physicsLoop.p95Ms)} />
+        <Metric label="Terrain p95" value={formatMilliseconds(summary.terrainQuery.p95Ms)} />
+        <Metric label="Collision p95" value={formatMilliseconds(summary.collision.p95Ms)} />
+        <Metric label="Tick p95" value={formatMilliseconds(summary.flightTick.p95Ms)} />
+      </div>
+      <p className="flight-panel__hint">
+        {`${summary.slowFrames.over50Ms} frames over 50 ms; ${summary.slowFrames.over100Ms} over 100 ms. `}
+        {`${summary.streamingFrames} frames streamed map tiles.`}
+      </p>
+      <button className="flight-panel__command" type="button" onClick={copyTrace}>
+        Copy performance trace
+      </button>
+      <p className="flight-panel__hint">The same trace is available in DevTools as <code>window.osfsFlightPerformance</code>.</p>
+    </fieldset>
+  );
+}
+
+function formatTerrainDetailTarget(target: number): string {
+  const exponent = Math.log2(target).toFixed(Number.isInteger(Math.log2(target)) ? 0 : 2);
+  return `2^${exponent} = ${target.toLocaleString()} px`;
+}
+
+function WorldDetailSettings({
+  snapshot,
+  onGoogleTerrainDetailChange,
+  onAutomaticGoogleTerrainDetailChange,
+  onFlightTerrainRequirementChange,
+  onTerrainDetailOverrideChange,
+}: Pick<FlightControlPanelProps,
+  "snapshot" | "onGoogleTerrainDetailChange" | "onAutomaticGoogleTerrainDetailChange"
+  | "onFlightTerrainRequirementChange" | "onTerrainDetailOverrideChange">) {
+  const detail = snapshot.googleTerrainDetail;
+  if (!detail || snapshot.runtimeStatus.mode !== "google-tiles") {
+    return (
+      <fieldset className="flight-panel__fieldset">
+        <legend>World detail</legend>
+        <p className="flight-panel__hint">Switch the map source to Google 3D Tiles to control World detail.</p>
+      </fieldset>
+    );
+  }
+
+  // Detail targets cover several orders of magnitude, so the two handles use
+  // log2(target) while their labels retain the power-of-two representation.
+  const detailSliderValue = Math.log2(detail.errorTarget);
+  const requirementSliderValue = Math.log2(snapshot.flightTerrainRequirement);
+  const rangeStart = Math.min(detailSliderValue, requirementSliderValue);
+  const rangeEnd = Math.max(detailSliderValue, requirementSliderValue);
+
+  return (
+    <fieldset className="flight-panel__fieldset">
+      <legend>World detail</legend>
+      <div className="flight-panel__detail-range-control">
+        <div className="flight-panel__detail-range-labels">
+          <span className="flight-panel__detail-range-label flight-panel__detail-range-label--world">
+            <strong>World detail limit</strong>
+            <output>{formatTerrainDetailTarget(detail.errorTarget)}</output>
+          </span>
+          <span className="flight-panel__detail-range-label flight-panel__detail-range-label--flight">
+            <strong>Flight minimum</strong>
+            <output>{formatTerrainDetailTarget(snapshot.flightTerrainRequirement)}</output>
+          </span>
+        </div>
+        <div className="flight-panel__detail-range" role="group" aria-label="World detail range">
+          <span className="flight-panel__detail-range-track" aria-hidden="true" />
+          <span
+            className="flight-panel__detail-range-selected"
+            aria-hidden="true"
+            style={{ left: `${rangeStart / 19 * 100}%`, width: `${(rangeEnd - rangeStart) / 19 * 100}%` }}
+          />
+          <input
+            className="flight-panel__detail-range-input flight-panel__detail-range-input--world"
+            aria-label="World detail target"
+            type="range"
+            min="0"
+            max="19"
+            step="0.05"
+            value={detailSliderValue}
+            onChange={(event) => onGoogleTerrainDetailChange(Math.round(2 ** Number(event.target.value)))}
+          />
+          <input
+            className="flight-panel__detail-range-input flight-panel__detail-range-input--flight"
+            aria-label="Minimum World detail for flight"
+            type="range"
+            min="0"
+            max="19"
+            step="0.05"
+            value={requirementSliderValue}
+            onChange={(event) => onFlightTerrainRequirementChange(Math.round(2 ** Number(event.target.value)))}
+          />
+        </div>
+        <div className="flight-panel__detail-range-scale" aria-hidden="true">
+          <span>More detail · 2^0 = 1 px</span>
+          <span>Less detail · 2^19</span>
+        </div>
+      </div>
+      <p className="flight-panel__hint">
+        Move the amber handle to limit renderer detail and the blue handle to set the coarsest detail that can fly without an override.
+      </p>
+      <button
+        className="flight-panel__command"
+        type="button"
+        disabled={snapshot.worldDetailIsAutomatic}
+        onClick={onAutomaticGoogleTerrainDetailChange}
+      >
+        {`Use automatic detail (${formatTerrainDetailTarget(snapshot.automaticWorldDetailTarget)})`}
+      </button>
+      <p className="flight-panel__hint">
+        {snapshot.worldDetailIsAutomatic
+          ? "Automatic detail is selected from this device's browser renderer and CPU/memory hints."
+          : "A manual World detail target is saved on this device."}
+      </p>
+      <p className="flight-panel__hint">
+        Flight accepts displayed Google terrain at this target or any smaller target. The default, 2^12 = 4,096 px, is the level you selected as flyable.
+      </p>
+      <label className="flight-panel__field flight-panel__field--inline">
+        <input
+          aria-label="Allow coarser terrain for this session"
+          type="checkbox"
+          checked={snapshot.allowCoarserTerrainThisSession}
+          onChange={(event) => onTerrainDetailOverrideChange(event.target.checked)}
+        />
+        <span>Allow coarser terrain for this session</span>
+      </label>
+      <p className="flight-panel__hint">
+        This temporary override lets you fly below your selected requirement. It resets when the game reloads.
+      </p>
+    </fieldset>
+  );
+}
+
 function DebugPanel({ snapshot }: Pick<FlightControlPanelProps, "snapshot">) {
   return (
     <div className="flight-panel__content">
@@ -340,6 +519,7 @@ function DebugPanel({ snapshot }: Pick<FlightControlPanelProps, "snapshot">) {
         <Gauge size={18} aria-hidden="true" />
         <span>{snapshot.runtimeStatus.lastError ?? snapshot.runtimeStatus.message}</span>
       </div>
+      <FlightPerformancePanel />
       <fieldset className="flight-panel__fieldset">
         <legend>Event log</legend>
         <EventLog />
@@ -368,7 +548,10 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
           </div>
           {tabId === "weather" ? <WeatherPanel initialWeather={props.initialWeather} onWeatherChange={props.onWeatherChange} />
             : tabId === "aircraft" ? <AircraftPanel {...props} />
-              : tabId === "settings" ? <MapCachePanel /> : <DebugPanel snapshot={props.snapshot} />}
+              : tabId === "settings" ? <>
+                <WorldDetailSettings {...props} />
+                <MapCachePanel />
+              </> : <DebugPanel snapshot={props.snapshot} />}
         </>;
       }}
     />

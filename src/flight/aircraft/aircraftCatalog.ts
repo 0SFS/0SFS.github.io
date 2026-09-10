@@ -10,10 +10,20 @@
 export const AIRCRAFT_IDS = ["cessna-172", "cirrus-vision-jet"] as const;
 export type AircraftId = (typeof AIRCRAFT_IDS)[number];
 
-// The ladder runs finest first. "hd" sits above lod0 and is not always ours:
-// an airframe can carry a level by another artist, which is why the credit
-// belongs to the LEVEL rather than to the airframe.
-export const AIRCRAFT_LOD_IDS = ["auto", "hd", "lod0", "lod1", "lod2", "lod3"] as const;
+// Level NUMBERS run coarsest-first: lod0 is the silhouette and each step up
+// adds detail, so a bigger number is always a better mesh. That is the
+// direction the generators number their `--lod` argument in, and it is chosen
+// so that adding or removing a level at the bottom of a ladder does not
+// renumber the ones above it - a renumbering is a silent change to every asset
+// path and to every stored preference. It also means the two airframes agree
+// on what "lod3" means - their best procedural mesh - even though the C172
+// carries one level below the Vision Jet's coarsest.
+//
+// The ARRAYS below still run FINEST first, because that is the order
+// `selectAutoLod` walks and the order the panel offers. "hd" sits above lod3
+// and is not always ours: an airframe can carry a level by another artist,
+// which is why the credit belongs to the LEVEL rather than to the airframe.
+export const AIRCRAFT_LOD_IDS = ["auto", "hd", "lod3", "lod2", "lod1", "lod0"] as const;
 export type AircraftLodId = (typeof AIRCRAFT_LOD_IDS)[number];
 export type AircraftLodMeshId = Exclude<AircraftLodId, "auto">;
 
@@ -96,17 +106,22 @@ const CIRRUS_LODS: readonly AircraftLodDefinition[] = [
   // 40 m rather than 0 because HD covers the close range when it is switched
   // on. With it off, the finest level available always covers the close range,
   // so this still starts at the camera - see selectAutoLod.
-  { id: "lod0", label: "LOD0 — near", triangles: 1212, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD0.glb", autoFromMeters: 40, credit: PROCEDURAL },
-  { id: "lod1", label: "LOD1 — medium", triangles: 900, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD1.glb", autoFromMeters: 65, credit: PROCEDURAL },
-  { id: "lod2", label: "LOD2 — far", triangles: 246, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD2.glb", autoFromMeters: 170, credit: PROCEDURAL },
-  { id: "lod3", label: "LOD3 — silhouette", triangles: 98, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD3.glb", autoFromMeters: 340, credit: PROCEDURAL },
+  { id: "lod3", label: "LOD3 — near", triangles: 1220, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD3.glb", autoFromMeters: 40, credit: PROCEDURAL },
+  { id: "lod2", label: "LOD2 — medium", triangles: 908, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD2.glb", autoFromMeters: 65, credit: PROCEDURAL },
+  // The bottom of this ladder, and it runs all the way out: there is no
+  // silhouette level under it. The one that used to be there was 98 triangles,
+  // and the level above it was little better - both painted their glazing on
+  // as one band down each side, so the aeroplane had no windscreen at all.
+  // This one cuts the windscreen and the three cabin windows as real panes,
+  // which is what makes it read as this aeroplane rather than a white dart.
+  { id: "lod1", label: "LOD1 — far", triangles: 442, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD1.glb", autoFromMeters: 170, credit: PROCEDURAL },
 ];
 
 const C172_LODS: readonly AircraftLodDefinition[] = [
-  { id: "lod0", label: "LOD0 — near", triangles: 1016, path: "aircraft/cessna-172/Cessna_172_LOD0.glb", autoFromMeters: 0, credit: PROCEDURAL },
-  { id: "lod1", label: "LOD1 — medium", triangles: 778, path: "aircraft/cessna-172/Cessna_172_LOD1.glb", autoFromMeters: 60, credit: PROCEDURAL },
-  { id: "lod2", label: "LOD2 — far", triangles: 288, path: "aircraft/cessna-172/Cessna_172_LOD2.glb", autoFromMeters: 160, credit: PROCEDURAL },
-  { id: "lod3", label: "LOD3 — silhouette", triangles: 130, path: "aircraft/cessna-172/Cessna_172_LOD3.glb", autoFromMeters: 320, credit: PROCEDURAL },
+  { id: "lod3", label: "LOD3 — near", triangles: 1016, path: "aircraft/cessna-172/Cessna_172_LOD3.glb", autoFromMeters: 0, credit: PROCEDURAL },
+  { id: "lod2", label: "LOD2 — medium", triangles: 778, path: "aircraft/cessna-172/Cessna_172_LOD2.glb", autoFromMeters: 60, credit: PROCEDURAL },
+  { id: "lod1", label: "LOD1 — far", triangles: 288, path: "aircraft/cessna-172/Cessna_172_LOD1.glb", autoFromMeters: 160, credit: PROCEDURAL },
+  { id: "lod0", label: "LOD0 — silhouette", triangles: 130, path: "aircraft/cessna-172/Cessna_172_LOD0.glb", autoFromMeters: 320, credit: PROCEDURAL },
 ];
 
 export const AIRCRAFT_CATALOG: readonly AircraftDefinition[] = [
@@ -163,8 +178,8 @@ export function availableLods(
  *
  * The finest level available always covers the close range, whatever its own
  * threshold says. That is what lets an opt-in level be switched on and off
- * without rewriting the thresholds under it: with HD on, LOD0 starts at its
- * own 40 m; with HD off, LOD0 is the finest there is and starts at the camera.
+ * without rewriting the thresholds under it: with HD on, LOD3 starts at its
+ * own 40 m; with HD off, LOD3 is the finest there is and starts at the camera.
  */
 export function selectAutoLod(
   definition: AircraftDefinition,

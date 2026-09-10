@@ -1,8 +1,12 @@
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
 
+const ATTITUDE_CANVAS_SIZE = 220;
+const ATTITUDE_RADIUS = 96;
+
 export interface FlightHudOptions {
   onThrottleChange(value: number): void;
   onPitchTrimChange(value: number): void;
+  onStickChange(aileron: number, elevator: number): void;
 }
 
 export interface FlightHudHandle {
@@ -65,6 +69,43 @@ function drawAttitudeIndicator(
   ctx.stroke();
 }
 
+function drawStickOverlay(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  radius: number,
+  stickX: number,
+  stickY: number,
+  active: boolean,
+): void {
+  if (!active && stickX === 0 && stickY === 0) return;
+
+  ctx.save();
+  ctx.strokeStyle = "rgba(255,255,255,0.18)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(cx - radius, cy);
+  ctx.lineTo(cx + radius, cy);
+  ctx.moveTo(cx, cy - radius);
+  ctx.lineTo(cx, cy + radius);
+  ctx.stroke();
+
+  const knobX = cx + stickX * radius;
+  const knobY = cy + stickY * radius;
+  ctx.beginPath();
+  ctx.fillStyle = active ? "rgba(255,210,80,0.95)" : "rgba(255,210,80,0.55)";
+  ctx.strokeStyle = "rgba(255,255,255,0.85)";
+  ctx.lineWidth = 2;
+  ctx.arc(knobX, knobY, 10, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
+
+function stickResponse(value: number): number {
+  return Math.abs(value) <= 0.035 ? 0 : Math.sign(value) * (Math.abs(value) - 0.035) / 0.965;
+}
+
 function formatAltitudeFt(altMeters: number): string {
   return Math.round(altMeters / 0.3048).toString().padStart(5, " ");
 }
@@ -72,7 +113,7 @@ function formatAltitudeFt(altMeters: number): string {
 export function createFlightHud(root: HTMLElement, options: FlightHudOptions): FlightHudHandle {
   root.innerHTML = `
     <div class="flight-hud" aria-label="Flight instruments">
-      <canvas class="flight-hud__attitude" width="220" height="220" aria-label="Attitude indicator"></canvas>
+      <canvas class="flight-hud__attitude" width="220" height="220" role="button" tabindex="0" aria-label="Attitude indicator and pitch roll control. Drag to steer."></canvas>
       <div class="flight-hud__tapes">
         <div class="flight-hud__tape">
           <span class="flight-hud__label">IAS</span>
@@ -134,10 +175,115 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   throttleInput.addEventListener("input", onThrottleInput);
   trimInput.addEventListener("input", onTrimInput);
 
+  let stickX = 0;
+  let stickY = 0;
+  let stickActive = false;
+  let capturedPointer: number | null = null;
+  const stickKeys = new Set<string>();
+
+  const applyStick = (x: number, y: number): void => {
+    stickX = x;
+    stickY = y;
+    options.onStickChange(stickResponse(x), -stickResponse(y));
+  };
+
+  const releaseStick = (): void => {
+    if (capturedPointer !== null && canvas.hasPointerCapture(capturedPointer)) {
+      canvas.releasePointerCapture(capturedPointer);
+    }
+    capturedPointer = null;
+    stickKeys.clear();
+    stickActive = false;
+    canvas.removeAttribute("data-active");
+    applyStick(0, 0);
+  };
+
+  const moveStick = (clientX: number, clientY: number): void => {
+    const rect = canvas.getBoundingClientRect();
+    const radius = Math.max(1, Math.min(rect.width, rect.height) * (ATTITUDE_RADIUS / ATTITUDE_CANVAS_SIZE));
+    let x = (clientX - rect.left - rect.width / 2) / radius;
+    let y = (clientY - rect.top - rect.height / 2) / radius;
+    const magnitude = Math.hypot(x, y);
+    if (magnitude > 1) {
+      x /= magnitude;
+      y /= magnitude;
+    }
+    applyStick(x, y);
+  };
+
+  const onPointerDown = (event: PointerEvent): void => {
+    if (capturedPointer !== null || event.button !== 0) return;
+    event.preventDefault();
+    capturedPointer = event.pointerId;
+    canvas.setPointerCapture(event.pointerId);
+    canvas.setAttribute("data-active", "");
+    stickActive = true;
+    moveStick(event.clientX, event.clientY);
+  };
+
+  const onPointerMove = (event: PointerEvent): void => {
+    if (capturedPointer !== event.pointerId) return;
+    event.preventDefault();
+    moveStick(event.clientX, event.clientY);
+  };
+
+  const onPointerEnd = (event: PointerEvent): void => {
+    if (capturedPointer !== event.pointerId) return;
+    releaseStick();
+  };
+
+  const applyKeyboardStick = (): void => {
+    let x = Number(stickKeys.has("ArrowRight")) - Number(stickKeys.has("ArrowLeft"));
+    let y = Number(stickKeys.has("ArrowDown")) - Number(stickKeys.has("ArrowUp"));
+    const magnitude = Math.hypot(x, y);
+    if (magnitude > 1) {
+      x /= magnitude;
+      y /= magnitude;
+    }
+    stickActive = x !== 0 || y !== 0;
+    applyStick(x, y);
+  };
+
+  const onKeyDown = (event: KeyboardEvent): void => {
+    if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key) || capturedPointer !== null) return;
+    event.preventDefault();
+    stickKeys.add(event.key);
+    applyKeyboardStick();
+  };
+
+  const onKeyUp = (event: KeyboardEvent): void => {
+    if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key) || capturedPointer !== null) return;
+    event.preventDefault();
+    stickKeys.delete(event.key);
+    if (stickKeys.size === 0) releaseStick();
+    else applyKeyboardStick();
+  };
+
+  const onBlur = (): void => releaseStick();
+  const onVisibilityChange = (): void => {
+    if (document.hidden) releaseStick();
+  };
+
+  canvas.addEventListener("pointerdown", onPointerDown);
+  canvas.addEventListener("pointermove", onPointerMove);
+  canvas.addEventListener("pointerup", onPointerEnd);
+  canvas.addEventListener("pointercancel", onPointerEnd);
+  canvas.addEventListener("lostpointercapture", onPointerEnd);
+  canvas.addEventListener("keydown", onKeyDown);
+  canvas.addEventListener("keyup", onKeyUp);
+  canvas.addEventListener("blur", onBlur);
+  const onContextMenu = (event: Event): void => event.preventDefault();
+  canvas.addEventListener("contextmenu", onContextMenu);
+  window.addEventListener("blur", onBlur);
+  window.addEventListener("resize", onBlur);
+  document.addEventListener("visibilitychange", onVisibilityChange);
+
   return {
     update(state: FlightState, pitchTrim: number): void {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawAttitudeIndicator(ctx, canvas.width / 2, canvas.height / 2, 96, state.rollRad, state.pitchRad);
+      const center = canvas.width / 2;
+      drawAttitudeIndicator(ctx, center, center, ATTITUDE_RADIUS, state.rollRad, state.pitchRad);
+      drawStickOverlay(ctx, center, center, ATTITUDE_RADIUS, stickX, stickY, stickActive);
 
       iasEl.textContent = Math.round(state.airspeedKts).toString().padStart(3, "0");
       altEl.textContent = formatAltitudeFt(state.altMeters);
@@ -152,8 +298,21 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
       trimOutput.value = `${Math.round(pitchTrim * 100)}%`;
     },
     destroy(): void {
+      releaseStick();
       throttleInput.removeEventListener("input", onThrottleInput);
       trimInput.removeEventListener("input", onTrimInput);
+      canvas.removeEventListener("pointerdown", onPointerDown);
+      canvas.removeEventListener("pointermove", onPointerMove);
+      canvas.removeEventListener("pointerup", onPointerEnd);
+      canvas.removeEventListener("pointercancel", onPointerEnd);
+      canvas.removeEventListener("lostpointercapture", onPointerEnd);
+      canvas.removeEventListener("keydown", onKeyDown);
+      canvas.removeEventListener("keyup", onKeyUp);
+      canvas.removeEventListener("blur", onBlur);
+      canvas.removeEventListener("contextmenu", onContextMenu);
+      window.removeEventListener("blur", onBlur);
+      window.removeEventListener("resize", onBlur);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       root.innerHTML = "";
     },
   };

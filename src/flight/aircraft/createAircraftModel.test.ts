@@ -37,7 +37,7 @@ describe("aircraft model loader", () => {
     await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
 
     expect(t.urls[0]).toContain("Cessna_172_LOD2.glb");
-    expect(model.getState().triangles).toBe(288);
+    expect(model.getState().triangles).toBe(778);
     expect(model.getState().activeLodId).toBe("lod2");
     expect(t.containers[0].rootNodes[0].parent).toBe(model.root);
     // The aircraft must never be a pick target: the terrain probe and the
@@ -59,7 +59,7 @@ describe("aircraft model loader", () => {
     // The stored choice is a level the user has not enabled, so the finest one
     // they have takes its place rather than the aircraft going missing.
     await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
-    expect(model.getState().activeLodId).toBe("lod0");
+    expect(model.getState().activeLodId).toBe("lod3");
     expect(t.urls.some((url) => url.includes("HilosRun"))).toBe(false);
 
     model.setOptInEnabled(true);
@@ -70,7 +70,7 @@ describe("aircraft model loader", () => {
 
     // ...and switching it back off puts the cheap mesh back.
     model.setOptInEnabled(false);
-    await vi.waitFor(() => expect(model.getState().activeLodId).toBe("lod0"));
+    await vi.waitFor(() => expect(model.getState().activeLodId).toBe("lod3"));
 
     model.dispose();
     t.teardown();
@@ -79,7 +79,7 @@ describe("aircraft model loader", () => {
   it("orients the glTF -Z nose onto the sim's +Z nose and drops it to the ground", async () => {
     const t = setup();
     const model = createAircraftModel(t.scene, t.parent, {
-      aircraftId: "cessna-172", lodId: "lod0", loadContainer: t.loadContainer,
+      aircraftId: "cessna-172", lodId: "lod3", loadContainer: t.loadContainer,
     });
     await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
 
@@ -95,15 +95,15 @@ describe("aircraft model loader", () => {
   it("swaps levels and disposes the mesh it replaces", async () => {
     const t = setup();
     const model = createAircraftModel(t.scene, t.parent, {
-      aircraftId: "cessna-172", lodId: "lod0", loadContainer: t.loadContainer,
+      aircraftId: "cessna-172", lodId: "lod3", loadContainer: t.loadContainer,
     });
     await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
     // capture before the swap: AssetContainer.dispose() empties its own arrays
     const firstMesh = t.containers[0].meshes[0];
 
-    model.setLod("lod3");
-    await vi.waitFor(() => expect(model.getState().activeLodId).toBe("lod3"));
-    expect(t.urls[1]).toContain("Cessna_172_LOD3.glb");
+    model.setLod("lod0");
+    await vi.waitFor(() => expect(model.getState().activeLodId).toBe("lod0"));
+    expect(t.urls[1]).toContain("Cessna_172_LOD0.glb");
     expect(firstMesh.isDisposed()).toBe(true);
 
     model.dispose();
@@ -118,7 +118,7 @@ describe("aircraft model loader", () => {
       getChaseDistanceMeters: () => distance,
       loadContainer: t.loadContainer,
     });
-    await vi.waitFor(() => expect(model.getState().activeLodId).toBe("lod0"));
+    await vi.waitFor(() => expect(model.getState().activeLodId).toBe("lod3"));
 
     distance = 40;
     model.refreshAutoLod();
@@ -126,7 +126,7 @@ describe("aircraft model loader", () => {
 
     distance = 400;
     model.refreshAutoLod();
-    await vi.waitFor(() => expect(model.getState().activeLodId).toBe("lod3"));
+    await vi.waitFor(() => expect(model.getState().activeLodId).toBe("lod0"));
     expect(t.loadContainer).toHaveBeenCalledTimes(2);
 
     model.dispose();
@@ -136,14 +136,14 @@ describe("aircraft model loader", () => {
   it("loads the jet's own levels when the airframe is switched", async () => {
     const t = setup();
     const model = createAircraftModel(t.scene, t.parent, {
-      aircraftId: "cessna-172", lodId: "lod0", loadContainer: t.loadContainer,
+      aircraftId: "cessna-172", lodId: "lod3", loadContainer: t.loadContainer,
     });
     await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
 
     model.setAircraft("cirrus-vision-jet");
     await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
-    expect(t.urls[1]).toContain("Cirrus_Vision_Jet_LOD0.glb");
-    expect(model.getState().triangles).toBe(1212);
+    expect(t.urls[1]).toContain("Cirrus_Vision_Jet_LOD3.glb");
+    expect(model.getState().triangles).toBe(1220);
 
     model.dispose();
     t.teardown();
@@ -152,7 +152,7 @@ describe("aircraft model loader", () => {
   it("surfaces a load failure instead of throwing", async () => {
     const t = setup();
     const model = createAircraftModel(t.scene, t.parent, {
-      aircraftId: "cessna-172", lodId: "lod0",
+      aircraftId: "cessna-172", lodId: "lod3",
       loadContainer: () => Promise.reject(new Error("404 not found")),
     });
     await vi.waitFor(() => expect(model.getState().status).toBe("error"));

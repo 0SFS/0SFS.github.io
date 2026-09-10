@@ -2,15 +2,19 @@
 
 A measured reconstruction of the SF50 (G2) built to
 `docs/creating-an-aircraft-model.md`, generated procedurally from a table of
-cross-section stations. Four levels of detail, 1212 / 900 / 246 / 98 triangles,
+cross-section stations. Three levels of detail, 1220 / 908 / 442 triangles,
 wired into `AIRCRAFT_CATALOG` as `cirrus-vision-jet`.
+
+Levels are numbered **coarsest first**: LOD1 is the far mesh and each step up
+adds detail, so a bigger number is always a better mesh. There is no LOD0 —
+that slot is for a silhouette level below the far one, and this airframe does
+not need one.
 
 | level | triangles | vertices | objects | takes over at |
 | --- | --- | --- | --- | --- |
-| LOD0 | 1212 | 665 | 22 | 0 m |
-| LOD1 | 900 | 508 | 22 | 65 m |
-| LOD2 | 246 | 156 | 12 | 170 m |
-| LOD3 | 98 | 74 | 1 | 340 m |
+| LOD3 | 1220 | 670 | 22 | 0 m |
+| LOD2 | 908 | 513 | 22 | 65 m |
+| LOD1 | 442 | 255 | 12 | 170 m |
 
 Overall length, wingspan and height are **identical at every level and exactly
 equal to the published figures**, and every level's lowest vertex is at
@@ -158,9 +162,10 @@ Other things measurement changed from the first blockout:
   what keeps every LOD reporting the same overall dimensions.
 - The nacelle ring point count has to be **even**. An odd ring straddles the
   centreline instead of mirroring across it, and showed up as 0.21 m of
-  left/right symmetry error at LOD2 before the validator caught it.
+  left/right symmetry error at the far level before the validator caught it.
 - The nose station has to survive to every level. When it was marked
-  LOD0-only, LOD1 came out 0.15 m short and nothing else noticed.
+  finest-only, the level under it came out 0.15 m short and nothing else
+  noticed.
 
 ---
 
@@ -170,12 +175,13 @@ Other things measurement changed from the first blockout:
   measured, not assumed.** Faces that meet within `DISSOLVE_DEG` are describing
   one surface, so the edge between them is a line the eye cannot find:
   dissolving those and retriangulating what is left handed back 110 triangles
-  at LOD0 and 16 at LOD1. Sampled both ways against the undissolved surface,
+  at LOD3 and 16 at LOD2. Sampled both ways against the undissolved surface,
   1.0 deg moves the skin by at most 3.6 mm — on a 9.36 m aeroplane read off a
   drawing to about 10 mm. 2.0 deg gives 46 more for 6.8 mm, which is a number
-  the drawing would notice, so 1.0 is where it stops. LOD2 and LOD3 give back
-  nothing at all, which is the check that it is not eating shape: at those
-  levels there is no face pair flat enough to merge.
+  the drawing would notice, so 1.0 is where it stops. LOD1 gives back only what
+  its fuselage offers and nothing from the flying surfaces, which is the check
+  that it is not eating shape: down there most face pairs are not flat enough
+  to merge.
   The biggest single win was not the fuselage but the wings, 61 triangles down
   to 33 each — the ruled surface between two aerofoil sections is flat, and the
   loft had been splitting it anyway.
@@ -251,7 +257,7 @@ Other things measurement changed from the first blockout:
   adds are the windshield's two ends, where the crown rows stop being glazed,
   the crossings solved for below, and one just clear of each end of each pane.
 - **A station the glazing asked for is not a whole ring.** Ten of the 33
-  stations at LOD0 are there for the windscreen or the windows, and the belly
+  stations at LOD3 are there for the windscreen or the windows, and the belly
   has no use for any of them: a ring is 22 triangles and eleven of them are
   under the waterline. So each ring LINE carries only the stations a row beside
   it was actually cut at, and a row whose two lines disagree closes the
@@ -317,25 +323,44 @@ Other things measurement changed from the first blockout:
   each of the two rows, the boundary jogs back along the line by one gap, and
   the glass gets a notch a whole row deep. It is the C172's lesson - put the
   vertices where the features are - applied along the fuselage instead of
-  around it, and it costs three rings at LOD0.
+  around it, and it costs three rings at LOD3.
 - **A cut within 4 mm of a ring vertex IS that ring vertex.** The traced curves
   and the section table are separate measurements, so where they should meet
   exactly - the roof leaving the crown, the sill meeting it at the forward
   corner - they meet a third of a millimetre apart. Left alone that puts a
   vertex 3 mm from the ring's own, on a ring line the next row never split, and
   the fuselage comes back with a T-junction. `SNAP_M` closes the gap.
-- **The centre post tapers to nothing at both ends.** 62 mm wide on the plan
-  view in the middle, zero at the windshield's forward tip - where the two
-  panes meet anyway - and zero again at Y = −2.18, where the roof line leaves
-  the crown and the panes stop being joined over the top. That is what the
-  aircraft does, and it is also what keeps the post's ends off a ring line that
-  was never split: a post that simply stopped left a T-junction at each end.
+- **The centre post is a black rectangle, 62 mm wide the whole way.** It runs
+  from the windshield's forward tip to Y = −2.18, where the roof line leaves
+  the crown and the panes stop being joined over the top. It used to taper to
+  nothing at each end, which drew it as a rectangle with a spike on either tip
+  - the taper was there to keep the post's ends off a ring line that was never
+  split, because a post that simply stopped left a T-junction at each end.
+  Squaring it needed two things:
+  - Its edges are cut into the two rows either side of top dead centre, so its
+    end vertices sit on those rows' own chords, and the gap beyond each end of
+    the post is cut too, with the edge running in to x = 0. That is enough at
+    the forward tip.
+  - **The post's edge is sorted before the glass edges where two cuts cross.**
+    At Y = −2.18 the roof cut lands exactly on the crown ring vertex while the
+    post's is still interior, and the monotone clamp that resolves a crossing
+    was collapsing the post's cut into the roof's - so the forward gap split
+    the ring line at the post and the aft gap did not. The post wins that tie
+    for a topological reason: its ends have to land on the vertex the
+    neighbouring gap put there, whereas a glass edge that loses a crossing only
+    mis-colours the sliver it was crossing in.
+- **It has a material of its own, and not the one the tyres use.** `SF50_Dark`
+  is matte and lives inside the intake and under the wheels, where its specular
+  level never shows. The post sits on the crown facing the sky, and at that
+  material it rendered as a light grey bar - lighter than the glass it divides,
+  which is the one thing it must not be. `SF50_Post` is near-black at the
+  glass's low specular. `renders/WINDSCREEN_front_lod3.png` is the check.
 - **The nacelle is open where the fuselage closes it.** The drawing leaves a
   7–13 cm gap between the pod and the crown, too small to be worth a pylon at
   this budget, so the pod is seated on the fuselage and the four faces that
   would then be sealed inside the body are not built.
 - **The intake is a dished cap, not a hole.** One ring plus a centre vertex in
-  the dark material, set 9 cm inside the lip — eight triangles at LOD0.
+  the dark material, set 9 cm inside the lip — eight triangles at LOD3.
 
 The one thing added purely as geometry rather than material is the **ventral
 keel** under the nose gear bay and the **main gear doors** — 28 and 24
@@ -350,31 +375,48 @@ Generated from the same parameterised script, never decimated.
 
 | dropped at | what goes |
 | --- | --- |
-| LOD1 | 7 pane columns → 5, fewer fuselage stations, coarser nacelle and wheels, the wing's mid-span station. The ring stays at 11 points: the body is the same shape, the panes are less round |
-| LOD2 | ring → 6 points, 9 stations, the pane-edge rings (one glazed band instead of four windows), control surfaces merged into their panels, intake, keel, gear doors |
-| LOD3 | ring → 4 points, 5 stations, 4-point aerofoils (3-point on the V-tail), tyres, everything joined into one mesh |
+| LOD2 | 7 pane columns → 5, fewer fuselage stations, coarser nacelle and wheels, the wing's mid-span station. The ring stays at 11 points: the body is the same shape, the panes are less round |
+| LOD1 | ring → 6 points, 9 base stations, 6-point aerofoils, control surfaces merged into their panels, coarser wheels, the intake, the ventral keel and the two gear doors. **The glazing layout stays**: the windscreen and all three cabin windows are still cut as panes |
 
 The station table carries the level each one survives to, and which stations
 those are is a shape decision rather than an every-other-one rule: the nose and
 tail points that set the length, the windshield base, the belly's low point and
 the tail-cone pinch are all marked as surviving to every level, and only the
-stations that merely smooth between them are dropped. `LOD1` first came out with every
+stations that merely smooth between them are dropped. `LOD2` first came out with every
 station marked as surviving; relabelling took 128 triangles off it with no
-visible change to the side profile.
+visible change to the side profile. LOD1 does not use a rank at all: it takes a
+hand-picked set of nine stations, because which ones hold the silhouette up
+that far down is a judgement rather than a number.
 
-Everything that identifies the aircraft survives to LOD3: the deep blunt nose,
+Everything that identifies the aircraft survives to LOD1: the deep blunt nose,
 the dorsal engine pod, the low swept wing, the 38.7° V-tail and the dark
-wraparound glazing. `renders/LOD_COMPARE.png` stacks all four, and `renders/WIREFRAME_lod0.png`
+wraparound glazing. `renders/LOD_COMPARE.png` stacks all three, and `renders/WIREFRAME_lod3.png`
 shows where the triangles actually go — the only view that catches geometry
 spent on nothing, which a shaded render hides completely.
 
+**The far level cuts real panes, and that was worth 200 triangles.** It used to
+paint its glazing on as one band per face row, on the argument that a pane
+outline is unreadable at 170 m. What is readable at 170 m is *where the glass
+is*, and a band on the cabin rows put none of it on the nose: the aeroplane had
+one long stripe down each side and no windscreen at all, which reads as a white
+dart. Cutting the windscreen and the three cabin windows the same way every
+other level does took LOD1 from 246 to 442 triangles and is what makes it look
+like this aeroplane. The band code path is gone rather than left as an option.
+
+One thing that has to be right for panes to be cut this coarsely: **the ring
+line under the window row has to stay below the sills.** A pane is clamped to
+its row's own edges, so a lower line that has crept above a sill gives a
+flat-bottomed window and a run of zero-area triangles where the pane edge lies
+on the line. The 6-point ring had that line at 10° against the 11-point ring's
+8°, and the far level validated with two degenerate faces under the door
+window. Both rings now use 8°; the upper line is free to move with the ring
+size, the lower one is a measurement.
+
 **Wheels and the ground.** Every wheel ring starts at −90°, so there is always a
 vertex exactly at the bottom of the tyre at any point count — the failure that
-left the Cessna's LOD2 and LOD3 floating. The validator asserts it: the lowest
-vertex is at `z = 0.0` at all four levels. LOD3 has no tyres at all; its gear
-legs run to the ground instead, so it stands correctly but on stubs. That is the
-one place the "wheels touching z = 0" instruction is met in spirit rather than
-literally, and it is what let LOD3 come in under 100 triangles.
+left the Cessna's two coarsest levels floating. The validator asserts it: the lowest
+vertex is at `z = 0.0` at all three levels. Every level keeps its tyres: the
+one that did without them was the 98-triangle silhouette, and it is gone.
 
 ---
 
@@ -382,19 +424,19 @@ literally, and it is what let LOD3 come in under 100 triangles.
 
 `scripts/validate_sf50.py` writes `measurements/validate_LOD*.json`.
 
-| check | LOD0 | LOD1 | LOD2 | LOD3 |
-| --- | --- | --- | --- | --- |
-| triangles | 1212 | 900 | 246 | 98 |
-| length 9.357 m | 9.357 | 9.357 | 9.357 | 9.357 |
-| span 11.796 m | 11.796 | 11.796 | 11.796 | 11.796 |
-| height 3.322 m | 3.3227 | 3.3227 | 3.3219 | 3.3227 |
-| lowest vertex z | 0.0 | 0.0 | 0.0 | 0.0 |
-| degenerate faces | 0 | 0 | 0 | 0 |
-| loose vertices | 0 | 0 | 0 | 0 |
-| unapplied transforms | 0 | 0 | 0 | 0 |
-| symmetry error, max | 0.0 | 0.0 | 0.0 | 0.0 |
-| textures | 0 | 0 | 0 | 0 |
-| materials | 4 | 4 | 4 | 3 |
+| check | LOD3 | LOD2 | LOD1 |
+| --- | --- | --- | --- |
+| triangles | 1220 | 908 | 442 |
+| length 9.357 m | 9.357 | 9.357 | 9.357 |
+| span 11.796 m | 11.796 | 11.796 | 11.796 |
+| height 3.322 m | 3.3227 | 3.3227 | 3.3219 |
+| lowest vertex z | 0.0 | 0.0 | 0.0 |
+| degenerate faces | 0 | 0 | 0 |
+| loose vertices | 0 | 0 | 0 |
+| unapplied transforms | 0 | 0 | 0 |
+| symmetry error, max | 0.0 | 0.0 | 0.0 |
+| textures | 0 | 0 | 0 |
+| materials | 5 | 5 | 4 |
 
 **Symmetry is exactly zero** and should be: unlike the Cessna there is no
 propeller, so this airframe has no genuinely asymmetric part. Anything non-zero
@@ -411,7 +453,6 @@ fewer than two faces.
 | Intake | 8 / 6 | the bore is a dished cap, open at its rim inside the lip |
 | Wing_Left / _Right | 7 / 6 | root ribs, uncapped inside the fuselage |
 | VTail_Left / _Right | 7 / 6 | roots run to the centreline, uncapped deep inside the tail cone |
-| LOD3 body | 36 | all of the above, joined into one mesh |
 
 ---
 
@@ -422,10 +463,10 @@ root node is `Sketchfab_model` and its counts match the page. It is **CC
 Attribution**, so it can ship, and it now does: as the Vision Jet's `hd` level,
 **off by default**, switched on from the panel.
 
-| | hd (hilos run) | our LOD0 |
+| | hd (hilos run) | our LOD3 |
 | --- | --- | --- |
-| triangles | 7,294 | 1,212 |
-| vertices | 4,578 | 665 |
+| triangles | 7,294 | 1,220 |
+| vertices | 4,578 | 670 |
 | download | 3.4 MB (4096² texture) | 60 KB |
 | span | 11.796 (the scale datum) | 11.796 |
 | length | 9.075 (−3.0%) | 9.357 (exact) |
@@ -455,13 +496,14 @@ because the validator reports it, not because the model looks lopsided.
 
 `src/flight/aircraft/aircraftCatalog.ts`:
 
-- Four levels of ours — 1212 / 900 / 246 / 98 triangles — at `autoFromMeters`
-  of 40 / 65 / 170 / 340, plus hilos run's opt-in `hd` at 0. The three coarse
-  thresholds are the Cessna's scaled by the span ratio, so the two airframes
-  switch at the same apparent size. LOD0's is 40 rather than 0 because `hd`
-  covers the close range when it is on; with `hd` off, `selectAutoLod` gives
-  the close range to the finest level available, so LOD0 still starts at the
-  camera. There is one threshold table, not one per setting.
+- Three levels of ours — 1220 / 908 / 442 triangles — at `autoFromMeters` of
+  40 / 65 / 170, plus hilos run's opt-in `hd` at 0. The two coarse thresholds
+  are the Cessna's scaled by the span ratio, so the two airframes switch at the
+  same apparent size; the fourth threshold is gone with the level it selected,
+  so LOD1 runs from 170 m all the way out. LOD3's is 40 rather than 0 because
+  `hd` covers the close range when it is on; with `hd` off, `selectAutoLod`
+  gives the close range to the finest level available, so LOD3 still starts at
+  the camera. There is one threshold table, not one per setting.
 - Every level names its artist. Ours are `felipegalin0`, "measured
   reconstruction, designed explicitly for max runtime speed"; `hd` is
   `hilos run` with its licence and a link, which the panel shows whenever that
@@ -587,8 +629,8 @@ Read this before treating any of it as accurate.
   wing chord plane, which is free, but a super-ellipse cannot be wide low and
   narrow high: the body ends up about 7 cm too wide at mid-height in that
   region. The plan and front outlines are right, which is the trade taken.
-- **The cabin windows are polygons of nine columns, not smooth curves.** Their
-  top and bottom edges follow the measured super-ellipse to 4.3 mm; their fore
+- **The cabin windows are polygons of seven columns, not smooth curves.** Their
+  top and bottom edges follow the measured super-ellipse to 6.9 mm; their fore
   and aft ends close at the station just clear of the pane's tip.
 - **The reference model is 3% short** once its span is set to the published
   figure, and its fuselage is up to 0.24 m wider than the drawing at the cabin.
@@ -596,7 +638,7 @@ Read this before treating any of it as accurate.
   the drawing gives independently and agrees with to 8 mm; everywhere else the
   drawing wins.
 - **The strip closing each pane still fans at its two ends.** Six triangles at
-  LOD0 have an aspect quality under 0.05, all of them there. The window row is
+  LOD3 have an aspect quality under 0.05, all of them there. The window row is
   0.72 m tall abeam the aft window and the window in it is 0.35 m, so the wedge
   that closes each end of the block runs from a pane tip 100 mm tall to a
   station edge 720 mm tall. Three ways of squaring it were tried and measured,
@@ -612,8 +654,6 @@ Read this before treating any of it as accurate.
   slivers are flat, so their normals are the normals of the surface they lie
   in. The count is the minimum tiling of a flat region whose two sides have
   different vertex counts. It is left alone deliberately.
-- **LOD2 and LOD3 keep a plain glazed band**, not shaped panes: at 170 m and
-  beyond the whole aircraft is a few tens of pixels.
 - **No panel lines, antennas, deice boots, door outline, exhaust, static ports
   or wheel fairings.** The door's outline is drawn on the three view and is not
   modelled — only its window is.
@@ -633,30 +673,30 @@ cd planes/Cirrus_Vision_Jet/agent_workspace
 
 # one level
 blender -b --factory-startup --python scripts/generate_sf50.py -- \
-    --lod 0 --blend work/sf50_lod0.blend --glb exports/Cirrus_Vision_Jet_LOD0.glb
+    --lod 3 --blend work/sf50_lod3.blend --glb exports/Cirrus_Vision_Jet_LOD3.glb
 
 # check it
 blender -b --factory-startup --python scripts/validate_sf50.py -- \
-    work/sf50_lod0.blend --json measurements/validate_LOD0.json
+    work/sf50_lod3.blend --json measurements/validate_LOD3.json
 blender -b --factory-startup --python scripts/verify_rig.py -- \
-    exports/Cirrus_Vision_Jet_LOD0.glb
+    exports/Cirrus_Vision_Jet_LOD3.glb
 
 # look at it, against the drawing and on its own
 blender -b --factory-startup --python scripts/compare_drawing.py -- \
-    work/sf50_lod0.blend side renders/COMPARE_side_vs_drawing.png --px 150
+    work/sf50_lod3.blend side renders/COMPARE_side_vs_drawing.png --px 150
 blender -b --factory-startup --python scripts/render_sf50_views.py -- \
-    work/sf50_lod0.blend renders/final_lod0 final --fit 13 --res 640 --keepmat
+    work/sf50_lod3.blend renders/final_lod3 final --fit 13 --res 640 --keepmat
 
 # where the polygons went, and which of them show anything
 blender -b --factory-startup --python scripts/audit_fuselage.py -- \
-    work/sf50_lod0.blend
+    work/sf50_lod3.blend
 blender -b --factory-startup --python scripts/wireframe.py -- \
-    work/sf50_lod0.blend side renders/WIREFRAME_lod0.png --px 150
+    work/sf50_lod3.blend side renders/WIREFRAME_lod3.png --px 150
 blender -b --factory-startup --python scripts/wireframe.py -- \
-    work/sf50_lod0.blend side renders/preview/WIRE_cabin_after.png \
+    work/sf50_lod3.blend side renders/preview/WIRE_cabin_after.png \
     --px 420 --only Fuselage --half --win 2.9,-1.5,2.6,1.2
 
-# master .blend with all four levels in their own collections
+# master .blend with every level in its own collection
 blender -b --factory-startup --python scripts/assemble_master.py -- \
     work exports/Cirrus_Vision_Jet_master.blend
 ```
@@ -683,7 +723,7 @@ blender -b --factory-startup --python scripts/prepare_third_party.py -- \
     work/refA_oriented.blend exports/Cirrus_Vision_Jet_HilosRun.glb
 # and check it lands where ours land - this failure is otherwise silent
 blender -b --factory-startup --python scripts/compare_assets.py -- \
-    exports/Cirrus_Vision_Jet_LOD0.glb exports/Cirrus_Vision_Jet_HilosRun.glb
+    exports/Cirrus_Vision_Jet_LOD3.glb exports/Cirrus_Vision_Jet_HilosRun.glb
 ```
 
 `scripts/montage.py` tiles any set of PNGs into one sheet, which is the only
@@ -709,7 +749,7 @@ asserted, so `npx vitest run` catches a forgotten one.
 Would someone who knows the type identify this immediately as a Vision Jet
 rather than a small jet of roughly the right layout? Yes — the dorsal pod, the
 V-tail, the deep round nose and the wraparound glazing are all present and in
-the right places, and they survive to LOD3. The proportions trace to a factory
+the right places, and they survive to LOD1. The proportions trace to a factory
 drawing sampled per pixel rather than to an impression of the aircraft, and the
 places where the drawing and the published numbers disagree are listed above
 rather than silently averaged.

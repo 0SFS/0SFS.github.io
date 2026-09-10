@@ -11,7 +11,7 @@ import { AlertTriangle, Loader } from "lucide-react";
  */
 export type FlightStatusOverlayState =
   | { kind: "fault"; message: string; failed: readonly string[] }
-  | { kind: "waiting"; message: string; heldSeconds: number }
+  | { kind: "waiting"; message: string; heldSeconds: number; detail?: string }
   | null;
 
 export interface FlightStatusOverlayOptions {
@@ -33,9 +33,7 @@ export function FlightStatusOverlay({ state, onResume }: FlightStatusOverlayProp
           <div>
             <strong>{state.message}</strong>
             <p>
-              The aircraft is low enough for the ground to matter, and the map has
-              not published a height here yet, so the simulation is holding rather
-              than guessing one.
+              {state.detail ?? "The aircraft is low enough for the ground to matter, and the map has not published a height here yet, so the simulation is holding rather than guessing one."}
               {state.heldSeconds >= 5
                 ? " Still waiting after several seconds — climb away or reposition if it does not clear."
                 : ""}

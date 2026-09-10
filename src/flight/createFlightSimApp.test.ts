@@ -14,6 +14,16 @@ const mocks = vi.hoisted(() => {
       prepareTerrain: vi.fn(async (request: { altitudeMeters?: number }) => ({ groundHeightMeters: 250, altitudeMeters: request.altitudeMeters ?? 1774 })),
       surface: { sample: vi.fn(() => null) },
       getWorldRoot: () => ({}), setSimViewState: vi.fn(), setSimTick: vi.fn(),
+      googleTerrainDetail: {
+        defaultErrorTarget: 20,
+        errorTarget: 20,
+        overrideErrorTarget: null as number | null,
+      },
+      getGoogleTerrainDetailState: vi.fn(() => mocks.runtime.googleTerrainDetail),
+      setGoogleTerrainDetailTarget: vi.fn((errorTarget: number | null) => {
+        mocks.runtime.googleTerrainDetail.errorTarget = errorTarget ?? mocks.runtime.googleTerrainDetail.defaultErrorTarget;
+        mocks.runtime.googleTerrainDetail.overrideErrorTarget = errorTarget;
+      }),
       setSimRunning: vi.fn(), requestRender: vi.fn(), setMapSource: vi.fn(), setTerrainSource: vi.fn(), setRasterQuality: vi.fn(), destroy: vi.fn(),
     },
     aircraft: {
@@ -24,7 +34,7 @@ const mocks = vi.hoisted(() => {
     aircraftModel: {
       root: {},
       getState: () => ({
-        aircraftId: "cessna-172", lodId: "auto", activeLodId: "lod0",
+        aircraftId: "cessna-172", lodId: "auto", activeLodId: "lod3",
         status: "ready", triangles: 876, error: null,
       }),
       getRig: () => mocks.rig,
@@ -108,7 +118,7 @@ it("samples visible terrain contact in Google mode and resets a recoverable faul
   try {
     const tick = mocks.runtime.setSimTick.mock.calls.at(-1)?.[0] as (dt: number) => void;
     tick(1 / 60);
-    expect(mocks.terrainContact.update).toHaveBeenCalled();
+    expect(mocks.terrainContact.update).toHaveBeenLastCalledWith(false, true, true, true);
     window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyP" }));
     window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyP" }));
     expect(mocks.physics.reset).toHaveBeenCalled();
@@ -213,7 +223,7 @@ it("selects the airframe and LOD from the Aircraft tab and persists both", async
     expect(radios.map((input) => input.value)).toEqual(["cessna-172", "cirrus-vision-jet"]);
     const lodSelect = root.querySelector<HTMLSelectElement>(".flight-panel__select")!;
     expect(Array.from(lodSelect.options, (option) => option.value))
-      .toEqual(["auto", "lod0", "lod1", "lod2", "lod3"]);
+      .toEqual(["auto", "lod3", "lod2", "lod1", "lod0"]);
 
     await act(async () => {
       lodSelect.value = "lod2";
@@ -241,5 +251,53 @@ it("drives the model's control surfaces and propeller from the simulation each t
     mocks.applyAircraftRig.mockClear();
     tick(1 / 60);
     expect(mocks.applyAircraftRig).toHaveBeenCalledWith(mocks.rig, mocks.surfaceState, 1 / 60);
+  } finally { await act(async () => app.destroy()); }
+});
+
+it("saves World detail and the flight terrain requirement from Settings", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  const setItem = vi.fn();
+  vi.stubGlobal("localStorage", { getItem: () => null, setItem });
+  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
+  mocks.runtime.status.mode = "google-tiles";
+  mocks.runtime.googleTerrainDetail = {
+    defaultErrorTarget: 20,
+    errorTarget: 20,
+    overrideErrorTarget: null,
+  };
+  const root = document.createElement("div");
+  document.body.append(root);
+  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
+  await act(async () => { app = await createFlightSimApp(root); });
+  try {
+    await act(async () => root.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')!.click());
+    const settings = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="menuitem"]'))
+      .find((button) => button.textContent === "Settings")!;
+    await act(async () => settings.click());
+    const target = root.querySelector<HTMLInputElement>('[aria-label="World detail target"]')!;
+    const requirement = root.querySelector<HTMLInputElement>('[aria-label="Minimum World detail for flight"]')!;
+    expect(target.max).toBe("19");
+    expect(target.closest(".flight-panel__detail-range")).toBe(requirement.closest(".flight-panel__detail-range"));
+    await act(async () => {
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(target, "12");
+      target.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    expect(mocks.runtime.setGoogleTerrainDetailTarget).toHaveBeenLastCalledWith(4_096);
+    expect(setItem).toHaveBeenCalledWith("osfs.world-detail-target", "4096");
+
+    await act(async () => {
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(requirement, "13");
+      requirement.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    expect(setItem).toHaveBeenCalledWith("osfs.flight-terrain-requirement", "8192");
+
+    const override = root.querySelector<HTMLInputElement>('[aria-label="Allow coarser terrain for this session"]')!;
+    await act(async () => override.click());
+    expect(override.checked).toBe(true);
+
+    const automatic = Array.from(root.querySelectorAll<HTMLButtonElement>("button"))
+      .find((button) => button.textContent?.startsWith("Use automatic detail"))!;
+    await act(async () => automatic.click());
+    expect(setItem).toHaveBeenCalledWith("osfs.world-detail-target", "auto");
   } finally { await act(async () => app.destroy()); }
 });

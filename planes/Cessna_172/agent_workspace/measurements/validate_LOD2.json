@@ -1,16 +1,17 @@
 {
  "file": "c172_lod2.blend",
- "objects": 16,
+ "objects": 23,
  "empties": 1,
- "meshes": 16,
- "triangles": 288,
- "vertices": 189,
- "materials": 4,
+ "meshes": 23,
+ "triangles": 778,
+ "vertices": 473,
+ "materials": 5,
  "material_names": [
   "C172_Dark",
   "C172_Glass",
   "C172_Metal",
-  "C172_Paint"
+  "C172_Paint",
+  "C172_PropDisc"
  ],
  "textures": 0,
  "texture_names": [],
@@ -49,50 +50,63 @@
   8.28,
   2.718
  ],
- "non_manifold_edges": 36,
+ "non_manifold_edges": 106,
  "open_boundary_by_object": [
+  {
+   "name": "Fuselage",
+   "boundary_edges": 44
+  },
+  {
+   "name": "Propeller_Disc",
+   "boundary_edges": 20
+  },
   {
    "name": "Propeller",
    "boundary_edges": 8
   },
   {
    "name": "Wing_Left",
-   "boundary_edges": 6
+   "boundary_edges": 7
   },
   {
    "name": "HorizontalTail_Left",
-   "boundary_edges": 6
+   "boundary_edges": 7
   },
   {
    "name": "Wing_Right",
-   "boundary_edges": 6
+   "boundary_edges": 7
   },
   {
    "name": "HorizontalTail_Right",
-   "boundary_edges": 6
+   "boundary_edges": 7
   },
   {
    "name": "Spinner",
-   "boundary_edges": 4
+   "boundary_edges": 6
   }
  ],
  "degenerate_faces": 0,
  "loose_vertices": 0,
  "unapplied_transforms": [],
  "symmetry_error_m": {
-  "mean": 0.003312,
-  "max": 0.108122,
-  "over_1mm": 16
+  "mean": 0.001586,
+  "max": 0.06186,
+  "over_1mm": 24
  },
  "asymmetric_objects": [
   {
    "name": "Propeller",
-   "max": 0.10812,
-   "over_1mm": 16
+   "max": 0.06186,
+   "over_1mm": 24
   }
  ],
  "object_names": [
+  "Aileron_Left",
+  "Aileron_Right",
   "Cessna_172",
+  "Elevator",
+  "Flap_Left",
+  "Flap_Right",
   "Fuselage",
   "HorizontalTail_Left",
   "HorizontalTail_Right",
@@ -100,6 +114,8 @@
   "LandingGear_Nose",
   "LandingGear_Right",
   "Propeller",
+  "Propeller_Disc",
+  "Rudder",
   "Spinner",
   "Strut_Left",
   "Strut_Right",
@@ -113,8 +129,8 @@
  "per_object": [
   {
    "name": "Fuselage",
-   "tris": 80,
-   "verts": 42,
+   "tris": 248,
+   "verts": 138,
    "mats": [
     "C172_Paint",
     "C172_Glass"
@@ -126,9 +142,48 @@
    ]
   },
   {
+   "name": "Propeller_Disc",
+   "tris": 100,
+   "verts": 60,
+   "mats": [
+    "C172_PropDisc"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Propeller",
+   "tris": 36,
+   "verts": 24,
+   "mats": [
+    "C172_Dark"
+   ],
+   "origin": [
+    0.0,
+    2.32,
+    1.25
+   ]
+  },
+  {
    "name": "Wing_Left",
-   "tris": 28,
-   "verts": 18,
+   "tris": 33,
+   "verts": 21,
+   "mats": [
+    "C172_Paint"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "HorizontalTail_Left",
+   "tris": 33,
+   "verts": 21,
    "mats": [
     "C172_Paint"
    ],
@@ -140,10 +195,49 @@
   },
   {
    "name": "Wing_Right",
-   "tris": 28,
-   "verts": 18,
+   "tris": 33,
+   "verts": 21,
    "mats": [
     "C172_Paint"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "HorizontalTail_Right",
+   "tris": 33,
+   "verts": 21,
+   "mats": [
+    "C172_Paint"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "LandingGear_Left",
+   "tris": 20,
+   "verts": 12,
+   "mats": [
+    "C172_Metal"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "LandingGear_Right",
+   "tris": 20,
+   "verts": 12,
+   "mats": [
+    "C172_Metal"
    ],
    "origin": [
     0.0,
@@ -165,37 +259,24 @@
    ]
   },
   {
-   "name": "Propeller",
+   "name": "Rudder",
    "tris": 20,
-   "verts": 16,
-   "mats": [
-    "C172_Dark"
-   ],
-   "origin": [
-    0.0,
-    2.32,
-    1.25
-   ]
-  },
-  {
-   "name": "HorizontalTail_Left",
-   "tris": 16,
    "verts": 12,
    "mats": [
     "C172_Paint"
    ],
    "origin": [
     0.0,
-    0.0,
-    0.0
+    -4.815,
+    2.07
    ]
   },
   {
-   "name": "HorizontalTail_Right",
-   "tris": 16,
+   "name": "LandingGear_Nose",
+   "tris": 20,
    "verts": 12,
    "mats": [
-    "C172_Paint"
+    "C172_Metal"
    ],
    "origin": [
     0.0,
@@ -205,8 +286,8 @@
   },
   {
    "name": "Wheel_Left",
-   "tris": 12,
-   "verts": 8,
+   "tris": 20,
+   "verts": 12,
    "mats": [
     "C172_Dark"
    ],
@@ -218,8 +299,8 @@
   },
   {
    "name": "Wheel_Right",
-   "tris": 12,
-   "verts": 8,
+   "tris": 20,
+   "verts": 12,
    "mats": [
     "C172_Dark"
    ],
@@ -231,8 +312,8 @@
   },
   {
    "name": "Wheel_Nose",
-   "tris": 12,
-   "verts": 8,
+   "tris": 20,
+   "verts": 12,
    "mats": [
     "C172_Dark"
    ],
@@ -243,37 +324,63 @@
    ]
   },
   {
-   "name": "LandingGear_Left",
-   "tris": 8,
-   "verts": 6,
+   "name": "Spinner",
+   "tris": 18,
+   "verts": 13,
    "mats": [
     "C172_Metal"
    ],
    "origin": [
     0.0,
-    0.0,
-    0.0
+    2.17,
+    1.25
    ]
   },
   {
-   "name": "Strut_Left",
-   "tris": 8,
-   "verts": 6,
+   "name": "Elevator",
+   "tris": 16,
+   "verts": 12,
    "mats": [
     "C172_Paint"
    ],
    "origin": [
     0.0,
-    0.0,
-    0.0
+    -4.67,
+    1.38
    ]
   },
   {
-   "name": "LandingGear_Right",
-   "tris": 8,
-   "verts": 6,
+   "name": "Aileron_Left",
+   "tris": 14,
+   "verts": 9,
    "mats": [
-    "C172_Metal"
+    "C172_Paint"
+   ],
+   "origin": [
+    -4.16,
+    -0.7144,
+    2.1039
+   ]
+  },
+  {
+   "name": "Aileron_Right",
+   "tris": 14,
+   "verts": 9,
+   "mats": [
+    "C172_Paint"
+   ],
+   "origin": [
+    4.16,
+    -0.7144,
+    2.1039
+   ]
+  },
+  {
+   "name": "Strut_Left",
+   "tris": 12,
+   "verts": 8,
+   "mats": [
+    "C172_Paint"
    ],
    "origin": [
     0.0,
@@ -283,8 +390,8 @@
   },
   {
    "name": "Strut_Right",
-   "tris": 8,
-   "verts": 6,
+   "tris": 12,
+   "verts": 8,
    "mats": [
     "C172_Paint"
    ],
@@ -295,29 +402,29 @@
    ]
   },
   {
-   "name": "LandingGear_Nose",
+   "name": "Flap_Left",
    "tris": 8,
    "verts": 6,
    "mats": [
-    "C172_Metal"
+    "C172_Paint"
    ],
    "origin": [
-    0.0,
-    0.0,
-    0.0
+    -1.605,
+    -0.6515,
+    2.024
    ]
   },
   {
-   "name": "Spinner",
-   "tris": 4,
-   "verts": 5,
+   "name": "Flap_Right",
+   "tris": 8,
+   "verts": 6,
    "mats": [
-    "C172_Metal"
+    "C172_Paint"
    ],
    "origin": [
-    0.0,
-    2.17,
-    1.25
+    1.605,
+    -0.6515,
+    2.024
    ]
   }
  ]

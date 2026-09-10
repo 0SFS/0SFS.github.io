@@ -62,27 +62,58 @@ If a newly added aircraft looks sunk or floating when parked, `modelOffset.y` in
 
 ## Levels of detail
 
-Four levels ship per aircraft. Each drops the cheapest-to-lose detail first:
+**A bigger number is a better mesh.** `lod0` is the silhouette and each step up
+adds detail, up to `lod3`, the best procedural mesh an airframe has. That is the
+direction the generators number their `--lod` argument in, the direction the
+catalog ids run, and it is chosen for one reason: a ladder grows and shrinks at
+the *bottom*, and numbering from the top means every such change renumbers every
+level above it — which is a silent change to every asset path on disk and to
+every `osfs.aircraft-lod` value already in somebody's browser.
+
+The two airframes therefore agree on what `lod3` means without having to carry
+the same number of levels. The C172 has four; the Vision Jet has three, because
+its coarsest level is already cheap enough that a silhouette below it bought
+nothing but a jet with no windscreen.
+
+Each step down drops the cheapest-to-lose detail first: pane shape, then
 cross-section resolution, then control-surface separation, then part separation.
+
+Cessna 172:
 
 | Level | Triangles | Vertices | Meshes | Intended range |
 | --- | --- | --- | --- | --- |
-| LOD0 | 1016 | 591 | 23 | Close / cockpit |
-| LOD1 | 778 | 473 | 23 | Medium |
-| LOD2 | 288 | 189 | 16 | Far |
-| LOD3 | 130 | 105 | 2 | Distant silhouette |
+| LOD3 | 1016 | 591 | 23 | Close / cockpit |
+| LOD2 | 778 | 473 | 23 | Medium |
+| LOD1 | 288 | 189 | 16 | Far |
+| LOD0 | 130 | 105 | 2 | Distant silhouette |
 
-LOD0 and LOD1 carry a `Propeller_Disc` swept from the blade sections (140 and
-100 triangles). It is never drawn at the same time as the blades, so the cost is
-the larger of the two rather than the sum.
+Cirrus Vision Jet:
 
-Every level keeps the features that make the aircraft recognisable — high wing
-with dihedral, both lift struts, tricycle gear, swept fin, dark greenhouse,
-two-blade propeller. LOD3 merges all static parts into a single mesh so the whole
-aircraft is two draw-call groups.
+| Level | Triangles | Vertices | Meshes | Intended range |
+| --- | --- | --- | --- | --- |
+| LOD3 | 1220 | 669 | 22 | Close / cockpit |
+| LOD2 | 908 | 512 | 22 | Medium |
+| LOD1 | 442 | 254 | 12 | Far, and all the way out |
 
-All four validate at exactly 10.998 × 8.280 × 2.718 m with the wheels on `z = 0`,
-four materials and no textures.
+LOD3 and LOD2 of the C172 carry a `Propeller_Disc` swept from the blade sections
+(140 and 100 triangles). It is never drawn at the same time as the blades, so the
+cost is the larger of the two rather than the sum.
+
+Every level keeps the features that make the aircraft recognisable — for the
+C172, high wing with dihedral, both lift struts, tricycle gear, swept fin, dark
+greenhouse, two-blade propeller; its LOD0 merges all static parts into a single
+mesh so the whole aircraft is two draw-call groups.
+
+**The glazing LAYOUT is one of those features.** The Vision Jet's far level used
+to paint its windows on as one band down each side and no windscreen at all, and
+what that reads as at 200 m is not a cheap Vision Jet, it is a white dart. Its
+LOD1 now cuts the windscreen and the three cabin windows as real panes for
+about 200 extra triangles, and it is the change that made the far level look
+like the aeroplane.
+
+Every C172 level validates at exactly 10.998 × 8.280 × 2.718 m and every Vision
+Jet level at 11.796 × 9.357 × 3.322 m, wheels on `z = 0`, four or five materials
+and no textures.
 
 The UI exposes an `Auto` mode that picks a level from the chase-camera distance
 using each level's `autoFromMeters` threshold, and it only reloads when the
@@ -90,8 +121,10 @@ chosen level actually changes.
 
 ## More than one artist per airframe
 
-A ladder is per airframe and ordered finest first, but its rungs need not all
-come from the same place, so **the credit belongs to the level, not to the
+A ladder is per airframe and its array is ordered finest first — the opposite
+of the way the levels are numbered, because that is the order `selectAutoLod`
+walks and the order the panel offers. Its rungs need not all come from the same
+place, so **the credit belongs to the level, not to the
 airframe**. `AircraftModelCredit` carries the artist, a line on what the mesh is
 for, and — for anything not ours — the licence and a link back. The panel shows
 one line per artist in the ladder it is offering, which is how a CC-BY
@@ -110,14 +143,14 @@ a stored selection of one falls back to the finest level that *is* available
 rather than leaving the aircraft invisible.
 
 The Vision Jet has one: **HD, 7,294 triangles, by hilos run**, CC Attribution,
-from Sketchfab. It sits above our LOD0 and covers the close range when it is
-switched on, with our own LOD0 taking over at 40 m — so the 3.4 MB textured
+from Sketchfab. It sits above our LOD3 and covers the close range when it is
+switched on, with our own LOD3 taking over at 40 m — so the 3.4 MB textured
 mesh is never drawn at distance.
 
 `selectAutoLod` has one rule that makes this work without rewriting thresholds
 whenever the flag changes: **the finest level available always covers the close
-range**, whatever its own `autoFromMeters` says. With HD on, LOD0 starts at its
-own 40 m; with HD off, LOD0 is the finest there is and starts at the camera.
+range**, whatever its own `autoFromMeters` says. With HD on, LOD3 starts at its
+own 40 m; with HD off, LOD3 is the finest there is and starts at the camera.
 
 The choice persists to `localStorage` under `osfs.aircraft-opt-in-lods`.
 
@@ -204,7 +237,7 @@ disc does not.
 
 If a mesh ships no disc, the runtime builds a flat one sized from the
 propeller's bounding box, so an airframe gets something usable without touching
-its GLB. LOD2 and LOD3 take that path deliberately: at those distances the
+its GLB. LOD1 and LOD0 take that path deliberately: at those distances the
 propeller is a few pixels and the swept solid is not worth carrying.
 
 Set `propellerBlades` in the catalog — `0` for a jet, which suppresses the disc
@@ -265,9 +298,9 @@ The generator is reproducible and writes straight to wherever it is pointed:
 ```bash
 blender -b --factory-startup \
   --python planes/Cessna_172/agent_workspace/scripts/generate_c172.py -- \
-  --lod 0 \
-  --blend planes/Cessna_172/agent_workspace/work/c172_lod0.blend \
-  --glb public/aircraft/cessna-172/Cessna_172_LOD0.glb
+  --lod 3 \
+  --blend planes/Cessna_172/agent_workspace/work/c172_lod3.blend \
+  --glb public/aircraft/cessna-172/Cessna_172_LOD3.glb
 ```
 
 Two companion scripts are worth knowing about:
@@ -301,6 +334,16 @@ vertices, nothing hidden.
 posts, and the rounded glazing corners are all material assignment on faces that
 already exist. A separate mesh would have cost geometry and bought nothing.
 
+**A material is a colour *and* a specular level, and reusing one across
+lighting situations bites.** The Vision Jet's windscreen post was first given
+`SF50_Dark`, the near-black already used for tyres and the intake bore. Those
+sit under the aircraft or deep inside a duct where their specular level never
+shows; the post lies on the crown facing the sky, and at the same material it
+rendered a light grey bar — *lighter than the glass it divides*, which is the
+one thing it must not be. It got a material of its own at the glass's low
+specular. If a new part reuses an existing material, check it in the lighting
+that part actually lives in.
+
 **Assign per triangle when a whole face is too coarse.** A quad is already two
 triangles, so painting only one of them produces a diagonal edge for free. That
 is how the windshield and rear-window corners are chamfered.
@@ -313,7 +356,7 @@ and rake independent — which also removed a station and ended up cheaper.
 **Choose ring angles deliberately.** Evenly spaced cross-section vertices put
 nothing at the window sill or head, which is what forced the glazing into a
 separate shell in the first place. Placing vertices where features actually fall
-let LOD0 drop from 12-point to 10-point rings with no visible loss.
+let the finest level drop from 12-point to 10-point rings with no visible loss.
 
 **Leave the fuselage open where the wing closes it.** The cabin roof follows the
 wing's lower surface across the wing chord, and the fuselage top is omitted
@@ -326,7 +369,7 @@ the wing thins to a knife edge and stops covering the opening.
   C172's, so its parked stance is that aircraft's rather than an SF50's, and
   its V-tail does not move. See
   `planes/Cirrus_Vision_Jet/agent_workspace/REPORT.md`.
-- The Cessna's LOD3 is 130 triangles against a 100 target. The remaining cuts are the lift
+- The Cessna's LOD0 is 130 triangles against a 100 target. The remaining cuts are the lift
   struts, landing gear and glazing, which are what distinguish the airframe from
   a generic monoplane at any distance.
 - The models carry no panel lines, antennas, door outlines or wheel fairings.

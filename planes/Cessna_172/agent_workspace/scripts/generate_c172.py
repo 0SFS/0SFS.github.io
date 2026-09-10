@@ -2,7 +2,11 @@
 Procedural low-poly Cessna 172S Skyhawk generator.
 
     blender -b --factory-startup --python generate_c172.py -- \
-        --lod 0 --blend out.blend [--glb out.glb]
+        --lod 3 --blend out.blend [--glb out.glb]
+
+The LOD ladder runs COARSEST FIRST: --lod 0 is the silhouette mesh and every
+step up adds detail, so a bigger number is always a better mesh and the top of
+the ladder does not move when a level is added below it.
 
 Method: measured reconstruction.  The fuselage is a loft through explicit
 cross-section STATIONS (not a stretched primitive); the flying surfaces are
@@ -24,7 +28,7 @@ from mathutils import Vector, Matrix
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 def arg(name, default=None):
     return argv[argv.index(name) + 1] if name in argv else default
-LOD      = int(arg("--lod", 0))
+LOD      = int(arg("--lod", 3))
 OUT_BLEND = arg("--blend")
 OUT_GLB   = arg("--glb")
 
@@ -116,37 +120,44 @@ def in_post_band(y):
     return any(lo <= y <= hi for lo, hi in POST_BANDS)
 
 
-# Per-LOD tessellation.  These are NOT blind decimations: each level drops the
-# cheapest-to-lose detail first (cross-section resolution, then control-surface
-# separation, then part separation) while every silhouette-defining feature
-# (high wing + dihedral, struts, tricycle gear, swept fin, tail cone, prop disc)
-# survives to LOD3.
+# Per-LOD tessellation.  The ladder runs COARSEST FIRST - LOD0 is the
+# silhouette mesh and each step up adds detail - so a bigger number is always a
+# better mesh, and adding a level at the bottom does not renumber the ones
+# above it (which would silently change every asset path).
+#
+# These are NOT blind decimations: each step down drops the cheapest-to-lose
+# detail first (cross-section resolution, then control-surface separation, then
+# part separation) while every silhouette-defining feature (high wing +
+# dihedral, struts, tricycle gear, swept fin, tail cone, prop disc) survives to
+# LOD0.
 LODP = {
-    0: dict(ring=10, st_level=2, wheel=8, spin=6, prop_st=3,
-            wing_st=(0.0, TAPER_START, 5.30, SEMI), gear_st=4, gear_n=4, strut_n=4,
-            glass=True, ctrl=True, af='full', merge=False,
-            spin_rings=3, prop_flat=False, fin_pts=0, flat_gear=False, prop_2st=False,
-            pillars=True, disc_seg=14),
-    1: dict(ring=8,  st_level=1, wheel=6, spin=6, prop_st=2,
-            wing_st=(0.0, TAPER_START, SEMI), gear_st=3, gear_n=4, strut_n=4,
-            glass=True, ctrl=True, af='full', merge=False,
-            spin_rings=3, prop_flat=False, fin_pts=0, flat_gear=False, prop_2st=False,
-            pillars=True, disc_seg=10),
-    2: dict(ring=6,  st_level=-2, wheel=4, spin=4, prop_st=2,
-            wing_st=(0.0, TAPER_START, SEMI), gear_st=2, gear_n=3, strut_n=3,
-            glass=True, ctrl=False, af='mid', merge=False,
-            spin_rings=2, prop_flat=False, fin_pts=6, flat_gear=False, prop_2st=True,
-            pillars=False, disc_seg=0),
-    3: dict(ring=6,  st_level=-1, wheel=0, spin=4, prop_st=2,
+    0: dict(ring=6,  st_level=-1, wheel=0, spin=4, prop_st=2,
             wing_st=(0.0, SEMI), gear_st=2, gear_n=2, strut_n=2,
             glass=True, ctrl=False, af='low', merge=True,
             spin_rings=2, prop_flat=True, fin_pts=5, flat_gear=True, prop_2st=True,
             pillars=False, disc_seg=0),
+    1: dict(ring=6,  st_level=-2, wheel=4, spin=4, prop_st=2,
+            wing_st=(0.0, TAPER_START, SEMI), gear_st=2, gear_n=3, strut_n=3,
+            glass=True, ctrl=False, af='mid', merge=False,
+            spin_rings=2, prop_flat=False, fin_pts=6, flat_gear=False, prop_2st=True,
+            pillars=False, disc_seg=0),
+    2: dict(ring=8,  st_level=1, wheel=6, spin=6, prop_st=2,
+            wing_st=(0.0, TAPER_START, SEMI), gear_st=3, gear_n=4, strut_n=4,
+            glass=True, ctrl=True, af='full', merge=False,
+            spin_rings=3, prop_flat=False, fin_pts=0, flat_gear=False, prop_2st=False,
+            pillars=True, disc_seg=10),
+    3: dict(ring=10, st_level=2, wheel=8, spin=6, prop_st=3,
+            wing_st=(0.0, TAPER_START, 5.30, SEMI), gear_st=4, gear_n=4, strut_n=4,
+            glass=True, ctrl=True, af='full', merge=False,
+            spin_rings=3, prop_flat=False, fin_pts=0, flat_gear=False, prop_2st=False,
+            pillars=True, disc_seg=14),
 }
 P = LODP[LOD]
-# LOD3 uses an explicit reduced station subset
-LOD2_STATIONS = {1.55, 0.48, -0.10, -1.63, -2.10, -3.30, -6.05}
-LOD3_STATIONS = {1.55, 0.48, -0.10, -1.63, -6.05}
+# The two coarsest levels take an explicit reduced station subset rather than a
+# detail rank: which stations hold the silhouette up is a judgement, not a
+# number.
+LOD1_STATIONS = {1.55, 0.48, -0.10, -1.63, -2.10, -3.30, -6.05}
+LOD0_STATIONS = {1.55, 0.48, -0.10, -1.63, -6.05}
 
 # ----------------------------------------------------------------------------
 # scene / materials
@@ -341,10 +352,10 @@ def section(y, zb, zm, zt, hw, pu, pl, n):
 
 
 def fuselage_stations():
-    if LOD == 3:
-        base = [s for s in STATIONS if s[0] in LOD3_STATIONS]
-    elif LOD == 2:
-        base = [s for s in STATIONS if s[0] in LOD2_STATIONS]
+    if LOD == 0:
+        base = [s for s in STATIONS if s[0] in LOD0_STATIONS]
+    elif LOD == 1:
+        base = [s for s in STATIONS if s[0] in LOD1_STATIONS]
     else:
         base = [s for s in STATIONS if s[7] <= P["st_level"]]
     if not P["pillars"]:
@@ -693,7 +704,7 @@ def htail_geom(x):
 
 def build_htail(side):
     sgn = 1.0 if side == "Right" else -1.0
-    xs = [0.10, HTAIL_SEMI] if LOD >= 2 else [0.10, 1.05, HTAIL_SEMI]
+    xs = [0.10, HTAIL_SEMI] if LOD <= 1 else [0.10, 1.05, HTAIL_SEMI]
     rings = []
     for x in xs:
         le_y, chord, z = htail_geom(x)
@@ -706,7 +717,7 @@ def build_htail(side):
             rings.append([pts[0], pts[1], pts[2], pts[3], pts[5], pts[6], pts[7]])
         else:
             rings.append(pts)          # elevator merged into the stabiliser
-    verts, faces = loft(rings, cap_start=(LOD == 0), cap_end=True)
+    verts, faces = loft(rings, cap_start=(LOD == 3), cap_end=True)
     return make(f"HorizontalTail_{side}", verts, faces, M_PAINT)
 
 
@@ -770,7 +781,7 @@ def build_fin():
 
 
 def build_rudder():
-    pts = RUDDER_OUTLINE if LOD < 2 else [RUDDER_OUTLINE[i] for i in (0, 2, 4, 5)]
+    pts = RUDDER_OUTLINE if LOD > 1 else [RUDDER_OUTLINE[i] for i in (0, 2, 4, 5)]
     verts, faces = extrude_profile(pts, RUDDER_HALF_T)
     piv = (0.0, (FIN_OUTLINE[4][0] + FIN_OUTLINE[5][0]) / 2.0,
            (FIN_OUTLINE[4][1] + FIN_OUTLINE[5][1]) / 2.0)

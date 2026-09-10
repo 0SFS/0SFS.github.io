@@ -25,6 +25,50 @@ describe("displayed terrain contact", () => {
     expect(contact.update()).toBe(false);
   });
 
+  it("uses Google terrain chosen at the flight-ready World detail regardless of geometric-error metadata", () => {
+    const properties: Record<string, number> = {
+      "position/lat-geod-deg": 34, "position/long-gc-deg": -118,
+      "position/h-sl-ft": 301.33 / 0.3048,
+    };
+    const sdk = {
+      getPropertyValue: vi.fn((property: string) => properties[property] ?? 0),
+      setPropertyValue: vi.fn((property: string, value: number) => { properties[property] = value; }),
+      resetToInitialConditions: vi.fn(), runIc: vi.fn(() => true),
+    } as unknown as JSBSimSdk;
+    let hit: SurfaceHit | null = { heightMeters: 300, revision: 1, geometricErrorMeters: 500_000 } as SurfaceHit;
+    const contact = createTerrainContact(sdk, { raycast: () => null, sample: () => hit });
+    expect(contact.update(true, true, true)).toBe(true);
+
+    hit = null;
+    expect(contact.update(true, true, true)).toBe(true);
+    expect(contact.getBlockReason()).toBeNull();
+
+    // Tile metadata can be replaced while its mesh remains visible. It is not
+    // part of the flight policy and cannot make a flyable scene stop.
+    hit = { heightMeters: 300, revision: 2 } as SurfaceHit;
+    expect(contact.update(true, true, true)).toBe(true);
+    expect(contact.getBlockReason()).toBeNull();
+  });
+
+  it("holds Google contact only when the caller's World-detail policy requires it", () => {
+    const properties: Record<string, number> = {
+      "position/lat-geod-deg": 34, "position/long-gc-deg": -118,
+      "position/h-sl-ft": 301.33 / 0.3048,
+    };
+    const sdk = {
+      getPropertyValue: vi.fn((property: string) => properties[property] ?? 0),
+      setPropertyValue: vi.fn((property: string, value: number) => { properties[property] = value; }),
+      resetToInitialConditions: vi.fn(), runIc: vi.fn(() => true),
+    } as unknown as JSBSimSdk;
+    const hit: SurfaceHit = { heightMeters: 300, revision: 1, geometricErrorMeters: 1 } as SurfaceHit;
+    const contact = createTerrainContact(sdk, { raycast: () => null, sample: () => hit });
+
+    expect(contact.update(true, true)).toBe(false);
+    expect(contact.getBlockReason()).toBe("coarse");
+    expect(contact.update(true, true, true)).toBe(true);
+    expect(sdk.setPropertyValue).toHaveBeenCalledWith("position/terrain-elevation-asl-ft", 300 / 0.3048);
+  });
+
   it("refuses to step before any terrain height exists, in either map mode", () => {
     // Google 3D Tiles publish nothing until the first tiles land. Stepping then
     // drops the aircraft toward a ground plane JSBSim has not been told about,
@@ -42,6 +86,10 @@ describe("displayed terrain contact", () => {
 
     expect(contact.update(false)).toBe(false);
     expect(contact.update(true)).toBe(false);
+    // Flight spawn preparation has already written a known terrain elevation
+    // into JSBSim. After that point a streaming miss cannot become a second
+    // loading gate.
+    expect(contact.update(false, true, true, true)).toBe(true);
     // JSBSim must not be told a terrain elevation it cannot support either.
     expect(sdk.setPropertyValue).not.toHaveBeenCalledWith("position/terrain-elevation-asl-ft", expect.anything());
 

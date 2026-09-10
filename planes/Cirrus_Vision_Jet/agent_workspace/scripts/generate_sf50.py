@@ -2,7 +2,11 @@
 Procedural low-poly Cirrus SF50 Vision Jet generator.
 
     blender -b --factory-startup --python generate_sf50.py -- \
-        --lod 0 --blend out.blend [--glb out.glb]
+        --lod 3 --blend out.blend [--glb out.glb]
+
+The LOD ladder runs COARSEST FIRST: --lod 1 is the far mesh and every step up
+adds detail, so a bigger number is always a better mesh and the top of the
+ladder does not move when a level is added below it.
 
 Method: measured reconstruction.  The fuselage is a loft through explicit
 cross-section STATIONS (not a stretched primitive); the flying surfaces are
@@ -107,10 +111,11 @@ CG_SHIFT = -4.00
 # fuselage stations
 #   (y, z_bottom, z_maxwidth, z_top, half_width, p_upper, p_lower, level)
 # p_* is the super-ellipse exponent of that half: 2.0 = ellipse, larger = flatter
-# with harder shoulders.  level is the coarsest LOD that keeps the station:
-# 0 = every level, because the station carries a feature (the nose and tail
-# points that set the length, the windshield base, the belly's low point, the
-# tail-cone pinch); 2 = LOD0 only, an in-between station that just smooths.
+# with harder shoulders.  level is how much detail a station is worth, NOT a
+# LOD number: 0 = every level, because the station carries a feature (the nose
+# and tail points that set the length, the windshield base, the belly's low
+# point, the tail-cone pinch); 2 = the finest level only, an in-between station
+# that just smooths.
 # ----------------------------------------------------------------------------
 STATIONS = [
     # Blunt, deep nose: 0.4 m aft of the tip the section is already 0.57 m deep.
@@ -215,27 +220,30 @@ CABIN_WINDOWS = [
 ]
 
 WINDSHIELD_Y = (-2.600, -1.480)   # forward corner of the windshield base
-# Falls back to one plain band at the levels too coarse to resolve a shape.
-CABIN_Y = (-4.506, -2.774)
-# Half-width of the windshield's centre post, measured on the plan view. It
-# tapers to nothing at each end of its run, which is both what the aircraft
-# does - the two panes meet at the windshield's forward tip, and again where
-# the roof line leaves the crown and the glass stops going over the top - and
-# what keeps the post's ends off a ring line that has not been split. A post
-# that just stopped left a T-junction at each end.
+# Half-width of the windshield's centre post, measured on the plan view. It is
+# the same width for its whole run: on the aircraft it is a straight black
+# divider between the two panes, and an earlier version that tapered to nothing
+# at each end drew it as a rectangle with a spike on either tip.
+#
+# The taper was there to keep the post's ends off a ring line that had not been
+# split. It is not needed for that: the post's edges are cut into the two rows
+# either side of top dead centre, so its end vertices sit on those rows' own
+# chords, not on the ring line they share with the rows outside - and the gap
+# beyond each end of the post is cut too, with the edge running in to x = 0.
 WINDSHIELD_POST_HALF = 0.031
-POST_TAPER = 0.12                 # metres of run the taper is spread over
 SNAP_M = 0.004                    # a cut nearer than this to a ring vertex
                                   # is that ring vertex
 
 
 def post_half(y):
-    """Half-width of the windshield's centre post at station y."""
-    aft = WINDSHIELD_ROOF[0][0]                # where the glass stops wrapping
-    if not (aft <= y <= WINDSHIELD_Y[1]):
-        return 0.0
-    d = min(WINDSHIELD_Y[1] - y, y - aft)
-    return WINDSHIELD_POST_HALF * min(1.0, max(0.0, d) / POST_TAPER)
+    """Half-width of the windshield's centre post at station y.
+
+    Zero outside its run: forward of the windshield's tip there is no glass to
+    divide, and aft of where the roof line leaves the crown the glass has
+    already stopped going over the top.
+    """
+    return (WINDSHIELD_POST_HALF
+            if WINDSHIELD_ROOF[0][0] <= y <= WINDSHIELD_Y[1] else 0.0)
 
 # Fractions of the pane half-length to put a station at. The +/-1.0 pair sits
 # just outside the pane and closes it off; the rest sample its outline.
@@ -340,54 +348,70 @@ def is_glass(y, z):
 # one to ask finds it already gone. It pays for itself twice over - it is also
 # the only vertex that puts the polygon crown exactly on the measured crown,
 # and it is where the centre post's two edges hang from.
+#
+# The window row's LOWER line is 8 degrees at every ring size, and that is not
+# a coincidence to be tidied away. A pane is cut inside its row and clamped to
+# the row's own edges, so a pane that reaches below the line comes back pinned
+# to it - a flat-bottomed window, and a strip of zero-area triangles where the
+# pane edge lies on the line it was clamped to. Eight degrees is where the
+# section is still below the cabin sills at every station the windows cross;
+# ten was not, and the far level came back with two degenerate faces under the
+# door window. The row's upper line has no such constraint, so it is free to
+# move with the ring size.
 RING_SPEC = {
     11: dict(angles=[8, 48, 70, 90, 110, 132, 172, 200, 240, 300, 340],
              window=[0, 5], crown=[1, 2, 3, 4], top=2, crown_line=3),
-    8:  dict(angles=[8, 48, 132, 172, 200, 250, 290, 340],
+    6:  dict(angles=[8, 60, 120, 172, 230, 310],
              window=[0, 2], crown=[1], top=1),
-    6:  dict(angles=[10, 60, 120, 170, 230, 310],
-             window=[0, 2], crown=[1], top=1),
-    4:  dict(angles=[30, 150, 230, 310],
-             window=[0], crown=[0], top=0),
 }
 
 # ----------------------------------------------------------------------------
-# per-LOD tessellation.  Each level drops the cheapest-to-lose detail first:
-# pane shape, then cross-section resolution, then control-surface separation,
-# then part separation.  Every silhouette-defining feature - deep blunt nose,
-# dorsal nacelle, low swept wing, 38.7 deg V-tail, dark wraparound glazing -
-# survives to LOD3.
+# per-LOD tessellation.  The ladder runs COARSEST FIRST - LOD1 is the far mesh
+# and each step up adds detail - so a bigger number is always a better mesh.
+# LOD0 is deliberately left free: it is the slot for a level BELOW the far one,
+# which this airframe does not need and the C172 does. Numbering the other way
+# round meant that adding or removing a level at the bottom renumbered every
+# level above it, and a renumbering is a silent change to every asset path.
+#
+# Each step down drops the cheapest-to-lose detail first: pane shape, then
+# cross-section resolution, then control-surface separation, then the small
+# trim parts.  Every silhouette-defining feature - deep blunt nose, dorsal
+# nacelle, low swept wing, 38.7 deg V-tail, dark wraparound glazing - survives
+# to LOD1, and so does the glazing LAYOUT: the windscreen and three separate
+# cabin windows, not one painted band. A band was what the far level used to
+# carry, and it read as a jet with no windscreen at all.
+#
+# `trim` is the small stuff that is geometry rather than shape: the ventral
+# keel and the two main gear doors. They are 200 mm details, so the far level
+# does without them.
 # ----------------------------------------------------------------------------
 LODP = {
-    0: dict(ring=11, st_level=2, pane_detail='fine', wheel=8,
-            wing_st=(0.0, 1.30, 3.20, 5.60, SEMI),
-            vt_st=(VT_ROOT_ETA, 0.55, 1.0), gear_n=4, gear_st=3,
-            glass=True, ctrl=True, af='full', merge=False, nac_ring=8,
-            pillars=True, intake=True, flat_gear=False, nac_st=5, panes=True,
-            tip_cap=True, gear_cap=True),
-    1: dict(ring=11, st_level=0, pane_detail='coarse', wheel=6,
+    1: dict(ring=6, pane_detail='coarse', wheel=4,
+            wing_st=(0.0, SEMI),
+            vt_st=(VT_ROOT_ETA, 1.0), gear_n=3, gear_st=2,
+            ctrl=False, af='mid', nac_ring=4,
+            pillars=False, intake=False, nac_st=3,
+            tip_cap=True, gear_cap=True, trim=False),
+    2: dict(ring=11, st_level=0, pane_detail='coarse', wheel=6,
             wing_st=(0.0, 1.30, SEMI),
             vt_st=(VT_ROOT_ETA, 1.0), gear_n=4, gear_st=2,
-            glass=True, ctrl=True, af='full', merge=False, nac_ring=6,
-            pillars=True, intake=True, flat_gear=False, nac_st=4, panes=True,
-            tip_cap=True, gear_cap=True),
-    2: dict(ring=6, st_level=-2, pane_detail='coarse', wheel=4,
-            wing_st=(0.0, SEMI),
-            vt_st=(VT_ROOT_ETA, 1.0), gear_n=3, gear_st=2,
-            glass=True, ctrl=False, af='mid', merge=False, nac_ring=4,
-            pillars=False, intake=False, flat_gear=False, nac_st=3, panes=False,
-            tip_cap=True, gear_cap=True),
-    3: dict(ring=4, st_level=-1, pane_detail='coarse', wheel=0,
-            wing_st=(0.0, SEMI),
-            vt_st=(VT_ROOT_ETA, 1.0), gear_n=3, gear_st=2,
-            glass=True, ctrl=False, af='low', merge=True, nac_ring=4,
-            pillars=False, intake=False, flat_gear=True, nac_st=2, panes=False,
-            tip_cap=True, gear_cap=False),
+            ctrl=True, af='full', nac_ring=6,
+            pillars=True, intake=True, nac_st=4,
+            tip_cap=True, gear_cap=True, trim=True),
+    3: dict(ring=11, st_level=2, pane_detail='fine', wheel=8,
+            wing_st=(0.0, 1.30, 3.20, 5.60, SEMI),
+            vt_st=(VT_ROOT_ETA, 0.55, 1.0), gear_n=4, gear_st=3,
+            ctrl=True, af='full', nac_ring=8,
+            pillars=True, intake=True, nac_st=5,
+            tip_cap=True, gear_cap=True, trim=True),
 }
 P = LODP[LOD]
 
-LOD2_STATIONS = {0.000, -0.80, -2.00, -3.20, -4.40, -5.27, -6.40, -7.85, -9.357}
-LOD3_STATIONS = {0.000, -2.40, -4.40, -7.50, -9.357}
+# The far level takes a hand-picked subset rather than a detail rank. It wants
+# fewer stations than even rank 0 gives, and which ones to keep is a judgement
+# about the silhouette - the nose tip, the windscreen base, the wing box, the
+# nacelle, the tail cone pinch, the tail point - not a number.
+LOD1_STATIONS = {0.000, -0.80, -2.00, -3.20, -4.40, -5.27, -6.40, -7.85, -9.357}
 
 # ----------------------------------------------------------------------------
 # scene / materials
@@ -423,6 +447,18 @@ M_PAINT = mat("SF50_Paint", (0.905, 0.910, 0.915, 1.0), 0.32)
 M_GLASS = mat("SF50_Glass", (0.030, 0.045, 0.068, 1.0), 0.38, spec=0.12)
 M_DARK = mat("SF50_Dark", (0.085, 0.088, 0.095, 1.0), 0.55)   # tyres, intake bore
 M_METAL = mat("SF50_Metal", (0.545, 0.555, 0.575, 1.0), 0.32, metal=0.85)
+# The windscreen's centre post. Not M_DARK, which is for tyres and the intake
+# bore: those are matte and deep inside the aircraft, so their specular level
+# never shows. The post sits on the crown facing the sky, and at M_DARK's
+# default specular it came back a light grey bar - lighter than the glass it
+# divides, which is the one thing it must not be. Low specular, like the glass.
+M_POST = mat("SF50_Post", (0.020, 0.021, 0.024, 1.0), 0.62, spec=0.05)
+
+# Fuselage material slots. The skin carries three and the mesh carries one set
+# of triangles: paint, glazing, and the windscreen's centre post, which is a
+# black divider on the aircraft and would read as a white bar without a slot
+# of its own. Slots cost nothing - a face already exists to be coloured.
+MAT_PAINT, MAT_GLASS, MAT_POST = 0, 1, 2
 
 # ----------------------------------------------------------------------------
 # mesh helpers
@@ -681,14 +717,8 @@ def edge_ring_crossings(base, n):
 
 
 def fuselage_stations():
-    if LOD == 3:
-        base = [s for s in STATIONS if s[0] in LOD3_STATIONS]
-    elif LOD == 2:
-        base = [s for s in STATIONS if s[0] in LOD2_STATIONS]
-    else:
-        base = [s for s in STATIONS if s[7] <= P["st_level"]]
-    if not P["panes"]:
-        return base, set()
+    base = ([s for s in STATIONS if s[0] in LOD1_STATIONS] if LOD == 1
+            else [s for s in STATIONS if s[7] <= P["st_level"]])
 
     # Each pane is cut into the window row as a hole bounded by the stations
     # either side of it, so two panes must never reach into the same station
@@ -704,8 +734,7 @@ def fuselage_stations():
     wanted = list(WINDSHIELD_Y) + [WINDSHIELD_ROOF[0][0]]
     for f0, a1 in pane_spans()[1:]:          # the windshield brings its own
         wanted += [f0 + PANE_MARGIN, a1 - PANE_MARGIN]
-    if P["glass"]:
-        wanted += edge_ring_crossings(base, P["ring"])
+    wanted += edge_ring_crossings(base, P["ring"])
     extra = []
     for y in wanted:          # named stations first, crossings after
         if all(abs(y - st[0]) > 0.04 for st in base + extra):
@@ -775,13 +804,15 @@ def build_fuselage():
     def in_ws(y):
         return WS_LO - 1e-6 <= y <= WS_HI + 1e-6
 
-    def emit(idx, glass):
+    def emit(idx, mati=MAT_PAINT):
         """One face, with its material decided structurally.
 
         Never by testing the geometry: a pane's own outline vertices sit
         exactly ON it, so any inside/outside test of them is a knife edge that
         sub-millimetre float noise flips - which once left a glazed sliver
         spiking the full height of the row off each end of a cabin window.
+
+        `mati` is a slot index, and False/True still read as paint/glass.
         """
         idx = list(idx)
         # A face this thin is three collinear points: it covers nothing, so
@@ -799,9 +830,9 @@ def build_fuselage():
         if area < 1e-12:
             return
         faces.append(idx)
-        fmats.append(1 if glass else 0)
+        fmats.append(int(mati))
         nonlocal glazed_n
-        glazed_n += 1 if glass else 0
+        glazed_n += 1 if int(mati) == MAT_GLASS else 0
 
     def gap_of(y):
         for i in range(len(ys) - 1):
@@ -918,17 +949,24 @@ def build_fuselage():
         t = SNAP_M / d
         return 0.0 if f < t else (1.0 if f > 1.0 - t else f)
 
-    def glazed(p, ym):
-        """Is this point on the skin glass? Structural, not a knife edge.
+    def skin_mat(p, ym):
+        """Which material this bit of skin is. Structural, not a knife edge.
 
         Only ever asked about the middle of a strip, never about a vertex on a
         pane's own outline: a vertex sits exactly ON the boundary, so testing
         one is a coin toss that float noise flips - which is how a glazed
         sliver once ended up spiking off the end of a cabin window.
+
+        The centre post is a strip of dark INSIDE the glazing, not a strip of
+        body colour: forward of the sill and above the roof line the crown is
+        painted like the rest of the aeroplane, and the post has nothing to
+        divide there. Asking about the post first drew a white bar up the nose.
         """
+        if not (sill_z(ym) < p[2] < roof_z(ym)):
+            return MAT_PAINT
         if P["pillars"] and abs(p[0]) <= post_half(ym):
-            return False
-        return sill_z(ym) < p[2] < roof_z(ym)
+            return MAT_POST
+        return MAT_GLASS
 
     def cut_windshield():
         """Cut the windscreen's own edges into whichever ring row holds them.
@@ -964,26 +1002,71 @@ def build_fuselage():
                 k = (j + 1) % n
                 pa0, pa1 = rings[g][j], rings[g][k]
                 pb0, pb1 = rings[g + 1][j], rings[g + 1][k]
-                edges = [(2, sill_z(ya), sill_z(yb)),
-                         (2, roof_z(ya), roof_z(yb))]
+                # (priority, coordinate, value at ya, value at yb). Priority
+                # decides which edge survives where two of them cross inside
+                # one row, and the post goes first for a topological reason,
+                # not a cosmetic one: its ends have to land on the same vertex
+                # the neighbouring gap put there, or the ring line between two
+                # gaps is split on one side only. A glass edge that loses a
+                # crossing only mis-colours the sliver it was crossing in.
+                edges = [('sill', 1, 2, sill_z(ya), sill_z(yb)),
+                         ('roof', 1, 2, roof_z(ya), roof_z(yb))]
                 cl = spec.get("crown_line")
-                # The centre post is a vertical edge, and only in the two rows
+                # The centre post is a lateral edge, and only in the two rows
                 # that touch top dead centre - asking for it anywhere else cuts
                 # the belly in half for nothing.
                 if P["pillars"] and cl is not None and j in (cl - 1, cl):
                     sgn = 1.0 if j == cl - 1 else -1.0
-                    edges.append((0, sgn * post_half(ya), sgn * post_half(yb)))
+                    edges.append(('post', 0, 0, sgn * post_half(ya),
+                                  sgn * post_half(yb)))
                 cuts = []
-                for c, va, vb in edges:
+                # Where the roof line actually is, as a fraction across this
+                # row, kept unclamped and only for the stations that HAVE a
+                # roof: forward of Y = -2.18 `roof_z` is not a height, it is
+                # the sentinel meaning "no roof yet", and the fraction that
+                # comes out of it is a number on one row and its opposite on
+                # the other - the two rows either side of top dead centre run
+                # their fractions in opposite directions in Z. Reading it as a
+                # real fraction clipped one side's post away entirely.
+                roof_f = [None, None]
+                for kind, prio, c, va, vb in edges:
                     da, db = pa1[c] - pa0[c], pb1[c] - pb0[c]
                     if abs(da) < 1e-9 or abs(db) < 1e-9:
                         continue
                     fa = snap(pa0, pa1, (va - pa0[c]) / da)
                     fb = snap(pb0, pb1, (vb - pb0[c]) / db)
+                    if kind == 'roof':
+                        roof_f = [fa if roof_z(ya) < 1e8 else None,
+                                  fb if roof_z(yb) < 1e8 else None]
+                    elif kind == 'post':
+                        # The post is a band INSIDE the glass, so its edge
+                        # cannot run past the glass's own. Without this the two
+                        # edges cross inside the one 60 mm gap where the roof
+                        # sweeps a whole row - from the crown at Y = -2.18 to
+                        # the shoulder at -2.24 - and only one edge survives a
+                        # crossing. The post did, the roof did not, and the
+                        # strip the roof would have split came out one colour:
+                        # 190 cm2 of body white in the middle of the right-hand
+                        # pane.
+                        #
+                        # Which way to clamp is NOT the same on the two rows.
+                        # They meet at top dead centre and run their fractions
+                        # in opposite directions, so the post band is the high
+                        # fractions on one and the low fractions on the other,
+                        # and the glass is on the far side of the roof in each.
+                        # Clamping both the same way pinched the left-hand post
+                        # to 3 mm and left the two sides with different face
+                        # counts - which is what a symmetric model not being
+                        # symmetric looks like before anyone sees it.
+                        clip = min if j == cl - 1 else max
+                        if roof_f[0] is not None:
+                            fa = clip(fa, roof_f[0])
+                        if roof_f[1] is not None:
+                            fb = clip(fb, roof_f[1])
                     if (fa <= 0.0 and fb <= 0.0) or (fa >= 1.0 and fb >= 1.0):
                         continue        # wholly one side of this row
                     cuts.append((min(max(fa, 0.0), 1.0),
-                                 min(max(fb, 0.0), 1.0)))
+                                 min(max(fb, 0.0), 1.0), prio))
                 # Two edges can meet inside one row - the sill runs into the
                 # roof at the aft corner, and into the post at the forward one
                 # - and there they swap order between the two stations. Left
@@ -999,12 +1082,12 @@ def build_fuselage():
                     # nothing.
                     mid = [(pa0[c] + pa1[c] + pb0[c] + pb1[c]) / 4.0
                            for c in range(3)]
-                    if not glazed(mid, ym):
+                    if skin_mat(mid, ym) == MAT_PAINT:
                         continue
                 consumed[j].add(g)
-                cuts.sort(key=lambda t: t[0] + t[1])
+                cuts.sort(key=lambda t: (t[2], t[0] + t[1]))
                 levels = [(0.0, 0.0)]
-                for fa, fb in cuts + [(1.0, 1.0)]:
+                for fa, fb in [c[:2] for c in cuts] + [(1.0, 1.0)]:
                     levels.append((max(fa, levels[-1][0]),
                                    max(fb, levels[-1][1])))
                 ids = []
@@ -1028,14 +1111,12 @@ def build_fuselage():
                     quad = [v for i, v in enumerate(quad)
                             if v != quad[(i - 1) % len(quad)]]
                     if len(quad) >= 3:
-                        emit(quad, glazed(mid, ym))
+                        emit(quad, skin_mat(mid, ym))
         panes_cut += 1
-    if P["panes"]:
-        if P["glass"]:
-            cut_windshield()
-        for j in spec["window"]:
-            for (yc, a, zc, b, ex) in CABIN_WINDOWS:
-                cut_cabin_pane(j, yc, a, zc, b, ex)
+    cut_windshield()
+    for j in spec["window"]:
+        for (yc, a, zc, b, ex) in CABIN_WINDOWS:
+            cut_cabin_pane(j, yc, a, zc, b, ex)
 
     # ---- everything else is the plain uniform ring ---------------------------
     def line_keeps(i, L):
@@ -1053,19 +1134,6 @@ def build_fuselage():
             return True
         return any(g in consumed[r]
                    for r in ((L - 1) % n, L % n) for g in (i - 1, i))
-
-    def row_glass(i0, i1, j, k):
-        if not P["glass"] or P["panes"]:
-            return False        # cut_windshield already took every glazed row
-        # Too coarse to resolve a pane shape: a plain band instead. The roof
-        # line still applies - a level too coarse for the window shapes is not
-        # too coarse to notice a bubble canopy.
-        mid = (ys[i0] + ys[i1]) / 2.0
-        zmid = (rings[i0][j][2] + rings[i0][k][2]
-                + rings[i1][j][2] + rings[i1][k][2]) / 4.0
-        return (CABIN_Y[0] <= mid <= CABIN_Y[1] and j in spec["window"]) \
-            or (in_ws(mid) and zmid < roof_z(mid)
-                and j in set(spec["window"]) | set(spec["crown"]))
 
     for j in range(n):
         k = (j + 1) % n
@@ -1091,15 +1159,15 @@ def build_fuselage():
                 nb = B[q + 1] if q + 1 < len(B) else None
                 if nb is None or (na is not None and na < nb):
                     emit((A[p] * n + j, B[q] * n + k, na * n + j),
-                         row_glass(A[p], na, j, k))
+                         MAT_PAINT)
                     p += 1
                 elif na is None or nb < na:
                     emit((A[p] * n + j, B[q] * n + k, nb * n + k),
-                         row_glass(B[q], nb, j, k))
+                         MAT_PAINT)
                     q += 1
                 else:
                     emit((A[p] * n + j, B[q] * n + k, nb * n + k, na * n + j),
-                         row_glass(A[p], na, j, k))
+                         MAT_PAINT)
                     p += 1
                     q += 1
             g = g1 + 1
@@ -1110,7 +1178,8 @@ def build_fuselage():
     print(f"###FUSELAGE### stations={len(sts)} ring={n} glazed_faces={glazed_n} "
           f"panes={panes_cut} (0 duplicated, 0 occluded)")
     return make("Fuselage", verts, faces, M_PAINT,
-                extra_mats=[M_GLASS], face_mats=fmats)
+                extra_mats=[M_GLASS] + ([M_POST] if P["pillars"] else []),
+                face_mats=fmats)
 
 
 # ----------------------------------------------------------------------------
@@ -1126,16 +1195,13 @@ HINGE_UP, HINGE_LO = 3, 5
 
 AF6_WING = [(0.000, 0.000), (0.150, 0.086), (0.450, 0.092),
             (1.000, 0.002), (0.450, -0.055), (0.150, -0.050)]
-AF4_WING = [(0.000, 0.000), (0.350, 0.100), (1.000, 0.002), (0.350, -0.058)]
 AF6_TAIL = [(0.000, 0.000), (0.180, 0.047), (0.500, 0.046),
             (1.000, 0.001), (0.500, -0.046), (0.180, -0.047)]
-AF4_TAIL = [(0.000, 0.000), (0.380, 0.050), (1.000, 0.001), (0.380, -0.050)]
 # LOD3 only: a flat-bottomed wedge. At the distance that level is drawn from,
 # the V-tail's job is to be a 38.7 deg V of the right size, not an aerofoil.
-AF3_TAIL = [(0.000, 0.000), (0.380, 0.050), (1.000, 0.001)]
 
-WING_AF = {'full': AF_WING, 'mid': AF6_WING, 'low': AF4_WING}[P["af"]]
-TAIL_AF = {'full': AF_TAIL, 'mid': AF6_TAIL, 'low': AF3_TAIL}[P["af"]]
+WING_AF = {'full': AF_WING, 'mid': AF6_WING}[P["af"]]
+TAIL_AF = {'full': AF_TAIL, 'mid': AF6_TAIL}[P["af"]]
 
 # The three view draws no hinge lines, so these spans are conventional rather
 # than measured.  The flap starts inboard of the fuselage side (0.673 m at the
@@ -1235,7 +1301,7 @@ def build_vtail(side):
             rings.append([pts[0], pts[1], pts[2], pts[3], pts[5], pts[6], pts[7]])
         else:
             rings.append(pts)
-    verts, faces = loft(rings, cap_start=(LOD == 0), cap_end=P["tip_cap"])
+    verts, faces = loft(rings, cap_start=(LOD == 3), cap_end=P["tip_cap"])
     return make(f"VTail_{side}", verts, faces, M_PAINT)
 
 
@@ -1337,7 +1403,7 @@ def build_nacelle():
 
 def build_keel():
     """Ventral keel under the nose gear bay: one flat plate, 8 triangles."""
-    if LOD >= 2:
+    if not P["trim"]:
         return None
     pts = [(y, zt) for (y, zt, zb) in KEEL] + \
           [(y, zb) for (y, zt, zb) in reversed(KEEL)]
@@ -1412,7 +1478,7 @@ def build_nose_gear():
 
 
 def build_gear_door(side):
-    if LOD >= 2:
+    if not P["trim"]:
         return None
     sgn = 1.0 if side == "Right" else -1.0
     n = len(GEAR_DOOR)
@@ -1484,18 +1550,6 @@ for ob in BUILT:
     else:
         ob.location = ob.location + SHIFT
 bpy.context.view_layer.update()
-
-if P["merge"]:
-    if len(BUILT) > 1:
-        bpy.ops.object.select_all(action='DESELECT')
-        for o in BUILT:
-            o.select_set(True)
-        bpy.context.view_layer.objects.active = BUILT[0]
-        bpy.ops.object.join()
-        merged = bpy.context.view_layer.objects.active
-        merged.name = "Cirrus_Vision_Jet_Body"
-        merged.data.name = "Cirrus_Vision_Jet_Body"
-        BUILT[:] = [merged]
 
 root = bpy.data.objects.new("Cirrus_Vision_Jet", None)
 SC.collection.objects.link(root)

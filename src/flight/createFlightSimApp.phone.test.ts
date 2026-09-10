@@ -24,6 +24,7 @@ const mocks = vi.hoisted(() => {
       engine: { getFps: () => 60 }, geospatialCamera: null, prepareTerrain: vi.fn(async (request: { altitudeMeters?: number }) => ({ groundHeightMeters: 250, altitudeMeters: request.altitudeMeters ?? 1774 })),
       surface: { sample: vi.fn(() => null) },
       getWorldRoot: () => ({}), setSimViewState: vi.fn(), setSimTick: vi.fn(), setSimRunning: vi.fn(),
+      getGoogleTerrainDetailState: vi.fn(() => null), setGoogleTerrainDetailTarget: vi.fn(),
       requestRender: vi.fn(), destroy: vi.fn(),
     },
     aircraft: {

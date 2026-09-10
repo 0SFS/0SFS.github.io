@@ -1,4 +1,4 @@
-"""Assemble Cirrus_Vision_Jet_master.blend: all four LODs, each in a collection.
+"""Assemble Cirrus_Vision_Jet_master.blend: every LOD, each in a collection.
 
     blender -b --factory-startup --python assemble_master.py -- <workdir> <out.blend>
 """
@@ -9,7 +9,10 @@ WORK, OUT = argv[0], argv[1]
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 sc = bpy.context.scene
-for lod in range(4):
+# The ladder runs coarsest first, so the finest level is the last one and is
+# the one left visible.
+LODS = [1, 2, 3]
+for lod in LODS:
     src = os.path.join(WORK, f"sf50_lod{lod}.blend")
     coll = bpy.data.collections.new(f"LOD{lod}")
     sc.collection.children.link(coll)
@@ -18,8 +21,8 @@ for lod in range(4):
     for ob in dt.objects:
         if ob is not None:
             coll.objects.link(ob)
-    coll.hide_viewport = (lod != 0)
-    coll.hide_render = (lod != 0)
+    coll.hide_viewport = (lod != LODS[-1])
+    coll.hide_render = (lod != LODS[-1])
     print(f"LOD{lod}: {len(list(coll.objects))} objects")
 
 bpy.ops.wm.save_as_mainfile(filepath=OUT)

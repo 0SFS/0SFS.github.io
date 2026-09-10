@@ -426,12 +426,30 @@ Four things that technique needs to be watertight:
   at its first station decides whether that gap gets a clean diagonal or a
   step. An inclusive bound at the first station is what made it clean.
 
-**Give a divider that ends mid-body a taper to nothing.** A windscreen's centre
-post runs out where the two panes meet at the forward tip and again where the
-glass stops going over the crown; modelling it as a constant-width band that
-simply stops leaves a T-junction at each end, because its end vertices sit on
-ring lines nothing else split. Tapering the width to zero puts those vertices
-*on* the ring line instead, and it is also what the aircraft does.
+**A divider that ends mid-body needs square ends, and a taper is not how you
+get them.** A windscreen's centre post runs out where the two panes meet at the
+forward tip and again where the glass stops going over the crown. Tapering its
+width to nothing at each end does make the mesh sound — the end vertices land
+*on* a ring line instead of splitting one nothing else split — but it draws the
+post as a rectangle with a spike on either tip, and how long each spike is has
+nothing to do with the taper length you chose: it is the distance to the nearest
+station, so a 40 mm taper still produced a 180 mm spike. Two things give a
+square end instead:
+
+- **Cut the gap beyond each end too**, with the edge running in to zero width
+  there. The divider's own edges are cut into the two rows either side of it, so
+  its end vertices sit on those rows' *chords*, not on the ring line those rows
+  share with their neighbours. Nothing outside needs to know.
+- **Sort a structural edge before a material edge where two cuts cross.** A row
+  is tiled as a monotone stack of strips, so when two cut lines cross inside one
+  row the second one gets clamped into the first and loses its vertex. On the
+  SF50 the roof line landed exactly on the crown ring vertex at the post's aft
+  end while the post's cut was still interior, so the post's vertex was the one
+  that vanished — in one of the two gaps sharing that ring line, and a
+  T-junction is exactly what that means. The divider has to win, and for a
+  reason that is not cosmetic: *its* ends must meet the vertex the neighbouring
+  gap put there, whereas a glass edge that loses a crossing only mis-colours the
+  sliver it was crossing in.
 
 **Put a ring line on the crown if the glazing needs one.** It costs a vertex
 per station, and on the SF50 it paid for itself three times: the polygon's top
@@ -456,17 +474,17 @@ Intermediate rules that are still true when the pane is coarse:
 
 ### Say "no polygon is wasted" only after looking
 
-The SF50 reached 1376 triangles at LOD0 with rounder windows than it had at
+The SF50 reached 1376 triangles at its finest level with rounder windows than it had at
 2344, entirely by removing geometry that showed nothing. Each round of that was
 found by looking at the wireframe, not the render. Before claiming a level is
 lean, render the wires and account for every cluster of density: it should sit
 where a feature is, and nowhere else.
 
 The reverse also holds. Getting the windscreen's outline right afterwards put
-LOD0 back up to 1515 — a crown ring line, three crossing stations, and the cuts
+it back up to 1515 — a crown ring line, three crossing stations, and the cuts
 those allow. "No polygon is wasted" is a claim about every polygon *earning*
 its place, not about the total going down. Reading the wireframe again after
-that took it to 1286 without touching the shape; the three things it found are
+that took it to 1212 without touching the shape; the three things it found are
 the three sections below.
 
 ### A station a feature asked for should not be a whole ring
@@ -474,8 +492,8 @@ the three sections below.
 A loft splits at stations, and the natural way to add one for a feature — a
 windscreen edge, the gap between two windows — is to add a ring. On the SF50
 that is 22 triangles, of which the eleven below the waterline show nothing:
-the belly does not know the windscreen is there. Ten of LOD0's 33 stations were
-there for the glazing.
+the belly does not know the windscreen is there. Ten of the finest level's 33
+stations were there for the glazing.
 
 The fix is that a ring **line** carries only the stations a row beside it was
 actually cut at, and a row whose two lines disagree closes the difference with
@@ -517,20 +535,37 @@ Two more things about that strip:
   aft window to one 400 mm behind it, and every triangle closing it was that
   long. The same station also keeps two panes out of one station gap, which
   they must be.
+- **Emit the strip as one polygon, not as a walk.** A strip whose two chains
+  have very different vertex counts — three station vertices against seven pane
+  columns — has no good zip: whichever rule picks the diagonals, it fans. An
+  n-gon costs *exactly* the same triangles (a polygon of V vertices is V−2
+  either way) and lets the triangulator choose instead. On the SF50 that also
+  removed the last folded pair, so the dissolve pass below stopped backing off.
 - **A strip between two polylines costs their lengths less two, and nothing
   beats that.** So the only lever on the count is how many vertices the pane's
   outline has — and each one costs *four* triangles, not two: one on the pane
-  and one in the strip, top and bottom. Measure before choosing. Nine columns
-  hold the SF50's door window to 4.3 mm against the super-ellipse it is cut
-  from, finer than the 11-sided ring it sits in; twelve bought 1.8 mm for
-  twelve triangles a pane.
+  and one in the strip, top and bottom. It also sets how well the strip tiles,
+  because it is the ratio of the two chains that decides the fan. So measure,
+  over the same range for every candidate so a blunter end is not doing the
+  work. The SF50's door window, against the super-ellipse it is cut from:
+
+  | columns | door | window 3 | window 4 | triangles per pane side |
+  | --- | --- | --- | --- | --- |
+  | 12 | 1.8 mm | 1.7 mm | 1.4 mm | 52 |
+  | 9 | 4.3 | 4.3 | 3.5 | 40 |
+  | 7 | 6.9 | 6.2 | 5.0 | 32 |
+  | 5 | 18.4 | 16.4 | 13.3 | 24 |
+
+  The drawing those windows were read off is good to about 10 mm. Seven is
+  where the outline stops being the limiting error and starts being accuracy
+  the source does not have — and it is two arms shorter on every fan.
 
 ### Give back the triangles that describe nothing — with a number, and a check
 
 Faces that meet within a degree or so are describing one surface, and the edge
 between them is a line the eye cannot find. Dissolving those and
 retriangulating what is left is the cheapest pass in the pipeline: it gave the
-SF50 back 110 triangles at LOD0, and the biggest single win was not the
+SF50 back 110 triangles at its finest level, and the biggest single win was not the
 fuselage but the wings, 61 down to 33 each, because the ruled surface between
 two aerofoil sections is flat and the loft had been splitting it anyway.
 
@@ -543,12 +578,14 @@ Then check it, because it can break the mesh. Two triangles can be flat and
 still be *folded*, and merging those gives a quad the retriangulator can only
 split across itself — four faces on one edge. Dissolve into a copy, count the
 copy's edges against the original's, and halve the angle until the mesh is
-exactly as sound as it was. The SF50's fuselage settles for 0.25° that way
-while everything else takes the full 1.0°.
+exactly as sound as it was. Every part of the SF50 takes the full 1.0° — but
+only once the pane strips became n-gons; before that the fuselage settled for
+0.25°, and the 40 triangles that cost were the tell that something upstream was
+making folded pairs.
 
 Two signs the pass is behaving: the coarsest levels should give back **nothing**
-(at LOD2 and LOD3 no face pair is flat enough), and the silhouette overlay
-against the drawing should not move at all.
+(down there no face pair is flat enough), and the silhouette overlay against the
+drawing should not move at all.
 
 Two mesh-health numbers say whether a cut went in cleanly, and the validator
 prints both: **boundary edges** on a surface that should be closed, and
@@ -641,29 +678,62 @@ images and that the line through them sits at the measured dihedral.
 
 ## Stage 6 — Levels of detail
 
-Four levels. Drop the cheapest-to-lose thing first, in this order: pane shape →
-cross-section resolution → control-surface separation → part separation.
+Three or four levels. Drop the cheapest-to-lose thing first, in this order:
+pane shape → cross-section resolution → control-surface separation → part
+separation.
+
+**Number the ladder coarsest-first: `lod0` is the silhouette and a bigger number
+is a better mesh.** It reads backwards for about a day and then never bites
+again. Numbering from the top means the ladder is numbered from the end that
+moves: drop a silhouette level, or add one under an existing bottom, and every
+level above it is renumbered — which is a silent change to every GLB path on
+disk, every row in the catalog, and every level id already stored in a user's
+browser. Numbered from the bottom, the top of the ladder is a fixed point, and
+two airframes with different numbers of levels still agree on what `lod3` means.
+
+Not every airframe needs the same number of rungs. Give it a silhouette level
+only if the level above it is too expensive to run all the way out.
 
 | Level | Rough size | What it keeps |
 | --- | --- | --- |
-| LOD0 | 1000–1500 tris | Everything, separately addressable, panes shaped |
-| LOD1 | 400–1000 | Same names, coarser panes and sections |
-| LOD2 | 150–300 | Control surfaces merged; a plain glazed band, not shapes |
-| LOD3 | ≤100 | Static parts joined into one mesh |
+| LOD3 | 1000–1500 tris | Everything, separately addressable, panes shaped |
+| LOD2 | 400–1000 | Same names, coarser panes and sections |
+| LOD1 | 150–450 | Control surfaces merged; glazing still cut as panes |
+| LOD0 | ≤150 | Static parts joined into one mesh |
 
 Those sizes are targets, not walls. The right count is the one where the
 wireframe shows density only where a feature is; a level that is 30% over
 because its windows are round is a better level than one that hits a number
-with rectangles. The SF50 sits at 1286 / 982 / 246 / 98 — over the targets at
-the top two, spent on window shape, and the wireframe accounts for all of it.
+with rectangles. The SF50 sits at 1220 / 908 / 442 — over the targets at the
+top and the bottom, spent on window shape, and the wireframe accounts for all
+of it.
+
+**The glazing LAYOUT is a silhouette feature. Do not paint it on.** The far
+levels of both airframes started out replacing the window shapes with a plain
+glazed band on whole face rows, on the argument that nobody can resolve a pane
+outline at 200 m. What they can resolve is *where the glass is*, and a band on
+the cabin rows put none of it on the nose: the SF50's far level had a stripe
+down each side and no windscreen at all, which reads as a white dart rather
+than as a small jet. Cutting the real panes at the far level cost about 200
+triangles out of 442 and was the single change that made it look like the
+aeroplane. The band path has been deleted rather than left as an option.
+
+A corollary, once the panes are cut at every level: **the ring line under the
+window row has to sit below the sills at every ring size.** A pane is cut inside
+its row and clamped to that row's own edges, so a row whose lower line has crept
+up above a sill comes back with a flat-bottomed window and a run of zero-area
+triangles where the pane edge lies on the line it was clamped to. The SF50's
+coarse ring had that line at 10° against the fine ring's 8°, and the far level
+validated with two degenerate faces under the door window. The upper line is
+free; the lower one is a measurement.
 
 **A station's level is a shape decision, not an every-other-one rule.** Mark
 the stations that carry a feature — the nose and tail points that set the
 length, the windshield base, the belly's low point, a tail-cone pinch — as
 surviving to every level, and drop only the ones that smooth between them.
-The SF50's LOD1 first came out barely cheaper than LOD0 because every station
-had been marked as surviving; relabelling took 128 triangles off it with no
-visible change to the side profile.
+The SF50's second-finest level first came out barely cheaper than its finest
+because every station had been marked as surviving; relabelling took 128
+triangles off it with no visible change to the side profile.
 
 Generate every level from the same parameterised script — never decimate. A
 decimator does not know that the lift struts matter more than the cowl's
@@ -671,15 +741,15 @@ roundness.
 
 **Every level keeps the features that identify the aircraft.** For the Cessna 172
 that is the high wing with dihedral, both lift struts, the tricycle gear, the
-swept fin, the dark greenhouse and the two-blade propeller. LOD3 came in at 130
-against a target of 100, and that was the right call: the only remaining cuts
-were the struts, gear and glazing, which are exactly what separates it from a
-generic monoplane at any distance.
+swept fin, the dark greenhouse and the two-blade propeller. Its LOD0 came in at
+130 against a target of 100, and that was the right call: the only remaining
+cuts were the struts, gear and glazing, which are exactly what separates it from
+a generic monoplane at any distance.
 
 Coarse levels legitimately lack the control-surface nodes. The runtime binds
 whatever it finds, so this needs no special handling.
 
-`scripts/lod_sheet.py` stacks the four contact sheets into one image. Look at it
+`scripts/lod_sheet.py` stacks the contact sheets into one image. Look at it
 before calling the set finished: each level should still be recognisable as the
 type, and the step between consecutive levels should be a reduction in fineness,
 not a change of shape.
@@ -719,10 +789,10 @@ Two more checks worth having, both of which caught real bugs on the SF50:
   between the wheels; anything else floats or sinks by exactly that much. Give
   every wheel ring a vertex at bottom dead centre — start its angles at −90° —
   because a coarse tyre approximated without one sits its whole bounding box
-  above the runway. That is why the Cessna's LOD2 and LOD3 floated.
+  above the runway. That is why the Cessna's two coarsest levels floated.
 - **Overall length, span and height must be identical at every level**, not just
   close. A station that carries an extremity — the nose cap, the tail point —
-  must survive to LOD3, or a coarse level quietly loses 0.15 m and nothing
+  must survive to LOD0, or a coarse level quietly loses 0.15 m and nothing
   else notices.
 
 ---
@@ -791,5 +861,7 @@ approach is the earlier one and the SF50's is what replaced it.
 | Glazing | material index on whole face rows, corners chamfered per triangle | pane traced as a shape and cut into one face row as a hole |
 | Ring resolution | chosen so vertices land on features | uniform everywhere; features are cut inside a row instead |
 | Face material | region test on the face | decided structurally by which sub-row it is |
+| Glazing at the far level | a plain band on whole rows, the same mechanism it uses everywhere | the same panes as every other level; the band was tried and read as no windscreen at all |
+| Level numbering | finest first, LOD0 the best mesh | coarsest first, LOD0 the silhouette, so the top of the ladder is a fixed point — both airframes were renumbered to this |
 | Reference material | the drawing | the drawing, plus photographs and a scaled reference model to check the reading |
 | Judging a level | the shaded contact sheet | the shaded sheet *and* the wireframe |

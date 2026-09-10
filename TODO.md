@@ -57,9 +57,9 @@ chase it with.
 ## aircraft
 
 **Cirrus Vision Jet flies the C172's flight model.** The mesh is built and
-wired in (1286 / 982 / 246 / 98 triangles), but the aerodynamics, gear and
-stance are still the Cessna's, so the jet sits at the C172's 1.33 m reference
-stance rather than its own.
+wired in (1220 / 908 / 442 triangles, LOD3 down to LOD1), but the aerodynamics,
+gear and stance are still the Cessna's, so the jet sits at the C172's 1.33 m
+reference stance rather than its own.
 
 **The Vision Jet's opt-in HD level has no landing gear.** hilos run's Sketchfab
 model ships as the `hd` level, off by default. It is modelled gear-up, so

@@ -65,6 +65,7 @@ export interface FlightInputManager {
   resetControls(throttle: number): void;
   setThrottle(value: number): void;
   setPitchTrim(value: number): void;
+  setStick(aileron: number, elevator: number): void;
   setPaused(paused: boolean): void;
   isPaused(): boolean;
 }
@@ -88,6 +89,7 @@ export function createFlightInputManager(options: {
   let paused = false;
   let remoteOwned = false;
   let protectGamepad = false;
+  let stickOverride: Pick<ControlSurfaceState, "aileron" | "elevator"> | null = null;
   let gamepadBaseline: GamepadSnapshot | null = null;
   let previousGamepad: GamepadSnapshot | null = null;
   const enabledAxes = new Set<number>();
@@ -250,10 +252,18 @@ export function createFlightInputManager(options: {
       if (remoteOwned) return { ...smoothed };
       const keyboardTarget = targetFromKeyboard(dt);
       pollGamepad(keyboardTarget, gamepad);
+      if (stickOverride) {
+        keyboardTarget.aileron = stickOverride.aileron;
+        keyboardTarget.elevator = stickOverride.elevator;
+      }
 
       smoothed = {
-        elevator: smoothToward(smoothed.elevator, keyboardTarget.elevator, dt),
-        aileron: smoothToward(smoothed.aileron, keyboardTarget.aileron, dt),
+        elevator: stickOverride
+          ? stickOverride.elevator
+          : smoothToward(smoothed.elevator, keyboardTarget.elevator, dt),
+        aileron: stickOverride
+          ? stickOverride.aileron
+          : smoothToward(smoothed.aileron, keyboardTarget.aileron, dt),
         rudder: smoothToward(smoothed.rudder, keyboardTarget.rudder, dt),
         throttle: smoothToward(smoothed.throttle, keyboardTarget.throttle, dt),
         pitchTrim: keyboardTarget.pitchTrim,
@@ -269,6 +279,7 @@ export function createFlightInputManager(options: {
     },
     adoptControls(controls: ControlSurfaceState): void {
       keysDown.clear();
+      stickOverride = null;
       throttleTarget = controls.throttle;
       smoothed = { ...controls, elevator: 0, aileron: 0, rudder: 0, brake: 0 };
       protectGamepad = true;
@@ -281,7 +292,7 @@ export function createFlightInputManager(options: {
       captureGamepadBaseline();
     },
     hasActiveFlightInput(): boolean {
-      if (keysDown.size > 0 || [smoothed.elevator, smoothed.aileron, smoothed.rudder, smoothed.brake]
+      if (stickOverride !== null || keysDown.size > 0 || [smoothed.elevator, smoothed.aileron, smoothed.rudder, smoothed.brake]
         .some((value) => Math.abs(value) > TAKEOVER_DEADBAND)) return true;
       const pad = readGamepad();
       if (!pad) return false;
@@ -298,6 +309,7 @@ export function createFlightInputManager(options: {
     },
     resetControls(throttle: number): void {
       keysDown.clear();
+      stickOverride = null;
       throttleTarget = Math.min(1, Math.max(0, throttle));
       smoothed = { elevator: 0, aileron: 0, rudder: 0, throttle: throttleTarget, pitchTrim: 0, flaps: 0, brake: 0 };
       if (protectGamepad) captureGamepadBaseline();
@@ -312,6 +324,19 @@ export function createFlightInputManager(options: {
       options.onLocalInput?.();
       if (remoteOwned) return;
       smoothed.pitchTrim = Math.min(1, Math.max(-1, value));
+    },
+    setStick(aileron: number, elevator: number): void {
+      options.onLocalInput?.();
+      if (remoteOwned) return;
+      const clamped = {
+        aileron: Math.min(1, Math.max(-1, aileron)),
+        elevator: Math.min(1, Math.max(-1, elevator)),
+      };
+      stickOverride = clamped.aileron === 0 && clamped.elevator === 0 ? null : clamped;
+      if (stickOverride) {
+        smoothed.aileron = stickOverride.aileron;
+        smoothed.elevator = stickOverride.elevator;
+      }
     },
     setPaused,
     isPaused(): boolean {
