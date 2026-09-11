@@ -1,4 +1,4 @@
-import{ps as e}from"./resolveMapRuntimeConfig-B3gwNqda.js";var t=`screenSpaceCurvaturePixelShader`,n=`varying vUV: vec2f;var textureSamplerSampler: sampler;var textureSampler: texture_2d<f32>;var normalSampler: texture_2d<f32>;uniform curvature_ridge: f32;uniform curvature_valley: f32;
+import{ps as e}from"./resolveMapRuntimeConfig-C_SNEWKz.js";var t=`screenSpaceCurvaturePixelShader`,n=`varying vUV: vec2f;var textureSamplerSampler: sampler;var textureSampler: texture_2d<f32>;var normalSampler: texture_2d<f32>;uniform curvature_ridge: f32;uniform curvature_valley: f32;
 #ifndef CURVATURE_OFFSET
 #define CURVATURE_OFFSET 1
 #endif
