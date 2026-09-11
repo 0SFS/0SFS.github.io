@@ -335,6 +335,43 @@ Retractable tricycle; drawn extended in both views, compressed in the side view.
 | main gear track | 3.414 m (11.2 ft callout) |
 | wheelbase | 3.296 m |
 
+### Main wheel wells and doors, gear up
+
+The drawing shows none of this; it is read off `photo_PS-CVJ_bottom_view.jpg`, a
+straight bottom view (a flight-simulator model, not an aeroplane — see
+GALLERY.md), and checked against `photo_N914AF.jpg`, a real one.
+
+Scale: the yellow wingtips span x = 281 to 955 px, 674 px for 11.796 m, so
+**57.1 px/m**. Centreline x = 614.3, midway between the two wells (the tips give
+618, 4 px off, which is the camera's slight roll). Edges are read off
+brightness profiles across a contrast-stretched crop, averaged over rows
+305-330 / columns inside each panel.
+
+| quantity | left | right | metres off centreline |
+|---|---|---|---|
+| well, dark-disc centre | x 563.5 | x 665.4 | 0.889 / 0.894 |
+| well's outboard rim (dark to light) | x 548.5 | x 680.5 | 1.152 / 1.159 |
+| panel's outboard seam | x 505 | x 723.5 | 1.91 / 1.91 |
+| panel's forward seam | y 300.5 | y 294 | ~0.17 m ahead of the well centre, both |
+| panel's aft seam | y 334.5 | y 328.5 | ~0.10-0.15 m aft of the well centre |
+
+- Panel spanwise: from the well's rim to the seam, **0.75 m**. Chordwise
+  **0.60 m**, which on this wing is **0.29 to 0.635 of the chord** at every
+  station across it.
+- The dark disc is ~0.56-0.59 m across including its hook: the real 18 x 5.5
+  tyre and its well. The model's well hugs the drawing's 0.38 m tyre instead
+  (see "Two places the drawing contradicts itself") and keeps the measured
+  centre.
+- The **hook**: a tab on each well's forward outboard side, ~45 deg round from
+  outboard, tip 0.24 m ahead of the centre. N914AF shows the same thing as a
+  wedge. It is where the folded trailing arm leaves the hub for the knee.
+- **N914AF**, independently: the two well centres are 234.8 px apart along a line
+  parallel (to 3 deg) to the 1521 px tip-to-tip line, so 0.1544 of the span,
+  **±0.91 m**.
+- `crops/photo_N291AH_right_main_door.png`: the door open, from the front
+  quarter, hanging outboard of the tyre and splayed out, free edge level with
+  the axle. For a 0.75 m door hinged ~0.8 m up that is ~125 deg.
+
 ## Glazing
 
 Measured, not estimated. Scanning **row 1000** of the reference image — z = 1.94,

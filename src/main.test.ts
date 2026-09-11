@@ -39,8 +39,9 @@ describe("application route", () => {
     expect(appMocks.createPhoneControllerApp).not.toHaveBeenCalled();
     expect(appMocks.createFlightSimApp).toHaveBeenCalledWith(document.getElementById("root"), {
       loadingScreen: expect.objectContaining({ show: expect.any(Function), setPhase: expect.any(Function) }),
+      log: expect.objectContaining({ print: expect.any(Function) }),
     });
-    expect(document.querySelector('[data-phase="app"] [role="progressbar"]')!.getAttribute("aria-valuenow")).toBe("100");
+    expect(document.getElementById("app-log")!.textContent).toContain("Application ready");
   });
 
   it.each(["/", "/?mode=flight", "/?mode=unknown"])("loads the flight simulator by default (%s)", async (route) => {
@@ -55,14 +56,14 @@ describe("application route", () => {
 
   it("loads only FOSS Earth with mode=globe", async () => {
     window.history.replaceState(null, "", "/?mode=globe");
-    document.body.insertAdjacentHTML("beforeend", '<div id="app-loading"></div>');
+    document.body.insertAdjacentHTML("beforeend", '<div id="app-log"></div>');
 
     await import("./main");
     await vi.waitFor(() => expect(appMocks.createGlobeApp).toHaveBeenCalledOnce());
 
     expect(appMocks.createFlightSimApp).not.toHaveBeenCalled();
     expect(appMocks.createPhoneControllerApp).not.toHaveBeenCalled();
-    await vi.waitFor(() => expect(document.getElementById("app-loading")).toBeNull());
+    await vi.waitFor(() => expect(document.getElementById("app-log")).toBeNull());
   });
 
   it("loads the phone controller at the production base without booting either simulator", async () => {
@@ -84,20 +85,20 @@ describe("application route", () => {
 
     await import("./main");
 
-    await vi.waitFor(() => expect(document.getElementById("app-loading-error")?.hidden).toBe(false));
-    expect(document.getElementById("app-loading")!.hidden).toBe(false);
-    expect(document.querySelector("[data-retry]")!.textContent).toBe("Reload and try again");
+    await vi.waitFor(() => expect(document.querySelector('#app-log [data-tone="error"]')).not.toBeNull());
+    expect(document.getElementById("app-log")!.hidden).toBe(false);
+    expect(document.querySelector('#app-log [data-tone="error"] button')!.textContent).toBe("Reload and try again");
   });
 
   it("keeps the original generic error behavior when a non-flight route fails", async () => {
     window.history.replaceState(null, "", "/?mode=globe");
-    document.body.insertAdjacentHTML("beforeend", '<div id="app-loading"></div>');
+    document.body.insertAdjacentHTML("beforeend", '<div id="app-log"></div>');
     appMocks.createGlobeApp.mockRejectedValueOnce(new Error("Offline"));
     vi.spyOn(console, "error").mockImplementation(() => {});
 
     await import("./main");
 
     await vi.waitFor(() => expect(document.querySelector(".boot-error")?.textContent).toBe("Failed to initialize the application."));
-    expect(document.getElementById("app-loading")).toBeNull();
+    expect(document.getElementById("app-log")).toBeNull();
   });
 });

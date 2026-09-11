@@ -4,6 +4,7 @@ import "foss-earth/input-mode.css";
 
 import { attachRendererActivity, attachTileStreamingActivity, attachMapDownloadSpeed, setMapSourceLabel, createInputModeHud, createHudBar, type HudBarHandle, type RenderActivitySource, type TileStreamingSource, type MapDownloadSource } from "foss-earth/shell";
 import type { BabylonRuntimeStatus, RasterBaseMapSource, RendererMode, TerrainSource } from "foss-earth/runtime";
+import { canRequestFullscreen, isFullscreen, onFullscreenChange, toggleFullscreen } from "../../fullscreen/fullscreen";
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
 
 export interface FlightTerrainDetailState {
@@ -38,6 +39,8 @@ export interface FlightHudBarOptions {
   onSettingsClick(): void;
   onPhoneControlClick?(): void;
   onDebugClick(): void;
+  /** Opens or closes the game log history; returns whether it is now open. */
+  onLogToggle?(): boolean;
   /** Host for the top-left FPS chip so it can sit under the window chrome. */
   fpsHost?: HTMLElement;
 }
@@ -136,7 +139,6 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
   const hudBar: HudBarHandle = createHudBar(container, {
     ariaLabel: "Flight simulator controls",
     items: [
-      { kind: "button", id: "flightPhoneButton", title: "Connect a phone controller", ariaLabel: "Phone controller", appearance: "chip", text: "Phone controller" },
       { kind: "button", id: "flightPauseButton", title: "Pause simulation", ariaLabel: "Pause simulation", className: "flight-shell-pause-button", text: "Ⅱ" },
       {
         kind: "menu",
@@ -165,7 +167,10 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
         optionDataAttribute: "mapSource",
         options: [],
       },
+      { kind: "button", id: "flightPhoneButton", title: "Connect a phone controller", ariaLabel: "Phone controller", className: "flight-phone-button", text: "🎮" },
       { kind: "button", id: "flightSettingsButton", title: "Open flight settings", ariaLabel: "Open flight settings", className: "settings-button", text: "⚙" },
+      { kind: "button", id: "flightFullscreenButton", title: "Enter fullscreen", ariaLabel: "Enter fullscreen", className: "flight-fullscreen-button", text: "⛶" },
+      { kind: "button", id: "flightLogButton", title: "Show the game log history", ariaLabel: "Show the game log history", className: "flight-log-button", text: "☰" },
       { kind: "slot", id: "flightShellStatus", className: "hud-chip hud-status-text", ariaLive: "polite", ariaLabel: "Flight status" },
     ],
   });
@@ -400,6 +405,27 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     }
   };
 
+  const fullscreenButton = hudBar.getElement<HTMLButtonElement>("flightFullscreenButton");
+  const logButton = hudBar.getElement<HTMLButtonElement>("flightLogButton");
+  const syncFullscreenButton = (): void => {
+    if (!fullscreenButton) return;
+    const on = isFullscreen();
+    fullscreenButton.title = on ? "Leave fullscreen" : "Enter fullscreen";
+    fullscreenButton.setAttribute("aria-label", fullscreenButton.title);
+    fullscreenButton.setAttribute("aria-pressed", String(on));
+  };
+  const onFullscreenClick = (): void => { void toggleFullscreen().catch(() => {}); };
+  const onLogClick = (): void => { logButton?.setAttribute("aria-pressed", String(options.onLogToggle?.() ?? false)); };
+  if (fullscreenButton) fullscreenButton.hidden = !canRequestFullscreen();
+  if (logButton) {
+    logButton.hidden = !options.onLogToggle;
+    logButton.setAttribute("aria-pressed", "false");
+  }
+  syncFullscreenButton();
+  const detachFullscreen = onFullscreenChange(syncFullscreenButton);
+  fullscreenButton?.addEventListener("click", onFullscreenClick);
+  logButton?.addEventListener("click", onLogClick);
+
   pauseButton.addEventListener("click", onPauseClick);
   rendererButton.addEventListener("click", onRendererClick);
   rendererMenu.addEventListener("click", onRendererMenuClick);
@@ -413,7 +439,11 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
   updateTerrainDetailState();
 
   return {
-    setPhoneStatus(text) { if (phoneButton) phoneButton.textContent = text; },
+    setPhoneStatus(text) {
+      if (!phoneButton) return;
+      phoneButton.title = text;
+      phoneButton.setAttribute("aria-label", text);
+    },
     update(state, runtimeStatus, fps, nextPaused): void {
       updatePauseState(nextPaused);
       updateMapState(runtimeStatus);
@@ -424,6 +454,9 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     },
     destroy(): void {
       phoneButton?.removeEventListener("click", onPhoneClick);
+      fullscreenButton?.removeEventListener("click", onFullscreenClick);
+      logButton?.removeEventListener("click", onLogClick);
+      detachFullscreen();
       pauseButton.removeEventListener("click", onPauseClick);
       rendererButton.removeEventListener("click", onRendererClick);
       rendererMenu.removeEventListener("click", onRendererMenuClick);

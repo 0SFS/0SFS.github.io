@@ -56,6 +56,10 @@ chase it with.
 
 ## aircraft
 
+**Create SR20 and SR22 aircraft models.** Add dedicated SR20 and SR22 aircraft
+variants with their own geometry, flight model tuning, gear/stance settings, and
+visual setup, separate from the current C172 and Vision Jet work.
+
 **Cirrus Vision Jet flies the C172's flight model.** The mesh is built and
 wired in (1204 / 908 / 442 triangles, LOD3 down to LOD1), but the aerodynamics,
 gear and stance are still the Cessna's, so the jet sits at the C172's 1.33 m

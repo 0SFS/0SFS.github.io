@@ -132,6 +132,7 @@ describe("flight HUD auto-trim", () => {
     expect(pitch?.querySelector(".flight-hud__lever-meta")?.textContent).toContain("PITCH");
     expect(flaps?.querySelector(".flight-hud__lever-meta")?.textContent).toContain("FLAPS");
     expect(pitch?.firstElementChild?.className).toBe("flight-hud__lever-meta");
+    expect(flaps?.firstElementChild?.className).toBe("flight-hud__lever-meta");
     expect(t.pitchTrim.closest(".flight-hud__lever-track")).not.toBeNull();
     expect(t.host.querySelector('[data-control="flaps"]')!.closest(".flight-hud__lever-track")).not.toBeNull();
     t.hud.destroy();

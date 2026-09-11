@@ -5,6 +5,7 @@ Usage:
   blender -b --factory-startup --python render_sf50_views.py -- \
       <input.blend|input.glb|EMPTY> <outdir> <prefix> [--silhouette] [--fit N] [--res N]
       [--center Y | --center X,Y,Z] [--views 01,06,...] [--wire] [--keepmat]
+      (--views also takes 11-13: three views from BELOW at a slant)
       [--hide Obj,Obj]   hide these objects
       [--blur]           draw the tyres' blurred half, as the runtime does at speed
 
@@ -176,6 +177,18 @@ VIEWS = [
     ("09_RearLeft3Q",   (-0.80, -0.80,  0.42)),
     ("10_RearRight3Q",  ( 0.80, -0.80,  0.42)),
 ]
+# From BELOW at a slant: the only angle that shows whether a hole in the
+# underside is a clean hole. Every canonical 3Q view is from above, and the
+# straight bottom view is the one angle at which two edges at different
+# heights line up and hide whatever is between them. Rendered only on request
+# (--views 11,12), so the contact sheet stays the ten it has always been.
+LOW_VIEWS = [
+    ("11_LowFrontRight", (0.70,  0.70, -0.45)),
+    ("12_LowRearRight",  (0.70, -0.70, -0.45)),
+    ("13_LowInboard",    (-0.60, 0.25, -0.75)),
+]
+if ONLY:
+    VIEWS = VIEWS + [v for v in LOW_VIEWS if v[0].split("_")[0] in ONLY]
 
 cd = bpy.data.cameras.new("VCam")
 cd.type = 'ORTHO'

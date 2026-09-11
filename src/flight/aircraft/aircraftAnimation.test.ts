@@ -131,8 +131,10 @@ describe("control surface geometry", () => {
  * stowed point the model was designed around.
  */
 const SF50_GEAR = [
-  { leg: "LandingGear_Left", pivot: [-1.712, 0.792, 0.406], wheel: [-1.707, 0.190, 0.434], stowed: [-1.110, 0.797, 0.434] },
-  { leg: "LandingGear_Right", pivot: [1.712, 0.792, 0.406], wheel: [1.707, 0.190, 0.434], stowed: [1.110, 0.797, 0.434] },
+  // Stowed at the MEASURED well, 0.90 m off the centreline (it was 1.110 for a
+  // build, which made the leg 0.60 m where the aeroplane's is 0.71).
+  { leg: "LandingGear_Left", pivot: [-1.607, 0.897, 0.406], wheel: [-1.707, 0.190, 0.434], stowed: [-0.900, 0.797, 0.434] },
+  { leg: "LandingGear_Right", pivot: [1.607, 0.897, 0.406], wheel: [1.707, 0.190, 0.434], stowed: [0.900, 0.797, 0.434] },
   { leg: "LandingGear_Nose", pivot: [0, 0.8235, -2.6055], wheel: [0, 0.179, -2.862], stowed: [0, 1.080, -3.250] },
 ] as const;
 
@@ -202,8 +204,8 @@ describe("retractable gear", () => {
     const CASES = [
       { name: "BayDoor_Nose_Left", down: [0.0165, -0.2345, 0.3705], up: [0.1716, -0.0552, 0.4000] },
       { name: "BayDoor_Nose_Right", down: [-0.0165, -0.2345, 0.3705], up: [-0.1716, -0.0552, 0.4000] },
-      { name: "BayDoor_Main_Left", down: [-0.2829, -0.5796, -0.3121], up: [0.6200, -0.0813, -0.3498] },
-      { name: "BayDoor_Main_Right", down: [0.2829, -0.5796, -0.3121], up: [-0.6200, -0.0813, -0.3498] },
+      { name: "BayDoor_Main_Left", down: [-0.4845, -0.5947, -0.3096], up: [0.7500, -0.0856, -0.3383] },
+      { name: "BayDoor_Main_Right", down: [0.4845, -0.5947, -0.3096], up: [-0.7500, -0.0856, -0.3383] },
     ] as const;
     const s = scene();
     for (const { name, down, up } of CASES) {
@@ -295,12 +297,27 @@ describe("retractable gear", () => {
   });
 
   it("snaps to the commanded position when no time has passed", () => {
-    // A paused sim, or the first frame after a model swap: half-retracted gear
-    // that never finishes is worse than gear that is simply where it is told.
+    // The first frame after a model swap: half-retracted gear that never
+    // finishes is worse than gear that is simply where it is told.
     const s = scene();
     const { rig } = gearRig(s.scene);
     applyAircraftRig(rig, { ...NEUTRAL_CONTROL_SURFACES, gearDownNorm: 0 }, 0);
     expect(rig.gearNorm).toBe(0);
+    s.scene.dispose(); s.engine.dispose();
+  });
+
+  it("holds a transit under way while the simulation is held", () => {
+    // Paused, with the camera orbiting: frames still arrive with a real
+    // interval, and the gear must neither keep moving nor snap to its end.
+    const s = scene();
+    const { rig } = gearRig(s.scene);
+    const up = { ...NEUTRAL_CONTROL_SURFACES, gearDownNorm: 0 };
+    applyAircraftRig(rig, up, 1);
+    const midway = rig.gearNorm;
+    for (let frame = 0; frame < 20; frame += 1) applyAircraftRig(rig, up, 1, { simulationHeld: true });
+    expect(rig.gearNorm).toBe(midway);
+    applyAircraftRig(rig, up, 1);
+    expect(rig.gearNorm).toBeLessThan(midway);
     s.scene.dispose(); s.engine.dispose();
   });
 
@@ -365,9 +382,43 @@ describe("rolling wheels", () => {
   it("rolls at ground speed over radius, and not at all in the air", () => {
     const t = wheelRig(1.9);                      // 10 rad/s on a 0.19 m tyre
     applyAircraftRig(t.rig, t.state, 0.1);
-    expect(t.rig.wheelAngleRad).toBeCloseTo(1, 3);
+    expect(Math.abs(t.rig.wheelAngleRad)).toBeCloseTo(1, 3);
+    const rolled = t.rig.wheelAngleRad;
     applyAircraftRig(t.rig, { ...t.state, onGround: false }, 0.1);
-    expect(t.rig.wheelAngleRad).toBeCloseTo(1, 3);   // held, not driven
+    expect(t.rig.wheelAngleRad).toBe(rolled);     // held, not driven
+    t.scene.dispose(); t.engine.dispose();
+  });
+
+  it("rolls forward: the top of the tyre moves toward the nose", () => {
+    // The nose is -Z (see the module header). A tyre rolling without slip
+    // carries its top tread forward and its contact patch stays put, so after
+    // a short roll the point that was on top has moved toward -Z.
+    const t = wheelRig(1.9);
+    applyAircraftRig(t.rig, t.state, 0.05);       // half a radian
+    for (const node of t.nodes) {
+      const top = Vector3.TransformCoordinates(new Vector3(0, 0.19, 0), node.computeWorldMatrix(true));
+      expect(top.z).toBeLessThan(-0.05);
+      const bottom = Vector3.TransformCoordinates(new Vector3(0, -0.19, 0), node.computeWorldMatrix(true));
+      expect(bottom.z).toBeGreaterThan(0.05);
+    }
+    t.scene.dispose(); t.engine.dispose();
+  });
+
+  it("holds the tyres while the simulation is held, however the camera renders", () => {
+    // Paused on the runway at speed: JSBSim still reports that ground speed,
+    // and orbiting the camera renders frames with a real interval.
+    const t = wheelRig(10);
+    applyAircraftRig(t.rig, t.state, 1 / 60);
+    const angle = t.rig.wheelAngleRad;
+    for (let frame = 0; frame < 30; frame += 1) {
+      applyAircraftRig(t.rig, t.state, 1 / 60, { simulationHeld: true });
+    }
+    expect(t.rig.wheelAngleRad).toBe(angle);
+    // Display time is still display time: the alias limit keeps tracking it.
+    for (let frame = 0; frame < 200; frame += 1) {
+      applyAircraftRig(t.rig, t.state, 1 / 144, { simulationHeld: true });
+    }
+    expect(t.rig.frameSeconds).toBeCloseTo(1 / 144, 4);
     t.scene.dispose(); t.engine.dispose();
   });
 
@@ -437,6 +488,9 @@ describe("propeller", () => {
     applyAircraftRig(rig, { ...NEUTRAL_CONTROL_SURFACES, propellerRadPerSec: 10 }, 0);
     expect(rig.propellerAngleRad).toBe(held);
     applyAircraftRig(rig, { ...NEUTRAL_CONTROL_SURFACES, propellerRadPerSec: 0 }, 0.1);
+    expect(rig.propellerAngleRad).toBe(held);
+    // Paused with the camera orbiting: real frame intervals, engine still at rpm.
+    applyAircraftRig(rig, { ...NEUTRAL_CONTROL_SURFACES, propellerRadPerSec: 10 }, 0.1, { simulationHeld: true });
     expect(rig.propellerAngleRad).toBe(held);
     s.scene.dispose(); s.engine.dispose();
   });

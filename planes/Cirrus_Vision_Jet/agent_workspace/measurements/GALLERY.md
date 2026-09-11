@@ -39,13 +39,17 @@ wing area and tyre diameter, neither of which was used to fit them.
 
 ## Photographs
 
-No dimension comes from any of these — they are perspective shots. What they do
-is settle things the drawing answers ambiguously or not at all, and **every one
-below corrected something the model had wrong**.
+Almost no dimension comes from these, because they are perspective shots. What
+they do is settle things the drawing answers ambiguously or not at all, and
+**every one below corrected something the model had wrong**. The exception is
+the bottom view, the one image taken square to the belly: the main wells and
+their panels are read off it, scaled on the published span, and checked
+against N914AF.
 
 | | |
 |---|---|
 | ![N914AF belly](photo_N914AF.jpg) | **`photo_N914AF.jpg`** — belly, climbing out, **gear up**. The single most useful photograph here. It settled that the main wheels retract into the **wing root** and stay **visible** — two dark tyre faces, no door over them — and that the rectangular leg-bay panel sits immediately **outboard** of each round wheel well. Two builds got that wrong: one buried the wheels 24 mm inside the wing, another cut a large bay into the belly that the aeroplane does not have, and a third put the bay outboard of the leg so the gear folded past it.<br>Wikimedia Commons. |
+| ![PS-CVJ bottom view](photo_PS-CVJ_bottom_view.jpg) | **`photo_PS-CVJ_bottom_view.jpg`** — a straight **bottom view**, gear up. **A flight-simulator screenshot of a third-party model, not a photograph of an aeroplane.** Its wells, hooks and panels are where N914AF's are, and it is square to the belly, so the main bay's spanwise positions are read off it. Scaled on the yellow wingtips, 674 px for 11.796 m (57.1 px/m): well centres 0.889 / 0.894 m off the centreline, panel from the well's rim out to 1.91 m, 0.60 m chordwise at 0.29–0.635 of the chord. It caught a build that had moved the wheels 0.26 m outboard to hide an intersection, which shortened the leg by 0.14 m. `scripts/compare_bottom_photo.py` renders the model against it at its own scale.<br>Forum attachment, supplied by the user. **No verifiable licence — do not redistribute.** |
 | ![N124MW gear down](photo_N124MW_gear_down.jpg) | **`photo_N124MW_gear_down.jpg`** — side on, on approach, **gear down**. Settled that the nose gear retracts **FORWARD**: a long door hangs open ahead of the leg. Scaled on the nose tyre in the same frame (0.358 m across 85 px) it is 1.10 m long, which is the ventral band the side view draws at Y −0.35 to −1.43. The nose gear was modelled retracting aft for two builds, off a drag brace a few pixels wide on the drawing.<br>Wikimedia Commons. |
 | ![N291AH main gear](photo_N291AH_main_gear.png) | **`photo_N291AH_main_gear.png`** — right main gear, close in, parked. Settled that the main leg is a **trailing link**, not a rod with a wheel on the end: a rigid forward leg down to a knee ahead of and above the axle, a trailing arm aft to the axle, and an oleo onto the arm. Scaled on the tyre (0.190 m of radius across 170 px) the knee is 0.240 m ahead of the axle and 0.050 m above it.<br>Cirrus marketing photograph. **No verifiable licence — do not redistribute.** |
 | ![N291AH ramp](photo_N291AH_ramp_wide.jpg) | **`photo_N291AH_ramp_wide.jpg`** — the frame the crop above came from: parked, door open, nose gear and right main both visible.<br>**No verifiable licence — do not redistribute.** |
@@ -91,6 +95,22 @@ Regions of the sources above, at the resolution they were measured at.
 | ![ramp wide](crops/photo_ramp_wide.png) | `photo_ramp_wide` — the whole aircraft parked |
 | ![cabin](crops/photo_cabin.png) | `photo_cabin` — cabin window count |
 | ![aft cabin](crops/photo_aft_cabin.png) | `photo_aft_cabin` — the aft windows and the wing root fairing |
+| ![right main door](crops/photo_N291AH_right_main_door.png) | `photo_N291AH_right_main_door` — the right main door from the front quarter: a long panel hanging **outboard** of the tyre, splayed out, its free edge level with the axle. What set the door's opening angle at 125 deg |
+
+### Contrast-stretched
+
+The same crops, with the 0.5th and 99.5th luminance percentiles stretched to
+black and white and each source pixel enlarged to a square you can count —
+because what they are for is a panel seam two grey levels off its neighbours.
+`make_crops.py` makes these too; `scripts/enhance_crop.py` is the tool for
+finding the next one.
+
+| crop | what it settled |
+|---|---|
+| ![bottom view](crops/bottom_view_gear_enhanced.png) | `bottom_view_gear_enhanced` — both wells and both panels, 4x. Each well is round with a **hook** on its forward outboard side, where the folded trailing arm comes out of the hub; each panel starts at the well's rim |
+| ![left well](crops/bottom_view_left_well_x8.png) | `bottom_view_left_well_x8` — 8x. The panel's outboard seam at x = 505 px |
+| ![right well](crops/bottom_view_right_well_x8.png) | `bottom_view_right_well_x8` — 8x. The panel's outboard seam at x = 723 px |
+| ![N914AF wells](crops/photo_N914AF_wells_enhanced.png) | `photo_N914AF_wells_enhanced` — the real aeroplane, 2x. The same hook, as a wedge, and the same rounded panel outboard of each well |
 
 ---
 

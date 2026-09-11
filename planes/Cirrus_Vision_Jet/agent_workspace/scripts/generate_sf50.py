@@ -111,37 +111,67 @@ INTAKE_INSET = 0.09                 # how far the dark bore sits inside the lip
 # and modelling them as two things at two depths - a real cut outboard and a
 # flat dark patch inboard - read as two unrelated marks on the wing.
 #
-# It runs from x = 0.60, which is inboard of the stowed wheel and behind the
-# fuselage anyway (the belly is the outer surface inboard of about 0.66), out to
-# 1.78. The bay covers where the RETRACTED leg lies, not where the extended one
-# hangs: the wheel stows at x = 0.850 and the leg runs outboard from it to 1.54.
-# It was 1.42 to 1.92 first - centred on the EXTENDED leg - which put the whole
-# fold outside it.
+# The bay covers where the RETRACTED leg lies, not where the extended one
+# hangs. It was 1.42 to 1.92 first - centred on the EXTENDED leg - which put the
+# whole fold outside it.
 #
-# photo_N914AF.jpg is what settled the outboard half: gear up, each round wheel
-# well has a rectangular panel immediately OUTBOARD of it. Scaled on the tyre in
-# the same frame (0.38 m across 110 px, so 290 px/m) that panel is 0.67 m wide
-# and starts at the well's rim.
-WING_BAY_X = (0.84, 1.78)           # spanwise edges of the mouth
+# Every spanwise number here is MEASURED, off two views that agree:
+# measurements/photo_PS-CVJ_bottom_view.jpg, a straight bottom view scaled on
+# the published span (the yellow wingtips, 674 px for 11.796 m, 57.1 px/m),
+# and photo_N914AF.jpg, a real aeroplane at a slant, scaled the same way along
+# its tip-to-tip line. `scripts/enhance_crop.py` stretches the contrast until
+# the panel seams show, and a brightness profile across them reads the edges:
+#
+#   well centre             0.889 / 0.894 m either side   (N914AF: 0.91)
+#   well's outboard rim     1.152 / 1.159
+#   panel's outboard seam   1.91  / 1.91                  -> panel 0.75 m
+#   panel, chordwise        0.60 m, centred ~0.17 m ahead of the axle
+#
+# The inboard end is just inside the well; the outboard end is the seam.
+WING_BAY_X = (0.66, 1.91)           # spanwise edges of the mouth
 # ...and it is not one rectangle. The wheel end HUGS the tyre: a circle of
 # WELL_R about the stowed axle, merged into the rectangular leg bay outboard of
 # WELL_JOIN. A rectangle wide enough to contain the wheel is a much bigger hole
 # than the aeroplane has, and it reads as a box with a tyre loose in it.
+#
+# The well hugs OUR tyre, which is the drawing's 0.38 m rather than the real
+# 18 x 5.5 (sf50_reference.md, "two places the drawing contradicts itself"), so
+# it is 0.21 m in radius where the photographs' is ~0.27. Its CENTRE is the
+# measured one; its size follows the tyre it has to hold.
 WELL_R = 0.210                      # wheel well radius; the tyre is 0.190
-WELL_JOIN = 1.16                    # where the circle merges into the rectangle
-WELL_ARC = 9                        # points on the arc
-# The DOOR covers only the leg half. The wheel end stays open - the retracted
-# tyre is visible from outside and nothing closes over it.
-WING_DOOR_X = (1.16, 1.78)
+# The door starts a skin's width outboard of the well, NOT inside it. It used to
+# start at 1.16 with the well's rim at 1.32, so the door's inboard edge cut
+# across the circle and the retracted tyre sat half under the panel - which the
+# aeroplane never does. The photographs show 3 px of skin between the two,
+# about 50 mm.
+WELL_ARC = 13                       # points on the arc
+# ...and the well is not quite a circle. Both views show a NOTCH on its forward
+# outboard side - a hook in the bottom view, a wedge in N914AF - and it is where
+# the retracted trailing arm runs forward from the hub to the knee (0.24 m
+# ahead of the axle, see LINK_KNEE). It is a slot from the circle out to the
+# door, between these distances AHEAD of the axle, and it is also what makes the
+# well and the leg bay one opening rather than two holes touching at a point.
+#
+# The bottom view puts the hook at about 45 deg round from outboard towards
+# the nose, 0.24 m ahead of the axle at its tip; the slot is centred there.
+WELL_SLOT = (0.080, 0.190)
+# The door is NOT the whole face row. The row runs 0.35 to 0.72 of the chord -
+# its aft edge is the flap hinge - and the photograph's panel runs 0.29 to
+# 0.635: 0.60 m against 0.67, and 0.10-0.15 m further forward, so that its aft
+# edge is level with the tyre's aft third rather than with the flap. It is cut
+# at those two chord fractions, across the ring line at 0.35 that it straddles.
+WING_DOOR_C = (0.290, 0.635)        # forward edge, aft edge
 WING_BAY_ROW = 4                    # lower surface, 0.72 -> 0.35 chord
 WING_BAY_DEPTH = 0.16               # how far the pocket rises into the wing
 WING_BAY_TAPER = 0.94               # gentle: a hard taper over a 1.18 m mouth
                                     # walls the stowed tyre off from its own bay
 # PAST vertical, so the open door leans OUTBOARD and clears the extended wheel.
-# At 82 deg it hung in the wheel's own plane - the tyre's outer face is at
-# x = 1.777 and the hinge at 1.78 - and the two z-fought. A gear door that hangs
-# outboard of its wheel is also what the photographs show.
-WING_BAY_OPEN = 112.0               # how far the door swings down and out
+# measurements/crops/photo_N291AH_right_main_door.png is the one view that
+# shows it from the front: a long panel hanging off the wing outboard of the
+# tyre, splayed out at the bottom, its free edge level with the axle. A 0.75 m
+# door hinged at z ~0.8 reaches axle height at ~125 deg; at 90 it would stand
+# 30 mm off the ground.
+WING_BAY_OPEN = 125.0               # how far the door swings down and out
 
 # gear
 NOSE_AXLE_Y = -1.138
@@ -228,18 +258,48 @@ LINK_R = dict(leg=(0.056, 0.036), oleo=(0.050, 0.044), arm=(0.044, 0.028))
 # reports as 24 mm inside the wing's lower surface and 115 mm inside the
 # belly's: correct kinematics, invisible, and the wrong part of the aeroplane.
 #
-# At x = 0.850 the wing's lower surface runs z = 0.745 to 0.772 across the
-# tyre's width, so a disc centred at 0.797 stands 18 to 45 mm proud of it.
-# Far enough outboard that the WELL clears the FUSELAGE. The test is not where
-# the belly stops being the lowest surface - it is where the fuselage stops
-# existing under the wing at all, which is its half-width, 0.872 m at this
-# station. A well about an axle at 0.850 had its whole inboard half backed by
-# fuselage: the hole was cut in the wing, and what showed through it was belly.
-# 1.110 with a 0.21 m well puts the opening at 0.90 to 1.32, clear by 28 mm.
+# The x is MEASURED - 0.889 to 0.91 m off the centreline in two independent
+# views, see WING_BAY_X - and z puts the disc 18 to 45 mm proud of the wing's
+# lower surface, which runs z = 0.745 to 0.772 across the tyre's width here.
 #
-# The hinge that falls out of it is well placed too - x 1.712, z 0.792, at the
-# wing's lower surface and 0.60 m from the axle against a 0.69 m strut.
-MAIN_STOWED = (1.110, 0.797)        # (x, z) of the retracted main axle
+# It was 1.110 for one build, and that was a fix aimed at the wrong thing. The
+# fuselage's lower side runs INSIDE the wing from about x = 0.67 out to its
+# half-width, 0.87, so a well at the measured place had belly showing up
+# through it - and moving the wheel 0.26 m outboard hid the belly by moving the
+# wheel off the aeroplane's real well. With a quarter-turn swing the leg's
+# length is set by where the wheel ends up, so it also cut the leg from 0.74 m
+# to 0.60 and dragged the hinge out and down onto the wing skin. The belly is
+# now cut instead (`cut_well` in build_fuselage), which is the fix that leaves
+# the dimensions alone.
+#
+# The hinge that falls out of 0.900 is where a trunnion belongs: x 1.607,
+# z 0.897 - on the wing's chord plane, inside the wing box, and 0.10 m inboard
+# of the tyre centreline, against the front view's 0.07 for the strut top.
+MAIN_STOWED = (0.900, 0.797)        # (x, z) of the retracted main axle
+WELL_JOIN = MAIN_STOWED[0] + WELL_R + 0.050
+
+
+def well_outline():
+    """The main wheel well in plan, as (x, Y) on the right side.
+
+    The circle from where the slot's forward edge meets it, round the INBOARD
+    side, to where its aft edge does: everything but the slot. Both the wing
+    and the fuselage are cut on exactly these points, so the two holes are one
+    outline in plan and a pocket built on it has nothing to leave a gap
+    against.
+    """
+    xs, yc, r = MAIN_STOWED[0], MAIN_AXLE_Y, WELL_R
+    p_hi = math.asin(WELL_SLOT[1] / r)
+    p_lo = math.asin(WELL_SLOT[0] / r)
+    return [(xs + r * math.cos(phi), yc + r * math.sin(phi))
+            for phi in (p_hi + (i / (WELL_ARC - 1)) * (2 * math.pi + p_lo - p_hi)
+                        for i in range(WELL_ARC))]
+
+
+# The fuselage's own z at each outline point it holds, per side - filled in by
+# build_fuselage, read by build_wing_bay. Where the belly is lower than the
+# wing, the pocket has to start from the belly.
+FUSE_WELL_Z = {}
 NOSE_STOWED = (-0.750, 1.080)       # (y, z) of the retracted nose axle
 NOSE_SENSE = -1                     # forward, not aft
 
@@ -1464,6 +1524,85 @@ def build_fuselage():
             BAY_MOUTHS[name] = mouth
             BAY_SPINES[name] = spine
 
+    def cut_well(side):
+        """Take the main wheel well's outline out of the belly's side row.
+
+        The measured well sits where the wing root meets the fuselage, and the
+        fuselage's lower side row runs through that footprint: BELOW the wing
+        for its inboard few centimetres, where it is the aeroplane's outer
+        skin and was drawn across the well, and INSIDE the wing for the rest,
+        where it stood up in the pocket as a white ledge. Either way it has no
+        business inside the outline, so the outline is cut out of the row.
+
+        The cut is a bite on the row's OUTER ring line, not a hole in its
+        middle, so each gap it spans becomes one polygon: the inner ring line,
+        then the outline, fore to aft. Where the outline crosses a station it
+        crosses that station's edge, and the vertex put there is shared by the
+        gaps either side - so there is no T-junction, the same rule the
+        windscreen cut keeps. The ring line the bite opens onto keeps its own
+        vertices and never learns the bite is there. The two ends run straight
+        to the outer ring vertex rather than following the circle out to the
+        line, because a vertex ON that line would be one the next row never
+        split; the sliver that costs is inside the wing.
+        """
+        sgn = 1.0 if side == "Right" else -1.0
+        xs, yc, r = MAIN_STOWED[0], MAIN_AXLE_Y, WELL_R
+        g0 = gap_of(yc)
+        row = None
+        for j in range(n):
+            xa, xb = sgn * rings[g0][j][0], sgn * rings[g0][(j + 1) % n][0]
+            if min(xa, xb) >= 0.0 and min(xa, xb) < xs - r < max(xa, xb):
+                row = j
+        if row is None:
+            return
+        k = (row + 1) % n
+        inner, outer = (row, k) if abs(rings[g0][row][0]) < abs(rings[g0][k][0]) \
+            else (k, row)
+
+        def line_x(L, y):
+            i = gap_of(y)
+            t = (ys[i] - y) / (ys[i] - ys[i + 1])
+            return sgn * (rings[i][L][0] + (rings[i + 1][L][0] - rings[i][L][0]) * t)
+
+        # The outline's points that lie in this row, fore to aft. The inboard
+        # side of the circle is one contiguous run of them.
+        run = [(ai, x, y) for ai, (x, y) in enumerate(well_outline())
+               if ys[-1] < y < ys[0] and x < line_x(outer, y) - 0.005]
+        if len(run) < 2:
+            return
+        ga = max(i for i in range(len(ys)) if ys[i] >= run[0][2])
+        gb = min(i for i in range(len(ys)) if ys[i] <= run[-1][2])
+
+        # Each station inside the bite is crossed on the CHORD between the two
+        # outline points either side of it, not on the true circle - so the
+        # belly's hole and the wing's are the same polygon in plan.
+        edge = {ga: ga * n + outer, gb: gb * n + outer}
+        for i in range(ga + 1, gb):
+            for (_, x0, y0), (_, x1, y1) in zip(run, run[1:]):
+                if y1 <= ys[i] <= y0:
+                    xc = x0 + (x1 - x0) * (ys[i] - y0) / (y1 - y0)
+                    edge[i] = add(row_point(ys[i], sgn * xc, row, 0))
+                    break
+        zs = {}
+        chain = {g: [] for g in range(ga, gb)}
+        for ai, x, y in run:
+            g = gap_of(y)
+            p = row_point(y, sgn * x, row, 0)
+            zs[ai] = p[2]
+            chain[g].append(add(p))
+        for g in range(ga, gb):
+            consumed[row].add(g)
+            bite = [edge[g]] + chain[g] + [edge[g + 1]]
+            if inner == row:
+                emit([g * n + inner] + bite + [(g + 1) * n + inner], MAT_PAINT)
+            else:
+                emit([g * n + inner, (g + 1) * n + inner] + bite[::-1], MAT_PAINT)
+        FUSE_WELL_Z[side] = zs
+
+    if P["bays"]:
+        for side in ("Left", "Right"):
+            cut_well(side)
+
     # ---- everything else is the plain uniform ring ---------------------------
     def line_keeps(i, L):
         """Does ring line L have to carry a vertex at station i?
@@ -1626,72 +1765,91 @@ def build_wing(side):
         ij = stations.index(WELL_JOIN)           # where circle meets rectangle
         ib = stations.index(WING_BAY_X[1])       # outboard end of the leg bay
 
-        # loft() emits segment i, row j at index i * n + j, caps after. The
-        # OUTBOARD segment loses its whole face - that is the rectangular leg
-        # bay. The INBOARD one keeps a C of skin around the circular well.
-        drop = {ia * n + row, ij * n + row}
+        r5 = (k + 1) % n                         # the row forward of it
 
-        # The circle lives in (station, t) where t is a fraction ACROSS the row,
-        # so the radius has to be converted into t or the well comes out
-        # elliptical - the row is 0.68 m deep and the bay 1.18 m wide.
-        #
-        # And t is SOLVED for the axle, not taken as 0.5. Mid-row is 0.062 m
-        # forward of where the stowed wheel actually sits, which is small enough
-        # to look like nothing and large enough that the well and the tyre are
-        # visibly not concentric. Both the fraction and the row length are read
-        # at the circle's OWN station rather than at the join, because the row
-        # is 40 mm deeper at one end of the well than the other.
-        f_c = ((MAIN_STOWED[0] - WING_BAY_X[0])
-               / (WELL_JOIN - WING_BAY_X[0]))
-        c0 = Vector(rings[ia][row]).lerp(Vector(rings[ij][row]), f_c)
-        c1 = Vector(rings[ia][k]).lerp(Vector(rings[ij][k]), f_c)
-        ct = (MAIN_AXLE_Y - c0.y) / (c1.y - c0.y)
-        rt = WELL_R / (c1 - c0).length
-        phi0 = math.acos(max(-1.0, min(1.0,
-                                       (WELL_JOIN - MAIN_STOWED[0]) / WELL_R)))
-        # phi0 -> 2*pi - phi0 walks from the upper crossing of the join station
-        # round the INBOARD side to the lower one.
-        arc = []
-        for i in range(WELL_ARC):
-            phi = phi0 + (i / (WELL_ARC - 1)) * (2 * math.pi - 2 * phi0)
-            arc.append((MAIN_STOWED[0] + WELL_R * math.cos(phi),
-                        ct + rt * math.sin(phi)))
+        # loft() emits segment i, row j at index i * n + j - as the quad
+        # (i, j), (i, j+1), (i+1, j+1), (i+1, j) - caps after. The door is cut
+        # across two rows, so both rows lose their face in both segments: the
+        # OUTBOARD pair comes back as the skin fore and aft of the door, the
+        # INBOARD row as a C of skin round the well, and the inboard row ahead
+        # of it gains one vertex, where the door's forward edge meets its side.
+        drop = {ia * n + row, ij * n + row, ia * n + k, ij * n + k}
 
-        def surf(xx, tt):
-            """Point at absolute station xx, fraction tt across the row.
+        def at_chord(si, c):
+            """The lower-surface point at chord fraction c on ring si.
+
+            On the ring's own edge - the section is a polygon, so this is on
+            the surface exactly, and on the edge the neighbouring face shares.
+            """
+            le_y, chord, _ = wing_geom(stations[si])
+            for j0, j1 in ((row, k), (k, r5)):
+                p0, p1 = Vector(rings[si][j0]), Vector(rings[si][j1])
+                c0, c1 = (le_y - p0.y) / chord, (le_y - p1.y) / chord
+                if min(c0, c1) - 1e-9 <= c <= max(c0, c1) + 1e-9:
+                    return tuple(p0.lerp(p1, (c - c0) / (c1 - c0)))
+            raise ValueError(f"chord {c} is not on rows {row}-{r5}")
+
+        def surf(xx, yy):
+            """The point on the row at absolute station xx and plan Y yy.
 
             The loft is ruled between its stations, so interpolating between
             the two the bay is bounded by lands exactly on the surface the wing
             already had - no crease, and nothing for the dissolve to argue with.
+
+            Addressed by plan Y rather than by a fraction across the row. It
+            used to be the fraction, with the radius converted into it at the
+            circle's own station, which is right for a circle on its own and
+            wrong the moment the belly has to be cut on the same outline: the
+            fuselage knows plan coordinates, not this row's.
             """
             f = (xx - WING_BAY_X[0]) / (WELL_JOIN - WING_BAY_X[0])
-            a = Vector(rings[ia][row]) + (Vector(rings[ia][k])
-                                          - Vector(rings[ia][row])) * tt
-            b = Vector(rings[ij][row]) + (Vector(rings[ij][k])
-                                          - Vector(rings[ij][row])) * tt
-            return tuple(a + (b - a) * f)
+            a = Vector(rings[ia][row]).lerp(Vector(rings[ij][row]), f)
+            b = Vector(rings[ia][k]).lerp(Vector(rings[ij][k]), f)
+            return tuple(a + (b - a) * ((yy - a.y) / (b.y - a.y)))
 
         def add(p):
             verts.append(p)
             return len(verts) - 1
 
-        arc3 = [surf(*pt) for pt in arc]
+        # The circle, and the slot out of its forward outboard side to the
+        # join station - which is what joins the well to the leg bay. Both slot
+        # ends sit on the join station's edge, which the dropped face leaves
+        # open, so they split nothing.
+        yc = MAIN_AXLE_Y
+        arc3 = ([surf(WELL_JOIN, yc + WELL_SLOT[1])]
+                + [surf(x, y) for x, y in well_outline()]
+                + [surf(WELL_JOIN, yc + WELL_SLOT[0])])
         arc_i = [add(p) for p in arc3]
         # ONE n-gon: three closed sides of the inboard quad, then the arc. The
         # bite is on the boundary rather than in the middle, so the region is
         # simply connected and the triangulator can have it whole. Both arc ends
         # sit on the join station's edge, which the dropped face leaves open -
         # so they split nothing and there is no T-junction.
+        fwd_c, aft_c = WING_DOOR_C
+        a_aft, a_fwd = add(at_chord(ij, aft_c)), add(at_chord(ij, fwd_c))
+        b_aft, b_fwd = add(at_chord(ib, aft_c)), add(at_chord(ib, fwd_c))
+        # The door's outboard corners split the hinge station's edges, and the
+        # faces OUTBOARD of the hinge share those edges - so they take the same
+        # two vertices, or the hinge line is a crack with a door on one side.
+        # (The join station needs no such care: every face on both sides of it
+        # is rebuilt here.)
+        faces[ib * n + row] = [ib * n + row, b_aft] + faces[ib * n + row][1:]
+        faces[ib * n + k] = [ib * n + k, b_fwd] + faces[ib * n + k][1:]
         faces = [f for i, f in enumerate(faces) if i not in drop]
         faces.append([ia * n + row, ia * n + k, ij * n + k]
-                     + arc_i + [ij * n + row])
+                     + arc_i + [a_aft, ij * n + row])
+        faces.append([ia * n + k, ia * n + r5, ij * n + r5, a_fwd, ij * n + k])
+        faces.append([ij * n + row, a_aft, b_aft, ib * n + row])     # aft of it
+        faces.append([a_fwd, ij * n + r5, ib * n + r5, b_fwd])       # ahead of it
 
-        # The pocket rim is the whole hole: round the arc, then the rectangle.
+        # The door's outline: its inboard edge at the join station, its
+        # outboard edge at the hinge, each through the 0.35 ring vertex it
+        # crosses. The pocket rim is the whole hole: round the well, then that.
+        door = [a_aft, ij * n + k, a_fwd, b_fwd, ib * n + k, b_aft]
         WING_BAY_MOUTHS[side] = dict(
-            rect=[verts[ij * n + row], verts[ij * n + k],
-                  verts[ib * n + k], verts[ib * n + row]],
-            rim=arc3 + [verts[ij * n + row], verts[ib * n + row],
-                        verts[ib * n + k], verts[ij * n + k]])
+            door=[verts[i] for i in door],
+            rim=arc3 + [verts[i] for i in (a_aft, b_aft, ib * n + k, b_fwd,
+                                           a_fwd, ij * n + k)])
     return make(f"Wing_{side}", verts, faces, M_PAINT)
 
 
@@ -2066,23 +2224,42 @@ def build_wing_bay(side):
     cy = sum(p[1] for p in rim) / len(rim)
     cap = [(cx + (p[0] - cx) * WING_BAY_TAPER, cy + (p[1] - cy) * WING_BAY_TAPER,
             p[2] + WING_BAY_DEPTH) for p in rim]
-    verts, faces = loft([list(rim), cap], cap_start=False, cap_end=True)
+    # Where the BELLY is lower than the wing - the inboard few centimetres of
+    # the well - the hole you look into is the one cut in the belly, and the
+    # wing's own edge is up inside the fuselage. Starting the pocket at the wing
+    # there leaves a band with no wall between the two, and through it the
+    # inside of the aeroplane. So those rim points start at the belly and rise
+    # straight up to the wing, which is one collar of faces and only where the
+    # belly is actually lower. rim[0] is the slot's forward end; the outline's
+    # points follow it, which is the index FUSE_WELL_Z keys them by.
+    fz = FUSE_WELL_Z.get(side, {})
+    low = [(p[0], p[1], min(p[2], fz.get(i - 1, p[2]))) for i, p in enumerate(rim)]
+    m = len(rim)
+    verts = list(low) + list(rim) + cap
+    faces = []
+    for i in range(m):
+        a, b = i, (i + 1) % m
+        drop_a, drop_b = low[a][2] < rim[a][2] - 1e-6, low[b][2] < rim[b][2] - 1e-6
+        if drop_a or drop_b:
+            quad = [a, b, m + b if drop_b else b, m + a if drop_a else a]
+            faces.append([v for j, v in enumerate(quad) if v != quad[j - 1]])
+        faces.append([m + a, m + b, 2 * m + b, 2 * m + a])
+    faces.append(list(range(2 * m, 3 * m)))
     bay = make(f"WingBay_{side}", verts, faces, M_DARK, smooth_angle=0.0,
                flip_normals=True)
 
-    # The door is the RECTANGLE, and only that: the wheel end of the mouth is
+    # The door covers the leg bay, and only that: the wheel end of the mouth is
     # the circular well and nothing closes over it - the retracted tyre is
     # visible from outside, which is what the belly photograph shows.
-    pts = [(p[0], p[1], p[2] - BAY_DOOR_LIFT) for p in mouth["rect"]]
+    pts = [(p[0], p[1], p[2] - BAY_DOOR_LIFT) for p in mouth["door"]]
 
-    # The rectangle is (join, row j), (join, j+1), (outboard, j+1),
-    # (outboard, j), so its two FORE-AFT edges are (0,1) and (2,3) - one at each
-    # end - and the spanwise ones are (1,2) and (3,0). A wing gear door hinges
-    # on a fore-aft edge and falls; hinging it spanwise, which is what taking
-    # "the other pair" gives, swings it forward like a speed brake.
-    edges = ((pts[0], pts[1]), (pts[2], pts[3]))
-    out_i = 0 if abs(pts[0][0]) > abs(pts[2][0]) else 1
-    hinge_edge = edges[out_i]
+    # The outline runs inboard edge (aft, 0.35, fore) then outboard edge (fore,
+    # 0.35, aft), so the hinge is the OUTBOARD one, from pts[3] to pts[5]. A
+    # wing gear door hinges on a fore-aft edge and falls; hinging it spanwise
+    # swings it forward like a speed brake. Its middle point is the 0.35 ring
+    # vertex, a couple of millimetres off the line through its ends because
+    # the section bends there, and it turns with the rest.
+    hinge_edge = (pts[5], pts[3])
     hinge = tuple((hinge_edge[0][c] + hinge_edge[1][c]) / 2.0 for c in range(3))
     axis = (Vector(hinge_edge[1]) - Vector(hinge_edge[0])).normalized()
     if axis.y > 0:                       # point aft, so one sign serves both
@@ -2090,11 +2267,10 @@ def build_wing_bay(side):
     WING_BAY_AXES[side] = tuple(round(c, 5) for c in axis)
     turn = Matrix.Rotation(math.radians(WING_BAY_OPEN) * sgn, 4, axis)
     h = Vector(hinge)
-    # The whole quad turns; the two points on the hinge edge sit on the axis
-    # and do not move, so the winding is unchanged.
-    quad = [tuple(turn @ (Vector(q) - h) + h) for q in pts]
-    door = make(f"BayDoor_Main_{side}", quad,
-                [[0, 1, 2, 3], [3, 2, 1, 0]], M_PAINT,
+    panel = [tuple(turn @ (Vector(q) - h) + h) for q in pts]
+    m = len(panel)
+    door = make(f"BayDoor_Main_{side}", panel,
+                [list(range(m)), list(range(m - 1, -1, -1))], M_PAINT,
                 origin=hinge, smooth_angle=0.0)
     return [bay, door]
 

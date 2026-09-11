@@ -717,10 +717,13 @@ zero-width slit on the centreline. Trace the keel row in X.
 **Find out where the belly is actually the outer surface before choosing where
 to cut.** Over the wing box the wing's lower surface drops below the
 fuselage's, so a hole cut outboard of that crossover has a wing behind it and
-reads as no hole at all. On the SF50 the crossover is at x ≈ 0.62 — barely half
-the body's half-width, and a long way inboard of where the fuselage stops.
-`scripts/belly_rows.py` reports it per station next to each row's span, and it
-was written after the first bay rendered as a light-grey panel.
+reads as no hole at all. On the SF50 the crossover is at x ≈ 0.62–0.77 depending
+on the station — barely half the body's half-width, and a long way inboard of
+where the fuselage stops. `scripts/belly_rows.py` reports it per station next to
+each row's span, and it was written after the first bay rendered as a
+light-grey panel. Confirm it with `scripts/surface_probe.py` wherever it
+matters: at the main axle station the row table says 0.665 and the ray cast
+says 0.74.
 
 That constraint usually settles it: inboard of the crossover there is often only
 the keel row, and **two panes cannot share a row's station gap**.
@@ -804,6 +807,71 @@ forward hinge fixes the symmetry and is still wrong: a panel that swings down
 across the whole mouth is a speed brake, and on a real aeroplane it would pitch
 the nose down hard. Two doors parting in the middle are symmetric AND what the
 aircraft has.
+
+**Never move a part to hide an intersection — cut the thing that intrudes.** The
+SF50's main wells sit where the wing root meets the belly, and the first well at
+the measured position had belly showing inside it. The fix that went in moved
+the wheel 0.26 m outboard, where there is no fuselage, and it looked fine. But a
+quarter-turn retraction ties the leg's length to where the wheel ends up, so the
+same move shortened the leg from 0.74 m to 0.60, dragged the hinge onto the
+wing's skin, and pushed the well under the door. The user found it by eye,
+three builds later. The right fix was to take the well's outline out of the
+belly too (`cut_well` in the generator). That changes nothing anyone
+measured.
+
+**Read underside positions off a bottom view, scaled on the span.** Side and
+three-quarter photographs give shapes, not distances. A view square to the belly
+gives distances, once it has a scale, and the span is the one dimension every
+bottom view shows end to end. On the SF50, the wingtips are painted yellow,
+which made them a colour threshold. Then:
+
+- **Stretch the contrast until the seams show.** A door seam is a couple of grey
+  levels off the skin either side of it. `scripts/enhance_crop.py` maps a crop's
+  0.5th–99.5th luminance percentiles to black–white and enlarges each pixel to a
+  square you can count.
+- **Read edges off a brightness profile, not off the picture.** Average a band
+  of rows across the feature and print the column values. A seam is a one-pixel
+  dip, a panel is a plateau, and the edge is where it steps. Your eye will put an
+  edge wherever the contrast looks like it ends.
+- **Get a second source by ratio, not by scale.** A photograph taken at a slant
+  has no single scale, but two lines that are parallel on the aeroplane stay in
+  proportion. The SF50's well-to-well line and tip-to-tip line are both lateral,
+  so their ratio gave the wells' spacing (0.91 against the bottom view's 0.89)
+  with no camera model at all.
+
+**Compare against the reference at the reference's own scale — and prove the
+comparison's orientation first.** `scripts/compare_bottom_photo.py` renders the
+belly orthographic at the photograph's px/m and stacks it under the stretched
+photograph, so a misplaced feature is misplaced by the number of pixels it
+looks. Its first run had the model upside down: the camera turned a half turn
+about two axes where one was meant, which put the nose at the bottom and the
+right wing on the right. The slot in the well then looked aft of the axle when
+it is ahead. Project a known point, the nose and one wingtip, through the camera
+before reading anything off the picture.
+
+**Where two surfaces cross inside a hole, the pocket starts from the lower one.**
+Where the belly is below the wing, the well's visible rim is the belly's, and
+the wing's own edge is a few centimetres up inside the fuselage. A pocket
+started at the wing leaves a band with no wall between the two, and through it
+the inside of the aeroplane. Drop those rim points to the belly and rise
+straight up to the wing: one collar of faces, only where it is needed. And find
+the crossover with a ray cast (`scripts/surface_probe.py`), not a table. At the
+SF50's main axle station `belly_rows.py` put it at x = 0.665, and the ray cast
+at 0.74.
+
+**A cut that splits an edge splits it for both faces that share it.** The SF50's
+wing door is cut at two chord fractions, across a ring line, so its outboard
+corners land on the hinge station's edges. The faces outboard of the hinge share
+those edges and have to take the same two vertices, or the hinge line is a
+crack. Count boundary loops to catch it (`scripts/boundary_loops.py` in the
+SF50 workspace): the mouth came out with 23 open edges
+against the pocket rim's 21. A render would not have shown it.
+
+**Size a door from the photograph, then check it can open.** Measured, the
+SF50's wing door is 0.75 m across. Hinged 0.8 m up, a panel that long reaches the
+ground at 90°, so the opening angle has to come from a photograph too: 125°,
+free edge splayed out level with the axle, which is what the one front-quarter
+view shows.
 
 Set `propellerBlades` in the catalog entry — `0` for a jet. Above the speed at
 which the blades alias, the runtime hides them and shows a translucent disc
@@ -963,7 +1031,7 @@ only if the level above it is too expensive to run all the way out.
 Those sizes are targets, not walls. The right count is the one where the
 wireframe shows density only where a feature is; a level that is 30% over
 because its windows are round is a better level than one that hits a number
-with rectangles. The SF50 sits at 1384 / 856 / 442 — over the targets at the
+with rectangles. The SF50 sits at 1514 / 856 / 442 — over the targets at the
 top and the bottom, spent on window shape, and the wireframe accounts for all
 of it.
 

@@ -322,14 +322,20 @@ const THRUST_AXIS = new Vector3(0, 0, 1);
 const NOSE_DOOR_HINGE = new Vector3(0, 0.16248, -0.9867);
 
 /**
- * The wing bay doors' hinge line: the mouth's outboard fore-aft edge, which
- * carries the wing's dihedral. Hinging them on the spanwise edge instead - the
- * other pair of the mouth quad - swings the panel forward like a speed brake.
+ * The wing bay doors' hinge line: the door's outboard fore-aft edge, which
+ * carries the wing's dihedral and the lower surface's slope between the two
+ * chord fractions the door is cut at (0.29 and 0.635). Hinging them on the
+ * spanwise edge instead swings the panel forward like a speed brake. Printed
+ * by the generator as `###DOORAXIS###` like the nose pair's, and re-read when
+ * the door moved forward off the flap hinge.
  */
-const WING_DOOR_HINGE = new Vector3(0, 0.07546, 0.99715);
-// 112 deg, not the nose pair's 88: the wing doors open PAST vertical so they
-// lean outboard and clear the extended wheel. At 82 the panel hung in the
-// tyre's own plane and the two z-fought.
+const WING_DOOR_HINGE = new Vector3(0, 0.05638, 0.99841);
+// 125 deg, not the nose pair's 88: the wing doors open PAST vertical so they
+// lean outboard and clear the extended wheel - at 82 the panel hung in the
+// tyre's own plane and the two z-fought. It is 125 rather than the 112 it was
+// because the door is now its measured 0.75 m: hinged ~0.8 m up, a panel that
+// long reaches the ground at 90 deg, and the one photograph that shows it from
+// the front has its free edge splayed out level with the axle.
 
 /**
  * How many times a banded tyre's image repeats in one turn. The band runs
@@ -392,8 +398,8 @@ const GEAR_BINDINGS: readonly {
   // door that stops at 90 deg has swung through the skin.
   { name: "BayDoor_Nose_Left", axis: NOSE_DOOR_HINGE, sign: -1, rad: DOOR_RAD(88), window: DOOR_WINDOW },
   { name: "BayDoor_Nose_Right", axis: NOSE_DOOR_HINGE, sign: 1, rad: DOOR_RAD(88), window: DOOR_WINDOW },
-  { name: "BayDoor_Main_Left", axis: WING_DOOR_HINGE, sign: 1, rad: DOOR_RAD(112), window: DOOR_WINDOW },
-  { name: "BayDoor_Main_Right", axis: WING_DOOR_HINGE, sign: -1, rad: DOOR_RAD(112), window: DOOR_WINDOW },
+  { name: "BayDoor_Main_Left", axis: WING_DOOR_HINGE, sign: 1, rad: DOOR_RAD(125), window: DOOR_WINDOW },
+  { name: "BayDoor_Main_Right", axis: WING_DOOR_HINGE, sign: -1, rad: DOOR_RAD(125), window: DOOR_WINDOW },
 ];
 /**
  * Seconds end to end. The SF50's AFM gives 8 s for a normal extension; nothing
@@ -537,17 +543,23 @@ export function disposeAircraftRig(rig: AircraftRig): void {
  *
  * The transit is run here rather than read from the flight model because no
  * flight model in this project has a retraction system to run it — see
- * `readGearCommand`. A zero or negative delta (a paused sim, the first frame)
- * snaps to the commanded position rather than stalling half way.
+ * `readGearCommand`. A zero or negative delta (the first frame, a resume)
+ * snaps to the commanded position rather than stalling half way; a held
+ * simulation holds the transit where it is.
  */
-function applyGear(rig: AircraftRig, command: number, deltaSeconds: number): void {
+function applyGear(rig: AircraftRig, command: number, deltaSeconds: number, held: boolean): void {
   if (rig.gear.length === 0) return;
   const target = Number.isFinite(command) ? Math.min(1, Math.max(0, command)) : 1;
-  if (Number.isFinite(deltaSeconds) && deltaSeconds > 0) {
-    const step = deltaSeconds / GEAR_TRANSIT_SECONDS;
-    rig.gearNorm += Math.min(step, Math.max(-step, target - rig.gearNorm));
-  } else {
-    rig.gearNorm = target;
+  // A held simulation is not "no time has passed": frames keep coming while
+  // the camera moves, and a transit under way stops where it is rather than
+  // snapping to its end.
+  if (!held) {
+    if (Number.isFinite(deltaSeconds) && deltaSeconds > 0) {
+      const step = deltaSeconds / GEAR_TRANSIT_SECONDS;
+      rig.gearNorm += Math.min(step, Math.max(-step, target - rig.gearNorm));
+    } else {
+      rig.gearNorm = target;
+    }
   }
   const travel = 1 - rig.gearNorm;
   for (const leg of rig.gear) {
@@ -573,6 +585,7 @@ function applyWheels(
   rig: AircraftRig,
   state: ControlSurfaceState,
   deltaSeconds: number,
+  held: boolean,
 ): void {
   if (rig.wheels.length === 0) return;
   // Airborne the tyres hold whatever angle they stopped at rather than being
@@ -582,8 +595,10 @@ function applyWheels(
   for (const wheel of rig.wheels) {
     fastest = Math.max(fastest, Math.abs(speed) / wheel.radius);
   }
-  if (Number.isFinite(deltaSeconds) && deltaSeconds > 0) {
-    rig.wheelAngleRad = (rig.wheelAngleRad + fastest * Math.sign(speed) * deltaSeconds)
+  if (!held && Number.isFinite(deltaSeconds) && deltaSeconds > 0) {
+    // Rolling forward carries the top of the tyre toward the nose, -Z. A
+    // positive rotation about +X carries +Y toward +Z, so the angle decreases.
+    rig.wheelAngleRad = (rig.wheelAngleRad - fastest * Math.sign(speed) * deltaSeconds)
       % (2 * Math.PI);
   }
   for (const wheel of rig.wheels) {
@@ -603,11 +618,23 @@ function applyWheels(
   }
 }
 
+export interface ApplyRigOptions {
+  /**
+   * True while the simulation is not advancing: paused, faulted, or waiting
+   * for terrain. Orbiting the camera still renders frames then, and their
+   * interval is display time, not flight time - so the tyres, propeller and
+   * gear transit hold, and only the frame interval is measured.
+   */
+  simulationHeld?: boolean;
+}
+
 export function applyAircraftRig(
   rig: AircraftRig,
   state: ControlSurfaceState,
   deltaSeconds: number,
+  options: ApplyRigOptions = {},
 ): void {
+  const held = options.simulationHeld === true;
   for (const part of rig.parts) {
     const angle = state[part.key] * part.sign;
     part.node.rotationQuaternion = part.rest.multiply(Quaternion.RotationAxis(part.axis, angle));
@@ -621,13 +648,13 @@ export function applyAircraftRig(
     rig.frameSeconds += (deltaSeconds - rig.frameSeconds) * FRAME_SMOOTHING;
   }
 
-  applyGear(rig, state.gearDownNorm, deltaSeconds);
-  applyWheels(rig, state, deltaSeconds);
+  applyGear(rig, state.gearDownNorm, deltaSeconds, held);
+  applyWheels(rig, state, deltaSeconds, held);
 
   const propeller = rig.propeller;
   if (!propeller) return;
 
-  if (Number.isFinite(deltaSeconds) && deltaSeconds > 0) {
+  if (!held && Number.isFinite(deltaSeconds) && deltaSeconds > 0) {
     // A Lycoming turns clockwise seen from the cockpit. Looking forward is
     // looking down -Z, and a positive rotation about +Z reads anticlockwise
     // from there, so the angle decreases.

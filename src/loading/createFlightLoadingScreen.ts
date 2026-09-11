@@ -1,4 +1,4 @@
-import "./loadingScreen.css";
+import { createGameLog, type GameLog, type GameLogEntry, type GameLogLine } from "../log/createGameLog";
 
 export type FlightLoadingPhase = "app" | "world" | "flight" | "assets" | "terrain";
 
@@ -25,72 +25,66 @@ const PHASE_LABELS: Record<FlightLoadingPhase, string> = {
   terrain: "Safe terrain",
 };
 
-/** Lives beside #root so mounting the renderer cannot erase the loading screen. */
-export function createFlightLoadingScreen(): FlightLoadingScreen {
-  const overlay = document.getElementById("app-loading") ?? document.createElement("div");
-  overlay.id = "app-loading";
-  overlay.className = "app-loading";
-  overlay.setAttribute("role", "dialog");
-  overlay.setAttribute("aria-modal", "true");
-  overlay.setAttribute("aria-labelledby", "app-loading-title");
-  overlay.setAttribute("aria-describedby", "app-loading-detail");
-  overlay.tabIndex = -1;
-  overlay.innerHTML = `
-    <div class="app-loading__card">
-      <p class="app-loading__brand">OSFS</p>
-      <h1 id="app-loading-title">Preparing your flight</h1>
-      <p id="app-loading-detail" class="app-loading__detail" role="status">Loading the world and flight systems. You will enter the aircraft when the terrain is ready.</p>
-      <ol class="app-loading__phases">
-        ${Object.entries(PHASE_LABELS).map(([id, label]) => `
-          <li data-phase="${id}">
-            <div class="app-loading__phase-heading"><span>${label}</span><span data-state>Waiting</span></div>
-            <div class="app-loading__track" role="progressbar" aria-label="${label}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-state="waiting"></div>
-            <p class="app-loading__phase-detail" data-detail hidden></p>
-          </li>`).join("")}
-      </ol>
-      <div class="app-loading__error" id="app-loading-error" hidden>
-        <p data-error-message role="alert"></p>
-        <button type="button" data-retry>Reload and try again</button>
-      </div>
-      <p class="app-loading__note">Flight stays paused while your surroundings load.</p>
-    </div>`;
-  if (!overlay.isConnected) document.body.append(overlay);
+const DEFAULT_TITLE = "Preparing your flight";
 
-  const get = <T extends HTMLElement>(selector: string) => overlay.querySelector<T>(selector)!;
-  const title = get("#app-loading-title");
-  const detail = get("#app-loading-detail");
-  const errorPanel = get("#app-loading-error");
-  const retry = get<HTMLButtonElement>("[data-retry]");
+interface PhaseLine {
+  line: GameLogLine;
+  startedAt: number;
+  ready: boolean;
+}
+
+/**
+ * Loading progress as game-log lines over a visible world. Only the renderer
+ * root is made inert, so flight input still waits for safe terrain.
+ */
+export function createFlightLoadingScreen(sharedLog?: GameLog): FlightLoadingScreen {
+  const log = sharedLog ?? createGameLog();
   const root = document.getElementById("root");
-  let previousFocus: HTMLElement | null = null;
+  const phases = new Map<FlightLoadingPhase, PhaseLine>();
+  let failure: { line: GameLogLine; entry: GameLogEntry } | null = null;
   let previousInert = false;
   let previousBusy: string | null = null;
   let visible = false;
   let destroyed = false;
 
-  const setPhase = (phase: FlightLoadingPhase, update: FlightLoadingPhaseUpdate) => {
-    if (destroyed) return;
-    const row = get(`[data-phase="${phase}"]`);
-    const bar = row.querySelector<HTMLElement>("[role=progressbar]")!;
-    const state = row.querySelector<HTMLElement>("[data-state]")!;
-    const phaseDetail = row.querySelector<HTMLElement>("[data-detail]")!;
-    const progress = update.state === "ready" ? 1 : update.state === "waiting" ? 0
-      : typeof update.progress === "number" && Number.isFinite(update.progress)
-        ? Math.max(0, Math.min(1, update.progress)) : null;
-    bar.dataset.state = update.state;
-    bar.style.setProperty("--loading-progress", `${(progress ?? 0) * 100}%`);
-    if (progress === null) bar.removeAttribute("aria-valuenow");
-    else bar.setAttribute("aria-valuenow", String(Math.round(progress * 100)));
-    const stateLabel = update.state === "ready" ? "Ready" : update.state === "waiting" ? "Waiting"
-      : progress === null ? "Loading" : `${Math.round(progress * 100)}%`;
-    state.textContent = stateLabel;
-    bar.setAttribute("aria-valuetext", update.detail ? `${stateLabel}. ${update.detail}` : stateLabel);
-    phaseDetail.textContent = update.detail ?? "";
-    phaseDetail.hidden = !update.detail;
+  const holdRoot = (): void => {
+    if (visible) return;
+    previousInert = root?.hasAttribute("inert") ?? false;
+    previousBusy = root?.getAttribute("aria-busy") ?? null;
+    root?.setAttribute("inert", "");
+    root?.setAttribute("aria-busy", "true");
+    visible = true;
+    log.setBusy(true);
   };
 
-  const hide = () => {
-    overlay.hidden = true;
+  const setPhase = (phase: FlightLoadingPhase, update: FlightLoadingPhaseUpdate): void => {
+    if (destroyed || update.state === "waiting") return;
+    const label = PHASE_LABELS[phase];
+    const current = phases.get(phase);
+    if (update.state === "ready") {
+      // A phase never seen loading (a teleport keeps the aircraft and physics)
+      // has nothing worth announcing unless it carries a note.
+      if (current?.ready || (!current && !update.detail)) return;
+      const seconds = current ? ` · ${((performance.now() - current.startedAt) / 1000).toFixed(1)} s` : "";
+      const entry: GameLogEntry = { text: `${update.detail ? `${label}: ${update.detail}` : `${label} ready`}${seconds}`, tone: "success" };
+      if (current) {
+        current.line.update(entry);
+        current.ready = true;
+      } else {
+        phases.set(phase, { line: log.print(entry), startedAt: performance.now(), ready: true });
+      }
+      return;
+    }
+    const entry: GameLogEntry = {
+      text: update.detail ? `${label}: ${update.detail}` : label,
+      tone: "progress",
+      progress: typeof update.progress === "number" ? update.progress : null,
+    };
+    if (current && !current.ready) current.line.update(entry);
+    else phases.set(phase, { line: log.print(entry), startedAt: performance.now(), ready: false });
+  };
+
+  const hide = (): void => {
     if (!visible) return;
     visible = false;
     if (root) {
@@ -98,39 +92,21 @@ export function createFlightLoadingScreen(): FlightLoadingScreen {
       if (previousBusy === null) root.removeAttribute("aria-busy");
       else root.setAttribute("aria-busy", previousBusy);
     }
-    if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
-    previousFocus = null;
+    log.setBusy(false);
   };
 
   const show: FlightLoadingScreen["show"] = (options = {}) => {
     if (destroyed) return;
-    title.textContent = options.title ?? "Preparing your flight";
-    detail.textContent = options.detail ?? "Loading the world and flight systems. You will enter the aircraft when the terrain is ready.";
-    errorPanel.hidden = true;
-    overlay.removeAttribute("data-error");
-    retry.onclick = null;
-    retry.disabled = false;
-    if (options.reset) {
-      for (const phase of Object.keys(PHASE_LABELS) as FlightLoadingPhase[]) setPhase(phase, { state: "waiting" });
+    // Keep a failure in the history, without its now-stale button.
+    failure?.line.update({ ...failure.entry, actions: [] });
+    failure = null;
+    if (options.reset) phases.clear();
+    if (!visible || options.title !== undefined) {
+      const title = options.title ?? DEFAULT_TITLE;
+      log.print({ text: options.detail ? `${title}: ${options.detail}` : title });
     }
-    if (!visible) {
-      previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      previousInert = root?.hasAttribute("inert") ?? false;
-      previousBusy = root?.getAttribute("aria-busy") ?? null;
-      root?.setAttribute("inert", "");
-      root?.setAttribute("aria-busy", "true");
-      visible = true;
-    }
-    overlay.hidden = false;
-    overlay.focus({ preventScroll: true });
+    holdRoot();
   };
-
-  const onKeyDown = (event: KeyboardEvent) => {
-    if (event.key !== "Tab") return;
-    event.preventDefault();
-    if (!errorPanel.hidden) retry.focus();
-  };
-  overlay.addEventListener("keydown", onKeyDown);
 
   show();
   return {
@@ -139,27 +115,21 @@ export function createFlightLoadingScreen(): FlightLoadingScreen {
     hide,
     fail(message, onRetry) {
       if (destroyed) return;
-      if (!visible) show();
-      overlay.dataset.error = "true";
-      title.textContent = "Your flight is still paused";
-      detail.textContent = "We could not finish preparing your flight.";
-      get("[data-error-message]").textContent = message;
-      errorPanel.hidden = false;
-      retry.disabled = false;
-      retry.textContent = onRetry ? "Try again" : "Reload and try again";
-      retry.onclick = () => {
-        retry.disabled = true;
+      holdRoot();
+      const label = onRetry ? "Try again" : "Reload and try again";
+      const retry = (): void => {
+        if (failure) failure.line.update({ ...failure.entry, actions: [{ label, onClick: retry, disabled: true }] });
         if (onRetry) onRetry();
         else window.location.reload();
       };
-      retry.focus({ preventScroll: true });
+      const entry: GameLogEntry = { text: `Flight paused. ${message}`, tone: "error", actions: [{ label, onClick: retry }] };
+      failure = { line: log.print(entry), entry };
+      failure.line.focusAction();
     },
     destroy() {
       hide();
       destroyed = true;
-      retry.onclick = null;
-      overlay.removeEventListener("keydown", onKeyDown);
-      overlay.remove();
+      if (!sharedLog) log.destroy();
     },
   };
 }

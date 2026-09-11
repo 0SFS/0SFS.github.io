@@ -92,10 +92,13 @@ import {
 import { createJsbsimRuntime } from "./jsbsim/createJsbsimRuntime";
 import { createFixedStepPhysicsLoop, FIXED_DT } from "./physics/fixedStepLoop";
 import { createFlightLoadingScreen, type FlightLoadingScreen } from "../loading/createFlightLoadingScreen";
+import { createGameLog, type GameLog } from "../log/createGameLog";
 import { DEFAULT_FLIGHT_START, START_ALTITUDE_AGL_METERS } from "./jsbsim/bootstrapC172";
 
 export interface FlightSimAppOptions {
   loadingScreen?: FlightLoadingScreen;
+  /** Shared with the page's first-paint log; created here when absent. */
+  log?: GameLog;
   googleApiKey?: string | null;
   baseMap?: string | RasterBaseMapSource | null;
   preferGoogleTiles?: boolean;
@@ -215,7 +218,8 @@ export async function createFlightSimApp(
   rootElement: HTMLElement,
   options: FlightSimAppOptions = {},
 ): Promise<FlightSimAppHandle> {
-  const loading = options.loadingScreen ?? createFlightLoadingScreen();
+  const log = options.log ?? createGameLog();
+  const loading = options.loadingScreen ?? createFlightLoadingScreen(log);
   loading.show();
   loading.setPhase("app", { state: "ready" });
   loading.setPhase("world", { state: "loading", detail: "Preparing the map renderer" });
@@ -1071,6 +1075,10 @@ export async function createFlightSimApp(
     onPhoneControlClick: openPhoneController,
     onSettingsClick: () => panelRoot.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')?.click(),
     onDebugClick: () => controlPanel?.openOrSelectTab("debug"),
+    onLogToggle: () => {
+      log.setOpen(!log.isOpen());
+      return log.isOpen();
+    },
     fpsHost: panelRoot,
   });
   statusOverlay = createFlightStatusOverlay(statusRoot, {
@@ -1266,7 +1274,7 @@ export async function createFlightSimApp(
     if (collisionDebugEnabled) collisionDebugOverlay?.update();
     if (collisionDebugEnabled && wheelSpinMode !== "off") wheelSpinDebugOverlay?.update();
     const rig = aircraftModel?.getRig();
-    if (rig) applyAircraftRig(rig, readControlSurfaceState(jsbsim.sdk), deltaSeconds);
+    if (rig) applyAircraftRig(rig, readControlSurfaceState(jsbsim.sdk), deltaSeconds, { simulationHeld: feedbackHeld });
     const phoneOwned = phoneSession?.getSnapshot().owner === "phone";
     flightHud.update(displayState, phoneOwned ? appliedControls : controls, inputManager.getGearDownNorm() > 0, {
       pitch: pitchAutoTrim.enabled, roll: rollAutoTrim.enabled,
@@ -1305,7 +1313,10 @@ export async function createFlightSimApp(
       if (disposed) return;
       disposed = true;
       placementAbort.abort();
-      if (!preserveLoadingScreen) loading.destroy();
+      if (!preserveLoadingScreen) {
+        loading.destroy();
+        if (!options.log) log.destroy();
+      }
       detachPhoneStatus?.();
       phoneDialog?.destroy();
       phoneSession?.destroy();

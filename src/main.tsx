@@ -1,5 +1,7 @@
 import { trackViewportInsets } from "foss-earth/shell";
+import { offerFullscreen } from "./fullscreen/fullscreen";
 import { createFlightLoadingScreen, type FlightLoadingScreen } from "./loading/createFlightLoadingScreen";
+import { createGameLog, type GameLog } from "./log/createGameLog";
 
 type AppRoute = "flight" | "globe" | "remote";
 
@@ -17,24 +19,24 @@ function isFlightMode(): boolean {
   return appRoute() === "flight";
 }
 
-async function bootApp(rootElement: HTMLElement, loading: FlightLoadingScreen | null): Promise<void> {
+async function bootApp(rootElement: HTMLElement, loading: FlightLoadingScreen | null, log: GameLog | null): Promise<void> {
   if (appRoute() === "remote") {
     const { createPhoneControllerApp } = await import("./remote/createPhoneControllerApp");
     await createPhoneControllerApp(rootElement);
-    document.getElementById("app-loading")?.remove();
+    document.getElementById("app-log")?.remove();
     return;
   }
 
   if (isFlightMode()) {
     const { createFlightSimApp } = await import("./flight/createFlightSimApp");
     loading?.setPhase("app", { state: "ready" });
-    await createFlightSimApp(rootElement, { loadingScreen: loading ?? undefined });
+    await createFlightSimApp(rootElement, { loadingScreen: loading ?? undefined, log: log ?? undefined });
     return;
   }
 
   const { createGlobeModeApp } = await import("./compat/createGlobeModeApp");
   await createGlobeModeApp(rootElement);
-  document.getElementById("app-loading")?.remove();
+  document.getElementById("app-log")?.remove();
 }
 
 const rootElement = document.getElementById("root");
@@ -47,15 +49,17 @@ if (!rootElement) {
 // (Firefox Android's URL bar, Chrome's dynamic toolbar).
 trackViewportInsets();
 
-const loading = isFlightMode() ? createFlightLoadingScreen() : null;
+const log = isFlightMode() ? createGameLog() : null;
+const loading = log ? createFlightLoadingScreen(log) : null;
 loading?.setPhase("app", { state: "loading", detail: "Downloading application code" });
+if (log) offerFullscreen(log);
 
-void bootApp(rootElement, loading).catch((error: unknown) => {
+void bootApp(rootElement, loading, log).catch((error: unknown) => {
   console.error("Failed to bootstrap application.", error);
   if (loading) {
     loading.fail("The application could not initialize. Check your connection and reload to try again.");
     return;
   }
-  document.getElementById("app-loading")?.remove();
+  document.getElementById("app-log")?.remove();
   rootElement.innerHTML = '<div class="boot-error">Failed to initialize the application.</div>';
 });

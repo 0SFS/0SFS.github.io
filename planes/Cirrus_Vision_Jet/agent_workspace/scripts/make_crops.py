@@ -26,6 +26,13 @@ PHOTO4 = os.path.join(M, "photo_N291AH_ramp.webp")
 # workspace that shows the LINKAGE rather than a silhouette of it.
 PHOTO5 = os.path.join(M, "photo_N291AH_ramp_wide.jpg")
 PHOTO6 = os.path.join(M, "photo_N291AH_main_gear.png")
+# A straight bottom view, gear up. It is a flight-simulator screenshot of a
+# third-party SF50 model (registration PS-CVJ), not a photograph of an
+# aeroplane - but its wells, hooks and panels are where N914AF's are, and it is
+# the only view in this workspace taken square to the belly, so it is the one
+# the main bay's spanwise positions are READ off. See REPORT.md, "The main
+# gear bay is where the photographs put it".
+PHOTO7 = os.path.join(M, "photo_PS-CVJ_bottom_view.jpg")
 
 # (source, name, x0, y0, x1, y1, downscale) in top-down pixels
 CROPS = [
@@ -60,10 +67,26 @@ CROPS = [
     (PHOTO6, "photo_main_gear_linkage", 0, 0, 302, 384, 1),
     (PHOTO, "photo_cabin", 400, 480, 1000, 720, 1),
     (PHOTO, "photo_aft_cabin", 700, 520, 1250, 720, 1),
+    # The right main door open, from the front quarter: the one view of the
+    # angle it hangs at - splayed outboard, free edge level with the axle.
+    (PHOTO4, "photo_N291AH_right_main_door", 1040, 540, 1199, 710, 4, True),
+]
+
+# Contrast-stretched as well as cropped, because what they are for is a panel
+# seam a couple of grey levels off its neighbours: the 0.5th and 99.5th
+# percentiles of the crop go to black and white, in luminance, and each source
+# pixel is enlarged to a square you can count. The same stretch as
+# enhance_crop.py, which is the tool for finding the next one.
+ENHANCED = [
+    (PHOTO7, "bottom_view_gear_enhanced", 470, 270, 760, 380, 4),
+    (PHOTO7, "bottom_view_left_well_x8", 495, 290, 590, 350, 8),
+    (PHOTO7, "bottom_view_right_well_x8", 640, 285, 735, 345, 8),
+    (PHOTO2, "photo_N914AF_wells_enhanced", 620, 520, 1140, 780, 2),
 ]
 
 
-def crop(src, name, x0, y0, x1, y1, down):
+def crop(src, name, x0, y0, x1, y1, down, up=False, stretch=False):
+    """`down` px of source per crop px - or, with `up`, crop px per source px."""
     im = bpy.data.images.load(src)
     w, h = im.size
     buf = np.empty(w * h * im.channels, dtype=np.float32)
@@ -71,7 +94,14 @@ def crop(src, name, x0, y0, x1, y1, down):
     arr = buf.reshape(h, w, im.channels)[::-1]
     a = arr[y0:min(y1, h), x0:min(x1, w)]
     bpy.data.images.remove(im)
-    if down > 1:
+    if stretch:
+        g = a[..., :3] @ np.array([0.2126, 0.7152, 0.0722], np.float32)
+        lo, hi = np.percentile(g, 0.5), np.percentile(g, 99.5)
+        g = np.clip((g - lo) / max(hi - lo, 1e-6), 0.0, 1.0)
+        a = np.repeat(g[..., None], 3, axis=2)
+    if up:
+        a = np.repeat(np.repeat(a, down, axis=0), down, axis=1)
+    elif down > 1:
         a = a[::down, ::down]
     if a.shape[2] == 3:
         a = np.concatenate([a, np.ones(a.shape[:2] + (1,), np.float32)], axis=2)
@@ -87,3 +117,5 @@ def crop(src, name, x0, y0, x1, y1, down):
 
 for c in CROPS:
     crop(*c)
+for src, name, x0, y0, x1, y1, scale in ENHANCED:
+    crop(src, name, x0, y0, x1, y1, scale, up=True, stretch=True)

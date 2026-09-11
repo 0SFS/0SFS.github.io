@@ -170,7 +170,7 @@ describe("aircraft model loader", () => {
     model.setAircraft("cirrus-vision-jet");
     await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
     expect(t.urls[1]).toContain("Cirrus_Vision_Jet_LOD3.glb");
-    expect(model.getState().triangles).toBe(1384);
+    expect(model.getState().triangles).toBe(1514);
 
     model.dispose();
     t.teardown();

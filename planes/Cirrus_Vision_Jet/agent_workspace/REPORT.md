@@ -2,7 +2,7 @@
 
 A measured reconstruction of the SF50 (G2) built to
 `docs/creating-an-aircraft-model.md`, generated procedurally from a table of
-cross-section stations. Three levels of detail, 1384 / 856 / 442 triangles,
+cross-section stations. Three levels of detail, 1514 / 856 / 442 triangles,
 wired into `AIRCRAFT_CATALOG` as `cirrus-vision-jet`.
 
 Levels are numbered **coarsest first**: LOD1 is the far mesh and each step up
@@ -12,7 +12,7 @@ not need one.
 
 | level | triangles | vertices | objects | takes over at |
 | --- | --- | --- | --- | --- |
-| LOD3 | 1384 | 797 | 26 | 0 m |
+| LOD3 | 1514 | 888 | 26 | 0 m |
 | LOD2 | 856 | 480 | 19 | 65 m |
 | LOD1 | 442 | 255 | 12 | 170 m |
 
@@ -492,8 +492,8 @@ bay the aeroplane does not have.
 
 | | first build | now |
 | --- | --- | --- |
-| main stow | x 0.620, z 0.830 — 24 mm inside the wing | x 0.850, z 0.797 — 18 to 45 mm proud of it |
-| main hinge | x 1.4835, z 1.0535, above the wing chord plane | x 1.582, z 0.922, inside the wing |
+| main stow | x 0.620, z 0.830 — 24 mm inside the wing | x 0.900, z 0.797 — measured, and 18 to 45 mm proud of the wing |
+| main hinge | x 1.4835, z 1.0535, above the wing chord plane | x 1.607, z 0.897, on the chord plane, in the wing box |
 | main bay | 0.92 m cut in the belly on the centreline | none; a well in the wing root |
 | nose retraction | aft | forward |
 | nose mouth | 0.52 m, rounded, aft of the leg | 0.80 m, square, ahead of it |
@@ -573,91 +573,137 @@ and modelled as a slab it was as wide as the linkage and read as a vestige of
 nothing. It is gone.
 
 **A keyhole, not a rectangle.** The wheel end HUGS the tyre - a circle of
-0.245 m about the stowed axle, merged into the rectangular leg bay outboard of
-x = 1.02. A rectangle wide enough to contain the wheel is a much bigger hole
-than the aeroplane has, and it read as a box with a tyre loose in it.
+0.21 m about the stowed axle - and a rectangle wide enough to contain the wheel
+is a much bigger hole than the aeroplane has: it read as a box with a tyre
+loose in it.
 
-Cutting it is still not a pane trace. Adding a third station at the join splits
-the bay into two segments, and each takes a different treatment: the outboard
-one loses its whole face, which is the rectangle, and the inboard one is
-re-emitted as **one n-gon** - three closed sides of the quad, then the arc. The
-bite is on the boundary rather than in the middle, so the region is simply
-connected and the triangulator can have it whole. Both arc ends sit on the join
-station's edge, which the dropped face has already left open, so they split
-nothing and there is no T-junction.
+Cutting it is still not a pane trace. A station at the join splits the bay
+into two segments. The inboard one is re-emitted as **one n-gon** - three
+closed sides of the quad, then the outline. The bite is on the boundary rather
+than in the middle, so the region is simply connected and the triangulator can
+have it whole. Both ends of the outline sit on the join station's edge, which
+the dropped face has already left open, so they split nothing and there is no
+T-junction.
 
-The circle has to be defined in (station, fraction-across-the-row), and two
-things about that fraction are easy to get wrong and were:
+The outline is addressed in **plan coordinates**, (x, Y), and put on the
+surface by interpolating inside the row. It used to be (station, fraction
+across the row), with the radius converted into the fraction at the circle's
+own station. That is right for a circle alone and wrong once the belly has to
+be cut on the same outline, because the fuselage knows plan coordinates, not
+the wing row's. `well_outline()` in the generator is that one outline, and
+both cuts use it.
 
-- **Its radius has to be converted into the fraction.** The row is 0.68 m deep
-  and the bay 1.18 m wide, so a circle specified in the row's own parameter
-  comes out an ellipse.
-- **The centre has to be SOLVED for the axle, not taken as mid-row.** Mid-row
-  is 0.062 m forward of where the stowed wheel sits - small enough to look like
-  nothing and large enough that the well and the tyre are visibly not
-  concentric. Both the fraction and the row length are read at the circle's own
-  station rather than at the join, because the row is 40 mm deeper at one end
-  of the well than at the other.
+**The door is not the whole face row.** The row runs 0.35 to 0.72 of the chord,
+and its aft edge is the flap hinge. The panel in the photographs runs 0.29 to
+0.635, so the door is cut at those two fractions, across the 0.35 ring line it
+straddles. That makes six faces instead of two: the skin fore and aft of the
+door in the outboard segment, the C round the well, and the inboard row ahead
+of it, which gains the vertex where the door's forward edge meets its side.
+**The faces outboard of the hinge take the door's two corner vertices too.**
+They share the hinge station's edges, and leaving them out made the hinge line
+a crack. The wing mouth then had 23 open edges against the pocket rim's 21. A
+boundary-loop count (`scripts/boundary_loops.py`) caught it; a render would not
+have.
 
-The check is not the render: measure the arc's vertices against the wheel's
-centre and they should all be one radius. They come out 0.240 to 0.248 against
-a nominal 0.245. The arc's *centroid* is no use for this - it is a 268 deg arc,
-not a full circle, so it sits well inboard of the centre it is drawn about.
+**The door opens PAST vertical, to 125 deg, so it leans outboard.** At 82 it
+hung in the extended wheel's own plane and the two z-fought, which read as the
+wheel poking through the panel. The wheels have no camber and never did; that
+was the door. It is 125 rather than the 112 it was for a while because the door
+is now its measured 0.75 m. Hinged 0.8 m up, a panel that long stands 30 mm off
+the ground at 90 deg. `crops/photo_N291AH_right_main_door.png` shows it from
+the front: splayed out, free edge level with the axle. The model's free edge
+stops 0.24 m up, 13 cm outboard of the tyre.
 
-72 triangles for the shaping, and the wheel now sits in a well rather than in a
-box.
+The pocket behind the mouth is the same dark tapered cup the nose bay uses,
+with one addition described below: a collar where the belly is lower than the
+wing.
 
-**One opening, not two.** The wheel well and the leg bay are one indent at one
-depth, running x = 0.60 to 1.78 - inboard of the stowed wheel, out past the
-leg. They were two things at two depths first, a real cut outboard and a flat
-dark patch inboard, and they read as two unrelated marks on the wing rather
-than as the place the gear lives. The inboard end runs behind the fuselage,
-which is the outer surface inboard of about x = 0.66, so none of it is wasted.
+### The main gear bay is where the photographs put it
 
-**The door covers only the leg half**, x = 1.10 to 1.78, interpolated along the
-mouth's two spanwise edges - exact, because a loft is ruled between its
-stations. The wheel end stays open: the retracted tyre is visible from outside
-and nothing closes over it, which is what the belly photograph shows.
+This was wrong for one build in a way worth recording, because the wrong
+version looked right.
 
-**The door opens PAST vertical, to 112 deg, so it leans outboard.** At 82 it
-hung in the extended wheel's own plane - the tyre's outer face is at x = 1.777
-and the door's hinge at 1.78 - and the two z-fought, which read as the wheel
-poking through the panel. The wheels themselves have no camber and never did;
-that was the door.
+The first well at the measured position showed white inside it. The fuselage's
+lower side row runs through that footprint: below the wing for its inboard few
+centimetres, where it was drawn straight across the well, and inside the wing
+for the rest, where it stood up in the pocket as a ledge. The fix that went in
+moved the wheel **0.26 m outboard**, to x = 1.110, where there is no fuselage.
+It looked fine. With a quarter-turn retraction, though, the leg's length is set
+by where the wheel ends up. So the move also cut the leg from 0.74 m to 0.60,
+dragged the hinge out and down onto the wing's skin, and left the door
+starting at x = 1.16 across a well whose rim was at 1.32. The retracted tyre
+sat half under the panel. The fix changed the dimensions to hide an
+intersection. It should have cut the thing that intersected.
 
-**The bay covers where the RETRACTED leg lies, not where the extended one
-hangs.** The wheel stows at x = 0.850 and the leg runs outboard from it to
-1.54, so the bay starts at the wheel well's outboard rim and goes out from
-there. It was 1.42 to 1.92 first — centred on the *extended* leg — which put
-the whole fold outside it: the gear swung past the hole meant to hold it.
-`photo_N914AF.jpg` agrees and is what settled it: gear up, each round wheel
-well has a rectangular panel immediately **outboard** of it, and scaled on the
-tyre in the same frame (0.38 m across 110 px) that panel is 0.67 m wide and
-starts at the well's rim.
+So the numbers were measured again, off two views that agree:
 
-The mouth is **one quad**. Two spanwise stations are added at x = 1.10 and 1.78
-and the face between them on row 4 - the lower surface from 0.72 back to 0.35
-of the chord, which is where the leg comes down at 48% - is simply not emitted.
-Any station falling inside the bay is dropped so the mouth stays one quad,
-which costs nothing for the same reason the two new ones are nearly free.
-No pane tracing is needed, because a gear door is a rib bay: it is bounded by
-the wing's own structure on all four sides. Behind it goes the same dark
-tapered pocket the nose bay uses, and over it one door hinged on the mouth's
-outboard fore-aft edge.
+- `measurements/photo_PS-CVJ_bottom_view.jpg`, a straight bottom view (a
+  flight-simulator model, not an aeroplane, but its wells, hooks and panels are
+  where N914AF's are). It is scaled on the published span: the yellow wingtips
+  are 674 px apart for 11.796 m, 57.1 px/m.
+- `photo_N914AF.jpg`, a real aeroplane at a slant. Its well-to-well line is
+  parallel to its tip-to-tip line to within 3 deg, so the ratio of the two
+  gives the wells' spacing without knowing the camera.
 
-The two stations cost almost nothing. The planform, the dihedral and the
-thickness are all linear in x, so an intermediate station is coplanar with its
-neighbours and the dissolve pass takes it straight back out; these two survive
-only because the cut makes them a feature.
+`scripts/enhance_crop.py` stretches a crop's contrast until the panel seams
+show. A brightness profile across them then reads the edges to a pixel:
 
-Two things to get right, both of which were wrong first:
+| | measured | model |
+| --- | --- | --- |
+| well centre off the centreline | 0.889 / 0.894 (bottom view), 0.91 (N914AF) | 0.900 |
+| well's outboard rim | 1.152 / 1.159 | 1.110 (our tyre is the drawing's 0.38 m, so our well is smaller; its centre is the measured one) |
+| panel's outboard seam | 1.91 / 1.91 | 1.91, the door hinge |
+| panel spanwise | 0.75 m | 0.75 m |
+| panel chordwise | 0.29c to 0.635c, 0.60 m | 0.29c to 0.635c |
+| hook | forward outboard, ~45 deg round from outboard | slot 0.08 to 0.19 m ahead of the axle |
 
-- **Hinge on a fore-aft edge.** `loft` emits the quad as (station A, row j),
-  (A, j+1), (B, j+1), (B, j), so the fore-aft edges are (0,1) and (2,3) and the
-  spanwise ones are (1,2) and (3,0). Taking "the other pair" hinges the panel
-  spanwise and swings it forward like a speed brake.
-- **One door, not a pair.** The nose mouth straddles the centreline and needs
-  two halves to stay symmetric. This one is wholly off it.
+From x = 0.900 the hinge follows: **x 1.607, z 0.897**. That's on the wing's
+chord plane, inside the wing box, and 0.10 m inboard of the tyre centreline,
+against the front view's 0.07 for the strut top. The leg is **0.714 m** from
+hinge to axle. The door starts 50 mm outboard of the well, which is the skin
+the photographs show between the two, so the tyre and the panel no longer
+overlap at all.
+
+The **hook** on each well is the retracted trailing arm. The knee sits 0.24 m
+ahead of the axle, so folded, the arm runs forward out of the hub, and the
+slot is where it does. It is also what makes the well and the leg bay one
+opening rather than two holes touching at a point.
+
+**The belly is cut, not dodged.** `cut_well` in `build_fuselage` takes the same
+outline out of the belly's side row (row 9, and row 7 on the left). Each gap it
+spans becomes one polygon: the inner ring line, then the outline. Where the
+outline crosses a station it crosses on the chord between two outline points,
+so the belly's hole and the wing's are the same polygon in plan. The vertex put
+there is shared by both gaps, so there is no T-junction. The ring line the bite
+opens onto keeps its own vertices, and its two ends run straight to the outer
+ring vertex rather than following the circle out to the line, because a vertex
+on that line would be one the next row never split. Each side's hole is one
+closed loop of 12 edges, every vertex on exactly two.
+
+Where the belly is the lower surface, the pocket starts from **the belly**, not
+the wing. The wing's edge is up inside the fuselage there, and starting the cup
+at it leaves a band with no wall, through which you see the inside of the
+aeroplane. So those rim points drop to the belly and rise straight up to the
+wing: one collar of faces, only where it is needed.
+
+The straight bottom view is the one angle at which two edges at different
+heights line up and hide whatever is between them, so it is not enough on its
+own. `render_sf50_views.py --views 11,12,13` renders three views from below at
+a slant for that. `scripts/compare_bottom_photo.py` renders the belly gear up
+at the photograph's own scale, nose up and right wing on the viewer's left the
+way the photograph has them, under the contrast-stretched photograph:
+
+![model against the bottom view](renders/bays/BOTTOM_vs_photo.png)
+
+Its first run had the model upside down. The camera took a half turn about Z
+as well as about Y, which reads as "and turn it the right way up" and does the
+opposite. The slot then looked as if it were aft of the axle when it is ahead.
+Projecting the nose and a wingtip through the camera is what found it: a
+comparison that can mirror has to prove its orientation before it proves
+anything else.
+
+130 triangles for all of it: the longer outline, the slot, the belly bites,
+the collar, and a door cut across two rows.
 
 ### The doors do not move with the legs
 
@@ -760,7 +806,7 @@ the model carries no physics mesh.
 
 | check | LOD3 | LOD2 | LOD1 |
 | --- | --- | --- | --- |
-| triangles | 1384 | 856 | 442 |
+| triangles | 1514 | 856 | 442 |
 | length 9.357 m | 9.357 | 9.357 | 9.357 |
 | span 11.796 m | 11.796 | 11.796 | 11.796 |
 | height 3.322 m | 3.3227 | 3.3227 | 3.3219 |
@@ -833,7 +879,7 @@ because the validator reports it, not because the model looks lopsided.
 
 `src/flight/aircraft/aircraftCatalog.ts`:
 
-- Three levels of ours — 1384 / 856 / 442 triangles — at `autoFromMeters` of
+- Three levels of ours — 1514 / 856 / 442 triangles — at `autoFromMeters` of
   40 / 65 / 170, plus hilos run's opt-in `hd` at 0. The two coarse thresholds
   are the Cessna's scaled by the span ratio, so the two airframes switch at the
   same apparent size; the fourth threshold is gone with the level it selected,
@@ -1064,6 +1110,19 @@ blender -b --factory-startup --python scripts/montage.py -- \
     renders/bays/BAY_COMPARE_belly.png 2 \
     renders/bays/BAY_belly_down_06_Bottom.png \
     renders/bays/BAY_belly_up_06_Bottom.png
+
+# the main wells from BELOW at a slant - the angles a straight bottom view
+# hides - and the belly against the bottom-view photograph at its own scale
+blender -b --factory-startup --python scripts/render_sf50_views.py -- \
+    work/sf50_lod3_gearup.blend renders/bays WELL_up --views 06,11,12,13 \
+    --fit 1.9 --res 700 --keepmat --center 1.25,-0.40,0.70
+blender -b --factory-startup --python scripts/compare_bottom_photo.py -- \
+    work/sf50_lod3_gearup.blend renders/bays/BOTTOM_vs_photo.png
+
+# a reference crop with its contrast stretched, to read a faint panel seam
+blender -b --factory-startup --python scripts/enhance_crop.py -- \
+    measurements/photo_PS-CVJ_bottom_view.jpg out.png 640 285 735 345 \
+    --scale 8 --grey --clip 0.5
 
 # which face row can hold an opening this wide, and how far outboard the belly
 # is still the OUTER surface - the two things a belly cut-out turns on

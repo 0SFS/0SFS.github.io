@@ -363,6 +363,7 @@ it("selects the airframe and LOD from the Aircraft tab and persists both", async
 
 it("drives the model's control surfaces and propeller from the simulation each tick", async () => {
   vi.stubGlobal("localStorage", { getItem: () => "trackpad", setItem: vi.fn() });
+  mocks.physics.getFault = () => null;
   Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
   const root = document.createElement("div");
   document.body.append(root);
@@ -372,7 +373,12 @@ it("drives the model's control surfaces and propeller from the simulation each t
     const tick = mocks.runtime.setSimTick.mock.calls.at(-1)?.[0] as (dt: number) => void;
     mocks.applyAircraftRig.mockClear();
     tick(1 / 60);
-    expect(mocks.applyAircraftRig).toHaveBeenCalledWith(mocks.rig, mocks.surfaceState, 1 / 60);
+    expect(mocks.applyAircraftRig).toHaveBeenCalledWith(mocks.rig, mocks.surfaceState, 1 / 60, { simulationHeld: false });
+    // Paused, the camera can still orbit and render frames with a real
+    // interval; the rig must be told the simulation is not advancing.
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyP" }));
+    tick(1 / 60);
+    expect(mocks.applyAircraftRig).toHaveBeenLastCalledWith(mocks.rig, mocks.surfaceState, 1 / 60, { simulationHeld: true });
   } finally { await act(async () => app.destroy()); }
 });
 

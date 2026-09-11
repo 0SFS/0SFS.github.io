@@ -179,12 +179,12 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
         </label>
         <canvas class="flight-hud__attitude" width="220" height="220" role="button" tabindex="0" aria-label="Attitude indicator and pitch roll control. Drag to steer."></canvas>
         <label class="flight-hud__lever flight-hud__lever--flaps">
-          <span class="flight-hud__lever-track">
-            <input data-control="flaps" type="range" min="0" max="1" step="0.01" value="0" aria-label="Flaps" />
-          </span>
           <span class="flight-hud__lever-meta">
             <span>FLAPS</span>
             <output data-output="flaps">0%</output>
+          </span>
+          <span class="flight-hud__lever-track">
+            <input data-control="flaps" type="range" min="0" max="1" step="0.01" value="0" aria-label="Flaps" />
           </span>
         </label>
       </div>

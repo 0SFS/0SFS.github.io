@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { BabylonRuntimeStatus } from "foss-earth/runtime";
-import { createFlightHudBar } from "./createFlightHudBar";
+import { createFlightHudBar, type FlightHudBarOptions } from "./createFlightHudBar";
 
 beforeEach(() => {
   const values = new Map<string, string>();
@@ -12,6 +12,69 @@ beforeEach(() => {
   });
 });
 afterEach(() => { document.body.replaceChildren(); window.localStorage.clear(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+
+function createTestHud(overrides: Partial<FlightHudBarOptions> = {}) {
+  const container = document.createElement("div");
+  document.body.append(container);
+  const hud = createFlightHudBar(container, {
+    renderActivity: {
+      getMapDownloadBytesPerSecond: () => 0,
+      onMapDownloadRateChange: () => vi.fn(),
+      isStreamingTiles: () => false,
+      onTilesStreamingChange: () => vi.fn(),
+      isRendering: () => false,
+      onActiveRenderChange: () => vi.fn(),
+    },
+    rendererMode: "webgl2", rendererForce: null,
+    runtimeStatus: {
+      mode: "raster-basemap",
+      terrainSource: { id: "mapterhorn", label: "Mapterhorn Terrain" },
+      rasterQuality: { setting: "auto", activeProfile: "balanced" },
+    } as BabylonRuntimeStatus,
+    rasterSources: [], terrainSources: [],
+    onPausedChange: vi.fn(), onRendererChange: vi.fn(), onMapSourceChange: vi.fn(), onTerrainSourceChange: vi.fn(),
+    getTerrainDetailState: () => ({ available: false, minErrorTarget: 16, maxErrorTarget: 4096, overrideErrorTarget: null, activeErrorTarget: null }),
+    onTerrainDetailChange: vi.fn(), onSettingsClick: vi.fn(), onDebugClick: vi.fn(),
+    onInputModeChange: vi.fn(), onInputSensitivityChange: vi.fn(),
+    ...overrides,
+  });
+  return { container, hud };
+}
+
+describe("flight HUD fullscreen and log buttons", () => {
+  afterEach(() => {
+    Reflect.deleteProperty(document, "fullscreenEnabled");
+    Reflect.deleteProperty(document.documentElement, "requestFullscreen");
+  });
+
+  it("hides fullscreen where the browser has none and pins the game log", () => {
+    let pinned = false;
+    const { container, hud } = createTestHud({ onLogToggle: () => (pinned = !pinned) });
+    expect(container.querySelector<HTMLButtonElement>("#flightFullscreenButton")!.hidden).toBe(true);
+    const logButton = container.querySelector<HTMLButtonElement>("#flightLogButton")!;
+    expect(logButton.hidden).toBe(false);
+
+    logButton.click();
+    expect(logButton.getAttribute("aria-pressed")).toBe("true");
+    logButton.click();
+    expect(logButton.getAttribute("aria-pressed")).toBe("false");
+    hud.destroy();
+  });
+
+  it("requests fullscreen without browser navigation UI", () => {
+    Object.defineProperty(document, "fullscreenEnabled", { configurable: true, value: true });
+    const requestFullscreen = vi.fn(async () => {});
+    document.documentElement.requestFullscreen = requestFullscreen;
+    const { container, hud } = createTestHud();
+    const button = container.querySelector<HTMLButtonElement>("#flightFullscreenButton")!;
+    expect(button.hidden).toBe(false);
+    expect(container.querySelector<HTMLButtonElement>("#flightLogButton")!.hidden).toBe(true);
+
+    button.click();
+    expect(requestFullscreen).toHaveBeenCalledWith({ navigationUI: "hide" });
+    hud.destroy();
+  });
+});
 describe("flight input method selector", () => {
   it("loads the shared preference, offers only supported modes and persists selection", () => {
     window.localStorage.setItem("foss-earth.inputMode", "mouse");
@@ -103,6 +166,18 @@ describe("flight input method selector", () => {
     expect(mapDownloadSpeed.textContent).toBe("000MB/s");
     expect(mapDownloadSpeed.parentElement).toBe(mapButton);
     expect([...mapControl.children].indexOf(terrainDetailControl)).toBeGreaterThan([...mapControl.children].indexOf(mapButton));
+    const hudBar = container.querySelector(".hud-bar")!;
+    const phoneButton = container.querySelector<HTMLButtonElement>("#flightPhoneButton")!;
+    const settingsButton = container.querySelector<HTMLButtonElement>("#flightSettingsButton")!;
+    expect(phoneButton.textContent).toBe("🎮");
+    expect(phoneButton.getAttribute("aria-label")).toBe("Phone controller");
+    const hudChildren = [...hudBar.children];
+    expect(hudChildren.indexOf(phoneButton)).toBeGreaterThan(hudChildren.indexOf(mapControl));
+    expect(hudChildren.indexOf(phoneButton)).toBeLessThan(hudChildren.indexOf(settingsButton));
+    hud.setPhoneStatus?.("Phone controls");
+    expect(phoneButton.textContent).toBe("🎮");
+    expect(phoneButton.title).toBe("Phone controls");
+    expect(phoneButton.getAttribute("aria-label")).toBe("Phone controls");
     expect(container.querySelector("#flightTerrainSourceButton")).toBeNull();
     expect(Array.from(mapMenu.querySelectorAll(".flight-basemap-menu__section-toggle .flight-basemap-menu__heading"), (heading) => heading.textContent))
       .toEqual(["3D basemaps", "2D basemaps"]);

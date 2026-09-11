@@ -3,8 +3,8 @@
  "objects": 26,
  "empties": 1,
  "meshes": 26,
- "triangles": 1384,
- "vertices": 797,
+ "triangles": 1514,
+ "vertices": 888,
  "materials": 6,
  "material_names": [
   "SF50_Dark",
@@ -62,31 +62,31 @@
    "Wheel_Right"
   ]
  },
- "non_manifold_edges": 126,
+ "non_manifold_edges": 186,
  "open_boundary_by_object": [
   {
+   "name": "Fuselage",
+   "boundary_edges": 34
+  },
+  {
    "name": "Wing_Left",
-   "boundary_edges": 20
+   "boundary_edges": 28
   },
   {
    "name": "Wing_Right",
-   "boundary_edges": 20
+   "boundary_edges": 28
+  },
+  {
+   "name": "WingBay_Left",
+   "boundary_edges": 21
+  },
+  {
+   "name": "WingBay_Right",
+   "boundary_edges": 21
   },
   {
    "name": "Nacelle",
    "boundary_edges": 16
-  },
-  {
-   "name": "WingBay_Left",
-   "boundary_edges": 13
-  },
-  {
-   "name": "WingBay_Right",
-   "boundary_edges": 13
-  },
-  {
-   "name": "Fuselage",
-   "boundary_edges": 10
   },
   {
    "name": "GearBay_Nose",
@@ -106,11 +106,11 @@
   },
   {
    "name": "BayDoor_Main_Left",
-   "boundary_edges": 1
+   "boundary_edges": 3
   },
   {
    "name": "BayDoor_Main_Right",
-   "boundary_edges": 1
+   "boundary_edges": 3
   }
  ],
  "degenerate_faces": 0,
@@ -154,8 +154,8 @@
  "per_object": [
   {
    "name": "Fuselage",
-   "tris": 788,
-   "verts": 400,
+   "tris": 834,
+   "verts": 433,
    "mats": [
     "SF50_Paint",
     "SF50_Glass",
@@ -176,6 +176,56 @@
      0.955,
      4.0,
      2.466
+    ]
+   ]
+  },
+  {
+   "name": "WingBay_Left",
+   "tris": 67,
+   "verts": 45,
+   "mats": [
+    "SF50_Dark"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "bbox": [
+    [
+     -1.91,
+     -0.6426,
+     0.706
+    ],
+    [
+     -0.6928,
+     0.0621,
+     1.0209
+    ]
+   ]
+  },
+  {
+   "name": "WingBay_Right",
+   "tris": 67,
+   "verts": 45,
+   "mats": [
+    "SF50_Dark"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "bbox": [
+    [
+     0.6928,
+     -0.6426,
+     0.706
+    ],
+    [
+     1.91,
+     0.0621,
+     1.0209
     ]
    ]
   },
@@ -206,8 +256,8 @@
   },
   {
    "name": "Wing_Left",
-   "tris": 48,
-   "verts": 34,
+   "tris": 56,
+   "verts": 42,
    "mats": [
     "SF50_Paint"
    ],
@@ -231,8 +281,8 @@
   },
   {
    "name": "Wing_Right",
-   "tris": 48,
-   "verts": 34,
+   "tris": 56,
+   "verts": 42,
    "mats": [
     "SF50_Paint"
    ],
@@ -305,56 +355,6 @@
    ]
   },
   {
-   "name": "WingBay_Left",
-   "tris": 37,
-   "verts": 26,
-   "mats": [
-    "SF50_Dark"
-   ],
-   "origin": [
-    0.0,
-    0.0,
-    0.0
-   ],
-   "bbox": [
-    [
-     -1.78,
-     -0.7133,
-     0.755
-    ],
-    [
-     -0.9,
-     -0.0461,
-     1.0203
-    ]
-   ]
-  },
-  {
-   "name": "WingBay_Right",
-   "tris": 37,
-   "verts": 26,
-   "mats": [
-    "SF50_Dark"
-   ],
-   "origin": [
-    0.0,
-    0.0,
-    0.0
-   ],
-   "bbox": [
-    [
-     0.9,
-     -0.7133,
-     0.755
-    ],
-    [
-     1.78,
-     -0.0461,
-     1.0203
-    ]
-   ]
-  },
-  {
    "name": "LandingGear_Left",
    "tris": 36,
    "verts": 24,
@@ -362,9 +362,9 @@
     "SF50_Metal"
    ],
    "origin": [
-    -1.712,
+    -1.607,
     -0.406,
-    0.792
+    0.897
    ],
    "bbox": [
     [
@@ -387,9 +387,9 @@
     "SF50_Metal"
    ],
    "origin": [
-    1.712,
+    1.607,
     -0.406,
-    0.792
+    0.897
    ],
    "bbox": [
     [
@@ -655,6 +655,31 @@
    ]
   },
   {
+   "name": "BayDoor_Main_Left",
+   "tris": 8,
+   "verts": 6,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    -1.91,
+    -0.2762,
+    0.8384
+   ],
+   "bbox": [
+    [
+     -2.4026,
+     -0.5887,
+     0.2436
+    ],
+    [
+     -1.91,
+     0.0334,
+     0.8549
+    ]
+   ]
+  },
+  {
    "name": "Flap_Right",
    "tris": 8,
    "verts": 6,
@@ -730,6 +755,31 @@
    ]
   },
   {
+   "name": "BayDoor_Main_Right",
+   "tris": 8,
+   "verts": 6,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    1.91,
+    -0.2762,
+    0.8384
+   ],
+   "bbox": [
+    [
+     1.91,
+     -0.5887,
+     0.2436
+    ],
+    [
+     2.4026,
+     0.0334,
+     0.8549
+    ]
+   ]
+  },
+  {
    "name": "Intake",
    "tris": 8,
    "verts": 9,
@@ -751,56 +801,6 @@
      0.1996,
      -0.95,
      2.4615
-    ]
-   ]
-  },
-  {
-   "name": "BayDoor_Main_Left",
-   "tris": 4,
-   "verts": 4,
-   "mats": [
-    "SF50_Paint"
-   ],
-   "origin": [
-    -1.78,
-    -0.3959,
-    0.8303
-   ],
-   "bbox": [
-    [
-     -2.0629,
-     -0.751,
-     0.2507
-    ],
-    [
-     -1.78,
-     -0.0785,
-     0.8543
-    ]
-   ]
-  },
-  {
-   "name": "BayDoor_Main_Right",
-   "tris": 4,
-   "verts": 4,
-   "mats": [
-    "SF50_Paint"
-   ],
-   "origin": [
-    1.78,
-    -0.3959,
-    0.8303
-   ],
-   "bbox": [
-    [
-     1.78,
-     -0.751,
-     0.2507
-    ],
-    [
-     2.0629,
-     -0.0785,
-     0.8543
     ]
    ]
   }
