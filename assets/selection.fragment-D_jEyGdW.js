@@ -1,4 +1,4 @@
-import{ps as e}from"./resolveMapRuntimeConfig-C_SNEWKz.js";var t=`selectionPixelShader`,n=`#ifdef INSTANCES
+import{ps as e}from"./resolveMapRuntimeConfig-Bdar9pzI.js";var t=`selectionPixelShader`,n=`#ifdef INSTANCES
 flat varying vSelectionId: f32;
 #else
 uniform selectionId: f32;
