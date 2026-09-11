@@ -41,6 +41,11 @@ export function PhoneController({ client }: { client: PhoneControllerClient }) {
         <div><input id="phone-trim" type="range" min="-1" max="1" step=".01" value={state.controls.pitchTrim} disabled={!state.canControl} onChange={event => client.updateControls({ pitchTrim: Number(event.target.value) })} />
           <button type="button" disabled={!state.canControl} onClick={() => client.updateControls({ pitchTrim: 0 })}>Center</button></div>
       </div>
+      <label className="phone-panel phone-haptics">
+        <span>HAPTICS <small>{state.hapticsSupported ? "Touchdown pulses while you fly" : "Unavailable on this device"}</small></span>
+        <input type="checkbox" aria-label="Haptics" checked={state.hapticsEnabled} disabled={!state.hapticsSupported}
+          onChange={event => client.setHapticsEnabled(event.target.checked)} />
+      </label>
       <fieldset className="phone-panel phone-flaps" disabled={!state.canControl}><legend>FLAPS</legend><div>{FLAP_PRESETS.map((value, index) => <button type="button" key={value} aria-pressed={Math.abs(state.controls.flaps - value) < .01} onClick={() => client.updateControls({ flaps: value })}>{index === 0 ? "UP" : `${index * 10}°`}</button>)}</div></fieldset>
     </section>
     <footer className="phone-actions">
