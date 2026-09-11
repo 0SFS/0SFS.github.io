@@ -43,8 +43,18 @@ describe("application route", () => {
     expect(document.querySelector('[data-phase="app"] [role="progressbar"]')!.getAttribute("aria-valuenow")).toBe("100");
   });
 
-  it("loads only FOSS Earth on the root route", async () => {
-    window.history.replaceState(null, "", "/");
+  it.each(["/", "/?mode=flight", "/?mode=unknown"])("loads the flight simulator by default (%s)", async (route) => {
+    window.history.replaceState(null, "", route);
+
+    await import("./main");
+    await vi.waitFor(() => expect(appMocks.createFlightSimApp).toHaveBeenCalledOnce());
+
+    expect(appMocks.createGlobeApp).not.toHaveBeenCalled();
+    expect(appMocks.createPhoneControllerApp).not.toHaveBeenCalled();
+  });
+
+  it("loads only FOSS Earth with mode=globe", async () => {
+    window.history.replaceState(null, "", "/?mode=globe");
     document.body.insertAdjacentHTML("beforeend", '<div id="app-loading"></div>');
 
     await import("./main");
@@ -80,7 +90,7 @@ describe("application route", () => {
   });
 
   it("keeps the original generic error behavior when a non-flight route fails", async () => {
-    window.history.replaceState(null, "", "/");
+    window.history.replaceState(null, "", "/?mode=globe");
     document.body.insertAdjacentHTML("beforeend", '<div id="app-loading"></div>');
     appMocks.createGlobeApp.mockRejectedValueOnce(new Error("Offline"));
     vi.spyOn(console, "error").mockImplementation(() => {});

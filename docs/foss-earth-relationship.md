@@ -41,7 +41,7 @@ OSFS imports only public FOSS Earth package exports:
 | `foss-earth/windowing.css` | Shared windowing structure |
 | `foss-earth/runtime` | Babylon runtime, renderer/map types, map selection, and simulation hooks |
 | `foss-earth/cameraMath` | Shared WGS84/ECEF conversion and angle constants |
-| `foss-earth` | Root globe application and public globe APIs |
+| `foss-earth` | Globe application (`?mode=globe`) and public globe APIs |
 
 The HUD is adapted in `src/flight/hud/createFlightHudBar.ts`. `FlightControlPanel.tsx` supplies Weather, Aircraft, and Debug content to the shared `WindowOverlay`. FOSS Earth owns both window slots, responsive fit, launchers, tab movement, minimize/restore behavior, and window styling.
 

@@ -1,13 +1,24 @@
 import { trackViewportInsets } from "foss-earth/shell";
 import { createFlightLoadingScreen, type FlightLoadingScreen } from "./loading/createFlightLoadingScreen";
 
+type AppRoute = "flight" | "globe" | "remote";
+
+/**
+ * OSFS opens the flight simulator by default. `?mode=globe` opens the FOSS
+ * Earth globe and `?mode=remote` the phone controller; older `?mode=flight`
+ * links keep working because every other value falls through to flight.
+ */
+function appRoute(): AppRoute {
+  const mode = new URLSearchParams(window.location.search).get("mode");
+  return mode === "remote" || mode === "globe" ? mode : "flight";
+}
+
 function isFlightMode(): boolean {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("mode") === "flight";
+  return appRoute() === "flight";
 }
 
 async function bootApp(rootElement: HTMLElement, loading: FlightLoadingScreen | null): Promise<void> {
-  if (new URLSearchParams(window.location.search).get("mode") === "remote") {
+  if (appRoute() === "remote") {
     const { createPhoneControllerApp } = await import("./remote/createPhoneControllerApp");
     await createPhoneControllerApp(rootElement);
     document.getElementById("app-loading")?.remove();

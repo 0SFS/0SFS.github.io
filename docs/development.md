@@ -34,22 +34,22 @@ npm install
 npm run dev
 ```
 
-Vite serves source changes directly; no production build is needed first. Open the URL it prints and
-select flight mode:
+Vite serves source changes directly; no production build is needed first. Open the URL it prints;
+the flight simulator is the default route:
 
 ```text
-http://127.0.0.1:5173/?mode=flight&mapSource=osm-standard
+http://127.0.0.1:5173/?mapSource=osm-standard
 ```
 
 To use Google Photorealistic 3D Tiles, pass your own key:
 
 ```text
-http://127.0.0.1:5173/?mode=flight&key=YOUR_GOOGLE_MAPS_API_KEY
+http://127.0.0.1:5173/?key=YOUR_GOOGLE_MAPS_API_KEY
 ```
 
-Vite may choose a different port when `5173` is occupied. Opening the app without `mode=flight`
-starts the globe application exported by the linked FOSS Earth checkout. `?mode=remote` loads the
-phone controller route on its own.
+Vite may choose a different port when `5173` is occupied. `?mode=globe` starts the globe application
+exported by the linked FOSS Earth checkout, and `?mode=remote` loads the phone controller route on
+its own. Older `?mode=flight` links still open the simulator.
 
 Restart `npm run dev` after changing the FOSS Earth package manifest or exports.
 
