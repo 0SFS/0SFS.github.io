@@ -36,6 +36,22 @@ import { createWheelSpinDebugOverlay } from "./diagnostics/createWheelSpinDebugO
 import { createWheelSpinExperiment } from "./physics/createWheelSpinExperiment";
 import type { WheelSpinMode } from "./physics/wheelSpin";
 import { createTireAudio } from "./audio/createTireAudio";
+import { WHEEL_SPIN_CONFIGS } from "./physics/wheelSpin";
+import { probeWheelContactCapability } from "./physics/wheelContact";
+import { createSlipAudioSink, createWheelCueBus, type WheelCueResetReason } from "./feedback/wheelCueBus";
+import { createGamepadHapticOutput, createHapticsController, type HapticOutput } from "./feedback/haptics";
+import {
+  applyGroundPreset,
+  createGroundSettingsStore,
+  GROUND_CHOICE_LABELS,
+  GROUND_BOUNDARY_KEYS,
+  patchGroundSettings,
+  resolveGroundInteraction,
+  type GroundBoundaryKey,
+  type GroundCapabilities,
+  type GroundInteractionSettingsV1,
+} from "./settings/groundInteractionSettings";
+import type { GroundInteractionAction, GroundInteractionPanelState } from "./hud/GroundInteractionSettingsPanel";
 import {
   createFlightPerformanceCapture,
   isFlightPerformanceCaptureEnabled,
@@ -61,6 +77,7 @@ import { createFlightStatusOverlay, type FlightStatusOverlayHandle } from "./hud
 import type { FlightStatusOverlayState } from "./hud/FlightStatusOverlay";
 import { attachFlightCameraInput } from "./input/flightCameraInput";
 import { applyFlightControls } from "./input/applyFlightControls";
+import { createAutoTrimState, setAutoTrimEnabled, stepPitchAutoTrim, stepRollAutoTrim } from "./input/autoTrim";
 import type { PhoneControlSession } from "./remote/createPhoneControlSession";
 import type { PhonePairingDialog } from "./hud/createPhonePairingDialog";
 import { createFlightInputManager } from "./input/flightInputManager";
@@ -117,6 +134,8 @@ const WORLD_DETAIL_PREFERENCE_KEY = "osfs.world-detail-target";
 const FLIGHT_TERRAIN_REQUIREMENT_PREFERENCE_KEY = "osfs.flight-terrain-requirement";
 const TERRAIN_DETAIL_ANCHOR_PREFERENCE_KEY = "osfs.terrain-detail-anchor";
 const ARCADE_GROUND_LAUNCHES_PREFERENCE_KEY = "osfs.arcade-ground-launches";
+const AUTO_TRIM_PREFERENCE_KEY = "osfs.auto-trim";
+const AUTO_ROLL_TRIM_PREFERENCE_KEY = "osfs.auto-roll-trim";
 const MIN_WORLD_DETAIL_TARGET = 1;
 const MAX_WORLD_DETAIL_TARGET = 524_288;
 const DEFAULT_FLIGHT_TERRAIN_REQUIREMENT = 4_096;
@@ -354,23 +373,70 @@ export async function createFlightSimApp(
     ARCADE_GROUND_LAUNCHES_PREFERENCE_KEY, ARCADE_GROUND_LAUNCHES_PREFERENCE_KEY,
     (value): value is "on" | "off" => value === "on" || value === "off", "off",
   ) === "on";
+  let pitchAutoTrim = createAutoTrimState(readPreference(
+    AUTO_TRIM_PREFERENCE_KEY, AUTO_TRIM_PREFERENCE_KEY,
+    (value): value is "on" | "off" => value === "on" || value === "off", "on",
+  ) === "on");
+  let rollAutoTrim = createAutoTrimState(readPreference(
+    AUTO_ROLL_TRIM_PREFERENCE_KEY, AUTO_ROLL_TRIM_PREFERENCE_KEY,
+    (value): value is "on" | "off" => value === "on" || value === "off", "on",
+  ) === "on");
+  // Ground interaction: persistent requests resolve to what can actually run.
+  // The Debug A/B experiment is a session-only override layered on top.
+  const groundStore = createGroundSettingsStore((() => {
+    try { return window.localStorage; } catch { return null; }
+  })());
+  const contactCapability = probeWheelContactCapability(jsbsim.sdk);
+  const groundCapabilities: GroundCapabilities = {
+    // Even a detected bridge stays unavailable until the coupled solver is integrated with it.
+    contactBridgeUnavailable: contactCapability.available
+      ? "the coupled solver is not yet integrated with the native bridge" : contactCapability.reason,
+    audioUnavailable: (globalThis as { AudioContext?: unknown; webkitAudioContext?: unknown }).AudioContext
+      || (globalThis as { webkitAudioContext?: unknown }).webkitAudioContext ? null : "Web Audio is unavailable in this browser",
+  };
+  const boundaryOf = (settings: GroundInteractionSettingsV1) => Object.fromEntries(
+    GROUND_BOUNDARY_KEYS.map(key => [key, settings[key]])) as Pick<GroundInteractionSettingsV1, GroundBoundaryKey>;
+  // A new flight is a safe boundary: saved wheel/force/contact choices start applied.
+  let appliedGroundBoundary = boundaryOf(groundStore.settings);
+  let groundResolution = resolveGroundInteraction(groundStore.settings, groundCapabilities, appliedGroundBoundary);
+  let wheelExperiment: { rotation: WheelSpinMode | "off" | null; tireSound: boolean | null } = { rotation: null, tireSound: null };
+  let groundMessage: GroundInteractionPanelState["message"] = null;
+  let groundExportText: string | null = null;
   let wheelSpinMode: WheelSpinMode | "off" = "off";
   let tireSoundEnabled = false;
+  let hapticsActive = false;
+  let acceptedWheelSteps = 0;
+  let groundRevision = 0;
   const wheelSpin = createWheelSpinExperiment(jsbsim.sdk);
   const tireAudio = createTireAudio();
   tireAudio.setPaused(true);
-  let tireSlipEnergy = 0;
-  let tireStepSeconds = 0;
-  const resetWheelSpin = (): void => {
+  // Accepted fixed steps only; presentation consumers can never feed back into forces.
+  const wheelCues = createWheelCueBus(WHEEL_SPIN_CONFIGS.map(config => config.name), error => {
+    flightLog.warn("sim", "A wheel feedback consumer failed and was detached", {
+      reason: error instanceof Error ? error.message : String(error),
+    });
+  });
+  const slipAudio = createSlipAudioSink();
+  wheelCues.subscribe(slipAudio);
+  const gamepadHaptics = createGamepadHapticOutput({ onChange: () => haptics.cancel() });
+  const phoneHaptics: HapticOutput = {
+    // Coarse on/off pulses: magnitude maps to pulse length, not intensity.
+    play: envelope => phoneSession?.setHapticFeedback(Math.min(envelope.durationMs,
+      Math.round(10 + 50 * Math.max(envelope.strong, envelope.weak)))),
+    cancel: () => phoneSession?.setHapticFeedback(0),
+  };
+  const haptics = createHapticsController([gamepadHaptics, phoneHaptics]);
+  wheelCues.subscribe(haptics);
+  const resetWheelSpin = (reason: WheelCueResetReason = "reset"): void => {
     wheelSpin.reset();
-    tireSlipEnergy = tireStepSeconds = 0;
+    wheelCues.invalidate(reason);
     tireAudio.update(0);
   };
   const physicsLoop = createFixedStepPhysicsLoop(jsbsim.sdk, () => {
     if (wheelSpinMode === "off") return;
     wheelSpin.step(FIXED_DT, wheelSpinMode);
-    for (const wheel of wheelSpin.getStates()) tireSlipEnergy += wheel.slipPowerWatts * FIXED_DT;
-    tireStepSeconds += FIXED_DT;
+    acceptedWheelSteps += 1;
+    wheelCues.publish(acceptedWheelSteps * FIXED_DT, FIXED_DT, wheelSpin.getStates());
   }, {
     getArcadeGroundLaunches: () => arcadeGroundLaunches,
   });
@@ -389,9 +455,22 @@ export async function createFlightSimApp(
     onGearChange: (down) => { inputManager.setGearDown(down); runtime.requestRender(); },
     onThrottleChange: (value) => { inputManager.setThrottle(value); runtime.requestRender(); },
     onPitchTrimChange: (value) => { inputManager.setPitchTrim(value); runtime.requestRender(); },
+    onRollTrimChange: (value) => { inputManager.setRollTrim(value); runtime.requestRender(); },
+    onPitchAutoTrimChange: (enabled) => {
+      pitchAutoTrim = setAutoTrimEnabled(pitchAutoTrim, enabled);
+      writePreference(AUTO_TRIM_PREFERENCE_KEY, enabled ? "on" : "off");
+      runtime.requestRender();
+    },
+    onRollAutoTrimChange: (enabled) => {
+      rollAutoTrim = setAutoTrimEnabled(rollAutoTrim, enabled);
+      writePreference(AUTO_ROLL_TRIM_PREFERENCE_KEY, enabled ? "on" : "off");
+      runtime.requestRender();
+    },
     onFlapsChange: (value) => { inputManager.setFlaps(value); runtime.requestRender(); },
     onRudderChange: (value) => { inputManager.setRudder(value); runtime.requestRender(); },
     onStickChange: (aileron, elevator) => { inputManager.setStick(aileron, elevator); runtime.requestRender(); },
+    pitchAutoTrim: pitchAutoTrim.enabled,
+    rollAutoTrim: rollAutoTrim.enabled,
   });
 
   let floatingOrigin: FloatingOriginHandle | null = null;
@@ -412,6 +491,35 @@ export async function createFlightSimApp(
     }
     wheelSpinDebugOverlay?.setEnabled(showWheels);
   };
+  /** Applies the resolved settings plus any Debug override; boundary choices only change when applied. */
+  const applyGroundRuntime = (): void => {
+    groundResolution = resolveGroundInteraction(groundStore.settings, groundCapabilities, appliedGroundBoundary);
+    const active = groundResolution.active;
+    const nextMode = wheelExperiment.rotation ?? active.rotation;
+    if (nextMode !== wheelSpinMode) {
+      wheelSpinMode = nextMode;
+      resetWheelSpin("mode");
+    }
+    const nextSound = wheelSpinMode !== "off" && (wheelExperiment.tireSound ?? active.tireAudio === "slip");
+    if (nextSound !== tireSoundEnabled) {
+      tireSoundEnabled = nextSound;
+      tireAudio.setEnabled(nextSound);
+    }
+    tireAudio.setVolume(groundStore.settings.tireAudioVolume);
+    const nextHaptics = wheelSpinMode !== "off" && active.haptics === "landing";
+    if (nextHaptics !== hapticsActive) {
+      hapticsActive = nextHaptics;
+      haptics.setEnabled(nextHaptics);
+    }
+    haptics.setStrength(groundStore.settings.hapticStrength);
+    syncCollisionDebugOverlay();
+  };
+  /** Paused, loading and reset states are safe boundaries for wheel/force/contact choices. */
+  const applyGroundBoundary = (): void => {
+    appliedGroundBoundary = boundaryOf(groundStore.settings);
+    applyGroundRuntime();
+  };
+  applyGroundRuntime();
   let aircraftId: AircraftId = readPreference(AIRCRAFT_PREFERENCE_KEY, LEGACY_AIRCRAFT_PREFERENCE_KEY, isAircraftId, "cessna-172");
   let aircraftLodId: AircraftLodId = readPreference(AIRCRAFT_LOD_PREFERENCE_KEY, LEGACY_AIRCRAFT_LOD_PREFERENCE_KEY, isAircraftLodId, "auto");
   let optInLodsEnabled = readPreference(
@@ -533,6 +641,57 @@ export async function createFlightSimApp(
 
   mountFlightWorld();
   const initialState = readFlightState(jsbsim.sdk);
+  const describeWheelExperiment = (): string | null => {
+    const parts: string[] = [];
+    if (wheelExperiment.rotation !== null) parts.push(`wheel response ${GROUND_CHOICE_LABELS.rotation[wheelExperiment.rotation]}`);
+    if (wheelExperiment.tireSound !== null) parts.push(`tire sound ${wheelExperiment.tireSound ? "on" : "off"}`);
+    return parts.length > 0 ? parts.join(", ") : null;
+  };
+  const handleGroundAction = (action: GroundInteractionAction): void => {
+    groundMessage = null;
+    const safeBoundary = inputManager.isPaused() || worldLoading;
+    const commit = (settings: GroundInteractionSettingsV1) => {
+      groundStore.set(settings);
+      if (safeBoundary) applyGroundBoundary();
+      else applyGroundRuntime();
+    };
+    const report = (error: string | null, success: string) => {
+      groundMessage = error ? { text: error, error: true } : { text: success, error: false };
+    };
+    switch (action.type) {
+      case "preset": commit(applyGroundPreset(groundStore.settings, action.preset)); break;
+      case "set": commit(patchGroundSettings(groundStore.settings, action.patch)); break;
+      case "lock":
+        commit(patchGroundSettings(groundStore.settings, { locked: { ...groundStore.settings.locked, [action.key]: action.locked } }));
+        break;
+      case "save-profile": report(groundStore.saveProfile(action.name), "Profile saved."); break;
+      case "load-profile": {
+        const error = groundStore.loadProfile(action.name);
+        report(error, "Profile applied.");
+        if (safeBoundary) applyGroundBoundary(); else applyGroundRuntime();
+        break;
+      }
+      case "delete-profile": groundStore.deleteProfile(action.name); report(null, "Profile deleted."); break;
+      case "export": groundExportText = groundStore.exportProfile(); report(null, "Copy this text to keep or share the profile."); break;
+      case "import": report(groundStore.importProfile(action.text), "Profile imported. Choose it under Saved profiles."); break;
+      case "keep-experiment": {
+        const patch: Partial<GroundInteractionSettingsV1> = {};
+        if (wheelExperiment.rotation !== null) patch.rotation = wheelExperiment.rotation;
+        if (wheelExperiment.tireSound !== null) patch.tireAudio = wheelExperiment.tireSound ? "slip" : "off";
+        groundStore.set(patchGroundSettings(groundStore.settings, patch));
+        // Already running, so keeping it is not a mid-flight change.
+        if (wheelExperiment.rotation !== null) appliedGroundBoundary = { ...appliedGroundBoundary, rotation: wheelExperiment.rotation };
+        wheelExperiment = { rotation: null, tireSound: null };
+        applyGroundRuntime();
+        report(null, "Experiment choices saved to Ground interaction.");
+        break;
+      }
+      case "discard-experiment":
+        wheelExperiment = { rotation: null, tireSound: null };
+        applyGroundRuntime();
+        break;
+    }
+  };
   const createPanelSnapshot = (flightState = initialState): FlightControlPanelSnapshot => {
     const activeGoogleTerrainDetail = runtime.getGoogleTerrainDetailState();
     // Settings edits the saved World-detail handle. The in-flight rail is a
@@ -570,6 +729,20 @@ export async function createFlightSimApp(
       tireSoundEnabled,
       tireAudioStatus: tireAudio.getStatus(),
       wheelSpinStates: wheelSpinMode === "off" ? [] : wheelSpin.getStates().map(wheel => ({ ...wheel })),
+      groundInteraction: {
+        settings: groundStore.settings,
+        resolution: groundResolution,
+        capabilities: groundCapabilities,
+        profiles: groundStore.profiles.map(profile => profile.name),
+        readOnlyReason: groundStore.readOnlyReason,
+        message: groundMessage,
+        exportText: groundExportText,
+        experimentOverride: describeWheelExperiment(),
+        hapticDevices: {
+          gamepad: gamepadHaptics.describe(),
+          phone: phoneSession ? "Uses the phone's Haptics switch where its browser supports vibration" : "Not paired",
+        },
+      },
     };
   };
 
@@ -592,7 +765,12 @@ export async function createFlightSimApp(
       }
       terrainContact.reset();
       visibleMeshCollision.reset();
-      resetWheelSpin();
+      resetWheelSpin("fault");
+    }
+    // Pausing discards partial feedback windows and is a safe settings boundary.
+    if (paused) {
+      wheelCues.invalidate("pause");
+      applyGroundBoundary();
     }
     phoneSession?.cancelHandoff();
     physicsLoop.setPaused(paused || worldLoading);
@@ -621,7 +799,8 @@ export async function createFlightSimApp(
     const abort = placementAbort = new AbortController();
     worldLoading = true;
     tireAudio.setPaused(true);
-    resetWheelSpin();
+    resetWheelSpin("teleport");
+    applyGroundBoundary();
     physicsLoop.setPaused(true);
     runtime.setSimRunning(false);
     floatingOrigin?.aircraftRoot.setEnabled(false);
@@ -658,6 +837,8 @@ export async function createFlightSimApp(
       appliedControls = inputManager.getControls();
       physicsLoop.reset();
       applyWeather(weather);
+      pitchAutoTrim = createAutoTrimState(pitchAutoTrim.enabled);
+      rollAutoTrim = createAutoTrimState(rollAutoTrim.enabled);
       floatingOrigin?.apply(state);
       runtime.setSimViewState({
         latDeg: state.latDeg, lonDeg: state.lonDeg,
@@ -672,7 +853,9 @@ export async function createFlightSimApp(
       runtime.setSimRunning(!inputManager.isPaused());
       skipResumeDelta = true;
       phoneSession?.syncStatus();
-      flightHud.update(state, inputManager.getControls(), inputManager.getGearDownNorm() > 0);
+      flightHud.update(state, inputManager.getControls(), inputManager.getGearDownNorm() > 0, {
+        pitch: pitchAutoTrim.enabled, roll: rollAutoTrim.enabled,
+      });
       controlPanel?.update(createPanelSnapshot(state));
       hudBar?.update(state, runtime.status, measuredFps, inputManager.isPaused());
       loading.hide();
@@ -722,7 +905,11 @@ export async function createFlightSimApp(
     }).catch(() => { if (!disposed) hudBar?.setPhoneStatus?.("Phone unavailable · Retry"); })
       .finally(() => { phoneLoading = null; });
   };
-  const onVisibilityChange = () => { if (document.hidden) phoneSession?.onHidden(); };
+  const onVisibilityChange = () => {
+    if (!document.hidden) return;
+    haptics.cancel();
+    phoneSession?.onHidden();
+  };
   document.addEventListener("visibilitychange", onVisibilityChange);
 
   controlPanel = createFlightControlPanel(panelRoot, createPanelSnapshot(), {
@@ -810,20 +997,23 @@ export async function createFlightSimApp(
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
       runtime.requestRender();
     },
+    // Debug A/B remains immediate and session-only; Settings can keep it explicitly.
     onWheelSpinModeChange: (mode) => {
-      wheelSpinMode = mode;
-      resetWheelSpin();
-      if (mode === "off") {
-        tireSoundEnabled = false;
-        tireAudio.setEnabled(false);
-      }
-      syncCollisionDebugOverlay();
+      wheelExperiment = { rotation: mode, tireSound: mode === "off" ? false : wheelExperiment.tireSound };
+      resetWheelSpin("mode");
+      applyGroundRuntime();
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
       runtime.requestRender();
     },
     onTireSoundChange: (enabled) => {
-      tireSoundEnabled = enabled && wheelSpinMode !== "off";
-      tireAudio.setEnabled(tireSoundEnabled);
+      // Synchronous inside the checkbox gesture so audio can unlock.
+      wheelExperiment = { ...wheelExperiment, tireSound: enabled && wheelSpinMode !== "off" };
+      applyGroundRuntime();
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+      runtime.requestRender();
+    },
+    onGroundInteractionAction: (action) => {
+      handleGroundAction(action);
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
       runtime.requestRender();
     },
@@ -956,6 +1146,7 @@ export async function createFlightSimApp(
       && terrainContact.update(false, googleTiles, true, true) === "reset") {
       physicsLoop.reset();
       visibleMeshCollision.reset();
+      wheelCues.setGroundRevision(++groundRevision);
     }
     if (flightPerformance) terrainQueryCpuMs += performance.now() - preContactStartedMs;
 
@@ -975,7 +1166,10 @@ export async function createFlightSimApp(
       // A terrain correction is a placement, not a swept flight trajectory.
       // Discard the old probe positions before testing the next movement.
       // Surface refinement adjusts placement but must preserve tire momentum.
-      if (contact === "reset") visibleMeshCollision.reset();
+      if (contact === "reset") {
+        visibleMeshCollision.reset();
+        wheelCues.setGroundRevision(++groundRevision);
+      }
       const collisionStartedMs = flightPerformance ? performance.now() : 0;
       const collisionReset = visibleMeshCollision.update();
       if (flightPerformance) collisionCpuMs += performance.now() - collisionStartedMs;
@@ -983,15 +1177,46 @@ export async function createFlightSimApp(
       // authority immediately before allowing this step to advance physics.
       const selected = phoneSession?.beforeStep(controls) ?? controls;
       if (selected === false || inputManager.isPaused()) return false;
-      if (collisionReset) { resetWheelSpin(); return "reset"; }
+      if (collisionReset) { resetWheelSpin("reset"); return "reset"; }
+      const onGround = [0, 1, 2].some((index) => {
+        const wow = jsbsim.sdk.getPropertyValue(`gear/unit[${index}]/WOW`);
+        return Number.isFinite(wow) && wow > 0.5;
+      });
+      const pitchRad = jsbsim.sdk.getPropertyValue("attitude/theta-deg") * Math.PI / 180;
+      const rollRad = jsbsim.sdk.getPropertyValue("attitude/phi-deg") * Math.PI / 180;
+      const pitched = stepPitchAutoTrim(pitchAutoTrim, {
+        dt: FIXED_DT,
+        pitchRad,
+        pitchRateRad: jsbsim.sdk.getPropertyValue("velocities/q-rad_sec"),
+        rollRad,
+        elevator: selected.elevator,
+        pitchTrim: selected.pitchTrim,
+        onGround,
+      });
+      const rolled = stepRollAutoTrim(rollAutoTrim, {
+        dt: FIXED_DT,
+        rollRad,
+        rollRateRad: jsbsim.sdk.getPropertyValue("velocities/p-rad_sec"),
+        aileron: selected.aileron,
+        rollTrim: selected.rollTrim,
+        onGround,
+      });
+      pitchAutoTrim = pitched.state;
+      rollAutoTrim = rolled.state;
+      selected.pitchTrim = pitched.pitchTrim;
+      selected.rollTrim = rolled.rollTrim;
+      inputManager.replacePitchTrim(pitched.pitchTrim);
+      inputManager.replaceRollTrim(rolled.rollTrim);
       applyFlightControls(jsbsim.sdk, selected, inputManager.getGearDownNorm());
       appliedControls = { ...selected };
       return contact;
     });
     const physicsLoopCpuMs = flightPerformance ? performance.now() - physicsStartedMs : 0;
-    tireAudio.setPaused(inputManager.isPaused() || terrainBlocked || !!physicsLoop.getFault());
-    if (tireStepSeconds > 0) tireAudio.update(tireSlipEnergy / tireStepSeconds);
-    tireSlipEnergy = tireStepSeconds = 0;
+    const feedbackHeld = inputManager.isPaused() || terrainBlocked || !!physicsLoop.getFault();
+    tireAudio.setPaused(feedbackHeld);
+    const slipPowerWatts = slipAudio.takeMeanPowerWatts();
+    if (slipPowerWatts !== null) tireAudio.update(slipPowerWatts);
+    haptics.tick(performance.now(), !feedbackHeld && !document.hidden);
 
     const tickNowMs = performance.now();
     if (terrainBlocked) {
@@ -1043,7 +1268,9 @@ export async function createFlightSimApp(
     const rig = aircraftModel?.getRig();
     if (rig) applyAircraftRig(rig, readControlSurfaceState(jsbsim.sdk), deltaSeconds);
     const phoneOwned = phoneSession?.getSnapshot().owner === "phone";
-    flightHud.update(displayState, phoneOwned ? appliedControls : controls, inputManager.getGearDownNorm() > 0);
+    flightHud.update(displayState, phoneOwned ? appliedControls : controls, inputManager.getGearDownNorm() > 0, {
+      pitch: pitchAutoTrim.enabled, roll: rollAutoTrim.enabled,
+    });
     const now = performance.now();
     if (now - lastPanelUpdateMs >= 100) {
       lastPanelUpdateMs = now;
@@ -1094,6 +1321,9 @@ export async function createFlightSimApp(
       flightHud.destroy();
       collisionDebugOverlay?.dispose();
       wheelSpinDebugOverlay?.dispose();
+      haptics.dispose();
+      gamepadHaptics.dispose();
+      wheelCues.invalidate("dispose");
       tireAudio.dispose();
       aircraftModel?.dispose();
       aircraft?.dispose();

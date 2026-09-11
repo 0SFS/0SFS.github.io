@@ -259,6 +259,11 @@ a Lycoming turns clockwise seen from the cockpit and a positive rotation about
 
 ### The blurred disc
 
+One instance of a general technique — **below the sampling limit draw the
+object, above it draw its time-average over one rotation** — which
+[docs/drawing-fast-rotation.md](drawing-fast-rotation.md) sets out once and the
+rolling tyres use as well.
+
 Past a certain speed the blades cannot be drawn honestly: they advance far
 enough between frames that the image aliases into a strobe. The blades are then
 hidden and a translucent disc is shown instead, which is also what a real
@@ -297,6 +302,61 @@ entirely.
 
 Coarse levels merge the control surfaces into their panels and expose only the
 propeller. The rig binds whatever it finds, so this needs no special handling.
+
+### Rolling tyres
+
+`Wheel_Left`, `_Right` and `_Nose` turn about their own local X — the axle —
+from **ground speed over the tyre's radius**, and only while a gear unit carries
+weight; airborne they hold whatever angle they stopped at rather than being
+driven by an airspeed no wheel is touching. The radius is measured off each
+node's bounding box, the same way the propeller disc sizes itself, so no
+airframe has to declare it.
+
+A bare tyre is rotationally symmetric and its rate of turn is invisible, so
+every tyre carries a **white band** straight through its hub — across both
+sidewalls and over the tread top and bottom. Past the sampling limit the tyre
+shows the band **averaged over a turn** instead. The argument, shared with the
+propeller disc, is [docs/drawing-fast-rotation.md](drawing-fast-rotation.md).
+
+**Neither is geometry.** The tyre is the plain n-sided cylinder, and both
+pictures are one texture on it, an atlas of two squares: the band on the left,
+its rotational average on the right. The runtime blurs a tyre by moving that
+texture's u offset half a width. Same mesh, same draw call, nothing hidden or
+shown, and not one triangle or vertex more than a plain rubber tyre.
+
+- The band looks the same every half turn, so it repeats **twice** per turn
+  and aliases at `π / 2 / frameSeconds` — 15 rev/s at 60 fps, about 35 kt on a
+  0.19 m tyre, more on a faster display. The frame interval is measured every
+  frame whether or not the aircraft has a propeller.
+- One decision covers every tyre, so the nose does not blur a frame before the
+  mains; they share one material, so the texture could carry no other. 20%
+  hysteresis, as for the propeller.
+- The sharp tyre is held at u offset **1**, not 0 (the sampler repeats, so it is
+  the same picture). At 0 the texture has no transform and Babylon compiles the
+  material without one, and the first blur would recompile it in the middle
+  of the take-off roll. `TYRE_SHARP_U` / `TYRE_BLURRED_U` in
+  `aircraftAnimation.ts`.
+
+The tyres come from `planes/shared/tyres.py`, which the C172 and the SF50 both
+build from. Levels with fewer than six sides on a tyre get plain rubber, with
+no texture and nothing to blur.
+
+The first version of the blur was a **second copy of every tyre**, `WheelBlur_*`,
+hidden until needed, like the propeller disc, plus extra edges cut into the tyre
+for the band. That added 48 triangles a tyre to a model that draws one of the
+two at a time, and more nodes and bytes to load, all to show a different
+picture on the same shape. The propeller needs a second mesh because its average
+is a different *shape*, a lens instead of blades. A tyre's average is the same
+shape, so it only needs a different texture. Don't bring a twin back.
+
+**The tyre is never collision geometry.** Ground contact is JSBSim's contact
+points; the body probes are points; the collision and wheel-spin debug overlays
+draw their own plain tyre outlines; and every mesh of the loaded aircraft is
+made unpickable, so the terrain probe and the chase camera never hit it.
+`createAircraftModel.test.ts` pins this. The visual model carries no physics
+mesh either. If collision ever needs a tyre, it is its own plain cylinder
+built from the radius and width, owned by the collision code, never read from
+this model and never shipped inside it.
 
 ## When the simulation stops
 

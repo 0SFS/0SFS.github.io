@@ -23,6 +23,11 @@ exported origin sits on the ground directly below the CG.
 import bpy, bmesh, sys, os, math
 from mathutils import Vector, Matrix
 
+# Tyres are shared with every other airframe - see planes/shared/tyres.py.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                "..", "..", "..", "shared"))
+import tyres  # noqa: E402
+
 # ----------------------------------------------------------------------------
 # args
 # ----------------------------------------------------------------------------
@@ -117,17 +122,17 @@ INTAKE_INSET = 0.09                 # how far the dark bore sits inside the lip
 # well has a rectangular panel immediately OUTBOARD of it. Scaled on the tyre in
 # the same frame (0.38 m across 110 px, so 290 px/m) that panel is 0.67 m wide
 # and starts at the well's rim.
-WING_BAY_X = (0.60, 1.78)           # spanwise edges of the mouth
+WING_BAY_X = (0.84, 1.78)           # spanwise edges of the mouth
 # ...and it is not one rectangle. The wheel end HUGS the tyre: a circle of
 # WELL_R about the stowed axle, merged into the rectangular leg bay outboard of
 # WELL_JOIN. A rectangle wide enough to contain the wheel is a much bigger hole
 # than the aeroplane has, and it reads as a box with a tyre loose in it.
-WELL_R = 0.245                      # wheel well radius; the tyre is 0.190
-WELL_JOIN = 1.02                    # where the circle merges into the rectangle
+WELL_R = 0.210                      # wheel well radius; the tyre is 0.190
+WELL_JOIN = 1.16                    # where the circle merges into the rectangle
 WELL_ARC = 9                        # points on the arc
 # The DOOR covers only the leg half. The wheel end stays open - the retracted
 # tyre is visible from outside and nothing closes over it.
-WING_DOOR_X = (1.10, 1.78)
+WING_DOOR_X = (1.16, 1.78)
 WING_BAY_ROW = 4                    # lower surface, 0.72 -> 0.35 chord
 WING_BAY_DEPTH = 0.16               # how far the pocket rises into the wing
 WING_BAY_TAPER = 0.94               # gentle: a hard taper over a 1.18 m mouth
@@ -225,7 +230,16 @@ LINK_R = dict(leg=(0.056, 0.036), oleo=(0.050, 0.044), arm=(0.044, 0.028))
 #
 # At x = 0.850 the wing's lower surface runs z = 0.745 to 0.772 across the
 # tyre's width, so a disc centred at 0.797 stands 18 to 45 mm proud of it.
-MAIN_STOWED = (0.850, 0.797)        # (x, z) of the retracted main axle
+# Far enough outboard that the WELL clears the FUSELAGE. The test is not where
+# the belly stops being the lowest surface - it is where the fuselage stops
+# existing under the wing at all, which is its half-width, 0.872 m at this
+# station. A well about an axle at 0.850 had its whole inboard half backed by
+# fuselage: the hole was cut in the wing, and what showed through it was belly.
+# 1.110 with a 0.21 m well puts the opening at 0.90 to 1.32, clear by 28 mm.
+#
+# The hinge that falls out of it is well placed too - x 1.712, z 0.792, at the
+# wing's lower surface and 0.60 m from the axle against a 0.69 m strut.
+MAIN_STOWED = (1.110, 0.797)        # (x, z) of the retracted main axle
 NOSE_STOWED = (-0.750, 1.080)       # (y, z) of the retracted nose axle
 NOSE_SENSE = -1                     # forward, not aft
 
@@ -709,7 +723,10 @@ def mat(name, rgba, rough=0.45, metal=0.0, alpha=1.0, spec=None):
 
 M_PAINT = mat("SF50_Paint", (0.905, 0.910, 0.915, 1.0), 0.32)
 M_GLASS = mat("SF50_Glass", (0.030, 0.045, 0.068, 1.0), 0.38, spec=0.12)
-M_DARK = mat("SF50_Dark", (0.085, 0.088, 0.095, 1.0), 0.55)   # tyres, intake bore
+M_DARK = mat("SF50_Dark", (0.085, 0.088, 0.095, 1.0), 0.55)   # intake bore, bays
+# Tyres make their own material - planes/shared/tyres.py. It is BLACKER than
+# the bays, because a tyre reads as rubber only if it is nearly black; the bay
+# grey is a shadowed cavity, which is a different thing.
 M_METAL = mat("SF50_Metal", (0.545, 0.555, 0.575, 1.0), 0.32, metal=0.85)
 # The windscreen's centre post. Not M_DARK, which is for tyres and the intake
 # bore: those are matte and deep inside the aircraft, so their specular level
@@ -1617,8 +1634,19 @@ def build_wing(side):
         # The circle lives in (station, t) where t is a fraction ACROSS the row,
         # so the radius has to be converted into t or the well comes out
         # elliptical - the row is 0.68 m deep and the bay 1.18 m wide.
-        row_len = (Vector(rings[ij][k]) - Vector(rings[ij][row])).length
-        rt = WELL_R / row_len
+        #
+        # And t is SOLVED for the axle, not taken as 0.5. Mid-row is 0.062 m
+        # forward of where the stowed wheel actually sits, which is small enough
+        # to look like nothing and large enough that the well and the tyre are
+        # visibly not concentric. Both the fraction and the row length are read
+        # at the circle's OWN station rather than at the join, because the row
+        # is 40 mm deeper at one end of the well than the other.
+        f_c = ((MAIN_STOWED[0] - WING_BAY_X[0])
+               / (WELL_JOIN - WING_BAY_X[0]))
+        c0 = Vector(rings[ia][row]).lerp(Vector(rings[ij][row]), f_c)
+        c1 = Vector(rings[ia][k]).lerp(Vector(rings[ij][k]), f_c)
+        ct = (MAIN_AXLE_Y - c0.y) / (c1.y - c0.y)
+        rt = WELL_R / (c1 - c0).length
         phi0 = math.acos(max(-1.0, min(1.0,
                                        (WELL_JOIN - MAIN_STOWED[0]) / WELL_R)))
         # phi0 -> 2*pi - phi0 walks from the upper crossing of the join station
@@ -1627,7 +1655,7 @@ def build_wing(side):
         for i in range(WELL_ARC):
             phi = phi0 + (i / (WELL_ARC - 1)) * (2 * math.pi - 2 * phi0)
             arc.append((MAIN_STOWED[0] + WELL_R * math.cos(phi),
-                        0.5 + rt * math.sin(phi)))
+                        ct + rt * math.sin(phi)))
 
         def surf(xx, tt):
             """Point at absolute station xx, fraction tt across the row.
@@ -2072,25 +2100,20 @@ def build_wing_bay(side):
 
 
 def build_wheel(name, center, r, w, n):
-    """Tyre as an n-gon cylinder with its axis along X.
+    """The plain n-sided tyre, with the band and its blur in one texture.
 
-    The ring angles start at -90 deg so ONE vertex sits exactly at the bottom of
-    the tyre at every n.  The Cessna's LOD2 and LOD3 floated above the runway
-    because their coarse wheels had no bottom vertex, and the bounding box the
-    sim stands on is built from vertices, not from the circle they approximate.
+    planes/shared/tyres.py builds it, for the C172 too. The band is what makes
+    the rate of turn readable, and it is painted, not modelled: the mesh is the
+    same cylinder it always was, and the runtime shifts the texture to its
+    blurred half once the tyre turns faster than the display can show -
+    docs/drawing-fast-rotation.md. The far level's tyre is plain rubber: at the
+    170 m it takes over from, the band is a pixel.
     """
     if n <= 0:
         return None
-    cx, cy, cz = center
-    rings = []
-    for s in (-w / 2.0, w / 2.0):
-        ring = []
-        for i in range(n):
-            a = 2 * math.pi * i / n - math.pi / 2.0
-            ring.append((cx + s, cy + r * math.cos(a), cz + r * math.sin(a)))
-        rings.append(ring)
-    verts, faces = loft(rings, cap_start=True, cap_end=True)
-    return make(name, verts, faces, M_DARK, origin=center, smooth_angle=45.0)
+    wheel = tyres.build_tyre(bpy, name, center, r, w, n, "SF50", SC.collection)
+    BUILT.append(wheel)
+    return wheel
 
 
 # ----------------------------------------------------------------------------
@@ -2144,8 +2167,8 @@ bpy.context.view_layer.update()
 # ----------------------------------------------------------------------------
 GEAR_CHILDREN = {
     "LandingGear_Nose": ["Wheel_Nose"],
-    "LandingGear_Left": ["Wheel_Left", "GearDoor_Left"],
-    "LandingGear_Right": ["Wheel_Right", "GearDoor_Right"],
+    "LandingGear_Left": ["Wheel_Left"],
+    "LandingGear_Right": ["Wheel_Right"],
 }
 by_name = {ob.name: ob for ob in BUILT}
 for leg_name, child_names in GEAR_CHILDREN.items():

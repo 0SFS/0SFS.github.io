@@ -27,15 +27,23 @@
   font-family: "SF Mono", "Menlo", "Consolas", monospace;
   /* Clears the bottom button bar so attitude / levers stay readable. */
   --flight-controls-bottom: calc(56px + var(--foss-inset-bottom, 0px));
+  --flight-attitude-size: 220px;
+  --flight-side-column: 56px;
+  --flight-auto-trim-size: 35px;
+  --flight-roll-trim-height: 16px;
+  --flight-lever-thickness: var(--flight-roll-trim-height);
+  --flight-attitude-cluster-height: calc(var(--flight-auto-trim-size) + 2px + var(--flight-attitude-size));
 }
 
 .flight-hud__attitude-cluster {
   position: absolute;
   left: 24px;
   bottom: var(--flight-controls-bottom);
-  display: flex;
-  align-items: center;
-  gap: 2px;
+  display: grid;
+  grid-template-columns: var(--flight-side-column) var(--flight-attitude-size) var(--flight-side-column);
+  grid-template-rows: var(--flight-auto-trim-size) var(--flight-attitude-size);
+  column-gap: 0;
+  row-gap: 2px;
   pointer-events: auto;
 }
 
@@ -43,9 +51,11 @@
   position: relative;
   left: auto;
   bottom: auto;
+  grid-column: 2;
+  grid-row: 2;
   flex: 0 0 auto;
-  width: 220px;
-  height: 220px;
+  width: var(--flight-attitude-size);
+  height: var(--flight-attitude-size);
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -68,13 +78,13 @@
  * Sits directly on top of the attitude cluster, so the numbers are read in
  * the same glance as the horizon rather than at the other end of the screen.
  * Anchored on `bottom` so a wrapped row grows upward and the gap to the
- * cluster stays fixed. 220px is the attitude square; the trim/flaps levers
- * add roughly 48px each plus gaps.
+ * cluster stays fixed. The attitude square plus the roll-trim row above it
+ * set the cluster height; the pitch/flaps levers sit in the same grid.
  */
 .flight-hud__tapes {
   position: absolute;
   left: 24px;
-  bottom: calc(var(--flight-controls-bottom) + 220px + 8px);
+  bottom: calc(var(--flight-controls-bottom) + var(--flight-attitude-cluster-height) + 8px);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -261,8 +271,192 @@
   cursor: ns-resize;
 }
 
-.flight-hud__attitude-cluster .flight-hud__slider-control input[type="range"] {
-  height: 180px;
+.flight-hud__auto-trims {
+  grid-column: 1;
+  grid-row: 1;
+  position: relative;
+  display: grid;
+  grid-template: 1fr / 1fr;
+  justify-self: end;
+  align-self: end;
+  width: var(--flight-auto-trim-size);
+  height: var(--flight-auto-trim-size);
+  overflow: hidden;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.flight-hud__auto-trims::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom right,
+    transparent calc(50% - 0.6px),
+    rgba(255, 255, 255, 0.28) 50%,
+    transparent calc(50% + 0.6px)
+  );
+}
+
+.flight-hud__auto-trim {
+  display: flex;
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  appearance: none;
+  cursor: pointer;
+}
+
+.flight-hud__auto-trim--roll {
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 3px 3px 0 0;
+  text-align: right;
+}
+
+.flight-hud__auto-trim--pitch {
+  clip-path: polygon(0 0, 0 100%, 100% 100%);
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 0 0 3px 3px;
+}
+
+.flight-hud__auto-trim:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.flight-hud__auto-trim:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(255, 210, 80, 0.45);
+}
+
+.flight-hud__auto-trim.is-on {
+  color: #11161a;
+  background: var(--flight-panel-accent);
+}
+
+.flight-hud__slider-control--roll-trim {
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: 1fr;
+  align-items: center;
+  align-self: end;
+  gap: 6px;
+  width: auto;
+  height: var(--flight-roll-trim-height);
+  padding: 0 8px;
+}
+
+.flight-hud__slider-control--roll-trim input[type="range"] {
+  width: 100%;
+  height: 12px;
+  writing-mode: horizontal-tb;
+  direction: ltr;
+  cursor: ew-resize;
+}
+
+.flight-hud__slider-control input[type="range"]:disabled {
+  cursor: default;
+  opacity: 0.9;
+}
+
+.flight-hud__lever {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  pointer-events: auto;
+}
+
+.flight-hud__lever--pitch {
+  grid-column: 1;
+  grid-row: 2;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 3px;
+}
+
+.flight-hud__lever--flaps {
+  grid-column: 3;
+  grid-row: 2;
+  justify-content: flex-start;
+}
+
+.flight-hud__lever-meta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  font-size: 9px;
+  letter-spacing: 0;
+  opacity: 0.8;
+}
+
+.flight-hud__lever--flaps .flight-hud__lever-meta {
+  align-items: flex-start;
+}
+
+.flight-hud__lever--pitch .flight-hud__lever-meta {
+  flex: 0 0 auto;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.flight-hud__lever--pitch .flight-hud__lever-track {
+  flex: 1 1 auto;
+  width: var(--flight-lever-thickness);
+  min-height: 0;
+}
+
+.flight-hud__lever-track {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  flex: 0 0 var(--flight-lever-thickness);
+  width: var(--flight-lever-thickness);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 2px 0;
+}
+
+.flight-hud__lever-track input[type="range"] {
+  width: 10px;
+  height: 100%;
+  margin: 0;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  accent-color: var(--flight-panel-accent);
+  cursor: ns-resize;
+}
+
+.flight-hud__lever-track input[type="range"]:disabled {
+  cursor: default;
+  opacity: 0.9;
 }
 
 .flight-hud__throttle .flight-hud__slider-control input[type="range"] {
@@ -286,14 +480,16 @@
 }
 
 /*
- * Sits under the right-side + launcher or tab strip (both 30px at 12px from
- * the top). z-index 15 is above dock panels (10) and below the add-tab menu (20)
- * so the chip stays visible on an open panel without covering the menu.
+ * Sits under the left-side + launcher or tab strip (both 30px at 12px from
+ * the top). When the window is too narrow for a left slot, the chip still
+ * occupies this typical FPS corner. z-index 15 is above dock panels (10) and
+ * below the add-tab menu (20) so the chip stays visible on an open panel
+ * without covering the menu.
  */
 .flight-fps-button {
   position: absolute;
   top: 48px;
-  right: 12px;
+  left: 12px;
   z-index: 15;
   pointer-events: auto;
   font-variant-numeric: tabular-nums;
@@ -892,16 +1088,19 @@
   .flight-hud {
     /* Wrapped bottom chip row needs more clearance than the desktop single row. */
     --flight-controls-bottom: calc(96px + var(--foss-inset-bottom, 0px));
+    --flight-attitude-size: 130px;
+    --flight-side-column: 40px;
+    --flight-auto-trim-size: 25px;
+    --flight-roll-trim-height: 14px;
   }
 
   .flight-hud__attitude-cluster {
     left: 10px;
-    gap: 1px;
   }
 
   .flight-hud__attitude {
-    width: 130px;
-    height: 130px;
+    width: var(--flight-attitude-size);
+    height: var(--flight-attitude-size);
   }
 
   .flight-hud__yaw-throttle {
@@ -923,12 +1122,23 @@
     padding: 2px 1px;
   }
 
+  .flight-hud__slider-control--roll-trim {
+    width: auto;
+    height: var(--flight-roll-trim-height);
+    padding: 0 6px;
+  }
+
   .flight-hud__slider-control input[type="range"] {
     width: 12px;
   }
 
-  .flight-hud__attitude-cluster .flight-hud__slider-control input[type="range"] {
-    height: 108px;
+  .flight-hud__slider-control--roll-trim input[type="range"] {
+    width: 100%;
+    height: 10px;
+  }
+
+  .flight-hud__auto-trim {
+    font-size: 7px;
   }
 
   .flight-hud__throttle .flight-hud__slider-control input[type="range"] {
@@ -937,8 +1147,8 @@
 
   .flight-hud__tapes {
     left: 10px;
-    /* Tracks the 130px attitude square this breakpoint shrinks it to. */
-    bottom: calc(var(--flight-controls-bottom) + 130px + 8px);
+    /* Tracks the attitude cluster this breakpoint shrinks. */
+    bottom: calc(var(--flight-controls-bottom) + var(--flight-attitude-cluster-height) + 8px);
     gap: 4px;
     max-width: calc(100vw - 20px);
   }

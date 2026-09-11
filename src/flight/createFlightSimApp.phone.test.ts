@@ -7,7 +7,7 @@ import type { FlightHudBarOptions } from "./hud/createFlightHudBar";
 const mocks = vi.hoisted(() => {
   const state = { latDeg: 1, lonDeg: 2, altMeters: 1000, headingRad: 0, airspeedKts: 110 };
   const snapshot = { owner: "local" as "local" | "phone", phase: "paired" };
-  const phoneControls = { elevator: -0.4, aileron: 0.6, rudder: 0.5, throttle: 0.83, pitchTrim: -0.2, flaps: 1 / 3, brake: 1 };
+  const phoneControls = { elevator: -0.4, aileron: 0.6, rudder: 0.5, throttle: 0.83, pitchTrim: -0.2, rollTrim: 0.15, flaps: 1 / 3, brake: 1 };
   const phone = {
     subscribe: vi.fn(() => vi.fn()), getSnapshot: () => snapshot,
     beforeStep: vi.fn(), takeControl: vi.fn(), cancelHandoff: vi.fn(), reset: vi.fn(),
@@ -56,7 +56,7 @@ vi.mock("./aircraft/createPlaceholderAircraft", () => ({ createPlaceholderAircra
 vi.mock("./aircraft/aircraftCatalog", () => ({ isAircraftId: () => true, isAircraftLodId: () => true }));
 vi.mock("./aircraft/createAircraftModel", () => ({ createAircraftModel: () => mocks.aircraftModel }));
 vi.mock("./aircraft/aircraftAnimation", () => ({ applyAircraftRig: vi.fn(), readControlSurfaceState: vi.fn() }));
-vi.mock("./physics/fixedStepLoop", () => ({ createFixedStepPhysicsLoop: () => mocks.physics }));
+vi.mock("./physics/fixedStepLoop", () => ({ FIXED_DT: 1 / 120, createFixedStepPhysicsLoop: () => mocks.physics }));
 vi.mock("./physics/terrainContact", () => ({ createTerrainContact: () => mocks.terrainContact }));
 vi.mock("./physics/visibleMeshCollision", () => ({ createVisibleMeshCollision: () => mocks.visibleMeshCollision }));
 vi.mock("./input/flightCameraInput", () => ({ attachFlightCameraInput: () => vi.fn() }));

@@ -7,10 +7,10 @@
  "vertices": 254,
  "materials": 4,
  "material_names": [
-  "SF50_Dark",
   "SF50_Glass",
   "SF50_Metal",
-  "SF50_Paint"
+  "SF50_Paint",
+  "SF50_TyrePlain"
  ],
  "textures": 0,
  "texture_names": [],
@@ -262,7 +262,7 @@
    "tris": 12,
    "verts": 8,
    "mats": [
-    "SF50_Dark"
+    "SF50_TyrePlain"
    ],
    "origin": [
     -1.707,
@@ -287,7 +287,7 @@
    "tris": 12,
    "verts": 8,
    "mats": [
-    "SF50_Dark"
+    "SF50_TyrePlain"
    ],
    "origin": [
     1.707,
@@ -312,7 +312,7 @@
    "tris": 12,
    "verts": 8,
    "mats": [
-    "SF50_Dark"
+    "SF50_TyrePlain"
    ],
    "origin": [
     0.0,
@@ -340,9 +340,9 @@
     "SF50_Metal"
    ],
    "origin": [
-    -1.582,
+    -1.712,
     -0.406,
-    0.922
+    0.792
    ],
    "bbox": [
     [
@@ -365,9 +365,9 @@
     "SF50_Metal"
    ],
    "origin": [
-    1.582,
+    1.712,
     -0.406,
-    0.922
+    0.792
    ],
    "bbox": [
     [

@@ -37,7 +37,11 @@ export function PhoneController({ client }: { client: PhoneControllerClient }) {
       <div className="phone-controls__right"><PhoneStick label="PITCH / ROLL" disabled={!state.canControl} onChange={stick} /><p className="phone-stick-help">Pull down to climb · Release to center</p></div>
     </section>
     <section className="phone-settings" aria-label="Aircraft settings">
-      <div className="phone-panel phone-trim"><label htmlFor="phone-trim">PITCH TRIM <output>{Math.round(state.controls.pitchTrim * 100)}%</output></label>
+      <div className="phone-panel phone-trim">
+        <label htmlFor="phone-roll-trim">ROLL TRIM <output>{Math.round(state.controls.rollTrim * 100)}%</output></label>
+        <div><input id="phone-roll-trim" type="range" min="-1" max="1" step=".01" value={state.controls.rollTrim} disabled={!state.canControl} onChange={event => client.updateControls({ rollTrim: Number(event.target.value) })} />
+          <button type="button" disabled={!state.canControl} onClick={() => client.updateControls({ rollTrim: 0 })}>Center</button></div>
+        <label htmlFor="phone-trim">PITCH TRIM <output>{Math.round(state.controls.pitchTrim * 100)}%</output></label>
         <div><input id="phone-trim" type="range" min="-1" max="1" step=".01" value={state.controls.pitchTrim} disabled={!state.canControl} onChange={event => client.updateControls({ pitchTrim: Number(event.target.value) })} />
           <button type="button" disabled={!state.canControl} onClick={() => client.updateControls({ pitchTrim: 0 })}>Center</button></div>
       </div>

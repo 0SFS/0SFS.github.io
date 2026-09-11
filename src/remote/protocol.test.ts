@@ -5,7 +5,7 @@ import {
 } from "./protocol";
 
 const controls: ControlSurfaceState = {
-  elevator: -0.3, aileron: 0.4, rudder: -0.5, throttle: 0.83, pitchTrim: 0.2, flaps: 1 / 3, brake: 0,
+  elevator: -0.3, aileron: 0.4, rudder: -0.5, throttle: 0.83, pitchTrim: 0.2, rollTrim: -0.1, flaps: 1 / 3, brake: 0,
 };
 const status: AircraftStatus = {
   owner: "local", paused: false, viewMode: "third", controls, airspeedKts: 110, altitudeFt: 4321, headingDeg: 231,
@@ -51,7 +51,7 @@ describe("phone protocol parsing", () => {
 
   it("rejects missing controls, every invalid range, nonfinite values, and nonnumeric values", () => {
     for (const key of Object.keys(controls)) {
-      const signed = ["elevator", "aileron", "rudder", "pitchTrim"].includes(key);
+      const signed = ["elevator", "aileron", "rudder", "pitchTrim", "rollTrim"].includes(key);
       for (const invalid of [1.001, signed ? -1.001 : -0.001, NaN, Infinity, -Infinity, "0", null, undefined]) {
         const value = { ...controls, [key]: invalid };
         expect(isControls(value), `${key}: ${String(invalid)}`).toBe(false);

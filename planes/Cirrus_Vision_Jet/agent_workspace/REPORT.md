@@ -586,11 +586,26 @@ connected and the triangulator can have it whole. Both arc ends sit on the join
 station's edge, which the dropped face has already left open, so they split
 nothing and there is no T-junction.
 
-The circle has to be defined in (station, fraction-across-the-row), which means
-converting its radius into that fraction - the row is 0.68 m deep and the bay
-1.18 m wide, so a circle specified in the row's own parameter comes out an
-ellipse. 72 triangles for the shaping, and the wheel now sits in a well rather
-than in a box.
+The circle has to be defined in (station, fraction-across-the-row), and two
+things about that fraction are easy to get wrong and were:
+
+- **Its radius has to be converted into the fraction.** The row is 0.68 m deep
+  and the bay 1.18 m wide, so a circle specified in the row's own parameter
+  comes out an ellipse.
+- **The centre has to be SOLVED for the axle, not taken as mid-row.** Mid-row
+  is 0.062 m forward of where the stowed wheel sits - small enough to look like
+  nothing and large enough that the well and the tyre are visibly not
+  concentric. Both the fraction and the row length are read at the circle's own
+  station rather than at the join, because the row is 40 mm deeper at one end
+  of the well than at the other.
+
+The check is not the render: measure the arc's vertices against the wheel's
+centre and they should all be one radius. They come out 0.240 to 0.248 against
+a nominal 0.245. The arc's *centroid* is no use for this - it is a 268 deg arc,
+not a full circle, so it sits well inboard of the centre it is drawn about.
+
+72 triangles for the shaping, and the wheel now sits in a well rather than in a
+box.
 
 **One opening, not two.** The wheel well and the leg bay are one indent at one
 depth, running x = 0.60 to 1.78 - inboard of the stowed wheel, out past the
@@ -706,6 +721,37 @@ left the Cessna's two coarsest levels floating. The validator asserts it: the lo
 vertex is at `z = 0.0` at all three levels. Every level keeps its tyres: the
 one that did without them was the 98-triangle silhouette, and it is gone.
 
+**The tyres are banded, and they are not this airframe's.** They come from
+`planes/shared/tyres.py`, which the C172 builds from too: the plain n-sided
+tyre in near-black rubber (darker than the bays' grey, which is a shadowed
+cavity and a different thing), with one texture. That texture is an atlas: a
+white band 68 mm wide straight through the hub on one half, and the band
+averaged over a turn on the other. The runtime moves the texture to the
+blurred half once the band spins faster than the display can show. The atlas
+is this airframe's one texture, which is why the texture count is not zero.
+`docs/drawing-fast-rotation.md` has the argument and `docs/aircraft-assets.md`
+the runtime side.
+
+The band and its blur cost **no geometry**: the counts are exactly what they
+were with plain tyres. It took four passes to get there:
+
+1. One tread block painted white. Free, correct, and invisible in the running
+   simulator, because a tyre is looked at from the side.
+2. The caps fanned from a hub vertex with one fan triangle painted. That's a
+   pizza slice, not a stripe, because every fan triangle widens toward the rim.
+3. Two parallel chords cut into the ring (16 triangles a tyre), plus a blurred
+   twin `WheelBlur_*` hidden until needed (32 more). This was a real stripe,
+   but 144 triangles and three nodes spent on a picture.
+4. A planar texture projection on the plain tyre. It's exact for any polygon,
+   so the band is a straight, constant-width stripe even on LOD3's 8-sided
+   tyre, and the blur is a u offset on the same texture.
+
+![sharp and blurred, the same mesh](renders/tyres/TYRE_COMPARE.png)
+
+LOD1 keeps plain rubber tyres with no texture. None of it is collision
+geometry: the loaded aircraft is unpickable, contact is JSBSim's points, and
+the model carries no physics mesh.
+
 ---
 
 ## Validation
@@ -723,8 +769,8 @@ one that did without them was the 98-triangle silhouette, and it is gone.
 | loose vertices | 0 | 0 | 0 |
 | unapplied transforms | 0 | 0 | 0 |
 | symmetry error, max | 0.0 | 0.0 | 0.0 |
-| textures | 0 | 0 | 0 |
-| materials | 5 | 5 | 4 |
+| textures | 1 | 1 | 0 |
+| materials | 8 | 8 | 4 |
 
 **Symmetry is exactly zero** and should be: unlike the Cessna there is no
 propeller, so this airframe has no genuinely asymmetric part. Anything non-zero

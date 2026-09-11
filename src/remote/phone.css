@@ -113,6 +113,7 @@ button { touch-action: manipulation; }
 .phone-brake { min-height: 54px; border: 1px solid #58798f; border-radius: 12px; color: #e9f7ff; background: #263f53; font-weight: 700; }
 .phone-settings { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .phone-trim > div { display: flex; align-items: center; gap: 8px; margin-top: 7px; }
+.phone-trim label + div + label { margin-top: 12px; }
 .phone-trim button, .phone-flaps button, .phone-actions button { min-height: 44px; border: 1px solid #58798f; border-radius: 9px; color: #eaf8ff; background: #24465e; padding: 9px 11px; }
 .phone-flaps { min-width: 0; }
 .phone-flaps > div { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 5px; }
@@ -171,3 +172,6 @@ button:focus-visible, input:focus-visible { outline: 3px solid #86e5ff; outline-
   .phone-actions { grid-column: 2; grid-row: 5; }
   .phone-diagnostics { grid-column: 1 / -1; }
 }
+.phone-haptics { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.phone-haptics small { display: block; font-size: 10px; opacity: .72; }
+.phone-haptics input { width: 22px; height: 22px; }

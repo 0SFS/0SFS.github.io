@@ -50,7 +50,7 @@ export type RemoteMessage =
   | (Envelope & { type: "ping" | "pong"; id: number; sentAt: number });
 
 export const NEUTRAL_CONTROLS: ControlSurfaceState = {
-  elevator: 0, aileron: 0, rudder: 0, throttle: 0, pitchTrim: 0, flaps: 0, brake: 0,
+  elevator: 0, aileron: 0, rudder: 0, throttle: 0, pitchTrim: 0, rollTrim: 0, flaps: 0, brake: 0,
 };
 export function neutralize(controls: ControlSurfaceState): ControlSurfaceState {
   return { ...controls, elevator: 0, aileron: 0, rudder: 0, brake: 0 };
@@ -71,7 +71,7 @@ function boundedString(value: unknown, limit = 256): value is string {
 }
 export function isControls(value: unknown): value is ControlSurfaceState {
   if (!record(value)) return false;
-  return ["elevator", "aileron", "rudder", "pitchTrim"].every(key => finite(value[key]) && Math.abs(value[key]) <= 1)
+  return ["elevator", "aileron", "rudder", "pitchTrim", "rollTrim"].every(key => finite(value[key]) && Math.abs(value[key]) <= 1)
     && ["throttle", "flaps", "brake"].every(key => finite(value[key]) && value[key] >= 0 && value[key] <= 1);
 }
 export function isHapticFeedback(value: unknown): value is HapticFeedbackFrame {

@@ -471,7 +471,7 @@ export function createPhoneControllerClient(
       if (!isControls(next)) return
       controls = next
       // Persistent controls render their values; stick motion never waits on a render.
-      if (partial.throttle !== undefined || partial.pitchTrim !== undefined || partial.flaps !== undefined) emit({ controls: { ...controls } })
+      if (partial.throttle !== undefined || partial.pitchTrim !== undefined || partial.rollTrim !== undefined || partial.flaps !== undefined) emit({ controls: { ...controls } })
       sendControls()
     },
     cancelTransientControls,

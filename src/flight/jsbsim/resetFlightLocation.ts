@@ -56,6 +56,7 @@ export function resetFlightLocation(sdk: JSBSimSdk, location: GeodeticLocation, 
     sdk.setPropertyValue("fcs/aileron-cmd-norm", 0);
     sdk.setPropertyValue("fcs/rudder-cmd-norm", 0);
     sdk.setPropertyValue("fcs/pitch-trim-cmd-norm", 0);
+    sdk.setPropertyValue("fcs/roll-trim-cmd-norm", 0);
     sdk.setPropertyValue("propulsion/set-running", -1);
     sdk.setPropertyValue("propulsion/magneto_cmd", 3);
     sdk.setPropertyValue("fcs/gear-cmd-norm", 1);

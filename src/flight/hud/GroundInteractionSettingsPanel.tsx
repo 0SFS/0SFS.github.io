@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  GROUND_CHOICES, GROUND_PRESETS, groundChoiceUnavailable,
+  GROUND_CHOICE_LABELS, GROUND_CHOICES, GROUND_PRESETS, groundChoiceUnavailable,
   type GroundCapabilities, type GroundInteractionSettingsV1, type GroundLockableKey, type GroundPresetId,
   type GroundResolution,
 } from "../settings/groundInteractionSettings";
@@ -30,19 +30,6 @@ export type GroundInteractionAction =
   | { type: "import"; text: string }
   | { type: "keep-experiment" }
   | { type: "discard-experiment" };
-
-export const GROUND_CHOICE_LABELS: { [K in GroundLockableKey]: Record<GroundInteractionSettingsV1[K], string> } = {
-  rotation: { off: "Off", instant: "Instant rolling", inertia: "Finite inertia" },
-  forceModel: { "jsbsim": "Existing JSBSim", "coupled-rigid": "Coupled rigid wheel",
-    "combined-slip": "Combined-slip tire", "compliant-soil": "Compliant tire and soil" },
-  contactModel: { "shared": "Shared terrain", "per-wheel-point": "Per-wheel support",
-    "footprint": "Wheel footprint", "swept": "Swept wheel shape" },
-  backend: { "auto": "Auto (CPU today)", "cpu-js": "CPU · JavaScript", "cpu-wasm": "CPU · WASM",
-    "worker": "Worker", "gpu": "GPU" },
-  tireAudio: { off: "Off", slip: "Slip cue", contact: "Contact cues", geometry: "Geometry rolling", detailed: "Detailed" },
-  haptics: { off: "Off", landing: "Landing cues", roughness: "Roughness" },
-  wheelVisuals: { off: "Off", asset: "Asset wheel rotation" },
-};
 
 const ROW_LABELS: Record<GroundLockableKey, string> = {
   rotation: "Wheel response", forceModel: "Ground forces", contactModel: "Ground contact",

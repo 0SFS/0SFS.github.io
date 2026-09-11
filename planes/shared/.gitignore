@@ -1,0 +1,2 @@
+# Blender writes these when a generator imports the shared tyre module.
+__pycache__/

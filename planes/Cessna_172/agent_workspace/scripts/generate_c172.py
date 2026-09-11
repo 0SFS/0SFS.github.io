@@ -22,6 +22,11 @@ exported origin sits on the ground directly below the CG.
 import bpy, bmesh, sys, os, math
 from mathutils import Vector, Matrix
 
+# Tyres are shared with every other airframe - see planes/shared/tyres.py.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                "..", "..", "..", "shared"))
+import tyres  # noqa: E402
+
 # ----------------------------------------------------------------------------
 # args
 # ----------------------------------------------------------------------------
@@ -185,7 +190,9 @@ def mat(name, rgba, rough=0.45, metal=0.0, alpha=1.0, spec=None):
 M_PAINT = mat("C172_Paint", (0.90, 0.90, 0.91, 1.0), 0.35)
 M_TRIM  = mat("C172_Trim",  (0.10, 0.24, 0.48, 1.0), 0.30)
 M_GLASS = mat("C172_Glass", (0.035, 0.052, 0.078, 1.0), 0.42, spec=0.12)
-M_DARK  = mat("C172_Dark",  (0.09, 0.09, 0.10, 1.0), 0.55)   # tyres, prop, antiglare
+M_DARK  = mat("C172_Dark",  (0.09, 0.09, 0.10, 1.0), 0.55)   # prop, antiglare
+# Tyres make their own material, blacker than M_DARK - the same tyre every
+# airframe uses, from planes/shared/tyres.py.
 M_METAL = mat("C172_Metal", (0.55, 0.56, 0.58, 1.0), 0.32, metal=0.85)  # gear, struts, spinner
 # Shown in place of the blades once they alias; translucent so the airframe
 # and the world behind stay visible through the disc.
@@ -854,19 +861,21 @@ def build_nose_gear():
 
 
 def build_wheel(name, center, r, w, n):
-    """Tyre as an n-gon cylinder with its axis along X."""
+    """The plain n-sided tyre, with the band and its blur in one texture.
+
+    planes/shared/tyres.py builds it, exactly as it builds the SF50's, so the two
+    airframes cannot drift apart on something a viewer compares side by side.
+    The band is painted, not modelled, and the runtime shifts the texture to its
+    blurred half once the tyre turns faster than the display can show - the
+    propeller disc's rule, docs/drawing-fast-rotation.md. Levels with fewer than
+    six sides get plain rubber: LOD1 is drawn from 160 m, where the band is a
+    pixel.
+    """
     if n <= 0:
         return None
-    cx, cy, cz = center
-    rings = []
-    for s in (-w / 2.0, w / 2.0):
-        ring = []
-        for i in range(n):
-            a = 2 * math.pi * i / n + math.pi / 2
-            ring.append((cx + s, cy + r * math.cos(a), cz + r * math.sin(a)))
-        rings.append(ring)
-    verts, faces = loft(rings, cap_start=True, cap_end=True)
-    return make(name, verts, faces, M_DARK, origin=center, smooth_angle=45.0)
+    wheel = tyres.build_tyre(bpy, name, center, r, w, n, "C172", SC.collection)
+    BUILT.append(wheel)
+    return wheel
 
 
 # ----------------------------------------------------------------------------

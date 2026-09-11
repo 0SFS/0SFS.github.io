@@ -31,7 +31,7 @@ const mocks = vi.hoisted(() => {
     collisionOverlay: { setEnabled: vi.fn(), update: vi.fn(), dispose: vi.fn() },
     wheelOverlay: { setEnabled: vi.fn(), update: vi.fn(), dispose: vi.fn() },
     wheelSpin: { step: vi.fn(), reset: vi.fn(), getStates: () => [] },
-    tireAudio: { setEnabled: vi.fn(), setPaused: vi.fn(), update: vi.fn(), dispose: vi.fn(), getStatus: () => null },
+    tireAudio: { setEnabled: vi.fn(), setPaused: vi.fn(), setVolume: vi.fn(), update: vi.fn(), dispose: vi.fn(), getStatus: () => null },
     aircraft: {
       root: {},
       setViewMode: vi.fn(), toggleViewMode: vi.fn(), getViewMode: () => "third",

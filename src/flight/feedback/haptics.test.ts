@@ -38,6 +38,17 @@ describe("haptic aggregation", () => {
     expect(aggregator.take(1)).toBeNull();
   });
 
+  it("pulses for spin-up slip but not for a sustained skid long after contact", () => {
+    const bus = createWheelCueBus(NAMES);
+    const aggregator = createHapticAggregator();
+    bus.subscribe(aggregator);
+    bus.publish(0, DT, wheels([false, false, false]));
+    for (let step = 0; step < 60; step++) bus.publish(DT * (step + 1), DT, wheels([true, true, true], 4_000, 20_000));
+    expect(aggregator.take(1)?.weak).toBeGreaterThan(0);
+    for (let step = 0; step < 6; step++) bus.publish(1 + DT * step, DT, wheels([true, true, true], 4_000, 50_000));
+    expect(aggregator.take(1)).toBeNull();
+  });
+
   it("scales by strength, rejects invalid strength and never exceeds unit magnitude", () => {
     const aggregator = createHapticAggregator();
     const bus = createWheelCueBus(NAMES);

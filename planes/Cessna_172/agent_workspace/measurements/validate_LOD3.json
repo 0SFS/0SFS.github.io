@@ -1,20 +1,25 @@
 {
  "file": "c172_lod3.blend",
- "objects": 23,
+ "objects": 26,
  "empties": 1,
- "meshes": 23,
- "triangles": 1016,
- "vertices": 591,
- "materials": 5,
+ "meshes": 26,
+ "triangles": 1160,
+ "vertices": 669,
+ "materials": 8,
  "material_names": [
   "C172_Dark",
   "C172_Glass",
   "C172_Metal",
   "C172_Paint",
-  "C172_PropDisc"
+  "C172_PropDisc",
+  "C172_Stripe",
+  "C172_Tyre",
+  "C172_TyreBlur"
  ],
- "textures": 0,
- "texture_names": [],
+ "textures": 1,
+ "texture_names": [
+  "C172_TyreBlur"
+ ],
  "dimensions": {
   "length": {
    "value": 8.28,
@@ -81,7 +86,7 @@
  "loose_vertices": 0,
  "unapplied_transforms": [],
  "symmetry_error_m": {
-  "mean": 0.000799,
+  "mean": 0.000706,
   "max": 0.035694,
   "over_1mm": 24
  },
@@ -112,6 +117,9 @@
   "Strut_Left",
   "Strut_Right",
   "VerticalTail",
+  "WheelBlur_Left",
+  "WheelBlur_Nose",
+  "WheelBlur_Right",
   "Wheel_Left",
   "Wheel_Nose",
   "Wheel_Right",
@@ -173,6 +181,48 @@
    ]
   },
   {
+   "name": "Wheel_Left",
+   "tris": 44,
+   "verts": 24,
+   "mats": [
+    "C172_Tyre",
+    "C172_Stripe"
+   ],
+   "origin": [
+    -1.25,
+    -0.31,
+    0.22
+   ]
+  },
+  {
+   "name": "Wheel_Right",
+   "tris": 44,
+   "verts": 24,
+   "mats": [
+    "C172_Tyre",
+    "C172_Stripe"
+   ],
+   "origin": [
+    1.25,
+    -0.31,
+    0.22
+   ]
+  },
+  {
+   "name": "Wheel_Nose",
+   "tris": 44,
+   "verts": 24,
+   "mats": [
+    "C172_Tyre",
+    "C172_Stripe"
+   ],
+   "origin": [
+    0.0,
+    1.32,
+    0.175
+   ]
+  },
+  {
    "name": "HorizontalTail_Left",
    "tris": 38,
    "verts": 21,
@@ -212,6 +262,45 @@
    ]
   },
   {
+   "name": "WheelBlur_Left",
+   "tris": 32,
+   "verts": 18,
+   "mats": [
+    "C172_TyreBlur"
+   ],
+   "origin": [
+    -1.25,
+    -0.31,
+    0.22
+   ]
+  },
+  {
+   "name": "WheelBlur_Right",
+   "tris": 32,
+   "verts": 18,
+   "mats": [
+    "C172_TyreBlur"
+   ],
+   "origin": [
+    1.25,
+    -0.31,
+    0.22
+   ]
+  },
+  {
+   "name": "WheelBlur_Nose",
+   "tris": 32,
+   "verts": 18,
+   "mats": [
+    "C172_TyreBlur"
+   ],
+   "origin": [
+    0.0,
+    1.32,
+    0.175
+   ]
+  },
+  {
    "name": "LandingGear_Left",
    "tris": 28,
    "verts": 16,
@@ -235,45 +324,6 @@
     0.0,
     0.0,
     0.0
-   ]
-  },
-  {
-   "name": "Wheel_Left",
-   "tris": 28,
-   "verts": 16,
-   "mats": [
-    "C172_Dark"
-   ],
-   "origin": [
-    -1.25,
-    -0.31,
-    0.22
-   ]
-  },
-  {
-   "name": "Wheel_Right",
-   "tris": 28,
-   "verts": 16,
-   "mats": [
-    "C172_Dark"
-   ],
-   "origin": [
-    1.25,
-    -0.31,
-    0.22
-   ]
-  },
-  {
-   "name": "Wheel_Nose",
-   "tris": 28,
-   "verts": 16,
-   "mats": [
-    "C172_Dark"
-   ],
-   "origin": [
-    0.0,
-    1.32,
-    0.175
    ]
   },
   {

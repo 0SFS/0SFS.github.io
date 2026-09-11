@@ -38,7 +38,7 @@ export interface FlightHudBarOptions {
   onSettingsClick(): void;
   onPhoneControlClick?(): void;
   onDebugClick(): void;
-  /** Host for the top-right FPS chip so it can sit under the window chrome. */
+  /** Host for the top-left FPS chip so it can sit under the window chrome. */
   fpsHost?: HTMLElement;
 }
 

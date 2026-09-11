@@ -143,7 +143,7 @@ describe("named profiles", () => {
     const store = createGroundSettingsStore(memoryStorage());
     expect(store.saveProfile("")).toMatch(/name/);
     expect(store.saveProfile("x".repeat(41))).toMatch(/name/);
-    expect(store.saveProfile("badname")).toMatch(/name/);
+    expect(store.saveProfile("bad\u0007name")).toMatch(/name/);
     for (let index = 0; index < MAX_NAMED_PROFILES; index++) expect(store.saveProfile(`P${index}`)).toBeNull();
     expect(store.saveProfile("one more")).toMatch(/At most/);
     expect(store.saveProfile("P0")).toBeNull();

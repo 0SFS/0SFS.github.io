@@ -7,26 +7,36 @@ export interface FlightHudOptions {
   onGearChange(down: boolean): void;
   onThrottleChange(value: number): void;
   onPitchTrimChange(value: number): void;
+  onRollTrimChange(value: number): void;
+  onPitchAutoTrimChange(enabled: boolean): void;
+  onRollAutoTrimChange(enabled: boolean): void;
   onFlapsChange(value: number): void;
   onRudderChange(value: number): void;
   onStickChange(aileron: number, elevator: number): void;
+  pitchAutoTrim?: boolean;
+  rollAutoTrim?: boolean;
 }
 
 export interface FlightHudControls {
   pitchTrim: number;
+  rollTrim: number;
   flaps: number;
   rudder: number;
   aileron: number;
   elevator: number;
 }
 
+export interface FlightHudAutoTrim {
+  pitch: boolean;
+  roll: boolean;
+}
+
 export interface FlightHudHandle {
   /**
-   * `gearDown` is passed separately rather than added to `FlightHudControls`
-   * because the gear is not one of the smoothed axes that record holds - it is
-   * a latching switch the input manager owns, like pause.
+   * `gearDown` and auto-trim are passed separately rather than added to
+   * `FlightHudControls` because they are latching switches, not smoothed axes.
    */
-  update(state: FlightState, controls: FlightHudControls, gearDown: boolean): void;
+  update(state: FlightState, controls: FlightHudControls, gearDown: boolean, autoTrim: FlightHudAutoTrim): void;
   /** Repaint just the gear button, for when the key moves it between frames. */
   setGearDown(down: boolean): void;
   destroy(): void;
@@ -149,16 +159,33 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   root.innerHTML = `
     <div class="flight-hud" aria-label="Flight instruments">
       <div class="flight-hud__attitude-cluster" aria-label="Attitude and adjacent levers">
-        <label class="flight-hud__slider-control flight-hud__slider-control--trim">
-          <span>TRIM</span>
-          <output data-output="pitch-trim">0%</output>
-          <input data-control="pitch-trim" type="range" min="-1" max="1" step="0.01" value="0" aria-label="Pitch trim" />
+        <div class="flight-hud__auto-trims" role="group" aria-label="Auto trim">
+          <button class="flight-hud__auto-trim flight-hud__auto-trim--roll" data-control="auto-roll-trim" type="button" aria-pressed="false">AUTO</button>
+          <button class="flight-hud__auto-trim flight-hud__auto-trim--pitch" data-control="auto-pitch-trim" type="button" aria-pressed="false">AUTO</button>
+        </div>
+        <label class="flight-hud__slider-control flight-hud__slider-control--roll-trim">
+          <span>ROLL</span>
+          <input data-control="roll-trim" type="range" min="-1" max="1" step="0.01" value="0" aria-label="Roll trim" />
+          <output data-output="roll-trim">0%</output>
+        </label>
+        <label class="flight-hud__lever flight-hud__lever--pitch">
+          <span class="flight-hud__lever-meta">
+            <span>PITCH</span>
+            <output data-output="pitch-trim">0%</output>
+          </span>
+          <span class="flight-hud__lever-track">
+            <input data-control="pitch-trim" type="range" min="-1" max="1" step="0.01" value="0" aria-label="Pitch trim" />
+          </span>
         </label>
         <canvas class="flight-hud__attitude" width="220" height="220" role="button" tabindex="0" aria-label="Attitude indicator and pitch roll control. Drag to steer."></canvas>
-        <label class="flight-hud__slider-control flight-hud__slider-control--flaps">
-          <span>FLAPS</span>
-          <output data-output="flaps">0%</output>
-          <input data-control="flaps" type="range" min="0" max="1" step="0.01" value="0" aria-label="Flaps" />
+        <label class="flight-hud__lever flight-hud__lever--flaps">
+          <span class="flight-hud__lever-track">
+            <input data-control="flaps" type="range" min="0" max="1" step="0.01" value="0" aria-label="Flaps" />
+          </span>
+          <span class="flight-hud__lever-meta">
+            <span>FLAPS</span>
+            <output data-output="flaps">0%</output>
+          </span>
         </label>
       </div>
       <div class="flight-hud__tapes">
@@ -219,18 +246,23 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   const hdgEl = root.querySelector<HTMLElement>('[data-metric="hdg"]');
   const vsEl = root.querySelector<HTMLElement>('[data-metric="vs"]');
   const throttleInput = root.querySelector<HTMLInputElement>('[data-control="throttle"]');
-  const trimInput = root.querySelector<HTMLInputElement>('[data-control="pitch-trim"]');
+  const pitchTrimInput = root.querySelector<HTMLInputElement>('[data-control="pitch-trim"]');
+  const rollTrimInput = root.querySelector<HTMLInputElement>('[data-control="roll-trim"]');
+  const pitchAutoTrimButton = root.querySelector<HTMLButtonElement>('[data-control="auto-pitch-trim"]');
+  const rollAutoTrimButton = root.querySelector<HTMLButtonElement>('[data-control="auto-roll-trim"]');
   const flapsInput = root.querySelector<HTMLInputElement>('[data-control="flaps"]');
   const rudderInput = root.querySelector<HTMLInputElement>('[data-control="rudder"]');
   const throttleOutput = root.querySelector<HTMLOutputElement>('[data-output="throttle"]');
-  const trimOutput = root.querySelector<HTMLOutputElement>('[data-output="pitch-trim"]');
+  const pitchTrimOutput = root.querySelector<HTMLOutputElement>('[data-output="pitch-trim"]');
+  const rollTrimOutput = root.querySelector<HTMLOutputElement>('[data-output="roll-trim"]');
   const flapsOutput = root.querySelector<HTMLOutputElement>('[data-output="flaps"]');
   const rudderOutput = root.querySelector<HTMLOutputElement>('[data-output="rudder"]');
   const gearButton = root.querySelector<HTMLButtonElement>('[data-control="gear"]');
 
-  if (!canvas || !gearButton || !iasEl || !altEl || !hdgEl || !vsEl
-    || !throttleInput || !trimInput || !flapsInput || !rudderInput
-    || !throttleOutput || !trimOutput || !flapsOutput || !rudderOutput) {
+  if (!canvas || !gearButton || !pitchAutoTrimButton || !rollAutoTrimButton
+    || !iasEl || !altEl || !hdgEl || !vsEl
+    || !throttleInput || !pitchTrimInput || !rollTrimInput || !flapsInput || !rudderInput
+    || !throttleOutput || !pitchTrimOutput || !rollTrimOutput || !flapsOutput || !rudderOutput) {
     throw new Error("Flight HUD markup failed to initialize.");
   }
 
@@ -240,19 +272,45 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   }
 
   let gearDown = true;
+  let pitchAutoTrim = options.pitchAutoTrim === true;
+  let rollAutoTrim = options.rollAutoTrim === true;
   const renderGearButton = (): void => {
     gearButton.setAttribute("aria-pressed", String(gearDown));
     gearButton.classList.toggle("is-down", gearDown);
     gearButton.title = gearDown ? "Landing gear down (G) — click to raise" : "Landing gear up (G) — click to lower";
     gearButton.setAttribute("aria-label", gearButton.title);
   };
+  const renderAxisAutoTrim = (
+    button: HTMLButtonElement,
+    input: HTMLInputElement,
+    enabled: boolean,
+    axis: "pitch" | "roll",
+  ): void => {
+    button.setAttribute("aria-pressed", String(enabled));
+    button.classList.toggle("is-on", enabled);
+    button.title = enabled
+      ? `Auto-trim on — holds ${axis} with the trim wheel while the stick is centered. Click to turn off.`
+      : `Auto-trim off — click to hold ${axis} as the aircraft wanders.`;
+    button.setAttribute("aria-label", button.title);
+    input.disabled = enabled;
+  };
+  const renderAutoTrimButtons = (): void => {
+    renderAxisAutoTrim(pitchAutoTrimButton, pitchTrimInput, pitchAutoTrim, "pitch");
+    renderAxisAutoTrim(rollAutoTrimButton, rollTrimInput, rollAutoTrim, "roll");
+  };
   const onGearClick = (): void => options.onGearChange(!gearDown);
+  const onPitchAutoTrimClick = (): void => options.onPitchAutoTrimChange(!pitchAutoTrim);
+  const onRollAutoTrimClick = (): void => options.onRollAutoTrimChange(!rollAutoTrim);
   gearButton.addEventListener("click", onGearClick);
+  pitchAutoTrimButton.addEventListener("click", onPitchAutoTrimClick);
+  rollAutoTrimButton.addEventListener("click", onRollAutoTrimClick);
   renderGearButton();
+  renderAutoTrimButtons();
 
   let rudderDragging = false;
   const onThrottleInput = (): void => options.onThrottleChange(Number(throttleInput.value));
-  const onTrimInput = (): void => options.onPitchTrimChange(Number(trimInput.value));
+  const onPitchTrimInput = (): void => options.onPitchTrimChange(Number(pitchTrimInput.value));
+  const onRollTrimInput = (): void => options.onRollTrimChange(Number(rollTrimInput.value));
   const onFlapsInput = (): void => options.onFlapsChange(Number(flapsInput.value));
   const onRudderInput = (): void => options.onRudderChange(Number(rudderInput.value));
   const releaseRudder = (): void => {
@@ -266,7 +324,8 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   const onRudderPointerUp = (): void => releaseRudder();
   const onRudderBlur = (): void => releaseRudder();
   throttleInput.addEventListener("input", onThrottleInput);
-  trimInput.addEventListener("input", onTrimInput);
+  pitchTrimInput.addEventListener("input", onPitchTrimInput);
+  rollTrimInput.addEventListener("input", onRollTrimInput);
   flapsInput.addEventListener("input", onFlapsInput);
   rudderInput.addEventListener("input", onRudderInput);
   rudderInput.addEventListener("pointerdown", onRudderPointerDown);
@@ -377,11 +436,18 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
     gearDown = next;
     renderGearButton();
   };
+  const setAutoTrim = (next: FlightHudAutoTrim): void => {
+    if (next.pitch === pitchAutoTrim && next.roll === rollAutoTrim) return;
+    pitchAutoTrim = next.pitch;
+    rollAutoTrim = next.roll;
+    renderAutoTrimButtons();
+  };
 
   return {
     setGearDown,
-    update(state: FlightState, controls: FlightHudControls, nextGearDown: boolean): void {
+    update(state: FlightState, controls: FlightHudControls, nextGearDown: boolean, nextAutoTrim: FlightHudAutoTrim): void {
       setGearDown(nextGearDown);
+      setAutoTrim(nextAutoTrim);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const center = canvas.width / 2;
       drawAttitudeIndicator(ctx, center, center, ATTITUDE_HALF, state.rollRad, state.pitchRad);
@@ -405,11 +471,13 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
       const vsFpm = Math.round(state.verticalSpeedFps * 60);
       vsEl.textContent = `${vsFpm < 0 ? "-" : "+"}${Math.abs(vsFpm).toString().padStart(4, " ")}`;
       throttleInput.value = String(state.throttleNorm);
-      trimInput.value = String(controls.pitchTrim);
+      pitchTrimInput.value = String(controls.pitchTrim);
+      rollTrimInput.value = String(controls.rollTrim);
       flapsInput.value = String(controls.flaps);
       if (!rudderDragging) rudderInput.value = String(controls.rudder);
       throttleOutput.value = `${Math.round(state.throttleNorm * 100)}%`;
-      trimOutput.value = `${Math.round(controls.pitchTrim * 100)}%`;
+      pitchTrimOutput.value = `${Math.round(controls.pitchTrim * 100)}%`;
+      rollTrimOutput.value = `${Math.round(controls.rollTrim * 100)}%`;
       flapsOutput.value = `${Math.round(controls.flaps * 100)}%`;
       rudderOutput.value = `${Math.round((rudderDragging ? Number(rudderInput.value) : controls.rudder) * 100)}%`;
     },
@@ -417,8 +485,11 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
       releaseStick();
       releaseRudder();
       gearButton.removeEventListener("click", onGearClick);
+      pitchAutoTrimButton.removeEventListener("click", onPitchAutoTrimClick);
+      rollAutoTrimButton.removeEventListener("click", onRollAutoTrimClick);
       throttleInput.removeEventListener("input", onThrottleInput);
-      trimInput.removeEventListener("input", onTrimInput);
+      pitchTrimInput.removeEventListener("input", onPitchTrimInput);
+      rollTrimInput.removeEventListener("input", onRollTrimInput);
       flapsInput.removeEventListener("input", onFlapsInput);
       rudderInput.removeEventListener("input", onRudderInput);
       rudderInput.removeEventListener("pointerdown", onRudderPointerDown);

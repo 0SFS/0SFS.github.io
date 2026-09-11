@@ -19,6 +19,7 @@ export interface ControlSurfaceState {
   rudder: number;
   throttle: number;
   pitchTrim: number;
+  rollTrim: number;
   flaps: number;
   brake: number;
 }
@@ -80,6 +81,13 @@ export interface FlightInputManager {
   resetControls(throttle: number): void;
   setThrottle(value: number): void;
   setPitchTrim(value: number): void;
+  setRollTrim(value: number): void;
+  /**
+   * Write a trim wheel without treating it as a local takeover. Auto-trim
+   * uses this while a phone owns the stick.
+   */
+  replacePitchTrim(value: number): void;
+  replaceRollTrim(value: number): void;
   setFlaps(value: number): void;
   setRudder(value: number): void;
   setStick(aileron: number, elevator: number): void;
@@ -109,6 +117,7 @@ export function createFlightInputManager(options: {
     rudder: 0,
     throttle: INITIAL_THROTTLE,
     pitchTrim: 0,
+    rollTrim: 0,
     flaps: 0,
     brake: 0,
   };
@@ -209,7 +218,7 @@ export function createFlightInputManager(options: {
     return { elevator, aileron, rudder };
   };
 
-  const integratePersistentControls = (dt: number): Pick<ControlSurfaceState, "throttle" | "pitchTrim" | "flaps" | "brake"> => {
+  const integratePersistentControls = (dt: number): Pick<ControlSurfaceState, "throttle" | "pitchTrim" | "rollTrim" | "flaps" | "brake"> => {
     let flaps = smoothed.flaps;
     let brake = 0;
     for (const key of keysDown) {
@@ -223,7 +232,7 @@ export function createFlightInputManager(options: {
       }
       if (binding.brake !== undefined) brake = binding.brake;
     }
-    return { throttle: throttleTarget, pitchTrim: smoothed.pitchTrim, flaps, brake };
+    return { throttle: throttleTarget, pitchTrim: smoothed.pitchTrim, rollTrim: smoothed.rollTrim, flaps, brake };
   };
 
   const gamepadAxisActive = (axisIndex: number): boolean => !protectGamepad || enabledAxes.has(axisIndex);
@@ -387,6 +396,7 @@ export function createFlightInputManager(options: {
         rudder,
         throttle: smoothToward(smoothed.throttle, persistent.throttle, dt),
         pitchTrim: persistent.pitchTrim,
+        rollTrim: persistent.rollTrim,
         flaps: persistent.flaps,
         brake: persistent.brake,
       };
@@ -434,7 +444,7 @@ export function createFlightInputManager(options: {
       stickOverride = null;
       rudderOverride = null;
       throttleTarget = Math.min(1, Math.max(0, throttle));
-      smoothed = { elevator: 0, aileron: 0, rudder: 0, throttle: throttleTarget, pitchTrim: 0, flaps: 0, brake: 0 };
+      smoothed = { elevator: 0, aileron: 0, rudder: 0, throttle: throttleTarget, pitchTrim: 0, rollTrim: 0, flaps: 0, brake: 0 };
       resetKeyboardAxes();
       if (protectGamepad) captureGamepadBaseline();
     },
@@ -448,6 +458,17 @@ export function createFlightInputManager(options: {
       options.onLocalInput?.();
       if (remoteOwned) return;
       smoothed.pitchTrim = Math.min(1, Math.max(-1, value));
+    },
+    replacePitchTrim(value: number): void {
+      smoothed.pitchTrim = Math.min(1, Math.max(-1, value));
+    },
+    setRollTrim(value: number): void {
+      options.onLocalInput?.();
+      if (remoteOwned) return;
+      smoothed.rollTrim = Math.min(1, Math.max(-1, value));
+    },
+    replaceRollTrim(value: number): void {
+      smoothed.rollTrim = Math.min(1, Math.max(-1, value));
     },
     setFlaps(value: number): void {
       options.onLocalInput?.();

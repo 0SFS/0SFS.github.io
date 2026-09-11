@@ -61,7 +61,7 @@ function setup() {
   let pageVisible = true
   const state: AircraftStatus = {
     owner: 'local', paused: false, viewMode: 'third', airspeedKts: 100, altitudeFt: 4000, headingDeg: 90,
-    controls: { elevator: 0, aileron: 0, rudder: 0, throttle: .67, pitchTrim: -.12, flaps: 1 / 3, brake: 0 },
+    controls: { elevator: 0, aileron: 0, rudder: 0, throttle: .67, pitchTrim: -.12, rollTrim: .08, flaps: 1 / 3, brake: 0 },
   }
   type EndpointOptions = Parameters<typeof createPeerEndpoint>[0]
   const endpoints: { callbacks: NonNullable<EndpointOptions>; destroy: ReturnType<typeof vi.fn> }[] = []

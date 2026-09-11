@@ -46,8 +46,8 @@ BOUND = ["Aileron_Left", "Aileron_Right", "Flap_Left", "Flap_Right",
 # who must ride with which leg.  A door only exists where the level carries trim.
 GEAR_CHILDREN = {
     "LandingGear_Nose": ["Wheel_Nose"],
-    "LandingGear_Left": ["Wheel_Left", "GearDoor_Left"],
-    "LandingGear_Right": ["Wheel_Right", "GearDoor_Right"],
+    "LandingGear_Left": ["Wheel_Left"],
+    "LandingGear_Right": ["Wheel_Right"],
 }
 # The hinges come FROM the generator, not from a copy of them. They were
 # copied once, and moving the stowed main wheels out into the wing root left

@@ -125,12 +125,15 @@ Bounding box (LOD3, Blender axes): min `[-5.499, -5.720, 0.000]`, max `[5.499, 2
 ## 5. Counts, materials, textures
 
 - **Materials: 4**, shared by every LOD — `C172_Paint` (white airframe), `C172_Glass`
-  (opaque dark blue-grey), `C172_Dark` (tyres, propeller), `C172_Metal` (gear legs, spinner).
+  (opaque dark blue-grey), `C172_Dark` (propeller, anti-glare), `C172_Metal` (gear legs, spinner) — plus the
+  tyres' own `C172_Tyre` (§12).
 - **The glazing is not geometry.** The cabin windows, windshield and rear window are
   fuselage polygons carrying a second material index — there is no overlay shell, so
   nothing is duplicated and no fuselage face is permanently hidden behind glass.
   This is why the ring angles are chosen rather than evenly spaced (see §8.4).
-- **Textures: 0.** Nothing is textured; all identity comes from geometry and flat colour.
+- **Textures: 0 at LOD0 and LOD1, 1 at LOD2 and LOD3** — the tyres' atlas (the
+  band, and the band averaged over a turn), see §12. Everything else is
+  geometry and flat colour.
 - Glazing is deliberately **opaque**, not alpha-blended, so Babylon never has to
   depth-sort a transparent pass for the aircraft.
 
@@ -350,6 +353,40 @@ Root: `~/gh/Felipegalind0/flight-sim/planes/Cessna_172/agent_workspace/`
 - `crop_side.png`, `crop_nose2.png`, `crop_tail2.png` — the measured crops
 
 Nothing under `Cessna_172/tests/` was modified.
+
+## 12. Tyres — shared with the SF50
+
+The tyres were an 8- or 6-sided cylinder in `C172_Dark`, the material the
+propeller and anti-glare panel also use. They are now built by
+`planes/shared/tyres.py`, the same module the Vision Jet builds from, so the
+two airframes' tyres cannot drift apart:
+
+- **Their own material**, `C172_Tyre`, nearly black — darker than `C172_Dark`,
+  because rubber reads as rubber only when it is darker than the shadows round
+  it.
+- **A white band**, 18% of the radius each side of the hub, running across both
+  sidewalls and over the tread top and bottom. Without a mark a tyre's rotation
+  is invisible; with one its rate can be read.
+- **Painted, not modelled.** The tyre is still the plain cylinder. The band is
+  one half of a texture atlas, mapped by a planar projection onto the sidewall
+  plane, which is exact for any polygon. The other half is the band averaged
+  over a turn, and the runtime moves the texture there once the band spins
+  faster than the display can show. That's the propeller disc's rule, applied
+  without a second mesh, because a tyre's average is still a tyre.
+
+LOD2 and LOD3 carry the atlas; LOD1 keeps plain four-sided rubber tyres, and
+LOD0 has none. **Counts are unchanged** from the plain tyres: 778 at LOD2, 1016
+at LOD3. An earlier pass cut the band into the mesh and added a blurred copy of
+every tyre, 898 and 1160. That was 48 triangles a tyre to show a different
+picture on the same shape, and it is gone.
+
+![sharp and blurred, the same mesh](renders/tyres/C172_TYRES.png)
+
+Dimensions, ground contact and the propeller-only symmetry error are unchanged
+at every level. None of it is collision geometry: ground contact is JSBSim's
+contact points and the loaded aircraft is unpickable.
+`docs/drawing-fast-rotation.md` and "Rolling tyres" in `docs/aircraft-assets.md`
+carry the rest.
 
 ## Sources
 - [Cessna 172G Skyhawk 3-view line drawing — Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cessna_172G_Skyhawk_3-view_line_drawing.png)

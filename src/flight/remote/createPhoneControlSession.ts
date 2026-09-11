@@ -178,7 +178,7 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     if (!pending) return false;
     const current = options.getStatus();
     return !isPageVisible() || options.hasActiveLocalInput() || !isCentered(current.controls) || current.paused !== pending.paused
-      || (["throttle", "pitchTrim", "flaps"] as const).some(key => current.controls[key] !== pending!.baseline[key]);
+      || (["throttle", "pitchTrim", "rollTrim", "flaps"] as const).some(key => current.controls[key] !== pending!.baseline[key]);
   };
   const handleAction = (message: ActionMessage) => {
     if (actions.has(message.id)) { send(actions.get(message.id)!); return; }
@@ -223,7 +223,7 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     if (message.type === "ping") { active?.sendNative({ ...message, type: "pong" }, true); return; }
     if (message.type !== "controls" || (!pending && snapshot.owner !== "phone") || message.seq <= lastSeq || !freshLease(message.lease)) return;
     if (pending && (!isCentered(message.controls)
-      || ["throttle", "pitchTrim", "flaps"].some(key => message.controls[key as keyof ControlSurfaceState] !== pending!.baseline[key as keyof ControlSurfaceState]))) return;
+      || ["throttle", "pitchTrim", "rollTrim", "flaps"].some(key => message.controls[key as keyof ControlSurfaceState] !== pending!.baseline[key as keyof ControlSurfaceState]))) return;
     const receivedAt = now();
     while (frameTimes.length && receivedAt - frameTimes[0] >= 1000) frameTimes.shift();
     // The phone schedules 60 Hz plus prompt touch/release events up to 120 Hz.

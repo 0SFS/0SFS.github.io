@@ -22,6 +22,7 @@ export function applyFlightControls(
   sdk.setPropertyValue("fcs/rudder-cmd-norm", -controls.rudder);
   sdk.setPropertyValue("fcs/throttle-cmd-norm", controls.throttle);
   sdk.setPropertyValue("fcs/pitch-trim-cmd-norm", controls.pitchTrim);
+  sdk.setPropertyValue("fcs/roll-trim-cmd-norm", controls.rollTrim);
   sdk.setPropertyValue("fcs/flap-cmd-norm", controls.flaps);
   sdk.setPropertyValue("fcs/brake-cmd-norm", controls.brake);
   sdk.setPropertyValue("fcs/left-brake-cmd-norm", controls.brake);

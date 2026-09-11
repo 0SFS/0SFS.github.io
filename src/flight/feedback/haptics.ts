@@ -1,4 +1,4 @@
-import type { WheelCue, WheelCueResetReason, WheelCueSink } from "./wheelCueBus";
+import type { WheelCue, WheelCueSink } from "./wheelCueBus";
 
 /** One device envelope; magnitudes are 0..1. Presentation only. */
 export interface HapticEnvelope {
@@ -12,6 +12,8 @@ export interface HapticEnvelope {
 export const HAPTIC_INTERVAL_MS = 50;
 export const HAPTIC_MAX_DURATION_MS = 60;
 const TOUCHDOWN_WINDOW_S = 0.06;
+/** Only spin-up slip pulses; a sustained skid is not a touchdown cue and must not buzz continuously. */
+const SPIN_UP_WINDOW_S = 0.4;
 const MIN_MAGNITUDE = 0.03;
 /**
  * Authored scales, not measured tire data: ~0.3 kN·s is the estimated main-gear
@@ -48,8 +50,8 @@ export function createHapticAggregator(wheelCount = 3) {
         if (!cue.onGround) { sinceContact[index] = Infinity; continue; }
         if (cue.contactEntered) sinceContact[index] = 0;
         if (sinceContact[index] < TOUCHDOWN_WINDOW_S) touchdownImpulseNs += cue.normalImpulseNs;
+        if (sinceContact[index] < SPIN_UP_WINDOW_S) slipJ += cue.slipDissipatedJ;
         sinceContact[index] += cue.stepSeconds;
-        slipJ += cue.slipDissipatedJ;
       }
     },
     reset,
@@ -95,7 +97,7 @@ export function createHapticsController(outputs: readonly HapticOutput[]): Hapti
   };
   return {
     accept(cues) { if (enabled && !disposed) aggregator.accept(cues); },
-    reset(_reason: WheelCueResetReason) { cancel(); },
+    reset() { cancel(); },
     setEnabled(value) {
       if (disposed || value === enabled) return;
       enabled = value;

@@ -55,6 +55,20 @@ export const GROUND_CHOICES = {
 
 type PresetFields = Pick<GroundInteractionSettingsV1, GroundLockableKey>;
 
+/** Pilot-facing names shared by Settings, Debug and status text. */
+export const GROUND_CHOICE_LABELS: { [K in GroundLockableKey]: Record<GroundInteractionSettingsV1[K], string> } = {
+  rotation: { off: "Off", instant: "Instant rolling", inertia: "Finite inertia" },
+  forceModel: { "jsbsim": "Existing JSBSim", "coupled-rigid": "Coupled rigid wheel",
+    "combined-slip": "Combined-slip tire", "compliant-soil": "Compliant tire and soil" },
+  contactModel: { "shared": "Shared terrain", "per-wheel-point": "Per-wheel support",
+    "footprint": "Wheel footprint", "swept": "Swept wheel shape" },
+  backend: { "auto": "Auto (CPU today)", "cpu-js": "CPU · JavaScript", "cpu-wasm": "CPU · WASM",
+    "worker": "Worker", "gpu": "GPU" },
+  tireAudio: { off: "Off", slip: "Slip cue", contact: "Contact cues", geometry: "Geometry rolling", detailed: "Detailed" },
+  haptics: { off: "Off", landing: "Landing cues", roughness: "Roughness" },
+  wheelVisuals: { off: "Off", asset: "Asset wheel rotation" },
+};
+
 /** Preset identity ignores volume, strength, locks and selection. */
 export const GROUND_PRESETS: Record<GroundPresetId, PresetFields> = {
   "minimal": { rotation: "off", forceModel: "jsbsim", contactModel: "shared", backend: "auto",
@@ -287,7 +301,8 @@ function byteLength(text: string): number { return new TextEncoder().encode(text
 export function normalizeProfileName(name: unknown): string | null {
   if (typeof name !== "string") return null;
   const trimmed = name.replace(/\s+/g, " ").trim();
-  return trimmed.length > 0 && trimmed.length <= MAX_PROFILE_NAME_LENGTH && !/[ -]/.test(trimmed) ? trimmed : null;
+  const control = [...trimmed].some(character => character.charCodeAt(0) < 0x20 || character.charCodeAt(0) === 0x7f);
+  return trimmed.length > 0 && trimmed.length <= MAX_PROFILE_NAME_LENGTH && !control ? trimmed : null;
 }
 
 export interface GroundSettingsStore {

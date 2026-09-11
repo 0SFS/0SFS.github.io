@@ -201,7 +201,7 @@ describe("flightInputManager keyboard roll", () => {
 describe("flightInputManager phone handoff", () => {
   const transferred: ControlSurfaceState = {
     elevator: -0.6, aileron: 0.7, rudder: 0.5,
-    throttle: 0.83, pitchTrim: -0.2, flaps: 0.33, brake: 1,
+    throttle: 0.83, pitchTrim: -0.2, rollTrim: 0.11, flaps: 0.33, brake: 1,
   };
   const centered: ControlSurfaceState = { ...transferred, elevator: 0, aileron: 0, rudder: 0, brake: 0 };
   const cleanups: (() => void)[] = [];
@@ -272,12 +272,29 @@ describe("flightInputManager phone handoff", () => {
   it.each([
     ["setThrottle", 0.41, { throttle: 0.41 }],
     ["setPitchTrim", 0.12, { pitchTrim: 0.12 }],
+    ["setRollTrim", -0.3, { rollTrim: -0.3 }],
   ] as const)("revokes before applying %s", (method, value, expected) => {
     connectPad();
     const { input, onLocalInput } = withSynchronousTakeover();
     input[method](value);
     expect(onLocalInput).toHaveBeenCalledTimes(1);
     expect(input.poll(1)).toEqual({ ...centered, ...expected });
+  });
+
+  it("writes auto-trim without taking the stick from a remote pilot", () => {
+    const onLocalInput = vi.fn();
+    const input = createFlightInputManager({ onLocalInput });
+    input.setRemoteOwned(true);
+    input.replacePitchTrim(-0.18);
+    input.replaceRollTrim(0.27);
+    expect(onLocalInput).not.toHaveBeenCalled();
+    expect(input.poll(1).pitchTrim).toBeCloseTo(-0.18);
+    expect(input.poll(1).rollTrim).toBeCloseTo(0.27);
+    input.setPitchTrim(0.4);
+    input.setRollTrim(-0.4);
+    expect(onLocalInput).toHaveBeenCalledTimes(2);
+    expect(input.poll(1).pitchTrim).toBeCloseTo(-0.18);
+    expect(input.poll(1).rollTrim).toBeCloseTo(0.27);
   });
 
   it("applies HUD stick input and clears it on release", () => {
@@ -422,6 +439,6 @@ describe("flightInputManager phone handoff", () => {
     pad.axes[3] = -0.8;
     expect(input.poll(1).throttle).toBeCloseTo(0.9);
     input.resetControls(0);
-    expect(input.poll(1)).toEqual({ elevator: 0, aileron: 0, rudder: 0, throttle: 0, pitchTrim: 0, flaps: 0, brake: 0 });
+    expect(input.poll(1)).toEqual({ elevator: 0, aileron: 0, rudder: 0, throttle: 0, pitchTrim: 0, rollTrim: 0, flaps: 0, brake: 0 });
   });
 });

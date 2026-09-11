@@ -5,6 +5,7 @@ import {
   MeshBuilder,
   Quaternion,
   StandardMaterial,
+  Texture,
   TransformNode,
   Vector3,
   type Scene,
@@ -42,15 +43,26 @@ export interface ControlSurfaceState {
   propellerRadPerSec: number;
   /** Commanded gear position: 1 is down and locked, 0 is up. */
   gearDownNorm: number;
+  /** Ground speed in m/s; what the tyres roll at when they are on the ground. */
+  groundSpeedMps: number;
+  /** True while any gear unit carries weight. */
+  onGround: boolean;
 }
 
 export const NEUTRAL_CONTROL_SURFACES: ControlSurfaceState = {
   aileronLeftRad: 0, aileronRightRad: 0, elevatorRad: 0,
   rudderRad: 0, flapRad: 0, propellerRadPerSec: 0, gearDownNorm: 1,
+  groundSpeedMps: 0, onGround: false,
 };
 
 const DEG_TO_RAD = Math.PI / 180;
 const RPM_TO_RAD_PER_SEC = (2 * Math.PI) / 60;
+const FEET_TO_METERS = 0.3048;
+// Any unit carrying weight means the tyres are turning. Three is every gear a
+// tricycle has, and a model with more simply reports the first three.
+const WOW_PROPERTIES = [
+  "gear/unit[0]/WOW", "gear/unit[1]/WOW", "gear/unit[2]/WOW",
+] as const;
 
 // JSBSim engine RPM lives under a different property depending on how the
 // propulsion block is written, so try the usual spellings and keep the first
@@ -129,10 +141,14 @@ export function readControlSurfaceState(sdk: JSBSimSdk): ControlSurfaceState {
     flapRad: readNumber(sdk, "fcs/flap-pos-deg") * DEG_TO_RAD,
     propellerRadPerSec: readPropellerRpm(sdk) * RPM_TO_RAD_PER_SEC,
     gearDownNorm: readGearCommand(sdk),
+    // Wheels roll at ground speed, not airspeed: a headwind does not spin them.
+    groundSpeedMps: readNumber(sdk, "velocities/vg-fps") * FEET_TO_METERS,
+    onGround: WOW_PROPERTIES.some((property) => readNumber(sdk, property) > 0),
   };
 }
 
-type SurfaceKey = keyof Omit<ControlSurfaceState, "propellerRadPerSec" | "gearDownNorm">;
+type SurfaceKey = keyof Omit<ControlSurfaceState,
+  "propellerRadPerSec" | "gearDownNorm" | "groundSpeedMps" | "onGround">;
 
 interface HingedPart {
   node: TransformNode;
@@ -153,6 +169,20 @@ interface RetractingGear {
   window: readonly [number, number];
 }
 
+/**
+ * A rolling wheel.
+ *
+ * `radius` is measured off the node's own bounding box rather than carried in
+ * the catalog, the same way the propeller disc sizes itself: the mesh already
+ * knows how big its tyre is, and a second copy of that number is a second
+ * thing to keep in step.
+ */
+interface RollingWheel {
+  node: TransformNode;
+  rest: Quaternion;
+  radius: number;
+}
+
 interface Propeller {
   node: TransformNode;
   rest: Quaternion;
@@ -165,6 +195,18 @@ interface Propeller {
 
 export interface AircraftRig {
   parts: HingedPart[];
+  wheels: RollingWheel[];
+  /** Where the tyres are in their roll, radians. */
+  wheelAngleRad: number;
+  /**
+   * The tyres' atlases: the band on one half, the band averaged over a turn on
+   * the other (planes/shared/tyres.py). Blurring a tyre is moving its texture
+   * half a width along - the same mesh, the same draw, one number. A level
+   * whose tyres are plain rubber has none, and its tyres never blur.
+   */
+  tyreTextures: Texture[];
+  /** True while the tyres are drawing the blurred half of their atlas. */
+  wheelBlurred: boolean;
   gear: RetractingGear[];
   /** Where the gear actually is, 1 down to 0 up; it chases the lever. */
   gearNorm: number;
@@ -197,18 +239,31 @@ const DEFAULT_FRAME_SECONDS = 1 / 60;
  * 900 rpm — below a Cessna's idle, so in practice the disc is shown almost
  * whenever the engine is running, which is also how a real propeller looks.
  */
-export function maxReadableRadPerSec(blades: number, frameSeconds: number): number {
-  if (blades < 2 || frameSeconds <= 0) return Number.POSITIVE_INFINITY;
-  return Math.PI / blades / frameSeconds;
+export function maxReadableRadPerSec(repeats: number, frameSeconds: number): number {
+  // `repeats` is how many times the image repeats in one turn, not how many
+  // parts there are: two blades repeat twice, one tyre stripe repeats once.
+  // The guard is < 1, not < 2 - a single stripe DOES alias, at half the rate a
+  // two-blade propeller does, and guarding at 2 quietly returned Infinity and
+  // made the wheel blur unreachable. Zero means no repeating image at all,
+  // which is a jet's propeller: nothing to alias, no limit.
+  if (repeats < 1 || frameSeconds <= 0) return Number.POSITIVE_INFINITY;
+  return Math.PI / repeats / frameSeconds;
 }
 
 function propellerRadius(node: TransformNode): number {
-  if (node instanceof AbstractMesh) {
-    const extend = node.getBoundingInfo().boundingBox.extendSize;
-    const radius = Math.max(extend.x, extend.y);
-    if (radius > 0.05) return radius;
-  }
-  return 1;
+  const radius = nodeRadius(node);
+  return radius > 0.05 ? radius : 1;
+}
+
+/** Largest half-extent across the node's own axis of rotation, or 0. */
+function nodeRadius(node: TransformNode): number {
+  if (!(node instanceof AbstractMesh)) return 0;
+  const extend = node.getBoundingInfo().boundingBox.extendSize;
+  // A wheel turns about local X, a propeller about local Z; in both cases the
+  // radius is the larger of the two extents that are NOT along that axis, and
+  // taking the max of Y and Z would read a propeller's chord. Y is common to
+  // both, so pair it with whichever of X and Z is larger.
+  return Math.max(extend.y, Math.min(extend.x, extend.z));
 }
 
 function buildPropellerDisc(node: TransformNode, scene: Scene): Mesh {
@@ -275,6 +330,25 @@ const WING_DOOR_HINGE = new Vector3(0, 0.07546, 0.99715);
 // 112 deg, not the nose pair's 88: the wing doors open PAST vertical so they
 // lean outboard and clear the extended wheel. At 82 the panel hung in the
 // tyre's own plane and the two z-fought.
+
+/**
+ * How many times a banded tyre's image repeats in one turn. The band runs
+ * straight through the hub, so it looks the same every half turn: TWO, and the
+ * tyre aliases at `PI / 2 / frameSeconds` - 15 rev/s at 60 fps, about 35 kt on
+ * a 0.19 m tyre, and proportionally more on a faster display. That is the rate
+ * at which the tyre switches to the blurred half of its texture. See
+ * docs/drawing-fast-rotation.md, and planes/shared/tyres.py for the band.
+ */
+const TYRE_STRIPE_REPEATS = 2;
+/**
+ * The atlas's u offset for the band and for its blur. The sharp tyre sits at
+ * 1, not 0 - the same picture, since the sampler repeats - because at 0 the
+ * texture has no transform and Babylon compiles the material without one; the
+ * first blur would then recompile it, mid take-off roll. Held off zero, both
+ * states are one shader and switching is a uniform.
+ */
+export const TYRE_SHARP_U = 1;
+export const TYRE_BLURRED_U = 1.5;
 
 const GEAR_RETRACT_RAD = Math.PI / 2;
 const DOOR_RAD = (deg: number): number => (deg * Math.PI) / 180;
@@ -373,6 +447,18 @@ export function bindAircraftRig(
     bound.push(binding.name);
   }
 
+  const wheels: RollingWheel[] = [];
+  const tyreTextures = new Set<Texture>();
+  for (const [key, node] of byName) {
+    if (!key.startsWith("Wheel_")) continue;
+    const radius = nodeRadius(node);
+    if (radius <= 0) continue;
+    wheels.push({ node, rest: restRotation(node), radius });
+    bound.push(key);
+    for (const texture of tyreAtlases(node)) tyreTextures.add(texture);
+  }
+  for (const texture of tyreTextures) texture.uOffset = TYRE_SHARP_U;
+
   const gear: RetractingGear[] = [];
   for (const binding of GEAR_BINDINGS) {
     const node = byName.get(binding.name);
@@ -403,6 +489,10 @@ export function bindAircraftRig(
 
   return {
     parts,
+    wheels,
+    wheelAngleRad: 0,
+    tyreTextures: [...tyreTextures],
+    wheelBlurred: false,
     gear,
     gearNorm: 1,
     propeller: propNode
@@ -413,6 +503,25 @@ export function bindAircraftRig(
     discVisible: false,
     bound,
   };
+}
+
+/**
+ * Every texture on a tyre's own meshes. The tyre's material carries the atlas
+ * and nothing else, and several tyres share one material, hence the caller's
+ * set.
+ */
+function tyreAtlases(node: TransformNode): Texture[] {
+  const meshes = [
+    ...(node instanceof AbstractMesh ? [node] : []),
+    ...node.getChildMeshes(true),
+  ];
+  const found: Texture[] = [];
+  for (const mesh of meshes) {
+    for (const texture of mesh.material?.getActiveTextures() ?? []) {
+      if (texture instanceof Texture) found.push(texture);
+    }
+  }
+  return found;
 }
 
 /** Free only a disc this module built; a baked one belongs to the AssetContainer. */
@@ -450,6 +559,50 @@ function applyGear(rig: AircraftRig, command: number, deltaSeconds: number): voi
   }
 }
 
+/**
+ * Roll the tyres, and move their texture to its blurred half once they turn
+ * faster than the frame rate can show. `docs/drawing-fast-rotation.md` is the
+ * argument; this is the wheel half of it, and the propeller below is the other.
+ *
+ * One decision for all of them: they are the same size to within a centimetre
+ * and rolling on the same ground, and a nose tyre blurring a frame before the
+ * mains would be a flicker nobody could explain. They also share one material,
+ * so one decision is all the texture could carry anyway.
+ */
+function applyWheels(
+  rig: AircraftRig,
+  state: ControlSurfaceState,
+  deltaSeconds: number,
+): void {
+  if (rig.wheels.length === 0) return;
+  // Airborne the tyres hold whatever angle they stopped at rather than being
+  // driven by an airspeed no wheel is touching.
+  const speed = state.onGround ? state.groundSpeedMps : 0;
+  let fastest = 0;
+  for (const wheel of rig.wheels) {
+    fastest = Math.max(fastest, Math.abs(speed) / wheel.radius);
+  }
+  if (Number.isFinite(deltaSeconds) && deltaSeconds > 0) {
+    rig.wheelAngleRad = (rig.wheelAngleRad + fastest * Math.sign(speed) * deltaSeconds)
+      % (2 * Math.PI);
+  }
+  for (const wheel of rig.wheels) {
+    wheel.node.rotationQuaternion = wheel.rest.multiply(
+      Quaternion.RotationAxis(SPAN_AXIS, rig.wheelAngleRad),
+    );
+  }
+
+  const limit = maxReadableRadPerSec(TYRE_STRIPE_REPEATS, rig.frameSeconds);
+  const blurred = rig.wheelBlurred
+    ? fastest > limit * DISC_HYSTERESIS
+    : fastest > limit;
+  if (blurred === rig.wheelBlurred) return;
+  rig.wheelBlurred = blurred;
+  for (const texture of rig.tyreTextures) {
+    texture.uOffset = blurred ? TYRE_BLURRED_U : TYRE_SHARP_U;
+  }
+}
+
 export function applyAircraftRig(
   rig: AircraftRig,
   state: ControlSurfaceState,
@@ -460,7 +613,16 @@ export function applyAircraftRig(
     part.node.rotationQuaternion = part.rest.multiply(Quaternion.RotationAxis(part.axis, angle));
   }
 
+  // The display's frame interval sets the alias limit for EVERYTHING that
+  // spins, so it is measured whether or not there is a propeller. It used to
+  // live inside the propeller branch, and a jet's tyres were judged against a
+  // hard-coded 60 fps whatever the display was doing.
+  if (Number.isFinite(deltaSeconds) && deltaSeconds > 0) {
+    rig.frameSeconds += (deltaSeconds - rig.frameSeconds) * FRAME_SMOOTHING;
+  }
+
   applyGear(rig, state.gearDownNorm, deltaSeconds);
+  applyWheels(rig, state, deltaSeconds);
 
   const propeller = rig.propeller;
   if (!propeller) return;
@@ -471,7 +633,6 @@ export function applyAircraftRig(
     // from there, so the angle decreases.
     rig.propellerAngleRad -= state.propellerRadPerSec * deltaSeconds;
     rig.propellerAngleRad %= 2 * Math.PI;
-    rig.frameSeconds += (deltaSeconds - rig.frameSeconds) * FRAME_SMOOTHING;
   }
 
   if (propeller.disc) {

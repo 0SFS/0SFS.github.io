@@ -4,25 +4,60 @@ Research checked 2026-09-10. The experiment adds a small wheel-rotation model an
 
 ## Try it
 
-Open **Debug → Wheel spin experiment**, choose **A · Instant rolling** or
-**B · Gradual spin-up**, and enable **tire sound** if wanted. Turn on **Show
+The durable way is **Settings → Ground interaction**: choose **Landing
+feedback** (finite-inertia wheels plus the slip cue) or build a Custom mix of
+wheel response, tire audio, volume, haptics and strength. These choices persist,
+can be saved as named profiles and exported/imported as text. Wheel-response
+changes made while flying wait until you pause or reset; volume, haptic strength
+and audio/haptic modes change immediately. Unimplemented options (coupled or
+compliant tires, footprint contact, geometry audio, asset wheel rotation,
+WASM/worker/GPU backends) are listed but disabled with the missing capability.
+
+For quick A/B comparisons, **Debug → Wheel spin experiment** still switches
+**A · Instant rolling** / **B · Gradual spin-up** and tire sound immediately,
+as a session-only override. Settings shows the override and offers **Keep
+experiment choices**; otherwise it is gone after reload. Turn on **Show
 aircraft collision geometry** to see three tire outlines with rotating spokes.
 The telemetry reports individual wheel RPM, slip speed and contact state.
 Changing modes resets the virtual tires, so select a mode before an airborne
-approach rather than midway through rolling. All options reset on reload.
+approach rather than midway through rolling.
 
 The outlines are a debug display of C172 tire estimates, including when another
 visual aircraft is selected. They do not animate the asset's wheel meshes or
-replace the contact geometry. Each axle is offset above its existing contact
+replace the contact geometry. (The asset's tyres do roll, but on their own:
+from ground speed over radius, independent of this experiment and of its slip
+model — see [docs/aircraft-assets.md](aircraft-assets.md#rolling-tyres).) Each axle is offset above its existing contact
 reference by tire radius and estimated suspension compression; strut flex and
 sloped-ground projection are not reconstructed. The amber dots retain their
 original meaning as uncompressed contact references.
 
-Sound starts only after its checkbox is enabled, pauses with the simulation,
-and is silenced in background tabs. It uses synthesized filtered noise and a
+Sound starts only when enabled (the Debug checkbox, or a saved Slip cue, which
+waits for your next click or key press before the browser allows audio), pauses
+with the simulation, and is silenced in background tabs. It uses synthesized filtered noise and a
 quiet tonal component, driven by slip work accumulated over successful physics
 steps. The current effect covers longitudinal slipping/spin-up; it does not add
-engine sound, rolling rumble, crosswind scrub, surface-specific audio or haptics.
+engine sound, rolling rumble, crosswind scrub or surface-specific audio.
+
+## Cues and haptics
+
+Every accepted 120 Hz step publishes one `WheelCue` per wheel (load and impulse
+estimates, slip work, tread distance, contact entry, epoch, terrain revision).
+Pausing, resets, faults, teleports, mode changes and terrain re-placement start
+a new epoch, so partial feedback never carries across. The slip sound reads this
+bus; nothing reads it back into flight physics. An integrated benchmark asserts
+the trajectory is identical with feedback off and on.
+
+Haptics are optional presentation (**Settings → Ground interaction → Haptics →
+Landing cues**, off by default): a touchdown load pulse on a gamepad's
+low-frequency motor and a short spin-up pulse on its high-frequency motor, at
+most one ≤60 ms envelope per 50 ms, replaced rather than queued. A controller
+without `vibrationActuator` shows "Unavailable on this device". With a paired
+phone that has taken control, the desktop adds a latest-value pulse to its
+50 ms heartbeat; the phone vibrates only if its own **Haptics** switch is on and
+its browser exposes `navigator.vibrate` (for example Android Chrome; iOS Safari
+has not exposed it). All output stops on pause, hidden page, reset, disconnect,
+loss of control, expiry and disable. Mappings are authored scales, not measured tire data, and
+physical devices have not been tested yet.
 
 ## What the debug spheres mean
 
@@ -67,7 +102,7 @@ The one-way model takes aircraft motion as input and supplies visual/audio feedb
 
 For audio, a slip- and load-driven chirp decays as the wheel catches up, even during a gentle touchdown. Rolling noise could later track contact speed and load. A procedural sound is an authored approximation, not a validated tire-acoustics model. The same tire state drives the rotating disk and audio so they respond together.
 
-Full longitudinal coupling would also need to replace or explicitly budget against existing friction. Simply turning off JSBSim's rolling coefficient leaves its braking force active; adding another complete brake/slip model would double-count forces. Its per-wheel `maximum-force-lbs` property is a limit rather than a measured normal force. [JSBSim friction and bindings](https://github.com/JSBSim-Team/jsbsim/blob/v1.2.4/src/models/FGLGear.cpp#L583).
+Full longitudinal coupling would also need to replace or explicitly budget against existing friction. Simply turning off JSBSim's rolling coefficient leaves its braking force active; adding another complete brake/slip model would double-count forces. Its per-wheel `maximum-force-lbs` property is a limit rather than a measured normal force. [JSBSim friction and bindings](https://github.com/JSBSim-Team/jsbsim/blob/v1.2.4/src/models/FGLGear.cpp#L583). The native contact contract that coupling needs, and a reference coupled rigid-wheel solver with conservation tests, now exist in `src/flight/physics/wheelContact.ts` and `coupledRigidWheels.ts`; neither is wired into the game, because the installed JSBSim WASM offers no per-wheel contact packet and the probe refuses any bridge that leaves JSBSim's own friction active.
 
 ## A/B evaluation
 

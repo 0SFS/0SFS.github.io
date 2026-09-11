@@ -1,4 +1,6 @@
-import { NullEngine, Quaternion, Scene, TransformNode, Vector3 } from "@babylonjs/core";
+import {
+  MeshBuilder, NullEngine, PBRMaterial, Quaternion, Scene, Texture, TransformNode, Vector3,
+} from "@babylonjs/core";
 import { beforeEach, describe, expect, it } from "vitest";
 import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
 import {
@@ -9,6 +11,8 @@ import {
   NEUTRAL_CONTROL_SURFACES,
   readControlSurfaceState,
   resetPropellerRpmProperty,
+  TYRE_BLURRED_U,
+  TYRE_SHARP_U,
 } from "./aircraftAnimation";
 
 const PART_NAMES = [
@@ -127,8 +131,8 @@ describe("control surface geometry", () => {
  * stowed point the model was designed around.
  */
 const SF50_GEAR = [
-  { leg: "LandingGear_Left", pivot: [-1.582, 0.922, 0.406], wheel: [-1.707, 0.190, 0.434], stowed: [-0.850, 0.797, 0.434] },
-  { leg: "LandingGear_Right", pivot: [1.582, 0.922, 0.406], wheel: [1.707, 0.190, 0.434], stowed: [0.850, 0.797, 0.434] },
+  { leg: "LandingGear_Left", pivot: [-1.712, 0.792, 0.406], wheel: [-1.707, 0.190, 0.434], stowed: [-1.110, 0.797, 0.434] },
+  { leg: "LandingGear_Right", pivot: [1.712, 0.792, 0.406], wheel: [1.707, 0.190, 0.434], stowed: [1.110, 0.797, 0.434] },
   { leg: "LandingGear_Nose", pivot: [0, 0.8235, -2.6055], wheel: [0, 0.179, -2.862], stowed: [0, 1.080, -3.250] },
 ] as const;
 
@@ -198,8 +202,8 @@ describe("retractable gear", () => {
     const CASES = [
       { name: "BayDoor_Nose_Left", down: [0.0165, -0.2345, 0.3705], up: [0.1716, -0.0552, 0.4000] },
       { name: "BayDoor_Nose_Right", down: [-0.0165, -0.2345, 0.3705], up: [-0.1716, -0.0552, 0.4000] },
-      { name: "BayDoor_Main_Left", down: [-0.3468, -0.7050, -0.3109], up: [0.7600, -0.0942, -0.3571] },
-      { name: "BayDoor_Main_Right", down: [0.3468, -0.7050, -0.3109], up: [-0.7600, -0.0942, -0.3571] },
+      { name: "BayDoor_Main_Left", down: [-0.2829, -0.5796, -0.3121], up: [0.6200, -0.0813, -0.3498] },
+      { name: "BayDoor_Main_Right", down: [0.2829, -0.5796, -0.3121], up: [-0.6200, -0.0813, -0.3498] },
     ] as const;
     const s = scene();
     for (const { name, down, up } of CASES) {
@@ -307,6 +311,109 @@ describe("retractable gear", () => {
     expect(() => applyAircraftRig(rig, { ...NEUTRAL_CONTROL_SURFACES, gearDownNorm: 0 }, 1))
       .not.toThrow();
     s.scene.dispose(); s.engine.dispose();
+  });
+});
+
+describe("rolling wheels", () => {
+  // Three tyres sharing one material and its atlas, as the exporter writes
+  // them (planes/shared/tyres.py). `textured` false is a coarse level's plain
+  // rubber tyre, which has no atlas.
+  function wheelRig(speed: number, onGround = true, textured = true) {
+    const s = scene();
+    const material = new PBRMaterial("SF50_Tyre", s.scene);
+    const atlas = textured ? new Texture(null, s.scene) : null;
+    if (atlas) material.albedoTexture = atlas;
+    const nodes: TransformNode[] = [];
+    for (const side of ["Left", "Right", "Nose"]) {
+      const mesh = MeshBuilder.CreateCylinder(`Wheel_${side}`, { diameter: 0.38, height: 0.14 }, s.scene);
+      mesh.rotation.z = Math.PI / 2;              // axle along X, as exported
+      mesh.bakeCurrentTransformIntoVertices();
+      mesh.material = material;
+      nodes.push(mesh);
+    }
+    const rig = bindAircraftRig(nodes, { scene: s.scene });
+    return {
+      ...s, rig, nodes, atlas,
+      state: { ...NEUTRAL_CONTROL_SURFACES, groundSpeedMps: speed, onGround },
+    };
+  }
+
+  it("measures each tyre's radius off its own mesh, and finds their one atlas", () => {
+    const t = wheelRig(0);
+    expect(t.rig.wheels).toHaveLength(3);
+    for (const wheel of t.rig.wheels) expect(wheel.radius).toBeCloseTo(0.19, 2);
+    // One texture however many tyres share it: blurring is one number.
+    expect(t.rig.tyreTextures).toEqual([t.atlas]);
+    // Held at the sharp half from the start, and NOT at zero - see TYRE_SHARP_U.
+    expect(t.atlas?.uOffset).toBe(TYRE_SHARP_U);
+    expect(TYRE_SHARP_U).not.toBe(0);
+    t.scene.dispose(); t.engine.dispose();
+  });
+
+  it("blurs a tyre without a second mesh", () => {
+    // The blur used to be a twin of every tyre, hidden until needed. It is the
+    // same mesh reading the other half of its texture now, so the loaded nodes
+    // are exactly the tyres and nothing is ever hidden to make it work.
+    const t = wheelRig(40);
+    applyAircraftRig(t.rig, t.state, 1 / 60);
+    expect(t.rig.wheelBlurred).toBe(true);
+    expect(t.nodes.map((node) => node.name)).toEqual(["Wheel_Left", "Wheel_Right", "Wheel_Nose"]);
+    for (const node of t.nodes) expect(node.isEnabled()).toBe(true);
+    t.scene.dispose(); t.engine.dispose();
+  });
+
+  it("rolls at ground speed over radius, and not at all in the air", () => {
+    const t = wheelRig(1.9);                      // 10 rad/s on a 0.19 m tyre
+    applyAircraftRig(t.rig, t.state, 0.1);
+    expect(t.rig.wheelAngleRad).toBeCloseTo(1, 3);
+    applyAircraftRig(t.rig, { ...t.state, onGround: false }, 0.1);
+    expect(t.rig.wheelAngleRad).toBeCloseTo(1, 3);   // held, not driven
+    t.scene.dispose(); t.engine.dispose();
+  });
+
+  it("moves the atlas to its blurred half once the band aliases, and back", () => {
+    // The band runs through the hub, so the image repeats TWICE per turn and
+    // the limit is PI / 2 / frame: 15 rev/s at 60 fps, about 35 kt on this
+    // tyre. Just under it the band is still the truth.
+    const t = wheelRig(17);                       // 89 rad/s, limit 94
+    applyAircraftRig(t.rig, t.state, 1 / 60);
+    expect(t.rig.wheelBlurred).toBe(false);
+    expect(t.atlas?.uOffset).toBe(TYRE_SHARP_U);
+
+    applyAircraftRig(t.rig, { ...t.state, groundSpeedMps: 25 }, 1 / 60);
+    expect(t.rig.wheelBlurred).toBe(true);
+    expect(t.atlas?.uOffset).toBe(TYRE_BLURRED_U);
+    // Half the atlas along: the other square, whichever way it wraps.
+    expect(Math.abs(TYRE_BLURRED_U - TYRE_SHARP_U) % 1).toBe(0.5);
+
+    // Hysteresis: sitting just under the limit on the way down stays blurred
+    // rather than flickering between the two.
+    applyAircraftRig(t.rig, { ...t.state, groundSpeedMps: 17 }, 1 / 60);
+    expect(t.rig.wheelBlurred).toBe(true);
+    applyAircraftRig(t.rig, { ...t.state, groundSpeedMps: 0 }, 1 / 60);
+    expect(t.rig.wheelBlurred).toBe(false);
+    expect(t.atlas?.uOffset).toBe(TYRE_SHARP_U);
+    t.scene.dispose(); t.engine.dispose();
+  });
+
+  it("judges the limit against the real frame rate, with or without a propeller", () => {
+    // A jet has no propeller, and the frame interval used to be measured only
+    // in the propeller branch - so its tyres were held to 60 fps on any display.
+    const t = wheelRig(25);
+    for (let i = 0; i < 200; i += 1) applyAircraftRig(t.rig, t.state, 1 / 144);
+    // At 144 Hz the limit is 2.4x higher and 25 m/s no longer aliases.
+    expect(t.rig.frameSeconds).toBeCloseTo(1 / 144, 4);
+    expect(t.rig.wheelBlurred).toBe(false);
+    t.scene.dispose(); t.engine.dispose();
+  });
+
+  it("still rolls a plain rubber tyre, which has nothing to blur", () => {
+    const t = wheelRig(40, true, false);
+    applyAircraftRig(t.rig, t.state, 1 / 60);
+    expect(t.rig.tyreTextures).toHaveLength(0);
+    expect(t.rig.wheelAngleRad).not.toBe(0);
+    for (const node of t.nodes) expect(node.isEnabled()).toBe(true);
+    t.scene.dispose(); t.engine.dispose();
   });
 });
 

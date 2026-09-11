@@ -26,6 +26,33 @@ function setup() {
 }
 
 describe("aircraft model loader", () => {
+  it("never makes a tyre something to collide with", async () => {
+    // Collision is JSBSim's contact points and the body probes, and the debug
+    // overlays draw their own plain tyre outlines. The visual tyres are a
+    // picture - their band and its blur are a texture, planes/shared/tyres.py
+    // - and not a shape anything should hit, so every loaded mesh, tyres
+    // included, stays unpickable.
+    const t = setup();
+    const loadContainer = vi.fn(async () => {
+      const container = new AssetContainer(t.scene);
+      for (const name of ["Wheel_Left", "Wheel_Right", "Wheel_Nose"]) {
+        const mesh = new Mesh(name, t.scene);
+        t.scene.removeMesh(mesh);
+        container.meshes.push(mesh);
+        container.rootNodes.push(mesh);
+      }
+      t.containers.push(container);
+      return container;
+    });
+    const model = createAircraftModel(t.scene, t.parent, {
+      aircraftId: "cirrus-vision-jet", lodId: "lod3", loadContainer,
+    });
+    await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
+    expect(t.containers[0].meshes.every((mesh) => mesh.isPickable === false)).toBe(true);
+    model.dispose();
+    t.teardown();
+  });
+
   it("loads the requested level, parents it, and reports triangle count", async () => {
     const t = setup();
     const model = createAircraftModel(t.scene, t.parent, {

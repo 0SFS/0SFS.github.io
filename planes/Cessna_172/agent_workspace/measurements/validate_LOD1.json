@@ -5,12 +5,13 @@
  "meshes": 16,
  "triangles": 288,
  "vertices": 189,
- "materials": 4,
+ "materials": 5,
  "material_names": [
   "C172_Dark",
   "C172_Glass",
   "C172_Metal",
-  "C172_Paint"
+  "C172_Paint",
+  "C172_Tyre"
  ],
  "textures": 0,
  "texture_names": [],
@@ -208,7 +209,7 @@
    "tris": 12,
    "verts": 8,
    "mats": [
-    "C172_Dark"
+    "C172_Tyre"
    ],
    "origin": [
     -1.25,
@@ -221,7 +222,7 @@
    "tris": 12,
    "verts": 8,
    "mats": [
-    "C172_Dark"
+    "C172_Tyre"
    ],
    "origin": [
     1.25,
@@ -234,7 +235,7 @@
    "tris": 12,
    "verts": 8,
    "mats": [
-    "C172_Dark"
+    "C172_Tyre"
    ],
    "origin": [
     0.0,

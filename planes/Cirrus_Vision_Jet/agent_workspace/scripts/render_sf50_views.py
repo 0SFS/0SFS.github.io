@@ -5,6 +5,8 @@ Usage:
   blender -b --factory-startup --python render_sf50_views.py -- \
       <input.blend|input.glb|EMPTY> <outdir> <prefix> [--silhouette] [--fit N] [--res N]
       [--center Y | --center X,Y,Z] [--views 01,06,...] [--wire] [--keepmat]
+      [--hide Obj,Obj]   hide these objects
+      [--blur]           draw the tyres' blurred half, as the runtime does at speed
 
 Renders 10 fixed orthographic views + a contact sheet.
 Aircraft convention: nose +Y, right wing +X, up +Z (Blender).
@@ -37,6 +39,28 @@ if inp != "EMPTY":
         bpy.ops.wm.open_mainfile(filepath=inp)
 
 sc = bpy.context.scene
+
+# Hide named objects, to see what sits behind them.
+if "--hide" in argv:
+    for name in argv[argv.index("--hide") + 1].split(","):
+        ob = bpy.data.objects.get(name)
+        if ob is not None:
+            ob.hide_render = True
+
+# The blurred tyre is the same mesh reading the other half of its texture
+# (planes/shared/tyres.py), so drawing it is a u offset of one half - which is
+# what the runtime does, and all it does.
+if "--blur" in argv:
+    for m in bpy.data.materials:
+        if not m.use_nodes or not m.name.endswith("_Tyre"):
+            continue
+        nt = m.node_tree
+        for tex in [n for n in nt.nodes if n.type == 'TEX_IMAGE']:
+            uv = nt.nodes.new("ShaderNodeTexCoord")
+            shift = nt.nodes.new("ShaderNodeMapping")
+            shift.inputs["Location"].default_value[0] = 0.5
+            nt.links.new(uv.outputs["UV"], shift.inputs["Vector"])
+            nt.links.new(shift.outputs["Vector"], tex.inputs["Vector"])
 
 # ---- strip existing cameras/lights so framing is fully deterministic ----
 for o in list(sc.objects):

@@ -831,6 +831,58 @@ two broken pivots on a model that was correct. It now execs the generator's
 constant header and derives them, which is the only way a check and the thing it
 checks cannot drift apart.
 
+### Tyres come from the shared module
+
+Don't write your own tyre. `planes/shared/tyres.py` builds them for every
+airframe. Import it the way both generators do and call `build_tyre`:
+
+```python
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                "..", "..", "..", "shared"))
+import tyres
+
+wheel = tyres.build_tyre(bpy, "Wheel_Left", center, r, w, n, "SF50", SC.collection)
+```
+
+It builds the plain n-sided cylinder, origin on the hub, with one texture: an
+atlas holding a white band through the hub (so the rate of turn can be read)
+beside that band averaged over a turn. The runtime moves the texture to the
+blurred half once the band spins faster than the display can show. That's the
+whole mechanism: no second mesh, no extra edges, not one triangle more than a
+plain tyre. The colours, the band's width and the coarsest ring worth
+texturing are the module's constants, not a generator's, so two airframes can't
+drift apart on something a viewer compares side by side. Name the tyre
+`Wheel_<suffix>`. `docs/drawing-fast-rotation.md` explains why.
+
+What came out of building it, which applies to any mark on any part:
+
+- **Put a mark in the texture unless it changes the outline.** The band went
+  through two geometric versions first. Cut edges came out as a pizza slice
+  because a fan from the hub widens toward the rim, and the fix of parallel
+  chords cost 16 triangles a tyre. The blur was a hidden second copy of the
+  tyre, 32 more. Both were pictures on an unchanged shape, which is what a
+  texture is for. A **planar** projection (u from fore-aft position, v from
+  height) is exact for any polygon, because a linear function interpolates
+  exactly across any triangle. So the coarsest cylinder carries a perfectly
+  straight, constant-width band with no new vertices. This is the opposite of
+  the glazing rule below: where the glass is changes how the aircraft reads at
+  200 m; a stripe on a tyre doesn't.
+- **A second mesh is for a different shape, not a different picture.** The
+  propeller disc is a separate mesh because a spinning propeller's average is a
+  lens, not blades. A tyre's average is a tyre. If what changes is only the
+  colour, change the material or the texture, not the mesh.
+- **A mark on the part people do not look at is not a mark.** The first band was
+  one tread block — free, correct, and invisible, because a tyre is seen from
+  the side almost always. Put the mark where the eye lands.
+- **Check a texture by reading the file, not by rendering it.** Blender shows an
+  image through its own colour space; `glb_texture_probe.py` prints the bytes a
+  viewer will actually sample.
+
+The visual tyre is **never** collision geometry — see "Rolling tyres" in
+`docs/aircraft-assets.md`. Contact is JSBSim's points; if something ever needs
+a tyre shape to collide with, it builds a plain cylinder from the radius and
+width.
+
 ### Test where a part LANDS, not how far it turned
 
 The most transferable thing in this document about rigging, and it is one line:
