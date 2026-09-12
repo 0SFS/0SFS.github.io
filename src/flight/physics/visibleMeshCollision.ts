@@ -43,12 +43,14 @@ function probePosition(state: FlightState, probe: typeof BODY_COLLISION_PROBES[n
 }
 
 export interface VisibleMeshCollisionOptions {
+  bodyProbes?: readonly typeof BODY_COLLISION_PROBES[number][];
   /** Values above one deliberately add energy, for the optional arcade mode. */
   getRestitution?: () => number;
 }
 
 export function createVisibleMeshCollision(sdk: JSBSimSdk, surface: SurfaceQuery, options: VisibleMeshCollisionOptions = {}) {
   let previousState: FlightState | null = null;
+  const probes = options.bodyProbes ?? BODY_COLLISION_PROBES;
 
   return {
     reset(): void { previousState = null; },
@@ -61,7 +63,7 @@ export function createVisibleMeshCollision(sdk: JSBSimSdk, surface: SurfaceQuery
       }
 
       let impact: { fraction: number; point: EcefVector; normal: EcefVector; probe: typeof BODY_COLLISION_PROBES[number] } | null = null;
-      for (const probe of BODY_COLLISION_PROBES) {
+      for (const probe of probes) {
         const from = probePosition(previousState, probe);
         const to = probePosition(current, probe);
         const movement = subtract(to, from);

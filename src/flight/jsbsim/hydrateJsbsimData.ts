@@ -1,9 +1,17 @@
 import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
 import type { AircraftId } from "../aircraft/aircraftIds";
 
-interface ManifestFileList {
-  files: string[];
-  aircraft: Record<string, string[]>;
+/** The same aircraft dependency selection is used by the browser and FDM tests. */
+export function resolveAircraftDataFiles(manifest: unknown, aircraftId: AircraftId): string[] {
+  const aircraft = manifest && typeof manifest === "object" && "aircraft" in manifest
+    ? manifest.aircraft : null;
+  const files = aircraft && typeof aircraft === "object" && aircraftId in aircraft
+    ? (aircraft as Record<string, unknown>)[aircraftId] : null;
+  if (!Array.isArray(files) || files.length === 0 || !files.every(path =>
+    typeof path === "string" && path.length > 0 && !path.startsWith("/") && !path.split("/").includes(".."))) {
+    throw new Error("No valid JSBSim package defined for aircraft " + aircraftId + ".");
+  }
+  return [...new Set(files as string[])];
 }
 
 const cache = new Map<string, Promise<Array<{ path: string; contents: string }>>>();
@@ -22,11 +30,7 @@ export async function downloadJsbsimData(
   const downloadPromise = (async () => {
     const response = await fetch(`${baseUrl}/manifest.json`);
     if (!response.ok) throw new Error("Failed to load the flight data manifest.");
-    const manifest = await response.json() as ManifestFileList;
-    const packageFiles = manifest.aircraft[aircraftId];
-    if (!Array.isArray(packageFiles) || packageFiles.length === 0) {
-      throw new Error(`No JSBSim package defined for aircraft ${aircraftId}.`);
-    }
+    const packageFiles = resolveAircraftDataFiles(await response.json(), aircraftId);
     let complete = 0;
     onProgress?.({ message: `Loading flight data: 0 of ${packageFiles.length} files`, progress: 0 });
     return Promise.all(packageFiles.map(async path => {

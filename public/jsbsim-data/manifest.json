@@ -15,11 +15,19 @@
       "engine/prop_75in2f.xml"
     ],
     "cirrus-vision-jet": [
-      "aircraft/c172p/c172p.xml",
-      "aircraft/c172p/reset00.xml",
-      "aircraft/c172p/reset01.xml",
-      "engine/eng_io320.xml",
-      "engine/prop_75in2f.xml"
+      "aircraft/sf50/sf50.xml",
+      "engine/fj33_5a.xml",
+      "engine/direct.xml"
+    ],
+    "cirrus-vision-jet-g2": [
+      "aircraft/sf50-g2/sf50-g2.xml",
+      "engine/fj33_5a.xml",
+      "engine/direct.xml"
+    ],
+    "cirrus-vision-jet-g3": [
+      "aircraft/sf50-g3/sf50-g3.xml",
+      "engine/fj33_5a.xml",
+      "engine/direct.xml"
     ]
-  ]
+  }
 }

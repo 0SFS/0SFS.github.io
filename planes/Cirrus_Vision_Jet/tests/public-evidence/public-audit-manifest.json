@@ -1,0 +1,555 @@
+{
+  "schemaVersion": 1,
+  "title": "SF50 public source audit supplement",
+  "date": "2026-09-12",
+  "baselineManifest": "manifest.json",
+  "scope": "Supplementary sources and navigation snapshots; do not conflate this with the original analyzer manifest.",
+  "rawLocation": "raw/",
+  "rawRedistributionApproved": false,
+  "aircraftValidated": false,
+  "sources": [
+    {
+      "file": "cen21-raw.csv",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15437675&FileExtension=csv&FileName=RDM%20Data%20File%20--%20N10GG-Rel.csv",
+      "bytes": 11699797,
+      "sha256": "3ca2a4eb59b754f00c4a2b4cd3df119fdcf6535fcfafb29cab02085aa55fd0ad",
+      "retrievedAt": "2026-09-12T17:19:23.754Z",
+      "status": "acquired",
+      "id": "audit-cen21-raw"
+    },
+    {
+      "file": "cen21-position.gpx",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15611228&FileExtension=gpx&FileName=arinc_20210929_133346_774-Rel.gpx",
+      "bytes": 567464,
+      "sha256": "f5e44fe3fb9d8946f1f6044cc1f9fceee3e0931134862669c56a7d19b07f3e85",
+      "retrievedAt": "2026-09-12T17:19:24.261Z",
+      "status": "acquired",
+      "id": "audit-cen21-position"
+    },
+    {
+      "file": "cen21-exam.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15243728&FileExtension=pdf&FileName=Examination%20Summary%20--%20CEN21LA384-Rel.pdf",
+      "bytes": 148116,
+      "sha256": "c6bc3032805026b887a82efc37e7b15cb34bc2479997c2aa015061856c56f1a6",
+      "retrievedAt": "2026-09-12T17:19:24.493Z",
+      "status": "acquired",
+      "id": "audit-cen21-exam"
+    },
+    {
+      "file": "cen21-pilot.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15145247&FileExtension=pdf&FileName=NTSB%20Accident%20Report%20--%20CEN21LA384_redacted-Rel.pdf",
+      "bytes": 3105384,
+      "sha256": "7febd920fe4ced4ed65f8eb2e01fc9361b5a1d6b9e85a3615d2fdf484de1f9b7",
+      "retrievedAt": "2026-09-12T17:19:25.679Z",
+      "status": "acquired",
+      "id": "audit-cen21-pilot"
+    },
+    {
+      "file": "cen21-weather.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15552928&FileExtension=pdf&FileName=WX_CEN21LA384_Specialists_Factual_v2-Rel.pdf",
+      "bytes": 2613173,
+      "sha256": "30935f25a6da5c41d19506ab148fea7a758e28b8b0dad4e3bb374342226dab76",
+      "retrievedAt": "2026-09-12T17:19:26.795Z",
+      "status": "acquired",
+      "id": "audit-cen21-weather"
+    },
+    {
+      "file": "cen21-airframe-maintenance.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15145577&FileExtension=pdf&FileName=Maintenance%20Records%20--%20Airframe_redacted-Rel.pdf",
+      "bytes": 3157068,
+      "sha256": "f57fc76290b217b1f780ca34d05f7d45b667df43820fdb6e68a888ef1e581fd0",
+      "retrievedAt": "2026-09-12T17:19:28.022Z",
+      "status": "acquired",
+      "id": "audit-cen21-airframe-maintenance"
+    },
+    {
+      "file": "cen21-engine-maintenance.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15542235&FileExtension=pdf&FileName=Maintenance%20Records%20--%20Engine_redacted-Rel.pdf",
+      "bytes": 1680093,
+      "sha256": "5a25c512b74668be5e4d6ae95feb106b7a76c0c0487ce7639891919d56ac3c91",
+      "retrievedAt": "2026-09-12T17:19:28.660Z",
+      "status": "acquired",
+      "id": "audit-cen21-engine-maintenance"
+    },
+    {
+      "file": "cen23-systems.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=17290579&FileExtension=pdf&FileName=CEN23FA045%20Systems%20Factual%20-%20final-Rel.pdf",
+      "bytes": 3255676,
+      "sha256": "ad309ade4be6aaa579a1b907bc92a534550f3119846388017b9ad8d1a075262b",
+      "retrievedAt": "2026-09-12T17:19:30.058Z",
+      "status": "acquired",
+      "id": "audit-cen23-systems"
+    },
+    {
+      "file": "cen23-exam.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=18188231&FileExtension=pdf&FileName=Aircraft%20on-scene%20examination%20Summary-Rel.pdf",
+      "bytes": 557342,
+      "sha256": "fa9f056117a82ffea21814070bce7205e69868a0e10e4588bd7aa1d05411200c",
+      "retrievedAt": "2026-09-12T17:19:30.354Z",
+      "status": "acquired",
+      "id": "audit-cen23-exam"
+    },
+    {
+      "file": "cen23-pilot.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=18167134&FileExtension=pdf&FileName=Pilot%20Interview%20on%2011-26-2022-Rel.pdf",
+      "bytes": 97460,
+      "sha256": "c4863a7e1743d89e5bba6590b31f7fe99fe4fc8906342789783b3a620ab2cf86",
+      "retrievedAt": "2026-09-12T17:19:30.530Z",
+      "status": "acquired",
+      "id": "audit-cen23-pilot"
+    },
+    {
+      "file": "garmin-touch-g1.pdf",
+      "url": "https://static.garmin.com/pumac/190-01979-01_a.pdf",
+      "bytes": 43735914,
+      "sha256": "30c4ca6e83166f8effa28ec5d237ae872582bec5fb4b6d12caa9ad0dbb63bb09",
+      "retrievedAt": "2026-09-12T17:19:43.115Z",
+      "status": "acquired",
+      "id": "audit-garmin-touch-g1"
+    },
+    {
+      "file": "historical-told-climb.pdf",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/5b0345689ba98cafce44659ac97d634a74c600ad/Data/climb.pdf",
+      "bytes": 156632,
+      "sha256": "b67a28c6a2238e8d3f9350dcb1b8a69442934cde7417df4fc61fc0f2e342182b",
+      "retrievedAt": "2026-09-12T17:19:43.455Z",
+      "status": "acquired",
+      "id": "audit-historical-told-climb"
+    },
+    {
+      "file": "anac-operational-report.pdf",
+      "url": "https://www.gov.br/anac/pt-br/assuntos/regulados/aeronaves/avaliacao-operacional/Cirrus_SF50_Vision_Jet_OE_Report.pdf",
+      "bytes": 509147,
+      "sha256": "f0c002a33122ed15e4aab6a63f1418da3bdf8fa2e31aa1f30190eb44fb409b5b",
+      "retrievedAt": "2026-09-12T17:19:47.389Z",
+      "status": "acquired",
+      "id": "audit-anac-operational-report"
+    },
+    {
+      "file": "wpr20-recorder.csv",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=14295671&FileExtension=csv&FileName=Recorders%20Summary%20Report%20attachment1-Rel.csv",
+      "bytes": 36884,
+      "sha256": "0fb3cb16ffb3e377cebfba27ac0d568968b16ed565ab8550425a0f38a7b3aa41",
+      "retrievedAt": "2026-09-12T17:21:51.632Z",
+      "status": "acquired",
+      "id": "audit-wpr20-recorder"
+    },
+    {
+      "file": "wpr20-recorder-report.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=14295319&FileExtension=pdf&FileName=Recorders%20Summary%20Report-Rel.pdf",
+      "bytes": 457790,
+      "sha256": "a26c665fa39a26ccf327bd027dffadb9c794a2398b3d80891a0da19c83efc0ea",
+      "retrievedAt": "2026-09-12T17:21:52.018Z",
+      "status": "acquired",
+      "id": "audit-wpr20-recorder-report"
+    },
+    {
+      "file": "era22-recorder.csv",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=16352357&FileExtension=csv&FileName=Recorded%20Data%20Specialist%27s%20Factual%20Report%20-%20Attachment%201-Rel.csv",
+      "finalUrl": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=16352357&FileExtension=csv&FileName=Recorded%20Data%20Specialist%27s%20Factual%20Report%20-%20Attachment%201-Rel.csv",
+      "bytes": 798734,
+      "sha256": "98504e0fcdad4539a2e3f133164e78e64b565e623f655af398c9a5dbfadf21a5",
+      "retrievedAt": "2026-09-12T17:23:56.677Z",
+      "status": "acquired",
+      "id": "audit-era22-recorder"
+    },
+    {
+      "file": "era22-recorder-report.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=17547347&FileExtension=pdf&FileName=Recorded%20data%20specialist_s%20factual%20report-FINAL-Rel.pdf",
+      "finalUrl": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=17547347&FileExtension=pdf&FileName=Recorded%20data%20specialist_s%20factual%20report-FINAL-Rel.pdf",
+      "bytes": 3024003,
+      "sha256": "1094e1afb7c5f5034d4b9df9b9755798ae1392980b64335e71440f1d298ebb25",
+      "retrievedAt": "2026-09-12T17:23:57.957Z",
+      "status": "acquired",
+      "id": "audit-era22-recorder-report"
+    },
+    {
+      "file": "era22-cirrus-energy.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=17486254&FileExtension=pdf&FileName=Updated%20Energy%20Analysis%20NTSB%20req%2008.05.2024_Redacted-Rel.pdf",
+      "finalUrl": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=17486254&FileExtension=pdf&FileName=Updated%20Energy%20Analysis%20NTSB%20req%2008.05.2024_Redacted-Rel.pdf",
+      "bytes": 367685,
+      "sha256": "86fdc52ea0c8bd2b2687d162db85d64260e50083a4b983540c9063fff81536e1",
+      "retrievedAt": "2026-09-12T17:23:58.260Z",
+      "status": "acquired",
+      "id": "audit-era22-cirrus-energy"
+    },
+    {
+      "file": "era22-final.pdf",
+      "url": "https://data.ntsb.gov/carol-repgen/api/Aviation/ReportMain/GenerateNewestReport/105897/pdf",
+      "finalUrl": "https://data.ntsb.gov/carol-repgen/api/Aviation/ReportMain/GenerateNewestReport/105897/pdf",
+      "bytes": 787750,
+      "sha256": "4fcb496248f23622de419e6fa0b71cdd0ff8168f12ca47edbbbeea526a3b3f5e",
+      "retrievedAt": "2026-09-12T17:24:01.926Z",
+      "status": "acquired",
+      "id": "audit-era22-final"
+    },
+    {
+      "file": "cen21-final.pdf",
+      "url": "https://data.ntsb.gov/carol-repgen/api/Aviation/ReportMain/GenerateNewestReport/103750/pdf",
+      "finalUrl": "https://data.ntsb.gov/carol-repgen/api/Aviation/ReportMain/GenerateNewestReport/103750/pdf",
+      "bytes": 783374,
+      "sha256": "0db65d1653082564e6f706dfb07f3525f1a8e67f9a06edd30dfcef92dc4dd8e1",
+      "retrievedAt": "2026-09-12T17:24:05.710Z",
+      "status": "acquired",
+      "id": "audit-cen21-final"
+    },
+    {
+      "file": "cen21-weather-attachment1.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=13018957&FileExtension=pdf&FileName=WX_CEN21LA384_Attachment_1_redacted-Rel.pdf",
+      "bytes": 48678832,
+      "sha256": "dc851f22b38e32b3b3bdc2dec3c93ed8d9bfd45e30afc4474532338e32ea7464",
+      "retrievedAt": "2026-09-12T17:29:20.254Z",
+      "status": "acquired",
+      "id": "audit-cen21-weather-attachment1"
+    },
+    {
+      "id": "flightdata-g1-0045-public-dom",
+      "file": "flightdata-headless.html",
+      "url": "https://www.flightdata.com/flight/2754779",
+      "acquisition": "Normal isolated Chrome headless navigation of an explicitly shared flight; hydrated DOM snapshot, not original avionics CSV",
+      "bytes": 1573627,
+      "sha256": "e828d6ece046ffc1092356ce7f586ceca7cc0a34bf53cb1873438e0a34549249",
+      "status": "acquired",
+      "retrievedAt": "2026-09-12T17:42:52.512Z",
+      "redistribution": "not-reviewed; raw cache only"
+    },
+    {
+      "id": "audit-navigation-portal",
+      "file": "portal.txt",
+      "url": "https://techpubs.cirrusaircraft.com/",
+      "bytes": 10517,
+      "sha256": "b75c266088e1a0e8749a659924c80c346dc917dd85b465823a7ab9be7189deda",
+      "status": "acquired",
+      "acquisition": "public navigation response; dynamic snapshot, not stable binary"
+    },
+    {
+      "id": "audit-navigation-portalPage",
+      "file": "portalPage.txt",
+      "url": "https://techpubs.cirrusaircraft.com/_next/static/chunks/app/page-f846a8abbe30e02e.js",
+      "bytes": 22025,
+      "sha256": "748af20d46c0284798e2966cabd9f888bcefdbf6514fe540bcf0e5dbf3136601",
+      "status": "acquired",
+      "acquisition": "public navigation response; dynamic snapshot, not stable binary"
+    },
+    {
+      "id": "audit-navigation-toldHistory",
+      "file": "toldHistory.txt",
+      "url": "https://api.github.com/repos/RISCfuture/SF50-TOLD/commits?path=SF50%20Shared%2FData%2Fg1%2Flanding%2F100%2Ftotal%20distance.csv&per_page=10",
+      "bytes": 13913,
+      "sha256": "e1e3f0ce05bf36b57ce11ecfabab3e649b2577c4e177cf11a3c3515d6d951f1f",
+      "status": "acquired",
+      "acquisition": "public navigation response; dynamic snapshot, not stable binary"
+    },
+    {
+      "id": "audit-navigation-toldChange",
+      "file": "toldChange.txt",
+      "url": "https://api.github.com/repos/RISCfuture/SF50-TOLD/commits/e3aedbc69b93d439919c0af403bd61719449b21a",
+      "bytes": 619277,
+      "sha256": "055ddfb8fbaace021efb9692e7c111d8fe8573c6b89a175306325ac625248c22",
+      "status": "acquired",
+      "acquisition": "public navigation response; dynamic snapshot, not stable binary"
+    },
+    {
+      "id": "audit-navigation-toldOldTree",
+      "file": "toldOldTree.html",
+      "url": "https://api.github.com/repos/RISCfuture/SF50-TOLD/git/trees/5b0345689ba98cafce44659ac97d634a74c600ad?recursive=1",
+      "bytes": 132906,
+      "sha256": "097e64a8c7a73b2c12879efcf0be77eb5cd4333f17067d7c5252741834f1970e",
+      "status": "acquired",
+      "acquisition": "public navigation response; dynamic snapshot, not stable binary"
+    },
+    {
+      "id": "audit-navigation-cen21Docket",
+      "file": "cen21Docket.txt",
+      "url": "https://data.ntsb.gov/Docket?NTSBNumber=CEN21LA384",
+      "bytes": 35751,
+      "sha256": "7311054996e5487a538e6a2cfe41b2792bc9efaf64fd6a743e3f44a3b66a1e64",
+      "status": "acquired",
+      "acquisition": "public navigation response; dynamic snapshot, not stable binary"
+    },
+    {
+      "id": "audit-navigation-cen23Docket",
+      "file": "cen23Docket.txt",
+      "url": "https://data.ntsb.gov/Docket?ProjectID=106361",
+      "bytes": 28130,
+      "sha256": "488c6a07b147b3b598acb4a065a50ae76f31460774e75ba0ead74bdbe12d5969",
+      "status": "acquired",
+      "acquisition": "public navigation response; dynamic snapshot, not stable binary"
+    },
+    {
+      "id": "audit-navigation-wpr20Docket",
+      "file": "wpr20Docket.html",
+      "url": "https://data.ntsb.gov/Docket?ProjectID=100738",
+      "bytes": 30440,
+      "sha256": "5dd70db482326a3ec96cbaa9e538dca72a586872b84ab8b49e8f17323db1943f",
+      "status": "acquired",
+      "acquisition": "public navigation response; dynamic snapshot, not stable binary"
+    },
+    {
+      "id": "audit-navigation-era22CorrectDocket",
+      "file": "era22CorrectDocket.html",
+      "url": "https://data.ntsb.gov/Docket?NTSBNumber=ERA22LA404",
+      "bytes": 33781,
+      "sha256": "8b8f48e4453d9cfbd60efcead7b15400c18e774159ef680819c4974536ae3762",
+      "status": "acquired",
+      "acquisition": "public navigation response; dynamic snapshot, not stable binary"
+    },
+    {
+      "id": "audit-navigation-cen25CorrectDocket",
+      "file": "cen25CorrectDocket.html",
+      "url": "https://data.ntsb.gov/Docket?NTSBNumber=CEN25LA069",
+      "bytes": 20769,
+      "sha256": "901309ec337d97dfc3beb1cac8fe9ebad044581b951f2a1ce89b3e49968dee8c",
+      "status": "acquired",
+      "acquisition": "public navigation response; dynamic snapshot, not stable binary"
+    },
+    {
+      "id": "audit-navigation-dca24Docket",
+      "file": "dca24Docket.html",
+      "url": "https://data.ntsb.gov/Docket?NTSBNumber=DCA24LA328",
+      "bytes": 20769,
+      "sha256": "176a7d983b7a02f91e67915a8aa2d653c1883b859277e437abd5b435b0f05ccd",
+      "status": "acquired",
+      "acquisition": "public navigation response; dynamic snapshot, not stable binary"
+    },
+    {
+      "id": "audit-navigation-flightdata-shared",
+      "file": "flightdata-shared.html",
+      "url": "https://www.flightdata.com/shared",
+      "bytes": 1051250,
+      "sha256": "61833f2c2f52bf56f7d9d16625f7b13562ea54f026f294901616fc52443604c0",
+      "status": "acquired",
+      "acquisition": "public navigation response; dynamic snapshot, not stable binary"
+    }
+  ],
+  "attempts": [
+    {
+      "file": "cen21-raw.csv",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15437675&FileExtension=csv&FileName=RDM%20Data%20File%20--%20N10GG-Rel.csv",
+      "bytes": 11699797,
+      "sha256": "3ca2a4eb59b754f00c4a2b4cd3df119fdcf6535fcfafb29cab02085aa55fd0ad",
+      "retrievedAt": "2026-09-12T17:19:23.754Z",
+      "status": "acquired"
+    },
+    {
+      "file": "cen21-position.gpx",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15611228&FileExtension=gpx&FileName=arinc_20210929_133346_774-Rel.gpx",
+      "bytes": 567464,
+      "sha256": "f5e44fe3fb9d8946f1f6044cc1f9fceee3e0931134862669c56a7d19b07f3e85",
+      "retrievedAt": "2026-09-12T17:19:24.261Z",
+      "status": "acquired"
+    },
+    {
+      "file": "cen21-exam.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15243728&FileExtension=pdf&FileName=Examination%20Summary%20--%20CEN21LA384-Rel.pdf",
+      "bytes": 148116,
+      "sha256": "c6bc3032805026b887a82efc37e7b15cb34bc2479997c2aa015061856c56f1a6",
+      "retrievedAt": "2026-09-12T17:19:24.493Z",
+      "status": "acquired"
+    },
+    {
+      "file": "cen21-pilot.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15145247&FileExtension=pdf&FileName=NTSB%20Accident%20Report%20--%20CEN21LA384_redacted-Rel.pdf",
+      "bytes": 3105384,
+      "sha256": "7febd920fe4ced4ed65f8eb2e01fc9361b5a1d6b9e85a3615d2fdf484de1f9b7",
+      "retrievedAt": "2026-09-12T17:19:25.679Z",
+      "status": "acquired"
+    },
+    {
+      "file": "cen21-weather.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15552928&FileExtension=pdf&FileName=WX_CEN21LA384_Specialists_Factual_v2-Rel.pdf",
+      "bytes": 2613173,
+      "sha256": "30935f25a6da5c41d19506ab148fea7a758e28b8b0dad4e3bb374342226dab76",
+      "retrievedAt": "2026-09-12T17:19:26.795Z",
+      "status": "acquired"
+    },
+    {
+      "file": "cen21-airframe-maintenance.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15145577&FileExtension=pdf&FileName=Maintenance%20Records%20--%20Airframe_redacted-Rel.pdf",
+      "bytes": 3157068,
+      "sha256": "f57fc76290b217b1f780ca34d05f7d45b667df43820fdb6e68a888ef1e581fd0",
+      "retrievedAt": "2026-09-12T17:19:28.022Z",
+      "status": "acquired"
+    },
+    {
+      "file": "cen21-engine-maintenance.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15542235&FileExtension=pdf&FileName=Maintenance%20Records%20--%20Engine_redacted-Rel.pdf",
+      "bytes": 1680093,
+      "sha256": "5a25c512b74668be5e4d6ae95feb106b7a76c0c0487ce7639891919d56ac3c91",
+      "retrievedAt": "2026-09-12T17:19:28.660Z",
+      "status": "acquired"
+    },
+    {
+      "file": "cen23-systems.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=17290579&FileExtension=pdf&FileName=CEN23FA045%20Systems%20Factual%20-%20final-Rel.pdf",
+      "bytes": 3255676,
+      "sha256": "ad309ade4be6aaa579a1b907bc92a534550f3119846388017b9ad8d1a075262b",
+      "retrievedAt": "2026-09-12T17:19:30.058Z",
+      "status": "acquired"
+    },
+    {
+      "file": "cen23-exam.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=18188231&FileExtension=pdf&FileName=Aircraft%20on-scene%20examination%20Summary-Rel.pdf",
+      "bytes": 557342,
+      "sha256": "fa9f056117a82ffea21814070bce7205e69868a0e10e4588bd7aa1d05411200c",
+      "retrievedAt": "2026-09-12T17:19:30.354Z",
+      "status": "acquired"
+    },
+    {
+      "file": "cen23-pilot.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=18167134&FileExtension=pdf&FileName=Pilot%20Interview%20on%2011-26-2022-Rel.pdf",
+      "bytes": 97460,
+      "sha256": "c4863a7e1743d89e5bba6590b31f7fe99fe4fc8906342789783b3a620ab2cf86",
+      "retrievedAt": "2026-09-12T17:19:30.530Z",
+      "status": "acquired"
+    },
+    {
+      "file": "garmin-touch-g1.pdf",
+      "url": "https://static.garmin.com/pumac/190-01979-01_a.pdf",
+      "bytes": 43735914,
+      "sha256": "30c4ca6e83166f8effa28ec5d237ae872582bec5fb4b6d12caa9ad0dbb63bb09",
+      "retrievedAt": "2026-09-12T17:19:43.115Z",
+      "status": "acquired"
+    },
+    {
+      "file": "historical-told-climb.pdf",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/5b0345689ba98cafce44659ac97d634a74c600ad/Data/climb.pdf",
+      "bytes": 156632,
+      "sha256": "b67a28c6a2238e8d3f9350dcb1b8a69442934cde7417df4fc61fc0f2e342182b",
+      "retrievedAt": "2026-09-12T17:19:43.455Z",
+      "status": "acquired"
+    },
+    {
+      "file": "anac-operational-report.pdf",
+      "url": "https://www.gov.br/anac/pt-br/assuntos/regulados/aeronaves/avaliacao-operacional/Cirrus_SF50_Vision_Jet_OE_Report.pdf",
+      "bytes": 509147,
+      "sha256": "f0c002a33122ed15e4aab6a63f1418da3bdf8fa2e31aa1f30190eb44fb409b5b",
+      "retrievedAt": "2026-09-12T17:19:47.389Z",
+      "status": "acquired"
+    },
+    {
+      "file": "wpr20-recorder.csv",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=14295671&FileExtension=csv&FileName=Recorders%20Summary%20Report%20attachment1-Rel.csv",
+      "bytes": 36884,
+      "sha256": "0fb3cb16ffb3e377cebfba27ac0d568968b16ed565ab8550425a0f38a7b3aa41",
+      "retrievedAt": "2026-09-12T17:21:51.632Z",
+      "status": "acquired"
+    },
+    {
+      "file": "wpr20-recorder-report.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=14295319&FileExtension=pdf&FileName=Recorders%20Summary%20Report-Rel.pdf",
+      "bytes": 457790,
+      "sha256": "a26c665fa39a26ccf327bd027dffadb9c794a2398b3d80891a0da19c83efc0ea",
+      "retrievedAt": "2026-09-12T17:21:52.018Z",
+      "status": "acquired"
+    },
+    {
+      "file": "swiss-n474cg-report.pdf",
+      "url": "https://www.sust.admin.ch/inhalte/AV-berichte/N474CG_SumB_e.pdf",
+      "status": "failed",
+      "reason": "Error: HTTP 404"
+    },
+    {
+      "file": "era22-recorder.csv",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=16352357&FileExtension=csv&FileName=Recorded%20Data%20Specialist%27s%20Factual%20Report%20-%20Attachment%201-Rel.csv",
+      "finalUrl": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=16352357&FileExtension=csv&FileName=Recorded%20Data%20Specialist%27s%20Factual%20Report%20-%20Attachment%201-Rel.csv",
+      "bytes": 798734,
+      "sha256": "98504e0fcdad4539a2e3f133164e78e64b565e623f655af398c9a5dbfadf21a5",
+      "retrievedAt": "2026-09-12T17:23:56.677Z",
+      "status": "acquired"
+    },
+    {
+      "file": "era22-recorder-report.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=17547347&FileExtension=pdf&FileName=Recorded%20data%20specialist_s%20factual%20report-FINAL-Rel.pdf",
+      "finalUrl": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=17547347&FileExtension=pdf&FileName=Recorded%20data%20specialist_s%20factual%20report-FINAL-Rel.pdf",
+      "bytes": 3024003,
+      "sha256": "1094e1afb7c5f5034d4b9df9b9755798ae1392980b64335e71440f1d298ebb25",
+      "retrievedAt": "2026-09-12T17:23:57.957Z",
+      "status": "acquired"
+    },
+    {
+      "file": "era22-cirrus-energy.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=17486254&FileExtension=pdf&FileName=Updated%20Energy%20Analysis%20NTSB%20req%2008.05.2024_Redacted-Rel.pdf",
+      "finalUrl": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=17486254&FileExtension=pdf&FileName=Updated%20Energy%20Analysis%20NTSB%20req%2008.05.2024_Redacted-Rel.pdf",
+      "bytes": 367685,
+      "sha256": "86fdc52ea0c8bd2b2687d162db85d64260e50083a4b983540c9063fff81536e1",
+      "retrievedAt": "2026-09-12T17:23:58.260Z",
+      "status": "acquired"
+    },
+    {
+      "file": "era22-final.pdf",
+      "url": "https://data.ntsb.gov/carol-repgen/api/Aviation/ReportMain/GenerateNewestReport/105897/pdf",
+      "finalUrl": "https://data.ntsb.gov/carol-repgen/api/Aviation/ReportMain/GenerateNewestReport/105897/pdf",
+      "bytes": 787750,
+      "sha256": "4fcb496248f23622de419e6fa0b71cdd0ff8168f12ca47edbbbeea526a3b3f5e",
+      "retrievedAt": "2026-09-12T17:24:01.926Z",
+      "status": "acquired"
+    },
+    {
+      "file": "cen21-final.pdf",
+      "url": "https://data.ntsb.gov/carol-repgen/api/Aviation/ReportMain/GenerateNewestReport/103750/pdf",
+      "finalUrl": "https://data.ntsb.gov/carol-repgen/api/Aviation/ReportMain/GenerateNewestReport/103750/pdf",
+      "bytes": 783374,
+      "sha256": "0db65d1653082564e6f706dfb07f3525f1a8e67f9a06edd30dfcef92dc4dd8e1",
+      "retrievedAt": "2026-09-12T17:24:05.710Z",
+      "status": "acquired"
+    },
+    {
+      "file": "flightdata-g1-0045.html",
+      "url": "https://www.flightdata.com/aircraft/8709/latest-flight",
+      "status": "failed",
+      "reason": "Error: HTTP 202 bytes=0 final=https://www.flightdata.com/flight/2754779"
+    },
+    {
+      "file": "flightdata-g1-0009.html",
+      "url": "https://www.flightdata.com/aircraft/10333/latest-flight",
+      "status": "failed",
+      "reason": "Error: HTTP 202 bytes=0 final=https://www.flightdata.com/flight/2085393"
+    },
+    {
+      "file": "cen21-weather-attachment1.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=13018957&FileExtension=pdf&FileName=WX_CEN21LA384_Attachment_1_redacted-Rel.pdf",
+      "bytes": 48678832,
+      "sha256": "dc851f22b38e32b3b3bdc2dec3c93ed8d9bfd45e30afc4474532338e32ea7464",
+      "retrievedAt": "2026-09-12T17:29:20.254Z",
+      "status": "acquired"
+    },
+    {
+      "file": "cen21-weather-attachment2.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=13018829&FileExtension=pdf&FileName=WX_CEN21LA384_Attachment_2_redacted-Rel.pdf",
+      "status": "failed",
+      "reason": "TimeoutError: The operation was aborted due to timeout"
+    },
+    {
+      "file": "rev-a1-caps-change.pdf",
+      "url": "https://downloads.regulations.gov/FAA-2023-0424-0002/attachment_1.pdf",
+      "status": "failed",
+      "reason": "Error: HTTP 403"
+    },
+    {
+      "file": "swiss-n474cg-report.pdf",
+      "url": "https://www.sust.admin.ch/inhalte/AV-berichte/N474CG_SumB_e.pdf",
+      "status": "failed",
+      "reason": "Error: HTTP 404"
+    },
+    {
+      "file": "cen21-weather-attachment2.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=13018829&FileExtension=pdf&FileName=WX_CEN21LA384_Attachment_2_redacted-Rel.pdf",
+      "status": "failed",
+      "reason": "TimeoutError: The operation was aborted due to timeout"
+    },
+    {
+      "file": "swiss-n474cg-report-de.pdf",
+      "url": "https://www.sust.admin.ch/inhalte/AV-berichte/N474CG_SumB_D.pdf",
+      "status": "failed",
+      "reason": "Error: HTTP 404"
+    }
+  ],
+  "notes": [
+    "The original collector/analyzer still use manifest.json (47 sources).",
+    "This supplement preserves exact acquired bytes, including dynamic page snapshots. Dynamic pages are not expected to be byte-identical on a future visit.",
+    "Published recorder files, manufacturer documents and publicly shared flights have different reuse rights; raw files remain ignored.",
+    "Two guessed docket IDs resolved to unrelated events and were excluded from SF50 evidence. Correct event IDs were recovered from primary reports.",
+    "A missing/empty docket response is not proof that records do not exist."
+  ]
+}

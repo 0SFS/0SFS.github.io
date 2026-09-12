@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-12T18:21:48.145Z",
+  "rawArtifactsVerified": 101,
+  "rawBytesVerified": 202667196,
+  "primaryAfmSha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+  "pinnedDerivedInputs": [
+    "primary-afm-candidates",
+    "public-flight-chart-candidates"
+  ],
+  "stages": [
+    {
+      "id": "primary-g1-afm",
+      "status": "processed",
+      "cruiseRows": 640,
+      "integratedClimbRows": 180,
+      "runwayAnchors": 12,
+      "calibrationCandidates": 600,
+      "sameSourceCheckRows": 220,
+      "eligibleIndependentValidationRows": 0
+    },
+    {
+      "id": "told-generation-tables",
+      "status": "processed",
+      "tableCount": 53,
+      "rowCount": 8535,
+      "blockedTables": 0,
+      "byVariant": {
+        "g1": {
+          "tables": 37,
+          "rows": 3552
+        },
+        "g2": {
+          "tables": 10,
+          "rows": 3361
+        },
+        "g2+": {
+          "tables": 6,
+          "rows": 1622
+        }
+      }
+    },
+    {
+      "id": "era22-g1-recorder",
+      "status": "processed",
+      "samples": 3178,
+      "duplicates": 0,
+      "gaps": 2,
+      "steadyReviewCandidates": 7
+    },
+    {
+      "id": "public-g1-dashboard",
+      "status": "processed",
+      "samples": 1013,
+      "gaps": 2,
+      "steadyReviewCandidates": 34
+    },
+    {
+      "id": "cen21-engineering-recorder",
+      "status": "processed",
+      "sourceRows": 450,
+      "uniqueTimes": 360,
+      "duplicateRows": 90,
+      "applicableToG1": false,
+      "aircraftSerial": "0202"
+    },
+    {
+      "id": "wide-recorder-quarantine",
+      "status": "processed",
+      "inventoried": 2,
+      "normalizedForCalibration": 0
+    },
+    {
+      "id": "wpr20-fuel-subset",
+      "status": "processed",
+      "samples": 714,
+      "eligibleForCalibration": false
+    }
+  ],
+  "modelInputsApplied": {
+    "ratedThrustLbf": 1846,
+    "usableFuelLb": 2001,
+    "usableFuelUsGal": 296,
+    "nominalFuelDensityLbPerUsGal": 6.76,
+    "wingAreaSqFt": 195.7,
+    "wingMacIn": 62.2,
+    "sources": {
+      "engineAndFuel": {
+        "file": "planes/Cirrus_Vision_Jet/tests/SF50-POH.pdf",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "document": "31452-001",
+        "pdfPage": 23,
+        "printedPage": "1-7"
+      },
+      "wingMac": {
+        "file": "planes/Cirrus_Vision_Jet/tests/public-evidence/raw/ntsb-stations.pdf",
+        "document": "AMM 6-00-2, 2018-07-09, reproduced in WPR20FA051",
+        "pdfPage": 13,
+        "figure": 15
+      }
+    }
+  },
+  "aircraftValidated": false,
+  "simulationExecuted": false,
+  "testSuiteExecuted": false,
+  "important": "Hash/schema processing success is not aircraft-fidelity validation. Review candidates are not automatically calibration-eligible."
+}

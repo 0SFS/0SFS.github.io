@@ -60,7 +60,14 @@ vi.mock("foss-earth/runtime", () => ({
   createBabylonRuntime: async () => mocks.runtime,
   RASTER_BASE_MAP_SOURCES: [], TERRAIN_SOURCES: [], resolveTerrainSource: vi.fn(), resolveRasterBaseMapSource: vi.fn(), resolveMapRuntimeConfig: () => ({}), setMapSourcePreference: vi.fn(), setTerrainSourcePreference: vi.fn(), setRasterQualityPreference: vi.fn(),
 }));
-vi.mock("./jsbsim/createJsbsimRuntime", () => ({ createJsbsimRuntime: async () => ({ sdk: { setPropertyValue: vi.fn(), getPropertyValue: vi.fn(() => 0) }, dispose: vi.fn() }) }));
+vi.mock("./jsbsim/createJsbsimRuntime", () => ({ createJsbsimRuntime: vi.fn(async (options: { aircraftId?: string } = {}) => ({
+  sdk: {
+    setPropertyValue: vi.fn(),
+    getPropertyValue: vi.fn((property: string) => property === "fcs/throttle-cmd-norm"
+      ? options.aircraftId === "cirrus-vision-jet" ? 0.35 : 0.65
+      : property === "gear/gear-cmd-norm" ? options.aircraftId === "cirrus-vision-jet" ? 0 : 1 : 0),
+  }, dispose: vi.fn(),
+})) }));
 vi.mock("./bridge/ecefBridge", () => ({ readFlightState: () => mocks.state }));
 vi.mock("./bridge/floatingOrigin", () => ({ createFloatingOrigin: () => ({ aircraftRoot: { setEnabled: vi.fn() }, apply: mocks.applyOrigin, dispose: vi.fn() }) }));
 vi.mock("./aircraft/createPlaceholderAircraft", () => ({ createPlaceholderAircraft: () => mocks.aircraft }));
@@ -86,6 +93,7 @@ vi.mock("./hud/createFlightHudBar", () => ({
 }));
 
 import { createFlightSimApp } from "./createFlightSimApp";
+import { createJsbsimRuntime } from "./jsbsim/createJsbsimRuntime";
 import { createCollisionDebugOverlay } from "./diagnostics/createCollisionDebugOverlay";
 import { createFixedStepPhysicsLoop } from "./physics/fixedStepLoop";
 import { createVisibleMeshCollision } from "./physics/visibleMeshCollision";
@@ -305,7 +313,7 @@ it("mounts the shared + menu, opens Location, and applies coordinates to the sim
       }
     });
     await act(async () => inputs[0].form!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })));
-    expect(mocks.resetLocation).toHaveBeenCalledWith(expect.anything(), { latDeg: 46.7867, lonDeg: -92.1005, altMeters: 1000 }, 250);
+    expect(mocks.resetLocation).toHaveBeenCalledWith(expect.anything(), { latDeg: 46.7867, lonDeg: -92.1005, altMeters: 1000 }, 250, "cessna-172");
     expect(mocks.physics.reset).toHaveBeenCalledTimes(2);
     expect(mocks.applyOrigin).toHaveBeenLastCalledWith(mocks.state);
     expect(mocks.runtime.setSimViewState).toHaveBeenLastCalledWith(expect.objectContaining({ latDeg: mocks.state.latDeg, lonDeg: mocks.state.lonDeg }));
@@ -324,7 +332,7 @@ it("mounts the shared + menu, opens Location, and applies coordinates to the sim
 });
 
 
-it("selects the airframe and LOD from the Aircraft tab and persists both", async () => {
+it("persists a new airframe for reload while retaining the active model, and applies LOD immediately", async () => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
   const setItem = vi.fn();
   vi.stubGlobal("localStorage", { getItem: () => null, setItem });
@@ -355,11 +363,28 @@ it("selects the airframe and LOD from the Aircraft tab and persists both", async
     expect(setItem).toHaveBeenCalledWith("osfs.aircraft-lod", "lod2");
 
     await act(async () => radios[1].click());
-    expect(mocks.aircraftModel.setAircraft).toHaveBeenCalledWith("cirrus-vision-jet");
+    expect(mocks.aircraftModel.setAircraft).not.toHaveBeenCalled();
+    expect(createJsbsimRuntime).toHaveBeenCalledTimes(1);
     expect(setItem).toHaveBeenCalledWith("osfs.aircraft", "cirrus-vision-jet");
   } finally { await act(async () => app.destroy()); }
 });
 
+
+it("boots a saved SF50 selection with its matching FDM, reset identity and collision probes", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  vi.stubGlobal("localStorage", { getItem: (key: string) => key === "osfs.aircraft" ? "cirrus-vision-jet" : null, setItem: vi.fn() });
+  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
+  const root = document.createElement("div"); document.body.append(root);
+  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
+  await act(async () => { app = await createFlightSimApp(root); });
+  try {
+    expect(createJsbsimRuntime).toHaveBeenCalledWith(expect.objectContaining({ aircraftId: "cirrus-vision-jet" }));
+    expect(mocks.resetLocation).toHaveBeenLastCalledWith(expect.anything(), expect.anything(), 250, "cirrus-vision-jet");
+    const probes = vi.mocked(createVisibleMeshCollision).mock.calls.at(-1)![2]!.bodyProbes!;
+    expect(probes).toContainEqual(expect.objectContaining({ name: "left-wing", left: 5.898 }));
+    expect(probes).toContainEqual(expect.objectContaining({ name: "right-tail" }));
+  } finally { await act(async () => app.destroy()); }
+});
 
 it("drives the model's control surfaces and propeller from the simulation each tick", async () => {
   vi.stubGlobal("localStorage", { getItem: () => "trackpad", setItem: vi.fn() });

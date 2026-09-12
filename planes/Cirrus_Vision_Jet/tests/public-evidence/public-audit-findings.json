@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-12",
+  "target": "Historical G1; AFM P/N 31452-001 Rev 4 retained",
+  "publicOptionsExhausted": false,
+  "aircraftValidated": false,
+  "takeoffReconciliation": {
+    "status": "sea-level-6000lb-interpolation-discrepancy-explained",
+    "pdfPage": 383,
+    "groundEndpointsFt": [
+      1999,
+      2231
+    ],
+    "totalEndpointsFt": [
+      3133,
+      3519
+    ],
+    "temperaturesC": [
+      10,
+      20
+    ],
+    "linearAt15C": {
+      "groundFt": 2115,
+      "totalFt": 3326
+    },
+    "explicitIsa": {
+      "groundFt": 2036,
+      "totalFt": 3192
+    },
+    "physicalBreakpointCauseVerified": false
+  },
+  "landingReconciliation": {
+    "status": "unresolved-at-exact-temperature-grid-points",
+    "retainPinnedRev4": true,
+    "doNotAverageOrWidenTolerance": true
+  },
+  "primaryExtraction": {
+    "cruiseRows": 640,
+    "cruisePdfPages": [
+      433,
+      472
+    ],
+    "integratedClimbRows": 180,
+    "integratedClimbPdfPages": [
+      421,
+      432
+    ],
+    "fullyVisuallyReviewed": false,
+    "eligibleForAircraftValidation": false
+  },
+  "cirrusEnergyCandidate": {
+    "sourceId": "audit-era22-cirrus-energy",
+    "pdfPage": 2,
+    "letterDate": "2024-08-05",
+    "estimatedWeightLb": 4981,
+    "oatC": 22,
+    "averageAltitudeFt": 2000,
+    "afmExpectedClimbFpm": 1971,
+    "role": "AFM-based condition-specific estimate; not an independent normal climb measurement",
+    "visuallyInspected": true
+  },
+  "publicFlightCandidate": {
+    "source": "https://www.flightdata.com/flight/2754779",
+    "aircraftSerial": "0045",
+    "seriesCount": 50,
+    "timeSeriesCount": 49,
+    "pointsPerTimeSeries": 1013,
+    "phaseSeriesPoints": 4,
+    "intervalCountsSec": {
+      "5": 1,
+      "6": 985,
+      "7": 24,
+      "12": 1,
+      "16": 1
+    },
+    "originalAvionicsExport": false,
+    "normalOperationReviewed": false,
+    "loadingKnown": false,
+    "reuseApproved": false,
+    "access": "Normal isolated Chrome headless navigation; no login or bypass"
+  },
+  "recorderDonors": [
+    {
+      "event": "ERA22LA404",
+      "serial": "0088",
+      "year": 2018,
+      "rows": 3178,
+      "columns": 56,
+      "status": "G1 pre-upset candidate; replay not approved"
+    },
+    {
+      "event": "CEN21LA384",
+      "serial": "0202",
+      "reportedAccidentWeightLb": 5756,
+      "rows": 4642,
+      "columns": 1097,
+      "encoding": "utf-8",
+      "bootstrapRows": 40,
+      "status": "Not a directly matched historical G1 donor; wind and timebase limitations"
+    },
+    {
+      "event": "CEN23FA045",
+      "serial": "0215",
+      "rows": 1027,
+      "columns": 1083,
+      "bootstrapRows": 8,
+      "status": "Abnormal automation; flags and status words unreviewed"
+    },
+    {
+      "event": "WPR20FA051",
+      "serial": "0010",
+      "schema": "Time PST; electrical/oil/fuel channels; negative sentinels",
+      "status": "No N1/attitude/brake dynamics in published selected export"
+    }
+  ],
+  "engine": {
+    "source": "EASA IM.E.016 Issue 13",
+    "maximumHpBleedLbPerMin": 40,
+    "installationOperatingInstructions": "112471",
+    "installedThrustMapAcquired": false
+  },
+  "researchFailure": {
+    "component": "research-only multi-recorder inventory",
+    "file": "wpr20-recorder.csv",
+    "reason": "Time PST header not supported by exploratory shared Time-header assumption",
+    "fixed": false,
+    "affectsExecutedBaselineAnalyzer": false
+  },
+  "remainingGates": [
+    "Approve primary table transcription/conditions",
+    "Reconcile newer primary landing pages through authorized publication access",
+    "Obtain public-flight raw-export/reuse and loading context",
+    "Normalize supplementary schemas and test them",
+    "Establish independent holdouts before fitting",
+    "Resolve installed engine definitions, CG/inertia and pilot inputs where public evidence permits"
+  ],
+  "noAccountsCreated": true,
+  "noContactsMade": true,
+  "noModelOrDependencyCodeChanged": true
+}

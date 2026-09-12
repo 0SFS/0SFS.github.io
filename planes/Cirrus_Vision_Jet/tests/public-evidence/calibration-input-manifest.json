@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "sources": [
+    {
+      "id": "primary-afm-candidates",
+      "file": "primary-afm-expanded-candidates.json",
+      "upstreamSha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+      "bytes": 297826,
+      "sha256": "0dc9791ffeda22dad6f77508c527c5b31ac92c4f0ffe1414103f12f65ab82d11",
+      "transcriptionReviewed": false
+    },
+    {
+      "id": "public-flight-chart-candidates",
+      "file": "derived/public-audit-2026-09-12/flightdata-chart-candidate.json",
+      "upstreamSha256": "e828d6ece046ffc1092356ce7f586ceca7cc0a34bf53cb1873438e0a34549249",
+      "bytes": 1204026,
+      "sha256": "8aed5e8cd732544df330c9ace8b4cba8a8b6d272ad48569141d572847f4dcd9c",
+      "transcriptionReviewed": false
+    }
+  ],
+  "aircraftValidated": false
+}

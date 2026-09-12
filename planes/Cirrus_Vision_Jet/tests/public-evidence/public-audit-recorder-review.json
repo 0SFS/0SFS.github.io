@@ -1,0 +1,1581 @@
+{
+  "status": "partial-research-inventory",
+  "aircraftValidated": false,
+  "recorders": [
+    {
+      "id": "cen21",
+      "encoding": "utf-8",
+      "rows": 4642,
+      "columns": 1097,
+      "firstClock": [
+        "01/01/0001",
+        "00:03.4",
+        "0:00"
+      ],
+      "lastClock": [
+        "8/24/2021",
+        "03:03.2",
+        "0:00"
+      ],
+      "bootstrapYear0001Rows": 40,
+      "firstNonBootstrap": [
+        "8/24/2021",
+        "47:43.0",
+        "0:00"
+      ],
+      "channels": [
+        {
+          "index": 20,
+          "name": "OAT (ADC1)",
+          "unit": "°C",
+          "label": "Label 033.00",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 96.8,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 59,
+          "name": "CAPS System Activated",
+          "unit": "BIN",
+          "label": "Label 060.00.28",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 153,
+          "name": "Bleed Air Selected On",
+          "unit": "BIN",
+          "label": "Label 064.00.14",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "1",
+            "1",
+            "1"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 1,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 178,
+          "name": "Gross Weight",
+          "unit": "Lbs",
+          "label": "Label 075.00",
+          "first": [
+            "3816.5",
+            "3816.5",
+            "3816.5"
+          ],
+          "last": [
+            "5756.5",
+            "5756.5",
+            "5756.5"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 3816.5,
+          "max": 5782.5,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 230,
+          "name": "Bleed Air Pressure",
+          "unit": "PSI",
+          "label": "Label 153.00",
+          "first": [
+            "-0.2",
+            "-0.2",
+            "-0.2"
+          ],
+          "last": [
+            "0.3",
+            "0.3",
+            "0.3"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": -2.1,
+          "max": 46.2,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 392,
+          "name": "BLEED AIR",
+          "unit": "BIN",
+          "label": "Label 231.00.27",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "1",
+            "1",
+            "1"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 1,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 393,
+          "name": "BLEED LEAK",
+          "unit": "BIN",
+          "label": "Label 231.00.26",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "1",
+            "1",
+            "1"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 1,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 394,
+          "name": "BLEED OFF",
+          "unit": "BIN",
+          "label": "Label 231.00.25",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 395,
+          "name": "BLEED OFF (ACK)",
+          "unit": "BIN",
+          "label": "Label 231.00.24",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 1,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 396,
+          "name": "BLEED OPEN",
+          "unit": "BIN",
+          "label": "Label 231.00.23",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 397,
+          "name": "BLEED OVERPRESSURE",
+          "unit": "BIN",
+          "label": "Label 231.00.22",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 401,
+          "name": "ECS BLEED HOT",
+          "unit": "BIN",
+          "label": "Label 231.00.18",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 402,
+          "name": "ECS BLEED OVERHEAT",
+          "unit": "BIN",
+          "label": "Label 231.00.17",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "1",
+            "1",
+            "1"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 1,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 435,
+          "name": "FUEL QTY MISCOMPARE",
+          "unit": "BIN",
+          "label": "Label 233.00.24",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 1,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 450,
+          "name": "IPS BLEED OVERHEAT",
+          "unit": "BIN",
+          "label": "Label 234.00.29",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 536,
+          "name": "N1 Takeoff Request (Label 250)",
+          "unit": "%",
+          "label": "Label 250.00",
+          "first": [
+            "92.52",
+            "92.52",
+            "92.52"
+          ],
+          "last": [
+            "77.59",
+            "77.59",
+            "77.59"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 77.58,
+          "max": 94.72,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 548,
+          "name": "Fuel Quantity (Left)",
+          "unit": "Gal",
+          "label": "Label 257.00",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 148,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 550,
+          "name": "Fuel Quantity (Right)",
+          "unit": "Gal",
+          "label": "Label 257.01",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 148,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 662,
+          "name": "CAPS AUTOPILOT INOP",
+          "unit": "BIN",
+          "label": "Label 270.00.29",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 848,
+          "name": "Pitch Angle (AHRS1)",
+          "unit": "Deg",
+          "label": "Label 324.00",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "3.66",
+            "3.67",
+            "3.66"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": -19.56,
+          "max": 4.34,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 894,
+          "name": "N1 Requested Speed (Label 341)",
+          "unit": "%",
+          "label": "Label 341.00",
+          "first": [
+            "46.7",
+            "46.7",
+            "46.7"
+          ],
+          "last": [
+            "42.4",
+            "42.4",
+            "42.4"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 42.4,
+          "max": 94.72,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 900,
+          "name": "N2 Core Speed (%)",
+          "unit": "%",
+          "label": "Label 344.00",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 96,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 942,
+          "name": "Bleed Failure (Fault Code 22)",
+          "unit": "BIN",
+          "label": "Label 351.00.13",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 983,
+          "name": "Bleed Split Failure (Fault Code 59)",
+          "unit": "BIN",
+          "label": "Label 353.00.12",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 1079,
+          "name": "Bleed Level (Table A45)",
+          "unit": "BIN",
+          "label": "Label 372.00.20",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 1080,
+          "name": "Bleed Level (Table A45)",
+          "unit": "BIN",
+          "label": "Label 372.00.19",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 4602,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        }
+      ],
+      "status": "quarantined-not-replay-approved"
+    },
+    {
+      "id": "cen23",
+      "encoding": "windows-1252",
+      "rows": 1027,
+      "columns": 1083,
+      "firstClock": [
+        "01/01/0001",
+        "00:00:03.678",
+        "00:00"
+      ],
+      "lastClock": [
+        "11/25/2022",
+        "12:58:31.874",
+        "00:00"
+      ],
+      "bootstrapYear0001Rows": 8,
+      "firstNonBootstrap": [
+        "11/25/2022",
+        "12:41:32.334",
+        "00:00"
+      ],
+      "channels": [
+        {
+          "index": 20,
+          "name": "OAT (ADC1)",
+          "unit": "°C",
+          "label": "Label 033.00",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "4.8",
+            "4.8",
+            "4.5"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 8,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 59,
+          "name": "CAPS System Activated",
+          "unit": "BIN",
+          "label": "Label 060.00.28",
+          "first": [
+            "1",
+            "1",
+            "1"
+          ],
+          "last": [
+            "1",
+            "1",
+            "1"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 1,
+          "max": 1,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 153,
+          "name": "Bleed Air Selected On",
+          "unit": "BIN",
+          "label": "Label 064.00.14",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "1",
+            "1",
+            "1"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 1,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 178,
+          "name": "Gross Weight",
+          "unit": "Lbs",
+          "label": "Label 075.00",
+          "first": [
+            "4406",
+            "4406",
+            "4406"
+          ],
+          "last": [
+            "5387",
+            "5387",
+            "5387"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 4406,
+          "max": 5884,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 231,
+          "name": "CAPS Autopilot Mode Active",
+          "unit": "BIN",
+          "label": "Label 144.00.28",
+          "first": [
+            "",
+            "",
+            ""
+          ],
+          "last": [
+            "",
+            "",
+            ""
+          ],
+          "finiteCount": 0,
+          "negativeSentinels": 0,
+          "min": null,
+          "max": null,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 254,
+          "name": "Bleed Air Pressure",
+          "unit": "PSI",
+          "label": "Label 153.00",
+          "first": [
+            "0.5",
+            "0.5",
+            "0.5"
+          ],
+          "last": [
+            "0.4",
+            "0.4",
+            "0.4"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0.3,
+          "max": 44.6,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 416,
+          "name": "BLEED AIR",
+          "unit": "BIN",
+          "label": "Label 231.00.27",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "1",
+            "1",
+            "1"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 1,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 417,
+          "name": "BLEED LEAK",
+          "unit": "BIN",
+          "label": "Label 231.00.26",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 418,
+          "name": "BLEED OFF",
+          "unit": "BIN",
+          "label": "Label 231.00.25",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 419,
+          "name": "BLEED OFF ACK",
+          "unit": "BIN",
+          "label": "Label 231.00.24",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 1,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 420,
+          "name": "BLEED OPEN",
+          "unit": "BIN",
+          "label": "Label 231.00.23",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 421,
+          "name": "BLEED OVERPRESSURE",
+          "unit": "BIN",
+          "label": "Label 231.00.22",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 425,
+          "name": "ECS BLEED HOT",
+          "unit": "BIN",
+          "label": "Label 231.00.18",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 426,
+          "name": "ECS BLEED OVERHEAT",
+          "unit": "BIN",
+          "label": "Label 231.00.17",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 459,
+          "name": "FUEL QTY MISCOMPARE",
+          "unit": "BIN",
+          "label": "Label 233.00.24",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 1,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 474,
+          "name": "IPS BLEED OVERHEAT",
+          "unit": "BIN",
+          "label": "Label 234.00.29",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 538,
+          "name": "N1 Takeoff Request (Label 250)",
+          "unit": "%",
+          "label": "Label 250.00",
+          "first": [
+            "96.85",
+            "96.85",
+            "96.84"
+          ],
+          "last": [
+            "97.1",
+            "97.12",
+            "97.14"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 96.7,
+          "max": 99.03,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 550,
+          "name": "Fuel Quantity (Left)",
+          "unit": "Gal",
+          "label": "Label 257.00",
+          "first": [
+            "0",
+            "0",
+            "109.8"
+          ],
+          "last": [
+            "100.5",
+            "100.5",
+            "100.5"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 111.3,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 552,
+          "name": "Fuel Quantity (Right)",
+          "unit": "Gal",
+          "label": "Label 257.01",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "107.8",
+            "107.8",
+            "107.8"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 111.8,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 684,
+          "name": "CAPS AUTOPILOT INOP",
+          "unit": "BIN",
+          "label": "Label 270.00.29",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 846,
+          "name": "Pitch Angle (AHRS1)",
+          "unit": "Deg",
+          "label": "Label 324.00",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "5.23",
+            "5.12",
+            "5.15"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": -55.62,
+          "max": 81.52,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 892,
+          "name": "N1 Requested Speed (Label 341)",
+          "unit": "%",
+          "label": "Label 341.00",
+          "first": [
+            "49.01",
+            "49.01",
+            "49.01"
+          ],
+          "last": [
+            "49.98",
+            "49.97",
+            "49.96"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 48.99,
+          "max": 99.08,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 898,
+          "name": "N2 Core Speed (%)",
+          "unit": "%",
+          "label": "Label 344.00",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 97.2,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 940,
+          "name": "Bleed Failure (Fault Code 22)",
+          "unit": "BIN",
+          "label": "Label 351.00.13",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 981,
+          "name": "Bleed Split Failure (Fault Code 59)",
+          "unit": "BIN",
+          "label": "Label 353.00.12",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 1073,
+          "name": "Bleed Level (Table A45)",
+          "unit": "BIN",
+          "label": "Label 372.00.20",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 1074,
+          "name": "Bleed Level (Table A45)",
+          "unit": "BIN",
+          "label": "Label 372.00.19",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 1019,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 0,
+          "uniqueNonNumeric": []
+        }
+      ],
+      "status": "quarantined-not-replay-approved"
+    },
+    {
+      "id": "era22",
+      "encoding": "utf-8",
+      "rows": 3178,
+      "columns": 56,
+      "firstClock": [
+        "14:10:00"
+      ],
+      "lastClock": [
+        "15:02:59"
+      ],
+      "bootstrapYear0001Rows": 0,
+      "channels": [
+        {
+          "index": 0,
+          "name": "Time",
+          "unit": "(EDT)",
+          "first": [
+            "14:10:00",
+            "14:10:01",
+            "14:10:02"
+          ],
+          "last": [
+            "15:02:57",
+            "15:02:58",
+            "15:02:59"
+          ],
+          "finiteCount": 0,
+          "negativeSentinels": 0,
+          "min": null,
+          "max": null,
+          "uniqueNonNumeric": [
+            "14:10:00",
+            "14:10:01",
+            "14:10:02",
+            "14:10:03",
+            "14:10:04",
+            "14:10:05",
+            "14:10:06",
+            "14:10:07",
+            "14:10:08",
+            "14:10:09"
+          ]
+        },
+        {
+          "index": 11,
+          "name": "Altitude Press-1",
+          "unit": "(ft)",
+          "first": [
+            "102",
+            "103",
+            "102"
+          ],
+          "last": [
+            "139",
+            "139",
+            "141"
+          ],
+          "finiteCount": 3178,
+          "negativeSentinels": 0,
+          "min": 81,
+          "max": 17104,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 12,
+          "name": "Altitude Press-2",
+          "unit": "(ft)",
+          "first": [
+            "96",
+            "97",
+            "97"
+          ],
+          "last": [
+            "121",
+            "121",
+            "123"
+          ],
+          "finiteCount": 3178,
+          "negativeSentinels": 0,
+          "min": 75,
+          "max": 17099,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 24,
+          "name": "Eng ITT",
+          "unit": "(?C)",
+          "first": [
+            "501",
+            "500",
+            "500"
+          ],
+          "last": [
+            "511",
+            "514",
+            "517"
+          ],
+          "finiteCount": 3178,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 918,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 25,
+          "name": "Eng N1",
+          "unit": "(%)",
+          "first": [
+            "24.2",
+            "24.3",
+            "24.4"
+          ],
+          "last": [
+            "0.0",
+            "0.0",
+            "0.0"
+          ],
+          "finiteCount": 3178,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 94.9,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 26,
+          "name": "Eng N1 Request",
+          "unit": "(%)",
+          "first": [
+            "47",
+            "47",
+            "47"
+          ],
+          "last": [
+            "48",
+            "48",
+            "48"
+          ],
+          "finiteCount": 3178,
+          "negativeSentinels": 0,
+          "min": 46,
+          "max": 95,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 27,
+          "name": "Eng N2",
+          "unit": "(%)",
+          "first": [
+            "53.4",
+            "53.4",
+            "53.4"
+          ],
+          "last": [
+            "0.0",
+            "0.0",
+            "0.0"
+          ],
+          "finiteCount": 3178,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 98.8,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 28,
+          "name": "Eng Oil Press",
+          "unit": "(PSI)",
+          "first": [
+            "53",
+            "53",
+            "53"
+          ],
+          "last": [
+            "-2",
+            "-2",
+            "-2"
+          ],
+          "finiteCount": 3178,
+          "negativeSentinels": 0,
+          "min": -2,
+          "max": 80,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 29,
+          "name": "Eng Oil Temp",
+          "unit": "(?C)",
+          "first": [
+            "80",
+            "80",
+            "80"
+          ],
+          "last": [
+            "86",
+            "86",
+            "86"
+          ],
+          "finiteCount": 3178,
+          "negativeSentinels": 0,
+          "min": 74,
+          "max": 107,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 30,
+          "name": "Eng Percent Thrust",
+          "unit": "(%)",
+          "first": [
+            "3",
+            "3",
+            "3"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 3178,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 76,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 31,
+          "name": "Eng T2",
+          "unit": "(?C)",
+          "first": [
+            "35",
+            "35",
+            "35"
+          ],
+          "last": [
+            "27",
+            "27",
+            "27"
+          ],
+          "finiteCount": 3178,
+          "negativeSentinels": 0,
+          "min": 6,
+          "max": 35,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 32,
+          "name": "Eng TLA",
+          "unit": "(deg)",
+          "first": [
+            "-22",
+            "-22",
+            "-22"
+          ],
+          "last": [
+            "-22",
+            "-22",
+            "-22"
+          ],
+          "finiteCount": 3178,
+          "negativeSentinels": 0,
+          "min": -22,
+          "max": 38,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 38,
+          "name": "GPS Altitude (GIA1)",
+          "unit": "(ft)",
+          "first": [
+            "12",
+            "12",
+            "12"
+          ],
+          "last": [
+            "1019",
+            "1041",
+            "1062"
+          ],
+          "finiteCount": 3178,
+          "negativeSentinels": 0,
+          "min": 9,
+          "max": 18033,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 39,
+          "name": "GPS Altitude (GIA2)",
+          "unit": "(ft)",
+          "first": [
+            "13",
+            "13",
+            "13"
+          ],
+          "last": [
+            "57",
+            "56",
+            "56"
+          ],
+          "finiteCount": 3178,
+          "negativeSentinels": 0,
+          "min": 11,
+          "max": 18025,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 46,
+          "name": "High Pitch ESP Engaged_1",
+          "unit": "()",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 3178,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 1,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 47,
+          "name": "High Pitch ESP Engaged_2",
+          "unit": "()",
+          "first": [
+            "0",
+            "0",
+            "0"
+          ],
+          "last": [
+            "0",
+            "0",
+            "0"
+          ],
+          "finiteCount": 3178,
+          "negativeSentinels": 0,
+          "min": 0,
+          "max": 1,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 48,
+          "name": "Pitch Angle-1",
+          "unit": "(deg)",
+          "first": [
+            "0.22",
+            "0.22",
+            "0.23"
+          ],
+          "last": [
+            "0.00",
+            "0.00",
+            "0.00"
+          ],
+          "finiteCount": 3178,
+          "negativeSentinels": 0,
+          "min": -8.33,
+          "max": 66.83,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 49,
+          "name": "Pitch Angle-2",
+          "unit": "(deg)",
+          "first": [
+            "0.23",
+            "0.23",
+            "0.25"
+          ],
+          "last": [
+            "0.00",
+            "0.00",
+            "0.00"
+          ],
+          "finiteCount": 3178,
+          "negativeSentinels": 0,
+          "min": -27.39,
+          "max": 63.52,
+          "uniqueNonNumeric": []
+        },
+        {
+          "index": 52,
+          "name": "Selected Altitude",
+          "unit": "(ft)",
+          "first": [
+            "2000",
+            "2000",
+            "2000"
+          ],
+          "last": [
+            "2000",
+            "2000",
+            "2000"
+          ],
+          "finiteCount": 3178,
+          "negativeSentinels": 0,
+          "min": 1900,
+          "max": 17200,
+          "uniqueNonNumeric": []
+        }
+      ],
+      "status": "quarantined-not-replay-approved"
+    }
+  ],
+  "exploratoryFailure": {
+    "file": "wpr20-recorder.csv",
+    "reason": "Research-only common-header assumption 'Time' did not match 'Time PST'; no repository parser changed.",
+    "followup": "Source schema manually inventoried: electrical channels, oil pressure, fuel flow; no N1/pitch/brake channels. Sentinel handling remains unimplemented."
+  }
+}

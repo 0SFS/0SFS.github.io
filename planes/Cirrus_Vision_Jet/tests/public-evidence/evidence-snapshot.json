@@ -1,0 +1,1207 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-12",
+  "toldCommit": "3a6fa1853e67a221a7613ba3523c59886d7d0cab",
+  "tableCount": 37,
+  "tableRowCount": 3552,
+  "tableInventory": [
+    {
+      "id": "told-g1-takeoff-ground run - downhill factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 3
+    },
+    {
+      "id": "told-g1-takeoff-ground run - headwind factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 3
+    },
+    {
+      "id": "told-g1-takeoff-ground run - tailwind factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 3
+    },
+    {
+      "id": "told-g1-takeoff-ground run - uphill factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 3
+    },
+    {
+      "id": "told-g1-takeoff-ground run.csv",
+      "columns": [
+        "weight",
+        "altitude",
+        "temperature",
+        "value"
+      ],
+      "rowCount": 252
+    },
+    {
+      "id": "told-g1-takeoff-total distance - headwind factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 3
+    },
+    {
+      "id": "told-g1-takeoff-total distance - tailwind factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 3
+    },
+    {
+      "id": "told-g1-takeoff-total distance - unpaved factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 3
+    },
+    {
+      "id": "told-g1-takeoff-total distance.csv",
+      "columns": [
+        "weight",
+        "altitude",
+        "temperature",
+        "value"
+      ],
+      "rowCount": 252
+    },
+    {
+      "id": "told-g1-takeoff-climb-gradient.csv",
+      "columns": [
+        "weight",
+        "altitude",
+        "temperature",
+        "value"
+      ],
+      "rowCount": 435
+    },
+    {
+      "id": "told-g1-takeoff-climb-rate.csv",
+      "columns": [
+        "weight",
+        "altitude",
+        "temperature",
+        "value"
+      ],
+      "rowCount": 435
+    },
+    {
+      "id": "told-g1-vref-100.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 5
+    },
+    {
+      "id": "told-g1-vref-50 ice.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 5
+    },
+    {
+      "id": "told-g1-vref-50.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 5
+    },
+    {
+      "id": "told-g1-vref-up ice.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 5
+    },
+    {
+      "id": "told-g1-vref-up.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 5
+    },
+    {
+      "id": "told-g1-landing-100-ground run - downhill factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 2
+    },
+    {
+      "id": "told-g1-landing-100-ground run - headwind factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 2
+    },
+    {
+      "id": "told-g1-landing-100-ground run - tailwind factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 2
+    },
+    {
+      "id": "told-g1-landing-100-ground run - uphill factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 2
+    },
+    {
+      "id": "told-g1-landing-100-ground run.csv",
+      "columns": [
+        "weight",
+        "altitude",
+        "temperature",
+        "value"
+      ],
+      "rowCount": 97
+    },
+    {
+      "id": "told-g1-landing-100-total distance - headwind factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 2
+    },
+    {
+      "id": "told-g1-landing-100-total distance - tailwind factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 2
+    },
+    {
+      "id": "told-g1-landing-100-total distance - unpaved factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 2
+    },
+    {
+      "id": "told-g1-landing-100-total distance.csv",
+      "columns": [
+        "weight",
+        "altitude",
+        "temperature",
+        "value"
+      ],
+      "rowCount": 97
+    },
+    {
+      "id": "told-g1-landing-50-ground run - downhill factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 2
+    },
+    {
+      "id": "told-g1-landing-50-ground run - headwind factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 2
+    },
+    {
+      "id": "told-g1-landing-50-ground run - tailwind factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 2
+    },
+    {
+      "id": "told-g1-landing-50-ground run - uphill factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 2
+    },
+    {
+      "id": "told-g1-landing-50-ground run.csv",
+      "columns": [
+        "weight",
+        "altitude",
+        "temperature",
+        "value"
+      ],
+      "rowCount": 125
+    },
+    {
+      "id": "told-g1-landing-50-total distance - headwind factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 2
+    },
+    {
+      "id": "told-g1-landing-50-total distance - tailwind factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 2
+    },
+    {
+      "id": "told-g1-landing-50-total distance - unpaved factor.csv",
+      "columns": [
+        "weight",
+        "value"
+      ],
+      "rowCount": 2
+    },
+    {
+      "id": "told-g1-landing-50-total distance.csv",
+      "columns": [
+        "weight",
+        "altitude",
+        "temperature",
+        "value"
+      ],
+      "rowCount": 125
+    },
+    {
+      "id": "told-g1-enroute-climb-normal-gradient.csv",
+      "columns": [
+        "pressure_alt_ft",
+        "oat_c",
+        "weight_lb",
+        "value"
+      ],
+      "rowCount": 552
+    },
+    {
+      "id": "told-g1-enroute-climb-normal-rate.csv",
+      "columns": [
+        "pressure_alt_ft",
+        "oat_c",
+        "weight_lb",
+        "value"
+      ],
+      "rowCount": 556
+    },
+    {
+      "id": "told-g1-enroute-climb-normal-speed.csv",
+      "columns": [
+        "pressure_alt_ft",
+        "oat_c",
+        "weight_lb",
+        "value"
+      ],
+      "rowCount": 552
+    }
+  ],
+  "sourceComparison": [
+    {
+      "phase": "takeoff",
+      "weightLb": 6000,
+      "pressureAltitudeFt": 0,
+      "temperatureC": 15.0,
+      "metric": "ground run",
+      "pinnedAfmValueFt": 2036,
+      "toldInterpolatedValueFt": 2115.0,
+      "differenceFt": 79.0,
+      "relativeDifference": 0.03880157170923379
+    },
+    {
+      "phase": "takeoff",
+      "weightLb": 6000,
+      "pressureAltitudeFt": 0,
+      "temperatureC": 15.0,
+      "metric": "total distance",
+      "pinnedAfmValueFt": 3192,
+      "toldInterpolatedValueFt": 3326.0,
+      "differenceFt": 134.0,
+      "relativeDifference": 0.041979949874686714
+    },
+    {
+      "phase": "takeoff",
+      "weightLb": 6000,
+      "pressureAltitudeFt": 1000,
+      "temperatureC": 13.0188,
+      "metric": "ground run",
+      "pinnedAfmValueFt": 2106,
+      "toldInterpolatedValueFt": 2175.16776,
+      "differenceFt": 69.16775999999982,
+      "relativeDifference": 0.03284319088319079
+    },
+    {
+      "phase": "takeoff",
+      "weightLb": 6000,
+      "pressureAltitudeFt": 1000,
+      "temperatureC": 13.0188,
+      "metric": "total distance",
+      "pinnedAfmValueFt": 3302,
+      "toldInterpolatedValueFt": 3420.4494,
+      "differenceFt": 118.44939999999997,
+      "relativeDifference": 0.03587201695941852
+    },
+    {
+      "phase": "takeoff",
+      "weightLb": 6000,
+      "pressureAltitudeFt": 2000,
+      "temperatureC": 11.037600000000001,
+      "metric": "ground run",
+      "pinnedAfmValueFt": 2175,
+      "toldInterpolatedValueFt": 2212.2679200000002,
+      "differenceFt": 37.26792000000023,
+      "relativeDifference": 0.01713467586206907
+    },
+    {
+      "phase": "takeoff",
+      "weightLb": 6000,
+      "pressureAltitudeFt": 2000,
+      "temperatureC": 11.037600000000001,
+      "metric": "total distance",
+      "pinnedAfmValueFt": 3411,
+      "toldInterpolatedValueFt": 3474.83952,
+      "differenceFt": 63.83951999999999,
+      "relativeDifference": 0.018715778364116094
+    },
+    {
+      "phase": "takeoff",
+      "weightLb": 6000,
+      "pressureAltitudeFt": 5000,
+      "temperatureC": 5.094000000000001,
+      "metric": "ground run",
+      "pinnedAfmValueFt": 2542,
+      "toldInterpolatedValueFt": 2542.2318,
+      "differenceFt": 0.2318000000000211,
+      "relativeDifference": 9.118804091267549e-05
+    },
+    {
+      "phase": "takeoff",
+      "weightLb": 6000,
+      "pressureAltitudeFt": 5000,
+      "temperatureC": 5.094000000000001,
+      "metric": "total distance",
+      "pinnedAfmValueFt": 4009,
+      "toldInterpolatedValueFt": 4009.2604,
+      "differenceFt": 0.26040000000011787,
+      "relativeDifference": 6.49538538289144e-05
+    },
+    {
+      "phase": "takeoff",
+      "weightLb": 5500,
+      "pressureAltitudeFt": 0,
+      "temperatureC": 15.0,
+      "metric": "ground run",
+      "pinnedAfmValueFt": 1867,
+      "toldInterpolatedValueFt": 1939.0,
+      "differenceFt": 72.0,
+      "relativeDifference": 0.0385645420460632
+    },
+    {
+      "phase": "takeoff",
+      "weightLb": 5500,
+      "pressureAltitudeFt": 0,
+      "temperatureC": 15.0,
+      "metric": "total distance",
+      "pinnedAfmValueFt": 2812,
+      "toldInterpolatedValueFt": 2930.0,
+      "differenceFt": 118.0,
+      "relativeDifference": 0.041963015647226175
+    },
+    {
+      "phase": "takeoff",
+      "weightLb": 5500,
+      "pressureAltitudeFt": 1000,
+      "temperatureC": 13.0188,
+      "metric": "ground run",
+      "pinnedAfmValueFt": 1931,
+      "toldInterpolatedValueFt": 1994.31888,
+      "differenceFt": 63.318880000000036,
+      "relativeDifference": 0.03279071983428277
+    },
+    {
+      "phase": "takeoff",
+      "weightLb": 5500,
+      "pressureAltitudeFt": 1000,
+      "temperatureC": 13.0188,
+      "metric": "total distance",
+      "pinnedAfmValueFt": 2910,
+      "toldInterpolatedValueFt": 3012.73284,
+      "differenceFt": 102.73284000000012,
+      "relativeDifference": 0.03530338144329901
+    },
+    {
+      "phase": "takeoff",
+      "weightLb": 5500,
+      "pressureAltitudeFt": 2000,
+      "temperatureC": 11.037600000000001,
+      "metric": "ground run",
+      "pinnedAfmValueFt": 1994,
+      "toldInterpolatedValueFt": 2028.53256,
+      "differenceFt": 34.5325600000001,
+      "relativeDifference": 0.017318234704112388
+    },
+    {
+      "phase": "takeoff",
+      "weightLb": 5500,
+      "pressureAltitudeFt": 2000,
+      "temperatureC": 11.037600000000001,
+      "metric": "total distance",
+      "pinnedAfmValueFt": 3006,
+      "toldInterpolatedValueFt": 3061.8124000000003,
+      "differenceFt": 55.81240000000025,
+      "relativeDifference": 0.01856699933466409
+    },
+    {
+      "phase": "takeoff",
+      "weightLb": 5500,
+      "pressureAltitudeFt": 5000,
+      "temperatureC": 5.094000000000001,
+      "metric": "ground run",
+      "pinnedAfmValueFt": 2330,
+      "toldInterpolatedValueFt": 2329.9122,
+      "differenceFt": -0.08779999999978827,
+      "relativeDifference": -3.7682403433385524e-05
+    },
+    {
+      "phase": "takeoff",
+      "weightLb": 5500,
+      "pressureAltitudeFt": 5000,
+      "temperatureC": 5.094000000000001,
+      "metric": "total distance",
+      "pinnedAfmValueFt": 3531,
+      "toldInterpolatedValueFt": 3531.4896,
+      "differenceFt": 0.48959999999988213,
+      "relativeDifference": 0.00013865760407813144
+    },
+    {
+      "phase": "landing",
+      "weightLb": 5550,
+      "pressureAltitudeFt": 0,
+      "temperatureC": 15.0,
+      "metric": "ground run",
+      "pinnedAfmValueFt": 1628,
+      "toldInterpolatedValueFt": 1621.5,
+      "differenceFt": -6.5,
+      "relativeDifference": -0.003992628992628993
+    },
+    {
+      "phase": "landing",
+      "weightLb": 5550,
+      "pressureAltitudeFt": 0,
+      "temperatureC": 15.0,
+      "metric": "total distance",
+      "pinnedAfmValueFt": 3011,
+      "toldInterpolatedValueFt": 2532.0,
+      "differenceFt": -479.0,
+      "relativeDifference": -0.15908336100963136
+    },
+    {
+      "phase": "landing",
+      "weightLb": 5550,
+      "pressureAltitudeFt": 1000,
+      "temperatureC": 13.0188,
+      "metric": "ground run",
+      "pinnedAfmValueFt": 1677,
+      "toldInterpolatedValueFt": 1669.81092,
+      "differenceFt": -7.189080000000104,
+      "relativeDifference": -0.004286869409660169
+    },
+    {
+      "phase": "landing",
+      "weightLb": 5550,
+      "pressureAltitudeFt": 1000,
+      "temperatureC": 13.0188,
+      "metric": "total distance",
+      "pinnedAfmValueFt": 3082,
+      "toldInterpolatedValueFt": 2590.73536,
+      "differenceFt": -491.2646399999999,
+      "relativeDifference": -0.1593980012978585
+    },
+    {
+      "phase": "landing",
+      "weightLb": 5550,
+      "pressureAltitudeFt": 2000,
+      "temperatureC": 11.037600000000001,
+      "metric": "ground run",
+      "pinnedAfmValueFt": 1727,
+      "toldInterpolatedValueFt": 1720.2256,
+      "differenceFt": -6.774400000000014,
+      "relativeDifference": -0.003922640416907941
+    },
+    {
+      "phase": "landing",
+      "weightLb": 5550,
+      "pressureAltitudeFt": 2000,
+      "temperatureC": 11.037600000000001,
+      "metric": "total distance",
+      "pinnedAfmValueFt": 3155,
+      "toldInterpolatedValueFt": 2651.782,
+      "differenceFt": -503.21799999999985,
+      "relativeDifference": -0.15949857369255147
+    },
+    {
+      "phase": "landing",
+      "weightLb": 5550,
+      "pressureAltitudeFt": 5000,
+      "temperatureC": 5.094000000000001,
+      "metric": "ground run",
+      "pinnedAfmValueFt": 1889,
+      "toldInterpolatedValueFt": 1881.6392,
+      "differenceFt": -7.3607999999999265,
+      "relativeDifference": -0.0038966649020645457
+    },
+    {
+      "phase": "landing",
+      "weightLb": 5550,
+      "pressureAltitudeFt": 5000,
+      "temperatureC": 5.094000000000001,
+      "metric": "total distance",
+      "pinnedAfmValueFt": 3394,
+      "toldInterpolatedValueFt": 2851.2802,
+      "differenceFt": -542.7197999999999,
+      "relativeDifference": -0.15990565704183848
+    }
+  ],
+  "cen21": {
+    "header": [
+      "Time",
+      "N1 Fan Spd",
+      "N2 Core Spd",
+      "GroundSpeed",
+      "Airspeed True",
+      "Pitch-1",
+      "Roll-1",
+      "Airspeed Ind",
+      "Parking Brake",
+      "Flaps Cmd 0",
+      "Flaps Cmd 100",
+      "Flaps Cmd 50",
+      "Heading Corr",
+      "Heading_YawRate_AHRS1_",
+      "Throttle Lever Angle"
+    ],
+    "units": [
+      "(EDT)",
+      "(%)",
+      "(%)",
+      "(kt)",
+      "(kt)",
+      "(Deg)",
+      "(Deg)",
+      "(kt)",
+      "()",
+      "()",
+      "()",
+      "()",
+      "(deg)",
+      "(\u00b0/s)",
+      "(Deg)"
+    ],
+    "responseCandidates": {
+      "riseCommandTimeEdt": "18:57:09.92",
+      "riseCommandAngleDeg": 38,
+      "n1AtCommandPercent": 25.2,
+      "n1Crossings": [
+        {
+          "thresholdN1Percent": 50,
+          "previousSampleTime": "18:57:12.92",
+          "firstCrossingSampleTime": "18:57:13.32",
+          "elapsedFromCommandSec": 3.4
+        },
+        {
+          "thresholdN1Percent": 80,
+          "previousSampleTime": "18:57:13.92",
+          "firstCrossingSampleTime": "18:57:14.32",
+          "elapsedFromCommandSec": 4.4
+        },
+        {
+          "thresholdN1Percent": 90,
+          "previousSampleTime": "18:57:14.92",
+          "firstCrossingSampleTime": "18:57:15.32",
+          "elapsedFromCommandSec": 5.4
+        },
+        {
+          "thresholdN1Percent": 94,
+          "previousSampleTime": "18:57:15.92",
+          "firstCrossingSampleTime": "18:57:16.32",
+          "elapsedFromCommandSec": 6.4
+        }
+      ],
+      "idleCommandTimeEdt": "18:57:56.92",
+      "idleCommandAngleDeg": -22,
+      "n1AtIdleCommandPercent": 94.7,
+      "decayCrossings": [
+        {
+          "thresholdN1Percent": 80,
+          "previousSampleTime": "18:57:57.92",
+          "firstCrossingSampleTime": "18:57:58.32",
+          "elapsedFromCommandSec": 1.4
+        },
+        {
+          "thresholdN1Percent": 50,
+          "previousSampleTime": "18:57:59.92",
+          "firstCrossingSampleTime": "18:58:00.32",
+          "elapsedFromCommandSec": 3.4
+        },
+        {
+          "thresholdN1Percent": 30,
+          "previousSampleTime": "18:58:05.92",
+          "firstCrossingSampleTime": "18:58:06.32",
+          "elapsedFromCommandSec": 9.4
+        }
+      ],
+      "use": "Candidate only; clock/update uncertainty and operating conditions unresolved"
+    }
+  },
+  "cen21DataQuality": {
+    "dataRows": 450,
+    "uniqueTimes": 360,
+    "firstTime": "18:57:05.32",
+    "lastTime": "18:58:34.91",
+    "duplicateTimes": 90,
+    "conflictingDuplicates": 0,
+    "nonNominalGaps": {
+      "0.4": 88,
+      "0.41": 1
+    },
+    "numericRanges": {
+      "N1 Fan Spd": [
+        24.1,
+        94.8
+      ],
+      "N2 Core Spd": [
+        53.3,
+        96.0
+      ],
+      "Airspeed Ind": [
+        0.0,
+        104.7
+      ],
+      "GroundSpeed": [
+        0.0,
+        121.0
+      ],
+      "Pitch-1": [
+        -19.56,
+        4.34
+      ],
+      "Throttle Lever Angle": [
+        -22.0,
+        38.0
+      ]
+    }
+  },
+  "cen23": {
+    "bytes": 2631190,
+    "sha256": "a5a43eb768bc0e3576e6ce71970fd067db4ab713c67ecf17e245865d9b37d58f",
+    "encoding": "windows-1252",
+    "rows": 1030,
+    "rowWidths": {
+      "1083": 1030
+    },
+    "firstRowsFirstColumns": [
+      [
+        "Label 260.00*",
+        "Label 150.00*",
+        "Label 130.00*",
+        "SSM",
+        "Label 023.00",
+        "SSM",
+        "Label 025.00",
+        "SSM",
+        "Label 026.00",
+        "SSM",
+        "Label 026.01",
+        "SSM",
+        "Label 030.00",
+        "SSM"
+      ],
+      [
+        "mm/dd/yy",
+        "hh:mm:ss",
+        "hh:mm",
+        "",
+        "Deg",
+        "",
+        "ft",
+        "",
+        "kt",
+        "",
+        "MACH",
+        "",
+        "MHz",
+        ""
+      ],
+      [
+        "UTC Date",
+        "UTC Time",
+        "UTC Offset",
+        "",
+        "Selected Heading",
+        "",
+        "Selected Altitude",
+        "",
+        "IAS Submode (FLC Vertical Mode)",
+        "",
+        "MACH Submode (FLC Vertical Mode)",
+        "",
+        "COM1 ACTV + 100 MHZ",
+        ""
+      ],
+      [
+        "01/01/0001",
+        "00:00:03.678",
+        "00:00",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      [
+        "01/01/0001",
+        "00:00:04.693",
+        "00:00",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    ],
+    "matchingHeaders": [
+      {},
+      {},
+      {
+        "0": "UTC Date",
+        "1": "UTC Time",
+        "6": "Selected Altitude",
+        "59": "CAPS System Activated",
+        "118": "Pilot/Copilot Pitch Trim Up",
+        "119": "Pilot/Copilot Pitch Trim Down",
+        "152": "CAPS Handle Pull Initial",
+        "180": "GPS Altitude (GIA1)",
+        "182": "GPS Altitude (GIA2)",
+        "198": "GARMIN HOBBS Time",
+        "200": "GARMIN FLIGHT Time",
+        "231": "CAPS Autopilot Mode Active",
+        "256": "Cabin Altitude",
+        "260": "Density Altitude (ADC1)",
+        "262": "Density Altitude (ADC2)",
+        "264": "Radar Altitude",
+        "280": "Cumulative Engine Run Time (Label 325)",
+        "302": "Pressure Altitude (ADC1)",
+        "304": "Pressure Altitude (ADC2)",
+        "306": "Pressure Altitude (STBY)",
+        "355": "CABIN ALTITUDE HIGH",
+        "358": "CAPS ACTIVATED",
+        "363": "ENGINE START N1",
+        "389": "N1",
+        "390": "N2",
+        "400": "TAKEOFF PITCH TRIM",
+        "403": "ENGINE START N1",
+        "448": "FLAPS TIME OUT",
+        "483": "IPS WINDSHLD TIMER",
+        "511": "SFD PITCH MISCOMPARE",
+        "521": "THROTTLE SERVO",
+        "527": "PITCH MET ACTIVE",
+        "538": "N1 Takeoff Request (Label 250)",
+        "544": "N2 Requested Speed (%) (Label 252)",
+        "585": "Low Thrust Throttle ESP Engaged",
+        "586": "High Thrust Throttle ESP Engaged",
+        "587": "Throttle ESP Low Enabled",
+        "588": "Throttle ESP High Enabled",
+        "589": "Throttle ESP Failed",
+        "596": "High Pitch ESP Engaged",
+        "597": "Low Pitch ESP Engaged",
+        "600": "ESP Pitch mode Absolute",
+        "605": "Low Thrust Throttle ESP Engaged",
+        "606": "High Thrust Throttle ESP Engaged",
+        "607": "Throttle ESP Low Enabled",
+        "608": "Throttle ESP High Enabled",
+        "609": "Throttle ESP Failed",
+        "616": "High Pitch ESP Engaged",
+        "617": "Low Pitch ESP Engaged",
+        "620": "ESP Pitch mode Absolute",
+        "627": "Pilot/Copilot Pitch Trim Up",
+        "628": "Pilot/Copilot Pitch Trim Down",
+        "647": "Pilot/Copilot Pitch Trim Up",
+        "648": "Pilot/Copilot Pitch Trim Down",
+        "684": "CAPS AUTOPILOT INOP",
+        "685": "CAPS MISCOMPARE",
+        "716": "TAKEOFF PITCH TRIM",
+        "842": "Engine Run Time (Label 321)",
+        "844": "FADEC System Run Time (Label 322)",
+        "846": "Pitch Angle (AHRS1)",
+        "848": "Pitch Angle (AHRS2)",
+        "850": "Pitch Angle  (STBY)",
+        "858": "Pitch Rate  (AHRS1)",
+        "860": "Pitch Rate  (AHRS2)",
+        "862": "Pitch Rate   (STBY)",
+        "892": "N1 Requested Speed (Label 341)",
+        "898": "N2 Core Speed (%)",
+        "902": "N1  Fan Speed (%)",
+        "918": "N1 Overspeed (Fault Code 5)",
+        "919": "N1 Signal Lost (Fault Code 4)",
+        "920": "N2 Underspeed (Fault Code 3)",
+        "921": "N2 Overspeed (Fault Code 2)",
+        "922": "N2 Signal Lost (Fault Code 1)",
+        "935": "N2 Split Failure (Fault Code 27)",
+        "936": "N1 Split Failure (Fault Code 26)",
+        "938": "N1 Trim Failure (Fault Code 24)",
+        "949": "OPS N2 Failure (Fault Code 52)",
+        "956": "N2 Sense Failure (Fault Code 45)",
+        "957": "N1 Sense Failure (Fault Code 44)",
+        "999": "Throttle Failure",
+        "1019": "Throttle Failure",
+        "1041": "Long Term/Time Limited Dispatch",
+        "1061": "Long Term/Time Limited Dispatch"
+      }
+    ]
+  },
+  "aircraftValidationStatus": "blocked",
+  "normalFlightReplayApproved": false,
+  "productionParserTestsRun": false,
+  "downloadAttempts": [
+    {
+      "id": "told-g1-takeoff-ground run - downhill factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff/ground%20run%20-%20downhill%20factor.csv",
+      "file": "told-g1-takeoff-ground run - downhill factor.csv",
+      "bytes": 43,
+      "sha256": "483a402b7e370f0016e3e1121d544745d656e98b4f61d1e557ac1c16a4904a2e"
+    },
+    {
+      "id": "told-g1-takeoff-ground run - headwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff/ground%20run%20-%20headwind%20factor.csv",
+      "file": "told-g1-takeoff-ground run - headwind factor.csv",
+      "bytes": 43,
+      "sha256": "63b0d5105ec248747661dfaef3f72395d0b6fd64ee89be7ff4e3837d34d38e7f"
+    },
+    {
+      "id": "told-g1-takeoff-ground run - tailwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff/ground%20run%20-%20tailwind%20factor.csv",
+      "file": "told-g1-takeoff-ground run - tailwind factor.csv",
+      "bytes": 40,
+      "sha256": "65670c7477437454b07395621069c9acf8dfad7e86bbaedaeec326a9b9239475"
+    },
+    {
+      "id": "told-g1-takeoff-ground run - uphill factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff/ground%20run%20-%20uphill%20factor.csv",
+      "file": "told-g1-takeoff-ground run - uphill factor.csv",
+      "bytes": 43,
+      "sha256": "d40ff7f75d31c410e35a8b6beb45b030b270775dd019c2ae255076f6a741d91a"
+    },
+    {
+      "id": "told-g1-takeoff-ground run.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff/ground%20run.csv",
+      "file": "told-g1-takeoff-ground run.csv",
+      "bytes": 4552,
+      "sha256": "26b6825ce725f5cb1b6d9a7d92c93acabb8ab1506a12c324d68344ee7a14bdd9"
+    },
+    {
+      "id": "told-g1-takeoff-total distance - headwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff/total%20distance%20-%20headwind%20factor.csv",
+      "file": "told-g1-takeoff-total distance - headwind factor.csv",
+      "bytes": 43,
+      "sha256": "ee9c2a0bf0f0d56568dc82b5aef10cee51b7fce05ba4c0c6ca4052cd35947ce6"
+    },
+    {
+      "id": "told-g1-takeoff-total distance - tailwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff/total%20distance%20-%20tailwind%20factor.csv",
+      "file": "told-g1-takeoff-total distance - tailwind factor.csv",
+      "bytes": 43,
+      "sha256": "ca6cc962f4068343f2bc4e6b737c7863b80cb0b8b6da8e77a17fc1f12e16ba79"
+    },
+    {
+      "id": "told-g1-takeoff-total distance - unpaved factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff/total%20distance%20-%20unpaved%20factor.csv",
+      "file": "told-g1-takeoff-total distance - unpaved factor.csv",
+      "bytes": 43,
+      "sha256": "3e641b607fd7011815068f2ba2a0a2191eea6d6be9c82fc4b49ac43dde7daae6"
+    },
+    {
+      "id": "told-g1-takeoff-total distance.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff/total%20distance.csv",
+      "file": "told-g1-takeoff-total distance.csv",
+      "bytes": 4568,
+      "sha256": "73c3ab944c57c7c92036adf8144bfff0cffa8736636122df010f18657b0ce9dd"
+    },
+    {
+      "id": "told-g1-takeoff-climb-gradient.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff%20climb/gradient.csv",
+      "file": "told-g1-takeoff-climb-gradient.csv",
+      "bytes": 7771,
+      "sha256": "98bc7d17ace41544b5d7ed901140a7eec4c05ed224d86b7903a3ddb9a2c59ef1"
+    },
+    {
+      "id": "told-g1-takeoff-climb-rate.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff%20climb/rate.csv",
+      "file": "told-g1-takeoff-climb-rate.csv",
+      "bytes": 7856,
+      "sha256": "93cbd1fd3b27f4b9bcbddbda7c96d5128e502594060e4f1a725ba70a18c2e102"
+    },
+    {
+      "id": "told-g1-vref-100.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/vref/100.csv",
+      "file": "told-g1-vref-100.csv",
+      "bytes": 53,
+      "sha256": "a7f26ce39ed26c260534ac9d35be63c83f9318cd7afeafc3ad629af3b660107b"
+    },
+    {
+      "id": "told-g1-vref-50 ice.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/vref/50%20ice.csv",
+      "file": "told-g1-vref-50 ice.csv",
+      "bytes": 57,
+      "sha256": "2835323d9624837e31f4d7c1d6a5e5a9c12d05ad01a084ed641f652ad9e09a24"
+    },
+    {
+      "id": "told-g1-vref-50.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/vref/50.csv",
+      "file": "told-g1-vref-50.csv",
+      "bytes": 54,
+      "sha256": "f4989b9b56476fc0484ff1bc2c8d7dff5c9a914646f6556258c985b44b1282db"
+    },
+    {
+      "id": "told-g1-vref-up ice.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/vref/up%20ice.csv",
+      "file": "told-g1-vref-up ice.csv",
+      "bytes": 58,
+      "sha256": "75f3aff9967f140fa3fad8868fd1184e507b6721589ab07d0edb91661fdf02f0"
+    },
+    {
+      "id": "told-g1-vref-up.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/vref/up.csv",
+      "file": "told-g1-vref-up.csv",
+      "bytes": 56,
+      "sha256": "84863f0b2df00032d87b076559ce977514a03b98e74349feb904855769d1fd46"
+    },
+    {
+      "id": "easa-sf50-tcds.pdf",
+      "url": "https://www.easa.europa.eu/es/downloads/24242/en",
+      "file": "easa-sf50-tcds.pdf",
+      "bytes": 517249,
+      "sha256": "24bae613e45c18994d014957fdd9a5944d3230285f94f51e1f88bc57a37bb738"
+    },
+    {
+      "id": "easa-fj33-tcds.pdf",
+      "url": "https://www.easa.europa.eu/en/downloads/7771/en",
+      "file": "easa-fj33-tcds.pdf",
+      "bytes": 458748,
+      "sha256": "5b8a2f51e78546b09b3a94b909c304c346ad90c704609fd313cb1eac4aaec050"
+    },
+    {
+      "id": "garmin-sf50-touch-plus.pdf",
+      "url": "https://static.garmin.com/pumac/190-02470-02_a.pdf",
+      "status": "download-failed",
+      "error": "Error: Unexpected response size 46797861 https://static.garmin.com/pumac/190-02470-02_a.pdf"
+    },
+    {
+      "id": "ntsb-cen21-recorder-report.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15611171&FileExtension=pdf&FileName=factual%20-%20dms-Rel.pdf",
+      "file": "ntsb-cen21-recorder-report.pdf",
+      "bytes": 1365222,
+      "sha256": "b70072788fffc9c8ca5860a98da801b6afa4ab4eb60686341b6ecd89784767c4"
+    },
+    {
+      "id": "ntsb-cen23-recorder-report.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15327968&FileExtension=pdf&FileName=Electronic%20Devices%20-%20Specialist%27s%20Factual%20Report-CEN23FA045-Rel.pdf",
+      "file": "ntsb-cen23-recorder-report.pdf",
+      "bytes": 91408,
+      "sha256": "f09915403a24cba9fee8c1a663cdc77d5519f45d823217748793c3b485e113fb"
+    },
+    {
+      "id": "told-g1-landing-100-ground run - downhill factor.csv",
+      "file": "told-g1-landing-100-ground run - downhill factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/100/ground%20run%20-%20downhill%20factor.csv",
+      "bytes": 33,
+      "sha256": "08096b5f5fc052803b0fb024af47ed41cd175fcb8aceede1c3aabd3ecdae884b"
+    },
+    {
+      "id": "told-g1-landing-100-ground run - headwind factor.csv",
+      "file": "told-g1-landing-100-ground run - headwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/100/ground%20run%20-%20headwind%20factor.csv",
+      "bytes": 33,
+      "sha256": "db3d325c93d59d277e15914772ea1d9f8ec6f25e7fef181041783ab9bc935b62"
+    },
+    {
+      "id": "told-g1-landing-100-ground run - tailwind factor.csv",
+      "file": "told-g1-landing-100-ground run - tailwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/100/ground%20run%20-%20tailwind%20factor.csv",
+      "bytes": 33,
+      "sha256": "796bf4928c82e73e467e1a13d42b744ea087ef8a3ace05d959e8fe12e1e358b2"
+    },
+    {
+      "id": "told-g1-landing-100-ground run - uphill factor.csv",
+      "file": "told-g1-landing-100-ground run - uphill factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/100/ground%20run%20-%20uphill%20factor.csv",
+      "bytes": 33,
+      "sha256": "0ede8ac6bbb87e6b5b1d5d8eda034a6526c99896da00faef47de71eca0f5e083"
+    },
+    {
+      "id": "told-g1-landing-100-ground run.csv",
+      "file": "told-g1-landing-100-ground run.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/100/ground%20run.csv",
+      "bytes": 1731,
+      "sha256": "4f3675d1037fc6343a1b3663ba2efb15304a2fea620fa7cfed4942f1c9b6f2ca"
+    },
+    {
+      "id": "told-g1-landing-100-total distance - headwind factor.csv",
+      "file": "told-g1-landing-100-total distance - headwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/100/total%20distance%20-%20headwind%20factor.csv",
+      "bytes": 33,
+      "sha256": "8d4da21bcad2457774cf0858b9fbc9259147093af54503505a011768a037bb69"
+    },
+    {
+      "id": "told-g1-landing-100-total distance - tailwind factor.csv",
+      "file": "told-g1-landing-100-total distance - tailwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/100/total%20distance%20-%20tailwind%20factor.csv",
+      "bytes": 33,
+      "sha256": "b0adbb5cc8beb2bcb49d1a2b1c4a150265eb9987e68fd27821e4c903cd190f06"
+    },
+    {
+      "id": "told-g1-landing-100-total distance - unpaved factor.csv",
+      "file": "told-g1-landing-100-total distance - unpaved factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/100/total%20distance%20-%20unpaved%20factor.csv",
+      "bytes": 31,
+      "sha256": "16b9bad8f6c4e04efd8c160faae28e29389716092cf85006561812d17c8410f0"
+    },
+    {
+      "id": "told-g1-landing-100-total distance.csv",
+      "file": "told-g1-landing-100-total distance.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/100/total%20distance.csv",
+      "bytes": 1731,
+      "sha256": "6e4fb6057349b79eb4937bc13d03040bf23e904672a9eed35d5f7b6f34d74b1d"
+    },
+    {
+      "id": "told-g1-landing-50-ground run - downhill factor.csv",
+      "file": "told-g1-landing-50-ground run - downhill factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/50/ground%20run%20-%20downhill%20factor.csv",
+      "bytes": 33,
+      "sha256": "08096b5f5fc052803b0fb024af47ed41cd175fcb8aceede1c3aabd3ecdae884b"
+    },
+    {
+      "id": "told-g1-landing-50-ground run - headwind factor.csv",
+      "file": "told-g1-landing-50-ground run - headwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/50/ground%20run%20-%20headwind%20factor.csv",
+      "bytes": 33,
+      "sha256": "8d4da21bcad2457774cf0858b9fbc9259147093af54503505a011768a037bb69"
+    },
+    {
+      "id": "told-g1-landing-50-ground run - tailwind factor.csv",
+      "file": "told-g1-landing-50-ground run - tailwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/50/ground%20run%20-%20tailwind%20factor.csv",
+      "bytes": 33,
+      "sha256": "95f518d623c7672246ca02d680fbfa36cd7a04a983f303f1b8f7a471de19a820"
+    },
+    {
+      "id": "told-g1-landing-50-ground run - uphill factor.csv",
+      "file": "told-g1-landing-50-ground run - uphill factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/50/ground%20run%20-%20uphill%20factor.csv",
+      "bytes": 33,
+      "sha256": "0ede8ac6bbb87e6b5b1d5d8eda034a6526c99896da00faef47de71eca0f5e083"
+    },
+    {
+      "id": "told-g1-landing-50-ground run.csv",
+      "file": "told-g1-landing-50-ground run.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/50/ground%20run.csv",
+      "bytes": 2236,
+      "sha256": "0d7a1849a271be25b1ca81e7db2bcca8edc0936399160bff977722120f809774"
+    },
+    {
+      "id": "told-g1-landing-50-total distance - headwind factor.csv",
+      "file": "told-g1-landing-50-total distance - headwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/50/total%20distance%20-%20headwind%20factor.csv",
+      "bytes": 33,
+      "sha256": "ffd21c2fa890e749f65b4e7e8cbc3e898f8ddfe639a4783707bbef9133eb2e1a"
+    },
+    {
+      "id": "told-g1-landing-50-total distance - tailwind factor.csv",
+      "file": "told-g1-landing-50-total distance - tailwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/50/total%20distance%20-%20tailwind%20factor.csv",
+      "bytes": 33,
+      "sha256": "75457ad159dfa6d2ec064062c904007e6f7de5285670d378c5f5c84276f08a8a"
+    },
+    {
+      "id": "told-g1-landing-50-total distance - unpaved factor.csv",
+      "file": "told-g1-landing-50-total distance - unpaved factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/50/total%20distance%20-%20unpaved%20factor.csv",
+      "bytes": 31,
+      "sha256": "16b9bad8f6c4e04efd8c160faae28e29389716092cf85006561812d17c8410f0"
+    },
+    {
+      "id": "told-g1-landing-50-total distance.csv",
+      "file": "told-g1-landing-50-total distance.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/50/total%20distance.csv",
+      "bytes": 2236,
+      "sha256": "d049ecbc01a07f4b584dd548d20e4a772d83f23dadb546b70b1daf22eef96c4d"
+    },
+    {
+      "id": "told-g1-enroute-climb-normal-gradient.csv",
+      "file": "told-g1-enroute-climb-normal-gradient.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/enroute%20climb/normal/gradient.csv",
+      "bytes": 9925,
+      "sha256": "038d76442838c538410e30769dfe25d4b98bb88bb009a9e02f7172dd6f0c4272"
+    },
+    {
+      "id": "told-g1-enroute-climb-normal-rate.csv",
+      "file": "told-g1-enroute-climb-normal-rate.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/enroute%20climb/normal/rate.csv",
+      "bytes": 10423,
+      "sha256": "3aa2b5d863d4512046f93bc9d0d90acaf037e2f8adee35d3c8a370ceedc4b234"
+    },
+    {
+      "id": "told-g1-enroute-climb-normal-speed.csv",
+      "file": "told-g1-enroute-climb-normal-speed.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/enroute%20climb/normal/speed.csv",
+      "bytes": 9906,
+      "sha256": "1a0a56dc9b8e1e8fbc4fb545a1b070164ab8898572fc42c4a7d382a4b609c46d"
+    },
+    {
+      "id": "garmin-sf50-touch-plus.pdf",
+      "file": "garmin-sf50-touch-plus.pdf",
+      "url": "https://static.garmin.com/pumac/190-02470-02_a.pdf",
+      "bytes": 46797861,
+      "sha256": "19f00ba3d80ae16bf2883776a2d1312c2182075baceb4d506cdaf672cd33df59"
+    }
+  ]
+}

@@ -17,8 +17,8 @@ flowchart LR
   Runtime --> Hydrate[hydrateJsbsimData]
   Hydrate --> Manifest[public/jsbsim-data/manifest.json]
   Manifest --> MEMFS[Emscripten MEMFS]
-  MEMFS --> Bootstrap[bootstrapC172p]
-  Bootstrap --> FDM[FGFDMExec C172P]
+    MEMFS --> Bootstrap[bootstrapAircraft]
+    Bootstrap --> FDM[FGFDMExec selected aircraft]
   FDM --> Loop[120 Hz fixed-step loop]
   Loop --> Bridge[ECEF/ENU visual bridge]
   Bridge --> Babylon[Babylon aircraft and globe]
@@ -38,13 +38,27 @@ Vite needs two deliberate configuration choices for that to work:
 * `assetsInclude: ['**/*.wasm']` makes the binary a build asset. The confirmed
   production build emits both `jsbsim_wasm.mjs` and `jsbsim_wasm.wasm`.
 
-The SDK does **not** ship the OSFS C172 data into its virtual filesystem. The
-repository serves `public/jsbsim-data/manifest.json` and five XML files. During
-startup `hydrateJsbsimData` fetches that manifest, fetches every listed file,
-and calls `sdk.writeDataFile(relativePath, text)`. This places the files in
-Emscripten MEMFS. `bootstrapC172p` then configures the paths, loads `c172p`,
-sets initial-condition and control properties, calls `runIc`, and the flight
-loop advances the engine at its fixed timestep.
+The SDK does **not** ship the OSFS aircraft data into its virtual filesystem.
+The repository serves `public/jsbsim-data/manifest.json` with separate C172
+and SF50 package closures. During startup `downloadJsbsimData` fetches the
+manifest, and `resolveAircraftDataFiles` validates the selected aircraft's
+relative file paths. It rejects missing or malformed packages instead of
+silently falling back to C172. Only the selected package is fetched and
+written with `sdk.writeDataFile(relativePath, text)` into Emscripten MEMFS.
+
+`bootstrapAircraft` configures the paths and loads the selected `c172p` or
+`sf50` model. It sets the native timestep with `setDt(1 / 120)`, checks the
+reported timestep, and initializes geodetic latitude with `ic/lat-geod-deg`.
+Actual gear/flap positions and their commands are initialized before `runIc`;
+runway resets likewise use the selected profile's physical configuration.
+The flight loop then advances the native engine at that fixed timestep.
+
+The application reads native wheel and structure contact coordinates for
+clearance, including retractability and current CG. Visible-body collision
+probes remain application-owned, aircraft-specific approximations. The SF50
+development model's integration tests establish initialization and physical
+sign contracts, not calibrated AFM performance. See the
+[SF50 proposal and implementation status](proposals/sf50-flight-model-v2.md).
 
 The browser does not run a native executable, use a server-side flight
 simulator, or send physics data to a remote service. The engine runs locally in
@@ -78,6 +92,37 @@ simulation data: the C172P file has an unknown author and a “not to be sold”
 statement, so it is a release blocker until its provenance and redistribution
 terms are resolved. Do not describe all JSBSim-related content as MIT.
 
+## Repository ownership and upstream work
+
+Use the existing canonical dependency checkouts, with ordinary branches for
+separate changes rather than specially named checkout folders:
+
+- JSBSim: `/Users/felg/gh/Felipegalind0/jsbsim`.
+- jsbsim-wasm: `/Users/felg/gh/Felipegalind0/jsbsim-wasm`.
+- Preferred layout for new checkouts: `/Users/felg/gh/owner/repo`.
+
+Native flight dynamics and portability belong in JSBSim. Generic bindings,
+native object ownership, model loading, and diagnostics belong in
+jsbsim-wasm. Aircraft packages, scenarios, input mapping, scheduling, and
+terrain/presentation adaptation belong in OSFS. Reusable globe, terrain,
+and rendering functionality belongs in FOSS Earth. Consult
+[the repository instructions](../AGENTS.md) before adding dependency workarounds.
+
+Existing upstream work includes
+[JSBSim wheel rotational dynamics #1502](https://github.com/JSBSim-Team/jsbsim/pull/1502),
+[jsbsim-wasm batch properties and gear contacts #8](https://github.com/0x62/jsbsim-wasm/pull/8),
+and [JSBSim Emscripten portability #1504](https://github.com/JSBSim-Team/jsbsim/pull/1504).
+Check their current status before opening overlapping changes. The wrapper's
+tracked `patches/jsbsim-emscripten-compat.patch` is applied to `vendor/jsbsim`
+by its scripts and can make that submodule appear dirty; do not discard it
+as unexplained local work. Native disposal and generic model-load diagnostics
+now have a local source implementation and regression tests in the canonical
+wrapper checkout. The local SDK build, typecheck and all 17 SDK tests passed;
+browser lifecycle measurements remain outstanding. These changes have not
+been published or adopted by the application's installed package. See the wrapper's
+`docs/sdk-lifetime-and-diagnostics.md` and the
+[SF50 validation guide](validation/sf50-performance.md).
+
 ## Maintenance checklist
 
 1. Pin a tested package version rather than relying on a beta range for a
@@ -86,9 +131,11 @@ terms are resolved. Do not describe all JSBSim-related content as MIT.
    any applied patch in the release SBOM/notices.
 3. Test a fresh production build on the actual deployment base path, including
    manifest and all XML requests.
-4. Exercise repeated create/dispose cycles. The current disposer does not keep
-   the registered log-listener function references and does not destroy the
-   SDK; decide the correct upstream lifecycle and test it before release.
-5. Keep JSBSim coordinate terminology precise: the bootstrap writes
-   `ic/lat-gc-deg`; calling it geodetic without conversion can create an
-   accuracy discrepancy.
+4. Exercise repeated create/dispose cycles after fixing native ownership in
+   jsbsim-wasm. The application unregisters its stored log listeners and calls
+   `sdk.destroy()`, but the installed wrapper does not release the native
+   executive through that call. The SF50 tests explicitly delete their native
+   executive; this is not evidence that the application's lifecycle is fixed.
+5. Preserve the geodetic contract: bootstrap/reset use `ic/lat-geod-deg`, not
+   geocentric latitude. Preserve the native `setDt(1 / 120)` initialization;
+   an application accumulator alone does not configure JSBSim's timestep.

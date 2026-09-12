@@ -101,6 +101,9 @@ export interface FlightInputManager {
 }
 
 export function createFlightInputManager(options: {
+  initialThrottle?: number;
+  initialGearDown?: boolean;
+  rudderSign?: 1 | -1;
   onPausedChange?: (paused: boolean) => void;
   /** Fires on the G key so the HUD's gear button can follow it. */
   onGearChange?: (down: boolean) => void;
@@ -111,19 +114,20 @@ export function createFlightInputManager(options: {
   keyboardStickSettings?: KeyboardStickSettings;
 } = {}): FlightInputManager {
   const keysDown = new Set<string>();
+  const initialThrottle = Math.min(1, Math.max(0, options.initialThrottle ?? INITIAL_THROTTLE));
   let smoothed: ControlSurfaceState = {
     elevator: 0,
     aileron: 0,
     rudder: 0,
-    throttle: INITIAL_THROTTLE,
+    throttle: initialThrottle,
     pitchTrim: 0,
     rollTrim: 0,
     flaps: 0,
     brake: 0,
   };
-  let throttleTarget = INITIAL_THROTTLE;
+  let throttleTarget = initialThrottle;
   let paused = false;
-  let gearDown = true;
+  let gearDown = options.initialGearDown ?? true;
   let remoteOwned = false;
   let protectGamepad = false;
   let stickOverride: Pick<ControlSurfaceState, "aileron" | "elevator"> | null = null;
@@ -405,7 +409,7 @@ export function createFlightInputManager(options: {
     },
     apply(sdk: JSBSimSdk, controls: ControlSurfaceState): void {
       if (paused) return;
-      applyFlightControls(sdk, controls, gearDown ? 1 : 0);
+      applyFlightControls(sdk, controls, gearDown ? 1 : 0, options.rudderSign);
     },
     adoptControls(controls: ControlSurfaceState): void {
       keysDown.clear();

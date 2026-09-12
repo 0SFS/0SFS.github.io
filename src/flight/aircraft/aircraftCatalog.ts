@@ -1,7 +1,9 @@
 import { getFdmProfile } from "../jsbsim/fdmProfiles";
+import { SF50_VARIANTS } from "./sf50Variants";
 import { AIRCRAFT_IDS, type AircraftId, isAircraftId } from "./aircraftIds";
 
 export { AIRCRAFT_IDS, isAircraftId };
+export type { AircraftId };
 
 /**
  * Selectable aircraft and their level-of-detail meshes.
@@ -13,10 +15,7 @@ export { AIRCRAFT_IDS, isAircraftId };
  */
 
 /** Drop each visual root to align with its profile's settled ground stance. */
-const MODEL_OFFSET_Y_BY_ID: Record<AircraftId, number> = {
-  "cessna-172": -getFdmProfile("cessna-172").stance.staticMeters,
-  "cirrus-vision-jet": -getFdmProfile("cirrus-vision-jet").stance.staticMeters,
-};
+const modelOffsetY = (id: AircraftId): number => -getFdmProfile(id).stance.staticMeters;
 
 // Level NUMBERS run coarsest-first: lod0 is the silhouette and each step up
 // adds detail, so a bigger number is always a better mesh. That is the
@@ -136,22 +135,19 @@ export const AIRCRAFT_CATALOG: readonly AircraftDefinition[] = [
     label: "Cessna 172 Skyhawk",
     summary: "High-wing trainer. Flight model and visuals both available.",
     modelYawRad: Math.PI,
-    modelOffset: { x: 0, y: MODEL_OFFSET_Y_BY_ID["cessna-172"], z: 0 },
+    modelOffset: { x: 0, y: modelOffsetY("cessna-172"), z: 0 },
     propellerBlades: 2,
     lods: C172_LODS,
   },
-  {
-    id: "cirrus-vision-jet",
-    label: "Cirrus Vision Jet",
-    summary: "Single-engine V-tail jet. Visuals only — it flies the C172's model.",
+  ...SF50_VARIANTS.map((variant): AircraftDefinition => ({
+    id: variant.aircraftId,
+    label: variant.label,
+    summary: variant.summary,
     modelYawRad: Math.PI,
-    // The temporary profile keeps the dropped mesh aligned until a true SF50
-    // stance enters the flight profile package.
-    modelOffset: { x: 0, y: MODEL_OFFSET_Y_BY_ID["cirrus-vision-jet"], z: 0 },
-    // A jet: the propeller-disc logic must never engage.
+    modelOffset: { x: 0, y: modelOffsetY(variant.aircraftId), z: 0 },
     propellerBlades: 0,
     lods: CIRRUS_LODS,
-  },
+  })),
 ];
 
 export function getAircraftDefinition(id: AircraftId): AircraftDefinition {

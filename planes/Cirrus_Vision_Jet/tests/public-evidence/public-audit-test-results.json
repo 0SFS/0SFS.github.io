@@ -1,0 +1,82 @@
+{
+  "date": "2026-09-12",
+  "nodeVersion": "v26.8.2",
+  "analyzer": {
+    "exitCode": 0,
+    "manifest": "manifest.json",
+    "sourceCount": 47,
+    "tableCount": 37,
+    "tableRows": 3552,
+    "recorderRows": 450,
+    "uniqueTimes": 360,
+    "duplicates": 90,
+    "aircraftValidated": false,
+    "simulationExecuted": false,
+    "eligibility": {
+      "eligibleForComparison": false,
+      "aircraftValidated": false,
+      "blockers": [
+        "applicableVariant",
+        "unitsVerified",
+        "conditionsMatched",
+        "timebaseReviewed",
+        "normalOperationReviewed",
+        "independentOfCalibration"
+      ]
+    }
+  },
+  "focusedTests": {
+    "framework": "Vitest 4.1.6",
+    "success": true,
+    "testFiles": 7,
+    "passed": 42,
+    "failed": 0,
+    "pending": 0,
+    "files": [
+      {
+        "path": "src/flight/validation/evaluateSf50AfmMeasurement.test.ts",
+        "status": "passed",
+        "tests": 6
+      },
+      {
+        "path": "src/flight/validation/runwayMeasurement.test.ts",
+        "status": "passed",
+        "tests": 5
+      },
+      {
+        "path": "src/flight/validation/sf50AfmBenchmark.test.ts",
+        "status": "passed",
+        "tests": 8
+      },
+      {
+        "path": "src/flight/validation/sf50AfmData.test.ts",
+        "status": "passed",
+        "tests": 3
+      },
+      {
+        "path": "src/flight/validation/sf50LandingPilot.test.ts",
+        "status": "passed",
+        "tests": 7
+      },
+      {
+        "path": "src/flight/validation/sf50PilotProfiles.test.ts",
+        "status": "passed",
+        "tests": 4
+      },
+      {
+        "path": "src/flight/validation/sf50PublicEvidence.test.ts",
+        "status": "passed",
+        "tests": 9
+      }
+    ]
+  },
+  "supplement": {
+    "sourceCount": 34,
+    "bytes": 129811473,
+    "combinedBaselineAndSupplementSources": 81,
+    "combinedBytes": 200995197,
+    "acquiredBinaryAndRecorderSources": 21
+  },
+  "noAircraftSimulationRun": true,
+  "noModelCoefficientsChanged": true
+}

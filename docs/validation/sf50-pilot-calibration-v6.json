@@ -1,0 +1,1787 @@
+{
+  "schemaVersion": 1,
+  "scope": "18 in-memory pilot-only calibration runs; no held-out cases",
+  "runtime": {
+    "node": "v22.22.3",
+    "platform": "darwin",
+    "arch": "arm64",
+    "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+    "fixedDtSec": 0.008333333333333333
+  },
+  "wasmSha256": "4e8c4a199aefe6bed6067f86ad4c24ee4aa3a894fe4c9c1b34c148dfdbfa9091",
+  "selected": {
+    "takeoff": "rotation-rate4",
+    "landing": "landing-rate3"
+  },
+  "calibrationStatus": "Pilot tuning only; unknown conditions still block aircraft validation",
+  "selectionNotes": [
+    "Takeoff selected for unchanged pitch gates, not nearest runway distance.",
+    "Landing selected for improved sink/path tracking and lower pitch-rate limit than the rate-4 alternative.",
+    "The 0.16 g landing deceleration demand is a provisional ground-roll fit, not a verified Cirrus pilot instruction or tire-friction coefficient.",
+    "Airborne-distance comparisons are derived independently from total minus ground roll to expose compensating errors.",
+    "The baseline was reproduced on the same Node version, WASM artifact, XML hashes and loading as all candidates."
+  ],
+  "results": [
+    {
+      "variant": {
+        "id": "takeoff-baseline",
+        "phase": "takeoff"
+      },
+      "generatedAt": "2026-09-12T15:29:40.031Z",
+      "runtime": {
+        "node": "v22.22.3",
+        "platform": "darwin",
+        "arch": "arm64",
+        "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+        "fixedDtSec": 0.008333333333333333
+      },
+      "packageHashes": {
+        "aircraft/sf50/sf50.xml": "820a56aba35860b615cc65a006b84b66f37bd7c60f5f6ec2d4901d7bcc5b2b7a",
+        "engine/fj33_5a.xml": "876ab3d416c8cd92fa0e9b8edbf53279841dfef9eedc29acbb203e689dd6550a",
+        "engine/direct.xml": "f897f13f36a927388d985de6fe1543489f661c9fd42c75ca5edf3ac0250f5c0f"
+      },
+      "modelHash": "f36abd3d99ad64875c71f4fee19423947d05df77a7f6eba476d3105c62c6ab09",
+      "completed": true,
+      "initializationChecksPassed": 7,
+      "status": "blocked",
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 2036,
+          "actual": 2103.3056781516534,
+          "relativeError": 0.03305779869924038,
+          "passed": true
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3192,
+          "actual": 3305.638855316488,
+          "relativeError": 0.03560114514927567,
+          "passed": true
+        },
+        {
+          "name": "airborneDistanceFt",
+          "expected": 1156,
+          "actual": 1202.3331771648345,
+          "relativeError": 0.04008060308376689,
+          "passed": true
+        }
+      ],
+      "pitchTracking": {
+        "targetPitchDeg": 5,
+        "toleranceDeg": 1,
+        "settlingAllowanceSec": 5,
+        "rotationCommandTimeSec": 147.36666666669697,
+        "firstAirborne": {
+          "simTimeSec": 150.28333333336099,
+          "pitchDeg": 3.513103430596049,
+          "errorDeg": 1.4868965694039509,
+          "passed": false
+        },
+        "screen": {
+          "simTimeSec": 156.90000000002163,
+          "pitchDeg": 5.201512353400973,
+          "errorDeg": -0.20151235340097262,
+          "passed": true
+        },
+        "observedSamples": 1144,
+        "settledSamples": 544,
+        "settledRmsErrorDeg": 0.15739071381819933,
+        "settledMaximumErrorDeg": 0.20420144987157318,
+        "nearElevatorLimitFraction": 0,
+        "status": "blocked",
+        "basis": "Project numerical tracking gates, not AFM tolerances; first-airborne and screen samples are not interpolated flight-test measurements",
+        "blockers": [
+          "Takeoff pitch did not meet the project tracking gate at first sampled airborne state."
+        ]
+      },
+      "touchdown": null,
+      "landingTracking": null,
+      "bounces": 0,
+      "abortReason": null,
+      "events": [
+        {
+          "kind": "brake-release",
+          "timeSec": 127.29166666671404,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "liftoff",
+          "timeSec": 150.28333333336099,
+          "distanceFt": 2103.3056781516534,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "screen-height",
+          "timeSec": 156.89473644564566,
+          "distanceFt": 3305.638855316488,
+          "timingBasis": "height-interpolation"
+        }
+      ],
+      "relativeTolerance": 0.15,
+      "sourceReport": {
+        "path": "/private/tmp/sf50-v6-calibration.3BhSV2/takeoff-baseline.json",
+        "sha256": "677707e4e333a7fdb605cb04ff150ed786662f2f7792fd399d776094b1dec11d"
+      }
+    },
+    {
+      "variant": {
+        "id": "rotation-rate3",
+        "phase": "takeoff",
+        "pitch": {
+          "outer": 1.8,
+          "integral": 0.18,
+          "rate": 3
+        }
+      },
+      "generatedAt": "2026-09-12T15:29:41.080Z",
+      "runtime": {
+        "node": "v22.22.3",
+        "platform": "darwin",
+        "arch": "arm64",
+        "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+        "fixedDtSec": 0.008333333333333333
+      },
+      "packageHashes": {
+        "aircraft/sf50/sf50.xml": "820a56aba35860b615cc65a006b84b66f37bd7c60f5f6ec2d4901d7bcc5b2b7a",
+        "engine/fj33_5a.xml": "876ab3d416c8cd92fa0e9b8edbf53279841dfef9eedc29acbb203e689dd6550a",
+        "engine/direct.xml": "f897f13f36a927388d985de6fe1543489f661c9fd42c75ca5edf3ac0250f5c0f"
+      },
+      "modelHash": "f36abd3d99ad64875c71f4fee19423947d05df77a7f6eba476d3105c62c6ab09",
+      "completed": true,
+      "initializationChecksPassed": 7,
+      "status": "blocked",
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 2036,
+          "actual": 2042.5667064718882,
+          "relativeError": 0.003225297874208355,
+          "passed": true
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3192,
+          "actual": 3264.3172034299887,
+          "relativeError": 0.02265576548558543,
+          "passed": true
+        },
+        {
+          "name": "airborneDistanceFt",
+          "expected": 1156,
+          "actual": 1221.7504969581005,
+          "relativeError": 0.05687759252430838,
+          "passed": true
+        }
+      ],
+      "pitchTracking": {
+        "targetPitchDeg": 5,
+        "toleranceDeg": 1,
+        "settlingAllowanceSec": 5,
+        "rotationCommandTimeSec": 147.36666666669697,
+        "firstAirborne": {
+          "simTimeSec": 149.92500000002798,
+          "pitchDeg": 3.809947855794958,
+          "errorDeg": 1.1900521442050418,
+          "passed": false
+        },
+        "screen": {
+          "simTimeSec": 156.70833333335514,
+          "pitchDeg": 5.0957426991313355,
+          "errorDeg": -0.09574269913133548,
+          "passed": true
+        },
+        "observedSamples": 1121,
+        "settledSamples": 521,
+        "settledRmsErrorDeg": 0.1083398116237937,
+        "settledMaximumErrorDeg": 0.11933228118183781,
+        "nearElevatorLimitFraction": 0.0044603033006244425,
+        "status": "blocked",
+        "basis": "Project numerical tracking gates, not AFM tolerances; first-airborne and screen samples are not interpolated flight-test measurements",
+        "blockers": [
+          "Takeoff pitch did not meet the project tracking gate at first sampled airborne state."
+        ]
+      },
+      "touchdown": null,
+      "landingTracking": null,
+      "bounces": 0,
+      "abortReason": null,
+      "events": [
+        {
+          "kind": "brake-release",
+          "timeSec": 127.29166666671404,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "liftoff",
+          "timeSec": 149.92500000002798,
+          "distanceFt": 2042.5667064718882,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "screen-height",
+          "timeSec": 156.7024000712226,
+          "distanceFt": 3264.3172034299887,
+          "timingBasis": "height-interpolation"
+        }
+      ],
+      "relativeTolerance": 0.15,
+      "sourceReport": {
+        "path": "/private/tmp/sf50-v6-calibration.3BhSV2/rotation-rate3.json",
+        "sha256": "17b19fb510a3f3ee714cd0464255b822f660a6e6d04298dc82ced8ea6be9161e"
+      }
+    },
+    {
+      "variant": {
+        "id": "rotation-rate4",
+        "phase": "takeoff",
+        "pitch": {
+          "outer": 2.4,
+          "integral": 0.24,
+          "rate": 4
+        }
+      },
+      "generatedAt": "2026-09-12T15:29:42.101Z",
+      "runtime": {
+        "node": "v22.22.3",
+        "platform": "darwin",
+        "arch": "arm64",
+        "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+        "fixedDtSec": 0.008333333333333333
+      },
+      "packageHashes": {
+        "aircraft/sf50/sf50.xml": "820a56aba35860b615cc65a006b84b66f37bd7c60f5f6ec2d4901d7bcc5b2b7a",
+        "engine/fj33_5a.xml": "876ab3d416c8cd92fa0e9b8edbf53279841dfef9eedc29acbb203e689dd6550a",
+        "engine/direct.xml": "f897f13f36a927388d985de6fe1543489f661c9fd42c75ca5edf3ac0250f5c0f"
+      },
+      "modelHash": "f36abd3d99ad64875c71f4fee19423947d05df77a7f6eba476d3105c62c6ab09",
+      "completed": true,
+      "initializationChecksPassed": 7,
+      "status": "blocked",
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 2036,
+          "actual": 1941.0775704468128,
+          "relativeError": -0.04662201844459094,
+          "passed": true
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3192,
+          "actual": 3244.4236309043254,
+          "relativeError": 0.016423443265766093,
+          "passed": true
+        },
+        {
+          "name": "airborneDistanceFt",
+          "expected": 1156,
+          "actual": 1303.3460604575125,
+          "relativeError": 0.12746199001514924,
+          "passed": true
+        }
+      ],
+      "pitchTracking": {
+        "targetPitchDeg": 5,
+        "toleranceDeg": 1,
+        "settlingAllowanceSec": 5,
+        "rotationCommandTimeSec": 147.36666666669697,
+        "firstAirborne": {
+          "simTimeSec": 149.3166666666952,
+          "pitchDeg": 4.186889817781411,
+          "errorDeg": 0.8131101822185887,
+          "passed": true
+        },
+        "screen": {
+          "simTimeSec": 156.6333333333552,
+          "pitchDeg": 5.052264298972941,
+          "errorDeg": -0.052264298972940715,
+          "passed": true
+        },
+        "observedSamples": 1112,
+        "settledSamples": 512,
+        "settledRmsErrorDeg": 0.06653548849065898,
+        "settledMaximumErrorDeg": 0.07447367039804842,
+        "nearElevatorLimitFraction": 0.053057553956834536,
+        "status": "tracking-gates-met",
+        "basis": "Project numerical tracking gates, not AFM tolerances; first-airborne and screen samples are not interpolated flight-test measurements",
+        "blockers": []
+      },
+      "touchdown": null,
+      "landingTracking": null,
+      "bounces": 0,
+      "abortReason": null,
+      "events": [
+        {
+          "kind": "brake-release",
+          "timeSec": 127.29166666671404,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "liftoff",
+          "timeSec": 149.3166666666952,
+          "distanceFt": 1941.0775704468128,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "screen-height",
+          "timeSec": 156.62541697074423,
+          "distanceFt": 3244.4236309043254,
+          "timingBasis": "height-interpolation"
+        }
+      ],
+      "relativeTolerance": 0.15,
+      "sourceReport": {
+        "path": "/private/tmp/sf50-v6-calibration.3BhSV2/rotation-rate4.json",
+        "sha256": "27e87573d68997beb98398b8084a23b201243dd584b6915048a50c5f207bc819"
+      }
+    },
+    {
+      "variant": {
+        "id": "landing-baseline",
+        "phase": "landing"
+      },
+      "generatedAt": "2026-09-12T15:29:42.442Z",
+      "runtime": {
+        "node": "v22.22.3",
+        "platform": "darwin",
+        "arch": "arm64",
+        "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+        "fixedDtSec": 0.008333333333333333
+      },
+      "packageHashes": {
+        "aircraft/sf50/sf50.xml": "820a56aba35860b615cc65a006b84b66f37bd7c60f5f6ec2d4901d7bcc5b2b7a",
+        "engine/fj33_5a.xml": "876ab3d416c8cd92fa0e9b8edbf53279841dfef9eedc29acbb203e689dd6550a",
+        "engine/direct.xml": "f897f13f36a927388d985de6fe1543489f661c9fd42c75ca5edf3ac0250f5c0f"
+      },
+      "modelHash": "6b51e344c1798104ee692830ad63c98ab26a0ba166bbc92696f2c04eb771ce4a",
+      "completed": true,
+      "initializationChecksPassed": 7,
+      "status": "blocked",
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 1628,
+          "actual": 480.3024787063421,
+          "relativeError": -0.7049739074285368,
+          "passed": false
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3011,
+          "actual": 1646.2047671817118,
+          "relativeError": -0.453269755170471,
+          "passed": false
+        },
+        {
+          "name": "airborneDistanceFt",
+          "expected": 1383,
+          "actual": 1165.9022884753697,
+          "relativeError": -0.15697593024195974,
+          "passed": false
+        }
+      ],
+      "pitchTracking": null,
+      "touchdown": {
+        "timeSec": 9.141666666666788,
+        "pitchDeg": 4.642547385686512,
+        "casKts": 69.22339766697826,
+        "groundSpeedFps": 116.57100668348819,
+        "downVelocityFps": 7.959387456913012,
+        "flightPathAngleDeg": -3.906053510161519,
+        "flightPathCommandDeg": null
+      },
+      "landingTracking": null,
+      "bounces": 0,
+      "abortReason": null,
+      "events": [
+        {
+          "kind": "threshold",
+          "timeSec": 0,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "touchdown",
+          "timeSec": 9.141666666666788,
+          "distanceFt": 1165.9022884753697,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "stop",
+          "timeSec": 16.849999999999685,
+          "distanceFt": 1646.2047671817118,
+          "timingBasis": "sample"
+        }
+      ],
+      "relativeTolerance": 0.15,
+      "sourceReport": {
+        "path": "/private/tmp/sf50-v6-calibration.3BhSV2/landing-baseline.json",
+        "sha256": "918c59883da7e04195e02533a69124f6f44a830836bac34765a83ebc3b64ce24"
+      }
+    },
+    {
+      "variant": {
+        "id": "landing-path-ramp",
+        "phase": "landing",
+        "landing": {
+          "flareHeight": 20,
+          "minimumSinkFps": 2.5,
+          "gammaGain": 1.5,
+          "brakeDelaySec": 0.35,
+          "brakeRampSec": 1
+        }
+      },
+      "generatedAt": "2026-09-12T15:29:42.788Z",
+      "runtime": {
+        "node": "v22.22.3",
+        "platform": "darwin",
+        "arch": "arm64",
+        "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+        "fixedDtSec": 0.008333333333333333
+      },
+      "packageHashes": {
+        "aircraft/sf50/sf50.xml": "820a56aba35860b615cc65a006b84b66f37bd7c60f5f6ec2d4901d7bcc5b2b7a",
+        "engine/fj33_5a.xml": "876ab3d416c8cd92fa0e9b8edbf53279841dfef9eedc29acbb203e689dd6550a",
+        "engine/direct.xml": "f897f13f36a927388d985de6fe1543489f661c9fd42c75ca5edf3ac0250f5c0f"
+      },
+      "modelHash": "6b51e344c1798104ee692830ad63c98ab26a0ba166bbc92696f2c04eb771ce4a",
+      "completed": true,
+      "initializationChecksPassed": 7,
+      "status": "blocked",
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 1628,
+          "actual": 640.5640264696298,
+          "relativeError": -0.6065331532741832,
+          "passed": false
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3011,
+          "actual": 1603.5018702442496,
+          "relativeError": -0.4674520523931419,
+          "passed": false
+        },
+        {
+          "name": "airborneDistanceFt",
+          "expected": 1383,
+          "actual": 962.9378437746199,
+          "relativeError": -0.3037325786156039,
+          "passed": false
+        }
+      ],
+      "pitchTracking": null,
+      "touchdown": {
+        "timeSec": 7.275000000000151,
+        "pitchDeg": 5.7068905138466555,
+        "casKts": 73.0828971236107,
+        "groundSpeedFps": 123.28516356332504,
+        "downVelocityFps": 4.208133134315625,
+        "flightPathAngleDeg": -1.954936745977858,
+        "flightPathCommandDeg": -1.16143748038142
+      },
+      "landingTracking": {
+        "sampledAirborneRmsGammaErrorDeg": 0.94844361468403,
+        "sampledMaximumGammaErrorDeg": 1.3839821309800642,
+        "sampledAirborneNearElevatorLimitFraction": 0
+      },
+      "bounces": 0,
+      "abortReason": null,
+      "events": [
+        {
+          "kind": "threshold",
+          "timeSec": 0,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "touchdown",
+          "timeSec": 7.275000000000151,
+          "distanceFt": 962.9378437746199,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "stop",
+          "timeSec": 16.291666666666384,
+          "distanceFt": 1603.5018702442496,
+          "timingBasis": "sample"
+        }
+      ],
+      "relativeTolerance": 0.15,
+      "sourceReport": {
+        "path": "/private/tmp/sf50-v6-calibration.3BhSV2/landing-path-ramp.json",
+        "sha256": "121f9166eb5f23651c4823d40b426fbc9ebed766b85c433ec0db24e134c403a1"
+      }
+    },
+    {
+      "variant": {
+        "id": "landing-path-018g",
+        "phase": "landing",
+        "landing": {
+          "flareHeight": 20,
+          "minimumSinkFps": 2.5,
+          "gammaGain": 1.5,
+          "brakeDelaySec": 0.35,
+          "decelerationG": 0.18
+        }
+      },
+      "generatedAt": "2026-09-12T15:29:43.220Z",
+      "runtime": {
+        "node": "v22.22.3",
+        "platform": "darwin",
+        "arch": "arm64",
+        "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+        "fixedDtSec": 0.008333333333333333
+      },
+      "packageHashes": {
+        "aircraft/sf50/sf50.xml": "820a56aba35860b615cc65a006b84b66f37bd7c60f5f6ec2d4901d7bcc5b2b7a",
+        "engine/fj33_5a.xml": "876ab3d416c8cd92fa0e9b8edbf53279841dfef9eedc29acbb203e689dd6550a",
+        "engine/direct.xml": "f897f13f36a927388d985de6fe1543489f661c9fd42c75ca5edf3ac0250f5c0f"
+      },
+      "modelHash": "6b51e344c1798104ee692830ad63c98ab26a0ba166bbc92696f2c04eb771ce4a",
+      "completed": true,
+      "initializationChecksPassed": 7,
+      "status": "blocked",
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 1628,
+          "actual": 1539.6385044741842,
+          "relativeError": -0.05427610290283527,
+          "passed": true
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3011,
+          "actual": 2502.576348248804,
+          "relativeError": -0.16885541406549182,
+          "passed": false
+        },
+        {
+          "name": "airborneDistanceFt",
+          "expected": 1383,
+          "actual": 962.93784377462,
+          "relativeError": -0.30373257861560377,
+          "passed": false
+        }
+      ],
+      "pitchTracking": null,
+      "touchdown": {
+        "timeSec": 7.275000000000151,
+        "pitchDeg": 5.7068905138466555,
+        "casKts": 73.0828971236107,
+        "groundSpeedFps": 123.28516356332504,
+        "downVelocityFps": 4.208133134315625,
+        "flightPathAngleDeg": -1.954936745977858,
+        "flightPathCommandDeg": -1.16143748038142
+      },
+      "landingTracking": {
+        "sampledAirborneRmsGammaErrorDeg": 0.94844361468403,
+        "sampledMaximumGammaErrorDeg": 1.3839821309800642,
+        "sampledAirborneNearElevatorLimitFraction": 0
+      },
+      "bounces": 0,
+      "abortReason": null,
+      "events": [
+        {
+          "kind": "threshold",
+          "timeSec": 0,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "touchdown",
+          "timeSec": 7.275000000000151,
+          "distanceFt": 962.9378437746199,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "stop",
+          "timeSec": 30.391666666665582,
+          "distanceFt": 2502.576348248804,
+          "timingBasis": "sample"
+        }
+      ],
+      "relativeTolerance": 0.15,
+      "sourceReport": {
+        "path": "/private/tmp/sf50-v6-calibration.3BhSV2/landing-path-018g.json",
+        "sha256": "a085cb75d2d881e1c96041f4a8454f0e4c4e7e7dbc97637668b90d9e4f5a0941"
+      }
+    },
+    {
+      "variant": {
+        "id": "landing-path-014g",
+        "phase": "landing",
+        "landing": {
+          "flareHeight": 20,
+          "minimumSinkFps": 2.5,
+          "gammaGain": 1.5,
+          "brakeDelaySec": 0.35,
+          "decelerationG": 0.14
+        }
+      },
+      "generatedAt": "2026-09-12T15:29:43.676Z",
+      "runtime": {
+        "node": "v22.22.3",
+        "platform": "darwin",
+        "arch": "arm64",
+        "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+        "fixedDtSec": 0.008333333333333333
+      },
+      "packageHashes": {
+        "aircraft/sf50/sf50.xml": "820a56aba35860b615cc65a006b84b66f37bd7c60f5f6ec2d4901d7bcc5b2b7a",
+        "engine/fj33_5a.xml": "876ab3d416c8cd92fa0e9b8edbf53279841dfef9eedc29acbb203e689dd6550a",
+        "engine/direct.xml": "f897f13f36a927388d985de6fe1543489f661c9fd42c75ca5edf3ac0250f5c0f"
+      },
+      "modelHash": "6b51e344c1798104ee692830ad63c98ab26a0ba166bbc92696f2c04eb771ce4a",
+      "completed": true,
+      "initializationChecksPassed": 7,
+      "status": "blocked",
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 1628,
+          "actual": 1891.378612207206,
+          "relativeError": 0.16178047432875065,
+          "passed": false
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3011,
+          "actual": 2854.316455981826,
+          "relativeError": -0.052037045505869794,
+          "passed": true
+        },
+        {
+          "name": "airborneDistanceFt",
+          "expected": 1383,
+          "actual": 962.93784377462,
+          "relativeError": -0.30373257861560377,
+          "passed": false
+        }
+      ],
+      "pitchTracking": null,
+      "touchdown": {
+        "timeSec": 7.275000000000151,
+        "pitchDeg": 5.7068905138466555,
+        "casKts": 73.0828971236107,
+        "groundSpeedFps": 123.28516356332504,
+        "downVelocityFps": 4.208133134315625,
+        "flightPathAngleDeg": -1.954936745977858,
+        "flightPathCommandDeg": -1.16143748038142
+      },
+      "landingTracking": {
+        "sampledAirborneRmsGammaErrorDeg": 0.94844361468403,
+        "sampledMaximumGammaErrorDeg": 1.3839821309800642,
+        "sampledAirborneNearElevatorLimitFraction": 0
+      },
+      "bounces": 0,
+      "abortReason": null,
+      "events": [
+        {
+          "kind": "threshold",
+          "timeSec": 0,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "touchdown",
+          "timeSec": 7.275000000000151,
+          "distanceFt": 962.9378437746199,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "stop",
+          "timeSec": 36.32499999999858,
+          "distanceFt": 2854.316455981826,
+          "timingBasis": "sample"
+        }
+      ],
+      "relativeTolerance": 0.15,
+      "sourceReport": {
+        "path": "/private/tmp/sf50-v6-calibration.3BhSV2/landing-path-014g.json",
+        "sha256": "ce32ce517e9e190a942486c67402389b48f1ba2933c4480298e14de3c7e343d3"
+      }
+    },
+    {
+      "variant": {
+        "id": "landing-path-022g",
+        "phase": "landing",
+        "landing": {
+          "flareHeight": 20,
+          "minimumSinkFps": 2.5,
+          "gammaGain": 1.5,
+          "brakeDelaySec": 0.35,
+          "decelerationG": 0.22
+        }
+      },
+      "generatedAt": "2026-09-12T15:29:44.079Z",
+      "runtime": {
+        "node": "v22.22.3",
+        "platform": "darwin",
+        "arch": "arm64",
+        "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+        "fixedDtSec": 0.008333333333333333
+      },
+      "packageHashes": {
+        "aircraft/sf50/sf50.xml": "820a56aba35860b615cc65a006b84b66f37bd7c60f5f6ec2d4901d7bcc5b2b7a",
+        "engine/fj33_5a.xml": "876ab3d416c8cd92fa0e9b8edbf53279841dfef9eedc29acbb203e689dd6550a",
+        "engine/direct.xml": "f897f13f36a927388d985de6fe1543489f661c9fd42c75ca5edf3ac0250f5c0f"
+      },
+      "modelHash": "6b51e344c1798104ee692830ad63c98ab26a0ba166bbc92696f2c04eb771ce4a",
+      "completed": true,
+      "initializationChecksPassed": 7,
+      "status": "blocked",
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 1628,
+          "actual": 1316.693793033599,
+          "relativeError": -0.19122002884914072,
+          "passed": false
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3011,
+          "actual": 2279.631636808219,
+          "relativeError": -0.2428988253709004,
+          "passed": false
+        },
+        {
+          "name": "airborneDistanceFt",
+          "expected": 1383,
+          "actual": 962.93784377462,
+          "relativeError": -0.30373257861560377,
+          "passed": false
+        }
+      ],
+      "pitchTracking": null,
+      "touchdown": {
+        "timeSec": 7.275000000000151,
+        "pitchDeg": 5.7068905138466555,
+        "casKts": 73.0828971236107,
+        "groundSpeedFps": 123.28516356332504,
+        "downVelocityFps": 4.208133134315625,
+        "flightPathAngleDeg": -1.954936745977858,
+        "flightPathCommandDeg": -1.16143748038142
+      },
+      "landingTracking": {
+        "sampledAirborneRmsGammaErrorDeg": 0.94844361468403,
+        "sampledMaximumGammaErrorDeg": 1.3839821309800642,
+        "sampledAirborneNearElevatorLimitFraction": 0
+      },
+      "bounces": 0,
+      "abortReason": null,
+      "events": [
+        {
+          "kind": "threshold",
+          "timeSec": 0,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "touchdown",
+          "timeSec": 7.275000000000151,
+          "distanceFt": 962.9378437746199,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "stop",
+          "timeSec": 26.62499999999913,
+          "distanceFt": 2279.631636808219,
+          "timingBasis": "sample"
+        }
+      ],
+      "relativeTolerance": 0.15,
+      "sourceReport": {
+        "path": "/private/tmp/sf50-v6-calibration.3BhSV2/landing-path-022g.json",
+        "sha256": "7d76155729f9cd3eaa41c7c689f76c6d06be247d37a3dc15b723bdcf63213630"
+      }
+    },
+    {
+      "variant": {
+        "id": "landing-fixed-pitch-018g",
+        "phase": "landing",
+        "landing": {
+          "path": false,
+          "flareHeight": 20,
+          "minimumSinkFps": 2.5,
+          "gammaGain": 1.5,
+          "brakeDelaySec": 0.35,
+          "decelerationG": 0.18
+        }
+      },
+      "generatedAt": "2026-09-12T15:33:08.090Z",
+      "runtime": {
+        "node": "v22.22.3",
+        "platform": "darwin",
+        "arch": "arm64",
+        "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+        "fixedDtSec": 0.008333333333333333
+      },
+      "packageHashes": {
+        "aircraft/sf50/sf50.xml": "820a56aba35860b615cc65a006b84b66f37bd7c60f5f6ec2d4901d7bcc5b2b7a",
+        "engine/fj33_5a.xml": "876ab3d416c8cd92fa0e9b8edbf53279841dfef9eedc29acbb203e689dd6550a",
+        "engine/direct.xml": "f897f13f36a927388d985de6fe1543489f661c9fd42c75ca5edf3ac0250f5c0f"
+      },
+      "modelHash": "6b51e344c1798104ee692830ad63c98ab26a0ba166bbc92696f2c04eb771ce4a",
+      "completed": true,
+      "initializationChecksPassed": 7,
+      "status": "blocked",
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 1628,
+          "actual": 1390.3910508502506,
+          "relativeError": -0.14595144296667653,
+          "passed": true
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3011,
+          "actual": 2556.2933393256203,
+          "relativeError": -0.15101516462118222,
+          "passed": false
+        },
+        {
+          "name": "airborneDistanceFt",
+          "expected": 1383,
+          "actual": 1165.9022884753697,
+          "relativeError": -0.15697593024195974,
+          "passed": false
+        }
+      ],
+      "pitchTracking": null,
+      "touchdown": {
+        "timeSec": 9.141666666666788,
+        "pitchDeg": 4.642547385686512,
+        "casKts": 69.22339766697826,
+        "groundSpeedFps": 116.57100668348819,
+        "downVelocityFps": 7.959387456913012,
+        "flightPathAngleDeg": -3.906053510161519,
+        "flightPathCommandDeg": null
+      },
+      "landingTracking": null,
+      "bounces": 0,
+      "abortReason": null,
+      "events": [
+        {
+          "kind": "threshold",
+          "timeSec": 0,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "touchdown",
+          "timeSec": 9.141666666666788,
+          "distanceFt": 1165.9022884753697,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "stop",
+          "timeSec": 31.108333333332208,
+          "distanceFt": 2556.2933393256203,
+          "timingBasis": "sample"
+        }
+      ],
+      "relativeTolerance": 0.15,
+      "sourceReport": {
+        "path": "/private/tmp/sf50-v6-calibration.3BhSV2/landing-fixed-pitch-018g.json",
+        "sha256": "cef1f1c5dec10717a93edf642aa7b0b460f0e72b441e222b3721def2ba8ead17"
+      }
+    },
+    {
+      "variant": {
+        "id": "landing-flare30",
+        "phase": "landing",
+        "landing": {
+          "flareHeight": 30,
+          "minimumSinkFps": 2.5,
+          "gammaGain": 2.4,
+          "brakeDelaySec": 0.35,
+          "decelerationG": 0.18
+        }
+      },
+      "generatedAt": "2026-09-12T15:33:08.520Z",
+      "runtime": {
+        "node": "v22.22.3",
+        "platform": "darwin",
+        "arch": "arm64",
+        "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+        "fixedDtSec": 0.008333333333333333
+      },
+      "packageHashes": {
+        "aircraft/sf50/sf50.xml": "820a56aba35860b615cc65a006b84b66f37bd7c60f5f6ec2d4901d7bcc5b2b7a",
+        "engine/fj33_5a.xml": "876ab3d416c8cd92fa0e9b8edbf53279841dfef9eedc29acbb203e689dd6550a",
+        "engine/direct.xml": "f897f13f36a927388d985de6fe1543489f661c9fd42c75ca5edf3ac0250f5c0f"
+      },
+      "modelHash": "6b51e344c1798104ee692830ad63c98ab26a0ba166bbc92696f2c04eb771ce4a",
+      "completed": true,
+      "initializationChecksPassed": 7,
+      "status": "blocked",
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 1628,
+          "actual": 1425.8864929985057,
+          "relativeError": -0.12414834582401371,
+          "passed": true
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3011,
+          "actual": 2529.379442598982,
+          "relativeError": -0.15995368894088932,
+          "passed": false
+        },
+        {
+          "name": "airborneDistanceFt",
+          "expected": 1383,
+          "actual": 1103.4929496004765,
+          "relativeError": -0.20210198871982896,
+          "passed": false
+        }
+      ],
+      "pitchTracking": null,
+      "touchdown": {
+        "timeSec": 8.458333333333494,
+        "pitchDeg": 6.527961961976396,
+        "casKts": 70.10315834729919,
+        "groundSpeedFps": 118.27638940027322,
+        "downVelocityFps": 3.475688369042455,
+        "flightPathAngleDeg": -1.6832182846760584,
+        "flightPathCommandDeg": -1.2105987986213942
+      },
+      "landingTracking": {
+        "sampledAirborneRmsGammaErrorDeg": 0.6871319415426848,
+        "sampledMaximumGammaErrorDeg": 1.2758569379035187,
+        "sampledAirborneNearElevatorLimitFraction": 0
+      },
+      "bounces": 0,
+      "abortReason": null,
+      "events": [
+        {
+          "kind": "threshold",
+          "timeSec": 0,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "touchdown",
+          "timeSec": 8.458333333333494,
+          "distanceFt": 1103.4929496004765,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "stop",
+          "timeSec": 30.716666666665564,
+          "distanceFt": 2529.379442598982,
+          "timingBasis": "sample"
+        }
+      ],
+      "relativeTolerance": 0.15,
+      "sourceReport": {
+        "path": "/private/tmp/sf50-v6-calibration.3BhSV2/landing-flare30.json",
+        "sha256": "c3662141bc53549258b3e8d3db457aaf9ecc0fc03612a5dfc9f2a70e4e47f6a8"
+      }
+    },
+    {
+      "variant": {
+        "id": "landing-flare35",
+        "phase": "landing",
+        "landing": {
+          "flareHeight": 35,
+          "minimumSinkFps": 2.5,
+          "gammaGain": 2.4,
+          "brakeDelaySec": 0.35,
+          "decelerationG": 0.18
+        }
+      },
+      "generatedAt": "2026-09-12T15:33:08.949Z",
+      "runtime": {
+        "node": "v22.22.3",
+        "platform": "darwin",
+        "arch": "arm64",
+        "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+        "fixedDtSec": 0.008333333333333333
+      },
+      "packageHashes": {
+        "aircraft/sf50/sf50.xml": "820a56aba35860b615cc65a006b84b66f37bd7c60f5f6ec2d4901d7bcc5b2b7a",
+        "engine/fj33_5a.xml": "876ab3d416c8cd92fa0e9b8edbf53279841dfef9eedc29acbb203e689dd6550a",
+        "engine/direct.xml": "f897f13f36a927388d985de6fe1543489f661c9fd42c75ca5edf3ac0250f5c0f"
+      },
+      "modelHash": "6b51e344c1798104ee692830ad63c98ab26a0ba166bbc92696f2c04eb771ce4a",
+      "completed": true,
+      "initializationChecksPassed": 7,
+      "status": "blocked",
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 1628,
+          "actual": 1403.7855550860615,
+          "relativeError": -0.1377238605122472,
+          "passed": true
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3011,
+          "actual": 2535.627110248765,
+          "relativeError": -0.15787874119934742,
+          "passed": false
+        },
+        {
+          "name": "airborneDistanceFt",
+          "expected": 1383,
+          "actual": 1131.8415551627033,
+          "relativeError": -0.18160408158879007,
+          "passed": false
+        }
+      ],
+      "pitchTracking": null,
+      "touchdown": {
+        "timeSec": 8.70833333333348,
+        "pitchDeg": 6.576357152466467,
+        "casKts": 69.51557436740586,
+        "groundSpeedFps": 117.27720914881913,
+        "downVelocityFps": 3.7033511328766107,
+        "flightPathAngleDeg": -1.8086711486639635,
+        "flightPathCommandDeg": -1.220915369699602
+      },
+      "landingTracking": {
+        "sampledAirborneRmsGammaErrorDeg": 0.7158812884747242,
+        "sampledMaximumGammaErrorDeg": 1.2758569379035187,
+        "sampledAirborneNearElevatorLimitFraction": 0
+      },
+      "bounces": 0,
+      "abortReason": null,
+      "events": [
+        {
+          "kind": "threshold",
+          "timeSec": 0,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "touchdown",
+          "timeSec": 8.70833333333348,
+          "distanceFt": 1131.8415551627033,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "stop",
+          "timeSec": 30.79166666666556,
+          "distanceFt": 2535.627110248765,
+          "timingBasis": "sample"
+        }
+      ],
+      "relativeTolerance": 0.15,
+      "sourceReport": {
+        "path": "/private/tmp/sf50-v6-calibration.3BhSV2/landing-flare35.json",
+        "sha256": "734e499a876df26b47ad76d57e31cd3f388203a96c4b717cb598fed044abd6bd"
+      }
+    },
+    {
+      "variant": {
+        "id": "landing-flare30-faster",
+        "phase": "landing",
+        "landing": {
+          "flareHeight": 30,
+          "minimumSinkFps": 2.5,
+          "gammaGain": 3.5,
+          "brakeDelaySec": 0.35,
+          "decelerationG": 0.18
+        }
+      },
+      "generatedAt": "2026-09-12T15:33:09.367Z",
+      "runtime": {
+        "node": "v22.22.3",
+        "platform": "darwin",
+        "arch": "arm64",
+        "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+        "fixedDtSec": 0.008333333333333333
+      },
+      "packageHashes": {
+        "aircraft/sf50/sf50.xml": "820a56aba35860b615cc65a006b84b66f37bd7c60f5f6ec2d4901d7bcc5b2b7a",
+        "engine/fj33_5a.xml": "876ab3d416c8cd92fa0e9b8edbf53279841dfef9eedc29acbb203e689dd6550a",
+        "engine/direct.xml": "f897f13f36a927388d985de6fe1543489f661c9fd42c75ca5edf3ac0250f5c0f"
+      },
+      "modelHash": "6b51e344c1798104ee692830ad63c98ab26a0ba166bbc92696f2c04eb771ce4a",
+      "completed": true,
+      "initializationChecksPassed": 7,
+      "status": "blocked",
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 1628,
+          "actual": 1388.330398075175,
+          "relativeError": -0.14721720019952395,
+          "passed": true
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3011,
+          "actual": 2538.736738997523,
+          "relativeError": -0.15684598505562175,
+          "passed": false
+        },
+        {
+          "name": "airborneDistanceFt",
+          "expected": 1383,
+          "actual": 1150.406340922348,
+          "relativeError": -0.16818051994045705,
+          "passed": false
+        }
+      ],
+      "pitchTracking": null,
+      "touchdown": {
+        "timeSec": 8.866666666666804,
+        "pitchDeg": 6.666216849848115,
+        "casKts": 69.0925812545589,
+        "groundSpeedFps": 116.5693234795354,
+        "downVelocityFps": 3.494420697446209,
+        "flightPathAngleDeg": -1.7170522294054997,
+        "flightPathCommandDeg": -1.228325184082773
+      },
+      "landingTracking": {
+        "sampledAirborneRmsGammaErrorDeg": 0.5859702686847985,
+        "sampledMaximumGammaErrorDeg": 1.215592149396051,
+        "sampledAirborneNearElevatorLimitFraction": 0
+      },
+      "bounces": 0,
+      "abortReason": null,
+      "events": [
+        {
+          "kind": "threshold",
+          "timeSec": 0,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "touchdown",
+          "timeSec": 8.866666666666804,
+          "distanceFt": 1150.406340922348,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "stop",
+          "timeSec": 30.833333333332224,
+          "distanceFt": 2538.736738997523,
+          "timingBasis": "sample"
+        }
+      ],
+      "relativeTolerance": 0.15,
+      "sourceReport": {
+        "path": "/private/tmp/sf50-v6-calibration.3BhSV2/landing-flare30-faster.json",
+        "sha256": "849a0e08208dd715e4e8a0fd4c19f0584ea5e658bc395b39bdd8caafe35d06ca"
+      }
+    },
+    {
+      "variant": {
+        "id": "landing-pitch8",
+        "phase": "landing",
+        "landing": {
+          "flareHeight": 30,
+          "minimumSinkFps": 2.5,
+          "gammaGain": 2.4,
+          "maximumPitchDeg": 8,
+          "brakeDelaySec": 0.35,
+          "decelerationG": 0.18
+        }
+      },
+      "generatedAt": "2026-09-12T15:35:39.845Z",
+      "runtime": {
+        "node": "v22.22.3",
+        "platform": "darwin",
+        "arch": "arm64",
+        "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+        "fixedDtSec": 0.008333333333333333
+      },
+      "packageHashes": {
+        "aircraft/sf50/sf50.xml": "820a56aba35860b615cc65a006b84b66f37bd7c60f5f6ec2d4901d7bcc5b2b7a",
+        "engine/fj33_5a.xml": "876ab3d416c8cd92fa0e9b8edbf53279841dfef9eedc29acbb203e689dd6550a",
+        "engine/direct.xml": "f897f13f36a927388d985de6fe1543489f661c9fd42c75ca5edf3ac0250f5c0f"
+      },
+      "modelHash": "6b51e344c1798104ee692830ad63c98ab26a0ba166bbc92696f2c04eb771ce4a",
+      "completed": true,
+      "initializationChecksPassed": 7,
+      "status": "blocked",
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 1628,
+          "actual": 1417.1147722716687,
+          "relativeError": -0.12953638066850817,
+          "passed": true
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3011,
+          "actual": 2528.4293136142637,
+          "relativeError": -0.16026924157613293,
+          "passed": false
+        },
+        {
+          "name": "airborneDistanceFt",
+          "expected": 1383,
+          "actual": 1111.314541342595,
+          "relativeError": -0.1964464632374584,
+          "passed": false
+        }
+      ],
+      "pitchTracking": null,
+      "touchdown": {
+        "timeSec": 8.525000000000157,
+        "pitchDeg": 7.081916410330963,
+        "casKts": 69.8876514484724,
+        "groundSpeedFps": 117.92511844775723,
+        "downVelocityFps": 3.0169670224845717,
+        "flightPathAngleDeg": -1.4655213459687182,
+        "flightPathCommandDeg": -1.2141876235287363
+      },
+      "landingTracking": {
+        "sampledAirborneRmsGammaErrorDeg": 0.6794618358232792,
+        "sampledMaximumGammaErrorDeg": 1.2758569379035187,
+        "sampledAirborneNearElevatorLimitFraction": 0
+      },
+      "bounces": 0,
+      "abortReason": null,
+      "events": [
+        {
+          "kind": "threshold",
+          "timeSec": 0,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "touchdown",
+          "timeSec": 8.525000000000157,
+          "distanceFt": 1111.314541342595,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "stop",
+          "timeSec": 30.716666666665564,
+          "distanceFt": 2528.4293136142637,
+          "timingBasis": "sample"
+        }
+      ],
+      "relativeTolerance": 0.15,
+      "sourceReport": {
+        "path": "/private/tmp/sf50-v6-calibration.3BhSV2/landing-pitch8.json",
+        "sha256": "503b95346d19373b6ac34002a8ecf2240c5e3ca3637dcc393467afb4f1041262"
+      }
+    },
+    {
+      "variant": {
+        "id": "landing-pitch9",
+        "phase": "landing",
+        "landing": {
+          "flareHeight": 30,
+          "minimumSinkFps": 2.5,
+          "gammaGain": 2.4,
+          "maximumPitchDeg": 9,
+          "brakeDelaySec": 0.35,
+          "decelerationG": 0.18
+        }
+      },
+      "generatedAt": "2026-09-12T15:35:40.265Z",
+      "runtime": {
+        "node": "v22.22.3",
+        "platform": "darwin",
+        "arch": "arm64",
+        "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+        "fixedDtSec": 0.008333333333333333
+      },
+      "packageHashes": {
+        "aircraft/sf50/sf50.xml": "820a56aba35860b615cc65a006b84b66f37bd7c60f5f6ec2d4901d7bcc5b2b7a",
+        "engine/fj33_5a.xml": "876ab3d416c8cd92fa0e9b8edbf53279841dfef9eedc29acbb203e689dd6550a",
+        "engine/direct.xml": "f897f13f36a927388d985de6fe1543489f661c9fd42c75ca5edf3ac0250f5c0f"
+      },
+      "modelHash": "6b51e344c1798104ee692830ad63c98ab26a0ba166bbc92696f2c04eb771ce4a",
+      "completed": true,
+      "initializationChecksPassed": 7,
+      "status": "blocked",
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 1628,
+          "actual": 1417.1147722716687,
+          "relativeError": -0.12953638066850817,
+          "passed": true
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3011,
+          "actual": 2528.4293136142637,
+          "relativeError": -0.16026924157613293,
+          "passed": false
+        },
+        {
+          "name": "airborneDistanceFt",
+          "expected": 1383,
+          "actual": 1111.314541342595,
+          "relativeError": -0.1964464632374584,
+          "passed": false
+        }
+      ],
+      "pitchTracking": null,
+      "touchdown": {
+        "timeSec": 8.525000000000157,
+        "pitchDeg": 7.081916410330963,
+        "casKts": 69.8876514484724,
+        "groundSpeedFps": 117.92511844775723,
+        "downVelocityFps": 3.0169670224845717,
+        "flightPathAngleDeg": -1.4655213459687182,
+        "flightPathCommandDeg": -1.2141876235287363
+      },
+      "landingTracking": {
+        "sampledAirborneRmsGammaErrorDeg": 0.6794618358232792,
+        "sampledMaximumGammaErrorDeg": 1.2758569379035187,
+        "sampledAirborneNearElevatorLimitFraction": 0
+      },
+      "bounces": 0,
+      "abortReason": null,
+      "events": [
+        {
+          "kind": "threshold",
+          "timeSec": 0,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "touchdown",
+          "timeSec": 8.525000000000157,
+          "distanceFt": 1111.314541342595,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "stop",
+          "timeSec": 30.716666666665564,
+          "distanceFt": 2528.4293136142637,
+          "timingBasis": "sample"
+        }
+      ],
+      "relativeTolerance": 0.15,
+      "sourceReport": {
+        "path": "/private/tmp/sf50-v6-calibration.3BhSV2/landing-pitch9.json",
+        "sha256": "af93a67d9e74ed2aad598c271548461fc3f8ab137d5463bd52da41eafd88a3be"
+      }
+    },
+    {
+      "variant": {
+        "id": "landing-pitch8-016g",
+        "phase": "landing",
+        "landing": {
+          "flareHeight": 30,
+          "minimumSinkFps": 2.5,
+          "gammaGain": 2.4,
+          "maximumPitchDeg": 8,
+          "brakeDelaySec": 0.35,
+          "decelerationG": 0.16
+        }
+      },
+      "generatedAt": "2026-09-12T15:35:40.704Z",
+      "runtime": {
+        "node": "v22.22.3",
+        "platform": "darwin",
+        "arch": "arm64",
+        "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+        "fixedDtSec": 0.008333333333333333
+      },
+      "packageHashes": {
+        "aircraft/sf50/sf50.xml": "820a56aba35860b615cc65a006b84b66f37bd7c60f5f6ec2d4901d7bcc5b2b7a",
+        "engine/fj33_5a.xml": "876ab3d416c8cd92fa0e9b8edbf53279841dfef9eedc29acbb203e689dd6550a",
+        "engine/direct.xml": "f897f13f36a927388d985de6fe1543489f661c9fd42c75ca5edf3ac0250f5c0f"
+      },
+      "modelHash": "6b51e344c1798104ee692830ad63c98ab26a0ba166bbc92696f2c04eb771ce4a",
+      "completed": true,
+      "initializationChecksPassed": 7,
+      "status": "blocked",
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 1628,
+          "actual": 1558.1614055531627,
+          "relativeError": -0.042898399537369354,
+          "passed": true
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3011,
+          "actual": 2669.4759468957577,
+          "relativeError": -0.11342545768988452,
+          "passed": true
+        },
+        {
+          "name": "airborneDistanceFt",
+          "expected": 1383,
+          "actual": 1111.314541342595,
+          "relativeError": -0.1964464632374584,
+          "passed": false
+        }
+      ],
+      "pitchTracking": null,
+      "touchdown": {
+        "timeSec": 8.525000000000157,
+        "pitchDeg": 7.081916410330963,
+        "casKts": 69.8876514484724,
+        "groundSpeedFps": 117.92511844775723,
+        "downVelocityFps": 3.0169670224845717,
+        "flightPathAngleDeg": -1.4655213459687182,
+        "flightPathCommandDeg": -1.2141876235287363
+      },
+      "landingTracking": {
+        "sampledAirborneRmsGammaErrorDeg": 0.6794618358232792,
+        "sampledMaximumGammaErrorDeg": 1.2758569379035187,
+        "sampledAirborneNearElevatorLimitFraction": 0
+      },
+      "bounces": 0,
+      "abortReason": null,
+      "events": [
+        {
+          "kind": "threshold",
+          "timeSec": 0,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "touchdown",
+          "timeSec": 8.525000000000157,
+          "distanceFt": 1111.314541342595,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "stop",
+          "timeSec": 33.19999999999876,
+          "distanceFt": 2669.4759468957577,
+          "timingBasis": "sample"
+        }
+      ],
+      "relativeTolerance": 0.15,
+      "sourceReport": {
+        "path": "/private/tmp/sf50-v6-calibration.3BhSV2/landing-pitch8-016g.json",
+        "sha256": "91e27565ffdd1334827772215e82672cf3dad9a97f5df8c5de252c97014f7a02"
+      }
+    },
+    {
+      "variant": {
+        "id": "landing-rate4",
+        "phase": "landing",
+        "pitch": {
+          "outer": 2.4,
+          "integral": 0.24,
+          "rate": 4
+        },
+        "landing": {
+          "flareHeight": 30,
+          "minimumSinkFps": 2.5,
+          "gammaGain": 2.4,
+          "maximumPitchDeg": 8,
+          "brakeDelaySec": 0.35,
+          "decelerationG": 0.16
+        }
+      },
+      "generatedAt": "2026-09-12T15:37:26.180Z",
+      "runtime": {
+        "node": "v22.22.3",
+        "platform": "darwin",
+        "arch": "arm64",
+        "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+        "fixedDtSec": 0.008333333333333333
+      },
+      "packageHashes": {
+        "aircraft/sf50/sf50.xml": "820a56aba35860b615cc65a006b84b66f37bd7c60f5f6ec2d4901d7bcc5b2b7a",
+        "engine/fj33_5a.xml": "876ab3d416c8cd92fa0e9b8edbf53279841dfef9eedc29acbb203e689dd6550a",
+        "engine/direct.xml": "f897f13f36a927388d985de6fe1543489f661c9fd42c75ca5edf3ac0250f5c0f"
+      },
+      "modelHash": "6b51e344c1798104ee692830ad63c98ab26a0ba166bbc92696f2c04eb771ce4a",
+      "completed": true,
+      "initializationChecksPassed": 7,
+      "status": "blocked",
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 1628,
+          "actual": 1473.1655439315098,
+          "relativeError": -0.09510715974722987,
+          "passed": true
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3011,
+          "actual": 2679.457953124678,
+          "relativeError": -0.11011027793932973,
+          "passed": true
+        },
+        {
+          "name": "airborneDistanceFt",
+          "expected": 1383,
+          "actual": 1206.2924091931684,
+          "relativeError": -0.12777121533393465,
+          "passed": true
+        }
+      ],
+      "pitchTracking": null,
+      "touchdown": {
+        "timeSec": 9.358333333333443,
+        "pitchDeg": 7.718054008452422,
+        "casKts": 67.76138089314453,
+        "groundSpeedFps": 114.34109120473364,
+        "downVelocityFps": 2.7770079507892618,
+        "flightPathAngleDeg": -1.3912720285213582,
+        "flightPathCommandDeg": -1.2522322749695685
+      },
+      "landingTracking": {
+        "sampledAirborneRmsGammaErrorDeg": 0.4923320766497637,
+        "sampledMaximumGammaErrorDeg": 1.1567738000345267,
+        "sampledAirborneNearElevatorLimitFraction": 0
+      },
+      "bounces": 0,
+      "abortReason": null,
+      "events": [
+        {
+          "kind": "threshold",
+          "timeSec": 0,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "touchdown",
+          "timeSec": 9.358333333333443,
+          "distanceFt": 1206.2924091931684,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "stop",
+          "timeSec": 33.34166666666542,
+          "distanceFt": 2679.457953124678,
+          "timingBasis": "sample"
+        }
+      ],
+      "relativeTolerance": 0.15,
+      "sourceReport": {
+        "path": "/private/tmp/sf50-v6-calibration.3BhSV2/landing-rate4.json",
+        "sha256": "f13d1c4d82cd65f80f203a5f8c3a26bc6b79e35a9372e037da687fc94d60496a"
+      }
+    },
+    {
+      "variant": {
+        "id": "landing-rate3",
+        "phase": "landing",
+        "pitch": {
+          "outer": 1.8,
+          "integral": 0.18,
+          "rate": 3
+        },
+        "landing": {
+          "flareHeight": 30,
+          "minimumSinkFps": 2.5,
+          "gammaGain": 2.4,
+          "maximumPitchDeg": 8,
+          "brakeDelaySec": 0.35,
+          "decelerationG": 0.16
+        }
+      },
+      "generatedAt": "2026-09-12T15:37:26.619Z",
+      "runtime": {
+        "node": "v22.22.3",
+        "platform": "darwin",
+        "arch": "arm64",
+        "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+        "fixedDtSec": 0.008333333333333333
+      },
+      "packageHashes": {
+        "aircraft/sf50/sf50.xml": "820a56aba35860b615cc65a006b84b66f37bd7c60f5f6ec2d4901d7bcc5b2b7a",
+        "engine/fj33_5a.xml": "876ab3d416c8cd92fa0e9b8edbf53279841dfef9eedc29acbb203e689dd6550a",
+        "engine/direct.xml": "f897f13f36a927388d985de6fe1543489f661c9fd42c75ca5edf3ac0250f5c0f"
+      },
+      "modelHash": "6b51e344c1798104ee692830ad63c98ab26a0ba166bbc92696f2c04eb771ce4a",
+      "completed": true,
+      "initializationChecksPassed": 7,
+      "status": "blocked",
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 1628,
+          "actual": 1491.1091944787186,
+          "relativeError": -0.08408526137670849,
+          "passed": true
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3011,
+          "actual": 2678.4644204810525,
+          "relativeError": -0.11044024560576139,
+          "passed": true
+        },
+        {
+          "name": "airborneDistanceFt",
+          "expected": 1383,
+          "actual": 1187.355226002334,
+          "relativeError": -0.14146404482839198,
+          "passed": true
+        }
+      ],
+      "pitchTracking": null,
+      "touchdown": {
+        "timeSec": 9.191666666666785,
+        "pitchDeg": 7.426454404455199,
+        "casKts": 68.24458679214395,
+        "groundSpeedFps": 115.14644733617985,
+        "downVelocityFps": 3.181303850271595,
+        "flightPathAngleDeg": -1.5825840138041876,
+        "flightPathCommandDeg": -1.2434843838471257
+      },
+      "landingTracking": {
+        "sampledAirborneRmsGammaErrorDeg": 0.5425933176661566,
+        "sampledMaximumGammaErrorDeg": 1.2119513667177584,
+        "sampledAirborneNearElevatorLimitFraction": 0
+      },
+      "bounces": 0,
+      "abortReason": null,
+      "events": [
+        {
+          "kind": "threshold",
+          "timeSec": 0,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "touchdown",
+          "timeSec": 9.191666666666785,
+          "distanceFt": 1187.355226002334,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "stop",
+          "timeSec": 33.333333333332085,
+          "distanceFt": 2678.4644204810525,
+          "timingBasis": "sample"
+        }
+      ],
+      "relativeTolerance": 0.15,
+      "sourceReport": {
+        "path": "/private/tmp/sf50-v6-calibration.3BhSV2/landing-rate3.json",
+        "sha256": "f2f8ea68f795285b49f95f1c6cae885a512f04a2653e2049d934a425078d0d93"
+      }
+    },
+    {
+      "variant": {
+        "id": "landing-rate4-flare20",
+        "phase": "landing",
+        "pitch": {
+          "outer": 2.4,
+          "integral": 0.24,
+          "rate": 4
+        },
+        "landing": {
+          "flareHeight": 20,
+          "minimumSinkFps": 2.5,
+          "gammaGain": 2.4,
+          "maximumPitchDeg": 8,
+          "brakeDelaySec": 0.35,
+          "decelerationG": 0.16
+        }
+      },
+      "generatedAt": "2026-09-12T15:37:27.052Z",
+      "runtime": {
+        "node": "v22.22.3",
+        "platform": "darwin",
+        "arch": "arm64",
+        "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+        "fixedDtSec": 0.008333333333333333
+      },
+      "packageHashes": {
+        "aircraft/sf50/sf50.xml": "820a56aba35860b615cc65a006b84b66f37bd7c60f5f6ec2d4901d7bcc5b2b7a",
+        "engine/fj33_5a.xml": "876ab3d416c8cd92fa0e9b8edbf53279841dfef9eedc29acbb203e689dd6550a",
+        "engine/direct.xml": "f897f13f36a927388d985de6fe1543489f661c9fd42c75ca5edf3ac0250f5c0f"
+      },
+      "modelHash": "6b51e344c1798104ee692830ad63c98ab26a0ba166bbc92696f2c04eb771ce4a",
+      "completed": true,
+      "initializationChecksPassed": 7,
+      "status": "blocked",
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 1628,
+          "actual": 1567.5716201972898,
+          "relativeError": -0.03711816941198415,
+          "passed": true
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3011,
+          "actual": 2666.9186336573634,
+          "relativeError": -0.11427478124963021,
+          "passed": true
+        },
+        {
+          "name": "airborneDistanceFt",
+          "expected": 1383,
+          "actual": 1099.3470134600736,
+          "relativeError": -0.2050997733477414,
+          "passed": false
+        }
+      ],
+      "pitchTracking": null,
+      "touchdown": {
+        "timeSec": 8.41666666666683,
+        "pitchDeg": 7.655057305025161,
+        "casKts": 70.10456840081436,
+        "groundSpeedFps": 118.29226488186838,
+        "downVelocityFps": 2.9826172804670783,
+        "flightPathAngleDeg": -1.4443478756075603,
+        "flightPathCommandDeg": -1.210404347422035
+      },
+      "landingTracking": {
+        "sampledAirborneRmsGammaErrorDeg": 0.5755295461828093,
+        "sampledMaximumGammaErrorDeg": 1.1567738000345267,
+        "sampledAirborneNearElevatorLimitFraction": 0
+      },
+      "bounces": 0,
+      "abortReason": null,
+      "events": [
+        {
+          "kind": "threshold",
+          "timeSec": 0,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "touchdown",
+          "timeSec": 8.41666666666683,
+          "distanceFt": 1099.3470134600736,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "stop",
+          "timeSec": 33.14999999999876,
+          "distanceFt": 2666.9186336573634,
+          "timingBasis": "sample"
+        }
+      ],
+      "relativeTolerance": 0.15,
+      "sourceReport": {
+        "path": "/private/tmp/sf50-v6-calibration.3BhSV2/landing-rate4-flare20.json",
+        "sha256": "ba1b93d9cc93553e965825167ea84fa95b9b212fc8b31e08c3dd41a90b86cd46"
+      }
+    }
+  ],
+  "implementation": {
+    "status": "Selected pilot behavior extracted into application modules; extracted implementation not yet executed",
+    "defaultProfile": "development-v6",
+    "baselineProfile": "baseline-v5",
+    "addedUnitTestsRun": false,
+    "namedProfileRunnerRun": false,
+    "aircraftCalibrated": false,
+    "installedSdkReplaced": false,
+    "upstreamPrOpened": false
+  },
+  "sdkEntrySha256": "a499e03992c8d959eea25686c0f2ae3efa85cd4b14e3a484acc7eb13bc52f4ec",
+  "evidenceRetention": "This summary is durable; referenced raw prototype traces remain in a temporary directory."
+}

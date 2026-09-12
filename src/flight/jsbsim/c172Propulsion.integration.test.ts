@@ -4,6 +4,7 @@ import { JSBSimSdk } from "@0x62/jsbsim-wasm";
 import { wasmBinaryUrl, wasmModuleUrl } from "@0x62/jsbsim-wasm/wasm";
 import { describe, expect, it } from "vitest";
 import { bootstrapC172p } from "./bootstrapC172";
+import { resolveAircraftDataFiles } from "./hydrateJsbsimData";
 
 interface DataManifest {
   files: string[];
@@ -19,7 +20,7 @@ describe("C172 propulsion", () => {
     });
     const dataRoot = resolve(process.cwd(), "public/jsbsim-data");
     const manifest = JSON.parse(readFileSync(resolve(dataRoot, "manifest.json"), "utf8")) as DataManifest;
-    for (const relativePath of manifest.files) {
+    for (const relativePath of resolveAircraftDataFiles(manifest, "cessna-172")) {
       sdk.writeDataFile(relativePath, readFileSync(resolve(dataRoot, relativePath), "utf8"));
     }
 

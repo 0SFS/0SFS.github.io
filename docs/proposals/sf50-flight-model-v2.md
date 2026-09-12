@@ -1,8 +1,43 @@
 # SF50 flight model, simulation boundaries, and validation
 
-Status: replacement proposal complete and ready for review; implementation not started
+Status: SF50 development runtime integration implemented; the full proposal remains in progress
 
 Date: 2026-09-11
+
+Implementation update (2026-09-11):
+- Implemented: aircraft FDM/profile plumbing, per-aircraft stance/engine metadata, validated profile-scoped package manifests, and clearance queries using the loaded model's native wheel and structure contact coordinates and current CG.
+- Implemented: an independent `sf50` JSBSim package with a provisional direct-thrust FJ33-5A schedule, source-informed geometry, retractable physical gear, turbine gauge property mappings, and a clipped V-tail ruddervator mixer.
+- Implemented: profile-aware yaw conversion, startup controls initialized from physical state, runway flap/gear presets applied before `RunIC`, command and actual gear-position snapshots, physical gear observation for the visual rig, and measured V-tail hinge bindings.
+- Implemented: reload-based aircraft selection. The active aircraft retains its matching mesh, FDM, gauges, controls, and terrain/contact state until the selected package boots together.
+- Implemented: aircraft-specific visible-body collision probes and a corrected dorsal-engine thrust-line datum. Body probes are approximate empty-CG geometry, and the installed engine location/tilt remains provisional.
+
+### Integration regression evidence (2026-09-11)
+
+The development runtime milestone is implemented. This does not mark every architectural or performance milestone below complete.
+
+- `npm test -- src/flight`: 430 tests passed across 48 files, including 23 new SF50/package cases (18 exercising the real Wasm SDK and five manifest rejection cases).
+- `npm run build`: TypeScript and the production Vite build passed. The existing large renderer dependency chunk warning remains.
+- ESLint passed for the changed TypeScript files and JSBSim integration directory; the final added thrust-line test also passed lint.
+- Recorded environment: Node `v26.8.2`, macOS `darwin/arm64`, `@0x62/jsbsim-wasm` `1.2.4-beta.4`.
+
+The [SF50 integration suite](../../src/flight/jsbsim/sf50.integration.test.ts) covers package isolation, geodetic initialization, the 120 Hz native timestep, startup input continuity, roll/yaw signs, V-tail mixing and moment signs, physical gear transit, partially extended gear across resets, runway flap/gear configuration, turbine response and fuel use, dorsal thrust pitching moment, and deep-penetration handling. It also compares trajectories after equal accepted physics steps at 10/30/60/120 display FPS; low-FPS catch-up drops wall time, so this is not a claim of identical real-time progression.
+
+Actual browser navigation/rendering, deployment-base-path loading, device performance, and AFM performance accuracy were not validated by these checks. The reload-selection test runs in jsdom and checks selection persistence and active-model coherence, not a completed browser navigation.
+
+### Remaining implementation and validation
+
+Follow-on implementation (2026-09-11, calibration not yet validated):
+
+- Added published AFM takeoff/landing fixtures with calibration and holdout roles, a source-aware acceptance evaluator, and a headless Wasm baseline runner. The runner reports setup/procedure blockers as well as numerical errors; these additions do not establish that the model matches the AFM.
+- Added a private, typed flight-model driver used by the baseline runner. The interactive application's existing SDK access has not yet been migrated.
+- Implemented native executive disposal, model-view invalidation, and bounded model-load diagnostics in the canonical jsbsim-wasm source checkout. The SDK build, typecheck, and all 17 SDK tests passed; the changes have not been published or adopted by the application's installed package.
+- The initial baseline also passed 11 driver/acceptance tests, but exposed coupled pitch/flight-path initialization and a full-power engine startup transient during landing. The driver now explicitly resolves the requested angle of attack and recomputes the restored power command at zero timestep; new regression and runner checks cover those initial-state contracts. Performance calibration remains separate from these initialization corrections.
+- See [SF50 performance validation](../validation/sf50-performance.md) for source pages, commands, tolerances, and the remaining calibration prerequisites. The earlier 430-test result predates these additions.
+
+- Source-led aerodynamic and propulsion calibration, published-weight performance scenarios, envelope protection thresholds, and independent validation. The default development loading is not the published takeoff or landing calibration loading; passing integration tests does not establish those performance figures.
+- The broader private-driver/typed-observation boundary, full aircraft capability metadata, optional wheel/diagnostic paths, parameter import/export, and live model replacement described below. Reload-based selection is the implemented transition mechanism.
+- Generic native ownership/disposal and actionable model-load diagnostics in `jsbsim-wasm`, rather than new application workarounds. The integration tests explicitly delete their native executive; that does not demonstrate that application disposal is fixed.
+- Browser/deployment checks and representative device performance measurements.
 
 Supersedes: [SF50 flight model and the per-aircraft FDM seam](sf50-flight-model.md)
 
@@ -588,3 +623,155 @@ none prevents independent wrapper or package work:
 Keep these uncertainties visible until evidence resolves them. Passing one
 milestone narrows the claims that can be made; it does not automatically certify
 all aircraft variants, custom configurations, devices or operating conditions.
+
+
+## AFM audit and benchmark v3 update
+
+The historical AFM has been source-pinned and twelve selected ISA distance
+cases extracted, including ten altitude/weight holdouts. Benchmark v3 corrects
+KIAS/KCAS handling, uses the published 5-degree takeoff pitch target, separates
+brakes-held engine preparation from measurement, records runway-projected
+event distances and trajectory telemetry, and blocks validation when observed
+conditions are unknown. See [the AFM audit](../validation/sf50-afm-audit.md).
+
+The v3 brake-gate fix passed 33 unit tests and completed all 12 real-Wasm
+scenarios with 84/84 initialization checks; all performance cases remained
+blocked. V4 now adds native runway-level pressure/temperature probes,
+terrain-grade evidence, explicit surface configuration/readbacks and
+continuous condition monitoring. V4 passed 45 focused tests and the two
+sea-level smoke scenarios, with no runway-condition blockers. The smoke
+traces exposed stale native N1 at time zero and poor takeoff pitch tracking;
+those and loading/datum evidence must be addressed before calibration.
+Selected loading constraints and explicit-datum helpers have been added,
+but no synthetic loading has been adopted. Aircraft coefficients were not
+changed. This update does
+not mark calibration or the overall proposal complete: CG/datum reconciliation,
+target N1/bleed matching, pilot/braking technique, gear timing and broader
+performance/response validation remain unfinished. SDK changes also remain
+subject to upstream integration and application adoption.
+
+
+## September 12, 2026: calibration prerequisite fixes, benchmark v5
+
+Native JSBSim now has a source fix for zero-time turbine N1/N2 synchronization
+and a regression using the standard F16 turbine fixture. It has not been
+built, tested or adopted into an installed WASM artifact. The implementation
+belongs in the canonical native fork, not an application-side spool override.
+
+Benchmark v5 replaces proportional-only pitch control with a bounded
+pitch-rate request and rate PI controller with anti-windup. It adds independent
+takeoff tracking gates at the first sampled airborne state, the 50-foot
+endpoint and after a settling allowance. The new controller, gates and
+regressions have not been executed. The v4 smoke report remains the latest
+real-WASM evidence; successful rotation has not yet been demonstrated.
+
+Online research found a G1 aircraft-specific broker empty mass and a factory
+entry documenting removable-seat accounting, but not a usable empty-CG record.
+Reports now include explicit synthetic loading candidates and empty-CG
+sensitivity. They are not applied to the native model during the isolated
+pilot experiment, and real-record fields remain unknown.
+
+See [evidence, assumptions, Cirrus questions and the execution order](../validation/sf50-cirrus-questions.md).
+Next: build the native fix, run focused regressions and the two sea-level
+scenarios, establish pitch tracking, then conduct a separately versioned
+loading/datum experiment. N1/bleed matching, landing technique, friction,
+aerodynamic calibration and broader proposal completion remain open.
+
+### V5 execution results, September 12, 2026
+
+The focused simulator suite passed 65 tests in 10 files. A new native Python
+binding passed the existing CheckTrim, TestEngineIndexedProps and TestTurbine
+CTest entries. The added turbine regression exposed an incorrect F16
+partial-throttle expectation and is not yet registered in CTest; those
+test-only corrections await approval.
+
+An isolated rebuilt WASM SDK completed both sea-level scenarios with 14/14
+initialization checks. Landing N1 stayed at 30% from time zero to the first
+step, confirming the indication fix in that artifact. Takeoff pitch was
+3.513 degrees at first sampled airborne state and 5.202 degrees at 50 feet;
+settled maximum error was 0.204 degrees. The liftoff tracking gate still fails.
+
+Takeoff distance was 3305.639 ft versus 3192 ft (+3.560%); landing distance
+was 1646.205 ft versus 3011 ft (-45.327%). Neither is an aircraft-validation
+pass. Native loading and coefficients were unchanged, and no holdout cases
+were used. The v4/v5 comparison also changes the native artifact and Node
+version, so it is not a strict single-variable A/B experiment.
+
+The canonical native source still needs the SDK's existing Emscripten
+strerror compatibility fix for a WASM build. That patch section was reused
+only in a temporary source snapshot; no repository or installed SDK
+distribution was replaced. See the
+[executed audit and adoption boundary](../validation/sf50-afm-audit.md)
+and [durable result summary](../validation/sf50-v5-validation-summary.json).
+Overall calibration and proposal completion remain open.
+
+
+### Native regression follow-up, September 12, 2026
+
+The F16 regression now checks its command-to-position mapping separately
+and derives expected spool speeds from effective dry throttle position.
+The test is registered with CTest.
+
+After reconfiguring the existing native build, all four focused CTest
+entries passed: CheckTrim, TestEngineIndexedProps, TestTurbine and
+TestTurbineTrimSpool (10.70 seconds total). The earlier partial-throttle
+failure was a test expectation error, now corrected. This closes the
+native regression/registration issue, not aircraft calibration.
+
+Only tests and CTest registration changed. The existing native binding was
+reused; the turbine, aircraft model, isolated WASM artifact and installed
+application SDK were unchanged. Takeoff liftoff tracking and the other
+loading, engine and landing-calibration blockers remain open.
+
+The rerun log is at
+`/private/tmp/sf50-v5-validation.30axFG/native-regression-rerun.log`.
+
+
+## 2026-09-12 update: development pilot v6
+
+Implemented the next development-pilot and benchmark-methodology step: per-phase pitch gains, landing flight-path/flare control, provisional deceleration-based braking, preserved baseline/open-loop comparison profiles, explicit calibration/holdout selection, and separate airborne-distance/touchdown-quality checks.
+
+The [v6 calibration note](../validation/sf50-pilot-calibration-v6.md) records 18 controlled prototype runs on unchanged aircraft coefficients and the rebuilt SDK. The selected prototype passes the existing takeoff pitch gates and all three distance-segment comparisons for the two calibration cases. Landing sink improves from about 478 to 191 ft/min. These are fitted development-pilot results, not independent aircraft-validation results.
+
+The extracted application implementation and added unit cases have not yet been executed. Holdouts remain unused. N1/bleed matching, physical CG/loading/datum, verified normal pilot/brake technique, friction identification, and installed SDK adoption remain unresolved. Do not mark the overall SF50 proposal implemented end to end on the strength of this step alone.
+
+
+## 2026-09-12 public-source acquisition update
+
+Implemented a reproducible public-evidence collection/analyzer scaffold, source-integrity pins, strict recorder/table parsing, explicit evidence-eligibility gates, and a datum helper requiring a reviewed anchor. Archived 47 sources locally and saved the acquisition findings, candidate recording, and [evidence-to-test roadmap](../validation/sf50-public-data-acquisition.md).
+
+Important: new table sources disagree with our pinned AFM, and accident recordings are not automatically normal-aircraft validation data. Source reconciliation and review precede further tuning. Extracted scripts and added unit tests remain unexecuted. The overall proposal is still not validated end to end; this update does not close calibration or SDK-adoption work.
+
+
+## Public evidence and focused validation update (2026-09-12)
+
+See [the expanded public-data audit](../validation/sf50-public-data-audit-2026-09-12.md). The local corpus now contains 81 artifacts (200,995,197 bytes), including a public G1 flight dashboard, additional G1 recorder evidence, a Cirrus condition-specific engineering estimate, and 820 automatically extracted primary-AFM cruise/climb candidate rows. Counts are artifacts/rows, not independent aircraft-validation cases.
+
+The offline analyzer passed against its original 47-source manifest. All 42 focused tests passed across seven evidence, AFM, runway and pilot-controller files (Node v26.8.2; Vitest 4.1.6). The supplemental sources remain separately inventoried; no aircraft simulation or model coefficient changes occurred during this audit.
+
+The 6,000-lb sea-level takeoff source discrepancy is explained by interpolating a sparse temperature grid instead of retaining the AFM's explicit ISA column. The exact-grid landing source conflict remains unresolved. Do not retune the aircraft to either an interpolation artifact or an unapproved newer transcription.
+
+Public-data qualification, supplementary ingestion, normal publication access, loading/input interpretation and independent held-out aircraft evaluation remain unfinished. The existence of additional public shared flights means public data is not exhausted. This update does not mark end-to-end aircraft calibration or the full proposal complete.
+
+
+## Generation selection and first public-input application (2026-09-12)
+
+G1, G2 and G3 now have separate catalog identities and JSBSim packages. The historical saved SF50 choice remains G1. Later packages are generated from the common development airframe and explicitly disclosed as sharing uncalibrated physics/meshes, not three independently validated models.
+
+The first directly sourced replacements are 1,846 lbf rated thrust, 2,001 lb nominal usable fuel capacity and 62.2-inch MAC. Earlier calibration-run numbers are historical and do not validate these changed packages. No uniform G2+/G3 thrust multiplier was introduced.
+
+The new offline processing pipeline consumes the expanded AFM/recorder corpus and separately pinned G2/G2+ tables. It produces generation-tagged calibration candidates, cumulative-climb targets, equilibrium-lift inferences and steady-flight review windows with fail-closed eligibility. See [variant implementation and methodology](../validation/sf50-variant-models.md) and the machine-readable variant-processing summary for actual processing outcomes.
+
+Generation selection and data-processing plumbing are implemented. Variant-specific installed-engine/aerodynamic calibration, source qualification, realistic G3 cabin/avionics modeling, focused tests of these changes and independent aircraft validation remain unfinished. This does not mark the entire proposal complete.
+
+
+## Fresh-conversation execution order and retained context (2026-09-12)
+
+The user requested a documentation handoff before starting shorter, focused conversations.
+
+1. **Aircraft selection UI first:** replace the interim flat aircraft/generation radio list with a scrollable image grid of aircraft families. Show generation choices and all applicable existing aircraft-specific controls underneath, outside the gallery's scroll region. One Vision Jet card leads to G1/G2/G3 controls; preserve saved IDs, credits and atomic aircraft activation. Use [the UI prompt](../prompts/aircraft-selection-ui-work-app-prompt.md).
+2. **SF50 development afterward:** resume qualification of the processed public data and source-grounded calibration using [the SF50 prompt](../prompts/sf50-resume-work-app-prompt.md).
+
+[The consolidated handoff](../validation/sf50-development-handoff.md) records the current implementation, actual processing results, historical test/build evidence, known source conflicts and upstream ownership. It is the entry point for the next conversations, not a replacement for current source or permission to run deferred checks.
+
+The latest processor completed all stages, including 820 AFM cruise/climb rows, 8,535 TOLD rows and 41 steady-review windows. G2/G3 remain explicitly shared-physics development packages. No new flight-model validation occurred during this documentation update, and the overall proposal remains incomplete.

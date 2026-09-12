@@ -364,6 +364,9 @@ export async function createFlightSimApp(
   let phoneLoading: Promise<void> | null = null;
   let detachPhoneStatus: (() => void) | null = null;
   const inputManager = createFlightInputManager({
+    initialThrottle: jsbsim.sdk.getPropertyValue("fcs/throttle-cmd-norm"),
+    initialGearDown: jsbsim.sdk.getPropertyValue("gear/gear-cmd-norm") > 0.5,
+    rudderSign: getFdmProfile(initialAircraftId).rudderSign,
     onPausedChange: (paused) => syncSimulationPaused(paused),
     // The HUD's gear button follows the G key. Repainting here rather than
     // waiting for the next frame is what keeps the two in step while the
@@ -453,6 +456,7 @@ export async function createFlightSimApp(
   const flightSurface = createFrameSurfaceQuery(runtime.surface);
   const terrainContact = createTerrainContact(jsbsim.sdk, flightSurface, getFdmProfile(initialAircraftId).stance);
   const visibleMeshCollision = createVisibleMeshCollision(jsbsim.sdk, flightSurface, {
+    bodyProbes: getFdmProfile(initialAircraftId).bodyCollisionProbes,
     getRestitution: () => arcadeGroundLaunches ? 1.35 : 0.25,
   });
   // This stays completely out of the normal render loop unless someone opts
@@ -530,7 +534,7 @@ export async function createFlightSimApp(
     applyGroundRuntime();
   };
   applyGroundRuntime();
-  let aircraftId: AircraftId = initialAircraftId;
+  const aircraftId: AircraftId = initialAircraftId;
   let aircraftLodId: AircraftLodId = readPreference(AIRCRAFT_LOD_PREFERENCE_KEY, LEGACY_AIRCRAFT_LOD_PREFERENCE_KEY, isAircraftLodId, "auto");
   let optInLodsEnabled = readPreference(
     AIRCRAFT_OPT_IN_PREFERENCE_KEY, AIRCRAFT_OPT_IN_PREFERENCE_KEY,
@@ -837,11 +841,13 @@ export async function createFlightSimApp(
     }, allowCoarserTerrainThisSession).then(terrain => {
       if (disposed || abort.signal.aborted) return;
       const destination = { ...location, altMeters: terrain.altitudeMeters };
-      const state = resetFlightLocation(jsbsim.sdk, destination, terrain.groundHeightMeters);
+      const state = resetFlightLocation(jsbsim.sdk, destination, terrain.groundHeightMeters, aircraftId);
       terrainContact.reset();
       visibleMeshCollision.reset();
       if (location.flightPreset) {
-        inputManager.resetControls(location.flightPreset.mode === "departure" ? 0 : 0.35);
+        inputManager.resetControls(state.throttleNorm);
+        inputManager.setFlaps(getFdmProfile(aircraftId).runwayPresets[location.flightPreset.mode].flapsNorm);
+        inputManager.setGearDown(true);
         if (location.flightPreset.mode === "departure") setSimulationPaused(true);
       }
       appliedControls = inputManager.getControls();
@@ -930,11 +936,12 @@ export async function createFlightSimApp(
     onPausedChange: setSimulationPaused,
     onViewModeChange: (mode) => { aircraft?.setViewMode(mode); phoneSession?.syncStatus(); runtime.requestRender(); },
     onAircraftChange: (nextId) => {
-      aircraftId = nextId;
+      if (nextId === aircraftId) return;
       writePreference(AIRCRAFT_PREFERENCE_KEY, nextId);
-      aircraftModel?.setAircraft(nextId);
-      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
-      runtime.requestRender();
+      // The package, control convention, contact geometry, and gauges all
+      // change together on boot. Keep the current complete identity visible
+      // until that atomic reload rather than swapping only the mesh.
+      window.location.reload();
     },
     onLodChange: (nextLod) => {
       aircraftLodId = nextLod;
@@ -1221,7 +1228,12 @@ export async function createFlightSimApp(
       selected.rollTrim = rolled.rollTrim;
       inputManager.replacePitchTrim(pitched.pitchTrim);
       inputManager.replaceRollTrim(rolled.rollTrim);
-      applyFlightControls(jsbsim.sdk, selected, inputManager.getGearDownNorm());
+      applyFlightControls(
+        jsbsim.sdk,
+        selected,
+        inputManager.getGearDownNorm(),
+        getFdmProfile(aircraftId).rudderSign,
+      );
       appliedControls = { ...selected };
       return contact;
     });
@@ -1354,7 +1366,7 @@ export async function createFlightSimApp(
     const terrain = await terrainReady;
     const state = resetFlightLocation(jsbsim.sdk, {
       ...DEFAULT_FLIGHT_START, altMeters: terrain.altitudeMeters,
-    }, terrain.groundHeightMeters);
+    }, terrain.groundHeightMeters, aircraftId);
     terrainContact.reset();
     visibleMeshCollision.reset();
     physicsLoop.reset();

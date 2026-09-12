@@ -26,7 +26,7 @@ export function validFlightState(state: FlightState): boolean {
 }
 
 const controls = ["fcs/throttle-cmd-norm", "fcs/mixture-cmd-norm", "fcs/elevator-cmd-norm",
-  "fcs/aileron-cmd-norm", "fcs/rudder-cmd-norm", "fcs/pitch-trim-cmd-norm", "fcs/roll-trim-cmd-norm", "fcs/gear-cmd-norm",
+  "fcs/aileron-cmd-norm", "fcs/rudder-cmd-norm", "fcs/pitch-trim-cmd-norm", "fcs/roll-trim-cmd-norm", "gear/gear-cmd-norm", "gear/gear-pos-norm",
   "fcs/flap-cmd-norm", "fcs/left-brake-cmd-norm", "fcs/right-brake-cmd-norm",
   "propulsion/tank[0]/contents-lbs", "propulsion/tank[1]/contents-lbs",
   "atmosphere/wind-north-fps", "atmosphere/wind-east-fps", "atmosphere/wind-down-fps"];

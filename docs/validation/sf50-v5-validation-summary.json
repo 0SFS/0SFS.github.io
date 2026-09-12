@@ -1,0 +1,634 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-12T14:46:28.825Z",
+  "procedureVersion": "development-pilot-v5-pitch-tracking",
+  "scope": "Two sea-level cases only; diagnostic report, not calibrated aircraft validation",
+  "runtime": {
+    "node": "v22.22.3",
+    "platform": "darwin",
+    "arch": "arm64",
+    "sdk": "/private/tmp/sf50-v5-validation.30axFG/sdk",
+    "fixedDtSec": 0.008333333333333333
+  },
+  "afmSource": {
+    "document": "Cirrus SF50 AFM P/N 31452-001",
+    "localPath": "planes/Cirrus_Vision_Jet/tests/SF50-POH.pdf",
+    "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+    "pdfPages": 624,
+    "latestListedRevision": "4",
+    "latestListedRevisionDate": "2018-11-20",
+    "scope": "Historical SF50-0005 and subsequent AFM; later configurations are not implied"
+  },
+  "packageHashes": {
+    "aircraft/sf50/sf50.xml": "820a56aba35860b615cc65a006b84b66f37bd7c60f5f6ec2d4901d7bcc5b2b7a",
+    "engine/fj33_5a.xml": "876ab3d416c8cd92fa0e9b8edbf53279841dfef9eedc29acbb203e689dd6550a",
+    "engine/direct.xml": "f897f13f36a927388d985de6fe1543489f661c9fd42c75ca5edf3ac0250f5c0f"
+  },
+  "artifacts": {
+    "turbineSource": {
+      "path": "/private/tmp/sf50-v5-validation.30axFG/wasm-native-source/src/models/propulsion/FGTurbine.cpp",
+      "sha256": "e9cfc13113e4297543ee621eca3bc938714e69a162a1ace9d8061a8825665569"
+    },
+    "compatibilityPatch": {
+      "path": "/private/tmp/sf50-v5-validation.30axFG/emscripten-strerror.patch",
+      "sha256": "a5042abe4f35151d64adb5b56bacacd23708f79d9571fa56b49e3294c5c86ee6"
+    },
+    "generatedBindings": {
+      "path": "/Users/felg/gh/Felipegalind0/jsbsim-wasm/generated/FGFDMExecBindings.cpp",
+      "sha256": "8e17ac03fd57a3f2cd9d57c64a35bb78813cf5ee3e6232efdf0ec981cf82285f"
+    },
+    "wasmBinary": {
+      "path": "/private/tmp/sf50-v5-validation.30axFG/sdk/dist/wasm/jsbsim_wasm.wasm",
+      "sha256": "4e8c4a199aefe6bed6067f86ad4c24ee4aa3a894fe4c9c1b34c148dfdbfa9091"
+    },
+    "wasmModule": {
+      "path": "/private/tmp/sf50-v5-validation.30axFG/sdk/dist/wasm/jsbsim_wasm.mjs",
+      "sha256": "3fd5cb234b332c4e8fd72a21b42ad76f64bd530974750f6f07b10c1956ca345a"
+    },
+    "sdkEntry": {
+      "path": "/private/tmp/sf50-v5-validation.30axFG/sdk/dist/index.js",
+      "sha256": "a499e03992c8d959eea25686c0f2ae3efa85cd4b14e3a484acc7eb13bc52f4ec"
+    },
+    "nativeBinding": {
+      "path": "/private/tmp/sf50-v5-validation.30axFG/native-build/tests/jsbsim/_jsbsim.so",
+      "sha256": "b66bf420931e66293f755be055aa7d2184aecac71a9005eb6cc1bdd10eeab6a0"
+    }
+  },
+  "rawReport": {
+    "path": "/private/tmp/sf50-v5-validation.30axFG/sf50-v5-smoke.json",
+    "sha256": "1613359324794723675fbc5cbb8f04ceef3143116a938431c753140fb560ca2b"
+  },
+  "buildNotes": [
+    "Native Python binding built directly from /Users/felg/gh/Felipegalind0/jsbsim.",
+    "WASM built from a temporary snapshot of that native source, including the turbine fix.",
+    "Reused only the strutils.cxx section of the SDK's existing jsbsim-emscripten-compat.patch in the temporary snapshot.",
+    "Existing SDK JavaScript distribution was copied beside the newly built WASM; no production or repository distribution artifacts were replaced.",
+    "Selected the two sea-level reference cases in memory using Node registerHooks; no holdouts were run.",
+    "Recorded source-file and artifact hashes are not a complete repository commit identity."
+  ],
+  "testResults": {
+    "simulator": {
+      "passedTests": 65,
+      "passedFiles": 10,
+      "command": "./node_modules/.bin/vitest run src/flight/model/flightModelDriver.test.ts src/flight/validation"
+    },
+    "existingNative": {
+      "passedCTestEntries": [
+        "CheckTrim",
+        "TestEngineIndexedProps",
+        "TestTurbine"
+      ],
+      "seconds": 13.13
+    },
+    "newNative": {
+      "name": "TestTurbineTrimSpool",
+      "status": "passed",
+      "ctestRegistered": true,
+      "correction": "Assert the F16 FCS command-to-position mapping independently, then calculate expected N1/N2 from effective throttle position clamped to the dry-power range.",
+      "previousRun": {
+        "name": "TestTurbineTrimSpool",
+        "status": "failed",
+        "ctestRegistered": false,
+        "failure": "Partial-throttle expected N1 61%, observed 82%; the F16 FCS maps a 0.35 command to 0.70 position.",
+        "diagnostic": "At zero time, post-FCS throttle positions 0/0.7/2/0 produced N1 40/82/100/40 and N2 53/85.9/100/53.",
+        "followup": "Correct expected spool speeds using the effective dry throttle position and register the test with CTest; approval requested, not changed."
+      }
+    }
+  },
+  "results": [
+    {
+      "caseId": "takeoff-6000lb-0ft-isa",
+      "phase": "takeoff",
+      "status": "blocked",
+      "completed": true,
+      "initializationChecks": [
+        {
+          "name": "pitch",
+          "actual": 7.951386703658792e-15,
+          "expected": 0,
+          "tolerance": 0.01,
+          "passed": true
+        },
+        {
+          "name": "flight-path",
+          "actual": 0,
+          "expected": 0,
+          "tolerance": 0.01,
+          "passed": true
+        },
+        {
+          "name": "calibrated-airspeed",
+          "actual": 0,
+          "expected": 0,
+          "tolerance": 0.01,
+          "passed": true
+        },
+        {
+          "name": "throttle-command",
+          "actual": 0,
+          "expected": 0,
+          "tolerance": 1e-8,
+          "passed": true
+        },
+        {
+          "name": "throttle-position",
+          "actual": 0,
+          "expected": 0,
+          "tolerance": 1e-8,
+          "passed": true
+        },
+        {
+          "name": "zero-time",
+          "actual": 0,
+          "expected": 0,
+          "tolerance": 1e-8,
+          "passed": true
+        },
+        {
+          "name": "fuel-0",
+          "actual": 1500,
+          "expected": 1500,
+          "tolerance": 0.000001,
+          "passed": true
+        }
+      ],
+      "measuredConditions": {
+        "weightLb": 6000,
+        "pressureAltitudeFt": 0.9999999999868695,
+        "temperatureC": 14.998018800092552,
+        "runwaySlopePercent": -3.2603866217006385e-10,
+        "runwaySurface": "dry-paved",
+        "flapsNorm": 0.5,
+        "gearDown": true,
+        "windKts": 0
+      },
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 2036,
+          "actual": 2103.3056781516534,
+          "relativeError": 0.03305779869924038,
+          "passed": true
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3192,
+          "actual": 3305.638855316488,
+          "relativeError": 0.03560114514927567,
+          "passed": true
+        }
+      ],
+      "blockers": [
+        "Payload remains concentrated at model empty CG; AFM loading envelope and model datum have not been reconciled.",
+        "AFM does not specify the simulated normalized brake/flare control law; controller tracking is diagnostic, not validated average piloting.",
+        "Lowest-wheel 50-foot datum and native contact-location/compression semantics need confirmation against AFM and JSBSim definitions.",
+        "Dry-paved scenario settings are explicit; SF50 tire friction/brake coefficients remain unvalidated against aircraft data.",
+        "AFM airspeed correction is specified at level-flight thrust or MCT, not takeoff/idle.",
+        "Stable full throttle does not establish AFM target N1 or bleed-on thrust.",
+        "Selected 90 KIAS rotation is within the AFM range, but the weight-specific schedule is unresolved.",
+        "Table gear-down configuration versus normal positive-climb retraction timing remains unresolved.",
+        "Takeoff pitch did not meet the project tracking gate at first sampled airborne state.",
+        "Missing observed condition: thrust",
+        "Missing observed condition: bleed"
+      ],
+      "events": [
+        {
+          "kind": "brake-release",
+          "timeSec": 127.29166666671404,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "liftoff",
+          "timeSec": 150.28333333336099,
+          "distanceFt": 2103.3056781516534,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "screen-height",
+          "timeSec": 156.89473644564566,
+          "distanceFt": 3305.638855316488,
+          "timingBasis": "height-interpolation"
+        }
+      ],
+      "bounces": 0,
+      "pilotEvidence": {
+        "controller": {
+          "pitchToRateGainPerSec": 1.2,
+          "maximumCommandedPitchRateDegSec": 3,
+          "pitchRateProportionalGain": 0.25,
+          "pitchRateIntegralGain": 0.12,
+          "maximumIntegralNorm": 0.8,
+          "nearElevatorLimitNorm": 0.98,
+          "takeoffTrackingToleranceDeg": 1,
+          "takeoffSettlingAllowanceSec": 5
+        },
+        "takeoffPitchTracking": {
+          "targetPitchDeg": 5,
+          "toleranceDeg": 1,
+          "settlingAllowanceSec": 5,
+          "rotationCommandTimeSec": 147.36666666669697,
+          "firstAirborne": {
+            "simTimeSec": 150.28333333336099,
+            "pitchDeg": 3.513103430596049,
+            "errorDeg": 1.4868965694039509,
+            "passed": false
+          },
+          "screen": {
+            "simTimeSec": 156.90000000002163,
+            "pitchDeg": 5.201512353400973,
+            "errorDeg": -0.20151235340097262,
+            "passed": true
+          },
+          "observedSamples": 1144,
+          "settledSamples": 544,
+          "settledRmsErrorDeg": 0.15739071381819933,
+          "settledMaximumErrorDeg": 0.20420144987157318,
+          "nearElevatorLimitFraction": 0,
+          "status": "blocked",
+          "basis": "Project numerical tracking gates, not AFM tolerances; first-airborne and screen samples are not interpolated flight-test measurements",
+          "blockers": [
+            "Takeoff pitch did not meet the project tracking gate at first sampled airborne state."
+          ]
+        }
+      },
+      "engineEvidence": {
+        "n1Percent": 100,
+        "modelMaxN1Percent": 100,
+        "modelBleedLossFactor": 0.04,
+        "targetN1Status": "unresolved",
+        "bleedStateStatus": "unresolved",
+        "note": "AFM N1 chart uses inlet PT2/TT2 and anti-ice configuration. Native MaxN1 and generic bleed-loss factor do not establish those conditions."
+      },
+      "zeroTimeObservation": {
+        "simTimeSec": 0,
+        "pitchDeg": 7.951386703658792e-15,
+        "pitchRateRadSec": 0,
+        "rollDeg": 2.9922884152202147e-15,
+        "calibratedAirspeedKts": 0,
+        "altitudeAglFt": 3.999980659030973,
+        "weightOnWheels": false,
+        "thrustLb": 86.40691200000003,
+        "weightLb": 6000,
+        "throttleCommandNorm": 0,
+        "throttlePositionNorm": 0,
+        "diagnostics": {
+          "n1Percent": 30,
+          "maxN1Percent": 100,
+          "bleedLossFactor": 0.04,
+          "nativePressureAltitudeFt": 4.000000000005139,
+          "terrainElevationFt": 3.260386621700641e-9,
+          "groundSolid": 1,
+          "groundBumpiness": 0,
+          "groundStaticFrictionFactor": 1,
+          "groundRollingFrictionFactor": 1,
+          "groundMaximumForceLb": 1.7976931348623157e+308,
+          "alphaDeg": 0,
+          "aeroForceXLb": 0,
+          "aeroForceZLb": 0,
+          "propulsionForceXLb": 86.40691200000003,
+          "gearForceXLb": 0,
+          "cgXIn": 159.5,
+          "cgYIn": 0,
+          "cgZIn": -39,
+          "pressurePsf": 2115.9221184638545,
+          "windNorthFps": 0,
+          "windEastFps": 0,
+          "windDownFps": 0
+        }
+      },
+      "firstIntegratedLandingObservation": null,
+      "firstSampledTakeoffAirborne": {
+        "simTimeSec": 150.28333333336099,
+        "pitchDeg": 3.513103430596049,
+        "errorDeg": 1.4868965694039509,
+        "passed": false
+      },
+      "runwayMonitoring": {
+        "observedSamples": 3554,
+        "blockers": []
+      },
+      "traceBounds": {
+        "samples": 151,
+        "minPitchDeg": -0.1599685226556693,
+        "maxPitchDeg": 5.20419944719718,
+        "minElevatorNorm": -0.9233522104805839,
+        "maxElevatorNorm": 0
+      },
+      "actualLoading": {
+        "fuelLb": [
+          1500
+        ],
+        "payloadLb": 950,
+        "scenarioModelSha256": "f36abd3d99ad64875c71f4fee19423947d05df77a7f6eba476d3105c62c6ab09"
+      },
+      "proposedSyntheticLoading": {
+        "status": "proposed-not-applied-to-native-model",
+        "weightLb": 6000,
+        "cgFsIn": 192.92558333333332,
+        "emptyCgSensitivity": [
+          {
+            "emptyCgFsIn": 193,
+            "loadedCgFsIn": 191.74224999999998,
+            "basis": "Illustrative +/-2 inch assumption sweep, not an evidence-derived confidence interval"
+          },
+          {
+            "emptyCgFsIn": 195,
+            "loadedCgFsIn": 192.92558333333332,
+            "basis": "Illustrative +/-2 inch assumption sweep, not an evidence-derived confidence interval"
+          },
+          {
+            "emptyCgFsIn": 197,
+            "loadedCgFsIn": 194.10891666666666,
+            "basis": "Illustrative +/-2 inch assumption sweep, not an evidence-derived confidence interval"
+          }
+        ],
+        "nativeModelDatumEstablished": false
+      }
+    },
+    {
+      "caseId": "landing-5550lb-0ft-isa",
+      "phase": "landing",
+      "status": "blocked",
+      "completed": true,
+      "initializationChecks": [
+        {
+          "name": "pitch",
+          "actual": 2.9999999999999947,
+          "expected": 3,
+          "tolerance": 0.01,
+          "passed": true
+        },
+        {
+          "name": "flight-path",
+          "actual": -2.9999999999999876,
+          "expected": -3,
+          "tolerance": 0.01,
+          "passed": true
+        },
+        {
+          "name": "calibrated-airspeed",
+          "actual": 83.99999999999896,
+          "expected": 84,
+          "tolerance": 0.01,
+          "passed": true
+        },
+        {
+          "name": "throttle-command",
+          "actual": 0,
+          "expected": 0,
+          "tolerance": 1e-8,
+          "passed": true
+        },
+        {
+          "name": "throttle-position",
+          "actual": 0,
+          "expected": 0,
+          "tolerance": 1e-8,
+          "passed": true
+        },
+        {
+          "name": "zero-time",
+          "actual": 0,
+          "expected": 0,
+          "tolerance": 1e-8,
+          "passed": true
+        },
+        {
+          "name": "fuel-0",
+          "actual": 1500,
+          "expected": 1500,
+          "tolerance": 0.000001,
+          "passed": true
+        }
+      ],
+      "measuredConditions": {
+        "weightLb": 5550,
+        "pressureAltitudeFt": 0.9999999999868695,
+        "temperatureC": 14.998018800092552,
+        "runwaySlopePercent": -3.2603866217006385e-10,
+        "runwaySurface": "dry-paved",
+        "flapsNorm": 1,
+        "gearDown": true,
+        "windKts": 5.065232791264639e-14,
+        "referenceSpeedKias": 84.99999999999896,
+        "thrust": "idle"
+      },
+      "metrics": [
+        {
+          "name": "groundRollFt",
+          "expected": 1628,
+          "actual": 480.3024787063421,
+          "relativeError": -0.7049739074285368,
+          "passed": false
+        },
+        {
+          "name": "totalDistanceFt",
+          "expected": 3011,
+          "actual": 1646.2047671817118,
+          "relativeError": -0.453269755170471,
+          "passed": false
+        }
+      ],
+      "blockers": [
+        "Payload remains concentrated at model empty CG; AFM loading envelope and model datum have not been reconciled.",
+        "AFM does not specify the simulated normalized brake/flare control law; controller tracking is diagnostic, not validated average piloting.",
+        "Lowest-wheel 50-foot datum and native contact-location/compression semantics need confirmation against AFM and JSBSim definitions.",
+        "Dry-paved scenario settings are explicit; SF50 tire friction/brake coefficients remain unvalidated against aircraft data.",
+        "AFM airspeed correction is specified at level-flight thrust or MCT, not takeoff/idle.",
+        "Full brake command is a provisional upper-bound diagnostic, not a source-specified landing technique."
+      ],
+      "events": [
+        {
+          "kind": "threshold",
+          "timeSec": 0,
+          "distanceFt": 0,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "touchdown",
+          "timeSec": 9.141666666666788,
+          "distanceFt": 1165.9022884753697,
+          "timingBasis": "sample"
+        },
+        {
+          "kind": "stop",
+          "timeSec": 16.849999999999685,
+          "distanceFt": 1646.2047671817118,
+          "timingBasis": "sample"
+        }
+      ],
+      "bounces": 0,
+      "pilotEvidence": {
+        "controller": {
+          "pitchToRateGainPerSec": 1.2,
+          "maximumCommandedPitchRateDegSec": 3,
+          "pitchRateProportionalGain": 0.25,
+          "pitchRateIntegralGain": 0.12,
+          "maximumIntegralNorm": 0.8,
+          "nearElevatorLimitNorm": 0.98,
+          "takeoffTrackingToleranceDeg": 1,
+          "takeoffSettlingAllowanceSec": 5
+        },
+        "takeoffPitchTracking": null
+      },
+      "engineEvidence": {
+        "n1Percent": 30,
+        "modelMaxN1Percent": 100,
+        "modelBleedLossFactor": 0.04,
+        "targetN1Status": "not-required-by-reference",
+        "bleedStateStatus": "not-specified-by-reference",
+        "note": "AFM N1 chart uses inlet PT2/TT2 and anti-ice configuration. Native MaxN1 and generic bleed-loss factor do not establish those conditions."
+      },
+      "zeroTimeObservation": {
+        "simTimeSec": 0,
+        "pitchDeg": 2.9999999999999947,
+        "pitchRateRadSec": 0,
+        "rollDeg": 3.12236946372044e-15,
+        "calibratedAirspeedKts": 83.99999999999896,
+        "altitudeAglFt": 53.817622679150666,
+        "weightOnWheels": false,
+        "thrustLb": 81.0017812506922,
+        "weightLb": 5550,
+        "throttleCommandNorm": 0,
+        "throttlePositionNorm": 0,
+        "diagnostics": {
+          "n1Percent": 30,
+          "maxN1Percent": 100,
+          "bleedLossFactor": 0.04,
+          "nativePressureAltitudeFt": 53.817882940170136,
+          "terrainElevationFt": -3.2603866217006416e-9,
+          "groundSolid": 1,
+          "groundBumpiness": 0,
+          "groundStaticFrictionFactor": 1,
+          "groundRollingFrictionFactor": 1,
+          "groundMaximumForceLb": 1.7976931348623157e+308,
+          "alphaDeg": 5.999999999999987,
+          "aeroForceXLb": -276.4585796656452,
+          "aeroForceZLb": -7146.23658272497,
+          "propulsionForceXLb": 81.0017812506922,
+          "gearForceXLb": 0,
+          "cgXIn": 159.45945945945945,
+          "cgYIn": 0,
+          "cgZIn": -38.91891891891892,
+          "pressurePsf": 2112.1155342054853,
+          "windNorthFps": -8.526512829121202e-14,
+          "windEastFps": 0,
+          "windDownFps": -6.217248937900877e-15
+        }
+      },
+      "firstIntegratedLandingObservation": {
+        "simTimeSec": 0.008333333333333333,
+        "pitchDeg": 3.000003244593635,
+        "pitchRateRadSec": -0.0016539384050774503,
+        "rollDeg": -1.1822493815897485e-12,
+        "calibratedAirspeedKts": 83.98146299086565,
+        "altitudeAglFt": 53.75574369785969,
+        "weightOnWheels": false,
+        "thrustLb": 81.00289222399009,
+        "weightLb": 5550,
+        "throttleCommandNorm": 0,
+        "throttlePositionNorm": 0,
+        "diagnostics": {
+          "n1Percent": 30,
+          "maxN1Percent": 100,
+          "bleedLossFactor": 0.04,
+          "nativePressureAltitudeFt": 53.75600365549055,
+          "terrainElevationFt": -3.2603866199780425e-9,
+          "groundSolid": 1,
+          "groundBumpiness": 0,
+          "groundStaticFrictionFactor": 1,
+          "groundRollingFrictionFactor": 1,
+          "groundMaximumForceLb": 1.7976931348623157e+308,
+          "alphaDeg": 5.969755827142785,
+          "aeroForceXLb": -281.67368325365294,
+          "aeroForceZLb": -7130.451541426887,
+          "propulsionForceXLb": 81.00289222399009,
+          "gearForceXLb": 0,
+          "cgXIn": 159.45945945945945,
+          "cgYIn": 0,
+          "cgZIn": -38.91891891891892,
+          "pressurePsf": 2112.1202589480954,
+          "windNorthFps": -8.526512829121202e-14,
+          "windEastFps": 0,
+          "windDownFps": -6.217248937900877e-15
+        }
+      },
+      "firstSampledTakeoffAirborne": null,
+      "runwayMonitoring": {
+        "observedSamples": 2083,
+        "blockers": []
+      },
+      "traceBounds": {
+        "samples": 90,
+        "minPitchDeg": -0.4980745176800039,
+        "maxPitchDeg": 4.642547385686512,
+        "minElevatorNorm": -1,
+        "maxElevatorNorm": 0.51052257787119
+      },
+      "actualLoading": {
+        "fuelLb": [
+          1500
+        ],
+        "payloadLb": 500,
+        "scenarioModelSha256": "6b51e344c1798104ee692830ad63c98ab26a0ba166bbc92696f2c04eb771ce4a"
+      },
+      "proposedSyntheticLoading": {
+        "status": "proposed-not-applied-to-native-model",
+        "weightLb": 5550,
+        "cgFsIn": 192.90522522522522,
+        "emptyCgSensitivity": [
+          {
+            "emptyCgFsIn": 193,
+            "loadedCgFsIn": 191.62594594594594,
+            "basis": "Illustrative +/-2 inch assumption sweep, not an evidence-derived confidence interval"
+          },
+          {
+            "emptyCgFsIn": 195,
+            "loadedCgFsIn": 192.90522522522522,
+            "basis": "Illustrative +/-2 inch assumption sweep, not an evidence-derived confidence interval"
+          },
+          {
+            "emptyCgFsIn": 197,
+            "loadedCgFsIn": 194.1845045045045,
+            "basis": "Illustrative +/-2 inch assumption sweep, not an evidence-derived confidence interval"
+          }
+        ],
+        "nativeModelDatumEstablished": false
+      }
+    }
+  ],
+  "staticThrust": {
+    "reference": {
+      "thrustLb": 1846,
+      "relativeTolerance": 0.05,
+      "source": {
+        "document": "EASA.IM.A.615",
+        "issue": "6",
+        "date": "2026-06-01",
+        "page": 8,
+        "url": "https://www.easa.europa.eu/en/downloads/24242/en"
+      }
+    },
+    "actualLb": 1727.8555492683934,
+    "relativeError": -0.06400024416663415,
+    "status": "diagnostic-only",
+    "note": "Rated-thrust comparison; not an installed bleed-ON performance validation."
+  },
+  "calibrated": false,
+  "productionSdkUpdated": false,
+  "nativeRegressionFollowup": {
+    "date": "2026-09-12",
+    "passedCTestEntries": [
+      "CheckTrim",
+      "TestEngineIndexedProps",
+      "TestTurbine",
+      "TestTurbineTrimSpool"
+    ],
+    "seconds": 10.7,
+    "exitCode": 0,
+    "logPath": "/private/tmp/sf50-v5-validation.30axFG/native-regression-rerun.log",
+    "command": "ctest --test-dir /private/tmp/sf50-v5-validation.30axFG/native-build --output-on-failure --no-tests=error -R '^(TestTurbineTrimSpool|TestTurbine|TestEngineIndexedProps|CheckTrim)$'",
+    "scope": "Test-only corrections and CMake reconfiguration; reused the previously built native binding. No turbine, aircraft, WASM artifact or installed SDK changes."
+  }
+}

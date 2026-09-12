@@ -39,7 +39,18 @@ describe("shared aircraft collision geometry", () => {
     "uses the same contact positions for ground clearance at roll=$roll, pitch=$pitch", ({ roll, pitch }) => {
       const cg = { xIn: 44, yIn: 2, zIn: 17 };
       const values: Record<string, number> = { "inertia/cg-x-in": cg.xIn, "inertia/cg-y-in": cg.yIn, "inertia/cg-z-in": cg.zIn };
-      const sdk = { getPropertyValue: vi.fn((name: string) => values[name]) };
+      values["gear/num-units"] = C172_GROUND_CONTACTS.length;
+      values["gear/gear-pos-norm"] = 1;
+      C172_GROUND_CONTACTS.forEach((contact, index) => {
+        const prefix = (contact.kind === "wheel" ? "gear" : "contact") + "/unit[" + index + "]/";
+        for (const axis of ["x", "y", "z"] as const) {
+          values[prefix + axis + "-position"] = contact[(axis + "In") as "xIn" | "yIn" | "zIn"];
+        }
+      });
+      const sdk = {
+        getPropertyValue: vi.fn((name: string) => values[name]),
+        queryPropertyCatalog: () => Object.keys(values).filter(name => name.endsWith("-position")).map(name => name + " (RW)").join("\n"),
+      };
       const points = C172_GROUND_CONTACTS.map(contact => groundContactBodyPosition(contact, cg));
       // At level, knife-edge right bank, and vertical nose-up attitudes,
       // the downward extent is respectively -up, -left, and -forward.
@@ -47,7 +58,6 @@ describe("shared aircraft collision geometry", () => {
         : pitch !== 0 ? Math.max(...points.map(point => -point.forward))
           : Math.max(...points.map(point => -point.up));
       expect(groundContactClearanceMeters(sdk as never, roll, pitch)).toBeCloseTo(extent, 12);
-      expect(sdk.getPropertyValue).toHaveBeenCalledTimes(3);
     },
   );
 });

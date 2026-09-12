@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!--
+  Initial Williams FJ33-5A schedule for the Cirrus SF50 package.
+  Rated thrust is 1,846 lbf per AFM 31452-001, PDF 23 / printed 1-7.
+  The altitude/Mach schedule, TSFC, N1 limits and 4% bleed loss remain engineering
+  estimates, NOT a manufacturer EEC or installed net-thrust map. No generic
+  G2+/G3 thrust uplift is inferred from published takeoff-distance improvements.
+-->
+<turbine_engine name="FJ33-5A">
+  <milthrust unit="LBS">1846</milthrust>
+  <bypassratio>3.3</bypassratio>
+  <tsfc>0.65</tsfc>
+  <bleed>0.04</bleed>
+  <idlen1>30.0</idlen1>
+  <idlen2>60.0</idlen2>
+  <maxn1>100.0</maxn1>
+  <maxn2>100.0</maxn2>
+  <augmented>0</augmented>
+  <injected>0</injected>
+
+  <function name="IdleThrust">
+    <table>
+      <independentVar lookup="row">velocities/mach</independentVar>
+      <independentVar lookup="column">atmosphere/density-altitude</independentVar>
+      <tableData>
+        -10000 0 10000 20000 30000 40000
+        0.0 0.045 0.050 0.060 0.075 0.095 0.120
+        0.2 0.040 0.045 0.055 0.070 0.090 0.115
+        0.4 0.025 0.030 0.040 0.055 0.075 0.100
+        0.6 0.010 0.015 0.025 0.040 0.060 0.085
+      </tableData>
+    </table>
+  </function>
+
+  <function name="MilThrust">
+    <table>
+      <independentVar lookup="row">velocities/mach</independentVar>
+      <independentVar lookup="column">atmosphere/density-altitude</independentVar>
+      <tableData>
+        -10000 0 10000 20000 30000 40000
+        0.0 1.03 1.00 0.78 0.60 0.45 0.32
+        0.2 1.00 0.96 0.75 0.58 0.43 0.30
+        0.4 0.96 0.92 0.72 0.55 0.41 0.29
+        0.6 0.90 0.86 0.67 0.51 0.38 0.27
+      </tableData>
+    </table>
+  </function>
+</turbine_engine>

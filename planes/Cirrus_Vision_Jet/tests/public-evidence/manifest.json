@@ -1,0 +1,432 @@
+{
+  "schemaVersion": 1,
+  "collectedAt": "2026-09-12",
+  "toldCommit": "3a6fa1853e67a221a7613ba3523c59886d7d0cab",
+  "rawDirectory": "raw",
+  "aircraftValidationStatus": "blocked",
+  "sources": [
+    {
+      "id": "told-g1-takeoff-ground run - downhill factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff/ground%20run%20-%20downhill%20factor.csv",
+      "file": "told-g1-takeoff-ground run - downhill factor.csv",
+      "bytes": 43,
+      "sha256": "483a402b7e370f0016e3e1121d544745d656e98b4f61d1e557ac1c16a4904a2e",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-takeoff-ground run - headwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff/ground%20run%20-%20headwind%20factor.csv",
+      "file": "told-g1-takeoff-ground run - headwind factor.csv",
+      "bytes": 43,
+      "sha256": "63b0d5105ec248747661dfaef3f72395d0b6fd64ee89be7ff4e3837d34d38e7f",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-takeoff-ground run - tailwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff/ground%20run%20-%20tailwind%20factor.csv",
+      "file": "told-g1-takeoff-ground run - tailwind factor.csv",
+      "bytes": 40,
+      "sha256": "65670c7477437454b07395621069c9acf8dfad7e86bbaedaeec326a9b9239475",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-takeoff-ground run - uphill factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff/ground%20run%20-%20uphill%20factor.csv",
+      "file": "told-g1-takeoff-ground run - uphill factor.csv",
+      "bytes": 43,
+      "sha256": "d40ff7f75d31c410e35a8b6beb45b030b270775dd019c2ae255076f6a741d91a",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-takeoff-ground run.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff/ground%20run.csv",
+      "file": "told-g1-takeoff-ground run.csv",
+      "bytes": 4552,
+      "sha256": "26b6825ce725f5cb1b6d9a7d92c93acabb8ab1506a12c324d68344ee7a14bdd9",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-takeoff-total distance - headwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff/total%20distance%20-%20headwind%20factor.csv",
+      "file": "told-g1-takeoff-total distance - headwind factor.csv",
+      "bytes": 43,
+      "sha256": "ee9c2a0bf0f0d56568dc82b5aef10cee51b7fce05ba4c0c6ca4052cd35947ce6",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-takeoff-total distance - tailwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff/total%20distance%20-%20tailwind%20factor.csv",
+      "file": "told-g1-takeoff-total distance - tailwind factor.csv",
+      "bytes": 43,
+      "sha256": "ca6cc962f4068343f2bc4e6b737c7863b80cb0b8b6da8e77a17fc1f12e16ba79",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-takeoff-total distance - unpaved factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff/total%20distance%20-%20unpaved%20factor.csv",
+      "file": "told-g1-takeoff-total distance - unpaved factor.csv",
+      "bytes": 43,
+      "sha256": "3e641b607fd7011815068f2ba2a0a2191eea6d6be9c82fc4b49ac43dde7daae6",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-takeoff-total distance.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff/total%20distance.csv",
+      "file": "told-g1-takeoff-total distance.csv",
+      "bytes": 4568,
+      "sha256": "73c3ab944c57c7c92036adf8144bfff0cffa8736636122df010f18657b0ce9dd",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-takeoff-climb-gradient.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff%20climb/gradient.csv",
+      "file": "told-g1-takeoff-climb-gradient.csv",
+      "bytes": 7771,
+      "sha256": "98bc7d17ace41544b5d7ed901140a7eec4c05ed224d86b7903a3ddb9a2c59ef1",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-takeoff-climb-rate.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/takeoff%20climb/rate.csv",
+      "file": "told-g1-takeoff-climb-rate.csv",
+      "bytes": 7856,
+      "sha256": "93cbd1fd3b27f4b9bcbddbda7c96d5128e502594060e4f1a725ba70a18c2e102",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-vref-100.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/vref/100.csv",
+      "file": "told-g1-vref-100.csv",
+      "bytes": 53,
+      "sha256": "a7f26ce39ed26c260534ac9d35be63c83f9318cd7afeafc3ad629af3b660107b",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-vref-50 ice.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/vref/50%20ice.csv",
+      "file": "told-g1-vref-50 ice.csv",
+      "bytes": 57,
+      "sha256": "2835323d9624837e31f4d7c1d6a5e5a9c12d05ad01a084ed641f652ad9e09a24",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-vref-50.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/vref/50.csv",
+      "file": "told-g1-vref-50.csv",
+      "bytes": 54,
+      "sha256": "f4989b9b56476fc0484ff1bc2c8d7dff5c9a914646f6556258c985b44b1282db",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-vref-up ice.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/vref/up%20ice.csv",
+      "file": "told-g1-vref-up ice.csv",
+      "bytes": 58,
+      "sha256": "75f3aff9967f140fa3fad8868fd1184e507b6721589ab07d0edb91661fdf02f0",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-vref-up.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/vref/up.csv",
+      "file": "told-g1-vref-up.csv",
+      "bytes": 56,
+      "sha256": "84863f0b2df00032d87b076559ce977514a03b98e74349feb904855769d1fd46",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "easa-sf50-tcds.pdf",
+      "url": "https://www.easa.europa.eu/es/downloads/24242/en",
+      "file": "easa-sf50-tcds.pdf",
+      "bytes": 517249,
+      "sha256": "24bae613e45c18994d014957fdd9a5944d3230285f94f51e1f88bc57a37bb738",
+      "kind": "reference",
+      "reuse": "Publicly downloadable; no blanket redistribution license inferred"
+    },
+    {
+      "id": "easa-fj33-tcds.pdf",
+      "url": "https://www.easa.europa.eu/en/downloads/7771/en",
+      "file": "easa-fj33-tcds.pdf",
+      "bytes": 458748,
+      "sha256": "5b8a2f51e78546b09b3a94b909c304c346ad90c704609fd313cb1eac4aaec050",
+      "kind": "reference",
+      "reuse": "Publicly downloadable; no blanket redistribution license inferred"
+    },
+    {
+      "id": "ntsb-cen21-recorder-report.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15611171&FileExtension=pdf&FileName=factual%20-%20dms-Rel.pdf",
+      "file": "ntsb-cen21-recorder-report.pdf",
+      "bytes": 1365222,
+      "sha256": "b70072788fffc9c8ca5860a98da801b6afa4ab4eb60686341b6ecd89784767c4",
+      "kind": "reference",
+      "reuse": "Publicly downloadable; no blanket redistribution license inferred"
+    },
+    {
+      "id": "ntsb-cen23-recorder-report.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15327968&FileExtension=pdf&FileName=Electronic%20Devices%20-%20Specialist%27s%20Factual%20Report-CEN23FA045-Rel.pdf",
+      "file": "ntsb-cen23-recorder-report.pdf",
+      "bytes": 91408,
+      "sha256": "f09915403a24cba9fee8c1a663cdc77d5519f45d823217748793c3b485e113fb",
+      "kind": "reference",
+      "reuse": "Publicly downloadable; no blanket redistribution license inferred"
+    },
+    {
+      "id": "told-g1-landing-100-ground run - downhill factor.csv",
+      "file": "told-g1-landing-100-ground run - downhill factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/100/ground%20run%20-%20downhill%20factor.csv",
+      "bytes": 33,
+      "sha256": "08096b5f5fc052803b0fb024af47ed41cd175fcb8aceede1c3aabd3ecdae884b",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-landing-100-ground run - headwind factor.csv",
+      "file": "told-g1-landing-100-ground run - headwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/100/ground%20run%20-%20headwind%20factor.csv",
+      "bytes": 33,
+      "sha256": "db3d325c93d59d277e15914772ea1d9f8ec6f25e7fef181041783ab9bc935b62",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-landing-100-ground run - tailwind factor.csv",
+      "file": "told-g1-landing-100-ground run - tailwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/100/ground%20run%20-%20tailwind%20factor.csv",
+      "bytes": 33,
+      "sha256": "796bf4928c82e73e467e1a13d42b744ea087ef8a3ace05d959e8fe12e1e358b2",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-landing-100-ground run - uphill factor.csv",
+      "file": "told-g1-landing-100-ground run - uphill factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/100/ground%20run%20-%20uphill%20factor.csv",
+      "bytes": 33,
+      "sha256": "0ede8ac6bbb87e6b5b1d5d8eda034a6526c99896da00faef47de71eca0f5e083",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-landing-100-ground run.csv",
+      "file": "told-g1-landing-100-ground run.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/100/ground%20run.csv",
+      "bytes": 1731,
+      "sha256": "4f3675d1037fc6343a1b3663ba2efb15304a2fea620fa7cfed4942f1c9b6f2ca",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-landing-100-total distance - headwind factor.csv",
+      "file": "told-g1-landing-100-total distance - headwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/100/total%20distance%20-%20headwind%20factor.csv",
+      "bytes": 33,
+      "sha256": "8d4da21bcad2457774cf0858b9fbc9259147093af54503505a011768a037bb69",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-landing-100-total distance - tailwind factor.csv",
+      "file": "told-g1-landing-100-total distance - tailwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/100/total%20distance%20-%20tailwind%20factor.csv",
+      "bytes": 33,
+      "sha256": "b0adbb5cc8beb2bcb49d1a2b1c4a150265eb9987e68fd27821e4c903cd190f06",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-landing-100-total distance - unpaved factor.csv",
+      "file": "told-g1-landing-100-total distance - unpaved factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/100/total%20distance%20-%20unpaved%20factor.csv",
+      "bytes": 31,
+      "sha256": "16b9bad8f6c4e04efd8c160faae28e29389716092cf85006561812d17c8410f0",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-landing-100-total distance.csv",
+      "file": "told-g1-landing-100-total distance.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/100/total%20distance.csv",
+      "bytes": 1731,
+      "sha256": "6e4fb6057349b79eb4937bc13d03040bf23e904672a9eed35d5f7b6f34d74b1d",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-landing-50-ground run - downhill factor.csv",
+      "file": "told-g1-landing-50-ground run - downhill factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/50/ground%20run%20-%20downhill%20factor.csv",
+      "bytes": 33,
+      "sha256": "08096b5f5fc052803b0fb024af47ed41cd175fcb8aceede1c3aabd3ecdae884b",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-landing-50-ground run - headwind factor.csv",
+      "file": "told-g1-landing-50-ground run - headwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/50/ground%20run%20-%20headwind%20factor.csv",
+      "bytes": 33,
+      "sha256": "8d4da21bcad2457774cf0858b9fbc9259147093af54503505a011768a037bb69",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-landing-50-ground run - tailwind factor.csv",
+      "file": "told-g1-landing-50-ground run - tailwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/50/ground%20run%20-%20tailwind%20factor.csv",
+      "bytes": 33,
+      "sha256": "95f518d623c7672246ca02d680fbfa36cd7a04a983f303f1b8f7a471de19a820",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-landing-50-ground run - uphill factor.csv",
+      "file": "told-g1-landing-50-ground run - uphill factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/50/ground%20run%20-%20uphill%20factor.csv",
+      "bytes": 33,
+      "sha256": "0ede8ac6bbb87e6b5b1d5d8eda034a6526c99896da00faef47de71eca0f5e083",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-landing-50-ground run.csv",
+      "file": "told-g1-landing-50-ground run.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/50/ground%20run.csv",
+      "bytes": 2236,
+      "sha256": "0d7a1849a271be25b1ca81e7db2bcca8edc0936399160bff977722120f809774",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-landing-50-total distance - headwind factor.csv",
+      "file": "told-g1-landing-50-total distance - headwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/50/total%20distance%20-%20headwind%20factor.csv",
+      "bytes": 33,
+      "sha256": "ffd21c2fa890e749f65b4e7e8cbc3e898f8ddfe639a4783707bbef9133eb2e1a",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-landing-50-total distance - tailwind factor.csv",
+      "file": "told-g1-landing-50-total distance - tailwind factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/50/total%20distance%20-%20tailwind%20factor.csv",
+      "bytes": 33,
+      "sha256": "75457ad159dfa6d2ec064062c904007e6f7de5285670d378c5f5c84276f08a8a",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-landing-50-total distance - unpaved factor.csv",
+      "file": "told-g1-landing-50-total distance - unpaved factor.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/50/total%20distance%20-%20unpaved%20factor.csv",
+      "bytes": 31,
+      "sha256": "16b9bad8f6c4e04efd8c160faae28e29389716092cf85006561812d17c8410f0",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-landing-50-total distance.csv",
+      "file": "told-g1-landing-50-total distance.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/landing/50/total%20distance.csv",
+      "bytes": 2236,
+      "sha256": "d049ecbc01a07f4b584dd548d20e4a772d83f23dadb546b70b1daf22eef96c4d",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-enroute-climb-normal-gradient.csv",
+      "file": "told-g1-enroute-climb-normal-gradient.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/enroute%20climb/normal/gradient.csv",
+      "bytes": 9925,
+      "sha256": "038d76442838c538410e30769dfe25d4b98bb88bb009a9e02f7172dd6f0c4272",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-enroute-climb-normal-rate.csv",
+      "file": "told-g1-enroute-climb-normal-rate.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/enroute%20climb/normal/rate.csv",
+      "bytes": 10423,
+      "sha256": "3aa2b5d863d4512046f93bc9d0d90acaf037e2f8adee35d3c8a370ceedc4b234",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "told-g1-enroute-climb-normal-speed.csv",
+      "file": "told-g1-enroute-climb-normal-speed.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g1/enroute%20climb/normal/speed.csv",
+      "bytes": 9906,
+      "sha256": "1a0a56dc9b8e1e8fbc4fb545a1b070164ab8898572fc42c4a7d382a4b609c46d",
+      "kind": "derived-afm",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    },
+    {
+      "id": "garmin-sf50-touch-plus.pdf",
+      "file": "garmin-sf50-touch-plus.pdf",
+      "url": "https://static.garmin.com/pumac/190-02470-02_a.pdf",
+      "bytes": 46797861,
+      "sha256": "19f00ba3d80ae16bf2883776a2d1312c2182075baceb4d506cdaf672cd33df59",
+      "kind": "reference",
+      "reuse": "Publicly downloadable; no blanket redistribution license inferred"
+    },
+    {
+      "id": "ntsb-rdm-1hz.csv",
+      "file": "ntsb-rdm-1hz.csv",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=18188585&FileExtension=csv&FileName=RDM%201%20hz-Rel.csv",
+      "bytes": 2631190,
+      "sha256": "a5a43eb768bc0e3576e6ce71970fd067db4ab713c67ecf17e245865d9b37d58f",
+      "kind": "recording",
+      "reuse": "Publicly downloadable; no blanket redistribution license inferred"
+    },
+    {
+      "id": "ntsb-cen21-tabular.csv",
+      "file": "ntsb-cen21-tabular.csv",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15611483&FileExtension=csv&FileName=data%20for%20dms-Rel.csv",
+      "bytes": 46710,
+      "sha256": "9c95a61c24e2452c2df3c2094a370b5b37a99e5b793ef63bdce7d6ccd54b14f0",
+      "kind": "recording",
+      "reuse": "Publicly downloadable; no blanket redistribution license inferred"
+    },
+    {
+      "id": "ntsb-stations.pdf",
+      "file": "ntsb-stations.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=14462664&FileExtension=pdf&FileName=FINAL%20-%20Airframe%20Examination-WPR20FA051-Rel.pdf",
+      "bytes": 5498112,
+      "sha256": "703e6d761d70f9f1b5a3ddfda1511c3347893d554cb42558e5991ab35f27906f",
+      "kind": "reference",
+      "reuse": "Publicly downloadable; no blanket redistribution license inferred"
+    },
+    {
+      "id": "ntsb-cen21-afm-excerpt.pdf",
+      "file": "ntsb-cen21-afm-excerpt.pdf",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=15749963&FileExtension=pdf&FileName=Airplane%20Flight%20Manual%20--%20Excerpt-Rel.pdf",
+      "bytes": 13712188,
+      "sha256": "fd35fb1d8bcc40bf20d1145a398342f68a9b880ae55cd2a0e524eaea43b424f0",
+      "kind": "reference",
+      "reuse": "Publicly downloadable; no blanket redistribution license inferred"
+    },
+    {
+      "id": "told-license.txt",
+      "file": "told-license.txt",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/LICENSE",
+      "bytes": 1067,
+      "sha256": "01a836f3afe3b901e97d0bac361b5cc86c6505f18027abda94ccc0b7346a8e97",
+      "kind": "reference",
+      "reuse": "MIT project; underlying AFM applicability/rights require separate review"
+    }
+  ]
+}

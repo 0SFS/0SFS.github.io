@@ -160,9 +160,12 @@ function worldPositions(wheels: readonly TransformNode[]) {
 describe("retractable gear", () => {
   it("binds the three legs and starts down", () => {
     const s = scene();
-    const { rig } = gearRig(s.scene);
+    const { rig, wheels } = gearRig(s.scene);
     expect(rig.gear).toHaveLength(3);
-    expect(rig.gearNorm).toBe(1);
+    applyAircraftRig(rig, NEUTRAL_CONTROL_SURFACES, 0);
+    worldPositions(wheels).forEach((got, index) => {
+      expect(Vector3.Distance(got, new Vector3(...SF50_GEAR[index].wheel))).toBeLessThan(1e-6);
+    });
     s.scene.dispose(); s.engine.dispose();
   });
 
@@ -284,25 +287,29 @@ describe("retractable gear", () => {
     s.scene.dispose(); s.engine.dispose();
   });
 
-  it("takes the transit time to travel rather than snapping", () => {
+  it("poses a partial physical extension without advancing it with display time", () => {
     const s = scene();
-    const { rig } = gearRig(s.scene);
-    const up = { ...NEUTRAL_CONTROL_SURFACES, gearDownNorm: 0 };
-    applyAircraftRig(rig, up, 1);
-    expect(rig.gearNorm).toBeGreaterThan(0.8);
-    expect(rig.gearNorm).toBeLessThan(1);
-    for (let step = 0; step < 20; step += 1) applyAircraftRig(rig, up, 1);
-    expect(rig.gearNorm).toBe(0);
+    const { rig, wheels } = gearRig(s.scene);
+    const halfway = { ...NEUTRAL_CONTROL_SURFACES, gearDownNorm: 0.5 };
+    applyAircraftRig(rig, halfway, 1 / 60);
+    const positions = worldPositions(wheels);
+    expect(Vector3.Distance(positions[0], new Vector3(...SF50_GEAR[0].wheel))).toBeGreaterThan(0.1);
+    for (const fps of [10, 30, 60, 120]) {
+      for (let frame = 0; frame < fps; frame += 1) applyAircraftRig(rig, halfway, 1 / fps);
+      worldPositions(wheels).forEach((got, index) => {
+        expect(Vector3.Distance(got, positions[index])).toBeLessThan(1e-9);
+      });
+    }
     s.scene.dispose(); s.engine.dispose();
   });
 
-  it("snaps to the commanded position when no time has passed", () => {
-    // The first frame after a model swap: half-retracted gear that never
-    // finishes is worse than gear that is simply where it is told.
+  it("shows the latest physical position on the first frame", () => {
     const s = scene();
-    const { rig } = gearRig(s.scene);
+    const { rig, wheels } = gearRig(s.scene);
     applyAircraftRig(rig, { ...NEUTRAL_CONTROL_SURFACES, gearDownNorm: 0 }, 0);
-    expect(rig.gearNorm).toBe(0);
+    worldPositions(wheels).forEach((got, index) => {
+      expect(Vector3.Distance(got, new Vector3(...SF50_GEAR[index].stowed))).toBeLessThan(1e-6);
+    });
     s.scene.dispose(); s.engine.dispose();
   });
 
@@ -310,14 +317,17 @@ describe("retractable gear", () => {
     // Paused, with the camera orbiting: frames still arrive with a real
     // interval, and the gear must neither keep moving nor snap to its end.
     const s = scene();
-    const { rig } = gearRig(s.scene);
+    const { rig, wheels } = gearRig(s.scene);
+    const halfway = { ...NEUTRAL_CONTROL_SURFACES, gearDownNorm: 0.5 };
     const up = { ...NEUTRAL_CONTROL_SURFACES, gearDownNorm: 0 };
+    applyAircraftRig(rig, halfway, 1);
+    const midway = worldPositions(wheels);
+    for (let frame = 0; frame < 20; frame += 1) applyAircraftRig(rig, halfway, 1, { simulationHeld: true });
+    worldPositions(wheels).forEach((got, index) => {
+      expect(Vector3.Distance(got, midway[index])).toBeLessThan(1e-9);
+    });
     applyAircraftRig(rig, up, 1);
-    const midway = rig.gearNorm;
-    for (let frame = 0; frame < 20; frame += 1) applyAircraftRig(rig, up, 1, { simulationHeld: true });
-    expect(rig.gearNorm).toBe(midway);
-    applyAircraftRig(rig, up, 1);
-    expect(rig.gearNorm).toBeLessThan(midway);
+    expect(Vector3.Distance(worldPositions(wheels)[0], midway[0])).toBeGreaterThan(0.1);
     s.scene.dispose(); s.engine.dispose();
   });
 

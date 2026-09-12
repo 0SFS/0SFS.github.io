@@ -39,9 +39,11 @@ export interface ControlSurfaceState {
   aileronRightRad: number;
   elevatorRad: number;
   rudderRad: number;
+  ruddervatorLeftRad: number;
+  ruddervatorRightRad: number;
   flapRad: number;
   propellerRadPerSec: number;
-  /** Commanded gear position: 1 is down and locked, 0 is up. */
+  /** Physical gear position: 1 is down and locked, 0 is retracted. */
   gearDownNorm: number;
   /** Ground speed in m/s; what the tyres roll at when they are on the ground. */
   groundSpeedMps: number;
@@ -51,7 +53,8 @@ export interface ControlSurfaceState {
 
 export const NEUTRAL_CONTROL_SURFACES: ControlSurfaceState = {
   aileronLeftRad: 0, aileronRightRad: 0, elevatorRad: 0,
-  rudderRad: 0, flapRad: 0, propellerRadPerSec: 0, gearDownNorm: 1,
+  rudderRad: 0, ruddervatorLeftRad: 0, ruddervatorRightRad: 0,
+  flapRad: 0, propellerRadPerSec: 0, gearDownNorm: 1,
   groundSpeedMps: 0, onGround: false,
 };
 
@@ -104,20 +107,7 @@ function readPropellerRpm(sdk: JSBSimSdk): number {
   return 0;
 }
 
-/**
- * The gear LEVER, not the gear position.
- *
- * `gear/gear-pos-norm` is the one that would be right, and it is the one that
- * never moves: it and `gear/gear-cmd-norm` are both plain FGFCS properties, and
- * what drives one from the other is a retraction system in the aircraft
- * config. The c172p — still the flight model every airframe here flies — has
- * fixed gear and no such system, so `gear-pos-norm` sits at 1 for ever however
- * the command is set. Measured against the wasm build, not assumed. So the
- * lever is what is read, and `applyAircraftRig` runs the transit itself.
- *
- * An unknown or unreadable property answers "down", which is the failure worth
- * having: gear that will not come up beats gear that is not there on landing.
- */
+/** Reads a legacy command only when no physical gear position is available. */
 function readGearCommand(sdk: JSBSimSdk): number {
   try {
     const value = sdk.getPropertyValue("gear/gear-cmd-norm");
@@ -125,6 +115,21 @@ function readGearCommand(sdk: JSBSimSdk): number {
   } catch {
     return 1;
   }
+}
+
+/**
+ * Gear presentation follows the FDM's physical observation. Fixed-gear or
+ * legacy models can omit it, in which case the commanded state is the explicit
+ * fallback rather than an independent visual timer.
+ */
+function readGearPosition(sdk: JSBSimSdk): number {
+  try {
+    const value = sdk.getPropertyValue("gear/gear-pos-norm");
+    if (Number.isFinite(value)) return Math.min(1, Math.max(0, value));
+  } catch {
+    // Fall through to the command-only fallback below.
+  }
+  return readGearCommand(sdk);
 }
 
 /** Test seam: forget the cached RPM property name. */
@@ -138,9 +143,11 @@ export function readControlSurfaceState(sdk: JSBSimSdk): ControlSurfaceState {
     aileronRightRad: readNumber(sdk, "fcs/right-aileron-pos-rad"),
     elevatorRad: readNumber(sdk, "fcs/elevator-pos-rad"),
     rudderRad: readNumber(sdk, "fcs/rudder-pos-rad"),
+    ruddervatorLeftRad: readNumber(sdk, "fcs/left-ruddervator-pos-rad"),
+    ruddervatorRightRad: readNumber(sdk, "fcs/right-ruddervator-pos-rad"),
     flapRad: readNumber(sdk, "fcs/flap-pos-deg") * DEG_TO_RAD,
     propellerRadPerSec: readPropellerRpm(sdk) * RPM_TO_RAD_PER_SEC,
-    gearDownNorm: readGearCommand(sdk),
+    gearDownNorm: readGearPosition(sdk),
     // Wheels roll at ground speed, not airspeed: a headwind does not spin them.
     groundSpeedMps: readNumber(sdk, "velocities/vg-fps") * FEET_TO_METERS,
     onGround: WOW_PROPERTIES.some((property) => readNumber(sdk, property) > 0),
@@ -208,8 +215,6 @@ export interface AircraftRig {
   /** True while the tyres are drawing the blurred half of their atlas. */
   wheelBlurred: boolean;
   gear: RetractingGear[];
-  /** Where the gear actually is, 1 down to 0 up; it chases the lever. */
-  gearNorm: number;
   propeller: Propeller | null;
   propellerAngleRad: number;
   /** Smoothed frame interval; the sampling rate the blades are judged against. */
@@ -294,6 +299,10 @@ function buildPropellerDisc(node: TransformNode, scene: Scene): Mesh {
 const SPAN_AXIS = new Vector3(1, 0, 0);
 const VERTICAL_AXIS = new Vector3(0, 1, 0);
 const THRUST_AXIS = new Vector3(0, 0, 1);
+// The two V-tail hinge lines are measured from the SF50 three-view geometry.
+// Mesh nodes retain global axes after export, so these are not cardinal axes.
+const LEFT_RUDDERVATOR_HINGE_AXIS = new Vector3(-2.2405, -1.025, 1.792).normalize();
+const RIGHT_RUDDERVATOR_HINGE_AXIS = new Vector3(2.2405, -1.025, 1.792).normalize();
 
 /**
  * Retracting gear parts. Each leg's origin is on its own retraction hinge and
@@ -401,13 +410,6 @@ const GEAR_BINDINGS: readonly {
   { name: "BayDoor_Main_Left", axis: WING_DOOR_HINGE, sign: 1, rad: DOOR_RAD(125), window: DOOR_WINDOW },
   { name: "BayDoor_Main_Right", axis: WING_DOOR_HINGE, sign: -1, rad: DOOR_RAD(125), window: DOOR_WINDOW },
 ];
-/**
- * Seconds end to end. The SF50's AFM gives 8 s for a normal extension; nothing
- * here depends on the exact figure, only on the gear not snapping between
- * states in one frame.
- */
-const GEAR_TRANSIT_SECONDS = 8;
-
 const SURFACE_BINDINGS: readonly { name: string; key: SurfaceKey; axis: Vector3; sign: number }[] = [
   { name: "Aileron_Left", key: "aileronLeftRad", axis: SPAN_AXIS, sign: 1 },
   { name: "Aileron_Right", key: "aileronRightRad", axis: SPAN_AXIS, sign: 1 },
@@ -415,6 +417,9 @@ const SURFACE_BINDINGS: readonly { name: string; key: SurfaceKey; axis: Vector3;
   { name: "Flap_Left", key: "flapRad", axis: SPAN_AXIS, sign: 1 },
   { name: "Flap_Right", key: "flapRad", axis: SPAN_AXIS, sign: 1 },
   { name: "Rudder", key: "rudderRad", axis: VERTICAL_AXIS, sign: -1 },
+  // Positive surface deflection is trailing-edge down on both sides.
+  { name: "Ruddervator_Left", key: "ruddervatorLeftRad", axis: LEFT_RUDDERVATOR_HINGE_AXIS, sign: -1 },
+  { name: "Ruddervator_Right", key: "ruddervatorRightRad", axis: RIGHT_RUDDERVATOR_HINGE_AXIS, sign: 1 },
 ];
 
 /** Strip Babylon's de-duplication suffix, e.g. "Elevator.001" -> "Elevator". */
@@ -500,7 +505,6 @@ export function bindAircraftRig(
     tyreTextures: [...tyreTextures],
     wheelBlurred: false,
     gear,
-    gearNorm: 1,
     propeller: propNode
       ? { node: propNode, rest: restRotation(propNode), disc, discFromMesh: baked !== null, blades }
       : null,
@@ -539,29 +543,13 @@ export function disposeAircraftRig(rig: AircraftRig): void {
 }
 
 /**
- * Drive the legs toward the lever at a fixed rate.
- *
- * The transit is run here rather than read from the flight model because no
- * flight model in this project has a retraction system to run it — see
- * `readGearCommand`. A zero or negative delta (the first frame, a resume)
- * snaps to the commanded position rather than stalling half way; a held
- * simulation holds the transit where it is.
+ * Pose the legs and doors from the physical actuator observation. Render
+ * frequency and paused camera movement must not advance a second gear clock.
  */
-function applyGear(rig: AircraftRig, command: number, deltaSeconds: number, held: boolean): void {
+function applyGear(rig: AircraftRig, position: number): void {
   if (rig.gear.length === 0) return;
-  const target = Number.isFinite(command) ? Math.min(1, Math.max(0, command)) : 1;
-  // A held simulation is not "no time has passed": frames keep coming while
-  // the camera moves, and a transit under way stops where it is rather than
-  // snapping to its end.
-  if (!held) {
-    if (Number.isFinite(deltaSeconds) && deltaSeconds > 0) {
-      const step = deltaSeconds / GEAR_TRANSIT_SECONDS;
-      rig.gearNorm += Math.min(step, Math.max(-step, target - rig.gearNorm));
-    } else {
-      rig.gearNorm = target;
-    }
-  }
-  const travel = 1 - rig.gearNorm;
+  const physical = Number.isFinite(position) ? Math.min(1, Math.max(0, position)) : 1;
+  const travel = 1 - physical;
   for (const leg of rig.gear) {
     const [from, to] = leg.window;
     const part = Math.min(1, Math.max(0, (travel - from) / (to - from)));
@@ -648,7 +636,7 @@ export function applyAircraftRig(
     rig.frameSeconds += (deltaSeconds - rig.frameSeconds) * FRAME_SMOOTHING;
   }
 
-  applyGear(rig, state.gearDownNorm, deltaSeconds, held);
+  applyGear(rig, state.gearDownNorm);
   applyWheels(rig, state, deltaSeconds, held);
 
   const propeller = rig.propeller;

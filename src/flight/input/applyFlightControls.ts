@@ -14,12 +14,13 @@ export function applyFlightControls(
   sdk: JSBSimSdk,
   controls: ControlSurfaceState,
   gearDownNorm = 1,
+  rudderSign: 1 | -1 = -1,
 ): void {
   sdk.setPropertyValue("fcs/elevator-cmd-norm", controls.elevator);
   sdk.setPropertyValue("fcs/aileron-cmd-norm", controls.aileron);
-  // Controls use positive yaw-right; the C172 rudder coefficient makes
-  // positive surface deflection yaw left. Convert at the physics boundary.
-  sdk.setPropertyValue("fcs/rudder-cmd-norm", -controls.rudder);
+  // Controls use positive yaw-right. Each FDM profile declares whether its
+  // native yaw-surface convention needs conversion at this boundary.
+  sdk.setPropertyValue("fcs/rudder-cmd-norm", controls.rudder * rudderSign);
   sdk.setPropertyValue("fcs/throttle-cmd-norm", controls.throttle);
   sdk.setPropertyValue("fcs/pitch-trim-cmd-norm", controls.pitchTrim);
   sdk.setPropertyValue("fcs/roll-trim-cmd-norm", controls.rollTrim);
@@ -27,8 +28,7 @@ export function applyFlightControls(
   sdk.setPropertyValue("fcs/brake-cmd-norm", controls.brake);
   sdk.setPropertyValue("fcs/left-brake-cmd-norm", controls.brake);
   sdk.setPropertyValue("fcs/right-brake-cmd-norm", controls.brake);
-  // The lever. Nothing in the c172p acts on it - it has fixed gear - but it is
-  // where the visual rig reads the gear from, and it is the right property for
-  // a retractable flight model to pick up when one arrives.
+  // The SF50 FCS drives its physical actuator from this lever. The fixed-gear
+  // C172 ignores it; presentation reads the resulting physical position.
   sdk.setPropertyValue("gear/gear-cmd-norm", gearDownNorm);
 }

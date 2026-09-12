@@ -5,6 +5,7 @@ import { wasmBinaryUrl, wasmModuleUrl } from "@0x62/jsbsim-wasm/wasm";
 import { Vector3 } from "@babylonjs/core";
 import { describe, expect, it } from "vitest";
 import { bootstrapC172p } from "./bootstrapC172";
+import { resolveAircraftDataFiles } from "./hydrateJsbsimData";
 import { flightAttitudeToQuaternion, readFlightState } from "../bridge/ecefBridge";
 
 describe("C172 roll direction", () => {
@@ -17,7 +18,7 @@ describe("C172 roll direction", () => {
     });
     const dataRoot = resolve(process.cwd(), "public/jsbsim-data");
     const manifest = JSON.parse(readFileSync(resolve(dataRoot, "manifest.json"), "utf8")) as { files: string[] };
-    for (const relativePath of manifest.files) {
+    for (const relativePath of resolveAircraftDataFiles(manifest, "cessna-172")) {
       sdk.writeDataFile(relativePath, readFileSync(resolve(dataRoot, relativePath), "utf8"));
     }
     await bootstrapC172p(sdk);

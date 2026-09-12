@@ -1,0 +1,220 @@
+{
+  "schemaVersion": 1,
+  "toldCommit": "3a6fa1853e67a221a7613ba3523c59886d7d0cab",
+  "rawRedistributionApproved": false,
+  "aircraftValidated": false,
+  "sources": [
+    {
+      "id": "told-g2+-landing-100-ground run.csv",
+      "file": "told-g2+-landing-100-ground run.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g2%2B/landing/100/ground%20run.csv",
+      "variant": "g2+",
+      "kind": "derived-afm",
+      "bytes": 1981,
+      "sha256": "0fb8e617288ea84d80b4b7c1f0a9b885019b5312e644329dec438de26e7c42d3",
+      "retrievedAt": "2026-09-12T18:08:08.643Z",
+      "sourceRevision": "TOLD claims AFM 31452-002 Rev 2; updated thrust AFMS 31452-111 Rev 1. Primary applicability unverified."
+    },
+    {
+      "id": "told-g2+-landing-100-total distance.csv",
+      "file": "told-g2+-landing-100-total distance.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g2%2B/landing/100/total%20distance.csv",
+      "variant": "g2+",
+      "kind": "derived-afm",
+      "bytes": 1981,
+      "sha256": "5819e9776c497b6eea755b6a41f4e3c23a2ee1c0476ef9cfce47ac918fc96b2c",
+      "retrievedAt": "2026-09-12T18:08:08.893Z",
+      "sourceRevision": "TOLD claims AFM 31452-002 Rev 2; updated thrust AFMS 31452-111 Rev 1. Primary applicability unverified."
+    },
+    {
+      "id": "told-g2+-takeoff climb-gradient.csv",
+      "file": "told-g2+-takeoff climb-gradient.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g2%2B/takeoff%20climb/gradient.csv",
+      "variant": "g2+",
+      "kind": "derived-afm",
+      "bytes": 7885,
+      "sha256": "db88c21b6aec2e4330a8366ffac12b16a95eed59145c1ac6807268e2da7fd90c",
+      "retrievedAt": "2026-09-12T18:08:09.061Z",
+      "sourceRevision": "TOLD claims AFM 31452-002 Rev 2; updated thrust AFMS 31452-111 Rev 1. Primary applicability unverified."
+    },
+    {
+      "id": "told-g2+-takeoff climb-rate.csv",
+      "file": "told-g2+-takeoff climb-rate.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g2%2B/takeoff%20climb/rate.csv",
+      "variant": "g2+",
+      "kind": "derived-afm",
+      "bytes": 7967,
+      "sha256": "cde1a1d26a23e101e469ac52416d15fefaea0266ef4cd11637670f25497fa807",
+      "retrievedAt": "2026-09-12T18:08:09.176Z",
+      "sourceRevision": "TOLD claims AFM 31452-002 Rev 2; updated thrust AFMS 31452-111 Rev 1. Primary applicability unverified."
+    },
+    {
+      "id": "told-g2+-takeoff-ground run.csv",
+      "file": "told-g2+-takeoff-ground run.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g2%2B/takeoff/ground%20run.csv",
+      "variant": "g2+",
+      "kind": "derived-afm",
+      "bytes": 4698,
+      "sha256": "170d0cad101db6f54fc9290fcd426062cc0b33446750807b55a231e3d693daae",
+      "retrievedAt": "2026-09-12T18:08:09.572Z",
+      "sourceRevision": "TOLD claims AFM 31452-002 Rev 2; updated thrust AFMS 31452-111 Rev 1. Primary applicability unverified."
+    },
+    {
+      "id": "told-g2+-takeoff-total distance.csv",
+      "file": "told-g2+-takeoff-total distance.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g2%2B/takeoff/total%20distance.csv",
+      "variant": "g2+",
+      "kind": "derived-afm",
+      "bytes": 4703,
+      "sha256": "cfed8d7ae83180ac03cf991b366075bbbdad64cfc057db1c090422f471c1c1f2",
+      "retrievedAt": "2026-09-12T18:08:09.982Z",
+      "sourceRevision": "TOLD claims AFM 31452-002 Rev 2; updated thrust AFMS 31452-111 Rev 1. Primary applicability unverified."
+    },
+    {
+      "id": "told-g2-enroute climb-normal-gradient.csv",
+      "file": "told-g2-enroute climb-normal-gradient.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g2/enroute%20climb/normal/gradient.csv",
+      "variant": "g2",
+      "kind": "derived-afm",
+      "bytes": 10685,
+      "sha256": "5d27b202677482da8580289c7ca1689392c809c24b3c223906c1cdd37173ffb7",
+      "retrievedAt": "2026-09-12T18:08:10.186Z",
+      "sourceRevision": "TOLD claims AFM 31452-002 Rev 2; updated thrust AFMS 31452-111 Rev 1. Primary applicability unverified."
+    },
+    {
+      "id": "told-g2-enroute climb-normal-rate.csv",
+      "file": "told-g2-enroute climb-normal-rate.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g2/enroute%20climb/normal/rate.csv",
+      "variant": "g2",
+      "kind": "derived-afm",
+      "bytes": 11356,
+      "sha256": "f43fb7f6976cbaa055cf1315cb262aa6dc318df8271796763e5ffec6defba1a8",
+      "retrievedAt": "2026-09-12T18:08:10.473Z",
+      "sourceRevision": "TOLD claims AFM 31452-002 Rev 2; updated thrust AFMS 31452-111 Rev 1. Primary applicability unverified."
+    },
+    {
+      "id": "told-g2-enroute climb-normal-speed.csv",
+      "file": "told-g2-enroute climb-normal-speed.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g2/enroute%20climb/normal/speed.csv",
+      "variant": "g2",
+      "kind": "derived-afm",
+      "bytes": 10666,
+      "sha256": "a4dd28e142e85634752a6e6191953997a0dc0a98fa8cea501c8536295d2bf39a",
+      "retrievedAt": "2026-09-12T18:08:10.624Z",
+      "sourceRevision": "TOLD claims AFM 31452-002 Rev 2; updated thrust AFMS 31452-111 Rev 1. Primary applicability unverified."
+    },
+    {
+      "id": "told-g2-landing-100-ground run.csv",
+      "file": "told-g2-landing-100-ground run.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g2/landing/100/ground%20run.csv",
+      "variant": "g2",
+      "kind": "derived-afm",
+      "bytes": 1731,
+      "sha256": "4f3675d1037fc6343a1b3663ba2efb15304a2fea620fa7cfed4942f1c9b6f2ca",
+      "retrievedAt": "2026-09-12T18:08:10.827Z",
+      "sourceRevision": "TOLD claims AFM 31452-002 Rev 2; updated thrust AFMS 31452-111 Rev 1. Primary applicability unverified."
+    },
+    {
+      "id": "told-g2-landing-100-total distance.csv",
+      "file": "told-g2-landing-100-total distance.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g2/landing/100/total%20distance.csv",
+      "variant": "g2",
+      "kind": "derived-afm",
+      "bytes": 1731,
+      "sha256": "6e4fb6057349b79eb4937bc13d03040bf23e904672a9eed35d5f7b6f34d74b1d",
+      "retrievedAt": "2026-09-12T18:08:11.007Z",
+      "sourceRevision": "TOLD claims AFM 31452-002 Rev 2; updated thrust AFMS 31452-111 Rev 1. Primary applicability unverified."
+    },
+    {
+      "id": "told-g2-takeoff climb-gradient.csv",
+      "file": "told-g2-takeoff climb-gradient.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g2/takeoff%20climb/gradient.csv",
+      "variant": "g2",
+      "kind": "derived-afm",
+      "bytes": 7771,
+      "sha256": "98bc7d17ace41544b5d7ed901140a7eec4c05ed224d86b7903a3ddb9a2c59ef1",
+      "retrievedAt": "2026-09-12T18:08:11.518Z",
+      "sourceRevision": "TOLD claims AFM 31452-002 Rev 2; updated thrust AFMS 31452-111 Rev 1. Primary applicability unverified."
+    },
+    {
+      "id": "told-g2-takeoff climb-rate.csv",
+      "file": "told-g2-takeoff climb-rate.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g2/takeoff%20climb/rate.csv",
+      "variant": "g2",
+      "kind": "derived-afm",
+      "bytes": 7856,
+      "sha256": "7afc6a7b90785f03e957847e558b4521e1ce5ed88b9f46e9044813c6734d5c77",
+      "retrievedAt": "2026-09-12T18:08:12.016Z",
+      "sourceRevision": "TOLD claims AFM 31452-002 Rev 2; updated thrust AFMS 31452-111 Rev 1. Primary applicability unverified."
+    },
+    {
+      "id": "told-g2-takeoff-ground run.csv",
+      "file": "told-g2-takeoff-ground run.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g2/takeoff/ground%20run.csv",
+      "variant": "g2",
+      "kind": "derived-afm",
+      "bytes": 4552,
+      "sha256": "26b6825ce725f5cb1b6d9a7d92c93acabb8ab1506a12c324d68344ee7a14bdd9",
+      "retrievedAt": "2026-09-12T18:08:12.130Z",
+      "sourceRevision": "TOLD claims AFM 31452-002 Rev 2; updated thrust AFMS 31452-111 Rev 1. Primary applicability unverified."
+    },
+    {
+      "id": "told-g2-takeoff-total distance.csv",
+      "file": "told-g2-takeoff-total distance.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g2/takeoff/total%20distance.csv",
+      "variant": "g2",
+      "kind": "derived-afm",
+      "bytes": 4568,
+      "sha256": "73c3ab944c57c7c92036adf8144bfff0cffa8736636122df010f18657b0ce9dd",
+      "retrievedAt": "2026-09-12T18:08:12.440Z",
+      "sourceRevision": "TOLD claims AFM 31452-002 Rev 2; updated thrust AFMS 31452-111 Rev 1. Primary applicability unverified."
+    },
+    {
+      "id": "told-g2-vref-100.csv",
+      "file": "told-g2-vref-100.csv",
+      "url": "https://raw.githubusercontent.com/RISCfuture/SF50-TOLD/3a6fa1853e67a221a7613ba3523c59886d7d0cab/SF50%20Shared/Data/g2/vref/100.csv",
+      "variant": "g2",
+      "kind": "derived-afm",
+      "bytes": 53,
+      "sha256": "18e57caa5ee054856116e815664d04930d8df5c8746ee3656de0961d97226505",
+      "retrievedAt": "2026-09-12T18:08:12.707Z",
+      "sourceRevision": "TOLD claims AFM 31452-002 Rev 2; updated thrust AFMS 31452-111 Rev 1. Primary applicability unverified."
+    },
+    {
+      "id": "cirrus-g2-announcement",
+      "file": "cirrus-g2-announcement.html",
+      "url": "https://cirrusaircraft.com/story/cirrus-aircraft-unveils-generation-2-vision-jet/",
+      "kind": "manufacturer-publication",
+      "bytes": 254702,
+      "sha256": "d4c74e47789bdb5fd3a6a42c7e85b1342fa4331144cee5896939062663861c21",
+      "retrievedAt": "2026-09-12T18:08:12.974Z"
+    },
+    {
+      "id": "cirrus-g2plus-announcement",
+      "file": "cirrus-g2plus-announcement.html",
+      "url": "https://cirrusaircraft.com/story/cirrus-aircraft-unveils-g2-vision-jet-with-up-to-20-enhanced-take-off-performance-and-inflight-wifi-connectivity/",
+      "kind": "manufacturer-publication",
+      "bytes": 257581,
+      "sha256": "b6ae7e6082e1bf45d7699a8bd6fcff74965cd592ef4d1b345f7cc3d2ea257dd3",
+      "retrievedAt": "2026-09-12T18:08:13.074Z"
+    },
+    {
+      "id": "cirrus-g3-announcement",
+      "file": "cirrus-g3-announcement.html",
+      "url": "https://cirrusaircraft.com/story/cirrus-unveils-new-g3-vision-jet/",
+      "kind": "manufacturer-publication",
+      "bytes": 262497,
+      "sha256": "62b4dbc30b0b0556701ce5e4700dcfb078e70589a3f62aef1fcb0670256383d4",
+      "retrievedAt": "2026-09-12T18:08:13.118Z"
+    },
+    {
+      "id": "cirrus-g3-specifications",
+      "file": "cirrus-g3-specifications.html",
+      "url": "https://cirrusaircraft.com/aircraft/vision-jet/",
+      "kind": "manufacturer-publication",
+      "bytes": 807035,
+      "sha256": "f160570782d17368e7c7a4de91ad6ab33d61329eeeafdec1ba1bc769b46f2da4",
+      "retrievedAt": "2026-09-12T18:08:13.182Z"
+    }
+  ]
+}

@@ -80,8 +80,12 @@ export async function bootstrapAircraft(
   sdk.setPropertyValue("ic/theta-deg", 0);
   sdk.setPropertyValue("ic/phi-deg", 0);
   sdk.setPropertyValue("ic/vc-kts", opts.airspeedKts);
-  sdk.setPropertyValue("ic/gear-gear-pos-norm", 0);
-  sdk.setPropertyValue("ic/flap-pos-norm", 0);
+  // Commands and physical actuator positions must agree before RunIC, which
+  // already evaluates the FCS and ground contacts. These are not IC properties.
+  sdk.setPropertyValue("gear/gear-cmd-norm", profile.initialGearDown ? 1 : 0);
+  sdk.setPropertyValue("gear/gear-pos-norm", profile.initialGearDown ? 1 : 0);
+  sdk.setPropertyValue("fcs/flap-cmd-norm", 0);
+  sdk.setPropertyValue(profile.flapPosition.property, 0);
 
   if (!sdk.runIc()) {
     throw new Error(`JSBSim RunIC failed for ${aircraftId} initial conditions.`);
