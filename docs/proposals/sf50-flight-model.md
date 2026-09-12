@@ -1,9 +1,20 @@
 # SF50 flight model and the per-aircraft FDM seam
 
-Status: proposal, awaiting approval
+Status: superseded; replacement proposal written and ready for review
 Date: 2026-09-11
-Scope: per-aircraft JSBSim FDM selection, a Cirrus SF50 flight model, and the
-per-aircraft physics constants the seam needs. The C172 is unchanged.
+Replacement: [SF50 flight model, simulation boundaries, and validation](sf50-flight-model-v2.md)
+
+We are replacing this proposal with the linked revised proposal. This document
+is retained as a historical record. Review found incomplete aircraft separation,
+unsupported lifecycle guarantees, wrapper defects, and
+SF50 source/configuration mismatches. Its implementation instructions,
+acceptance criteria, and claims below are superseded by the replacement;
+they are not constraints on the revised work. In particular, a non-throwing
+`simulation/dt` write did not change the timestep, and the installed SDK's
+`destroy()` did not delete the native execution object in the review probe.
+
+Original scope: per-aircraft JSBSim FDM selection, a Cirrus SF50 flight model,
+and the per-aircraft physics constants the seam needs. The C172 is unchanged.
 
 ## Problem
 

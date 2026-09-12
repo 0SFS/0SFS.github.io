@@ -5,5 +5,21 @@
     "aircraft/c172p/reset01.xml",
     "engine/eng_io320.xml",
     "engine/prop_75in2f.xml"
+  ],
+  "aircraft": {
+    "cessna-172": [
+      "aircraft/c172p/c172p.xml",
+      "aircraft/c172p/reset00.xml",
+      "aircraft/c172p/reset01.xml",
+      "engine/eng_io320.xml",
+      "engine/prop_75in2f.xml"
+    ],
+    "cirrus-vision-jet": [
+      "aircraft/c172p/c172p.xml",
+      "aircraft/c172p/reset00.xml",
+      "aircraft/c172p/reset01.xml",
+      "engine/eng_io320.xml",
+      "engine/prop_75in2f.xml"
+    ]
   ]
 }

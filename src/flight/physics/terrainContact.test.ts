@@ -6,6 +6,9 @@ import type { SurfaceQuery, SurfaceHit } from "foss-earth/runtime";
 import { createTerrainContact, syncTerrainContact } from "./terrainContact";
 import { createFixedStepPhysicsLoop } from "./fixedStepLoop";
 import { bootstrapC172p } from "../jsbsim/bootstrapC172";
+import { getFdmProfile } from "../jsbsim/fdmProfiles";
+
+const C172_STATIC_METERS = getFdmProfile("cessna-172").stance.staticMeters;
 
 describe("displayed terrain contact", () => {
   it("does not halt flight for a transient optional visible-mesh miss", () => {
@@ -28,7 +31,7 @@ describe("displayed terrain contact", () => {
   it("uses Google terrain chosen at the flight-ready World detail regardless of geometric-error metadata", () => {
     const properties: Record<string, number> = {
       "position/lat-geod-deg": 34, "position/long-gc-deg": -118,
-      "position/h-sl-ft": 301.33 / 0.3048,
+      "position/h-sl-ft": (300 + C172_STATIC_METERS) / 0.3048,
     };
     const sdk = {
       getPropertyValue: vi.fn((property: string) => properties[property] ?? 0),
@@ -53,7 +56,7 @@ describe("displayed terrain contact", () => {
   it("holds Google contact only when the caller's World-detail policy requires it", () => {
     const properties: Record<string, number> = {
       "position/lat-geod-deg": 34, "position/long-gc-deg": -118,
-      "position/h-sl-ft": 301.33 / 0.3048,
+      "position/h-sl-ft": (300 + C172_STATIC_METERS) / 0.3048,
     };
     const sdk = {
       getPropertyValue: vi.fn((property: string) => properties[property] ?? 0),
@@ -220,7 +223,7 @@ describe("displayed terrain contact", () => {
     properties["position/h-sl-ft"] = 200 / 0.3048;
     hit = { heightMeters: 260, revision: 2 } as SurfaceHit;
     expect(contact.update(true)).toBe("reset");
-    expect(sdk.setPropertyValue).toHaveBeenCalledWith("ic/h-sl-ft", expect.closeTo(261.33 / 0.3048, 1));
+    expect(sdk.setPropertyValue).toHaveBeenCalledWith("ic/h-sl-ft", expect.closeTo((260 + C172_STATIC_METERS) / 0.3048, 1));
   });
 
   it("does not reposition a parked aircraft when single frames of surface go missing", () => {
@@ -229,7 +232,7 @@ describe("displayed terrain contact", () => {
     // off its own springs every time - sinking, then popping back up.
     const properties: Record<string, number> = {
       "position/lat-geod-deg": 44.98, "position/long-gc-deg": -93.27,
-      "position/h-sl-ft": 251.33 / 0.3048,
+      "position/h-sl-ft": (250 + C172_STATIC_METERS) / 0.3048,
     };
     const sdk = {
       getPropertyValue: vi.fn((property: string) => properties[property] ?? 0),
@@ -244,7 +247,7 @@ describe("displayed terrain contact", () => {
 
     for (let step = 0; step < 200; step += 1) {
       // Settled on the springs, a few centimetres below the nominal stance.
-      properties["position/h-sl-ft"] = (250 + 1.29) / 0.3048;
+      properties["position/h-sl-ft"] = (250 + C172_STATIC_METERS - 0.04) / 0.3048;
       hit = step % 7 === 0 ? null : { heightMeters: 250, revision: 1 } as SurfaceHit;
       expect(contact.update(false)).not.toBe("reset");
     }
@@ -256,7 +259,7 @@ describe("displayed terrain contact", () => {
     // oleos ringing; a real wheel bridges anything shorter than its footprint.
     const properties: Record<string, number> = {
       "position/lat-geod-deg": 44.98, "position/long-gc-deg": -93.27,
-      "position/h-sl-ft": 251.33 / 0.3048,
+      "position/h-sl-ft": (250 + C172_STATIC_METERS) / 0.3048,
     };
     const elevations: number[] = [];
     const sdk = {

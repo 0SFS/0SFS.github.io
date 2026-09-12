@@ -1,3 +1,8 @@
+import { getFdmProfile } from "../jsbsim/fdmProfiles";
+import { AIRCRAFT_IDS, type AircraftId, isAircraftId } from "./aircraftIds";
+
+export { AIRCRAFT_IDS, isAircraftId };
+
 /**
  * Selectable aircraft and their level-of-detail meshes.
  *
@@ -7,8 +12,11 @@
  * a pure rotation, not a mirror, so chirality (propeller twist) is preserved.
  */
 
-export const AIRCRAFT_IDS = ["cessna-172", "cirrus-vision-jet"] as const;
-export type AircraftId = (typeof AIRCRAFT_IDS)[number];
+/** Drop each visual root to align with its profile's settled ground stance. */
+const MODEL_OFFSET_Y_BY_ID: Record<AircraftId, number> = {
+  "cessna-172": -getFdmProfile("cessna-172").stance.staticMeters,
+  "cirrus-vision-jet": -getFdmProfile("cirrus-vision-jet").stance.staticMeters,
+};
 
 // Level NUMBERS run coarsest-first: lod0 is the silhouette and each step up
 // adds detail, so a bigger number is always a better mesh. That is the
@@ -64,10 +72,8 @@ export interface AircraftDefinition {
   modelYawRad: number;
   /**
    * Model offset in body axes. The sim keeps the aircraft reference point
-   * `aircraftClearanceMeters()` above the terrain - 1.33 m level, the stance
-   * the c172p gear actually settles at - while the exported models put their
-   * origin on the ground between the wheels, so the visual is dropped by that
-   * stance to stand on the runway rather than sunk into it.
+   * above the terrain by the profile-dependent stance, while exported meshes
+   * sit near the ground plane.
    */
   modelOffset: { x: number; y: number; z: number };
   /**
@@ -130,7 +136,7 @@ export const AIRCRAFT_CATALOG: readonly AircraftDefinition[] = [
     label: "Cessna 172 Skyhawk",
     summary: "High-wing trainer. Flight model and visuals both available.",
     modelYawRad: Math.PI,
-    modelOffset: { x: 0, y: -1.33, z: 0 },
+    modelOffset: { x: 0, y: MODEL_OFFSET_Y_BY_ID["cessna-172"], z: 0 },
     propellerBlades: 2,
     lods: C172_LODS,
   },
@@ -139,13 +145,9 @@ export const AIRCRAFT_CATALOG: readonly AircraftDefinition[] = [
     label: "Cirrus Vision Jet",
     summary: "Single-engine V-tail jet. Visuals only — it flies the C172's model.",
     modelYawRad: Math.PI,
-    // Same -1.33 as the C172, and for the same reason rather than by
-    // coincidence: this mesh also puts its origin on the ground between the
-    // wheels, so it has to be dropped by exactly the stance the simulator
-    // holds the reference point at. That stance is the C172's, because the
-    // flight model is; a real SF50 sits lower on its own gear, so the parked
-    // attitude here is a compromise until an SF50 flight model exists.
-    modelOffset: { x: 0, y: -1.33, z: 0 },
+    // The temporary profile keeps the dropped mesh aligned until a true SF50
+    // stance enters the flight profile package.
+    modelOffset: { x: 0, y: MODEL_OFFSET_Y_BY_ID["cirrus-vision-jet"], z: 0 },
     // A jet: the propeller-disc logic must never engage.
     propellerBlades: 0,
     lods: CIRRUS_LODS,
@@ -154,10 +156,6 @@ export const AIRCRAFT_CATALOG: readonly AircraftDefinition[] = [
 
 export function getAircraftDefinition(id: AircraftId): AircraftDefinition {
   return AIRCRAFT_CATALOG.find((entry) => entry.id === id) ?? AIRCRAFT_CATALOG[0];
-}
-
-export function isAircraftId(value: unknown): value is AircraftId {
-  return typeof value === "string" && (AIRCRAFT_IDS as readonly string[]).includes(value);
 }
 
 export function isAircraftLodId(value: unknown): value is AircraftLodId {

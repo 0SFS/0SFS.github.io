@@ -78,6 +78,7 @@ import type { FlightStatusOverlayState } from "./hud/FlightStatusOverlay";
 import { attachFlightCameraInput } from "./input/flightCameraInput";
 import { applyFlightControls } from "./input/applyFlightControls";
 import { createAutoTrimState, setAutoTrimEnabled, stepPitchAutoTrim, stepRollAutoTrim } from "./input/autoTrim";
+import { getFdmProfile } from "./jsbsim/fdmProfiles";
 import type { PhoneControlSession } from "./remote/createPhoneControlSession";
 import type { PhonePairingDialog } from "./hud/createPhonePairingDialog";
 import { createFlightInputManager } from "./input/flightInputManager";
@@ -229,6 +230,10 @@ export async function createFlightSimApp(
     baseMap: options.baseMap,
     preferGoogleTiles: options.preferGoogleTiles,
   });
+  const initialAircraftId: AircraftId = readPreference(
+    AIRCRAFT_PREFERENCE_KEY, LEGACY_AIRCRAFT_PREFERENCE_KEY,
+    isAircraftId, "cessna-172",
+  );
   // `null` means follow the local automatic recommendation. A manual target
   // remains in local storage and is reapplied before terrain preparation
   // starts, including when Google Tiles are selected after launch.
@@ -320,6 +325,7 @@ export async function createFlightSimApp(
   void terrainReady.catch(() => {});
   const jsbsimPromise = createJsbsimRuntime({
     dataBaseUrl: options.dataBaseUrl,
+    aircraftId: initialAircraftId,
     onProgress: progress => loading.setPhase("flight", {
       state: "loading", detail: progress.message, progress: progress.progress,
     }),
@@ -445,7 +451,7 @@ export async function createFlightSimApp(
     getArcadeGroundLaunches: () => arcadeGroundLaunches,
   });
   const flightSurface = createFrameSurfaceQuery(runtime.surface);
-  const terrainContact = createTerrainContact(jsbsim.sdk, flightSurface);
+  const terrainContact = createTerrainContact(jsbsim.sdk, flightSurface, getFdmProfile(initialAircraftId).stance);
   const visibleMeshCollision = createVisibleMeshCollision(jsbsim.sdk, flightSurface, {
     getRestitution: () => arcadeGroundLaunches ? 1.35 : 0.25,
   });
@@ -524,7 +530,7 @@ export async function createFlightSimApp(
     applyGroundRuntime();
   };
   applyGroundRuntime();
-  let aircraftId: AircraftId = readPreference(AIRCRAFT_PREFERENCE_KEY, LEGACY_AIRCRAFT_PREFERENCE_KEY, isAircraftId, "cessna-172");
+  let aircraftId: AircraftId = initialAircraftId;
   let aircraftLodId: AircraftLodId = readPreference(AIRCRAFT_LOD_PREFERENCE_KEY, LEGACY_AIRCRAFT_LOD_PREFERENCE_KEY, isAircraftLodId, "auto");
   let optInLodsEnabled = readPreference(
     AIRCRAFT_OPT_IN_PREFERENCE_KEY, AIRCRAFT_OPT_IN_PREFERENCE_KEY,

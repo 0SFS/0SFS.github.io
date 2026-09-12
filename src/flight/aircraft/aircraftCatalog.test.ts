@@ -9,6 +9,7 @@ import {
   selectAutoLod,
   type AircraftDefinition,
 } from "./aircraftCatalog";
+import { getFdmProfile } from "../jsbsim/fdmProfiles";
 
 const c172 = getAircraftDefinition("cessna-172");
 const cirrus = getAircraftDefinition("cirrus-vision-jet");
@@ -98,7 +99,8 @@ describe("aircraft catalog", () => {
     // Both meshes put their origin on the ground between the wheels, so both
     // are dropped by STATIC_STANCE_METERS. See docs/ground-contact.md.
     for (const definition of AIRCRAFT_CATALOG) {
-      expect(definition.modelOffset).toEqual({ x: 0, y: -1.33, z: 0 });
+      const profile = getFdmProfile(definition.id);
+      expect(definition.modelOffset).toEqual({ x: 0, y: -profile.stance.staticMeters, z: 0 });
       expect(definition.modelYawRad).toBe(Math.PI);
     }
   });

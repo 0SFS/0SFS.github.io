@@ -42,7 +42,8 @@ async function aircraftAt(rollDeg: number, pitchDeg: number, aglMeters: number) 
   for (const file of manifest.files) sdk.writeDataFile(file, readFileSync(`public/jsbsim-data/${file}`, "utf8"));
   sdk.configurePaths({ rootDir: "/runtime", aircraftPath: "aircraft", enginePath: "engine", systemsPath: "systems" });
   sdk.loadModel("c172p");
-  for (const [property, value] of Object.entries({ "simulation/dt": FIXED_DT,
+  sdk.setDt(FIXED_DT);
+  for (const [property, value] of Object.entries({
     "ic/lat-geod-deg": 34, "ic/long-gc-deg": -118.3,
     "ic/h-sl-ft": (300 + aglMeters) / 0.3048, "ic/terrain-elevation-ft": 300 / 0.3048,
     "ic/phi-deg": rollDeg, "ic/theta-deg": pitchDeg, "ic/vc-kts": 80 })) sdk.setPropertyValue(property, value);

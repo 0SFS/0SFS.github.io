@@ -1,7 +1,8 @@
 import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
 import type { SurfaceQuery } from "foss-earth/runtime";
 import { flightLog } from "../diagnostics/flightLog";
-import { aircraftClearanceMeters, captureSimulation, restoreSimulation } from "./safeFlightState";
+import { getFdmProfile } from "../jsbsim/fdmProfiles";
+import { aircraftClearanceMeters, type AircraftClearanceStance, captureSimulation, restoreSimulation } from "./safeFlightState";
 import { createWheelGroundFilter } from "./wheelGroundFilter";
 
 /**
@@ -64,7 +65,11 @@ const WHEELS_CLEAR_METERS = 5;
 
 export type TerrainBlockReason = "missing" | "coarse" | null;
 
-export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
+export function createTerrainContact(
+  sdk: JSBSimSdk,
+  surface: SurfaceQuery,
+  clearanceProfile: AircraftClearanceStance = getFdmProfile("cessna-172").stance,
+) {
   // `height` is the raw sample, used to detect the world changing. `ground` is
   // what the wheels ride on and what JSBSim is given.
   let previous: { lat: number; lon: number; height: number; ground: number; revision: number; clearance: number; resting: boolean } | null = null;
@@ -157,8 +162,11 @@ export function createTerrainContact(sdk: JSBSimSdk, surface: SurfaceQuery) {
         });
       }
       const altitude = sdk.getPropertyValue("position/h-sl-ft") * 0.3048;
-      const clearance = aircraftClearanceMeters(sdk.getPropertyValue("attitude/phi-deg") * Math.PI / 180,
-        sdk.getPropertyValue("attitude/theta-deg") * Math.PI / 180);
+      const clearance = aircraftClearanceMeters(
+        clearanceProfile,
+        sdk.getPropertyValue("attitude/phi-deg") * Math.PI / 180,
+        sdk.getPropertyValue("attitude/theta-deg") * Math.PI / 180,
+      );
       let refinementDelta = 0;
       if (previous && hit.revision !== previous.revision) {
         // Compare two versions at ONE coordinate, never two heights along a flight path.

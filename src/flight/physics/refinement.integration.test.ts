@@ -7,6 +7,9 @@ import { createTerrainContact } from "./terrainContact";
 import { createFixedStepPhysicsLoop, FIXED_DT } from "./fixedStepLoop";
 import { readFlightState } from "../bridge/ecefBridge";
 import { resetFlightLocation } from "../jsbsim/resetFlightLocation";
+import { getFdmProfile } from "../jsbsim/fdmProfiles";
+
+const C172_STATIC_METERS = getFdmProfile("cessna-172").stance.staticMeters;
 
 async function setup(altitude = 400, terrain = 300) {
   const sdk = await JSBSimSdk.create({ moduleUrl: wasmModuleUrl, wasmUrl: wasmBinaryUrl,
@@ -15,7 +18,8 @@ async function setup(altitude = 400, terrain = 300) {
   for (const file of manifest.files) sdk.writeDataFile(file, readFileSync(`public/jsbsim-data/${file}`, "utf8"));
   sdk.configurePaths({ rootDir: "/runtime", aircraftPath: "aircraft", enginePath: "engine", systemsPath: "systems" });
   sdk.loadModel("c172p");
-  for (const [property, value] of Object.entries({ "simulation/dt": FIXED_DT, "ic/lat-geod-deg": 34,
+  sdk.setDt(FIXED_DT);
+  for (const [property, value] of Object.entries({ "ic/lat-geod-deg": 34,
     "ic/long-gc-deg": -118.3, "ic/h-sl-ft": altitude / 0.3048, "ic/terrain-elevation-ft": terrain / 0.3048,
     "ic/psi-true-deg": 45, "ic/vc-kts": 100 })) sdk.setPropertyValue(property, value);
   sdk.runIc();
@@ -69,12 +73,12 @@ describe("terrain refinement physics regressions", () => {
     expect(readFlightState(sdk).altMeters).toBeCloseTo(400, 3);
   });
   it("follows a downward refinement when resting on the surface", async () => {
-    const sdk = await setup(301.33); sdk.setPropertyValue("ic/vc-kts", 0); sdk.runIc();
+    const sdk = await setup(300 + C172_STATIC_METERS); sdk.setPropertyValue("ic/vc-kts", 0); sdk.runIc();
     let height = 300, revision = 0;
     const contact = createTerrainContact(sdk, surfaceAt(() => height, () => revision));
     contact.update(); height = 200; revision++;
     expect(contact.update()).toBe("reset");
-    expect(readFlightState(sdk).altMeters).toBeCloseTo(201.33, 2);
+    expect(readFlightState(sdk).altMeters).toBeCloseTo(200 + C172_STATIC_METERS, 2);
   });
   it("setting altitude to 500 discards a stale 1500m floor before RunIC", async () => {
     const sdk = await setup(2000, 1500);

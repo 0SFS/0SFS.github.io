@@ -62,21 +62,12 @@ export function restoreSimulation(sdk: JSBSimSdk, snapshot: SimulationSnapshot):
   for (const [property, value] of Object.entries(snapshot.controls)) sdk.setPropertyValue(property, value);
 }
 
-/**
- * Height of the aircraft reference point above the ground when the gear is
- * settled on it, measured from the c172p flight model itself: dropped onto a
- * known terrain elevation and left to settle, it rests 1.33 m up with 4-7 cm
- * of oleo compression at a 2.5 deg nose-high stance.
- *
- * Anything that places the aircraft on the ground has to use this number. A
- * placement target even a few centimetres above it leaves the gear extended,
- * the aircraft sinks back onto its springs, and the next placement lifts it
- * again - which reads as sinking into quicksand and being teleported out.
- */
-export const STATIC_STANCE_METERS = 1.33;
-
-/** The nose-high attitude that stance is measured at. */
-const STATIC_PITCH_RAD = 2.48 * Math.PI / 180;
+export interface AircraftClearanceStance {
+  staticMeters: number;
+  staticPitchRad: number;
+  pitchArmMeters: number;
+  rollArmMeters: number;
+}
 
 /**
  * Conservative C172 envelope about the reference point: the stance, grown to
@@ -88,8 +79,14 @@ const STATIC_PITCH_RAD = 2.48 * Math.PI / 180;
  * sitting on its own wheels, which is exactly the gap that made repositioning
  * bounce it.
  */
-export function aircraftClearanceMeters(roll: number, pitch: number): number {
-  const excessPitch = Math.max(0, Math.abs(Math.sin(pitch)) - Math.sin(STATIC_PITCH_RAD));
-  return excessPitch * 4.5 + Math.abs(Math.sin(roll) * Math.cos(pitch)) * 5.5
-    + Math.abs(Math.cos(roll) * Math.cos(pitch)) * STATIC_STANCE_METERS;
+export function aircraftClearanceMeters(
+  stance: AircraftClearanceStance,
+  roll: number,
+  pitch: number,
+): number {
+  const staticPitchSine = Math.sin(stance.staticPitchRad);
+  const excessPitch = Math.max(0, Math.abs(Math.sin(pitch)) - staticPitchSine);
+  return excessPitch * stance.pitchArmMeters
+    + Math.abs(Math.sin(roll) * Math.cos(pitch)) * stance.rollArmMeters
+    + Math.abs(Math.cos(roll) * Math.cos(pitch)) * stance.staticMeters;
 }

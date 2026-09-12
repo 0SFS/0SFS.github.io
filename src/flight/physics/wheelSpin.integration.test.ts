@@ -18,7 +18,8 @@ async function setup() {
   for (const file of manifest.files) sdk.writeDataFile(file, readFileSync(`public/jsbsim-data/${file}`, "utf8"));
   sdk.configurePaths({ rootDir: "/runtime", aircraftPath: "aircraft", enginePath: "engine", systemsPath: "systems" });
   expect(sdk.loadModel("c172p")).toBe(true);
-  for (const [property, value] of Object.entries({ "simulation/dt": FIXED_DT, "ic/lat-geod-deg": 34,
+  sdk.setDt(FIXED_DT);
+  for (const [property, value] of Object.entries({ "ic/lat-geod-deg": 34,
     "ic/long-gc-deg": -118.3, "ic/h-sl-ft": 301.6 / METERS_PER_FOOT,
     "ic/terrain-elevation-ft": 300 / METERS_PER_FOOT, "ic/psi-true-deg": 0,
     "ic/theta-deg": 2.48, "ic/phi-deg": 0, "ic/vc-kts": 50,

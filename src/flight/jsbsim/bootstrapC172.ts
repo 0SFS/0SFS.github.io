@@ -1,5 +1,7 @@
 import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
-import { PHYSICS_HZ } from "../physics/fixedStepLoop";
+import type { AircraftId } from "../aircraft/aircraftIds";
+import { FIXED_DT } from "../physics/fixedStepLoop";
+import { getFdmProfile } from "./fdmProfiles";
 
 export interface C172BootstrapOptions {
   /** Geodetic latitude in degrees. Default: KMSP area. */
@@ -15,6 +17,11 @@ export interface C172BootstrapOptions {
   /** Start with engine running. */
   engineRunning?: boolean;
 }
+
+type JsbsimTimingApi = JSBSimSdk & {
+  setDt?: (deltaSeconds: number) => void;
+  getDeltaT?: () => number;
+};
 
 export const START_ALTITUDE_AGL_METERS = 5000 * 0.3048;
 export const DEFAULT_FLIGHT_START = { latDeg: 44.977753, lonDeg: -93.265011 };
@@ -33,11 +40,26 @@ function mixtureForAltitude(altitudeFt: number): number {
   return Math.min(1, Math.max(0, pressureRatio * 1.3));
 }
 
-export async function bootstrapC172p(
+function applyFixedDeltaT(sdk: JSBSimSdk, deltaSeconds: number): void {
+  const timing = sdk as JsbsimTimingApi;
+  if (typeof timing.setDt !== "function") {
+    throw new Error("JSBSim SDK is missing setDt(); cannot configure the simulation timestep.");
+  }
+  timing.setDt(deltaSeconds);
+  const actual = timing.getDeltaT?.();
+  if (actual !== undefined && Number.isFinite(actual) && Math.abs(actual - deltaSeconds) > 1e-9) {
+    throw new Error(`JSBSim dt mismatch: expected ${deltaSeconds}s, got ${actual}s.`);
+  }
+}
+
+export async function bootstrapAircraft(
   sdk: JSBSimSdk,
+  aircraftId: AircraftId,
   options: C172BootstrapOptions = {},
 ): Promise<void> {
   const opts = { ...DEFAULT_OPTIONS, ...options };
+  const profile = getFdmProfile(aircraftId);
+  const isPiston = profile.engine === "piston";
 
   sdk.configurePaths({
     rootDir: "/runtime",
@@ -46,12 +68,12 @@ export async function bootstrapC172p(
     systemsPath: "systems",
   });
 
-  if (!sdk.loadModel("c172p")) {
-    throw new Error("JSBSim failed to load the c172p aircraft model.");
+  if (!sdk.loadModel(profile.model)) {
+    throw new Error(`JSBSim failed to load the ${aircraftId} aircraft model (${profile.model}).`);
   }
 
-  sdk.setPropertyValue("simulation/dt", 1 / PHYSICS_HZ);
-  sdk.setPropertyValue("ic/lat-gc-deg", opts.latDeg);
+  applyFixedDeltaT(sdk, FIXED_DT);
+  sdk.setPropertyValue("ic/lat-geod-deg", opts.latDeg);
   sdk.setPropertyValue("ic/long-gc-deg", opts.lonDeg);
   sdk.setPropertyValue("ic/h-sl-ft", opts.altFt);
   sdk.setPropertyValue("ic/psi-true-deg", opts.headingDeg);
@@ -62,12 +84,18 @@ export async function bootstrapC172p(
   sdk.setPropertyValue("ic/flap-pos-norm", 0);
 
   if (!sdk.runIc()) {
-    throw new Error("JSBSim RunIC failed for c172p initial conditions.");
+    throw new Error(`JSBSim RunIC failed for ${aircraftId} initial conditions.`);
   }
 
-  sdk.setPropertyValue("fcs/throttle-cmd-norm", 0.65);
+  sdk.setPropertyValue("fcs/throttle-cmd-norm", profile.initialThrottleNorm);
   if (opts.engineRunning) sdk.setPropertyValue("propulsion/set-running", -1);
   else sdk.setPropertyValue("propulsion/engine/set-running", 0);
-  sdk.setPropertyValue("propulsion/magneto_cmd", opts.engineRunning ? 3 : 0);
-  sdk.setPropertyValue("fcs/mixture-cmd-norm", mixtureForAltitude(opts.altFt));
+  if (isPiston) {
+    sdk.setPropertyValue("propulsion/magneto_cmd", opts.engineRunning ? 3 : 0);
+    sdk.setPropertyValue("fcs/mixture-cmd-norm", mixtureForAltitude(opts.altFt));
+  }
+}
+
+export async function bootstrapC172p(sdk: JSBSimSdk, options: C172BootstrapOptions = {}): Promise<void> {
+  return bootstrapAircraft(sdk, "cessna-172", options);
 }

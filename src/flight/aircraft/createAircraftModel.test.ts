@@ -1,6 +1,7 @@
 import { AssetContainer, Mesh, NullEngine, Scene, TransformNode } from "@babylonjs/core";
 import { describe, expect, it, vi } from "vitest";
 import { createAircraftModel, type AircraftModelState } from "./createAircraftModel";
+import { getFdmProfile } from "../jsbsim/fdmProfiles";
 
 function setup() {
   const engine = new NullEngine();
@@ -113,7 +114,7 @@ describe("aircraft model loader", () => {
     const yaw = model.root.rotationQuaternion!.toEulerAngles().y;
     expect(Math.abs(Math.sin(yaw))).toBeCloseTo(0, 6);
     expect(Math.cos(yaw)).toBeCloseTo(-1, 6);
-    expect(model.root.position.y).toBeCloseTo(-1.33, 6);
+    expect(model.root.position.y).toBeCloseTo(-getFdmProfile("cessna-172").stance.staticMeters, 6);
 
     model.dispose();
     t.teardown();

@@ -5,13 +5,15 @@ import { afterEach, describe, expect, it } from "vitest";
 import type { SurfaceHit, SurfaceQuery } from "foss-earth/runtime";
 import { createTerrainContact } from "./terrainContact";
 import { createFixedStepPhysicsLoop, FIXED_DT } from "./fixedStepLoop";
+import { getFdmProfile } from "../jsbsim/fdmProfiles";
 
 const METERS_PER_FOOT = 0.3048;
 const INITIAL_GROUND_METERS = 300;
+const C172_STATIC_METERS = getFdmProfile("cessna-172").stance.staticMeters;
 const instances: JSBSimSdk[] = [];
 afterEach(() => { for (const sdk of instances.splice(0)) sdk.destroy(); });
 
-async function setup(altitude = 301.33, speedKts = 10, descentFps = 0) {
+async function setup(altitude = INITIAL_GROUND_METERS + C172_STATIC_METERS, speedKts = 10, descentFps = 0) {
   const sdk = await JSBSimSdk.create({ moduleUrl: wasmModuleUrl, wasmUrl: wasmBinaryUrl,
     persistence: { enabled: false }, log: { console: false } });
   instances.push(sdk);
@@ -19,7 +21,8 @@ async function setup(altitude = 301.33, speedKts = 10, descentFps = 0) {
   for (const file of manifest.files) sdk.writeDataFile(file, readFileSync(`public/jsbsim-data/${file}`, "utf8"));
   sdk.configurePaths({ rootDir: "/runtime", aircraftPath: "aircraft", enginePath: "engine", systemsPath: "systems" });
   sdk.loadModel("c172p");
-  for (const [property, value] of Object.entries({ "simulation/dt": FIXED_DT, "ic/lat-geod-deg": 34,
+  sdk.setDt(FIXED_DT);
+  for (const [property, value] of Object.entries({ "ic/lat-geod-deg": 34,
     "ic/long-gc-deg": -118.3, "ic/h-sl-ft": altitude / METERS_PER_FOOT,
     "ic/terrain-elevation-ft": INITIAL_GROUND_METERS / METERS_PER_FOOT,
     "ic/psi-true-deg": 0, "ic/theta-deg": 2.48, "ic/vc-kts": speedKts, "ic/vd-fps": descentFps,
@@ -63,7 +66,7 @@ function advance(sdk: JSBSimSdk, loop: ReturnType<typeof createFixedStepPhysicsL
 describe("ground contact energy regressions with real JSBSim", () => {
   it.each([{ speedKts: 10, rise: 0.6 }, { speedKts: 10, rise: 1 }, { speedKts: 10, rise: 2 }, { speedKts: 10, rise: 5 },
     { speedKts: 100, rise: 5 }, { speedKts: 150, rise: 5 }])("stops a known $rise m barrier at $speedKts kt before its penetration fires the gear springs", async ({ speedKts, rise }) => {
-    const sdk = await setup(301.33, speedKts);
+    const sdk = await setup(INITIAL_GROUND_METERS + C172_STATIC_METERS, speedKts);
     const { state, surface } = terrain();
     const contact = createTerrainContact(sdk, surface);
     const loop = createFixedStepPhysicsLoop(sdk);
@@ -134,7 +137,7 @@ describe("ground contact energy regressions with real JSBSim", () => {
     // Account for integration error, without suppressing the physical spring rebound.
     expect(result.maxEnergy).toBeLessThan(before.energy + 0.1);
     expect(after.energy).toBeLessThan(before.energy);
-    expect(after.altitude).toBeCloseTo(301.33, 1);
+    expect(after.altitude).toBeCloseTo(INITIAL_GROUND_METERS + C172_STATIC_METERS, 1);
     expect(sdk.getPropertyValue("gear/unit[1]/WOW")).toBe(1);
   });
   it("keeps a powered engine running across a surface refinement", async () => {
