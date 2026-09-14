@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-13",
+  "purpose": "Rename the browser package from @felipegalind0/jsbsim-wasm to @felipegalind0/jsbsim. The old name described a separate SDK source that no longer exists after the in-tree consolidation.",
+  "behaviourChange": "none intended",
+  "source": {
+    "repository": "/Users/felg/gh/Felipegalind0/jsbsim",
+    "branch": "feature/jsbsim-package-rename",
+    "commit": "e727e6f1bdb9c616c14858025844b36cc47bc7b2",
+    "parent": "c328c7ab6d81e6de68b8db2115c35d350b226025",
+    "changedPaths": ["wasm/package.json", "wasm/package-lock.json", "wasm/README.md", "wasm/docs/centralized-builds.md"],
+    "engineAndSdkCodeUnchanged": true,
+    "dirty": false
+  },
+  "identity": {
+    "package": "@felipegalind0/jsbsim@1.2.4-fork.5",
+    "previousPackage": "@felipegalind0/jsbsim-wasm@1.2.4-fork.4",
+    "repositoryContentSha256": "ca56f7cdfb989d38b5d2783597be93c3766bdd9ca2218724106dcfc54b187cff",
+    "sdkSubtreeSha256": "0c7c82faaafedbc2f96d158c9745cdb48c84c161953e0a5622e3b4d0f9169d58",
+    "buildInputSha256": "837a8746acab8263c77ae351988238c77f9d492cbf2d3083bad4c6c2ff3736e8",
+    "tarballSha256": "9312e2b657fd5f396f6ed55904616b907d387c9cd76d98ca66ad756cf3d8aa52",
+    "tarballIntegrity": "sha512-eAFv3Xj2feXkqymBiS0ie2rMwRFp6IwG/Lheub7xjxrCIlxeCJAaOZLy53i5kCYaHguSFrf6mUkvCZvnwUZ55Q==",
+    "emittedLoaderSha256": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+    "emittedWasmSha256": "d848696de238128cee41c34e7e63951af9563eebdef6ddb631adfb02f989f1b1"
+  },
+  "buildReproducibility": {
+    "status": "not-reproducible",
+    "finding": "Rebuilding the same commit with the same toolchain on the same machine produced a different WASM binary.",
+    "observedWasmSha256": [
+      "d848696de238128cee41c34e7e63951af9563eebdef6ddb631adfb02f989f1b1",
+      "950433d3036d1bb77c7f96b3b3cc4e96d3c7a04c7e7b6264a20cd71075a1f76a"
+    ],
+    "sizeBytesBothBuilds": 2198897,
+    "differingBytes": 1417,
+    "loaderByteIdentical": true,
+    "causeAssigned": false,
+    "likelyCandidate": "parallel optimisation-pass ordering in native codegen/link",
+    "consequence": "A shipped binary cannot be re-derived from its source revision. The tarball is the authority, not the commit. A hash difference between two builds of one revision is not evidence of a source or behaviour change.",
+    "adoptedArtifact": "The first build, packed and hash-locked; the second was discarded and the accepted pointers were restored and re-verified."
+  },
+  "appChanges": [
+    "56 import specifiers across 41 files in src/, scripts/ and vite.config.ts.",
+    "package.json declaration and package-lock.json.",
+    "jsbsimBuildIdentity.ts now pairs every accepted version with the exact name it was published under and exports expectedJsbsimPackageName plus JSBSIM_ACCEPTED_PACKAGE_NAMES.",
+    "verify-jsbsim-artifact.mjs resolves the declared package name from that accepted set instead of a single constant, and requires exactly one declared JSBSim dependency.",
+    "docs/jsbsim-wasm.md renamed to docs/jsbsim.md with all inbound links retargeted."
+  ],
+  "gateStrengthChange": "The identity gate is strictly stronger: it now also rejects a renamed package claiming a pre-rename version, and the verifier rejects more than one declared JSBSim dependency.",
+  "preservedDeliberately": [
+    "0x62/jsbsim-wasm MIT notice and Benedict Lewis's copyright in wasm/LICENSE and the packed notices.",
+    "The upstream 0x62 demo link and open SDK PR #8 references.",
+    "The retired standalone checkout path under /Users/felg/gh/.preservation/.../retired-jsbsim-wasm, which is a real path on disk.",
+    "Dated validation records and the fork.1-fork.4 tarball filenames, which are identified by name plus SHA-256 and were not rewritten."
+  ],
+  "checks": {
+    "sdkBuild": { "status": "passed", "tests": 50, "suites": 9, "log": "fork5-build.log" },
+    "browserPersistence": { "status": "passed", "log": "fork5-browser.log" },
+    "releasePack": { "status": "passed", "releaseEligible": true, "log": "fork5-pack.log" },
+    "installedArtifactIdentity": { "status": "passed", "verifiedFiles": 14, "log": "fork5-verify.log" },
+    "identityAndVerifierGates": { "status": "passed", "tests": 48, "files": 2, "log": "rename-gate-tests.log" },
+    "fullAppSuite": {
+      "status": "passed-except-pre-existing",
+      "passed": 943,
+      "failed": 16,
+      "log": "fork5-all-tests.log",
+      "note": "All 16 failures are pre-existing and unrelated to the rename. 10 are in createFlightSimApp.phone.test.ts, whose committed vi.mock of aircraftCatalog predates the normalizeAircraftSelection export added by the user's uncommitted aircraft-family work. 6 are in preserved foss-earth recovery copies under build/validation/ that vitest globs. Neither references the package."
+    },
+    "productionBuild": { "status": "passed", "log": "fork5-production-build.log" },
+    "browserArtifact": { "status": "passed", "aircraft": ["cessna-172", "cirrus-vision-jet", "cirrus-vision-jet-g2", "cirrus-vision-jet-g3"], "log": "fork5-browser-artifact.log" },
+    "familyUi": { "status": "passed", "viewports": ["wide", "narrow", "short"], "log": "fork5-aircraft-ui.log" },
+    "nativeWasmParity": {
+      "status": "passed",
+      "scenarios": 4,
+      "maximumNormalizedError": 0.00014851043486171765,
+      "log": "fork5-parity.log",
+      "report": "runtime-fork5-parity.json",
+      "note": "Identical to the fork.3 and fork.4 results, which is the available behavioural evidence that the rename changed nothing, given the binary is not reproducible."
+    }
+  },
+  "rollback": {
+    "retainedTarballs": {
+      "1.2.4-fork.1": "81369af4b23e71c4a067ae730cb6a9ac8ff95fa9d1d9ceb80ff1bdc412d50628",
+      "1.2.4-fork.2": "ca9f22b23c1444c2dc1ff80fc8d7fc877bb607f71534ea5a64bab3965bfc468a",
+      "1.2.4-fork.3": "43d0fe826fe0948d6e9049f90aa8d4ffd780844f859effda38ec22da81de0171",
+      "1.2.4-fork.4": "957156d73ce44672621d0f0163fbefa753b53bddcc577b7f24da5ee25c4f1474",
+      "1.2.4-fork.5": "9312e2b657fd5f396f6ed55904616b907d387c9cd76d98ca66ad756cf3d8aa52"
+    },
+    "preAdoptionFiles": "before-fork5-adoption/",
+    "note": "fork.1 through fork.4 keep the pre-rename package name, so rolling back to one requires restoring that release's declaration, lock and jsbsimBuildIdentity.ts together."
+  },
+  "notDone": [
+    "The turbine trim fuel-flow fix (7511df10) is deliberately not in this package; it is a separate adoption cycle.",
+    "No hosted CI run is claimed for this revision.",
+    "No aircraft calibration, AFM fit or terrain claim is made."
+  ]
+}

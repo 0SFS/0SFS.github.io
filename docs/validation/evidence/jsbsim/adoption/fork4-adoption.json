@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-13",
+  "purpose": "Adopt the upstream-contributed IDBFS linkage and native-exception build corrections into the full working SDK and the installed app package.",
+  "source": {
+    "repository": "/Users/felg/gh/Felipegalind0/jsbsim",
+    "branch": "feature/wasm-integration-idbfs-exceptions",
+    "commit": "c328c7ab6d81e6de68b8db2115c35d350b226025",
+    "parent": "f7a80a6f064d22efe0591c20c8637b9c38179ba9",
+    "portedFrom": { "branch": "feature/wasm-package", "commit": "c6d4063ab7dd7721f280d03726ead85355ad8e57", "pullRequest": "JSBSim #1507" },
+    "nativeSourceUnchangedVsParent": ["src", "tests"],
+    "dirty": false
+  },
+  "identity": {
+    "package": "@felipegalind0/jsbsim-wasm@1.2.4-fork.4",
+    "repositoryContentSha256": "fed5354cb2a5eeaaf4114309d98658e73c851c5fef907d5deba9c23bf1986670",
+    "sdkSubtreeSha256": "c51c24715dd4f5911ba893e5f23b8ccb8e82161904615df9b6d356834bedff13",
+    "buildInputSha256": "6870e498836f4285dc480eb37b7ea4daf0748ebcf9d4beca6672db66af2c56c6",
+    "artifactSha256": "934fa6f415a323380d938bf72bc4fcbc5889625a6841f2bbac35948cf79b7fd1",
+    "tarballSha256": "957156d73ce44672621d0f0163fbefa753b53bddcc577b7f24da5ee25c4f1474",
+    "tarballIntegrity": "sha512-M/nk2vy7LuHYjdo6XZ/jgHYf+yJkbu1f+bmXpdWE01B5FF7qDUO51lio6yFvee0fG8ByPa6OVTts4UWFHizSrQ==",
+    "emittedLoaderSha256": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+    "emittedWasmSha256": "64f6cbc0f364863cd2e8f4c8b3183c5fdb245101764878e49e44f617f8e9f885"
+  },
+  "toolchain": {
+    "node": "v26.8.2", "npm": "11.19.1", "cmake": "cmake version 4.4.3",
+    "emscripten": "emcc 6.0.9-git (Homebrew)", "clang": "clang version 24.0.0git",
+    "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3",
+    "platform": "darwin", "arch": "arm64",
+    "appleClangNative": "Apple clang (build/native)",
+    "playwright": "1.63.0", "chromium": "153.0.8010.12"
+  },
+  "adoptedCorrections": [
+    "Root CMakeLists compiles native C++ object libraries with -fexceptions whenever BUILD_WASM_MODULE is ON, before add_subdirectory(src).",
+    "wasm/CMakeLists.txt links -lidbfs.js while keeping the hand-written property-batch and gear-contact extension bindings.",
+    "vfs.ts normalizes . and .. segments, rejects NUL, and exposes WasmVfsManager.resolveRoots, which rejects equal or nested runtime/persistence roots.",
+    "JSBSimSdk.create resolves and validates both roots before loading the runtime module or allocating an executive.",
+    "writeDataFile, readDataFile, mkdir, enablePersistence, syncFromPersistence and syncToPersistence now check executive lifetime.",
+    "New regressions: malformed-propulsion native catch/recovery, four persistence-boundary cases, and a pinned Playwright browser persistence check.",
+    "Build and check runners enumerate test/*.test.mjs explicitly so the browser check is not run as a unit test."
+  ],
+  "deliberatelyNotAdopted": [
+    "The review package's @jsbsim/wasm@0.1.0 identity, private/publish settings, upstream repository URL and LICENSES.md/NOTICE package-file inventory.",
+    "Removal of PropertyBatch, GearContacts, GEAR_CONTACT_FIELDS, child invalidation on model replacement, the property-batch bench and extensions.test.mjs.",
+    "Removal of source-archive extraction checks and the demo tracked-preview source-contract case."
+  ],
+  "checks": {
+    "sdkBuild": { "status": "passed", "tests": 50, "suites": 9, "log": "sdk-build-fork4.log", "note": "45 previously accepted tests plus 5 new; typecheck and WASM/TypeScript compilation included." },
+    "releasePack": { "status": "passed", "releaseEligible": true, "log": "pack-fork4.log" },
+    "browserPersistence": { "status": "passed", "browser": "Chromium 153.0.8010.12", "phases": ["write", "restore-and-delete", "verify-deletion"], "log": "browser-persistence-fork4.log", "checks": ["IDBFS linked", "text and binary survive navigation", "deletions and updates persist", "downstream PropertyBatch/GearContacts bindings retained", "executive disposed after each phase"] },
+    "negativeControl": { "status": "reproduced-the-defect", "log": "negative-control-no-engine-fexceptions.log", "note": "With the engine -fexceptions block removed, a dirty diagnostic build gives 49/50 with the malformed-propulsion test failing on an escaped native exception (excPtr: 278536). Never promoted." },
+    "nativeIsolation": { "status": "passed", "logs": ["native-isolation-configure.log", "native-isolation-build.log", "native-cc-configure.log", "native-wasm-rejection.log"], "note": "BUILD_WASM_MODULE:BOOL=OFF by default, no build/wasm directory, JSBSim 1.3.2.dev1 starts, 148 native compile commands contain no -fexceptions, and BUILD_WASM_MODULE=ON with a native compiler is rejected." },
+    "nativeRegressions": { "status": "passed", "targets": 11, "log": "native-fork4-regressions.log" },
+    "installedArtifactIdentity": { "status": "passed", "verifiedFiles": 14, "log": "app-fork4-verify.log" },
+    "focusedAppTests": { "status": "passed", "tests": 144, "files": 13, "log": "app-fork4-focused-tests.log", "note": "143 previously accepted plus the added fork.4 in-tree version case." },
+    "productionBuild": { "status": "passed", "log": "app-fork4-production-build.log", "note": "Preflight, tsc, Vite build and emitted loader/WASM hash comparison; browserLoadedAssetsVerified remains false in dist/jsbsim-artifact.json." },
+    "browserArtifact": { "status": "passed", "aircraft": ["cessna-172", "cirrus-vision-jet", "cirrus-vision-jet-g2", "cirrus-vision-jet-g3"], "log": "app-fork4-browser-artifact.log", "report": "/private/tmp/osfs-sdk-browser-fork4/report.json" },
+    "familyUi": { "status": "passed", "viewports": ["wide", "narrow", "short"], "log": "app-fork4-aircraft-ui.log", "report": "/private/tmp/osfs-aircraft-ui-fork4/report.json" },
+    "nativeWasmParity": { "status": "passed", "scenarios": 4, "maximumNormalizedError": 0.00014851043486171765, "log": "native-wasm-fork4-parity.log", "report": "runtime-fork4-parity.json" },
+    "focusedLint": { "status": "passed", "files": 4, "log": "app-fork4-eslint.log" }
+  },
+  "rollback": {
+    "retainedTarballs": {
+      "1.2.4-fork.1": "81369af4b23e71c4a067ae730cb6a9ac8ff95fa9d1d9ceb80ff1bdc412d50628",
+      "1.2.4-fork.2": "ca9f22b23c1444c2dc1ff80fc8d7fc877bb607f71534ea5a64bab3965bfc468a",
+      "1.2.4-fork.3": "43d0fe826fe0948d6e9049f90aa8d4ffd780844f859effda38ec22da81de0171",
+      "1.2.4-fork.4": "957156d73ce44672621d0f0163fbefa753b53bddcc577b7f24da5ee25c4f1474"
+    },
+    "preAdoptionFiles": "before-fork4-adoption/"
+  },
+  "limitations": [
+    "These are software, artifact and identity results. They establish no aircraft calibration, AFM fit, terrain readiness or GPU performance claim.",
+    "Browser persistence was exercised with SDK-written fixtures only; the app itself still does not enable IDBFS persistence.",
+    "Upstream review of JSBSim #1505, #1506 and #1507 is separate from this local adoption and is not claimed to be complete.",
+    "Hosted CI was not re-run for this revision; the workflow now contains the browser step but no run is claimed.",
+    "Production builds retain the large renderer-chunk warning, some jsdom app tests retain React act warnings, and the component check still records a clipped lower LOD-select focus outline."
+  ]
+}

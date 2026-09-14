@@ -6,7 +6,11 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // `build` is gitignored scratch, and the evidence tree holds frozen
+  // snapshots of earlier releases. Neither is source: linting them reports on
+  // code nobody may edit, and a rule change would break the build over files
+  // that must not be rewritten.
+  globalIgnores(['dist', 'build', 'docs/validation/evidence']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

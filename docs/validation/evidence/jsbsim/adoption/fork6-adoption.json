@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-13",
+  "purpose": "Adopt the FGTurbine zero-time trim fuel-flow fix into the app runtime. fork.5 shipped the defect: Trim() computed steady thrust and spool speeds but never assigned FuelFlow_pph, so every zero-time evaluation reported the previous operating point's fuel flow.",
+  "behaviourChange": "intended, engine fuel flow only",
+  "source": {
+    "repository": "/Users/felg/gh/Felipegalind0/jsbsim",
+    "branch": "feature/jsbsim-package-rename",
+    "commit": "0efc3e7a2351a38c7d98c109ad707ab8af5deef8",
+    "parent": "6c3547be",
+    "cherryPickedFrom": "7511df10cda909c32dfc378dfde204eb44dc5a48",
+    "upstreamPullRequest": "https://github.com/JSBSim-Team/jsbsim/pull/1508",
+    "changedPaths": ["src/models/propulsion/FGTurbine.cpp", "tests/TestTurbineTrimFuelFlow.py", "tests/CMakeLists.txt", "wasm/package.json", "wasm/package-lock.json", "wasm/README.md", "wasm/docs/centralized-builds.md"],
+    "sdkCodeUnchanged": true,
+    "dirty": false,
+    "note": "The companion spool fix (07eba55f, PR #1505) was already present in this branch's FGTurbine::Trim from the earlier consolidation, so only the fuel-flow half was outstanding."
+  },
+  "identity": {
+    "package": "@felipegalind0/jsbsim@1.2.4-fork.6",
+    "previousPackage": "@felipegalind0/jsbsim@1.2.4-fork.5",
+    "repositoryContentSha256": "bdaf50a99686ccabbb13e5cc670e6475defd53b4f38dfdc58030c78dbb40af1d",
+    "sdkSubtreeSha256": "b1d216eb975b8833da7e5f936397657a47f6e981a52180ef2d529eb3ca8debba",
+    "buildInputSha256": "307687399a85e97a61a7d4e0e1ddcb0e7d9ce09ba53207d3891e01745bccbee3",
+    "tarballSha256": "9ad6c6e549b2bb81ec728c005a06f79501d53b7a718c84c735c95442f2ab9754",
+    "tarballIntegrity": "sha512-2asdnpY1rQkgotf70fcFX4lKDoUqX8T20ttY0lH04VcH/WKcLAxx7VU86u82Cg79y+VLc9stx0ZFjFar0knrhg==",
+    "emittedLoaderSha256": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+    "emittedWasmSha256": "105f69678f9172b6c07bdb62af650b8a2e4783889540f65fa5ca9bf797d7beac"
+  },
+  "runtimeEvidence": {
+    "check": "trim-fuel-flow-wasm-check.mjs, in build/validation/jsbsim-fork6-20260913/",
+    "method": "F16 fixture at 5000 ft / 300 KCAS. propulsion/set-running forces throttle to 1, so each setting is applied after it and trimmed by a further zero-time run_ic. Each setting is trimmed both in its own freshly booted executive and in one shared executive out of order.",
+    "fork5": {
+      "result": "failed",
+      "observed": "Every throttle setting reported 1548.9166 gph, the value left by set-running's forced full throttle, including at idle.",
+      "log": "trim-fuel-flow-fork5.log"
+    },
+    "fork6": {
+      "result": "passed",
+      "observed": "Dry sweep 114.80, 284.34, 807.49, 1485.99 gph across commands 0.00, 0.20, 0.35, 0.49; augmented 7823.98 gph at 1.00. Order-dependence exactly zero.",
+      "log": "trim-fuel-flow-fork6.log"
+    },
+    "significance": "This is the negative control for the adoption: the identical script fails on the retained fork.5 artifact and passes on fork.6, so the behaviour change is attributable to this package and not to the harness."
+  },
+  "checks": {
+    "nativeRegressions": { "status": "passed-except-environment", "passed": 80, "failed": 1, "note": "TestInputSocket fails on this machine with ModuleNotFoundError: telnetlib3, a test-only dependency absent from the venv since Python 3.14 removed stdlib telnetlib. Unrelated to this change." },
+    "nativeTrimTests": { "status": "passed", "tests": ["TestTurbineTrimSpool", "TestTurbineTrimFuelFlow"] },
+    "sdkBuild": { "status": "passed", "tests": 50, "suites": 9 },
+    "browserPersistence": { "status": "passed", "browser": "153.0.8010.12" },
+    "releasePack": { "status": "passed", "releaseEligible": true },
+    "installedArtifactIdentity": { "status": "passed", "verifiedFiles": 14, "log": "../jsbsim-fork6-20260913/fork6-verify.log" },
+    "fullAppSuite": { "status": "passed", "passed": 731, "failed": 0, "files": 77, "log": "../jsbsim-fork6-20260913/fork6-all-tests.log", "note": "The 16 failures recorded against fork.5 are resolved: the 10 phone-integration failures by dropping the stale aircraftCatalog mock, the 6 foss-earth recovery copies by scoping vitest away from gitignored build/." },
+    "typecheck": { "status": "passed" },
+    "eslint": { "status": "passed", "files": 5, "log": "../jsbsim-fork6-20260913/fork6-eslint.log" },
+    "productionBuild": { "status": "passed", "log": "../jsbsim-fork6-20260913/fork6-production-build.log" },
+    "browserArtifact": { "status": "passed", "aircraft": ["cessna-172", "cirrus-vision-jet", "cirrus-vision-jet-g2", "cirrus-vision-jet-g3"], "report": "../jsbsim-fork6-20260913/browser/report.json" },
+    "nativeWasmParity": {
+      "status": "passed",
+      "scenarios": 4,
+      "maximumNormalizedError": 0.00014872352474936678,
+      "report": "../jsbsim-fork6-20260913/parity",
+      "note": "Native and WASM built from the same clean revision 0efc3e7a agree. The error is in line with the 1.4851e-4 recorded for fork.5."
+    },
+    "sf50ValidationSuite": {
+      "status": "blocked-unchanged",
+      "note": "All metrics and initialization checks pass. The blocked status is SF50's standing calibration state (CG datum, brake control law, 50-foot datum, runway friction) and is unrelated to fuel flow. Static thrust remains 1772.01 lb against the 1846 lb EASA reference, diagnostic-only."
+    }
+  },
+  "gateChanges": [
+    "jsbsimBuildIdentity.ts accepts 1.2.4-fork.6 under @felipegalind0/jsbsim and retains fork.5 under the same name; fork.1-fork.4 keep the pre-rename name.",
+    "The identity test now pairs each accepted version with the name it was published under as explicit data rather than deriving it by string comparison, which would have misordered a future fork.10.",
+    "The next unissued version guarded by the rejection case advances from 1.2.4-fork.6 to 1.2.4-fork.7."
+  ],
+  "rollback": {
+    "retainedTarballs": {
+      "1.2.4-fork.1": "81369af4b23e71c4a067ae730cb6a9ac8ff95fa9d1d9ceb80ff1bdc412d50628",
+      "1.2.4-fork.2": "ca9f22b23c1444c2dc1ff80fc8d7fc877bb607f71534ea5a64bab3965bfc468a",
+      "1.2.4-fork.3": "43d0fe826fe0948d6e9049f90aa8d4ffd780844f859effda38ec22da81de0171",
+      "1.2.4-fork.4": "957156d73ce44672621d0f0163fbefa753b53bddcc577b7f24da5ee25c4f1474",
+      "1.2.4-fork.5": "9312e2b657fd5f396f6ed55904616b907d387c9cd76d98ca66ad756cf3d8aa52",
+      "1.2.4-fork.6": "9ad6c6e549b2bb81ec728c005a06f79501d53b7a718c84c735c95442f2ab9754"
+    },
+    "preAdoptionFiles": "../jsbsim-fork6-20260913/before-fork6-adoption/",
+    "note": "Rolling back to fork.5 restores the trim defect recorded under runtimeEvidence."
+  },
+  "notDone": [
+    "The SF50 idle fuel-flow decision is still open. This package corrects which operating point trim reports; it does not choose engine/fj33_5a.xml's idle flow, and the two lowest AFM cruise rows remain clamped at the estimated idle floor.",
+    "No re-run of the SF50 cruise fuel-flow diagnostic against this package is claimed; the recorded diagnostic ran natively, where the fix was already present.",
+    "No hosted CI run is claimed for this revision.",
+    "The build remains non-reproducible as recorded for fork.5; the tarball is the authority, not the commit."
+  ]
+}

@@ -12,7 +12,7 @@ and IDBFS persistence were ported selectively into the full integration as
 `feature/wasm-integration-idbfs-exceptions` at `c328c7ab`, packaged as
 `1.2.4-fork.4` and adopted by the app with affected checks re-run. See
 [the adopted corrections](../jsbsim.md#adopted-idbfs-and-native-exception-corrections)
-and `build/validation/jsbsim-in-tree-20260913/fork4-adoption.json`.
+and `docs/validation/evidence/jsbsim/adoption/fork4-adoption.json`.
 
 Use the rewritten [fresh SF50 prompt](../prompts/sf50-resume-work-app-prompt.md).
 Its Phase A is done. Phase B's first step is also done: the historical G1 AFM

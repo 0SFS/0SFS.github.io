@@ -54,8 +54,9 @@ open review there.
 Retained rollback tarballs keep the name they were published under, so
 `jsbsimBuildIdentity.ts` pairs every accepted version with its exact name and
 rejects a renamed package claiming an older version. A full rollback restores
-that release's preserved declaration, lock and identity module together from
-`build/validation/jsbsim-in-tree-20260913/before-fork*-adoption/`.
+that release's declaration, lock and identity module together from
+[`validation/evidence/jsbsim/rollback/`](validation/evidence/jsbsim/rollback);
+fork.5 and fork.6 are at commits `f9a27c0d` and `9e22e168` instead.
 
 ## Build and installation chain
 
@@ -85,10 +86,9 @@ The previous exact schema-1 `1.2.4-fork.1` and schema-2 `1.2.4-fork.2` and
 requires clean pinned source; fork.2 and fork.3 require clean in-tree source. Schema/version pairs, archive
 integrity and recorded distribution bytes remain checked, with no version
 range or implicit runtime fallback. Use each retained tarball with its matching
-declaration and lock. Fork.1 pre-adoption files remain under
-`build/validation/jsbsim-in-tree-20260913/rollback/`; fork.2 files remain under
-`before-fork3-adoption/` and fork.3 files under `before-fork4-adoption/` in that
-evidence directory. Fork.3 replaced the earlier
+declaration and lock, which are tracked per version under
+[`validation/evidence/jsbsim/rollback/`](validation/evidence/jsbsim/rollback).
+Fork.3 replaced the earlier
 accepted fork.2 package after an explicitly verified official emsdk compiler
 banner was added to the toolchain lock. Fork.4 replaces fork.3 after adopting
 the IDBFS and native-exception corrections. No earlier archive was overwritten.
@@ -163,11 +163,12 @@ The previously accepted fork.3 identity (commit `f7a80a6f`, tarball
 and its retained archive.
 
 The installed distribution's 14 recorded files and archive SHA-512 lock
-integrity were verified. Local acceptance evidence is retained under
-`build/validation/jsbsim-in-tree-20260913/`: exact command/log files,
-`fork4-adoption.json`, `runtime-fork4-parity.json` and earlier
-`browser-artifact-fork3/report.json`, `aircraft-ui-fork3/report.json` and
-screenshots. Current logs use the `app-fork4-` prefix; earlier artifacts retain
+integrity were verified. The adoption record and parity report are tracked as
+[`validation/evidence/jsbsim/adoption/fork4-adoption.json`](validation/evidence/jsbsim/adoption/fork4-adoption.json)
+and
+[`parity/fork4-parity.json`](validation/evidence/jsbsim/parity/fork4-parity.json).
+Command logs, earlier per-fork browser and UI reports and screenshots stay in
+the local, undistributed tree under `build/validation/jsbsim-in-tree-20260913/`. Current logs use the `app-fork4-` prefix; earlier artifacts retain
 their separate reports.
 These ignored files are local evidence; the identities and outcomes above
 remain in documentation.
@@ -269,7 +270,7 @@ The older pinned Playwright 1.58.2 installer stalled during archive extraction,
 so 1.63.0 is pinned and only its headless shell is requested. Build and check
 runners now enumerate `test/*.test.mjs` explicitly, keeping this browser check
 out of the unit-test run. Full adoption results, hashes and limitations are in
-`build/validation/jsbsim-in-tree-20260913/fork4-adoption.json`.
+[`validation/evidence/jsbsim/adoption/fork4-adoption.json`](validation/evidence/jsbsim/adoption/fork4-adoption.json).
 
 ## Trim fuel flow
 
@@ -284,7 +285,7 @@ throttle command, idle included. On fork.6 the same sweep gives 114.80, 284.34,
 807.49 and 1485.99 gph across dry commands 0.00 to 0.49, and 7823.98 gph
 augmented, with no dependence on the order the settings are trimmed in. The
 script producing both is preserved as
-`build/validation/jsbsim-fork6-20260913/trim-fuel-flow-wasm-check.mjs`; it fails
+[`validation/evidence/jsbsim/trim-fuel-flow/`](validation/evidence/jsbsim/trim-fuel-flow); it fails
 on fork.5 and passes on fork.6, which is what attributes the change to this
 package rather than to the harness.
 
@@ -300,7 +301,7 @@ idle fuel flow: the two lowest AFM cruise rows remain clamped at the estimated
 idle floor, which is
 [a separate open question](validation/sf50-g1-cruise-fuel-flow-2026-09-13.md).
 Full results and hashes are in
-`build/validation/jsbsim-in-tree-20260913/fork6-adoption.json`.
+[`validation/evidence/jsbsim/adoption/fork6-adoption.json`](validation/evidence/jsbsim/adoption/fork6-adoption.json).
 
 ## Runtime diagnostics and native lifetime
 

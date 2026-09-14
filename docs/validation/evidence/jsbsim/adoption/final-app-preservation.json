@@ -1,0 +1,7 @@
+{
+  "archive": "/Users/felg/gh/.preservation/jsbsim-in-tree-20260913T233508Z/final-app-working-changes.tar.gz",
+  "sha256": "bd0811eafadd8367b248aaeaf033826f22d9c575b4123f07b366da45bfbcf6cc",
+  "files": 89,
+  "verified": true,
+  "scope": "final changed and untracked app files plus exact staged/unstaged patches; no app commit"
+}

@@ -164,4 +164,4 @@ new contribution and existing PR branches. SHA-256:
 artifact and package. App source/dependency files were not changed by submission;
 its mixed working tree remains uncommitted.
 
-The final evidence inventory hashes 49 reports/logs/helpers and the recovery bundle. Key reports are also copied to app `build/validation/jsbsim-upstream-submissions-20260913/` for handoff.
+The final evidence inventory hashes 49 reports/logs/helpers and the recovery bundle. Key reports are also copied to app `build/validation/jsbsim-upstream-submissions-20260913/` for handoff, which is gitignored and local-only.

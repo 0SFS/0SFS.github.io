@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-14T03:21:09.501Z",
+  "scope": "Actual aircraft React components, shell and CSS; static snapshot, no FDM.",
+  "serverStarted": false,
+  "visibleBrowserUsed": false,
+  "results": [
+    {
+      "name": "wide",
+      "width": 1440,
+      "height": 900,
+      "passed": true,
+      "geometry": {
+        "controlsOutsideGallery": true,
+        "controlsBelowGallery": true,
+        "documentFits": true,
+        "focusVisible": true,
+        "galleryHeight": 136.109375,
+        "galleryScrollHeight": 134,
+        "galleryClientHeight": 134,
+        "overflowY": "auto",
+        "focusedFamily": "cirrus-vision-jet",
+        "focusOutline": "solid"
+      },
+      "controlFocus": {
+        "tag": "SELECT",
+        "text": "Auto (by chase distance)LOD3 — near — 1,514 trisLOD2 — medium — 856 trisLOD1 — far — 442 tris",
+        "visible": true,
+        "outlineStyle": "solid",
+        "outlineFullyVisible": false,
+        "clip": {
+          "top": 43,
+          "left": 13,
+          "right": 331,
+          "bottom": 523
+        },
+        "bounds": {
+          "top": 487.109375,
+          "bottom": 523.109375,
+          "left": 31,
+          "right": 313
+        },
+        "isApply": false
+      },
+      "applyFocus": {
+        "tag": "BUTTON",
+        "text": "Apply & fly Cirrus Vision Jet G2",
+        "visible": true,
+        "outlineStyle": "solid",
+        "outlineFullyVisible": true,
+        "clip": {
+          "top": 43,
+          "left": 13,
+          "right": 331,
+          "bottom": 523
+        },
+        "bounds": {
+          "top": 347.109375,
+          "bottom": 383.109375,
+          "left": 31,
+          "right": 313
+        },
+        "isApply": true
+      },
+      "appliedBefore": 0,
+      "applied": {
+        "aircraftId": "cirrus-vision-jet-g2",
+        "lodId": "auto",
+        "optInLodsEnabled": false,
+        "generationId": "g2+"
+      },
+      "screenshot": "wide.png",
+      "applyScreenshot": "wide-apply.png"
+    },
+    {
+      "name": "narrow",
+      "width": 360,
+      "height": 760,
+      "passed": true,
+      "geometry": {
+        "controlsOutsideGallery": true,
+        "controlsBelowGallery": true,
+        "documentFits": true,
+        "focusVisible": true,
+        "galleryHeight": 136.109375,
+        "galleryScrollHeight": 134,
+        "galleryClientHeight": 134,
+        "overflowY": "auto",
+        "focusedFamily": "cirrus-vision-jet",
+        "focusOutline": "solid"
+      },
+      "controlFocus": {
+        "tag": "SELECT",
+        "text": "Auto (by chase distance)LOD3 — near — 1,514 trisLOD2 — medium — 856 trisLOD1 — far — 442 tris",
+        "visible": true,
+        "outlineStyle": "solid",
+        "outlineFullyVisible": false,
+        "clip": {
+          "top": 43,
+          "left": 29,
+          "right": 347,
+          "bottom": 523
+        },
+        "bounds": {
+          "top": 487.109375,
+          "bottom": 523.109375,
+          "left": 47,
+          "right": 329
+        },
+        "isApply": false
+      },
+      "applyFocus": {
+        "tag": "BUTTON",
+        "text": "Apply & fly Cirrus Vision Jet G2",
+        "visible": true,
+        "outlineStyle": "solid",
+        "outlineFullyVisible": true,
+        "clip": {
+          "top": 43,
+          "left": 29,
+          "right": 347,
+          "bottom": 523
+        },
+        "bounds": {
+          "top": 347.109375,
+          "bottom": 383.109375,
+          "left": 47,
+          "right": 329
+        },
+        "isApply": true
+      },
+      "appliedBefore": 0,
+      "applied": {
+        "aircraftId": "cirrus-vision-jet-g2",
+        "lodId": "auto",
+        "optInLodsEnabled": false,
+        "generationId": "g2+"
+      },
+      "screenshot": "narrow.png",
+      "applyScreenshot": "narrow-apply.png"
+    },
+    {
+      "name": "short",
+      "width": 740,
+      "height": 360,
+      "passed": true,
+      "geometry": {
+        "controlsOutsideGallery": true,
+        "controlsBelowGallery": true,
+        "documentFits": true,
+        "focusVisible": true,
+        "galleryHeight": 124,
+        "galleryScrollHeight": 134,
+        "galleryClientHeight": 122,
+        "overflowY": "auto",
+        "focusedFamily": "cirrus-vision-jet",
+        "focusOutline": "solid"
+      },
+      "controlFocus": {
+        "tag": "SELECT",
+        "text": "Auto (by chase distance)LOD3 — near — 1,514 trisLOD2 — medium — 856 trisLOD1 — far — 442 tris",
+        "visible": true,
+        "outlineStyle": "solid",
+        "outlineFullyVisible": true,
+        "clip": {
+          "top": 43,
+          "left": 409,
+          "right": 727,
+          "bottom": 347
+        },
+        "bounds": {
+          "top": 265,
+          "bottom": 301,
+          "left": 427,
+          "right": 709
+        },
+        "isApply": false
+      },
+      "applyFocus": {
+        "tag": "BUTTON",
+        "text": "Apply & fly Cirrus Vision Jet G2",
+        "visible": true,
+        "outlineStyle": "solid",
+        "outlineFullyVisible": true,
+        "clip": {
+          "top": 43,
+          "left": 409,
+          "right": 727,
+          "bottom": 347
+        },
+        "bounds": {
+          "top": 210,
+          "bottom": 246,
+          "left": 427,
+          "right": 709
+        },
+        "isApply": true
+      },
+      "appliedBefore": 0,
+      "applied": {
+        "aircraftId": "cirrus-vision-jet-g2",
+        "lodId": "auto",
+        "optInLodsEnabled": false,
+        "generationId": "g2+"
+      },
+      "screenshot": "short.png",
+      "applyScreenshot": "short-apply.png"
+    }
+  ],
+  "network": [
+    {
+      "path": "/",
+      "sha256": "df5238c55eac9676398da91b80ecaf3fa4f6e213c59144fc414a5ced0014a094"
+    },
+    {
+      "path": "/assets/index-2poBCZRg.js",
+      "sha256": "7153fb8a51e686b87f9103bf2dc029a442363989156a1be70e03a12ce66731d1"
+    },
+    {
+      "path": "/assets/index-DhruzjDj.css",
+      "sha256": "757199810a3c3ee818eaa8bf8a19d02f8c34cd00eb6a0cc403e5aac641e46963"
+    },
+    {
+      "path": "/aircraft/thumbnails/cirrus-vision-jet.png",
+      "sha256": "4ca6de02e6b39e266f738c4f9c0336ca6451f46e564dfe91119127b8de5e9f70"
+    },
+    {
+      "path": "/aircraft/thumbnails/cessna-172.png",
+      "sha256": "f2bc59eab0d3e61259704ebf158f67525b2daf4d276d3e76c8007df1785f567c"
+    },
+    {
+      "path": "/",
+      "sha256": "df5238c55eac9676398da91b80ecaf3fa4f6e213c59144fc414a5ced0014a094"
+    },
+    {
+      "path": "/assets/index-DhruzjDj.css",
+      "sha256": "757199810a3c3ee818eaa8bf8a19d02f8c34cd00eb6a0cc403e5aac641e46963"
+    },
+    {
+      "path": "/assets/index-2poBCZRg.js",
+      "sha256": "7153fb8a51e686b87f9103bf2dc029a442363989156a1be70e03a12ce66731d1"
+    },
+    {
+      "path": "/aircraft/thumbnails/cessna-172.png",
+      "sha256": "f2bc59eab0d3e61259704ebf158f67525b2daf4d276d3e76c8007df1785f567c"
+    },
+    {
+      "path": "/aircraft/thumbnails/cirrus-vision-jet.png",
+      "sha256": "4ca6de02e6b39e266f738c4f9c0336ca6451f46e564dfe91119127b8de5e9f70"
+    },
+    {
+      "path": "/",
+      "sha256": "df5238c55eac9676398da91b80ecaf3fa4f6e213c59144fc414a5ced0014a094"
+    },
+    {
+      "path": "/assets/index-DhruzjDj.css",
+      "sha256": "757199810a3c3ee818eaa8bf8a19d02f8c34cd00eb6a0cc403e5aac641e46963"
+    },
+    {
+      "path": "/assets/index-2poBCZRg.js",
+      "sha256": "7153fb8a51e686b87f9103bf2dc029a442363989156a1be70e03a12ce66731d1"
+    },
+    {
+      "path": "/aircraft/thumbnails/cirrus-vision-jet.png",
+      "sha256": "4ca6de02e6b39e266f738c4f9c0336ca6451f46e564dfe91119127b8de5e9f70"
+    },
+    {
+      "path": "/aircraft/thumbnails/cessna-172.png",
+      "sha256": "f2bc59eab0d3e61259704ebf158f67525b2daf4d276d3e76c8007df1785f567c"
+    }
+  ],
+  "browserErrors": [],
+  "failures": [],
+  "passed": true
+}

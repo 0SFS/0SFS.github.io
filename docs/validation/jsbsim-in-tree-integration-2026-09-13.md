@@ -84,7 +84,9 @@ isolation configure/build/start and native-compiler WASM rejection passed.
 
 Evidence is under native `build/in-tree-integration/`,
 `build/in-tree-native-isolation/`, and app
-`build/validation/jsbsim-in-tree-20260913/`. Package paths are identified by
+`build/validation/jsbsim-in-tree-20260913/`. All three are gitignored and are
+not distributed; the records later documents rely on are tracked separately
+under `docs/validation/evidence/jsbsim/`. Package paths are identified by
 `wasm/build/last-package.json`. Old `1.2.4-fork.1` remains in app `deps/` for rollback.
 
 ## Completed adoption checks
@@ -142,7 +144,7 @@ diagnostic work is preserved.
 0sfs, combined JSBSim engine/SDK, and FOSS Earth. There is no active standalone
 SDK checkout under `gh/Felipegalind0`. The app keeps the fork.1 and fork.2 tarballs and exact
 pre-adoption package/lock/workspace under
-`build/validation/jsbsim-in-tree-20260913/before-fork2-adoption/`, `before-fork3-adoption/` and `rollback/`.
+`docs/validation/evidence/jsbsim/rollback/fork1/` and `fork2/`, which are tracked. The bulk capture they were taken from stays in the gitignored `build/validation/jsbsim-in-tree-20260913/` tree.
 App changes remain reviewable and uncommitted alongside the user's existing UI
 and aircraft/evidence work; unrelated changes were not swept into a commit.
 
@@ -209,7 +211,7 @@ working tree were not pushed or merged. No npm or site publication was performed
 
 The promised [completion reply](https://github.com/JSBSim-Team/jsbsim/pull/1504#issuecomment-5657291008) was posted and read back after the final local and WASM CI checks passed. It points to the working fork and requires no implementation work from upstream maintainers.
 
-Final app preservation contains 89 changed/untracked files and exact staged/unstaged patches, verified in `final-app-working-changes.tar.gz` under the recovery root. Its integrity and the local execution-evidence inventory are recorded in `build/validation/jsbsim-in-tree-20260913/final-app-preservation.json` and `evidence-manifest.json`.
+Final app preservation contains 89 changed/untracked files and exact staged/unstaged patches, verified in `final-app-working-changes.tar.gz` under the recovery root. Its integrity is recorded in the tracked `docs/validation/evidence/jsbsim/adoption/final-app-preservation.json`. The execution-evidence inventory, `evidence-manifest.json`, and the bundle itself stay in the gitignored `build/validation/jsbsim-in-tree-20260913/` tree and are not distributed.
 
 ## Subsequent upstream submission and validation update
 
@@ -270,7 +272,7 @@ Fork.4 accepts schema-2 identities for fork.2, fork.3 and fork.4, so each
 retained tarball still verifies with its own declaration and lock. Exact
 pre-adoption `package.json`, `package-lock.json`, identity module, AGENTS.md and
 affected docs are preserved under
-`build/validation/jsbsim-in-tree-20260913/before-fork4-adoption/`; the full
+the tracked `docs/validation/evidence/jsbsim/rollback/fork3/`; the full
 adoption record with every hash, log name and limitation is
 `fork4-adoption.json` in that directory.
 
