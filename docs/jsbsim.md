@@ -304,6 +304,26 @@ idle fuel flow, which fork.7 addresses below.
 Full results and hashes are in
 [`validation/evidence/jsbsim/adoption/fork6-adoption.json`](validation/evidence/jsbsim/adoption/fork6-adoption.json).
 
+### Known defect: shut-off engines after a zero-time reset
+
+Found on 2026-09-14 and not fixed. `Calculate()` enters `Trim()` for every
+zero-time evaluation, running or not. The spool change (`fc13a97b`, PR #1505)
+and this fuel-flow change (PR #1508) assign N1, N2 and fuel flow there for every
+engine. A shut-off engine therefore comes out of RunIC spooled to its throttle
+setting, then winds down once time advances, burning a little fuel while the
+fuel flow bleeds off.
+
+The app hits this when `resetFlightLocation.ts` applies a location whose saved
+engine is not running. On the SF50 at 5,000 ft and 150 kt with throttle 0.6:
+- fork.5 comes out of the reset at N1 69.7 % and N2 81.4 %;
+- fork.7 shows the same spool and also 344.7 lb/h of fuel flow.
+
+The audio adapter reads that fuel flow as combustion for the first few steps.
+Upstream `master` leaves the engine at rest. Evidence and the proposed direction
+(assign only when `Running`) are in
+[the open PR review](validation/jsbsim-open-pr-review-2026-09-14.md).
+Do not add an app-level workaround; fix it in the engine and in both PRs.
+
 ## Idle fuel flow
 
 `FGTurbine::Load()` always set `IdleFF` to `107 * milthrust^0.2`, an estimate
@@ -329,7 +349,12 @@ are in
 
 `TestTurbineIdleFuelFlow` covers the unchanged default, a configured value above
 and below the estimate, a running engine settling on the configured value, and
-rejection of a negative one. The change is not submitted upstream.
+rejection of a negative one.
+
+The change is not submitted upstream. As of 2026-09-14 it is in use: the SF50
+declares the element under fork.7. `c70be257` merges cleanly onto upstream
+`master`. It is a candidate for its own PR; see
+[the contribution policy](jsbsim-upstream-contribution-policy.md).
 
 ## Runtime diagnostics and native lifetime
 

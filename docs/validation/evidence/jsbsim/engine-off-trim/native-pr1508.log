@@ -1,0 +1,11 @@
+Engine never started, throttle 0.35, RunIC
+  after RunIC              t= 0.000 running=0 N1= 82.00 N2= 85.90 fuel flow= 7275.5 lb/h fuel used=0.0000 lb
+  after step 1             t= 0.008 running=0 N1= 81.66 N2= 85.54 fuel flow= 7192.2 lb/h fuel used=0.0166 lb
+  after step 12            t= 0.100 running=0 N1= 77.99 N2= 81.70 fuel flow= 6275.5 lb/h fuel used=0.1871 lb
+  after step 24            t= 0.200 running=0 N1= 74.18 N2= 77.71 fuel flow= 5275.5 lb/h fuel used=0.3463 lb
+Engine running at 0.35, cut off for 10 s, then RunIC
+  running for 2 s          t= 2.000 running=1 N1= 82.00 N2= 85.90 fuel flow= 7221.7 lb/h fuel used=4.4396 lb
+  10 s after cutoff        t=12.000 running=0 N1=  0.55 N2=  0.57 fuel flow=    0.0 lb/h fuel used=5.1556 lb
+  after RunIC              t=12.000 running=0 N1= 82.00 N2= 85.90 fuel flow= 7275.5 lb/h fuel used=5.1556 lb
+  after step 1             t=12.008 running=0 N1= 81.66 N2= 85.54 fuel flow= 7192.2 lb/h fuel used=5.1723 lb
+  after step 12            t=12.100 running=0 N1= 77.99 N2= 81.70 fuel flow= 6275.5 lb/h fuel used=5.3427 lb

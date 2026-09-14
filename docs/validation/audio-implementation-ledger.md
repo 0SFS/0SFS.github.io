@@ -476,7 +476,8 @@ In a suggested order:
 5. **Qualification** (§6): named devices, per-callback timing, the dropout detector on real routes, and the headless worklet check (needs Playwright).
 6. **Listening review and FDM evidence** (§6): mix balance, cockpit treatment, FJ33 shaft orders, starvation and relight traces.
 7. **JSBSim turbine property exposure** (§10).
-8. **Decisions:**
+8. **Engine state after a reset (engine defect).** Found 2026-09-14. When a location is applied with the engine shut off, fork.7 brings the SF50 out of RunIC at N2 81 % and 344.7 lb/h. The adapter reads that as combustion for a few steps, then the spool winds down. The cause is JSBSim PRs #1505/#1508, not the audio code. Do not mask it here; see [the open PR review](jsbsim-open-pr-review-2026-09-14.md).
+9. **Decisions:**
    - `benchmarks/audio/sweep.jsonl` (5.2 MB) is **not committed**. Regenerate it with `node benchmarks/audio/generate-sweep.mjs > benchmarks/audio/sweep.jsonl`; its hash is in `sweep.jsonl.sha256`.
    - A licensed Tier 3 bank.
    - Tier X.

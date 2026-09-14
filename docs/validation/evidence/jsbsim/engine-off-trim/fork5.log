@@ -1,0 +1,5 @@
+package @felipegalind0/jsbsim@1.2.4-fork.5
+after the reset            t=0.000 running=0 N1=69.7 N2=81.4 fuel flow=0.0 lb/h fuel used=0.0000 lb
+after 1 s of flight        t=1.000 running=0 N1=42.2 N2=49.3 fuel flow=0.0 lb/h fuel used=0.0000 lb
+
+FAIL: the shut-off engine came out of the reset spooled or burning fuel

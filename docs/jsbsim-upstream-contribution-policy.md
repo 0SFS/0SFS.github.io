@@ -31,7 +31,7 @@ Scale verification to the change. A portability fix needs affected compiler/plat
 ## Contribution workflow
 
 1. Track each candidate in the owning repository with its purpose, source commits or preserved working content, intended upstream, dependencies, unresolved decisions and acceptance evidence. Preserve all work before extracting changes, following the [centralization spec](proposals/jsbsim-dependency-centralization.md).
-2. Inspect existing upstream issues, PRs and current contribution instructions before preparing a new submission. Continue existing PRs #1502, #1504 and #8 where applicable. Do not duplicate them or bundle a separate defect into a feature PR simply because it shares the current local branch.
+2. Inspect existing upstream issues, PRs and current contribution instructions before preparing a new submission. Continue existing PRs #1502, #1504–#1508 and #8 where applicable. Do not duplicate them or bundle a separate defect into a feature PR simply because it shares the current local branch.
 3. Prepare a focused contribution on an ordinary branch in the canonical owning repository. Retain the integration branch and recovery record. Do not overwrite user changes, stage the whole tree, or rewrite published history as an incidental cleanup operation.
 4. Complete the readiness evidence and record the final candidate identity. Build and test the same inputs that will be submitted. SDK evidence must use coherent generation/compilation sources and an identified package; an application's manual native-handle deletion or spool-property reset cannot validate the SDK/engine fix.
 5. Submit or update the existing PR within the standing authorization for the task. Local preparation, pushing a branch, creating a PR and publishing a package are distinct actions. This policy update performs none of them. Review feedback may require revisions even after our readiness gates pass; record and retest affected changes.
@@ -58,9 +58,45 @@ records exact heads, native/sanitizer/WASM/browser/package checks, passing
 hosted WASM CI, preserved branches, and the restored downstream environment.
 This supersedes the **not submitted** states below for these specific scopes.
 Child APIs from SDK #8 and its requested benchmark remain separate. The full
-working integration and app's verified fork.3 dependency remain preserved;
-the new IDBFS/native-exception build corrections are not yet adopted in that
-installed dependency.
+working integration remains preserved. The IDBFS and native-exception build
+corrections were later adopted into the app as fork.4, and the app now installs
+fork.7.
+
+[PR #1508](https://github.com/JSBSim-Team/jsbsim/pull/1508) (turbine trim fuel
+flow) was opened on 2026-09-14 on top of #1505.
+
+## Open PR review: 2026-09-14
+
+[The review record](validation/jsbsim-open-pr-review-2026-09-14.md) reads every
+open PR and has the evidence. It changes readiness as follows:
+
+- **#1505 and #1508 are back to blocked.** Both assign spool speeds (#1505) and
+  fuel flow (#1508) in `FGTurbine::Trim()` for every engine. `Trim()` runs for
+  shut-off engines too, so those come out of RunIC spooled and then burn fuel
+  as it bleeds off.
+  - Natively, the F-16 fixture shows N2 85.9 % and 7,275.5 lb/h against 0 on
+    `master`.
+  - In the app, the SF50 at fork.7 shows N2 81.4 % and 344.7 lb/h after a
+    location reset.
+  - Fix both PRs and add regressions for shut-off engines before asking for
+    review.
+- **Unanswered comments:**
+  - Sean on #1508 (2026-09-14): set fuel flow in the trim-finished block
+    instead;
+  - bcoconni's analysis on #1502 (2026-09-13);
+  - Sean's cache-only benchmark question on SDK #8 (2026-09-12).
+- **CI:** it has not run on #1505–#1508. The workflow runs are `action_required`,
+  waiting for maintainer approval.
+- **Coverage on #1502:** the 0 % patch coverage is instrumentation, not missing
+  execution. Upstream's coverage job builds with `-DBUILD_PYTHON_MODULE=OFF`, so
+  Python regressions are never measured. A CxxTest would give real coverage.
+- **#1507's scope** (6,429 lines, a new workflow, an MIT subtree) has no
+  maintainer agreement yet. Our #1504 comment promised a plan for smaller PRs.
+- **Turbine idle fuel flow** (`c70be257`) is in use by the SF50 and merges
+  cleanly onto `master`, but has no PR.
+
+#1504 and #1506 need nothing from us. The prerequisite commits carried in #1507
+and #1508 have the same diffs as the PRs they come from.
 
 ## Candidate ledger before extraction: 2026-09-13
 
@@ -69,8 +105,10 @@ This is an assessment of suitability and remaining gates, not authorization to p
 | Work and destination | Readiness | Upstream state and downstream adoption |
 | --- | --- | --- |
 | Emscripten portability → native JSBSim | Functional native/Emscripten integration is verified. The terminal-color question is answered in the [source-linked clarification](https://github.com/JSBSim-Team/jsbsim/pull/1504#issuecomment-5656709734); the PR description now names only its actual socket/strerror changes. Maintainer acceptance and the WASM-integration scope discussion remain open; preserve focused scope. | Existing [PR #1504](https://github.com/JSBSim-Team/jsbsim/pull/1504), retained. Socket/strerror changes are in local `b0332970`; logging behavior is retained separately in `aeb43b70`. Both are in the verified installed artifact. Live socket loopback remains unrun. |
-| Turbine zero-time N1/N2 consistency → native JSBSim | Strong focused correctness candidate. Native regressions and installed app bootstrap/reset/restoration plus matched WASM scenarios pass. Extract on the correct upstream base and run the focused before/after evidence there before submission. | Not submitted as a new PR. Local `fc13a97b` is retained in native integration `61b31329` and the verified installed artifact. No app N1/N2 reset masks it. |
-| Model replacement property lifetime → native JSBSim | Strong focused correctness candidate. Native invalid memory access reproduced before the fix; 11/11 CTest targets, six sanitizer sequences and real-WASM reload/failure/destruction tests pass afterwards. Preserve the six-case regression and independent scope when extracting. | Not submitted. Local `61b3132947dde7bc46827fd9fe3eef31193336d2` is packaged and verified in the app. [Merged #902](https://github.com/JSBSim-Team/jsbsim/pull/902) is a related atmosphere-replacement precedent, not this complete model-reload correction. |
+| Turbine zero-time N1/N2 consistency → native JSBSim | Strong focused correctness candidate. Native regressions and installed app bootstrap/reset/restoration plus matched WASM scenarios pass. Extract on the correct upstream base and run the focused before/after evidence there before submission. **2026-09-14: blocked.** It also spools engines that are shut off (see the open PR review). | Submitted as [PR #1505](https://github.com/JSBSim-Team/jsbsim/pull/1505) (`07eba55f`), open; CI awaiting maintainer approval. Local `fc13a97b` is retained in native integration `61b31329` and in every installed package since. No app N1/N2 reset masks it. |
+| Model replacement property lifetime → native JSBSim | Strong focused correctness candidate. Native invalid memory access reproduced before the fix; 11/11 CTest targets, six sanitizer sequences and real-WASM reload/failure/destruction tests pass afterwards. Preserve the six-case regression and independent scope when extracting. | Submitted as [PR #1506](https://github.com/JSBSim-Team/jsbsim/pull/1506) (`a25956a2`), open; CI awaiting maintainer approval. Local `61b3132947dde7bc46827fd9fe3eef31193336d2` is packaged and verified in the app. [Merged #902](https://github.com/JSBSim-Team/jsbsim/pull/902) is a related atmosphere-replacement precedent, not this complete model-reload correction. |
+| Turbine trim fuel flow → native JSBSim (added 2026-09-14) | Causal before/after regression (`TestTurbineTrimFuelFlow`, 3 methods) and fork.5/fork.6 controls. **Blocked:** it also assigns fuel flow to engines that are shut off, and Sean's alternative placement is unanswered. | Submitted as [PR #1508](https://github.com/JSBSim-Team/jsbsim/pull/1508) (`7511df10`, carries #1505), open; CI awaiting maintainer approval. Local `6c3547be`, installed since fork.6. |
+| Turbine idle fuel flow `<idlefuelflow>` → native JSBSim (added 2026-09-14) | Ready with evidence apart from exact-candidate verification. `TestTurbineIdleFuelFlow` (5 cases), fork.6/fork.7 controls, and in use by the SF50. It only needs rebasing onto `master` and a rerun there. | Not submitted. `c70be257` on pushed `feature/turbine-idle-fuel-flow`; merges cleanly onto `master`. Installed since fork.7. |
 | SDK executive ownership, child lifetime and failure cleanup → jsbsim-wasm | Strong correctness candidate. Real-WASM exactly-once destruction, repeated destroy, child invalidation and initialization/allocation failures pass in the coherent SDK. Extract a focused contribution and verify its declared native dependency; lifetime behavior on older native reload code remains a separate compatibility concern. | Not submitted as a new PR. Included in SDK integration `61ee9486` and the verified installed artifact. Current app/tests use SDK-owned cleanup. Preserve existing #8 while separating unrelated changes. |
 | Bounded model-load diagnostics → jsbsim-wasm | Useful generic candidate. Boolean load APIs, bounded per-attempt diagnostics, cleanup and successive success/failure behavior pass. Keep the public error contract and any lifetime dependency explicit in extraction. | Not submitted as a new PR. Included in the verified SDK/app artifact. Browser process memory reclamation is not established by native-handle tests. |
 | Property batching and per-gear contact reads → jsbsim-wasm | Functional APIs and affected lifetime regressions pass. Readiness remains blocked by the requested cache-only performance comparison and any associated API review work. No new performance claim is made by centralization. | Existing [PR #8](https://github.com/0x62/jsbsim-wasm/pull/8), retained. Preserved from `35d6100` and included in the verified installed artifact. |
@@ -88,7 +126,7 @@ The turbine and lifetime defects can be addressed without proving distinct SF50 
 | Native [#1504](https://github.com/JSBSim-Team/jsbsim/pull/1504) | `d47fd2e38feba9cc40340ac9740356f6f7afc37d` | Open, non-draft. Reported check jobs succeeded or were skipped. No formal review decision; clarification questions remain. |
 | SDK [#8](https://github.com/0x62/jsbsim-wasm/pull/8) | `35d610095d71ea40c8f90a0f1e5a14e11006ee1c` | Open, non-draft. No checks were reported in the status rollup; this is not a CI pass. No formal review decision; performance comparison requested. |
 
-The [wheel review](https://github.com/JSBSim-Team/jsbsim/pull/1502#issuecomment-5654721219) recognizes the feature's benefit but requests clearer implementation and flags errors, with further explanation still to come. Do not invent the unspecified errors or mark them resolved. The coverage bot also reports uncovered changed lines; investigate whether this reflects missing execution or instrumentation before relying on the green check status.
+The [wheel review](https://github.com/JSBSim-Team/jsbsim/pull/1502#issuecomment-5654721219) recognizes the feature's benefit but requests clearer implementation and flags errors, with further explanation still to come. Do not invent the unspecified errors or mark them resolved. The coverage bot also reports uncovered changed lines; investigate whether this reflects missing execution or instrumentation before relying on the green check status. (Resolved 2026-09-14: instrumentation. The coverage job does not build the Python module, so the Python regressions are not measured.)
 
 The portability discussion asks for [terminal-color clarification](https://github.com/JSBSim-Team/jsbsim/pull/1504#issuecomment-5645055803) and [WASM integration context](https://github.com/JSBSim-Team/jsbsim/pull/1504#issuecomment-5645415466). The PR reports a completed Emscripten build, but that historical result does not verify a different local integration revision. The SDK discussion requests a [cache-only performance comparison](https://github.com/0x62/jsbsim-wasm/pull/8#issuecomment-5645552459); its existing benchmark/test claims remain attached to the PR's recorded environment.
 

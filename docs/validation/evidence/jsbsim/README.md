@@ -106,6 +106,32 @@ with `OSFS_JSBSIM_DATA_ROOT` set to the app's `public/jsbsim-data`. The SF50
 package it reads is the calibrated one; an older package without the element
 would fail on both artifacts.
 
+## engine-off-trim/
+
+Evidence for a defect found on 2026-09-14, not an adoption control. JSBSim runs
+`Trim()` for every zero-time evaluation, running or not. PR #1505 (`fc13a97b`)
+and PR #1508 (`6c3547be`) assign spool speeds and fuel flow there for every
+engine, so a shut-off engine comes out of RunIC spooled.
+
+`native_check.py` uses the repository's F-16 fixture, built as a Python module
+from Git archives of upstream `master` `14c19022` and the #1508 head `7511df10`.
+Run it from any directory as `python native_check.py <source root>`.
+
+- `native-master.log`: the engine stays at rest.
+- `native-pr1508.log`: after RunIC the engine reports N1 82.00 %, N2 85.90 % and
+  7,275.5 lb/h, then burns 0.35 lb in the next 0.2 s. An engine that was cut off
+  and then put through RunIC does the same.
+
+`check.mjs` replays the app's location reset for an engine that is not running,
+on the SF50 package at 5,000 ft, 150 kt and throttle 0.6. Set
+`OSFS_JSBSIM_PACKAGE` to an installed or unpacked package directory and
+`OSFS_JSBSIM_DATA_ROOT` to `public/jsbsim-data`.
+
+- `fork5.log` fails on the spool alone: N1 69.7 %, N2 81.4 %, no fuel flow.
+- `fork7.log` fails on both: the same spool and 344.7 lb/h.
+
+Both logs fail. That is the finding: the check passes only once the engine is fixed.
+
 ## reports/
 
 `fork6-browser-artifact.json` boots the accepted artifact in headless Chromium

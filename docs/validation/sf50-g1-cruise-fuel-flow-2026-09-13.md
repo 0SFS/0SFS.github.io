@@ -187,6 +187,15 @@ software gate results, not aircraft evidence.
    confirmed in use; it sits on the package branch, so it would need rebasing
    onto upstream `master` first.
 
+> **Update 2026-09-14.** Step 1 is done: fork.7 is installed and
+> `engine/fj33_5a.xml` declares `<idlefuelflow>76</idlefuelflow>`. That also
+> meets step 5's condition. `c70be257` merges cleanly onto upstream `master`,
+> but no PR exists yet. A review the same day found that the trim fuel-flow fix
+> (#1508), and the spool fix it builds on (#1505), wake up engines that are shut
+> off during a zero-time reset. Values read straight after RunIC for a running
+> engine, which this diagnostic uses, are not affected. See
+> [the open PR review](jsbsim-open-pr-review-2026-09-14.md).
+
 ## 7. Idle fuel flow from recorded data
 
 ### Source
