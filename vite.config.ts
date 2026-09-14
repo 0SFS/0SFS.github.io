@@ -3,7 +3,10 @@ import react from '@vitejs/plugin-react'
 import { execSync } from 'node:child_process'
 
 const repositoryName = process.env.GITHUB_REPOSITORY?.split('/')[1]
-const base = process.env.GITHUB_ACTIONS && repositoryName ? `/${repositoryName}/` : '/'
+// A `<owner>.github.io` repository is served from the domain root; any other
+// repository is served from `/<repository>/`.
+const isRootPagesSite = repositoryName?.endsWith('.github.io') ?? false
+const base = process.env.GITHUB_ACTIONS && repositoryName && !isRootPagesSite ? `/${repositoryName}/` : '/'
 
 function getGitOutput(command: string): string | null {
   try {
