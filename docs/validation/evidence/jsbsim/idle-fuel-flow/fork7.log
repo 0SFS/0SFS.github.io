@@ -1,0 +1,5 @@
+package <idlefuelflow>: 76.0 lbm/hr (11.28 gph)
+FGTurbine fallback    : 481.5 lbm/hr (71.44 gph)
+model at ground idle  : 76.0 lbm/hr (11.28 gph), N1 24.3 %, N2 53.4 %
+
+PASS: the binary honours <idlefuelflow> (0.000 % from the declared value)

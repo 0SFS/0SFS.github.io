@@ -19,6 +19,7 @@ every check run with its result, and what was deliberately left undone.
 | `fork4-adoption.json` | IDBFS linkage and native-exception build corrections |
 | `fork5-adoption.json` | rename to `@felipegalind0/jsbsim`; no behaviour change |
 | `fork6-adoption.json` | turbine trim fuel flow |
+| `fork7-adoption.json` | configurable turbine idle fuel flow |
 
 `final-app-preservation.json` records the working-tree preservation taken during
 the in-tree consolidation.
@@ -36,7 +37,8 @@ at once; a declaration without its lock and identity module will not verify.
 These four states were never committed — the adoptions happened inside one
 working tree and reached history as a single commit — so this directory is their
 only copy. fork.5 and fork.6 need no snapshot: they are at `f9a27c0d` and
-`9e22e168`, recoverable with `git show <commit>:package.json`.
+`9e22e168`, recoverable with `git show <commit>:package.json`. fork.7 is the
+installed declaration.
 
 `rollback/fork1` and `rollback/fork2` have no identity module because the
 snapshots taken at the time did not include one.
@@ -52,6 +54,7 @@ contains, because the build is not reproducible:
 | 1.2.4-fork.4 | `957156d73ce44672621d0f0163fbefa753b53bddcc577b7f24da5ee25c4f1474` |
 | 1.2.4-fork.5 | `9312e2b657fd5f396f6ed55904616b907d387c9cd76d98ca66ad756cf3d8aa52` |
 | 1.2.4-fork.6 | `9ad6c6e549b2bb81ec728c005a06f79501d53b7a718c84c735c95442f2ab9754` |
+| 1.2.4-fork.7 | `58afaf9fa575ec61838ba794b7b4a0919b8eaf516c7261e571700e8367b5217b` |
 
 ## parity/
 
@@ -87,6 +90,21 @@ passes: 114.80, 284.34, 807.49, 1485.99 gph across dry commands 0.00 to 0.49 and
 The same script on both artifacts is what attributes the change to the package
 rather than to the harness. Run it from an unpacked artifact root with
 `JSBSIM_SOURCE_ROOT` set to a JSBSim checkout for the aircraft fixtures.
+
+## idle-fuel-flow/
+
+The negative control for the fork.7 adoption. `check.mjs` loads the app's own
+SF50 package and reads fuel flow at ground idle with the thrust lever closed.
+The package declares 76 lbm/hr, the WPR20FA051 recorder's ground idle; JSBSim's
+fallback for a 1,846 lbf engine is 481.5 lbm/hr.
+
+`fork6.log` fails: 481.5 lbm/hr, so that artifact ignores `<idlefuelflow>`.
+`fork7.log` passes: 76.0 lbm/hr at the same 24.3 % N1 and 53.4 % N2.
+
+Run it from an unpacked artifact root, as `evidence/check.mjs` beside `dist/`,
+with `OSFS_JSBSIM_DATA_ROOT` set to the app's `public/jsbsim-data`. The SF50
+package it reads is the calibrated one; an older package without the element
+would fail on both artifacts.
 
 ## reports/
 

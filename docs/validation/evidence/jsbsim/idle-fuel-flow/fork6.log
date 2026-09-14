@@ -1,0 +1,18 @@
+package <idlefuelflow>: 76.0 lbm/hr (11.28 gph)
+FGTurbine fallback    : 481.5 lbm/hr (71.44 gph)
+model at ground idle  : 481.5 lbm/hr (71.44 gph), N1 24.3 %, N2 53.4 %
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: idle fuel flow 481.5 lbm/hr is not the declared 76 lbm/hr (FGTurbine's fallback is 481.5); this binary ignores <idlefuelflow>
+    at file:///private/tmp/claude-501/-Users-felg-gh-foss-earth/1217e4a0-c5d9-407a-8a86-3a2b8d512980/scratchpad/fork6-sdk/evidence/check.mjs:60:8 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v26.8.2

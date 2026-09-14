@@ -7,13 +7,15 @@ bindings, native lifetime, generic diagnostics and SDK build tooling belong in
 `wasm/`. OSFS owns aircraft data, initial conditions, controls and scheduling.
 FOSS Earth remains the separate terrain/rendering dependency.
 
-**Application acceptance, 2026-09-13:** clean in-tree package
-`1.2.4-fork.6` is installed and locked. It carries the turbine trim fuel-flow
-fix described in [Trim fuel flow](#trim-fuel-flow) on top of the IDBFS-linkage
+**Application acceptance, 2026-09-14:** clean in-tree package
+`1.2.4-fork.7` is installed and locked. It adds the configurable turbine idle
+fuel flow described in [Idle fuel flow](#idle-fuel-flow) on top of fork.6's
+turbine trim fuel-flow fix, described in [Trim fuel flow](#trim-fuel-flow), the
+IDBFS-linkage
 and native-exception build corrections described in
 [the fork.4 adoption record](#adopted-idbfs-and-native-exception-corrections)
-and the fork.5 rename. All 731 app/runtime/UI/artifact tests across 77 files
-passed against it. Production build/typecheck and emitted
+and the fork.5 rename. fork.6's acceptance run passed all 731
+app/runtime/UI/artifact tests across 77 files. Production build/typecheck and emitted
 asset checks passed; focused ESLint passed the five changed identity/artifact
 and test-configuration files with no warnings. Headless Chrome verified actual SDK boot and loaded
 bytes for C172 and all three SF50 runtime packages. The separate component
@@ -56,7 +58,8 @@ Retained rollback tarballs keep the name they were published under, so
 rejects a renamed package claiming an older version. A full rollback restores
 that release's declaration, lock and identity module together from
 [`validation/evidence/jsbsim/rollback/`](validation/evidence/jsbsim/rollback);
-fork.5 and fork.6 are at commits `f9a27c0d` and `9e22e168` instead.
+fork.5 and fork.6 are at commits `f9a27c0d` and `9e22e168` instead, and
+fork.7 is the installed declaration.
 
 ## Build and installation chain
 
@@ -67,7 +70,7 @@ uses native TypeScript stripping. This integration was exercised with
 The application declares:
 
 ```json
-"@felipegalind0/jsbsim": "file:deps/felipegalind0-jsbsim-1.2.4-fork.6.tgz"
+"@felipegalind0/jsbsim": "file:deps/felipegalind0-jsbsim-1.2.4-fork.7.tgz"
 ```
 
 The package scope and API imports stay the same. The wrapper version does not
@@ -297,11 +300,36 @@ augmentation branch applies. Trim still leaves EGT, oil pressure, nozzle
 position and EPR at their previous values.
 
 This corrects *which operating point* trim reports. It does not settle the SF50
-idle fuel flow: the two lowest AFM cruise rows remain clamped at the estimated
-idle floor, which is
-[a separate open question](validation/sf50-g1-cruise-fuel-flow-2026-09-13.md).
+idle fuel flow, which fork.7 addresses below.
 Full results and hashes are in
 [`validation/evidence/jsbsim/adoption/fork6-adoption.json`](validation/evidence/jsbsim/adoption/fork6-adoption.json).
+
+## Idle fuel flow
+
+`FGTurbine::Load()` always set `IdleFF` to `107 * milthrust^0.2`, an estimate
+from rated thrust alone, and `Run()` floors steady fuel flow at it. For the
+SF50's 1,846 lbf that floor is 481.5 lbm/hr, or 71.4 US gph: six times the
+11.3 gph the WPR20FA051 recorder shows at ground idle, and above the two lowest
+printed AFM cruise rows, so those rows were unreachable at any power setting.
+
+fork.7 reads an optional `<idlefuelflow>` in lbm/hr and keeps the estimate when
+it is absent. A negative value is rejected, before `FGEngine::Load` ties engine
+properties: rejecting it afterwards left the ties behind for an engine that was
+never constructed, and destroying the executive then crashed in
+`FGPropertyManager::Unbind`.
+
+The app's SF50 package declares the recorded 76 lbm/hr. Loading that package on
+the retained fork.6 artifact reports 481.5 lbm/hr at ground idle; on fork.7 it
+reports 76.0. The script producing both is preserved as
+[`validation/evidence/jsbsim/idle-fuel-flow/`](validation/evidence/jsbsim/idle-fuel-flow);
+it fails on fork.6 and passes on fork.7, which attributes the change to this
+package rather than to the SF50 package or the harness. Full results and hashes
+are in
+[`validation/evidence/jsbsim/adoption/fork7-adoption.json`](validation/evidence/jsbsim/adoption/fork7-adoption.json).
+
+`TestTurbineIdleFuelFlow` covers the unchanged default, a configured value above
+and below the estimate, a running engine settling on the configured value, and
+rejection of a negative one. The change is not submitted upstream.
 
 ## Runtime diagnostics and native lifetime
 

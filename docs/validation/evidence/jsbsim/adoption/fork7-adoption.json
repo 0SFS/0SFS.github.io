@@ -1,0 +1,88 @@
+{
+ "schemaVersion": 1,
+ "date": "2026-09-14",
+ "purpose": "Adopt configurable turbine idle fuel flow into the app runtime. FGTurbine derived IdleFF from rated thrust alone (107 * milthrust^0.2), which for the SF50's 1,846 lbf is 481.5 lbm/hr, or 71.4 US gph. Fuel flow is floored at that value, so the WPR20FA051 recorder's 76 lbm/hr ground idle and the two lowest printed AFM cruise rows were unreachable.",
+ "behaviourChange": "intended, turbine idle fuel flow only; the derived estimate is kept when <idlefuelflow> is absent",
+ "source": {
+  "repository": "/Users/felg/gh/Felipegalind0/jsbsim",
+  "branch": "feature/jsbsim-package-rename",
+  "commit": "fea688020fb683c0696aa8339dbed9cdb238a39d",
+  "parent": "c70be25718c693b110c07de630a309bb4b38f487",
+  "engineChangeCommit": "c70be25718c693b110c07de630a309bb4b38f487",
+  "upstreamPullRequest": null,
+  "changedPaths": [
+   "src/models/propulsion/FGTurbine.cpp",
+   "src/models/propulsion/FGTurbine.h",
+   "tests/TestTurbineIdleFuelFlow.py",
+   "tests/CMakeLists.txt",
+   "wasm/package.json",
+   "wasm/package-lock.json",
+   "wasm/README.md",
+   "wasm/docs/centralized-builds.md"
+  ],
+  "sdkCodeUnchanged": true,
+  "dirty": false,
+  "note": "The element is validated before FGEngine::Load ties engine properties. Rejecting it afterwards left the ties behind for an engine that was never constructed, and destroying the executive then crashed in FGPropertyManager::Unbind. TSFC and ATSFC functions are still constructed after that point, so that path is unchanged."
+ },
+ "identity": {
+  "package": "@felipegalind0/jsbsim@1.2.4-fork.7",
+  "previousPackage": "@felipegalind0/jsbsim@1.2.4-fork.6",
+  "repositoryContentSha256": "688091cc93ad332d8e55ca376393dea3d544a80de0711a4781e10c7e1539ec35",
+  "sdkSubtreeSha256": "b5d8ff6d2cc76d2b96c92aef1a3228bf6cfebe5dd8ddc4e571c6b713f3d5a93d",
+  "buildInputSha256": "733a60a62ef3061dc254f6d4a3c8f3cf7f162a213b444e423e4ac3d6b18553f0",
+  "tarballSha256": "58afaf9fa575ec61838ba794b7b4a0919b8eaf516c7261e571700e8367b5217b",
+  "tarballIntegrity": "sha512-lYi/DfCul0C9UjITvOzUvYXk862s0WRNTBL4vE7QlJRb++9DiU4nOemAxxIboCZU3aWTGEiVt0I3NF6I3Wnn7g==",
+  "emittedLoaderSha256": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+  "emittedWasmSha256": "6eae23db0fc26d4e02daa27eb95fba12932265164e4bb194cb3e183d04882806"
+ },
+ "runtimeEvidence": {
+  "check": "evidence/jsbsim/idle-fuel-flow/check.mjs",
+  "method": "The app's own public/jsbsim-data SF50 package is written into the SDK's virtual filesystem, loaded, and trimmed on the runway with the thrust lever closed. The package declares <idlefuelflow>76</idlefuelflow>; the check compares the reported idle fuel flow with that figure and with FGTurbine's 481.5 lbm/hr fallback.",
+  "fork6": {
+   "result": "failed",
+   "observed": "481.5 lbm/hr (71.44 US gph) at 24.3 % N1 and 53.4 % N2: the rated-thrust fallback, so the element was ignored.",
+   "log": "idle-fuel-flow/fork6.log"
+  },
+  "fork7": {
+   "result": "passed",
+   "observed": "76.0 lbm/hr (11.28 US gph) at the same spool speeds, 0.000 % from the declared value.",
+   "log": "idle-fuel-flow/fork7.log"
+  },
+  "significance": "The negative control for this adoption: the identical script fails on the retained fork.6 tarball and passes on fork.7, so the change is attributable to this package and not to the SF50 package or the harness."
+ },
+ "checks": {
+  "nativeTurbineTests": {
+   "status": "passed",
+   "build": "/Users/felg/gh/Felipegalind0/jsbsim/build/idle-ff",
+   "tests": [
+    "TestTurbine",
+    "TestTurbineTrimSpool",
+    "TestTurbineTrimFuelFlow",
+    "TestTurbineIdleFuelFlow"
+   ]
+  },
+  "sdkPackValidation": {
+   "status": "passed",
+   "recordedBy": "dist/build-metadata.json validation block",
+   "commands": [
+    "tsc --noEmit (frozen SDK workspace)",
+    "node --test test/*.test.mjs (frozen SDK workspace and resolved native fixtures)"
+   ]
+  },
+  "installedArtifactIdentity": {
+   "status": "passed",
+   "command": "npm run verify:jsbsim",
+   "verifiedFiles": 14
+  },
+  "sf50AfmBaseline": {
+   "status": "unchanged",
+   "command": "node scripts/validate-sf50.mjs",
+   "note": "Run with the recalibrated SF50 package on this artifact. Every takeoff metric and every landing ground roll and total distance is within the 15 % benchmark tolerance; the two landing airborne distances that already failed before this work still fail, at -15.5 % and -18.8 %. Static thrust 1771.9 lbf, -4.0 % of the 1,846 lbf rating."
+  }
+ },
+ "notAttempted": [
+  "No WASM/native parity report was produced for this release. fork.6's parity report stands for the shared engine revision; this change alters only turbine idle fuel flow and is covered by the negative control above.",
+  "No browser persistence or release-pack run was repeated for this release.",
+  "The app suite result is not recorded here because the working tree carries another agent's uncommitted work; the three failures in it are in that work, not in the JSBSim path."
+ ]
+}

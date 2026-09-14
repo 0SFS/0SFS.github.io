@@ -5,7 +5,7 @@ assets. A line to a service does not mean OSFS owns, redistributes, or licenses
 that service's data.
 
 The current development source is one `Felipegalind0/jsbsim` checkout containing
-the C++ engine and `wasm/` SDK. OSFS installs the clean in-tree `1.2.4-fork.6`
+the C++ engine and `wasm/` SDK. OSFS installs the clean in-tree `1.2.4-fork.7`
 package from that repository, which adopts the IDBFS-linkage and
 native-exception build corrections from the upstream package contribution. Its
 144 focused app/runtime/UI/artifact tests,
@@ -27,7 +27,7 @@ flowchart TB
   FE["FOSS Earth<br/>local file dependency<br/>AGPL-3.0-only"]
   BJS["Babylon.js Core + Loaders<br/>Apache-2.0"]
   TILES["3d-tiles-renderer<br/>NASA AMMOS / Caltech<br/>Apache-2.0"]
-  JSW["@felipegalind0/jsbsim<br/>1.2.4-fork.6 tarball under deps/<br/>SDK: MIT"]
+  JSW["@felipegalind0/jsbsim<br/>1.2.4-fork.7 tarball under deps/<br/>SDK: MIT"]
   JSB["Felipegalind0/jsbsim source<br/>C++ engine + wasm/ SDK, one revision<br/>Native engine: LGPL-2.1"]
   DATA["JSBSim C172 XML<br/>rights unresolved"]
   ASSETS["Aircraft GLB / Blender / images<br/>per-asset rights unresolved"]
@@ -59,7 +59,7 @@ the exact JSBSim integration is in [JSBSim WASM](jsbsim.md).
 
 ## Identified SDK dependency
 
-`package.json` declares `file:deps/felipegalind0-jsbsim-1.2.4-fork.6.tgz`
+`package.json` declares `file:deps/felipegalind0-jsbsim-1.2.4-fork.7.tgz`
 and Node `>=22.18` for the shared artifact validator; the tested Node version
 is 26.8.2. Retain the tarball, declaration and lock together for portable SDK
 installation without a source sibling or npm publication. The SDK package

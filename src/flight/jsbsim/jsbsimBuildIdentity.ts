@@ -1,6 +1,6 @@
 /** Expected public contract of the packaged fork; no native handles are exposed. */
 export const JSBSIM_PACKAGE_NAME = "@felipegalind0/jsbsim";
-export const JSBSIM_PACKAGE_VERSION = "1.2.4-fork.6";
+export const JSBSIM_PACKAGE_VERSION = "1.2.4-fork.7";
 
 /**
  * The package was renamed from `@felipegalind0/jsbsim-wasm` at fork.5: engine
@@ -19,6 +19,7 @@ const acceptedPackages: Record<1 | 2, Readonly<Record<string, string>>> = {
     "1.2.4-fork.3": RENAMED_FROM,
     "1.2.4-fork.4": RENAMED_FROM,
     "1.2.4-fork.5": JSBSIM_PACKAGE_NAME,
+    "1.2.4-fork.6": JSBSIM_PACKAGE_NAME,
     [JSBSIM_PACKAGE_VERSION]: JSBSIM_PACKAGE_NAME,
   },
 };
