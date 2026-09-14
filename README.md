@@ -34,9 +34,15 @@ switch to the chase camera to take it all in.
 | `V` | Toggle first- and third-person camera |
 
 Throttle and pitch trim are also vertical sliders in the lower-right corner, and the gear has a `G`
-button in the instrument row above the attitude indicator. Gamepads are supported.
+button in the instrument row above the attitude indicator.
 In mouse input mode, right-drag to orbit the chase camera and scroll to zoom; trackpad mode supports
 scrolling to orbit and pinching to zoom.
+
+The **Controls** tab in the flight panel rebinds both the keyboard and a controller. It comes with
+two built-in controller profiles, **Xbox** and **Classic**, and your own profiles can be exported and
+imported as JSON. Stick response is **Smooth** by default, taking 375 ms to approach a held stick, or
+**Direct**. The same tab inverts the chase camera's orbit on either axis, and chooses whether the
+camera holds its angle or returns behind the aircraft when you let go.
 
 Use the flight panel to change wind conditions, reposition, or choose an airport preset. Departure
 presets start paused — press `P` when you're ready.
@@ -50,7 +56,7 @@ aircraft and richer models are part of where the project is headed.
 Future directions:
 
 - **More aircraft:** expand beyond the bundled C172P, with aircraft selection and matching visual models.
-- **ArduPilot support:** use ArduPilot as an optional autopilot when you do not want to fly manually. The Autopilot tab already runs an in-sim autopilot (roll/yaw stabilize, pitch hold, auto-throttle, and optional gear/flaps). ArduPilot can be selected there but will not fly until a local SITL bridge is connected — the sim will not pretend it is. The planned SITL integration looks like this:
+- **ArduPilot support:** use ArduPilot as an optional autopilot when you do not want to fly manually. The Autopilot tab already runs an in-sim autopilot (roll/yaw stabilize, pitch hold, auto-throttle, and optional gear/flaps), and the **AP** button beside the gear button engages it. ArduPilot can be selected there but will not fly until a local SITL bridge is connected — the sim will not pretend it is. The planned SITL integration looks like this:
   1. JSBSim remains the flight dynamics model. It advances the aircraft and produces the simulated sensor state: position, attitude, velocity, airspeed, and altitude.
   2. A small local bridge connects the browser to ArduPilot Plane SITL. It sends that sensor state into the autopilot and receives its servo outputs over the [external simulator interface](https://ardupilot.org/dev/docs/sim-on-hardware.html)/MAVLink.
   3. OSFS maps those outputs back to the aircraft controls — elevator, aileron, rudder, throttle, and flaps — so ArduPilot is flying the same aircraft you see on screen.
