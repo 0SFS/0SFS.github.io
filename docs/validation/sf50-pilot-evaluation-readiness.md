@@ -27,7 +27,8 @@ Status meanings:
   silently: `npm run build -- --base=/` appended `--base=/` to the artifact
   verifier, which rejects any argument but `--dist=`, so `gh-pages` never ran.
 - **Done — cruise, stall and climb measured against the AFM** with
-  [`scripts/diagnose-sf50-steady-flight.py`](../../scripts/diagnose-sf50-steady-flight.py).
+  [`scripts/diagnose-sf50-steady-flight.py`](../../scripts/diagnose-sf50-steady-flight.py),
+  and the climb/cruise disagreement traced to thrust and parasite drag together.
   Results below.
 - **Done — idle fuel flow sourced from recorded data**, and JSBSim can now take
   it ([cruise fuel-flow record §7](sf50-g1-cruise-fuel-flow-2026-09-13.md)).
@@ -70,15 +71,45 @@ model's 100 % ceiling.
 
 Both results say thrust minus drag is too large, and increasingly so with
 altitude. The installed thrust map, including its altitude lapse, and the drag
-polar are both estimates and have never been separated. Fuel flow at part power
-already ran 10–20 % high in the earlier diagnostic.
+polar are both estimates. Fuel flow at part power already ran 10–20 % high in
+the earlier diagnostic.
 
-**Next.** Use the two tables together, at the same altitude, to separate the
-errors: cruise gives thrust = drag at the cruise N1 and speed; climb gives thrust
-− drag = weight × rate of climb ÷ speed at the MCT N1 and climb speed. Fix
-whichever the pair points to, and re-run both checks together with fuel flow.
-Do not tune one to hide the other. Owner: aircraft package and scripts; can
-start now.
+**Which is wrong.** [`scripts/separate-sf50-thrust-drag.py`](../../scripts/separate-sf50-thrust-drag.py)
+writes one equation per AFM condition. At each cruise altitude, the real airplane
+balances thrust and drag at the printed cruise TAS and MCT N1, and has a known
+excess force in the ISA climb; the model's departure from each is the equation.
+With all four AFM weights that is eight equations per altitude, fitted by least
+squares to each candidate error:
+
+| Explanation | RMS residual, 10,000–28,000 ft |
+| --- | --- |
+| Thrust scale only | 33–68 lbf |
+| Parasite drag only | 71–102 lbf |
+| Induced drag only | 21–38 lbf |
+| Thrust scale and parasite drag | **9–11 lbf** |
+| Thrust scale and induced drag | 17–33 lbf |
+| Parasite and induced drag | 18–26 lbf |
+| All three | 6–10 lbf |
+
+The only two-term explanation that fits is thrust **and** parasite drag, with
+stable values at every altitude from 10,000 ft up: installed thrust **17–27 %
+too high**, and CD0 **0.0045–0.0070 too high** on a model value of 0.025–0.027.
+At 5,000 ft thrust is within 3 % and CD0 is right. A third, induced-drag term
+lowers the residual only a little and swings wildly at 5,000 ft. The climb
+excess is also nearly identical at every weight (150–157 lbf at 15,000 and
+28,000 ft) although the model's induced drag rises about 70 % from 4,500 to
+6,000 lb, which rules induced drag out as the main cause.
+
+The two errors have opposite signs and partly cancel in cruise, which is why
+cruise looks nearly right and climb does not. Correcting either alone makes the
+other table worse: with thrust cut by a fifth and drag unchanged, the model could
+not reach AFM cruise speed at MCT.
+
+**Next.** Correct thrust above 5,000 ft and CD0 together, alongside idle N1
+(item 7): the model derives thrust from N1 through its idle endpoint, so part of
+the thrust error may belong to that mapping rather than the altitude lapse. Then
+re-run cruise, climb and fuel flow as one set. Owner: aircraft package and
+scripts; can start now.
 
 ### 2. No stall warning, stick pusher or low-speed awareness
 
@@ -235,7 +266,8 @@ python3 scripts/diagnose-sf50-steady-flight.py \
 The 2026-09-13 run used `Felipegalind0/jsbsim` `c70be257` (identical to the app's
 `1.2.4-fork.6` for these checks), app `55f28082`, `sf50.xml` SHA-256 `d00da7a5…`
 and `fj33_5a.xml` `a201f738…`. Outputs carry printed AFM values and stay in the
-ignored `build/validation/sf50-steady-flight-20260913/`.
+ignored `build/validation/sf50-steady-flight-20260913/`. The thrust/drag
+separation runs the same way with `scripts/separate-sf50-thrust-drag.py`.
 
 What these checks do not establish: loading uses the model's CG rather than an
 AFM loading case; the climb uses AFM cruise-table MCT N1 as a stand-in for the
