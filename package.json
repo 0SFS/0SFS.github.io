@@ -16,7 +16,7 @@
     "build": "npm run verify:jsbsim && tsc -b && vite build && node scripts/verify-jsbsim-artifact.mjs --dist=dist",
     "ci": "npm run lint && npm run test && npm run build",
     "deploy": "npm run deploy:gh-pages",
-    "deploy:gh-pages": "npm run build -- --base=/ && gh-pages -d dist",
+    "deploy:gh-pages": "npm run build && gh-pages -d dist",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run --passWithNoTests",
