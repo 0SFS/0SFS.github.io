@@ -19,6 +19,7 @@ Supplementary artifacts:
 - public-audit-findings.json records the applicability decisions, search coverage and unresolved gates.
 - public-audit-test-results.json records actual analyzer scope and focused-test outcomes.
 - public-audit-recorder-review.json retains the partial research inventory and its explicit WPR header limitation.
+- idle-fuel-flow-2026-09-13.json derives FJ33-5A ground-idle fuel flow from the WPR20FA051 recorder export, verified against public-audit-manifest.json, with the event context and limitations. Regenerate it into a new path with scripts/derive-sf50-idle-fuel-flow.py; the raw export stays ignored.
 - derived/public-audit-2026-09-12/ retains analyzer outputs, the full Vitest report and processed public-flight chart arrays. These are ignored by Git, as is raw/.
 
 The existing collector/analyzer still use the original manifest.json. They do not automatically reacquire or normalize the supplement. Dynamic navigation/flight pages are snapshot evidence and may not reproduce byte-for-byte on another visit. Do not change hashes automatically to make reacquisition pass. See docs/validation/sf50-public-data-audit-2026-09-12.md for remaining acquisition/qualification work.

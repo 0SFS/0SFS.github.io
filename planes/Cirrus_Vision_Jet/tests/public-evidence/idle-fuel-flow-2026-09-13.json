@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-13",
+  "purpose": "Source an installed FJ33-5A idle fuel flow for engine/fj33_5a.xml, which currently inherits JSBSim's thrust-only estimate.",
+  "status": "source-backed-estimate",
+  "appliedToPackage": false,
+  "source": {
+    "docket": "NTSB WPR20FA051",
+    "aircraft": "N52CV, Cirrus SF50",
+    "manifest": "public-audit-manifest.json",
+    "manifestId": "audit-wpr20-recorder",
+    "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=14295671&FileExtension=csv&FileName=Recorders%20Summary%20Report%20attachment1-Rel.csv",
+    "sha256": "0fb3cb16ffb3e377cebfba27ac0d568968b16ed565ab8550425a0f38a7b3aa41",
+    "verifiedAgainstManifest": true,
+    "channels": {
+      "Eng1 Fuel Flow": "gph",
+      "Eng1 Oil Press": "psi"
+    },
+    "sampleRateHz": 1,
+    "redistribution": "The export is not committed; public availability is not treated as permission to redistribute it."
+  },
+  "method": {
+    "engineRunning": "oil pressure valid and >= 40 psi, and fuel flow valid and > 0",
+    "sentinels": "values <= -9999 are invalid",
+    "window": "engine-running samples excluding the first 30 s after start and the last 10 s before the recording ends",
+    "whyIdle": "The recorder has no N1, N2 or throttle channel. The segment is taken as idle because it is the only engine-running state in the session, follows directly from start, holds steady for minutes, and burns a small fraction of rated fuel flow. It is an inference from the recording, not a recorded lever position."
+  },
+  "session": {
+    "samples": 714,
+    "engineOffSamplesBeforeStart": 194,
+    "engineRunning": {
+      "samples": 444,
+      "from": "11:41:08",
+      "to": "11:48:31",
+      "durationS": 443,
+      "meanUsGph": 11.206531531531532,
+      "medianUsGph": 11.2,
+      "stdevUsGph": 1.2772988027510093,
+      "minUsGph": 0.1,
+      "maxUsGph": 18.6,
+      "p05UsGph": 10.4,
+      "p95UsGph": 11.8
+    },
+    "maximumGapWhileRunningS": 1
+  },
+  "idle": {
+    "samples": 404,
+    "from": "11:41:38",
+    "to": "11:48:21",
+    "durationS": 403,
+    "meanUsGph": 11.239851485148513,
+    "medianUsGph": 11.3,
+    "stdevUsGph": 0.48426453173605516,
+    "minUsGph": 10.3,
+    "maxUsGph": 11.9,
+    "p05UsGph": 10.4,
+    "p95UsGph": 11.8
+  },
+  "steadiness": {
+    "fuelFlowFirstMinuteMeanUsGph": 11.567213114754098,
+    "fuelFlowLastMinuteMeanUsGph": 11.191803278688525,
+    "oilPressureFirstMinuteMeanPsi": 53.98360655737705,
+    "oilPressureLastMinuteMeanPsi": 55.18032786885246,
+    "alternatorCurrentA": {
+      "Alternator 1": {
+        "window": 115.5940594059406,
+        "firstMinute": 129.2295081967213,
+        "lastMinute": 136.81967213114754
+      },
+      "Alternator 2": {
+        "window": 12.977722772277227,
+        "firstMinute": 14.311475409836065,
+        "lastMinute": 12.557377049180328
+      }
+    },
+    "alternatorValidWindowSamples": 404
+  },
+  "sensitivityOfMeanUsGph": {
+    "transient0s-guard0s": 11.206531531531532,
+    "transient0s-guard10s": 11.270506912442395,
+    "transient0s-guard30s": 11.292995169082126,
+    "transient30s-guard0s": 11.171980676328502,
+    "transient30s-guard10s": 11.239851485148513,
+    "transient30s-guard30s": 11.262500000000001,
+    "transient60s-guard0s": 11.158333333333333,
+    "transient60s-guard10s": 11.231283422459892,
+    "transient60s-guard30s": 11.255367231638418
+  },
+  "massFlow": {
+    "lbmPerHourAtAfmNominalDensity": 75.98139603960395,
+    "lbmPerHourAtJsbsimJetADensity": 75.75659900990098,
+    "densityConventionSensitivityFraction": 0.0029673590504450953,
+    "stdevLbmPerHourAtAfmNominalDensity": 3.2736282345357326
+  },
+  "proposedIdleFuelFlowLbmPerHour": 76,
+  "proposedBasis": "Window mean at the AFM nominal density, rounded to whole lbm/hr, which is finer than the sample spread.",
+  "corroboration": {
+    "jsbsimEstimateLbmPerHour": 481.53750368326286,
+    "jsbsimEstimateOverRecorded": 6.337571152710461,
+    "modelStaticMaxFuelFlowLbmPerHour": 1199.9,
+    "recordedIdleFractionOfModelStaticMax": 0.06332310695858318,
+    "modelStaticMaxBasis": "AFM rated thrust 1846 lbf times the package's estimated TSFC 0.65; the TSFC is not source-backed, so this ratio is a plausibility check only.",
+    "lowestAfmCruiseRowsUsGph": {
+      "5000ftIsa": 54,
+      "15000ftIsa": 50
+    },
+    "recordedIdleFractionOfLowestCruiseRows": {
+      "5000ftIsa": 0.2081453978731206,
+      "15000ftIsa": 0.22479702970297027
+    }
+  },
+  "eventContext": {
+    "summary": "The recorded session is the ground operation in which a cabin fire occurred. The fire was not an engine fire; its effect on electrical and bleed load during the window is not known.",
+    "docketItems": [
+      {
+        "item": 1,
+        "title": "Materials Laboratory Fire Factual Report 21-031",
+        "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=14295435&FileExtension=pdf&FileName=21-031%20Factual-Rel.pdf",
+        "relevant": "Examination focused on the right passenger sidewall wire bundles and the underfloor area; conductors below the right egress window showed welding and beading."
+      },
+      {
+        "item": 6,
+        "title": "Airframe Examination Report",
+        "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=14462664&FileExtension=pdf&FileName=FINAL%20-%20Airframe%20Examination-WPR20FA051-Rel.pdf",
+        "relevant": "The engine and engine compartment appeared undamaged, although the compressor blades were sooted and the right side of the nacelle outer shell was burnt about halfway along its length."
+      },
+      {
+        "item": 9,
+        "title": "FAA Emergency Airworthiness Directive 2020-03-50",
+        "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=14292800&FileExtension=pdf&FileName=2020-03-50_Emergency-Rel.pdf",
+        "relevant": "Prompted by a cabin fire on an SF50 during ground operations, with smoke from behind the right sidewall panel; issued to prevent an electrical short and uncontained cabin fire."
+      }
+    ],
+    "retained": "Reviewed copies are kept only in the ignored build/validation/sf50-idle-fuel-flow-20260913/wpr20-docket/ directory and are not redistributed."
+  },
+  "limitations": [
+    "One airframe and one recorded session.",
+    "Recorded during the ground operation in which a cabin electrical fire occurred; the engine was not damaged. Fuel flow averages 11.57 gph in the first minute of the window and 11.19 gph in the last, and oil pressure 54 and 55 psi. Alternator 1 current is not steady: 116 A over the window against 129 A and 137 A in its first and last minutes. Abnormal electrical or bleed load during the window cannot be excluded.",
+    "Ground idle only. Pressure altitude, temperature, bleed/ECS state and taxi versus stationary are not recorded.",
+    "Alternator current is recorded for the whole window; ECS and bleed extraction are not.",
+    "Fuel flow is an avionics-computed volume flow; its density convention is unknown. US gallons are assumed for this N-registered aircraft.",
+    "JSBSim applies idle fuel flow as one constant at every altitude and Mach. In-flight idle may be scheduled higher than ground idle; the model has no separate flight-idle floor.",
+    "The recorder is quarantined for replay in public-audit-recorder-review.json. This uses one channel as a scalar, not as a replay."
+  ]
+}

@@ -171,16 +171,105 @@ software gate results, not aircraft evidence.
 
 ## 6. Next concrete step
 
-1. Decide the idle fuel-flow treatment for the SF50 package. The floor is
-   generic JSBSim behaviour driven by rated thrust, and the aircraft-specific
-   idle flow belongs in `engine/fj33_5a.xml` — but a source-backed idle fuel
-   flow for the FJ33-5A has not been found. Either locate one, or record an
-   explicit estimate with its basis. Do not pick a value that merely makes the
-   two clamped rows agree.
+1. **Idle fuel flow: a recorded value is found (§7).** Remaining: adopt a JSBSim
+   package that contains `c70be257` and add `<idlefuelflow>76</idlefuelflow>` to
+   `engine/fj33_5a.xml` in the same change. Doing only one half would leave the
+   package stating a value the browser runtime ignores, or a runtime capability
+   the package does not use.
 2. Only then revisit the part-power shape, and only with installed thrust and
-   TSFC treated as the coupled pair they are.
-3. Adopt the JSBSim trim fuel-flow fix into the application package when the
-   SF50 engine work is ready, so the engine change and any schedule change reach
-   the app together rather than in two dependency cycles.
-4. Upstream `fix/turbine-trim-fuel-flow` under the contribution policy, after
-   #1505 (its declared prerequisite) is resolved. Do not duplicate #1505.
+   TSFC treated as the coupled pair they are. With the floor gone, all eight rows
+   now exercise that path.
+3. ~~Adopt the JSBSim trim fuel-flow fix into the application package.~~ Done as
+   `1.2.4-fork.6` in `a3e6c65a`.
+4. ~~Upstream `fix/turbine-trim-fuel-flow`.~~ Opened as JSBSim PR #1508,
+   declaring #1505 as its prerequisite.
+5. Upstream `feature/turbine-idle-fuel-flow` only after the capability is
+   confirmed in use; it sits on the package branch, so it would need rebasing
+   onto upstream `master` first.
+
+## 7. Idle fuel flow from recorded data
+
+### Source
+
+The only installed FJ33-5A idle fuel flow found in public data is in the NTSB
+WPR20FA051 recorder export for N52CV (serial 0010), which carries a 1 Hz
+`Eng1 Fuel Flow` channel in gph. The engine is off for the first three minutes;
+after start the session holds one steady running state for about seven minutes
+until the recording ends.
+
+[`scripts/derive-sf50-idle-fuel-flow.py`](../../scripts/derive-sf50-idle-fuel-flow.py)
+verifies the export against the SHA-256 in `public-audit-manifest.json` and takes
+the engine-running samples from 30 s after start to 10 s before the end: **404
+samples, mean 11.24 US gph** (median 11.3, standard deviation 0.48, range
+10.3–11.9). Moving either edge of that window by 0–60 s changes the mean by less
+than 0.7 %. That is **76.0 lbm/hr** at the AFM's 6.76 lb/US gal and 75.8 at
+JSBSim's 6.74. The record, with every statistic and limitation, is
+`planes/Cirrus_Vision_Jet/tests/public-evidence/idle-fuel-flow-2026-09-13.json`.
+The raw export and the docket documents reviewed stay in ignored directories.
+
+JSBSim's rated-thrust estimate for this engine, 481.5 lbm/hr, is 6.3 times the
+recorded value.
+
+### How far it can be trusted
+
+- **Idle is inferred, not recorded.** The export has no N1, N2 or throttle
+  channel. The segment is taken as idle because it is the only running state in
+  the session, follows directly from start, holds steady for minutes, and burns
+  about 6 % of the model's static maximum fuel flow (1,846 lbf × the package's
+  estimated TSFC 0.65, so that ratio is a plausibility check only).
+- **It is the ground operation in which a cabin fire occurred.** Emergency AD
+  2020-03-50, in the same docket, describes a cabin fire on an SF50 during ground
+  operations, with smoke from behind the right sidewall panel, and addresses an
+  electrical short. The NTSB airframe examination found the engine and engine
+  compartment undamaged apart from sooted compressor blades and a burnt right
+  nacelle shell. Fuel flow drifts from 11.57 to 11.19 gph between the window's
+  first and last minute, and Alternator 1 current is not steady (116 A over the
+  window, 129 A and 137 A in its first and last minutes). Abnormal electrical or
+  bleed load cannot be excluded.
+- One airframe, one session, ground idle only. Ambient conditions and bleed/ECS
+  state are not recorded, and US gallons are assumed.
+- JSBSim applies idle fuel flow as one constant at every altitude and Mach. In
+  flight, idle may be scheduled higher than on the ground, and the model has no
+  separate flight-idle floor.
+
+### Engine capability
+
+JSBSim could not use a measured value: `FGTurbine::Load` always assigned the
+estimate. `Felipegalind0/jsbsim` `c70be257` (branch
+`feature/turbine-idle-fuel-flow`) reads an optional `<idlefuelflow>` in lbm/hr
+and keeps the estimate when it is absent. A negative value is rejected before
+the engine binds its properties. `TestTurbineIdleFuelFlow` covers the default,
+a configured value above and below the estimate, a running engine settling at
+it while spooling down, and rejection. Four of its five tests fail on the build
+without the change. The full native suite passes except `TestInputSocket`, which
+needs `telnetlib3`, absent from the local Python.
+
+### Effect on this diagnostic
+
+`diagnose-sf50-cruise-fuel-flow.py` now takes `--data-root`, so a proposed
+package change can be evaluated on a copy without editing the app's package.
+On `c70be257`, the unchanged app data reproduces §3's table exactly. A copy with
+`<idlefuelflow>76</idlefuelflow>` gives:
+
+| Target row | AFM US gph | Estimated floor | Recorded idle, 76 lbm/hr |
+| --- | ---: | ---: | ---: |
+| `g1-cruise-6000-5000-0-tabulated-part-power-71.4` | 54 | 71.4 (1.323, clamped) | 66.7 (1.236) |
+| `g1-cruise-6000-15000-0-tabulated-part-power-79.2` | 50 | 71.4 (1.429, clamped) | 64.7 (1.294) |
+
+Every other row, and every thrust and TSFC value, is identical. Neither row is
+at the floor any more, so both now go through thrust × TSFC and show the same
+part-power excess as their neighbours (§3 b) instead of a clamp. The value was
+taken from the recorder before this run and was not adjusted to it; it does not
+make the two rows agree with the AFM, and it should not be tuned to.
+
+Outputs, local and ignored because they carry printed AFM values:
+`build/validation/sf50-idle-fuel-flow-20260913/cruise-control-c70be257.json` and
+`cruise-proposed-76-c70be257.json`.
+
+### Not done
+
+`engine/fj33_5a.xml` is unchanged. The installed `1.2.4-fork.6` ignores
+`<idlefuelflow>`, so the element and the package that honours it have to land
+together (step 1). That adoption changes `package.json` and
+`package-lock.json`, which currently hold unrelated uncommitted work, so it waits
+for them.

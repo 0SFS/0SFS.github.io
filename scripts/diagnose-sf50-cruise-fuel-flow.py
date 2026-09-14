@@ -41,6 +41,9 @@ def parse_args():
     parser.add_argument("--jsbsim-source", required=True,
                         help="Canonical JSBSim checkout, recorded for provenance")
     parser.add_argument("--out", required=True, help="New output JSON path")
+    parser.add_argument("--data-root", default=None,
+                        help="JSBSim data tree to load; defaults to the app's public/jsbsim-data. "
+                             "Point it at a copy to evaluate a proposed package change without editing it.")
     parser.add_argument("--altitudes", default="5000,15000",
                         help="Comma-separated reviewed pressure altitudes in feet")
     return parser.parse_args()
@@ -83,9 +86,9 @@ def reviewed_rows(root, altitudes):
     return rows, candidates["source"], ledger["recordedPrimarySha256"]
 
 
-def engine_bleed_fraction(root):
+def engine_bleed_fraction(data_root):
     """The package's declared bleed fraction, needed to recover dry thrust."""
-    engine = (root / "public/jsbsim-data/engine/fj33_5a.xml").read_text()
+    engine = (data_root / "engine/fj33_5a.xml").read_text()
     return float(engine.split("<bleed>")[1].split("</bleed>")[0])
 
 
@@ -200,7 +203,7 @@ def main():
     if not rows:
         raise SystemExit("No reviewed ISA rows matched the requested altitudes")
 
-    data_root = root / "public/jsbsim-data"
+    data_root = pathlib.Path(args.data_root).resolve() if args.data_root else root / "public/jsbsim-data"
     fdm = jsbsim.FGFDMExec(str(data_root))
     fdm.set_debug_level(0)
     fdm.set_aircraft_path("aircraft")
@@ -209,7 +212,7 @@ def main():
     assert fdm.load_model("sf50"), "The canonical G1 package must load"
     fdm.set_dt(1.0 / 120.0)
 
-    bleed_fraction = engine_bleed_fraction(root)
+    bleed_fraction = engine_bleed_fraction(data_root)
     results = [evaluate(fdm, row, bleed_fraction) for row in rows]
     for result in results:
         assert abs(result["model"]["n1Pct"] - result["printed"]["n1Pct"]) < 1e-6, \
@@ -227,6 +230,7 @@ def main():
         "diagnostic": "g1-cruise-fuel-flow-at-observed-n1",
         "purpose": "Compare installed model fuel flow with reviewed AFM cruise rows at imposed conditions.",
         "aircraftPackage": "sf50 (G1, canonical)",
+        "dataRoot": str(data_root),
         "engineFile": "engine/fj33_5a.xml",
         "jsbsim": git_identity(str(pathlib.Path(args.jsbsim_source).resolve())),
         "nativeBuild": str(native_build),
