@@ -24,6 +24,7 @@ const mocks = vi.hoisted(() => {
       root: {}, setViewMode: vi.fn(), toggleViewMode: vi.fn(), getViewMode: () => "third",
       orbitChaseCamera: vi.fn(), zoomChaseCamera: vi.fn(), dispose: vi.fn(),
       modelRoot: {}, setModelLoaded: vi.fn(), getChaseDistanceMeters: () => 14,
+      thirdPersonCamera: { position: { y: 2.2, length: () => Math.hypot(2.2, 14) } },
     },
     aircraftModel: {
       getState: () => ({ aircraftId: "cessna-172", lodId: "auto", activeLodId: "lod3", status: "ready", triangles: 876, error: null }),

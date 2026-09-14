@@ -37,6 +37,7 @@ const mocks = vi.hoisted(() => {
       setViewMode: vi.fn(), toggleViewMode: vi.fn(), getViewMode: () => "third",
       orbitChaseCamera: vi.fn(), zoomChaseCamera: vi.fn(), dispose: vi.fn(),
       modelRoot: {}, setModelLoaded: vi.fn(), getChaseDistanceMeters: () => 14,
+      thirdPersonCamera: { position: { y: 2.2, length: () => Math.hypot(2.2, 14) } },
     },
     aircraftModel: {
       root: {},
