@@ -10,21 +10,31 @@ opening a pull request.
 
 - Node.js 22 or newer
 - npm
-- A sibling checkout of [`foss-earth`](https://github.com/Felipegalind0/foss-earth)
+- A sibling checkout of [FOSS Earth](https://github.com/foss-earth/foss-earth.github.io)
+- A sibling checkout of [gamepad-tools](https://github.com/Felipegalind0/gamepad-tools), built before
+  installing OSFS
 - Optional: a Google Maps Tiles API key with the Map Tiles API enabled
 
-OSFS depends on FOSS Earth as a local file dependency, so the two repositories must sit side by side:
+OSFS depends on both as local file dependencies, and FOSS Earth links gamepad-tools as well, so the
+checkouts must sit at these relative paths:
 
 ```text
 parent-directory/
-├── OSFS/
-└── foss-earth/
+├── 0sfs/                   this repository
+├── foss-earth/
+└── Felipegalind0/
+    └── gamepad-tools/
 ```
 
+gamepad-tools does not commit its compiled output, and its package exports point at it, so build it
+before installing here:
+
 ```sh
-git clone https://github.com/Felipegalind0/foss-earth.git
-git clone https://github.com/Felipegalind0/OSFS.git
-cd OSFS
+git clone https://github.com/Felipegalind0/gamepad-tools.git Felipegalind0/gamepad-tools
+(cd Felipegalind0/gamepad-tools && npm install && npm run build)
+git clone https://github.com/foss-earth/foss-earth.github.io.git foss-earth
+git clone https://github.com/0SFS/0SFS.github.io.git 0sfs
+cd 0sfs
 npm install
 ```
 
@@ -62,8 +72,9 @@ npm run build
 ```
 
 Or all three with `npm run ci`. Tests cover coordinate and attitude transforms, keyboard and throttle
-behavior, engine bootstrap sequencing, and real JSBSim/WASM C172 propulsion. `npm run test:watch`
-reruns on change.
+behavior, engine bootstrap sequencing, controller profiles through gamepad-tools' sampling and
+evaluation (`src/flight/input/gamepadProfiles.test.ts`), and real JSBSim/WASM C172 propulsion.
+`npm run test:watch` reruns on change.
 
 ## The FOSS Earth dependency
 
@@ -94,7 +105,7 @@ git pull --ff-only
 Then refresh and validate OSFS:
 
 ```sh
-cd ../OSFS
+cd ../0sfs
 npm install
 npm run ci
 ```
@@ -114,6 +125,37 @@ Note that FOSS Earth's stylesheets are exported as separate entry points. OSFS i
 `foss-earth/shell.css` and `foss-earth/input-mode.css` but **not** its `base.css`, so any CSS custom
 property a shell rule depends on has to be defined within the entry point that ships it — otherwise
 the declaration is invalid at computed-value time here and silently falls back to its initial value.
+
+## The gamepad-tools dependency
+
+`package.json` links gamepad-tools from its own sibling folder:
+
+```json
+"@felipegalind0/gamepad-tools": "file:../Felipegalind0/gamepad-tools"
+```
+
+FOSS Earth declares the same link, so one checkout serves both applications. gamepad-tools provides
+controller and keyboard sampling, binding profiles and their evaluation, the binding editor shown in
+the flight panel's **Controls** tab, and the optional 3D controller view.
+
+OSFS keeps the flight-specific half in `src/flight/input/gamepadToolsAdapter.ts`: the catalog of
+flight actions, the built-in **Xbox** and **Classic** profiles including their keyboard defaults, and
+the adapter that turns binding intents into flight controls. Reusable input work belongs in
+gamepad-tools instead.
+
+### Rebuilding gamepad-tools
+
+Its package exports point at `dist/`, which is not committed, so rebuild it after changing its
+source:
+
+```sh
+cd ../Felipegalind0/gamepad-tools
+npm run build
+```
+
+Because the dependency is linked, the rebuilt output is picked up without reinstalling here; restart
+Vite if it keeps serving an older module. Its `styles.css` export is read straight from `src/` and
+needs no rebuild. Run `npm install` here when its package manifest or exports change.
 
 ## Project layout
 
