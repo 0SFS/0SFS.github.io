@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { configDefaults, defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { execSync } from 'node:child_process'
 
@@ -43,4 +43,10 @@ export default defineConfig({
     __REPOSITORY_SLUG__: JSON.stringify(getRepositorySlug()),
   },
   plugins: [react()],
+  test: {
+    // `build/` holds gitignored validation sandboxes, some of which symlink to
+    // sibling packages. Collecting those runs another package's tests under
+    // this config and fails on environment it never opted into.
+    exclude: [...configDefaults.exclude, 'build/**'],
+  },
 })
