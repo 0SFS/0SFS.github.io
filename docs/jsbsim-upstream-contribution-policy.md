@@ -67,6 +67,12 @@ flow) was opened on 2026-09-14 on top of #1505.
 
 ## Open PR review: 2026-09-14
 
+[The turbine evaluation proposal](proposals/jsbsim-turbine-evaluation.md)
+records the recommended long-term design for #1505/#1508: explicit evaluation
+intent, shared engine calculations and completion before initialization returns.
+It is a local proposal, not an implemented fix or an agreed plan for every open
+PR; caller compatibility and delivery decisions remain open.
+
 [The review record](validation/jsbsim-open-pr-review-2026-09-14.md) reads every
 open PR and has the evidence. It changes readiness as follows:
 
