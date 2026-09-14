@@ -11,6 +11,10 @@
     {
       "name": "FOSS Earth rendering",
       "path": "../foss-earth"
+    },
+    {
+      "name": "Gamepad input and bindings",
+      "path": "../Felipegalind0/gamepad-tools"
     }
   ],
   "settings": {}

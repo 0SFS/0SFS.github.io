@@ -2,7 +2,8 @@
 
 This is a release-audit record, not a replacement for the license texts
 distributed in dependencies. The JSBSim row reflects the accepted in-tree
-package on 2026-09-13; other versions below are the installed versions resolved
+package on 2026-09-13 and the gamepad-tools row the lockfile on 2026-09-14;
+other versions below are the installed versions resolved
 by `package-lock.json` on 2026-09-09. “Generally compatible” means the stated
 license is normally combinable with AGPLv3 when its notice and source terms are
 met; it is not a legal opinion.
@@ -12,6 +13,7 @@ met; it is not a legal opinion.
 | Component | Version | License | Usage | AGPLv3 assessment and notes |
 | --- | ---: | --- | --- | --- |
 | [@felipegalind0/jsbsim](https://github.com/Felipegalind0/jsbsim) | 1.2.4-fork.7, local tarball | MIT SDK; bundled JSBSim WASM is LGPL-2.1, with native third-party notices | Flight dynamics engine and virtual filesystem SDK, built from one JSBSim repository revision | Conditional. The SDK retains 0x62’s attribution and MIT notice; preserve native LGPL/third-party notices and corresponding source. The accepted distribution records its source identity and includes 14 hashed files, including notices. See [JSBSim WASM integration](docs/jsbsim.md). Package metadata alone is incomplete; aircraft/assets retain separate rights questions. |
+| [@felipegalind0/gamepad-tools](https://github.com/Felipegalind0/gamepad-tools) | 0.1.0, local link | MIT | Controller and keyboard input, binding profiles and evaluation, the binding editor, and the optional 3D controller view | Project-owned code; retain its MIT notice. Like `foss-earth`, the sibling link is not an immutable release pin. Its peer dependency `@babylonjs/core` is listed below. |
 | [@babylonjs/core](https://www.babylonjs.com/) | 8.56.2 | Apache-2.0 | WebGL/WebGPU renderer | Generally compatible; retain Apache notice. |
 | [@babylonjs/loaders](https://www.babylonjs.com/) | 8.56.2 | Apache-2.0 | glTF and asset loading | Generally compatible; retain Apache notice. |
 | [3d-tiles-renderer](https://github.com/NASA-AMMOS/3DTilesRendererJS) | 0.4.24 | Apache-2.0 | 3D Tiles renderer and Google auth plugin | Generally compatible; retain Apache notice and Caltech/JPL non-endorsement notice. Provider data has separate terms. |

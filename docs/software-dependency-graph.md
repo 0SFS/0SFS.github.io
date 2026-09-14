@@ -90,6 +90,12 @@ does not establish browser-loaded bytes or aircraft fidelity.
 FOSS Earth remains `file:../foss-earth` and does not acquire a mandatory JSBSim
 dependency. Its existing checkout/build requirements are separate.
 
+gamepad-tools is linked the same way, as
+`file:../Felipegalind0/gamepad-tools`, by both this application and FOSS Earth,
+and acquires no JSBSim dependency either. Its package exports point at a `dist/`
+that is not committed, so it must be built before either application installs;
+see [the gamepad-tools dependency](development.md#the-gamepad-tools-dependency).
+
 SDK destruction owns native executive cleanup. App startup/reset sequences
 use normal native initialization after engine setup and preserve application
 controls/actuator positions; they do not reset N1/N2 properties. Details,
@@ -110,9 +116,14 @@ The SF50 integration exposed a recurring ownership issue: generic engine/SDK fix
 | Generic JSBSim engine initialization/dynamics | `/Users/felg/gh/Felipegalind0/jsbsim` |
 | Generic WASM bindings, SDK lifecycle/disposal and model-load diagnostics | `/Users/felg/gh/Felipegalind0/jsbsim/wasm` |
 | Earth/terrain/rendering dependency | `/Users/felg/gh/foss-earth` |
+| Reusable controller/keyboard sampling, binding evaluation and the binding editor | `/Users/felg/gh/Felipegalind0/gamepad-tools` |
+
+App-specific input adapters stay in each app: the flight actions and profiles in
+`src/flight/input/gamepadToolsAdapter.ts` here, and the globe actions and profile
+in `src/input/globeNavigation.ts` in FOSS Earth.
 
 The [flight development workspace](../flight-development.code-workspace) names
-the three active repository roots explicitly. Engine and SDK work share one
+the four active repository roots explicitly. Engine and SDK work share one
 JSBSim checkout and branch. The old separate SDK was reversibly moved under
 `gh/.preservation/jsbsim-in-tree-20260913T233508Z/retired-jsbsim-wasm`; it remains
 a migration/PR reference outside the active workspace. The user's preferred layout is `gh/owner/repo`, with work on ordinary branches in the canonical repositories. Do not recreate special task-named repository copies/worktrees. The app path above is the actual path used in this work, not a request to relocate it.

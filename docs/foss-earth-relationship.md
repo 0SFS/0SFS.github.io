@@ -2,12 +2,14 @@
 
 ## Current Structure
 
-OSFS and FOSS Earth are separate sibling repositories:
+OSFS and FOSS Earth are separate sibling repositories, and both use a third, gamepad-tools:
 
 ```text
 parent-directory/
-├── OSFS/
-└── foss-earth/
+├── 0sfs/
+├── foss-earth/
+└── Felipegalind0/
+    └── gamepad-tools/
 ```
 
 OSFS originated from FOSS Earth, but the copied globe runtime has been removed. Shared globe, rendering, map, input, and UI behavior is consumed through the FOSS Earth package boundary.
@@ -18,16 +20,18 @@ OSFS declares:
 
 ```json
 "foss-earth": "file:../foss-earth"
+"@felipegalind0/gamepad-tools": "file:../Felipegalind0/gamepad-tools"
 ```
 
-The npm lockfile marks `node_modules/foss-earth` as a link resolved to `../foss-earth`. Therefore:
+FOSS Earth declares the same gamepad-tools link, so one checkout serves both applications. The npm lockfile marks `node_modules/foss-earth` and `node_modules/@felipegalind0/gamepad-tools` as links resolved to those sibling folders. Therefore:
 
-- The sibling checkout must exist before installing OSFS dependencies.
-- Source edits in the sibling package are available through the link.
+- Both sibling checkouts must exist before installing OSFS dependencies.
+- gamepad-tools must be built first: its package exports point at a `dist/` that is not committed.
+- Source edits in FOSS Earth are available through the link. Edits in gamepad-tools are available once it is rebuilt.
 - Vite may need a restart when package exports or optimized dependencies change.
 - `npm install` should be rerun when either package manifest or the lockfile relationship changes.
 
-This local dependency is convenient for developing both repositories together, but it is not a reproducible remote version pin. CI and deployments must check out both repositories in the expected layout, or the dependency must later be changed to a published package or pinned Git revision.
+These local dependencies are convenient for developing the repositories together, but they are not reproducible remote version pins. CI and deployments must check out all three repositories in the expected layout and build gamepad-tools, or the dependencies must later be changed to published packages or pinned Git revisions.
 
 ## Imported Surfaces
 
