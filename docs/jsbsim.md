@@ -8,13 +8,14 @@ bindings, native lifetime, generic diagnostics and SDK build tooling belong in
 FOSS Earth remains the separate terrain/rendering dependency.
 
 **Application acceptance, 2026-09-13:** clean in-tree package
-`1.2.4-fork.5` is installed and locked. It adds the adopted IDBFS-linkage and
-native-exception build corrections described in
+`1.2.4-fork.6` is installed and locked. It carries the turbine trim fuel-flow
+fix described in [Trim fuel flow](#trim-fuel-flow) on top of the IDBFS-linkage
+and native-exception build corrections described in
 [the fork.4 adoption record](#adopted-idbfs-and-native-exception-corrections)
-to the previously accepted fork.3 integration. All 144 focused
-app/runtime/UI/artifact tests across 13 files passed against it. Production build/typecheck and emitted
-asset checks passed; focused ESLint passed the four changed identity/artifact
-files with no warnings. Headless Chrome verified actual SDK boot and loaded
+and the fork.5 rename. All 731 app/runtime/UI/artifact tests across 77 files
+passed against it. Production build/typecheck and emitted
+asset checks passed; focused ESLint passed the five changed identity/artifact
+and test-configuration files with no warnings. Headless Chrome verified actual SDK boot and loaded
 bytes for C172 and all three SF50 runtime packages. The separate component
 keyboard/layout check passed three viewports. These establish software and
 artifact contracts, not aircraft calibration or terrain readiness. See the
@@ -65,7 +66,7 @@ uses native TypeScript stripping. This integration was exercised with
 The application declares:
 
 ```json
-"@felipegalind0/jsbsim": "file:deps/felipegalind0-jsbsim-1.2.4-fork.5.tgz"
+"@felipegalind0/jsbsim": "file:deps/felipegalind0-jsbsim-1.2.4-fork.6.tgz"
 ```
 
 The package scope and API imports stay the same. The wrapper version does not
@@ -269,6 +270,37 @@ so 1.63.0 is pinned and only its headless shell is requested. Build and check
 runners now enumerate `test/*.test.mjs` explicitly, keeping this browser check
 out of the unit-test run. Full adoption results, hashes and limitations are in
 `build/validation/jsbsim-in-tree-20260913/fork4-adoption.json`.
+
+## Trim fuel flow
+
+`FGTurbine::Trim()` computes steady thrust and spool speeds without advancing
+time. It never assigned `FuelFlow_pph`, so a zero-time evaluation reported
+whatever the engine had last produced. This reaches the app directly:
+`propulsion/set-running` forces the throttle to 1 and trims there, so every
+later trim at a lower setting still read the full-throttle number.
+
+On the retained fork.5 artifact the F16 fixture reports 1548.92 gph at every
+throttle command, idle included. On fork.6 the same sweep gives 114.80, 284.34,
+807.49 and 1485.99 gph across dry commands 0.00 to 0.49, and 7823.98 gph
+augmented, with no dependence on the order the settings are trimmed in. The
+script producing both is preserved as
+`build/validation/jsbsim-fork6-20260913/trim-fuel-flow-wasm-check.mjs`; it fails
+on fork.5 and passes on fork.6, which is what attributes the change to this
+package rather than to the harness.
+
+The fix is submitted upstream as
+[JSBSim PR #1508](https://github.com/JSBSim-Team/jsbsim/pull/1508). It assigns
+the same steady products `Run()` seeks — pre-bleed dry thrust times corrected
+TSFC, floored at idle flow, and augmented thrust times ATSFC in whichever
+augmentation branch applies. Trim still leaves EGT, oil pressure, nozzle
+position and EPR at their previous values.
+
+This corrects *which operating point* trim reports. It does not settle the SF50
+idle fuel flow: the two lowest AFM cruise rows remain clamped at the estimated
+idle floor, which is
+[a separate open question](validation/sf50-g1-cruise-fuel-flow-2026-09-13.md).
+Full results and hashes are in
+`build/validation/jsbsim-in-tree-20260913/fork6-adoption.json`.
 
 ## Runtime diagnostics and native lifetime
 

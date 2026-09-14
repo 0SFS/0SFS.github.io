@@ -26,7 +26,7 @@
   "dependencies": {
     "@babylonjs/core": "^8.21.1",
     "@babylonjs/loaders": "^8.21.1",
-    "@felipegalind0/jsbsim": "file:deps/felipegalind0-jsbsim-1.2.4-fork.5.tgz",
+    "@felipegalind0/jsbsim": "file:deps/felipegalind0-jsbsim-1.2.4-fork.6.tgz",
     "3d-tiles-renderer": "^0.4.24",
     "foss-earth": "file:../foss-earth",
     "lucide-react": "^1.41.0",

@@ -18,17 +18,25 @@ const inTreeIdentity = (): Extract<JsbsimBuildIdentity, { schemaVersion: 2 }> =>
   return {
     ...source,
     schemaVersion: 2,
-    package: { name: "@felipegalind0/jsbsim", version: "1.2.4-fork.5" },
+    package: { name: "@felipegalind0/jsbsim", version: "1.2.4-fork.6" },
     sdk: { ...source.sdk, commit: source.native.commit, path: "wasm" },
     build: { ...source.build, mode: "in-tree" },
   };
 };
 
 describe("JSBSim build identity", () => {
-  it.each(["1.2.4-fork.2", "1.2.4-fork.3", "1.2.4-fork.4", "1.2.4-fork.5"])("accepts only an explicitly supported in-tree package version: %s", version => {
+  // Each version is paired with the name it was actually published under;
+  // the rename landed at fork.5.
+  it.each([
+    ["1.2.4-fork.2", "@felipegalind0/jsbsim-wasm"],
+    ["1.2.4-fork.3", "@felipegalind0/jsbsim-wasm"],
+    ["1.2.4-fork.4", "@felipegalind0/jsbsim-wasm"],
+    ["1.2.4-fork.5", "@felipegalind0/jsbsim"],
+    ["1.2.4-fork.6", "@felipegalind0/jsbsim"],
+  ])("accepts only an explicitly supported in-tree package version: %s", (version, name) => {
     const source = inTreeIdentity();
     source.package.version = version;
-    source.package.name = version === "1.2.4-fork.5" ? "@felipegalind0/jsbsim" : "@felipegalind0/jsbsim-wasm";
+    source.package.name = name;
     expect(readJsbsimBuildIdentity(source).package.version).toBe(version);
   });
   it("retains the shared repository revision and distinct component digests of an in-tree build", () => {
@@ -56,7 +64,7 @@ describe("JSBSim build identity", () => {
     // renamed package claiming an older version must be rejected.
     (source: ReturnType<typeof inTreeIdentity>) => { source.package.version = "1.2.4-fork.4"; },
     (source: ReturnType<typeof inTreeIdentity>) => { source.package.name = "@felipegalind0/jsbsim-wasm"; },
-    (source: ReturnType<typeof inTreeIdentity>) => { source.package.version = "1.2.4-fork.6"; },
+    (source: ReturnType<typeof inTreeIdentity>) => { source.package.version = "1.2.4-fork.7"; },
     (source: ReturnType<typeof inTreeIdentity>) => { Reflect.set(source, "schemaVersion", 1); },
   ])("rejects an inconsistent in-tree identity %#", mutate => {
     const source = inTreeIdentity();

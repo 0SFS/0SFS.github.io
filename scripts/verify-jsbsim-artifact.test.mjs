@@ -12,12 +12,12 @@ const roots = [];
 const digest = (data, algorithm = "sha256", encoding = "hex") => createHash(algorithm).update(data).digest(encoding);
 // Retained rollback tarballs keep the name they were published under, so the
 // fixture derives the name from the version the way the identity gate does.
-const RENAMED_AT = "1.2.4-fork.5";
-const nameFor = version => version === RENAMED_AT ? "@felipegalind0/jsbsim" : "@felipegalind0/jsbsim-wasm";
+const POST_RENAME_VERSIONS = new Set(["1.2.4-fork.5", "1.2.4-fork.6"]);
+const nameFor = version => POST_RENAME_VERSIONS.has(version) ? "@felipegalind0/jsbsim" : "@felipegalind0/jsbsim-wasm";
 afterEach(async () => { await Promise.all(roots.splice(0).map(root => rm(root, { recursive: true, force: true }))); });
 
 async function fixture({ schemaVersion = 2, mode = schemaVersion === 2 ? "in-tree" : "pinned", dirty = false,
-  version = schemaVersion === 2 ? "1.2.4-fork.5" : "1.2.4-fork.1" } = {}) {
+  version = schemaVersion === 2 ? "1.2.4-fork.6" : "1.2.4-fork.1" } = {}) {
   const pkgName = nameFor(version);
   const root = await mkdtemp(path.join(tmpdir(), "osfs-sdk-artifact-test-"));
   roots.push(root);
