@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { BindingRuntime } from "@felipegalind0/gamepad-tools/core";
 import { createBrowserInputSource } from "@felipegalind0/gamepad-tools/browser";
 import { createFlightInputManager, type FlightInputManager } from "./flightInputManager";
+import { DEFAULT_GAMEPAD_RESPONSE_SETTINGS, type GamepadResponseSettings } from "./gamepadResponseSettings";
 import {
   createFlightGamepadAdapter,
   createLegacyFlightProfile,
@@ -37,7 +38,14 @@ function button(index: number, value: number): void {
   Object.assign(pad.buttons[index], { value, pressed: value > 0.5 });
 }
 
-function harness(factory = createStandardFlightProfile, input = createFlightInputManager({ initialThrottle: 0.5 })) {
+// Most tests here cover binding evaluation, so they use Direct response to
+// read each step's command unsmoothed. Smooth, the default, has its own test.
+function harness(
+  factory = createStandardFlightProfile,
+  input = createFlightInputManager({ initialThrottle: 0.5 }),
+  mode: GamepadResponseSettings["mode"] = "direct",
+) {
+  input.getGamepadResponseController().setSettings({ ...DEFAULT_GAMEPAD_RESPONSE_SETTINGS, mode });
   const onCameraOrbit = vi.fn();
   const source = createBrowserInputSource({ target: window });
   const runtime = new BindingRuntime({
@@ -103,12 +111,24 @@ describe("flight profiles through browser sampling and evaluation", () => {
     expect(step().throttle).toBeCloseTo(0.5);
   });
 
+  it("smooths analog axes by default, reaching the stick over the response time", () => {
+    expect(DEFAULT_GAMEPAD_RESPONSE_SETTINGS).toMatchObject({ mode: "smooth", responseTimeSec: 0.375 });
+    const { step } = harness(createStandardFlightProfile, undefined, "smooth");
+    const target = (0.7 - 0.08) / 0.92;
+    axis(0, 0.7);
+    // Each step closes min(1, 3 / 0.375 * dt) of the remaining gap.
+    expect(step().aileron).toBeCloseTo(target * 8 / 60);
+    for (let i = 0; i < 60; i += 1) step();
+    expect(step().aileron).toBeCloseTo(target, 2);
+  });
+
   it("uses the right stick only for the camera and stops at its deadzone", () => {
     const { step, onCameraOrbit } = harness();
     axis(2, 0.1);
     const controls = step();
     expect(controls.rudder).toBe(0);
-    expect(onCameraOrbit).toHaveBeenCalledWith(expect.closeTo((0.1 - 0.08) / 0.92), 0, expect.any(Number));
+    // The Xbox profile inverts right-stick X for the camera.
+    expect(onCameraOrbit).toHaveBeenCalledWith(expect.closeTo(-(0.1 - 0.08) / 0.92), 0, expect.any(Number));
     onCameraOrbit.mockClear();
     axis(2, 0.03);
     step();
