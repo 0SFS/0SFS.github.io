@@ -34,6 +34,8 @@ import {
 } from "./aircraft/aircraftCatalog";
 import { applyAircraftRig, readControlSurfaceState } from "./aircraft/aircraftAnimation";
 import { flightLog } from "./diagnostics/flightLog";
+import { createFlightRecorder } from "./diagnostics/flightRecorder";
+import { createEvaluationInstruments } from "./hud/evaluationInstruments";
 import { createCollisionDebugOverlay } from "./diagnostics/createCollisionDebugOverlay";
 import { createWheelSpinDebugOverlay } from "./diagnostics/createWheelSpinDebugOverlay";
 import { createWheelSpinExperiment } from "./physics/createWheelSpinExperiment";
@@ -555,6 +557,22 @@ export async function createFlightSimApp(
   let floatingOrigin: FloatingOriginHandle | null = null;
   let aircraft: ReturnType<typeof createPlaceholderAircraft> | null = null;
   let aircraftModel: AircraftModelHandle | null = null;
+  // Pilot evaluation: engine, AoA and CAS readouts, and a recorder that runs for
+  // the whole session so any moment the pilot marks can be exported with the build.
+  const flightRecorder = createFlightRecorder({
+    metadata: {
+      build: __SOURCE_VERSION__,
+      built: __BUILD_TIME__,
+      aircraft: initialAircraftId,
+      generation: initialAircraftSelection.generationId ?? "",
+      jsbsim: JSON.stringify(jsbsim.identity),
+      recording_started_utc: new Date().toISOString(),
+    },
+  });
+  const evaluationInstruments = createEvaluationInstruments(hudRoot, {
+    recorder: flightRecorder,
+    recordingName: () => `0sfs-${initialAircraftId}-${__SOURCE_VERSION__}-${new Date().toISOString().replace(/[:.]/g, "-")}`,
+  });
   // Session-only debug opt-in: no overlay meshes or SDK reads until enabled.
   let collisionDebugEnabled = false;
   let collisionDebugOverlay: ReturnType<typeof createCollisionDebugOverlay> | null = null;
@@ -1375,6 +1393,8 @@ export async function createFlightSimApp(
       controlPanel?.update(createPanelSnapshot(displayState));
       hudBar?.update(displayState, runtime.status, measuredFps, inputManager.isPaused());
     }
+    flightRecorder.sample(jsbsim.sdk);
+    evaluationInstruments.update(jsbsim.sdk);
     if (flightPerformance) {
       const tileMetrics = runtime.getTileMetrics();
       flightPerformance.record({
@@ -1419,6 +1439,7 @@ export async function createFlightSimApp(
       hudBar?.destroy();
       statusOverlay?.destroy();
       controlPanel?.destroy();
+      evaluationInstruments.destroy();
       flightHud.destroy();
       collisionDebugOverlay?.dispose();
       wheelSpinDebugOverlay?.dispose();
