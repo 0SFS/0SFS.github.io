@@ -1,8 +1,12 @@
 /**
- * Casual auto-trim: when that axis's stick is centered, drive the matching
+ * Casual trim assist: when that axis's stick is centered, drive the matching
  * trim wheel so the aircraft holds the last hands-off attitude. Trim is
  * summed with the stick in the C172 FCS, so the wheel can take the speed-
  * change and spiral-stability loads without turning the stick into an autopilot.
+ *
+ * This is not the HUD Autopilot button. Master AP lives in
+ * `src/flight/autopilot/` and drives surfaces/throttle when engaged. These
+ * TRIM squares only run while AP does not own that axis.
  *
  * Signs follow the stick: positive elevator / pitch-trim pitches the nose
  * down, so a nose-high error reduces pitch trim. Positive aileron / roll-trim

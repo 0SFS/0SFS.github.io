@@ -91,9 +91,9 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 5px;
-  /* Wide enough that the four chips and the gear button hold one row; below
+  /* Wide enough that the four chips, gear, and AP hold one row; below
      that the row wraps, and `bottom` anchoring grows it upward. */
-  max-width: min(420px, calc(100vw - 48px));
+  max-width: min(460px, calc(100vw - 48px));
 }
 
 /* Compact chips: code+unit on one row, value below. */
@@ -179,6 +179,45 @@
   color: #11161a;
   background: var(--flight-panel-accent);
   border-color: var(--flight-panel-accent);
+}
+
+.flight-hud__ap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  width: 28px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: inherit;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  appearance: none;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.flight-hud__ap:hover {
+  border-color: rgba(255, 255, 255, 0.32);
+}
+
+.flight-hud__ap:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 210, 80, 0.45);
+}
+
+.flight-hud__ap.is-on {
+  color: #11161a;
+  background: var(--flight-panel-accent);
+  border-color: var(--flight-panel-accent);
+}
+
+.flight-hud__ap.is-blocked:not(.is-on) {
+  opacity: 0.55;
 }
 
 .flight-hud__yaw-throttle {
@@ -295,7 +334,7 @@
   inset: 0;
   pointer-events: none;
   background: linear-gradient(
-    to bottom right,
+    to bottom left,
     transparent calc(50% - 0.6px),
     rgba(255, 255, 255, 0.28) 50%,
     transparent calc(50% + 0.6px)
@@ -304,7 +343,9 @@
 
 .flight-hud__auto-trim {
   display: flex;
+  flex-direction: column;
   grid-area: 1 / 1;
+  gap: 1px;
   width: 100%;
   height: 100%;
   min-height: 0;
@@ -314,7 +355,7 @@
   background: transparent;
   color: inherit;
   font-family: inherit;
-  font-size: 8px;
+  font-size: 7px;
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -324,16 +365,16 @@
 
 .flight-hud__auto-trim--roll {
   clip-path: polygon(0 0, 100% 0, 100% 100%);
-  align-items: flex-start;
-  justify-content: flex-end;
+  align-items: flex-end;
+  justify-content: flex-start;
   padding: 3px 3px 0 0;
   text-align: right;
 }
 
 .flight-hud__auto-trim--pitch {
   clip-path: polygon(0 0, 0 100%, 100% 100%);
-  align-items: flex-end;
-  justify-content: flex-start;
+  align-items: flex-start;
+  justify-content: flex-end;
   padding: 0 0 3px 3px;
 }
 
@@ -1378,6 +1419,11 @@
   }
 
   .flight-hud__gear {
+    width: 26px;
+    padding: 0;
+  }
+
+  .flight-hud__ap {
     width: 26px;
     padding: 0;
   }

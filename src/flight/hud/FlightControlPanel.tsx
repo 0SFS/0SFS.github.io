@@ -10,6 +10,7 @@ import {
   Bug,
   CloudSun,
   Gauge,
+  Navigation,
   Settings,
   Pause,
   Play,
@@ -30,8 +31,6 @@ import {
 } from "../aircraft/aircraftCatalog";
 import type { AircraftModelStatus } from "../aircraft/createAircraftModel";
 import { AircraftSelectionPanel } from "./AircraftSelectionPanel";
-import { SoundSettingsPanel, type SoundAction } from "./SoundSettingsPanel";
-import type { FlightAudioStatus } from "../audio/createFlightAudio";
 import { flightLog, type FlightLogEntry } from "../diagnostics/flightLog";
 import {
   getActiveFlightPerformanceCapture,
@@ -50,12 +49,17 @@ import {
   type GroundInteractionAction,
   type GroundInteractionPanelState,
 } from "./GroundInteractionSettingsPanel";
+import { AutopilotPanel, type AutopilotPanelState } from "./AutopilotPanel";
+import { SoundSettingsPanel, type SoundAction } from "./SoundSettingsPanel";
+import type { FlightAudioStatus } from "../audio/createFlightAudio";
+import type { AutopilotSettingsV1 } from "../autopilot/autopilotSettings";
 
-export type FlightPanelTab = "weather" | "aircraft" | "sound" | "debug" | "settings";
+export type FlightPanelTab = "weather" | "aircraft" | "autopilot" | "sound" | "debug" | "settings";
 
 const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "weather", label: "Weather" },
   { id: "aircraft", label: "Aircraft" },
+  { id: "autopilot", label: "Autopilot" },
   { id: "sound", label: "Sound" },
   { id: "debug", label: "Debug" },
   { id: "settings", label: "Settings" },
@@ -64,6 +68,7 @@ const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
 const TAB_ICONS = {
   weather: CloudSun,
   aircraft: Plane,
+  autopilot: Navigation,
   sound: Volume2,
   debug: Bug,
   settings: Settings,
@@ -113,6 +118,7 @@ export interface FlightControlPanelSnapshot {
   sound: FlightAudioStatus;
   wheelSpinStates: readonly WheelSpinState[];
   groundInteraction: GroundInteractionPanelState;
+  autopilot: AutopilotPanelState;
 }
 
 export interface FlightControlPanelOptions {
@@ -138,6 +144,8 @@ export interface FlightControlPanelOptions {
   /** Must act synchronously: the control's gesture is what unlocks audio. */
   onSoundAction(action: SoundAction): void;
   onGroundInteractionAction(action: GroundInteractionAction): void;
+  onAutopilotSettingsChange(settings: AutopilotSettingsV1): void;
+  onAutopilotEngageChange(engaged: boolean): void;
 }
 
 export interface FlightControlPanelHandle {
@@ -878,6 +886,10 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
               aircraftSelection={aircraftSelection}
               onAircraftSelectionChange={onAircraftSelectionChange}
               onAircraftFamilyChange={setSelectedAircraftFamily} />
+              : tabId === "autopilot" ? <AutopilotPanel
+                state={props.snapshot.autopilot}
+                onSettingsChange={props.onAutopilotSettingsChange}
+                onEngageChange={props.onAutopilotEngageChange} />
               : tabId === "sound" ? <SoundSettingsPanel state={props.snapshot.sound} onAction={props.onSoundAction} />
               : tabId === "settings" ? <>
                 <OrbitInvertSettingsPanel {...props} />

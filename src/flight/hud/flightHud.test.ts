@@ -30,6 +30,7 @@ function mount() {
   const onGearChange = vi.fn();
   const onPitchAutoTrimChange = vi.fn();
   const onRollAutoTrimChange = vi.fn();
+  const onAutopilotEngageChange = vi.fn();
   const hud = createFlightHud(host, {
     onGearChange,
     onThrottleChange: vi.fn(),
@@ -37,18 +38,20 @@ function mount() {
     onRollTrimChange: vi.fn(),
     onPitchAutoTrimChange,
     onRollAutoTrimChange,
+    onAutopilotEngageChange,
     onFlapsChange: vi.fn(),
     onRudderChange: vi.fn(),
     onStickChange: vi.fn(),
   });
   const gear = host.querySelector<HTMLButtonElement>('[data-control="gear"]')!;
+  const ap = host.querySelector<HTMLButtonElement>('[data-control="autopilot"]')!;
   const pitchAuto = host.querySelector<HTMLButtonElement>('[data-control="auto-pitch-trim"]')!;
   const rollAuto = host.querySelector<HTMLButtonElement>('[data-control="auto-roll-trim"]')!;
   const pitchTrim = host.querySelector<HTMLInputElement>('[data-control="pitch-trim"]')!;
   const rollTrim = host.querySelector<HTMLInputElement>('[data-control="roll-trim"]')!;
   return {
-    host, hud, gear, pitchAuto, rollAuto, pitchTrim, rollTrim,
-    onGearChange, onPitchAutoTrimChange, onRollAutoTrimChange,
+    host, hud, gear, ap, pitchAuto, rollAuto, pitchTrim, rollTrim,
+    onGearChange, onPitchAutoTrimChange, onRollAutoTrimChange, onAutopilotEngageChange,
   };
 }
 
@@ -81,6 +84,8 @@ describe("flight HUD gear button", () => {
   it("sits with the instrument tapes, so both read in one glance", () => {
     const t = mount();
     expect(t.gear.parentElement?.className).toBe("flight-hud__tapes");
+    expect(t.ap.parentElement).toBe(t.gear.parentElement);
+    expect(t.ap.previousElementSibling).toBe(t.gear);
     const metrics = [...t.host.querySelectorAll("[data-metric]")].map(
       (element) => (element as HTMLElement).dataset.metric,
     );
@@ -119,8 +124,8 @@ describe("flight HUD auto-trim", () => {
     expect(t.rollAuto.classList.contains("flight-hud__auto-trim--roll")).toBe(true);
     expect(t.pitchAuto.classList.contains("flight-hud__auto-trim--pitch")).toBe(true);
     expect([...t.rollAuto.parentElement!.children]).toEqual([t.rollAuto, t.pitchAuto]);
-    expect(t.rollAuto.textContent).toBe("AUTO");
-    expect(t.pitchAuto.textContent).toBe("AUTO");
+    expect([...t.rollAuto.querySelectorAll("span")].map((el) => el.textContent)).toEqual(["TRIM", "AUTO"]);
+    expect([...t.pitchAuto.querySelectorAll("span")].map((el) => el.textContent)).toEqual(["AUTO", "TRIM"]);
     expect(t.pitchTrim.closest(".flight-hud__attitude-cluster")).toBe(t.rollAuto.closest(".flight-hud__attitude-cluster"));
     t.hud.destroy();
   });
@@ -175,5 +180,47 @@ describe("flight HUD auto-trim", () => {
     rollAuto.click();
     expect(t.onPitchAutoTrimChange).not.toHaveBeenCalled();
     expect(t.onRollAutoTrimChange).not.toHaveBeenCalled();
+  });
+});
+
+describe("flight HUD master autopilot", () => {
+  it("sits next to gear and asks the sim to toggle, lighting only from update", () => {
+    const t = mount();
+    expect(t.ap.textContent).toBe("AP");
+    expect(t.ap.getAttribute("aria-pressed")).toBe("false");
+    expect(t.ap.classList.contains("is-on")).toBe(false);
+    t.ap.click();
+    expect(t.onAutopilotEngageChange).toHaveBeenCalledWith(true);
+    expect(t.ap.classList.contains("is-on")).toBe(false);
+    t.hud.update(STATE, CONTROLS, true, AUTO_OFF, {
+      engaged: true, canEngage: true, blockedReason: null,
+      ownsPitch: true, ownsRoll: true, ownsGear: true, ownsFlaps: false,
+    });
+    expect(t.ap.getAttribute("aria-pressed")).toBe("true");
+    expect(t.ap.classList.contains("is-on")).toBe(true);
+    expect(t.ap.title).toMatch(/Autopilot on/);
+    t.hud.destroy();
+  });
+
+  it("shows a blocked ArduPilot path without lighting as if it were flying", () => {
+    const t = mount();
+    t.hud.update(STATE, CONTROLS, true, AUTO_OFF, {
+      engaged: false, canEngage: false, blockedReason: "ArduPilot is not connected.",
+      ownsPitch: false, ownsRoll: false, ownsGear: false, ownsFlaps: false,
+    });
+    expect(t.ap.classList.contains("is-on")).toBe(false);
+    expect(t.ap.classList.contains("is-blocked")).toBe(true);
+    expect(t.ap.title).toMatch(/not connected/i);
+    t.ap.click();
+    expect(t.onAutopilotEngageChange).toHaveBeenCalledWith(true);
+    t.hud.destroy();
+  });
+
+  it("stops answering clicks once destroyed", () => {
+    const t = mount();
+    const ap = t.ap;
+    t.hud.destroy();
+    ap.click();
+    expect(t.onAutopilotEngageChange).not.toHaveBeenCalled();
   });
 });

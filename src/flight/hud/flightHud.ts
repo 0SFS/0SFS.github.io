@@ -10,11 +10,13 @@ export interface FlightHudOptions {
   onRollTrimChange(value: number): void;
   onPitchAutoTrimChange(enabled: boolean): void;
   onRollAutoTrimChange(enabled: boolean): void;
+  onAutopilotEngageChange(engaged: boolean): void;
   onFlapsChange(value: number): void;
   onRudderChange(value: number): void;
   onStickChange(aileron: number, elevator: number): void;
   pitchAutoTrim?: boolean;
   rollAutoTrim?: boolean;
+  autopilotEngaged?: boolean;
 }
 
 export interface FlightHudControls {
@@ -31,12 +33,39 @@ export interface FlightHudAutoTrim {
   roll: boolean;
 }
 
+export interface FlightHudMasterAp {
+  engaged: boolean;
+  canEngage: boolean;
+  blockedReason: string | null;
+  ownsPitch: boolean;
+  ownsRoll: boolean;
+  ownsGear: boolean;
+  ownsFlaps: boolean;
+}
+
+export const FLIGHT_HUD_MASTER_OFF: FlightHudMasterAp = {
+  engaged: false,
+  canEngage: true,
+  blockedReason: null,
+  ownsPitch: false,
+  ownsRoll: false,
+  ownsGear: false,
+  ownsFlaps: false,
+};
+
 export interface FlightHudHandle {
   /**
-   * `gearDown` and auto-trim are passed separately rather than added to
-   * `FlightHudControls` because they are latching switches, not smoothed axes.
+   * `gearDown`, auto-trim, and master AP are passed separately rather than
+   * added to `FlightHudControls` because they are latching switches, not
+   * smoothed axes.
    */
-  update(state: FlightState, controls: FlightHudControls, gearDown: boolean, autoTrim: FlightHudAutoTrim): void;
+  update(
+    state: FlightState,
+    controls: FlightHudControls,
+    gearDown: boolean,
+    autoTrim: FlightHudAutoTrim,
+    masterAp?: FlightHudMasterAp,
+  ): void;
   /** Repaint just the gear button, for when the key moves it between frames. */
   setGearDown(down: boolean): void;
   destroy(): void;
@@ -159,9 +188,9 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   root.innerHTML = `
     <div class="flight-hud" aria-label="Flight instruments">
       <div class="flight-hud__attitude-cluster" aria-label="Attitude and adjacent levers">
-        <div class="flight-hud__auto-trims" role="group" aria-label="Auto trim">
-          <button class="flight-hud__auto-trim flight-hud__auto-trim--roll" data-control="auto-roll-trim" type="button" aria-pressed="false">AUTO</button>
-          <button class="flight-hud__auto-trim flight-hud__auto-trim--pitch" data-control="auto-pitch-trim" type="button" aria-pressed="false">AUTO</button>
+        <div class="flight-hud__auto-trims" role="group" aria-label="Trim assists">
+          <button class="flight-hud__auto-trim flight-hud__auto-trim--roll" data-control="auto-roll-trim" type="button" aria-pressed="false"><span>TRIM</span><span>AUTO</span></button>
+          <button class="flight-hud__auto-trim flight-hud__auto-trim--pitch" data-control="auto-pitch-trim" type="button" aria-pressed="false"><span>AUTO</span><span>TRIM</span></button>
         </div>
         <label class="flight-hud__slider-control flight-hud__slider-control--roll-trim">
           <span>ROLL</span>
@@ -218,6 +247,7 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
           <span class="flight-hud__value" data-metric="vs">+0000</span>
         </div>
         <button class="flight-hud__gear" data-control="gear" type="button" aria-pressed="true">G</button>
+        <button class="flight-hud__ap" data-control="autopilot" type="button" aria-pressed="false">AP</button>
       </div>
       <div class="flight-hud__yaw-throttle" aria-label="Yaw and throttle">
         <div class="flight-hud__yaw">
@@ -258,8 +288,9 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   const flapsOutput = root.querySelector<HTMLOutputElement>('[data-output="flaps"]');
   const rudderOutput = root.querySelector<HTMLOutputElement>('[data-output="rudder"]');
   const gearButton = root.querySelector<HTMLButtonElement>('[data-control="gear"]');
+  const apButton = root.querySelector<HTMLButtonElement>('[data-control="autopilot"]');
 
-  if (!canvas || !gearButton || !pitchAutoTrimButton || !rollAutoTrimButton
+  if (!canvas || !gearButton || !apButton || !pitchAutoTrimButton || !rollAutoTrimButton
     || !iasEl || !altEl || !hdgEl || !vsEl
     || !throttleInput || !pitchTrimInput || !rollTrimInput || !flapsInput || !rudderInput
     || !throttleOutput || !pitchTrimOutput || !rollTrimOutput || !flapsOutput || !rudderOutput) {
@@ -274,37 +305,60 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   let gearDown = true;
   let pitchAutoTrim = options.pitchAutoTrim === true;
   let rollAutoTrim = options.rollAutoTrim === true;
+  let masterAp: FlightHudMasterAp = {
+    ...FLIGHT_HUD_MASTER_OFF,
+    engaged: options.autopilotEngaged === true,
+  };
   const renderGearButton = (): void => {
     gearButton.setAttribute("aria-pressed", String(gearDown));
     gearButton.classList.toggle("is-down", gearDown);
-    gearButton.title = gearDown ? "Landing gear down (G) — click to raise" : "Landing gear up (G) — click to lower";
+    gearButton.title = masterAp.ownsGear
+      ? "Landing gear is held by Autopilot. Click or press G to take it back."
+      : gearDown ? "Landing gear down (G) — click to raise" : "Landing gear up (G) — click to lower";
     gearButton.setAttribute("aria-label", gearButton.title);
+  };
+  const renderMasterApButton = (): void => {
+    apButton.setAttribute("aria-pressed", String(masterAp.engaged));
+    apButton.classList.toggle("is-on", masterAp.engaged);
+    apButton.classList.toggle("is-blocked", !masterAp.canEngage);
+    apButton.title = masterAp.engaged
+      ? "Autopilot on — flying the axes selected on the Autopilot tab. Click to disengage."
+      : masterAp.canEngage
+        ? "Autopilot off — click to engage the package from the Autopilot tab."
+        : (masterAp.blockedReason ?? "Autopilot cannot engage.");
+    apButton.setAttribute("aria-label", apButton.title);
   };
   const renderAxisAutoTrim = (
     button: HTMLButtonElement,
     input: HTMLInputElement,
     enabled: boolean,
     axis: "pitch" | "roll",
+    apOwns: boolean,
   ): void => {
     button.setAttribute("aria-pressed", String(enabled));
-    button.classList.toggle("is-on", enabled);
-    button.title = enabled
-      ? `Auto-trim on — holds ${axis} with the trim wheel while the stick is centered. Click to turn off.`
-      : `Auto-trim off — click to hold ${axis} as the aircraft wanders.`;
+    button.classList.toggle("is-on", enabled && !apOwns);
+    button.title = apOwns
+      ? `${axis} is owned by Autopilot. TRIM is a wheel assist; disengage AP to use it.`
+      : enabled
+        ? `Trim assist on — holds ${axis} with the trim wheel while the stick is centered. Click to turn off.`
+        : `Trim assist off — click to hold ${axis} as the aircraft wanders.`;
     button.setAttribute("aria-label", button.title);
-    input.disabled = enabled;
+    input.disabled = enabled || apOwns;
   };
   const renderAutoTrimButtons = (): void => {
-    renderAxisAutoTrim(pitchAutoTrimButton, pitchTrimInput, pitchAutoTrim, "pitch");
-    renderAxisAutoTrim(rollAutoTrimButton, rollTrimInput, rollAutoTrim, "roll");
+    renderAxisAutoTrim(pitchAutoTrimButton, pitchTrimInput, pitchAutoTrim, "pitch", masterAp.ownsPitch);
+    renderAxisAutoTrim(rollAutoTrimButton, rollTrimInput, rollAutoTrim, "roll", masterAp.ownsRoll);
   };
   const onGearClick = (): void => options.onGearChange(!gearDown);
   const onPitchAutoTrimClick = (): void => options.onPitchAutoTrimChange(!pitchAutoTrim);
   const onRollAutoTrimClick = (): void => options.onRollAutoTrimChange(!rollAutoTrim);
+  const onAutopilotClick = (): void => options.onAutopilotEngageChange(!masterAp.engaged);
   gearButton.addEventListener("click", onGearClick);
   pitchAutoTrimButton.addEventListener("click", onPitchAutoTrimClick);
   rollAutoTrimButton.addEventListener("click", onRollAutoTrimClick);
+  apButton.addEventListener("click", onAutopilotClick);
   renderGearButton();
+  renderMasterApButton();
   renderAutoTrimButtons();
 
   let rudderDragging = false;
@@ -442,12 +496,33 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
     rollAutoTrim = next.roll;
     renderAutoTrimButtons();
   };
+  const setMasterAp = (next: FlightHudMasterAp): void => {
+    const same = next.engaged === masterAp.engaged
+      && next.canEngage === masterAp.canEngage
+      && next.blockedReason === masterAp.blockedReason
+      && next.ownsPitch === masterAp.ownsPitch
+      && next.ownsRoll === masterAp.ownsRoll
+      && next.ownsGear === masterAp.ownsGear
+      && next.ownsFlaps === masterAp.ownsFlaps;
+    if (same) return;
+    masterAp = { ...next };
+    renderMasterApButton();
+    renderGearButton();
+    renderAutoTrimButtons();
+  };
 
   return {
     setGearDown,
-    update(state: FlightState, controls: FlightHudControls, nextGearDown: boolean, nextAutoTrim: FlightHudAutoTrim): void {
+    update(
+      state: FlightState,
+      controls: FlightHudControls,
+      nextGearDown: boolean,
+      nextAutoTrim: FlightHudAutoTrim,
+      nextMasterAp = FLIGHT_HUD_MASTER_OFF,
+    ): void {
       setGearDown(nextGearDown);
       setAutoTrim(nextAutoTrim);
+      setMasterAp(nextMasterAp);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const center = canvas.width / 2;
       drawAttitudeIndicator(ctx, center, center, ATTITUDE_HALF, state.rollRad, state.pitchRad);
@@ -487,6 +562,7 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
       gearButton.removeEventListener("click", onGearClick);
       pitchAutoTrimButton.removeEventListener("click", onPitchAutoTrimClick);
       rollAutoTrimButton.removeEventListener("click", onRollAutoTrimClick);
+      apButton.removeEventListener("click", onAutopilotClick);
       throttleInput.removeEventListener("input", onThrottleInput);
       pitchTrimInput.removeEventListener("input", onPitchTrimInput);
       rollTrimInput.removeEventListener("input", onRollTrimInput);

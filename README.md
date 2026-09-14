@@ -50,14 +50,14 @@ aircraft and richer models are part of where the project is headed.
 Future directions:
 
 - **More aircraft:** expand beyond the bundled C172P, with aircraft selection and matching visual models.
-- **ArduPilot support:** use ArduPilot as an optional autopilot when you do not want to fly manually. The planned integration looks like this:
+- **ArduPilot support:** use ArduPilot as an optional autopilot when you do not want to fly manually. The Autopilot tab already runs an in-sim autopilot (roll/yaw stabilize, pitch hold, auto-throttle, and optional gear/flaps). ArduPilot can be selected there but will not fly until a local SITL bridge is connected — the sim will not pretend it is. The planned SITL integration looks like this:
   1. JSBSim remains the flight dynamics model. It advances the aircraft and produces the simulated sensor state: position, attitude, velocity, airspeed, and altitude.
   2. A small local bridge connects the browser to ArduPilot Plane SITL. It sends that sensor state into the autopilot and receives its servo outputs over the [external simulator interface](https://ardupilot.org/dev/docs/sim-on-hardware.html)/MAVLink.
   3. OSFS maps those outputs back to the aircraft controls — elevator, aileron, rudder, throttle, and flaps — so ArduPilot is flying the same aircraft you see on screen.
   4. You can switch between manual and autopilot control, monitor the autopilot state in the HUD, and take over immediately. The bridge can start as a local WebSocket-to-SITL process because browsers cannot open arbitrary UDP connections themselves.
 
-This is a planned integration, not an implemented feature yet. The first milestone is a C172P with
-ArduPilot Plane SITL flying through the existing JSBSim loop; later milestones can add missions,
+The SITL bridge itself is still planned. The first milestone is a C172P with
+ArduPilot Plane SITL flying Circle/LOITER after a manual climb through the existing JSBSim loop; later milestones can add missions,
 telemetry, and other ArduPilot vehicle types.
 
 OSFS is under active development. The world streaming and flight physics are running today; the

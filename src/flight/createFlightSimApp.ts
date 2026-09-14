@@ -80,14 +80,27 @@ import {
   type FlightWeatherState,
 } from "./hud/FlightControlPanel";
 import { createFlightControlPanel } from "./hud/createFlightControlPanel";
-import { createFlightHud, type FlightHudHandle } from "./hud/flightHud";
+import { createFlightHud, type FlightHudHandle, type FlightHudMasterAp } from "./hud/flightHud";
 import { createFlightHudBar, type FlightHudBarHandle } from "./hud/createFlightHudBar";
 import { createFlightStatusOverlay, type FlightStatusOverlayHandle } from "./hud/createFlightStatusOverlay";
 import type { FlightStatusOverlayState } from "./hud/FlightStatusOverlay";
 import { attachFlightCameraInput } from "./input/flightCameraInput";
 import { applyFlightControls } from "./input/applyFlightControls";
 import { createAutoTrimState, setAutoTrimEnabled, stepPitchAutoTrim, stepRollAutoTrim } from "./input/autoTrim";
-import { getFdmProfile } from "./jsbsim/fdmProfiles";
+import {
+  createAutopilotSettingsStore,
+  type AutopilotSettingsV1,
+} from "./autopilot/autopilotSettings";
+import { DISCONNECTED_ARDUPILOT_STATUS } from "./autopilot/ardupilotStatus";
+import {
+  autopilotEngageBlockReason,
+  createControlArbiterState,
+  idleAutopilotOwners,
+  resetArbiterHold,
+  setArbiterEngaged,
+  stepControlArbiter,
+  type ControlArbiterResult,
+} from "./autopilot/controlArbiter";
 import type { PhoneControlSession } from "./remote/createPhoneControlSession";
 import type { PhonePairingDialog } from "./hud/createPhonePairingDialog";
 import { createFlightInputManager } from "./input/flightInputManager";
@@ -100,6 +113,7 @@ import {
   saveOrbitInvertSettings,
 } from "./input/orbitInvertSettings";
 import { createJsbsimRuntime } from "./jsbsim/createJsbsimRuntime";
+import { getFdmProfile } from "./jsbsim/fdmProfiles";
 import { createFixedStepPhysicsLoop, FIXED_DT } from "./physics/fixedStepLoop";
 import { createFlightLoadingScreen, type FlightLoadingScreen } from "../loading/createFlightLoadingScreen";
 import { createGameLog, type GameLog } from "../log/createGameLog";
@@ -465,6 +479,76 @@ export async function createFlightSimApp(
     AUTO_ROLL_TRIM_PREFERENCE_KEY, AUTO_ROLL_TRIM_PREFERENCE_KEY,
     (value): value is "on" | "off" => value === "on" || value === "off", "on",
   ) === "on");
+  const ardupilotStatus = DISCONNECTED_ARDUPILOT_STATUS;
+  const autopilotStore = createAutopilotSettingsStore((() => {
+    try { return window.localStorage; } catch { return null; }
+  })());
+  let autopilotSettings: AutopilotSettingsV1 = autopilotStore.settings;
+  let arbiterState = createControlArbiterState(
+    inputManager.getGearDownNorm(),
+    inputManager.getControls().flaps,
+    inputManager.getControls().throttle,
+  );
+  let lastApResult: ControlArbiterResult = {
+    engaged: false,
+    blockedReason: autopilotEngageBlockReason(autopilotSettings, ardupilotStatus),
+    owners: idleAutopilotOwners(),
+    controls: inputManager.getControls(),
+    gearDownNorm: inputManager.getGearDownNorm(),
+  };
+  const autopilotBlockReason = () => autopilotEngageBlockReason(autopilotSettings, ardupilotStatus);
+  const hudMasterAp = (): FlightHudMasterAp => ({
+    engaged: lastApResult.engaged,
+    canEngage: autopilotBlockReason() === null,
+    blockedReason: autopilotBlockReason(),
+    ownsPitch: lastApResult.owners.pitch !== "pilot",
+    ownsRoll: lastApResult.owners.roll !== "pilot",
+    ownsGear: lastApResult.owners.gear !== "pilot",
+    ownsFlaps: lastApResult.owners.flaps !== "pilot",
+  });
+  const aircraftOnGround = (): boolean => [0, 1, 2].some((index) => {
+    const wow = jsbsim.sdk.getPropertyValue(`gear/unit[${index}]/WOW`);
+    return Number.isFinite(wow) && wow > 0.5;
+  });
+  const readArbiterFlight = (dt: number) => ({
+    dt,
+    onGround: aircraftOnGround(),
+    rollRad: jsbsim.sdk.getPropertyValue("attitude/phi-deg") * Math.PI / 180,
+    rollRateRad: jsbsim.sdk.getPropertyValue("velocities/p-rad_sec"),
+    pitchRad: jsbsim.sdk.getPropertyValue("attitude/theta-deg") * Math.PI / 180,
+    pitchRateRad: jsbsim.sdk.getPropertyValue("velocities/q-rad_sec"),
+    headingRad: jsbsim.sdk.getPropertyValue("attitude/psi-deg") * Math.PI / 180,
+    yawRateRad: jsbsim.sdk.getPropertyValue("velocities/r-rad_sec"),
+    airspeedKts: jsbsim.sdk.getPropertyValue("velocities/vc-kts"),
+  });
+  const syncArbiter = (pilot = inputManager.getControls()): ControlArbiterResult => {
+    const stepped = stepControlArbiter(arbiterState, {
+      settings: autopilotSettings,
+      ardupilot: ardupilotStatus,
+      pilot,
+      gearDownNorm: inputManager.getGearDownNorm(),
+      flight: readArbiterFlight(FIXED_DT),
+    });
+    arbiterState = stepped.state;
+    lastApResult = stepped.result;
+    return lastApResult;
+  };
+  const setAutopilotEngaged = (engaged: boolean): void => {
+    if (engaged && autopilotBlockReason()) {
+      runtime.requestRender();
+      return;
+    }
+    arbiterState = setArbiterEngaged(arbiterState, engaged);
+    syncArbiter();
+    runtime.requestRender();
+  };
+  const applyAutopilotSettings = (next: AutopilotSettingsV1): void => {
+    autopilotStore.set(next);
+    autopilotSettings = autopilotStore.settings;
+    if (autopilotBlockReason()) arbiterState = setArbiterEngaged(arbiterState, false);
+    syncArbiter();
+    runtime.requestRender();
+  };
   // Ground interaction: persistent requests resolve to what can actually run.
   // The Debug A/B experiment is a session-only override layered on top.
   const groundStore = createGroundSettingsStore((() => {
@@ -584,11 +668,13 @@ export async function createFlightSimApp(
       writePreference(AUTO_ROLL_TRIM_PREFERENCE_KEY, enabled ? "on" : "off");
       runtime.requestRender();
     },
+    onAutopilotEngageChange: (engaged) => { setAutopilotEngaged(engaged); },
     onFlapsChange: (value) => { inputManager.setFlaps(value); runtime.requestRender(); },
     onRudderChange: (value) => { inputManager.setRudder(value); runtime.requestRender(); },
     onStickChange: (aileron, elevator) => { inputManager.setStick(aileron, elevator); runtime.requestRender(); },
     pitchAutoTrim: pitchAutoTrim.enabled,
     rollAutoTrim: rollAutoTrim.enabled,
+    autopilotEngaged: lastApResult.engaged,
   });
 
   let floatingOrigin: FloatingOriginHandle | null = null;
@@ -883,6 +969,14 @@ export async function createFlightSimApp(
           phone: phoneSession ? "Uses the phone's Haptics switch where its browser supports vibration" : "Not paired",
         },
       },
+      autopilot: {
+        settings: autopilotSettings,
+        engaged: lastApResult.engaged,
+        owners: lastApResult.owners,
+        ardupilot: ardupilotStatus,
+        blockedReason: autopilotBlockReason(),
+        readOnlyReason: autopilotStore.readOnlyReason,
+      },
     };
   };
 
@@ -985,6 +1079,8 @@ export async function createFlightSimApp(
       applyWeather(weather);
       pitchAutoTrim = createAutoTrimState(pitchAutoTrim.enabled);
       rollAutoTrim = createAutoTrimState(rollAutoTrim.enabled);
+      arbiterState = resetArbiterHold(arbiterState);
+      lastApResult = { ...lastApResult, owners: idleAutopilotOwners() };
       floatingOrigin?.apply(state);
       runtime.setSimViewState({
         latDeg: state.latDeg, lonDeg: state.lonDeg,
@@ -1002,7 +1098,7 @@ export async function createFlightSimApp(
       phoneSession?.syncStatus();
       flightHud.update(state, inputManager.getControls(), inputManager.getGearDownNorm() > 0, {
         pitch: pitchAutoTrim.enabled, roll: rollAutoTrim.enabled,
-      });
+      }, hudMasterAp());
       controlPanel?.update(createPanelSnapshot(state));
       hudBar?.update(state, runtime.status, measuredFps, inputManager.isPaused());
       loading.hide();
@@ -1184,6 +1280,14 @@ export async function createFlightSimApp(
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
       runtime.requestRender();
     },
+    onAutopilotSettingsChange: (settings) => {
+      applyAutopilotSettings(settings);
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+    },
+    onAutopilotEngageChange: (engaged) => {
+      setAutopilotEngaged(engaged);
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+    },
     onArcadeGroundLaunchesChange: (enabled) => {
       arcadeGroundLaunches = enabled;
       writePreference(ARCADE_GROUND_LAUNCHES_PREFERENCE_KEY, enabled ? "on" : "off");
@@ -1350,42 +1454,45 @@ export async function createFlightSimApp(
       const selected = phoneSession?.beforeStep(controls) ?? controls;
       if (selected === false || inputManager.isPaused()) return false;
       if (collisionReset) { resetWheelSpin("reset"); return "reset"; }
-      const onGround = [0, 1, 2].some((index) => {
-        const wow = jsbsim.sdk.getPropertyValue(`gear/unit[${index}]/WOW`);
-        return Number.isFinite(wow) && wow > 0.5;
-      });
+      const ap = syncArbiter(selected);
+      const onGround = aircraftOnGround();
       const pitchRad = jsbsim.sdk.getPropertyValue("attitude/theta-deg") * Math.PI / 180;
       const rollRad = jsbsim.sdk.getPropertyValue("attitude/phi-deg") * Math.PI / 180;
-      const pitched = stepPitchAutoTrim(pitchAutoTrim, {
-        dt: FIXED_DT,
-        pitchRad,
-        pitchRateRad: jsbsim.sdk.getPropertyValue("velocities/q-rad_sec"),
-        rollRad,
-        elevator: selected.elevator,
-        pitchTrim: selected.pitchTrim,
-        onGround,
-      });
-      const rolled = stepRollAutoTrim(rollAutoTrim, {
-        dt: FIXED_DT,
-        rollRad,
-        rollRateRad: jsbsim.sdk.getPropertyValue("velocities/p-rad_sec"),
-        aileron: selected.aileron,
-        rollTrim: selected.rollTrim,
-        onGround,
-      });
-      pitchAutoTrim = pitched.state;
-      rollAutoTrim = rolled.state;
-      selected.pitchTrim = pitched.pitchTrim;
-      selected.rollTrim = rolled.rollTrim;
-      inputManager.replacePitchTrim(pitched.pitchTrim);
-      inputManager.replaceRollTrim(rolled.rollTrim);
+      const commanded = { ...ap.controls };
+      if (ap.owners.pitch === "pilot") {
+        const pitched = stepPitchAutoTrim(pitchAutoTrim, {
+          dt: FIXED_DT,
+          pitchRad,
+          pitchRateRad: jsbsim.sdk.getPropertyValue("velocities/q-rad_sec"),
+          rollRad,
+          elevator: selected.elevator,
+          pitchTrim: commanded.pitchTrim,
+          onGround,
+        });
+        pitchAutoTrim = pitched.state;
+        commanded.pitchTrim = pitched.pitchTrim;
+        inputManager.replacePitchTrim(pitched.pitchTrim);
+      }
+      if (ap.owners.roll === "pilot") {
+        const rolled = stepRollAutoTrim(rollAutoTrim, {
+          dt: FIXED_DT,
+          rollRad,
+          rollRateRad: jsbsim.sdk.getPropertyValue("velocities/p-rad_sec"),
+          aileron: selected.aileron,
+          rollTrim: commanded.rollTrim,
+          onGround,
+        });
+        rollAutoTrim = rolled.state;
+        commanded.rollTrim = rolled.rollTrim;
+        inputManager.replaceRollTrim(rolled.rollTrim);
+      }
       applyFlightControls(
         jsbsim.sdk,
-        selected,
-        inputManager.getGearDownNorm(),
+        commanded,
+        ap.gearDownNorm,
         getFdmProfile(aircraftId).rudderSign,
       );
-      appliedControls = { ...selected };
+      appliedControls = { ...commanded };
       return contact;
     });
     const physicsLoopCpuMs = flightPerformance ? performance.now() - physicsStartedMs : 0;
@@ -1456,9 +1563,13 @@ export async function createFlightSimApp(
     const rig = aircraftModel?.getRig();
     if (rig) applyAircraftRig(rig, readControlSurfaceState(jsbsim.sdk), deltaSeconds, { simulationHeld: feedbackHeld });
     const phoneOwned = phoneSession?.getSnapshot().owner === "phone";
-    flightHud.update(displayState, phoneOwned ? appliedControls : controls, inputManager.getGearDownNorm() > 0, {
-      pitch: pitchAutoTrim.enabled, roll: rollAutoTrim.enabled,
-    });
+    flightHud.update(
+      displayState,
+      phoneOwned || lastApResult.engaged ? appliedControls : controls,
+      lastApResult.engaged ? lastApResult.gearDownNorm > 0 : inputManager.getGearDownNorm() > 0,
+      { pitch: pitchAutoTrim.enabled, roll: rollAutoTrim.enabled },
+      hudMasterAp(),
+    );
     const now = performance.now();
     if (now - lastPanelUpdateMs >= 100) {
       lastPanelUpdateMs = now;

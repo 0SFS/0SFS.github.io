@@ -180,6 +180,31 @@ it("defaults to passive impacts and applies the persistent arcade override to bo
   } finally { await act(async () => app.destroy()); }
 });
 
+it("keeps autopilot configuration on the Autopilot tab, not Settings", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  vi.stubGlobal("localStorage", { getItem: () => null, setItem: vi.fn() });
+  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
+  const root = document.createElement("div");
+  document.body.append(root);
+  const openTab = async (label: string) => {
+    const launcher = root.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')
+      ?? root.querySelector<HTMLButtonElement>('.foss-earth-tab-strip [aria-label="Open new tab"]')!;
+    await act(async () => launcher.click());
+    const item = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')).find((button) => button.textContent === label)!;
+    await act(async () => item.click());
+  };
+  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
+  await act(async () => { app = await createFlightSimApp(root); });
+  try {
+    await openTab("Settings");
+    expect(root.querySelector('[aria-label="Autopilot backend"]')).toBeNull();
+    expect(root.querySelector('[aria-label="Arcade ground launches"]')).not.toBeNull();
+    await openTab("Autopilot");
+    expect(root.querySelector('[aria-label="Autopilot backend"]')).not.toBeNull();
+    expect(root.querySelector('[aria-label="ArduPilot status"]')!.textContent).toMatch(/LOITER/);
+  } finally { await act(async () => app.destroy()); }
+});
+
 it.each([0, 1])("discards swept body history when terrain repositions during contact call %s", async resetCall => {
   vi.stubGlobal("localStorage", { getItem: () => null, setItem: vi.fn() });
   Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
