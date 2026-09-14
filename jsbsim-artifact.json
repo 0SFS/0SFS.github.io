@@ -4,23 +4,23 @@
     "schemaVersion": 2,
     "package": {
       "name": "@felipegalind0/jsbsim",
-      "version": "1.2.4-fork.6"
+      "version": "1.2.4-fork.7"
     },
     "native": {
       "origin": "https://github.com/Felipegalind0/jsbsim",
-      "commit": "0efc3e7a2351a38c7d98c109ad707ab8af5deef8",
-      "contentSha256": "bdaf50a99686ccabbb13e5cc670e6475defd53b4f38dfdc58030c78dbb40af1d",
+      "commit": "fea688020fb683c0696aa8339dbed9cdb238a39d",
+      "contentSha256": "688091cc93ad332d8e55ca376393dea3d544a80de0711a4781e10c7e1539ec35",
       "dirty": false
     },
     "sdk": {
-      "commit": "0efc3e7a2351a38c7d98c109ad707ab8af5deef8",
-      "contentSha256": "b1d216eb975b8833da7e5f936397657a47f6e981a52180ef2d529eb3ca8debba",
+      "commit": "fea688020fb683c0696aa8339dbed9cdb238a39d",
+      "contentSha256": "b5d8ff6d2cc76d2b96c92aef1a3228bf6cfebe5dd8ddc4e571c6b713f3d5a93d",
       "dirty": false,
       "path": "wasm"
     },
     "build": {
       "mode": "in-tree",
-      "inputSha256": "307687399a85e97a61a7d4e0e1ddcb0e7d9ce09ba53207d3891e01745bccbee3",
+      "inputSha256": "733a60a62ef3061dc254f6d4a3c8f3cf7f162a213b444e423e4ac3d6b18553f0",
       "toolchain": {
         "node": "v26.8.2",
         "npm": "11.19.1",
@@ -39,10 +39,10 @@
     }
   },
   "files": {
-    "index.d.ts": "2b249738a1ed3664a9e7b1551d4e332dbb650484d5ce405a86e9b3c402e4084d",
-    "index.js": "310ce9665f5404b561832beb1475c1da0c363b30cfd4d1104c769300a6ff6e8a",
-    "index.js.map": "411f0b5255d5519d55cb16b22705b7c9dd40e35656b76545dac3d08cc4fb939e",
-    "licenses/README.txt": "69d5e6f5dd2d68a217a5691855b6679db9d2edb2e3ad4117a79f695793dec11a",
+    "index.d.ts": "4021db027f6d90aa0ada9f8581b128dac9cdf97e06e710e91cabd2f156f8e27a",
+    "index.js": "8876d3467c6ebb32a9fe38d42a03fb8e0ee491d6353580347ba47d71af8036f3",
+    "index.js.map": "7bce5725a434ae51f8cb3e9823c956b7c40fba613eb1e3149b9fc9fad3f03029",
+    "licenses/README.txt": "4a7e892a7ea73b245c8e8918e3f7c47af46ea5dc58303b866d8747d2580e8fde",
     "licenses/jsbsim/AUTHORS": "ca8556894da80f81f773893a9c1009021aac2972d7bb6a39c2f981b4fd00aa9a",
     "licenses/jsbsim/COPYING": "1e7e6bae5a5bde32f1ae5a7c37a082d1ab03cf89354f7f936ac40be9e39a6531",
     "licenses/jsbsim/src/GeographicLib/LICENSE.txt": "90d25298be0c5d7f5219ae20009d18910150b3a4ea0ca86dda5df04cfb8d3823",
@@ -52,7 +52,7 @@
     "wasm.js": "758d98989301d86ec3aa589fa851d6416b305eca58bb1e6b9579780ea339e09b",
     "wasm.js.map": "d75a89efd5b3cf07ebfbe70d321f55c01bd8cdde1be50a15d1dcfad21a7ca763",
     "wasm/jsbsim_wasm.mjs": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
-    "wasm/jsbsim_wasm.wasm": "105f69678f9172b6c07bdb62af650b8a2e4783889540f65fa5ca9bf797d7beac"
+    "wasm/jsbsim_wasm.wasm": "6eae23db0fc26d4e02daa27eb95fba12932265164e4bb194cb3e183d04882806"
   },
   "validation": {
     "status": "passed",
@@ -62,13 +62,13 @@
     ]
   },
   "packageArchive": {
-    "path": "deps/felipegalind0-jsbsim-1.2.4-fork.6.tgz",
-    "sha256": "9ad6c6e549b2bb81ec728c005a06f79501d53b7a718c84c735c95442f2ab9754",
-    "integrity": "sha512-2asdnpY1rQkgotf70fcFX4lKDoUqX8T20ttY0lH04VcH/WKcLAxx7VU86u82Cg79y+VLc9stx0ZFjFar0knrhg=="
+    "path": "deps/felipegalind0-jsbsim-1.2.4-fork.7.tgz",
+    "sha256": "58afaf9fa575ec61838ba794b7b4a0919b8eaf516c7261e571700e8367b5217b",
+    "integrity": "sha512-lYi/DfCul0C9UjITvOzUvYXk862s0WRNTBL4vE7QlJRb++9DiU4nOemAxxIboCZU3aWTGEiVt0I3NF6I3Wnn7g=="
   },
   "emitted": {
     "assets/jsbsim_wasm-DAhL615P.mjs": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
-    "assets/jsbsim_wasm-BYpcLeoA.wasm": "105f69678f9172b6c07bdb62af650b8a2e4783889540f65fa5ca9bf797d7beac"
+    "assets/jsbsim_wasm-DaXz3Eqj.wasm": "6eae23db0fc26d4e02daa27eb95fba12932265164e4bb194cb3e183d04882806"
   },
   "browserLoadedAssetsVerified": false
 }

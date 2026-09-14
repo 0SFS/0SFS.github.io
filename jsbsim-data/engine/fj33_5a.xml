@@ -1,18 +1,51 @@
 <?xml version="1.0"?>
 <!--
-  Initial Williams FJ33-5A schedule for the Cirrus SF50 package.
-  Rated thrust is 1,846 lbf per AFM 31452-001, PDF 23 / printed 1-7.
-  The altitude/Mach schedule, TSFC, N1 limits and 4% bleed loss remain engineering
-  estimates, NOT a manufacturer EEC or installed net-thrust map. No generic
-  G2+/G3 thrust uplift is inferred from published takeoff-distance improvements.
+  Williams FJ33-5A schedule for the Cirrus SF50 package.
+  Rated thrust is 1,846 lbf per AFM 31452-001, PDF 23 / printed 1-7, and is the
+  fixed anchor: sea-level static thrust is not fitted.
+
+  The altitude/Mach schedule, the N1 shape, the temperature term and TSFC were
+  fitted to AFM cruise and climb tables by
+  scripts/calibrate-sf50-propulsion-drag.py, together with the SF50 parasite
+  drag. ISA+10 cruise rows and ISA+5..+15 climb rows were held out of the fit
+  and used only as checks. See docs/validation/sf50-propulsion-drag-calibration-2026-09-14.md.
+  This is still NOT a manufacturer EEC or installed net-thrust map, and no
+  generic G2+/G3 thrust uplift is inferred from published takeoff distances.
+
+  Idle N1/N2 are the ERA22LA404 recorder's ground idle (84 samples, thrust
+  lever at -22 deg): 24.3 % N1, 53.4 % N2. Idle fuel flow is WPR20FA051's
+  recorded ground idle, 76 lbm/hr, and needs @felipegalind0/jsbsim 1.2.4-fork.7
+  or newer; older builds ignore <idlefuelflow> and idle back at 1 % of rated
+  flow.
 -->
 <turbine_engine name="FJ33-5A">
   <milthrust unit="LBS">1846</milthrust>
   <bypassratio>3.3</bypassratio>
-  <tsfc>0.65</tsfc>
+  <tsfc>
+    <!-- JSBSim's built-in TSFC is tsfc * sqrt(T/389.7) * (0.84 + (1-N2norm)^2).
+         The temperature correction is kept; the spool-speed polynomial is
+         replaced by a table fitted to AFM cruise fuel flow over calibrated
+         thrust, anchored at the recorded ground idle. -->
+    <product>
+      <pow><quotient><property>atmosphere/T-R</property><value>389.7</value></quotient><value>0.5</value></pow>
+      <table>
+        <independentVar>propulsion/engine[#]/n2</independentVar>
+        <tableData>
+           53.40 0.7137
+           78.00 0.6634
+           83.00 0.6473
+           88.00 0.6478
+           93.00 0.6513
+           97.00 0.6489
+          100.00 0.6267
+        </tableData>
+      </table>
+    </product>
+  </tsfc>
   <bleed>0.04</bleed>
-  <idlen1>30.0</idlen1>
-  <idlen2>60.0</idlen2>
+  <idlen1>24.3</idlen1>
+  <idlen2>53.4</idlen2>
+  <idlefuelflow>76</idlefuelflow>
   <maxn1>100.0</maxn1>
   <maxn2>100.0</maxn2>
   <augmented>0</augmented>
@@ -33,16 +66,38 @@
   </function>
 
   <function name="MilThrust">
-    <table>
-      <independentVar lookup="row">velocities/mach</independentVar>
-      <independentVar lookup="column">atmosphere/density-altitude</independentVar>
-      <tableData>
-        -10000 0 10000 20000 30000 40000
-        0.0 1.03 1.00 0.78 0.60 0.45 0.32
-        0.2 1.00 0.96 0.75 0.58 0.43 0.30
-        0.4 0.96 0.92 0.72 0.55 0.41 0.29
-        0.6 0.90 0.86 0.67 0.51 0.38 0.27
-      </tableData>
-    </table>
+    <product>
+      <!-- Density-altitude and Mach schedule. The -10,000 ft and sea-level
+           columns are the pre-calibration estimate, held fixed by the rated
+           thrust anchor; the columns above them were fitted. -->
+      <table>
+        <independentVar lookup="row">velocities/mach</independentVar>
+        <independentVar lookup="column">atmosphere/density-altitude</independentVar>
+        <tableData>
+             -10000        0    10000    20000    30000    40000
+        0.0   1.03000  1.00000  0.67596  0.46580  0.30112  0.21413
+        0.2   1.03641  0.99495  0.67363  0.46666  0.29821  0.20805
+        0.4   1.02990  0.98699  0.66940  0.45807  0.29433  0.20818
+        0.6   0.99829  0.95392  0.64405  0.43917  0.28205  0.20040
+        </tableData>
+      </table>
+      <!-- Thrust lost on a hot day beyond what density altitude accounts for. -->
+      <sum><value>1</value><product><value>-0.00163519</value><property>atmosphere/delta-T</property></product></sum>
+      <!-- JSBSim takes thrust from the square of normalised spool speed. The
+           AFM's part-power rows need a steeper curve than that, so this table
+           reshapes available thrust with N1 and is 1 at the rating point. -->
+      <table>
+        <independentVar>propulsion/engine[#]/n1</independentVar>
+        <tableData>
+            65.0 0.72020
+            72.5 0.72061
+            80.0 0.72818
+            85.0 0.76546
+            90.0 0.83347
+            95.0 0.92322
+           100.0 1.00000
+        </tableData>
+      </table>
+    </product>
   </function>
 </turbine_engine>
