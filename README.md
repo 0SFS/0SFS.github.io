@@ -49,13 +49,15 @@ presets start paused — press `P` when you're ready.
 
 ## Aircraft and the road ahead
 
-The ambition extends across aircraft types. The **Cessna 172P is the current starting aircraft**:
-this build bundles its JSBSim definitions and boots into it, with a placeholder visual model. More
-aircraft and richer models are part of where the project is headed.
+The ambition extends across aircraft types. The **Cessna 172 Skyhawk** is the default aircraft, with
+its JSBSim flight model and its visual model both bundled. The **Cirrus Vision Jet** can be chosen in
+the flight panel's **Aircraft** tab, in G1, G2, G2+ and G3 variants, though they share one
+development flight model rather than a calibrated one per generation. More aircraft and richer models
+are part of where the project is headed.
 
 Future directions:
 
-- **More aircraft:** expand beyond the bundled C172P, with aircraft selection and matching visual models.
+- **More aircraft:** expand beyond the Cessna 172 and the Vision Jet family, with matching visual models.
 - **ArduPilot support:** use ArduPilot as an optional autopilot when you do not want to fly manually. The Autopilot tab already runs an in-sim autopilot (roll/yaw stabilize, pitch hold, auto-throttle, and optional gear/flaps), and the **AP** button beside the gear button engages it. ArduPilot can be selected there but will not fly until a local SITL bridge is connected — the sim will not pretend it is. The planned SITL integration looks like this:
   1. JSBSim remains the flight dynamics model. It advances the aircraft and produces the simulated sensor state: position, attitude, velocity, airspeed, and altitude.
   2. A small local bridge connects the browser to ArduPilot Plane SITL. It sends that sensor state into the autopilot and receives its servo outputs over the [external simulator interface](https://ardupilot.org/dev/docs/sim-on-hardware.html)/MAVLink.

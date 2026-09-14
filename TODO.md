@@ -60,10 +60,12 @@ chase it with.
 variants with their own geometry, flight model tuning, gear/stance settings, and
 visual setup, separate from the current C172 and Vision Jet work.
 
-**Cirrus Vision Jet flies the C172's flight model.** The mesh is built and
-wired in (1204 / 908 / 442 triangles, LOD3 down to LOD1), but the aerodynamics,
-gear and stance are still the Cessna's, so the jet sits at the C172's 1.33 m
-reference stance rather than its own.
+**Vision Jet generations share one development flight model.** G1, G2 and G3
+load their own JSBSim packages (`sf50`, `sf50-g2`, `sf50-g3`) and the jet sits on
+its own 1.12 m stance, but all three still fly G1-based development
+aerodynamics, and G2+ runs the G2 package. See `developmentNote` in
+`src/flight/aircraft/aircraftCatalog.ts` and the per-variant summaries in
+`src/flight/aircraft/sf50Variants.ts`.
 
 **The main gear linkage does not articulate.** LOD3 models the trailing link as
 three members - forward leg, trailing arm, oleo - but as one rigid mesh under
@@ -71,25 +73,18 @@ one node. The oleo does not compress and the arm does not swing on its knee,
 because each needs a node of its own and a runtime that can drive a chain
 rather than a single rotation. It is a trailing link in shape only.
 
-**The retractable gear is visual only.** `L` raises and lowers it and the rig
-runs an 8-second transit off `gear/gear-cmd-norm`, but nothing acts on that
-command: the c172p has fixed gear and no retraction system, so
-`gear/gear-pos-norm` never moves and neither does the drag, the stance or the
-weight-on-wheels logic. So the gear can be raised while parked, which leaves the
-aeroplane standing on an invisible stance. An SF50 flight model would pick up
-the same property with no runtime change; until then, a weight-on-wheels
-interlock would be the cheap half-measure.
+**Nothing stops the gear retracting on the ground.** The SF50 packages declare
+retractable gear and run `gear/gear-cmd-norm` through an 8-second kinematic into
+`gear/gear-pos-norm`, so the command now drives the physics: both JSBSim and
+`src/flight/physics/groundContactClearance.ts` stop supporting a retractable
+contact as soon as that position leaves the down stop at 0.99. But the gear
+channel has no weight-on-wheels interlock, so `G` still raises the gear while
+parked. The `gear/wow` tests in `sf50.xml` gate the stall warning and the stick
+pusher only. The C172's gear is fixed and its position never moves, but `G` and
+the HUD gear button still toggle the command and the button's own state.
 
 **The Vision Jet's opt-in HD level has no landing gear.** hilos run's Sketchfab
 model ships as the `hd` level, off by default. It is modelled gear-up, so
 parked it hovers 0.67 m over the runway with nothing underneath — right in
 flight, wrong on the ground. Either model a gear for it, hide it while the
 aircraft is on the ground, or leave it as the flight-only option it is.
-
-**The V-tail does not move.** `SURFACE_BINDINGS` turns one named node about one
-fixed local axis, and a V-tail's two ruddervators are not a single rigid
-rotation for either pitch or yaw. The mesh already exports
-`Ruddervator_Left` / `Ruddervator_Right` with their origins on the real hinge
-lines; the runtime needs two bindings with per-node axes and an
-elevator-plus-rudder mix. `planes/Cirrus_Vision_Jet/agent_workspace/REPORT.md`
-gives the exact change.
