@@ -34,6 +34,8 @@ POH_SHA256 = "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949"
 KTS_TO_FPS = 1.6878098571011957
 RANKINE_PER_CELSIUS = 1.8
 KELVIN_AT_ZERO_C = 273.15
+# The engine package owns these; read from it so a recalibrated idle N1 does not
+# silently rescale the throttle position a printed N1 maps to.
 IDLE_N1, MAX_N1 = 30.0, 100.0
 EMPTY_WEIGHT_LB, MAX_FUEL_LB = 3550.0, 1500.0
 # AFM 5-14 static source error correction, flaps 0 (sf50AfmData.ts).
@@ -50,6 +52,15 @@ def parse_args():
     p.add_argument("--out", required=True, help="New output directory")
     p.add_argument("--checks", default="cruise,stall,climb")
     return p.parse_args()
+
+
+def read_engine_n1_limits(data_root):
+    """Set IDLE_N1 and MAX_N1 from the engine package being evaluated."""
+    global IDLE_N1, MAX_N1
+    xml = (data_root / "engine/fj33_5a.xml").read_text()
+    find = lambda tag: float(re.search(rf"<{tag}>([^<]+)</{tag}>", xml).group(1))
+    IDLE_N1, MAX_N1 = find("idlen1"), find("maxn1")
+    return IDLE_N1, MAX_N1
 
 
 def git_identity(path):
@@ -216,6 +227,11 @@ class Model:
             self.engine_running = True
             self._throttle(throttle)
             assert f.run_ic()
+        # Engine thrust and TSFC functions are evaluated at the start of the engine
+        # update, before N1 and N2 move, so a function of spool speed sees the
+        # previous pass. One more pass at the same state makes zero-time results
+        # self-consistent.
+        assert f.run_ic()
         return f
 
     def _throttle(self, value):
@@ -503,6 +519,7 @@ def main():
     sys.path.insert(0, str(native / "tests"))
     from jsbsim import _jsbsim as jsbsim
     data_root = pathlib.Path(args.data_root).resolve() if args.data_root else root / "public/jsbsim-data"
+    read_engine_n1_limits(data_root)
     checks = args.checks.split(",")
     pages = poh_pages(root, work) if {"stall", "climb"} & set(checks) else None
 
@@ -514,6 +531,7 @@ def main():
               "method": "Zero-time equilibrium: udot, wdot and 100*qdot below 1e-3 ft/s^2, 1e-3 ft/s^2 and 1e-4 by damped Newton. "
                         "Pressure altitude and OAT imposed jointly through geometric altitude and atmosphere/delta-T. "
                         "Loading: fuel up to 1500 lb, remaining payload at the model CG, as in validate-sf50.mjs.",
+              "engineN1": {"idlePct": IDLE_N1, "maximumPct": MAX_N1},
               "frozen": "No coefficient, engine table or FCS value is changed."}
     if "cruise" in checks:
         report["cruise"] = check_cruise(jsbsim, data_root, work, root)

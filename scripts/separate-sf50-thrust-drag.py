@@ -162,6 +162,7 @@ def main():
     sys.path.insert(0, str(pathlib.Path(args.native_build).resolve() / "tests"))
     from jsbsim import _jsbsim as jsbsim
     data_root = pathlib.Path(args.data_root).resolve() if args.data_root else ROOT / "public/jsbsim-data"
+    steady.read_engine_n1_limits(data_root)
 
     altitudes, eqs, unsolved = equations(jsbsim, data_root, work)
     fits = {}

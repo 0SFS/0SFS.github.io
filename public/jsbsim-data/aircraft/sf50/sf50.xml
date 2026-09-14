@@ -130,10 +130,99 @@
   </propulsion>
 
   <flight_control name="SF50 V-tail FCS">
+    <!-- Stall protection. The SF50 carries an angle-of-attack stall warning and
+         a stick pusher, and the AFM's Section 5 stall speeds are pusher
+         activation speeds, not aerodynamic stall. Thresholds are this model's
+         own angle of attack at those printed speeds, and at 5 kt above them for
+         the warning, solved at 1 g by scripts/diagnose-sf50-steady-flight.py
+         over the AFM's four weights: the spread across weight is under 0.9 deg,
+         so a flap-position schedule is enough. Both inhibit on the ground.
+         Each threshold drops while its function is active, which latches it
+         until the pilot has recovered rather than chattering at the edge. -->
+    <channel name="Stall Protection">
+      <fcs_function name="Warning Alpha">
+        <function>
+          <difference>
+            <table>
+              <independentVar>fcs/flap-pos-norm</independentVar>
+              <tableData>
+                0.0 9.49
+                0.5 8.14
+                1.0 8.69
+              </tableData>
+            </table>
+            <product><value>0.50</value><property>fcs/stall-warning</property></product>
+          </difference>
+        </function>
+        <output>fcs/warning-alpha-deg</output>
+      </fcs_function>
+      <fcs_function name="Pusher Alpha">
+        <function>
+          <difference>
+            <table>
+              <independentVar>fcs/flap-pos-norm</independentVar>
+              <tableData>
+                0.0 11.10
+                0.5 10.34
+                1.0 12.50
+              </tableData>
+            </table>
+            <product><value>2.00</value><property>fcs/stick-pusher</property></product>
+          </difference>
+        </function>
+        <output>fcs/pusher-alpha-deg</output>
+      </fcs_function>
+      <switch name="Stall Warning">
+        <default value="0"/>
+        <test logic="AND" value="1">
+          gear/wow lt 0.5
+          aero/alpha-deg ge fcs/warning-alpha-deg
+        </test>
+        <output>fcs/stall-warning</output>
+      </switch>
+      <switch name="Stick Pusher">
+        <default value="0"/>
+        <test logic="AND" value="1">
+          gear/wow lt 0.5
+          aero/alpha-deg ge fcs/pusher-alpha-deg
+        </test>
+        <output>fcs/stick-pusher</output>
+      </switch>
+      <!-- Nose-down command while the pusher is engaged: firm at activation and
+           harder the deeper the overshoot, as a force-limited pusher behaves. -->
+      <fcs_function name="Pusher Command">
+        <function>
+          <product>
+            <property>fcs/stick-pusher</property>
+            <max>
+              <value>0.35</value>
+              <min>
+                <value>1.0</value>
+                <sum>
+                  <value>0.35</value>
+                  <product>
+                    <value>0.15</value>
+                    <difference>
+                      <property>aero/alpha-deg</property>
+                      <property>fcs/pusher-alpha-deg</property>
+                    </difference>
+                  </product>
+                </sum>
+              </min>
+            </max>
+          </product>
+        </function>
+        <output>fcs/pusher-cmd-norm</output>
+      </fcs_function>
+    </channel>
+
     <channel name="Pitch">
       <summer name="Pitch Command">
         <input>fcs/elevator-cmd-norm</input>
         <input>fcs/pitch-trim-cmd-norm</input>
+        <!-- Positive pitch command is nose down (Cm from ruddervator is
+             negative), so the pusher adds here. -->
+        <input>fcs/pusher-cmd-norm</input>
         <clipto><min>-1</min><max>1</max></clipto>
       </summer>
       <aerosurface_scale name="Elevator Control">
@@ -232,13 +321,16 @@
           <property>metrics/Sw-sqft</property>
           <table>
             <independentVar>aero/alpha-rad</independentVar>
+            <!-- Shifted -0.00258 from the pre-calibration estimate by
+                 scripts/calibrate-sf50-propulsion-drag.py, fitted with the
+                 FJ33-5A thrust schedule against AFM cruise and climb. -->
             <tableData>
-              -0.35 0.095
-              -0.10 0.032
-               0.00 0.025
-               0.20 0.040
-               0.40 0.140
-               0.70 0.700
+              -0.35 0.09242
+              -0.10 0.02942
+               0.00 0.02242
+               0.20 0.03742
+               0.40 0.13742
+               0.70 0.69742
             </tableData>
           </table>
         </product>

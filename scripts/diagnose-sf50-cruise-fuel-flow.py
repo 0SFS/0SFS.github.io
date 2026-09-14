@@ -22,6 +22,8 @@ import sys
 # The package's turbine endpoints. N1 is linear in throttle position between
 # them (FGTurbine::Run), so an observed N1 is imposed by position, not by a
 # thrust-lever angle. An AFM N1 observation is not a TLA command.
+# Read from the engine package below, so a recalibrated idle does not silently
+# rescale the throttle position a printed N1 maps to.
 IDLE_N1 = 30.0
 MAX_N1 = 100.0
 
@@ -84,6 +86,15 @@ def reviewed_rows(root, altitudes):
                      "inReviewLedger": identity in reviewed})
     rows.sort(key=lambda row: (row["pressureAltitudeFt"], -row["n1Pct"]))
     return rows, candidates["source"], ledger["recordedPrimarySha256"]
+
+
+def read_engine_n1_limits(data_root):
+    """Set IDLE_N1 and MAX_N1 from the engine package being evaluated."""
+    global IDLE_N1, MAX_N1
+    engine = (data_root / "engine/fj33_5a.xml").read_text()
+    between = lambda tag: float(engine.split(f"<{tag}>")[1].split(f"</{tag}>")[0])
+    IDLE_N1, MAX_N1 = between("idlen1"), between("maxn1")
+    return IDLE_N1, MAX_N1
 
 
 def engine_bleed_fraction(data_root):
@@ -212,6 +223,7 @@ def main():
     assert fdm.load_model("sf50"), "The canonical G1 package must load"
     fdm.set_dt(1.0 / 120.0)
 
+    read_engine_n1_limits(data_root)
     bleed_fraction = engine_bleed_fraction(data_root)
     results = [evaluate(fdm, row, bleed_fraction) for row in rows]
     for result in results:
@@ -232,6 +244,7 @@ def main():
         "aircraftPackage": "sf50 (G1, canonical)",
         "dataRoot": str(data_root),
         "engineFile": "engine/fj33_5a.xml",
+        "engineN1": {"idlePct": IDLE_N1, "maximumPct": MAX_N1},
         "jsbsim": git_identity(str(pathlib.Path(args.jsbsim_source).resolve())),
         "nativeBuild": str(native_build),
         "afmSource": source,
