@@ -299,10 +299,19 @@ function buildPropellerDisc(node: TransformNode, scene: Scene): Mesh {
 const SPAN_AXIS = new Vector3(1, 0, 0);
 const VERTICAL_AXIS = new Vector3(0, 1, 0);
 const THRUST_AXIS = new Vector3(0, 0, 1);
-// The two V-tail hinge lines are measured from the SF50 three-view geometry.
-// Mesh nodes retain global axes after export, so these are not cardinal axes.
-const LEFT_RUDDERVATOR_HINGE_AXIS = new Vector3(-2.2405, -1.025, 1.792).normalize();
-const RIGHT_RUDDERVATOR_HINGE_AXIS = new Vector3(2.2405, -1.025, 1.792).normalize();
+// 38.7° is the SF50 V-tail dihedral. Each ruddervator hinges about ITS panel
+// span, in the rear-view plane, so a deflection is trailing-edge up/down
+// relative to that fin. The numbers that used to live here were the Blender
+// leading-edge vector (X span, Y forward, Z up) used as a glTF axis (Y up,
+// Z aft), which put most of the rotation about the fuselage and made the
+// surfaces spin in the rear view.
+const VT_DIHEDRAL_RAD = 38.7 * DEG_TO_RAD;
+const LEFT_RUDDERVATOR_HINGE_AXIS = new Vector3(
+  -Math.cos(VT_DIHEDRAL_RAD), Math.sin(VT_DIHEDRAL_RAD), 0,
+);
+const RIGHT_RUDDERVATOR_HINGE_AXIS = new Vector3(
+  Math.cos(VT_DIHEDRAL_RAD), Math.sin(VT_DIHEDRAL_RAD), 0,
+);
 
 /**
  * Retracting gear parts. Each leg's origin is on its own retraction hinge and

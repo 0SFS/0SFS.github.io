@@ -123,6 +123,48 @@ describe("control surface geometry", () => {
 });
 
 /**
+ * SF50 V-tail, in glTF axes. Each ruddervator hinges about its own 38.7° span,
+ * not about the fuselage: from dead astern a pitch input must drop both
+ * trailing edges perpendicular to their fins, not spin the panels clockwise.
+ */
+const VT_DIHEDRAL_RAD = 38.7 * Math.PI / 180;
+const RIGHT_HINGE = new Vector3(Math.cos(VT_DIHEDRAL_RAD), Math.sin(VT_DIHEDRAL_RAD), 0);
+const LEFT_HINGE = new Vector3(-Math.cos(VT_DIHEDRAL_RAD), Math.sin(VT_DIHEDRAL_RAD), 0);
+
+function localAfter(node: TransformNode, local: Vector3): Vector3 {
+  return Vector3.Zero().copyFrom(local)
+    .rotateByQuaternionToRef(node.rotationQuaternion!, Vector3.Zero());
+}
+
+describe("ruddervator geometry", () => {
+  it("hinges each panel about its V-tail span, not about the fuselage", () => {
+    const s = scene();
+    const rig = rigOf(["Ruddervator_Left", "Ruddervator_Right"], s.scene);
+    applyAircraftRig(rig, {
+      ...NEUTRAL_CONTROL_SURFACES, ruddervatorLeftRad: 0.3, ruddervatorRightRad: 0.3,
+    }, 0);
+    const left = rig.parts.find((part) => part.node.name === "Ruddervator_Left")!.node;
+    const right = rig.parts.find((part) => part.node.name === "Ruddervator_Right")!.node;
+
+    // A point on the hinge line stays put. Spinning about +Z (the rear-view
+    // bug) would orbit this point around the fuselage.
+    expect(Vector3.Distance(localAfter(right, RIGHT_HINGE), RIGHT_HINGE)).toBeLessThan(1e-6);
+    expect(Vector3.Distance(localAfter(left, LEFT_HINGE), LEFT_HINGE)).toBeLessThan(1e-6);
+
+    // Trailing edge down and outboard: perpendicular to the fin, not a
+    // clockwise/counterclockwise spin in the rear view.
+    const rightTe = trailingEdgeAfter(right);
+    const leftTe = trailingEdgeAfter(left);
+    expect(rightTe.y).toBeLessThan(-0.2);
+    expect(rightTe.x).toBeGreaterThan(0.1);
+    expect(leftTe.y).toBeLessThan(-0.2);
+    expect(leftTe.x).toBeLessThan(-0.1);
+    expect(Math.abs(rightTe.x + leftTe.x)).toBeLessThan(1e-6);
+    s.scene.dispose(); s.engine.dispose();
+  });
+});
+
+/**
  * The SF50's gear, in glTF axes (+X starboard, +Y up, +Z aft), straight out of
  * generate_sf50.py: each leg's pivot, its wheel's extended centre, and where
  * the generator's own `--gear 0` build puts that wheel once the leg has turned
