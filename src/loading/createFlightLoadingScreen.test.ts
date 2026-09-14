@@ -40,23 +40,32 @@ describe("flight loading log", () => {
     let now = 1000;
     vi.spyOn(performance, "now").mockImplementation(() => now);
     screen = createFlightLoadingScreen();
-    screen.setPhase("terrain", { state: "loading", detail: "Refining the ground" });
-    const terrain = newestLine();
-    const bar = terrain.querySelector('[role="progressbar"]')!;
-    expect(terrain.textContent).toContain("Safe terrain: Refining the ground");
+    screen.setPhase("assets", { state: "loading", detail: "Downloading the model" });
+    const aircraft = newestLine();
+    const bar = aircraft.querySelector('[role="progressbar"]')!;
+    expect(aircraft.textContent).toContain("Aircraft: Downloading the model");
     expect(bar.hasAttribute("aria-valuenow")).toBe(false);
 
-    screen.setPhase("terrain", { state: "loading", progress: 0.42 });
-    expect(newestLine()).toBe(terrain);
+    screen.setPhase("assets", { state: "loading", progress: 0.42 });
+    expect(newestLine()).toBe(aircraft);
     expect(bar.getAttribute("aria-valuenow")).toBe("42");
 
-    screen.setPhase("terrain", { state: "loading", progress: Number.NaN });
+    screen.setPhase("assets", { state: "loading", progress: Number.NaN });
     expect(bar.hasAttribute("aria-valuenow")).toBe(false);
 
     now = 4200;
-    screen.setPhase("terrain", { state: "ready" });
-    expect(terrain.dataset.tone).toBe("success");
-    expect(terrain.textContent).toContain("Safe terrain ready · 3.2 s");
+    screen.setPhase("assets", { state: "ready" });
+    expect(aircraft.dataset.tone).toBe("success");
+    expect(aircraft.textContent).toContain("Aircraft ready · 3.2 s");
+  });
+
+  it("describes terrain work without a coverage percentage", () => {
+    screen = createFlightLoadingScreen();
+    screen.setPhase("terrain", { state: "loading", detail: "Refining the ground", progress: 0.42 });
+    const terrain = newestLine();
+    expect(terrain.textContent).toContain("Terrain: Refining the ground");
+    expect(terrain.querySelector('[role="progressbar"]')).toBeNull();
+    expect(terrain.textContent).not.toContain("42%");
   });
 
   it("stays quiet about phases a teleport never loads and starts fresh lines", () => {
