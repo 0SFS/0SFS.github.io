@@ -1,9 +1,16 @@
 import { getFdmProfile } from "../jsbsim/fdmProfiles";
 import { SF50_VARIANTS } from "./sf50Variants";
-import { AIRCRAFT_IDS, type AircraftId, isAircraftId } from "./aircraftIds";
+import {
+  AIRCRAFT_FAMILY_IDS,
+  AIRCRAFT_IDS,
+  type AircraftFamilyId,
+  type AircraftId,
+  isAircraftFamilyId,
+  isAircraftId,
+} from "./aircraftIds";
 
-export { AIRCRAFT_IDS, isAircraftId };
-export type { AircraftId };
+export { AIRCRAFT_FAMILY_IDS, AIRCRAFT_IDS, isAircraftFamilyId, isAircraftId };
+export type { AircraftFamilyId, AircraftId };
 
 /**
  * Selectable aircraft and their level-of-detail meshes.
@@ -43,6 +50,36 @@ export interface AircraftModelCredit {
   sourceUrl?: string;
 }
 
+export interface AircraftFamilyDefinition {
+  id: AircraftFamilyId;
+  label: string;
+  summary: string;
+  thumbnail: {
+    /** Static image path relative to the Vite base URL. */
+    path: string;
+    credit: AircraftModelCredit;
+  };
+  defaultAircraftId: AircraftId;
+  variants: readonly AircraftFamilyVariantDefinition[];
+  /** Present only when this family offers a variant selector. */
+  variantLabel?: string;
+  developmentNote?: string;
+}
+
+export interface AircraftFamilyVariantDefinition {
+  id: string;
+  aircraftId: AircraftId;
+  label: string;
+}
+
+/** One complete choice, applied atomically when the runtime aircraft changes. */
+export interface AircraftSelection {
+  aircraftId: AircraftId;
+  lodId: AircraftLodId;
+  optInLodsEnabled: boolean;
+  generationId?: string;
+}
+
 export interface AircraftLodDefinition {
   id: AircraftLodMeshId;
   label: string;
@@ -65,6 +102,7 @@ export interface AircraftLodDefinition {
 
 export interface AircraftDefinition {
   id: AircraftId;
+  familyId: AircraftFamilyId;
   label: string;
   summary: string;
   /** Yaw applied to the imported glTF so its -Z nose faces the sim's +Z nose. */
@@ -88,6 +126,42 @@ const PROCEDURAL: AircraftModelCredit = {
   artist: "felipegalin0",
   note: "Measured reconstruction, designed explicitly for max runtime speed.",
 };
+
+const THUMBNAIL_CREDIT: AircraftModelCredit = {
+  artist: PROCEDURAL.artist,
+  note: "Static render of the existing procedural LOD3 aircraft mesh.",
+};
+
+const SF50_FAMILY_VARIANTS: readonly AircraftFamilyVariantDefinition[] = [
+  ...SF50_VARIANTS.map((variant): AircraftFamilyVariantDefinition => ({
+    id: variant.id,
+    aircraftId: variant.aircraftId,
+    label: variant.id.toUpperCase(),
+  })),
+  { id: "g2+", aircraftId: "cirrus-vision-jet-g2", label: "G2+" },
+];
+
+/** Family cards choose an airframe; variants below the gallery choose its package. */
+export const AIRCRAFT_FAMILIES: readonly AircraftFamilyDefinition[] = [
+  {
+    id: "cessna-172",
+    label: "Cessna 172 Skyhawk",
+    summary: "High-wing trainer. Flight model and visuals both available.",
+    thumbnail: { path: "aircraft/thumbnails/cessna-172.png", credit: THUMBNAIL_CREDIT },
+    defaultAircraftId: "cessna-172",
+    variants: [{ id: "cessna-172", aircraftId: "cessna-172", label: "Cessna 172 Skyhawk" }],
+  },
+  {
+    id: "cirrus-vision-jet",
+    label: "Cirrus Vision Jet",
+    summary: "Single-engine personal jet. G1, G2, G2+ and G3 variants.",
+    thumbnail: { path: "aircraft/thumbnails/cirrus-vision-jet.png", credit: THUMBNAIL_CREDIT },
+    defaultAircraftId: "cirrus-vision-jet",
+    variants: SF50_FAMILY_VARIANTS,
+    variantLabel: "Generation",
+    developmentNote: "G1, G2 and G3 have separate runtime packages. G2+ is currently mapped to the G2 runtime while separate physics/package support is not yet implemented. Choosing a generation does not provide calibrated generation-specific performance, a new cabin or complete generation-specific avionics.",
+  },
+];
 
 /**
  * https://sketchfab.com/3d-models/cirrus-vision-sf50-d46dd06b4b5646acaed90993db34d639
@@ -132,6 +206,7 @@ const C172_LODS: readonly AircraftLodDefinition[] = [
 export const AIRCRAFT_CATALOG: readonly AircraftDefinition[] = [
   {
     id: "cessna-172",
+    familyId: "cessna-172",
     label: "Cessna 172 Skyhawk",
     summary: "High-wing trainer. Flight model and visuals both available.",
     modelYawRad: Math.PI,
@@ -141,6 +216,7 @@ export const AIRCRAFT_CATALOG: readonly AircraftDefinition[] = [
   },
   ...SF50_VARIANTS.map((variant): AircraftDefinition => ({
     id: variant.aircraftId,
+    familyId: "cirrus-vision-jet",
     label: variant.label,
     summary: variant.summary,
     modelYawRad: Math.PI,
@@ -154,6 +230,15 @@ export function getAircraftDefinition(id: AircraftId): AircraftDefinition {
   return AIRCRAFT_CATALOG.find((entry) => entry.id === id) ?? AIRCRAFT_CATALOG[0];
 }
 
+export function getAircraftFamily(id: AircraftFamilyId): AircraftFamilyDefinition {
+  return AIRCRAFT_FAMILIES.find((family) => family.id === id) ?? AIRCRAFT_FAMILIES[0];
+}
+
+/** Includes the legacy Vision Jet runtime ID, which continues to select G1. */
+export function getAircraftFamilyForAircraft(id: AircraftId): AircraftFamilyDefinition {
+  return getAircraftFamily(getAircraftDefinition(id).familyId);
+}
+
 export function isAircraftLodId(value: unknown): value is AircraftLodId {
   return typeof value === "string" && (AIRCRAFT_LOD_IDS as readonly string[]).includes(value);
 }
@@ -164,6 +249,29 @@ export function availableLods(
   optInEnabled: boolean,
 ): readonly AircraftLodDefinition[] {
   return optInEnabled ? definition.lods : definition.lods.filter((lod) => !lod.optIn);
+}
+
+/** Keep staged and restored presentation choices valid for the selected package. */
+export function normalizeAircraftSelection(selection: AircraftSelection): AircraftSelection {
+  const definition = getAircraftDefinition(selection.aircraftId);
+  const family = getAircraftFamily(definition.familyId);
+  const familyVariant = family.variants.find((entry) => entry.id === selection.generationId)
+    ?? family.variants.find((entry) => entry.aircraftId === selection.aircraftId)
+    ?? family.variants[0];
+  const normalizedDefinition = getAircraftDefinition(familyVariant.aircraftId);
+  // This existing preference survives families without optional meshes; their
+  // hidden flag has no effect, and returning to an opted-in family retains it.
+  const optInLodsEnabled = selection.optInLodsEnabled;
+  const lodId = selection.lodId === "auto"
+    || availableLods(normalizedDefinition, optInLodsEnabled).some((lod) => lod.id === selection.lodId)
+    ? selection.lodId
+    : "auto";
+  return {
+    aircraftId: normalizedDefinition.id,
+    lodId,
+    optInLodsEnabled,
+    generationId: familyVariant.id,
+  };
 }
 
 /**

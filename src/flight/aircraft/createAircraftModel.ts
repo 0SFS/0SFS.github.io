@@ -46,6 +46,8 @@ export interface AircraftModelHandle {
   /** Moving parts of the loaded mesh, or null while none is in the scene. */
   getRig(): AircraftRig | null;
   setAircraft(id: AircraftId): void;
+  /** Apply staged mesh settings with one resolution/load. */
+  setPresentation(lodId: AircraftLodId, optInEnabled: boolean): void;
   setLod(id: AircraftLodId): void;
   setOptInEnabled(enabled: boolean): void;
   /** Re-evaluate "auto" against the current chase distance. Cheap to call. */
@@ -159,6 +161,11 @@ export function createAircraftModel(
       state = { ...state, aircraftId: id };
       activeKey = null;
       clearContainer();
+      apply();
+    },
+    setPresentation(lodId, optInEnabled): void {
+      if (lodId === state.lodId && optInEnabled === state.optInEnabled) return;
+      state = { ...state, lodId, optInEnabled };
       apply();
     },
     setLod(id): void {

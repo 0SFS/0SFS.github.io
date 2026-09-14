@@ -45,7 +45,7 @@ const mocks = vi.hoisted(() => {
         status: "ready", triangles: 876, error: null,
       }),
       getRig: () => mocks.rig,
-      setAircraft: vi.fn(), setLod: vi.fn(), refreshAutoLod: vi.fn(), dispose: vi.fn(),
+      setAircraft: vi.fn(), setLod: vi.fn(), setPresentation: vi.fn(), refreshAutoLod: vi.fn(), dispose: vi.fn(),
     },
     rig: { parts: [], propeller: null, propellerAngleRad: 0, bound: [] },
     surfaceState: { elevatorRad: 0.1 },
@@ -332,41 +332,181 @@ it("mounts the shared + menu, opens Location, and applies coordinates to the sim
 });
 
 
-it("persists a new airframe for reload while retaining the active model, and applies LOD immediately", async () => {
+function selectionControl<T extends Element>(root: HTMLElement, selector: string): T {
+  const control = root.querySelector<T>(selector);
+  if (!control) throw new Error("Missing aircraft selection control: " + selector);
+  return control;
+}
+
+async function changeSelect(root: HTMLElement, selector: string, value: string) {
+  const select = selectionControl<HTMLSelectElement>(root, selector);
+  await act(async () => {
+    select.value = value;
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+}
+
+async function openPanelTab(root: HTMLElement, label: string, initiallyClosed = false) {
+  const existing = Array.from(root.querySelectorAll<HTMLButtonElement>(".foss-earth-tab-button"))
+    .find(button => button.textContent === label);
+  if (existing) {
+    await act(async () => existing.click());
+    return;
+  }
+  const launcher = initiallyClosed ? '[aria-label="Open right panel"]' : '[aria-label="Open new tab"]';
+  await act(async () => selectionControl<HTMLButtonElement>(root, launcher).click());
+  const item = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="menuitem"]'))
+    .find(button => button.textContent === label);
+  if (!item) throw new Error("Missing panel tab: " + label);
+  await act(async () => item.click());
+}
+
+async function mountAircraftSelection(initial: [string, string][] = []) {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
-  const setItem = vi.fn();
-  vi.stubGlobal("localStorage", { getItem: () => null, setItem });
+  const storage = new Map(initial);
+  const setItem = vi.fn((key: string, value: string) => { storage.set(key, value); });
+  vi.stubGlobal("localStorage", {
+    getItem: (key: string) => storage.get(key) ?? null,
+    setItem,
+    removeItem: vi.fn((key: string) => { storage.delete(key); }),
+  });
+  const reload = vi.fn();
+  const browserWindow = window;
+  const location = { href: browserWindow.location.href, search: browserWindow.location.search, reload };
+  vi.stubGlobal("window", new Proxy(browserWindow, {
+    get(target, property) {
+      return property === "location" ? location : Reflect.get(target, property, target);
+    },
+  }));
   Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
   const root = document.createElement("div");
   document.body.append(root);
   let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
   await act(async () => { app = await createFlightSimApp(root); });
+  await openPanelTab(root, "Aircraft", true);
+  setItem.mockClear();
+  return { root, app, storage, setItem, reload };
+}
+
+const generationSelector = ".flight-panel__generation-field select";
+const lodSelector = ".flight-panel__model-controls select";
+const applySelector = ".flight-panel__aircraft-controls > button";
+
+it("stages all Vision Jet generations and applies a complete package once", async () => {
+  const t = await mountAircraftSelection();
   try {
-    await act(async () => root.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')!.click());
-    const aircraftTab = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="menuitem"]'))
-      .find((button) => button.textContent === "Aircraft")!;
-    expect(aircraftTab).not.toBeUndefined();
-    await act(async () => aircraftTab.click());
-
-    // Both airframes are offered, and the C172 lists every exported level.
-    const radios = Array.from(root.querySelectorAll<HTMLInputElement>('input[name="flight-aircraft"]'));
-    expect(radios.map((input) => input.value)).toEqual(["cessna-172", "cirrus-vision-jet"]);
-    const lodSelect = root.querySelector<HTMLSelectElement>(".flight-panel__select")!;
-    expect(Array.from(lodSelect.options, (option) => option.value))
-      .toEqual(["auto", "lod3", "lod2", "lod1", "lod0"]);
-
-    await act(async () => {
-      lodSelect.value = "lod2";
-      lodSelect.dispatchEvent(new Event("change", { bubbles: true }));
-    });
-    expect(mocks.aircraftModel.setLod).toHaveBeenCalledWith("lod2");
-    expect(setItem).toHaveBeenCalledWith("osfs.aircraft-lod", "lod2");
-
+    const radios = Array.from(t.root.querySelectorAll<HTMLInputElement>('input[name="flight-aircraft"]'));
+    expect(radios.map(input => input.value)).toEqual(["cessna-172", "cirrus-vision-jet"]);
+    expect(t.root.querySelector(generationSelector)).toBeNull();
     await act(async () => radios[1].click());
+    expect(Array.from(selectionControl<HTMLSelectElement>(t.root, generationSelector).options, option => option.value).sort())
+      .toEqual(["g1", "g2", "g2+", "g3"]);
+    for (const generation of ["g1", "g2", "g2+", "g3"]) {
+      await changeSelect(t.root, generationSelector, generation);
+      expect(selectionControl<HTMLSelectElement>(t.root, generationSelector).value).toBe(generation);
+      expect(t.root.textContent).toContain("Currently flying Cessna 172 Skyhawk until you apply.");
+      expect(t.setItem).not.toHaveBeenCalled();
+      expect(t.reload).not.toHaveBeenCalled();
+      expect(mocks.aircraftModel.setPresentation).not.toHaveBeenCalled();
+    }
+    await changeSelect(t.root, generationSelector, "g2+");
+    await act(async () => selectionControl<HTMLInputElement>(t.root, '.flight-panel__model-controls input[type="checkbox"]').click());
+    await changeSelect(t.root, lodSelector, "hd");
+    await act(async () => selectionControl<HTMLButtonElement>(t.root, applySelector).click());
+    expect(t.setItem.mock.calls).toEqual([
+      ["osfs.aircraft-lod", "hd"], ["osfs.aircraft-opt-in-lods", "on"],
+      ["osfs.aircraft-generation", "g2+"], ["osfs.aircraft", "cirrus-vision-jet-g2"],
+    ]);
+    expect(t.reload).toHaveBeenCalledOnce();
+    expect(t.setItem.mock.invocationCallOrder.at(-1)).toBeLessThan(t.reload.mock.invocationCallOrder[0]);
     expect(mocks.aircraftModel.setAircraft).not.toHaveBeenCalled();
+    expect(mocks.aircraftModel.setPresentation).not.toHaveBeenCalled();
     expect(createJsbsimRuntime).toHaveBeenCalledTimes(1);
-    expect(setItem).toHaveBeenCalledWith("osfs.aircraft", "cirrus-vision-jet");
-  } finally { await act(async () => app.destroy()); }
+    await act(async () => selectionControl<HTMLButtonElement>(t.root, applySelector).click());
+    expect(t.reload).toHaveBeenCalledOnce();
+    expect(t.setItem).toHaveBeenCalledTimes(4);
+  } finally { await act(async () => t.app.destroy()); }
+});
+
+it("applies presentation changes once after staging and retains per-family drafts across tabs", async () => {
+  const t = await mountAircraftSelection();
+  try {
+    await changeSelect(t.root, lodSelector, "lod2");
+    expect(mocks.aircraftModel.setPresentation).not.toHaveBeenCalled();
+    expect(t.setItem).not.toHaveBeenCalled();
+    await act(async () => selectionControl<HTMLButtonElement>(t.root, applySelector).click());
+    expect(mocks.aircraftModel.setPresentation).toHaveBeenCalledExactlyOnceWith("lod2", false);
+    expect(t.reload).not.toHaveBeenCalled();
+    expect(selectionControl<HTMLButtonElement>(t.root, applySelector).disabled).toBe(true);
+
+    await act(async () => selectionControl<HTMLInputElement>(t.root, 'input[name="flight-aircraft"][value="cirrus-vision-jet"]').click());
+    await changeSelect(t.root, generationSelector, "g3");
+    await act(async () => selectionControl<HTMLInputElement>(t.root, '.flight-panel__model-controls input[type="checkbox"]').click());
+    await changeSelect(t.root, lodSelector, "hd");
+    await act(async () => selectionControl<HTMLInputElement>(t.root, 'input[name="flight-aircraft"][value="cessna-172"]').click());
+    expect(t.root.querySelector(generationSelector)).toBeNull();
+    expect(t.root.querySelector('.flight-panel__model-controls input[type="checkbox"]')).toBeNull();
+    expect(selectionControl<HTMLSelectElement>(t.root, lodSelector).value).toBe("lod2");
+    await openPanelTab(t.root, "Weather");
+    await openPanelTab(t.root, "Aircraft");
+    await act(async () => selectionControl<HTMLInputElement>(t.root, 'input[name="flight-aircraft"][value="cirrus-vision-jet"]').click());
+    expect(selectionControl<HTMLSelectElement>(t.root, generationSelector).value).toBe("g3");
+    expect(selectionControl<HTMLSelectElement>(t.root, lodSelector).value).toBe("hd");
+    expect(selectionControl<HTMLInputElement>(t.root, '.flight-panel__model-controls input[type="checkbox"]').checked).toBe(true);
+    expect(mocks.aircraftModel.setPresentation).toHaveBeenCalledTimes(1);
+    expect(t.setItem).toHaveBeenCalledTimes(4);
+    await act(async () => selectionControl<HTMLButtonElement>(t.root, ".flight-panel__command--secondary").click());
+    expect(selectionControl<HTMLInputElement>(t.root, 'input[name="flight-aircraft"][value="cessna-172"]').checked).toBe(true);
+    expect(selectionControl<HTMLSelectElement>(t.root, lodSelector).value).toBe("lod2");
+    expect(selectionControl<HTMLButtonElement>(t.root, applySelector).disabled).toBe(true);
+  } finally { await act(async () => t.app.destroy()); }
+});
+
+it.each([
+  ["osfs.aircraft-lod", false],
+  ["osfs.aircraft-opt-in-lods", true],
+  ["osfs.aircraft-generation", false],
+  ["osfs.aircraft", true],
+] as const)("rolls back partial selection persistence when %s fails (existing preferences: %s)", async (failKey, existing) => {
+  const initial: [string, string][] = existing ? [
+    ["osfs.aircraft", "cessna-172"], ["osfs.aircraft-lod", "lod2"],
+    ["osfs.aircraft-opt-in-lods", "off"], ["osfs.aircraft-generation", "cessna-172"],
+  ] : [];
+  const t = await mountAircraftSelection(initial);
+  try {
+    await act(async () => selectionControl<HTMLInputElement>(t.root, 'input[name="flight-aircraft"][value="cirrus-vision-jet"]').click());
+    await changeSelect(t.root, generationSelector, "g2+");
+    const beforeApply = [...t.storage.entries()];
+    let failed = false;
+    t.setItem.mockImplementation((key, value) => {
+      if (!failed && key === failKey) { failed = true; throw new Error("storage unavailable"); }
+      t.storage.set(key, value);
+    });
+    await act(async () => selectionControl<HTMLButtonElement>(t.root, applySelector).click());
+    expect(t.root.querySelector('[role="alert"]')?.textContent).toContain("Could not save your aircraft choice");
+    expect([...t.storage.entries()]).toEqual(beforeApply);
+    expect(t.reload).not.toHaveBeenCalled();
+    expect(mocks.aircraftModel.setPresentation).not.toHaveBeenCalled();
+    expect(mocks.aircraftModel.setAircraft).not.toHaveBeenCalled();
+    await changeSelect(t.root, generationSelector, "g1");
+    expect(t.root.querySelector('[role="alert"]')).toBeNull();
+  } finally { await act(async () => t.app.destroy()); }
+});
+
+it.each([
+  ["flight-sim.aircraft", "cirrus-vision-jet", undefined, "g1"],
+  ["osfs.aircraft", "cirrus-vision-jet-g2", "g2+", "g2+"],
+  ["osfs.aircraft", "cirrus-vision-jet-g3", "g3", "g3"],
+] as const)("restores %s=%s with saved generation %s", async (key, aircraftId, savedGeneration, expectedGeneration) => {
+  const initial: [string, string][] = [[key, aircraftId]];
+  if (savedGeneration !== undefined) initial.push(["osfs.aircraft-generation", savedGeneration]);
+  const t = await mountAircraftSelection(initial);
+  try {
+    expect(selectionControl<HTMLSelectElement>(t.root, generationSelector).value).toBe(expectedGeneration);
+    expect(createJsbsimRuntime).toHaveBeenLastCalledWith(expect.objectContaining({ aircraftId }));
+    expect(selectionControl<HTMLButtonElement>(t.root, applySelector).disabled).toBe(true);
+    expect(t.setItem).not.toHaveBeenCalled();
+  } finally { await act(async () => t.app.destroy()); }
 });
 
 

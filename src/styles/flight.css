@@ -1082,6 +1082,218 @@
   accent-color: var(--flight-panel-accent);
 }
 
+.flight-panel__aircraft-picker,
+.flight-panel__aircraft-controls {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+
+/* Only the image grid scrolls here; the selected controls are its sibling. */
+.flight-panel__aircraft-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 108px), 1fr));
+  align-content: start;
+  gap: 6px;
+  max-height: clamp(124px, 24dvh, 206px);
+  margin-top: 4px;
+  padding: 2px;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+  border: 1px solid var(--flight-panel-line);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.flight-panel__aircraft-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  border: 1px solid var(--flight-panel-line);
+  border-radius: 3px;
+  background: rgba(13, 17, 20, 0.8);
+  color: var(--flight-panel-text);
+  cursor: pointer;
+}
+
+.flight-panel__aircraft-card:hover {
+  border-color: var(--flight-panel-muted);
+}
+
+.flight-panel__aircraft-card.is-selected {
+  border-color: var(--flight-panel-accent);
+  background: rgba(232, 182, 71, 0.1);
+}
+
+.flight-panel__aircraft-card:focus-within {
+  outline: 2px solid var(--flight-panel-accent);
+  outline-offset: 2px;
+}
+
+.flight-panel__aircraft-card > input {
+  position: absolute;
+  z-index: 1;
+  top: 8px;
+  left: 8px;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--flight-panel-accent);
+  cursor: pointer;
+}
+
+.flight-panel__aircraft-image {
+  display: grid;
+  width: 100%;
+  aspect-ratio: 8 / 5;
+  overflow: hidden;
+  border-radius: 2px 2px 0 0;
+  background: #172128;
+}
+
+.flight-panel__aircraft-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.flight-panel__aircraft-image-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 4px 4px;
+  color: var(--flight-panel-muted);
+  font-size: 10px;
+}
+
+.flight-panel__aircraft-card-caption {
+  display: grid;
+  gap: 4px;
+  padding: 7px;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.flight-panel__aircraft-card-caption > span {
+  color: var(--flight-panel-muted);
+  font-size: 9px;
+}
+
+.flight-panel__aircraft-card.is-selected .flight-panel__aircraft-card-caption > span {
+  color: var(--flight-panel-accent);
+}
+
+.flight-panel__generation-field {
+  grid-template-columns: minmax(0, 1fr) minmax(88px, 112px);
+  align-items: center;
+}
+
+.flight-panel__aircraft-controls input[type="checkbox"] {
+  accent-color: var(--flight-panel-accent);
+}
+
+.flight-panel__aircraft-controls .flight-panel__field--inline,
+.flight-panel__aircraft-controls select,
+.flight-panel__aircraft-controls .flight-panel__command {
+  min-height: 36px;
+}
+
+.flight-panel__aircraft-controls .flight-panel__command {
+  padding: 8px 10px;
+  line-height: 1.35;
+}
+
+.flight-panel__aircraft-controls .flight-panel__hint {
+  margin: 0;
+  font-size: 10px;
+}
+
+.flight-panel__aircraft-controls .flight-panel__command:focus-visible,
+.flight-panel__aircraft-controls input:focus-visible,
+.flight-panel__aircraft-controls a:focus-visible {
+  outline: 2px solid var(--flight-panel-accent);
+  outline-offset: 3px;
+}
+
+.flight-panel__aircraft-controls .flight-panel__command:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.flight-panel__aircraft-controls .flight-panel__command--secondary {
+  border-color: var(--flight-panel-line);
+  background: transparent;
+  color: var(--flight-panel-muted);
+}
+
+.flight-panel__info-details {
+  position: relative;
+}
+
+.flight-panel__info-summary {
+  list-style: none;
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--flight-panel-line);
+  border-radius: 999px;
+  background: rgba(232, 182, 71, 0.12);
+  color: var(--flight-panel-text);
+  font: 700 13px/1 "Avenir Next Condensed", "Helvetica Neue", sans-serif;
+  display: inline-grid;
+  place-items: center;
+  user-select: none;
+}
+
+.flight-panel__info-summary::-webkit-details-marker {
+  display: none;
+}
+
+.flight-panel__info-summary::marker {
+  content: "";
+}
+
+.flight-panel__info-summary:focus-visible {
+  outline: 2px solid var(--flight-panel-accent);
+  outline-offset: 3px;
+}
+
+.flight-panel__info-content {
+  width: min(300px, 90vw);
+  margin-top: 4px;
+  display: grid;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid var(--flight-panel-line);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.flight-panel__model-controls {
+  gap: 8px;
+}
+
+.flight-panel__model-controls,
+.flight-panel__model-status {
+  display: grid;
+  gap: 10px;
+}
+
+.flight-panel__aircraft-controls .flight-panel__metric strong {
+  overflow: visible;
+  font-size: 13px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
 .flight-panel__debug-status {
   justify-content: flex-start;
   align-items: flex-start;

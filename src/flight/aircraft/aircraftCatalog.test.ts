@@ -1,10 +1,17 @@
 import { describe, expect, it } from "vitest";
 import {
   AIRCRAFT_CATALOG,
+  AIRCRAFT_FAMILIES,
+  AIRCRAFT_FAMILY_IDS,
+  AIRCRAFT_IDS,
   availableLods,
   getAircraftDefinition,
+  getAircraftFamily,
+  getAircraftFamilyForAircraft,
+  isAircraftFamilyId,
   isAircraftId,
   isAircraftLodId,
+  normalizeAircraftSelection,
   resolveLod,
   selectAutoLod,
   type AircraftDefinition,
@@ -15,18 +22,94 @@ const c172 = getAircraftDefinition("cessna-172");
 const cirrus = getAircraftDefinition("cirrus-vision-jet");
 
 describe("aircraft catalog", () => {
-  it("exposes both selectable airframes and falls back to the first for unknown ids", () => {
-    expect(AIRCRAFT_CATALOG.map((entry) => entry.id)).toEqual(["cessna-172", "cirrus-vision-jet"]);
+  it("exposes four runtime packages and falls back to the first for unknown ids", () => {
+    expect(AIRCRAFT_CATALOG.map((entry) => entry.id)).toEqual([
+      "cessna-172", "cirrus-vision-jet", "cirrus-vision-jet-g2", "cirrus-vision-jet-g3",
+    ]);
+    expect(AIRCRAFT_CATALOG.map((entry) => entry.id)).toEqual(AIRCRAFT_IDS);
     expect(getAircraftDefinition("nope" as never).id).toBe("cessna-172");
   });
 
   it("validates persisted preferences", () => {
-    expect(isAircraftId("cessna-172")).toBe(true);
+    for (const id of AIRCRAFT_IDS) expect(isAircraftId(id)).toBe(true);
+    expect(isAircraftId("cirrus-vision-jet-g2+")).toBe(false);
     expect(isAircraftId("f16")).toBe(false);
     expect(isAircraftId(null)).toBe(false);
     expect(isAircraftLodId("auto")).toBe(true);
     expect(isAircraftLodId("lod3")).toBe(true);
     expect(isAircraftLodId("lod9")).toBe(false);
+  });
+
+  it("groups every runtime package under one of the two family cards", () => {
+    expect(AIRCRAFT_FAMILIES.map((family) => family.id)).toEqual([
+      "cessna-172", "cirrus-vision-jet",
+    ]);
+    expect(AIRCRAFT_FAMILIES.map((family) => family.id)).toEqual(AIRCRAFT_FAMILY_IDS);
+    for (const family of AIRCRAFT_FAMILIES) {
+      expect(isAircraftFamilyId(family.id)).toBe(true);
+      expect(family.thumbnail.path).toMatch(/^aircraft\/thumbnails\/.+\.png$/);
+      expect(family.thumbnail.credit.artist).toBeTruthy();
+      expect(family.variants.some((variant) => variant.aircraftId === family.defaultAircraftId)).toBe(true);
+      for (const variant of family.variants) {
+        expect(getAircraftDefinition(variant.aircraftId).familyId).toBe(family.id);
+      }
+    }
+    expect(isAircraftFamilyId("cirrus-vision-jet-g2")).toBe(false);
+    for (const definition of AIRCRAFT_CATALOG) {
+      const family = getAircraftFamilyForAircraft(definition.id);
+      expect(family.id).toBe(definition.familyId);
+      expect(family.variants.some((variant) => variant.aircraftId === definition.id)).toBe(true);
+    }
+  });
+
+  it("keeps G2+ as a distinct generation label backed by the provisional G2 package", () => {
+    const family = getAircraftFamily("cirrus-vision-jet");
+    expect(family.variantLabel).toBe("Generation");
+    expect(Object.fromEntries(family.variants.map(({ id, aircraftId, label }) => [id, { aircraftId, label }]))).toEqual({
+      g1: { aircraftId: "cirrus-vision-jet", label: "G1" },
+      g2: { aircraftId: "cirrus-vision-jet-g2", label: "G2" },
+      "g2+": { aircraftId: "cirrus-vision-jet-g2", label: "G2+" },
+      g3: { aircraftId: "cirrus-vision-jet-g3", label: "G3" },
+    });
+    expect(new Set(family.variants.map((variant) => variant.id)).size).toBe(4);
+    expect(family.developmentNote).toContain("G2+ is currently mapped to the G2 runtime");
+    expect(family.developmentNote).toContain("does not provide calibrated generation-specific performance");
+    const selection = normalizeAircraftSelection({
+      aircraftId: "cirrus-vision-jet", generationId: "g2+", lodId: "lod3", optInLodsEnabled: false,
+    });
+    expect(selection).toEqual({
+      aircraftId: "cirrus-vision-jet-g2", generationId: "g2+", lodId: "lod3", optInLodsEnabled: false,
+    });
+    expect(normalizeAircraftSelection(selection)).toEqual(selection);
+  });
+
+  it("restores the legacy Vision Jet preference as G1 and identifies later packages", () => {
+    expect(getAircraftFamilyForAircraft("cirrus-vision-jet").defaultAircraftId).toBe("cirrus-vision-jet");
+    for (const [aircraftId, generationId] of [
+      ["cirrus-vision-jet", "g1"],
+      ["cirrus-vision-jet-g2", "g2"],
+      ["cirrus-vision-jet-g3", "g3"],
+    ] as const) {
+      expect(normalizeAircraftSelection({ aircraftId, lodId: "auto", optInLodsEnabled: false })).toEqual({
+        aircraftId, generationId, lodId: "auto", optInLodsEnabled: false,
+      });
+    }
+  });
+
+  it("keeps C172 free of generation controls while preserving the hidden mesh opt-in preference", () => {
+    const family = getAircraftFamily("cessna-172");
+    expect(family.variantLabel).toBeUndefined();
+    expect(family.variants).toHaveLength(1);
+    expect(normalizeAircraftSelection({
+      aircraftId: "cessna-172", generationId: "g3", lodId: "hd", optInLodsEnabled: true,
+    })).toEqual({
+      aircraftId: "cessna-172", generationId: "cessna-172", lodId: "auto", optInLodsEnabled: true,
+    });
+    expect(normalizeAircraftSelection({
+      aircraftId: "cirrus-vision-jet-g3", generationId: "unrecognized", lodId: "hd", optInLodsEnabled: false,
+    })).toEqual({
+      aircraftId: "cirrus-vision-jet-g3", generationId: "g3", lodId: "auto", optInLodsEnabled: false,
+    });
   });
 
   it("orders every airframe's levels from most to least detailed", () => {

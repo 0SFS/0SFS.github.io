@@ -19,14 +19,16 @@ import { useEffect, useState } from "react";
 import type { BabylonRuntimeStatus, GoogleTerrainDetailState, RendererMode } from "foss-earth/runtime";
 import type { FlightViewMode } from "../aircraft/createPlaceholderAircraft";
 import {
-  AIRCRAFT_CATALOG,
-  availableLods,
-  getAircraftDefinition,
+  AIRCRAFT_FAMILIES,
+  getAircraftFamilyForAircraft,
+  normalizeAircraftSelection,
+  type AircraftFamilyId,
+  type AircraftSelection,
   type AircraftId,
-  type AircraftLodDefinition,
   type AircraftLodId,
 } from "../aircraft/aircraftCatalog";
 import type { AircraftModelStatus } from "../aircraft/createAircraftModel";
+import { AircraftSelectionPanel } from "./AircraftSelectionPanel";
 import { flightLog, type FlightLogEntry } from "../diagnostics/flightLog";
 import {
   getActiveFlightPerformanceCapture,
@@ -62,13 +64,6 @@ const TAB_ICONS = {
   settings: Settings,
 } satisfies Record<FlightPanelTab, typeof Plane>;
 
-const LOD_STATUS_LABEL: Record<AircraftModelStatus, string> = {
-  placeholder: "Placeholder blocks",
-  loading: "Loading mesh…",
-  ready: "Mesh loaded",
-  error: "Load failed",
-};
-
 export interface FlightWeatherState {
   windDirectionDeg: number;
   windSpeedKts: number;
@@ -93,6 +88,7 @@ export interface FlightControlPanelSnapshot {
   allowCoarserTerrainThisSession: boolean;
   terrainDetailAnchor: FlightTerrainDetailAnchor;
   aircraftId: AircraftId;
+  generationId?: string;
   lodId: AircraftLodId;
   /** Whether the opt-in levels are switched on. */
   optInLodsEnabled: boolean;
@@ -119,9 +115,8 @@ export interface FlightControlPanelOptions {
   onWeatherChange(weather: FlightWeatherState): void;
   onPausedChange(paused: boolean): void;
   onViewModeChange(mode: FlightViewMode): void;
-  onAircraftChange(aircraftId: AircraftId): void;
-  onLodChange(lodId: AircraftLodId): void;
-  onOptInLodsChange(enabled: boolean): void;
+  /** Commit a staged aircraft and presentation choice; return a visible error if it fails. */
+  onAircraftApply(selection: AircraftSelection): string | null;
   onGoogleTerrainDetailChange(errorTarget: number): void;
   onAutomaticGoogleTerrainDetailChange(): void;
   onFlightTerrainRequirementChange(errorTarget: number): void;
@@ -205,25 +200,21 @@ function WeatherPanel({
   );
 }
 
+interface AircraftPanelProps extends FlightControlPanelProps {
+  aircraftSelection: AircraftSelection;
+  onAircraftSelectionChange(selection: AircraftSelection): void;
+  onAircraftFamilyChange(familyId: AircraftFamilyId): void;
+}
+
 function AircraftPanel({
   snapshot,
   onPausedChange,
   onViewModeChange,
-  onAircraftChange,
-  onLodChange,
-  onOptInLodsChange,
-}: FlightControlPanelProps) {
-  const definition = getAircraftDefinition(snapshot.aircraftId);
-  const offered = availableLods(definition, snapshot.optInLodsEnabled);
-  const hasModel = offered.length > 0;
-  const activeLod = definition.lods.find((lod) => lod.id === snapshot.modelActiveLodId);
-  const optInLods = definition.lods.filter((lod) => lod.optIn);
-  // Credited once each, finest first, so a ladder by two artists says so.
-  const credited = offered.reduce<AircraftLodDefinition[]>((keep, lod) => {
-    if (!keep.some((seen) => seen.credit.artist === lod.credit.artist)) keep.push(lod);
-    return keep;
-  }, []);
-
+  onAircraftApply,
+  aircraftSelection,
+  onAircraftSelectionChange,
+  onAircraftFamilyChange,
+}: AircraftPanelProps) {
   return (
     <div className="flight-panel__content">
       <div className="flight-panel__metrics">
@@ -232,90 +223,13 @@ function AircraftPanel({
         <Metric label="Heading" value={`${Math.round(headingDegFromRad(snapshot.flightState.headingRad))}°`} />
         <Metric label="Throttle" value={`${Math.round(snapshot.flightState.throttleNorm * 100)}%`} />
       </div>
-      <fieldset className="flight-panel__fieldset">
-        <legend>Airframe</legend>
-        <div className="flight-panel__radio-list">
-          {AIRCRAFT_CATALOG.map((entry) => (
-            <label key={entry.id} className={entry.id === snapshot.aircraftId ? "is-active" : ""}>
-              <input
-                type="radio"
-                name="flight-aircraft"
-                value={entry.id}
-                checked={entry.id === snapshot.aircraftId}
-                onChange={() => onAircraftChange(entry.id)}
-              />
-              <span className="flight-panel__option">
-                <strong>{entry.label}</strong>
-                <em>{entry.summary}</em>
-              </span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
-      <fieldset className="flight-panel__fieldset">
-        <legend>Model detail</legend>
-        <label className="flight-panel__field">
-          <span>Level of detail</span>
-          <select
-            className="flight-panel__select"
-            value={snapshot.lodId}
-            disabled={!hasModel}
-            onChange={(event) => onLodChange(event.target.value as AircraftLodId)}
-          >
-            <option value="auto">Auto (by chase distance)</option>
-            {offered.map((lod) => (
-              <option key={lod.id} value={lod.id}>
-                {`${lod.label} — ${lod.triangles.toLocaleString()} tris`}
-              </option>
-            ))}
-          </select>
-        </label>
-        {optInLods.length > 0 ? (
-          <label className="flight-panel__field flight-panel__field--inline">
-            <input
-              type="checkbox"
-              checked={snapshot.optInLodsEnabled}
-              onChange={(event) => onOptInLodsChange(event.target.checked)}
-            />
-            <span>
-              {`Higher-detail models (${optInLods
-                .map((lod) => `${lod.triangles.toLocaleString()} tris`)
-                .join(", ")})`}
-            </span>
-          </label>
-        ) : null}
-        <div className="flight-panel__metrics">
-          <Metric label="Model" value={LOD_STATUS_LABEL[snapshot.modelStatus]} />
-          <Metric
-            label="Triangles"
-            value={snapshot.modelTriangles === null ? "—" : snapshot.modelTriangles.toLocaleString()}
-          />
-        </div>
-        {snapshot.lodId === "auto" && activeLod ? (
-          <p className="flight-panel__hint">Auto selected {activeLod.label}.</p>
-        ) : null}
-        {credited.map((lod) => (
-          <p className="flight-panel__hint" key={lod.credit.artist}>
-            <strong>{lod.credit.artist}</strong>
-            {` — ${lod.credit.note}`}
-            {lod.credit.licence ? ` ${lod.credit.licence}.` : null}
-            {lod.credit.sourceUrl ? (
-              <>
-                {" "}
-                <a href={lod.credit.sourceUrl} target="_blank" rel="noreferrer noopener">
-                  Source
-                </a>
-              </>
-            ) : null}
-          </p>
-        ))}
-        {!hasModel ? (
-          <p className="flight-panel__hint">
-            No mesh exists for this airframe yet, so the block placeholder is drawn instead.
-          </p>
-        ) : null}
-        {snapshot.modelError ? <p className="flight-panel__hint is-error">{snapshot.modelError}</p> : null}
-      </fieldset>
+      <AircraftSelectionPanel
+        snapshot={snapshot}
+        selection={aircraftSelection}
+        onSelectionChange={onAircraftSelectionChange}
+        onFamilyChange={onAircraftFamilyChange}
+        onApply={onAircraftApply}
+      />
       <fieldset className="flight-panel__fieldset">
         <legend>Camera</legend>
         <div className="flight-panel__segmented">
@@ -909,6 +823,32 @@ function DebugPanel({ snapshot, onCollisionDebugChange, onWheelSpinModeChange, o
 }
 
 export function FlightControlPanel(props: FlightControlPanelProps) {
+  // Keep drafts above the tabs so visiting Weather/Settings does not discard them.
+  // Each family remembers its own generation and model choices for this session.
+  const [selectedAircraftFamily, setSelectedAircraftFamily] = useState<AircraftFamilyId>(
+    () => getAircraftFamilyForAircraft(props.snapshot.aircraftId).id,
+  );
+  const [aircraftSelections, setAircraftSelections] = useState<AircraftSelection[]>(() => {
+    const activeFamily = getAircraftFamilyForAircraft(props.snapshot.aircraftId);
+    return AIRCRAFT_FAMILIES.map(family => normalizeAircraftSelection(
+      family.id === activeFamily.id ? props.snapshot : {
+        aircraftId: family.defaultAircraftId,
+        lodId: props.snapshot.lodId,
+        optInLodsEnabled: props.snapshot.optInLodsEnabled,
+      },
+    ));
+  });
+  const aircraftSelection = aircraftSelections.find(
+    selection => getAircraftFamilyForAircraft(selection.aircraftId).id === selectedAircraftFamily,
+  ) ?? normalizeAircraftSelection(props.snapshot);
+  const onAircraftSelectionChange = (selection: AircraftSelection) => {
+    const familyId = getAircraftFamilyForAircraft(selection.aircraftId).id;
+    setAircraftSelections(previous => previous.map(entry =>
+      getAircraftFamilyForAircraft(entry.aircraftId).id === familyId ? selection : entry,
+    ));
+    setSelectedAircraftFamily(familyId);
+  };
+
   return (
     <WindowOverlay<FlightPanelTab>
       enableAirportPresets
@@ -925,7 +865,10 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
             <span>{getTabLabel(tabId)}</span>
           </div>
           {tabId === "weather" ? <WeatherPanel initialWeather={props.initialWeather} onWeatherChange={props.onWeatherChange} />
-            : tabId === "aircraft" ? <AircraftPanel {...props} />
+            : tabId === "aircraft" ? <AircraftPanel {...props}
+              aircraftSelection={aircraftSelection}
+              onAircraftSelectionChange={onAircraftSelectionChange}
+              onAircraftFamilyChange={setSelectedAircraftFamily} />
               : tabId === "settings" ? <>
                 <OrbitInvertSettingsPanel {...props} />
                 <fieldset className="flight-panel__fieldset">

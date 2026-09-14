@@ -26,8 +26,11 @@ import { createPlaceholderAircraft } from "./aircraft/createPlaceholderAircraft"
 import {
   isAircraftId,
   isAircraftLodId,
+  getAircraftFamilyForAircraft,
+  normalizeAircraftSelection,
   type AircraftId,
   type AircraftLodId,
+  type AircraftSelection,
 } from "./aircraft/aircraftCatalog";
 import { applyAircraftRig, readControlSurfaceState } from "./aircraft/aircraftAnimation";
 import { flightLog } from "./diagnostics/flightLog";
@@ -129,6 +132,7 @@ function setRendererForce(force: FlightRendererForce | null): void {
 
 const AIRCRAFT_PREFERENCE_KEY = "osfs.aircraft";
 const AIRCRAFT_LOD_PREFERENCE_KEY = "osfs.aircraft-lod";
+const AIRCRAFT_GENERATION_PREFERENCE_KEY = "osfs.aircraft-generation";
 // Opt-in levels are a per-user decision, so the choice persists like the rest.
 // It has no legacy key: nothing before this stored it.
 const AIRCRAFT_OPT_IN_PREFERENCE_KEY = "osfs.aircraft-opt-in-lods";
@@ -158,6 +162,50 @@ function writePreference(key: string, value: string): void {
     window.localStorage.setItem(key, value);
   } catch {
     // Preference persistence is best-effort; private mode must not break the sim.
+  }
+}
+
+/** Commit the complete aircraft choice before a reload can activate it. */
+function writeAircraftSelectionPreference(selection: AircraftSelection): string | null {
+  const preferences: (null | [string, string])[] = [
+    [AIRCRAFT_LOD_PREFERENCE_KEY, selection.lodId],
+    [AIRCRAFT_OPT_IN_PREFERENCE_KEY, selection.optInLodsEnabled ? "on" : "off"],
+    selection.generationId !== undefined ? [AIRCRAFT_GENERATION_PREFERENCE_KEY, selection.generationId] : null,
+    // Identity is last: the next boot must never read a new package with
+    // presentation preferences that failed to save.
+    [AIRCRAFT_PREFERENCE_KEY, selection.aircraftId],
+  ];
+  const savedPreferences = preferences.filter((preference): preference is [string, string] => preference !== null);
+  let storage: Storage;
+  let previous: [string, string | null][];
+  try {
+    storage = window.localStorage;
+    previous = savedPreferences.map(([key]) => [key, storage.getItem(key)]);
+  } catch {
+    return "Could not access browser storage. Allow storage and apply your aircraft choice again.";
+  }
+
+  let writtenCount = 0;
+  try {
+    for (const [key, value] of savedPreferences) {
+      storage.setItem(key, value);
+      writtenCount += 1;
+    }
+    return null;
+  } catch {
+    let restored = true;
+    for (let index = writtenCount - 1; index >= 0; index -= 1) {
+      const [key, value] = previous[index];
+      try {
+        if (value === null) storage.removeItem(key);
+        else storage.setItem(key, value);
+      } catch {
+        restored = false;
+      }
+    }
+    return restored
+      ? "Could not save your aircraft choice. The active aircraft is unchanged. Check browser storage and try Apply again."
+      : "Could not save your aircraft choice or restore every saved setting. The active aircraft is unchanged. Allow browser storage, then apply again.";
   }
 }
 
@@ -230,10 +278,26 @@ export async function createFlightSimApp(
     baseMap: options.baseMap,
     preferGoogleTiles: options.preferGoogleTiles,
   });
-  const initialAircraftId: AircraftId = readPreference(
-    AIRCRAFT_PREFERENCE_KEY, LEGACY_AIRCRAFT_PREFERENCE_KEY,
-    isAircraftId, "cessna-172",
-  );
+  const initialAircraftSelection = normalizeAircraftSelection({
+    aircraftId: readPreference(
+      AIRCRAFT_PREFERENCE_KEY, LEGACY_AIRCRAFT_PREFERENCE_KEY,
+      isAircraftId, "cessna-172",
+    ),
+    generationId: readPreference(
+      AIRCRAFT_GENERATION_PREFERENCE_KEY, AIRCRAFT_GENERATION_PREFERENCE_KEY,
+      (value): value is string => typeof value === "string" && value.length > 0,
+      "",
+    ),
+    lodId: readPreference(
+      AIRCRAFT_LOD_PREFERENCE_KEY, LEGACY_AIRCRAFT_LOD_PREFERENCE_KEY,
+      isAircraftLodId, "auto",
+    ),
+    optInLodsEnabled: readPreference(
+      AIRCRAFT_OPT_IN_PREFERENCE_KEY, AIRCRAFT_OPT_IN_PREFERENCE_KEY,
+      (value): value is "on" | "off" => value === "on" || value === "off", "off",
+    ) === "on",
+  });
+  const initialAircraftId: AircraftId = initialAircraftSelection.aircraftId;
   // `null` means follow the local automatic recommendation. A manual target
   // remains in local storage and is reapplied before terrain preparation
   // starts, including when Google Tiles are selected after launch.
@@ -337,6 +401,7 @@ export async function createFlightSimApp(
   }).then(jsbsim => {
     if (bootstrapFailed) { jsbsim.dispose(); throw new Error("Startup cancelled."); }
     bootResources.jsbsim = jsbsim;
+    flightLog.info("jsbsim", "Runtime build identified", { identity: jsbsim.identity });
     loading.setPhase("flight", { state: "ready" });
     return jsbsim;
   });
@@ -535,11 +600,10 @@ export async function createFlightSimApp(
   };
   applyGroundRuntime();
   const aircraftId: AircraftId = initialAircraftId;
-  let aircraftLodId: AircraftLodId = readPreference(AIRCRAFT_LOD_PREFERENCE_KEY, LEGACY_AIRCRAFT_LOD_PREFERENCE_KEY, isAircraftLodId, "auto");
-  let optInLodsEnabled = readPreference(
-    AIRCRAFT_OPT_IN_PREFERENCE_KEY, AIRCRAFT_OPT_IN_PREFERENCE_KEY,
-    (value): value is "on" | "off" => value === "on" || value === "off", "off",
-  ) === "on";
+  let aircraftLodId: AircraftLodId = initialAircraftSelection.lodId;
+  let aircraftGenerationId: string = initialAircraftSelection.generationId ?? getAircraftFamilyForAircraft(aircraftId).variants[0]?.id ?? "cessna-172";
+  let optInLodsEnabled = initialAircraftSelection.optInLodsEnabled;
+  let aircraftReloadRequested = false;
   let modelState: AircraftModelState = {
     aircraftId, lodId: aircraftLodId, activeLodId: null,
     optInEnabled: optInLodsEnabled,
@@ -729,6 +793,7 @@ export async function createFlightSimApp(
       allowCoarserTerrainThisSession,
       terrainDetailAnchor,
       aircraftId,
+      generationId: aircraftGenerationId,
       lodId: aircraftLodId,
       optInLodsEnabled,
       modelStatus: modelState.status,
@@ -935,27 +1000,34 @@ export async function createFlightSimApp(
     onWeatherChange: applyWeather,
     onPausedChange: setSimulationPaused,
     onViewModeChange: (mode) => { aircraft?.setViewMode(mode); phoneSession?.syncStatus(); runtime.requestRender(); },
-    onAircraftChange: (nextId) => {
-      if (nextId === aircraftId) return;
-      writePreference(AIRCRAFT_PREFERENCE_KEY, nextId);
-      // The package, control convention, contact geometry, and gauges all
-      // change together on boot. Keep the current complete identity visible
-      // until that atomic reload rather than swapping only the mesh.
-      window.location.reload();
-    },
-    onLodChange: (nextLod) => {
-      aircraftLodId = nextLod;
-      writePreference(AIRCRAFT_LOD_PREFERENCE_KEY, nextLod);
-      aircraftModel?.setLod(nextLod);
+    onAircraftApply: (selection) => {
+      if (aircraftReloadRequested) return null;
+      const next = normalizeAircraftSelection(selection);
+      const saveError = writeAircraftSelectionPreference(next);
+      if (saveError) return saveError;
+      if (next.aircraftId !== aircraftId) {
+        // Package, control convention, contact geometry, gauges and visuals
+        // change together on boot. Staged model settings never touch the
+        // current aircraft while another complete identity is being chosen.
+        aircraftReloadRequested = true;
+        try {
+          window.location.reload();
+          return null;
+        } catch {
+          aircraftReloadRequested = false;
+          return "Your aircraft choice was saved, but the app could not reload. Reload the page to activate it.";
+        }
+      }
+      aircraftLodId = next.lodId;
+      aircraftGenerationId = next.generationId
+        ?? getAircraftFamilyForAircraft(next.aircraftId).variants[0]?.id
+        ?? "cessna-172";
+      optInLodsEnabled = next.optInLodsEnabled;
+      aircraftModel?.setPresentation(next.lodId, next.optInLodsEnabled);
+      if (aircraftModel) modelState = aircraftModel.getState();
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
       runtime.requestRender();
-    },
-    onOptInLodsChange: (enabled) => {
-      optInLodsEnabled = enabled;
-      writePreference(AIRCRAFT_OPT_IN_PREFERENCE_KEY, enabled ? "on" : "off");
-      aircraftModel?.setOptInEnabled(enabled);
-      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
-      runtime.requestRender();
+      return null;
     },
     onGoogleTerrainDetailChange: (errorTarget) => {
       worldDetailTarget = errorTarget;
