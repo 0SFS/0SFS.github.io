@@ -7,6 +7,13 @@ import { createFrameSurfaceQuery } from "./physics/frameSurfaceQuery";
 import { createVisibleMeshCollision } from "./physics/visibleMeshCollision";
 import { loadInputModePreference, loadInputSensitivityPreference } from "foss-earth/input";
 import "../styles/flight.css";
+import "@felipegalind0/gamepad-tools/styles.css";
+import { createBrowserInputSource } from "@felipegalind0/gamepad-tools/browser";
+import {
+  BindingRuntime,
+  createProfileStore,
+} from "@felipegalind0/gamepad-tools/core";
+import { mountBindingEditor } from "@felipegalind0/gamepad-tools/ui";
 
 import {
   createBabylonRuntime,
@@ -105,9 +112,15 @@ import type { PhoneControlSession } from "./remote/createPhoneControlSession";
 import type { PhonePairingDialog } from "./hud/createPhonePairingDialog";
 import { createFlightInputManager } from "./input/flightInputManager";
 import {
+  createFlightGamepadAdapter,
+  createLegacyFlightProfile,
+  createStandardFlightProfile,
+} from "./input/gamepadToolsAdapter";
+import {
   loadKeyboardStickSettings,
   saveKeyboardStickSettings,
 } from "./input/keyboardStickSettings";
+import { createGamepadPollingController } from "./input/gamepadPolling";
 import {
   loadOrbitInvertSettings,
   saveOrbitInvertSettings,
@@ -617,7 +630,10 @@ export async function createFlightSimApp(
   });
   const slipAudio = createSlipAudioSink();
   wheelCues.subscribe(slipAudio);
-  const gamepadHaptics = createGamepadHapticOutput({ onChange: () => haptics.cancel() });
+  const gamepadHaptics = createGamepadHapticOutput({
+    getSelectedSlot: () => inputManager.getSelectedGamepadSlot(),
+    onChange: () => haptics.cancel(),
+  });
   const phoneHaptics: HapticOutput = {
     // Coarse on/off pulses: magnitude maps to pulse length, not intensity.
     play: envelope => phoneSession?.setHapticFeedback(Math.min(envelope.durationMs,
@@ -778,14 +794,17 @@ export async function createFlightSimApp(
   let inputMode = loadInputModePreference(new Set(["mouse", "trackpad"]));
   let inputSensitivity = loadInputSensitivityPreference();
   let orbitInvert = loadOrbitInvertSettings();
+  const applyOrbitDelta = (yaw: number, pitch: number): void => {
+    if (!aircraft || aircraft.getViewMode() !== "third") return;
+    aircraft.orbitChaseCamera(yaw, pitch);
+    runtime.requestRender();
+  };
   const detachCameraInput = attachFlightCameraInput(canvas, {
     getMode: () => inputMode,
     getSensitivity: () => inputSensitivity,
     getOrbitInvert: () => orbitInvert,
     orbit: (yaw, pitch) => {
-      if (!aircraft || aircraft.getViewMode() !== "third") return;
-      aircraft.orbitChaseCamera(yaw, pitch);
-      runtime.requestRender();
+      applyOrbitDelta(yaw, pitch);
     },
     zoom: (factor) => {
       if (!aircraft || aircraft.getViewMode() !== "third") return;
@@ -856,12 +875,87 @@ export async function createFlightSimApp(
   const onViewKeyDown = (event: KeyboardEvent): void => {
     if (event.code !== "KeyV" || event.repeat) return;
     if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
+    if (inputManager.isBindingCaptureActive() || inputManager.isGamepadToolsActive()) {
+      event.preventDefault();
+      return;
+    }
     event.preventDefault();
     toggleCameraView();
     phoneSession?.syncStatus();
   };
 
   window.addEventListener("keydown", onViewKeyDown);
+
+  const flightGamepadSource = createBrowserInputSource({ target: window });
+  const flightGamepadPolling = createGamepadPollingController();
+  const flightGamepadResponse = inputManager.getGamepadResponseController();
+  const flightGamepadRuntime = new BindingRuntime({
+    defaultAxisDeadzone: 0.08,
+    getAxisDeadzoneMode: () => flightGamepadResponse.getSettings().deadzoneMode,
+    adapter: createFlightGamepadAdapter(inputManager, {
+      onViewToggle: () => {
+        toggleCameraView();
+        phoneSession?.syncStatus();
+      },
+      onCameraOrbit: (yaw, pitch, dt) => {
+        const inversion = orbitInvert;
+        applyOrbitDelta(
+          yaw * dt * 1.5 * (inversion.invertYaw ? -1 : 1),
+          pitch * dt * 1.15 * (inversion.invertPitch ? -1 : 1),
+        );
+      },
+    }),
+    profile: createStandardFlightProfile(flightGamepadSource.getSelectedDevice()?.slot ?? 0),
+  });
+  const flightGamepadStore = createProfileStore();
+  inputManager.setGamepadToolsActive(true);
+  const detachGamepadProfileInput = flightGamepadSource.subscribe((frame) => {
+    inputManager.setSelectedGamepadSlot(flightGamepadSource.getSelectedDevice()?.slot ?? 0);
+    flightGamepadRuntime.dispatch(frame);
+  });
+  // The flight step owns active-flight sampling. Poll separately only while
+  // it is idle so controller pause/resume and binding capture still work.
+  flightGamepadSource.start({
+    useAnimationFrame: true,
+    shouldPoll: flightGamepadPolling.claimIdleFrame,
+  });
+  let flightBindingSignature = JSON.stringify(flightGamepadRuntime.getProfile().bindings);
+  const gamepadBindings = {
+    polling: flightGamepadPolling,
+    response: flightGamepadResponse,
+    mount(root: HTMLElement): { destroy(): void } {
+      return mountBindingEditor({
+        root,
+        runtime: flightGamepadRuntime,
+        source: flightGamepadSource,
+        store: flightGamepadStore,
+        builtInProfiles: [
+          {
+            id: "legacy",
+            label: "Classic",
+            previousNames: ["Legacy 0sfs compatibility"],
+            create: () => createLegacyFlightProfile(inputManager.getSelectedGamepadSlot()),
+          },
+          {
+            id: "standard",
+            label: "Xbox",
+            previousNames: ["Standard Xbox / PlayStation flight"],
+            create: () => createStandardFlightProfile(inputManager.getSelectedGamepadSlot()),
+          },
+        ],
+        onProfileChange: (profile) => {
+          const signature = JSON.stringify(profile.bindings);
+          if (signature === flightBindingSignature) return;
+          flightBindingSignature = signature;
+          inputManager.setGamepadToolsActive(false);
+          inputManager.setGamepadToolsActive(true);
+          // Prime neutral/held inputs at the switch so the next movement
+          // reaches the next flight step, without a first-input wait.
+          flightGamepadSource.tick();
+        },
+      });
+    },
+  };
 
   mountFlightWorld();
   const initialState = readFlightState(jsbsim.sdk);
@@ -1157,6 +1251,7 @@ export async function createFlightSimApp(
 
   controlPanel = createFlightControlPanel(panelRoot, createPanelSnapshot(), {
     initialWeather: weather,
+    gamepadBindings,
     onLocationApply: teleportToLocation,
     locationSearchProvider: options.locationSearchProvider,
     onWeatherChange: applyWeather,
@@ -1427,6 +1522,7 @@ export async function createFlightSimApp(
     if (flightPerformance) terrainQueryCpuMs += performance.now() - preContactStartedMs;
 
     physicsLoop.setPaused(inputManager.isPaused());
+    if (flightGamepadPolling.claimFlightFrame()) flightGamepadSource.tick();
     const controls = inputManager.poll(deltaSeconds);
     let terrainBlocked = false;
     const physicsStartedMs = flightPerformance ? performance.now() : 0;
@@ -1617,6 +1713,10 @@ export async function createFlightSimApp(
       document.removeEventListener("visibilitychange", onVisibilityChange);
       runtime.setSimTick(null);
       window.removeEventListener("keydown", onViewKeyDown);
+      flightGamepadSource.stop();
+      detachGamepadProfileInput();
+      flightGamepadRuntime.dispose();
+      flightGamepadSource.dispose();
       detachCameraInput();
       detachInput();
       if (flightPerformance) setActiveFlightPerformanceCapture(null);

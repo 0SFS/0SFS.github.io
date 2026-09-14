@@ -17,7 +17,7 @@ import {
   Plane,
   Volume2,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import type { BabylonRuntimeStatus, GoogleTerrainDetailState, RendererMode } from "foss-earth/runtime";
 import type { FlightViewMode } from "../aircraft/createPlaceholderAircraft";
 import {
@@ -31,6 +31,7 @@ import {
 } from "../aircraft/aircraftCatalog";
 import type { AircraftModelStatus } from "../aircraft/createAircraftModel";
 import { AircraftSelectionPanel } from "./AircraftSelectionPanel";
+import { GamepadBindingsPanel, type GamepadBindingsMount } from "./GamepadBindingsPanel";
 import { flightLog, type FlightLogEntry } from "../diagnostics/flightLog";
 import {
   getActiveFlightPerformanceCapture,
@@ -43,6 +44,12 @@ import {
   type KeyboardStickSettings,
 } from "../input/keyboardStickSettings";
 import type { OrbitInvertSettings } from "../input/orbitInvertSettings";
+import { GAMEPAD_POLLING_OPTIONS, type GamepadPollingController } from "../input/gamepadPolling";
+import {
+  DEFAULT_GAMEPAD_RESPONSE_SETTINGS,
+  type GamepadResponseController,
+  type GamepadResponseSettings,
+} from "../input/gamepadResponseSettings";
 import { WHEEL_SPIN_CONFIGS, type WheelSpinMode, type WheelSpinState } from "../physics/wheelSpin";
 import {
   GroundInteractionSettingsPanel,
@@ -54,12 +61,13 @@ import { SoundSettingsPanel, type SoundAction } from "./SoundSettingsPanel";
 import type { FlightAudioStatus } from "../audio/createFlightAudio";
 import type { AutopilotSettingsV1 } from "../autopilot/autopilotSettings";
 
-export type FlightPanelTab = "weather" | "aircraft" | "autopilot" | "sound" | "debug" | "settings";
+export type FlightPanelTab = "weather" | "aircraft" | "autopilot" | "controls" | "sound" | "debug" | "settings";
 
 const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "weather", label: "Weather" },
   { id: "aircraft", label: "Aircraft" },
   { id: "autopilot", label: "Autopilot" },
+  { id: "controls", label: "Controls" },
   { id: "sound", label: "Sound" },
   { id: "debug", label: "Debug" },
   { id: "settings", label: "Settings" },
@@ -69,6 +77,7 @@ const TAB_ICONS = {
   weather: CloudSun,
   aircraft: Plane,
   autopilot: Navigation,
+  controls: Gauge,
   sound: Volume2,
   debug: Bug,
   settings: Settings,
@@ -123,6 +132,7 @@ export interface FlightControlPanelSnapshot {
 
 export interface FlightControlPanelOptions {
   initialWeather: FlightWeatherState;
+  gamepadBindings?: GamepadBindingsMount;
   onLocationApply(location: GeodeticLocation): void;
   locationSearchProvider?: LocationSearchProvider;
   onWeatherChange(weather: FlightWeatherState): void;
@@ -378,7 +388,7 @@ function OrbitInvertSettingsPanel({
           checked={settings.invertYaw}
           onChange={(event) => onOrbitInvertChange({ ...settings, invertYaw: event.target.checked })}
         />
-        <span>Invert yaw (left / right)</span>
+        <span>Invert yaw (left / right) for right-stick and trackpad</span>
       </label>
       <label className="flight-panel__field flight-panel__field--inline">
         <input
@@ -387,10 +397,10 @@ function OrbitInvertSettingsPanel({
           checked={settings.invertPitch}
           onChange={(event) => onOrbitInvertChange({ ...settings, invertPitch: event.target.checked })}
         />
-        <span>Invert pitch (up / down)</span>
+        <span>Invert pitch (up / down) for right-stick and trackpad</span>
       </label>
       <p className="flight-panel__hint">
-        Two-finger swipe and right-drag orbit. Use these if the camera feels backwards on your device.
+        Applies to right-stick, two-finger swipe, and right-drag camera orbit.
       </p>
     </fieldset>
   );
@@ -428,6 +438,90 @@ function SettingSlider({
   );
 }
 
+function GamepadSettingsPanel({ polling, response }: {
+  polling: GamepadPollingController;
+  response: GamepadResponseController;
+}) {
+  const rate = useSyncExternalStore(polling.subscribe, polling.getRate, polling.getRate);
+  const settings = useSyncExternalStore(response.subscribe, response.getSettings, response.getSettings);
+  return (
+    <fieldset className="flight-panel__fieldset">
+      <legend>Gamepad</legend>
+      <label className="flight-panel__field">
+        <span>Polling rate</span>
+        <select
+          aria-label="Gamepad polling rate"
+          value={rate}
+          onChange={event => polling.setRate(event.currentTarget.value)}
+        >
+          {GAMEPAD_POLLING_OPTIONS.map(option => (
+            <option key={option.id} value={option.id}>{option.label}</option>
+          ))}
+        </select>
+      </label>
+      <p className="flight-panel__hint">
+        Every frame reads input before each flight frame without an added timer cap.
+        Fixed limits reduce scheduled polling and can introduce visible stepping.
+        The browser frame rate remains the upper limit.
+      </p>
+      <p className="flight-panel__hint">
+        This controls application polling, not the controller's hardware report rate.
+        Keyboard events remain immediate.
+      </p>
+      <label className="flight-panel__field">
+        <span>Analog response</span>
+        <select
+          aria-label="Gamepad analog response"
+          value={settings.mode}
+          onChange={event => response.setSettings({ mode: event.currentTarget.value as GamepadResponseSettings["mode"] })}
+        >
+          <option value="smooth">Smooth (original)</option>
+          <option value="direct">Direct (no smoothing)</option>
+        </select>
+      </label>
+      {settings.mode === "smooth" && <SettingSlider
+        label="Response time"
+        value={settings.responseTimeSec}
+        min={0.05}
+        max={2}
+        step={0.025}
+        format={value => `${Math.round(value * 1000)} ms`}
+        onChange={responseTimeSec => response.setSettings({ responseTimeSec })}
+      />}
+      <p className="flight-panel__hint">
+        Smooth updates pitch, roll, and yaw every flight frame, including between controller reports.
+        The original setting is 375 ms to approach 95% of a held command; Direct holds each report unchanged.
+      </p>
+      <label className="flight-panel__field">
+        <span>Stick deadzone behavior</span>
+        <select
+          aria-label="Gamepad stick deadzone behavior"
+          value={settings.deadzoneMode}
+          onChange={event => response.setSettings({ deadzoneMode: event.currentTarget.value as GamepadResponseSettings["deadzoneMode"] })}
+        >
+          <option value="cutoff">Cutoff (original magnitude)</option>
+          <option value="scaled">Rescaled (reduced near-center response)</option>
+        </select>
+      </label>
+      <p className="flight-panel__hint">
+        Cutoff ignores the center zone and preserves stick magnitude outside it.
+        Each binding keeps its deadzone size; the Xbox profile uses 8%.
+        Rescaled subtracts that zone from the remaining travel.
+      </p>
+      <p className="flight-panel__hint">
+        Polling and response settings are saved on this device and apply across binding profiles.
+        They do not change keyboard, on-screen stick, or phone response.
+      </p>
+      <button className="flight-panel__command" type="button" onClick={() => {
+        polling.setRate("frame");
+        response.setSettings(DEFAULT_GAMEPAD_RESPONSE_SETTINGS);
+      }}>
+        Reset gamepad defaults
+      </button>
+    </fieldset>
+  );
+}
+
 function KeyboardStickSettingsPanel({
   snapshot,
   onKeyboardStickSettingsChange,
@@ -440,7 +534,7 @@ function KeyboardStickSettingsPanel({
 
   return (
     <fieldset className="flight-panel__fieldset">
-      <legend>Keyboard stick (WASD / QE)</legend>
+      <legend>Keyboard response</legend>
       <label className="flight-panel__field">
         <span>Response mode</span>
         <select
@@ -605,7 +699,7 @@ function KeyboardStickSettingsPanel({
         format={(value) => `${Math.round(value * 100)}%`}
         onChange={(expo) => patch({ expo })}
       />
-      <p className="flight-panel__hint">Softens small keyboard deflections while keeping full range. HUD stick, gamepad, and phone are unchanged.</p>
+      <p className="flight-panel__hint">Applies to keyboard bindings in the selected profile. Softens small deflections while keeping full range. HUD stick, gamepad, and phone are unchanged.</p>
       <button
         className="flight-panel__command"
         type="button"
@@ -877,10 +971,10 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
       renderAdditionalTab={(tabId) => {
         const Icon = TAB_ICONS[tabId];
         return <>
-          <div className="flight-panel__title">
+          {tabId !== "controls" && <div className="flight-panel__title">
             <Icon size={17} aria-hidden="true" />
             <span>{getTabLabel(tabId)}</span>
-          </div>
+          </div>}
           {tabId === "weather" ? <WeatherPanel initialWeather={props.initialWeather} onWeatherChange={props.onWeatherChange} />
             : tabId === "aircraft" ? <AircraftPanel {...props}
               aircraftSelection={aircraftSelection}
@@ -890,9 +984,19 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
                 state={props.snapshot.autopilot}
                 onSettingsChange={props.onAutopilotSettingsChange}
                 onEngageChange={props.onAutopilotEngageChange} />
+              : tabId === "controls" ? <div className="flight-panel__content">
+                {props.gamepadBindings
+                  ? <GamepadBindingsPanel mount={props.gamepadBindings} />
+                  : <p className="flight-panel__hint">Controller bindings are unavailable in this session.</p>}
+                {props.gamepadBindings?.polling && props.gamepadBindings.response && <GamepadSettingsPanel
+                  polling={props.gamepadBindings.polling}
+                  response={props.gamepadBindings.response}
+                />}
+                <KeyboardStickSettingsPanel {...props} />
+                <OrbitInvertSettingsPanel {...props} />
+              </div>
               : tabId === "sound" ? <SoundSettingsPanel state={props.snapshot.sound} onAction={props.onSoundAction} />
               : tabId === "settings" ? <>
-                <OrbitInvertSettingsPanel {...props} />
                 <fieldset className="flight-panel__fieldset">
                   <legend>Ground impacts</legend>
                   <label className="flight-panel__field flight-panel__field--inline">
@@ -905,7 +1009,6 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
                 </fieldset>
                 <GroundInteractionSettingsPanel state={props.snapshot.groundInteraction}
                   onAction={props.onGroundInteractionAction} />
-                <KeyboardStickSettingsPanel {...props} />
                 <WorldDetailSettings {...props} />
                 <MapCachePanel />
               </> : <DebugPanel snapshot={props.snapshot} onCollisionDebugChange={props.onCollisionDebugChange}

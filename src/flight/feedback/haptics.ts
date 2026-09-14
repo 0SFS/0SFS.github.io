@@ -150,6 +150,7 @@ export interface GamepadHapticOutput extends HapticOutput {
  */
 export function createGamepadHapticOutput(options: {
   getGamepads?: (() => ArrayLike<GamepadLike | null>) | null;
+  getSelectedSlot?: () => number;
   events?: EventTarget | null;
   onChange?: () => void;
 } = {}): GamepadHapticOutput {
@@ -164,7 +165,8 @@ export function createGamepadHapticOutput(options: {
   const pad = (): GamepadLike | null => {
     if (!getGamepads) return null;
     try {
-      const candidate = getGamepads()[0] ?? null;
+      const slot = Math.max(0, Math.floor(options.getSelectedSlot?.() ?? 0));
+      const candidate = getGamepads()[slot] ?? null;
       return candidate && candidate.connected !== false ? candidate : null;
     } catch { return null; }
   };

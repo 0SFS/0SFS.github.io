@@ -1,5 +1,7 @@
 import type { JSBSimSdk } from "@felipegalind0/jsbsim";
+import type { ActionIntentFrame } from "@felipegalind0/gamepad-tools/core";
 import { applyFlightControls } from "./applyFlightControls";
+import { createGamepadResponseController, type GamepadResponseController } from "./gamepadResponseSettings";
 import {
   applyStickExpo,
   createKeyboardAxisState,
@@ -54,8 +56,46 @@ interface GamepadSnapshot {
   buttons: { value: number; pressed: boolean }[];
 }
 
-function readGamepad(): GamepadSnapshot | null {
-  const pad = navigator.getGamepads?.()[0];
+interface BindingIntentValue {
+  actionId: string;
+  value: number;
+  inputKind: "keyboard" | "gamepad";
+}
+
+type BindingAxis = "aileron" | "elevator" | "rudder";
+
+interface GamepadBindingControls {
+  elevator: number;
+  aileron: number;
+  rudder: number;
+  throttle: number | null;
+  throttleRate: number;
+  pitchTrim: number | null;
+  pitchTrimRate: number;
+  rollTrim: number | null;
+  rollTrimRate: number;
+  flaps: number | null;
+  flapsRate: number;
+  brake: number;
+}
+
+const emptyGamepadBindingControls = (): GamepadBindingControls => ({
+  elevator: 0,
+  aileron: 0,
+  rudder: 0,
+  throttle: null,
+  throttleRate: 0,
+  pitchTrim: null,
+  pitchTrimRate: 0,
+  rollTrim: null,
+  rollTrimRate: 0,
+  flaps: null,
+  flapsRate: 0,
+  brake: 0,
+});
+
+function readGamepad(slot = 0): GamepadSnapshot | null {
+  const pad = navigator.getGamepads?.()[slot];
   if (!pad) return null;
   return {
     id: pad.id,
@@ -70,6 +110,7 @@ function sameGamepad(a: GamepadSnapshot | null, b: GamepadSnapshot | null): bool
 }
 
 export interface FlightInputManager {
+  getGamepadResponseController(): GamepadResponseController;
   attach(target: Window): () => void;
   poll(dt: number): ControlSurfaceState;
   apply(sdk: JSBSimSdk, controls: ControlSurfaceState): void;
@@ -98,6 +139,16 @@ export interface FlightInputManager {
   /** Landing gear lever, 1 down and 0 up. A fixed-gear airframe ignores it. */
   getGearDownNorm(): number;
   setGearDown(down: boolean): void;
+  /** Enables the profile-driven input path and suppresses legacy mappings. */
+  setGamepadToolsActive(value: boolean): void;
+  isGamepadToolsActive(): boolean;
+  /** Receives evaluated profile intents from the shared gamepad runtime. */
+  applyGamepadBindingIntents(frame: ActionIntentFrame): void;
+  /** Keeps binding capture from leaking controls into the active simulation. */
+  setBindingCapture(value: boolean): void;
+  isBindingCaptureActive(): boolean;
+  setSelectedGamepadSlot(slot: number): void;
+  getSelectedGamepadSlot(): number;
 }
 
 export function createFlightInputManager(options: {
@@ -129,11 +180,22 @@ export function createFlightInputManager(options: {
   let paused = false;
   let gearDown = options.initialGearDown ?? true;
   let remoteOwned = false;
+  let gamepadToolsActive = false;
+  let bindingCaptureActive = false;
+  let selectedGamepadSlot = 0;
   let protectGamepad = false;
   let stickOverride: Pick<ControlSurfaceState, "aileron" | "elevator"> | null = null;
   let rudderOverride: number | null = null;
   let gamepadBaseline: GamepadSnapshot | null = null;
   let previousGamepad: GamepadSnapshot | null = null;
+  let gamepadBindingControls = emptyGamepadBindingControls();
+  const bindingBaselines = new Map<string, number>();
+  const armedBindingSources = new Set<string>();
+  const bindingIntentValues = new Map<string, BindingIntentValue>();
+  const keyboardBindingAxes = new Set<BindingAxis>();
+  const gamepadBindingAxes = new Set<BindingAxis>();
+  const gamepadResponse = createGamepadResponseController();
+  let primeBindingCommands = true;
   const enabledAxes = new Set<number>();
   const enabledButtons = new Set<number>();
   let keyboardSettings = normalizeKeyboardStickSettings(
@@ -149,7 +211,7 @@ export function createFlightInputManager(options: {
     rudderAxis = createKeyboardAxisState(rudder);
   };
 
-  const captureGamepadBaseline = (pad = readGamepad()): void => {
+  const captureGamepadBaseline = (pad = readGamepad(selectedGamepadSlot)): void => {
     gamepadBaseline = pad;
     previousGamepad = pad;
     enabledAxes.clear();
@@ -206,6 +268,116 @@ export function createFlightInputManager(options: {
     if (paused === value) return;
     paused = value;
     options.onPausedChange?.(paused);
+  };
+
+  const clamp = (value: number, minimum = -1, maximum = 1): number => (
+    Math.min(maximum, Math.max(minimum, value))
+  );
+
+  const resetGamepadBindingInputs = (): void => {
+    gamepadBindingControls = emptyGamepadBindingControls();
+    keyboardBindingAxes.clear();
+    gamepadBindingAxes.clear();
+    resetKeyboardAxes();
+    bindingBaselines.clear();
+    armedBindingSources.clear();
+    bindingIntentValues.clear();
+    // Prime held commands once without imposing a timed lockout.
+    primeBindingCommands = true;
+  };
+
+  const aggregateBindingValue = (
+    actionId: string,
+    minimum = -1,
+    maximum = 1,
+    inputKind?: BindingIntentValue["inputKind"],
+  ): number | null => {
+    let found = false;
+    let total = 0;
+    for (const entry of bindingIntentValues.values()) {
+      if (entry.actionId !== actionId) continue;
+      if (inputKind !== undefined && entry.inputKind !== inputKind) continue;
+      found = true;
+      total += entry.value;
+    }
+    return found ? clamp(total, minimum, maximum) : null;
+  };
+
+  const refreshGamepadBindingControls = (): void => {
+    gamepadBindingControls = {
+      elevator: aggregateBindingValue("flight.elevator") ?? 0,
+      aileron: aggregateBindingValue("flight.aileron") ?? 0,
+      rudder: aggregateBindingValue("flight.rudder") ?? 0,
+      throttle: aggregateBindingValue("flight.throttle", 0, 1),
+      throttleRate: aggregateBindingValue("flight.throttleRate") ?? 0,
+      pitchTrim: aggregateBindingValue("flight.pitchTrim"),
+      pitchTrimRate: aggregateBindingValue("flight.pitchTrimRate") ?? 0,
+      rollTrim: aggregateBindingValue("flight.rollTrim"),
+      rollTrimRate: aggregateBindingValue("flight.rollTrimRate") ?? 0,
+      flaps: aggregateBindingValue("flight.flaps", 0, 1),
+      flapsRate: aggregateBindingValue("flight.flapsRate") ?? 0,
+      brake: aggregateBindingValue("flight.brake", 0, 1) ?? 0,
+    };
+  };
+
+  const applyGamepadBindingIntents = (frame: ActionIntentFrame): void => {
+    if (!gamepadToolsActive || bindingCaptureActive) return;
+
+    const suppressCommands = primeBindingCommands;
+    primeBindingCommands = false;
+    const nextValues = new Map<string, BindingIntentValue>();
+    let hasLocalContinuousInput = false;
+    for (const intent of frame.intents) {
+      if (intent.kind === "command") {
+        if (intent.edge !== "press" || suppressCommands) continue;
+        if (intent.actionId === "flight.pause") setPaused(!paused);
+        if (intent.actionId === "flight.gearToggle") setGearDown(!gearDown);
+        continue;
+      }
+      if (
+        (intent.kind !== "axis" && intent.kind !== "value" && intent.kind !== "rate")
+        || typeof intent.value !== "number"
+      ) continue;
+
+      const bindingId = intent.source.bindingId;
+      const value = intent.value;
+      if (!Number.isFinite(value)) continue;
+      const persistentValue = intent.kind === "value" && intent.actionId !== "flight.brake";
+      const baseline = bindingBaselines.get(bindingId);
+      if (baseline === undefined) {
+        bindingBaselines.set(bindingId, value);
+        if (!persistentValue && value === 0) armedBindingSources.add(bindingId);
+        continue;
+      }
+      if (!armedBindingSources.has(bindingId)) {
+        if (!persistentValue && value === 0) {
+          armedBindingSources.add(bindingId);
+        } else if (Math.abs(value - baseline) > TAKEOVER_DEADBAND) {
+          armedBindingSources.add(bindingId);
+        } else {
+          continue;
+        }
+      }
+      nextValues.set(bindingId, {
+        actionId: intent.actionId,
+        value,
+        inputKind: intent.source.inputKind,
+      });
+      hasLocalContinuousInput ||= Math.abs(value) > 0.001
+        && Math.abs(value - (bindingIntentValues.get(bindingId)?.value ?? 0)) > 0.001;
+    }
+
+    if (hasLocalContinuousInput) options.onLocalInput?.();
+    if (remoteOwned) return;
+    // A synchronous phone handoff can clear the maps above. Restore this
+    // frame's initiating input afterwards, and drop any disconnected sources.
+    bindingIntentValues.clear();
+    for (const [id, entry] of nextValues) {
+      bindingIntentValues.set(id, entry);
+      bindingBaselines.set(id, entry.value);
+      armedBindingSources.add(id);
+    }
+    refreshGamepadBindingControls();
   };
 
   const readKeyDirections = (): { elevator: number; aileron: number; rudder: number } => {
@@ -276,11 +448,110 @@ export function createFlightInputManager(options: {
     applyStickExpo(state.position, keyboardSettings.expo)
   );
 
+  const pollBindingAxis = (
+    axis: BindingAxis,
+    dt: number,
+    rates: BodyRatesRad | null,
+    override: number | null,
+  ): number => {
+    const actionId = `flight.${axis}`;
+    const keyboard = aggregateBindingValue(actionId, -1, 1, "keyboard");
+    const gamepad = aggregateBindingValue(actionId, -1, 1, "gamepad");
+    let state = axis === "aileron" ? aileronAxis : axis === "elevator" ? elevatorAxis : rudderAxis;
+    let output = override ?? gamepad ?? 0;
+
+    // Virtual controls remain direct. Keyboard and gamepad axes have separate
+    // response policies; neither inherits the other's ramp or assist history.
+    if (override !== null) {
+      keyboardBindingAxes.delete(axis);
+      gamepadBindingAxes.delete(axis);
+      state = createKeyboardAxisState();
+    } else if (
+      gamepad !== null
+      && (gamepad !== 0 || keyboard === null || (keyboard === 0 && !keyboardBindingAxes.has(axis)))
+    ) {
+      const previous = gamepadBindingAxes.has(axis) ? state.position : 0;
+      const response = gamepadResponse.getSettings();
+      output = response.mode === "smooth"
+        ? previous + (gamepad - previous) * Math.min(1, 3 / response.responseTimeSec * Math.max(0, dt))
+        : gamepad;
+      state = createKeyboardAxisState(output);
+      keyboardBindingAxes.delete(axis);
+      gamepadBindingAxes.add(axis);
+    } else if (
+      keyboard !== null
+      && (keyboard !== 0 || gamepad === null || keyboardBindingAxes.has(axis))
+    ) {
+      // An idle connected pad must not suppress keyboard input or its return
+      // ramp. Assist retains ownership after key release, until analog takeover.
+      if (gamepadBindingAxes.delete(axis)) state = createKeyboardAxisState();
+      if (keyboard !== 0) keyboardBindingAxes.add(axis);
+      state = stepKeyboardAxis(axis, state, keyboard, dt, keyboardSettings, rates);
+      output = outputAxis(state);
+    } else {
+      keyboardBindingAxes.delete(axis);
+      gamepadBindingAxes.delete(axis);
+      state = createKeyboardAxisState();
+    }
+
+    if (axis === "aileron") aileronAxis = state;
+    else if (axis === "elevator") elevatorAxis = state;
+    else rudderAxis = state;
+    return output;
+  };
+
+  const pollGamepadToolBindings = (dt: number): ControlSurfaceState => {
+    const binding = gamepadBindingControls;
+    if (binding.throttle !== null) {
+      throttleTarget = clamp(binding.throttle, 0, 1);
+    } else {
+      throttleTarget = clamp(
+        throttleTarget + binding.throttleRate * THROTTLE_CHANGE_RATE * dt,
+        0,
+        1,
+      );
+    }
+
+    const rates = keyboardSettings.mode === "assist" ? (options.getBodyRates?.() ?? null) : null;
+    const aileron = pollBindingAxis("aileron", dt, rates, stickOverride?.aileron ?? null);
+    const elevator = pollBindingAxis("elevator", dt, rates, stickOverride?.elevator ?? null);
+    const rudder = pollBindingAxis("rudder", dt, rates, rudderOverride);
+    const pitchTrim = binding.pitchTrim ?? clamp(
+      smoothed.pitchTrim + binding.pitchTrimRate * 0.5 * dt,
+    );
+    const rollTrim = binding.rollTrim ?? clamp(
+      smoothed.rollTrim + binding.rollTrimRate * 0.5 * dt,
+    );
+    const flaps = binding.flaps ?? clamp(
+      smoothed.flaps + binding.flapsRate * 0.5 * dt,
+      0,
+      1,
+    );
+
+    smoothed = {
+      elevator,
+      aileron,
+      rudder,
+      throttle: throttleTarget,
+      pitchTrim,
+      rollTrim,
+      flaps,
+      brake: binding.brake,
+    };
+    return { ...smoothed };
+  };
+
   return {
     attach(target: Window): () => void {
       const onKeyDown = (event: KeyboardEvent): void => {
         if (event.target instanceof Element && event.target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) {
           keysDown.clear();
+          return;
+        }
+        if (bindingCaptureActive || gamepadToolsActive) {
+          if (event.code in KEY_BINDINGS || event.code === "KeyP" || event.code === "KeyG") {
+            event.preventDefault();
+          }
           return;
         }
         if (event.code === "KeyP") {
@@ -330,7 +601,15 @@ export function createFlightInputManager(options: {
       };
     },
     poll(dt: number): ControlSurfaceState {
-      const gamepad = readGamepad();
+      const gamepad = readGamepad(selectedGamepadSlot);
+      if (bindingCaptureActive) {
+        captureGamepadBaseline(gamepad);
+        return { ...smoothed };
+      }
+      if (gamepadToolsActive) {
+        if (remoteOwned) return { ...smoothed };
+        return pollGamepadToolBindings(dt);
+      }
       sampleGamepadActivity(gamepad);
       if (remoteOwned) return { ...smoothed };
 
@@ -418,19 +697,36 @@ export function createFlightInputManager(options: {
       throttleTarget = controls.throttle;
       smoothed = { ...controls, elevator: 0, aileron: 0, rudder: 0, brake: 0 };
       resetKeyboardAxes();
+      resetGamepadBindingInputs();
       protectGamepad = true;
       captureGamepadBaseline();
     },
     setRemoteOwned(value: boolean): void {
       if (remoteOwned === value) return;
       remoteOwned = value;
+      resetGamepadBindingInputs();
       protectGamepad = true;
       captureGamepadBaseline();
     },
     hasActiveFlightInput(): boolean {
+      if (bindingCaptureActive) return false;
+      if (gamepadToolsActive) {
+        return stickOverride !== null
+          || rudderOverride !== null
+          || [
+            gamepadBindingControls.elevator,
+            gamepadBindingControls.aileron,
+            gamepadBindingControls.rudder,
+            gamepadBindingControls.throttleRate,
+            gamepadBindingControls.pitchTrimRate,
+            gamepadBindingControls.rollTrimRate,
+            gamepadBindingControls.flapsRate,
+            gamepadBindingControls.brake,
+          ].some((value) => Math.abs(value) > TAKEOVER_DEADBAND);
+      }
       if (stickOverride !== null || rudderOverride !== null || keysDown.size > 0 || [smoothed.elevator, smoothed.aileron, smoothed.rudder, smoothed.brake]
         .some((value) => Math.abs(value) > TAKEOVER_DEADBAND)) return true;
-      const pad = readGamepad();
+      const pad = readGamepad(selectedGamepadSlot);
       if (!pad) return false;
       if (protectGamepad) {
         const activity = gamepadActivity(pad);
@@ -450,7 +746,48 @@ export function createFlightInputManager(options: {
       throttleTarget = Math.min(1, Math.max(0, throttle));
       smoothed = { elevator: 0, aileron: 0, rudder: 0, throttle: throttleTarget, pitchTrim: 0, rollTrim: 0, flaps: 0, brake: 0 };
       resetKeyboardAxes();
+      resetGamepadBindingInputs();
       if (protectGamepad) captureGamepadBaseline();
+    },
+    setGamepadToolsActive(value: boolean): void {
+      if (gamepadToolsActive === value) return;
+      gamepadToolsActive = value;
+      keysDown.clear();
+      stickOverride = null;
+      rudderOverride = null;
+      resetKeyboardAxes();
+      resetGamepadBindingInputs();
+      smoothed = { ...smoothed, elevator: 0, aileron: 0, rudder: 0, brake: 0 };
+      protectGamepad = true;
+      captureGamepadBaseline();
+    },
+    isGamepadToolsActive(): boolean {
+      return gamepadToolsActive;
+    },
+    applyGamepadBindingIntents,
+    setBindingCapture(value: boolean): void {
+      if (bindingCaptureActive === value) return;
+      bindingCaptureActive = value;
+      keysDown.clear();
+      stickOverride = null;
+      rudderOverride = null;
+      resetKeyboardAxes();
+      resetGamepadBindingInputs();
+      smoothed = { ...smoothed, elevator: 0, aileron: 0, rudder: 0, brake: 0 };
+      captureGamepadBaseline();
+    },
+    isBindingCaptureActive(): boolean {
+      return bindingCaptureActive;
+    },
+    setSelectedGamepadSlot(slot: number): void {
+      const nextSlot = Math.max(0, Math.floor(slot));
+      if (nextSlot === selectedGamepadSlot) return;
+      selectedGamepadSlot = nextSlot;
+      resetGamepadBindingInputs();
+      captureGamepadBaseline();
+    },
+    getSelectedGamepadSlot(): number {
+      return selectedGamepadSlot;
     },
     setThrottle(value: number): void {
       options.onLocalInput?.();
@@ -509,6 +846,7 @@ export function createFlightInputManager(options: {
         resetKeyboardAxes(0, 0, rudderAxis.position);
       }
     },
+    getGamepadResponseController: () => gamepadResponse,
     getKeyboardStickSettings(): KeyboardStickSettings {
       return { ...keyboardSettings };
     },
