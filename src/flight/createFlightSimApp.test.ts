@@ -238,6 +238,7 @@ describe("OSFS render demand", () => {
     await act(async () => { app = await createFlightSimApp(root); });
     try {
       window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyP" }));
+      window.dispatchEvent(new KeyboardEvent("keyup", { code: "KeyP" }));
       expect(mocks.runtime.setSimRunning).toHaveBeenLastCalledWith(false);
       expect(mocks.physics.setPaused).toHaveBeenLastCalledWith(true);
       const canvas = root.querySelector("canvas")!;

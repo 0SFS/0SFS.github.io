@@ -201,6 +201,8 @@ describe("OSFS phone integration", () => {
   it("keeps ownership through explicit pause, cancels handoff immediately, and preserves the resume delta guard", async () => {
     await mount();
     grant();
+    // A handoff re-arms profile commands; the next flight frame samples input.
+    tick(1 / 60);
     window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyP" }));
     expect(mocks.snapshot.owner).toBe("phone");
     expect(mocks.phone.takeControl).not.toHaveBeenCalled();
