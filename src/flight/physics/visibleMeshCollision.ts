@@ -1,4 +1,4 @@
-import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
+import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import { DEG_TO_RAD, ecefToGeodetic, geodeticToEcef } from "foss-earth/cameraMath";
 import type { SurfaceQuery } from "foss-earth/runtime";
 import { readFlightState } from "../bridge/ecefBridge";

@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 
 import { readFileSync } from "node:fs";
-import { JSBSimSdk } from "@0x62/jsbsim-wasm";
-import { wasmBinaryUrl, wasmModuleUrl } from "@0x62/jsbsim-wasm/wasm";
+import { JSBSimSdk } from "@felipegalind0/jsbsim";
+import { wasmBinaryUrl, wasmModuleUrl } from "@felipegalind0/jsbsim/wasm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { bootstrapAircraft, type C172BootstrapOptions } from "./bootstrapC172";
 import { getFdmProfile } from "./fdmProfiles";
@@ -14,7 +14,7 @@ import { createFlightInputManager } from "../input/flightInputManager";
 import { applyFlightControls } from "../input/applyFlightControls";
 import { createFixedStepPhysicsLoop, FIXED_DT } from "../physics/fixedStepLoop";
 import { groundContactClearanceMeters } from "../physics/groundContactClearance";
-import { validFlightState } from "../physics/safeFlightState";
+import { captureSimulation, restoreSimulation, validFlightState } from "../physics/safeFlightState";
 
 const aircraftId = "cirrus-vision-jet";
 const profile = getFdmProfile(aircraftId);
@@ -25,12 +25,11 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  // These tests own their execs directly. SDK-native teardown remains separate
-  // upstream work; calling the installed SDK's destroy alone does not delete it.
   for (const sdk of instances.splice(0)) {
+    const exec = sdk.exec as typeof sdk.exec & { isDeleted(): boolean };
     sdk.destroy();
-    const exec = sdk.exec as typeof sdk.exec & { delete(): void; isDeleted(): boolean };
-    if (!exec.isDeleted()) exec.delete();
+    expect(exec.isDeleted()).toBe(true);
+    expect(() => sdk.destroy()).not.toThrow();
   }
   vi.restoreAllMocks();
 });
@@ -72,6 +71,24 @@ describe("SF50 runtime contracts (not performance calibration)", () => {
     advance(sdk, 120);
     expect(sdk.getPropertyValue("simulation/sim-time-sec")).toBeCloseTo(1, 10);
   });
+
+  it.each(["bootstrap", "location reset", "snapshot restore"] as const)(
+    "evaluates running turbine state at the selected throttle before returning from %s", async operation => {
+      const sdk = await createSf50();
+      if (operation === "location reset") resetFlightLocation(sdk, { latDeg: 45, lonDeg: -93, altMeters: 1500 }, undefined, aircraftId);
+      if (operation === "snapshot restore") restoreSimulation(sdk, captureSimulation(sdk));
+      expect(sdk.getPropertyValue("fcs/throttle-cmd-norm")).toBe(profile.initialThrottleNorm);
+      expect(sdk.getPropertyValue("simulation/sim-time-sec")).toBe(0);
+      const properties = ["propulsion/engine[0]/n1", "propulsion/engine[0]/n2", "propulsion/engine[0]/thrust-lbs"];
+      const returned = properties.map(property => sdk.getPropertyValue(property));
+      // Re-evaluating the same zero-time conditions must not repair a stale
+      // full-power initial sample. This checks initialization, not aircraft fit.
+      expect(sdk.runIc()).toBe(true);
+      properties.forEach((property, index) => expect(returned[index], property).toBeCloseTo(sdk.getPropertyValue(property), 8));
+      advance(sdk, 1);
+      expect(sdk.getPropertyValue("fcs/throttle-cmd-norm")).toBe(profile.initialThrottleNorm);
+    },
+  );
 
   it("keeps the selected aircraft's throttle and gear through the first input step", async () => {
     const sdk = await createSf50();
@@ -136,12 +153,13 @@ describe("SF50 runtime contracts (not performance calibration)", () => {
     expect(groundContactClearanceMeters(sdk, 0, 0)).toBeCloseTo(expectedClearance, 8);
   });
 
-  it("preserves a partly extended gear and its lever across a location reset", async () => {
+  it.each(["location reset", "snapshot restore"] as const)("preserves a partly extended gear and its lever across %s", async operation => {
     const sdk = await createSf50();
     sdk.setPropertyValue("gear/gear-cmd-norm", 1);
     advance(sdk, 240);
     const position = sdk.getPropertyValue("gear/gear-pos-norm");
-    resetFlightLocation(sdk, { latDeg: 47, lonDeg: -92, altMeters: 2000 }, 300, aircraftId);
+    if (operation === "location reset") resetFlightLocation(sdk, { latDeg: 47, lonDeg: -92, altMeters: 2000 }, 300, aircraftId);
+    else restoreSimulation(sdk, captureSimulation(sdk));
     expect(sdk.getPropertyValue("gear/gear-cmd-norm")).toBe(1);
     expect(sdk.getPropertyValue("gear/gear-pos-norm")).toBeCloseTo(position, 10);
     expect(sdk.getPropertyValue("simulation/sim-time-sec")).toBe(0);

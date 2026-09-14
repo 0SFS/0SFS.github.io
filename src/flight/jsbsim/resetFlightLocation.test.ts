@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
+import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import { resetFlightLocation } from "./resetFlightLocation";
 
 describe("resetFlightLocation", () => {
@@ -28,7 +28,7 @@ describe("resetFlightLocation", () => {
     expect(sdk.setPropertyValue).toHaveBeenCalledWith("ic/long-gc-deg", -92.1005);
     expect(sdk.setPropertyValue).toHaveBeenCalledWith("ic/h-sl-ft", 10000);
     expect(sdk.setPropertyValue).toHaveBeenCalledWith("ic/vc-kts", 120);
-    expect(sdk.runIc).toHaveBeenCalledOnce();
+    expect(sdk.runIc).toHaveBeenCalledTimes(2);
     expect(state).toMatchObject({ latDeg: 46.7867, lonDeg: -92.1005, altMeters: 3048 });
   });
   it("sets runway departure heading, ground elevation, gear, brakes and zero ground speed", () => {
@@ -51,6 +51,11 @@ describe("resetFlightLocation", () => {
     expect(sdk.setPropertyValue).toHaveBeenCalledWith("ic/gamma-deg", -3);
     expect(sdk.setPropertyValue).toHaveBeenCalledWith("fcs/left-brake-cmd-norm", 0);
     expect(sdk.setPropertyValue).toHaveBeenCalledWith("fcs/throttle-cmd-norm", 0.35);
+  });
+  it("reports an engine re-evaluation failure instead of returning a stale location state", () => {
+    const sdk = setup();
+    sdk.runIc.mockReturnValueOnce(true).mockReturnValueOnce(false);
+    expect(() => resetFlightLocation(sdk as unknown as JSBSimSdk, { latDeg: 45, lonDeg: -93 })).toThrow("initialize engines");
   });
   it("rejects invalid input before mutating JSBSim and reports RunIC failure", () => {
     const sdk = setup(false);

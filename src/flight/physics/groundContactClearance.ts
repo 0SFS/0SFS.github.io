@@ -1,4 +1,4 @@
-import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
+import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 
 // Cache only property availability, never native nodes or geometry. Positions
 // and CG stay live so fuel/payload changes and supported geometry edits apply.

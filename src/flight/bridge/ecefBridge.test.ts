@@ -1,5 +1,5 @@
 import { Vector3 } from "@babylonjs/core";
-import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
+import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import { describe, expect, it } from "vitest";
 import { flightAttitudeToQuaternion, readFlightState } from "./ecefBridge";
 

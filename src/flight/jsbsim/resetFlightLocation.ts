@@ -1,4 +1,4 @@
-import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
+import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import type { GeodeticLocation } from "foss-earth/windowing";
 import type { AircraftId } from "../aircraft/aircraftIds";
 import { readFlightState } from "../bridge/ecefBridge";
@@ -87,5 +87,14 @@ export function resetFlightLocation(
     }
   }
   sdk.setPropertyValue("fcs/throttle-cmd-norm", runway?.throttleNorm ?? state.throttleNorm);
+  // Engine startup evaluates full power. Re-evaluate the restored commands
+  // at zero time before the caller samples the newly placed aircraft.
+  if (!sdk.runIc()) throw new Error("JSBSim could not initialize engines at the new location.");
+  if (!runway) {
+    // RunIC also evaluates actuator nodes. Keep the saved physical positions
+    // and controls intact until the first normal simulation step.
+    for (const [property, value] of Object.entries(saved.controls)) if (Number.isFinite(value)) sdk.setPropertyValue(property, value);
+    if (Number.isFinite(flapPosition)) sdk.setPropertyValue(profile.flapPosition.property, flapPosition);
+  }
   return readFlightState(sdk);
 }

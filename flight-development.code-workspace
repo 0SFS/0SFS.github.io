@@ -1,0 +1,17 @@
+{
+  "folders": [
+    {
+      "name": "0sfs application and aircraft",
+      "path": "."
+    },
+    {
+      "name": "JSBSim engine and WASM SDK",
+      "path": "../Felipegalind0/jsbsim"
+    },
+    {
+      "name": "FOSS Earth rendering",
+      "path": "../foss-earth"
+    }
+  ],
+  "settings": {}
+}

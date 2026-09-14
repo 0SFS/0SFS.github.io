@@ -1,14 +1,17 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { JSBSimSdk } from "@0x62/jsbsim-wasm";
-import { wasmBinaryUrl, wasmModuleUrl } from "@0x62/jsbsim-wasm/wasm";
-import { describe, expect, it } from "vitest";
+import { JSBSimSdk } from "@felipegalind0/jsbsim";
+import { wasmBinaryUrl, wasmModuleUrl } from "@felipegalind0/jsbsim/wasm";
+import { afterEach, describe, expect, it } from "vitest";
 import { bootstrapC172p } from "./bootstrapC172";
 import { resolveAircraftDataFiles } from "./hydrateJsbsimData";
 
 interface DataManifest {
   files: string[];
 }
+
+const instances: JSBSimSdk[] = [];
+afterEach(() => { for (const sdk of instances.splice(0)) sdk.destroy(); });
 
 describe("C172 propulsion", () => {
   it("sustains engine power at full throttle", async () => {
@@ -18,6 +21,7 @@ describe("C172 propulsion", () => {
       persistence: { enabled: false },
       log: { console: false, stripAnsi: true },
     });
+    instances.push(sdk);
     const dataRoot = resolve(process.cwd(), "public/jsbsim-data");
     const manifest = JSON.parse(readFileSync(resolve(dataRoot, "manifest.json"), "utf8")) as DataManifest;
     for (const relativePath of resolveAircraftDataFiles(manifest, "cessna-172")) {

@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
-import { JSBSimSdk } from "@0x62/jsbsim-wasm";
-import { wasmBinaryUrl, wasmModuleUrl } from "@0x62/jsbsim-wasm/wasm";
+import { JSBSimSdk } from "@felipegalind0/jsbsim";
+import { wasmBinaryUrl, wasmModuleUrl } from "@felipegalind0/jsbsim/wasm";
 import { afterEach, describe, expect, it } from "vitest";
 import { readFlightState } from "../bridge/ecefBridge";
 import { FIXED_DT } from "./fixedStepLoop";

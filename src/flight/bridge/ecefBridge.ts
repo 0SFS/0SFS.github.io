@@ -1,5 +1,5 @@
 import { Quaternion } from "@babylonjs/core";
-import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
+import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import { degreesToRadians, feetToMeters, type FlightState } from "../physics/flightState";
 
 export function readFlightState(sdk: JSBSimSdk): FlightState {

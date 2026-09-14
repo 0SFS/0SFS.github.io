@@ -1,10 +1,10 @@
-import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
+import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import { describe, expect, it, vi } from "vitest";
 import { bootstrapC172p } from "./bootstrapC172";
 import { FIXED_DT } from "../physics/fixedStepLoop";
 
 describe("bootstrapC172p", () => {
-  it("starts the engine with mixture and throttle after RunIC", async () => {
+  it("starts the engine and re-evaluates requested controls before returning", async () => {
     const events: string[] = [];
     const sdk = {
       configurePaths: vi.fn(),
@@ -35,6 +35,8 @@ describe("bootstrapC172p", () => {
       "propulsion/magneto_cmd=3",
     ]);
     expect(Number(events[4]?.split("=")[1])).toBeCloseTo(1, 3);
+    expect(events.slice(-2)).toEqual(["fcs/throttle-cmd-norm=0.65", "runIc"]);
+    expect(sdk.runIc).toHaveBeenCalledTimes(2);
   });
 
   it("fails clearly when the SDK cannot configure dt", async () => {

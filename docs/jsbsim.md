@@ -1,0 +1,380 @@
+# How JSBSim runs in the browser
+
+OSFS consumes a packaged WASM build from `Felipegalind0/jsbsim/wasm`.
+Native engine code and the JavaScript/TypeScript SDK now share the canonical
+`Felipegalind0/jsbsim` checkout and revision. Native changes belong in `src/`;
+bindings, native lifetime, generic diagnostics and SDK build tooling belong in
+`wasm/`. OSFS owns aircraft data, initial conditions, controls and scheduling.
+FOSS Earth remains the separate terrain/rendering dependency.
+
+**Application acceptance, 2026-09-13:** clean in-tree package
+`1.2.4-fork.5` is installed and locked. It adds the adopted IDBFS-linkage and
+native-exception build corrections described in
+[the fork.4 adoption record](#adopted-idbfs-and-native-exception-corrections)
+to the previously accepted fork.3 integration. All 144 focused
+app/runtime/UI/artifact tests across 13 files passed against it. Production build/typecheck and emitted
+asset checks passed; focused ESLint passed the four changed identity/artifact
+files with no warnings. Headless Chrome verified actual SDK boot and loaded
+bytes for C172 and all three SF50 runtime packages. The separate component
+keyboard/layout check passed three viewports. These establish software and
+artifact contracts, not aircraft calibration or terrain readiness. See the
+[in-tree execution record](validation/jsbsim-in-tree-integration-2026-09-13.md).
+The [earlier centralization record](validation/jsbsim-centralization-2026-09-13.md)
+retains fork.1 acceptance and migration history; its two-repository editing
+layout is superseded by this integration.
+
+```mermaid
+flowchart LR
+  Source[JSBSim repository: engine and wasm SDK at one revision] --> Package[Identified immutable npm tarball]
+  Package --> App[OSFS installed dependency]
+  App --> Runtime[createJsbsimRuntime]
+  Runtime --> WASM[Browser WebAssembly / FGFDMExec]
+  Runtime --> Data[Selected aircraft XML in MEMFS]
+  Data --> WASM
+  WASM --> Loop[120 Hz fixed-step loop]
+  Loop --> Bridge[ECEF/ENU visual bridge]
+  Bridge --> Earth[FOSS Earth / Babylon]
+```
+
+## Package name
+
+The package is `@felipegalind0/jsbsim`, named after the repository it is built
+from. It was called `@felipegalind0/jsbsim-wasm` through fork.4; that name
+described a separate SDK source that no longer exists, since the engine and the
+`wasm/` SDK have shared one repository and one revision since the in-tree
+consolidation. The rename landed with fork.5 and changed no engine or SDK code.
+
+There is no `jsbsim-wasm` dependency, checkout or source selector anywhere in
+this project. The remaining `0x62/jsbsim-wasm` references are to the upstream
+project this SDK derives from: its MIT notice and Benedict Lewis's copyright
+travel with the distribution and must not be removed, and SDK PR #8 is still an
+open review there.
+
+Retained rollback tarballs keep the name they were published under, so
+`jsbsimBuildIdentity.ts` pairs every accepted version with its exact name and
+rejects a renamed package claiming an older version. A full rollback restores
+that release's preserved declaration, lock and identity module together from
+`build/validation/jsbsim-in-tree-20260913/before-fork*-adoption/`.
+
+## Build and installation chain
+
+The app requires Node **22.18 or newer** because its shared artifact validator
+uses native TypeScript stripping. This integration was exercised with
+**Node 26.8.2**; SDK compilation additionally uses its locked toolchain.
+
+The application declares:
+
+```json
+"@felipegalind0/jsbsim": "file:deps/felipegalind0-jsbsim-1.2.4-fork.5.tgz"
+```
+
+The package scope and API imports stay the same. The wrapper version does not
+identify the native engine version; `buildIdentity` records the actual common
+source revision. No npm publication is implied or needed.
+
+Stable installation requires a **clean in-tree** schema-2 identity. The engine
+and SDK commit/dirty fields must agree, `sdk.path` must be `wasm`, and metadata
+must identify that same repository with null external native archive/source-lock
+fields. A dirty candidate is rejected even if its archive and installed bytes
+agree. Explicit SDK diagnostics may use a checked candidate directory with
+`validate-sf50.mjs --sdk-root=...`, labeled as a candidate.
+
+The previous exact schema-1 `1.2.4-fork.1` and schema-2 `1.2.4-fork.2` and
+`1.2.4-fork.3` contracts remain supported for deliberate rollback. Fork.1
+requires clean pinned source; fork.2 and fork.3 require clean in-tree source. Schema/version pairs, archive
+integrity and recorded distribution bytes remain checked, with no version
+range or implicit runtime fallback. Use each retained tarball with its matching
+declaration and lock. Fork.1 pre-adoption files remain under
+`build/validation/jsbsim-in-tree-20260913/rollback/`; fork.2 files remain under
+`before-fork3-adoption/` and fork.3 files under `before-fork4-adoption/` in that
+evidence directory. Fork.3 replaced the earlier
+accepted fork.2 package after an explicitly verified official emsdk compiler
+banner was added to the toolchain lock. Fork.4 replaces fork.3 after adopting
+the IDBFS and native-exception corrections. No earlier archive was overwritten.
+
+Retain the accepted tarball under `deps/` together with `package.json` and
+`package-lock.json`. `npm ci` then installs the same SDK without a JSBSim/SDK
+source sibling, compiler or private package registry. Do not replace an accepted
+tarball in place: a changed candidate requires an explicit dependency update
+and new acceptance evidence. FOSS Earth still uses `file:../foss-earth`; its
+checkout/build remains necessary, and it does not acquire a JSBSim dependency.
+
+Build engine or SDK changes from `/Users/felg/gh/Felipegalind0/jsbsim`,
+currently on `feature/wasm-integration`. The original `integration` branch is
+the preserved pre-import reference, not the accepted in-tree branch.
+
+```sh
+npm --prefix wasm ci
+npm --prefix wasm run build
+npm --prefix wasm run pack:build -- --release
+```
+
+For uncommitted development, use `npm --prefix wasm run build:dev` instead.
+That produces an identified dirty diagnostic candidate; it cannot qualify for
+release packing or stable app adoption. Default native CMake builds leave
+`BUILD_WASM_MODULE=OFF` and do not require Node or Emscripten. The owning build
+contract is `wasm/docs/centralized-builds.md` in JSBSim.
+
+The build captures the enclosing repository once. Generator, compiler, tests
+and metadata share that frozen source; the SDK digest is the `wasm/` subset of
+the same snapshot. No native archive, vendor checkout or external source path is
+selected. Successful builds produce an immutable package under
+`wasm/build/artifacts/`; `wasm/build/last-package.json` identifies its checked
+tarball and archive integrity. Failed attempts do not replace the accepted
+artifact. Captured sources and output directories are not development checkouts
+or implicit app overrides.
+
+**The WASM build is not reproducible.** Rebuilding the same commit with the same
+toolchain on the same machine produces a different `jsbsim_wasm.wasm`: the fork.5
+source revision `e727e6f1` was built twice and gave
+`d848696de238128cee41c34e7e63951af9563eebdef6ddb631adfb02f989f1b1` and
+`950433d3036d1bb77c7f96b3b3cc4e96d3c7a04c7e7b6264a20cd71075a1f76a`, identical in
+size at 2,198,897 bytes with roughly 1,400 scattered differing bytes and no
+embedded build paths. The emitted `jsbsim_wasm.mjs` loader is byte-identical
+across builds, so the variation is in native code generation and linking rather
+than in Emscripten's JavaScript output. The cause has not been assigned; parallel
+optimisation-pass ordering is the likely candidate.
+
+Consequences: each build is still immutable, hashed and gated once produced, and
+`verify:jsbsim` still rejects any substituted or modified artifact. But a shipped
+binary cannot be re-derived from its source revision, so **the tarball is the
+authority, not the commit**. Two artifacts built from one revision are different
+artifacts and must be accepted separately. Do not treat a hash difference between
+two builds of the same source as evidence of a source or behaviour change.
+
+## Installed and browser artifact checks
+
+The accepted application artifact is:
+
+| Identity | Value |
+| --- | --- |
+| Common native/SDK commit | `e727e6f1bdb9c616c14858025844b36cc47bc7b2` |
+| Repository content SHA-256 | `ca56f7cdfb989d38b5d2783597be93c3766bdd9ca2218724106dcfc54b187cff` |
+| SDK subtree content SHA-256 | `0c7c82faaafedbc2f96d158c9745cdb48c84c161953e0a5622e3b4d0f9169d58` |
+| Build input SHA-256 | `837a8746acab8263c77ae351988238c77f9d492cbf2d3083bad4c6c2ff3736e8` |
+| Package tarball SHA-256 | `9312e2b657fd5f396f6ed55904616b907d387c9cd76d98ca66ad756cf3d8aa52` |
+| Emitted/browser loader SHA-256 | `784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2` |
+| Emitted/browser WASM SHA-256 | `d848696de238128cee41c34e7e63951af9563eebdef6ddb631adfb02f989f1b1` |
+
+The previously accepted fork.3 identity (commit `f7a80a6f`, tarball
+`43d0fe82…`) remains recorded in
+[the in-tree execution record](validation/jsbsim-in-tree-integration-2026-09-13.md)
+and its retained archive.
+
+The installed distribution's 14 recorded files and archive SHA-512 lock
+integrity were verified. Local acceptance evidence is retained under
+`build/validation/jsbsim-in-tree-20260913/`: exact command/log files,
+`fork4-adoption.json`, `runtime-fork4-parity.json` and earlier
+`browser-artifact-fork3/report.json`, `aircraft-ui-fork3/report.json` and
+screenshots. Current logs use the `app-fork4-` prefix; earlier artifacts retain
+their separate reports.
+These ignored files are local evidence; the identities and outcomes above
+remain in documentation.
+
+All app imports, type imports, mocks and SDK assets use the fork scope.
+`createJsbsimRuntime` imports `JSBSimSdk` and `buildIdentity` from the package,
+and `wasmModuleUrl`/`wasmBinaryUrl` from its `/wasm` export. Vite excludes the
+fork from dependency optimization and includes `**/*.wasm` as build assets.
+
+```sh
+npm run verify:jsbsim
+npm run build
+```
+
+`verify:jsbsim` checks the repository-relative tarball, lock resolution and
+SHA-512 integrity; it rejects a live SDK symlink or ineligible source identity.
+It compares installed and archived metadata/package identity, hashes every
+recorded distribution file, rejects unrecorded files and checks the exported
+identity against metadata. Schema-2 repository provenance is checked separately.
+The complete distribution includes entry points, declarations, loader, WASM and
+recorded notices. Schema-1 checks remain available for explicit rollback.
+
+`npm run build` performs that preflight, app TypeScript checking, the Vite
+production build and emitted loader/WASM SHA-256 comparisons. It writes
+`dist/jsbsim-artifact.json` with `browserLoadedAssetsVerified: false`;
+successful bundling alone does not prove browser instantiation.
+
+Two bounded headless checks start no server or visible browser:
+
+```sh
+node scripts/check-aircraft-selection-headless.mjs --out=/private/tmp/osfs-aircraft-ui-new
+node scripts/check-jsbsim-browser-artifact.mjs --out=/private/tmp/osfs-sdk-browser-new
+```
+
+Each output directory must be new. The selection check bundles actual React
+components and shell/CSS with a static flight snapshot, checks wide/narrow/short
+viewports, family keyboard navigation, staged G2+ selection and keyboard Apply,
+and saves screenshots. It does not instantiate an FDM. The built-app check
+serves actual `dist/` bytes through headless Chrome request interception, boots
+each runtime aircraft and compares diagnostic identity and fetched
+loader/WASM/XML hashes to the installed package and build manifest.
+
+The current component check passed all three viewports. It still records a
+clipped lower LOD-select focus outline in wide/narrow shells; control bounds
+and keyboard-reached Apply/outline remain visible. The actual built-app check
+passed all four runtime aircraft with no missing local assets or runtime
+exceptions. External terrain/font requests were blocked, the no-Google-key
+warning was recorded and terrain stayed unready. Production builds retain the
+large renderer-chunk warning; some jsdom app tests retain React act warnings.
+These checks exclude terrain readiness, GPU performance and aircraft fidelity.
+
+## Adopted IDBFS and native-exception corrections
+
+Fork.4 carries the two build defects found while preparing the upstream package
+contribution ([JSBSim #1507](https://github.com/JSBSim-Team/jsbsim/pull/1507),
+branch `feature/wasm-package` at `c6d4063a`). They were ported selectively onto
+the full integration as `feature/wasm-integration-idbfs-exceptions`
+at `c328c7ab6d81e6de68b8db2115c35d350b226025`. The review package's
+`@jsbsim/wasm@0.1.0` identity and its omission of the property-batch,
+gear-contact and wheel features were **not** adopted.
+
+| Correction | Adopted change |
+| --- | --- |
+| Native exception handling | The root `CMakeLists.txt` adds `-fexceptions` to C++ compilation whenever `BUILD_WASM_MODULE` is `ON`, before `add_subdirectory(src)`. Enabling exceptions only on the bindings target or the final link cannot restore engine catch blocks that were compiled away. |
+| Browser persistence | `wasm/CMakeLists.txt` links `-lidbfs.js`, so the advertised optional IDBFS persistence actually exists in the module. The hand-written extension bindings are still compiled into the same target. |
+| Persistence root safety | `WasmVfsManager.resolveRoots` normalizes `.`/`..` segments, rejects NUL and rejects equal or nested runtime/persistence roots. `JSBSimSdk.create` resolves both roots before loading the module, so an unsafe pair cannot reach tree copying or allocation. Sibling prefixes such as `/data/runtime` and `/data/runtime-cache` stay valid. |
+| Lifecycle checks | `writeDataFile`, `readDataFile`, `mkdir`, `enablePersistence`, `syncFromPersistence` and `syncToPersistence` now reject use after `destroy()`. |
+
+Native builds with the component disabled receive no additional exception flag:
+148 native compile commands contain none, `BUILD_WASM_MODULE` defaults to `OFF`,
+no `build/wasm` directory is generated, `JSBSim --version` starts, and enabling
+the component with a native compiler is still rejected.
+
+The added regressions are a malformed-propulsion recovery test, four
+persistence-boundary cases and a pinned Playwright 1.63.0 browser check.
+The propulsion test removes the standard C172's required `<thruster>`: native
+`FGPropulsion::Load` must catch its own XML error, return `false`, and then load
+a valid C172 and step it. A dirty diagnostic build with the engine flag removed
+reproduces the defect at 49/50 with that test failing on an escaped native
+exception (`excPtr: 278536`); that candidate was never promoted. With the flag,
+all 50 SDK tests in nine suites pass.
+
+The browser check serves only accepted artifact bytes through request
+interception — no server, app checkout or aircraft data — and verifies across
+three navigations in pinned Chromium 153.0.8010.12 that IDBFS is linked, that
+text and binary files survive navigation, that deletions and updates persist,
+that the downstream `PropertyBatch`/`GearContacts` bindings are still present in
+the same artifact, and that the executive is disposed after each phase. The
+application itself still does not enable persistence; this is an SDK capability
+check. Run it after a build with:
+
+```sh
+# From the canonical JSBSim root, once per machine:
+npm --prefix wasm exec -- playwright install --only-shell --no-remove chromium
+npm --prefix wasm run test:browser
+```
+
+The older pinned Playwright 1.58.2 installer stalled during archive extraction,
+so 1.63.0 is pinned and only its headless shell is requested. Build and check
+runners now enumerate `test/*.test.mjs` explicitly, keeping this browser check
+out of the unit-test run. Full adoption results, hashes and limitations are in
+`build/validation/jsbsim-in-tree-20260913/fork4-adoption.json`.
+
+## Runtime diagnostics and native lifetime
+
+The SDK exports schema-2 `buildIdentity` with package identity, the shared repository
+origin/revision/content digest/dirty state, the SDK subtree path/content digest,
+build mode/input digest, toolchain (including the Emscripten configuration SHA-256)
+and build options. Its `/build-metadata` JSON
+export records final relative distribution-file hashes and completed checks
+separately, avoiding a self-referential SDK-entry hash.
+
+The app validates the identity before allocation. A successful runtime exposes
+`window.osfsJsbsimBuild` with the selected `aircraftId`, build identity and
+actual module/binary URLs, and logs the identity in developer flight
+diagnostics. This contains no native executive handle. Disposal removes that
+runtime's global diagnostic reference and stored event listeners, then calls
+`sdk.destroy()` once. Failed startup also releases a late successful
+allocation. Native executive deletion is SDK-owned; no app `exec.delete()` or
+optional `sdk.delete()` fallback completes cleanup.
+
+`validate-sf50.mjs` reports schema 2 with the verified artifact identity and
+file hashes. Its normal mode verifies the installed app dependency. An
+explicit `--sdk-root` is labeled `explicit-sdk-root-candidate` and verified as
+a candidate directory; it is not reported as the installed app runtime.
+SF50 real-WASM tests now assert that SDK destruction deletes the native
+executive and repeated destruction is safe. These checks passed against the
+current in-tree package in the 144-test installed-app run; exact results remain
+attached to that artifact in the execution record.
+
+## Aircraft loading and initialization
+
+The SDK does not bundle OSFS aircraft data into its virtual filesystem.
+`downloadJsbsimData` fetches `public/jsbsim-data/manifest.json` independently of
+WASM compilation. `resolveAircraftDataFiles` validates the selected closure,
+rejecting missing/malformed paths rather than falling back to another model.
+Only the selected files are written to Emscripten MEMFS with `writeDataFile`.
+
+| Runtime aircraft ID | JSBSim model | Selection meaning |
+| --- | --- | --- |
+| `cessna-172` | `c172p` | C172 family |
+| `cirrus-vision-jet` | `sf50` | Legacy/default G1 |
+| `cirrus-vision-jet-g2` | `sf50-g2` | Original G2 development model; G2+ UI label retains this runtime alias |
+| `cirrus-vision-jet-g3` | `sf50-g3` | Provisional G3 development model |
+
+Family selection, generation labels, staged drafts, atomic Apply/persistence,
+credits and presentation preferences remain app-owned. A G2+ label does not
+make G2+ performance tables applicable to original G2 or G3. All three SF50
+packages still share development physics and exterior meshes; selectable
+packages and runtime agreement do not establish distinct calibration.
+
+`bootstrapAircraft` configures paths, loads the selected model, sets and checks
+native `setDt(1 / 120)`, and initializes geodetic `ic/lat-geod-deg`. Gear/flap
+commands and physical positions agree before initial `runIc()`. Engine startup
+via `propulsion/set-running` internally evaluates a full-power steady state.
+Bootstrap, location reset and snapshot restoration therefore reapply requested
+controls and run normal zero-time initialization after engine setup before
+returning a sample. Native JSBSim owns N1/N2 updates; the application does not
+write those engine properties. Location/reset recovery reapplies preserved
+physical actuator positions after RunIC because that evaluation also visits
+rate-limited actuator nodes. Saved fuel, controls, wind and partial gear remain
+part of the restoration contract.
+
+Diagnostic-only tests on SDK attempt `dd81bae46e74-F96sOJ` reproduced returned
+N1 100 at throttle 0.35 in all three old sequences; re-evaluation gave 54.5.
+After sequencing and actuator-preservation corrections, 39 tests across six
+focused runtime files passed against that candidate. Those are software
+initialization results, not measured aircraft targets or AFM calibration.
+The earlier installed pinned artifact subsequently passed those initialization
+and actuator regressions in its 97-test run. The current in-tree artifact passed
+them again in the 144-test installed-app run described above.
+
+The engine runs locally in browser WebAssembly. The app's coordinate/terrain
+bridge, ground contact handling and 120 Hz fixed-step scheduling remain
+separate from streamed map data and optional phone pairing. Hydration derives
+its base from Vite `BASE_URL`; verify the deployed manifest and XML request
+paths before release, including non-root deployments.
+
+## Ownership, notices and continued work
+
+Use the canonical repositories and ordinary branches:
+
+- Native engine and WASM SDK: `/Users/felg/gh/Felipegalind0/jsbsim` (`src/` and `wasm/`).
+- App/aircraft/evidence: `/Users/felg/gh/0sfs`.
+- Reusable terrain/rendering: `/Users/felg/gh/foss-earth`.
+
+Open [flight-development.code-workspace](../flight-development.code-workspace)
+for the three labeled app, combined JSBSim and terrain roots. The old separate
+SDK checkout was reversibly moved to
+`/Users/felg/gh/.preservation/jsbsim-in-tree-20260913T233508Z/retired-jsbsim-wasm`;
+its history and the fork.1/fork.2 tarballs remain migration/PR references. SDK
+development belongs in the combined repository. The preferred checkout
+layout remains `gh/owner/repo`. Captured sources and immutable packages are
+build inputs/outputs, not extra editing checkouts. Historical SDK compatibility
+patches remain provenance; no preparation script applies them.
+
+The wrapper MIT notice and native JSBSim LGPL notices remain distinct and must
+travel with the relevant package/source distribution. C172 XML and aircraft
+models have their own unresolved provenance/redistribution requirements; see
+[the software inventory](../THIRD_PARTY_LICENSES.md). Do not describe all
+JSBSim-related content as MIT or redistribute AFM/dashboard evidence merely
+because it is publicly accessible.
+
+Continue existing upstream work under the
+[contribution policy and dated PR ledger](jsbsim-upstream-contribution-policy.md).
+Upstream review status, local correctness, installed app adoption and aircraft
+fidelity are separate outcomes. Preserve the
+[SF50 development handoff](validation/sf50-development-handoff.md) and
+[validation guide](validation/sf50-performance.md), including source identities,
+qualification ledgers and the 600-fit/220-same-source-check allocation, when
+updating the dependency.

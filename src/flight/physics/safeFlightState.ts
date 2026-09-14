@@ -1,4 +1,4 @@
-import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
+import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import type { FlightState } from "./flightState";
 
 /**
@@ -59,6 +59,11 @@ export function restoreSimulation(sdk: JSBSimSdk, snapshot: SimulationSnapshot):
   // boolean alone does not do after a reset.
   if (snapshot.running) sdk.setPropertyValue("propulsion/set-running", -1);
   else sdk.setPropertyValue("propulsion/engine/set-running", 0);
+  for (const [property, value] of Object.entries(snapshot.controls)) sdk.setPropertyValue(property, value);
+  // Startup evaluates full power internally; the restored commands must be
+  // reflected in native engine state before returning a recovered snapshot.
+  if (!sdk.runIc()) throw new Error("Flight engine reinitialization failed");
+  // Preserve physical actuator positions evaluated by RunIC until stepping.
   for (const [property, value] of Object.entries(snapshot.controls)) sdk.setPropertyValue(property, value);
 }
 

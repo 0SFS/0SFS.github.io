@@ -1,7 +1,8 @@
 # Third-party software and service review
 
 This is a release-audit record, not a replacement for the license texts
-distributed in dependencies. Versions below are the installed versions resolved
+distributed in dependencies. The JSBSim row reflects the accepted in-tree
+package on 2026-09-13; other versions below are the installed versions resolved
 by `package-lock.json` on 2026-09-09. “Generally compatible” means the stated
 license is normally combinable with AGPLv3 when its notice and source terms are
 met; it is not a legal opinion.
@@ -10,7 +11,7 @@ met; it is not a legal opinion.
 
 | Component | Version | License | Usage | AGPLv3 assessment and notes |
 | --- | ---: | --- | --- | --- |
-| [@0x62/jsbsim-wasm](https://github.com/0x62/jsbsim-wasm) | 1.2.4-beta.4 | MIT SDK; bundled JSBSim WASM is LGPL-2.1 | Flight dynamics engine and virtual filesystem SDK | Conditional. Preserve LGPL notice and corresponding source for the engine and its Emscripten patch; see [JSBSim WASM integration](docs/jsbsim-wasm.md). Package metadata alone is incomplete. |
+| [@felipegalind0/jsbsim](https://github.com/Felipegalind0/jsbsim) | 1.2.4-fork.5, local tarball | MIT SDK; bundled JSBSim WASM is LGPL-2.1, with native third-party notices | Flight dynamics engine and virtual filesystem SDK, built from one JSBSim repository revision | Conditional. The SDK retains 0x62’s attribution and MIT notice; preserve native LGPL/third-party notices and corresponding source. The accepted distribution records its source identity and includes 14 hashed files, including notices. See [JSBSim WASM integration](docs/jsbsim.md). Package metadata alone is incomplete; aircraft/assets retain separate rights questions. |
 | [@babylonjs/core](https://www.babylonjs.com/) | 8.56.2 | Apache-2.0 | WebGL/WebGPU renderer | Generally compatible; retain Apache notice. |
 | [@babylonjs/loaders](https://www.babylonjs.com/) | 8.56.2 | Apache-2.0 | glTF and asset loading | Generally compatible; retain Apache notice. |
 | [3d-tiles-renderer](https://github.com/NASA-AMMOS/3DTilesRendererJS) | 0.4.24 | Apache-2.0 | 3D Tiles renderer and Google auth plugin | Generally compatible; retain Apache notice and Caltech/JPL non-endorsement notice. Provider data has separate terms. |

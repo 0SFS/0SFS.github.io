@@ -1,4 +1,4 @@
-import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
+import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 
 /**
  * The contact state JSBSim was in when the physics loop tripped.

@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
-import { JSBSimSdk } from "@0x62/jsbsim-wasm";
-import { wasmBinaryUrl, wasmModuleUrl } from "@0x62/jsbsim-wasm/wasm";
+import { JSBSimSdk } from "@felipegalind0/jsbsim";
+import { wasmBinaryUrl, wasmModuleUrl } from "@felipegalind0/jsbsim/wasm";
 import { describe, expect, it, vi } from "vitest";
 import type { SurfaceQuery, SurfaceHit } from "foss-earth/runtime";
 import { createTerrainContact, syncTerrainContact } from "./terrainContact";

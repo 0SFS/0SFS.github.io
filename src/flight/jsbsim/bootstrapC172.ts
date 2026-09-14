@@ -1,4 +1,4 @@
-import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
+import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import type { AircraftId } from "../aircraft/aircraftIds";
 import { FIXED_DT } from "../physics/fixedStepLoop";
 import { getFdmProfile } from "./fdmProfiles";
@@ -97,6 +97,13 @@ export async function bootstrapAircraft(
   if (isPiston) {
     sdk.setPropertyValue("propulsion/magneto_cmd", opts.engineRunning ? 3 : 0);
     sdk.setPropertyValue("fcs/mixture-cmd-norm", mixtureForAltitude(opts.altFt));
+  }
+  // Starting engines evaluates a full-power steady state internally. Restore
+  // the requested command and evaluate normal zero-time FCS/propulsion before
+  // exposing the first sample; native JSBSim owns the turbine state update.
+  sdk.setPropertyValue("fcs/throttle-cmd-norm", profile.initialThrottleNorm);
+  if (!sdk.runIc()) {
+    throw new Error(`JSBSim RunIC failed for ${aircraftId} engine initial conditions.`);
   }
 }
 

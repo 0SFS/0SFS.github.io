@@ -34,7 +34,7 @@ export default defineConfig({
     dedupe: ['@babylonjs/core', '@babylonjs/loaders', '3d-tiles-renderer', 'react', 'react-dom'],
   },
   optimizeDeps: {
-    exclude: ['@0x62/jsbsim-wasm'],
+    exclude: ['@felipegalind0/jsbsim'],
   },
   assetsInclude: ['**/*.wasm'],
   define: {

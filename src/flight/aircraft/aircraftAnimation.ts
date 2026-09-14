@@ -10,7 +10,7 @@ import {
   Vector3,
   type Scene,
 } from "@babylonjs/core";
-import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
+import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 
 /**
  * Drives the model's moving parts from JSBSim.

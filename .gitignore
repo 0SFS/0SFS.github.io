@@ -2,3 +2,6 @@ node_modules/
 dist/
 GOOGLE_3D_TILES.local.md
 .DS_Store
+
+# Local build/validation artifacts; identities and outcomes are documented.
+/build/

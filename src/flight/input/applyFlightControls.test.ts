@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
+import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import { applyFlightControls } from "./applyFlightControls";
 
 describe("applyFlightControls", () => {

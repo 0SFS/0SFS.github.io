@@ -2,7 +2,7 @@ import {
   MeshBuilder, NullEngine, PBRMaterial, Quaternion, Scene, Texture, TransformNode, Vector3,
 } from "@babylonjs/core";
 import { beforeEach, describe, expect, it } from "vitest";
-import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
+import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import {
   applyAircraftRig,
   bindAircraftRig,

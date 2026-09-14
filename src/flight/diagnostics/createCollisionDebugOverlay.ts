@@ -1,4 +1,4 @@
-import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
+import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import {
   Color3, Constants, Material, MeshBuilder, StandardMaterial, TransformNode, Vector3, VertexBuffer,
   type LinesMesh, type Mesh, type Scene,

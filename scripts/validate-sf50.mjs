@@ -19,24 +19,25 @@ if (afmHash !== SF50_AFM_SOURCE.sha256) {
 
 /**
  * Node 26 headless baseline runner. No browser, network, or production XML writes.
- * Requires the local SDK's lifetime/diagnostics changes to have been built.
+ * Verifies the installed fork artifact, or an explicitly selected checked candidate.
  */
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { createHash } from "node:crypto";
+import { verifyInstalledSdk, verifySdkDirectory } from "./verify-jsbsim-artifact.mjs";
 import { FlightModelDriver } from "../src/flight/model/flightModelDriver.ts";
 import { SF50_RATED_THRUST } from "../src/flight/validation/sf50ReferenceData.ts";
-import { evaluateSf50Performance } from "../src/flight/validation/evaluateSf50Performance.ts";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const args = process.argv.slice(2);
 const sdkArg = args.find(value => value.startsWith("--sdk-root="))?.slice("--sdk-root=".length);
 const sdkRoot = sdkArg ? path.resolve(sdkArg) : null;
-const sdkModule = await import(sdkRoot ? pathToFileURL(path.join(sdkRoot, "dist/index.js")).href : "@0x62/jsbsim-wasm");
-const wasm = await import(sdkRoot ? pathToFileURL(path.join(sdkRoot, "dist/wasm.js")).href : "@0x62/jsbsim-wasm/wasm");
+const sdkArtifact = sdkRoot ? await verifySdkDirectory(sdkRoot) : await verifyInstalledSdk(root);
+const sdkModule = await import(sdkRoot ? pathToFileURL(path.join(sdkRoot, "dist/index.js")).href : "@felipegalind0/jsbsim");
+const wasm = await import(sdkRoot ? pathToFileURL(path.join(sdkRoot, "dist/wasm.js")).href : "@felipegalind0/jsbsim/wasm");
 if (typeof sdkModule.JSBSimSdk.prototype.loadModelOrThrow !== "function") {
-  throw new Error("Build the upstream SDK changes with npm run build:sdk, then pass --sdk-root=/path/to/jsbsim-wasm. The installed SDK lacks diagnostic model loading.");
+  throw new Error("The selected fork artifact lacks diagnostic model loading. Build and check the SDK in its owning repository, then install its identified tarball or pass --sdk-root=/path/to/checked/artifact.");
 }
 
 const dataRoot = path.join(root, "public/jsbsim-data");
@@ -104,7 +105,6 @@ async function createDriver(reference) {
   return { driver, loading };
 }
 
-const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const neutral = { elevatorNorm: 0, aileronNorm: 0, rudderNorm: 0, throttleNorm: 0,
   flapsNorm: 0, gearDown: true, leftBrakeNorm: 0, rightBrakeNorm: 0 };
 function initialState(reference, fuelLb) {
@@ -170,9 +170,11 @@ const report = {
   benchmarkAssumptions: sf50AfmPilotAssumptions(SF50_SELECTED_PILOT_PROFILE),
   caseSelection: SF50_CASE_SELECTION,
 
-  schemaVersion: 1, aircraftId, generatedAt: new Date().toISOString(),
+  schemaVersion: 2, aircraftId, generatedAt: new Date().toISOString(),
   runtime: { node: process.version, platform: process.platform, arch: process.arch,
-    sdk: sdkRoot ?? "@0x62/jsbsim-wasm", fixedDtSec: 1 / 120 },
+    sdk: sdkRoot ?? "@felipegalind0/jsbsim", fixedDtSec: 1 / 120,
+    selection: sdkRoot ? "explicit-sdk-root-candidate" : "installed-app-dependency",
+    artifact: sdkArtifact },
   packageHashes, procedureVersion: "development-pilot-v6-response",
   calibrated: false, results, staticThrust: thrust,
 };

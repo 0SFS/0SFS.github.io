@@ -1,4 +1,4 @@
-import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
+import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import { Color3, Constants, MeshBuilder, TransformNode, Vector3, type Scene } from "@babylonjs/core";
 import { C172_GROUND_CONTACTS, groundContactBodyPosition } from "../physics/collisionGeometry";
 import { WHEEL_SPIN_CONFIGS, type WheelSpinState } from "../physics/wheelSpin";

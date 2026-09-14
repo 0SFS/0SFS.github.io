@@ -72,7 +72,7 @@ broader simulator is still taking shape.
 | [Development](docs/development.md) | Local setup, tests, the FOSS Earth dependency, building your own copy |
 | [Contributing](CONTRIBUTING.md) | Review expectations, asset provenance, pull request scope |
 | [FOSS Earth relationship](docs/foss-earth-relationship.md) | How OSFS and the shared globe runtime divide responsibilities |
-| [How JSBSim runs in the browser](docs/jsbsim-wasm.md) | The WebAssembly flight dynamics pipeline |
+| [How JSBSim runs in the browser](docs/jsbsim.md) | The WebAssembly flight dynamics pipeline |
 | [Ground contact](docs/ground-contact.md) | Terrain collision and gear contact against streamed meshes |
 | [Aircraft assets](docs/aircraft-assets.md) | Aircraft asset structure and provenance requirements |
 | [Creating an aircraft model](docs/creating-an-aircraft-model.md) | Modeling guide for contributing new aircraft |

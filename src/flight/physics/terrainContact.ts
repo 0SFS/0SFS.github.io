@@ -1,4 +1,4 @@
-import type { JSBSimSdk } from "@0x62/jsbsim-wasm";
+import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import type { SurfaceQuery } from "foss-earth/runtime";
 import { flightLog } from "../diagnostics/flightLog";
 import { getFdmProfile } from "../jsbsim/fdmProfiles";

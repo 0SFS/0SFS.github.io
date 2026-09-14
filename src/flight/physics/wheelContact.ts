@@ -60,7 +60,7 @@ const REQUIRED_METHODS = ["readContacts", "applyAcceptedImpulses"] as const;
 
 /**
  * Detects a typed contact bridge on the SDK object. The installed
- * @0x62/jsbsim-wasm exposes whole-simulation Run() and string properties
+ * @felipegalind0/jsbsim exposes whole-simulation Run() and string properties
  * only, so today this reports unavailable and the JSBSim path stays active.
  */
 export function probeWheelContactCapability(sdk: unknown): WheelContactCapability {
