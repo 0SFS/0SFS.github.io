@@ -1,0 +1,150 @@
+/* Live engine monitor. Sits in the evaluation column and matches its chips. */
+.flight-engine {
+  pointer-events: auto;
+  max-width: min(460px, calc(100vw - 24px));
+  font-size: 11px;
+  color: #e8edf5;
+  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+}
+
+.flight-engine__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 3px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.55);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.flight-engine__summary:hover {
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+.flight-engine__summary:focus-visible {
+  outline: 2px solid #e8b647;
+  outline-offset: 1px;
+}
+
+.flight-engine__title {
+  letter-spacing: 0.08em;
+  opacity: 0.8;
+}
+
+.flight-engine__values {
+  white-space: pre-wrap;
+}
+
+.flight-engine__phase {
+  padding: 0 5px;
+  border-radius: 4px;
+  background: #4a5260;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.flight-engine__phase[data-phase="running"] { background: #2e7d32; }
+.flight-engine__phase[data-phase="starting"],
+.flight-engine__phase[data-phase="motoring"],
+.flight-engine__phase[data-phase="turning"] { background: #f9a825; color: #15171a; }
+.flight-engine__phase[data-phase="windmilling"] { background: #1565c0; }
+.flight-engine__phase[data-phase="starved"],
+.flight-engine__phase[data-phase="stalled"],
+.flight-engine__phase[data-phase="seized"] { background: #c62828; }
+
+.flight-engine__details {
+  margin-top: 4px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.78);
+  max-height: min(70vh, calc(100vh - 180px));
+  overflow: auto;
+}
+
+.flight-engine__details[hidden] {
+  display: none;
+}
+
+.flight-engine__detail {
+  margin: 0 0 6px;
+  line-height: 1.35;
+}
+
+.flight-engine__muted {
+  margin: 0;
+  opacity: 0.7;
+}
+
+.flight-engine__section {
+  margin: 4px 0;
+}
+
+.flight-engine__section > summary {
+  cursor: pointer;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.flight-engine__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.flight-engine__table td,
+.flight-engine__table th {
+  padding: 1px 4px;
+  vertical-align: top;
+}
+
+.flight-engine__label {
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+.flight-engine__value {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.flight-engine__table--wrap .flight-engine__value {
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.flight-engine__group th {
+  padding-top: 5px;
+  text-align: left;
+  font-weight: 400;
+  opacity: 0.6;
+}
+
+.flight-engine__log {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  white-space: pre-wrap;
+}
+
+.flight-engine__button {
+  padding: 1px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.55);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.flight-engine__button:focus-visible {
+  outline: 2px solid #e8b647;
+  outline-offset: 1px;
+}

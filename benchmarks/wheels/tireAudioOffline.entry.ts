@@ -1,4 +1,4 @@
-import { createTireAudioGraph } from "../../src/flight/audio/createTireAudio";
+import { createTireAudioGraph } from "../../src/flight/audio/legacyTireAudioGraph";
 
 type AudioComparison = {
   durationSeconds: number;

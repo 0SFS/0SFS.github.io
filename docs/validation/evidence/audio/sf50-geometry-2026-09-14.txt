@@ -1,0 +1,9 @@
+inertia/cg-x-in = 159.56043956043956
+inertia/cg-y-in = 0
+inertia/cg-z-in = -39.120879120879124
+propulsion/engine[0]/x-position = 225
+propulsion/engine[0]/y-position = 0
+propulsion/engine[0]/z-position = 6
+atmosphere/a-fps = 1097.094813634724
+simulation/sim-time-sec = 0
+metrics/Sw-sqft = 195.7

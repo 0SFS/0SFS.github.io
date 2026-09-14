@@ -28,3 +28,8 @@
 - When browser verification requires a server, give the user the exact command and ask them to start it.
 - Do not assume permission from an already running server or from a request to test browser behavior.
 - If the agent started a server after an explicit request, report its URL and stop it as soon as the requested verification is complete.
+
+## Sound
+
+- `docs/sound.md` is the sound specification. `docs/validation/audio-implementation-ledger.md` records what is implemented, software-verified, pending and worth knowing. Nothing is qualified on a device, so never describe a tier as qualified without a device record.
+- After changing `src/flight/audio/dsp/*`, run `npm run build:audio` (emcc 6.0.9) and commit the WASM together with its provenance file. `npm run build` rejects a WASM that drifted from its sources.

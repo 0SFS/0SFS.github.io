@@ -14,6 +14,7 @@ import {
   Pause,
   Play,
   Plane,
+  Volume2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { BabylonRuntimeStatus, GoogleTerrainDetailState, RendererMode } from "foss-earth/runtime";
@@ -29,6 +30,8 @@ import {
 } from "../aircraft/aircraftCatalog";
 import type { AircraftModelStatus } from "../aircraft/createAircraftModel";
 import { AircraftSelectionPanel } from "./AircraftSelectionPanel";
+import { SoundSettingsPanel, type SoundAction } from "./SoundSettingsPanel";
+import type { FlightAudioStatus } from "../audio/createFlightAudio";
 import { flightLog, type FlightLogEntry } from "../diagnostics/flightLog";
 import {
   getActiveFlightPerformanceCapture,
@@ -48,11 +51,12 @@ import {
   type GroundInteractionPanelState,
 } from "./GroundInteractionSettingsPanel";
 
-export type FlightPanelTab = "weather" | "aircraft" | "debug" | "settings";
+export type FlightPanelTab = "weather" | "aircraft" | "sound" | "debug" | "settings";
 
 const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "weather", label: "Weather" },
   { id: "aircraft", label: "Aircraft" },
+  { id: "sound", label: "Sound" },
   { id: "debug", label: "Debug" },
   { id: "settings", label: "Settings" },
 ];
@@ -60,6 +64,7 @@ const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
 const TAB_ICONS = {
   weather: CloudSun,
   aircraft: Plane,
+  sound: Volume2,
   debug: Bug,
   settings: Settings,
 } satisfies Record<FlightPanelTab, typeof Plane>;
@@ -104,6 +109,8 @@ export interface FlightControlPanelSnapshot {
   wheelSpinMode: WheelSpinMode | "off";
   tireSoundEnabled: boolean;
   tireAudioStatus: string | null;
+  /** The shared sound runtime: engine sound and the tire cue. */
+  sound: FlightAudioStatus;
   wheelSpinStates: readonly WheelSpinState[];
   groundInteraction: GroundInteractionPanelState;
 }
@@ -128,6 +135,8 @@ export interface FlightControlPanelOptions {
   onCollisionDebugChange(enabled: boolean): void;
   onWheelSpinModeChange(mode: WheelSpinMode | "off"): void;
   onTireSoundChange(enabled: boolean): void;
+  /** Must act synchronously: the control's gesture is what unlocks audio. */
+  onSoundAction(action: SoundAction): void;
   onGroundInteractionAction(action: GroundInteractionAction): void;
 }
 
@@ -869,6 +878,7 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
               aircraftSelection={aircraftSelection}
               onAircraftSelectionChange={onAircraftSelectionChange}
               onAircraftFamilyChange={setSelectedAircraftFamily} />
+              : tabId === "sound" ? <SoundSettingsPanel state={props.snapshot.sound} onAction={props.onSoundAction} />
               : tabId === "settings" ? <>
                 <OrbitInvertSettingsPanel {...props} />
                 <fieldset className="flight-panel__fieldset">

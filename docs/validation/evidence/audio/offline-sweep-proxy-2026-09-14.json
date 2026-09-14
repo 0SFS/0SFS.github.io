@@ -1,0 +1,1011 @@
+{
+  "schema": "osfs-audio-bench/1",
+  "kind": "offline-kernel-proxy",
+  "disclaimer": "Synthetic sweep rendered offline in Node through the compiled core. Not real-time acceptance, not a device qualification, and no physical output route: dropout count is unknown.",
+  "createdUtc": "2026-09-14T09:43:31.941Z",
+  "environment": {
+    "node": "v26.8.2",
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpu": "Apple M5",
+    "logicalCpus": 10
+  },
+  "inputs": {
+    "sweepSha256": "0e4a927e80859f19f9fab923fb547d4aa6073b55e5dd6781ec2fcbf014704389",
+    "sweepSeconds": 240,
+    "seed": 1397110064,
+    "bridge": "none (direct WASM calls)",
+    "quantumFrames": 128,
+    "cockpitSourceMetres": [
+      0,
+      0.96,
+      -4.06
+    ]
+  },
+  "build": {
+    "wasmSha256": "ef9369b6b64cd93fb976ff0a19571de38b3dc0d06fbb5e1d3b6a17b4fe8a4d41",
+    "wasmBytes": 42542,
+    "emcc": null,
+    "flags": [
+      "-O3",
+      "-std=c++17",
+      "--no-entry",
+      "-sSTANDALONE_WASM=1",
+      "-sALLOW_MEMORY_GROWTH=1",
+      "-sINITIAL_MEMORY=2097152",
+      "-sSTACK_SIZE=131072",
+      "-sMALLOC=emmalloc",
+      "-sERROR_ON_UNDEFINED_SYMBOLS=1",
+      "-sFILESYSTEM=0",
+      "-fno-exceptions",
+      "-fno-rtti",
+      "-fno-fast-math"
+    ]
+  },
+  "dropouts": {
+    "count": null,
+    "detector": "none: offline render has no output route"
+  },
+  "runs": [
+    {
+      "tier": "off",
+      "sampleRate": 44100,
+      "pass": "sweep",
+      "shed": 0,
+      "tireSlipWatts": 0,
+      "seconds": 240,
+      "quantumMs": 2.9024943310657596,
+      "output": {
+        "peak": 0,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0,
+          "motoring": 0,
+          "light-off-and-idle": 0,
+          "acceleration": 0,
+          "maximum": 0,
+          "deceleration": 0,
+          "re-acceleration": 0,
+          "exterior-flyby": 0,
+          "cruise-config-cycle": 0,
+          "windmill": 0,
+          "rundown": 0,
+          "silence": 0
+        }
+      },
+      "core": {
+        "snapshotsIn": 14400,
+        "snapshotsDropped": 14336,
+        "eventsIn": 6,
+        "eventsDropped": 0,
+        "resyncs": 0,
+        "staleFades": 0,
+        "blocks": 0,
+        "frames": 0,
+        "peak": 0,
+        "telemetryAge": 0,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 0,
+        "queueDepth": 0,
+        "fade": 0,
+        "doppler": 0,
+        "distance": 0,
+        "tier": 0,
+        "shed": 0,
+        "epoch": 1
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0,
+        "repeats": [
+          {
+            "samples": 82688,
+            "meanMs": 0.00002949396526701911,
+            "p50Ms": 0.000040999999995960934,
+            "p95Ms": 0.00004200000000764703,
+            "maxMs": 0.20483399999999818,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.00016700000000469117,
+            "p95OverProposedBudget": null
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.00002574190934593344,
+            "p50Ms": 0.00004100000001017179,
+            "p95Ms": 0.00004200000000764703,
+            "maxMs": 0.0049999999999954525,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.00008400000000108321,
+            "p95OverProposedBudget": null
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.000025054167472963704,
+            "p50Ms": 0.00004100000001017179,
+            "p95Ms": 0.00004200000000764703,
+            "maxMs": 0.0007910000000208584,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.00008300000001781882,
+            "p95OverProposedBudget": null
+          }
+        ],
+        "aggregate": {
+          "samples": 248064,
+          "meanMs": 0.000026763347361972083,
+          "p50Ms": 0.000040999999995960934,
+          "p95Ms": 0.00004200000000764703,
+          "maxMs": 0.20483399999999818,
+          "overQuantumCount": 0,
+          "worstRolling2sP95Ms": 0.00016700000000469117,
+          "p95OverProposedBudget": null
+        }
+      }
+    },
+    {
+      "tier": "off",
+      "sampleRate": 48000,
+      "pass": "sweep",
+      "shed": 0,
+      "tireSlipWatts": 0,
+      "seconds": 240,
+      "quantumMs": 2.6666666666666665,
+      "output": {
+        "peak": 0,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0,
+          "motoring": 0,
+          "light-off-and-idle": 0,
+          "acceleration": 0,
+          "maximum": 0,
+          "deceleration": 0,
+          "re-acceleration": 0,
+          "exterior-flyby": 0,
+          "cruise-config-cycle": 0,
+          "windmill": 0,
+          "rundown": 0,
+          "silence": 0
+        }
+      },
+      "core": {
+        "snapshotsIn": 14400,
+        "snapshotsDropped": 14336,
+        "eventsIn": 6,
+        "eventsDropped": 0,
+        "resyncs": 0,
+        "staleFades": 0,
+        "blocks": 0,
+        "frames": 0,
+        "peak": 0,
+        "telemetryAge": 0,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 0,
+        "queueDepth": 0,
+        "fade": 0,
+        "doppler": 0,
+        "distance": 0,
+        "tier": 0,
+        "shed": 0,
+        "epoch": 1
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0,
+        "repeats": [
+          {
+            "samples": 90000,
+            "meanMs": 0.00002534264444445411,
+            "p50Ms": 0.00004100000001017179,
+            "p95Ms": 0.00004200000000764703,
+            "maxMs": 0.012958999999966636,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.00004200000000764703,
+            "p95OverProposedBudget": null
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.000026157866666677718,
+            "p50Ms": 0.00004100000001017179,
+            "p95Ms": 0.00004200000000764703,
+            "maxMs": 0.011124999999992724,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.00004200000000764703,
+            "p95OverProposedBudget": null
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.00002570915555553294,
+            "p50Ms": 0.00004100000001017179,
+            "p95Ms": 0.00004200000000764703,
+            "maxMs": 0.07450000000000045,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.00004200000000764703,
+            "p95OverProposedBudget": null
+          }
+        ],
+        "aggregate": {
+          "samples": 270000,
+          "meanMs": 0.00002573655555555492,
+          "p50Ms": 0.00004100000001017179,
+          "p95Ms": 0.00004200000000764703,
+          "maxMs": 0.07450000000000045,
+          "overQuantumCount": 0,
+          "worstRolling2sP95Ms": 0.00004200000000764703,
+          "p95OverProposedBudget": null
+        }
+      }
+    },
+    {
+      "tier": "low",
+      "sampleRate": 44100,
+      "pass": "sweep",
+      "shed": 0,
+      "tireSlipWatts": 0,
+      "seconds": 240,
+      "quantumMs": 2.9024943310657596,
+      "output": {
+        "peak": 0.05245433747768402,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0,
+          "motoring": 0.0014516134392104235,
+          "light-off-and-idle": 0.0029741897536577203,
+          "acceleration": 0.00484779253184657,
+          "maximum": 0.006519425607256303,
+          "deceleration": 0.005111539613805268,
+          "re-acceleration": 0.004812531920579114,
+          "exterior-flyby": 0.0009195118134628767,
+          "cruise-config-cycle": 0.006133536155498263,
+          "windmill": 0.00449281853510202,
+          "rundown": 0.0029932966802021063,
+          "silence": 0.000026777358311189104
+        }
+      },
+      "core": {
+        "snapshotsIn": 14400,
+        "snapshotsDropped": 0,
+        "eventsIn": 6,
+        "eventsDropped": 0,
+        "resyncs": 0,
+        "staleFades": 0,
+        "blocks": 82688,
+        "frames": 10584000,
+        "peak": 0.05245433585595301,
+        "telemetryAge": 0,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 0,
+        "queueDepth": 3,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 1,
+        "shed": 0,
+        "epoch": 1
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.12,
+        "repeats": [
+          {
+            "samples": 82688,
+            "meanMs": 0.022338540332332853,
+            "p50Ms": 0.02341599999999744,
+            "p95Ms": 0.025415999999950145,
+            "maxMs": 3.0448750000000473,
+            "overQuantumCount": 2,
+            "worstRolling2sP95Ms": 0.03491699999995035,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.02225007606907931,
+            "p50Ms": 0.023416999999881227,
+            "p95Ms": 0.024958000000424363,
+            "maxMs": 3.045082999999977,
+            "overQuantumCount": 1,
+            "worstRolling2sP95Ms": 0.028874999999970896,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.022243048785798407,
+            "p50Ms": 0.02345900000000256,
+            "p95Ms": 0.025000000000545697,
+            "maxMs": 3.0808749999996508,
+            "overQuantumCount": 2,
+            "worstRolling2sP95Ms": 0.030000000000654836,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 248064,
+          "meanMs": 0.02227722172907019,
+          "p50Ms": 0.023417000000335975,
+          "p95Ms": 0.02508299999999508,
+          "maxMs": 3.0808749999996508,
+          "overQuantumCount": 5,
+          "worstRolling2sP95Ms": 0.03491699999995035,
+          "p95OverProposedBudget": false
+        }
+      }
+    },
+    {
+      "tier": "low",
+      "sampleRate": 44100,
+      "pass": "capacity",
+      "shed": 0,
+      "tireSlipWatts": 15000,
+      "seconds": 240,
+      "quantumMs": 2.9024943310657596,
+      "output": {
+        "peak": 0.0891527459025383,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0.018763248719619163,
+          "motoring": 0.01884680434433898,
+          "light-off-and-idle": 0.018984268885848646,
+          "acceleration": 0.019432578481326287,
+          "maximum": 0.019830633346651895,
+          "deceleration": 0.019410412894108275,
+          "re-acceleration": 0.01938464276500454,
+          "exterior-flyby": 0.001148847775637388,
+          "cruise-config-cycle": 0.019759027223903193,
+          "windmill": 0.019339431798194095,
+          "rundown": 0.018982971332583094,
+          "silence": 0.018837422220497176
+        }
+      },
+      "core": {
+        "snapshotsIn": 14400,
+        "snapshotsDropped": 0,
+        "eventsIn": 6,
+        "eventsDropped": 0,
+        "resyncs": 0,
+        "staleFades": 0,
+        "blocks": 82688,
+        "frames": 10584000,
+        "peak": 0.0891527486754882,
+        "telemetryAge": 0,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 0,
+        "queueDepth": 3,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 1,
+        "shed": 0,
+        "epoch": 1
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.12,
+        "repeats": [
+          {
+            "samples": 82688,
+            "meanMs": 0.022998374310661627,
+            "p50Ms": 0.02404099999967002,
+            "p95Ms": 0.025583000000551692,
+            "maxMs": 2.568750000000364,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.029915999999502674,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.023046783705010277,
+            "p50Ms": 0.02404200000091805,
+            "p95Ms": 0.02562500000021828,
+            "maxMs": 3.229957999999897,
+            "overQuantumCount": 2,
+            "worstRolling2sP95Ms": 0.02862500000082946,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.022996098006965122,
+            "p50Ms": 0.024041999999099062,
+            "p95Ms": 0.02562500000021828,
+            "maxMs": 2.861332999998922,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.029125000000931323,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 248064,
+          "meanMs": 0.023013752007545674,
+          "p50Ms": 0.024041999999099062,
+          "p95Ms": 0.02562499999839929,
+          "maxMs": 3.229957999999897,
+          "overQuantumCount": 2,
+          "worstRolling2sP95Ms": 0.029915999999502674,
+          "p95OverProposedBudget": false
+        }
+      }
+    },
+    {
+      "tier": "low",
+      "sampleRate": 48000,
+      "pass": "sweep",
+      "shed": 0,
+      "tireSlipWatts": 0,
+      "seconds": 240,
+      "quantumMs": 2.6666666666666665,
+      "output": {
+        "peak": 0.04863426834344864,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0,
+          "motoring": 0.001437298743725602,
+          "light-off-and-idle": 0.002969155788652284,
+          "acceleration": 0.004746067322074102,
+          "maximum": 0.0063455903261851404,
+          "deceleration": 0.004987054224078378,
+          "re-acceleration": 0.0047107317344655735,
+          "exterior-flyby": 0.0009273047084045638,
+          "cruise-config-cycle": 0.005982996860195408,
+          "windmill": 0.004413537598411787,
+          "rundown": 0.0029678494836909946,
+          "silence": 0.000030057675713800452
+        }
+      },
+      "core": {
+        "snapshotsIn": 14400,
+        "snapshotsDropped": 0,
+        "eventsIn": 6,
+        "eventsDropped": 0,
+        "resyncs": 0,
+        "staleFades": 0,
+        "blocks": 90000,
+        "frames": 11520000,
+        "peak": 0.048634267393386534,
+        "telemetryAge": 0,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 0,
+        "queueDepth": 3,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 1,
+        "shed": 0,
+        "epoch": 1
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.12,
+        "repeats": [
+          {
+            "samples": 90000,
+            "meanMs": 0.02278149416666361,
+            "p50Ms": 0.023250000000189175,
+            "p95Ms": 0.025166999999783002,
+            "maxMs": 8.942332999999053,
+            "overQuantumCount": 7,
+            "worstRolling2sP95Ms": 0.10766599999988102,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.022053614466666073,
+            "p50Ms": 0.023166000000856002,
+            "p95Ms": 0.02491600000030303,
+            "maxMs": 3.0957909999997355,
+            "overQuantumCount": 1,
+            "worstRolling2sP95Ms": 0.02958299999954761,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.022196765244436232,
+            "p50Ms": 0.023208000002341578,
+            "p95Ms": 0.02491600000212202,
+            "maxMs": 3.130915999998251,
+            "overQuantumCount": 3,
+            "worstRolling2sP95Ms": 0.036583999997674255,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 270000,
+          "meanMs": 0.022343957959255305,
+          "p50Ms": 0.02320800000052259,
+          "p95Ms": 0.024999999999636202,
+          "maxMs": 8.942332999999053,
+          "overQuantumCount": 11,
+          "worstRolling2sP95Ms": 0.10766599999988102,
+          "p95OverProposedBudget": false
+        }
+      }
+    },
+    {
+      "tier": "low",
+      "sampleRate": 48000,
+      "pass": "capacity",
+      "shed": 0,
+      "tireSlipWatts": 15000,
+      "seconds": 240,
+      "quantumMs": 2.6666666666666665,
+      "output": {
+        "peak": 0.08757166564464569,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0.018254691841381523,
+          "motoring": 0.01839642455279809,
+          "light-off-and-idle": 0.018500826308703325,
+          "acceleration": 0.01888021683440511,
+          "maximum": 0.019297617885869915,
+          "deceleration": 0.018957784459964967,
+          "re-acceleration": 0.018883872825803314,
+          "exterior-flyby": 0.0011640617767568712,
+          "cruise-config-cycle": 0.019205939726605913,
+          "windmill": 0.01879584643799328,
+          "rundown": 0.01849355954839341,
+          "silence": 0.018297971244262346
+        }
+      },
+      "core": {
+        "snapshotsIn": 14400,
+        "snapshotsDropped": 0,
+        "eventsIn": 6,
+        "eventsDropped": 0,
+        "resyncs": 0,
+        "staleFades": 0,
+        "blocks": 90000,
+        "frames": 11520000,
+        "peak": 0.08757166766144074,
+        "telemetryAge": 0,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 0,
+        "queueDepth": 3,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 1,
+        "shed": 0,
+        "epoch": 1
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.12,
+        "repeats": [
+          {
+            "samples": 90000,
+            "meanMs": 0.022970444844441468,
+            "p50Ms": 0.023999999997613486,
+            "p95Ms": 0.02558399999907124,
+            "maxMs": 2.8857499999976426,
+            "overQuantumCount": 1,
+            "worstRolling2sP95Ms": 0.029959000003145775,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.022836924177783012,
+            "p50Ms": 0.02387500000259024,
+            "p95Ms": 0.025417000000743428,
+            "maxMs": 2.5053329999973357,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.029666000002180226,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.022819891833335836,
+            "p50Ms": 0.02391600000191829,
+            "p95Ms": 0.025417000000743428,
+            "maxMs": 3.5410830000000715,
+            "overQuantumCount": 1,
+            "worstRolling2sP95Ms": 0.03149999999732245,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 270000,
+          "meanMs": 0.022875753618520105,
+          "p50Ms": 0.023917000002256827,
+          "p95Ms": 0.025459000000410015,
+          "maxMs": 3.5410830000000715,
+          "overQuantumCount": 2,
+          "worstRolling2sP95Ms": 0.03149999999732245,
+          "p95OverProposedBudget": false
+        }
+      }
+    },
+    {
+      "tier": "med",
+      "sampleRate": 44100,
+      "pass": "sweep",
+      "shed": 0,
+      "tireSlipWatts": 0,
+      "seconds": 240,
+      "quantumMs": 2.9024943310657596,
+      "output": {
+        "peak": 0.03421042487025261,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0,
+          "motoring": 0.0021833073499467515,
+          "light-off-and-idle": 0.003721325025268834,
+          "acceleration": 0.005327505664525617,
+          "maximum": 0.007604405881748613,
+          "deceleration": 0.005632200246880107,
+          "re-acceleration": 0.005259910265972935,
+          "exterior-flyby": 0.0008248349777710654,
+          "cruise-config-cycle": 0.005645423351397171,
+          "windmill": 0.004910523779814143,
+          "rundown": 0.0038299811190324927,
+          "silence": 0.000035674135360295256
+        }
+      },
+      "core": {
+        "snapshotsIn": 14400,
+        "snapshotsDropped": 0,
+        "eventsIn": 6,
+        "eventsDropped": 0,
+        "resyncs": 0,
+        "staleFades": 0,
+        "blocks": 82688,
+        "frames": 10584000,
+        "peak": 0.0342104259682306,
+        "telemetryAge": 0,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 0,
+        "queueDepth": 3,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 2,
+        "shed": 0,
+        "epoch": 1
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.25,
+        "repeats": [
+          {
+            "samples": 82688,
+            "meanMs": 0.039993138847227744,
+            "p50Ms": 0.04133400000137044,
+            "p95Ms": 0.04587499999979627,
+            "maxMs": 3.172708000001876,
+            "overQuantumCount": 1,
+            "worstRolling2sP95Ms": 0.11275000000023283,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.0403157535071743,
+            "p50Ms": 0.04120899999907124,
+            "p95Ms": 0.046167000000423286,
+            "maxMs": 8.263333000002604,
+            "overQuantumCount": 6,
+            "worstRolling2sP95Ms": 0.10566599999947357,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.03996106897010052,
+            "p50Ms": 0.04125000000203727,
+            "p95Ms": 0.04633299999841256,
+            "maxMs": 3.272333000000799,
+            "overQuantumCount": 2,
+            "worstRolling2sP95Ms": 0.10962499999732245,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 248064,
+          "meanMs": 0.040089987108167524,
+          "p50Ms": 0.04129099999772734,
+          "p95Ms": 0.0461250000007567,
+          "maxMs": 8.263333000002604,
+          "overQuantumCount": 9,
+          "worstRolling2sP95Ms": 0.11275000000023283,
+          "p95OverProposedBudget": false
+        }
+      }
+    },
+    {
+      "tier": "med",
+      "sampleRate": 44100,
+      "pass": "capacity",
+      "shed": 0,
+      "tireSlipWatts": 15000,
+      "seconds": 240,
+      "quantumMs": 2.9024943310657596,
+      "output": {
+        "peak": 0.08847759664058685,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0.018763248719619163,
+          "motoring": 0.01891692788843123,
+          "light-off-and-idle": 0.019104169385142512,
+          "acceleration": 0.019546069682079482,
+          "maximum": 0.020208185680522107,
+          "deceleration": 0.01957585762495199,
+          "re-acceleration": 0.019514520319321983,
+          "exterior-flyby": 0.0010817334587588723,
+          "cruise-config-cycle": 0.019599884760597933,
+          "windmill": 0.01942592103873268,
+          "rundown": 0.01913137334766186,
+          "silence": 0.018837434158737214
+        }
+      },
+      "core": {
+        "snapshotsIn": 14400,
+        "snapshotsDropped": 0,
+        "eventsIn": 6,
+        "eventsDropped": 0,
+        "resyncs": 0,
+        "staleFades": 0,
+        "blocks": 82688,
+        "frames": 10584000,
+        "peak": 0.08847759296311387,
+        "telemetryAge": 0,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 0,
+        "queueDepth": 3,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 2,
+        "shed": 0,
+        "epoch": 1
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.25,
+        "repeats": [
+          {
+            "samples": 82688,
+            "meanMs": 0.040846298652772,
+            "p50Ms": 0.042249999998603016,
+            "p95Ms": 0.04679200000100536,
+            "maxMs": 3.3169589999961318,
+            "overQuantumCount": 2,
+            "worstRolling2sP95Ms": 0.11783299999660812,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.04073925677244041,
+            "p50Ms": 0.04208400000061374,
+            "p95Ms": 0.047416000001248904,
+            "maxMs": 3.20808300000499,
+            "overQuantumCount": 2,
+            "worstRolling2sP95Ms": 0.1007919999974547,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.04038758396623277,
+            "p50Ms": 0.04199999999400461,
+            "p95Ms": 0.0464159999974072,
+            "maxMs": 3.2286670000030426,
+            "overQuantumCount": 3,
+            "worstRolling2sP95Ms": 0.05362500000046566,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 248064,
+          "meanMs": 0.04065771313048173,
+          "p50Ms": 0.04208400000061374,
+          "p95Ms": 0.04691599999932805,
+          "maxMs": 3.3169589999961318,
+          "overQuantumCount": 7,
+          "worstRolling2sP95Ms": 0.11783299999660812,
+          "p95OverProposedBudget": false
+        }
+      }
+    },
+    {
+      "tier": "med",
+      "sampleRate": 48000,
+      "pass": "sweep",
+      "shed": 0,
+      "tireSlipWatts": 0,
+      "seconds": 240,
+      "quantumMs": 2.6666666666666665,
+      "output": {
+        "peak": 0.03148152679204941,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0,
+          "motoring": 0.0022552326630648966,
+          "light-off-and-idle": 0.0034678182848211533,
+          "acceleration": 0.0054024903197462315,
+          "maximum": 0.00685729221428117,
+          "deceleration": 0.00566798105007547,
+          "re-acceleration": 0.0053869649473165995,
+          "exterior-flyby": 0.0008356903259252796,
+          "cruise-config-cycle": 0.005767828337508595,
+          "windmill": 0.005021226239096744,
+          "rundown": 0.003988494273609215,
+          "silence": 0.000037334652217080635
+        }
+      },
+      "core": {
+        "snapshotsIn": 14400,
+        "snapshotsDropped": 0,
+        "eventsIn": 6,
+        "eventsDropped": 0,
+        "resyncs": 0,
+        "staleFades": 0,
+        "blocks": 90000,
+        "frames": 11520000,
+        "peak": 0.03148152789661013,
+        "telemetryAge": 0,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 0,
+        "queueDepth": 3,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 2,
+        "shed": 0,
+        "epoch": 1
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.25,
+        "repeats": [
+          {
+            "samples": 90000,
+            "meanMs": 0.04257910876666679,
+            "p50Ms": 0.04233399999793619,
+            "p95Ms": 0.04891700000007404,
+            "maxMs": 12.329125000003842,
+            "overQuantumCount": 13,
+            "worstRolling2sP95Ms": 0.26150000000052387,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.04020646800000508,
+            "p50Ms": 0.04175000000395812,
+            "p95Ms": 0.04695799999899464,
+            "maxMs": 3.396290999997291,
+            "overQuantumCount": 3,
+            "worstRolling2sP95Ms": 0.07045800000196323,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.03994848236665922,
+            "p50Ms": 0.041875000002619345,
+            "p95Ms": 0.0461250000007567,
+            "maxMs": 3.3626250000015716,
+            "overQuantumCount": 3,
+            "worstRolling2sP95Ms": 0.0610000000015134,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 270000,
+          "meanMs": 0.040911353044443696,
+          "p50Ms": 0.04200000000128057,
+          "p95Ms": 0.047292000002926216,
+          "maxMs": 12.329125000003842,
+          "overQuantumCount": 19,
+          "worstRolling2sP95Ms": 0.26150000000052387,
+          "p95OverProposedBudget": false
+        }
+      }
+    },
+    {
+      "tier": "med",
+      "sampleRate": 48000,
+      "pass": "capacity",
+      "shed": 0,
+      "tireSlipWatts": 15000,
+      "seconds": 240,
+      "quantumMs": 2.6666666666666665,
+      "output": {
+        "peak": 0.0894666537642479,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0.018254691841381523,
+          "motoring": 0.01847861215721617,
+          "light-off-and-idle": 0.018579034443744025,
+          "acceleration": 0.019056071561412372,
+          "maximum": 0.019479169970233426,
+          "deceleration": 0.019133092531543692,
+          "re-acceleration": 0.019082344610548,
+          "exterior-flyby": 0.0010948398943253228,
+          "cruise-config-cycle": 0.019138915271173788,
+          "windmill": 0.018938956420428074,
+          "rundown": 0.01868286419880488,
+          "silence": 0.018297971315171944
+        }
+      },
+      "core": {
+        "snapshotsIn": 14400,
+        "snapshotsDropped": 0,
+        "eventsIn": 6,
+        "eventsDropped": 0,
+        "resyncs": 0,
+        "staleFades": 0,
+        "blocks": 90000,
+        "frames": 11520000,
+        "peak": 0.08946665290342984,
+        "telemetryAge": 0,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 0,
+        "queueDepth": 3,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 2,
+        "shed": 0,
+        "epoch": 1
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.25,
+        "repeats": [
+          {
+            "samples": 90000,
+            "meanMs": 0.041887550522235445,
+            "p50Ms": 0.043041000004450325,
+            "p95Ms": 0.048707999994803686,
+            "maxMs": 10.51579099999799,
+            "overQuantumCount": 6,
+            "worstRolling2sP95Ms": 0.13858299999992596,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.04064557901109874,
+            "p50Ms": 0.04233399999793619,
+            "p95Ms": 0.04737500000192085,
+            "maxMs": 3.1102500000051805,
+            "overQuantumCount": 2,
+            "worstRolling2sP95Ms": 0.08237500000541331,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.041901875711096846,
+            "p50Ms": 0.0427919999929145,
+            "p95Ms": 0.04908299999078736,
+            "maxMs": 8.150625000009313,
+            "overQuantumCount": 5,
+            "worstRolling2sP95Ms": 0.16266699999687262,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 270000,
+          "meanMs": 0.04147833508147701,
+          "p50Ms": 0.04275000000779983,
+          "p95Ms": 0.048458999997819774,
+          "maxMs": 10.51579099999799,
+          "overQuantumCount": 13,
+          "worstRolling2sP95Ms": 0.16266699999687262,
+          "p95OverProposedBudget": false
+        }
+      }
+    }
+  ]
+}

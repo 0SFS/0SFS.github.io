@@ -36,11 +36,15 @@ import { applyAircraftRig, readControlSurfaceState } from "./aircraft/aircraftAn
 import { flightLog } from "./diagnostics/flightLog";
 import { createFlightRecorder } from "./diagnostics/flightRecorder";
 import { createEvaluationInstruments } from "./hud/evaluationInstruments";
+import { createEngineMonitor } from "./hud/engineMonitor";
 import { createCollisionDebugOverlay } from "./diagnostics/createCollisionDebugOverlay";
 import { createWheelSpinDebugOverlay } from "./diagnostics/createWheelSpinDebugOverlay";
 import { createWheelSpinExperiment } from "./physics/createWheelSpinExperiment";
 import type { WheelSpinMode } from "./physics/wheelSpin";
 import { createTireAudio } from "./audio/createTireAudio";
+import { createFlightAudio } from "./audio/createFlightAudio";
+import { createAudioSettingsStore } from "./audio/audioSettings";
+import { createJsbsimAudioAdapter } from "./audio/jsbsimAudioAdapter";
 import { WHEEL_SPIN_CONFIGS } from "./physics/wheelSpin";
 import { probeWheelContactCapability } from "./physics/wheelContact";
 import { createSlipAudioSink, createWheelCueBus, type WheelCueResetReason } from "./feedback/wheelCueBus";
@@ -488,8 +492,39 @@ export async function createFlightSimApp(
   let acceptedWheelSteps = 0;
   let groundRevision = 0;
   const wheelSpin = createWheelSpinExperiment(jsbsim.sdk);
-  const tireAudio = createTireAudio();
+  // One sound owner for the engine and the tire cue: one context, one worklet,
+  // one limiter, one set of holds (sound.md §2). Nothing is allocated until a
+  // gesture asks for sound.
+  const audioSettingsStore = createAudioSettingsStore((() => {
+    try { return window.localStorage; } catch { return null; }
+  })());
+  // Status can change before the panel exists (a restored tire cue arms its
+  // unlock during startup), so refreshes wait until there is a panel to refresh.
+  let audioPanelReady = false;
+  const flightAudio = createFlightAudio({
+    settings: audioSettingsStore,
+    onStatusChange: () => {
+      if (audioPanelReady) controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+    },
+  });
+  if (getAircraftFamilyForAircraft(initialAircraftId).id === "cirrus-vision-jet") {
+    // Engine sound is SF50-only: the C172 is not a turbofan, and keeps its tire cue.
+    try {
+      flightAudio.attachAdapter(createJsbsimAudioAdapter(jsbsim.sdk, {
+        gearHeightMetres: getFdmProfile(initialAircraftId).stance.staticMeters,
+      }));
+    } catch (error) {
+      flightLog.warn("sim", "Engine sound telemetry is unavailable; the tire cue still plays", {
+        reason: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+  const tireAudio = createTireAudio({ audio: flightAudio });
   tireAudio.setPaused(true);
+  // Engine sound is held for pause and world loading only. Blocked terrain and
+  // contact faults hold the tire cue alone (through tireAudio); the engine
+  // follows its telemetry, so a flickering contact cannot chop it.
+  flightAudio.setHeld(true, "loading");
   // Accepted fixed steps only; presentation consumers can never feed back into forces.
   const wheelCues = createWheelCueBus(WHEEL_SPIN_CONFIGS.map(config => config.name), error => {
     flightLog.warn("sim", "A wheel feedback consumer failed and was detached", {
@@ -513,6 +548,8 @@ export async function createFlightSimApp(
     tireAudio.update(0);
   };
   const physicsLoop = createFixedStepPhysicsLoop(jsbsim.sdk, () => {
+    // Ahead of the wheel guard: engine sound must not depend on a wheel experiment.
+    flightAudio.publishStep();
     if (wheelSpinMode === "off") return;
     wheelSpin.step(FIXED_DT, wheelSpinMode);
     acceptedWheelSteps += 1;
@@ -572,6 +609,11 @@ export async function createFlightSimApp(
   const evaluationInstruments = createEvaluationInstruments(hudRoot, {
     recorder: flightRecorder,
     recordingName: () => `0sfs-${initialAircraftId}-${__SOURCE_VERSION__}-${new Date().toISOString().replace(/[:.]/g, "-")}`,
+  });
+  // Live engine data under the evaluation readouts, with what sound is hearing,
+  // so a sound problem can be told apart from an engine that is really doing that.
+  const engineMonitor = createEngineMonitor(hudRoot.querySelector<HTMLElement>(".flight-eval") ?? hudRoot, {
+    soundStatus: () => flightAudio.getStatus(),
   });
   // Session-only debug opt-in: no overlay meshes or SDK reads until enabled.
   let collisionDebugEnabled = false;
@@ -825,6 +867,7 @@ export async function createFlightSimApp(
       wheelSpinMode,
       tireSoundEnabled,
       tireAudioStatus: tireAudio.getStatus(),
+      sound: flightAudio.getStatus(),
       wheelSpinStates: wheelSpinMode === "off" ? [] : wheelSpin.getStates().map(wheel => ({ ...wheel })),
       groundInteraction: {
         settings: groundStore.settings,
@@ -872,6 +915,7 @@ export async function createFlightSimApp(
     phoneSession?.cancelHandoff();
     physicsLoop.setPaused(paused || worldLoading);
     tireAudio.setPaused(paused || worldLoading);
+    flightAudio.setHeld(paused, "pause");
     runtime.setSimRunning(!paused && !worldLoading);
     skipResumeDelta = !paused;
     const state = physicsLoop.getLatestState() ?? initialState;
@@ -896,6 +940,7 @@ export async function createFlightSimApp(
     const abort = placementAbort = new AbortController();
     worldLoading = true;
     tireAudio.setPaused(true);
+    flightAudio.setHeld(true, "loading");
     resetWheelSpin("teleport");
     applyGroundBoundary();
     physicsLoop.setPaused(true);
@@ -935,6 +980,8 @@ export async function createFlightSimApp(
       }
       appliedControls = inputManager.getControls();
       physicsLoop.reset();
+      // A reposition is a discontinuity: new timeline, cleared queues, a fade.
+      flightAudio.beginEpoch();
       applyWeather(weather);
       pitchAutoTrim = createAutoTrimState(pitchAutoTrim.enabled);
       rollAutoTrim = createAutoTrimState(rollAutoTrim.enabled);
@@ -949,6 +996,7 @@ export async function createFlightSimApp(
       aircraft?.setViewMode(aircraft.getViewMode());
       physicsLoop.setPaused(inputManager.isPaused());
       tireAudio.setPaused(inputManager.isPaused());
+      flightAudio.setHeld(false, "loading");
       runtime.setSimRunning(!inputManager.isPaused());
       skipResumeDelta = true;
       phoneSession?.syncStatus();
@@ -1119,6 +1167,18 @@ export async function createFlightSimApp(
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
       runtime.requestRender();
     },
+    onSoundAction: (action) => {
+      // Synchronous inside the control's gesture so audio can unlock.
+      switch (action.type) {
+        case "enable": flightAudio.setEnabled(action.enabled); break;
+        case "quality": flightAudio.setQuality(action.quality); break;
+        case "settings": flightAudio.patchSettings(action.patch); break;
+        case "retest": flightAudio.retest(); break;
+        case "allow-unvalidated": flightAudio.setAllowUnvalidated(action.allowed); break;
+      }
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+      runtime.requestRender();
+    },
     onGroundInteractionAction: (action) => {
       handleGroundAction(action);
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
@@ -1131,6 +1191,7 @@ export async function createFlightSimApp(
       runtime.requestRender();
     },
   });
+  audioPanelReady = true;
   const rendererForce = getRendererForceFromUrl();
   hudBar = createFlightHudBar(shellRoot, {
     renderActivity: runtime,
@@ -1368,7 +1429,8 @@ export async function createFlightSimApp(
     }
 
     const viewQueryStartedMs = flightPerformance ? performance.now() : 0;
-    const surfaceHeight = flightSurface.sample(displayState.latDeg, displayState.lonDeg)?.heightMeters ?? 0;
+    const sampledSurfaceHeight = flightSurface.sample(displayState.latDeg, displayState.lonDeg)?.heightMeters ?? null;
+    const surfaceHeight = sampledSurfaceHeight ?? 0;
     if (flightPerformance) terrainQueryCpuMs += performance.now() - viewQueryStartedMs;
 
     runtime.setSimViewState({
@@ -1379,6 +1441,16 @@ export async function createFlightSimApp(
     });
 
     floatingOrigin?.apply(displayState);
+    const audioCamera = runtime.scene.activeCamera;
+    if (aircraft && audioCamera && flightAudio.isEngineActive()) {
+      flightAudio.updateView({
+        camera: audioCamera,
+        aircraftRoot: aircraft.root,
+        exterior: aircraft.getViewMode() === "third" ? 1 : 0,
+        // Unknown terrain switches the ground reflection off rather than guessing it.
+        heightAboveGroundM: sampledSurfaceHeight === null ? null : displayState.altMeters - sampledSurfaceHeight,
+      });
+    }
     if (collisionDebugEnabled) collisionDebugOverlay?.update();
     if (collisionDebugEnabled && wheelSpinMode !== "off") wheelSpinDebugOverlay?.update();
     const rig = aircraftModel?.getRig();
@@ -1395,6 +1467,7 @@ export async function createFlightSimApp(
     }
     flightRecorder.sample(jsbsim.sdk);
     evaluationInstruments.update(jsbsim.sdk);
+    engineMonitor.update(jsbsim.sdk);
     if (flightPerformance) {
       const tileMetrics = runtime.getTileMetrics();
       flightPerformance.record({
@@ -1440,6 +1513,7 @@ export async function createFlightSimApp(
       statusOverlay?.destroy();
       controlPanel?.destroy();
       evaluationInstruments.destroy();
+      engineMonitor.destroy();
       flightHud.destroy();
       collisionDebugOverlay?.dispose();
       wheelSpinDebugOverlay?.dispose();
@@ -1447,6 +1521,8 @@ export async function createFlightSimApp(
       gamepadHaptics.dispose();
       wheelCues.invalidate("dispose");
       tireAudio.dispose();
+      // Before jsbsim.dispose(): the audio adapter's property batch must not outlive the SDK.
+      flightAudio.dispose();
       aircraftModel?.dispose();
       aircraft?.dispose();
       floatingOrigin?.dispose();
@@ -1468,6 +1544,8 @@ export async function createFlightSimApp(
     worldLoading = false;
     physicsLoop.setPaused(inputManager.isPaused());
     tireAudio.setPaused(inputManager.isPaused());
+    flightAudio.setHeld(inputManager.isPaused(), "pause");
+    flightAudio.setHeld(false, "loading");
     runtime.setSimRunning(!inputManager.isPaused());
     loading.hide();
     runtime.requestRender();

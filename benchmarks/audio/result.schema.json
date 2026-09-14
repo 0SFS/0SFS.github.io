@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "osfs-audio-bench/1",
+  "title": "0sfs audio benchmark result",
+  "description": "One schema for both offline proxies and device qualification records (sound.md §5). `kind` says which; only `device-qualification` records can qualify a tier, and only with a validated dropout detector.",
+  "type": "object",
+  "required": ["schema", "kind", "disclaimer", "createdUtc", "environment", "inputs", "build", "dropouts", "runs"],
+  "properties": {
+    "schema": { "const": "osfs-audio-bench/1" },
+    "kind": { "enum": ["offline-kernel-proxy", "headless-worklet-check", "device-qualification", "overload-positive-control"] },
+    "disclaimer": { "type": "string" },
+    "createdUtc": { "type": "string" },
+    "environment": {
+      "type": "object",
+      "required": ["platform"],
+      "properties": {
+        "platform": { "type": "string" },
+        "device": { "type": "string", "description": "Named device. Required for device-qualification." },
+        "osBuild": { "type": "string" },
+        "browserBuild": { "type": "string" },
+        "outputRoute": { "type": "string", "description": "Physical route, e.g. built-in speaker, wired headphones." },
+        "gpuAdapter": { "type": "string", "description": "Hardware adapter; software renderers are rejected for integrated runs." },
+        "powerAndThermal": { "type": "string" }
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "required": ["sweepSha256", "seed", "bridge"],
+      "properties": {
+        "sweepSha256": { "type": "string" },
+        "seed": { "type": "integer" },
+        "bridge": { "type": "string" }
+      }
+    },
+    "build": {
+      "type": "object",
+      "required": ["wasmSha256"],
+      "properties": {
+        "wasmSha256": { "type": "string" },
+        "sourceCommit": { "type": "string" },
+        "assetHashes": { "type": "object" },
+        "flags": {}
+      }
+    },
+    "dropouts": {
+      "type": "object",
+      "required": ["count", "detector"],
+      "properties": {
+        "count": { "type": ["integer", "null"], "description": "null means unknown. Unknown can never pass." },
+        "detector": { "type": "string" },
+        "positiveControl": { "type": "string", "description": "Path/hash of the separate induced-overload capture that the detector reported." }
+      }
+    },
+    "runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["tier", "sampleRate", "pass", "shed", "output", "timing"],
+        "properties": {
+          "tier": { "enum": ["off", "low", "med", "high"] },
+          "sampleRate": { "type": "number", "description": "Actual context/render rate, not the requested one." },
+          "pass": { "enum": ["sweep", "capacity", "fault-injection", "soak"] },
+          "shed": { "type": "integer" },
+          "output": {
+            "type": "object",
+            "required": ["peak", "nonFiniteSamples"],
+            "properties": {
+              "peak": { "type": "number" },
+              "nonFiniteSamples": { "type": "integer" }
+            }
+          },
+          "timing": {
+            "type": "object",
+            "required": ["provenance", "aggregate"],
+            "properties": {
+              "provenance": { "type": "string", "description": "Which clock timed what. Offline and worker timings are proxies." },
+              "aggregate": {
+                "type": "object",
+                "required": ["samples", "p95Ms", "maxMs", "overQuantumCount"],
+                "properties": {
+                  "samples": { "type": "integer" },
+                  "p95Ms": { "type": ["number", "null"] },
+                  "maxMs": { "type": ["number", "null"] },
+                  "overQuantumCount": { "type": "integer" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
