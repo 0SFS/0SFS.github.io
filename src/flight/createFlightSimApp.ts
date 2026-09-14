@@ -388,7 +388,7 @@ export async function createFlightSimApp(
     signal: startupAbort.signal,
     onProgress: progress => loading.setPhase("terrain", {
       state: progress.phase === "ready" ? "ready" : "loading",
-      detail: progress.message, progress: progress.progress,
+      detail: progress.message, terrain: progress,
     }),
   }));
   // The full readiness join happens after the visual assets have started too.
@@ -963,7 +963,7 @@ export async function createFlightSimApp(
       onProgress: progress => {
         if (!abort.signal.aborted) loading.setPhase("terrain", {
           state: progress.phase === "ready" ? "ready" : "loading",
-          detail: progress.message, progress: progress.progress,
+          detail: progress.message, terrain: progress,
         });
       },
     }, allowCoarserTerrainThisSession).then(terrain => {

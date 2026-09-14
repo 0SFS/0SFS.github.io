@@ -83,7 +83,7 @@
   transition: opacity 500ms ease;
 }
 .game-log__icon { color: #9aabb8; text-align: center; }
-.game-log__text { overflow-wrap: anywhere; }
+.game-log__text { overflow-wrap: anywhere; white-space: pre-line; }
 .game-log__text a { color: var(--game-log-accent); pointer-events: auto; }
 .game-log__value { color: #9aabb8; font-variant-numeric: tabular-nums; }
 .game-log__actions { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
@@ -111,4 +111,10 @@
 @keyframes game-log-pulse { to { transform: translateX(210%); } }
 @media (prefers-reduced-motion: reduce) {
   .game-log__line, .game-log__bar::before { transition: none; animation: none; }
+}
+
+/* Startup has actionable diagnostics, not a single opaque progress value. */
+.game-log[data-loading-details] {
+  max-height: min(65vh, 30rem);
+  max-height: min(65dvh, 30rem);
 }
