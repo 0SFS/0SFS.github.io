@@ -1,6 +1,7 @@
 # SF50 pilot evaluation readiness
 
-Date: 2026-09-13. Applies to the G1 package (`aircraft/sf50`).
+Date: 2026-09-13, updated 2026-09-14. Applies to the G1 package
+(`aircraft/sf50`).
 
 A former Cirrus test pilot's time is best spent on what only a pilot can judge:
 how the airplane responds, how it feels and how much work it takes. Anything a
@@ -14,6 +15,29 @@ Status meanings:
 - **Blocks** — without it the pilot cannot give useful feedback on the airplane.
 - **Weakens** — a session is possible, but their comments will be muddied.
 - **Done** — finished and checked.
+
+## What changed on 2026-09-14
+
+- **Done — thrust, drag and idle N1 calibrated** (item 1, item 7's idle half).
+  The climb ratio at the AFM's MCT N1 went from 0.85 low down and 1.66 at
+  28,000 ft to 0.98 and 1.01, and cruise N1 error from a median of −1.98 to
+  −0.54. Held-out ISA+10 cruise rows check no worse than the fitted rows.
+  Idle spool speeds are now the ERA22LA404 recorder's 24.3 % N1 / 53.4 % N2.
+  [Calibration record](sf50-propulsion-drag-calibration-2026-09-14.md).
+- **Done — stall warning and stick pusher** (item 2). AoA-triggered, scheduled by
+  flap position, inhibited on the ground. Flown as the AFM demonstrates it, the
+  pusher fires at 86.0, 77.1 and 66.0 KCAS against printed 86, 77 and 67, and
+  the warning about 5 kt ahead of it.
+- **Done — N1, fuel flow, AoA and CAS warnings on the HUD** (item 3), and a
+  **flight recorder** with a mark key and CSV export (item 4). Readouts appear
+  only for properties the loaded aircraft has, so the C172 shows no N1 box.
+- **Done — idle fuel flow** (item 8). `1.2.4-fork.7` is adopted and the package
+  declares the recorded 76 lbm/hr; the model idles at 11.28 US gph instead of
+  71.44, and the two lowest AFM cruise rows are reachable.
+- **Done — test card** (item 6): [SF50 pilot test card](sf50-pilot-test-card.md).
+- Still open: real controls (item 5), starting scenarios (item 10), build version
+  in the app (item 11), spool-down (item 7's remaining half), landing flare
+  distance (item 9), ESP and yaw damper (item 12).
 
 ## What changed on 2026-09-13
 
@@ -36,6 +60,10 @@ Status meanings:
 ## Blocks
 
 ### 1. Climb and cruise: too much thrust, or too little drag, at altitude
+
+**Done on 2026-09-14** — see the
+[calibration record](sf50-propulsion-drag-calibration-2026-09-14.md). The
+measurements below are what the problem looked like before the fit.
 
 A pilot will see this in the first climb.
 
@@ -113,6 +141,9 @@ scripts; can start now.
 
 ### 2. No stall warning, stick pusher or low-speed awareness
 
+**Done on 2026-09-14**, except the low-speed band on the airspeed tape. The
+measurements below are what the thresholds were derived from.
+
 The real airplane defines its stall speed as the speed at which the stick pusher
 fires (AFM 2-26). It has STALL WARNING and STICK PUSHER CAS warnings, both
 answered with "AOA — reduce, thrust lever — T/O" (3-81), and a low-speed band on
@@ -136,27 +167,36 @@ varies with weight, which is what makes AoA the right trigger. One oddity to
 check: the model needs less AoA at 50 % flap than at 0 %, because its flap
 effect is a constant lift increment that does not move the stall angle.
 
-**Next.** Add AoA-triggered stall warning and pusher to the SF50 package, with
-per-flap trigger angles from this table; show the warning in the app. Unknown and
-worth asking the pilot: the warning margin ahead of the pusher, and how hard and
-how fast the pusher pushes. Owner: aircraft package now; warning display is app
-HUD work (coordinate).
+**Done.** The package's `Stall Protection` channel triggers on AoA with these
+per-flap angles, the warning 5 kt of AoA ahead of the pusher, both inhibited on
+the ground, and the HUD shows both as red CAS boxes. Still unknown and worth
+asking the pilot: the real warning margin ahead of the pusher, and how hard and
+how fast the real pusher pushes. The low-speed band on the airspeed tape is not
+built.
 
 ### 3. Engine and warning instruments
 
-The SF50 is flown by N1. The HUD shows IAS, altitude, vertical speed, heading,
-pitch, roll, throttle, flaps, trim and autopilot state. It shows no N1, fuel
-flow, AoA or low-speed awareness, and no CAS messages. Owner: app HUD (another
-agent is editing it; coordinate).
+**Done on 2026-09-14.**
+
+The SF50 is flown by N1. The HUD showed IAS, altitude, vertical speed, heading,
+pitch, roll, throttle, flaps, trim and autopilot state, and no N1, fuel flow, AoA
+or CAS messages. `src/flight/hud/evaluationInstruments.ts` now adds N1, fuel flow
+and AoA chips and a red CAS box carrying STALL WARNING and STICK PUSHER, with
+STICK PUSHER outranking the warning. Each readout appears only if the loaded
+aircraft has the property, so the C172 shows fuel flow and AoA without an N1 box.
+The low-speed awareness band is still not built.
 
 ### 4. No flight recorder
 
-`flightPerformanceCapture.ts` records frame timing only (`flightPerf=1`). Nothing
-records the flight itself, so a comment like "the nose drops too much when the
-flaps come down" cannot be tied to what the model did. Needed: aircraft state and
-control inputs at a fixed rate, a "mark" button the pilot can press, and CSV
-export, recorded with the build version. Owner: app (touches
-`createFlightSimApp.ts`, which another agent is editing; coordinate).
+**Done on 2026-09-14.**
+
+`flightPerformanceCapture.ts` records frame timing only (`flightPerf=1`).
+`src/flight/diagnostics/flightRecorder.ts` now records 44 channels of aircraft
+state and the control positions JSBSim actually received, sampled on simulation
+time at 20 Hz into a half-hour ring buffer, with a MARK button and the M key, and
+CSV export. The file's header carries the build version, the aircraft, the JSBSim
+identity and every mark. Samples come from JSBSim properties rather than the
+app's input objects, so the record is what physics saw whoever was flying.
 
 ### 5. Real controls
 
@@ -167,6 +207,8 @@ travel, and decide whether the casual auto-trim assist stays off for the
 evaluation (it should). Owner: app input and the gamepad work in progress.
 
 ### 6. Test card and briefing
+
+**Done on 2026-09-14**: [SF50 pilot test card](sf50-pilot-test-card.md).
 
 The session needs a card, not an open-ended "what do you think":
 pitch and roll response; trim changes with flaps, gear and power; slow flight
@@ -203,12 +245,13 @@ separately.
 
 ### 8. Idle fuel flow is 6.4 times too high
 
-Model 71.4 US gph; recorded ground idle 11.24 gph (76 lb/hr). The JSBSim capability
-is built (`Felipegalind0/jsbsim` `c70be257`). It needs a `1.2.4-fork.7` package
-adopted together with `<idlefuelflow>76</idlefuelflow>` in `engine/fj33_5a.xml`.
-Adoption changes `package.json` and `package-lock.json`, which currently hold
-another agent's uncommitted gamepad-tools dependency, so it waits for that. Only
-visible once fuel flow is displayed (item 3).
+**Done on 2026-09-14.**
+
+Model 71.4 US gph; recorded ground idle 11.24 gph (76 lb/hr). `1.2.4-fork.7` is
+adopted and `engine/fj33_5a.xml` declares `<idlefuelflow>76</idlefuelflow>`, so
+the model idles at 11.28 gph. The retained fork.6 tarball still reports 71.44 on
+the same package, which is the negative control for the adoption
+([evidence](evidence/jsbsim/idle-fuel-flow/)).
 
 ### 9. Takeoff and landing
 
@@ -246,13 +289,15 @@ either and has not been checked against the AFM. Tell the pilot, or model them.
 
 ## Order of work
 
-1. Thrust and drag at altitude (item 1), then idle N1 and spool with it (item 7).
-2. Stall warning and pusher in the package (item 2).
-3. Test card and known-issue briefing (item 6).
-4. With the agent working on the app: N1, fuel flow, AoA and warnings on the HUD
-   (item 3); flight recorder and starting scenarios (items 4, 10); controls
-   (item 5); fork.7 and idle fuel flow once `package.json` is free (item 8).
-5. Redeploy and run the whole check set against the deployed build.
+Items 1, 2, 3, 4, 6 and 8 are done. What is left, in order:
+
+1. Real controls: a joystick and throttle, with auto-trim off (item 5).
+2. Repeatable starting scenarios (item 10) and the build version where the pilot
+   can read it (item 11).
+3. Spool-down timing (the rest of item 7).
+4. Redeploy and run the whole check set against the deployed build.
+5. After the session: landing flare distance (item 9), ESP and yaw damper
+   (item 12).
 
 ## Reproduce
 
