@@ -2,9 +2,11 @@
 
 Updated: 2026-09-12. Development simulation only, not an operational reference.
 
+Latest phase: [source qualification and parameter plan](sf50-calibration-qualification-2026-09-12.md). All 41 windows now have recorded dispositions (zero eligible); 27 selected ISA AFM rows have numeric transcription review without condition approval. The 600/220 allocation is retained and now enforced by the comparison helper, with an explicit same-source-check purpose and no independence override. Cruise anti-ice is explicitly unknown. Dashboard OAT is labeled Celsius in the pinned chart; raw `gal/Hr` is retained without declaring US gallons. Older cached outputs still have their previous labels until an authorized new processing run. Aircraft XML, shared provisional physics and the family UI were preserved. Regression source was prepared; no tests or flight runs executed.
+
 ## What this implementation changes
 
-- The aircraft picker offers G1, G2 and G3. The existing `cirrus-vision-jet` saved preference remains G1; G2/G3 have separate persistent IDs and JSBSim packages.
+- The aircraft-family image gallery selects C172 or Vision Jet; the Vision Jet controls below the gallery offer G1, G2, G2+ and G3. The existing `cirrus-vision-jet` saved preference remains G1; G2/G3 have separate persistent IDs and JSBSim packages, while G2+ is currently exposed as a separate generation label that maps to the existing G2 runtime.
 - G1 is the canonical editable airframe. `scripts/build-sf50-variants.mjs` generates the G2/G3 XML packages from it to avoid hand-maintained copies.
 - All three currently share development aerodynamics, estimated installed-thrust/spool/bleed behavior and the exterior meshes. Separate IDs do **not** mean three independently calibrated aircraft. The picker explicitly discloses this.
 - G2 means the original G2 configuration, not G2+. G2+ performance evidence is separately tagged; it is not silently reused as G3.
@@ -70,17 +72,24 @@ The implementation-run ledger is `planes/Cirrus_Vision_Jet/tests/public-evidence
 
 The G3 website lists 1,910 ft takeoff ground roll, 2,815 ft over 50 ft and 317 KTAS maximum cruise. These do not specify one complete matched test condition and are not installed as golden tests. Its seating wording also varies between page sections; the generation profile does not invent a new loading distribution from marketing copy.
 
-Next: complete transcription/conditions review, review normal-flight windows and loading metadata, obtain applicable G2/G3 AFM/installed-engine configuration evidence, fit identifiable parameters, then execute matched native/WASM runs and independent holdouts. Browser selection and the changed model packages still need focused tests and a flight smoke test. Generic engine/SDK changes belong upstream; this pass changes app-owned aircraft data and evidence processing only.
+Next: complete transcription/conditions review, review normal-flight windows and loading metadata, obtain applicable G2/G3 AFM/installed-engine configuration evidence, fit identifiable parameters, then execute matched native/WASM runs and independent holdouts. The implemented family-selection UI and changed model packages still need authorized focused tests and a flight smoke test. Generic engine/SDK changes belong upstream; the original variant pass changed app-owned aircraft data and evidence processing, and the subsequent gallery implementation changed selection/presentation UI only.
 
 
-## Conversation handoff and revised selection UI (2026-09-12)
+## Conversation handoff and implemented selection UI (2026-09-12)
 
-The generation entries described above are an interim integration, not the final aircraft-selection experience. The user's next UI requirement is a **scrollable grid of aircraft-family images with aircraft-specific controls underneath, outside the gallery scroller**. A Vision Jet family card exposes G1/G2/G3 below it; generations should not be separate nearly identical gallery cards. Preserve existing aircraft-specific controls, model credits, preferences and atomic FDM/visual activation.
+The initial flat generation picker was an interim integration. The subsequent 2026-09-12 implementation adds a **scrollable grid of aircraft-family images with aircraft-specific controls underneath, outside the gallery scroller**. `AIRCRAFT_FAMILIES` in `src/flight/aircraft/aircraftCatalog.ts` supplies gallery and variant metadata; `src/flight/hud/AircraftSelectionPanel.tsx` renders the family radio grid and applicable controls. `FlightControlPanel.tsx` retains the per-family drafts across panel tabs and the surrounding global controls. C172 has no generation or HD toggle; one Vision Jet family card exposes G1/G2/G2+/G3 below it. G2+ is currently available as a separate selection label and maps to the existing G2 runtime entry.
+
+Existing LOD/Auto choices, opt-in HD, model credits and shared-development disclosures remain available. Optional-model credit is disclosed before opt-in, and the active licensed mesh's credit stays visible and labeled with the currently flying aircraft when another family is previewed. The existing opt-in preference survives switching to C172, where it is hidden and has no effect. Runtime model loading/error status is associated only with the exact active aircraft ID. The static thumbnails in `public/aircraft/thumbnails/` are rendered from existing procedural LOD3 meshes; their provenance is documented in that directory.
+
+All family/generation and presentation changes are staged until Apply, with active versus pending choices identified and a reset to the active selection. `src/flight/createFlightSimApp.ts` normalizes and persists the three existing selection preferences together, rolls them back on storage failure, then reloads once when the runtime ID changes. This preserves atomic FDM/controls/contact-geometry/gauges/visual activation and legacy G1 restoration. Presentation-only changes for the same runtime ID use `createAircraftModel.setPresentation` for one mesh resolution/load. No physics coefficients, calibration targets or dependency lifecycle behavior changed in the gallery work.
+
+See [the selection implementation record](aircraft-selection-ui.md) for behavior and pending acceptance checks. No Git commands, tests, builds, dev server, browser checks or extra verification pass ran during the UI implementation. Family/generation selection, preference restoration, atomic activation, retained controls/credits, loading/errors, image failure handling, keyboard access, responsive scrolling and persistence-failure rollback remain untested.
 
 Work order:
-1. [Aircraft selection UI prompt](../prompts/aircraft-selection-ui-work-app-prompt.md).
+
+1. Review [the implemented aircraft selection UI and pending checks](aircraft-selection-ui.md), requested by [the UI prompt](../prompts/aircraft-selection-ui-work-app-prompt.md); run focused checks only when authorized.
 2. [SF50 development resume prompt](../prompts/sf50-resume-work-app-prompt.md).
 
 The latest offline processing actually completed: 101 raw artifacts; 820 primary AFM cruise/climb rows; 12 ISA runway anchors; 53 TOLD tables / 8,535 rows; seven ERA22 and 34 public-dashboard steady-review candidates. The 820 AFM rows allocate 600 fitting candidates and 220 same-source ISA+10 checks, with zero independent-validation rows. Broad raw recorder exports remain quarantined despite successful inventory processing.
 
-See [the consolidated development handoff](sf50-development-handoff.md) for repository ownership, actual historical checks, source distinctions and remaining work. No new source inspection, test, build or flight simulation was performed while preparing this handoff. Prior 42/42 test results predate the latest variant/model-input changes.
+See [the consolidated development handoff](sf50-development-handoff.md) for repository ownership, actual historical checks, source distinctions and remaining work. Preparing the original handoff performed no new source inspection, test, build or flight simulation. The subsequent UI implementation read the relevant current source, but ran no acceptance checks or flight simulations. Prior 42/42 test results predate the latest variant/model-input changes and do not validate the gallery implementation.

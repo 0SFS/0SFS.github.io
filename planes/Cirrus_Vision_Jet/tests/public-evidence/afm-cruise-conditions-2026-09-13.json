@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "reviewDate": "2026-09-13",
+  "variant": "G1",
+  "scope": "Condition, altitude, atmosphere and unit conventions for the reviewed historical G1 AFM cruise and cumulative-climb tables. Supersedes the open condition questions in afm-qualification-2026-09-12.json for the four gates below; every other blocker in that ledger still stands.",
+  "sourceDocument": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+  "recordedPrimarySha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+  "reviewMethod": "Text extraction of the local primary PDF with pdftotext -layout, read against the printed page numbering. No new acquisition and no third-party transcription was used.",
+  "gates": [
+    {
+      "gate": "altitude-meaning",
+      "status": "resolved-by-source",
+      "resolution": "Cruise 'Alt FT' is pressure altitude.",
+      "basis": [
+        "PDF 31 / printed 1-15 defines Pressure Altitude and defines Standard Temperature as the temperature found at a given pressure altitude, decreasing approximately 2 C per 1000 ft.",
+        "PDF 366 / printed 5-8 'OAT for International Standard Atmosphere (ISA) Condition' is indexed by 'Press Alt Feet' and its ISA column is exactly 15 C minus 2 C per 1000 ft.",
+        "PDF 389 / printed 5-31 enroute climb tables are indexed by 'Press Alt FT'; PDF 473 / printed 5-115 takeoff climb tables are indexed by 'Press Alt Feet'.",
+        "The cruise table's own Delta ISA and OAT columns are the standard-temperature relation, which only closes if its altitude column is pressure altitude."
+      ],
+      "residualInterpretation": "The cruise heading itself prints only 'Alt FT'. Section 5 uses four spellings for the same quantity: 'Press Alt Feet', 'Press Alt FT', 'Altitude (ft)' and 'Alt FT'."
+    },
+    {
+      "gate": "atmosphere-convention",
+      "status": "resolved-by-source-with-a-recorded-internal-inconsistency",
+      "resolution": "The AFM's ISA is a dry perfect gas at 15 C and 29.92 inHg at sea level, and its standard temperature decreases 2 C per 1000 ft of pressure altitude. That 2 C per 1000 ft rule, not the true 1.98 C per 1000 ft lapse rate, reproduces every reviewed OAT column below 28,000 ft.",
+      "basis": [
+        "PDF 30 / printed 1-14 defines ISA; PDF 31 / printed 1-15 defines Standard Temperature as decreasing approximately 4 F (2 C) per 1000 ft.",
+        "Reviewed cruise OAT at Delta ISA 0 is 5 C at 5,000 ft and -15 C at 15,000 ft, both exactly 15 - 2 per 1000.",
+        "The ISA cumulative-climb column on PDF 425 / printed 5-67 is exactly 15, 11, 7, 3, -1, -5, -9, -13, -17, -21, -25, -29, -33, -37 at 0 through 26,000 ft.",
+        "At 26,000 ft the reviewed table prints -37 C, which follows the 2 C per 1000 ft rule and not the true lapse rate's -36.48 C."
+      ],
+      "recordedInconsistency": "Every reviewed 28,000-ft entry is exactly 1 C warmer than the 2 C per 1000 ft rule: cruise prints -20/-30/-40/-50 C for Delta ISA +20/+10/0/-10 where the rule gives -21/-31/-41/-51, the ISA climb table prints -40 where the rule gives -41, and the ISA+10 climb tables print -30 where the rule gives -31. The general PDF 366 / printed 5-8 chart prints -41 C at 28,000 ft. The true 1.98 C per 1000 ft lapse rate gives -40.44 C, which rounds to the tables' -40. The offset is uniform across the whole 28,000-ft block rather than a single typo. Preserve both printed statements; the earlier -40 versus -41 conflict is explained but not eliminated.",
+      "residualInterpretation": "PDF 364 / printed 5-6 states the section's charts cover -20 C to 40 C ambient, yet the reviewed cruise and climb tables publish -50 C entries and the takeoff climb tables grid -40 C to 50 C. That statement does not bound the reviewed rows."
+    },
+    {
+      "gate": "cruise-configuration",
+      "status": "not-printed-inference-recorded",
+      "resolution": "Gear UP and flaps UP are used for cruise comparisons as a recorded inference, not a printed condition.",
+      "basis": [
+        "PDF 363 / printed 5-5 states all data are based on published normal procedures.",
+        "PDF 364 / printed 5-6 states flap position and thrust setting technique are noted with each table.",
+        "The Cruise Performance section beginning at PDF 433 / printed 5-75 carries no Conditions block: only the '** MCT' and '* Max Range Cruise (No Wind)' legends. The preceding page is a cumulative-climb table.",
+        "The AFM labels its one non-clean set explicitly as 'Gear UP, Flaps 50%' at PDF 473 / printed 5-115 with a full Conditions block, so unlabelled tables are not that configuration.",
+        "PDF 348 / printed 4-22 normal takeoff retracts the gear with positive rate and the flaps at 115 KIAS; the enroute climb and cumulative climb Conditions blocks on PDF 388 and PDF 420 state gear UP and flaps UP."
+      ],
+      "residualInterpretation": "Cruise configuration is never printed in the reviewed cruise section. Treat gear/flap position as an assumption of any cruise comparison."
+    },
+    {
+      "gate": "cruise-anti-ice-and-bleed",
+      "status": "unresolved-not-printed",
+      "resolution": "Neither cruise anti-ice state nor bleed extraction is printed. Anti-ice OFF is used as a recorded assumption; installed bleed flow remains unknown.",
+      "basis": [
+        "PDF 349 / printed 4-23 cruise checklist lists only Thrust Lever A/R, Ice Protection A/R and EIS MONITOR. It states no gear, flap, anti-ice or bleed setting.",
+        "The climb Conditions blocks state Anti-ice OFF (PDF 388, PDF 420 and the ice-contaminated equivalents); the cruise section states nothing.",
+        "Takeoff provides separate N1 schedules for Engine Anti-Ice OFF and ON (PDF 380 / Figure 5-2 and PDF 381 / Figure 5-3), so anti-ice measurably changes N1 for a given thrust. No equivalent cruise distinction is published.",
+        "The BLEED switch appears only in preflight verification and abnormal/emergency procedures, selecting FRESH air rather than scheduling engine bleed. The Bleed Bias Valve is required for all kinds of operation (PDF 67 / printed 2-31), so bleed extraction is continuous in normal cruise and is not pilot-scheduled.",
+        "The acquired EASA engine TCDS gives a maximum HP bleed flow of 40 lb/min. That is a limit, not the cruise extraction, and it is not a percentage thrust penalty."
+      ],
+      "residualInterpretation": "A standard day at the reviewed conditions is not an icing condition and ice protection is A/R, which makes anti-ice OFF the probable intended basis. It remains an inference. The model's 4 percent bleed thrust loss is an estimate with no source backing."
+    },
+    {
+      "gate": "afm-fuel-volume-convention",
+      "status": "resolved-by-source",
+      "resolution": "AFM gallons are US gallons.",
+      "basis": [
+        "The reviewed cruise tables print Specific Range in 'Nm/10 U.S. Gal' beside 'Fuel Flow GPH' in the same table.",
+        "Arithmetic agrees: 268 KTAS / 114 GPH gives 23.5 versus the printed 23.6 Nm per 10 US gal, and 295 / 99 gives 29.8 versus the printed 29.9.",
+        "Cumulative climb tables print 'Fuel (U.S. gal)' alongside 'Fuel (lb)', and Section 5's conversion chart is 'Fuel Quantity Conversion - U.S. Gallons to Liters' (printed 5-10).",
+        "PDF 33 / printed 1-17 defines GPH only as gallons per hour and does not itself state the gallon."
+      ],
+      "residualInterpretation": "This resolves the AFM only. The public dashboard's 'Engine 1 gal/Hr' caption remains unqualified, and the September 12 ledger's null qualified US-gph for that source still stands."
+    }
+  ],
+  "unchangedBlockers": [
+    "The reviewed rows remain same-source calibration candidates; eligibleForCalibration and eligibleForIndependentValidation stay false.",
+    "Sensor, transcription and model-target uncertainty and any pass tolerance remain unestablished. Printed resolution is not a tolerance.",
+    "The 600 fitting candidate / 220 whole-condition ISA+10 same-source check allocation is unchanged, with zero independent validation rows.",
+    "These 27 transcription reviews plus these convention resolutions do not qualify the full 820-row corpus.",
+    "Loading and CG applicability for the reviewed rows remain unresolved; the printed 6,000 lb is a table condition, not a reviewed mass/CG state.",
+    "The 100.4 percent MCT N1 row at 28,000 ft still exceeds the model's estimated 100 percent endpoint, and the 104.7 percent limit is not a replacement FADEC or TLA schedule.",
+    "The 28,000-ft cumulative-climb endpoint's 32 US gal and 226 lb still do not reconcile at the nominal 6.76 lb per US gallon with simple rounding.",
+    "The landing revision and applicability discrepancy remains open."
+  ],
+  "aircraftValidated": false,
+  "coefficientsFitted": false
+}

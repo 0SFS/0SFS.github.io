@@ -2,6 +2,10 @@
 
 Status: SF50 development runtime integration implemented; the full proposal remains in progress
 
+Current dependency status (2026-09-13): [centralization and installed-fork acceptance are complete](../validation/jsbsim-centralization-2026-09-13.md). Native/SDK lifetime and turbine fixes are adopted; current app checks, production browser asset checks and four matched native/WASM scenarios pass. The native and SDK integration branches preserve existing PR branches. These results supersede older dependency-adoption/cleanup blockers below; broader private-driver work and aircraft calibration remain incomplete.
+
+Latest qualification status (2026-09-12): [41 window dispositions, 27 selected AFM transcription reviews, and the parameter-to-evidence plan](../validation/sf50-calibration-qualification-2026-09-12.md) are recorded. Zero recordings are eligible; AFM condition qualification and distinct generation calibration remain incomplete. Evidence gates now enforce the ISA+10 same-source allocation and refuse independence overrides. Dashboard Celsius labeling is reviewed; its gallon convention remains unknown. Focused regression source is prepared, but no tests, build, processing rerun or aircraft simulation ran in this phase.
+
 Date: 2026-09-11
 
 Implementation update (2026-09-11):
@@ -36,7 +40,7 @@ Follow-on implementation (2026-09-11, calibration not yet validated):
 
 - Source-led aerodynamic and propulsion calibration, published-weight performance scenarios, envelope protection thresholds, and independent validation. The default development loading is not the published takeoff or landing calibration loading; passing integration tests does not establish those performance figures.
 - The broader private-driver/typed-observation boundary, full aircraft capability metadata, optional wheel/diagnostic paths, parameter import/export, and live model replacement described below. Reload-based selection is the implemented transition mechanism.
-- Generic native ownership/disposal and actionable model-load diagnostics in `jsbsim-wasm`, rather than new application workarounds. The integration tests explicitly delete their native executive; that does not demonstrate that application disposal is fixed.
+- Native/SDK lifetime and actionable load diagnostics are now adopted and verified by centralization; the broader live-replacement architecture below remains separate work. Current integration tests assert SDK-owned destruction rather than manually deleting the executive.
 - Browser/deployment checks and representative device performance measurements.
 
 Supersedes: [SF50 flight model and the per-aircraft FDM seam](sf50-flight-model.md)

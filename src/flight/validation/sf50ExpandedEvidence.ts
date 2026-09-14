@@ -4,6 +4,7 @@ import { SF50_AFM_SOURCE } from "./sf50AfmData.ts";
 import { evaluateSf50EvidenceReview, parseEvidenceCsv, type Sf50EvidenceReview } from "./sf50PublicEvidence.ts";
 
 export type Sf50EvidenceVariant = Sf50VariantId | "g2+";
+export type Sf50ProcessedComparisonPurpose = "calibration" | "within-source-check" | "validation";
 export interface Sf50ProcessedTarget {
   id: string;
   variant: Sf50EvidenceVariant;
@@ -71,7 +72,7 @@ export function processSf50AfmCandidates(input: unknown): Sf50ProcessedTarget[] 
         const power = string(row.power, "power");
         if (!["MCT", "max-range-no-wind", "tabulated-part-power"].includes(power)) throw new Error("Unknown cruise power.");
         const n1Pct = number(row.n1Pct, "n1Pct");
-        conditions = { ...common, weightLb: weight, n1Pct, power, bleed: null, gear: null, flapsNorm: null };
+        conditions = { ...common, weightLb: weight, n1Pct, power, bleed: null, gear: null, flapsNorm: null, antiIce: null };
         expected = numbers(row, ["fuelFlowUsGph", "tasKt", "specificRangeNmPer10UsGal"]);
         if (n1Pct <= 0 || n1Pct > 110 || Object.values(expected).some(value => value <= 0)) {
           throw new Error("Invalid cruise output.");
@@ -123,28 +124,59 @@ export function inferSf50CruiseLiftCoefficient(target: Sf50ProcessedTarget): num
  * Diagnostic differences are available even when eligibility is blocked.
  * Conditions must match exactly: a caller needing interpolation must construct
  * a separately reviewed target, not hide extrapolation or missing conditions.
+ * This processor's pinned AFM corpus contains no independent-validation rows.
+ * Review overrides cannot change that fact or the reserved ISA+10 allocation.
+ * Eligibility permits a comparison; it supplies neither a tolerance nor a pass.
  */
 export function compareSf50ProcessedTarget(
   target: Sf50ProcessedTarget,
   measurement: { variant: Sf50EvidenceVariant; conditions: Record<string, unknown>; metrics: Record<string, number> },
   review: Sf50EvidenceReview = target.review,
-  purpose: "calibration" | "validation" = "validation",
+  purpose: Sf50ProcessedComparisonPurpose = "validation",
 ) {
-  const conditionMismatches = Object.entries(target.conditions)
-    .filter(([key, expected]) => expected === null || measurement.conditions[key] !== expected)
-    .map(([key]) => key);
+  const requiredConditions = target.kind === "cruise" ?
+    ["pressureAltitudeFt", "deltaIsaC", "oatC", "weightLb", "n1Pct", "power", "bleed", "gear", "flapsNorm", "antiIce"] :
+    ["pressureAltitudeFt", "deltaIsaC", "oatC", "initialWeightLb", "iasKt", "thrust", "gear", "flapsNorm", "antiIce", "bleed"];
+  const conditionMismatches = [...new Set([...Object.keys(target.conditions), ...requiredConditions])]
+    .filter(key => {
+      const expected = target.conditions[key];
+      const known = typeof expected === "number" ? Number.isFinite(expected) :
+        typeof expected === "string" && expected.trim().length > 0;
+      return !known || !Object.prototype.hasOwnProperty.call(target.conditions, key) ||
+        !Object.prototype.hasOwnProperty.call(measurement.conditions, key) ||
+        measurement.conditions[key] !== expected;
+    });
   const metrics = Object.fromEntries(Object.entries(target.expected).map(([key, expected]) => {
     const measured = measurement.metrics[key];
     return [key, { expected, measured: Number.isFinite(measured) ? measured : null,
-      difference: Number.isFinite(measured) ? measured! - expected : null }];
+      difference: Number.isFinite(measured) && Number.isFinite(expected) ? measured! - expected : null }];
   }));
   const missingMetrics = Object.keys(target.expected).filter(key => !Number.isFinite(measurement.metrics[key]));
+  const invalidExpectedMetrics = Object.keys(target.expected).filter(key => !Number.isFinite(target.expected[key]));
   const eligibility = evaluateSf50EvidenceReview({
     ...review, sourceKind: "afm-table",
-    applicableVariant: review.applicableVariant === true && target.variant === measurement.variant,
-    conditionsMatched: review.conditionsMatched === true && conditionMismatches.length === 0 && missingMetrics.length === 0,
-  }, purpose);
-  return { targetId: target.id, metrics, conditionMismatches, missingMetrics, ...eligibility };
+    provenanceVerified: review.provenanceVerified === true && target.source.sha256 === SF50_AFM_SOURCE.sha256,
+    applicableVariant: review.applicableVariant === true && target.variant === "g1" && target.variant === measurement.variant,
+    conditionsMatched: review.conditionsMatched === true && Object.keys(target.conditions).length > 0 &&
+      conditionMismatches.length === 0 && Object.keys(target.expected).length > 0 &&
+      missingMetrics.length === 0 && invalidExpectedMetrics.length === 0,
+    independentOfCalibration: false,
+    // A same-source check needs the common review gates, without asserting the
+    // independence required by the generic evaluator's validation purpose.
+  }, purpose === "within-source-check" ? "calibration" : purpose);
+  const blockers = [...eligibility.blockers];
+  if (target.kind !== "cruise" && target.kind !== "integrated-climb") blockers.push("supportedTargetKind");
+  const sourceAllocation = target.conditions.deltaIsaC === 10 ? "within-source-check" : "calibration-candidate";
+  if (target.allocation !== sourceAllocation) blockers.push("sourceAllocation");
+  if (purpose === "calibration" && target.allocation !== "calibration-candidate") blockers.push("calibrationAllocation");
+  if (purpose === "within-source-check" && target.allocation !== "within-source-check") blockers.push("withinSourceCheckAllocation");
+  const eligibleForComparison = blockers.length === 0;
+  const comparisonClaim = !eligibleForComparison ? "diagnostic-only" :
+    purpose === "within-source-check" ? "within-source-check" : "calibration-comparison";
+  return { targetId: target.id, purpose, allocation: target.allocation,
+    metrics, conditionMismatches, missingMetrics, invalidExpectedMetrics,
+    eligibleForComparison, comparisonClaim, independentOfCalibration: false as const,
+    aircraftValidated: false as const, blockers };
 }
 
 export interface Sf50RecorderSample {
@@ -284,17 +316,29 @@ export function normalizeSf50Dashboard(input: unknown) {
     return { timeSec, timestampUtcMs: timestamp, sourceRecord: index + 1,
       n1Pct: n("data_n1_1"), requestedN1Pct: null, n2Pct: n("data_n2_1"),
       pressureAltitudeFt: n("data_palt"), airspeedKt: n("data_tas"), airspeedKind: "TAS",
-      pitchDeg: n("data_pitch"), rollDeg: n("data_roll"), fuelFlowUsGph: n("data_ff_1"),
+      pitchDeg: n("data_pitch"), rollDeg: n("data_roll"),
+      // The pinned chart says gal/Hr, without establishing US versus Imperial
+      // gallons. Retain the observation below without inventing a conversion.
+      fuelFlowUsGph: null,
       excludedFromSteadyScreen: gps !== "3D" && gps !== "3DDiff",
       extra: { gpsFix: typeof gps === "string" ? gps : null,
-        apRaw: String(get("data_ApOn") ?? ""), oatRaw: n("data_oat") },
+        apRaw: String(get("data_ApOn") ?? ""), oatRaw: n("data_oat"),
+        // The OAT-only chart in this exact snapshot labels its axis Temp (C).
+        oatC: n("data_oat"), fuelFlowGalPerHourRaw: n("data_ff_1") },
     };
   });
   return { variant: "g1" as const, serial: "0045", samples, gaps,
     source: data.source, sourceCadence: "approximately six-second dashboard samples; not a raw avionics log",
     normalOperationReviewed: false, aircraftValidated: false,
+    channelUnitReview: {
+      snapshotSha256: data.snapshotSha256,
+      oatC: { sourceCaption: "Temp (C)", basis: "OAT-only chart axis in the pinned snapshot" },
+      fuelFlowGalPerHourRaw: { sourceCaption: "Engine 1 gal/Hr", gallonConvention: null },
+    },
     limitations: ["Loading, configuration and reuse not approved.", "AP channel contains off, on and 5; not coerced to boolean.",
-      "OAT retained as raw until its chart-unit convention is reviewed.", "No fast spool, damping or flare identification from these samples."] };
+      "OAT Celsius caption reviewed; sensor accuracy and processing remain unqualified. oatRaw is retained.",
+      "Fuel-flow gallon convention is unresolved; raw gal/Hr is retained and fuelFlowUsGph remains null.",
+      "No fast spool, damping or flare identification from these samples."] };
 }
 
 export interface Sf50SteadyWindow {

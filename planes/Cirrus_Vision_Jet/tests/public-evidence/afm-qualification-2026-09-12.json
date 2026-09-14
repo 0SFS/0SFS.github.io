@@ -1,0 +1,845 @@
+{
+  "schemaVersion": 1,
+  "reviewDate": "2026-09-12",
+  "variant": "g1",
+  "sourceDocument": "31452-001 Rev 4",
+  "recordedPrimarySha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+  "targetFile": "derived/variant-calibration-2026-09-12-v1/g1-afm-targets.json",
+  "reviewMethod": "Rendered local primary PDF pages and read existing target JSON; source-document review only. No processor, tests, simulation or new hash-validation run.",
+  "corpusStatus": "27 selected ISA rows reviewed for numeric transcription; do not promote all 820 rows. Existing 600/220 allocation unchanged; ISA+10 not used for fitting.",
+  "reviewedRows": [
+    {
+      "targetId": "g1-cruise-6000-5000-0-MCT-93.8",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 433,
+        "printedPage": "5-75"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Alt FT interpreted as pressure altitude; reviewed cruise heading does not explicitly state pressure",
+        "gear/flaps/anti-ice/bleed unavailable in reviewed table; normal procedures do not quantify installed bleed"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-cruise-6000-5000-0-tabulated-part-power-86.5",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 433,
+        "printedPage": "5-75"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Alt FT interpreted as pressure altitude; reviewed cruise heading does not explicitly state pressure",
+        "gear/flaps/anti-ice/bleed unavailable in reviewed table; normal procedures do not quantify installed bleed"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-cruise-6000-5000-0-tabulated-part-power-78.9",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 433,
+        "printedPage": "5-75"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Alt FT interpreted as pressure altitude; reviewed cruise heading does not explicitly state pressure",
+        "gear/flaps/anti-ice/bleed unavailable in reviewed table; normal procedures do not quantify installed bleed"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-cruise-6000-5000-0-max-range-no-wind-71.4",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 433,
+        "printedPage": "5-75"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Alt FT interpreted as pressure altitude; reviewed cruise heading does not explicitly state pressure",
+        "gear/flaps/anti-ice/bleed unavailable in reviewed table; normal procedures do not quantify installed bleed"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-cruise-6000-15000-0-MCT-98.1",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 441,
+        "printedPage": "5-83"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Alt FT interpreted as pressure altitude; reviewed cruise heading does not explicitly state pressure",
+        "gear/flaps/anti-ice/bleed unavailable in reviewed table; normal procedures do not quantify installed bleed"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-cruise-6000-15000-0-tabulated-part-power-91.8",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 441,
+        "printedPage": "5-83"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Alt FT interpreted as pressure altitude; reviewed cruise heading does not explicitly state pressure",
+        "gear/flaps/anti-ice/bleed unavailable in reviewed table; normal procedures do not quantify installed bleed"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-cruise-6000-15000-0-tabulated-part-power-85.3",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 441,
+        "printedPage": "5-83"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Alt FT interpreted as pressure altitude; reviewed cruise heading does not explicitly state pressure",
+        "gear/flaps/anti-ice/bleed unavailable in reviewed table; normal procedures do not quantify installed bleed"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-cruise-6000-15000-0-max-range-no-wind-79.2",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 441,
+        "printedPage": "5-83"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Alt FT interpreted as pressure altitude; reviewed cruise heading does not explicitly state pressure",
+        "gear/flaps/anti-ice/bleed unavailable in reviewed table; normal procedures do not quantify installed bleed"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-cruise-6000-28000-0-MCT-100.4",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 469,
+        "printedPage": "5-111"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Alt FT interpreted as pressure altitude; reviewed cruise heading does not explicitly state pressure",
+        "gear/flaps/anti-ice/bleed unavailable in reviewed table; normal procedures do not quantify installed bleed",
+        "Source ISA OAT -40 C differs from general ISA chart PDF 366, printed 5-8 (-41 C); exact atmospheric convention unresolved"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-cruise-6000-28000-0-tabulated-part-power-96.1",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 469,
+        "printedPage": "5-111"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Alt FT interpreted as pressure altitude; reviewed cruise heading does not explicitly state pressure",
+        "gear/flaps/anti-ice/bleed unavailable in reviewed table; normal procedures do not quantify installed bleed",
+        "Source ISA OAT -40 C differs from general ISA chart PDF 366, printed 5-8 (-41 C); exact atmospheric convention unresolved"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-cruise-6000-28000-0-tabulated-part-power-92.7",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 469,
+        "printedPage": "5-111"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Alt FT interpreted as pressure altitude; reviewed cruise heading does not explicitly state pressure",
+        "gear/flaps/anti-ice/bleed unavailable in reviewed table; normal procedures do not quantify installed bleed",
+        "Source ISA OAT -40 C differs from general ISA chart PDF 366, printed 5-8 (-41 C); exact atmospheric convention unresolved"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-cruise-6000-28000-0-max-range-no-wind-89.7",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 469,
+        "printedPage": "5-111"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Alt FT interpreted as pressure altitude; reviewed cruise heading does not explicitly state pressure",
+        "gear/flaps/anti-ice/bleed unavailable in reviewed table; normal procedures do not quantify installed bleed",
+        "Source ISA OAT -40 C differs from general ISA chart PDF 366, printed 5-8 (-41 C); exact atmospheric convention unresolved"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-integrated-climb-6000-0-0-MCT",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 425,
+        "printedPage": "5-67"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Aircraft Weight interpreted as initialWeightLb; evolving-weight/CG convention unresolved",
+        "MCT/gear UP/flaps UP/anti-ice OFF from PDF 420, printed 5-62; bleed remains unknown",
+        "published cumulative fuel gallons and pounds retained independently; 28000-ft endpoint density/rounding conflict unresolved"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-integrated-climb-6000-2000-0-MCT",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 425,
+        "printedPage": "5-67"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Aircraft Weight interpreted as initialWeightLb; evolving-weight/CG convention unresolved",
+        "MCT/gear UP/flaps UP/anti-ice OFF from PDF 420, printed 5-62; bleed remains unknown",
+        "published cumulative fuel gallons and pounds retained independently; 28000-ft endpoint density/rounding conflict unresolved"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-integrated-climb-6000-4000-0-MCT",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 425,
+        "printedPage": "5-67"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Aircraft Weight interpreted as initialWeightLb; evolving-weight/CG convention unresolved",
+        "MCT/gear UP/flaps UP/anti-ice OFF from PDF 420, printed 5-62; bleed remains unknown",
+        "published cumulative fuel gallons and pounds retained independently; 28000-ft endpoint density/rounding conflict unresolved"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-integrated-climb-6000-6000-0-MCT",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 425,
+        "printedPage": "5-67"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Aircraft Weight interpreted as initialWeightLb; evolving-weight/CG convention unresolved",
+        "MCT/gear UP/flaps UP/anti-ice OFF from PDF 420, printed 5-62; bleed remains unknown",
+        "published cumulative fuel gallons and pounds retained independently; 28000-ft endpoint density/rounding conflict unresolved"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-integrated-climb-6000-8000-0-MCT",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 425,
+        "printedPage": "5-67"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Aircraft Weight interpreted as initialWeightLb; evolving-weight/CG convention unresolved",
+        "MCT/gear UP/flaps UP/anti-ice OFF from PDF 420, printed 5-62; bleed remains unknown",
+        "published cumulative fuel gallons and pounds retained independently; 28000-ft endpoint density/rounding conflict unresolved"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-integrated-climb-6000-10000-0-MCT",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 425,
+        "printedPage": "5-67"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Aircraft Weight interpreted as initialWeightLb; evolving-weight/CG convention unresolved",
+        "MCT/gear UP/flaps UP/anti-ice OFF from PDF 420, printed 5-62; bleed remains unknown",
+        "published cumulative fuel gallons and pounds retained independently; 28000-ft endpoint density/rounding conflict unresolved"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-integrated-climb-6000-12000-0-MCT",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 425,
+        "printedPage": "5-67"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Aircraft Weight interpreted as initialWeightLb; evolving-weight/CG convention unresolved",
+        "MCT/gear UP/flaps UP/anti-ice OFF from PDF 420, printed 5-62; bleed remains unknown",
+        "published cumulative fuel gallons and pounds retained independently; 28000-ft endpoint density/rounding conflict unresolved"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-integrated-climb-6000-14000-0-MCT",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 425,
+        "printedPage": "5-67"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Aircraft Weight interpreted as initialWeightLb; evolving-weight/CG convention unresolved",
+        "MCT/gear UP/flaps UP/anti-ice OFF from PDF 420, printed 5-62; bleed remains unknown",
+        "published cumulative fuel gallons and pounds retained independently; 28000-ft endpoint density/rounding conflict unresolved"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-integrated-climb-6000-16000-0-MCT",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 425,
+        "printedPage": "5-67"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Aircraft Weight interpreted as initialWeightLb; evolving-weight/CG convention unresolved",
+        "MCT/gear UP/flaps UP/anti-ice OFF from PDF 420, printed 5-62; bleed remains unknown",
+        "published cumulative fuel gallons and pounds retained independently; 28000-ft endpoint density/rounding conflict unresolved"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-integrated-climb-6000-18000-0-MCT",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 425,
+        "printedPage": "5-67"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Aircraft Weight interpreted as initialWeightLb; evolving-weight/CG convention unresolved",
+        "MCT/gear UP/flaps UP/anti-ice OFF from PDF 420, printed 5-62; bleed remains unknown",
+        "published cumulative fuel gallons and pounds retained independently; 28000-ft endpoint density/rounding conflict unresolved"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-integrated-climb-6000-20000-0-MCT",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 425,
+        "printedPage": "5-67"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Aircraft Weight interpreted as initialWeightLb; evolving-weight/CG convention unresolved",
+        "MCT/gear UP/flaps UP/anti-ice OFF from PDF 420, printed 5-62; bleed remains unknown",
+        "published cumulative fuel gallons and pounds retained independently; 28000-ft endpoint density/rounding conflict unresolved"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-integrated-climb-6000-22000-0-MCT",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 425,
+        "printedPage": "5-67"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Aircraft Weight interpreted as initialWeightLb; evolving-weight/CG convention unresolved",
+        "MCT/gear UP/flaps UP/anti-ice OFF from PDF 420, printed 5-62; bleed remains unknown",
+        "published cumulative fuel gallons and pounds retained independently; 28000-ft endpoint density/rounding conflict unresolved"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-integrated-climb-6000-24000-0-MCT",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 425,
+        "printedPage": "5-67"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Aircraft Weight interpreted as initialWeightLb; evolving-weight/CG convention unresolved",
+        "MCT/gear UP/flaps UP/anti-ice OFF from PDF 420, printed 5-62; bleed remains unknown",
+        "published cumulative fuel gallons and pounds retained independently; 28000-ft endpoint density/rounding conflict unresolved"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-integrated-climb-6000-26000-0-MCT",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 425,
+        "printedPage": "5-67"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Aircraft Weight interpreted as initialWeightLb; evolving-weight/CG convention unresolved",
+        "MCT/gear UP/flaps UP/anti-ice OFF from PDF 420, printed 5-62; bleed remains unknown",
+        "published cumulative fuel gallons and pounds retained independently; 28000-ft endpoint density/rounding conflict unresolved"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "targetId": "g1-integrated-climb-6000-28000-0-MCT",
+      "source": {
+        "document": "Cirrus SF50 AFM P/N 31452-001 Revision 4",
+        "sha256": "d83e904dbd6bc3656321c93d793166d4a5c6eddf81852b15767e5c336fc23949",
+        "pdfPage": 425,
+        "printedPage": "5-67"
+      },
+      "allocation": "calibration-candidate",
+      "numericTranscriptionVisuallyReviewed": true,
+      "reviewedFields": [
+        "conditions",
+        "expected",
+        "printed table headers"
+      ],
+      "reviewScope": "Numeric correspondence to this source page only; derived condition names/semantics remain interpretations. Printed resolution is not uncertainty.",
+      "assumptionsAndBlockers": [
+        "configuration/conditions not approved for fitting",
+        "sensor/model-target uncertainty and pass tolerance not established",
+        "whole-source evidence is not independent aircraft validation",
+        "Aircraft Weight interpreted as initialWeightLb; evolving-weight/CG convention unresolved",
+        "MCT/gear UP/flaps UP/anti-ice OFF from PDF 420, printed 5-62; bleed remains unknown",
+        "published cumulative fuel gallons and pounds retained independently; 28000-ft endpoint density/rounding conflict unresolved",
+        "Source ISA OAT -40 C differs from general ISA chart PDF 366, printed 5-8 (-41 C); exact atmospheric convention unresolved"
+      ],
+      "unitsReference": "Source table headers; existing target field names retain published units, subject to condition interpretations above.",
+      "uncertainty": null,
+      "passTolerance": null,
+      "conditionsApproved": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    }
+  ],
+  "aircraftValidated": false,
+  "simulationExecuted": false,
+  "testSuiteExecuted": false
+}

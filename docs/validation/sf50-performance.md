@@ -11,6 +11,12 @@ zero timestep after native engine startup. The runner now rejects mismatched
 pitch, flight path, throttle command/position, time, fuel, or a full-power
 landing transient. Inspect the new run's report before using its residuals.
 
+## Current dependency acceptance (2026-09-13)
+
+The app now consumes the identified fork artifact described in the [centralization execution record](jsbsim-centralization-2026-09-13.md). Native turbine state and reload lifetime, SDK destruction, and app initialization ordering are exercised on that installed artifact. Four matched native/WASM scenarios passed using identical app aircraft files and declared initial/reset conditions. The runner attaches schema-2 SDK/native/artifact identity to new reports and rejects an unverified stable dependency.
+
+This migration did not rerun the AFM runway fitting campaign or replace its targets/tolerances. Earlier SDK, driver and AFM results below remain attached to their historical inputs. Preserve source conflicts, applicable procedures, same-source check roles and the qualification boundaries in the [current handoff](sf50-development-handoff.md).
+
 ## What existed before this work
 
 The recorded 430 flight tests covered integration, contact behavior, response
@@ -65,7 +71,7 @@ for every existing SDK access in the application.
 Native executive deletion, model-bound view invalidation, and bounded
 model-load errors are implemented in the canonical jsbsim-wasm checkout.
 They are not duplicated in OSFS. The local wrapper build, typecheck and 17
-SDK tests passed. The currently installed npm package does not yet contain
+SDK tests passed. That historical installed npm package did not contain
 those edits, so the runner requires the built local wrapper.
 
 ## Commands
@@ -117,7 +123,7 @@ than receiving a plausible-looking distance.
 3. Fit propulsion and aerodynamic parameters against calibration points, with explicit source and uncertainty records.
 4. Evaluate holdout points without fitting against them.
 5. Add source-backed climb/cruise/fuel-flow points and handling-response data where available.
-6. Adopt the tested SDK artifact and migrate the interactive app to the private driver.
+6. Keep the verified fork artifact pinned; migrating the interactive app to the private driver remains separate work.
 
 Public performance tables constrain aggregate performance. They do not by
 themselves identify stability derivatives, stall dynamics, or time histories

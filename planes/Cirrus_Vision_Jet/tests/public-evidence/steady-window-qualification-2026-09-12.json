@@ -1,0 +1,1337 @@
+{
+  "schemaVersion": 1,
+  "reviewDate": "2026-09-12",
+  "reviewKind": "Source qualification by reading the existing 41 candidates and their normalized records; not a rerun of screening, processing, tests or aircraft validation.",
+  "identityStatus": "Source hashes copied from existing manifests; no new integrity-validation run performed. Derived artifacts identified by prior run directory, candidate index and source record/time bounds.",
+  "methodology": "../../../../docs/validation/sf50-calibration-qualification-2026-09-12.md",
+  "independenceRule": "Do not split windows from either wholeFlightGroup across fitting and independent validation. Neither reviewed flight is an approved independent holdout.",
+  "uncertaintyRule": "Source-level unknowns apply to every referenced candidate; no fit tolerances assigned.",
+  "redistributionStatus": "Authored review metadata only; original raw exports and bulk numeric arrays remain local cache with reuse unresolved.",
+  "sources": {
+    "era22": {
+      "wholeFlightGroup": "ERA22LA404-2022-09-09-N77VJ-0088",
+      "serial": "0088",
+      "rawFile": "raw/era22-recorder.csv",
+      "recordedRawSha256": "98504e0fcdad4539a2e3f133164e78e64b565e623f655af398c9a5dbfadf21a5",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=16352357&FileExtension=csv&FileName=Recorded%20Data%20Specialist%27s%20Factual%20Report%20-%20Attachment%201-Rel.csv",
+      "sourceRecordMeaning": "CSV record including metadata/header/unit/type rows; not a sample-array index",
+      "clock": "2022-09-09 EDT (UTC-04:00); normalized source UTC milliseconds",
+      "cadence": "approximately 1 second, two source gaps outside these candidate windows",
+      "units": {
+        "n1Pct": "percent fan speed",
+        "requestedN1Pct": "percent requested fan speed, not measured thrust",
+        "pressureAltitudeFt": "ft",
+        "airspeedKt": "KIAS",
+        "throttleLeverAngleDeg": "degrees",
+        "engineT2C": "degrees C, total inlet temperature, not OAT",
+        "fuelFlow": null
+      },
+      "commonBlockers": [
+        "normal-flight/weather qualification incomplete",
+        "weight/CG at each window unknown",
+        "gear/flaps/anti-ice/bleed and installed-engine/retrofit configuration unresolved",
+        "T2 does not supply OAT",
+        "fuel flow absent",
+        "surface inputs and brake force absent"
+      ],
+      "variant": "g1",
+      "dataPlateConfiguration": null,
+      "updatedThrustSbStatus": null,
+      "candidateFile": "derived/variant-calibration-2026-09-12-v1/era22-steady-candidates.json",
+      "normalizedFile": "derived/variant-calibration-2026-09-12-v1/era22-normalized.json",
+      "uncertainty": {
+        "sensorAccuracy": null,
+        "processingError": null,
+        "weightCg": null,
+        "passTolerance": null,
+        "note": "Unknown; screening thresholds, published resolution and sample variation are not uncertainty bounds."
+      }
+    },
+    "public-flight": {
+      "wholeFlightGroup": "FlightData-2754779-2022-11-20-N474CG-0045",
+      "serial": "0045",
+      "rawFile": "raw/flightdata-headless.html",
+      "recordedRawSha256": "e828d6ece046ffc1092356ce7f586ceca7cc0a34bf53cb1873438e0a34549249",
+      "url": "https://www.flightdata.com/flight/2754779",
+      "sourceRecordMeaning": "one-based row of joined dashboard timestamps, not a raw avionics CSV record",
+      "clock": "source Unix milliseconds, preserved exactly",
+      "cadence": "approximately 6 seconds, processed chart points; two early source gaps outside these windows",
+      "units": {
+        "n1Pct": "percent fan speed",
+        "pressureAltitudeFt": "ft",
+        "airspeedKt": "KTAS",
+        "oatC": "degrees C per pinned OAT-only chart Temp (C) caption",
+        "fuelFlowGalPerHourRaw": "gal/Hr per chart; US/Imperial convention unresolved"
+      },
+      "commonBlockers": [
+        "normal-operation and complete automation/safety qualification incomplete",
+        "weight/CG unknown",
+        "gear/flaps/anti-ice/bleed and installed-engine/retrofit configuration unresolved",
+        "requested N1 and TLA absent",
+        "gallon convention and sensor/processing uncertainty unresolved",
+        "original raw export and downstream reuse not qualified",
+        "near-constant N1 provides no broad schedule identification",
+        "six-second processing excludes fast spool/damping/flare identification"
+      ],
+      "variant": "g1",
+      "dataPlateConfiguration": null,
+      "updatedThrustSbStatus": null,
+      "candidateFile": "derived/variant-calibration-2026-09-12-v1/public-flight-steady-candidates.json",
+      "normalizedFile": "derived/variant-calibration-2026-09-12-v1/public-flight-normalized.json",
+      "uncertainty": {
+        "sensorAccuracy": null,
+        "processingError": null,
+        "weightCg": null,
+        "passTolerance": null,
+        "note": "Unknown; screening thresholds, published resolution and sample variation are not uncertainty bounds."
+      }
+    }
+  },
+  "windows": [
+    {
+      "id": "ERA22-01",
+      "sourceKey": "era22",
+      "candidateIndexOneBased": 1,
+      "firstRecord": 1048,
+      "lastRecord": 1108,
+      "startUtc": "2022-09-09T18:27:17Z",
+      "endUtc": "2022-09-09T18:28:17Z",
+      "durationSec": 60,
+      "samples": 61,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "throttleLeverAngleDeg": [
+          23
+        ],
+        "lateralMode": [
+          "Nav GPS"
+        ],
+        "verticalMode": [
+          "ALT"
+        ],
+        "apFdEngaged1": [
+          "1"
+        ],
+        "apFdEngaged2": [
+          "1"
+        ],
+        "requestedN1Pct": [
+          94
+        ],
+        "availableSafetyFlags": "all seven normalized CAPS/AOA ESP/high-pitch ESP flags recorded zero throughout; not a complete safety/weather review"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "ERA22-02",
+      "sourceKey": "era22",
+      "candidateIndexOneBased": 2,
+      "firstRecord": 1109,
+      "lastRecord": 1169,
+      "startUtc": "2022-09-09T18:28:18Z",
+      "endUtc": "2022-09-09T18:29:18Z",
+      "durationSec": 60,
+      "samples": 61,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "throttleLeverAngleDeg": [
+          23
+        ],
+        "lateralMode": [
+          "Nav GPS"
+        ],
+        "verticalMode": [
+          "ALT"
+        ],
+        "apFdEngaged1": [
+          "1"
+        ],
+        "apFdEngaged2": [
+          "1"
+        ],
+        "requestedN1Pct": [
+          94
+        ],
+        "availableSafetyFlags": "all seven normalized CAPS/AOA ESP/high-pitch ESP flags recorded zero throughout; not a complete safety/weather review"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "ERA22-03",
+      "sourceKey": "era22",
+      "candidateIndexOneBased": 3,
+      "firstRecord": 1170,
+      "lastRecord": 1230,
+      "startUtc": "2022-09-09T18:29:19Z",
+      "endUtc": "2022-09-09T18:30:19Z",
+      "durationSec": 60,
+      "samples": 61,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "throttleLeverAngleDeg": [
+          23
+        ],
+        "lateralMode": [
+          "Nav GPS"
+        ],
+        "verticalMode": [
+          "ALT"
+        ],
+        "apFdEngaged1": [
+          "1"
+        ],
+        "apFdEngaged2": [
+          "1"
+        ],
+        "requestedN1Pct": [
+          94
+        ],
+        "availableSafetyFlags": "all seven normalized CAPS/AOA ESP/high-pitch ESP flags recorded zero throughout; not a complete safety/weather review"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "ERA22-04",
+      "sourceKey": "era22",
+      "candidateIndexOneBased": 4,
+      "firstRecord": 1231,
+      "lastRecord": 1291,
+      "startUtc": "2022-09-09T18:30:20Z",
+      "endUtc": "2022-09-09T18:31:20Z",
+      "durationSec": 60,
+      "samples": 61,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "throttleLeverAngleDeg": [
+          23
+        ],
+        "lateralMode": [
+          "Nav GPS",
+          "HDG"
+        ],
+        "verticalMode": [
+          "ALT"
+        ],
+        "apFdEngaged1": [
+          "1"
+        ],
+        "apFdEngaged2": [
+          "1"
+        ],
+        "requestedN1Pct": [
+          94
+        ],
+        "availableSafetyFlags": "all seven normalized CAPS/AOA ESP/high-pitch ESP flags recorded zero throughout; not a complete safety/weather review"
+      },
+      "additionalBlockers": [
+        "recorded lateralMode changes within candidate; exclude from a single-setting steady case without separately reviewing segmentation"
+      ],
+      "disposition": "exclude-from-single-setting-case",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "ERA22-05",
+      "sourceKey": "era22",
+      "candidateIndexOneBased": 5,
+      "firstRecord": 1475,
+      "lastRecord": 1535,
+      "startUtc": "2022-09-09T18:34:24Z",
+      "endUtc": "2022-09-09T18:35:24Z",
+      "durationSec": 60,
+      "samples": 61,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "throttleLeverAngleDeg": [
+          23
+        ],
+        "lateralMode": [
+          "HDG"
+        ],
+        "verticalMode": [
+          "ALT"
+        ],
+        "apFdEngaged1": [
+          "1"
+        ],
+        "apFdEngaged2": [
+          "1"
+        ],
+        "requestedN1Pct": [
+          94
+        ],
+        "availableSafetyFlags": "all seven normalized CAPS/AOA ESP/high-pitch ESP flags recorded zero throughout; not a complete safety/weather review"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "ERA22-06",
+      "sourceKey": "era22",
+      "candidateIndexOneBased": 6,
+      "firstRecord": 1536,
+      "lastRecord": 1596,
+      "startUtc": "2022-09-09T18:35:25Z",
+      "endUtc": "2022-09-09T18:36:25Z",
+      "durationSec": 60,
+      "samples": 61,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "throttleLeverAngleDeg": [
+          23,
+          24
+        ],
+        "lateralMode": [
+          "HDG"
+        ],
+        "verticalMode": [
+          "ALT"
+        ],
+        "apFdEngaged1": [
+          "1"
+        ],
+        "apFdEngaged2": [
+          "1"
+        ],
+        "requestedN1Pct": [
+          94
+        ],
+        "availableSafetyFlags": "all seven normalized CAPS/AOA ESP/high-pitch ESP flags recorded zero throughout; not a complete safety/weather review"
+      },
+      "additionalBlockers": [
+        "recorded throttleLeverAngleDeg changes within candidate; exclude from a single-setting steady case without separately reviewing segmentation"
+      ],
+      "disposition": "exclude-from-single-setting-case",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "ERA22-07",
+      "sourceKey": "era22",
+      "candidateIndexOneBased": 7,
+      "firstRecord": 1658,
+      "lastRecord": 1718,
+      "startUtc": "2022-09-09T18:37:27Z",
+      "endUtc": "2022-09-09T18:38:27Z",
+      "durationSec": 60,
+      "samples": 61,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "throttleLeverAngleDeg": [
+          23
+        ],
+        "lateralMode": [
+          "HDG"
+        ],
+        "verticalMode": [
+          "ALT",
+          "VS"
+        ],
+        "apFdEngaged1": [
+          "1"
+        ],
+        "apFdEngaged2": [
+          "1"
+        ],
+        "requestedN1Pct": [
+          94
+        ],
+        "availableSafetyFlags": "all seven normalized CAPS/AOA ESP/high-pitch ESP flags recorded zero throughout; not a complete safety/weather review"
+      },
+      "additionalBlockers": [
+        "recorded verticalMode changes within candidate; exclude from a single-setting steady case without separately reviewing segmentation"
+      ],
+      "disposition": "exclude-from-single-setting-case",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-01",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 1,
+      "firstRecord": 339,
+      "lastRecord": 349,
+      "startUtc": "2022-11-21T01:05:20Z",
+      "endUtc": "2022-11-21T01:06:21Z",
+      "durationSec": 61,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-02",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 2,
+      "firstRecord": 350,
+      "lastRecord": 360,
+      "startUtc": "2022-11-21T01:06:27Z",
+      "endUtc": "2022-11-21T01:07:28Z",
+      "durationSec": 61,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-03",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 3,
+      "firstRecord": 361,
+      "lastRecord": 371,
+      "startUtc": "2022-11-21T01:07:34Z",
+      "endUtc": "2022-11-21T01:08:34Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-04",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 4,
+      "firstRecord": 372,
+      "lastRecord": 382,
+      "startUtc": "2022-11-21T01:08:40Z",
+      "endUtc": "2022-11-21T01:09:40Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-05",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 5,
+      "firstRecord": 394,
+      "lastRecord": 404,
+      "startUtc": "2022-11-21T01:10:53Z",
+      "endUtc": "2022-11-21T01:11:53Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-06",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 6,
+      "firstRecord": 405,
+      "lastRecord": 415,
+      "startUtc": "2022-11-21T01:11:59Z",
+      "endUtc": "2022-11-21T01:12:59Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-07",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 7,
+      "firstRecord": 416,
+      "lastRecord": 426,
+      "startUtc": "2022-11-21T01:13:05Z",
+      "endUtc": "2022-11-21T01:14:05Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-08",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 8,
+      "firstRecord": 427,
+      "lastRecord": 437,
+      "startUtc": "2022-11-21T01:14:11Z",
+      "endUtc": "2022-11-21T01:15:11Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-09",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 9,
+      "firstRecord": 438,
+      "lastRecord": 448,
+      "startUtc": "2022-11-21T01:15:17Z",
+      "endUtc": "2022-11-21T01:16:17Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-10",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 10,
+      "firstRecord": 449,
+      "lastRecord": 459,
+      "startUtc": "2022-11-21T01:16:23Z",
+      "endUtc": "2022-11-21T01:17:23Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-11",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 11,
+      "firstRecord": 460,
+      "lastRecord": 470,
+      "startUtc": "2022-11-21T01:17:29Z",
+      "endUtc": "2022-11-21T01:18:30Z",
+      "durationSec": 61,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-12",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 12,
+      "firstRecord": 482,
+      "lastRecord": 492,
+      "startUtc": "2022-11-21T01:19:43Z",
+      "endUtc": "2022-11-21T01:20:43Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-13",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 13,
+      "firstRecord": 493,
+      "lastRecord": 503,
+      "startUtc": "2022-11-21T01:20:49Z",
+      "endUtc": "2022-11-21T01:21:49Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-14",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 14,
+      "firstRecord": 504,
+      "lastRecord": 514,
+      "startUtc": "2022-11-21T01:21:55Z",
+      "endUtc": "2022-11-21T01:22:58Z",
+      "durationSec": 63,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-15",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 15,
+      "firstRecord": 515,
+      "lastRecord": 525,
+      "startUtc": "2022-11-21T01:23:04Z",
+      "endUtc": "2022-11-21T01:24:04Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-16",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 16,
+      "firstRecord": 526,
+      "lastRecord": 536,
+      "startUtc": "2022-11-21T01:24:10Z",
+      "endUtc": "2022-11-21T01:25:10Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-17",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 17,
+      "firstRecord": 537,
+      "lastRecord": 547,
+      "startUtc": "2022-11-21T01:25:16Z",
+      "endUtc": "2022-11-21T01:26:16Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-18",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 18,
+      "firstRecord": 548,
+      "lastRecord": 558,
+      "startUtc": "2022-11-21T01:26:22Z",
+      "endUtc": "2022-11-21T01:27:22Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-19",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 19,
+      "firstRecord": 559,
+      "lastRecord": 569,
+      "startUtc": "2022-11-21T01:27:28Z",
+      "endUtc": "2022-11-21T01:28:28Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-20",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 20,
+      "firstRecord": 570,
+      "lastRecord": 580,
+      "startUtc": "2022-11-21T01:28:34Z",
+      "endUtc": "2022-11-21T01:29:34Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-21",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 21,
+      "firstRecord": 581,
+      "lastRecord": 591,
+      "startUtc": "2022-11-21T01:29:40Z",
+      "endUtc": "2022-11-21T01:30:40Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-22",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 22,
+      "firstRecord": 592,
+      "lastRecord": 602,
+      "startUtc": "2022-11-21T01:30:46Z",
+      "endUtc": "2022-11-21T01:31:46Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-23",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 23,
+      "firstRecord": 603,
+      "lastRecord": 613,
+      "startUtc": "2022-11-21T01:31:52Z",
+      "endUtc": "2022-11-21T01:32:52Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-24",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 24,
+      "firstRecord": 614,
+      "lastRecord": 624,
+      "startUtc": "2022-11-21T01:32:58Z",
+      "endUtc": "2022-11-21T01:33:58Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-25",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 25,
+      "firstRecord": 625,
+      "lastRecord": 635,
+      "startUtc": "2022-11-21T01:34:04Z",
+      "endUtc": "2022-11-21T01:35:04Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-26",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 26,
+      "firstRecord": 636,
+      "lastRecord": 646,
+      "startUtc": "2022-11-21T01:35:10Z",
+      "endUtc": "2022-11-21T01:36:10Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-27",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 27,
+      "firstRecord": 647,
+      "lastRecord": 657,
+      "startUtc": "2022-11-21T01:36:16Z",
+      "endUtc": "2022-11-21T01:37:16Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-28",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 28,
+      "firstRecord": 658,
+      "lastRecord": 668,
+      "startUtc": "2022-11-21T01:37:22Z",
+      "endUtc": "2022-11-21T01:38:22Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-29",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 29,
+      "firstRecord": 669,
+      "lastRecord": 679,
+      "startUtc": "2022-11-21T01:38:28Z",
+      "endUtc": "2022-11-21T01:39:28Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-30",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 30,
+      "firstRecord": 680,
+      "lastRecord": 690,
+      "startUtc": "2022-11-21T01:39:34Z",
+      "endUtc": "2022-11-21T01:40:34Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-31",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 31,
+      "firstRecord": 691,
+      "lastRecord": 701,
+      "startUtc": "2022-11-21T01:40:40Z",
+      "endUtc": "2022-11-21T01:41:40Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-32",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 32,
+      "firstRecord": 702,
+      "lastRecord": 712,
+      "startUtc": "2022-11-21T01:41:46Z",
+      "endUtc": "2022-11-21T01:42:46Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-33",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 33,
+      "firstRecord": 713,
+      "lastRecord": 723,
+      "startUtc": "2022-11-21T01:42:52Z",
+      "endUtc": "2022-11-21T01:43:52Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    },
+    {
+      "id": "FD2754779-34",
+      "sourceKey": "public-flight",
+      "candidateIndexOneBased": 34,
+      "firstRecord": 724,
+      "lastRecord": 734,
+      "startUtc": "2022-11-21T01:43:58Z",
+      "endUtc": "2022-11-21T01:44:58Z",
+      "durationSec": 60,
+      "samples": 11,
+      "conditionsReference": "Existing candidate means plus source-level units, configuration and uncertainty above; no missing value inferred.",
+      "observedChannels": {
+        "gpsFix": [
+          "3DDiff"
+        ],
+        "apRaw": [
+          "on"
+        ],
+        "oatUnitReview": "Celsius chart caption reviewed; cached oatRaw retained",
+        "fuelFlowUnitReview": "cached means.fuelFlowUsGph is a legacy unqualified gal/Hr label; do not use as qualified US gph"
+      },
+      "additionalBlockers": [],
+      "disposition": "retain-for-context-review-only",
+      "allocation": "quarantined-whole-flight",
+      "normalOperationReviewed": false,
+      "eligibleForCalibration": false,
+      "eligibleForIndependentValidation": false
+    }
+  ],
+  "summary": {
+    "reviewedCandidateRecords": 41,
+    "excludedFromSingleSettingCase": 3,
+    "remainingContextOnly": 38,
+    "eligibleForCalibration": 0,
+    "eligibleForIndependentValidation": 0
+  },
+  "aircraftValidated": false,
+  "testSuiteExecuted": false,
+  "simulationExecuted": false,
+  "processingPipelineExecuted": false
+}

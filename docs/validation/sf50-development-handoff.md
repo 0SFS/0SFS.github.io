@@ -1,15 +1,73 @@
 # SF50 development handoff
 
-Snapshot: 2026-09-12. Consolidated from the preceding conversation and its recorded tool results. This handoff did not run another inspection, build, test or aircraft simulation.
+Snapshot: 2026-09-12. Consolidated from the preceding conversation and its recorded tool results. Preparing the original handoff did not run another inspection, build, test or aircraft simulation. A subsequent 2026-09-12 UI implementation update is recorded below; it does not establish new aircraft-validation results.
+
+## Fresh-session starting point after upstream submissions
+
+Repository consolidation is complete: one canonical JSBSim checkout owns both
+native engine and `wasm/` SDK. The [submission record](jsbsim-upstream-submissions-2026-09-13.md)
+identifies upstream PRs #1505/#1506/#1507 and their exact validation. That
+dependency closeout is now complete: the corrected native exception compilation
+and IDBFS persistence were ported selectively into the full integration as
+`feature/wasm-integration-idbfs-exceptions` at `c328c7ab`, packaged as
+`1.2.4-fork.4` and adopted by the app with affected checks re-run. See
+[the adopted corrections](../jsbsim.md#adopted-idbfs-and-native-exception-corrections)
+and `build/validation/jsbsim-in-tree-20260913/fork4-adoption.json`.
+
+Use the rewritten [fresh SF50 prompt](../prompts/sf50-resume-work-app-prompt.md).
+Its Phase A is done. Phase B's first step is also done: the historical G1 AFM
+cruise altitude, atmosphere, configuration and gallon conventions are resolved
+from the primary source, a generic zero-time-trim fuel-flow gap was fixed in
+JSBSim, and the narrow fuel-flow diagnostic at observed AFM N1 has run. See
+[the cruise condition and fuel-flow record](sf50-g1-cruise-fuel-flow-2026-09-13.md)
+and its [condition ledger](../../planes/Cirrus_Vision_Jet/tests/public-evidence/afm-cruise-conditions-2026-09-13.json).
+The diagnostic found the package's estimated idle fuel-flow floor sitting above
+published cruise fuel flow at the two lowest reviewed power settings, and a
+part-power fuel-flow shape that runs 10-20 percent high while matching at MCT.
+Nothing was fitted. Continue from that record's next concrete step. Do not substitute the smaller upstream review SDK or repeat
+the completed 41-window review and parameter plan. The older qualification
+phase's beta.4, pending-check and permission statements below are historical;
+latest acceptance and the user's continuing implementation/check authorization
+supersede them. No SF50 implementation or validation was resumed while preparing
+this fresh-session handoff.
+
+## Current in-tree runtime and environment (2026-09-13 follow-up)
+
+[The in-tree integration is implemented and locally accepted](jsbsim-in-tree-integration-2026-09-13.md). Engine and SDK now live in the single canonical `/Users/felg/gh/Felipegalind0/jsbsim` checkout, on `feature/wasm-integration-idbfs-exceptions` at `c328c7ab6d81e6de68b8db2115c35d350b226025`; SDK work belongs in `wasm/`. 0sfs installs the exact `@felipegalind0/jsbsim-wasm@1.2.4-fork.4` tarball. The separate SDK checkout is preserved outside the active workspace. Use the three-root workspace and current build guide; do not recreate the old native/SDK source split.
+
+Current checks passed on fork.4: 50 SDK tests, native isolation (148 compile commands with no added exception flag) and 11 native CTest targets, 144 installed app tests, TypeScript/production build and artifact gates, browser IDBFS persistence across three navigations in pinned Chromium 153, four actual browser aircraft boots, three UI viewports and four native/WASM matched scenarios at the same maximum normalized error as fork.3. Exact identities and limits are in the execution record. The older numbers below belong to the earlier package. Existing engine/SDK fixes and aircraft-family UI are preserved; no calibration coefficients, source qualification or real-aircraft fidelity claim changed. Current reusable fixes can be developed in our fork without waiting for maintainers; upstream feature review remains separate.
+
+## Earlier runtime and environment (2026-09-13, separate SDK package)
+
+
+[Dependency centralization is implemented and locally accepted](jsbsim-centralization-2026-09-13.md). 0sfs now installs `@felipegalind0/jsbsim-wasm@1.2.4-fork.1` from its exact repository-contained tarball. Native `61b31329` and SDK `61ee9486` are clean local integration commits. The loaded WASM SHA-256 is `b0acdb992f850c9b8028702e27ba4d88f9922e477522992f6da4654bd27cbdc1`. Use the canonical repositories and [named workspace](../../flight-development.code-workspace); the nested vendor checkout and stale canonical SDK dist are retired with verified recovery archives.
+
+Current acceptance: 11 native CTest targets and six sanitizer sequences; both final SDK modes with 43/43 tests; 97/97 installed app runtime/UI tests; 125/125 evidence/package tests; TypeScript/production build; headless browser asset starts for all four runtime models; three component UI viewport/keyboard checks; four matched native/WASM initial/reset/short-trajectory scenarios; and 48-file focused lint. The execution record identifies scope, binaries, reports and limitations. These software results establish neither AFM fit nor real-aircraft fidelity. No coefficient or recorder qualification changed.
+
+Native turbine zero-time state and model-reload property lifetime are fixed in the adopted engine. SDK executive cleanup and child invalidation are exercised through real WASM; tests and application call `sdk.destroy()` without manual native deletion. App bootstrap/reset/restoration evaluate normal engine state after startup while preserving saved physical actuator positions. No N1/N2 property workaround was added.
+
+The user authorized centralization implementation and its checks. No dev server, visible browser, push, publication or PR update occurred. Earlier authorization/untested-status statements below describe their dated phases and do not override this completed acceptance. Open PR review follow-up is the next dependency task; SF50 calibration still follows its evidence qualification plan.
+
+## Latest source-qualification phase (2026-09-12)
+
+Read [the calibration qualification record](sf50-calibration-qualification-2026-09-12.md) and then [the 2026-09-13 cruise condition and fuel-flow record](sf50-g1-cruise-fuel-flow-2026-09-13.md), which resolves four of that record's open condition gates, before using the older processing outputs below. All 41 steady candidates have per-window dispositions: three ERA22 windows contain recorded mode/TLA changes and are excluded from single-setting cases; the remaining 38 are context-only. Zero recordings qualify for fitting or independent validation. The two whole-flight boundaries remain intact. Numeric transcription of 27 selected ISA AFM rows was visually reviewed; configuration/condition gates remain open and the 600/220 allocation is unchanged.
+
+The reviewed AFM includes 100.4% MCT N1 above the model's estimated 100% endpoint, but neither the 104.7% operational limit nor steady cruise observations supply a replacement TLA/FADEC schedule. Newly documented temperature and cumulative-fuel inconsistencies must be preserved, not normalized away. The first candidate constraint is fuel flow at specified observed N1 and flight conditions; installed thrust, drag and TSFC remain unseparated. No aircraft XML or UI was edited in this phase.
+
+Evidence comparison now explicitly distinguishes same-source checks, enforces the reserved ISA+10 allocation and disallows independence overrides. Cruise anti-ice remains an explicit unknown. The pinned dashboard's OAT axis establishes Celsius; its `gal/Hr` caption does not establish the gallon convention. The normalizer retains raw flow with qualified US-gph null. **Existing cached normalized/candidate files still contain the earlier fuel-field label and OAT disclaimer** because processing was not rerun; consult the new review ledger.
+
+Public research found a configuration-specific 31452-111 applicability lead and a later-AFM text mirror, with ordinary registered publication access still relevant. No outreach or acquisition through restricted access occurred. Production dependency metadata identifies installed registry SDK `1.2.4-beta.4`; the native Trim fix's inclusion in that WASM binary remains unestablished.
+
+Focused evidence and generation/package test source is prepared; the exact proposed command is in the qualification record. No tests, typecheck, build, processing-pipeline run, simulation, browser acceptance check, server or Git command ran. Explicit check approval remains required by the resume prompt.
 
 ## Start here and work in this order
 
-1. Implement the aircraft-family gallery and aircraft-specific controls using [the UI conversation prompt](../prompts/aircraft-selection-ui-work-app-prompt.md).
-2. Resume evidence qualification and SF50 development using [the SF50 conversation prompt](../prompts/sf50-resume-work-app-prompt.md).
+1. Follow the [fresh-session prompt](../prompts/sf50-resume-work-app-prompt.md) to close the remaining full-SDK/app adoption gap using the submission and acceptance records. Preserve the aircraft-family UI and its generation aliases/atomic Apply contract.
+2. Continue the existing qualification plan from the completed window/AFM ledgers, beginning with unresolved AFM conditions and the narrow G1 fuel-flow diagnostic.
 
-The latest user request replaces the temporary flat generation picker with **a scrollable grid of aircraft images, followed by aircraft-specific controls underneath**. A Vision Jet family card should reveal its G1/G2/G3 selector below the gallery. The generations should not appear as three almost-identical aircraft cards.
+The 2026-09-12 UI implementation replaces the temporary flat generation picker with **a scrollable grid of aircraft-family images, followed by aircraft-specific controls underneath**. The Vision Jet family card reveals its G1/G2/G2+/G3 selector below the gallery. Family, generation and model-presentation choices are staged until Apply; the active aircraft remains identified separately.
 
-This is a handoff, not a claim that the proposal, generation-specific flight models or public-data qualification are complete.
+This is a handoff, not a claim that UI acceptance checks, the proposal, generation-specific flight models or public-data qualification are complete.
 
 ## Repository ownership and working constraints
 
@@ -17,7 +75,7 @@ This is a handoff, not a claim that the proposal, generation-specific flight mod
 | --- | --- |
 | Application, aircraft catalog/UI, SF50 XML/data and evidence processing | `/Users/felg/gh/0sfs` |
 | Generic native flight-engine behavior | `/Users/felg/gh/Felipegalind0/jsbsim` |
-| Generic WASM bindings, SDK lifecycle and diagnostics | `/Users/felg/gh/Felipegalind0/jsbsim-wasm` |
+| Generic WASM bindings, SDK lifecycle and diagnostics | `/Users/felg/gh/Felipegalind0/jsbsim/wasm` (same repository as native engine) |
 | Earth/terrain/rendering dependency | `/Users/felg/gh/foss-earth` |
 
 The user's preferred repository layout is `gh/owner/repo`. Use ordinary branches in the existing canonical repositories, not task-named copies or worktrees such as `jsbsim-wasm-model-load-diagnostics` or `jsbsim-emscripten-portability`. Do not relocate the app or recreate those folders as part of the next tasks.
@@ -26,7 +84,7 @@ This conversation's shell workspace was sometimes foss-earth even while the work
 
 Existing upstream work was already reported, including native PRs #1502 (wheel dynamics), #1504 (Emscripten portability) and SDK PR #8 (batching/gear contacts). These are historical references, NOT a fresh statement of their open/merged status. Consult existing repo documentation and current PR state before duplicating upstream work. Do not create PRs until the user confirms the relevant work functions correctly.
 
-Do not revert unrelated changes or remove tracked SDK portability/vendor patches. Do not run Git, tests, builds for verification, dev servers or visible browser automation without the relevant explicit authorization. Prefer terminal/headless routes when checks are authorized. This documentation request did not accept the previous offer to run focused tests or native/WASM checks.
+Preserve unrelated work and the historical SDK compatibility patch. Vendor patch application is retired after reconciliation into the canonical native fork. The centralization request authorized its local implementation and checks; use the current session authorization for subsequent work. Development/preview servers retain the explicit repository permission requirement. Prefer terminal/headless verification.
 
 ## What is implemented now
 
@@ -34,7 +92,7 @@ Do not revert unrelated changes or remove tracked SDK portability/vendor patches
 - JSBSim model names: `c172p`, `sf50`, `sf50-g2`, `sf50-g3`.
 - G1 remains the canonical editable SF50 XML. `scripts/build-sf50-variants.mjs` regenerates G2/G3 XML from it.
 - All SF50 generations currently share development aerodynamics, estimated installed-engine/spool/bleed behavior and exterior meshes. Separate identities/packages are NOT evidence of separate calibrated performance.
-- G2 means original G2, not G2+. Evidence tagged `g2+` is deliberately separate and must not be silently assigned to G2 or G3.
+- G2 means original G2, not G2+. Evidence tagged `g2+` is deliberately separate and must not be silently assigned to G2 or G3; this UI now exposes G2+ as a distinct generation label that currently reuses the G2 runtime.
 - Published operating-envelope metadata distinguishes historical G1 FL280 from G2/G3 FL310. It is not an artificial altitude clamp.
 - G3 cabin layouts, avionics, autothrottle and emergency systems are not newly implemented by the generation-selection change.
 - An expanded offline processor now produces source-tagged AFM targets, generation-tagged tables, normalized recorder subsets and steady-flight review candidates.
@@ -56,8 +114,11 @@ These are source-backed baseline replacements, not a completed aerodynamic or en
 | Area | Starting files |
 | --- | --- |
 | IDs, family/variant integration | `src/flight/aircraft/aircraftIds.ts`, `aircraftCatalog.ts`, `sf50Variants.ts` |
-| Existing panel and aircraft-specific controls | `src/flight/hud/FlightControlPanel.tsx` |
+| Aircraft gallery, generation and model controls | `src/flight/hud/AircraftSelectionPanel.tsx` |
+| Panel integration and retained per-family drafts | `src/flight/hud/FlightControlPanel.tsx` |
 | Selection persistence and activation | `src/flight/createFlightSimApp.ts` |
+| Model presentation updates | `src/flight/aircraft/createAircraftModel.ts` |
+| Static gallery images and provenance | `public/aircraft/thumbnails/` |
 | Flight profiles and loading | `src/flight/jsbsim/fdmProfiles.ts`, `hydrateJsbsimData.ts`, `createJsbsimRuntime.ts` |
 | Shared bootstrap, despite the legacy filename | `src/flight/jsbsim/bootstrapC172.ts`, export `bootstrapAircraft` |
 | Model package selection | `public/jsbsim-data/manifest.json` |
@@ -68,9 +129,15 @@ These are source-backed baseline replacements, not a completed aerodynamic or en
 | AFM/runway methodology | `sf50AfmData.ts`, `sf50AfmReferenceCases.ts`, `sf50AfmBenchmark.ts`, `evaluateSf50AfmMeasurement.ts`, `runwayMeasurement.ts`, `sf50Airspeed.ts` under `src/flight/validation/` |
 | Pilot/loading qualifications | `sf50PilotController.ts`, `sf50PilotProfiles.ts`, `sf50LandingPilot.ts`, `sf50RunwayConditions.ts`, `sf50Loading.ts`, `sf50SyntheticLoading.ts` in the same directory |
 
-The current panel maps the flat aircraft catalog to radio choices. Aircraft activation saves the selected ID and reloads the application, changing the FDM package, controls, contact geometry, gauges and visuals together. The UI redesign must not replace that with a mesh-only change or silently leave the active physics on another generation.
+### Selection implementation update (2026-09-12)
 
-The catalog also supplies LOD choices, opt-in HD meshes, credits and status. Vision Jet procedural meshes are shared; its third-party HD mesh has attribution requirements and is modeled gear-up. Preserve existing credit/opt-in behavior.
+`AIRCRAFT_FAMILIES` now provides explicit family identities, gallery metadata and variant choices independently of the runtime IDs in `AIRCRAFT_CATALOG`. A bounded native-radio image grid selects the C172 or Vision Jet family. The selected family's controls sit outside the gallery scroller. The Vision Jet family offers the G1/G2/G2+/G3 generation selector; G2+ currently maps to the G2 runtime. Static thumbnails come from the existing procedural LOD3 meshes, with provenance in the thumbnail directory.
+
+LOD/Auto, opt-in HD, applicable model credits and development disclosures are retained. The optional model's credit is also disclosed before enabling it. Vision Jet procedural meshes are shared; its third-party HD mesh has attribution requirements and is modeled gear-up. The active licensed mesh's credit remains visible and labeled with the currently flying aircraft while another family is being previewed. The C172 shows neither generation choices nor an HD toggle; the existing opt-in preference is preserved while hidden and has no effect on its meshes. Runtime model loading/error status is shown only for the exact active aircraft ID, so selecting another family or generation does not present the previous package's status as its own. Global controls remain global.
+
+The panel retains staged choices per family across panel tabs, identifies active versus pending choices, and offers a reset to the active selection. Apply normalizes the complete aircraft/LOD/opt-in selection and saves the three existing preferences together, with rollback on storage failure. A changed runtime ID triggers one application reload so the FDM package, controls, contact geometry, gauges and visuals change together. Applying presentation changes to the same runtime ID calls `createAircraftModel.setPresentation` once, resolving/loading the selected mesh without switching aircraft physics. The legacy `cirrus-vision-jet` preference still selects G1.
+
+No Git commands, tests, builds, dev server, browser checks or extra verification pass ran during this UI work. Family/generation interaction, legacy preference restoration, atomic package activation, retained controls/credits, loading/errors, thumbnail failure handling, keyboard access, responsive scrolling and persistence-failure rollback remain untested. See [the dedicated selection record](aircraft-selection-ui.md). This UI update changes no flight-model coefficients, calibration targets, JSBSim behavior or SDK lifecycle.
 
 ## Durable evidence corpus and actual processing results
 
@@ -184,7 +251,7 @@ A historical SDK build was retained at `/private/tmp/sf50-v5-validation.30axFG/s
 
 Broader architecture and upstream SDK disposal/diagnostics were earlier reported unfinished. The last data/variant pass did not establish their closure; consult their existing records rather than declaring them completed.
 
-**After the latest source-backed model changes, only offline data processing ran. No new focused tests, native/WASM flight checks or browser selection checks ran.**
+**Historical status at the original handoff:** only offline processing had run after those model changes. The current 2026-09-13 software checks are recorded above; they do not add aircraft-calibration results.
 
 ## Resume priorities after the UI work
 
@@ -195,4 +262,6 @@ Broader architecture and upstream SDK disposal/diagnostics were earlier reported
 5. When authorized, add/run focused parser, selection/package and source-gate tests; then matched native/WASM scenarios with artifact identities and clearly separated same-source checks versus independent holdouts.
 6. Update the proposal with measured outcomes and remaining blockers. Do not mark end-to-end implementation complete because the aircraft can load or a parser passes.
 
-Additional durable context: [variant implementation](sf50-variant-models.md), [public acquisition](sf50-public-data-acquisition.md), [expanded audit](sf50-public-data-audit-2026-09-12.md), [AFM audit](sf50-afm-audit.md), [owner-data request](sf50-owner-data-request.md), [Cirrus question list](sf50-cirrus-questions.md), and [the proposal](../proposals/sf50-flight-model-v2.md).
+Additional durable context:
+[cruise conditions and fuel flow](sf50-g1-cruise-fuel-flow-2026-09-13.md),
+[variant implementation](sf50-variant-models.md), [public acquisition](sf50-public-data-acquisition.md), [expanded audit](sf50-public-data-audit-2026-09-12.md), [AFM audit](sf50-afm-audit.md), [owner-data request](sf50-owner-data-request.md), [Cirrus question list](sf50-cirrus-questions.md), and [the proposal](../proposals/sf50-flight-model-v2.md).
