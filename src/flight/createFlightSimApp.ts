@@ -180,6 +180,11 @@ const AUTO_ROLL_TRIM_PREFERENCE_KEY = "osfs.auto-roll-trim";
 const MIN_WORLD_DETAIL_TARGET = 1;
 const MAX_WORLD_DETAIL_TARGET = 524_288;
 const DEFAULT_FLIGHT_TERRAIN_REQUIREMENT = 4_096;
+const CAMERA_ORBIT_PITCH_MIN = -Math.PI / 3;
+const CAMERA_ORBIT_PITCH_MAX = Math.PI * 0.45;
+const CAMERA_ORBIT_RESTORE_PITCH = Math.atan2(2.2, 14);
+const CAMERA_ORBIT_RESTORE_YAW = 0;
+const CAMERA_ORBIT_RETURN_SECONDS = 0.45;
 
 function readPreference<T>(key: string, legacyKey: string, isValid: (value: unknown) => value is T, fallback: T): T {
   try {
@@ -196,6 +201,22 @@ function writePreference(key: string, value: string): void {
   } catch {
     // Preference persistence is best-effort; private mode must not break the sim.
   }
+}
+
+function normalizeAngle(angle: number): number {
+  const fullTurn = 2 * Math.PI;
+  const normalized = angle % fullTurn;
+  if (normalized > Math.PI) return normalized - fullTurn;
+  if (normalized < -Math.PI) return normalized + fullTurn;
+  return normalized;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+function approach(current: number, target: number, deltaSeconds: number, halfLife: number): number {
+  return current + (target - current) * (1 - Math.exp(-deltaSeconds / halfLife));
 }
 
 /** Commit the complete aircraft choice before a reload can activate it. */
@@ -794,10 +815,34 @@ export async function createFlightSimApp(
   let inputMode = loadInputModePreference(new Set(["mouse", "trackpad"]));
   let inputSensitivity = loadInputSensitivityPreference();
   let orbitInvert = loadOrbitInvertSettings();
+  let orbitStateYaw = CAMERA_ORBIT_RESTORE_YAW;
+  let orbitStatePitch = CAMERA_ORBIT_RESTORE_PITCH;
+  const orbitInputSources = new Set<"gamepad" | "manual">();
+  const setOrbitInputActive = (source: "gamepad" | "manual", active: boolean): void => {
+    if (active) orbitInputSources.add(source);
+    else orbitInputSources.delete(source);
+  };
+  const isOrbitInputActive = (): boolean => orbitInputSources.size > 0;
   const applyOrbitDelta = (yaw: number, pitch: number): void => {
     if (!aircraft || aircraft.getViewMode() !== "third") return;
+    orbitStateYaw = normalizeAngle(orbitStateYaw + yaw);
+    orbitStatePitch = clamp(orbitStatePitch + pitch, CAMERA_ORBIT_PITCH_MIN, CAMERA_ORBIT_PITCH_MAX);
     aircraft.orbitChaseCamera(yaw, pitch);
     runtime.requestRender();
+  };
+  const recenterOrbit = (deltaSeconds: number): void => {
+    if (!aircraft || aircraft.getViewMode() !== "third") return;
+    if (deltaSeconds <= 0) return;
+    if (orbitInvert.recenterMode !== "recenter") return;
+    if (isOrbitInputActive()) return;
+    const targetYaw = CAMERA_ORBIT_RESTORE_YAW;
+    const targetPitch = CAMERA_ORBIT_RESTORE_PITCH;
+    const deltaYaw = -normalizeAngle(orbitStateYaw - targetYaw);
+    const deltaPitch = targetPitch - orbitStatePitch;
+    if (Math.abs(deltaYaw) <= 0.00005 && Math.abs(deltaPitch) <= 0.00005) return;
+    const nextYaw = approach(orbitStateYaw, targetYaw, deltaSeconds, CAMERA_ORBIT_RETURN_SECONDS);
+    const nextPitch = approach(orbitStatePitch, targetPitch, deltaSeconds, CAMERA_ORBIT_RETURN_SECONDS);
+    applyOrbitDelta(nextYaw - orbitStateYaw, nextPitch - orbitStatePitch);
   };
   const detachCameraInput = attachFlightCameraInput(canvas, {
     getMode: () => inputMode,
@@ -806,6 +851,7 @@ export async function createFlightSimApp(
     orbit: (yaw, pitch) => {
       applyOrbitDelta(yaw, pitch);
     },
+    onOrbitActive: (active) => setOrbitInputActive("manual", active),
     zoom: (factor) => {
       if (!aircraft || aircraft.getViewMode() !== "third") return;
       aircraft.zoomChaseCamera(factor);
@@ -843,6 +889,10 @@ export async function createFlightSimApp(
     floatingOrigin.aircraftRoot.setEnabled(false);
     aircraft = createPlaceholderAircraft(runtime.scene, floatingOrigin.aircraftRoot);
     aircraft.setViewMode("third");
+    orbitStateYaw = CAMERA_ORBIT_RESTORE_YAW;
+    orbitStatePitch = Math.asin(
+      clamp(aircraft.thirdPersonCamera.position.y / aircraft.thirdPersonCamera.position.length(), CAMERA_ORBIT_PITCH_MIN, CAMERA_ORBIT_PITCH_MAX),
+    );
     syncCollisionDebugOverlay();
     aircraftModel = createAircraftModel(runtime.scene, aircraft.modelRoot, {
       aircraftId,
@@ -897,6 +947,7 @@ export async function createFlightSimApp(
         toggleCameraView();
         phoneSession?.syncStatus();
       },
+      onCameraOrbitActive: (active) => setOrbitInputActive("gamepad", active),
       onCameraOrbit: (yaw, pitch, dt) => {
         const inversion = orbitInvert;
         applyOrbitDelta(
@@ -1496,6 +1547,7 @@ export async function createFlightSimApp(
     // Do not integrate the time spent idle when resuming the simulation.
     deltaSeconds = skipResumeDelta ? 0 : Math.min(deltaSeconds, 0.1);
     skipResumeDelta = false;
+    recenterOrbit(deltaSeconds);
 
     fpsSampleFrames += 1;
     const frameNow = performance.now();

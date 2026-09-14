@@ -33,6 +33,7 @@ export const FLIGHT_GAMEPAD_ACTIONS: readonly ActionDescriptor[] = [
 export interface FlightGamepadAdapterOptions {
   onViewToggle?(): void;
   onCameraOrbit?(yaw: number, pitch: number, dt: number): void;
+  onCameraOrbitActive?(active: boolean): void;
 }
 
 export function createFlightGamepadAdapter(
@@ -56,6 +57,7 @@ export function createFlightGamepadAdapter(
       { yaw: 0, pitch: 0 },
     );
     const cameraOrbitActive = !input.isBindingCaptureActive() && (cameraOrbit.yaw !== 0 || cameraOrbit.pitch !== 0);
+    options.onCameraOrbitActive?.(cameraOrbitActive);
     input.applyGamepadBindingIntents({
       ...frame,
       intents: frame.intents.filter((intent) => (

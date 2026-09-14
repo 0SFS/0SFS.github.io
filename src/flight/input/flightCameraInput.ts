@@ -8,6 +8,7 @@ export interface FlightCameraInputOptions {
   getOrbitInvert?(): OrbitInvertSettings;
   orbit(dx: number, dy: number): void;
   zoom(factor: number): void;
+  onOrbitActive?(active: boolean): void;
 }
 
 /** Ignore late synthesized wheel pans briefly after a touch gesture ends. */
@@ -23,6 +24,9 @@ export function attachFlightCameraInput(canvas: HTMLCanvasElement, options: Flig
   let gestureScale: number | null = null;
   let touch: { x: number; y: number; distance: number } | null = null;
   let touchWheelCooldownUntil = 0;
+  const setOrbitActive = (active: boolean): void => {
+    options.onOrbitActive?.(active);
+  };
   const listeners: Array<() => void> = [];
   function listen<E extends Event>(target: EventTarget, name: string, handler: (event: E) => void): void {
     const listener = handler as EventListener;
@@ -31,6 +35,7 @@ export function attachFlightCameraInput(canvas: HTMLCanvasElement, options: Flig
   }
   const invert = (): OrbitInvertSettings => options.getOrbitInvert?.() ?? DEFAULT_ORBIT_INVERT_SETTINGS;
   const orbit = (x: number, y: number) => {
+    setOrbitActive(true);
     const sensitivity = options.getSensitivity()[options.getMode()].orbit;
     const signs = invert();
     const dx = x * 0.005 * sensitivity * (signs.invertYaw ? -1 : 1);
@@ -42,6 +47,7 @@ export function attachFlightCameraInput(canvas: HTMLCanvasElement, options: Flig
     const id = drag?.id;
     drag = null;
     if (id !== undefined && canvas.hasPointerCapture?.(id)) canvas.releasePointerCapture(id);
+    setOrbitActive(false);
   };
   const touchBlocksWheel = (): boolean => (
     touch !== null || owner.performance.now() < touchWheelCooldownUntil
@@ -49,6 +55,7 @@ export function attachFlightCameraInput(canvas: HTMLCanvasElement, options: Flig
   listen(canvas, "pointerdown", (event: PointerEvent) => {
     if (options.getMode() !== "mouse" || event.button !== 2) return;
     event.preventDefault();
+    setOrbitActive(true);
     drag = { id: event.pointerId, x: event.clientX, y: event.clientY };
     canvas.setPointerCapture?.(event.pointerId);
   });
@@ -100,6 +107,7 @@ export function attachFlightCameraInput(canvas: HTMLCanvasElement, options: Flig
   listen(canvas, "touchstart", (event: TouchEvent) => {
     event.preventDefault();
     touch = readTouch(event);
+    setOrbitActive(touch !== null && options.getMode() === "trackpad");
     if (touch) touchWheelCooldownUntil = 0;
   });
   listen(canvas, "touchmove", (event: TouchEvent) => {
@@ -112,12 +120,15 @@ export function attachFlightCameraInput(canvas: HTMLCanvasElement, options: Flig
       orbit(next.x - touch.x, next.y - touch.y);
       if (touch.distance > 0 && next.distance > 0) zoom(touch.distance / next.distance);
     }
+    setOrbitActive(touch !== null && options.getMode() === "trackpad" && next !== null && gestureScale === null);
     touch = next;
   });
   for (const name of ["touchend", "touchcancel"]) {
     listen(canvas, name, (event: TouchEvent) => {
       event.preventDefault();
-      touch = null;
+      const nextTouch = readTouch(event);
+      touch = nextTouch;
+      setOrbitActive(nextTouch !== null && options.getMode() === "trackpad");
       touchWheelCooldownUntil = owner.performance.now() + TOUCH_WHEEL_COOLDOWN_MS;
     });
   }

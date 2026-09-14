@@ -399,8 +399,22 @@ function OrbitInvertSettingsPanel({
         />
         <span>Invert pitch (up / down) for right-stick and trackpad</span>
       </label>
+      <label className="flight-panel__field">
+        <span>Behavior when holding still</span>
+        <select
+          aria-label="Camera orbit hold behavior"
+          value={settings.recenterMode}
+          onChange={(event) => onOrbitInvertChange({ ...settings, recenterMode: event.target.value as "hold" | "recenter" })}
+        >
+          <option value="hold">Hold camera position</option>
+          <option value="recenter">Return behind aircraft on release</option>
+        </select>
+      </label>
       <p className="flight-panel__hint">
         Applies to right-stick, two-finger swipe, and right-drag camera orbit.
+      </p>
+      <p className="flight-panel__hint">
+        Hold keeps the camera where you left it. Recenter smoothly returns to the default chase offset after a two-finger swipe or joystick release.
       </p>
     </fieldset>
   );

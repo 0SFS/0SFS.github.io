@@ -119,7 +119,7 @@ describe("flight camera gestures", () => {
     const dispose = attachFlightCameraInput(canvas, {
       getMode: () => "mouse",
       getSensitivity: loadInputSensitivityPreference,
-      getOrbitInvert: () => ({ invertYaw: true, invertPitch: true }),
+      getOrbitInvert: () => ({ invertYaw: true, invertPitch: true, recenterMode: "hold" }),
       orbit,
       zoom: vi.fn(),
     });
