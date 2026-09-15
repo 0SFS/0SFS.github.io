@@ -340,8 +340,8 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
     button.title = apOwns
       ? `${axis} is owned by Autopilot. TRIM is a wheel assist; disengage AP to use it.`
       : enabled
-        ? `Trim assist on — holds ${axis} with the trim wheel while the stick is centered. Click to turn off.`
-        : `Trim assist off — click to hold ${axis} as the aircraft wanders.`;
+        ? `Trim assist on — the ${axis} wheel cancels leftover moment in real time, including while you fly. Click to turn off.`
+        : `Trim assist off — click to cancel leftover ${axis} moment on the trim wheel.`;
     button.setAttribute("aria-label", button.title);
     input.disabled = enabled || apOwns;
   };

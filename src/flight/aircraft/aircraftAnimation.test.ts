@@ -123,13 +123,14 @@ describe("control surface geometry", () => {
 });
 
 /**
- * SF50 V-tail, in glTF axes. Each ruddervator hinges about its own 38.7° span,
- * not about the fuselage: from dead astern a pitch input must drop both
- * trailing edges perpendicular to their fins, not spin the panels clockwise.
+ * SF50 V-tail, in glTF axes. Each ruddervator hinges about the 70% chord cut:
+ * 38.7° dihedral plus 10.7° of sweep. The tip hinge midpoints are measured
+ * off Cirrus_Vision_Jet_LOD3.glb; an unswept (Z = 0) axis lets them walk.
  */
-const VT_DIHEDRAL_RAD = 38.7 * Math.PI / 180;
-const RIGHT_HINGE = new Vector3(Math.cos(VT_DIHEDRAL_RAD), Math.sin(VT_DIHEDRAL_RAD), 0);
-const LEFT_HINGE = new Vector3(-Math.cos(VT_DIHEDRAL_RAD), Math.sin(VT_DIHEDRAL_RAD), 0);
+const RIGHT_HINGE = new Vector3(1.994045, 1.597531, 0.484872).normalize();
+const LEFT_HINGE = new Vector3(-1.994045, 1.597531, 0.484872).normalize();
+const RIGHT_TIP_HINGE = new Vector3(0.99702239, 0.79876554, 0.24243546);
+const LEFT_TIP_HINGE = new Vector3(-0.99702239, 0.79876554, 0.24243546);
 
 function localAfter(node: TransformNode, local: Vector3): Vector3 {
   return Vector3.Zero().copyFrom(local)
@@ -146,10 +147,12 @@ describe("ruddervator geometry", () => {
     const left = rig.parts.find((part) => part.node.name === "Ruddervator_Left")!.node;
     const right = rig.parts.find((part) => part.node.name === "Ruddervator_Right")!.node;
 
-    // A point on the hinge line stays put. Spinning about +Z (the rear-view
-    // bug) would orbit this point around the fuselage.
+    // A point on the hinge line stays put, including the swept tip. An
+    // unswept dihedral axis leaves that tip walking toward the centre.
     expect(Vector3.Distance(localAfter(right, RIGHT_HINGE), RIGHT_HINGE)).toBeLessThan(1e-6);
     expect(Vector3.Distance(localAfter(left, LEFT_HINGE), LEFT_HINGE)).toBeLessThan(1e-6);
+    expect(Vector3.Distance(localAfter(right, RIGHT_TIP_HINGE), RIGHT_TIP_HINGE)).toBeLessThan(1e-6);
+    expect(Vector3.Distance(localAfter(left, LEFT_TIP_HINGE), LEFT_TIP_HINGE)).toBeLessThan(1e-6);
 
     // Trailing edge down and outboard: perpendicular to the fin, not a
     // clockwise/counterclockwise spin in the rear view.
