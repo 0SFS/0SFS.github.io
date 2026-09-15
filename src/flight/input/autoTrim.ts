@@ -1,37 +1,55 @@
 /**
- * Casual trim assist: when that axis's stick is centered, drive the matching
- * trim wheel so the aircraft holds the last hands-off attitude. Trim is
- * summed with the stick in the C172 FCS, so the wheel can take the speed-
- * change and spiral-stability loads without turning the stick into an autopilot.
+ * Casual trim assist: move the matching trim wheel so leftover pitch/roll
+ * moment stays near zero — including while the stick is flying that axis.
  *
- * This is not the HUD Autopilot button. Master AP lives in
+ * Stick and trim sum in the FCS, so JSBSim has no separate "imbalance"
+ * property. The leftover acceleration is reconstructed from the current
+ * `pdot`/`qdot` after removing the stick's control power and the aero rate
+ * damping. Driving that residual to zero is the trim definition: with the
+ * stick released the aircraft is not trying to rotate. Control power scales
+ * with `qbar`, so a dive does not suddenly gain loop authority.
+ *
+ * This is not attitude hold and not the HUD Autopilot. Master AP lives in
  * `src/flight/autopilot/` and drives surfaces/throttle when engaged. These
  * TRIM squares only run while AP does not own that axis.
  *
  * Signs follow the stick: positive elevator / pitch-trim pitches the nose
- * down, so a nose-high error reduces pitch trim. Positive aileron / roll-trim
- * rolls right, so a left-of-target bank increases roll trim.
+ * down (negative qdot). Positive aileron / roll-trim rolls right (positive
+ * pdot).
  */
 
 export interface AutoTrimState {
   enabled: boolean;
-  hasTarget: boolean;
-  targetRad: number;
   /** Owned trim while enabled; null means adopt the incoming wheel position. */
   trim: number | null;
+  /** Filtered leftover acceleration, rad/s²; null until the first airborne sample. */
+  filteredHandsOff: number | null;
 }
 
 export const STICK_DEADBAND = 0.05;
 /** Full-scale trim travel in about three seconds. */
 const MAX_TRIM_RATE = 0.35;
-/** Trim units / s per radian of attitude error. */
-const AXIS_KP = 1.8;
-/** Trim units / s per rad/s of rate, opposing the error. */
-const AXIS_KD = 0.35;
-const MAX_ERROR = 30 * Math.PI / 180;
+/** Inverse seconds: fraction of the leftover acceleration to cancel per second. */
+const NEWTON = 1.25;
+const ACCEL_DEADBAND = 0.04;
+const FILTER_TAU = 0.08;
+const QBAR_AUTHORITY_PSF = 20;
+const MIN_VT_FPS = 80;
+/**
+ * |∂(rad/s²)/∂trim| per psf. SF50 pitch is about 0.028, roll about 0.018;
+ * a slightly high estimate makes the Newton step conservative.
+ */
+const PITCH_POWER_PER_PSF = 0.03;
+const ROLL_POWER_PER_PSF = 0.02;
+/**
+ * Rate damping D in `accel += -D * rate`, with D = coeff * qbar / vt.
+ * Slightly under the SF50 Cmq/Clp values so a sustained rate is not fought.
+ */
+const PITCH_DAMPING_QBAR_OVER_VT = 2.2;
+const ROLL_DAMPING_QBAR_OVER_VT = 2.5;
 
 export function createAutoTrimState(enabled: boolean): AutoTrimState {
-  return { enabled, hasTarget: false, targetRad: 0, trim: null };
+  return { enabled, trim: null, filteredHandsOff: null };
 }
 
 export function setAutoTrimEnabled(state: AutoTrimState, enabled: boolean): AutoTrimState {
@@ -43,10 +61,6 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
-function wrapAngle(value: number): number {
-  return ((value + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
-}
-
 function finite(value: number, fallback = 0): number {
   return Number.isFinite(value) ? value : fallback;
 }
@@ -55,14 +69,17 @@ function stepAutoTrimAxis(
   state: AutoTrimState,
   input: {
     dt: number;
-    measuredRad: number;
+    accelRad: number;
     rateRad: number;
     stick: number;
     trim: number;
+    qbarPsf: number;
+    vtFps: number;
     onGround: boolean;
-    /** +1 if positive trim increases `measuredRad`. */
+    /** +1 if positive trim increases the measured acceleration. */
     trimSign: number;
-    authority: number;
+    powerPerPsf: number;
+    dampingQbarOverVt: number;
   },
 ): { state: AutoTrimState; trim: number } {
   const incoming = clamp(finite(input.trim), -1, 1);
@@ -71,37 +88,45 @@ function stepAutoTrimAxis(
   }
 
   const dt = Math.max(0, finite(input.dt));
-  const measuredRad = finite(input.measuredRad);
-  const rateRad = finite(input.rateRad);
-  const stick = finite(input.stick);
   const trim = state.trim === null ? incoming : clamp(finite(state.trim), -1, 1);
-  const stickOut = Math.abs(stick) > STICK_DEADBAND;
+  const accelRad = finite(input.accelRad);
+  const hold = {
+    state: { enabled: true, trim, filteredHandsOff: state.filteredHandsOff } satisfies AutoTrimState,
+    trim,
+  };
+  if (dt === 0 || input.onGround) return hold;
 
-  if (dt === 0 || input.onGround || stickOut) {
+  const qbar = Math.max(0, finite(input.qbarPsf));
+  const authority = clamp(qbar / QBAR_AUTHORITY_PSF, 0, 1);
+  if (authority === 0) {
     return {
-      state: {
-        enabled: true,
-        hasTarget: !input.onGround,
-        targetRad: measuredRad,
-        trim,
-      },
+      state: { enabled: true, trim, filteredHandsOff: accelRad },
       trim,
     };
   }
 
-  const targetRad = state.hasTarget ? state.targetRad : measuredRad;
-  const error = clamp(wrapAngle(targetRad - measuredRad), -MAX_ERROR, MAX_ERROR);
-  const authority = clamp(finite(input.authority, 1), 0, 1);
-  const alongMeasured = (AXIS_KP * error - AXIS_KD * rateRad) * authority;
-  const delta = clamp(input.trimSign * alongMeasured * dt, -MAX_TRIM_RATE * dt, MAX_TRIM_RATE * dt);
+  const vt = Math.max(finite(input.vtFps), MIN_VT_FPS);
+  const qbarEff = Math.max(qbar, QBAR_AUTHORITY_PSF);
+  const power = input.trimSign * input.powerPerPsf * qbarEff;
+  const damping = Math.max(0, finite(input.dampingQbarOverVt)) * qbarEff / vt;
+  const stick = clamp(finite(input.stick), -1, 1);
+  const rawHandsOff = accelRad - power * stick + damping * finite(input.rateRad);
+  const previous = state.filteredHandsOff;
+  const blend = 1 - Math.exp(-dt / FILTER_TAU);
+  const filtered = previous === null ? rawHandsOff : previous + (rawHandsOff - previous) * blend;
+  const leftover = Math.abs(filtered) < ACCEL_DEADBAND ? 0 : filtered;
+  const delta = clamp(
+    -NEWTON * authority * leftover / power * dt,
+    -MAX_TRIM_RATE * dt,
+    MAX_TRIM_RATE * dt,
+  );
   const nextTrim = clamp(trim + delta, -1, 1);
 
   return {
     state: {
       enabled: true,
-      hasTarget: true,
-      targetRad,
       trim: nextTrim,
+      filteredHandsOff: filtered,
     },
     trim: nextTrim,
   };
@@ -109,11 +134,12 @@ function stepAutoTrimAxis(
 
 export interface PitchAutoTrimInput {
   dt: number;
-  pitchRad: number;
+  pitchAccelRad: number;
   pitchRateRad: number;
-  rollRad: number;
   elevator: number;
   pitchTrim: number;
+  qbarPsf: number;
+  vtFps: number;
   onGround: boolean;
 }
 
@@ -123,24 +149,28 @@ export function stepPitchAutoTrim(state: AutoTrimState, input: PitchAutoTrimInpu
 } {
   const next = stepAutoTrimAxis(state, {
     dt: input.dt,
-    measuredRad: input.pitchRad,
+    accelRad: input.pitchAccelRad,
     rateRad: input.pitchRateRad,
     stick: input.elevator,
     trim: input.pitchTrim,
+    qbarPsf: input.qbarPsf,
+    vtFps: input.vtFps,
     onGround: input.onGround,
     trimSign: -1,
-    // Banked flight needs back-pressure that should not be trimmed in.
-    authority: Math.cos(finite(input.rollRad)) ** 2,
+    powerPerPsf: PITCH_POWER_PER_PSF,
+    dampingQbarOverVt: PITCH_DAMPING_QBAR_OVER_VT,
   });
   return { state: next.state, pitchTrim: next.trim };
 }
 
 export interface RollAutoTrimInput {
   dt: number;
-  rollRad: number;
+  rollAccelRad: number;
   rollRateRad: number;
   aileron: number;
   rollTrim: number;
+  qbarPsf: number;
+  vtFps: number;
   onGround: boolean;
 }
 
@@ -150,13 +180,16 @@ export function stepRollAutoTrim(state: AutoTrimState, input: RollAutoTrimInput)
 } {
   const next = stepAutoTrimAxis(state, {
     dt: input.dt,
-    measuredRad: input.rollRad,
+    accelRad: input.rollAccelRad,
     rateRad: input.rollRateRad,
     stick: input.aileron,
     trim: input.rollTrim,
+    qbarPsf: input.qbarPsf,
+    vtFps: input.vtFps,
     onGround: input.onGround,
     trimSign: 1,
-    authority: 1,
+    powerPerPsf: ROLL_POWER_PER_PSF,
+    dampingQbarOverVt: ROLL_DAMPING_QBAR_OVER_VT,
   });
   return { state: next.state, rollTrim: next.trim };
 }

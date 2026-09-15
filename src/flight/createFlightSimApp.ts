@@ -1604,17 +1604,20 @@ export async function createFlightSimApp(
       if (collisionReset) { resetWheelSpin("reset"); return "reset"; }
       const ap = syncArbiter(selected);
       const onGround = aircraftOnGround();
-      const pitchRad = jsbsim.sdk.getPropertyValue("attitude/theta-deg") * Math.PI / 180;
-      const rollRad = jsbsim.sdk.getPropertyValue("attitude/phi-deg") * Math.PI / 180;
+      const qbarPsf = jsbsim.sdk.getPropertyValue("aero/qbar-psf");
+      const vtFps = jsbsim.sdk.getPropertyValue("velocities/vt-fps");
       const commanded = { ...ap.controls };
       if (ap.owners.pitch === "pilot") {
+        const pusher = getFdmProfile(aircraftId).sf50VariantId
+          ? jsbsim.sdk.getPropertyValue("fcs/pusher-cmd-norm") : 0;
         const pitched = stepPitchAutoTrim(pitchAutoTrim, {
           dt: FIXED_DT,
-          pitchRad,
+          pitchAccelRad: jsbsim.sdk.getPropertyValue("accelerations/qdot-rad_sec2"),
           pitchRateRad: jsbsim.sdk.getPropertyValue("velocities/q-rad_sec"),
-          rollRad,
-          elevator: selected.elevator,
+          elevator: selected.elevator + (Number.isFinite(pusher) ? pusher : 0),
           pitchTrim: commanded.pitchTrim,
+          qbarPsf,
+          vtFps,
           onGround,
         });
         pitchAutoTrim = pitched.state;
@@ -1624,10 +1627,12 @@ export async function createFlightSimApp(
       if (ap.owners.roll === "pilot") {
         const rolled = stepRollAutoTrim(rollAutoTrim, {
           dt: FIXED_DT,
-          rollRad,
+          rollAccelRad: jsbsim.sdk.getPropertyValue("accelerations/pdot-rad_sec2"),
           rollRateRad: jsbsim.sdk.getPropertyValue("velocities/p-rad_sec"),
           aileron: selected.aileron,
           rollTrim: commanded.rollTrim,
+          qbarPsf,
+          vtFps,
           onGround,
         });
         rollAutoTrim = rolled.state;
