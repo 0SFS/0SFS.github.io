@@ -6,7 +6,7 @@ Implemented: 2026-09-12. Current bounded acceptance passed on 2026-09-13 during 
 
 The installed-fork run passed the 21 app-shell and eight selection-panel tests, within 97 focused app tests. Headless component checks passed wide (1440×900), narrow (360×760) and short (740×360) viewport layouts, native family-radio keyboard navigation, Tab and Enter/Apply. The actual production app separately booted C172 and G1/G2/G3 with matching SDK/aircraft bytes. No dev server or visible browser was used.
 
-A minor LOD-select focus-outline clipping measurement remains on wide/narrow layouts; controls remain usable, and keyboard navigation scrolls Apply into view with its full focus outline. External terrain requests were blocked during the built-app artifact check, so these results do not establish terrain readiness or aircraft fidelity. Screenshots, measured bounds and scope are in the [centralization execution record](jsbsim-centralization-2026-09-13.md).
+A minor LOD-select focus-outline clipping measurement remains on wide/narrow layouts; controls remain usable, and keyboard navigation scrolls Apply into view with its full focus outline. External terrain requests were blocked during the built-app artifact check, so these results do not establish terrain readiness or aircraft fidelity. Screenshots, measured bounds and scope are in the [centralization execution record](../old/jsbsim-centralization-2026-09-13.md).
 
 ## Selection and activation
 
@@ -63,4 +63,4 @@ Per the task's working boundaries, no Git commands, tests, builds, development s
 6. Thumbnail load failure, visible names/selected state, family-radio and generation-dropdown keyboard behavior, focus order and touch targets.
 7. Responsive grid and bounded scrolling on narrow, wide and short panels; selected controls remaining outside the gallery scroller.
 
-The later calibration task can resume from [the SF50 development handoff](sf50-development-handoff.md) and [variant models](sf50-variant-models.md). The UI implementation does not validate aircraft performance or supersede the recorded evidence gates.
+The later calibration task can resume from [the SF50 development handoff](../old/sf50-development-handoff.md) and [variant models](sf50-variant-models.md). The UI implementation does not validate aircraft performance or supersede the recorded evidence gates.

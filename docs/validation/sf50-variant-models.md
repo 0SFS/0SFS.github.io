@@ -87,9 +87,9 @@ See [the selection implementation record](aircraft-selection-ui.md) for behavior
 
 Work order:
 
-1. Review [the implemented aircraft selection UI and pending checks](aircraft-selection-ui.md), requested by [the UI prompt](../prompts/aircraft-selection-ui-work-app-prompt.md); run focused checks only when authorized.
-2. [SF50 development resume prompt](../prompts/sf50-resume-work-app-prompt.md).
+1. Review [the implemented aircraft selection UI and pending checks](aircraft-selection-ui.md); run focused checks only when authorized.
+2. Historical session prompts are in [`docs/old/`](../old/).
 
 The latest offline processing actually completed: 101 raw artifacts; 820 primary AFM cruise/climb rows; 12 ISA runway anchors; 53 TOLD tables / 8,535 rows; seven ERA22 and 34 public-dashboard steady-review candidates. The 820 AFM rows allocate 600 fitting candidates and 220 same-source ISA+10 checks, with zero independent-validation rows. Broad raw recorder exports remain quarantined despite successful inventory processing.
 
-See [the consolidated development handoff](sf50-development-handoff.md) for repository ownership, actual historical checks, source distinctions and remaining work. Preparing the original handoff performed no new source inspection, test, build or flight simulation. The subsequent UI implementation read the relevant current source, but ran no acceptance checks or flight simulations. Prior 42/42 test results predate the latest variant/model-input changes and do not validate the gallery implementation.
+See [the consolidated development handoff](../old/sf50-development-handoff.md) for repository ownership, actual historical checks, source distinctions and remaining work. Preparing the original handoff performed no new source inspection, test, build or flight simulation. The subsequent UI implementation read the relevant current source, but ran no acceptance checks or flight simulations. Prior 42/42 test results predate the latest variant/model-input changes and do not validate the gallery implementation.

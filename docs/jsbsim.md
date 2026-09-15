@@ -20,11 +20,11 @@ asset checks passed; focused ESLint passed the five changed identity/artifact
 and test-configuration files with no warnings. Headless Chrome verified actual SDK boot and loaded
 bytes for C172 and all three SF50 runtime packages. The separate component
 keyboard/layout check passed three viewports. These establish software and
-artifact contracts, not aircraft calibration or terrain readiness. See the
-[in-tree execution record](validation/jsbsim-in-tree-integration-2026-09-13.md).
-The [earlier centralization record](validation/jsbsim-centralization-2026-09-13.md)
-retains fork.1 acceptance and migration history; its two-repository editing
-layout is superseded by this integration.
+artifact contracts, not aircraft calibration or terrain readiness. The
+[in-tree execution record](old/jsbsim-in-tree-integration-2026-09-13.md)
+and [centralization record](old/jsbsim-centralization-2026-09-13.md) are
+historical snapshots; their checkout names and package identities are not the
+starting state.
 
 ```mermaid
 flowchart LR
@@ -103,9 +103,9 @@ tarball in place: a changed candidate requires an explicit dependency update
 and new acceptance evidence. FOSS Earth still uses `file:../foss-earth`; its
 checkout/build remains necessary, and it does not acquire a JSBSim dependency.
 
-Build engine or SDK changes from `/Users/felg/gh/Felipegalind0/jsbsim`,
-currently on `feature/wasm-integration`. The original `integration` branch is
-the preserved pre-import reference, not the accepted in-tree branch.
+Build engine or SDK changes from `/Users/felg/gh/Felipegalind0/jsbsim` on
+`master`. New work branches from there. The original `integration` branch is
+the preserved pre-import reference, not the development tip.
 
 ```sh
 npm --prefix wasm ci
@@ -152,29 +152,27 @@ The accepted application artifact is:
 
 | Identity | Value |
 | --- | --- |
-| Common native/SDK commit | `e727e6f1bdb9c616c14858025844b36cc47bc7b2` |
-| Repository content SHA-256 | `ca56f7cdfb989d38b5d2783597be93c3766bdd9ca2218724106dcfc54b187cff` |
-| SDK subtree content SHA-256 | `0c7c82faaafedbc2f96d158c9745cdb48c84c161953e0a5622e3b4d0f9169d58` |
-| Build input SHA-256 | `837a8746acab8263c77ae351988238c77f9d492cbf2d3083bad4c6c2ff3736e8` |
-| Package tarball SHA-256 | `9312e2b657fd5f396f6ed55904616b907d387c9cd76d98ca66ad756cf3d8aa52` |
+| Common native/SDK commit | `fea688020fb683c0696aa8339dbed9cdb238a39d` |
+| Repository content SHA-256 | `688091cc93ad332d8e55ca376393dea3d544a80de0711a4781e10c7e1539ec35` |
+| SDK subtree content SHA-256 | `b5d8ff6d2cc76d2b96c92aef1a3228bf6cfebe5dd8ddc4e571c6b713f3d5a93d` |
+| Build input SHA-256 | `733a60a62ef3061dc254f6d4a3c8f3cf7f162a213b444e423e4ac3d6b18553f0` |
+| Package tarball SHA-256 | `58afaf9fa575ec61838ba794b7b4a0919b8eaf516c7261e571700e8367b5217b` |
 | Emitted/browser loader SHA-256 | `784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2` |
-| Emitted/browser WASM SHA-256 | `d848696de238128cee41c34e7e63951af9563eebdef6ddb631adfb02f989f1b1` |
+| Emitted/browser WASM SHA-256 | `6eae23db0fc26d4e02daa27eb95fba12932265164e4bb194cb3e183d04882806` |
 
-The previously accepted fork.3 identity (commit `f7a80a6f`, tarball
-`43d0fe82…`) remains recorded in
-[the in-tree execution record](validation/jsbsim-in-tree-integration-2026-09-13.md)
-and its retained archive.
+That is fork.7, packed from `feature/jsbsim-package-rename`. The JSBSim checkout's
+`master` (`f9082ee1`) is that commit merged with JSBSim-Team `master`. Earlier
+fork identities remain in
+[the adoption records](validation/evidence/jsbsim/adoption/) and the
+[historical in-tree execution record](old/jsbsim-in-tree-integration-2026-09-13.md).
 
 The installed distribution's 14 recorded files and archive SHA-512 lock
-integrity were verified. The adoption record and parity report are tracked as
-[`validation/evidence/jsbsim/adoption/fork4-adoption.json`](validation/evidence/jsbsim/adoption/fork4-adoption.json)
-and
-[`parity/fork4-parity.json`](validation/evidence/jsbsim/parity/fork4-parity.json).
+integrity were verified. The current adoption record is
+[`validation/evidence/jsbsim/adoption/fork7-adoption.json`](validation/evidence/jsbsim/adoption/fork7-adoption.json).
 Command logs, earlier per-fork browser and UI reports and screenshots stay in
-the local, undistributed tree under `build/validation/jsbsim-in-tree-20260913/`. Current logs use the `app-fork4-` prefix; earlier artifacts retain
-their separate reports.
-These ignored files are local evidence; the identities and outcomes above
-remain in documentation.
+the local, undistributed tree under `build/validation/jsbsim-in-tree-20260913/`.
+Those ignored files are local evidence; they keep per-fork name prefixes.
+The identities and outcomes above remain in documentation.
 
 All app imports, type imports, mocks and SDK assets use the fork scope.
 `createJsbsimRuntime` imports `JSBSimSdk` and `buildIdentity` from the package,
@@ -440,7 +438,7 @@ Use the canonical repositories and ordinary branches:
 - Reusable terrain/rendering: `/Users/felg/gh/foss-earth`.
 
 Open [flight-development.code-workspace](../flight-development.code-workspace)
-for the three labeled app, combined JSBSim and terrain roots. The old separate
+for the four labeled roots: 0sfs, JSBSim, FOSS Earth, and gamepad-tools. The old separate
 SDK checkout was reversibly moved to
 `/Users/felg/gh/.preservation/jsbsim-in-tree-20260913T233508Z/retired-jsbsim-wasm`;
 its history and the fork.1/fork.2 tarballs remain migration/PR references. SDK
@@ -459,8 +457,7 @@ because it is publicly accessible.
 Continue existing upstream work under the
 [contribution policy and dated PR ledger](jsbsim-upstream-contribution-policy.md).
 Upstream review status, local correctness, installed app adoption and aircraft
-fidelity are separate outcomes. Preserve the
-[SF50 development handoff](validation/sf50-development-handoff.md) and
-[validation guide](validation/sf50-performance.md), including source identities,
-qualification ledgers and the 600-fit/220-same-source-check allocation, when
-updating the dependency.
+fidelity are separate outcomes. Preserve the [validation guide](validation/sf50-performance.md), including
+source identities, qualification ledgers and the 600-fit/220-same-source-check
+allocation, when updating the dependency. The
+[SF50 development handoff](old/sf50-development-handoff.md) is a dated snapshot.

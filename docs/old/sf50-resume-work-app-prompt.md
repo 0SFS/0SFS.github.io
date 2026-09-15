@@ -22,10 +22,10 @@ Preserve unrelated user changes, including aircraft-family UI and controller wor
 Read the relevant AGENTS.md files, then these app documents in order. Read only
 source needed for the next implementation step after that:
 
-1. `docs/validation/jsbsim-upstream-submissions-2026-09-13.md`
-2. `docs/jsbsim-wasm.md` and the acceptance/recovery sections of
-   `docs/validation/jsbsim-in-tree-integration-2026-09-13.md`
-3. `docs/validation/sf50-development-handoff.md`
+1. `docs/old/jsbsim-upstream-submissions-2026-09-13.md`
+2. `docs/jsbsim.md` and the acceptance/recovery sections of
+   `docs/old/jsbsim-in-tree-integration-2026-09-13.md`
+3. `docs/old/sf50-development-handoff.md`
 4. `docs/validation/sf50-calibration-qualification-2026-09-12.md`
 5. The two existing review ledgers under
    `planes/Cirrus_Vision_Jet/tests/public-evidence/`:

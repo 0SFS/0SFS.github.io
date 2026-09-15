@@ -2,7 +2,7 @@
 
 Status: superseded; replacement proposal written and ready for review
 Date: 2026-09-11
-Replacement: [SF50 flight model, simulation boundaries, and validation](sf50-flight-model-v2.md)
+Replacement: [SF50 flight model, simulation boundaries, and validation](../proposals/sf50-flight-model-v2.md)
 
 We are replacing this proposal with the linked revised proposal. This document
 is retained as a historical record. Review found incomplete aircraft separation,

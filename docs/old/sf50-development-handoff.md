@@ -1,5 +1,7 @@
 # SF50 development handoff
 
+**Archived 2026-09-15.** Historical snapshot. Current checkout and package guidance is [AGENTS.md](../../AGENTS.md) and [JSBSim in the browser](../jsbsim.md). Do not use this file as the starting checkout.
+
 Snapshot: 2026-09-12. Consolidated from the preceding conversation and its recorded tool results. Preparing the original handoff did not run another inspection, build, test or aircraft simulation. A subsequent 2026-09-12 UI implementation update is recorded below; it does not establish new aircraft-validation results.
 
 ## Fresh-session starting point after upstream submissions
@@ -14,12 +16,12 @@ and IDBFS persistence were ported selectively into the full integration as
 [the adopted corrections](../jsbsim.md#adopted-idbfs-and-native-exception-corrections)
 and `docs/validation/evidence/jsbsim/adoption/fork4-adoption.json`.
 
-Use the rewritten [fresh SF50 prompt](../prompts/sf50-resume-work-app-prompt.md).
+Use the rewritten [fresh SF50 prompt](sf50-resume-work-app-prompt.md).
 Its Phase A is done. Phase B's first step is also done: the historical G1 AFM
 cruise altitude, atmosphere, configuration and gallon conventions are resolved
 from the primary source, a generic zero-time-trim fuel-flow gap was fixed in
 JSBSim, and the narrow fuel-flow diagnostic at observed AFM N1 has run. See
-[the cruise condition and fuel-flow record](sf50-g1-cruise-fuel-flow-2026-09-13.md)
+[the cruise condition and fuel-flow record](../validation/sf50-g1-cruise-fuel-flow-2026-09-13.md)
 and its [condition ledger](../../planes/Cirrus_Vision_Jet/tests/public-evidence/afm-cruise-conditions-2026-09-13.json).
 The diagnostic found the package's estimated idle fuel-flow floor sitting above
 published cruise fuel flow at the two lowest reviewed power settings, and a
@@ -50,7 +52,7 @@ The user authorized centralization implementation and its checks. No dev server,
 
 ## Latest source-qualification phase (2026-09-12)
 
-Read [the calibration qualification record](sf50-calibration-qualification-2026-09-12.md) and then [the 2026-09-13 cruise condition and fuel-flow record](sf50-g1-cruise-fuel-flow-2026-09-13.md), which resolves four of that record's open condition gates, before using the older processing outputs below. All 41 steady candidates have per-window dispositions: three ERA22 windows contain recorded mode/TLA changes and are excluded from single-setting cases; the remaining 38 are context-only. Zero recordings qualify for fitting or independent validation. The two whole-flight boundaries remain intact. Numeric transcription of 27 selected ISA AFM rows was visually reviewed; configuration/condition gates remain open and the 600/220 allocation is unchanged.
+Read [the calibration qualification record](../validation/sf50-calibration-qualification-2026-09-12.md) and then [the 2026-09-13 cruise condition and fuel-flow record](../validation/sf50-g1-cruise-fuel-flow-2026-09-13.md), which resolves four of that record's open condition gates, before using the older processing outputs below. All 41 steady candidates have per-window dispositions: three ERA22 windows contain recorded mode/TLA changes and are excluded from single-setting cases; the remaining 38 are context-only. Zero recordings qualify for fitting or independent validation. The two whole-flight boundaries remain intact. Numeric transcription of 27 selected ISA AFM rows was visually reviewed; configuration/condition gates remain open and the 600/220 allocation is unchanged.
 
 The reviewed AFM includes 100.4% MCT N1 above the model's estimated 100% endpoint, but neither the 104.7% operational limit nor steady cruise observations supply a replacement TLA/FADEC schedule. Newly documented temperature and cumulative-fuel inconsistencies must be preserved, not normalized away. The first candidate constraint is fuel flow at specified observed N1 and flight conditions; installed thrust, drag and TSFC remain unseparated. No aircraft XML or UI was edited in this phase.
 
@@ -62,7 +64,7 @@ Focused evidence and generation/package test source is prepared; the exact propo
 
 ## Start here and work in this order
 
-1. Follow the [fresh-session prompt](../prompts/sf50-resume-work-app-prompt.md) to close the remaining full-SDK/app adoption gap using the submission and acceptance records. Preserve the aircraft-family UI and its generation aliases/atomic Apply contract.
+1. Follow the [fresh-session prompt](sf50-resume-work-app-prompt.md) to close the remaining full-SDK/app adoption gap using the submission and acceptance records. Preserve the aircraft-family UI and its generation aliases/atomic Apply contract.
 2. Continue the existing qualification plan from the completed window/AFM ledgers, beginning with unresolved AFM conditions and the narrow G1 fuel-flow diagnostic.
 
 The 2026-09-12 UI implementation replaces the temporary flat generation picker with **a scrollable grid of aircraft-family images, followed by aircraft-specific controls underneath**. The Vision Jet family card reveals its G1/G2/G2+/G3 selector below the gallery. Family, generation and model-presentation choices are staged until Apply; the active aircraft remains identified separately.
@@ -137,7 +139,7 @@ LOD/Auto, opt-in HD, applicable model credits and development disclosures are re
 
 The panel retains staged choices per family across panel tabs, identifies active versus pending choices, and offers a reset to the active selection. Apply normalizes the complete aircraft/LOD/opt-in selection and saves the three existing preferences together, with rollback on storage failure. A changed runtime ID triggers one application reload so the FDM package, controls, contact geometry, gauges and visuals change together. Applying presentation changes to the same runtime ID calls `createAircraftModel.setPresentation` once, resolving/loading the selected mesh without switching aircraft physics. The legacy `cirrus-vision-jet` preference still selects G1.
 
-No Git commands, tests, builds, dev server, browser checks or extra verification pass ran during this UI work. Family/generation interaction, legacy preference restoration, atomic package activation, retained controls/credits, loading/errors, thumbnail failure handling, keyboard access, responsive scrolling and persistence-failure rollback remain untested. See [the dedicated selection record](aircraft-selection-ui.md). This UI update changes no flight-model coefficients, calibration targets, JSBSim behavior or SDK lifecycle.
+No Git commands, tests, builds, dev server, browser checks or extra verification pass ran during this UI work. Family/generation interaction, legacy preference restoration, atomic package activation, retained controls/credits, loading/errors, thumbnail failure handling, keyboard access, responsive scrolling and persistence-failure rollback remain untested. See [the dedicated selection record](../validation/aircraft-selection-ui.md). This UI update changes no flight-model coefficients, calibration targets, JSBSim behavior or SDK lifecycle.
 
 ## Durable evidence corpus and actual processing results
 
@@ -263,5 +265,5 @@ Broader architecture and upstream SDK disposal/diagnostics were earlier reported
 6. Update the proposal with measured outcomes and remaining blockers. Do not mark end-to-end implementation complete because the aircraft can load or a parser passes.
 
 Additional durable context:
-[cruise conditions and fuel flow](sf50-g1-cruise-fuel-flow-2026-09-13.md),
-[variant implementation](sf50-variant-models.md), [public acquisition](sf50-public-data-acquisition.md), [expanded audit](sf50-public-data-audit-2026-09-12.md), [AFM audit](sf50-afm-audit.md), [owner-data request](sf50-owner-data-request.md), [Cirrus question list](sf50-cirrus-questions.md), and [the proposal](../proposals/sf50-flight-model-v2.md).
+[cruise conditions and fuel flow](../validation/sf50-g1-cruise-fuel-flow-2026-09-13.md),
+[variant implementation](../validation/sf50-variant-models.md), [public acquisition](../validation/sf50-public-data-acquisition.md), [expanded audit](../validation/sf50-public-data-audit-2026-09-12.md), [AFM audit](../validation/sf50-afm-audit.md), [owner-data request](../validation/sf50-owner-data-request.md), [Cirrus question list](../validation/sf50-cirrus-questions.md), and [the proposal](../proposals/sf50-flight-model-v2.md).

@@ -25,8 +25,8 @@ every check run with its result, and what was deliberately left undone.
 the in-tree consolidation.
 
 fork.1 through fork.3 predate this format; their history is in
-[the centralization record](../../jsbsim-centralization-2026-09-13.md) and
-[the in-tree integration record](../../jsbsim-in-tree-integration-2026-09-13.md).
+[the centralization record](../../../old/jsbsim-centralization-2026-09-13.md) and
+[the in-tree integration record](../../../old/jsbsim-in-tree-integration-2026-09-13.md).
 
 ## rollback/
 

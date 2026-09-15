@@ -32,7 +32,7 @@ Credits, development status and errors
 
 ## Read the handoff, then inspect only the relevant UI
 
-Start with `docs/validation/sf50-development-handoff.md` and the selection sections of `docs/validation/sf50-variant-models.md`.
+Start with `docs/old/sf50-development-handoff.md` and the selection sections of `docs/validation/sf50-variant-models.md`.
 
 Likely implementation files:
 
