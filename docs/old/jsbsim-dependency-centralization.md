@@ -1,9 +1,9 @@
 # Centralize the JSBSim fork, SDK and application dependency
 
-Date: 2026-09-13. Status: implemented and locally accepted. Native and SDK are clean on ordinary integration branches; 0sfs runs the pinned fork tarball. See the [execution record](../validation/jsbsim-centralization-2026-09-13.md) for preservation, exact identities, completed checks, reviewable app changes and remaining upstream/calibration work. No remote publication was performed.
+Date: 2026-09-13. Status: implemented and locally accepted. Native and SDK are clean on ordinary integration branches; 0sfs runs the pinned fork tarball. See the [execution record](jsbsim-centralization-2026-09-13.md) for preservation, exact identities, completed checks, reviewable app changes and remaining upstream/calibration work. No remote publication was performed.
 
 
-**Follow-up decision, 2026-09-13:** the user authorized folding the SDK into the native fork under `wasm/`, following JSBSim's Python package precedent. This specification preserves the completed first centralization phase; its separate-repository topology is superseded by [the in-tree integration record](../validation/jsbsim-in-tree-integration-2026-09-13.md). Preserve every prior fix and rollback artifact while moving daily work to one engine/SDK repository.
+**Follow-up decision, 2026-09-13:** the user authorized folding the SDK into the native fork under `wasm/`, following JSBSim's Python package precedent. This specification preserves the completed first centralization phase; its separate-repository topology is superseded by [the in-tree integration record](jsbsim-in-tree-integration-2026-09-13.md). Preserve every prior fix and rollback artifact while moving daily work to one engine/SDK repository.
 
 ## Objective and decisions
 

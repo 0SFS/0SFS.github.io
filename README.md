@@ -86,6 +86,7 @@ broader simulator is still taking shape.
 | [Creating an aircraft model](docs/creating-an-aircraft-model.md) | Modeling guide for contributing new aircraft |
 | [Software dependency graph](docs/software-dependency-graph.md) | What OSFS is built on, and under which licenses |
 | [Design proposals](docs/proposals/) | ArduPilot SITL, phone controller protocol, collision, and elevation proposals |
+| [Historical records](docs/old/) | Dated snapshots and completed prompts; not current procedure |
 | [Release checklist](RELEASE_CHECKLIST.md) | What to verify before publishing a build |
 
 ## Contributing

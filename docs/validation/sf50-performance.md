@@ -13,9 +13,9 @@ landing transient. Inspect the new run's report before using its residuals.
 
 ## Current dependency acceptance (2026-09-13)
 
-The app now consumes the identified fork artifact described in the [centralization execution record](jsbsim-centralization-2026-09-13.md). Native turbine state and reload lifetime, SDK destruction, and app initialization ordering are exercised on that installed artifact. Four matched native/WASM scenarios passed using identical app aircraft files and declared initial/reset conditions. The runner attaches schema-2 SDK/native/artifact identity to new reports and rejects an unverified stable dependency.
+The app now consumes the identified fork artifact described in the [centralization execution record](../old/jsbsim-centralization-2026-09-13.md). Native turbine state and reload lifetime, SDK destruction, and app initialization ordering are exercised on that installed artifact. Four matched native/WASM scenarios passed using identical app aircraft files and declared initial/reset conditions. The runner attaches schema-2 SDK/native/artifact identity to new reports and rejects an unverified stable dependency.
 
-This migration did not rerun the AFM runway fitting campaign or replace its targets/tolerances. Earlier SDK, driver and AFM results below remain attached to their historical inputs. Preserve source conflicts, applicable procedures, same-source check roles and the qualification boundaries in the [current handoff](sf50-development-handoff.md).
+This migration did not rerun the AFM runway fitting campaign or replace its targets/tolerances. Earlier SDK, driver and AFM results below remain attached to their historical inputs. Preserve source conflicts, applicable procedures, same-source check roles and the qualification boundaries in the [dated handoff](../old/sf50-development-handoff.md).
 
 ## What existed before this work
 

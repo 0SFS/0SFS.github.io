@@ -30,9 +30,10 @@ Scale verification to the change. A portability fix needs affected compiler/plat
 
 ## Contribution workflow
 
-1. Track each candidate in the owning repository with its purpose, source commits or preserved working content, intended upstream, dependencies, unresolved decisions and acceptance evidence. Preserve all work before extracting changes, following the [centralization spec](proposals/jsbsim-dependency-centralization.md).
+1. Track each candidate in the owning repository with its purpose, source commits or preserved working content, intended upstream, dependencies, unresolved decisions and acceptance evidence. Preserve all work before extracting changes. The completed
+[centralization spec](old/jsbsim-dependency-centralization.md) is historical.
 2. Inspect existing upstream issues, PRs and current contribution instructions before preparing a new submission. Continue existing PRs #1502, #1504–#1508 and #8 where applicable. Do not duplicate them or bundle a separate defect into a feature PR simply because it shares the current local branch.
-3. Prepare a focused contribution on an ordinary branch in the canonical owning repository. Retain the integration branch and recovery record. Do not overwrite user changes, stage the whole tree, or rewrite published history as an incidental cleanup operation.
+3. Prepare a focused contribution on an ordinary branch in `/Users/felg/gh/Felipegalind0/jsbsim`, starting from `master`. Do not delete historical `integration` or PR branches. Do not overwrite user changes, stage the whole tree, or rewrite published history as an incidental cleanup operation.
 4. Complete the readiness evidence and record the final candidate identity. Build and test the same inputs that will be submitted. SDK evidence must use coherent generation/compilation sources and an identified package; an application's manual native-handle deletion or spool-property reset cannot validate the SDK/engine fix.
 5. Submit or update the existing PR within the standing authorization for the task. Local preparation, pushing a branch, creating a PR and publishing a package are distinct actions. This policy update performs none of them. Review feedback may require revisions even after our readiness gates pass; record and retest affected changes.
 6. Track upstream review, merge and release separately from downstream adoption. After merge, identify the actual upstream commit/release and verify that it contains the intended behavior before replacing our patch or pin. Confirm the consuming application loads the new artifact. Keep the prior artifact and recovery path until the replacement passes its adoption checks.
@@ -53,7 +54,7 @@ which explicitly carries #1504/#1506 prerequisites. It excludes the wheel and
 batching/gear features with separate reviews. All three are open, non-draft;
 maintainer workflow approval and review remain pending.
 
-[The submission record](validation/jsbsim-upstream-submissions-2026-09-13.md)
+[The submission record](old/jsbsim-upstream-submissions-2026-09-13.md)
 records exact heads, native/sanitizer/WASM/browser/package checks, passing
 hosted WASM CI, preserved branches, and the restored downstream environment.
 This supersedes the **not submitted** states below for these specific scopes.
@@ -106,7 +107,7 @@ and #1508 have the same diffs as the PRs they come from.
 
 ## Candidate ledger before extraction: 2026-09-13
 
-This is an assessment of suitability and remaining gates, not authorization to publish. Live GitHub PR bodies, comments and check states were read on this date. The [centralization execution record](validation/jsbsim-centralization-2026-09-13.md) records subsequent local implementation and exact validation; those results do not resolve existing upstream review concerns.
+This is an assessment of suitability and remaining gates, not authorization to publish. Live GitHub PR bodies, comments and check states were read on this date. The [centralization execution record](old/jsbsim-centralization-2026-09-13.md) records subsequent local implementation and exact validation; those results do not resolve existing upstream review concerns.
 
 | Work and destination | Readiness | Upstream state and downstream adoption |
 | --- | --- | --- |
@@ -136,7 +137,7 @@ The [wheel review](https://github.com/JSBSim-Team/jsbsim/pull/1502#issuecomment-
 
 The portability discussion asks for [terminal-color clarification](https://github.com/JSBSim-Team/jsbsim/pull/1504#issuecomment-5645055803) and [WASM integration context](https://github.com/JSBSim-Team/jsbsim/pull/1504#issuecomment-5645415466). The PR reports a completed Emscripten build, but that historical result does not verify a different local integration revision. The SDK discussion requests a [cache-only performance comparison](https://github.com/0x62/jsbsim-wasm/pull/8#issuecomment-5645552459); its existing benchmark/test claims remain attached to the PR's recorded environment.
 
-On 2026-09-13, the [terminal-color clarification](https://github.com/JSBSim-Team/jsbsim/pull/1504#issuecomment-5656709734) was posted and PR #1504’s description corrected. Its code/head remained `d47fd2e3`. The old patch belonged to our SDK fork; upstream moved ANSI codes into `FGLogConsole`, so the old patch location was obsolete but the behavior was not. Sean’s integration question is an invitation to discuss scope, not a recorded decision to import the entire SDK. The [review note](validation/jsbsim-pr1504-review-2026-09-13.md) records the evidence and proposed direction.
+On 2026-09-13, the [terminal-color clarification](https://github.com/JSBSim-Team/jsbsim/pull/1504#issuecomment-5656709734) was posted and PR #1504’s description corrected. Its code/head remained `d47fd2e3`. The old patch belonged to our SDK fork; upstream moved ANSI codes into `FGLogConsole`, so the old patch location was obsolete but the behavior was not. Sean’s integration question is an invitation to discuss scope, not a recorded decision to import the entire SDK. The [review note](old/jsbsim-pr1504-review-2026-09-13.md) records the evidence and proposed direction.
 
 Recheck upstream states before acting. The execution record establishes current local fork integration and app adoption; it does not establish maintainer acceptance or readiness of a separately extracted contribution.
 
@@ -148,4 +149,4 @@ Review the ledger when a change reaches local acceptance, receives upstream feed
 
 ## In-tree integration follow-up
 
-The [roadmap reply](https://github.com/JSBSim-Team/jsbsim/pull/1504#issuecomment-5657061563) was posted on 2026-09-13 and implementation began in our native fork. The [execution record](validation/jsbsim-in-tree-integration-2026-09-13.md) supersedes separate SDK ownership and artifact identities above where explicitly stated. Existing native dynamics and SDK features retain their review/readiness gates; moving their source does not settle those reviews. Prepare focused upstream contributions after exact-source checks; do not submit the entire downstream integration history as one finished upstream change.
+The [roadmap reply](https://github.com/JSBSim-Team/jsbsim/pull/1504#issuecomment-5657061563) was posted on 2026-09-13 and implementation began in our native fork. The [execution record](old/jsbsim-in-tree-integration-2026-09-13.md) supersedes separate SDK ownership and artifact identities above where explicitly stated. Existing native dynamics and SDK features retain their review/readiness gates; moving their source does not settle those reviews. Prepare focused upstream contributions after exact-source checks; do not submit the entire downstream integration history as one finished upstream change.

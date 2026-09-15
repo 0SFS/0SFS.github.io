@@ -13,11 +13,12 @@ production build/typecheck, emitted-byte checks and actual browser SDK boot/byte
 checks for all four runtime aircraft passed, together with 50 SDK tests,
 11 native regression targets, native build isolation, browser IDBFS persistence
 and four matched native/WASM scenarios. Focused ESLint passed the four
-changed identity/artifact files. See the [in-tree execution record](validation/jsbsim-in-tree-integration-2026-09-13.md)
-and the [adopted corrections](jsbsim.md#adopted-idbfs-and-native-exception-corrections)
-for exact artifacts and outcomes. The [earlier centralization spec](proposals/jsbsim-dependency-centralization.md)
-and [record](validation/jsbsim-centralization-2026-09-13.md) retain preservation
-and rollback history; their separate native/SDK editing layout is superseded.
+changed identity/artifact files. See the [adopted corrections](jsbsim.md#adopted-idbfs-and-native-exception-corrections)
+and [fork.7 adoption record](validation/evidence/jsbsim/adoption/fork7-adoption.json)
+for exact artifacts and outcomes. The [in-tree execution record](old/jsbsim-in-tree-integration-2026-09-13.md),
+[centralization spec](old/jsbsim-dependency-centralization.md) and
+[centralization record](old/jsbsim-centralization-2026-09-13.md) retain
+preservation and rollback history; they are not the current editing layout.
 The [upstream contribution policy](jsbsim-upstream-contribution-policy.md)
 records reusable upgrades and existing PR follow-up.
 
@@ -66,9 +67,11 @@ installation without a source sibling or npm publication. The SDK package
 version is distinct from the native engine version.
 
 The accepted tarball SHA-256 is
-`9312e2b657fd5f396f6ed55904616b907d387c9cd76d98ca66ad756cf3d8aa52`.
+`58afaf9fa575ec61838ba794b7b4a0919b8eaf516c7261e571700e8367b5217b`.
 Both engine and SDK come from commit
-`e727e6f1bdb9c616c14858025844b36cc47bc7b2` in the same repository snapshot.
+`fea688020fb683c0696aa8339dbed9cdb238a39d` (fork.7) in the same repository
+snapshot. The JSBSim checkout's `master` (`f9082ee1`) is that line merged with
+JSBSim-Team `master`.
 `buildIdentity` schema 2 records the shared commit/dirty flag, `sdk.path: "wasm"`,
 full repository and SDK subtree content digests and actual build inputs.
 Metadata identifies the shared repository with null external native archive
@@ -124,10 +127,12 @@ in `src/input/globeNavigation.ts` in FOSS Earth.
 
 The [flight development workspace](../flight-development.code-workspace) names
 the four active repository roots explicitly. Engine and SDK work share one
-JSBSim checkout and branch. The old separate SDK was reversibly moved under
+JSBSim checkout on `master`. The old separate SDK was reversibly moved under
 `gh/.preservation/jsbsim-in-tree-20260913T233508Z/retired-jsbsim-wasm`; it remains
 a migration/PR reference outside the active workspace. The user's preferred layout is `gh/owner/repo`, with work on ordinary branches in the canonical repositories. Do not recreate special task-named repository copies/worktrees. The app path above is the actual path used in this work, not a request to relocate it.
 
 Existing upstream PRs and portability patches predate this handoff. Their status and discussions were subsequently checked on 2026-09-13 in the [contribution ledger](jsbsim-upstream-contribution-policy.md#existing-pr-evidence-and-open-discussion); refresh those observations before extending work. Production adoption of a historical native fix or temporary SDK build must not be assumed. PR creation follows confirmation that the relevant changes work.
 
-See [the SF50 development handoff](validation/sf50-development-handoff.md), [aircraft-selection UI prompt](prompts/aircraft-selection-ui-work-app-prompt.md) and [SF50 resume prompt](prompts/sf50-resume-work-app-prompt.md) for the preserved integration state and next-task boundaries.
+See [the SF50 development handoff](old/sf50-development-handoff.md) for the
+preserved 2026-09-12 integration snapshot. Current next-task boundaries are in
+[`AGENTS.md`](../AGENTS.md) and [JSBSim in the browser](jsbsim.md).

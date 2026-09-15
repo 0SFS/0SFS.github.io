@@ -2,7 +2,7 @@
 
 Status: SF50 development runtime integration implemented; the full proposal remains in progress
 
-Current dependency status (2026-09-13): [centralization and installed-fork acceptance are complete](../validation/jsbsim-centralization-2026-09-13.md). Native/SDK lifetime and turbine fixes are adopted; current app checks, production browser asset checks and four matched native/WASM scenarios pass. The native and SDK integration branches preserve existing PR branches. These results supersede older dependency-adoption/cleanup blockers below; broader private-driver work and aircraft calibration remain incomplete.
+Current dependency status (2026-09-13): [centralization and installed-fork acceptance are complete](../old/jsbsim-centralization-2026-09-13.md). Native/SDK lifetime and turbine fixes are adopted; current app checks, production browser asset checks and four matched native/WASM scenarios pass. The native and SDK integration branches preserve existing PR branches. These results supersede older dependency-adoption/cleanup blockers below; broader private-driver work and aircraft calibration remain incomplete.
 
 Latest qualification status (2026-09-12): [41 window dispositions, 27 selected AFM transcription reviews, and the parameter-to-evidence plan](../validation/sf50-calibration-qualification-2026-09-12.md) are recorded. Zero recordings are eligible; AFM condition qualification and distinct generation calibration remain incomplete. Evidence gates now enforce the ISA+10 same-source allocation and refuse independence overrides. Dashboard Celsius labeling is reviewed; its gallon convention remains unknown. Focused regression source is prepared, but no tests, build, processing rerun or aircraft simulation ran in this phase.
 
@@ -43,7 +43,7 @@ Follow-on implementation (2026-09-11, calibration not yet validated):
 - Native/SDK lifetime and actionable load diagnostics are now adopted and verified by centralization; the broader live-replacement architecture below remains separate work. Current integration tests assert SDK-owned destruction rather than manually deleting the executive.
 - Browser/deployment checks and representative device performance measurements.
 
-Supersedes: [SF50 flight model and the per-aircraft FDM seam](sf50-flight-model.md)
+Supersedes: [SF50 flight model and the per-aircraft FDM seam](../old/sf50-flight-model.md)
 
 ## Objective and decisions
 
@@ -773,9 +773,9 @@ Generation selection and data-processing plumbing are implemented. Variant-speci
 
 The user requested a documentation handoff before starting shorter, focused conversations.
 
-1. **Aircraft selection UI first:** replace the interim flat aircraft/generation radio list with a scrollable image grid of aircraft families. Show generation choices and all applicable existing aircraft-specific controls underneath, outside the gallery's scroll region. One Vision Jet card leads to G1/G2/G3 controls; preserve saved IDs, credits and atomic aircraft activation. Use [the UI prompt](../prompts/aircraft-selection-ui-work-app-prompt.md).
-2. **SF50 development afterward:** resume qualification of the processed public data and source-grounded calibration using [the SF50 prompt](../prompts/sf50-resume-work-app-prompt.md).
+1. **Aircraft selection UI first:** replace the interim flat aircraft/generation radio list with a scrollable image grid of aircraft families. Show generation choices and all applicable existing aircraft-specific controls underneath, outside the gallery's scroll region. One Vision Jet card leads to G1/G2/G3 controls; preserve saved IDs, credits and atomic aircraft activation. The family UI is implemented; see [aircraft-selection UI](../validation/aircraft-selection-ui.md). The original [UI prompt](../old/aircraft-selection-ui-work-app-prompt.md) is historical.
+2. **SF50 development afterward:** resume qualification of the processed public data and source-grounded calibration from [the validation records](../validation/). The original [SF50 prompt](../old/sf50-resume-work-app-prompt.md) is historical.
 
-[The consolidated handoff](../validation/sf50-development-handoff.md) records the current implementation, actual processing results, historical test/build evidence, known source conflicts and upstream ownership. It is the entry point for the next conversations, not a replacement for current source or permission to run deferred checks.
+[The consolidated handoff](../old/sf50-development-handoff.md) records a 2026-09-12 snapshot of implementation, processing results, historical test/build evidence, known source conflicts and upstream ownership. It is not the current checkout or package identity.
 
 The latest processor completed all stages, including 820 AFM cruise/climb rows, 8,535 TOLD rows and 41 steady-review windows. G2/G3 remain explicitly shared-physics development packages. No new flight-model validation occurred during this documentation update, and the overall proposal remains incomplete.

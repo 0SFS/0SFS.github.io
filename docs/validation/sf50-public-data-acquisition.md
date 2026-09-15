@@ -167,9 +167,9 @@ Actual processing outcomes are retained in `planes/Cirrus_Vision_Jet/tests/publi
 
 The expanded processor completed its run against 101 raw artifacts. It produced 820 primary AFM cruise/climb candidates, 12 existing ISA runway anchors, 8,535 rows across 53 generation-tagged TOLD tables and 41 steady-flight review windows. These are processing counts, not independent experiments or validated aircraft behavior. The current ledger is `planes/Cirrus_Vision_Jet/tests/public-evidence/variant-processing-summary.json`.
 
-[The consolidated SF50 handoff](sf50-development-handoff.md) preserves source-revision conflicts, generation applicability, recorder/channel limitations, public-access follow-ups and ownership boundaries. Existing raw and bulk derived artifacts remain local/Git-ignored; a new conversation on this machine can use them, but a new clone will not automatically have the corpus.
+[The consolidated SF50 handoff](../old/sf50-development-handoff.md) preserves source-revision conflicts, generation applicability, recorder/channel limitations, public-access follow-ups and ownership boundaries. Existing raw and bulk derived artifacts remain local/Git-ignored; a new conversation on this machine can use them, but a new clone will not automatically have the corpus.
 
-The next task is the [aircraft-family gallery UI](../prompts/aircraft-selection-ui-work-app-prompt.md), followed by [SF50 source qualification and development](../prompts/sf50-resume-work-app-prompt.md). No employee outreach, new tests or flight checks were authorized or performed by the handoff request. Public-data qualification is not complete and public options have not been declared exhausted.
+The family UI is implemented. Remaining source qualification is recorded here and in the calibration documents in this folder. Historical session prompts are in [`docs/old/`](../old/). No employee outreach, new tests or flight checks were authorized or performed by the handoff request. Public-data qualification is not complete and public options have not been declared exhausted.
 
 ## 10. Subsequent source qualification (2026-09-12)
 
