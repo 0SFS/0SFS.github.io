@@ -171,6 +171,15 @@ describe("flight HUD auto-trim", () => {
     t.hud.destroy();
   });
 
+  it("describes leftover-moment assist, not attitude hold", () => {
+    const t = mount();
+    expect(t.pitchAuto.title).toMatch(/leftover pitch moment/i);
+    t.hud.update(STATE, CONTROLS, true, { pitch: true, roll: true });
+    expect(t.pitchAuto.title).toMatch(/leftover moment in real time/i);
+    expect(t.rollAuto.title).not.toMatch(/holds roll|stick is centered/i);
+    t.hud.destroy();
+  });
+
   it("stops answering clicks once destroyed", () => {
     const t = mount();
     const pitchAuto = t.pitchAuto;
