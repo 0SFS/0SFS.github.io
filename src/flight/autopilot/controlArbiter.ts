@@ -5,10 +5,12 @@
  * arbiter then decides, per axis, whether the pilot or an autopilot writes
  * the normalized command that `applyFlightControls` sends to JSBSim.
  *
- * Override policy (documented, same idea as auto-trim):
+ * Override policy:
  * - Attitude axes (roll / pitch / yaw) yield while that stick is deflected
  *   beyond STICK_DEADBAND, and while on the ground. Releasing recaptures
- *   the current attitude.
+ *   the current attitude. HUD TRIM assists are separate: they keep cancelling
+ *   leftover moment on the wheels even while that stick is out, and only run
+ *   when this arbiter has left the axis to the pilot.
  * - Throttle and flaps yield when the pilot lever moves.
  * - Gear yields when the lever changes.
  * - ArduPilot never owns an axis unless the status object says it is

@@ -145,7 +145,7 @@ export function AutopilotPanel({ state, onSettingsChange, onEngageChange }: Auto
           </select>
         </label>
         <p className="flight-panel__hint">
-          Moving the throttle lever takes that axis back. Attitude axes yield while that stick is deflected or on the ground — the same idea as the HUD TRIM assists, which only drive trim wheels when AP does not own that axis.
+          Moving the throttle lever takes that axis back. Attitude axes yield while that stick is deflected or on the ground. HUD TRIM assists still only drive the wheels when AP does not own that axis; they cancel leftover moment continuously rather than holding attitude.
         </p>
       </fieldset>
 

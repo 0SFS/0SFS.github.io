@@ -4,28 +4,30 @@ import {
   setAutoTrimEnabled,
   stepPitchAutoTrim,
   stepRollAutoTrim,
-  STICK_DEADBAND,
   type PitchAutoTrimInput,
   type RollAutoTrimInput,
 } from "./autoTrim";
 
+const CRUISE = { qbarPsf: 50, vtFps: 220 };
+
 const PITCH_HOLD: PitchAutoTrimInput = {
   dt: 1 / 120,
-  pitchRad: 0.08,
+  pitchAccelRad: 0,
   pitchRateRad: 0,
-  rollRad: 0,
   elevator: 0,
   pitchTrim: 0.1,
   onGround: false,
+  ...CRUISE,
 };
 
 const ROLL_HOLD: RollAutoTrimInput = {
   dt: 1 / 120,
-  rollRad: 0.2,
+  rollAccelRad: 0,
   rollRateRad: 0,
   aileron: 0,
   rollTrim: 0.1,
   onGround: false,
+  ...CRUISE,
 };
 
 function stepPitch(state = createAutoTrimState(true), input: Partial<PitchAutoTrimInput> = {}) {
@@ -37,9 +39,9 @@ function stepRoll(state = createAutoTrimState(true), input: Partial<RollAutoTrim
 }
 
 describe("pitch auto-trim", () => {
-  it("leaves the wheel alone when disabled, and forgets any captured target", () => {
+  it("leaves the wheel alone when disabled, and forgets any captured trim", () => {
     const armed = stepPitch().state;
-    const next = stepPitch(setAutoTrimEnabled(armed, false), { pitchTrim: -0.4, pitchRad: 0.3 });
+    const next = stepPitch(setAutoTrimEnabled(armed, false), { pitchTrim: -0.4, pitchAccelRad: 0.3 });
     expect(next.pitchTrim).toBe(-0.4);
     expect(next.state).toEqual(createAutoTrimState(false));
   });
@@ -50,125 +52,157 @@ describe("pitch auto-trim", () => {
     expect(next.pitchTrim).toBe(0.22);
   });
 
-  it("captures the current pitch when enabled with the stick centered", () => {
-    const next = stepPitch(createAutoTrimState(true), { pitchRad: 0.12 });
-    expect(next.state.hasTarget).toBe(true);
-    expect(next.state.targetRad).toBe(0.12);
+  it("moves trim nose-down (positive) when leftover qdot is nose-up", () => {
+    const next = stepPitch(createAutoTrimState(true), { pitchAccelRad: 0.25, pitchTrim: 0.1 });
+    expect(next.pitchTrim).toBeGreaterThan(0.1);
   });
 
-  it("moves trim nose-down (positive) when the nose is above the target", () => {
-    const held = stepPitch(createAutoTrimState(true), { pitchRad: 0.1 });
-    const next = stepPitch(held.state, { pitchRad: 0.18, pitchTrim: held.pitchTrim });
-    expect(next.pitchTrim).toBeGreaterThan(held.pitchTrim);
+  it("moves trim nose-up (negative) when leftover qdot is nose-down", () => {
+    const next = stepPitch(createAutoTrimState(true), { pitchAccelRad: -0.25, pitchTrim: 0 });
+    expect(next.pitchTrim).toBeLessThan(0);
   });
 
-  it("moves trim nose-up (negative) when the nose is below the target", () => {
-    const held = stepPitch(createAutoTrimState(true), { pitchRad: 0.1, pitchTrim: 0 });
-    const next = stepPitch(held.state, { pitchRad: 0.02, pitchTrim: held.pitchTrim });
-    expect(next.pitchTrim).toBeLessThan(held.pitchTrim);
-  });
-
-  it("does not move the wheel while the stick is flying the pitch", () => {
-    const held = stepPitch(createAutoTrimState(true), { pitchRad: 0.1, pitchTrim: 0.2 });
-    const next = stepPitch(held.state, {
-      elevator: STICK_DEADBAND + 0.01,
-      pitchRad: 0.25,
-      pitchTrim: held.pitchTrim,
+  it("still cancels leftover pitch acceleration while the stick is deflected", () => {
+    const elevator = 0.45;
+    const stickQdot = -0.03 * 50 * elevator;
+    const matched = stepPitch(createAutoTrimState(true), {
+      elevator, pitchAccelRad: stickQdot, pitchTrim: 0.1,
     });
-    expect(next.pitchTrim).toBe(held.pitchTrim);
-    expect(next.state.targetRad).toBe(0.25);
+    const leftover = stepPitch(createAutoTrimState(true), {
+      elevator, pitchAccelRad: stickQdot + 0.3, pitchTrim: 0.1,
+    });
+    expect(matched.pitchTrim).toBeCloseTo(0.1, 3);
+    expect(leftover.pitchTrim).toBeGreaterThan(0.1);
+  });
+
+  it("does not chase a pitch attitude when angular acceleration is already zero", () => {
+    const held = stepPitch(createAutoTrimState(true), { pitchTrim: 0.18 });
+    const next = stepPitch(held.state, { pitchAccelRad: 0, pitchTrim: held.pitchTrim });
+    expect(next.pitchTrim).toBeCloseTo(held.pitchTrim, 8);
   });
 
   it("does not trim on the ground", () => {
-    const held = stepPitch(createAutoTrimState(true), { pitchRad: 0.1, pitchTrim: -0.15 });
-    const next = stepPitch(held.state, { onGround: true, pitchRad: 0.4, pitchTrim: held.pitchTrim });
+    const held = stepPitch(createAutoTrimState(true), { pitchTrim: -0.15 });
+    const next = stepPitch(held.state, {
+      onGround: true,
+      pitchAccelRad: 0.4,
+      pitchTrim: held.pitchTrim,
+    });
     expect(next.pitchTrim).toBe(held.pitchTrim);
-    expect(next.state.hasTarget).toBe(false);
   });
 
   it("clamps the wheel to the trim range", () => {
-    let result = stepPitch(createAutoTrimState(true), { pitchRad: 0, pitchTrim: 0.99 });
+    let result = stepPitch(createAutoTrimState(true), { pitchTrim: 0.99 });
     for (let i = 0; i < 240; i += 1) {
-      result = stepPitch(result.state, { pitchRad: 0.5, pitchTrim: result.pitchTrim });
+      result = stepPitch(result.state, { pitchAccelRad: 0.5, pitchTrim: result.pitchTrim });
     }
     expect(result.pitchTrim).toBe(1);
   });
 
-  it("holds pitch against a steady nose-down moment better than a frozen wheel", () => {
+  it("cancels a steady nose-down moment to the same wheel whether or not the stick is held", () => {
     const dt = 1 / 120;
-    const speedMoment = 0.35;
-    const plant = (auto: boolean) => {
-      let pitch = 0.1;
-      let rate = 0;
+    const L = -1.5;
+    const D = 0.5;
+    const moment = 0.35;
+    const plant = (elevator: number) => {
+      let q = 0;
       let trim = 0;
-      let state = createAutoTrimState(auto);
-      for (let i = 0; i < 600; i += 1) {
+      let state = createAutoTrimState(true);
+      for (let i = 0; i < 720; i += 1) {
+        const qdot = L * (elevator + trim) - D * q - moment;
         const next = stepPitchAutoTrim(state, {
-          dt, pitchRad: pitch, pitchRateRad: rate, rollRad: 0,
-          elevator: 0, pitchTrim: trim, onGround: false,
+          dt,
+          pitchAccelRad: qdot,
+          pitchRateRad: q,
+          elevator,
+          pitchTrim: trim,
+          onGround: false,
+          ...CRUISE,
         });
         state = next.state;
         trim = next.pitchTrim;
-        rate += (-2.8 * trim - 4 * rate - speedMoment) * dt;
-        pitch += rate * dt;
+        q += qdot * dt;
       }
-      return { pitch, trim };
+      return { q, trim };
     };
 
-    const frozen = plant(false);
-    const held = plant(true);
-    expect(Math.abs(held.pitch - 0.1)).toBeLessThan(Math.abs(frozen.pitch - 0.1) * 0.35);
-    expect(held.trim).toBeLessThan(0);
+    const handsOff = plant(0);
+    const flying = plant(0.4);
+    expect(handsOff.trim).toBeLessThan(-0.1);
+    expect(Math.abs(flying.trim - handsOff.trim)).toBeLessThan(0.08);
+    expect(Math.abs(flying.trim - (handsOff.trim + 0.4))).toBeGreaterThan(0.2);
+  });
+
+  it("takes a smaller trim step for the same leftover qdot at dive qbar than at cruise", () => {
+    const cruise = stepPitch(createAutoTrimState(true), {
+      pitchAccelRad: 0.3, pitchTrim: 0, qbarPsf: 50, vtFps: 220,
+    });
+    const dive = stepPitch(createAutoTrimState(true), {
+      pitchAccelRad: 0.3, pitchTrim: 0, qbarPsf: 140, vtFps: 370,
+    });
+    expect(Math.abs(dive.pitchTrim)).toBeLessThan(Math.abs(cruise.pitchTrim));
   });
 });
 
 describe("roll auto-trim", () => {
-  it("moves trim right-wing-down (positive) when the bank is left of the target", () => {
-    const held = stepRoll(createAutoTrimState(true), { rollRad: 0.2 });
-    const next = stepRoll(held.state, { rollRad: 0.05, rollTrim: held.rollTrim });
-    expect(next.rollTrim).toBeGreaterThan(held.rollTrim);
+  it("moves trim left-wing-down (negative) when leftover pdot is rolling right", () => {
+    const next = stepRoll(createAutoTrimState(true), { rollAccelRad: 0.25, rollTrim: 0.1 });
+    expect(next.rollTrim).toBeLessThan(0.1);
   });
 
-  it("moves trim left-wing-down (negative) when the bank is right of the target", () => {
-    const held = stepRoll(createAutoTrimState(true), { rollRad: 0.2, rollTrim: 0 });
-    const next = stepRoll(held.state, { rollRad: 0.35, rollTrim: held.rollTrim });
-    expect(next.rollTrim).toBeLessThan(held.rollTrim);
+  it("moves trim right-wing-down (positive) when leftover pdot is rolling left", () => {
+    const next = stepRoll(createAutoTrimState(true), { rollAccelRad: -0.25, rollTrim: 0 });
+    expect(next.rollTrim).toBeGreaterThan(0);
   });
 
-  it("does not move the wheel while aileron is flying the bank", () => {
-    const held = stepRoll(createAutoTrimState(true), { rollRad: 0.2, rollTrim: 0.15 });
-    const next = stepRoll(held.state, {
-      aileron: STICK_DEADBAND + 0.01,
-      rollRad: 0.5,
-      rollTrim: held.rollTrim,
+  it("still cancels leftover roll acceleration while aileron is deflected", () => {
+    const aileron = 0.4;
+    const stickPdot = 0.02 * 50 * aileron;
+    const matched = stepRoll(createAutoTrimState(true), {
+      aileron, rollAccelRad: stickPdot, rollTrim: 0.05,
     });
-    expect(next.rollTrim).toBe(held.rollTrim);
-    expect(next.state.targetRad).toBe(0.5);
+    const leftover = stepRoll(createAutoTrimState(true), {
+      aileron, rollAccelRad: stickPdot - 0.3, rollTrim: 0.05,
+    });
+    expect(matched.rollTrim).toBeCloseTo(0.05, 3);
+    expect(leftover.rollTrim).toBeGreaterThan(0.05);
   });
 
-  it("holds bank against a steady left-rolling moment better than a frozen wheel", () => {
+  it("does not chase bank when roll acceleration is already zero", () => {
+    const held = stepRoll(createAutoTrimState(true), { rollTrim: 0.2 });
+    const next = stepRoll(held.state, { rollAccelRad: 0, rollTrim: held.rollTrim });
+    expect(next.rollTrim).toBeCloseTo(held.rollTrim, 8);
+  });
+
+  it("cancels a steady left-rolling moment without oscillating as qbar rises", () => {
     const dt = 1 / 120;
     const spiral = 0.35;
-    const plant = (auto: boolean) => {
-      let roll = 0.25;
-      let rate = 0;
-      let trim = 0;
-      let state = createAutoTrimState(auto);
-      for (let i = 0; i < 600; i += 1) {
-        const next = stepRollAutoTrim(state, {
-          dt, rollRad: roll, rollRateRad: rate, aileron: 0, rollTrim: trim, onGround: false,
-        });
-        state = next.state;
-        trim = next.rollTrim;
-        rate += (2.8 * trim - 4 * rate - spiral) * dt;
-        roll += rate * dt;
+    let p = 0;
+    let trim = 0;
+    let state = createAutoTrimState(true);
+    let flips = 0;
+    let lastDelta = 0;
+    for (let i = 0; i < 900; i += 1) {
+      const qbarPsf = 40 + i * 0.12;
+      const vtFps = 200 + i * 0.2;
+      const L = 0.02 * Math.max(qbarPsf, 20);
+      const D = 2.5 * Math.max(qbarPsf, 20) / Math.max(vtFps, 80);
+      const pdot = L * trim - D * p - spiral;
+      const next = stepRollAutoTrim(state, {
+        dt, rollAccelRad: pdot, rollRateRad: p, aileron: 0, rollTrim: trim,
+        qbarPsf, vtFps, onGround: false,
+      });
+      const delta = next.rollTrim - trim;
+      if (i > 120 && lastDelta !== 0 && Math.sign(delta) !== 0 && Math.sign(delta) !== Math.sign(lastDelta)) {
+        flips += 1;
       }
-      return { roll, trim };
-    };
-
-    const frozen = plant(false);
-    const held = plant(true);
-    expect(Math.abs(held.roll - 0.25)).toBeLessThan(Math.abs(frozen.roll - 0.25) * 0.35);
-    expect(held.trim).toBeGreaterThan(0);
+      lastDelta = delta;
+      state = next.state;
+      trim = next.rollTrim;
+      p += pdot * dt;
+    }
+    expect(trim).toBeGreaterThan(0.1);
+    expect(Math.abs(p)).toBeLessThan(0.15);
+    expect(flips).toBeLessThan(6);
   });
 });

@@ -12,6 +12,7 @@ import { readFlightState } from "../bridge/ecefBridge";
 import { readControlSurfaceState } from "../aircraft/aircraftAnimation";
 import { createFlightInputManager } from "../input/flightInputManager";
 import { applyFlightControls } from "../input/applyFlightControls";
+import { createAutoTrimState, stepPitchAutoTrim, type AutoTrimState } from "../input/autoTrim";
 import { createFixedStepPhysicsLoop, FIXED_DT } from "../physics/fixedStepLoop";
 import { groundContactClearanceMeters } from "../physics/groundContactClearance";
 import { captureSimulation, restoreSimulation, validFlightState } from "../physics/safeFlightState";
@@ -243,6 +244,55 @@ describe("SF50 runtime contracts (not performance calibration)", () => {
       if (reference) sample.forEach((value, index) => expect(value).toBeCloseTo(reference![index], 8));
       else reference = sample;
     }
+  });
+
+  it("cancels a pitch moment on the trim wheel without copying a held stick onto it", async () => {
+    const sdk = await createSf50({ latDeg: 46.7867, lonDeg: -92.1005, altFt: 8500, airspeedKts: 130 });
+    const idle = {
+      elevator: 0, aileron: 0, rudder: 0, throttle: profile.initialThrottleNorm,
+      pitchTrim: 0, rollTrim: 0, flaps: 0, brake: 0,
+    };
+    const sensors = () => ({
+      pitchAccelRad: sdk.getPropertyValue("accelerations/qdot-rad_sec2"),
+      pitchRateRad: sdk.getPropertyValue("velocities/q-rad_sec"),
+      qbarPsf: sdk.getPropertyValue("aero/qbar-psf"),
+      vtFps: sdk.getPropertyValue("velocities/vt-fps"),
+    });
+    const stepAssist = (elevator: number, trim: number, state: AutoTrimState) => {
+      const next = stepPitchAutoTrim(state, {
+        dt: FIXED_DT, elevator, pitchTrim: trim, onGround: false, ...sensors(),
+      });
+      applyFlightControls(sdk, { ...idle, elevator, pitchTrim: next.pitchTrim }, 0, profile.rudderSign);
+      expect(sdk.run()).toBe(true);
+      return next;
+    };
+
+    applyFlightControls(sdk, idle, 0, profile.rudderSign);
+    advance(sdk, 30);
+    applyFlightControls(sdk, { ...idle, pitchTrim: 0.35 }, 0, profile.rudderSign);
+    advance(sdk, 12);
+    const disturbedQdot = sensors().pitchAccelRad;
+    expect(disturbedQdot).toBeLessThan(-0.04);
+
+    let trim = 0.35;
+    let state = createAutoTrimState(true);
+    for (let i = 0; i < 360; i += 1) {
+      const next = stepAssist(0, trim, state);
+      state = next.state;
+      trim = next.pitchTrim;
+    }
+    expect(validFlightState(readFlightState(sdk))).toBe(true);
+    expect(trim).toBeLessThan(0.25);
+    expect(trim).toBeGreaterThan(-0.2);
+    expect(Math.abs(sensors().pitchAccelRad)).toBeLessThan(Math.abs(disturbedQdot) * 0.5);
+
+    const beforePulse = trim;
+    for (let i = 0; i < 24; i += 1) {
+      const next = stepAssist(0.25, trim, state);
+      state = next.state;
+      trim = next.pitchTrim;
+    }
+    expect(Math.abs(trim - beforePulse)).toBeLessThan(0.06);
   });
 });
 
