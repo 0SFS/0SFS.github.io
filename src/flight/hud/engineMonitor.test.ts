@@ -2,7 +2,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import type { FlightAudioStatus } from "../audio/createFlightAudio";
 import type { FlightRecorderPropertyReader } from "../diagnostics/flightRecorder";
-import { createEngineMonitor, type EngineMonitorOptions } from "./engineMonitor";
+import { closestUprightRingAngle, createEngineMonitor, type EngineMonitorOptions } from "./engineMonitor";
 
 function fakeReader(values: Record<string, number>, access: Record<string, string> = {}) {
   const reader: FlightRecorderPropertyReader & { values: Record<string, number> } = {
@@ -22,6 +22,7 @@ const sf50Values = (): Record<string, number> => ({
   "propulsion/engine/n2": 69.7,
   "propulsion/engine/thrust-lbs": 212.6,
   "propulsion/engine/fuel-flow-rate-pps": 0.0474,
+  "propulsion/engine/fuel-flow-rate-gph": 25.4,
   "propulsion/engine/set-running": 1,
   "propulsion/starter_cmd": 0,
   "propulsion/cutoff_cmd": 0,
@@ -65,18 +66,162 @@ describe("engine monitor", () => {
   };
   const showDetails = (monitor: ReturnType<typeof createEngineMonitor>) => monitor.attachDetails(root);
   const text = (selector: string) => root.querySelector(selector)?.textContent?.trim();
-  const rows = () => Object.fromEntries([...root.querySelectorAll("tr")]
-    .filter((row) => row.children.length === 2)
-    .map((row) => [row.children[0].textContent, row.children[1].textContent]));
+  const rows = () => Object.fromEntries([...root.querySelectorAll(".flight-engine__pair")]
+    .map((pair) => [
+      pair.querySelector(".flight-engine__label")?.textContent,
+      pair.querySelector(".flight-engine__value")?.textContent,
+    ]));
 
-  it("starts as one HUD line with the phase, spools, fuel flow, thrust and sound", () => {
+  it("starts as a HUD chip with the diagram, phase under it, and padded fuel flow", () => {
     root = document.createElement("div");
     const monitor = mount({ soundStatus: () => status() });
     monitor.update(fakeReader(sf50Values(), WRITE_ONLY));
     expect(text(".flight-engine__phase")).toBe("RUNNING");
-    expect(text(".flight-engine__values")).toBe("N1 50.8%  N2 69.7%  FF 171 lb/h  THR 213 lbf  SND low");
+    expect(root.querySelector(".flight-engine__title")).toBeNull();
+    expect(root.querySelector(".flight-engine__diagram .flight-engine__flow")).not.toBeNull();
+    expect(root.querySelector(".flight-engine__diagram .flight-engine__phase")).not.toBeNull();
+    expect(text(".flight-engine__spool--n2 .flight-engine__spool-label")).toBe("N2");
+    expect(text(".flight-engine__spool--n2 .flight-engine__spool-value")).toBe("69.7");
+    expect(text(".flight-engine__spool--n2 .flight-engine__spool-unit")).toBe("%");
+    expect(text(".flight-engine__spool-n1 .flight-engine__spool-label")).toBe("N1");
+    expect(text(".flight-engine__spool-n1 .flight-engine__spool-value")).toBe("50.8");
+    expect(text(".flight-engine__spool-n1 .flight-engine__spool-unit")).toBe("%");
+    expect(text(".flight-engine__spool-thrust .flight-engine__spool-label")).toBe("T");
+    expect(text(".flight-engine__spool-thrust .flight-engine__spool-value")).toBe("0213");
+    expect(text(".flight-engine__spool-thrust .flight-engine__spool-unit")).toBe("lbf");
+    expect(text(".flight-engine__flow-label")).toBe("⛽");
+    expect(text(".flight-engine__flow-value")).toBe("0171");
+    expect(text(".flight-engine__flow-unit")).toBe("lb/h");
+    expect(text(".flight-engine__values")).toBe("");
+    expect(root.querySelector(".flight-engine__summary")?.textContent).not.toMatch(/SND|ENGINE|FF /);
+    expect(root.querySelector(".flight-engine__spools")?.hidden).toBe(false);
     expect(root.querySelector(".flight-engine__summary")?.getAttribute("aria-expanded")).toBe("false");
     expect(root.querySelector(".flight-engine__details")).toBeNull();
+  });
+
+  it("prints 100 instead of 100.0 on the spool diagram", () => {
+    root = document.createElement("div");
+    const values = sf50Values();
+    values["propulsion/engine/n1"] = 100;
+    values["propulsion/engine/n2"] = 99.96;
+    const monitor = mount();
+    monitor.update(fakeReader(values, WRITE_ONLY));
+    expect(text(".flight-engine__spool-n1 .flight-engine__spool-value")).toBe("100");
+    expect(text(".flight-engine__spool--n2 .flight-engine__spool-value")).toBe("100");
+  });
+
+  it("pads HUD thrust to four digits", () => {
+    root = document.createElement("div");
+    const values = sf50Values();
+    values["propulsion/engine/thrust-lbs"] = 90.4;
+    const monitor = mount();
+    monitor.update(fakeReader(values, WRITE_ONLY));
+    expect(text(".flight-engine__spool-thrust .flight-engine__spool-value")).toBe("0090");
+    values["propulsion/engine/thrust-lbs"] = 1213.2;
+    monitor.update(fakeReader(values, WRITE_ONLY));
+    expect(text(".flight-engine__spool-thrust .flight-engine__spool-value")).toBe("1213");
+  });
+
+  it("toggles HUD fuel flow between lb/h and gal/h without opening the Engine tab", () => {
+    root = document.createElement("div");
+    let opened = 0;
+    const storage = memoryStorage();
+    const monitor = mount({ storage, onOpen: () => { opened += 1; } });
+    monitor.update(fakeReader(sf50Values(), WRITE_ONLY));
+    expect(text(".flight-engine__flow-value")).toBe("0171");
+    expect(text(".flight-engine__flow-unit")).toBe("lb/h");
+    root.querySelector<HTMLElement>(".flight-engine__flow")?.click();
+    expect(opened).toBe(0);
+    expect(text(".flight-engine__flow-value")).toBe("0025");
+    expect(text(".flight-engine__flow-unit")).toBe("gal/h");
+    monitor.destroy();
+    const again = mount({ storage });
+    again.update(fakeReader(sf50Values(), WRITE_ONLY));
+    expect(text(".flight-engine__flow-unit")).toBe("gal/h");
+    expect(text(".flight-engine__flow-value")).toBe("0025");
+    again.destroy();
+  });
+
+  it("packs upright ring marks just clear of the value", () => {
+    const radius = 40;
+    const value = { w: 22, h: 10 };
+    const label = { w: 12, h: 8 };
+    const unit = { w: 8, h: 8 };
+    const overlap = (
+      fromDeg: number, angle: number, mark: { w: number; h: number }, pad: number,
+    ) => {
+      const originRad = (fromDeg * Math.PI) / 180;
+      const rad = (angle * Math.PI) / 180;
+      const ox = radius * Math.sin(originRad);
+      const oy = -radius * Math.cos(originRad);
+      const x = radius * Math.sin(rad);
+      const y = -radius * Math.cos(rad);
+      return Math.abs(ox - x) < (value.w + mark.w) / 2 + pad
+        && Math.abs(oy - y) < (value.h + mark.h) / 2 + pad;
+    };
+    const n1Left = closestUprightRingAngle(radius, value, label, 180, 1);
+    const n1Right = closestUprightRingAngle(radius, value, unit, 180, -1);
+    expect(n1Left).toBeGreaterThan(180);
+    expect(n1Right).toBeLessThan(180);
+    expect(overlap(180, n1Left, label, 2)).toBe(false);
+    expect(overlap(180, n1Right, unit, 2)).toBe(false);
+    expect(overlap(180, n1Left - 2, label, 2)).toBe(true);
+    expect(overlap(180, n1Right + 2, unit, 2)).toBe(true);
+
+    const thrustLeft = closestUprightRingAngle(radius, value, label, 0, -1);
+    const thrustRight = closestUprightRingAngle(radius, value, unit, 0, 1);
+    expect(thrustLeft).toBeLessThan(0);
+    expect(thrustRight).toBeGreaterThan(0);
+    expect(overlap(0, thrustLeft, label, 2)).toBe(false);
+    expect(overlap(0, thrustRight, unit, 2)).toBe(false);
+    expect(overlap(0, thrustLeft + 2, label, 2)).toBe(true);
+    expect(overlap(0, thrustRight - 2, unit, 2)).toBe(true);
+  });
+
+  it("places HUD N1 and thrust with packed ring transforms", () => {
+    root = document.createElement("div");
+    const monitor = mount();
+    Object.defineProperty(root.querySelector(".flight-engine__spools")!, "clientWidth", {
+      configurable: true, get: () => 68,
+    });
+    const size = (selector: string, w: number, h: number) => {
+      const node = root.querySelector<HTMLElement>(selector)!;
+      Object.defineProperty(node, "offsetWidth", { configurable: true, get: () => w });
+      Object.defineProperty(node, "offsetHeight", { configurable: true, get: () => h });
+    };
+    size(".flight-engine__spool-n1 .flight-engine__spool-value", 22, 10);
+    size(".flight-engine__spool-n1 .flight-engine__spool-label", 12, 8);
+    size(".flight-engine__spool-n1 .flight-engine__spool-unit", 8, 8);
+    size(".flight-engine__spool-thrust .flight-engine__spool-value", 18, 10);
+    size(".flight-engine__spool-thrust .flight-engine__spool-label", 8, 8);
+    size(".flight-engine__spool-thrust .flight-engine__spool-unit", 14, 8);
+    monitor.update(fakeReader(sf50Values(), WRITE_ONLY));
+    const angle = (selector: string) => {
+      const transform = root.querySelector<HTMLElement>(selector)?.style.transform ?? "";
+      return Number(/rotate\(([-\d.]+)deg\)/.exec(transform)?.[1]);
+    };
+    expect(angle(".flight-engine__spool-n1 .flight-engine__spool-value")).toBe(180);
+    const n1Label = angle(".flight-engine__spool-n1 .flight-engine__spool-label");
+    const n1Unit = angle(".flight-engine__spool-n1 .flight-engine__spool-unit");
+    expect(n1Label).toBeGreaterThan(180);
+    expect(n1Unit).toBeLessThan(180);
+    expect(n1Label - 180).toBeGreaterThan(180 - n1Unit);
+    expect(angle(".flight-engine__spool-thrust .flight-engine__spool-value")).toBe(0);
+    const thrustLabel = angle(".flight-engine__spool-thrust .flight-engine__spool-label");
+    const thrustUnit = angle(".flight-engine__spool-thrust .flight-engine__spool-unit");
+    expect(thrustLabel).toBeLessThan(0);
+    expect(thrustUnit).toBeGreaterThan(0);
+    expect(Math.abs(thrustLabel)).toBeLessThan(thrustUnit);
+    const reader = fakeReader(sf50Values(), WRITE_ONLY);
+    reader.values["propulsion/engine/thrust-lbs"] = 1213;
+    reader.values["propulsion/engine/n1"] = 99.9;
+    monitor.update(reader);
+    expect(angle(".flight-engine__spool-thrust .flight-engine__spool-value")).toBe(0);
+    expect(angle(".flight-engine__spool-thrust .flight-engine__spool-label")).toBe(thrustLabel);
+    expect(angle(".flight-engine__spool-thrust .flight-engine__spool-unit")).toBe(thrustUnit);
+    expect(angle(".flight-engine__spool-n1 .flight-engine__spool-label")).toBe(n1Label);
+    expect(angle(".flight-engine__spool-n1 .flight-engine__spool-unit")).toBe(n1Unit);
+    monitor.destroy();
   });
 
   it("asks to open a tab instead of expanding in place", () => {
@@ -103,13 +248,18 @@ describe("engine monitor", () => {
     showDetails(monitor);
     monitor.update(fakeReader(values, WRITE_ONLY));
     const shown = rows();
+    expect(root.querySelector(".flight-engine__summary .flight-engine__spools")).not.toBeNull();
+    expect(root.querySelector(".flight-engine__details .flight-engine__spools")).toBeNull();
     expect(shown.N1).toBe("50.8 %");
+    expect(shown.N2).toBe("69.7 %");
     expect(shown["Fuel flow"]).toBe("171 lb/h");
     expect(shown["Cutoff command"]).toBe("off");
     expect(shown["Tank 1 contents"]).toBe("1000.0 lb");
     expect(shown["Dynamic pressure"]).toBe("48.0 psf");
     // A turbine has no crankshaft speed, so that row is simply absent.
     expect(shown["Engine RPM"]).toBeUndefined();
+    expect(root.querySelector("table")).toBeNull();
+    expect(root.querySelector(".flight-engine__grid")).not.toBeNull();
     const readable = Object.keys(values).filter((path) => path !== "propulsion/set-running").length;
     expect(root.querySelector('details[data-section="all"] > summary')?.textContent)
       .toBe(`All engine properties (${readable})`);
@@ -140,7 +290,7 @@ describe("engine monitor", () => {
     showDetails(monitor);
     const reader = fakeReader(sf50Values(), WRITE_ONLY);
     monitor.update(reader);
-    expect(text(".flight-engine__values")).toMatch(/SND low held$/);
+    expect(root.querySelector(".flight-engine__summary")?.textContent).not.toMatch(/SND/);
     expect(rows()["Engine as heard"]).toMatch(/not receiving/);
     expect(rows().Held).toBe("yes");
     expect(rows().Timeline).toMatch(/n\/a until/);
@@ -156,6 +306,7 @@ describe("engine monitor", () => {
     showDetails(monitor);
     expect(() => monitor.update({ getPropertyValue: () => 0 })).not.toThrow();
     expect(text(".flight-engine__phase")).toBe("UNKNOWN");
+    expect(root.querySelector(".flight-engine__spools")?.hidden).toBe(true);
     expect(root.textContent).toMatch(/publishes no engine properties/);
   });
 });

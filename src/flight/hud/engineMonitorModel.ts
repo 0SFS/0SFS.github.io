@@ -28,6 +28,7 @@ export const ENGINE_PATHS = {
   rpm: "propulsion/engine/engine-rpm",
   thrust: "propulsion/engine/thrust-lbs",
   fuelFlowPps: "propulsion/engine/fuel-flow-rate-pps",
+  fuelFlowGph: "propulsion/engine/fuel-flow-rate-gph",
   running: "propulsion/engine/set-running",
   starter: "propulsion/starter_cmd",
   cutoff: "propulsion/cutoff_cmd",
@@ -64,6 +65,7 @@ export interface EngineSample {
   rpm: number | null;
   thrustLbf: number | null;
   fuelFlowPps: number | null;
+  fuelFlowGph: number | null;
   running: boolean | null;
   starter: boolean | null;
   cutoff: boolean | null;
@@ -92,6 +94,7 @@ export function readEngineSample(reader: EngineReader, available: ReadonlySet<st
     rpm: number(ENGINE_PATHS.rpm),
     thrustLbf: number(ENGINE_PATHS.thrust),
     fuelFlowPps: number(ENGINE_PATHS.fuelFlowPps),
+    fuelFlowGph: number(ENGINE_PATHS.fuelFlowGph),
     running: flag(ENGINE_PATHS.running),
     starter: flag(ENGINE_PATHS.starter),
     cutoff: flag(ENGINE_PATHS.cutoff),

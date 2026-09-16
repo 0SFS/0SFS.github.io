@@ -91,9 +91,13 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 5px;
-  /* Wide enough that the four chips, gear, and AP hold one row; below
-     that the row wraps, and `bottom` anchoring grows it upward. */
-  max-width: min(460px, calc(100vw - 48px));
+  /* Wide enough that the speed/alt/heading/VS/AoA chips, gear, and AP hold
+     one row; below that the row wraps, and `bottom` anchoring grows it upward. */
+  max-width: min(520px, calc(100vw - 48px));
+}
+
+.flight-hud__aoa {
+  display: contents;
 }
 
 /* Compact chips: code+unit on one row, value below. */
@@ -222,16 +226,33 @@
 
 .flight-hud__yaw-throttle {
   position: absolute;
-  right: 24px;
+  right: calc(env(safe-area-inset-right, 0px) + 24px);
   bottom: var(--flight-controls-bottom);
   display: grid;
-  justify-items: stretch;
-  gap: 6px;
+  grid-template-columns: max-content max-content;
+  grid-template-areas:
+    "eval ."
+    "yaw throttle"
+    "engine throttle";
+  align-items: end;
+  justify-items: end;
+  column-gap: 6px;
+  row-gap: 6px;
   pointer-events: auto;
 }
 
+.flight-hud__eval {
+  grid-area: eval;
+  justify-self: stretch;
+}
+
+.flight-hud__engine {
+  grid-area: engine;
+}
+
 .flight-hud__throttle {
-  justify-self: end;
+  grid-area: throttle;
+  align-self: end;
   padding: 8px 6px;
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.45);
@@ -239,6 +260,7 @@
 }
 
 .flight-hud__yaw {
+  grid-area: yaw;
   width: 148px;
   padding: 6px 8px;
   border-radius: 8px;
@@ -1366,7 +1388,7 @@
   }
 
   .flight-hud__yaw-throttle {
-    right: 10px;
+    right: calc(env(safe-area-inset-right, 0px) + 10px);
     gap: 4px;
   }
 

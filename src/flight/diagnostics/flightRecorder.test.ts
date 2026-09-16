@@ -27,8 +27,24 @@ describe("flight recorder", () => {
     expect(propertyInCatalog(r, "fcs/stick-pusher")).toBe(false);
   });
 
+  it("records nothing until start() and ignores samples after stop()", () => {
+    const rec = createFlightRecorder({ sampleHz: 10, channels: CHANNELS, now: () => 0 });
+    const r = reader({ "simulation/sim-time-sec": 0, "velocities/vc-kts": 100 });
+    expect(rec.isRecording()).toBe(false);
+    expect(rec.sample(r)).toBe(false);
+    expect(rec.getSampleCount()).toBe(0);
+    rec.start();
+    expect(rec.isRecording()).toBe(true);
+    expect(rec.sample(r)).toBe(true);
+    rec.stop();
+    r.set("simulation/sim-time-sec", 0.1);
+    expect(rec.sample(r)).toBe(false);
+    expect(rec.getSampleCount()).toBe(1);
+  });
+
   it("samples at the simulation-time rate and records nothing while time stands still", () => {
     const rec = createFlightRecorder({ sampleHz: 10, channels: CHANNELS, now: () => 0 });
+    rec.start();
     const r = reader({ "simulation/sim-time-sec": 0, "velocities/vc-kts": 100 });
     expect(rec.sample(r)).toBe(true);
     expect(rec.sample(r)).toBe(false);
@@ -42,6 +58,7 @@ describe("flight recorder", () => {
 
   it("leaves a channel empty on aircraft that lack it, and applies scales", () => {
     const rec = createFlightRecorder({ channels: CHANNELS, now: () => 0 });
+    rec.start();
     rec.sample(reader({ "simulation/sim-time-sec": 1, "velocities/vc-kts": 120, "velocities/v-down-fps": -10 }));
     const [header, row] = rec.toCsv().trim().split("\n").filter((line) => !line.startsWith("#"));
     expect(header).toBe("sim_time_sec,wall_time_utc,segment,kcas,n1_pct,vs_fpm,mark");
@@ -50,6 +67,7 @@ describe("flight recorder", () => {
 
   it("starts a new segment when the simulation is reset", () => {
     const rec = createFlightRecorder({ sampleHz: 10, channels: CHANNELS, now: () => 0 });
+    rec.start();
     const r = reader({ "simulation/sim-time-sec": 5 });
     rec.sample(r);
     r.set("simulation/sim-time-sec", 0);
@@ -63,6 +81,7 @@ describe("flight recorder", () => {
       metadata: { build: "abc123", aircraft: "cirrus-vision-jet" } });
     expect(rec.mark()).toBeNull();
     const r = reader({ "simulation/sim-time-sec": 2 });
+    rec.start();
     rec.sample(r);
     expect(rec.mark("nose drops, with flaps")?.number).toBe(1);
     const csv = rec.toCsv();
@@ -74,6 +93,7 @@ describe("flight recorder", () => {
 
   it("drops the oldest samples, and their marks, beyond capacity", () => {
     const rec = createFlightRecorder({ sampleHz: 1, capacitySeconds: 3, channels: CHANNELS, now: () => 0 });
+    rec.start();
     const r = reader({ "simulation/sim-time-sec": 0 });
     rec.sample(r);
     rec.mark("first");

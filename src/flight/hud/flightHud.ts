@@ -246,10 +246,12 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
           </div>
           <span class="flight-hud__value" data-metric="vs">+0000</span>
         </div>
+        <div class="flight-hud__aoa" data-slot="aoa"></div>
         <button class="flight-hud__gear" data-control="gear" type="button" aria-pressed="true">G</button>
         <button class="flight-hud__ap" data-control="autopilot" type="button" aria-pressed="false">AP</button>
       </div>
       <div class="flight-hud__yaw-throttle" aria-label="Yaw and throttle">
+        <div class="flight-hud__eval" data-slot="eval"></div>
         <div class="flight-hud__yaw">
           <label class="flight-hud__yaw-control">
             <span class="flight-hud__yaw-heading">
@@ -259,6 +261,7 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
             <input data-control="rudder" type="range" min="-1" max="1" step="0.01" value="0" aria-label="Yaw rudder. Drag left or right; releases to center." />
           </label>
         </div>
+        <div class="flight-hud__engine" data-slot="engine"></div>
         <div class="flight-hud__throttle">
           <label class="flight-hud__slider-control">
             <span>THR</span>

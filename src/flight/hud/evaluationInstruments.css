@@ -1,25 +1,13 @@
-/* Engine, AoA and CAS readouts plus recorder controls. Chips reuse the main
-   HUD's tape styling; only placement and the warning box are defined here. */
+/* CAS sits above yaw. AoA is a tape in the left instrument row. */
 .flight-eval {
-  position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + 12px);
-  left: calc(env(safe-area-inset-left, 0px) + 12px);
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: flex-end;
   gap: 6px;
-  max-width: calc(100% - 24px);
+  max-width: 100%;
   pointer-events: none;
   color: #e8edf5;
   font-family: "SF Mono", "Menlo", "Consolas", monospace;
-}
-
-.flight-eval__readouts,
-.flight-eval__recorder {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
 }
 
 .flight-eval__readout {
@@ -44,58 +32,4 @@
 
 .flight-eval__cas.is-active {
   display: block;
-}
-
-.flight-eval__recorder {
-  pointer-events: auto;
-  font-size: 11px;
-}
-
-.flight-eval__rec {
-  padding: 3px 6px;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.45);
-  font-variant-numeric: tabular-nums;
-  white-space: pre;
-}
-
-.flight-eval__rec::before {
-  content: "";
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-right: 5px;
-  border-radius: 50%;
-  background: #e53935;
-  vertical-align: 1px;
-}
-
-.flight-eval__button {
-  padding: 3px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.55);
-  color: inherit;
-  font: inherit;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-}
-
-.flight-eval__button:hover {
-  border-color: rgba(255, 255, 255, 0.55);
-}
-
-.flight-eval__button:focus-visible {
-  outline: 2px solid #e8b647;
-  outline-offset: 1px;
-}
-
-.flight-eval__status {
-  padding: 3px 6px;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.45);
-}
-
-.flight-eval__status:empty {
-  display: none;
 }

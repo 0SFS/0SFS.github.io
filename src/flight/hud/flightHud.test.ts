@@ -233,3 +233,20 @@ describe("flight HUD master autopilot", () => {
     expect(t.onAutopilotEngageChange).not.toHaveBeenCalled();
   });
 });
+
+describe("flight HUD yaw-throttle cluster", () => {
+  it("keeps eval above yaw and engine left of throttle", () => {
+    const t = mount();
+    const cluster = t.host.querySelector(".flight-hud__yaw-throttle");
+    expect(cluster?.querySelector(".flight-hud__eval")).not.toBeNull();
+    expect(cluster?.querySelector(".flight-hud__yaw")).not.toBeNull();
+    expect(cluster?.querySelector(".flight-hud__engine")).not.toBeNull();
+    expect(cluster?.querySelector(".flight-hud__throttle")).not.toBeNull();
+    expect(cluster?.querySelector(".flight-hud__aoa")).toBeNull();
+    const tapes = [...t.host.querySelector(".flight-hud__tapes")!.children];
+    const vs = tapes.findIndex((node) => node.querySelector('[data-metric="vs"]'));
+    const aoa = tapes.findIndex((node) => node.classList.contains("flight-hud__aoa"));
+    expect(aoa).toBe(vs + 1);
+    t.hud.destroy();
+  });
+});
