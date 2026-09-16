@@ -717,6 +717,7 @@ export async function createFlightSimApp(
   let floatingOrigin: FloatingOriginHandle | null = null;
   let aircraft: ReturnType<typeof createPlaceholderAircraft> | null = null;
   let aircraftModel: AircraftModelHandle | null = null;
+  let controlPanel: FlightControlPanelHandle | null = null;
   // Pilot evaluation: engine, AoA and CAS readouts, and a recorder that runs for
   // the whole session so any moment the pilot marks can be exported with the build.
   const flightRecorder = createFlightRecorder({
@@ -733,10 +734,10 @@ export async function createFlightSimApp(
     recorder: flightRecorder,
     recordingName: () => `0sfs-${initialAircraftId}-${__SOURCE_VERSION__}-${new Date().toISOString().replace(/[:.]/g, "-")}`,
   });
-  // Live engine data under the evaluation readouts, with what sound is hearing,
-  // so a sound problem can be told apart from an engine that is really doing that.
+  // Live engine data under the evaluation readouts; the HUD line opens the Engine tab.
   const engineMonitor = createEngineMonitor(hudRoot.querySelector<HTMLElement>(".flight-eval") ?? hudRoot, {
     soundStatus: () => flightAudio.getStatus(),
+    onOpen: () => controlPanel?.openOrSelectTab("engine"),
   });
   // Session-only debug opt-in: no overlay meshes or SDK reads until enabled.
   let collisionDebugEnabled = false;
@@ -792,7 +793,6 @@ export async function createFlightSimApp(
     optInEnabled: optInLodsEnabled,
     status: "placeholder", triangles: null, error: null,
   };
-  let controlPanel: FlightControlPanelHandle | null = null;
   let hudBar: FlightHudBarHandle | null = null;
   let statusOverlay: FlightStatusOverlayHandle | null = null;
   // A missing terrain sample stops the loop from stepping without raising a
@@ -1434,6 +1434,7 @@ export async function createFlightSimApp(
       setAutopilotEngaged(engaged);
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
     },
+    attachEngineDetails: (host) => engineMonitor.attachDetails(host),
     onArcadeGroundLaunchesChange: (enabled) => {
       arcadeGroundLaunches = enabled;
       writePreference(ARCADE_GROUND_LAUNCHES_PREFERENCE_KEY, enabled ? "on" : "off");

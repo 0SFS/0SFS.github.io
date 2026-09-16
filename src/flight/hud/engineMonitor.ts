@@ -7,27 +7,29 @@ import {
 } from "./engineMonitorModel";
 
 /**
- * Live engine monitor on the flight HUD.
- *
- * Collapsed, it is one line: phase, spools, fuel flow, thrust and what sound is
- * doing. Expanded, it shows every engine property the model publishes, a log of
- * each discrete change with its simulation time, and what the audio core is
- * hearing, so an odd sound can be traced back to what JSBSim actually did.
+ * Live engine monitor. The HUD keeps one line: phase, spools, fuel flow, thrust
+ * and what sound is doing. Clicking that line opens the Engine tab, which shows
+ * every engine property the model publishes, a log of each discrete change with
+ * its simulation time, and what the audio core is hearing, so an odd sound can
+ * be traced back to what JSBSim actually did.
  */
 
 export interface EngineMonitorOptions {
   soundStatus?: () => FlightAudioStatus | null;
-  /** Remembers the expanded state and open sections. Defaults to localStorage. */
+  /** Remembers which detail sections are open. Defaults to localStorage. */
   storage?: Pick<Storage, "getItem" | "setItem"> | null;
   now?: () => number;
   /** DOM refresh period. The transition log still samples on every update. */
   refreshIntervalMs?: number;
+  /** Opens the Engine tab. The HUD line never expands in place. */
+  onOpen?: () => void;
 }
 
 export interface EngineMonitorHandle {
   /** Call every rendered frame; readings are cheap and the DOM refreshes at `refreshIntervalMs`. */
   update(reader: EngineReader): void;
-  setExpanded(expanded: boolean): void;
+  /** Move the detail tables into a tab host. Detach with the returned function. */
+  attachDetails(host: HTMLElement): () => void;
   destroy(): void;
 }
 
@@ -35,7 +37,7 @@ const STORAGE_KEY = "osfs.engineMonitor.v1";
 /** Sections closed until opened; everything else starts open. */
 const CLOSED_BY_DEFAULT: ReadonlySet<string> = new Set(["all"]);
 
-interface Layout { expanded: boolean; open: Record<string, boolean> }
+interface Layout { open: Record<string, boolean> }
 
 function defaultStorage(): Pick<Storage, "getItem" | "setItem"> | null {
   try { return window.localStorage; } catch { return null; }
@@ -48,9 +50,9 @@ function readLayout(storage: Pick<Storage, "getItem" | "setItem"> | null): Layou
     if (parsed?.open && typeof parsed.open === "object") {
       for (const [id, value] of Object.entries(parsed.open)) if (typeof value === "boolean") open[id] = value;
     }
-    return { expanded: parsed?.expanded === true, open };
+    return { open };
   } catch {
-    return { expanded: false, open: {} };
+    return { open: {} };
   }
 }
 
@@ -76,20 +78,19 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
   container.setAttribute("aria-label", "Engine monitor");
   const toggle = element("button", "flight-engine__summary");
   toggle.type = "button";
-  toggle.title = "Show or hide live engine data";
-  const caret = element("span", "flight-engine__caret");
-  caret.setAttribute("aria-hidden", "true");
+  toggle.title = "Open engine details";
+  toggle.setAttribute("aria-expanded", "false");
   const phaseChip = element("span", "flight-engine__phase", "…");
   const summaryValues = element("span", "flight-engine__values");
-  toggle.append(caret, element("span", "flight-engine__title", "ENGINE"), phaseChip, summaryValues);
+  toggle.append(element("span", "flight-engine__title", "ENGINE"), phaseChip, summaryValues);
   const panel = element("div", "flight-engine__details");
   panel.id = `flight-engine-details-${++instanceCount}`;
   toggle.setAttribute("aria-controls", panel.id);
   panel.append(element("p", "flight-engine__muted", "Waiting for the flight model…"));
-  container.append(toggle, panel);
+  container.append(toggle);
   root.appendChild(container);
 
-  let expanded = layout.expanded;
+  let detailsHost: HTMLElement | null = null;
   let destroyed = false;
   let lastReader: EngineReader | null = null;
   let available: Set<string> | null = null;
@@ -104,7 +105,7 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
   const allCells: { path: string; cell: HTMLElement }[] = [];
 
   const save = (): void => {
-    try { storage?.setItem(STORAGE_KEY, JSON.stringify({ expanded, open: layout.open })); } catch { /* A convenience only. */ }
+    try { storage?.setItem(STORAGE_KEY, JSON.stringify({ open: layout.open })); } catch { /* A convenience only. */ }
   };
 
   const refreshNow = (): void => {
@@ -112,10 +113,11 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
     if (lastReader) handle.update(lastReader);
   };
 
-  const applyExpanded = (): void => {
-    toggle.setAttribute("aria-expanded", String(expanded));
-    caret.textContent = expanded ? "▾" : "▸";
-    panel.hidden = !expanded;
+  const detachDetails = (): void => {
+    if (!detailsHost) return;
+    panel.remove();
+    detailsHost = null;
+    toggle.setAttribute("aria-expanded", "false");
   };
 
   const addSection = (id: string, title: string): HTMLDetailsElement => {
@@ -244,7 +246,7 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
     reader: EngineReader, sample: EngineSample, phase: EnginePhaseReading, status: FlightAudioStatus | null,
   ): void => {
     summarize(sample, phase, status);
-    if (!expanded) return;
+    if (!panel.isConnected) return;
     if (detailLine) {
       detailLine.textContent = `${phase.label}${phase.derived ? " (derived from JSBSim's turbine rules)" : ""}: ${phase.detail}`;
     }
@@ -295,22 +297,27 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
       lastRender = time;
       render(reader, sample, phase, status);
     },
-    setExpanded(next) {
-      if (destroyed || next === expanded) return;
-      expanded = next;
-      applyExpanded();
-      save();
+    attachDetails(host) {
+      if (destroyed) return () => {};
+      if (detailsHost === host) {
+        return () => { if (detailsHost === host) detachDetails(); };
+      }
+      detachDetails();
+      detailsHost = host;
+      host.append(panel);
+      toggle.setAttribute("aria-expanded", "true");
       logDirty = true;
       refreshNow();
+      return () => { if (detailsHost === host) detachDetails(); };
     },
     destroy() {
       if (destroyed) return;
       destroyed = true;
+      detachDetails();
       container.remove();
     },
   };
 
-  toggle.addEventListener("click", () => handle.setExpanded(!expanded));
-  applyExpanded();
+  toggle.addEventListener("click", () => { if (!destroyed) options.onOpen?.(); });
   return handle;
 }
