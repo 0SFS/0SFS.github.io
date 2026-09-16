@@ -1,0 +1,14 @@
+
+> osfs@0.0.0 test
+> vitest run --passWithNoTests src/flight/audio/simulationResetAudio.integration.test.ts
+
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+(node:41381) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  16:22:39
+   Duration  567ms (transform 44ms, setup 0ms, import 423ms, tests 58ms, environment 0ms)

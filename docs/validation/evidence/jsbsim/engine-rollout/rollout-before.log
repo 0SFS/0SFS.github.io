@@ -1,0 +1,41 @@
+
+> osfs@0.0.0 test
+> vitest run --passWithNoTests src/flight/physics/rolloutEngine.integration.test.ts
+
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+(node:43528) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/flight/physics/rolloutEngine.integration.test.ts > keeps the SF50 lit through refinement touchdown and rollout
+[terrain] First terrain height established { heightMeters: 0, latDeg: 34, lonDeg: -118 }
+
+ ❯ src/flight/physics/rolloutEngine.integration.test.ts (3 tests | 1 failed) 2470ms
+   × keeps the SF50 lit through refinement touchdown and rollout 602ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/flight/physics/rolloutEngine.integration.test.ts > keeps the SF50 lit through refinement touchdown and rollout
+AssertionError: expected 15 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 15
+
+ ❯ src/flight/physics/rolloutEngine.integration.test.ts:35:45
+     33|       else expect(result.summary.stoppedStep).not.toBeNull();
+     34|       expect(result.summary.outageFrames).toBe(0);
+     35|       expect(result.summary.simTimeRewinds).toBe(0);
+       |                                             ^
+     36|       if (surface === "refinement") expect(result.summary.resetCount).…
+     37|     } finally {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  16:27:17
+   Duration  2.90s (transform 56ms, setup 0ms, import 350ms, tests 2.47s, environment 0ms)

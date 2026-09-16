@@ -163,7 +163,8 @@ describe("SF50 runtime contracts (not performance calibration)", () => {
     else restoreSimulation(sdk, captureSimulation(sdk));
     expect(sdk.getPropertyValue("gear/gear-cmd-norm")).toBe(1);
     expect(sdk.getPropertyValue("gear/gear-pos-norm")).toBeCloseTo(position, 10);
-    expect(sdk.getPropertyValue("simulation/sim-time-sec")).toBe(0);
+    expect(sdk.getPropertyValue("simulation/sim-time-sec"))
+      .toBeCloseTo(operation === "snapshot restore" ? 2 : 0, 10);
     expect(sdk.getDeltaT()).toBeCloseTo(FIXED_DT, 12);
     advance(sdk, 1);
     expect(sdk.getPropertyValue("gear/gear-pos-norm")).toBeGreaterThan(position);
