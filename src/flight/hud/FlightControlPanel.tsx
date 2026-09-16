@@ -9,6 +9,7 @@ import {
 import {
   Bug,
   CloudSun,
+  Fan,
   Gauge,
   Navigation,
   Settings,
@@ -17,7 +18,7 @@ import {
   Plane,
   Volume2,
 } from "lucide-react";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { BabylonRuntimeStatus, GoogleTerrainDetailState, RendererMode } from "foss-earth/runtime";
 import type { FlightViewMode } from "../aircraft/createPlaceholderAircraft";
 import {
@@ -61,7 +62,7 @@ import { SoundSettingsPanel, type SoundAction } from "./SoundSettingsPanel";
 import type { FlightAudioStatus } from "../audio/createFlightAudio";
 import type { AutopilotSettingsV1 } from "../autopilot/autopilotSettings";
 
-export type FlightPanelTab = "weather" | "aircraft" | "autopilot" | "controls" | "sound" | "debug" | "settings";
+export type FlightPanelTab = "weather" | "aircraft" | "autopilot" | "controls" | "sound" | "engine" | "debug" | "settings";
 
 const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "weather", label: "Weather" },
@@ -69,6 +70,7 @@ const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "autopilot", label: "Autopilot" },
   { id: "controls", label: "Controls" },
   { id: "sound", label: "Sound" },
+  { id: "engine", label: "Engine" },
   { id: "debug", label: "Debug" },
   { id: "settings", label: "Settings" },
 ];
@@ -79,6 +81,7 @@ const TAB_ICONS = {
   autopilot: Navigation,
   controls: Gauge,
   sound: Volume2,
+  engine: Fan,
   debug: Bug,
   settings: Settings,
 } satisfies Record<FlightPanelTab, typeof Plane>;
@@ -156,6 +159,8 @@ export interface FlightControlPanelOptions {
   onGroundInteractionAction(action: GroundInteractionAction): void;
   onAutopilotSettingsChange(settings: AutopilotSettingsV1): void;
   onAutopilotEngageChange(engaged: boolean): void;
+  /** Hosts the live engine-detail tables inside the Engine tab. */
+  attachEngineDetails(host: HTMLElement): () => void;
 }
 
 export interface FlightControlPanelHandle {
@@ -171,6 +176,16 @@ interface FlightControlPanelProps extends FlightControlPanelOptions {
 
 function getTabLabel(tabId: FlightPanelTab): string {
   return TAB_DEFINITIONS.find((definition) => definition.id === tabId)?.label ?? tabId;
+}
+
+function EngineDetailsHost({ attach }: { attach: (host: HTMLElement) => () => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const host = ref.current;
+    if (!host) return;
+    return attach(host);
+  }, [attach]);
+  return <div className="flight-engine-host" ref={ref} />;
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
@@ -1010,6 +1025,7 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
                 <OrbitInvertSettingsPanel {...props} />
               </div>
               : tabId === "sound" ? <SoundSettingsPanel state={props.snapshot.sound} onAction={props.onSoundAction} />
+              : tabId === "engine" ? <EngineDetailsHost attach={props.attachEngineDetails} />
               : tabId === "settings" ? <>
                 <fieldset className="flight-panel__fieldset">
                   <legend>Ground impacts</legend>

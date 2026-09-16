@@ -695,3 +695,27 @@ it("opens Debug from the FPS control on the right when the left slot cannot fit"
     expect(right.dataset.collapsed).toBe("false");
   } finally { await act(async () => app.destroy()); }
 });
+
+it("opens Engine from the HUD indicator as a tab, not an overlay", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  vi.stubGlobal("localStorage", { getItem: () => null, setItem: vi.fn() });
+  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
+  const root = document.createElement("div");
+  document.body.append(root);
+  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
+  await act(async () => { app = await createFlightSimApp(root); });
+  try {
+    expect(root.querySelector(".flight-engine__details")).toBeNull();
+    await act(async () => root.querySelector<HTMLButtonElement>(".flight-engine__summary")!.click());
+    const right = root.querySelector<HTMLElement>('[data-side="right"]')!;
+    expect(right.querySelector(".foss-earth-tab-button")?.textContent).toBe("Engine");
+    expect(right.dataset.collapsed).toBe("false");
+    expect(right.querySelector(".flight-engine__details")).not.toBeNull();
+    expect(root.querySelector(".flight-eval .flight-engine__details")).toBeNull();
+    await act(async () => right.querySelector<HTMLButtonElement>(".foss-earth-tab-button")!.click());
+    expect(right.dataset.collapsed).toBe("true");
+    await act(async () => root.querySelector<HTMLButtonElement>(".flight-engine__summary")!.click());
+    expect(right.dataset.collapsed).toBe("false");
+    expect(right.querySelector(".flight-engine__details")).not.toBeNull();
+  } finally { await act(async () => app.destroy()); }
+});

@@ -63,42 +63,44 @@ describe("engine monitor", () => {
     if (!root.isConnected) document.body.appendChild(root);
     return createEngineMonitor(root, { storage: memoryStorage(), refreshIntervalMs: 0, ...options });
   };
+  const showDetails = (monitor: ReturnType<typeof createEngineMonitor>) => monitor.attachDetails(root);
   const text = (selector: string) => root.querySelector(selector)?.textContent?.trim();
   const rows = () => Object.fromEntries([...root.querySelectorAll("tr")]
     .filter((row) => row.children.length === 2)
     .map((row) => [row.children[0].textContent, row.children[1].textContent]));
 
-  it("starts collapsed to one line with the phase, spools, fuel flow, thrust and sound", () => {
+  it("starts as one HUD line with the phase, spools, fuel flow, thrust and sound", () => {
     root = document.createElement("div");
     const monitor = mount({ soundStatus: () => status() });
     monitor.update(fakeReader(sf50Values(), WRITE_ONLY));
     expect(text(".flight-engine__phase")).toBe("RUNNING");
     expect(text(".flight-engine__values")).toBe("N1 50.8%  N2 69.7%  FF 171 lb/h  THR 213 lbf  SND low");
     expect(root.querySelector(".flight-engine__summary")?.getAttribute("aria-expanded")).toBe("false");
-    expect(root.querySelector<HTMLElement>(".flight-engine__details")?.hidden).toBe(true);
+    expect(root.querySelector(".flight-engine__details")).toBeNull();
   });
 
-  it("expands on click and remembers that", () => {
+  it("asks to open a tab instead of expanding in place", () => {
     root = document.createElement("div");
-    const storage = memoryStorage();
+    let opened = 0;
     const reader = fakeReader(sf50Values(), WRITE_ONLY);
-    const first = mount({ storage });
-    first.update(reader);
+    const monitor = mount({ onOpen: () => { opened += 1; } });
+    monitor.update(reader);
     root.querySelector<HTMLButtonElement>(".flight-engine__summary")?.click();
+    expect(opened).toBe(1);
+    expect(root.querySelector(".flight-engine__details")).toBeNull();
+    showDetails(monitor);
     expect(root.querySelector(".flight-engine__summary")?.getAttribute("aria-expanded")).toBe("true");
-    expect(root.querySelector<HTMLElement>(".flight-engine__details")?.hidden).toBe(false);
-    first.destroy();
+    expect(root.querySelector(".flight-engine__details")).not.toBeNull();
+    monitor.destroy();
     expect(root.querySelector(".flight-engine")).toBeNull();
-    const second = mount({ storage });
-    second.update(reader);
-    expect(root.querySelector(".flight-engine__summary")?.getAttribute("aria-expanded")).toBe("true");
+    expect(root.querySelector(".flight-engine__details")).toBeNull();
   });
 
   it("shows the curated rows the model publishes, and lists every readable property", () => {
     root = document.createElement("div");
     const values = sf50Values();
     const monitor = mount();
-    monitor.setExpanded(true);
+    showDetails(monitor);
     monitor.update(fakeReader(values, WRITE_ONLY));
     const shown = rows();
     expect(shown.N1).toBe("50.8 %");
@@ -118,7 +120,7 @@ describe("engine monitor", () => {
     root = document.createElement("div");
     const reader = fakeReader(sf50Values(), WRITE_ONLY);
     const monitor = mount();
-    monitor.setExpanded(true);
+    showDetails(monitor);
     monitor.update(reader);
     Object.assign(reader.values, {
       "propulsion/engine/set-running": 0, "propulsion/cutoff_cmd": 1,
@@ -135,7 +137,7 @@ describe("engine monitor", () => {
     root = document.createElement("div");
     let current = status({ engine: null, held: true, core: null });
     const monitor = mount({ soundStatus: () => current });
-    monitor.setExpanded(true);
+    showDetails(monitor);
     const reader = fakeReader(sf50Values(), WRITE_ONLY);
     monitor.update(reader);
     expect(text(".flight-engine__values")).toMatch(/SND low held$/);
@@ -151,7 +153,7 @@ describe("engine monitor", () => {
   it("copes with a model, or a mock, that publishes no engine catalog", () => {
     root = document.createElement("div");
     const monitor = mount();
-    monitor.setExpanded(true);
+    showDetails(monitor);
     expect(() => monitor.update({ getPropertyValue: () => 0 })).not.toThrow();
     expect(text(".flight-engine__phase")).toBe("UNKNOWN");
     expect(root.textContent).toMatch(/publishes no engine properties/);
