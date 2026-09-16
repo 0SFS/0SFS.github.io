@@ -69,7 +69,7 @@ benchmarks/audio/            generator, offline/real-time/fault harnesses
 docs/validation/evidence/audio/  small reproducible manifests/results
 ```
 
-Keep generated bulk captures, compiler scratch and machine-local artifacts in ignored `build/validation/` or temporary directories. Evidence linked from committed documents must be committed or explicitly identified as an external artifact. Add source/build/license provenance for the audio module; do not treat generated WASM as its corresponding source.
+Keep generated bulk captures, compiler scratch, generated benchmark fixtures and machine-local artifacts in ignored `build/` (`build/validation/`, `build/benchmarks/`, or temporary directories). Evidence linked from committed documents must be committed or explicitly identified as an external artifact. Add source/build/license provenance for the audio module; do not treat generated WASM as its corresponding source.
 
 Define a versioned snapshot with sequence/epoch, simulation time, mapped audio frame, availability/validity, engine values/state, airframe configuration and listener/source pose. Use owned numeric storage: SDK `PropertyBatch.read()` without a target returns an ephemeral WASM view. Read into a preallocated `Float64Array` destination, keep property creation disabled, create batches after model load, and dispose/recreate with the model. The existing [flight recorder](../src/flight/diagnostics/flightRecorder.ts) handles catalog paths that omit `[0]`; reuse that convention when checking availability. Send no SDK handles or Babylon objects to the worklet.
 

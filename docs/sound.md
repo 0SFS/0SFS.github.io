@@ -127,7 +127,7 @@ Compare **inference + DSP + glue p95/max** against Q, with dropouts. Native M1/N
 
 ### Fixed telemetry script
 
-Implement `benchmarks/audio/generate-sweep.mjs`: emit **240 seconds at 60 Hz**, timestamps `i/60`, PRNG seed **0x53463530**, using the keyframes below. Interpolate continuous columns linearly; hold discrete state until its event. These are **synthetic stress inputs, not FJ33 procedures or validated responses**. Commit generator, JSONL and SHA-256; replay identically per tier. FDM separately supplies a hashed actual-JSBSim start/flight/shutdown trace for realism.
+Implement `benchmarks/audio/generate-sweep.mjs`: emit **240 seconds at 60 Hz**, timestamps `i/60`, PRNG seed **0x53463530**, using the keyframes below. Interpolate continuous columns linearly; hold discrete state until its event. These are **synthetic stress inputs, not FJ33 procedures or validated responses**. Commit the generator and SHA-256; write the JSONL under gitignored `build/benchmarks/audio/` and replay identically per tier. FDM separately supplies a hashed actual-JSBSim start/flight/shutdown trace for realism.
 
 | Time (s) | N1 / N2 (%) | Fuel (lbm/h) / thrust (lbf) | KIAS | Event |
 | --- | --- | --- | --- | --- |
@@ -147,7 +147,7 @@ Implement `benchmarks/audio/generate-sweep.mjs`: emit **240 seconds at 60 Hz**, 
 
 Hold fuel at zero until 12 s and after cutoff at 180 s; these events override interpolation. Emit combustion true over **[12,180) s** and running true over **[20,180) s**, false otherwise. Throttle is 0 until 40 s, ramps to 1 at 80 s, holds until 100 s, steps to 0 at 100 s and to 1 at 120 s, ramps to 0.7 at 140 s, then holds until cutoff at 180 s and becomes 0. Gear retracts over 60–70 s, extends over 160–170 s, retracts over 170–180 s; flaps follow only the latter cycle. For 140–160 s use a fixed ground listener and a source moving **−1000 to +1000 m**, along a line **50 m** away at **10 m** height; velocity is its derivative, fixture sound speed **343 m/s**. Crossfade exterior/cockpit at 140/160 s. Run seeks, stale input, switches and overload injection separately, labeling deliberate faults rather than counting them as normal-run dropouts.
 
-This runnable Node generator reads the keyframe table from this document; save it at the proposed path and run from the repository root as `node benchmarks/audio/generate-sweep.mjs > sweep.jsonl`. The normalized fixture fields are mapped to the properties/units above by the harness; combustion is a fixture signal, not a claimed native property. The seed controls synthesis randomness. Force the tier's maximum voice/effect configuration in a separate capacity pass, including tire slip at **15,000 W** as a stress input.
+This runnable Node generator reads the keyframe table from this document; save it at the proposed path and run from the repository root as `node benchmarks/audio/generate-sweep.mjs` (writes `build/benchmarks/audio/sweep.jsonl`). The normalized fixture fields are mapped to the properties/units above by the harness; combustion is a fixture signal, not a claimed native property. The seed controls synthesis randomness. Force the tier's maximum voice/effect configuration in a separate capacity pass, including tire slip at **15,000 W** as a stress input.
 
 ```javascript
 import { readFileSync } from "node:fs";

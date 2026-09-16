@@ -183,8 +183,9 @@ core, limiter and holds as the engine.
 
 - **Sweep generator:** `benchmarks/audio/generate-sweep.mjs`, taken verbatim from §5. It reads the keyframe
   table from sound.md and fails if the table changes shape.
-  - Fixture `benchmarks/audio/sweep.jsonl`: 14,400 rows, 5,222,891 bytes, sha256
-    `0e4a927e80859f19f9fab923fb547d4aa6073b55e5dd6781ec2fcbf014704389` (also in `sweep.jsonl.sha256`).
+  - Fixture `build/benchmarks/audio/sweep.jsonl`: 14,400 rows, 5,222,891 bytes, sha256
+    `0e4a927e80859f19f9fab923fb547d4aa6073b55e5dd6781ec2fcbf014704389` (also in `benchmarks/audio/sweep.jsonl.sha256`).
+    Generated and gitignored; regenerate with `node benchmarks/audio/generate-sweep.mjs`.
   - Generation is deterministic (tested).
 - **Offline renderer:** `benchmarks/audio/renderSweep.mjs` runs the compiled core over the sweep per tier and rate.
   - Passes: `sweep`, `capacity` (tier maximum plus 15,000 W tire slip) and a labelled `fault-injection` pass
@@ -310,7 +311,7 @@ The worklet file name is content-hashed, so it changes with any edit to `dspProc
 
 ### 5.3 Offline sweep proxy
 
-`node benchmarks/audio/renderSweep.mjs --sweep=benchmarks/audio/sweep.jsonl --tiers=off,low,med --rates=44100,48000 --repeats=3 --passes=sweep,capacity --out=docs/validation/evidence/audio/offline-sweep-proxy-2026-09-14.json`
+`node benchmarks/audio/renderSweep.mjs --sweep=build/benchmarks/audio/sweep.jsonl --tiers=off,low,med --rates=44100,48000 --repeats=3 --passes=sweep,capacity --out=docs/validation/evidence/audio/offline-sweep-proxy-2026-09-14.json`
 
 Full sweep, 3 repeats, run on an otherwise idle machine. `performance.now()` wraps each
 `osfs_audio_process()` call in Node. That is a kernel proxy: **not** AudioWorklet callback timing, not
@@ -346,7 +347,7 @@ What this does and does not show:
 
 ### 5.4 Offline fault-injection proxy
 
-`node benchmarks/audio/renderSweep.mjs --sweep=benchmarks/audio/sweep.jsonl --tiers=low,med --rates=44100,48000 --passes=fault-injection --out=docs/validation/evidence/audio/offline-fault-injection-proxy-2026-09-14.json`
+`node benchmarks/audio/renderSweep.mjs --sweep=build/benchmarks/audio/sweep.jsonl --tiers=low,med --rates=44100,48000 --passes=fault-injection --out=docs/validation/evidence/audio/offline-fault-injection-proxy-2026-09-14.json`
 
 These are deliberate faults, not normal-run dropouts. Identical counters at every tier and rate:
 
@@ -389,7 +390,7 @@ at Low and 0.045–0.046 ms at Med.
 | SAB bridge in a deployed cross-origin-isolated host | Release | Verify COOP/COEP/CORP end to end; the static host uses the port bridge |
 | Half-rate synthesis | DSP | Enable only after a measured, resampler-inclusive cost win |
 | Tier X | DSP / Release | Corpus, licence and cost gates (§4); not started |
-| Committing `benchmarks/audio/sweep.jsonl` (5.2 MB) | Maintainer | §5 asks for the JSONL and its SHA-256 to be committed; confirm that size is acceptable |
+| Generated sweep JSONL | — | Lives under gitignored `build/benchmarks/audio/`; commit the generator and `sweep.jsonl.sha256` |
 
 ## 7. Known limitations
 
@@ -418,7 +419,7 @@ at Low and 0.045–0.046 ms at Med.
 - `src/flight/hud/SoundSettingsPanel.tsx`.
 - `src/flight/hud/engineMonitor.ts`, `engineMonitor.css`, `engineMonitorModel.ts`, and their unit, DOM and real-SDK tests.
 - `scripts/build-audio-wasm.mjs`, `scripts/verify-audio-artifact.mjs`.
-- `benchmarks/audio/`: generator, fixture and hash, renderer, schema, dropout detector, headless worklet check, tests.
+- `benchmarks/audio/`: generator, committed SHA-256, renderer, schema, dropout detector, headless worklet check, tests. The JSONL fixture is generated under `build/benchmarks/audio/`.
 - `docs/validation/evidence/audio/`:
   - start trace, geometry, property catalog
   - offline sweep and fault-injection proxy results
@@ -478,7 +479,7 @@ In a suggested order:
 7. **JSBSim turbine property exposure** (§10).
 8. **Engine state after a reset (engine defect).** Found 2026-09-14. When a location is applied with the engine shut off, fork.7 brings the SF50 out of RunIC at N2 81 % and 344.7 lb/h. The adapter reads that as combustion for a few steps, then the spool winds down. The cause is JSBSim PRs #1505/#1508, not the audio code. Do not mask it here; see [the open PR review](jsbsim-open-pr-review-2026-09-14.md).
 9. **Decisions:**
-   - `benchmarks/audio/sweep.jsonl` (5.2 MB) is **not committed**. Regenerate it with `node benchmarks/audio/generate-sweep.mjs > benchmarks/audio/sweep.jsonl`; its hash is in `sweep.jsonl.sha256`.
+   - `build/benchmarks/audio/sweep.jsonl` (5.2 MB) is generated and gitignored with the rest of `build/`. Regenerate it with `node benchmarks/audio/generate-sweep.mjs`; its hash is in `benchmarks/audio/sweep.jsonl.sha256`.
    - A licensed Tier 3 bank.
    - Tier X.
 

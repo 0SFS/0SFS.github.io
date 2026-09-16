@@ -10,13 +10,13 @@
 // timings are proxies (sound.md §5.4). There is no output route, so the dropout
 // count is null ("unknown"), never zero.
 //
-//   node benchmarks/audio/renderSweep.mjs [--sweep=sweep.jsonl] [--tiers=off,low,med]
+//   node benchmarks/audio/renderSweep.mjs [--sweep=build/benchmarks/audio/sweep.jsonl] [--tiers=off,low,med]
 //     [--rates=44100,48000] [--repeats=1] [--seconds=240] [--passes=sweep,capacity,fault-injection]
 //     [--out=result.json] [--wav=dir]
 
 import { createHash } from "node:crypto";
-import { execFileSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { generateSweepText } from "./generate-sweep.mjs";
 import os from "node:os";
 import path from "node:path";
 import { performance } from "node:perf_hooks";
@@ -104,9 +104,7 @@ export function readAbi(header = readFileSync(HEADER_PATH, "utf8")) {
 }
 
 export function loadSweep(file) {
-  const text = file
-    ? readFileSync(file, "utf8")
-    : execFileSync(process.execPath, ["benchmarks/audio/generate-sweep.mjs"], { encoding: "utf8", maxBuffer: 64 << 20 });
+  const text = file ? readFileSync(file, "utf8") : generateSweepText();
   return { sha256: sha256(text), rows: text.trim().split("\n").map((line) => JSON.parse(line)) };
 }
 

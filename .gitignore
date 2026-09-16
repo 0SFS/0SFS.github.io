@@ -4,4 +4,5 @@ GOOGLE_3D_TILES.local.md
 .DS_Store
 
 # Local build/validation artifacts; identities and outcomes are documented.
+# Generated benchmark fixtures belong here (e.g. build/benchmarks/audio/).
 /build/
