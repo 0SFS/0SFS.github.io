@@ -132,6 +132,16 @@ on the SF50 package at 5,000 ft, 150 kt and throttle 0.6. Set
 
 Both logs fail. That is the finding: the check passes only once the engine is fixed.
 
+## engine-rollout/
+
+The causal before/after logs for the 2026-09-16 SF50 rollout investigation.
+The installed turbine remains running through touchdown, roughness, and terrain
+refinement. The app's state-recovery path instead rewound simulation time,
+which reset and faded the audio timeline. `restore-before.log` and
+`rollout-before.log` reproduce that rewind; their after controls pass when
+state recovery retains executive time. See the directory README and
+[`engine-cutout-rollout-2026-09-16.md`](../../engine-cutout-rollout-2026-09-16.md).
+
 ## reports/
 
 `fork6-browser-artifact.json` boots the accepted artifact in headless Chromium

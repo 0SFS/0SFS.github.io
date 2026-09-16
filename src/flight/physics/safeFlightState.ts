@@ -40,16 +40,28 @@ const initialProperties: Record<string, string> = {
   "ic/p-rad_sec": "velocities/p-rad_sec", "ic/q-rad_sec": "velocities/q-rad_sec", "ic/r-rad_sec": "velocities/r-rad_sec",
 };
 export function captureSimulation(sdk: JSBSimSdk) {
+  const timing = sdk as JSBSimSdk & { getSimTime?: () => number };
   return { initial: Object.fromEntries(Object.entries(initialProperties).map(([ic, property]) => [ic, sdk.getPropertyValue(property)])),
     controls: Object.fromEntries(controls.map(property => [property, sdk.getPropertyValue(property)])),
-    running: sdk.getPropertyValue("propulsion/engine/set-running") > 0.5 };
+    running: sdk.getPropertyValue("propulsion/engine/set-running") > 0.5,
+    // Contact recovery rebuilds model state at zero integration time, but it is
+    // still part of the current flight. Preserve the public simulation clock so
+    // real-time consumers do not mistake every terrain refinement for a seek.
+    // Some unit-test doubles implement the property reader without the SDK's
+    // convenience method. The installed runtime supplies getSimTime().
+    simTimeS: timing.getSimTime?.() ?? sdk.getPropertyValue("simulation/sim-time-sec") };
 }
 export type SimulationSnapshot = ReturnType<typeof captureSimulation>;
 
 /** Clear contact forces and integrator history before rebuilding valid kinematics. */
 export function restoreSimulation(sdk: JSBSimSdk, snapshot: SimulationSnapshot): void {
-  if (![...Object.values(snapshot.initial), ...Object.values(snapshot.controls)].every(Number.isFinite)) throw new Error("Invalid simulation snapshot");
+  if (![...Object.values(snapshot.initial), ...Object.values(snapshot.controls), snapshot.simTimeS].every(Number.isFinite)) throw new Error("Invalid simulation snapshot");
   sdk.resetToInitialConditions(2);
+  // ResetToInitialConditions rewinds the executive. This is state recovery
+  // within one flight, so zero-time model evaluation belongs at the captured
+  // time and the next accepted step must advance from it.
+  const timing = sdk as JSBSimSdk & { setSimTime?: (seconds: number) => number };
+  timing.setSimTime?.(snapshot.simTimeS);
   // Terrain MUST be set before RunIC: even a zero-time initialization evaluates contacts.
   for (const [property, value] of Object.entries(snapshot.initial)) sdk.setPropertyValue(property, value);
   for (const [property, value] of Object.entries(snapshot.controls)) sdk.setPropertyValue(property, value);

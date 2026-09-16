@@ -1,0 +1,14 @@
+
+> osfs@0.0.0 test
+> vitest run --passWithNoTests src/flight/physics/rolloutEngine.integration.test.ts
+
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+(node:43572) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  16:27:20
+   Duration  2.87s (transform 52ms, setup 0ms, import 330ms, tests 2.47s, environment 0ms)

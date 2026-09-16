@@ -1,0 +1,31 @@
+
+> osfs@0.0.0 test
+> vitest run --passWithNoTests src/flight/audio/simulationResetAudio.integration.test.ts
+
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+(node:41357) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/flight/audio/simulationResetAudio.integration.test.ts (1 test | 1 failed) 63ms
+   × keeps SF50 audio telemetry monotonic through repeated contact restores 62ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/flight/audio/simulationResetAudio.integration.test.ts > keeps SF50 audio telemetry monotonic through repeated contact restores
+AssertionError: expected +0 to be close to 0.9999999999999989, received difference is 0.9999999999999989, but expected 5e-11
+ ❯ src/flight/audio/simulationResetAudio.integration.test.ts:40:30
+     38|         reading = adapter.read();
+     39|         const restoredTime = reading.simTimeS;
+     40|         expect(restoredTime).toBeCloseTo(previousTime, 10);
+       |                              ^
+     41|         expect(reading).toMatchObject({ combustion: true, running: tru…
+     42|         expect(sdk.run()).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  16:22:38
+   Duration  754ms (transform 54ms, setup 0ms, import 597ms, tests 63ms, environment 0ms)
