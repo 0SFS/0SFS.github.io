@@ -43,6 +43,12 @@ import { applyAircraftRig, readControlSurfaceState } from "./aircraft/aircraftAn
 import { flightLog } from "./diagnostics/flightLog";
 import { createFlightRecorder } from "./diagnostics/flightRecorder";
 import { createEvaluationInstruments } from "./hud/evaluationInstruments";
+import {
+  bindRecorderMarkHotkey,
+  downloadCsv,
+  type LoggingAction,
+  type LoggingPanelState,
+} from "./hud/LoggingPanel";
 import { createEngineMonitor } from "./hud/engineMonitor";
 import { createCollisionDebugOverlay } from "./diagnostics/createCollisionDebugOverlay";
 import { createWheelSpinDebugOverlay } from "./diagnostics/createWheelSpinDebugOverlay";
@@ -718,8 +724,8 @@ export async function createFlightSimApp(
   let aircraft: ReturnType<typeof createPlaceholderAircraft> | null = null;
   let aircraftModel: AircraftModelHandle | null = null;
   let controlPanel: FlightControlPanelHandle | null = null;
-  // Pilot evaluation: engine, AoA and CAS readouts, and a recorder that runs for
-  // the whole session so any moment the pilot marks can be exported with the build.
+  // Pilot evaluation: engine, AoA and CAS on the HUD. Flight recording lives in
+  // the Logging tab and stays off until the pilot starts it.
   const flightRecorder = createFlightRecorder({
     metadata: {
       build: __SOURCE_VERSION__,
@@ -727,18 +733,39 @@ export async function createFlightSimApp(
       aircraft: initialAircraftId,
       generation: initialAircraftSelection.generationId ?? "",
       jsbsim: JSON.stringify(jsbsim.identity),
-      recording_started_utc: new Date().toISOString(),
     },
   });
-  const evaluationInstruments = createEvaluationInstruments(hudRoot, {
-    recorder: flightRecorder,
-    recordingName: () => `0sfs-${initialAircraftId}-${__SOURCE_VERSION__}-${new Date().toISOString().replace(/[:.]/g, "-")}`,
+  const recordingFileName = () =>
+    `0sfs-${initialAircraftId}-${__SOURCE_VERSION__}-${new Date().toISOString().replace(/[:.]/g, "-")}`;
+  const loggingSnapshot = (): LoggingPanelState => ({
+    recording: flightRecorder.isRecording(),
+    sampleCount: flightRecorder.getSampleCount(),
+    durationSec: flightRecorder.getDurationSec(),
+    markCount: flightRecorder.getMarks().length,
   });
-  // Live engine data under the evaluation readouts; the HUD line opens the Engine tab.
-  const engineMonitor = createEngineMonitor(hudRoot.querySelector<HTMLElement>(".flight-eval") ?? hudRoot, {
-    soundStatus: () => flightAudio.getStatus(),
-    onOpen: () => controlPanel?.openOrSelectTab("engine"),
-  });
+  const handleLoggingAction = (action: LoggingAction): void => {
+    if (action.type === "start") flightRecorder.start();
+    else if (action.type === "stop") flightRecorder.stop();
+    else if (action.type === "mark") flightRecorder.mark();
+    else if (action.type === "clear") {
+      flightRecorder.stop();
+      flightRecorder.clear();
+    } else if (action.type === "save" && flightRecorder.getSampleCount() > 0) {
+      downloadCsv(`${recordingFileName()}.csv`, flightRecorder.toCsv());
+    }
+    controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+  };
+  const unbindRecorderMark = bindRecorderMarkHotkey(flightRecorder);
+  const evaluationInstruments = createEvaluationInstruments(
+    hudRoot.querySelector<HTMLElement>(".flight-hud__eval") ?? hudRoot,
+  );
+  const engineMonitor = createEngineMonitor(
+    hudRoot.querySelector<HTMLElement>(".flight-hud__engine") ?? hudRoot,
+    {
+      soundStatus: () => flightAudio.getStatus(),
+      onOpen: () => controlPanel?.openOrSelectTab("engine"),
+    },
+  );
   // Session-only debug opt-in: no overlay meshes or SDK reads until enabled.
   let collisionDebugEnabled = false;
   let collisionDebugOverlay: ReturnType<typeof createCollisionDebugOverlay> | null = null;
@@ -1122,6 +1149,7 @@ export async function createFlightSimApp(
         blockedReason: autopilotBlockReason(),
         readOnlyReason: autopilotStore.readOnlyReason,
       },
+      logging: loggingSnapshot(),
     };
   };
 
@@ -1435,6 +1463,8 @@ export async function createFlightSimApp(
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
     },
     attachEngineDetails: (host) => engineMonitor.attachDetails(host),
+    onLoggingAction: handleLoggingAction,
+    flightRecorder,
     onArcadeGroundLaunchesChange: (enabled) => {
       arcadeGroundLaunches = enabled;
       writePreference(ARCADE_GROUND_LAUNCHES_PREFERENCE_KEY, enabled ? "on" : "off");
@@ -1769,6 +1799,7 @@ export async function createFlightSimApp(
       phoneDialog?.destroy();
       phoneSession?.destroy();
       document.removeEventListener("visibilitychange", onVisibilityChange);
+      unbindRecorderMark();
       runtime.setSimTick(null);
       window.removeEventListener("keydown", onViewKeyDown);
       flightGamepadSource.stop();

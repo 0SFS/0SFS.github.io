@@ -5,7 +5,7 @@ import {
 } from "./engineMonitorModel";
 
 const sample = (overrides: Partial<EngineSample> = {}): EngineSample => ({
-  simTimeS: 10, n1Pct: 24.3, n2Pct: 53.4, rpm: null, thrustLbf: 90, fuelFlowPps: 0.0211,
+  simTimeS: 10, n1Pct: 24.3, n2Pct: 53.4, rpm: null, thrustLbf: 90, fuelFlowPps: 0.0211, fuelFlowGph: 11.2,
   running: true, starter: false, cutoff: false, seized: false, stalled: false,
   totalFuelLbs: 900, qbarPsf: 60, throttleNorm: 0, kcas: 130, ...overrides,
 });

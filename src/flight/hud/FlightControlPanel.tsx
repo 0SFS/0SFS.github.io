@@ -12,6 +12,7 @@ import {
   Fan,
   Gauge,
   Navigation,
+  ScrollText,
   Settings,
   Pause,
   Play,
@@ -59,10 +60,17 @@ import {
 } from "./GroundInteractionSettingsPanel";
 import { AutopilotPanel, type AutopilotPanelState } from "./AutopilotPanel";
 import { SoundSettingsPanel, type SoundAction } from "./SoundSettingsPanel";
+import {
+  LoggingPanel,
+  allowCloseLoggingTab,
+  type LoggingAction,
+  type LoggingPanelState,
+} from "./LoggingPanel";
 import type { FlightAudioStatus } from "../audio/createFlightAudio";
 import type { AutopilotSettingsV1 } from "../autopilot/autopilotSettings";
+import type { FlightRecorder } from "../diagnostics/flightRecorder";
 
-export type FlightPanelTab = "weather" | "aircraft" | "autopilot" | "controls" | "sound" | "engine" | "debug" | "settings";
+export type FlightPanelTab = "weather" | "aircraft" | "autopilot" | "controls" | "sound" | "engine" | "logging" | "debug" | "settings";
 
 const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "weather", label: "Weather" },
@@ -71,6 +79,7 @@ const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "controls", label: "Controls" },
   { id: "sound", label: "Sound" },
   { id: "engine", label: "Engine" },
+  { id: "logging", label: "Logging" },
   { id: "debug", label: "Debug" },
   { id: "settings", label: "Settings" },
 ];
@@ -82,6 +91,7 @@ const TAB_ICONS = {
   controls: Gauge,
   sound: Volume2,
   engine: Fan,
+  logging: ScrollText,
   debug: Bug,
   settings: Settings,
 } satisfies Record<FlightPanelTab, typeof Plane>;
@@ -131,6 +141,7 @@ export interface FlightControlPanelSnapshot {
   wheelSpinStates: readonly WheelSpinState[];
   groundInteraction: GroundInteractionPanelState;
   autopilot: AutopilotPanelState;
+  logging: LoggingPanelState;
 }
 
 export interface FlightControlPanelOptions {
@@ -159,8 +170,10 @@ export interface FlightControlPanelOptions {
   onGroundInteractionAction(action: GroundInteractionAction): void;
   onAutopilotSettingsChange(settings: AutopilotSettingsV1): void;
   onAutopilotEngageChange(engaged: boolean): void;
-  /** Hosts the live engine-detail tables inside the Engine tab. */
+  /** Hosts the live engine-detail readings inside the Engine tab. */
   attachEngineDetails(host: HTMLElement): () => void;
+  onLoggingAction(action: LoggingAction): void;
+  flightRecorder: FlightRecorder;
 }
 
 export interface FlightControlPanelHandle {
@@ -997,6 +1010,10 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
       setViewState={props.onLocationApply}
       locationSearchProvider={props.locationSearchProvider}
       additionalTabs={TAB_DEFINITIONS}
+      onBeforeCloseTab={(tabId) => {
+        if (tabId !== "logging") return;
+        if (!allowCloseLoggingTab(props.flightRecorder)) return false;
+      }}
       renderAdditionalTab={(tabId) => {
         const Icon = TAB_ICONS[tabId];
         return <>
@@ -1026,6 +1043,7 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
               </div>
               : tabId === "sound" ? <SoundSettingsPanel state={props.snapshot.sound} onAction={props.onSoundAction} />
               : tabId === "engine" ? <EngineDetailsHost attach={props.attachEngineDetails} />
+              : tabId === "logging" ? <LoggingPanel state={props.snapshot.logging} onAction={props.onLoggingAction} />
               : tabId === "settings" ? <>
                 <fieldset className="flight-panel__fieldset">
                   <legend>Ground impacts</legend>

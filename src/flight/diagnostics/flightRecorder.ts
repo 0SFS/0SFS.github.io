@@ -10,6 +10,9 @@
  * Samples come from JSBSim properties rather than the app's input objects, so
  * the record is what physics saw regardless of who was flying: keyboard,
  * gamepad, phone or autopilot.
+ *
+ * Recording is off until `start()`. Sampling is skipped while stopped so idle
+ * flights do not pay for a log nobody asked for.
  */
 
 export interface FlightRecorderPropertyReader {
@@ -91,10 +94,16 @@ export interface FlightRecorderOptions {
 }
 
 export interface FlightRecorder {
+  /** Begin sampling. Does nothing if already recording. */
+  start(): void;
+  /** Keep the buffer; later `sample()` calls are ignored until `start()`. */
+  stop(): void;
+  isRecording(): boolean;
   /**
-   * Record one row if simulation time has advanced a full sample interval.
-   * Call as often as convenient; paused time records nothing. Simulation time
-   * running backwards (a reset or reposition) starts a new segment.
+   * Record one row if recording is on and simulation time has advanced a full
+   * sample interval. Call as often as convenient; paused time records nothing.
+   * Simulation time running backwards (a reset or reposition) starts a new
+   * segment.
    */
   sample(reader: FlightRecorderPropertyReader): boolean;
   /** Mark the most recent sample. Returns null before anything is recorded. */
@@ -145,12 +154,23 @@ export function createFlightRecorder(options: FlightRecorderOptions = {}): Fligh
   let available: boolean[] | null = null;
   // Marks keyed by the absolute row number they label, so ring overwrite can drop them.
   let written = 0;
+  let recording = false;
   const marks: { row: number; mark: FlightRecorderMark }[] = [];
 
   const rowOffset = (index: number): number => ((start + index) % capacity) * width;
 
   return {
+    start(): void {
+      if (recording) return;
+      recording = true;
+      metadata.set("recording_started_utc", new Date(now()).toISOString());
+    },
+    stop(): void {
+      recording = false;
+    },
+    isRecording: () => recording,
     sample(reader: FlightRecorderPropertyReader): boolean {
+      if (!recording) return false;
       const simTime = reader.getPropertyValue("simulation/sim-time-sec");
       if (!Number.isFinite(simTime)) return false;
       if (lastSimTime !== null) {

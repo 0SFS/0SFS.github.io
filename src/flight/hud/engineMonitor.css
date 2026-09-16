@@ -1,4 +1,4 @@
-/* Live engine monitor. The HUD chip sits in the evaluation column; details
+/* Live engine monitor. The HUD chip sits left of the throttle; details
    render inside the Engine tab and follow that panel's type. */
 .flight-engine {
   pointer-events: auto;
@@ -11,7 +11,7 @@
 .flight-engine__summary {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   gap: 6px;
   max-width: 100%;
   padding: 3px 8px;
@@ -34,21 +34,46 @@
   outline-offset: 1px;
 }
 
-.flight-engine__title {
-  letter-spacing: 0.08em;
-  opacity: 0.8;
+.flight-engine__diagram {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex: none;
 }
 
 .flight-engine__values {
   white-space: pre-wrap;
 }
 
+.flight-engine__flow {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3em;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.flight-engine__flow-label,
+.flight-engine__flow-unit {
+  color: #8b949e;
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+
+.flight-engine__flow-value {
+  min-width: 4ch;
+  font-variant-numeric: tabular-nums;
+}
+
 .flight-engine__phase {
-  padding: 0 5px;
+  padding: 0 4px;
   border-radius: 4px;
   background: #4a5260;
+  font-size: 8px;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
 }
 
 .flight-engine__phase[data-phase="running"] { background: #2e7d32; }
@@ -59,6 +84,89 @@
 .flight-engine__phase[data-phase="starved"],
 .flight-engine__phase[data-phase="stalled"],
 .flight-engine__phase[data-phase="seized"] { background: #c62828; }
+
+.flight-engine__spools {
+  --size: 4.25rem;
+  display: block;
+  box-sizing: border-box;
+  width: var(--size);
+  height: var(--size);
+  flex: none;
+}
+
+.flight-engine__spool--n1,
+.flight-engine__spool--n2 {
+  box-sizing: border-box;
+}
+
+.flight-engine__spool--n1 {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(190, 214, 232, 0.4);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.flight-engine__spool--n2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 56%;
+  height: 56%;
+  border: 1px solid rgba(232, 182, 71, 0.35);
+  border-radius: 50%;
+  background: rgba(18, 20, 24, 0.94);
+  line-height: 1.05;
+}
+
+.flight-engine__spool-label,
+.flight-engine__spool-unit {
+  color: #8b949e;
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+
+.flight-engine__spool-value {
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.flight-engine__spool--n2 .flight-engine__spool-value {
+  font-size: 11px;
+}
+
+.flight-engine__spool-thrust,
+.flight-engine__spool-n1 {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.flight-engine__spool-thrust .flight-engine__spool-label,
+.flight-engine__spool-thrust .flight-engine__spool-value,
+.flight-engine__spool-thrust .flight-engine__spool-unit,
+.flight-engine__spool-n1 .flight-engine__spool-label,
+.flight-engine__spool-n1 .flight-engine__spool-value,
+.flight-engine__spool-n1 .flight-engine__spool-unit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+.flight-engine__spool-n1 .flight-engine__spool-value,
+.flight-engine__spool-thrust .flight-engine__spool-value {
+  min-width: 4ch;
+  text-align: center;
+}
+
 
 .flight-engine-host {
   padding: 0 14px 18px;
@@ -90,39 +198,48 @@
   letter-spacing: 0.05em;
 }
 
-.flight-engine__table {
-  width: 100%;
-  border-collapse: collapse;
-  font-variant-numeric: tabular-nums;
+.flight-engine__grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.9em;
+  row-gap: 0.15em;
+  margin: 4px 0 8px;
 }
 
-.flight-engine__table td,
-.flight-engine__table th {
-  padding: 1px 4px;
-  vertical-align: top;
+.flight-engine__pair {
+  display: inline-flex;
+  gap: 0.4em;
+  align-items: baseline;
+  width: max-content;
+  max-width: 100%;
+}
+
+.flight-engine__pair--wide,
+.flight-engine__group {
+  flex: 1 1 100%;
+  width: auto;
 }
 
 .flight-engine__label {
-  opacity: 0.8;
+  opacity: 0.7;
   white-space: nowrap;
 }
 
 .flight-engine__value {
-  text-align: right;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
-.flight-engine__table--wrap .flight-engine__value {
-  text-align: left;
+.flight-engine__pair--wide .flight-engine__value {
   white-space: normal;
   overflow-wrap: anywhere;
 }
 
-.flight-engine__group th {
-  padding-top: 5px;
-  text-align: left;
-  font-weight: 400;
+.flight-engine__group {
+  padding-top: 6px;
   opacity: 0.6;
+  font-weight: 400;
 }
 
 .flight-engine__log {

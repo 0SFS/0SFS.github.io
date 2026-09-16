@@ -22,10 +22,11 @@ device, and no claim of fidelity is made.
    up, G gear, B brakes, P pause.
 4. Turn **auto-trim off** if it is on. It is a casual-flying aid and it will
    hide exactly what we want you to judge.
-5. The recorder runs the whole session. **Press M — or the MARK button — the
-   moment anything feels wrong**, then say what it was. A mark with a sentence
-   is worth more to us than a perfect description afterwards. At the end, SAVE
-   CSV.
+5. Recording is off until you start it. Open the **Logging** tab, press
+   **Record**, and leave that tab in the strip. **Press M — or Mark — the
+   moment anything feels wrong**, then say what it was. Closing Logging ends
+   the recording. A mark with a sentence is worth more to us than a perfect
+   description afterwards. At the end, **Save CSV**.
 
 ## Known — please do not spend time on these
 
@@ -131,7 +132,7 @@ doesn't do that". Mark it if you can, and describe it however you like.
 
 ## At the end
 
-1. **SAVE CSV.**
+1. Open **Logging** and **Save CSV**.
 2. Three questions:
    - What is the single worst thing about how this flies?
    - What would you fix first?

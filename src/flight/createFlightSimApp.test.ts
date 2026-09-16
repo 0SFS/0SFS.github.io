@@ -719,3 +719,28 @@ it("opens Engine from the HUD indicator as a tab, not an overlay", async () => {
     expect(right.querySelector(".flight-engine__details")).not.toBeNull();
   } finally { await act(async () => app.destroy()); }
 });
+
+it("keeps flight recording in Logging, off until started, and warns before closing the tab", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  vi.stubGlobal("localStorage", { getItem: () => null, setItem: vi.fn() });
+  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
+  const root = document.createElement("div");
+  document.body.append(root);
+  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
+  await act(async () => { app = await createFlightSimApp(root); });
+  try {
+    expect(root.querySelector(".flight-eval__recorder")).toBeNull();
+    await openPanelTab(root, "Logging", true);
+    expect(root.querySelector(".foss-earth-tab-button")?.textContent).toBe("Logging");
+    expect(root.textContent).toContain("Idle");
+    await act(async () => root.querySelector<HTMLButtonElement>('[aria-label="Start recording"]')!.click());
+    expect(root.textContent).toContain("Recording");
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+    await act(async () => root.querySelector<HTMLButtonElement>('[aria-label="Close Logging tab"]')!.click());
+    expect(confirm).toHaveBeenCalledOnce();
+    expect(root.querySelector(".foss-earth-tab-button")?.textContent).toBe("Logging");
+    confirm.mockReturnValue(true);
+    await act(async () => root.querySelector<HTMLButtonElement>('[aria-label="Close Logging tab"]')!.click());
+    expect(root.querySelector(".foss-earth-tab-button")).toBeNull();
+  } finally { await act(async () => app.destroy()); }
+});

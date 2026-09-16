@@ -29,8 +29,9 @@ Status meanings:
   pusher fires at 86.0, 77.1 and 66.0 KCAS against printed 86, 77 and 67, and
   the warning about 5 kt ahead of it.
 - **Done — N1, fuel flow, AoA and CAS warnings on the HUD** (item 3), and a
-  **flight recorder** with a mark key and CSV export (item 4). Readouts appear
-  only for properties the loaded aircraft has, so the C172 shows no N1 box.
+  **flight recorder** in the Logging tab (item 4). Recording starts only when
+  the pilot presses Record. Readouts appear only for properties the loaded
+  aircraft has, so the C172 shows no N1 box.
 - **Done — idle fuel flow** (item 8). `1.2.4-fork.7` is adopted and the package
   declares the recorded 76 lbm/hr; the model idles at 11.28 US gph instead of
   71.44, and the two lowest AFM cruise rows are reachable.
@@ -193,10 +194,12 @@ The low-speed awareness band is still not built.
 `flightPerformanceCapture.ts` records frame timing only (`flightPerf=1`).
 `src/flight/diagnostics/flightRecorder.ts` now records 44 channels of aircraft
 state and the control positions JSBSim actually received, sampled on simulation
-time at 20 Hz into a half-hour ring buffer, with a MARK button and the M key, and
-CSV export. The file's header carries the build version, the aircraft, the JSBSim
-identity and every mark. Samples come from JSBSim properties rather than the
-app's input objects, so the record is what physics saw whoever was flying.
+time at 20 Hz into a half-hour ring buffer. Recording is off until the Logging
+tab's Record control is pressed; closing that tab ends the log. Mark (and the M
+key while recording) and CSV export live in that tab. The file's header carries
+the build version, the aircraft, the JSBSim identity and every mark. Samples come
+from JSBSim properties rather than the app's input objects, so the record is what
+physics saw whoever was flying.
 
 ### 5. Real controls
 
