@@ -4,6 +4,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { evaluate, openHeadlessChrome, waitForExpression } from "./headless-chrome.mjs";
+import { resolvePagesDistFile } from "./pagesDistFile.mjs";
 import { verifyInstalledSdk } from "./verify-jsbsim-artifact.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -39,9 +40,13 @@ const detach = chrome.onEvent(message => {
       await chrome.send("Fetch.failRequest", { requestId, errorReason: "BlockedByClient" }, message.sessionId);
       return;
     }
-    const pathname = decodeURIComponent(url.pathname), file = path.resolve(dist, "." + (pathname === "/" ? "/index.html" : pathname));
-    if (!file.startsWith(dist + path.sep)) throw new Error("Unsafe application asset request");
+    const pathname = decodeURIComponent(url.pathname);
+    let file;
+    try { file = await resolvePagesDistFile(dist, pathname); }
+    catch { file = null; }
+    if (file && !file.startsWith(dist + path.sep)) throw new Error("Unsafe application asset request");
     try {
+      if (!file) throw new Error("Not a built file");
       const bytes = await readFile(file);
       current.loaded.push({ path: pathname, sha256: hash(bytes), bytes: bytes.length });
       await chrome.send("Fetch.fulfillRequest", { requestId, responseCode: 200,
@@ -65,7 +70,7 @@ try {
       await chrome.send("Fetch.enable", { patterns: [{ urlPattern: "*" }] }, sessionId);
       await chrome.send("Emulation.setDeviceMetricsOverride", { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false }, sessionId);
       await chrome.send("Page.addScriptToEvaluateOnNewDocument", { source: `localStorage.clear();localStorage.setItem('osfs.aircraft',${JSON.stringify(aircraftId)});localStorage.setItem('osfs.aircraft-lod','auto');localStorage.setItem('osfs.aircraft-opt-in-lods','off');` }, sessionId);
-      await chrome.send("Page.navigate", { url: "https://0sfs.test/?renderer=webgl2" }, sessionId);
+      await chrome.send("Page.navigate", { url: "https://0sfs.test/fly/?renderer=webgl2" }, sessionId);
       await waitForExpression(chrome, sessionId, "Boolean(window.osfsJsbsimBuild)", 20000);
       current.runtime = await evaluate(chrome, sessionId, "window.osfsJsbsimBuild");
       assert.equal(current.runtime.aircraftId, aircraftId, "Browser booted another aircraft");

@@ -1,0 +1,231 @@
+.info-page {
+  --info-bg: #080e14;
+  --info-ink: #ecf1f4;
+  --info-muted: #91a0a6;
+  --info-accent: #e8b647;
+  --info-panel: #0d1114;
+  --info-line: rgba(208, 220, 224, 0.15);
+  color: var(--info-ink);
+  background:
+    radial-gradient(1200px 480px at 12% -10%, #1e4669 0%, transparent 58%),
+    var(--info-bg);
+  min-height: 100dvh;
+  font: 17px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.info-page a {
+  color: var(--info-accent);
+}
+
+.info-page a:focus-visible,
+.info-page__start:focus-visible,
+.info-page__secondary:focus-visible,
+.info-page__skip:focus-visible {
+  outline: 3px solid #79d9ff;
+  outline-offset: 3px;
+}
+
+.info-page__skip {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  z-index: 2;
+  padding: 8px 12px;
+  background: var(--info-panel);
+  color: var(--info-ink);
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.info-page__skip:focus {
+  transform: none;
+}
+
+.info-page__hero,
+.info-page__main,
+.info-page__footer {
+  box-sizing: border-box;
+  width: min(44rem, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.info-page__hero {
+  padding: calc(56px + env(safe-area-inset-top, 0px)) 0 40px;
+  border-bottom: 1px solid var(--info-line);
+}
+
+.info-page__mark {
+  margin: 0 0 8px;
+  color: var(--info-accent);
+  letter-spacing: 0.28em;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.info-page h1 {
+  margin: 0 0 16px;
+  font-size: clamp(32px, 6vw, 52px);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.info-page__lede {
+  margin: 0 0 28px;
+  color: #c5d0d4;
+  font-size: 1.05rem;
+}
+
+.info-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0;
+}
+
+.info-page__start,
+.info-page__secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 22px;
+  border-radius: 8px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.info-page a.info-page__start {
+  background: var(--info-accent);
+  color: #080e14;
+}
+
+.info-page a.info-page__start:hover {
+  background: #f0c96a;
+  color: #080e14;
+}
+
+.info-page a.info-page__secondary {
+  color: var(--info-ink);
+  background: #243954;
+  border: 1px solid #6683a3;
+}
+
+.info-page__main {
+  padding: 36px 0 48px;
+}
+
+.info-page h2 {
+  margin: 36px 0 12px;
+  font-size: 1.35rem;
+}
+
+.info-page h2:first-child {
+  margin-top: 0;
+}
+
+.info-page h3 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.info-page p,
+.info-page li {
+  color: #d5dee1;
+}
+
+.info-page__features {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 14px;
+}
+
+.info-page__features li {
+  padding: 14px 16px;
+  border: 1px solid var(--info-line);
+  border-radius: 10px;
+  background: rgba(13, 17, 20, 0.72);
+}
+
+.info-page__aircraft {
+  display: grid;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+@media (min-width: 720px) {
+  .info-page__aircraft {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.info-page__aircraft article {
+  padding: 12px 12px 16px;
+  border: 1px solid var(--info-line);
+  border-radius: 12px;
+  background: var(--info-panel);
+}
+
+.info-page__aircraft img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: #04060a;
+}
+
+.info-page__note {
+  color: var(--info-muted);
+  font-size: 0.92rem;
+}
+
+.info-page table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0 16px;
+}
+
+.info-page th,
+.info-page td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--info-line);
+  vertical-align: top;
+}
+
+.info-page tbody th {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-weight: 550;
+  white-space: nowrap;
+  color: var(--info-ink);
+}
+
+.info-page__caption {
+  caption-side: top;
+  text-align: left;
+  margin-bottom: 8px;
+  color: var(--info-muted);
+  font-size: 0.9rem;
+}
+
+.info-page__footer {
+  padding: 24px 0 calc(32px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--info-line);
+  color: var(--info-muted);
+  font-size: 0.95rem;
+}
+
+.info-page__footer p {
+  color: var(--info-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .info-page,
+  .info-page * {
+    scroll-behavior: auto;
+    transition: none !important;
+    animation: none !important;
+  }
+}

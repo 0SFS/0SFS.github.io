@@ -5,7 +5,7 @@ to install and nothing to configure — both ends are just web pages.
 
 ## Pairing
 
-1. On the computer, open flight mode and click **Phone controller**.
+1. On the computer, open [flight mode](https://0sfs.github.io/fly/) and click **Phone controller**.
 2. Scan the QR code with your phone camera.
 3. On the phone, tap **Fly** to take control.
 
@@ -36,11 +36,26 @@ Wi-Fi network.
 
 The phone and desktop must run the same protocol version — reload both after an update.
 
-## Notes for self-hosting
+## Where the QR points
 
-The QR normally opens `https://0sfs.github.io/?mode=remote`. To point it at a different static HTTPS
-deployment, set `VITE_PHONE_CONTROLLER_URL` to that base URL at build time. See
-[Deploying to GitHub Pages](deploying.md).
+The QR points at **the site the desktop is already on** — same origin, same base path, plus `/rc/`.
+A fork served from anywhere needs no configuration for this, and a locally served copy pairs with a
+phone without being deployed first.
+
+Two exceptions:
+
+- **Loopback.** A phone cannot reach `localhost`, so a QR must never offer it. The dev server reports
+  the address other devices can use, and the QR is built from that instead. A browser cannot discover
+  its own LAN address — WebRTC stopped exposing it — so this only works when a dev server has supplied
+  one; see [Development](development.md#testing-on-a-real-phone). Without one, creating a QR fails and
+  names the command to run rather than producing an unreachable link.
+- **`VITE_PHONE_CONTROLLER_URL`.** Set at build time, it overrides the origin entirely, for a
+  deployment whose QR has to point somewhere else. See [Deploying to GitHub Pages](deploying.md).
+
+Invitations require HTTPS, with one carve-out: plain HTTP is accepted when the host is a private
+address (loopback, `10.x`, `192.168.x`, `172.16–31.x`, IPv6 unique- and link-local). That is what a
+laptop serving its own LAN looks like, and requiring a certificate there would mean no testing on a
+real phone without one. A deployed site is never on such a host, so a published QR is always HTTPS.
 
 The phone route loads independently of the globe renderer and JSBSim, so it stays lightweight on
 mobile data.

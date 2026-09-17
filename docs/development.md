@@ -1,7 +1,7 @@
 # Development
 
 This page is for people who want to change the code. If you just want to fly, open
-[0sfs.github.io](https://0sfs.github.io/) — it is the same build, always current, and needs no setup.
+[0sfs.github.io/fly](https://0sfs.github.io/fly/) — it is the same build, always current, and needs no setup.
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for review expectations and asset provenance rules before
 opening a pull request.
@@ -44,22 +44,23 @@ npm install
 npm run dev
 ```
 
-Vite serves source changes directly; no production build is needed first. Open the URL it prints;
-the flight simulator is the default route:
+Vite serves source changes directly; no production build is needed first. Open the URL it prints.
+The site root is an information page. The flight simulator is `/fly/`:
 
 ```text
-http://127.0.0.1:5173/?mapSource=osm-standard
+http://127.0.0.1:5173/fly/?mapSource=osm-standard
 ```
 
 To use Google Photorealistic 3D Tiles, pass your own key:
 
 ```text
-http://127.0.0.1:5173/?key=YOUR_GOOGLE_MAPS_API_KEY
+http://127.0.0.1:5173/fly/?key=YOUR_GOOGLE_MAPS_API_KEY
 ```
 
-Vite may choose a different port when `5173` is occupied. `?mode=globe` starts the globe application
-exported by the linked FOSS Earth checkout, and `?mode=remote` loads the phone controller route on
-its own. Older `?mode=flight` links still open the simulator.
+Vite may choose a different port when `5173` is occupied. `/rc/` loads the phone controller route
+on its own. `?mode=flight` redirects to `/fly/` and `?mode=remote` redirects to `/rc/`, keeping other
+query parameters and the invitation hash. `?mode=globe` leaves OSFS and opens
+[foss-earth.github.io](https://foss-earth.github.io/), the standalone globe.
 
 Restart `npm run dev` after changing the FOSS Earth package manifest or exports.
 
@@ -75,6 +76,27 @@ Or all three with `npm run ci`. Tests cover coordinate and attitude transforms, 
 behavior, engine bootstrap sequencing, controller profiles through gamepad-tools' sampling and
 evaluation (`src/flight/input/gamepadProfiles.test.ts`), and real JSBSim/WASM C172 propulsion.
 `npm run test:watch` reruns on change.
+
+### Testing on a real phone
+
+```sh
+npm run dev:lan          # HTTPS on this machine's LAN address
+npm run dev -- --host    # plain HTTP on the LAN, no certificate
+```
+
+Either one serves the site to other devices on the network, and the phone-controller QR then points
+at this machine instead of the deployed site — so pairing can be tested without deploying.
+
+`dev:lan` adds a self-signed certificate for the LAN address. That matters when something needs a
+secure context: the screen wake lock and the clipboard button are secure-only and silently do nothing
+over plain HTTP. Flight control itself does not need one. The certificate is self-signed, so **open
+the printed address on the phone once and accept the warning before scanning a QR** — a
+camera-launched tab cannot show the warning and the failure looks like a pairing problem.
+`npm run dev:lan -- --print` shows the address and command without starting anything.
+
+Both work because `vite.config.ts` injects the address the server is reachable on
+(`window.__OSFS_LAN_ORIGIN__`), and only when it is bound to something other than loopback. A browser
+cannot discover its own LAN address, so without that the QR would have nothing to point at.
 
 ## The FOSS Earth dependency
 

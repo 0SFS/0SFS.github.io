@@ -2,8 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
+    <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#080e14" />
     <!-- Home Screen launches have no browser bars; iPhone Safari has no page fullscreen. -->
@@ -13,6 +13,38 @@
     <meta name="apple-mobile-web-app-title" content="OSFS" />
     <title>OSFS — Open Source Flight Simulator</title>
     <script>
+      (function () {
+        var base = "%BASE_URL%";
+        var prefix = base.charAt(base.length - 1) === "/" ? base.slice(0, -1) : base;
+        var path = location.pathname;
+        var rest;
+        if (prefix && path !== prefix && path.indexOf(prefix + "/") !== 0) rest = "/";
+        else if (!prefix) rest = path;
+        else if (path === prefix) rest = "/";
+        else rest = path.slice(prefix.length) || "/";
+        if (rest.length > 1 && rest.charAt(rest.length - 1) === "/") rest = rest.slice(0, -1);
+        if (!rest) rest = "/";
+        var mode = new URLSearchParams(location.search).get("mode");
+        var route = "info";
+        if (mode === "remote" || rest === "/rc") route = "remote";
+        else if (mode === "globe") {
+          location.replace("https://foss-earth.github.io/");
+          return;
+        }
+        else if (mode === "flight" || rest === "/fly") route = "flight";
+        document.documentElement.setAttribute("data-route", route);
+        function canonical(segment) {
+          var next = new URL(base + segment + "/", location.origin);
+          var params = new URLSearchParams(location.search);
+          params.delete("mode");
+          next.search = params.toString();
+          return next.pathname + next.search + location.hash;
+        }
+        if (route === "remote" && rest !== "/rc") location.replace(canonical("rc"));
+        else if (route === "flight" && rest !== "/fly") location.replace(canonical("fly"));
+      })();
+    </script>
+    <script>
       // Keep the first-paint log useful if the module bundle itself cannot load.
       addEventListener("error", function (event) {
         if (event.target !== window && !(event.target instanceof HTMLScriptElement)) return;
@@ -21,6 +53,7 @@
     </script>
     <style>
       /* Paint immediately, before the application or its styles download. Mirrors src/log/gameLog.css. */
+      html { color-scheme: dark; }
       html, body { margin: 0; background: #080e14; }
       .game-log { position: fixed; z-index: 25; top: calc(84px + env(safe-area-inset-top, 0px)); left: calc(12px + env(safe-area-inset-left, 0px)); box-sizing: border-box; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; width: max-content; max-width: min(380px, calc(100vw - 88px)); color: #ecf1f4; font: 12px/1.4 ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
       @media (min-width: 884px) { .game-log { top: calc(12px + env(safe-area-inset-top, 0px)); left: 50%; max-width: clamp(220px, calc(100vw - 688px), 560px); transform: translateX(-50%); } }
@@ -28,10 +61,27 @@
       .game-log__line { box-sizing: border-box; width: fit-content; max-width: 100%; padding: 4px 8px; border-radius: 6px; background: rgba(4, 7, 11, 0.66); }
       .game-log__line[data-tone="error"] { color: #ffd1c9; background: rgba(58, 18, 16, 0.84); }
       .game-log a { color: #e8b647; }
+      html[data-route="info"] #app-log,
+      html[data-route="remote"] #app-log .game-log__line:not([data-tone="error"]) { display: none; }
+      html[data-route="info"] #app-log:has(#app-log-error:not([hidden])) {
+        display: flex; position: static; transform: none; margin: 16px 24px 0; max-width: 40rem;
+      }
+      #info-first-paint { display: none; box-sizing: border-box; padding: calc(48px + env(safe-area-inset-top, 0px)) 24px 48px; color: #ecf1f4; font: 18px/1.5 system-ui, sans-serif; max-width: 40rem; }
+      html[data-route="info"] #info-first-paint { display: block; }
+      #info-first-paint p { margin: 0 0 12px; }
+      #info-first-paint .info-first-paint__title { font-size: 28px; font-weight: 650; letter-spacing: 0.04em; }
+      #info-first-paint a { display: inline-block; margin-top: 8px; padding: 12px 20px; border-radius: 8px; background: #e8b647; color: #080e14; font-weight: 650; text-decoration: none; }
+      #info-first-paint a:focus-visible { outline: 3px solid #79d9ff; outline-offset: 3px; }
     </style>
   </head>
   <body>
     <div id="root"></div>
+    <div id="info-first-paint">
+      <p class="info-first-paint__title">OSFS — Open Source Flight Simulator</p>
+      <p>A real-world browser flight simulator. Nothing to install, no account.</p>
+      <a href="%BASE_URL%fly/">Start flying</a>
+      <noscript><p>OSFS needs JavaScript enabled.</p></noscript>
+    </div>
     <div id="app-log" class="game-log" role="log" aria-label="Game log" aria-relevant="additions">
       <div id="app-log-error" class="game-log__line" data-tone="error" hidden>The application could not download. Check your connection, then <a href="">reload and try again</a>.</div>
       <div class="game-log__line">Downloading the application…</div>

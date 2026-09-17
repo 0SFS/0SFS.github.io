@@ -6,7 +6,8 @@ Redeploying the live site is one command:
 npm run deploy
 ```
 
-A minute or so later, https://0sfs.github.io/ serves the new build.
+A minute or so later, https://0sfs.github.io/ serves the information page. The simulator is
+https://0sfs.github.io/fly/ and the phone controller is https://0sfs.github.io/rc/.
 
 ## What the command does
 
@@ -33,17 +34,20 @@ The deploy is manual and runs from your machine. There is no GitHub Actions work
 
 ```sh
 curl -o /dev/null -w '%{http_code}\n' https://0sfs.github.io/
+curl -o /dev/null -w '%{http_code}\n' https://0sfs.github.io/fly/
+curl -o /dev/null -w '%{http_code}\n' https://0sfs.github.io/rc/
 curl -s https://0sfs.github.io/ | grep -o 'src="[^"]*"'
 ```
 
 `200` means the page is up, but a blank page returns `200` too, so check the main script as well:
-its path should start with `/assets/` and requesting it should also return `200`. Hard-refresh in
-the browser — Pages caches aggressively and a normal reload will happily serve you the previous
-build.
+its path should start with `/assets/` and requesting it should also return `200`. `/fly/` and `/rc/`
+are real directories in the build (`dist/fly/index.html` and `dist/rc/index.html`); GitHub Pages has
+no SPA fallback, so those copies are what make a hard refresh work. Hard-refresh in the browser —
+Pages caches aggressively and a normal reload will happily serve you the previous build.
 
-Before treating a release as done, open the deployed site and check flight mode, JSBSim loading, and
-phone pairing on the public URL. Local `npm run dev` does not exercise the same asset paths or the
-HTTPS-only parts of pairing. See [RELEASE_CHECKLIST.md](../RELEASE_CHECKLIST.md).
+Before treating a release as done, open the deployed site and check the information page, `/fly/`
+flight mode, JSBSim loading, and phone pairing on `/rc/`. Local `npm run dev` does not exercise the
+same asset paths or the HTTPS-only parts of pairing. See [RELEASE_CHECKLIST.md](../RELEASE_CHECKLIST.md).
 
 ## Troubleshooting
 
@@ -65,8 +69,8 @@ load `/assets/…`. Check `deploy:gh-pages` in `package.json` for a stray `--bas
 `vite.config.ts` for the base it chooses.
 
 **Phone pairing works locally but not on the deployed site.** The QR points at
-`https://0sfs.github.io/?mode=remote` by default. A different static HTTPS deployment needs
-`VITE_PHONE_CONTROLLER_URL` set to its base URL *at build time*.
+`https://0sfs.github.io/rc/` by default. A different static HTTPS deployment needs
+`VITE_PHONE_CONTROLLER_URL` set to its base URL *at build time* (the build appends `rc/`).
 
 ## Deploying your own fork
 

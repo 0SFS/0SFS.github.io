@@ -2,7 +2,7 @@
 
 **A real-world browser flight simulator built to be explored, extended, and shared.**
 
-### **[→ Start flying](https://0sfs.github.io/)**
+### **[→ Start flying](https://0sfs.github.io/fly/)**
 
 Nothing to install, no account, no sign-up. It runs in a browser tab.
 
