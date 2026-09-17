@@ -1,7 +1,7 @@
 {
   "name": "OSFS — Open Source Flight Simulator",
   "short_name": "OSFS",
-  "start_url": "./",
+  "start_url": "./fly/",
   "scope": "./",
   "display": "fullscreen",
   "background_color": "#080e14",

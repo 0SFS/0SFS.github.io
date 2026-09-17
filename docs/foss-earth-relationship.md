@@ -45,11 +45,12 @@ OSFS imports only public FOSS Earth package exports:
 | `foss-earth/windowing.css` | Shared windowing structure |
 | `foss-earth/runtime` | Babylon runtime, renderer/map types, map selection, and simulation hooks |
 | `foss-earth/cameraMath` | Shared WGS84/ECEF conversion and angle constants |
-| `foss-earth` | Globe application (`?mode=globe`) and public globe APIs |
+| `foss-earth` | Globe application and public globe APIs |
 
 The HUD is adapted in `src/flight/hud/createFlightHudBar.ts`. `FlightControlPanel.tsx` supplies Weather, Aircraft, and Debug content to the shared `WindowOverlay`. FOSS Earth owns both window slots, responsive fit, launchers, tab movement, minimize/restore behavior, and window styling.
 
-The normal globe route mounts the same overlay through `src/compat/createGlobeModeApp.tsx`, forwarding Location changes to the globe's public view API and disposing the React overlay with the globe app.
+The standalone globe lives at [foss-earth.github.io](https://foss-earth.github.io/). OSFS used to
+host a copy behind `?mode=globe`; that query now redirects there.
 
 Location content uses `LocationPanel` from `foss-earth/windowing`. Its structured `onApply` callback reaches OSFS’s `resetFlightLocation`, which resets the loaded JSBSim aircraft at geodetic coordinates while retaining altitude, airspeed, and heading. The app reseeds physics interpolation and updates the ECEF/ENU floating origin and map view immediately, including while paused.
 

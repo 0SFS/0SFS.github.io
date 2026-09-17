@@ -45,7 +45,7 @@ The desktop remains authoritative. Take control works immediately without waitin
 Scanning opens this route in the normal browser:
 
 ```text
-https://0sfs.github.io/?mode=remote#v=1&peer=<desktop-id>&join=<secret>
+https://0sfs.github.io/rc/#v=1&peer=<desktop-id>&join=<secret>
 ```
 
 The controller displays connection progress, then the aircraft's current settings and **Fly**. It must not offer Fly until authentication and both channels are ready.
@@ -300,7 +300,7 @@ Keep feature code in OSFS. No FOSS Earth modification or `services/signaling/` d
 
 Implementation is complete only after these checks pass:
 
-1. **Production-only flow:** Open the deployed app and scan its QR with no local process running. The phone reloads the `/?mode=remote` route successfully; its network requests contain no simulator/globe payloads or map keys.
+1. **Production-only flow:** Open the deployed app and scan its QR with no local process running. The phone reloads the `/rc/` route successfully; its network requests contain no simulator/globe payloads or map keys.
 2. **Real devices:** Current iPhone Safari and Android Chrome pair with desktop Chromium on a home LAN; also verify desktop Safari. Record OS/browser versions, selected non-relay candidate pair, and actual channel delivery settings. Confirm PeerJS's wrapped channel remains intact.
 3. **Pairing:** Expired/reused/wrong invitations, second phone, malformed links, and version mismatch cannot control the aircraft. The secret stays out of signaling metadata, requests to static hosting, logs, and persistent storage.
 4. **Authority:** Pairing does not alter flight. Both handoffs preserve non-default throttle/trim/flaps. Idle gamepad cannot overwrite phone controls. Deliberate desktop takeover works without network acknowledgements. Old epochs cannot regain control.
