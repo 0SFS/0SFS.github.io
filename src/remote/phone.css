@@ -1,7 +1,20 @@
+/*
+ * Placement and theme for the phone controller. How the controls *look* lives
+ * in `src/styles/flightControls.css`, shared with the desktop HUD.
+ *
+ * The theme is tuned for an OLED handset: the page is true black so those
+ * pixels are off, panels are outlines rather than filled shapes, and the only
+ * saturated colour is the HUD's amber accent. Text sits below pure white — a
+ * phone held at arm's length in a dark cockpit does not need #fff.
+ */
+
+/* The popup card, shared with the flight page's iPhone notice. */
+@import "./phonePopup.css";
+
 :root {
   color-scheme: dark;
-  background: #07101c;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #000;
+  font-family: "SF Mono", "Menlo", "Consolas", ui-monospace, monospace;
 }
 
 * { box-sizing: border-box; }
@@ -9,169 +22,625 @@
 body {
   margin: 0;
   min-width: 320px;
-  min-height: 100dvh;
-  background: radial-gradient(circle at 50% -20%, #1e4669, #07101c 54%);
+  /* True black: on OLED these pixels are off, which is the point. */
+  background: #000;
 }
+
+/* No rubber-band: a document that bounces under a thumb reads as the page
+   moving, even when it has nowhere to scroll to. Not `touch-action` on the
+   page, which would stop the open sheets scrolling under a finger too. */
+html, body { overscroll-behavior: none; }
 
 button, input { font: inherit; }
 button { touch-action: manipulation; }
 
 .phone-app {
-  width: min(760px, 100%);
-  min-height: 100dvh;
-  margin: 0 auto;
-  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
-  color: #edf7ff;
+  /* Shared control tokens, re-pointed for a black screen. */
+  --ctl-surface: transparent;
+  --ctl-surface-deep: transparent;
+  --ctl-line: rgba(196, 208, 220, 0.24);
+  --ctl-line-bright: rgba(196, 208, 220, 0.3);
+  --ctl-line-strong: rgba(196, 208, 220, 0.5);
+  --ctl-divider: rgba(196, 208, 220, 0.34);
+  --ctl-hover: rgba(232, 182, 71, 0.12);
+  --ctl-muted: rgba(150, 163, 176, 0.75);
+  --ctl-accent: #e8b647;
+  --ctl-accent-ink: #0a0a0a;
+  --ctl-chip-size: 34px;
+  /* Two tap targets share this square, so it is larger than the HUD's 35px. */
+  --phone-trim-square: 48px;
+  --ctl-lever-thickness: 30px;
+
+  --phone-text: #c9d2da;
+  --phone-gap: 8px;
+  /* The engine widget's box: its spool ring (4.25rem) plus padding, and the
+     fuel flow and phase above and below it. Fixed, because the camera pad and
+     the throttle are laid out around it. */
+  --phone-engine-width: calc(4.25rem + 20px);
+  --phone-engine-height: 104px;
+
+  width: 100%;
+  height: 100dvh;
+  padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  color: var(--phone-text);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--phone-gap);
+  /* A flight control that can scroll out from under a thumb is a bug, not a
+     layout choice. Everything secondary collapses instead. */
+  overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
 }
 
-.phone-header, .phone-brand, .phone-flight-status, .phone-actions, .phone-range-labels, .phone-diagnostics dl {
-  display: flex;
-  align-items: center;
-}
+/* Take control: a popup whenever the phone is not flying. It dims the flight
+   controls, which are disabled without control, and leaves the chip grid above
+   the dimming — Connection details, Settings, fullscreen and haptics need no
+   control, and one of them is how you find out why Take control is greyed out.
+   Below the fullscreen question, which is asked once and covers everything. */
+.phone-popup--control { z-index: 25; }
+.phone-app--needs-control .phone-actions { position: relative; z-index: 26; }
+.phone-popup__actions .phone-popup__wide { flex: 1; min-height: 48px; font-size: 14px; }
 
-.phone-header { justify-content: space-between; gap: 12px; }
-.phone-brand { gap: 10px; letter-spacing: .08em; }
-.phone-brand > div { display: grid; gap: 1px; }
-.phone-brand strong { font-size: 15px; }
-.phone-brand span:not(.phone-brand__mark) { font-size: 10px; color: #a9c7da; }
-.phone-brand__mark { color: #7fe1ff; font-size: 24px; transform: rotate(-28deg); }
+/* ---- Status chips, in the chip grid. ---- */
 
-.phone-connection {
+/* One width for every label it can show, so a connection that goes DELAYED
+   and back never reflows the grid under a thumb. */
+.phone-link {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  color: #b8cad7;
-  font-size: 12px;
+  justify-content: center;
+  gap: 6px;
+  min-width: calc(7 * (1ch + 0.08em) + 32px);
+  padding: 0 8px;
+  border: 1px solid var(--ctl-line);
+  border-radius: 8px;
+  color: var(--ctl-muted);
+  font-size: 9px;
+  letter-spacing: 0.08em;
 }
-.phone-connection > span { width: 8px; height: 8px; border-radius: 50%; background: #e8ae54; box-shadow: 0 0 10px #e8ae54; }
-.phone-connection--online > span { background: #65e5a0; box-shadow: 0 0 10px #65e5a0; }
+.phone-link__dot { width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--ctl-muted); }
+.phone-link--live { color: var(--ctl-accent); border-color: rgba(232, 182, 71, 0.4); }
+.phone-link--live > .phone-link__dot { border-color: var(--ctl-accent); background: var(--ctl-accent); }
 
-.phone-flight-status, .phone-notice, .phone-panel, .phone-telemetry > div, .phone-diagnostics, .phone-app--empty {
-  border: 1px solid #2c4a60;
-  background: color-mix(in srgb, #132739 88%, transparent);
-  border-radius: 12px;
-}
-
-.phone-flight-status { justify-content: space-between; padding: 9px 12px; font-size: 13px; }
-.phone-flight-status > span:last-child { color: #8fe1b6; font-weight: 700; font-size: 11px; letter-spacing: .08em; }
-.phone-flight-status .phone-paused { color: #ffc46c; }
-
-.phone-telemetry { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.phone-telemetry > div { padding: 10px 8px; text-align: center; }
-.phone-telemetry span, .phone-telemetry small, .phone-panel label, .phone-panel legend { color: #aac6d9; font-size: 10px; letter-spacing: .08em; }
-.phone-telemetry strong { display: block; margin: 3px 0 1px; font-size: clamp(18px, 6vw, 27px); font-variant-numeric: tabular-nums; }
-
-.phone-notice { min-height: 43px; padding: 10px 12px; color: #c6dce9; font-size: 13px; }
-.phone-notice small { display: block; margin-top: 4px; }
-.phone-notice--error { border-color: #b65c5c; color: #ffd1d1; }
-
-.phone-controls { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 12px; flex: 1; min-height: 300px; }
-.phone-controls__left, .phone-controls__right { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
-.phone-controls__right { justify-content: center; align-items: center; }
-.phone-panel { padding: 10px; }
-.phone-panel label { display: flex; justify-content: space-between; gap: 8px; }
-.phone-panel output { color: #edf7ff; font-variant-numeric: tabular-nums; }
-
-.phone-throttle input, .phone-trim input { width: 100%; min-width: 0; min-height: 44px; margin: 0; accent-color: #6ed9ff; }
-.phone-range-labels { justify-content: space-between; color: #99b8ca; font-size: 9px; margin-top: 4px; }
-.phone-stick {
-  position: relative;
-  display: block;
-  flex: 1;
-  width: 100%;
-  min-height: 110px;
+/* Read aloud, never drawn: the client's full status sentence. On screen there
+   is no banner for it — the link chip says the part that matters. */
+.phone-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
   overflow: hidden;
-  border: 1px solid #396079;
-  border-radius: 18px;
-  color: #d9f1ff;
-  background: radial-gradient(circle at center, #294c64 0 3%, #132b3d 4% 100%);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/*
+ * The desktop HUD's two bottom corners, plus the buttons the HUD keeps in its
+ * bar. Portrait stacks them because a handset is too narrow to hold both
+ * corners side by side; landscape puts them where the HUD does.
+ */
+.phone-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  /* The cluster is as tall as its square pad needs; yaw, the camera pad and the
+     throttle take every pixel of the slack; the chip grid — instruments and
+     buttons both — sits at the bottom under the thumbs. Nothing is above. */
+  grid-template-rows: max-content minmax(0, 1fr) max-content;
+  gap: var(--phone-gap);
+  flex: 1;
+  min-height: 0;
+}
+.phone-cluster { grid-row: 1; }
+.phone-yaw-throttle { grid-row: 2; }
+.phone-actions { grid-row: 3; }
+/* Settings → Button grid → Top: the same grid, above the flight controls. */
+.phone-controls--grid-top { grid-template-rows: max-content max-content minmax(0, 1fr); }
+.phone-controls--grid-top > .phone-actions { grid-row: 1; }
+.phone-controls--grid-top > .phone-cluster { grid-row: 2; }
+.phone-controls--grid-top > .phone-yaw-throttle { grid-row: 3; }
+
+.phone-cluster {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  /* Row 1 is the trim square, so the roll trim beside it is that tall too and
+     the pad below starts level with the pitch lever. */
+  grid-template-rows: var(--phone-trim-square) minmax(0, 1fr);
+  column-gap: 5px;
+  row-gap: 5px;
+  min-height: 0;
+}
+.phone-cluster > .flight-hud__auto-trims {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: end;
+  width: var(--phone-trim-square);
+  height: var(--phone-trim-square);
+}
+.phone-cluster > .flight-hud__lever--pitch { grid-column: 1; grid-row: 2; min-width: var(--ctl-chip-size); }
+/*
+ * The pad is the square itself, and the roll trim hangs off its top edge rather
+ * than sharing a grid column with it. That is what makes the slider exactly as
+ * wide as the square underneath in both orientations: `left: 0; right: 0`
+ * against this box cannot be anything else. Sizing the column from the square
+ * instead does not work — a grid or flex container measures its intrinsic width
+ * before any row height exists, so an aspect-ratio box contributes nothing and
+ * the column collapses to the slider's own minimum.
+ *
+ * Square, because PhoneStick ignores everything past min(width, height).
+ * Portrait is width-constrained so width drives; landscape is
+ * height-constrained and flips it below. CSS cannot express "largest square
+ * that fits" in one rule, so the orientation picks the driver.
+ */
+.phone-cluster__pad {
+  grid-column: 2;
+  grid-row: 2;
+  position: relative;
+  aspect-ratio: 1;
+  width: 100%;
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  justify-self: center;
+}
+/* One lever thickness, like the pitch and flaps levers it flies beside: the
+   trim square keeps the row's full height, and this sits on its bottom edge. */
+.phone-cluster__pad > .flight-hud__slider-control--roll-trim {
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  height: var(--ctl-lever-thickness);
+  width: auto;
+}
+/* The track fills the strip rather than floating in the middle of it: the
+   desktop's 12px bar is a mouse target, and a thinner box needs all of it. */
+.phone-cluster__pad > .flight-hud__slider-control--roll-trim input[type="range"] {
+  align-self: stretch;
+  height: auto;
+  min-height: 0;
+}
+.phone-cluster__pad > .phone-stick { width: 100%; height: 100%; min-height: 0; }
+.phone-cluster > .flight-hud__lever--flaps { grid-column: 3; grid-row: 2; min-width: var(--ctl-chip-size); }
+
+/* Yaw above the camera pad, throttle outermost spanning both — the slot layout
+   the desktop HUD uses for yaw, its engine monitor and the throttle lever. The
+   camera pad takes the monitor's slot; the monitor moves over the throttle. */
+.phone-yaw-throttle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  grid-template-rows: max-content minmax(0, 1fr);
+  grid-template-areas:
+    "yaw throttle"
+    "camera throttle";
+  column-gap: 6px;
+  row-gap: 6px;
+  min-height: 0;
+}
+/* One row: YAW, the slider, its value. The HUD's heading row above the track
+   made the box nearly twice the height the track needs; beside it, the label
+   and value cost width instead, which this column has to spare. */
+.phone-yaw {
+  grid-area: yaw;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  align-items: center;
+  column-gap: 8px;
+  padding: 0 8px;
+  border: 1px solid var(--ctl-line);
+  border-radius: 8px;
+}
+.phone-yaw > .flight-hud__yaw-heading { display: contents; }
+.phone-yaw > .flight-hud__yaw-heading > span { grid-column: 1; grid-row: 1; }
+/* A fixed width, so the track does not resize as the value goes from 0% to -100%
+   under the thumb dragging it. */
+.phone-yaw > .flight-hud__yaw-heading > output { grid-column: 3; grid-row: 1; width: 5ch; min-width: 0; }
+/* The rest of the row, and exactly one lever thickness tall counting its
+   border, so yaw is the same strip as the pitch and flaps levers. The track
+   fills it: what is left of the row after the border is the touch target. */
+.phone-yaw input[type="range"] { grid-column: 2; grid-row: 1; height: calc(var(--ctl-lever-thickness) - 2px); }
+/* A trackpad, not a stick: nothing to centre, so nothing is drawn but a surface
+   to swipe on. The dot grid is what says "drag here" without a knob. It is not
+   held to a square either — a gesture is measured in pixels moved, so the pad's
+   shape never changes what it means. */
+.phone-camera-slot { grid-area: camera; position: relative; display: grid; min-width: 0; min-height: 0; }
+.phone-camera {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  min-height: 96px;
+  padding: 7px 9px;
+  border: 1px solid var(--ctl-line-bright);
+  border-radius: 10px;
+  background: transparent;
+  background-image: radial-gradient(circle, rgba(196, 208, 220, 0.13) 1px, transparent 1px);
+  background-size: 18px 18px;
+  color: var(--ctl-muted);
+  font: inherit;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-align: left;
   touch-action: none;
   -webkit-tap-highlight-color: transparent;
 }
-.phone-controls__right .phone-stick { width: min(100%, 320px); aspect-ratio: 1; min-height: 220px; }
-.phone-stick:disabled, .phone-brake:disabled { opacity: .45; }
-.phone-stick[data-active], .phone-brake[data-active] { border-color: #82e1ff; box-shadow: inset 0 0 24px #54cafa33, 0 0 15px #54cafa44; }
-.phone-stick__cross { position: absolute; inset: 50% auto auto 50%; width: 78%; height: 1px; transform: translate(-50%, -50%); background: #6b95ac66; }
-.phone-stick__cross::after { content: ""; position: absolute; left: 50%; top: -3900%; width: 1px; height: 7900%; background: #6b95ac66; }
-.phone-stick__knob { position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; margin: -27px; border-radius: 50%; border: 2px solid #a8eaff; background: radial-gradient(circle at 35% 30%, #74dfff, #225a79); box-shadow: 0 4px 12px #0008; pointer-events: none; transition: transform 35ms linear; }
-.phone-stick__knob span { display: block; width: 3px; height: 22px; margin: 4px auto; background: #e8fbff; border-radius: 3px; }
-.phone-stick__label, .phone-stick__top, .phone-stick__bottom, .phone-stick__left, .phone-stick__right { position: absolute; color: #bcd9e8; font-size: 10px; letter-spacing: .06em; pointer-events: none; }
-.phone-stick__label { left: 10px; top: 9px; font-weight: 700; }
-.phone-stick__top { top: 32px; left: 50%; transform: translateX(-50%); }
-.phone-stick__bottom { bottom: 10px; left: 50%; transform: translateX(-50%); }
-.phone-stick__left { left: 11px; top: 50%; transform: translateY(-50%); }
-.phone-stick__right { right: 11px; top: 50%; transform: translateY(-50%); }
-.phone-stick--rudder { min-height: 84px; flex: none; }
-.phone-stick--rudder .phone-stick__cross::after { display: none; }
-.phone-stick-help { color: #9dbdce; text-align: center; font-size: 11px; margin: -5px 0 0; }
+.phone-camera:disabled { opacity: 0.4; }
+.phone-camera[data-active] { border-color: rgba(232, 182, 71, 0.55); box-shadow: 0 0 0 2px rgba(232, 182, 71, 0.18); }
+.phone-camera__hint { align-self: center; opacity: 0.7; }
+/* Cockpit/chase in the pad's top-left corner, with the pad's label moved under
+   it. Opaque, so the dot grid does not show through the switch. */
+.phone-camera-slot {
+  --phone-view-option: 34px;
+  --phone-view-switch-height: 30px;
+}
+.phone-camera-slot > .phone-view-switch { position: absolute; top: 6px; left: 8px; z-index: 1; }
+.phone-camera-slot .phone-camera__label { margin-top: calc(var(--phone-view-switch-height) + 3px); }
+.phone-view-switch {
+  position: relative;
+  display: inline-flex;
+  height: var(--phone-view-switch-height);
+  padding: 1px;
+  border: 1px solid var(--ctl-line-bright);
+  border-radius: 999px;
+  color: var(--ctl-muted);
+  background: #000;
+  -webkit-tap-highlight-color: transparent;
+}
+/* The thumb, under whichever view is on. */
+.phone-view-switch::before {
+  content: "";
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  left: 1px;
+  width: var(--phone-view-option);
+  border: 1px solid rgba(232, 182, 71, 0.55);
+  border-radius: 999px;
+  background: rgba(232, 182, 71, 0.12);
+  transition: transform 120ms ease-out;
+}
+.phone-view-switch[aria-checked="true"]::before { transform: translateX(var(--phone-view-option)); }
+.phone-view-switch__option { position: relative; display: grid; place-items: center; width: var(--phone-view-option); }
+.phone-view-switch__option[data-selected] { color: var(--ctl-accent); }
+.phone-view-switch svg { display: block; }
+.phone-view-switch:disabled { opacity: 0.4; }
+.phone-throttle { grid-area: throttle; align-self: stretch; }
+/*
+ * With an engine reading, its widget sits just above the throttle: top right in
+ * landscape, centre right in portrait. It is wider than the throttle and taller
+ * than yaw, and giving it a grid cell of its own made both sliders that thick.
+ * So it sits over the group's top-right corner instead, and the camera pad —
+ * which has no reason to be a rectangle, a swipe is measured in pixels — runs
+ * underneath it with that corner notched out. Yaw stops short of the widget,
+ * the throttle starts below it, and both keep their own thickness. A host that
+ * sends no engine leaves the throttle the whole column.
+ */
+.phone-yaw-throttle--engine > .phone-yaw { margin-right: calc(var(--phone-engine-width) - var(--ctl-chip-size)); }
+.phone-yaw-throttle--engine > .phone-throttle { margin-top: calc(var(--phone-engine-height) + 6px); }
+.phone-engine {
+  /* Spans the flexible row and column, so it sizes neither. */
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+  justify-self: end;
+  align-self: start;
+  position: relative;
+  z-index: 1;
+  width: var(--phone-engine-width);
+  height: var(--phone-engine-height);
+  max-width: none;
+  border-radius: 8px;
+  color: var(--phone-text);
+  background: #000;
+  /* The notch: black over the camera pad's corner, as wide as the grid's gap. */
+  box-shadow: 0 0 0 6px #000;
+}
+/* The desktop widget, re-pointed for the OLED theme like every other panel:
+   an outline on black rather than a translucent fill over a canvas. */
+.phone-engine .flight-engine__summary {
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  border-color: var(--ctl-line);
+  border-radius: 8px;
+  background: transparent;
+  cursor: default;
+}
+.phone-engine .flight-engine__summary:hover { border-color: var(--ctl-line); }
+.phone-engine .flight-engine__flow { cursor: pointer; }
+.phone-throttle input[type="range"] { width: 26px; }
 
-.phone-brake { min-height: 54px; border: 1px solid #58798f; border-radius: 12px; color: #e9f7ff; background: #263f53; font-weight: 700; }
-.phone-settings { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.phone-trim > div { display: flex; align-items: center; gap: 8px; margin-top: 7px; }
-.phone-trim label + div + label { margin-top: 12px; }
-.phone-trim button, .phone-flaps button, .phone-actions button { min-height: 44px; border: 1px solid #58798f; border-radius: 9px; color: #eaf8ff; background: #24465e; padding: 9px 11px; }
-.phone-flaps { min-width: 0; }
-.phone-flaps > div { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 5px; }
-.phone-flaps button { padding: 8px 2px; font-size: 11px; }
-.phone-flaps button[aria-pressed="true"], .phone-view button[aria-pressed="true"] { background: #087ea4; border-color: #8be7ff; }
+/* ---- Buttons: outlined, never filled, except the one primary action. ---- */
 
-.phone-actions { flex-wrap: wrap; gap: 9px; }
-.phone-actions button { flex: 1; min-height: 45px; font-weight: 700; }
-.phone-actions .phone-primary { background: #087ea4; border-color: #8be7ff; }
-.phone-actions button:disabled { opacity: .45; }
-.phone-view { display: flex; width: 100%; gap: 7px; }
-.phone-view button { min-height: 44px; font-size: 12px; }
+/* FOSS Earth's HUD bar density, for the same reason it uses it: these are menu
+   items and readouts, and a phone screen is worth more to the controls above
+   them. Instruments come first, then the buttons. Chips on one line share its
+   height, so a line reads as a row rather than a ragged edge. */
+.phone-actions { display: flex; flex-wrap: wrap; align-items: stretch; gap: 3px; }
+.phone-actions > button, .phone-brake {
+  min-height: 28px;
+  padding: 6px 10px;
+  border: 1px solid var(--ctl-line);
+  border-radius: 8px;
+  color: var(--phone-text);
+  background: transparent;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+/* The brake is held rather than tapped, so it is a little wider than a glyph
+   chip — and no bigger than that: a full-width bar was a screen of brake. */
+.phone-actions > .phone-brake { min-width: 44px; padding: 0 10px; font-size: 13px; }
+.phone-actions .phone-primary,
+.phone-haptics[aria-pressed="true"] { color: var(--ctl-accent); border-color: rgba(232, 182, 71, 0.55); }
+/* The flight page's pause chip: a glyph, not a word, and filled while paused. */
+.phone-actions > .phone-pause { min-width: 36px; padding: 0 8px; font-size: 14px; font-weight: 400; line-height: 1; }
+.phone-actions > .phone-pause[aria-pressed="true"] { color: var(--ctl-accent-ink); background: var(--ctl-accent); border-color: var(--ctl-accent); }
+/* ⛶ and the like: a glyph where a word would be wider. */
+.phone-actions > .phone-icon { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; padding: 0 8px; font-size: 15px; font-weight: 400; line-height: 1; }
+.phone-actions > .phone-icon[aria-pressed="true"] { color: var(--ctl-accent); border-color: rgba(232, 182, 71, 0.55); }
+.phone-actions button:disabled, .phone-brake:disabled { opacity: 0.4; }
+.phone-brake[data-active] { color: var(--ctl-accent-ink); background: var(--ctl-accent); border-color: var(--ctl-accent); }
 
-.phone-diagnostics { padding: 0 11px; color: #bbd1df; font-size: 12px; }
-.phone-diagnostics summary { min-height: 44px; padding: 13px 0; cursor: pointer; }
-.phone-diagnostics[open] { padding-bottom: 11px; }
-.phone-diagnostics dl { flex-wrap: wrap; gap: 7px 18px; margin: 10px 0; }
+/* ---- The pitch/roll pad, drawn as the HUD's attitude square. ---- */
+
+.phone-stick {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 110px;
+  overflow: hidden;
+  border: 1px solid var(--ctl-line-bright);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ctl-muted);
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.phone-stick:disabled { opacity: 0.4; }
+.phone-stick[data-active] { border-color: rgba(232, 182, 71, 0.55); box-shadow: 0 0 0 2px rgba(232, 182, 71, 0.18); }
+.phone-stick__cross { position: absolute; inset: 50% auto auto 50%; width: 76%; height: 1px; transform: translate(-50%, -50%); background: var(--ctl-line); }
+.phone-stick__cross::after { content: ""; position: absolute; left: 50%; top: -3900%; width: 1px; height: 7900%; background: var(--ctl-line); }
+/* An outlined ring, not a filled puck: fewer lit pixels, clearer position. */
+.phone-stick__knob {
+  position: absolute; left: 50%; top: 50%;
+  width: 52px; height: 52px; margin: -26px;
+  border: 2px solid var(--ctl-accent);
+  border-radius: 50%;
+  background: transparent;
+  pointer-events: none;
+  transition: transform 35ms linear;
+}
+.phone-stick__knob span { display: block; width: 2px; height: 18px; margin: 15px auto; background: var(--ctl-accent); border-radius: 2px; }
+.phone-stick__label, .phone-stick__top, .phone-stick__bottom, .phone-stick__left, .phone-stick__right {
+  position: absolute; color: var(--ctl-muted); font-size: 9px; letter-spacing: 0.06em; pointer-events: none;
+}
+.phone-stick__label { left: 8px; top: 7px; }
+.phone-stick__top { top: 22px; left: 50%; transform: translateX(-50%); }
+.phone-stick__bottom { bottom: 7px; left: 50%; transform: translateX(-50%); }
+.phone-stick__left { left: 9px; top: 50%; transform: translateY(-50%); }
+.phone-stick__right { right: 9px; top: 50%; transform: translateY(-50%); }
+
+/* ---- Sheets: a chip in the grid, a full-screen page when open. ---- */
+
+/* Connection details and Settings. Closed, each is one chip; open, a page with
+   its own scroll, so neither ever competes with the controls for screen. */
+.phone-sheet {
+  flex: 0 0 auto;
+  /* Centres the summary in a line the brake has made taller. */
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--ctl-line); border-radius: 8px;
+  color: var(--ctl-muted); font-size: 11px;
+}
+.phone-sheet summary {
+  flex: 1;
+  padding: 6px 10px; line-height: 14px; cursor: pointer;
+  list-style: none;
+  color: var(--phone-text); font-weight: 700; letter-spacing: 0.04em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.phone-sheet summary::-webkit-details-marker { display: none; }
+.phone-sheet:not([open]) .phone-sheet__title {
+  position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%);
+}
+.phone-sheet[open] .phone-sheet__chip { display: none; }
+.phone-sheet__title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; font-weight: 400; }
+.phone-settings summary { min-width: 34px; padding: 6px 8px; font-size: 15px; font-weight: 400; text-align: center; }
+.phone-settings[open] summary { font-size: 11px; text-align: left; }
+.phone-sheet[open] {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: max(8px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+  border: 0;
+  border-radius: 0;
+  background: #000;
+}
+/* The header closes the sheet, so it says so. */
+.phone-sheet[open] summary::after { content: "✕" / ""; margin-left: 12px; color: var(--ctl-muted); }
+.phone-sheet[open] summary {
+  display: flex; align-items: center;
+  position: sticky; top: 0; z-index: 1;
+  min-height: 42px;
+  margin: 0 -12px; padding: 0 12px;
+  background: #000; border-bottom: 1px solid var(--ctl-line);
+}
+
+.phone-settings__option { margin: 12px 0 0; padding: 10px 12px 12px; border: 1px solid var(--ctl-line); border-radius: 8px; color: var(--phone-text); }
+.phone-settings__option legend { padding: 0 4px; font-weight: 700; letter-spacing: 0.04em; }
+.phone-settings__option p { margin: 2px 0 10px; color: var(--ctl-muted); line-height: 1.4; }
+.phone-settings__choices { display: flex; gap: 8px; }
+.phone-settings__choice { flex: 1; position: relative; }
+.phone-settings__choice input { position: absolute; opacity: 0; inset: 0; margin: 0; }
+.phone-settings__choice span {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 44px; border: 1px solid var(--ctl-line); border-radius: 8px;
+  font-weight: 700;
+}
+.phone-settings__choice input:checked + span { color: var(--ctl-accent); border-color: rgba(232, 182, 71, 0.55); }
+.phone-settings__choice input:focus-visible + span { outline: 2px solid var(--ctl-accent); outline-offset: 2px; }
+/* A setting that is a number rather than a choice: label, track, reading. */
+.phone-settings__slider { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-weight: 700; }
+.phone-settings__slider input[type="range"] {
+  flex: 1; min-width: 0; height: 44px; margin: 0;
+  accent-color: var(--ctl-accent); cursor: ew-resize;
+}
+/* Fixed and wide enough for its longest word, so the track does not resize
+   between "Instant" and "1.50s". */
+.phone-settings__slider output { width: 7ch; text-align: right; color: var(--ctl-accent); font-weight: 400; }
+
+.phone-diagnostics__cause { margin: 8px 0 0; padding: 8px 9px; border: 1px solid rgba(214, 106, 106, 0.6); border-radius: 8px; color: #e8a9a9; user-select: text; -webkit-user-select: text; }
+.phone-diagnostics__cause strong { display: block; font-size: 10px; color: #f0b4b4; }
+.phone-diagnostics__cause small { display: block; margin-top: 6px; color: var(--phone-text); }
+.phone-diagnostics__actions { display: flex; align-items: center; gap: 9px; margin: 9px 0; }
+.phone-diagnostics__actions button { min-height: 36px; padding: 7px 11px; border: 1px solid var(--ctl-line); border-radius: 8px; color: var(--phone-text); background: transparent; }
+.phone-diagnostics dl { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 9px 0; }
 .phone-diagnostics dl > div { display: flex; gap: 5px; }
-.phone-diagnostics dt { color: #88aabd; }
-.phone-diagnostics dd { margin: 0; color: #e7f3fa; }
+.phone-diagnostics dt { color: rgba(150, 163, 176, 0.65); }
+.phone-diagnostics dd { margin: 0; color: var(--phone-text); word-break: break-word; }
 .phone-diagnostics p { margin: 8px 0 0; line-height: 1.4; }
-.phone-app--empty { margin: auto 0; padding: 24px; line-height: 1.5; user-select: text; }
-.phone-app--empty h1 { font-size: 24px; }
-.phone-empty-hint { color: #a9c7da; }
 
-button:focus-visible, input:focus-visible { outline: 3px solid #86e5ff; outline-offset: 3px; }
+/* Not a scroll container of its own. The log has no height cap, so it never had
+   anything to scroll, and `overscroll-behavior: contain` on it swallowed every
+   swipe that started on the timeline instead of passing it to the sheet: the
+   sheet only scrolled from the few rows above the log. The sheet is the one
+   scroller; long unbroken text wraps instead of widening the log. */
+.phone-log {
+  margin: 0; padding: 7px;
+  list-style: none;
+  border: 1px solid var(--ctl-line); border-radius: 8px;
+  font-size: 10px; line-height: 1.45;
+  user-select: text; -webkit-user-select: text;
+}
+.phone-log__line { display: grid; grid-template-columns: 4.5em 5.4em minmax(0, auto); gap: 2px 8px; padding: 2px 0; border-top: 1px solid rgba(196, 208, 220, 0.12); }
+.phone-log__line:first-child { border-top: 0; }
+.phone-log__at { color: rgba(150, 163, 176, 0.6); text-align: right; }
+.phone-log__scope { color: rgba(150, 163, 176, 0.85); }
+.phone-log__code { grid-column: 3; color: var(--phone-text); overflow-wrap: anywhere; }
+.phone-log__detail { grid-column: 3; color: var(--ctl-muted); overflow-wrap: anywhere; }
+.phone-log__line--warn .phone-log__code { color: var(--ctl-accent); }
+.phone-log__line--error .phone-log__code { color: #e8a9a9; }
 
-@media (max-width: 430px) {
-  .phone-app { gap: 10px; }
-  .phone-controls { grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); gap: 9px; min-height: 270px; }
-  .phone-controls__left, .phone-controls__right, .phone-settings { gap: 9px; }
-  .phone-controls__right .phone-stick { min-height: 175px; }
-  .phone-controls__left .phone-panel { padding: 8px; }
-  .phone-throttle label { flex-wrap: wrap; }
-  .phone-stick__knob { width: 48px; height: 48px; margin: -24px; }
-  .phone-settings { grid-template-columns: 1fr; }
+.phone-app--empty {
+  display: block; height: auto; margin: auto; padding: 20px; line-height: 1.5; overflow: auto;
+  border: 1px solid rgba(196, 208, 220, 0.24); border-radius: 10px;
+  user-select: text;
+}
+.phone-app--empty h1 { font-size: 20px; }
+.phone-empty-hint { color: rgba(150, 163, 176, 0.75); }
+.phone-empty-scan {
+  width: 100%; min-height: 48px; margin: 4px 0 8px;
+  border: 1px solid rgba(232, 182, 71, 0.55); border-radius: 8px;
+  color: var(--ctl-accent); background: transparent;
+  font-size: 14px; font-weight: 700;
 }
 
-@media (orientation: landscape) and (max-height: 560px) {
-  .phone-app { width: min(980px, 100%); padding-top: max(10px, env(safe-area-inset-top)); gap: 8px; }
-  .phone-controls { min-height: 220px; grid-template-columns: minmax(125px, .7fr) minmax(0, 1fr); }
-  .phone-controls__right .phone-stick { width: min(100%, 250px); min-height: 190px; }
-  .phone-throttle { padding: 7px; }
-  .phone-stick--rudder { min-height: 64px; }
-  .phone-brake { min-height: 44px; }
+/* ---- Pairing by camera. ---- */
+
+/* The camera fills the screen, the QR goes in the frame, and what to do — or
+   what went wrong — sits along the bottom under the thumbs, with the way out.
+   Above everything, popups included: it is what the pilot just asked for. */
+.phone-scanner {
+  /* The panel's height, which the frame is centred above. */
+  --phone-scanner-panel: 128px;
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  overflow: hidden;
+  background: #000;
+  color: var(--phone-text);
+  user-select: none;
+  -webkit-user-select: none;
+}
+.phone-scanner__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* The square to aim at; everything outside it is dimmed. Centred in the space
+   above the panel, not the screen, so the panel never covers it. */
+.phone-scanner__frame {
+  position: absolute;
+  left: 50%;
+  top: calc((100% - var(--phone-scanner-panel)) / 2);
+  width: min(64vw, calc(100dvh - var(--phone-scanner-panel) - 48px));
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--ctl-accent);
+  border-radius: 14px;
+  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.5);
+}
+.phone-scanner__panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: var(--phone-scanner-panel);
+  padding: 12px max(16px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  border-top: 1px solid var(--ctl-line);
+  background: #000;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.phone-scanner__panel p { margin: 0; }
+.phone-scanner__title { font-weight: 700; }
+.phone-scanner__panel .phone-scanner__status { margin-top: 4px; color: var(--ctl-muted); font-size: 12px; }
+.phone-scanner__actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+.phone-scanner__actions button {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--ctl-line);
+  border-radius: 8px;
+  color: var(--phone-text);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 700;
+}
+.phone-scanner__actions .phone-scanner__primary { color: var(--ctl-accent); border-color: rgba(232, 182, 71, 0.55); }
+
+button:focus-visible, input:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--ctl-accent);
+  outline-offset: 2px;
 }
 
-@media (orientation: landscape) and (min-width: 760px) and (max-height: 560px) {
-  .phone-app { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(270px, 1fr); align-content: start; align-items: start; column-gap: 16px; }
-  .phone-header { grid-column: 1 / -1; }
-  .phone-flight-status { grid-column: 1; grid-row: 2; }
-  .phone-notice { grid-column: 1; grid-row: 3; }
-  .phone-telemetry { grid-column: 2; grid-row: 2 / 4; }
-  .phone-controls { grid-column: 1; grid-row: 4 / 6; }
-  .phone-settings { grid-column: 2; grid-row: 4; grid-template-columns: 1fr; gap: 8px; }
-  .phone-actions { grid-column: 2; grid-row: 5; }
-  .phone-diagnostics { grid-column: 1 / -1; }
+/*
+ * Landscape is how a controller is actually held, and the one orientation
+ * where the desktop HUD's arrangement fits as-is: cluster left; yaw, the engine
+ * widget, the camera pad and the throttle lever right with the throttle
+ * outermost; the chip grid across the bottom (or the top). Full bleed, because
+ * a centred column wastes both margins on a handset.
+ */
+@media (orientation: landscape) {
+  .phone-app {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+    gap: 6px;
+    /* Every pixel here is height the pitch/roll square does not get. */
+    --phone-trim-square: 40px;
+  }
+  .phone-controls {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) max-content;
+    column-gap: 8px;
+    margin: 0 8px;
+  }
+  .phone-cluster { grid-row: 1; grid-column: 1; }
+  .phone-yaw-throttle { grid-row: 1; grid-column: 2; }
+  .phone-actions { grid-row: 2; grid-column: 1 / span 2; }
+  .phone-controls--grid-top { grid-template-rows: max-content minmax(0, 1fr); }
+  .phone-controls--grid-top > .phone-actions { grid-row: 1; }
+  .phone-controls--grid-top > .phone-cluster,
+  .phone-controls--grid-top > .phone-yaw-throttle { grid-row: 2; }
+  /* Landscape is height-constrained, so the square follows the height. */
+  .phone-cluster__pad { width: auto; height: 100%; max-width: 100%; }
 }
-.phone-haptics { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.phone-haptics small { display: block; font-size: 10px; opacity: .72; }
-.phone-haptics input { width: 22px; height: 22px; }
+
+@media (orientation: portrait) and (max-width: 430px) {
+  .phone-app { --ctl-lever-thickness: 26px; }
+  /* A floor on the square, set on the axis that drives it: a minimum on the
+     other one would make the pad taller than it is wide. */
+  .phone-cluster__pad { min-width: 140px; }
+  .phone-log__line { grid-template-columns: 4em 5.2em minmax(0, auto); }
+}

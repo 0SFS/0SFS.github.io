@@ -18,6 +18,7 @@ met; it is not a legal opinion.
 | [@babylonjs/loaders](https://www.babylonjs.com/) | 8.56.2 | Apache-2.0 | glTF and asset loading | Generally compatible; retain Apache notice. |
 | [3d-tiles-renderer](https://github.com/NASA-AMMOS/3DTilesRendererJS) | 0.4.24 | Apache-2.0 | 3D Tiles renderer and Google auth plugin | Generally compatible; retain Apache notice and Caltech/JPL non-endorsement notice. Provider data has separate terms. |
 | `foss-earth` | 0.0.0 local link | AGPL-3.0-only | Globe, maps, shared UI/input/runtime | Project-owned code under the same core-code license. The current sibling link still needs an immutable release pin. |
+| [jsqr](https://github.com/cozmo/jsQR) | 1.4.0 | Apache-2.0 | Phone-controller QR reading, so a Home Screen controller can pair | Generally compatible; retain Apache notice. No dependencies of its own; loaded only when the scanner opens. |
 | [lucide-react](https://lucide.dev) | 1.41.0 | ISC; Feather-derived icon notice is MIT | UI icons | Generally compatible; preserve both applicable notices. |
 | [peerjs](https://peerjs.com) | 1.5.5 | MIT | WebRTC pairing/signalling client | Generally compatible; PeerJS Cloud is an external service with its own operational terms. |
 | [qrcode](https://github.com/soldair/node-qrcode) | 1.5.4 | MIT | Phone-controller QR generation | Generally compatible. |

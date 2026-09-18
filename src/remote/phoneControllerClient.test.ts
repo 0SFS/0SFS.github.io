@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPhoneControlSession } from '../flight/remote/createPhoneControlSession'
 import { createPhoneControllerClient, type PhoneControllerClient } from './phoneControllerClient'
 import { parsePairingUrl } from './pairing'
+import { DEFAULT_PHONE_CAMERA_TUNING } from '../flight/remote/phoneCameraTuning'
 import { NEUTRAL_CONTROLS, type AircraftStatus, type ControlFrame, type RemoteMessage } from './protocol'
 import type { createPeerEndpoint, SessionTransport } from './peerTransport'
 
@@ -76,7 +77,8 @@ afterEach(() => { for (const destroy of cleanup.splice(0)) destroy(); vi.useReal
 const flush = () => vi.advanceTimersByTimeAsync(0)
 const advance = (ms: number) => vi.advanceTimersByTimeAsync(ms)
 
-async function setup(clientOptions: Partial<Parameters<typeof createPhoneControllerClient>[1]> = {}) {
+async function setup(clientOptions: Partial<Parameters<typeof createPhoneControllerClient>[1]> = {},
+  hostOptions: Partial<Parameters<typeof createPhoneControlSession>[0]> = {}) {
   const hostLink = new Link()
   const phoneLink = new Link()
   hostLink.other = phoneLink
@@ -100,11 +102,12 @@ async function setup(clientOptions: Partial<Parameters<typeof createPhoneControl
     signaling = options.onSignalingState
     return { ready: Promise.resolve('phone'), connect: () => { accept!(hostLink); return phoneLink }, destroy: endpointDestroy }
   })
+  const aimFrames = vi.fn()
   const host = createPhoneControlSession({
     getStatus: () => ({ ...state, controls: { ...state.controls } }), hasActiveLocalInput: () => false,
     onOwnershipChange: (owner, controls) => { state.owner = owner; state.controls = { ...controls } },
     setPaused: paused => { state.paused = paused }, setViewMode: view => { state.viewMode = view },
-    createEndpoint: hostEndpoint, now: () => Date.now(),
+    createEndpoint: hostEndpoint, now: () => Date.now(), onCameraAim: aimFrames, ...hostOptions,
   })
   await host.startPairing()
   const invitation = parsePairingUrl(host.getSnapshot().invitationUrl!)!
@@ -120,7 +123,7 @@ async function setup(clientOptions: Partial<Parameters<typeof createPhoneControl
     await flush()
     expect(client.getSnapshot().canControl).toBe(true)
   }
-  return { host, client, hostLink, phoneLink, state, invitation, doc, win, endpointDestroy, clientEndpoint, envelope, fly, signal: (available: boolean) => signaling!(available) }
+  return { host, client, hostLink, phoneLink, state, invitation, doc, win, endpointDestroy, clientEndpoint, envelope, fly, aimFrames, signal: (available: boolean) => signaling!(available) }
 }
 
 describe('phone controller', () => {
@@ -160,6 +163,129 @@ describe('phone controller', () => {
     expect(h.state).toMatchObject({ owner: 'local', paused: true })
     expect(h.client.getSnapshot()).toMatchObject({ canFly: true, canControl: false, pendingActions: 0 })
     expect(h.clientEndpoint).toHaveBeenCalledTimes(1)
+  })
+
+  it('sums camera gestures until a frame carries them, then hands each one over once', async () => {
+    const h = await setup()
+    await advance(50)
+    await h.fly()
+    expect(h.host.takeCameraAim()).toBeNull()
+    // Several pointermoves inside one frame are one gesture, not the last one.
+    h.client.nudgeCamera({ yaw: .2, pitch: -.1 })
+    h.client.nudgeCamera({ yaw: .1, pitch: -.05 })
+    h.client.nudgeCamera({ yaw: 0, pitch: 0, zoom: 1.5 })
+    await advance(60)
+    // A paused desktop renders only on request, so an arriving gesture asks for a frame.
+    expect(h.aimFrames).toHaveBeenCalled()
+    expect(h.phoneLink.native.filter(message => message.type === 'controls' && message.camera).length).toBeGreaterThan(0)
+    // However the gesture was split across frames, the host draws all of it, once.
+    const drawn = h.host.takeCameraAim()!
+    expect(drawn.yaw).toBeCloseTo(.3)
+    expect(drawn.pitch).toBeCloseTo(-.15)
+    expect(drawn.zoom).toBeCloseTo(1.5)
+    // Drained: the same movement is never drawn twice.
+    expect(h.host.takeCameraAim()).toBeNull()
+    // A gesture is a view, not a deflection: the surfaces this step applies are untouched.
+    expect(h.host.beforeStep(h.state.controls)).toMatchObject({ aileron: 0, elevator: 0, rudder: 0 })
+    // A spent delta leaves the next frame, so a still finger sends no camera at all.
+    h.aimFrames.mockClear()
+    await advance(60)
+    expect(h.phoneLink.last('controls').camera).toBeUndefined()
+    expect(h.aimFrames).not.toHaveBeenCalled()
+    // The desktop taking the aircraft back ends the gesture: a phone that no
+    // longer controls anything cannot move the camera either.
+    h.host.takeControl()
+    await advance(60)
+    h.client.nudgeCamera({ yaw: 1, pitch: 0 })
+    await advance(60)
+    expect(h.phoneLink.last('controls').camera).toBeUndefined()
+    expect(h.host.takeCameraAim()).toBeNull()
+    expect(h.host.isCameraActive()).toBe(false)
+  })
+
+  it('sends once per touch frame when the computer asks, carrying the running total', async () => {
+    const tuning = { ...DEFAULT_PHONE_CAMERA_TUNING }
+    const h = await setup({ postTask: task => { setTimeout(task, 0) } }, { getCameraTuning: () => tuning })
+    await advance(50)
+    await h.fly()
+    await advance(50)
+    // The original timing is what a heartbeat without the field means.
+    expect('controlSend' in h.hostLink.last('heartbeat')).toBe(false)
+    tuning.send = 'batch'
+    await advance(50)
+    expect(h.hostLink.last('heartbeat')).toMatchObject({ controlSend: 'batch' })
+    const controlFrames = () => h.phoneLink.native.filter((message): message is ControlFrame => message.type === 'controls')
+    await advance(40)
+    const before = controlFrames().length
+    // One touch frame: the stick's and the camera's pointer events, back to back.
+    const touchedAt = Date.now() - 1
+    h.client.updateControls({ aileron: .3 }, { at: touchedAt })
+    h.client.nudgeCamera({ yaw: .01, pitch: 0 }, { at: touchedAt })
+    expect(controlFrames()).toHaveLength(before)
+    await advance(0)
+    expect(controlFrames()).toHaveLength(before + 1)
+    expect(controlFrames().at(-1)).toMatchObject({ controls: { aileron: .3 }, camera: { yaw: .01 }, aim: { yaw: .01, t: touchedAt } })
+    // While a finger is moving, the 60 Hz timer stays out of its way.
+    await advance(30)
+    expect(controlFrames()).toHaveLength(before + 1)
+    // A touch frame the 120/s cap would turn away waits for the cap instead.
+    h.client.nudgeCamera({ yaw: .02, pitch: 0 }, { at: Date.now() })
+    await advance(0)
+    h.client.nudgeCamera({ yaw: .01, pitch: 0 }, { at: Date.now() + 4 })
+    await advance(4)
+    expect(controlFrames()).toHaveLength(before + 2)
+    await advance(5)
+    expect(controlFrames()).toHaveLength(before + 3)
+    const [previous, last] = controlFrames().slice(-2)
+    // The total carries everything; stamps only move forward.
+    expect(last.aim!.yaw).toBeCloseTo(.04)
+    expect(last.aim!.t).toBeGreaterThan(previous.aim!.t)
+    // A blur discards movement that has not left, from the total as from the delta.
+    h.client.nudgeCamera({ yaw: .05, pitch: 0 }, { at: Date.now() })
+    h.win.dispatchEvent(new Event('blur'))
+    await advance(20)
+    expect(controlFrames().at(-1)!.aim!.yaw).toBeCloseTo(.04)
+    expect(controlFrames().at(-1)!.camera).toBeUndefined()
+    // Once the fingers are still, the timer keeps the stream alive again.
+    const quiet = controlFrames().length
+    await advance(100)
+    expect(controlFrames().length - quiet).toBeGreaterThanOrEqual(4)
+  })
+
+  it('attaches its own timings to control frames only while the desktop asks for a trace', async () => {
+    const plain = await setup()
+    await advance(50)
+    await plain.fly()
+    plain.client.nudgeCamera({ yaw: .01, pitch: 0 }, { at: 12.34, coalesced: () => 2 })
+    await advance(60)
+    // No `?phoneCameraTrace=1` on the desktop: frames are exactly what they were.
+    expect(plain.hostLink.native.some(message => message.type === 'heartbeat' && 'trace' in message)).toBe(false)
+    expect(plain.phoneLink.native.some(message => message.type === 'controls' && 'trace' in message)).toBe(false)
+
+    const controlFrame = vi.fn()
+    const h = await setup({}, { trace: { controlFrame } })
+    await advance(50)
+    await h.fly()
+    await advance(20)
+    h.client.updateControls({ aileron: .2 }, { at: 100.04 })
+    await advance(20)
+    h.client.nudgeCamera({ yaw: .012, pitch: -.003 }, { at: 101.25, coalesced: () => 3 })
+    await advance(0)
+    const traced = h.phoneLink.native.filter((message): message is ControlFrame => message.type === 'controls' && message.trace !== undefined)
+    const carrying = traced.find(message => message.camera)!
+    // The camera event and when it ran, as ages before the frame that carried it, on the phone's clock.
+    const [age, handled, dx, dy, samples] = carrying.trace!.cam[0]
+    expect(carrying.trace!.at - age).toBeCloseTo(101.3, 0)
+    expect(handled).toBe(0)
+    expect([dx, dy, samples]).toEqual([12, -3, 3])
+    expect(carrying.trace).toMatchObject({ by: 0, drop: [0, 0, 0] })
+    // The stick event since the previous frame rides along too.
+    expect(traced.some(message => message.trace!.ctl.some(([stickAge]) => Math.abs(message.trace!.at - stickAge - 100) < .1))).toBe(true)
+    // Spent with its frame: the next one reports only what happened after it.
+    await advance(40)
+    expect(h.phoneLink.last('controls').trace).toMatchObject({ by: 1, cam: [], ctl: [] })
+    // Every frame the desktop handled was reported with what became of it.
+    expect(controlFrame).toHaveBeenCalledWith(expect.objectContaining({ seq: carrying.seq }), 'accepted', expect.any(Number))
   })
 
   it('handles a newer heartbeat overtaking handoff and late local telemetry after the grant without replacing live input', async () => {
@@ -296,6 +422,29 @@ describe('phone controller', () => {
     expect(h.client.getSnapshot()).toMatchObject({ canControl: false, canFly: true, status: { owner: 'local' } })
     await h.fly()
     expect(h.state.paused).toBe(false)
+  })
+
+  it('puts a control the screen draws into the snapshot, and centres that drawing too', async () => {
+    const h = await setup()
+    await advance(50)
+    await h.fly()
+    // The yaw slider is React-controlled, so a rudder that moved only in the
+    // mailbox is painted back to the snapshot's value on the next render: the
+    // aircraft answers the finger while the thumb sits still.
+    h.client.updateControls({ rudder: -.6 })
+    expect(h.client.getSnapshot().controls.rudder).toBe(-.6)
+    await advance(20)
+    expect(h.host.beforeStep(h.state.controls)).toMatchObject({ rudder: -.6 })
+    // The pad and the brake draw themselves from the pointer; making them wait
+    // on a render would cost a frame of stick movement for nothing.
+    h.client.updateControls({ aileron: .8, brake: 1 })
+    expect(h.client.getSnapshot().controls).toMatchObject({ aileron: 0, brake: 0 })
+    // Whatever drops the transient controls — a stale link, a blur, a release —
+    // returns the slider on screen as well as the rudder on the wire.
+    h.client.cancelTransientControls()
+    expect(h.client.getSnapshot().controls.rudder).toBe(0)
+    await advance(20)
+    expect(h.host.beforeStep(h.state.controls)).toMatchObject({ rudder: 0 })
   })
 
   it('releases on page hide, preserves pause on return, survives signaling-only loss, and tears down after closure', async () => {

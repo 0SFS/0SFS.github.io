@@ -1,6 +1,8 @@
 import type { GameLog } from "../log/createGameLog";
 
 const EVERY_VISIT_PREFERENCE_KEY = "osfs.fullscreen-every-visit";
+/** A declined offer, remembered per device the way the every-visit choice is. */
+const PROMPT_DISMISSED_PREFERENCE_KEY = "osfs.fullscreen-prompt-dismissed";
 
 type FullscreenDocument = Document & {
   webkitFullscreenEnabled?: boolean;
@@ -62,6 +64,22 @@ function writeFullscreenEveryVisit(enabled: boolean): void {
     if (enabled) window.localStorage.setItem(EVERY_VISIT_PREFERENCE_KEY, "1");
     else window.localStorage.removeItem(EVERY_VISIT_PREFERENCE_KEY);
   } catch { /* Private browsing: the choice lasts for this visit only. */ }
+}
+
+export function readFullscreenPromptDismissed(): boolean {
+  try { return window.localStorage.getItem(PROMPT_DISMISSED_PREFERENCE_KEY) === "1"; } catch { return false; }
+}
+
+export function writeFullscreenPromptDismissed(dismissed: boolean): void {
+  try {
+    if (dismissed) window.localStorage.setItem(PROMPT_DISMISSED_PREFERENCE_KEY, "1");
+    else window.localStorage.removeItem(PROMPT_DISMISSED_PREFERENCE_KEY);
+  } catch { /* Private browsing: the choice lasts for this visit only. */ }
+}
+
+/** Coarse pointer and no page fullscreen: an iPhone, where the Home Screen is the only way. */
+export function prefersHomeScreenInstall(): boolean {
+  return typeof window.matchMedia === "function" && window.matchMedia("(pointer: coarse)").matches;
 }
 
 /**
