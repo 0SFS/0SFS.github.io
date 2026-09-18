@@ -98,6 +98,26 @@ Both work because `vite.config.ts` injects the address the server is reachable o
 (`window.__OSFS_LAN_ORIGIN__`), and only when it is bound to something other than loopback. A browser
 cannot discover its own LAN address, so without that the QR would have nothing to point at.
 
+### Phone controller layout
+
+```sh
+npm run check:phone-layout
+```
+
+jsdom has no layout engine, so the phone controller's geometry is checked in headless Chrome instead.
+`scripts/phone-layout/render.tsx` renders the real `PhoneController` with the real stylesheet, and
+[`scripts/check-phone-layout.mjs`](../scripts/check-phone-layout.mjs) measures it at three phone sizes
+and exits non-zero when a rule breaks. Screenshots land in the gitignored `build/phone-layout/`;
+`--keep-html` also keeps the rendered pages.
+
+The same run also renders the desktop flight HUD, so the two can be compared: the phone controller is
+the HUD rearranged, and they share a stylesheet. [Phone controller UI](phone-controller-ui.md)
+explains that arrangement, the rules this script enforces and why, and the layout traps already paid
+for.
+
+`render.tsx` is deliberately not named `*.test.tsx`: it writes files, so it must not be collected by
+`npm run test`. Its own config opts it in.
+
 ## The FOSS Earth dependency
 
 `package.json` declares FOSS Earth as a local file dependency:

@@ -16,6 +16,7 @@
     "dev:lan": "node scripts/dev-lan.mjs",
     "build": "npm run verify:jsbsim && npm run verify:audio && tsc -b && vite build && node scripts/verify-jsbsim-artifact.mjs --dist=dist && node scripts/verify-audio-artifact.mjs --dist=dist",
     "build:audio": "node scripts/build-audio-wasm.mjs",
+    "check:phone-layout": "node scripts/check-phone-layout.mjs",
     "ci": "npm run lint && npm run test && npm run build",
     "deploy": "npm run deploy:gh-pages",
     "deploy:gh-pages": "npm run build && gh-pages -d dist",
