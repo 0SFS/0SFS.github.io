@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { DEFAULT_ICE_SERVERS } from './iceConfig'
 
 const mocks = vi.hoisted(() => {
   class Events {
@@ -56,6 +57,20 @@ const mocks = vi.hoisted(() => {
     peerConnection = {
       ondatachannel: vi.fn(),
       sctp: { maxChannels: 16 },
+      iceConnectionState: 'new',
+      iceGatheringState: 'new',
+      connectionState: 'new',
+      signalingState: 'stable',
+      listeners: new Map<string, Set<(event: unknown) => void>>(),
+      addEventListener: vi.fn(function (this: { listeners: Map<string, Set<(event: unknown) => void>> }, name: string, handler: (event: unknown) => void) {
+        const set = this.listeners.get(name) ?? new Set()
+        set.add(handler)
+        this.listeners.set(name, set)
+      }),
+      removeEventListener: vi.fn(function (this: { listeners: Map<string, Set<(event: unknown) => void>> }, name: string, handler: (event: unknown) => void) {
+        this.listeners.get(name)?.delete(handler)
+      }),
+      getConfiguration: vi.fn(() => ({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] })),
       getStats: vi.fn(async () => new Map<string, unknown>()),
       createDataChannel: vi.fn((_label: string, options: RTCDataChannelInit) => {
         this.native = new Channel(options)
@@ -64,6 +79,7 @@ const mocks = vi.hoisted(() => {
     }
     close = vi.fn(() => { this.open = false; this.emit('close') })
     send = vi.fn()
+    fire(name: string, event: unknown) { for (const handler of this.peerConnection.listeners.get(name) ?? []) handler(event) }
     opened() { this.open = true; this.dataChannel.open(); this.emit('open') }
     receive(json: string) { this.emit('data', this.parse(json)) }
   }
@@ -103,13 +119,17 @@ beforeEach(() => { vi.useFakeTimers(); mocks.MockPeer.instances.length = 0 })
 afterEach(() => { for (const endpoint of endpoints.splice(0)) endpoint.destroy(); vi.useRealTimers() })
 
 describe('PeerJS/native channel adapter', () => {
-  it('uses secure cloud signaling, explicit STUN only, public metadata, and pre-open subscriptions', async () => {
+  it('uses secure cloud signaling, the configured STUN list, public metadata, and pre-open subscriptions', async () => {
     const { endpoint, peer, transport, connection } = setup()
     expect(await endpoint.ready).toBe('test-peer')
     expect(peer.options).toEqual({
       secure: true, port: 443, debug: 0, referrerPolicy: 'no-referrer',
-      config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] },
+      config: { iceServers: DEFAULT_ICE_SERVERS },
     })
+    // Several independent STUN hosts and no relay by default: one blocked
+    // server costs gathering time instead of the whole connection.
+    expect(DEFAULT_ICE_SERVERS.flatMap(server => (typeof server.urls === 'string' ? [server.urls] : server.urls)))
+      .not.toContain(expect.stringContaining('turn:'))
     expect(peer.connect).toHaveBeenCalledWith('target-peer', {
       label: 'flight-session-v1', reliable: true, serialization: 'json', metadata: { v: 1, protocol: 'flight-session' },
     })
@@ -234,6 +254,75 @@ describe('PeerJS/native channel adapter', () => {
     expect(connection.close).not.toHaveBeenCalled()
     expect(transport.sendReliable({ type: 'still-connected' })).toBe(true)
     expect(signaling).toHaveBeenLastCalledWith(false)
+  })
+
+  it('ends a dial to an unregistered computer at once, naming the real cause', async () => {
+    const { endpoint, peer, transport } = setup()
+    const closed = vi.fn()
+    transport.onClose(closed)
+    const rejected = expect(transport.ready).rejects.toThrow(/no computer registered/i)
+    peer.emit('error', { type: 'peer-unavailable', message: 'Could not connect to peer target-peer' })
+    await rejected
+    // No waiting out the 15 second setup deadline for an answer that cannot come.
+    expect(closed).toHaveBeenCalledOnce()
+    expect(closed.mock.calls[0][0]).not.toContain('Wi-Fi')
+    expect(endpoint.log.facts().failure?.code).toBe('peer-unavailable')
+    expect(endpoint.log.facts().signaling.lastErrorType).toBe('peer-unavailable')
+  })
+
+  it('keeps an open flight link through a recoverable signaling error but records it', async () => {
+    const { endpoint, peer, transport, connection } = setup()
+    connection.opened()
+    await transport.ready
+    peer.emit('error', { type: 'network', message: 'Lost connection to server.' })
+    expect(connection.close).not.toHaveBeenCalled()
+    expect(transport.sendReliable({ type: 'still-connected' })).toBe(true)
+    expect(endpoint.log.facts().signaling.lastErrorType).toBe('network')
+    // Recoverable: recorded for the report, but not promoted to the failure cause.
+    expect(endpoint.log.facts().failure).toBeNull()
+  })
+
+  it('explains an ICE negotiation failure instead of guessing at the network', async () => {
+    const { transport, connection, endpoint } = setup()
+    const rejected = expect(transport.ready).rejects.toThrow('Could not connect directly')
+    connection.fire('icecandidate', { candidate: { candidate: 'a', type: 'host', protocol: 'udp', address: '192.168.1.44', port: 5000 } })
+    connection.emit('error', { type: 'negotiation-failed', message: 'Negotiation of connection to target-peer failed.' })
+    await rejected
+    const facts = endpoint.log.facts()
+    expect(facts.ice.local.host).toBe(1)
+    expect(facts.failure?.code).toBe('connection-negotiation-failed')
+    // The local candidate was recorded, but never at full address.
+    expect(endpoint.log.report()).toContain('192.168.1.x')
+    expect(endpoint.log.report()).not.toContain('192.168.1.44')
+  })
+
+  it('records ICE state changes and STUN server errors for the report', async () => {
+    const { connection, endpoint } = setup()
+    connection.peerConnection.iceGatheringState = 'gathering'
+    connection.fire('icegatheringstatechange', {})
+    connection.fire('icecandidateerror', { url: 'stun:stun.l.google.com:19302', errorCode: 701, errorText: 'STUN host lookup received error.' })
+    connection.fire('icecandidateerror', { url: 'stun:stun.l.google.com:19302', errorCode: 701, errorText: 'STUN host lookup received error.' })
+    connection.peerConnection.iceConnectionState = 'failed'
+    connection.fire('iceconnectionstatechange', {})
+    const facts = endpoint.log.facts()
+    expect(facts.ice.gatheringState).toBe('gathering')
+    expect(facts.ice.connectionState).toBe('failed')
+    // Repeated reports from one server collapse into a count.
+    expect(facts.ice.serverErrors).toEqual([{ url: 'stun:stun.l.google.com:19302', code: 701, text: 'STUN host lookup received error.', count: 2 }])
+  })
+
+  it('counts remote candidates from stats so a silent far end is visible', async () => {
+    const { transport, connection, endpoint } = setup()
+    connection.peerConnection.getStats.mockResolvedValue(new Map<string, unknown>([
+      ['r1', { type: 'remote-candidate', candidateType: 'host', address: 'abc.local' }],
+      ['r2', { type: 'remote-candidate', candidateType: 'srflx', address: '203.0.113.9' }],
+    ]))
+    connection.opened()
+    await transport.ready
+    await vi.advanceTimersByTimeAsync(1000)
+    const facts = endpoint.log.facts()
+    expect(facts.ice.remote).toMatchObject({ host: 1, srflx: 1, mdns: 1 })
+    expect(facts.channels.reliableOpenMs).not.toBeNull()
   })
 
   it('bounds registration, connection and native setup time', async () => {
