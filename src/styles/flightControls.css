@@ -1,0 +1,450 @@
+/*
+ * Flight control appearance, shared by the desktop HUD (`src/styles/flight.css`)
+ * and the phone controller (`src/remote/phone.css`).
+ *
+ * These two surfaces show the same controls, so they use the same class names
+ * and the same rules. Only *placement* belongs to each host: the HUD anchors
+ * its cluster to the bottom corners of the canvas, the phone lays the same
+ * pieces out in a grid that fills a handset screen. Appearance lives here, once.
+ *
+ * Everything colour-like is a token so a host can re-theme without forking the
+ * rules. The defaults are the desktop HUD's existing values, so the HUD renders
+ * exactly as it did before this file existed.
+ */
+
+:root {
+  --ctl-surface: rgba(0, 0, 0, 0.45);
+  --ctl-surface-deep: rgba(0, 0, 0, 0.35);
+  --ctl-line: rgba(255, 255, 255, 0.12);
+  --ctl-line-bright: rgba(255, 255, 255, 0.15);
+  --ctl-line-strong: rgba(255, 255, 255, 0.32);
+  --ctl-divider: rgba(255, 255, 255, 0.28);
+  --ctl-hover: rgba(255, 255, 255, 0.06);
+  --ctl-muted: rgba(180, 188, 198, 0.55);
+  --ctl-accent: #e8b647;
+  --ctl-accent-ink: #11161a;
+  --ctl-accent-edge: rgba(255, 210, 80, 0.55);
+  --ctl-focus: rgba(255, 210, 80, 0.45);
+  --ctl-focus-soft: rgba(255, 210, 80, 0.18);
+  /* The button in the tape row; also the width of a lever's meta column. */
+  --ctl-chip-size: 28px;
+  --ctl-lever-thickness: 16px;
+}
+
+/* ---- Instrument chips: code+unit on one row, value below. ---- */
+
+.flight-hud__tape {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  min-width: 0;
+  padding: 4px 6px;
+  border-radius: 8px;
+  background: var(--ctl-surface);
+  border: 1px solid var(--ctl-line);
+  text-align: center;
+}
+
+.flight-hud__tape-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+  color: var(--ctl-muted);
+}
+
+.flight-hud__label {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: inherit;
+  opacity: 1;
+}
+
+.flight-hud__value {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.1;
+  /* Values are space-padded to a fixed width by their host, and both halves of
+     that matter: `pre` keeps the padding HTML would otherwise collapse, and
+     tabular figures keep the glyphs an equal width. Without them an altitude
+     crossing 10,000 ft widens its chip and shunts the rest of the row sideways. */
+  white-space: pre;
+  font-variant-numeric: tabular-nums;
+}
+
+.flight-hud__unit {
+  font-size: 9px;
+  color: inherit;
+  opacity: 1;
+}
+
+/* ---- Square state buttons that sit in the tape row. ---- */
+
+.flight-hud__gear,
+.flight-hud__ap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  width: var(--ctl-chip-size);
+  min-height: 0;
+  padding: 0;
+  border-radius: 8px;
+  background: var(--ctl-surface);
+  border: 1px solid var(--ctl-line);
+  color: inherit;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  appearance: none;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.flight-hud__gear:hover,
+.flight-hud__ap:hover {
+  border-color: var(--ctl-line-strong);
+}
+
+.flight-hud__gear:focus-visible,
+.flight-hud__ap:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ctl-focus);
+}
+
+/* Down is the safe, powered-up state, so it is the one that lights. */
+.flight-hud__gear.is-down,
+.flight-hud__ap.is-on {
+  color: var(--ctl-accent-ink);
+  background: var(--ctl-accent);
+  border-color: var(--ctl-accent);
+}
+
+.flight-hud__ap.is-blocked:not(.is-on) {
+  opacity: 0.55;
+}
+
+.flight-hud__gear:disabled,
+.flight-hud__ap:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* ---- One square split on the diagonal: roll trim above, pitch trim below. ---- */
+
+.flight-hud__auto-trims {
+  position: relative;
+  display: grid;
+  grid-template: 1fr / 1fr;
+  overflow: hidden;
+  border-radius: 5px;
+  background: var(--ctl-surface);
+  border: 1px solid var(--ctl-line);
+}
+
+.flight-hud__auto-trims::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom left,
+    transparent calc(50% - 0.6px),
+    var(--ctl-divider) 50%,
+    transparent calc(50% + 0.6px)
+  );
+}
+
+.flight-hud__auto-trim {
+  display: flex;
+  flex-direction: column;
+  grid-area: 1 / 1;
+  gap: 1px;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  appearance: none;
+  cursor: pointer;
+}
+
+.flight-hud__auto-trim--roll {
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 3px 3px 0 0;
+  text-align: right;
+}
+
+.flight-hud__auto-trim--pitch {
+  clip-path: polygon(0 0, 0 100%, 100% 100%);
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 0 0 3px 3px;
+}
+
+.flight-hud__auto-trim:hover {
+  background: var(--ctl-hover);
+}
+
+.flight-hud__auto-trim:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--ctl-focus);
+}
+
+.flight-hud__auto-trim.is-on {
+  color: var(--ctl-accent-ink);
+  background: var(--ctl-accent);
+}
+
+.flight-hud__auto-trim:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* ---- Vertical slider in a labelled box (throttle). ---- */
+
+.flight-hud__slider-control {
+  display: grid;
+  /* Label, value, then the slider — which takes whatever height the host gives
+     the box. In the HUD that box is content-height and the third row lands on
+     the slider's own size, so this changes nothing there; on the phone the box
+     is stretched and the slider grows instead of leaving the space empty. */
+  grid-template-rows: max-content max-content minmax(0, 1fr);
+  justify-items: center;
+  gap: 3px;
+  width: var(--ctl-chip-size);
+  padding: 4px 2px;
+  border-radius: 6px;
+  background: var(--ctl-surface);
+  border: 1px solid var(--ctl-line);
+  font-size: 10px;
+  pointer-events: auto;
+}
+
+.flight-hud__slider-control > span,
+.flight-hud__slider-control output {
+  font-size: 9px;
+  letter-spacing: 0;
+  opacity: 0.8;
+}
+
+.flight-hud__slider-control input[type="range"] {
+  width: 14px;
+  /* Stretching as a grid item rather than taking `height: 100%`: a percentage
+     here resolves against an indefinite ancestor, and Chrome then falls back to
+     the viewport height and drags the whole page taller. */
+  height: auto;
+  align-self: stretch;
+  min-height: 0;
+  margin: 0;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  accent-color: var(--ctl-accent);
+  cursor: ns-resize;
+}
+
+.flight-hud__slider-control input[type="range"]:disabled {
+  cursor: default;
+  opacity: 0.9;
+}
+
+/* ---- The same control turned horizontal (roll trim). ---- */
+
+.flight-hud__slider-control--roll-trim {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: 1fr;
+  align-items: center;
+  align-self: center;
+  gap: 6px;
+  width: auto;
+  padding: 0 8px;
+}
+
+.flight-hud__slider-control--roll-trim input[type="range"] {
+  width: 100%;
+  /* Undoes the vertical slider's stretch: this one is a fixed-height bar that
+     sits on the box's centre line, however tall its host makes the box. */
+  align-self: center;
+  height: 12px;
+  writing-mode: horizontal-tb;
+  direction: ltr;
+  cursor: ew-resize;
+}
+
+/* ---- Tall thin levers (pitch trim, flaps). ---- */
+
+.flight-hud__lever {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  pointer-events: auto;
+}
+
+.flight-hud__lever--pitch,
+.flight-hud__lever--flaps {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 3px;
+}
+
+.flight-hud__lever-meta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  font-size: 9px;
+  letter-spacing: 0;
+  opacity: 0.8;
+}
+
+.flight-hud__lever--pitch .flight-hud__lever-meta,
+.flight-hud__lever--flaps .flight-hud__lever-meta {
+  flex: 0 0 auto;
+  align-items: center;
+  text-align: center;
+}
+
+.flight-hud__lever--pitch .flight-hud__lever-track,
+.flight-hud__lever--flaps .flight-hud__lever-track {
+  flex: 1 1 auto;
+  width: var(--ctl-lever-thickness);
+  min-height: 0;
+}
+
+.flight-hud__lever-track {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  flex: 0 0 var(--ctl-lever-thickness);
+  width: var(--ctl-lever-thickness);
+  border-radius: 6px;
+  background: var(--ctl-surface);
+  border: 1px solid var(--ctl-line);
+  padding: 2px 0;
+}
+
+.flight-hud__lever-track input[type="range"] {
+  width: 10px;
+  /* Stretching as a flex child rather than taking `height: 100%`: a percentage
+     here resolves against an indefinite ancestor, and Chrome then falls back to
+     the viewport height and drags the whole page taller. */
+  height: auto;
+  align-self: stretch;
+  min-height: 0;
+  margin: 0;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  accent-color: var(--ctl-accent);
+  cursor: ns-resize;
+}
+
+.flight-hud__lever-track input[type="range"]:disabled {
+  cursor: default;
+  opacity: 0.9;
+}
+
+/*
+ * No `-webkit-appearance: slider-vertical` fallback here. Chrome still answers
+ * `CSS.supports('-webkit-appearance', 'slider-vertical')` with true long after
+ * dropping the behaviour, so an `@supports` guard fires on Chrome as well and
+ * applies a legacy appearance to every range it matches — including the
+ * horizontal roll trim, which then loses its fill. `writing-mode` is the
+ * standard, and is what the desktop HUD has always relied on.
+ */
+
+/* ---- Yaw: a horizontal slider, not a pad. ---- */
+
+.flight-hud__yaw-control {
+  display: grid;
+  gap: 4px;
+  font-size: 9px;
+  letter-spacing: 0;
+  opacity: 0.9;
+}
+
+.flight-hud__yaw-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.flight-hud__yaw-control input[type="range"] {
+  width: 100%;
+  min-width: 0;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--ctl-accent);
+  cursor: ew-resize;
+}
+
+.flight-hud__yaw-control input[type="range"]:disabled {
+  cursor: default;
+  opacity: 0.9;
+}
+
+.flight-hud__yaw-control output {
+  min-width: 2.2em;
+  text-align: right;
+  font-size: 9px;
+  opacity: 0.8;
+}
+
+/* ---- The pitch/roll surface. ---- */
+
+.flight-hud__attitude {
+  position: relative;
+  border-radius: 10px;
+  background: var(--ctl-surface-deep);
+  border: 1px solid var(--ctl-line-bright);
+  touch-action: none;
+  cursor: grab;
+  outline: none;
+}
+
+.flight-hud__attitude[data-active] {
+  cursor: grabbing;
+  border-color: var(--ctl-accent-edge);
+  box-shadow: 0 0 0 2px var(--ctl-focus-soft);
+}
+
+.flight-hud__attitude:focus-visible {
+  box-shadow: 0 0 0 2px var(--ctl-focus);
+}
+
+/*
+ * The sliders need the attitude surface's `touch-action` for the same reason.
+ * iOS hands a drag that starts on a range input to the nearest scroller before
+ * the input sees it, and for a vertical slider the gesture it needs is exactly
+ * the one Safari reads as a scroll: the phone's throttle was unusable on an
+ * iPhone until this. The HUD has the same defect on any touchscreen. Only the
+ * flight controls: a slider in a settings panel sits in something that scrolls,
+ * and a vertical swipe across it should still scroll that.
+ */
+.flight-hud__slider-control input[type="range"],
+.flight-hud__lever-track input[type="range"],
+.flight-hud__yaw-control input[type="range"] {
+  touch-action: none;
+}

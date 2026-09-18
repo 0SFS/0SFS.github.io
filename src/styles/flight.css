@@ -1,9 +1,14 @@
+/* Control appearance is shared with the phone controller. */
+@import "./flightControls.css";
+
 .flight-app {
   --flight-panel-bg: rgba(13, 17, 20, 0.94);
   --flight-panel-line: rgba(208, 220, 224, 0.15);
   --flight-panel-muted: #91a0a6;
   --flight-panel-text: #edf2f3;
   --flight-panel-accent: #e8b647;
+  /* The shared control rules read `--ctl-*`; the HUD's accent drives theirs. */
+  --ctl-accent: var(--flight-panel-accent);
   position: relative;
   width: 100%;
   height: 100vh;
@@ -34,6 +39,7 @@
   --flight-auto-trim-size: 35px;
   --flight-roll-trim-height: 16px;
   --flight-lever-thickness: var(--flight-roll-trim-height);
+  --ctl-lever-thickness: var(--flight-lever-thickness);
   --flight-attitude-cluster-height: calc(var(--flight-auto-trim-size) + 2px + var(--flight-attitude-size));
 }
 
@@ -50,30 +56,11 @@
 }
 
 .flight-hud__attitude {
-  position: relative;
-  left: auto;
-  bottom: auto;
   grid-column: 2;
   grid-row: 2;
   flex: 0 0 auto;
   width: var(--flight-attitude-size);
   height: var(--flight-attitude-size);
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  touch-action: none;
-  cursor: grab;
-  outline: none;
-}
-
-.flight-hud__attitude[data-active] {
-  cursor: grabbing;
-  border-color: rgba(255, 210, 80, 0.55);
-  box-shadow: 0 0 0 2px rgba(255, 210, 80, 0.18);
-}
-
-.flight-hud__attitude:focus-visible {
-  box-shadow: 0 0 0 2px rgba(255, 210, 80, 0.45);
 }
 
 /*
@@ -98,130 +85,6 @@
 
 .flight-hud__aoa {
   display: contents;
-}
-
-/* Compact chips: code+unit on one row, value below. */
-.flight-hud__tape {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
-  min-width: 0;
-  padding: 4px 6px;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  text-align: center;
-}
-
-.flight-hud__tape-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 4px;
-  color: rgba(180, 188, 198, 0.55);
-}
-
-.flight-hud__label {
-  font-size: 9px;
-  letter-spacing: 0.08em;
-  color: inherit;
-  opacity: 1;
-}
-
-.flight-hud__value {
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.1;
-  /* The values are space-padded to a fixed width by flightHud.ts, and both
-     halves of that matter: `pre` keeps the padding HTML would otherwise
-     collapse, and tabular figures keep the glyphs an equal width. Without
-     them an altitude crossing 10,000 ft widens its chip and shunts the rest
-     of the row sideways. */
-  white-space: pre;
-  font-variant-numeric: tabular-nums;
-}
-
-.flight-hud__unit {
-  font-size: 9px;
-  color: inherit;
-  opacity: 1;
-}
-
-.flight-hud__gear {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  align-self: stretch;
-  width: 28px;
-  min-height: 0;
-  padding: 0;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: inherit;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  appearance: none;
-  cursor: pointer;
-  pointer-events: auto;
-}
-
-.flight-hud__gear:hover {
-  border-color: rgba(255, 255, 255, 0.32);
-}
-
-.flight-hud__gear:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 210, 80, 0.45);
-}
-
-/* Down is the safe, powered-up state, so it is the one that lights. */
-.flight-hud__gear.is-down {
-  color: #11161a;
-  background: var(--flight-panel-accent);
-  border-color: var(--flight-panel-accent);
-}
-
-.flight-hud__ap {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  align-self: stretch;
-  width: 28px;
-  min-height: 0;
-  padding: 0;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: inherit;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  appearance: none;
-  cursor: pointer;
-  pointer-events: auto;
-}
-
-.flight-hud__ap:hover {
-  border-color: rgba(255, 255, 255, 0.32);
-}
-
-.flight-hud__ap:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 210, 80, 0.45);
-}
-
-.flight-hud__ap.is-on {
-  color: #11161a;
-  background: var(--flight-panel-accent);
-  border-color: var(--flight-panel-accent);
-}
-
-.flight-hud__ap.is-blocked:not(.is-on) {
-  opacity: 0.55;
 }
 
 .flight-hud__yaw-throttle {
@@ -268,263 +131,37 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.flight-hud__yaw-control {
-  display: grid;
-  gap: 4px;
-  font-size: 9px;
-  letter-spacing: 0;
-  opacity: 0.9;
-}
-
-.flight-hud__yaw-heading {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.flight-hud__yaw-control input[type="range"] {
-  width: 100%;
-  min-width: 0;
-  height: 18px;
-  margin: 0;
-  accent-color: var(--flight-panel-accent);
-  cursor: ew-resize;
-}
-
-.flight-hud__yaw-control output {
-  min-width: 2.2em;
-  text-align: right;
-  font-size: 9px;
-  opacity: 0.8;
-}
-
-.flight-hud__slider-control {
-  display: grid;
-  justify-items: center;
-  gap: 3px;
-  width: 28px;
-  padding: 4px 2px;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  font-size: 10px;
-  pointer-events: auto;
-}
-
 .flight-hud__throttle .flight-hud__slider-control {
   padding: 0;
   border: 0;
   background: transparent;
 }
 
-.flight-hud__slider-control > span,
-.flight-hud__slider-control output {
-  font-size: 9px;
-  letter-spacing: 0;
-  opacity: 0.8;
-}
-
-.flight-hud__slider-control input[type="range"] {
-  width: 14px;
-  margin: 0;
-  writing-mode: vertical-lr;
-  direction: rtl;
-  accent-color: var(--flight-panel-accent);
-  cursor: ns-resize;
-}
-
 .flight-hud__auto-trims {
   grid-column: 1;
   grid-row: 1;
-  position: relative;
-  display: grid;
-  grid-template: 1fr / 1fr;
   justify-self: end;
   align-self: end;
   width: var(--flight-auto-trim-size);
   height: var(--flight-auto-trim-size);
-  overflow: hidden;
-  border-radius: 5px;
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.flight-hud__auto-trims::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    to bottom left,
-    transparent calc(50% - 0.6px),
-    rgba(255, 255, 255, 0.28) 50%,
-    transparent calc(50% + 0.6px)
-  );
-}
-
-.flight-hud__auto-trim {
-  display: flex;
-  flex-direction: column;
-  grid-area: 1 / 1;
-  gap: 1px;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: inherit;
-  font-family: inherit;
-  font-size: 7px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  line-height: 1;
-  appearance: none;
-  cursor: pointer;
-}
-
-.flight-hud__auto-trim--roll {
-  clip-path: polygon(0 0, 100% 0, 100% 100%);
-  align-items: flex-end;
-  justify-content: flex-start;
-  padding: 3px 3px 0 0;
-  text-align: right;
-}
-
-.flight-hud__auto-trim--pitch {
-  clip-path: polygon(0 0, 0 100%, 100% 100%);
-  align-items: flex-start;
-  justify-content: flex-end;
-  padding: 0 0 3px 3px;
-}
-
-.flight-hud__auto-trim:hover {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.flight-hud__auto-trim:focus-visible {
-  outline: none;
-  box-shadow: inset 0 0 0 2px rgba(255, 210, 80, 0.45);
-}
-
-.flight-hud__auto-trim.is-on {
-  color: #11161a;
-  background: var(--flight-panel-accent);
 }
 
 .flight-hud__slider-control--roll-trim {
   grid-column: 2;
   grid-row: 1;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  grid-template-rows: 1fr;
-  align-items: center;
-  align-self: center;
-  gap: 6px;
-  width: auto;
   height: var(--flight-roll-trim-height);
-  padding: 0 8px;
-}
-
-.flight-hud__slider-control--roll-trim input[type="range"] {
-  width: 100%;
-  height: 12px;
-  writing-mode: horizontal-tb;
-  direction: ltr;
-  cursor: ew-resize;
-}
-
-.flight-hud__slider-control input[type="range"]:disabled {
-  cursor: default;
-  opacity: 0.9;
-}
-
-.flight-hud__lever {
-  display: flex;
-  align-items: stretch;
-  gap: 4px;
-  min-width: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  pointer-events: auto;
 }
 
 .flight-hud__lever--pitch {
   grid-column: 1;
   grid-row: 2;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 3px;
   min-width: var(--flight-auto-trim-size);
 }
 
 .flight-hud__lever--flaps {
   grid-column: 3;
   grid-row: 2;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 3px;
   min-width: var(--flight-auto-trim-size);
-}
-
-.flight-hud__lever-meta {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 2px;
-  min-width: 0;
-  font-size: 9px;
-  letter-spacing: 0;
-  opacity: 0.8;
-}
-
-.flight-hud__lever--pitch .flight-hud__lever-meta,
-.flight-hud__lever--flaps .flight-hud__lever-meta {
-  flex: 0 0 auto;
-  align-items: center;
-  text-align: center;
-}
-
-.flight-hud__lever--pitch .flight-hud__lever-track,
-.flight-hud__lever--flaps .flight-hud__lever-track {
-  flex: 1 1 auto;
-  width: var(--flight-lever-thickness);
-  min-height: 0;
-}
-
-.flight-hud__lever-track {
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-  flex: 0 0 var(--flight-lever-thickness);
-  width: var(--flight-lever-thickness);
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 2px 0;
-}
-
-.flight-hud__lever-track input[type="range"] {
-  width: 10px;
-  height: 100%;
-  margin: 0;
-  writing-mode: vertical-lr;
-  direction: rtl;
-  accent-color: var(--flight-panel-accent);
-  cursor: ns-resize;
-}
-
-.flight-hud__lever-track input[type="range"]:disabled {
-  cursor: default;
-  opacity: 0.9;
 }
 
 .flight-hud__throttle .flight-hud__slider-control input[type="range"] {
