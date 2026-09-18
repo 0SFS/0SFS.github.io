@@ -5,6 +5,9 @@ import {
   formatRowValue, formatValue, readEngineSample, tankRows,
   type EnginePhaseReading, type EngineReader, type EngineRow, type EngineSample,
 } from "./engineMonitorModel";
+import { createEngineSummary, engineSummaryView, type FuelFlowUnit } from "./engineSummary";
+
+export { closestUprightRingAngle } from "./engineSummary";
 
 /**
  * Live engine monitor. The HUD keeps a compact spool diagram (N1 around N2)
@@ -24,9 +27,14 @@ export interface EngineMonitorOptions {
   onOpen?: () => void;
 }
 
+/** The latest reading, for a second surface that shows the engine — the phone controller. */
+export interface EngineReading { sample: EngineSample; phase: EnginePhaseReading }
+
 export interface EngineMonitorHandle {
   /** Call every rendered frame; readings are cheap and the DOM refreshes at `refreshIntervalMs`. */
   update(reader: EngineReader): void;
+  /** What `update` last read, or null before the first frame. Never re-reads the model. */
+  getReading(): EngineReading | null;
   /** Move the detail view into a tab host. Detach with the returned function. */
   attachDetails(host: HTMLElement): () => void;
   destroy(): void;
@@ -36,7 +44,7 @@ const STORAGE_KEY = "osfs.engineMonitor.v1";
 /** Sections closed until opened; everything else starts open. */
 const CLOSED_BY_DEFAULT: ReadonlySet<string> = new Set(["all"]);
 
-interface Layout { open: Record<string, boolean>; flowUnit: "lb/h" | "gal/h" }
+interface Layout { open: Record<string, boolean>; flowUnit: FuelFlowUnit }
 
 function defaultStorage(): Pick<Storage, "getItem" | "setItem"> | null {
   try { return window.localStorage; } catch { return null; }
@@ -64,84 +72,6 @@ function element<K extends keyof HTMLElementTagNameMap>(
   return node;
 }
 
-function formatSpoolPct(value: number): string {
-  const rounded = Math.round(value * 10) / 10;
-  return rounded === 100 ? "100" : rounded.toFixed(1);
-}
-
-function formatThrustLbf(value: number): string {
-  return Math.round(Math.abs(value)).toString().padStart(4, "0");
-}
-
-function padFuelFlow(value: number): string {
-  return Math.round(Math.abs(value)).toString().padStart(4, "0");
-}
-
-/** Used only when JSBSim has mass flow but no volume flow. */
-const LB_PER_US_GAL = 6.7;
-
-const SPOOL_RING_FRAC = 0.39;
-const SPOOL_N1_VALUE_ANGLE = 180;
-const SPOOL_THRUST_VALUE_ANGLE = 0;
-const SPOOL_RING_PAD_PX = 2;
-
-function ringCenter(radius: number, angleDeg: number): { x: number; y: number } {
-  const rad = (angleDeg * Math.PI) / 180;
-  return { x: radius * Math.sin(rad), y: -radius * Math.cos(rad) };
-}
-
-function uprightBoxesOverlap(
-  ax: number, ay: number, aw: number, ah: number,
-  bx: number, by: number, bw: number, bh: number,
-  pad: number,
-): boolean {
-  return Math.abs(ax - bx) < (aw + bw) / 2 + pad && Math.abs(ay - by) < (ah + bh) / 2 + pad;
-}
-
-/** Smallest angle from `fromDeg` along `dir` where an upright mark on the ring clears the value. */
-export function closestUprightRingAngle(
-  radius: number,
-  value: { w: number; h: number },
-  mark: { w: number; h: number },
-  fromDeg: number,
-  dir: 1 | -1,
-  pad = SPOOL_RING_PAD_PX,
-): number {
-  const origin = ringCenter(radius, fromDeg);
-  let lo = 0;
-  let hi = 80;
-  for (let i = 0; i < 18; i++) {
-    const mid = (lo + hi) / 2;
-    const point = ringCenter(radius, fromDeg + dir * mid);
-    if (uprightBoxesOverlap(origin.x, origin.y, value.w, value.h, point.x, point.y, mark.w, mark.h, pad)) lo = mid;
-    else hi = mid;
-  }
-  return fromDeg + dir * hi;
-}
-
-function placeOnRing(node: HTMLElement, radiusPx: number, angleDeg: number): void {
-  node.style.transform =
-    `translate(-50%, -50%) rotate(${angleDeg}deg) translateY(${-radiusPx}px) rotate(${-angleDeg}deg)`;
-}
-
-function ringRadiusPx(spools: HTMLElement): number {
-  const measured = spools.clientWidth * SPOOL_RING_FRAC;
-  if (measured > 0) return measured;
-  const width = parseFloat(getComputedStyle(spools).width);
-  if (Number.isFinite(width) && width > 0) return width * SPOOL_RING_FRAC;
-  return 4.25 * 16 * SPOOL_RING_FRAC;
-}
-
-function measureBox(node: HTMLElement, fallbackFontPx: number, fallbackChars = 1): { w: number; h: number } {
-  if (node.offsetWidth > 0 && node.offsetHeight > 0) {
-    return { w: node.offsetWidth, h: node.offsetHeight };
-  }
-  const font = parseFloat(getComputedStyle(node).fontSize);
-  const px = Number.isFinite(font) && font > 0 ? font : fallbackFontPx;
-  const chars = Math.max(fallbackChars, (node.textContent ?? "").length || 1);
-  return { w: px * 0.62 * chars, h: px * 1.15 };
-}
-
 let instanceCount = 0;
 
 export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOptions = {}): EngineMonitorHandle {
@@ -157,43 +87,8 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
   toggle.type = "button";
   toggle.title = "Open engine details";
   toggle.setAttribute("aria-expanded", "false");
-  const phaseChip = element("span", "flight-engine__phase", "…");
-  const spools = element("span", "flight-engine__spools");
-  spools.hidden = true;
-  const n1Ring = element("span", "flight-engine__spool flight-engine__spool--n1");
-  const thrustValue = element("span", "flight-engine__spool-value", "—");
-  const thrustLabel = element("span", "flight-engine__spool-label", "T");
-  const thrustUnit = element("span", "flight-engine__spool-unit", "lbf");
-  const thrustReadout = element("span", "flight-engine__spool-thrust");
-  thrustReadout.append(thrustLabel, thrustValue, thrustUnit);
-  const n2Core = element("span", "flight-engine__spool flight-engine__spool--n2");
-  const n2Value = element("span", "flight-engine__spool-value", "—");
-  n2Core.append(
-    element("span", "flight-engine__spool-label", "N2"),
-    n2Value,
-    element("span", "flight-engine__spool-unit", "%"),
-  );
-  const n1Value = element("span", "flight-engine__spool-value", "—");
-  const n1Label = element("span", "flight-engine__spool-label", "N1");
-  const n1Unit = element("span", "flight-engine__spool-unit", "%");
-  const n1Readout = element("span", "flight-engine__spool-n1");
-  n1Readout.append(n1Label, n1Value, n1Unit);
-  n1Ring.append(thrustReadout, n2Core, n1Readout);
-  spools.append(n1Ring);
-  const diagram = element("span", "flight-engine__diagram");
-  const flow = element("span", "flight-engine__flow");
-  flow.hidden = true;
-  flow.title = "Fuel flow. Click to switch pounds and gallons per hour.";
-  const flowValue = element("span", "flight-engine__flow-value");
-  const flowUnit = element("span", "flight-engine__flow-unit", "lb/h");
-  flow.append(
-    element("span", "flight-engine__flow-label", "⛽"),
-    flowValue,
-    flowUnit,
-  );
-  diagram.append(flow, spools, phaseChip);
-  const summaryValues = element("span", "flight-engine__values");
-  toggle.append(diagram, summaryValues);
+  const summary = createEngineSummary();
+  toggle.append(summary.diagram, summary.values);
   const panel = element("div", "flight-engine__details");
   panel.id = `flight-engine-details-${++instanceCount}`;
   toggle.setAttribute("aria-controls", panel.id);
@@ -222,33 +117,6 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
   const refreshNow = (): void => {
     lastRender = Number.NEGATIVE_INFINITY;
     if (lastReader) handle.update(lastReader);
-  };
-
-  let spoolRingPacked = false;
-  const packRingTriplet = (
-    radius: number,
-    valueNode: HTMLElement,
-    labelNode: HTMLElement,
-    unitNode: HTMLElement,
-    valueAngle: number,
-    labelDir: 1 | -1,
-    unitDir: 1 | -1,
-  ): void => {
-    const value = measureBox(valueNode, 10, 4);
-    placeOnRing(valueNode, radius, valueAngle);
-    placeOnRing(labelNode, radius, closestUprightRingAngle(
-      radius, value, measureBox(labelNode, 8), valueAngle, labelDir,
-    ));
-    placeOnRing(unitNode, radius, closestUprightRingAngle(
-      radius, value, measureBox(unitNode, 8), valueAngle, unitDir,
-    ));
-  };
-  const packSpoolRingOnce = (): void => {
-    if (spoolRingPacked) return;
-    spoolRingPacked = true;
-    const radius = ringRadiusPx(spools);
-    packRingTriplet(radius, n1Value, n1Label, n1Unit, SPOOL_N1_VALUE_ANGLE, 1, -1);
-    packRingTriplet(radius, thrustValue, thrustLabel, thrustUnit, SPOOL_THRUST_VALUE_ANGLE, -1, 1);
   };
 
   const detachDetails = (): void => {
@@ -336,38 +204,7 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
   };
 
   const summarize = (sample: EngineSample, phase: EnginePhaseReading): void => {
-    phaseChip.textContent = phase.label;
-    phaseChip.dataset.phase = phase.phase;
-    const turbine = sample.n1Pct !== null && sample.n2Pct !== null;
-    spools.hidden = !turbine;
-    if (turbine) {
-      n1Value.textContent = formatSpoolPct(sample.n1Pct!);
-      n2Value.textContent = formatSpoolPct(sample.n2Pct!);
-      thrustValue.textContent = sample.thrustLbf === null ? "0000" : formatThrustLbf(sample.thrustLbf);
-      spools.title = `N1 ${formatSpoolPct(sample.n1Pct!)}% · N2 ${formatSpoolPct(sample.n2Pct!)}%`
-        + (sample.thrustLbf === null ? "" : ` · thrust ${Math.round(sample.thrustLbf)} lbf`);
-      packSpoolRingOnce();
-    }
-    const hasFlow = sample.fuelFlowPps !== null || sample.fuelFlowGph !== null;
-    flow.hidden = !hasFlow;
-    if (hasFlow) {
-      if (layout.flowUnit === "gal/h") {
-        const gph = sample.fuelFlowGph ?? (sample.fuelFlowPps !== null ? sample.fuelFlowPps * 3600 / LB_PER_US_GAL : 0);
-        flowValue.textContent = padFuelFlow(gph);
-        flowUnit.textContent = "gal/h";
-      } else {
-        const pph = sample.fuelFlowPps !== null
-          ? sample.fuelFlowPps * 3600
-          : (sample.fuelFlowGph !== null ? sample.fuelFlowGph * LB_PER_US_GAL : 0);
-        flowValue.textContent = padFuelFlow(pph);
-        flowUnit.textContent = "lb/h";
-      }
-    }
-    const parts: string[] = [];
-    if (!turbine && sample.rpm !== null) parts.push(`RPM ${sample.rpm.toFixed(0)}`);
-    if (!turbine && sample.thrustLbf !== null) parts.push(`THR ${Math.round(sample.thrustLbf)} lbf`);
-    summaryValues.hidden = parts.length === 0;
-    summaryValues.textContent = parts.join("  ");
+    summary.render(engineSummaryView(sample, phase), layout.flowUnit);
   };
 
   const soundRows = (status: FlightAudioStatus | null): [string, string][] => {
@@ -426,7 +263,9 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
     if (allSection?.open) for (const { path, cell } of allCells) cell.textContent = formatValue(reader.getPropertyValue(path));
   };
 
+  let reading: EngineReading | null = null;
   const handle: EngineMonitorHandle = {
+    getReading: () => reading,
     update(reader) {
       if (destroyed) return;
       lastReader = reader;
@@ -437,6 +276,7 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
       }
       const sample = readEngineSample(reader, available);
       const phase = deriveEnginePhase(sample);
+      reading = { sample, phase };
       const state = discreteEngineState(sample, phase);
       const time = now();
       const due = time - lastRender >= refreshMs;
@@ -472,13 +312,14 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
     destroy() {
       if (destroyed) return;
       destroyed = true;
+      reading = null;
       detachDetails();
       container.remove();
     },
   };
 
   toggle.addEventListener("click", () => { if (!destroyed) options.onOpen?.(); });
-  flow.addEventListener("click", (event) => {
+  summary.flow.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
     layout.flowUnit = layout.flowUnit === "gal/h" ? "lb/h" : "gal/h";
