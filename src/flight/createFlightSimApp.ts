@@ -50,6 +50,7 @@ import {
   type LoggingPanelState,
 } from "./hud/LoggingPanel";
 import { createEngineMonitor } from "./hud/engineMonitor";
+import { toEngineStatus } from "./remote/engineStatus";
 import { createCollisionDebugOverlay } from "./diagnostics/createCollisionDebugOverlay";
 import { createWheelSpinDebugOverlay } from "./diagnostics/createWheelSpinDebugOverlay";
 import { createWheelSpinExperiment } from "./physics/createWheelSpinExperiment";
@@ -80,11 +81,17 @@ import {
   setActiveFlightPerformanceCapture,
 } from "./diagnostics/flightPerformanceCapture";
 import {
+  createPhoneCameraTrace,
+  isPhoneCameraTraceEnabled,
+  setActivePhoneCameraTrace,
+} from "./diagnostics/phoneCameraTrace";
+import {
   createAircraftModel,
   type AircraftModelHandle,
   type AircraftModelState,
 } from "./aircraft/createAircraftModel";
-import { readFlightState } from "./bridge/ecefBridge";
+import { flightAttitudeToQuaternion, readFlightState } from "./bridge/ecefBridge";
+import type { FlightState } from "./physics/flightState";
 import { createFloatingOrigin, type FloatingOriginHandle } from "./bridge/floatingOrigin";
 import {
   type FlightControlPanelHandle,
@@ -115,7 +122,14 @@ import {
   type ControlArbiterResult,
 } from "./autopilot/controlArbiter";
 import type { PhoneControlSession } from "./remote/createPhoneControlSession";
-import type { PhonePairingDialog } from "./hud/createPhonePairingDialog";
+import type { CameraAim } from "../remote/protocol";
+import {
+  describePhoneCameraTuning,
+  loadPhoneCameraTuning,
+  savePhoneCameraTuning,
+  type PhoneCameraTuning,
+} from "./remote/phoneCameraTuning";
+import type { MountPhonePairing } from "./hud/RemoteControlTab";
 import { createFlightInputManager } from "./input/flightInputManager";
 import {
   createFlightGamepadAdapter,
@@ -136,6 +150,7 @@ import { getFdmProfile } from "./jsbsim/fdmProfiles";
 import { createFixedStepPhysicsLoop, FIXED_DT } from "./physics/fixedStepLoop";
 import { createFlightLoadingScreen, type FlightLoadingScreen } from "../loading/createFlightLoadingScreen";
 import { createGameLog, type GameLog } from "../log/createGameLog";
+import { appHref } from "../appRoute";
 import { DEFAULT_FLIGHT_START, START_ALTITUDE_AGL_METERS } from "./jsbsim/bootstrapC172";
 
 export interface FlightSimAppOptions {
@@ -191,6 +206,12 @@ const CAMERA_ORBIT_PITCH_MAX = Math.PI * 0.45;
 const CAMERA_ORBIT_RESTORE_PITCH = Math.atan2(2.2, 14);
 const CAMERA_ORBIT_RESTORE_YAW = 0;
 const CAMERA_ORBIT_RETURN_SECONDS = 0.45;
+/**
+ * The phone sends a swipe in CSS pixels scaled by 1/1000, so this works out at
+ * 0.005 rad per pixel — the same rate a mouse drag on the desktop canvas uses,
+ * which is why a swipe there and a swipe on the phone feel like one gesture.
+ */
+const PHONE_SWIPE_RADIANS = 5;
 
 function readPreference<T>(key: string, legacyKey: string, isValid: (value: unknown) => value is T, fallback: T): T {
   try {
@@ -485,9 +506,7 @@ export async function createFlightSimApp(
   let placementAbort = startupAbort;
 
   let phoneSession: PhoneControlSession | null = null;
-  let phoneDialog: PhonePairingDialog | null = null;
-  let phoneLoading: Promise<void> | null = null;
-  let detachPhoneStatus: (() => void) | null = null;
+  let phonePairing: Promise<MountPhonePairing> | null = null;
   const inputManager = createFlightInputManager({
     initialThrottle: jsbsim.sdk.getPropertyValue("fcs/throttle-cmd-norm"),
     initialGearDown: jsbsim.sdk.getPropertyValue("gear/gear-cmd-norm") > 0.5,
@@ -696,6 +715,13 @@ export async function createFlightSimApp(
   const flightPerformance = isFlightPerformanceCaptureEnabled()
     ? createFlightPerformanceCapture() : null;
   if (flightPerformance) setActiveFlightPerformanceCapture(flightPerformance);
+  // The same idea for the phone's camera trackpad (`phoneCameraTrace=1`): every
+  // hop from the phone's touch to the orbit drawn here, with both clocks.
+  const phoneCameraTrace = isPhoneCameraTraceEnabled()
+    ? createPhoneCameraTrace({
+      getSettings: () => ({ recenterMode: orbitInvert.recenterMode, phoneSwipeRadians: PHONE_SWIPE_RADIANS, tuning: { ...phoneCameraTuning } }),
+    }) : null;
+  if (phoneCameraTrace) setActivePhoneCameraTrace(phoneCameraTrace);
   const flightHud: FlightHudHandle = createFlightHud(hudRoot, {
     onGearChange: (down) => { inputManager.setGearDown(down); runtime.requestRender(); },
     onThrottleChange: (value) => { inputManager.setThrottle(value); runtime.requestRender(); },
@@ -842,10 +868,16 @@ export async function createFlightSimApp(
   let inputMode = loadInputModePreference(new Set(["mouse", "trackpad"]));
   let inputSensitivity = loadInputSensitivityPreference();
   let orbitInvert = loadOrbitInvertSettings();
+  // The phone trackpad's A/B settings (Remote Control tab). Read live by the
+  // phone session and each frame, so a change is felt on the next swipe.
+  let phoneCameraTuning: PhoneCameraTuning = loadPhoneCameraTuning();
+  let phoneCameraVariant = describePhoneCameraTuning(phoneCameraTuning);
+  let chaseFrameApplied: PhoneCameraTuning["chaseFrame"] = "attitude";
   let orbitStateYaw = CAMERA_ORBIT_RESTORE_YAW;
   let orbitStatePitch = CAMERA_ORBIT_RESTORE_PITCH;
-  const orbitInputSources = new Set<"gamepad" | "manual">();
-  const setOrbitInputActive = (source: "gamepad" | "manual", active: boolean): void => {
+  type OrbitInputSource = "gamepad" | "manual" | "phone";
+  const orbitInputSources = new Set<OrbitInputSource>();
+  const setOrbitInputActive = (source: OrbitInputSource, active: boolean): void => {
     if (active) orbitInputSources.add(source);
     else orbitInputSources.delete(source);
   };
@@ -856,6 +888,43 @@ export async function createFlightSimApp(
     orbitStatePitch = clamp(orbitStatePitch + pitch, CAMERA_ORBIT_PITCH_MIN, CAMERA_ORBIT_PITCH_MAX);
     aircraft.orbitChaseCamera(yaw, pitch);
     runtime.requestRender();
+  };
+  const applyCameraZoom = (factor: number): void => {
+    if (!aircraft || aircraft.getViewMode() !== "third") return;
+    aircraft.zoomChaseCamera(factor);
+    aircraftModel?.refreshAutoLod();
+    runtime.requestRender();
+  };
+  /**
+   * The phone controller's camera trackpad. It sends what the fingers did —
+   * a swipe as a fraction of the pad, a pinch as a spread ratio — so this is a
+   * one-to-one gesture like the mouse drag, not something integrated over time.
+   * A full-pad swipe is a little over a third of a turn before sensitivity.
+   */
+  const applyPhoneCameraAim = (): CameraAim | null => {
+    setOrbitInputActive("phone", phoneSession?.isCameraActive() ?? false);
+    const aim = phoneSession?.takeCameraAim() ?? null;
+    if (!aim) return null;
+    // Deliberately not the desktop's pointer sensitivity: that setting belongs
+    // to a mouse or a laptop trackpad, and a phone is neither.
+    if (aim.yaw !== 0 || aim.pitch !== 0) {
+      applyOrbitDelta(
+        aim.yaw * PHONE_SWIPE_RADIANS * (orbitInvert.invertYaw ? -1 : 1),
+        aim.pitch * PHONE_SWIPE_RADIANS * (orbitInvert.invertPitch ? -1 : 1),
+      );
+    }
+    // A pinch apart brings the aircraft closer, which is a smaller distance.
+    if (aim.zoom !== undefined && aim.zoom !== 1) applyCameraZoom(1 / aim.zoom);
+    return aim;
+  };
+  /** Keeps the chase camera out of whichever aircraft rotations the setting leaves out. */
+  const applyChaseFrame = (state: FlightState): void => {
+    const frame = phoneCameraTuning.chaseFrame;
+    if (!aircraft || (frame === "attitude" && chaseFrameApplied === "attitude")) return;
+    chaseFrameApplied = frame;
+    aircraft.setChaseFrame(frame === "attitude" ? null : flightAttitudeToQuaternion(
+      0, frame === "no-roll" ? state.pitchRad : 0, state.headingRad,
+    ));
   };
   const recenterOrbit = (deltaSeconds: number): void => {
     if (!aircraft || aircraft.getViewMode() !== "third") return;
@@ -879,12 +948,7 @@ export async function createFlightSimApp(
       applyOrbitDelta(yaw, pitch);
     },
     onOrbitActive: (active) => setOrbitInputActive("manual", active),
-    zoom: (factor) => {
-      if (!aircraft || aircraft.getViewMode() !== "third") return;
-      aircraft.zoomChaseCamera(factor);
-      aircraftModel?.refreshAutoLod();
-      runtime.requestRender();
-    },
+    zoom: applyCameraZoom,
   });
   let skipResumeDelta = false;
   let disposed = false;
@@ -1120,6 +1184,7 @@ export async function createFlightSimApp(
       modelError: modelState.error,
       keyboardStick: inputManager.getKeyboardStickSettings(),
       orbitInvert,
+      phoneCameraTuning,
       arcadeGroundLaunches,
       collisionDebugEnabled,
       wheelSpinMode,
@@ -1282,45 +1347,51 @@ export async function createFlightSimApp(
     });
   };
 
-  const openPhoneController = (): void => {
-    if (phoneDialog) { phoneDialog.open(); return; }
-    if (phoneLoading) return;
-    hudBar?.setPhoneStatus?.("Connecting phone…");
-    phoneLoading = Promise.all([
-      import("./remote/createPhoneControlSession"), import("./hud/createPhonePairingDialog"),
-    ]).then(([{ createPhoneControlSession }, { createPhonePairingDialog }]) => {
-      if (disposed) return;
-      phoneSession = createPhoneControlSession({
-        getStatus: () => {
-          const state = physicsLoop.getLatestState() ?? initialState;
-          return {
-            owner: phoneSession?.getSnapshot().owner ?? "local",
-            paused: inputManager.isPaused(), viewMode: aircraft?.getViewMode() ?? "third",
-            controls: phoneSession?.getSnapshot().owner === "phone" ? { ...appliedControls } : inputManager.getControls(),
-            airspeedKts: state.airspeedKts, altitudeFt: state.altMeters / 0.3048,
-            headingDeg: (state.headingRad * 180 / Math.PI + 360) % 360,
-          };
-        },
-        hasActiveLocalInput: () => inputManager.hasActiveFlightInput(),
-        isPageVisible: () => !document.hidden,
-        onOwnershipChange: (owner, controls) => {
-          inputManager.adoptControls(controls);
-          inputManager.setRemoteOwned(owner === "phone");
-          appliedControls = { ...controls };
-          runtime.requestRender();
-        },
-        setPaused: setSimulationPaused,
-        setViewMode: mode => { aircraft?.setViewMode(mode); runtime.requestRender(); },
-      });
-      detachPhoneStatus = phoneSession.subscribe(() => {
-        const state = phoneSession!.getSnapshot();
-        hudBar?.setPhoneStatus?.(state.owner === "phone" ? "Phone controls" : state.phase === "paired" ? "Phone paired · Desktop controls" : "Phone controller");
-      });
-      phoneDialog = createPhonePairingDialog(rootElement, phoneSession);
-      phoneDialog.open();
-    }).catch(() => { if (!disposed) hudBar?.setPhoneStatus?.("Phone unavailable · Retry"); })
-      .finally(() => { phoneLoading = null; });
-  };
+  /**
+   * Pairing loads with the Remote Control tab, not with the flight: PeerJS and
+   * the QR encoder are fetched only for a pilot who opens it. The session is
+   * made once and outlives the tab, so switching tabs keeps the phone.
+   */
+  const loadPhonePairing = (): Promise<MountPhonePairing> => phonePairing ??= Promise.all([
+    import("./remote/createPhoneControlSession"), import("./hud/createPhonePairingPanel"),
+  ]).then(([{ createPhoneControlSession }, { createPhonePairingPanel }]): MountPhonePairing => {
+    if (disposed) throw new Error("The flight has closed.");
+    const session = phoneSession ??= createPhoneControlSession({
+      getStatus: () => {
+        const state = physicsLoop.getLatestState() ?? initialState;
+        return {
+          owner: phoneSession?.getSnapshot().owner ?? "local",
+          paused: inputManager.isPaused(), viewMode: aircraft?.getViewMode() ?? "third",
+          controls: phoneSession?.getSnapshot().owner === "phone" ? { ...appliedControls } : inputManager.getControls(),
+          airspeedKts: state.airspeedKts, altitudeFt: state.altMeters / 0.3048,
+          headingDeg: (state.headingRad * 180 / Math.PI + 360) % 360,
+          // Presence of this field is what tells the phone it may offer a G button.
+          gearDown: inputManager.getGearDownNorm() > 0,
+          // The same reading the HUD's engine chip is drawing from, so both
+          // screens show one engine rather than two sampled at two times.
+          engine: toEngineStatus(engineMonitor.getReading()),
+        };
+      },
+      hasActiveLocalInput: () => inputManager.hasActiveFlightInput(),
+      isPageVisible: () => !document.hidden,
+      onOwnershipChange: (owner, controls) => {
+        inputManager.adoptControls(controls);
+        inputManager.setRemoteOwned(owner === "phone");
+        appliedControls = { ...controls };
+        runtime.requestRender();
+      },
+      setPaused: setSimulationPaused,
+      setViewMode: mode => { aircraft?.setViewMode(mode); runtime.requestRender(); },
+      // A paused simulation renders only on request; keep frames coming while
+      // the phone is orbiting, the way a mouse drag does.
+      onCameraAim: () => runtime.requestRender(),
+      getCameraTuning: () => phoneCameraTuning,
+      ...(phoneCameraTrace ? { trace: phoneCameraTrace } : {}),
+      // Same path the HUD's G button and the G key take, so the three stay in step.
+      setGearDown: down => { inputManager.setGearDown(down); flightHud.setGearDown(down); runtime.requestRender(); },
+    });
+    return (host, panelOptions) => createPhonePairingPanel(host, session, panelOptions);
+  }).catch((error: unknown) => { phonePairing = null; throw error; });
   const onVisibilityChange = () => {
     if (!document.hidden) return;
     haptics.cancel();
@@ -1416,6 +1487,13 @@ export async function createFlightSimApp(
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
       runtime.requestRender();
     },
+    onPhoneCameraTuningChange: (tuning) => {
+      phoneCameraTuning = tuning;
+      phoneCameraVariant = describePhoneCameraTuning(tuning);
+      savePhoneCameraTuning(tuning);
+      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+      runtime.requestRender();
+    },
     onCollisionDebugChange: (enabled) => {
       collisionDebugEnabled = enabled;
       syncCollisionDebugOverlay();
@@ -1465,6 +1543,9 @@ export async function createFlightSimApp(
     attachEngineDetails: (host) => engineMonitor.attachDetails(host),
     onLoggingAction: handleLoggingAction,
     flightRecorder,
+    loadPhonePairing,
+    // A clean /rc/: nothing the simulator was opened with means anything there.
+    onUseAsRemote: () => window.location.assign(appHref("rc", new URL(window.location.origin))),
     onArcadeGroundLaunchesChange: (enabled) => {
       arcadeGroundLaunches = enabled;
       writePreference(ARCADE_GROUND_LAUNCHES_PREFERENCE_KEY, enabled ? "on" : "off");
@@ -1517,7 +1598,6 @@ export async function createFlightSimApp(
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
       runtime.requestRender();
     },
-    onPhoneControlClick: openPhoneController,
     onSettingsClick: () => panelRoot.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')?.click(),
     onDebugClick: () => controlPanel?.openOrSelectTab("debug"),
     onLogToggle: () => {
@@ -1578,6 +1658,10 @@ export async function createFlightSimApp(
     // Do not integrate the time spent idle when resuming the simulation.
     deltaSeconds = skipResumeDelta ? 0 : Math.min(deltaSeconds, 0.1);
     skipResumeDelta = false;
+    const phoneAimAt = phoneCameraTrace ? performance.now() : 0;
+    const phoneAim = applyPhoneCameraAim();
+    // Paced playout draws over several frames; a paused view renders only on request.
+    if (phoneSession?.hasPendingCameraAim()) runtime.requestRender();
     recenterOrbit(deltaSeconds);
 
     fpsSampleFrames += 1;
@@ -1732,6 +1816,7 @@ export async function createFlightSimApp(
     });
 
     floatingOrigin?.apply(displayState);
+    applyChaseFrame(displayState);
     const audioCamera = runtime.scene.activeCamera;
     if (aircraft && audioCamera && flightAudio.isEngineActive()) {
       flightAudio.updateView({
@@ -1763,6 +1848,16 @@ export async function createFlightSimApp(
     flightRecorder.sample(jsbsim.sdk);
     evaluationInstruments.update(jsbsim.sdk);
     engineMonitor.update(jsbsim.sdk);
+    phoneCameraTrace?.renderFrame({
+      at: phoneAimAt, intervalMs: frameIntervalMs,
+      dxPx: (phoneAim?.yaw ?? 0) * 1000, dyPx: (phoneAim?.pitch ?? 0) * 1000, zoom: phoneAim?.zoom ?? 1,
+      gestureActive: phoneSession?.isCameraActive() ?? false,
+      orbitYaw: orbitStateYaw, orbitPitch: orbitStatePitch, variant: phoneCameraVariant,
+      rollDeg: displayState.rollRad * 180 / Math.PI, pitchDeg: displayState.pitchRad * 180 / Math.PI,
+      headingDeg: displayState.headingRad * 180 / Math.PI,
+      viewMode: aircraft?.getViewMode() ?? "third",
+      mapDownloadBytesPerSecond: runtime.getMapDownloadBytesPerSecond(),
+    });
     if (flightPerformance) {
       const tileMetrics = runtime.getTileMetrics();
       flightPerformance.record({
@@ -1795,8 +1890,6 @@ export async function createFlightSimApp(
         loading.destroy();
         if (!options.log) log.destroy();
       }
-      detachPhoneStatus?.();
-      phoneDialog?.destroy();
       phoneSession?.destroy();
       document.removeEventListener("visibilitychange", onVisibilityChange);
       unbindRecorderMark();
@@ -1809,6 +1902,7 @@ export async function createFlightSimApp(
       detachCameraInput();
       detachInput();
       if (flightPerformance) setActiveFlightPerformanceCapture(null);
+      if (phoneCameraTrace) setActivePhoneCameraTrace(null);
       hudBar?.destroy();
       statusOverlay?.destroy();
       controlPanel?.destroy();

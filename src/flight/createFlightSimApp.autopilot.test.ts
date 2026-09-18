@@ -50,7 +50,7 @@ const mocks = vi.hoisted(() => {
     },
     createHud: vi.fn(() => ({ update: vi.fn(), setGearDown: vi.fn(), destroy: vi.fn() })),
     createPanel: vi.fn(() => ({ update: vi.fn(), openOrSelectTab: vi.fn(), destroy: vi.fn() })),
-    createHudBar: vi.fn(() => ({ update: vi.fn(), setPhoneStatus: vi.fn(), destroy: vi.fn() })),
+    createHudBar: vi.fn(() => ({ update: vi.fn(), destroy: vi.fn() })),
   };
 });
 vi.mock("foss-earth/runtime", () => ({

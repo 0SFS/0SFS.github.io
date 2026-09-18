@@ -1,9 +1,13 @@
 import { createPeerEndpoint, type SessionTransport, type PeerEndpoint } from "../../remote/peerTransport";
-import { createJoinSecret, createPairingUrl, INVITATION_TTL_MS } from "../../remote/pairing";
+import { createConnectionLog, describeIceFailure, type ConnectionLog } from "../../remote/connectionDiagnostics";
+import { createJoinSecret, createPairingUrl, createSessionId, INVITATION_TTL_MS } from "../../remote/pairing";
+import { createPhoneCameraReceiver } from "./phoneCameraPlayout";
+import { DEFAULT_PHONE_CAMERA_TUNING, type PhoneCameraTuning } from "./phoneCameraTuning";
 import {
   HANDOFF_MS, HAPTIC_FEEDBACK_TTL_MS, HAPTIC_FEEDBACK_VERSION, HEARTBEAT_MS, MAX_HAPTIC_PULSE_MS, STALE_MS,
   PROTOCOL_MISMATCH_MESSAGE, isCentered, isProtocolVersionMismatch, neutralize, parseMessage,
-  type ActionMessage, type AircraftStatus, type ControlFrame, type ControlSurfaceState, type HapticFeedbackFrame, type RemoteMessage,
+  type ActionMessage, type AircraftStatus, type CameraAim, type ControlFrame, type ControlSurfaceState,
+  type HapticFeedbackFrame, type RemoteMessage,
 } from "../../remote/protocol";
 
 export interface PhoneSessionSnapshot {
@@ -21,8 +25,31 @@ export interface PhoneControlSessionOptions {
   onOwnershipChange(owner: "local" | "phone", controls: ControlSurfaceState): void;
   setPaused(paused: boolean): void;
   setViewMode(mode: "first" | "third"): void;
+  /** Absent hosts simply never advertise `gearDown`, so no phone offers the control. */
+  setGearDown?(down: boolean): void;
+  /**
+   * Called when a camera gesture arrives. A paused host renders only on
+   * request, so without this the pad would be dead exactly when someone wants
+   * to look at the aircraft — the desktop's own mouse drag schedules its frame
+   * from the pointer event, and this is the phone's equivalent.
+   */
+  onCameraAim?(): void;
+  /** The A/B camera settings, read as each frame arrives and each view is drawn. Defaults to the original behaviour. */
+  getCameraTuning?(): PhoneCameraTuning;
+  /**
+   * The opt-in camera trace. Present, the heartbeat asks the phone for its
+   * timings, and every control frame that reaches this session is reported
+   * with what became of it. Measurement only.
+   */
+  trace?: PhoneControlTraceSink;
   now?: () => number;
   createEndpoint?: typeof createPeerEndpoint;
+  log?: ConnectionLog;
+}
+/** Why a control frame was not used. `accepted` frames moved the controls and the camera. */
+export type ControlFrameOutcome = "accepted" | "not-owner" | "out-of-order" | "stale-lease" | "handoff-mismatch" | "rate-window";
+export interface PhoneControlTraceSink {
+  controlFrame(frame: ControlFrame, outcome: ControlFrameOutcome, receivedAt: number): void;
 }
 interface PendingHandoff {
   id: number; baseline: ControlSurfaceState; paused: boolean; deadline: number; ack: boolean; frame: ControlFrame | null;
@@ -31,12 +58,15 @@ interface PendingHandoff {
 /** The desktop, not PeerJS Cloud, authenticates the invitation and owns flight authority. */
 export function createPhoneControlSession(options: PhoneControlSessionOptions) {
   const now = options.now ?? (() => performance.now());
+  // One log for the dialog's lifetime: repeated pairing attempts stay in a
+  // single timeline, which is what a bug report needs.
+  const log = options.log ?? createConnectionLog("desktop", now);
   const isPageVisible = options.isPageVisible ?? (() => true);
   const listeners = new Set<() => void>();
   const transports = new Set<SessionTransport>();
   const cleanup = new Map<SessionTransport, () => void>();
   let snapshot: PhoneSessionSnapshot = {
-    phase: "off", message: "Phone controller", owner: "local", invitationUrl: null, expiresAt: null, signalingAvailable: true,
+    phase: "off", message: "No phone paired.", owner: "local", invitationUrl: null, expiresAt: null, signalingAvailable: true,
   };
   let endpoint: PeerEndpoint | null = null;
   let active: SessionTransport | null = null;
@@ -106,8 +136,20 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     return Boolean(lease && lease.epoch === epoch && now() - lease.time <= STALE_MS);
   };
   const freshInput = () => Boolean(latest && now() - latest.receivedAt <= STALE_MS && freshLease(latest.frame.lease));
+  const tuning = (): PhoneCameraTuning => options.getCameraTuning?.() ?? DEFAULT_PHONE_CAMERA_TUNING;
+  /**
+   * Trackpad movement that has arrived but not yet been drawn. Frames can land
+   * faster than the host renders, so every one is kept rather than overwriting
+   * one another — dropping a swipe on the floor because two frames shared a
+   * video frame is how a trackpad comes out feeling slow. How it is read and
+   * when it is drawn are the A/B settings in `phoneCameraTuning.ts`.
+   *
+   * A view, not a control surface: it cannot refresh a lease, take authority or
+   * advance physics.
+   */
+  const aim = createPhoneCameraReceiver(tuning);
   const newEpoch = () => {
-    epoch += 1; latest = null; lastSeq = -1; leases.clear(); actions.clear(); pending = null; pendingStatus = null; feedback = null;
+    epoch += 1; latest = null; lastSeq = -1; leases.clear(); actions.clear(); pending = null; pendingStatus = null; feedback = null; aim.reset();
     maxActionId = -1; lastAppliedSeq = undefined; receiveToApplyMs = undefined; frameTimes.length = 0;
   };
   const issueLease = () => {
@@ -155,6 +197,7 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
   };
   const fail = (message: string) => {
     if (disposed) return;
+    log.recordFailure("session", "host-failure", message);
     revoke(message, true);
     generation += 1;
     closeAll();
@@ -212,6 +255,9 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
       options.setPaused(message.value as boolean);
     } else if (message.action === "setViewMode") {
       options.setViewMode(message.value as "first" | "third");
+    } else if (message.action === "setGearDown") {
+      if (!options.setGearDown) { acknowledge(message.id, false, "This simulator cannot move the gear."); return; }
+      options.setGearDown(message.value as boolean);
     }
     acknowledge(message.id, true, "Applied");
     publishStatus(snapshot.owner === "phone" ? "Phone controls" : "Desktop controls");
@@ -221,17 +267,23 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     if (!message && isProtocolVersionMismatch(input)) { rejectVersion(); return; }
     if (!message || !("session" in message) || message.session !== session || message.epoch !== epoch || !localReady || !remoteReady) return;
     if (message.type === "ping") { active?.sendNative({ ...message, type: "pong" }, true); return; }
-    if (message.type !== "controls" || (!pending && snapshot.owner !== "phone") || message.seq <= lastSeq || !freshLease(message.lease)) return;
-    if (pending && (!isCentered(message.controls)
-      || ["throttle", "pitchTrim", "rollTrim", "flaps"].some(key => message.controls[key as keyof ControlSurfaceState] !== pending!.baseline[key as keyof ControlSurfaceState]))) return;
+    if (message.type !== "controls") return;
     const receivedAt = now();
+    const report = (outcome: ControlFrameOutcome) => { options.trace?.controlFrame(message, outcome, receivedAt); };
+    if (!pending && snapshot.owner !== "phone") { report("not-owner"); return; }
+    if (message.seq <= lastSeq) { report("out-of-order"); return; }
+    if (!freshLease(message.lease)) { report("stale-lease"); return; }
+    if (pending && (!isCentered(message.controls)
+      || ["throttle", "pitchTrim", "rollTrim", "flaps"].some(key => message.controls[key as keyof ControlSurfaceState] !== pending!.baseline[key as keyof ControlSurfaceState]))) { report("handoff-mismatch"); return; }
     while (frameTimes.length && receivedAt - frameTimes[0] >= 1000) frameTimes.shift();
     // The phone schedules 60 Hz plus prompt touch/release events up to 120 Hz.
     // Also bound accepted input here so excessive frames cannot refresh authority.
-    if (frameTimes.length >= 120) return;
+    if (frameTimes.length >= 120) { report("rate-window"); return; }
+    report("accepted");
     frameTimes.push(receivedAt);
     lastSeq = message.seq;
     latest = { frame: message, receivedAt };
+    if (snapshot.owner === "phone" && aim.receive(message, receivedAt)) options.onCameraAim?.();
     if (pending) { pending.frame = message; maybeGrant(); }
   };
 
@@ -284,13 +336,15 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
             transport.close(); return;
           }
           // Consume the invitation before any asynchronous native channel setup.
-          active = transport; secret = null; session = crypto.randomUUID(); maxActionId = -1;
+          active = transport; secret = null; session = createSessionId(); maxActionId = -1;
           clearTimeout(helloTimer);
           newEpoch();
           publish({ phase: "authenticating", invitationUrl: null, expiresAt: null, message: "Connecting phone controls…" });
           setupTimer = setTimeout(() => {
             if (!disposed && currentGeneration === generation && active === transport && (!localReady || !remoteReady)) {
-              fail("Could not connect directly. Try the same non-guest Wi-Fi network.");
+              const stalled = localReady ? "the phone never confirmed its control channel" : "this computer never opened its control channel";
+              fail(log.facts().failure?.detail
+                ?? `Could not connect directly: ${stalled}. ${describeIceFailure(log.facts())}`);
             }
           }, 15_000);
           for (const other of [...transports]) if (other !== active) other.close();
@@ -308,7 +362,10 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
               clearTimeout(setupTimer); setupTimer = undefined;
               publish({ phase: "paired", message: "Phone paired · Desktop controls" });
             }
-          }).catch(() => { if (!rejectingVersion && !disposed && currentGeneration === generation) fail("Could not connect directly. Try the same non-guest Wi-Fi network."); });
+          }).catch(() => {
+            if (rejectingVersion || disposed || currentGeneration !== generation) return;
+            fail(log.facts().failure?.detail ?? `Could not connect directly. ${describeIceFailure(log.facts())}`);
+          });
           return;
         }
         if (!("session" in message) || message.session !== session || message.epoch !== epoch) return;
@@ -362,10 +419,15 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     active.sendNative({ ...envelope(), type: "heartbeat", lease,
       ...(ticks % 2 === 0 ? { status: status(), appliedSeq: lastAppliedSeq, receiveToApplyMs } : {}),
       ...takeFeedback(),
+      ...(options.trace ? { trace: 1 as const } : {}),
+      // Absent means the original timing, which is all an older phone knows.
+      ...(tuning().send === "batch" ? { controlSend: "batch" as const } : {}),
     }, true);
   }, HEARTBEAT_MS);
 
   return {
+    /** The pairing timeline, for the dialog's diagnostics panel and bug reports. */
+    log,
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
     getSnapshot: () => snapshot,
     async startPairing() {
@@ -373,8 +435,9 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
       disconnect();
       const currentGeneration = generation;
       publish({ phase: "preparing", message: "Preparing connection…" });
+      log.reset("Creating a new QR");
       try {
-        const next = (options.createEndpoint ?? createPeerEndpoint)({ onConnection: transport => {
+        const next = (options.createEndpoint ?? createPeerEndpoint)({ log, role: "desktop", onConnection: transport => {
           if (disposed || currentGeneration !== generation) { transport.close(); return; }
           accept(transport);
         }, onSignalingState: available => {
@@ -385,7 +448,11 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
         if (disposed || currentGeneration !== generation) { next.destroy(); return; }
         secret = createJoinSecret();
         publish({ phase: "invitation", message: "Scan with your phone camera", invitationUrl: createPairingUrl(peerId, secret), expiresAt: now() + INVITATION_TTL_MS });
-      } catch { if (!disposed && currentGeneration === generation) fail("Pairing service unavailable. Retry."); }
+      } catch (error: unknown) {
+        if (disposed || currentGeneration !== generation) return;
+        fail(log.facts().failure?.detail
+          ?? (error instanceof Error && error.message ? error.message : "Pairing service unavailable. Retry."));
+      }
     },
     disconnect,
     takeControl(message = "Desktop controls") { revoke(message, false); },
@@ -400,6 +467,15 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
       lastAppliedSeq = latest!.frame.seq;
       return { ...latest!.frame.controls };
     },
+    /** The gesture movement to draw this frame, if any is owed. */
+    takeCameraAim(): CameraAim | null {
+      const movement = aim.take(now());
+      return snapshot.owner === "phone" ? movement : null;
+    },
+    /** Movement has arrived that a later frame still has to draw: keep frames coming. */
+    hasPendingCameraAim: () => snapshot.owner === "phone" && aim.pending(),
+    /** Whether a gesture is still in progress, so auto-recenter can wait for it. */
+    isCameraActive: () => snapshot.owner === "phone" && (now() - aim.lastMovementAt() <= STALE_MS || aim.pending()),
     onHidden() { revoke("Desktop hidden · Simulation paused", true); },
     /**
      * Presentation only. Replaces any unsent pulse; 0 asks the phone to stop.
