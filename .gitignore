@@ -6,3 +6,7 @@ GOOGLE_3D_TILES.local.md
 # Local build/validation artifacts; identities and outcomes are documented.
 # Generated benchmark fixtures belong here (e.g. build/benchmarks/audio/).
 /build/
+
+# Python bytecode, written whenever Blender or a script imports a module.
+__pycache__/
+*.pyc
