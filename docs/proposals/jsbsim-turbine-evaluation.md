@@ -71,6 +71,7 @@ N2 at about 0.57% and consumed no additional fuel after RunIC.
 
 Those exploratory files remain local scratch material under
 `/tmp/jsbsim-trim-guard-hpzclhb6`; they are not durable contribution evidence.
+*(2026-09-18: gone; macOS empties `/private/tmp` on every restart.)*
 There was no separate #1505 candidate build, corrected WASM build, immediate
 cutoff-transition test, custom TSFC/injection fixture or runtime AugMethod 1
 test. The experiment supports the narrow guard, not the architecture proposed

@@ -2,27 +2,25 @@
 // real AudioWorkletGlobalScope. Same approach as benchmarks/wheels/run-audio-headless.mjs:
 // a Vite library bundle loaded from a file URL into headless Chromium. No server.
 //
-//   PLAYWRIGHT_MODULE=/path/to/playwright/index.mjs node benchmarks/audio/run-worklet-headless.mjs [outDir]
+//   node benchmarks/audio/run-worklet-headless.mjs [outDir]
+//
+// Writes to a new build/benchmarks/audio/worklet-check/<date_time>/ unless outDir
+// is given. Playwright is found as benchmarks/playwright.mjs describes.
 //
 // Result kind "headless-worklet-check": proves the load path only. OfflineAudioContext
 // has no output route, so it says nothing about dropouts or real-time performance.
 import { build } from "vite";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { newOutputDirectory } from "../../scripts/outputDirectory.mjs";
+import { importPlaywright } from "../playwright.mjs";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
-const moduleName = process.env.PLAYWRIGHT_MODULE;
-let chromium;
-try {
-  ({ chromium } = await import(moduleName ? pathToFileURL(path.resolve(moduleName)).href : "playwright"));
-} catch (error) {
-  throw new Error("Install Playwright separately and set PLAYWRIGHT_MODULE to its index.mjs, or install playwright in this project.", { cause: error });
-}
+const { chromium } = await importPlaywright();
 
-const outputDirectory = process.argv[2] ? path.resolve(process.argv[2]) : mkdtempSync(path.join(tmpdir(), "audio-worklet-check-"));
+const outputDirectory = process.argv[2] ? path.resolve(process.argv[2]) : newOutputDirectory("benchmarks", "audio", "worklet-check");
 mkdirSync(outputDirectory, { recursive: true });
 const wasm = readFileSync(path.join(root, "src/flight/audio/dsp/audio-dsp.wasm"));
 const workletSource = readFileSync(path.join(root, "src/flight/audio/worklet/dspProcessor.js"), "utf8");

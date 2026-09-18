@@ -1,10 +1,10 @@
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { getSf50PilotProfile } from "../src/flight/validation/sf50PilotProfiles.ts";
+import { newOutputDirectory } from "./outputDirectory.mjs";
 
 const args = process.argv.slice(2);
 if (args.some(arg => !["--sdk-root=", "--out=", "--profiles="].some(prefix => arg.startsWith(prefix)))) {
@@ -21,7 +21,7 @@ const hash = bytes => createHash("sha256").update(bytes).digest("hex");
 const wasmSha256 = hash(readFileSync(join(sdkRoot, "dist/wasm/jsbsim_wasm.wasm")));
 const sdkEntrySha256 = hash(readFileSync(join(sdkRoot, "dist/index.js")));
 const outputArg = value("--out=");
-const output = outputArg ? resolve(outputArg) : mkdtempSync(join(tmpdir(), "sf50-pilot-calibration-"));
+const output = outputArg ? resolve(outputArg) : newOutputDirectory("validation", "sf50-pilot-calibration");
 if (outputArg) mkdirSync(output);
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const modelHashes = new Map();

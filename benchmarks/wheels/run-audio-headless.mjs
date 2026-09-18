@@ -1,17 +1,12 @@
 import { build } from "vite";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { newOutputDirectory } from "../../scripts/outputDirectory.mjs";
+import { importPlaywright } from "../playwright.mjs";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
-const moduleName = process.env.PLAYWRIGHT_MODULE;
-let chromium;
-try {
-  ({ chromium } = await import(moduleName ? pathToFileURL(path.resolve(moduleName)).href : "playwright"));
-} catch (error) {
-  throw new Error("Install Playwright separately and set PLAYWRIGHT_MODULE to its index.mjs, or install playwright in this project.", { cause: error });
-}
+const { chromium } = await importPlaywright();
 
 const scriptedChirp = [
   { timeSeconds: 0, slipPowerWatts: 0 },
@@ -30,7 +25,7 @@ const comparison = suppliedManifest ? JSON.parse(readFileSync(suppliedManifest, 
     { name: "bounded-loud-input", samples: [{ timeSeconds: 0, slipPowerWatts: 1e30 }] },
   ],
 };
-const outputDirectory = process.argv[3] ? path.resolve(process.argv[3]) : mkdtempSync(path.join(tmpdir(), "tire-audio-check-"));
+const outputDirectory = process.argv[3] ? path.resolve(process.argv[3]) : newOutputDirectory("benchmarks", "wheels", "tire-audio");
 mkdirSync(outputDirectory, { recursive: true });
 const result = await build({
   root,

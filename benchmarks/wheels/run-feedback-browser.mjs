@@ -7,22 +7,19 @@
 // cross-origin-isolated. The WebGL renderer string is recorded so a software
 // fallback (SwiftShader/llvmpipe) is labelled rather than reported as GPU.
 //
-//   PLAYWRIGHT_MODULE=/path/to/playwright/index.mjs node benchmarks/wheels/run-feedback-browser.mjs [out.json]
+//   node benchmarks/wheels/run-feedback-browser.mjs [out.json]
+//
+// Playwright is found as benchmarks/playwright.mjs describes.
 import { build } from "vite";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import os from "node:os";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
+import { importPlaywright } from "../playwright.mjs";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
-const moduleName = process.env.PLAYWRIGHT_MODULE;
-let chromium;
-try {
-  ({ chromium } = await import(moduleName ? pathToFileURL(path.resolve(moduleName)).href : "playwright"));
-} catch (error) {
-  throw new Error("Install Playwright separately and set PLAYWRIGHT_MODULE to its index.mjs.", { cause: error });
-}
+const { chromium } = await importPlaywright();
 const output = process.argv[2] ? path.resolve(process.argv[2])
   : fileURLToPath(new URL("../../../foss-earth/benchmarks/wheels/results-feedback-browser.json", import.meta.url));
 

@@ -6,13 +6,14 @@ import {
   parseEvidenceCsv, parseNumericEvidenceTable, SF50_PUBLIC_STATIONS,
 } from "../src/flight/validation/sf50PublicEvidence.ts";
 import { SF50_AFM_SOURCE, SF50_ISA_DISTANCE_ROWS } from "../src/flight/validation/sf50AfmData.ts";
+import { newOutputDirectory } from "./outputDirectory.mjs";
 
 const args = process.argv.slice(2);
 const value = prefix => args.find(arg => arg.startsWith(prefix))?.slice(prefix.length);
-if (args.length !== 2 || !value("--raw-root=") || !value("--out=")) {
-  throw new Error("Usage: node scripts/analyze-sf50-public-evidence.mjs --raw-root=PATH --out=NEW_DIRECTORY");
+if (!value("--raw-root=") || args.some(arg => !["--raw-root=", "--out="].some(prefix => arg.startsWith(prefix)))) {
+  throw new Error("Usage: node scripts/analyze-sf50-public-evidence.mjs --raw-root=PATH [--out=NEW_DIRECTORY]");
 }
-const rawRoot = resolve(value("--raw-root=")), output = resolve(value("--out="));
+const rawRoot = resolve(value("--raw-root=")), outArg = value("--out=");
 const manifest = JSON.parse(readFileSync(new URL("../planes/Cirrus_Vision_Jet/tests/public-evidence/manifest.json", import.meta.url), "utf8"));
 const csvFiles = new Map(), provenance = [];
 for (const source of manifest.sources) {
@@ -66,7 +67,9 @@ const broadRecorderInventory = {
   ],
 };
 const eligibility = evaluateSf50EvidenceReview({ sourceKind: "recording", provenanceVerified: true });
-mkdirSync(output);
+// Default: a new build/validation/sf50-evidence-analysis/<date_time>/.
+const output = outArg ? resolve(outArg) : newOutputDirectory("validation", "sf50-evidence-analysis");
+if (outArg) mkdirSync(output);
 const save = (name, data) => writeFileSync(join(output, name), JSON.stringify(data, null, 2) + "\n", { flag: "wx" });
 save("cen21-normalized.json", recording);
 save("cen23-inventory.json", broadRecorderInventory);

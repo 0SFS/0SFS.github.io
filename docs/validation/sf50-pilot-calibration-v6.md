@@ -90,6 +90,10 @@ WASM SHA-256: 4e8c4a199aefe6bed6067f86ad4c24ee4aa3a894fe4c9c1b34c148dfdbfa9091
 SDK entry SHA-256: a499e03992c8d959eea25686c0f2ae3efa85cd4b14e3a484acc7eb13bc52f4ec
 ```
 
+> **2026-09-18:** both temporary directories above are gone; macOS empties `/private/tmp` on every restart.
+> The raw reports survive only as the checked-in summary, and the rebuilt SDK
+> only as the hashes above, so the commands below cannot run as written.
+
 With Node v22.22.3, the new named-profile comparison command is:
 
 ```sh
@@ -97,7 +101,7 @@ node scripts/calibrate-sf50-pilot.mjs \
   --sdk-root=/private/tmp/sf50-v5-validation.30axFG/sdk
 ```
 
-This creates a fresh temporary report directory and runs five named profiles against only the two calibration cases. It is a reproducible comparison of the extracted profiles, not an exact replay of every exploratory variant. To request only the selected profile:
+This creates a new dated report directory under the gitignored `build/validation/sf50-pilot-calibration/` and runs five named profiles against only the two calibration cases. It is a reproducible comparison of the extracted profiles, not an exact replay of every exploratory variant. To request only the selected profile:
 
 ```sh
 SF50_AFM_CASES=calibration SF50_PILOT_PROFILE=development-v6 \

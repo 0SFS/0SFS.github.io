@@ -10,15 +10,16 @@
 //
 // The build is NOT byte-reproducible across toolchain patch levels; the
 // committed artifact is the authority, exactly as docs/jsbsim.md says of the
-// flight-dynamics module. Run with --check to compile to a temporary directory
-// and diff the exports instead of replacing the committed binary.
+// flight-dynamics module. Run with --check to compile into a new
+// build/validation/audio-wasm-check/<date_time>/ and diff the exports instead of
+// replacing the committed binary.
 
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { newOutputDirectory } from "./outputDirectory.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const sourceDir = path.join(root, "src/flight/audio/dsp");
@@ -92,7 +93,7 @@ export async function main(argv) {
       "and a note in docs/validation/audio-implementation-ledger.md.");
   }
   const destination = check
-    ? mkdtempSync(path.join(tmpdir(), "osfs-audio-check-"))
+    ? newOutputDirectory("validation", "audio-wasm-check")
     : outputDir;
   mkdirSync(destination, { recursive: true });
   const wasmPath = path.join(destination, "audio-dsp.wasm");

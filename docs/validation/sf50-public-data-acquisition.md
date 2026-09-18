@@ -130,18 +130,18 @@ Use Node with native TypeScript stripping for the analyzer. This run used Node v
 
 ~~~sh
 node scripts/analyze-sf50-public-evidence.mjs \
-  --raw-root=planes/Cirrus_Vision_Jet/tests/public-evidence/raw \
-  --out=/private/tmp/sf50-evidence-analysis-new
+  --raw-root=planes/Cirrus_Vision_Jet/tests/public-evidence/raw
 ~~~
 
 To reacquire the exact pinned sources into a fresh directory:
 
 ~~~sh
-node scripts/collect-sf50-public-evidence.mjs \
-  --out=/private/tmp/sf50-evidence-download-new
+node scripts/collect-sf50-public-evidence.mjs
 ~~~
 
-Both commands refuse an existing output directory. Download changes fail the pinned hash rather than silently replacing the evidence. The collector is explicitly networked; the analyzer is offline and checks source integrity before parsing.
+Each writes a new dated folder under the gitignored `build/validation/`
+(`sf50-evidence-analysis/` and `sf50-evidence-download/`). `--out=` chooses
+another; both commands refuse an existing output directory. Download changes fail the pinned hash rather than silently replacing the evidence. The collector is explicitly networked; the analyzer is offline and checks source integrity before parsing.
 
 The offline analyzer and 42 focused unit cases now pass; the network collector remains unexecuted. Results are retained in public-audit-test-results.json. The original snapshot is historical and is not overwritten. The dated audit distinguishes the original analyzer's 47-source coverage from the 34 supplementary artifacts and research-only extraction.
 

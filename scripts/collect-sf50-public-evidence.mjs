@@ -2,14 +2,17 @@ import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { newOutputDirectory } from "./outputDirectory.mjs";
 
 const args = process.argv.slice(2);
-if (args.length !== 1 || !args[0].startsWith("--out=") || !args[0].slice(6)) {
-  throw new Error("Usage: node scripts/collect-sf50-public-evidence.mjs --out=NEW_DIRECTORY");
+if (args.length > 1 || (args.length === 1 && (!args[0].startsWith("--out=") || !args[0].slice(6)))) {
+  throw new Error("Usage: node scripts/collect-sf50-public-evidence.mjs [--out=NEW_DIRECTORY]");
 }
-const output = resolve(args[0].slice(6));
+const outArg = args[0]?.slice(6);
 const manifest = JSON.parse(readFileSync(new URL("../planes/Cirrus_Vision_Jet/tests/public-evidence/manifest.json", import.meta.url), "utf8"));
-mkdirSync(output); // Refuse to overwrite an existing evidence collection.
+// Default: a new build/validation/sf50-evidence-download/<date_time>/.
+const output = outArg ? resolve(outArg) : newOutputDirectory("validation", "sf50-evidence-download");
+if (outArg) mkdirSync(output); // Refuse to overwrite an existing evidence collection.
 const attempts = [];
 for (const source of manifest.sources) {
   try {

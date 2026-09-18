@@ -367,7 +367,7 @@ at Low and 0.045–0.046 ms at Med.
 
 | Item | Why | Command when unblocked |
 | --- | --- | --- |
-| Headless worklet load check | The Playwright node module is not installed in this project (browser binaries are cached, the module is not). Installing packages was outside this assignment. | `PLAYWRIGHT_MODULE=/path/to/playwright/index.mjs node benchmarks/audio/run-worklet-headless.mjs` |
+| Headless worklet load check | The Playwright node module is not installed in this project (browser binaries are cached, the module is not). Installing packages was outside this assignment. | `npm install --prefix build/tools/playwright --no-audit --no-fund playwright`, then `node benchmarks/audio/run-worklet-headless.mjs` |
 | Real-time runs, soak, 3 × 240 s per device | Needs the named devices and a physical route | §5 protocol |
 | Dropout detection on a real capture | Needs loopback/OS capture per device, plus its induced-overload positive control | `detectDropouts()` from `benchmarks/audio/dropoutDetector.mjs` |
 | Listening review | No reviewers or level-matched sessions yet | — |
