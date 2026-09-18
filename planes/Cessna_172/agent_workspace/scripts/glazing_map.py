@@ -1,6 +1,6 @@
 """Colour every windshield / rear-window candidate face so specific polygons can
 be named unambiguously.  Legend is printed to stdout."""
-import bpy, sys, math
+import bpy, sys, math, os
 from mathutils import Vector
 a = sys.argv[sys.argv.index("--")+1:]
 BLEND, OUTDIR, PREFIX = a[0], a[1], a[2]
@@ -52,5 +52,5 @@ for i,(key, polys) in enumerate(sorted(groups.items())):
     print(f"  {PAL[i%len(PAL)][0]:8s} = {key[0]:11s} {key[1]:5s} seg, {key[2]:6s} side, {key[3]:5s} band   ({len(polys)} tris)")
 
 sc = bpy.context.scene
-bpy.ops.wm.save_as_mainfile(filepath="/tmp/dbg_glazing.blend")
+bpy.ops.wm.save_as_mainfile(filepath=os.path.join(OUTDIR, f"{PREFIX}_glazing.blend"))
 print("###SAVED###")

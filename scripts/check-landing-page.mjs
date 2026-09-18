@@ -3,28 +3,29 @@
  * Headless check of the information page, /fly/ boot, and /rc/ controller.
  * Serves `dist` through Chrome Fetch interception — no HTTP server.
  *
- * Usage: node scripts/check-landing-page.mjs --out=build/validation/landing/<new-dir> [--dist=dist]
+ * Usage: node scripts/check-landing-page.mjs [--out=/new/directory] [--dist=dist]
+ * Output: a new build/validation/landing/<date_time>/ unless --out names another.
  */
 import assert from "node:assert/strict";
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { evaluate, openHeadlessChrome, waitForExpression } from "./headless-chrome.mjs";
+import { newOutputDirectory } from "./outputDirectory.mjs";
 import { resolvePagesDistFile } from "./pagesDistFile.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const args = process.argv.slice(2);
 if (args.some((arg) => !arg.startsWith("--out=") && !arg.startsWith("--dist="))) {
-  throw new Error("Usage: check-landing-page.mjs --out=/new/directory [--dist=dist]");
+  throw new Error("Usage: check-landing-page.mjs [--out=/new/directory] [--dist=dist]");
 }
 const outArg = args.find((arg) => arg.startsWith("--out="))?.slice(6);
-if (!outArg) throw new Error("Supply a new --out directory for landing-page evidence.");
-const out = path.resolve(outArg);
 const dist = path.resolve(root, args.find((arg) => arg.startsWith("--dist="))?.slice(7) ?? "dist");
 await access(path.join(dist, "index.html"));
 await access(path.join(dist, "fly", "index.html"));
 await access(path.join(dist, "rc", "index.html"));
-await mkdir(out);
+const out = outArg ? path.resolve(outArg) : newOutputDirectory("validation", "landing");
+if (outArg) await mkdir(out);
 
 const mime = {
   ".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript", ".wasm": "application/wasm",

@@ -4,15 +4,15 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { evaluate, openHeadlessChrome, waitForExpression } from "./headless-chrome.mjs";
+import { newOutputDirectory } from "./outputDirectory.mjs";
 import { resolvePagesDistFile } from "./pagesDistFile.mjs";
 import { verifyInstalledSdk } from "./verify-jsbsim-artifact.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const args = process.argv.slice(2);
-if (args.some(arg => !arg.startsWith("--out=") && !arg.startsWith("--dist="))) throw new Error("Usage: check-jsbsim-browser-artifact.mjs --out=/new/directory [--dist=dist]");
+if (args.some(arg => !arg.startsWith("--out=") && !arg.startsWith("--dist="))) throw new Error("Usage: check-jsbsim-browser-artifact.mjs [--out=/new/directory] [--dist=dist]");
 const outArg = args.find(arg => arg.startsWith("--out="))?.slice(6);
-if (!outArg) throw new Error("Supply a new --out directory for browser acceptance evidence.");
-const out = path.resolve(outArg), dist = path.resolve(root, args.find(arg => arg.startsWith("--dist="))?.slice(7) ?? "dist");
+const dist = path.resolve(root, args.find(arg => arg.startsWith("--dist="))?.slice(7) ?? "dist");
 const hash = bytes => createHash("sha256").update(bytes).digest("hex");
 const installed = await verifyInstalledSdk(root);
 const built = JSON.parse(await readFile(path.join(dist, "jsbsim-artifact.json"), "utf8"));
@@ -22,7 +22,9 @@ assert.deepEqual(built.files, installed.files, "Build's source-file manifest dif
 for (const [name, digest] of Object.entries(built.emitted)) assert.equal(hash(await readFile(path.join(dist, name))), digest, "Stale emitted file: " + name);
 const manifestBytes = await readFile(path.join(dist, "jsbsim-data/manifest.json"));
 const manifest = JSON.parse(manifestBytes);
-await mkdir(out); // Earlier browser evidence must not be overwritten.
+// Default: a new build/validation/jsbsim-browser-artifact/<date_time>/.
+const out = outArg ? path.resolve(outArg) : newOutputDirectory("validation", "jsbsim-browser-artifact");
+if (outArg) await mkdir(out); // Earlier browser evidence must not be overwritten.
 const chrome = await openHeadlessChrome(path.join(out, "chrome-profile"));
 const results = [], failures = [], sessions = new Map();
 const mime = { ".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript", ".wasm": "application/wasm", ".css": "text/css", ".json": "application/json", ".xml": "text/xml", ".png": "image/png", ".jpg": "image/jpeg", ".svg": "image/svg+xml", ".woff2": "font/woff2", ".glb": "model/gltf-binary" };

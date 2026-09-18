@@ -200,11 +200,13 @@ successful bundling alone does not prove browser instantiation.
 Two bounded headless checks start no server or visible browser:
 
 ```sh
-node scripts/check-aircraft-selection-headless.mjs --out=/private/tmp/osfs-aircraft-ui-new
-node scripts/check-jsbsim-browser-artifact.mjs --out=/private/tmp/osfs-sdk-browser-new
+node scripts/check-aircraft-selection-headless.mjs
+node scripts/check-jsbsim-browser-artifact.mjs
 ```
 
-Each output directory must be new. The selection check bundles actual React
+Each run writes a new dated folder under the gitignored
+`build/validation/aircraft-selection/` or `build/validation/jsbsim-browser-artifact/`.
+`--out=` chooses another folder, which must be new. The selection check bundles actual React
 components and shell/CSS with a static flight snapshot, checks wide/narrow/short
 viewports, family keyboard navigation, staged G2+ selection and keyboard Apply,
 and saves screenshots. It does not instantiate an FDM. The built-app check

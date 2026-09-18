@@ -5,12 +5,13 @@ import { fileURLToPath } from "node:url";
 import { build } from "vite";
 import react from "@vitejs/plugin-react";
 import { evaluate, openHeadlessChrome, waitForExpression } from "./headless-chrome.mjs";
+import { newOutputDirectory } from "./outputDirectory.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const outArg = process.argv.slice(2).find(arg => arg.startsWith("--out="))?.slice(6);
-if (!outArg) throw new Error("Usage: check-aircraft-selection-headless.mjs --out=/new/artifact/directory");
-const out = path.resolve(outArg);
-await mkdir(out); // Refuse to overwrite earlier acceptance evidence.
+// Default: a new build/validation/aircraft-selection/<date_time>/.
+const out = outArg ? path.resolve(outArg) : newOutputDirectory("validation", "aircraft-selection");
+if (outArg) await mkdir(out); // Refuse to overwrite earlier acceptance evidence.
 const fixtureRoot = path.join(out, "fixture");
 const bundleRoot = path.join(out, "bundle");
 await mkdir(fixtureRoot);

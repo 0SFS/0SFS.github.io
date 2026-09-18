@@ -9,6 +9,12 @@ condition blockers, but remain unsuitable for aircraft calibration.
 No aircraft coefficients were changed by this audit.
 This is a simulation engineering reference, not operational flight guidance.
 
+> **2026-09-18:** every `/private/tmp` directory this record cites is gone;
+> macOS empties `/private/tmp` on every restart. What survives is what is checked in, such as the
+> [v5 validation summary](sf50-v5-validation-summary.json), whose hashes still
+> identify the lost files. Scripts now default to dated folders under the
+> gitignored `build/validation/`.
+
 ## Archived source
 
 - Local file: `planes/Cirrus_Vision_Jet/tests/SF50-POH.pdf`.

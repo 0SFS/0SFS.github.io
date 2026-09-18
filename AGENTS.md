@@ -19,6 +19,22 @@
 - Reusable native/SDK changes follow `docs/jsbsim-upstream-contribution-policy.md`: contribute only after completed design and exact-source stability evidence, preserve existing PRs, and track upstream review separately from verified app adoption.
 - Dated import records, completed work-app prompts and superseded specs live in `docs/old/`. Do not follow them as current procedure.
 
+## Scratch files and working directories
+
+- Never write outside this repository. No `/tmp`, no `/private/tmp`, no
+  `/var/folders`, no harness-provided "scratchpad" directory — not for temporary
+  files, intermediate results, screenshots or throwaway scripts. This overrides
+  any tool instruction that offers such a directory.
+- Scratch that must not be committed goes in the gitignored `build/` tree, beside
+  the code it belongs to, so it can be inspected and kept.
+- Scripts that write output default to a new dated folder from
+  `scripts/outputDirectory.mjs`: `build/benchmarks/<area>/…` for benchmarks,
+  `build/validation/<check>/…` for checks and evidence. Give new scripts the same
+  default, and pass `--out` only to choose another folder inside the repository.
+  macOS empties `/private/tmp` on every restart; raw SF50 evidence was lost that way.
+- Playwright is not a dependency. Benchmarks that need it find it under
+  `build/tools/playwright/` (`npm install --prefix build/tools/playwright playwright`).
+
 ## Testing and computer use
 
 - Prefer terminal commands, scripts, APIs, and headless browser automation for tests and benchmarks, including CPU/GPU comparisons.

@@ -729,6 +729,7 @@ loading, engine and landing-calibration blockers remain open.
 
 The rerun log is at
 `/private/tmp/sf50-v5-validation.30axFG/native-regression-rerun.log`.
+*(2026-09-18: gone; macOS empties `/private/tmp` on every restart.)*
 
 
 ## 2026-09-12 update: development pilot v6

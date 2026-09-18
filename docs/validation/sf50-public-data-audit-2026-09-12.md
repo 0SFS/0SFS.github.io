@@ -170,6 +170,9 @@ node scripts/analyze-sf50-public-evidence.mjs \
   --out=/private/tmp/sf50-public-audit.jEzxjB/offline-analysis
 ~~~
 
+*(2026-09-18: that output directory is gone; macOS empties `/private/tmp` on every restart. The script now
+writes to `build/validation/sf50-evidence-analysis/` by default.)*
+
 It checked the original 47 pinned sources, parsed 37 tables / 3,552 rows, and normalized the 450-row CEN21 engineering-unit export to 360 unique timestamps with 90 identical duplicates. Its evidence gate correctly remained blocked. The 24 distance-source comparisons are not 24 aircraft simulations.
 
 The focused Vitest run passed **42/42 cases in seven files**, with no skipped/pending cases:
