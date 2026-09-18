@@ -124,7 +124,14 @@ float* gBandStorage[kMaxBands] = {};
 int gBandCount = 0;
 
 Biquad gColour;
-Smoother gSpatial, gPan, gColourHz, gCombustion, gDelaySmoother;
+Smoother gSpatial, gPan, gColourHz, gCombustion, gRangeFade;
+/**
+ * Propagation delay in samples, integrated from the Doppler ratio rather than
+ * read straight off the geometry. See the propagation block in
+ * osfs_audio_process() for why the distance cannot drive it directly.
+ */
+double gDelaySamples = 0.0;
+bool gDelaySeeded = false;
 Smoother gN1, gN2, gThrust, gFuel, gKias, gGear, gFlap, gExterior;
 
 double gTireWatts = 0.0;
@@ -242,7 +249,9 @@ void resetVoices() {
                            &gFlap, &gExterior, &gCombustion, &gSpatial, &gPan};
   for (Smoother* s : smoothers) s->reset(0.0);
   gColourHz.reset(1200.0);
-  gDelaySmoother.reset(0.0);
+  gRangeFade.reset(1.0);
+  gDelaySamples = 0.0;
+  gDelaySeeded = false;
 }
 
 /** Ingests one snapshot, keeping the queue ordered by target frame. */
@@ -402,12 +411,10 @@ OSFS_EXPORT int osfs_audio_init(double sampleRate, int maxBlockFrames, unsigned 
   gDelay.configure(gDelayStorage, static_cast<int>(clamp(sampleRate * 0.5, 2.0, kDelayCapacity)));
   gConvolver.configure(gIrSpectra, gIrFdl, gIrScratch);
   for (Smoother* s : {&gN1, &gN2, &gThrust, &gFuel, &gKias, &gGear, &gFlap,
-                      &gExterior, &gCombustion, &gSpatial, &gPan, &gColourHz}) {
+                      &gExterior, &gCombustion, &gSpatial, &gPan, &gColourHz,
+                      &gRangeFade}) {
     s->configure(sampleRate, kSmoothTau);
   }
-  // The propagation delay carries the Doppler shift, so it is smoothed far more
-  // gently: a 10 ms constant on distance would sound like a pitch wobble.
-  gDelaySmoother.configure(sampleRate, 0.060);
   gIrSeconds = -1.0;
   for (int i = 0; i < kStatCount; ++i) gStats[i] = 0.0;
   clearQueue();
@@ -434,6 +441,9 @@ OSFS_EXPORT void osfs_audio_set_tier(int tier) {
   gTier = next;
   gShed = 0;
   applyCaps();
+  // Low does not run the delay line, so its tap is stale on the way back into
+  // Med. The fade below covers re-seating it from the current geometry.
+  gDelaySeeded = false;
   // §1: fade down, switch, fade up. Never run two engines to cross a tier.
   gFade = 0.0;
   beginFade(1.0, kTransitionFadeSeconds);
@@ -468,7 +478,10 @@ OSFS_EXPORT void osfs_audio_set_epoch(int epoch, double simTimeS, double audioFr
   clearQueue();
   gStats[kStatEpoch] = epoch;
   // A reset, a seek or a model replacement is a discontinuity: mute, rebase,
-  // and come back up rather than gliding through unrelated state.
+  // and come back up rather than gliding through unrelated state. That includes
+  // re-seating the propagation delay, so a teleport lands on its new range
+  // under the fade below instead of holding the old one.
+  gDelaySeeded = false;
   gFade = 0.0;
   beginFade(1.0, kTransitionFadeSeconds);
 }
@@ -649,6 +662,8 @@ OSFS_EXPORT void osfs_audio_process(double blockStartFrame, int frames) {
     const double soundSpeed = std::fmax(50.0, interpolated[kSoundSpeedMps]);
 
     double doppler = 1.0;
+    // Range rate along the source -> listener line, positive when opening.
+    double rangeRate = 0.0;
     if (distance > 1e-3) {
       // n is the unit vector source -> listener (sound.md §3).
       const double nx = -sx / distance, ny = -sy / distance, nz = -sz / distance;
@@ -659,6 +674,7 @@ OSFS_EXPORT void osfs_audio_process(double blockStartFrame, int frames) {
       const double denominator = soundSpeed - vs;
       doppler = std::fabs(denominator) > 1e-6 ? (soundSpeed - vl) / denominator : 1.0;
       doppler = clamp(sanitize(doppler, 1.0), 0.5, 2.0);
+      rangeRate = sanitize(vl - vs);
     }
 
     // ---- sources --------------------------------------------------------
@@ -677,22 +693,60 @@ OSFS_EXPORT void osfs_audio_process(double blockStartFrame, int frames) {
 
     // ---- propagation ----------------------------------------------------
     double direct = mono;
-    double distanceFade = 1.0;
     if (spatialTier) {
       gDelay.write(mono);
-      const double wanted = distance / soundSpeed * gSampleRate;
-      const double delaySamples = gDelaySmoother.process(wanted);
-      // Beyond the 0.5 s storage cap the path is faded out rather than
-      // clamped into a false stationary distance. At that range the 1/d law
-      // has already put the source near -45 dB.
-      distanceFade = 1.0 - clamp01((delaySamples - ceilingDelay) / (gSampleRate * 0.06));
-      direct = gDelay.read(delaySamples) * distanceFade;
+      // Sound arriving now left the source when it was `wanted` seconds ago, so
+      // the target solves tau = d(t - tau)/c, not d(t)/c. For constant velocity
+      // that is d / (c + rangeRate); the denominator gets the same 0.5..2 guard
+      // as the ratio itself. With a rigidly parented camera the range rate is 0
+      // and this is the plain distance/c the app has always used.
+      const double wanted = distance * gSampleRate
+          / clamp(soundSpeed + rangeRate, soundSpeed * 0.5, soundSpeed * 2.0);
+      // What the ear hears from a delay line is the RATE its read pointer
+      // moves, so that rate is the modelled Doppler ratio and nothing else.
+      // Distance sets where the tap sits, never how fast it travels.
+      //
+      // audioPose.ts reports a rigidly parented camera: it shares the
+      // aircraft's velocity, so the ratio is 1 and the tap holds still. A
+      // chase-camera zoom moves that same listener tens of metres between two
+      // 60 Hz snapshots, and reading the new distance as travel made every
+      // zoom an octave-wide pitch glide; a wide enough one walked the read
+      // pointer backwards into reversed audio. A view is not a flight path, so
+      // the tap now ignores it. Genuine motion still arrives through `doppler`,
+      // which is what the exterior flyby fixture exercises. Measured either way
+      // in docs/validation/evidence/audio/camera-zoom-med-2026-09-16.md.
+      //
+      // The tap is re-seated only at a declared discontinuity
+      // (osfs_audio_set_epoch) and on a tier change, where a fade already
+      // covers it.
+      if (gDelaySeeded) {
+        gDelaySamples += 1.0 - doppler;
+      } else {
+        gDelaySamples = wanted;
+        gDelaySeeded = true;
+      }
+      // The 0.5 s cap (sound.md §2) is a storage limit, and storage is all it
+      // may cost. The direct tap simply pins there: a pinned tap plays the
+      // right sound at the right level and only loses its absolute propagation
+      // lag, which has no audible reference, while fading it out would silence
+      // an engine that sound.md §3's own 1/d law says is still there - you can
+      // hear a jet from half a kilometre. Level at range is that law's job
+      // alone, exactly as at Low.
+      gDelaySamples = clamp(gDelaySamples, 1.0, gSampleRate * 0.5 - 2.0);
+      const double delaySamples = gDelaySamples;
+      direct = gDelay.read(delaySamples);
 
       const double pathDifference = interpolated[kGroundReflectionM];
       if (pathDifference >= 0.0) {
-        // One ground-image reflection, gain <= 0.25 (sound.md §3).
-        const double reflected = gDelay.read(delaySamples + pathDifference / soundSpeed * gSampleRate);
-        direct += reflected * 0.25 * distanceFade;
+        // One ground-image reflection, gain <= 0.25 (sound.md §3). This tap
+        // sits a path difference further back, so it reaches the cap first, and
+        // it is the one that does fade: a reflection pinned to the cap would
+        // comb at a path difference the geometry never asked for, and a wrong
+        // comb is audible in a way a wrong absolute lag is not.
+        const double reflectedDelay = delaySamples + pathDifference / soundSpeed * gSampleRate;
+        const double reflectedFade = gRangeFade.process(
+            1.0 - clamp01((reflectedDelay - ceilingDelay) / (gSampleRate * 0.06)));
+        direct += gDelay.read(reflectedDelay) * 0.25 * reflectedFade;
       }
     }
 

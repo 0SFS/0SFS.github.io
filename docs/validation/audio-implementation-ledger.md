@@ -58,7 +58,7 @@ core, limiter and holds as the engine.
 
 | Artifact | Value |
 | --- | --- |
-| `src/flight/audio/dsp/audio-dsp.wasm` | 42,542 bytes, sha256 `ef9369b6b64cd93fb976ff0a19571de38b3dc0d06fbb5e1d3b6a17b4fe8a4d41` |
+| `src/flight/audio/dsp/audio-dsp.wasm` | 42,740 bytes, sha256 `01367066b89f28d8d560c326216f507d821cbef57d091d0a4f85f309f99c238b` (was 42,542 / `ef9369b6…8a4d41` before §13) |
 | Only import | `env.emscripten_notify_memory_growth` |
 | Flags | `-O3 -std=c++17 --no-entry -sSTANDALONE_WASM=1 -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=2097152 -sSTACK_SIZE=131072 -sMALLOC=emmalloc -sERROR_ON_UNDEFINED_SYMBOLS=1 -sFILESYSTEM=0 -fno-exceptions -fno-rtti -fno-fast-math` |
 | `src/flight/audio/worklet/dspProcessor.js` | sha256 `aebee765ab0a6744679853d62ccf21e70b2a5853de3f00b87bb31fd1c5360e22` (plain JS, emitted verbatim) |
@@ -219,13 +219,19 @@ core, limiter and holds as the engine.
 - Tier caps: 12 partials plus a bypass band, and a 20 ms generated cabin impulse response through a
   128-sample partitioned FFT convolver.
 - Doppler on the whole source through a variable delay line (first-order `1 ± v/c`), capped at 0.5 s and
-  faded before the cap.
-- Air absorption and one ground-image reflection (gain 0.25, off when terrain is unknown).
+  faded before the cap. The line's read pointer is advanced by the velocity-derived ratio alone; distance
+  seats the tap but never moves it. See §13 for why, and for what happened when distance did move it.
+- Air absorption and one ground-image reflection (gain 0.25, off when terrain is unknown, and faded
+  out where its tap would pass the 0.5 s storage cap).
+- Level at range is `min(1, 1/d)` at every audible tier, with no distance cutoff: Med tracks Low to the
+  500 m zoom clamp at a constant −3.4 dB, which is the cabin IR and bypass band, not distance (§13).
 - Shedding ladder: partials 12→8→4, grains, IR 40→20→10→0, partials →2.
   Half-rate synthesis is deliberately **not** enabled: its cost is unmeasured.
-- Evidence (`dspCore.test.ts`): Doppler direction and magnitude, approaching and receding, at 44.1 and 48 kHz;
-  shed levels 1–6 keep the output finite and bounded; a tier switch fades from silence over 50 ms.
-  Fault-injection proxy covers the Med↔Low switch.
+- Evidence (`dspCore.test.ts`): shed levels 1–6 keep the output finite and bounded; a tier switch fades from
+  silence over 50 ms. Fault-injection proxy covers the Med↔Low switch.
+  Doppler magnitude and direction, and the camera-zoom behaviour, are in
+  `cameraZoomAudio.integration.test.ts` (§13). **This line previously claimed `dspCore.test.ts` held the
+  Doppler evidence. It did not; no such test existed.**
 - Resource results are **proxies only** (§5.3). Med cannot become effective in normal use: Auto never picks it
   without a qualified profile, and an explicit Med request runs Low with the reason shown. Only the
   session testing switch runs it.
@@ -269,8 +275,11 @@ This file, the status block at the top of sound.md, and the reviewer summary in 
 3. **Engine sound is Vision Jet only.** The C172 gets no turbofan; it keeps the tire cue.
 4. **Med is selectable but runs as Low** while unvalidated, with the reason shown, unless the session
    testing switch is on. High's option is disabled.
-5. **Doppler is first-order** via the delay line. The velocity-derived ratio only culls partials that would
-   alias. In the app both cameras are rigidly attached, so Doppler is 1 there; flybys are exercised offline.
+5. **Doppler is first-order** via the delay line, and the velocity-derived ratio is what drives it. It also
+   culls partials that would alias. In the app both cameras are rigidly attached, so Doppler is 1 there and
+   the tap holds still however the pilot zooms; flybys are exercised offline. The tap is seated from the
+   retarded range `d / (c + range rate)`, and re-seated only at an epoch, at a tier change, or while the
+   direct path is faded out (§13).
 6. **Slipped-clock re-anchor (150 ms)** was added beyond the spec's 0.5 s backlog rule, for the stall case in §3.
 7. **Underrun counters** are used where the browser has them, as fallback input only, marked unvalidated.
 8. **Bank payload format is raw float32 PCM.** It needs no decoder; whether compression is worth its
@@ -396,6 +405,10 @@ at Low and 0.045–0.046 ms at Med.
 
 - The app's stats line shows DSP p95/max and RAM as `n/a`: there is no per-block timer or resident-memory reading.
 - View mode is binary (third person = exterior) with 10 ms smoothing; there is no designed crossfade in the app.
+- The propagation delay is the pilot's *view* distance at the moment the tap was last seated, not a live
+  reading of it. For a rigidly parented camera that absolute lag has no listener to be wrong for; for a
+  detached listener it is kept honest by the Doppler rate. A published velocity that disagrees with the
+  published positions would let it drift, bounded by the 0.5 s line (§13).
 - Ground reflection uses a 2 × height-above-ground approximation.
 - Simulation speed k = 1 only.
 - A stopped engine still makes sound that rises and falls with airspeed. JSBSim's `FGTurbine::Off()` windmills
@@ -423,6 +436,14 @@ at Low and 0.045–0.046 ms at Med.
 - `docs/validation/evidence/audio/`:
   - start trace, geometry, property catalog
   - offline sweep and fault-injection proxy results
+
+**Added by §13 (2026-09-16).**
+
+- `src/flight/audio/cameraZoomAudio.integration.test.ts`: the real chase camera through `audioPose` into the
+  real WASM, covering camera-zoom pitch, level at range, genuine Doppler, and Low and cockpit as controls.
+- `docs/validation/evidence/audio/camera-zoom-med-2026-09-16.md` and
+  `offline-sweep-proxy-2026-09-16.json`.
+- `src/flight/audio/dsp/core.cpp` and its rebuilt WASM and provenance; `docs/sound.md` §2's storage-cap clause.
 
 **Modified.** These tracked files also carry pre-existing, unrelated uncommitted changes, which were kept;
 their diff stats include that work.
@@ -471,6 +492,8 @@ In a suggested order:
    - Med through the testing button
    - sound after a crash with the new holds
    - the engine monitor's phase and transitions log during a crash
+   - and, from the 2026-09-16 session, the camera-zoom pitch bend at Med (§13): scroll in and out in chase
+     view and say whether anything is still wrong
 2. **Crash and ground-contact physics.** No friction or rotational damping after an impact (flight model).
 3. **If the engine stops in a crash, find out why.** The transitions log shows `running`, `cutoff`, `fuel on board`, `seized` and `stalled` changes with sim time.
 4. **Flight recorder engine channels.** Add running, cutoff, starter and qbar so a saved CSV explains engine state. Not done: the recorder's columns feed pilot-evaluation tooling, so check those consumers first.
@@ -488,6 +511,14 @@ In a suggested order:
 **Build and ABI**
 
 - **Any change under `src/flight/audio/dsp/`** needs `npm run build:audio` (Homebrew `emcc` 6.0.9), then commit the WASM with `audio-dsp.provenance.json`. `npm run build` refuses a WASM whose sources or hash drifted.
+- **The Med delay line carries pitch.** Anything that changes how fast `gDelaySamples` moves is a pitch change,
+  whatever it looks like in the source. Distance may seat that tap; only the Doppler ratio may move it (§13).
+- **The 0.5 s delay cap bounds storage, not audibility.** The direct tap pins at it; only the ground-image tap
+  fades there. Level at range belongs to `min(1, 1/d)` alone, at every tier (§13).
+- **The zoom defect was already forbidden in writing.** `sound-implementation-prompt.md`'s scene-graph row
+  asks to "cover view changes from keyboard/gamepad, panel and phone, without Doppler spikes on origin shifts
+  or teleports". The requirement was there from the start and simply had no test behind it, which is why it
+  survived to a pilot. Worth remembering when a spec line has no named check next to it.
 - **The snapshot ABI** is `dsp/snapshot.h` ⇄ `audioSnapshot.ts`. `audioSnapshot.test.ts` and `benchmarks/audio/renderSweep.mjs` parse the header. The worklet keeps its own constants, which the ABI test checks.
 - **Changing an export signature** (as happened to `osfs_audio_set_gains` for airframe gain) means updating the worklet, `dspHarness.ts`, the tests and `renderSweep.mjs` together.
 
@@ -508,6 +539,64 @@ In a suggested order:
 
 **Environment**
 
-- Unrelated baseline failures: 9 tests in `createFlightSimApp.test.ts`, `createFlightSimApp.phone.test.ts`, `input/gamepadProfiles.test.ts` and `loading/createFlightLoadingScreen.test.ts`.
+- Unrelated baseline failures as of 2026-09-14: 9 tests in `createFlightSimApp.test.ts`, `createFlightSimApp.phone.test.ts`, `input/gamepadProfiles.test.ts` and `loading/createFlightLoadingScreen.test.ts`. **Gone as of 2026-09-16:** `npx vitest run` is 980 pass / 106 files / 0 fail.
 - To hear it: `npm run dev`, fly the Vision Jet, open the Sound tab, click Enable sound. Agents do not start servers (AGENTS.md).
 - **The sound commit contains only the sound hunks** of `createFlightSimApp.ts`, `FlightControlPanel.tsx` and `package.json`. The autopilot, gamepad and phone changes in those files, and their untracked files, were left uncommitted in the working tree.
+
+## 13. Camera-zoom pitch bend at Med, 2026-09-16 (fixed, software-verified)
+
+Pilot report: *"when i have the engine sound in mid and i zoom in and out of the plane the engine sound bugs
+out."* Full record, including the configuration it was reproduced under and every before/after measurement:
+[`evidence/audio/camera-zoom-med-2026-09-16.md`](evidence/audio/camera-zoom-med-2026-09-16.md).
+
+**What it was.** Med's propagation delay read its length straight off the source distance, through a 60 ms
+smoother. A delay line's pitch comes from how fast its read pointer travels, so distance was being heard as
+speed. `zoomChaseCamera` multiplies the chase range by `exp(0.2)` per wheel notch inside a single frame with
+no easing, so one notch from the default 14.17 m range shifted the engine about 2.8 semitones flat, and a
+scroll of eight notches took it down by a factor of 3.2 — measured as a dominant frequency falling from
+1000 Hz to 310 Hz and gliding back over ~400 ms. Wide enough steps drive the read pointer backwards.
+
+`audioPose.ts` reports both cameras as rigidly parented, so the modelled Doppler ratio was exactly 1 while
+the geometry said the listener had jumped tens of metres. The ratio handed to the partial anti-alias cull was
+that same 1.0, so a zoom-in also folded shifted partials back down the spectrum. Only Med and above run this
+code, which is why the pilot heard it on "mid" and not on Low.
+
+**What changed** (`dsp/core.cpp` only). The tap advances by `1 - doppler` per sample and by nothing else;
+distance seats it, never moves it. It is seated from the retarded range `d / (c + range rate)` and re-seated
+only where that is free: at an epoch, at a tier change, and while the direct path is faded out past the cap.
+The range fade now follows geometry directly and is de-zippered at 10 ms. The 60 ms delay smoother is gone.
+Distance gain, absorption, panning, the ground-image tap, the 0.5 s cap, Low and the cockpit installation are
+untouched.
+
+**Evidence.** `cameraZoomAudio.integration.test.ts` drives the real chase camera through `computeListenerPose`
+into the real WASM — no facade mock. Four of its seven tests fail on the `c1405f0e` binary (scroll out 0.268
+against a 0.8 floor, scroll in 1.785 against a 1.25 ceiling, digital silence at the 500 m zoom clamp against a
+1e-5 floor, and a closing detached listener at 1.075 where the model says 1.412) and all seven pass on the
+rebuilt one. Full suite 981 pass / 0 fail; `npm run build`
+exit 0; lint unchanged (its 5 errors are unrelated HUD work in `LoggingPanel.tsx` and `evaluationInstruments.test.ts`). The sweep proxy was re-run at 3
+repeats into [`evidence/audio/offline-sweep-proxy-2026-09-16.json`](evidence/audio/offline-sweep-proxy-2026-09-16.json):
+zero non-finite samples, every peak inside the ceiling, Med p95 0.0454–0.0463 ms, every fault counter
+identical to the old binary, every Low row identical to the last digit.
+
+**Follow-on the same day: Med went silent past ~144 m.** Pilot: *"in real life you can hear a jet engine
+500m away no?"* Yes, and sound.md §3's `min(1, 1 m/distance)` already said so with no cutoff. The silence was
+§2's delay-storage guard leaking into the level path: the **direct** path was faded once the geometric delay
+passed 0.42 s, which gated on delay rather than distance (so the threshold moved with the speed of sound —
+144→165 m at sea level, 124→142 m at 35,000 ft) and cost 21 dB over 21 metres before stopping. After the zoom
+fix the guard was also unnecessary there, because the tap no longer follows the view. The direct tap now pins
+at the cap instead: it keeps the right sound at the right level and loses only an absolute propagation lag the
+ear has no reference for. The ground-image tap still fades, because a reflection pinned to the cap would comb
+at a spacing the geometry never asked for. sound.md §2's clause was rewritten to say the cap bounds storage,
+not audibility. Med now tracks Low across the whole 8…500 m zoom range at a constant −3.3…−3.5 dB, both at
+6 dB per doubling; at the 500 m clamp Med is −36.1 dB against Low's −32.8 dB where it used to be digital
+silence.
+
+**Still open.**
+
+- **Nothing is qualified and nobody has listened to the fixed build.** Med still needs "Run Med anyway
+  (testing)" to be effective at all.
+- **The pilot's artefact is not confirmed to be this one.** Worth asking on a re-test whether it was a pitch
+  bend and whether it tracked the scroll in both directions.
+- **Whether −36 dB at the 500 m clamp is the right listening level is a mix question, not a physics one.**
+  The app has no calibrated SPL, so audibility there follows the master gain. Mix balance is already listed
+  as barely tuned (§4.9).

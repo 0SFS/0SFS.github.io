@@ -1,0 +1,1351 @@
+{
+  "schema": "osfs-audio-bench/1",
+  "kind": "offline-kernel-proxy",
+  "disclaimer": "Synthetic sweep rendered offline in Node through the compiled core. Not real-time acceptance, not a device qualification, and no physical output route: dropout count is unknown.",
+  "createdUtc": "2026-09-16T23:35:01.568Z",
+  "environment": {
+    "node": "v26.8.2",
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpu": "Apple M5",
+    "logicalCpus": 10
+  },
+  "inputs": {
+    "sweepSha256": "0e4a927e80859f19f9fab923fb547d4aa6073b55e5dd6781ec2fcbf014704389",
+    "sweepSeconds": 240,
+    "seed": 1397110064,
+    "bridge": "none (direct WASM calls)",
+    "quantumFrames": 128,
+    "cockpitSourceMetres": [
+      0,
+      0.96,
+      -4.06
+    ]
+  },
+  "build": {
+    "wasmSha256": "01367066b89f28d8d560c326216f507d821cbef57d091d0a4f85f309f99c238b",
+    "wasmBytes": 42740,
+    "emcc": null,
+    "flags": [
+      "-O3",
+      "-std=c++17",
+      "--no-entry",
+      "-sSTANDALONE_WASM=1",
+      "-sALLOW_MEMORY_GROWTH=1",
+      "-sINITIAL_MEMORY=2097152",
+      "-sSTACK_SIZE=131072",
+      "-sMALLOC=emmalloc",
+      "-sERROR_ON_UNDEFINED_SYMBOLS=1",
+      "-sFILESYSTEM=0",
+      "-fno-exceptions",
+      "-fno-rtti",
+      "-fno-fast-math"
+    ]
+  },
+  "dropouts": {
+    "count": null,
+    "detector": "none: offline render has no output route"
+  },
+  "runs": [
+    {
+      "tier": "low",
+      "sampleRate": 44100,
+      "pass": "sweep",
+      "shed": 0,
+      "tireSlipWatts": 0,
+      "seconds": 240,
+      "quantumMs": 2.9024943310657596,
+      "output": {
+        "peak": 0.05245433747768402,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0,
+          "motoring": 0.0014516134392104235,
+          "light-off-and-idle": 0.0029741897536577203,
+          "acceleration": 0.00484779253184657,
+          "maximum": 0.006519425607256303,
+          "deceleration": 0.005111539613805268,
+          "re-acceleration": 0.004812531920579114,
+          "exterior-flyby": 0.0009195118134628767,
+          "cruise-config-cycle": 0.006133536155498263,
+          "windmill": 0.00449281853510202,
+          "rundown": 0.0029932966802021063,
+          "silence": 0.000026777358311189104
+        }
+      },
+      "core": {
+        "snapshotsIn": 14400,
+        "snapshotsDropped": 0,
+        "eventsIn": 6,
+        "eventsDropped": 0,
+        "resyncs": 0,
+        "staleFades": 0,
+        "blocks": 82688,
+        "frames": 10584000,
+        "peak": 0.05245433585595301,
+        "telemetryAge": 0,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 0,
+        "queueDepth": 3,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 1,
+        "shed": 0,
+        "epoch": 1
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.12,
+        "repeats": [
+          {
+            "samples": 82688,
+            "meanMs": 0.021789514306791727,
+            "p50Ms": 0.0232499999999618,
+            "p95Ms": 0.024458999999978914,
+            "maxMs": 0.3305830000000043,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.027167000000019925,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.021937449327592177,
+            "p50Ms": 0.02329199999985576,
+            "p95Ms": 0.024459000000206288,
+            "maxMs": 0.8253749999998945,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.05124999999998181,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.021941397022544572,
+            "p50Ms": 0.02329199999985576,
+            "p95Ms": 0.02449999999953434,
+            "maxMs": 0.2909589999999298,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.06537500000013097,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 248064,
+          "meanMs": 0.021889453552309496,
+          "p50Ms": 0.023290999999517226,
+          "p95Ms": 0.02449999999953434,
+          "maxMs": 0.8253749999998945,
+          "overQuantumCount": 0,
+          "worstRolling2sP95Ms": 0.06537500000013097,
+          "p95OverProposedBudget": false
+        }
+      }
+    },
+    {
+      "tier": "low",
+      "sampleRate": 44100,
+      "pass": "capacity",
+      "shed": 0,
+      "tireSlipWatts": 15000,
+      "seconds": 240,
+      "quantumMs": 2.9024943310657596,
+      "output": {
+        "peak": 0.0891527459025383,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0.018763248719619163,
+          "motoring": 0.01884680434433898,
+          "light-off-and-idle": 0.018984268885848646,
+          "acceleration": 0.019432578481326287,
+          "maximum": 0.019830633346651895,
+          "deceleration": 0.019410412894108275,
+          "re-acceleration": 0.01938464276500454,
+          "exterior-flyby": 0.001148847775637388,
+          "cruise-config-cycle": 0.019759027223903193,
+          "windmill": 0.019339431798194095,
+          "rundown": 0.018982971332583094,
+          "silence": 0.018837422220497176
+        }
+      },
+      "core": {
+        "snapshotsIn": 14400,
+        "snapshotsDropped": 0,
+        "eventsIn": 6,
+        "eventsDropped": 0,
+        "resyncs": 0,
+        "staleFades": 0,
+        "blocks": 82688,
+        "frames": 10584000,
+        "peak": 0.0891527486754882,
+        "telemetryAge": 0,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 0,
+        "queueDepth": 3,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 1,
+        "shed": 0,
+        "epoch": 1
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.12,
+        "repeats": [
+          {
+            "samples": 82688,
+            "meanMs": 0.022566763278831593,
+            "p50Ms": 0.02379099999961909,
+            "p95Ms": 0.025166999999783002,
+            "maxMs": 0.09087500000077853,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.05279199999949924,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.022535551156155288,
+            "p50Ms": 0.023791999999957625,
+            "p95Ms": 0.025208000000020547,
+            "maxMs": 0.09375,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.027792000000772532,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.022554034551564957,
+            "p50Ms": 0.02379099999961909,
+            "p95Ms": 0.02520899999944959,
+            "maxMs": 0.06229200000052515,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.028915999999298947,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 248064,
+          "meanMs": 0.022552116328850614,
+          "p50Ms": 0.02379100000143808,
+          "p95Ms": 0.025208000000020547,
+          "maxMs": 0.09375,
+          "overQuantumCount": 0,
+          "worstRolling2sP95Ms": 0.05279199999949924,
+          "p95OverProposedBudget": false
+        }
+      }
+    },
+    {
+      "tier": "low",
+      "sampleRate": 44100,
+      "pass": "fault-injection",
+      "shed": 0,
+      "tireSlipWatts": 0,
+      "seconds": 240,
+      "faults": [
+        {
+          "atSeconds": 30,
+          "kind": "seek",
+          "effect": "new epoch anchored at the current frame; queues cleared under a fade"
+        },
+        {
+          "atSeconds": 50,
+          "kind": "stale-input",
+          "effect": "600 ms of snapshots never delivered"
+        },
+        {
+          "atSeconds": 70,
+          "kind": "non-finite-snapshot",
+          "effect": "one snapshot carries a NaN N1"
+        },
+        {
+          "atSeconds": 90,
+          "kind": "tier-switch",
+          "effect": "another tier for 2 s, then back"
+        },
+        {
+          "atSeconds": 110,
+          "kind": "shed-ladder",
+          "effect": "shed levels 1..6 over 3 s, then 0"
+        },
+        {
+          "atSeconds": 150,
+          "kind": "event-overflow",
+          "effect": "40 future-stamped events into a 32-event core queue"
+        },
+        {
+          "atSeconds": 170,
+          "kind": "main-thread-stall",
+          "effect": "0.7 s stall; the simulation then runs 0.7 s behind the audio clock"
+        }
+      ],
+      "quantumMs": 2.9024943310657596,
+      "output": {
+        "peak": 0.06268194317817688,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0,
+          "motoring": 0.0014516134392104235,
+          "light-off-and-idle": 0.0029725824097943895,
+          "acceleration": 0.004842012971975492,
+          "maximum": 0.006623662458100515,
+          "deceleration": 0.005086843264132062,
+          "re-acceleration": 0.0048248919229005385,
+          "exterior-flyby": 0.0011981797120769787,
+          "cruise-config-cycle": 0.006040302298935819,
+          "windmill": 0.004596537410519717,
+          "rundown": 0.003020262528798797,
+          "silence": 0.00028219186257372577
+        }
+      },
+      "core": {
+        "snapshotsIn": 14324,
+        "snapshotsDropped": 1,
+        "eventsIn": 38,
+        "eventsDropped": 8,
+        "resyncs": 2,
+        "staleFades": 2,
+        "blocks": 82688,
+        "frames": 10584000,
+        "peak": 0.06268194499939167,
+        "telemetryAge": 0.012244897959183673,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 1,
+        "queueDepth": 1,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 1,
+        "shed": 0,
+        "epoch": 2
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.12,
+        "repeats": [
+          {
+            "samples": 82688,
+            "meanMs": 0.02196105673132459,
+            "p50Ms": 0.023333999999522348,
+            "p95Ms": 0.02487499999915599,
+            "maxMs": 0.08195800000066811,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.04195799999979499,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.022105319865036253,
+            "p50Ms": 0.023333999999522348,
+            "p95Ms": 0.02595899999869289,
+            "maxMs": 0.24099999999998545,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.06020800000078452,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.0219430243808025,
+            "p50Ms": 0.0233330000010028,
+            "p95Ms": 0.02541699999710545,
+            "maxMs": 0.07337499999994179,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.043542000001252745,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 248064,
+          "meanMs": 0.022003133659054448,
+          "p50Ms": 0.023333999999522348,
+          "p95Ms": 0.025292000000263215,
+          "maxMs": 0.24099999999998545,
+          "overQuantumCount": 0,
+          "worstRolling2sP95Ms": 0.05979200000001583,
+          "p95OverProposedBudget": false
+        }
+      }
+    },
+    {
+      "tier": "low",
+      "sampleRate": 48000,
+      "pass": "sweep",
+      "shed": 0,
+      "tireSlipWatts": 0,
+      "seconds": 240,
+      "quantumMs": 2.6666666666666665,
+      "output": {
+        "peak": 0.04863426834344864,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0,
+          "motoring": 0.001437298743725602,
+          "light-off-and-idle": 0.002969155788652284,
+          "acceleration": 0.004746067322074102,
+          "maximum": 0.0063455903261851404,
+          "deceleration": 0.004987054224078378,
+          "re-acceleration": 0.0047107317344655735,
+          "exterior-flyby": 0.0009273047084045638,
+          "cruise-config-cycle": 0.005982996860195408,
+          "windmill": 0.004413537598411787,
+          "rundown": 0.0029678494836909946,
+          "silence": 0.000030057675713800452
+        }
+      },
+      "core": {
+        "snapshotsIn": 14400,
+        "snapshotsDropped": 0,
+        "eventsIn": 6,
+        "eventsDropped": 0,
+        "resyncs": 0,
+        "staleFades": 0,
+        "blocks": 90000,
+        "frames": 11520000,
+        "peak": 0.048634267393386534,
+        "telemetryAge": 0,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 0,
+        "queueDepth": 3,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 1,
+        "shed": 0,
+        "epoch": 1
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.12,
+        "repeats": [
+          {
+            "samples": 90000,
+            "meanMs": 0.02171150326666765,
+            "p50Ms": 0.023041999997076346,
+            "p95Ms": 0.024457999999867752,
+            "maxMs": 0.05516599999828031,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.02608400000099209,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.021703204799996496,
+            "p50Ms": 0.023041999997076346,
+            "p95Ms": 0.024457999999867752,
+            "maxMs": 0.07608299999992596,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.026458000000275206,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.021707440144444545,
+            "p50Ms": 0.023041999997076346,
+            "p95Ms": 0.024457999999867752,
+            "maxMs": 0.0757499999999709,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.027041000001190696,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 270000,
+          "meanMs": 0.02170738273703623,
+          "p50Ms": 0.023041999997076346,
+          "p95Ms": 0.024457999999867752,
+          "maxMs": 0.07608299999992596,
+          "overQuantumCount": 0,
+          "worstRolling2sP95Ms": 0.027041000001190696,
+          "p95OverProposedBudget": false
+        }
+      }
+    },
+    {
+      "tier": "low",
+      "sampleRate": 48000,
+      "pass": "capacity",
+      "shed": 0,
+      "tireSlipWatts": 15000,
+      "seconds": 240,
+      "quantumMs": 2.6666666666666665,
+      "output": {
+        "peak": 0.08757166564464569,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0.018254691841381523,
+          "motoring": 0.01839642455279809,
+          "light-off-and-idle": 0.018500826308703325,
+          "acceleration": 0.01888021683440511,
+          "maximum": 0.019297617885869915,
+          "deceleration": 0.018957784459964967,
+          "re-acceleration": 0.018883872825803314,
+          "exterior-flyby": 0.0011640617767568712,
+          "cruise-config-cycle": 0.019205939726605913,
+          "windmill": 0.01879584643799328,
+          "rundown": 0.01849355954839341,
+          "silence": 0.018297971244262346
+        }
+      },
+      "core": {
+        "snapshotsIn": 14400,
+        "snapshotsDropped": 0,
+        "eventsIn": 6,
+        "eventsDropped": 0,
+        "resyncs": 0,
+        "staleFades": 0,
+        "blocks": 90000,
+        "frames": 11520000,
+        "peak": 0.08757166766144074,
+        "telemetryAge": 0,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 0,
+        "queueDepth": 3,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 1,
+        "shed": 0,
+        "epoch": 1
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.12,
+        "repeats": [
+          {
+            "samples": 90000,
+            "meanMs": 0.022414105399998555,
+            "p50Ms": 0.023666000000957865,
+            "p95Ms": 0.025125000000116415,
+            "maxMs": 0.45183299999916926,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.026999999998224666,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.022546068733329552,
+            "p50Ms": 0.023832999999285676,
+            "p95Ms": 0.025165999999444466,
+            "maxMs": 1.9559580000022834,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.03504199999952107,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.022875957433325676,
+            "p50Ms": 0.023915999998280313,
+            "p95Ms": 0.02658300000257441,
+            "maxMs": 2.50145799999882,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.04366699999809498,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 270000,
+          "meanMs": 0.02261204385555126,
+          "p50Ms": 0.023791999999957625,
+          "p95Ms": 0.02533400000174879,
+          "maxMs": 2.50145799999882,
+          "overQuantumCount": 0,
+          "worstRolling2sP95Ms": 0.04366699999809498,
+          "p95OverProposedBudget": false
+        }
+      }
+    },
+    {
+      "tier": "low",
+      "sampleRate": 48000,
+      "pass": "fault-injection",
+      "shed": 0,
+      "tireSlipWatts": 0,
+      "seconds": 240,
+      "faults": [
+        {
+          "atSeconds": 30,
+          "kind": "seek",
+          "effect": "new epoch anchored at the current frame; queues cleared under a fade"
+        },
+        {
+          "atSeconds": 50,
+          "kind": "stale-input",
+          "effect": "600 ms of snapshots never delivered"
+        },
+        {
+          "atSeconds": 70,
+          "kind": "non-finite-snapshot",
+          "effect": "one snapshot carries a NaN N1"
+        },
+        {
+          "atSeconds": 90,
+          "kind": "tier-switch",
+          "effect": "another tier for 2 s, then back"
+        },
+        {
+          "atSeconds": 110,
+          "kind": "shed-ladder",
+          "effect": "shed levels 1..6 over 3 s, then 0"
+        },
+        {
+          "atSeconds": 150,
+          "kind": "event-overflow",
+          "effect": "40 future-stamped events into a 32-event core queue"
+        },
+        {
+          "atSeconds": 170,
+          "kind": "main-thread-stall",
+          "effect": "0.7 s stall; the simulation then runs 0.7 s behind the audio clock"
+        }
+      ],
+      "quantumMs": 2.6666666666666665,
+      "output": {
+        "peak": 0.06224767863750458,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0,
+          "motoring": 0.001437298743725602,
+          "light-off-and-idle": 0.002967541662623545,
+          "acceleration": 0.00474205021194377,
+          "maximum": 0.006408245633189014,
+          "deceleration": 0.004987006495289591,
+          "re-acceleration": 0.00471967232550792,
+          "exterior-flyby": 0.0011841279085860557,
+          "cruise-config-cycle": 0.0058928538645571455,
+          "windmill": 0.0045024900812639535,
+          "rundown": 0.003013283519348991,
+          "silence": 0.0002669966406238783
+        }
+      },
+      "core": {
+        "snapshotsIn": 14324,
+        "snapshotsDropped": 1,
+        "eventsIn": 38,
+        "eventsDropped": 8,
+        "resyncs": 2,
+        "staleFades": 2,
+        "blocks": 90000,
+        "frames": 11520000,
+        "peak": 0.06224767869860483,
+        "telemetryAge": 0.012645833333333334,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 1,
+        "queueDepth": 1,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 1,
+        "shed": 0,
+        "epoch": 2
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.12,
+        "repeats": [
+          {
+            "samples": 90000,
+            "meanMs": 0.022064618211117583,
+            "p50Ms": 0.023042000000714324,
+            "p95Ms": 0.027167000000190455,
+            "maxMs": 1.090582999997423,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.06083299999954761,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.022294042477783216,
+            "p50Ms": 0.02316600000631297,
+            "p95Ms": 0.027708999994501937,
+            "maxMs": 1.3227499999993597,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.058457999999518506,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.022235957355569956,
+            "p50Ms": 0.023249999998370185,
+            "p95Ms": 0.027709000001777895,
+            "maxMs": 2.0328329999974812,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.05216700000164565,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 270000,
+          "meanMs": 0.022198206014823585,
+          "p50Ms": 0.023166999999375548,
+          "p95Ms": 0.027582999995502178,
+          "maxMs": 2.0328329999974812,
+          "overQuantumCount": 0,
+          "worstRolling2sP95Ms": 0.06083299999954761,
+          "p95OverProposedBudget": false
+        }
+      }
+    },
+    {
+      "tier": "med",
+      "sampleRate": 44100,
+      "pass": "sweep",
+      "shed": 0,
+      "tireSlipWatts": 0,
+      "seconds": 240,
+      "quantumMs": 2.9024943310657596,
+      "output": {
+        "peak": 0.04148866608738899,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0,
+          "motoring": 0.0021833073499454903,
+          "light-off-and-idle": 0.0037213250252712995,
+          "acceleration": 0.005327505664525533,
+          "maximum": 0.007604405881748667,
+          "deceleration": 0.005632200246875513,
+          "re-acceleration": 0.005259910265950616,
+          "exterior-flyby": 0.0008740018639643176,
+          "cruise-config-cycle": 0.00573217971306032,
+          "windmill": 0.004993643577170028,
+          "rundown": 0.003845921109520482,
+          "silence": 0.0002898875734518862
+        }
+      },
+      "core": {
+        "snapshotsIn": 14400,
+        "snapshotsDropped": 0,
+        "eventsIn": 6,
+        "eventsDropped": 0,
+        "resyncs": 0,
+        "staleFades": 0,
+        "blocks": 82688,
+        "frames": 10584000,
+        "peak": 0.041488665273845295,
+        "telemetryAge": 0,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 0,
+        "queueDepth": 3,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 2,
+        "shed": 0,
+        "epoch": 1
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.25,
+        "repeats": [
+          {
+            "samples": 82688,
+            "meanMs": 0.038977783596164065,
+            "p50Ms": 0.04104100000404287,
+            "p95Ms": 0.04499999999825377,
+            "maxMs": 0.15333300000202144,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.05141599999478785,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.04014056044407189,
+            "p50Ms": 0.04120800000237068,
+            "p95Ms": 0.047749999997904524,
+            "maxMs": 4.071207999993931,
+            "overQuantumCount": 1,
+            "worstRolling2sP95Ms": 0.11175000000366708,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.039014189277762,
+            "p50Ms": 0.040916999998444226,
+            "p95Ms": 0.04524999999557622,
+            "maxMs": 0.11541700000088895,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.04941700000199489,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 248064,
+          "meanMs": 0.03937751110599932,
+          "p50Ms": 0.04104199999710545,
+          "p95Ms": 0.045915999995486345,
+          "maxMs": 4.071207999993931,
+          "overQuantumCount": 1,
+          "worstRolling2sP95Ms": 0.11137500000040745,
+          "p95OverProposedBudget": false
+        }
+      }
+    },
+    {
+      "tier": "med",
+      "sampleRate": 44100,
+      "pass": "capacity",
+      "shed": 0,
+      "tireSlipWatts": 15000,
+      "seconds": 240,
+      "quantumMs": 2.9024943310657596,
+      "output": {
+        "peak": 0.08847759664058685,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0.018763248719619163,
+          "motoring": 0.018916927888431186,
+          "light-off-and-idle": 0.019104169385127934,
+          "acceleration": 0.019546069682086657,
+          "maximum": 0.020208185680509607,
+          "deceleration": 0.01957585762494429,
+          "re-acceleration": 0.01951452031933258,
+          "exterior-flyby": 0.00111841825635464,
+          "cruise-config-cycle": 0.019637818201466695,
+          "windmill": 0.019450943709192276,
+          "rundown": 0.019132380842580135,
+          "silence": 0.018839717056516655
+        }
+      },
+      "core": {
+        "snapshotsIn": 14400,
+        "snapshotsDropped": 0,
+        "eventsIn": 6,
+        "eventsDropped": 0,
+        "resyncs": 0,
+        "staleFades": 0,
+        "blocks": 82688,
+        "frames": 10584000,
+        "peak": 0.08847759296306654,
+        "telemetryAge": 0,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 0,
+        "queueDepth": 3,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 2,
+        "shed": 0,
+        "epoch": 1
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.25,
+        "repeats": [
+          {
+            "samples": 82688,
+            "meanMs": 0.039910702121232516,
+            "p50Ms": 0.04175000000395812,
+            "p95Ms": 0.046290999998745974,
+            "maxMs": 2.369458000001032,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.06641700000182027,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.0400591752249246,
+            "p50Ms": 0.04195800000161398,
+            "p95Ms": 0.04625000000669388,
+            "maxMs": 1.3222080000050482,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.11899999999877764,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.0398485864091347,
+            "p50Ms": 0.04174999999668216,
+            "p95Ms": 0.046333999998751096,
+            "maxMs": 1.1005829999994603,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.06524999999965075,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 248064,
+          "meanMs": 0.039939487918430605,
+          "p50Ms": 0.0418329999956768,
+          "p95Ms": 0.04629199999908451,
+          "maxMs": 2.369458000001032,
+          "overQuantumCount": 0,
+          "worstRolling2sP95Ms": 0.11899999999877764,
+          "p95OverProposedBudget": false
+        }
+      }
+    },
+    {
+      "tier": "med",
+      "sampleRate": 44100,
+      "pass": "fault-injection",
+      "shed": 0,
+      "tireSlipWatts": 0,
+      "seconds": 240,
+      "faults": [
+        {
+          "atSeconds": 30,
+          "kind": "seek",
+          "effect": "new epoch anchored at the current frame; queues cleared under a fade"
+        },
+        {
+          "atSeconds": 50,
+          "kind": "stale-input",
+          "effect": "600 ms of snapshots never delivered"
+        },
+        {
+          "atSeconds": 70,
+          "kind": "non-finite-snapshot",
+          "effect": "one snapshot carries a NaN N1"
+        },
+        {
+          "atSeconds": 90,
+          "kind": "tier-switch",
+          "effect": "another tier for 2 s, then back"
+        },
+        {
+          "atSeconds": 110,
+          "kind": "shed-ladder",
+          "effect": "shed levels 1..6 over 3 s, then 0"
+        },
+        {
+          "atSeconds": 150,
+          "kind": "event-overflow",
+          "effect": "40 future-stamped events into a 32-event core queue"
+        },
+        {
+          "atSeconds": 170,
+          "kind": "main-thread-stall",
+          "effect": "0.7 s stall; the simulation then runs 0.7 s behind the audio clock"
+        }
+      ],
+      "quantumMs": 2.9024943310657596,
+      "output": {
+        "peak": 0.0510852187871933,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0,
+          "motoring": 0.0021833073499454903,
+          "light-off-and-idle": 0.0037192078405229837,
+          "acceleration": 0.005338377642922054,
+          "maximum": 0.0075051328847397835,
+          "deceleration": 0.005565958236972934,
+          "re-acceleration": 0.005263715914015931,
+          "exterior-flyby": 0.0010804662192280324,
+          "cruise-config-cycle": 0.0056553128684644965,
+          "windmill": 0.005052157681634078,
+          "rundown": 0.0038546615070072687,
+          "silence": 0.0007004462741838753
+        }
+      },
+      "core": {
+        "snapshotsIn": 14324,
+        "snapshotsDropped": 1,
+        "eventsIn": 38,
+        "eventsDropped": 8,
+        "resyncs": 2,
+        "staleFades": 2,
+        "blocks": 82688,
+        "frames": 10584000,
+        "peak": 0.05108521842746511,
+        "telemetryAge": 0.012244897959183673,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 1,
+        "queueDepth": 1,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 2,
+        "shed": 0,
+        "epoch": 2
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.25,
+        "repeats": [
+          {
+            "samples": 82688,
+            "meanMs": 0.038520550998932736,
+            "p50Ms": 0.04091599999810569,
+            "p95Ms": 0.0446250000022701,
+            "maxMs": 0.08449999999720603,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.04899999999906868,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.038988764657507606,
+            "p50Ms": 0.04100000000471482,
+            "p95Ms": 0.046082999993814155,
+            "maxMs": 0.9945000000006985,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.09287500000209548,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 82688,
+            "meanMs": 0.039715527827487745,
+            "p50Ms": 0.04141700000036508,
+            "p95Ms": 0.04775000000518048,
+            "maxMs": 1.508125000000291,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.08804200000304263,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 248064,
+          "meanMs": 0.03907494782797603,
+          "p50Ms": 0.04108300000370946,
+          "p95Ms": 0.04624999999941792,
+          "maxMs": 1.508125000000291,
+          "overQuantumCount": 0,
+          "worstRolling2sP95Ms": 0.09287500000209548,
+          "p95OverProposedBudget": false
+        }
+      }
+    },
+    {
+      "tier": "med",
+      "sampleRate": 48000,
+      "pass": "sweep",
+      "shed": 0,
+      "tireSlipWatts": 0,
+      "seconds": 240,
+      "quantumMs": 2.6666666666666665,
+      "output": {
+        "peak": 0.036982353776693344,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0,
+          "motoring": 0.0022552326630642804,
+          "light-off-and-idle": 0.003467818284824605,
+          "acceleration": 0.005402490319746586,
+          "maximum": 0.006857292214279673,
+          "deceleration": 0.0056679810500721624,
+          "re-acceleration": 0.00538696494731454,
+          "exterior-flyby": 0.0009282297448254248,
+          "cruise-config-cycle": 0.005835913174212475,
+          "windmill": 0.005102194781227892,
+          "rundown": 0.003992813796085747,
+          "silence": 0.00027338802531531436
+        }
+      },
+      "core": {
+        "snapshotsIn": 14400,
+        "snapshotsDropped": 0,
+        "eventsIn": 6,
+        "eventsDropped": 0,
+        "resyncs": 0,
+        "staleFades": 0,
+        "blocks": 90000,
+        "frames": 11520000,
+        "peak": 0.03698235507378789,
+        "telemetryAge": 0,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 0,
+        "queueDepth": 3,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 2,
+        "shed": 0,
+        "epoch": 1
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.25,
+        "repeats": [
+          {
+            "samples": 90000,
+            "meanMs": 0.039325931022214676,
+            "p50Ms": 0.041250000009313226,
+            "p95Ms": 0.045458000007783994,
+            "maxMs": 1.069458999991184,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.1104159999958938,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.039309909877767654,
+            "p50Ms": 0.04145800000696909,
+            "p95Ms": 0.04575000000477303,
+            "maxMs": 0.15833400000701658,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.06483299999672454,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.039411937266658224,
+            "p50Ms": 0.04137500000069849,
+            "p95Ms": 0.045540999999502674,
+            "maxMs": 0.8902499999967404,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.10833299999649171,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 270000,
+          "meanMs": 0.03934925938888018,
+          "p50Ms": 0.04137500000069849,
+          "p95Ms": 0.04558299999916926,
+          "maxMs": 1.069458999991184,
+          "overQuantumCount": 0,
+          "worstRolling2sP95Ms": 0.1104159999958938,
+          "p95OverProposedBudget": false
+        }
+      }
+    },
+    {
+      "tier": "med",
+      "sampleRate": 48000,
+      "pass": "capacity",
+      "shed": 0,
+      "tireSlipWatts": 15000,
+      "seconds": 240,
+      "quantumMs": 2.6666666666666665,
+      "output": {
+        "peak": 0.0894666537642479,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0.018254691841381523,
+          "motoring": 0.01847861215721617,
+          "light-off-and-idle": 0.018579034443736955,
+          "acceleration": 0.01905607156143035,
+          "maximum": 0.01947916997027814,
+          "deceleration": 0.019133092531541683,
+          "re-acceleration": 0.019082344610558948,
+          "exterior-flyby": 0.0011708705157772753,
+          "cruise-config-cycle": 0.01915370884095424,
+          "windmill": 0.018966071375508906,
+          "rundown": 0.018687939304494902,
+          "silence": 0.01830003933817229
+        }
+      },
+      "core": {
+        "snapshotsIn": 14400,
+        "snapshotsDropped": 0,
+        "eventsIn": 6,
+        "eventsDropped": 0,
+        "resyncs": 0,
+        "staleFades": 0,
+        "blocks": 90000,
+        "frames": 11520000,
+        "peak": 0.08946665290372335,
+        "telemetryAge": 0,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 0,
+        "queueDepth": 3,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 2,
+        "shed": 0,
+        "epoch": 1
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.25,
+        "repeats": [
+          {
+            "samples": 90000,
+            "meanMs": 0.03986476443333878,
+            "p50Ms": 0.04220799999893643,
+            "p95Ms": 0.04616600000008475,
+            "maxMs": 0.11612499998591375,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.0513749999954598,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.03985448367779819,
+            "p50Ms": 0.042167000006884336,
+            "p95Ms": 0.046167000007699244,
+            "maxMs": 0.15379199999733828,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.05049999999755528,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.039949609711095076,
+            "p50Ms": 0.04212500000721775,
+            "p95Ms": 0.04624999999941792,
+            "maxMs": 0.7205410000024131,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.11758299999928568,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 270000,
+          "meanMs": 0.039889619274077345,
+          "p50Ms": 0.042167000006884336,
+          "p95Ms": 0.04620799999975134,
+          "maxMs": 0.7205410000024131,
+          "overQuantumCount": 0,
+          "worstRolling2sP95Ms": 0.11758299999928568,
+          "p95OverProposedBudget": false
+        }
+      }
+    },
+    {
+      "tier": "med",
+      "sampleRate": 48000,
+      "pass": "fault-injection",
+      "shed": 0,
+      "tireSlipWatts": 0,
+      "seconds": 240,
+      "faults": [
+        {
+          "atSeconds": 30,
+          "kind": "seek",
+          "effect": "new epoch anchored at the current frame; queues cleared under a fade"
+        },
+        {
+          "atSeconds": 50,
+          "kind": "stale-input",
+          "effect": "600 ms of snapshots never delivered"
+        },
+        {
+          "atSeconds": 70,
+          "kind": "non-finite-snapshot",
+          "effect": "one snapshot carries a NaN N1"
+        },
+        {
+          "atSeconds": 90,
+          "kind": "tier-switch",
+          "effect": "another tier for 2 s, then back"
+        },
+        {
+          "atSeconds": 110,
+          "kind": "shed-ladder",
+          "effect": "shed levels 1..6 over 3 s, then 0"
+        },
+        {
+          "atSeconds": 150,
+          "kind": "event-overflow",
+          "effect": "40 future-stamped events into a 32-event core queue"
+        },
+        {
+          "atSeconds": 170,
+          "kind": "main-thread-stall",
+          "effect": "0.7 s stall; the simulation then runs 0.7 s behind the audio clock"
+        }
+      ],
+      "quantumMs": 2.6666666666666665,
+      "output": {
+        "peak": 0.058929525315761566,
+        "peakWithinLimiterCeiling": true,
+        "nonFiniteSamples": 0,
+        "rmsBySegment": {
+          "off": 0,
+          "motoring": 0.0022552326630642804,
+          "light-off-and-idle": 0.0034661657673074817,
+          "acceleration": 0.005402884071995839,
+          "maximum": 0.006827086954689258,
+          "deceleration": 0.0055944131333976795,
+          "re-acceleration": 0.005398725306081824,
+          "exterior-flyby": 0.0010876177767347186,
+          "cruise-config-cycle": 0.005759076747221278,
+          "windmill": 0.005187443899960543,
+          "rundown": 0.003994114291193352,
+          "silence": 0.0006526679866461917
+        }
+      },
+      "core": {
+        "snapshotsIn": 14324,
+        "snapshotsDropped": 1,
+        "eventsIn": 38,
+        "eventsDropped": 8,
+        "resyncs": 2,
+        "staleFades": 2,
+        "blocks": 90000,
+        "frames": 11520000,
+        "peak": 0.058929525793534866,
+        "telemetryAge": 0.012645833333333334,
+        "activeGrains": 0,
+        "grainDrops": 0,
+        "nonFinite": 1,
+        "queueDepth": 1,
+        "fade": 1,
+        "doppler": 1,
+        "distance": 4.171953978653168,
+        "tier": 2,
+        "shed": 0,
+        "epoch": 2
+      },
+      "timing": {
+        "provenance": "performance.now() around each osfs_audio_process() call in Node; an offline kernel proxy, not AudioWorklet callback timing",
+        "proposedP95BudgetMs": 0.25,
+        "repeats": [
+          {
+            "samples": 90000,
+            "meanMs": 0.03882955867778979,
+            "p50Ms": 0.041415999992750585,
+            "p95Ms": 0.04533300000184681,
+            "maxMs": 0.14283399999840185,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.04991699999663979,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.03890859235554898,
+            "p50Ms": 0.04145800000696909,
+            "p95Ms": 0.045417000001179986,
+            "maxMs": 0.11783299999660812,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.05158400000073016,
+            "p95OverProposedBudget": false
+          },
+          {
+            "samples": 90000,
+            "meanMs": 0.03885903333334912,
+            "p50Ms": 0.041415999992750585,
+            "p95Ms": 0.04533300000184681,
+            "maxMs": 0.11120900000969414,
+            "overQuantumCount": 0,
+            "worstRolling2sP95Ms": 0.04966599999170285,
+            "p95OverProposedBudget": false
+          }
+        ],
+        "aggregate": {
+          "samples": 270000,
+          "meanMs": 0.0388657281222293,
+          "p50Ms": 0.04141700000036508,
+          "p95Ms": 0.0453750000015134,
+          "maxMs": 0.14283399999840185,
+          "overQuantumCount": 0,
+          "worstRolling2sP95Ms": 0.05158400000073016,
+          "p95OverProposedBudget": false
+        }
+      }
+    }
+  ]
+}

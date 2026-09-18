@@ -130,3 +130,41 @@ tested rollout cases and the audio timeline failure on state recovery. It does
 not establish that the timeline failure was the sole cause of the original
 observation: the user's SF50 variant, terrain provider, and whether the symptom
 included measured thrust loss were not available during this run.
+
+## Pilot follow-up and deferred concerns — 2026-09-16
+
+After the simulation-clock fix in commit `c1405f0e`, the user tried another
+landing and reported that the engine sounded fine. This is a pilot observation,
+not a device qualification or proof that every original symptom is resolved.
+
+The user questioned the principle and computational cost of reconstructing
+simulator state when terrain refines. The architectural concern is that a
+ground-contact correction resets more than ground contact, and restoring a
+selected set of properties can disturb unrelated dynamic state. No profiling
+was performed to quantify the cost. Keeping the local collision surface stable
+and adopting refinements gradually was discussed as a possible future design,
+not validated or selected for implementation.
+
+**Decision: leave contact recovery working as it is.** The user considers it
+good enough and does not want further redesign or optimization now. This note
+records the concern; it is not an instruction to reopen that work.
+
+The same manual session produced two separate reports, neither diagnosed nor
+fixed as part of this follow-up:
+
+- Flaps appeared to reset up and then slowly lower after hitting a bump.
+  Handoff: [flaps-reset-on-bumps-prompt.md](../flaps-reset-on-bumps-prompt.md).
+- With engine sound set to "mid," zooming in and out of the aircraft made the
+  sound "bug out." The type of artifact and effective audio tier are unknown.
+  Handoff: [engine-sound-zoom-prompt.md](../engine-sound-zoom-prompt.md).
+  **Closed out later the same day.** Med's propagation delay line read its length
+  from the camera distance, so a wheel-notch zoom was heard as speed and bent the
+  whole engine by up to two octaves; the tap now moves only with the modelled
+  Doppler ratio. A second defect found in the same area, Med falling silent past
+  about 144 m where Low keeps playing, was fixed with it. Record:
+  [evidence/audio/camera-zoom-med-2026-09-16.md](evidence/audio/camera-zoom-med-2026-09-16.md),
+  ledger §13. Not re-heard by a pilot, and nothing is device-qualified.
+
+The user requested these prompt files for agents in fresh conversations, with
+no implementation of either fix in the documentation session. The audio one was
+taken up from its prompt file afterwards; the flaps one has not been.
