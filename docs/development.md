@@ -87,11 +87,14 @@ npm run dev -- --host    # plain HTTP on the LAN, no certificate
 Either one serves the site to other devices on the network, and the phone-controller QR then points
 at this machine instead of the deployed site — so pairing can be tested without deploying.
 
-`dev:lan` adds a self-signed certificate for the LAN address. That matters when something needs a
-secure context: the screen wake lock and the clipboard button are secure-only and silently do nothing
-over plain HTTP. Flight control itself does not need one. The certificate is self-signed, so **open
-the printed address on the phone once and accept the warning before scanning a QR** — a
-camera-launched tab cannot show the warning and the failure looks like a pairing problem.
+`dev:lan` adds a self-signed certificate for the LAN address and `localhost`, and listens on both:
+open `https://localhost:5173/fly/` on the computer, and the QR still sends the phone to the LAN
+address. That matters when something needs a secure context: the screen wake lock and the clipboard
+button are secure-only and silently do nothing over plain HTTP, and the phone controller's QR scanner
+cannot open the camera without one. Flight control itself does not need one. The certificate is
+self-signed, so **open the printed address on the phone once and accept the warning before scanning
+a QR** — a camera-launched tab cannot show the warning and the failure looks like a pairing problem.
+The computer's browser warns once too.
 `npm run dev:lan -- --print` shows the address and command without starting anything.
 
 Both work because `vite.config.ts` injects the address the server is reachable on
