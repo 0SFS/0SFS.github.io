@@ -33,6 +33,18 @@
         }
         else if (mode === "flight" || rest === "/fly") route = "flight";
         document.documentElement.setAttribute("data-route", route);
+        // Safari tints its bars with theme-color, so each page names its own
+        // background: the controller's true black, the flight page's canvas.
+        // The information page's is the default above.
+        var themeColor = { remote: "#000", flight: "#04060a" }[route];
+        if (themeColor) document.querySelector('meta[name="theme-color"]').setAttribute("content", themeColor);
+        // Add to Home Screen must install the page it was done from. The
+        // controller has its own manifest and name, so an icon made on /rc/
+        // opens /rc/ and can sit beside the simulator's on one Home Screen.
+        if (route === "remote") {
+          document.querySelector('link[rel="manifest"]').setAttribute("href", base + "rc.webmanifest");
+          document.querySelector('meta[name="apple-mobile-web-app-title"]').setAttribute("content", "OSFS RC");
+        }
         function canonical(segment) {
           var next = new URL(base + segment + "/", location.origin);
           var params = new URLSearchParams(location.search);
