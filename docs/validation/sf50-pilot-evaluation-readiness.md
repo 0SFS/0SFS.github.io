@@ -212,6 +212,9 @@ evaluation (it should). Owner: app input and the gamepad work in progress.
 ### 6. Test card and briefing
 
 **Done on 2026-09-14**: [SF50 pilot test card](sf50-pilot-test-card.md).
+**Extended on 2026-09-16** with Card 8, sound, after the camera-zoom pitch defect
+was found and fixed at Med; the card now also tells the pilot how to switch sound
+on, since it is off and unvalidated by default.
 
 The session needs a card, not an open-ended "what do you think":
 pitch and roll response; trim changes with flaps, gear and power; slow flight

@@ -494,6 +494,8 @@ In a suggested order:
    - the engine monitor's phase and transitions log during a crash
    - and, from the 2026-09-16 session, the camera-zoom pitch bend at Med (§13): scroll in and out in chase
      view and say whether anything is still wrong
+   - all of it now has a home in the pilot instrument: [test card](sf50-pilot-test-card.md) Card 8, with the
+     switch-on steps in "Before you start"
 2. **Crash and ground-contact physics.** No friction or rotational damping after an impact (flight model).
 3. **If the engine stops in a crash, find out why.** The transitions log shows `running`, `cutoff`, `fuel on board`, `seized` and `stalled` changes with sim time.
 4. **Flight recorder engine channels.** Add running, cutoff, starter and qbar so a saved CSV explains engine state. Not done: the recorder's columns feed pilot-evaluation tooling, so check those consumers first.

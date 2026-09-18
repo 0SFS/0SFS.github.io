@@ -27,6 +27,12 @@ device, and no claim of fidelity is made.
    moment anything feels wrong**, then say what it was. Closing Logging ends
    the recording. A mark with a sentence is worth more to us than a perfect
    description afterwards. At the end, **Save CSV**.
+6. Sound is off until you ask for it, and it is Vision Jet only. Open the
+   **Sound** tab, press **Enable sound**, set **Sound quality** to **Med**, then
+   press **Run Med anyway (testing)**. Med has no device evidence behind it and
+   runs as Low until you press that; the switch lasts this session only. Leave it
+   on for the whole flight and judge the sound as you go — Card 8 is only the
+   handful of checks that need you to do something specific.
 
 ## Known — please do not spend time on these
 
@@ -34,7 +40,13 @@ device, and no claim of fidelity is made.
   avionics, no autopilot modes to speak of, no ESP, no yaw damper.
 - Mid-altitude climb runs about 15 % high at MCT.
 - The landing flare distance is short of the book.
-- Ground handling, brakes and tires are unvalidated assumptions.
+- Ground handling, brakes and tires are unvalidated assumptions, and so is the
+  tire sound.
+- **Sound quality High** says "Audio pack unavailable". There is no licensed
+  engine recording, and there may never be. Med is the top of the ladder today.
+- An engine you have shut down still makes noise, and it rises and falls with
+  airspeed. JSBSim windmills N1 and N2 with dynamic pressure and the sound
+  follows. We know.
 - Weight and CG are synthetic; there is no loading page.
 - The G2 and G3 entries are the same model under a different name.
 
@@ -125,7 +137,45 @@ Gear down, flaps 100 %, same technique.
 - Engine: spool time from idle, response in the climb, anything odd in N1 or
   fuel flow.
 
-## Card 8 — Anything you noticed
+## Card 8 — Sound
+
+Do this with the engine running and settled. It takes a few minutes; the rest
+you will have formed an opinion about while flying the other cards.
+
+1. Cockpit view. Idle, then smoothly to full thrust, then back to idle.
+2. Switch to the outside (chase) view. Same thing.
+3. Outside view, engine at a steady cruise power: **scroll the view in and out**
+   — mouse wheel, or a two-finger pinch on a trackpad; there is no zoom on the
+   joystick or keyboard. Slowly first, then as fast as you can, then reverse
+   direction mid-scroll.
+4. Zoom all the way out to the stop, and all the way back in.
+5. Sometime at 250 KIAS or faster, listen to the airframe, not the engine.
+
+- Does it sound like an FJ33 sitting behind you, or like something else? What?
+- Does the sound follow the thrust lever the way the engine does — the spool
+  lag, the whine coming up, the way it decays?
+- **While you were scrolling in step 3, did the pitch stay put?** Any slide,
+  wobble, warble or lurch is what we are asking about. This was broken until
+  2026-09-16 — scrolling out bent the whole engine down by about two octaves —
+  and you are the first pilot to hear it since.
+- Anything that is not the airplane: clicks, gaps, dropouts, a level that jumps.
+- Cockpit against outside: is the cockpit muffled about the right amount?
+- Zoomed right out, is the engine still there and about the right level?
+- The airframe wind: an earlier session reported it as loud static in a 300 kt
+  dive, and it was retuned about 18 dB quieter at 250 kt. Where is it now — still
+  too loud, now too quiet, or about right?
+- Balance between the three: fan whine, low rumble, wind noise.
+
+The 1–10 handling rating does not fit here. Describe it instead, and if you can
+name what it should sound like, that is worth more than a number.
+
+Fair warning so you do not waste effort: **every frequency and gain in this is a
+synthetic placeholder**, not a measurement of an FJ33. The fan tone is literally
+"2500 × N1 hertz" and is not a blade-pass frequency — nobody has the blade counts
+or shaft speeds. So "the pitch is wrong" is expected. What we cannot get anywhere
+else is *which way* it is wrong and what the real one does instead.
+
+## Card 9 — Anything you noticed
 
 The most valuable thing you can tell us is the thing that made you say "no, it
 doesn't do that". Mark it if you can, and describe it however you like.
