@@ -2,7 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { PhoneControlSessionOptions } from "./remote/createPhoneControlSession";
 import type { ControlSurfaceState } from "./input/flightInputManager";
-import type { FlightHudBarOptions } from "./hud/createFlightHudBar";
+import type { FlightControlPanelOptions } from "./hud/FlightControlPanel";
 
 const mocks = vi.hoisted(() => {
   const state = { latDeg: 1, lonDeg: 2, altMeters: 1000, headingRad: 0, airspeedKts: 110 };
@@ -11,12 +11,15 @@ const mocks = vi.hoisted(() => {
   const phone = {
     subscribe: vi.fn(() => vi.fn()), getSnapshot: () => snapshot,
     beforeStep: vi.fn(), takeControl: vi.fn(), cancelHandoff: vi.fn(), reset: vi.fn(),
+    takeCameraAim: vi.fn(() => null as { yaw: number; pitch: number; zoom?: number } | null),
+    isCameraActive: vi.fn(() => false),
+    hasPendingCameraAim: vi.fn(() => false),
     onHidden: vi.fn(), syncStatus: vi.fn(), destroy: vi.fn(),
   };
   return {
     state, snapshot, phoneControls, phone,
     createPhoneSession: vi.fn(() => phone),
-    dialog: { open: vi.fn(), destroy: vi.fn() }, createDialog: vi.fn(),
+    pairingPanel: { destroy: vi.fn() }, createPairingPanel: vi.fn(),
     resetLocation: vi.fn(() => state),
     sdk: {
       setPropertyValue: vi.fn(), run: vi.fn(),
@@ -44,7 +47,7 @@ const mocks = vi.hoisted(() => {
     },
     createHud: vi.fn(() => ({ update: vi.fn(), destroy: vi.fn() })),
     createPanel: vi.fn(() => ({ update: vi.fn(), openOrSelectTab: vi.fn(), destroy: vi.fn() })),
-    createHudBar: vi.fn(() => ({ update: vi.fn(), setPhoneStatus: vi.fn(), destroy: vi.fn() })),
+    createHudBar: vi.fn(() => ({ update: vi.fn(), destroy: vi.fn() })),
   };
 });
 vi.mock("foss-earth/runtime", () => ({
@@ -68,7 +71,7 @@ vi.mock("./hud/createFlightControlPanel", () => ({ createFlightControlPanel: moc
 vi.mock("./hud/createFlightHudBar", () => ({ createFlightHudBar: mocks.createHudBar }));
 vi.mock("./jsbsim/resetFlightLocation", () => ({ resetFlightLocation: mocks.resetLocation }));
 vi.mock("./remote/createPhoneControlSession", () => ({ createPhoneControlSession: mocks.createPhoneSession }));
-vi.mock("./hud/createPhonePairingDialog", () => ({ createPhonePairingDialog: mocks.createDialog }));
+vi.mock("./hud/createPhonePairingPanel", () => ({ createPhonePairingPanel: mocks.createPairingPanel }));
 
 import { createFlightSimApp } from "./createFlightSimApp";
 
@@ -80,7 +83,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   Object.defineProperty(navigator, "getGamepads", { configurable: true, value: vi.fn(() => []) });
   mocks.snapshot.owner = "local";
-  mocks.createDialog.mockReturnValue(mocks.dialog);
+  mocks.createPairingPanel.mockReturnValue(mocks.pairingPanel);
   mocks.terrainContact.update.mockReturnValue(true);
   mocks.visibleMeshCollision.update.mockReturnValue(false);
   mocks.physics.update.mockImplementation((_dt, apply: () => boolean | void | "reset") => {
@@ -103,15 +106,18 @@ afterEach(() => {
   document.body.replaceChildren();
 });
 
+/** What the flight hands the side panel; the Remote Control tab calls into it. */
+function panelOptions() {
+  return mocks.createPanel.mock.calls.at(-1)![2] as FlightControlPanelOptions;
+}
+
 async function mount(pair = true) {
   const root = document.createElement("div");
   document.body.append(root);
   app = await createFlightSimApp(root);
   tick = mocks.runtime.setSimTick.mock.calls.at(-1)![0];
   if (pair) {
-    const hudOptions = mocks.createHudBar.mock.calls.at(-1)![1] as FlightHudBarOptions;
-    hudOptions.onPhoneControlClick!();
-    await vi.waitFor(() => expect(mocks.createPhoneSession).toHaveBeenCalledOnce());
+    await panelOptions().loadPhonePairing();
     options = mocks.createPhoneSession.mock.calls[0][0];
   }
   return root;
@@ -123,17 +129,41 @@ function grant() {
 }
 
 describe("OSFS phone integration", () => {
-  it("initializes the phone session only from the HUD button, reuses the dialog, and leaves flight unchanged", async () => {
+  it("makes the phone session only when the Remote Control tab asks, once, and leaves flight unchanged", async () => {
     await mount(false);
     expect(mocks.createPhoneSession).not.toHaveBeenCalled();
     tick(1 / 60);
     expect(mocks.sdk.setPropertyValue).toHaveBeenCalledWith("fcs/throttle-cmd-norm", 0.65);
-    const hudOptions = mocks.createHudBar.mock.calls.at(-1)![1] as FlightHudBarOptions;
-    hudOptions.onPhoneControlClick!();
-    await vi.waitFor(() => expect(mocks.createPhoneSession).toHaveBeenCalledOnce());
-    hudOptions.onPhoneControlClick!();
-    expect(mocks.dialog.open).toHaveBeenCalledTimes(2);
+
+    const mountPairing = await panelOptions().loadPhonePairing();
+    expect(mocks.createPhoneSession).toHaveBeenCalledOnce();
+    const host = document.createElement("div");
+    expect(mountPairing(host, { pairOnOpen: true })).toBe(mocks.pairingPanel);
+    expect(mocks.createPairingPanel).toHaveBeenCalledWith(host, mocks.phone, { pairOnOpen: true });
+    // The tab comes and goes with the panel; the session and its phone stay.
+    expect(await panelOptions().loadPhonePairing()).toBe(mountPairing);
+    expect(mocks.createPhoneSession).toHaveBeenCalledOnce();
     expect(mocks.runtime.setSimRunning).toHaveBeenLastCalledWith(true);
+  });
+
+  it("lets the tab try again after pairing failed to load", async () => {
+    await mount(false);
+    mocks.createPhoneSession.mockImplementationOnce(() => { throw new Error("offline"); });
+    await expect(panelOptions().loadPhonePairing()).rejects.toThrow("offline");
+
+    await panelOptions().loadPhonePairing();
+    expect(mocks.createPhoneSession).toHaveBeenCalledTimes(2);
+  });
+
+  it("switches this device to the controller at a clean /rc/, leaving the simulator", async () => {
+    await mount(false);
+    const assign = vi.fn();
+    vi.stubGlobal("location", { ...window.location, href: "https://0sfs.github.io/fly/?key=secret#spot", origin: "https://0sfs.github.io", assign });
+    panelOptions().onUseAsRemote();
+    vi.unstubAllGlobals();
+
+    expect(assign).toHaveBeenCalledWith("/rc/");
+    expect(mocks.createPhoneSession).not.toHaveBeenCalled();
   });
 
   it("selects fresh phone controls directly at the SDK boundary and keeps their applied settings for takeover", async () => {
@@ -213,6 +243,34 @@ describe("OSFS phone integration", () => {
     expect(mocks.physics.update).toHaveBeenLastCalledWith(0, expect.any(Function));
   });
 
+  it("draws the phone's camera swipe once, at the mouse's rate, and pinches the chase distance", async () => {
+    await mount();
+    grant();
+    // A gesture is what the fingers did, not a rate: the frame length cannot
+    // change how far a swipe moves the view.
+    mocks.phone.takeCameraAim.mockReturnValueOnce({ yaw: 0.1, pitch: -0.05 });
+    tick(0.1);
+    expect(mocks.aircraft.orbitChaseCamera).toHaveBeenCalledWith(expect.closeTo(0.5, 5), expect.closeTo(-0.25, 5));
+    // Drained by the session, so the next frame draws nothing further.
+    mocks.aircraft.orbitChaseCamera.mockClear();
+    tick(0.1);
+    expect(mocks.aircraft.orbitChaseCamera).not.toHaveBeenCalled();
+    // Pinching apart brings the aircraft closer, which is a smaller distance.
+    mocks.phone.takeCameraAim.mockReturnValueOnce({ yaw: 0, pitch: 0, zoom: 2 });
+    tick(0.1);
+    expect(mocks.aircraft.zoomChaseCamera).toHaveBeenCalledWith(0.5);
+    expect(mocks.aircraftModel.refreshAutoLod).toHaveBeenCalled();
+  });
+
+  it("reports the engine reading the HUD is drawing, so the phone shows the same one", async () => {
+    await mount();
+    grant();
+    tick(1 / 60);
+    // The mocked model publishes nothing readable, so the phase is still a
+    // label and every number is absent rather than a zero the phone would show.
+    expect(options.getStatus().engine).toEqual({ phase: expect.stringMatching(/^[A-Z][A-Z ]*$/) });
+  });
+
   it("adopts reset state and clears a held local key before a general reposition", async () => {
     await mount();
     grant(); tick(1 / 60);
@@ -251,8 +309,6 @@ describe("OSFS phone integration", () => {
     window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyW" }));
     document.dispatchEvent(new Event("visibilitychange"));
     expect(mocks.phone.destroy).toHaveBeenCalledOnce();
-    expect(mocks.dialog.destroy).toHaveBeenCalledOnce();
-    expect(mocks.phone.subscribe.mock.results[0].value).toHaveBeenCalledOnce();
     expect(mocks.runtime.setSimTick).toHaveBeenLastCalledWith(null);
     expect(mocks.sdk.setPropertyValue).toHaveBeenCalledTimes(writes);
     expect(mocks.phone.takeControl).not.toHaveBeenCalled();
@@ -263,11 +319,10 @@ describe("OSFS phone integration", () => {
 
   it("does not create a late session when destroyed during lazy loading", async () => {
     await mount(false);
-    const hudOptions = mocks.createHudBar.mock.calls.at(-1)![1] as FlightHudBarOptions;
-    hudOptions.onPhoneControlClick!();
+    const loading = panelOptions().loadPhonePairing();
     app!.destroy(); app = null;
-    await new Promise(resolve => setTimeout(resolve, 0));
+    await expect(loading).rejects.toThrow();
     expect(mocks.createPhoneSession).not.toHaveBeenCalled();
-    expect(mocks.createDialog).not.toHaveBeenCalled();
+    expect(mocks.createPairingPanel).not.toHaveBeenCalled();
   });
 });

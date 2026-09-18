@@ -24,6 +24,14 @@ export interface AircraftEntity {
   thirdPersonCamera: UniversalCamera;
   orbitChaseCamera(yaw: number, pitch: number): void;
   zoomChaseCamera(factor: number): void;
+  /**
+   * What the chase camera orbits in. `null` rides on the aircraft and turns
+   * with every rotation it makes (the original). A world rotation — say,
+   * heading alone — keeps the camera on the aircraft but out of the rotations
+   * left out of it, so the horizon stays level through a roll. Call it each
+   * frame after the aircraft moves.
+   */
+  setChaseFrame(rotation: Quaternion | null): void;
   setViewMode(mode: FlightViewMode): void;
   toggleViewMode(): FlightViewMode;
   getViewMode(): FlightViewMode;
@@ -81,6 +89,9 @@ export function createPlaceholderAircraft(scene: Scene, parent: TransformNode): 
 
   const thirdPersonCamera = new UniversalCamera("chase-camera", Vector3.Zero(), scene);
   thirdPersonCamera.parent = root;
+  // Only used when the chase camera should not turn with the whole aircraft.
+  const chasePivot = new TransformNode("chase-pivot", scene);
+  chasePivot.rotationQuaternion = Quaternion.Identity();
   thirdPersonCamera.position = THIRD_PERSON_OFFSET.clone();
   configureFlightCamera(thirdPersonCamera);
 
@@ -128,6 +139,15 @@ export function createPlaceholderAircraft(scene: Scene, parent: TransformNode): 
       chasePitch = Math.max(-Math.PI / 3, Math.min(Math.PI * 0.45, chasePitch + pitch));
       updateChaseCamera();
     },
+    setChaseFrame(rotation): void {
+      if (rotation === null) {
+        if (thirdPersonCamera.parent !== root) thirdPersonCamera.parent = root;
+        return;
+      }
+      chasePivot.position.copyFrom(root.getAbsolutePosition());
+      chasePivot.rotationQuaternion!.copyFrom(rotation);
+      if (thirdPersonCamera.parent !== chasePivot) thirdPersonCamera.parent = chasePivot;
+    },
     zoomChaseCamera(factor): void {
       if (viewMode !== "third" || !Number.isFinite(factor) || factor <= 0) return;
       chaseDistance = Math.max(8, Math.min(500, chaseDistance * factor));
@@ -144,6 +164,7 @@ export function createPlaceholderAircraft(scene: Scene, parent: TransformNode): 
     dispose(): void {
       firstPersonCamera.dispose();
       thirdPersonCamera.dispose();
+      chasePivot.dispose();
       cockpit.dispose();
       modelRoot.dispose();
       material.dispose();

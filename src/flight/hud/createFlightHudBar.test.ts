@@ -167,17 +167,11 @@ describe("flight input method selector", () => {
     expect(mapDownloadSpeed.parentElement).toBe(mapButton);
     expect([...mapControl.children].indexOf(terrainDetailControl)).toBeGreaterThan([...mapControl.children].indexOf(mapButton));
     const hudBar = container.querySelector(".hud-bar")!;
-    const phoneButton = container.querySelector<HTMLButtonElement>("#flightPhoneButton")!;
     const settingsButton = container.querySelector<HTMLButtonElement>("#flightSettingsButton")!;
-    expect(phoneButton.textContent).toBe("🎮");
-    expect(phoneButton.getAttribute("aria-label")).toBe("Phone controller");
+    // Pairing a phone lives in the panel's Remote Control tab, not in the bar.
+    expect(container.querySelector("#flightPhoneButton")).toBeNull();
     const hudChildren = [...hudBar.children];
-    expect(hudChildren.indexOf(phoneButton)).toBeGreaterThan(hudChildren.indexOf(mapControl));
-    expect(hudChildren.indexOf(phoneButton)).toBeLessThan(hudChildren.indexOf(settingsButton));
-    hud.setPhoneStatus?.("Phone controls");
-    expect(phoneButton.textContent).toBe("🎮");
-    expect(phoneButton.title).toBe("Phone controls");
-    expect(phoneButton.getAttribute("aria-label")).toBe("Phone controls");
+    expect(hudChildren.indexOf(settingsButton)).toBeGreaterThan(hudChildren.indexOf(mapControl));
     expect(container.querySelector("#flightTerrainSourceButton")).toBeNull();
     expect(Array.from(mapMenu.querySelectorAll(".flight-basemap-menu__section-toggle .flight-basemap-menu__heading"), (heading) => heading.textContent))
       .toEqual(["3D basemaps", "2D basemaps"]);

@@ -14,6 +14,7 @@ import {
   Navigation,
   ScrollText,
   Settings,
+  Smartphone,
   Pause,
   Play,
   Plane,
@@ -60,6 +61,8 @@ import {
 } from "./GroundInteractionSettingsPanel";
 import { AutopilotPanel, type AutopilotPanelState } from "./AutopilotPanel";
 import { SoundSettingsPanel, type SoundAction } from "./SoundSettingsPanel";
+import { RemoteControlTab, type MountPhonePairing } from "./RemoteControlTab";
+import type { PhoneCameraTuning } from "../remote/phoneCameraTuning";
 import {
   LoggingPanel,
   allowCloseLoggingTab,
@@ -70,13 +73,14 @@ import type { FlightAudioStatus } from "../audio/createFlightAudio";
 import type { AutopilotSettingsV1 } from "../autopilot/autopilotSettings";
 import type { FlightRecorder } from "../diagnostics/flightRecorder";
 
-export type FlightPanelTab = "weather" | "aircraft" | "autopilot" | "controls" | "sound" | "engine" | "logging" | "debug" | "settings";
+export type FlightPanelTab = "weather" | "aircraft" | "autopilot" | "controls" | "remote" | "sound" | "engine" | "logging" | "debug" | "settings";
 
 const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "weather", label: "Weather" },
   { id: "aircraft", label: "Aircraft" },
   { id: "autopilot", label: "Autopilot" },
   { id: "controls", label: "Controls" },
+  { id: "remote", label: "Remote Control" },
   { id: "sound", label: "Sound" },
   { id: "engine", label: "Engine" },
   { id: "logging", label: "Logging" },
@@ -89,6 +93,7 @@ const TAB_ICONS = {
   aircraft: Plane,
   autopilot: Navigation,
   controls: Gauge,
+  remote: Smartphone,
   sound: Volume2,
   engine: Fan,
   logging: ScrollText,
@@ -131,6 +136,7 @@ export interface FlightControlPanelSnapshot {
   modelError: string | null;
   keyboardStick: KeyboardStickSettings;
   orbitInvert: OrbitInvertSettings;
+  phoneCameraTuning: PhoneCameraTuning;
   arcadeGroundLaunches: boolean;
   collisionDebugEnabled: boolean;
   wheelSpinMode: WheelSpinMode | "off";
@@ -161,6 +167,7 @@ export interface FlightControlPanelOptions {
   onTerrainDetailAnchorChange(anchor: FlightTerrainDetailAnchor): void;
   onKeyboardStickSettingsChange(settings: KeyboardStickSettings): void;
   onOrbitInvertChange(settings: OrbitInvertSettings): void;
+  onPhoneCameraTuningChange(tuning: PhoneCameraTuning): void;
   onArcadeGroundLaunchesChange(enabled: boolean): void;
   onCollisionDebugChange(enabled: boolean): void;
   onWheelSpinModeChange(mode: WheelSpinMode | "off"): void;
@@ -174,6 +181,10 @@ export interface FlightControlPanelOptions {
   attachEngineDetails(host: HTMLElement): () => void;
   onLoggingAction(action: LoggingAction): void;
   flightRecorder: FlightRecorder;
+  /** Pairing for the Remote Control tab, loaded the first time the tab opens. */
+  loadPhonePairing(): Promise<MountPhonePairing>;
+  /** Leaves the simulator for the phone controller page on this device. */
+  onUseAsRemote(): void;
 }
 
 export interface FlightControlPanelHandle {
@@ -1041,6 +1052,8 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
                 <KeyboardStickSettingsPanel {...props} />
                 <OrbitInvertSettingsPanel {...props} />
               </div>
+              : tabId === "remote" ? <RemoteControlTab loadPhonePairing={props.loadPhonePairing} onUseAsRemote={props.onUseAsRemote}
+                cameraTuning={{ tuning: props.snapshot.phoneCameraTuning, onChange: props.onPhoneCameraTuningChange }} />
               : tabId === "sound" ? <SoundSettingsPanel state={props.snapshot.sound} onAction={props.onSoundAction} />
               : tabId === "engine" ? <EngineDetailsHost attach={props.attachEngineDetails} />
               : tabId === "logging" ? <LoggingPanel state={props.snapshot.logging} onAction={props.onLoggingAction} />

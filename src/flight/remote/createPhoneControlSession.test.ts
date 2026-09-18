@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPhoneControlSession } from './createPhoneControlSession'
+import { DEFAULT_PHONE_CAMERA_TUNING } from './phoneCameraTuning'
 import { parsePairingUrl } from '../../remote/pairing'
 import { PROTOCOL_MISMATCH_MESSAGE, type AircraftStatus, type ControlSurfaceState, type RemoteMessage } from '../../remote/protocol'
 import type { createPeerEndpoint, SessionTransport } from '../../remote/peerTransport'
@@ -55,7 +56,7 @@ class SlowReliableTransport extends Transport {
 }
 
 const allSessions: ReturnType<typeof createPhoneControlSession>[] = []
-function setup() {
+function setup(extra: Partial<Parameters<typeof createPhoneControlSession>[0]> = {}) {
   let time = 0
   let localActive = false
   let pageVisible = true
@@ -76,7 +77,7 @@ function setup() {
   const session = createPhoneControlSession({
     getStatus: () => ({ ...state, controls: { ...state.controls } }), hasActiveLocalInput: () => localActive,
     isPageVisible: () => pageVisible,
-    onOwnershipChange: ownership, setPaused: pause, setViewMode: view, createEndpoint, now: () => time,
+    onOwnershipChange: ownership, setPaused: pause, setViewMode: view, createEndpoint, now: () => time, ...extra,
   })
   allSessions.push(session)
   const advance = async (ms: number) => { time += ms; await vi.advanceTimersByTimeAsync(ms) }
@@ -113,6 +114,57 @@ beforeEach(() => vi.useFakeTimers())
 afterEach(() => { for (const session of allSessions.splice(0)) session.destroy(); vi.useRealTimers() })
 
 describe('desktop phone control session', () => {
+  it('draws the phone camera through the A/B settings, read live', async () => {
+    const tuning = { ...DEFAULT_PHONE_CAMERA_TUNING }
+    const h = setup({ getCameraTuning: () => tuning })
+    const transport = await h.pair()
+    const handoff = h.grant(transport)
+    const frame = (seq: number, delta: number, total: number) => ({
+      v: 1, type: 'controls', session: handoff.session, epoch: handoff.epoch, seq, lease: handoff.lease, controls: handoff.controls,
+      camera: { yaw: delta, pitch: 0 }, aim: { yaw: total, pitch: 0, zoom: 0, t: seq * 16 },
+    })
+    // Frame 2 is lost. Read as deltas, its movement is gone.
+    transport.receiveNative(frame(1, .01, .01))
+    transport.receiveNative(frame(3, .01, .03))
+    expect(h.session.takeCameraAim()!.yaw).toBeCloseTo(.02)
+    // Read as running totals, a later frame carries it.
+    tuning.source = 'total'
+    transport.receiveNative(frame(4, .01, .04))
+    transport.receiveNative(frame(6, .01, .06))
+    expect(h.session.takeCameraAim()!.yaw).toBeCloseTo(.03)
+    // The phone is told how to send on every heartbeat; absent means the original.
+    await h.advance(50)
+    expect('controlSend' in transport.last('heartbeat')).toBe(false)
+    tuning.send = 'batch'
+    await h.advance(50)
+    expect(transport.last('heartbeat')).toMatchObject({ controlSend: 'batch' })
+  })
+
+  it('reports what became of every control frame to an opt-in trace, and only then asks the phone for timings', async () => {
+    const plain = setup()
+    const plainTransport = await plain.pair()
+    expect('trace' in plainTransport.last('heartbeat')).toBe(false)
+
+    const controlFrame = vi.fn()
+    const h = setup({ trace: { controlFrame } })
+    const transport = await h.pair()
+    expect(transport.last('heartbeat')).toMatchObject({ trace: 1 })
+    const handoff = h.grant(transport)
+    expect(controlFrame).toHaveBeenLastCalledWith(expect.objectContaining({ seq: 0 }), 'accepted', expect.any(Number))
+    const frame = (seq: number, lease = handoff.lease) => ({
+      v: 1, type: 'controls', session: handoff.session, epoch: handoff.epoch, seq, lease, controls: handoff.controls,
+      camera: { yaw: .01, pitch: 0 },
+    })
+    transport.receiveNative(frame(2))
+    transport.receiveNative(frame(1))
+    expect(controlFrame).toHaveBeenLastCalledWith(expect.objectContaining({ seq: 1 }), 'out-of-order', expect.any(Number))
+    // A late frame on the unordered channel loses its camera movement with it.
+    expect(h.session.takeCameraAim()!.yaw).toBeCloseTo(.01)
+    h.jump(300)
+    transport.receiveNative(frame(3))
+    expect(controlFrame).toHaveBeenLastCalledWith(expect.objectContaining({ seq: 3 }), 'stale-lease', expect.any(Number))
+  })
+
   it('pairs without changing flight and requires both native readiness confirmations', async () => {
     const h = setup()
     await h.session.startPairing()

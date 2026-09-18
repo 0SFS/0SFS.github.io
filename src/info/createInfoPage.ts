@@ -80,7 +80,7 @@ export function createInfoPage(root: HTMLElement): void {
       </section>
       <section aria-labelledby="info-phone">
         <h2 id="info-phone">Phone controller</h2>
-        <p>On the computer, open the simulator and click <strong>Phone controller</strong>. Scan the QR with your phone camera. Both ends are web pages — there is no app to install. The QR expires after two minutes and admits one phone.</p>
+        <p>On the computer, open the simulator, then ⚙ → <strong>Remote Control</strong>. Scan the QR with your phone camera. Both ends are web pages — there is no app to install. The QR expires after two minutes and admits one phone.</p>
         <p><a href="${docs}/docs/phone-controller.md">How pairing works, and what to do when it fails</a></p>
       </section>
       <section aria-labelledby="info-docs">

@@ -37,7 +37,6 @@ export interface FlightHudBarOptions {
   /** Set a session-only detail target; null restores the saved World detail. */
   onTerrainDetailChange(errorTarget: number | null): void;
   onSettingsClick(): void;
-  onPhoneControlClick?(): void;
   onDebugClick(): void;
   /** Opens or closes the game log history; returns whether it is now open. */
   onLogToggle?(): boolean;
@@ -46,7 +45,6 @@ export interface FlightHudBarOptions {
 }
 
 export interface FlightHudBarHandle {
-  setPhoneStatus?(text: string): void;
   update(state: FlightState, status: BabylonRuntimeStatus, fps: number | null, paused: boolean): void;
   destroy(): void;
 }
@@ -167,7 +165,6 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
         optionDataAttribute: "mapSource",
         options: [],
       },
-      { kind: "button", id: "flightPhoneButton", title: "Connect a phone controller", ariaLabel: "Phone controller", className: "flight-phone-button", text: "🎮" },
       { kind: "button", id: "flightSettingsButton", title: "Open flight settings", ariaLabel: "Open flight settings", className: "settings-button", text: "⚙" },
       { kind: "button", id: "flightFullscreenButton", title: "Enter fullscreen", ariaLabel: "Enter fullscreen", className: "flight-fullscreen-button", text: "⛶" },
       { kind: "button", id: "flightLogButton", title: "Show the game log history", ariaLabel: "Show the game log history", className: "flight-log-button", text: "☰" },
@@ -175,9 +172,6 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     ],
   });
 
-  const phoneButton = hudBar.getElement<HTMLButtonElement>("flightPhoneButton");
-  const onPhoneClick = () => options.onPhoneControlClick?.();
-  phoneButton?.addEventListener("click", onPhoneClick);
   const pauseButton = hudBar.getElement<HTMLButtonElement>("flightPauseButton");
   const rendererButton = hudBar.getElement<HTMLButtonElement>("flightRendererButton");
   const rendererMenu = hudBar.getElement("flightRendererMenu");
@@ -439,11 +433,6 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
   updateTerrainDetailState();
 
   return {
-    setPhoneStatus(text) {
-      if (!phoneButton) return;
-      phoneButton.title = text;
-      phoneButton.setAttribute("aria-label", text);
-    },
     update(state, runtimeStatus, fps, nextPaused): void {
       updatePauseState(nextPaused);
       updateMapState(runtimeStatus);
@@ -453,7 +442,6 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
       statusElement.textContent = `${Math.abs(state.latDeg).toFixed(4)}°${state.latDeg >= 0 ? "N" : "S"} ${Math.abs(state.lonDeg).toFixed(4)}°${state.lonDeg >= 0 ? "E" : "W"} h${heading}°`;
     },
     destroy(): void {
-      phoneButton?.removeEventListener("click", onPhoneClick);
       fullscreenButton?.removeEventListener("click", onFullscreenClick);
       logButton?.removeEventListener("click", onLogClick);
       detachFullscreen();
