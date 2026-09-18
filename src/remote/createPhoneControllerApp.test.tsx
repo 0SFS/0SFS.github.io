@@ -6,6 +6,7 @@ vi.mock('react-dom/client', () => ({ createRoot: () => ({ render: mocks.render, 
 vi.mock('./phoneControllerClient', () => ({ createPhoneControllerClient: mocks.createClient }))
 vi.mock('./PhoneController', () => ({ PhoneController: () => null }))
 import { createPhoneControllerApp } from './createPhoneControllerApp'
+import { PhoneUnpaired } from './PhoneUnpaired'
 const secret = 'a'.repeat(43)
 const apps: Awaited<ReturnType<typeof createPhoneControllerApp>>[] = []
 async function mount() {
@@ -46,7 +47,7 @@ describe('phone controller application', () => {
       const app = await mount()
       expect(window.location.hash).toBe('')
       expect(mocks.createClient).not.toHaveBeenCalled()
-      expect(mocks.render.mock.calls.at(-1)![0].props.className).toContain('phone-app--empty')
+      expect(mocks.render.mock.calls.at(-1)![0].type).toBe(PhoneUnpaired)
       app.destroy()
     }
     expect(mocks.destroyClient).not.toHaveBeenCalled()
@@ -111,11 +112,38 @@ describe('phone controller application', () => {
     await vi.waitFor(() => expect(mocks.destroyClient).toHaveBeenCalledOnce())
     expect(window.location.hash).toBe('')
     expect(mocks.createClient).toHaveBeenCalledOnce()
-    expect(mocks.render.mock.calls.at(-1)![0].props.className).toContain('phone-app--empty')
+    expect(mocks.render.mock.calls.at(-1)![0].type).toBe(PhoneUnpaired)
     window.location.hash = invitationHash('new-desktop')
     await vi.waitFor(() => expect(mocks.createClient).toHaveBeenCalledTimes(2))
     expect(mocks.destroyClient).toHaveBeenCalledOnce()
     expect(window.location.hash).toBe('')
+  })
+
+  it('pairs from the page\'s own scanner without the credential touching the address bar', async () => {
+    await mount()
+    const replace = vi.spyOn(window.history, 'replaceState')
+    const { onPair } = mocks.render.mock.calls.at(-1)![0].props
+    onPair(`https://0sfs.github.io/rc/${invitationHash('scanned-desktop')}`)
+
+    expect(mocks.createClient).toHaveBeenCalledOnce()
+    expect(mocks.createClient.mock.calls[0][0]).toEqual({ peerId: 'scanned-desktop', secret: '' })
+    expect(window.location.href).toBe('https://0sfs.github.io/rc/')
+    expect(replace).not.toHaveBeenCalled()
+    // The controller it opens can scan again when its session ends.
+    expect(mocks.render.mock.calls.at(-1)![0].props.onPair).toBe(onPair)
+  })
+
+  it('loads a QR for another copy of the site, as the Camera app would', async () => {
+    await mount()
+    const { onPair } = mocks.render.mock.calls.at(-1)![0].props
+    const assign = vi.fn()
+    vi.stubGlobal('location', { ...window.location, href: 'https://0sfs.github.io/rc/', origin: 'https://0sfs.github.io', assign })
+    const elsewhere = `http://192.168.1.20:5173/rc/${invitationHash()}`
+    onPair(elsewhere)
+    vi.unstubAllGlobals()
+
+    expect(assign).toHaveBeenCalledWith(elsewhere)
+    expect(mocks.createClient).not.toHaveBeenCalled()
   })
 
   it('detaches hash navigation on destroy, including events queued before destruction', async () => {

@@ -1,9 +1,19 @@
 import { createPeerEndpoint, type PeerEndpoint, type SessionTransport, type TransportDiagnostics } from './peerTransport'
+import { createConnectionLog, describeIceFailure, type ConnectionLog } from './connectionDiagnostics'
 import {
-  CONTROL_INTERVAL_MS, HANDOFF_MS, MAX_HAPTIC_PULSE_MS, NEUTRAL_CONTROLS, STALE_MS, isCentered,
-  isControls, neutralize, parseMessage, isProtocolVersionMismatch, PROTOCOL_MISMATCH_MESSAGE,
-  type ActionName, type AircraftStatus, type ControlSurfaceState, type HapticFeedbackFrame, type RemoteMessage,
+  CONTROL_INTERVAL_MS, HANDOFF_MS, MAX_CAMERA_ZOOM_STEP, MAX_HAPTIC_PULSE_MS, MAX_TRACE_EVENTS, MIN_CAMERA_ZOOM_STEP,
+  NEUTRAL_CAMERA_AIM, NEUTRAL_CONTROLS, STALE_MS, isAiming,
+  isCameraAim, isCentered, isControls, neutralize, parseMessage, isProtocolVersionMismatch, PROTOCOL_MISMATCH_MESSAGE,
+  type ActionName, type AircraftStatus, type CameraAim, type CameraTotal, type ControlFrame, type ControlSendMode, type ControlSurfaceState, type ControlTrace, type HapticFeedbackFrame, type RemoteMessage,
 } from './protocol'
+
+/**
+ * When the input event behind a control change happened, for the opt-in
+ * camera trace only. `at` is the event's `timeStamp`; `coalesced` counts the
+ * touch samples the browser folded into it, and is only asked for while a
+ * trace is running.
+ */
+export interface InputTiming { at: number; coalesced?(): number }
 
 export interface PhoneControllerSnapshot {
   phase: 'connecting' | 'authenticating' | 'ready' | 'disconnected' | 'error'
@@ -26,13 +36,24 @@ export interface PhoneControllerSnapshot {
 }
 
 export interface PhoneControllerClient {
+  /** Everything this pairing attempt observed. Subscribe to it separately: a
+   *  log line must not re-render the flight controls. */
+  readonly log: ConnectionLog
   subscribe(listener: () => void): () => void
   getSnapshot(): PhoneControllerSnapshot
-  updateControls(controls: Partial<ControlSurfaceState>): void
+  updateControls(controls: Partial<ControlSurfaceState>, input?: InputTiming): void
+  /**
+   * Adds a camera trackpad gesture — a swipe as a fraction of the pad, a pinch
+   * as a spread ratio — to the next control frame. Deltas accumulate until one
+   * is actually sent, so a gesture is never lost to a frame that never left.
+   */
+  nudgeCamera(delta: CameraAim, input?: InputTiming): void
   cancelTransientControls(): void
   requestControl(): boolean
   setPaused(paused: boolean): boolean
   setViewMode(mode: 'first' | 'third'): boolean
+  /** Only offered when the host advertises `gearDown`; older hosts cannot move it. */
+  setGearDown(down: boolean): boolean
   releaseControl(): boolean
   setHapticsEnabled(enabled: boolean): void
   destroy(): void
@@ -41,6 +62,15 @@ export interface PhoneControllerClient {
 export const PHONE_HAPTICS_PREFERENCE_KEY = 'osfs.phone-haptics'
 // A new pulse may replace the running one, but not faster than the host heartbeat.
 const MIN_PULSE_INTERVAL_MS = 45
+/**
+ * The controls the screen draws a number for. Each of these has to reach the
+ * snapshot, because its slider is React-controlled: a value that only moves in
+ * the mailbox is painted back to the snapshot's on the next render, so the
+ * thumb sits still while the aircraft answers the finger. The pitch/roll pad
+ * and the brake draw themselves from the pointer and are deliberately absent —
+ * stick motion must never wait on a render.
+ */
+const RENDERED_CONTROLS = ['throttle', 'pitchTrim', 'rollTrim', 'flaps', 'rudder'] as const
 
 interface ClientOptions {
   endpointFactory?: typeof createPeerEndpoint
@@ -51,6 +81,25 @@ interface ClientOptions {
   /** Injectable Vibration API; null means unsupported. */
   vibrate?: ((durationMs: number) => boolean) | null
   storage?: Pick<Storage, 'getItem' | 'setItem'> | null
+  log?: ConnectionLog
+  /**
+   * Runs a task after the current one, which is how batch sending waits for
+   * the rest of a touch frame's pointer events. Defaults to a MessageChannel:
+   * a task without `setTimeout`'s clamping, and not a microtask, which would
+   * run between two pointers' events.
+   */
+  postTask?: (task: () => void) => void
+}
+
+function createPostTask(): { post(task: () => void): void; close(): void } {
+  if (typeof MessageChannel !== 'function') return { post: task => { setTimeout(task, 0) }, close() {} }
+  const channel = new MessageChannel()
+  let queued: (() => void) | null = null
+  channel.port1.onmessage = () => { const task = queued; queued = null; task?.() }
+  return {
+    post(task) { queued = task; channel.port2.postMessage(0) },
+    close() { channel.port1.onmessage = null; channel.port1.close(); channel.port2.close() },
+  }
 }
 
 /** The control mailbox changes synchronously in pointer handlers, outside React. */
@@ -59,6 +108,7 @@ export function createPhoneControllerClient(
   options: ClientOptions = {},
 ): PhoneControllerClient {
   const now = options.now ?? (() => performance.now())
+  const log = options.log ?? createConnectionLog('phone', now)
   const doc = options.document ?? (typeof document === 'undefined' ? undefined : document)
   const win = options.window ?? (typeof window === 'undefined' ? undefined : window)
   const listeners = new Set<() => void>()
@@ -72,6 +122,40 @@ export function createPhoneControllerClient(
     hapticsSupported: false, hapticsEnabled: false,
   }
   let controls = { ...NEUTRAL_CONTROLS }
+  // Gesture movement not yet on the wire. It clears when a frame carrying it is
+  // actually sent, and on a blur, so an abandoned swipe never arrives late.
+  let camera: CameraAim = { ...NEUTRAL_CAMERA_AIM }
+  // The same gesture as a running total for this epoch (`CameraTotal`), so a
+  // host that reads it loses nothing to a lost frame. `aimSent` is the total the
+  // last frame carried, which a blur rewinds to, as it discards `camera`.
+  let aimTotal = { yaw: 0, pitch: 0, zoom: 0 }
+  let aimSent = { ...aimTotal }
+  let aimUsed = false
+  let aimStamp = -Infinity
+  let aimMovedAt: number | null = null
+  // When frames leave: chosen by the computer on its heartbeat.
+  let sendMode: ControlSendMode = 'timer'
+  let lastInputAt = -Infinity
+  let batchQueued = false
+  let batchTimer: ReturnType<typeof setTimeout> | undefined
+  // Made on first use, so a controller that never batches holds no open port.
+  let ownTask: ReturnType<typeof createPostTask> | null = null
+  const postTask = options.postTask ?? ((task: () => void) => (ownTask ??= createPostTask()).post(task))
+  // The opt-in camera trace (`?phoneCameraTrace=1` on the desktop): what the
+  // next frame will report about how it came to be sent. Measurement only.
+  let traceRequested = false
+  let traceCam: number[][] = []
+  let traceCtl: number[][] = []
+  let traceGated = 0
+  let traceDrop = [0, 0, 0]
+  const tenth = (value: number) => Math.round(value * 10) / 10
+  /** A millionth of a pad is a thousandth of a pixel; the total stays exact where it matters. */
+  const micro = (value: number) => Math.round(value * 1e6) / 1e6
+  function traceInput(list: number[][], entry: number[]): void {
+    if (list.length < MAX_TRACE_EVENTS) list.push(entry)
+  }
+  /** Event times become ages before the frame, which stay short on the wire. */
+  const aged = (list: number[][], time: number) => list.map(([at, handled, ...rest]) => [time - at, time - handled, ...rest].map(tenth))
   let endpoint: PeerEndpoint | undefined
   let transport: SessionTransport | undefined
   let secret = invitation.secret
@@ -176,22 +260,75 @@ export function createPhoneControllerClient(
     stopVibration()
     clearPending(preserveRequest)
     adoptControls(controls)
+    // A running total belongs to its epoch; the host starts from zero with it.
+    aimTotal = { yaw: 0, pitch: 0, zoom: 0 }
+    aimSent = { ...aimTotal }
+    aimUsed = false
+    aimStamp = -Infinity
+    aimMovedAt = null
   }
 
-  function sendControls(): void {
+  /** `by` is for the opt-in trace only: 0 an input event, 1 the control timer, 2 anything else. */
+  function sendControls(by: ControlTrace['by'] = 2): void {
     if (finished || !session || !transport?.nativeOpen || lease < 0 || suspended) return
     if (handoffEpoch !== epoch && !(snapshot.status?.owner === 'phone' && authorityEpoch === epoch)) return
     const time = now()
     // An interval plus immediate contacts/releases can never exceed 120 frames/s.
-    if (time - lastControlAt < 1000 / 120) return
+    if (time - lastControlAt < 1000 / 120) { if (traceRequested) traceGated++; return }
     if (sequence >= Number.MAX_SAFE_INTEGER) { fail('Controller session ended. Scan a new QR.'); return }
     lastControlAt = time
-    transport.sendNative({ ...envelope(), type: 'controls', seq: sequence++, lease, controls: { ...controls } })
+    // An unmoved camera is the absence of the key, which is exactly how a host
+    // that predates this field reads every frame.
+    const gesture = isAiming(camera) ? { camera: { ...camera } } : null
+    // As of the newest touch it includes, or of now if the finger has not moved
+    // since; always later than the previous frame's, so the timeline only runs forward.
+    const stamp = Math.round(Math.max(aimStamp + .01, aimMovedAt ?? time) * 100) / 100
+    const total: { aim: CameraTotal } | null = aimUsed ? { aim: {
+      yaw: micro(aimTotal.yaw), pitch: micro(aimTotal.pitch), zoom: micro(aimTotal.zoom), t: stamp,
+    } } : null
+    const trace: { trace: ControlTrace } | null = traceRequested ? { trace: {
+      at: tenth(time), by, gated: traceGated, buf: transport.nativeBufferedAmount,
+      cam: aged(traceCam, time), ctl: aged(traceCtl, time), drop: traceDrop.map(tenth),
+    } } : null
+    const sent = transport.sendNative({ ...envelope(), type: 'controls', seq: sequence++, lease, controls: { ...controls }, ...gesture, ...total, ...trace })
+    // Only a delta that left the device has been spent.
+    if (sent && gesture) camera = { ...NEUTRAL_CAMERA_AIM }
+    if (sent && total) { aimSent = { ...aimTotal }; aimStamp = stamp; aimMovedAt = null }
+    if (sent && trace) { traceCam = []; traceCtl = []; traceGated = 0; traceDrop = [0, 0, 0] }
   }
 
   function cancelTransientControls(): void {
-    controls = neutralize(controls)
+    // Through `adoptControls`, so a rudder the screen is drawing goes back to
+    // centre on the screen too, not just on the wire.
+    adoptControls(controls)
+    camera = { ...NEUTRAL_CAMERA_AIM }
+    aimTotal = { ...aimSent }
+    aimMovedAt = null
     sendControls()
+    emit()
+  }
+
+  /**
+   * An input event changed what the next frame carries. `timer` sends now,
+   * within the 120/s cap, and leaves anything the cap turned away to the next
+   * event or the 60 Hz timer. `batch` waits for the rest of this touch frame's
+   * events, then sends once — and if the cap is still closed, when it opens.
+   */
+  function inputChanged(): void {
+    lastInputAt = now()
+    if (sendMode === 'timer') { sendControls(0); return }
+    if (batchQueued) return
+    batchQueued = true
+    postTask(sendBatch)
+  }
+  function sendBatch(): void {
+    clearTimeout(batchTimer)
+    batchTimer = undefined
+    batchQueued = false
+    if (finished || destroyed) return
+    const wait = lastControlAt + 1000 / 120 - now()
+    if (wait > 0) { batchQueued = true; batchTimer = setTimeout(sendBatch, Math.ceil(wait)); return }
+    sendControls(0)
   }
 
   function stopTransport(): void {
@@ -217,8 +354,14 @@ export function createPhoneControllerClient(
     finally { wakeLockPending = false }
   }
 
-  function fail(message: string, disconnected = false): void {
+  /** Prefers the cause the transport already recorded over a generic guess. */
+  function recordedReason(fallback: string): string {
+    return log.facts().failure?.detail ?? fallback
+  }
+
+  function fail(message: string, disconnected = false, code = 'client-failure'): void {
     if (finished || destroyed) return
+    log.recordFailure('session', code, message)
     finished = true
     secret = ''
     clearTimeout(setupTimer)
@@ -304,7 +447,8 @@ export function createPhoneControllerClient(
           fail('Could not finish pairing. Scan a new QR.'); return
         }
         checkReady()
-      }).catch(() => fail('Could not open the direct control channel. Try the same non-guest Wi-Fi network.'))
+      }).catch(() => fail(recordedReason(
+        `Could not open the direct control channel. ${describeIceFailure(log.facts())}`), false, 'control-channel-failed'))
       return
     }
     if (!session || message.session !== session || message.epoch < epoch) return
@@ -372,6 +516,8 @@ export function createPhoneControllerClient(
       if (message.lease <= lease) return
       lease = message.lease
       lastHeartbeatAt = now()
+      traceRequested = message.trace === 1
+      sendMode = message.controlSend === 'batch' ? 'batch' : 'timer'
       if (message.status) updateStatus(message.status, false)
       if (message.feedback) applyFeedback(message.feedback)
       emit({
@@ -415,7 +561,10 @@ export function createPhoneControllerClient(
       cancelTransientControls()
       emit({ message: fresh ? snapshot.message : 'Connection delayed · Waiting for the computer' })
     }
-    sendControls()
+    // Batch sending keeps the stream alive from here only while no input is:
+    // a timer frame just before a touch frame would hold that frame back.
+    if (sendMode === 'batch' && (batchQueued || now() - lastInputAt < 2 * CONTROL_INTERVAL_MS)) return
+    sendControls(1)
   }, CONTROL_INTERVAL_MS)
   const pingTimer = setInterval(() => {
     if (finished || destroyed || snapshot.phase !== 'ready' || !transport?.nativeOpen) return
@@ -431,6 +580,8 @@ export function createPhoneControllerClient(
 
   function stopRuntime(): void {
     clearTimeout(setupTimer)
+    clearTimeout(batchTimer)
+    ownTask?.close()
     clearInterval(frameTimer)
     clearInterval(pingTimer)
     clearInterval(diagnosticsTimer)
@@ -440,18 +591,31 @@ export function createPhoneControllerClient(
     win?.removeEventListener('orientationchange', cancelTransientControls)
   }
 
-  setupTimer = setTimeout(() => fail('Pairing service unavailable. Open a new QR on the computer and try again.'), 10_000)
+  setupTimer = setTimeout(() => fail(recordedReason(
+    'Pairing service unavailable. This phone never finished registering with the signaling server, so it could not call the computer.',
+  ), false, 'phone-registration-timeout'), 10_000)
   try {
     endpoint = (options.endpointFactory ?? createPeerEndpoint)({
+      log,
+      role: 'phone',
       onConnection: incoming => incoming.close(),
       onSignalingState: available => { if (!finished) emit({ signalingAvailable: available }) },
     })
     void endpoint.ready.then(() => {
       if (finished || destroyed) return
       clearTimeout(setupTimer)
-      setupTimer = setTimeout(() => fail('Could not connect directly, or the invitation is no longer available. Open a new QR and try the same non-guest Wi-Fi network.'), 15_000)
+      setupTimer = setTimeout(() => fail(recordedReason(
+        `Could not connect directly. ${describeIceFailure(log.facts())}`), false, 'phone-setup-timeout'), 15_000)
       transport = endpoint!.connect(peerId)
-      subscriptions.push(transport.onReliable(receiveReliable), transport.onNative(receiveNative), transport.onClose(reason => fail(reason, true)))
+      subscriptions.push(transport.onReliable(receiveReliable), transport.onNative(receiveNative), transport.onClose(reason => fail(reason, true, 'transport-closed')))
+      const discarded = transport.onNativeDiscarded?.(value => {
+        const frame = value as Partial<ControlFrame>
+        if (!traceRequested || frame.type !== 'controls') return
+        traceDrop[0]++
+        traceDrop[1] += (frame.camera?.yaw ?? 0) * 1000
+        traceDrop[2] += (frame.camera?.pitch ?? 0) * 1000
+      })
+      if (discarded) subscriptions.push(discarded)
       // onClose may report an already-closed transport synchronously.
       if (finished || destroyed) { for (const unsubscribe of subscriptions.splice(0)) unsubscribe(); return }
       emit({ phase: 'authenticating', message: 'Connecting to your computer…' })
@@ -459,25 +623,51 @@ export function createPhoneControllerClient(
         if (finished || destroyed) return
         if (!transport?.sendReliable({ v: 1, type: 'hello', secret })) fail('Could not finish pairing. Scan a new QR.')
       })
-    }).catch(() => fail('Could not reach the computer or pairing service. Open a new QR and try again.'))
-  } catch { fail('This browser could not start phone control. Try a current Safari or Chrome browser.') }
+    }).catch((error: unknown) => fail(recordedReason(
+      error instanceof Error && error.message ? error.message
+        : 'Could not reach the computer or pairing service. Open a new QR and try again.'), false, 'endpoint-failed'))
+  } catch (error: unknown) {
+    log.record('session', 'peer-construction-failed', error instanceof Error ? error.message : String(error), 'error')
+    fail('This browser could not start phone control. Try a current Safari or Chrome browser.', false, 'peer-unsupported')
+  }
 
   return {
+    log,
     subscribe(listener) { listeners.add(listener); return () => { listeners.delete(listener) } },
     getSnapshot: () => snapshot,
-    updateControls(partial) {
+    updateControls(partial, input) {
       if (!snapshot.canControl || finished) return
       const next = { ...controls, ...partial }
       if (!isControls(next)) return
       controls = next
-      // Persistent controls render their values; stick motion never waits on a render.
-      if (partial.throttle !== undefined || partial.pitchTrim !== undefined || partial.rollTrim !== undefined || partial.flaps !== undefined) emit({ controls: { ...controls } })
-      sendControls()
+      if (traceRequested && input) traceInput(traceCtl, [input.at, now()])
+      if (RENDERED_CONTROLS.some(key => partial[key] !== undefined)) emit({ controls: { ...controls } })
+      inputChanged()
+    },
+    nudgeCamera(delta, input) {
+      if (!snapshot.canControl || finished || !isCameraAim(delta) || !isAiming(delta)) return
+      if (traceRequested && input) traceInput(traceCam, [input.at, now(), delta.yaw * 1000, delta.pitch * 1000, input.coalesced?.() ?? 1])
+      const bound = (value: number) => Math.max(-1, Math.min(1, value))
+      const zoom = Math.max(MIN_CAMERA_ZOOM_STEP,
+        Math.min(MAX_CAMERA_ZOOM_STEP, (camera.zoom ?? 1) * (delta.zoom ?? 1)))
+      camera = {
+        yaw: bound(camera.yaw + delta.yaw), pitch: bound(camera.pitch + delta.pitch),
+        ...(zoom === 1 ? {} : { zoom }),
+      }
+      aimTotal = {
+        yaw: aimTotal.yaw + delta.yaw, pitch: aimTotal.pitch + delta.pitch,
+        zoom: aimTotal.zoom + Math.log(delta.zoom ?? 1),
+      }
+      aimUsed = true
+      aimMovedAt = Math.max(aimMovedAt ?? -Infinity, input?.at ?? now())
+      // The camera never renders a value, so this never needs a re-render.
+      inputChanged()
     },
     cancelTransientControls,
     requestControl: () => sendAction('requestControl'),
     setPaused: value => sendAction('setPaused', value),
     setViewMode: value => sendAction('setViewMode', value),
+    setGearDown: value => (snapshot.status?.gearDown === undefined ? false : sendAction('setGearDown', value)),
     releaseControl() { cancelTransientControls(); return sendAction('releaseControl') },
     setHapticsEnabled(enabled) {
       if (destroyed) return

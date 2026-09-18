@@ -34,6 +34,7 @@ flowchart TB
   ASSETS["Aircraft GLB / Blender / images<br/>per-asset rights unresolved"]
   PEER["PeerJS client<br/>MIT"]
   QR["QR code<br/>MIT"]
+  JSQR["jsQR<br/>Apache-2.0"]
   GOOGLE["Google Maps Tiles API<br/>service and data terms"]
   MAPS["Raster / terrain / search providers<br/>provider terms and attribution"]
   SIGNAL["PeerJS Cloud + STUN<br/>external operations"]
@@ -44,6 +45,7 @@ flowchart TB
   OSFS --> ASSETS
   OSFS --> PEER
   OSFS --> QR
+  OSFS --> JSQR
   FE --> BJS
   FE --> TILES
   TILES --> GOOGLE

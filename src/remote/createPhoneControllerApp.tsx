@@ -1,7 +1,9 @@
 import { createRoot } from 'react-dom/client'
+import { isAppPath } from '../appRoute'
 import { parsePairingUrl } from './pairing'
 import { createPhoneControllerClient, type PhoneControllerClient } from './phoneControllerClient'
 import { PhoneController } from './PhoneController'
+import { PhoneUnpaired } from './PhoneUnpaired'
 import './phone.css'
 
 export async function createPhoneControllerApp(container: HTMLElement): Promise<{ destroy(): void }> {
@@ -18,11 +20,23 @@ export async function createPhoneControllerApp(container: HTMLElement): Promise<
   let client: PhoneControllerClient | null = null
   let generation = 0
   let disposed = false
+  /**
+   * A QR read by the page's own scanner. One for this page pairs here, and its
+   * credential never touches the address bar. One for another copy of the site
+   * loads that copy, as the Camera app would, so the phone runs the code the
+   * computer that showed it runs.
+   */
+  const pair = (url: string) => {
+    if (disposed) return
+    const scanned = new URL(url)
+    if (scanned.origin === window.location.origin && isAppPath(scanned.pathname, 'rc')) connect(parsePairingUrl(url))
+    else window.location.assign(url)
+  }
   const connect = (next: ReturnType<typeof parsePairingUrl>) => {
     client?.destroy()
     client = null
     if (!next) {
-      root.render(<main className="phone-app phone-app--empty"><div className="phone-brand"><span className="phone-brand__mark" aria-hidden="true">✈</span><strong>OSFS</strong></div><h1>Scan a new QR to connect</h1><p>This controller link is incomplete or has already been cleared. Open <strong>Phone controller</strong> on the computer and scan its QR with your phone camera.</p><p className="phone-empty-hint">Keep both devices on the same non-guest Wi-Fi for the best connection.</p></main>)
+      root.render(<PhoneUnpaired onPair={pair} />)
       return
     }
     // Networking stays outside React effects: one live client per invitation.
@@ -32,7 +46,7 @@ export async function createPhoneControllerApp(container: HTMLElement): Promise<
       next.secret = ''
     }
     // Reset touch component state when the same browser tab scans another QR.
-    root.render(<PhoneController key={++generation} client={client} />)
+    root.render(<PhoneController key={++generation} client={client} onPair={pair} />)
   }
   const onHashChange = () => {
     // replaceState does not emit hashchange. Ignore empty/stale queued events
