@@ -28,7 +28,7 @@
     },
     {
       "file": "core.cpp",
-      "sha256": "4a58b78515be257fb140a06dc0a01cf8861f74758427c3d8e1886c907f2ff647"
+      "sha256": "2f41de37bbea429c63c19687dddb89f93abb357ac070ec8b61a69ee9ee86826a"
     },
     {
       "file": "granular.h",
@@ -48,8 +48,8 @@
     }
   ],
   "wasm": {
-    "bytes": 42542,
-    "sha256": "ef9369b6b64cd93fb976ff0a19571de38b3dc0d06fbb5e1d3b6a17b4fe8a4d41"
+    "bytes": 42740,
+    "sha256": "01367066b89f28d8d560c326216f507d821cbef57d091d0a4f85f309f99c238b"
   },
   "imports": [
     "env.emscripten_notify_memory_growth"
@@ -81,5 +81,5 @@
     "osfs_audio_stats",
     "osfs_audio_stats_count"
   ],
-  "builtUtc": "2026-09-14T09:41:52.063Z"
+  "builtUtc": "2026-09-16T23:31:30.656Z"
 }
