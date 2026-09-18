@@ -86,14 +86,29 @@ export function prefersHomeScreenInstall(): boolean {
  * Offers to hide the browser bars in the log. Nothing happens without the
  * pilot's choice: "Every visit" enters fullscreen on their first tap or key
  * press, because browsers refuse fullscreen that is not started by one.
+ *
+ * An iPhone has no fullscreen to offer, and this page is where the screen
+ * matters most, so it gets the controller's notice — asked once per device, the
+ * same dismissal the controller remembers — and the log line opens it again.
+ * The notice is React and loads only here, so no other browser downloads it.
  */
 export function offerFullscreen(log: GameLog): () => void {
   if (isStandaloneDisplay()) return () => {};
   if (!canRequestFullscreen()) {
-    if (typeof window.matchMedia === "function" && window.matchMedia("(pointer: coarse)").matches) {
-      log.print({ text: "To hide the browser bars, add OSFS to your Home Screen (Share → Add to Home Screen)." });
-    }
-    return () => {};
+    if (!prefersHomeScreenInstall()) return () => {};
+    let destroyed = false;
+    const notice = import("./createFullscreenNotice")
+      .then(({ createFullscreenNotice }) => destroyed ? null : createFullscreenNotice(document.body))
+      // Without its chunk the log line below still says what to do.
+      .catch(() => null);
+    log.print({
+      text: "To hide the browser bars, add OSFS to your Home Screen (Share → Add to Home Screen).",
+      actions: [{ label: "Why?", onClick: () => { void notice.then(current => current?.open()); } }],
+    });
+    return () => {
+      destroyed = true;
+      void notice.then(current => current?.destroy());
+    };
   }
 
   let everyVisit = readFullscreenEveryVisit();
