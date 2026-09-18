@@ -35,7 +35,10 @@ const CERT_DIR = path.join(ROOT, "build", "dev-certs");
 const CERT = path.join(CERT_DIR, "lan.crt");
 const KEY = path.join(CERT_DIR, "lan.key");
 const META = path.join(CERT_DIR, "lan.json");
+/** Apple's ceiling for a TLS server certificate on iOS 13 and macOS 10.15 onwards. */
 const CERT_DAYS = 825;
+/** Bumped when what goes into the certificate changes, so an older one is replaced once. */
+const CERT_PROFILE = 2;
 
 function argValue(name, fallback) {
   const index = process.argv.indexOf(`--${name}`);
@@ -76,7 +79,8 @@ function ensureCertificate(address) {
   if (existsSync(CERT) && existsSync(KEY) && existsSync(META)) {
     try {
       const meta = JSON.parse(readFileSync(META, "utf8"));
-      if (meta.address === address && Date.parse(meta.expires) > Date.now() + 86_400_000) return false;
+      if (meta.address === address && meta.profile === CERT_PROFILE
+        && Date.parse(meta.expires) > Date.now() + 86_400_000) return false;
     } catch { /* Regenerate on an unreadable record. */ }
   }
   const result = spawnSync("openssl", [
@@ -85,12 +89,14 @@ function ensureCertificate(address) {
     "-keyout", KEY, "-out", CERT,
     "-subj", "/CN=OSFS LAN dev",
     "-addext", `subjectAltName=IP:${address},IP:127.0.0.1,DNS:localhost`,
+    // Apple requires it of every TLS server certificate, self-signed included.
+    "-addext", "extendedKeyUsage=serverAuth",
   ], { encoding: "utf8" });
   if (result.status !== 0) {
     throw new Error(`Could not create a development certificate with openssl:\n${result.stderr ?? ""}`);
   }
   writeFileSync(META, JSON.stringify({
-    address, expires: new Date(Date.now() + CERT_DAYS * 86_400_000).toISOString(),
+    address, profile: CERT_PROFILE, expires: new Date(Date.now() + CERT_DAYS * 86_400_000).toISOString(),
   }, null, 2) + "\n");
   return true;
 }
@@ -118,11 +124,15 @@ if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).
   if (process.argv.includes("--print")) {
     console.log("Start it with:");
     console.log(`  VITE_PHONE_CONTROLLER_URL=${origin} DEV_TLS_CERT=${CERT} DEV_TLS_KEY=${KEY} \\`);
-    console.log(`    npx vite --host ${found.address} --port ${port}`);
+    console.log(`    npx vite --host 0.0.0.0 --port ${port}`);
     process.exit(0);
   }
 
-  const vite = spawnSync("npx", ["vite", "--host", found.address, "--port", port], {
+  // Every interface, not only the LAN address: the phone comes in on that, and
+  // the computer on localhost, which the certificate covers too. Bound to the
+  // LAN address alone, localhost was refused — while Vite still listed it,
+  // because it prints every name the certificate carries.
+  const vite = spawnSync("npx", ["vite", "--host", "0.0.0.0", "--port", port], {
     cwd: ROOT,
     stdio: "inherit",
     env: { ...process.env, VITE_PHONE_CONTROLLER_URL: origin, DEV_TLS_CERT: CERT, DEV_TLS_KEY: KEY },
