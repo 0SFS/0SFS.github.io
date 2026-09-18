@@ -72,6 +72,13 @@ load `/assets/…`. Check `deploy:gh-pages` in `package.json` for a stray `--bas
 `https://0sfs.github.io/rc/` by default. A different static HTTPS deployment needs
 `VITE_PHONE_CONTROLLER_URL` set to its base URL *at build time* (the build appends `rc/`).
 
+**Phone pairing reaches the QR but never connects.** Open **Connection details** on either end — both
+sides record the whole attempt and name the cause. If the report shows candidates on both sides but no
+selected pair, there is no direct path between the two devices and the deployment needs a TURN relay:
+build with `VITE_ICE_SERVERS` set to a JSON array of `RTCIceServer` entries. One build-time setting
+reaches both devices, since they load the same bundle. See
+[Phone controller](phone-controller.md#adding-a-turn-relay).
+
 ## Deploying your own fork
 
 A fork named `<user>.github.io` is served from the domain root, like this one, and needs no change.
