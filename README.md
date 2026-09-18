@@ -75,6 +75,7 @@ broader simulator is still taking shape.
 
 | Document | What it covers |
 | --- | --- |
+| [Phone controller UI](docs/phone-controller-ui.md) | How the `/rc/` screen is built and checked |
 | [Phone controller](docs/phone-controller.md) | Pairing a phone as a touch controller, and its limits |
 | [Deploying to GitHub Pages](docs/deploying.md) | Publishing the live site — one command, `npm run deploy` |
 | [Development](docs/development.md) | Local setup, tests, the FOSS Earth dependency, building your own copy |

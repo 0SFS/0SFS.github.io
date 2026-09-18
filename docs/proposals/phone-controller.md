@@ -178,10 +178,22 @@ interface ControlFrameV1 {
     flaps: number;
     brake: number;
   };
+  // What the camera trackpad did since the last frame; absent when it did nothing.
+  camera?: { yaw: number; pitch: number; zoom?: number };
 }
 ```
 
-Use finite values in `[-1, 1]` for surfaces/trim and `[0, 1]` for throttle/flaps/brake. Local pointer processing clamps to these ranges; network validation rejects invalid values rather than repairing malformed input. Frame size is at most **2 KiB UTF-8 JSON**. Unknown message types, invalid sessions, and unsafe/noninteger/negative counters are rejected.
+Use finite values in `[-1, 1]` for surfaces/trim and `[0, 1]` for throttle/flaps/brake.
+
+`camera` is additive on v1 and a view rather than a control surface: it cannot refresh a lease or take
+authority, and malformed aim is dropped on its own rather than costing the frame its control surfaces.
+A peer that never sends it behaves exactly as before. It carries gesture *deltas*, not a position or a
+rate — `yaw`/`pitch` are the swipe in CSS pixels scaled by 1/1000 and bounded to `[-1, 1]`, and `zoom`
+is a pinch ratio bounded to `[0.5, 2]` per frame. The desktop sums the frames it receives and draws
+the total once per rendered frame, so a dropped frame costs that frame's movement and nothing more. The status frame carries the desktop's engine reading the same way, in an
+optional `engine` field — a `phase` label plus `n1`, `n2`, `rpm`, `thrustLbf`, `fuelFlowPph` and
+`fuelFlowGph`, everything the HUD's engine widget draws, each absent rather than zero when the flight
+model does not publish it. Local pointer processing clamps to these ranges; network validation rejects invalid values rather than repairing malformed input. Frame size is at most **2 KiB UTF-8 JSON**. Unknown message types, invalid sessions, and unsafe/noninteger/negative counters are rejected.
 
 Sequence starts at zero for each new epoch and increases for every transmitted snapshot. Keep only frames newer than the last accepted sequence; reset the counter with a new epoch before exhausting safe integer range. Old epochs, duplicates, and reordered frames cannot alter controls or refresh freshness.
 
@@ -290,7 +302,7 @@ V1 introduces no paid infrastructure. Free services can change or become unavail
 | `src/flight/remote/createPhoneControlSession.ts` | Host authentication, one-phone claim, mailbox, leases, watchdog. |
 | Host session and `src/flight/input/applyFlightControls.ts` | Exclusive owner, applied-state baseline, handoff, one JSBSim writer. |
 | `src/flight/input/flightInputManager.ts` | Local state adoption and intentional takeover detection. |
-| `src/flight/hud/createFlightHudBar.ts`, pairing dialog | Phone button, QR, status, takeover and disconnect. |
+| `src/flight/hud/RemoteControlTab.tsx`, `createPhonePairingPanel.ts` | Remote Control tab: QR, status, takeover and disconnect. |
 | `src/flight/createFlightSimApp.ts`, HUD updates | Composition, pause/reset/destroy wiring, applied-control diagnostics. |
 | `package.json`, lockfile, README | Client dependencies, production configuration, usage and limitations. |
 
@@ -321,7 +333,9 @@ The main product choices to review are: **touch controls before tilt; explicit F
 
 ## Implementation notes
 
-The implementation uses `src/remote/` for the browser-only controller, protocol, QR invitation helpers, and pinned PeerJS transport. `src/flight/remote/createPhoneControlSession.ts` owns desktop authentication, readiness, input leases, action deduplication, and authority. `applyFlightControls.ts` is the common normalized input-to-JSBSim boundary. The desktop dialog labels the invitation cancellation action **Disconnect**; closing the dialog preserves the invitation.
+The implementation uses `src/remote/` for the browser-only controller, protocol, QR invitation helpers, and pinned PeerJS transport. `src/flight/remote/createPhoneControlSession.ts` owns desktop authentication, readiness, input leases, action deduplication, and authority. `applyFlightControls.ts` is the common normalized input-to-JSBSim boundary. The desktop labels the invitation cancellation action **Disconnect**; leaving the tab preserves the invitation.
+
+The HUD-bar button and its dialog described under [Desktop](#desktop) were later replaced by a **Remote Control** tab in the flight panel (⚙ → Remote Control), with the same pairing controls and a **Switch to RC mode** button that turns the device showing it into the controller. Networking still initializes only when the tab first opens.
 
 The desktop and phone entry points are dynamically imported by `mode=flight` and `mode=remote`. Dependencies are pinned to PeerJS 1.5.5 and qrcode 1.5.4. Automated protocol, transport, input, lifecycle, and application integration checks accompany the implementation. The device/network acceptance checklist above remains a manual release check; automated tests do not establish latency or compatibility on physical phones.
 
