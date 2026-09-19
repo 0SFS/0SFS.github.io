@@ -39,6 +39,13 @@ wheel spin experiment (`docs/wheel-spin-experiment.md`) is sound and haptics
 only and feeds no forces back. `docs/ground-contact.md` still describes the
 engine as lacking this.
 
+It shows on screen too: the tyres spin while touching the ground but stop dead
+the moment they leave it, as if they had no inertia, and jump straight to full
+speed at touchdown. `aircraftAnimation.ts` turns them at ground speed over
+radius only while their gear carries weight, and holds the last angle
+otherwise. Driving them from JSBSim's `wheel-spin-rad_sec` once a gear declares
+the wheel DOF would give them spin-up and run-down.
+
 **Control surface deflection directions are unverified in flight.** Magnitudes
 are verified against the aero tables and against real JSBSim output. If a
 surface moves the wrong way, the fix is the `sign` field in `SURFACE_BINDINGS`
