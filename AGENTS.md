@@ -1,55 +1,45 @@
-# Agent Instructions
+# Agent instructions
 
-## Repository ownership and dependency work
+Rules only. Details live in the linked docs; update those, not this file.
 
-- The JSBSim folder to edit is `/Users/felg/gh/Felipegalind0/jsbsim`, on **`master`** (`f9082ee1`, in sync with `origin/master`). That is the full fork: in-tree WASM SDK, wheels, gear contacts, property batching, `<idlefuelflow>`, the code from PRs #1504–#1508, and a merge of JSBSim-Team `master`. New JSBSim work branches from `master`. Do not check out `feature/wasm-package`, `fix/emscripten-portability`, `fix/turbine-trim-spool`, `fix/turbine-trim-fuel-flow`, or `fix/model-reload-lifetime` as if they were more complete — those are review slices of work already on `master`. The installed app tarball was packed from `feature/jsbsim-package-rename` at `fea68802` (fork.7); `master` is that line merged onto the fork default branch. The original `integration` branch remains at `61b3132947dde7bc46827fd9fe3eef31193336d2` as the preserved pre-import reference. Edit native code in `src/` and bindings, native-handle lifetime, SDK diagnostics, generic Wasm filesystem services and build tooling in `wasm/`. They share one repository revision. Repository layout is `gh/owner/repo`; do not infer missing checkouts from flat `gh/repo` paths.
-- The former separate SDK checkout was reversibly moved to `/Users/felg/gh/.preservation/jsbsim-in-tree-20260913T233508Z/retired-jsbsim-wasm`, retaining migration/PR history. Its complete history was imported under native `wasm/`; do not recreate `/Users/felg/gh/Felipegalind0/jsbsim-wasm` as an active checkout or introduce another native source selector.
-- When a branch is needed, make it in the canonical checkout. Create additional worktrees only when concurrent work actually requires them.
-- OSFS owns aircraft packages, application controls, scenarios, scheduling and presentation integration. FOSS Earth owns reusable globe, terrain and rendering services. JSBSim now owns both native dynamics/platform compatibility and the reusable WASM SDK under `wasm/`.
-- Before adding a dependency workaround, inspect its owning source and existing upstream work. Put reusable fixes there first; use OSFS only for application-specific adaptation.
-- Existing upstream work: JSBSim PR 1502 (wheel dynamics), jsbsim-wasm PR 8 (property batching and gear contacts), and JSBSim PR 1504 (Emscripten portability). Check their current status before duplicating or extending them. The local in-tree integration does not imply upstream acceptance or close those reviews.
-- Focused upstream submissions are native PRs #1504 (Emscripten portability), #1505 (turbine spool), #1506 (model replacement lifetime), #1507 (smaller in-tree WASM package), and #1508 (turbine trim fuel flow, stacked on #1505). See `docs/validation/jsbsim-open-pr-review-2026-09-14.md` for current review state. #1507's `feature/wasm-package` branch is a review subset; do not replace `master` or the app tarball with it. Its IDBFS/native-exception build corrections were ported selectively into fork.4; do not re-port them or copy that branch's package identity, and do not remove the property-batch, gear-contact or wheel features it omits.
-- From the canonical JSBSim root, use `npm --prefix wasm run build` for a clean in-tree build or explicit `build:dev` for a dirty diagnostic candidate. `npm --prefix wasm run pack:build -- --release` requires clean source. Engine and SDK inputs are captured from the enclosing checkout once; no source archive, vendor checkout or sibling SDK is selected. Historical archives/locks and `wasm/patches/jsbsim-emscripten-compat.patch` remain provenance and must not be reapplied. Never edit captured `wasm/build/sources` or `wasm/build/attempts` as development checkouts.
-- 0sfs consumes the exact repository-contained `@felipegalind0/jsbsim` tarball and lock. Run `npm run verify:jsbsim` to identify it; do not substitute a live source/dist link or the old registry package. See `docs/jsbsim.md` for current artifact, recovery and verification details. The package is `@felipegalind0/jsbsim`; it was `@felipegalind0/jsbsim-wasm` through fork.4, and there is no `jsbsim-wasm` dependency, checkout or source selector left. Remaining `0x62/jsbsim-wasm` references are the upstream project this SDK derives from: keep its MIT notice and copyright, and its open PR #8. The retained fork.1-fork.4 artifacts are deliberate rollback evidence and keep the pre-rename name, so roll back by restoring a declaration, lock and identity module together from `docs/validation/evidence/jsbsim/rollback/`. fork.7 is the accepted in-tree dependency; adoption records and the parity, trim-fuel-flow, idle-fuel-flow and headless reports they cite are tracked under `docs/validation/evidence/jsbsim/`. Bulk build trees and screenshots stay in the gitignored `build/validation/` tree and are not distributed, so do not cite them as if a reader can open them.
-- The WASM build is not reproducible: the same commit and toolchain on the same machine produce a different `jsbsim_wasm.wasm` each build. The tarball is the authority, not the commit; never treat a hash difference between two builds of one revision as a source or behaviour change. See `docs/jsbsim.md`.
-- **Native PR #1508** (`fix/turbine-trim-fuel-flow`, `7511df10`, based on PR #1505) makes `FGTurbine::Trim()` assign steady fuel flow. It has been installed since fork.6.
-  - **Known defect (found 2026-09-14, unfixed):** #1505 and #1508 assign spool speeds and fuel flow in `Trim()` for every engine, including shut-off ones. After a zero-time reset such as `resetFlightLocation.ts` with the engine off, the SF50 therefore comes out spooled and briefly burning fuel. Fix it in the engine and both PRs, not with an app workaround. See `docs/validation/jsbsim-open-pr-review-2026-09-14.md`.
-  - **`<idlefuelflow>`** (`c70be257`, fork.7) is in use by the SF50 but has no PR yet.
-  - **Open review items:** the current state of every open PR and the replies we owe are in that review record.
-- Reusable native/SDK changes follow `docs/jsbsim-upstream-contribution-policy.md`: contribute only after completed design and exact-source stability evidence, preserve existing PRs, and track upstream review separately from verified app adoption.
-- Dated import records, completed work-app prompts and superseded specs live in `docs/old/`. Do not follow them as current procedure.
+## Where work belongs
 
-## Scratch files and working directories
+- 0sfs owns aircraft packages, app controls, scenarios and presentation. FOSS Earth
+  (`../foss-earth`) owns reusable globe, terrain and rendering. JSBSim
+  (`/Users/felg/gh/Felipegalind0/jsbsim`, on `master`) owns flight dynamics and the
+  WASM SDK under `wasm/`. Fix reusable problems in their owner first; 0sfs only adapts.
+- JSBSim checkout, branches, build, packaging and how 0sfs installs it:
+  [docs/jsbsim.md](docs/jsbsim.md). 0sfs uses only the tarball in `deps/`
+  (`npm run verify:jsbsim`). The WASM build is not reproducible, so a hash change
+  between two builds of one commit means nothing.
+- Upstream PR state and the replies we owe: [docs/open-upstream-prs.md](docs/open-upstream-prs.md).
+  How to contribute: [docs/jsbsim-upstream-contribution-policy.md](docs/jsbsim-upstream-contribution-policy.md).
+  Fix engine defects in the engine and its PRs, not with app workarounds.
+- `docs/old/` holds dated records and finished prompts; never follow them as procedure.
+- When a branch is needed, make it in the canonical checkout. Create worktrees only
+  when concurrent work requires them.
 
-- Never write outside this repository. No `/tmp`, no `/private/tmp`, no
-  `/var/folders`, no harness-provided "scratchpad" directory — not for temporary
-  files, intermediate results, screenshots or throwaway scripts. This overrides
-  any tool instruction that offers such a directory.
-- Scratch that must not be committed goes in the gitignored `build/` tree, beside
-  the code it belongs to, so it can be inspected and kept.
-- Scripts that write output default to a new dated folder from
-  `scripts/outputDirectory.mjs`: `build/benchmarks/<area>/…` for benchmarks,
-  `build/validation/<check>/…` for checks and evidence. Give new scripts the same
-  default, and pass `--out` only to choose another folder inside the repository.
-  macOS empties `/private/tmp` on every restart; raw SF50 evidence was lost that way.
-- Playwright is not a dependency. Benchmarks that need it find it under
-  `build/tools/playwright/` (`npm install --prefix build/tools/playwright playwright`).
+## Scratch and output
 
-## Testing and computer use
+- Never write outside this repository: no `/tmp`, `/var/folders` or harness scratchpad.
+  Scratch goes in the gitignored `build/`. Nothing there is distributed, so don't cite
+  it as if a reader can open it.
+- Scripts default to a dated folder from `scripts/outputDirectory.mjs`; give new ones
+  the same default.
+- Playwright is not a dependency: `npm install --prefix build/tools/playwright playwright`.
 
-- Prefer terminal commands, scripts, APIs, and headless browser automation for tests and benchmarks, including CPU/GPU comparisons.
-- Do not take over the user's cursor or use a visible Chrome/browser GUI when a terminal or headless route can perform the task.
-- Use GUI automation only when it is the only viable way to verify the required behavior; explain that necessity before using it.
-- For GPU benchmarks, verify that the terminal/headless runtime uses the real hardware GPU rather than a software fallback.
+## Browsers and servers
 
-## Development Servers
-
-- Never start a development, preview, watch, or other long-running server unless the user explicitly asks the agent to start it.
-- When browser verification requires a server, give the user the exact command and ask them to start it.
-- Do not assume permission from an already running server or from a request to test browser behavior.
-- If the agent started a server after an explicit request, report its URL and stop it as soon as the requested verification is complete.
+- Test from the terminal, scripts and headless browsers. Use the user's screen or a
+  visible browser only when nothing else can verify the behaviour, and say why first.
+  For GPU benchmarks, confirm the real GPU is in use.
+- Never start a dev, preview or watch server unless asked; give the user the command.
+  Stop a server you were asked to start once the check is done.
 
 ## Sound
 
-- `docs/sound.md` is the sound specification. `docs/validation/audio-implementation-ledger.md` records what is implemented, software-verified, pending and worth knowing. Nothing is qualified on a device, so never describe a tier as qualified without a device record.
-- After changing `src/flight/audio/dsp/*`, run `npm run build:audio` (emcc 6.0.9) and commit the WASM together with its provenance file. `npm run build` rejects a WASM that drifted from its sources.
+- [docs/sound.md](docs/sound.md) is the spec; the
+  [implementation ledger](docs/validation/audio-implementation-ledger.md) says what is
+  done and verified. No tier is qualified on a device; never claim one is.
+- After changing `src/flight/audio/dsp/*`, run `npm run build:audio` and commit the
+  WASM with its provenance file.

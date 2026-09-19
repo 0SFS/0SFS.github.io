@@ -105,7 +105,10 @@ checkout/build remains necessary, and it does not acquire a JSBSim dependency.
 
 Build engine or SDK changes from `/Users/felg/gh/Felipegalind0/jsbsim` on
 `master`. New work branches from there. The original `integration` branch is
-the preserved pre-import reference, not the development tip.
+the preserved pre-import reference, not the development tip. The PR branches
+`feature/wasm-package`, `fix/emscripten-portability`, `fix/turbine-trim-spool`,
+`fix/turbine-trim-fuel-flow` and `fix/model-reload-lifetime` are review slices of
+work already on `master`, not more complete versions of it.
 
 ```sh
 npm --prefix wasm ci
