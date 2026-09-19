@@ -112,7 +112,7 @@ work already on `master`, not more complete versions of it.
 
 ```sh
 npm --prefix wasm ci
-npm --prefix wasm run build
+SOURCE_DATE_EPOCH=$(git log -1 --format=%ct) npm --prefix wasm run build
 npm --prefix wasm run pack:build -- --release
 ```
 
@@ -131,23 +131,44 @@ tarball and archive integrity. Failed attempts do not replace the accepted
 artifact. Captured sources and output directories are not development checkouts
 or implicit app overrides.
 
-**The WASM build is not reproducible.** Rebuilding the same commit with the same
-toolchain on the same machine produces a different `jsbsim_wasm.wasm`: the fork.5
-source revision `e727e6f1` was built twice and gave
+**The WASM build is not reproducible, because the engine embeds its compile
+time.** `src/FGJSBBase.cpp` sets `JSBSim_version` to
+`JSBSIM_VERSION " " __DATE__ " " __TIME__`, so every binary carries the local
+time it was compiled at; fork.7's contains `1.3.2.dev1 Sep 14 2026 00:19:14`.
+The fork.5 source revision `e727e6f1` was built twice with the same toolchain on
+the same machine and gave
 `d848696de238128cee41c34e7e63951af9563eebdef6ddb631adfb02f989f1b1` and
-`950433d3036d1bb77c7f96b3b3cc4e96d3c7a04c7e7b6264a20cd71075a1f76a`, identical in
-size at 2,198,897 bytes with roughly 1,400 scattered differing bytes and no
-embedded build paths. The emitted `jsbsim_wasm.mjs` loader is byte-identical
-across builds, so the variation is in native code generation and linking rather
-than in Emscripten's JavaScript output. The cause has not been assigned; parallel
-optimisation-pass ordering is the likely candidate.
+`950433d3036d1bb77c7f96b3b3cc4e96d3c7a04c7e7b6264a20cd71075a1f76a`, both
+2,198,897 bytes. They differ in 1,728 bytes, and every one comes from that string:
 
-Consequences: each build is still immutable, hashed and gated once produced, and
-`verify:jsbsim` still rejects any substituted or modified artifact. But a shipped
-binary cannot be re-derived from its source revision, so **the tarball is the
-authority, not the commit**. Two artifacts built from one revision are different
-artifacts and must be accepted separately. Do not treat a hash difference between
-two builds of the same source as evidence of a source or behaviour change.
+- The two strings end `21:32:22` and `21:33:58`. wasm-ld sorts merged string
+  constants by their endings, so one sits among strings ending in "2" and the
+  other among strings ending in "8".
+- Every string between those two places moves by 32 bytes, the timestamp's
+  length with its terminator.
+- What refers to those strings changes with them: 414 instruction operands and
+  76 data pointers differ by exactly 32, and 8 operands follow the timestamp
+  itself.
+
+Nothing else differs. The binaries contain no build paths, and the emitted
+`jsbsim_wasm.mjs` loader is byte-identical across builds.
+
+When `SOURCE_DATE_EPOCH` is set, the compiler takes `__DATE__` and `__TIME__`
+from it, in UTC; test compiles with the locked Emscripten 6.0.9 confirmed this.
+The build command above sets it to the commit time, so the version string names
+the commit instead of the build. Whether that makes a whole build identical has
+not been tested: build the next package twice and compare `jsbsim_wasm.wasm`
+before relying on it. This needs no JSBSim change, and none is worth proposing
+upstream: dropping the timestamp would change the version banner, and builders
+who need reproducible output already set `SOURCE_DATE_EPOCH`.
+
+Consequences, for every package built so far: each build is still immutable,
+hashed and gated once produced, and `verify:jsbsim` still rejects any
+substituted or modified artifact. But a shipped binary cannot be re-derived from
+its source revision, so **the tarball is the authority, not the commit**. Two
+artifacts built from one revision are different artifacts and must be accepted
+separately. Do not treat a hash difference between two builds of the same source
+as evidence of a source or behaviour change.
 
 ## Installed and browser artifact checks
 

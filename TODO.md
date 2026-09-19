@@ -30,6 +30,13 @@ before changing anything.
 
 ## flight model
 
+**Turbine initialization and restoration need an explicit state contract.**
+The [implementation plan](docs/turbine-initialization/plan.md) starts with the
+#1505/#1508 shut-off-engine regressions, then separates advancing, refreshing,
+initializing and restoring a turbine. It covers shared calculations, completed
+aircraft trim, real WASM and app recovery. Planned, not implemented; fork.7
+still contains the known regression.
+
 **No aircraft turns on wheel angular state.** The installed JSBSim (fork.7)
 has the wheel spin degree of freedom from PR #1502: spin-up drag at touchdown,
 and brakes that act as a torque on the wheel. A gear only gets it when it
@@ -50,16 +57,6 @@ the wheel DOF would give them spin-up and run-down.
 are verified against the aero tables and against real JSBSim output. If a
 surface moves the wrong way, the fix is the `sign` field in `SURFACE_BINDINGS`
 in `src/flight/aircraft/aircraftAnimation.ts`.
-
-## build
-
-**Give each JSBSim WASM build its own build number.** The build is not
-reproducible: the same commit and toolchain give a different `jsbsim_wasm.wasm`
-each time (`docs/jsbsim.md`), so the commit alone does not name a binary.
-`dist/build-metadata.json` records the commit and content hashes but no time.
-Stamp each build with a number that includes the date and time of the latest
-commit. Every build of one commit shares that time, so add the build's own time
-or a counter as well. The change belongs in JSBSim's `wasm/` build.
 
 ## map
 
