@@ -1,7 +1,7 @@
 # SF50 rollout clock evidence
 
 These logs are the causal controls for
-[`engine-cutout-rollout-2026-09-16.md`](../../../engine-cutout-rollout-2026-09-16.md).
+[`engine-cutout-rollout-2026-09-16.md`](../../../../docs/validation/engine-cutout-rollout-2026-09-16.md).
 
 - `restore-before.log`: the real-WASM SF50 restore regression fails because
   simulation time changes from one second to zero.

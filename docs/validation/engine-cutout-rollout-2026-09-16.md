@@ -99,7 +99,7 @@ expected +0 to be close to 0.9999999999999989
 ```
 
 The exact before/after outputs are retained under
-[`evidence/jsbsim/engine-rollout/`](evidence/jsbsim/engine-rollout/).
+[`validation/evidence/jsbsim/engine-rollout/`](../../validation/evidence/jsbsim/engine-rollout/).
 
 With the fix, the clock remains at the captured time, advances by one fixed
 step afterward, and native running and combustion stay true through all three
@@ -162,7 +162,7 @@ fixed as part of this follow-up:
   whole engine by up to two octaves; the tap now moves only with the modelled
   Doppler ratio. A second defect found in the same area, Med falling silent past
   about 144 m where Low keeps playing, was fixed with it. Record:
-  [evidence/audio/camera-zoom-med-2026-09-16.md](evidence/audio/camera-zoom-med-2026-09-16.md),
+  [validation/evidence/audio/camera-zoom-med-2026-09-16.md](../../validation/evidence/audio/camera-zoom-med-2026-09-16.md),
   ledger §13. Not re-heard by a pilot, and nothing is device-qualified.
 
 The user requested these prompt files for agents in fresh conversations, with

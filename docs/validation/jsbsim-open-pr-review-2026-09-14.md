@@ -95,7 +95,12 @@ a browser; the numbers above are from Node against the installed package.
 
 ### Evidence
 
-[`evidence/jsbsim/engine-off-trim/`](evidence/jsbsim/engine-off-trim) contains:
+[`validation/evidence/jsbsim/engine-off-trim/`](../../validation/evidence/jsbsim/engine-off-trim)
+contains the items below. On 2026-09-19 the two scripts moved, byte-identical,
+to [`scripts/validation/jsbsim/engine-off-trim/`](../../scripts/validation/jsbsim/engine-off-trim/)
+([tool relocation record](../../validation/evidence/jsbsim/tool-relocation.md)),
+and the logs moved with the evidence tree from `docs/validation/evidence/`
+([evidence relocation record](evidence-relocation-2026-09-19.md)).
 
 - `native_check.py`, with `native-master.log` and `native-pr1508.log`.
   Module SHA-256:

@@ -33,7 +33,7 @@ implementation for every engine type, or bundle the wheel and WASM-package PRs.
 ## Problem and evidence
 
 The [open-PR review](../validation/jsbsim-open-pr-review-2026-09-14.md) records the
-defect and its [native and WASM evidence](../validation/evidence/jsbsim/engine-off-trim/).
+defect and its [native and WASM evidence](../../validation/evidence/jsbsim/engine-off-trim/).
 The source and live review checked during this discussion were:
 
 | Reference | Revision |

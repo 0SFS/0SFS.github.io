@@ -257,7 +257,7 @@ Model 71.4 US gph; recorded ground idle 11.24 gph (76 lb/hr). `1.2.4-fork.7` is
 adopted and `engine/fj33_5a.xml` declares `<idlefuelflow>76</idlefuelflow>`, so
 the model idles at 11.28 gph. The retained fork.6 tarball still reports 71.44 on
 the same package, which is the negative control for the adoption
-([evidence](evidence/jsbsim/idle-fuel-flow/)).
+([evidence](../../validation/evidence/jsbsim/idle-fuel-flow/)).
 
 ### 9. Takeoff and landing
 

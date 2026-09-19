@@ -57,7 +57,7 @@ Retained rollback tarballs keep the name they were published under, so
 `jsbsimBuildIdentity.ts` pairs every accepted version with its exact name and
 rejects a renamed package claiming an older version. A full rollback restores
 that release's declaration, lock and identity module together from
-[`validation/evidence/jsbsim/rollback/`](validation/evidence/jsbsim/rollback);
+[`validation/evidence/jsbsim/rollback/`](../validation/evidence/jsbsim/rollback);
 fork.5 and fork.6 are at commits `f9a27c0d` and `9e22e168` instead, and
 fork.7 is the installed declaration.
 
@@ -90,7 +90,7 @@ requires clean pinned source; fork.2 and fork.3 require clean in-tree source. Sc
 integrity and recorded distribution bytes remain checked, with no version
 range or implicit runtime fallback. Use each retained tarball with its matching
 declaration and lock, which are tracked per version under
-[`validation/evidence/jsbsim/rollback/`](validation/evidence/jsbsim/rollback).
+[`validation/evidence/jsbsim/rollback/`](../validation/evidence/jsbsim/rollback).
 Fork.3 replaced the earlier
 accepted fork.2 package after an explicitly verified official emsdk compiler
 banner was added to the toolchain lock. Fork.4 replaces fork.3 after adopting
@@ -166,12 +166,12 @@ The accepted application artifact is:
 That is fork.7, packed from `feature/jsbsim-package-rename`. The JSBSim checkout's
 `master` (`f9082ee1`) is that commit merged with JSBSim-Team `master`. Earlier
 fork identities remain in
-[the adoption records](validation/evidence/jsbsim/adoption/) and the
+[the adoption records](../validation/evidence/jsbsim/adoption/) and the
 [historical in-tree execution record](old/jsbsim-in-tree-integration-2026-09-13.md).
 
 The installed distribution's 14 recorded files and archive SHA-512 lock
 integrity were verified. The current adoption record is
-[`validation/evidence/jsbsim/adoption/fork7-adoption.json`](validation/evidence/jsbsim/adoption/fork7-adoption.json).
+[`validation/evidence/jsbsim/adoption/fork7-adoption.json`](../validation/evidence/jsbsim/adoption/fork7-adoption.json).
 Command logs, earlier per-fork browser and UI reports and screenshots stay in
 the local, undistributed tree under `build/validation/jsbsim-in-tree-20260913/`.
 Those ignored files are local evidence; they keep per-fork name prefixes.
@@ -276,7 +276,7 @@ The older pinned Playwright 1.58.2 installer stalled during archive extraction,
 so 1.63.0 is pinned and only its headless shell is requested. Build and check
 runners now enumerate `test/*.test.mjs` explicitly, keeping this browser check
 out of the unit-test run. Full adoption results, hashes and limitations are in
-[`validation/evidence/jsbsim/adoption/fork4-adoption.json`](validation/evidence/jsbsim/adoption/fork4-adoption.json).
+[`validation/evidence/jsbsim/adoption/fork4-adoption.json`](../validation/evidence/jsbsim/adoption/fork4-adoption.json).
 
 ## Trim fuel flow
 
@@ -291,7 +291,9 @@ throttle command, idle included. On fork.6 the same sweep gives 114.80, 284.34,
 807.49 and 1485.99 gph across dry commands 0.00 to 0.49, and 7823.98 gph
 augmented, with no dependence on the order the settings are trimmed in. The
 script producing both is preserved as
-[`validation/evidence/jsbsim/trim-fuel-flow/`](validation/evidence/jsbsim/trim-fuel-flow); it fails
+[`scripts/validation/jsbsim/trim-fuel-flow/check.mjs`](../scripts/validation/jsbsim/trim-fuel-flow/check.mjs),
+with its logs in
+[`validation/evidence/jsbsim/trim-fuel-flow/`](../validation/evidence/jsbsim/trim-fuel-flow); it fails
 on fork.5 and passes on fork.6, which is what attributes the change to this
 package rather than to the harness.
 
@@ -305,7 +307,7 @@ position and EPR at their previous values.
 This corrects *which operating point* trim reports. It does not settle the SF50
 idle fuel flow, which fork.7 addresses below.
 Full results and hashes are in
-[`validation/evidence/jsbsim/adoption/fork6-adoption.json`](validation/evidence/jsbsim/adoption/fork6-adoption.json).
+[`validation/evidence/jsbsim/adoption/fork6-adoption.json`](../validation/evidence/jsbsim/adoption/fork6-adoption.json).
 
 ### Known defect: shut-off engines after a zero-time reset
 
@@ -344,11 +346,13 @@ never constructed, and destroying the executive then crashed in
 The app's SF50 package declares the recorded 76 lbm/hr. Loading that package on
 the retained fork.6 artifact reports 481.5 lbm/hr at ground idle; on fork.7 it
 reports 76.0. The script producing both is preserved as
-[`validation/evidence/jsbsim/idle-fuel-flow/`](validation/evidence/jsbsim/idle-fuel-flow);
+[`scripts/validation/jsbsim/idle-fuel-flow/check.mjs`](../scripts/validation/jsbsim/idle-fuel-flow/check.mjs),
+with its logs in
+[`validation/evidence/jsbsim/idle-fuel-flow/`](../validation/evidence/jsbsim/idle-fuel-flow);
 it fails on fork.6 and passes on fork.7, which attributes the change to this
 package rather than to the SF50 package or the harness. Full results and hashes
 are in
-[`validation/evidence/jsbsim/adoption/fork7-adoption.json`](validation/evidence/jsbsim/adoption/fork7-adoption.json).
+[`validation/evidence/jsbsim/adoption/fork7-adoption.json`](../validation/evidence/jsbsim/adoption/fork7-adoption.json).
 
 `TestTurbineIdleFuelFlow` covers the unchanged default, a configured value above
 and below the estimate, a running engine settling on the configured value, and

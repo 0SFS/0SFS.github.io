@@ -10,7 +10,7 @@ export default defineConfig([
   // snapshots of earlier releases. Neither is source: linting them reports on
   // code nobody may edit, and a rule change would break the build over files
   // that must not be rewritten.
-  globalIgnores(['dist', 'build', 'docs/validation/evidence']),
+  globalIgnores(['dist', 'build', 'validation/evidence']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

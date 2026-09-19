@@ -14,7 +14,7 @@ checks for all four runtime aircraft passed, together with 50 SDK tests,
 11 native regression targets, native build isolation, browser IDBFS persistence
 and four matched native/WASM scenarios. Focused ESLint passed the four
 changed identity/artifact files. See the [adopted corrections](jsbsim.md#adopted-idbfs-and-native-exception-corrections)
-and [fork.7 adoption record](validation/evidence/jsbsim/adoption/fork7-adoption.json)
+and [fork.7 adoption record](../validation/evidence/jsbsim/adoption/fork7-adoption.json)
 for exact artifacts and outcomes. The [in-tree execution record](old/jsbsim-in-tree-integration-2026-09-13.md),
 [centralization spec](old/jsbsim-dependency-centralization.md) and
 [centralization record](old/jsbsim-centralization-2026-09-13.md) retain

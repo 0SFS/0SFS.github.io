@@ -10,7 +10,7 @@ Current sources:
 - JSBSim in the browser: [`docs/jsbsim.md`](../jsbsim.md)
 - Upstream policy and open PR ledger: [`docs/jsbsim-upstream-contribution-policy.md`](../jsbsim-upstream-contribution-policy.md)
 - Open PR review (2026-09-14): [`docs/validation/jsbsim-open-pr-review-2026-09-14.md`](../validation/jsbsim-open-pr-review-2026-09-14.md)
-- Adoption, parity and rollback evidence: [`docs/validation/evidence/jsbsim/`](../validation/evidence/jsbsim/)
+- Adoption, parity and rollback evidence: [`validation/evidence/jsbsim/`](../../validation/evidence/jsbsim/)
 - SF50 calibration still in use: [`docs/validation/`](../validation/) (qualification, fuel-flow, AFM, pilot cards)
 
 | File | Why it is here |

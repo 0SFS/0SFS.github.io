@@ -18,8 +18,8 @@ established. Establish that first.
 
 **Build a deterministic, automated reproduction before attempting any fix.** A
 headless Node script against the installed package is the right shape; the
-existing native and package checks under
-`docs/validation/evidence/jsbsim/` show the pattern. The reproduction is the
+existing native and package checks under `scripts/validation/jsbsim/` (with
+their logs in `validation/evidence/jsbsim/`) show the pattern. The reproduction is the
 deliverable even if the fix is not reached in one session.
 
 Shape it roughly as: place the SF50 on short final, fly it to touchdown, roll out
@@ -150,7 +150,7 @@ From `AGENTS.md` and `docs/jsbsim-upstream-contribution-policy.md`:
 | Audio combustion rule | `src/flight/audio/jsbsimAudioAdapter.ts` |
 | Reset and bootstrap sequences | `src/flight/jsbsim/resetFlightLocation.ts`, `bootstrapC172.ts` |
 | Open upstream PR state | `docs/open-upstream-prs.md` |
-| Prior turbine evidence | `docs/validation/evidence/jsbsim/` |
+| Prior turbine evidence | `validation/evidence/jsbsim/` |
 
 ## Done looks like
 

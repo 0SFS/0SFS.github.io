@@ -66,7 +66,7 @@ src/flight/audio/
   dsp/                       original C++ source, bounded state and build config
 scripts/                     audio build/asset verification commands
 benchmarks/audio/            generator, offline/real-time/fault harnesses
-docs/validation/evidence/audio/  small reproducible manifests/results
+validation/evidence/audio/   small reproducible manifests/results
 ```
 
 Keep generated bulk captures, compiler scratch, generated benchmark fixtures and machine-local artifacts in ignored `build/` (`build/validation/`, `build/benchmarks/`, or temporary directories). Evidence linked from committed documents must be committed or explicitly identified as an external artifact. Add source/build/license provenance for the audio module; do not treat generated WASM as its corresponding source.

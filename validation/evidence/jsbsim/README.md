@@ -9,6 +9,19 @@ past revision, so they are excluded from lint (`eslint.config.js`) and were
 never in the typecheck root, which is `src` only. Correcting a file here would
 destroy the thing it exists to attest.
 
+The tools that produced these records are in
+[`scripts/validation/jsbsim/`](../../../scripts/validation/jsbsim/), one
+directory per topic. Until 2026-09-19 they sat beside their logs here, so older
+records cite them at those paths; [tool-relocation.md](tool-relocation.md) maps
+each old path to its new one.
+
+Later on 2026-09-19 this whole directory moved from
+`docs/validation/evidence/jsbsim/` to `validation/evidence/jsbsim/`, with every
+file kept byte-identical except for README links. Records written before then,
+including `tool-relocation.md`, cite the `docs/` prefix; the
+[evidence relocation record](../../../docs/validation/evidence-relocation-2026-09-19.md)
+maps it.
+
 ## adoption/
 
 One record per adopted package version: what changed, why, the identity digests,
@@ -25,8 +38,8 @@ every check run with its result, and what was deliberately left undone.
 the in-tree consolidation.
 
 fork.1 through fork.3 predate this format; their history is in
-[the centralization record](../../../old/jsbsim-centralization-2026-09-13.md) and
-[the in-tree integration record](../../../old/jsbsim-in-tree-integration-2026-09-13.md).
+[the centralization record](../../../docs/old/jsbsim-centralization-2026-09-13.md) and
+[the in-tree integration record](../../../docs/old/jsbsim-in-tree-integration-2026-09-13.md).
 
 ## rollback/
 
@@ -78,7 +91,8 @@ behaviour and the one report that differs.
 
 ## trim-fuel-flow/
 
-The negative control for the fork.6 adoption. `check.mjs` trims an F16 fixture
+The negative control for the fork.6 adoption.
+[`check.mjs`](../../../scripts/validation/jsbsim/trim-fuel-flow/check.mjs) trims an F16 fixture
 at a range of throttle settings, both in isolated executives and out of order in
 one shared executive, and compares.
 
@@ -88,12 +102,13 @@ passes: 114.80, 284.34, 807.49, 1485.99 gph across dry commands 0.00 to 0.49 and
 7823.98 augmented, with no order dependence.
 
 The same script on both artifacts is what attributes the change to the package
-rather than to the harness. Run it from an unpacked artifact root with
+rather than to the harness. Run a copy from an unpacked artifact root with
 `JSBSIM_SOURCE_ROOT` set to a JSBSim checkout for the aircraft fixtures.
 
 ## idle-fuel-flow/
 
-The negative control for the fork.7 adoption. `check.mjs` loads the app's own
+The negative control for the fork.7 adoption.
+[`check.mjs`](../../../scripts/validation/jsbsim/idle-fuel-flow/check.mjs) loads the app's own
 SF50 package and reads fuel flow at ground idle with the thrust lever closed.
 The package declares 76 lbm/hr, the WPR20FA051 recorder's ground idle; JSBSim's
 fallback for a 1,846 lbf engine is 481.5 lbm/hr.
@@ -101,7 +116,7 @@ fallback for a 1,846 lbf engine is 481.5 lbm/hr.
 `fork6.log` fails: 481.5 lbm/hr, so that artifact ignores `<idlefuelflow>`.
 `fork7.log` passes: 76.0 lbm/hr at the same 24.3 % N1 and 53.4 % N2.
 
-Run it from an unpacked artifact root, as `evidence/check.mjs` beside `dist/`,
+Run a copy from an unpacked artifact root, as `evidence/check.mjs` beside `dist/`,
 with `OSFS_JSBSIM_DATA_ROOT` set to the app's `public/jsbsim-data`. The SF50
 package it reads is the calibrated one; an older package without the element
 would fail on both artifacts.
@@ -113,7 +128,8 @@ Evidence for a defect found on 2026-09-14, not an adoption control. JSBSim runs
 and PR #1508 (`6c3547be`) assign spool speeds and fuel flow there for every
 engine, so a shut-off engine comes out of RunIC spooled.
 
-`native_check.py` uses the repository's F-16 fixture, built as a Python module
+[`native_check.py`](../../../scripts/validation/jsbsim/engine-off-trim/native_check.py)
+uses the repository's F-16 fixture, built as a Python module
 from Git archives of upstream `master` `14c19022` and the #1508 head `7511df10`.
 Run it from any directory as `python native_check.py <source root>`.
 
@@ -122,7 +138,8 @@ Run it from any directory as `python native_check.py <source root>`.
   7,275.5 lb/h, then burns 0.35 lb in the next 0.2 s. An engine that was cut off
   and then put through RunIC does the same.
 
-`check.mjs` replays the app's location reset for an engine that is not running,
+[`check.mjs`](../../../scripts/validation/jsbsim/engine-off-trim/check.mjs)
+replays the app's location reset for an engine that is not running,
 on the SF50 package at 5,000 ft, 150 kt and throttle 0.6. Set
 `OSFS_JSBSIM_PACKAGE` to an installed or unpacked package directory and
 `OSFS_JSBSIM_DATA_ROOT` to `public/jsbsim-data`.
@@ -140,7 +157,7 @@ refinement. The app's state-recovery path instead rewound simulation time,
 which reset and faded the audio timeline. `restore-before.log` and
 `rollout-before.log` reproduce that rewind; their after controls pass when
 state recovery retains executive time. See the directory README and
-[`engine-cutout-rollout-2026-09-16.md`](../../engine-cutout-rollout-2026-09-16.md).
+[`engine-cutout-rollout-2026-09-16.md`](../../../docs/validation/engine-cutout-rollout-2026-09-16.md).
 
 ## reports/
 

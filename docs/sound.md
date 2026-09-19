@@ -123,7 +123,7 @@ Compare **inference + DSP + glue p95/max** against Q, with dropouts. Native M1/N
 
 ## 5. Publishable benchmark protocol
 
-**Perf owns proposed `benchmarks/audio/` and `docs/validation/evidence/audio/` deliverables, not existing results.** Freeze source/WASM/asset hashes, flags, seed, bridge, tier/degrade state, output route and actual rate. Exercise worst-case counts including tires/transitions, both isolated and in a fixed full-simulator scene. Record resolution, renderer settings, camera path and physics workload.
+**Perf owns proposed `benchmarks/audio/` and `validation/evidence/audio/` deliverables, not existing results.** Freeze source/WASM/asset hashes, flags, seed, bridge, tier/degrade state, output route and actual rate. Exercise worst-case counts including tires/transitions, both isolated and in a fixed full-simulator scene. Record resolution, renderer settings, camera path and physics workload.
 
 ### Fixed telemetry script
 

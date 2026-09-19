@@ -70,7 +70,7 @@ core, limiter and holds as the engine.
   - Availability comes from the property catalog, never from JSBSim's 0.
   - Engine acoustic centre comes from the model's own engine and CG positions (a geometric reading,
     not a measured acoustic centre).
-- **Combustion:** `fuel flow > 1e-4 lbm/s || running`. Evidence: `evidence/audio/sf50-start-trace-2026-09-14.txt`.
+- **Combustion:** `fuel flow > 1e-4 lbm/s || running`. Evidence: `validation/evidence/audio/sf50-start-trace-2026-09-14.txt`.
   Fuel burns for ~14.5 s of a fork.7 cold start while `set-running` is still 0.
   - Checked against the real SDK for fueled start, aborted start and shutdown.
   - **Not** validated against starvation or relight traces (FDM).
@@ -322,6 +322,10 @@ The worklet file name is content-hashed, so it changes with any edit to `dspProc
 
 `node benchmarks/audio/renderSweep.mjs --sweep=build/benchmarks/audio/sweep.jsonl --tiers=off,low,med --rates=44100,48000 --repeats=3 --passes=sweep,capacity --out=docs/validation/evidence/audio/offline-sweep-proxy-2026-09-14.json`
 
+The command is as run. Its output has been at
+[`validation/evidence/audio/offline-sweep-proxy-2026-09-14.json`](../../validation/evidence/audio/offline-sweep-proxy-2026-09-14.json)
+since the [2026-09-19 evidence move](evidence-relocation-2026-09-19.md); it was not rerun.
+
 Full sweep, 3 repeats, run on an otherwise idle machine. `performance.now()` wraps each
 `osfs_audio_process()` call in Node. That is a kernel proxy: **not** AudioWorklet callback timing, not
 real-time acceptance (§5.4), and it includes Node scheduling and GC outliers in `max`. Dropouts: unknown.
@@ -357,6 +361,10 @@ What this does and does not show:
 ### 5.4 Offline fault-injection proxy
 
 `node benchmarks/audio/renderSweep.mjs --sweep=build/benchmarks/audio/sweep.jsonl --tiers=low,med --rates=44100,48000 --passes=fault-injection --out=docs/validation/evidence/audio/offline-fault-injection-proxy-2026-09-14.json`
+
+The command is as run. Its output has been at
+[`validation/evidence/audio/offline-fault-injection-proxy-2026-09-14.json`](../../validation/evidence/audio/offline-fault-injection-proxy-2026-09-14.json)
+since the [2026-09-19 evidence move](evidence-relocation-2026-09-19.md); it was not rerun.
 
 These are deliberate faults, not normal-run dropouts. Identical counters at every tier and rate:
 
@@ -433,7 +441,7 @@ at Low and 0.045–0.046 ms at Med.
 - `src/flight/hud/engineMonitor.ts`, `engineMonitor.css`, `engineMonitorModel.ts`, and their unit, DOM and real-SDK tests.
 - `scripts/build-audio-wasm.mjs`, `scripts/verify-audio-artifact.mjs`.
 - `benchmarks/audio/`: generator, committed SHA-256, renderer, schema, dropout detector, headless worklet check, tests. The JSONL fixture is generated under `build/benchmarks/audio/`.
-- `docs/validation/evidence/audio/`:
+- `validation/evidence/audio/`:
   - start trace, geometry, property catalog
   - offline sweep and fault-injection proxy results
 
@@ -441,7 +449,7 @@ at Low and 0.045–0.046 ms at Med.
 
 - `src/flight/audio/cameraZoomAudio.integration.test.ts`: the real chase camera through `audioPose` into the
   real WASM, covering camera-zoom pitch, level at range, genuine Doppler, and Low and cockpit as controls.
-- `docs/validation/evidence/audio/camera-zoom-med-2026-09-16.md` and
+- `validation/evidence/audio/camera-zoom-med-2026-09-16.md` and
   `offline-sweep-proxy-2026-09-16.json`.
 - `src/flight/audio/dsp/core.cpp` and its rebuilt WASM and provenance; `docs/sound.md` §2's storage-cap clause.
 
@@ -549,7 +557,7 @@ In a suggested order:
 
 Pilot report: *"when i have the engine sound in mid and i zoom in and out of the plane the engine sound bugs
 out."* Full record, including the configuration it was reproduced under and every before/after measurement:
-[`evidence/audio/camera-zoom-med-2026-09-16.md`](evidence/audio/camera-zoom-med-2026-09-16.md).
+[`validation/evidence/audio/camera-zoom-med-2026-09-16.md`](../../validation/evidence/audio/camera-zoom-med-2026-09-16.md).
 
 **What it was.** Med's propagation delay read its length straight off the source distance, through a 60 ms
 smoother. A delay line's pitch comes from how fast its read pointer travels, so distance was being heard as
@@ -576,7 +584,7 @@ against a 0.8 floor, scroll in 1.785 against a 1.25 ceiling, digital silence at 
 1e-5 floor, and a closing detached listener at 1.075 where the model says 1.412) and all seven pass on the
 rebuilt one. Full suite 981 pass / 0 fail; `npm run build`
 exit 0; lint unchanged (its 5 errors are unrelated HUD work in `LoggingPanel.tsx` and `evaluationInstruments.test.ts`). The sweep proxy was re-run at 3
-repeats into [`evidence/audio/offline-sweep-proxy-2026-09-16.json`](evidence/audio/offline-sweep-proxy-2026-09-16.json):
+repeats into [`validation/evidence/audio/offline-sweep-proxy-2026-09-16.json`](../../validation/evidence/audio/offline-sweep-proxy-2026-09-16.json):
 zero non-finite samples, every peak inside the ceiling, Med p95 0.0454–0.0463 ms, every fault counter
 identical to the old binary, every Low row identical to the last digit.
 
