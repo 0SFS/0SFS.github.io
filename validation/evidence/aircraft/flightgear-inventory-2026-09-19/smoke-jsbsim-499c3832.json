@@ -1,0 +1,2132 @@
+{
+ "source": "/Users/felg/gh/0sfs/build/fg-aircraft-inventory/jsbsim-499c3832",
+ "dt": 0.008333333333333333,
+ "results": [
+  {
+   "variant": "737",
+   "aero": "737",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 2,
+   "gearUnits": 3,
+   "ground": {
+    "ok": false,
+    "error": "Cannot find module 'ws'\nRequire stack:\n- /Users/felg/gh/0sfs/node_modules/@felipegalind0/jsbsim/dist/wasm/jsbsim_wasm.mjs"
+   },
+   "trim": null,
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "error": "Cannot find module 'ws'\nRequire stack:\n- /Users/felg/gh/0sfs/node_modules/@felipegalind0/jsbsim/dist/wasm/jsbsim_wasm.mjs"
+   },
+   "logTail": []
+  },
+  {
+   "variant": "787-8",
+   "aero": "787-8",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 2,
+   "gearUnits": 7,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 4.2,
+    "pitchDeg": -0.7,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 220
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 220,
+    "thrustLbs": 26152,
+    "maxAltErrorFt": 208,
+    "speedChangeKts": 10,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 2.61
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 2.76e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.64   udot : 3.90e+00  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.59  qdot : -6.19e-02 Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 2.96e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.66   udot : 4.09e+00  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.71  qdot : -6.29e-02 Tolerance: 1e-04  Failed"
+   ]
+  },
+  {
+   "variant": "A320",
+   "aero": "A320",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 2,
+   "gearUnits": 12,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 2.567,
+    "pitchDeg": 0.04,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 220
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 220,
+    "thrustLbs": 14867,
+    "maxAltErrorFt": 136,
+    "speedChangeKts": 7,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 2.55
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 2.84e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.64   udot : 4.54e+00  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.87  qdot : -2.60e-03 Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 3.00e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.64   udot : 4.76e+00  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.91  qdot : -6.83e-03 Tolerance: 1e-04  Failed"
+   ]
+  },
+  {
+   "variant": "A4",
+   "aero": "A4",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 1,
+   "gearUnits": 5,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.125,
+    "pitchDeg": 0.52,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 160
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 160,
+    "thrustLbs": 1371,
+    "maxAltErrorFt": 282,
+    "speedChangeKts": 17,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 2.42
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 2.96e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.36   udot : 1.05e+01  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.4   qdot : -1.90e-01 Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 3.07e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.37   udot : 1.10e+01  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.48  qdot : -1.98e-01 Tolerance: 1e-04  Failed"
+   ]
+  },
+  {
+   "variant": "B17",
+   "aero": "B17",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 4,
+   "gearUnits": 5,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 2.304,
+    "pitchDeg": 6.46,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": null,
+   "flight": {
+    "ok": true,
+    "trimmed": false,
+    "startKts": 120,
+    "thrustLbs": 4567,
+    "maxAltErrorFt": 198,
+    "speedChangeKts": -5,
+    "maxRollDeg": 0.8,
+    "msPerSimSecond": 3.07
+   },
+   "logTail": [
+    "ERROR: unable to open the file /runtime/output/JSBoutB17.csv",
+    "ERROR: unable to open the file /runtime/output/JSBoutB17.csv",
+    "  Trim failed",
+    "  Angle of Attack     : 6.3    wdot : 2.20e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -1.82e+00 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.13  qdot : -9.58e-02 Tolerance: 1e-04  Failed",
+    "  Ailerons            : 0.013  pdot : -5.36e-03 Tolerance: 1e-04  Failed",
+    "ERROR: unable to open the file /runtime/output/JSBoutB17.csv"
+   ]
+  },
+  {
+   "variant": "B747",
+   "aero": "B747",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 4,
+   "gearUnits": 3,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 4.102,
+    "pitchDeg": -2.64,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 220
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 220,
+    "thrustLbs": 41816,
+    "maxAltErrorFt": 172,
+    "speedChangeKts": 7,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 2.51
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 2.89e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.53   udot : 5.46e+00  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.41  qdot : 6.12e-03  Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 3.03e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.55   udot : 5.69e+00  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.35  qdot : 9.13e-03  Tolerance: 1e-04  Failed"
+   ]
+  },
+  {
+   "variant": "Boeing314",
+   "aero": "Boeing314",
+   "load": "ok",
+   "createdProperties": 3,
+   "engines": 4,
+   "gearUnits": 6,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 2.267,
+    "pitchDeg": -1.03,
+    "rollDeg": 0.08,
+    "wheelsDown": 2
+   },
+   "trim": {
+    "kts": 120
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 120,
+    "thrustLbs": 7364,
+    "maxAltErrorFt": 37,
+    "speedChangeKts": 3,
+    "maxRollDeg": 0.4,
+    "msPerSimSecond": 2.93
+   },
+   "logTail": []
+  },
+  {
+   "variant": "C130",
+   "aero": "C130",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 4,
+   "gearUnits": 3,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 2.744,
+    "pitchDeg": 0.29,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": null,
+   "flight": {
+    "ok": true,
+    "trimmed": false,
+    "startKts": 120,
+    "thrustLbs": 109,
+    "maxAltErrorFt": 260,
+    "speedChangeKts": -18,
+    "maxRollDeg": 0.1,
+    "msPerSimSecond": 2.37
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : 5.9    wdot : 2.16e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -1.17e+00 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.13  qdot : -5.69e-02 Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 2.62e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.28   udot : 2.44e+00  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.27  qdot : -6.77e-02 Tolerance: 1e-04  Failed"
+   ]
+  },
+  {
+   "variant": "Camel",
+   "aero": "Camel",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 1,
+   "gearUnits": 19,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.305,
+    "pitchDeg": 14.8,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 90
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 90,
+    "thrustLbs": 251,
+    "maxAltErrorFt": 93,
+    "speedChangeKts": -4,
+    "maxRollDeg": 2.7,
+    "msPerSimSecond": 2.95
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : -0.61  wdot : -1.19e+01 Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -5.96e+00 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : 0.079  qdot : 8.31e+00  Tolerance: 1e-04  Failed",
+    "  Ailerons            : 0.06   pdot : -4.06e-01 Tolerance: 1e-04  Failed",
+    "  Rudder              : -0.029 rdot : 1.58e-02  Tolerance: 1e-04  Failed"
+   ]
+  },
+  {
+   "variant": "Concorde",
+   "aero": "Concorde",
+   "load": "ok",
+   "createdProperties": 6,
+   "engines": 4,
+   "gearUnits": 10,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 3.397,
+    "pitchDeg": 0,
+    "rollDeg": 0.05,
+    "wheelsDown": 5
+   },
+   "trim": {
+    "kts": 220
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 220,
+    "thrustLbs": 33207,
+    "maxAltErrorFt": 385,
+    "speedChangeKts": 17,
+    "maxRollDeg": 0.5,
+    "msPerSimSecond": 3.05
+   },
+   "logTail": [
+    "    Loading Component \"systems/pushback/speed-error\" of type: SUMMER",
+    "      OUTPUT: speed-error",
+    "      INPUT: speed-error",
+    "    Loading Component \"systems/pushback/speed-error\" of type: SUMMER",
+    "      OUTPUT: speed-error",
+    "      INPUT: speed-error",
+    "  Trim failed",
+    "  Angle of Attack     : 5.5    wdot : 3.17e+01  Tolerance: 1e-03  Failed"
+   ]
+  },
+  {
+   "variant": "DHC6",
+   "aero": "DHC6",
+   "load": "ok",
+   "createdProperties": 2,
+   "engines": 2,
+   "gearUnits": 3,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 2.552,
+    "pitchDeg": -1.39,
+    "rollDeg": -0.03,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 120
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 120,
+    "thrustLbs": 1292,
+    "maxAltErrorFt": 74,
+    "speedChangeKts": -5,
+    "maxRollDeg": 1.9,
+    "msPerSimSecond": 2.5
+   },
+   "logTail": []
+  },
+  {
+   "variant": "F450",
+   "aero": "F450",
+   "load": "ok",
+   "createdProperties": 3,
+   "engines": 4,
+   "gearUnits": 3,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 0.15,
+    "pitchDeg": -0.32,
+    "rollDeg": 0.02,
+    "wheelsDown": 3
+   },
+   "trim": null,
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "startKts": 90,
+    "thrustLbs": 7,
+    "maxAltErrorFt": 1552,
+    "speedChangeKts": -61,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 5.31
+   },
+   "logTail": [
+    "    Channel Temperature Error Model",
+    "    Channel Accelerometer Error Model",
+    "Failed to tie property fcs/accelx/malfunction/fail_low to object methods",
+    "Failed to tie property fcs/accelx/malfunction/fail_high to object methods",
+    "Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods",
+    "Failed to tie property fcs/accelx/randomseed to object methods",
+    "Failed to tie property fcs/accely/malfunction/fail_low to object methods",
+    "Failed to tie property fcs/accely/malfunction/fail_high to object methods"
+   ]
+  },
+  {
+   "variant": "F4N",
+   "aero": "F4N",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 2,
+   "gearUnits": 5,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.334,
+    "pitchDeg": 0.31,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 160
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 160,
+    "thrustLbs": 6469,
+    "maxAltErrorFt": 450,
+    "speedChangeKts": 33,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 5.15
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 3.05e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.54   udot : 6.23e+00  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.22  qdot : -3.93e-02 Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 3.12e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.53   udot : 6.54e+00  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.3   qdot : -3.99e-02 Tolerance: 1e-04  Failed"
+   ]
+  },
+  {
+   "variant": "F80C",
+   "aero": "F80C",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 1,
+   "gearUnits": 7,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.523,
+    "pitchDeg": 2.43,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 120
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": false,
+    "startKts": 180,
+    "thrustLbs": 3706,
+    "maxAltErrorFt": 318,
+    "speedChangeKts": 15,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 4.48
+   },
+   "logTail": []
+  },
+  {
+   "variant": "J246",
+   "aero": "J246",
+   "load": "ok",
+   "createdProperties": 13,
+   "engines": 12,
+   "gearUnits": 0,
+   "groundTrim": "failed",
+   "ground": {
+    "ok": false,
+    "cgAglM": -119.527,
+    "pitchDeg": 0.01,
+    "rollDeg": 0,
+    "wheelsDown": 0
+   },
+   "trim": null,
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "startKts": 90,
+    "thrustLbs": 5812393,
+    "maxAltErrorFt": 14847,
+    "speedChangeKts": 888,
+    "maxRollDeg": 178.7,
+    "msPerSimSecond": 4.09
+   },
+   "logTail": [
+    "    Loading Component \"control/gravity-turn-pitch-rate-error\" of type: SUMMER",
+    "      OUTPUT: gravity-turn-pitch-rate-error",
+    "      INPUT: gravity-turn-pitch-rate-error",
+    "    Loading Component \"control/peg-pitch-rate-error\" of type: SUMMER",
+    "      OUTPUT: peg-pitch-rate-error",
+    "      INPUT: peg-pitch-rate-error",
+    "  Trim failed",
+    "  Altitude AGL        : 5      wdot : 3.22e+01  Tolerance: 1e-03  Failed"
+   ]
+  },
+  {
+   "variant": "J3Cub",
+   "aero": "J3Cub",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 1,
+   "gearUnits": 5,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.152,
+    "pitchDeg": 12.26,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 70
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 70,
+    "thrustLbs": 103,
+    "maxAltErrorFt": 157,
+    "speedChangeKts": -12,
+    "maxRollDeg": 0.5,
+    "msPerSimSecond": 4.67
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : 20     wdot : -1.17e+02 Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -1.20e+01 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : 1      qdot : 4.99e+00  Tolerance: 1e-04  Failed",
+    "  Ailerons            : 0.028  pdot : -9.17e-02 Tolerance: 1e-04  Failed",
+    "  Rudder              : -0.0006 rdot : 8.58e-04  Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : -4.2   wdot : -5.29e+01 Tolerance: 1e-03  Failed"
+   ]
+  },
+  {
+   "variant": "L17",
+   "aero": "L17",
+   "load": "ok",
+   "createdProperties": 2,
+   "engines": 1,
+   "gearUnits": 3,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 0.756,
+    "pitchDeg": 0.49,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 120
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 120,
+    "thrustLbs": 276,
+    "maxAltErrorFt": 69,
+    "speedChangeKts": -5,
+    "maxRollDeg": 0.8,
+    "msPerSimSecond": 4.11
+   },
+   "logTail": []
+  },
+  {
+   "variant": "L410",
+   "aero": "L410",
+   "load": "ok",
+   "createdProperties": 6,
+   "engines": 2,
+   "gearUnits": 3,
+   "groundTrim": "failed",
+   "ground": {
+    "ok": false,
+    "cgAglM": -86.059,
+    "pitchDeg": -30,
+    "rollDeg": -0.01,
+    "wheelsDown": 0
+   },
+   "trim": null,
+   "flight": {
+    "ok": true,
+    "trimmed": false,
+    "startKts": 120,
+    "thrustLbs": 6,
+    "maxAltErrorFt": 242,
+    "speedChangeKts": -35,
+    "maxRollDeg": 3.2,
+    "msPerSimSecond": 5.33
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Altitude AGL        : 5      wdot : 3.22e+01  Tolerance: 1e-03  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 3.5    wdot : 1.74e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -2.10e+00 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.58  qdot : -1.32e-01 Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 8.1    wdot : 2.38e+01  Tolerance: 1e-03  Failed"
+   ]
+  },
+  {
+   "variant": "MD11",
+   "aero": "MD11",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 3,
+   "gearUnits": 3,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 5.728,
+    "pitchDeg": 0.13,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 220
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": false,
+    "startKts": 180,
+    "thrustLbs": 145572,
+    "maxAltErrorFt": 838,
+    "speedChangeKts": 47,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 4.26
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 2.92e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.52   udot : 5.91e+00  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.43  qdot : -1.24e-02 Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 3.05e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.53   udot : 6.15e+00  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.63  qdot : -1.29e-02 Tolerance: 1e-04  Failed"
+   ]
+  },
+  {
+   "variant": "OV10",
+   "aero": "OV10",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 2,
+   "gearUnits": 3,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.163,
+    "pitchDeg": 0.72,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 120
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 120,
+    "thrustLbs": 1460,
+    "maxAltErrorFt": 242,
+    "speedChangeKts": 18,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 4.68
+   },
+   "logTail": []
+  },
+  {
+   "variant": "Pterosaur",
+   "aero": "Pterosaur",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 1,
+   "gearUnits": 8,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.497,
+    "pitchDeg": 4.48,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": null,
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "startKts": 90,
+    "thrustLbs": 0,
+    "maxAltErrorFt": 221,
+    "speedChangeKts": -61,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 8.04
+   },
+   "logTail": [
+    "    Loading Component \"Pitch Trim error\" of type: SUMMER",
+    "      OUTPUT: pitch-trim-error",
+    "      OUTPUT: pitch-trim-error",
+    "      INPUT: pitch-trim-error",
+    "    Loading Component \"Pitch Trim error\" of type: SUMMER",
+    "      OUTPUT: pitch-trim-error",
+    "      OUTPUT: pitch-trim-error",
+    "      INPUT: pitch-trim-error"
+   ]
+  },
+  {
+   "variant": "SGS",
+   "aero": "SGS",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 0,
+   "gearUnits": 6,
+   "groundTrim": "failed",
+   "ground": {
+    "ok": false,
+    "error": "function signature mismatch"
+   },
+   "trim": null,
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "startKts": 90,
+    "thrustLbs": 0,
+    "maxAltErrorFt": 838,
+    "speedChangeKts": -56,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 5.96
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : -1.17e+02 Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -4.87e+00 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.088 qdot : 8.61e-01  Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : -5.18e+01 Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -2.74e+00 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.097 qdot : 4.01e-01  Tolerance: 1e-04  Failed"
+   ]
+  },
+  {
+   "variant": "Short_S23",
+   "aero": "Short_S23",
+   "load": "ok",
+   "createdProperties": 33,
+   "engines": 4,
+   "gearUnits": 4,
+   "groundTrim": "failed",
+   "ground": {
+    "ok": false,
+    "cgAglM": 2.069,
+    "pitchDeg": 3.1,
+    "rollDeg": -0.35,
+    "wheelsDown": 0
+   },
+   "trim": {
+    "kts": 90
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 90,
+    "thrustLbs": 2852,
+    "maxAltErrorFt": 23,
+    "speedChangeKts": 3,
+    "maxRollDeg": 0.8,
+    "msPerSimSecond": 32.33
+   },
+   "logTail": [
+    "    Loading Component \"sperry-autopilot/heading/error-raw-deg\" of type: FCS_FUNCTION",
+    "      OUTPUT: error-raw-deg",
+    "    Loading Component \"sperry-autopilot/heading/error-correction-deg\" of type: SWITCH",
+    "        error-raw-deg LT constant value -180.000000      if all of the following are true: {",
+    "      }        error-raw-deg GT constant value 180.000000      if all of the following are true: {",
+    "      OUTPUT: error-correction-deg",
+    "    Loading Component \"sperry-autopilot/heading/error-deg\" of type: SUMMER",
+    "       error-raw-deg"
+   ]
+  },
+  {
+   "variant": "Shuttle",
+   "aero": "Shuttle",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 0,
+   "gearUnits": 3,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 4.776,
+    "pitchDeg": -3.47,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": null,
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "startKts": 90,
+    "thrustLbs": 0,
+    "maxAltErrorFt": 5007,
+    "speedChangeKts": -5,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 4.13
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : 15     wdot : 3.21e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -1.11e+00 Tolerance: 1e-03  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 3.21e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -6.25e-01 Tolerance: 1e-03  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 9.1    wdot : 3.21e+01  Tolerance: 1e-03  Failed"
+   ]
+  },
+  {
+   "variant": "Submarine_Scout",
+   "aero": "Submarine_Scout",
+   "load": "ok",
+   "createdProperties": 8,
+   "engines": 1,
+   "gearUnits": 7,
+   "groundTrim": "failed",
+   "ground": {
+    "ok": true,
+    "cgAglM": 5.143,
+    "pitchDeg": 0.38,
+    "rollDeg": 0,
+    "wheelsDown": 2
+   },
+   "trim": null,
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "startKts": 90,
+    "thrustLbs": 116,
+    "maxAltErrorFt": 420,
+    "speedChangeKts": -72,
+    "maxRollDeg": 180,
+    "msPerSimSecond": 6.49
+   },
+   "logTail": [
+    "    Loading Component \"ap/pitch-error-rad\" of type: SUMMER",
+    "      OUTPUT: pitch-error-rad",
+    "      INPUT: pitch-error-rad",
+    "  Trim failed",
+    "  Altitude AGL        : 17     wdot : 1.48e+00  Tolerance: 1e-03  Failed",
+    "  Pitch Angle         : 0.24   qdot : 3.63e-03  Tolerance: 1e-04  Failed",
+    "    Loading Component \"ap/pitch-error-rad\" of type: SUMMER",
+    "      OUTPUT: pitch-error-rad"
+   ]
+  },
+  {
+   "variant": "T37",
+   "aero": "T37",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 2,
+   "gearUnits": 3,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 0.435,
+    "pitchDeg": 3.6,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 120
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 120,
+    "thrustLbs": 660,
+    "maxAltErrorFt": 168,
+    "speedChangeKts": 6,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 5.19
+   },
+   "logTail": []
+  },
+  {
+   "variant": "T38",
+   "aero": "T38",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 2,
+   "gearUnits": 9,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 0.958,
+    "pitchDeg": 0.06,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 160
+   },
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "startKts": 90,
+    "thrustLbs": 4672,
+    "maxAltErrorFt": 5021,
+    "speedChangeKts": -51,
+    "maxRollDeg": 94.9,
+    "msPerSimSecond": 4.62
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 3.21e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.32   udot : 1.08e+01  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.33  qdot : -8.71e-02 Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 3.21e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.32   udot : 1.11e+01  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.47  qdot : -8.87e-02 Tolerance: 1e-04  Failed"
+   ]
+  },
+  {
+   "variant": "X15",
+   "aero": "X15",
+   "load": "ok",
+   "createdProperties": 4,
+   "engines": 1,
+   "gearUnits": 3,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.585,
+    "pitchDeg": -3.8,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": null,
+   "flight": {
+    "ok": true,
+    "trimmed": false,
+    "startKts": 250,
+    "thrustLbs": 0,
+    "maxAltErrorFt": 532,
+    "speedChangeKts": -91,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 4.28
+   },
+   "logTail": [
+    "    Loading Component \"fcs/pitch-error-rad\" of type: SUMMER",
+    "      OUTPUT: pitch-error-rad",
+    "      INPUT: pitch-error-rad",
+    "    Loading Component \"fcs/altitude-error-ft\" of type: SUMMER",
+    "      OUTPUT: altitude-error-ft",
+    "      INPUT: altitude-error-ft",
+    "    Loading Component \"fcs/pitch-error-rad\" of type: SUMMER",
+    "      OUTPUT: pitch-error-rad"
+   ]
+  },
+  {
+   "variant": "XB-70",
+   "aero": "XB-70",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 6,
+   "gearUnits": 3,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 5.503,
+    "pitchDeg": 0.05,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 220
+   },
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "startKts": 90,
+    "thrustLbs": 97232,
+    "maxAltErrorFt": 3359,
+    "speedChangeKts": 19,
+    "maxRollDeg": 28.1,
+    "msPerSimSecond": 4.54
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : 11     wdot : 2.58e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.43   udot : 4.59e+00  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : 0      qdot : 6.99e-02  Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 2.86e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.56   udot : 4.94e+00  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : 0.98   qdot : -3.10e-02 Tolerance: 1e-04  Failed"
+   ]
+  },
+  {
+   "variant": "ZLT-NT",
+   "aero": "ZLT-NT",
+   "load": "ok",
+   "createdProperties": 36,
+   "engines": 4,
+   "gearUnits": 6,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 5.046,
+    "pitchDeg": 4.07,
+    "rollDeg": 0,
+    "wheelsDown": 2
+   },
+   "trim": null,
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "startKts": 90,
+    "thrustLbs": 0,
+    "maxAltErrorFt": 274,
+    "speedChangeKts": -86,
+    "maxRollDeg": 1,
+    "msPerSimSecond": 7.74
+   },
+   "logTail": [
+    "    Loading Component \"fcs/etc/propeller-speed-error-rpm[0]\" of type: SUMMER",
+    "      OUTPUT: propeller-speed-error-rpm",
+    "    Loading Component \"fcs/etc/propeller-speed-error-switch[0]\" of type: SWITCH",
+    "      Switch takes test 1 value (propeller-speed-error-rpm)",
+    "      OUTPUT: propeller-speed-error-switch",
+    "      }        propeller-speed-error-switch GT constant value 0.000000        fcs/etc/throttle-controller-pid[0] GT constant value 1.000000      if all of the following are true: {",
+    "      INPUT: propeller-speed-error-switch",
+    "    Loading Component \"fcs/etc/propeller-speed-error-rpm[1]\" of type: SUMMER"
+   ]
+  },
+  {
+   "variant": "ah1s",
+   "aero": "ah1s",
+   "load": "ok",
+   "createdProperties": 5,
+   "engines": 2,
+   "gearUnits": 5,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.859,
+    "pitchDeg": -0.77,
+    "rollDeg": 0,
+    "wheelsDown": 4
+   },
+   "trim": null,
+   "flight": {
+    "ok": true,
+    "trimmed": false,
+    "startKts": 180,
+    "thrustLbs": 11624,
+    "maxAltErrorFt": 62,
+    "speedChangeKts": -74,
+    "maxRollDeg": 6,
+    "msPerSimSecond": 6.66
+   },
+   "logTail": [
+    "      ap/afcs/adj/altitude-error-ctrl-gain (initial value: -0.00035)",
+    "    Loading Component \"ap/afcs/psi-error-rad\" of type: FCS_FUNCTION",
+    "      OUTPUT: psi-error-rad",
+    "      INPUT: psi-error-rad",
+    "    Loading Component \"ap/afcs/altitude-error-ctrl\" of type: FCS_FUNCTION",
+    "      OUTPUT: altitude-error-ctrl",
+    "      ap/afcs/adj/altitude-error-ctrl-gain (initial value: -0.00035)",
+    "    Loading Component \"ap/afcs/psi-error-rad\" of type: FCS_FUNCTION"
+   ]
+  },
+  {
+   "variant": "ball",
+   "aero": "ball",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 0,
+   "gearUnits": 1,
+   "groundTrim": "failed",
+   "ground": {
+    "ok": true,
+    "cgAglM": -0.002,
+    "pitchDeg": 0,
+    "rollDeg": 0,
+    "wheelsDown": 1
+   },
+   "trim": null,
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "startKts": 90,
+    "thrustLbs": 0,
+    "maxAltErrorFt": 4985,
+    "speedChangeKts": 9,
+    "maxRollDeg": 179.7,
+    "msPerSimSecond": 2.86
+   },
+   "logTail": [
+    "ERROR: unable to open the file /runtime/output/BallOut.csv",
+    "  Trim failed",
+    "  Altitude AGL        : 5      wdot : 3.22e+01  Tolerance: 1e-03  Failed",
+    "ERROR: unable to open the file /runtime/output/BallOut.csv",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 3.21e+01  Tolerance: 1e-03  Failed",
+    "ERROR: unable to open the file /runtime/output/BallOut.csv",
+    "  Trim failed"
+   ]
+  },
+  {
+   "variant": "ballx",
+   "aero": "ballx",
+   "load": "ok",
+   "createdProperties": 2,
+   "engines": 0,
+   "gearUnits": 1,
+   "groundTrim": "failed",
+   "ground": {
+    "ok": true,
+    "cgAglM": -0.002,
+    "pitchDeg": 0,
+    "rollDeg": 0,
+    "wheelsDown": 1
+   },
+   "trim": null,
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "startKts": 90,
+    "thrustLbs": 0,
+    "maxAltErrorFt": 4985,
+    "speedChangeKts": 9,
+    "maxRollDeg": 179.7,
+    "msPerSimSecond": 2.89
+   },
+   "logTail": [
+    "ERROR: unable to open the file /runtime/output/BallXOut.csv",
+    "  Trim failed",
+    "  Altitude AGL        : 5      wdot : 3.22e+01  Tolerance: 1e-03  Failed",
+    "ERROR: unable to open the file /runtime/output/BallXOut.csv",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 3.21e+01  Tolerance: 1e-03  Failed",
+    "ERROR: unable to open the file /runtime/output/BallXOut.csv",
+    "  Trim failed"
+   ]
+  },
+  {
+   "variant": "blank",
+   "aero": "blank",
+   "load": "failed",
+   "loadError": "Current version needed is: 2.0 | You have version: | No metrics element was found in the aircraft config file."
+  },
+  {
+   "variant": "c172p",
+   "aero": "c172p",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 1,
+   "gearUnits": 7,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.368,
+    "pitchDeg": 2.89,
+    "rollDeg": -0.09,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 120
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 120,
+    "thrustLbs": 313,
+    "maxAltErrorFt": 169,
+    "speedChangeKts": -8,
+    "maxRollDeg": 1.2,
+    "msPerSimSecond": 5.11
+   },
+   "logTail": []
+  },
+  {
+   "variant": "c172r",
+   "aero": "c172r",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 1,
+   "gearUnits": 6,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.349,
+    "pitchDeg": 0.29,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 120
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 120,
+    "thrustLbs": 327,
+    "maxAltErrorFt": 141,
+    "speedChangeKts": -7,
+    "maxRollDeg": 0.7,
+    "msPerSimSecond": 4.71
+   },
+   "logTail": []
+  },
+  {
+   "variant": "c172x",
+   "aero": "c172x",
+   "load": "ok",
+   "createdProperties": 10,
+   "engines": 1,
+   "gearUnits": 6,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.315,
+    "pitchDeg": 0.6,
+    "rollDeg": 0.28,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 90
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 90,
+    "thrustLbs": 239,
+    "maxAltErrorFt": 62,
+    "speedChangeKts": -4,
+    "maxRollDeg": 4.3,
+    "msPerSimSecond": 5.32
+   },
+   "logTail": [
+    "    Loading Component \"ap/limited-roll-angle-error\" of type: SUMMER",
+    "      OUTPUT: limited-roll-angle-error",
+    "      INPUT: limited-roll-angle-error",
+    "    Loading Component \"ap/limited-roll-rate-error\" of type: SUMMER",
+    "      OUTPUT: limited-roll-rate-error",
+    "      INPUT: limited-roll-rate-error",
+    "    Loading Component \"fcs/roll-ap-error-pid\" of type: PID",
+    "      OUTPUT: roll-ap-error-pid"
+   ]
+  },
+  {
+   "variant": "c182",
+   "aero": "c182",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 1,
+   "gearUnits": 6,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.449,
+    "pitchDeg": 0.86,
+    "rollDeg": -0.09,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 120
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 120,
+    "thrustLbs": 326,
+    "maxAltErrorFt": 142,
+    "speedChangeKts": -8,
+    "maxRollDeg": 2.4,
+    "msPerSimSecond": 4.88
+   },
+   "logTail": []
+  },
+  {
+   "variant": "c310",
+   "aero": "c310",
+   "load": "ok",
+   "createdProperties": 4,
+   "engines": 2,
+   "gearUnits": 10,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.022,
+    "pitchDeg": 0.2,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": null,
+   "flight": {
+    "ok": true,
+    "trimmed": false,
+    "startKts": 120,
+    "thrustLbs": 656,
+    "maxAltErrorFt": 37,
+    "speedChangeKts": -6,
+    "maxRollDeg": 1.9,
+    "msPerSimSecond": 5.62
+   },
+   "logTail": [
+    "    Loading Component \"fcs/roll-ap-error-pid\" of type: PID",
+    "      OUTPUT: roll-ap-error-pid",
+    "      Switch takes test 1 value (-roll-ap-error-pid)",
+    "    Loading Component \"fcs/heading-error\" of type: SUMMER",
+    "      OUTPUT: heading-error",
+    "    Loading Component \"fcs/heading-error-bias-switch\" of type: SWITCH",
+    "        heading-error lt constant value -180.000000      if all of the following are true: {",
+    "      }        heading-error gt constant value 180.000000      if all of the following are true: {"
+   ]
+  },
+  {
+   "variant": "dr1",
+   "aero": "dr1",
+   "load": "ok",
+   "createdProperties": 2,
+   "engines": 1,
+   "gearUnits": 9,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.537,
+    "pitchDeg": 17.54,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": null,
+   "flight": {
+    "ok": true,
+    "trimmed": false,
+    "startKts": 120,
+    "thrustLbs": 199,
+    "maxAltErrorFt": 121,
+    "speedChangeKts": -48,
+    "maxRollDeg": 2.9,
+    "msPerSimSecond": 4.63
+   },
+   "logTail": [
+    "    Loading Component \"systems/pushback/speed-error\" of type: SUMMER",
+    "      OUTPUT: speed-error",
+    "      INPUT: speed-error",
+    "    Loading Component \"systems/pushback/speed-error\" of type: SUMMER",
+    "      OUTPUT: speed-error",
+    "      INPUT: speed-error",
+    "  Trim failed",
+    "  Angle of Attack     : -2.5   wdot : -5.14e+01 Tolerance: 1e-03  Failed"
+   ]
+  },
+  {
+   "variant": "f104",
+   "aero": "f104",
+   "load": "ok",
+   "createdProperties": 2,
+   "engines": 1,
+   "gearUnits": 7,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 2.052,
+    "pitchDeg": 0.45,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 220
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 220,
+    "thrustLbs": 7065,
+    "maxAltErrorFt": 509,
+    "speedChangeKts": 65,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 5.48
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 3.15e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.59   udot : 6.54e+00  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.34  qdot : -3.80e-02 Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 3.17e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.57   udot : 6.79e+00  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.47  qdot : -6.08e-02 Tolerance: 1e-04  Failed"
+   ]
+  },
+  {
+   "variant": "f15",
+   "aero": "f15",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 2,
+   "gearUnits": 9,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 2.13,
+    "pitchDeg": 0.73,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 160
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 160,
+    "thrustLbs": 8670,
+    "maxAltErrorFt": 339,
+    "speedChangeKts": 37,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 5.05
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : 19     wdot : 2.78e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.67   udot : 1.41e+01  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : 0      qdot : -1.46e-01 Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 2.87e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.34   udot : 1.46e+01  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.64  qdot : -1.36e-01 Tolerance: 1e-04  Failed"
+   ]
+  },
+  {
+   "variant": "f16",
+   "aero": "f16",
+   "load": "ok",
+   "createdProperties": 6,
+   "engines": 1,
+   "gearUnits": 10,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.659,
+    "pitchDeg": -0.19,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 160
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 160,
+    "thrustLbs": 2927,
+    "maxAltErrorFt": 405,
+    "speedChangeKts": 23,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 6.52
+   },
+   "logTail": [
+    "    Loading Component \"systems/pushback/speed-error\" of type: SUMMER",
+    "      OUTPUT: speed-error",
+    "      INPUT: speed-error",
+    "    Loading Component \"fcs/roll-trim-error\" of type: SUMMER",
+    "      OUTPUT: roll-trim-error",
+    "      INPUT: roll-trim-error",
+    "    Loading Component \"fcs/pitch-trim-error\" of type: SUMMER",
+    "      OUTPUT: pitch-trim-error"
+   ]
+  },
+  {
+   "variant": "f22",
+   "aero": "f22",
+   "load": "ok",
+   "createdProperties": 19,
+   "engines": 2,
+   "gearUnits": 3,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.694,
+    "pitchDeg": 0.26,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": null,
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "startKts": 90,
+    "thrustLbs": 66274,
+    "maxAltErrorFt": 1248,
+    "speedChangeKts": 44,
+    "maxRollDeg": 180,
+    "msPerSimSecond": 6.95
+   },
+   "logTail": [
+    "    Loading Component \"fcs/roll-rate-error\" of type: SUMMER",
+    "      OUTPUT: roll-rate-error",
+    "      INPUT: roll-rate-error",
+    "    Loading Component \"fcs/yaw-rate-error\" of type: SUMMER",
+    "      OUTPUT: yaw-rate-error",
+    "      INPUT: yaw-rate-error",
+    "    Loading Component \"fcs/pitch-rate-error\" of type: SUMMER",
+    "      OUTPUT: pitch-rate-error"
+   ]
+  },
+  {
+   "variant": "fokker100",
+   "aero": "fokker100",
+   "load": "ok",
+   "createdProperties": 6,
+   "engines": 2,
+   "gearUnits": 5,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 2.233,
+    "pitchDeg": -0.79,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 160
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 160,
+    "thrustLbs": 6551,
+    "maxAltErrorFt": 206,
+    "speedChangeKts": 9,
+    "maxRollDeg": 0.1,
+    "msPerSimSecond": 4.72
+   },
+   "logTail": [
+    "    Loading Component \"systems/pushback/speed-error\" of type: SUMMER",
+    "      OUTPUT: speed-error",
+    "      INPUT: speed-error",
+    "    Loading Component \"systems/pushback/speed-error\" of type: SUMMER",
+    "      OUTPUT: speed-error",
+    "      INPUT: speed-error",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 2.74e+01  Tolerance: 1e-03  Failed"
+   ]
+  },
+  {
+   "variant": "fokker50",
+   "aero": "fokker50",
+   "load": "ok",
+   "createdProperties": 2,
+   "engines": 2,
+   "gearUnits": 8,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 2.296,
+    "pitchDeg": 0.34,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": null,
+   "flight": {
+    "ok": true,
+    "trimmed": false,
+    "startKts": 120,
+    "thrustLbs": 1959553,
+    "maxAltErrorFt": 743,
+    "speedChangeKts": -8,
+    "maxRollDeg": 0.9,
+    "msPerSimSecond": 6.01
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : 2.7    wdot : 1.37e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : nan    udot : 1.75e+03  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : 1      qdot : 4.94e+00  Tolerance: 1e-04  Failed",
+    "  Rudder              : 1      rdot : 3.07e+01  Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 9.7    wdot : 2.19e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -6.58e-01 Tolerance: 1e-03  Failed"
+   ]
+  },
+  {
+   "variant": "global5000",
+   "aero": "global5000",
+   "load": "ok",
+   "createdProperties": 13,
+   "engines": 2,
+   "gearUnits": 5,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 2.677,
+    "pitchDeg": 0.3,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 160
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 160,
+    "thrustLbs": 7271,
+    "maxAltErrorFt": 509,
+    "speedChangeKts": 23,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 5.46
+   },
+   "logTail": [
+    "    Loading Component \"ap/limited-roll-angle-error\" of type: SUMMER",
+    "      OUTPUT: limited-roll-angle-error",
+    "      INPUT: limited-roll-angle-error",
+    "    Loading Component \"ap/limited-roll-rate-error\" of type: SUMMER",
+    "      OUTPUT: limited-roll-rate-error",
+    "      INPUT: limited-roll-rate-error",
+    "    Loading Component \"fcs/roll-ap-error-pid\" of type: PID",
+    "      OUTPUT: roll-ap-error-pid"
+   ]
+  },
+  {
+   "variant": "minisgs",
+   "aero": "minisgs",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 0,
+   "gearUnits": 6,
+   "groundTrim": "failed",
+   "ground": {
+    "ok": false,
+    "error": "function signature mismatch"
+   },
+   "trim": null,
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "startKts": 90,
+    "thrustLbs": 0,
+    "maxAltErrorFt": 249,
+    "speedChangeKts": -80,
+    "maxRollDeg": 129.5,
+    "msPerSimSecond": 4.03
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : -2.84e+03 Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -9.38e+01 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : 0.2    qdot : 3.45e+02  Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : -1.58e+03 Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -5.28e+01 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : 0.2    qdot : 1.93e+02  Tolerance: 1e-04  Failed"
+   ]
+  },
+  {
+   "variant": "mk82",
+   "aero": "mk82",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 0,
+   "gearUnits": 2,
+   "groundTrim": "failed",
+   "ground": {
+    "ok": false,
+    "cgAglM": 169.807,
+    "pitchDeg": -77.94,
+    "rollDeg": 167.52,
+    "wheelsDown": 0
+   },
+   "trim": null,
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "startKts": 90,
+    "error": "non-finite state",
+    "thrustLbs": 0,
+    "maxAltErrorFt": 28806,
+    "speedChangeKts": -90,
+    "maxRollDeg": 179.3,
+    "msPerSimSecond": 2
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Altitude AGL        : 5      wdot : 3.22e+01  Tolerance: 1e-03  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 3.21e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -1.11e+00 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : 0      qdot : -1.85e-04 Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 3.21e+01  Tolerance: 1e-03  Failed"
+   ]
+  },
+  {
+   "variant": "p51d",
+   "aero": "p51d",
+   "load": "ok",
+   "createdProperties": 2,
+   "engines": 1,
+   "gearUnits": 16,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.681,
+    "pitchDeg": 11.64,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": null,
+   "flight": {
+    "ok": true,
+    "trimmed": false,
+    "startKts": 120,
+    "thrustLbs": 0,
+    "maxAltErrorFt": 256,
+    "speedChangeKts": -2,
+    "maxRollDeg": 1.1,
+    "msPerSimSecond": 7.55
+   },
+   "logTail": [
+    "      }        ap/map-error LT constant value 0.000000        throttle-pos-norm LE constant value 0.001000      if all of the following are true: {",
+    "      }        ap/map-error GT constant value 0.000000        throttle-pos-norm GT constant value 0.990000      if all of the following are true: {",
+    "    Loading Component \"ap/map-error\" of type: SUMMER",
+    "      OUTPUT: map-error",
+    "    Loading Component \"ap/map-error-lag\" of type: LAG_FILTER",
+    "      INPUT: map-error",
+    "      OUTPUT: map-error-lag",
+    "      Switch takes test 1 value (map-error-lag)"
+   ]
+  },
+  {
+   "variant": "pa28",
+   "aero": "pa28",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 1,
+   "gearUnits": 9,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.07,
+    "pitchDeg": 3.82,
+    "rollDeg": -0.03,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 120
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 120,
+    "thrustLbs": 220,
+    "maxAltErrorFt": 287,
+    "speedChangeKts": -14,
+    "maxRollDeg": 3.8,
+    "msPerSimSecond": 4.67
+   },
+   "logTail": []
+  },
+  {
+   "variant": "paraglider",
+   "aero": "paraglider",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 1,
+   "gearUnits": 2,
+   "groundTrim": "failed",
+   "ground": {
+    "ok": false,
+    "cgAglM": null,
+    "pitchDeg": null,
+    "rollDeg": null,
+    "wheelsDown": 0
+   },
+   "trim": null,
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "startKts": 90,
+    "error": "non-finite state",
+    "thrustLbs": 26,
+    "maxAltErrorFt": 0,
+    "speedChangeKts": -90,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 0.02
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Altitude AGL        : 5      wdot : 3.22e+01  Tolerance: 1e-03  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 20     wdot : nan       Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : nan       Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : 0      qdot : nan       Tolerance: 1e-04  Failed",
+    "  Roll Angle          : 30     vdot : nan       Tolerance: 1e-03  Failed",
+    "  Ailerons            : 1      pdot : nan       Tolerance: 1e-04  Failed"
+   ]
+  },
+  {
+   "variant": "pc7",
+   "aero": "pc7",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 1,
+   "gearUnits": 5,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 0.816,
+    "pitchDeg": 1.59,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": null,
+   "flight": {
+    "ok": true,
+    "trimmed": false,
+    "startKts": 120,
+    "thrustLbs": 397,
+    "maxAltErrorFt": 4,
+    "speedChangeKts": -9,
+    "maxRollDeg": 1,
+    "msPerSimSecond": 4.93
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : 1.4    wdot : 6.65e+00  Tolerance: 1e-03  Failed",
+    "  Throttle            : nan    udot : -1.73e+00 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.18  qdot : -7.62e-01 Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 6      wdot : 1.76e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : nan    udot : -9.72e-01 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.49  qdot : -5.34e-01 Tolerance: 1e-04  Failed"
+   ]
+  },
+  {
+   "variant": "pogo-jsbsim",
+   "aero": "pogo-jsbsim",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 1,
+   "gearUnits": 5,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.751,
+    "pitchDeg": -16.85,
+    "rollDeg": -39.53,
+    "wheelsDown": 2
+   },
+   "trim": {
+    "kts": 300
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 300,
+    "thrustLbs": 2176,
+    "maxAltErrorFt": 178,
+    "speedChangeKts": -72,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 4.51
+   },
+   "logTail": [
+    "ERROR: unable to open the file /runtime/output/pogo.csv",
+    "ERROR: unable to open the file /runtime/output/pogo.csv",
+    "  Trim failed",
+    "  Angle of Attack     : 7.8    wdot : 2.50e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : nan    udot : 2.92e+00  Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.23  qdot : -2.64e-01 Tolerance: 1e-04  Failed",
+    "  Rudder              : -0.0011 rdot : -5.37e-04 Tolerance: 1e-04  Failed",
+    "ERROR: unable to open the file /runtime/output/pogo.csv"
+   ]
+  },
+  {
+   "variant": "sgs126",
+   "aero": "sgs126",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 0,
+   "gearUnits": 5,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 0.386,
+    "pitchDeg": -7.06,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": null,
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "startKts": 90,
+    "thrustLbs": 0,
+    "maxAltErrorFt": 106,
+    "speedChangeKts": -46,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 4.11
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : -2.1   wdot : -1.09e+02 Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -6.44e+00 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : 0.09   qdot : 4.29e+00  Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : -1.6   wdot : -4.72e+01 Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -3.63e+00 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : 0.07   qdot : 1.87e+00  Tolerance: 1e-04  Failed"
+   ]
+  },
+  {
+   "variant": "sgs233",
+   "aero": "sgs233",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 0,
+   "gearUnits": 6,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.056,
+    "pitchDeg": 0.95,
+    "rollDeg": -0.11,
+    "wheelsDown": 3
+   },
+   "trim": null,
+   "flight": {
+    "ok": true,
+    "trimmed": false,
+    "startKts": 90,
+    "thrustLbs": 0,
+    "maxAltErrorFt": 30,
+    "speedChangeKts": -40,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 4.08
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : -1.6   wdot : -5.65e+01 Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -7.13e+00 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.073 qdot : -1.85e+00 Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : -0.79  wdot : -1.78e+01 Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -4.01e+00 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.21  qdot : -1.40e+00 Tolerance: 1e-04  Failed"
+   ]
+  },
+  {
+   "variant": "t6texan2",
+   "aero": "t6texan2",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 1,
+   "gearUnits": 3,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.846,
+    "pitchDeg": 0.93,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": {
+    "kts": 120
+   },
+   "flight": {
+    "ok": true,
+    "trimmed": true,
+    "startKts": 120,
+    "thrustLbs": 619,
+    "maxAltErrorFt": 85,
+    "speedChangeKts": 8,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 4.3
+   },
+   "logTail": []
+  },
+  {
+   "variant": "weather-balloon",
+   "aero": "weather-balloon",
+   "load": "ok",
+   "createdProperties": 3,
+   "engines": 0,
+   "gearUnits": 1,
+   "groundTrim": "failed",
+   "ground": {
+    "ok": false,
+    "cgAglM": 31.178,
+    "pitchDeg": 0,
+    "rollDeg": 0,
+    "wheelsDown": 0
+   },
+   "trim": null,
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "startKts": 90,
+    "thrustLbs": 0,
+    "maxAltErrorFt": 405,
+    "speedChangeKts": -81,
+    "maxRollDeg": 180,
+    "msPerSimSecond": 3.37
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Altitude AGL        : 5      wdot : -2.51e+01 Tolerance: 1e-03  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : -0.58  wdot : -2.43e+01 Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -2.42e+03 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : 0      qdot : 3.06e+02  Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : -1     wdot : -2.43e+01 Tolerance: 1e-03  Failed"
+   ]
+  },
+  {
+   "variant": "wrightFlyer1903",
+   "aero": "wrightFlyer1903",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 1,
+   "gearUnits": 12,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 0.781,
+    "pitchDeg": 2.91,
+    "rollDeg": -0.27,
+    "wheelsDown": 4
+   },
+   "trim": null,
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "startKts": 90,
+    "thrustLbs": 86,
+    "maxAltErrorFt": 126,
+    "speedChangeKts": -74,
+    "maxRollDeg": 4.3,
+    "msPerSimSecond": 4.27
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : -6.19e+02 Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -1.25e+02 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : 0      qdot : -1.94e+01 Tolerance: 1e-04  Failed",
+    "  Ailerons            : 0.11   pdot : -7.90e-01 Tolerance: 1e-04  Failed",
+    "  Rudder              : 0      rdot : 1.38e-01  Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : -3.34e+02 Tolerance: 1e-03  Failed"
+   ]
+  },
+  {
+   "variant": "x24b",
+   "aero": "x24b",
+   "load": "ok",
+   "createdProperties": 1,
+   "engines": 1,
+   "gearUnits": 3,
+   "groundTrim": "ok",
+   "ground": {
+    "ok": true,
+    "cgAglM": 1.448,
+    "pitchDeg": -3.83,
+    "rollDeg": 0,
+    "wheelsDown": 3
+   },
+   "trim": null,
+   "flight": {
+    "ok": false,
+    "trimmed": false,
+    "startKts": 90,
+    "thrustLbs": 0,
+    "maxAltErrorFt": 4924,
+    "speedChangeKts": 155,
+    "maxRollDeg": 0,
+    "msPerSimSecond": 4.01
+   },
+   "logTail": [
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 3.19e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -1.05e+00 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.15  qdot : -2.32e-02 Tolerance: 1e-04  Failed",
+    "  Trim failed",
+    "  Angle of Attack     : 7.5    wdot : 3.20e+01  Tolerance: 1e-03  Failed",
+    "  Throttle            : 0.5    udot : -5.92e-01 Tolerance: 1e-03  Failed",
+    "  Pitch Trim          : -0.15  qdot : -1.31e-02 Tolerance: 1e-04  Failed"
+   ]
+  }
+ ]
+}

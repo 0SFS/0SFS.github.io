@@ -1,0 +1,990 @@
+{
+ "package": "dhc6",
+ "variant": "dhc6jsb",
+ "model_path": "Aircraft/dhc6/Models/DHC6.xml",
+ "problems": [
+  "Models/Flightdeck/Instruments/ai/ai.ac: ",
+  "Models/Flightdeck/Instruments/ai/ai.ac: "
+ ],
+ "triangles": {
+  "exterior": 28491,
+  "interior": 138901,
+  "extras": 18933
+ },
+ "ac_bytes": {
+  "exterior": 2305571,
+  "interior": 12787889,
+  "extras": 1391772
+ },
+ "exterior_only": false,
+ "files": [
+  {
+   "file": "Models/Flightdeck/flightdeck.ac",
+   "category": "interior",
+   "triangles": 32124,
+   "objects": 149,
+   "bytes": 2906593
+  },
+  {
+   "file": "Models/Flightdeck/Circuit-breakers/main-breaker-panel.ac",
+   "category": "interior",
+   "triangles": 16942,
+   "objects": 68,
+   "bytes": 1879487
+  },
+  {
+   "file": "Models/dhc-6.ac",
+   "category": "exterior",
+   "triangles": 16032,
+   "objects": 107,
+   "bytes": 1277589
+  },
+  {
+   "file": "Models/wheels.ac",
+   "category": "exterior",
+   "triangles": 8750,
+   "objects": 17,
+   "bytes": 723907
+  },
+  {
+   "file": "Models/Flightdeck/Circuit-breakers/center-breaker-panel.ac",
+   "category": "interior",
+   "triangles": 8066,
+   "objects": 61,
+   "bytes": 897166
+  },
+  {
+   "file": "Models/Equipment/ground-services/fuel-truck/fuel-truck.ac",
+   "category": "extras",
+   "triangles": 7707,
+   "objects": 45,
+   "bytes": 581006
+  },
+  {
+   "file": "Models/Cabin/cabin.ac",
+   "category": "interior",
+   "triangles": 7063,
+   "objects": 9,
+   "bytes": 533323
+  },
+  {
+   "file": "Models/Flightdeck/Circuit-breakers/overhead-breaker-panel.ac",
+   "category": "interior",
+   "triangles": 6658,
+   "objects": 28,
+   "bytes": 757607
+  },
+  {
+   "file": "Models/Pilot/pilot.ac",
+   "category": "interior",
+   "triangles": 6064,
+   "objects": 16,
+   "bytes": 465991
+  },
+  {
+   "file": "Models/Pilot/copilot.ac",
+   "category": "interior",
+   "triangles": 6064,
+   "objects": 16,
+   "bytes": 465087
+  },
+  {
+   "file": "Models/floats.ac",
+   "category": "exterior",
+   "triangles": 3709,
+   "objects": 18,
+   "bytes": 304075
+  },
+  {
+   "file": "Models/Equipment/ground-services/external-power/external-power.ac",
+   "category": "extras",
+   "triangles": 2068,
+   "objects": 12,
+   "bytes": 155016
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/VHF-22/ctl22.ac",
+   "category": "interior",
+   "triangles": 1882,
+   "objects": 73,
+   "bytes": 121605
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/VHF-22/ctl22.ac",
+   "category": "interior",
+   "triangles": 1882,
+   "objects": 73,
+   "bytes": 121605
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/VIR-32/ctl32.ac",
+   "category": "interior",
+   "triangles": 1770,
+   "objects": 43,
+   "bytes": 106491
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/VIR-32/ctl32.ac",
+   "category": "interior",
+   "triangles": 1770,
+   "objects": 43,
+   "bytes": 106491
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/ADF-462/ctl62.ac",
+   "category": "interior",
+   "triangles": 1770,
+   "objects": 43,
+   "bytes": 107015
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/ADF-462/ctl62.ac",
+   "category": "interior",
+   "triangles": 1770,
+   "objects": 43,
+   "bytes": 107015
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/alt/alt2.ac",
+   "category": "interior",
+   "triangles": 1758,
+   "objects": 12,
+   "bytes": 153335
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/alt/alt2.ac",
+   "category": "interior",
+   "triangles": 1758,
+   "objects": 12,
+   "bytes": 153335
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/rmi/rmi.ac",
+   "category": "interior",
+   "triangles": 1723,
+   "objects": 20,
+   "bytes": 146712
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/rmi/rmi.ac",
+   "category": "interior",
+   "triangles": 1723,
+   "objects": 20,
+   "bytes": 146712
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/kma20_AudioPanel/kma20.ac",
+   "category": "interior",
+   "triangles": 1529,
+   "objects": 35,
+   "bytes": 112609
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/vsi/vsi.ac",
+   "category": "interior",
+   "triangles": 1388,
+   "objects": 7,
+   "bytes": 116944
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/vsi/vsi.ac",
+   "category": "interior",
+   "triangles": 1388,
+   "objects": 7,
+   "bytes": 116944
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/hi/hi.ac",
+   "category": "interior",
+   "triangles": 1363,
+   "objects": 14,
+   "bytes": 116733
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/hi/hi.ac",
+   "category": "interior",
+   "triangles": 1363,
+   "objects": 14,
+   "bytes": 116733
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/transponder/gtx320a.ac",
+   "category": "interior",
+   "triangles": 1346,
+   "objects": 14,
+   "bytes": 118889
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/ki206/ki206.ac",
+   "category": "interior",
+   "triangles": 1278,
+   "objects": 15,
+   "bytes": 108831
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/ki206/ki206.ac",
+   "category": "interior",
+   "triangles": 1278,
+   "objects": 15,
+   "bytes": 108831
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/ki206/ki206.ac",
+   "category": "interior",
+   "triangles": 1278,
+   "objects": 15,
+   "bytes": 108831
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/ki206/ki206.ac",
+   "category": "interior",
+   "triangles": 1278,
+   "objects": 15,
+   "bytes": 108831
+  },
+  {
+   "file": "Models/Equipment/pitot-cover/left-pitot-cover.ac",
+   "category": "extras",
+   "triangles": 1276,
+   "objects": 4,
+   "bytes": 97947
+  },
+  {
+   "file": "Models/Equipment/pitot-cover/right-pitot-cover.ac",
+   "category": "extras",
+   "triangles": 1276,
+   "objects": 4,
+   "bytes": 97950
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/tc/tc.ac",
+   "category": "interior",
+   "triangles": 1224,
+   "objects": 8,
+   "bytes": 104674
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/tc/tc.ac",
+   "category": "interior",
+   "triangles": 1224,
+   "objects": 8,
+   "bytes": 104674
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/airtemp/airtemp.ac",
+   "category": "interior",
+   "triangles": 1209,
+   "objects": 6,
+   "bytes": 102312
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/asi/asi-gauge.ac",
+   "category": "interior",
+   "triangles": 1205,
+   "objects": 6,
+   "bytes": 101723
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/asi/asi-gauge.ac",
+   "category": "interior",
+   "triangles": 1205,
+   "objects": 6,
+   "bytes": 101723
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/compass/magcompass.ac",
+   "category": "interior",
+   "triangles": 1148,
+   "objects": 4,
+   "bytes": 86521
+  },
+  {
+   "file": "Models/Equipment/tiedowns/left-tiedown-wheels.ac",
+   "category": "extras",
+   "triangles": 984,
+   "objects": 6,
+   "bytes": 75990
+  },
+  {
+   "file": "Models/Equipment/tiedowns/right-tiedown-wheels.ac",
+   "category": "extras",
+   "triangles": 984,
+   "objects": 6,
+   "bytes": 75803
+  },
+  {
+   "file": "Models/Equipment/tiedowns/rear-tiedown-wheels.ac",
+   "category": "extras",
+   "triangles": 984,
+   "objects": 6,
+   "bytes": 76326
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/ki266/ki266.ac",
+   "category": "interior",
+   "triangles": 950,
+   "objects": 32,
+   "bytes": 110713
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/alt-set/alt-selt.ac",
+   "category": "interior",
+   "triangles": 936,
+   "objects": 21,
+   "bytes": 77609
+  },
+  {
+   "file": "Models/Lights/landing-light-cone.ac",
+   "category": "extras",
+   "triangles": 864,
+   "objects": 4,
+   "bytes": 39698
+  },
+  {
+   "file": "Models/Lights/landing-light-cone.ac",
+   "category": "extras",
+   "triangles": 864,
+   "objects": 4,
+   "bytes": 39698
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/hyd/hydpress.ac",
+   "category": "interior",
+   "triangles": 834,
+   "objects": 6,
+   "bytes": 72415
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/nav1_gps_slave/nav1_gps_slave.ac",
+   "category": "interior",
+   "triangles": 760,
+   "objects": 11,
+   "bytes": 86452
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/nav1_gps_slave/nav1_gps_slave.ac",
+   "category": "interior",
+   "triangles": 760,
+   "objects": 11,
+   "bytes": 86452
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/ELT/ArtexELT.ac",
+   "category": "interior",
+   "triangles": 718,
+   "objects": 10,
+   "bytes": 57618
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/gear/gear-ctl.ac",
+   "category": "interior",
+   "triangles": 644,
+   "objects": 16,
+   "bytes": 58181
+  },
+  {
+   "file": "Models/Equipment/engine-cover/left-engine-cover.ac",
+   "category": "extras",
+   "triangles": 612,
+   "objects": 6,
+   "bytes": 44993
+  },
+  {
+   "file": "Models/Equipment/engine-cover/right-engine-cover.ac",
+   "category": "extras",
+   "triangles": 612,
+   "objects": 6,
+   "bytes": 45240
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/kma20_AudioPanel/audiopanel_support.ac",
+   "category": "interior",
+   "triangles": 582,
+   "objects": 4,
+   "bytes": 66377
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/torque/T5.ac",
+   "category": "interior",
+   "triangles": 581,
+   "objects": 6,
+   "bytes": 48107
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/torque/T5.ac",
+   "category": "interior",
+   "triangles": 581,
+   "objects": 6,
+   "bytes": 48107
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/torque/torque.ac",
+   "category": "interior",
+   "triangles": 579,
+   "objects": 7,
+   "bytes": 48066
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/torque/torque.ac",
+   "category": "interior",
+   "triangles": 579,
+   "objects": 7,
+   "bytes": 48066
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/fuel/fuel-qty.ac",
+   "category": "interior",
+   "triangles": 563,
+   "objects": 7,
+   "bytes": 46538
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/fuel/fuel-qty.ac",
+   "category": "interior",
+   "triangles": 563,
+   "objects": 7,
+   "bytes": 46538
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/prop/prop-rpm.ac",
+   "category": "interior",
+   "triangles": 558,
+   "objects": 8,
+   "bytes": 45806
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/prop/prop-rpm.ac",
+   "category": "interior",
+   "triangles": 558,
+   "objects": 8,
+   "bytes": 45806
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/torque/gg-rpm.ac",
+   "category": "interior",
+   "triangles": 558,
+   "objects": 8,
+   "bytes": 46058
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/torque/gg-rpm.ac",
+   "category": "interior",
+   "triangles": 558,
+   "objects": 8,
+   "bytes": 46058
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/oil/oilpsi.ac",
+   "category": "interior",
+   "triangles": 557,
+   "objects": 7,
+   "bytes": 45692
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/oil/oilpsi.ac",
+   "category": "interior",
+   "triangles": 557,
+   "objects": 7,
+   "bytes": 45692
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/fuel/fuelflow.ac",
+   "category": "interior",
+   "triangles": 555,
+   "objects": 6,
+   "bytes": 45321
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/fuel/fuelflow.ac",
+   "category": "interior",
+   "triangles": 555,
+   "objects": 6,
+   "bytes": 45321
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/oil/oiltemp.ac",
+   "category": "interior",
+   "triangles": 555,
+   "objects": 6,
+   "bytes": 45470
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/oil/oiltemp.ac",
+   "category": "interior",
+   "triangles": 555,
+   "objects": 6,
+   "bytes": 45470
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/radar-alt/radar-alt.ac",
+   "category": "interior",
+   "triangles": 416,
+   "objects": 11,
+   "bytes": 36851
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/ias-set/ias-set.ac",
+   "category": "interior",
+   "triangles": 392,
+   "objects": 9,
+   "bytes": 31844
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/clock/m877.ac",
+   "category": "interior",
+   "triangles": 280,
+   "objects": 16,
+   "bytes": 26848
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/clock/m877.ac",
+   "category": "interior",
+   "triangles": 280,
+   "objects": 16,
+   "bytes": 26848
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/volts/voltmeter.ac",
+   "category": "interior",
+   "triangles": 245,
+   "objects": 4,
+   "bytes": 21270
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/volts/ammeter.ac",
+   "category": "interior",
+   "triangles": 245,
+   "objects": 4,
+   "bytes": 21268
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/oat/oat.ac",
+   "category": "interior",
+   "triangles": 220,
+   "objects": 4,
+   "bytes": 18131
+  },
+  {
+   "file": "Models/Equipment/Wiper/LHwiper.ac",
+   "category": "extras",
+   "triangles": 124,
+   "objects": 4,
+   "bytes": 10193
+  },
+  {
+   "file": "Models/Equipment/Wiper/RHwiper.ac",
+   "category": "extras",
+   "triangles": 124,
+   "objects": 4,
+   "bytes": 10288
+  },
+  {
+   "file": "Models/Lights/Lights.ac",
+   "category": "extras",
+   "triangles": 106,
+   "objects": 7,
+   "bytes": 8869
+  },
+  {
+   "file": "Models/Lights/Lights.ac",
+   "category": "extras",
+   "triangles": 106,
+   "objects": 7,
+   "bytes": 8869
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/ap/AP-board.ac",
+   "category": "interior",
+   "triangles": 90,
+   "objects": 30,
+   "bytes": 12776
+  },
+  {
+   "file": "Models/Lights/lightcone-central.ac",
+   "category": "extras",
+   "triangles": 64,
+   "objects": 2,
+   "bytes": 4426
+  },
+  {
+   "file": "Models/Equipment/chocks/left-chock-fwd.ac",
+   "category": "extras",
+   "triangles": 28,
+   "objects": 2,
+   "bytes": 3346
+  },
+  {
+   "file": "Models/Equipment/chocks/left-chock-aft.ac",
+   "category": "extras",
+   "triangles": 28,
+   "objects": 2,
+   "bytes": 3326
+  },
+  {
+   "file": "Models/Equipment/chocks/right-chock-fwd.ac",
+   "category": "extras",
+   "triangles": 28,
+   "objects": 2,
+   "bytes": 3319
+  },
+  {
+   "file": "Models/Equipment/chocks/right-chock-aft.ac",
+   "category": "extras",
+   "triangles": 28,
+   "objects": 2,
+   "bytes": 3305
+  },
+  {
+   "file": "Models/Lights/lightcone-oh.ac",
+   "category": "extras",
+   "triangles": 22,
+   "objects": 2,
+   "bytes": 1434
+  },
+  {
+   "file": "Models/Lights/L-lightcone-oh.ac",
+   "category": "extras",
+   "triangles": 22,
+   "objects": 2,
+   "bytes": 1440
+  },
+  {
+   "file": "Models/Flightdeck/No-smoking/no-smoking.ac",
+   "category": "interior",
+   "triangles": 16,
+   "objects": 4,
+   "bytes": 2001
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/flaps/flap-gauge.ac",
+   "category": "interior",
+   "triangles": 10,
+   "objects": 3,
+   "bytes": 1344
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/nav1_gps_slave/slave_lamp.ac",
+   "category": "interior",
+   "triangles": 10,
+   "objects": 2,
+   "bytes": 995
+  },
+  {
+   "file": "Models/Flightdeck/Instruments/nav1_gps_slave/slave_lamp.ac",
+   "category": "interior",
+   "triangles": 10,
+   "objects": 2,
+   "bytes": 995
+  },
+  {
+   "file": "Models/Effects/procedural_light.ac",
+   "category": "extras",
+   "triangles": 2,
+   "objects": 2,
+   "bytes": 279
+  },
+  {
+   "file": "Models/shadow.ac",
+   "category": "extras",
+   "triangles": 2,
+   "objects": 2,
+   "bytes": 389
+  },
+  {
+   "file": "Models/shadowF.ac",
+   "category": "extras",
+   "triangles": 2,
+   "objects": 2,
+   "bytes": 390
+  },
+  {
+   "file": "Models/Effects/procedural_light.ac",
+   "category": "extras",
+   "triangles": 2,
+   "objects": 2,
+   "bytes": 279
+  },
+  {
+   "file": "Models/Effects/procedural_light.ac",
+   "category": "extras",
+   "triangles": 2,
+   "objects": 2,
+   "bytes": 279
+  },
+  {
+   "file": "Models/Effects/procedural_light.ac",
+   "category": "extras",
+   "triangles": 2,
+   "objects": 2,
+   "bytes": 279
+  },
+  {
+   "file": "Models/Effects/procedural_light.ac",
+   "category": "extras",
+   "triangles": 2,
+   "objects": 2,
+   "bytes": 279
+  },
+  {
+   "file": "Models/Effects/procedural_light.ac",
+   "category": "extras",
+   "triangles": 2,
+   "objects": 2,
+   "bytes": 279
+  },
+  {
+   "file": "Models/Effects/procedural_light.ac",
+   "category": "extras",
+   "triangles": 2,
+   "objects": 2,
+   "bytes": 279
+  },
+  {
+   "file": "Models/Effects/procedural_light.ac",
+   "category": "extras",
+   "triangles": 2,
+   "objects": 2,
+   "bytes": 279
+  },
+  {
+   "file": "Models/Effects/procedural_light.ac",
+   "category": "extras",
+   "triangles": 2,
+   "objects": 2,
+   "bytes": 279
+  }
+ ],
+ "missing": [
+  "Aircraft/Generic/marker.xml",
+  "Aircraft/Instruments-3d/garmin196/garmin196.xml"
+ ],
+ "animations": {
+  "by_type": {
+   "?": 44,
+   "select": 388,
+   "pick": 361,
+   "material": 288,
+   "shader": 40,
+   "rotate": 374,
+   "spin": 11,
+   "translate": 153,
+   "slider": 5,
+   "knob": 52,
+   "noshadow": 54,
+   "light": 50,
+   "texrotate": 2,
+   "textranslate": 109,
+   "scale": 19,
+   "range": 6,
+   "alpha-test": 9,
+   "flash": 3,
+   "dist-scale": 18,
+   "billboard": 6
+  },
+  "control surfaces": {
+   "animations": 48,
+   "objects": [
+    "FlapLever",
+    "Head",
+    "L.aileron",
+    "L.flap",
+    "L.slat",
+    "LHpedal",
+    "Larm",
+    "Lcalf",
+    "Lfoot",
+    "Lforearm",
+    "Pelvis",
+    "R.aileron",
+    "R.flap",
+    "R.slat",
+    "RHpedal",
+    "Rarm",
+    "Rcalf",
+    "Rfoot",
+    "Rforearm",
+    "Torso",
+    "Yoke",
+    "Yoke1",
+    "Yoke2",
+    "flaplever",
+    "glasses",
+    "headset",
+    "tiller",
+    "trimind-aileron",
+    "trimind-elevator",
+    "trimind-rudder"
+   ],
+   "properties": [
+    "controls/flight/aileron",
+    "controls/flight/aileron-smooth",
+    "controls/flight/aileron-trim-actuated",
+    "controls/flight/elevator",
+    "controls/flight/elevator-smooth",
+    "controls/flight/elevator-trim",
+    "controls/flight/flaplever-pos",
+    "controls/flight/indicated-aileron-trim",
+    "controls/flight/rudder",
+    "controls/flight/rudder-trim",
+    "surface-positions/flap-pos-norm"
+   ]
+  },
+  "gear retraction": {
+   "animations": 8,
+   "objects": [
+    "LHRam",
+    "LHWheel",
+    "LHWheelMounting",
+    "LHfrtWheel",
+    "LHfrtWheelMounting",
+    "LHlwrRam",
+    "LHuprRam",
+    "RHRam",
+    "RHWheel",
+    "RHWheelMounting",
+    "RHfrtWheel",
+    "RHfrtWheelMounting",
+    "RHlwrRam",
+    "RHuprRam"
+   ],
+   "properties": [
+    "gear/gear[4]/position-norm",
+    "gear/gear[5]/position-norm",
+    "gear/gear[6]/position-norm",
+    "gear/gear[7]/position-norm"
+   ]
+  },
+  "gear compression/steering": {
+   "animations": 9,
+   "objects": [
+    "FrtSki",
+    "FrtStrut",
+    "FrtWheel",
+    "LHWheel",
+    "LHWheelMounting",
+    "LHfrtWheel",
+    "LHfrtWheelMounting",
+    "LHstrut",
+    "Lski",
+    "Lwheel",
+    "RHWheel",
+    "RHWheelMounting",
+    "RHfrtWheel",
+    "RHfrtWheelMounting",
+    "RHstrut",
+    "Rski",
+    "Rwheel",
+    "frt.d1",
+    "frt.d2",
+    "taxi-light"
+   ],
+   "properties": [
+    "gear/gear[0]/compression-m",
+    "gear/gear[1]/compression-m",
+    "gear/gear[2]/compression-m",
+    "gear/gear[4]/compression-m",
+    "gear/gear[5]/compression-m",
+    "gear/gear[6]/compression-m",
+    "gear/gear[7]/compression-m"
+   ]
+  },
+  "propeller/rotor spin": {
+   "animations": 22,
+   "objects": [
+    "LHprop",
+    "Lprop.1",
+    "Lprop.2",
+    "Lprop.3",
+    "LpropParent",
+    "PropRPMneedle",
+    "Prpm.1",
+    "RHprop",
+    "Rprop.1",
+    "Rprop.2",
+    "Rprop.3",
+    "RpropParent",
+    "SpinnerL",
+    "SpinnerR"
+   ],
+   "properties": [
+    "controls/engines/engine[0]/propeller-pitch",
+    "controls/engines/engine[1]/propeller-pitch",
+    "engines/engine[0]/n2",
+    "engines/engine[0]/thruster/rpm",
+    "engines/engine[1]/n2",
+    "engines/engine[1]/thruster/rpm",
+    "instrumentation/engine-instruments/propeller[0]/indicated-rpm",
+    "instrumentation/engine-instruments/propeller[1]/indicated-rpm"
+   ]
+  },
+  "doors/canopy": {
+   "animations": 2,
+   "objects": [
+    "doors-unlocked-breaker"
+   ],
+   "properties": [
+    "controls/electric/circuit-breakers/overhead/doors-unlocked-pos"
+   ]
+  },
+  "other": {
+   "animations": 449,
+   "objects": [
+    "ADF",
+    "AI.knob",
+    "AIneedle",
+    "AIplane",
+    "AIring",
+    "ASIneedle",
+    "AUTO",
+    "AftBoostPump.sw",
+    "Airtemp.needle",
+    "Anticoll.sw",
+    "AutoFthr.toggle",
+    "Baggage.door",
+    "Baggage.door.inn",
+    "Ball",
+    "Brakelever",
+    "BusTie.sw",
+    "COM1",
+    "COM2",
+    "Compass.ball",
+    "DH.bug",
+    "DME",
+    "Dial1",
+    "Dial10",
+    "Dial100",
+    "Dial1000",
+    "Elevator",
+    "FFneedle",
+    "Fire.test",
+    "FrtSki",
+    "FrtStrut"
+   ],
+   "properties": [
+    "",
+    "autopilot/settings/target-altitude-ft",
+    "autopilot/settings/target-speed-kt",
+    "autopilot/settings/vertical-speed-fpm",
+    "controls/anti-ice/pitot-heat-pos",
+    "controls/anti-ice/prop-heat-pos",
+    "controls/anti-ice/window-heat-pos",
+    "controls/armament/station[5]/release-all-pos",
+    "controls/armament/station[6]/release-all-pos",
+    "controls/electric/aft-boost-pump-pos",
+    "controls/electric/ammeter-switch-pos",
+    "controls/electric/bus-tie-pos",
+    "controls/electric/caution-test-pos",
+    "controls/electric/circuit-breakers/center/ap-pos",
+    "controls/electric/circuit-breakers/center/dme-pos",
+    "controls/electric/circuit-breakers/center/gps-pos",
+    "controls/electric/circuit-breakers/center/lh-adf1-pos",
+    "controls/electric/circuit-breakers/center/lh-audio-pos",
+    "controls/electric/circuit-breakers/center/lh-com1-pos",
+    "controls/electric/circuit-breakers/center/lh-hsi1-pos"
+   ]
+  }
+ },
+ "bytes_fetched": 10869929,
+ "glb": "build/fg-aircraft-inventory/models-trial/dhc6jsb-exterior.glb",
+ "glb_textured_parts": 104
+}

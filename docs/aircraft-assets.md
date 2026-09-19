@@ -2,6 +2,10 @@
 
 How aircraft meshes are authored, exported, and loaded into the simulator.
 
+For importing an aircraft rather than authoring one, see
+[adding aircraft from FlightGear](flightgear-aircraft.md): what converts, what
+does not, and which aircraft are measured as the easiest.
+
 ## Layout
 
 ```text
