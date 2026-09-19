@@ -30,18 +30,29 @@ before changing anything.
 
 ## flight model
 
-**Wheels have no angular state.** JSBSim's gear models a rolling axis, slip
-angle, a slip-dependent side force, oleo spring and damper, steering and brake
-groups — but no wheel rotational inertia, no spin-up drag at touchdown, no brake
-torque fighting that inertia, and no lock-up or skid. Braking is an
-instantaneous friction multiplier. Adding a wheel layer means simulating omega
-per gear and feeding it back through the friction coefficients. See
-`docs/ground-contact.md`.
+**No aircraft turns on wheel angular state.** The installed JSBSim (fork.7)
+has the wheel spin degree of freedom from PR #1502: spin-up drag at touchdown,
+and brakes that act as a torque on the wheel. A gear only gets it when it
+declares both `wheel_radius` and `wheel_inertia`, and neither the SF50 nor the
+C172 does, so braking is still an instantaneous friction multiplier. The 0sfs
+wheel spin experiment (`docs/wheel-spin-experiment.md`) is sound and haptics
+only and feeds no forces back. `docs/ground-contact.md` still describes the
+engine as lacking this.
 
 **Control surface deflection directions are unverified in flight.** Magnitudes
 are verified against the aero tables and against real JSBSim output. If a
 surface moves the wrong way, the fix is the `sign` field in `SURFACE_BINDINGS`
 in `src/flight/aircraft/aircraftAnimation.ts`.
+
+## build
+
+**Give each JSBSim WASM build its own build number.** The build is not
+reproducible: the same commit and toolchain give a different `jsbsim_wasm.wasm`
+each time (`docs/jsbsim.md`), so the commit alone does not name a binary.
+`dist/build-metadata.json` records the commit and content hashes but no time.
+Stamp each build with a number that includes the date and time of the latest
+commit. Every build of one commit shares that time, so add the build's own time
+or a counter as well. The change belongs in JSBSim's `wasm/` build.
 
 ## map
 
