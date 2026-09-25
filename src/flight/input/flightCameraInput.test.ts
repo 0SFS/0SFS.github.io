@@ -98,6 +98,51 @@ describe("flight camera gestures", () => {
     expect(s.orbit).not.toHaveBeenCalled();
   });
 
+  it("orbits and pinches with two fingers in mouse mode too, at touch sensitivity", () => {
+    const canvas = document.createElement("canvas");
+    const orbit = vi.fn();
+    const zoom = vi.fn();
+    const sensitivity = {
+      mouse: { pan: 1, orbit: 1, zoom: 1 },
+      trackpad: { pan: 1, orbit: 1, zoom: 1 },
+      touch: { pan: 1, orbit: 2, zoom: 3 },
+    };
+    disposers.push(attachFlightCameraInput(canvas, { getMode: () => "mouse", getSensitivity: () => sensitivity, orbit, zoom }));
+    const touches = (name: string, points: number[][]) => {
+      const event = new Event(name, { cancelable: true });
+      Object.assign(event, { touches: points.map(([clientX, clientY]) => ({ clientX, clientY })) });
+      canvas.dispatchEvent(event);
+    };
+
+    touches("touchstart", [[0, 0], [10, 0]]);
+    touches("touchmove", [[10, 10], [20, 10]]);
+    expect(orbit).toHaveBeenCalledWith(0.1, 0.1);
+    touches("touchmove", [[5, 10], [25, 10]]);
+    expect(zoom).toHaveBeenLastCalledWith(0.125);
+  });
+
+  it("leaves a touchscreen pinch to the touch path when Safari also sends gesture events", () => {
+    vi.stubGlobal("GestureEvent", Event);
+    const s = setup("trackpad");
+    const touches = (name: string, points: number[][]) => {
+      const event = new Event(name, { cancelable: true });
+      Object.assign(event, { touches: points.map(([clientX, clientY]) => ({ clientX, clientY })) });
+      s.canvas.dispatchEvent(event);
+    };
+    const gesture = (name: string, scale: number) => {
+      const event = new Event(name, { cancelable: true });
+      Object.assign(event, { scale });
+      s.canvas.dispatchEvent(event);
+    };
+
+    touches("touchstart", [[0, 0], [10, 0]]);
+    gesture("gesturestart", 1);
+    gesture("gesturechange", 2);
+    expect(s.zoom).not.toHaveBeenCalled();
+    touches("touchmove", [[0, 0], [20, 0]]);
+    expect(s.zoom).toHaveBeenLastCalledWith(0.5);
+  });
+
   it("ignores synthesized wheel pans while two-finger touch is active", () => {
     const s = setup("trackpad");
     const touches = (name: string, points: number[][]) => {

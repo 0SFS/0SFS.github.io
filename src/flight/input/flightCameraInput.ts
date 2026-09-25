@@ -35,15 +35,18 @@ export function attachFlightCameraInput(canvas: HTMLCanvasElement, options: Flig
     listeners.push(() => target.removeEventListener(name, listener));
   }
   const invert = (): OrbitInvertSettings => options.getOrbitInvert?.() ?? DEFAULT_ORBIT_INVERT_SETTINGS;
-  const orbit = (x: number, y: number) => {
+  // Touch is not a pointer mode: touch gestures pass "touch" for their own
+  // sensitivity, and everything else reads the chosen mouse or trackpad.
+  const orbit = (x: number, y: number, mode: HudInputMode = options.getMode()) => {
     setOrbitActive(true);
-    const sensitivity = options.getSensitivity()[options.getMode()].orbit;
+    const sensitivity = options.getSensitivity()[mode].orbit;
     const signs = invert();
     const dx = x * 0.005 * sensitivity * (signs.invertYaw ? -1 : 1);
     const dy = y * 0.005 * sensitivity * (signs.invertPitch ? -1 : 1);
     options.orbit(dx, dy);
   };
-  const zoom = (factor: number) => options.zoom(Math.pow(factor, options.getSensitivity()[options.getMode()].zoom));
+  const zoom = (factor: number, mode: HudInputMode = options.getMode()) =>
+    options.zoom(Math.pow(factor, options.getSensitivity()[mode].zoom));
   const clearDrag = () => {
     const id = drag?.id;
     drag = null;
@@ -89,7 +92,9 @@ export function attachFlightCameraInput(canvas: HTMLCanvasElement, options: Flig
   });
   listen(canvas, "gesturestart", (event: Event & { scale?: number }) => {
     event.preventDefault();
-    gestureScale = options.getMode() === "trackpad" ? event.scale ?? 1 : null;
+    // Safari fires these for a touchscreen pinch too; with fingers down the
+    // touch path owns it, so only a trackpad pinch comes this way.
+    gestureScale = options.getMode() === "trackpad" && touch === null ? event.scale ?? 1 : null;
   });
   listen(canvas, "gesturechange", (event: Event & { scale?: number }) => {
     event.preventDefault();
@@ -108,20 +113,21 @@ export function attachFlightCameraInput(canvas: HTMLCanvasElement, options: Flig
   listen(canvas, "touchstart", (event: TouchEvent) => {
     event.preventDefault();
     touch = readTouch(event);
-    setOrbitActive(touch !== null && options.getMode() === "trackpad");
+    setOrbitActive(touch !== null);
     if (touch) touchWheelCooldownUntil = 0;
   });
   listen(canvas, "touchmove", (event: TouchEvent) => {
     event.preventDefault();
     const next = readTouch(event);
-    if (options.getMode() === "trackpad" && touch && next && gestureScale === null) {
+    // Two fingers orbit and pinch whatever the pointer mode is.
+    if (touch && next && gestureScale === null) {
       // Match mouse/trackpad grab direction: finger right → positive yaw.
       // Older code used (prev - next), which felt inverted on Android touch
       // relative to desktop Firefox trackpad wheel pans.
-      orbit(next.x - touch.x, next.y - touch.y);
-      if (touch.distance > 0 && next.distance > 0) zoom(touch.distance / next.distance);
+      orbit(next.x - touch.x, next.y - touch.y, "touch");
+      if (touch.distance > 0 && next.distance > 0) zoom(touch.distance / next.distance, "touch");
     }
-    setOrbitActive(touch !== null && options.getMode() === "trackpad" && next !== null && gestureScale === null);
+    setOrbitActive(touch !== null && next !== null && gestureScale === null);
     touch = next;
   });
   for (const name of ["touchend", "touchcancel"]) {
@@ -129,7 +135,7 @@ export function attachFlightCameraInput(canvas: HTMLCanvasElement, options: Flig
       event.preventDefault();
       const nextTouch = readTouch(event);
       touch = nextTouch;
-      setOrbitActive(nextTouch !== null && options.getMode() === "trackpad");
+      setOrbitActive(nextTouch !== null);
       touchWheelCooldownUntil = owner.performance.now() + TOUCH_WHEEL_COOLDOWN_MS;
     });
   }
