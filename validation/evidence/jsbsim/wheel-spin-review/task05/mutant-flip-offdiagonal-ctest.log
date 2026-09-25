@@ -1,0 +1,80 @@
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-task05-mutant
+    Start 21: FGAccelerationsTest1
+1/1 Test #21: FGAccelerationsTest1 .............***Failed    0.00 sec
+Running cxxtest tests (8 tests)
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 19 2026 01:45:30
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+.
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 19 2026 01:45:30
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+.
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 19 2026 01:45:30
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+.
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 19 2026 01:45:30
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+In FGAccelerationsTest::testRollAndBrakeOnSameWheel:
+/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-task05-mutant/tests/unit_tests/../../../pr1502-task05-mutant-source/tests/unit_tests/FGAccelerationsTest.h:241: Error: Expected (roll.value == -360./17.) up to epsilon (0.0000), found (-39.9999 != -21.1764)
+/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-task05-mutant/tests/unit_tests/../../../pr1502-task05-mutant-source/tests/unit_tests/FGAccelerationsTest.h:242: Error: Expected (brake.value == -280./17.) up to epsilon (0.0000), found (39.9999 != -16.4705)
+/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-task05-mutant/tests/unit_tests/../../../pr1502-task05-mutant-source/tests/unit_tests/FGAccelerationsTest.h:244: Error: Expected (wheel.Accel == 80./17.) up to epsilon (0.0000), found (79.9999 != 4.7058)
+/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-task05-mutant/tests/unit_tests/../../../pr1502-task05-mutant-source/tests/unit_tests/FGAccelerationsTest.h:246: Error: Expected (x(1) == y(1)) up to delta (0.0000), found (-39.9999 != -21.1764)
+/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-task05-mutant/tests/unit_tests/../../../pr1502-task05-mutant-source/tests/unit_tests/FGAccelerationsTest.h:248: Error: Expected (x(2) == y(2)) up to delta (0.0000), found (0.0000 != -37.6470)
+/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-task05-mutant/tests/unit_tests/../../../pr1502-task05-mutant-source/tests/unit_tests/FGAccelerationsTest.h:255: Error: Expected (u1 + q1 - rate1 == 0.) up to residual_tol (0.0000), found (-7.9999 != 0.0000)
+/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-task05-mutant/tests/unit_tests/../../../pr1502-task05-mutant-source/tests/unit_tests/FGAccelerationsTest.h:256: Error: Expected (rate1 + q1 == 0.) up to residual_tol (0.0000), found (7.9999 != 0.0000)
+
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 19 2026 01:45:30
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+.
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 19 2026 01:45:30
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+.
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 19 2026 01:45:30
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+.
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 19 2026 01:45:30
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+.
+Failed 1 and Skipped 0 of 8 tests
+Success rate: 87%
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   0.00 sec
+
+The following tests FAILED:
+	 21 - FGAccelerationsTest1 (Failed)
+Errors while running CTest

@@ -1,0 +1,19 @@
+--- src/models/FGLGear.cpp	2026-09-18 23:46:49
++++ build/pr1502-task03-mutant-source/src/models/FGLGear.cpp	2026-09-18 23:50:18
+@@ -460,13 +460,9 @@
+       // relative to the airframe. wheelSpin.Rate and in.PQR share the same
+       // reference frame, so the airframe rate about the axle is subtracted
+       // before damping and added back afterwards.
+-      if (!fdmex->GetTrimStatus() && in.TotalDeltaT > 0.0) {
+-        double brake = eBrakeGrp != bgNone ? in.BrakePos[eBrakeGrp] : 0.0;
+-        double decrement = (13.0 + 100.0 * brake) / wheelRadius * in.TotalDeltaT;
+-        double bodyRate = DotProduct(in.PQR, GetWheelSpinAxis());
+-        double relativeRate = wheelSpin.Rate - bodyRate;
+-        wheelSpin.Rate = bodyRate + sign(relativeRate) * max(0.0, fabs(relativeRate) - decrement);
+-      }
++      double brake = eBrakeGrp != bgNone ? in.BrakePos[eBrakeGrp] : 0.0;
++      double decrement = (13.0 + 100.0 * brake) / wheelRadius * in.TotalDeltaT;
++      wheelSpin.Rate = sign(wheelSpin.Rate) * max(0.0, fabs(wheelSpin.Rate) - decrement);
+       wheelTreadSlip = 0.0;
+     }
+   }

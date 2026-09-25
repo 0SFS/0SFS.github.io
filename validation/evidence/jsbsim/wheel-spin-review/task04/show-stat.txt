@@ -1,0 +1,34 @@
+commit 8924c17603aa322cdde684440ada1a061e137e7d
+Author: Felipegalind0 <Felipegalind0@outlook.com>
+Date:   Sat Sep 19 01:10:35 2026 -0500
+
+    Document wheel friction and airborne spin-down
+    
+    The airborne spin-down names its constants legacyTreadDeceleration
+    (13 ft/s^2, copied from the legacy wheel-speed-fps spin-down) and
+    additionalBrakeTreadDeceleration (100 ft/s^2, an uncalibrated approximation
+    introduced with the wheel spin DOF, neither a measured brake torque nor
+    derived from BrakeFCoeff). The decrement keeps the same arithmetic order and
+    the legacy spin-down is unchanged.
+    
+    The FGLGear class documentation now contrasts the two meanings of
+    rolling_friction: tire rolling resistance without the wheel elements, and
+    part of the wheel-to-axle torque, bounded by BrakeFCoeff times the normal
+    load times the radius, with them. It covers the opt-in elements and their
+    units, the tread force bound and axle lever arm, the no-slip and
+    no-relative-spin conditions, ground initialization, the airborne
+    approximation and its limits, the ground and airborne spin axes and the jump
+    they can cause in the reported rate at a contact transition, and the frame
+    of the spin properties. It no longer says aircraft without the elements are
+    unchanged: their friction rows use the reordered solver arithmetic.
+    
+    The comment above ConfigureWheelSpinRows gives the Jacobians and velocity
+    conditions of both rows, says the airframe lever arm runs from the CG to the
+    axle, and links the derivation at
+    https://github.com/JSBSim-Team/jsbsim/pull/1502#issuecomment-5654721219.
+    
+    No behavior changes.
+
+ src/models/FGLGear.cpp |  55 +++++++++++++++++++-------
+ src/models/FGLGear.h   | 102 +++++++++++++++++++++++++++++++++++++++++--------
+ 2 files changed, 128 insertions(+), 29 deletions(-)

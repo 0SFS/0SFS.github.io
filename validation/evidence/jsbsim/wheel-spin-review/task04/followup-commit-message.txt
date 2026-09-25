@@ -1,0 +1,17 @@
+Clarify wheel spin limits and axis alignment
+
+The FGLGear class documentation separated two airborne conditions that it
+had conflated. On a positive-time airborne step outside trim, damping stops
+the wheel relative to the airframe only if the decrement is at least the
+magnitude of the relative spin before damping. Once stopped, the wheel stays
+stopped only while the decrement absorbs the magnitude of later changes in
+the airframe rate projected on the current axle. The approximation does not
+enforce a rigid brake lock.
+
+The ground and airborne spin axes coincide when the ground normal lies in
+the plane of gear up and steered forward and has a positive component along
+gear up. Coplanarity alone would also admit a reversed normal, which
+reverses the ground axis.
+
+Documentation only.
+

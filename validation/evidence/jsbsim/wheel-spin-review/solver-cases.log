@@ -1,0 +1,7 @@
+0 roll=-32 brake=0 wheel_accel=0 other_accel=0 udot=-16 qdot=-4
+1 roll=-12.307692307692308 brake=0 wheel_accel=12.307692307692308 other_accel=0 udot=-6.1538461538461542 qdot=-1.5384615384615385
+2 roll=0 brake=-44.444444444444443 wheel_accel=-44.444444444444443 other_accel=0 udot=0 qdot=-5.5555555555555554
+3 roll=-21.176467261352443 brake=-16.470585647718568 wheel_accel=4.7058816136338741 other_accel=0 udot=-10.588233630676221 qdot=-4.7058816136338759
+4 roll=0 brake=-2 wheel_accel=-2 other_accel=0 udot=0 qdot=-0.25
+5 roll=6.666666666666667 brake=-13.333333333333334 wheel_accel=-6.666666666666667 other_accel=13.333333333333334 udot=3.3333333333333335 qdot=0
+6 roll=0 brake=0 wheel_accel=0 other_accel=0 udot=0 qdot=0

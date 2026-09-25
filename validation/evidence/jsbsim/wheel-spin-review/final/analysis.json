@@ -1,0 +1,972 @@
+{
+  "checks": {
+    "labels": {
+      "ok": true,
+      "detail": [
+        "base",
+        "head",
+        "probe",
+        "candidate"
+      ]
+    },
+    "trace_enabled": {
+      "ok": true
+    },
+    "script_set_and_hashes_equal_retained": {
+      "ok": true,
+      "detail": {
+        "new": 61,
+        "retained": 61
+      }
+    },
+    "run_count": {
+      "ok": true,
+      "detail": 244
+    },
+    "exit_classification_base": {
+      "ok": true,
+      "detail": {
+        "0": 57,
+        "1": 1,
+        "255": 3
+      }
+    },
+    "exit_classification_head": {
+      "ok": true,
+      "detail": {
+        "0": 57,
+        "1": 1,
+        "255": 3
+      }
+    },
+    "exit_classification_probe": {
+      "ok": true,
+      "detail": {
+        "0": 57,
+        "1": 1,
+        "255": 3
+      }
+    },
+    "exit_classification_candidate": {
+      "ok": true,
+      "detail": {
+        "0": 57,
+        "1": 1,
+        "255": 3
+      }
+    },
+    "no_timeouts": {
+      "ok": true
+    },
+    "file_count_base": {
+      "ok": true,
+      "detail": 102
+    },
+    "file_count_head": {
+      "ok": true,
+      "detail": 102
+    },
+    "file_count_probe": {
+      "ok": true,
+      "detail": 102
+    },
+    "file_count_candidate": {
+      "ok": true,
+      "detail": 102
+    },
+    "runscript_count": {
+      "ok": true,
+      "detail": 58
+    },
+    "nonempty_trace_every_runscript": {
+      "ok": true,
+      "detail": []
+    },
+    "base_files_and_exits_equal_retained_base": {
+      "ok": true,
+      "detail": []
+    },
+    "head_files_and_exits_equal_retained_head": {
+      "ok": true,
+      "detail": []
+    },
+    "probe_files_and_exits_equal_retained_probe": {
+      "ok": true,
+      "detail": []
+    },
+    "candidate_files_and_exits_equal_retained_probe": {
+      "ok": true,
+      "detail": []
+    },
+    "comparison_count": {
+      "ok": true,
+      "detail": 366
+    },
+    "base_head_all_byte_identical": {
+      "ok": true,
+      "detail": {
+        "exit_equal_all": true,
+        "files_equal_scripts": 61,
+        "changed_files": 0,
+        "changed_scripts": 0,
+        "changed_successful_runs": 0
+      }
+    },
+    "probe_candidate_all_byte_identical": {
+      "ok": true,
+      "detail": {
+        "exit_equal_all": true,
+        "files_equal_scripts": 61,
+        "changed_files": 0,
+        "changed_scripts": 0,
+        "changed_successful_runs": 0
+      }
+    },
+    "base_candidate_60_files_31_runs": {
+      "ok": true,
+      "detail": {
+        "exit_equal_all": true,
+        "files_equal_scripts": 30,
+        "changed_files": 60,
+        "changed_scripts": 31,
+        "changed_successful_runs": 31
+      }
+    },
+    "diagnostics_base_candidate_equal_retained_base_probe": {
+      "ok": true,
+      "detail": []
+    },
+    "diagnostics_head_candidate_equal_retained_head_probe": {
+      "ok": true,
+      "detail": []
+    },
+    "diagnostics_base_probe_equal_retained_base_probe": {
+      "ok": true,
+      "detail": []
+    },
+    "diagnostics_head_probe_equal_retained_head_probe": {
+      "ok": true,
+      "detail": []
+    },
+    "diagnostics_base_head_equal_retained_base_head": {
+      "ok": true,
+      "detail": []
+    },
+    "no_shape_header_missing_or_nonfinite_mismatch": {
+      "ok": true,
+      "detail": []
+    }
+  },
+  "failures": [],
+  "pairs": {
+    "base/head": {
+      "exit_equal_all": true,
+      "files_equal_scripts": 61,
+      "changed_files": 0,
+      "changed_scripts": 0,
+      "changed_successful_runs": 0
+    },
+    "base/probe": {
+      "exit_equal_all": true,
+      "files_equal_scripts": 30,
+      "changed_files": 60,
+      "changed_scripts": 31,
+      "changed_successful_runs": 31
+    },
+    "base/candidate": {
+      "exit_equal_all": true,
+      "files_equal_scripts": 30,
+      "changed_files": 60,
+      "changed_scripts": 31,
+      "changed_successful_runs": 31
+    },
+    "head/probe": {
+      "exit_equal_all": true,
+      "files_equal_scripts": 30,
+      "changed_files": 60,
+      "changed_scripts": 31,
+      "changed_successful_runs": 31
+    },
+    "head/candidate": {
+      "exit_equal_all": true,
+      "files_equal_scripts": 30,
+      "changed_files": 60,
+      "changed_scripts": 31,
+      "changed_successful_runs": 31
+    },
+    "probe/candidate": {
+      "exit_equal_all": true,
+      "files_equal_scripts": 61,
+      "changed_files": 0,
+      "changed_scripts": 0,
+      "changed_successful_runs": 0
+    }
+  },
+  "text_mismatches": [
+    [
+      "base",
+      "probe",
+      "c1723.xml",
+      "initfile.133.441667.xml"
+    ],
+    [
+      "base",
+      "candidate",
+      "c1723.xml",
+      "initfile.133.441667.xml"
+    ],
+    [
+      "head",
+      "probe",
+      "c1723.xml",
+      "initfile.133.441667.xml"
+    ],
+    [
+      "head",
+      "candidate",
+      "c1723.xml",
+      "initfile.133.441667.xml"
+    ]
+  ],
+  "base_candidate_changed": {
+    "B737_Runway.xml": [
+      "review-trace.csv"
+    ],
+    "B747_script1.xml": [
+      "review-trace.csv"
+    ],
+    "Concorde_rotate_test.xml": [
+      "review-trace.csv"
+    ],
+    "Concorde_runway_test.xml": [
+      "review-trace.csv"
+    ],
+    "F4N_runway_test.xml": [
+      "review-trace.csv"
+    ],
+    "L410.xml": [
+      "review-trace.csv"
+    ],
+    "L4102.xml": [
+      "L410.csv",
+      "review-trace.csv"
+    ],
+    "Short_S23_1.xml": [
+      "review-trace.csv"
+    ],
+    "T37.xml": [
+      "review-trace.csv"
+    ],
+    "T38.xml": [
+      "review-trace.csv"
+    ],
+    "Test_F450_Launch.xml": [
+      "quad_log.csv",
+      "review-trace.csv"
+    ],
+    "ZLT-NT-moored-1.xml": [
+      "review-trace.csv"
+    ],
+    "ah1s_flight_test.xml": [
+      "review-trace.csv"
+    ],
+    "b171.xml": [
+      "JSBoutB17.csv",
+      "review-trace.csv"
+    ],
+    "b737_runway_new.xml": [
+      "review-trace.csv"
+    ],
+    "c1721.xml": [
+      "review-trace.csv"
+    ],
+    "c1723.xml": [
+      "JSBout172B.csv",
+      "initfile.133.441667.xml",
+      "review-trace.csv"
+    ],
+    "c1724.xml": [
+      "JSBout172B.csv",
+      "review-trace.csv"
+    ],
+    "c172_cross_wind.xml": [
+      "JSBout172B.csv",
+      "cross_wind.csv",
+      "review-trace.csv"
+    ],
+    "c172_elevation_test.xml": [
+      "JSBout172B.csv",
+      "JSBout172B_0.csv",
+      "JSBout172B_1.csv",
+      "JSBout172B_2.csv",
+      "JSBout172B_3.csv",
+      "JSBout172B_4.csv",
+      "JSBout172B_5.csv",
+      "JSBout172B_6.csv",
+      "JSBout172B_7.csv",
+      "review-trace.csv",
+      "review-trace_0.csv",
+      "review-trace_1.csv",
+      "review-trace_2.csv",
+      "review-trace_3.csv",
+      "review-trace_4.csv",
+      "review-trace_5.csv",
+      "review-trace_6.csv",
+      "review-trace_7.csv"
+    ],
+    "c172_head_wind.xml": [
+      "JSBout172B.csv",
+      "head_wind.csv",
+      "review-trace.csv"
+    ],
+    "c172_runway_at_rest_cg_shift.xml": [
+      "JSBout172B.csv",
+      "review-trace.csv"
+    ],
+    "c3101.xml": [
+      "review-trace.csv"
+    ],
+    "c3104.xml": [
+      "review-trace.csv"
+    ],
+    "c3105.xml": [
+      "review-trace.csv"
+    ],
+    "f16_runway_test.xml": [
+      "review-trace.csv"
+    ],
+    "f16_test.xml": [
+      "review-trace.csv"
+    ],
+    "ov10_runway.xml": [
+      "review-trace.csv"
+    ],
+    "p51_start_test.xml": [
+      "review-trace.csv"
+    ],
+    "p51d_tail_wind.xml": [
+      "p51d.csv",
+      "review-trace.csv"
+    ],
+    "sim_primer.xml": [
+      "review-trace.csv"
+    ]
+  },
+  "representative_base_candidate": {
+    "c172_cross_wind.xml": {
+      "JSBout172B.csv": {
+        "different_rows": 251,
+        "max_abs_by_column": {
+          "Q dot (deg/s^2)": 4.560077466239843,
+          "R dot (deg/s^2)": 0.08887031025848063,
+          "UdotBody": 0.39054848117125895,
+          "VdotBody_i": 0.4055192102584755,
+          "WdotBody_i": 0.5524274702113945,
+          "BodyAccel_X": 0.3797469787518244,
+          "Q (deg/s)": 0.04343269219109214,
+          "R (deg/s)": 0.0020750783644229408,
+          "P dot (deg/s^2)": 0.353631039742365,
+          "Q_{inertial} (deg/s)": 0.043432644727769976,
+          "R_{inertial} (deg/s)": 0.002073703876424641,
+          "UBody": 0.0020515161949776067,
+          "WBody": 0.020124843365317224,
+          "VdotBody": 0.0184384214555553,
+          "UdotBody_i": 0.014657080606877648,
+          "BodyAccel_Y": 0.018840035735975202,
+          "Aero V_{X Body} (ft/s)": 0.0020258083040671226,
+          "Aero V_{Z Body} (ft/s)": 0.02020937624617991,
+          "V_{Z_{inertial}} (ft/s)": 0.008114287376980805,
+          "V_{Y_{ecef}} (ft/s)": 0.018794238061295987,
+          "V_{Z_{ecef}} (ft/s)": 0.008114287376980611,
+          "V_{North} (ft/s)": 0.0033330906428066243,
+          "VBody": 0.0009384716578639801,
+          "WdotBody": 0.5649474540160249,
+          "Aero V_{Y Body} (ft/s)": 0.0009374020733510235,
+          "V_{East} (ft/s)": 0.00097172263370973,
+          "V_{Down} (ft/s)": 0.019734369444698696,
+          "P (deg/s)": 0.01273746806805448,
+          "P_{inertial} (deg/s)": 0.01273774054599039,
+          "velocities/pi-deg_sec": 0.012737740545990445,
+          "V_{X_{ecef}} (ft/s)": 0.0011898723373081586,
+          "Alpha (deg)": 3.6627362775669994,
+          "BodyAccel_Z": 0.566929680203522,
+          "Phi (deg)": 0.0016595014573064781,
+          "Theta (deg)": 0.01998930668920984,
+          "Psi (deg)": 0.00035637823168599425,
+          "Q(2)_{LOCAL}": 1.4201015250704923e-05,
+          "Q(3)_{LOCAL}": 0.00017373300666843894,
+          "Q(4)_{LOCAL}": 2.161268187529376e-06,
+          "Q(1)_{ECEF}": 9.77977550387088e-05,
+          "Q(4)_{ECEF}": 0.00010354032155507342,
+          "Q(2)_{ECEF}": 7.582849191911656e-05,
+          "Q(3)_{ECEF}": 6.636477842780764e-05,
+          "Q(2)_{ECI}": 7.577547848724997e-05,
+          "Q(3)_{ECI}": 6.642530287881421e-05,
+          "Q(4)_{ECI}": 0.00010346220148571561,
+          "Q(1)_{LOCAL}": 1.5680397904338506e-05,
+          "Q(1)_{ECI}": 9.78803961070307e-05,
+          "V_{Y_{inertial}} (ft/s)": 0.018795419343703657,
+          "Beta (deg)": 0.19202010621600607,
+          "V_{X_{inertial}} (ft/s)": 0.0011623254658843507,
+          "ap/roll-cmd-smoother": 0.00218781400000001,
+          "V_{Total} (ft/s)": 0.0009244057400001893,
+          "fcs/hdot-error": 0.019691442000000003,
+          "Reynolds Number": 28.80500000002212,
+          "fcs/heading-command": 6.219258000000015e-06,
+          "ap/roll-command-pid-control": 0.0021011750000000107,
+          "fcs/roll-ap-error-pid": 0.0048666759999999865,
+          "fcs/heading-true-degrees": 0.0003560000000106811,
+          "fcs/heading-error": 0.0003560000000106811,
+          "fcs/heading-corrected": 0.0003564045000000009,
+          "fcs/heading-roll-error": 2.733724000000045e-05,
+          "q bar (psf)": 1.1032219999998483e-05,
+          "Terrain Elevation (ft)": 1.10582884865757e-08,
+          "navigation/actual-heading-rad": 6.219999999501624e-06,
+          "ap/limited-roll-angle-error": 2.8963770000000298e-05,
+          "ap/roll-rate-pid-control": 0.0008662640000000055,
+          "ap/limited-roll-rate-error": 0.0008404700000000098,
+          "/fdm/jsbsim/position/vrp-gc-latitude_deg": 3.152223371216678e-09,
+          "Altitude AGL (ft)": 0.002042407686400516,
+          "Z_{ECI} (ft)": 0.0009375400841236115,
+          "X_{ECEF} (ft)": 0.00018692505545914173,
+          "Z_{ECEF} (ft)": 0.0009375400841236115,
+          "Distance AGL (ft)": 0.002042407686400516,
+          "fcs/heading-roll-error-lag": 2.0035744000000043e-06,
+          "fcs/altitude-error": 0.002042409999999606,
+          "/fdm/jsbsim/position/vrp-radius-ft": 0.0021144933998584747,
+          "Altitude ASL (ft)": 0.002042420208399953,
+          "X_{ECI} (ft)": 0.0001832710113376379,
+          "Y_{ECI} (ft)": 0.0022882409393787384,
+          "Y_{ECEF} (ft)": 0.002287939190864563,
+          "Latitude Geodetic (deg)": 2.8940014829004213e-09,
+          "V_{Inertial} (ft/s)": 0.0009720699999888893,
+          "/fdm/jsbsim/position/vrp-longitude_deg": 4.317968205214129e-10,
+          "fcs/alt-error-lag": 0.00035791999999990054,
+          "Latitude (deg)": 2.868002724198959e-09,
+          "fcs/hdot-command": 4.2926999999970405e-05,
+          "Longitude (deg)": 4.0400038869847776e-10,
+          "systems/mixture-cmd-norm": 7.299999993382045e-08,
+          "guidance/angle-to-heading-rad": 6.219999999945713e-06
+        },
+        "nonfinite_mismatches": 0,
+        "first_different_row": 1,
+        "first_different_time": "0",
+        "rows": 251
+      },
+      "cross_wind.csv": {
+        "different_rows": 3003,
+        "max_abs_by_column": {
+          "Q dot (deg/s^2)": 123.5854796434304,
+          "R dot (deg/s^2)": 1.5946547644776299,
+          "UdotBody": 2.7831820395664124,
+          "VdotBody_i": 1.39075428078268,
+          "WdotBody_i": 3.3028620069656895,
+          "BodyAccel_X": 2.783023132717105,
+          "F_{Gear x} (lbs)": 197.32762922233587,
+          "F_{Total x} (lbs)": 214.51752526200426,
+          "N_{Gear} (ft-lbs)": 66.14549200694637,
+          "N_{Total} (ft-lbs)": 78.93324122453396,
+          "Q (deg/s)": 1.0073259130547711,
+          "R (deg/s)": 0.013161063002850706,
+          "P dot (deg/s^2)": 0.8692742212923328,
+          "Q_{inertial} (deg/s)": 1.0073259121463796,
+          "R_{inertial} (deg/s)": 0.013161059861013402,
+          "VdotBody": 0.08689829944564242,
+          "F_{Drag} (lbs)": 0.10183941316422906,
+          "F_{Side} (lbs)": 0.002177937900423532,
+          "F_{Lift} (lbs)": 185.06047026938768,
+          "F_{Aero x} (lbs)": 214.75958111654404,
+          "F_{Aero y} (lbs)": 0.10173106460703418,
+          "F_{Aero z} (lbs)": 42.70562023134403,
+          "L_{Aero} (ft-lbs)": 15.044265595705497,
+          "M_{Aero} (ft-lbs)": 3197.311191444809,
+          "N_{Aero} (ft-lbs)": 75.6568027108708,
+          "M_{Aero MRC} (ft-lbs)": 2760.1275930645934,
+          "N_{Aero MRC} (ft-lbs)": 0.02238456774067199,
+          "L_{Gear} (ft-lbs)": 32.687056209101286,
+          "M_{Gear} (ft-lbs)": 1358.699599207761,
+          "L_{Total} (ft-lbs)": 37.862200451155985,
+          "/fdm/jsbsim/aero/alphadot-rad_sec": 42.728422746707,
+          "UBody": 0.05404303293459101,
+          "UdotBody_i": 0.1403735961537672,
+          "BodyAccel_Y": 0.0869585698320336,
+          "Aero V_{X Body} (ft/s)": 0.0540625257578852,
+          "V_{Z_{inertial}} (ft/s)": 0.0474358880680054,
+          "V_{Z_{ecef}} (ft/s)": 0.04743588806800546,
+          "V_{North} (ft/s)": 0.05520212909051053,
+          "V_{Down} (ft/s)": 0.036484916998995864,
+          "F_{Gear y} (lbs)": 6.701313934110104,
+          "F_{Total y} (lbs)": 6.702832247922654,
+          "M_{Total} (ft-lbs)": 3246.028511095308,
+          "/fdm/jsbsim/aero/alpha-rad": 0.09918580501262808,
+          "L_{Aero MRC} (ft-lbs)": 0.09609803486578983,
+          "P_{inertial} (deg/s)": 0.016137578435951788,
+          "P (deg/s)": 0.016137136275124003,
+          "WBody": 0.038428922678556354,
+          "WdotBody": 2.133224447160309,
+          "BodyAccel_Z": 2.1222753959304796,
+          "Aero V_{Z Body} (ft/s)": 0.03844997568668118,
+          "V_{X_{ecef}} (ft/s)": 0.002664165794713142,
+          "Right Main Gear wheel side force (lbs)": 15.698979490000001,
+          "Right Main Gear body Y force (lbs)": 15.698979490000001,
+          "V_{Y_{ecef}} (ft/s)": 0.0385125503179517,
+          "VBody": 0.0011769977844641386,
+          "Aero V_{Y Body} (ft/s)": 0.0011770671626187834,
+          "V_{East} (ft/s)": 0.0013454808876035493,
+          "Total Gear Moment_N (ft-lbs)": 66.14549199999999,
+          "Total Gear Moment_M (ft-lbs)": 1358.6996,
+          "V_{Total} (ft/s)": 0.0052423017100000635,
+          "Alpha (deg)": 5.682928014830999,
+          "F_{Total z} (lbs)": 163.58659060622495,
+          "Beta (deg)": 0.46727725280500465,
+          "F_{Gear z} (lbs)": 148.7653630639511,
+          "Left Main Gear wheel side force (lbs)": 55.96944843,
+          "Left Main Gear body Y force (lbs)": 55.96944843,
+          "Total Gear Moment_L (ft-lbs)": 32.68705623000001,
+          "Right Main Gear wheel roll force (lbs)": 123.82170699999995,
+          "Right Main Gear body X force (lbs)": 123.82170699999995,
+          "Nose Gear wheel side force (lbs)": 30.19478865,
+          "Nose Gear body Y force (lbs)": 30.19478865,
+          "Nose Gear wheel roll force (lbs)": 15.222595550000001,
+          "Nose Gear body X force (lbs)": 15.222595550000001,
+          "F_{Weight x} (lbs)": 0.9000507661725692,
+          "F_{Weight y} (lbs)": 0.07191057264205014,
+          "F_{Weight z} (lbs)": 0.16527067252809502,
+          "Phi (deg)": 0.0016729674651318194,
+          "Theta (deg)": 0.021115069907349238,
+          "Psi (deg)": 359.9998962401268,
+          "Q(2)_{LOCAL}": 1.431313292471004e-05,
+          "Q(3)_{LOCAL}": 0.00018349343834937748,
+          "Q(4)_{LOCAL}": 2.1675238789477854e-06,
+          "Q(4)_{ECEF}": 0.00010708467420400547,
+          "Q(4)_{ECI}": 0.00010700054157330996,
+          "Q(1)_{LOCAL}": 1.6845679706278816e-05,
+          "Q(1)_{ECEF}": 0.00010556780598258708,
+          "Q(2)_{ECEF}": 8.12522338452526e-05,
+          "Q(3)_{ECEF}": 6.918426996882499e-05,
+          "Q(1)_{ECI}": 0.00010565307952148384,
+          "Q(2)_{ECI}": 8.119709368636929e-05,
+          "Q(3)_{ECI}": 6.92489761141557e-05,
+          "V_{Y_{inertial}} (ft/s)": 0.038516731152896,
+          "fcs/heading-command": 0.000460930125718,
+          "Left Main Gear wheel roll force (lbs)": 113.11027539999998,
+          "Left Main Gear body X force (lbs)": 113.11027539999998,
+          "Total Gear Force_Y (lbs)": 6.701313940000002,
+          "V_{X_{inertial}} (ft/s)": 0.0026030189110315405,
+          "Left Main Gear compress force (lbs)": 17.86939749999999,
+          "L/D": 96.080109,
+          "Total Gear Force_X (lbs)": 197.32762900000012,
+          "Right Main Gear compress force (lbs)": 16.855052999999998,
+          "fcs/hdot-error": 0.036485568000000024,
+          "Nose Gear compress force (lbs)": 58.879292700000065,
+          "fcs/roll-ap-error-pid": 0.005229238000000025,
+          "Reynolds Number": 163.3569000000134,
+          "fcs/heading-true-degrees": 360.0264143874337,
+          "fcs/heading-error": 360.0264143874337,
+          "fcs/heading-corrected": 0.0264143338337,
+          "ap/roll-cmd-smoother": 0.0023486690000000254,
+          "Total Gear Force_Z (lbs)": 148.76536299999998,
+          "aero/coefficient/Cnp": 0.0057397,
+          "ap/roll-command-pid-control": 0.002361188000000014,
+          "aero/coefficient/Clp": 0.08992,
+          "fcs/heading-roll-error": 2.7525149999999866e-05,
+          "q bar (psf)": 6.31290700000009e-05,
+          "aero/coefficient/CYp": 0.0001966400000000001,
+          "ap/limited-roll-angle-error": 2.919878999999969e-05,
+          "Left Main Gear wheel slip (deg)": 47.61269,
+          "fcs/heading-roll-error-lag": 2.139541099999999e-06,
+          "ap/limited-roll-rate-error": 0.0009444750000000002,
+          "Left Main Gear wheel velocity vec Y (ft/sec)": 0.0006851600000000002,
+          "Left Main Gear wheel side velocity (ft/sec)": 0.0006851600000000002,
+          "aero/coefficient/Cnr": 0.015571000000000015,
+          "ap/roll-rate-pid-control": 0.0008782870000000054,
+          "V_{Inertial} (ft/s)": 0.001360440000098606,
+          "navigation/actual-heading-rad": 6.28318349161,
+          "Altitude AGL (ft)": 0.0023393455856002277,
+          "Distance AGL (ft)": 0.0023393455856002277,
+          "Terrain Elevation (ft)": 1.3607189393414201e-08,
+          "Left Main Gear stroke velocity (ft/sec)": 0.038036000000000014,
+          "Right Main Gear stroke velocity (ft/sec)": 0.03559200000000001,
+          "Altitude ASL (ft)": 0.00233935937289953,
+          "Nose Gear wheel slip (deg)": 17.64124,
+          "fcs/altitude-error": 0.002339339999999801,
+          "Right Main Gear wheel slip (deg)": 47.87595,
+          "Z_{ECI} (ft)": 0.0009386800229549408,
+          "Z_{ECEF} (ft)": 0.0009386800229549408,
+          "aero/coefficient/Clr": 0.012583300000000006,
+          "aero/angle/right_wing_tip_alpha": 0.098742,
+          "Nose Gear wheel velocity vec Y (ft/sec)": 0.000685808,
+          "Nose Gear wheel side velocity (ft/sec)": 0.000685808,
+          "Left Main Gear wheel velocity vec X (ft/sec)": 0.0405011,
+          "Left Main Gear wheel rolling velocity (ft/sec)": 0.0405011,
+          "Right Main Gear wheel velocity vec Y (ft/sec)": 0.0006831699999999999,
+          "Right Main Gear wheel side velocity (ft/sec)": 0.0006831699999999999,
+          "X_{ECEF} (ft)": 0.00018822005949914455,
+          "X_{ECI} (ft)": 0.00018441397696733475,
+          "aero/coefficient/CYr": 0.0009174999999999999,
+          "aero/coefficient/CLadot": 184.0,
+          "aero/coefficient/Cmalpha": 4.5288,
+          "aero/coefficient/Cmadot": 2757.800000000003,
+          "Right Main Gear wheel velocity vec X (ft/sec)": 0.041731500000000005,
+          "Right Main Gear wheel rolling velocity (ft/sec)": 0.041731500000000005,
+          "aero/coefficient/CLq": 0.17776000000000014,
+          "aero/coefficient/CLalpha": 2.3564999999999987,
+          "aero/coefficient/Cmq": 2.7695000000000007,
+          "Nose Gear stroke velocity (ft/sec)": 0.11433000000000004,
+          "Nose Gear wheel velocity vec X (ft/sec)": 0.002897500000000011,
+          "Nose Gear wheel rolling velocity (ft/sec)": 0.002897500000000011,
+          "Latitude Geodetic (deg)": 3.2119977788624965e-09,
+          "Latitude (deg)": 3.183000529816127e-09,
+          "fcs/hdot-command": 4.300700000003932e-05,
+          "Y_{ECEF} (ft)": 0.0025946199893951416,
+          "Y_{ECI} (ft)": 0.0025948993861675262,
+          "aero/coefficient/Clb": 0.012300000000000644,
+          "fcs/alt-error-lag": 0.0003586599999998441,
+          "P_{Ambient} (psf)": 0.00017899999966175528,
+          "Longitude (deg)": 4.100115802430082e-10,
+          "aero/coefficient/CDbeta": 0.005449999999999955,
+          "aero/coefficient/Cmde": 0.00013779999999999348,
+          "aero/coefficient/CLDe": 7.620000000000283e-06,
+          "aero/coefficient/CLwbh": 1.543763,
+          "aero/coefficient/CDDe": 1.3189999999999513e-06,
+          "aero/coefficient/CYb": 0.0011860000000000204,
+          "Kinematic Viscosity": 8.800000008205022e-12,
+          "systems/mixture-cmd-norm": 8.500000003852648e-08,
+          "Right Main Gear stroke (ft)": 0.0022300000000000098,
+          "Nose Gear stroke (ft)": 0.0009522999999999997,
+          "Absolute Viscosity": 4.700000006461309e-15,
+          "Left Main Gear stroke (ft)": 0.0023500000000000187,
+          "Temperature (R)": 8.400000069741509e-06,
+          "aero/coefficient/CDwbh": 0.10197600000000001,
+          "Rho (slugs/ft^3)": 1.6300000021604588e-10,
+          "aero/coefficient/Cnb": 0.00898000000000021,
+          "aero/function/ground-effect-factor-drag": 0.00010100000000001774,
+          "aero/coefficient/CDo": 0.00035200000000001896,
+          "aero/coefficient/Cmo": 0.005389999999999784,
+          "guidance/angle-to-heading-rad": 6.259999999924659e-06,
+          "aero/function/ground-effect-factor-lift": 2.999999999997449e-05,
+          "TAIL_SKID stroke (ft)": 0.0030740000000000003,
+          "TAIL_SKID stroke velocity (ft/sec)": 0.215216,
+          "TAIL_SKID compress force (lbs)": 175.7919220000001,
+          "fcs/heading-error-bias-switch": 360.0
+        },
+        "nonfinite_mismatches": 0,
+        "first_different_row": 1,
+        "first_different_time": "0",
+        "rows": 3003
+      },
+      "review-trace.csv": {
+        "different_rows": 3003,
+        "max_abs_by_column": {
+          "/fdm/jsbsim/forces/fbx-gear-lbs": 197.32762922233633,
+          "/fdm/jsbsim/moments/m-gear-lbsft": 1358.6995992077645,
+          "/fdm/jsbsim/moments/n-gear-lbsft": 66.14549200694637,
+          "/fdm/jsbsim/velocities/q-rad_sec": 0.017581153823463952,
+          "/fdm/jsbsim/velocities/r-rad_sec": 0.00022970388246215667,
+          "/fdm/jsbsim/forces/fby-gear-lbs": 6.701313934110093,
+          "/fdm/jsbsim/moments/l-gear-lbsft": 32.68705620910124,
+          "/fdm/jsbsim/velocities/u-fps": 0.05404303293459101,
+          "/fdm/jsbsim/velocities/w-fps": 0.03842892267855624,
+          "/fdm/jsbsim/velocities/p-rad_sec": 0.000281646159843928,
+          "/fdm/jsbsim/forces/fbz-gear-lbs": 148.76536306395064,
+          "/fdm/jsbsim/velocities/v-fps": 0.0011769977844641386,
+          "/fdm/jsbsim/attitude/phi-rad": 2.9198790545292667e-05,
+          "/fdm/jsbsim/attitude/theta-rad": 0.0003685274916720993,
+          "/fdm/jsbsim/attitude/psi-rad": 6.283183496228166,
+          "/fdm/jsbsim/position/lat-geod-deg": 3.212555554910068e-09,
+          "/fdm/jsbsim/position/h-sl-ft": 0.002339359372854233,
+          "/fdm/jsbsim/position/long-gc-deg": 4.1022474306373624e-10
+        },
+        "nonfinite_mismatches": 0,
+        "first_different_row": 1,
+        "first_different_time": "0",
+        "rows": 3003
+      }
+    },
+    "c1723.xml": {
+      "JSBout172B.csv": {
+        "different_rows": 2001,
+        "max_abs_by_column": {
+          "Q dot (deg/s^2)": 0.02243225451592301,
+          "R dot (deg/s^2)": 0.023053198596281854,
+          "UdotBody": 0.0018416770882989653,
+          "VdotBody_i": 0.007459599924402038,
+          "WdotBody_i": 0.01065729397415538,
+          "BodyAccel_X": 0.0007517179273968111,
+          "R (deg/s)": 0.006509797929372811,
+          "R_{inertial} (deg/s)": 0.006509202275601301,
+          "WBody": 0.002000088692501123,
+          "VdotBody": 0.032662761116755146,
+          "UdotBody_i": 0.005232153162060271,
+          "BodyAccel_Y": 0.004378768811411304,
+          "Aero V_{Z Body} (ft/s)": 0.002000088692501123,
+          "V_{Z_{inertial}} (ft/s)": 0.011556228853407902,
+          "V_{Z_{ecef}} (ft/s)": 0.011556228853429218,
+          "V_{North} (ft/s)": 0.013011752651578945,
+          "P dot (deg/s^2)": 1.456056001687278,
+          "P_{inertial} (deg/s)": 0.13857586257360052,
+          "UBody": 0.002516367231123695,
+          "Aero V_{X Body} (ft/s)": 0.002516367231123695,
+          "V_{Down} (ft/s)": 0.004665703202340055,
+          "Q (deg/s)": 0.002567895399967046,
+          "Q_{inertial} (deg/s)": 0.0025682777607978213,
+          "P (deg/s)": 0.13857586380372103,
+          "V_{Y_{ecef}} (ft/s)": 0.006036041352238897,
+          "WdotBody": 0.011156112658245117,
+          "velocities/pi-deg_sec": 0.13857586257360047,
+          "VBody": 0.009438671967128442,
+          "Aero V_{Y Body} (ft/s)": 0.009438671967128442,
+          "Alpha (deg)": 0.0012153263470002784,
+          "V_{X_{ecef}} (ft/s)": 0.011825534752276212,
+          "BodyAccel_Z": 0.004409186937259335,
+          "V_{Y_{inertial}} (ft/s)": 0.006171594882175668,
+          "Phi (deg)": 0.017858242506102018,
+          "Theta (deg)": 0.0025564041579890784,
+          "Q(1)_{LOCAL}": 8.697656198997095e-05,
+          "Q(2)_{LOCAL}": 9.879218721579874e-05,
+          "Q(3)_{LOCAL}": 0.0001201848984705503,
+          "Q(1)_{ECEF}": 0.00013441659450108556,
+          "Q(2)_{ECEF}": 7.444265364842106e-05,
+          "Q(1)_{ECI}": 0.0001346017546334788,
+          "Q(2)_{ECI}": 7.451876180741834e-05,
+          "V_{East} (ft/s)": 0.011464834961479653,
+          "Q(4)_{LOCAL}": 4.064915348289677e-05,
+          "Q(3)_{ECEF}": 5.493787423482832e-05,
+          "Q(4)_{ECEF}": 7.957105481998239e-05,
+          "Q(3)_{ECI}": 5.5110760935506153e-05,
+          "Q(4)_{ECI}": 7.909439277897778e-05,
+          "Beta (deg)": 0.005944080179800082,
+          "Psi (deg)": 0.009372338518602419,
+          "V_{X_{inertial}} (ft/s)": 0.011784760839873343,
+          "fcs/roll-ap-error-pid": 0.042939210000000116,
+          "V_{Total} (ft/s)": 0.0024643425000050456,
+          "ap/roll-command-pid-control": 0.02147285900000001,
+          "ap/roll-cmd-smoother": 0.019544261000000007,
+          "ap/roll-cmd-norm-output": 0.019544261000000007,
+          "ap/roll-command-selector-steering": 5.000000025123796e-09,
+          "fcs/hdot-error": 0.004668230000000051,
+          "fcs/roll-trim-sum": 0.019544261000000007,
+          "fcs/left-aileron-control": 0.006820947999999993,
+          "fcs/left-aileron-actuator": 0.00541412400000002,
+          "fcs/delta-aileron-pos": 0.009474715999999994,
+          "ap/limited-roll-rate-error": 0.008589143999999993,
+          "X_{ECEF} (ft)": 0.16264424100518227,
+          "fcs/effective-aileron-pos": 0.004737357999999997,
+          "Altitude AGL (ft)": 0.0071969626999361935,
+          "Z_{ECI} (ft)": 0.07342191971838474,
+          "Z_{ECEF} (ft)": 0.07342191971838474,
+          "Distance AGL (ft)": 0.0071969626999361935,
+          "fcs/heading-roll-error": 0.000311685000000006,
+          "fcs/alt-error-lag": 1.000000082740371e-08,
+          "/fdm/jsbsim/position/vrp-gc-latitude_deg": 2.29059470058246e-07,
+          "X_{ECI} (ft)": 0.16226018103770912,
+          "q bar (psf)": 0.0005526000000006803,
+          "Altitude ASL (ft)": 0.007196992700073679,
+          "Y_{ECEF} (ft)": 0.028809890151023865,
+          "ap/limited-roll-angle-error": 0.0003031741000000046,
+          "fcs/altitude-error": 1.000000082740371e-08,
+          "/fdm/jsbsim/position/vrp-radius-ft": 0.007043968886137009,
+          "Terrain Elevation (ft)": 1.49135140630262e-08,
+          "fcs/right-aileron-control": 0.005115711000000009,
+          "fcs/right-aileron-actuator": 0.004060592000000002,
+          "guidance/angle-to-heading-rad": 0.00016357799999999756,
+          "ap/limited-roll-angle-rad": 0.00016357799999999756,
+          "ap/roll-attitude-selector": 0.00016357799999999756,
+          "/fdm/jsbsim/position/vrp-longitude_deg": 5.025472376019025e-07,
+          "Y_{ECI} (ft)": 0.031128667294979095,
+          "V_{Inertial} (ft/s)": 0.010994409999966592,
+          "Latitude (deg)": 2.290800011905958e-07,
+          "fcs/hdot-command": 7.20000000065113e-06,
+          "navigation/actual-heading-rad": 0.00016358000000016304,
+          "fcs/ap-alt-hold-switch": 0.004668230000000051,
+          "fcs/altitude-hold-pid": 4.7086899999999876e-05,
+          "fcs/elevator": 4.7086899999999876e-05,
+          "fcs/pitch-trim-sum": 4.7086899999999876e-05,
+          "fcs/elevator-control": 2.30066999999997e-05,
+          "Longitude (deg)": 5.026300016197638e-07,
+          "fcs/heading-true-degrees": 0.009373000000010734,
+          "fcs/heading-error": 0.009373000000010734,
+          "Fixed-Pitch 75-inch Two-Blade Propeller PFactor Yaw (engine 0)": 0.006000000000000227,
+          "fcs/elevator-actuator": 2.2972500000002782e-05,
+          "Latitude Geodetic (deg)": 2.2985399894537295e-07,
+          "Reynolds Number": 75.0840000002645,
+          "X_{cg}": 2.5644908419053536e-10,
+          "Y_{cg}": 4.318341240150403e-10,
+          "Z_{cg}": 2.448857117087755e-09,
+          "ap/roll-rate-pid-control": 0.008504894999999985,
+          "systems/mixture-cmd-norm": 2.5100000000666256e-07,
+          "Fixed-Pitch 75-inch Two-Blade Propeller PFactor Pitch (engine 0)": 0.03539999999999921,
+          "I_{yz}": 6.000000496442226e-09,
+          "I_{zy}": 6.000000496442226e-09,
+          "I_{xx}": 1.0000003385357559e-06,
+          "guidance/wp-heading-deg": 3.000000106112566e-07,
+          "Fixed-Pitch 75-inch Two-Blade Propeller RPM (engine 0)": 0.010000000000218279,
+          "I_{zz}": 1.0000003385357559e-06,
+          "guidance/wp-distance": 0.20000000298023224,
+          "guidance/wp-heading-rad": 1.0000000161269895e-08,
+          "I_{xz}": 1.000000082740371e-08,
+          "I_{zx}": 1.000000082740371e-08,
+          "Fixed-Pitch 75-inch Two-Blade Propeller Thrust (engine 0 in lbs)": 0.0030000000000427463,
+          "IO320 Power Available (engine 0 in ft-lbs/sec)": 1.0,
+          "IO320 HP (engine 0)": 0.0010000000000047748,
+          "propulsion/tank[0]/contents-volume-gal": 1.0000000116860974e-07,
+          "propulsion/tank[1]/contents-volume-gal": 1.0000000116860974e-07,
+          "Mass": 1.0000007932831068e-08,
+          "Weight": 1.0000003385357559e-06,
+          "I_{yy}": 1.0000001111620804e-06,
+          "fcs/attitude/sensor/phi-rad": 0.0015339850000000155,
+          "IO320 MAP (engine 0 in inHg)": 9.999999999976694e-05,
+          "Fixed-Pitch 75-inch Two-Blade Propeller Torque (engine 0)": 0.0010000000000331966,
+          "I_{xy}": 1.000000082740371e-08,
+          "I_{yx}": 1.000000082740371e-08
+        },
+        "nonfinite_mismatches": 0,
+        "first_different_row": 1,
+        "first_different_time": "0",
+        "rows": 2001
+      },
+      "initfile.133.441667.xml": {
+        "different_rows": 9,
+        "max_abs_by_column": {},
+        "nonfinite_mismatches": 0,
+        "first_different_row": 10,
+        "first_different_time": "    <yaw> 199.695 </yaw>",
+        "text_mismatch": true,
+        "rows": 27
+      },
+      "review-trace.csv": {
+        "different_rows": 23994,
+        "max_abs_by_column": {
+          "/fdm/jsbsim/forces/fbx-gear-lbs": 3.755791388115881e-06,
+          "/fdm/jsbsim/moments/m-gear-lbsft": 0.0001934237968725938,
+          "/fdm/jsbsim/moments/n-gear-lbsft": 8.952726716415782e-05,
+          "/fdm/jsbsim/velocities/q-rad_sec": 4.6155606074148314e-05,
+          "/fdm/jsbsim/velocities/r-rad_sec": 0.00011515977080260641,
+          "/fdm/jsbsim/forces/fby-gear-lbs": 1.5271472051381352e-05,
+          "/fdm/jsbsim/moments/l-gear-lbsft": 0.00028115494683333964,
+          "/fdm/jsbsim/velocities/u-fps": 0.0025165619928060323,
+          "/fdm/jsbsim/velocities/w-fps": 0.0020256287002720086,
+          "/fdm/jsbsim/velocities/p-rad_sec": 0.002735121391829831,
+          "/fdm/jsbsim/forces/fbz-gear-lbs": 0.00012902894781063878,
+          "/fdm/jsbsim/velocities/v-fps": 0.009597425399684667,
+          "/fdm/jsbsim/attitude/phi-rad": 0.00031210163410944416,
+          "/fdm/jsbsim/attitude/theta-rad": 4.461766956859181e-05,
+          "/fdm/jsbsim/attitude/psi-rad": 0.00016357851581716432,
+          "/fdm/jsbsim/position/long-gc-deg": 5.026319058742956e-07,
+          "/fdm/jsbsim/position/lat-geod-deg": 2.298552495005879e-07,
+          "/fdm/jsbsim/position/h-sl-ft": 0.007197592407464981
+        },
+        "nonfinite_mismatches": 0,
+        "first_different_row": 1,
+        "first_different_time": "0",
+        "rows": 24002
+      }
+    },
+    "ZLT-NT-moored-1.xml": {
+      "review-trace.csv": {
+        "different_rows": 220465,
+        "max_abs_by_column": {
+          "/fdm/jsbsim/forces/fby-gear-lbs": 443.28982943957556,
+          "/fdm/jsbsim/moments/l-gear-lbsft": 9490.073946462871,
+          "/fdm/jsbsim/moments/n-gear-lbsft": 20928.614482739315,
+          "/fdm/jsbsim/velocities/p-rad_sec": 2.871287256608283e-05,
+          "/fdm/jsbsim/velocities/r-rad_sec": 3.101851172420886e-06,
+          "/fdm/jsbsim/moments/m-gear-lbsft": 1570.5792158373552,
+          "/fdm/jsbsim/velocities/q-rad_sec": 4.785951294734435e-07,
+          "/fdm/jsbsim/forces/fbx-gear-lbs": 67.31148442711716,
+          "/fdm/jsbsim/forces/fbz-gear-lbs": 11.875357378493732,
+          "/fdm/jsbsim/velocities/u-fps": 9.748873432067215e-05,
+          "/fdm/jsbsim/velocities/w-fps": 2.4756949204417233e-05,
+          "/fdm/jsbsim/velocities/v-fps": 0.0007859825505822648,
+          "/fdm/jsbsim/attitude/phi-rad": 3.4625997936054906e-06,
+          "/fdm/jsbsim/attitude/theta-rad": 1.574495246126073e-07,
+          "/fdm/jsbsim/attitude/psi-rad": 6.283183251378142,
+          "/fdm/jsbsim/position/h-sl-ft": 1.4621764421463013e-05,
+          "/fdm/jsbsim/position/lat-geod-deg": 1.3577761137639754e-10,
+          "/fdm/jsbsim/position/long-gc-deg": 9.30867827264592e-10
+        },
+        "nonfinite_mismatches": 0,
+        "first_different_row": 7,
+        "first_different_time": "0.0062500002",
+        "rows": 230402
+      }
+    },
+    "f16_test.xml": {
+      "review-trace.csv": {
+        "different_rows": 84003,
+        "max_abs_by_column": {
+          "/fdm/jsbsim/moments/l-gear-lbsft": 723660.9227141239,
+          "/fdm/jsbsim/forces/fby-gear-lbs": 3614.3794233566928,
+          "/fdm/jsbsim/moments/n-gear-lbsft": 311794.1530526946,
+          "/fdm/jsbsim/velocities/p-rad_sec": 0.5615378491377292,
+          "/fdm/jsbsim/velocities/r-rad_sec": 0.04715166077816723,
+          "/fdm/jsbsim/forces/fbx-gear-lbs": 179038.46736810825,
+          "/fdm/jsbsim/moments/m-gear-lbsft": 2755572.890989693,
+          "/fdm/jsbsim/velocities/q-rad_sec": 1.8291100945658751,
+          "/fdm/jsbsim/velocities/u-fps": 71.64351232904448,
+          "/fdm/jsbsim/velocities/w-fps": 177.7313440693709,
+          "/fdm/jsbsim/forces/fbz-gear-lbs": 425136.07209366676,
+          "/fdm/jsbsim/velocities/v-fps": 4.510948623229699,
+          "/fdm/jsbsim/attitude/phi-rad": 6.28318003700441,
+          "/fdm/jsbsim/attitude/theta-rad": 0.2360396170611999,
+          "/fdm/jsbsim/attitude/psi-rad": 0.03294978259904213,
+          "/fdm/jsbsim/position/long-gc-deg": 0.0022039209924287206,
+          "/fdm/jsbsim/position/lat-geod-deg": 0.0010171198551063299,
+          "/fdm/jsbsim/position/h-sl-ft": 17.81938809901476
+        },
+        "nonfinite_mismatches": 0,
+        "first_different_row": 1,
+        "first_different_time": "0",
+        "rows": 84003
+      }
+    }
+  },
+  "binaries": {
+    "base": {
+      "path": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-base/src/JSBSim",
+      "sha256": "cf0a75a6998a8728608775c05907378f5eac5fa51931b4ce4e16e6bb2419d825"
+    },
+    "head": {
+      "path": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-final-original/src/JSBSim",
+      "sha256": "a6f6086905f0d1d8930799cfea999782a88e2b385ef75abefa42d8324931a570"
+    },
+    "probe": {
+      "path": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-probe/src/JSBSim",
+      "sha256": "80a2f8f07eb239c486da1b5e21853ef39cc95865818d6071d8c97ca3587bcf22"
+    },
+    "candidate": {
+      "path": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502/src/JSBSim",
+      "sha256": "675f4f3968c852116629b23ca6b2d3dcd822de0ee3db512b0085e13ddb5ef88f"
+    }
+  },
+  "source_commit": "499c38326bb6f39b6360bd82d74c5c00e64faeaf",
+  "exit_counts": {
+    "base": {
+      "0": 57,
+      "1": 1,
+      "255": 3
+    },
+    "head": {
+      "0": 57,
+      "1": 1,
+      "255": 3
+    },
+    "probe": {
+      "0": 57,
+      "1": 1,
+      "255": 3
+    },
+    "candidate": {
+      "0": 57,
+      "1": 1,
+      "255": 3
+    }
+  },
+  "file_counts": {
+    "base": 102,
+    "head": 102,
+    "probe": 102,
+    "candidate": 102
+  },
+  "result": "ALL CHECKS PASS"
+}

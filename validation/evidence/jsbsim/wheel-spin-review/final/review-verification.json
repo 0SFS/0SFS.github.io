@@ -1,0 +1,74 @@
+{
+  "reviewed_at_utc": "2026-09-19T18:44:30.880830+00:00",
+  "candidate": "499c38326bb6f39b6360bd82d74c5c00e64faeaf",
+  "summary_sha256": "c2abd0ce875b977c2bd1c276129e03ff83fa6671c427f8eaadfb68d0d6c47ee7",
+  "verified_manifest_runs": 244,
+  "verified_pair_diagnostics": 366,
+  "reference_file_maps_equal": true,
+  "base_candidate_changed_files": 60,
+  "base_candidate_changed_successful_runs": 31,
+  "raw_representative_files_hashed": 32,
+  "wrap_checks": {
+    "c172_cross_wind": {
+      "phi-rad": {
+        "wrapped_max": 2.9198790545414965e-05,
+        "rows_raw_over_pi": 0
+      },
+      "theta-rad": {
+        "wrapped_max": 0.0003685274916720438,
+        "rows_raw_over_pi": 0
+      },
+      "psi-rad": {
+        "wrapped_max": 6.258138210313291e-06,
+        "rows_raw_over_pi": 1
+      }
+    },
+    "c1723": {
+      "phi-rad": {
+        "wrapped_max": 0.00031210163410966274,
+        "rows_raw_over_pi": 0
+      },
+      "theta-rad": {
+        "wrapped_max": 4.4617669568758345e-05,
+        "rows_raw_over_pi": 0
+      },
+      "psi-rad": {
+        "wrapped_max": 0.00016357851581716432,
+        "rows_raw_over_pi": 0
+      }
+    },
+    "ZLT-NT-moored-1": {
+      "phi-rad": {
+        "wrapped_max": 3.4625997935577857e-06,
+        "rows_raw_over_pi": 0
+      },
+      "theta-rad": {
+        "wrapped_max": 1.5744952452934058e-07,
+        "rows_raw_over_pi": 0
+      },
+      "psi-rad": {
+        "wrapped_max": 2.729764618791819e-06,
+        "rows_raw_over_pi": 13
+      }
+    },
+    "f16_test": {
+      "phi-rad": {
+        "wrapped_max": 0.030705586677082675,
+        "rows_raw_over_pi": 96
+      },
+      "theta-rad": {
+        "wrapped_max": 0.2360396170611998,
+        "rows_raw_over_pi": 0
+      },
+      "psi-rad": {
+        "wrapped_max": 0.03294978259904191,
+        "rows_raw_over_pi": 0
+      }
+    }
+  },
+  "tests": "Reused task05 evidence; 8 source and 4 binary hashes verified, no simulations or tests rerun",
+  "live_pr_head": "24e085bf81b5ef8bab8500ab9d416571753b93cc",
+  "live_pr_updated_at": "2026-09-18T14:57:26Z",
+  "live_pr_snapshot_sha256": "e289c636b0a4180b9727582b40fc929bfc91f97e93d3d7bb072b76331aa3ecec",
+  "all_checks_pass": true
+}

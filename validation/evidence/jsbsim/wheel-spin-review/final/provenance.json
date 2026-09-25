@@ -1,0 +1,182 @@
+{
+  "date": "2026-09-19",
+  "jsbsim_repository": "/Users/felg/gh/Felipegalind0/jsbsim",
+  "candidate": {
+    "commit": "499c38326bb6f39b6360bd82d74c5c00e64faeaf",
+    "branch": "feature/wheel-spin-dof",
+    "approval_receipt": "build/pr1502-handoff/05.json (JSBSim, local)",
+    "approval_receipt_sha256": "8c2b93ae0a6e66efca2acb3be9dab217f748c6ef92484aa911ea159bfdfb290e"
+  },
+  "pre_run": {
+    "utc": "2026-09-19T18:11:39.094675+00:00",
+    "head": "499c38326bb6f39b6360bd82d74c5c00e64faeaf",
+    "branch": "feature/wheel-spin-dof",
+    "status_porcelain": "",
+    "binaries": {
+      "base": "cf0a75a6998a8728608775c05907378f5eac5fa51931b4ce4e16e6bb2419d825",
+      "head": "a6f6086905f0d1d8930799cfea999782a88e2b385ef75abefa42d8324931a570",
+      "probe": "80a2f8f07eb239c486da1b5e21853ef39cc95865818d6071d8c97ca3587bcf22",
+      "candidate": "675f4f3968c852116629b23ca6b2d3dcd822de0ee3db512b0085e13ddb5ef88f"
+    },
+    "harness": "76aa5a7f0edcb3dec75b41827c82bb52b7d901144d4bb40a43148e6a9b11e32c",
+    "scripts_tree": "14394154199758f25132437c04192a5b3b9b9fcf",
+    "aircraft_tree": "962d46764e278f7f1907b6ca86d3af0585d69a76",
+    "engine_tree": "3e78f17dcf9ef4fcff031ffaa504d81ee9418594",
+    "systems_tree": "a87444bcb6776b6c59c27fc2de3094e8dcd2d353"
+  },
+  "post_run": {
+    "utc": "2026-09-19T18:15:28.854867+00:00",
+    "head": "499c38326bb6f39b6360bd82d74c5c00e64faeaf",
+    "branch": "feature/wheel-spin-dof",
+    "status_porcelain": "",
+    "binaries": {
+      "base": "cf0a75a6998a8728608775c05907378f5eac5fa51931b4ce4e16e6bb2419d825",
+      "head": "a6f6086905f0d1d8930799cfea999782a88e2b385ef75abefa42d8324931a570",
+      "probe": "80a2f8f07eb239c486da1b5e21853ef39cc95865818d6071d8c97ca3587bcf22",
+      "candidate": "675f4f3968c852116629b23ca6b2d3dcd822de0ee3db512b0085e13ddb5ef88f"
+    },
+    "harness": "76aa5a7f0edcb3dec75b41827c82bb52b7d901144d4bb40a43148e6a9b11e32c",
+    "scripts_tree": "14394154199758f25132437c04192a5b3b9b9fcf",
+    "aircraft_tree": "962d46764e278f7f1907b6ca86d3af0585d69a76",
+    "engine_tree": "3e78f17dcf9ef4fcff031ffaa504d81ee9418594",
+    "systems_tree": "a87444bcb6776b6c59c27fc2de3094e8dcd2d353",
+    "receipt_hashes_still_match": true
+  },
+  "toolchain": {
+    "uname -sm": "Darwin arm64",
+    "sw_vers": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0\nBuildVersion:\t\t26A428",
+    "cmake --version": "cmake version 4.4.3",
+    "c++ --version": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.0.0",
+    "harness interpreter (python3 --version)": "Python 3.14.7",
+    ".venv/bin/python --version": "Python 3.14.7"
+  },
+  "original_head_rebuild": {
+    "commit": "24e085bf81b5ef8bab8500ab9d416571753b93cc",
+    "parent": "d0d8bc6e9233a6c283898896d7bbac6d9af1888b",
+    "source_dir": "build/pr1502-final-original-source",
+    "build_dir": "build/pr1502-final-original",
+    "commands": [
+      "test ! -e build/pr1502-final-original-source && test ! -e build/pr1502-final-original",
+      "mkdir build/pr1502-final-original-source",
+      "set -o pipefail; git archive 24e085bf81b5ef8bab8500ab9d416571753b93cc | tar -x -C build/pr1502-final-original-source",
+      "cmake -S build/pr1502-final-original-source -B build/pr1502-final-original -DCMAKE_BUILD_TYPE=Release -DBUILD_PYTHON_MODULE=OFF",
+      "cmake --build build/pr1502-final-original --target JSBSim -j8"
+    ],
+    "exit_statuses": {
+      "archive_extract": "archive-extract-exit=0",
+      "configure": "configure-exit=0",
+      "build": "build-exit=0"
+    },
+    "build_utc": [
+      "2026-09-19T18:11:17Z",
+      "2026-09-19T18:11:27Z"
+    ],
+    "archive_verification": "every git ls-tree entry of the commit compared by git hash-object and executable bit; see original-head-archive-verify.log",
+    "objects_compiled": "104 C++ + 5 C objects, no compiler launcher configured",
+    "binary_sha256": "a6f6086905f0d1d8930799cfea999782a88e2b385ef75abefa42d8324931a570",
+    "historical_head_binary_sha256_not_this_artifact": "0830fdb84774f1479a5600b580bf122be35bd988ae5d0c5d528ebe8c69d63cdb"
+  },
+  "reused_reference_binaries": {
+    "base": {
+      "path": "build/pr1502-base/src/JSBSim",
+      "sha256": "cf0a75a6998a8728608775c05907378f5eac5fa51931b4ce4e16e6bb2419d825",
+      "source": "d0d8bc6e archive; built during planning"
+    },
+    "probe": {
+      "path": "build/pr1502-probe/src/JSBSim",
+      "sha256": "80a2f8f07eb239c486da1b5e21853ef39cc95865818d6071d8c97ca3587bcf22",
+      "source": "24e085bf archive + make_solver_probe.py; built during planning"
+    },
+    "candidate": {
+      "path": "build/pr1502/src/JSBSim",
+      "sha256": "675f4f3968c852116629b23ca6b2d3dcd822de0ee3db512b0085e13ddb5ef88f",
+      "source": "499c3832 canonical checkout; built in tasks 03-05, per 05.json"
+    }
+  },
+  "comparison": {
+    "harness": "0sfs scripts/validation/jsbsim/wheel-spin-review/compare_scripts.py",
+    "harness_sha256": "76aa5a7f0edcb3dec75b41827c82bb52b7d901144d4bb40a43148e6a9b11e32c",
+    "cwd": "/Users/felg/gh/0sfs",
+    "command": "python3 scripts/validation/jsbsim/wheel-spin-review/compare_scripts.py --source /Users/felg/gh/Felipegalind0/jsbsim --trace --jobs 8 --binary base=/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-base/src/JSBSim --binary head=/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-final-original/src/JSBSim --binary probe=/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-probe/src/JSBSim --binary candidate=/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502/src/JSBSim",
+    "exit_status": "comparison-exit=0",
+    "utc": [
+      "2026-09-19T18:11:46Z",
+      "2026-09-19T18:15:10Z"
+    ],
+    "stderr_bytes": 0,
+    "raw_output_dir_scratch": "JSBSim build/wheel-spin-review/2026-09-19_131146 (about 14 GB, not retained)",
+    "summary_sha256": "c2abd0ce875b977c2bd1c276129e03ff83fa6671c427f8eaadfb68d0d6c47ee7"
+  },
+  "post_run_analysis": {
+    "helper": "0sfs build/pr1502-final-validation/analyze_final.py (scratch, not retained)",
+    "helper_sha256": "920b8d1ca46c5ca0e3badb1602fc56a1fb0cc8dee136b2bbad5954bd1f68aa8f",
+    "command": "python3 build/pr1502-final-validation/analyze_final.py <summary.json> validation/evidence/jsbsim/wheel-spin-review/per-step-summary.json",
+    "output": "analysis.json",
+    "output_sha256": "a21746d9d4edcad7a48f541ac64a9c54113432eac6f5fd56fb8143bbe69618c1",
+    "angle_wrap_output": "angle-wrap.json (inline scratch script, not retained)",
+    "trace_data_rows": [
+      "base trace_data_rows=11877246",
+      "head trace_data_rows=11877246",
+      "probe trace_data_rows=11877246",
+      "candidate trace_data_rows=11877246"
+    ],
+    "f16_inspect": {
+      "tool_sha256": "d0812f594498171cdaf001d99fef0bbbb9cb170935e7eea8c13e4ef47810f84c",
+      "base_probe_output_sha256": "f9f644a19c87a72c694cae2cfd0014a770170bc5e340805514075eccbcbc3e0f",
+      "base_candidate_output_sha256 (probe label symlinked to candidate outputs)": "f9f644a19c87a72c694cae2cfd0014a770170bc5e340805514075eccbcbc3e0f",
+      "retained_f16_divergence_sha256": "f9f644a19c87a72c694cae2cfd0014a770170bc5e340805514075eccbcbc3e0f"
+    }
+  },
+  "reused_test_results_not_rerun": [
+    {
+      "command": "cmake -S . -B build/pr1502 -DCMAKE_BUILD_TYPE=Release -DBUILD_PYTHON_MODULE=ON -DPython3_EXECUTABLE=/Users/felg/gh/Felipegalind0/jsbsim/.venv/bin/python",
+      "result": "configured successfully; Release/Python ON cache independently checked",
+      "source_commit": "499c38326bb6f39b6360bd82d74c5c00e64faeaf"
+    },
+    {
+      "command": "cmake --build build/pr1502 -j",
+      "result": "built successfully; no compiler warnings; post-commit rebuild compiled/relinked nothing",
+      "source_commit": "499c38326bb6f39b6360bd82d74c5c00e64faeaf"
+    },
+    {
+      "command": "ctest --test-dir build/pr1502 -R '^FGAccelerationsTest1$' --output-on-failure",
+      "result": "1/1 passed; verbose output confirms all 8 methods",
+      "source_commit": "499c38326bb6f39b6360bd82d74c5c00e64faeaf"
+    },
+    {
+      "command": "ctest --test-dir build/pr1502 -R TestWheelSpin --output-on-failure",
+      "result": "1/1 passed; existing nine-method wheel test",
+      "source_commit": "499c38326bb6f39b6360bd82d74c5c00e64faeaf"
+    },
+    {
+      "command": "ctest --test-dir build/pr1502 -j8 --output-on-failure",
+      "result": "79/79 passed; socket and actuator passed first try",
+      "source_commit": "499c38326bb6f39b6360bd82d74c5c00e64faeaf"
+    },
+    {
+      "command": "cmake -S . -B build/pr1502-cxx -DCMAKE_BUILD_TYPE=Release -DBUILD_PYTHON_MODULE=OFF",
+      "result": "configured; CxxTest found; optional LSB_Release warning, no configure failure",
+      "source_commit": "499c38326bb6f39b6360bd82d74c5c00e64faeaf"
+    },
+    {
+      "command": "cmake --build build/pr1502-cxx -j",
+      "result": "built successfully; post-commit rebuild compiled/relinked nothing",
+      "source_commit": "499c38326bb6f39b6360bd82d74c5c00e64faeaf"
+    },
+    {
+      "command": "ctest --test-dir build/pr1502-cxx -R Test1 --output-on-failure",
+      "result": "21/21 passed, including FGAccelerationsTest1",
+      "source_commit": "499c38326bb6f39b6360bd82d74c5c00e64faeaf"
+    },
+    {
+      "command": "ctest --test-dir build/pr1502 -R '^FGAccelerationsTest1$|TestWheelSpin' --output-on-failure",
+      "result": "post-commit 2/2 passed",
+      "source_commit": "499c38326bb6f39b6360bd82d74c5c00e64faeaf"
+    },
+    {
+      "command": "ctest --test-dir build/pr1502-cxx -R Test1 --output-on-failure",
+      "result": "post-commit 21/21 passed",
+      "source_commit": "499c38326bb6f39b6360bd82d74c5c00e64faeaf"
+    }
+  ]
+}

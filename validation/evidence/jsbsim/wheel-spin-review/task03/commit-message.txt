@@ -1,0 +1,23 @@
+Report wheel spin relative to the airframe
+
+gear/unit[i]/wheel-spin-rad_sec now reads and writes the wheel spin rate
+relative to the airframe, positive rolling forward, through a getter/setter
+tie. The spin state and its integration, ground initialization, solver
+Jacobians and tread slip keep their meaning: the state is measured in the same
+frame as the airframe rates in in.PQR (FGPropagate::GetPQR(), relative to the
+ECEF frame), and the property subtracts the airframe rate about the spin axis.
+
+In ground contact the spin axis is the brake row's, ground normal cross the
+rolling direction. In the air it is gear up cross the steered wheel forward
+direction, from the current gear orientation and steering angle.
+
+Bearing and brake drag act between wheel and airframe, so the airborne drag
+now damps the relative spin: a braked wheel stays at rest relative to a
+rotating airframe instead of stopping in the ground frame. No damping happens
+during trim or when the time step is not positive.
+
+TestWheelSpin reconstructs the spin state from the relative rate for its
+momentum estimate, computes the airborne spin-down in the right frame, and
+adds regressions for the property transform, RunIC and reset, the airborne
+drag of both spin signs, a braked wheel on a pitching airframe, and the
+airborne axle of a steered wheel.

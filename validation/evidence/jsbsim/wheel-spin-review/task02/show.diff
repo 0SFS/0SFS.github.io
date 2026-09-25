@@ -1,0 +1,73 @@
+commit bcf7d272bcedebcf75a3631e005287a3dcc1c8e5
+Author: Felipegalind0 <Felipegalind0@outlook.com>
+Date:   Fri Sep 18 23:32:11 2026 -0500
+
+    Configure wheel friction bounds before clamping
+    
+    ConfigureWheelSpinRows now sets the wheel roll row's tire-grip bound with
+    the rest of that row, and the ordinary BOGEY path keeps only its braking
+    bound. The configuration runs before the roll and side warm-start values
+    are clamped, so each clamp sees its row's final limits. The rows are still
+    registered roll, side, then wheel brake, and the brake bound is unchanged.
+    
+    In ConfigureWheelSpinRows, roll and axle are renamed rollDirection and
+    axleLeverArm: the axle term is the lever arm from the CG to the axle.
+
+diff --git a/src/models/FGLGear.cpp b/src/models/FGLGear.cpp
+index 96560f10..1e3a5519 100644
+--- a/src/models/FGLGear.cpp
++++ b/src/models/FGLGear.cpp
+@@ -776,10 +776,7 @@ void FGLGear::ComputeJacobian(const FGColumnVector3& vWhlContactVec)
+ 
+     switch(eContactType) {
+     case ctBOGEY:
+-      if (wheelSpinEnabled) // Tire grip; brakes act on the wheel instead.
+-        LMultiplier[ftRoll].Max = fabs(staticFFactor * staticFCoeff * vFn(eZ));
+-      else
+-        LMultiplier[ftRoll].Max = fabs(BrakeFCoeff * vFn(eZ));
++      LMultiplier[ftRoll].Max = fabs(BrakeFCoeff * vFn(eZ));
+       LMultiplier[ftSide].Max = fabs(FCoeff * vFn(eZ));
+       break;
+     case ctSTRUCTURE:
+@@ -791,6 +788,9 @@ void FGLGear::ComputeJacobian(const FGColumnVector3& vWhlContactVec)
+     LMultiplier[ftRoll].Min = -LMultiplier[ftRoll].Max;
+     LMultiplier[ftSide].Min = -LMultiplier[ftSide].Max;
+ 
++    if (wheelSpinEnabled)
++      ConfigureWheelSpinRows(vWhlContactVec);
++
+     // The Lagrange multiplier value obtained from the previous iteration is
+     // kept. This is supposed to accelerate the convergence of the projected
+     // Gauss-Seidel algorithm. The code just below is to make sure that the
+@@ -802,10 +802,8 @@ void FGLGear::ComputeJacobian(const FGColumnVector3& vWhlContactVec)
+     GroundReactions->RegisterLagrangeMultiplier(&LMultiplier[ftRoll]);
+     GroundReactions->RegisterLagrangeMultiplier(&LMultiplier[ftSide]);
+ 
+-    if (wheelSpinEnabled) {
+-      ConfigureWheelSpinRows(vWhlContactVec);
++    if (wheelSpinEnabled)
+       GroundReactions->RegisterLagrangeMultiplier(&LMultiplier[ftWheelBrake]);
+-    }
+   }
+ }
+ 
+@@ -821,12 +819,15 @@ void FGLGear::ComputeJacobian(const FGColumnVector3& vWhlContactVec)
+ 
+ void FGLGear::ConfigureWheelSpinRows(const FGColumnVector3& vWhlContactVec)
+ {
+-  const FGColumnVector3 roll = LMultiplier[ftRoll].ForceJacobian;
+-  const FGColumnVector3 axle = vWhlContactVec + wheelRadius * vGroundNormal;
++  const FGColumnVector3 rollDirection = LMultiplier[ftRoll].ForceJacobian;
++  const FGColumnVector3 axleLeverArm = vWhlContactVec + wheelRadius * vGroundNormal;
+   // Positive spin rolls forward: spin axis = ground normal x roll direction.
+-  const FGColumnVector3 spinAxis = vGroundNormal * roll;
++  const FGColumnVector3 spinAxis = vGroundNormal * rollDirection;
+ 
+-  LMultiplier[ftRoll].MomentJacobian = axle * roll;
++  // Tire grip; brakes act on the wheel instead.
++  LMultiplier[ftRoll].Max = fabs(staticFFactor * staticFCoeff * vFn(eZ));
++  LMultiplier[ftRoll].Min = -LMultiplier[ftRoll].Max;
++  LMultiplier[ftRoll].MomentJacobian = axleLeverArm * rollDirection;
+   LMultiplier[ftRoll].Wheel = &wheelSpin;
+   LMultiplier[ftRoll].WheelJacobian = -wheelRadius;
+ 

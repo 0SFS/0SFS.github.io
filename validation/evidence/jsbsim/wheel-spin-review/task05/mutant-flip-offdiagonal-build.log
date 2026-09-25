@@ -1,0 +1,18 @@
+[  1%] Built target Magvar
+[  1%] Built target IOStreams
+[  1%] Built target Properties
+[  5%] Built target Xml
+[  6%] Built target Misc
+[ 10%] Built target GeographicLib
+[ 13%] Built target Init
+[ 18%] Built target Atmosphere
+[ 29%] Built target Math
+[ 41%] Built target Propulsion
+[ 56%] Built target FlightControl
+[ 74%] Built target InputOutput
+[ 75%] Building CXX object src/models/CMakeFiles/Models.dir/FGAccelerations.cpp.o
+[ 93%] Built target Models
+[ 94%] Linking CXX static library libJSBSim.a
+[ 96%] Built target libJSBSim
+[ 98%] Linking CXX executable FGAccelerationsTest1
+[100%] Built target FGAccelerationsTest1

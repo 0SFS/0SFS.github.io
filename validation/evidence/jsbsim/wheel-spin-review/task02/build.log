@@ -1,0 +1,62 @@
+[  1%] Built target Magvar
+[  2%] Built target IOStreams
+[  2%] Built target Properties
+[  4%] Built target Xml
+[  5%] Built target Misc
+[  6%] Built target GeographicLib
+[  9%] Built target Atmosphere
+[ 11%] Built target Init
+[ 17%] Built target Math
+[ 24%] Built target Propulsion
+[ 33%] Built target Aeromatic++
+[ 43%] Built target FlightControl
+[ 52%] Built target InputOutput
+[ 52%] Building CXX object src/models/CMakeFiles/Models.dir/FGLGear.cpp.o
+[ 53%] Built target aeromatic
+[ 64%] Built target Models
+[ 65%] Linking CXX static library libJSBSim.a
+[ 66%] Built target libJSBSim
+[ 66%] Linking CXX executable JSBSim
+[ 67%] Linking CXX executable FGJSBBaseTest1
+[ 68%] Linking CXX executable FGGroundCallbackTest1
+[ 68%] Linking CXX executable FGParameterTest1
+[ 69%] Linking CXX executable FGMatrix33Test1
+[ 70%] Linking CXX executable FGInitialConditionTest1
+[ 71%] Linking CXX executable StringUtilitiesTest1
+[ 71%] Linking CXX executable FGLocationTest1
+[ 71%] Linking CXX executable FGInertialTest1
+[ 72%] Linking CXX executable FGColumnVector3Test1
+[ 72%] Linking CXX executable FGTableTest1
+[ 72%] Linking CXX executable FGConditionTest1
+[ 73%] Linking CXX executable FGRealValueTest1
+[ 74%] Linking CXX executable FGPropertyValueTest1
+[ 74%] Linking CXX executable FGQuaternionTest1
+[ 75%] Linking CXX executable FGLogTest1
+[ 75%] Linking CXX executable FGAuxiliaryTest1
+[ 76%] Linking CXX shared module ../tests/jsbsim/_jsbsim.so
+[ 77%] Linking CXX executable FGAtmosphereTest1
+[ 77%] Linking CXX executable FGMSISTest1
+[ 78%] Linking CXX executable FGParameterValueTest1
+[ 78%] Linking CXX executable FGPropertyManagerTest1
+[ 79%] Built target FGMatrix33Test1
+[ 80%] Built target FGColumnVector3Test1
+[ 81%] Built target FGTableTest1
+[ 82%] Built target FGRealValueTest1
+[ 83%] Built target StringUtilitiesTest1
+[ 84%] Built target FGAuxiliaryTest1
+[ 85%] Built target FGLogTest1
+[ 86%] Built target FGLocationTest1
+[ 88%] Built target FGConditionTest1
+[ 88%] Built target FGPropertyValueTest1
+[ 89%] Built target FGGroundCallbackTest1
+[ 90%] Built target FGInertialTest1
+[ 91%] Built target FGParameterTest1
+[ 92%] Built target FGQuaternionTest1
+[ 93%] Built target FGParameterValueTest1
+[ 94%] Built target FGInitialConditionTest1
+[ 95%] Built target FGJSBBaseTest1
+[ 96%] Built target JSBSim
+[ 97%] Built target FGMSISTest1
+[ 98%] Built target FGAtmosphereTest1
+[ 99%] Built target FGPropertyManagerTest1
+[100%] Built target _jsbsim

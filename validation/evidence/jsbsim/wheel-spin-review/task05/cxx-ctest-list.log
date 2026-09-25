@@ -1,0 +1,24 @@
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-cxx
+  Test  #1: FGColumnVector3Test1
+  Test  #2: StringUtilitiesTest1
+  Test  #3: FGJSBBaseTest1
+  Test  #4: FGMatrix33Test1
+  Test  #5: FGQuaternionTest1
+  Test  #6: FGLocationTest1
+  Test  #7: FGGroundCallbackTest1
+  Test  #8: FGInitialConditionTest1
+  Test  #9: FGInertialTest1
+  Test #10: FGPropertyValueTest1
+  Test #11: FGTableTest1
+  Test #12: FGRealValueTest1
+  Test #13: FGParameterTest1
+  Test #14: FGParameterValueTest1
+  Test #15: FGConditionTest1
+  Test #16: FGPropertyManagerTest1
+  Test #17: FGAtmosphereTest1
+  Test #18: FGAuxiliaryTest1
+  Test #19: FGMSISTest1
+  Test #20: FGLogTest1
+  Test #21: FGAccelerationsTest1
+
+Total Tests: 21

@@ -1,0 +1,65 @@
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-task03-pre
+    Start 43: TestWheelSpin
+1/1 Test #43: TestWheelSpin ....................***Failed    0.41 sec
+test_airborne_axle_follows_steering (__main__.TestWheelSpin.test_airborne_axle_follows_steering) ... FAIL
+test_airborne_brake_holds_wheel_to_airframe (__main__.TestWheelSpin.test_airborne_brake_holds_wheel_to_airframe) ... FAIL
+test_airborne_drag_acts_on_relative_spin (__main__.TestWheelSpin.test_airborne_drag_acts_on_relative_spin) ... FAIL
+test_airborne_spin_down (__main__.TestWheelSpin.test_airborne_spin_down) ... ok
+test_ground_start_rolls_without_slip (__main__.TestWheelSpin.test_ground_start_rolls_without_slip) ... ok
+test_opt_in (__main__.TestWheelSpin.test_opt_in) ... ok
+test_rolling_resistance_and_braking_match_legacy (__main__.TestWheelSpin.test_rolling_resistance_and_braking_match_legacy) ... ok
+test_run_ic_keeps_spin_state (__main__.TestWheelSpin.test_run_ic_keeps_spin_state) ... FAIL
+test_touchdown_spin_up (__main__.TestWheelSpin.test_touchdown_spin_up) ... ok
+
+======================================================================
+FAIL: test_airborne_axle_follows_steering (__main__.TestWheelSpin.test_airborne_axle_follows_steering)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-task03-pre-source/tests/TestWheelSpin.py", line 267, in test_airborne_axle_follows_steering
+    self.assertAlmostEqual(fdm[spin], q, delta=1e-12)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.0 != 0.4 within 1e-12 delta (0.4 difference)
+
+======================================================================
+FAIL: test_airborne_brake_holds_wheel_to_airframe (__main__.TestWheelSpin.test_airborne_brake_holds_wheel_to_airframe)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-task03-pre-source/tests/TestWheelSpin.py", line 198, in test_airborne_brake_holds_wheel_to_airframe
+    self.assertAlmostEqual(fdm[spin], q, delta=1e-12)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.0 != 0.4 within 1e-12 delta (0.4 difference)
+
+======================================================================
+FAIL: test_airborne_drag_acts_on_relative_spin (__main__.TestWheelSpin.test_airborne_drag_acts_on_relative_spin)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-task03-pre-source/tests/TestWheelSpin.py", line 251, in test_airborne_drag_acts_on_relative_spin
+    self.assertAlmostEqual(result, expected, delta=1e-8)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 99.84990909113723 != 99.86574663065623 within 1e-08 delta (0.0158375395189978 difference)
+
+======================================================================
+FAIL: test_run_ic_keeps_spin_state (__main__.TestWheelSpin.test_run_ic_keeps_spin_state)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-task03-pre-source/tests/TestWheelSpin.py", line 218, in test_run_ic_keeps_spin_state
+    self.assertAlmostEqual(fdm[spin], 0.3 - 0.2, delta=1e-12)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.7 != 0.09999999999999998 within 1e-12 delta (0.6 difference)
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.075s
+
+FAILED (failures=4)
+
+In file ./aircraft/c172p/c172p.xml: line 118
+wheel_radius and wheel_inertia must be positive; the wheel spin degree of freedom of contact LEFT_MAIN is disabled.
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   0.41 sec
+
+The following tests FAILED:
+	 43 - TestWheelSpin (Failed)
+Errors while running CTest

@@ -1,0 +1,25 @@
+{
+  "date": "2026-09-18",
+  "base": "d0d8bc6e9233a6c283898896d7bbac6d9af1888b",
+  "head": "24e085bf81b5ef8bab8500ab9d416571753b93cc",
+  "probe": "head plus make_solver_probe.py; not a commit",
+  "commands": {
+    "uname -sm": "Darwin arm64",
+    "sw_vers": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0\nBuildVersion:\t\t26A428",
+    "cmake --version": "cmake version 4.4.3\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake).",
+    "c++ --version": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin",
+    "/Users/felg/gh/Felipegalind0/jsbsim/.venv/bin/python --version": "Python 3.14.7"
+  },
+  "evidence_script_sha256": {
+    "compare_scripts.py": "76aa5a7f0edcb3dec75b41827c82bb52b7d901144d4bb40a43148e6a9b11e32c",
+    "make_solver_probe.py": "b4e7702fc049f7c51c8e4adac3cff7faef5bc51324f638967ee5bdf092d1f223",
+    "check_airborne_frame.py": "c2c4bcfe772781c019faca3ff3f54744edd1246bda04b15a3765d573f9229641",
+    "check_solver.cpp": "e651d7d4d7a792a0c51ffb592c178c4701624dc44dbab536a0f3d1a48dd1d49d",
+    "inspect_f16.py": "d0812f594498171cdaf001d99fef0bbbb9cb170935e7eea8c13e4ef47810f84c"
+  },
+  "probe_source_sha256": {
+    "src/math/LagrangeMultiplier.h": "bc56362df7a8f2df36ecff2c475465f11c1dad7a884bfcc8eeb7b2fcacb2ec73",
+    "src/models/FGAccelerations.cpp": "04fa64917e54ec8fe046de500b1ceb53ef79d4cf69e90d3e265e8b0bb5cc53f8",
+    "src/models/FGLGear.cpp": "73bd1f4ff42d8fa65538116bc7c525b8635114aaffc18e29dd184b733b45254c"
+  }
+}

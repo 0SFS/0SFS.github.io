@@ -1,0 +1,234 @@
+[  0%] Building CXX object src/GeographicLib/CMakeFiles/GeographicLib.dir/Geodesic.cpp.o
+[  1%] Building CXX object src/initialization/CMakeFiles/Init.dir/FGTrim.cpp.o
+[  1%] Building CXX object src/models/atmosphere/CMakeFiles/Atmosphere.dir/FGWinds.cpp.o
+[  1%] Building CXX object src/initialization/CMakeFiles/Init.dir/FGTrimAxis.cpp.o
+[  1%] Building CXX object src/math/CMakeFiles/Math.dir/FGLocation.cpp.o
+[  2%] Building CXX object src/initialization/CMakeFiles/Init.dir/FGInitialCondition.cpp.o
+[  2%] Building CXX object src/GeographicLib/CMakeFiles/GeographicLib.dir/GeodesicLine.cpp.o
+[  3%] Building CXX object src/GeographicLib/CMakeFiles/GeographicLib.dir/Math.cpp.o
+[  3%] Building CXX object src/models/atmosphere/CMakeFiles/Atmosphere.dir/FGMSIS.cpp.o
+[  3%] Building CXX object src/models/atmosphere/CMakeFiles/Atmosphere.dir/FGMars.cpp.o
+[  3%] Building CXX object src/models/CMakeFiles/Models.dir/FGAtmosphere.cpp.o
+[  5%] Building CXX object src/simgear/magvar/CMakeFiles/Magvar.dir/coremag.cxx.o
+[  5%] Building CXX object src/models/CMakeFiles/Models.dir/FGAircraft.cpp.o
+[  6%] Building CXX object src/models/atmosphere/CMakeFiles/Atmosphere.dir/FGStandardAtmosphere.cpp.o
+[  6%] Building CXX object src/math/CMakeFiles/Math.dir/FGColumnVector3.cpp.o
+[  7%] Building CXX object src/models/CMakeFiles/Models.dir/FGAerodynamics.cpp.o
+[  7%] Building C object src/models/atmosphere/CMakeFiles/Atmosphere.dir/MSIS/nrlmsise-00_data.c.o
+[  8%] Building C object src/models/atmosphere/CMakeFiles/Atmosphere.dir/MSIS/nrlmsise-00.c.o
+[  9%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGEngine.cpp.o
+[ 10%] Building CXX object src/models/CMakeFiles/Models.dir/FGSurface.cpp.o
+[ 11%] Building CXX object src/initialization/CMakeFiles/Init.dir/FGLinearization.cpp.o
+[ 12%] Building CXX object src/math/CMakeFiles/Math.dir/FGFunction.cpp.o
+[ 12%] Building CXX object src/models/CMakeFiles/Models.dir/FGAuxiliary.cpp.o
+[ 12%] Building CXX object src/models/CMakeFiles/Models.dir/FGFCS.cpp.o
+[ 13%] Building CXX object src/math/CMakeFiles/Math.dir/FGMatrix33.cpp.o
+[ 13%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGGroundCallback.cpp.o
+[ 14%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGPropertyManager.cpp.o
+[ 14%] Building CXX object src/simgear/misc/CMakeFiles/Misc.dir/strutils.cxx.o
+[ 14%] Building CXX object src/models/CMakeFiles/Models.dir/FGLGear.cpp.o
+[ 16%] Building CXX object src/math/CMakeFiles/Math.dir/FGQuaternion.cpp.o
+[ 16%] Building CXX object src/simgear/misc/CMakeFiles/Misc.dir/sg_path.cxx.o
+[ 17%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGElectric.cpp.o
+[ 18%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGForce.cpp.o
+[ 18%] Building CXX object src/models/CMakeFiles/Models.dir/FGGroundReactions.cpp.o
+[ 19%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGPiston.cpp.o
+[ 20%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGFilter.cpp.o
+[ 20%] Building CXX object src/math/CMakeFiles/Math.dir/FGPropertyValue.cpp.o
+[ 20%] Building CXX object src/simgear/props/CMakeFiles/Properties.dir/props.cxx.o
+[ 20%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGScript.cpp.o
+[ 21%] Building CXX object src/math/CMakeFiles/Math.dir/FGRealValue.cpp.o
+[ 21%] Building CXX object src/math/CMakeFiles/Math.dir/FGTable.cpp.o
+[ 21%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGNozzle.cpp.o
+[ 22%] Building CXX object src/simgear/io/iostreams/CMakeFiles/IOStreams.dir/sgstream.cxx.o
+[ 22%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGFCSComponent.cpp.o
+[ 23%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGXMLElement.cpp.o
+[ 23%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGXMLParse.cpp.o
+[ 24%] Building CXX object src/models/CMakeFiles/Models.dir/FGInertial.cpp.o
+[ 25%] Building CXX object utils/aeromatic++/CMakeFiles/Aeromatic++.dir/Aircraft.cpp.o
+[ 26%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGKinemat.cpp.o
+[ 27%] Building CXX object utils/aeromatic++/CMakeFiles/Aeromatic++.dir/types.cpp.o
+[ 27%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGPropeller.cpp.o
+[ 27%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGSummer.cpp.o
+[ 27%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGXMLFileRead.cpp.o
+[ 28%] Building CXX object src/math/CMakeFiles/Math.dir/FGCondition.cpp.o
+[ 28%] Building CXX object utils/aeromatic++/CMakeFiles/Aeromatic++.dir/AeroFighterJet.cpp.o
+[ 28%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGGain.cpp.o
+[ 28%] Building CXX object utils/aeromatic++/CMakeFiles/Aeromatic++.dir/AeroLightGA.cpp.o
+[ 29%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGDeadBand.cpp.o
+[ 29%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGFCSFunction.cpp.o
+[ 29%] Building CXX object src/models/CMakeFiles/Models.dir/FGMassBalance.cpp.o
+[ 29%] Building CXX object utils/aeromatic++/CMakeFiles/Aeromatic++.dir/AeroHighPerformance.cpp.o
+[ 29%] Building C object src/simgear/xml/CMakeFiles/Xml.dir/xmltok.c.o
+[ 30%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGfdmSocket.cpp.o
+[ 31%] Building CXX object src/math/CMakeFiles/Math.dir/FGRungeKutta.cpp.o
+[ 31%] Building CXX object src/simgear/xml/CMakeFiles/Xml.dir/easyxml.cxx.o
+[ 32%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGThruster.cpp.o
+[ 34%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGOutputType.cpp.o
+[ 34%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGTank.cpp.o
+[ 34%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGRocket.cpp.o
+[ 35%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGOutputFG.cpp.o
+[ 35%] Building C object src/simgear/xml/CMakeFiles/Xml.dir/xmlrole.c.o
+[ 36%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGActuator.cpp.o
+[ 37%] Building CXX object utils/aeromatic++/CMakeFiles/Aeromatic++.dir/Systems/LandingGear.cpp.o
+[ 38%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGGyro.cpp.o
+[ 38%] Building CXX object src/math/CMakeFiles/Math.dir/FGModelFunctions.cpp.o
+[ 39%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGLinearActuator.cpp.o
+[ 40%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGAngles.cpp.o
+[ 40%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGDistributor.cpp.o
+[ 41%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGOutputSocket.cpp.o
+[ 41%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGMagnetometer.cpp.o
+[ 41%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGOutputFile.cpp.o
+[ 41%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGPID.cpp.o
+[ 41%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGPropertyReader.cpp.o
+[ 42%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGSensor.cpp.o
+[ 43%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGInputSocket.cpp.o
+[ 43%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGUDPInputSocket.cpp.o
+[ 44%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGModelLoader.cpp.o
+[ 44%] Building CXX object utils/aeromatic++/CMakeFiles/Aeromatic++.dir/Systems/Flaps.cpp.o
+[ 44%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGLog.cpp.o
+[ 45%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/string_utilities.cpp.o
+[ 46%] Building CXX object src/math/CMakeFiles/Math.dir/FGTemplateFunc.cpp.o
+[ 46%] Building CXX object src/math/CMakeFiles/Math.dir/FGStateSpace.cpp.o
+[ 47%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGOutputTextFile.cpp.o
+[ 48%] Building CXX object utils/aeromatic++/CMakeFiles/Aeromatic++.dir/Systems/Controls.cpp.o
+[ 48%] Building CXX object utils/aeromatic++/CMakeFiles/Aeromatic++.dir/AeroPropTransport.cpp.o
+[ 48%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGAccelerometer.cpp.o
+[ 49%] Building CXX object utils/aeromatic++/CMakeFiles/Aeromatic++.dir/AeroJetTransport.cpp.o
+[ 49%] Building CXX object utils/aeromatic++/CMakeFiles/Aeromatic++.dir/Systems/Propulsion.cpp.o
+[ 50%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGWaypoint.cpp.o
+[ 51%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGSwitch.cpp.o
+[ 52%] Building C object src/simgear/xml/CMakeFiles/Xml.dir/xmlparse.c.o
+[ 52%] Building CXX object utils/aeromatic++/CMakeFiles/Aeromatic++.dir/Systems/Chute.cpp.o
+[ 52%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGInputType.cpp.o
+[ 52%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGTurbine.cpp.o
+[ 52%] Building CXX object utils/aeromatic++/CMakeFiles/Aeromatic++.dir/Systems/Spoilers.cpp.o
+[ 53%] Building CXX object utils/aeromatic++/CMakeFiles/Aeromatic++.dir/Systems/Thruster.cpp.o
+[ 53%] Building CXX object utils/aeromatic++/CMakeFiles/Aeromatic++.dir/Systems/ThrustReverse.cpp.o
+[ 54%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGTransmission.cpp.o
+[ 54%] Building CXX object utils/aeromatic++/CMakeFiles/Aeromatic++.dir/Systems/Catapult.cpp.o
+[ 55%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGRotor.cpp.o
+[ 56%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGTurboProp.cpp.o
+[ 57%] Building CXX object utils/aeromatic++/CMakeFiles/Aeromatic++.dir/Systems/ArrestorHook.cpp.o
+[ 58%] Building CXX object utils/aeromatic++/CMakeFiles/Aeromatic++.dir/Systems/Speedbrake.cpp.o
+[ 58%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGBrushLessDCMotor.cpp.o
+[ 58%] Building CXX object src/models/CMakeFiles/Models.dir/FGModel.cpp.o
+[ 59%] Building CXX object src/models/CMakeFiles/Models.dir/FGInput.cpp.o
+[ 59%] Building CXX object src/models/CMakeFiles/Models.dir/FGOutput.cpp.o
+[ 59%] Building CXX object src/models/CMakeFiles/Models.dir/FGPropagate.cpp.o
+[ 59%] Building CXX object src/models/CMakeFiles/Models.dir/FGExternalForce.cpp.o
+[ 60%] Building CXX object src/models/CMakeFiles/Models.dir/FGPropulsion.cpp.o
+[ 61%] Building CXX object src/models/CMakeFiles/Models.dir/FGExternalReactions.cpp.o
+[ 62%] Building CXX object src/models/CMakeFiles/Models.dir/FGAccelerations.cpp.o
+[ 63%] Building CXX object src/models/CMakeFiles/Models.dir/FGBuoyantForces.cpp.o
+[ 63%] Building CXX object src/models/CMakeFiles/Models.dir/FGGasCell.cpp.o
+[ 63%] Built target Magvar
+[ 63%] Built target GeographicLib
+[ 63%] Built target IOStreams
+[ 63%] Built target Misc
+[ 63%] Built target Xml
+[ 63%] Built target Atmosphere
+[ 63%] Built target FlightControl
+[ 63%] Built target Propulsion
+[ 63%] Built target Init
+[ 63%] Linking CXX static library libAeromatic++.a
+[ 63%] Built target Properties
+[ 63%] Built target Aeromatic++
+[ 63%] Built target InputOutput
+[ 63%] Built target Models
+[ 63%] Building CXX object utils/aeromatic++/CMakeFiles/aeromatic.dir/aeromatic.cpp.o
+[ 64%] Linking CXX executable aeromatic
+[ 64%] Built target aeromatic
+[ 64%] Built target Math
+[ 64%] Building CXX object src/CMakeFiles/libJSBSim.dir/FGFDMExec.cpp.o
+[ 65%] Building CXX object src/CMakeFiles/libJSBSim.dir/FGJSBBase.cpp.o
+[ 66%] Linking CXX static library libJSBSim.a
+[ 66%] Built target libJSBSim
+[ 66%] Compiling Cython CXX source for _jsbsim...
+[ 67%] Generating FGMatrix33Test.cpp
+[ 67%] Generating FGLocationTest.cpp
+[ 67%] Generating FGJSBBaseTest.cpp
+[ 67%] Generating FGQuaternionTest.cpp
+[ 68%] Generating FGGroundCallbackTest.cpp
+[ 69%] Generating FGPropertyValueTest.cpp
+[ 70%] Generating StringUtilitiesTest.cpp
+[ 71%] Generating FGAtmosphereTest.cpp
+[ 71%] Generating FGTableTest.cpp
+[ 72%] Generating FGInertialTest.cpp
+[ 73%] Generating FGColumnVector3Test.cpp
+[ 73%] Generating FGRealValueTest.cpp
+[ 74%] Generating FGInitialConditionTest.cpp
+[ 75%] Generating FGLogTest.cpp
+[ 75%] Generating FGParameterTest.cpp
+[ 75%] Generating FGAuxiliaryTest.cpp
+[ 75%] Generating FGConditionTest.cpp
+[ 76%] Generating FGParameterValueTest.cpp
+[ 76%] Generating FGMSISTest.cpp
+[ 76%] Generating FGPropertyManagerTest.cpp
+[ 77%] Building CXX object src/CMakeFiles/JSBSim.dir/JSBSim.cpp.o
+[ 78%] Building CXX object tests/unit_tests/CMakeFiles/FGParameterTest1.dir/FGParameterTest.cpp.o
+[ 78%] Building CXX object tests/unit_tests/CMakeFiles/FGParameterValueTest1.dir/FGParameterValueTest.cpp.o
+[ 78%] Building CXX object tests/unit_tests/CMakeFiles/FGMatrix33Test1.dir/FGMatrix33Test.cpp.o
+[ 78%] Building CXX object tests/unit_tests/CMakeFiles/FGLogTest1.dir/FGLogTest.cpp.o
+[ 78%] Building CXX object tests/unit_tests/CMakeFiles/FGPropertyValueTest1.dir/FGPropertyValueTest.cpp.o
+[ 79%] Building CXX object tests/unit_tests/CMakeFiles/FGJSBBaseTest1.dir/FGJSBBaseTest.cpp.o
+[ 79%] Building CXX object tests/unit_tests/CMakeFiles/FGColumnVector3Test1.dir/FGColumnVector3Test.cpp.o
+[ 80%] Building CXX object tests/unit_tests/CMakeFiles/FGQuaternionTest1.dir/FGQuaternionTest.cpp.o
+[ 80%] Building CXX object tests/unit_tests/CMakeFiles/FGInitialConditionTest1.dir/FGInitialConditionTest.cpp.o
+[ 80%] Building CXX object tests/unit_tests/CMakeFiles/FGAtmosphereTest1.dir/FGAtmosphereTest.cpp.o
+[ 80%] Building CXX object tests/unit_tests/CMakeFiles/StringUtilitiesTest1.dir/StringUtilitiesTest.cpp.o
+[ 81%] Building CXX object tests/unit_tests/CMakeFiles/FGPropertyManagerTest1.dir/FGPropertyManagerTest.cpp.o
+[ 81%] Building CXX object tests/unit_tests/CMakeFiles/FGGroundCallbackTest1.dir/FGGroundCallbackTest.cpp.o
+[ 82%] Building CXX object tests/unit_tests/CMakeFiles/FGInertialTest1.dir/FGInertialTest.cpp.o
+[ 83%] Building CXX object tests/unit_tests/CMakeFiles/FGConditionTest1.dir/FGConditionTest.cpp.o
+[ 83%] Building CXX object tests/unit_tests/CMakeFiles/FGRealValueTest1.dir/FGRealValueTest.cpp.o
+[ 84%] Building CXX object tests/unit_tests/CMakeFiles/FGLocationTest1.dir/FGLocationTest.cpp.o
+[ 85%] Building CXX object tests/unit_tests/CMakeFiles/FGAuxiliaryTest1.dir/FGAuxiliaryTest.cpp.o
+[ 86%] Building CXX object tests/unit_tests/CMakeFiles/FGMSISTest1.dir/FGMSISTest.cpp.o
+[ 87%] Building CXX object tests/unit_tests/CMakeFiles/FGTableTest1.dir/FGTableTest.cpp.o
+[ 88%] Linking CXX executable FGRealValueTest1
+[ 88%] Linking CXX executable FGParameterTest1
+[ 88%] Linking CXX executable JSBSim
+[ 89%] Linking CXX executable FGJSBBaseTest1
+[ 89%] Built target FGRealValueTest1
+[ 89%] Built target FGParameterTest1
+[ 89%] Built target JSBSim
+[ 89%] Built target FGJSBBaseTest1
+[ 89%] Linking CXX executable FGPropertyManagerTest1
+[ 90%] Linking CXX executable FGColumnVector3Test1
+[ 90%] Built target FGPropertyManagerTest1
+[ 90%] Linking CXX executable FGAuxiliaryTest1
+[ 90%] Built target FGColumnVector3Test1
+[ 90%] Building CXX object python/CMakeFiles/_jsbsim.dir/src/PyLogger.cxx.o
+[ 91%] Building CXX object python/CMakeFiles/_jsbsim.dir/_jsbsim.cxx.o
+[ 91%] Built target FGAuxiliaryTest1
+[ 91%] Linking CXX executable FGInertialTest1
+[ 92%] Linking CXX executable FGMatrix33Test1
+[ 92%] Built target FGInertialTest1
+[ 93%] Linking CXX executable FGParameterValueTest1
+[ 94%] Linking CXX executable FGPropertyValueTest1
+[ 94%] Built target FGMatrix33Test1
+[ 94%] Built target FGParameterValueTest1
+[ 94%] Built target FGPropertyValueTest1
+[ 94%] Linking CXX executable FGMSISTest1
+[ 95%] Linking CXX executable StringUtilitiesTest1
+[ 95%] Built target FGMSISTest1
+[ 95%] Linking CXX executable FGQuaternionTest1
+[ 95%] Built target StringUtilitiesTest1
+[ 95%] Built target FGQuaternionTest1
+[ 95%] Linking CXX executable FGConditionTest1
+[ 96%] Linking CXX executable FGLogTest1
+[ 96%] Linking CXX executable FGLocationTest1
+[ 96%] Built target FGConditionTest1
+[ 96%] Built target FGLogTest1
+[ 96%] Built target FGLocationTest1
+[ 97%] Linking CXX executable FGAtmosphereTest1
+[ 98%] Linking CXX executable FGInitialConditionTest1
+[ 98%] Built target FGAtmosphereTest1
+[ 98%] Built target FGInitialConditionTest1
+[ 99%] Linking CXX executable FGGroundCallbackTest1
+[ 99%] Built target FGGroundCallbackTest1
+[ 99%] Linking CXX executable FGTableTest1
+[ 99%] Built target FGTableTest1
+[100%] Linking CXX shared module ../tests/jsbsim/_jsbsim.so
+[100%] Built target _jsbsim

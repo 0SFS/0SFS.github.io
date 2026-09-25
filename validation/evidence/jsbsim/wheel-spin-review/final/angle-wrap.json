@@ -1,0 +1,70 @@
+{
+ "c172_cross_wind": {
+  "phi-rad": {
+   "raw_max": 2.9198790545292667e-05,
+   "wrapped_max": 2.9198790545414965e-05,
+   "rows_raw_over_pi": 0
+  },
+  "theta-rad": {
+   "raw_max": 0.0003685274916720993,
+   "wrapped_max": 0.0003685274916720438,
+   "rows_raw_over_pi": 0
+  },
+  "psi-rad": {
+   "raw_max": 6.283183496228166,
+   "wrapped_max": 6.258138210313291e-06,
+   "rows_raw_over_pi": 1
+  }
+ },
+ "c1723": {
+  "phi-rad": {
+   "raw_max": 0.00031210163410944416,
+   "wrapped_max": 0.00031210163410966274,
+   "rows_raw_over_pi": 0
+  },
+  "theta-rad": {
+   "raw_max": 4.461766956859181e-05,
+   "wrapped_max": 4.4617669568758345e-05,
+   "rows_raw_over_pi": 0
+  },
+  "psi-rad": {
+   "raw_max": 0.00016357851581716432,
+   "wrapped_max": 0.00016357851581716432,
+   "rows_raw_over_pi": 0
+  }
+ },
+ "ZLT-NT-moored-1": {
+  "phi-rad": {
+   "raw_max": 3.4625997936054906e-06,
+   "wrapped_max": 3.4625997935577857e-06,
+   "rows_raw_over_pi": 0
+  },
+  "theta-rad": {
+   "raw_max": 1.574495246126073e-07,
+   "wrapped_max": 1.5744952452934058e-07,
+   "rows_raw_over_pi": 0
+  },
+  "psi-rad": {
+   "raw_max": 6.283183251378142,
+   "wrapped_max": 2.729764618791819e-06,
+   "rows_raw_over_pi": 13
+  }
+ },
+ "f16_test": {
+  "phi-rad": {
+   "raw_max": 6.28318003700441,
+   "wrapped_max": 0.030705586677082675,
+   "rows_raw_over_pi": 96
+  },
+  "theta-rad": {
+   "raw_max": 0.2360396170611999,
+   "wrapped_max": 0.2360396170611998,
+   "rows_raw_over_pi": 0
+  },
+  "psi-rad": {
+   "raw_max": 0.03294978259904213,
+   "wrapped_max": 0.03294978259904191,
+   "rows_raw_over_pi": 0
+  }
+ }
+}

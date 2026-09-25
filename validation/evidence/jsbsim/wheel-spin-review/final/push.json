@@ -1,0 +1,169 @@
+{
+  "verified_at_utc": "2026-09-19T19:22:30.513033+00:00",
+  "old_head": "24e085bf81b5ef8bab8500ab9d416571753b93cc",
+  "pushed_head": "499c38326bb6f39b6360bd82d74c5c00e64faeaf",
+  "remote": "https://github.com/Felipegalind0/jsbsim.git",
+  "ref": "refs/heads/feature/wheel-spin-dof",
+  "command": "git push origin 499c38326bb6f39b6360bd82d74c5c00e64faeaf:refs/heads/feature/wheel-spin-dof",
+  "exit_status": 0,
+  "commits": 6,
+  "working_tree_clean": true,
+  "drafts_rechecked": true,
+  "public_messages_posted": false,
+  "pr_body_edited": false,
+  "pr": {
+    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502",
+    "headRefOid": "499c38326bb6f39b6360bd82d74c5c00e64faeaf",
+    "state": "OPEN",
+    "mergeable": "MERGEABLE",
+    "mergeStateStatus": "UNSTABLE",
+    "reviewDecision": "CHANGES_REQUESTED",
+    "commits": {
+      "nodes": [
+        {
+          "commit": {
+            "oid": "499c38326bb6f39b6360bd82d74c5c00e64faeaf",
+            "statusCheckRollup": {
+              "contexts": {
+                "nodes": [
+                  {
+                    "__typename": "CheckRun",
+                    "name": "Code coverage",
+                    "status": "IN_PROGRESS",
+                    "conclusion": null,
+                    "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108478/job/105953059713"
+                  },
+                  {
+                    "__typename": "CheckRun",
+                    "name": "Analyze (cpp)",
+                    "status": "IN_PROGRESS",
+                    "conclusion": null,
+                    "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108477/job/105953060168"
+                  },
+                  {
+                    "__typename": "CheckRun",
+                    "name": "XML validation",
+                    "status": "COMPLETED",
+                    "conclusion": "SUCCESS",
+                    "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953059886"
+                  },
+                  {
+                    "__typename": "CheckRun",
+                    "name": "Analyze (python)",
+                    "status": "IN_PROGRESS",
+                    "conclusion": null,
+                    "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108477/job/105953060013"
+                  },
+                  {
+                    "__typename": "CheckRun",
+                    "name": "MSIS code validation (ubuntu-latest)",
+                    "status": "COMPLETED",
+                    "conclusion": "SUCCESS",
+                    "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953060106"
+                  },
+                  {
+                    "__typename": "CheckRun",
+                    "name": "MSIS code validation (macos-latest)",
+                    "status": "COMPLETED",
+                    "conclusion": "SUCCESS",
+                    "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953060046"
+                  },
+                  {
+                    "__typename": "CheckRun",
+                    "name": "C/C++ build (MinGW) (ON)",
+                    "status": "IN_PROGRESS",
+                    "conclusion": null,
+                    "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953109252"
+                  },
+                  {
+                    "__typename": "CheckRun",
+                    "name": "C/C++ build (MinGW) (OFF)",
+                    "status": "IN_PROGRESS",
+                    "conclusion": null,
+                    "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953109314"
+                  },
+                  {
+                    "__typename": "CheckRun",
+                    "name": "C/C++ build (MSVC) (ON, ON)",
+                    "status": "IN_PROGRESS",
+                    "conclusion": null,
+                    "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953109299"
+                  },
+                  {
+                    "__typename": "CheckRun",
+                    "name": "C/C++ build (MSVC) (ON, OFF)",
+                    "status": "QUEUED",
+                    "conclusion": null,
+                    "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953109282"
+                  },
+                  {
+                    "__typename": "CheckRun",
+                    "name": "C/C++ build (MSVC) (OFF, ON)",
+                    "status": "IN_PROGRESS",
+                    "conclusion": null,
+                    "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953109350"
+                  },
+                  {
+                    "__typename": "CheckRun",
+                    "name": "C/C++ build (MSVC) (OFF, OFF)",
+                    "status": "IN_PROGRESS",
+                    "conclusion": null,
+                    "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953109323"
+                  },
+                  {
+                    "__typename": "CheckRun",
+                    "name": "C/C++ build (Linux) (ubuntu-24.04, ON, ON, OFF, ON)",
+                    "status": "IN_PROGRESS",
+                    "conclusion": null,
+                    "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953125854"
+                  },
+                  {
+                    "__typename": "CheckRun",
+                    "name": "C/C++ build (Linux) (ubuntu-24.04, ON, OFF, OFF, ON)",
+                    "status": "IN_PROGRESS",
+                    "conclusion": null,
+                    "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953125742"
+                  },
+                  {
+                    "__typename": "CheckRun",
+                    "name": "C/C++ build (Linux) (ubuntu-24.04, OFF, ON, OFF, ON)",
+                    "status": "IN_PROGRESS",
+                    "conclusion": null,
+                    "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953125739"
+                  },
+                  {
+                    "__typename": "CheckRun",
+                    "name": "C/C++ build (Linux) (ubuntu-24.04, OFF, OFF, OFF, ON)",
+                    "status": "IN_PROGRESS",
+                    "conclusion": null,
+                    "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953125773"
+                  },
+                  {
+                    "__typename": "CheckRun",
+                    "name": "C/C++ build (Linux) (ubuntu-22.04, OFF, OFF, ON, OFF)",
+                    "status": "IN_PROGRESS",
+                    "conclusion": null,
+                    "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953125748"
+                  },
+                  {
+                    "__typename": "CheckRun",
+                    "name": "C/C++ build (MacOSX)",
+                    "status": "IN_PROGRESS",
+                    "conclusion": null,
+                    "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953125687"
+                  }
+                ],
+                "pageInfo": {
+                  "hasNextPage": false
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "drafts_sha256_at_push": "d17e92a4e1c5378e6257fe701df3d46668b6af2acef8440bbcb2f5492bfa63c2",
+  "approved_public_text_sha256": "f1c202c348729b84485b850fe057f6c3b758dec68ac06586e68d72a13d9414e0",
+  "local_status_notes_updated_after_push": true
+}

@@ -1,0 +1,9 @@
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/pr1502
+    Start 43: TestWheelSpin
+1/2 Test #43: TestWheelSpin ....................   Passed    0.39 sec
+    Start 79: FGAccelerationsTest1
+2/2 Test #79: FGAccelerationsTest1 .............   Passed    0.01 sec
+
+100% tests passed out of 2
+
+Total Test time (real) =   0.40 sec

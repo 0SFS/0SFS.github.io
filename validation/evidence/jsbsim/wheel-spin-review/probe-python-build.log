@@ -1,0 +1,42 @@
+[  1%] Built target Magvar
+[  1%] Built target Properties
+[  2%] Built target GeographicLib
+[  3%] Built target IOStreams
+[  4%] Built target Misc
+[  6%] Built target Xml
+[  9%] Built target Atmosphere
+[ 11%] Built target Init
+[ 17%] Built target Math
+[ 24%] Built target Propulsion
+[ 33%] Built target Aeromatic++
+[ 43%] Built target FlightControl
+[ 52%] Built target InputOutput
+[ 63%] Built target Models
+[ 64%] Built target aeromatic
+[ 66%] Built target libJSBSim
+[ 66%] Compiling Cython CXX source for _jsbsim...
+[ 68%] Built target FGInitialConditionTest1
+[ 69%] Built target JSBSim
+[ 71%] Built target FGGroundCallbackTest1
+[ 73%] Built target FGMatrix33Test1
+[ 75%] Built target FGPropertyValueTest1
+[ 76%] Built target FGAuxiliaryTest1
+[ 78%] Built target FGParameterValueTest1
+[ 79%] Built target FGTableTest1
+[ 80%] Built target FGMSISTest1
+[ 82%] Built target FGJSBBaseTest1
+[ 83%] Built target FGQuaternionTest1
+[ 86%] Built target FGLogTest1
+[ 87%] Built target FGColumnVector3Test1
+[ 88%] Built target FGParameterTest1
+[ 90%] Built target FGRealValueTest1
+[ 91%] Built target FGInertialTest1
+[ 92%] Built target FGConditionTest1
+[ 93%] Built target FGPropertyManagerTest1
+[ 94%] Built target FGLocationTest1
+[ 96%] Built target FGAtmosphereTest1
+[ 98%] Built target StringUtilitiesTest1
+[ 98%] Building CXX object python/CMakeFiles/_jsbsim.dir/src/PyLogger.cxx.o
+[ 99%] Building CXX object python/CMakeFiles/_jsbsim.dir/_jsbsim.cxx.o
+[100%] Linking CXX shared module ../tests/jsbsim/_jsbsim.so
+[100%] Built target _jsbsim

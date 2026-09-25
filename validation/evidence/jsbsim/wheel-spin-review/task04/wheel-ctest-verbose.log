@@ -1,0 +1,39 @@
+UpdateCTestConfiguration  from :/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502/DartConfiguration.tcl
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/pr1502
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 43
+    Start 43: TestWheelSpin
+
+43: Test command: /Users/felg/gh/Felipegalind0/jsbsim/.venv/bin/python "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestWheelSpin.py"
+43: Working Directory: /Users/felg/gh/Felipegalind0/jsbsim/build/pr1502/tests
+43: Test timeout computed to be: 10000000
+43: test_airborne_axle_follows_steering (__main__.TestWheelSpin.test_airborne_axle_follows_steering) ... ok
+43: test_airborne_brake_holds_wheel_to_airframe (__main__.TestWheelSpin.test_airborne_brake_holds_wheel_to_airframe) ... ok
+43: test_airborne_drag_acts_on_relative_spin (__main__.TestWheelSpin.test_airborne_drag_acts_on_relative_spin) ... ok
+43: test_airborne_spin_down (__main__.TestWheelSpin.test_airborne_spin_down) ... ok
+43: test_ground_start_rolls_without_slip (__main__.TestWheelSpin.test_ground_start_rolls_without_slip) ... ok
+43: test_opt_in (__main__.TestWheelSpin.test_opt_in) ... ok
+43: test_rolling_resistance_and_braking_match_legacy (__main__.TestWheelSpin.test_rolling_resistance_and_braking_match_legacy) ... ok
+43: test_run_ic_keeps_spin_state (__main__.TestWheelSpin.test_run_ic_keeps_spin_state) ... ok
+43: test_touchdown_spin_up (__main__.TestWheelSpin.test_touchdown_spin_up) ... ok
+43: 
+43: ----------------------------------------------------------------------
+43: Ran 9 tests in 0.084s
+43: 
+43: OK
+43: 
+43: In file ./aircraft/c172p/c172p.xml: line 118
+43: wheel_radius and wheel_inertia must be positive; the wheel spin degree of freedom of contact LEFT_MAIN is disabled.
+1/1 Test #43: TestWheelSpin ....................   Passed    0.32 sec
+
+The following tests passed:
+	TestWheelSpin
+
+100% tests passed out of 1
+
+Total Test time (real) =   0.32 sec

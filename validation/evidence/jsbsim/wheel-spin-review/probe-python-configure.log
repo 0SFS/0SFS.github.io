@@ -1,0 +1,7 @@
+-- Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE) 
+-- Could NOT find Doxygen (missing: DOXYGEN_EXECUTABLE) 
+-- Found Python3: /Users/felg/gh/Felipegalind0/jsbsim/.venv/bin/python (found version "3.14.7") found components: Interpreter Development.Module
+-- Found Cython: /Users/felg/gh/Felipegalind0/jsbsim/.venv/bin/cython
+-- Configuring done (1.3s)
+-- Generating done (0.1s)
+-- Build files have been written to: /Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-probe

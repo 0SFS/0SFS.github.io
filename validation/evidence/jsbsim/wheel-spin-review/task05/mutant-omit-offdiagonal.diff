@@ -1,0 +1,11 @@
+--- pr1502-task05-FGAccelerations.cpp.orig	2026-09-19 01:44:55
++++ pr1502-task05-mutant-source/src/models/FGAccelerations.cpp	2026-09-19 01:45:01
+@@ -262,7 +262,7 @@
+     for (unsigned int j=i; j < n; j++) {
+       const LagrangeMultiplier* mj = multipliers[j];
+       a[i*n+j] = DotProduct(mj->ForceJacobian, v1) + DotProduct(mj->MomentJacobian, v2);
+-      if (mi->Wheel && mi->Wheel == mj->Wheel)
++      if (mi->Wheel && mi->Wheel == mj->Wheel && i == j)
+         a[i*n+j] += mi->WheelJacobian * mj->WheelJacobian * mi->Wheel->Jinv;
+     }
+   }

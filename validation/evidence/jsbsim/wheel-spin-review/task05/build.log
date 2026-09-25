@@ -1,0 +1,96 @@
+[  0%] Built target Magvar
+[  0%] Built target IOStreams
+[  3%] Built target GeographicLib
+[  4%] Built target Xml
+[  4%] Built target Properties
+[  5%] Built target Misc
+[  8%] Built target Atmosphere
+[  8%] Building CXX object src/initialization/CMakeFiles/Init.dir/FGLinearization.cpp.o
+[  8%] Building CXX object src/initialization/CMakeFiles/Init.dir/FGTrim.cpp.o
+[  9%] Building CXX object src/initialization/CMakeFiles/Init.dir/FGTrimAxis.cpp.o
+[ 10%] Building CXX object src/math/CMakeFiles/Math.dir/FGStateSpace.cpp.o
+[ 17%] Built target Propulsion
+[ 26%] Built target Aeromatic++
+[ 27%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGOutputFG.cpp.o
+[ 27%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGFCSComponent.cpp.o
+[ 27%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGOutputTextFile.cpp.o
+[ 28%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGDeadBand.cpp.o
+[ 28%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGGain.cpp.o
+[ 29%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGKinemat.cpp.o
+[ 27%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGOutputSocket.cpp.o
+[ 29%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGFCSFunction.cpp.o
+[ 30%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGSwitch.cpp.o
+[ 31%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGSensor.cpp.o
+[ 31%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGPID.cpp.o
+[ 31%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGSummer.cpp.o
+[ 32%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGFilter.cpp.o
+[ 33%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGActuator.cpp.o
+[ 34%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGAngles.cpp.o
+[ 34%] Building CXX object src/models/CMakeFiles/Models.dir/FGFCS.cpp.o
+[ 34%] Building CXX object src/models/CMakeFiles/Models.dir/FGLGear.cpp.o
+[ 34%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGMagnetometer.cpp.o
+[ 34%] Building CXX object src/models/CMakeFiles/Models.dir/FGGroundReactions.cpp.o
+[ 35%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGGyro.cpp.o
+[ 36%] Building CXX object src/models/CMakeFiles/Models.dir/FGPropulsion.cpp.o
+[ 37%] Built target aeromatic
+[ 37%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGWaypoint.cpp.o
+[ 37%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGAccelerometer.cpp.o
+[ 38%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGDistributor.cpp.o
+[ 38%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGLinearActuator.cpp.o
+[ 44%] Built target Math
+[ 44%] Built target FlightControl
+[ 45%] Built target Init
+[ 54%] Built target InputOutput
+[ 63%] Built target Models
+[ 63%] Building CXX object src/CMakeFiles/libJSBSim.dir/FGFDMExec.cpp.o
+[ 64%] Linking CXX static library libJSBSim.a
+[ 65%] Built target libJSBSim
+[ 66%] Generating FGAccelerationsTest.cpp
+[ 66%] Linking CXX executable FGColumnVector3Test1
+[ 67%] Linking CXX executable FGJSBBaseTest1
+[ 68%] Linking CXX executable FGMatrix33Test1
+[ 69%] Linking CXX executable JSBSim
+[ 69%] Linking CXX executable FGLocationTest1
+[ 70%] Linking CXX executable StringUtilitiesTest1
+[ 70%] Linking CXX executable FGInitialConditionTest1
+[ 70%] Linking CXX executable FGQuaternionTest1
+[ 70%] Linking CXX executable FGGroundCallbackTest1
+[ 70%] Linking CXX executable FGPropertyManagerTest1
+[ 71%] Linking CXX executable FGInertialTest1
+[ 72%] Linking CXX executable FGTableTest1
+[ 72%] Linking CXX executable FGLogTest1
+[ 72%] Linking CXX executable FGAtmosphereTest1
+[ 74%] Linking CXX executable FGPropertyValueTest1
+[ 75%] Building CXX object python/CMakeFiles/_jsbsim.dir/_jsbsim.cxx.o
+[ 74%] Linking CXX executable FGRealValueTest1
+[ 76%] Linking CXX executable FGAuxiliaryTest1
+[ 77%] Linking CXX executable FGParameterValueTest1
+[ 77%] Linking CXX executable FGParameterTest1
+[ 77%] Linking CXX executable FGMSISTest1
+[ 78%] Linking CXX executable FGConditionTest1
+[ 78%] Building CXX object tests/unit_tests/CMakeFiles/FGAccelerationsTest1.dir/FGAccelerationsTest.cpp.o
+[ 79%] Built target FGColumnVector3Test1
+[ 80%] Built target StringUtilitiesTest1
+[ 81%] Built target FGJSBBaseTest1
+[ 83%] Built target FGPropertyValueTest1
+[ 83%] Built target FGLogTest1
+[ 84%] Built target FGPropertyManagerTest1
+[ 85%] Built target FGRealValueTest1
+[ 86%] Built target FGQuaternionTest1
+[ 87%] Built target FGConditionTest1
+[ 88%] Built target FGParameterValueTest1
+[ 89%] Built target FGMatrix33Test1
+[ 91%] Built target FGLocationTest1
+[ 92%] Built target FGParameterTest1
+[ 92%] Built target FGAtmosphereTest1
+[ 92%] Built target JSBSim
+[ 93%] Built target FGGroundCallbackTest1
+[ 94%] Built target FGTableTest1
+[ 95%] Built target FGInitialConditionTest1
+[ 96%] Built target FGInertialTest1
+[ 97%] Built target FGAuxiliaryTest1
+[ 98%] Built target FGMSISTest1
+[ 99%] Linking CXX executable FGAccelerationsTest1
+[ 99%] Built target FGAccelerationsTest1
+[100%] Linking CXX shared module ../tests/jsbsim/_jsbsim.so
+[100%] Built target _jsbsim

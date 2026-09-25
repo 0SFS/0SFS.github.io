@@ -1,0 +1,17 @@
+commit bcf7d272bcedebcf75a3631e005287a3dcc1c8e5
+Author: Felipegalind0 <Felipegalind0@outlook.com>
+Date:   Fri Sep 18 23:32:11 2026 -0500
+
+    Configure wheel friction bounds before clamping
+    
+    ConfigureWheelSpinRows now sets the wheel roll row's tire-grip bound with
+    the rest of that row, and the ordinary BOGEY path keeps only its braking
+    bound. The configuration runs before the roll and side warm-start values
+    are clamped, so each clamp sees its row's final limits. The rows are still
+    registered roll, side, then wheel brake, and the brake bound is unchanged.
+    
+    In ConfigureWheelSpinRows, roll and axle are renamed rollDirection and
+    axleLeverArm: the axle term is the lever arm from the CG to the axle.
+
+ src/models/FGLGear.cpp | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)

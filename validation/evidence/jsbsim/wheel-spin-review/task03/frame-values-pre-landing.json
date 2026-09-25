@@ -1,0 +1,19 @@
+{
+  "landing": {
+    "touch_step": 47,
+    "unit1_wow_transitions": 1,
+    "max_abs_property_before_touch": 0.0,
+    "before_touch": {
+      "q": 0.08181625127294832,
+      "spin1": 0.0,
+      "slip": 0.0
+    },
+    "touch": {
+      "q": 0.14706574900099786,
+      "u": 92.04840023778345,
+      "spin1": 0.0,
+      "slip": 92.7355627771991
+    },
+    "radius_ft_times_q_touch": 0.10614981883274123
+  }
+}

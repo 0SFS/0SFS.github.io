@@ -1,0 +1,565 @@
+{
+  "data": {
+    "repository": {
+      "pullRequest": {
+        "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502",
+        "headRefOid": "499c38326bb6f39b6360bd82d74c5c00e64faeaf",
+        "state": "OPEN",
+        "body": "### Summary\n\nAdds an opt-in wheel rotational degree of freedom for `BOGEY` contacts.\nDeclare positive radius and spin inertia to enable it:\n\n```xml\n<contact type=\"BOGEY\" name=\"LEFT_MAIN\">\n  <!-- existing contact elements -->\n  <wheel_radius unit=\"M\"> 0.22 </wheel_radius>\n  <wheel_inertia unit=\"KG*M2\"> 0.124 </wheel_inertia>\n</contact>\n```\n\nThe existing `wheel-speed-fps` is a kinematic proxy. The new state lets the\nfriction solve account for touchdown spin-up and apply braking through the\nwheel. For stationary terrain:\n\n- The tread row drives axle ground speed minus radius times internal spin\n  toward zero, bounded by static friction times normal load and the ground's\n  static friction factor.\n- The tread force reaches the airframe through the axle, while its wheel\n  torque accelerates the spin state. Applying the full contact-patch moment\n  to the airframe as well would count the spin-up moment twice.\n- A second row applies equal and opposite wheel/airframe brake torque. Its\n  target is zero **relative** wheel spin; its bound is the existing braking\n  force coefficient times normal load times radius.\n\nWith the DOF enabled, `rolling_friction` therefore describes wheel-to-axle\nresisting torque. Without it, the legacy interpretation is tire rolling\nresistance/hysteresis. This distinction is documented in `FGLGear.h`.\n\nGround initialization and trim initialize a contacting wheel without tread\nslip. Airborne, an approximation reduces the magnitude of wheel spin relative\nto the airframe without reversing it: tread deceleration is\n`13 + 100*brake` ft/s\u00b2. The 13 value comes from the legacy wheel-speed decay;\nthe additional 100 is an authored, uncalibrated brake approximation, not a\nnormal-load-derived or measured torque. It has no explicit airborne reaction\ntorque on the airframe. Damping acts only on positive-time steps outside\ntrim. Its finite decrement does not enforce a rigid brake lock under\narbitrary body motion.\n\nThe opt-in properties are:\n\n| Property | Meaning |\n| --- | --- |\n| `gear/unit[i]/wheel-spin-rad_sec` | Wheel angular rate relative to the airframe, positive for forward rolling. Reads subtract the body rate projected on the spin axis; writes apply the inverse conversion. |\n| `gear/unit[i]/wheel-tread-slip-fps` | Axle ground speed along the roll direction minus radius times the internal wheel rate; zero when airborne. |\n\nThe internal spin state stays in the ground reference used by the existing\nsolve, with the same rate reference as `in.PQR`. It is not an inertial or\n\u201cabsolute\u201d angular velocity. `wheel-speed-fps` retains its existing meaning.\nIn contact, the spin axis is ground normal cross projected rolling direction;\nairborne it is gear up cross steered forward. The scalar state is not remapped\nwhen those axes differ, so banked or steered contact transitions can produce\na jump in the reported relative rate. `FGLGear.h` documents this limitation.\n\n### Why\n\nThis comes from [OSFS](https://0sfs.github.io/), an open-source browser flight\nsimulator using JSBSim through WebAssembly. Touchdown visuals, tire sound and\nhaptics need wheel spin, and spin-up/braking should also act on the aircraft.\nAn application-side state cannot participate in JSBSim's friction solve and\nwould risk counting existing rolling/brake forces again. The wheel degree\nof freedom belongs in that solve.\n\n### Implementation\n\n`LagrangeMultiplier` supplies force, moment and optional scalar wheel\nJacobians. The common solver assembles the body terms for every row, adds a\nwheel term only when rows share a wheel, and accumulates its acceleration\nalongside the body force/moment. `FGLGear` owns the state, configures the\ntread and brake rows, and advances spin using the previous solve's\nacceleration in step with the existing integration sequence.\n\nThe analysis linked from `ConfigureWheelSpinRows` explains the two\nconstraints: [wheel dynamics and braking derivation](https://github.com/JSBSim-Team/jsbsim/pull/1502#issuecomment-5654721219).\n\nWithout both positive wheel elements there is no additional wheel state or\nproperty. The friction formulation for those aircraft is mathematically\nequivalent, but the unified moment-Jacobian arithmetic changes floating-point\nevaluation order. **Existing aircraft are not guaranteed byte-identical\ntrajectories.**\n\n### Validation\n\n`TestWheelSpin.py` covers opt-in/invalid dimensions, touchdown spin-up and\nmomentum transfer, ground initialization, rolling/braking comparison and\nairborne decay. This round adds body-relative property/frame regressions and\na native `FGAccelerationsTest1` for analytical tread/brake constraints,\nshared/distinct wheel couplings, limits and zero dt.\n\nVerified candidate `499c38326bb6f39b6360bd82d74c5c00e64faeaf` on macOS 27\narm64, Apple clang 21.0.0, CMake 4.4.3 and Python 3.14.7, Release builds:\n\n- Python enabled: **79/79 CTest targets pass**, including all nine Python\n  wheel methods and all eight native constraint methods. Python disabled:\n  **21/21 CxxTests pass**, including `FGAccelerationsTest1` in the selection\n  used by the coverage workflow. No new hosted coverage percentage is claimed.\n- The four new Python frame regressions fail on the pre-frame-change engine.\n  A control with the new getter and old damping also fails the locked-wheel\n  and near-zero drag checks. Omitting or reversing the native solver's\n  shared-wheel off-diagonal term fails the coupled-row case; restoring it\n  passes. Existing tolerances were not relaxed.\n- Fresh four-binary comparison: all 61 shipped XML inputs, isolated working\n  directories, natural data outputs plus per-step traces. Each binary has\n  57 successful simulations, the same simplex steady-turn trim failure\n  (exit 1), and three output/plot inputs (exit 255). Each emits 102 data files\n  and 11,877,246 trace rows, including 13 rows from the trim failure.\n- Base `d0d8bc6e` and original PR `24e085bf` data are byte-identical. The\n  final candidate matches the isolated common-Jacobian cleanup probe exactly.\n  Base/final differ in **60 of 102 files across 31 of 57 successful runs**,\n  with no exit, shape or non-finite mismatch. Rebuilt original-head outputs\n  and reused base/probe outputs also match their retained earlier records.\n  Console banners and timings are excluded from data identity.\n\nRepresentative maximum absolute base/final differences in the per-step trace:\n\n| Run | u (ft/s) | Pitch (rad) | Altitude (ft) | Gear Fx (lbf) |\n| --- | ---: | ---: | ---: | ---: |\n| `c172_cross_wind` | 0.054043 | 3.6853e\u22124 | 0.0023394 | 197.33 |\n| `c1723` | 0.0025166 | 4.4618e\u22125 | 0.0071976 | 3.7558e\u22126 |\n| `ZLT-NT-moored-1` | 9.7489e\u22125 | 1.5745e\u22127 | 1.4622e\u22125 | 67.311 |\n| `f16_test` | 71.644 | 0.23604 | 17.819 | 179038 |\n\nCrosswind gear pitching moment differs by up to 1,358.7 lbf\u00b7ft; moored-ZLT\ngear lateral force by 443.29 lbf and yaw moment by 20,929 lbf\u00b7ft. These are\nnot uniformly small force/moment changes. F-16 \u0394u stays below 1e\u22126 ft/s until\n127.908 s, when gear Fx is already about \u22122.11 million lbf; both trajectories\nsubsequently go below ground. Matching that impact sequence is not a\nphysical-accuracy criterion, and its divergence is not a general tolerance.\n\nThe saved-init XML in `c1723` also changes (nine lines of attitude, local\nvelocity and body rates). Its exact hashes and text diff were checked; the\nCSV harness reports only a text mismatch for that file. Raw 2\u03c0 angle\ndifferences in crosswind/ZLT heading and F-16 roll\nare wrap artifacts; wrapped maxima are 6.258e\u22126, 2.730e\u22126 and 0.030706 rad.\nAll comparisons are specific to this compiler, architecture and input set.\n\nThe test suites above ran on this exact candidate and were reused\nfor the final comparison after source and binary hash checks; they were not\nrerun as part of that comparison. `TestInputSocket` historically has a\ntelnetlib3 timeout on this machine, and `TestActuator` once hit a subprocess\ntimeout under competing load. Both passed first try in the candidate suite.\nNo revised WebAssembly verification is claimed.\n\nThe C172 wheel dimensions/inertias in the existing fixture are estimates,\nnot measured assemblies or aircraft calibration. The current scalar axle\nmodel and airborne approximation do not establish full wheel gyroscopic,\ncamber or airborne reaction-torque dynamics.",
+        "reviewDecision": "CHANGES_REQUESTED",
+        "mergeable": "MERGEABLE",
+        "mergeStateStatus": "UNSTABLE",
+        "reviewThreads": {
+          "nodes": [
+            {
+              "id": "PRRT_kwDOBtQiWM6jxfJT",
+              "isResolved": false,
+              "comments": {
+                "nodes": [
+                  {
+                    "databaseId": 4047586942,
+                    "author": {
+                      "login": "bcoconni"
+                    },
+                    "body": "Use `Jinv` for the inverse of the inertia for consistency with the rest of the code:\r\n```suggestion\r\n  double Jinv = 0.0; ///< 1 / spin inertia about the axle [1/(slug*ft^2)]\r\n```",
+                    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4047586942",
+                    "replyTo": null
+                  },
+                  {
+                    "databaseId": 4054389590,
+                    "author": {
+                      "login": "Felipegalind0"
+                    },
+                    "body": "Renamed `InvInertia` to `Jinv` in \u201cUse explicit moment Jacobians for friction.\u201d\r\n",
+                    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054389590",
+                    "replyTo": {
+                      "databaseId": 4047586942
+                    }
+                  }
+                ],
+                "pageInfo": {
+                  "hasNextPage": false
+                }
+              }
+            },
+            {
+              "id": "PRRT_kwDOBtQiWM6jxjWh",
+              "isResolved": false,
+              "comments": {
+                "nodes": [
+                  {
+                    "databaseId": 4047612197,
+                    "author": {
+                      "login": "bcoconni"
+                    },
+                    "body": "You should remove `LeverArm` now that you have introduced the moment jacobian, it would simplify the code using it everywhere. ",
+                    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4047612197",
+                    "replyTo": null
+                  },
+                  {
+                    "databaseId": 4054390239,
+                    "author": {
+                      "login": "Felipegalind0"
+                    },
+                    "body": "Removed `LeverArm` and `UseMomentJacobian` in \u201cUse explicit moment Jacobians\nfor friction.\u201d All rows now supply their moment Jacobian.\n\nI rechecked all 61 shipped XML inputs on the final candidate. Base and\noriginal PR data match byte-for-byte; the cleanup changes 60 of 102 files\nacross 31 of 57 successful simulations. Crosswind reaches \u0394u = 0.0540 ft/s\nand \u0394gear Fx = 197 lbf; the moored ZLT reaches \u0394gear yaw moment = 20,929\nlbf\u00b7ft. F-16 \u0394u reaches 71.6 ft/s after severe ground impacts. These are\nnot uniformly rounding-sized output differences. The final candidate matches\nthe isolated cleanup probe exactly, and the PR body now reports these limits\ninstead of claiming existing aircraft are unaffected.",
+                    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054390239",
+                    "replyTo": {
+                      "databaseId": 4047612197
+                    }
+                  }
+                ],
+                "pageInfo": {
+                  "hasNextPage": false
+                }
+              }
+            },
+            {
+              "id": "PRRT_kwDOBtQiWM6jxlBX",
+              "isResolved": false,
+              "comments": {
+                "nodes": [
+                  {
+                    "databaseId": 4047622267,
+                    "author": {
+                      "login": "bcoconni"
+                    },
+                    "body": "Once having removed `LeverArm`, you will no longer need the lambda function `moment`.",
+                    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4047622267",
+                    "replyTo": null
+                  },
+                  {
+                    "databaseId": 4054391888,
+                    "author": {
+                      "login": "Felipegalind0"
+                    },
+                    "body": "Removed the lambda in \u201cUse explicit moment Jacobians for friction.\u201d Assembly,\nRHS and final moment accumulation now read `MomentJacobian` directly.",
+                    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054391888",
+                    "replyTo": {
+                      "databaseId": 4047622267
+                    }
+                  }
+                ],
+                "pageInfo": {
+                  "hasNextPage": false
+                }
+              }
+            },
+            {
+              "id": "PRRT_kwDOBtQiWM6jxpgh",
+              "isResolved": false,
+              "comments": {
+                "nodes": [
+                  {
+                    "databaseId": 4047650299,
+                    "author": {
+                      "login": "bcoconni"
+                    },
+                    "body": "This loop is basically a duplication of the code just below with only the specificity of handling the wheel:\r\n```c++\r\n        if (mi->Wheel && mi->Wheel == mj->Wheel)\r\n          a[i*n+j] += mi->WheelCoeff * mj->WheelCoeff * mi->Wheel->InvInertia;\r\n```\r\nSince this code is guarded by the `if (mi->Wheel)` it can be integrated in the legacy code rather than duplicating the loops.",
+                    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4047650299",
+                    "replyTo": null
+                  },
+                  {
+                    "databaseId": 4047870001,
+                    "author": {
+                      "login": "bcoconni"
+                    },
+                    "body": "And the `continue` keyword to avoid an `else` is debatable...",
+                    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4047870001",
+                    "replyTo": {
+                      "databaseId": 4047650299
+                    }
+                  },
+                  {
+                    "databaseId": 4054406714,
+                    "author": {
+                      "login": "Felipegalind0"
+                    },
+                    "body": "Merged the matrix assembly, RHS and accumulation paths in \u201cUse explicit\nmoment Jacobians for friction.\u201d The wheel term is conditional on the two\nrows sharing a wheel; the `generalized` branch and its `continue` are gone.\nI also renamed `WheelCoeff` to `WheelJacobian`.",
+                    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054406714",
+                    "replyTo": {
+                      "databaseId": 4047650299
+                    }
+                  }
+                ],
+                "pageInfo": {
+                  "hasNextPage": false
+                }
+              }
+            },
+            {
+              "id": "PRRT_kwDOBtQiWM6jxupD",
+              "isResolved": false,
+              "comments": {
+                "nodes": [
+                  {
+                    "databaseId": 4047682190,
+                    "author": {
+                      "login": "bcoconni"
+                    },
+                    "body": "This code should be located in the new method `ConfigureWheelSpinRows`. With the current code, it is far from obvious that when a wheel is accounted for, then the friction coefficient is `staticFFactor * staticFCoeff`. The reason for that is that with the current code in the PR, I was expecting the friction coefficient of `ftRoll` to be updated in `ConfigureWheelSpinRows`.",
+                    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4047682190",
+                    "replyTo": null
+                  },
+                  {
+                    "databaseId": 4054406814,
+                    "author": {
+                      "login": "Felipegalind0"
+                    },
+                    "body": "Moved the wheel roll row's `Max` and `Min` into `ConfigureWheelSpinRows` in\n\u201cConfigure wheel friction bounds before clamping.\u201d The static tire-grip\nbound is now alongside the wheel row, separate from the brake-torque bound.",
+                    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054406814",
+                    "replyTo": {
+                      "databaseId": 4047682190
+                    }
+                  }
+                ],
+                "pageInfo": {
+                  "hasNextPage": false
+                }
+              }
+            },
+            {
+              "id": "PRRT_kwDOBtQiWM6jxy9J",
+              "isResolved": false,
+              "comments": {
+                "nodes": [
+                  {
+                    "databaseId": 4047708987,
+                    "author": {
+                      "login": "bcoconni"
+                    },
+                    "body": "This code should be moved before the calls to `Constrain`:\r\n```c++\r\n    LMultiplier[ftRoll].value = Constrain(LMultiplier[ftRoll].Min, LMultiplier[ftRoll].value, LMultiplier[ftRoll].Max);\r\n    LMultiplier[ftSide].value = Constrain(LMultiplier[ftSide].Min, LMultiplier[ftSide].value, LMultiplier[ftSide].Max);\r\n```\r\nThe reason being that once the update of `LMultiplier[ftRoll].Max` will be moved to `ConfigureWheelSpinRows`, `Constrain` shall be called **after** `LMultiplier[ftRoll].Max` has been updated.",
+                    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4047708987",
+                    "replyTo": null
+                  },
+                  {
+                    "databaseId": 4054406913,
+                    "author": {
+                      "login": "Felipegalind0"
+                    },
+                    "body": "\u201cConfigure wheel friction bounds before clamping\u201d calls the configuration\nbefore the roll and side warm-start clamps. Registration still runs in\nroll, side, brake order.",
+                    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054406913",
+                    "replyTo": {
+                      "databaseId": 4047708987
+                    }
+                  }
+                ],
+                "pageInfo": {
+                  "hasNextPage": false
+                }
+              }
+            },
+            {
+              "id": "PRRT_kwDOBtQiWM6jx4dG",
+              "isResolved": false,
+              "comments": {
+                "nodes": [
+                  {
+                    "databaseId": 4047742902,
+                    "author": {
+                      "login": "bcoconni"
+                    },
+                    "body": "These variable names are misleading because `roll` is actually the direction of the roll friction force (unit vector) and `axle` is not the axle direction but the axle **position** with respect to the CG. And since the code is historically using *lever arm* to designate this position, then do so here as well.",
+                    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4047742902",
+                    "replyTo": null
+                  },
+                  {
+                    "databaseId": 4054407051,
+                    "author": {
+                      "login": "Felipegalind0"
+                    },
+                    "body": "Renamed them `rollDirection` and `axleLeverArm` in \u201cConfigure wheel friction\nbounds before clamping.\u201d \u201cDocument wheel friction and airborne spin-down\u201d\nalso clarifies that the lever arm runs from the CG to the axle.",
+                    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054407051",
+                    "replyTo": {
+                      "databaseId": 4047742902
+                    }
+                  }
+                ],
+                "pageInfo": {
+                  "hasNextPage": false
+                }
+              }
+            },
+            {
+              "id": "PRRT_kwDOBtQiWM6jyA5W",
+              "isResolved": false,
+              "comments": {
+                "nodes": [
+                  {
+                    "databaseId": 4047795134,
+                    "author": {
+                      "login": "bcoconni"
+                    },
+                    "body": "Do not export the so-called *absolute spin rate*. Instead export the wheel spin rate measured with respect to the body frame. The latter is the spin rate that the Flight Control System and the Anti Blocking System will have access to (using a phonic wheel) in the real world.\r\n\r\nAlso it is the spin rate relative to the aircraft that 3D modelers need to display the wheels since models are generally organized through a hierarchy of bodies, each one being positioned relative to its parent in the hierarchy.",
+                    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4047795134",
+                    "replyTo": null
+                  },
+                  {
+                    "databaseId": 4054407218,
+                    "author": {
+                      "login": "Felipegalind0"
+                    },
+                    "body": "\u201cReport wheel spin relative to the airframe\u201d keeps `wheel-spin-rad_sec` and\nexports `Rate - dot(in.PQR, spinAxis)`. Writes apply the inverse conversion,\nso the property remains writable. The constraint solve retains its internal\nstate. The same commit fixes airborne drag to reduce this relative rate and\nadds nonzero body-rate and steering regressions.",
+                    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054407218",
+                    "replyTo": {
+                      "databaseId": 4047795134
+                    }
+                  }
+                ],
+                "pageInfo": {
+                  "hasNextPage": false
+                }
+              }
+            },
+            {
+              "id": "PRRT_kwDOBtQiWM6jyGSs",
+              "isResolved": false,
+              "comments": {
+                "nodes": [
+                  {
+                    "databaseId": 4047828797,
+                    "author": {
+                      "login": "bcoconni"
+                    },
+                    "body": "There is no \"absolute\" in JSBSim. Instead tell that it is the spin rate measured with respect to the NED frame.\r\n```suggestion\r\n  double Rate = 0.0;       ///< spin rate about the axle measured in the NED frame [rad/s]\r\n```",
+                    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4047828797",
+                    "replyTo": null
+                  },
+                  {
+                    "databaseId": 4054406587,
+                    "author": {
+                      "login": "Felipegalind0"
+                    },
+                    "body": "Removed \u201cabsolute\u201d in \u201cReport wheel spin relative to the airframe.\u201d I used\n\u201cground reference frame,\u201d matching the rate supplied to the solve.\n`FGPropagate::GetPQR()` documents that rate as ECEF-relative; a transported\nNED frame would require another correction. The state and its reference are\nunchanged; the public property is now relative to the airframe.",
+                    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054406587",
+                    "replyTo": {
+                      "databaseId": 4047828797
+                    }
+                  }
+                ],
+                "pageInfo": {
+                  "hasNextPage": false
+                }
+              }
+            }
+          ],
+          "pageInfo": {
+            "hasNextPage": false
+          }
+        },
+        "comments": {
+          "nodes": [
+            {
+              "databaseId": 5652976823,
+              "author": {
+                "login": "codecov"
+              },
+              "body": "## [Codecov](https://app.codecov.io/gh/JSBSim-Team/jsbsim/pull/1502?dropdown=coverage&src=pr&el=h1&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=JSBSim-Team) Report\n:x: Patch coverage is `15.78947%` with `80 lines` in your changes missing coverage. Please review.\n:white_check_mark: Project coverage is 26.46%. Comparing base ([`b39c387`](https://app.codecov.io/gh/JSBSim-Team/jsbsim/commit/b39c3870b417cbb1acc994d67527a017b6ccf313?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=JSBSim-Team)) to head ([`499c383`](https://app.codecov.io/gh/JSBSim-Team/jsbsim/commit/499c38326bb6f39b6360bd82d74c5c00e64faeaf?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=JSBSim-Team)).\n:warning: Report is 9 commits behind head on master.\n\n| [Files with missing lines](https://app.codecov.io/gh/JSBSim-Team/jsbsim/pull/1502?dropdown=coverage&src=pr&el=tree&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=JSBSim-Team) | Patch % | Lines |\n|---|---|---|\n| [src/models/FGLGear.cpp](https://app.codecov.io/gh/JSBSim-Team/jsbsim/pull/1502?src=pr&el=tree&filepath=src%2Fmodels%2FFGLGear.cpp&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=JSBSim-Team#diff-c3JjL21vZGVscy9GR0xHZWFyLmNwcA==) | 0.00% | [80 Missing :warning: ](https://app.codecov.io/gh/JSBSim-Team/jsbsim/pull/1502?src=pr&el=tree&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=JSBSim-Team) |\n\n<details><summary>Additional details and impacted files</summary>\n\n\n\n```diff\n@@            Coverage Diff             @@\n##           master    #1502      +/-   ##\n==========================================\n+ Coverage   25.06%   26.46%   +1.40%     \n==========================================\n  Files         171      171              \n  Lines       18842    18917      +75     \n==========================================\n+ Hits         4722     5006     +284     \n+ Misses      14120    13911     -209     \n```\n</details>\n\n[:umbrella: View full report in Codecov by Harness](https://app.codecov.io/gh/JSBSim-Team/jsbsim/pull/1502?dropdown=coverage&src=pr&el=continue&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=JSBSim-Team).   \n:loudspeaker: Have feedback on the report? [Share it here](https://about.codecov.io/codecov-pr-comment-feedback/?utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=JSBSim-Team).\n<details><summary> :rocket: New features to boost your workflow: </summary>\n\n- :snowflake: [Test Analytics](https://docs.codecov.com/docs/test-analytics): Detect flaky tests, report on failures, and find test suite problems.\n</details>",
+              "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#issuecomment-5652976823"
+            },
+            {
+              "databaseId": 5654721219,
+              "author": {
+                "login": "bcoconni"
+              },
+              "body": "Thanks @Felipegalind0 for your contribution. This PR is quite complex and it took me some time to understand what it does and how.\r\n\r\nFor everyone, including my future self, the idea is to make wheels independent bodies from the aircraft. At its very core, JSBSim assumes that the aircraft is a single body and that other bodies are only interacting with the aircraft through the forces and moments that they apply to it.\r\n\r\nThis is typically the case for propellers where `FGPropeller` is inheriting from `FGForce` via the `FGThruster` class:\r\nhttps://github.com/JSBSim-Team/jsbsim/blob/14c19022943f5850daf2c6b90554050b3139b853/src/models/propulsion/FGPropeller.h#L169\r\nhttps://github.com/JSBSim-Team/jsbsim/blob/14c19022943f5850daf2c6b90554050b3139b853/src/models/propulsion/FGThruster.h#L77\r\nThe class `FGPropeller` manages its own body (the propeller!):\r\n* The propeller rotation rate is updated using its inertia and the angular momentum $I\\dot{\\theta}=\\sum_i M_i$:\r\nhttps://github.com/JSBSim-Team/jsbsim/blob/14c19022943f5850daf2c6b90554050b3139b853/src/models/propulsion/FGPropeller.cpp#L294\r\n* Forces and moments are computed and applied to the aircraft:\r\nhttps://github.com/JSBSim-Team/jsbsim/blob/14c19022943f5850daf2c6b90554050b3139b853/src/models/propulsion/FGPropeller.cpp#L282\r\nhttps://github.com/JSBSim-Team/jsbsim/blob/14c19022943f5850daf2c6b90554050b3139b853/src/models/propulsion/FGPropeller.cpp#L300\r\n\r\nThe idea of the PR is to apply the same logic to the wheels using `FGLGear`: they become independent bodies with their own degree of freedom (DOF) and they apply a force and a moment to the aircraft.\r\n\r\n<img width=\"1408\" height=\"768\" alt=\"Free body diagrams (force and moment) of a wheel\" src=\"https://github.com/user-attachments/assets/a9f92072-cc33-46fb-b260-3cce5ac1f013\" />\r\n\r\nAbove are free body diagrams of the wheel: the friction force $F_{\\text{roll}}$ is the friction that the ground applies to the wheel and that the wheel applies to the aircraft axle (point A). Hence - now that the wheel is an independent body - the friction force is applied on the aircraft at the point A instead of the point C, so the code below is updated by the PR:\r\nhttps://github.com/JSBSim-Team/jsbsim/blob/14c19022943f5850daf2c6b90554050b3139b853/src/models/FGLGear.cpp#L725\r\nNote that in this PR, $F_{\\text{roll}}$ is used for 2 different purposes:\r\n1. To apply the friction force to the aircraft body (as is currently the case)\r\n2. To compute the driving torque $R\\cdot F_{\\text{roll}}$ (in blue on the picture above) that will be applied to the wheel.\r\n\r\n### Braking management\r\n\r\nUnlike in the current code, the friction coefficient for $F_{\\text{roll}}$ is always the static coefficient $\\mu_{\\text{static}}$ and is independent of the brake position `BrakePos`.\r\n\r\nTo keep the braking feature, the patch introduces the braking torque $\\tau_{brake}$ (in yellow on the picture above) that is currently not modeled by `FGLGear`. Hence the new Lagrange multiplier `ftWheelBrake` whose job is to zero out the relative motion between the wheel and the aircraft.\r\n\r\nThe braking torque $\\tau_{brake}$ obviously depends on the brake position `BrakePos` and is using `BrakeFCoeff`:\r\nhttps://github.com/JSBSim-Team/jsbsim/blob/14c19022943f5850daf2c6b90554050b3139b853/src/models/FGLGear.cpp#L590-L593\r\n\r\nIt is following that the wheel applies permanently a resisting torque $\\mu_{\\text{rolling}}F_{\\text{roll}}R$ to the axle, whatever the braking position and this has 2 consequences:\r\n1. The rolling friction coefficient is now characterizing the friction between the wheel and its axle. Legacy behavior is to assume that the rolling friction coefficient characterizes the hysteresis in the compression/expansion of the tire while rolling. There is nothing problematic in these two different interpretations of the rolling friction coefficient but model designers need to know that.\r\n2. When the wheel is spinning $\\tau_{\\text{brake}}$ will **always** be equal to the maximum torque allowed by the Coulomb law i.e. $\\tau_{\\text{brake}}=\\mu_{\\text{brake}}F_{\\text{roll}}R$ because the `ftWheelBrake` multiplier is targetting a *no wheel spin* condition.\r\n\r\nSo, how is braking working, now? When applying some brake, $\\tau_{brake}$ increases, $\\omega$ decreases so $F_{\\text{roll}}$ increases to try to restore the no slip condition $R\\omega=v_A$.\r\n\r\nNote that $F_{\\text{roll}}$ can reach $\\mu_{\\text{static}}F_n$ with the wheel still spinning.\r\n\r\n### Wheel dynamics\r\n\r\nThe driving torque and the braking torque are then used to compute the spin rate $\\omega$ using the classic angular momentum equation \r\n\r\n$$I\\dot{\\omega}=R\\cdot F_{\\text{roll}}-\\tau_{\\text{brake}}$$\r\n\r\nNote that there is a subtlety here: $\\omega$ is the wheel spin rate **measured in the NED frame** (so-called *absolute spin rate* in the PR). This is deviating from what most people would expect i.e. a spin rate measured in the body frame:\r\n* This allows to define the no slip condition as $R\\omega=V_{\\text{axle}}$ instead of $R\\omega=V_C$ where $V_C$ is the velocity at the contact point with respect to the ground (i.e. $V_C=V_G+\\Omega_{\\text{aircraft}}\\times GC$). It simplifies the code a bit but;\r\n* The condition that the `ftWheelBrake` multiplier has to resolve is not $\\omega=0$ but \r\n\r\n$$\\omega=\\vec{\\Omega}_{\\text{aircraft}}\\cdot\\vec{u}_{\\text{axle}}$$\r\n\r\n### No slip condition vs *no wheel spin* condition\r\n\r\nWith respect to that point, the code in the PR is not so easy to understand because it is far from obvious that, for the `ftWheelBrake` multiplier, the following code actually simplifies to the equation above:\r\n```c++\r\n    double wheelTerm = (mi->Wheel && dt > 0.) ? mi->WheelCoeff * mi->Wheel->Rate / dt : 0.;\r\n    rhs[i] = -(DotProduct(U, vdot) + DotProduct(moment(mi), wdot) + wheelTerm)/d;\r\n```\r\nAs a reminder, according to the following code:\r\nhttps://github.com/JSBSim-Team/jsbsim/blob/14c19022943f5850daf2c6b90554050b3139b853/src/models/FGAccelerations.cpp#L265-L273\r\nwe have (the terrain movement is ignored to simplify the analysis)\r\n\r\n$$\\text{vdot}=\\dfrac{d\\vec{v}_G}{dt}+\\dfrac{\\vec{v}_G}{\\Delta t}$$\r\n\r\n$$\\text{wdot}=\\dfrac{d\\vec{\\Omega}_{\\text{aircraft}}}{dt}+\\dfrac{\\vec{\\Omega}_{\\text{aircraft}}}{\\Delta t}$$\r\n\r\nSo, for `ftWheelBrake`, we have $U=0$, `moment(mi)` is equal to $-u_{\\text{axle}}$, `mi->WheelCoeff == 1.0`, and `mi->Wheel->Rate` is obviously $\\omega$ so we have:\r\n\r\n$$\\text{rhs}=\\left(-\\dfrac{d\\vec{\\Omega}_{\\text{aircraft}}}{dt}\\cdot\\vec{u}_{\\text{axle}}+\\dfrac{\\omega-\\vec{\\Omega}_{\\text{aircraft}}\\cdot\\vec{u}_{\\text{axle}}}{\\Delta t}\\right)\\dfrac{1}{d}$$\r\n\r\nwhere one can recognize the *no wheel spin* condition $\\omega-\\Omega_{\\text{aircraft}}\\cdot u_{\\text{axle}}$\r\n\r\n*Note: You can ignore the time derivation and the division by `d` because they are technical details unrelated to the point I am trying to make.*\r\n\r\nOn the other hand, for the `ftRoll` multiplier, the same C++ code leads to the no slip condition because $U=u_{\\text{roll}}$, `moment(mi)` is equal to $GA\\times u_{\\text{roll}}$ and `mi->Wheel->Rate` is equal to $-R$ so we have\r\n\r\n$$\\text{rhs}=\\left(\\vec{u}_{\\text{roll}}\\cdot\\left(\\dfrac{d\\vec{v}_G}{dt}+\\dfrac{\\vec{v}_G}{\\Delta t}\\right)+(\\vec{GA}\\times\\vec{u}_{\\text{roll}})\\cdot\\left(\\dfrac{d\\vec{\\Omega}_{\\text{aircraft}}}{dt}+\\dfrac{\\vec{\\Omega}_{\\text{aircraft}}}{\\Delta t}\\right)+\\dfrac{-R\\omega}{\\Delta t}\\right)\\dfrac{1}{d}$$\r\n\r\nwhich simplifies to (using the identity $(A\\times B)\\cdot C=(C\\times A)\\cdot B$)\r\n\r\n$$\\text{rhs}=\\left(\\vec{u}_{\\text{roll}}\\cdot\\left(\\dfrac{d\\vec{v}_G}{dt}+\\dfrac{d\\vec{\\Omega}_{\\text{aircraft}}}{dt}\\times\\vec{GA}\\right)-\\dfrac{R\\omega-\\vec{u}_{\\text{roll}}\\cdot(\\vec{v}_G+\\vec{\\Omega}_{\\text{aircraft}}\\times\\vec{GA})}{\\Delta t}\\right)\\dfrac{1}{d}$$\r\n\r\nand since the velocity at the axle is $v_A=v_G+{\\Omega}_{\\text{aircraft}}\\times GA$, we finally have:\r\n\r\n$$\\text{rhs}=\\left(\\vec{u}_{\\text{roll}}\\cdot\\dfrac{d\\vec{v}_A}{dt}-\\dfrac{R\\omega-\\vec{u}_{\\text{roll}}\\cdot\\vec{v}_A}{\\Delta t}\\right)\\dfrac{1}{d}$$\r\n\r\nwhere we recognize the no slip condition $R\\omega-u_{\\text{roll}}\\cdot v_A$.\r\n\r\nSo, great! the code works. However it has been a pain to understand that this code covers two entirely different conditions using some tricks: setting $U$ to 0 and the not-very-well-named `WheelCoeff` to either 1 or $-R$!\r\n\r\n### Conclusion (for now)\r\n\r\nAs claimed, the PR brings a better and more realistic handling of braking, wheel spin up energy, wheel spin up when touching ground, etc.\r\n\r\nHowever, the code deserves some clean up and there are a couple of errors that need to be addressed.\r\n\r\nTo be continued... (sorry I'm running out of time for now but questions/comments on my analysis above are welcome).",
+              "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#issuecomment-5654721219"
+            },
+            {
+              "databaseId": 5680186393,
+              "author": {
+                "login": "seanmcleod70"
+              },
+              "body": "Merci beaucoup @bcoconni for the addition of your writeup. In an ideal world every non-trivial bit of physics code in JSBSim would include a URL in the class/method pointing to writeups like this, i.e. markdown/jupyter style with snippets of explanatory text, equations, diagrams, snippets of code.",
+              "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#issuecomment-5680186393"
+            },
+            {
+              "databaseId": 5744732853,
+              "author": {
+                "login": "Felipegalind0"
+              },
+              "body": "For stationary terrain, your reading matches the two constraints: the roll\nrow drives axle tread slip toward zero, while the brake row drives wheel\nspin relative to the airframe toward zero, within their bounds. Both remain\nin the shared solve, now with explicit moment Jacobians and `WheelJacobian`\nnaming. The internal reference is unchanged; the exported rate is\nairframe-relative. I used \u201cground reference frame\u201d in the comments because\nthe supplied `in.PQR` comes from the ECEF-relative `FGPropagate::GetPQR()`.\n\n\u201cDocument wheel friction and airborne spin-down\u201d explains the enabled\n`rolling_friction` interpretation as wheel-to-axle resistance in the\n`FGLGear.h` class documentation. The comment above `ConfigureWheelSpinRows`\nlinks your analysis and states the two rows, addressing Sean's link request.\n\nI also changed two things outside the inline requests: airborne drag now\nreduces airframe-relative spin, and the 13/100 ft/s\u00b2 spin-down constants are\nnamed with their provenance. The 100 ft/s\u00b2 extra brake term is an authored,\nuncalibrated approximation; I retained its value rather than deriving a\ntorque from zero airborne normal load. A CxxTest now checks the constraint\nsigns, shared-wheel coupling, clamping and zero-dt case in the Python-disabled\ntest configuration.\n\nThe final candidate `499c3832` passes 79/79 CTest targets with Python enabled\nand 21/21 CxxTests with Python disabled. The new native test also detects\nomitted or reversed shared-wheel coupling in mutation checks.\n\nI ran all 61 shipped XML inputs with per-step logging on the base, original\nPR, isolated cleanup probe and final candidate. Original/base data match\nbyte-for-byte, as do final/probe data. Base/final differ in 60 of 102 files\nacross 31 of 57 successful simulations. Crosswind and moored-ZLT contact\nforces/moments change materially, and the F-16 trajectory diverges after\nsevere impacts. The body gives the measurements and removes the \u201cunaffected\u201d\nclaim. One common trim failure and three non-runscript inputs are accounted\nfor separately. These results are specific to this macOS arm64 build.",
+              "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#issuecomment-5744732853"
+            }
+          ],
+          "pageInfo": {
+            "hasNextPage": false
+          }
+        },
+        "commits": {
+          "nodes": [
+            {
+              "commit": {
+                "oid": "499c38326bb6f39b6360bd82d74c5c00e64faeaf",
+                "statusCheckRollup": {
+                  "contexts": {
+                    "nodes": [
+                      {
+                        "__typename": "CheckRun",
+                        "name": "XML validation",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953059886"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "Code coverage",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108478/job/105953059713"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "Analyze (cpp)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108477/job/105953060168"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "Analyze (python)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108477/job/105953060013"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "MSIS code validation (ubuntu-latest)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953060106"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "MSIS code validation (macos-latest)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953060046"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "C/C++ build (MinGW) (ON)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953109252"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "C/C++ build (MinGW) (OFF)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953109314"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "C/C++ build (MSVC) (ON, ON)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953109299"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "C/C++ build (MSVC) (ON, OFF)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953109282"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "C/C++ build (MSVC) (OFF, ON)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953109350"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "C/C++ build (MSVC) (OFF, OFF)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953109323"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "C/C++ build (Linux) (ubuntu-24.04, ON, ON, OFF, ON)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953125854"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "C/C++ build (Linux) (ubuntu-24.04, ON, OFF, OFF, ON)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953125742"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "C/C++ build (Linux) (ubuntu-24.04, OFF, ON, OFF, ON)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953125739"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "C/C++ build (Linux) (ubuntu-24.04, OFF, OFF, OFF, ON)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953125773"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "C/C++ build (Linux) (ubuntu-22.04, OFF, OFF, ON, OFF)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953125748"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "C/C++ build (MacOSX)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953125687"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "Matlab S-Function (macos-14)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105954153153"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "Matlab S-Function (ubuntu-22.04)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105954153157"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "Matlab S-Function (windows-latest)",
+                        "status": "IN_PROGRESS",
+                        "conclusion": null,
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105954153149"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "Build Python Module from Source (ubuntu-latest)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953828372"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "Build Python Module from Source (macos-latest)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953828412"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "Build Python Module from Source (windows-latest)",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105953828446"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "Build Python wheels",
+                        "status": "COMPLETED",
+                        "conclusion": "SKIPPED",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/actions/runs/35464108481/job/105954154112"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "CodeQL",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://github.com/JSBSim-Team/jsbsim/runs/105953218364"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "codecov/patch",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://app.codecov.io/gh/JSBSim-Team/jsbsim/pull/1502"
+                      },
+                      {
+                        "__typename": "CheckRun",
+                        "name": "codecov/project",
+                        "status": "COMPLETED",
+                        "conclusion": "SUCCESS",
+                        "detailsUrl": "https://app.codecov.io/gh/JSBSim-Team/jsbsim/pull/1502"
+                      }
+                    ],
+                    "pageInfo": {
+                      "hasNextPage": false
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

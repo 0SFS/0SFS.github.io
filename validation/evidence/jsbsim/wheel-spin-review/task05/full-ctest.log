@@ -1,0 +1,163 @@
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/pr1502
+      Start 35: TestAeroFuncFrame
+      Start 32: TestEngineIndexedProps
+      Start 12: CheckScripts
+      Start  4: TestModelLoading
+      Start  3: RunCheckCases
+      Start 11: TestInitialConditions
+      Start  5: TestActuator
+      Start 10: TestInputSocket
+ 1/79 Test #11: TestInitialConditions ..............   Passed    1.96 sec
+      Start 33: TestExternalReactions
+ 2/79 Test  #3: RunCheckCases ......................   Passed    2.22 sec
+      Start 29: TestAeroFuncOutput
+ 3/79 Test  #5: TestActuator .......................   Passed    2.28 sec
+      Start 17: TestPythonDefaultLoggerFiltering
+ 4/79 Test #10: TestInputSocket ....................   Passed    2.86 sec
+      Start 23: TestHoldDown
+ 5/79 Test  #4: TestModelLoading ...................   Passed    2.88 sec
+      Start 15: TestAccelerometer
+ 6/79 Test #33: TestExternalReactions ..............   Passed    1.20 sec
+      Start 16: CheckDebugLvl
+ 7/79 Test #17: TestPythonDefaultLoggerFiltering ...   Passed    1.04 sec
+      Start  7: TestPointMassInertia
+ 8/79 Test #29: TestAeroFuncOutput .................   Passed    1.30 sec
+      Start  9: TestFuelTanksInertia
+ 9/79 Test #23: TestHoldDown .......................   Passed    0.84 sec
+      Start 31: TestTurboProp
+10/79 Test #15: TestAccelerometer ..................   Passed    0.94 sec
+      Start 34: TestTurbine
+11/79 Test #16: CheckDebugLvl ......................   Passed    0.77 sec
+      Start  6: TestGustReset
+12/79 Test  #7: TestPointMassInertia ...............   Passed    0.71 sec
+      Start 13: CheckAircrafts
+13/79 Test  #9: TestFuelTanksInertia ...............   Passed    0.60 sec
+      Start 58: TestPQRdot
+14/79 Test #31: TestTurboProp ......................   Passed    0.57 sec
+      Start 52: TestLinearization
+15/79 Test #34: TestTurbine ........................   Passed    0.58 sec
+      Start 21: TestScriptOutput
+16/79 Test  #6: TestGustReset ......................   Passed    0.57 sec
+      Start 22: CheckSimTimeReset
+17/79 Test #13: CheckAircrafts .....................   Passed    0.53 sec
+      Start 19: TestCosineGust
+18/79 Test #58: TestPQRdot .........................   Passed    0.51 sec
+      Start  1: ResetOutputFiles
+19/79 Test #52: TestLinearization ..................   Passed    0.42 sec
+      Start 20: TestTurbulenceGustStop
+20/79 Test #21: TestScriptOutput ...................   Passed    0.44 sec
+      Start 51: TestMagnetometer
+21/79 Test #22: CheckSimTimeReset ..................   Passed    0.35 sec
+      Start 49: TestFunctions
+22/79 Test #19: TestCosineGust .....................   Passed    0.35 sec
+      Start 14: CheckOutputRate
+23/79 Test  #1: ResetOutputFiles ...................   Passed    0.38 sec
+      Start 41: TestMiscellaneous
+24/79 Test #20: TestTurbulenceGustStop .............   Passed    0.37 sec
+      Start 27: TestSuspend
+25/79 Test #49: TestFunctions ......................   Passed    0.36 sec
+      Start 24: CheckTrim
+26/79 Test #51: TestMagnetometer ...................   Passed    0.36 sec
+      Start 28: TestLGearSteer
+27/79 Test #14: CheckOutputRate ....................   Passed    0.36 sec
+      Start 46: TestGain
+28/79 Test #41: TestMiscellaneous ..................   Passed    0.38 sec
+      Start 18: TestTurbulenceRandomSeed
+29/79 Test #27: TestSuspend ........................   Passed    0.38 sec
+      Start 40: TestStdAtmosphere
+30/79 Test #24: CheckTrim ..........................   Passed    0.39 sec
+      Start 50: TestDistributor
+31/79 Test #28: TestLGearSteer .....................   Passed    0.42 sec
+      Start  8: CheckMomentsUpdate
+32/79 Test #46: TestGain ...........................   Passed    0.36 sec
+      Start 48: TestFilter
+33/79 Test #18: TestTurbulenceRandomSeed ...........   Passed    0.36 sec
+      Start 45: TestSwitch
+34/79 Test #40: TestStdAtmosphere ..................   Passed    0.39 sec
+      Start 54: TestPlanet
+35/79 Test #50: TestDistributor ....................   Passed    0.35 sec
+      Start 30: TestKinematic
+36/79 Test  #8: CheckMomentsUpdate .................   Passed    0.32 sec
+      Start 36: TestTemplateFunctions
+37/79 Test #48: TestFilter .........................   Passed    0.35 sec
+      Start 25: TestChannelRate
+38/79 Test #45: TestSwitch .........................   Passed    0.36 sec
+      Start  2: TestICOverride
+39/79 Test #54: TestPlanet .........................   Passed    0.34 sec
+      Start 26: TestWaypoint
+40/79 Test #25: TestChannelRate ....................   Passed    0.32 sec
+      Start 38: TestPressureAltitude
+41/79 Test #30: TestKinematic ......................   Passed    0.36 sec
+      Start 55: TestLighterThanAir
+42/79 Test #36: TestTemplateFunctions ..............   Passed    0.37 sec
+      Start 42: TestGndReactions
+43/79 Test  #2: TestICOverride .....................   Passed    0.30 sec
+      Start 44: TestIntegrators
+44/79 Test #26: TestWaypoint .......................   Passed    0.30 sec
+      Start 47: TestDeadBand
+45/79 Test #38: TestPressureAltitude ...............   Passed    0.29 sec
+      Start 57: TestSensorRandomSeed
+46/79 Test #55: TestLighterThanAir .................   Passed    0.33 sec
+      Start 37: TestDensityAltitude
+47/79 Test #42: TestGndReactions ...................   Passed    0.32 sec
+      Start 56: TestUnusableFuel
+48/79 Test #44: TestIntegrators ....................   Passed    0.31 sec
+      Start 53: TestLinearActuator
+49/79 Test #47: TestDeadBand .......................   Passed    0.32 sec
+      Start 39: test_fpectl
+50/79 Test #57: TestSensorRandomSeed ...............   Passed    0.30 sec
+      Start 66: FGInitialConditionTest1
+51/79 Test #37: TestDensityAltitude ................   Passed    0.29 sec
+      Start 43: TestWheelSpin
+52/79 Test #56: TestUnusableFuel ...................   Passed    0.28 sec
+      Start 75: FGAtmosphereTest1
+53/79 Test #75: FGAtmosphereTest1 ..................   Passed    0.01 sec
+      Start 77: FGMSISTest1
+54/79 Test #77: FGMSISTest1 ........................   Passed    0.01 sec
+      Start 65: FGGroundCallbackTest1
+55/79 Test #65: FGGroundCallbackTest1 ..............   Passed    0.01 sec
+      Start 76: FGAuxiliaryTest1
+56/79 Test #76: FGAuxiliaryTest1 ...................   Passed    0.01 sec
+      Start 67: FGInertialTest1
+57/79 Test #67: FGInertialTest1 ....................   Passed    0.01 sec
+      Start 69: FGTableTest1
+58/79 Test #69: FGTableTest1 .......................   Passed    0.01 sec
+      Start 73: FGConditionTest1
+59/79 Test #73: FGConditionTest1 ...................   Passed    0.01 sec
+      Start 72: FGParameterValueTest1
+60/79 Test #72: FGParameterValueTest1 ..............   Passed    0.01 sec
+      Start 64: FGLocationTest1
+61/79 Test #64: FGLocationTest1 ....................   Passed    0.00 sec
+      Start 78: FGLogTest1
+62/79 Test #78: FGLogTest1 .........................   Passed    0.00 sec
+      Start 60: StringUtilitiesTest1
+63/79 Test #60: StringUtilitiesTest1 ...............   Passed    0.00 sec
+      Start 68: FGPropertyValueTest1
+64/79 Test #68: FGPropertyValueTest1 ...............   Passed    0.00 sec
+      Start 62: FGMatrix33Test1
+65/79 Test #62: FGMatrix33Test1 ....................   Passed    0.00 sec
+      Start 59: FGColumnVector3Test1
+66/79 Test #59: FGColumnVector3Test1 ...............   Passed    0.00 sec
+      Start 61: FGJSBBaseTest1
+67/79 Test #61: FGJSBBaseTest1 .....................   Passed    0.00 sec
+      Start 71: FGParameterTest1
+68/79 Test #71: FGParameterTest1 ...................   Passed    0.00 sec
+      Start 74: FGPropertyManagerTest1
+69/79 Test #74: FGPropertyManagerTest1 .............   Passed    0.00 sec
+      Start 70: FGRealValueTest1
+70/79 Test #53: TestLinearActuator .................   Passed    0.29 sec
+      Start 63: FGQuaternionTest1
+71/79 Test #70: FGRealValueTest1 ...................   Passed    0.00 sec
+      Start 79: FGAccelerationsTest1
+72/79 Test #63: FGQuaternionTest1 ..................   Passed    0.00 sec
+73/79 Test #79: FGAccelerationsTest1 ...............   Passed    0.01 sec
+74/79 Test #66: FGInitialConditionTest1 ............   Passed    0.15 sec
+75/79 Test #39: test_fpectl ........................   Passed    0.28 sec
+76/79 Test #43: TestWheelSpin ......................   Passed    0.35 sec
+77/79 Test #12: CheckScripts .......................   Passed    9.77 sec
+78/79 Test #32: TestEngineIndexedProps .............   Passed   10.51 sec
+79/79 Test #35: TestAeroFuncFrame ..................   Passed   10.78 sec
+
+100% tests passed out of 79
+
+Total Test time (real) =  10.79 sec

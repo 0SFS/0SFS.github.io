@@ -1,0 +1,156 @@
+{
+  "started_at_utc": "2026-09-19T19:32:51.772349+00:00",
+  "head": "499c38326bb6f39b6360bd82d74c5c00e64faeaf",
+  "approved_public_text_sha256": "f1c202c348729b84485b850fe057f6c3b758dec68ac06586e68d72a13d9414e0",
+  "status": "posted_and_verified",
+  "actions": [
+    {
+      "operation": "update_pr_body",
+      "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502",
+      "verified": true
+    },
+    {
+      "operation": "edit",
+      "root_comment": 4047612197,
+      "comment_id": 4054390239,
+      "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054390239",
+      "verified": true
+    },
+    {
+      "operation": "edit",
+      "root_comment": 4047622267,
+      "comment_id": 4054391888,
+      "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054391888",
+      "verified": true
+    },
+    {
+      "operation": "keep",
+      "root_comment": 4047586942,
+      "comment_id": 4054389590,
+      "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054389590"
+    },
+    {
+      "operation": "reply",
+      "root_comment": 4047828797,
+      "comment_id": 4054406587,
+      "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054406587",
+      "verified": true
+    },
+    {
+      "operation": "reply",
+      "root_comment": 4047650299,
+      "comment_id": 4054406714,
+      "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054406714",
+      "verified": true
+    },
+    {
+      "operation": "reply",
+      "root_comment": 4047682190,
+      "comment_id": 4054406814,
+      "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054406814",
+      "verified": true
+    },
+    {
+      "operation": "reply",
+      "root_comment": 4047708987,
+      "comment_id": 4054406913,
+      "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054406913",
+      "verified": true
+    },
+    {
+      "operation": "reply",
+      "root_comment": 4047742902,
+      "comment_id": 4054407051,
+      "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054407051",
+      "verified": true
+    },
+    {
+      "operation": "reply",
+      "root_comment": 4047795134,
+      "comment_id": 4054407218,
+      "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054407218",
+      "verified": true
+    },
+    {
+      "operation": "round_comment",
+      "comment_id": 5744732853,
+      "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#issuecomment-5744732853",
+      "verified": true
+    }
+  ],
+  "posted_at_utc": "2026-09-19T19:33:17.061043+00:00",
+  "verified_at_utc": "2026-09-19T19:34:04.582914+00:00",
+  "replies_verified": [
+    {
+      "root_comment": 4047586942,
+      "reply_id": 4054389590,
+      "reply_url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054389590",
+      "body_matches": true,
+      "parent_matches": true
+    },
+    {
+      "root_comment": 4047828797,
+      "reply_id": 4054406587,
+      "reply_url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054406587",
+      "body_matches": true,
+      "parent_matches": true
+    },
+    {
+      "root_comment": 4047612197,
+      "reply_id": 4054390239,
+      "reply_url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054390239",
+      "body_matches": true,
+      "parent_matches": true
+    },
+    {
+      "root_comment": 4047622267,
+      "reply_id": 4054391888,
+      "reply_url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054391888",
+      "body_matches": true,
+      "parent_matches": true
+    },
+    {
+      "root_comment": 4047650299,
+      "reply_id": 4054406714,
+      "reply_url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054406714",
+      "body_matches": true,
+      "parent_matches": true
+    },
+    {
+      "root_comment": 4047682190,
+      "reply_id": 4054406814,
+      "reply_url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054406814",
+      "body_matches": true,
+      "parent_matches": true
+    },
+    {
+      "root_comment": 4047708987,
+      "reply_id": 4054406913,
+      "reply_url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054406913",
+      "body_matches": true,
+      "parent_matches": true
+    },
+    {
+      "root_comment": 4047742902,
+      "reply_id": 4054407051,
+      "reply_url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054407051",
+      "body_matches": true,
+      "parent_matches": true
+    },
+    {
+      "root_comment": 4047795134,
+      "reply_id": 4054407218,
+      "reply_url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4054407218",
+      "body_matches": true,
+      "parent_matches": true
+    }
+  ],
+  "round_comment_url": "https://github.com/JSBSim-Team/jsbsim/pull/1502#issuecomment-5744732853",
+  "pr_body_verified": true,
+  "threads_left_unresolved": true,
+  "check_counts": {
+    "SUCCESS": 26,
+    "IN_PROGRESS": 1,
+    "SKIPPED": 1
+  }
+}

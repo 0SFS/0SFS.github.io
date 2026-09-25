@@ -1,0 +1,79 @@
+UpdateCTestConfiguration  from :/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502/DartConfiguration.tcl
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/pr1502
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 79
+    Start 79: FGAccelerationsTest1
+
+79: Test command: /Users/felg/gh/Felipegalind0/jsbsim/build/pr1502/tests/unit_tests/FGAccelerationsTest1
+79: Working Directory: /Users/felg/gh/Felipegalind0/jsbsim/build/pr1502/tests/unit_tests
+79: Test timeout computed to be: 10000000
+79: Running cxxtest tests (8 tests)
+79: 
+79:      JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 18 2026 23:14:37
+79:             [JSBSim-ML v2.0]
+79: 
+79: JSBSim startup beginning ...
+79: 
+79: .
+79: 
+79:      JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 18 2026 23:14:37
+79:             [JSBSim-ML v2.0]
+79: 
+79: JSBSim startup beginning ...
+79: 
+79: .
+79: 
+79:      JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 18 2026 23:14:37
+79:             [JSBSim-ML v2.0]
+79: 
+79: JSBSim startup beginning ...
+79: 
+79: .
+79: 
+79:      JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 18 2026 23:14:37
+79:             [JSBSim-ML v2.0]
+79: 
+79: JSBSim startup beginning ...
+79: 
+79: .
+79: 
+79:      JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 18 2026 23:14:37
+79:             [JSBSim-ML v2.0]
+79: 
+79: JSBSim startup beginning ...
+79: 
+79: .
+79: 
+79:      JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 18 2026 23:14:37
+79:             [JSBSim-ML v2.0]
+79: 
+79: JSBSim startup beginning ...
+79: 
+79: .
+79: 
+79:      JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 18 2026 23:14:37
+79:             [JSBSim-ML v2.0]
+79: 
+79: JSBSim startup beginning ...
+79: 
+79: .
+79: 
+79:      JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 18 2026 23:14:37
+79:             [JSBSim-ML v2.0]
+79: 
+79: JSBSim startup beginning ...
+79: 
+79: .OK!
+1/1 Test #79: FGAccelerationsTest1 .............   Passed    0.00 sec
+
+The following tests passed:
+	FGAccelerationsTest1
+
+100% tests passed out of 1
+
+Total Test time (real) =   0.00 sec

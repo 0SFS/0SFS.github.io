@@ -1,0 +1,53 @@
+source_commit 24e085bf81b5ef8bab8500ab9d416571753b93cc trace True
+binary base cf0a75a6998a8728608775c05907378f5eac5fa51931b4ce4e16e6bb2419d825
+binary candidate cf60e34559fbd7305b8064e7b6db140598805673039442bdeb86b68be20aab61
+binary probe 80a2f8f07eb239c486da1b5e21853ef39cc95865818d6071d8c97ca3587bcf22
+recorded base/probe hashes equal: True True
+script corpus hashes equal to recorded: True
+xml inputs 61 {'runscript': 58, 'output': 2, 'plotset': 1}
+outcomes base {('runscript', 0): 57, ('runscript', 1): 1, ('output', 255): 2, ('plotset', 255): 1} data files 102
+outcomes candidate {('runscript', 0): 57, ('runscript', 1): 1, ('output', 255): 2, ('plotset', 255): 1} data files 102
+outcomes probe {('runscript', 0): 57, ('runscript', 1): 1, ('output', 255): 2, ('plotset', 255): 1} data files 102
+  nonzero exit 737_cruise_steady_turn_simplex.xml runscript {'base': 1, 'candidate': 1, 'probe': 1} files {'base': ['review-trace.csv'], 'candidate': ['review-trace.csv'], 'probe': ['review-trace.csv']}
+  nonzero exit kml_output.xml output {'base': 255, 'candidate': 255, 'probe': 255} files {'base': [], 'candidate': [], 'probe': []}
+  nonzero exit plotfile.xml plotset {'base': 255, 'candidate': 255, 'probe': 255} files {'base': [], 'candidate': [], 'probe': []}
+  nonzero exit unitconversions.xml output {'base': 255, 'candidate': 255, 'probe': 255} files {'base': [], 'candidate': [], 'probe': []}
+candidate vs probe (this run): files compared 102 differing files 0 differing exits 0
+candidate vs probe (recorded): files compared 102 differing files 0 differing exits 0
+probe (this run) vs probe (recorded): files compared 102 differing files 0 differing exits 0
+base (this run) vs base (recorded): files compared 102 differing files 0 differing exits 0
+base vs candidate (this run): files compared 102 differing files 60 differing exits 0
+base vs candidate: scripts with changed files 31 of which exit 0 31
+  B737_Runway.xml              rows 12003    diff rows 12002    first t 0.0083333  max|du| 2.48e-09   max|Fx| 0.000198
+  B747_script1.xml             rows 84003    diff rows 83947    first t 0.4499982  max|du| 4.49e-11   max|Fx| 5.32e-09
+  Concorde_rotate_test.xml     rows 12002    diff rows 12000    first t 0          max|du| 6.82e-13   max|Fx| 7.49e-10
+  Concorde_runway_test.xml     rows 10802    diff rows 10789    first t 0          max|du| 3.33e-16   max|Fx| 1.68e-10
+  F4N_runway_test.xml          rows 10802    diff rows 10802    first t 0          max|du| 4.39e-08   max|Fx| 0.0058
+  L410.xml                     rows 10002    diff rows 9957     first t 0          max|du| 4.86e-17   max|Fx| 6.76e-12
+  L4102.xml                    rows 10002    diff rows 10000    first t 0          max|du| 8.92e-09   max|Fx| 0.000307
+  Short_S23_1.xml              rows 192002   diff rows 48       first t 0          max|du| 0          max|Fx| 2.39e-12
+  T37.xml                      rows 12002    diff rows 11950    first t 0.43333316 max|du| 5.34e-12   max|Fx| 1.56e-11
+  T38.xml                      rows 12002    diff rows 11952    first t 0.4166665  max|du| 1.76e-09   max|Fx| 1.02e-05
+  Test_F450_Launch.xml         rows 15002    diff rows 15000    first t 0.004      max|du| 3.54e-13   max|Fx| 9.37e-17
+  ZLT-NT-moored-1.xml          rows 230402   diff rows 220465   first t 0.0062500002 max|du| 9.75e-05   max|Fx| 67.3
+  ah1s_flight_test.xml         rows 373349   diff rows 373349   first t 0          max|du| 5.54e-08   max|Fx| 5.31e-05
+  b171.xml                     rows 2402     diff rows 2402     first t 0          max|du| 1.4e-16    max|Fx| 1.55e-11
+  b737_runway_new.xml          rows 10802    diff rows 10801    first t 0.00833333 max|du| 1.11e-16   max|Fx| 2.64e-11
+  c1721.xml                    rows 1203     diff rows 1203     first t 0          max|du| 5.38e-17   max|Fx| 3.04e-13
+  c1723.xml                    rows 24002    diff rows 23994    first t 0          max|du| 0.00252    max|Fx| 3.76e-06
+  c1724.xml                    rows 2402     diff rows 2402     first t 0          max|du| 6.91e-15   max|Fx| 4.67e-11
+  c172_cross_wind.xml          rows 3003     diff rows 3003     first t 0          max|du| 0.054      max|Fx| 197
+  c172_elevation_test.xml      rows 36001    diff rows 36001    first t 0          max|du| 5.51e-07   max|Fx| 6.68e-06
+  c172_head_wind.xml           rows 3003     diff rows 3003     first t 0          max|du| 4.57e-17   max|Fx| 2.7e-13
+  c172_runway_at_rest_cg_shift.xml rows 603      diff rows 602      first t 0.008333   max|du| 1.31e-14   max|Fx| 6.78e-11
+  c3101.xml                    rows 16802    diff rows 16761    first t 0.34166653 max|du| 5.55e-09   max|Fx| 4.21e-06
+  c3104.xml                    rows 94927    diff rows 755      first t 1.28       max|du| 6.22e-15   max|Fx| 2.73e-12
+  c3105.xml                    rows 269777   diff rows 2061     first t 1.274999949 max|du| 8.88e-16   max|Fx| 1.24e-13
+  f16_runway_test.xml          rows 9602     diff rows 9602     first t 0          max|du| 1.11e-16   max|Fx| 1.29e-11
+  f16_test.xml                 rows 84003    diff rows 84003    first t 0          max|du| 71.6       max|Fx| 1.79e+05
+  ov10_runway.xml              rows 10802    diff rows 10798    first t 0.00833333 max|du| 4.85e-08   max|Fx| 0.00223
+  p51_start_test.xml           rows 12002    diff rows 12002    first t 0          max|du| 5.65e-07   max|Fx| 0.0164
+  p51d_tail_wind.xml           rows 3603     diff rows 3603     first t 0          max|du| 1.46e-13   max|Fx| 2.14e-09
+  sim_primer.xml               rows 12003    diff rows 12003    first t 0          max|du| 1.7e-07    max|Fx| 0.00375
+base vs candidate: shape mismatches 0 nonfinite mismatches 0 header diffs 0 text mismatches 1
+base-vs-candidate changed scripts == recorded base-vs-probe changed scripts: True 31

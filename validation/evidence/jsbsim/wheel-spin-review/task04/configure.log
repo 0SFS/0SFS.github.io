@@ -1,0 +1,5 @@
+-- Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE) 
+-- Could NOT find Doxygen (missing: DOXYGEN_EXECUTABLE) 
+-- Configuring done (1.2s)
+-- Generating done (0.1s)
+-- Build files have been written to: /Users/felg/gh/Felipegalind0/jsbsim/build/pr1502

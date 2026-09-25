@@ -1,0 +1,79 @@
+UpdateCTestConfiguration  from :/Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-cxx/DartConfiguration.tcl
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-cxx
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 21
+    Start 21: FGAccelerationsTest1
+
+21: Test command: /Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-cxx/tests/unit_tests/FGAccelerationsTest1
+21: Working Directory: /Users/felg/gh/Felipegalind0/jsbsim/build/pr1502-cxx/tests/unit_tests
+21: Test timeout computed to be: 10000000
+21: Running cxxtest tests (8 tests)
+21: 
+21:      JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 19 2026 01:44:27
+21:             [JSBSim-ML v2.0]
+21: 
+21: JSBSim startup beginning ...
+21: 
+21: .
+21: 
+21:      JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 19 2026 01:44:27
+21:             [JSBSim-ML v2.0]
+21: 
+21: JSBSim startup beginning ...
+21: 
+21: .
+21: 
+21:      JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 19 2026 01:44:27
+21:             [JSBSim-ML v2.0]
+21: 
+21: JSBSim startup beginning ...
+21: 
+21: .
+21: 
+21:      JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 19 2026 01:44:27
+21:             [JSBSim-ML v2.0]
+21: 
+21: JSBSim startup beginning ...
+21: 
+21: .
+21: 
+21:      JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 19 2026 01:44:27
+21:             [JSBSim-ML v2.0]
+21: 
+21: JSBSim startup beginning ...
+21: 
+21: .
+21: 
+21:      JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 19 2026 01:44:27
+21:             [JSBSim-ML v2.0]
+21: 
+21: JSBSim startup beginning ...
+21: 
+21: .
+21: 
+21:      JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 19 2026 01:44:27
+21:             [JSBSim-ML v2.0]
+21: 
+21: JSBSim startup beginning ...
+21: 
+21: .
+21: 
+21:      JSBSim Flight Dynamics Model v1.3.2.dev1 Sep 19 2026 01:44:27
+21:             [JSBSim-ML v2.0]
+21: 
+21: JSBSim startup beginning ...
+21: 
+21: .OK!
+1/1 Test #21: FGAccelerationsTest1 .............   Passed    0.00 sec
+
+The following tests passed:
+	FGAccelerationsTest1
+
+100% tests passed out of 1
+
+Total Test time (real) =   0.01 sec

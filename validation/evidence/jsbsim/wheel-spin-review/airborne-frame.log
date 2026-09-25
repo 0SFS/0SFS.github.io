@@ -1,0 +1,13 @@
+{
+  "before": {
+    "q": 0.4,
+    "internal_rate": -0.4,
+    "relative_rate": 0.0
+  },
+  "after_one_step": {
+    "q": 0.4000000074950578,
+    "internal_rate": -0.0,
+    "relative_rate": 0.4000000074950578,
+    "wow": 0.0
+  }
+}
