@@ -1,0 +1,39 @@
+{
+  "stage": "Stage 0 of the turbine initialization plan: PR #1505 off-engine repair",
+  "reviewed": "2026-09-19, accepted by the user",
+  "commit": {
+    "sha": "6f95bfb0a590d1a45de9f883857c17af0819f6ad",
+    "branch": "fix/turbine-trim-spool",
+    "parent": "07eba55fcd6fed530f6f404e857765c3224541fb",
+    "tree": "94d10e1d20e07ee2f37e68168b1c54f0f5be6173",
+    "subject": "Preserve off-engine spool state during turbine trim",
+    "author": "Felipegalind0 <Felipegalind0@outlook.com>",
+    "date": "Sat Sep 19 17:11:55 2026 -0500",
+    "files": {
+      "src/models/propulsion/FGTurbine.cpp": {
+        "blob": "096b372644060d68d9c17c5bc7a0065c8f95ce4c",
+        "sha256": "0a79048f0d5c6e8768a005226af6e741169f258696ea24ff6a563df44db8adfb"
+      },
+      "tests/TestTurbineTrimSpool.py": {
+        "blob": "e055c62caa5a8bc974cce5530bbbbf4f3ad6fb07",
+        "sha256": "ba7f4fb1ae4f1d836410b5309181199264db87649df182a3621d7e85291e97d3"
+      }
+    },
+    "pushed": false,
+    "published_pr_head": "07eba55fcd6fed530f6f404e857765c3224541fb",
+    "note": "Local commit only. The PR head is unchanged; nothing was pushed."
+  },
+  "post_review_change": {
+    "what": "Comment wording only: the claim that every zero-time evaluation reaches Trim() was too broad, because starvation, stall and seizure override the tpTrim selection.",
+    "diff": "post-review-comment-only.diff",
+    "tested_source_sha256": "90811fe17e163fdbf92805cc4d27bfaf1107246746f29c2aac7a15117ac36739",
+    "committed_source_sha256": "0a79048f0d5c6e8768a005226af6e741169f258696ea24ff6a563df44db8adfb",
+    "non_comment_lines_changed": 0,
+    "code_sha256_comments_stripped": "33dff8a24cb81a2477e9fa1bd665635b04d3af407fef72d7c4715996dc3e5f0e",
+    "code_identical_to_tested": true,
+    "retested": false,
+    "why_not_retested": "The committed code is byte-identical to the tested code once comments are stripped, so the recorded before/after results still apply. The reviewer waived a rerun for a comment-only correction.",
+    "tested_extension_sha256": "696c54ec7eed21c96c26ee45575c5df16d047a7396aad7de3b16a4bbba8aacf8"
+  },
+  "unchanged_records": "provenance.json, candidate.patch and every log in this directory describe the tested working tree and are left as they were."
+}

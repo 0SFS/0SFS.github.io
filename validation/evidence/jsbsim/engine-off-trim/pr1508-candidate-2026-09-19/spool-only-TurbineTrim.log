@@ -1,0 +1,228 @@
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/spool-only
+    Start 35: TestTurbineTrimSpool
+1/2 Test #35: TestTurbineTrimSpool .............***Failed    0.20 sec
+test_zero_time_trim_preserves_never_started_spools (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_never_started_spools) ... FAIL
+test_zero_time_trim_preserves_residual_spin_after_cutoff (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_residual_spin_after_cutoff) ... FAIL
+test_zero_time_trim_updates_both_spools (__main__.TestTurbineTrimSpool.test_zero_time_trim_updates_both_spools) ... ok
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_never_started_spools (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_never_started_spools)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimSpool.py", line 127, in test_zero_time_trim_preserves_never_started_spools
+    self.assert_stays_off(fdm)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimSpool.py", line 110, in assert_stays_off
+    self.assertEqual(fdm[ENGINE + "fuel-flow-rate-pps"], 0.0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 13.323485924466473 != 0.0
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_residual_spin_after_cutoff (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_residual_spin_after_cutoff)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimSpool.py", line 149, in test_zero_time_trim_preserves_residual_spin_after_cutoff
+    self.assert_stays_off(fdm)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimSpool.py", line 110, in assert_stays_off
+    self.assertEqual(fdm[ENGINE + "fuel-flow-rate-pps"], 0.0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 13.323485924466473 != 0.0
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.019s
+
+FAILED (failures=2)
+
+    Start 36: TestTurbineTrimFuelFlow
+2/2 Test #36: TestTurbineTrimFuelFlow ..........***Failed    0.23 sec
+test_trim_fuel_flow_does_not_retain_the_previous_setting (__main__.TestTurbineTrimFuelFlow.test_trim_fuel_flow_does_not_retain_the_previous_setting) ... ok
+test_trim_fuel_flow_needs_no_seeking (__main__.TestTurbineTrimFuelFlow.test_trim_fuel_flow_needs_no_seeking) ... ok
+test_trim_reports_the_tsfc_of_its_own_operating_point (__main__.TestTurbineTrimFuelFlow.test_trim_reports_the_tsfc_of_its_own_operating_point) ... ok
+test_zero_time_trim_preserves_fuel_state_after_cutoff (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_fuel_state_after_cutoff) ... 
+  test_zero_time_trim_preserves_fuel_state_after_cutoff (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_fuel_state_after_cutoff) (property='fuel-flow-rate-pps', command=0.35) ... FAIL
+  test_zero_time_trim_preserves_fuel_state_after_cutoff (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_fuel_state_after_cutoff) (property='fuel-flow-rate-gph', command=0.35) ... FAIL
+  test_zero_time_trim_preserves_fuel_state_after_cutoff (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_fuel_state_after_cutoff) (property='tsfc', command=0.35) ... FAIL
+  test_zero_time_trim_preserves_fuel_state_after_cutoff (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_fuel_state_after_cutoff) (property='fuel-flow-rate-pps', command=1.0) ... FAIL
+  test_zero_time_trim_preserves_fuel_state_after_cutoff (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_fuel_state_after_cutoff) (property='fuel-flow-rate-gph', command=1.0) ... FAIL
+  test_zero_time_trim_preserves_fuel_state_after_cutoff (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_fuel_state_after_cutoff) (property='tsfc', command=1.0) ... FAIL
+test_zero_time_trim_preserves_fuel_state_after_cutoff (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_fuel_state_after_cutoff) ... FAIL
+test_zero_time_trim_preserves_never_started_fuel_state (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_never_started_fuel_state) ... 
+  test_zero_time_trim_preserves_never_started_fuel_state (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_never_started_fuel_state) (property='fuel-flow-rate-pps', command=0.35) ... FAIL
+  test_zero_time_trim_preserves_never_started_fuel_state (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_never_started_fuel_state) (property='fuel-flow-rate-gph', command=0.35) ... FAIL
+  test_zero_time_trim_preserves_never_started_fuel_state (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_never_started_fuel_state) (property='tsfc', command=0.35) ... FAIL
+  test_zero_time_trim_preserves_never_started_fuel_state (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_never_started_fuel_state) (property='fuel-flow-rate-pps', command=1.0) ... FAIL
+  test_zero_time_trim_preserves_never_started_fuel_state (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_never_started_fuel_state) (property='fuel-flow-rate-gph', command=1.0) ... FAIL
+  test_zero_time_trim_preserves_never_started_fuel_state (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_never_started_fuel_state) (property='tsfc', command=1.0) ... FAIL
+test_zero_time_trim_preserves_never_started_fuel_state (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_never_started_fuel_state) ... FAIL
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_fuel_state_after_cutoff (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_fuel_state_after_cutoff) (property='fuel-flow-rate-pps', command=0.35)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimFuelFlow.py", line 103, in assert_run_ic_preserves_off_fuel_state
+    self.assertAlmostEqual(after[name], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2.0209790642434604 != 0.0 within 1e-09 delta (2.0209790642434604 difference)
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_fuel_state_after_cutoff (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_fuel_state_after_cutoff) (property='fuel-flow-rate-gph', command=0.35)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimFuelFlow.py", line 103, in assert_run_ic_preserves_off_fuel_state
+    self.assertAlmostEqual(after[name], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1102.3522168600693 != 0.0 within 1e-09 delta (1102.3522168600693 difference)
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_fuel_state_after_cutoff (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_fuel_state_after_cutoff) (property='tsfc', command=0.35)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimFuelFlow.py", line 103, in assert_run_ic_preserves_off_fuel_state
+    self.assertAlmostEqual(after[name], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.7939384189678486 != 0.7939385632805157 within 1e-09 delta (1.4431266714964863e-07 difference)
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_fuel_state_after_cutoff (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_fuel_state_after_cutoff) (property='fuel-flow-rate-pps', command=1.0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimFuelFlow.py", line 103, in assert_run_ic_preserves_off_fuel_state
+    self.assertAlmostEqual(after[name], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: 16.512239472416365 != 2.0209790642434604 within 1e-09 delta (14.491260408172904 difference)
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_fuel_state_after_cutoff (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_fuel_state_after_cutoff) (property='fuel-flow-rate-gph', command=1.0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimFuelFlow.py", line 103, in assert_run_ic_preserves_off_fuel_state
+    self.assertAlmostEqual(after[name], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: 9006.676075863472 != 1102.3522168600693 within 1e-09 delta (7904.3238590034025 difference)
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_fuel_state_after_cutoff (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_fuel_state_after_cutoff) (property='tsfc', command=1.0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimFuelFlow.py", line 103, in assert_run_ic_preserves_off_fuel_state
+    self.assertAlmostEqual(after[name], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.7171056687451535 != 0.7939384189678486 within 1e-09 delta (0.07683275022269509 difference)
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_fuel_state_after_cutoff (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_fuel_state_after_cutoff)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimFuelFlow.py", line 199, in test_zero_time_trim_preserves_fuel_state_after_cutoff
+    self.assert_burns_no_fuel(fdm)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimFuelFlow.py", line 110, in assert_burns_no_fuel
+    self.assertEqual(fdm[FUEL_FLOW], 0.0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 9006.676075863472 != 0.0
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_never_started_fuel_state (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_never_started_fuel_state) (property='fuel-flow-rate-pps', command=0.35)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimFuelFlow.py", line 103, in assert_run_ic_preserves_off_fuel_state
+    self.assertAlmostEqual(after[name], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2.0209790642434604 != 0.0 within 1e-09 delta (2.0209790642434604 difference)
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_never_started_fuel_state (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_never_started_fuel_state) (property='fuel-flow-rate-gph', command=0.35)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimFuelFlow.py", line 103, in assert_run_ic_preserves_off_fuel_state
+    self.assertAlmostEqual(after[name], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1102.3522168600693 != 0.0 within 1e-09 delta (1102.3522168600693 difference)
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_never_started_fuel_state (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_never_started_fuel_state) (property='tsfc', command=0.35)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimFuelFlow.py", line 103, in assert_run_ic_preserves_off_fuel_state
+    self.assertAlmostEqual(after[name], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.7939384189678486 != 1.6981973999620525 within 1e-09 delta (0.904258980994204 difference)
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_never_started_fuel_state (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_never_started_fuel_state) (property='fuel-flow-rate-pps', command=1.0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimFuelFlow.py", line 103, in assert_run_ic_preserves_off_fuel_state
+    self.assertAlmostEqual(after[name], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: 16.512239472416365 != 2.0209790642434604 within 1e-09 delta (14.491260408172904 difference)
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_never_started_fuel_state (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_never_started_fuel_state) (property='fuel-flow-rate-gph', command=1.0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimFuelFlow.py", line 103, in assert_run_ic_preserves_off_fuel_state
+    self.assertAlmostEqual(after[name], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: 9006.676075863472 != 1102.3522168600693 within 1e-09 delta (7904.3238590034025 difference)
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_never_started_fuel_state (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_never_started_fuel_state) (property='tsfc', command=1.0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimFuelFlow.py", line 103, in assert_run_ic_preserves_off_fuel_state
+    self.assertAlmostEqual(after[name], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.7171056687451535 != 0.7939384189678486 within 1e-09 delta (0.07683275022269509 difference)
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_never_started_fuel_state (__main__.TestTurbineTrimFuelFlow.test_zero_time_trim_preserves_never_started_fuel_state)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimFuelFlow.py", line 175, in test_zero_time_trim_preserves_never_started_fuel_state
+    self.assert_burns_no_fuel(fdm)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimFuelFlow.py", line 110, in assert_burns_no_fuel
+    self.assertEqual(fdm[FUEL_FLOW], 0.0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 9006.676075863472 != 0.0
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.045s
+
+FAILED (failures=14)
+
+
+0% tests passed, 2 tests failed out of 2
+
+Total Test time (real) =   0.43 sec
+
+The following tests FAILED:
+	 35 - TestTurbineTrimSpool (Failed)
+	 36 - TestTurbineTrimFuelFlow (Failed)
+Errors while running CTest

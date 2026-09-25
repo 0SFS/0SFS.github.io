@@ -1,0 +1,134 @@
+{
+  "recorded": "2026-09-19",
+  "stage": "2 - repair off-engine fuel state in the #1508 stack",
+  "jsbsim_checkout": "/Users/felg/gh/Felipegalind0/jsbsim",
+  "branch_at_start": "fix/turbine-trim-spool",
+  "head_at_start": "6f95bfb0a590d1a45de9f883857c17af0819f6ad",
+  "clean_at_start": true,
+  "candidate_branch": "candidate/pr1508-off-engine-fuel",
+  "refs": {
+    "upstream_base": "14c19022943f5850daf2c6b90554050b3139b853",
+    "pr1505_published": "07eba55fcd6fed530f6f404e857765c3224541fb",
+    "pr1505_repaired_local": "6f95bfb0a590d1a45de9f883857c17af0819f6ad",
+    "pr1508_published": "7511df10cda909c32dfc378dfde204eb44dc5a48",
+    "spool_only_control": "c803eeef9ae7479d450109266213b189da729af2",
+    "final_candidate": "8945b0e34ddc85df1d324dffbe39d0732b03197d"
+  },
+  "published_refs_unchanged": {
+    "origin/fix/turbine-trim-fuel-flow": "7511df10cda909c32dfc378dfde204eb44dc5a48",
+    "origin/fix/turbine-trim-spool": "07eba55fcd6fed530f6f404e857765c3224541fb",
+    "gh_pr_1508_headRefOid": "7511df10cda909c32dfc378dfde204eb44dc5a48",
+    "gh_pr_1508_state": "OPEN",
+    "gh_pr_1508_updatedAt": "2026-09-15T08:17:04Z"
+  },
+  "file_sha256": {
+    "upstream_base": {
+      "src/models/propulsion/FGTurbine.cpp": "5bccfd0244d62ae10fd1624b19c34731a257e83ec6ba01182832a2650c472609",
+      "tests/TestTurbineTrimFuelFlow.py": null,
+      "tests/TestTurbineTrimSpool.py": null,
+      "tests/CMakeLists.txt": "73602b067dc75f3ff373777dd75eef0768b49ea8ff7f4a9b0ca9b556d6560b6f"
+    },
+    "pr1505_published": {
+      "src/models/propulsion/FGTurbine.cpp": "e9cfc13113e4297543ee621eca3bc938714e69a162a1ace9d8061a8825665569",
+      "tests/TestTurbineTrimFuelFlow.py": null,
+      "tests/TestTurbineTrimSpool.py": "719f5b993c4e0803c91137eac41ea268b5d05dbe416661f2b54cba004403943f",
+      "tests/CMakeLists.txt": "bf3f919060a6ea61f42800bf86650c1398b64aafc16981369412401270c4d22f"
+    },
+    "pr1505_repaired_local": {
+      "src/models/propulsion/FGTurbine.cpp": "0a79048f0d5c6e8768a005226af6e741169f258696ea24ff6a563df44db8adfb",
+      "tests/TestTurbineTrimFuelFlow.py": null,
+      "tests/TestTurbineTrimSpool.py": "ba7f4fb1ae4f1d836410b5309181199264db87649df182a3621d7e85291e97d3",
+      "tests/CMakeLists.txt": "bf3f919060a6ea61f42800bf86650c1398b64aafc16981369412401270c4d22f"
+    },
+    "pr1508_published": {
+      "src/models/propulsion/FGTurbine.cpp": "e277f9614d4a03771bfc727ca3fe0adfeeffc3626fe82bd0e3fd42de5921e353",
+      "tests/TestTurbineTrimFuelFlow.py": "20fb1c2cb085fcfe613253cd1fd332c6478fe0254a4e0e28d405713dd0f1ecd7",
+      "tests/TestTurbineTrimSpool.py": "719f5b993c4e0803c91137eac41ea268b5d05dbe416661f2b54cba004403943f",
+      "tests/CMakeLists.txt": "80a00147916c683c6d6f33cc07d05f093437e3bea0a1304021f9fd74aa38444a"
+    },
+    "spool_only_control": {
+      "src/models/propulsion/FGTurbine.cpp": "77aa93091234d86ee10006b5a423f4298f1a0617491cd8c73117c4fd143d7c6c",
+      "tests/TestTurbineTrimFuelFlow.py": "20fb1c2cb085fcfe613253cd1fd332c6478fe0254a4e0e28d405713dd0f1ecd7",
+      "tests/TestTurbineTrimSpool.py": "ba7f4fb1ae4f1d836410b5309181199264db87649df182a3621d7e85291e97d3",
+      "tests/CMakeLists.txt": "80a00147916c683c6d6f33cc07d05f093437e3bea0a1304021f9fd74aa38444a"
+    },
+    "final_candidate": {
+      "src/models/propulsion/FGTurbine.cpp": "32c87c0c7984dccdf72f0ed14d8e8846dbf1f0b97e3960709be980643f6c59ef",
+      "tests/TestTurbineTrimFuelFlow.py": "b323f9e3d58498b33e50a70e12faff7118cd0db2925ce5bd716dabccaf370c82",
+      "tests/TestTurbineTrimSpool.py": "ba7f4fb1ae4f1d836410b5309181199264db87649df182a3621d7e85291e97d3",
+      "tests/CMakeLists.txt": "80a00147916c683c6d6f33cc07d05f093437e3bea0a1304021f9fd74aa38444a"
+    }
+  },
+  "working_tree_sha256": {
+    "src/models/propulsion/FGTurbine.cpp": "32c87c0c7984dccdf72f0ed14d8e8846dbf1f0b97e3960709be980643f6c59ef",
+    "tests/TestTurbineTrimFuelFlow.py": "b323f9e3d58498b33e50a70e12faff7118cd0db2925ce5bd716dabccaf370c82",
+    "tests/TestTurbineTrimSpool.py": "ba7f4fb1ae4f1d836410b5309181199264db87649df182a3621d7e85291e97d3",
+    "tests/CMakeLists.txt": "80a00147916c683c6d6f33cc07d05f093437e3bea0a1304021f9fd74aa38444a"
+  },
+  "working_tree_clean_after_commit": true,
+  "toolchain": {
+    "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)",
+    "cmake": "cmake version 4.4.3",
+    "python": "3.14.7",
+    "cython": "3.3.0",
+    "platform": "Darwin 27.0.0 arm64",
+    "python_on_options": [
+      "CMAKE_BUILD_TYPE=Release",
+      "BUILD_DOCS=OFF",
+      "BUILD_SHARED_LIBS=OFF",
+      "BUILD_PYTHON_MODULE=ON",
+      "Python3_EXECUTABLE=<repo>/.venv/bin/python",
+      "CYTHON_EXECUTABLE=<repo>/.venv/bin/cython"
+    ],
+    "python_off_options": [
+      "CMAKE_BUILD_TYPE=Release",
+      "BUILD_DOCS=OFF",
+      "BUILD_SHARED_LIBS=OFF",
+      "BUILD_PYTHON_MODULE=OFF"
+    ]
+  },
+  "build_root": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919",
+  "builds": {
+    "original": {
+      "source_ref": "7511df10cda909c32dfc378dfde204eb44dc5a48",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/original/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "885d426fbd0327281c3044d7a7c52dfd4013707b3616c1f65cf726a6906edaef",
+      "extension_mtime": "2026-09-19T17:25:27"
+    },
+    "spool-only": {
+      "source_ref": "c803eeef9ae7479d450109266213b189da729af2",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/spool-only/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "b2b9aaee0ac71a58bbee2029c2af6205454eff151f570a75527e999c54baff45",
+      "extension_mtime": "2026-09-19T17:25:49"
+    },
+    "final": {
+      "source_ref": "8945b0e34ddc85df1d324dffbe39d0732b03197d",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/final/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "f739de7773b2144ca315a5e76705d36fcb08e3db4a9a6495c859951198a40779",
+      "extension_mtime": "2026-09-19T17:29:53"
+    },
+    "final-nopython": {
+      "source_ref": "8945b0e34ddc85df1d324dffbe39d0732b03197d",
+      "python_module": false,
+      "ctest_total": 21,
+      "ctest_passed": 21
+    }
+  },
+  "source_edit_mtimes": {
+    "src/models/propulsion/FGTurbine.cpp": "2026-09-19T17:29:28",
+    "tests/TestTurbineTrimFuelFlow.py": "2026-09-19T17:28:51"
+  },
+  "rebase_order_check": {
+    "what": "rebase 7511df10 onto the repaired #1505 (6f95bfb0) instead of cherry-picking 6f95bfb0 onto 7511df10",
+    "command": "git rebase --onto 6f95bfb0 07eba55f <branch at 7511df10>",
+    "conflicting_files": [
+      "src/models/propulsion/FGTurbine.cpp"
+    ],
+    "resolution": "the same two hunks, resolved identically to c803eeef",
+    "result_commit": "a6ceb2aaf9088d4a46dcf5c2b8693d0a6acc8ee7",
+    "result_tree": "b504bc5b263e68854c0c30417bd2c3768d8c2bc3",
+    "spool_only_control_tree": "b504bc5b263e68854c0c30417bd2c3768d8c2bc3",
+    "trees_identical": true,
+    "note": "verification only; the temporary branch was deleted and no published ref was rewritten"
+  }
+}

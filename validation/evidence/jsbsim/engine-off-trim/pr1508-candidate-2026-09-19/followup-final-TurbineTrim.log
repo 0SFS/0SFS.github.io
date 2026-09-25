@@ -1,0 +1,9 @@
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/final
+    Start 35: TestTurbineTrimSpool
+1/2 Test #35: TestTurbineTrimSpool .............   Passed    0.40 sec
+    Start 36: TestTurbineTrimFuelFlow
+2/2 Test #36: TestTurbineTrimFuelFlow ..........   Passed    0.47 sec
+
+100% tests passed out of 2
+
+Total Test time (real) =   0.88 sec

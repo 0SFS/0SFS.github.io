@@ -1,0 +1,3330 @@
+{
+  "source": "/Users/felg/gh/Felipegalind0/jsbsim",
+  "source_head": "c803eeef9ae7479d450109266213b189da729af2",
+  "source_status": [
+    " M src/models/propulsion/FGTurbine.cpp",
+    " M tests/TestTurbineTrimFuelFlow.py"
+  ],
+  "builds": {
+    "original": {
+      "jsbsim_file": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/original/tests/jsbsim/__init__.py",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/original/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "885d426fbd0327281c3044d7a7c52dfd4013707b3616c1f65cf726a6906edaef",
+      "jsbsim_version": "1.3.2.dev1",
+      "python": "3.14.7",
+      "fixture": {
+        "aircraft": "f16",
+        "initialize": "reset00",
+        "engine_sha256": "92fd101fdcc60dc8f41f449a297e134419ff062f5293c2e58678fd07d8127e69",
+        "variant_sha256": {
+          "stock": "92fd101fdcc60dc8f41f449a297e134419ff062f5293c2e58678fd07d8127e69",
+          "augmethod1": "9d4512d2ffd3910e7e559da833c34cfaaa94659252d82849ec3230f50e395acf",
+          "xmlfunctions": "f05d74692455f7165024eacccb3bde51c3af705461e0c84353af706f29a81d0b"
+        }
+      },
+      "frames_after": 24,
+      "dt": 0.008333333333333333
+    },
+    "spool-only": {
+      "jsbsim_file": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/spool-only/tests/jsbsim/__init__.py",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/spool-only/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "b2b9aaee0ac71a58bbee2029c2af6205454eff151f570a75527e999c54baff45",
+      "jsbsim_version": "1.3.2.dev1",
+      "python": "3.14.7",
+      "fixture": {
+        "aircraft": "f16",
+        "initialize": "reset00",
+        "engine_sha256": "92fd101fdcc60dc8f41f449a297e134419ff062f5293c2e58678fd07d8127e69",
+        "variant_sha256": {
+          "stock": "92fd101fdcc60dc8f41f449a297e134419ff062f5293c2e58678fd07d8127e69",
+          "augmethod1": "9d4512d2ffd3910e7e559da833c34cfaaa94659252d82849ec3230f50e395acf",
+          "xmlfunctions": "f05d74692455f7165024eacccb3bde51c3af705461e0c84353af706f29a81d0b"
+        }
+      },
+      "frames_after": 24,
+      "dt": 0.008333333333333333
+    },
+    "final": {
+      "jsbsim_file": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/final/tests/jsbsim/__init__.py",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/final/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "f739de7773b2144ca315a5e76705d36fcb08e3db4a9a6495c859951198a40779",
+      "jsbsim_version": "1.3.2.dev1",
+      "python": "3.14.7",
+      "fixture": {
+        "aircraft": "f16",
+        "initialize": "reset00",
+        "engine_sha256": "92fd101fdcc60dc8f41f449a297e134419ff062f5293c2e58678fd07d8127e69",
+        "variant_sha256": {
+          "stock": "92fd101fdcc60dc8f41f449a297e134419ff062f5293c2e58678fd07d8127e69",
+          "augmethod1": "9d4512d2ffd3910e7e559da833c34cfaaa94659252d82849ec3230f50e395acf",
+          "xmlfunctions": "f05d74692455f7165024eacccb3bde51c3af705461e0c84353af706f29a81d0b"
+        }
+      },
+      "frames_after": 24,
+      "dt": 0.008333333333333333
+    }
+  },
+  "all_running_states_identical": true,
+  "off_rows": 12,
+  "off_rows_with_identical_flow": 0,
+  "rows": [
+    {
+      "variant": "stock",
+      "state": "never_started",
+      "throttle": "dry",
+      "flow_gph": {
+        "original": 1102.3522168600693,
+        "spool-only": 1102.3522168600693,
+        "final": 0.0
+      },
+      "following_frames_burned_lbs": {
+        "original": 0.3463254424783219,
+        "spool-only": 0.3463254424783219,
+        "final": 0.0
+      },
+      "flow_identical": false,
+      "state_identical": false,
+      "cases": {
+        "original": {
+          "variant": "stock",
+          "state": "never_started",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 2.0209790642434604,
+            "fuel-flow-rate-gph": 1102.3522168600693,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 74.18116918625138,
+            "n2": 77.70929796462188,
+            "fuel-flow-rate-pps": 1.4654235086879068,
+            "fuel-flow-rate-gph": 799.3219138297675,
+            "fuel-used-lbs": 0.3463254424783219,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2999.6536745575213
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.3463254424783219,
+          "following_frames_tank_drop_lbs": 0.346325442478701
+        },
+        "spool-only": {
+          "variant": "stock",
+          "state": "never_started",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 2.0209790642434604,
+            "fuel-flow-rate-gph": 1102.3522168600693,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 3.890595222234704e-06,
+            "n2": 2.59373014815647e-06,
+            "fuel-flow-rate-pps": 1.4654235086879068,
+            "fuel-flow-rate-gph": 799.3219138297675,
+            "fuel-used-lbs": 0.3463254424783219,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2999.6536745575213
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.3463254424783219,
+          "following_frames_tank_drop_lbs": 0.346325442478701
+        },
+        "final": {
+          "variant": "stock",
+          "state": "never_started",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 3.890765119430072e-06,
+            "n2": 2.5938434129533817e-06,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 3000.0
+          },
+          "run_ic_changed_fuel_flow": false,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.0,
+          "following_frames_tank_drop_lbs": 0.0
+        }
+      }
+    },
+    {
+      "variant": "stock",
+      "state": "never_started",
+      "throttle": "augmented",
+      "flow_gph": {
+        "original": 7267.355958799894,
+        "spool-only": 7267.355958799894,
+        "final": 0.0
+      },
+      "following_frames_burned_lbs": {
+        "original": 2.6068268145229223,
+        "spool-only": 2.6068268145229223,
+        "final": 0.0
+      },
+      "flow_identical": false,
+      "state_identical": false,
+      "cases": {
+        "original": {
+          "variant": "stock",
+          "state": "never_started",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 13.323485924466473,
+            "fuel-flow-rate-gph": 7267.355958799894,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 23397.341135648443,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 90.46484047103824,
+            "n2": 90.46484047103824,
+            "fuel-flow-rate-pps": 12.767930368910902,
+            "fuel-flow-rate-gph": 6964.325655769583,
+            "fuel-used-lbs": 2.6068268145229223,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2997.3931731854773
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 2.6068268145229223,
+          "following_frames_tank_drop_lbs": 2.6068268145227194
+        },
+        "spool-only": {
+          "variant": "stock",
+          "state": "never_started",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 13.323485924466473,
+            "fuel-flow-rate-gph": 7267.355958799894,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 23397.341135648443,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 1.0074799480643475e-05,
+            "n2": 6.716532987095651e-06,
+            "fuel-flow-rate-pps": 12.767930368910902,
+            "fuel-flow-rate-gph": 6964.325655769583,
+            "fuel-used-lbs": 2.6068268145229223,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2997.3931731854773
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 2.6068268145229223,
+          "following_frames_tank_drop_lbs": 2.6068268145227194
+        },
+        "final": {
+          "variant": "stock",
+          "state": "never_started",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 23397.341135648443,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 1.0074799480643475e-05,
+            "n2": 6.716532987095651e-06,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 3000.0
+          },
+          "run_ic_changed_fuel_flow": false,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.0,
+          "following_frames_tank_drop_lbs": 0.0
+        }
+      }
+    },
+    {
+      "variant": "stock",
+      "state": "cut_off",
+      "throttle": "dry",
+      "flow_gph": {
+        "original": 1102.3522168600693,
+        "spool-only": 1102.3522168600693,
+        "final": 0.0
+      },
+      "following_frames_burned_lbs": {
+        "original": 0.34632544247832175,
+        "spool-only": 0.34632544247832175,
+        "final": 0.0
+      },
+      "flow_identical": false,
+      "state_identical": false,
+      "cases": {
+        "original": {
+          "variant": "stock",
+          "state": "cut_off",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 5.155691333909993,
+            "tsfc": 0.7939385632805157,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2994.844308666095
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 2.0209790642434604,
+            "fuel-flow-rate-gph": 1102.3522168600693,
+            "fuel-used-lbs": 5.155691333909993,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2994.844308666095
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 74.18116918625138,
+            "n2": 77.70929796462188,
+            "fuel-flow-rate-pps": 1.4654235086879068,
+            "fuel-flow-rate-gph": 799.3219138297675,
+            "fuel-used-lbs": 5.502016776388315,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 12.199999999999948,
+            "tank-total-lbs": 2994.4979832236163
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.34632544247832175,
+          "following_frames_tank_drop_lbs": 0.346325442478701
+        },
+        "spool-only": {
+          "variant": "stock",
+          "state": "cut_off",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 5.155691333909993,
+            "tsfc": 0.7939385632805157,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2994.844308666095
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 2.0209790642434604,
+            "fuel-flow-rate-gph": 1102.3522168600693,
+            "fuel-used-lbs": 5.155691333909993,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2994.844308666095
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 0.49463490254727127,
+            "n2": 0.518160221083056,
+            "fuel-flow-rate-pps": 1.4654235086879068,
+            "fuel-flow-rate-gph": 799.3219138297675,
+            "fuel-used-lbs": 5.502016776388315,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 12.199999999999948,
+            "tank-total-lbs": 2994.4979832236163
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.34632544247832175,
+          "following_frames_tank_drop_lbs": 0.346325442478701
+        },
+        "final": {
+          "variant": "stock",
+          "state": "cut_off",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 5.155691333909993,
+            "tsfc": 0.7939385632805157,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2994.844308666095
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 5.155691333909993,
+            "tsfc": 0.7939385632805157,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2994.844308666095
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 0.49463490254727127,
+            "n2": 0.518160221083056,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 5.155691333909993,
+            "tsfc": 0.7939385632805157,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 12.199999999999948,
+            "tank-total-lbs": 2994.844308666095
+          },
+          "run_ic_changed_fuel_flow": false,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.0,
+          "following_frames_tank_drop_lbs": 0.0
+        }
+      }
+    },
+    {
+      "variant": "stock",
+      "state": "cut_off",
+      "throttle": "augmented",
+      "flow_gph": {
+        "original": 7267.355958799894,
+        "spool-only": 7267.355958799894,
+        "final": 0.0
+      },
+      "following_frames_burned_lbs": {
+        "original": 2.606826814522922,
+        "spool-only": 2.606826814522922,
+        "final": 0.0
+      },
+      "flow_identical": false,
+      "state_identical": false,
+      "cases": {
+        "original": {
+          "variant": "stock",
+          "state": "cut_off",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 5.155691333909993,
+            "tsfc": 0.7939385632805157,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2994.844308666095
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 13.323485924466473,
+            "fuel-flow-rate-gph": 7267.355958799894,
+            "fuel-used-lbs": 5.155691333909993,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 23397.341135648443,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2994.844308666095
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 90.46484047103824,
+            "n2": 90.46484047103824,
+            "fuel-flow-rate-pps": 12.767930368910902,
+            "fuel-flow-rate-gph": 6964.325655769583,
+            "fuel-used-lbs": 7.762518148432915,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 12.199999999999948,
+            "tank-total-lbs": 2992.2374818515723
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 2.606826814522922,
+          "following_frames_tank_drop_lbs": 2.6068268145227194
+        },
+        "spool-only": {
+          "variant": "stock",
+          "state": "cut_off",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 5.155691333909993,
+            "tsfc": 0.7939385632805157,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2994.844308666095
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 13.323485924466473,
+            "fuel-flow-rate-gph": 7267.355958799894,
+            "fuel-used-lbs": 5.155691333909993,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 23397.341135648443,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2994.844308666095
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 0.49463490254727127,
+            "n2": 0.518160221083056,
+            "fuel-flow-rate-pps": 12.767930368910902,
+            "fuel-flow-rate-gph": 6964.325655769583,
+            "fuel-used-lbs": 7.762518148432915,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 12.199999999999948,
+            "tank-total-lbs": 2992.2374818515723
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 2.606826814522922,
+          "following_frames_tank_drop_lbs": 2.6068268145227194
+        },
+        "final": {
+          "variant": "stock",
+          "state": "cut_off",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 5.155691333909993,
+            "tsfc": 0.7939385632805157,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2994.844308666095
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 5.155691333909993,
+            "tsfc": 0.7939385632805157,
+            "thrust-lbs": 23397.341135648443,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2994.844308666095
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 0.49463490254727127,
+            "n2": 0.518160221083056,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 5.155691333909993,
+            "tsfc": 0.7939385632805157,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 12.199999999999948,
+            "tank-total-lbs": 2994.844308666095
+          },
+          "run_ic_changed_fuel_flow": false,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.0,
+          "following_frames_tank_drop_lbs": 0.0
+        }
+      }
+    },
+    {
+      "variant": "stock",
+      "state": "running",
+      "throttle": "dry",
+      "flow_gph": {
+        "original": 1102.3522168600693,
+        "spool-only": 1102.3522168600693,
+        "final": 1102.3522168600693
+      },
+      "following_frames_burned_lbs": {
+        "original": 0.40404399187267265,
+        "spool-only": 0.40404399187267265,
+        "final": 0.40404399187267265
+      },
+      "flow_identical": true,
+      "state_identical": true,
+      "cases": {
+        "original": {
+          "variant": "stock",
+          "state": "running",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 0.37903437176265015,
+            "fuel-flow-rate-gph": 206.74602096144554,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 17797.578807541315,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 2.0209790642434604,
+            "fuel-flow-rate-gph": 1102.3522168600693,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 2.0195341762284817,
+            "fuel-flow-rate-gph": 1101.5640961246265,
+            "fuel-used-lbs": 0.40404399187267265,
+            "tsfc": 0.7939385000476085,
+            "thrust-lbs": 9157.287414562425,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2999.595956008127
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.40404399187267265,
+          "following_frames_tank_drop_lbs": 0.40404399187309537
+        },
+        "spool-only": {
+          "variant": "stock",
+          "state": "running",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 0.37903437176265015,
+            "fuel-flow-rate-gph": 206.74602096144554,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 17797.578807541315,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 2.0209790642434604,
+            "fuel-flow-rate-gph": 1102.3522168600693,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 2.0195341762284817,
+            "fuel-flow-rate-gph": 1101.5640961246265,
+            "fuel-used-lbs": 0.40404399187267265,
+            "tsfc": 0.7939385000476085,
+            "thrust-lbs": 9157.287414562425,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2999.595956008127
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.40404399187267265,
+          "following_frames_tank_drop_lbs": 0.40404399187309537
+        },
+        "final": {
+          "variant": "stock",
+          "state": "running",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 17797.578807541315,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 2.0209790642434604,
+            "fuel-flow-rate-gph": 1102.3522168600693,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 2.0195341762284817,
+            "fuel-flow-rate-gph": 1101.5640961246265,
+            "fuel-used-lbs": 0.40404399187267265,
+            "tsfc": 0.7939385000476085,
+            "thrust-lbs": 9157.287414562425,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2999.595956008127
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.40404399187267265,
+          "following_frames_tank_drop_lbs": 0.40404399187309537
+        }
+      }
+    },
+    {
+      "variant": "stock",
+      "state": "running",
+      "throttle": "augmented",
+      "flow_gph": {
+        "original": 7267.355958799894,
+        "spool-only": 7267.355958799894,
+        "final": 7267.355958799894
+      },
+      "following_frames_burned_lbs": {
+        "original": 2.662434502108409,
+        "spool-only": 2.662434502108409,
+        "final": 2.662434502108409
+      },
+      "flow_identical": true,
+      "state_identical": true,
+      "cases": {
+        "original": {
+          "variant": "stock",
+          "state": "running",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 0.37903437176265015,
+            "fuel-flow-rate-gph": 206.74602096144554,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 17797.578807541315,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 13.323485924466473,
+            "fuel-flow-rate-gph": 7267.355958799894,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 23397.341135648443,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 13.30265719019119,
+            "fuel-flow-rate-gph": 7255.994831013377,
+            "fuel-used-lbs": 2.662434502108409,
+            "tsfc": 0.7171056687407359,
+            "thrust-lbs": 23360.76384618941,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2997.3375654978913
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 2.662434502108409,
+          "following_frames_tank_drop_lbs": 2.662434502108681
+        },
+        "spool-only": {
+          "variant": "stock",
+          "state": "running",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 0.37903437176265015,
+            "fuel-flow-rate-gph": 206.74602096144554,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 17797.578807541315,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 13.323485924466473,
+            "fuel-flow-rate-gph": 7267.355958799894,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 23397.341135648443,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 13.30265719019119,
+            "fuel-flow-rate-gph": 7255.994831013377,
+            "fuel-used-lbs": 2.662434502108409,
+            "tsfc": 0.7171056687407359,
+            "thrust-lbs": 23360.76384618941,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2997.3375654978913
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 2.662434502108409,
+          "following_frames_tank_drop_lbs": 2.662434502108681
+        },
+        "final": {
+          "variant": "stock",
+          "state": "running",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 17797.578807541315,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 13.323485924466473,
+            "fuel-flow-rate-gph": 7267.355958799894,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 23397.341135648443,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 13.30265719019119,
+            "fuel-flow-rate-gph": 7255.994831013377,
+            "fuel-used-lbs": 2.662434502108409,
+            "tsfc": 0.7171056687407359,
+            "thrust-lbs": 23360.76384618941,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2997.3375654978913
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 2.662434502108409,
+          "following_frames_tank_drop_lbs": 2.662434502108681
+        }
+      }
+    },
+    {
+      "variant": "augmethod1",
+      "state": "never_started",
+      "throttle": "dry",
+      "flow_gph": {
+        "original": 1102.3522168600693,
+        "spool-only": 1102.3522168600693,
+        "final": 0.0
+      },
+      "following_frames_burned_lbs": {
+        "original": 0.3463254424783219,
+        "spool-only": 0.3463254424783219,
+        "final": 0.0
+      },
+      "flow_identical": false,
+      "state_identical": false,
+      "cases": {
+        "original": {
+          "variant": "augmethod1",
+          "state": "never_started",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 2.0209790642434604,
+            "fuel-flow-rate-gph": 1102.3522168600693,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 74.18116918625138,
+            "n2": 77.70929796462188,
+            "fuel-flow-rate-pps": 1.4654235086879068,
+            "fuel-flow-rate-gph": 799.3219138297675,
+            "fuel-used-lbs": 0.3463254424783219,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2999.6536745575213
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.3463254424783219,
+          "following_frames_tank_drop_lbs": 0.346325442478701
+        },
+        "spool-only": {
+          "variant": "augmethod1",
+          "state": "never_started",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 2.0209790642434604,
+            "fuel-flow-rate-gph": 1102.3522168600693,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 3.890595222234704e-06,
+            "n2": 2.59373014815647e-06,
+            "fuel-flow-rate-pps": 1.4654235086879068,
+            "fuel-flow-rate-gph": 799.3219138297675,
+            "fuel-used-lbs": 0.3463254424783219,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2999.6536745575213
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.3463254424783219,
+          "following_frames_tank_drop_lbs": 0.346325442478701
+        },
+        "final": {
+          "variant": "augmethod1",
+          "state": "never_started",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 3.890765119430072e-06,
+            "n2": 2.5938434129533817e-06,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 3000.0
+          },
+          "run_ic_changed_fuel_flow": false,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.0,
+          "following_frames_tank_drop_lbs": 0.0
+        }
+      }
+    },
+    {
+      "variant": "augmethod1",
+      "state": "never_started",
+      "throttle": "augmented",
+      "flow_gph": {
+        "original": 9006.676075863472,
+        "spool-only": 9006.676075863472,
+        "final": 0.0
+      },
+      "following_frames_burned_lbs": {
+        "original": 3.2445775241129007,
+        "spool-only": 3.2445775241129007,
+        "final": 0.0
+      },
+      "flow_identical": false,
+      "state_identical": false,
+      "cases": {
+        "original": {
+          "variant": "augmethod1",
+          "state": "never_started",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 16.512239472416365,
+            "fuel-flow-rate-gph": 9006.676075863472,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 28997.103463755568,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 90.46484047103824,
+            "n2": 90.46484047103824,
+            "fuel-flow-rate-pps": 15.956683916860792,
+            "fuel-flow-rate-gph": 8703.645772833159,
+            "fuel-used-lbs": 3.2445775241129007,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2996.755422475887
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 3.2445775241129007,
+          "following_frames_tank_drop_lbs": 3.244577524113083
+        },
+        "spool-only": {
+          "variant": "augmethod1",
+          "state": "never_started",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 16.512239472416365,
+            "fuel-flow-rate-gph": 9006.676075863472,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 28997.103463755568,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 1.5358346717770523e-05,
+            "n2": 1.0238897811847017e-05,
+            "fuel-flow-rate-pps": 15.956683916860792,
+            "fuel-flow-rate-gph": 8703.645772833159,
+            "fuel-used-lbs": 3.2445775241129007,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2996.755422475887
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 3.2445775241129007,
+          "following_frames_tank_drop_lbs": 3.244577524113083
+        },
+        "final": {
+          "variant": "augmethod1",
+          "state": "never_started",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 28997.103463755568,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 1.5358346717770523e-05,
+            "n2": 1.0238897811847017e-05,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 3000.0
+          },
+          "run_ic_changed_fuel_flow": false,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.0,
+          "following_frames_tank_drop_lbs": 0.0
+        }
+      }
+    },
+    {
+      "variant": "augmethod1",
+      "state": "cut_off",
+      "throttle": "dry",
+      "flow_gph": {
+        "original": 1102.3522168600693,
+        "spool-only": 1102.3522168600693,
+        "final": 0.0
+      },
+      "following_frames_burned_lbs": {
+        "original": 0.3463254424783244,
+        "spool-only": 0.3463254424783244,
+        "final": 0.0
+      },
+      "flow_identical": false,
+      "state_identical": false,
+      "cases": {
+        "original": {
+          "variant": "augmethod1",
+          "state": "cut_off",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 49.14655171272835,
+            "tsfc": 0.7939385648775384,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2950.85344828727
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 2.0209790642434604,
+            "fuel-flow-rate-gph": 1102.3522168600693,
+            "fuel-used-lbs": 49.14655171272835,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2950.85344828727
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 74.18116918625138,
+            "n2": 77.70929796462188,
+            "fuel-flow-rate-pps": 1.4654235086879068,
+            "fuel-flow-rate-gph": 799.3219138297675,
+            "fuel-used-lbs": 49.49287715520668,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 12.199999999999948,
+            "tank-total-lbs": 2950.5071228447914
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.3463254424783244,
+          "following_frames_tank_drop_lbs": 0.346325442478701
+        },
+        "spool-only": {
+          "variant": "augmethod1",
+          "state": "cut_off",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 49.14655171272835,
+            "tsfc": 0.7939385648775384,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2950.85344828727
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 2.0209790642434604,
+            "fuel-flow-rate-gph": 1102.3522168600693,
+            "fuel-used-lbs": 49.14655171272835,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2950.85344828727
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 0.49463490254727127,
+            "n2": 0.518160221083056,
+            "fuel-flow-rate-pps": 1.4654235086879068,
+            "fuel-flow-rate-gph": 799.3219138297675,
+            "fuel-used-lbs": 49.49287715520668,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 12.199999999999948,
+            "tank-total-lbs": 2950.5071228447914
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.3463254424783244,
+          "following_frames_tank_drop_lbs": 0.346325442478701
+        },
+        "final": {
+          "variant": "augmethod1",
+          "state": "cut_off",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 49.14655171272835,
+            "tsfc": 0.7939385648775384,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2950.85344828727
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 49.14655171272835,
+            "tsfc": 0.7939385648775384,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2950.85344828727
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 0.49463490254727127,
+            "n2": 0.518160221083056,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 49.14655171272835,
+            "tsfc": 0.7939385648775384,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 12.199999999999948,
+            "tank-total-lbs": 2950.85344828727
+          },
+          "run_ic_changed_fuel_flow": false,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.0,
+          "following_frames_tank_drop_lbs": 0.0
+        }
+      }
+    },
+    {
+      "variant": "augmethod1",
+      "state": "cut_off",
+      "throttle": "augmented",
+      "flow_gph": {
+        "original": 9006.676075863472,
+        "spool-only": 9006.676075863472,
+        "final": 0.0
+      },
+      "following_frames_burned_lbs": {
+        "original": 3.2445775241128985,
+        "spool-only": 3.2445775241128985,
+        "final": 0.0
+      },
+      "flow_identical": false,
+      "state_identical": false,
+      "cases": {
+        "original": {
+          "variant": "augmethod1",
+          "state": "cut_off",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 49.14655171272835,
+            "tsfc": 0.7939385648775384,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2950.85344828727
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 16.512239472416365,
+            "fuel-flow-rate-gph": 9006.676075863472,
+            "fuel-used-lbs": 49.14655171272835,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 28997.103463755568,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2950.85344828727
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 90.46484047103824,
+            "n2": 90.46484047103824,
+            "fuel-flow-rate-pps": 15.956683916860792,
+            "fuel-flow-rate-gph": 8703.645772833159,
+            "fuel-used-lbs": 52.39112923684125,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 12.199999999999948,
+            "tank-total-lbs": 2947.608870763157
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 3.2445775241128985,
+          "following_frames_tank_drop_lbs": 3.244577524113083
+        },
+        "spool-only": {
+          "variant": "augmethod1",
+          "state": "cut_off",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 49.14655171272835,
+            "tsfc": 0.7939385648775384,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2950.85344828727
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 16.512239472416365,
+            "fuel-flow-rate-gph": 9006.676075863472,
+            "fuel-used-lbs": 49.14655171272835,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 28997.103463755568,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2950.85344828727
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 0.49463490254727127,
+            "n2": 0.518160221083056,
+            "fuel-flow-rate-pps": 15.956683916860792,
+            "fuel-flow-rate-gph": 8703.645772833159,
+            "fuel-used-lbs": 52.39112923684125,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 12.199999999999948,
+            "tank-total-lbs": 2947.608870763157
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 3.2445775241128985,
+          "following_frames_tank_drop_lbs": 3.244577524113083
+        },
+        "final": {
+          "variant": "augmethod1",
+          "state": "cut_off",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 49.14655171272835,
+            "tsfc": 0.7939385648775384,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2950.85344828727
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 49.14655171272835,
+            "tsfc": 0.7939385648775384,
+            "thrust-lbs": 28997.103463755568,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2950.85344828727
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 0.49463490254727127,
+            "n2": 0.518160221083056,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 49.14655171272835,
+            "tsfc": 0.7939385648775384,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 12.199999999999948,
+            "tank-total-lbs": 2950.85344828727
+          },
+          "run_ic_changed_fuel_flow": false,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.0,
+          "following_frames_tank_drop_lbs": 0.0
+        }
+      }
+    },
+    {
+      "variant": "augmethod1",
+      "state": "running",
+      "throttle": "dry",
+      "flow_gph": {
+        "original": 1102.3522168600693,
+        "spool-only": 1102.3522168600693,
+        "final": 1102.3522168600693
+      },
+      "following_frames_burned_lbs": {
+        "original": 0.40404399187267265,
+        "spool-only": 0.40404399187267265,
+        "final": 0.40404399187267265
+      },
+      "flow_identical": true,
+      "state_identical": true,
+      "cases": {
+        "original": {
+          "variant": "augmethod1",
+          "state": "running",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 0.37903437176265015,
+            "fuel-flow-rate-gph": 206.74602096144554,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 28997.103463755568,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 2.0209790642434604,
+            "fuel-flow-rate-gph": 1102.3522168600693,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 2.0195341762284817,
+            "fuel-flow-rate-gph": 1101.5640961246265,
+            "fuel-used-lbs": 0.40404399187267265,
+            "tsfc": 0.7939385000476085,
+            "thrust-lbs": 9157.287414562425,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2999.595956008127
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.40404399187267265,
+          "following_frames_tank_drop_lbs": 0.40404399187309537
+        },
+        "spool-only": {
+          "variant": "augmethod1",
+          "state": "running",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 0.37903437176265015,
+            "fuel-flow-rate-gph": 206.74602096144554,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 28997.103463755568,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 2.0209790642434604,
+            "fuel-flow-rate-gph": 1102.3522168600693,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 2.0195341762284817,
+            "fuel-flow-rate-gph": 1101.5640961246265,
+            "fuel-used-lbs": 0.40404399187267265,
+            "tsfc": 0.7939385000476085,
+            "thrust-lbs": 9157.287414562425,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2999.595956008127
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.40404399187267265,
+          "following_frames_tank_drop_lbs": 0.40404399187309537
+        },
+        "final": {
+          "variant": "augmethod1",
+          "state": "running",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 28997.103463755568,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 2.0209790642434604,
+            "fuel-flow-rate-gph": 1102.3522168600693,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7939384189678486,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 2.0195341762284817,
+            "fuel-flow-rate-gph": 1101.5640961246265,
+            "fuel-used-lbs": 0.40404399187267265,
+            "tsfc": 0.7939385000476085,
+            "thrust-lbs": 9157.287414562425,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2999.595956008127
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.40404399187267265,
+          "following_frames_tank_drop_lbs": 0.40404399187309537
+        }
+      }
+    },
+    {
+      "variant": "augmethod1",
+      "state": "running",
+      "throttle": "augmented",
+      "flow_gph": {
+        "original": 9006.676075863472,
+        "spool-only": 9006.676075863472,
+        "final": 9006.676075863472
+      },
+      "following_frames_burned_lbs": {
+        "original": 3.2996922209092228,
+        "spool-only": 3.2996922209092228,
+        "final": 3.2996922209092228
+      },
+      "flow_identical": true,
+      "state_identical": true,
+      "cases": {
+        "original": {
+          "variant": "augmethod1",
+          "state": "running",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 0.37903437176265015,
+            "fuel-flow-rate-gph": 206.74602096144554,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 28997.103463755568,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 16.512239472416365,
+            "fuel-flow-rate-gph": 9006.676075863472,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 28997.103463755568,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 16.485820737802108,
+            "fuel-flow-rate-gph": 8992.26585698297,
+            "fuel-used-lbs": 3.2996922209092228,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 28950.709588335412,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2996.7003077790914
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 3.2996922209092228,
+          "following_frames_tank_drop_lbs": 3.2996922209085824
+        },
+        "spool-only": {
+          "variant": "augmethod1",
+          "state": "running",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 0.37903437176265015,
+            "fuel-flow-rate-gph": 206.74602096144554,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 28997.103463755568,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 16.512239472416365,
+            "fuel-flow-rate-gph": 9006.676075863472,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 28997.103463755568,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 16.485820737802108,
+            "fuel-flow-rate-gph": 8992.26585698297,
+            "fuel-used-lbs": 3.2996922209092228,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 28950.709588335412,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2996.7003077790914
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 3.2996922209092228,
+          "following_frames_tank_drop_lbs": 3.2996922209085824
+        },
+        "final": {
+          "variant": "augmethod1",
+          "state": "running",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 28997.103463755568,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 16.512239472416365,
+            "fuel-flow-rate-gph": 9006.676075863472,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 28997.103463755568,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 16.485820737802108,
+            "fuel-flow-rate-gph": 8992.26585698297,
+            "fuel-used-lbs": 3.2996922209092228,
+            "tsfc": 0.7171056687451535,
+            "thrust-lbs": 28950.709588335412,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2996.7003077790914
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 3.2996922209092228,
+          "following_frames_tank_drop_lbs": 3.2996922209085824
+        }
+      }
+    },
+    {
+      "variant": "xmlfunctions",
+      "state": "never_started",
+      "throttle": "dry",
+      "flow_gph": {
+        "original": 586.1664132551086,
+        "spool-only": 1027.4608470729338,
+        "final": 0.0
+      },
+      "following_frames_burned_lbs": {
+        "original": 0.15705731448983604,
+        "spool-only": 0.3188652735563722,
+        "final": 0.0
+      },
+      "flow_identical": false,
+      "state_identical": false,
+      "cases": {
+        "original": {
+          "variant": "xmlfunctions",
+          "state": "never_started",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 1.0746384243010325,
+            "fuel-flow-rate-gph": 586.1664132551086,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 74.18116918625138,
+            "n2": 77.70929796462188,
+            "fuel-flow-rate-pps": 0.5190828687454762,
+            "fuel-flow-rate-gph": 283.1361102248052,
+            "fuel-used-lbs": 0.15705731448983604,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2999.84294268551
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.15705731448983604,
+          "following_frames_tank_drop_lbs": 0.1570573144899754
+        },
+        "spool-only": {
+          "variant": "xmlfunctions",
+          "state": "never_started",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 1.8836782196337116,
+            "fuel-flow-rate-gph": 1027.4608470729338,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.74,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 3.890607316601861e-06,
+            "n2": 2.593738211067908e-06,
+            "fuel-flow-rate-pps": 1.3281226640781583,
+            "fuel-flow-rate-gph": 724.4305440426318,
+            "fuel-used-lbs": 0.3188652735563722,
+            "tsfc": 0.74,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2999.681134726444
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.3188652735563722,
+          "following_frames_tank_drop_lbs": 0.31886527355618455
+        },
+        "final": {
+          "variant": "xmlfunctions",
+          "state": "never_started",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 3.890765119430072e-06,
+            "n2": 2.5938434129533817e-06,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 3000.0
+          },
+          "run_ic_changed_fuel_flow": false,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.0,
+          "following_frames_tank_drop_lbs": 0.0
+        }
+      }
+    },
+    {
+      "variant": "xmlfunctions",
+      "state": "never_started",
+      "throttle": "augmented",
+      "flow_gph": {
+        "original": 6540.620362919906,
+        "spool-only": 7267.355958799897,
+        "final": 0.0
+      },
+      "following_frames_burned_lbs": {
+        "original": 2.340357096033593,
+        "spool-only": 2.6068268145229236,
+        "final": 0.0
+      },
+      "flow_identical": false,
+      "state_identical": false,
+      "cases": {
+        "original": {
+          "variant": "xmlfunctions",
+          "state": "never_started",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 11.991137332019827,
+            "fuel-flow-rate-gph": 6540.620362919906,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.37,
+            "thrust-lbs": 23397.341135648443,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 90.46484047103824,
+            "n2": 90.46484047103824,
+            "fuel-flow-rate-pps": 11.435581776464256,
+            "fuel-flow-rate-gph": 6237.590059889594,
+            "fuel-used-lbs": 2.340357096033593,
+            "tsfc": 0.37,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2997.6596429039664
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 2.340357096033593,
+          "following_frames_tank_drop_lbs": 2.3403570960335855
+        },
+        "spool-only": {
+          "variant": "xmlfunctions",
+          "state": "never_started",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 13.323485924466477,
+            "fuel-flow-rate-gph": 7267.355958799897,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.74,
+            "thrust-lbs": 23397.341135648443,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 1.0074799480643475e-05,
+            "n2": 6.716532987095651e-06,
+            "fuel-flow-rate-pps": 12.767930368910905,
+            "fuel-flow-rate-gph": 6964.325655769585,
+            "fuel-used-lbs": 2.6068268145229236,
+            "tsfc": 0.74,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2997.3931731854773
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 2.6068268145229236,
+          "following_frames_tank_drop_lbs": 2.6068268145227194
+        },
+        "final": {
+          "variant": "xmlfunctions",
+          "state": "never_started",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 23397.341135648443,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 1.0074799480643475e-05,
+            "n2": 6.716532987095651e-06,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 1.6981973999620525,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 3000.0
+          },
+          "run_ic_changed_fuel_flow": false,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.0,
+          "following_frames_tank_drop_lbs": 0.0
+        }
+      }
+    },
+    {
+      "variant": "xmlfunctions",
+      "state": "cut_off",
+      "throttle": "dry",
+      "flow_gph": {
+        "original": 586.1664132551086,
+        "spool-only": 1024.518326327297,
+        "final": 0.0
+      },
+      "following_frames_burned_lbs": {
+        "original": 0.15705731448983595,
+        "spool-only": 0.3177863492829722,
+        "final": 0.0
+      },
+      "flow_identical": false,
+      "state_identical": false,
+      "cases": {
+        "original": {
+          "variant": "xmlfunctions",
+          "state": "cut_off",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 2.4409789905006427,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2997.559021009497
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 1.0746384243010325,
+            "fuel-flow-rate-gph": 586.1664132551086,
+            "fuel-used-lbs": 2.4409789905006427,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2997.559021009497
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 74.18116918625138,
+            "n2": 77.70929796462188,
+            "fuel-flow-rate-pps": 0.5190828687454762,
+            "fuel-flow-rate-gph": 283.1361102248052,
+            "fuel-used-lbs": 2.5980363049904787,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 12.199999999999948,
+            "tank-total-lbs": 2997.401963695007
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.15705731448983595,
+          "following_frames_tank_drop_lbs": 0.1570573144899754
+        },
+        "spool-only": {
+          "variant": "xmlfunctions",
+          "state": "cut_off",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 2.4409789905006427,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2997.559021009497
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 1.878283598266711,
+            "fuel-flow-rate-gph": 1024.518326327297,
+            "fuel-used-lbs": 2.4409789905006427,
+            "tsfc": 0.7378807315549061,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2997.559021009497
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 0.49463490254727127,
+            "n2": 0.518160221083056,
+            "fuel-flow-rate-pps": 1.3227280427111574,
+            "fuel-flow-rate-gph": 721.488023296995,
+            "fuel-used-lbs": 2.758765339783615,
+            "tsfc": 0.7378807315549061,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 12.199999999999948,
+            "tank-total-lbs": 2997.241234660214
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.3177863492829722,
+          "following_frames_tank_drop_lbs": 0.3177863492828692
+        },
+        "final": {
+          "variant": "xmlfunctions",
+          "state": "cut_off",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 2.4409789905006427,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2997.559021009497
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 2.4409789905006427,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2997.559021009497
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 0.49463490254727127,
+            "n2": 0.518160221083056,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 2.4409789905006427,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 12.199999999999948,
+            "tank-total-lbs": 2997.559021009497
+          },
+          "run_ic_changed_fuel_flow": false,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.0,
+          "following_frames_tank_drop_lbs": 0.0
+        }
+      }
+    },
+    {
+      "variant": "xmlfunctions",
+      "state": "cut_off",
+      "throttle": "augmented",
+      "flow_gph": {
+        "original": 6540.620362919906,
+        "spool-only": 7263.193397134287,
+        "final": 0.0
+      },
+      "following_frames_burned_lbs": {
+        "original": 2.3403570960335935,
+        "spool-only": 2.6053005419121993,
+        "final": 0.0
+      },
+      "flow_identical": false,
+      "state_identical": false,
+      "cases": {
+        "original": {
+          "variant": "xmlfunctions",
+          "state": "cut_off",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 2.4409789905006427,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2997.559021009497
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 11.991137332019827,
+            "fuel-flow-rate-gph": 6540.620362919906,
+            "fuel-used-lbs": 2.4409789905006427,
+            "tsfc": 0.37,
+            "thrust-lbs": 23397.341135648443,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2997.559021009497
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 90.46484047103824,
+            "n2": 90.46484047103824,
+            "fuel-flow-rate-pps": 11.435581776464256,
+            "fuel-flow-rate-gph": 6237.590059889594,
+            "fuel-used-lbs": 4.781336086534236,
+            "tsfc": 0.37,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 12.199999999999948,
+            "tank-total-lbs": 2995.2186639134634
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 2.3403570960335935,
+          "following_frames_tank_drop_lbs": 2.3403570960335855
+        },
+        "spool-only": {
+          "variant": "xmlfunctions",
+          "state": "cut_off",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 2.4409789905006427,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2997.559021009497
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 13.31585456141286,
+            "fuel-flow-rate-gph": 7263.193397134287,
+            "fuel-used-lbs": 2.4409789905006427,
+            "tsfc": 0.7378807315549061,
+            "thrust-lbs": 23397.341135648443,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2997.559021009497
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 0.49463490254727127,
+            "n2": 0.518160221083056,
+            "fuel-flow-rate-pps": 12.760299005857286,
+            "fuel-flow-rate-gph": 6960.163094103975,
+            "fuel-used-lbs": 5.046279532412842,
+            "tsfc": 0.7378807315549061,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 12.199999999999948,
+            "tank-total-lbs": 2994.953720467585
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 2.6053005419121993,
+          "following_frames_tank_drop_lbs": 2.605300541912129
+        },
+        "final": {
+          "variant": "xmlfunctions",
+          "state": "cut_off",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 2.4409789905006427,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2997.559021009497
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 2.4409789905006427,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 23397.341135648443,
+            "sim-time-sec": 11.99999999999996,
+            "tank-total-lbs": 2997.559021009497
+          },
+          "after_following_frames": {
+            "set-running": 0.0,
+            "n1": 0.49463490254727127,
+            "n2": 0.518160221083056,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 2.4409789905006427,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 0.0,
+            "sim-time-sec": 12.199999999999948,
+            "tank-total-lbs": 2997.559021009497
+          },
+          "run_ic_changed_fuel_flow": false,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.0,
+          "following_frames_tank_drop_lbs": 0.0
+        }
+      }
+    },
+    {
+      "variant": "xmlfunctions",
+      "state": "running",
+      "throttle": "dry",
+      "flow_gph": {
+        "original": 586.1664132551086,
+        "spool-only": 586.1664132551086,
+        "final": 586.1664132551086
+      },
+      "following_frames_burned_lbs": {
+        "original": 0.21484694446860672,
+        "spool-only": 0.21484694446860672,
+        "final": 0.21484694446860672
+      },
+      "flow_identical": true,
+      "state_identical": true,
+      "cases": {
+        "original": {
+          "variant": "xmlfunctions",
+          "state": "running",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 0.21045792170580988,
+            "fuel-flow-rate-gph": 114.79523002135086,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.37,
+            "thrust-lbs": 17797.578807541315,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 1.0746384243010325,
+            "fuel-flow-rate-gph": 586.1664132551086,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 1.0738700108573809,
+            "fuel-flow-rate-gph": 585.7472786494804,
+            "fuel-used-lbs": 0.21484694446860672,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 9157.2874412833,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2999.785153055531
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.21484694446860672,
+          "following_frames_tank_drop_lbs": 0.21484694446917274
+        },
+        "spool-only": {
+          "variant": "xmlfunctions",
+          "state": "running",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 0.21045792170580988,
+            "fuel-flow-rate-gph": 114.79523002135086,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.37,
+            "thrust-lbs": 17797.578807541315,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 1.0746384243010325,
+            "fuel-flow-rate-gph": 586.1664132551086,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 1.0738700108573809,
+            "fuel-flow-rate-gph": 585.7472786494804,
+            "fuel-used-lbs": 0.21484694446860672,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 9157.2874412833,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2999.785153055531
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.21484694446860672,
+          "following_frames_tank_drop_lbs": 0.21484694446917274
+        },
+        "final": {
+          "variant": "xmlfunctions",
+          "state": "running",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.37,
+            "thrust-lbs": 17797.578807541315,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 1.0746384243010325,
+            "fuel-flow-rate-gph": 586.1664132551086,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 9163.839987407246,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "fuel-flow-rate-pps": 1.0738700108573809,
+            "fuel-flow-rate-gph": 585.7472786494804,
+            "fuel-used-lbs": 0.21484694446860672,
+            "tsfc": 0.42217000000000005,
+            "thrust-lbs": 9157.2874412833,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2999.785153055531
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": true,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 0.21484694446860672,
+          "following_frames_tank_drop_lbs": 0.21484694446917274
+        }
+      }
+    },
+    {
+      "variant": "xmlfunctions",
+      "state": "running",
+      "throttle": "augmented",
+      "flow_gph": {
+        "original": 6540.620362919906,
+        "spool-only": 6540.620362919906,
+        "final": 6540.620362919906
+      },
+      "following_frames_burned_lbs": {
+        "original": 2.396181414189925,
+        "spool-only": 2.396181414189925,
+        "final": 2.396181414189925
+      },
+      "flow_identical": true,
+      "state_identical": true,
+      "cases": {
+        "original": {
+          "variant": "xmlfunctions",
+          "state": "running",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 0.21045792170580988,
+            "fuel-flow-rate-gph": 114.79523002135086,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.37,
+            "thrust-lbs": 17797.578807541315,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 11.991137332019827,
+            "fuel-flow-rate-gph": 6540.620362919906,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.37,
+            "thrust-lbs": 23397.341135648443,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 11.972391581265907,
+            "fuel-flow-rate-gph": 6530.395407963222,
+            "fuel-used-lbs": 2.396181414189925,
+            "tsfc": 0.37,
+            "thrust-lbs": 23360.76406100665,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2997.6038185858115
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 2.396181414189925,
+          "following_frames_tank_drop_lbs": 2.3961814141885043
+        },
+        "spool-only": {
+          "variant": "xmlfunctions",
+          "state": "running",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 0.21045792170580988,
+            "fuel-flow-rate-gph": 114.79523002135086,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.37,
+            "thrust-lbs": 17797.578807541315,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 11.991137332019827,
+            "fuel-flow-rate-gph": 6540.620362919906,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.37,
+            "thrust-lbs": 23397.341135648443,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 11.972391581265907,
+            "fuel-flow-rate-gph": 6530.395407963222,
+            "fuel-used-lbs": 2.396181414189925,
+            "tsfc": 0.37,
+            "thrust-lbs": 23360.76406100665,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2997.6038185858115
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 2.396181414189925,
+          "following_frames_tank_drop_lbs": 2.3961814141885043
+        },
+        "final": {
+          "variant": "xmlfunctions",
+          "state": "running",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "tanks": [
+            "propulsion/tank/contents-lbs",
+            "propulsion/tank[1]/contents-lbs",
+            "propulsion/tank[2]/contents-lbs",
+            "propulsion/tank[3]/contents-lbs"
+          ],
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 0.0,
+            "fuel-flow-rate-gph": 0.0,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.37,
+            "thrust-lbs": 17797.578807541315,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 11.991137332019827,
+            "fuel-flow-rate-gph": 6540.620362919906,
+            "fuel-used-lbs": 0.0,
+            "tsfc": 0.37,
+            "thrust-lbs": 23397.341135648443,
+            "sim-time-sec": 0.0,
+            "tank-total-lbs": 3000.0
+          },
+          "after_following_frames": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "fuel-flow-rate-pps": 11.972391581265907,
+            "fuel-flow-rate-gph": 6530.395407963222,
+            "fuel-used-lbs": 2.396181414189925,
+            "tsfc": 0.37,
+            "thrust-lbs": 23360.76406100665,
+            "sim-time-sec": 0.19999999999999998,
+            "tank-total-lbs": 2997.6038185858115
+          },
+          "run_ic_changed_fuel_flow": true,
+          "run_ic_changed_tsfc": false,
+          "run_ic_burned_lbs": 0.0,
+          "following_frames_burned_lbs": 2.396181414189925,
+          "following_frames_tank_drop_lbs": 2.3961814141885043
+        }
+      }
+    }
+  ]
+}

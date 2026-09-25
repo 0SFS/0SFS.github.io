@@ -1,0 +1,39 @@
+##### original #####
+RESULT test_zero_time_trim_preserves_never_started_fuel_state: FAIL (failures=11 errors=0)
+RESULT test_zero_time_trim_preserves_fuel_state_after_cutoff: FAIL (failures=11 errors=0)
+RESULT test_zero_time_trim_preserves_residual_fuel_flow: FAIL (failures=11 errors=0)
+RESULT test_trim_fuel_flow_needs_no_seeking: PASS (failures=0 errors=0)
+RESULT test_trim_fuel_flow_does_not_retain_the_previous_setting: PASS (failures=0 errors=0)
+RESULT test_trim_reports_the_tsfc_of_its_own_operating_point: PASS (failures=0 errors=0)
+
+##### spool-only #####
+RESULT test_zero_time_trim_preserves_never_started_fuel_state: FAIL (failures=7 errors=0)
+RESULT test_zero_time_trim_preserves_fuel_state_after_cutoff: FAIL (failures=7 errors=0)
+RESULT test_zero_time_trim_preserves_residual_fuel_flow: FAIL (failures=7 errors=0)
+RESULT test_trim_fuel_flow_needs_no_seeking: PASS (failures=0 errors=0)
+RESULT test_trim_fuel_flow_does_not_retain_the_previous_setting: PASS (failures=0 errors=0)
+RESULT test_trim_reports_the_tsfc_of_its_own_operating_point: PASS (failures=0 errors=0)
+
+##### final #####
+RESULT test_zero_time_trim_preserves_never_started_fuel_state: PASS (failures=0 errors=0)
+RESULT test_zero_time_trim_preserves_fuel_state_after_cutoff: PASS (failures=0 errors=0)
+RESULT test_zero_time_trim_preserves_residual_fuel_flow: PASS (failures=0 errors=0)
+RESULT test_trim_fuel_flow_needs_no_seeking: PASS (failures=0 errors=0)
+RESULT test_trim_fuel_flow_does_not_retain_the_previous_setting: PASS (failures=0 errors=0)
+RESULT test_trim_reports_the_tsfc_of_its_own_operating_point: PASS (failures=0 errors=0)
+
+##### original TestTurbineTrimSpool #####
+RESULT test_zero_time_trim_updates_both_spools: PASS (failures=0 errors=0)
+RESULT test_zero_time_trim_preserves_never_started_spools: FAIL (failures=5 errors=0)
+RESULT test_zero_time_trim_preserves_residual_spin_after_cutoff: FAIL (failures=5 errors=0)
+
+##### spool-only TestTurbineTrimSpool #####
+RESULT test_zero_time_trim_updates_both_spools: PASS (failures=0 errors=0)
+RESULT test_zero_time_trim_preserves_never_started_spools: FAIL (failures=1 errors=0)
+RESULT test_zero_time_trim_preserves_residual_spin_after_cutoff: FAIL (failures=1 errors=0)
+
+##### final TestTurbineTrimSpool #####
+RESULT test_zero_time_trim_updates_both_spools: PASS (failures=0 errors=0)
+RESULT test_zero_time_trim_preserves_never_started_spools: PASS (failures=0 errors=0)
+RESULT test_zero_time_trim_preserves_residual_spin_after_cutoff: PASS (failures=0 errors=0)
+

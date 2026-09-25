@@ -1,0 +1,150 @@
+{
+  "task": "JSBSim PR #1505 shut-off-engine regression: local candidate, uncommitted",
+  "date": "2026-09-19",
+  "engine_repository": "/Users/felg/gh/Felipegalind0/jsbsim",
+  "branch": "fix/turbine-trim-spool",
+  "head": "07eba55fcd6fed530f6f404e857765c3224541fb",
+  "pr": {
+    "number": 1505,
+    "url": "https://github.com/JSBSim-Team/jsbsim/pull/1505",
+    "live_head_read_2026_09_19": "07eba55fcd6fed530f6f404e857765c3224541fb",
+    "parent_base": "14c19022943f5850daf2c6b90554050b3139b853",
+    "state": "open",
+    "mergeable": "MERGEABLE",
+    "review_decision": null,
+    "checks_at_read": "28 successful, 5 skipped, 0 failing",
+    "comments_read": [
+      5669726016,
+      5676788537,
+      5744958064,
+      5745172993
+    ]
+  },
+  "candidate": {
+    "committed": false,
+    "working_tree_status": [
+      "M src/models/propulsion/FGTurbine.cpp",
+      " M tests/TestTurbineTrimSpool.py"
+    ],
+    "changed_files": {
+      "src/models/propulsion/FGTurbine.cpp": "90811fe17e163fdbf92805cc4d27bfaf1107246746f29c2aac7a15117ac36739",
+      "tests/TestTurbineTrimSpool.py": "ba7f4fb1ae4f1d836410b5309181199264db87649df182a3621d7e85291e97d3"
+    },
+    "head_versions": {
+      "src/models/propulsion/FGTurbine.cpp": "e9cfc13113e4297543ee621eca3bc938714e69a162a1ace9d8061a8825665569",
+      "tests/TestTurbineTrimSpool.py": "719f5b993c4e0803c91137eac41ea268b5d05dbe416661f2b54cba004403943f"
+    },
+    "unchanged_inputs": {
+      "src/models/propulsion/FGTurbine.h": "5ece86eeeaad354481698eb6e60b5c149147d3c5d9c24f72365676f3681bac02",
+      "tests/JSBSim_utils.py": "5faacbe8651c58094ef190fe4cd420902a1b97b32bdb751a212a6dfb5cd9d31a"
+    }
+  },
+  "toolchain": {
+    "compiler": "Apple clang 21.0.0 (clang-2100.3.34.2), arm64-apple-darwin27.0.0",
+    "cmake": "4.4.3",
+    "python": "3.14.7",
+    "cython": "3.3.0",
+    "numpy": "2.5.3",
+    "pandas": "3.0.5",
+    "macos_sdk": "27.0",
+    "kernel": "Darwin 27.0.0 arm64"
+  },
+  "build_options": [
+    "-DCMAKE_BUILD_TYPE=Release",
+    "-DBUILD_DOCS=OFF",
+    "-DBUILD_SHARED_LIBS=OFF",
+    "-DBUILD_PYTHON_MODULE=ON",
+    "-DPython3_EXECUTABLE=/Users/felg/gh/Felipegalind0/jsbsim/.venv/bin/python",
+    "-DCYTHON_EXECUTABLE=/Users/felg/gh/Felipegalind0/jsbsim/.venv/bin/cython"
+  ],
+  "cxx_flags_release": "-O3 -DNDEBUG",
+  "builds": {
+    "before": {
+      "purpose": "unmodified PR #1505 head (negative control)",
+      "directory": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1505-off-engine-20260919/before",
+      "fgturbine_cpp_sha256": "e9cfc13113e4297543ee621eca3bc938714e69a162a1ace9d8061a8825665569",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1505-off-engine-20260919/before/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "d23d591ade1d0765579ea6d6f5ef98dd9a43062ea1e9a6a9cfc157b1fe39d83f",
+      "built_at": "2026-09-19 16:15:25",
+      "rebuilt_after_source_edit": false
+    },
+    "after": {
+      "purpose": "candidate (uncommitted working tree)",
+      "directory": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1505-off-engine-20260919/after",
+      "fgturbine_cpp_sha256": "90811fe17e163fdbf92805cc4d27bfaf1107246746f29c2aac7a15117ac36739",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1505-off-engine-20260919/after/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "696c54ec7eed21c96c26ee45575c5df16d047a7396aad7de3b16a4bbba8aacf8",
+      "built_at": "2026-09-19 16:21:46"
+    },
+    "mutant-wrap-only": {
+      "purpose": "diagnostic only: assignments wrapped in if (Running) while the rest of Trim() keeps reading the member N2",
+      "directory": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1505-off-engine-20260919/mutant-wrap-only",
+      "source_copy": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1505-off-engine-20260919/mutant-wrap-only-source",
+      "fgturbine_cpp_sha256": "69ce7f9b9387af437b5752344b090f60f230554bff811a64331e0d6af262cdd7",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1505-off-engine-20260919/mutant-wrap-only/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "d8e22edd67e092e9bbabf6c8b833614cc364c6561d2995e82d9f57338f08b63a",
+      "built_at": "2026-09-19 16:22:50",
+      "is_candidate": false
+    }
+  },
+  "test_source_used_for_every_run": {
+    "tests/TestTurbineTrimSpool.py": "ba7f4fb1ae4f1d836410b5309181199264db87649df182a3621d7e85291e97d3"
+  },
+  "results": {
+    "before_TestTurbineTrimSpool": {
+      "ctest_exit": 8,
+      "methods": {
+        "test_zero_time_trim_updates_both_spools": "pass",
+        "test_zero_time_trim_preserves_never_started_spools": "fail",
+        "test_zero_time_trim_preserves_residual_spin_after_cutoff": "fail"
+      },
+      "failed_subtests": 8,
+      "note": "every failure is a spool-preservation assertion; setup, import and fixture succeeded"
+    },
+    "after_TestTurbineTrimSpool": {
+      "ctest_exit": 0,
+      "tests_run": 3,
+      "result": "OK"
+    },
+    "after_focused_suite": {
+      "ctest_exit": 0,
+      "targets": 11,
+      "passed": 11,
+      "regex": "^(TestModelLoading|TestInitialConditions|TestPythonDefaultLoggerFiltering|CheckSimTimeReset|TestHoldDown|CheckTrim|TestEngineIndexedProps|TestTurbine|TestTurbineTrimSpool|TestGndReactions|TestPlanet)$"
+    },
+    "mutant_TestTurbineTrimSpool": {
+      "exit": 0,
+      "result": "OK",
+      "note": "the spool tests alone do not detect the stale-member-N2 trap; the thrust comparison does"
+    },
+    "thrust_comparison_before_after": {
+      "cases": 12,
+      "all_identical": true,
+      "comparison": "exact equality"
+    },
+    "thrust_comparison_with_mutant": {
+      "off_engine_rows_changed_by_mutant": 8,
+      "running_rows_changed": 0
+    }
+  },
+  "tolerances": {
+    "off_engine_spool_delta_percent_n": 1e-09,
+    "running_spool_places": 7,
+    "integrated_sample_places": 5,
+    "thrust_formula_match_lbs": 1e-06,
+    "thrust_before_after": "exact equality (no tolerance applied)"
+  },
+  "evidence_files": {
+    "after-TestTurbineTrimSpool.log": "d159fd9e4b2d6b254aa610e301bf5d21356f055c861ced69bd85a606bf5bed63",
+    "after-focused-suite.log": "b385c15dba46ad72c78478f96b4fd7c28efb9d150195fd06de3ef54d78668aa0",
+    "before-TestTurbineTrimSpool.log": "78181a485de323bd79405734f671b47982c51f144d2a70c07c5d09f5b00d6820",
+    "candidate.patch": "5677753d011461763a3a47759ff26a470bbe65067847c4be66f8017c8f4388e2",
+    "fgturbine-vs-pr-base.diff": "f7c552820cadd55dac96ec36bb9d21862ca3ee5b5bef588ad68940ddac9b9c89",
+    "mutant-wrap-only-TestTurbineTrimSpool.log": "bfdfd87649b8f806933bc5f55e178affffcbf1056a0cf0de0199e5b935619dfb",
+    "mutant-wrap-only.diff": "49017cf51e430029e6463609b7e50cbccce6825bee897e06781154b5e40618e8",
+    "thrust-comparison-with-mutant.json": "b0198d0f8aecde20d0e59a9576a7e1bec30ba27435082b956cc92c4936f30233",
+    "thrust-comparison-with-mutant.md": "7ddc8eedeca591debf989f31374e8c6783a9ed56384de21791c2961f9e072690",
+    "thrust-comparison.json": "bb4169ac1a11febcd65cd8e237ec6650bab1ae8baff94a2c4780a8d1de714543",
+    "thrust-comparison.md": "a803dce2904a2e32679625d2b34f0ce64743a920fd6c5f6792e04fd132450f31"
+  }
+}

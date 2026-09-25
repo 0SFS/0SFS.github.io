@@ -1,0 +1,28 @@
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/pr1505-off-engine-20260919/after
+      Start  4: TestModelLoading
+ 1/11 Test  #4: TestModelLoading ...................   Passed    2.17 sec
+      Start 11: TestInitialConditions
+ 2/11 Test #11: TestInitialConditions ..............   Passed    1.33 sec
+      Start 17: TestPythonDefaultLoggerFiltering
+ 3/11 Test #17: TestPythonDefaultLoggerFiltering ...   Passed    0.70 sec
+      Start 22: CheckSimTimeReset
+ 4/11 Test #22: CheckSimTimeReset ..................   Passed    0.21 sec
+      Start 23: TestHoldDown
+ 5/11 Test #23: TestHoldDown .......................   Passed    0.50 sec
+      Start 24: CheckTrim
+ 6/11 Test #24: CheckTrim ..........................   Passed    0.20 sec
+      Start 32: TestEngineIndexedProps
+ 7/11 Test #32: TestEngineIndexedProps .............   Passed    7.38 sec
+      Start 34: TestTurbine
+ 8/11 Test #34: TestTurbine ........................   Passed    0.32 sec
+      Start 35: TestTurbineTrimSpool
+ 9/11 Test #35: TestTurbineTrimSpool ...............   Passed    0.20 sec
+      Start 43: TestGndReactions
+10/11 Test #43: TestGndReactions ...................   Passed    0.19 sec
+      Start 54: TestPlanet
+11/11 Test #54: TestPlanet .........................   Passed    0.19 sec
+
+100% tests passed out of 11
+
+Total Test time (real) =  13.40 sec
+ctest exit 0

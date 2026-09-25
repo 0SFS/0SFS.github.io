@@ -1,0 +1,41 @@
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/final
+      Start  2: TestICOverride
+ 1/18 Test  #2: TestICOverride .....................   Passed    0.60 sec
+      Start  4: TestModelLoading
+ 2/18 Test  #4: TestModelLoading ...................   Passed    3.82 sec
+      Start  9: TestFuelTanksInertia
+ 3/18 Test  #9: TestFuelTanksInertia ...............   Passed    0.74 sec
+      Start 11: TestInitialConditions
+ 4/18 Test #11: TestInitialConditions ..............   Passed    2.32 sec
+      Start 17: TestPythonDefaultLoggerFiltering
+ 5/18 Test #17: TestPythonDefaultLoggerFiltering ...   Passed    1.29 sec
+      Start 22: CheckSimTimeReset
+ 6/18 Test #22: CheckSimTimeReset ..................   Passed    0.44 sec
+      Start 23: TestHoldDown
+ 7/18 Test #23: TestHoldDown .......................   Passed    0.99 sec
+      Start 24: CheckTrim
+ 8/18 Test #24: CheckTrim ..........................   Passed    0.41 sec
+      Start 27: TestSuspend
+ 9/18 Test #27: TestSuspend ........................   Passed    0.40 sec
+      Start 31: TestTurboProp
+10/18 Test #31: TestTurboProp ......................   Passed    0.71 sec
+      Start 32: TestEngineIndexedProps
+11/18 Test #32: TestEngineIndexedProps .............   Passed   14.86 sec
+      Start 34: TestTurbine
+12/18 Test #34: TestTurbine ........................   Passed    0.72 sec
+      Start 35: TestTurbineTrimSpool
+13/18 Test #35: TestTurbineTrimSpool ...............   Passed    0.39 sec
+      Start 36: TestTurbineTrimFuelFlow
+14/18 Test #36: TestTurbineTrimFuelFlow ............   Passed    0.46 sec
+      Start 44: TestGndReactions
+15/18 Test #44: TestGndReactions ...................   Passed    0.36 sec
+      Start 55: TestPlanet
+16/18 Test #55: TestPlanet .........................   Passed    0.39 sec
+      Start 57: TestUnusableFuel
+17/18 Test #57: TestUnusableFuel ...................   Passed    0.41 sec
+      Start 67: FGInitialConditionTest1
+18/18 Test #67: FGInitialConditionTest1 ............   Passed    0.22 sec
+
+100% tests passed out of 18
+
+Total Test time (real) =  29.55 sec

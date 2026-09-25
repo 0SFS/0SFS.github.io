@@ -1,0 +1,1625 @@
+{
+  "source": "/Users/felg/gh/Felipegalind0/jsbsim",
+  "source_head": "c803eeef9ae7479d450109266213b189da729af2",
+  "source_status": [
+    " M src/models/propulsion/FGTurbine.cpp",
+    " M tests/TestTurbineTrimFuelFlow.py"
+  ],
+  "builds": {
+    "original": {
+      "jsbsim_file": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/original/tests/jsbsim/__init__.py",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/original/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "885d426fbd0327281c3044d7a7c52dfd4013707b3616c1f65cf726a6906edaef",
+      "jsbsim_version": "1.3.2.dev1",
+      "python": "3.14.7",
+      "fixture": {
+        "aircraft": "f16",
+        "initialize": "reset00",
+        "engine_sha256": "92fd101fdcc60dc8f41f449a297e134419ff062f5293c2e58678fd07d8127e69",
+        "augmethod1_copy_sha256": "9d4512d2ffd3910e7e559da833c34cfaaa94659252d82849ec3230f50e395acf"
+      }
+    },
+    "spool-only": {
+      "jsbsim_file": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/spool-only/tests/jsbsim/__init__.py",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/spool-only/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "b2b9aaee0ac71a58bbee2029c2af6205454eff151f570a75527e999c54baff45",
+      "jsbsim_version": "1.3.2.dev1",
+      "python": "3.14.7",
+      "fixture": {
+        "aircraft": "f16",
+        "initialize": "reset00",
+        "engine_sha256": "92fd101fdcc60dc8f41f449a297e134419ff062f5293c2e58678fd07d8127e69",
+        "augmethod1_copy_sha256": "9d4512d2ffd3910e7e559da833c34cfaaa94659252d82849ec3230f50e395acf"
+      }
+    },
+    "final": {
+      "jsbsim_file": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/final/tests/jsbsim/__init__.py",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/final/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "f739de7773b2144ca315a5e76705d36fcb08e3db4a9a6495c859951198a40779",
+      "jsbsim_version": "1.3.2.dev1",
+      "python": "3.14.7",
+      "fixture": {
+        "aircraft": "f16",
+        "initialize": "reset00",
+        "engine_sha256": "92fd101fdcc60dc8f41f449a297e134419ff062f5293c2e58678fd07d8127e69",
+        "augmethod1_copy_sha256": "9d4512d2ffd3910e7e559da833c34cfaaa94659252d82849ec3230f50e395acf"
+      }
+    }
+  },
+  "match_tolerance_lbs": 1e-06,
+  "all_thrust_identical": true,
+  "rows": [
+    {
+      "method": "stock",
+      "state": "never_started",
+      "throttle": "dry",
+      "thrust_lbs": {
+        "original": 9163.839987407246,
+        "spool-only": 9163.839987407246,
+        "final": 9163.839987407246
+      },
+      "thrust_identical": true,
+      "max_abs_difference_lbs": 0.0,
+      "cases": {
+        "original": {
+          "method": "stock",
+          "augmethod": 2,
+          "state": "never_started",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "thrust-lbs": 9163.839987407246
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 9163.83998740725,
+            "steady": 9163.83998740725,
+            "stored_n2": 22395.74077603068
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": true,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "spool-only": {
+          "method": "stock",
+          "augmethod": 2,
+          "state": "never_started",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "thrust-lbs": 9163.839987407246
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 9163.83998740725,
+            "steady": 9163.83998740725,
+            "stored_n2": 22395.74077603068
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": true,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "final": {
+          "method": "stock",
+          "augmethod": 2,
+          "state": "never_started",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "thrust-lbs": 9163.839987407246
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 9163.83998740725,
+            "steady": 9163.83998740725,
+            "stored_n2": 22395.74077603068
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": true,
+            "steady": true,
+            "stored_n2": false
+          }
+        }
+      }
+    },
+    {
+      "method": "stock",
+      "state": "never_started",
+      "throttle": "augmented",
+      "thrust_lbs": {
+        "original": 23397.341135648443,
+        "spool-only": 23397.341135648443,
+        "final": 23397.341135648443
+      },
+      "thrust_identical": true,
+      "max_abs_difference_lbs": 0.0,
+      "cases": {
+        "original": {
+          "method": "stock",
+          "augmethod": 2,
+          "state": "never_started",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "thrust-lbs": 23397.341135648443
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 17797.578807541315,
+            "steady": 23397.341135648443,
+            "stored_n2": 25696.422119893126
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": false,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "spool-only": {
+          "method": "stock",
+          "augmethod": 2,
+          "state": "never_started",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "thrust-lbs": 23397.341135648443
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 17797.578807541315,
+            "steady": 23397.341135648443,
+            "stored_n2": 25696.422119893126
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": false,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "final": {
+          "method": "stock",
+          "augmethod": 2,
+          "state": "never_started",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "thrust-lbs": 23397.341135648443
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 17797.578807541315,
+            "steady": 23397.341135648443,
+            "stored_n2": 25696.422119893126
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": false,
+            "steady": true,
+            "stored_n2": false
+          }
+        }
+      }
+    },
+    {
+      "method": "stock",
+      "state": "cut_off",
+      "throttle": "dry",
+      "thrust_lbs": {
+        "original": 9163.839987407246,
+        "spool-only": 9163.839987407246,
+        "final": 9163.839987407246
+      },
+      "thrust_identical": true,
+      "max_abs_difference_lbs": 0.0,
+      "cases": {
+        "original": {
+          "method": "stock",
+          "augmethod": 2,
+          "state": "cut_off",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "thrust-lbs": 9163.839987407246
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 9163.83998740725,
+            "steady": 9163.83998740725,
+            "stored_n2": 21932.96561917349
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": true,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "spool-only": {
+          "method": "stock",
+          "augmethod": 2,
+          "state": "cut_off",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "thrust-lbs": 9163.839987407246
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 9163.83998740725,
+            "steady": 9163.83998740725,
+            "stored_n2": 21932.96561917349
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": true,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "final": {
+          "method": "stock",
+          "augmethod": 2,
+          "state": "cut_off",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "thrust-lbs": 9163.839987407246
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 9163.83998740725,
+            "steady": 9163.83998740725,
+            "stored_n2": 21932.96561917349
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": true,
+            "steady": true,
+            "stored_n2": false
+          }
+        }
+      }
+    },
+    {
+      "method": "stock",
+      "state": "cut_off",
+      "throttle": "augmented",
+      "thrust_lbs": {
+        "original": 23397.341135648443,
+        "spool-only": 23397.341135648443,
+        "final": 23397.341135648443
+      },
+      "thrust_identical": true,
+      "max_abs_difference_lbs": 0.0,
+      "cases": {
+        "original": {
+          "method": "stock",
+          "augmethod": 2,
+          "state": "cut_off",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "thrust-lbs": 23397.341135648443
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 17797.578807541315,
+            "steady": 23397.341135648443,
+            "stored_n2": 25465.034541464527
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": false,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "spool-only": {
+          "method": "stock",
+          "augmethod": 2,
+          "state": "cut_off",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "thrust-lbs": 23397.341135648443
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 17797.578807541315,
+            "steady": 23397.341135648443,
+            "stored_n2": 25465.034541464527
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": false,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "final": {
+          "method": "stock",
+          "augmethod": 2,
+          "state": "cut_off",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "thrust-lbs": 23397.341135648443
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 17797.578807541315,
+            "steady": 23397.341135648443,
+            "stored_n2": 25465.034541464527
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": false,
+            "steady": true,
+            "stored_n2": false
+          }
+        }
+      }
+    },
+    {
+      "method": "stock",
+      "state": "running",
+      "throttle": "dry",
+      "thrust_lbs": {
+        "original": 9163.839987407246,
+        "spool-only": 9163.839987407246,
+        "final": 9163.839987407246
+      },
+      "thrust_identical": true,
+      "max_abs_difference_lbs": 0.0,
+      "cases": {
+        "original": {
+          "method": "stock",
+          "augmethod": 2,
+          "state": "running",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "thrust-lbs": 9163.839987407246
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 9163.83998740725,
+            "steady": 9163.83998740725,
+            "stored_n2": 17797.578807541315
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": true,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "spool-only": {
+          "method": "stock",
+          "augmethod": 2,
+          "state": "running",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "thrust-lbs": 9163.839987407246
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 9163.83998740725,
+            "steady": 9163.83998740725,
+            "stored_n2": 17797.578807541315
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": true,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "final": {
+          "method": "stock",
+          "augmethod": 2,
+          "state": "running",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "thrust-lbs": 9163.839987407246
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 9163.83998740725,
+            "steady": 9163.83998740725,
+            "stored_n2": 17797.578807541315
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": true,
+            "steady": true,
+            "stored_n2": false
+          }
+        }
+      }
+    },
+    {
+      "method": "stock",
+      "state": "running",
+      "throttle": "augmented",
+      "thrust_lbs": {
+        "original": 23397.341135648443,
+        "spool-only": 23397.341135648443,
+        "final": 23397.341135648443
+      },
+      "thrust_identical": true,
+      "max_abs_difference_lbs": 0.0,
+      "cases": {
+        "original": {
+          "method": "stock",
+          "augmethod": 2,
+          "state": "running",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "thrust-lbs": 23397.341135648443
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 17797.578807541315,
+            "steady": 23397.341135648443,
+            "stored_n2": 23397.341135648443
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": false,
+            "steady": true,
+            "stored_n2": true
+          }
+        },
+        "spool-only": {
+          "method": "stock",
+          "augmethod": 2,
+          "state": "running",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "thrust-lbs": 23397.341135648443
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 17797.578807541315,
+            "steady": 23397.341135648443,
+            "stored_n2": 23397.341135648443
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": false,
+            "steady": true,
+            "stored_n2": true
+          }
+        },
+        "final": {
+          "method": "stock",
+          "augmethod": 2,
+          "state": "running",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "thrust-lbs": 23397.341135648443
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 17797.578807541315,
+            "steady": 23397.341135648443,
+            "stored_n2": 23397.341135648443
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": false,
+            "steady": true,
+            "stored_n2": true
+          }
+        }
+      }
+    },
+    {
+      "method": "augmethod1",
+      "state": "never_started",
+      "throttle": "dry",
+      "thrust_lbs": {
+        "original": 9163.839987407246,
+        "spool-only": 9163.839987407246,
+        "final": 9163.839987407246
+      },
+      "thrust_identical": true,
+      "max_abs_difference_lbs": 0.0,
+      "cases": {
+        "original": {
+          "method": "augmethod1",
+          "augmethod": 1,
+          "state": "never_started",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "thrust-lbs": 9163.839987407246
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 9163.83998740725,
+            "steady": 9163.83998740725,
+            "stored_n2": 22395.74077603068
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": true,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "spool-only": {
+          "method": "augmethod1",
+          "augmethod": 1,
+          "state": "never_started",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "thrust-lbs": 9163.839987407246
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 9163.83998740725,
+            "steady": 9163.83998740725,
+            "stored_n2": 22395.74077603068
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": true,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "final": {
+          "method": "augmethod1",
+          "augmethod": 1,
+          "state": "never_started",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "thrust-lbs": 9163.839987407246
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 9163.83998740725,
+            "steady": 9163.83998740725,
+            "stored_n2": 22395.74077603068
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": true,
+            "steady": true,
+            "stored_n2": false
+          }
+        }
+      }
+    },
+    {
+      "method": "augmethod1",
+      "state": "never_started",
+      "throttle": "augmented",
+      "thrust_lbs": {
+        "original": 28997.103463755568,
+        "spool-only": 28997.103463755568,
+        "final": 28997.103463755568
+      },
+      "thrust_identical": true,
+      "max_abs_difference_lbs": 0.0,
+      "cases": {
+        "original": {
+          "method": "augmethod1",
+          "augmethod": 1,
+          "state": "never_started",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "thrust-lbs": 28997.103463755568
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 17797.578807541315,
+            "steady": 28997.103463755568,
+            "stored_n2": 22395.74077603068
+          },
+          "formula_augmentation": {
+            "steady": true,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": false,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "spool-only": {
+          "method": "augmethod1",
+          "augmethod": 1,
+          "state": "never_started",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "thrust-lbs": 28997.103463755568
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 17797.578807541315,
+            "steady": 28997.103463755568,
+            "stored_n2": 22395.74077603068
+          },
+          "formula_augmentation": {
+            "steady": true,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": false,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "final": {
+          "method": "augmethod1",
+          "augmethod": 1,
+          "state": "never_started",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.0,
+            "n2": 0.0,
+            "thrust-lbs": 28997.103463755568
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 17797.578807541315,
+            "steady": 28997.103463755568,
+            "stored_n2": 22395.74077603068
+          },
+          "formula_augmentation": {
+            "steady": true,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": false,
+            "steady": true,
+            "stored_n2": false
+          }
+        }
+      }
+    },
+    {
+      "method": "augmethod1",
+      "state": "cut_off",
+      "throttle": "dry",
+      "thrust_lbs": {
+        "original": 9163.839987407246,
+        "spool-only": 9163.839987407246,
+        "final": 9163.839987407246
+      },
+      "thrust_identical": true,
+      "max_abs_difference_lbs": 0.0,
+      "cases": {
+        "original": {
+          "method": "augmethod1",
+          "augmethod": 1,
+          "state": "cut_off",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "thrust-lbs": 9163.839987407246
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 9163.83998740725,
+            "steady": 9163.83998740725,
+            "stored_n2": 21932.96561917349
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": true,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "spool-only": {
+          "method": "augmethod1",
+          "augmethod": 1,
+          "state": "cut_off",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "thrust-lbs": 9163.839987407246
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 9163.83998740725,
+            "steady": 9163.83998740725,
+            "stored_n2": 21932.96561917349
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": true,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "final": {
+          "method": "augmethod1",
+          "augmethod": 1,
+          "state": "cut_off",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "thrust-lbs": 9163.839987407246
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 9163.83998740725,
+            "steady": 9163.83998740725,
+            "stored_n2": 21932.96561917349
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": true,
+            "steady": true,
+            "stored_n2": false
+          }
+        }
+      }
+    },
+    {
+      "method": "augmethod1",
+      "state": "cut_off",
+      "throttle": "augmented",
+      "thrust_lbs": {
+        "original": 28997.103463755568,
+        "spool-only": 28997.103463755568,
+        "final": 28997.103463755568
+      },
+      "thrust_identical": true,
+      "max_abs_difference_lbs": 0.0,
+      "cases": {
+        "original": {
+          "method": "augmethod1",
+          "augmethod": 1,
+          "state": "cut_off",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "thrust-lbs": 28997.103463755568
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 17797.578807541315,
+            "steady": 28997.103463755568,
+            "stored_n2": 21932.96561917349
+          },
+          "formula_augmentation": {
+            "steady": true,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": false,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "spool-only": {
+          "method": "augmethod1",
+          "augmethod": 1,
+          "state": "cut_off",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "thrust-lbs": 28997.103463755568
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 17797.578807541315,
+            "steady": 28997.103463755568,
+            "stored_n2": 21932.96561917349
+          },
+          "formula_augmentation": {
+            "steady": true,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": false,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "final": {
+          "method": "augmethod1",
+          "augmethod": 1,
+          "state": "cut_off",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "before_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012
+          },
+          "after_run_ic": {
+            "set-running": 0.0,
+            "n1": 0.5467703253239313,
+            "n2": 0.5727752554308012,
+            "thrust-lbs": 28997.103463755568
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 17797.578807541315,
+            "steady": 28997.103463755568,
+            "stored_n2": 21932.96561917349
+          },
+          "formula_augmentation": {
+            "steady": true,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": false,
+            "steady": true,
+            "stored_n2": false
+          }
+        }
+      }
+    },
+    {
+      "method": "augmethod1",
+      "state": "running",
+      "throttle": "dry",
+      "thrust_lbs": {
+        "original": 9163.839987407246,
+        "spool-only": 9163.839987407246,
+        "final": 9163.839987407246
+      },
+      "thrust_identical": true,
+      "max_abs_difference_lbs": 0.0,
+      "cases": {
+        "original": {
+          "method": "augmethod1",
+          "augmethod": 1,
+          "state": "running",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "thrust-lbs": 9163.839987407246
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 9163.83998740725,
+            "steady": 9163.83998740725,
+            "stored_n2": 17797.578807541315
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": true,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "spool-only": {
+          "method": "augmethod1",
+          "augmethod": 1,
+          "state": "running",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "thrust-lbs": 9163.839987407246
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 9163.83998740725,
+            "steady": 9163.83998740725,
+            "stored_n2": 17797.578807541315
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": true,
+            "steady": true,
+            "stored_n2": false
+          }
+        },
+        "final": {
+          "method": "augmethod1",
+          "augmethod": 1,
+          "state": "running",
+          "throttle": "dry",
+          "throttle_cmd": 0.35,
+          "throttle_position": 0.7,
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 82.0,
+            "n2": 85.89999999999999,
+            "thrust-lbs": 9163.839987407246
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 9163.83998740725,
+            "steady": 9163.83998740725,
+            "stored_n2": 17797.578807541315
+          },
+          "formula_augmentation": {
+            "steady": false,
+            "stored_n2": false
+          },
+          "matches": {
+            "dry": true,
+            "steady": true,
+            "stored_n2": false
+          }
+        }
+      }
+    },
+    {
+      "method": "augmethod1",
+      "state": "running",
+      "throttle": "augmented",
+      "thrust_lbs": {
+        "original": 28997.103463755568,
+        "spool-only": 28997.103463755568,
+        "final": 28997.103463755568
+      },
+      "thrust_identical": true,
+      "max_abs_difference_lbs": 0.0,
+      "cases": {
+        "original": {
+          "method": "augmethod1",
+          "augmethod": 1,
+          "state": "running",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "thrust-lbs": 28997.103463755568
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 17797.578807541315,
+            "steady": 28997.103463755568,
+            "stored_n2": 28997.103463755568
+          },
+          "formula_augmentation": {
+            "steady": true,
+            "stored_n2": true
+          },
+          "matches": {
+            "dry": false,
+            "steady": true,
+            "stored_n2": true
+          }
+        },
+        "spool-only": {
+          "method": "augmethod1",
+          "augmethod": 1,
+          "state": "running",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "thrust-lbs": 28997.103463755568
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 17797.578807541315,
+            "steady": 28997.103463755568,
+            "stored_n2": 28997.103463755568
+          },
+          "formula_augmentation": {
+            "steady": true,
+            "stored_n2": true
+          },
+          "matches": {
+            "dry": false,
+            "steady": true,
+            "stored_n2": true
+          }
+        },
+        "final": {
+          "method": "augmethod1",
+          "augmethod": 1,
+          "state": "running",
+          "throttle": "augmented",
+          "throttle_cmd": 0.75,
+          "throttle_position": 1.5,
+          "before_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0
+          },
+          "after_run_ic": {
+            "set-running": 1.0,
+            "n1": 100.0,
+            "n2": 100.0,
+            "thrust-lbs": 28997.103463755568
+          },
+          "lookups": {
+            "IdleThrust": 0.04880220001233817,
+            "MilThrust": 0.9998569991980191,
+            "AugThrust": 0.9999001194398471,
+            "bleed-factor": 0.0
+          },
+          "formula_lbs": {
+            "dry": 17797.578807541315,
+            "steady": 28997.103463755568,
+            "stored_n2": 28997.103463755568
+          },
+          "formula_augmentation": {
+            "steady": true,
+            "stored_n2": true
+          },
+          "matches": {
+            "dry": false,
+            "steady": true,
+            "stored_n2": true
+          }
+        }
+      }
+    }
+  ]
+}

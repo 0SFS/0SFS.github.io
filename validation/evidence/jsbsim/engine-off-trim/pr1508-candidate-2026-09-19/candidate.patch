@@ -1,0 +1,489 @@
+From c803eeef9ae7479d450109266213b189da729af2 Mon Sep 17 00:00:00 2001
+From: Felipegalind0 <Felipegalind0@outlook.com>
+Date: Sat, 19 Sep 2026 17:11:55 -0500
+Subject: [PATCH 1/2] Preserve off-engine spool state during turbine trim
+
+---
+ src/models/propulsion/FGTurbine.cpp |  17 ++--
+ tests/TestTurbineTrimSpool.py       | 128 +++++++++++++++++++++++-----
+ 2 files changed, 119 insertions(+), 26 deletions(-)
+
+diff --git a/src/models/propulsion/FGTurbine.cpp b/src/models/propulsion/FGTurbine.cpp
+index 1b59916a..b928f770 100644
+--- a/src/models/propulsion/FGTurbine.cpp
++++ b/src/models/propulsion/FGTurbine.cpp
+@@ -352,11 +352,16 @@ double FGTurbine::Trim()
+ {
+     double idlethrust = MilThrust * IdleThrustLookup->GetValue();
+     double milthrust = (MilThrust - idlethrust) * MilThrustLookup->GetValue();
+-    // Trim establishes steady thrust without advancing time. Keep the
+-    // observable spool state consistent with that same operating point.
+-    N1 = IdleN1 + ThrottlePos * N1_factor;
+-    N2 = IdleN2 + ThrottlePos * N2_factor;
+-    N2norm = (N2 - IdleN2) / N2_factor;
++    double steadyN2 = IdleN2 + ThrottlePos * N2_factor;
++    // Trim establishes steady thrust without advancing time. Keep a running
++    // engine's observable spool state consistent with that operating point.
++    // Zero-time evaluations, such as RunIC(), can reach Trim even when the
++    // engine is off. Such an engine keeps its (possibly windmilling) spools.
++    if (Running) {
++      N1 = IdleN1 + ThrottlePos * N1_factor;
++      N2 = steadyN2;
++    }
++    N2norm = (steadyN2 - IdleN2) / N2_factor;
+     double dryThrust = idlethrust + (milthrust * N2norm * N2norm);
+     double thrust = dryThrust * (1.0 - BleedDemand);
+ 
+@@ -367,7 +372,7 @@ double FGTurbine::Trim()
+     FuelFlow_pph = std::max(IdleFF, dryThrust * correctedTSFC);
+ 
+     if (AugMethod == 1) {
+-      if ((ThrottlePos > 0.99) && (N2 > 97.0)) {Augmentation = true;}
++      if ((ThrottlePos > 0.99) && (steadyN2 > 97.0)) {Augmentation = true;}
+       else {Augmentation = false;}
+     }
+ 
+diff --git a/tests/TestTurbineTrimSpool.py b/tests/TestTurbineTrimSpool.py
+index 56ffbaf9..e055c62c 100644
+--- a/tests/TestTurbineTrimSpool.py
++++ b/tests/TestTurbineTrimSpool.py
+@@ -1,12 +1,20 @@
+ """Regression for observable turbine spool speeds during zero-time trim."""
+ 
++import math
+ import xml.etree.ElementTree as et
+ 
+ from JSBSim_utils import JSBSimTestCase, RunTest
+ 
++ENGINE = "propulsion/engine[0]/"
++
++# A zero-time evaluation must not write the spools of an engine that is off,
++# so their values are expected to be unchanged. The tolerance is far below the
++# residual spin checked here (about 0.5 %) and any throttle's steady speed.
++OFF_SPOOL_TOLERANCE = 1e-9
++
+ 
+ class TestTurbineTrimSpool(JSBSimTestCase):
+-    def test_zero_time_trim_updates_both_spools(self):
++    def create_turbine_fdm(self):
+         # Use the standard turbine fixture without script events that could
+         # overwrite the throttle during the continuity check.
+         script = et.parse(self.sandbox.path_to_jsbsim_file(
+@@ -18,17 +26,34 @@ class TestTurbineTrimSpool(JSBSimTestCase):
+         engine_name = aircraft.getroot().find("propulsion/engine").attrib["file"]
+         engine = et.parse(self.sandbox.path_to_jsbsim_file(
+             "engine", engine_name + ".xml")).getroot()
+-        idle_n1 = float(engine.find("idlen1").text)
+-        maximum_n1 = float(engine.find("maxn1").text)
+-        idle_n2 = float(engine.find("idlen2").text)
+-        maximum_n2 = float(engine.find("maxn2").text)
++        self.idle_n1 = float(engine.find("idlen1").text)
++        self.maximum_n1 = float(engine.find("maxn1").text)
++        self.idle_n2 = float(engine.find("idlen2").text)
++        self.maximum_n2 = float(engine.find("maxn2").text)
+ 
+         fdm = self.create_fdm()
+         self.assertTrue(fdm.load_model(aircraft_name))
+         self.assertTrue(fdm.load_ic(use.attrib["initialize"], True))
+         fdm.set_dt(1.0 / 120.0)
++        return fdm
++
++    def checked_dry_throttle(self, fdm, throttle):
++        # The F16 FCS maps the command to a 0..2 position range.
++        # Positions above 1 request augmentation, not higher dry
++        # spool speeds. Assert the fixture mapping independently.
++        throttle_position = fdm["fcs/throttle-pos-norm[0]"]
++        self.assertAlmostEqual(throttle_position, 2.0 * throttle, places=7)
++        return max(0.0, min(1.0, throttle_position))
++
++    def test_zero_time_trim_updates_both_spools(self):
++        fdm = self.create_turbine_fdm()
+         self.assertTrue(fdm.run_ic())
+         fdm["propulsion/set-running"] = -1
++        # InitRunning() marks the engine running before its zero-time
++        # evaluation; set-running then settles it at full dry throttle.
++        self.assertEqual(fdm[ENGINE + "set-running"], 1)
++        self.assertAlmostEqual(fdm[ENGINE + "n1"], self.maximum_n1, places=7)
++        self.assertAlmostEqual(fdm[ENGINE + "n2"], self.maximum_n2, places=7)
+ 
+         for throttle in (0.0, 0.35, 1.0, 0.0):
+             with self.subTest(throttle=throttle):
+@@ -37,28 +62,91 @@ class TestTurbineTrimSpool(JSBSimTestCase):
+                 before_time = fdm.get_sim_time()
+                 self.assertTrue(fdm.run_ic())
+                 self.assertEqual(fdm.get_sim_time(), before_time)
+-                # The F16 FCS maps the command to a 0..2 position range.
+-                # Positions above 1 request augmentation, not higher dry
+-                # spool speeds. Assert the fixture mapping independently.
+-                throttle_position = fdm["fcs/throttle-pos-norm[0]"]
+-                self.assertAlmostEqual(throttle_position, 2.0 * throttle,
+-                                       places=7)
+-                dry_throttle = max(0.0, min(1.0, throttle_position))
++                self.assertEqual(fdm[ENGINE + "set-running"], 1)
++                dry_throttle = self.checked_dry_throttle(fdm, throttle)
+                 self.assertAlmostEqual(
+-                    fdm["propulsion/engine[0]/n1"],
+-                    idle_n1 + dry_throttle * (maximum_n1 - idle_n1), places=7)
++                    fdm[ENGINE + "n1"],
++                    self.idle_n1 + dry_throttle * (self.maximum_n1 - self.idle_n1),
++                    places=7)
+                 self.assertAlmostEqual(
+-                    fdm["propulsion/engine[0]/n2"],
+-                    idle_n2 + dry_throttle * (maximum_n2 - idle_n2), places=7)
++                    fdm[ENGINE + "n2"],
++                    self.idle_n2 + dry_throttle * (self.maximum_n2 - self.idle_n2),
++                    places=7)
+ 
+         # The first integrated idle sample must not repair stale full-power
+         # indications. No application-side property writes mask the defect.
+-        before_n1 = fdm["propulsion/engine[0]/n1"]
+-        before_n2 = fdm["propulsion/engine[0]/n2"]
++        before_n1 = fdm[ENGINE + "n1"]
++        before_n2 = fdm[ENGINE + "n2"]
+         self.assertTrue(fdm.run())
+         self.assertGreater(fdm.get_sim_time(), before_time)
+-        self.assertAlmostEqual(fdm["propulsion/engine[0]/n1"], before_n1, places=5)
+-        self.assertAlmostEqual(fdm["propulsion/engine[0]/n2"], before_n2, places=5)
++        self.assertEqual(fdm[ENGINE + "set-running"], 1)
++        self.assertAlmostEqual(fdm[ENGINE + "n1"], before_n1, places=5)
++        self.assertAlmostEqual(fdm[ENGINE + "n2"], before_n2, places=5)
++
++    def assert_run_ic_preserves_off_spools(self, fdm, throttles):
++        for throttle in throttles:
++            with self.subTest(throttle=throttle):
++                fdm["fcs/throttle-cmd-norm[0]"] = throttle
++                before_time = fdm.get_sim_time()
++                before = {spool: fdm[ENGINE + spool] for spool in ("n1", "n2")}
++                self.assertTrue(fdm.run_ic())
++                self.assertEqual(fdm.get_sim_time(), before_time)
++                self.assertEqual(fdm[ENGINE + "set-running"], 0)
++                # Re-spooling to this throttle would be detectable: its steady
++                # speed is well away from the speed the engine must keep.
++                dry_throttle = self.checked_dry_throttle(fdm, throttle)
++                self.assertGreater(abs(
++                    self.idle_n2 + dry_throttle * (self.maximum_n2 - self.idle_n2)
++                    - before["n2"]), 1.0)
++                for spool, value in before.items():
++                    with self.subTest(spool=spool):
++                        self.assertAlmostEqual(fdm[ENGINE + spool], value,
++                                               delta=OFF_SPOOL_TOLERANCE)
++
++    def assert_stays_off(self, fdm):
++        # Fuel flow has settled to zero, so the following frames must not
++        # burn fuel. The spools may windmill, so only their finiteness is
++        # checked, not their direction.
++        self.assertEqual(fdm[ENGINE + "fuel-flow-rate-pps"], 0.0)
++        fuel_used = fdm[ENGINE + "fuel-used-lbs"]
++        before_time = fdm.get_sim_time()
++        for _ in range(24):
++            self.assertTrue(fdm.run())
++            self.assertEqual(fdm[ENGINE + "set-running"], 0)
++            self.assertTrue(math.isfinite(fdm[ENGINE + "n1"]))
++            self.assertTrue(math.isfinite(fdm[ENGINE + "n2"]))
++            self.assertEqual(fdm[ENGINE + "fuel-flow-rate-pps"], 0.0)
++        self.assertGreater(fdm.get_sim_time(), before_time)
++        self.assertEqual(fdm[ENGINE + "fuel-used-lbs"], fuel_used)
++
++    def test_zero_time_trim_preserves_never_started_spools(self):
++        fdm = self.create_turbine_fdm()
++        self.assertEqual(fdm[ENGINE + "set-running"], 0)
++        # Dry and augmented commands; each RunIC repeats the initialization.
++        self.assert_run_ic_preserves_off_spools(fdm, (0.35, 0.75))
++        self.assert_stays_off(fdm)
++
++    def test_zero_time_trim_preserves_residual_spin_after_cutoff(self):
++        fdm = self.create_turbine_fdm()
++        self.assertTrue(fdm.run_ic())
++        fdm["propulsion/set-running"] = -1
++        fdm["fcs/throttle-cmd-norm[0]"] = 0.35
++        for _ in range(240):  # 2 s running
++            self.assertTrue(fdm.run())
++        self.assertEqual(fdm[ENGINE + "set-running"], 1)
++
++        fdm["propulsion/cutoff_cmd"] = 1
++        for _ in range(1200):  # 10 s after cutoff
++            self.assertTrue(fdm.run())
++        # Shut down, still turning, and no longer burning fuel.
++        self.assertEqual(fdm[ENGINE + "set-running"], 0)
++        self.assertGreater(fdm[ENGINE + "n1"], 0.0)
++        self.assertGreater(fdm[ENGINE + "n2"], 0.0)
++        self.assertEqual(fdm[ENGINE + "fuel-flow-rate-pps"], 0.0)
++
++        # The second RunIC checks that nothing resets the spools later.
++        self.assert_run_ic_preserves_off_spools(fdm, (0.35, 0.75))
++        self.assert_stays_off(fdm)
+ 
+ 
+ RunTest(TestTurbineTrimSpool)
+-- 
+2.54.0 (Apple Git-157)
+
+
+From 8945b0e34ddc85df1d324dffbe39d0732b03197d Mon Sep 17 00:00:00 2001
+From: Felipegalind0 <Felipegalind0@outlook.com>
+Date: Sat, 19 Sep 2026 17:35:40 -0500
+Subject: [PATCH 2/2] Leave an engine that is off out of the trim fuel state
+
+FGTurbine::Calculate() selects tpTrim whenever in.TotalDeltaT is zero,
+independently of any aircraft trim request, so zero-time evaluations such as
+RunIC() reach Trim() even when the engine is off. The steady fuel assignments
+added for the trim case ran for every engine, so an engine that had never been
+started, or that had been cut off and spooled down, came out of RunIC()
+reporting the throttle's running fuel flow and corrected TSFC. Off() then seeks
+that flow back to zero over the following frames, and CalcFuelNeed() debits the
+tanks for it: on the F16 fixture a never-started engine burned 0.35 lb dry and
+2.6 lb with augmentation requested, in 0.2 s.
+
+Commit the running state - N1, N2 and N2norm - and evaluate the TSFC and fuel
+targets only when the engine is running. The steady speed and its
+normalization are still computed unconditionally as locals, and the thrust and
+the AugMethod 1 threshold still use them, so what Trim() returns is unchanged
+in every case: twelve never-started, cut-off and running cases at a dry and an
+augmented throttle, with augmethod 1 and 2, are identical to this PR's previous
+implementation. An engine that is off keeps its own, possibly windmilling,
+spools and its own fuel state.
+
+A running engine is unaffected. N2norm is still updated before TSFC is
+evaluated, so a configured TSFC parameter still sees the operating point being
+trimmed; measured with an XML tsfc function reading the engine's N2, all six
+running cases match the previous implementation exactly.
+
+TestTurbineTrimFuelFlow keeps its three running checks and adds the two
+off-engine cases - never started and started then cut off - requiring the
+engine to be off before the call and its flow, corrected TSFC, spools,
+simulation time, tank contents and fuel used to come back unchanged, then
+requiring the following frames to burn nothing. This does not claim that every
+turbine's fuel flow is zero once it is shut down; the fixture's has settled
+there before the comparison is taken.
+---
+ src/models/propulsion/FGTurbine.cpp |  27 ++++---
+ tests/TestTurbineTrimFuelFlow.py    | 120 +++++++++++++++++++++++++++-
+ 2 files changed, 135 insertions(+), 12 deletions(-)
+
+diff --git a/src/models/propulsion/FGTurbine.cpp b/src/models/propulsion/FGTurbine.cpp
+index b928f770..416834a6 100644
+--- a/src/models/propulsion/FGTurbine.cpp
++++ b/src/models/propulsion/FGTurbine.cpp
+@@ -353,23 +353,30 @@ double FGTurbine::Trim()
+     double idlethrust = MilThrust * IdleThrustLookup->GetValue();
+     double milthrust = (MilThrust - idlethrust) * MilThrustLookup->GetValue();
+     double steadyN2 = IdleN2 + ThrottlePos * N2_factor;
++    double steadyN2norm = (steadyN2 - IdleN2) / N2_factor;
+     // Trim establishes steady thrust without advancing time. Keep a running
+-    // engine's observable spool state consistent with that operating point.
+-    // Zero-time evaluations, such as RunIC(), can reach Trim even when the
+-    // engine is off. Such an engine keeps its (possibly windmilling) spools.
++    // engine's observable spool state and fuel flow consistent with that
++    // operating point. Zero-time evaluations, such as RunIC(), can reach Trim
++    // even when the engine is off. Such an engine keeps its (possibly
++    // windmilling) spools and its existing fuel state: the throttle describes
++    // no operating point it is in, and a steady flow assigned here would be
++    // reported and then burned as it decayed.
+     if (Running) {
+       N1 = IdleN1 + ThrottlePos * N1_factor;
+       N2 = steadyN2;
++      N2norm = steadyN2norm;
+     }
+-    N2norm = (steadyN2 - IdleN2) / N2_factor;
+-    double dryThrust = idlethrust + (milthrust * N2norm * N2norm);
++    double dryThrust = idlethrust + (milthrust * steadyN2norm * steadyN2norm);
+     double thrust = dryThrust * (1.0 - BleedDemand);
+ 
+     // Run() derives fuel flow from the thrust produced before bleed extraction
+     // is deducted. Trim has no time to seek that value, so assign the same
+-    // steady product directly; TSFC is evaluated at this operating point.
+-    correctedTSFC = TSFC->GetValue();
+-    FuelFlow_pph = std::max(IdleFF, dryThrust * correctedTSFC);
++    // steady product directly; TSFC is evaluated at this operating point,
++    // after N2norm has been updated to it.
++    if (Running) {
++      correctedTSFC = TSFC->GetValue();
++      FuelFlow_pph = std::max(IdleFF, dryThrust * correctedTSFC);
++    }
+ 
+     if (AugMethod == 1) {
+       if ((ThrottlePos > 0.99) && (steadyN2 > 97.0)) {Augmentation = true;}
+@@ -378,14 +385,14 @@ double FGTurbine::Trim()
+ 
+     if ((Augmented == 1) && Augmentation && (AugMethod < 2)) {
+       thrust = MaxThrust * MaxThrustLookup->GetValue();
+-      FuelFlow_pph = thrust * ATSFC->GetValue();
++      if (Running) FuelFlow_pph = thrust * ATSFC->GetValue();
+     }
+ 
+     if (AugMethod == 2) {
+       if (AugmentCmd > 0.0) {
+         double tdiff = (MaxThrust * MaxThrustLookup->GetValue()) - thrust;
+         thrust += (tdiff * std::min(AugmentCmd, 1.0));
+-        FuelFlow_pph = thrust * ATSFC->GetValue();
++        if (Running) FuelFlow_pph = thrust * ATSFC->GetValue();
+       }
+     }
+ 
+diff --git a/tests/TestTurbineTrimFuelFlow.py b/tests/TestTurbineTrimFuelFlow.py
+index 199b4de2..387b7fcd 100644
+--- a/tests/TestTurbineTrimFuelFlow.py
++++ b/tests/TestTurbineTrimFuelFlow.py
+@@ -1,14 +1,26 @@
+ """Regression for steady turbine fuel flow during zero-time trim."""
+ 
++import math
+ import xml.etree.ElementTree as et
+ 
+ from JSBSim_utils import JSBSimTestCase, RunTest
+ 
+-FUEL_FLOW = "propulsion/engine[0]/fuel-flow-rate-gph"
++ENGINE = "propulsion/engine[0]/"
++FUEL_FLOW = ENGINE + "fuel-flow-rate-gph"
+ # The F16 FCS maps the command to a 0..2 position range, so commands at or
+ # below 0.49 stay in the dry range and 1.0 requests augmentation.
+ DRY_COMMANDS = (0.0, 0.2, 0.35, 0.49)
+ ALL_COMMANDS = DRY_COMMANDS + (1.0,)
++OFF_COMMANDS = (0.35, 1.0)
++# A zero-time evaluation must not give an engine that is off a running
++# operating point, so its fuel state is expected to be unchanged. Nothing
++# should write it at all, so the difference is expected to be exactly zero;
++# the tolerance is far below the flow a running engine reports at the same
++# commands, which the tests measure rather than assume.
++OFF_TOLERANCE = 1e-9
++# Enough to separate a preserved zero from any value the steady assignment
++# could produce: it is floored at the engine's idle fuel flow.
++MINIMUM_RUNNING_FLOW_GPH = 100.0
+ 
+ 
+ class TestTurbineTrimFuelFlow(JSBSimTestCase):
+@@ -21,13 +33,20 @@ class TestTurbineTrimFuelFlow(JSBSimTestCase):
+         self.use = script.getroot().find("use")
+         self.aircraft_name = self.use.attrib["aircraft"]
+ 
+-    def trimmed_fdm(self):
++    def create_turbine_fdm(self):
+         fdm = self.create_fdm()
+         self.assertTrue(fdm.load_model(self.aircraft_name))
+         self.assertTrue(fdm.load_ic(self.use.attrib["initialize"], True))
+         fdm.set_dt(1.0 / 120.0)
++        return fdm
++
++    def trimmed_fdm(self):
++        fdm = self.create_turbine_fdm()
+         self.assertTrue(fdm.run_ic())
+         fdm["propulsion/set-running"] = -1
++        # InitRunning() marks the engine running before its zero-time
++        # evaluation, so this public path really trims a running engine.
++        self.assertEqual(fdm[ENGINE + "set-running"], 1)
+         return fdm
+ 
+     def trim_at(self, fdm, command):
+@@ -38,6 +57,71 @@ class TestTurbineTrimFuelFlow(JSBSimTestCase):
+         self.assertEqual(fdm.get_sim_time(), before_time)
+         return fdm[FUEL_FLOW]
+ 
++    def steady_flow_at(self, command):
++        """The flow a running engine reports at this command, as a reference."""
++        fdm = self.trimmed_fdm()
++        flow = self.trim_at(fdm, command)
++        self.assertEqual(fdm[ENGINE + "set-running"], 1)
++        del fdm
++        return flow
++
++    def tank_contents(self, fdm):
++        catalog = fdm.query_property_catalog("propulsion/tank")
++        names = [line.split()[0] for line in catalog.split("\n")
++                 if "/contents-lbs" in line]
++        self.assertTrue(names)
++        return {name: fdm[name] for name in names}
++
++    def fuel_state(self, fdm):
++        state = {name: fdm[ENGINE + name] for name in (
++            "fuel-flow-rate-pps", "fuel-flow-rate-gph", "fuel-used-lbs",
++            "tsfc", "n1", "n2")}
++        state["sim-time-sec"] = fdm.get_sim_time()
++        state.update(self.tank_contents(fdm))
++        return state
++
++    def assert_run_ic_preserves_off_fuel_state(self, fdm, commands):
++        # What the steady assignment would have written, measured on running
++        # engines at the same commands, so a check that cannot detect the
++        # difference fails here instead of passing quietly.
++        for command in commands:
++            with self.subTest(reference=command):
++                self.assertGreater(self.steady_flow_at(command),
++                                   MINIMUM_RUNNING_FLOW_GPH)
++
++        for command in commands:
++            with self.subTest(command=command):
++                # The engine must be off before the evaluation being tested.
++                self.assertEqual(fdm[ENGINE + "set-running"], 0)
++                fdm["fcs/throttle-cmd-norm[0]"] = command
++                before = self.fuel_state(fdm)
++                self.assertTrue(fdm.run_ic())
++                self.assertEqual(fdm[ENGINE + "set-running"], 0)
++                after = self.fuel_state(fdm)
++                for name, value in before.items():
++                    with self.subTest(property=name):
++                        self.assertAlmostEqual(after[name], value,
++                                               delta=OFF_TOLERANCE)
++
++    def assert_burns_no_fuel(self, fdm):
++        # This fixture's flow has settled to zero, so the following frames
++        # must not create any. An engine handed a running flow while off
++        # reports it and debits the tanks as the flow decays.
++        self.assertEqual(fdm[FUEL_FLOW], 0.0)
++        tanks = self.tank_contents(fdm)
++        fuel_used = fdm[ENGINE + "fuel-used-lbs"]
++        before_time = fdm.get_sim_time()
++        for _ in range(24):
++            self.assertTrue(fdm.run())
++            self.assertEqual(fdm[ENGINE + "set-running"], 0)
++            self.assertEqual(fdm[FUEL_FLOW], 0.0)
++            # The spools may windmill, so only their finiteness is checked.
++            self.assertTrue(math.isfinite(fdm[ENGINE + "n1"]))
++            self.assertTrue(math.isfinite(fdm[ENGINE + "n2"]))
++        self.assertGreater(fdm.get_sim_time(), before_time)
++        self.assertEqual(fdm[ENGINE + "fuel-used-lbs"], fuel_used)
++        self.assertEqual(self.tank_contents(fdm), tanks)
++
+     def test_trim_fuel_flow_needs_no_seeking(self):
+         # Fuel flow is rate limited while time advances, so a trim value that
+         # already is the steady one cannot be sought away on the next frame.
+@@ -82,5 +166,37 @@ class TestTurbineTrimFuelFlow(JSBSimTestCase):
+         # points must not report the same corrected value.
+         self.assertGreater(idle, high)
+ 
++    def test_zero_time_trim_preserves_never_started_fuel_state(self):
++        fdm = self.create_turbine_fdm()
++        self.assertEqual(fdm[ENGINE + "set-running"], 0)
++        self.assertEqual(fdm[FUEL_FLOW], 0.0)
++        # Dry and augmented commands; each RunIC repeats the initialization.
++        self.assert_run_ic_preserves_off_fuel_state(fdm, OFF_COMMANDS)
++        self.assert_burns_no_fuel(fdm)
++
++    def test_zero_time_trim_preserves_fuel_state_after_cutoff(self):
++        fdm = self.trimmed_fdm()
++        fdm["fcs/throttle-cmd-norm[0]"] = 0.35
++        for _ in range(240):  # 2 s running
++            self.assertTrue(fdm.run())
++        self.assertEqual(fdm[ENGINE + "set-running"], 1)
++        self.assertGreater(fdm[FUEL_FLOW], MINIMUM_RUNNING_FLOW_GPH)
++
++        fdm["propulsion/cutoff_cmd"] = 1
++        for _ in range(1200):  # 10 s after cutoff
++            self.assertTrue(fdm.run())
++        # Shut down, still turning, and no longer burning fuel. That is this
++        # engine's modelled shutdown at this operating point, not a claim
++        # that every turbine's flow reaches zero the moment it is cut off.
++        self.assertEqual(fdm[ENGINE + "set-running"], 0)
++        self.assertGreater(fdm[ENGINE + "n1"], 0.0)
++        self.assertGreater(fdm[ENGINE + "n2"], 0.0)
++        self.assertEqual(fdm[FUEL_FLOW], 0.0)
++        self.assertGreater(fdm[ENGINE + "fuel-used-lbs"], 0.0)
++
++        # The second RunIC checks that nothing restores a flow later.
++        self.assert_run_ic_preserves_off_fuel_state(fdm, OFF_COMMANDS)
++        self.assert_burns_no_fuel(fdm)
++
+ 
+ RunTest(TestTurbineTrimFuelFlow)
+-- 
+2.54.0 (Apple Git-157)
+

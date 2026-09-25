@@ -1,0 +1,87 @@
+{
+  "recorded": "2026-09-19",
+  "stage": "2 follow-up - review gaps closed before stage 2 is marked reviewed",
+  "supersedes_nothing": "provenance.json and the files it names are unchanged; this record only adds what the follow-up produced",
+  "scope": [
+    "residual nonzero fuel-flow regression",
+    "configured TSFC/ATSFC copyto measurement",
+    "report and evidence corrections"
+  ],
+  "production_code_unchanged": true,
+  "commits": {
+    "stage_2_candidate": "8945b0e34ddc85df1d324dffbe39d0732b03197d",
+    "follow_up": "482da811f1bc6ab42c3cb76c8079eab7af75f49d"
+  },
+  "branch": "candidate/pr1508-off-engine-fuel",
+  "file_sha256": {
+    "src/models/propulsion/FGTurbine.cpp": "32c87c0c7984dccdf72f0ed14d8e8846dbf1f0b97e3960709be980643f6c59ef",
+    "tests/TestTurbineTrimFuelFlow.py": "4151687404774e51036befcbb7d23ccc10b952de84961e6040c10fd816b046a8",
+    "tests/TestTurbineTrimSpool.py": "ba7f4fb1ae4f1d836410b5309181199264db87649df182a3621d7e85291e97d3"
+  },
+  "fgturbine_unchanged_since_stage_2": true,
+  "binaries_reused": {
+    "original": "885d426fbd0327281c3044d7a7c52dfd4013707b3616c1f65cf726a6906edaef",
+    "spool-only": "b2b9aaee0ac71a58bbee2029c2af6205454eff151f570a75527e999c54baff45",
+    "final": "f739de7773b2144ca315a5e76705d36fcb08e3db4a9a6495c859951198a40779"
+  },
+  "binaries_still_match": {
+    "original": true,
+    "spool-only": true,
+    "final": true
+  },
+  "results": {
+    "TestTurbineTrimFuelFlow": {
+      "tests": 6,
+      "original_failures": 33,
+      "spool_only_failures": 21,
+      "final_failures": 0
+    },
+    "TestTurbineTrimSpool": {
+      "tests": 3,
+      "original_failures": 10,
+      "spool_only_failures": 2,
+      "final_failures": 0
+    },
+    "affected_targets": {
+      "total": 18,
+      "passed": 18
+    },
+    "full_ctest_targets_python_on": {
+      "total": 80,
+      "passed": 80
+    }
+  },
+  "residual_flow_fixture": {
+    "frames_after_cutoff": 24,
+    "dt": 0.008333333333333333,
+    "running_before_cutoff_gph": 1094.219,
+    "off_at_sample_gph": 791.1887015312342,
+    "frames_until_flow_reaches_zero": 86,
+    "steady_assignment_would_write_gph": {
+      "dry_cmd_0.35": 1102.352216872178,
+      "augmented_cmd_1.0": 9006.676075863472
+    }
+  },
+  "copyto_measurement": {
+    "sentinels": {
+      "tsfc": "test/trim-tsfc-copy",
+      "atsfc": "test/trim-atsfc-copy"
+    },
+    "sentinel_value": -1.0,
+    "created_before": "load_model",
+    "reset_before": "each observed RunIC",
+    "atsfc_property_read": false,
+    "note": "propulsion/engine[#]/atsfc is tied to the function getter, so reading it would fire the copyto being observed",
+    "variants": [
+      "xmlfunctions",
+      "xmlfunctions-augmethod1"
+    ],
+    "shared_rows_identical_to_pre_copyto_run": true,
+    "shared_rows_compared": 18
+  },
+  "tools": {
+    "trim_fuel_compare.py": "360dda10c7955b360c08bf27c4a4336be04f918f5874eae574e2d7f8cc8253dd",
+    "trim_thrust_compare.py": "b64e28bee7e28fe810b444b66dfaa95c1fb1d392467384b59c151a444af293fc",
+    "note": "trim_fuel_compare.py gained the copyto fixture and the fourth engine variant in this follow-up; trim_thrust_compare.py is unchanged since stage 0"
+  }
+}

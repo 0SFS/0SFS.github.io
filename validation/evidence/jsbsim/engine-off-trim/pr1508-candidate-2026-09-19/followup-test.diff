@@ -1,0 +1,133 @@
+diff --git a/tests/TestTurbineTrimFuelFlow.py b/tests/TestTurbineTrimFuelFlow.py
+index 387b7fcd..44d6504c 100644
+--- a/tests/TestTurbineTrimFuelFlow.py
++++ b/tests/TestTurbineTrimFuelFlow.py
+@@ -21,6 +21,14 @@ OFF_TOLERANCE = 1e-9
+ # Enough to separate a preserved zero from any value the steady assignment
+ # could produce: it is floored at the engine's idle fuel flow.
+ MINIMUM_RUNNING_FLOW_GPH = 100.0
++# The steady value must also differ from the flow the engine is holding by
++# far more than the tolerance above, or preservation could not be told from
++# assignment. A tenth of the steady value is ample for both fixtures here.
++MINIMUM_SEPARATION = 0.1
++# Frames after cutoff for the residual-flow fixture. This engine's flow takes
++# 86 frames to reach zero from throttle command 0.35, so a quarter of the way
++# down leaves plenty of margin on both sides.
++FRAMES_WITH_RESIDUAL_FLOW = 24
+ 
+ 
+ class TestTurbineTrimFuelFlow(JSBSimTestCase):
+@@ -81,20 +89,22 @@ class TestTurbineTrimFuelFlow(JSBSimTestCase):
+         return state
+ 
+     def assert_run_ic_preserves_off_fuel_state(self, fdm, commands):
+-        # What the steady assignment would have written, measured on running
+-        # engines at the same commands, so a check that cannot detect the
+-        # difference fails here instead of passing quietly.
+-        for command in commands:
+-            with self.subTest(reference=command):
+-                self.assertGreater(self.steady_flow_at(command),
+-                                   MINIMUM_RUNNING_FLOW_GPH)
+-
+         for command in commands:
+             with self.subTest(command=command):
+                 # The engine must be off before the evaluation being tested.
+                 self.assertEqual(fdm[ENGINE + "set-running"], 0)
+-                fdm["fcs/throttle-cmd-norm[0]"] = command
+                 before = self.fuel_state(fdm)
++                # What the steady assignment would have written, measured on a
++                # running engine at the same command, so a check that cannot
++                # tell preservation from assignment fails here instead of
++                # passing quietly.
++                reference = self.steady_flow_at(command)
++                self.assertGreater(reference, MINIMUM_RUNNING_FLOW_GPH)
++                self.assertGreater(
++                    abs(reference - before["fuel-flow-rate-gph"]) / reference,
++                    MINIMUM_SEPARATION)
++
++                fdm["fcs/throttle-cmd-norm[0]"] = command
+                 self.assertTrue(fdm.run_ic())
+                 self.assertEqual(fdm[ENGINE + "set-running"], 0)
+                 after = self.fuel_state(fdm)
+@@ -103,6 +113,25 @@ class TestTurbineTrimFuelFlow(JSBSimTestCase):
+                         self.assertAlmostEqual(after[name], value,
+                                                delta=OFF_TOLERANCE)
+ 
++    def assert_residual_flow_decays_normally(self, fdm):
++        # Residual flow is still being delivered, so the tanks must keep
++        # paying for it. Only its decay to zero is asserted here; demanding
++        # no consumption while the engine still reports a flow would assert
++        # away the model's own shutdown behaviour.
++        previous = fdm[FUEL_FLOW]
++        self.assertGreater(previous, 0.0)
++        used = fdm[ENGINE + "fuel-used-lbs"]
++        for _ in range(240):
++            self.assertTrue(fdm.run())
++            self.assertEqual(fdm[ENGINE + "set-running"], 0)
++            flow = fdm[FUEL_FLOW]
++            self.assertLessEqual(flow, previous)
++            previous = flow
++            if flow == 0.0:
++                break
++        self.assertEqual(previous, 0.0)
++        self.assertGreater(fdm[ENGINE + "fuel-used-lbs"], used)
++
+     def assert_burns_no_fuel(self, fdm):
+         # This fixture's flow has settled to zero, so the following frames
+         # must not create any. An engine handed a running flow while off
+@@ -174,7 +203,8 @@ class TestTurbineTrimFuelFlow(JSBSimTestCase):
+         self.assert_run_ic_preserves_off_fuel_state(fdm, OFF_COMMANDS)
+         self.assert_burns_no_fuel(fdm)
+ 
+-    def test_zero_time_trim_preserves_fuel_state_after_cutoff(self):
++    def cut_off_fdm(self, frames_after_cutoff):
++        """A started engine, cut off and advanced by the given frame count."""
+         fdm = self.trimmed_fdm()
+         fdm["fcs/throttle-cmd-norm[0]"] = 0.35
+         for _ in range(240):  # 2 s running
+@@ -183,20 +213,40 @@ class TestTurbineTrimFuelFlow(JSBSimTestCase):
+         self.assertGreater(fdm[FUEL_FLOW], MINIMUM_RUNNING_FLOW_GPH)
+ 
+         fdm["propulsion/cutoff_cmd"] = 1
+-        for _ in range(1200):  # 10 s after cutoff
++        for _ in range(frames_after_cutoff):
+             self.assertTrue(fdm.run())
+-        # Shut down, still turning, and no longer burning fuel. That is this
+-        # engine's modelled shutdown at this operating point, not a claim
+-        # that every turbine's flow reaches zero the moment it is cut off.
++        # Shut down and still turning. Cutoff takes the engine out of tpRun on
++        # the first frame, so this is off with whatever fuel state the elapsed
++        # frames have left it.
+         self.assertEqual(fdm[ENGINE + "set-running"], 0)
+         self.assertGreater(fdm[ENGINE + "n1"], 0.0)
+         self.assertGreater(fdm[ENGINE + "n2"], 0.0)
+-        self.assertEqual(fdm[FUEL_FLOW], 0.0)
+         self.assertGreater(fdm[ENGINE + "fuel-used-lbs"], 0.0)
++        return fdm
++
++    def test_zero_time_trim_preserves_fuel_state_after_cutoff(self):
++        fdm = self.cut_off_fdm(1200)  # 10 s after cutoff
++        # This fixture's flow has settled to zero. That is this engine's
++        # modelled shutdown at this operating point, not a claim that every
++        # turbine's flow reaches zero the moment it is cut off.
++        self.assertEqual(fdm[FUEL_FLOW], 0.0)
+ 
+         # The second RunIC checks that nothing restores a flow later.
+         self.assert_run_ic_preserves_off_fuel_state(fdm, OFF_COMMANDS)
+         self.assert_burns_no_fuel(fdm)
+ 
++    def test_zero_time_trim_preserves_residual_fuel_flow(self):
++        # The same shutdown taken earlier, while the engine is already off but
++        # its flow is still decaying. A preserved value that is not zero is
++        # the stronger check: the steady assignment would replace it with a
++        # different positive number rather than merely create one.
++        fdm = self.cut_off_fdm(FRAMES_WITH_RESIDUAL_FLOW)
++        self.assertGreater(fdm[FUEL_FLOW], 0.0)
++
++        self.assert_run_ic_preserves_off_fuel_state(fdm, OFF_COMMANDS)
++        # The zero-time calls must not have disturbed the shutdown either.
++        self.assert_residual_flow_decays_normally(fdm)
++        self.assert_burns_no_fuel(fdm)
++
+ 
+ RunTest(TestTurbineTrimFuelFlow)

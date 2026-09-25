@@ -1,0 +1,204 @@
+diff --git a/src/models/propulsion/FGTurbine.cpp b/src/models/propulsion/FGTurbine.cpp
+index e0a51222..fede0b9d 100644
+--- a/src/models/propulsion/FGTurbine.cpp
++++ b/src/models/propulsion/FGTurbine.cpp
+@@ -351,16 +351,21 @@ double FGTurbine::Trim()
+ {
+     double idlethrust = MilThrust * IdleThrustLookup->GetValue();
+     double milthrust = (MilThrust - idlethrust) * MilThrustLookup->GetValue();
+-    // Trim establishes steady thrust without advancing time. Keep the
+-    // observable spool state consistent with that same operating point.
+-    N1 = IdleN1 + ThrottlePos * N1_factor;
+-    N2 = IdleN2 + ThrottlePos * N2_factor;
+-    double N2norm = (N2 - IdleN2) / N2_factor;
++    double steadyN2 = IdleN2 + ThrottlePos * N2_factor;
++    // Trim establishes steady thrust without advancing time. Keep a running
++    // engine's observable spool state consistent with that operating point.
++    // Every zero-time evaluation, such as RunIC(), comes here, so an engine
++    // that is off must keep its (possibly windmilling) spool state.
++    if (Running) {
++      N1 = IdleN1 + ThrottlePos * N1_factor;
++      N2 = steadyN2;
++    }
++    double N2norm = (steadyN2 - IdleN2) / N2_factor;
+     double thrust = (idlethrust + (milthrust * N2norm * N2norm))
+           * (1.0 - BleedDemand);
+ 
+     if (AugMethod == 1) {
+-      if ((ThrottlePos > 0.99) && (N2 > 97.0)) {Augmentation = true;}
++      if ((ThrottlePos > 0.99) && (steadyN2 > 97.0)) {Augmentation = true;}
+       else {Augmentation = false;}
+     }
+ 
+diff --git a/tests/TestTurbineTrimSpool.py b/tests/TestTurbineTrimSpool.py
+index 56ffbaf9..e055c62c 100644
+--- a/tests/TestTurbineTrimSpool.py
++++ b/tests/TestTurbineTrimSpool.py
+@@ -1,12 +1,20 @@
+ """Regression for observable turbine spool speeds during zero-time trim."""
+ 
++import math
+ import xml.etree.ElementTree as et
+ 
+ from JSBSim_utils import JSBSimTestCase, RunTest
+ 
++ENGINE = "propulsion/engine[0]/"
++
++# A zero-time evaluation must not write the spools of an engine that is off,
++# so their values are expected to be unchanged. The tolerance is far below the
++# residual spin checked here (about 0.5 %) and any throttle's steady speed.
++OFF_SPOOL_TOLERANCE = 1e-9
++
+ 
+ class TestTurbineTrimSpool(JSBSimTestCase):
+-    def test_zero_time_trim_updates_both_spools(self):
++    def create_turbine_fdm(self):
+         # Use the standard turbine fixture without script events that could
+         # overwrite the throttle during the continuity check.
+         script = et.parse(self.sandbox.path_to_jsbsim_file(
+@@ -18,17 +26,34 @@ class TestTurbineTrimSpool(JSBSimTestCase):
+         engine_name = aircraft.getroot().find("propulsion/engine").attrib["file"]
+         engine = et.parse(self.sandbox.path_to_jsbsim_file(
+             "engine", engine_name + ".xml")).getroot()
+-        idle_n1 = float(engine.find("idlen1").text)
+-        maximum_n1 = float(engine.find("maxn1").text)
+-        idle_n2 = float(engine.find("idlen2").text)
+-        maximum_n2 = float(engine.find("maxn2").text)
++        self.idle_n1 = float(engine.find("idlen1").text)
++        self.maximum_n1 = float(engine.find("maxn1").text)
++        self.idle_n2 = float(engine.find("idlen2").text)
++        self.maximum_n2 = float(engine.find("maxn2").text)
+ 
+         fdm = self.create_fdm()
+         self.assertTrue(fdm.load_model(aircraft_name))
+         self.assertTrue(fdm.load_ic(use.attrib["initialize"], True))
+         fdm.set_dt(1.0 / 120.0)
++        return fdm
++
++    def checked_dry_throttle(self, fdm, throttle):
++        # The F16 FCS maps the command to a 0..2 position range.
++        # Positions above 1 request augmentation, not higher dry
++        # spool speeds. Assert the fixture mapping independently.
++        throttle_position = fdm["fcs/throttle-pos-norm[0]"]
++        self.assertAlmostEqual(throttle_position, 2.0 * throttle, places=7)
++        return max(0.0, min(1.0, throttle_position))
++
++    def test_zero_time_trim_updates_both_spools(self):
++        fdm = self.create_turbine_fdm()
+         self.assertTrue(fdm.run_ic())
+         fdm["propulsion/set-running"] = -1
++        # InitRunning() marks the engine running before its zero-time
++        # evaluation; set-running then settles it at full dry throttle.
++        self.assertEqual(fdm[ENGINE + "set-running"], 1)
++        self.assertAlmostEqual(fdm[ENGINE + "n1"], self.maximum_n1, places=7)
++        self.assertAlmostEqual(fdm[ENGINE + "n2"], self.maximum_n2, places=7)
+ 
+         for throttle in (0.0, 0.35, 1.0, 0.0):
+             with self.subTest(throttle=throttle):
+@@ -37,28 +62,91 @@ class TestTurbineTrimSpool(JSBSimTestCase):
+                 before_time = fdm.get_sim_time()
+                 self.assertTrue(fdm.run_ic())
+                 self.assertEqual(fdm.get_sim_time(), before_time)
+-                # The F16 FCS maps the command to a 0..2 position range.
+-                # Positions above 1 request augmentation, not higher dry
+-                # spool speeds. Assert the fixture mapping independently.
+-                throttle_position = fdm["fcs/throttle-pos-norm[0]"]
+-                self.assertAlmostEqual(throttle_position, 2.0 * throttle,
+-                                       places=7)
+-                dry_throttle = max(0.0, min(1.0, throttle_position))
++                self.assertEqual(fdm[ENGINE + "set-running"], 1)
++                dry_throttle = self.checked_dry_throttle(fdm, throttle)
+                 self.assertAlmostEqual(
+-                    fdm["propulsion/engine[0]/n1"],
+-                    idle_n1 + dry_throttle * (maximum_n1 - idle_n1), places=7)
++                    fdm[ENGINE + "n1"],
++                    self.idle_n1 + dry_throttle * (self.maximum_n1 - self.idle_n1),
++                    places=7)
+                 self.assertAlmostEqual(
+-                    fdm["propulsion/engine[0]/n2"],
+-                    idle_n2 + dry_throttle * (maximum_n2 - idle_n2), places=7)
++                    fdm[ENGINE + "n2"],
++                    self.idle_n2 + dry_throttle * (self.maximum_n2 - self.idle_n2),
++                    places=7)
+ 
+         # The first integrated idle sample must not repair stale full-power
+         # indications. No application-side property writes mask the defect.
+-        before_n1 = fdm["propulsion/engine[0]/n1"]
+-        before_n2 = fdm["propulsion/engine[0]/n2"]
++        before_n1 = fdm[ENGINE + "n1"]
++        before_n2 = fdm[ENGINE + "n2"]
+         self.assertTrue(fdm.run())
+         self.assertGreater(fdm.get_sim_time(), before_time)
+-        self.assertAlmostEqual(fdm["propulsion/engine[0]/n1"], before_n1, places=5)
+-        self.assertAlmostEqual(fdm["propulsion/engine[0]/n2"], before_n2, places=5)
++        self.assertEqual(fdm[ENGINE + "set-running"], 1)
++        self.assertAlmostEqual(fdm[ENGINE + "n1"], before_n1, places=5)
++        self.assertAlmostEqual(fdm[ENGINE + "n2"], before_n2, places=5)
++
++    def assert_run_ic_preserves_off_spools(self, fdm, throttles):
++        for throttle in throttles:
++            with self.subTest(throttle=throttle):
++                fdm["fcs/throttle-cmd-norm[0]"] = throttle
++                before_time = fdm.get_sim_time()
++                before = {spool: fdm[ENGINE + spool] for spool in ("n1", "n2")}
++                self.assertTrue(fdm.run_ic())
++                self.assertEqual(fdm.get_sim_time(), before_time)
++                self.assertEqual(fdm[ENGINE + "set-running"], 0)
++                # Re-spooling to this throttle would be detectable: its steady
++                # speed is well away from the speed the engine must keep.
++                dry_throttle = self.checked_dry_throttle(fdm, throttle)
++                self.assertGreater(abs(
++                    self.idle_n2 + dry_throttle * (self.maximum_n2 - self.idle_n2)
++                    - before["n2"]), 1.0)
++                for spool, value in before.items():
++                    with self.subTest(spool=spool):
++                        self.assertAlmostEqual(fdm[ENGINE + spool], value,
++                                               delta=OFF_SPOOL_TOLERANCE)
++
++    def assert_stays_off(self, fdm):
++        # Fuel flow has settled to zero, so the following frames must not
++        # burn fuel. The spools may windmill, so only their finiteness is
++        # checked, not their direction.
++        self.assertEqual(fdm[ENGINE + "fuel-flow-rate-pps"], 0.0)
++        fuel_used = fdm[ENGINE + "fuel-used-lbs"]
++        before_time = fdm.get_sim_time()
++        for _ in range(24):
++            self.assertTrue(fdm.run())
++            self.assertEqual(fdm[ENGINE + "set-running"], 0)
++            self.assertTrue(math.isfinite(fdm[ENGINE + "n1"]))
++            self.assertTrue(math.isfinite(fdm[ENGINE + "n2"]))
++            self.assertEqual(fdm[ENGINE + "fuel-flow-rate-pps"], 0.0)
++        self.assertGreater(fdm.get_sim_time(), before_time)
++        self.assertEqual(fdm[ENGINE + "fuel-used-lbs"], fuel_used)
++
++    def test_zero_time_trim_preserves_never_started_spools(self):
++        fdm = self.create_turbine_fdm()
++        self.assertEqual(fdm[ENGINE + "set-running"], 0)
++        # Dry and augmented commands; each RunIC repeats the initialization.
++        self.assert_run_ic_preserves_off_spools(fdm, (0.35, 0.75))
++        self.assert_stays_off(fdm)
++
++    def test_zero_time_trim_preserves_residual_spin_after_cutoff(self):
++        fdm = self.create_turbine_fdm()
++        self.assertTrue(fdm.run_ic())
++        fdm["propulsion/set-running"] = -1
++        fdm["fcs/throttle-cmd-norm[0]"] = 0.35
++        for _ in range(240):  # 2 s running
++            self.assertTrue(fdm.run())
++        self.assertEqual(fdm[ENGINE + "set-running"], 1)
++
++        fdm["propulsion/cutoff_cmd"] = 1
++        for _ in range(1200):  # 10 s after cutoff
++            self.assertTrue(fdm.run())
++        # Shut down, still turning, and no longer burning fuel.
++        self.assertEqual(fdm[ENGINE + "set-running"], 0)
++        self.assertGreater(fdm[ENGINE + "n1"], 0.0)
++        self.assertGreater(fdm[ENGINE + "n2"], 0.0)
++        self.assertEqual(fdm[ENGINE + "fuel-flow-rate-pps"], 0.0)
++
++        # The second RunIC checks that nothing resets the spools later.
++        self.assert_run_ic_preserves_off_spools(fdm, (0.35, 0.75))
++        self.assert_stays_off(fdm)
+ 
+ 
+ RunTest(TestTurbineTrimSpool)

@@ -1,0 +1,21 @@
+label      : original
+jsbsim     : /Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/original/tests/jsbsim/__init__.py
+extension  : /Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/original/tests/jsbsim/_jsbsim.so
+sha256     : 885d426fbd0327281c3044d7a7c52dfd4013707b3616c1f65cf726a6906edaef
+version    : 1.3.2.dev1
+python     : 3.14.7
+
+label      : spool-only
+jsbsim     : /Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/spool-only/tests/jsbsim/__init__.py
+extension  : /Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/spool-only/tests/jsbsim/_jsbsim.so
+sha256     : b2b9aaee0ac71a58bbee2029c2af6205454eff151f570a75527e999c54baff45
+version    : 1.3.2.dev1
+python     : 3.14.7
+
+label      : final
+jsbsim     : /Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/final/tests/jsbsim/__init__.py
+extension  : /Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/final/tests/jsbsim/_jsbsim.so
+sha256     : f739de7773b2144ca315a5e76705d36fcb08e3db4a9a6495c859951198a40779
+version    : 1.3.2.dev1
+python     : 3.14.7
+

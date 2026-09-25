@@ -1,0 +1,29 @@
+diff --git a/src/models/propulsion/FGTurbine.cpp b/src/models/propulsion/FGTurbine.cpp
+index 68589257..fede0b9d 100644
+--- a/src/models/propulsion/FGTurbine.cpp
++++ b/src/models/propulsion/FGTurbine.cpp
+@@ -351,13 +351,21 @@ double FGTurbine::Trim()
+ {
+     double idlethrust = MilThrust * IdleThrustLookup->GetValue();
+     double milthrust = (MilThrust - idlethrust) * MilThrustLookup->GetValue();
+-    double N2 = IdleN2 + ThrottlePos * N2_factor;
+-    double N2norm = (N2 - IdleN2) / N2_factor;
++    double steadyN2 = IdleN2 + ThrottlePos * N2_factor;
++    // Trim establishes steady thrust without advancing time. Keep a running
++    // engine's observable spool state consistent with that operating point.
++    // Every zero-time evaluation, such as RunIC(), comes here, so an engine
++    // that is off must keep its (possibly windmilling) spool state.
++    if (Running) {
++      N1 = IdleN1 + ThrottlePos * N1_factor;
++      N2 = steadyN2;
++    }
++    double N2norm = (steadyN2 - IdleN2) / N2_factor;
+     double thrust = (idlethrust + (milthrust * N2norm * N2norm))
+           * (1.0 - BleedDemand);
+ 
+     if (AugMethod == 1) {
+-      if ((ThrottlePos > 0.99) && (N2 > 97.0)) {Augmentation = true;}
++      if ((ThrottlePos > 0.99) && (steadyN2 > 97.0)) {Augmentation = true;}
+       else {Augmentation = false;}
+     }
+ 

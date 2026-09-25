@@ -1,0 +1,117 @@
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/pr1505-off-engine-20260919/before
+    Start 35: TestTurbineTrimSpool
+1/1 Test #35: TestTurbineTrimSpool .............***Failed    0.62 sec
+test_zero_time_trim_preserves_never_started_spools (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_never_started_spools) ... 
+  test_zero_time_trim_preserves_never_started_spools (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_never_started_spools) (spool='n1', throttle=0.35) ... FAIL
+  test_zero_time_trim_preserves_never_started_spools (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_never_started_spools) (spool='n2', throttle=0.35) ... FAIL
+  test_zero_time_trim_preserves_never_started_spools (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_never_started_spools) (spool='n1', throttle=0.75) ... FAIL
+  test_zero_time_trim_preserves_never_started_spools (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_never_started_spools) (spool='n2', throttle=0.75) ... FAIL
+test_zero_time_trim_preserves_residual_spin_after_cutoff (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_residual_spin_after_cutoff) ... 
+  test_zero_time_trim_preserves_residual_spin_after_cutoff (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_residual_spin_after_cutoff) (spool='n1', throttle=0.35) ... FAIL
+  test_zero_time_trim_preserves_residual_spin_after_cutoff (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_residual_spin_after_cutoff) (spool='n2', throttle=0.35) ... FAIL
+  test_zero_time_trim_preserves_residual_spin_after_cutoff (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_residual_spin_after_cutoff) (spool='n1', throttle=0.75) ... FAIL
+  test_zero_time_trim_preserves_residual_spin_after_cutoff (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_residual_spin_after_cutoff) (spool='n2', throttle=0.75) ... FAIL
+test_zero_time_trim_updates_both_spools (__main__.TestTurbineTrimSpool.test_zero_time_trim_updates_both_spools) ... ok
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_never_started_spools (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_never_started_spools) (spool='n1', throttle=0.35)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimSpool.py", line 103, in assert_run_ic_preserves_off_spools
+    self.assertAlmostEqual(fdm[ENGINE + spool], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_SPOOL_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 82.0 != 0.0 within 1e-09 delta (82.0 difference)
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_never_started_spools (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_never_started_spools) (spool='n2', throttle=0.35)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimSpool.py", line 103, in assert_run_ic_preserves_off_spools
+    self.assertAlmostEqual(fdm[ENGINE + spool], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_SPOOL_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 85.89999999999999 != 0.0 within 1e-09 delta (85.89999999999999 difference)
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_never_started_spools (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_never_started_spools) (spool='n1', throttle=0.75)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimSpool.py", line 103, in assert_run_ic_preserves_off_spools
+    self.assertAlmostEqual(fdm[ENGINE + spool], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_SPOOL_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 100.0 != 82.0 within 1e-09 delta (18.0 difference)
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_never_started_spools (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_never_started_spools) (spool='n2', throttle=0.75)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimSpool.py", line 103, in assert_run_ic_preserves_off_spools
+    self.assertAlmostEqual(fdm[ENGINE + spool], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_SPOOL_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 100.0 != 85.89999999999999 within 1e-09 delta (14.100000000000009 difference)
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_residual_spin_after_cutoff (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_residual_spin_after_cutoff) (spool='n1', throttle=0.35)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimSpool.py", line 103, in assert_run_ic_preserves_off_spools
+    self.assertAlmostEqual(fdm[ENGINE + spool], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_SPOOL_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 82.0 != 0.5467703253239313 within 1e-09 delta (81.45322967467607 difference)
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_residual_spin_after_cutoff (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_residual_spin_after_cutoff) (spool='n2', throttle=0.35)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimSpool.py", line 103, in assert_run_ic_preserves_off_spools
+    self.assertAlmostEqual(fdm[ENGINE + spool], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_SPOOL_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 85.89999999999999 != 0.5727752554308012 within 1e-09 delta (85.3272247445692 difference)
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_residual_spin_after_cutoff (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_residual_spin_after_cutoff) (spool='n1', throttle=0.75)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimSpool.py", line 103, in assert_run_ic_preserves_off_spools
+    self.assertAlmostEqual(fdm[ENGINE + spool], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_SPOOL_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 100.0 != 82.0 within 1e-09 delta (18.0 difference)
+
+======================================================================
+FAIL: test_zero_time_trim_preserves_residual_spin_after_cutoff (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_residual_spin_after_cutoff) (spool='n2', throttle=0.75)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimSpool.py", line 103, in assert_run_ic_preserves_off_spools
+    self.assertAlmostEqual(fdm[ENGINE + spool], value,
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                           delta=OFF_SPOOL_TOLERANCE)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 100.0 != 85.89999999999999 within 1e-09 delta (14.100000000000009 difference)
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.042s
+
+FAILED (failures=8)
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   0.62 sec
+
+The following tests FAILED:
+	 35 - TestTurbineTrimSpool (Failed)
+Errors while running CTest
+ctest exit 8

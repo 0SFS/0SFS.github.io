@@ -1,0 +1,31 @@
+UpdateCTestConfiguration  from :/Users/felg/gh/Felipegalind0/jsbsim/build/pr1505-off-engine-20260919/after/DartConfiguration.tcl
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/pr1505-off-engine-20260919/after
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 35
+    Start 35: TestTurbineTrimSpool
+
+35: Test command: /Users/felg/gh/Felipegalind0/jsbsim/.venv/bin/python "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineTrimSpool.py"
+35: Working Directory: /Users/felg/gh/Felipegalind0/jsbsim/build/pr1505-off-engine-20260919/after/tests
+35: Test timeout computed to be: 10000000
+35: test_zero_time_trim_preserves_never_started_spools (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_never_started_spools) ... ok
+35: test_zero_time_trim_preserves_residual_spin_after_cutoff (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_residual_spin_after_cutoff) ... ok
+35: test_zero_time_trim_updates_both_spools (__main__.TestTurbineTrimSpool.test_zero_time_trim_updates_both_spools) ... ok
+35: 
+35: ----------------------------------------------------------------------
+35: Ran 3 tests in 0.020s
+35: 
+35: OK
+1/1 Test #35: TestTurbineTrimSpool .............   Passed    0.29 sec
+
+The following tests passed:
+	TestTurbineTrimSpool
+
+100% tests passed out of 1
+
+Total Test time (real) =   0.29 sec
+ctest exit 0

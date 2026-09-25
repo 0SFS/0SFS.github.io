@@ -1,0 +1,21 @@
+# Recorded 2026-09-19T22:24:11Z
+
+## JSBSim canonical checkout /Users/felg/gh/Felipegalind0/jsbsim
+branch: fix/turbine-trim-spool
+HEAD: 6f95bfb0a590d1a45de9f883857c17af0819f6ad
+status --short:
+(empty above = clean)
+
+## heads
+6f95bfb0a590d1a45de9f883857c17af0819f6ad 
+07eba55fcd6fed530f6f404e857765c3224541fb 
+7511df10cda909c32dfc378dfde204eb44dc5a48 
+7511df10cda909c32dfc378dfde204eb44dc5a48 
+14c19022943f5850daf2c6b90554050b3139b853 
+
+local fix/turbine-trim-spool      6f95bfb0a590d1a45de9f883857c17af0819f6ad
+remote origin/fix/turbine-trim-spool 07eba55fcd6fed530f6f404e857765c3224541fb
+local fix/turbine-trim-fuel-flow  7511df10cda909c32dfc378dfde204eb44dc5a48
+remote origin/fix/turbine-trim-fuel-flow 7511df10cda909c32dfc378dfde204eb44dc5a48
+ls-remote fix/turbine-trim-fuel-flow 7511df10cda909c32dfc378dfde204eb44dc5a48
+gh PR 1508 headRefOid 7511df10cda909c32dfc378dfde204eb44dc5a48 state OPEN updatedAt 2026-09-15T08:17:04Z

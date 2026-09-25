@@ -1,0 +1,9 @@
+test_zero_time_trim_preserves_never_started_spools (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_never_started_spools) ... ok
+test_zero_time_trim_preserves_residual_spin_after_cutoff (__main__.TestTurbineTrimSpool.test_zero_time_trim_preserves_residual_spin_after_cutoff) ... ok
+test_zero_time_trim_updates_both_spools (__main__.TestTurbineTrimSpool.test_zero_time_trim_updates_both_spools) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.017s
+
+OK
+spool test on mutant exit 0

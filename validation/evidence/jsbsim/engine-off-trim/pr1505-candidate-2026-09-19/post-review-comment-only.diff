@@ -1,0 +1,13 @@
+--- build/pr1505-off-engine-20260919/post-review/FGTurbine.cpp.tested	2026-09-19 17:11:30
++++ src/models/propulsion/FGTurbine.cpp	2026-09-19 17:11:33
+@@ -354,8 +354,8 @@
+     double steadyN2 = IdleN2 + ThrottlePos * N2_factor;
+     // Trim establishes steady thrust without advancing time. Keep a running
+     // engine's observable spool state consistent with that operating point.
+-    // Every zero-time evaluation, such as RunIC(), comes here, so an engine
+-    // that is off must keep its (possibly windmilling) spool state.
++    // Zero-time evaluations, such as RunIC(), can reach Trim even when the
++    // engine is off. Such an engine keeps its (possibly windmilling) spools.
+     if (Running) {
+       N1 = IdleN1 + ThrottlePos * N1_factor;
+       N2 = steadyN2;
