@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { BabylonRuntimeStatus } from "foss-earth/runtime";
+import { createMapDetailController } from "foss-earth/shell";
 import { createFlightHudBar, type FlightHudBarOptions } from "./createFlightHudBar";
 
 beforeEach(() => {
@@ -25,16 +26,16 @@ function createTestHud(overrides: Partial<FlightHudBarOptions> = {}) {
       isRendering: () => false,
       onActiveRenderChange: () => vi.fn(),
     },
-    rendererMode: "webgl2", rendererForce: null,
+    rendererMode: "webgl2",
     runtimeStatus: {
       mode: "raster-basemap",
       terrainSource: { id: "mapterhorn", label: "Mapterhorn Terrain" },
       rasterQuality: { setting: "auto", activeProfile: "balanced" },
     } as BabylonRuntimeStatus,
-    rasterSources: [], terrainSources: [],
-    onPausedChange: vi.fn(), onRendererChange: vi.fn(), onMapSourceChange: vi.fn(), onTerrainSourceChange: vi.fn(),
-    getTerrainDetailState: () => ({ available: false, minErrorTarget: 16, maxErrorTarget: 4096, overrideErrorTarget: null, activeErrorTarget: null }),
-    onTerrainDetailChange: vi.fn(), onSettingsClick: vi.fn(), onDebugClick: vi.fn(),
+    onPausedChange: vi.fn(),
+    mapDetail: createMapDetailController({ storage: null }),
+    onSettingsClick: vi.fn(), onDebugClick: vi.fn(), onInputMethodClick: vi.fn(),
+    onRendererClick: vi.fn(), onMapClick: vi.fn(), onStatusClick: vi.fn(),
     onInputModeChange: vi.fn(), onInputSensitivityChange: vi.fn(),
     ...overrides,
   });
@@ -76,21 +77,19 @@ describe("flight HUD fullscreen and log buttons", () => {
   });
 });
 describe("flight input method selector", () => {
-  it("loads the shared preference, offers only supported modes and persists selection", () => {
+  it("toggles Controls from the button, and the section loads, offers and persists the pointer mode", () => {
     window.localStorage.setItem("foss-earth.inputMode", "mouse");
     const container = document.createElement("div");
     document.body.append(container);
     const onInputModeChange = vi.fn();
-    const onTerrainSourceChange = vi.fn();
-    const onMapSourceChange = vi.fn();
-    let terrainDetailOverride: number | null = null;
-    let activeTerrainDetail = 16;
-    const onTerrainDetailChange = vi.fn((errorTarget: number | null) => {
-      terrainDetailOverride = errorTarget;
-      activeTerrainDetail = errorTarget ?? 16;
-    });
+    const mapDetail = createMapDetailController({ storage: null });
+    mapDetail.setRecommendationContext({ rendererDefaultErrorPx: 20, rendererMode: "webgl2" });
     const onSettingsClick = vi.fn();
     const onDebugClick = vi.fn();
+    const onInputMethodClick = vi.fn();
+    const onRendererClick = vi.fn();
+    const onMapClick = vi.fn();
+    const onStatusClick = vi.fn();
     let activityListener: (active: boolean) => void = () => {};
     const unsubscribe = vi.fn();
     const unsubscribeStreaming = vi.fn();
@@ -104,49 +103,43 @@ describe("flight input method selector", () => {
         isRendering: () => true,
         onActiveRenderChange: (listener) => { activityListener = listener; return unsubscribe; },
       },
-      rendererMode: "webgl2", rendererForce: null,
+      rendererMode: "webgl2",
       runtimeStatus: {
         mode: "raster-basemap",
+        rasterBaseMap: { id: "usgs-imagery", label: "USGS Imagery" },
         terrainSource: { id: "mapterhorn", label: "Mapterhorn Terrain" },
         rasterQuality: { setting: "auto", activeProfile: "balanced" },
       } as BabylonRuntimeStatus,
-      rasterSources: [{
-        id: "usgs-imagery",
-        label: "USGS Imagery",
-        provider: "USGS",
-        protocol: "xyz",
-        urlTemplate: "",
-        attribution: "",
-      }],
-      terrainSources: [{ id: "mapterhorn", label: "Mapterhorn Terrain", provider: "Mapterhorn", urlTemplate: "", maxZoom: 15, attribution: "" }],
-      onPausedChange: vi.fn(), onRendererChange: vi.fn(), onMapSourceChange, onTerrainSourceChange,
-      getTerrainDetailState: () => ({
-        available: true,
-        minErrorTarget: 16,
-        maxErrorTarget: 4096,
-        overrideErrorTarget: terrainDetailOverride,
-        activeErrorTarget: activeTerrainDetail,
-      }),
-      onTerrainDetailChange,
+      onPausedChange: vi.fn(),
+      mapDetail,
       onSettingsClick,
       onDebugClick,
+      onInputMethodClick,
+      onRendererClick,
+      onMapClick,
+      onStatusClick,
       onInputModeChange, onInputSensitivityChange: vi.fn(),
     });
     expect(onInputModeChange).toHaveBeenLastCalledWith("mouse");
     expect(container.querySelector("#flightControlsButton")).toBeNull();
     const button = container.querySelector<HTMLButtonElement>("#inputModeButton")!;
     button.click();
-    expect(button.getAttribute("aria-expanded")).toBe("true");
-    expect(container.querySelectorAll("[data-mode]")).toHaveLength(2);
-    expect(container.querySelector("[data-mode=touch]")).toBeNull();
-    expect(container.querySelectorAll(".gesture-card")).toHaveLength(2);
-    container.querySelector<HTMLButtonElement>("[data-mode=trackpad]")!.click();
+    expect(onInputMethodClick).toHaveBeenCalledOnce();
+    expect(container.querySelector("#inputModeMenu")).toBeNull();
+    // jsdom has a fine pointer and no touchscreen: a desktop, so no Touch part.
+    const section = document.createElement("div");
+    const unmountSection = hud.mountInputMethod(section);
+    expect(Array.from(section.querySelectorAll(".input-mode-heading"), (el) => el.textContent)).toEqual(["Mouse or trackpad"]);
+    expect(section.querySelectorAll(".input-mode-toggle-option")).toHaveLength(2);
+    expect(section.querySelector("[data-mode=touch]")).toBeNull();
+    expect(section.querySelectorAll(".gesture-card")).toHaveLength(2);
+    section.querySelector<HTMLButtonElement>(".input-mode-toggle-option[data-mode=trackpad]")!.click();
     expect(onInputModeChange).toHaveBeenLastCalledWith("trackpad");
     expect(window.localStorage.getItem("foss-earth.inputMode")).toBe("trackpad");
-    expect(button.getAttribute("aria-label")).toBe("Trackpad mode");
-    expect(container.querySelector('[aria-label="Two-finger swipe to orbit"]')).not.toBeNull();
-    document.body.dispatchEvent(new Event("pointerdown", { bubbles: true }));
-    expect(button.getAttribute("aria-expanded")).toBe("false");
+    expect(button.getAttribute("aria-label")).toBe("Trackpad mode. Show or hide input settings");
+    expect(section.querySelector('[aria-label="Two-finger swipe to orbit"]')).not.toBeNull();
+    unmountSection();
+    expect(section.childElementCount).toBe(0);
     const rendererButton = container.querySelector<HTMLElement>("#flightRendererButton")!;
     expect(rendererButton.classList.contains("is-rendering")).toBe(true);
     activityListener(false);
@@ -154,43 +147,42 @@ describe("flight input method selector", () => {
     expect(rendererButton.classList.contains("is-rendering")).toBe(false);
     activityListener(true);
     expect(rendererButton.dataset.renderState).toBe("rendering");
-    const mapButton = container.querySelector<HTMLElement>("#flightMapSourceButton")!;
-    const mapControl = mapButton.parentElement!;
-    const mapDownloadSpeed = mapControl.querySelector(".map-download-speed")!;
-    const terrainDetailControl = mapControl.querySelector(".flight-terrain-detail-control")!;
-    const mapMenu = container.querySelector<HTMLElement>("#flightMapSourceMenu")!;
-    const threeDToggle = mapMenu.querySelector<HTMLButtonElement>('[data-basemap-section="3d"]')!;
-    const twoDToggle = mapMenu.querySelector<HTMLButtonElement>('[data-basemap-section="2d"]')!;
-    const twoDContent = mapMenu.querySelector<HTMLElement>("#flightBasemap2DContent")!;
-    const elevationProviders = mapMenu.querySelector<HTMLElement>(".flight-basemap-menu__elevation-providers")!;
-    expect(mapDownloadSpeed.textContent).toBe("000MB/s");
-    expect(mapDownloadSpeed.parentElement).toBe(mapButton);
-    expect([...mapControl.children].indexOf(terrainDetailControl)).toBeGreaterThan([...mapControl.children].indexOf(mapButton));
+    // The World detail rail, then the download speed and basemap as one
+    // button, then its credit link end the bar, at the bottom-right corner.
     const hudBar = container.querySelector(".hud-bar")!;
-    const settingsButton = container.querySelector<HTMLButtonElement>("#flightSettingsButton")!;
+    const mapSource = hudBar.lastElementChild!;
+    expect(mapSource.id).toBe("flightMapSourceSlot");
+    const mapChip = mapSource.querySelector<HTMLElement>(".map-source-hud__chip")!;
+    const mapButton = mapChip.querySelector<HTMLButtonElement>(".map-source-hud__provider")!;
+    expect(Array.from(mapChip.children, (child) => child.className)).toEqual([
+      "map-source-hud__provider",
+      "map-source-hud__credit",
+    ]);
+    expect(mapButton.firstElementChild?.className).toBe("map-download-speed");
+    expect(mapChip.querySelector(".map-download-speed")?.textContent).toBe("000MB/s");
+    expect(mapChip.previousElementSibling?.classList.contains("map-detail-control")).toBe(true);
+    expect(mapChip.nextElementSibling).toBeNull();
+    expect(mapButton.querySelector(".map-source-label")?.textContent).toBe("USGS Imagery");
     // Pairing a phone lives in the panel's Remote Control tab, not in the bar.
     expect(container.querySelector("#flightPhoneButton")).toBeNull();
-    const hudChildren = [...hudBar.children];
-    expect(hudChildren.indexOf(settingsButton)).toBeGreaterThan(hudChildren.indexOf(mapControl));
-    expect(container.querySelector("#flightTerrainSourceButton")).toBeNull();
-    expect(Array.from(mapMenu.querySelectorAll(".flight-basemap-menu__section-toggle .flight-basemap-menu__heading"), (heading) => heading.textContent))
-      .toEqual(["3D basemaps", "2D basemaps"]);
-    expect(mapMenu.querySelector('[data-map-source="google"]')?.textContent).toBe("Google 3D Tiles");
-    expect(mapMenu.querySelector('[data-map-source="usgs-imagery"]')?.textContent).toBe("USGS Imagery");
-    expect(threeDToggle.getAttribute("aria-expanded")).toBe("false");
-    expect(twoDToggle.getAttribute("aria-expanded")).toBe("true");
-    expect(elevationProviders.hidden).toBe(false);
-    twoDToggle.click();
-    expect(twoDContent.hidden).toBe(true);
-    twoDToggle.click();
-    expect(twoDContent.hidden).toBe(false);
-    expect(mapButton.classList.contains("is-streaming")).toBe(true);
+    // The renderer, basemap and position chips toggle their tabs; none pops up a menu.
+    expect(container.querySelector('[role="menu"]')).toBeNull();
+    expect(container.querySelector("[aria-haspopup]")).toBeNull();
+    rendererButton.click();
+    expect(onRendererClick).toHaveBeenCalledOnce();
+    mapButton.click();
+    expect(onMapClick).toHaveBeenCalledOnce();
+    const status = container.querySelector<HTMLButtonElement>("#flightShellStatus")!;
+    expect(status).toBeInstanceOf(HTMLButtonElement);
+    status.click();
+    expect(onStatusClick).toHaveBeenCalledOnce();
+    expect(mapChip.classList.contains("is-streaming")).toBe(true);
     activityListener(false);
-    expect(mapButton.classList.contains("is-streaming")).toBe(true);
+    expect(mapChip.classList.contains("is-streaming")).toBe(true);
     streamingListener(false);
-    expect(mapButton.classList.contains("is-streaming")).toBe(false);
+    expect(mapChip.classList.contains("is-streaming")).toBe(false);
     streamingListener(true);
-    expect(mapButton.classList.contains("is-streaming")).toBe(true);
+    expect(mapChip.classList.contains("is-streaming")).toBe(true);
     hud.update({ latDeg: 0, lonDeg: 0, headingRad: 0 } as never, {
       mode: "raster-basemap",
       terrainSource: { id: "mapterhorn", label: "Mapterhorn Terrain" },
@@ -198,8 +190,7 @@ describe("flight input method selector", () => {
     } as BabylonRuntimeStatus, 59.6, false);
     expect(container.querySelector("#flightFps")?.textContent).toBe("FPS 60");
     expect(container.querySelector("#flightFps")).toBeInstanceOf(HTMLButtonElement);
-    expect(container.querySelector("#flightFps")?.classList.contains("flight-fps-button")).toBe(true);
-    expect(container.querySelector(".hud-bar #flightFps")).toBeNull();
+    expect(container.querySelector(".hud-bar #flightFps")).toBe(container.querySelector("#flightFps"));
     hud.update({ latDeg: 0, lonDeg: 0, headingRad: 0 } as never, {
       mode: "raster-basemap",
       terrainSource: { id: "mapterhorn", label: "Mapterhorn Terrain" },
@@ -210,35 +201,28 @@ describe("flight input method selector", () => {
     expect(onDebugClick).toHaveBeenCalledOnce();
     container.querySelector<HTMLButtonElement>("#flightSettingsButton")!.click();
     expect(onSettingsClick).toHaveBeenCalledOnce();
-    container.querySelector<HTMLButtonElement>("[data-map-source=usgs-imagery]")!.click();
-    expect(onMapSourceChange).toHaveBeenCalledWith("usgs-imagery");
-    container.querySelector<HTMLButtonElement>("[data-terrain-source=mapterhorn]")!.click();
-    expect(onTerrainSourceChange).toHaveBeenCalledWith("mapterhorn");
     hud.update({ latDeg: 0, lonDeg: 0, headingRad: 0 } as never, {
       mode: "google-tiles",
       terrainSource: { id: "mapterhorn", label: "Mapterhorn Terrain" },
     } as BabylonRuntimeStatus, 60, false);
-    expect(elevationProviders.hidden).toBe(true);
-    expect(threeDToggle.getAttribute("aria-expanded")).toBe("true");
-    expect(twoDToggle.getAttribute("aria-expanded")).toBe("false");
-    expect(mapMenu.querySelector(".flight-basemap-menu__notice")?.textContent)
-      .toBe("Terrain is included. No elevation provider is used.");
-    const terrainDetailSlider = container.querySelector<HTMLInputElement>("#flightTerrainDetailSlider")!;
-    expect(terrainDetailSlider.value).toBe("12");
-    const terrainDetailMarker = container.querySelector<HTMLElement>(".flight-terrain-detail-control__active-marker")!;
-    expect(terrainDetailMarker.hidden).toBe(false);
-    expect(terrainDetailMarker.title).toBe("Renderer target: 2^4");
+    expect(mapButton.querySelector(".map-source-label")?.textContent).toBe("Google 3D Tiles");
+    expect(status.textContent).toBe("0.0000°N 0.0000°E h000°");
+    // The rail is the shared one, driven by the app's detail controller.
+    mapDetail.setActiveSource({ key: "google", availability: "ready" });
+    mapDetail.updatePolicy({ kind: "google", finestErrorPx: 16, coarsestErrorPx: 4096, defaultValue: 16 });
+    const terrainDetailSlider = container.querySelector<HTMLInputElement>(".map-detail-control__slider")!;
+    expect(terrainDetailSlider.getAttribute("aria-label")).toBe("World detail for this session");
+    expect(terrainDetailSlider.value).toBe("4");
     terrainDetailSlider.value = "10";
     terrainDetailSlider.dispatchEvent(new Event("input"));
-    expect(onTerrainDetailChange).toHaveBeenCalledWith(1024);
-    expect(terrainDetailSlider.value).toBe("10");
-    expect(terrainDetailMarker.title).toBe("Renderer target: 2^10");
+    expect(mapDetail.getState()).toMatchObject({ sessionOverride: 1024, requestedTarget: 1024 });
+    // The coarse end is a value like any other, not a reset.
     terrainDetailSlider.value = "12";
     terrainDetailSlider.dispatchEvent(new Event("input"));
-    expect(onTerrainDetailChange).toHaveBeenLastCalledWith(null);
+    expect(mapDetail.getState()).toMatchObject({ sessionOverride: 4096 });
     hud.destroy();
     expect(unsubscribeStreaming).toHaveBeenCalledOnce();
-    expect(mapButton.classList.contains("is-streaming")).toBe(false);
+    expect(mapChip.classList.contains("is-streaming")).toBe(false);
     expect(unsubscribe).toHaveBeenCalledOnce();
     expect(container.children).toHaveLength(0);
   });

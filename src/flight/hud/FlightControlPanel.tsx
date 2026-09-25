@@ -21,7 +21,7 @@ import {
   Volume2,
 } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import type { BabylonRuntimeStatus, GoogleTerrainDetailState, RendererMode } from "foss-earth/runtime";
+import type { BabylonRuntimeStatus, RendererMode } from "foss-earth/runtime";
 import type { FlightViewMode } from "../aircraft/createPlaceholderAircraft";
 import {
   AIRCRAFT_FAMILIES,
@@ -118,12 +118,10 @@ export interface FlightControlPanelSnapshot {
   viewMode: FlightViewMode;
   runtimeStatus: BabylonRuntimeStatus;
   rendererMode: RendererMode;
-  googleTerrainDetail: GoogleTerrainDetailState | null;
-  /** Whether the World detail target follows this device's first-run recommendation. */
-  worldDetailIsAutomatic: boolean;
-  automaticWorldDetailTarget: number;
-  /** Maximum Google screen-space error accepted for ground contact. */
+  /** The coarsest Google screen-space error a low spawn prepares with. */
   flightTerrainRequirement: number;
+  /** True while a low spawn holds Google mesh at the flight minimum. */
+  flightTerrainRequirementHeld: boolean;
   /** A deliberately temporary waiver of the flight terrain requirement. */
   allowCoarserTerrainThisSession: boolean;
   terrainDetailAnchor: FlightTerrainDetailAnchor;
@@ -153,7 +151,14 @@ export interface FlightControlPanelSnapshot {
   logging: LoggingPanelState;
 }
 
+/** Every tab the panel can show: the flight's own, and the shared globe tabs. */
+export type FlightOverlayTab = "location" | "map" | "renderer" | FlightPanelTab;
+
 export interface FlightControlPanelOptions {
+  /** The shared Map tab's contents, from `createMapSourcePanel`. */
+  mapTab: HTMLElement;
+  /** The shared Renderer tab's contents, from `createRendererPanel`. */
+  rendererTab: HTMLElement;
   initialWeather: FlightWeatherState;
   gamepadBindings?: GamepadBindingsMount;
   onLocationApply(location: GeodeticLocation): void;
@@ -163,8 +168,6 @@ export interface FlightControlPanelOptions {
   onViewModeChange(mode: FlightViewMode): void;
   /** Commit a staged aircraft and presentation choice; return a visible error if it fails. */
   onAircraftApply(selection: AircraftSelection): string | null;
-  onGoogleTerrainDetailChange(errorTarget: number): void;
-  onAutomaticGoogleTerrainDetailChange(): void;
   onFlightTerrainRequirementChange(errorTarget: number): void;
   onTerrainDetailOverrideChange(enabled: boolean): void;
   onTerrainDetailAnchorChange(anchor: FlightTerrainDetailAnchor): void;
@@ -182,6 +185,8 @@ export interface FlightControlPanelOptions {
   onAutopilotEngageChange(engaged: boolean): void;
   /** Hosts the live engine-detail readings inside the Engine tab. */
   attachEngineDetails(host: HTMLElement): () => void;
+  /** Hosts the Input method section, shared with FOSS Earth, in the Controls tab. */
+  attachInputMethod(host: HTMLElement): () => void;
   onLoggingAction(action: LoggingAction): void;
   flightRecorder: FlightRecorder;
   /** Pairing for the Remote Control tab, loaded the first time the tab opens. */
@@ -192,7 +197,9 @@ export interface FlightControlPanelOptions {
 
 export interface FlightControlPanelHandle {
   update(snapshot: FlightControlPanelSnapshot): void;
-  openOrSelectTab(tabId: "location" | FlightPanelTab): void;
+  openOrSelectTab(tabId: FlightOverlayTab): void;
+  /** For a HUD button: shows the tab, or closes it when it is already showing. */
+  toggleTab(tabId: FlightOverlayTab): void;
   destroy(): void;
 }
 
@@ -203,6 +210,25 @@ interface FlightControlPanelProps extends FlightControlPanelOptions {
 
 function getTabLabel(tabId: FlightPanelTab): string {
   return TAB_DEFINITIONS.find((definition) => definition.id === tabId)?.label ?? tabId;
+}
+
+/**
+ * Touch on a touchscreen, then the mouse or trackpad choice where there is a
+ * pointer. The toolbar's input-method button opens this tab; it has no popup.
+ */
+export function InputMethodSettings({ attach }: { attach: (host: HTMLElement) => () => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const host = ref.current;
+    if (!host) return;
+    return attach(host);
+  }, [attach]);
+  return (
+    <fieldset className="flight-panel__fieldset">
+      <legend>Input method</legend>
+      <div ref={ref} />
+    </fieldset>
+  );
 }
 
 function EngineDetailsHost({ attach }: { attach: (host: HTMLElement) => () => void }) {
@@ -767,98 +793,37 @@ function KeyboardStickSettingsPanel({
   );
 }
 
-function WorldDetailSettings({
+/**
+ * What only the flight needs from World detail. The saved range and default
+ * are the Map tab's Detail group and the rail beside the basemap, shared with
+ * FOSS Earth.
+ */
+function FlightTerrainSettings({
   snapshot,
-  onGoogleTerrainDetailChange,
-  onAutomaticGoogleTerrainDetailChange,
   onFlightTerrainRequirementChange,
   onTerrainDetailOverrideChange,
   onTerrainDetailAnchorChange,
 }: Pick<FlightControlPanelProps,
-  "snapshot" | "onGoogleTerrainDetailChange" | "onAutomaticGoogleTerrainDetailChange"
-  | "onFlightTerrainRequirementChange" | "onTerrainDetailOverrideChange" | "onTerrainDetailAnchorChange">) {
-  const detail = snapshot.googleTerrainDetail;
-  if (!detail || snapshot.runtimeStatus.mode !== "google-tiles") {
-    return (
-      <fieldset className="flight-panel__fieldset">
-        <legend>World detail</legend>
-        <p className="flight-panel__hint">Switch the map source to Google 3D Tiles to control World detail.</p>
-      </fieldset>
-    );
-  }
-
-  // Detail targets cover several orders of magnitude, so the two handles use
-  // log2(target) while their labels retain the power-of-two representation.
-  const detailSliderValue = Math.log2(detail.errorTarget);
-  const requirementSliderValue = Math.log2(snapshot.flightTerrainRequirement);
-  const rangeStart = Math.min(detailSliderValue, requirementSliderValue);
-  const rangeEnd = Math.max(detailSliderValue, requirementSliderValue);
-
+  "snapshot" | "onFlightTerrainRequirementChange" | "onTerrainDetailOverrideChange" | "onTerrainDetailAnchorChange">) {
   return (
     <fieldset className="flight-panel__fieldset">
-      <legend>World detail</legend>
-      <div className="flight-panel__detail-range-control">
-        <div className="flight-panel__detail-range-labels">
-          <span className="flight-panel__detail-range-label flight-panel__detail-range-label--world">
-            <strong>World detail limit</strong>
-            <output>{formatTerrainDetailTarget(detail.errorTarget)}</output>
-          </span>
-          <span className="flight-panel__detail-range-label flight-panel__detail-range-label--flight">
-            <strong>Flight minimum</strong>
-            <output>{formatTerrainDetailTarget(snapshot.flightTerrainRequirement)}</output>
-          </span>
-        </div>
-        <div className="flight-panel__detail-range" role="group" aria-label="World detail range">
-          <span className="flight-panel__detail-range-track" aria-hidden="true" />
-          <span
-            className="flight-panel__detail-range-selected"
-            aria-hidden="true"
-            style={{ left: `${rangeStart / 19 * 100}%`, width: `${(rangeEnd - rangeStart) / 19 * 100}%` }}
-          />
-          <input
-            className="flight-panel__detail-range-input flight-panel__detail-range-input--world"
-            aria-label="World detail target"
-            type="range"
-            min="0"
-            max="19"
-            step="0.05"
-            value={detailSliderValue}
-            onChange={(event) => onGoogleTerrainDetailChange(Math.round(2 ** Number(event.target.value)))}
-          />
-          <input
-            className="flight-panel__detail-range-input flight-panel__detail-range-input--flight"
-            aria-label="Minimum World detail for flight"
-            type="range"
-            min="0"
-            max="19"
-            step="0.05"
-            value={requirementSliderValue}
-            onChange={(event) => onFlightTerrainRequirementChange(Math.round(2 ** Number(event.target.value)))}
-          />
-        </div>
-        <div className="flight-panel__detail-range-scale" aria-hidden="true">
-          <span>More detail · 2^0 = 1 px</span>
-          <span>Less detail · 2^19</span>
-        </div>
-      </div>
+      <legend>Flight terrain</legend>
       <p className="flight-panel__hint">
-        Move the green handle to limit renderer detail and the red handle to set the coarsest detail that can fly without an override.
+        World detail's range and saved default are in the Map tab. The rail beside the basemap changes it for this session.
       </p>
-      <button
-        className="flight-panel__command"
-        type="button"
-        disabled={snapshot.worldDetailIsAutomatic}
-        onClick={onAutomaticGoogleTerrainDetailChange}
-      >
-        {`Use automatic detail (${formatTerrainDetailTarget(snapshot.automaticWorldDetailTarget)})`}
-      </button>
+      <SettingSlider
+        label="Flight minimum"
+        value={Math.log2(snapshot.flightTerrainRequirement)}
+        min={0}
+        max={19}
+        step={0.05}
+        format={(value) => formatTerrainDetailTarget(Math.round(2 ** value))}
+        onChange={(value) => onFlightTerrainRequirementChange(Math.round(2 ** value))}
+      />
       <p className="flight-panel__hint">
-        {snapshot.worldDetailIsAutomatic
-          ? "Automatic detail is selected from this device's browser renderer and CPU/memory hints."
-          : "A manual World detail target is saved on this device."}
-      </p>
-      <p className="flight-panel__hint">
-        Flight accepts displayed Google terrain at this target or any smaller target. The default, 2^12 = 4,096 px, is the level you selected as flyable.
+        {snapshot.flightTerrainRequirementHeld
+          ? "Held now: this spawn keeps Google 3D Tiles at the flight minimum or finer until the aircraft has flown for a second at least 100 m above the ground."
+          : "A spawn below 100 m keeps Google 3D Tiles at this target or finer until the aircraft has flown for a second at least 100 m above the ground. Your World detail setting is not changed."}
       </p>
       <div className="flight-panel__section-heading">
         <span>Terrain detail follows</span>
@@ -894,7 +859,7 @@ function WorldDetailSettings({
         <span>Allow coarser terrain for this session</span>
       </label>
       <p className="flight-panel__hint">
-        This temporary override lets you fly below your selected requirement. It resets when the game reloads.
+        This temporary override lets you spawn below your flight minimum and ends a held requirement. It resets when the game reloads.
       </p>
     </fieldset>
   );
@@ -1021,6 +986,8 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
     <WindowOverlay<FlightPanelTab>
       enableAirportPresets
       overlayApiRef={props.overlayApiRef}
+      mapTab={props.mapTab}
+      rendererTab={props.rendererTab}
       getViewState={() => props.snapshot.flightState}
       setViewState={props.onLocationApply}
       locationSearchProvider={props.locationSearchProvider}
@@ -1046,6 +1013,7 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
                 onSettingsChange={props.onAutopilotSettingsChange}
                 onEngageChange={props.onAutopilotEngageChange} />
               : tabId === "controls" ? <div className="flight-panel__content">
+                <InputMethodSettings attach={props.attachInputMethod} />
                 {props.gamepadBindings
                   ? <GamepadBindingsPanel mount={props.gamepadBindings} />
                   : <p className="flight-panel__hint">Controller bindings are unavailable in this session.</p>}
@@ -1075,7 +1043,7 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
                 </fieldset>
                 <GroundInteractionSettingsPanel state={props.snapshot.groundInteraction}
                   onAction={props.onGroundInteractionAction} />
-                <WorldDetailSettings {...props} />
+                <FlightTerrainSettings {...props} />
                 <MapCachePanel />
               </> : <DebugPanel snapshot={props.snapshot} onCollisionDebugChange={props.onCollisionDebugChange}
                 onWheelSpinModeChange={props.onWheelSpinModeChange} onTireSoundChange={props.onTireSoundChange} />}

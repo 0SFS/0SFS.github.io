@@ -32,8 +32,11 @@
   pointer-events: none;
   color: #e8edf5;
   font-family: "SF Mono", "Menlo", "Consolas", monospace;
-  /* Clears the bottom button bar so attitude / levers stay readable. */
-  --flight-controls-bottom: calc(56px + var(--foss-inset-bottom, 0px));
+  /*
+   * Clears the bottom button bar so attitude / levers stay readable. The bar
+   * publishes its height, which grows when it wraps on a narrow screen.
+   */
+  --flight-controls-bottom: calc(var(--foss-hud-bottom, 16px) + var(--foss-hud-bar-height, 32px) + 8px);
   --flight-hud-left: env(safe-area-inset-left, 0px);
   --flight-attitude-size: 220px;
   --flight-auto-trim-size: 35px;
@@ -184,19 +187,7 @@
   pointer-events: none;
 }
 
-/*
- * Sits under the left-side + launcher or tab strip (both 30px at 12px from
- * the top). When the window is too narrow for a left slot, the chip still
- * occupies this typical FPS corner. z-index 15 is above dock panels (10) and
- * below the add-tab menu (20) so the chip stays visible on an open panel
- * without covering the menu.
- */
-.flight-fps-button {
-  position: absolute;
-  top: 48px;
-  left: 12px;
-  z-index: 15;
-  pointer-events: auto;
+#flightFps {
   font-variant-numeric: tabular-nums;
 }
 
@@ -216,194 +207,10 @@
   display: none;
 }
 
-.flight-shell-root .input-mode-sensitivity-panel {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
 .flight-shell-root .flight-shell-pause-button.is-active {
   color: #11161a;
   background: var(--flight-panel-accent);
   border-color: var(--flight-panel-accent);
-}
-
-.flight-terrain-detail-control {
-  flex: 0 0 41px;
-  width: 41px;
-  margin: 0 3px 0 4px;
-}
-
-.flight-terrain-detail-control__rail {
-  position: relative;
-  display: block;
-  height: 28px;
-}
-
-.flight-terrain-detail-control__valid-range {
-  position: absolute;
-  top: 12px;
-  right: 0;
-  left: 0;
-  height: 4px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #46db8f 0%, #f6d365 55%, #ff6b6b 100%);
-}
-
-.flight-terrain-detail-control__valid-range {
-  z-index: 1;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14), 0 0 8px rgba(246, 211, 101, 0.28);
-}
-
-.flight-terrain-detail-control__active-marker {
-  position: absolute;
-  z-index: 3;
-  top: 3px;
-  width: 2px;
-  height: 18px;
-  border-radius: 999px;
-  background: #4eb9ff;
-  box-shadow: 0 0 0 1px rgba(6, 20, 34, 0.82), 0 0 8px rgba(78, 185, 255, 0.9);
-  pointer-events: none;
-  transform: translateX(-50%);
-}
-
-.flight-terrain-detail-control__active-marker::before {
-  position: absolute;
-  top: -3px;
-  left: -3px;
-  width: 0;
-  height: 0;
-  border-right: 3px solid transparent;
-  border-bottom: 4px solid #4eb9ff;
-  border-left: 3px solid transparent;
-  content: "";
-}
-
-.flight-terrain-detail-control__slider {
-  position: absolute;
-  z-index: 4;
-  top: 4px;
-  height: 20px;
-  margin: 0;
-  padding: 0;
-  appearance: none;
-  background: transparent;
-  cursor: ew-resize;
-}
-
-.flight-terrain-detail-control__slider::-webkit-slider-runnable-track {
-  height: 4px;
-  background: transparent;
-}
-
-.flight-terrain-detail-control__slider::-webkit-slider-thumb {
-  width: 12px;
-  height: 12px;
-  margin-top: -4px;
-  border: 2px solid #f7fafc;
-  border-radius: 50%;
-  appearance: none;
-  background: #111820;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.55);
-}
-
-.flight-terrain-detail-control__slider::-moz-range-track {
-  height: 4px;
-  background: transparent;
-}
-
-.flight-terrain-detail-control__slider::-moz-range-thumb {
-  width: 8px;
-  height: 8px;
-  border: 2px solid #f7fafc;
-  border-radius: 50%;
-  background: #111820;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.55);
-}
-
-.flight-terrain-detail-control__slider:focus-visible {
-  outline: 2px solid rgba(78, 185, 255, 0.92);
-  outline-offset: 3px;
-  border-radius: 4px;
-}
-
-.flight-terrain-detail-control.is-unavailable {
-  opacity: 0.35;
-}
-
-.flight-basemap-menu__section {
-  display: grid;
-  gap: 3px;
-}
-
-.flight-basemap-menu__section + .flight-basemap-menu__section {
-  margin-top: 3px;
-  padding-top: 6px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.flight-basemap-menu__section-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 4px 7px;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  text-align: left;
-}
-
-.flight-basemap-menu__section-toggle:hover {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.flight-basemap-menu__heading {
-  color: rgba(226, 232, 240, 0.58);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.flight-basemap-menu__chevron {
-  color: rgba(226, 232, 240, 0.58);
-  font-size: 12px;
-  line-height: 1;
-  transition: transform 120ms ease;
-}
-
-.flight-basemap-menu__section-toggle[aria-expanded="false"] .flight-basemap-menu__chevron {
-  transform: rotate(-90deg);
-}
-
-.flight-basemap-menu__section-content {
-  display: grid;
-  gap: 3px;
-}
-
-.flight-basemap-menu__section-content[hidden],
-.flight-basemap-menu__elevation-providers[hidden] {
-  display: none;
-}
-
-.flight-basemap-menu__elevation-providers {
-  display: grid;
-  gap: 3px;
-  margin-top: 3px;
-  padding-top: 6px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.flight-basemap-menu__elevation-providers .flight-basemap-menu__heading {
-  padding: 1px 7px 2px;
-}
-
-.flight-basemap-menu__notice {
-  margin: 1px 7px 3px;
-  color: rgba(226, 232, 240, 0.58);
-  font-size: 10px;
-  line-height: 1.35;
 }
 
 .flight-panel__title {
@@ -612,142 +419,6 @@
   background: rgba(0, 0, 0, 0.35);
   color: #e8edf5;
   font: inherit;
-}
-
-.flight-panel__detail-range-control {
-  display: grid;
-  gap: 8px;
-}
-
-.flight-panel__detail-range-labels,
-.flight-panel__detail-range-scale {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.flight-panel__detail-range-label {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-  font-size: 11px;
-}
-
-.flight-panel__detail-range-label:last-child {
-  text-align: right;
-}
-
-.flight-panel__detail-range-label strong {
-  color: #cad3d5;
-}
-
-.flight-panel__detail-range-label output {
-  font-family: "SF Mono", Menlo, monospace;
-  font-size: 10px;
-}
-
-.flight-panel__detail-range-label--world output {
-  color: #46db8f;
-}
-
-.flight-panel__detail-range-label--flight output {
-  color: #ff6b6b;
-}
-
-.flight-panel__detail-range {
-  position: relative;
-  height: 28px;
-}
-
-.flight-panel__detail-range-track,
-.flight-panel__detail-range-selected {
-  position: absolute;
-  top: 12px;
-  height: 4px;
-  border-radius: 999px;
-}
-
-.flight-panel__detail-range-track {
-  right: 7px;
-  left: 7px;
-  background: rgba(202, 211, 213, 0.28);
-}
-
-.flight-panel__detail-range-selected {
-  background: linear-gradient(90deg, #46db8f, #ff6b6b);
-}
-
-.flight-panel__detail-range-input {
-  position: absolute;
-  z-index: 1;
-  width: 100%;
-  height: 28px;
-  margin: 0;
-  pointer-events: none;
-  appearance: none;
-  -webkit-appearance: none;
-  background: transparent;
-}
-
-.flight-panel__detail-range-input::-webkit-slider-runnable-track {
-  height: 4px;
-  background: transparent;
-}
-
-.flight-panel__detail-range-input::-moz-range-track {
-  height: 4px;
-  background: transparent;
-}
-
-.flight-panel__detail-range-input::-webkit-slider-thumb {
-  width: 16px;
-  height: 16px;
-  margin-top: -6px;
-  border: 2px solid #101518;
-  border-radius: 50%;
-  pointer-events: auto;
-  cursor: grab;
-  appearance: none;
-  -webkit-appearance: none;
-}
-
-.flight-panel__detail-range-input::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  border: 2px solid #101518;
-  border-radius: 50%;
-  pointer-events: auto;
-  cursor: grab;
-}
-
-.flight-panel__detail-range-input:active::-webkit-slider-thumb {
-  cursor: grabbing;
-}
-
-.flight-panel__detail-range-input:active::-moz-range-thumb {
-  cursor: grabbing;
-}
-
-.flight-panel__detail-range-input--world::-webkit-slider-thumb {
-  background: #46db8f;
-}
-
-.flight-panel__detail-range-input--world::-moz-range-thumb {
-  background: #46db8f;
-}
-
-.flight-panel__detail-range-input--flight::-webkit-slider-thumb {
-  background: #ff6b6b;
-}
-
-.flight-panel__detail-range-input--flight::-moz-range-thumb {
-  background: #ff6b6b;
-}
-
-.flight-panel__detail-range-scale {
-  color: #8d999c;
-  font-size: 10px;
 }
 
 .flight-panel__radio-list {
@@ -1008,8 +679,6 @@
 
 @media (max-width: 720px) {
   .flight-hud {
-    /* Wrapped bottom chip row needs more clearance than the desktop single row. */
-    --flight-controls-bottom: calc(96px + var(--foss-inset-bottom, 0px));
     --flight-attitude-size: 130px;
     --flight-auto-trim-size: 25px;
     --flight-roll-trim-height: 14px;

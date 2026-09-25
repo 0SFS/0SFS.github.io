@@ -29,6 +29,12 @@ const mocks = vi.hoisted(() => {
       surface: { sample: vi.fn(() => null) },
       getWorldRoot: () => ({}), setSimViewState: vi.fn(), setSimTick: vi.fn(), setSimRunning: vi.fn(),
       getGoogleTerrainDetailState: vi.fn(() => null),
+      subscribeStatus: vi.fn(() => () => {}),
+      isStreamingTiles: () => false,
+      onTilesStreamingChange: vi.fn(() => () => {}),
+      onRasterDetailFeedback: vi.fn(() => () => {}),
+      getRasterDetailFeedback: vi.fn(() => null),
+      setRasterDetailTarget: vi.fn(),
       getGoogleTerrainDetailAnchor: vi.fn(() => "simulation-origin"),
       setGoogleTerrainDetailTarget: vi.fn(), setGoogleTerrainDetailAnchor: vi.fn(),
       requestRender: vi.fn(), destroy: vi.fn(),
@@ -49,7 +55,7 @@ const mocks = vi.hoisted(() => {
       reset: vi.fn(), setPaused: vi.fn(), update: vi.fn(), getLatestState: () => state, getFault: () => null,
     },
     createHud: vi.fn(() => ({ update: vi.fn(), setGearDown: vi.fn(), destroy: vi.fn() })),
-    createPanel: vi.fn(() => ({ update: vi.fn(), openOrSelectTab: vi.fn(), destroy: vi.fn() })),
+    createPanel: vi.fn(() => ({ update: vi.fn(), openOrSelectTab: vi.fn(), toggleTab: vi.fn(), destroy: vi.fn() })),
     createHudBar: vi.fn(() => ({ update: vi.fn(), destroy: vi.fn() })),
   };
 });

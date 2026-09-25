@@ -33,6 +33,9 @@ export function createFlightControlPanel(
     openOrSelectTab(tabId): void {
       overlayApiRef.current?.openOrSelectTab(tabId);
     },
+    toggleTab(tabId): void {
+      overlayApiRef.current?.toggleTab(tabId);
+    },
     destroy(): void {
       root.unmount();
       overlayHost.remove();
