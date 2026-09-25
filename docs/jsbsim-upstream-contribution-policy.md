@@ -10,6 +10,22 @@ Contribute reusable fixes and features to their upstream project once they are f
 
 Implement native dynamics, initialization and platform compatibility in `Felipegalind0/jsbsim`, targeting `JSBSim-Team/jsbsim`. Implement generic bindings, SDK lifetime, diagnostics and SDK build behavior in `Felipegalind0/jsbsim/wasm`, alongside the native engine. The user authorized this in-tree arrangement following the Python package precedent. Offer stable, focused integration work to `JSBSim-Team/jsbsim`; retain 0x62's authorship and notices, and preserve the existing SDK PR #8 independently while its review continues. Keep aircraft calibration, application UI, fork package names and personal checkout paths in their owning downstream projects. Do implementation, research and validation we can handle ourselves; involve upstream maintainers when their decisions or expertise are necessary. Our productive local setup can proceed without waiting for upstream architectural approval. Acceptance and release ownership remain upstream decisions.
 
+## Validation tooling and evidence
+
+Follow the repository-wide [validation layout](validation/layout.md).
+Permanent engine regressions live in JSBSim `tests/` and travel with the fix.
+Retained downstream JSBSim reproduction tools live in
+`scripts/validation/jsbsim/<topic>/`; retained evidence lives in top-level
+`validation/evidence/jsbsim/<topic>/`. Documentation links to those records.
+Scratch and raw outputs stay in the owning repository's gitignored `build/`.
+
+For PR #1502, the twelve tools have moved to scripts, and the evidence tree
+moved out of docs on 2026-09-19
+([evidence relocation record](validation/evidence-relocation-2026-09-19.md)).
+Preserve historical logs, hashes, approval receipts and rollback snapshots.
+These path changes do not require another engine commit or imply rerunning
+past checks.
+
 ## Readiness gates
 
 All applicable gates must be satisfied before a new contribution is submitted as complete:
