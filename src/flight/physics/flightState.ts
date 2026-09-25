@@ -8,6 +8,9 @@ export interface FlightState {
   pitchRad: number;
   headingRad: number;
   airspeedKts: number;
+  /** Ground-relative velocity: with `verticalSpeedFps`, where the aircraft is actually going. */
+  northVelocityFps: number;
+  eastVelocityFps: number;
   verticalSpeedFps: number;
   throttleNorm: number;
 }
@@ -20,6 +23,8 @@ export const EMPTY_FLIGHT_STATE: FlightState = {
   pitchRad: 0,
   headingRad: 0,
   airspeedKts: 0,
+  northVelocityFps: 0,
+  eastVelocityFps: 0,
   verticalSpeedFps: 0,
   throttleNorm: 0,
 };
@@ -47,6 +52,8 @@ export function interpolateFlightState(
     pitchRad: lerpAngle(prev.pitchRad, curr.pitchRad),
     headingRad: lerpAngle(prev.headingRad, curr.headingRad),
     airspeedKts: lerp(prev.airspeedKts, curr.airspeedKts),
+    northVelocityFps: lerp(prev.northVelocityFps, curr.northVelocityFps),
+    eastVelocityFps: lerp(prev.eastVelocityFps, curr.eastVelocityFps),
     verticalSpeedFps: lerp(prev.verticalSpeedFps, curr.verticalSpeedFps),
     throttleNorm: lerp(prev.throttleNorm, curr.throttleNorm),
   };

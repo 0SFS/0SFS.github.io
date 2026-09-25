@@ -11,6 +11,8 @@ export function readFlightState(sdk: JSBSimSdk): FlightState {
     pitchRad: degreesToRadians(sdk.getPropertyValue("attitude/theta-deg")),
     headingRad: degreesToRadians(sdk.getPropertyValue("attitude/psi-deg")),
     airspeedKts: sdk.getPropertyValue("velocities/vc-kts"),
+    northVelocityFps: sdk.getPropertyValue("velocities/v-north-fps"),
+    eastVelocityFps: sdk.getPropertyValue("velocities/v-east-fps"),
     verticalSpeedFps: -sdk.getPropertyValue("velocities/v-down-fps"),
     throttleNorm: sdk.getPropertyValue("fcs/throttle-cmd-norm"),
   };

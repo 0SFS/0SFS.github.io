@@ -6,7 +6,8 @@ import type { FlightState } from "./flightState";
 
 const ok: FlightState = {
   latDeg: 37.6, lonDeg: -122.4, altMeters: 500, rollRad: 0, pitchRad: 0,
-  headingRad: 0, airspeedKts: 90, verticalSpeedFps: 0, throttleNorm: 0.5,
+  headingRad: 0, airspeedKts: 90, northVelocityFps: 150, eastVelocityFps: 0, verticalSpeedFps: 0,
+  throttleNorm: 0.5,
 };
 
 describe("invalid flight state reasons", () => {

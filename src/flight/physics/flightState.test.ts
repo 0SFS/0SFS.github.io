@@ -11,6 +11,8 @@ describe("interpolateFlightState", () => {
       pitchRad: 0.1,
       headingRad: 1,
       airspeedKts: 90,
+      northVelocityFps: 0,
+      eastVelocityFps: 0,
       verticalSpeedFps: 5,
       throttleNorm: 0.5,
     };
@@ -26,6 +28,8 @@ describe("interpolateFlightState", () => {
       pitchRad: 0,
       headingRad: 0,
       airspeedKts: 0,
+      northVelocityFps: 0,
+      eastVelocityFps: 0,
       verticalSpeedFps: 0,
       throttleNorm: 0,
     };
@@ -37,6 +41,8 @@ describe("interpolateFlightState", () => {
       pitchRad: 0.2,
       headingRad: Math.PI / 2,
       airspeedKts: 100,
+      northVelocityFps: 0,
+      eastVelocityFps: 0,
       verticalSpeedFps: 10,
       throttleNorm: 1,
     };
