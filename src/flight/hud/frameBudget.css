@@ -1,0 +1,37 @@
+/* Debug → Frame budget. */
+
+.frame-budget {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.frame-budget th,
+.frame-budget td {
+  padding: 3px 4px;
+  border-bottom: 1px solid var(--flight-panel-line);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.frame-budget th[scope="row"],
+.frame-budget thead th:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+
+.frame-budget thead th {
+  color: var(--flight-panel-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.frame-budget__group th {
+  color: var(--flight-panel-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}

@@ -1,4 +1,6 @@
 import "foss-earth/shell.css";
+import { canTimeGpuFrames, createFrameProfiler, profileBabylonScene } from "foss-earth/perf";
+import { setActiveFrameProfile } from "./diagnostics/frameProfile";
 import "foss-earth/windowing.css";
 import type { LocationSearchProvider, GeodeticLocation } from "foss-earth/windowing";
 import { resetFlightLocation } from "./jsbsim/resetFlightLocation";
@@ -712,6 +714,25 @@ export async function createFlightSimApp(
   const flightPerformance = isFlightPerformanceCaptureEnabled()
     ? createFlightPerformanceCapture() : null;
   if (flightPerformance) setActiveFlightPerformanceCapture(flightPerformance);
+  // Where each frame's time goes (Debug → Frame budget). `flightPerf=1` starts
+  // it on; otherwise it is off until the Debug tab switches it on. Off, it
+  // leaves nothing attached to the scene.
+  const frameProfiler = createFrameProfiler();
+  let stopSceneProfiling: (() => void) | null = null;
+  const setFrameProfiling = (enabled: boolean): void => {
+    frameProfiler.enabled = enabled;
+    if (enabled && !stopSceneProfiling) stopSceneProfiling = profileBabylonScene(frameProfiler, runtime.scene, runtime.engine);
+    if (!enabled && stopSceneProfiling) {
+      stopSceneProfiling();
+      stopSceneProfiling = null;
+    }
+  };
+  setActiveFrameProfile({
+    profiler: frameProfiler,
+    setEnabled: setFrameProfiling,
+    gpuTimed: () => canTimeGpuFrames(runtime.engine),
+  });
+  if (flightPerformance) setFrameProfiling(true);
   // The same idea for the phone's camera trackpad (`phoneCameraTrace=1`): every
   // hop from the phone's touch to the orbit drawn here, with both clocks.
   const phoneCameraTrace = isPhoneCameraTraceEnabled()
@@ -1649,9 +1670,10 @@ export async function createFlightSimApp(
     if (disposed || worldLoading) return;
     flightSurface.beginFrame();
     const frameIntervalMs = deltaSeconds * 1000;
-    const flightTickStartedMs = flightPerformance ? performance.now() : 0;
-    let terrainQueryCpuMs = 0;
-    let collisionCpuMs = 0;
+    // One frame per sim tick; Babylon's render of the tick lands in the same frame.
+    frameProfiler.frame();
+    const flightTickStarted = frameProfiler.clock();
+    let sectionStarted = flightTickStarted;
     // Do not integrate the time spent idle when resuming the simulation.
     deltaSeconds = skipResumeDelta ? 0 : Math.min(deltaSeconds, 0.1);
     skipResumeDelta = false;
@@ -1676,24 +1698,27 @@ export async function createFlightSimApp(
     // placed the aircraft on known ground, streaming may update contact but
     // can never pause an already-running flight.
     const googleTiles = runtime.status.mode === "google-tiles";
-    const preContactStartedMs = flightPerformance ? performance.now() : 0;
+    frameProfiler.add("flight/camera", sectionStarted);
+    sectionStarted = frameProfiler.clock();
     if (!physicsLoop.getFault()
       && terrainContact.update(false, googleTiles, true, true) === "reset") {
       physicsLoop.reset();
       visibleMeshCollision.reset();
       wheelCues.setGroundRevision(++groundRevision);
     }
-    if (flightPerformance) terrainQueryCpuMs += performance.now() - preContactStartedMs;
+    frameProfiler.add("flight/terrain", sectionStarted);
 
+    sectionStarted = frameProfiler.clock();
     physicsLoop.setPaused(inputManager.isPaused());
     if (flightGamepadPolling.claimFlightFrame()) flightGamepadSource.tick();
     const controls = inputManager.poll(deltaSeconds);
+    frameProfiler.add("flight/input", sectionStarted);
     let terrainBlocked = false;
-    const physicsStartedMs = flightPerformance ? performance.now() : 0;
+    const physicsStarted = frameProfiler.clock();
     const displayState = physicsLoop.update(deltaSeconds, () => {
-      const contactStartedMs = flightPerformance ? performance.now() : 0;
+      const contactStarted = frameProfiler.clock();
       const contact = terrainContact.update(false, googleTiles, true, true);
-      if (flightPerformance) terrainQueryCpuMs += performance.now() - contactStartedMs;
+      frameProfiler.add("flight/physics/terrain contact", contactStarted);
       if (contact === false) {
         terrainBlocked = true;
         terrainBlockedReason = terrainContact.getBlockReason();
@@ -1706,9 +1731,9 @@ export async function createFlightSimApp(
         visibleMeshCollision.reset();
         wheelCues.setGroundRevision(++groundRevision);
       }
-      const collisionStartedMs = flightPerformance ? performance.now() : 0;
+      const collisionStarted = frameProfiler.clock();
       const collisionReset = visibleMeshCollision.update();
-      if (flightPerformance) collisionCpuMs += performance.now() - collisionStartedMs;
+      frameProfiler.add("flight/physics/collision", collisionStarted);
       // Terrain/collision work can consume the remaining input lease. Check
       // authority immediately before allowing this step to advance physics.
       const selected = phoneSession?.beforeStep(controls) ?? controls;
@@ -1760,12 +1785,14 @@ export async function createFlightSimApp(
       appliedControls = { ...commanded };
       return contact;
     });
-    const physicsLoopCpuMs = flightPerformance ? performance.now() - physicsStartedMs : 0;
+    frameProfiler.add("flight/physics", physicsStarted);
+    sectionStarted = frameProfiler.clock();
     const feedbackHeld = inputManager.isPaused() || terrainBlocked || !!physicsLoop.getFault();
     tireAudio.setPaused(feedbackHeld);
     const slipPowerWatts = slipAudio.takeMeanPowerWatts();
     if (slipPowerWatts !== null) tireAudio.update(slipPowerWatts);
     haptics.tick(performance.now(), !feedbackHeld && !document.hidden);
+    frameProfiler.add("flight/feedback", sectionStarted);
 
     const tickNowMs = performance.now();
     if (terrainBlocked) {
@@ -1800,11 +1827,12 @@ export async function createFlightSimApp(
       }
     }
 
-    const viewQueryStartedMs = flightPerformance ? performance.now() : 0;
+    sectionStarted = frameProfiler.clock();
     const sampledSurfaceHeight = flightSurface.sample(displayState.latDeg, displayState.lonDeg)?.heightMeters ?? null;
     const surfaceHeight = sampledSurfaceHeight ?? 0;
-    if (flightPerformance) terrainQueryCpuMs += performance.now() - viewQueryStartedMs;
+    frameProfiler.add("flight/terrain", sectionStarted);
 
+    sectionStarted = frameProfiler.clock();
     runtime.setSimViewState({
       latDeg: displayState.latDeg,
       lonDeg: displayState.lonDeg,
@@ -1828,6 +1856,8 @@ export async function createFlightSimApp(
     if (collisionDebugEnabled && wheelSpinMode !== "off") wheelSpinDebugOverlay?.update();
     const rig = aircraftModel?.getRig();
     if (rig) applyAircraftRig(rig, readControlSurfaceState(jsbsim.sdk), deltaSeconds, { simulationHeld: feedbackHeld });
+    frameProfiler.add("flight/view", sectionStarted);
+    sectionStarted = frameProfiler.clock();
     const phoneOwned = phoneSession?.getSnapshot().owner === "phone";
     flightHud.update(
       displayState,
@@ -1836,15 +1866,20 @@ export async function createFlightSimApp(
       { pitch: pitchAutoTrim.enabled, roll: rollAutoTrim.enabled },
       hudMasterAp(),
     );
+    frameProfiler.add("flight/hud", sectionStarted);
     const now = performance.now();
     if (now - lastPanelUpdateMs >= 100) {
+      sectionStarted = frameProfiler.clock();
       lastPanelUpdateMs = now;
       controlPanel?.update(createPanelSnapshot(displayState));
       hudBar?.update(displayState, runtime.status, measuredFps, inputManager.isPaused());
+      frameProfiler.add("flight/panels", sectionStarted);
     }
+    sectionStarted = frameProfiler.clock();
     flightRecorder.sample(jsbsim.sdk);
     evaluationInstruments.update(jsbsim.sdk);
     engineMonitor.update(jsbsim.sdk);
+    frameProfiler.add("flight/instruments", sectionStarted);
     phoneCameraTrace?.renderFrame({
       at: phoneAimAt, intervalMs: frameIntervalMs,
       dxPx: (phoneAim?.yaw ?? 0) * 1000, dyPx: (phoneAim?.pitch ?? 0) * 1000, zoom: phoneAim?.zoom ?? 1,
@@ -1855,14 +1890,15 @@ export async function createFlightSimApp(
       viewMode: aircraft?.getViewMode() ?? "third",
       mapDownloadBytesPerSecond: runtime.getMapDownloadBytesPerSecond(),
     });
+    frameProfiler.add("flight", flightTickStarted);
     if (flightPerformance) {
       const tileMetrics = runtime.getTileMetrics();
       flightPerformance.record({
         frameIntervalMs,
-        flightTickCpuMs: performance.now() - flightTickStartedMs,
-        terrainQueryCpuMs,
-        collisionCpuMs,
-        physicsLoopCpuMs,
+        flightTickCpuMs: frameProfiler.current("flight"),
+        terrainQueryCpuMs: frameProfiler.current("flight/terrain") + frameProfiler.current("flight/physics/terrain contact"),
+        collisionCpuMs: frameProfiler.current("flight/physics/collision"),
+        physicsLoopCpuMs: frameProfiler.current("flight/physics"),
         streamingTiles: runtime.isStreamingTiles(),
         mapDownloadBytesPerSecond: runtime.getMapDownloadBytesPerSecond(),
         visibleTiles: tileMetrics?.visibleTiles ?? null,
@@ -1899,6 +1935,8 @@ export async function createFlightSimApp(
       detachCameraInput();
       detachInput();
       if (flightPerformance) setActiveFlightPerformanceCapture(null);
+      setFrameProfiling(false);
+      setActiveFrameProfile(null);
       if (phoneCameraTrace) setActivePhoneCameraTrace(null);
       hudBar?.destroy();
       statusOverlay?.destroy();

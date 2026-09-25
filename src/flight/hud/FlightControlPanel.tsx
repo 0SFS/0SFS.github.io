@@ -61,6 +61,7 @@ import {
 } from "./GroundInteractionSettingsPanel";
 import { AutopilotPanel, type AutopilotPanelState } from "./AutopilotPanel";
 import { SoundSettingsPanel, type SoundAction } from "./SoundSettingsPanel";
+import { FrameBudgetPanel } from "./FrameBudgetPanel";
 import { RemoteControlTab, type MountPhonePairing } from "./RemoteControlTab";
 import type { PhoneCameraTuning } from "../remote/phoneCameraTuning";
 import {
@@ -974,6 +975,7 @@ function DebugPanel({ snapshot, onCollisionDebugChange, onWheelSpinModeChange, o
         <Gauge size={18} aria-hidden="true" />
         <span>{snapshot.runtimeStatus.lastError ?? snapshot.runtimeStatus.message}</span>
       </div>
+      <FrameBudgetPanel />
       <FlightPerformancePanel />
       <fieldset className="flight-panel__fieldset">
         <legend>Event log</legend>
