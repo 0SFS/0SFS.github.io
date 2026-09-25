@@ -68,6 +68,26 @@ Rules only. Details live in the linked docs; update those, not this file.
 - Never start a dev, preview or watch server unless asked; give the user the command.
   Stop a server you were asked to start once the check is done.
 
+## Checks
+
+- Check what a change touches, and run the full suite once, when the work is done.
+  After an edit: `npx tsc -b`, `npx vitest related --run <changed files>` (or
+  `npm run test:changed`) and `npm run lint`. For finished work: `npm run ci`, once.
+- `tsc -b` and `npm run lint` are incremental. Never pass `--force` or delete
+  `node_modules/.tmp` or `node_modules/.cache` to make them check everything again.
+- Documentation-only changes need no typecheck, tests or build.
+- Keep each run's output in a log under `build/` and read it again rather than
+  rerunning. To look into a failure, rerun that test file, not the suite.
+- To check a series of commits, run each commit's related tests and the full suite
+  on the last one only. A worktree gets its own `node_modules/.tmp`.
+- Cap repeated or background runs at half the cores (`--maxWorkers=50%`, `-j5`),
+  and don't run a suite while another session is running one.
+- Benchmarks, headless-browser GPU runs, phone-layout checks and WASM builds run
+  only when the task asks for them.
+- JSBSim: one build directory per branch with ccache, only the targets the tests
+  need, and `ctest -R` for the tests the change affects; see
+  [docs/jsbsim.md](docs/jsbsim.md).
+
 ## Personal data
 
 - Never share the user's personal data with a third party without their consent

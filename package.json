@@ -20,9 +20,10 @@
     "ci": "npm run lint && npm run test && npm run build",
     "deploy": "npm run deploy:gh-pages",
     "deploy:gh-pages": "npm run build && gh-pages -d dist",
-    "lint": "eslint .",
+    "lint": "eslint . --cache --cache-strategy content --cache-location node_modules/.cache/eslint/",
     "preview": "vite preview",
     "test": "vitest run --passWithNoTests",
+    "test:changed": "vitest run --passWithNoTests --changed",
     "test:watch": "vitest",
     "verify:jsbsim": "node scripts/verify-jsbsim-artifact.mjs",
     "verify:audio": "node scripts/verify-audio-artifact.mjs"
