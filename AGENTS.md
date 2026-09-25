@@ -49,9 +49,11 @@ Rules only. Details live in the linked docs; update those, not this file.
 
 - Never write outside this repository: no `/tmp`, `/var/folders` or harness scratchpad.
   Scratch goes in the gitignored `build/`. Nothing there is distributed, so don't cite
-  it as if a reader can open it. It is disposable: delete a run's output once its
-  results are recorded, and keep only what [docs/build-scratch.md](docs/build-scratch.md)
-  lists, in 0sfs, FOSS Earth and JSBSim alike.
+  it as if a reader can open it. `build/` also holds working material: sources of the
+  competing simulators, trees and builds for open upstream PRs, and the only copies
+  of runs that the docs cite. Never delete from it, in 0sfs, FOSS Earth or JSBSim,
+  without the user agreeing to each folder. [docs/build-scratch.md](docs/build-scratch.md)
+  says what the large folders are for.
 - Scripts default to a dated folder from `scripts/outputDirectory.mjs`; give new ones
   the same default.
 - Runnable validation tools belong in `scripts/` or the owning project's `tests/`,
