@@ -8,7 +8,7 @@ Decision: 2026-09-19. Organize by purpose, not just file extension.
 | Retained measurements, logs, API snapshots, provenance and rollback snapshots | Top-level `validation/evidence/<topic>/` |
 | Runnable downstream validation/reproduction tools | `scripts/validation/<topic>/` (existing audio benchmark tools stay in `benchmarks/audio/`) |
 | Permanent engine regression tests | JSBSim `tests/` and `tests/unit_tests/` |
-| Disposable helpers, generated fixtures, binaries and raw run output | Owning repository's gitignored `build/` (offload list: [build-scratch-archive.md](../build-scratch-archive.md)) |
+| Disposable helpers, generated fixtures, binaries and raw run output | Owning repository's gitignored `build/` (what may stay: [build-scratch.md](../build-scratch.md)) |
 
 `validation/evidence/` is deliberately retained in version control. It is
 neither application source nor a build output directory. Preserve selected

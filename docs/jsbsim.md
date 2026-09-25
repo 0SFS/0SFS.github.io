@@ -125,6 +125,30 @@ release packing or stable app adoption. Default native CMake builds leave
 `BUILD_WASM_MODULE=OFF` and do not require Node or Emscripten. The owning build
 contract is `wasm/docs/centralized-builds.md` in JSBSim.
 
+A WASM build is a full Emscripten compile and its hash differs between builds of
+one commit, so build only when the engine or SDK changed. `wasm/build/` keeps the
+fork.7 artifact, its build descriptor and captured source, which `pack:build`
+and the demo read through `wasm/build/last-build.json`.
+
+Build native changes in one build directory for `master` (now
+`build/master-20260925`) or one per branch, not a new directory per commit, with
+ccache and its cache inside the checkout. Build only the targets the tests need,
+and run the tests the change affects; run the full `ctest` suite before
+publishing.
+
+```sh
+L="env;CCACHE_DIR=$PWD/build/ccache;CCACHE_MAXSIZE=2G;ccache"
+cmake -S . -B build/master-20260925 -DCMAKE_BUILD_TYPE=Release -DBUILD_PYTHON_MODULE=ON \
+  -DPython3_EXECUTABLE=$PWD/.venv/bin/python \
+  -DCMAKE_C_COMPILER_LAUNCHER="$L" -DCMAKE_CXX_COMPILER_LAUNCHER="$L"
+cmake --build build/master-20260925 --target _jsbsim -j5
+ctest --test-dir build/master-20260925 -R 'Turbine|WheelSpin'
+```
+
+Run `ccache -s` with the same `CCACHE_DIR`; without it ccache uses
+`~/Library/Caches/ccache`, outside the repository. What else may stay in
+`build/` is listed in [Build scratch](build-scratch.md).
+
 The build captures the enclosing repository once. Generator, compiler, tests
 and metadata share that frozen source; the SDK digest is the `wasm/` subset of
 the same snapshot. No native archive, vendor checkout or external source path is
