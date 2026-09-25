@@ -1,0 +1,7536 @@
+{
+  "base": "master",
+  "note": "every recorded value that differs from the master build, sample by sample, for the two uninstrumented variants. The instrumented builds reproduce these exactly: provenance.json records that all 2137 non-diagnostic values match their uninstrumented pair.",
+  "differences": [
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "runic",
+      "label": "settled-at-low-throttle",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          51.0,
+          24.588508242852853
+        ],
+        "n2": [
+          72.0,
+          16.39233882856857
+        ],
+        "thrust-lbs": [
+          1072.8489952500158,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          0.27905796041449904,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          149.05172959824876,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          1.5863953326711313,
+          0.0
+        ],
+        "tsfc": [
+          0.8989376095447246,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23996.827209334686,
+          24000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          2145.6979905000317,
+          0.0
+        ],
+        "tank-total-lbs": [
+          23996.827209334686,
+          24000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "runic",
+      "label": "settled-at-low-throttle",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          1072.8489952500158,
+          1072.848878330446
+        ],
+        "fuel-flow-rate-pps": [
+          0.27905796041449904,
+          0.2790579329387506
+        ],
+        "fuel-flow-rate-gph": [
+          149.05172959824876,
+          149.05171492277478
+        ],
+        "fuel-used-lbs": [
+          1.5863953326711313,
+          1.3943403382530029
+        ],
+        "tsfc": [
+          0.8989376095447246,
+          0.8989376190029175
+        ],
+        "propulsion/total-fuel-lbs": [
+          23996.827209334686,
+          23997.211319323524
+        ],
+        "forces/fbx-prop-lbs": [
+          2145.6979905000317,
+          2145.697756660892
+        ],
+        "tank-total-lbs": [
+          23996.827209334686,
+          23997.211319323524
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "runic",
+      "label": "throttle-changed",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          51.0,
+          24.588508242852853
+        ],
+        "n2": [
+          72.0,
+          16.39233882856857
+        ],
+        "thrust-lbs": [
+          1072.8489952500158,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          0.27905796041449904,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          149.05172959824876,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          1.5863953326711313,
+          0.0
+        ],
+        "tsfc": [
+          0.8989376095447246,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23996.827209334686,
+          24000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          2145.6979905000317,
+          0.0
+        ],
+        "tank-total-lbs": [
+          23996.827209334686,
+          24000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "runic",
+      "label": "throttle-changed",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          1072.8489952500158,
+          1072.848878330446
+        ],
+        "fuel-flow-rate-pps": [
+          0.27905796041449904,
+          0.2790579329387506
+        ],
+        "fuel-flow-rate-gph": [
+          149.05172959824876,
+          149.05171492277478
+        ],
+        "fuel-used-lbs": [
+          1.5863953326711313,
+          1.3943403382530029
+        ],
+        "tsfc": [
+          0.8989376095447246,
+          0.8989376190029175
+        ],
+        "propulsion/total-fuel-lbs": [
+          23996.827209334686,
+          23997.211319323524
+        ],
+        "forces/fbx-prop-lbs": [
+          2145.6979905000317,
+          2145.697756660892
+        ],
+        "tank-total-lbs": [
+          23996.827209334686,
+          23997.211319323524
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "runic",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          51.0,
+          24.588508242852853
+        ],
+        "n2": [
+          72.0,
+          16.39233882856857
+        ],
+        "thrust-lbs": [
+          6599.20747112264,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          0.27905796041449904,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          149.05172959824876,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          1.5863953326711313,
+          0.0
+        ],
+        "tsfc": [
+          0.8989376095447246,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23996.827209334686,
+          24000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          13198.41494224528,
+          0.0
+        ],
+        "tank-total-lbs": [
+          23996.827209334686,
+          24000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "runic",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "n1": [
+          51.0,
+          93.0
+        ],
+        "n2": [
+          72.0,
+          96.0
+        ],
+        "fuel-flow-rate-pps": [
+          0.27905796041449904,
+          1.0962269990587694
+        ],
+        "fuel-flow-rate-gph": [
+          149.05172959824876,
+          585.5218392598769
+        ],
+        "fuel-used-lbs": [
+          1.5863953326711313,
+          1.3943403382530029
+        ],
+        "tsfc": [
+          0.8989376095447246,
+          0.5740932567017184
+        ],
+        "propulsion/total-fuel-lbs": [
+          23996.827209334686,
+          23997.211319323524
+        ],
+        "tank-total-lbs": [
+          23996.827209334686,
+          23997.211319323524
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "runic",
+      "label": "one-frame-after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          93.0,
+          24.69179369386474
+        ],
+        "n2": [
+          96.0,
+          16.461473573687606
+        ],
+        "thrust-lbs": [
+          6599.2199731378205,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          0.28137277522931387,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          150.28812920260089,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          1.5887401057980424,
+          0.0
+        ],
+        "tsfc": [
+          0.5740932566994656,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23996.822519788435,
+          24000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          13198.439946275641,
+          0.0
+        ],
+        "tank-total-lbs": [
+          23996.822519788435,
+          24000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "runic",
+      "label": "one-frame-after-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          6599.2199731378205,
+          6599.219973066558
+        ],
+        "fuel-flow-rate-pps": [
+          0.28137277522931387,
+          1.0962290758142188
+        ],
+        "fuel-flow-rate-gph": [
+          150.28812920260089,
+          585.5229485061109
+        ],
+        "fuel-used-lbs": [
+          1.5887401057980424,
+          1.4034755805514547
+        ],
+        "propulsion/total-fuel-lbs": [
+          23996.822519788435,
+          23997.19304883893
+        ],
+        "forces/fbx-prop-lbs": [
+          13198.439946275641,
+          13198.439946133116
+        ],
+        "tank-total-lbs": [
+          23996.822519788435,
+          23997.19304883893
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "runic",
+      "label": "one-second-after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          93.0,
+          24.848848720435846
+        ],
+        "n2": [
+          96.0,
+          16.56589914695723
+        ],
+        "thrust-lbs": [
+          6602.499713912952,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          0.5568357381922744,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          297.4196821205026,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          2.0054995893819254,
+          0.0
+        ],
+        "tsfc": [
+          0.5741090357049389,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23995.989000821264,
+          24000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          13204.999427825904,
+          0.0
+        ],
+        "tank-total-lbs": [
+          23995.989000821264,
+          24000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "runic",
+      "label": "one-second-after-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          6602.499713912952,
+          6602.499715324673
+        ],
+        "fuel-flow-rate-pps": [
+          0.5568357381922744,
+          1.0968040349194466
+        ],
+        "fuel-flow-rate-gph": [
+          297.4196821205026,
+          585.8300483249269
+        ],
+        "fuel-used-lbs": [
+          2.0054995893819254,
+          2.490803975988401
+        ],
+        "tsfc": [
+          0.5741090357049389,
+          0.5741090356859196
+        ],
+        "propulsion/total-fuel-lbs": [
+          23995.989000821264,
+          23995.018392048074
+        ],
+        "forces/fbx-prop-lbs": [
+          13204.999427825904,
+          13204.999430649346
+        ],
+        "tank-total-lbs": [
+          23995.989000821264,
+          23995.018392048074
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "spool",
+      "label": "settled-at-low-throttle",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          51.0,
+          24.588508242852853
+        ],
+        "n2": [
+          72.0,
+          16.39233882856857
+        ],
+        "thrust-lbs": [
+          1072.8489952500158,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          0.27905796041449904,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          149.05172959824876,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          1.5863953326711313,
+          0.0
+        ],
+        "tsfc": [
+          0.8989376095447246,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23996.827209334686,
+          24000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          2145.6979905000317,
+          0.0
+        ],
+        "tank-total-lbs": [
+          23996.827209334686,
+          24000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "spool",
+      "label": "settled-at-low-throttle",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          1072.8489952500158,
+          1072.848878330446
+        ],
+        "fuel-flow-rate-pps": [
+          0.27905796041449904,
+          0.2790579329387506
+        ],
+        "fuel-flow-rate-gph": [
+          149.05172959824876,
+          149.05171492277478
+        ],
+        "fuel-used-lbs": [
+          1.5863953326711313,
+          1.3943403382530029
+        ],
+        "tsfc": [
+          0.8989376095447246,
+          0.8989376190029175
+        ],
+        "propulsion/total-fuel-lbs": [
+          23996.827209334686,
+          23997.211319323524
+        ],
+        "forces/fbx-prop-lbs": [
+          2145.6979905000317,
+          2145.697756660892
+        ],
+        "tank-total-lbs": [
+          23996.827209334686,
+          23997.211319323524
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "spool",
+      "label": "throttle-changed",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          51.0,
+          24.588508242852853
+        ],
+        "n2": [
+          72.0,
+          16.39233882856857
+        ],
+        "thrust-lbs": [
+          1072.8489952500158,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          0.27905796041449904,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          149.05172959824876,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          1.5863953326711313,
+          0.0
+        ],
+        "tsfc": [
+          0.8989376095447246,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23996.827209334686,
+          24000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          2145.6979905000317,
+          0.0
+        ],
+        "tank-total-lbs": [
+          23996.827209334686,
+          24000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "spool",
+      "label": "throttle-changed",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          1072.8489952500158,
+          1072.848878330446
+        ],
+        "fuel-flow-rate-pps": [
+          0.27905796041449904,
+          0.2790579329387506
+        ],
+        "fuel-flow-rate-gph": [
+          149.05172959824876,
+          149.05171492277478
+        ],
+        "fuel-used-lbs": [
+          1.5863953326711313,
+          1.3943403382530029
+        ],
+        "tsfc": [
+          0.8989376095447246,
+          0.8989376190029175
+        ],
+        "propulsion/total-fuel-lbs": [
+          23996.827209334686,
+          23997.211319323524
+        ],
+        "forces/fbx-prop-lbs": [
+          2145.6979905000317,
+          2145.697756660892
+        ],
+        "tank-total-lbs": [
+          23996.827209334686,
+          23997.211319323524
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "spool",
+      "label": "one-frame-no-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          51.03710762865269,
+          24.588895204036945
+        ],
+        "n2": [
+          72.03710762865269,
+          16.392596802691298
+        ],
+        "thrust-lbs": [
+          1077.1385002010697,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          0.2799009847130643,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          149.50200963902543,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          1.5887278408770735,
+          0.0
+        ],
+        "tsfc": [
+          0.8980626010376355,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23996.822544318275,
+          24000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          2154.2770004021395,
+          0.0
+        ],
+        "tank-total-lbs": [
+          23996.822544318275,
+          24000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "spool",
+      "label": "one-frame-no-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "n1": [
+          51.03710762865269,
+          51.03710762920645
+        ],
+        "n2": [
+          72.03710762865269,
+          72.03710762920646
+        ],
+        "thrust-lbs": [
+          1077.1385002010697,
+          1077.1383837880142
+        ],
+        "fuel-flow-rate-pps": [
+          0.2799009847130643,
+          0.27990095741401955
+        ],
+        "fuel-flow-rate-gph": [
+          149.50200963902543,
+          149.50199505793327
+        ],
+        "fuel-used-lbs": [
+          1.5887278408770735,
+          1.396672846231453
+        ],
+        "tsfc": [
+          0.8980626010376355,
+          0.8980626105078326
+        ],
+        "propulsion/total-fuel-lbs": [
+          23996.822544318275,
+          23997.206654307567
+        ],
+        "forces/fbx-prop-lbs": [
+          2154.2770004021395,
+          2154.2767675760283
+        ],
+        "tank-total-lbs": [
+          23996.822544318275,
+          23997.206654307567
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "spool",
+      "label": "one-second-no-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          55.8117128242946,
+          24.66173922164688
+        ],
+        "n2": [
+          76.81171282429455,
+          16.44115948109792
+        ],
+        "thrust-lbs": [
+          1741.7390407390224,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          0.4007373737747587,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          214.0437011259839,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          1.9233139980576504,
+          0.0
+        ],
+        "tsfc": [
+          0.7951526212433813,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23996.15337200392,
+          24000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          3483.4780814780447,
+          0.0
+        ],
+        "tank-total-lbs": [
+          23996.15337200392,
+          24000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "spool",
+      "label": "one-second-no-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "n1": [
+          55.8117128242946,
+          55.81171292755323
+        ],
+        "n2": [
+          76.81171282429455,
+          76.81171292755319
+        ],
+        "thrust-lbs": [
+          1741.7390407390224,
+          1741.73907290103
+        ],
+        "fuel-flow-rate-pps": [
+          0.4007373737747587,
+          0.4007373864034472
+        ],
+        "fuel-flow-rate-gph": [
+          214.0437011259839,
+          214.0437078712774
+        ],
+        "fuel-used-lbs": [
+          1.9233139980576504,
+          1.7312589929496522
+        ],
+        "tsfc": [
+          0.7951526212433813,
+          0.7951526316186682
+        ],
+        "propulsion/total-fuel-lbs": [
+          23996.15337200392,
+          23996.537482014137
+        ],
+        "forces/fbx-prop-lbs": [
+          3483.4780814780447,
+          3483.47814580206
+        ],
+        "tank-total-lbs": [
+          23996.15337200392,
+          23996.537482014137
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "spool",
+      "label": "five-seconds-no-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          79.81040034094666,
+          25.491608743276387
+        ],
+        "n2": [
+          96.0,
+          16.994405828850926
+        ],
+        "thrust-lbs": [
+          6773.925818486978,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.1286040515620523,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          602.8152204189004,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          5.089629964240084,
+          0.0
+        ],
+        "tsfc": [
+          0.5758042982333186,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23989.820740071536,
+          24000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          13547.851636973955,
+          0.0
+        ],
+        "tank-total-lbs": [
+          23989.820740071536,
+          24000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-b737",
+      "arm": "spool",
+      "label": "five-seconds-no-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "n1": [
+          79.81040034094666,
+          79.81040190249935
+        ],
+        "thrust-lbs": [
+          6773.925818486978,
+          6773.9294552647
+        ],
+        "fuel-flow-rate-pps": [
+          1.1286040515620523,
+          1.1286047092200369
+        ],
+        "fuel-flow-rate-gph": [
+          602.8152204189004,
+          602.8155716902274
+        ],
+        "fuel-used-lbs": [
+          5.089629964240084,
+          4.897576113876176
+        ],
+        "tsfc": [
+          0.5758042982333186,
+          0.5758043246277108
+        ],
+        "propulsion/total-fuel-lbs": [
+          23989.820740071536,
+          23990.204847772293
+        ],
+        "forces/fbx-prop-lbs": [
+          13547.851636973955,
+          13547.8589105294
+        ],
+        "tank-total-lbs": [
+          23989.820740071536,
+          23990.204847772293
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "runic",
+      "label": "settled-at-low-throttle",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          76.0,
+          6.205962317107154
+        ],
+        "n2": [
+          81.2,
+          6.630580791435552
+        ],
+        "thrust-lbs": [
+          6875.251727578658,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          0.0
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          6875.251727578658,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "runic",
+      "label": "settled-at-low-throttle",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          6875.251727578658,
+          6875.254449890577
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          1.6303851922948007
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          889.3010139789823
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          8.203732235164122
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          0.8536973773173874
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ],
+        "forces/fbx-prop-lbs": [
+          6875.251727578658,
+          6875.254449890577
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "runic",
+      "label": "throttle-changed",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          76.0,
+          6.205962317107154
+        ],
+        "n2": [
+          81.2,
+          6.630580791435552
+        ],
+        "thrust-lbs": [
+          6875.251727578658,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          0.0
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          6875.251727578658,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "runic",
+      "label": "throttle-changed",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          6875.251727578658,
+          6875.254449890577
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          1.6303851922948007
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          889.3010139789823
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          8.203732235164122
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          0.8536973773173874
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ],
+        "forces/fbx-prop-lbs": [
+          6875.251727578658,
+          6875.254449890577
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "runic",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          76.0,
+          6.205962317107154
+        ],
+        "n2": [
+          81.2,
+          6.630580791435552
+        ],
+        "thrust-lbs": [
+          26757.19853274975,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          0.0
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          26757.19853274975,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "runic",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "n1": [
+          76.0,
+          100.0
+        ],
+        "n2": [
+          81.2,
+          100.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          15.236738053371383
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          8310.948029111663
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          8.203732235164122
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          0.7171056687463014
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "runic",
+      "label": "one-frame-after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          6.1801041407858746
+        ],
+        "n2": [
+          100.0,
+          6.602953371471237
+        ],
+        "thrust-lbs": [
+          26755.39711076134,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.6442734357075153,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          896.8764194768265,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.856223996411783,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687418931,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1437760035888,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          26755.39711076134,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.1437760035888,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "runic",
+      "label": "one-frame-after-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          26755.39711076134,
+          26755.39718510893
+        ],
+        "fuel-flow-rate-pps": [
+          1.6442734357075153,
+          15.225163979297308
+        ],
+        "fuel-flow-rate-gph": [
+          896.8764194768265,
+          8304.634897798533
+        ],
+        "fuel-used-lbs": [
+          8.856223996411783,
+          8.330608601658266
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1437760035888,
+          2991.669391398338
+        ],
+        "forces/fbx-prop-lbs": [
+          26755.39711076134,
+          26755.39718510893
+        ],
+        "tank-total-lbs": [
+          2991.1437760035888,
+          2991.669391398338
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "runic",
+      "label": "one-second-after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          3.76017660133986
+        ],
+        "n2": [
+          100.0,
+          4.017451842484177
+        ],
+        "thrust-lbs": [
+          26545.823793829044,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          3.0215882505223237,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          1648.1390457394493,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          11.17545256089581,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687418931,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2988.8245474391047,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          26545.823793829044,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2988.8245474391047,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "runic",
+      "label": "one-second-after-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          26545.823793829044,
+          26545.76385323935
+        ],
+        "fuel-flow-rate-pps": [
+          3.0215882505223237,
+          15.116337749761295
+        ],
+        "fuel-flow-rate-gph": [
+          1648.1390457394493,
+          8245.275136233433
+        ],
+        "fuel-used-lbs": [
+          11.17545256089581,
+          23.37959089808232
+        ],
+        "propulsion/total-fuel-lbs": [
+          2988.8245474391047,
+          2976.6204091019144
+        ],
+        "forces/fbx-prop-lbs": [
+          26545.823793829044,
+          26545.76385323935
+        ],
+        "tank-total-lbs": [
+          2988.8245474391047,
+          2976.6204091019144
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "spool",
+      "label": "settled-at-low-throttle",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          76.0,
+          6.205962317107154
+        ],
+        "n2": [
+          81.2,
+          6.630580791435552
+        ],
+        "thrust-lbs": [
+          6875.251727578658,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          0.0
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          6875.251727578658,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "spool",
+      "label": "settled-at-low-throttle",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          6875.251727578658,
+          6875.254449890577
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          1.6303851922948007
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          889.3010139789823
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          8.203732235164122
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          0.8536973773173874
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ],
+        "forces/fbx-prop-lbs": [
+          6875.251727578658,
+          6875.254449890577
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "spool",
+      "label": "throttle-changed",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          76.0,
+          6.205962317107154
+        ],
+        "n2": [
+          81.2,
+          6.630580791435552
+        ],
+        "thrust-lbs": [
+          6875.251727578658,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          0.0
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          6875.251727578658,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "spool",
+      "label": "throttle-changed",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          6875.251727578658,
+          6875.254449890577
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          1.6303851922948007
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          889.3010139789823
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          8.203732235164122
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          0.8536973773173874
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ],
+        "forces/fbx-prop-lbs": [
+          6875.251727578658,
+          6875.254449890577
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "spool",
+      "label": "one-frame-no-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          76.20402933507914,
+          6.1801041407858746
+        ],
+        "n2": [
+          81.40402933507914,
+          6.602953371471237
+        ],
+        "thrust-lbs": [
+          24378.901249305884,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.6442734357075153,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          896.8764194768265,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.856223996411783,
+          0.0
+        ],
+        "tsfc": [
+          0.8507487108548945,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1437760035888,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          24378.901249305884,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.1437760035888,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "spool",
+      "label": "one-frame-no-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "n1": [
+          76.20402933507914,
+          76.20402933499258
+        ],
+        "n2": [
+          81.40402933507914,
+          81.40402933499259
+        ],
+        "thrust-lbs": [
+          24378.901249305884,
+          24378.908352124916
+        ],
+        "fuel-flow-rate-pps": [
+          1.6442734357075153,
+          1.6442740811836896
+        ],
+        "fuel-flow-rate-gph": [
+          896.8764194768265,
+          896.8767715547398
+        ],
+        "fuel-used-lbs": [
+          8.856223996411783,
+          8.217434519173986
+        ],
+        "tsfc": [
+          0.8507487108548945,
+          0.8507487108102895
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1437760035888,
+          2991.7825654808225
+        ],
+        "forces/fbx-prop-lbs": [
+          24378.901249305884,
+          24378.908352124916
+        ],
+        "tank-total-lbs": [
+          2991.1437760035888,
+          2991.7825654808225
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "spool",
+      "label": "one-second-no-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          3.76017660133986
+        ],
+        "n2": [
+          100.0,
+          4.017451842484177
+        ],
+        "thrust-lbs": [
+          26294.323005490955,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          3.0215882505223237,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          1648.1390457394493,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          11.17545256089581,
+          0.0
+        ],
+        "tsfc": [
+          0.8507487108548945,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2988.8245474391047,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          26294.323005490955,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2988.8245474391047,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "spool",
+      "label": "one-second-no-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          26294.323005490955,
+          26294.337317255133
+        ],
+        "fuel-flow-rate-pps": [
+          3.0215882505223237,
+          3.021588895998498
+        ],
+        "fuel-flow-rate-gph": [
+          1648.1390457394493,
+          1648.1393978173628
+        ],
+        "fuel-used-lbs": [
+          11.17545256089581,
+          10.53666372375522
+        ],
+        "tsfc": [
+          0.8507487108548945,
+          0.8507487108102895
+        ],
+        "propulsion/total-fuel-lbs": [
+          2988.8245474391047,
+          2989.4633362762415
+        ],
+        "forces/fbx-prop-lbs": [
+          26294.323005490955,
+          26294.337317255133
+        ],
+        "tank-total-lbs": [
+          2988.8245474391047,
+          2989.4633362762415
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "spool",
+      "label": "five-seconds-no-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          0.5067627405441312
+        ],
+        "n2": [
+          100.0,
+          0.5414359806866261
+        ],
+        "thrust-lbs": [
+          25569.760970870928,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          8.577143806077974,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          4678.442076042531,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          34.39606482224445,
+          0.0
+        ],
+        "tsfc": [
+          0.8507487108548945,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2965.603935177756,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          25569.760970870928,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2965.603935177756,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16",
+      "arm": "spool",
+      "label": "five-seconds-no-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          25569.760970870928,
+          25569.772282422116
+        ],
+        "fuel-flow-rate-pps": [
+          8.577143806077974,
+          8.57714445155415
+        ],
+        "fuel-flow-rate-gph": [
+          4678.442076042531,
+          4678.442428120446
+        ],
+        "fuel-used-lbs": [
+          34.39606482224445,
+          33.75727856700857
+        ],
+        "tsfc": [
+          0.8507487108548945,
+          0.8507487108102895
+        ],
+        "propulsion/total-fuel-lbs": [
+          2965.603935177756,
+          2966.242721432989
+        ],
+        "forces/fbx-prop-lbs": [
+          25569.760970870928,
+          25569.772282422116
+        ],
+        "tank-total-lbs": [
+          2965.603935177756,
+          2966.242721432989
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "runic",
+      "label": "settled-at-low-throttle",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          76.0,
+          6.205962317107154
+        ],
+        "n2": [
+          81.2,
+          6.630580791435552
+        ],
+        "thrust-lbs": [
+          6875.251727578658,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          0.0
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          6875.251727578658,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "runic",
+      "label": "settled-at-low-throttle",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          6875.251727578658,
+          6875.254449890577
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          1.6303851922948007
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          889.3010139789823
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          8.203732235164122
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          0.8536973773173874
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ],
+        "forces/fbx-prop-lbs": [
+          6875.251727578658,
+          6875.254449890577
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "runic",
+      "label": "throttle-changed",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          76.0,
+          6.205962317107154
+        ],
+        "n2": [
+          81.2,
+          6.630580791435552
+        ],
+        "thrust-lbs": [
+          6875.251727578658,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          0.0
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          6875.251727578658,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "runic",
+      "label": "throttle-changed",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          6875.251727578658,
+          6875.254449890577
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          1.6303851922948007
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          889.3010139789823
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          8.203732235164122
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          0.8536973773173874
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ],
+        "forces/fbx-prop-lbs": [
+          6875.251727578658,
+          6875.254449890577
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "runic",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          76.0,
+          6.205962317107154
+        ],
+        "n2": [
+          81.2,
+          6.630580791435552
+        ],
+        "thrust-lbs": [
+          28997.103464000647,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          0.0
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          28997.103464000647,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "runic",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "n1": [
+          76.0,
+          100.0
+        ],
+        "n2": [
+          81.2,
+          100.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          16.512239472555923
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          9006.676075939595
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          8.203732235164122
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          0.7171056687463014
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "runic",
+      "label": "one-frame-after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          6.1801041407858746
+        ],
+        "n2": [
+          100.0,
+          6.602953371471237
+        ],
+        "thrust-lbs": [
+          28995.13817304808,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.6442734357075153,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          896.8764194768265,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.856223996411783,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687418931,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1437760035888,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          28995.13817304808,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.1437760035888,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "runic",
+      "label": "one-frame-after-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          28995.13817304808,
+          28995.13825140793
+        ],
+        "fuel-flow-rate-pps": [
+          1.6442734357075153,
+          16.500665398481846
+        ],
+        "fuel-flow-rate-gph": [
+          896.8764194768265,
+          9000.362944626462
+        ],
+        "fuel-used-lbs": [
+          8.856223996411783,
+          8.34123778015147
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1437760035888,
+          2991.658762219845
+        ],
+        "forces/fbx-prop-lbs": [
+          28995.13817304808,
+          28995.13825140793
+        ],
+        "tank-total-lbs": [
+          2991.1437760035888,
+          2991.658762219845
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "runic",
+      "label": "one-second-after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          3.76017660133986
+        ],
+        "n2": [
+          100.0,
+          4.017451842484177
+        ],
+        "thrust-lbs": [
+          28765.95297722386,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          3.0215882505223237,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          1648.1390457394493,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          11.17545256089581,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687418931,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2988.8245474391047,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          28765.95297722386,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2988.8245474391047,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "runic",
+      "label": "one-second-after-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          28765.95297722386,
+          28765.880443329384
+        ],
+        "fuel-flow-rate-pps": [
+          3.0215882505223237,
+          16.380570808007008
+        ],
+        "fuel-flow-rate-gph": [
+          1648.1390457394493,
+          8934.85680436746
+        ],
+        "fuel-used-lbs": [
+          11.17545256089581,
+          24.649403808415947
+        ],
+        "propulsion/total-fuel-lbs": [
+          2988.8245474391047,
+          2975.3505961915816
+        ],
+        "forces/fbx-prop-lbs": [
+          28765.95297722386,
+          28765.880443329384
+        ],
+        "tank-total-lbs": [
+          2988.8245474391047,
+          2975.3505961915816
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "spool",
+      "label": "settled-at-low-throttle",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          76.0,
+          6.205962317107154
+        ],
+        "n2": [
+          81.2,
+          6.630580791435552
+        ],
+        "thrust-lbs": [
+          6875.251727578658,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          0.0
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          6875.251727578658,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "spool",
+      "label": "settled-at-low-throttle",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          6875.251727578658,
+          6875.254449890577
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          1.6303851922948007
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          889.3010139789823
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          8.203732235164122
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          0.8536973773173874
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ],
+        "forces/fbx-prop-lbs": [
+          6875.251727578658,
+          6875.254449890577
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "spool",
+      "label": "throttle-changed",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          76.0,
+          6.205962317107154
+        ],
+        "n2": [
+          81.2,
+          6.630580791435552
+        ],
+        "thrust-lbs": [
+          6875.251727578658,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          0.0
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          6875.251727578658,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "spool",
+      "label": "throttle-changed",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          6875.251727578658,
+          6875.254449890577
+        ],
+        "fuel-flow-rate-pps": [
+          1.6303845468186262,
+          1.6303851922948007
+        ],
+        "fuel-flow-rate-gph": [
+          889.3006619010689,
+          889.3010139789823
+        ],
+        "fuel-used-lbs": [
+          8.842521717780887,
+          8.203732235164122
+        ],
+        "tsfc": [
+          0.8536973773633956,
+          0.8536973773173874
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ],
+        "forces/fbx-prop-lbs": [
+          6875.251727578658,
+          6875.254449890577
+        ],
+        "tank-total-lbs": [
+          2991.1574782822195,
+          2991.7962677648325
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "spool",
+      "label": "one-frame-no-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          76.20402933507914,
+          6.1801041407858746
+        ],
+        "n2": [
+          81.40402933507914,
+          6.602953371471237
+        ],
+        "thrust-lbs": [
+          28733.061622995345,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.6442734357075153,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          896.8764194768265,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.856223996411783,
+          0.0
+        ],
+        "tsfc": [
+          0.8507487108548945,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1437760035888,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          28733.061622995345,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.1437760035888,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "spool",
+      "label": "one-frame-no-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "n1": [
+          76.20402933507914,
+          76.20402933499258
+        ],
+        "n2": [
+          81.40402933507914,
+          81.40402933499259
+        ],
+        "thrust-lbs": [
+          28733.061622995345,
+          28733.06980930212
+        ],
+        "fuel-flow-rate-pps": [
+          1.6442734357075153,
+          1.6442740811836896
+        ],
+        "fuel-flow-rate-gph": [
+          896.8764194768265,
+          896.8767715547398
+        ],
+        "fuel-used-lbs": [
+          8.856223996411783,
+          8.217434519173986
+        ],
+        "tsfc": [
+          0.8507487108548945,
+          0.8507487108102895
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1437760035888,
+          2991.7825654808225
+        ],
+        "forces/fbx-prop-lbs": [
+          28733.061622995345,
+          28733.06980930212
+        ],
+        "tank-total-lbs": [
+          2991.1437760035888,
+          2991.7825654808225
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "spool",
+      "label": "one-second-no-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          3.76017660133986
+        ],
+        "n2": [
+          100.0,
+          4.017451842484177
+        ],
+        "thrust-lbs": [
+          28505.864706885186,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          3.0215882505223237,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          1648.1390457394493,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          11.17545256089581,
+          0.0
+        ],
+        "tsfc": [
+          0.8507487108548945,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2988.8245474391047,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          28505.864706885186,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2988.8245474391047,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "spool",
+      "label": "one-second-no-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          28505.864706885186,
+          28505.87988545248
+        ],
+        "fuel-flow-rate-pps": [
+          3.0215882505223237,
+          3.021588895998498
+        ],
+        "fuel-flow-rate-gph": [
+          1648.1390457394493,
+          1648.1393978173628
+        ],
+        "fuel-used-lbs": [
+          11.17545256089581,
+          10.53666372375522
+        ],
+        "tsfc": [
+          0.8507487108548945,
+          0.8507487108102895
+        ],
+        "propulsion/total-fuel-lbs": [
+          2988.8245474391047,
+          2989.4633362762415
+        ],
+        "forces/fbx-prop-lbs": [
+          28505.864706885186,
+          28505.87988545248
+        ],
+        "tank-total-lbs": [
+          2988.8245474391047,
+          2989.4633362762415
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "spool",
+      "label": "five-seconds-no-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          0.5067627405441312
+        ],
+        "n2": [
+          100.0,
+          0.5414359806866261
+        ],
+        "thrust-lbs": [
+          27769.46885234789,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          8.577143806077974,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          4678.442076042531,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          34.39606482224445,
+          0.0
+        ],
+        "tsfc": [
+          0.8507487108548945,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2965.603935177756,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          27769.46885234789,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2965.603935177756,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "sean-steady-thrust-f16-augmented",
+      "arm": "spool",
+      "label": "five-seconds-no-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          27769.46885234789,
+          27769.481587761016
+        ],
+        "fuel-flow-rate-pps": [
+          8.577143806077974,
+          8.57714445155415
+        ],
+        "fuel-flow-rate-gph": [
+          4678.442076042531,
+          4678.442428120446
+        ],
+        "fuel-used-lbs": [
+          34.39606482224445,
+          33.75727856700857
+        ],
+        "tsfc": [
+          0.8507487108548945,
+          0.8507487108102895
+        ],
+        "propulsion/total-fuel-lbs": [
+          2965.603935177756,
+          2966.242721432989
+        ],
+        "forces/fbx-prop-lbs": [
+          27769.46885234789,
+          27769.481587761016
+        ],
+        "tank-total-lbs": [
+          2965.603935177756,
+          2966.242721432989
+        ]
+      }
+    },
+    {
+      "scenario": "b737-cruise-never-started",
+      "arm": "cruise",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "thrust-lbs": [
+          379.24698044815096,
+          0.0
+        ],
+        "forces/fbx-prop-lbs": [
+          758.4939608963019,
+          0.0
+        ]
+      }
+    },
+    {
+      "scenario": "repeated-runic",
+      "arm": "repeat",
+      "label": "settled",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          72.0,
+          24.588508242852853
+        ],
+        "n2": [
+          84.0,
+          16.39233882856857
+        ],
+        "thrust-lbs": [
+          3156.1821873451786,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          0.6172518700152242,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          329.68942612089126,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          3.163339863167312,
+          0.0
+        ],
+        "tsfc": [
+          0.675886985018116,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23993.673320273683,
+          24000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          6312.364374690357,
+          0.0
+        ],
+        "tank-total-lbs": [
+          23993.673320273683,
+          24000.0
+        ]
+      }
+    },
+    {
+      "scenario": "repeated-runic",
+      "arm": "repeat",
+      "label": "settled",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          3156.1821873451786,
+          3156.1823085928213
+        ],
+        "fuel-flow-rate-pps": [
+          0.6172518700152242,
+          0.6172518967671375
+        ],
+        "fuel-flow-rate-gph": [
+          329.68942612089126,
+          329.689440409747
+        ],
+        "fuel-used-lbs": [
+          3.163339863167312,
+          3.0759163950510695
+        ],
+        "tsfc": [
+          0.675886985018116,
+          0.6758869883464752
+        ],
+        "propulsion/total-fuel-lbs": [
+          23993.673320273683,
+          23993.848167209893
+        ],
+        "forces/fbx-prop-lbs": [
+          6312.364374690357,
+          6312.364617185643
+        ],
+        "tank-total-lbs": [
+          23993.673320273683,
+          23993.848167209893
+        ]
+      }
+    },
+    {
+      "scenario": "repeated-runic",
+      "arm": "repeat",
+      "label": "run-ic-1",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          72.0,
+          24.588508242852853
+        ],
+        "n2": [
+          84.0,
+          16.39233882856857
+        ],
+        "thrust-lbs": [
+          3143.6738651923674,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          0.6172518700152242,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          329.68942612089126,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          3.163339863167312,
+          0.0
+        ],
+        "tsfc": [
+          0.675886985018116,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23993.673320273683,
+          24000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          6287.347730384735,
+          0.0
+        ],
+        "tank-total-lbs": [
+          23993.673320273683,
+          24000.0
+        ]
+      }
+    },
+    {
+      "scenario": "repeated-runic",
+      "arm": "repeat",
+      "label": "run-ic-1",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "fuel-flow-rate-pps": [
+          0.6172518700152242,
+          0.6143661380978911
+        ],
+        "fuel-flow-rate-gph": [
+          329.68942612089126,
+          328.14808563092106
+        ],
+        "fuel-used-lbs": [
+          3.163339863167312,
+          3.0759163950510695
+        ],
+        "tsfc": [
+          0.675886985018116,
+          0.6754038314137863
+        ],
+        "propulsion/total-fuel-lbs": [
+          23993.673320273683,
+          23993.848167209893
+        ],
+        "tank-total-lbs": [
+          23993.673320273683,
+          23993.848167209893
+        ]
+      }
+    },
+    {
+      "scenario": "repeated-runic",
+      "arm": "repeat",
+      "label": "run-ic-2",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          72.0,
+          24.588508242852853
+        ],
+        "n2": [
+          84.0,
+          16.39233882856857
+        ],
+        "thrust-lbs": [
+          3143.6738651923674,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          0.6172518700152242,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          329.68942612089126,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          3.163339863167312,
+          0.0
+        ],
+        "tsfc": [
+          0.675886985018116,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23993.673320273683,
+          24000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          6287.347730384735,
+          0.0
+        ],
+        "tank-total-lbs": [
+          23993.673320273683,
+          24000.0
+        ]
+      }
+    },
+    {
+      "scenario": "repeated-runic",
+      "arm": "repeat",
+      "label": "run-ic-2",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "fuel-flow-rate-pps": [
+          0.6172518700152242,
+          0.6143661380978911
+        ],
+        "fuel-flow-rate-gph": [
+          329.68942612089126,
+          328.14808563092106
+        ],
+        "fuel-used-lbs": [
+          3.163339863167312,
+          3.0759163950510695
+        ],
+        "tsfc": [
+          0.675886985018116,
+          0.6754038314137863
+        ],
+        "propulsion/total-fuel-lbs": [
+          23993.673320273683,
+          23993.848167209893
+        ],
+        "tank-total-lbs": [
+          23993.673320273683,
+          23993.848167209893
+        ]
+      }
+    },
+    {
+      "scenario": "repeated-runic",
+      "arm": "repeat",
+      "label": "run-ic-3",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          72.0,
+          24.588508242852853
+        ],
+        "n2": [
+          84.0,
+          16.39233882856857
+        ],
+        "thrust-lbs": [
+          3143.6738651923674,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          0.6172518700152242,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          329.68942612089126,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          3.163339863167312,
+          0.0
+        ],
+        "tsfc": [
+          0.675886985018116,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23993.673320273683,
+          24000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          6287.347730384735,
+          0.0
+        ],
+        "tank-total-lbs": [
+          23993.673320273683,
+          24000.0
+        ]
+      }
+    },
+    {
+      "scenario": "repeated-runic",
+      "arm": "repeat",
+      "label": "run-ic-3",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "fuel-flow-rate-pps": [
+          0.6172518700152242,
+          0.6143661380978911
+        ],
+        "fuel-flow-rate-gph": [
+          329.68942612089126,
+          328.14808563092106
+        ],
+        "fuel-used-lbs": [
+          3.163339863167312,
+          3.0759163950510695
+        ],
+        "tsfc": [
+          0.675886985018116,
+          0.6754038314137863
+        ],
+        "propulsion/total-fuel-lbs": [
+          23993.673320273683,
+          23993.848167209893
+        ],
+        "tank-total-lbs": [
+          23993.673320273683,
+          23993.848167209893
+        ]
+      }
+    },
+    {
+      "scenario": "repeated-runic",
+      "arm": "repeat",
+      "label": "one-frame-after",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          72.0,
+          24.69179369386474
+        ],
+        "n2": [
+          84.0,
+          16.461473573687606
+        ],
+        "thrust-lbs": [
+          3143.6680244981603,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          0.6143649966524116,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          328.14747595677767,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          3.1684595714727486,
+          0.0
+        ],
+        "tsfc": [
+          0.675403831411136,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23993.66308085707,
+          24000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          6287.336048996321,
+          0.0
+        ],
+        "tank-total-lbs": [
+          23993.66308085707,
+          24000.0
+        ]
+      }
+    },
+    {
+      "scenario": "repeated-runic",
+      "arm": "repeat",
+      "label": "one-frame-after",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          3143.6680244981603,
+          3143.6680245077328
+        ],
+        "fuel-flow-rate-pps": [
+          0.6143649966524116,
+          0.6143649966542823
+        ],
+        "fuel-flow-rate-gph": [
+          328.14747595677767,
+          328.1474759577769
+        ],
+        "fuel-used-lbs": [
+          3.1684595714727486,
+          3.0810361033565217
+        ],
+        "propulsion/total-fuel-lbs": [
+          23993.66308085707,
+          23993.83792779328
+        ],
+        "forces/fbx-prop-lbs": [
+          6287.336048996321,
+          6287.3360490154655
+        ],
+        "tank-total-lbs": [
+          23993.66308085707,
+          23993.83792779328
+        ]
+      }
+    },
+    {
+      "scenario": "off-f16",
+      "arm": "never-started",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "thrust-lbs": [
+          9163.839987407246,
+          0.0
+        ],
+        "forces/fbx-prop-lbs": [
+          9163.839987407246,
+          0.0
+        ]
+      }
+    },
+    {
+      "scenario": "off-f16",
+      "arm": "never-started",
+      "label": "24-frames-after",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          3.890765119430072e-06,
+          3.7933202153661295e-06
+        ],
+        "n2": [
+          2.5938434129533817e-06,
+          2.528880143577419e-06
+        ]
+      }
+    },
+    {
+      "scenario": "off-f16",
+      "arm": "cut-off-residual",
+      "label": "cut-off-24-frames-ago",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          74.18116918625138,
+          13.284280271877766
+        ],
+        "n2": [
+          77.70929796462188,
+          17.60167136023806
+        ],
+        "fuel-flow-rate-pps": [
+          1.4505126194739293,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          791.1887015312342,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          4.7829959249595735,
+          0.0
+        ],
+        "tsfc": [
+          0.7939385632805157,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2995.217004075045,
+          3000.0
+        ],
+        "tank-total-lbs": [
+          2995.217004075045,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "off-f16",
+      "arm": "cut-off-residual",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          74.18116918625138,
+          13.284280271877766
+        ],
+        "n2": [
+          77.70929796462188,
+          17.60167136023806
+        ],
+        "thrust-lbs": [
+          9163.839987494877,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.4505126194739293,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          791.1887015312342,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          4.7829959249595735,
+          0.0
+        ],
+        "tsfc": [
+          0.7939385632805157,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2995.217004075045,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          9163.839987494877,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2995.217004075045,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "off-f16",
+      "arm": "cut-off-residual",
+      "label": "24-frames-after",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          67.10787636389333,
+          12.017602955679829
+        ],
+        "n2": [
+          70.29959243485897,
+          15.923323916275791
+        ],
+        "fuel-flow-rate-pps": [
+          0.8949570639183744,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          488.1583985009315,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          5.0152280784839895,
+          0.0
+        ],
+        "tsfc": [
+          0.7939385632805157,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2994.984771921521,
+          3000.0
+        ],
+        "tank-total-lbs": [
+          2994.984771921521,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "off-f16",
+      "arm": "cut-off-settled",
+      "label": "cut-off-settled",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          0.5467703253239313,
+          0.09791501435778262
+        ],
+        "n2": [
+          0.5727752554308012,
+          0.12973739402406126
+        ],
+        "fuel-used-lbs": [
+          5.155691333909993,
+          0.0
+        ],
+        "tsfc": [
+          0.7939385632805157,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2994.844308666095,
+          3000.0
+        ],
+        "tank-total-lbs": [
+          2994.844308666095,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "off-f16",
+      "arm": "cut-off-settled",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          0.5467703253239313,
+          0.09791501435778262
+        ],
+        "n2": [
+          0.5727752554308012,
+          0.12973739402406126
+        ],
+        "thrust-lbs": [
+          9163.839987407246,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          5.155691333909993,
+          0.0
+        ],
+        "tsfc": [
+          0.7939385632805157,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2994.844308666095,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          9163.839987407246,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2994.844308666095,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "stale-running-cutoff",
+      "arm": "stale-running",
+      "label": "running",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          14.684467692319254
+        ],
+        "n2": [
+          100.0,
+          19.45691969232303
+        ],
+        "thrust-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1203515466127,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2990.1203515466127,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "stale-running-cutoff",
+      "arm": "stale-running",
+      "label": "cutoff-commanded-no-frame",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          14.684467692319254
+        ],
+        "n2": [
+          100.0,
+          19.45691969232303
+        ],
+        "thrust-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1203515466127,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2990.1203515466127,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "stale-running-cutoff",
+      "arm": "stale-running",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          14.684467692319254
+        ],
+        "n2": [
+          100.0,
+          19.45691969232303
+        ],
+        "thrust-lbs": [
+          20037.483739617037,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1203515466127,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          20037.483739617037,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2990.1203515466127,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "stale-running-cutoff",
+      "arm": "stale-running",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          11.410233796170813
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          6223.763888820444
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          0.7171056687496447
+        ]
+      }
+    },
+    {
+      "scenario": "stale-running-cutoff",
+      "arm": "stale-running",
+      "label": "one-frame-after",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          14.623282410267924
+        ],
+        "n2": [
+          100.0,
+          19.375849193605017
+        ],
+        "thrust-lbs": [
+          20036.15722201653,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.334500152619594,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3455.1819014288694,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.932435954659098,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.067564045341,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          20036.15722201653,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2990.067564045341,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "stale-running-cutoff",
+      "arm": "stale-running",
+      "label": "one-frame-after",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "fuel-flow-rate-pps": [
+          6.334500152619594,
+          11.409478418092744
+        ],
+        "fuel-flow-rate-gph": [
+          3455.1819014288694,
+          6223.351864414225
+        ],
+        "fuel-used-lbs": [
+          9.932435954659098,
+          9.974727440204708
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          0.7171056687496447
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.067564045341,
+          2990.025272559795
+        ],
+        "tank-total-lbs": [
+          2990.067564045341,
+          2990.025272559795
+        ]
+      }
+    },
+    {
+      "scenario": "fuel",
+      "arm": "empty-tanks",
+      "label": "tanks-emptied",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "thrust-lbs": [
+          868.6791602196195,
+          0.0
+        ],
+        "forces/fbx-prop-lbs": [
+          868.6791602196195,
+          0.0
+        ]
+      }
+    },
+    {
+      "scenario": "fuel",
+      "arm": "empty-tanks",
+      "label": "after-set-running",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          40.0
+        ],
+        "n2": [
+          100.0,
+          53.0
+        ],
+        "tsfc": [
+          0.7171056687451535,
+          1.6981973999620525
+        ]
+      }
+    },
+    {
+      "scenario": "fuel",
+      "arm": "empty-tanks",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          100.0,
+          40.0
+        ],
+        "n2": [
+          100.0,
+          53.0
+        ],
+        "tsfc": [
+          0.7171056687451535,
+          1.6981973999620525
+        ]
+      }
+    },
+    {
+      "scenario": "fuel",
+      "arm": "empty-tanks",
+      "label": "two-frames-after",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          99.16840277777777,
+          39.66736111111111
+        ],
+        "n2": [
+          99.16840277777777,
+          52.559253472222224
+        ],
+        "tsfc": [
+          0.7171056687451535,
+          1.6981973999620525
+        ]
+      }
+    },
+    {
+      "scenario": "fuel",
+      "arm": "fuel-freeze",
+      "label": "running",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          14.684467692319254
+        ],
+        "n2": [
+          100.0,
+          19.45691969232303
+        ],
+        "thrust-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1203515466127,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2990.1203515466127,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "fuel",
+      "arm": "fuel-freeze",
+      "label": "one-second-frozen",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          8.897281194824988
+        ],
+        "n2": [
+          100.0,
+          11.788897583143122
+        ],
+        "thrust-lbs": [
+          19581.618899291636,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1203515466127,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          19581.618899291636,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2990.1203515466127,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "fuel",
+      "arm": "fuel-freeze",
+      "label": "after-run-ic-frozen",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          8.897281194824988
+        ],
+        "n2": [
+          100.0,
+          11.788897583143122
+        ],
+        "thrust-lbs": [
+          20037.483738784165,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1203515466127,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          20037.483738784165,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2990.1203515466127,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "fuel",
+      "arm": "fuel-freeze",
+      "label": "after-run-ic-frozen",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "tsfc": [
+          0.7171056687407359,
+          0.7171056687451535
+        ]
+      }
+    },
+    {
+      "scenario": "fuel",
+      "arm": "fuel-freeze",
+      "label": "one-second-thawed",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          5.390839785169202
+        ],
+        "n2": [
+          100.0,
+          7.1428627153491995
+        ],
+        "thrust-lbs": [
+          19883.70431283454,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          9.100703856323378,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          4964.020285267297,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          18.29169490230322,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2981.7083050976967,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          19883.70431283454,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2981.7083050976967,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "fuel",
+      "arm": "fuel-freeze",
+      "label": "one-second-thawed",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          19883.70431283454,
+          19883.692407095383
+        ],
+        "fuel-flow-rate-pps": [
+          9.100703856323378,
+          11.322658176262648
+        ],
+        "fuel-flow-rate-gph": [
+          4964.020285267297,
+          6175.9953688705355
+        ],
+        "fuel-used-lbs": [
+          18.29169490230322,
+          21.245663815694567
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          0.7171056687451535
+        ],
+        "propulsion/total-fuel-lbs": [
+          2981.7083050976967,
+          2978.7543361843022
+        ],
+        "forces/fbx-prop-lbs": [
+          19883.70431283454,
+          19883.692407095383
+        ],
+        "tank-total-lbs": [
+          2981.7083050976967,
+          2978.7543361843022
+        ]
+      }
+    },
+    {
+      "scenario": "fuel",
+      "arm": "unselected-tank",
+      "label": "running",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          14.684467692319254
+        ],
+        "n2": [
+          100.0,
+          19.45691969232303
+        ],
+        "thrust-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1203515466127,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2990.1203515466127,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "fuel",
+      "arm": "unselected-tank",
+      "label": "two-frames-unselected",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          14.562352066891808
+        ],
+        "n2": [
+          100.0,
+          19.295116488631663
+        ],
+        "thrust-lbs": [
+          19729.641552861165,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.346074226693668,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3461.495032742001,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.985319906548213,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.0146800934517,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          19729.641552861165,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2990.0146800934517,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "fuel",
+      "arm": "unselected-tank",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          14.562352066891808
+        ],
+        "n2": [
+          100.0,
+          19.295116488631663
+        ],
+        "thrust-lbs": [
+          20037.483739620453,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.346074226693668,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3461.495032742001,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.985319906548213,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.0146800934517,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          20037.483739620453,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2990.0146800934517,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "fuel",
+      "arm": "unselected-tank",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "fuel-flow-rate-pps": [
+          6.346074226693668,
+          11.410233796172756
+        ],
+        "fuel-flow-rate-gph": [
+          3461.495032742001,
+          6223.763888821504
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          0.7171056687496631
+        ]
+      }
+    },
+    {
+      "scenario": "fuel",
+      "arm": "unselected-tank",
+      "label": "two-frames-after",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          14.441251951613316
+        ],
+        "n2": [
+          100.0,
+          19.13465883588766
+        ],
+        "thrust-lbs": [
+          20034.85582987862,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.369222374841817,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3474.121295368264,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          10.091377162178292,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2989.908622837822,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          20034.85582987862,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2989.908622837822,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "fuel",
+      "arm": "unselected-tank",
+      "label": "two-frames-after",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "fuel-flow-rate-pps": [
+          6.369222374841817,
+          11.408737347569767
+        ],
+        "fuel-flow-rate-gph": [
+          3474.121295368264,
+          6222.947644128964
+        ],
+        "fuel-used-lbs": [
+          10.091377162178292,
+          10.175471704545048
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          0.7171056687496631
+        ],
+        "propulsion/total-fuel-lbs": [
+          2989.908622837822,
+          2989.824528295455
+        ],
+        "tank-total-lbs": [
+          2989.908622837822,
+          2989.824528295455
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "stalled",
+      "label": "running",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          14.684467692319254
+        ],
+        "n2": [
+          100.0,
+          19.45691969232303
+        ],
+        "thrust-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1203515466127,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2990.1203515466127,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "stalled",
+      "label": "fault-set",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          14.684467692319254
+        ],
+        "n2": [
+          100.0,
+          19.45691969232303
+        ],
+        "thrust-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1203515466127,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2990.1203515466127,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "stalled",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          14.684467692319254
+        ],
+        "n2": [
+          100.0,
+          19.45691969232303
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1203515466127,
+          3000.0
+        ],
+        "tank-total-lbs": [
+          2990.1203515466127,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "stalled",
+      "label": "one-frame-after",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          99.91666666666667,
+          14.672230635908988
+        ],
+        "n2": [
+          99.91666666666667,
+          19.440705592579427
+        ],
+        "fuel-used-lbs": [
+          9.881402269401484,
+          0.0017538160142150823
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1185977305986,
+          2999.998246183986
+        ],
+        "tank-total-lbs": [
+          2990.1185977305986,
+          2999.998246183986
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "seized",
+      "label": "running",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          14.684467692319254
+        ],
+        "n2": [
+          100.0,
+          19.45691969232303
+        ],
+        "thrust-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1203515466127,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2990.1203515466127,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "seized",
+      "label": "fault-set",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          14.684467692319254
+        ],
+        "n2": [
+          100.0,
+          19.45691969232303
+        ],
+        "thrust-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1203515466127,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2990.1203515466127,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "seized",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          100.0,
+          14.684467692319254
+        ],
+        "fuel-flow-rate-pps": [
+          0.21045792170580988,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          114.79523002135086,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1203515466127,
+          3000.0
+        ],
+        "tank-total-lbs": [
+          2990.1203515466127,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "seized",
+      "label": "one-frame-after",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          99.94444444444444,
+          14.67630965471241
+        ],
+        "fuel-flow-rate-pps": [
+          0.21045792170580988,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          114.79523002135086,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.881402269401484,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1185977305986,
+          3000.0
+        ],
+        "tank-total-lbs": [
+          2990.1185977305986,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "starved",
+      "label": "running",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          14.684467692319254
+        ],
+        "n2": [
+          100.0,
+          19.45691969232303
+        ],
+        "thrust-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1203515466127,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2990.1203515466127,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "starved",
+      "label": "fault-set",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          14.623282410267924
+        ],
+        "n2": [
+          100.0,
+          19.375849193605017
+        ],
+        "thrust-lbs": [
+          19730.90344055902,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "forces/fbx-prop-lbs": [
+          19730.90344055902,
+          0.0
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "starved",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          100.0,
+          14.623282410267924
+        ],
+        "n2": [
+          100.0,
+          19.375849193605017
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "starved",
+      "label": "one-frame-after",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          99.58333333333333,
+          14.562352066891808
+        ],
+        "n2": [
+          99.58333333333333,
+          19.295116488631663
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "stalled+seized",
+      "label": "running",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          14.684467692319254
+        ],
+        "n2": [
+          100.0,
+          19.45691969232303
+        ],
+        "thrust-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1203515466127,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2990.1203515466127,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "stalled+seized",
+      "label": "fault-set",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          14.684467692319254
+        ],
+        "n2": [
+          100.0,
+          19.45691969232303
+        ],
+        "thrust-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1203515466127,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2990.1203515466127,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "stalled+seized",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          100.0,
+          14.684467692319254
+        ],
+        "fuel-flow-rate-pps": [
+          0.21045792170580988,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          114.79523002135086,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1203515466127,
+          3000.0
+        ],
+        "tank-total-lbs": [
+          2990.1203515466127,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "stalled+seized",
+      "label": "one-frame-after",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          99.94444444444444,
+          14.67630965471241
+        ],
+        "fuel-flow-rate-pps": [
+          0.21045792170580988,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          114.79523002135086,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.881402269401484,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1185977305986,
+          3000.0
+        ],
+        "tank-total-lbs": [
+          2990.1185977305986,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "stalled+seized+starved",
+      "label": "running",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          14.684467692319254
+        ],
+        "n2": [
+          100.0,
+          19.45691969232303
+        ],
+        "thrust-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2990.1203515466127,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          19732.16544516429,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2990.1203515466127,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "stalled+seized+starved",
+      "label": "fault-set",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          99.94444444444444,
+          14.67630965471241
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "stalled+seized+starved",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          99.94444444444444,
+          14.67630965471241
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ]
+      }
+    },
+    {
+      "scenario": "faults-precedence",
+      "arm": "stalled+seized+starved",
+      "label": "one-frame-after",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          99.88891975308641,
+          14.66815614934868
+        ],
+        "fuel-flow-rate-pps": [
+          6.322926078545519,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3448.8687701157382,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          9.879648453387269,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ]
+      }
+    },
+    {
+      "scenario": "suspend-refresh",
+      "arm": "suspend",
+      "label": "settled",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          76.0,
+          3.2662959563721827
+        ],
+        "n2": [
+          81.2,
+          4.3278421421931474
+        ],
+        "thrust-lbs": [
+          6872.3116082193965,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.629687332011842,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          888.9203629155502,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.839474831405058,
+          0.0
+        ],
+        "tsfc": [
+          0.8536973772006721,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.160525168597,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          6872.3116082193965,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.160525168597,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "suspend-refresh",
+      "arm": "suspend",
+      "label": "suspended-before-run",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          76.0,
+          3.2662959563721827
+        ],
+        "n2": [
+          81.2,
+          4.3278421421931474
+        ],
+        "thrust-lbs": [
+          6872.3116082193965,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.629687332011842,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          888.9203629155502,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.839474831405058,
+          0.0
+        ],
+        "tsfc": [
+          0.8536973772006721,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.160525168597,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          6872.3116082193965,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.160525168597,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "suspend-refresh",
+      "arm": "suspend",
+      "label": "suspended-after-one-run",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          76.0,
+          3.2662959563721827
+        ],
+        "n2": [
+          81.2,
+          4.3278421421931474
+        ],
+        "thrust-lbs": [
+          22011.395627949165,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.629687332011842,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          888.9203629155502,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.839474831405058,
+          0.0
+        ],
+        "tsfc": [
+          0.8536973772006721,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.160525168597,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          22011.395627949165,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.160525168597,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "suspend-refresh",
+      "arm": "suspend",
+      "label": "suspended-after-one-run",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "n1": [
+          76.0,
+          100.0
+        ],
+        "n2": [
+          81.2,
+          100.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.629687332011842,
+          12.534266954804385
+        ],
+        "fuel-flow-rate-gph": [
+          888.9203629155502,
+          6836.872884438756
+        ],
+        "tsfc": [
+          0.8536973772006721,
+          0.7171057968497494
+        ]
+      }
+    },
+    {
+      "scenario": "suspend-refresh",
+      "arm": "suspend",
+      "label": "suspended-after-two-runs",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          76.0,
+          3.2662959563721827
+        ],
+        "n2": [
+          81.2,
+          4.3278421421931474
+        ],
+        "thrust-lbs": [
+          22011.39562817194,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.629687332011842,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          888.9203629155502,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.839474831405058,
+          0.0
+        ],
+        "tsfc": [
+          0.8536973772006721,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.160525168597,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          22011.39562817194,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.160525168597,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "suspend-refresh",
+      "arm": "suspend",
+      "label": "suspended-after-two-runs",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "n1": [
+          76.0,
+          100.0
+        ],
+        "n2": [
+          81.2,
+          100.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.629687332011842,
+          12.534266954931242
+        ],
+        "fuel-flow-rate-gph": [
+          888.9203629155502,
+          6836.872884507951
+        ],
+        "tsfc": [
+          0.8536973772006721,
+          0.717105796850925
+        ]
+      }
+    },
+    {
+      "scenario": "suspend-refresh",
+      "arm": "suspend",
+      "label": "resumed-before-run",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          76.0,
+          3.2662959563721827
+        ],
+        "n2": [
+          81.2,
+          4.3278421421931474
+        ],
+        "thrust-lbs": [
+          22011.39562817194,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.629687332011842,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          888.9203629155502,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.839474831405058,
+          0.0
+        ],
+        "tsfc": [
+          0.8536973772006721,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.160525168597,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          22011.39562817194,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.160525168597,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "suspend-refresh",
+      "arm": "suspend",
+      "label": "resumed-before-run",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "n1": [
+          76.0,
+          100.0
+        ],
+        "n2": [
+          81.2,
+          100.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.629687332011842,
+          12.534266954931242
+        ],
+        "fuel-flow-rate-gph": [
+          888.9203629155502,
+          6836.872884507951
+        ],
+        "tsfc": [
+          0.8536973772006721,
+          0.717105796850925
+        ]
+      }
+    },
+    {
+      "scenario": "suspend-refresh",
+      "arm": "suspend",
+      "label": "resumed-after-one-run",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          3.2526863898872986
+        ],
+        "n2": [
+          100.0,
+          4.309809466600676
+        ],
+        "thrust-lbs": [
+          22009.47100168597,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.643576220900731,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          896.4961204913078,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          8.853171299912564,
+          0.0
+        ],
+        "tsfc": [
+          0.7171057968437796,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1468287000894,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          22009.47100168597,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2991.1468287000894,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "suspend-refresh",
+      "arm": "suspend",
+      "label": "resumed-after-one-run",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "fuel-flow-rate-pps": [
+          1.643576220900731,
+          12.522692880857168
+        ],
+        "fuel-flow-rate-gph": [
+          896.4961204913078,
+          6830.559753194819
+        ],
+        "fuel-used-lbs": [
+          8.853171299912564,
+          8.9438306054122
+        ],
+        "propulsion/total-fuel-lbs": [
+          2991.1468287000894,
+          2991.0561693945897
+        ],
+        "tank-total-lbs": [
+          2991.1468287000894,
+          2991.0561693945897
+        ]
+      }
+    },
+    {
+      "scenario": "first-frame",
+      "arm": "first-frame",
+      "label": "after-run-ic-held",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          40.0
+        ],
+        "n2": [
+          100.0,
+          53.0
+        ],
+        "thrust-lbs": [
+          20037.483738784165,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          3.5452068480073575,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          1933.749189822195,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687451535,
+          1.6981973999620525
+        ],
+        "forces/fbx-prop-lbs": [
+          20037.483738784165,
+          0.0
+        ]
+      }
+    },
+    {
+      "scenario": "first-frame",
+      "arm": "first-frame",
+      "label": "after-run-ic-held",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "fuel-flow-rate-pps": [
+          3.5452068480073575,
+          11.410233795696538
+        ],
+        "fuel-flow-rate-gph": [
+          1933.749189822195,
+          6223.763888561748
+        ]
+      }
+    },
+    {
+      "scenario": "first-frame",
+      "arm": "first-frame",
+      "label": "held-frame-1",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          39.833333333333336
+        ],
+        "n2": [
+          100.0,
+          52.77916666666667
+        ],
+        "thrust-lbs": [
+          20037.483737964398,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          3.556780921902467,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          1940.0623210377094,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          0.02963984101585389,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2999.970360158984,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          20037.483737964398,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2999.970360158984,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "first-frame",
+      "arm": "first-frame",
+      "label": "held-frame-1",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "fuel-flow-rate-pps": [
+          3.556780921902467,
+          11.398659721622462
+        ],
+        "fuel-flow-rate-gph": [
+          1940.0623210377094,
+          6217.450757248615
+        ],
+        "fuel-used-lbs": [
+          0.02963984101585389,
+          0.09498883101352051
+        ],
+        "propulsion/total-fuel-lbs": [
+          2999.970360158984,
+          2999.9050111689867
+        ],
+        "tank-total-lbs": [
+          2999.970360158984,
+          2999.9050111689867
+        ]
+      }
+    },
+    {
+      "scenario": "first-frame",
+      "arm": "first-frame",
+      "label": "held-frame-2",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          39.66736111111111
+        ],
+        "n2": [
+          100.0,
+          52.559253472222224
+        ],
+        "thrust-lbs": [
+          20037.483738645307,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          3.568354995976541,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          1946.3754523508405,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          0.059376132648991733,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2999.940623867351,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          20037.483738645307,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2999.940623867351,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "first-frame",
+      "arm": "first-frame",
+      "label": "held-frame-2",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "fuel-flow-rate-pps": [
+          3.568354995976541,
+          11.410233795617465
+        ],
+        "fuel-flow-rate-gph": [
+          1946.3754523508405,
+          6223.763888518618
+        ],
+        "fuel-used-lbs": [
+          0.059376132648991733,
+          0.19007411264366605
+        ],
+        "propulsion/total-fuel-lbs": [
+          2999.940623867351,
+          2999.8099258873567
+        ],
+        "tank-total-lbs": [
+          2999.940623867351,
+          2999.8099258873567
+        ]
+      }
+    },
+    {
+      "scenario": "first-frame",
+      "arm": "first-frame",
+      "label": "held-frame-3",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          39.50208043981482
+        ],
+        "n2": [
+          100.0,
+          52.340256582754634
+        ],
+        "thrust-lbs": [
+          20037.483739116007,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          3.5799290700506146,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          1952.6885836639717,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          0.08920887489941352,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2999.9107911251003,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          20037.483739116007,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2999.9107911251003,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "first-frame",
+      "arm": "first-frame",
+      "label": "held-frame-3",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          20037.483739116007,
+          20037.483740150856
+        ],
+        "fuel-flow-rate-pps": [
+          3.5799290700506146,
+          11.410233796474792
+        ],
+        "fuel-flow-rate-gph": [
+          1952.6885836639717,
+          6223.76388898625
+        ],
+        "fuel-used-lbs": [
+          0.08920887489941352,
+          0.285159394280956
+        ],
+        "propulsion/total-fuel-lbs": [
+          2999.9107911251003,
+          2999.7148406057195
+        ],
+        "forces/fbx-prop-lbs": [
+          20037.483739116007,
+          20037.483740150856
+        ],
+        "tank-total-lbs": [
+          2999.9107911251003,
+          2999.7148406057195
+        ]
+      }
+    },
+    {
+      "scenario": "starts",
+      "arm": "cold-start",
+      "label": "cold-loaded",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "thrust-lbs": [
+          868.6791602196195,
+          0.0
+        ],
+        "forces/fbx-prop-lbs": [
+          868.6791602196195,
+          0.0
+        ]
+      }
+    },
+    {
+      "scenario": "starts",
+      "arm": "cold-start",
+      "label": "cold-cranking",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "thrust-lbs": [
+          868.6791602196195,
+          0.0
+        ],
+        "forces/fbx-prop-lbs": [
+          868.6791602196195,
+          0.0
+        ]
+      }
+    },
+    {
+      "scenario": "starts",
+      "arm": "cold-start",
+      "label": "cold-n2-steady",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          31.19087821352104,
+          31.190878213521042
+        ],
+        "thrust-lbs": [
+          868.6787990347008,
+          868.6787991852287
+        ],
+        "tsfc": [
+          1.5708031675644472,
+          1.5708031675644671
+        ],
+        "forces/fbx-prop-lbs": [
+          868.6787990347008,
+          868.6787991852287
+        ]
+      }
+    },
+    {
+      "scenario": "starts",
+      "arm": "restart-after-shutdown",
+      "label": "running",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          3.2662959563721827
+        ],
+        "n2": [
+          100.0,
+          4.3278421421931474
+        ],
+        "thrust-lbs": [
+          19286.326610157023,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          10.489592745212185,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          5721.596042843011,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          35.11578780013507,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2964.884212199865,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          19286.326610157023,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2964.884212199865,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "starts",
+      "arm": "restart-after-shutdown",
+      "label": "shut-down-and-settled",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          1.8935330332335543,
+          0.00014522376802636287
+        ],
+        "n2": [
+          1.262355355489036,
+          0.00019242149263493097
+        ],
+        "fuel-used-lbs": [
+          54.877773561459236,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2945.122226438541,
+          3000.0
+        ],
+        "tank-total-lbs": [
+          2945.122226438541,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "starts",
+      "arm": "restart-after-shutdown",
+      "label": "restart-cranking",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          1.8935330332335543,
+          0.00014522376802636287
+        ],
+        "n2": [
+          1.262355355489036,
+          0.00019242149263493097
+        ],
+        "fuel-used-lbs": [
+          54.877773561459236,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2945.122226438541,
+          3000.0
+        ],
+        "tank-total-lbs": [
+          2945.122226438541,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "starts",
+      "arm": "restart-after-shutdown",
+      "label": "restart-n2-above-15",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n2": [
+          16.012355355489195,
+          16.000192421492795
+        ],
+        "fuel-used-lbs": [
+          54.877773561459236,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2945.122226438541,
+          3000.0
+        ],
+        "sim-time-sec": [
+          29.91666666666561,
+          30.333333333332252
+        ],
+        "tank-total-lbs": [
+          2945.122226438541,
+          3000.0
+        ],
+        "frames-to-crank": [
+          590,
+          640
+        ]
+      }
+    },
+    {
+      "scenario": "starts",
+      "arm": "restart-after-shutdown",
+      "label": "restart-running",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "fuel-used-lbs": [
+          57.41547639032398,
+          2.536809721205316
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2942.5845236096748,
+          2997.463190278795
+        ],
+        "sim-time-sec": [
+          48.424999999997894,
+          48.84166666666454
+        ],
+        "tank-total-lbs": [
+          2942.5845236096748,
+          2997.463190278795
+        ]
+      }
+    },
+    {
+      "scenario": "starts",
+      "arm": "restart-after-shutdown",
+      "label": "restart-n2-steady",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          31.330553058892846,
+          31.179211546854344
+        ],
+        "thrust-lbs": [
+          879.2614947735519,
+          868.6787991854635
+        ],
+        "fuel-used-lbs": [
+          57.41724949646165,
+          2.538582827342988
+        ],
+        "tsfc": [
+          1.5708031590208154,
+          1.5708031675642058
+        ],
+        "propulsion/total-fuel-lbs": [
+          2942.582750503537,
+          2997.4614171726575
+        ],
+        "forces/fbx-prop-lbs": [
+          879.2614947735519,
+          868.6787991854635
+        ],
+        "sim-time-sec": [
+          48.43333333333123,
+          48.84999999999787
+        ],
+        "tank-total-lbs": [
+          2942.582750503537,
+          2997.4614171726575
+        ]
+      }
+    },
+    {
+      "scenario": "set-running-boolean",
+      "arm": "set-running-boolean",
+      "label": "loaded-off",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "thrust-lbs": [
+          868.6791602196195,
+          0.0
+        ],
+        "forces/fbx-prop-lbs": [
+          868.6791602196195,
+          0.0
+        ]
+      }
+    },
+    {
+      "scenario": "set-running-boolean",
+      "arm": "set-running-boolean",
+      "label": "boolean-set",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "thrust-lbs": [
+          868.6791602196195,
+          0.0
+        ],
+        "forces/fbx-prop-lbs": [
+          868.6791602196195,
+          0.0
+        ]
+      }
+    },
+    {
+      "scenario": "set-running-boolean",
+      "arm": "set-running-boolean",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "thrust-lbs": [
+          20037.483738784165,
+          0.0
+        ],
+        "forces/fbx-prop-lbs": [
+          20037.483738784165,
+          0.0
+        ]
+      }
+    },
+    {
+      "scenario": "set-running-boolean",
+      "arm": "set-running-boolean",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "n1": [
+          0.0,
+          100.0
+        ],
+        "n2": [
+          0.0,
+          100.0
+        ],
+        "fuel-flow-rate-pps": [
+          0.0,
+          11.410233795696538
+        ],
+        "fuel-flow-rate-gph": [
+          0.0,
+          6223.763888561748
+        ],
+        "tsfc": [
+          1.6981973999620525,
+          0.7171056687451535
+        ]
+      }
+    },
+    {
+      "scenario": "set-running-boolean",
+      "arm": "set-running-boolean",
+      "label": "one-frame-after",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          4.046447709197246e-07
+        ],
+        "n2": [
+          100.0,
+          2.6976318061314973e-07
+        ],
+        "thrust-lbs": [
+          20036.158210561953,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          0.22203199577988394,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          121.10836133448217,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          0.001850266631499033,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2999.9981497333683,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          20036.158210561953,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2999.9981497333683,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "set-running-boolean",
+      "arm": "set-running-boolean",
+      "label": "one-frame-after",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "fuel-flow-rate-pps": [
+          0.22203199577988394,
+          11.398659721622462
+        ],
+        "fuel-flow-rate-gph": [
+          121.10836133448217,
+          6217.450757248615
+        ],
+        "fuel-used-lbs": [
+          0.001850266631499033,
+          0.09498883101352051
+        ],
+        "propulsion/total-fuel-lbs": [
+          2999.9981497333683,
+          2999.9050111689867
+        ],
+        "tank-total-lbs": [
+          2999.9981497333683,
+          2999.9050111689867
+        ]
+      }
+    },
+    {
+      "scenario": "set-running-boolean",
+      "arm": "set-running-boolean",
+      "label": "five-seconds-after",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          3.409603891694847e-07
+        ],
+        "n2": [
+          100.0,
+          2.2730692611298947e-07
+        ],
+        "thrust-lbs": [
+          19284.82305977524,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          7.166476440224378,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          3908.9871492132975,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          18.50205654182722,
+          0.0
+        ],
+        "tsfc": [
+          0.7171056687407359,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          2981.497943458172,
+          3000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          19284.82305977524,
+          0.0
+        ],
+        "tank-total-lbs": [
+          2981.497943458172,
+          3000.0
+        ]
+      }
+    },
+    {
+      "scenario": "set-running-boolean",
+      "arm": "set-running-boolean",
+      "label": "five-seconds-after",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          19284.82305977524,
+          19284.037652352476
+        ],
+        "fuel-flow-rate-pps": [
+          7.166476440224378,
+          10.981188107589603
+        ],
+        "fuel-flow-rate-gph": [
+          3908.9871492132975,
+          5989.738967776148
+        ],
+        "fuel-used-lbs": [
+          18.50205654182722,
+          56.05952692183305
+        ],
+        "propulsion/total-fuel-lbs": [
+          2981.497943458172,
+          2943.940473078167
+        ],
+        "forces/fbx-prop-lbs": [
+          19284.82305977524,
+          19284.037652352476
+        ],
+        "tank-total-lbs": [
+          2981.497943458172,
+          2943.940473078167
+        ]
+      }
+    },
+    {
+      "scenario": "app-restore",
+      "arm": "app-restore",
+      "label": "before-restore",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          51.0,
+          24.588469457793114
+        ],
+        "n2": [
+          72.0,
+          16.392312971862076
+        ],
+        "thrust-lbs": [
+          1071.4381986537205,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          0.27868830860405513,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          148.8542894621066,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          2.064374215235956,
+          0.0
+        ],
+        "tsfc": [
+          0.8989289309881093,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23995.871251569515,
+          24000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          2142.876397307441,
+          0.0
+        ],
+        "tank-total-lbs": [
+          23995.871251569515,
+          24000.0
+        ],
+        "captured": [
+          {
+            "n1": 51.0,
+            "n2": 72.0,
+            "sim-time-sec": 5.000000000000038,
+            "fuel-used-lbs": 2.064374215235956,
+            "tank-total-lbs": 23995.871251569515
+          },
+          {
+            "n1": 24.588469457793114,
+            "n2": 16.392312971862076,
+            "sim-time-sec": 5.000000000000038,
+            "fuel-used-lbs": 0.0,
+            "tank-total-lbs": 24000.0
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "app-restore",
+      "arm": "app-restore",
+      "label": "after-first-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "thrust-lbs": [
+          1070.3537016342052,
+          0.0
+        ],
+        "forces/fbx-prop-lbs": [
+          2140.7074032684104,
+          0.0
+        ]
+      }
+    },
+    {
+      "scenario": "app-restore",
+      "arm": "app-restore",
+      "label": "after-set-running",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          51.0
+        ],
+        "n2": [
+          100.0,
+          72.0
+        ],
+        "tsfc": [
+          0.5673392183875805,
+          1.3946446147188356
+        ]
+      }
+    },
+    {
+      "scenario": "app-restore",
+      "arm": "app-restore",
+      "label": "after-second-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          51.0
+        ],
+        "n2": [
+          100.0,
+          72.0
+        ],
+        "thrust-lbs": [
+          1070.3537016342052,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.322841109541528,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          706.5620169658013,
+          0.0
+        ],
+        "tsfc": [
+          0.5673392183875805,
+          1.3946446147188356
+        ],
+        "forces/fbx-prop-lbs": [
+          2140.7074032684104,
+          0.0
+        ],
+        "captured": [
+          {
+            "n1": 51.0,
+            "n2": 72.0,
+            "sim-time-sec": 5.000000000000038,
+            "fuel-used-lbs": 2.064374215235956,
+            "tank-total-lbs": 23995.871251569515
+          },
+          {
+            "n1": 24.588469457793114,
+            "n2": 16.392312971862076,
+            "sim-time-sec": 5.000000000000038,
+            "fuel-used-lbs": 0.0,
+            "tank-total-lbs": 24000.0
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "app-restore",
+      "arm": "app-restore",
+      "label": "after-second-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "n1": [
+          100.0,
+          51.0
+        ],
+        "n2": [
+          100.0,
+          72.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.322841109541528,
+          0.2782074415794914
+        ],
+        "fuel-flow-rate-gph": [
+          706.5620169658013,
+          148.59744654097463
+        ],
+        "tsfc": [
+          0.5673392183875805,
+          0.8982870957803357
+        ]
+      }
+    },
+    {
+      "scenario": "app-restore",
+      "arm": "app-restore",
+      "label": "one-frame-after",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          51.0,
+          50.7875
+        ],
+        "n2": [
+          72.0,
+          71.7
+        ],
+        "thrust-lbs": [
+          1070.3674725172734,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.2996929613933799,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          694.19802092228,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          0.010830774678278166,
+          0.0
+        ],
+        "tsfc": [
+          0.8982870957768108,
+          1.3946446147188356
+        ],
+        "propulsion/total-fuel-lbs": [
+          23999.978338450645,
+          24000.0
+        ],
+        "forces/fbx-prop-lbs": [
+          2140.734945034547,
+          0.0
+        ],
+        "tank-total-lbs": [
+          23999.978338450645,
+          24000.0
+        ]
+      }
+    },
+    {
+      "scenario": "app-restore",
+      "arm": "app-restore",
+      "label": "one-frame-after",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "fuel-flow-rate-pps": [
+          1.2996929613933799,
+          0.2782110209205749
+        ],
+        "fuel-flow-rate-gph": [
+          694.19802092228,
+          148.59935835520324
+        ],
+        "fuel-used-lbs": [
+          0.010830774678278166,
+          0.0023184251743381245
+        ],
+        "propulsion/total-fuel-lbs": [
+          23999.978338450645,
+          23999.995363149654
+        ],
+        "tank-total-lbs": [
+          23999.978338450645,
+          23999.995363149654
+        ]
+      }
+    },
+    {
+      "scenario": "injection-b747",
+      "arm": "injection",
+      "label": "injection-armed",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          72.0,
+          11.013350769239452
+        ],
+        "n2": [
+          84.0,
+          22.026701538478903
+        ],
+        "thrust-lbs": [
+          22621.67026822126,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          2.06978349164868,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          1128.972813626553,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          3.586326242556639,
+          0.0
+        ],
+        "tsfc": [
+          0.6506361613006595,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          27267.654695029778,
+          27282.0
+        ],
+        "forces/fbx-prop-lbs": [
+          90486.68107288504,
+          0.0
+        ],
+        "tank-total-lbs": [
+          27267.654695029778,
+          27282.0
+        ]
+      }
+    },
+    {
+      "scenario": "injection-b747",
+      "arm": "injection",
+      "label": "injection-armed",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          22621.67026822126,
+          22621.667790184754
+        ],
+        "fuel-flow-rate-pps": [
+          2.06978349164868,
+          4.088465299613679
+        ],
+        "fuel-flow-rate-gph": [
+          1128.972813626553,
+          2230.0719816074616
+        ],
+        "fuel-used-lbs": [
+          3.586326242556639,
+          12.194222929242855
+        ],
+        "tsfc": [
+          0.6506361613006595,
+          0.6506361606545826
+        ],
+        "propulsion/total-fuel-lbs": [
+          27267.654695029778,
+          27233.223108283026
+        ],
+        "forces/fbx-prop-lbs": [
+          90486.68107288504,
+          90486.67116073902
+        ],
+        "tank-total-lbs": [
+          27267.654695029778,
+          27233.223108283026
+        ]
+      }
+    },
+    {
+      "scenario": "injection-b747",
+      "arm": "injection",
+      "label": "one-second-of-injection",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          72.0,
+          6.672960896118747
+        ],
+        "n2": [
+          84.0,
+          13.345921792237494
+        ],
+        "thrust-lbs": [
+          23725.00998848603,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          2.3475612694264556,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          1280.4879651417032,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          5.796156030501608,
+          0.0
+        ],
+        "tsfc": [
+          0.6506366735907307,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          27258.815375877995,
+          27282.0
+        ],
+        "forces/fbx-prop-lbs": [
+          91510.75281273182,
+          0.0
+        ],
+        "tank-total-lbs": [
+          27258.815375877995,
+          27282.0
+        ]
+      }
+    },
+    {
+      "scenario": "injection-b747",
+      "arm": "injection",
+      "label": "one-second-of-injection",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          23725.00998848603,
+          23725.005144522598
+        ],
+        "fuel-flow-rate-pps": [
+          2.3475612694264556,
+          4.083692700653775
+        ],
+        "fuel-flow-rate-gph": [
+          1280.4879651417032,
+          2227.4687458111503
+        ],
+        "fuel-used-lbs": [
+          5.796156030501608,
+          16.28028303611672
+        ],
+        "tsfc": [
+          0.6506366735907307,
+          0.6506366727610624
+        ],
+        "propulsion/total-fuel-lbs": [
+          27258.815375877995,
+          27216.878867855536
+        ],
+        "forces/fbx-prop-lbs": [
+          91510.75281273182,
+          91510.73412887286
+        ],
+        "tank-total-lbs": [
+          27258.815375877995,
+          27216.878867855536
+        ]
+      }
+    },
+    {
+      "scenario": "injection-b747",
+      "arm": "injection",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          72.0,
+          6.672960896118747
+        ],
+        "n2": [
+          84.0,
+          13.345921792237494
+        ],
+        "thrust-lbs": [
+          23816.02311377116,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          2.3475612694264556,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          1280.4879651417032,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          5.796156030501608,
+          0.0
+        ],
+        "tsfc": [
+          0.6506366735907307,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          27258.815375877995,
+          27282.0
+        ],
+        "forces/fbx-prop-lbs": [
+          91861.80343883162,
+          0.0
+        ],
+        "tank-total-lbs": [
+          27258.815375877995,
+          27282.0
+        ],
+        "injection-timer-before": [
+          0.9999999999999989,
+          0.0
+        ],
+        "injection-water-before": [
+          0.9666666666666667,
+          1.0
+        ],
+        "injection-timer": [
+          0.9999999999999989,
+          0.0
+        ],
+        "injection-water": [
+          0.9666666666666667,
+          1.0
+        ]
+      }
+    },
+    {
+      "scenario": "injection-b747",
+      "arm": "injection",
+      "label": "after-run-ic",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          23816.02311377116,
+          23816.02311357094
+        ],
+        "fuel-flow-rate-pps": [
+          2.3475612694264556,
+          4.099289023140663
+        ],
+        "fuel-flow-rate-gph": [
+          1280.4879651417032,
+          2235.975830803998
+        ],
+        "fuel-used-lbs": [
+          5.796156030501608,
+          16.28028303611672
+        ],
+        "tsfc": [
+          0.6506366735907307,
+          0.6506255235636762
+        ],
+        "propulsion/total-fuel-lbs": [
+          27258.815375877995,
+          27216.878867855536
+        ],
+        "forces/fbx-prop-lbs": [
+          91861.80343883162,
+          91861.80343805933
+        ],
+        "tank-total-lbs": [
+          27258.815375877995,
+          27216.878867855536
+        ]
+      }
+    },
+    {
+      "scenario": "injection-b747",
+      "arm": "injection",
+      "label": "water-exhausted",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          72.0,
+          6.672960896118747
+        ],
+        "n2": [
+          84.0,
+          13.345921792237494
+        ],
+        "thrust-lbs": [
+          23816.02311377116,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          2.3475612694264556,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          1280.4879651417032,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          5.796156030501608,
+          0.0
+        ],
+        "tsfc": [
+          0.6506366735907307,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          27258.815375877995,
+          27282.0
+        ],
+        "forces/fbx-prop-lbs": [
+          91861.80343883162,
+          0.0
+        ],
+        "tank-total-lbs": [
+          27258.815375877995,
+          27282.0
+        ]
+      }
+    },
+    {
+      "scenario": "injection-b747",
+      "arm": "injection",
+      "label": "water-exhausted",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "thrust-lbs": [
+          23816.02311377116,
+          23816.02311357094
+        ],
+        "fuel-flow-rate-pps": [
+          2.3475612694264556,
+          4.099289023140663
+        ],
+        "fuel-flow-rate-gph": [
+          1280.4879651417032,
+          2235.975830803998
+        ],
+        "fuel-used-lbs": [
+          5.796156030501608,
+          16.28028303611672
+        ],
+        "tsfc": [
+          0.6506366735907307,
+          0.6506255235636762
+        ],
+        "propulsion/total-fuel-lbs": [
+          27258.815375877995,
+          27216.878867855536
+        ],
+        "forces/fbx-prop-lbs": [
+          91861.80343883162,
+          91861.80343805933
+        ],
+        "tank-total-lbs": [
+          27258.815375877995,
+          27216.878867855536
+        ]
+      }
+    },
+    {
+      "scenario": "injection-b747",
+      "arm": "injection",
+      "label": "after-run-ic-exhausted",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          72.0,
+          6.672960896118747
+        ],
+        "n2": [
+          84.0,
+          13.345921792237494
+        ],
+        "thrust-lbs": [
+          23816.02311404203,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          2.3475612694264556,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          1280.4879651417032,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          5.796156030501608,
+          0.0
+        ],
+        "tsfc": [
+          0.6506366735907307,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          27258.815375877995,
+          27282.0
+        ],
+        "forces/fbx-prop-lbs": [
+          91861.80343987638,
+          0.0
+        ],
+        "tank-total-lbs": [
+          27258.815375877995,
+          27282.0
+        ]
+      }
+    },
+    {
+      "scenario": "injection-b747",
+      "arm": "injection",
+      "label": "after-run-ic-exhausted",
+      "master": "master",
+      "other": "candidate",
+      "changed": {
+        "fuel-flow-rate-pps": [
+          2.3475612694264556,
+          4.099289023234349
+        ],
+        "fuel-flow-rate-gph": [
+          1280.4879651417032,
+          2235.9758308550995
+        ],
+        "fuel-used-lbs": [
+          5.796156030501608,
+          16.28028303611672
+        ],
+        "tsfc": [
+          0.6506366735907307,
+          0.6506255235656762
+        ],
+        "propulsion/total-fuel-lbs": [
+          27258.815375877995,
+          27216.878867855536
+        ],
+        "tank-total-lbs": [
+          27258.815375877995,
+          27216.878867855536
+        ]
+      }
+    },
+    {
+      "scenario": "ic-running-flag",
+      "arm": "ic-running",
+      "label": "after-first-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          51.0
+        ],
+        "n2": [
+          100.0,
+          72.0
+        ],
+        "tsfc": [
+          0.5673392183875805,
+          1.6981973999620525
+        ]
+      }
+    },
+    {
+      "scenario": "ic-running-flag",
+      "arm": "ic-running",
+      "label": "settled",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          73.61482949052028,
+          24.735464971287136
+        ],
+        "n2": [
+          72.0,
+          26.43204184617467
+        ],
+        "thrust-lbs": [
+          1071.293281163983,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          0.2784814275446337,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          148.74378919297942,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          1.2283674640243356,
+          0.0
+        ],
+        "tsfc": [
+          0.8983831323468688,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23997.543265071952,
+          23999.449573331218
+        ],
+        "forces/fbx-prop-lbs": [
+          2142.586562327966,
+          1073.2858780384204
+        ],
+        "tank-total-lbs": [
+          23997.543265071952,
+          23999.449573331218
+        ]
+      }
+    },
+    {
+      "scenario": "ic-running-flag",
+      "arm": "ic-running",
+      "label": "cut-off-and-settled",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "n1": [
+          26.4035071637859,
+          26.241325493853413
+        ],
+        "n2": [
+          17.6023381091906,
+          17.494216995902274
+        ],
+        "fuel-used-lbs": [
+          1.2411693104825026,
+          0.0
+        ],
+        "tsfc": [
+          0.8983831323468688,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23997.517661379035,
+          23999.436719637048
+        ],
+        "tank-total-lbs": [
+          23997.517661379035,
+          23999.436719637044
+        ]
+      }
+    },
+    {
+      "scenario": "ic-running-flag",
+      "arm": "ic-running",
+      "label": "after-second-run-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          51.0
+        ],
+        "n2": [
+          100.0,
+          72.0
+        ],
+        "fuel-used-lbs": [
+          1.2411693104825026,
+          0.0
+        ],
+        "tsfc": [
+          0.5673392183875805,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23997.517661379035,
+          23999.436719637048
+        ],
+        "tank-total-lbs": [
+          23997.517661379035,
+          23999.436719637044
+        ]
+      }
+    },
+    {
+      "scenario": "ic-running-flag",
+      "arm": "ic-running",
+      "label": "one-frame-after",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          99.87556137175761,
+          50.7875
+        ],
+        "n2": [
+          99.84445171469702,
+          71.7
+        ],
+        "thrust-lbs": [
+          7998.535641342534,
+          0.0
+        ],
+        "fuel-flow-rate-pps": [
+          1.3130684756705997,
+          0.0
+        ],
+        "fuel-flow-rate-gph": [
+          701.342212524356,
+          0.0
+        ],
+        "fuel-used-lbs": [
+          1.2521115477797575,
+          0.0
+        ],
+        "tsfc": [
+          0.5673494318712452,
+          1.6981973999620525
+        ],
+        "propulsion/total-fuel-lbs": [
+          23997.49577690444,
+          23999.43490517507
+        ],
+        "forces/fbx-prop-lbs": [
+          15997.071282685069,
+          1070.370747757566
+        ],
+        "tank-total-lbs": [
+          23997.49577690444,
+          23999.43490517507
+        ]
+      }
+    },
+    {
+      "scenario": "ic-running-flag",
+      "arm": "ic-running",
+      "label": "after-reset-to-ic",
+      "master": "master",
+      "other": "trimstatus",
+      "changed": {
+        "set-running": [
+          1.0,
+          0.0
+        ],
+        "n1": [
+          100.0,
+          30.0
+        ],
+        "n2": [
+          100.0,
+          60.0
+        ],
+        "tsfc": [
+          0.5673392183875805,
+          1.3946446147188356
+        ]
+      }
+    }
+  ]
+}

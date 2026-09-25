@@ -1,0 +1,33 @@
+Fatal Python error: Segmentation fault
+
+Current thread 0x0000000203efff80 (most recent call first):
+  File "<string>", line 12 in <module>
+
+Current thread's C stack trace (most recent call first):
+  Binary file "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Python", at _Py_DumpStack+0x44 [0x103ab2e5c]
+  Binary file "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Python", at faulthandler_dump_c_stack+0x58 [0x103ac584c]
+  Binary file "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Python", at faulthandler_fatal_error+0x140 [0x103ac5710]
+  Binary file "/usr/lib/system/libsystem_platform.dylib", at _sigtramp+0x38 [0x19e3e0144]
+  Binary file "/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/diag/tests/jsbsim/_jsbsim.so", at _ZN6JSBSim9FGTurbine4TrimEv+0x44 [0x1085442b4]
+  Binary file "/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/diag/tests/jsbsim/_jsbsim.so", at _ZN6JSBSim9FGTurbine9CalculateEv+0x2ac [0x10854304c]
+  Binary file "/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/diag/tests/jsbsim/_jsbsim.so", at _ZN6JSBSim12FGPropulsion3RunEb+0x64 [0x10850af9c]
+  Binary file "/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/diag/tests/jsbsim/_jsbsim.so", at _ZN6JSBSim9FGFDMExec3RunEv+0x13c [0x108429938]
+  Binary file "/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/diag/tests/jsbsim/_jsbsim.so", at _ZN6JSBSim9FGFDMExec5RunICEv+0x74 [0x108429a7c]
+  Binary file "/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/diag/tests/jsbsim/_jsbsim.so", at _ZL37__pyx_pw_7_jsbsim_9FGFDMExec_13run_icP7_objectPKS0_lS0_+0x24 [0x10840f7c0]
+  Binary file "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Python", at PyObject_Vectorcall+0x58 [0x1038eff48]
+  Binary file "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Python", at _PyEval_EvalFrameDefault+0x2a74 [0x103a1f764]
+  Binary file "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Python", at PyEval_EvalCode+0xf8 [0x103a1c7a4]
+  Binary file "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Python", at run_mod+0xac [0x103a962d8]
+  Binary file "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Python", at _PyRun_String+0xa0 [0x103a94f9c]
+  Binary file "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Python", at _PyRun_SimpleString+0x58 [0x103a94e24]
+  Binary file "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Python", at Py_RunMain+0x194 [0x103ac1a78]
+  Binary file "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Python", at pymain_main+0xec [0x103ac20ac]
+  Binary file "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Python", at Py_BytesMain+0x2c [0x103ac214c]
+  Binary file "/usr/lib/dyld", at start+0x1a20 [0x19dfffe80]
+
+Extension modules: _jsbsim, numpy._core._multiarray_umath, numpy.linalg._umath_linalg, jsbsim._jsbsim (total: 4)
+
+=== control: the same call with an <function name="Injection"> added to a sandbox copy of the engine ===
+InjWaterNorm 0.0
+survived; thrust 2830.84 -> 2972.38
+ratio 1.05 = the configured Injection factor, applied with no water left

@@ -1,0 +1,30 @@
+# Recorded 2026-09-20T00:18:07Z
+
+## JSBSim canonical checkout /Users/felg/gh/Felipegalind0/jsbsim
+branch: candidate/pr1508-off-engine-fuel
+HEAD: 482da811f1bc6ab42c3cb76c8079eab7af75f49d
+status --short:
+(empty above = clean)
+
+## refs
+candidate/pr1508-off-engine-fuel           482da811f1bc6ab42c3cb76c8079eab7af75f49d
+fix/turbine-trim-spool                     6f95bfb0a590d1a45de9f883857c17af0819f6ad
+fix/turbine-trim-fuel-flow                 7511df10cda909c32dfc378dfde204eb44dc5a48
+master                                     f0d1023a41d8eedf3bbcd2b17a91117f76a90f04
+upstream/master                            a6f86ae93256eb00c2c990b711faa5bbb72ecb20
+origin/fix/turbine-trim-spool              07eba55fcd6fed530f6f404e857765c3224541fb
+origin/fix/turbine-trim-fuel-flow          7511df10cda909c32dfc378dfde204eb44dc5a48
+origin/master                              f0d1023a41d8eedf3bbcd2b17a91117f76a90f04
+feature/wheel-spin-dof                     499c38326bb6f39b6360bd82d74c5c00e64faeaf
+14c1902 base: 14c19022943f5850daf2c6b90554050b3139b853
+
+## ls-remote upstream master
+a6f86ae93256eb00c2c990b711faa5bbb72ecb20	refs/heads/master
+43ed7cffe8bbeb2ba9a1283d38f9fc1ffe7b34f2	refs/remotes/origin/master
+
+## toolchain
+Apple clang version 21.0.0 (clang-2100.3.34.2)
+cmake version 4.4.3
+Python 3.14.7
+Cython version 3.3.0
+Darwin 27.0.0 arm64

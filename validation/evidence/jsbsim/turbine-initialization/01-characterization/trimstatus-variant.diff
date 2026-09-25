@@ -1,0 +1,11 @@
+--- /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/src/master/src/models/propulsion/FGTurbine.cpp	2026-09-19 15:16:23
++++ /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/src/trimstatus/src/models/propulsion/FGTurbine.cpp	2026-09-19 19:18:23
+@@ -148,7 +148,7 @@
+   }
+ 
+   if (Cutoff && (phase != tpSpinUp)) phase = tpOff;
+-  if (in.TotalDeltaT == 0) phase = tpTrim;
++  if (FDMExec->GetTrimStatus()) phase = tpTrim;
+   if (Starved) phase = tpOff;
+   if (Stalled) phase = tpStall;
+   if (Seized) phase = tpSeize;

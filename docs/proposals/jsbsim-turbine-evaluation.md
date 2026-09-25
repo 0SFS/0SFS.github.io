@@ -1,6 +1,11 @@
 # Explicit turbine evaluation and initialization
 
-Date: 2026-09-14. Status: proposed design; not implemented or submitted upstream.
+Date: 2026-09-14. Updated 2026-09-19: the user accepted this direction and
+requested an implementation plan. The [staged plan](../turbine-initialization/plan.md),
+[behavior contract](../turbine-initialization/contract.md) and
+[validation requirements](../turbine-initialization/validation.md) now govern
+the planned work. Implementation has not started and nothing has been
+submitted upstream as part of this redesign.
 
 The user requested this proposal after discussing the defects in JSBSim PRs
 [#1505](https://github.com/JSBSim-Team/jsbsim/pull/1505) and
@@ -293,11 +298,12 @@ started by writing this proposal.
    in-tree WASM package, test actual app reset/restore/audio behavior, and adopt
    an immutable new fork package with a rollback record.
 
-The narrow guard remains a possible independent corrective step while the
-larger design is discussed. Whether it ships first, how #1505/#1508 are updated,
-and whether the broader work becomes a follow-up PR remain delivery decisions.
-Do not expand or rewrite either existing PR implicitly. Package version fork.8
-was suggested in discussion; choose the next available version at adoption.
+The 2026-09-19 plan selects the narrow #1505/#1508 guards as independently
+reviewable first corrections, followed by shared calculations and explicit
+initialization in separate contributions. It includes native, SDK and app
+acceptance. Do not expand or rewrite either existing PR implicitly. Package
+version fork.8 was suggested in discussion; choose the next available version
+at adoption.
 
 The idle-fuel-flow feature remains separately scoped. Its current tests use
 immediate post-RunIC fuel-flow values, so their exact upstream base must provide

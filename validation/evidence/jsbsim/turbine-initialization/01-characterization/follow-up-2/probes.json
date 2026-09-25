@@ -1,0 +1,682 @@
+{
+  "source": "/Users/felg/gh/Felipegalind0/jsbsim",
+  "source_head": "482da811f1bc6ab42c3cb76c8079eab7af75f49d",
+  "source_status": [],
+  "probes_requested": [
+    "derivative-seeding",
+    "cold-reset",
+    "frozen-refill"
+  ],
+  "records": {
+    "master": {
+      "jsbsim_file": "/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/master/tests/jsbsim/__init__.py",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/master/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "ef60c3bf3c4f663a7184992fb0d361d43bbf07fa82f249b6bca2a8940725ab29",
+      "jsbsim_version": "1.3.2.dev1",
+      "python": "3.14.7",
+      "dt": 0.008333333333333333,
+      "probes": {
+        "derivative-seeding": {
+          "rows": [
+            {
+              "label": "600 frames at throttle 0.9",
+              "thrust": 17297.10920362834,
+              "n2": 100.0,
+              "udot-ft_sec2": 21.858659489426223,
+              "vdot-ft_sec2": 0.009136365597305244,
+              "wdot-ft_sec2": -1.3050171316804757,
+              "pdot-rad_sec2": 0.00013540367768441266,
+              "qdot-rad_sec2": 0.0005348558152626091,
+              "rdot-rad_sec2": 5.968006518609977e-06
+            },
+            {
+              "label": "throttle 0.0, after RunIC()",
+              "thrust": -779.9059193136236,
+              "n2": 100.0,
+              "udot-ft_sec2": -7.728662663558904,
+              "vdot-ft_sec2": 0.0718622202628953,
+              "wdot-ft_sec2": 18.627212198222853,
+              "pdot-rad_sec2": -0.0001936858259387921,
+              "qdot-rad_sec2": -0.14893214616659947,
+              "rdot-rad_sec2": 5.2454076287988536e-05
+            },
+            {
+              "label": "a second RunIC(), nothing changed",
+              "thrust": -779.9059193136236,
+              "n2": 100.0,
+              "udot-ft_sec2": -7.751095332159607,
+              "vdot-ft_sec2": 0.07223145778202,
+              "wdot-ft_sec2": 18.680108563600353,
+              "pdot-rad_sec2": -8.058414989348339e-09,
+              "qdot-rad_sec2": -0.16658865886655286,
+              "rdot-rad_sec2": 4.048187607325397e-09
+            }
+          ],
+          "seeded-by-the-first-run-ic": {
+            "udot-ft_sec2": 21.858659489426223,
+            "vdot-ft_sec2": 0.009136365597305244,
+            "wdot-ft_sec2": -1.3050171316804757,
+            "pdot-rad_sec2": 0.00013540367768441266,
+            "qdot-rad_sec2": 0.0005348558152626091,
+            "rdot-rad_sec2": 5.968006518609977e-06
+          },
+          "held-after-the-first-run-ic": {
+            "udot-ft_sec2": -7.728662663558904,
+            "vdot-ft_sec2": 0.0718622202628953,
+            "wdot-ft_sec2": 18.627212198222853,
+            "pdot-rad_sec2": -0.0001936858259387921,
+            "qdot-rad_sec2": -0.14893214616659947,
+            "rdot-rad_sec2": 5.2454076287988536e-05
+          },
+          "stale": {
+            "udot-ft_sec2": -29.587322152985127,
+            "vdot-ft_sec2": 0.06272585466559005,
+            "wdot-ft_sec2": 19.93222932990333,
+            "pdot-rad_sec2": -0.00032908950362320474,
+            "qdot-rad_sec2": -0.14946700198186208,
+            "rdot-rad_sec2": 4.648606976937856e-05
+          },
+          "read": "public properties only; the derivative history itself is not exposed, so this shows the two candidate values and the source order decides which one is used"
+        },
+        "cold-reset": {
+          "aircraft": "f16",
+          "rows": [
+            {
+              "field": "MaxN1",
+              "loaded": 100.0,
+              "written": 99.0,
+              "after-write": 99.0,
+              "after-run-ic": 99.0,
+              "after-reset-to-initial-conditions": 99.0,
+              "survives-run-ic": true,
+              "survives-scenario-reset": true
+            },
+            {
+              "field": "MaxN2",
+              "loaded": 100.0,
+              "written": 97.0,
+              "after-write": 97.0,
+              "after-run-ic": 97.0,
+              "after-reset-to-initial-conditions": 97.0,
+              "survives-run-ic": true,
+              "survives-scenario-reset": true
+            },
+            {
+              "field": "InjectionTimer",
+              "loaded": 0.0,
+              "written": 1.5,
+              "after-write": 1.5,
+              "after-run-ic": 1.5,
+              "after-reset-to-initial-conditions": 1.5,
+              "survives-run-ic": true,
+              "survives-scenario-reset": true
+            },
+            {
+              "field": "InjWaterNorm",
+              "loaded": 0.0,
+              "written": 0.5,
+              "after-write": 0.5,
+              "after-run-ic": 0.5,
+              "after-reset-to-initial-conditions": 0.0,
+              "survives-run-ic": true,
+              "survives-scenario-reset": false
+            },
+            {
+              "field": "InjN1increment",
+              "loaded": 0.0,
+              "written": 1.5,
+              "after-write": 1.5,
+              "after-run-ic": 1.5,
+              "after-reset-to-initial-conditions": 0.0,
+              "survives-run-ic": true,
+              "survives-scenario-reset": false
+            },
+            {
+              "field": "InjN2increment",
+              "loaded": 0.0,
+              "written": 1.5,
+              "after-write": 1.5,
+              "after-run-ic": 1.5,
+              "after-reset-to-initial-conditions": 0.0,
+              "survives-run-ic": true,
+              "survives-scenario-reset": false
+            },
+            {
+              "field": "bleed-factor",
+              "loaded": 0.0,
+              "written": 0.25,
+              "after-write": 0.25,
+              "after-run-ic": 0.25,
+              "after-reset-to-initial-conditions": 0.25,
+              "survives-run-ic": true,
+              "survives-scenario-reset": true
+            },
+            {
+              "field": "x-position",
+              "loaded": 0.0,
+              "written": 1.5,
+              "after-write": 1.5,
+              "after-run-ic": 1.5,
+              "after-reset-to-initial-conditions": 0.0,
+              "survives-run-ic": true,
+              "survives-scenario-reset": false
+            },
+            {
+              "field": "y-position",
+              "loaded": 0.0,
+              "written": 1.5,
+              "after-write": 1.5,
+              "after-run-ic": 1.5,
+              "after-reset-to-initial-conditions": 0.0,
+              "survives-run-ic": true,
+              "survives-scenario-reset": false
+            },
+            {
+              "field": "z-position",
+              "loaded": 0.0,
+              "written": 1.5,
+              "after-write": 1.5,
+              "after-run-ic": 1.5,
+              "after-reset-to-initial-conditions": 0.0,
+              "survives-run-ic": true,
+              "survives-scenario-reset": false
+            },
+            {
+              "field": "pitch-angle-rad",
+              "loaded": 0.0,
+              "written": 1.5,
+              "after-write": 1.5,
+              "after-run-ic": 1.5,
+              "after-reset-to-initial-conditions": 1.5,
+              "survives-run-ic": true,
+              "survives-scenario-reset": true
+            },
+            {
+              "field": "yaw-angle-rad",
+              "loaded": 0.0,
+              "written": 1.5,
+              "after-write": 1.5,
+              "after-run-ic": 1.5,
+              "after-reset-to-initial-conditions": 1.5,
+              "survives-run-ic": true,
+              "survives-scenario-reset": true
+            },
+            {
+              "field": "reverser-angle-rad",
+              "loaded": 0.0,
+              "written": 1.5,
+              "after-write": 1.5,
+              "after-run-ic": 1.5,
+              "after-reset-to-initial-conditions": 0.0,
+              "survives-run-ic": true,
+              "survives-scenario-reset": false
+            }
+          ],
+          "absent": []
+        },
+        "frozen-refill": {
+          "arms": {
+            "thawed": {
+              "running": {
+                "running": 1.0,
+                "n2": 100.0,
+                "gph": 3448.8687701157382,
+                "tank-total-lbs": 2990.1203515466127
+              },
+              "after-emptying": {
+                "running": 0.0,
+                "n2": 60.84325628955682,
+                "gph": 3448.8687701157382,
+                "tank-total-lbs": 0.0
+              },
+              "after-refilling": {
+                "running": 0.0,
+                "n2": 60.58974272168366,
+                "gph": 1940.0303862773644,
+                "tank-total-lbs": 1999.9703606468763
+              },
+              "after-set-running-and-120-frames": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 19576.30266194379,
+                "gph": 2658.6123955792727,
+                "tank-total-lbs": 1995.784895329055
+              }
+            },
+            "frozen": {
+              "running": {
+                "running": 1.0,
+                "n2": 100.0,
+                "gph": 3448.8687701157382,
+                "tank-total-lbs": 2990.1203515466127
+              },
+              "after-emptying": {
+                "running": 0.0,
+                "n2": 60.84325628955682,
+                "gph": 3448.8687701157382,
+                "tank-total-lbs": 0.0
+              },
+              "after-refilling": {
+                "running": 0.0,
+                "n2": 60.58974272168366,
+                "gph": 3448.8687701157382,
+                "tank-total-lbs": 2000.0
+              },
+              "after-set-running-and-120-frames": {
+                "running": 0.0,
+                "n1": 0.420239290223439,
+                "n2": 0.280159526815626,
+                "thrust": 0.0,
+                "gph": 3448.8687701157382,
+                "tank-total-lbs": 2000.0
+              }
+            },
+            "frozen-then-thawed": {
+              "running": {
+                "running": 1.0,
+                "n2": 100.0,
+                "gph": 3448.8687701157382,
+                "tank-total-lbs": 2990.1203515466127
+              },
+              "after-emptying": {
+                "running": 0.0,
+                "n2": 60.84325628955682,
+                "gph": 3448.8687701157382,
+                "tank-total-lbs": 0.0
+              },
+              "after-refilling": {
+                "running": 0.0,
+                "n2": 60.58974272168366,
+                "gph": 3448.8687701157382,
+                "tank-total-lbs": 2000.0
+              },
+              "after-set-running-and-120-frames": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 19576.33355286036,
+                "gph": 2658.6156731087226,
+                "tank-total-lbs": 1995.785082221486
+              }
+            }
+          },
+          "freeze": "propulsion/fuel_freeze, the manager-level flag that ConsumeFuel() tests"
+        }
+      },
+      "instrumented": false,
+      "injection-load": {
+        "run-ic": {
+          "returncode": -11,
+          "signal": 11,
+          "survived": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run-off": {
+          "returncode": 0,
+          "signal": null,
+          "survived": true,
+          "stdout": "loaded B747, engine path /Users/felg/gh/Felipegalind0/jsbsim/engine\nInjWaterNorm after load = 0.0\nRunIC with no injection command: ok, thrust 2830.84\ninjection_cmd set; InjWaterNorm = 0.0\ncalling Run() with the engine off, which dispatches Off()\nsurvived Run(); thrust 0.00\nSURVIVED",
+          "stderr": ""
+        },
+        "run-running": {
+          "returncode": -11,
+          "signal": 11,
+          "survived": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run-ic-with-function": {
+          "returncode": 0,
+          "signal": null,
+          "survived": true,
+          "stdout": "loaded B747, engine path /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/probes-followup2/master/engine-injection-with\nInjWaterNorm after load = 1.0\nRunIC with no injection command: ok, thrust 2830.84\ninjection_cmd set; InjWaterNorm = 1.0\ncalling RunIC(), which dispatches Trim()\nsurvived RunIC(); thrust 2972.38\nSURVIVED",
+          "stderr": ""
+        },
+        "run-running-with-function": {
+          "returncode": 0,
+          "signal": null,
+          "survived": true,
+          "stdout": "loaded B747, engine path /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/probes-followup2/master/engine-injection-with\nInjWaterNorm after load = 1.0\nRunIC with no injection command: ok, thrust 2830.84\ninjection_cmd set; InjWaterNorm = 1.0\ncalling Run() with the engine off, which dispatches Off()\nsurvived Run(); thrust 0.00\nSURVIVED",
+          "stderr": ""
+        }
+      }
+    },
+    "candidate": {
+      "jsbsim_file": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/final/tests/jsbsim/__init__.py",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/final/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "f739de7773b2144ca315a5e76705d36fcb08e3db4a9a6495c859951198a40779",
+      "jsbsim_version": "1.3.2.dev1",
+      "python": "3.14.7",
+      "dt": 0.008333333333333333,
+      "probes": {
+        "derivative-seeding": {
+          "rows": [
+            {
+              "label": "600 frames at throttle 0.9",
+              "thrust": 17297.10920362834,
+              "n2": 100.0,
+              "udot-ft_sec2": 21.858659489426223,
+              "vdot-ft_sec2": 0.009136365597305244,
+              "wdot-ft_sec2": -1.3050171316804757,
+              "pdot-rad_sec2": 0.00013540367768441266,
+              "qdot-rad_sec2": 0.0005348558152626091,
+              "rdot-rad_sec2": 5.968006518609977e-06
+            },
+            {
+              "label": "throttle 0.0, after RunIC()",
+              "thrust": -779.9059193136236,
+              "n2": 53.0,
+              "udot-ft_sec2": -7.728662663558904,
+              "vdot-ft_sec2": 0.0718622202628953,
+              "wdot-ft_sec2": 18.627212198222853,
+              "pdot-rad_sec2": -0.0001936858259387921,
+              "qdot-rad_sec2": -0.14893214616659947,
+              "rdot-rad_sec2": 5.2454076287988536e-05
+            },
+            {
+              "label": "a second RunIC(), nothing changed",
+              "thrust": -779.9059193136236,
+              "n2": 53.0,
+              "udot-ft_sec2": -7.751095332159607,
+              "vdot-ft_sec2": 0.07223145778202,
+              "wdot-ft_sec2": 18.680108563600353,
+              "pdot-rad_sec2": -8.058414989348339e-09,
+              "qdot-rad_sec2": -0.16658865886655286,
+              "rdot-rad_sec2": 4.048187607325397e-09
+            }
+          ],
+          "seeded-by-the-first-run-ic": {
+            "udot-ft_sec2": 21.858659489426223,
+            "vdot-ft_sec2": 0.009136365597305244,
+            "wdot-ft_sec2": -1.3050171316804757,
+            "pdot-rad_sec2": 0.00013540367768441266,
+            "qdot-rad_sec2": 0.0005348558152626091,
+            "rdot-rad_sec2": 5.968006518609977e-06
+          },
+          "held-after-the-first-run-ic": {
+            "udot-ft_sec2": -7.728662663558904,
+            "vdot-ft_sec2": 0.0718622202628953,
+            "wdot-ft_sec2": 18.627212198222853,
+            "pdot-rad_sec2": -0.0001936858259387921,
+            "qdot-rad_sec2": -0.14893214616659947,
+            "rdot-rad_sec2": 5.2454076287988536e-05
+          },
+          "stale": {
+            "udot-ft_sec2": -29.587322152985127,
+            "vdot-ft_sec2": 0.06272585466559005,
+            "wdot-ft_sec2": 19.93222932990333,
+            "pdot-rad_sec2": -0.00032908950362320474,
+            "qdot-rad_sec2": -0.14946700198186208,
+            "rdot-rad_sec2": 4.648606976937856e-05
+          },
+          "read": "public properties only; the derivative history itself is not exposed, so this shows the two candidate values and the source order decides which one is used"
+        },
+        "cold-reset": {
+          "aircraft": "f16",
+          "rows": [
+            {
+              "field": "MaxN1",
+              "loaded": 100.0,
+              "written": 99.0,
+              "after-write": 99.0,
+              "after-run-ic": 99.0,
+              "after-reset-to-initial-conditions": 99.0,
+              "survives-run-ic": true,
+              "survives-scenario-reset": true
+            },
+            {
+              "field": "MaxN2",
+              "loaded": 100.0,
+              "written": 97.0,
+              "after-write": 97.0,
+              "after-run-ic": 97.0,
+              "after-reset-to-initial-conditions": 97.0,
+              "survives-run-ic": true,
+              "survives-scenario-reset": true
+            },
+            {
+              "field": "InjectionTimer",
+              "loaded": 0.0,
+              "written": 1.5,
+              "after-write": 1.5,
+              "after-run-ic": 1.5,
+              "after-reset-to-initial-conditions": 1.5,
+              "survives-run-ic": true,
+              "survives-scenario-reset": true
+            },
+            {
+              "field": "InjWaterNorm",
+              "loaded": 0.0,
+              "written": 0.5,
+              "after-write": 0.5,
+              "after-run-ic": 0.5,
+              "after-reset-to-initial-conditions": 0.0,
+              "survives-run-ic": true,
+              "survives-scenario-reset": false
+            },
+            {
+              "field": "InjN1increment",
+              "loaded": 0.0,
+              "written": 1.5,
+              "after-write": 1.5,
+              "after-run-ic": 1.5,
+              "after-reset-to-initial-conditions": 0.0,
+              "survives-run-ic": true,
+              "survives-scenario-reset": false
+            },
+            {
+              "field": "InjN2increment",
+              "loaded": 0.0,
+              "written": 1.5,
+              "after-write": 1.5,
+              "after-run-ic": 1.5,
+              "after-reset-to-initial-conditions": 0.0,
+              "survives-run-ic": true,
+              "survives-scenario-reset": false
+            },
+            {
+              "field": "bleed-factor",
+              "loaded": 0.0,
+              "written": 0.25,
+              "after-write": 0.25,
+              "after-run-ic": 0.25,
+              "after-reset-to-initial-conditions": 0.25,
+              "survives-run-ic": true,
+              "survives-scenario-reset": true
+            },
+            {
+              "field": "x-position",
+              "loaded": 0.0,
+              "written": 1.5,
+              "after-write": 1.5,
+              "after-run-ic": 1.5,
+              "after-reset-to-initial-conditions": 0.0,
+              "survives-run-ic": true,
+              "survives-scenario-reset": false
+            },
+            {
+              "field": "y-position",
+              "loaded": 0.0,
+              "written": 1.5,
+              "after-write": 1.5,
+              "after-run-ic": 1.5,
+              "after-reset-to-initial-conditions": 0.0,
+              "survives-run-ic": true,
+              "survives-scenario-reset": false
+            },
+            {
+              "field": "z-position",
+              "loaded": 0.0,
+              "written": 1.5,
+              "after-write": 1.5,
+              "after-run-ic": 1.5,
+              "after-reset-to-initial-conditions": 0.0,
+              "survives-run-ic": true,
+              "survives-scenario-reset": false
+            },
+            {
+              "field": "pitch-angle-rad",
+              "loaded": 0.0,
+              "written": 1.5,
+              "after-write": 1.5,
+              "after-run-ic": 1.5,
+              "after-reset-to-initial-conditions": 1.5,
+              "survives-run-ic": true,
+              "survives-scenario-reset": true
+            },
+            {
+              "field": "yaw-angle-rad",
+              "loaded": 0.0,
+              "written": 1.5,
+              "after-write": 1.5,
+              "after-run-ic": 1.5,
+              "after-reset-to-initial-conditions": 1.5,
+              "survives-run-ic": true,
+              "survives-scenario-reset": true
+            },
+            {
+              "field": "reverser-angle-rad",
+              "loaded": 0.0,
+              "written": 1.5,
+              "after-write": 1.5,
+              "after-run-ic": 1.5,
+              "after-reset-to-initial-conditions": 0.0,
+              "survives-run-ic": true,
+              "survives-scenario-reset": false
+            }
+          ],
+          "absent": []
+        },
+        "frozen-refill": {
+          "arms": {
+            "thawed": {
+              "running": {
+                "running": 1.0,
+                "n2": 100.0,
+                "gph": 3448.8687701157382,
+                "tank-total-lbs": 2990.1203515466127
+              },
+              "after-emptying": {
+                "running": 0.0,
+                "n2": 60.84325628955682,
+                "gph": 3448.8687701157382,
+                "tank-total-lbs": 0.0
+              },
+              "after-refilling": {
+                "running": 0.0,
+                "n2": 60.58974272168366,
+                "gph": 1940.0303862773644,
+                "tank-total-lbs": 1999.9703606468763
+              },
+              "after-set-running-and-120-frames": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 19576.30266194379,
+                "gph": 2658.6123955792727,
+                "tank-total-lbs": 1995.784895329055
+              }
+            },
+            "frozen": {
+              "running": {
+                "running": 1.0,
+                "n2": 100.0,
+                "gph": 3448.8687701157382,
+                "tank-total-lbs": 2990.1203515466127
+              },
+              "after-emptying": {
+                "running": 0.0,
+                "n2": 60.84325628955682,
+                "gph": 3448.8687701157382,
+                "tank-total-lbs": 0.0
+              },
+              "after-refilling": {
+                "running": 0.0,
+                "n2": 60.58974272168366,
+                "gph": 3448.8687701157382,
+                "tank-total-lbs": 2000.0
+              },
+              "after-set-running-and-120-frames": {
+                "running": 0.0,
+                "n1": 0.420239290223439,
+                "n2": 0.280159526815626,
+                "thrust": 0.0,
+                "gph": 3448.8687701157382,
+                "tank-total-lbs": 2000.0
+              }
+            },
+            "frozen-then-thawed": {
+              "running": {
+                "running": 1.0,
+                "n2": 100.0,
+                "gph": 3448.8687701157382,
+                "tank-total-lbs": 2990.1203515466127
+              },
+              "after-emptying": {
+                "running": 0.0,
+                "n2": 60.84325628955682,
+                "gph": 3448.8687701157382,
+                "tank-total-lbs": 0.0
+              },
+              "after-refilling": {
+                "running": 0.0,
+                "n2": 60.58974272168366,
+                "gph": 3448.8687701157382,
+                "tank-total-lbs": 2000.0
+              },
+              "after-set-running-and-120-frames": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 19576.33355286036,
+                "gph": 2658.6156731087226,
+                "tank-total-lbs": 1995.785082221486
+              }
+            }
+          },
+          "freeze": "propulsion/fuel_freeze, the manager-level flag that ConsumeFuel() tests"
+        }
+      },
+      "instrumented": false,
+      "injection-load": {
+        "run-ic": {
+          "returncode": -11,
+          "signal": 11,
+          "survived": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run-off": {
+          "returncode": 0,
+          "signal": null,
+          "survived": true,
+          "stdout": "loaded B747, engine path /Users/felg/gh/Felipegalind0/jsbsim/engine\nInjWaterNorm after load = 0.0\nRunIC with no injection command: ok, thrust 2830.84\ninjection_cmd set; InjWaterNorm = 0.0\ncalling Run() with the engine off, which dispatches Off()\nsurvived Run(); thrust 0.00\nSURVIVED",
+          "stderr": ""
+        },
+        "run-running": {
+          "returncode": -11,
+          "signal": 11,
+          "survived": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run-ic-with-function": {
+          "returncode": 0,
+          "signal": null,
+          "survived": true,
+          "stdout": "loaded B747, engine path /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/probes-followup2/candidate/engine-injection-with\nInjWaterNorm after load = 1.0\nRunIC with no injection command: ok, thrust 2830.84\ninjection_cmd set; InjWaterNorm = 1.0\ncalling RunIC(), which dispatches Trim()\nsurvived RunIC(); thrust 2972.38\nSURVIVED",
+          "stderr": ""
+        },
+        "run-running-with-function": {
+          "returncode": 0,
+          "signal": null,
+          "survived": true,
+          "stdout": "loaded B747, engine path /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/probes-followup2/candidate/engine-injection-with\nInjWaterNorm after load = 1.0\nRunIC with no injection command: ok, thrust 2830.84\ninjection_cmd set; InjWaterNorm = 1.0\ncalling Run() with the engine off, which dispatches Off()\nsurvived Run(); thrust 0.00\nSURVIVED",
+          "stderr": ""
+        }
+      }
+    }
+  }
+}

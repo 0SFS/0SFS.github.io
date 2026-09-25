@@ -1,0 +1,157 @@
+{
+  "recorded": "2026-09-19",
+  "stage": "1 - characterize callers and settle implementation decisions",
+  "jsbsim_checkout": "/Users/felg/gh/Felipegalind0/jsbsim",
+  "branch_at_start": "candidate/pr1508-off-engine-fuel",
+  "head_at_start": "482da811f1bc6ab42c3cb76c8079eab7af75f49d",
+  "clean_at_start": true,
+  "refs": {
+    "upstream_master": "a6f86ae93256eb00c2c990b711faa5bbb72ecb20",
+    "upstream_base_of_prs": "14c19022943f5850daf2c6b90554050b3139b853",
+    "pr1505_published": "07eba55fcd6fed530f6f404e857765c3224541fb",
+    "pr1505_repaired_local": "6f95bfb0a590d1a45de9f883857c17af0819f6ad",
+    "pr1508_published": "7511df10cda909c32dfc378dfde204eb44dc5a48",
+    "stage2_production": "8945b0e34ddc85df1d324dffbe39d0732b03197d",
+    "stage2_reviewed": "482da811f1bc6ab42c3cb76c8079eab7af75f49d"
+  },
+  "published_refs_unchanged": {
+    "gh_pr_1505_headRefOid": "07eba55fcd6fed530f6f404e857765c3224541fb",
+    "gh_pr_1508_headRefOid": "7511df10cda909c32dfc378dfde204eb44dc5a48"
+  },
+  "builds": {
+    "master": {
+      "what": "upstream/master a6f86ae9, unmodified",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/master/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "ef60c3bf3c4f663a7184992fb0d361d43bbf07fa82f249b6bca2a8940725ab29",
+      "fgturbine_cpp_sha256": "5bccfd0244d62ae10fd1624b19c34731a257e83ec6ba01182832a2650c472609",
+      "jsbsim_version": "1.3.2.dev1",
+      "injection_null_lookup": {
+        "returncode": -11,
+        "signal": 11,
+        "stdout": "",
+        "stderr": "about to RunIC with injection commanded"
+      }
+    },
+    "trimstatus": {
+      "what": "upstream/master with bcoconni's proposed GetTrimStatus() condition, nothing else",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/trimstatus/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "e9cbd297451e2f716797be1b80f1c05a7e83dac93451e2f3c06a96bc48d0faac",
+      "fgturbine_cpp_sha256": "2644efebbeee030295a7ad208ba234fa0f73395c0ff93ab34f5e00d1fc6d790e",
+      "jsbsim_version": "1.3.2.dev1",
+      "injection_null_lookup": {
+        "returncode": 0,
+        "signal": null,
+        "stdout": "survived",
+        "stderr": "about to RunIC with injection commanded"
+      }
+    },
+    "candidate": {
+      "what": "the reviewed stage-0+2 repair 482da811; binary reused from the stage-2 evidence",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/final/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "f739de7773b2144ca315a5e76705d36fcb08e3db4a9a6495c859951198a40779",
+      "fgturbine_cpp_sha256": null,
+      "jsbsim_version": "1.3.2.dev1",
+      "injection_null_lookup": {
+        "returncode": -11,
+        "signal": 11,
+        "stdout": "",
+        "stderr": "about to RunIC with injection commanded"
+      }
+    },
+    "diag": {
+      "what": "master plus the scratch dispatch/state counters",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/diag/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "4c9dcc5e29f1250e8192bef504fa2ca97ec0e78fd4308e2f1bc8c7593949a81d",
+      "fgturbine_cpp_sha256": "35786119ac921a4b184d8bccbfdaf40af11fc22005ef41aefa5775a9e85cb339",
+      "jsbsim_version": "1.3.2.dev1",
+      "injection_null_lookup": {
+        "returncode": -11,
+        "signal": 11,
+        "stdout": "",
+        "stderr": "about to RunIC with injection commanded"
+      }
+    },
+    "diag-trimstatus": {
+      "what": "the GetTrimStatus() variant plus the same counters",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/diag-trimstatus/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "49eec2cfe36b7f5fb5298aa5a65e712806a0d60123e33d8948268d1ffb52c107",
+      "fgturbine_cpp_sha256": "18019350d6cbe545341c87ffff9d9c4435fd72140aaed94b17a371c2b73d3c44",
+      "jsbsim_version": "1.3.2.dev1",
+      "injection_null_lookup": {
+        "returncode": 0,
+        "signal": null,
+        "stdout": "survived",
+        "stderr": "about to RunIC with injection commanded"
+      }
+    },
+    "diag-candidate": {
+      "what": "the stage-0+2 candidate plus the same counters",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/diag-candidate/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "746e74d6f4f11fbd58f6b78f62f3dea323cd60c09890ebf2fa69ad55f8318a00",
+      "fgturbine_cpp_sha256": "765076ff15ae11cfcb24aa562946f412d9cac0ca5e3389bc604068006df97a12",
+      "jsbsim_version": "1.3.2.dev1",
+      "injection_null_lookup": {
+        "returncode": -11,
+        "signal": 11,
+        "stdout": "",
+        "stderr": "about to RunIC with injection commanded"
+      }
+    }
+  },
+  "instrumentation_controls": {
+    "master vs diag": {
+      "values_compared": 2137,
+      "values_differing": 0
+    },
+    "trimstatus vs diag-trimstatus": {
+      "values_compared": 2137,
+      "values_differing": 0
+    },
+    "candidate vs diag-candidate": {
+      "values_compared": 2137,
+      "values_differing": 0
+    }
+  },
+  "samples_differing_from_master": {
+    "trimstatus": 119,
+    "candidate": 59,
+    "diag": 0,
+    "diag-trimstatus": 119,
+    "diag-candidate": 59
+  },
+  "tool": {
+    "path": "scripts/validation/jsbsim/turbine-initialization/runic_trace.py",
+    "sha256": "0c44ce7d64b443476c59a12772b55e9ec4af5f4bd6786354e0e769470b6f1066",
+    "note": "the retained tool, unchanged from the run that produced these records; trace.md reproduces byte for byte"
+  },
+  "instrumentation": {
+    "path": "diag-instrumentation.py",
+    "sha256": "73e3ce0f7b08d0aa8fb59ebfa56dca236730d1411d0866a5144320b387b54567",
+    "note": "scratch only; applied to unpacked source archives, never to a branch"
+  },
+  "toolchain": {
+    "compiler": "AppleClang 21.0.0",
+    "cmake": "4.4.3",
+    "python": "3.14.7",
+    "cython": "3.3.0",
+    "platform": "Darwin 27.0.0 arm64"
+  },
+  "cmake_options": [
+    "Release",
+    "BUILD_DOCS=OFF",
+    "BUILD_SHARED_LIBS=OFF",
+    "BUILD_PYTHON_MODULE=ON"
+  ],
+  "reproduced": "the whole trace was run twice with the same builds; trace.md is byte-identical and the recorded differences are equal",
+  "commands": {
+    "build_each_variant": [
+      "git archive <ref> | tar -x -C /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/src/<label>",
+      "cmake -S /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/src/<label> -B /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/<label> -DCMAKE_BUILD_TYPE=Release -DBUILD_DOCS=OFF -DBUILD_SHARED_LIBS=OFF -DBUILD_PYTHON_MODULE=ON -DPython3_EXECUTABLE=/Users/felg/gh/Felipegalind0/jsbsim/.venv/bin/python -DCYTHON_EXECUTABLE=/Users/felg/gh/Felipegalind0/jsbsim/.venv/bin/cython",
+      "cmake --build /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/<label> -j 8"
+    ],
+    "instrument_a_scratch_tree": "python3 /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/apply-diag.py /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/src/<label>",
+    "trace": "/Users/felg/gh/Felipegalind0/jsbsim/.venv/bin/python /Users/felg/gh/0sfs/scripts/validation/jsbsim/turbine-initialization/runic_trace.py --source /Users/felg/gh/Felipegalind0/jsbsim --build master=/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/master --build trimstatus=/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/trimstatus --build candidate=/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/final --build diag=/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/diag --build diag-trimstatus=/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/diag-trimstatus --build diag-candidate=/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/diag-candidate --output /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/trace",
+    "focused_probes": "each probe under /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/probe/ was run as PYTHONPATH=<build>/tests .venv/bin/python <script>, and its output is the matching .txt file in this directory",
+    "note": "the build directories live in the JSBSim repository's gitignored build/ and are not distributed with this record; --output defaults to a new dated directory under <source>/build/ when omitted"
+  }
+}

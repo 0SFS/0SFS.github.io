@@ -1,0 +1,19 @@
+Compressor stall and its recovery, F-16 at 20,000 ft and 300 kt CAS.
+
+Stall() is selected by the Stalled flag ahead of every other phase, burns
+IdleFF and returns zero thrust, and is cleared only by a throttle below
+1 %. The engine then re-enters tpRun at whatever N2 the stall left, and
+Run() seeks N2 to the idle target, so the member N2norm returns to 0 from
+above rather than going below it. The idle thrust is negative here because
+the F-16 IdleThrust table models ram drag at speed; that is the model, not
+a defect. Whether tpRun can be entered with N2 below IdleN2, which would
+make the unbounded N2norm negative and the N2norm^2 thrust term grow again
+as the spool falls, is NOT demonstrated by this run.
+
+running        N2=100.000 N2norm=  1.0000 thrust=  9488.06 ffpph=  6325.2
+stalled 5 s    N2= 60.640 N2norm=  1.0000 thrust=     0.00 phase=4 ffpph=   757.6
+cleared +1     N2= 60.590 N2norm=  1.0000 thrust=     0.00 phase=4 ffpph=   757.6 running=1
+cleared +60    N2= 53.000 N2norm=  0.0000 thrust= -1086.59 phase=1 ffpph=   757.6 running=1
+cleared +300   N2= 53.000 N2norm=  0.0000 thrust= -1094.50 phase=1 ffpph=   757.6 running=1
+cleared +600   N2= 53.000 N2norm=  0.0000 thrust= -1130.66 phase=1 ffpph=   757.6 running=1
+cleared +1200  N2= 53.000 N2norm=  0.0000 thrust= -1276.41 phase=1 ffpph=   757.6 running=1

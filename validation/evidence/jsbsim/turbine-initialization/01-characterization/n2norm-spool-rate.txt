@@ -1,0 +1,7 @@
+First Run() frame after a restart, with N2norm forced to each value.
+The engine is at idle N2 with the throttle at full; only the member
+N2norm differs, and FGSpoolUp reads it to scale the spool rate.
+
+  N2norm= 0.0  N2 53.0000 -> 53.0692  (delta 0.06921)  N1 delta 40.0692
+  N2norm= 0.5  N2 53.0000 -> 53.1850  (delta 0.18503)  N1 delta 40.1850
+  N2norm= 1.0  N2 53.0000 -> 53.2206  (delta 0.22055)  N1 delta 40.2206

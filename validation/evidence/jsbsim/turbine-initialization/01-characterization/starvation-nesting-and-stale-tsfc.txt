@@ -1,0 +1,21 @@
+A. A starved engine keeps publishing its last running fuel flow.
+   running          gph=  3448.87 pps=  6.3229 run=1
+   starved +1       gph=  3448.87 pps=  6.3229 run=1 n2=100.000 pphInternal=22804.20
+   starved +120     gph=  3448.87 pps=  6.3229 run=0 n2= 60.843 pphInternal=12887.53
+   starved +1200    gph=  3448.87 pps=  6.3229 run=0 n2=  0.670 pphInternal=    0.00
+   starved +7200    gph=  3448.87 pps=  6.3229 run=0 n2=  0.029 pphInternal=    0.00
+
+B. What GetSteadyState leaves in the copied propulsion timestep.
+   after RunIC                     engine dt=0.000000 exec dt=0.008333
+   after set-running (not suspended) engine dt=0.500000 exec dt=0.008333
+   after set-running (suspended)    engine dt=0.500000 exec dt=0.000000 suspended=True
+   after resume                     exec dt=0.000000 suspended=True
+
+C. Nested suspension: RunIC() inside a suspended executive.
+   suspended: exec dt=0.000000
+   after RunIC: exec dt=0.000000 suspended=True
+   after resume: exec dt=0.000000 suspended=True
+
+D. The published tsfc while the engine is off.
+   running  n2=100.000 n2norm=1.0000 tsfc=0.7171
+   off      n2=  1.262 n2norm=1.0000 tsfc=0.7171

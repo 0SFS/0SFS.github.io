@@ -1,0 +1,21 @@
+# Follow-up module identity, recorded 2026-09-20T02:04:44Z
+# The first three are reused unchanged from the original stage-1 run.
+
+build              sha256 of tests/jsbsim/_jsbsim.so
+master             ef60c3bf3c4f663a7184992fb0d361d43bbf07fa82f249b6bca2a8940725ab29
+trimstatus         e9cbd297451e2f716797be1b80f1c05a7e83dac93451e2f3c06a96bc48d0faac
+candidate          f739de7773b2144ca315a5e76705d36fcb08e3db4a9a6495c859951198a40779
+live               fb793037516cd7bcc6f97cd4842eb0af3c3f301a1c353f3bd502e2b1a8fa94e8
+live-trimstatus    343659ded8266425680c026d6e8d70c25950f7e84bebc6a18cf5756675f19fc4
+live-candidate     6a40b6fef650fc533f0c620d4bbcac1e1acf93a619fe791cfc7c51b24c46eb26
+
+source             sha256 of src/models/propulsion/FGTurbine.cpp
+master             5bccfd0244d62ae10fd1624b19c34731a257e83ec6ba01182832a2650c472609
+trimstatus         2644efebbeee030295a7ad208ba234fa0f73395c0ff93ab34f5e00d1fc6d790e
+live               0b4c13fca46f2c322e9c381f00cce8890f08e2d598cd61e519d11a9bcea3ba55
+live-trimstatus    b9a4ab5be76cf1ac93fbc0085cc39baaf1b7e0742aa69c81c68719e636472dec
+live-candidate     4e7fc8c4616aeb4e7392397446a8f1683de3a9d59436390724eba106acf03fd9
+
+# The original diag/diag-trimstatus/diag-candidate binaries are recorded in
+# ../module-identity.txt and were not rebuilt; the live builds reproduce them
+# on all 5137 shared observables (provenance.json, equivalence).

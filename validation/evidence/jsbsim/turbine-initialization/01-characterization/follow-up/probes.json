@@ -1,0 +1,2106 @@
+{
+  "source": "/Users/felg/gh/Felipegalind0/jsbsim",
+  "source_head": "482da811f1bc6ab42c3cb76c8079eab7af75f49d",
+  "source_status": [],
+  "probes_requested": [
+    "live-state",
+    "nesting",
+    "starvation",
+    "fuel-matrix",
+    "stale-tsfc",
+    "n2norm-spool-rate",
+    "stall-recovery",
+    "linearization",
+    "function-calls"
+  ],
+  "records": {
+    "live": {
+      "jsbsim_file": "/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/live/tests/jsbsim/__init__.py",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/live/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "fb793037516cd7bcc6f97cd4842eb0af3c3f301a1c353f3bd502e2b1a8fa94e8",
+      "jsbsim_version": "1.3.2.dev1",
+      "python": "3.14.7",
+      "dt": 0.008333333333333333,
+      "probes": {
+        "live-state": {
+          "points": [
+            {
+              "label": "loaded",
+              "latched": {
+                "phase": "off",
+                "engine-dt": 0.0,
+                "exec-dt": 0.0,
+                "trim-status": 0.0
+              },
+              "live": {
+                "phase": "off",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0,
+                "suspended": 0.0
+              },
+              "exec-dt-public": 0.008333333333333333,
+              "suspended-public": false,
+              "trim-status-public": false
+            },
+            {
+              "label": "after RunIC(), engine off",
+              "latched": {
+                "phase": "trim",
+                "engine-dt": 0.0,
+                "exec-dt": 0.0,
+                "trim-status": 0.0
+              },
+              "live": {
+                "phase": "trim",
+                "engine-dt": 0.0,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0,
+                "suspended": 0.0
+              },
+              "exec-dt-public": 0.008333333333333333,
+              "suspended-public": false,
+              "trim-status-public": false
+            },
+            {
+              "label": "after propulsion/set-running = -1",
+              "latched": {
+                "phase": "run",
+                "engine-dt": 0.5,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 1.0
+              },
+              "live": {
+                "phase": "run",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0,
+                "suspended": 0.0
+              },
+              "exec-dt-public": 0.008333333333333333,
+              "suspended-public": false,
+              "trim-status-public": false
+            },
+            {
+              "label": "after 240 normal frames",
+              "latched": {
+                "phase": "run",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0
+              },
+              "live": {
+                "phase": "run",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0,
+                "suspended": 0.0
+              },
+              "exec-dt-public": 0.008333333333333333,
+              "suspended-public": false,
+              "trim-status-public": false
+            },
+            {
+              "label": "after RunIC(), engine running",
+              "latched": {
+                "phase": "trim",
+                "engine-dt": 0.0,
+                "exec-dt": 0.0,
+                "trim-status": 0.0
+              },
+              "live": {
+                "phase": "trim",
+                "engine-dt": 0.0,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0,
+                "suspended": 0.0
+              },
+              "exec-dt-public": 0.008333333333333333,
+              "suspended-public": false,
+              "trim-status-public": false
+            },
+            {
+              "label": "after one normal frame following RunIC()",
+              "latched": {
+                "phase": "run",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0
+              },
+              "live": {
+                "phase": "run",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0,
+                "suspended": 0.0
+              },
+              "exec-dt-public": 0.008333333333333333,
+              "suspended-public": false,
+              "trim-status-public": false
+            },
+            {
+              "label": "after SuspendIntegration(), before any Run()",
+              "latched": {
+                "phase": "run",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0
+              },
+              "live": {
+                "phase": "run",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.0,
+                "trim-status": 0.0,
+                "suspended": 1.0
+              },
+              "exec-dt-public": 0.0,
+              "suspended-public": true,
+              "trim-status-public": false
+            },
+            {
+              "label": "after one suspended Run()",
+              "latched": {
+                "phase": "trim",
+                "engine-dt": 0.0,
+                "exec-dt": 0.0,
+                "trim-status": 0.0
+              },
+              "live": {
+                "phase": "trim",
+                "engine-dt": 0.0,
+                "exec-dt": 0.0,
+                "trim-status": 0.0,
+                "suspended": 1.0
+              },
+              "exec-dt-public": 0.0,
+              "suspended-public": true,
+              "trim-status-public": false
+            },
+            {
+              "label": "after ResumeIntegration(), before any Run()",
+              "latched": {
+                "phase": "trim",
+                "engine-dt": 0.0,
+                "exec-dt": 0.0,
+                "trim-status": 0.0
+              },
+              "live": {
+                "phase": "trim",
+                "engine-dt": 0.0,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0,
+                "suspended": 0.0
+              },
+              "exec-dt-public": 0.008333333333333333,
+              "suspended-public": false,
+              "trim-status-public": false
+            },
+            {
+              "label": "after one resumed Run()",
+              "latched": {
+                "phase": "run",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0
+              },
+              "live": {
+                "phase": "run",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0,
+                "suspended": 0.0
+              },
+              "exec-dt-public": 0.008333333333333333,
+              "suspended-public": false,
+              "trim-status-public": false
+            }
+          ],
+          "reading": "latched fields are written during an evaluation and describe it; live fields are read now. Where a public call restores something after its last evaluation, only the live column describes what the caller has."
+        },
+        "nesting": {
+          "RunIC": {
+            "dt-before": 0.008333333333333333,
+            "after-outer-suspend": {
+              "exec-dt": 0.0,
+              "suspended": true
+            },
+            "after-inner-call": {
+              "exec-dt": 0.0,
+              "suspended": true
+            },
+            "after-outer-resume": {
+              "exec-dt": 0.0,
+              "suspended": true
+            },
+            "after-explicit-set-dt": {
+              "exec-dt": 0.008333333333333333,
+              "suspended": false
+            },
+            "outer-resume-restored-dt": false
+          },
+          "set-running": {
+            "dt-before": 0.008333333333333333,
+            "after-outer-suspend": {
+              "exec-dt": 0.0,
+              "suspended": true
+            },
+            "after-inner-call": {
+              "exec-dt": 0.0,
+              "suspended": true
+            },
+            "after-outer-resume": {
+              "exec-dt": 0.0,
+              "suspended": true
+            },
+            "after-explicit-set-dt": {
+              "exec-dt": 0.008333333333333333,
+              "suspended": false
+            },
+            "outer-resume-restored-dt": false
+          }
+        },
+        "starvation": {
+          "rows": [
+            {
+              "label": "running",
+              "gph": 3448.8687701157382,
+              "pps": 6.322926078545519,
+              "running": 1.0,
+              "n2": 100.0,
+              "used-lbs": 9.879648453387269
+            },
+            {
+              "label": "starved +1 frames",
+              "gph": 3448.8687701157382,
+              "pps": 6.322926078545519,
+              "running": 1.0,
+              "n2": 100.0,
+              "used-lbs": 9.879648453387269
+            },
+            {
+              "label": "starved +120 frames",
+              "gph": 3448.8687701157382,
+              "pps": 6.322926078545519,
+              "running": 0.0,
+              "n2": 60.84325628955682,
+              "used-lbs": 9.879648453387269
+            },
+            {
+              "label": "starved +1200 frames",
+              "gph": 3448.8687701157382,
+              "pps": 6.322926078545519,
+              "running": 0.0,
+              "n2": 0.6695830088669436,
+              "used-lbs": 9.879648453387269
+            },
+            {
+              "label": "starved +7200 frames",
+              "gph": 3448.8687701157382,
+              "pps": 6.322926078545519,
+              "running": 0.0,
+              "n2": 0.02911819455520569,
+              "used-lbs": 9.879648453387269
+            },
+            {
+              "label": "after refilling the tanks, +1 frame",
+              "gph": 0.0,
+              "pps": 0.0,
+              "running": 0.0,
+              "n2": 0.029101618207665044,
+              "used-lbs": 9.879648453387269
+            }
+          ]
+        },
+        "fuel-matrix": {
+          "cases": [
+            {
+              "tanks": "full",
+              "fuel-freeze": false,
+              "before": {
+                "tank-total-lbs": 3000.0,
+                "gph": 0.0
+              },
+              "after-set-running": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 17797.578807541315,
+                "gph": 0.0
+              },
+              "after-run-ic": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 20037.483738784165,
+                "gph": 1933.749189822195
+              },
+              "after-120-frames": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 19883.794519470724,
+                "gph": 2691.182088710796,
+                "used-lbs": 4.245176421895713,
+                "tank-total-lbs": 2995.754823578104
+              }
+            },
+            {
+              "tanks": "full",
+              "fuel-freeze": true,
+              "before": {
+                "tank-total-lbs": 3000.0,
+                "gph": 0.0
+              },
+              "after-set-running": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 17797.578807541315,
+                "gph": 0.0
+              },
+              "after-run-ic": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 20037.483738784165,
+                "gph": 0.0
+              },
+              "after-120-frames": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 19883.809388581234,
+                "gph": 0.0,
+                "used-lbs": 0.0,
+                "tank-total-lbs": 3000.0
+              }
+            },
+            {
+              "tanks": "empty",
+              "fuel-freeze": false,
+              "before": {
+                "tank-total-lbs": 0.0,
+                "gph": 0.0
+              },
+              "after-set-running": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 17797.578807541315,
+                "gph": 0.0
+              },
+              "after-run-ic": {
+                "running": 0.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 0.0,
+                "gph": 0.0
+              },
+              "after-120-frames": {
+                "running": 0.0,
+                "n1": 60.58974272168366,
+                "n2": 60.58974272168366,
+                "thrust": 0.0,
+                "gph": 0.0,
+                "used-lbs": 0.0,
+                "tank-total-lbs": 0.0
+              }
+            },
+            {
+              "tanks": "empty",
+              "fuel-freeze": true,
+              "before": {
+                "tank-total-lbs": 0.0,
+                "gph": 0.0
+              },
+              "after-set-running": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 17797.578807541315,
+                "gph": 0.0
+              },
+              "after-run-ic": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 20037.53932903401,
+                "gph": 0.0
+              },
+              "after-120-frames": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 19857.303244864677,
+                "gph": 0.0,
+                "used-lbs": 0.0,
+                "tank-total-lbs": 0.0
+              }
+            }
+          ],
+          "stale-starvation": {
+            "starved": {
+              "running": 0.0,
+              "n2": 99.58333333333333,
+              "gph": 3448.8687701157382
+            },
+            "refilled-without-a-frame": {
+              "running": 0.0,
+              "n2": 99.58333333333333,
+              "gph": 3448.8687701157382
+            },
+            "after-run-ic": {
+              "running": 0.0,
+              "n2": 99.58333333333333,
+              "gph": 3442.555638802607,
+              "thrust": 20037.48356196083
+            },
+            "after-set-running": {
+              "running": 1.0,
+              "n1": 100.0,
+              "n2": 100.0,
+              "gph": 3442.555638802607,
+              "thrust": 17797.578636007704
+            },
+            "after-120-frames": {
+              "running": 1.0,
+              "n2": 100.0,
+              "gph": 2691.0771301334466,
+              "used-lbs": 14.124632451224507
+            }
+          }
+        },
+        "stale-tsfc": {
+          "rows": [
+            {
+              "label": "running",
+              "n2": 100.0,
+              "n2norm": 1.0,
+              "tsfc": 0.7171056687407359
+            },
+            {
+              "label": "cut off +120 frames",
+              "n2": 60.58974272168366,
+              "n2norm": 1.0,
+              "tsfc": 0.7171056687407359
+            },
+            {
+              "label": "cut off +1200 frames",
+              "n2": 1.4927193041854558,
+              "n2norm": 1.0,
+              "tsfc": 0.7171056687407359
+            },
+            {
+              "label": "cut off +2400 frames",
+              "n2": 1.262355355489036,
+              "n2norm": 1.0,
+              "tsfc": 0.7171056687407359
+            }
+          ]
+        },
+        "n2norm-spool-rate": {
+          "rows": [
+            {
+              "n2norm": 0.0,
+              "n2-before": 53.0,
+              "n2-after": 53.06921154742145,
+              "n2-delta": 0.06921154742145319,
+              "n1-before": 40.0,
+              "n1-after": 40.06921154742145,
+              "n1-delta": 0.06921154742145319,
+              "ratio-to-n2norm-0": 1.0
+            },
+            {
+              "n2norm": 0.25,
+              "n2-before": 53.0,
+              "n2-after": 53.12093425044531,
+              "n2-delta": 0.12093425044530903,
+              "n1-before": 40.0,
+              "n1-after": 40.12093425044531,
+              "n1-delta": 0.12093425044530903,
+              "ratio-to-n2norm-0": 1.7473132006267438
+            },
+            {
+              "n2norm": 0.5,
+              "n2-before": 53.0,
+              "n2-after": 53.185032497926244,
+              "n2-delta": 0.18503249792624388,
+              "n1-before": 40.0,
+              "n1-after": 40.185032497926244,
+              "n1-delta": 0.18503249792624388,
+              "ratio-to-n2norm-0": 2.673433911244848
+            },
+            {
+              "n2norm": 1.0,
+              "n2-before": 53.0,
+              "n2-after": 53.220553074859744,
+              "n2-delta": 0.22055307485974396,
+              "n1-before": 40.0,
+              "n1-after": 40.220553074859744,
+              "n1-delta": 0.22055307485974396,
+              "ratio-to-n2norm-0": 3.1866514053893282
+            }
+          ],
+          "note": "one frame only; Run() recomputes N2norm after seeking"
+        },
+        "stall-recovery": {
+          "rows": [
+            {
+              "label": "running",
+              "n2": 100.0,
+              "n2norm": 1.0,
+              "thrust": 9488.062293725076,
+              "phase": "run",
+              "fuelflow-pph": 6325.192977273884,
+              "running": 1.0
+            },
+            {
+              "label": "stalled 5 s",
+              "n2": 60.64042420905933,
+              "n2norm": 1.0,
+              "thrust": 0.0,
+              "phase": "stall",
+              "fuelflow-pph": 757.6485181409156,
+              "running": 1.0
+            },
+            {
+              "label": "cleared +1",
+              "n2": 60.58989052221845,
+              "n2norm": 1.0,
+              "thrust": 0.0,
+              "phase": "stall",
+              "fuelflow-pph": 757.6485181409156,
+              "running": 1.0
+            },
+            {
+              "label": "cleared +60",
+              "n2": 53.0,
+              "n2norm": 0.0,
+              "thrust": -1086.5929126667822,
+              "phase": "run",
+              "fuelflow-pph": 757.6485181409156,
+              "running": 1.0
+            },
+            {
+              "label": "cleared +300",
+              "n2": 53.0,
+              "n2norm": 0.0,
+              "thrust": -1094.500139340809,
+              "phase": "run",
+              "fuelflow-pph": 757.6485181409156,
+              "running": 1.0
+            },
+            {
+              "label": "cleared +600",
+              "n2": 53.0,
+              "n2norm": 0.0,
+              "thrust": -1130.6564059125417,
+              "phase": "run",
+              "fuelflow-pph": 757.6485181409156,
+              "running": 1.0
+            },
+            {
+              "label": "cleared +1200",
+              "n2": 53.0,
+              "n2norm": 0.0,
+              "thrust": -1276.409790523537,
+              "phase": "run",
+              "fuelflow-pph": 757.6485181409156,
+              "running": 1.0
+            }
+          ],
+          "not-shown": "whether tpRun is reachable with N2 below IdleN2, which is what would make the unbounded N2norm negative"
+        },
+        "linearization": {
+          "arms": [
+            {
+              "throttle": 0.0,
+              "state-names": [
+                "Vt",
+                "Alpha",
+                "Theta",
+                "Q",
+                "Beta",
+                "Phi",
+                "P",
+                "Psi",
+                "R",
+                "Latitude",
+                "Longitude",
+                "Alt"
+              ],
+              "input-names": [
+                "ThtlCmd",
+                "DaCmd",
+                "DeCmd",
+                "DrCmd"
+              ],
+              "u0": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "B-throttle-column": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "throttle-column-index": 0,
+              "engine-after": {
+                "n1": 30.0,
+                "n2": 60.0,
+                "thrust": 379.24698044820656,
+                "gph": 115.06145996070241,
+                "running": 1.0,
+                "fcs-throttle-pos": 0.0
+              }
+            },
+            {
+              "throttle": 0.3,
+              "state-names": [
+                "Vt",
+                "Alpha",
+                "Theta",
+                "Q",
+                "Beta",
+                "Phi",
+                "P",
+                "Psi",
+                "R",
+                "Latitude",
+                "Longitude",
+                "Alt"
+              ],
+              "input-names": [
+                "ThtlCmd",
+                "DaCmd",
+                "DeCmd",
+                "DrCmd"
+              ],
+              "u0": [
+                0.3,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "B-throttle-column": [
+                2.7708039266919706,
+                0.0,
+                0.0,
+                0.0024612639773144425,
+                -1.1293772630057337e-17,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "throttle-column-index": 0,
+              "engine-after": {
+                "n1": 51.0,
+                "n2": 72.0,
+                "thrust": 1070.3537016342398,
+                "gph": 148.59744654097943,
+                "running": 1.0,
+                "fcs-throttle-pos": 0.3
+              }
+            },
+            {
+              "throttle": 0.6,
+              "state-names": [
+                "Vt",
+                "Alpha",
+                "Theta",
+                "Q",
+                "Beta",
+                "Phi",
+                "P",
+                "Psi",
+                "R",
+                "Latitude",
+                "Longitude",
+                "Alt"
+              ],
+              "input-names": [
+                "ThtlCmd",
+                "DaCmd",
+                "DeCmd",
+                "DrCmd"
+              ],
+              "u0": [
+                0.6,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "B-throttle-column": [
+                5.541607853384126,
+                0.0,
+                0.0,
+                0.004922527954633222,
+                7.905640841040136e-17,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "throttle-column-index": 0,
+              "engine-after": {
+                "n1": 72.0,
+                "n2": 84.0,
+                "thrust": 3143.6738651923397,
+                "gph": 328.1480856309182,
+                "running": 1.0,
+                "fcs-throttle-pos": 0.6
+              }
+            },
+            {
+              "throttle": 0.9,
+              "state-names": [
+                "Vt",
+                "Alpha",
+                "Theta",
+                "Q",
+                "Beta",
+                "Phi",
+                "P",
+                "Psi",
+                "R",
+                "Latitude",
+                "Longitude",
+                "Alt"
+              ],
+              "input-names": [
+                "ThtlCmd",
+                "DaCmd",
+                "DeCmd",
+                "DrCmd"
+              ],
+              "u0": [
+                0.9,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "B-throttle-column": [
+                8.312411780080167,
+                0.0,
+                0.0,
+                0.0073837919319491106,
+                7.905640841040136e-17,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "throttle-column-index": 0,
+              "engine-after": {
+                "n1": 93.0,
+                "n2": 96.0,
+                "thrust": 6599.207471122507,
+                "gph": 585.5218392598651,
+                "running": 1.0,
+                "fcs-throttle-pos": 0.9
+              }
+            }
+          ],
+          "engine-states-in-model": "none \u2014 FGLinearization adds spool states only for propeller thrusters, so a turbine contributes no state to x"
+        },
+        "function-calls": {
+          "stock": {
+            "steps": [
+              {
+                "label": "load then RunIC(), engine off",
+                "phase-after": "trim",
+                "evaluations": 2.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one frame, engine off",
+                "phase-after": "off",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "RunIC() at a dry throttle, engine off",
+                "phase-after": "trim",
+                "evaluations": 2.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "propulsion/set-running = -1",
+                "phase-after": "run",
+                "evaluations": 124.0,
+                "tsfc-calls": 123.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one running frame, dry",
+                "phase-after": "run",
+                "evaluations": 1.0,
+                "tsfc-calls": 1.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "RunIC(), running, dry",
+                "phase-after": "trim",
+                "evaluations": 2.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "first augmented frame",
+                "phase-after": "run",
+                "evaluations": 1.0,
+                "tsfc-calls": 1.0,
+                "atsfc-calls": 1.0
+              },
+              {
+                "label": "second augmented frame",
+                "phase-after": "run",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 1.0
+              },
+              {
+                "label": "RunIC(), running, augmented",
+                "phase-after": "trim",
+                "evaluations": 2.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one stalled frame",
+                "phase-after": "stall",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one seized frame",
+                "phase-after": "seize",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one frame after cutoff",
+                "phase-after": "off",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one cranking frame",
+                "phase-after": "spinup",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              }
+            ],
+            "throttle-position-at-augmented": 1.2
+          },
+          "augmethod1": {
+            "steps": [
+              {
+                "label": "load then RunIC(), engine off",
+                "phase-after": "trim",
+                "evaluations": 2.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one frame, engine off",
+                "phase-after": "off",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "RunIC() at a dry throttle, engine off",
+                "phase-after": "trim",
+                "evaluations": 2.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "propulsion/set-running = -1",
+                "phase-after": "run",
+                "evaluations": 124.0,
+                "tsfc-calls": 1.0,
+                "atsfc-calls": 122.0
+              },
+              {
+                "label": "one running frame, dry",
+                "phase-after": "run",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "RunIC(), running, dry",
+                "phase-after": "trim",
+                "evaluations": 2.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "first augmented frame",
+                "phase-after": "run",
+                "evaluations": 1.0,
+                "tsfc-calls": 1.0,
+                "atsfc-calls": 1.0
+              },
+              {
+                "label": "second augmented frame",
+                "phase-after": "run",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 1.0
+              },
+              {
+                "label": "RunIC(), running, augmented",
+                "phase-after": "trim",
+                "evaluations": 2.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one stalled frame",
+                "phase-after": "stall",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one seized frame",
+                "phase-after": "seize",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one frame after cutoff",
+                "phase-after": "off",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one cranking frame",
+                "phase-after": "spinup",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              }
+            ],
+            "throttle-position-at-augmented": 1.2
+          }
+        }
+      },
+      "instrumented": true,
+      "injection-load": {
+        "run-ic": {
+          "returncode": -11,
+          "signal": 11,
+          "survived": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run-off": {
+          "returncode": 0,
+          "signal": null,
+          "survived": true,
+          "stdout": "loaded B747, engine path /Users/felg/gh/Felipegalind0/jsbsim/engine\nInjWaterNorm after load = 0.0\nRunIC with no injection command: ok, thrust 2830.84\ninjection_cmd set; InjWaterNorm = 0.0\ncalling Run() with the engine off, which dispatches Off()\nsurvived Run(); thrust 0.00\nSURVIVED",
+          "stderr": ""
+        },
+        "run-running": {
+          "returncode": -11,
+          "signal": 11,
+          "survived": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run-ic-with-function": {
+          "returncode": 0,
+          "signal": null,
+          "survived": true,
+          "stdout": "loaded B747, engine path /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/probes/live/engine-injection-with\nInjWaterNorm after load = 1.0\nRunIC with no injection command: ok, thrust 2830.84\ninjection_cmd set; InjWaterNorm = 1.0\ncalling RunIC(), which dispatches Trim()\nsurvived RunIC(); thrust 2972.38\nSURVIVED",
+          "stderr": ""
+        },
+        "run-running-with-function": {
+          "returncode": 0,
+          "signal": null,
+          "survived": true,
+          "stdout": "loaded B747, engine path /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/probes/live/engine-injection-with\nInjWaterNorm after load = 1.0\nRunIC with no injection command: ok, thrust 2830.84\ninjection_cmd set; InjWaterNorm = 1.0\ncalling Run() with the engine off, which dispatches Off()\nsurvived Run(); thrust 0.00\nSURVIVED",
+          "stderr": ""
+        }
+      }
+    },
+    "live-candidate": {
+      "jsbsim_file": "/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/live-candidate/tests/jsbsim/__init__.py",
+      "extension": "/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/live-candidate/tests/jsbsim/_jsbsim.so",
+      "extension_sha256": "6a40b6fef650fc533f0c620d4bbcac1e1acf93a619fe791cfc7c51b24c46eb26",
+      "jsbsim_version": "1.3.2.dev1",
+      "python": "3.14.7",
+      "dt": 0.008333333333333333,
+      "probes": {
+        "live-state": {
+          "points": [
+            {
+              "label": "loaded",
+              "latched": {
+                "phase": "off",
+                "engine-dt": 0.0,
+                "exec-dt": 0.0,
+                "trim-status": 0.0
+              },
+              "live": {
+                "phase": "off",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0,
+                "suspended": 0.0
+              },
+              "exec-dt-public": 0.008333333333333333,
+              "suspended-public": false,
+              "trim-status-public": false
+            },
+            {
+              "label": "after RunIC(), engine off",
+              "latched": {
+                "phase": "trim",
+                "engine-dt": 0.0,
+                "exec-dt": 0.0,
+                "trim-status": 0.0
+              },
+              "live": {
+                "phase": "trim",
+                "engine-dt": 0.0,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0,
+                "suspended": 0.0
+              },
+              "exec-dt-public": 0.008333333333333333,
+              "suspended-public": false,
+              "trim-status-public": false
+            },
+            {
+              "label": "after propulsion/set-running = -1",
+              "latched": {
+                "phase": "run",
+                "engine-dt": 0.5,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 1.0
+              },
+              "live": {
+                "phase": "run",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0,
+                "suspended": 0.0
+              },
+              "exec-dt-public": 0.008333333333333333,
+              "suspended-public": false,
+              "trim-status-public": false
+            },
+            {
+              "label": "after 240 normal frames",
+              "latched": {
+                "phase": "run",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0
+              },
+              "live": {
+                "phase": "run",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0,
+                "suspended": 0.0
+              },
+              "exec-dt-public": 0.008333333333333333,
+              "suspended-public": false,
+              "trim-status-public": false
+            },
+            {
+              "label": "after RunIC(), engine running",
+              "latched": {
+                "phase": "trim",
+                "engine-dt": 0.0,
+                "exec-dt": 0.0,
+                "trim-status": 0.0
+              },
+              "live": {
+                "phase": "trim",
+                "engine-dt": 0.0,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0,
+                "suspended": 0.0
+              },
+              "exec-dt-public": 0.008333333333333333,
+              "suspended-public": false,
+              "trim-status-public": false
+            },
+            {
+              "label": "after one normal frame following RunIC()",
+              "latched": {
+                "phase": "run",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0
+              },
+              "live": {
+                "phase": "run",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0,
+                "suspended": 0.0
+              },
+              "exec-dt-public": 0.008333333333333333,
+              "suspended-public": false,
+              "trim-status-public": false
+            },
+            {
+              "label": "after SuspendIntegration(), before any Run()",
+              "latched": {
+                "phase": "run",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0
+              },
+              "live": {
+                "phase": "run",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.0,
+                "trim-status": 0.0,
+                "suspended": 1.0
+              },
+              "exec-dt-public": 0.0,
+              "suspended-public": true,
+              "trim-status-public": false
+            },
+            {
+              "label": "after one suspended Run()",
+              "latched": {
+                "phase": "trim",
+                "engine-dt": 0.0,
+                "exec-dt": 0.0,
+                "trim-status": 0.0
+              },
+              "live": {
+                "phase": "trim",
+                "engine-dt": 0.0,
+                "exec-dt": 0.0,
+                "trim-status": 0.0,
+                "suspended": 1.0
+              },
+              "exec-dt-public": 0.0,
+              "suspended-public": true,
+              "trim-status-public": false
+            },
+            {
+              "label": "after ResumeIntegration(), before any Run()",
+              "latched": {
+                "phase": "trim",
+                "engine-dt": 0.0,
+                "exec-dt": 0.0,
+                "trim-status": 0.0
+              },
+              "live": {
+                "phase": "trim",
+                "engine-dt": 0.0,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0,
+                "suspended": 0.0
+              },
+              "exec-dt-public": 0.008333333333333333,
+              "suspended-public": false,
+              "trim-status-public": false
+            },
+            {
+              "label": "after one resumed Run()",
+              "latched": {
+                "phase": "run",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0
+              },
+              "live": {
+                "phase": "run",
+                "engine-dt": 0.008333333333333333,
+                "exec-dt": 0.008333333333333333,
+                "trim-status": 0.0,
+                "suspended": 0.0
+              },
+              "exec-dt-public": 0.008333333333333333,
+              "suspended-public": false,
+              "trim-status-public": false
+            }
+          ],
+          "reading": "latched fields are written during an evaluation and describe it; live fields are read now. Where a public call restores something after its last evaluation, only the live column describes what the caller has."
+        },
+        "nesting": {
+          "RunIC": {
+            "dt-before": 0.008333333333333333,
+            "after-outer-suspend": {
+              "exec-dt": 0.0,
+              "suspended": true
+            },
+            "after-inner-call": {
+              "exec-dt": 0.0,
+              "suspended": true
+            },
+            "after-outer-resume": {
+              "exec-dt": 0.0,
+              "suspended": true
+            },
+            "after-explicit-set-dt": {
+              "exec-dt": 0.008333333333333333,
+              "suspended": false
+            },
+            "outer-resume-restored-dt": false
+          },
+          "set-running": {
+            "dt-before": 0.008333333333333333,
+            "after-outer-suspend": {
+              "exec-dt": 0.0,
+              "suspended": true
+            },
+            "after-inner-call": {
+              "exec-dt": 0.0,
+              "suspended": true
+            },
+            "after-outer-resume": {
+              "exec-dt": 0.0,
+              "suspended": true
+            },
+            "after-explicit-set-dt": {
+              "exec-dt": 0.008333333333333333,
+              "suspended": false
+            },
+            "outer-resume-restored-dt": false
+          }
+        },
+        "starvation": {
+          "rows": [
+            {
+              "label": "running",
+              "gph": 3448.8687701157382,
+              "pps": 6.322926078545519,
+              "running": 1.0,
+              "n2": 100.0,
+              "used-lbs": 9.879648453387269
+            },
+            {
+              "label": "starved +1 frames",
+              "gph": 3448.8687701157382,
+              "pps": 6.322926078545519,
+              "running": 1.0,
+              "n2": 100.0,
+              "used-lbs": 9.879648453387269
+            },
+            {
+              "label": "starved +120 frames",
+              "gph": 3448.8687701157382,
+              "pps": 6.322926078545519,
+              "running": 0.0,
+              "n2": 60.84325628955682,
+              "used-lbs": 9.879648453387269
+            },
+            {
+              "label": "starved +1200 frames",
+              "gph": 3448.8687701157382,
+              "pps": 6.322926078545519,
+              "running": 0.0,
+              "n2": 0.6695830088669436,
+              "used-lbs": 9.879648453387269
+            },
+            {
+              "label": "starved +7200 frames",
+              "gph": 3448.8687701157382,
+              "pps": 6.322926078545519,
+              "running": 0.0,
+              "n2": 0.02911819455520569,
+              "used-lbs": 9.879648453387269
+            },
+            {
+              "label": "after refilling the tanks, +1 frame",
+              "gph": 0.0,
+              "pps": 0.0,
+              "running": 0.0,
+              "n2": 0.029101618207665044,
+              "used-lbs": 9.879648453387269
+            }
+          ]
+        },
+        "fuel-matrix": {
+          "cases": [
+            {
+              "tanks": "full",
+              "fuel-freeze": false,
+              "before": {
+                "tank-total-lbs": 3000.0,
+                "gph": 0.0
+              },
+              "after-set-running": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 17797.578807541315,
+                "gph": 0.0
+              },
+              "after-run-ic": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 20037.483738784165,
+                "gph": 6223.763888561748
+              },
+              "after-120-frames": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 19883.76716621911,
+                "gph": 6176.01858950745,
+                "used-lbs": 11.365946754837907,
+                "tank-total-lbs": 2988.6340532451622
+              }
+            },
+            {
+              "tanks": "full",
+              "fuel-freeze": true,
+              "before": {
+                "tank-total-lbs": 3000.0,
+                "gph": 0.0
+              },
+              "after-set-running": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 17797.578807541315,
+                "gph": 0.0
+              },
+              "after-run-ic": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 20037.483738784165,
+                "gph": 0.0
+              },
+              "after-120-frames": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 19883.809388581234,
+                "gph": 0.0,
+                "used-lbs": 0.0,
+                "tank-total-lbs": 3000.0
+              }
+            },
+            {
+              "tanks": "empty",
+              "fuel-freeze": false,
+              "before": {
+                "tank-total-lbs": 0.0,
+                "gph": 0.0
+              },
+              "after-set-running": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 17797.578807541315,
+                "gph": 0.0
+              },
+              "after-run-ic": {
+                "running": 0.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 0.0,
+                "gph": 0.0
+              },
+              "after-120-frames": {
+                "running": 0.0,
+                "n1": 60.58974272168366,
+                "n2": 60.58974272168366,
+                "thrust": 0.0,
+                "gph": 0.0,
+                "used-lbs": 0.0,
+                "tank-total-lbs": 0.0
+              }
+            },
+            {
+              "tanks": "empty",
+              "fuel-freeze": true,
+              "before": {
+                "tank-total-lbs": 0.0,
+                "gph": 0.0
+              },
+              "after-set-running": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 17797.578807541315,
+                "gph": 0.0
+              },
+              "after-run-ic": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 20037.53932903401,
+                "gph": 0.0
+              },
+              "after-120-frames": {
+                "running": 1.0,
+                "n1": 100.0,
+                "n2": 100.0,
+                "thrust": 19857.303244864677,
+                "gph": 0.0,
+                "used-lbs": 0.0,
+                "tank-total-lbs": 0.0
+              }
+            }
+          ],
+          "stale-starvation": {
+            "starved": {
+              "running": 0.0,
+              "n2": 99.58333333333333,
+              "gph": 3448.8687701157382
+            },
+            "refilled-without-a-frame": {
+              "running": 0.0,
+              "n2": 99.58333333333333,
+              "gph": 3448.8687701157382
+            },
+            "after-run-ic": {
+              "running": 0.0,
+              "n2": 99.58333333333333,
+              "gph": 3442.555638802607,
+              "thrust": 20037.48356196083
+            },
+            "after-set-running": {
+              "running": 1.0,
+              "n1": 100.0,
+              "n2": 100.0,
+              "gph": 3442.555638802607,
+              "thrust": 17797.578636007704
+            },
+            "after-120-frames": {
+              "running": 1.0,
+              "n2": 100.0,
+              "gph": 2691.0771301334466,
+              "used-lbs": 14.124632451224507
+            }
+          }
+        },
+        "stale-tsfc": {
+          "rows": [
+            {
+              "label": "running",
+              "n2": 100.0,
+              "n2norm": 1.0,
+              "tsfc": 0.7171056687407359
+            },
+            {
+              "label": "cut off +120 frames",
+              "n2": 60.58974272168366,
+              "n2norm": 1.0,
+              "tsfc": 0.7171056687407359
+            },
+            {
+              "label": "cut off +1200 frames",
+              "n2": 1.4927193041854558,
+              "n2norm": 1.0,
+              "tsfc": 0.7171056687407359
+            },
+            {
+              "label": "cut off +2400 frames",
+              "n2": 1.262355355489036,
+              "n2norm": 1.0,
+              "tsfc": 0.7171056687407359
+            }
+          ]
+        },
+        "n2norm-spool-rate": {
+          "rows": [
+            {
+              "n2norm": 0.0,
+              "n2-before": 53.0,
+              "n2-after": 53.06921154742145,
+              "n2-delta": 0.06921154742145319,
+              "n1-before": 40.0,
+              "n1-after": 40.06921154742145,
+              "n1-delta": 0.06921154742145319,
+              "ratio-to-n2norm-0": 1.0
+            },
+            {
+              "n2norm": 0.25,
+              "n2-before": 53.0,
+              "n2-after": 53.12093425044531,
+              "n2-delta": 0.12093425044530903,
+              "n1-before": 40.0,
+              "n1-after": 40.12093425044531,
+              "n1-delta": 0.12093425044530903,
+              "ratio-to-n2norm-0": 1.7473132006267438
+            },
+            {
+              "n2norm": 0.5,
+              "n2-before": 53.0,
+              "n2-after": 53.185032497926244,
+              "n2-delta": 0.18503249792624388,
+              "n1-before": 40.0,
+              "n1-after": 40.185032497926244,
+              "n1-delta": 0.18503249792624388,
+              "ratio-to-n2norm-0": 2.673433911244848
+            },
+            {
+              "n2norm": 1.0,
+              "n2-before": 53.0,
+              "n2-after": 53.220553074859744,
+              "n2-delta": 0.22055307485974396,
+              "n1-before": 40.0,
+              "n1-after": 40.220553074859744,
+              "n1-delta": 0.22055307485974396,
+              "ratio-to-n2norm-0": 3.1866514053893282
+            }
+          ],
+          "note": "one frame only; Run() recomputes N2norm after seeking"
+        },
+        "stall-recovery": {
+          "rows": [
+            {
+              "label": "running",
+              "n2": 100.0,
+              "n2norm": 1.0,
+              "thrust": 9488.062293725076,
+              "phase": "run",
+              "fuelflow-pph": 6325.192977273884,
+              "running": 1.0
+            },
+            {
+              "label": "stalled 5 s",
+              "n2": 60.64042420905933,
+              "n2norm": 1.0,
+              "thrust": 0.0,
+              "phase": "stall",
+              "fuelflow-pph": 757.6485181409156,
+              "running": 1.0
+            },
+            {
+              "label": "cleared +1",
+              "n2": 60.58989052221845,
+              "n2norm": 1.0,
+              "thrust": 0.0,
+              "phase": "stall",
+              "fuelflow-pph": 757.6485181409156,
+              "running": 1.0
+            },
+            {
+              "label": "cleared +60",
+              "n2": 53.0,
+              "n2norm": 0.0,
+              "thrust": -1086.5929126667822,
+              "phase": "run",
+              "fuelflow-pph": 757.6485181409156,
+              "running": 1.0
+            },
+            {
+              "label": "cleared +300",
+              "n2": 53.0,
+              "n2norm": 0.0,
+              "thrust": -1094.500139340809,
+              "phase": "run",
+              "fuelflow-pph": 757.6485181409156,
+              "running": 1.0
+            },
+            {
+              "label": "cleared +600",
+              "n2": 53.0,
+              "n2norm": 0.0,
+              "thrust": -1130.6564059125417,
+              "phase": "run",
+              "fuelflow-pph": 757.6485181409156,
+              "running": 1.0
+            },
+            {
+              "label": "cleared +1200",
+              "n2": 53.0,
+              "n2norm": 0.0,
+              "thrust": -1276.409790523537,
+              "phase": "run",
+              "fuelflow-pph": 757.6485181409156,
+              "running": 1.0
+            }
+          ],
+          "not-shown": "whether tpRun is reachable with N2 below IdleN2, which is what would make the unbounded N2norm negative"
+        },
+        "linearization": {
+          "arms": [
+            {
+              "throttle": 0.0,
+              "state-names": [
+                "Vt",
+                "Alpha",
+                "Theta",
+                "Q",
+                "Beta",
+                "Phi",
+                "P",
+                "Psi",
+                "R",
+                "Latitude",
+                "Longitude",
+                "Alt"
+              ],
+              "input-names": [
+                "ThtlCmd",
+                "DaCmd",
+                "DeCmd",
+                "DrCmd"
+              ],
+              "u0": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "B-throttle-column": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "throttle-column-index": 0,
+              "engine-after": {
+                "n1": 30.0,
+                "n2": 60.0,
+                "thrust": 379.24698044820656,
+                "gph": 115.06145996070241,
+                "running": 1.0,
+                "fcs-throttle-pos": 0.0
+              }
+            },
+            {
+              "throttle": 0.3,
+              "state-names": [
+                "Vt",
+                "Alpha",
+                "Theta",
+                "Q",
+                "Beta",
+                "Phi",
+                "P",
+                "Psi",
+                "R",
+                "Latitude",
+                "Longitude",
+                "Alt"
+              ],
+              "input-names": [
+                "ThtlCmd",
+                "DaCmd",
+                "DeCmd",
+                "DrCmd"
+              ],
+              "u0": [
+                0.3,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "B-throttle-column": [
+                2.7708039266919706,
+                0.0,
+                0.0,
+                0.0024612639773144425,
+                -1.1293772630057337e-17,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "throttle-column-index": 0,
+              "engine-after": {
+                "n1": 51.0,
+                "n2": 72.0,
+                "thrust": 1070.3537016342398,
+                "gph": 148.59744654097943,
+                "running": 1.0,
+                "fcs-throttle-pos": 0.3
+              }
+            },
+            {
+              "throttle": 0.6,
+              "state-names": [
+                "Vt",
+                "Alpha",
+                "Theta",
+                "Q",
+                "Beta",
+                "Phi",
+                "P",
+                "Psi",
+                "R",
+                "Latitude",
+                "Longitude",
+                "Alt"
+              ],
+              "input-names": [
+                "ThtlCmd",
+                "DaCmd",
+                "DeCmd",
+                "DrCmd"
+              ],
+              "u0": [
+                0.6,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "B-throttle-column": [
+                5.541607853384126,
+                0.0,
+                0.0,
+                0.004922527954633222,
+                7.905640841040136e-17,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "throttle-column-index": 0,
+              "engine-after": {
+                "n1": 72.0,
+                "n2": 84.0,
+                "thrust": 3143.6738651923397,
+                "gph": 328.1480856309182,
+                "running": 1.0,
+                "fcs-throttle-pos": 0.6
+              }
+            },
+            {
+              "throttle": 0.9,
+              "state-names": [
+                "Vt",
+                "Alpha",
+                "Theta",
+                "Q",
+                "Beta",
+                "Phi",
+                "P",
+                "Psi",
+                "R",
+                "Latitude",
+                "Longitude",
+                "Alt"
+              ],
+              "input-names": [
+                "ThtlCmd",
+                "DaCmd",
+                "DeCmd",
+                "DrCmd"
+              ],
+              "u0": [
+                0.9,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "B-throttle-column": [
+                8.312411780080167,
+                0.0,
+                0.0,
+                0.0073837919319491106,
+                7.905640841040136e-17,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "throttle-column-index": 0,
+              "engine-after": {
+                "n1": 93.0,
+                "n2": 96.0,
+                "thrust": 6599.207471122507,
+                "gph": 585.5218392598651,
+                "running": 1.0,
+                "fcs-throttle-pos": 0.9
+              }
+            }
+          ],
+          "engine-states-in-model": "none \u2014 FGLinearization adds spool states only for propeller thrusters, so a turbine contributes no state to x"
+        },
+        "function-calls": {
+          "stock": {
+            "steps": [
+              {
+                "label": "load then RunIC(), engine off",
+                "phase-after": "trim",
+                "evaluations": 2.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one frame, engine off",
+                "phase-after": "off",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "RunIC() at a dry throttle, engine off",
+                "phase-after": "trim",
+                "evaluations": 2.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "propulsion/set-running = -1",
+                "phase-after": "run",
+                "evaluations": 123.0,
+                "tsfc-calls": 123.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one running frame, dry",
+                "phase-after": "run",
+                "evaluations": 1.0,
+                "tsfc-calls": 1.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "RunIC(), running, dry",
+                "phase-after": "trim",
+                "evaluations": 2.0,
+                "tsfc-calls": 2.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "first augmented frame",
+                "phase-after": "run",
+                "evaluations": 1.0,
+                "tsfc-calls": 1.0,
+                "atsfc-calls": 1.0
+              },
+              {
+                "label": "second augmented frame",
+                "phase-after": "run",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 1.0
+              },
+              {
+                "label": "RunIC(), running, augmented",
+                "phase-after": "trim",
+                "evaluations": 2.0,
+                "tsfc-calls": 2.0,
+                "atsfc-calls": 2.0
+              },
+              {
+                "label": "one stalled frame",
+                "phase-after": "stall",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one seized frame",
+                "phase-after": "seize",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one frame after cutoff",
+                "phase-after": "off",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one cranking frame",
+                "phase-after": "spinup",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              }
+            ],
+            "throttle-position-at-augmented": 1.2
+          },
+          "augmethod1": {
+            "steps": [
+              {
+                "label": "load then RunIC(), engine off",
+                "phase-after": "trim",
+                "evaluations": 2.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one frame, engine off",
+                "phase-after": "off",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "RunIC() at a dry throttle, engine off",
+                "phase-after": "trim",
+                "evaluations": 2.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "propulsion/set-running = -1",
+                "phase-after": "run",
+                "evaluations": 123.0,
+                "tsfc-calls": 1.0,
+                "atsfc-calls": 123.0
+              },
+              {
+                "label": "one running frame, dry",
+                "phase-after": "run",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "RunIC(), running, dry",
+                "phase-after": "trim",
+                "evaluations": 2.0,
+                "tsfc-calls": 2.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "first augmented frame",
+                "phase-after": "run",
+                "evaluations": 1.0,
+                "tsfc-calls": 1.0,
+                "atsfc-calls": 1.0
+              },
+              {
+                "label": "second augmented frame",
+                "phase-after": "run",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 1.0
+              },
+              {
+                "label": "RunIC(), running, augmented",
+                "phase-after": "trim",
+                "evaluations": 2.0,
+                "tsfc-calls": 2.0,
+                "atsfc-calls": 2.0
+              },
+              {
+                "label": "one stalled frame",
+                "phase-after": "stall",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one seized frame",
+                "phase-after": "seize",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one frame after cutoff",
+                "phase-after": "off",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              },
+              {
+                "label": "one cranking frame",
+                "phase-after": "spinup",
+                "evaluations": 1.0,
+                "tsfc-calls": 0.0,
+                "atsfc-calls": 0.0
+              }
+            ],
+            "throttle-position-at-augmented": 1.2
+          }
+        }
+      },
+      "instrumented": true,
+      "injection-load": {
+        "run-ic": {
+          "returncode": -11,
+          "signal": 11,
+          "survived": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run-off": {
+          "returncode": 0,
+          "signal": null,
+          "survived": true,
+          "stdout": "loaded B747, engine path /Users/felg/gh/Felipegalind0/jsbsim/engine\nInjWaterNorm after load = 0.0\nRunIC with no injection command: ok, thrust 2830.84\ninjection_cmd set; InjWaterNorm = 0.0\ncalling Run() with the engine off, which dispatches Off()\nsurvived Run(); thrust 0.00\nSURVIVED",
+          "stderr": ""
+        },
+        "run-running": {
+          "returncode": -11,
+          "signal": 11,
+          "survived": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run-ic-with-function": {
+          "returncode": 0,
+          "signal": null,
+          "survived": true,
+          "stdout": "loaded B747, engine path /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/probes/live-candidate/engine-injection-with\nInjWaterNorm after load = 1.0\nRunIC with no injection command: ok, thrust 2830.84\ninjection_cmd set; InjWaterNorm = 1.0\ncalling RunIC(), which dispatches Trim()\nsurvived RunIC(); thrust 2972.38\nSURVIVED",
+          "stderr": ""
+        },
+        "run-running-with-function": {
+          "returncode": 0,
+          "signal": null,
+          "survived": true,
+          "stdout": "loaded B747, engine path /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/probes/live-candidate/engine-injection-with\nInjWaterNorm after load = 1.0\nRunIC with no injection command: ok, thrust 2830.84\ninjection_cmd set; InjWaterNorm = 1.0\ncalling Run() with the engine off, which dispatches Off()\nsurvived Run(); thrust 0.00\nSURVIVED",
+          "stderr": ""
+        }
+      }
+    }
+  }
+}

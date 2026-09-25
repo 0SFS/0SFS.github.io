@@ -1,0 +1,20 @@
+# Module identity, recorded 2026-09-20T01:11:21Z
+# Each extension was loaded through PYTHONPATH=<build>/tests in its own process.
+
+build              sha256 of tests/jsbsim/_jsbsim.so
+master             ef60c3bf3c4f663a7184992fb0d361d43bbf07fa82f249b6bca2a8940725ab29
+trimstatus         e9cbd297451e2f716797be1b80f1c05a7e83dac93451e2f3c06a96bc48d0faac
+diag               4c9dcc5e29f1250e8192bef504fa2ca97ec0e78fd4308e2f1bc8c7593949a81d
+diag-trimstatus    49eec2cfe36b7f5fb5298aa5a65e712806a0d60123e33d8948268d1ffb52c107
+diag-candidate     746e74d6f4f11fbd58f6b78f62f3dea323cd60c09890ebf2fa69ad55f8318a00
+candidate          f739de7773b2144ca315a5e76705d36fcb08e3db4a9a6495c859951198a40779
+
+# candidate is the stage-2 'final' binary, reused unchanged; its hash matches
+# validation/evidence/jsbsim/engine-off-trim/pr1508-candidate-2026-09-19/provenance.json
+
+source             sha256 of src/models/propulsion/FGTurbine.cpp
+master             5bccfd0244d62ae10fd1624b19c34731a257e83ec6ba01182832a2650c472609
+trimstatus         2644efebbeee030295a7ad208ba234fa0f73395c0ff93ab34f5e00d1fc6d790e
+diag               35786119ac921a4b184d8bccbfdaf40af11fc22005ef41aefa5775a9e85cb339
+diag-trimstatus    18019350d6cbe545341c87ffff9d9c4435fd72140aaed94b17a371c2b73d3c44
+diag-candidate     765076ff15ae11cfcb24aa562946f412d9cac0ca5e3389bc604068006df97a12

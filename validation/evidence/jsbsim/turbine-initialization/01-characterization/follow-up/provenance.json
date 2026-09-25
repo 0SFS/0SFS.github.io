@@ -1,0 +1,144 @@
+{
+  "recorded": "2026-09-19",
+  "stage": "1 follow-up - coordinator review of 2026-09-19",
+  "supersedes": "nothing; the original records in the parent directory are unchanged",
+  "jsbsim_checkout": "/Users/felg/gh/Felipegalind0/jsbsim",
+  "branch": "candidate/pr1508-off-engine-fuel",
+  "head": "482da811f1bc6ab42c3cb76c8079eab7af75f49d",
+  "clean": true,
+  "why_new_builds": "the original diagnostics latch the copied propulsion timestep, the executive timestep, the trim status and the phase during an evaluation, so after a public call returns they describe that evaluation and not the state the caller has. The follow-up builds add side-effect-free live getters for the same four values plus the suspension flag, and change nothing else",
+  "builds": {
+    "master": {
+      "extension_sha256": "ef60c3bf3c4f663a7184992fb0d361d43bbf07fa82f249b6bca2a8940725ab29",
+      "fgturbine_cpp_sha256": "5bccfd0244d62ae10fd1624b19c34731a257e83ec6ba01182832a2650c472609",
+      "reused_from": "the original stage-1 run"
+    },
+    "trimstatus": {
+      "extension_sha256": "e9cbd297451e2f716797be1b80f1c05a7e83dac93451e2f3c06a96bc48d0faac",
+      "fgturbine_cpp_sha256": "2644efebbeee030295a7ad208ba234fa0f73395c0ff93ab34f5e00d1fc6d790e",
+      "reused_from": "the original stage-1 run"
+    },
+    "candidate": {
+      "extension_sha256": "f739de7773b2144ca315a5e76705d36fcb08e3db4a9a6495c859951198a40779",
+      "fgturbine_cpp_sha256": null,
+      "reused_from": "the original stage-1 run"
+    },
+    "live": {
+      "extension_sha256": "fb793037516cd7bcc6f97cd4842eb0af3c3f301a1c353f3bd502e2b1a8fa94e8",
+      "fgturbine_cpp_sha256": "0b4c13fca46f2c322e9c381f00cce8890f08e2d598cd61e519d11a9bcea3ba55",
+      "reused_from": null
+    },
+    "live-trimstatus": {
+      "extension_sha256": "343659ded8266425680c026d6e8d70c25950f7e84bebc6a18cf5756675f19fc4",
+      "fgturbine_cpp_sha256": "b9a4ab5be76cf1ac93fbc0085cc39baaf1b7e0742aa69c81c68719e636472dec",
+      "reused_from": null
+    },
+    "live-candidate": {
+      "extension_sha256": "6a40b6fef650fc533f0c620d4bbcac1e1acf93a619fe791cfc7c51b24c46eb26",
+      "fgturbine_cpp_sha256": "4e7fc8c4616aeb4e7392397446a8f1683de3a9d59436390724eba106acf03fd9",
+      "reused_from": null
+    }
+  },
+  "equivalence": {
+    "new instrumented vs its uninstrumented pair": {
+      "master vs live": {
+        "values_compared": 2137,
+        "values_differing": 0
+      },
+      "trimstatus vs live-trimstatus": {
+        "values_compared": 2137,
+        "values_differing": 0
+      },
+      "candidate vs live-candidate": {
+        "values_compared": 2137,
+        "values_differing": 0
+      }
+    },
+    "new instrumented vs the original instrumented build": {
+      "diag vs live": {
+        "values_compared": 5137,
+        "values_differing": 0
+      },
+      "diag-trimstatus vs live-trimstatus": {
+        "values_compared": 5137,
+        "values_differing": 0
+      },
+      "diag-candidate vs live-candidate": {
+        "values_compared": 5137,
+        "values_differing": 0
+      }
+    },
+    "uninstrumented builds vs the first run": {
+      "master": {
+        "values_compared": 2137,
+        "values_differing": 0
+      },
+      "trimstatus": {
+        "values_compared": 2137,
+        "values_differing": 0
+      },
+      "candidate": {
+        "values_compared": 2137,
+        "values_differing": 0
+      }
+    }
+  },
+  "tools": {
+    "runic_trace.py": {
+      "path": "scripts/validation/jsbsim/turbine-initialization/runic_trace.py",
+      "sha256": "0c44ce7d64b443476c59a12772b55e9ec4af5f4bd6786354e0e769470b6f1066"
+    },
+    "engine_probes.py": {
+      "path": "scripts/validation/jsbsim/turbine-initialization/engine_probes.py",
+      "sha256": "397a24825d5ded2446184c9b6eeca3fe5b3fb3f6c21fea139b0a4c135b7b61b3"
+    },
+    "instrument_turbine.py": {
+      "path": "scripts/validation/jsbsim/turbine-initialization/instrument_turbine.py",
+      "sha256": "ce91a93a86b42aa0f6d805363084d697596f5ed34d75e665983be0bf747f3ef1"
+    }
+  },
+  "commands": {
+    "instrument": "python3 /Users/felg/gh/0sfs/scripts/validation/jsbsim/turbine-initialization/instrument_turbine.py /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/src/<label>",
+    "configure": "cmake -S /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/src/<label> -B /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/<label> -DCMAKE_BUILD_TYPE=Release -DBUILD_DOCS=OFF -DBUILD_SHARED_LIBS=OFF -DBUILD_PYTHON_MODULE=ON -DPython3_EXECUTABLE=/Users/felg/gh/Felipegalind0/jsbsim/.venv/bin/python -DCYTHON_EXECUTABLE=/Users/felg/gh/Felipegalind0/jsbsim/.venv/bin/cython",
+    "build": "cmake --build /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/<label> -j 8",
+    "trace": "/Users/felg/gh/Felipegalind0/jsbsim/.venv/bin/python /Users/felg/gh/0sfs/scripts/validation/jsbsim/turbine-initialization/runic_trace.py --source /Users/felg/gh/Felipegalind0/jsbsim --build master=/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/master --build trimstatus=/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/trimstatus --build candidate=/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/final --build live=/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/live --build live-trimstatus=/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/live-trimstatus --build live-candidate=/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/live-candidate --output /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/trace-live",
+    "probes": "/Users/felg/gh/Felipegalind0/jsbsim/.venv/bin/python /Users/felg/gh/0sfs/scripts/validation/jsbsim/turbine-initialization/engine_probes.py --source /Users/felg/gh/Felipegalind0/jsbsim --build live=/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/live --build live-candidate=/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/live-candidate --output /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/probes"
+  },
+  "fixtures": {
+    "f16": {
+      "aircraft": "78edd90534338204913c35ed50d7c222eecac1b83c454c73ad70bf6d4907ea2f",
+      "ic": "738c7d0f3495b072bcdb570c203c92cbd7ae5af3c4213f01183a46dd861a0c85",
+      "engine": "92fd101fdcc60dc8f41f449a297e134419ff062f5293c2e58678fd07d8127e69"
+    },
+    "737": {
+      "aircraft": "1ac0bde51e3665306ebdc70f7920748aaf1b58a0f5443b63eed400dbf92be338",
+      "ic": "7f2ebb073c6f29b5274cdb091fbb31f302f1e1381e348850a3d8d4ca2c88da67",
+      "engine": "953efe535c5daf7fc7674dd39799b8a600b7d3a730b38b1db4884288c6d2a7d7"
+    },
+    "B747": {
+      "aircraft": "da5c74608dc7a53402270efa150083316d87018726ea25c66a2f30be05e484a9",
+      "ic": "a165eccfdba92a9c99f68c12c87fc7824ffad5c7a3b54abecce6ce15b6ada0ea",
+      "engine": "4b63dde10ba1cccd518068162eb05681ee4ba7b939bf13ed2362dd5a5d596942"
+    },
+    "note": "the 737 aircraft file is sandbox-copied with its two <input port> elements removed before use; the B747 engine is sandbox-copied with an Injection function added for the control arms"
+  },
+  "toolchain": {
+    "compiler": "AppleClang 21.0.0",
+    "cmake": "4.4.3",
+    "python": "3.14.7",
+    "cython": "3.3.0",
+    "platform": "Darwin 27.0.0 arm64"
+  },
+  "probes_run": [
+    "live-state",
+    "nesting",
+    "starvation",
+    "fuel-matrix",
+    "stale-tsfc",
+    "n2norm-spool-rate",
+    "stall-recovery",
+    "linearization",
+    "function-calls",
+    "injection-load"
+  ]
+}

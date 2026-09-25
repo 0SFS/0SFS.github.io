@@ -1,0 +1,51 @@
+{
+  "recorded": "2026-09-20",
+  "stage": "1 second follow-up - coordinator follow-up review of 2026-09-19",
+  "supersedes": "nothing; the records in the parent directory and in follow-up/ are unchanged",
+  "jsbsim_checkout": "/Users/felg/gh/Felipegalind0/jsbsim",
+  "branch": "candidate/pr1508-off-engine-fuel",
+  "head": "482da811f1bc6ab42c3cb76c8079eab7af75f49d",
+  "clean": true,
+  "why_these_probes": "the follow-up review left five contract groups open. Three of them turned on a factual question that source reading alone states but does not exhibit: what RunIC() seeds the integrator derivative history with, which runtime writes a scenario reset keeps, and whether refilling the tanks while fuel freeze is on clears a latched starvation. Each is one probe on an already-verified binary. No new build was made and no other probe was rerun.",
+  "builds": {
+    "master": {
+      "extension_sha256": "ef60c3bf3c4f663a7184992fb0d361d43bbf07fa82f249b6bca2a8940725ab29",
+      "path": "build/turbine-init-01-20260919/master",
+      "reused_from": "the original stage-1 run, unchanged; the hash matches follow-up/provenance.json"
+    },
+    "candidate": {
+      "extension_sha256": "f739de7773b2144ca315a5e76705d36fcb08e3db4a9a6495c859951198a40779",
+      "path": "build/pr1508-off-engine-20260919/final",
+      "reused_from": "the original stage-1 run, unchanged; the hash matches follow-up/provenance.json"
+    }
+  },
+  "tools": {
+    "engine_probes.py": {
+      "path": "scripts/validation/jsbsim/turbine-initialization/engine_probes.py",
+      "sha256": "180fa7d553256272239097a0d13c723f8110d1989c0c1a8cda1f521118dce288",
+      "change": "three probes added - derivative-seeding, cold-reset, frozen-refill. No existing probe was edited, so the earlier probes still reproduce follow-up/probes.json from the same binaries"
+    }
+  },
+  "sources_traced": {
+    "note": "read, not instrumented. These are the files the completion-sequence and fuel corrections were traced in",
+    "src/FGFDMExec.cpp": "07c2956c81324ffd6423cad30f2953b38343e081460318530eabae7e85349c66",
+    "src/models/FGPropagate.cpp": "c6805576989331b550acbe76a5401807e8ea6170c13efb1a6340b4f18efbd181",
+    "src/models/FGPropulsion.cpp": "5f9db76029b10505faf7243b6c850f13927cd4c84a8e3d7def0b9bfcfdfa0250",
+    "src/models/propulsion/FGTurbine.cpp": "32c87c0c7984dccdf72f0ed14d8e8846dbf1f0b97e3960709be980643f6c59ef"
+  },
+  "commands": {
+    "probes": "/Users/felg/gh/Felipegalind0/jsbsim/.venv/bin/python /Users/felg/gh/0sfs/scripts/validation/jsbsim/turbine-initialization/engine_probes.py --source /Users/felg/gh/Felipegalind0/jsbsim --build master=/Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/master --build candidate=/Users/felg/gh/Felipegalind0/jsbsim/build/pr1508-off-engine-20260919/final --probe derivative-seeding --probe cold-reset --probe frozen-refill --output /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-init-01-20260919/probes-followup2"
+  },
+  "agreement_between_builds": {
+    "derivative-seeding": { "values_compared": 46, "values_differing": 2,
+      "differing": "N2 after RunIC() at throttle 0.0 - master leaves the member at 100.0, the candidate assigns the steady 53.0. That is the repair under test, not a probe disagreement" },
+    "cold-reset": { "values_compared": 105, "values_differing": 0 },
+    "frozen-refill": { "values_compared": 55, "values_differing": 0 }
+  },
+  "not_done": [
+    "no new build",
+    "no rerun of the sixteen-scenario trace or of any earlier probe",
+    "no production source change; the JSBSim checkout stayed clean at the head above",
+    "no test suite run, no branch created or moved, nothing pushed, nothing posted"
+  ]
+}

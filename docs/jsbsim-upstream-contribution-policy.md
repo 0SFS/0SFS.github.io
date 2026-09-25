@@ -90,6 +90,14 @@ intent, shared engine calculations and completion before initialization returns.
 It is a local proposal, not an implemented fix or an agreed plan for every open
 PR; caller compatibility and delivery decisions remain open.
 
+On 2026-09-19 the user accepted that turbine direction and requested the
+[implementation plan](turbine-initialization/plan.md). It stages focused
+#1505/#1508 repairs, shared calculations, explicit evaluation/initialization,
+caller and trim finalization, then verified SDK/app adoption. Its first
+characterization task settles the detailed compatibility/API decisions;
+neither the plan nor the historical experiment establishes implementation
+readiness. The scope is turbine lifecycle work, not a plan for every open PR.
+
 [The review record](validation/jsbsim-open-pr-review-2026-09-14.md) reads every
 open PR and has the evidence. It changes readiness as follows:
 
