@@ -1,8 +1,8 @@
-import { trackViewportInsets } from "foss-earth/shell";
+import "foss-earth/shell.css";
+import { createGameLog, trackViewportInsets, type GameLog } from "foss-earth/shell";
 import { appRouteFrom, canonicalAppLocation, FOSS_EARTH_URL, type AppRoute } from "./appRoute";
 import { offerFullscreen } from "./fullscreen/fullscreen";
 import { createFlightLoadingScreen, type FlightLoadingScreen } from "./loading/createFlightLoadingScreen";
-import { createGameLog, type GameLog } from "./log/createGameLog";
 
 function appRoute(): AppRoute {
   return appRouteFrom(new URL(window.location.href));

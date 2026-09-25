@@ -141,15 +141,12 @@ import {
   saveKeyboardStickSettings,
 } from "./input/keyboardStickSettings";
 import { createGamepadPollingController } from "./input/gamepadPolling";
-import {
-  loadOrbitInvertSettings,
-  saveOrbitInvertSettings,
-} from "./input/orbitInvertSettings";
+import { loadOrbitInvertSettings, saveOrbitInvertSettings } from "foss-earth/input";
 import { createJsbsimRuntime } from "./jsbsim/createJsbsimRuntime";
 import { getFdmProfile } from "./jsbsim/fdmProfiles";
 import { createFixedStepPhysicsLoop, FIXED_DT } from "./physics/fixedStepLoop";
 import { createFlightLoadingScreen, type FlightLoadingScreen } from "../loading/createFlightLoadingScreen";
-import { createGameLog, type GameLog } from "../log/createGameLog";
+import { createGameLog, type GameLog } from "foss-earth/shell";
 import { appHref } from "../appRoute";
 import { DEFAULT_FLIGHT_START, START_ALTITUDE_AGL_METERS } from "./jsbsim/bootstrapC172";
 

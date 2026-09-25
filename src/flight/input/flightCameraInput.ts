@@ -1,6 +1,7 @@
-import { isSafariGestureSupported, type HudInputMode, type InputSensitivitySettings } from "foss-earth/input";
-import type { OrbitInvertSettings } from "./orbitInvertSettings";
-import { DEFAULT_ORBIT_INVERT_SETTINGS } from "./orbitInvertSettings";
+import {
+  DEFAULT_ORBIT_INVERT_SETTINGS, isSafariGestureSupported,
+  type HudInputMode, type InputSensitivitySettings, type OrbitInvertSettings,
+} from "foss-earth/input";
 
 export interface FlightCameraInputOptions {
   getMode(): HudInputMode;

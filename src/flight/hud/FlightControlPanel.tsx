@@ -46,13 +46,13 @@ import {
   KEYBOARD_STICK_MODES,
   type KeyboardStickSettings,
 } from "../input/keyboardStickSettings";
-import type { OrbitInvertSettings } from "../input/orbitInvertSettings";
+import type { OrbitInvertSettings } from "foss-earth/input";
 import { GAMEPAD_POLLING_OPTIONS, type GamepadPollingController } from "../input/gamepadPolling";
 import {
   DEFAULT_GAMEPAD_RESPONSE_SETTINGS,
   type GamepadResponseController,
   type GamepadResponseSettings,
-} from "../input/gamepadResponseSettings";
+} from "@felipegalind0/gamepad-tools/core";
 import { WHEEL_SPIN_CONFIGS, type WheelSpinMode, type WheelSpinState } from "../physics/wheelSpin";
 import {
   GroundInteractionSettingsPanel,

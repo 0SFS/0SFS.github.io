@@ -59,7 +59,11 @@ vi.mock("foss-earth/runtime", () => ({
   resolveRasterBaseMapSource: vi.fn(), resolveMapRuntimeConfig: () => ({}),
   setMapSourcePreference: vi.fn(), setTerrainSourcePreference: vi.fn(), setRasterQualityPreference: vi.fn(),
 }));
-vi.mock("foss-earth/input", () => ({ loadInputModePreference: () => "mouse", loadInputSensitivityPreference: () => ({}) }));
+vi.mock("foss-earth/input", () => ({
+  loadInputModePreference: () => "mouse", loadInputSensitivityPreference: () => ({}),
+  loadOrbitInvertSettings: () => ({ invertYaw: false, invertPitch: false, recenterMode: "hold" }),
+  saveOrbitInvertSettings: vi.fn(),
+}));
 vi.mock("./jsbsim/createJsbsimRuntime", () => ({ createJsbsimRuntime: async () => ({ sdk: mocks.sdk, dispose: mocks.disposeSdk }) }));
 vi.mock("./bridge/ecefBridge", () => ({ readFlightState: () => mocks.state }));
 vi.mock("./bridge/floatingOrigin", () => ({ createFloatingOrigin: () => ({ aircraftRoot: { setEnabled: vi.fn() }, apply: vi.fn(), dispose: vi.fn() }) }));

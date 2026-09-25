@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createGameLog } from "../log/createGameLog";
+import { createGameLog } from "foss-earth/shell";
 import { createFlightLoadingScreen, type FlightLoadingScreen } from "./createFlightLoadingScreen";
 
 let screen: FlightLoadingScreen;

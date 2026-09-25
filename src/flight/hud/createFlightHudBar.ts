@@ -4,7 +4,7 @@ import "foss-earth/input-mode.css";
 
 import { attachRendererActivity, attachTileStreamingActivity, attachMapDownloadSpeed, setMapSourceLabel, createInputModeHud, createHudBar, type HudBarHandle, type RenderActivitySource, type TileStreamingSource, type MapDownloadSource } from "foss-earth/shell";
 import type { BabylonRuntimeStatus, RasterBaseMapSource, RendererMode, TerrainSource } from "foss-earth/runtime";
-import { canRequestFullscreen, isFullscreen, onFullscreenChange, toggleFullscreen } from "../../fullscreen/fullscreen";
+import { canRequestFullscreen, isFullscreen, onFullscreenChange, toggleFullscreen } from "foss-earth/shell";
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
 
 export interface FlightTerrainDetailState {

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createGameLog, type GameLog } from "../log/createGameLog";
+import { createGameLog, type GameLog } from "foss-earth/shell";
 import { FULLSCREEN_BLOCKED_TITLE } from "../remote/fullscreenMessage";
 import { offerFullscreen } from "./fullscreen";
 // Loaded on demand by the iPhone offer; loading it here first keeps the waits short.
@@ -52,7 +52,7 @@ describe("fullscreen offer", () => {
     stubFullscreenApi();
     offerFullscreen(log);
 
-    expect(log.element.children).toHaveLength(0);
+    expect(log.element.querySelectorAll(".game-log__line")).toHaveLength(0);
   });
 
   it("enters fullscreen only from the pilot's button and remembers Every visit", async () => {
@@ -60,12 +60,12 @@ describe("fullscreen offer", () => {
     stubFullscreenApi();
     offerFullscreen(log);
     expect(requestFullscreen).not.toHaveBeenCalled();
-    const everyVisit = log.element.querySelectorAll("button")[1];
+    const everyVisit = log.element.querySelectorAll(".game-log__line button")[1];
     expect(everyVisit.getAttribute("aria-pressed")).toBe("false");
 
     everyVisit.click();
     expect(window.localStorage.getItem("osfs.fullscreen-every-visit")).toBe("1");
-    log.element.querySelector("button")!.click();
+    log.element.querySelector<HTMLButtonElement>(".game-log__line button")!.click();
 
     expect(requestFullscreen).toHaveBeenCalledWith({ navigationUI: "hide" });
     await vi.waitFor(() => expect(log.element.textContent).toContain("Fullscreen. Use ⛶"));
@@ -79,7 +79,7 @@ describe("fullscreen offer", () => {
     expect(log.element.textContent).toContain("first tap");
 
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
-    log.element.querySelector("button")!.dispatchEvent(new Event("pointerup", { bubbles: true }));
+    log.element.querySelector(".game-log__line button")!.dispatchEvent(new Event("pointerup", { bubbles: true }));
     expect(requestFullscreen).not.toHaveBeenCalled();
 
     document.body.dispatchEvent(new Event("pointerup", { bubbles: true }));
@@ -137,7 +137,7 @@ describe("fullscreen offer on an iPhone", () => {
     stubMedia(query => query === "(pointer: coarse)" || query.includes("display-mode"));
     offerFullscreen(log);
 
-    expect(log.element.children).toHaveLength(0);
+    expect(log.element.querySelectorAll(".game-log__line")).toHaveLength(0);
   });
 
   it("leaves a touch browser with page fullscreen on the log's own offer", () => {

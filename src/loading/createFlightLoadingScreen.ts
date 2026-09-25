@@ -1,4 +1,4 @@
-import { createGameLog, type GameLog, type GameLogEntry, type GameLogLine } from "../log/createGameLog";
+import { createGameLog, type GameLog, type GameLogEntry, type GameLogLine } from "foss-earth/shell";
 import type { TerrainPreparationProgress } from "foss-earth/runtime";
 
 export type FlightLoadingPhase = "app" | "world" | "flight" | "assets" | "terrain";

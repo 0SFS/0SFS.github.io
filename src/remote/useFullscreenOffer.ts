@@ -3,13 +3,13 @@ import {
   canRequestFullscreen, enterFullscreen, isFullscreen, isStandaloneDisplay, onFullscreenChange,
   prefersHomeScreenInstall, readFullscreenEveryVisit, readFullscreenPromptDismissed, toggleFullscreen,
   writeFullscreenPromptDismissed,
-} from '../fullscreen/fullscreen'
+} from 'foss-earth/shell'
 
 /**
  * Fullscreen on the controller: a popup that asks once, and a ⛶ button in the
  * chip grid for every time after that.
  *
- * Three constraints shape this, all of them from `src/fullscreen/fullscreen.ts`:
+ * Three constraints shape this, all of them from FOSS Earth's fullscreen module:
  * browsers grant fullscreen only inside a tap, so both are buttons and never an
  * effect; iPhone Safari has no page fullscreen at all, so there is nothing to
  * offer there but Add to Home Screen; and a controller that asks again every

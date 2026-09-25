@@ -1,7 +1,7 @@
 import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import type { ActionIntentFrame } from "@felipegalind0/gamepad-tools/core";
 import { applyFlightControls } from "./applyFlightControls";
-import { createGamepadResponseController, type GamepadResponseController } from "./gamepadResponseSettings";
+import { createGamepadResponseController, type GamepadResponseController } from "@felipegalind0/gamepad-tools/core";
 import {
   applyStickExpo,
   createKeyboardAxisState,
@@ -194,7 +194,9 @@ export function createFlightInputManager(options: {
   const bindingIntentValues = new Map<string, BindingIntentValue>();
   const keyboardBindingAxes = new Set<BindingAxis>();
   const gamepadBindingAxes = new Set<BindingAxis>();
-  const gamepadResponse = createGamepadResponseController();
+  // The key predates the move into gamepad-tools; passing it keeps a pilot's
+  // saved response setting.
+  const gamepadResponse = createGamepadResponseController({ storageKey: "osfs.gamepad-response" });
   let primeBindingCommands = true;
   const enabledAxes = new Set<number>();
   const enabledButtons = new Set<number>();

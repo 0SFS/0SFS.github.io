@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { BindingRuntime } from "@felipegalind0/gamepad-tools/core";
 import { createBrowserInputSource } from "@felipegalind0/gamepad-tools/browser";
 import { createFlightInputManager, type FlightInputManager } from "./flightInputManager";
-import { DEFAULT_GAMEPAD_RESPONSE_SETTINGS, type GamepadResponseSettings } from "./gamepadResponseSettings";
+import { DEFAULT_GAMEPAD_RESPONSE_SETTINGS, type GamepadResponseSettings } from "@felipegalind0/gamepad-tools/core";
 import {
   createFlightGamepadAdapter,
   createLegacyFlightProfile,
