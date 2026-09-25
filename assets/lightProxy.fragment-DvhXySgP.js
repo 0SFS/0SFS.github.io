@@ -1,0 +1,3 @@
+import{K as e}from"./index-fa2H_vXh.js";import{t}from"./shaderStore-DSzASZqB.js";var n=e({lightProxyPixelShader:()=>a}),r=`lightProxyPixelShader`,i=`flat varying vec2 vLimits;flat varying highp uint vMask;void main(void) {if (gl_FragCoord.y<vLimits.x || gl_FragCoord.y>vLimits.y) {discard;}
+gl_FragColor=vec4(vMask,0,0,1);}
+`;t.ShadersStore[r]||(t.ShadersStore[r]=i);var a={name:r,shader:i};export{n as t};

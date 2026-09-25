@@ -64,11 +64,10 @@
       }, true);
     </script>
     <style>
-      /* Paint immediately, before the application or its styles download. Mirrors src/log/gameLog.css. */
+      /* Paint immediately, before the application or its styles download. Mirrors foss-earth's src/log/gameLog.css, reached here through foss-earth/shell.css. */
       html { color-scheme: dark; }
       html, body { margin: 0; background: #080e14; }
-      .game-log { position: fixed; z-index: 25; top: calc(84px + env(safe-area-inset-top, 0px)); left: calc(12px + env(safe-area-inset-left, 0px)); box-sizing: border-box; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; width: max-content; max-width: min(380px, calc(100vw - 88px)); color: #ecf1f4; font: 12px/1.4 ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
-      @media (min-width: 884px) { .game-log { top: calc(12px + env(safe-area-inset-top, 0px)); left: 50%; max-width: clamp(220px, calc(100vw - 688px), 560px); transform: translateX(-50%); } }
+      .game-log { position: fixed; z-index: 25; top: calc(12px + env(safe-area-inset-top, 0px)); left: calc(12px + env(safe-area-inset-left, 0px)); box-sizing: border-box; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; width: max-content; max-width: min(380px, calc(100vw - 88px)); color: #ecf1f4; font: 12px/1.4 ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
       .game-log [hidden] { display: none !important; }
       .game-log__line { box-sizing: border-box; width: fit-content; max-width: 100%; padding: 4px 8px; border-radius: 6px; background: rgba(4, 7, 11, 0.66); }
       .game-log__line[data-tone="error"] { color: #ffd1c9; background: rgba(58, 18, 16, 0.84); }
@@ -85,8 +84,8 @@
       #info-first-paint a { display: inline-block; margin-top: 8px; padding: 12px 20px; border-radius: 8px; background: #e8b647; color: #080e14; font-weight: 650; text-decoration: none; }
       #info-first-paint a:focus-visible { outline: 3px solid #79d9ff; outline-offset: 3px; }
     </style>
-    <script type="module" crossorigin src="/assets/index-C-Y6kbze.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-K8eAosTU.css">
+    <script type="module" crossorigin src="/assets/index-fa2H_vXh.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BxNQNpj9.css">
   </head>
   <body>
     <div id="root"></div>
