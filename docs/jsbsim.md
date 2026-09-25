@@ -104,11 +104,14 @@ and new acceptance evidence. FOSS Earth still uses `file:../foss-earth`; its
 checkout/build remains necessary, and it does not acquire a JSBSim dependency.
 
 Build engine or SDK changes from `/Users/felg/gh/Felipegalind0/jsbsim` on
-`master`. New work branches from there. The original `integration` branch is
+`master`. New work branches from there, and the checkout returns to `master`
+when the branch's work is done. The original `integration` branch is
 the preserved pre-import reference, not the development tip. The PR branches
 `feature/wasm-package`, `fix/emscripten-portability`, `fix/turbine-trim-spool`,
-`fix/turbine-trim-fuel-flow` and `fix/model-reload-lifetime` are review slices of
-work already on `master`, not more complete versions of it.
+`fix/turbine-trim-fuel-flow`, `fix/model-reload-lifetime`, `feature/wheel-spin-dof`
+and `feature/tank-temperature-property`, and the local
+`candidate/pr1508-off-engine-fuel`, are review slices of work already on
+`master`, not more complete versions of it.
 
 ```sh
 npm --prefix wasm ci
@@ -185,7 +188,9 @@ The accepted application artifact is:
 | Emitted/browser WASM SHA-256 | `6eae23db0fc26d4e02daa27eb95fba12932265164e4bb194cb3e183d04882806` |
 
 That is fork.7, packed from `feature/jsbsim-package-rename`. The JSBSim checkout's
-`master` (`f9082ee1`) is that commit merged with JSBSim-Team `master`. Earlier
+`master` merged that commit with JSBSim-Team `master` in `f9082ee1`, and has since
+taken the tank temperature property, the #1502 review round and the local #1505
+and #1508 off-engine repairs. Earlier
 fork identities remain in
 [the adoption records](../validation/evidence/jsbsim/adoption/) and the
 [historical in-tree execution record](old/jsbsim-in-tree-integration-2026-09-13.md).
