@@ -1,6 +1,8 @@
 import "foss-earth/shell.css";
+import type { WebGPUEngine } from "@babylonjs/core";
 import { canTimeGpuFrames, createFrameProfiler, profileBabylonScene } from "foss-earth/perf";
 import { setActiveFrameProfile } from "./diagnostics/frameProfile";
+import { attitudeRendererSetting } from "./settings/attitudeRendererSetting";
 import "foss-earth/windowing.css";
 import type { LocationSearchProvider, GeodeticLocation } from "foss-earth/windowing";
 import { resetFlightLocation } from "./jsbsim/resetFlightLocation";
@@ -762,6 +764,21 @@ export async function createFlightSimApp(
     pitchAutoTrim: pitchAutoTrim.enabled,
     rollAutoTrim: rollAutoTrim.enabled,
     autopilotEngaged: lastApResult.engaged,
+    // Babylon keeps its device on an internal field. Sharing it puts the
+    // instrument on the globe's queue instead of opening a second device.
+    gpuDevice: runtime.renderer.mode === "webgpu" ? (runtime.renderer.engine as WebGPUEngine)._device : null,
+    attitudeRenderer: attitudeRendererSetting.getState().preference,
+    onAttitudeStatus: status => {
+      attitudeRendererSetting.publishStatus(status);
+      if (!status.backend) return;
+      flightLog.info("hud", `Attitude indicator draws with ${status.backend === "webgpu" ? "WebGPU" : "Canvas 2D"}`,
+        { preference: status.preference, renderer: runtime.renderer.mode, ...(status.reason ? { reason: status.reason } : {}) });
+    },
+    profiler: frameProfiler,
+  });
+  const stopAttitudeSetting = attitudeRendererSetting.subscribe(() => {
+    flightHud.setAttitudeRenderer(attitudeRendererSetting.getState().preference);
+    runtime.requestRender();
   });
 
   let floatingOrigin: FloatingOriginHandle | null = null;
@@ -1935,6 +1952,7 @@ export async function createFlightSimApp(
       detachCameraInput();
       detachInput();
       if (flightPerformance) setActiveFlightPerformanceCapture(null);
+      stopAttitudeSetting();
       setFrameProfiling(false);
       setActiveFrameProfile(null);
       if (phoneCameraTrace) setActivePhoneCameraTrace(null);

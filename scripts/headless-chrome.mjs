@@ -1,8 +1,11 @@
 import { spawn } from "node:child_process";
 import { access } from "node:fs/promises";
 
-/** Bounded headless Chrome control through inherited pipes; no HTTP server/listener. */
-export async function openHeadlessChrome(profileDirectory, explicitBinary = process.env.CHROME_BIN) {
+/**
+ * Bounded headless Chrome control through inherited pipes; no HTTP server/listener.
+ * `extraArgs` adds command-line switches, such as `--enable-webgpu-developer-features`.
+ */
+export async function openHeadlessChrome(profileDirectory, explicitBinary = process.env.CHROME_BIN, extraArgs = []) {
   const candidates = explicitBinary ? [explicitBinary] : [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "/usr/bin/google-chrome", "/usr/bin/chromium",
@@ -15,7 +18,7 @@ export async function openHeadlessChrome(profileDirectory, explicitBinary = proc
   const child = spawn(executable, [
     "--headless=new", "--remote-debugging-pipe", "--no-first-run", "--no-default-browser-check",
     "--disable-background-networking", "--disable-component-update", "--disable-extensions",
-    "--disable-sync", "--mute-audio", "--user-data-dir=" + profileDirectory, "about:blank",
+    "--disable-sync", "--mute-audio", "--user-data-dir=" + profileDirectory, ...extraArgs, "about:blank",
   ], { stdio: ["ignore", "ignore", "pipe", "pipe", "pipe"] });
   const pending = new Map();
   const listeners = new Set();

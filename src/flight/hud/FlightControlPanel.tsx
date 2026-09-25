@@ -61,7 +61,9 @@ import {
 } from "./GroundInteractionSettingsPanel";
 import { AutopilotPanel, type AutopilotPanelState } from "./AutopilotPanel";
 import { SoundSettingsPanel, type SoundAction } from "./SoundSettingsPanel";
+import { AttitudeIndicatorSettings } from "./AttitudeIndicatorSettings";
 import { FrameBudgetPanel } from "./FrameBudgetPanel";
+import { attitudeRendererSetting } from "../settings/attitudeRendererSetting";
 import { RemoteControlTab, type MountPhonePairing } from "./RemoteControlTab";
 import type { PhoneCameraTuning } from "../remote/phoneCameraTuning";
 import {
@@ -1060,6 +1062,7 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
               : tabId === "engine" ? <EngineDetailsHost attach={props.attachEngineDetails} />
               : tabId === "logging" ? <LoggingPanel state={props.snapshot.logging} onAction={props.onLoggingAction} />
               : tabId === "settings" ? <>
+                <AttitudeIndicatorSettings setting={attitudeRendererSetting} />
                 <fieldset className="flight-panel__fieldset">
                   <legend>Ground impacts</legend>
                   <label className="flight-panel__field flight-panel__field--inline">
