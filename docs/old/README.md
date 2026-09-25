@@ -15,6 +15,7 @@ Current sources:
 
 | File | Why it is here |
 | --- | --- |
+| `project-origin-spark-2026-09-19.md` | Origin spark: JSBSim discussion #984 plus the WASM-meets-FOSS-Earth idea |
 | `jsbsim-dependency-centralization.md` | Implemented two-repo centralization spec |
 | `jsbsim-centralization-2026-09-13.md` | fork.1 acceptance / two-repo layout |
 | `jsbsim-in-tree-integration-2026-09-13.md` | SDK-into-native import; fork.3–.4 identities |
