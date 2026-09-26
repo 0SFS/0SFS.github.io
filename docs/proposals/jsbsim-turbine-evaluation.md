@@ -27,7 +27,7 @@ time.
 
 Implement the native behavior in `Felipegalind0/jsbsim`, targeting
 `JSBSim-Team/jsbsim`. Any reusable SDK exposure belongs in that repository's
-`wasm/`. OSFS consumes a verified package and owns application reset/audio tests.
+`wasm/`. 0SFS consumes a verified package and owns application reset/audio tests.
 The [contribution policy](../jsbsim-upstream-contribution-policy.md) governs
 readiness and adoption.
 

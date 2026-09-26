@@ -2,7 +2,7 @@
 
 Status: **Implemented; device and network acceptance testing pending**  
 Date: 2026-09-08  
-Reviewed checkout: OSFS `4d54d204e584`
+Reviewed checkout: 0SFS `4d54d204e584`
 
 ## Intended result
 
@@ -84,7 +84,7 @@ flowchart LR
     J --> R[Desktop rendering]
 ```
 
-PeerJS Cloud forwards the setup information that lets the browsers establish their connection. It does not own application sessions, authenticate the phone for OSFS, or receive our control snapshots. The desktop implements pairing and ownership locally. Public STUN assists ICE address discovery; it does not relay aircraft controls.
+PeerJS Cloud forwards the setup information that lets the browsers establish their connection. It does not own application sessions, authenticate the phone for 0SFS, or receive our control snapshots. The desktop implements pairing and ownership locally. Public STUN assists ICE address discovery; it does not relay aircraft controls.
 
 The application remains usable with local controls if PeerJS Cloud is unavailable. An already established healthy peer connection can continue through a signaling-only outage. New pairing requires signaling availability.
 
@@ -306,7 +306,7 @@ V1 introduces no paid infrastructure. Free services can change or become unavail
 | `src/flight/createFlightSimApp.ts`, HUD updates | Composition, pause/reset/destroy wiring, applied-control diagnostics. |
 | `package.json`, lockfile, README | Client dependencies, production configuration, usage and limitations. |
 
-Keep feature code in OSFS. No FOSS Earth modification or `services/signaling/` deployment is planned.
+Keep feature code in 0SFS. No FOSS Earth modification or `services/signaling/` deployment is planned.
 
 ## Acceptance criteria
 

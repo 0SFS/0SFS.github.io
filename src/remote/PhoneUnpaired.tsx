@@ -9,7 +9,7 @@ import { PhoneQrScanner } from './PhoneQrScanner'
 export function PhoneUnpaired({ onPair }: { onPair(url: string): void }) {
   const [scanning, setScanning] = useState(false)
   return <main className="phone-app phone-app--empty">
-    <div className="phone-brand"><span className="phone-brand__mark" aria-hidden="true">✈</span><strong>OSFS</strong></div>
+    <div className="phone-brand"><span className="phone-brand__mark" aria-hidden="true">✈</span><strong>0SFS</strong></div>
     <h1>Scan a new QR to connect</h1>
     <p>Each QR pairs once, so this controller needs a new one. Open the <strong>Remote Control</strong> tab on the computer and scan its QR.</p>
     <button type="button" className="phone-empty-scan" onClick={() => setScanning(true)}>Scan QR code</button>

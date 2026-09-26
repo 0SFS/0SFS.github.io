@@ -48,7 +48,7 @@ met; it is not a legal opinion.
 
 ## Transitive dependency boundary
 
-The OSFS lockfile contains 347 registry packages and one local link;
+The 0SFS lockfile contains 347 registry packages and one local link;
 FOSS Earth contains 314 registry packages. `npm ls --all` succeeded for both.
 The installed package metadata declared licenses for the registry packages
 reviewed. In addition to permissive MIT/ISC/Apache/BSD families, the resolved

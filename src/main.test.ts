@@ -31,7 +31,7 @@ beforeEach(() => {
 afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 describe("application route", () => {
-  it("loads only OSFS when mode=flight", async () => {
+  it("loads only 0SFS when mode=flight", async () => {
     window.history.replaceState(null, "", "/?mode=flight&mapSource=google&key=test-key");
 
     await import("./main");

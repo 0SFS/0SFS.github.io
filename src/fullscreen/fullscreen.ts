@@ -27,7 +27,7 @@ export function offerFullscreen(log: GameLog): () => void {
       // Without its chunk the log line below still says what to do.
       .catch(() => null);
     log.print({
-      text: "To hide the browser bars, add OSFS to your Home Screen (Share → Add to Home Screen).",
+      text: "To hide the browser bars, add 0SFS to your Home Screen (Share → Add to Home Screen).",
       actions: [{ label: "Why?", onClick: () => { void notice.then(current => current?.open()); } }],
     });
     return () => {

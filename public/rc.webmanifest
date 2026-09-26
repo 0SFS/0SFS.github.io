@@ -1,6 +1,6 @@
 {
-  "name": "OSFS RC — Phone Controller",
-  "short_name": "OSFS RC",
+  "name": "0SFS RC — Phone Controller",
+  "short_name": "0SFS RC",
   "start_url": "./rc/",
   "scope": "./rc/",
   "display": "fullscreen",

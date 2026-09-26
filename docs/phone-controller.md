@@ -20,7 +20,7 @@ loads that copy, as the Camera app would, so the phone runs the code the compute
 A phone that is on the simulator instead — opened at `/fly/`, or from a Home Screen icon made there —
 becomes the controller from the same tab: **Switch to RC mode** opens `/rc/` in its place. On a phone
 the tab leads with that button and makes no QR until asked. The icon still opens the simulator next
-time; an icon made from `/rc/` is named *OSFS RC* and always opens the controller.
+time; an icon made from `/rc/` is named *0SFS RC* and always opens the controller.
 
 **Take control** preserves the simulator's current pause state; if the flight is paused, tap **▶** (Resume)
 in the grid separately. The touch controller provides pitch/roll, rudder, throttle, trim, flaps, brake, pause,
@@ -171,7 +171,7 @@ rules `npm run check:phone-layout` enforces.
   device** — the layout check passed before the fix too, because a geometric check cannot see a
   stolen gesture.
 - **Add to Home Screen from `/rc/` installed the flight simulator.** `/rc/` now links its own
-  manifest, `public/rc.webmanifest` — *OSFS RC*, opening `/rc/` — chosen by the boot script in
+  manifest, `public/rc.webmanifest` — *0SFS RC*, opening `/rc/` — chosen by the boot script in
   `index.html`, so the controller and the simulator install as two icons.
 - **`/fly/` said almost nothing about fullscreen on a phone.** It now shows the controller's own
   notice on an iPhone: the same component, words and card.

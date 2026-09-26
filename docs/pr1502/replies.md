@@ -175,7 +175,7 @@ a jump in the reported relative rate. `FGLGear.h` documents this limitation.
 
 ### Why
 
-This comes from [OSFS](https://0sfs.github.io/), an open-source browser flight
+This comes from [0SFS](https://0sfs.github.io/), an open-source browser flight
 simulator using JSBSim through WebAssembly. Touchdown visuals, tire sound and
 haptics need wheel spin, and spin-up/braking should also act on the aircraft.
 An application-side state cannot participate in JSBSim's friction solve and

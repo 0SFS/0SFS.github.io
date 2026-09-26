@@ -266,7 +266,7 @@ it.each([0, 1])("discards swept body history when terrain repositions during con
   }
 });
 
-describe("OSFS render demand", () => {
+describe("0SFS render demand", () => {
   it("pauses/resumes without a frame, wakes for camera changes, and discards idle elapsed time", async () => {
     vi.stubGlobal("localStorage", { getItem: () => "trackpad", setItem: vi.fn() });
     Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });

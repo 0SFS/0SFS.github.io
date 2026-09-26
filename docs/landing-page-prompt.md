@@ -71,7 +71,7 @@ the information page.
   at `/<repository>/`. Every link and asset reference on the new page must be
   base-relative (`import.meta.env.BASE_URL`), never a hard-coded leading slash.
 - **The manifest.** `public/manifest.webmanifest` uses `"start_url": "./"` with
-  `"display": "fullscreen"`. Decide deliberately whether an installed OSFS should
+  `"display": "fullscreen"`. Decide deliberately whether an installed 0SFS should
   launch into the information page or straight into the simulator, and make the
   manifest say so.
 - **First paint.** `index.html` inlines the boot-log styles and shows
@@ -97,7 +97,7 @@ Source the substance from the repository rather than inventing claims:
   `scripts/headless-chrome.mjs`, commit them deliberately, and keep the page's
   total weight reasonable.
 
-Cover at minimum: what OSFS is, that it needs no install or account, the
+Cover at minimum: what 0SFS is, that it needs no install or account, the
 prominent "start flying" control, what the simulator can do, that it is
 AGPL-3.0-only free software with a link to the repository, the phone controller,
 and the credits/licences the project already owes (`NOTICE`,

@@ -140,7 +140,7 @@ function grant() {
   options.onOwnershipChange("phone", { ...mocks.phoneControls, elevator: 0, aileron: 0, rudder: 0, brake: 0 });
 }
 
-describe("OSFS phone integration", () => {
+describe("0SFS phone integration", () => {
   it("makes the phone session only when the Remote Control tab asks, once, and leaves flight unchanged", async () => {
     await mount(false);
     expect(mocks.createPhoneSession).not.toHaveBeenCalled();

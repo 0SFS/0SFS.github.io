@@ -175,7 +175,7 @@ exposes a `modelRoot` slot. The placeholder blocks are drawn only while no real
 mesh is present, and the model follows the same cockpit/chase visibility rules.
 
 Selections persist to `localStorage` under `osfs.aircraft`,
-`osfs.aircraft-lod` and `osfs.aircraft-opt-in-lods`. OSFS reads the former
+`osfs.aircraft-lod` and `osfs.aircraft-opt-in-lods`. 0SFS reads the former
 `flight-sim.*` keys as a migration fallback so existing local selections are
 retained; the opt-in flag has no legacy key because nothing before it stored
 one.

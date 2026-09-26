@@ -70,7 +70,7 @@ for every existing SDK access in the application.
 
 Native executive deletion, model-bound view invalidation, and bounded
 model-load errors are implemented in the canonical jsbsim-wasm checkout.
-They are not duplicated in OSFS. The local wrapper build, typecheck and 17
+They are not duplicated in 0SFS. The local wrapper build, typecheck and 17
 SDK tests passed. That historical installed npm package did not contain
 those edits, so the runner requires the built local wrapper.
 

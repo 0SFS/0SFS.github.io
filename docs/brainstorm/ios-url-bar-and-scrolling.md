@@ -85,7 +85,7 @@ Options:
 - Drop `start_url` and let iOS keep the current page. Loses Android's install
   behaviour, which is worse.
 - **Two manifests**, one per route: `/fly/` links a flight manifest, `/rc/`
-  links a controller manifest with `"start_url": "./rc/"`, `"short_name": "OSFS
+  links a controller manifest with `"start_url": "./rc/"`, `"short_name": "0SFS
   RC"` and its own icon. The route is already known at boot by the inline script
   in `index.html`, so the right `<link rel="manifest">` can be chosen there.
   This is the one that gives the pilot what they asked for, on both platforms,

@@ -71,7 +71,7 @@ export function PhoneQrScanner({ onScan, onClose }: { onScan(url: string): void;
   }
   const status = problem ? PROBLEMS[problem]
     : read ? 'Found it. Connecting…'
-      : foreign ? 'That QR is not an OSFS controller link. Scan the one in the Remote Control tab on the computer.'
+      : foreign ? 'That QR is not a 0SFS controller link. Scan the one in the Remote Control tab on the computer.'
         : live ? 'Point the camera at the QR on the computer.' : 'Starting the camera…'
   return <div className="phone-scanner" role="dialog" aria-modal="true" aria-labelledby="phone-scanner-title">
     <video ref={video} className="phone-scanner__video" playsInline muted aria-hidden="true" />

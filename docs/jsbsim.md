@@ -1,10 +1,10 @@
 # How JSBSim runs in the browser
 
-OSFS consumes a packaged WASM build from `Felipegalind0/jsbsim/wasm`.
+0SFS consumes a packaged WASM build from `Felipegalind0/jsbsim/wasm`.
 Native engine code and the JavaScript/TypeScript SDK now share the canonical
 `Felipegalind0/jsbsim` checkout and revision. Native changes belong in `src/`;
 bindings, native lifetime, generic diagnostics and SDK build tooling belong in
-`wasm/`. OSFS owns aircraft data, initial conditions, controls and scheduling.
+`wasm/`. 0SFS owns aircraft data, initial conditions, controls and scheduling.
 FOSS Earth remains the separate terrain/rendering dependency.
 
 **Application acceptance, 2026-09-14:** clean in-tree package
@@ -29,7 +29,7 @@ starting state.
 ```mermaid
 flowchart LR
   Source[JSBSim repository: engine and wasm SDK at one revision] --> Package[Identified immutable npm tarball]
-  Package --> App[OSFS installed dependency]
+  Package --> App[0SFS installed dependency]
   App --> Runtime[createJsbsimRuntime]
   Runtime --> WASM[Browser WebAssembly / FGFDMExec]
   Runtime --> Data[Selected aircraft XML in MEMFS]
@@ -442,7 +442,7 @@ attached to that artifact in the execution record.
 
 ## Aircraft loading and initialization
 
-The SDK does not bundle OSFS aircraft data into its virtual filesystem.
+The SDK does not bundle 0SFS aircraft data into its virtual filesystem.
 `downloadJsbsimData` fetches `public/jsbsim-data/manifest.json` independently of
 WASM compilation. `resolveAircraftDataFiles` validates the selected closure,
 rejecting missing/malformed paths rather than falling back to another model.

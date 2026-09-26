@@ -470,7 +470,7 @@ export function createGroundSettingsStore(parameters: FlightParameterStore, stor
       try { value = JSON.parse(text); } catch { return "Profile text is not valid JSON."; }
       const envelope = value as { format?: unknown; version?: unknown; name?: unknown; settings?: unknown };
       if (typeof value !== "object" || value === null || envelope.format !== PROFILE_EXPORT_FORMAT) {
-        return "Not an OSFS Ground interaction profile.";
+        return "Not a 0SFS Ground interaction profile.";
       }
       if (envelope.version !== 1) return "Unsupported profile version.";
       // Imports must be complete; migration defaults are for our own older data only.

@@ -10,7 +10,7 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="OSFS" />
+    <meta name="apple-mobile-web-app-title" content="0SFS" />
     <title>0SFS — Open Source Flight Simulator</title>
     <!-- Search and link previews. The build rewrites these for /fly/ and /rc/ (vite.config.ts); see docs/search-visibility.md. -->
     <meta name="description" content="0SFS is a free, open-source flight simulator that runs in a browser tab, with JSBSim flight physics over real-world scenery. Nothing to install, no account." />
@@ -65,7 +65,7 @@
         // opens /rc/ and can sit beside the simulator's on one Home Screen.
         if (route === "remote") {
           document.querySelector('link[rel="manifest"]').setAttribute("href", base + "rc.webmanifest");
-          document.querySelector('meta[name="apple-mobile-web-app-title"]').setAttribute("content", "OSFS RC");
+          document.querySelector('meta[name="apple-mobile-web-app-title"]').setAttribute("content", "0SFS RC");
         }
         function canonical(segment) {
           var next = new URL(base + segment + "/", location.origin);
@@ -120,8 +120,8 @@
     <div id="app-log" class="game-log" role="log" aria-label="Game log" aria-relevant="additions">
       <div id="app-log-error" class="game-log__line" data-tone="error" hidden>The application could not download. Check your connection, then <a href="">reload and try again</a>.</div>
       <div class="game-log__line">Downloading the application…</div>
-      <div class="game-log__line">OSFS · Open Source Flight Simulator</div>
-      <noscript><div class="game-log__line">OSFS needs JavaScript enabled to load the simulator.</div></noscript>
+      <div class="game-log__line">0SFS · Open Source Flight Simulator</div>
+      <noscript><div class="game-log__line">0SFS needs JavaScript enabled to load the simulator.</div></noscript>
     </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

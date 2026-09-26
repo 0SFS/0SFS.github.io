@@ -1,11 +1,11 @@
-# OSFS software dependency graph
+# 0SFS software dependency graph
 
 This graph separates distributable software from live services and creative
-assets. A line to a service does not mean OSFS owns, redistributes, or licenses
+assets. A line to a service does not mean 0SFS owns, redistributes, or licenses
 that service's data.
 
 The current development source is one `Felipegalind0/jsbsim` checkout containing
-the C++ engine and `wasm/` SDK. OSFS installs the clean in-tree `1.2.4-fork.7`
+the C++ engine and `wasm/` SDK. 0SFS installs the clean in-tree `1.2.4-fork.7`
 package from that repository, which adopts the IDBFS-linkage and
 native-exception build corrections from the upstream package contribution. Its
 144 focused app/runtime/UI/artifact tests,
@@ -24,7 +24,7 @@ records reusable upgrades and existing PR follow-up.
 
 ```mermaid
 flowchart TB
-  OSFS["OSFS browser application<br/>TypeScript + React + Vite"]
+  APP["0SFS browser application<br/>TypeScript + React + Vite"]
   FE["FOSS Earth<br/>local file dependency<br/>AGPL-3.0-only"]
   BJS["Babylon.js Core + Loaders<br/>Apache-2.0"]
   TILES["3d-tiles-renderer<br/>NASA AMMOS / Caltech<br/>Apache-2.0"]
@@ -39,13 +39,13 @@ flowchart TB
   MAPS["Raster / terrain / search providers<br/>provider terms and attribution"]
   SIGNAL["PeerJS Cloud + STUN<br/>external operations"]
 
-  OSFS --> FE
-  OSFS --> JSW --> JSB
-  OSFS --> DATA
-  OSFS --> ASSETS
-  OSFS --> PEER
-  OSFS --> QR
-  OSFS --> JSQR
+  APP --> FE
+  APP --> JSW --> JSB
+  APP --> DATA
+  APP --> ASSETS
+  APP --> PEER
+  APP --> QR
+  APP --> JSQR
   FE --> BJS
   FE --> TILES
   TILES --> GOOGLE
@@ -55,7 +55,7 @@ flowchart TB
 
 The immediate release-critical paths are the local FOSS Earth dependency, the
 JSBSim C172 XML, and aircraft assets. Their license/provenance evidence must be
-complete before OSFS can offer a single project-wide release license. The
+complete before 0SFS can offer a single project-wide release license. The
 software inventory is in [THIRD_PARTY_LICENSES.md](../THIRD_PARTY_LICENSES.md);
 the exact JSBSim integration is in [JSBSim WASM](jsbsim.md).
 

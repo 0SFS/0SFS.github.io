@@ -74,7 +74,7 @@ from aircraft tuning.
 
 ## 1. Evidence and starting conditions
 
-The review inspected OSFS, the installed `@0x62/jsbsim-wasm` version
+The review inspected 0SFS, the installed `@0x62/jsbsim-wasm` version
 `1.2.4-beta.4`, and the local wrapper fork at commit `35d6100`. These observations
 describe those versions, not permanent limitations of JSBSim.
 
@@ -148,7 +148,7 @@ must verify hardware acceleration rather than a software fallback.
 | JSBSim / native upstream | Flight equations, native model/property lifetime, physical engine/contact capabilities. |
 | JSBSim WASM wrapper | Binding correctness, native-handle ownership, property discovery and batching, filesystem loading, timestep API, capabilities. |
 | Aircraft package | Model data, loading, FCS/propulsion schedules, actuator maps, source applicability, reference scenarios and presentation metadata. |
-| OSFS simulation host | Lifecycle, control arbitration, scheduling, terrain handoff, settings resolution, assistance and scenario/recovery policy. |
+| 0SFS simulation host | Lifecycle, control arbitration, scheduling, terrain handoff, settings resolution, assistance and scenario/recovery policy. |
 | FOSS Earth and presentation adapters | World/rendering services and display of authoritative simulation observations. |
 
 ### Runtime ownership

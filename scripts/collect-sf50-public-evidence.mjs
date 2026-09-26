@@ -19,7 +19,7 @@ for (const source of manifest.sources) {
     if (basename(source.file) !== source.file) throw new Error("Unsafe source filename.");
     const response = await fetch(source.url, {
       signal: AbortSignal.timeout(60000),
-      headers: { "User-Agent": "OSFS-SF50-public-evidence-collector" },
+      headers: { "User-Agent": "0SFS-SF50-public-evidence-collector" },
     });
     if (!response.ok || !response.body) throw new Error("HTTP " + response.status);
     const maximum = Math.min(64 * 1024 * 1024, Math.ceil(source.bytes * 1.1) + 1024);

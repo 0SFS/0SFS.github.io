@@ -171,7 +171,7 @@ describe("named profiles", () => {
     const envelope = JSON.parse(exported);
     const cases: [unknown, RegExp][] = [
       ["not json", /valid JSON/],
-      [{ ...envelope, format: "other" }, /Not an OSFS/],
+      [{ ...envelope, format: "other" }, /Not a 0SFS/],
       [{ ...envelope, version: 2 }, /Unsupported profile version/],
       [{ ...envelope, settings: { ...envelope.settings, version: undefined } }, /missing a version/],
       [{ ...envelope, settings: { ...envelope.settings, forceModel: "fea" } }, /forceModel/],

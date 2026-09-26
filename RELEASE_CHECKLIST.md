@@ -1,10 +1,10 @@
-# OSFS release checklist
+# 0SFS release checklist
 
 Use this for a specific tagged release; do not mark an item complete based only on intent.
 
-- [ ] Canonical OSFS name, repository slug, public URL, and Pages base path are decided.
+- [ ] Canonical 0SFS name, repository slug, public URL, and Pages base path are decided.
 - [ ] Rename plan has been applied without breaking historical URLs, phone pairing, or stored preferences.
-- [x] Baseline lint, tests, and production builds passed in OSFS and FOSS Earth on 2026-09-09.
+- [x] Baseline lint, tests, and production builds passed in 0SFS and FOSS Earth on 2026-09-09.
 - [x] Runtime `npm audit --omit=dev` reported zero known vulnerabilities for both repositories on 2026-09-09.
 - [ ] Build is tested at the real public deployment path, including JSBSim manifest/XML loads.
 - [ ] Official unmodified AGPLv3 text is installed for cleared core code, with identified copyright holders.

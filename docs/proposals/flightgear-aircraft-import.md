@@ -2,7 +2,7 @@
 
 Status: **Proposed**
 Date: 2026-09-19
-Reviewed checkout: OSFS `dd6b9315`, dirty
+Reviewed checkout: 0SFS `dd6b9315`, dirty
 Evidence: [adding aircraft from FlightGear](../flightgear-aircraft.md) and
 [its records](../../validation/evidence/aircraft/flightgear-inventory-2026-09-19/)
 

@@ -4,7 +4,7 @@ Copy everything below the line into a fresh conversation.
 
 ---
 
-I am fixing the phone side of OSFS (`/Users/felg/gh/0sfs`). A real iPhone
+I am fixing the phone side of 0SFS (`/Users/felg/gh/0sfs`). A real iPhone
 session just found four defects. Read these two files first — they are the whole
 brief, written by the previous session:
 
@@ -51,7 +51,7 @@ popup told them to and got a different program.
 
 Preferred fix, already reasoned through in the brainstorm: a manifest per route,
 chosen by the inline boot script in `index.html`, which already resolves the
-route. `/rc/` gets `"start_url": "./rc/"` and its own `short_name` (e.g. "OSFS
+route. `/rc/` gets `"start_url": "./rc/"` and its own `short_name` (e.g. "0SFS
 RC") so both icons can coexist on a Home Screen. Keep `/fly/` behaving as it
 does today.
 

@@ -12,10 +12,10 @@ opening a pull request.
 - npm
 - A sibling checkout of [FOSS Earth](https://github.com/foss-earth/foss-earth.github.io)
 - A sibling checkout of [gamepad-tools](https://github.com/Felipegalind0/gamepad-tools), built before
-  installing OSFS
+  installing 0SFS
 - Optional: a Google Maps Tiles API key with the Map Tiles API enabled
 
-OSFS depends on both as local file dependencies, and FOSS Earth links gamepad-tools as well, so the
+0SFS depends on both as local file dependencies, and FOSS Earth links gamepad-tools as well, so the
 checkouts must sit at these relative paths:
 
 ```text
@@ -59,7 +59,7 @@ http://127.0.0.1:5173/fly/?key=YOUR_GOOGLE_MAPS_API_KEY
 
 Vite may choose a different port when `5173` is occupied. `/rc/` loads the phone controller route
 on its own. `?mode=flight` redirects to `/fly/` and `?mode=remote` redirects to `/rc/`, keeping other
-query parameters and the invitation hash. `?mode=globe` leaves OSFS and opens
+query parameters and the invitation hash. `?mode=globe` leaves 0SFS and opens
 [foss-earth.github.io](https://foss-earth.github.io/), the standalone globe.
 
 Restart `npm run dev` after changing the FOSS Earth package manifest or exports.
@@ -131,7 +131,7 @@ for.
 
 The lockfile links `node_modules/foss-earth` to that sibling checkout. FOSS Earth provides the
 Babylon.js globe renderer, Google/raster map selection, application bar, and shared windowing and
-input UI. OSFS owns the flight physics, aircraft rendering, controls, and instruments. Shared
+input UI. 0SFS owns the flight physics, aircraft rendering, controls, and instruments. Shared
 functionality is imported through FOSS Earth's public package exports; compatibility modules forward
 to that package.
 
@@ -147,7 +147,7 @@ git switch main
 git pull --ff-only
 ```
 
-Then refresh and validate OSFS:
+Then refresh and validate 0SFS:
 
 ```sh
 cd ../0sfs
@@ -163,10 +163,10 @@ When both applications need new shared functionality:
 
 1. Implement and export it from FOSS Earth through its `package.json` `exports` map.
 2. Test it in the FOSS Earth repository.
-3. Import the public package path from OSFS instead of copying it.
-4. Run `npm run ci` in OSFS and manually verify flight mode.
+3. Import the public package path from 0SFS instead of copying it.
+4. Run `npm run ci` in 0SFS and manually verify flight mode.
 
-Note that FOSS Earth's stylesheets are exported as separate entry points. OSFS imports
+Note that FOSS Earth's stylesheets are exported as separate entry points. 0SFS imports
 `foss-earth/shell.css` and `foss-earth/input-mode.css` but **not** its `base.css`, so any CSS custom
 property a shell rule depends on has to be defined within the entry point that ships it — otherwise
 the declaration is invalid at computed-value time here and silently falls back to its initial value.
@@ -183,7 +183,7 @@ FOSS Earth declares the same link, so one checkout serves both applications. gam
 controller and keyboard sampling, binding profiles and their evaluation, the binding editor shown in
 the flight panel's **Controls** tab, and the optional 3D controller view.
 
-OSFS keeps the flight-specific half in `src/flight/input/gamepadToolsAdapter.ts`: the catalog of
+0SFS keeps the flight-specific half in `src/flight/input/gamepadToolsAdapter.ts`: the catalog of
 flight actions, the built-in **Xbox** and **Classic** profiles including their keyboard defaults, and
 the adapter that turns binding intents into flight controls. Reusable input work belongs in
 gamepad-tools instead.
@@ -228,7 +228,7 @@ npx vite preview
 the path it is served from and `VITE_PHONE_CONTROLLER_URL` points at your own deployment. For GitHub
 Pages specifically, see [Deploying to GitHub Pages](deploying.md).
 
-Note the terms in [NOTICE](../NOTICE) before publishing a modified copy: OSFS is AGPL-3.0-only, so a
+Note the terms in [NOTICE](../NOTICE) before publishing a modified copy: 0SFS is AGPL-3.0-only, so a
 network-accessible deployment must offer its users the corresponding source. Bundled aircraft and
 other assets carry their own terms — see [ASSET_LICENSES.md](../ASSET_LICENSES.md) and
 [THIRD_PARTY_LICENSES.md](../THIRD_PARTY_LICENSES.md).

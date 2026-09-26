@@ -1,10 +1,10 @@
-# Contributing to OSFS
+# Contributing to 0SFS
 
-Thank you for improving OSFS. Before opening a pull request, discuss material new features or large changes in an issue so the implementation fits the project's direction.
+Thank you for improving 0SFS. Before opening a pull request, discuss material new features or large changes in an issue so the implementation fits the project's direction.
 
 ## Development
 
-OSFS currently expects Node.js 22+, npm, and a sibling checkout of `foss-earth`; see the README for the directory layout. Install dependencies with `npm install`, then run:
+0SFS currently expects Node.js 22+, npm, and a sibling checkout of `foss-earth`; see the README for the directory layout. Install dependencies with `npm install`, then run:
 
 ```sh
 npm run lint

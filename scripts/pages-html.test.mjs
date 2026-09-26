@@ -19,7 +19,7 @@ describe("pageHtmlFor", () => {
     expect(rc).toContain('<meta name="robots" content="noindex" />');
     expect(rc).not.toContain('rel="canonical"');
     expect(rc).not.toContain("application/ld+json");
-    expect(rc).toContain("<title>OSFS RC — Phone Controller</title>");
+    expect(rc).toContain("<title>0SFS RC — Phone Controller</title>");
   });
 
   it("leaves the home page's tags for the home page", () => {

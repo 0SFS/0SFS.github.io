@@ -1,6 +1,6 @@
 {
-  "name": "OSFS — Open Source Flight Simulator",
-  "short_name": "OSFS",
+  "name": "0SFS — Open Source Flight Simulator",
+  "short_name": "0SFS",
   "start_url": "./fly/",
   "scope": "./",
   "display": "fullscreen",

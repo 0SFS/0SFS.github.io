@@ -8,7 +8,7 @@ This page says where that stands, what was changed on the site and on GitHub, an
 
 Done on 26 September 2026:
 
-- The site's tags, headings, `robots.txt` and sitemap ([On the site](#on-the-site), steps 2 to 6), in commit b6bb380e. They go live with the next `npm run deploy`.
+- The site's tags, headings, `robots.txt` and sitemap ([On the site](#on-the-site), steps 2 to 6), in commit b6bb380e, and the name 0SFS everywhere it is written ([Spelling](#spelling)). They go live with the next `npm run deploy`.
 - The repository's description and topics, the organization's name, description, website and [profile README](https://github.com/0SFS/.github/blob/main/profile/README.md), the README's first link, and FOSS Earth's README ([On GitHub](#on-github)).
 
 Left to do:
@@ -29,9 +29,9 @@ Before the changes of 26 September:
 
 ## Spelling
 
-Since the rename on 9 September 2026 the product has been called OSFS, with the letter O ([rename record](../RENAME_PLAN.md)). The address, the organization and the repository all use a zero, and people who have seen a link will type what they saw there. Google builds a result's title from the page's `<title>`, its headings, the text of links pointing at it and its `WebSite` structured data ([Title links](https://developers.google.com/search/docs/appearance/title-link)). Two spellings split those signals.
+From the rename on 9 September 2026 until 26 September the product was called OSFS, with the letter O ([rename record](../RENAME_PLAN.md)). The address, the organization and the repository all use a zero, and people who have seen a link will type what they saw there. Google builds a result's title from the page's `<title>`, its headings, the text of links pointing at it and its `WebSite` structured data ([Title links](https://developers.google.com/search/docs/appearance/title-link)). Two spellings split those signals.
 
-**Decided on 26 September 2026: write 0SFS, with a zero, in the title, the heading and every post, and give OSFS and "Open Source Flight Simulator" as alternate names in the structured data.** The site's title and information page, the README and the GitHub profiles now say 0SFS. The simulator, the phone controller, the Home Screen names and the other docs still say OSFS. The alternative was to keep OSFS and add 0SFS beside it, as in `OSFS (0SFS) — Open Source Flight Simulator`. That keeps the rename but still leaves `osfs` searches to the SourceForge projects.
+**Decided on 26 September 2026: the name is 0SFS, with a zero, everywhere it is written:** the site, the simulator, the phone controller, the Home Screen names, the README, the docs, the GitHub profiles and every post. OSFS and "Open Source Flight Simulator" stay as alternate names in the site's structured data, so the site still matches searches for either. Code names such as `OSFS_PARAMETERS` and the `osfs.*` settings keys keep the letter O; the [rename record](../RENAME_PLAN.md) says why. The alternative was to keep OSFS and add 0SFS beside it, as in `OSFS (0SFS) — Open Source Flight Simulator`. That would have kept the first rename but left `osfs` searches to the SourceForge projects.
 
 ## On the site
 

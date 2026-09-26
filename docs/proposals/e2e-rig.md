@@ -2,7 +2,7 @@
 
 Status: **Proposed**  
 Date: 2026-09-18  
-Reviewed checkout: OSFS `94c3e9d794cc`, dirty (the layout harness below is untracked)
+Reviewed checkout: 0SFS `94c3e9d794cc`, dirty (the layout harness below is untracked)
 
 ## Intended result
 

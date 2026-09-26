@@ -8,12 +8,12 @@ finished work.
 
 ## JSBSim community — GitHub Discussions “Show and tell”
 
-**Title:** OSFS: a browser flight simulator using JSBSim through WebAssembly
+**Title:** 0SFS: a browser flight simulator using JSBSim through WebAssembly
 
-Hello JSBSim community — we are releasing [OSFS (Open Source Flight
+Hello JSBSim community — we are releasing [0SFS (Open Source Flight
 Simulator)]([repository URL]), a browser-based flight-simulation project.
 
-OSFS runs JSBSim locally in the browser through the `@0x62/jsbsim-wasm` SDK. We
+0SFS runs JSBSim locally in the browser through the `@0x62/jsbsim-wasm` SDK. We
 load aircraft/engine XML into Emscripten MEMFS, bootstrap a C172P, and advance
 the FDM in a fixed-step flight loop while Babylon.js renders the visual world.
 The integration notes, including the Vite/WASM loading details, are here:
@@ -28,9 +28,9 @@ maintainers and contributors for the flight-dynamics work this builds on.
 
 ## Babylon.js forum — Demos and projects
 
-**Title:** OSFS — an open-source browser flight simulator with Babylon.js and JSBSim WASM
+**Title:** 0SFS — an open-source browser flight simulator with Babylon.js and JSBSim WASM
 
-We have released [OSFS]([repository URL]), an open-source browser flight
+We have released [0SFS]([repository URL]), an open-source browser flight
 simulator built with Babylon.js. It combines a Babylon-rendered globe and
 aircraft view with JSBSim flight dynamics running locally in WebAssembly. The
 current release includes [verified feature list], optional map sources, and a
@@ -48,9 +48,9 @@ showcases; include the accurate license and a working demo before posting.
 
 ## 3d-tiles-renderer maintainers — GitHub Discussion or issue only if appropriate
 
-**Title:** OSFS release using 3d-tiles-renderer with Babylon.js
+**Title:** 0SFS release using 3d-tiles-renderer with Babylon.js
 
-Hello — we are releasing [OSFS]([repository URL]), which uses
+Hello — we are releasing [0SFS]([repository URL]), which uses
 `3d-tiles-renderer`'s Babylon.js integration to render optional Google
 Photorealistic 3D Tiles. The project, attribution approach, and dependency
 graph are documented at [URL].
@@ -62,7 +62,7 @@ software notices.
 
 ## Maintainer-owned release note
 
-**OSFS [version] is out.** Open Source Flight Simulator is a browser-based
+**0SFS [version] is out.** Open Source Flight Simulator is a browser-based
 flight simulation platform built with Babylon.js, JSBSim through WebAssembly,
 and web technologies. This release is available at [playable URL] with source,
 release notes, and third-party notices at [repository/release URL].

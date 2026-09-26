@@ -215,7 +215,7 @@ function formatTally(tally: CandidateTally): string {
 
 export function formatReport(facts: DiagnosticFacts, events: readonly DiagnosticEvent[]): string {
   const lines: string[] = []
-  lines.push(`OSFS phone controller diagnostics (${facts.role})`)
+  lines.push(`0SFS phone controller diagnostics (${facts.role})`)
   lines.push(`user agent: ${typeof navigator === 'undefined' ? 'unknown' : navigator.userAgent}`)
   lines.push(`peer id: ${facts.peerId ?? '—'}${facts.remotePeerId ? ` → ${facts.remotePeerId}` : ''}`)
   lines.push(`signaling: ${facts.signaling.registered ? 'registered' : 'not registered'}`

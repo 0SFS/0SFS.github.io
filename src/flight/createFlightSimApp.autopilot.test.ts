@@ -139,7 +139,7 @@ function lastAileron(): number | undefined {
   return undefined;
 }
 
-describe("OSFS autopilot engage path", () => {
+describe("0SFS autopilot engage path", () => {
   it("keeps the stick in charge until the HUD master is engaged", async () => {
     await mount();
     tick(1 / 60);

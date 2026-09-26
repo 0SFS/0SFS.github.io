@@ -119,7 +119,7 @@ describe('connection log', () => {
     })
     log.recordFailure('channel', 'setup-timeout', 'Could not connect directly.')
     const report = log.report()
-    expect(report).toContain('OSFS phone controller diagnostics (phone)')
+    expect(report).toContain('0SFS phone controller diagnostics (phone)')
     expect(report).toContain('registered in 412 ms')
     expect(report).toContain('srflx=1')
     expect(report).toContain('setup-timeout')

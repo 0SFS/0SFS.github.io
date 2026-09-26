@@ -1,7 +1,7 @@
 # Aircraft gallery thumbnails
 
 These 640 × 400 transparent PNGs are static renders of the procedural LOD3
-meshes already shipped by OSFS. The mesh artist is **felipegalin0**, as recorded
+meshes already shipped by 0SFS. The mesh artist is **felipegalin0**, as recorded
 in `src/flight/aircraft/aircraftCatalog.ts`. The meshes are measured
 reconstructions made by the repository's aircraft generators; the thumbnails
 retain their existing geometry and body/window base colors. Tiny tyre treads

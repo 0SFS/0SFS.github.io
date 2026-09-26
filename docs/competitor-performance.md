@@ -1,16 +1,16 @@
 # Competitor performance techniques
 
 This page lists the speed and memory techniques that the simulators in
-[Open-source competitors](open-source-competitors.md) use and that OSFS and FOSS
+[Open-source competitors](open-source-competitors.md) use and that 0SFS and FOSS
 Earth do not. It also says which repository would own each one.
 
 Checked on 25 September 2026 by reading each project's source at the commits in
-[Sources](#sources). Nothing here was measured in OSFS. An entry means a competitor
-does something we don't. It does not mean the technique would make OSFS faster.
+[Sources](#sources). Nothing here was measured in 0SFS. An entry means a competitor
+does something we don't. It does not mean the technique would make 0SFS faster.
 Measure before and after any change with `flightPerf=1` and
 `window.osfsFlightPerformance.snapshot()` ([Near-ground CPU performance](near-ground-performance.md)).
 
-Owners: **FE** is FOSS Earth, **OSFS** is this repository, and **upstream** is
+Owners: **FE** is FOSS Earth, **0SFS** is this repository, and **upstream** is
 3d-tiles-renderer, whose Babylon adapter FOSS Earth uses for Google Photorealistic
 3D Tiles. Upstream fixes follow the usual rule: fix the defect where it lives, and
 have FOSS Earth only adapt.
@@ -21,7 +21,7 @@ have FOSS Earth only adapt.
 |---:|---|---|---|---|
 | 1 | Draw one pixel per CSS pixel on high-density screens | Aeronaut, Cesium Flight Simulator, Web Flight Simulator (CesiumJS default) | FE | Small |
 | 2 | Render resolution scale as a quality setting | Web Flight Simulator | FE | Small |
-| 3 | Frame-rate cap | FlightGear, Rigs of Rods | FE, OSFS picks the value | Small |
+| 3 | Frame-rate cap | FlightGear, Rigs of Rods | FE, 0SFS picks the value | Small |
 | 4 | Less 3D Tiles detail toward the horizon | Aeronaut, Cesium Flight Simulator (CesiumJS default) | FE | Medium |
 | 5 | Load the centre of the screen first | Aeronaut (CesiumJS default) | FE | Medium |
 | 6 | Hold back tile requests while the view turns fast | Cesium Flight Simulator (CesiumJS default) | FE | Medium |
@@ -31,10 +31,10 @@ have FOSS Earth only adapt.
 | 10 | Read terrain heights on the GPU from shared geometry | OpenGL Flightsim, Skybolt | FE | Large |
 | 11 | Skirts instead of edge stitching | Kestrel | FE | Medium |
 | 12 | Hysteresis before terrain detail changes | Kestrel | FE | Small |
-| 13 | Spatial index for ground and body collision | FlightGear, Kestrel, YS Flight, Rigs of Rods | FE query, OSFS caller | Medium |
-| 14 | Flight model off the main thread | MScSim, Rigs of Rods | OSFS | Large |
-| 15 | HUD text updated at 10 Hz, not every frame | OpenGL Flightsim, Aeronaut | OSFS | Small |
-| 16 | Distance level of detail for models | FlightGear, Retro Flight Simulator | OSFS, FE for generic models | Small today |
+| 13 | Spatial index for ground and body collision | FlightGear, Kestrel, YS Flight, Rigs of Rods | FE query, 0SFS caller | Medium |
+| 14 | Flight model off the main thread | MScSim, Rigs of Rods | 0SFS | Large |
+| 15 | HUD text updated at 10 Hz, not every frame | OpenGL Flightsim, Aeronaut | 0SFS | Small |
+| 16 | Distance level of detail for models | FlightGear, Retro Flight Simulator | 0SFS, FE for generic models | Small today |
 | 17 | GPU-compressed texture cache | FlightGear | FE | Medium |
 
 Numbers 4 to 8 apply only to Google Photorealistic 3D Tiles, and 9 to 12 only to
@@ -72,8 +72,8 @@ the Google Photorealistic view. Babylon's `setHardwareScalingLevel` would do it.
   (`source/main/main.cpp:2033–2041`).
 - **CesiumJS:** has `targetFrameRate`, but none of the browser simulators sets it.
 
-OSFS draws a frame on every display refresh while flying: 120 frames a second on a
-120 Hz display. A cap belongs in FOSS Earth's render scheduler. OSFS should choose a
+0SFS draws a frame on every display refresh while flying: 120 frames a second on a
+120 Hz display. A cap belongs in FOSS Earth's render scheduler. 0SFS should choose a
 rate that divides the 120 Hz physics evenly (60, 40 or 30). That is FlightGear's
 rounding.
 
@@ -208,12 +208,12 @@ hysteresis (`src/terrain/imagery/imagerySelector.ts`). Terrain could reuse the i
   maximum height so it can skip the cell without testing triangles
   (`source/main/physics/collision/Collisions.h:102–143`).
 
-OSFS casts finite rays against the visible Google tile meshes and rejects meshes by
+0SFS casts finite rays against the visible Google tile meshes and rejects meshes by
 their bounds. A BVH prototype in FOSS Earth's `benchmarks/collision/` took 0.0008 ms
 for five rays, where the production path took 2.25 ms. It is not integrated
 ([Collision compute comparison](collision-compute-comparison.md)).
 
-This is the largest gap we have measured. FOSS Earth owns the query. OSFS owns the
+This is the largest gap we have measured. FOSS Earth owns the query. 0SFS owns the
 per-frame cache and the radius.
 
 ## Simulation loop
@@ -222,7 +222,7 @@ per-frame cache and the radius.
 
 MScSim runs its flight model on a high-priority Qt thread at 100 Hz
 (`src/Simulation.cpp:71–88`). Rigs of Rods spreads vehicle physics across a thread
-pool (`source/main/physics/ActorManager.cpp:1269, 1304`). OSFS runs JSBSim's 120 Hz
+pool (`source/main/physics/ActorManager.cpp:1269, 1304`). 0SFS runs JSBSim's 120 Hz
 substeps inside the render tick (`src/flight/createFlightSimApp.ts:1698`).
 
 The hard part is ground contact. JSBSim asks for terrain height, and the terrain
@@ -233,7 +233,7 @@ Do 13 first.
 ### 15. HUD at 10 Hz
 
 OpenGL Flightsim updates its HUD every 0.1 s (`OpenGL_Flightsim/src/main.cpp:495–496`).
-Aeronaut publishes UI state every 90 ms (`src/engine.js:77`). OSFS already updates
+Aeronaut publishes UI state every 90 ms (`src/engine.js:77`). 0SFS already updates
 its panels every 100 ms (`src/flight/createFlightSimApp.ts:1858`). But the flight
 HUD writes `textContent` on every frame (`src/flight/hud/flightHud.ts:467–476`).
 Writing only when the text changes would be enough.
@@ -245,7 +245,7 @@ Writing only when the text changes would be enough.
 FlightGear draws scenery objects at detailed, rough and bare ranges
 (`/sim/rendering/static-lod/*`, `src/Scenery/tilemgr.cxx:104–108`). Retro Flight
 Simulator picks a model's level from its projected size on screen
-(`src/script/render/helpers.ts:263–272`). OSFS draws one aircraft mesh at every
+(`src/script/render/helpers.ts:263–272`). 0SFS draws one aircraft mesh at every
 distance. That hardly matters with one aircraft. It will matter with traffic or
 multiplayer.
 
@@ -275,7 +275,7 @@ These are not gaps, even though competitors have them too:
   - a 2 ms per-frame budget for rebuilding meshes
   - stitching only the affected tiles
 - **Flight app:**
-  - finite rays with mesh-bound rejection, and a per-tick height cache (OSFS)
+  - finite rays with mesh-bound rejection, and a per-tick height cache (0SFS)
   - 100 ms panel updates
   - a frame profiler
   - clamped frame time
@@ -292,10 +292,10 @@ These are not gaps, even though competitors have them too:
   detail first on purpose, and caches parents coarse-first.
 - **Not applicable yet:**
   - Instanced and impostor vegetation (Skybolt `GpuForest`, Rigs of Rods
-    PagedGeometry, Retro Flight Simulator's instanced models): OSFS draws no
+    PagedGeometry, Retro Flight Simulator's instanced models): 0SFS draws no
     vegetation.
   - YS Flight's lattice for many aircraft and ground vehicles (`src/core/fslattice.h`):
-    OSFS flies one aircraft.
+    0SFS flies one aircraft.
 - **Nothing found:**
   - The Little Plane Project draws 2D canvas terrain, batching same-coloured runs
     into one fill per colour. That doesn't carry over to a 3D globe.
@@ -337,5 +337,5 @@ Cheapest first. Measure each before moving on.
 | 3d-tiles-renderer | NASA-AMMOS/3DTilesRendererJS | 0.4.24, as installed in FOSS Earth |
 | CesiumJS defaults | cesium.com reference for `Cesium3DTileset` and `Viewer` | 1.145 |
 
-Line numbers refer to those commits. OSFS and FOSS Earth lines refer to the working
+Line numbers refer to those commits. 0SFS and FOSS Earth lines refer to the working
 trees on 25 September 2026.

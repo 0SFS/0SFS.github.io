@@ -10,7 +10,7 @@ const SITE_URL = "https://0sfs.github.io/";
  * @returns {string}
  */
 export function pageHtmlFor(route, html) {
-  const title = route === "fly" ? "Fly — 0SFS" : "OSFS RC — Phone Controller";
+  const title = route === "fly" ? "Fly — 0SFS" : "0SFS RC — Phone Controller";
   const url = `${SITE_URL}${route}/`;
   /** @type {Array<[RegExp, string]>} */
   const replacements = [

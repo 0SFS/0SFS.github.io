@@ -3,7 +3,7 @@
 Execute this task when the user starts a fresh conversation with this file.
 Work in `/Users/felg/gh/0sfs`. Read the current `AGENTS.md` before making changes.
 
-OSFS has no theme support at all today — `grep -r "prefers-color-scheme" src/`
+0SFS has no theme support at all today — `grep -r "prefers-color-scheme" src/`
 returns nothing, and `index.html` hard-codes `color-scheme: dark`. Every surface
 assumes a dark cockpit. The user wants light and dark themes across the flight
 UI and the phone controller.

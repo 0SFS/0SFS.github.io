@@ -1,16 +1,16 @@
 # Open-source competitors
 
-This page lists the other open-source flight simulators, what each one does, and where OSFS stands among them. The speed and memory techniques they use that OSFS lacks are in [Competitor performance techniques](competitor-performance.md).
+This page lists the other open-source flight simulators, what each one does, and where 0SFS stands among them. The speed and memory techniques they use that 0SFS lacks are in [Competitor performance techniques](competitor-performance.md).
 
 Checked on 25 September 2026. Star counts and last-push dates come from GitHub on that day, except FlightGear's, which come from GitLab. Features come from each project's own README. [Sources](#sources) says how each project was found.
 
 ## Browser simulators
 
-These run in a web page, like OSFS, and are its closest competitors.
+These run in a web page, like 0SFS, and are its closest competitors.
 
 | Project | Flight model | World | Built with | License | Last push | Stars |
 |---|---|---|---|---|---|---:|
-| **[OSFS](https://github.com/0SFS/0SFS.github.io)** | JSBSim in WebAssembly at 120 Hz | Google Photorealistic 3D Tiles with your key, or free raster maps over streamed elevation | TypeScript, Babylon.js, FOSS Earth | AGPL-3.0-only | 2026-09-19 | 1 |
+| **[0SFS](https://github.com/0SFS/0SFS.github.io)** | JSBSim in WebAssembly at 120 Hz | Google Photorealistic 3D Tiles with your key, or free raster maps over streamed elevation | TypeScript, Babylon.js, FOSS Earth | AGPL-3.0-only | 2026-09-19 | 1 |
 | [Aeronaut](https://github.com/vinny-palumbo/FlightSim) | Arcade by default. JSBSim in WebAssembly (Cessna 172P, F-16) is an option. | Google Photorealistic 3D Tiles, which require your key | JavaScript, Three.js, CesiumJS, React | MIT for the app code | 2026-09-22 | 0 |
 | [Cesium Flight Simulator](https://github.com/WilliamAvHolmberg/cesium-flight-simulator) | Its own, with an aircraft and a car | Cesium ion terrain and imagery, which require Cesium ion and Mapbox tokens | TypeScript, CesiumJS, React | The README says MIT, but the repository has no license file | 2026-01-04 | 438 |
 | [Retro Flight Simulator](https://github.com/ruben3d/retroflightsim) | Its own | Procedural, drawn like a 1991 flight simulator | TypeScript, Three.js | MIT | 2023-05-10 | 141 |
@@ -39,22 +39,22 @@ These open-source projects fly aircraft, but they are not general flight simulat
 
 ## Not open source
 
-People will compare OSFS with these, but they are not open source, so they are not in the tables:
+People will compare 0SFS with these, but they are not open source, so they are not in the tables:
 
 - **[Web Flight Simulator](https://github.com/dimartarmizi/web-flight-simulator)** (576 stars) is a browser F-15 combat game built on Three.js and CesiumJS terrain. Its source is public, but its license forbids commercial use.
 - **[GeoFS](https://www.geo-fs.com/)** is a free browser flight simulator with global scenery. It is closed source.
 - **X-Plane, Microsoft Flight Simulator and DCS World** are commercial desktop simulators.
 
-## Where OSFS stands
+## Where 0SFS stands
 
 - **Aeronaut is the closest match.** It pairs Google Photorealistic 3D Tiles with JSBSim in WebAssembly, and its JSBSim SDK is `@0x62/jsbsim-wasm`, the upstream project that ours derives from. Its README shows three differences:
-  - Aeronaut needs a Google key before it will fly. OSFS flies on free raster maps without one.
-  - Aeronaut does not give JSBSim the ground. In its JSBSim mode the aircraft stops at sea level and passes through higher scenery, and takeoff and landing are not supported. OSFS feeds the streamed terrain to JSBSim's landing gear ([Ground contact](ground-contact.md)), and its airport presets start on a runway.
-  - Aeronaut has an arcade model for casual flying, and a jet that flies with F-16 dynamics under a Rafale model. OSFS has no arcade mode.
-- **FlightGear sets the bar for depth.** Its aircraft, weather, multiplayer and VATSIM support go far beyond OSFS, and it also uses JSBSim. But it is a desktop install, while OSFS is a link. OSFS already studies its aircraft: see [FlightGear aircraft](flightgear-aircraft.md).
-- **Kestrel** gets its elevation from Mapterhorn, the same source FOSS Earth uses by default. It also has 3D cockpits with clickable controls, which OSFS lacks.
-- **Among the browser simulators, only OSFS and Aeronaut use JSBSim.** The others use flight models of their own.
-- **None of the others lets you use a phone as a controller for another screen.** Aeronaut shows touch controls on narrow screens, but OSFS pairs a phone over a QR code and flies the aircraft on your computer with it ([Phone controller](phone-controller.md)).
+  - Aeronaut needs a Google key before it will fly. 0SFS flies on free raster maps without one.
+  - Aeronaut does not give JSBSim the ground. In its JSBSim mode the aircraft stops at sea level and passes through higher scenery, and takeoff and landing are not supported. 0SFS feeds the streamed terrain to JSBSim's landing gear ([Ground contact](ground-contact.md)), and its airport presets start on a runway.
+  - Aeronaut has an arcade model for casual flying, and a jet that flies with F-16 dynamics under a Rafale model. 0SFS has no arcade mode.
+- **FlightGear sets the bar for depth.** Its aircraft, weather, multiplayer and VATSIM support go far beyond 0SFS, and it also uses JSBSim. But it is a desktop install, while 0SFS is a link. 0SFS already studies its aircraft: see [FlightGear aircraft](flightgear-aircraft.md).
+- **Kestrel** gets its elevation from Mapterhorn, the same source FOSS Earth uses by default. It also has 3D cockpits with clickable controls, which 0SFS lacks.
+- **Among the browser simulators, only 0SFS and Aeronaut use JSBSim.** The others use flight models of their own.
+- **None of the others lets you use a phone as a controller for another screen.** Aeronaut shows touch controls on narrow screens, but 0SFS pairs a phone over a QR code and flies the aircraft on your computer with it ([Phone controller](phone-controller.md)).
 
 ## Sources
 

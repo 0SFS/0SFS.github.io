@@ -87,7 +87,7 @@ function ensureCertificate(address) {
     "req", "-x509", "-newkey", "rsa:2048", "-sha256", "-nodes",
     "-days", String(CERT_DAYS),
     "-keyout", KEY, "-out", CERT,
-    "-subj", "/CN=OSFS LAN dev",
+    "-subj", "/CN=0SFS LAN dev",
     "-addext", `subjectAltName=IP:${address},IP:127.0.0.1,DNS:localhost`,
     // Apple requires it of every TLS server certificate, self-signed included.
     "-addext", "extendedKeyUsage=serverAuth",

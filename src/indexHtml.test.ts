@@ -60,12 +60,12 @@ describe("index.html boot script", () => {
 
 describe("Add to Home Screen", () => {
   it.each([
-    ["https://0sfs.github.io/", "/", "/manifest.webmanifest", "OSFS"],
-    ["https://0sfs.github.io/fly/", "/", "/manifest.webmanifest", "OSFS"],
-    ["https://0sfs.github.io/rc/", "/", "/rc.webmanifest", "OSFS RC"],
-    ["https://0sfs.github.io/?mode=remote#v=1&peer=d&join=s", "/", "/rc.webmanifest", "OSFS RC"],
-    ["https://example.test/repo/fly/", "/repo/", "/repo/manifest.webmanifest", "OSFS"],
-    ["https://example.test/repo/rc/", "/repo/", "/repo/rc.webmanifest", "OSFS RC"],
+    ["https://0sfs.github.io/", "/", "/manifest.webmanifest", "0SFS"],
+    ["https://0sfs.github.io/fly/", "/", "/manifest.webmanifest", "0SFS"],
+    ["https://0sfs.github.io/rc/", "/", "/rc.webmanifest", "0SFS RC"],
+    ["https://0sfs.github.io/?mode=remote#v=1&peer=d&join=s", "/", "/rc.webmanifest", "0SFS RC"],
+    ["https://example.test/repo/fly/", "/repo/", "/repo/manifest.webmanifest", "0SFS"],
+    ["https://example.test/repo/rc/", "/repo/", "/repo/rc.webmanifest", "0SFS RC"],
   ])("%s (base %s) links %s, named %s", (href, base, manifest, title) => {
     expect(boot(href, base)).toMatchObject({ manifest, title });
   });

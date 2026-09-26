@@ -79,7 +79,7 @@ describe('phone QR scanner', () => {
     mocks.decode.mockReturnValueOnce({ data: 'https://example.com/menu' }).mockReturnValue({ data: PAIRING })
     render()
 
-    await vi.waitFor(() => expect(status()).toContain('not an OSFS controller link'))
+    await vi.waitFor(() => expect(status()).toContain('not a 0SFS controller link'))
     await vi.waitFor(() => expect(onScan).toHaveBeenCalledWith(PAIRING))
   })
 

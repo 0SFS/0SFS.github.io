@@ -1,6 +1,6 @@
-# Release audit — OSFS candidate
+# Release audit — 0SFS candidate
 
-**Scope.** Read-only audit of the OSFS repository (then named `flight-sim`) at commit
+**Scope.** Read-only audit of the 0SFS repository (then named `flight-sim`) at commit
 `07ad7eee08e69f672c0feca33cc00a5021868abc`, plus its required sibling
 dependency `../foss-earth` at `c434df9c7cc9473aa184c5d613b7e3d1deaef66e`.
 The working tree contained unrelated aircraft and phone-controller work before
@@ -9,7 +9,7 @@ this audit; it was not changed. This document records facts observed on
 
 ## Release decision
 
-**Do not publish an OSFS release yet.** The application builds and tests, but
+**Do not publish a 0SFS release yet.** The application builds and tests, but
 the release cannot truthfully claim a clean AGPL asset and dependency story
 until the blocking items below are resolved.
 
@@ -42,7 +42,7 @@ until the blocking items below are resolved.
 The project uses npm, TypeScript 5.9, Vite 8, React 19, ESLint, and Vitest.
 `npm run ci` runs lint, 270 tests in 37 files, and a production build. It
 passed in this audit. The linked FOSS Earth `npm run ci` also passed. Both
-builds emit a chunk-size warning over Vite's 500 kB threshold; OSFS's
+builds emit a chunk-size warning over Vite's 500 kB threshold; 0SFS's
 largest emitted `shell` chunk was about 6.5 MB minified (1.46 MB gzip), and
 FOSS Earth's main chunk was about 6.8 MB (1.52 MB gzip). Treat that as a
 performance release risk, not a failing build.
@@ -63,10 +63,10 @@ package.
 
 | Service or data source | Use | Release concern |
 | --- | --- | --- |
-| Google Maps Tiles API / Photorealistic 3D Tiles | Optional streamed world data through `3d-tiles-renderer` | API key, Google terms, required attribution and quotas apply; source data is not part of OSFS. |
+| Google Maps Tiles API / Photorealistic 3D Tiles | Optional streamed world data through `3d-tiles-renderer` | API key, Google terms, required attribution and quotas apply; source data is not part of 0SFS. |
 | USGS, OpenStreetMap, CARTO, OpenTopoMap | Raster basemaps supplied by FOSS Earth | Provider terms and visible attribution apply. |
 | MapTilerhorn / AWS Terrarium | Streamed terrain elevation | Provider terms and attribution apply. |
-| Nominatim / Overpass / FreeAirportDB | Location/airport search | Rate limits and service policies apply; this is not a guaranteed OSFS service. |
+| Nominatim / Overpass / FreeAirportDB | Location/airport search | Rate limits and service policies apply; this is not a guaranteed 0SFS service. |
 | PeerJS Cloud and Google STUN | Phone pairing signal path / direct WebRTC setup | External availability and privacy dependency; PeerJS documents separate hosting for high-volume use. |
 | GitHub Pages / GitHub API | Static hosting and displayed release-version lookup | Configure a real release URL and hosting policy before announcement. |
 
@@ -93,7 +93,7 @@ provider-account review was performed in this phase.
 ## Known implementation release risks
 
 * Product labels, package metadata, Pages base, controller URL, GitHub
-  repository, and local-storage migration now use OSFS. Internal TypeScript
+  repository, and local-storage migration now use 0SFS. Internal TypeScript
   names and legacy preference keys remain deliberately for compatibility.
 * JSBSim bootstrap calls its geographic latitude field `lat-gc-deg` while
   higher-level code describes geodetic coordinates; the existing design notes

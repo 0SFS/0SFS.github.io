@@ -1,15 +1,15 @@
 # Asset licensing policy
 
-Software, documentation, and creative assets are separate works. A future OSFS core-code license must not be presented as a license for every model, texture, sound, photograph, PDF, map tile, or aircraft definition in this repository.
+Software, documentation, and creative assets are separate works. A future 0SFS core-code license must not be presented as a license for every model, texture, sound, photograph, PDF, map tile, or aircraft definition in this repository.
 
 ## Intended policy
 
 | Material | Intended license approach |
 | --- | --- |
-| Original OSFS source code | AGPLv3 after copyright holders and third-party boundaries are confirmed. |
-| Documentation written for OSFS | CC BY-SA 4.0, except embedded third-party quotations, trademarks, or material with another stated license. |
+| Original 0SFS source code | AGPLv3 after copyright holders and third-party boundaries are confirmed. |
+| Documentation written for 0SFS | CC BY-SA 4.0, except embedded third-party quotations, trademarks, or material with another stated license. |
 | Aircraft models, textures, sounds, and reference packs | Individual license and provenance record per asset. Do not assume the code license applies. |
-| External maps, terrain, airport search, and 3D tiles | Provider terms, required attribution, API policies, and access keys. They are not redistributed as OSFS assets. |
+| External maps, terrain, airport search, and 3D tiles | Provider terms, required attribution, API policies, and access keys. They are not redistributed as 0SFS assets. |
 | JSBSim aircraft/engine/propeller data | Record upstream file path, authorship, version, license/permission, and any redistribution restriction separately. |
 
 ## Minimum record for every distributable asset
@@ -19,7 +19,7 @@ Each shipped asset needs a nearby `LICENSE`/`NOTICE` or an inventory entry with:
 1. Repository path and a content hash or release version.
 2. Creator/copyright holder and source URL.
 3. Exact license or written permission, including commercial/derivative terms.
-4. Whether OSFS modified it and where editable source is kept.
+4. Whether 0SFS modified it and where editable source is kept.
 5. Required attribution and the UI/docs location where it appears.
 
 ## Current release status
