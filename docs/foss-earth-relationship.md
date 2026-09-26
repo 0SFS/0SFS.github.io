@@ -45,7 +45,7 @@ OSFS imports only public FOSS Earth package exports:
 | `foss-earth/input` | Input mode and sensitivity preferences, Safari gesture support, globe gamepad navigation, and orbit inversion |
 | `foss-earth/windowing` | Panel, tab, and workspace primitives |
 | `foss-earth/windowing.css` | Shared windowing structure |
-| `foss-earth/runtime` | Babylon runtime, renderer/map types, map selection, detail policy types, and simulation hooks |
+| `foss-earth/runtime` | Babylon runtime, renderer/map types, map selection, detail policy types, simulation hooks, and focus points (the aircraft, for Map → Detail's Load around) |
 | `foss-earth/cameraMath` | Shared WGS84/ECEF conversion and angle constants |
 | `foss-earth/mapDetailPolicy` | Map detail policy types and pure helpers, without the renderer, for the flight's World detail import |
 | `foss-earth` | Globe application and public globe APIs |
