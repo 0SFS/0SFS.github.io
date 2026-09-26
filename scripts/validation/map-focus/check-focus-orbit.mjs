@@ -223,7 +223,8 @@ try {
       // Where the aircraft is, to say whether any ground lies within the focus radius.
       const altitudeFt = await evaluate(chrome, sessionId, `Number(document.querySelector('[data-metric="alt"]')?.textContent)`);
       const loading = await evaluate(chrome, sessionId, `(window.osfsLoadingDiagnostics?.().history ?? [])
-        .map(({ elapsedMs, phase, update }) => ({ elapsedMs: Math.round(elapsedMs), phase, state: update.state, detail: update.detail ?? null }))`);
+        .map(({ elapsedMs, phase, update }) => ({ elapsedMs: Math.round(elapsedMs), phase, state: update.state, detail: update.detail ?? null,
+          pendingTiles: update.terrain?.diagnostics?.pendingTiles ?? null }))`);
       const before = current.requests.length;
       if (turn) await orbitOneTurn(sessionId, () => screenshot(sessionId, `${name}-half-turn.png`));
       else {
