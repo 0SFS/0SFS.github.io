@@ -1,5 +1,5 @@
 import { Quaternion, TransformNode, Vector3 } from "@babylonjs/core";
-import { DEG_TO_RAD } from "foss-earth/cameraMath";
+import { DEG_TO_RAD, geodeticToEcef, type EcefCoord } from "foss-earth/cameraMath";
 import { buildWorldShiftMatrix } from "./enuFrame";
 import { flightAttitudeToQuaternion } from "./ecefBridge";
 import type { FlightState } from "../physics/flightState";
@@ -8,6 +8,8 @@ export interface FloatingOriginHandle {
   worldShift: TransformNode;
   aircraftRoot: TransformNode;
   apply(state: FlightState): void;
+  /** Where the origin, and so the aircraft, is: ECEF metres of the last applied state; null before one. */
+  getOriginEcef(): EcefCoord | null;
   dispose(): void;
 }
 
@@ -18,6 +20,7 @@ export function createFloatingOrigin(scene: import("@babylonjs/core").Scene, wor
   worldContent.rotationQuaternion = Quaternion.Identity();
 
   const aircraftRoot = new TransformNode("aircraft-root", scene);
+  let originEcef: EcefCoord | null = null;
 
   return {
     worldShift,
@@ -25,6 +28,7 @@ export function createFloatingOrigin(scene: import("@babylonjs/core").Scene, wor
     apply(state: FlightState): void {
       const latRad = state.latDeg * DEG_TO_RAD;
       const lonRad = state.lonDeg * DEG_TO_RAD;
+      originEcef = geodeticToEcef(latRad, lonRad, state.altMeters);
       const shift = buildWorldShiftMatrix(latRad, lonRad, state.altMeters);
 
       const scale = new Vector3();
@@ -42,6 +46,7 @@ export function createFloatingOrigin(scene: import("@babylonjs/core").Scene, wor
       );
       aircraftRoot.position = Vector3.Zero();
     },
+    getOriginEcef: () => originEcef,
     dispose(): void {
       worldShift.position.set(0, 0, 0);
       worldShift.rotationQuaternion = Quaternion.Identity();
