@@ -3,13 +3,13 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createFlightRecorder, type FlightRecorderPropertyReader } from "../diagnostics/flightRecorder";
+import { LoggingPanel } from "./LoggingPanel";
 import {
   LOGGING_CLOSE_WARNING,
-  LoggingPanel,
   allowCloseLoggingTab,
   bindRecorderMarkHotkey,
   formatRecorderClock,
-} from "./LoggingPanel";
+} from "./loggingTab";
 
 function reader(values: Record<string, number>): FlightRecorderPropertyReader {
   return {

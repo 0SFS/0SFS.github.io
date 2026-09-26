@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { createEvaluationInstruments } from "./evaluationInstruments";
 import type { FlightRecorderPropertyReader } from "../diagnostics/flightRecorder";
 

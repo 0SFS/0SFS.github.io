@@ -62,12 +62,8 @@ import { AUDIO_PARAMETER_IDS } from "../audio/audioSettings";
 import { FrameBudgetPanel } from "./FrameBudgetPanel";
 import { RemoteControlTab, type MountPhonePairing } from "./RemoteControlTab";
 import { PhoneCameraTuningPanel } from "./PhoneCameraTuningPanel";
-import {
-  LoggingPanel,
-  allowCloseLoggingTab,
-  type LoggingAction,
-  type LoggingPanelState,
-} from "./LoggingPanel";
+import { LoggingPanel, type LoggingAction, type LoggingPanelState } from "./LoggingPanel";
+import { allowCloseLoggingTab } from "./loggingTab";
 import type { FlightAudioStatus } from "../audio/createFlightAudio";
 import { AUTOPILOT_PARAMETER_IDS, type AutopilotSettingsV1 } from "../autopilot/autopilotSettings";
 import { GROUND_PARAMETER_IDS } from "../settings/groundInteractionSettings";

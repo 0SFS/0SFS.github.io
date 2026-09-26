@@ -51,12 +51,8 @@ import { applyAircraftRig, readControlSurfaceState } from "./aircraft/aircraftAn
 import { flightLog } from "./diagnostics/flightLog";
 import { createFlightRecorder } from "./diagnostics/flightRecorder";
 import { createEvaluationInstruments } from "./hud/evaluationInstruments";
-import {
-  bindRecorderMarkHotkey,
-  downloadCsv,
-  type LoggingAction,
-  type LoggingPanelState,
-} from "./hud/LoggingPanel";
+import type { LoggingAction, LoggingPanelState } from "./hud/LoggingPanel";
+import { bindRecorderMarkHotkey, downloadCsv } from "./hud/loggingTab";
 import { createEngineMonitor } from "./hud/engineMonitor";
 import { toEngineStatus } from "./remote/engineStatus";
 import { createCollisionDebugOverlay } from "./diagnostics/createCollisionDebugOverlay";
