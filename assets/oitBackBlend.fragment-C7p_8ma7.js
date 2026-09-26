@@ -1,0 +1,3 @@
+import{K as e}from"./index-D-4xi28n.js";import{t}from"./shaderStore-DSzASZqB.js";var n=e({oitBackBlendPixelShaderWGSL:()=>a}),r=`oitBackBlendPixelShader`,i=`var uBackColor: texture_2d<f32>;@fragment
+fn main(input: FragmentInputs)->FragmentOutputs {fragmentOutputs.color=textureLoad(uBackColor,vec2i(fragmentInputs.position.xy),0);if (fragmentOutputs.color.a==0.0) {discard;}}
+`;t.ShadersStoreWGSL[r]||(t.ShadersStoreWGSL[r]=i);var a={name:r,shader:i};export{n as t};
