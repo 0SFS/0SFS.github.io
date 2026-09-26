@@ -9,6 +9,7 @@ import {
   Vector3,
   type AbstractMesh,
 } from "@babylonjs/core";
+import { flightParameterDefaults, type FlightParameters } from "../settings/flightParameters";
 
 export type FlightViewMode = "first" | "third";
 
@@ -32,6 +33,8 @@ export interface AircraftEntity {
    * frame after the aircraft moves.
    */
   setChaseFrame(rotation: Quaternion | null): void;
+  /** Both flight cameras' vertical field of view, in degrees. */
+  setFieldOfView(degrees: number): void;
   setViewMode(mode: FlightViewMode): void;
   toggleViewMode(): FlightViewMode;
   getViewMode(): FlightViewMode;
@@ -39,17 +42,25 @@ export interface AircraftEntity {
 }
 
 const FIRST_PERSON_OFFSET = new Vector3(0, 0.2, 0.6);
-const THIRD_PERSON_OFFSET = new Vector3(0, 2.2, -14);
+const RADIANS_PER_DEGREE = Math.PI / 180;
 
-function configureFlightCamera(camera: UniversalCamera): void {
+function configureFlightCamera(camera: UniversalCamera, fieldOfViewDeg: number): void {
   camera.rotationQuaternion = Quaternion.RotationYawPitchRoll(Math.PI, 0, 0);
   camera.minZ = 0.5;
   camera.maxZ = 250_000;
-  camera.fov = 1.05;
+  camera.fov = fieldOfViewDeg * RADIANS_PER_DEGREE;
   camera.inertia = 0.92;
 }
 
-export function createPlaceholderAircraft(scene: Scene, parent: TransformNode): AircraftEntity {
+/**
+ * The osfs.camera.* parameters. The chase offset is read once, when the
+ * aircraft is created; the limits are read on every orbit and zoom.
+ */
+export function createPlaceholderAircraft(
+  scene: Scene,
+  parent: TransformNode,
+  parameters: FlightParameters = flightParameterDefaults(),
+): AircraftEntity {
   const root = new TransformNode("aircraft-visual", scene);
   root.parent = parent;
 
@@ -85,20 +96,21 @@ export function createPlaceholderAircraft(scene: Scene, parent: TransformNode): 
   const firstPersonCamera = new UniversalCamera("cockpit-camera", Vector3.Zero(), scene);
   firstPersonCamera.parent = cockpit;
   firstPersonCamera.position = FIRST_PERSON_OFFSET.clone();
-  configureFlightCamera(firstPersonCamera);
+  configureFlightCamera(firstPersonCamera, parameters.get("osfs.camera.fieldOfView"));
 
   const thirdPersonCamera = new UniversalCamera("chase-camera", Vector3.Zero(), scene);
   thirdPersonCamera.parent = root;
   // Only used when the chase camera should not turn with the whole aircraft.
   const chasePivot = new TransformNode("chase-pivot", scene);
   chasePivot.rotationQuaternion = Quaternion.Identity();
-  thirdPersonCamera.position = THIRD_PERSON_OFFSET.clone();
-  configureFlightCamera(thirdPersonCamera);
+  const chaseOffset = new Vector3(0, parameters.get("osfs.camera.chaseHeight"), -parameters.get("osfs.camera.chaseDistance"));
+  thirdPersonCamera.position = chaseOffset.clone();
+  configureFlightCamera(thirdPersonCamera, parameters.get("osfs.camera.fieldOfView"));
 
   let viewMode: FlightViewMode = "third";
   let chaseYaw = 0;
-  let chasePitch = Math.atan2(THIRD_PERSON_OFFSET.y, -THIRD_PERSON_OFFSET.z);
-  let chaseDistance = THIRD_PERSON_OFFSET.length();
+  let chasePitch = Math.atan2(chaseOffset.y, -chaseOffset.z);
+  let chaseDistance = chaseOffset.length();
   const updateChaseCamera = (): void => {
     const horizontal = chaseDistance * Math.cos(chasePitch);
     thirdPersonCamera.position.set(Math.sin(chaseYaw) * horizontal, Math.sin(chasePitch) * chaseDistance, -Math.cos(chaseYaw) * horizontal);
@@ -135,8 +147,9 @@ export function createPlaceholderAircraft(scene: Scene, parent: TransformNode): 
     thirdPersonCamera,
     orbitChaseCamera(yaw, pitch): void {
       if (viewMode !== "third" || !Number.isFinite(yaw) || !Number.isFinite(pitch)) return;
+      const limits = parameters.get("osfs.camera.orbitPitchLimits");
       chaseYaw = (chaseYaw + yaw) % (2 * Math.PI);
-      chasePitch = Math.max(-Math.PI / 3, Math.min(Math.PI * 0.45, chasePitch + pitch));
+      chasePitch = Math.max(limits.min * RADIANS_PER_DEGREE, Math.min(limits.max * RADIANS_PER_DEGREE, chasePitch + pitch));
       updateChaseCamera();
     },
     setChaseFrame(rotation): void {
@@ -148,9 +161,14 @@ export function createPlaceholderAircraft(scene: Scene, parent: TransformNode): 
       chasePivot.rotationQuaternion!.copyFrom(rotation);
       if (thirdPersonCamera.parent !== chasePivot) thirdPersonCamera.parent = chasePivot;
     },
+    setFieldOfView(degrees): void {
+      firstPersonCamera.fov = degrees * RADIANS_PER_DEGREE;
+      thirdPersonCamera.fov = degrees * RADIANS_PER_DEGREE;
+    },
     zoomChaseCamera(factor): void {
       if (viewMode !== "third" || !Number.isFinite(factor) || factor <= 0) return;
-      chaseDistance = Math.max(8, Math.min(500, chaseDistance * factor));
+      const limits = parameters.get("osfs.camera.chaseZoomLimits");
+      chaseDistance = Math.max(limits.min, Math.min(limits.max, chaseDistance * factor));
       updateChaseCamera();
     },
     setViewMode,

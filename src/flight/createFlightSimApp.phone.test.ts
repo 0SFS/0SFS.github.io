@@ -59,7 +59,7 @@ const mocks = vi.hoisted(() => {
 vi.mock("foss-earth/runtime", () => ({
   createBabylonRuntime: async () => mocks.runtime,
   RASTER_BASE_MAP_SOURCES: [], TERRAIN_SOURCES: [], resolveTerrainSource: vi.fn(), resolveRasterBaseMapSource: vi.fn(),
-  resolveMapRuntimeConfig: () => ({}), setMapSourcePreference: vi.fn(), setTerrainSourcePreference: vi.fn(), setRasterQualityPreference: vi.fn(),
+  resolveMapRuntimeConfig: () => ({}), applyRendererChoice: vi.fn(), setMapSourcePreference: vi.fn(), setTerrainSourcePreference: vi.fn(), setRasterQualityPreference: vi.fn(),
 }));
 vi.mock("foss-earth/input", () => ({
   loadInputModePreference: () => "mouse", loadInputSensitivityPreference: () => ({}),
@@ -83,6 +83,7 @@ vi.mock("./jsbsim/resetFlightLocation", () => ({ resetFlightLocation: mocks.rese
 vi.mock("./remote/createPhoneControlSession", () => ({ createPhoneControlSession: mocks.createPhoneSession }));
 vi.mock("./hud/createPhonePairingPanel", () => ({ createPhonePairingPanel: mocks.createPairingPanel }));
 
+import { resetAppSettings } from "foss-earth/settings";
 import { createFlightSimApp } from "./createFlightSimApp";
 
 let app: Awaited<ReturnType<typeof createFlightSimApp>> | null = null;
@@ -114,6 +115,7 @@ afterEach(() => {
   app?.destroy(); app = null;
   vi.restoreAllMocks();
   document.body.replaceChildren();
+  resetAppSettings();
 });
 
 /** What the flight hands the side panel; the Remote Control tab calls into it. */

@@ -18,6 +18,8 @@
  * pdot).
  */
 
+import type { FlightParameters } from "../settings/flightParameters";
+
 export interface AutoTrimState {
   enabled: boolean;
   /** Owned trim while enabled; null means adopt the incoming wheel position. */
@@ -26,15 +28,33 @@ export interface AutoTrimState {
   filteredHandsOff: number | null;
 }
 
-export const STICK_DEADBAND = 0.05;
-/** Full-scale trim travel in about three seconds. */
-const MAX_TRIM_RATE = 0.35;
-/** Inverse seconds: fraction of the leftover acceleration to cancel per second. */
-const NEWTON = 1.25;
-const ACCEL_DEADBAND = 0.04;
-const FILTER_TAU = 0.08;
-const QBAR_AUTHORITY_PSF = 20;
-const MIN_VT_FPS = 80;
+/** The osfs.assist.* parameters: how hard and how fast the assist trims. */
+export interface AutoTrimTuning {
+  /** Full trim travel per second at most. */
+  maxRate: number;
+  /** Inverse seconds: fraction of the leftover acceleration to cancel per second. */
+  gain: number;
+  /** Leftover acceleration left alone, rad/s². */
+  deadband: number;
+  /** Time constant of the leftover-acceleration filter, s. */
+  filterSeconds: number;
+  /** Dynamic pressure of full authority, psf. */
+  authorityPsf: number;
+  /** Airspeed floor of the damping estimate, ft/s. */
+  minVtFps: number;
+}
+
+export function readAutoTrimTuning(parameters: FlightParameters): AutoTrimTuning {
+  return {
+    maxRate: parameters.get("osfs.assist.trimMaxRate"),
+    gain: parameters.get("osfs.assist.trimGain"),
+    deadband: parameters.get("osfs.assist.trimDeadband"),
+    filterSeconds: parameters.get("osfs.assist.trimFilter"),
+    authorityPsf: parameters.get("osfs.assist.trimAuthority"),
+    minVtFps: parameters.get("osfs.assist.trimMinAirspeed"),
+  };
+}
+
 /**
  * |∂(rad/s²)/∂trim| per psf. SF50 pitch is about 0.028, roll about 0.018;
  * a slightly high estimate makes the Newton step conservative.
@@ -81,6 +101,7 @@ function stepAutoTrimAxis(
     powerPerPsf: number;
     dampingQbarOverVt: number;
   },
+  tuning: AutoTrimTuning,
 ): { state: AutoTrimState; trim: number } {
   const incoming = clamp(finite(input.trim), -1, 1);
   if (!state.enabled) {
@@ -97,7 +118,7 @@ function stepAutoTrimAxis(
   if (dt === 0 || input.onGround) return hold;
 
   const qbar = Math.max(0, finite(input.qbarPsf));
-  const authority = clamp(qbar / QBAR_AUTHORITY_PSF, 0, 1);
+  const authority = clamp(qbar / tuning.authorityPsf, 0, 1);
   if (authority === 0) {
     return {
       state: { enabled: true, trim, filteredHandsOff: accelRad },
@@ -105,20 +126,20 @@ function stepAutoTrimAxis(
     };
   }
 
-  const vt = Math.max(finite(input.vtFps), MIN_VT_FPS);
-  const qbarEff = Math.max(qbar, QBAR_AUTHORITY_PSF);
+  const vt = Math.max(finite(input.vtFps), tuning.minVtFps);
+  const qbarEff = Math.max(qbar, tuning.authorityPsf);
   const power = input.trimSign * input.powerPerPsf * qbarEff;
   const damping = Math.max(0, finite(input.dampingQbarOverVt)) * qbarEff / vt;
   const stick = clamp(finite(input.stick), -1, 1);
   const rawHandsOff = accelRad - power * stick + damping * finite(input.rateRad);
   const previous = state.filteredHandsOff;
-  const blend = 1 - Math.exp(-dt / FILTER_TAU);
+  const blend = 1 - Math.exp(-dt / tuning.filterSeconds);
   const filtered = previous === null ? rawHandsOff : previous + (rawHandsOff - previous) * blend;
-  const leftover = Math.abs(filtered) < ACCEL_DEADBAND ? 0 : filtered;
+  const leftover = Math.abs(filtered) < tuning.deadband ? 0 : filtered;
   const delta = clamp(
-    -NEWTON * authority * leftover / power * dt,
-    -MAX_TRIM_RATE * dt,
-    MAX_TRIM_RATE * dt,
+    -tuning.gain * authority * leftover / power * dt,
+    -tuning.maxRate * dt,
+    tuning.maxRate * dt,
   );
   const nextTrim = clamp(trim + delta, -1, 1);
 
@@ -143,7 +164,7 @@ export interface PitchAutoTrimInput {
   onGround: boolean;
 }
 
-export function stepPitchAutoTrim(state: AutoTrimState, input: PitchAutoTrimInput): {
+export function stepPitchAutoTrim(state: AutoTrimState, input: PitchAutoTrimInput, tuning: AutoTrimTuning): {
   state: AutoTrimState;
   pitchTrim: number;
 } {
@@ -159,7 +180,7 @@ export function stepPitchAutoTrim(state: AutoTrimState, input: PitchAutoTrimInpu
     trimSign: -1,
     powerPerPsf: PITCH_POWER_PER_PSF,
     dampingQbarOverVt: PITCH_DAMPING_QBAR_OVER_VT,
-  });
+  }, tuning);
   return { state: next.state, pitchTrim: next.trim };
 }
 
@@ -174,7 +195,7 @@ export interface RollAutoTrimInput {
   onGround: boolean;
 }
 
-export function stepRollAutoTrim(state: AutoTrimState, input: RollAutoTrimInput): {
+export function stepRollAutoTrim(state: AutoTrimState, input: RollAutoTrimInput, tuning: AutoTrimTuning): {
   state: AutoTrimState;
   rollTrim: number;
 } {
@@ -190,6 +211,6 @@ export function stepRollAutoTrim(state: AutoTrimState, input: RollAutoTrimInput)
     trimSign: 1,
     powerPerPsf: ROLL_POWER_PER_PSF,
     dampingQbarOverVt: ROLL_DAMPING_QBAR_OVER_VT,
-  });
+  }, tuning);
   return { state: next.state, rollTrim: next.trim };
 }

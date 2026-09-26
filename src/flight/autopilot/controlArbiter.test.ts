@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ControlSurfaceState } from "../input/flightInputManager";
-import { STICK_DEADBAND } from "../input/autoTrim";
+import { flightParameterDefaults } from "../settings/flightParameters";
 import {
   createControlArbiterState,
   setArbiterEngaged,
@@ -10,6 +10,8 @@ import {
 } from "./controlArbiter";
 import { DEFAULT_AUTOPILOT_SETTINGS, patchAutopilotSettings } from "./autopilotSettings";
 import { DISCONNECTED_ARDUPILOT_STATUS, type ArduPilotStatus } from "./ardupilotStatus";
+
+const STICK_DEADBAND = flightParameterDefaults().get("osfs.autopilot.stickOverride");
 
 const PILOT: ControlSurfaceState = {
   elevator: 0, aileron: 0, rudder: 0, throttle: 0.55,
@@ -35,6 +37,7 @@ function input(partial: Partial<ControlArbiterInput> = {}): ControlArbiterInput 
     pilot: { ...PILOT },
     gearDownNorm: 1,
     flight: { ...FLIGHT },
+    stickOverride: STICK_DEADBAND,
     ...partial,
     pilot: { ...PILOT, ...partial.pilot },
     flight: { ...FLIGHT, ...partial.flight },

@@ -1,6 +1,7 @@
 import "foss-earth/windowing.css";
 
-import { MapCachePanel, WindowOverlay, type WindowOverlayHandle } from "foss-earth/shell";
+import { createParameterSection, createSavedSettingsSection, WindowOverlay, type WindowOverlayHandle } from "foss-earth/shell";
+import type { SettingsRegistry } from "foss-earth/settings";
 import {
   type GeodeticLocation,
   type LocationSearchProvider,
@@ -13,14 +14,14 @@ import {
   Gauge,
   Navigation,
   ScrollText,
-  Settings,
   Smartphone,
   Pause,
   Play,
   Plane,
   Volume2,
 } from "lucide-react";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import type { BabylonRuntimeStatus, RendererMode } from "foss-earth/runtime";
 import type { FlightViewMode } from "../aircraft/createPlaceholderAircraft";
 import {
@@ -34,6 +35,7 @@ import {
 } from "../aircraft/aircraftCatalog";
 import type { AircraftModelStatus } from "../aircraft/createAircraftModel";
 import { AircraftSelectionPanel } from "./AircraftSelectionPanel";
+import { AIRCRAFT_SELECTION_PARAMETER_IDS } from "../aircraft/aircraftSelectionSetting";
 import { GamepadBindingsPanel, type GamepadBindingsMount } from "./GamepadBindingsPanel";
 import { flightLog, type FlightLogEntry } from "../diagnostics/flightLog";
 import {
@@ -42,17 +44,12 @@ import {
 } from "../diagnostics/flightPerformanceCapture";
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
 import {
-  DEFAULT_KEYBOARD_STICK_SETTINGS,
-  KEYBOARD_STICK_MODES,
+  KEYBOARD_STICK_PARAMETER_IDS,
+  keyboardStickParameterValues,
+  readKeyboardStickSettings,
   type KeyboardStickSettings,
 } from "../input/keyboardStickSettings";
-import type { OrbitInvertSettings } from "foss-earth/input";
-import { GAMEPAD_POLLING_OPTIONS, type GamepadPollingController } from "../input/gamepadPolling";
-import {
-  DEFAULT_GAMEPAD_RESPONSE_SETTINGS,
-  type GamepadResponseController,
-  type GamepadResponseSettings,
-} from "@felipegalind0/gamepad-tools/core";
+import { flightParameterSpec, type FlightParameterStore } from "../settings/flightParameters";
 import { WHEEL_SPIN_CONFIGS, type WheelSpinMode, type WheelSpinState } from "../physics/wheelSpin";
 import {
   GroundInteractionSettingsPanel,
@@ -61,11 +58,10 @@ import {
 } from "./GroundInteractionSettingsPanel";
 import { AutopilotPanel, type AutopilotPanelState } from "./AutopilotPanel";
 import { SoundSettingsPanel, type SoundAction } from "./SoundSettingsPanel";
-import { AttitudeIndicatorSettings } from "./AttitudeIndicatorSettings";
+import { AUDIO_PARAMETER_IDS } from "../audio/audioSettings";
 import { FrameBudgetPanel } from "./FrameBudgetPanel";
-import { attitudeRendererSetting } from "../settings/attitudeRendererSetting";
 import { RemoteControlTab, type MountPhonePairing } from "./RemoteControlTab";
-import type { PhoneCameraTuning } from "../remote/phoneCameraTuning";
+import { PhoneCameraTuningPanel } from "./PhoneCameraTuningPanel";
 import {
   LoggingPanel,
   allowCloseLoggingTab,
@@ -73,10 +69,11 @@ import {
   type LoggingPanelState,
 } from "./LoggingPanel";
 import type { FlightAudioStatus } from "../audio/createFlightAudio";
-import type { AutopilotSettingsV1 } from "../autopilot/autopilotSettings";
+import { AUTOPILOT_PARAMETER_IDS, type AutopilotSettingsV1 } from "../autopilot/autopilotSettings";
+import { GROUND_PARAMETER_IDS } from "../settings/groundInteractionSettings";
 import type { FlightRecorder } from "../diagnostics/flightRecorder";
 
-export type FlightPanelTab = "weather" | "aircraft" | "autopilot" | "controls" | "remote" | "sound" | "engine" | "logging" | "debug" | "settings";
+export type FlightPanelTab = "weather" | "aircraft" | "autopilot" | "controls" | "remote" | "sound" | "engine" | "logging" | "debug";
 
 const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "weather", label: "Weather" },
@@ -88,7 +85,6 @@ const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "engine", label: "Engine" },
   { id: "logging", label: "Logging" },
   { id: "debug", label: "Debug" },
-  { id: "settings", label: "Settings" },
 ];
 
 const TAB_ICONS = {
@@ -101,15 +97,12 @@ const TAB_ICONS = {
   engine: Fan,
   logging: ScrollText,
   debug: Bug,
-  settings: Settings,
 } satisfies Record<FlightPanelTab, typeof Plane>;
 
 export interface FlightWeatherState {
   windDirectionDeg: number;
   windSpeedKts: number;
 }
-
-export type FlightTerrainDetailAnchor = "aircraft" | "camera";
 
 export interface FlightControlPanelSnapshot {
   flightState: FlightState;
@@ -118,13 +111,6 @@ export interface FlightControlPanelSnapshot {
   viewMode: FlightViewMode;
   runtimeStatus: BabylonRuntimeStatus;
   rendererMode: RendererMode;
-  /** The coarsest Google screen-space error a low spawn prepares with. */
-  flightTerrainRequirement: number;
-  /** True while a low spawn holds Google mesh at the flight minimum. */
-  flightTerrainRequirementHeld: boolean;
-  /** A deliberately temporary waiver of the flight terrain requirement. */
-  allowCoarserTerrainThisSession: boolean;
-  terrainDetailAnchor: FlightTerrainDetailAnchor;
   aircraftId: AircraftId;
   generationId?: string;
   lodId: AircraftLodId;
@@ -135,10 +121,6 @@ export interface FlightControlPanelSnapshot {
   modelActiveLodId: AircraftLodId | null;
   modelTriangles: number | null;
   modelError: string | null;
-  keyboardStick: KeyboardStickSettings;
-  orbitInvert: OrbitInvertSettings;
-  phoneCameraTuning: PhoneCameraTuning;
-  arcadeGroundLaunches: boolean;
   collisionDebugEnabled: boolean;
   wheelSpinMode: WheelSpinMode | "off";
   tireSoundEnabled: boolean;
@@ -155,6 +137,10 @@ export interface FlightControlPanelSnapshot {
 export type FlightOverlayTab = "location" | "map" | "renderer" | FlightPanelTab;
 
 export interface FlightControlPanelOptions {
+  /** The app's settings registry, whose sections the tabs draw. */
+  settings: SettingsRegistry;
+  /** The flight's own parameters in it. */
+  parameters: FlightParameterStore;
   /** The shared Map tab's contents, from `createMapSourcePanel`. */
   mapTab: HTMLElement;
   /** The shared Renderer tab's contents, from `createRendererPanel`. */
@@ -168,13 +154,6 @@ export interface FlightControlPanelOptions {
   onViewModeChange(mode: FlightViewMode): void;
   /** Commit a staged aircraft and presentation choice; return a visible error if it fails. */
   onAircraftApply(selection: AircraftSelection): string | null;
-  onFlightTerrainRequirementChange(errorTarget: number): void;
-  onTerrainDetailOverrideChange(enabled: boolean): void;
-  onTerrainDetailAnchorChange(anchor: FlightTerrainDetailAnchor): void;
-  onKeyboardStickSettingsChange(settings: KeyboardStickSettings): void;
-  onOrbitInvertChange(settings: OrbitInvertSettings): void;
-  onPhoneCameraTuningChange(tuning: PhoneCameraTuning): void;
-  onArcadeGroundLaunchesChange(enabled: boolean): void;
   onCollisionDebugChange(enabled: boolean): void;
   onWheelSpinModeChange(mode: WheelSpinMode | "off"): void;
   onTireSoundChange(enabled: boolean): void;
@@ -295,6 +274,60 @@ function WeatherPanel({
   );
 }
 
+/**
+ * One section of a tab, drawn by FOSS Earth from the settings registry: the
+ * section's own controls (`children`, when it has any), a control for each
+ * main-level parameter they do not cover, and Show all parameters.
+ */
+function ParameterSection({ settings, tab, section, covers, children }: {
+  settings: SettingsRegistry;
+  tab: string;
+  section: string;
+  /** Parameters `children` already edit, which the section should not draw again. */
+  covers?: readonly string[];
+  children?: ReactNode;
+}) {
+  const host = useRef<HTMLDivElement>(null);
+  const [main] = useState(() => document.createElement("div"));
+  const hasMain = children !== undefined;
+  // Ids joined, so a new array with the same ids does not rebuild the section.
+  const coverKey = covers?.join(" ") ?? "";
+  useLayoutEffect(() => {
+    const handle = createParameterSection(settings, {
+      tab,
+      section,
+      main: hasMain ? main : undefined,
+      covers: coverKey === "" ? undefined : coverKey.split(" "),
+    });
+    host.current?.append(handle.element);
+    return () => handle.destroy();
+  }, [settings, tab, section, main, coverKey, hasMain]);
+  return <>
+    <div className="flight-panel__parameter-section" ref={host} />
+    {children !== undefined && createPortal(children, main)}
+  </>;
+}
+
+/**
+ * Debug → Saved settings: every value this device keeps, at once. Export,
+ * import and reset of the whole record, and "Keep these values" for values a
+ * link set for this visit.
+ */
+function SavedSettings({ settings }: { settings: SettingsRegistry }) {
+  const host = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const handle = createSavedSettingsSection(settings);
+    host.current?.append(handle.element);
+    return () => handle.destroy();
+  }, [settings]);
+  return (
+    <fieldset className="flight-panel__fieldset">
+      <legend>Saved settings</legend>
+      <div ref={host} />
+    </fieldset>
+  );
+}
+
 interface AircraftPanelProps extends FlightControlPanelProps {
   aircraftSelection: AircraftSelection;
   onAircraftSelectionChange(selection: AircraftSelection): void;
@@ -302,10 +335,12 @@ interface AircraftPanelProps extends FlightControlPanelProps {
 }
 
 function AircraftPanel({
+  settings,
   snapshot,
   onPausedChange,
   onViewModeChange,
   onAircraftApply,
+  onGroundInteractionAction,
   aircraftSelection,
   onAircraftSelectionChange,
   onAircraftFamilyChange,
@@ -318,28 +353,30 @@ function AircraftPanel({
         <Metric label="Heading" value={`${Math.round(headingDegFromRad(snapshot.flightState.headingRad))}°`} />
         <Metric label="Throttle" value={`${Math.round(snapshot.flightState.throttleNorm * 100)}%`} />
       </div>
-      <AircraftSelectionPanel
-        snapshot={snapshot}
-        selection={aircraftSelection}
-        onSelectionChange={onAircraftSelectionChange}
-        onFamilyChange={onAircraftFamilyChange}
-        onApply={onAircraftApply}
-      />
-      <fieldset className="flight-panel__fieldset">
-        <legend>Camera</legend>
-        <div className="flight-panel__segmented">
+      <ParameterSection settings={settings} tab="aircraft" section="model" covers={AIRCRAFT_SELECTION_PARAMETER_IDS}>
+        <AircraftSelectionPanel
+          snapshot={snapshot}
+          selection={aircraftSelection}
+          onSelectionChange={onAircraftSelectionChange}
+          onFamilyChange={onAircraftFamilyChange}
+          onApply={onAircraftApply}
+        />
+      </ParameterSection>
+      <ParameterSection settings={settings} tab="aircraft" section="camera">
+        <div className="flight-panel__segmented" role="group" aria-label="Camera view">
           {(["first", "third"] as const).map((mode) => (
             <button
               key={mode}
               className={snapshot.viewMode === mode ? "is-active" : ""}
               type="button"
+              aria-pressed={snapshot.viewMode === mode}
               onClick={() => onViewModeChange(mode)}
             >
               {mode === "first" ? "Cockpit" : "Chase"}
             </button>
           ))}
         </div>
-      </fieldset>
+      </ParameterSection>
       <button className="flight-panel__command" type="button" onClick={() => onPausedChange(!snapshot.paused)}>
         {snapshot.paused ? <Play size={16} /> : <Pause size={16} />}
         {snapshot.paused ? "Resume simulation" : "Pause simulation"}
@@ -348,6 +385,11 @@ function AircraftPanel({
         <span><kbd>W/S</kbd> Pitch</span><span><kbd>A/D</kbd> Roll</span>
         <span><kbd>Q/E</kbd> Rudder</span><span><kbd>⇧/⌃</kbd> Throttle</span>
       </div>
+      <ParameterSection settings={settings} tab="aircraft" section="assists" />
+      <ParameterSection settings={settings} tab="aircraft" section="ground" covers={GROUND_PARAMETER_IDS}>
+        <GroundInteractionSettingsPanel state={snapshot.groundInteraction} onAction={onGroundInteractionAction} />
+      </ParameterSection>
+      <ParameterSection settings={settings} tab="aircraft" section="start" />
     </div>
   );
 }
@@ -436,58 +478,6 @@ function FlightPerformancePanel() {
   );
 }
 
-function formatTerrainDetailTarget(target: number): string {
-  const exponent = Math.log2(target).toFixed(Number.isInteger(Math.log2(target)) ? 0 : 2);
-  return `2^${exponent} = ${target.toLocaleString()} px`;
-}
-
-function OrbitInvertSettingsPanel({
-  snapshot,
-  onOrbitInvertChange,
-}: Pick<FlightControlPanelProps, "snapshot" | "onOrbitInvertChange">) {
-  const settings = snapshot.orbitInvert;
-  return (
-    <fieldset className="flight-panel__fieldset">
-      <legend>Camera orbit</legend>
-      <label className="flight-panel__field flight-panel__field--inline">
-        <input
-          type="checkbox"
-          aria-label="Invert orbit yaw"
-          checked={settings.invertYaw}
-          onChange={(event) => onOrbitInvertChange({ ...settings, invertYaw: event.target.checked })}
-        />
-        <span>Invert yaw (left / right) for right-stick and trackpad</span>
-      </label>
-      <label className="flight-panel__field flight-panel__field--inline">
-        <input
-          type="checkbox"
-          aria-label="Invert orbit pitch"
-          checked={settings.invertPitch}
-          onChange={(event) => onOrbitInvertChange({ ...settings, invertPitch: event.target.checked })}
-        />
-        <span>Invert pitch (up / down) for right-stick and trackpad</span>
-      </label>
-      <label className="flight-panel__field">
-        <span>Behavior when holding still</span>
-        <select
-          aria-label="Camera orbit hold behavior"
-          value={settings.recenterMode}
-          onChange={(event) => onOrbitInvertChange({ ...settings, recenterMode: event.target.value as "hold" | "recenter" })}
-        >
-          <option value="hold">Hold camera position</option>
-          <option value="recenter">Return behind aircraft on release</option>
-        </select>
-      </label>
-      <p className="flight-panel__hint">
-        Applies to right-stick, two-finger swipe, and right-drag camera orbit.
-      </p>
-      <p className="flight-panel__hint">
-        Hold keeps the camera where you left it. Recenter smoothly returns to the default chase offset after a two-finger swipe or joystick release.
-      </p>
-    </fieldset>
-  );
-}
-
 function SettingSlider({
   label,
   value,
@@ -520,103 +510,33 @@ function SettingSlider({
   );
 }
 
-function GamepadSettingsPanel({ polling, response }: {
-  polling: GamepadPollingController;
-  response: GamepadResponseController;
-}) {
-  const rate = useSyncExternalStore(polling.subscribe, polling.getRate, polling.getRate);
-  const settings = useSyncExternalStore(response.subscribe, response.getSettings, response.getSettings);
-  return (
-    <fieldset className="flight-panel__fieldset">
-      <legend>Gamepad</legend>
-      <label className="flight-panel__field">
-        <span>Polling rate</span>
-        <select
-          aria-label="Gamepad polling rate"
-          value={rate}
-          onChange={event => polling.setRate(event.currentTarget.value)}
-        >
-          {GAMEPAD_POLLING_OPTIONS.map(option => (
-            <option key={option.id} value={option.id}>{option.label}</option>
-          ))}
-        </select>
-      </label>
-      <p className="flight-panel__hint">
-        Every frame reads input before each flight frame without an added timer cap.
-        Fixed limits reduce scheduled polling and can introduce visible stepping.
-        The browser frame rate remains the upper limit.
-      </p>
-      <p className="flight-panel__hint">
-        This controls application polling, not the controller's hardware report rate.
-        Keyboard events remain immediate.
-      </p>
-      <label className="flight-panel__field">
-        <span>Analog response</span>
-        <select
-          aria-label="Gamepad analog response"
-          value={settings.mode}
-          onChange={event => response.setSettings({ mode: event.currentTarget.value as GamepadResponseSettings["mode"] })}
-        >
-          <option value="smooth">Smooth (original)</option>
-          <option value="direct">Direct (no smoothing)</option>
-        </select>
-      </label>
-      {settings.mode === "smooth" && <SettingSlider
-        label="Response time"
-        value={settings.responseTimeSec}
-        min={0.05}
-        max={2}
-        step={0.025}
-        format={value => `${Math.round(value * 1000)} ms`}
-        onChange={responseTimeSec => response.setSettings({ responseTimeSec })}
-      />}
-      <p className="flight-panel__hint">
-        Smooth updates pitch, roll, and yaw every flight frame, including between controller reports.
-        The original setting is 375 ms to approach 95% of a held command; Direct holds each report unchanged.
-      </p>
-      <label className="flight-panel__field">
-        <span>Stick deadzone behavior</span>
-        <select
-          aria-label="Gamepad stick deadzone behavior"
-          value={settings.deadzoneMode}
-          onChange={event => response.setSettings({ deadzoneMode: event.currentTarget.value as GamepadResponseSettings["deadzoneMode"] })}
-        >
-          <option value="cutoff">Cutoff (original magnitude)</option>
-          <option value="scaled">Rescaled (reduced near-center response)</option>
-        </select>
-      </label>
-      <p className="flight-panel__hint">
-        Cutoff ignores the center zone and preserves stick magnitude outside it.
-        Each binding keeps its deadzone size; the Xbox profile uses 8%.
-        Rescaled subtracts that zone from the remaining travel.
-      </p>
-      <p className="flight-panel__hint">
-        Polling and response settings are saved on this device and apply across binding profiles.
-        They do not change keyboard, on-screen stick, or phone response.
-      </p>
-      <button className="flight-panel__command" type="button" onClick={() => {
-        polling.setRate("frame");
-        response.setSettings(DEFAULT_GAMEPAD_RESPONSE_SETTINGS);
-      }}>
-        Reset gamepad defaults
-      </button>
-    </fieldset>
-  );
+const KEYBOARD_STICK_MODES = flightParameterSpec("osfs.input.keyboard.mode").choices;
+
+/** The keyboard stick as its parameters stand, following every change. */
+function useKeyboardStickSettings(parameters: FlightParameterStore): KeyboardStickSettings {
+  const [settings, setSettings] = useState(() => readKeyboardStickSettings(parameters));
+  useEffect(() => {
+    const update = () => setSettings(readKeyboardStickSettings(parameters));
+    const stops = KEYBOARD_STICK_PARAMETER_IDS.map(id => parameters.watch(id, update));
+    update();
+    return () => { for (const stop of stops) stop(); };
+  }, [parameters]);
+  return settings;
 }
 
-function KeyboardStickSettingsPanel({
-  snapshot,
-  onKeyboardStickSettingsChange,
-}: Pick<FlightControlPanelProps, "snapshot" | "onKeyboardStickSettingsChange">) {
-  const settings = snapshot.keyboardStick;
+/**
+ * Controls → Keyboard response: the mode, and only the parameters that mode
+ * uses. Show all parameters below lists every one of them.
+ */
+function KeyboardStickSettingsPanel({ parameters }: { parameters: FlightParameterStore }) {
+  const settings = useKeyboardStickSettings(parameters);
   const modeMeta = KEYBOARD_STICK_MODES.find((mode) => mode.id === settings.mode);
   const patch = (partial: Partial<KeyboardStickSettings>): void => {
-    onKeyboardStickSettingsChange({ ...settings, ...partial });
+    parameters.setMany(keyboardStickParameterValues(partial));
   };
 
   return (
-    <fieldset className="flight-panel__fieldset">
-      <legend>Keyboard response</legend>
+    <div className="flight-panel__fieldset">
       <label className="flight-panel__field">
         <span>Response mode</span>
         <select
@@ -785,88 +705,16 @@ function KeyboardStickSettingsPanel({
       <button
         className="flight-panel__command"
         type="button"
-        onClick={() => onKeyboardStickSettingsChange({ ...DEFAULT_KEYBOARD_STICK_SETTINGS })}
+        onClick={() => { for (const id of KEYBOARD_STICK_PARAMETER_IDS) parameters.reset(id); }}
       >
         Reset keyboard stick defaults
       </button>
-    </fieldset>
+    </div>
   );
 }
 
-/**
- * What only the flight needs from World detail. The saved range and default
- * are the Map tab's Detail group and the rail beside the basemap, shared with
- * FOSS Earth.
- */
-function FlightTerrainSettings({
-  snapshot,
-  onFlightTerrainRequirementChange,
-  onTerrainDetailOverrideChange,
-  onTerrainDetailAnchorChange,
-}: Pick<FlightControlPanelProps,
-  "snapshot" | "onFlightTerrainRequirementChange" | "onTerrainDetailOverrideChange" | "onTerrainDetailAnchorChange">) {
-  return (
-    <fieldset className="flight-panel__fieldset">
-      <legend>Flight terrain</legend>
-      <p className="flight-panel__hint">
-        World detail's range and saved default are in the Map tab. The rail beside the basemap changes it for this session.
-      </p>
-      <SettingSlider
-        label="Flight minimum"
-        value={Math.log2(snapshot.flightTerrainRequirement)}
-        min={0}
-        max={19}
-        step={0.05}
-        format={(value) => formatTerrainDetailTarget(Math.round(2 ** value))}
-        onChange={(value) => onFlightTerrainRequirementChange(Math.round(2 ** value))}
-      />
-      <p className="flight-panel__hint">
-        {snapshot.flightTerrainRequirementHeld
-          ? "Held now: this spawn keeps Google 3D Tiles at the flight minimum or finer until the aircraft has flown for a second at least 100 m above the ground."
-          : "A spawn below 100 m keeps Google 3D Tiles at this target or finer until the aircraft has flown for a second at least 100 m above the ground. Your World detail setting is not changed."}
-      </p>
-      <div className="flight-panel__section-heading">
-        <span>Terrain detail follows</span>
-      </div>
-      <div className="flight-panel__segmented" role="group" aria-label="Terrain detail follows">
-        <button
-          className={snapshot.terrainDetailAnchor === "aircraft" ? "is-active" : ""}
-          type="button"
-          aria-pressed={snapshot.terrainDetailAnchor === "aircraft"}
-          onClick={() => onTerrainDetailAnchorChange("aircraft")}
-        >
-          Aircraft
-        </button>
-        <button
-          className={snapshot.terrainDetailAnchor === "camera" ? "is-active" : ""}
-          type="button"
-          aria-pressed={snapshot.terrainDetailAnchor === "camera"}
-          onClick={() => onTerrainDetailAnchorChange("camera")}
-        >
-          Camera
-        </button>
-      </div>
-      <p className="flight-panel__hint">
-        Aircraft refines Google mesh by its distance from the aircraft. Camera uses the current view instead. The camera always determines which tiles are visible.
-      </p>
-      <label className="flight-panel__field flight-panel__field--inline">
-        <input
-          aria-label="Allow coarser terrain for this session"
-          type="checkbox"
-          checked={snapshot.allowCoarserTerrainThisSession}
-          onChange={(event) => onTerrainDetailOverrideChange(event.target.checked)}
-        />
-        <span>Allow coarser terrain for this session</span>
-      </label>
-      <p className="flight-panel__hint">
-        This temporary override lets you spawn below your flight minimum and ends a held requirement. It resets when the game reloads.
-      </p>
-    </fieldset>
-  );
-}
-
-function DebugPanel({ snapshot, onCollisionDebugChange, onWheelSpinModeChange, onTireSoundChange }: Pick<FlightControlPanelProps,
-  "snapshot" | "onCollisionDebugChange" | "onWheelSpinModeChange" | "onTireSoundChange">) {
+function DebugPanel({ settings, snapshot, onCollisionDebugChange, onWheelSpinModeChange, onTireSoundChange }: Pick<FlightControlPanelProps,
+  "settings" | "snapshot" | "onCollisionDebugChange" | "onWheelSpinModeChange" | "onTireSoundChange">) {
   return (
     <div className="flight-panel__content">
       <div className="flight-panel__metrics">
@@ -916,7 +764,7 @@ function DebugPanel({ snapshot, onCollisionDebugChange, onWheelSpinModeChange, o
         <p className="flight-panel__hint">
           Compare wheel rotation and touchdown sound. Aircraft handling and braking stay the same.
           Changing modes resets the wheels; compare from an airborne approach. These choices are a
-          session-only override of Settings → Ground interaction, which can keep them.
+          session-only override of Aircraft → Ground handling, which can keep them.
         </p>
         <label className="flight-panel__field flight-panel__field--inline">
           <input type="checkbox" aria-label="Enable tire sound" checked={snapshot.tireSoundEnabled}
@@ -951,12 +799,13 @@ function DebugPanel({ snapshot, onCollisionDebugChange, onWheelSpinModeChange, o
           Clear log
         </button>
       </fieldset>
+      <SavedSettings settings={settings} />
     </div>
   );
 }
 
 export function FlightControlPanel(props: FlightControlPanelProps) {
-  // Keep drafts above the tabs so visiting Weather/Settings does not discard them.
+  // Keep drafts above the tabs so visiting another tab does not discard them.
   // Each family remembers its own generation and model choices for this session.
   const [selectedAircraftFamily, setSelectedAircraftFamily] = useState<AircraftFamilyId>(
     () => getAircraftFamilyForAircraft(props.snapshot.aircraftId).id,
@@ -1008,44 +857,43 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
               aircraftSelection={aircraftSelection}
               onAircraftSelectionChange={onAircraftSelectionChange}
               onAircraftFamilyChange={setSelectedAircraftFamily} />
-              : tabId === "autopilot" ? <AutopilotPanel
-                state={props.snapshot.autopilot}
-                onSettingsChange={props.onAutopilotSettingsChange}
-                onEngageChange={props.onAutopilotEngageChange} />
+              : tabId === "autopilot" ? <ParameterSection settings={props.settings} tab="autopilot" section="package"
+                covers={AUTOPILOT_PARAMETER_IDS}>
+                <AutopilotPanel
+                  state={props.snapshot.autopilot}
+                  onSettingsChange={props.onAutopilotSettingsChange}
+                  onEngageChange={props.onAutopilotEngageChange} />
+              </ParameterSection>
               : tabId === "controls" ? <div className="flight-panel__content">
                 <InputMethodSettings attach={props.attachInputMethod} />
                 {props.gamepadBindings
                   ? <GamepadBindingsPanel mount={props.gamepadBindings} />
                   : <p className="flight-panel__hint">Controller bindings are unavailable in this session.</p>}
-                {props.gamepadBindings?.polling && props.gamepadBindings.response && <GamepadSettingsPanel
-                  polling={props.gamepadBindings.polling}
-                  response={props.gamepadBindings.response}
-                />}
-                <KeyboardStickSettingsPanel {...props} />
-                <OrbitInvertSettingsPanel {...props} />
+                <ParameterSection settings={props.settings} tab="controls" section="gamepad">
+                  <p className="flight-panel__hint">
+                    Polling and response apply across binding profiles, and are saved on this device.
+                    They do not change keyboard, on-screen stick, or phone response.
+                  </p>
+                </ParameterSection>
+                <ParameterSection settings={props.settings} tab="controls" section="keyboard" covers={KEYBOARD_STICK_PARAMETER_IDS}>
+                  <KeyboardStickSettingsPanel parameters={props.parameters} />
+                </ParameterSection>
+                <ParameterSection settings={props.settings} tab="controls" section="orbit" />
+                <ParameterSection settings={props.settings} tab="controls" section="feedback" />
               </div>
               : tabId === "remote" ? <RemoteControlTab loadPhonePairing={props.loadPhonePairing} onUseAsRemote={props.onUseAsRemote}
-                cameraTuning={{ tuning: props.snapshot.phoneCameraTuning, onChange: props.onPhoneCameraTuningChange }} />
-              : tabId === "sound" ? <SoundSettingsPanel state={props.snapshot.sound} onAction={props.onSoundAction} />
-              : tabId === "engine" ? <EngineDetailsHost attach={props.attachEngineDetails} />
+                cameraTuning={<ParameterSection settings={props.settings} tab="remote" section="camera">
+                  <PhoneCameraTuningPanel parameters={props.parameters} />
+                </ParameterSection>} />
+              : tabId === "sound" ? <ParameterSection settings={props.settings} tab="sound" section="sound" covers={AUDIO_PARAMETER_IDS}>
+                <SoundSettingsPanel state={props.snapshot.sound} onAction={props.onSoundAction} />
+              </ParameterSection>
+              : tabId === "engine" ? <>
+                <EngineDetailsHost attach={props.attachEngineDetails} />
+                <ParameterSection settings={props.settings} tab="engine" section="engine" />
+              </>
               : tabId === "logging" ? <LoggingPanel state={props.snapshot.logging} onAction={props.onLoggingAction} />
-              : tabId === "settings" ? <>
-                <AttitudeIndicatorSettings setting={attitudeRendererSetting} />
-                <fieldset className="flight-panel__fieldset">
-                  <legend>Ground impacts</legend>
-                  <label className="flight-panel__field flight-panel__field--inline">
-                    <input type="checkbox" aria-label="Arcade ground launches"
-                      checked={props.snapshot.arcadeGroundLaunches}
-                      onChange={(event) => props.onArcadeGroundLaunchesChange(event.target.checked)} />
-                    <span>Arcade ground launches</span>
-                  </label>
-                  <p className="flight-panel__hint">Exaggerated bounces for fun. With this off, deep ground impacts stop the flight before the gear springs can launch it.</p>
-                </fieldset>
-                <GroundInteractionSettingsPanel state={props.snapshot.groundInteraction}
-                  onAction={props.onGroundInteractionAction} />
-                <FlightTerrainSettings {...props} />
-                <MapCachePanel />
-              </> : <DebugPanel snapshot={props.snapshot} onCollisionDebugChange={props.onCollisionDebugChange}
+              : <DebugPanel settings={props.settings} snapshot={props.snapshot} onCollisionDebugChange={props.onCollisionDebugChange}
                 onWheelSpinModeChange={props.onWheelSpinModeChange} onTireSoundChange={props.onTireSoundChange} />}
         </>;
       }}

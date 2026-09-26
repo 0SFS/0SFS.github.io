@@ -1,3 +1,4 @@
+import { flightParameterDefaults, type FlightParameters } from "../settings/flightParameters";
 import type { WheelCue, WheelCueSink } from "./wheelCueBus";
 
 /** One device envelope; magnitudes are 0..1. Presentation only. */
@@ -9,19 +10,37 @@ export interface HapticEnvelope {
   weak: number;
 }
 
-export const HAPTIC_INTERVAL_MS = 50;
-export const HAPTIC_MAX_DURATION_MS = 60;
+/** The osfs.feedback.* parameters. */
+export interface HapticTuning {
+  /** One envelope per window of this length. */
+  intervalMs: number;
+  maxDurationMs: number;
+  /** Weaker envelopes are not sent, 0..1. */
+  minMagnitude: number;
+  /**
+   * Authored scales, not measured tire data: the strut impulse and the slip
+   * work in one window that give a full-strength vibration.
+   */
+  touchdownReferenceNs: number;
+  slipReferenceJ: number;
+}
+
+export function readHapticTuning(parameters: FlightParameters): HapticTuning {
+  return {
+    intervalMs: parameters.get("osfs.feedback.hapticInterval"),
+    maxDurationMs: parameters.get("osfs.feedback.hapticMaxDuration"),
+    minMagnitude: parameters.get("osfs.feedback.minMagnitude"),
+    touchdownReferenceNs: parameters.get("osfs.feedback.touchdownReference"),
+    slipReferenceJ: parameters.get("osfs.feedback.slipReference"),
+  };
+}
+
+/** The catalogue's values, for callers without a registry. */
+export const DEFAULT_HAPTIC_TUNING: Readonly<HapticTuning> = Object.freeze(readHapticTuning(flightParameterDefaults()));
+
 const TOUCHDOWN_WINDOW_S = 0.06;
 /** Only spin-up slip pulses; a sustained skid is not a touchdown cue and must not buzz continuously. */
 const SPIN_UP_WINDOW_S = 0.4;
-const MIN_MAGNITUDE = 0.03;
-/**
- * Authored scales, not measured tire data: ~0.3 kN·s is the estimated main-gear
- * strut impulse in the first 60 ms of a firm C172 touchdown; 1.2 kJ is roughly
- * one 50 ms window of the modeled gentle-touchdown spin-up slip work.
- */
-const REFERENCE_TOUCHDOWN_IMPULSE_NS = 300;
-const REFERENCE_SLIP_J = 1_200;
 
 export interface HapticOutput {
   /** Latest value replaces any running effect; implementations never queue. */
@@ -35,7 +54,7 @@ const round = (value: number) => Math.round(value * 100) / 100;
  * Aggregates three wheels into one envelope per 50 ms tick. There is no event
  * list: a window is summarized and cleared, so stale impacts cannot replay.
  */
-export function createHapticAggregator(wheelCount = 3) {
+export function createHapticAggregator(wheelCount = 3, getTuning: () => HapticTuning = () => DEFAULT_HAPTIC_TUNING) {
   const sinceContact = new Array<number>(wheelCount).fill(Infinity);
   let touchdownImpulseNs = 0;
   let slipJ = 0;
@@ -57,14 +76,16 @@ export function createHapticAggregator(wheelCount = 3) {
     reset,
     /** Summarizes and clears the current window. */
     take(strength: number): HapticEnvelope | null {
+      const tuning = getTuning();
       const scale = Number.isFinite(strength) ? Math.min(1, Math.max(0, strength)) : 0;
-      const impact = Math.min(1, touchdownImpulseNs / REFERENCE_TOUCHDOWN_IMPULSE_NS);
+      const impact = Math.min(1, touchdownImpulseNs / tuning.touchdownReferenceNs);
       const strong = touchdownImpulseNs > 0 ? round(scale * (0.25 + 0.75 * impact)) : 0;
-      const weak = round(scale * Math.min(1, Math.sqrt(slipJ / REFERENCE_SLIP_J)));
+      const weak = round(scale * Math.min(1, Math.sqrt(slipJ / tuning.slipReferenceJ)));
       touchdownImpulseNs = slipJ = 0;
-      if (strong < MIN_MAGNITUDE && weak < MIN_MAGNITUDE) return null;
-      return { durationMs: strong >= MIN_MAGNITUDE ? HAPTIC_MAX_DURATION_MS : 40,
-        strong: strong >= MIN_MAGNITUDE ? strong : 0, weak: weak >= MIN_MAGNITUDE ? weak : 0 };
+      const min = tuning.minMagnitude;
+      if (strong < min && weak < min) return null;
+      return { durationMs: strong >= min ? tuning.maxDurationMs : Math.min(40, tuning.maxDurationMs),
+        strong: strong >= min ? strong : 0, weak: weak >= min ? weak : 0 };
     },
   };
 }
@@ -72,15 +93,18 @@ export function createHapticAggregator(wheelCount = 3) {
 export interface HapticsController extends WheelCueSink {
   setEnabled(enabled: boolean): void;
   setStrength(strength: number): void;
-  /** Call from the render/sim tick. Emits at most once per 50 ms, only when playable. */
+  /** Call from the render/sim tick. Emits at most once per interval, only when playable. */
   tick(nowMs: number, playable: boolean): void;
   /** Zero all outputs now (pause, hidden page, reset, disconnect, disable). */
   cancel(): void;
   dispose(): void;
 }
 
-export function createHapticsController(outputs: readonly HapticOutput[]): HapticsController {
-  const aggregator = createHapticAggregator();
+export function createHapticsController(
+  outputs: readonly HapticOutput[],
+  getTuning: () => HapticTuning = () => DEFAULT_HAPTIC_TUNING,
+): HapticsController {
+  const aggregator = createHapticAggregator(3, getTuning);
   let enabled = false;
   let disposed = false;
   let strength = 0.6;
@@ -107,7 +131,7 @@ export function createHapticsController(outputs: readonly HapticOutput[]): Hapti
     tick(nowMs, playable) {
       if (!enabled || disposed) return;
       if (!playable) { cancel(); return; }
-      if (nowMs - lastEmitMs < HAPTIC_INTERVAL_MS) return;
+      if (nowMs - lastEmitMs < getTuning().intervalMs) return;
       lastEmitMs = nowMs;
       const envelope = aggregator.take(strength);
       if (!envelope) return;
@@ -153,6 +177,7 @@ export function createGamepadHapticOutput(options: {
   getSelectedSlot?: () => number;
   events?: EventTarget | null;
   onChange?: () => void;
+  getTuning?: () => HapticTuning;
 } = {}): GamepadHapticOutput {
   const navigatorLike = typeof navigator === "undefined" ? undefined
     : navigator as Navigator & { getGamepads?: () => ArrayLike<GamepadLike | null> };
@@ -208,7 +233,7 @@ export function createGamepadHapticOutput(options: {
         playing = current;
         const result = current.playEffect!("dual-rumble", {
           startDelay: 0,
-          duration: Math.min(HAPTIC_MAX_DURATION_MS, Math.max(0, Math.round(envelope.durationMs))),
+          duration: Math.min((options.getTuning?.() ?? DEFAULT_HAPTIC_TUNING).maxDurationMs, Math.max(0, Math.round(envelope.durationMs))),
           strongMagnitude: Math.min(1, Math.max(0, envelope.strong)),
           weakMagnitude: Math.min(1, Math.max(0, envelope.weak)),
         });

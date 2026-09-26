@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { STICK_DEADBAND } from "../input/autoTrim";
+import { flightParameterDefaults } from "../settings/flightParameters";
 import { createOurAutopilotState, stepOurAutopilot, type OurAutopilotInput } from "./ourAutopilot";
+
+const STICK_DEADBAND = flightParameterDefaults().get("osfs.autopilot.stickOverride");
 
 const AIRBORNE: OurAutopilotInput = {
   dt: 1 / 120,
@@ -18,6 +20,7 @@ const AIRBORNE: OurAutopilotInput = {
   rudder: 0,
   active: { roll: true, pitch: true, yaw: true, throttle: true },
   throttleMode: "airspeed",
+  stickOverride: STICK_DEADBAND,
 };
 
 function step(state = createOurAutopilotState(), input: Partial<OurAutopilotInput> = {}) {

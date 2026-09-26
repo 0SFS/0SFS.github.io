@@ -10,10 +10,12 @@ export interface FlightCameraInputOptions {
   orbit(dx: number, dy: number): void;
   zoom(factor: number): void;
   onOrbitActive?(active: boolean): void;
+  /**
+   * osfs.input.touchWheelCooldown: how long to ignore the late wheel pans a
+   * browser synthesises after a touch gesture ends, in ms.
+   */
+  getTouchWheelCooldownMs(): number;
 }
-
-/** Ignore late synthesized wheel pans briefly after a touch gesture ends. */
-const TOUCH_WHEEL_COOLDOWN_MS = 180;
 
 /** Canvas gestures only; keyboard/gamepad physics input remains independent. */
 export function attachFlightCameraInput(canvas: HTMLCanvasElement, options: FlightCameraInputOptions): () => void {
@@ -136,7 +138,7 @@ export function attachFlightCameraInput(canvas: HTMLCanvasElement, options: Flig
       const nextTouch = readTouch(event);
       touch = nextTouch;
       setOrbitActive(nextTouch !== null);
-      touchWheelCooldownUntil = owner.performance.now() + TOUCH_WHEEL_COOLDOWN_MS;
+      touchWheelCooldownUntil = owner.performance.now() + options.getTouchWheelCooldownMs();
     });
   }
   return () => {

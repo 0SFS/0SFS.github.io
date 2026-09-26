@@ -4,7 +4,7 @@ Research checked 2026-09-10. The experiment adds a small wheel-rotation model an
 
 ## Try it
 
-The durable way is **Settings → Ground interaction**: choose **Landing
+The durable way is **Aircraft → Ground handling**: choose **Landing
 feedback** (finite-inertia wheels plus the slip cue) or build a Custom mix of
 wheel response, tire audio, volume, haptics and strength. These choices persist,
 can be saved as named profiles and exported/imported as text. Wheel-response
@@ -47,7 +47,7 @@ a new epoch, so partial feedback never carries across. The slip sound reads this
 bus; nothing reads it back into flight physics. An integrated benchmark asserts
 the trajectory is identical with feedback off and on.
 
-Haptics are optional presentation (**Settings → Ground interaction → Haptics →
+Haptics are optional presentation (**Aircraft → Ground handling → Haptics →
 Landing cues**, off by default): a touchdown load pulse on a gamepad's
 low-frequency motor and a short spin-up pulse on its high-frequency motor, at
 most one ≤60 ms envelope per 50 ms, replaced rather than queued. A controller

@@ -130,6 +130,11 @@ export interface FlightAudioHandle {
   setAllowUnvalidated(allow: boolean): void;
   /** Explicit re-test after a downgrade (sound.md §1, §6). */
   retest(): void;
+  /**
+   * The saved settings changed without this handle, as from Show all
+   * parameters or an import: apply them. Enabling still needs a gesture.
+   */
+  followSettings(): void;
   /** Takes ownership; disposed before the SDK is torn down. */
   attachAdapter(adapter: AudioAdapter | null): void;
   /**
@@ -614,6 +619,22 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
       options.settings.update(patch);
       settings = options.settings.settings;
       sendGains();
+      refreshStats();
+      notify();
+    },
+
+    followSettings() {
+      if (disposed) return;
+      const next = options.settings.settings;
+      if (next === settings) return;
+      const tierChanged = next.requested !== settings.requested || next.enabled !== settings.enabled;
+      settings = next;
+      if (tierChanged) {
+        fallback?.retest(requestedTier(), now());
+        sync(inGesture());
+      } else {
+        sendGains();
+      }
       refreshStats();
       notify();
     },

@@ -1,3 +1,11 @@
+import {
+  flightParameterDefaults,
+  flightParameterSpec,
+  type FlightParameterId,
+  type FlightParameters,
+  type FlightParameterValues,
+} from "../settings/flightParameters";
+
 /** How WASD/QE move the simulated stick. */
 export type KeyboardStickMode = "direct" | "smooth" | "rate" | "assist";
 
@@ -58,27 +66,43 @@ export const KEYBOARD_STICK_MODES: readonly {
   },
 ];
 
-/** Defaults reproduce the previous hardcoded exponential filter (rate ≈ 8). */
-export const DEFAULT_KEYBOARD_STICK_SETTINGS: KeyboardStickSettings = {
-  mode: "smooth",
-  expo: 0,
-  smoothResponseSec: 0.375,
-  smoothReturnSec: 0.375,
-  rateTimeToFull: 0.6,
-  rateTimeToCenter: 0.25,
-  rateAccelAfterSec: 0.35,
-  rateAccelMultiplier: 2.5,
-  rateMaxDeflection: 1,
-  assistRollRateDeg: 45,
-  assistPitchRateDeg: 20,
-  assistYawRateDeg: 20,
-  assistKp: 0.8,
-  assistKi: 0.15,
-  assistKd: 0.02,
-  assistMaxDeflection: 1,
-};
+const NUMBER_FIELDS = [
+  "expo", "smoothResponseSec", "smoothReturnSec", "rateTimeToFull", "rateTimeToCenter",
+  "rateAccelAfterSec", "rateAccelMultiplier", "rateMaxDeflection", "assistRollRateDeg",
+  "assistPitchRateDeg", "assistYawRateDeg", "assistKp", "assistKi", "assistKd", "assistMaxDeflection",
+] as const satisfies readonly (keyof KeyboardStickSettings)[];
 
-const PREFERENCE_KEY = "osfs.keyboard-stick";
+type NumberField = (typeof NUMBER_FIELDS)[number];
+
+/** The osfs.input.keyboard.* parameter that holds a field. */
+export function keyboardStickParameterId<Field extends keyof KeyboardStickSettings>(field: Field) {
+  return `osfs.input.keyboard.${field}` as const;
+}
+
+/** Every osfs.input.keyboard.* id, for the section that edits them. */
+export const KEYBOARD_STICK_PARAMETER_IDS: readonly FlightParameterId[] = [
+  keyboardStickParameterId("mode"),
+  ...NUMBER_FIELDS.map(keyboardStickParameterId),
+];
+
+/** The keyboard stick as the osfs.input.keyboard.* parameters set it. */
+export function readKeyboardStickSettings(parameters: FlightParameters): KeyboardStickSettings {
+  const settings = { mode: parameters.get(keyboardStickParameterId("mode")) } as KeyboardStickSettings;
+  for (const field of NUMBER_FIELDS) settings[field] = parameters.get(keyboardStickParameterId(field));
+  return settings;
+}
+
+/** Settings as parameter values, to write with `setMany`. */
+export function keyboardStickParameterValues(settings: Partial<KeyboardStickSettings>): Partial<FlightParameterValues> {
+  const values: Partial<Record<FlightParameterId, unknown>> = {};
+  for (const [field, value] of Object.entries(settings)) {
+    if (value !== undefined) values[keyboardStickParameterId(field as keyof KeyboardStickSettings)] = value;
+  }
+  return values as Partial<FlightParameterValues>;
+}
+
+/** The catalogue's defaults, which reproduce the previous hardcoded exponential filter (rate ≈ 8). */
+export const DEFAULT_KEYBOARD_STICK_SETTINGS: KeyboardStickSettings = readKeyboardStickSettings(flightParameterDefaults());
 
 const MODES = new Set<KeyboardStickMode>(["direct", "smooth", "rate", "assist"]);
 
@@ -86,49 +110,19 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
-function finite(value: unknown, fallback: number, min: number, max: number): number {
-  return typeof value === "number" && Number.isFinite(value) ? clamp(value, min, max) : fallback;
+function finite(field: NumberField, value: unknown): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) return DEFAULT_KEYBOARD_STICK_SETTINGS[field];
+  const spec = flightParameterSpec(keyboardStickParameterId(field));
+  const bounds = "bounds" in spec ? spec.bounds() : null;
+  return bounds ? clamp(value, bounds.min, bounds.max) : value;
 }
 
+/** Fills missing fields with the defaults and keeps numbers inside the parameters' bounds. */
 export function normalizeKeyboardStickSettings(
   partial: Partial<KeyboardStickSettings> | null | undefined,
 ): KeyboardStickSettings {
-  const d = DEFAULT_KEYBOARD_STICK_SETTINGS;
-  const mode = partial?.mode && MODES.has(partial.mode) ? partial.mode : d.mode;
-  return {
-    mode,
-    expo: finite(partial?.expo, d.expo, 0, 1),
-    smoothResponseSec: finite(partial?.smoothResponseSec, d.smoothResponseSec, 0.05, 3),
-    smoothReturnSec: finite(partial?.smoothReturnSec, d.smoothReturnSec, 0.05, 3),
-    rateTimeToFull: finite(partial?.rateTimeToFull, d.rateTimeToFull, 0.1, 5),
-    rateTimeToCenter: finite(partial?.rateTimeToCenter, d.rateTimeToCenter, 0.05, 3),
-    rateAccelAfterSec: finite(partial?.rateAccelAfterSec, d.rateAccelAfterSec, 0, 3),
-    rateAccelMultiplier: finite(partial?.rateAccelMultiplier, d.rateAccelMultiplier, 1, 8),
-    rateMaxDeflection: finite(partial?.rateMaxDeflection, d.rateMaxDeflection, 0.1, 1),
-    assistRollRateDeg: finite(partial?.assistRollRateDeg, d.assistRollRateDeg, 5, 180),
-    assistPitchRateDeg: finite(partial?.assistPitchRateDeg, d.assistPitchRateDeg, 5, 90),
-    assistYawRateDeg: finite(partial?.assistYawRateDeg, d.assistYawRateDeg, 5, 90),
-    assistKp: finite(partial?.assistKp, d.assistKp, 0, 5),
-    assistKi: finite(partial?.assistKi, d.assistKi, 0, 2),
-    assistKd: finite(partial?.assistKd, d.assistKd, 0, 1),
-    assistMaxDeflection: finite(partial?.assistMaxDeflection, d.assistMaxDeflection, 0.1, 1),
-  };
-}
-
-export function loadKeyboardStickSettings(): KeyboardStickSettings {
-  try {
-    const raw = window.localStorage.getItem(PREFERENCE_KEY);
-    if (!raw) return { ...DEFAULT_KEYBOARD_STICK_SETTINGS };
-    return normalizeKeyboardStickSettings(JSON.parse(raw) as Partial<KeyboardStickSettings>);
-  } catch {
-    return { ...DEFAULT_KEYBOARD_STICK_SETTINGS };
-  }
-}
-
-export function saveKeyboardStickSettings(settings: KeyboardStickSettings): void {
-  try {
-    window.localStorage.setItem(PREFERENCE_KEY, JSON.stringify(normalizeKeyboardStickSettings(settings)));
-  } catch {
-    // Preference persistence is best-effort.
-  }
+  const mode = partial?.mode && MODES.has(partial.mode) ? partial.mode : DEFAULT_KEYBOARD_STICK_SETTINGS.mode;
+  const settings = { mode } as KeyboardStickSettings;
+  for (const field of NUMBER_FIELDS) settings[field] = finite(field, partial?.[field]);
+  return settings;
 }

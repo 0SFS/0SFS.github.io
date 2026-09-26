@@ -8,9 +8,11 @@ import {
   type BindingSpec,
   type HostInputAdapter,
 } from "@felipegalind0/gamepad-tools/core";
+import { flightParameterDefaults } from "../settings/flightParameters";
 import type { FlightInputManager } from "./flightInputManager";
 
-const PROFILE_STICK_DEADZONE = 0.08;
+/** osfs.input.stickDeadzone at the catalogue's default, for a profile built without a registry. */
+const DEFAULT_STICK_DEADZONE = flightParameterDefaults().get("osfs.input.stickDeadzone");
 
 export const FLIGHT_GAMEPAD_ACTIONS: readonly ActionDescriptor[] = [
   { id: "flight.elevator", label: "Pitch", category: "Flight controls", kind: "axis", range: [-1, 1], contexts: ["flight"], available: true },
@@ -100,6 +102,7 @@ function single(
   source: BindingSource,
   outputRange: readonly [number, number],
   override: Partial<BindingSpec["transform"]> = {},
+  stickDeadzone = DEFAULT_STICK_DEADZONE,
 ): BindingSpec {
   return {
     id,
@@ -112,7 +115,7 @@ function single(
     transform: {
       ...DEFAULT_BINDING_TRANSFORM,
       deadzone: source.selector.kind === "gamepad-axis" && semantics === "axis"
-        ? PROFILE_STICK_DEADZONE
+        ? stickDeadzone
         : DEFAULT_BINDING_TRANSFORM.deadzone,
       outputRange,
       inputRange: source.selector.kind === "gamepad-axis" ? [-1, 1] : [0, 1],
@@ -176,31 +179,31 @@ function profile(name: string, id: string, bindings: BindingSpec[]): BindingProf
  * The historical 0sfs mapping is offered explicitly rather than silently
  * replacing existing users' controller behavior.
  */
-export function createLegacyFlightProfile(slot = 0): BindingProfile {
+export function createLegacyFlightProfile(slot = 0, stickDeadzone = DEFAULT_STICK_DEADZONE): BindingProfile {
   return profile("Classic", "0sfs-legacy-compatible", [
     ...keyboardDefaults(),
-    single("legacy-aileron", "flight.aileron", "axis", axisSource(slot, 0), [-1, 1]),
-    single("legacy-elevator", "flight.elevator", "axis", axisSource(slot, 1), [-1, 1], { invert: true }),
-    single("legacy-rudder", "flight.rudder", "axis", axisSource(slot, 2), [-1, 1]),
-    single("legacy-throttle", "flight.throttle", "value", axisSource(slot, 3), [0, 1], { invert: true }),
+    single("legacy-aileron", "flight.aileron", "axis", axisSource(slot, 0), [-1, 1], {}, stickDeadzone),
+    single("legacy-elevator", "flight.elevator", "axis", axisSource(slot, 1), [-1, 1], { invert: true }, stickDeadzone),
+    single("legacy-rudder", "flight.rudder", "axis", axisSource(slot, 2), [-1, 1], {}, stickDeadzone),
+    single("legacy-throttle", "flight.throttle", "value", axisSource(slot, 3), [0, 1], { invert: true }, stickDeadzone),
     single("legacy-brake", "flight.brake", "value", buttonSource(slot, 0), [0, 1]),
   ]);
 }
 
 /** A deliberate standard-controller preset that avoids a resting-stick throttle. */
-export function createStandardFlightProfile(slot = 0): BindingProfile {
+export function createStandardFlightProfile(slot = 0, stickDeadzone = DEFAULT_STICK_DEADZONE): BindingProfile {
   return profile("Xbox", "0sfs-standard-flight", [
     ...keyboardDefaults(),
-    single("standard-aileron", "flight.aileron", "axis", axisSource(slot, 0), [-1, 1]),
-    single("standard-elevator", "flight.elevator", "axis", axisSource(slot, 1), [-1, 1], { invert: true }),
+    single("standard-aileron", "flight.aileron", "axis", axisSource(slot, 0), [-1, 1], {}, stickDeadzone),
+    single("standard-elevator", "flight.elevator", "axis", axisSource(slot, 1), [-1, 1], { invert: true }, stickDeadzone),
     paired("standard-rudder", "flight.rudder", "axis", buttonSource(slot, 7), buttonSource(slot, 6)),
     paired("standard-throttle", "flight.throttleRate", "rate", buttonSource(slot, 3), buttonSource(slot, 1)),
     // Xbox/PlayStation-style right-stick X is commonly interpreted as
     // "look right = higher heading offset", but this varies by browser
     // implementation. Start from an opinionated baseline and keep a UI
     // override for pilot preference.
-    single("standard-camera-yaw", "flight.cameraYaw", "axis", axisSource(slot, 2), [-1, 1], { invert: true }),
-    single("standard-camera-pitch", "flight.cameraPitch", "axis", axisSource(slot, 3), [-1, 1], { invert: true }),
+    single("standard-camera-yaw", "flight.cameraYaw", "axis", axisSource(slot, 2), [-1, 1], { invert: true }, stickDeadzone),
+    single("standard-camera-pitch", "flight.cameraPitch", "axis", axisSource(slot, 3), [-1, 1], { invert: true }, stickDeadzone),
     single("standard-brake", "flight.brake", "value", buttonSource(slot, 0), [0, 1]),
     single("standard-gear", "flight.gearToggle", "command", buttonSource(slot, 2), [0, 1]),
     single("standard-pause", "flight.pause", "command", buttonSource(slot, 9), [0, 1]),

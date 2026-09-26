@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { BabylonRuntimeStatus } from "foss-earth/runtime";
+import { getAppSettings, resetAppSettings } from "foss-earth/settings";
 import { createMapDetailController } from "foss-earth/shell";
 import { createFlightHudBar, type FlightHudBarOptions } from "./createFlightHudBar";
 
@@ -12,7 +13,8 @@ beforeEach(() => {
     clear: () => values.clear(),
   });
 });
-afterEach(() => { document.body.replaceChildren(); window.localStorage.clear(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+// The input mode lives in the app's settings registry: each test starts a fresh one.
+afterEach(() => { document.body.replaceChildren(); window.localStorage.clear(); vi.restoreAllMocks(); vi.unstubAllGlobals(); resetAppSettings(); });
 
 function createTestHud(overrides: Partial<FlightHudBarOptions> = {}) {
   const container = document.createElement("div");
@@ -135,7 +137,7 @@ describe("flight input method selector", () => {
     expect(section.querySelectorAll(".gesture-card")).toHaveLength(2);
     section.querySelector<HTMLButtonElement>(".input-mode-toggle-option[data-mode=trackpad]")!.click();
     expect(onInputModeChange).toHaveBeenLastCalledWith("trackpad");
-    expect(window.localStorage.getItem("foss-earth.inputMode")).toBe("trackpad");
+    expect(getAppSettings().get("input.mode")).toBe("trackpad");
     expect(button.getAttribute("aria-label")).toBe("Trackpad mode. Show or hide input settings");
     expect(section.querySelector('[aria-label="Two-finger swipe to orbit"]')).not.toBeNull();
     unmountSection();

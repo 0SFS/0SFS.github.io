@@ -7,8 +7,6 @@
  * pitches the nose down, positive rudder yaws right (converted at apply).
  */
 
-import { STICK_DEADBAND } from "../input/autoTrim";
-
 export interface AttitudeHoldState {
   hasTarget: boolean;
   targetRad: number;
@@ -122,6 +120,8 @@ export interface OurAutopilotInput {
   rudder: number;
   active: { roll: boolean; pitch: boolean; yaw: boolean; throttle: boolean };
   throttleMode: "airspeed" | "hold";
+  /** osfs.autopilot.stickOverride: a stick deflected further than this takes its axis back. */
+  stickOverride: number;
 }
 
 export interface OurAutopilotCommands {
@@ -131,8 +131,8 @@ export interface OurAutopilotCommands {
   throttle: number | null;
 }
 
-export function stickDeflected(value: number): boolean {
-  return Math.abs(finite(value)) > STICK_DEADBAND;
+export function stickDeflected(value: number, threshold: number): boolean {
+  return Math.abs(finite(value)) > threshold;
 }
 
 export function stepOurAutopilot(
@@ -148,7 +148,7 @@ export function stepOurAutopilot(
     kd: ROLL_KD,
     commandSign: 1,
     active: input.active.roll,
-    yieldToPilot: onGround || stickDeflected(input.aileron),
+    yieldToPilot: onGround || stickDeflected(input.aileron, input.stickOverride),
   });
   const pitched = stepAttitude(state.pitch, {
     dt: input.dt,
@@ -158,7 +158,7 @@ export function stepOurAutopilot(
     kd: PITCH_KD,
     commandSign: -1,
     active: input.active.pitch,
-    yieldToPilot: onGround || stickDeflected(input.elevator),
+    yieldToPilot: onGround || stickDeflected(input.elevator, input.stickOverride),
   });
   const yawed = stepAttitude(state.yaw, {
     dt: input.dt,
@@ -168,7 +168,7 @@ export function stepOurAutopilot(
     kd: YAW_KD,
     commandSign: 1,
     active: input.active.yaw,
-    yieldToPilot: onGround || stickDeflected(input.rudder),
+    yieldToPilot: onGround || stickDeflected(input.rudder, input.stickOverride),
   });
 
   let throttleState = state.throttle;

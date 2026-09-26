@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { createWheelSpinState, type WheelSpinState } from "../physics/wheelSpin";
 import {
   createGamepadHapticOutput, createHapticAggregator, createHapticsController,
-  HAPTIC_INTERVAL_MS, HAPTIC_MAX_DURATION_MS, type GamepadLike, type HapticOutput,
+  DEFAULT_HAPTIC_TUNING, type GamepadLike, type HapticOutput,
 } from "./haptics";
 import { createWheelCueBus, type WheelName } from "./wheelCueBus";
 
@@ -30,7 +30,7 @@ describe("haptic aggregation", () => {
     bus.publish(DT, DT, wheels([false, false, false]));
     for (let step = 0; step < 6; step++) bus.publish(DT * (step + 2), DT, wheels([false, true, true], 4_000, 20_000));
     const envelope = aggregator.take(1)!;
-    expect(envelope.durationMs).toBe(HAPTIC_MAX_DURATION_MS);
+    expect(envelope.durationMs).toBe(DEFAULT_HAPTIC_TUNING.maxDurationMs);
     expect(envelope.strong).toBeGreaterThan(0.25);
     expect(envelope.strong).toBeLessThanOrEqual(1);
     expect(envelope.weak).toBeGreaterThan(0);
@@ -79,7 +79,7 @@ describe("haptics controller", () => {
       controller.tick(frame * 10, true);
     }
     // 300 ms of 100 Hz ticks: 0, 50, …, 250 ms.
-    expect(output.plays).toHaveLength(Math.floor(290 / HAPTIC_INTERVAL_MS) + 1);
+    expect(output.plays).toHaveLength(Math.floor(290 / DEFAULT_HAPTIC_TUNING.intervalMs) + 1);
     expect(output.plays.every(envelope => (envelope as { durationMs: number }).durationMs <= 60)).toBe(true);
   });
 

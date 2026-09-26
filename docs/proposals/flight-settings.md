@@ -1,7 +1,8 @@
 # Flight settings
 
-Status: Proposal (2026-09-25). Nothing here is implemented yet.
-Builds on FOSS Earth's [Settings](../../../foss-earth/docs/proposals/settings.md)
+Status: stage 1 implemented (2026-09-25); detail focus, presets and the sound
+tiers' internal parameters are not. What stage 1 did and where it differs from
+this text: [Implementation](#implementation). Builds on FOSS Earth's [Settings](../../../foss-earth/docs/proposals/settings.md)
 spec, which defines the registry, the controls, presets, automatic adjustment,
 persistence and the globe's own settings. This document lists what 0sfs adds to
 that registry, where each flight setting lives, and which flight constants
@@ -20,6 +21,7 @@ Each moves to the tab where its effect is seen, and the tab is removed.
 | Flight terrain → Allow coarser terrain for this session | Map → Detail, beside the Flight minimum | It suspends that marker |
 | Map cache | Map → Loading and memory (FOSS Earth) | It is the globe's HTTP tile cache |
 | Attitude indicator renderer | Renderer → Instruments | It chooses a renderer backend |
+| (new) whole-record export, import and reset | Debug → Saved settings | FOSS Earth keeps it in a Settings tab 0sfs no longer has |
 | Ground impacts (Arcade ground launches) and Ground interaction | Aircraft → Ground handling | They change the aircraft's physics |
 
 The Aircraft tab's **Camera** choice (Cockpit, Chase) stays where it is, with
@@ -188,3 +190,70 @@ Follows FOSS Earth's sequence: stage 1 (registry) moves these sections and
 removes the Settings tab; the host-marker API and the Flight minimum marker come
 with it; the focus point registration comes with FOSS Earth's detail focus
 stage; the remaining parameters follow with FOSS Earth's stage 5.
+
+## Implementation
+
+### Stage 1 (2026-09-25)
+
+Done with FOSS Earth's stage 1 (the registry, its section UI and host markers):
+
+- 105 parameters are declared in `src/flight/settings/flightParameters.ts`, the
+  only place a flight default is written. `registerFlightSettings.ts` adds them
+  to the app registry with their section titles and source links, and
+  `flightMigrations.ts` moves every key in [Migration](#migration) into it once,
+  leaving the old keys for rollback. Code reads values through a
+  `FlightParameterStore`; `flightParameterDefaults()` is the catalogue in memory,
+  for tests.
+- The Settings tab is gone. Every 0sfs section is drawn with FOSS Earth's
+  `createParameterSection`, so each parameter is reachable under **Show all
+  parameters** with its unit, bounds, default, provenance and source.
+- The Flight minimum is a red, draggable requirement marker on the Map → Detail
+  Google track, hollow while waived, and a tick on the HUD rail while a hold is
+  active. **Allow coarser terrain for this session** is the session parameter
+  `osfs.flight.allowCoarserThisSession`, drawn beside it.
+- **Terrain detail follows** is FOSS Earth's `map.focus.refineFrom`; 0sfs sets
+  its default to the focus point, which in a flight is the aircraft.
+- A map switch made anywhere (the Map tab, Show all parameters, an import)
+  prepares the terrain again when it changes the ground under the aircraft.
+- Whole-record export, import and reset are in Debug → Saved settings.
+
+Where it differs from the tables above, from what the code turned out to do:
+
+- `osfs.input.initialThrottle` is `osfs.start.throttle` in Aircraft → Start. The
+  start throttle is set in JSBSim at bootstrap from the aircraft's profile
+  (0.65 for the Cessna 172, 0.35 for the SF50), which sets it as the default.
+- `osfs.start.location` is `osfs.start.latitude` and `.longitude`. The start
+  heading (300°) and airspeed (120 kt) were hidden in the same place and joined
+  them.
+- The chase offset was not per aircraft: one offset, 14 m behind and 2.2 m up.
+  The field of view was 1.05 rad on both flight cameras, not the globe's. The
+  chase zoom limits (8–500 m) and the gamepad orbit rates (1.5 and 1.15 rad/s)
+  were in the same code and joined `osfs.camera.*`.
+- The 0.05 listed as `osfs.assist.trimDeadband` is the stick deflection at which
+  the autopilot yields an axis: `osfs.autopilot.stickOverride`. The trim's own
+  deadband is 0.04 rad/s² of leftover acceleration, now `.trimDeadband`, and its
+  gain (1.25 per s) joined as `.trimGain`. `.trimMinAirspeed` is the floor of the
+  damping estimate, not a speed below which trim stops.
+- Orbit inversion had already moved to FOSS Earth: it is `input.orbit.*`, drawn
+  in Controls → Orbit beside `osfs.input.touchWheelCooldown`.
+- Phone camera tuning is `osfs.camera.phone.*` in Remote Control, with the
+  buffer, catch-up and prediction continuous instead of lists. The chase frame
+  changes every chase view, so it is `osfs.camera.chaseFrame` in Aircraft →
+  Camera.
+- The gamepad polling rate is a number (10–240 Hz) with Every frame as a named
+  value, not four choices.
+- Which engine sections are open stays in `osfs.engineMonitor.v1`, as FOSS
+  Earth keeps `foss-earth.panelSectionsOpen`: it is the panel's memory, not a
+  setting. The fuel flow unit is `osfs.engineMonitor.fuelFlowUnit`.
+- Named ground profiles stay in `osfs.ground-interaction-profiles.v1` until the
+  registry's presets can hold them; the ground values are `osfs.ground.*`.
+
+Not done:
+
+- [Detail around the aircraft](#detail-around-the-aircraft): the focus point,
+  `osfs.focus.default` and the headless orbit check wait for FOSS Earth's detail
+  focus stage.
+- [Presets](#presets) wait for FOSS Earth's preset stage; the ground profiles and
+  the phone camera's Original and Recommended move into them then.
+- The sound tiers' internal parameters are compiled into the DSP core. Exposing
+  them needs the core to take them at run time and a WASM rebuild.

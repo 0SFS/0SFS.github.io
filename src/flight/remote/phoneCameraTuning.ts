@@ -5,6 +5,14 @@
  * each option, with the delay it costs, is `docs/phone-controller.md`
  * → *Camera trackpad tuning*.
  */
+import {
+  flightParameterDefaults,
+  flightParameterSpec,
+  type FlightParameterId,
+  type FlightParameters,
+  type FlightParameterValues,
+} from "../settings/flightParameters";
+
 export interface PhoneCameraTuning {
   /**
    * When the phone sends a control frame. `timer`: on each input event, at most
@@ -40,13 +48,44 @@ export interface PhoneCameraTuning {
   chaseFrame: "attitude" | "no-roll" | "heading";
 }
 
-export const PHONE_CAMERA_BUFFER_OPTIONS = [0, 4, 8, 12, 16, 24, 33] as const;
-export const PHONE_CAMERA_CATCH_UP_OPTIONS = [1.5, 2, 3, 0] as const;
-export const PHONE_CAMERA_PREDICT_OPTIONS = [0, 8, 16] as const;
+/** The osfs.camera.* parameters the tuning is kept in, by field. */
+const PARAMETER_IDS = {
+  send: "osfs.camera.phone.send",
+  source: "osfs.camera.phone.source",
+  present: "osfs.camera.phone.present",
+  bufferMs: "osfs.camera.phone.bufferMs",
+  catchUp: "osfs.camera.phone.catchUp",
+  predictMs: "osfs.camera.phone.predictMs",
+  chaseFrame: "osfs.camera.chaseFrame",
+} as const satisfies Record<keyof PhoneCameraTuning, FlightParameterId>;
 
-export const DEFAULT_PHONE_CAMERA_TUNING: Readonly<PhoneCameraTuning> = Object.freeze({
-  send: "timer", source: "delta", present: "arrival", bufferMs: 12, catchUp: 2, predictMs: 0, chaseFrame: "attitude",
-});
+export const PHONE_CAMERA_PARAMETER_IDS: readonly FlightParameterId[] = Object.values(PARAMETER_IDS);
+
+/** The tuning as its parameters set it. A catch-up of "jump" is 0. */
+export function readPhoneCameraTuning(parameters: FlightParameters): PhoneCameraTuning {
+  const catchUp = parameters.get(PARAMETER_IDS.catchUp);
+  return {
+    send: parameters.get(PARAMETER_IDS.send),
+    source: parameters.get(PARAMETER_IDS.source),
+    present: parameters.get(PARAMETER_IDS.present),
+    bufferMs: parameters.get(PARAMETER_IDS.bufferMs),
+    catchUp: catchUp === "jump" ? 0 : catchUp,
+    predictMs: parameters.get(PARAMETER_IDS.predictMs),
+    chaseFrame: parameters.get(PARAMETER_IDS.chaseFrame),
+  };
+}
+
+/** Tuning as parameter values, to write with `setMany`. */
+export function phoneCameraTuningValues(tuning: Partial<PhoneCameraTuning>): Partial<FlightParameterValues> {
+  const values: Partial<Record<FlightParameterId, unknown>> = {};
+  for (const [field, value] of Object.entries(tuning) as [keyof PhoneCameraTuning, unknown][]) {
+    if (value === undefined) continue;
+    values[PARAMETER_IDS[field]] = field === "catchUp" && value === 0 ? "jump" : value;
+  }
+  return values as Partial<FlightParameterValues>;
+}
+
+export const DEFAULT_PHONE_CAMERA_TUNING: Readonly<PhoneCameraTuning> = Object.freeze(readPhoneCameraTuning(flightParameterDefaults()));
 
 /** What the measurements recommend: every part of it costs no delay but the 12 ms buffer. */
 export const RECOMMENDED_PHONE_CAMERA_TUNING: Readonly<PhoneCameraTuning> = Object.freeze({
@@ -57,15 +96,23 @@ function oneOf<T>(value: unknown, options: readonly T[], fallback: T): T {
   return options.includes(value as T) ? value as T : fallback;
 }
 
+function within(field: "bufferMs" | "catchUp" | "predictMs", value: unknown): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) return DEFAULT_PHONE_CAMERA_TUNING[field];
+  // A catch-up of 0 is "jump", outside the speed bounds.
+  if (field === "catchUp" && value === 0) return 0;
+  const bounds = flightParameterSpec(PARAMETER_IDS[field]).bounds();
+  return value >= bounds.min && value <= bounds.max ? value : DEFAULT_PHONE_CAMERA_TUNING[field];
+}
+
 export function normalizePhoneCameraTuning(partial: Partial<PhoneCameraTuning> | null | undefined): PhoneCameraTuning {
   const base = DEFAULT_PHONE_CAMERA_TUNING;
   return {
     send: oneOf(partial?.send, ["timer", "batch"] as const, base.send),
     source: oneOf(partial?.source, ["delta", "total"] as const, base.source),
     present: oneOf(partial?.present, ["arrival", "playout"] as const, base.present),
-    bufferMs: oneOf<number>(partial?.bufferMs, PHONE_CAMERA_BUFFER_OPTIONS, base.bufferMs),
-    catchUp: oneOf<number>(partial?.catchUp, PHONE_CAMERA_CATCH_UP_OPTIONS, base.catchUp),
-    predictMs: oneOf<number>(partial?.predictMs, PHONE_CAMERA_PREDICT_OPTIONS, base.predictMs),
+    bufferMs: within("bufferMs", partial?.bufferMs),
+    catchUp: within("catchUp", partial?.catchUp),
+    predictMs: within("predictMs", partial?.predictMs),
     chaseFrame: oneOf(partial?.chaseFrame, ["attitude", "no-roll", "heading"] as const, base.chaseFrame),
   };
 }
@@ -84,25 +131,16 @@ export function describePhoneCameraTuning(tuning: PhoneCameraTuning): string {
   return [tuning.send, tuning.source, present, tuning.chaseFrame].join(" · ");
 }
 
-const PREFERENCE_KEY = "osfs.phone-camera-tuning";
+/** The record the tuning used before the registry; migrated once, and kept for rollback. */
+export const PHONE_CAMERA_TUNING_STORAGE_KEY = "osfs.phone-camera-tuning";
 
-export function loadPhoneCameraTuning(storage: Pick<Storage, "getItem"> | null = safeStorage()): PhoneCameraTuning {
+/** The parameters an old record held, or null when it means nothing here. */
+export function migratePhoneCameraTuning(raw: string): Partial<FlightParameterValues> | null {
   try {
-    const raw = storage?.getItem(PREFERENCE_KEY);
-    return normalizePhoneCameraTuning(raw ? JSON.parse(raw) as Partial<PhoneCameraTuning> : null);
+    const stored = JSON.parse(raw) as unknown;
+    if (typeof stored !== "object" || stored === null) return null;
+    return phoneCameraTuningValues(normalizePhoneCameraTuning(stored as Partial<PhoneCameraTuning>));
   } catch {
-    return normalizePhoneCameraTuning(null);
+    return null;
   }
-}
-
-export function savePhoneCameraTuning(tuning: PhoneCameraTuning, storage: Pick<Storage, "setItem"> | null = safeStorage()): void {
-  try {
-    storage?.setItem(PREFERENCE_KEY, JSON.stringify(normalizePhoneCameraTuning(tuning)));
-  } catch {
-    // Preference persistence is best-effort.
-  }
-}
-
-function safeStorage(): Storage | null {
-  try { return typeof window === "undefined" ? null : window.localStorage; } catch { return null; }
 }

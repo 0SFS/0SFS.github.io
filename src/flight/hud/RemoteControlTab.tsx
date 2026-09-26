@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 import type { PhonePairingPanel, PhonePairingPanelOptions } from "./createPhonePairingPanel";
-import { PhoneCameraTuningPanel, type PhoneCameraTuningPanelProps } from "./PhoneCameraTuningPanel";
 
 export type MountPhonePairing = (host: HTMLElement, options: PhonePairingPanelOptions) => PhonePairingPanel;
 
@@ -9,8 +8,8 @@ export interface RemoteControlTabProps {
   loadPhonePairing(): Promise<MountPhonePairing>;
   /** Leaves the simulator for the controller page on this device. */
   onUseAsRemote(): void;
-  /** The trackpad's A/B settings; absent, the tab shows none. */
-  cameraTuning?: PhoneCameraTuningPanelProps;
+  /** The trackpad's A/B settings section; absent, the tab shows none. */
+  cameraTuning?: ReactNode;
 }
 
 /** A phone's primary pointer is coarse; a computer's is not, touchscreen or no. */
@@ -67,6 +66,6 @@ export function RemoteControlTab({ loadPhonePairing, onUseAsRemote, cameraTuning
     </p>
     <button className="flight-panel__command" type="button" onClick={onUseAsRemote}>Switch to RC mode</button>
   </fieldset>;
-  const tuning = cameraTuning && <PhoneCameraTuningPanel key="tuning" {...cameraTuning} />;
+  const tuning = cameraTuning && <Fragment key="tuning">{cameraTuning}</Fragment>;
   return <div className="flight-panel__content">{phone ? [thisDevice, pairing, tuning] : [pairing, tuning, thisDevice]}</div>;
 }

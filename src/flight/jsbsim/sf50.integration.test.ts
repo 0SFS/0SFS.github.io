@@ -12,7 +12,8 @@ import { readFlightState } from "../bridge/ecefBridge";
 import { readControlSurfaceState } from "../aircraft/aircraftAnimation";
 import { createFlightInputManager } from "../input/flightInputManager";
 import { applyFlightControls } from "../input/applyFlightControls";
-import { createAutoTrimState, stepPitchAutoTrim, type AutoTrimState } from "../input/autoTrim";
+import { createAutoTrimState, readAutoTrimTuning, stepPitchAutoTrim, type AutoTrimState } from "../input/autoTrim";
+import { flightParameterDefaults } from "../settings/flightParameters";
 import { createFixedStepPhysicsLoop, FIXED_DT } from "../physics/fixedStepLoop";
 import { groundContactClearanceMeters } from "../physics/groundContactClearance";
 import { captureSimulation, restoreSimulation, validFlightState } from "../physics/safeFlightState";
@@ -262,7 +263,7 @@ describe("SF50 runtime contracts (not performance calibration)", () => {
     const stepAssist = (elevator: number, trim: number, state: AutoTrimState) => {
       const next = stepPitchAutoTrim(state, {
         dt: FIXED_DT, elevator, pitchTrim: trim, onGround: false, ...sensors(),
-      });
+      }, readAutoTrimTuning(flightParameterDefaults()));
       applyFlightControls(sdk, { ...idle, elevator, pitchTrim: next.pitchTrim }, 0, profile.rudderSign);
       expect(sdk.run()).toBe(true);
       return next;

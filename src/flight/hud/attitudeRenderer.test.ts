@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createAttitudeRenderer } from "./attitudeRenderer";
+import { createAttitudeRenderer, describeAttitudeRendererStatus } from "./attitudeRenderer";
 import type { AttitudeState } from "./attitudeIndicator";
 
 const LEVEL: AttitudeState = {
@@ -143,5 +143,15 @@ describe("attitude renderer", () => {
     renderer.destroy();
     renderer.draw(LEVEL, CENTRED);
     expect(t.frames()).toBe(0);
+  });
+});
+
+describe("attitude renderer status note", () => {
+  it("says what draws, and why it is not what was asked for", () => {
+    expect(describeAttitudeRendererStatus({ preference: "auto", backend: null, reason: null })).toBeNull();
+    expect(describeAttitudeRendererStatus({ preference: "auto", backend: "webgpu", reason: null }))
+      .toBe("Drawing with WebGPU, on the globe's GPU device.");
+    expect(describeAttitudeRendererStatus({ preference: "webgpu", backend: "canvas2d", reason: "WebGPU is unavailable." }))
+      .toBe("Drawing with Canvas 2D. WebGPU is unavailable.");
   });
 });

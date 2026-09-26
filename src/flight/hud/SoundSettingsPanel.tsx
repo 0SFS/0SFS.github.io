@@ -151,7 +151,7 @@ export function SoundSettingsPanel({ state, onAction }: {
           ? `Engine sound follows the flight model. Combustion is read from ${
             COMBUSTION_SOURCE_LABELS[state.telemetry.combustionSource] ?? state.telemetry.combustionSource}.`
           : "This aircraft has no engine sound model; only the tire cue plays."}
-        {" "}Tire sound and its volume are under Settings → Ground interaction. For live engine data, click
+        {" "}Tire sound and its volume are under Aircraft → Ground handling. For live engine data, click
         ENGINE on the flight display. Muting sound never hides engine gauges or warnings.
       </p>
       {state.telemetry && state.telemetry.missing.length > 0 && <p className="flight-panel__hint">

@@ -1,10 +1,6 @@
 import { useEffect, useRef } from "react";
-import type { GamepadPollingController } from "../input/gamepadPolling";
-import type { GamepadResponseController } from "@felipegalind0/gamepad-tools/core";
 
 export interface GamepadBindingsMount {
-  polling?: GamepadPollingController;
-  response?: GamepadResponseController;
   mount(root: HTMLElement): { destroy(): void };
 }
 

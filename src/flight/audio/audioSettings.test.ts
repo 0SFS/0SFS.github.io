@@ -1,64 +1,42 @@
 import { describe, expect, it } from "vitest";
+import { flightParameterDefaults } from "../settings/flightParameters";
 import {
-  AUDIO_SETTINGS_STORAGE_KEY, DEFAULT_AUDIO_SETTINGS, createAudioSettingsStore,
-  parseAudioSettings, patchAudioSettings, type AudioSettingsStorage,
+  DEFAULT_AUDIO_SETTINGS, createAudioSettingsStore, migrateAudioSettings,
+  parseAudioSettings, patchAudioSettings,
 } from "./audioSettings";
-
-function memoryStorage(initial?: unknown): AudioSettingsStorage & { data: Map<string, string> } {
-  const data = new Map<string, string>();
-  if (initial !== undefined) {
-    data.set(AUDIO_SETTINGS_STORAGE_KEY, typeof initial === "string" ? initial : JSON.stringify(initial));
-  }
-  return { data, getItem: (key) => data.get(key) ?? null, setItem: (key, value) => { data.set(key, value); } };
-}
-
-const stored = (storage: { data: Map<string, string> }): unknown =>
-  JSON.parse(storage.data.get(AUDIO_SETTINGS_STORAGE_KEY) ?? "null");
 
 describe("audio settings", () => {
   it("starts disabled on Auto, because a saved preference cannot satisfy autoplay", () => {
-    const store = createAudioSettingsStore(memoryStorage());
+    const store = createAudioSettingsStore(flightParameterDefaults());
     expect(store.settings).toEqual(DEFAULT_AUDIO_SETTINGS);
     expect(store.settings.enabled).toBe(false);
     expect(store.settings.requested).toBe("auto");
   });
 
-  it("round-trips through storage", () => {
-    const storage = memoryStorage();
-    expect(createAudioSettingsStore(storage)
-      .update({ enabled: true, requested: "low", engineVolume: 0.3, engineMuted: true })).toBeNull();
-    expect(createAudioSettingsStore(storage).settings)
-      .toMatchObject({ enabled: true, requested: "low", engineVolume: 0.3, engineMuted: true });
+  it("lives in the osfs.sound parameters, with no downgrade kept as none", () => {
+    const parameters = flightParameterDefaults();
+    const store = createAudioSettingsStore(parameters);
+    expect(store.update({ enabled: true, requested: "low", engineVolume: 0.3, engineMuted: true, downgradedFrom: "med" })).toBeNull();
+    expect(parameters.get("osfs.sound.quality")).toBe("low");
+    expect(parameters.get("osfs.sound.downgradedFrom")).toBe("med");
+    expect(createAudioSettingsStore(parameters).settings)
+      .toMatchObject({ enabled: true, requested: "low", engineVolume: 0.3, engineMuted: true, downgradedFrom: "med" });
+    store.update({ downgradedFrom: null });
+    expect(parameters.get("osfs.sound.downgradedFrom")).toBe("none");
   });
 
-  it("migrates an unversioned entry and clamps out-of-range volumes", () => {
-    const storage = memoryStorage({ enabled: true, masterVolume: 4, engineVolume: -1 });
-    expect(createAudioSettingsStore(storage).settings)
-      .toMatchObject({ version: 1, enabled: true, masterVolume: 1, engineVolume: 0 });
-    expect(stored(storage)).toMatchObject({ version: 1, masterVolume: 1, engineVolume: 0 });
+  it("migrates an unversioned record, clamping out-of-range volumes, and ignores a newer or corrupt one", () => {
+    expect(migrateAudioSettings(JSON.stringify({ enabled: true, masterVolume: 4, engineVolume: -1 })))
+      .toMatchObject({ "osfs.sound.enabled": true, "osfs.sound.masterVolume": 1, "osfs.sound.engineVolume": 0 });
+    expect(migrateAudioSettings(JSON.stringify({ version: 2, enabled: true, requested: "high", futureField: 1 }))).toBeNull();
+    expect(migrateAudioSettings("{not json")).toBeNull();
   });
 
-  it("falls back to defaults on corrupt JSON instead of blocking the flight", () => {
-    expect(createAudioSettingsStore(memoryStorage("{not json")).settings).toEqual(DEFAULT_AUDIO_SETTINGS);
-  });
-
-  it("never overwrites settings saved by a newer version", () => {
-    const newer = { version: 2, enabled: true, requested: "high", futureField: 1 };
-    const storage = memoryStorage(newer);
-    const store = createAudioSettingsStore(storage);
-    expect(store.readOnlyReason).toMatch(/newer version/);
-    expect(store.update({ masterVolume: 0.1 })).toMatch(/this session only/);
-    expect(store.settings.masterVolume).toBe(0.1);
-    expect(stored(storage)).toEqual(newer);
-  });
-
-  it("reports a storage failure as session-only rather than throwing", () => {
-    const store = createAudioSettingsStore({
-      getItem: () => null,
-      setItem: () => { throw new Error("quota"); },
-    });
-    expect(store.update({ enabled: true })).toMatch(/Could not save/);
-    expect(store.settings.enabled).toBe(true);
+  it("reports a change that will not survive a reload as session-only", () => {
+    const parameters = { ...flightParameterDefaults(), storageError: () => "Settings could not be saved in this browser." };
+    const store = createAudioSettingsStore(parameters);
+    expect(store.update({ enabled: true })).toMatch(/this session only/);
+    expect(store.readOnlyReason).toMatch(/could not be saved/);
   });
 
   it("keeps the current value when a patch field is invalid", () => {

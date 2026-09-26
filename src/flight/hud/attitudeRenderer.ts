@@ -28,6 +28,16 @@ export interface AttitudeRendererStatus {
   reason: string | null;
 }
 
+/**
+ * What the instrument draws with, for the note under Renderer → Instruments →
+ * Attitude indicator; null while it is being set up.
+ */
+export function describeAttitudeRendererStatus(status: AttitudeRendererStatus): string | null {
+  if (!status.backend) return null;
+  const drawing = status.backend === "webgpu" ? "WebGPU, on the globe's GPU device" : "Canvas 2D";
+  return status.reason ? `Drawing with ${drawing}. ${status.reason}` : `Drawing with ${drawing}.`;
+}
+
 export interface AttitudeRenderer {
   /** Which backend draws, once the current choice is settled. */
   readonly ready: Promise<AttitudeBackend>;

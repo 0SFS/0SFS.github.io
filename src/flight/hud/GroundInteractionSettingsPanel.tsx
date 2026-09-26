@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  GROUND_CHOICE_LABELS, GROUND_CHOICES, GROUND_PRESETS, groundChoiceUnavailable,
+  GROUND_CHOICE_LABELS, GROUND_CHOICES, GROUND_FIELD_LABELS, GROUND_PRESETS, groundChoiceUnavailable,
   type GroundCapabilities, type GroundInteractionSettingsV1, type GroundLockableKey, type GroundPresetId,
   type GroundResolution,
 } from "../settings/groundInteractionSettings";
@@ -31,10 +31,7 @@ export type GroundInteractionAction =
   | { type: "keep-experiment" }
   | { type: "discard-experiment" };
 
-const ROW_LABELS: Record<GroundLockableKey, string> = {
-  rotation: "Wheel response", forceModel: "Ground forces", contactModel: "Ground contact",
-  tireAudio: "Tire audio", haptics: "Haptics", wheelVisuals: "Wheel visuals", backend: "Compute backend",
-};
+const ROW_LABELS = GROUND_FIELD_LABELS;
 
 const PRESET_LABELS: Record<GroundPresetId, string> = {
   "minimal": "Minimal", "landing-feedback": "Landing feedback",

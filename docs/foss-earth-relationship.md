@@ -39,7 +39,8 @@ OSFS imports only public FOSS Earth package exports:
 
 | Export | Purpose |
 | --- | --- |
-| `foss-earth/shell` | Configurable bottom HUD ending in the map source (provider, credit link, download speed, detail rail), responsive two-sided WindowOverlay with its Location, Map and Renderer tabs, the runtime status log, and page fullscreen with its remembered choices |
+| `foss-earth/shell` | Configurable bottom HUD ending in the map source (provider, credit link, download speed, detail rail), responsive two-sided WindowOverlay with its Location, Map and Renderer tabs, the runtime status log, page fullscreen with its remembered choices, `createParameterSection` for each settings section of the flight's tabs, the Saved settings section, and the detail controller's track markers (the Flight minimum) |
+| `foss-earth/settings` | The app's settings registry: FOSS Earth's parameters and the flight's `osfs.*` ones in one record, with their migration from the old keys |
 | `foss-earth/shell.css` | Shared shell styling |
 | `foss-earth/input` | Input mode and sensitivity preferences, Safari gesture support, globe gamepad navigation, and orbit inversion |
 | `foss-earth/windowing` | Panel, tab, and workspace primitives |
@@ -49,7 +50,7 @@ OSFS imports only public FOSS Earth package exports:
 | `foss-earth/mapDetailPolicy` | Map detail policy types and pure helpers, without the renderer, for the flight's World detail import |
 | `foss-earth` | Globe application and public globe APIs |
 
-The HUD is adapted in `src/flight/hud/createFlightHudBar.ts`. `FlightControlPanel.tsx` supplies Weather, Aircraft, and Debug content to the shared `WindowOverlay`. FOSS Earth owns both window slots, responsive fit, launchers, tab movement, minimize/restore behavior, and window styling.
+The HUD is adapted in `src/flight/hud/createFlightHudBar.ts`. `FlightControlPanel.tsx` supplies the flight's tabs (Weather, Aircraft, Autopilot, Controls, Remote Control, Sound, Engine, Logging, Debug) to the shared `WindowOverlay`. Flight parameters homed in FOSS Earth's tabs (Map → Detail, Renderer → Instruments, Controls → Orbit) are drawn there by FOSS Earth; see [Flight settings](proposals/flight-settings.md). FOSS Earth owns both window slots, responsive fit, launchers, tab movement, minimize/restore behavior, and window styling.
 
 The standalone globe lives at [foss-earth.github.io](https://foss-earth.github.io/). OSFS used to
 host a copy behind `?mode=globe`; that query now redirects there.

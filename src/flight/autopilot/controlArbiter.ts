@@ -7,7 +7,7 @@
  *
  * Override policy:
  * - Attitude axes (roll / pitch / yaw) yield while that stick is deflected
- *   beyond STICK_DEADBAND, and while on the ground. Releasing recaptures
+ *   beyond osfs.autopilot.stickOverride, and while on the ground. Releasing recaptures
  *   the current attitude. HUD TRIM assists are separate: they keep cancelling
  *   leftover moment on the wheels even while that stick is out, and only run
  *   when this arbiter has left the axis to the pilot.
@@ -130,6 +130,8 @@ export interface ControlArbiterInput {
   pilot: ControlSurfaceState;
   gearDownNorm: number;
   flight: ControlArbiterFlight;
+  /** osfs.autopilot.stickOverride: a stick deflected further than this takes its axis back. */
+  stickOverride: number;
 }
 
 export interface ControlArbiterResult {
@@ -184,9 +186,9 @@ export function stepControlArbiter(
     && input.gearDownNorm !== state.previousPilotGearDownNorm;
 
   const want = input.settings.axes;
-  const yieldRoll = input.flight.onGround || stickDeflected(input.pilot.aileron);
-  const yieldPitch = input.flight.onGround || stickDeflected(input.pilot.elevator);
-  const yieldYaw = input.flight.onGround || stickDeflected(input.pilot.rudder);
+  const yieldRoll = input.flight.onGround || stickDeflected(input.pilot.aileron, input.stickOverride);
+  const yieldPitch = input.flight.onGround || stickDeflected(input.pilot.elevator, input.stickOverride);
+  const yieldYaw = input.flight.onGround || stickDeflected(input.pilot.rudder, input.stickOverride);
   const yieldThrottle = input.flight.onGround || throttleMoved;
   if (want.roll && !yieldRoll) owners.roll = backendOwner;
   if (want.pitch && !yieldPitch) owners.pitch = backendOwner;
@@ -220,6 +222,7 @@ export function stepControlArbiter(
         throttle: owners.throttle === "our-ap",
       },
       throttleMode: input.settings.throttleMode,
+      stickOverride: input.stickOverride,
     });
     next.our = stepped.state;
     if (stepped.commands.aileron !== null) controls.aileron = stepped.commands.aileron;

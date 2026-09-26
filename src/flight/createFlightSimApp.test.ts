@@ -23,7 +23,11 @@ const mocks = vi.hoisted(() => {
         overrideErrorTarget: null as number | null,
       },
       getGoogleTerrainDetailState: vi.fn(() => mocks.runtime.googleTerrainDetail),
-      subscribeStatus: vi.fn(() => () => {}),
+      statusListeners: new Set<(status: { mode: string; terrainSource?: { id: string } }) => void>(),
+      subscribeStatus: vi.fn((listener: (status: { mode: string; terrainSource?: { id: string } }) => void) => {
+        mocks.runtime.statusListeners.add(listener);
+        return () => mocks.runtime.statusListeners.delete(listener);
+      }),
       isStreamingTiles: () => false,
       onTilesStreamingChange: vi.fn(() => () => {}),
       onRasterDetailFeedback: vi.fn(() => () => {}),
@@ -68,9 +72,12 @@ const mocks = vi.hoisted(() => {
 });
 vi.mock("foss-earth/runtime", () => ({
   createBabylonRuntime: async () => mocks.runtime,
-  RASTER_BASE_MAP_SOURCES: [], TERRAIN_SOURCES: [], resolveTerrainSource: vi.fn(), resolveRasterBaseMapSource: vi.fn(), resolveMapRuntimeConfig: () => ({}), setMapSourcePreference: vi.fn(), setTerrainSourcePreference: vi.fn(), setRasterQualityPreference: vi.fn(),
+  RASTER_BASE_MAP_SOURCES: [], TERRAIN_SOURCES: [], resolveTerrainSource: vi.fn(), resolveRasterBaseMapSource: vi.fn(), resolveMapRuntimeConfig: () => ({}), applyRendererChoice: vi.fn(), setMapSourcePreference: vi.fn(), setTerrainSourcePreference: vi.fn(), setRasterQualityPreference: vi.fn(),
 }));
-const shellCapture = vi.hoisted(() => ({ mapPanel: null as null | { onMapSourceChange(sourceId: string): void } }));
+const shellCapture = vi.hoisted(() => ({ mapPanel: null as null | {
+  onMapSourceChange(sourceId: string): void;
+  detail?: import("foss-earth/shell").MapDetailController;
+} }));
 vi.mock("foss-earth/shell", async importOriginal => {
   const actual = await importOriginal<typeof import("foss-earth/shell")>();
   return {
@@ -113,13 +120,27 @@ vi.mock("./hud/createFlightHudBar", () => ({
   },
 }));
 
+import { getAppSettings, resetAppSettings, SETTINGS_STORAGE_KEY } from "foss-earth/settings";
+import { setMapSourcePreference } from "foss-earth/runtime";
 import { createFlightSimApp } from "./createFlightSimApp";
 import { createJsbsimRuntime } from "./jsbsim/createJsbsimRuntime";
 import { createCollisionDebugOverlay } from "./diagnostics/createCollisionDebugOverlay";
 import { createFixedStepPhysicsLoop } from "./physics/fixedStepLoop";
 import { createVisibleMeshCollision } from "./physics/visibleMeshCollision";
 
-afterEach(() => { vi.clearAllMocks(); vi.unstubAllGlobals(); document.body.replaceChildren(); });
+// Each test is a fresh page: the app registry reads the stubbed storage again.
+afterEach(() => { vi.clearAllMocks(); vi.unstubAllGlobals(); document.body.replaceChildren(); resetAppSettings(); });
+
+const savedSettings = (storage: Map<string, string>): Record<string, unknown> =>
+  (JSON.parse(storage.get(SETTINGS_STORAGE_KEY) ?? "{\"values\":{}}") as { values: Record<string, unknown> }).values;
+
+async function openTab(root: HTMLElement, label: string): Promise<void> {
+  const launcher = root.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')
+    ?? root.querySelector<HTMLButtonElement>('.foss-earth-tab-strip [aria-label="Open new tab"]')!;
+  await act(async () => launcher.click());
+  const item = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')).find(button => button.textContent === label)!;
+  await act(async () => item.click());
+}
 
 it("runs wheel feedback only when selected, exposes A/B while paused, and mutes on off", async () => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
@@ -174,11 +195,9 @@ it("defaults to passive impacts and applies the persistent arcade override to bo
     setItem: (key: string, value: string) => storage.set(key, value) });
   Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
   const root = document.createElement("div"); document.body.append(root);
-  const openSettings = async () => {
-    await act(async () => root.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')!.click());
-    const item = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')).find(button => button.textContent === "Settings")!;
-    await act(async () => item.click());
-    return root.querySelector<HTMLInputElement>('[aria-label="Arcade ground launches"]')!;
+  const openGroundHandling = async () => {
+    await openTab(root, "Aircraft");
+    return root.querySelector<HTMLInputElement>('[data-parameter="osfs.ground.arcadeLaunches"] input')!;
   };
   let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
   await act(async () => { app = await createFlightSimApp(root); });
@@ -187,40 +206,38 @@ it("defaults to passive impacts and applies the persistent arcade override to bo
     const bodyOptions = vi.mocked(createVisibleMeshCollision).mock.calls.at(-1)![2]!;
     expect(physicsOptions.getArcadeGroundLaunches?.()).toBe(false);
     expect(bodyOptions.getRestitution?.()).toBe(0.25);
-    const checkbox = await openSettings();
+    const checkbox = await openGroundHandling();
     expect(checkbox.checked).toBe(false);
     await act(async () => checkbox.click());
     expect(checkbox.checked).toBe(true);
     expect(physicsOptions.getArcadeGroundLaunches?.()).toBe(true);
     expect(bodyOptions.getRestitution?.()).toBe(1.35);
-    expect(storage.get("osfs.arcade-ground-launches")).toBe("on");
+    expect(savedSettings(storage)["osfs.ground.arcadeLaunches"]).toBe(true);
   } finally { await act(async () => app.destroy()); }
+  resetAppSettings();
   await act(async () => { app = await createFlightSimApp(root); });
   try {
     expect(vi.mocked(createFixedStepPhysicsLoop).mock.calls.at(-1)![2]!.getArcadeGroundLaunches?.()).toBe(true);
   } finally { await act(async () => app.destroy()); }
 });
 
-it("keeps autopilot configuration on the Autopilot tab, not Settings", async () => {
+it("keeps autopilot configuration on the Autopilot tab, and has no Settings tab", async () => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
   vi.stubGlobal("localStorage", { getItem: () => null, setItem: vi.fn() });
   Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
   const root = document.createElement("div");
   document.body.append(root);
-  const openTab = async (label: string) => {
-    const launcher = root.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')
-      ?? root.querySelector<HTMLButtonElement>('.foss-earth-tab-strip [aria-label="Open new tab"]')!;
-    await act(async () => launcher.click());
-    const item = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')).find((button) => button.textContent === label)!;
-    await act(async () => item.click());
-  };
   let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
   await act(async () => { app = await createFlightSimApp(root); });
   try {
-    await openTab("Settings");
+    await openTab(root, "Aircraft");
     expect(root.querySelector('[aria-label="Autopilot backend"]')).toBeNull();
-    expect(root.querySelector('[aria-label="Arcade ground launches"]')).not.toBeNull();
-    await openTab("Autopilot");
+    expect(root.querySelector('[data-parameter="osfs.ground.arcadeLaunches"]')).not.toBeNull();
+    const launcher = root.querySelector<HTMLButtonElement>('.foss-earth-tab-strip [aria-label="Open new tab"]')!;
+    await act(async () => launcher.click());
+    const items = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="menuitem"]'));
+    expect(items.map(item => item.textContent)).not.toContain("Settings");
+    await act(async () => items.find(item => item.textContent === "Autopilot")!.click());
     expect(root.querySelector('[aria-label="Autopilot backend"]')).not.toBeNull();
     expect(root.querySelector('[aria-label="ArduPilot status"]')!.textContent).toMatch(/LOITER/);
   } finally { await act(async () => app.destroy()); }
@@ -460,10 +477,12 @@ it("stages all Vision Jet generations and applies a complete package once", asyn
     await act(async () => selectionControl<HTMLInputElement>(t.root, '.flight-panel__model-controls input[type="checkbox"]').click());
     await changeSelect(t.root, lodSelector, "hd");
     await act(async () => selectionControl<HTMLButtonElement>(t.root, applySelector).click());
-    expect(t.setItem.mock.calls).toEqual([
-      ["osfs.aircraft-lod", "hd"], ["osfs.aircraft-opt-in-lods", "on"],
-      ["osfs.aircraft-generation", "g2+"], ["osfs.aircraft", "cirrus-vision-jet-g2"],
-    ]);
+    // One write of the whole choice, before the reload that activates it.
+    expect(t.setItem).toHaveBeenCalledOnce();
+    expect(savedSettings(t.storage)).toMatchObject({
+      "osfs.aircraft.id": "cirrus-vision-jet-g2", "osfs.aircraft.generation": "g2+",
+      "osfs.aircraft.lod": "hd", "osfs.aircraft.optInLods": true,
+    });
     expect(t.reload).toHaveBeenCalledOnce();
     expect(t.setItem.mock.invocationCallOrder.at(-1)).toBeLessThan(t.reload.mock.invocationCallOrder[0]);
     expect(mocks.aircraftModel.setAircraft).not.toHaveBeenCalled();
@@ -471,7 +490,7 @@ it("stages all Vision Jet generations and applies a complete package once", asyn
     expect(createJsbsimRuntime).toHaveBeenCalledTimes(1);
     await act(async () => selectionControl<HTMLButtonElement>(t.root, applySelector).click());
     expect(t.reload).toHaveBeenCalledOnce();
-    expect(t.setItem).toHaveBeenCalledTimes(4);
+    expect(t.setItem).toHaveBeenCalledOnce();
   } finally { await act(async () => t.app.destroy()); }
 });
 
@@ -501,7 +520,7 @@ it("applies presentation changes once after staging and retains per-family draft
     expect(selectionControl<HTMLSelectElement>(t.root, lodSelector).value).toBe("hd");
     expect(selectionControl<HTMLInputElement>(t.root, '.flight-panel__model-controls input[type="checkbox"]').checked).toBe(true);
     expect(mocks.aircraftModel.setPresentation).toHaveBeenCalledTimes(1);
-    expect(t.setItem).toHaveBeenCalledTimes(4);
+    expect(t.setItem).toHaveBeenCalledOnce();
     await act(async () => selectionControl<HTMLButtonElement>(t.root, ".flight-panel__command--secondary").click());
     expect(selectionControl<HTMLInputElement>(t.root, 'input[name="flight-aircraft"][value="cessna-172"]').checked).toBe(true);
     expect(selectionControl<HTMLSelectElement>(t.root, lodSelector).value).toBe("lod2");
@@ -509,29 +528,21 @@ it("applies presentation changes once after staging and retains per-family draft
   } finally { await act(async () => t.app.destroy()); }
 });
 
-it.each([
-  ["osfs.aircraft-lod", false],
-  ["osfs.aircraft-opt-in-lods", true],
-  ["osfs.aircraft-generation", false],
-  ["osfs.aircraft", true],
-] as const)("rolls back partial selection persistence when %s fails (existing preferences: %s)", async (failKey, existing) => {
-  const initial: [string, string][] = existing ? [
-    ["osfs.aircraft", "cessna-172"], ["osfs.aircraft-lod", "lod2"],
-    ["osfs.aircraft-opt-in-lods", "off"], ["osfs.aircraft-generation", "cessna-172"],
-  ] : [];
-  const t = await mountAircraftSelection(initial);
+it("takes back an aircraft choice that could not be saved, and does not reload", async () => {
+  const t = await mountAircraftSelection([["osfs.aircraft", "cessna-172"], ["osfs.aircraft-lod", "lod2"]]);
   try {
     await act(async () => selectionControl<HTMLInputElement>(t.root, 'input[name="flight-aircraft"][value="cirrus-vision-jet"]').click());
     await changeSelect(t.root, generationSelector, "g2+");
     const beforeApply = [...t.storage.entries()];
-    let failed = false;
-    t.setItem.mockImplementation((key, value) => {
-      if (!failed && key === failKey) { failed = true; throw new Error("storage unavailable"); }
+    t.setItem.mockImplementation((key: string, value: string) => {
+      if (key === SETTINGS_STORAGE_KEY) throw new Error("storage unavailable");
       t.storage.set(key, value);
     });
     await act(async () => selectionControl<HTMLButtonElement>(t.root, applySelector).click());
     expect(t.root.querySelector('[role="alert"]')?.textContent).toContain("Could not save your aircraft choice");
     expect([...t.storage.entries()]).toEqual(beforeApply);
+    expect(getAppSettings().get("osfs.aircraft.id")).toBe("cessna-172");
+    expect(getAppSettings().get("osfs.aircraft.lod")).toBe("lod2");
     expect(t.reload).not.toHaveBeenCalled();
     expect(mocks.aircraftModel.setPresentation).not.toHaveBeenCalled();
     expect(mocks.aircraftModel.setAircraft).not.toHaveBeenCalled();
@@ -594,73 +605,98 @@ it("drives the model's control surfaces and propeller from the simulation each t
   } finally { await act(async () => app.destroy()); }
 });
 
-it("keeps flight terrain settings in Settings and World detail in the shared Map tab", async () => {
+it("puts the Flight minimum on the Map → Detail Google track, saved in the registry, with the waiver beside it", async () => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
-  const setItem = vi.fn();
-  vi.stubGlobal("localStorage", { getItem: () => null, setItem });
+  const values = new Map<string, string>([
+    ["osfs.flight-terrain-requirement", "8192"],
+    ["osfs.terrain-detail-anchor", "camera"],
+  ]);
+  vi.stubGlobal("localStorage", {
+    getItem: (key: string) => values.get(key) ?? null,
+    setItem: (key: string, value: string) => { values.set(key, value); },
+    removeItem: (key: string) => { values.delete(key); },
+  });
   Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
   mocks.runtime.status.mode = "google-tiles";
-  mocks.runtime.googleTerrainDetail = {
-    defaultErrorTarget: 20,
-    errorTarget: 20,
-    overrideErrorTarget: null,
-  };
+  mocks.runtime.googleTerrainDetail = { defaultErrorTarget: 20, errorTarget: 20, overrideErrorTarget: null };
   const root = document.createElement("div");
   document.body.append(root);
   let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
   await act(async () => { app = await createFlightSimApp(root); });
   try {
-    await act(async () => root.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')!.click());
-    const settings = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="menuitem"]'))
-      .find((button) => button.textContent === "Settings")!;
-    await act(async () => settings.click());
-    // The saved range and default are the shared Map tab's; Settings has none.
-    expect(root.querySelector('[aria-label="World detail target"]')).toBeNull();
-    const requirement = Array.from(root.querySelectorAll<HTMLLabelElement>("label.flight-panel__field"))
-      .find((label) => label.textContent?.startsWith("Flight minimum"))!.querySelector("input")!;
-    const detailAnchor = root.querySelector<HTMLElement>('[aria-label="Terrain detail follows"]')!;
-    expect(requirement.max).toBe("19");
-    expect(mocks.runtime.setGoogleTerrainDetailAnchor).toHaveBeenCalledWith("simulation-origin");
-    const camera = Array.from(detailAnchor.querySelectorAll<HTMLButtonElement>("button"))
-      .find((button) => button.textContent === "Camera")!;
-    await act(async () => camera.click());
-    expect(mocks.runtime.setGoogleTerrainDetailAnchor).toHaveBeenLastCalledWith("camera");
-    expect(setItem).toHaveBeenCalledWith("osfs.terrain-detail-anchor", "camera");
+    const settings = getAppSettings();
+    // The old keys moved into the registry, and stay for rollback.
+    expect(settings.get("osfs.flight.minimum")).toBe(8192);
+    expect(settings.get("map.focus.refineFrom")).toBe("camera");
+    expect(values.get("osfs.flight-terrain-requirement")).toBe("8192");
+    const detail = shellCapture.mapPanel!.detail!;
+    const marker = () => detail.getState()!.markers.find(candidate => candidate.id === "osfs.flight.minimum")!;
+    expect(marker()).toMatchObject({ kind: "google", value: 8192, draggable: true, requirement: true, hollow: false, onRail: false });
 
-    await act(async () => {
-      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(requirement, "13");
-      requirement.dispatchEvent(new Event("input", { bubbles: true }));
-    });
-    expect(setItem).toHaveBeenCalledWith("osfs.flight-terrain-requirement", "8192");
+    // Dragging the marker saves the Flight minimum; it is not clamped into the range.
+    await act(async () => marker().onChange!(2));
+    expect(settings.get("osfs.flight.minimum")).toBe(2);
+    expect(savedSettings(values)["osfs.flight.minimum"]).toBe(2);
+    expect(marker().value).toBe(2);
 
-    const override = root.querySelector<HTMLInputElement>('[aria-label="Allow coarser terrain for this session"]')!;
-    await act(async () => override.click());
-    expect(override.checked).toBe(true);
-    expect(setItem).not.toHaveBeenCalledWith("osfs.world-detail-target", expect.anything());
-  } finally { await act(async () => app.destroy()); }
-});
-
-it("prepares terrain again only when the map changes between Google and a 2D basemap", async () => {
-  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
-  vi.stubGlobal("localStorage", { getItem: () => null, setItem: vi.fn() });
-  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
-  mocks.runtime.status.mode = "raster-basemap";
-  const root = document.createElement("div");
-  document.body.append(root);
-  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
-  await act(async () => { app = await createFlightSimApp(root); });
-  try {
-    const preparations = mocks.runtime.prepareTerrain.mock.calls.length;
-    // One 2D basemap for another changes imagery only.
-    await act(async () => shellCapture.mapPanel!.onMapSourceChange("carto-positron"));
-    expect(mocks.runtime.setMapSource).toHaveBeenCalled();
-    expect(mocks.runtime.prepareTerrain.mock.calls.length).toBe(preparations);
-    await act(async () => shellCapture.mapPanel!.onMapSourceChange("google"));
-    expect(mocks.runtime.prepareTerrain.mock.calls.length).toBeGreaterThan(preparations);
+    // The waiver is a session switch in Map → Detail: it hollows the marker and is never saved.
+    await act(async () => { settings.set("osfs.flight.allowCoarserThisSession", true); });
+    expect(marker().hollow).toBe(true);
+    expect(savedSettings(values)).not.toHaveProperty("osfs.flight.allowCoarserThisSession");
   } finally {
     await act(async () => app.destroy());
     mocks.runtime.status.mode = "fallback";
   }
+  expect(shellCapture.mapPanel!.detail!.getState()?.markers ?? []).toEqual([]);
+});
+
+it("uses the Google default refinement around the aircraft when nothing was saved", async () => {
+  vi.stubGlobal("localStorage", { getItem: () => null, setItem: vi.fn() });
+  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
+  const root = document.createElement("div");
+  document.body.append(root);
+  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
+  await act(async () => { app = await createFlightSimApp(root); });
+  try {
+    expect(getAppSettings().inspect("map.focus.refineFrom")).toMatchObject({ value: "focus", provenance: "host-default" });
+  } finally { await act(async () => app.destroy()); }
+});
+
+it("prepares terrain again only when the ground changes: Google, a 2D basemap, or its elevation", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  vi.stubGlobal("localStorage", { getItem: () => null, setItem: vi.fn() });
+  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
+  mocks.runtime.status = { mode: "raster-basemap", terrainSource: { id: "mapterhorn" } } as never;
+  const root = document.createElement("div");
+  document.body.append(root);
+  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
+  await act(async () => { app = await createFlightSimApp(root); });
+  // The runtime reports each switch, wherever it was made: the Map tab, Show all parameters or an import.
+  const report = (status: { mode: string; terrainSource?: { id: string } }) => act(async () => {
+    for (const listener of [...mocks.runtime.statusListeners]) listener(status);
+  });
+  try {
+    const preparations = () => mocks.runtime.prepareTerrain.mock.calls.length;
+    const before = preparations();
+    // Saving the choice is what switches the map.
+    await act(async () => shellCapture.mapPanel!.onMapSourceChange("carto-positron"));
+    expect(vi.mocked(setMapSourcePreference)).toHaveBeenCalledWith("carto-positron");
+    // One 2D basemap for another changes imagery only.
+    await report({ mode: "raster-basemap", terrainSource: { id: "mapterhorn" } });
+    expect(preparations()).toBe(before);
+    await report({ mode: "google-tiles" });
+    expect(preparations()).toBe(before + 1);
+    await report({ mode: "fallback" });
+    await report({ mode: "google-tiles" });
+    expect(preparations()).toBe(before + 1);
+    await report({ mode: "raster-basemap", terrainSource: { id: "mapterhorn" } });
+    await report({ mode: "raster-basemap", terrainSource: { id: "terrarium" } });
+    expect(preparations()).toBe(before + 3);
+  } finally {
+    await act(async () => app.destroy());
+    mocks.runtime.status = { mode: "fallback" } as never;
+  }
+  expect(mocks.runtime.statusListeners.size).toBe(0);
 });
 
 it("holds a low spawn at the flight minimum without saving it, and releases it after departure", async () => {
@@ -686,16 +722,20 @@ it("holds a low spawn at the flight minimum without saving it, and releases it a
     // The old target became the saved default; the flight holds 4,096 px on top.
     expect(mocks.runtime.setGoogleTerrainDetailTarget).toHaveBeenCalledWith(16384);
     expect(mocks.runtime.setGoogleTerrainDetailTarget).toHaveBeenLastCalledWith(4096);
-    const record = JSON.parse(values.get("foss-earth.map-detail.v1")!);
-    expect(record.policies.google).toEqual({ kind: "google", finestErrorPx: 4096, coarsestErrorPx: 16384, defaultValue: 16384 });
+    const detail = shellCapture.mapPanel!.detail!;
+    expect(detail.getPolicy("google")).toEqual({ kind: "google", finestErrorPx: 4096, coarsestErrorPx: 16384, defaultValue: 16384 });
     expect(values.get("osfs.world-detail-target")).toBe("16384");
     expect(setItem).not.toHaveBeenCalledWith("osfs.world-detail-target", expect.anything());
+    // The HUD rail shows the Flight minimum while it holds detail, and why.
+    const onRail = () => detail.getState()!.markers.find(marker => marker.id === "osfs.flight.minimum")!.onRail;
 
     const tick = mocks.runtime.setSimTick.mock.calls.at(-1)?.[0] as (dt: number) => void;
     for (let frame = 0; frame < 5; frame++) tick(0.1);
     expect(mocks.runtime.setGoogleTerrainDetailTarget).toHaveBeenLastCalledWith(4096);
+    expect(onRail()).toBe(true);
     for (let frame = 0; frame < 8; frame++) tick(0.1);
     expect(mocks.runtime.setGoogleTerrainDetailTarget).toHaveBeenLastCalledWith(16384);
+    expect(onRail()).toBe(false);
   } finally {
     await act(async () => app.destroy());
     mocks.runtime.prepareTerrain.mockImplementation(async (request: { altitudeMeters?: number }) => ({ groundHeightMeters: 250, altitudeMeters: request.altitudeMeters ?? 1774 }));

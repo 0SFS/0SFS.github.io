@@ -2,7 +2,7 @@
 
 This page lists the other open-source flight simulators, what each one does, and where OSFS stands among them. The speed and memory techniques they use that OSFS lacks are in [Competitor performance techniques](competitor-performance.md).
 
-Checked on 25 September 2026. Star counts and last-push dates come from GitHub on that day, except FlightGear's, which come from GitLab. Features come from each project's own README.
+Checked on 25 September 2026. Star counts and last-push dates come from GitHub on that day, except FlightGear's, which come from GitLab. Features come from each project's own README. [Sources](#sources) says how each project was found.
 
 ## Browser simulators
 
@@ -55,3 +55,20 @@ People will compare OSFS with these, but they are not open source, so they are n
 - **Kestrel** gets its elevation from Mapterhorn, the same source FOSS Earth uses by default. It also has 3D cockpits with clickable controls, which OSFS lacks.
 - **Among the browser simulators, only OSFS and Aeronaut use JSBSim.** The others use flight models of their own.
 - **None of the others lets you use a phone as a controller for another screen.** Aeronaut shows touch controls on narrow screens, but OSFS pairs a phone over a QR code and flies the aircraft on your computer with it ([Phone controller](phone-controller.md)).
+
+## Sources
+
+The projects were found on 25 September 2026 in three ways:
+
+- **Web searches:** `open source flight simulator list FlightGear alternatives GPL`, `open source browser flight simulator WebGL github JSBSim three.js cesium`, and `"JSBSim" WebAssembly browser flight simulator open source 2026`. Aeronaut was the first result of the second and third. The second also found Web Flight Simulator and [its Hacker News thread](https://news.ycombinator.com/item?id=46948113).
+- **Lists of FlightGear alternatives** that the first search returned: [AlternativeTo](https://alternativeto.net/software/flightgear/) and [Fly Away Simulation](https://flyawaysimulation.com/ask/answers/best-flightgear-alternatives/).
+- **GitHub search, sorted by stars:** the phrases `flight simulator`, `flight simulator browser`, `flight sim cesium`, `jsbsim wasm`, `jsbsim webassembly`, `flight simulator three.js`, `flightsim webgl` and `flight simulator babylon`, and the topics [flight-simulator](https://github.com/topics/flight-simulator), [flight-simulation](https://github.com/topics/flight-simulation), [flightsim](https://github.com/topics/flightsim) and [jsbsim](https://github.com/topics/jsbsim).
+
+Each row's facts come from these places:
+
+- **Stars, license and last push:** the GitHub API for each repository. FlightGear's come from the GitLab API, including its release tags.
+- **Licenses the API could not name:** the license file itself. MScSim's is `LICENSE.rtf`. Web Flight Simulator's `LICENSE` forbids commercial use. Cesium Flight Simulator has no license file.
+- **Features:** each project's README, linked from its row. Aeronaut's README names its SDK, `@0x62/jsbsim-wasm`.
+- **Claims about source code:** the commits listed in [Competitor performance](competitor-performance.md#sources).
+
+These were also read but are not in the tables: [ThreeFlightSimulator](https://github.com/PierreEVEN/ThreeFlightSimulator) (archived), [Scramble](https://github.com/ScrambleSim/Scramble) (last push 2021), [Pylot](https://github.com/usuaero/Pylot) (last push 2022) and [fly](https://github.com/amhndu/fly) (last push 2024).

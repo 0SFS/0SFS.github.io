@@ -1,22 +1,14 @@
 import { describe, expect, it } from "vitest";
+import { flightParameterDefaults } from "../settings/flightParameters";
 import {
-  AUTOPILOT_SETTINGS_STORAGE_KEY,
   createAutopilotSettingsStore,
+  migrateAutopilotSettings,
   DEFAULT_AUTOPILOT_SETTINGS,
   parseAutopilotSettings,
   patchAutopilotSettings,
   withAllAutopilotAxes,
   type AutopilotSettingsV1,
 } from "./autopilotSettings";
-
-function memoryStorage(initial: Record<string, string> = {}) {
-  const map = new Map(Object.entries(initial));
-  return {
-    map,
-    getItem: (key: string) => map.get(key) ?? null,
-    setItem: (key: string, value: string) => { map.set(key, value); },
-  };
-}
 
 const base = (): AutopilotSettingsV1 => ({
   ...DEFAULT_AUTOPILOT_SETTINGS,
@@ -66,41 +58,40 @@ describe("autopilot settings parse", () => {
   });
 });
 
-describe("autopilot settings persist", () => {
-  it("rewrites partial stored JSON and later edits", () => {
-    const storage = memoryStorage({
-      [AUTOPILOT_SETTINGS_STORAGE_KEY]: JSON.stringify({ backend: "ours", axes: { roll: false } }),
-    });
-    const store = createAutopilotSettingsStore(storage);
-    expect(store.settings.axes.roll).toBe(false);
-    expect(store.settings.axes.pitch).toBe(true);
-    expect(JSON.parse(storage.map.get(AUTOPILOT_SETTINGS_STORAGE_KEY)!).version).toBe(1);
-    store.set(patchAutopilotSettings(store.settings, { throttleMode: "hold" }));
-    expect(JSON.parse(storage.map.get(AUTOPILOT_SETTINGS_STORAGE_KEY)!).throttleMode).toBe("hold");
+describe("autopilot settings persist in their parameters", () => {
+  it("reads and writes the osfs.autopilot.* parameters", () => {
+    const parameters = flightParameterDefaults();
+    const store = createAutopilotSettingsStore(parameters);
+    expect(store.settings).toEqual(base());
+    store.set(patchAutopilotSettings(store.settings, { throttleMode: "hold", axes: { roll: false } }));
+    expect(parameters.get("osfs.autopilot.throttleMode")).toBe("hold");
+    expect(parameters.get("osfs.autopilot.axes.roll")).toBe(false);
+    expect(store.settings.axes).toEqual({ ...base().axes, roll: false });
   });
 
-  it("never overwrites a newer saved blob, and keeps session edits local", () => {
-    const newer = JSON.stringify({ version: 2, backend: "ardupilot", future: true });
-    const storage = memoryStorage({ [AUTOPILOT_SETTINGS_STORAGE_KEY]: newer });
-    const store = createAutopilotSettingsStore(storage);
-    expect(store.readOnlyReason).toMatch(/newer version/);
-    store.set(patchAutopilotSettings(store.settings, { backend: "ours" }));
-    expect(store.settings.backend).toBe("ours");
-    expect(storage.map.get(AUTOPILOT_SETTINGS_STORAGE_KEY)).toBe(newer);
-  });
-
-  it("recovers from corrupt JSON and storage exceptions", () => {
-    expect(createAutopilotSettingsStore(memoryStorage({
-      [AUTOPILOT_SETTINGS_STORAGE_KEY]: "{nope",
-    })).settings.backend).toBe("ours");
-    const failing = {
-      getItem: () => { throw new Error("denied"); },
-      setItem: () => { throw new Error("full"); },
-    };
-    const store = createAutopilotSettingsStore(failing);
-    expect(() => store.set(patchAutopilotSettings(store.settings, { backend: "ardupilot" }))).not.toThrow();
+  it("keeps one snapshot until a parameter changes elsewhere", () => {
+    const parameters = flightParameterDefaults();
+    const store = createAutopilotSettingsStore(parameters);
+    const first = store.settings;
+    expect(store.settings).toBe(first);
+    parameters.set("osfs.autopilot.backend", "ardupilot");
+    expect(store.settings).not.toBe(first);
     expect(store.settings.backend).toBe("ardupilot");
-    expect(createAutopilotSettingsStore(null).settings).toEqual(base());
+  });
+
+  it("migrates the old record, filling what it left out, and ignores a newer or corrupt one", () => {
+    expect(migrateAutopilotSettings(JSON.stringify({ backend: "ours", axes: { roll: false } }))).toEqual({
+      "osfs.autopilot.backend": "ours",
+      "osfs.autopilot.throttleMode": "airspeed",
+      "osfs.autopilot.axes.roll": false,
+      "osfs.autopilot.axes.pitch": true,
+      "osfs.autopilot.axes.yaw": true,
+      "osfs.autopilot.axes.throttle": true,
+      "osfs.autopilot.axes.gear": true,
+      "osfs.autopilot.axes.flaps": true,
+    });
+    expect(migrateAutopilotSettings(JSON.stringify({ version: 2, backend: "ardupilot", future: true }))).toBeNull();
+    expect(migrateAutopilotSettings("{nope")).toBeNull();
   });
 
   it("restores the full our-AP package without changing backend", () => {

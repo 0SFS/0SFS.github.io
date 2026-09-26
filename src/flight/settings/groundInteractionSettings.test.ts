@@ -1,9 +1,15 @@
 import { describe, expect, it } from "vitest";
+import { flightParameterDefaults, type FlightParameterStore } from "./flightParameters";
 import {
-  applyGroundPreset, createGroundSettingsStore, DEFAULT_GROUND_INTERACTION_SETTINGS, GROUND_PROFILES_STORAGE_KEY,
-  GROUND_SETTINGS_STORAGE_KEY, MAX_IMPORT_BYTES, MAX_NAMED_PROFILES, parseGroundInteractionSettings, patchGroundSettings,
-  PROFILE_EXPORT_FORMAT, resolveGroundInteraction, type GroundCapabilities, type GroundInteractionSettingsV1,
+  applyGroundPreset, createGroundSettingsStore as createStore, DEFAULT_GROUND_INTERACTION_SETTINGS, GROUND_PROFILES_STORAGE_KEY,
+  MAX_IMPORT_BYTES, MAX_NAMED_PROFILES, migrateGroundSettings, parseGroundInteractionSettings, patchGroundSettings,
+  PROFILE_EXPORT_FORMAT, resolveGroundInteraction, type GroundCapabilities, type GroundInteractionSettingsV1, type GroundStorage,
 } from "./groundInteractionSettings";
+
+/** Settings in their parameters; named profiles in `storage`. */
+function createGroundSettingsStore(storage: GroundStorage | null, parameters: FlightParameterStore = flightParameterDefaults()) {
+  return createStore(parameters, storage);
+}
 
 const CAPABILITIES: GroundCapabilities = {
   contactBridgeUnavailable: "installed JSBSim WASM has no per-wheel contact packet",
@@ -25,34 +31,29 @@ describe("settings migration", () => {
     expect(resolveGroundInteraction(store.settings, CAPABILITIES).active.backend).toBe("cpu-js");
   });
 
-  it("migrates unversioned and partial data field-by-field to safe values and rewrites it", () => {
-    const storage = memoryStorage({ [GROUND_SETTINGS_STORAGE_KEY]: JSON.stringify({
+  it("migrates an unversioned, partial record field by field to safe values", () => {
+    const parameters = flightParameterDefaults(migrateGroundSettings(JSON.stringify({
       rotation: "inertia", tireAudio: "slip", tireAudioVolume: 7, haptics: "vibrate-everything", locked: { rotation: true, bogus: true },
-    }) });
-    const store = createGroundSettingsStore(storage);
+    }))!);
+    const store = createGroundSettingsStore(null, parameters);
     expect(store.settings).toMatchObject({ version: 1, rotation: "inertia", tireAudio: "slip", tireAudioVolume: 1,
       haptics: "off", selection: "manual", forceModel: "jsbsim", profile: "landing-feedback", locked: { rotation: true } });
     expect(store.settings.locked).not.toHaveProperty("bogus");
-    expect(JSON.parse(storage.map.get(GROUND_SETTINGS_STORAGE_KEY)!).version).toBe(1);
+    expect(parameters.get("osfs.ground.lock.rotation")).toBe(true);
   });
 
-  it("never downgrades data from a newer version and keeps changes session-only", () => {
-    const newer = JSON.stringify({ version: 2, rotation: "inertia", futureField: true });
-    const storage = memoryStorage({ [GROUND_SETTINGS_STORAGE_KEY]: newer });
-    const store = createGroundSettingsStore(storage);
-    expect(store.settings.rotation).toBe("off");
-    expect(store.readOnlyReason).toMatch(/newer version/);
-    store.set(applyGroundPreset(store.settings, "landing-feedback"));
-    expect(store.settings.rotation).toBe("inertia");
-    expect(storage.map.get(GROUND_SETTINGS_STORAGE_KEY)).toBe(newer);
+  it("never migrates a record from a newer version, or a corrupt one", () => {
+    expect(migrateGroundSettings(JSON.stringify({ version: 2, rotation: "inertia", futureField: true }))).toBeNull();
+    expect(migrateGroundSettings("{nope")).toBeNull();
   });
 
-  it("recovers from corrupt JSON and storage exceptions without throwing", () => {
-    expect(createGroundSettingsStore(memoryStorage({ [GROUND_SETTINGS_STORAGE_KEY]: "{nope" })).settings.profile).toBe("minimal");
+  it("keeps the settings in the osfs.ground parameters, and survives storage exceptions", () => {
+    const parameters = flightParameterDefaults();
     const failing = { getItem: () => { throw new Error("denied"); }, setItem: () => { throw new Error("full"); } };
-    const store = createGroundSettingsStore(failing);
+    const store = createGroundSettingsStore(failing, parameters);
     expect(() => store.set(applyGroundPreset(store.settings, "landing-feedback"))).not.toThrow();
     expect(store.settings.profile).toBe("landing-feedback");
+    expect(parameters.get("osfs.ground.rotation")).toBe("inertia");
     expect(store.saveProfile("Laptop")).toMatch(/storage/);
     expect(store.profiles).toHaveLength(0);
     expect(createGroundSettingsStore(null).settings.profile).toBe("minimal");

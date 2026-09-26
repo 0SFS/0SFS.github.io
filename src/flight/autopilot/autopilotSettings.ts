@@ -1,8 +1,17 @@
 /**
- * Persistent Autopilot preferences. The HUD Autopilot button engages this
- * package; it does not pick axes. Axis ownership is decided here, then the
- * control arbiter applies it each physics step.
+ * Autopilot preferences, kept in the osfs.autopilot.* parameters. The HUD
+ * Autopilot button engages this package; it does not pick axes. Axis
+ * ownership is decided here, then the control arbiter applies it each physics
+ * step.
  */
+
+import {
+  flightParameterDefaults,
+  type FlightParameterId,
+  type FlightParameters,
+  type FlightParameterStore,
+  type FlightParameterValues,
+} from "../settings/flightParameters";
 
 export type AutopilotBackend = "ours" | "ardupilot";
 export type AutopilotThrottleMode = "airspeed" | "hold";
@@ -37,21 +46,39 @@ export const AUTOPILOT_AXIS_COPY: Record<AutopilotAxisId, { label: string; hint:
   flaps: { label: "Flaps", hint: "Holds flap position while AP is engaged." },
 };
 
-export const DEFAULT_AUTOPILOT_AXES: Readonly<AutopilotAxes> = Object.freeze({
-  roll: true,
-  pitch: true,
-  yaw: true,
-  throttle: true,
-  gear: true,
-  flaps: true,
-});
+const axisParameterId = (axis: AutopilotAxisId) => `osfs.autopilot.axes.${axis}` as const;
 
-export const DEFAULT_AUTOPILOT_SETTINGS: Readonly<AutopilotSettingsV1> = Object.freeze({
-  version: 1,
-  backend: "ours",
-  axes: { ...DEFAULT_AUTOPILOT_AXES },
-  throttleMode: "airspeed",
-});
+/** Every osfs.autopilot.* parameter the Autopilot tab's own controls edit. */
+export const AUTOPILOT_PARAMETER_IDS: readonly FlightParameterId[] = [
+  "osfs.autopilot.backend",
+  ...AUTOPILOT_AXIS_IDS.map(axisParameterId),
+  "osfs.autopilot.throttleMode",
+];
+
+/** The package as its parameters set it. */
+export function readAutopilotSettings(parameters: FlightParameters): AutopilotSettingsV1 {
+  const axes = {} as AutopilotAxes;
+  for (const id of AUTOPILOT_AXIS_IDS) axes[id] = parameters.get(axisParameterId(id));
+  return {
+    version: 1,
+    backend: parameters.get("osfs.autopilot.backend"),
+    axes,
+    throttleMode: parameters.get("osfs.autopilot.throttleMode"),
+  };
+}
+
+/** Settings as parameter values, to write with `setMany`. */
+export function autopilotParameterValues(settings: AutopilotSettingsV1): Partial<FlightParameterValues> {
+  const values: Partial<Record<FlightParameterId, unknown>> = {
+    "osfs.autopilot.backend": settings.backend,
+    "osfs.autopilot.throttleMode": settings.throttleMode,
+  };
+  for (const id of AUTOPILOT_AXIS_IDS) values[axisParameterId(id)] = settings.axes[id];
+  return values as Partial<FlightParameterValues>;
+}
+
+export const DEFAULT_AUTOPILOT_SETTINGS: Readonly<AutopilotSettingsV1> = Object.freeze(readAutopilotSettings(flightParameterDefaults()));
+export const DEFAULT_AUTOPILOT_AXES: Readonly<AutopilotAxes> = Object.freeze({ ...DEFAULT_AUTOPILOT_SETTINGS.axes });
 
 export type AutopilotSettingsParse =
   | { ok: true; settings: AutopilotSettingsV1; migrated: boolean }
@@ -129,72 +156,39 @@ export function withAllAutopilotAxes(settings: AutopilotSettingsV1): AutopilotSe
   return patchAutopilotSettings(settings, { axes: { ...DEFAULT_AUTOPILOT_AXES } });
 }
 
-export interface AutopilotStorage {
-  getItem(key: string): string | null;
-  setItem(key: string, value: string): void;
-}
-
+/** The record the settings used before the registry; migrated once, and kept for rollback. */
 export const AUTOPILOT_SETTINGS_STORAGE_KEY = "osfs.autopilot.v1";
+
+/** The parameters an old record held, or null when it means nothing here, as from a newer version. */
+export function migrateAutopilotSettings(raw: string): Partial<FlightParameterValues> | null {
+  let stored: unknown;
+  try { stored = JSON.parse(raw) as unknown; } catch { return null; }
+  const parsed = parseAutopilotSettings(stored);
+  return parsed.ok ? autopilotParameterValues(parsed.settings) : null;
+}
 
 export interface AutopilotSettingsStore {
   readonly settings: AutopilotSettingsV1;
-  /** Non-null when saving is disabled, e.g. data from a newer version. */
+  /** Non-null when changes will not survive a reload. */
   readonly readOnlyReason: string | null;
   set(settings: AutopilotSettingsV1): void;
 }
 
-/**
- * Best-effort localStorage persistence. Mutating calls never throw, so private
- * mode and full storage keep the sim flying.
- */
-export function createAutopilotSettingsStore(storage: AutopilotStorage | null): AutopilotSettingsStore {
-  let readOnlyReason: string | null = null;
-  let settings: AutopilotSettingsV1 = {
-    ...DEFAULT_AUTOPILOT_SETTINGS,
-    axes: { ...DEFAULT_AUTOPILOT_AXES },
+/** The package over its parameters: a stable snapshot until one of them changes. */
+export function createAutopilotSettingsStore(parameters: FlightParameterStore): AutopilotSettingsStore {
+  let settings = readAutopilotSettings(parameters);
+  const current = (): AutopilotSettingsV1 => {
+    const next = readAutopilotSettings(parameters);
+    if (JSON.stringify(next) !== JSON.stringify(settings)) settings = next;
+    return settings;
   };
-
-  const read = (): unknown => {
-    try {
-      const text = storage?.getItem(AUTOPILOT_SETTINGS_STORAGE_KEY) ?? null;
-      return text === null ? undefined : JSON.parse(text) as unknown;
-    } catch {
-      return null;
-    }
-  };
-  const write = (value: AutopilotSettingsV1): void => {
-    if (readOnlyReason) return;
-    try {
-      storage?.setItem(AUTOPILOT_SETTINGS_STORAGE_KEY, JSON.stringify(value));
-    } catch {
-      // Persistence is best-effort.
-    }
-  };
-
-  const stored = read();
-  if (stored !== undefined) {
-    const parsed = parseAutopilotSettings(stored);
-    if (parsed.ok) {
-      settings = parsed.settings;
-      if (parsed.migrated) write(settings);
-    } else if (
-      stored
-      && typeof stored === "object"
-      && typeof (stored as { version?: unknown }).version === "number"
-      && (stored as { version: number }).version > 1
-    ) {
-      readOnlyReason = "Autopilot settings were saved by a newer version; changes apply to this session only.";
-    }
-  }
-
   return {
-    get settings() { return settings; },
-    get readOnlyReason() { return readOnlyReason; },
+    get settings() { return current(); },
+    get readOnlyReason() { return parameters.storageError(); },
     set(next) {
       const parsed = parseAutopilotSettings(next);
       if (!parsed.ok) return;
-      settings = parsed.settings;
-      write(settings);
+      parameters.setMany(autopilotParameterValues(parsed.settings));
     },
   };
 }

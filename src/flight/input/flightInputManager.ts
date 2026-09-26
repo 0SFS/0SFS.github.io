@@ -1,7 +1,9 @@
 import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import type { ActionIntentFrame } from "@felipegalind0/gamepad-tools/core";
 import { applyFlightControls } from "./applyFlightControls";
-import { createGamepadResponseController, type GamepadResponseController } from "@felipegalind0/gamepad-tools/core";
+import type { GamepadResponseController } from "@felipegalind0/gamepad-tools/core";
+import { flightParameterDefaults, type FlightParameterStore } from "../settings/flightParameters";
+import { createGamepadResponseSetting } from "./gamepadResponseSetting";
 import {
   applyStickExpo,
   createKeyboardAxisState,
@@ -43,11 +45,6 @@ const KEY_BINDINGS: Record<string, Partial<ControlSurfaceState>> = {
   KeyR: { flaps: -1 },
   KeyB: { brake: 1 },
 };
-
-const GAMEPAD_SMOOTHING_RATE = 8;
-const INITIAL_THROTTLE = 0.65;
-const THROTTLE_CHANGE_RATE = 0.5;
-const TAKEOVER_DEADBAND = 0.12;
 
 interface GamepadSnapshot {
   id: string;
@@ -111,6 +108,8 @@ function sameGamepad(a: GamepadSnapshot | null, b: GamepadSnapshot | null): bool
 
 export interface FlightInputManager {
   getGamepadResponseController(): GamepadResponseController;
+  /** Stops following the parameters. */
+  dispose(): void;
   attach(target: Window): () => void;
   poll(dt: number): ControlSurfaceState;
   apply(sdk: JSBSimSdk, controls: ControlSurfaceState): void;
@@ -152,6 +151,11 @@ export interface FlightInputManager {
 }
 
 export function createFlightInputManager(options: {
+  /**
+   * The osfs.input.* parameters, and the gamepad response kept in them. The
+   * catalogue's defaults, in memory, when absent.
+   */
+  parameters?: FlightParameterStore;
   initialThrottle?: number;
   initialGearDown?: boolean;
   rudderSign?: 1 | -1;
@@ -164,8 +168,10 @@ export function createFlightInputManager(options: {
   getBodyRates?: () => BodyRatesRad | null;
   keyboardStickSettings?: KeyboardStickSettings;
 } = {}): FlightInputManager {
+  const parameters = options.parameters ?? flightParameterDefaults();
+  const takeoverDeadband = (): number => parameters.get("osfs.input.takeoverDeadband");
   const keysDown = new Set<string>();
-  const initialThrottle = Math.min(1, Math.max(0, options.initialThrottle ?? INITIAL_THROTTLE));
+  const initialThrottle = Math.min(1, Math.max(0, options.initialThrottle ?? parameters.get("osfs.start.throttle")));
   let smoothed: ControlSurfaceState = {
     elevator: 0,
     aileron: 0,
@@ -194,9 +200,7 @@ export function createFlightInputManager(options: {
   const bindingIntentValues = new Map<string, BindingIntentValue>();
   const keyboardBindingAxes = new Set<BindingAxis>();
   const gamepadBindingAxes = new Set<BindingAxis>();
-  // The key predates the move into gamepad-tools; passing it keeps a pilot's
-  // saved response setting.
-  const gamepadResponse = createGamepadResponseController({ storageKey: "osfs.gamepad-response" });
+  const gamepadResponse = createGamepadResponseSetting(parameters);
   let primeBindingCommands = true;
   const enabledAxes = new Set<number>();
   const enabledButtons = new Set<number>();
@@ -224,12 +228,12 @@ export function createFlightInputManager(options: {
     if (!sameGamepad(pad, gamepadBaseline)) return { axes: [], buttons: [] };
     return {
       axes: pad.axes.flatMap((value, index) => (
-        Math.abs(value - (gamepadBaseline?.axes[index] ?? value)) > TAKEOVER_DEADBAND ? [index] : []
+        Math.abs(value - (gamepadBaseline?.axes[index] ?? value)) > takeoverDeadband() ? [index] : []
       )),
       buttons: pad.buttons.flatMap((button, index) => (
         (button.pressed && !previousGamepad?.buttons[index]?.pressed)
         || ((index === 6 || index === 7)
-          && button.value - (gamepadBaseline?.buttons[index]?.value ?? button.value) > TAKEOVER_DEADBAND)
+          && button.value - (gamepadBaseline?.buttons[index]?.value ?? button.value) > takeoverDeadband())
           ? [index] : []
       )),
     };
@@ -354,7 +358,7 @@ export function createFlightInputManager(options: {
       if (!armedBindingSources.has(bindingId)) {
         if (!persistentValue && value === 0) {
           armedBindingSources.add(bindingId);
-        } else if (Math.abs(value - baseline) > TAKEOVER_DEADBAND) {
+        } else if (Math.abs(value - baseline) > takeoverDeadband()) {
           armedBindingSources.add(bindingId);
         } else {
           continue;
@@ -403,7 +407,7 @@ export function createFlightInputManager(options: {
       const binding = KEY_BINDINGS[key];
       if (!binding) continue;
       if (binding.throttle !== undefined) {
-        throttleTarget = Math.min(1, Math.max(0, throttleTarget + binding.throttle * THROTTLE_CHANGE_RATE * dt));
+        throttleTarget = Math.min(1, Math.max(0, throttleTarget + binding.throttle * parameters.get("osfs.input.throttleRate") * dt));
       }
       if (binding.flaps !== undefined) {
         flaps = Math.min(1, Math.max(0, flaps + binding.flaps * dt * 0.5));
@@ -428,7 +432,8 @@ export function createFlightInputManager(options: {
     if (!pad) {
       return { elevator: null, aileron: null, rudder: null, throttle: null, brake: null };
     }
-    const deadzone = (value: number): number => (Math.abs(value) < 0.08 ? 0 : value);
+    const stickDeadzone = parameters.get("osfs.input.stickDeadzone");
+    const deadzone = (value: number): number => (Math.abs(value) < stickDeadzone ? 0 : value);
     return {
       elevator: gamepadAxisActive(1) ? deadzone(-(pad.axes[1] ?? 0)) : null,
       aileron: gamepadAxisActive(0) ? deadzone(pad.axes[0] ?? 0) : null,
@@ -443,7 +448,7 @@ export function createFlightInputManager(options: {
   };
 
   const smoothToward = (current: number, goal: number, dt: number): number => (
-    current + (goal - current) * Math.min(1, GAMEPAD_SMOOTHING_RATE * dt)
+    current + (goal - current) * Math.min(1, parameters.get("osfs.input.gamepadSmoothing") * dt)
   );
 
   const outputAxis = (state: KeyboardAxisState): number => (
@@ -508,7 +513,7 @@ export function createFlightInputManager(options: {
       throttleTarget = clamp(binding.throttle, 0, 1);
     } else {
       throttleTarget = clamp(
-        throttleTarget + binding.throttleRate * THROTTLE_CHANGE_RATE * dt,
+        throttleTarget + binding.throttleRate * parameters.get("osfs.input.throttleRate") * dt,
         0,
         1,
       );
@@ -724,10 +729,10 @@ export function createFlightInputManager(options: {
             gamepadBindingControls.rollTrimRate,
             gamepadBindingControls.flapsRate,
             gamepadBindingControls.brake,
-          ].some((value) => Math.abs(value) > TAKEOVER_DEADBAND);
+          ].some((value) => Math.abs(value) > takeoverDeadband());
       }
       if (stickOverride !== null || rudderOverride !== null || keysDown.size > 0 || [smoothed.elevator, smoothed.aileron, smoothed.rudder, smoothed.brake]
-        .some((value) => Math.abs(value) > TAKEOVER_DEADBAND)) return true;
+        .some((value) => Math.abs(value) > takeoverDeadband())) return true;
       const pad = readGamepad(selectedGamepadSlot);
       if (!pad) return false;
       if (protectGamepad) {
@@ -736,7 +741,7 @@ export function createFlightInputManager(options: {
       }
       return [pad.axes[0] ?? 0, pad.axes[1] ?? 0,
         pad.axes[2] ?? (pad.buttons[7]?.value ?? 0) - (pad.buttons[6]?.value ?? 0)]
-        .some((value) => Math.abs(value) > TAKEOVER_DEADBAND) || Boolean(pad.buttons[0]?.pressed);
+        .some((value) => Math.abs(value) > takeoverDeadband()) || Boolean(pad.buttons[0]?.pressed);
     },
     getControls(): ControlSurfaceState {
       return { ...smoothed };
@@ -849,6 +854,7 @@ export function createFlightInputManager(options: {
       }
     },
     getGamepadResponseController: () => gamepadResponse,
+    dispose: () => gamepadResponse.dispose(),
     getKeyboardStickSettings(): KeyboardStickSettings {
       return { ...keyboardSettings };
     },

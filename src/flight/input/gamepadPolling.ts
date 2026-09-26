@@ -1,34 +1,13 @@
-export const GAMEPAD_POLLING_OPTIONS = [
-  { id: "frame", label: "Every frame (recommended)" },
-  { id: "120", label: "Up to 120 Hz (8.3 ms)" },
-  { id: "60", label: "Up to 60 Hz (16.7 ms)" },
-  { id: "30", label: "Up to 30 Hz (33.3 ms)" },
-] as const;
+import type { FlightParameters } from "../settings/flightParameters";
 
-export type GamepadPollingRate = typeof GAMEPAD_POLLING_OPTIONS[number]["id"];
+/** How often the application reads the controller: every frame, or at most this many times a second. */
+export type GamepadPollingRate = number | "frame";
 
 export interface GamepadPollingController {
-  getRate(): GamepadPollingRate;
-  setRate(rate: string): void;
-  subscribe(listener: () => void): () => void;
   /** Claim the scheduled poll immediately before flight consumes input. */
   claimFlightFrame(): boolean;
   /** Poll idle frames without competing with the active flight loop. */
   claimIdleFrame(): boolean;
-}
-
-const STORAGE_KEY = "osfs.gamepad-polling-rate";
-
-function normalizeRate(value: unknown): GamepadPollingRate {
-  return GAMEPAD_POLLING_OPTIONS.find(option => option.id === value)?.id ?? "frame";
-}
-
-function readRate(): GamepadPollingRate {
-  try {
-    return normalizeRate(window.localStorage.getItem(STORAGE_KEY));
-  } catch {
-    return "frame";
-  }
 }
 
 function animationFrameTime(): number {
@@ -38,20 +17,27 @@ function animationFrameTime(): number {
   return typeof time === "number" && Number.isFinite(time) ? time : performance.now();
 }
 
-export function createGamepadPollingController(): GamepadPollingController {
-  let rate = readRate();
+/** Polls at osfs.input.gamepadPollingRate, read on every claim. */
+export function createGamepadPollingController(parameters: FlightParameters): GamepadPollingController {
+  let rate: GamepadPollingRate = parameters.get("osfs.input.gamepadPollingRate");
   let nextDueMs = -Infinity;
   let lastPolledFrame: number | null = null;
   let lastFlightFrame: number | null = null;
   let lastIdleFrame: number | null = null;
-  const listeners = new Set<() => void>();
 
   const claim = (frame: number): boolean => {
+    const current = parameters.get("osfs.input.gamepadPollingRate");
+    if (current !== rate) {
+      // A new rate starts a new schedule.
+      rate = current;
+      nextDueMs = -Infinity;
+      lastPolledFrame = null;
+    }
     if (frame === lastPolledFrame) return false;
     if (rate !== "frame") {
       // Allow timestamp rounding without accidentally halving a selected rate.
       if (frame + 0.1 < nextDueMs) return false;
-      const intervalMs = 1000 / Number(rate);
+      const intervalMs = 1000 / rate;
       if (!Number.isFinite(nextDueMs)) {
         nextDueMs = frame + intervalMs;
       } else {
@@ -66,24 +52,6 @@ export function createGamepadPollingController(): GamepadPollingController {
   };
 
   return {
-    getRate: () => rate,
-    setRate(value): void {
-      const next = normalizeRate(value);
-      if (next === rate) return;
-      rate = next;
-      nextDueMs = -Infinity;
-      lastPolledFrame = null;
-      try {
-        window.localStorage.setItem(STORAGE_KEY, rate);
-      } catch {
-        // The setting still applies for this session when storage is blocked.
-      }
-      for (const listener of listeners) listener();
-    },
-    subscribe(listener) {
-      listeners.add(listener);
-      return () => { listeners.delete(listener); };
-    },
     claimFlightFrame(): boolean {
       const frame = animationFrameTime();
       lastFlightFrame = frame;

@@ -2,7 +2,15 @@ import "foss-earth/shell.css";
 import type { WebGPUEngine } from "@babylonjs/core";
 import { canTimeGpuFrames, createFrameProfiler, profileBabylonScene } from "foss-earth/perf";
 import { setActiveFrameProfile } from "./diagnostics/frameProfile";
-import { attitudeRendererSetting } from "./settings/attitudeRendererSetting";
+import { getAppSettings } from "foss-earth/settings";
+import { describeAttitudeRendererStatus } from "./hud/attitudeRenderer";
+import { registerFlightSettings } from "./settings/registerFlightSettings";
+import type { FlightParameterStore } from "./settings/flightParameters";
+import {
+  AIRCRAFT_SELECTION_PARAMETER_IDS,
+  aircraftSelectionValues,
+  readAircraftSelection,
+} from "./aircraft/aircraftSelectionSetting";
 import "foss-earth/windowing.css";
 import type { LocationSearchProvider, GeodeticLocation } from "foss-earth/windowing";
 import { resetFlightLocation } from "./jsbsim/resetFlightLocation";
@@ -20,23 +28,19 @@ import {
 import { mountBindingEditor } from "@felipegalind0/gamepad-tools/ui";
 
 import {
+  applyRendererChoice,
   createBabylonRuntime,
   RASTER_BASE_MAP_SOURCES,
   TERRAIN_SOURCES,
-  resolveTerrainSource,
-  resolveRasterBaseMapSource,
   resolveMapRuntimeConfig,
   setMapSourcePreference,
   setTerrainSourcePreference,
   type BabylonRuntime,
-  type GoogleTerrainDetailAnchor,
   type RasterBaseMapSource,
 } from "foss-earth/runtime";
 import { readDeviceHints } from "foss-earth/mapDetailPolicy";
 import { createPlaceholderAircraft } from "./aircraft/createPlaceholderAircraft";
 import {
-  isAircraftId,
-  isAircraftLodId,
   getAircraftFamilyForAircraft,
   normalizeAircraftSelection,
   type AircraftId,
@@ -61,17 +65,18 @@ import { createWheelSpinExperiment } from "./physics/createWheelSpinExperiment";
 import type { WheelSpinMode } from "./physics/wheelSpin";
 import { createTireAudio } from "./audio/createTireAudio";
 import { createFlightAudio } from "./audio/createFlightAudio";
-import { createAudioSettingsStore } from "./audio/audioSettings";
+import { AUDIO_PARAMETER_IDS, createAudioSettingsStore } from "./audio/audioSettings";
 import { createJsbsimAudioAdapter } from "./audio/jsbsimAudioAdapter";
 import { WHEEL_SPIN_CONFIGS } from "./physics/wheelSpin";
 import { probeWheelContactCapability } from "./physics/wheelContact";
 import { createSlipAudioSink, createWheelCueBus, type WheelCueResetReason } from "./feedback/wheelCueBus";
-import { createGamepadHapticOutput, createHapticsController, type HapticOutput } from "./feedback/haptics";
+import { createGamepadHapticOutput, createHapticsController, readHapticTuning, type HapticOutput } from "./feedback/haptics";
 import {
   applyGroundPreset,
   createGroundSettingsStore,
   GROUND_CHOICE_LABELS,
   GROUND_BOUNDARY_KEYS,
+  GROUND_PARAMETER_IDS,
   patchGroundSettings,
   resolveGroundInteraction,
   type GroundBoundaryKey,
@@ -100,7 +105,6 @@ import { createFloatingOrigin, type FloatingOriginHandle } from "./bridge/floati
 import {
   type FlightControlPanelHandle,
   type FlightControlPanelSnapshot,
-  type FlightTerrainDetailAnchor,
   type FlightWeatherState,
 } from "./hud/FlightControlPanel";
 import { createFlightControlPanel } from "./hud/createFlightControlPanel";
@@ -110,8 +114,9 @@ import { createFlightStatusOverlay, type FlightStatusOverlayHandle } from "./hud
 import type { FlightStatusOverlayState } from "./hud/FlightStatusOverlay";
 import { attachFlightCameraInput } from "./input/flightCameraInput";
 import { applyFlightControls } from "./input/applyFlightControls";
-import { createAutoTrimState, setAutoTrimEnabled, stepPitchAutoTrim, stepRollAutoTrim } from "./input/autoTrim";
+import { createAutoTrimState, readAutoTrimTuning, setAutoTrimEnabled, stepPitchAutoTrim, stepRollAutoTrim } from "./input/autoTrim";
 import {
+  AUTOPILOT_PARAMETER_IDS,
   createAutopilotSettingsStore,
   type AutopilotSettingsV1,
 } from "./autopilot/autopilotSettings";
@@ -129,8 +134,8 @@ import type { PhoneControlSession } from "./remote/createPhoneControlSession";
 import type { CameraAim } from "../remote/protocol";
 import {
   describePhoneCameraTuning,
-  loadPhoneCameraTuning,
-  savePhoneCameraTuning,
+  PHONE_CAMERA_PARAMETER_IDS,
+  readPhoneCameraTuning,
   type PhoneCameraTuning,
 } from "./remote/phoneCameraTuning";
 import type { MountPhonePairing } from "./hud/RemoteControlTab";
@@ -140,12 +145,9 @@ import {
   createLegacyFlightProfile,
   createStandardFlightProfile,
 } from "./input/gamepadToolsAdapter";
-import {
-  loadKeyboardStickSettings,
-  saveKeyboardStickSettings,
-} from "./input/keyboardStickSettings";
+import { KEYBOARD_STICK_PARAMETER_IDS, readKeyboardStickSettings } from "./input/keyboardStickSettings";
 import { createGamepadPollingController } from "./input/gamepadPolling";
-import { loadOrbitInvertSettings, saveOrbitInvertSettings } from "foss-earth/input";
+import type { OrbitInvertSettings } from "foss-earth/input";
 import { createJsbsimRuntime } from "./jsbsim/createJsbsimRuntime";
 import { getFdmProfile } from "./jsbsim/fdmProfiles";
 import { createFixedStepPhysicsLoop, FIXED_DT } from "./physics/fixedStepLoop";
@@ -159,16 +161,8 @@ import {
   type GameLog,
   type MapDetailController,
 } from "foss-earth/shell";
-import {
-  createFlightDetailRequirements,
-  FLIGHT_TERRAIN_REQUIREMENT_KEY,
-  importLegacyWorldDetail,
-  isErrorTarget,
-  LOW_SPAWN_METERS,
-  readFlightTerrainRequirement,
-} from "./worldDetail";
+import { createFlightDetailRequirements, importLegacyWorldDetail } from "./worldDetail";
 import { appHref } from "../appRoute";
-import { DEFAULT_FLIGHT_START, START_ALTITUDE_AGL_METERS } from "./jsbsim/bootstrapC172";
 
 export interface FlightSimAppOptions {
   loadingScreen?: FlightLoadingScreen;
@@ -186,38 +180,9 @@ export interface FlightSimAppHandle {
   destroy(): void;
 }
 
-type FlightRendererForce = "webgl" | "webgl2" | "webgpu";
-
-function getRendererForceFromUrl(): FlightRendererForce | null {
-  const force = new URLSearchParams(window.location.search).get("renderer");
-  if (force === "webgl" || force === "webgl2" || force === "webgpu") return force;
-  return null;
-}
-
-function setRendererForce(force: FlightRendererForce | null): void {
-  const url = new URL(window.location.href);
-  if (force) url.searchParams.set("renderer", force);
-  else url.searchParams.delete("renderer");
-  window.location.assign(url.toString());
-}
-
-const AIRCRAFT_PREFERENCE_KEY = "osfs.aircraft";
-const AIRCRAFT_LOD_PREFERENCE_KEY = "osfs.aircraft-lod";
-const AIRCRAFT_GENERATION_PREFERENCE_KEY = "osfs.aircraft-generation";
-// Opt-in levels are a per-user decision, so the choice persists like the rest.
-// It has no legacy key: nothing before this stored it.
-const AIRCRAFT_OPT_IN_PREFERENCE_KEY = "osfs.aircraft-opt-in-lods";
-const LEGACY_AIRCRAFT_PREFERENCE_KEY = "flight-sim.aircraft";
-const LEGACY_AIRCRAFT_LOD_PREFERENCE_KEY = "flight-sim.aircraft-lod";
-const TERRAIN_DETAIL_ANCHOR_PREFERENCE_KEY = "osfs.terrain-detail-anchor";
-const ARCADE_GROUND_LAUNCHES_PREFERENCE_KEY = "osfs.arcade-ground-launches";
-const AUTO_TRIM_PREFERENCE_KEY = "osfs.auto-trim";
-const AUTO_ROLL_TRIM_PREFERENCE_KEY = "osfs.auto-roll-trim";
-const CAMERA_ORBIT_PITCH_MIN = -Math.PI / 3;
-const CAMERA_ORBIT_PITCH_MAX = Math.PI * 0.45;
-const CAMERA_ORBIT_RESTORE_PITCH = Math.atan2(2.2, 14);
-const CAMERA_ORBIT_RESTORE_YAW = 0;
-const CAMERA_ORBIT_RETURN_SECONDS = 0.45;
+const RADIANS_PER_DEGREE = Math.PI / 180;
+/** The Flight minimum's colour on the detail track and the HUD rail: the coarse end of the detail ramp. */
+const FLIGHT_MINIMUM_COLOUR = "#ff6b6b";
 /**
  * The phone sends a swipe in CSS pixels scaled by 1/1000, so this works out at
  * 0.005 rad per pixel — the same rate a mouse drag on the desktop canvas uses,
@@ -225,28 +190,11 @@ const CAMERA_ORBIT_RETURN_SECONDS = 0.45;
  */
 const PHONE_SWIPE_RADIANS = 5;
 
-function readPreference<T>(key: string, legacyKey: string, isValid: (value: unknown) => value is T, fallback: T): T {
-  try {
-    const stored = window.localStorage.getItem(key) ?? window.localStorage.getItem(legacyKey);
-    return isValid(stored) ? stored : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
 function preferenceStorage(): Storage | null {
   try {
     return window.localStorage;
   } catch {
     return null;
-  }
-}
-
-function writePreference(key: string, value: string): void {
-  try {
-    window.localStorage.setItem(key, value);
-  } catch {
-    // Preference persistence is best-effort; private mode must not break the sim.
   }
 }
 
@@ -266,60 +214,18 @@ function approach(current: number, target: number, deltaSeconds: number, halfLif
   return current + (target - current) * (1 - Math.exp(-deltaSeconds / halfLife));
 }
 
-/** Commit the complete aircraft choice before a reload can activate it. */
-function writeAircraftSelectionPreference(selection: AircraftSelection): string | null {
-  const preferences: (null | [string, string])[] = [
-    [AIRCRAFT_LOD_PREFERENCE_KEY, selection.lodId],
-    [AIRCRAFT_OPT_IN_PREFERENCE_KEY, selection.optInLodsEnabled ? "on" : "off"],
-    selection.generationId !== undefined ? [AIRCRAFT_GENERATION_PREFERENCE_KEY, selection.generationId] : null,
-    // Identity is last: the next boot must never read a new package with
-    // presentation preferences that failed to save.
-    [AIRCRAFT_PREFERENCE_KEY, selection.aircraftId],
-  ];
-  const savedPreferences = preferences.filter((preference): preference is [string, string] => preference !== null);
-  let storage: Storage;
-  let previous: [string, string | null][];
-  try {
-    storage = window.localStorage;
-    previous = savedPreferences.map(([key]) => [key, storage.getItem(key)]);
-  } catch {
-    return "Could not access browser storage. Allow storage and apply your aircraft choice again.";
-  }
-
-  let writtenCount = 0;
-  try {
-    for (const [key, value] of savedPreferences) {
-      storage.setItem(key, value);
-      writtenCount += 1;
-    }
-    return null;
-  } catch {
-    let restored = true;
-    for (let index = writtenCount - 1; index >= 0; index -= 1) {
-      const [key, value] = previous[index];
-      try {
-        if (value === null) storage.removeItem(key);
-        else storage.setItem(key, value);
-      } catch {
-        restored = false;
-      }
-    }
-    return restored
-      ? "Could not save your aircraft choice. The active aircraft is unchanged. Check browser storage and try Apply again."
-      : "Could not save your aircraft choice or restore every saved setting. The active aircraft is unchanged. Allow browser storage, then apply again.";
-  }
-}
-
-function readTerrainDetailAnchorPreference(): FlightTerrainDetailAnchor {
-  return readPreference(
-    TERRAIN_DETAIL_ANCHOR_PREFERENCE_KEY, TERRAIN_DETAIL_ANCHOR_PREFERENCE_KEY,
-    (value): value is FlightTerrainDetailAnchor => value === "aircraft" || value === "camera",
-    "aircraft",
-  );
-}
-
-function runtimeTerrainDetailAnchor(anchor: FlightTerrainDetailAnchor): GoogleTerrainDetailAnchor {
-  return anchor === "aircraft" ? "simulation-origin" : "camera";
+/**
+ * Commit the complete aircraft choice before a reload can activate it: all of
+ * it is saved, or none of it, and a choice that would not survive the reload
+ * is taken back.
+ */
+function writeAircraftSelection(parameters: FlightParameterStore, selection: AircraftSelection): string | null {
+  const previous = readAircraftSelection(parameters);
+  const result = parameters.setMany(aircraftSelectionValues(selection));
+  if (!result.ok) return `Could not apply your aircraft choice: ${result.reason}`;
+  if (parameters.storageError() === null) return null;
+  parameters.setMany(aircraftSelectionValues(previous));
+  return "Could not save your aircraft choice. The active aircraft is unchanged. Allow browser storage, then apply again.";
 }
 
 function zoomMetersFromAltitude(altMeters: number): number {
@@ -331,6 +237,12 @@ export async function createFlightSimApp(
   options: FlightSimAppOptions = {},
 ): Promise<FlightSimAppHandle> {
   const log = options.log ?? createGameLog();
+  // One registry for the page: FOSS Earth's parameters and the flight's.
+  const settings = getAppSettings();
+  const parameters = registerFlightSettings(settings);
+  const stopWatching: (() => void)[] = [];
+  const startLocation = () => ({ latDeg: parameters.get("osfs.start.latitude"), lonDeg: parameters.get("osfs.start.longitude") });
+  const startHeightMeters = parameters.get("osfs.start.heightAboveGround");
   const loading = options.loadingScreen ?? createFlightLoadingScreen(log);
   loading.show();
   loading.setPhase("app", { state: "ready" });
@@ -341,31 +253,11 @@ export async function createFlightSimApp(
     baseMap: options.baseMap,
     preferGoogleTiles: options.preferGoogleTiles,
   });
-  const initialAircraftSelection = normalizeAircraftSelection({
-    aircraftId: readPreference(
-      AIRCRAFT_PREFERENCE_KEY, LEGACY_AIRCRAFT_PREFERENCE_KEY,
-      isAircraftId, "cessna-172",
-    ),
-    generationId: readPreference(
-      AIRCRAFT_GENERATION_PREFERENCE_KEY, AIRCRAFT_GENERATION_PREFERENCE_KEY,
-      (value): value is string => typeof value === "string" && value.length > 0,
-      "",
-    ),
-    lodId: readPreference(
-      AIRCRAFT_LOD_PREFERENCE_KEY, LEGACY_AIRCRAFT_LOD_PREFERENCE_KEY,
-      isAircraftLodId, "auto",
-    ),
-    optInLodsEnabled: readPreference(
-      AIRCRAFT_OPT_IN_PREFERENCE_KEY, AIRCRAFT_OPT_IN_PREFERENCE_KEY,
-      (value): value is "on" | "off" => value === "on" || value === "off", "off",
-    ) === "on",
-  });
+  const initialAircraftSelection = readAircraftSelection(parameters);
   const initialAircraftId: AircraftId = initialAircraftSelection.aircraftId;
   // World detail's saved range, default and HUD rail belong to the shared
-  // detail controller, created with the renderer. The flight keeps its
-  // minimum for low spawns, the detail anchor and the session waiver.
-  let flightTerrainRequirement = readFlightTerrainRequirement(preferenceStorage());
-  let terrainDetailAnchor = readTerrainDetailAnchorPreference();
+  // detail controller, created with the renderer. The flight keeps its low-
+  // spawn hold: the osfs.flight.* parameters, and a marker on the Google track.
   // Assigned once the renderer exists; typed wide so failure paths may use it.
   let mapDetail = null as MapDetailController | null;
   let disconnectMapDetail: () => void = () => {};
@@ -379,11 +271,12 @@ export async function createFlightSimApp(
     let terrain = await runtime.prepareTerrain(request);
     const distanceToTerrain = terrain.altitudeMeters - terrain.groundHeightMeters;
     const detail = runtime.getGoogleTerrainDetailState();
+    const flightMinimum = parameters.get("osfs.flight.minimum");
     const needsFlightDetail = runtime.status.mode === "google-tiles"
       && !allowCoarserTerrain
-      && distanceToTerrain < LOW_SPAWN_METERS
+      && distanceToTerrain < parameters.get("osfs.flight.holdBelow")
       && detail !== null
-      && detail.errorTarget > flightTerrainRequirement;
+      && detail.errorTarget > flightMinimum;
     if (!needsFlightDetail || !detailRequirements) {
       detailRequirements?.supersede();
       return terrain;
@@ -392,7 +285,7 @@ export async function createFlightSimApp(
     // A low spawn needs the pilot's flight minimum. Hold Google mesh at least
     // that fine through preparation and the first moments of flight, without
     // touching the saved World detail; departure releases it.
-    const lease = detailRequirements.begin(flightTerrainRequirement);
+    const lease = detailRequirements.begin(flightMinimum);
     try {
       terrain = await runtime.prepareTerrain(request);
     } catch (error) {
@@ -436,7 +329,6 @@ export async function createFlightSimApp(
     terrainSource: mapConfig.terrainSource,
     rasterQuality: mapConfig.rasterQuality,
     rasterImagery: mapConfig.rasterImagery,
-    rendererForce: getRendererForceFromUrl(),
     simMode: true,
   }).then(runtime => {
     if (bootstrapFailed) { runtime.destroy(); throw new Error("Startup cancelled."); }
@@ -447,21 +339,21 @@ export async function createFlightSimApp(
     const imported = importLegacyWorldDetail(mapDetail, preferenceStorage(), {
       rendererMode: runtime.renderer.mode,
       deviceHints: readDeviceHints(),
+      flightMinimum: parameters.get("osfs.flight.minimum"),
     });
     if (imported === "retry") flightLog.warn("terrain", "World detail settings could not be saved; they apply until reload");
-    detailRequirements = createFlightDetailRequirements(mapDetail);
+    detailRequirements = createFlightDetailRequirements(mapDetail, parameters);
     disconnectMapDetail = connectMapDetailRuntime(mapDetail, runtime);
-    runtime.setGoogleTerrainDetailAnchor(runtimeTerrainDetailAnchor(terrainDetailAnchor));
     runtime.setSimRunning(false);
-    runtime.setSimViewState({ ...DEFAULT_FLIGHT_START, zoomMeters: START_ALTITUDE_AGL_METERS * 1.5 });
+    runtime.setSimViewState({ ...startLocation(), zoomMeters: startHeightMeters * 1.5 });
     loading.setPhase("world", { state: "ready" });
     return runtime;
   });
   // Start local terrain selection as soon as the renderer exists. WASM and its
   // aircraft data are loading independently; no simulator work blocks this.
   const terrainReady = runtimePromise.then(runtime => prepareFlightTerrain(runtime, {
-    ...DEFAULT_FLIGHT_START,
-    altitudeAboveGroundMeters: START_ALTITUDE_AGL_METERS,
+    ...startLocation(),
+    altitudeAboveGroundMeters: startHeightMeters,
     radiusMeters: 1000,
     clearanceMeters: 1000,
     signal: startupAbort.signal,
@@ -472,9 +364,18 @@ export async function createFlightSimApp(
   }));
   // The full readiness join happens after the visual assets have started too.
   void terrainReady.catch(() => {});
+  // Each aircraft starts at its own profile's throttle unless the pilot chose one.
+  settings.setHostDefault("osfs.start.throttle", getFdmProfile(initialAircraftId).initialThrottleNorm,
+    `the ${initialAircraftId} profile`);
   const jsbsimPromise = createJsbsimRuntime({
     dataBaseUrl: options.dataBaseUrl,
     aircraftId: initialAircraftId,
+    bootstrap: {
+      ...startLocation(),
+      headingDeg: parameters.get("osfs.start.heading"),
+      airspeedKts: parameters.get("osfs.start.airspeed"),
+      throttleNorm: parameters.get("osfs.start.throttle"),
+    },
     onProgress: progress => loading.setPhase("flight", {
       state: "loading", detail: progress.message, progress: progress.progress,
     }),
@@ -511,9 +412,49 @@ export async function createFlightSimApp(
   let worldLoading = true;
   let placementAbort = startupAbort;
 
+  // Map → Detail: the Flight minimum is a red marker on the Google track, and
+  // Allow coarser terrain a switch beside it that hollows the marker. While a
+  // low spawn holds detail, the HUD rail shows the marker too.
+  let flightMinimumOnRail = false;
+  let removeFlightMinimumMarker: () => void = () => {};
+  const showFlightMinimum = (): void => {
+    if (!mapDetail) return;
+    flightMinimumOnRail = detailRequirements?.isHeld() ?? false;
+    removeFlightMinimumMarker = mapDetail.setTrackMarker({
+      id: "osfs.flight.minimum",
+      kind: "google",
+      value: parameters.get("osfs.flight.minimum"),
+      colour: FLIGHT_MINIMUM_COLOUR,
+      label: "Flight minimum",
+      ariaLabel: "Flight minimum",
+      draggable: true,
+      hollow: parameters.get("osfs.flight.allowCoarserThisSession"),
+      requirement: true,
+      onRail: flightMinimumOnRail,
+      onChange: value => { parameters.set("osfs.flight.minimum", value); },
+    });
+  };
+  showFlightMinimum();
+  stopWatching.push(
+    parameters.watch("osfs.flight.minimum", value => {
+      // A held low-spawn requirement follows the edit at once; otherwise the
+      // new minimum applies to the next preparation. The saved range is untouched.
+      detailRequirements?.setRequirement(value);
+      showFlightMinimum();
+      runtime.requestRender();
+    }),
+    parameters.watch("osfs.flight.allowCoarserThisSession", allowed => {
+      // The waiver ends any requirement a low spawn is holding.
+      if (allowed) detailRequirements?.releaseAll();
+      showFlightMinimum();
+      runtime.requestRender();
+    }),
+  );
+
   let phoneSession: PhoneControlSession | null = null;
   let phonePairing: Promise<MountPhonePairing> | null = null;
   const inputManager = createFlightInputManager({
+    parameters,
     initialThrottle: jsbsim.sdk.getPropertyValue("fcs/throttle-cmd-norm"),
     initialGearDown: jsbsim.sdk.getPropertyValue("gear/gear-cmd-norm") > 0.5,
     rudderSign: getFdmProfile(initialAircraftId).rudderSign,
@@ -523,7 +464,7 @@ export async function createFlightSimApp(
     // simulation is paused and the render loop is idle.
     onGearChange: (down) => { flightHud.setGearDown(down); runtime.requestRender(); },
     onLocalInput: () => phoneSession?.takeControl(),
-    keyboardStickSettings: loadKeyboardStickSettings(),
+    keyboardStickSettings: readKeyboardStickSettings(parameters),
     getBodyRates: () => ({
       rollRateRad: jsbsim.sdk.getPropertyValue("velocities/p-rad_sec"),
       pitchRateRad: jsbsim.sdk.getPropertyValue("velocities/q-rad_sec"),
@@ -532,22 +473,19 @@ export async function createFlightSimApp(
   });
   let appliedControls = inputManager.getControls();
   const detachInput = inputManager.attach(window);
-  let arcadeGroundLaunches = readPreference(
-    ARCADE_GROUND_LAUNCHES_PREFERENCE_KEY, ARCADE_GROUND_LAUNCHES_PREFERENCE_KEY,
-    (value): value is "on" | "off" => value === "on" || value === "off", "off",
-  ) === "on";
-  let pitchAutoTrim = createAutoTrimState(readPreference(
-    AUTO_TRIM_PREFERENCE_KEY, AUTO_TRIM_PREFERENCE_KEY,
-    (value): value is "on" | "off" => value === "on" || value === "off", "on",
-  ) === "on");
-  let rollAutoTrim = createAutoTrimState(readPreference(
-    AUTO_ROLL_TRIM_PREFERENCE_KEY, AUTO_ROLL_TRIM_PREFERENCE_KEY,
-    (value): value is "on" | "off" => value === "on" || value === "off", "on",
-  ) === "on");
+  for (const id of KEYBOARD_STICK_PARAMETER_IDS) {
+    stopWatching.push(parameters.watch(id, () => inputManager.setKeyboardStickSettings(readKeyboardStickSettings(parameters))));
+  }
+  const arcadeGroundLaunches = (): boolean => parameters.get("osfs.ground.arcadeLaunches");
+  let pitchAutoTrim = createAutoTrimState(parameters.get("osfs.assist.autoTrim"));
+  let rollAutoTrim = createAutoTrimState(parameters.get("osfs.assist.autoRollTrim"));
+  // The HUD's TRIM squares and Aircraft → Assists edit the same parameters.
+  stopWatching.push(
+    parameters.watch("osfs.assist.autoTrim", enabled => { pitchAutoTrim = setAutoTrimEnabled(pitchAutoTrim, enabled); runtime.requestRender(); }),
+    parameters.watch("osfs.assist.autoRollTrim", enabled => { rollAutoTrim = setAutoTrimEnabled(rollAutoTrim, enabled); runtime.requestRender(); }),
+  );
   const ardupilotStatus = DISCONNECTED_ARDUPILOT_STATUS;
-  const autopilotStore = createAutopilotSettingsStore((() => {
-    try { return window.localStorage; } catch { return null; }
-  })());
+  const autopilotStore = createAutopilotSettingsStore(parameters);
   let autopilotSettings: AutopilotSettingsV1 = autopilotStore.settings;
   let arbiterState = createControlArbiterState(
     inputManager.getGearDownNorm(),
@@ -593,6 +531,7 @@ export async function createFlightSimApp(
       pilot,
       gearDownNorm: inputManager.getGearDownNorm(),
       flight: readArbiterFlight(FIXED_DT),
+      stickOverride: parameters.get("osfs.autopilot.stickOverride"),
     });
     arbiterState = stepped.state;
     lastApResult = stepped.result;
@@ -607,16 +546,23 @@ export async function createFlightSimApp(
     syncArbiter();
     runtime.requestRender();
   };
-  const applyAutopilotSettings = (next: AutopilotSettingsV1): void => {
-    autopilotStore.set(next);
+  // The Autopilot tab and its Show all parameters list edit the same parameters.
+  const followAutopilotSettings = (): void => {
+    if (autopilotSettings === autopilotStore.settings) return;
     autopilotSettings = autopilotStore.settings;
     if (autopilotBlockReason()) arbiterState = setArbiterEngaged(arbiterState, false);
     syncArbiter();
+    controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
     runtime.requestRender();
+  };
+  for (const id of AUTOPILOT_PARAMETER_IDS) stopWatching.push(parameters.watch(id, followAutopilotSettings));
+  const applyAutopilotSettings = (next: AutopilotSettingsV1): void => {
+    autopilotStore.set(next);
+    followAutopilotSettings();
   };
   // Ground interaction: persistent requests resolve to what can actually run.
   // The Debug A/B experiment is a session-only override layered on top.
-  const groundStore = createGroundSettingsStore((() => {
+  const groundStore = createGroundSettingsStore(parameters, (() => {
     try { return window.localStorage; } catch { return null; }
   })());
   const contactCapability = probeWheelContactCapability(jsbsim.sdk);
@@ -644,9 +590,7 @@ export async function createFlightSimApp(
   // One sound owner for the engine and the tire cue: one context, one worklet,
   // one limiter, one set of holds (sound.md §2). Nothing is allocated until a
   // gesture asks for sound.
-  const audioSettingsStore = createAudioSettingsStore((() => {
-    try { return window.localStorage; } catch { return null; }
-  })());
+  const audioSettingsStore = createAudioSettingsStore(parameters);
   // Status can change before the panel exists (a restored tire cue arms its
   // unlock during startup), so refreshes wait until there is a panel to refresh.
   let audioPanelReady = false;
@@ -656,6 +600,9 @@ export async function createFlightSimApp(
       if (audioPanelReady) controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
     },
   });
+  // The Sound tab's own controls go through flightAudio; Show all parameters
+  // and imports change the parameters directly, and the sound follows.
+  for (const id of AUDIO_PARAMETER_IDS) stopWatching.push(parameters.watch(id, () => flightAudio.followSettings()));
   if (getAircraftFamilyForAircraft(initialAircraftId).id === "cirrus-vision-jet") {
     // Engine sound is SF50-only: the C172 is not a turbofan, and keeps its tire cue.
     try {
@@ -682,9 +629,11 @@ export async function createFlightSimApp(
   });
   const slipAudio = createSlipAudioSink();
   wheelCues.subscribe(slipAudio);
+  const hapticTuning = () => readHapticTuning(parameters);
   const gamepadHaptics = createGamepadHapticOutput({
     getSelectedSlot: () => inputManager.getSelectedGamepadSlot(),
     onChange: () => haptics.cancel(),
+    getTuning: hapticTuning,
   });
   const phoneHaptics: HapticOutput = {
     // Coarse on/off pulses: magnitude maps to pulse length, not intensity.
@@ -692,7 +641,7 @@ export async function createFlightSimApp(
       Math.round(10 + 50 * Math.max(envelope.strong, envelope.weak)))),
     cancel: () => phoneSession?.setHapticFeedback(0),
   };
-  const haptics = createHapticsController([gamepadHaptics, phoneHaptics]);
+  const haptics = createHapticsController([gamepadHaptics, phoneHaptics], hapticTuning);
   wheelCues.subscribe(haptics);
   const resetWheelSpin = (reason: WheelCueResetReason = "reset"): void => {
     wheelSpin.reset();
@@ -707,13 +656,13 @@ export async function createFlightSimApp(
     acceptedWheelSteps += 1;
     wheelCues.publish(acceptedWheelSteps * FIXED_DT, FIXED_DT, wheelSpin.getStates());
   }, {
-    getArcadeGroundLaunches: () => arcadeGroundLaunches,
+    getArcadeGroundLaunches: arcadeGroundLaunches,
   });
   const flightSurface = createFrameSurfaceQuery(runtime.surface);
   const terrainContact = createTerrainContact(jsbsim.sdk, flightSurface, getFdmProfile(initialAircraftId).stance);
   const visibleMeshCollision = createVisibleMeshCollision(jsbsim.sdk, flightSurface, {
     bodyProbes: getFdmProfile(initialAircraftId).bodyCollisionProbes,
-    getRestitution: () => arcadeGroundLaunches ? 1.35 : 0.25,
+    getRestitution: () => arcadeGroundLaunches() ? 1.35 : 0.25,
   });
   // This stays completely out of the normal render loop unless someone opts
   // in through the URL. It makes a stutter reproducible with numbers instead
@@ -744,7 +693,7 @@ export async function createFlightSimApp(
   // hop from the phone's touch to the orbit drawn here, with both clocks.
   const phoneCameraTrace = isPhoneCameraTraceEnabled()
     ? createPhoneCameraTrace({
-      getSettings: () => ({ recenterMode: orbitInvert.recenterMode, phoneSwipeRadians: PHONE_SWIPE_RADIANS, tuning: { ...phoneCameraTuning } }),
+      getSettings: () => ({ recenterMode: orbitInvert().recenterMode, phoneSwipeRadians: PHONE_SWIPE_RADIANS, tuning: { ...phoneCameraTuning } }),
     }) : null;
   if (phoneCameraTrace) setActivePhoneCameraTrace(phoneCameraTrace);
   const flightHud: FlightHudHandle = createFlightHud(hudRoot, {
@@ -752,16 +701,8 @@ export async function createFlightSimApp(
     onThrottleChange: (value) => { inputManager.setThrottle(value); runtime.requestRender(); },
     onPitchTrimChange: (value) => { inputManager.setPitchTrim(value); runtime.requestRender(); },
     onRollTrimChange: (value) => { inputManager.setRollTrim(value); runtime.requestRender(); },
-    onPitchAutoTrimChange: (enabled) => {
-      pitchAutoTrim = setAutoTrimEnabled(pitchAutoTrim, enabled);
-      writePreference(AUTO_TRIM_PREFERENCE_KEY, enabled ? "on" : "off");
-      runtime.requestRender();
-    },
-    onRollAutoTrimChange: (enabled) => {
-      rollAutoTrim = setAutoTrimEnabled(rollAutoTrim, enabled);
-      writePreference(AUTO_ROLL_TRIM_PREFERENCE_KEY, enabled ? "on" : "off");
-      runtime.requestRender();
-    },
+    onPitchAutoTrimChange: (enabled) => { parameters.set("osfs.assist.autoTrim", enabled); },
+    onRollAutoTrimChange: (enabled) => { parameters.set("osfs.assist.autoRollTrim", enabled); },
     onAutopilotEngageChange: (engaged) => { setAutopilotEngaged(engaged); },
     onFlapsChange: (value) => { inputManager.setFlaps(value); runtime.requestRender(); },
     onRudderChange: (value) => { inputManager.setRudder(value); runtime.requestRender(); },
@@ -772,19 +713,20 @@ export async function createFlightSimApp(
     // Babylon keeps its device on an internal field. Sharing it puts the
     // instrument on the globe's queue instead of opening a second device.
     gpuDevice: runtime.renderer.mode === "webgpu" ? (runtime.renderer.engine as WebGPUEngine)._device : null,
-    attitudeRenderer: attitudeRendererSetting.getState().preference,
+    attitudeRenderer: parameters.get("osfs.renderer.attitudeIndicator"),
     onAttitudeStatus: status => {
-      attitudeRendererSetting.publishStatus(status);
+      // What actually draws, under the choice in Renderer → Instruments.
+      settings.setNote("osfs.renderer.attitudeIndicator", describeAttitudeRendererStatus(status));
       if (!status.backend) return;
       flightLog.info("hud", `Attitude indicator draws with ${status.backend === "webgpu" ? "WebGPU" : "Canvas 2D"}`,
         { preference: status.preference, renderer: runtime.renderer.mode, ...(status.reason ? { reason: status.reason } : {}) });
     },
     profiler: frameProfiler,
   });
-  const stopAttitudeSetting = attitudeRendererSetting.subscribe(() => {
-    flightHud.setAttitudeRenderer(attitudeRendererSetting.getState().preference);
+  stopWatching.push(parameters.watch("osfs.renderer.attitudeIndicator", preference => {
+    flightHud.setAttitudeRenderer(preference);
     runtime.requestRender();
-  });
+  }));
 
   let floatingOrigin: FloatingOriginHandle | null = null;
   let aircraft: ReturnType<typeof createPlaceholderAircraft> | null = null;
@@ -829,6 +771,7 @@ export async function createFlightSimApp(
     hudRoot.querySelector<HTMLElement>(".flight-hud__engine") ?? hudRoot,
     {
       soundStatus: () => flightAudio.getStatus(),
+      parameters,
       onOpen: () => controlPanel?.openOrSelectTab("engine"),
     },
   );
@@ -876,10 +819,34 @@ export async function createFlightSimApp(
     applyGroundRuntime();
   };
   applyGroundRuntime();
+  // Show all parameters and imports change the ground parameters directly:
+  // apply them the way the section's own controls are applied.
+  const followGroundSettings = (): void => {
+    if (inputManager.isPaused() || worldLoading) applyGroundBoundary();
+    else applyGroundRuntime();
+    controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+  };
+  for (const id of GROUND_PARAMETER_IDS) stopWatching.push(parameters.watch(id, followGroundSettings));
   const aircraftId: AircraftId = initialAircraftId;
   let aircraftLodId: AircraftLodId = initialAircraftSelection.lodId;
   let aircraftGenerationId: string = initialAircraftSelection.generationId ?? getAircraftFamilyForAircraft(aircraftId).variants[0]?.id ?? "cessna-172";
   let optInLodsEnabled = initialAircraftSelection.optInLodsEnabled;
+  // The model and its detail change live, from the chooser or Show all
+  // parameters; another aircraft loads on the next start.
+  const followAircraftPresentation = (): void => {
+    const next = readAircraftSelection(parameters);
+    if (next.aircraftId !== aircraftId) return;
+    const generationId = next.generationId ?? aircraftGenerationId;
+    if (next.lodId === aircraftLodId && next.optInLodsEnabled === optInLodsEnabled && generationId === aircraftGenerationId) return;
+    aircraftLodId = next.lodId;
+    aircraftGenerationId = generationId;
+    optInLodsEnabled = next.optInLodsEnabled;
+    aircraftModel?.setPresentation(next.lodId, next.optInLodsEnabled);
+    if (aircraftModel) modelState = aircraftModel.getState();
+    controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
+    runtime.requestRender();
+  };
+  for (const id of AIRCRAFT_SELECTION_PARAMETER_IDS) stopWatching.push(parameters.watch(id, followAircraftPresentation));
   let aircraftReloadRequested = false;
   let modelState: AircraftModelState = {
     aircraftId, lodId: aircraftLodId, activeLodId: null,
@@ -892,19 +859,36 @@ export async function createFlightSimApp(
   // fault, so track how long that has been true to tell a stall from a hitch.
   let terrainBlockedSinceMs: number | null = null;
   let terrainBlockedReason: ReturnType<typeof terrainContact.getBlockReason> = null;
-  // A pilot can temporarily waive their own flight requirement. This is never
-  // persisted, so reopening the game returns to the selected safety policy.
-  let allowCoarserTerrainThisSession = false;
   let inputMode = loadInputModePreference(new Set(["mouse", "trackpad"]));
   let inputSensitivity = loadInputSensitivityPreference();
-  let orbitInvert = loadOrbitInvertSettings();
+  // FOSS Earth's orbit inversion, shared with the globe's camera.
+  const orbitInvert = (): OrbitInvertSettings => ({
+    invertYaw: settings.get<boolean>("input.orbit.invertYaw"),
+    invertPitch: settings.get<boolean>("input.orbit.invertPitch"),
+    recenterMode: settings.get<OrbitInvertSettings["recenterMode"]>("input.orbit.recenterMode"),
+  });
+  // The chase camera's orbit, in radians, from the osfs.camera.* parameters.
+  const orbitPitchLimits = (): { min: number; max: number } => {
+    const limits = parameters.get("osfs.camera.orbitPitchLimits");
+    return { min: limits.min * RADIANS_PER_DEGREE, max: limits.max * RADIANS_PER_DEGREE };
+  };
+  const orbitRestoreYaw = (): number => parameters.get("osfs.camera.orbitRestoreYaw") * RADIANS_PER_DEGREE;
+  const orbitRestorePitch = (): number =>
+    Math.atan2(parameters.get("osfs.camera.chaseHeight"), parameters.get("osfs.camera.chaseDistance"));
   // The phone trackpad's A/B settings (Remote Control tab). Read live by the
   // phone session and each frame, so a change is felt on the next swipe.
-  let phoneCameraTuning: PhoneCameraTuning = loadPhoneCameraTuning();
+  let phoneCameraTuning: PhoneCameraTuning = readPhoneCameraTuning(parameters);
   let phoneCameraVariant = describePhoneCameraTuning(phoneCameraTuning);
+  for (const id of PHONE_CAMERA_PARAMETER_IDS) {
+    stopWatching.push(parameters.watch(id, () => {
+      phoneCameraTuning = readPhoneCameraTuning(parameters);
+      phoneCameraVariant = describePhoneCameraTuning(phoneCameraTuning);
+      runtime.requestRender();
+    }));
+  }
   let chaseFrameApplied: PhoneCameraTuning["chaseFrame"] = "attitude";
-  let orbitStateYaw = CAMERA_ORBIT_RESTORE_YAW;
-  let orbitStatePitch = CAMERA_ORBIT_RESTORE_PITCH;
+  let orbitStateYaw = orbitRestoreYaw();
+  let orbitStatePitch = orbitRestorePitch();
   type OrbitInputSource = "gamepad" | "manual" | "phone";
   const orbitInputSources = new Set<OrbitInputSource>();
   const setOrbitInputActive = (source: OrbitInputSource, active: boolean): void => {
@@ -915,7 +899,8 @@ export async function createFlightSimApp(
   const applyOrbitDelta = (yaw: number, pitch: number): void => {
     if (!aircraft || aircraft.getViewMode() !== "third") return;
     orbitStateYaw = normalizeAngle(orbitStateYaw + yaw);
-    orbitStatePitch = clamp(orbitStatePitch + pitch, CAMERA_ORBIT_PITCH_MIN, CAMERA_ORBIT_PITCH_MAX);
+    const limits = orbitPitchLimits();
+    orbitStatePitch = clamp(orbitStatePitch + pitch, limits.min, limits.max);
     aircraft.orbitChaseCamera(yaw, pitch);
     runtime.requestRender();
   };
@@ -938,9 +923,10 @@ export async function createFlightSimApp(
     // Deliberately not the desktop's pointer sensitivity: that setting belongs
     // to a mouse or a laptop trackpad, and a phone is neither.
     if (aim.yaw !== 0 || aim.pitch !== 0) {
+      const inversion = orbitInvert();
       applyOrbitDelta(
-        aim.yaw * PHONE_SWIPE_RADIANS * (orbitInvert.invertYaw ? -1 : 1),
-        aim.pitch * PHONE_SWIPE_RADIANS * (orbitInvert.invertPitch ? -1 : 1),
+        aim.yaw * PHONE_SWIPE_RADIANS * (inversion.invertYaw ? -1 : 1),
+        aim.pitch * PHONE_SWIPE_RADIANS * (inversion.invertPitch ? -1 : 1),
       );
     }
     // A pinch apart brings the aircraft closer, which is a smaller distance.
@@ -959,26 +945,28 @@ export async function createFlightSimApp(
   const recenterOrbit = (deltaSeconds: number): void => {
     if (!aircraft || aircraft.getViewMode() !== "third") return;
     if (deltaSeconds <= 0) return;
-    if (orbitInvert.recenterMode !== "recenter") return;
+    if (orbitInvert().recenterMode !== "recenter") return;
     if (isOrbitInputActive()) return;
-    const targetYaw = CAMERA_ORBIT_RESTORE_YAW;
-    const targetPitch = CAMERA_ORBIT_RESTORE_PITCH;
+    const targetYaw = orbitRestoreYaw();
+    const targetPitch = orbitRestorePitch();
     const deltaYaw = -normalizeAngle(orbitStateYaw - targetYaw);
     const deltaPitch = targetPitch - orbitStatePitch;
     if (Math.abs(deltaYaw) <= 0.00005 && Math.abs(deltaPitch) <= 0.00005) return;
-    const nextYaw = approach(orbitStateYaw, targetYaw, deltaSeconds, CAMERA_ORBIT_RETURN_SECONDS);
-    const nextPitch = approach(orbitStatePitch, targetPitch, deltaSeconds, CAMERA_ORBIT_RETURN_SECONDS);
+    const returnSeconds = parameters.get("osfs.camera.orbitReturnTime");
+    const nextYaw = approach(orbitStateYaw, targetYaw, deltaSeconds, returnSeconds);
+    const nextPitch = approach(orbitStatePitch, targetPitch, deltaSeconds, returnSeconds);
     applyOrbitDelta(nextYaw - orbitStateYaw, nextPitch - orbitStatePitch);
   };
   const detachCameraInput = attachFlightCameraInput(canvas, {
     getMode: () => inputMode,
     getSensitivity: () => inputSensitivity,
-    getOrbitInvert: () => orbitInvert,
+    getOrbitInvert: orbitInvert,
     orbit: (yaw, pitch) => {
       applyOrbitDelta(yaw, pitch);
     },
     onOrbitActive: (active) => setOrbitInputActive("manual", active),
     zoom: applyCameraZoom,
+    getTouchWheelCooldownMs: () => parameters.get("osfs.input.touchWheelCooldown"),
   });
   let skipResumeDelta = false;
   let disposed = false;
@@ -1008,11 +996,12 @@ export async function createFlightSimApp(
 
     floatingOrigin = createFloatingOrigin(runtime.scene, worldRoot);
     floatingOrigin.aircraftRoot.setEnabled(false);
-    aircraft = createPlaceholderAircraft(runtime.scene, floatingOrigin.aircraftRoot);
+    aircraft = createPlaceholderAircraft(runtime.scene, floatingOrigin.aircraftRoot, parameters);
     aircraft.setViewMode("third");
-    orbitStateYaw = CAMERA_ORBIT_RESTORE_YAW;
+    const limits = orbitPitchLimits();
+    orbitStateYaw = orbitRestoreYaw();
     orbitStatePitch = Math.asin(
-      clamp(aircraft.thirdPersonCamera.position.y / aircraft.thirdPersonCamera.position.length(), CAMERA_ORBIT_PITCH_MIN, CAMERA_ORBIT_PITCH_MAX),
+      clamp(aircraft.thirdPersonCamera.position.y / aircraft.thirdPersonCamera.position.length(), limits.min, limits.max),
     );
     syncCollisionDebugOverlay();
     aircraftModel = createAircraftModel(runtime.scene, aircraft.modelRoot, {
@@ -1038,6 +1027,11 @@ export async function createFlightSimApp(
     });
   };
 
+  stopWatching.push(parameters.watch("osfs.camera.fieldOfView", degrees => {
+    aircraft?.setFieldOfView(degrees);
+    runtime.requestRender();
+  }));
+
   const toggleCameraView = (): void => {
     aircraft?.toggleViewMode();
     runtime.requestRender();
@@ -1058,10 +1052,10 @@ export async function createFlightSimApp(
   window.addEventListener("keydown", onViewKeyDown);
 
   const flightGamepadSource = createBrowserInputSource({ target: window });
-  const flightGamepadPolling = createGamepadPollingController();
+  const flightGamepadPolling = createGamepadPollingController(parameters);
   const flightGamepadResponse = inputManager.getGamepadResponseController();
   const flightGamepadRuntime = new BindingRuntime({
-    defaultAxisDeadzone: 0.08,
+    defaultAxisDeadzone: parameters.get("osfs.input.stickDeadzone"),
     getAxisDeadzoneMode: () => flightGamepadResponse.getSettings().deadzoneMode,
     adapter: createFlightGamepadAdapter(inputManager, {
       onViewToggle: () => {
@@ -1070,14 +1064,14 @@ export async function createFlightSimApp(
       },
       onCameraOrbitActive: (active) => setOrbitInputActive("gamepad", active),
       onCameraOrbit: (yaw, pitch, dt) => {
-        const inversion = orbitInvert;
+        const inversion = orbitInvert();
         applyOrbitDelta(
-          yaw * dt * 1.5 * (inversion.invertYaw ? -1 : 1),
-          pitch * dt * 1.15 * (inversion.invertPitch ? -1 : 1),
+          yaw * dt * parameters.get("osfs.camera.gamepadOrbitYawRate") * RADIANS_PER_DEGREE * (inversion.invertYaw ? -1 : 1),
+          pitch * dt * parameters.get("osfs.camera.gamepadOrbitPitchRate") * RADIANS_PER_DEGREE * (inversion.invertPitch ? -1 : 1),
         );
       },
     }),
-    profile: createStandardFlightProfile(flightGamepadSource.getSelectedDevice()?.slot ?? 0),
+    profile: createStandardFlightProfile(flightGamepadSource.getSelectedDevice()?.slot ?? 0, parameters.get("osfs.input.stickDeadzone")),
   });
   const flightGamepadStore = createProfileStore();
   inputManager.setGamepadToolsActive(true);
@@ -1093,8 +1087,6 @@ export async function createFlightSimApp(
   });
   let flightBindingSignature = JSON.stringify(flightGamepadRuntime.getProfile().bindings);
   const gamepadBindings = {
-    polling: flightGamepadPolling,
-    response: flightGamepadResponse,
     mount(root: HTMLElement): { destroy(): void } {
       return mountBindingEditor({
         root,
@@ -1106,13 +1098,13 @@ export async function createFlightSimApp(
             id: "legacy",
             label: "Classic",
             previousNames: ["Legacy 0sfs compatibility"],
-            create: () => createLegacyFlightProfile(inputManager.getSelectedGamepadSlot()),
+            create: () => createLegacyFlightProfile(inputManager.getSelectedGamepadSlot(), parameters.get("osfs.input.stickDeadzone")),
           },
           {
             id: "standard",
             label: "Xbox",
             previousNames: ["Standard Xbox / PlayStation flight"],
-            create: () => createStandardFlightProfile(inputManager.getSelectedGamepadSlot()),
+            create: () => createStandardFlightProfile(inputManager.getSelectedGamepadSlot(), parameters.get("osfs.input.stickDeadzone")),
           },
         ],
         onProfileChange: (profile) => {
@@ -1190,10 +1182,6 @@ export async function createFlightSimApp(
       viewMode: aircraft?.getViewMode() ?? "third",
       runtimeStatus: { ...runtime.status },
       rendererMode: runtime.renderer.mode,
-      flightTerrainRequirement,
-      flightTerrainRequirementHeld: detailRequirements?.isHeld() ?? false,
-      allowCoarserTerrainThisSession,
-      terrainDetailAnchor,
       aircraftId,
       generationId: aircraftGenerationId,
       lodId: aircraftLodId,
@@ -1202,10 +1190,6 @@ export async function createFlightSimApp(
       modelActiveLodId: modelState.activeLodId,
       modelTriangles: modelState.triangles,
       modelError: modelState.error,
-      keyboardStick: inputManager.getKeyboardStickSettings(),
-      orbitInvert,
-      phoneCameraTuning,
-      arcadeGroundLaunches,
       collisionDebugEnabled,
       wheelSpinMode,
       tireSoundEnabled,
@@ -1318,7 +1302,7 @@ export async function createFlightSimApp(
           detail: progress.message, terrain: progress,
         });
       },
-    }, allowCoarserTerrainThisSession).then(terrain => {
+    }, parameters.get("osfs.flight.allowCoarserThisSession")).then(terrain => {
       if (disposed || abort.signal.aborted) return;
       const destination = { ...location, altMeters: terrain.altitudeMeters };
       const state = resetFlightLocation(jsbsim.sdk, destination, terrain.groundHeightMeters, aircraftId);
@@ -1420,26 +1404,33 @@ export async function createFlightSimApp(
   document.addEventListener("visibilitychange", onVisibilityChange);
 
   // The renderer and basemap choices each have a tab; their HUD chips toggle it.
-  const rendererPanel = createRendererPanel({ renderer: runtime.renderer, onChange: setRendererForce });
+  // The choice is renderer.backend, which the runtime reads when it starts.
+  const rendererPanel = createRendererPanel({ renderer: runtime.renderer, onChange: applyRendererChoice, settings });
+  // A switch between Google and a 2D basemap, or of elevation provider, changes
+  // the ground under the aircraft, so its terrain is prepared again. One 2D
+  // basemap for another changes imagery only. A switch can come from the Map
+  // tab, Show all parameters or an import; the runtime reports each one.
+  const mapGround = (status: Pick<BabylonRuntime["status"], "mode" | "terrainSource">): string | null =>
+    status.mode === "raster-basemap" ? `raster:${status.terrainSource?.id ?? ""}`
+      : status.mode === "google-tiles" ? "google" : null;
+  let preparedGround = mapGround(runtime.status);
+  stopWatching.push(runtime.subscribeStatus(status => {
+    const ground = mapGround(status);
+    if (ground === null || ground === preparedGround) return;
+    preparedGround = ground;
+    teleportToLocation(physicsLoop.getLatestState() ?? initialState);
+  }));
   const mapPanel = createMapSourcePanel({
     detail: mapDetail ?? undefined,
     rasterSources: RASTER_BASE_MAP_SOURCES,
     terrainSources: TERRAIN_SOURCES,
-    onMapSourceChange: (sourceId) => {
-      // One 2D basemap for another changes imagery only; the elevation and
-      // the surface under the aircraft stay, so there is nothing to prepare.
-      const imageryOnly = runtime.status.mode === "raster-basemap" && sourceId !== "google";
-      runtime.setMapSource(sourceId === "google" ? "google" : resolveRasterBaseMapSource(sourceId));
-      setMapSourcePreference(sourceId);
-      if (!imageryOnly) teleportToLocation(physicsLoop.getLatestState() ?? initialState);
-    },
-    onTerrainSourceChange: (sourceId) => {
-      runtime.setTerrainSource(resolveTerrainSource(sourceId));
-      setTerrainSourcePreference(sourceId);
-      teleportToLocation(physicsLoop.getLatestState() ?? initialState);
-    },
+    // Saving a choice switches the map: the runtime follows map.source.*.
+    onMapSourceChange: setMapSourcePreference,
+    onTerrainSourceChange: setTerrainSourcePreference,
   });
   controlPanel = createFlightControlPanel(panelRoot, createPanelSnapshot(), {
+    settings,
+    parameters,
     mapTab: mapPanel.element,
     rendererTab: rendererPanel.element,
     initialWeather: weather,
@@ -1452,7 +1443,7 @@ export async function createFlightSimApp(
     onAircraftApply: (selection) => {
       if (aircraftReloadRequested) return null;
       const next = normalizeAircraftSelection(selection);
-      const saveError = writeAircraftSelectionPreference(next);
+      const saveError = writeAircraftSelection(parameters, next);
       if (saveError) return saveError;
       if (next.aircraftId !== aircraftId) {
         // Package, control convention, contact geometry, gauges and visuals
@@ -1467,59 +1458,8 @@ export async function createFlightSimApp(
           return "Your aircraft choice was saved, but the app could not reload. Reload the page to activate it.";
         }
       }
-      aircraftLodId = next.lodId;
-      aircraftGenerationId = next.generationId
-        ?? getAircraftFamilyForAircraft(next.aircraftId).variants[0]?.id
-        ?? "cessna-172";
-      optInLodsEnabled = next.optInLodsEnabled;
-      aircraftModel?.setPresentation(next.lodId, next.optInLodsEnabled);
-      if (aircraftModel) modelState = aircraftModel.getState();
-      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
-      runtime.requestRender();
+      followAircraftPresentation();
       return null;
-    },
-    onFlightTerrainRequirementChange: (errorTarget) => {
-      if (!isErrorTarget(errorTarget)) return;
-      flightTerrainRequirement = errorTarget;
-      // A held low-spawn requirement follows the edit at once; otherwise the
-      // new minimum applies to the next preparation. The saved range is untouched.
-      detailRequirements?.setRequirement(errorTarget);
-      writePreference(FLIGHT_TERRAIN_REQUIREMENT_KEY, String(errorTarget));
-      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
-      runtime.requestRender();
-    },
-    onTerrainDetailOverrideChange: (enabled) => {
-      allowCoarserTerrainThisSession = enabled;
-      // The waiver ends any requirement a low spawn is holding.
-      if (enabled) detailRequirements?.releaseAll();
-      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
-      runtime.requestRender();
-    },
-    onTerrainDetailAnchorChange: (anchor) => {
-      terrainDetailAnchor = anchor;
-      writePreference(TERRAIN_DETAIL_ANCHOR_PREFERENCE_KEY, anchor);
-      runtime.setGoogleTerrainDetailAnchor(runtimeTerrainDetailAnchor(anchor));
-      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
-      runtime.requestRender();
-    },
-    onKeyboardStickSettingsChange: (settings) => {
-      inputManager.setKeyboardStickSettings(settings);
-      saveKeyboardStickSettings(inputManager.getKeyboardStickSettings());
-      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
-      runtime.requestRender();
-    },
-    onOrbitInvertChange: (settings) => {
-      orbitInvert = settings;
-      saveOrbitInvertSettings(settings);
-      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
-      runtime.requestRender();
-    },
-    onPhoneCameraTuningChange: (tuning) => {
-      phoneCameraTuning = tuning;
-      phoneCameraVariant = describePhoneCameraTuning(tuning);
-      savePhoneCameraTuning(tuning);
-      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
-      runtime.requestRender();
     },
     onCollisionDebugChange: (enabled) => {
       collisionDebugEnabled = enabled;
@@ -1576,12 +1516,6 @@ export async function createFlightSimApp(
     loadPhonePairing,
     // A clean /rc/: nothing the simulator was opened with means anything there.
     onUseAsRemote: () => window.location.assign(appHref("rc", new URL(window.location.origin))),
-    onArcadeGroundLaunchesChange: (enabled) => {
-      arcadeGroundLaunches = enabled;
-      writePreference(ARCADE_GROUND_LAUNCHES_PREFERENCE_KEY, enabled ? "on" : "off");
-      controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
-      runtime.requestRender();
-    },
   });
   audioPanelReady = true;
   hudBar = createFlightHudBar(shellRoot, {
@@ -1628,7 +1562,7 @@ export async function createFlightSimApp(
         state = terrainBlockedReason === "coarse"
           ? {
               kind: "waiting", message: "World detail is too coarse for flight", heldSeconds,
-              detail: `Flight requires World detail 2^${Math.log2(flightTerrainRequirement).toFixed(2)} or finer. Choose finer World detail on the rail or in the Map tab, or allow coarser terrain for this session.`,
+              detail: `Flight requires World detail 2^${Math.log2(parameters.get("osfs.flight.minimum")).toFixed(2)} or finer. Choose finer World detail on the rail or in Map → Detail, or allow coarser terrain for this session there.`,
             }
           : {
               kind: "waiting", message: "Waiting for terrain height data", heldSeconds,
@@ -1723,6 +1657,7 @@ export async function createFlightSimApp(
       const onGround = aircraftOnGround();
       const qbarPsf = jsbsim.sdk.getPropertyValue("aero/qbar-psf");
       const vtFps = jsbsim.sdk.getPropertyValue("velocities/vt-fps");
+      const trimTuning = readAutoTrimTuning(parameters);
       const commanded = { ...ap.controls };
       if (ap.owners.pitch === "pilot") {
         const pusher = getFdmProfile(aircraftId).sf50VariantId
@@ -1736,7 +1671,7 @@ export async function createFlightSimApp(
           qbarPsf,
           vtFps,
           onGround,
-        });
+        }, trimTuning);
         pitchAutoTrim = pitched.state;
         commanded.pitchTrim = pitched.pitchTrim;
         inputManager.replacePitchTrim(pitched.pitchTrim);
@@ -1751,7 +1686,7 @@ export async function createFlightSimApp(
           qbarPsf,
           vtFps,
           onGround,
-        });
+        }, trimTuning);
         rollAutoTrim = rolled.state;
         commanded.rollTrim = rolled.rollTrim;
         inputManager.replaceRollTrim(rolled.rollTrim);
@@ -1818,6 +1753,7 @@ export async function createFlightSimApp(
       paused: inputManager.isPaused() || terrainBlocked || Boolean(physicsLoop.getFault()),
       aboveGroundMeters: sampledSurfaceHeight === null ? null : displayState.altMeters - sampledSurfaceHeight,
     });
+    if ((detailRequirements?.isHeld() ?? false) !== flightMinimumOnRail) showFlightMinimum();
 
     sectionStarted = frameProfiler.clock();
     runtime.setSimViewState({
@@ -1923,7 +1859,9 @@ export async function createFlightSimApp(
       detachCameraInput();
       detachInput();
       if (flightPerformance) setActiveFlightPerformanceCapture(null);
-      stopAttitudeSetting();
+      for (const stop of stopWatching.splice(0)) stop();
+      removeFlightMinimumMarker();
+      inputManager.dispose();
       setFrameProfiling(false);
       setActiveFrameProfile(null);
       if (phoneCameraTrace) setActivePhoneCameraTrace(null);
@@ -1957,13 +1895,13 @@ export async function createFlightSimApp(
   try {
     const terrain = await terrainReady;
     const state = resetFlightLocation(jsbsim.sdk, {
-      ...DEFAULT_FLIGHT_START, altMeters: terrain.altitudeMeters,
+      ...startLocation(), altMeters: terrain.altitudeMeters,
     }, terrain.groundHeightMeters, aircraftId);
     terrainContact.reset();
     visibleMeshCollision.reset();
     physicsLoop.reset();
     revealAircraft(state);
-    runtime.setSimViewState({ ...DEFAULT_FLIGHT_START, zoomMeters: START_ALTITUDE_AGL_METERS * 1.5 });
+    runtime.setSimViewState({ ...startLocation(), zoomMeters: startHeightMeters * 1.5 });
     worldLoading = false;
     physicsLoop.setPaused(inputManager.isPaused());
     tireAudio.setPaused(inputManager.isPaused());

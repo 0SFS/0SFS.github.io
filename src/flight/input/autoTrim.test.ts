@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { flightParameterDefaults } from "../settings/flightParameters";
 import {
   createAutoTrimState,
+  readAutoTrimTuning,
   setAutoTrimEnabled,
   stepPitchAutoTrim,
   stepRollAutoTrim,
@@ -9,6 +11,7 @@ import {
 } from "./autoTrim";
 
 const CRUISE = { qbarPsf: 50, vtFps: 220 };
+const TUNING = readAutoTrimTuning(flightParameterDefaults());
 
 const PITCH_HOLD: PitchAutoTrimInput = {
   dt: 1 / 120,
@@ -31,11 +34,11 @@ const ROLL_HOLD: RollAutoTrimInput = {
 };
 
 function stepPitch(state = createAutoTrimState(true), input: Partial<PitchAutoTrimInput> = {}) {
-  return stepPitchAutoTrim(state, { ...PITCH_HOLD, ...input });
+  return stepPitchAutoTrim(state, { ...PITCH_HOLD, ...input }, TUNING);
 }
 
 function stepRoll(state = createAutoTrimState(true), input: Partial<RollAutoTrimInput> = {}) {
-  return stepRollAutoTrim(state, { ...ROLL_HOLD, ...input });
+  return stepRollAutoTrim(state, { ...ROLL_HOLD, ...input }, TUNING);
 }
 
 describe("pitch auto-trim", () => {
@@ -118,7 +121,7 @@ describe("pitch auto-trim", () => {
           pitchTrim: trim,
           onGround: false,
           ...CRUISE,
-        });
+        }, TUNING);
         state = next.state;
         trim = next.pitchTrim;
         q += qdot * dt;
@@ -191,7 +194,7 @@ describe("roll auto-trim", () => {
       const next = stepRollAutoTrim(state, {
         dt, rollAccelRad: pdot, rollRateRad: p, aileron: 0, rollTrim: trim,
         qbarPsf, vtFps, onGround: false,
-      });
+      }, TUNING);
       const delta = next.rollTrim - trim;
       if (i > 120 && lastDelta !== 0 && Math.sign(delta) !== 0 && Math.sign(delta) !== Math.sign(lastDelta)) {
         flips += 1;

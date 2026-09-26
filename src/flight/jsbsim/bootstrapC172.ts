@@ -1,10 +1,11 @@
 import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import type { AircraftId } from "../aircraft/aircraftIds";
 import { FIXED_DT } from "../physics/fixedStepLoop";
+import { flightParameterDefaults } from "../settings/flightParameters";
 import { getFdmProfile } from "./fdmProfiles";
 
 export interface C172BootstrapOptions {
-  /** Geodetic latitude in degrees. Default: KMSP area. */
+  /** Geodetic latitude in degrees. Default: osfs.start.latitude's. */
   latDeg?: number;
   /** Geodetic longitude in degrees. */
   lonDeg?: number;
@@ -16,6 +17,8 @@ export interface C172BootstrapOptions {
   airspeedKts?: number;
   /** Start with engine running. */
   engineRunning?: boolean;
+  /** Throttle command, 0..1. Default: the aircraft profile's. */
+  throttleNorm?: number;
 }
 
 type JsbsimTimingApi = JSBSimSdk & {
@@ -23,15 +26,14 @@ type JsbsimTimingApi = JSBSimSdk & {
   getDeltaT?: () => number;
 };
 
-export const START_ALTITUDE_AGL_METERS = 5000 * 0.3048;
-export const DEFAULT_FLIGHT_START = { latDeg: 44.977753, lonDeg: -93.265011 };
-
-const DEFAULT_OPTIONS: Required<C172BootstrapOptions> = {
-  ...DEFAULT_FLIGHT_START,
+const catalogue = flightParameterDefaults();
+const DEFAULT_OPTIONS: Required<Omit<C172BootstrapOptions, "throttleNorm">> = {
+  latDeg: catalogue.get("osfs.start.latitude"),
+  lonDeg: catalogue.get("osfs.start.longitude"),
   // Temporary initial state; flight placement adds the loaded ground height.
   altFt: 5_000,
-  headingDeg: 300,
-  airspeedKts: 120,
+  headingDeg: catalogue.get("osfs.start.heading"),
+  airspeedKts: catalogue.get("osfs.start.airspeed"),
   engineRunning: true,
 };
 
@@ -59,6 +61,7 @@ export async function bootstrapAircraft(
 ): Promise<void> {
   const opts = { ...DEFAULT_OPTIONS, ...options };
   const profile = getFdmProfile(aircraftId);
+  const throttleNorm = options.throttleNorm ?? profile.initialThrottleNorm;
   const isPiston = profile.engine === "piston";
 
   sdk.configurePaths({
@@ -91,7 +94,7 @@ export async function bootstrapAircraft(
     throw new Error(`JSBSim RunIC failed for ${aircraftId} initial conditions.`);
   }
 
-  sdk.setPropertyValue("fcs/throttle-cmd-norm", profile.initialThrottleNorm);
+  sdk.setPropertyValue("fcs/throttle-cmd-norm", throttleNorm);
   if (opts.engineRunning) sdk.setPropertyValue("propulsion/set-running", -1);
   else sdk.setPropertyValue("propulsion/engine/set-running", 0);
   if (isPiston) {
@@ -101,7 +104,7 @@ export async function bootstrapAircraft(
   // Starting engines evaluates a full-power steady state internally. Restore
   // the requested command and evaluate normal zero-time FCS/propulsion before
   // exposing the first sample; native JSBSim owns the turbine state update.
-  sdk.setPropertyValue("fcs/throttle-cmd-norm", profile.initialThrottleNorm);
+  sdk.setPropertyValue("fcs/throttle-cmd-norm", throttleNorm);
   if (!sdk.runIc()) {
     throw new Error(`JSBSim RunIC failed for ${aircraftId} engine initial conditions.`);
   }

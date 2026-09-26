@@ -1,5 +1,13 @@
+import {
+  flightParameterDefaults,
+  type FlightParameterId,
+  type FlightParameters,
+  type FlightParameterStore,
+  type FlightParameterValues,
+} from "../settings/flightParameters";
+
 /**
- * Validated, versioned persistence for the sound settings.
+ * Validated sound settings, kept in the osfs.sound.* parameters.
  *
  * Two rules come straight from sound.md §6 and shape everything here: a stored
  * preference must never restore louder sound than the pilot last heard, and a
@@ -7,8 +15,6 @@
  * ask, `effective` is a runtime fact that is never stored, and `enabled`
  * defaults off because a saved preference cannot satisfy autoplay anyway.
  */
-
-export const AUDIO_SETTINGS_STORAGE_KEY = "osfs.audio.settings.v1";
 
 /** Auto starts at Low and only moves up to a qualified tier. */
 export type AudioQualityId = "off" | "low" | "med" | "high" | "auto";
@@ -40,17 +46,6 @@ export interface AudioSettingsV1 {
   downgradedFrom: AudioQualityId | null;
 }
 
-export const DEFAULT_AUDIO_SETTINGS: Readonly<AudioSettingsV1> = Object.freeze({
-  version: 1,
-  enabled: false,
-  requested: "auto",
-  masterVolume: 0.7,
-  engineVolume: 0.8,
-  airframeVolume: 0.6,
-  engineMuted: false,
-  reducedDynamicRange: false,
-  downgradedFrom: null,
-});
 
 export type AudioSettingsParse =
   | { ok: true; settings: AudioSettingsV1; migrated: boolean }
@@ -124,9 +119,58 @@ export function patchAudioSettings(
   return next;
 }
 
-export interface AudioSettingsStorage {
-  getItem(key: string): string | null;
-  setItem(key: string, value: string): void;
+/** The parameters the settings are kept in, by field. */
+const PARAMETER_IDS = {
+  enabled: "osfs.sound.enabled",
+  requested: "osfs.sound.quality",
+  masterVolume: "osfs.sound.masterVolume",
+  engineVolume: "osfs.sound.engineVolume",
+  airframeVolume: "osfs.sound.airframeVolume",
+  engineMuted: "osfs.sound.engineMuted",
+  reducedDynamicRange: "osfs.sound.reducedDynamicRange",
+  downgradedFrom: "osfs.sound.downgradedFrom",
+} as const satisfies Record<Exclude<keyof AudioSettingsV1, "version">, FlightParameterId>;
+
+export const AUDIO_PARAMETER_IDS: readonly FlightParameterId[] = Object.values(PARAMETER_IDS);
+
+/** The settings as their osfs.sound.* parameters set them. */
+export function readAudioSettings(parameters: FlightParameters): AudioSettingsV1 {
+  const downgradedFrom = parameters.get(PARAMETER_IDS.downgradedFrom);
+  return {
+    version: 1,
+    enabled: parameters.get(PARAMETER_IDS.enabled),
+    requested: parameters.get(PARAMETER_IDS.requested),
+    masterVolume: parameters.get(PARAMETER_IDS.masterVolume),
+    engineVolume: parameters.get(PARAMETER_IDS.engineVolume),
+    airframeVolume: parameters.get(PARAMETER_IDS.airframeVolume),
+    engineMuted: parameters.get(PARAMETER_IDS.engineMuted),
+    reducedDynamicRange: parameters.get(PARAMETER_IDS.reducedDynamicRange),
+    downgradedFrom: downgradedFrom === "none" ? null : downgradedFrom,
+  };
+}
+
+/** The catalogue's defaults. */
+export const DEFAULT_AUDIO_SETTINGS: Readonly<AudioSettingsV1> = Object.freeze(readAudioSettings(flightParameterDefaults()));
+
+/** Settings as parameter values, to write with `setMany`. */
+export function audioSettingsValues(settings: Partial<AudioSettingsV1>): Partial<FlightParameterValues> {
+  const values: Partial<Record<FlightParameterId, unknown>> = {};
+  for (const [field, value] of Object.entries(settings) as [keyof typeof PARAMETER_IDS, unknown][]) {
+    if (!(field in PARAMETER_IDS) || value === undefined) continue;
+    values[PARAMETER_IDS[field]] = field === "downgradedFrom" && value === null ? "none" : value;
+  }
+  return values as Partial<FlightParameterValues>;
+}
+
+/** The record the settings used before the registry; migrated once, and kept for rollback. */
+export const AUDIO_SETTINGS_STORAGE_KEY = "osfs.audio.settings.v1";
+
+/** The parameters an old record held, or null when it means nothing here, as from a newer version. */
+export function migrateAudioSettings(raw: string): Partial<FlightParameterValues> | null {
+  let stored: unknown;
+  try { stored = JSON.parse(raw) as unknown; } catch { return null; }
+  const parsed = parseAudioSettings(stored);
+  return parsed.ok ? audioSettingsValues(parsed.settings) : null;
 }
 
 export interface AudioSettingsStore {
@@ -136,45 +180,21 @@ export interface AudioSettingsStore {
   readonly readOnlyReason: string | null;
 }
 
-export function createAudioSettingsStore(storage: AudioSettingsStorage | null): AudioSettingsStore {
-  let settings: AudioSettingsV1 = { ...DEFAULT_AUDIO_SETTINGS };
-  let readOnlyReason: string | null = null;
-
-  let stored: unknown;
-  try {
-    const text = storage?.getItem(AUDIO_SETTINGS_STORAGE_KEY) ?? null;
-    stored = text === null ? undefined : JSON.parse(text) as unknown;
-  } catch {
-    // A corrupt or unreadable entry must not stop the flight from starting.
-    stored = undefined;
-  }
-
-  const write = (value: AudioSettingsV1): string | null => {
-    if (readOnlyReason) return readOnlyReason;
-    try { storage?.setItem(AUDIO_SETTINGS_STORAGE_KEY, JSON.stringify(value)); return null; }
-    catch { return "Could not save; browser storage is unavailable or full."; }
+/** The settings over their parameters: a stable snapshot until one of them changes. */
+export function createAudioSettingsStore(parameters: FlightParameterStore): AudioSettingsStore {
+  let settings = readAudioSettings(parameters);
+  const current = (): AudioSettingsV1 => {
+    const next = readAudioSettings(parameters);
+    if (JSON.stringify(next) !== JSON.stringify(settings)) settings = next;
+    return settings;
   };
-
-  if (stored !== undefined) {
-    const parsed = parseAudioSettings(stored);
-    if (parsed.ok) {
-      settings = parsed.settings;
-      if (parsed.migrated) write(settings);
-    } else if (stored && typeof stored === "object"
-      && typeof (stored as { version?: unknown }).version === "number"
-      && (stored as { version: number }).version > 1) {
-      // Keep newer data intact rather than overwrite it with a downgrade.
-      readOnlyReason = "Sound settings were saved by a newer version; changes apply to this session only.";
-    }
-  }
-
   return {
-    get settings() { return settings; },
-    get readOnlyReason() { return readOnlyReason; },
+    get settings() { return current(); },
+    get readOnlyReason() { return parameters.storageError(); },
     update(patch) {
-      const next = patchAudioSettings(settings, patch);
-      settings = next;
-      return write(next);
+      const result = parameters.setMany(audioSettingsValues(patchAudioSettings(current(), patch)));
+      if (!result.ok) return result.reason;
+      return parameters.storageError() === null ? null : "Could not save; the change applies to this session only.";
     },
   };
 }

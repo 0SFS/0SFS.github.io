@@ -44,7 +44,7 @@ const mocks = vi.hoisted(() => {
 vi.mock("foss-earth/runtime", () => ({
   createBabylonRuntime: async () => mocks.runtime,
   RASTER_BASE_MAP_SOURCES: [], TERRAIN_SOURCES: [], resolveTerrainSource: vi.fn(), resolveRasterBaseMapSource: vi.fn(),
-  resolveMapRuntimeConfig: () => ({}), setMapSourcePreference: vi.fn(), setTerrainSourcePreference: vi.fn(),
+  resolveMapRuntimeConfig: () => ({}), applyRendererChoice: vi.fn(), setMapSourcePreference: vi.fn(), setTerrainSourcePreference: vi.fn(),
 }));
 vi.mock("./jsbsim/createJsbsimRuntime", () => ({ createJsbsimRuntime: async () => ({ sdk: { setPropertyValue: vi.fn(), getPropertyValue: vi.fn(() => 0) }, dispose: vi.fn() }) }));
 vi.mock("./bridge/ecefBridge", () => ({ readFlightState: () => mocks.state }));
@@ -63,10 +63,16 @@ vi.mock("./hud/flightHud", () => ({ createFlightHud: () => ({ update: vi.fn(), d
 vi.mock("./jsbsim/resetFlightLocation", () => ({ resetFlightLocation: () => mocks.state }));
 vi.mock("./hud/createFlightHudBar", () => ({ createFlightHudBar: () => ({ update: vi.fn(), destroy: vi.fn() }) }));
 
+import { resetAppSettings, SETTINGS_STORAGE_KEY } from "foss-earth/settings";
 import { createFlightSimApp } from "./createFlightSimApp";
 import { createFixedStepPhysicsLoop } from "./physics/fixedStepLoop";
 
-afterEach(() => { vi.clearAllMocks(); vi.unstubAllGlobals(); document.body.replaceChildren(); });
+// Each test is a fresh page: the app registry reads the stubbed storage again.
+afterEach(() => { vi.clearAllMocks(); vi.unstubAllGlobals(); document.body.replaceChildren(); resetAppSettings(); });
+
+/** What the settings record holds for this page. */
+const saved = (storage: Map<string, string>): Record<string, unknown> =>
+  (JSON.parse(storage.get(SETTINGS_STORAGE_KEY) ?? "{\"values\":{}}") as { values: Record<string, unknown> }).values;
 
 function environment(pads: unknown[] = []) {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
@@ -104,13 +110,13 @@ it("queues wheel-model changes until pause, applies audio immediately, and resto
   const storage = environment();
   const view = await mount();
   try {
-    await view.openTab("Settings");
+    await view.openTab("Aircraft");
     await view.choose("Ground interaction profile", "landing-feedback");
     // Running: the wheel model waits for a safe boundary.
     view.onStep();
     expect(mocks.wheelSpin.step).not.toHaveBeenCalled();
     expect(view.root.querySelector('[aria-label="Wheel response status"]')!.textContent).toMatch(/Applies when the simulation is paused or reset/);
-    expect(JSON.parse(storage.get("osfs.ground-interaction.v1")!)).toMatchObject({ profile: "landing-feedback", rotation: "inertia" });
+    expect(saved(storage)).toMatchObject({ "osfs.ground.rotation": "inertia", "osfs.ground.tireAudio": "slip" });
     await act(async () => {
       const volume = view.root.querySelector<HTMLInputElement>('[aria-label="Tire audio volume"]')!;
       Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(volume, "0.25");
@@ -132,7 +138,7 @@ it("queues wheel-model changes until pause, applies audio immediately, and resto
   } finally { await act(async () => second.app.destroy()); }
 });
 
-it("keeps Debug experiment choices only through the explicit Settings action", async () => {
+it("keeps Debug experiment choices only through the explicit Ground handling action", async () => {
   const storage = environment();
   const view = await mount();
   try {
@@ -140,13 +146,13 @@ it("keeps Debug experiment choices only through the explicit Settings action", a
     await view.choose("Wheel spin experiment", "instant");
     view.onStep();
     expect(mocks.wheelSpin.step).toHaveBeenLastCalledWith(1 / 120, "instant");
-    expect(storage.has("osfs.ground-interaction.v1")).toBe(false);
-    await view.openTab("Settings");
+    expect(saved(storage)).not.toHaveProperty("osfs.ground.rotation");
+    await view.openTab("Aircraft");
     const override = view.root.querySelector('[aria-label="Wheel experiment override"]')!;
     expect(override.textContent).toMatch(/Instant rolling/);
     const keep = Array.from(override.querySelectorAll("button")).find(button => button.textContent === "Keep experiment choices")!;
     await act(async () => keep.click());
-    expect(JSON.parse(storage.get("osfs.ground-interaction.v1")!)).toMatchObject({ rotation: "instant", profile: "custom" });
+    expect(saved(storage)).toMatchObject({ "osfs.ground.rotation": "instant" });
     expect(view.root.querySelector('[aria-label="Wheel experiment override"]')).toBeNull();
     // Keeping what already runs is not a pending mid-flight change.
     expect(view.root.querySelector('[aria-label="Wheel response status"]')).toBeNull();
@@ -160,7 +166,7 @@ it("drives gamepad haptics from accepted wheel cues and cancels them on pause", 
   mocks.wheelStates = [0, 1, 2].map(() => createWheelSpinState());
   const view = await mount();
   try {
-    await view.openTab("Settings");
+    await view.openTab("Aircraft");
     expect(view.root.querySelector('[aria-label="Haptic devices"]')!.textContent).toMatch(/Gamepad: Ready/);
     view.onStep();
     for (const wheel of mocks.wheelStates.slice(1)) Object.assign(wheel, { onGround: true, normalLoadNewtons: 5_000, slipPowerWatts: 30_000 });

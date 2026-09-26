@@ -1,3 +1,10 @@
+import type {
+  FlightParameterId,
+  FlightParameters,
+  FlightParameterStore,
+  FlightParameterValues,
+} from "./flightParameters";
+
 /**
  * Persistent Ground interaction preferences (proposal: GroundInteractionSettingsV1).
  *
@@ -55,7 +62,13 @@ export const GROUND_CHOICES = {
 
 type PresetFields = Pick<GroundInteractionSettingsV1, GroundLockableKey>;
 
-/** Pilot-facing names shared by Settings, Debug and status text. */
+/** Each choice's name, for its row and its parameter. */
+export const GROUND_FIELD_LABELS: Record<GroundLockableKey, string> = {
+  rotation: "Wheel response", forceModel: "Ground forces", contactModel: "Ground contact",
+  tireAudio: "Tire audio", haptics: "Haptics", wheelVisuals: "Wheel visuals", backend: "Compute backend",
+};
+
+/** Pilot-facing names shared by Ground handling, Debug and status text. */
 export const GROUND_CHOICE_LABELS: { [K in GroundLockableKey]: Record<GroundInteractionSettingsV1[K], string> } = {
   rotation: { off: "Off", instant: "Instant rolling", inertia: "Finite inertia" },
   forceModel: { "jsbsim": "Existing JSBSim", "coupled-rigid": "Coupled rigid wheel",
@@ -281,13 +294,68 @@ export function resolveGroundInteraction(
 
 /* --------------------------------------------------------------- Persistence */
 
+/** The record the settings used before the registry; migrated once, and kept for rollback. */
 export const GROUND_SETTINGS_STORAGE_KEY = "osfs.ground-interaction.v1";
+/**
+ * Named profiles are saved sets of the settings, kept in their own key until
+ * the settings registry's presets can hold them.
+ */
 export const GROUND_PROFILES_STORAGE_KEY = "osfs.ground-interaction-profiles.v1";
 export const MAX_NAMED_PROFILES = 12;
 export const MAX_PROFILE_NAME_LENGTH = 40;
 export const MAX_PROFILE_BYTES = 1024;
 export const MAX_IMPORT_BYTES = 4096;
 export const PROFILE_EXPORT_FORMAT = "osfs-ground-interaction";
+
+const lockParameterId = (key: GroundLockableKey) => `osfs.ground.lock.${key}` as const;
+const choiceParameterId = (key: GroundLockableKey) => `osfs.ground.${key}` as const;
+
+/** Every osfs.ground.* parameter the Ground handling section's own controls edit. */
+export const GROUND_PARAMETER_IDS: readonly FlightParameterId[] = [
+  "osfs.ground.selection",
+  ...GROUND_LOCKABLE_KEYS.map(choiceParameterId),
+  "osfs.ground.tireAudioVolume",
+  "osfs.ground.hapticStrength",
+  ...GROUND_LOCKABLE_KEYS.map(lockParameterId),
+];
+
+/** The settings as their osfs.ground.* parameters set them; the profile is derived. */
+export function readGroundSettings(parameters: FlightParameters): GroundInteractionSettingsV1 {
+  const locked: Partial<Record<GroundLockableKey, boolean>> = {};
+  for (const key of GROUND_LOCKABLE_KEYS) if (parameters.get(lockParameterId(key))) locked[key] = true;
+  const raw: Record<string, unknown> = {
+    version: 1,
+    selection: parameters.get("osfs.ground.selection"),
+    tireAudioVolume: parameters.get("osfs.ground.tireAudioVolume"),
+    hapticStrength: parameters.get("osfs.ground.hapticStrength"),
+    locked,
+  };
+  for (const key of GROUND_LOCKABLE_KEYS) raw[key] = parameters.get(choiceParameterId(key));
+  const parsed = parseGroundInteractionSettings(raw);
+  return parsed.ok ? parsed.settings : { ...DEFAULT_GROUND_INTERACTION_SETTINGS, locked: {} };
+}
+
+/** Settings as parameter values, to write with `setMany`. */
+export function groundSettingsValues(settings: GroundInteractionSettingsV1): Partial<FlightParameterValues> {
+  const values: Partial<Record<FlightParameterId, unknown>> = {
+    "osfs.ground.selection": settings.selection,
+    "osfs.ground.tireAudioVolume": settings.tireAudioVolume,
+    "osfs.ground.hapticStrength": settings.hapticStrength,
+  };
+  for (const key of GROUND_LOCKABLE_KEYS) {
+    values[choiceParameterId(key)] = settings[key];
+    values[lockParameterId(key)] = settings.locked[key] === true;
+  }
+  return values as Partial<FlightParameterValues>;
+}
+
+/** The parameters an old record held, or null when it means nothing here, as from a newer version. */
+export function migrateGroundSettings(raw: string): Partial<FlightParameterValues> | null {
+  let stored: unknown;
+  try { stored = JSON.parse(raw) as unknown; } catch { return null; }
+  const parsed = parseGroundInteractionSettings(stored);
+  return parsed.ok ? groundSettingsValues(parsed.settings) : null;
+}
 
 export interface GroundStorage {
   getItem(key: string): string | null;
@@ -308,7 +376,7 @@ export function normalizeProfileName(name: unknown): string | null {
 export interface GroundSettingsStore {
   readonly settings: GroundInteractionSettingsV1;
   readonly profiles: readonly NamedGroundProfile[];
-  /** Non-null when saving is disabled, e.g. data from a newer version. */
+  /** Non-null when changes will not survive a reload. */
   readonly readOnlyReason: string | null;
   set(settings: GroundInteractionSettingsV1): void;
   saveProfile(name: string): string | null;
@@ -319,13 +387,22 @@ export interface GroundSettingsStore {
 }
 
 /**
- * Best-effort localStorage persistence with capped named profiles. Returns an
- * error string from mutating calls instead of throwing, so the sim keeps flying
- * in private mode or with full storage.
+ * The settings over their parameters, and capped named profiles in storage.
+ * Mutating calls return an error string instead of throwing, so the sim keeps
+ * flying in private mode or with full storage.
  */
-export function createGroundSettingsStore(storage: GroundStorage | null): GroundSettingsStore {
-  let readOnlyReason: string | null = null;
-  let settings: GroundInteractionSettingsV1 = { ...DEFAULT_GROUND_INTERACTION_SETTINGS, locked: {} };
+export function createGroundSettingsStore(parameters: FlightParameterStore, storage: GroundStorage | null): GroundSettingsStore {
+  let settings = readGroundSettings(parameters);
+  const current = (): GroundInteractionSettingsV1 => {
+    const next = readGroundSettings(parameters);
+    if (JSON.stringify(next) !== JSON.stringify(settings)) settings = next;
+    return settings;
+  };
+  const save = (next: GroundInteractionSettingsV1): string | null => {
+    const result = parameters.setMany(groundSettingsValues(next));
+    if (!result.ok) return result.reason;
+    return parameters.storageError() === null ? null : "Could not save; the change applies to this session only.";
+  };
   let profiles: NamedGroundProfile[] = [];
 
   const read = (key: string): unknown => {
@@ -335,23 +412,10 @@ export function createGroundSettingsStore(storage: GroundStorage | null): Ground
     } catch { return null; }
   };
   const write = (key: string, value: unknown): string | null => {
-    if (readOnlyReason) return readOnlyReason;
     try { storage?.setItem(key, JSON.stringify(value)); return null; }
     catch { return "Could not save; browser storage is unavailable or full."; }
   };
 
-  const stored = read(GROUND_SETTINGS_STORAGE_KEY);
-  if (stored !== undefined) {
-    const parsed = parseGroundInteractionSettings(stored);
-    if (parsed.ok) {
-      settings = parsed.settings;
-      if (parsed.migrated) write(GROUND_SETTINGS_STORAGE_KEY, settings);
-    } else if (stored && typeof stored === "object" && typeof (stored as { version?: unknown }).version === "number"
-      && (stored as { version: number }).version > 1) {
-      // Keep the newer data intact rather than overwrite it with a downgrade.
-      readOnlyReason = "Ground interaction settings were saved by a newer version; changes apply to this session only.";
-    }
-  }
   const storedProfiles = read(GROUND_PROFILES_STORAGE_KEY);
   if (Array.isArray(storedProfiles)) {
     for (const entry of storedProfiles.slice(0, MAX_NAMED_PROFILES)) {
@@ -364,33 +428,32 @@ export function createGroundSettingsStore(storage: GroundStorage | null): Ground
   const persistProfiles = () => write(GROUND_PROFILES_STORAGE_KEY, profiles);
 
   return {
-    get settings() { return settings; },
+    get settings() { return current(); },
     get profiles() { return profiles; },
-    get readOnlyReason() { return readOnlyReason; },
+    get readOnlyReason() { return parameters.storageError(); },
     set(next) {
       const parsed = parseGroundInteractionSettings(next);
       if (!parsed.ok) return;
-      settings = parsed.settings;
-      write(GROUND_SETTINGS_STORAGE_KEY, settings);
+      save(parsed.settings);
     },
     saveProfile(rawName) {
       const name = normalizeProfileName(rawName);
       if (!name) return `Use a name of 1–${MAX_PROFILE_NAME_LENGTH} characters.`;
       const existing = profiles.findIndex(profile => profile.name === name);
       if (existing < 0 && profiles.length >= MAX_NAMED_PROFILES) return `At most ${MAX_NAMED_PROFILES} profiles can be saved.`;
-      const entry = { name, settings: { ...settings, locked: { ...settings.locked } } };
+      const now = current();
+      const entry = { name, settings: { ...now, locked: { ...now.locked } } };
       if (byteLength(JSON.stringify(entry)) > MAX_PROFILE_BYTES) return "Profile is too large to save.";
       const previous = profiles;
       profiles = existing < 0 ? [...profiles, entry] : profiles.map((profile, index) => index === existing ? entry : profile);
       const error = persistProfiles();
-      if (error && !readOnlyReason) profiles = previous;
+      if (error) profiles = previous;
       return error;
     },
     loadProfile(name) {
       const profile = profiles.find(candidate => candidate.name === name);
       if (!profile) return "Profile not found.";
-      settings = { ...profile.settings, locked: { ...profile.settings.locked } };
-      return write(GROUND_SETTINGS_STORAGE_KEY, settings);
+      return save({ ...profile.settings, locked: { ...profile.settings.locked } });
     },
     deleteProfile(name) {
       profiles = profiles.filter(profile => profile.name !== name);
@@ -399,7 +462,7 @@ export function createGroundSettingsStore(storage: GroundStorage | null): Ground
     exportProfile(name) {
       const profile = name === undefined ? null : profiles.find(candidate => candidate.name === name);
       return JSON.stringify({ format: PROFILE_EXPORT_FORMAT, version: 1,
-        name: profile?.name ?? "Current settings", settings: profile?.settings ?? settings });
+        name: profile?.name ?? "Current settings", settings: profile?.settings ?? current() });
     },
     importProfile(text) {
       if (typeof text !== "string" || byteLength(text) > MAX_IMPORT_BYTES) return "Profile text is empty or too large.";
@@ -429,7 +492,7 @@ export function createGroundSettingsStore(storage: GroundStorage | null): Ground
       const previous = profiles;
       profiles = existing < 0 ? [...profiles, entry] : profiles.map((profile, index) => index === existing ? entry : profile);
       const error = persistProfiles();
-      if (error && !readOnlyReason) profiles = previous;
+      if (error) profiles = previous;
       return error;
     },
   };

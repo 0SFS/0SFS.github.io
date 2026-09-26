@@ -20,7 +20,7 @@ export interface FlightHudOptions {
   onStickChange(aileron: number, elevator: number): void;
   /** The globe's WebGPU device, so the attitude indicator draws on the GPU; null on WebGL. */
   gpuDevice?: GPUDevice | null;
-  /** Settings → Attitude indicator → Renderer. */
+  /** Renderer → Instruments → Attitude indicator: osfs.renderer.attitudeIndicator. */
   attitudeRenderer?: AttitudeRendererPreference;
   /** Told what the attitude indicator draws with, whenever that changes. */
   onAttitudeStatus?(status: AttitudeRendererStatus): void;

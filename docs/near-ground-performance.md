@@ -117,7 +117,7 @@ restoration also preserves whether the engine was actually running: the global
 start command's value 0 means engine zero, not "off", and the global magneto
 command is write-only and cannot be read back as saved state.
 
-Settings → **Ground impacts → Arcade ground launches** deliberately permits the
+Aircraft → Ground handling → **Arcade ground launches** deliberately permits the
 historical deep-penetration spring launch and sets body restitution to 1.35.
 It defaults off and persists only when chosen. Absolute invalid-state/speed
 guards remain active. This mode intentionally adds energy; the default does not

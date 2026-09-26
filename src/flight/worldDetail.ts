@@ -6,25 +6,20 @@ import {
   type GoogleDetailPolicy,
 } from "foss-earth/mapDetailPolicy";
 import type { MapDetailController, MapDetailRequirement } from "foss-earth/shell";
+import type { FlightParameters } from "./settings/flightParameters";
 
 /**
  * World detail in flight: the shared detail controller owns the saved Google
- * range and the HUD rail. The flight keeps what only it needs: its minimum for
- * low spawns, the detail anchor and the session waiver, and a temporary
- * requirement that holds Google mesh finer while a low spawn is prepared.
+ * range and the HUD rail. The flight keeps what only it needs: a temporary
+ * requirement that holds Google mesh at the Flight minimum or finer while a
+ * low spawn is prepared and flown away from. The minimum, the hold height and
+ * the release time are the osfs.flight.* parameters.
  */
 
 /** The pre-controller World detail target: a number of px, or "auto". Kept for rollback. */
 export const LEGACY_WORLD_DETAIL_KEY = "osfs.world-detail-target";
-export const FLIGHT_TERRAIN_REQUIREMENT_KEY = "osfs.flight-terrain-requirement";
 /** Set once the legacy World detail has been written into the shared record. */
 export const WORLD_DETAIL_IMPORT_KEY = "osfs.world-detail-import";
-export const DEFAULT_FLIGHT_TERRAIN_REQUIREMENT = 4_096;
-
-/** A low spawn prepares detail below this height above the ground, in metres. */
-export const LOW_SPAWN_METERS = 100;
-/** The requirement ends after this long at least LOW_SPAWN_METERS up, in simulated seconds. */
-export const DEPARTURE_SECONDS = 1;
 
 type ReadableStorage = Pick<Storage, "getItem" | "setItem">;
 
@@ -40,12 +35,6 @@ function read(storage: ReadableStorage | null, key: string): string | null {
   }
 }
 
-export function readFlightTerrainRequirement(storage: ReadableStorage | null): number {
-  const stored = read(storage, FLIGHT_TERRAIN_REQUIREMENT_KEY);
-  const value = Number(stored);
-  return stored !== null && isErrorTarget(value) ? value : DEFAULT_FLIGHT_TERRAIN_REQUIREMENT;
-}
-
 export type LegacyImportResult = "imported" | "skipped" | "retry";
 
 /**
@@ -58,7 +47,7 @@ export type LegacyImportResult = "imported" | "skipped" | "retry";
 export function importLegacyWorldDetail(
   controller: MapDetailController,
   storage: ReadableStorage | null,
-  context: { rendererMode: string; deviceHints: DeviceHints },
+  context: { rendererMode: string; deviceHints: DeviceHints; flightMinimum: number },
 ): LegacyImportResult {
   const markDone = (): boolean => {
     try {
@@ -75,7 +64,7 @@ export function importLegacyWorldDetail(
   }
   const stored = read(storage, LEGACY_WORLD_DETAIL_KEY);
   const legacyTarget = stored !== null && stored !== "auto" && isErrorTarget(Number(stored)) ? Number(stored) : null;
-  const requirement = readFlightTerrainRequirement(storage);
+  const requirement = context.flightMinimum;
   const configured = legacyTarget ?? chooseDeviceHintErrorTarget(context.rendererMode, context.deviceHints);
   const policy: GoogleDetailPolicy = {
     kind: "google",
@@ -124,7 +113,10 @@ export interface FlightDetailRequirements {
   isHeld(): boolean;
 }
 
-export function createFlightDetailRequirements(controller: MapDetailController): FlightDetailRequirements {
+export function createFlightDetailRequirements(
+  controller: MapDetailController,
+  parameters: FlightParameters,
+): FlightDetailRequirements {
   let settled: MapDetailRequirement | null = null;
   const pending = new Set<MapDetailRequirement>();
   let clearSeconds = 0;
@@ -171,14 +163,15 @@ export function createFlightDetailRequirements(controller: MapDetailController):
     observe({ deltaSeconds, paused, aboveGroundMeters }) {
       dropInactive();
       if (!settled) return;
-      if (aboveGroundMeters === null || !Number.isFinite(aboveGroundMeters) || aboveGroundMeters < LOW_SPAWN_METERS) {
+      if (aboveGroundMeters === null || !Number.isFinite(aboveGroundMeters)
+        || aboveGroundMeters < parameters.get("osfs.flight.holdBelow")) {
         clearSeconds = 0;
         return;
       }
       // Only simulated time counts: a pause neither advances nor breaks the interval.
       if (paused || !(deltaSeconds > 0)) return;
       clearSeconds += deltaSeconds;
-      if (clearSeconds >= DEPARTURE_SECONDS) {
+      if (clearSeconds >= parameters.get("osfs.flight.holdReleaseAfter")) {
         settled.release();
         settled = null;
         clearSeconds = 0;

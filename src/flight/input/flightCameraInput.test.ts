@@ -1,7 +1,10 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { loadInputSensitivityPreference, type HudInputMode } from "foss-earth/input";
+import { flightParameterDefaults } from "../settings/flightParameters";
 import { attachFlightCameraInput } from "./flightCameraInput";
+
+const getTouchWheelCooldownMs = () => flightParameterDefaults().get("osfs.input.touchWheelCooldown");
 
 const disposers: Array<() => void> = [];
 afterEach(() => { disposers.splice(0).forEach((dispose) => dispose()); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
@@ -10,7 +13,7 @@ function setup(initial: HudInputMode = "mouse") {
   let mode = initial;
   const orbit = vi.fn();
   const zoom = vi.fn();
-  const dispose = attachFlightCameraInput(canvas, { getMode: () => mode, getSensitivity: loadInputSensitivityPreference, orbit, zoom });
+  const dispose = attachFlightCameraInput(canvas, { getMode: () => mode, getSensitivity: loadInputSensitivityPreference, orbit, zoom, getTouchWheelCooldownMs });
   disposers.push(dispose);
   const pointer = (target: EventTarget, name: string, button: number, x = 0, y = 0, buttons = button === 2 ? 2 : 1) => {
     const event = new MouseEvent(name, { button, buttons, clientX: x, clientY: y, cancelable: true });
@@ -107,7 +110,7 @@ describe("flight camera gestures", () => {
       trackpad: { pan: 1, orbit: 1, zoom: 1 },
       touch: { pan: 1, orbit: 2, zoom: 3 },
     };
-    disposers.push(attachFlightCameraInput(canvas, { getMode: () => "mouse", getSensitivity: () => sensitivity, orbit, zoom }));
+    disposers.push(attachFlightCameraInput(canvas, { getMode: () => "mouse", getSensitivity: () => sensitivity, orbit, zoom, getTouchWheelCooldownMs }));
     const touches = (name: string, points: number[][]) => {
       const event = new Event(name, { cancelable: true });
       Object.assign(event, { touches: points.map(([clientX, clientY]) => ({ clientX, clientY })) });
@@ -167,6 +170,7 @@ describe("flight camera gestures", () => {
       getOrbitInvert: () => ({ invertYaw: true, invertPitch: true, recenterMode: "hold" }),
       orbit,
       zoom: vi.fn(),
+      getTouchWheelCooldownMs,
     });
     disposers.push(dispose);
     const pointer = (target: EventTarget, name: string, button: number, x = 0, y = 0, buttons = button === 2 ? 2 : 1) => {

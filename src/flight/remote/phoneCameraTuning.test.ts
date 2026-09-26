@@ -1,24 +1,29 @@
 import { describe, expect, it } from "vitest";
+import { flightParameterDefaults } from "../settings/flightParameters";
 import {
-  DEFAULT_PHONE_CAMERA_TUNING, RECOMMENDED_PHONE_CAMERA_TUNING, describePhoneCameraTuning, loadPhoneCameraTuning,
-  normalizePhoneCameraTuning, savePhoneCameraTuning, samePhoneCameraTuning,
+  DEFAULT_PHONE_CAMERA_TUNING, RECOMMENDED_PHONE_CAMERA_TUNING, describePhoneCameraTuning, migratePhoneCameraTuning,
+  normalizePhoneCameraTuning, phoneCameraTuningValues, readPhoneCameraTuning, samePhoneCameraTuning,
 } from "./phoneCameraTuning";
 
 describe("phone camera tuning", () => {
-  it("defaults to the original behaviour and keeps only offered values", () => {
+  it("defaults to the original behaviour and keeps only valid values", () => {
     expect(DEFAULT_PHONE_CAMERA_TUNING).toMatchObject({ send: "timer", source: "delta", present: "arrival", chaseFrame: "attitude" });
     expect(normalizePhoneCameraTuning(null)).toEqual(DEFAULT_PHONE_CAMERA_TUNING);
-    expect(normalizePhoneCameraTuning({ send: "sometimes", bufferMs: 13, catchUp: 2, predictMs: 16, chaseFrame: "heading" } as never))
-      .toEqual({ ...DEFAULT_PHONE_CAMERA_TUNING, predictMs: 16, chaseFrame: "heading" });
+    expect(normalizePhoneCameraTuning({ send: "sometimes", bufferMs: 13, catchUp: 2, predictMs: 160, chaseFrame: "heading" } as never))
+      .toEqual({ ...DEFAULT_PHONE_CAMERA_TUNING, bufferMs: 13, chaseFrame: "heading" });
   });
 
-  it("persists through storage and survives a corrupt entry", () => {
-    const store = new Map<string, string>();
-    const storage = { getItem: (key: string) => store.get(key) ?? null, setItem: (key: string, value: string) => { store.set(key, value); } };
-    savePhoneCameraTuning({ ...RECOMMENDED_PHONE_CAMERA_TUNING, bufferMs: 16 }, storage);
-    expect(loadPhoneCameraTuning(storage)).toEqual({ ...RECOMMENDED_PHONE_CAMERA_TUNING, bufferMs: 16 });
-    store.set("osfs.phone-camera-tuning", "{not json");
-    expect(loadPhoneCameraTuning(storage)).toEqual(DEFAULT_PHONE_CAMERA_TUNING);
+  it("lives in the osfs.camera parameters, with a catch-up of 0 kept as Jump", () => {
+    const parameters = flightParameterDefaults();
+    parameters.setMany(phoneCameraTuningValues({ ...RECOMMENDED_PHONE_CAMERA_TUNING, bufferMs: 16, catchUp: 0 }));
+    expect(parameters.get("osfs.camera.phone.catchUp")).toBe("jump");
+    expect(readPhoneCameraTuning(parameters)).toEqual({ ...RECOMMENDED_PHONE_CAMERA_TUNING, bufferMs: 16, catchUp: 0 });
+  });
+
+  it("migrates the old record once, and ignores a corrupt one", () => {
+    expect(migratePhoneCameraTuning(JSON.stringify({ ...RECOMMENDED_PHONE_CAMERA_TUNING, chaseFrame: "no-roll" })))
+      .toMatchObject({ "osfs.camera.phone.send": "batch", "osfs.camera.phone.bufferMs": 12, "osfs.camera.chaseFrame": "no-roll" });
+    expect(migratePhoneCameraTuning("{not json")).toBeNull();
   });
 
   it("names a combination so a trace can be split by it", () => {

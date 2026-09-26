@@ -6,6 +6,7 @@ import {
   type EnginePhaseReading, type EngineReader, type EngineRow, type EngineSample,
 } from "./engineMonitorModel";
 import { createEngineSummary, engineSummaryView, type FuelFlowUnit } from "./engineSummary";
+import { flightParameterDefaults, type FlightParameterStore } from "../settings/flightParameters";
 
 export { closestUprightRingAngle } from "./engineSummary";
 
@@ -18,8 +19,10 @@ export { closestUprightRingAngle } from "./engineSummary";
 
 export interface EngineMonitorOptions {
   soundStatus?: () => FlightAudioStatus | null;
-  /** Remembers which detail sections are open. Defaults to localStorage. */
+  /** Remembers which detail sections are open: the panel's memory, not a setting. Defaults to localStorage. */
   storage?: Pick<Storage, "getItem" | "setItem"> | null;
+  /** Holds osfs.engineMonitor.fuelFlowUnit. The catalogue's defaults, in memory, when absent. */
+  parameters?: FlightParameterStore;
   now?: () => number;
   /** DOM refresh period. The transition log still samples on every update. */
   refreshIntervalMs?: number;
@@ -44,7 +47,7 @@ const STORAGE_KEY = "osfs.engineMonitor.v1";
 /** Sections closed until opened; everything else starts open. */
 const CLOSED_BY_DEFAULT: ReadonlySet<string> = new Set(["all"]);
 
-interface Layout { open: Record<string, boolean>; flowUnit: FuelFlowUnit }
+interface Layout { open: Record<string, boolean> }
 
 function defaultStorage(): Pick<Storage, "getItem" | "setItem"> | null {
   try { return window.localStorage; } catch { return null; }
@@ -57,9 +60,9 @@ function readLayout(storage: Pick<Storage, "getItem" | "setItem"> | null): Layou
     if (parsed?.open && typeof parsed.open === "object") {
       for (const [id, value] of Object.entries(parsed.open)) if (typeof value === "boolean") open[id] = value;
     }
-    return { open, flowUnit: parsed?.flowUnit === "gal/h" ? "gal/h" : "lb/h" };
+    return { open };
   } catch {
-    return { open: {}, flowUnit: "lb/h" };
+    return { open: {} };
   }
 }
 
@@ -79,6 +82,8 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
   const now = options.now ?? (() => performance.now());
   const refreshMs = options.refreshIntervalMs ?? 100;
   const layout = readLayout(storage);
+  const parameters = options.parameters ?? flightParameterDefaults();
+  const flowUnit = (): FuelFlowUnit => parameters.get("osfs.engineMonitor.fuelFlowUnit");
   const log = createTransitionLog();
 
   const container = element("section", "flight-engine");
@@ -111,7 +116,7 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
   const allCells: { path: string; cell: HTMLElement }[] = [];
 
   const save = (): void => {
-    try { storage?.setItem(STORAGE_KEY, JSON.stringify({ open: layout.open, flowUnit: layout.flowUnit })); } catch { /* A convenience only. */ }
+    try { storage?.setItem(STORAGE_KEY, JSON.stringify({ open: layout.open })); } catch { /* A convenience only. */ }
   };
 
   const refreshNow = (): void => {
@@ -204,7 +209,7 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
   };
 
   const summarize = (sample: EngineSample, phase: EnginePhaseReading): void => {
-    summary.render(engineSummaryView(sample, phase), layout.flowUnit);
+    summary.render(engineSummaryView(sample, phase), flowUnit());
   };
 
   const soundRows = (status: FlightAudioStatus | null): [string, string][] => {
@@ -312,19 +317,20 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
     destroy() {
       if (destroyed) return;
       destroyed = true;
+      stopFlowUnit();
       reading = null;
       detachDetails();
       container.remove();
     },
   };
+  // The HUD click and the Engine tab both change the unit; either redraws at once.
+  const stopFlowUnit = parameters.watch("osfs.engineMonitor.fuelFlowUnit", refreshNow);
 
   toggle.addEventListener("click", () => { if (!destroyed) options.onOpen?.(); });
   summary.flow.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
-    layout.flowUnit = layout.flowUnit === "gal/h" ? "lb/h" : "gal/h";
-    save();
-    refreshNow();
+    parameters.set("osfs.engineMonitor.fuelFlowUnit", flowUnit() === "gal/h" ? "lb/h" : "gal/h");
   });
   return handle;
 }

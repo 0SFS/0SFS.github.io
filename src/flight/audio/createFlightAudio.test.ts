@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AUDIO_BATCH_HEADER, AUDIO_BATCH_SNAPSHOTS, AUDIO_EVENT, AUDIO_EVENT_SIZE, AUDIO_SNAPSHOT_SIZE } from "./audioSnapshot";
-import { createAudioSettingsStore, type AudioSettingsStorage } from "./audioSettings";
+import { flightParameterDefaults } from "../settings/flightParameters";
+import { audioSettingsValues, createAudioSettingsStore, DEFAULT_AUDIO_SETTINGS, patchAudioSettings } from "./audioSettings";
 import { createFlightAudio, type FlightAudioHandle } from "./createFlightAudio";
 import type { AudioAdapter, AudioAdapterReading } from "./jsbsimAudioAdapter";
 
@@ -51,10 +52,10 @@ class FakeWorkletNode {
 
 const wasm = readFileSync("src/flight/audio/dsp/audio-dsp.wasm");
 
-function memoryStorage(initial?: object): AudioSettingsStorage {
-  const data = new Map<string, string>();
-  if (initial) data.set("osfs.audio.settings.v1", JSON.stringify({ version: 1, ...initial }));
-  return { getItem: key => data.get(key) ?? null, setItem: (key, value) => { data.set(key, value); } };
+/** The sound parameters as a saved record would leave them. */
+function savedParameters(initial?: object) {
+  if (!initial) return flightParameterDefaults();
+  return flightParameterDefaults(audioSettingsValues(patchAudioSettings(DEFAULT_AUDIO_SETTINGS, initial)));
 }
 
 function fakeAdapter() {
@@ -77,7 +78,7 @@ function create(options: {
   stored?: object; inGesture?: boolean; unlockTarget?: EventTarget; loadWasm?: () => Promise<BufferSource>;
   suspendDelayMs?: number;
 } = {}) {
-  const store = createAudioSettingsStore(memoryStorage(options.stored));
+  const store = createAudioSettingsStore(savedParameters(options.stored));
   const audio = createFlightAudio({
     settings: store,
     suspendDelayMs: options.suspendDelayMs,

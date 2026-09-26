@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createMapDetailController, MAP_DETAIL_STORAGE_KEY, type MapDetailController } from "foss-earth/shell";
+import { flightParameterDefaults, type FlightParameterValues } from "./settings/flightParameters";
 import {
   createFlightDetailRequirements,
   importLegacyWorldDetail,
@@ -19,7 +20,7 @@ function storage(initial: Record<string, string> = {}, denyWrites = false) {
   };
 }
 
-const context = { rendererMode: "webgl2", deviceHints: { hardwareConcurrency: 8, deviceMemory: 8 } };
+const context = { rendererMode: "webgl2", deviceHints: { hardwareConcurrency: 8, deviceMemory: 8 }, flightMinimum: 4096 };
 
 function googleController(store: ReturnType<typeof storage>): MapDetailController {
   const controller = createMapDetailController({ storage: store, googleRecommendation: "device-hints" });
@@ -29,7 +30,7 @@ function googleController(store: ReturnType<typeof storage>): MapDetailControlle
 
 describe("legacy World detail import", () => {
   it("makes a saved target the default and keeps the old reachable range", () => {
-    const store = storage({ [LEGACY_WORLD_DETAIL_KEY]: "16", "osfs.flight-terrain-requirement": "4096" });
+    const store = storage({ [LEGACY_WORLD_DETAIL_KEY]: "16" });
     const controller = googleController(store);
     expect(importLegacyWorldDetail(controller, store, context)).toBe("imported");
     expect(controller.getPolicy("google")).toEqual({ kind: "google", finestErrorPx: 16, coarsestErrorPx: 4096, defaultValue: 16 });
@@ -95,12 +96,12 @@ describe("legacy World detail import", () => {
 });
 
 describe("low-spawn detail requirement", () => {
-  function setup(saved = 16384) {
+  function setup(saved = 16384, parameters: Partial<FlightParameterValues> = {}) {
     const controller = createMapDetailController({ storage: null });
     controller.setRecommendationContext({ rendererDefaultErrorPx: 20, rendererMode: "webgl2" });
     controller.setActiveSource({ key: "google", availability: "ready" });
     controller.updatePolicy({ kind: "google", finestErrorPx: 4096, coarsestErrorPx: 16384, defaultValue: saved });
-    return { controller, requirements: createFlightDetailRequirements(controller) };
+    return { controller, requirements: createFlightDetailRequirements(controller, flightParameterDefaults(parameters)) };
   }
   const effective = (controller: MapDetailController) => controller.getState()?.effectiveTarget;
   const fly = (requirements: ReturnType<typeof setup>["requirements"], seconds: number, aboveGroundMeters: number | null, paused = false) => {
@@ -140,6 +141,17 @@ describe("low-spawn detail requirement", () => {
     fly(requirements, 0.9, 150);
     expect(effective(controller)).toBe(4096);
     fly(requirements, 0.2, 150);
+    expect(effective(controller)).toBe(16384);
+  });
+
+  it("follows the hold height and release time parameters", () => {
+    const { controller, requirements } = setup(16384, { "osfs.flight.holdBelow": 400, "osfs.flight.holdReleaseAfter": 3 });
+    requirements.begin(4096).complete();
+    fly(requirements, 5, 300);
+    expect(effective(controller)).toBe(4096);
+    fly(requirements, 2.9, 500);
+    expect(effective(controller)).toBe(4096);
+    fly(requirements, 0.2, 500);
     expect(effective(controller)).toBe(16384);
   });
 

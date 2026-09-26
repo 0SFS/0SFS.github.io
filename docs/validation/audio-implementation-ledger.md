@@ -544,7 +544,7 @@ In a suggested order:
 **Behaviour to keep**
 
 - Pause and loading hold all sound; terrain and contact holds silence only the tire cue.
-- Engine sound is Vision Jet only; the C172 gets the tire cue alone. Tire sound and its volume live in Settings → Ground interaction.
+- Engine sound is Vision Jet only; the C172 gets the tire cue alone. Tire sound and its volume live in Aircraft → Ground handling.
 - Nothing is qualified. Offline timings are proxies, and `QUALIFIED_PROFILES` stays empty until real device records exist.
 
 **Environment**

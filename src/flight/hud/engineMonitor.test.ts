@@ -2,6 +2,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import type { FlightAudioStatus } from "../audio/createFlightAudio";
 import type { FlightRecorderPropertyReader } from "../diagnostics/flightRecorder";
+import { flightParameterDefaults } from "../settings/flightParameters";
 import { closestUprightRingAngle, createEngineMonitor, type EngineMonitorOptions } from "./engineMonitor";
 
 function fakeReader(values: Record<string, number>, access: Record<string, string> = {}) {
@@ -126,7 +127,8 @@ describe("engine monitor", () => {
     root = document.createElement("div");
     let opened = 0;
     const storage = memoryStorage();
-    const monitor = mount({ storage, onOpen: () => { opened += 1; } });
+    const parameters = flightParameterDefaults();
+    const monitor = mount({ storage, parameters, onOpen: () => { opened += 1; } });
     monitor.update(fakeReader(sf50Values(), WRITE_ONLY));
     expect(text(".flight-engine__flow-value")).toBe("0171");
     expect(text(".flight-engine__flow-unit")).toBe("lb/h");
@@ -135,7 +137,8 @@ describe("engine monitor", () => {
     expect(text(".flight-engine__flow-value")).toBe("0025");
     expect(text(".flight-engine__flow-unit")).toBe("gal/h");
     monitor.destroy();
-    const again = mount({ storage });
+    expect(parameters.get("osfs.engineMonitor.fuelFlowUnit")).toBe("gal/h");
+    const again = mount({ storage, parameters });
     again.update(fakeReader(sf50Values(), WRITE_ONLY));
     expect(text(".flight-engine__flow-unit")).toBe("gal/h");
     expect(text(".flight-engine__flow-value")).toBe("0025");

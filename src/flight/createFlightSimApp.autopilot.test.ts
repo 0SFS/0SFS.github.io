@@ -2,7 +2,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { FlightHudOptions } from "./hud/flightHud";
 import type { FlightControlPanelOptions } from "./hud/FlightControlPanel";
-import { AUTOPILOT_SETTINGS_STORAGE_KEY } from "./autopilot/autopilotSettings";
 
 const mocks = vi.hoisted(() => {
   const state = { latDeg: 1, lonDeg: 2, altMeters: 1000, headingRad: 0, airspeedKts: 110 };
@@ -63,7 +62,7 @@ vi.mock("foss-earth/runtime", () => ({
   createBabylonRuntime: async () => mocks.runtime,
   RASTER_BASE_MAP_SOURCES: [], TERRAIN_SOURCES: [], resolveTerrainSource: vi.fn(),
   resolveRasterBaseMapSource: vi.fn(), resolveMapRuntimeConfig: () => ({}),
-  setMapSourcePreference: vi.fn(), setTerrainSourcePreference: vi.fn(), setRasterQualityPreference: vi.fn(),
+  applyRendererChoice: vi.fn(), setMapSourcePreference: vi.fn(), setTerrainSourcePreference: vi.fn(), setRasterQualityPreference: vi.fn(),
 }));
 vi.mock("foss-earth/input", () => ({
   loadInputModePreference: () => "mouse", loadInputSensitivityPreference: () => ({}),
@@ -85,6 +84,7 @@ vi.mock("./hud/createFlightControlPanel", () => ({ createFlightControlPanel: moc
 vi.mock("./hud/createFlightHudBar", () => ({ createFlightHudBar: mocks.createHudBar }));
 vi.mock("./jsbsim/resetFlightLocation", () => ({ resetFlightLocation: vi.fn(() => mocks.state) }));
 
+import { getAppSettings, resetAppSettings } from "foss-earth/settings";
 import { createFlightSimApp } from "./createFlightSimApp";
 
 let app: Awaited<ReturnType<typeof createFlightSimApp>> | null = null;
@@ -113,6 +113,7 @@ afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
   document.body.replaceChildren();
+  resetAppSettings();
 });
 
 async function mount() {
@@ -176,6 +177,6 @@ describe("OSFS autopilot engage path", () => {
     tick(1 / 60);
     expect(lastAileron()).toBe(0);
     expect(mocks.sdk.setPropertyValue).toHaveBeenCalledWith("fcs/throttle-cmd-norm", 0.65);
-    expect(window.localStorage.getItem(AUTOPILOT_SETTINGS_STORAGE_KEY)).toMatch(/ardupilot/);
+    expect(getAppSettings().get("osfs.autopilot.backend")).toBe("ardupilot");
   });
 });
