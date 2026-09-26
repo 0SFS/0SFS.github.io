@@ -279,16 +279,20 @@ Done with FOSS Earth's detail focus stage (its stage 3):
 
 ### Not done
 
-- The Google half of the orbit check. Flights on Google start at a wrong
-  altitude: starts from −23,569 ft to 42,999 ft were seen. This is a FOSS Earth
-  terrain preparation defect that predates this work, and FOSS Earth has been
-  told. At 42,999 ft no ground lies within the radius, so that run's zero
-  proves nothing. The check is to be run again once the start is fixed.
-- A larger radius is not in the evidence. With 30 km on the 2D map, one turn
-  made no request, and neither did the camera kept still for as long
-  (`--no-turn`). FOSS Earth had uncommitted stage 4 changes during those runs,
-  so they are not kept. An earlier 30 km run made 41 requests; its loading
-  counted as settled after 10.5 s instead of about 26 s, so a 5 s pause most
-  likely ended the wait before loading was done.
+- The Google half of the orbit check. With Around the aircraft, flights on
+  Google still start at 42,999 ft, where no ground lies within the radius, so
+  a turn's zero proves nothing. FOSS Earth `48ebc30` fixed the start with View
+  and with View and aircraft, the flight's default (5,762 ft), though one View
+  start at `15159c5` was 1,700 ft low. The wrong start is a FOSS Earth terrain
+  preparation defect that predates this work, and FOSS Earth has been told.
+- From FOSS Earth's stage 4 (`c7db4fd`), 2D terrain in Around mode still
+  follows the camera a little: one turn on the 2D map requested 6 elevation
+  tiles and no imagery, and the camera kept still for as long (`--no-turn`)
+  requested none. Stage 3 made no request. FOSS Earth has been told. The kept
+  evidence is from stage 3.
+- A larger radius is not in the evidence. Earlier runs that seemed to load
+  during a turn, 41 requests at 30 km and 19 at 10 km, had counted a 5 s pause
+  in requests as settled. The check now also waits for the map chip to stop
+  showing tiles streaming, about 28 s instead of 11.
 - [Presets](#presets) wait for FOSS Earth's preset stage; the ground profiles and
   the phone camera's Original and Recommended move into them then.
