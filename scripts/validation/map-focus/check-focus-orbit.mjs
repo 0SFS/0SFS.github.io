@@ -18,6 +18,7 @@
  *
  * Usage: node scripts/validation/map-focus/check-focus-orbit.mjs
  *   [--maps=raster,google] [--modes=view,around] [--quiet=5] [--settle-limit=180] [--after=5] [--out=dir] [--no-build]
+ *   [--foss-earth=dir: build against this FOSS Earth checkout, such as a worktree at a commit, not ../foss-earth]
  *   [--set.<parameter id>=<value> …, passed to every run as ?set.<id>=]
  *   [--no-turn: keep the camera still for as long as a turn takes, as the control
  *    for loading that happens without one]
@@ -64,10 +65,21 @@ function googleKey() {
 const key = maps.includes("google") ? googleKey() : null;
 if (maps.includes("google") && !key) throw new Error("The Google runs need GOOGLE_MAPS_API_KEY or a key in GOOGLE_3D_TILES.local.md; or pass --maps=raster.");
 
+const fossEarth = path.resolve(arg("foss-earth", path.join(root, "../foss-earth")));
+/** Each of FOSS Earth's exports, resolved in the chosen checkout. */
+function fossEarthAlias() {
+  const escape = text => text.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&");
+  return Object.entries(JSON.parse(readFileSync(path.join(fossEarth, "package.json"), "utf8")).exports)
+    .map(([name, target]) => ({ find: new RegExp(`^${escape(`foss-earth${name.slice(1)}`)}$`), replacement: path.join(fossEarth, target) }));
+}
 const dist = path.join(out, "dist");
 if (!process.argv.includes("--no-build")) {
   console.log("Building the app…");
-  await build({ root, logLevel: "warn", build: { outDir: dist, emptyOutDir: true } });
+  await build({
+    root, logLevel: "warn",
+    ...(arg("foss-earth") ? { resolve: { alias: fossEarthAlias() } } : {}),
+    build: { outDir: dist, emptyOutDir: true },
+  });
 }
 
 const mime = {
@@ -162,7 +174,7 @@ async function screenshot(sessionId, file) {
 const report = {
   generatedAt: new Date().toISOString(), quietSeconds, settleLimitSeconds, afterSeconds,
   turnPx: turn ? TURN_PX : 0, viewport: { width: WIDTH, height: HEIGHT }, extraSettings,
-  checkouts: { "0sfs": checkout(root), "foss-earth": checkout(path.join(root, "../foss-earth")) },
+  checkouts: { "0sfs": checkout(root), "foss-earth": checkout(fossEarth) },
   runs: {},
 };
 try {
