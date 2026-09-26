@@ -33,8 +33,7 @@ export function createInfoPage(root: HTMLElement): void {
   page.innerHTML = `
     <a class="info-page__skip" href="#info-main">Skip to content</a>
     <header class="info-page__hero">
-      <p class="info-page__mark">OSFS</p>
-      <h1>Open Source Flight Simulator</h1>
+      <h1><span class="info-page__mark">0SFS</span> Open Source Flight Simulator</h1>
       <p class="info-page__lede">A real-world browser flight simulator built to be explored, extended, and shared. Nothing to install, no account, no sign-up. It runs in a browser tab.</p>
       <p class="info-page__actions">
         <a class="info-page__start" href="./fly/">Start flying</a>
@@ -44,7 +43,7 @@ export function createInfoPage(root: HTMLElement): void {
     <main id="info-main" class="info-page__main">
       <section aria-labelledby="info-what">
         <h2 id="info-what">What it is</h2>
-        <p>OSFS puts streamed real-world scenery beneath your wings and JSBSim in charge of flight physics. Bank over a city you recognize. Follow the streets below. Change the wind, line up an approach, and switch to the chase camera to take it all in.</p>
+        <p>0SFS puts streamed real-world scenery beneath your wings and JSBSim in charge of flight physics. Bank over a city you recognize. Follow the streets below. Change the wind, line up an approach, and switch to the chase camera to take it all in.</p>
         <ul class="info-page__features">
           <li><strong>Fly over the real world in 3D.</strong> Google Photorealistic 3D Tiles brings detailed cityscapes and terrain into the scene. Free raster basemaps are available too, so you can get flying without a Google API key.</li>
           <li><strong>Physics powered by JSBSim.</strong> Flight dynamics run in WebAssembly at 120 Hz, with aircraft, engine, propeller, fuel, and control simulation.</li>
@@ -96,7 +95,7 @@ export function createInfoPage(root: HTMLElement): void {
       </section>
     </main>
     <footer class="info-page__footer">
-      <p>OSFS is <a href="${docs}/LICENSE">AGPL-3.0-only</a> free software. <a href="${repo}">Repository</a>.</p>
+      <p>0SFS is <a href="${docs}/LICENSE">AGPL-3.0-only</a> free software. <a href="${repo}">Repository</a>.</p>
       <p>Credits and licences: <a href="${docs}/NOTICE">NOTICE</a>, <a href="${docs}/THIRD_PARTY_LICENSES.md">third-party licences</a>, <a href="${docs}/ASSET_LICENSES.md">asset licences</a>.</p>
     </footer>
   `;

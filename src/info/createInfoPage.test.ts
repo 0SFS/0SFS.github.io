@@ -9,6 +9,6 @@ describe("createInfoPage", () => {
     const root = document.createElement("div");
     createInfoPage(root);
     expect(root.querySelector(".info-page__start")?.getAttribute("href")).toBe("/fly/?renderer=webgl2");
-    expect(root.querySelector("h1")?.textContent).toBe("Open Source Flight Simulator");
+    expect(root.querySelector("h1")?.textContent).toBe("0SFS Open Source Flight Simulator");
   });
 });

@@ -55,6 +55,7 @@
 }
 
 .info-page__mark {
+  display: block;
   margin: 0 0 8px;
   color: var(--info-accent);
   letter-spacing: 0.28em;

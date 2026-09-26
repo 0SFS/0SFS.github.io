@@ -1,10 +1,11 @@
 import { configDefaults, defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { execSync } from 'node:child_process'
-import { cpSync, existsSync, mkdirSync, readFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import type { Plugin } from 'vite'
 import { findLanAddress } from './scripts/dev-lan.mjs'
+import { pageHtmlFor } from './scripts/pages-html.mjs'
 
 /** GitHub Pages has no SPA fallback; /fly/ and /rc/ must be real files. */
 function copyIndexToPagesPaths(): Plugin {
@@ -18,9 +19,10 @@ function copyIndexToPagesPaths(): Plugin {
     closeBundle() {
       const index = path.join(outDir, 'index.html')
       if (!existsSync(index)) return
-      for (const dir of ['fly', 'rc']) {
+      const html = readFileSync(index, 'utf8')
+      for (const dir of ['fly', 'rc'] as const) {
         mkdirSync(path.join(outDir, dir), { recursive: true })
-        cpSync(index, path.join(outDir, dir, 'index.html'))
+        writeFileSync(path.join(outDir, dir, 'index.html'), pageHtmlFor(dir, html))
       }
     },
   }

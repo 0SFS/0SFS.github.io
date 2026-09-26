@@ -1,4 +1,4 @@
-# ✈️ OSFS — Open Source Flight Simulator
+# ✈️ [0SFS](https://0sfs.github.io/) — Open Source Flight Simulator
 
 **A real-world browser flight simulator built to be explored, extended, and shared.**
 
@@ -11,7 +11,7 @@
 
 There's nothing to install and no account to create. It runs in a browser tab.
 
-OSFS puts Google Photorealistic 3D Tiles beneath your wings and JSBSim in charge of the flight physics.
+0SFS puts Google Photorealistic 3D Tiles beneath your wings and JSBSim in charge of the flight physics.
 Bank over a city you recognize and follow the streets below. Change the wind, line up an approach,
 and switch to the chase camera to take it all in.
 
@@ -63,7 +63,7 @@ Departure presets start paused. Press `P` when you're ready.
 
 ## Run it locally
 
-You need Node.js 22 or newer. OSFS depends on [FOSS Earth](https://github.com/foss-earth/foss-earth.github.io)
+You need Node.js 22 or newer. 0SFS depends on [FOSS Earth](https://github.com/foss-earth/foss-earth.github.io)
 and [gamepad-tools](https://github.com/Felipegalind0/gamepad-tools) as sibling checkouts, and
 gamepad-tools must be built first:
 
@@ -84,7 +84,7 @@ Google Photorealistic 3D Tiles, add `?key=YOUR_GOOGLE_MAPS_API_KEY`; to choose a
 
 ## Limits
 
-- OSFS is not a training device. Its flight models are approximations, and the Vision Jet's is a
+- 0SFS is not a training device. Its flight models are approximations, and the Vision Jet's is a
   development model.
 - There is no sky yet: everything above the horizon is black. Weather is wind direction and speed only.
 - The world streaming and flight physics work today. The broader simulator is still taking shape.
@@ -114,15 +114,15 @@ tables of browser and desktop simulators.
 | --- | --- |
 | [Development](docs/development.md) | Local setup, tests, the FOSS Earth dependency, building your own copy |
 | [Deploying to GitHub Pages](docs/deploying.md) | Publishing the live site with one command, `npm run deploy` |
-| [Open-source competitors](docs/open-source-competitors.md) | Other open-source flight simulators, and where OSFS stands |
+| [Open-source competitors](docs/open-source-competitors.md) | Other open-source flight simulators, and where 0SFS stands |
 | [Phone controller](docs/phone-controller.md) | Pairing a phone as a touch controller, and its limits |
 | [Phone controller UI](docs/phone-controller-ui.md) | How the `/rc/` screen is built and checked |
-| [FOSS Earth relationship](docs/foss-earth-relationship.md) | How OSFS and the shared globe runtime divide responsibilities |
+| [FOSS Earth relationship](docs/foss-earth-relationship.md) | How 0SFS and the shared globe runtime divide responsibilities |
 | [How JSBSim runs in the browser](docs/jsbsim.md) | The WebAssembly flight dynamics pipeline |
 | [Ground contact](docs/ground-contact.md) | Terrain collision and gear contact against streamed meshes |
 | [Aircraft assets](docs/aircraft-assets.md) | Aircraft asset structure and provenance requirements |
 | [Creating an aircraft model](docs/creating-an-aircraft-model.md) | Modeling guide for contributing new aircraft |
-| [Software dependency graph](docs/software-dependency-graph.md) | What OSFS is built on, and under which licenses |
+| [Software dependency graph](docs/software-dependency-graph.md) | What 0SFS is built on, and under which licenses |
 | [Contributing](CONTRIBUTING.md) | Review expectations, asset provenance, pull request scope |
 | [Design proposals](docs/proposals/) | ArduPilot SITL, phone controller protocol, collision, and elevation proposals |
 | [Historical records](docs/old/) | Dated snapshots and completed prompts; not current procedure |
@@ -146,7 +146,7 @@ Security reports go through [SECURITY.md](SECURITY.md). Participation is covered
 
 ## License
 
-OSFS is licensed under [AGPL-3.0-only](LICENSE). See [NOTICE](NOTICE) for third-party terms,
+0SFS is licensed under [AGPL-3.0-only](LICENSE). See [NOTICE](NOTICE) for third-party terms,
 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) for bundled dependencies,
 [ASSET_LICENSES.md](ASSET_LICENSES.md) for aircraft and creative assets, and
 [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md) for commercial arrangements.
