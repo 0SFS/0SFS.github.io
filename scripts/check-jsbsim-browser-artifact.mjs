@@ -71,8 +71,11 @@ try {
       await chrome.send("Page.enable", {}, sessionId);
       await chrome.send("Fetch.enable", { patterns: [{ urlPattern: "*" }] }, sessionId);
       await chrome.send("Emulation.setDeviceMetricsOverride", { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false }, sessionId);
-      await chrome.send("Page.addScriptToEvaluateOnNewDocument", { source: `localStorage.clear();localStorage.setItem('osfs.aircraft',${JSON.stringify(aircraftId)});localStorage.setItem('osfs.aircraft-lod','auto');localStorage.setItem('osfs.aircraft-opt-in-lods','off');` }, sessionId);
-      await chrome.send("Page.navigate", { url: "https://0sfs.test/fly/?renderer=webgl2" }, sessionId);
+      // Saved settings would win over nothing here, but a clean record keeps runs independent;
+      // the aircraft is set for this visit only.
+      await chrome.send("Page.addScriptToEvaluateOnNewDocument", { source: "localStorage.clear();" }, sessionId);
+      const settings = new URLSearchParams({ renderer: "webgl2", "set.osfs.aircraft.id": aircraftId, "set.osfs.aircraft.lod": "auto", "set.osfs.aircraft.optInLods": "off" });
+      await chrome.send("Page.navigate", { url: `https://0sfs.test/fly/?${settings}` }, sessionId);
       await waitForExpression(chrome, sessionId, "Boolean(window.osfsJsbsimBuild)", 20000);
       current.runtime = await evaluate(chrome, sessionId, "window.osfsJsbsimBuild");
       assert.equal(current.runtime.aircraftId, aircraftId, "Browser booted another aircraft");

@@ -118,10 +118,10 @@ try {
     await chrome.send("Page.enable", {}, sessionId);
     await chrome.send("Fetch.enable", { patterns: [{ urlPattern: "*" }] }, sessionId);
     await chrome.send("Emulation.setDeviceMetricsOverride", { width: 1440, height: 900, deviceScaleFactor: 2, mobile: false }, sessionId);
-    await chrome.send("Page.addScriptToEvaluateOnNewDocument", {
-      source: `try { localStorage.setItem("osfs.attitude-renderer", ${JSON.stringify(run.attitude)}); } catch {}`,
+    // Both renderers are set for this visit only, so the runs do not depend on what an earlier one saved.
+    await chrome.send("Page.navigate", {
+      url: `${ORIGIN}/fly/?flightPerf=1&renderer=${run.globe}&set.osfs.renderer.attitudeIndicator=${run.attitude}`,
     }, sessionId);
-    await chrome.send("Page.navigate", { url: `${ORIGIN}/fly/?flightPerf=1&renderer=${run.globe}` }, sessionId);
     try {
       await waitForExpression(chrome, sessionId, "Boolean(window.osfsFrameProfiler) && window.osfsFrameProfiler.summary().frames > 60", 180000);
     } catch (error) {
