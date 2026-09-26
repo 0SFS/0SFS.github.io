@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2026-09-26T18:54:46.647Z",
+  "quietSeconds": 5,
+  "settleLimitSeconds": 180,
+  "afterSeconds": 5,
+  "turnPx": 1257,
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "checkouts": {
+    "0sfs": {
+      "commit": "51a8f1ae40e197760ef39f96b8658cb867ba27e2",
+      "uncommittedChanges": false
+    },
+    "foss-earth": {
+      "commit": "061b78fcf1ff4e0ec5c110f14d68cc3c2c8f2daf",
+      "uncommittedChanges": false
+    }
+  },
+  "runs": {
+    "raster-view": {
+      "map": "raster",
+      "mode": "view",
+      "settledAfterSeconds": 8.026,
+      "requestsBeforeTurn": 895,
+      "requestsDuringTurn": 203,
+      "duringTurnByHost": {
+        "basemap.nationalmap.gov": 203
+      },
+      "exceptions": []
+    },
+    "raster-around": {
+      "map": "raster",
+      "mode": "around",
+      "settledAfterSeconds": 5.773,
+      "requestsBeforeTurn": 704,
+      "requestsDuringTurn": 0,
+      "duringTurnByHost": {},
+      "exceptions": []
+    },
+    "google-view": {
+      "map": "google",
+      "mode": "view",
+      "settledAfterSeconds": 10.037,
+      "requestsBeforeTurn": 190,
+      "requestsDuringTurn": 250,
+      "duringTurnByHost": {
+        "tile.googleapis.com": 250
+      },
+      "exceptions": []
+    },
+    "google-around": {
+      "map": "google",
+      "mode": "around",
+      "settledAfterSeconds": 4.77,
+      "requestsBeforeTurn": 109,
+      "requestsDuringTurn": 0,
+      "duringTurnByHost": {},
+      "exceptions": []
+    }
+  }
+}

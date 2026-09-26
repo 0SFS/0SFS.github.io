@@ -1,8 +1,10 @@
 # Flight settings
 
 Status: stage 1 implemented (2026-09-25), with the sound tiers' internal
-parameters; detail focus and presets are not. What stage 1 did and where it differs from
-this text: [Implementation](#implementation). Builds on FOSS Earth's [Settings](../../../foss-earth/docs/proposals/settings.md)
+parameters, and the aircraft as a detail focus point (2026-09-26). The orbit
+check has passed on the 2D map; on Google it waits for a start altitude fix in
+FOSS Earth. Presets are not done. What was done and where it differs from this
+text: [Implementation](#implementation). Builds on FOSS Earth's [Settings](../../../foss-earth/docs/proposals/settings.md)
 spec, which defines the registry, the controls, presets, automatic adjustment,
 persistence and the globe's own settings. This document lists what 0sfs adds to
 that registry, where each flight setting lives, and which flight constants
@@ -252,10 +254,34 @@ Where it differs from the tables above, from what the code turned out to do:
 - Named ground profiles stay in `osfs.ground-interaction-profiles.v1` until the
   registry's presets can hold them; the ground values are `osfs.ground.*`.
 
-Not done:
+### Detail around the aircraft (2026-09-26)
 
-- [Detail around the aircraft](#detail-around-the-aircraft): the focus point,
-  `osfs.focus.default` and the headless orbit check wait for FOSS Earth's detail
-  focus stage.
+Done with FOSS Earth's detail focus stage (its stage 3):
+
+- The flight registers the aircraft with `runtime.registerFocusPoint` as
+  `aircraft`, labelled Aircraft. Its position is the floating origin's in ECEF,
+  which is the aircraft's. It is removed when the flight closes.
+- `osfs.focus.default` is not a parameter. 0sfs sets the host default of FOSS
+  Earth's `map.focus.point` to `aircraft`, and the pilot's choice is saved in
+  `map.focus.point` itself, so a second parameter would only repeat it. Until
+  the aircraft is registered, the default waits for its option and the orbit
+  target is used. In a flight the orbit target is the simulation origin, which
+  the floating origin keeps at the aircraft, so both load the same ground.
+- **Load around** keeps FOSS Earth's default, View.
+- The headless check is `scripts/validation/map-focus/check-focus-orbit.mjs`.
+  On the 2D map at the default 10 km radius, one turn made 203 map requests
+  with View and none with Around the aircraft
+  ([evidence](../../validation/evidence/map-focus/orbit-2026-09-26/README.md)).
+
+### Not done
+
+- The Google half of the orbit check. Flights on Google start at a wrong
+  altitude: starts from −23,569 ft to 42,999 ft were seen. This is a FOSS Earth
+  terrain preparation defect that predates this work, and FOSS Earth has been
+  told. At 42,999 ft no ground lies within the radius, so that run's zero
+  proves nothing. The check is to be run again once the start is fixed.
+- A larger radius has not been checked. With 30 km, one turn on the 2D map made
+  41 image requests with Around the aircraft. FOSS Earth had uncommitted changes
+  during that run, so it is not kept, and the cause is not established.
 - [Presets](#presets) wait for FOSS Earth's preset stage; the ground profiles and
   the phone camera's Original and Recommended move into them then.
