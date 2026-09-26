@@ -22,6 +22,8 @@
  *   [--set.<parameter id>=<value> …, passed to every run as ?set.<id>=]
  *   [--no-turn: keep the camera still for as long as a turn takes, as the control
  *    for loading that happens without one]
+ * Loading counts as settled after `--quiet` seconds without a map request, once
+ * the map chip no longer shows tiles streaming.
  * Output: build/validation/map-focus/<local time>/report.json, and per run a
  * screenshot at the half turn (the camera faces the aircraft) and one after it.
  */
@@ -126,11 +128,16 @@ chrome.onEvent(message => {
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const countByHost = requests => requests.reduce((hosts, { host }) => ({ ...hosts, [host]: (hosts[host] ?? 0) + 1 }), {});
 
-/** Waits until no map request has been made for `quietSeconds`; returns how long that took. */
-async function settle(current) {
+/**
+ * Waits until no map request has been made for `quietSeconds` and the map
+ * chip no longer shows tiles streaming; returns how long that took. A pause in
+ * requests alone can end before loading has.
+ */
+async function settle(current, sessionId) {
   const started = Date.now();
   while (Date.now() - started < settleLimitSeconds * 1000) {
-    if (Date.now() - current.lastExternalMs >= quietSeconds * 1000) return (Date.now() - started) / 1000;
+    if (Date.now() - current.lastExternalMs >= quietSeconds * 1000
+      && await evaluate(chrome, sessionId, `!document.querySelector(".is-streaming")`)) return (Date.now() - started) / 1000;
     await sleep(250);
   }
   return null;
@@ -212,7 +219,7 @@ try {
       }
       // Paused, the aircraft stays where it is; the camera still orbits and the map still loads.
       await evaluate(chrome, sessionId, `window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyP" })), true`);
-      const settledAfter = await settle(current);
+      const settledAfter = await settle(current, sessionId);
       // Where the aircraft is, to say whether any ground lies within the focus radius.
       const altitudeFt = await evaluate(chrome, sessionId, `Number(document.querySelector('[data-metric="alt"]')?.textContent)`);
       const loading = await evaluate(chrome, sessionId, `(window.osfsLoadingDiagnostics?.().history ?? [])
