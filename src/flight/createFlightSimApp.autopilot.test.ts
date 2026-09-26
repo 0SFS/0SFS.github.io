@@ -26,7 +26,7 @@ const mocks = vi.hoisted(() => {
         groundHeightMeters: 250, altitudeMeters: request.altitudeMeters ?? 1774,
       })),
       surface: { sample: vi.fn(() => null) },
-      getWorldRoot: () => ({}), setSimViewState: vi.fn(), setSimTick: vi.fn(), setSimRunning: vi.fn(),
+      getWorldRoot: () => ({}), registerFocusPoint: vi.fn(() => () => {}), setSimViewState: vi.fn(), setSimTick: vi.fn(), setSimRunning: vi.fn(),
       getGoogleTerrainDetailState: vi.fn(() => null),
       subscribeStatus: vi.fn(() => () => {}),
       isStreamingTiles: () => false,
@@ -34,8 +34,7 @@ const mocks = vi.hoisted(() => {
       onRasterDetailFeedback: vi.fn(() => () => {}),
       getRasterDetailFeedback: vi.fn(() => null),
       setRasterDetailTarget: vi.fn(),
-      getGoogleTerrainDetailAnchor: vi.fn(() => "simulation-origin"),
-      setGoogleTerrainDetailTarget: vi.fn(), setGoogleTerrainDetailAnchor: vi.fn(),
+      setGoogleTerrainDetailTarget: vi.fn(),
       requestRender: vi.fn(), destroy: vi.fn(),
     },
     aircraft: {

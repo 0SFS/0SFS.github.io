@@ -18,8 +18,10 @@
  *
  * Usage: node scripts/validation/map-focus/check-focus-orbit.mjs
  *   [--maps=raster,google] [--modes=view,around] [--quiet=5] [--settle-limit=180] [--after=5] [--out=dir] [--no-build]
- * Output: build/validation/map-focus/<local time>/report.json and a screenshot per run.
+ * Output: build/validation/map-focus/<local time>/report.json, and per run a
+ * screenshot at the half turn (the camera faces the aircraft) and one after it.
  */
+import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -122,7 +124,7 @@ const HEIGHT = 900;
 const TURN_PX = Math.ceil((2 * Math.PI) / 0.005);
 const STEPS = 60;
 
-async function orbitOneTurn(sessionId) {
+async function orbitOneTurn(sessionId, atHalfTurn) {
   const y = HEIGHT / 2;
   const startX = (WIDTH - TURN_PX / 2) / 2;
   const mouse = (type, x, extra = {}) => chrome.send("Input.dispatchMouseEvent", {
@@ -136,12 +138,26 @@ async function orbitOneTurn(sessionId) {
       await sleep(50);
     }
     await mouse("mouseReleased", startX + TURN_PX / 2);
+    if (half === 0) await atHalfTurn();
   }
+}
+
+/** The commit a checkout is at, and whether it has changes on top. */
+function checkout(directory) {
+  const git = (...args) => execFileSync("git", ["-C", directory, ...args], { encoding: "utf8" }).trim();
+  return { commit: git("rev-parse", "HEAD"), uncommittedChanges: git("status", "--porcelain", "--untracked-files=no") !== "" };
+}
+
+async function screenshot(sessionId, file) {
+  const shot = await chrome.send("Page.captureScreenshot", { format: "png" }, sessionId);
+  await writeFile(path.join(out, file), Buffer.from(shot.data, "base64"));
 }
 
 const report = {
   generatedAt: new Date().toISOString(), quietSeconds, settleLimitSeconds, afterSeconds,
-  turnPx: TURN_PX, viewport: { width: WIDTH, height: HEIGHT }, runs: {},
+  turnPx: TURN_PX, viewport: { width: WIDTH, height: HEIGHT },
+  checkouts: { "0sfs": checkout(root), "foss-earth": checkout(path.join(root, "../foss-earth")) },
+  runs: {},
 };
 try {
   for (const map of maps) {
@@ -172,19 +188,17 @@ try {
       try {
         await waitForExpression(chrome, sessionId, "Boolean(window.osfsFrameProfiler) && window.osfsFrameProfiler.summary().frames > 60", 180000);
       } catch (error) {
-        const shot = await chrome.send("Page.captureScreenshot", { format: "png" }, sessionId);
-        await writeFile(path.join(out, `${name}-stuck.png`), Buffer.from(shot.data, "base64"));
+        await screenshot(sessionId, `${name}-stuck.png`);
         throw new Error(`${name}: the flight never started (${error.message}). Exceptions: ${current.exceptions.join(" | ")}`);
       }
       // Paused, the aircraft stays where it is; the camera still orbits and the map still loads.
       await evaluate(chrome, sessionId, `window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyP" })), true`);
       const settledAfter = await settle(current);
       const before = current.requests.length;
-      await orbitOneTurn(sessionId);
+      await orbitOneTurn(sessionId, () => screenshot(sessionId, `${name}-half-turn.png`));
       await sleep(afterSeconds * 1000);
       const during = current.requests.slice(before);
-      const shot = await chrome.send("Page.captureScreenshot", { format: "png" }, sessionId);
-      await writeFile(path.join(out, `${name}.png`), Buffer.from(shot.data, "base64"));
+      await screenshot(sessionId, `${name}.png`);
       report.runs[name] = {
         map, mode, settledAfterSeconds: settledAfter, requestsBeforeTurn: before,
         requestsDuringTurn: during.length, duringTurnByHost: countByHost(during), exceptions: current.exceptions,

@@ -10,6 +10,9 @@ import {
 /** Where the files that read osfs.* parameters are browsable. */
 export const OSFS_SOURCE_BASE = "https://github.com/0SFS/0SFS.github.io/blob/main/";
 
+/** The aircraft's id among FOSS Earth's focus points (`map.focus.point`). */
+export const AIRCRAFT_FOCUS_POINT = "aircraft";
+
 /**
  * Adds the flight's parameters to the app's settings registry, once, with
  * their section titles, source links and the migration of the keys they
@@ -24,6 +27,9 @@ export function registerFlightSettings(registry: SettingsRegistry): FlightParame
     // Set before migrating: a migrated value equal to the default is not saved,
     // and an old "camera" must survive as the pilot's choice.
     registry.setHostDefault("map.focus.refineFrom", "focus", "0sfs: refine around the aircraft");
+    // The flight registers the aircraft as a focus point once the renderer
+    // exists; until then this default waits for its option.
+    registry.setHostDefault("map.focus.point", AIRCRAFT_FOCUS_POINT, "0sfs: the aircraft");
     registry.migrateLegacy(OSFS_LEGACY_MIGRATIONS);
   }
   return flightParameterStore(registry);

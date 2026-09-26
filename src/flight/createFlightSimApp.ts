@@ -4,7 +4,7 @@ import { canTimeGpuFrames, createFrameProfiler, profileBabylonScene } from "foss
 import { setActiveFrameProfile } from "./diagnostics/frameProfile";
 import { getAppSettings } from "foss-earth/settings";
 import { describeAttitudeRendererStatus } from "./hud/attitudeRenderer";
-import { registerFlightSettings } from "./settings/registerFlightSettings";
+import { AIRCRAFT_FOCUS_POINT, registerFlightSettings } from "./settings/registerFlightSettings";
 import type { FlightParameterStore } from "./settings/flightParameters";
 import {
   AIRCRAFT_SELECTION_PARAMETER_IDS,
@@ -742,6 +742,13 @@ export async function createFlightSimApp(
   }));
 
   let floatingOrigin: FloatingOriginHandle | null = null;
+  // Map → Detail can load the ground around the aircraft, so that turning the
+  // chase camera loads nothing new. The floating origin is the aircraft.
+  stopWatching.push(runtime.registerFocusPoint({
+    id: AIRCRAFT_FOCUS_POINT,
+    label: "Aircraft",
+    getPosition: () => floatingOrigin?.getOriginEcef() ?? null,
+  }));
   let aircraft: ReturnType<typeof createPlaceholderAircraft> | null = null;
   let aircraftModel: AircraftModelHandle | null = null;
   let controlPanel: FlightControlPanelHandle | null = null;

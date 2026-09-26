@@ -11,12 +11,15 @@ const mocks = vi.hoisted(() => {
     state,
     resetLocation: vi.fn(() => state),
     applyOrigin: vi.fn(),
+    originEcef: { x: 1, y: 2, z: 3 },
+    unregisterFocusPoint: vi.fn(),
     runtime: {
       renderer: { mode: "webgl2" }, status: { mode: "fallback" }, scene: {},
       engine: { getFps: () => 60 }, geospatialCamera: null,
       prepareTerrain: vi.fn(async (request: { altitudeMeters?: number }) => ({ groundHeightMeters: 250, altitudeMeters: request.altitudeMeters ?? 1774 })),
       surface: { sample: vi.fn(() => null) },
       getWorldRoot: () => ({}), setSimViewState: vi.fn(), setSimTick: vi.fn(),
+      registerFocusPoint: vi.fn<(point: { id: string; label: string; getPosition: () => unknown }) => () => void>(() => mocks.unregisterFocusPoint),
       googleTerrainDetail: {
         defaultErrorTarget: 20,
         errorTarget: 20,
@@ -33,8 +36,6 @@ const mocks = vi.hoisted(() => {
       onRasterDetailFeedback: vi.fn(() => () => {}),
       getRasterDetailFeedback: vi.fn(() => null),
       setRasterDetailTarget: vi.fn(),
-      getGoogleTerrainDetailAnchor: vi.fn(() => "simulation-origin"),
-      setGoogleTerrainDetailAnchor: vi.fn(),
       setGoogleTerrainDetailTarget: vi.fn((errorTarget: number | null) => {
         mocks.runtime.googleTerrainDetail.errorTarget = errorTarget ?? mocks.runtime.googleTerrainDetail.defaultErrorTarget;
         mocks.runtime.googleTerrainDetail.overrideErrorTarget = errorTarget;
@@ -97,7 +98,7 @@ vi.mock("./jsbsim/createJsbsimRuntime", () => ({ createJsbsimRuntime: vi.fn(asyn
   }, dispose: vi.fn(),
 })) }));
 vi.mock("./bridge/ecefBridge", () => ({ readFlightState: () => mocks.state }));
-vi.mock("./bridge/floatingOrigin", () => ({ createFloatingOrigin: () => ({ aircraftRoot: { setEnabled: vi.fn() }, apply: mocks.applyOrigin, dispose: vi.fn() }) }));
+vi.mock("./bridge/floatingOrigin", () => ({ createFloatingOrigin: () => ({ aircraftRoot: { setEnabled: vi.fn() }, apply: mocks.applyOrigin, getOriginEcef: () => mocks.originEcef, dispose: vi.fn() }) }));
 vi.mock("./aircraft/createPlaceholderAircraft", () => ({ createPlaceholderAircraft: () => mocks.aircraft }));
 vi.mock("./diagnostics/createCollisionDebugOverlay", () => ({ createCollisionDebugOverlay: vi.fn(() => mocks.collisionOverlay) }));
 vi.mock("./diagnostics/createWheelSpinDebugOverlay", () => ({ createWheelSpinDebugOverlay: vi.fn(() => mocks.wheelOverlay) }));
@@ -650,7 +651,7 @@ it("puts the Flight minimum on the Map → Detail Google track, saved in the reg
   expect(shellCapture.mapPanel!.detail!.getState()?.markers ?? []).toEqual([]);
 });
 
-it("uses the Google default refinement around the aircraft when nothing was saved", async () => {
+it("loads and refines around the aircraft when nothing was saved, and removes it as a focus point on close", async () => {
   vi.stubGlobal("localStorage", { getItem: () => null, setItem: vi.fn() });
   Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
   const root = document.createElement("div");
@@ -659,7 +660,15 @@ it("uses the Google default refinement around the aircraft when nothing was save
   await act(async () => { app = await createFlightSimApp(root); });
   try {
     expect(getAppSettings().inspect("map.focus.refineFrom")).toMatchObject({ value: "focus", provenance: "host-default" });
+    const point = mocks.runtime.registerFocusPoint.mock.calls[0][0];
+    expect(point).toMatchObject({ id: "aircraft", label: "Aircraft" });
+    expect(point.getPosition()).toEqual(mocks.originEcef);
+    // The runtime lists the aircraft among the focus points, and the flight selects it.
+    getAppSettings().setChoices("map.focus.point", [{ id: "orbit-target", label: "Simulation origin" }, { id: "aircraft", label: "Aircraft" }]);
+    expect(getAppSettings().inspect("map.focus.point")).toMatchObject({ value: "aircraft", provenance: "host-default" });
+    expect(mocks.unregisterFocusPoint).not.toHaveBeenCalled();
   } finally { await act(async () => app.destroy()); }
+  expect(mocks.unregisterFocusPoint).toHaveBeenCalledOnce();
 });
 
 it("prepares terrain again only when the ground changes: Google, a 2D basemap, or its elevation", async () => {
