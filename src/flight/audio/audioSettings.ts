@@ -198,3 +198,40 @@ export function createAudioSettingsStore(parameters: FlightParameterStore): Audi
     },
   };
 }
+
+/** One tier's limits, as the DSP core takes them; see `osfs_audio_set_limits`. */
+export interface SoundTierLimits {
+  /** 1 Low, 2 Med, 3 High. */
+  tier: number;
+  partials: number;
+  noiseBands: number;
+  grains: number;
+  startsPerSecond: number;
+  irMilliseconds: number;
+}
+
+/** The osfs.sound.<tier>.* parameters: what each tier may use at most. */
+export const SOUND_TIER_LIMIT_IDS: readonly FlightParameterId[] = [
+  "osfs.sound.low.partials", "osfs.sound.low.noiseBands",
+  "osfs.sound.med.partials", "osfs.sound.med.noiseBands", "osfs.sound.med.irMs",
+  "osfs.sound.high.partials", "osfs.sound.high.noiseBands", "osfs.sound.high.grains",
+  "osfs.sound.high.grainStarts", "osfs.sound.high.irMs",
+];
+
+export function readSoundTierLimits(parameters: FlightParameters): SoundTierLimits[] {
+  return [
+    {
+      tier: 1, partials: parameters.get("osfs.sound.low.partials"), noiseBands: parameters.get("osfs.sound.low.noiseBands"),
+      grains: 0, startsPerSecond: 0, irMilliseconds: 0,
+    },
+    {
+      tier: 2, partials: parameters.get("osfs.sound.med.partials"), noiseBands: parameters.get("osfs.sound.med.noiseBands"),
+      grains: 0, startsPerSecond: 0, irMilliseconds: parameters.get("osfs.sound.med.irMs"),
+    },
+    {
+      tier: 3, partials: parameters.get("osfs.sound.high.partials"), noiseBands: parameters.get("osfs.sound.high.noiseBands"),
+      grains: parameters.get("osfs.sound.high.grains"), startsPerSecond: parameters.get("osfs.sound.high.grainStarts"),
+      irMilliseconds: parameters.get("osfs.sound.high.irMs"),
+    },
+  ];
+}

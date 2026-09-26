@@ -610,3 +610,22 @@ silence.
 - **Whether −36 dB at the 500 m clamp is the right listening level is a mix question, not a physics one.**
   The app has no calibrated SPL, so audibility there follows the master gain. Mix balance is already listed
   as barely tuned (§4.9).
+
+## 14. Tier limits as settings, 2026-09-25 (implemented, software-verified)
+
+The pilot can lower what each tier uses, under Sound → Show all parameters, as the
+`osfs.sound.<tier>.*` parameters of [flight settings](../proposals/flight-settings.md): engine partials
+and noise bands for Low, Med and High, the cabin impulse response for Med and High, and High's grains and
+grain starts per second. Each is bounded by the tier's §1 budget, so a limit can only lower the tier, never
+raise it. The core applies the limits first and the shedding ladder then works down from them, in the same
+order, keeping the N1 and N2 fundamentals (at least two partials).
+
+- The core takes them through a new export, `osfs_audio_set_limits`, and reports what the running tier
+  uses in five new stats (indices 20–24). `audio-dsp.wasm` was rebuilt with the pinned emcc 6.0.9; its
+  provenance file is updated.
+- `dspCore.test.ts` checks, on the compiled WASM, that the limits lower Med and High, that a limit above
+  the budget or below the fundamentals is held to them, and that shedding works down from the limits.
+- The Sound tab shows each limit's running value beside it, and says when shedding lowered it.
+- Half-rate synthesis is still not wired up, so the internal sample rate is not a setting.
+
+Nothing here is qualified: lowering a limit reduces work by construction, but no timing was measured.

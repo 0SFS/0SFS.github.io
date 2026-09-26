@@ -72,6 +72,20 @@ int gTier = kTierOff;
 /** 0 = full tier; each stage sheds detail in the documented order. */
 int gShed = 0;
 
+/**
+ * The pilot's limits for each tier (the osfs.sound.<tier>.* parameters). They
+ * can only lower the tier's own caps below; shedding then works down from
+ * them. Until set, each tier runs at its caps.
+ */
+struct TierLimits {
+  int partials = 12;
+  int noiseBands = 5;
+  int grains = kMaxGrains;
+  double startsPerSecond = 160.0;
+  double irSeconds = 0.040;
+};
+TierLimits gLimits[kTierHigh + 1];
+
 double gMasterGain = 1.0;
 double gEngineGain = 1.0;
 double gTireGain = 1.0;
@@ -139,7 +153,7 @@ double gFade = 0.0;
 double gFadeTarget = 1.0;
 double gFadeStep = 1.0;
 
-constexpr int kStatCount = 20;
+constexpr int kStatCount = 25;
 double gStats[kStatCount];
 enum Stat {
   kStatSnapshotsIn = 0, kStatSnapshotsDropped, kStatEventsIn, kStatEventsDropped,
@@ -147,6 +161,8 @@ enum Stat {
   kStatTelemetryAge, kStatActiveGrains, kStatGrainDrops, kStatNonFinite,
   kStatQueueDepth, kStatFade, kStatDoppler, kStatDistance, kStatTier,
   kStatShed, kStatEpoch,
+  // What the current tier runs after the pilot's limits and shedding.
+  kStatPartials, kStatNoiseBands, kStatGrainCap, kStatGrainStarts, kStatIrMs,
 };
 
 // -------------------------------------------------------------- helpers ----
@@ -201,6 +217,14 @@ void applyCaps() {
       break;
   }
 
+  // The pilot's limits lower the caps; they never raise them.
+  const TierLimits& limit = gLimits[gTier];
+  caps.partials = caps.partials < limit.partials ? caps.partials : limit.partials;
+  caps.noiseBands = caps.noiseBands < limit.noiseBands ? caps.noiseBands : limit.noiseBands;
+  grains = grains < limit.grains ? grains : limit.grains;
+  starts = std::fmin(starts, limit.startsPerSecond);
+  irSeconds = std::fmin(irSeconds, limit.irSeconds);
+
   // Shedding order (sound.md §1): oscillator count, grain density, IR length,
   // then internal sample rate. Half-rate synthesis is deliberately NOT wired
   // up: it may only be enabled once its resampler-inclusive cost is measured
@@ -233,6 +257,11 @@ void applyCaps() {
   }
   gStats[kStatTier] = gTier;
   gStats[kStatShed] = gShed;
+  gStats[kStatPartials] = caps.partials;
+  gStats[kStatNoiseBands] = caps.noiseBands;
+  gStats[kStatGrainCap] = grains;
+  gStats[kStatGrainStarts] = starts;
+  gStats[kStatIrMs] = irSeconds * 1000.0;
 }
 
 void resetVoices() {
@@ -450,6 +479,24 @@ OSFS_EXPORT void osfs_audio_set_tier(int tier) {
 }
 
 OSFS_EXPORT int osfs_audio_get_tier(void) { return gTier; }
+
+/**
+ * One tier's limits: engine partials (at least the two fundamentals), noise
+ * bands, simultaneous grains, grain starts per second and impulse-response
+ * length. Each is clamped to what the tier allows at all.
+ */
+OSFS_EXPORT void osfs_audio_set_limits(int tier, int partials, int noiseBands, int grains,
+                                       double startsPerSecond, double irMilliseconds) {
+  if (tier <= kTierOff || tier > kTierHigh) return;
+  TierLimits& limit = gLimits[tier];
+  limit.partials = partials < 2 ? 2 : (partials > 12 ? 12 : partials);
+  limit.noiseBands = noiseBands < 0 ? 0 : (noiseBands > 5 ? 5 : noiseBands);
+  limit.grains = grains < 0 ? 0 : (grains > kMaxGrains ? kMaxGrains : grains);
+  limit.startsPerSecond = std::isfinite(startsPerSecond) ? std::fmin(std::fmax(startsPerSecond, 0.0), 160.0) : 160.0;
+  const double irSeconds = irMilliseconds / 1000.0;
+  limit.irSeconds = std::isfinite(irSeconds) ? std::fmin(std::fmax(irSeconds, 0.0), 0.040) : 0.040;
+  if (tier == gTier) applyCaps();
+}
 
 OSFS_EXPORT void osfs_audio_set_shed(int level) {
   const int next = level < 0 ? 0 : (level > 8 ? 8 : level);

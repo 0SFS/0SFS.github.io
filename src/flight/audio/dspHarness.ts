@@ -21,6 +21,8 @@ export interface DspExports {
   osfs_audio_set_tier(tier: number): void;
   osfs_audio_get_tier(): number;
   osfs_audio_set_shed(level: number): void;
+  osfs_audio_set_limits(tier: number, partials: number, noiseBands: number, grains: number,
+    startsPerSecond: number, irMilliseconds: number): void;
   osfs_audio_get_shed(): number;
   osfs_audio_set_gains(master: number, engine: number, tire: number, airframe: number, reduced: number): void;
   osfs_audio_set_epoch(epoch: number, simTimeS: number, audioFrame: number): void;
@@ -46,6 +48,7 @@ export const STAT = {
   staleFades: 5, blocks: 6, frames: 7, peak: 8, telemetryAge: 9, activeGrains: 10,
   grainDrops: 11, nonFinite: 12, queueDepth: 13, fade: 14, doppler: 15, distance: 16,
   tier: 17, shed: 18, epoch: 19,
+  partials: 20, noiseBands: 21, grainCap: 22, grainStarts: 23, irMs: 24,
 } as const;
 
 let cached: WebAssembly.Module | null = null;

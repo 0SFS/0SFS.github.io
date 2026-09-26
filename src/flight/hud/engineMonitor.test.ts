@@ -46,6 +46,7 @@ function status(overrides: Partial<FlightAudioStatus> = {}): FlightAudioStatus {
     readOnlyReason: null, allowUnvalidated: false,
     engine: { n1Pct: 50.8, n2Pct: 69.7, fuelFlowPps: 0.0474, combustion: true, running: true },
     core: { epoch: 2, resyncs: 1, staleFades: 0, snapshotsDropped: 0, eventsDropped: 0 },
+    running: null,
     telemetry: { combustionSource: "fuel-flow", missing: [] },
     ...overrides,
   };

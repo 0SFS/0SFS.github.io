@@ -328,6 +328,32 @@ describe("DSP core, running the compiled WASM", () => {
     expect(peak(full.left)).toBeGreaterThan(0);
   });
 
+  it("runs each tier within the pilot's limits, never above its budget, and sheds from there", async () => {
+    const harness = await createDspHarness();
+    const caps = () => {
+      const stats = harness.stats();
+      return { partials: stats.partials, noiseBands: stats.noiseBands, grains: stats.grainCap, starts: stats.grainStarts, irMs: stats.irMs };
+    };
+    harness.exports.osfs_audio_set_tier(TIER.med);
+    expect(caps()).toEqual({ partials: 12, noiseBands: 5, grains: 0, starts: 0, irMs: 20 });
+    harness.exports.osfs_audio_set_limits(TIER.med, 6, 3, 12, 160, 15);
+    expect(caps()).toEqual({ partials: 6, noiseBands: 3, grains: 0, starts: 0, irMs: 15 });
+    // Shedding works down from the limits: oscillators first, then the impulse response.
+    harness.exports.osfs_audio_set_shed(1);
+    expect(caps()).toMatchObject({ partials: 4, irMs: 15 });
+    harness.exports.osfs_audio_set_shed(2);
+    expect(caps()).toMatchObject({ partials: 4, irMs: 10 });
+    // A limit above the budget, or below the two fundamentals, is held to them.
+    harness.exports.osfs_audio_set_limits(TIER.low, 40, 9, 12, 160, 40);
+    harness.exports.osfs_audio_set_tier(TIER.low);
+    expect(caps()).toEqual({ partials: 4, noiseBands: 4, grains: 0, starts: 0, irMs: 0 });
+    harness.exports.osfs_audio_set_limits(TIER.low, 0, 0, 0, 0, 0);
+    expect(caps()).toMatchObject({ partials: 2, noiseBands: 0 });
+    harness.exports.osfs_audio_set_tier(TIER.high);
+    harness.exports.osfs_audio_set_limits(TIER.high, 12, 5, 6, 80, 30);
+    expect(caps()).toEqual({ partials: 12, noiseBands: 5, grains: 6, starts: 80, irMs: 30 });
+  });
+
   it.each([44_100, 48_000])("shifts the whole source through the propagation delay at Med (%i Hz)", async (sampleRate) => {
     const render = async (approaching: boolean): Promise<number> => {
       const harness = await createDspHarness({ sampleRate });

@@ -59,7 +59,7 @@ export const EMCC_FLAGS = [
 export const REQUIRED_EXPORTS = [
   "memory", "_initialize",
   "osfs_audio_init", "osfs_audio_reset", "osfs_audio_set_tier", "osfs_audio_get_tier",
-  "osfs_audio_set_shed", "osfs_audio_get_shed", "osfs_audio_set_gains",
+  "osfs_audio_set_shed", "osfs_audio_get_shed", "osfs_audio_set_limits", "osfs_audio_set_gains",
   "osfs_audio_set_epoch", "osfs_audio_batch_ptr", "osfs_audio_batch_length",
   "osfs_audio_snapshot_size", "osfs_audio_commit_batch", "osfs_audio_set_tire",
   "osfs_audio_out", "osfs_audio_stats", "osfs_audio_stats_count",

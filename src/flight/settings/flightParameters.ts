@@ -802,6 +802,20 @@ export const OSFS_PARAMETERS = [
     source: "src/flight/audio/createFlightAudio.ts",
   },
 
+  // Sound → what each tier may use at most. The caps are the tier budgets of
+  // sound.md §1; these can only lower them, and shedding under load works
+  // down from here.
+  soundLimit("low", "partials", "Low: engine oscillators", "How many engine partials Low synthesises; the N1 and N2 fundamentals come first.", "count", 2, 4, 1),
+  soundLimit("low", "noiseBands", "Low: noise sources", "How many engine and airframe noise bands Low synthesises.", "count", 0, 4, 1),
+  soundLimit("med", "partials", "Med: engine oscillators", "How many engine partials Med synthesises; the N1 and N2 fundamentals come first.", "count", 2, 12, 1),
+  soundLimit("med", "noiseBands", "Med: noise sources", "How many engine and airframe noise bands Med synthesises.", "count", 0, 5, 1),
+  soundLimit("med", "irMs", "Med: cabin impulse response", "The length of the cabin and airframe colouring Med convolves with.", "ms", 0, 20, 1),
+  soundLimit("high", "partials", "High: engine oscillators", "How many engine partials High synthesises; the N1 and N2 fundamentals come first.", "count", 2, 12, 1),
+  soundLimit("high", "noiseBands", "High: noise sources", "How many engine and airframe noise bands High synthesises.", "count", 0, 5, 1),
+  soundLimit("high", "grains", "High: grains", "How many recorded grains High plays at once.", "count", 0, 12, 1),
+  soundLimit("high", "grainStarts", "High: grain starts", "How many grains High starts per second at most.", "per-s", 0, 160, 5),
+  soundLimit("high", "irMs", "High: cabin impulse response", "The length of the cabin and airframe colouring High convolves with.", "ms", 0, 40, 1),
+
   // Engine.
   {
     id: "osfs.engineMonitor.fuelFlowUnit",
@@ -1140,6 +1154,26 @@ function groundLock<Key extends GroundLockableKey>(key: Key) {
     home: all(GROUND),
     appliesLive: true,
     source: "src/flight/settings/groundInteractionSettings.ts",
+  };
+}
+
+function soundLimit<Tier extends string, Field extends string>(
+  tier: Tier, field: Field, label: string, description: string,
+  unit: "count" | "ms" | "per-s", min: number, cap: number, step: number,
+) {
+  return {
+    id: `osfs.sound.${tier}.${field}` as const,
+    label,
+    description,
+    unit,
+    kind: "number" as const,
+    step,
+    bounds: () => ({ min, max: cap, reason: "The tier's budget in docs/sound.md §1" }),
+    default: cap,
+    defaultReason: "The tier's full budget; shedding lowers it under load.",
+    home: all(SOUND),
+    appliesLive: true,
+    source: "src/flight/audio/dsp/core.cpp",
   };
 }
 

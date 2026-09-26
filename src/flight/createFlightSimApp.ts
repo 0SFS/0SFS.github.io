@@ -61,7 +61,7 @@ import { createWheelSpinExperiment } from "./physics/createWheelSpinExperiment";
 import type { WheelSpinMode } from "./physics/wheelSpin";
 import { createTireAudio } from "./audio/createTireAudio";
 import { createFlightAudio } from "./audio/createFlightAudio";
-import { AUDIO_PARAMETER_IDS, createAudioSettingsStore } from "./audio/audioSettings";
+import { AUDIO_PARAMETER_IDS, createAudioSettingsStore, readSoundTierLimits, SOUND_TIER_LIMIT_IDS } from "./audio/audioSettings";
 import { createJsbsimAudioAdapter } from "./audio/jsbsimAudioAdapter";
 import { WHEEL_SPIN_CONFIGS } from "./physics/wheelSpin";
 import { probeWheelContactCapability } from "./physics/wheelContact";
@@ -592,13 +592,30 @@ export async function createFlightSimApp(
   let audioPanelReady = false;
   const flightAudio = createFlightAudio({
     settings: audioSettingsStore,
+    tierLimits: () => readSoundTierLimits(parameters),
     onStatusChange: () => {
       if (audioPanelReady) controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
     },
   });
   // The Sound tab's own controls go through flightAudio; Show all parameters
   // and imports change the parameters directly, and the sound follows.
-  for (const id of AUDIO_PARAMETER_IDS) stopWatching.push(parameters.watch(id, () => flightAudio.followSettings()));
+  for (const id of [...AUDIO_PARAMETER_IDS, ...SOUND_TIER_LIMIT_IDS]) {
+    stopWatching.push(parameters.watch(id, () => flightAudio.followSettings()));
+  }
+  // Beside each tier limit: what the running tier uses, and whether shedding lowered it.
+  const TIER_NAMES = ["off", "low", "med", "high"];
+  const RUNNING_FIELDS = {
+    partials: "partials", noiseBands: "noiseBands", grains: "grains", grainStarts: "startsPerSecond", irMs: "irMilliseconds",
+  } as const;
+  for (const id of SOUND_TIER_LIMIT_IDS) {
+    const [, , tier, field] = id.split(".") as [string, string, string, keyof typeof RUNNING_FIELDS];
+    stopWatching.push(settings.setReadingSource(id, () => {
+      const running = flightAudio.getStatus().running;
+      if (!running || TIER_NAMES[running.tier] !== tier) return null;
+      const value = running[RUNNING_FIELDS[field]];
+      return running.shed > 0 ? `Running ${value}, shed ${running.shed} stages under load` : `Running ${value}`;
+    }));
+  }
   if (getAircraftFamilyForAircraft(initialAircraftId).id === "cirrus-vision-jet") {
     // Engine sound is SF50-only: the C172 is not a turbofan, and keeps its tire cue.
     try {

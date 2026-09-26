@@ -28,7 +28,7 @@
     },
     {
       "file": "core.cpp",
-      "sha256": "2f41de37bbea429c63c19687dddb89f93abb357ac070ec8b61a69ee9ee86826a"
+      "sha256": "806451f709e0170d1ba87749ff1d005a16a9e80aee7ae45c78cc29d26ed4aec8"
     },
     {
       "file": "granular.h",
@@ -48,8 +48,8 @@
     }
   ],
   "wasm": {
-    "bytes": 42740,
-    "sha256": "01367066b89f28d8d560c326216f507d821cbef57d091d0a4f85f309f99c238b"
+    "bytes": 43478,
+    "sha256": "9cfbc9ce8e02690c63cccbd68d13978a53d48af99ec7bc7fbd3218f473d43924"
   },
   "imports": [
     "env.emscripten_notify_memory_growth"
@@ -74,6 +74,7 @@
     "osfs_audio_reset",
     "osfs_audio_set_epoch",
     "osfs_audio_set_gains",
+    "osfs_audio_set_limits",
     "osfs_audio_set_shed",
     "osfs_audio_set_tier",
     "osfs_audio_set_tire",
@@ -81,5 +82,5 @@
     "osfs_audio_stats",
     "osfs_audio_stats_count"
   ],
-  "builtUtc": "2026-09-16T23:31:30.656Z"
+  "builtUtc": "2026-09-26T04:11:01.036Z"
 }

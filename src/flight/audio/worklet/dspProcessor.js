@@ -41,6 +41,7 @@ class OsfsDspProcessor extends AudioWorkletProcessor {
     this.framesSinceStats = 0;
     this.pendingGains = null;
     this.pendingTier = null;
+    this.pendingLimits = null;
     this.silentBlocks = 0;
 
     this.port.onmessage = (event) => this.onMessage(event);
@@ -71,10 +72,12 @@ class OsfsDspProcessor extends AudioWorkletProcessor {
       const initial = settings.initial || null;
       if (initial) {
         if (initial.gains) this.applyGains(initial.gains);
+        if (initial.limits) this.applyLimits(initial.limits);
         if (typeof initial.tier === "number") this.exports.osfs_audio_set_tier(initial.tier);
         if (typeof initial.tireWatts === "number") this.exports.osfs_audio_set_tire(initial.tireWatts);
       }
       if (this.pendingGains) this.applyGains(this.pendingGains);
+      if (this.pendingLimits) this.applyLimits(this.pendingLimits);
       if (this.pendingTier !== null) this.exports.osfs_audio_set_tier(this.pendingTier);
       this.ready = true;
       this.port.postMessage({ type: "ready", sampleRate });
@@ -112,6 +115,14 @@ class OsfsDspProcessor extends AudioWorkletProcessor {
     this.exports.osfs_audio_set_gains(gains.master, gains.engine, gains.tire, airframe, gains.reducedRange);
   }
 
+  /** The pilot's limits for each tier, by tier index (osfs.sound.<tier>.*). */
+  applyLimits(limits) {
+    for (const entry of limits) {
+      this.exports.osfs_audio_set_limits(entry.tier, entry.partials, entry.noiseBands, entry.grains,
+        entry.startsPerSecond, entry.irMilliseconds);
+    }
+  }
+
   onMessage(event) {
     const message = event.data;
     if (!message) return;
@@ -128,6 +139,9 @@ class OsfsDspProcessor extends AudioWorkletProcessor {
         return;
       case "shed":
         if (this.exports) this.exports.osfs_audio_set_shed(message.level);
+        return;
+      case "limits":
+        if (this.exports) this.applyLimits(message.limits); else this.pendingLimits = message.limits;
         return;
       case "epoch":
         if (this.exports) {

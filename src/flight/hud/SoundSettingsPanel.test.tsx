@@ -26,7 +26,7 @@ function status(requested: AudioQualityId, overrides: Partial<FlightAudioStatus>
     },
     stats: "Audio: low (requested auto)", transport: "port", sampleRateHz: 48_000, held: false,
     settings: { ...DEFAULT_AUDIO_SETTINGS, enabled: true, requested }, readOnlyReason: null,
-    allowUnvalidated: false, engine: null, core: null, telemetry: null,
+    allowUnvalidated: false, engine: null, core: null, running: null, telemetry: null,
     ...overrides,
   };
 }

@@ -1,7 +1,7 @@
 # Flight settings
 
-Status: stage 1 implemented (2026-09-25); detail focus, presets and the sound
-tiers' internal parameters are not. What stage 1 did and where it differs from
+Status: stage 1 implemented (2026-09-25), with the sound tiers' internal
+parameters; detail focus and presets are not. What stage 1 did and where it differs from
 this text: [Implementation](#implementation). Builds on FOSS Earth's [Settings](../../../foss-earth/docs/proposals/settings.md)
 spec, which defines the registry, the controls, presets, automatic adjustment,
 persistence and the globe's own settings. This document lists what 0sfs adds to
@@ -197,7 +197,7 @@ stage; the remaining parameters follow with FOSS Earth's stage 5.
 
 Done with FOSS Earth's stage 1 (the registry, its section UI and host markers):
 
-- 105 parameters are declared in `src/flight/settings/flightParameters.ts`, the
+- 115 parameters are declared in `src/flight/settings/flightParameters.ts`, the
   only place a flight default is written. `registerFlightSettings.ts` adds them
   to the app registry with their section titles and source links, and
   `flightMigrations.ts` moves every key in [Migration](#migration) into it once,
@@ -216,6 +216,10 @@ Done with FOSS Earth's stage 1 (the registry, its section UI and host markers):
 - A map switch made anywhere (the Map tab, Show all parameters, an import)
   prepares the terrain again when it changes the ground under the aircraft.
 - Whole-record export, import and reset are in Debug → Saved settings.
+- The sound tiers' internal caps are `osfs.sound.<tier>.*`: engine partials and
+  noise bands, the cabin impulse response, and High's grains and grain starts.
+  They can only lower a tier below its budget, and shedding works down from
+  them. The internal sample rate is not one: half-rate synthesis is not wired up.
 
 Where it differs from the tables above, from what the code turned out to do:
 
@@ -255,5 +259,3 @@ Not done:
   focus stage.
 - [Presets](#presets) wait for FOSS Earth's preset stage; the ground profiles and
   the phone camera's Original and Recommended move into them then.
-- The sound tiers' internal parameters are compiled into the DSP core. Exposing
-  them needs the core to take them at run time and a WASM rebuild.

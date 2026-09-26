@@ -5,7 +5,7 @@ import {
   formatAudioStats, quantumMilliseconds, resolveRequestedTier, tierAvailability,
   type AudioCapabilities, type FallbackController, type TierAvailability, type TierId,
 } from "./audioQuality";
-import type { AudioQualityId, AudioSettingsStore, AudioSettingsV1 } from "./audioSettings";
+import type { AudioQualityId, AudioSettingsStore, AudioSettingsV1, SoundTierLimits } from "./audioSettings";
 import { createPortTransport, createSabTransport, isSharedMemoryAvailable, type AudioTransport } from "./audioTransport";
 import { toSnapshot, type AudioAdapter, type AudioAdapterReading } from "./jsbsimAudioAdapter";
 import { computeListenerPose, createListenerPose, type ListenerPose, type ListenerPoseInput } from "./audioPose";
@@ -53,6 +53,14 @@ export interface FlightAudioStatus {
   engine: { n1Pct: number; n2Pct: number; fuelFlowPps: number; combustion: boolean; running: boolean } | null;
   /** Core timeline counters from the worklet, refreshed at 1 Hz. */
   core: { epoch: number; resyncs: number; staleFades: number; snapshotsDropped: number; eventsDropped: number } | null;
+  /**
+   * What the running tier uses after the pilot's limits and shedding, from the
+   * core at 1 Hz; null until it reports.
+   */
+  running: {
+    tier: number; shed: number; partials: number; noiseBands: number;
+    grains: number; startsPerSecond: number; irMilliseconds: number;
+  } | null;
   /** Adapter diagnostics: which combustion rule ran, which properties are absent. */
   telemetry: { combustionSource: string; missing: readonly string[] } | null;
 }
@@ -62,6 +70,8 @@ export type FlightAudioView = Pick<ListenerPoseInput, "camera" | "aircraftRoot" 
 
 export interface FlightAudioOptions {
   settings: AudioSettingsStore;
+  /** What each tier may use at most, below its budget; the full budgets when absent. */
+  tierLimits?: () => readonly SoundTierLimits[];
   /** Receives the next gesture when wanted audio is still autoplay-locked. */
   unlockTarget?: EventTarget | null;
   onStatusChange?: (status: FlightAudioStatus) => void;
@@ -276,6 +286,13 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
       ? {
         epoch: lastStats[19] ?? 0, resyncs: lastStats[4] ?? 0, staleFades: lastStats[5] ?? 0,
         snapshotsDropped: lastStats[1] ?? 0, eventsDropped: lastStats[3] ?? 0,
+      }
+      : null,
+    // Stats 20–24 exist only in a core that takes tier limits.
+    running: lastStats && lastStats.length > 24
+      ? {
+        tier: lastStats[17], shed: lastStats[18], partials: lastStats[20], noiseBands: lastStats[21],
+        grains: lastStats[22], startsPerSecond: lastStats[23], irMilliseconds: lastStats[24],
       }
       : null,
     telemetry: adapter
@@ -555,7 +572,7 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
           maxBlockFrames: 128,
           seed: 0x53463530,
           sab: shared?.sharedBuffer ?? null,
-          initial: { tier: TIER_INDEX[held ? "off" : tier], gains: currentGains() },
+          initial: { tier: TIER_INDEX[held ? "off" : tier], gains: currentGains(), limits: options.tierLimits?.() },
         },
       });
       node = worklet;
@@ -625,6 +642,7 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
 
     followSettings() {
       if (disposed) return;
+      if (options.tierLimits) node?.port.postMessage({ type: "limits", limits: options.tierLimits() });
       const next = options.settings.settings;
       if (next === settings) return;
       const tierChanged = next.requested !== settings.requested || next.enabled !== settings.enabled;
