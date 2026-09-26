@@ -267,7 +267,11 @@ Done with FOSS Earth's detail focus stage (its stage 3):
   the aircraft is registered, the default waits for its option and the orbit
   target is used. In a flight the orbit target is the simulation origin, which
   the floating origin keeps at the aircraft, so both load the same ground.
-- **Load around** keeps FOSS Earth's default, View.
+- **Load around** (`map.focus.mode`) defaults to View and aircraft in a
+  flight: the ground under the aircraft is its collision surface, and the
+  cockpit view does not look at it. On Google this keeps the mesh around the
+  aircraft refined whichever way the camera looks. From FOSS Earth's stage 4,
+  2D terrain is chosen by the view, so it would otherwise coarsen there too.
 - The headless check is `scripts/validation/map-focus/check-focus-orbit.mjs`.
   On the 2D map at the default 10 km radius, one turn made 203 map requests
   with View and none with Around the aircraft
@@ -280,8 +284,11 @@ Done with FOSS Earth's detail focus stage (its stage 3):
   terrain preparation defect that predates this work, and FOSS Earth has been
   told. At 42,999 ft no ground lies within the radius, so that run's zero
   proves nothing. The check is to be run again once the start is fixed.
-- A larger radius has not been checked. With 30 km, one turn on the 2D map made
-  41 image requests with Around the aircraft. FOSS Earth had uncommitted changes
-  during that run, so it is not kept, and the cause is not established.
+- A larger radius is not in the evidence. With 30 km on the 2D map, one turn
+  made no request, and neither did the camera kept still for as long
+  (`--no-turn`). FOSS Earth had uncommitted stage 4 changes during those runs,
+  so they are not kept. An earlier 30 km run made 41 requests; its loading
+  counted as settled after 10.5 s instead of about 26 s, so a 5 s pause most
+  likely ended the wait before loading was done.
 - [Presets](#presets) wait for FOSS Earth's preset stage; the ground profiles and
   the phone camera's Original and Recommended move into them then.

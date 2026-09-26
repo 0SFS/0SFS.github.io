@@ -660,6 +660,7 @@ it("loads and refines around the aircraft when nothing was saved, and removes it
   await act(async () => { app = await createFlightSimApp(root); });
   try {
     expect(getAppSettings().inspect("map.focus.refineFrom")).toMatchObject({ value: "focus", provenance: "host-default" });
+    expect(getAppSettings().inspect("map.focus.mode")).toMatchObject({ value: "both", provenance: "host-default" });
     const point = mocks.runtime.registerFocusPoint.mock.calls[0][0];
     expect(point).toMatchObject({ id: "aircraft", label: "Aircraft" });
     expect(point.getPosition()).toEqual(mocks.originEcef);

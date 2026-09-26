@@ -19,6 +19,8 @@
  * Usage: node scripts/validation/map-focus/check-focus-orbit.mjs
  *   [--maps=raster,google] [--modes=view,around] [--quiet=5] [--settle-limit=180] [--after=5] [--out=dir] [--no-build]
  *   [--set.<parameter id>=<value> …, passed to every run as ?set.<id>=]
+ *   [--no-turn: keep the camera still for as long as a turn takes, as the control
+ *    for loading that happens without one]
  * Output: build/validation/map-focus/<local time>/report.json, and per run a
  * screenshot at the half turn (the camera faces the aircraft) and one after it.
  */
@@ -43,6 +45,7 @@ const quietSeconds = Number(arg("quiet", "5"));
 const settleLimitSeconds = Number(arg("settle-limit", "180"));
 /** Requests are still counted this long after the turn, for loading it set off late. */
 const afterSeconds = Number(arg("after", "5"));
+const turn = !process.argv.includes("--no-turn");
 const extraSettings = Object.fromEntries(process.argv.filter(value => value.startsWith("--set.") && value.includes("="))
   .map(value => [value.slice(2, value.indexOf("=")), value.slice(value.indexOf("=") + 1)]));
 
@@ -158,7 +161,7 @@ async function screenshot(sessionId, file) {
 
 const report = {
   generatedAt: new Date().toISOString(), quietSeconds, settleLimitSeconds, afterSeconds,
-  turnPx: TURN_PX, viewport: { width: WIDTH, height: HEIGHT }, extraSettings,
+  turnPx: turn ? TURN_PX : 0, viewport: { width: WIDTH, height: HEIGHT }, extraSettings,
   checkouts: { "0sfs": checkout(root), "foss-earth": checkout(path.join(root, "../foss-earth")) },
   runs: {},
 };
@@ -203,7 +206,12 @@ try {
       const loading = await evaluate(chrome, sessionId, `(window.osfsLoadingDiagnostics?.().history ?? [])
         .map(({ elapsedMs, phase, update }) => ({ elapsedMs: Math.round(elapsedMs), phase, state: update.state, detail: update.detail ?? null }))`);
       const before = current.requests.length;
-      await orbitOneTurn(sessionId, () => screenshot(sessionId, `${name}-half-turn.png`));
+      if (turn) await orbitOneTurn(sessionId, () => screenshot(sessionId, `${name}-half-turn.png`));
+      else {
+        await sleep(STEPS * 25);
+        await screenshot(sessionId, `${name}-half-turn.png`);
+        await sleep(STEPS * 25);
+      }
       await sleep(afterSeconds * 1000);
       const during = current.requests.slice(before);
       await screenshot(sessionId, `${name}.png`);
@@ -212,7 +220,7 @@ try {
         requestsDuringTurn: during.length, duringTurnByHost: countByHost(during), exceptions: current.exceptions, loading,
       };
       console.log(`${altitudeFt} ft; settled after ${settledAfter === null ? `more than ${settleLimitSeconds} s (not settled)` : `${settledAfter.toFixed(1)} s`};`
-        + ` ${before} map requests before the turn, ${during.length} during it and the ${afterSeconds} s after.`);
+        + ` ${before} map requests before the turn, ${during.length} during it${turn ? "" : " (camera still)"} and the ${afterSeconds} s after.`);
       if (current.exceptions.length) console.log(`  exceptions: ${current.exceptions.join(" | ")}`);
       await chrome.send("Target.closeTarget", { targetId });
       sessions.delete(sessionId);

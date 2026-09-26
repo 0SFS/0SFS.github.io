@@ -30,6 +30,9 @@ export function registerFlightSettings(registry: SettingsRegistry): FlightParame
     // The flight registers the aircraft as a focus point once the renderer
     // exists; until then this default waits for its option.
     registry.setHostDefault("map.focus.point", AIRCRAFT_FOCUS_POINT, "0sfs: the aircraft");
+    // The ground under the aircraft is its collision surface, and the cockpit
+    // view does not look at it: load it in every direction, as well as the view.
+    registry.setHostDefault("map.focus.mode", "both", "0sfs: the ground around the aircraft, as well as the view");
     registry.migrateLegacy(OSFS_LEGACY_MIGRATIONS);
   }
   return flightParameterStore(registry);
