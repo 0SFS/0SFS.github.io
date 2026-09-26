@@ -1,10 +1,9 @@
 # Flight settings
 
 Status: stage 1 implemented (2026-09-25), with the sound tiers' internal
-parameters, and the aircraft as a detail focus point (2026-09-26). The orbit
-check has passed on the 2D map; on Google it waits for a start altitude fix in
-FOSS Earth. Presets are not done. What was done and where it differs from this
-text: [Implementation](#implementation). Builds on FOSS Earth's [Settings](../../../foss-earth/docs/proposals/settings.md)
+parameters, and the aircraft as a detail focus point (2026-09-26), whose orbit
+check passes on Google and on a 2D map. Presets are not done. What was done and
+where it differs from this text: [Implementation](#implementation). Builds on FOSS Earth's [Settings](../../../foss-earth/docs/proposals/settings.md)
 spec, which defines the registry, the controls, presets, automatic adjustment,
 persistence and the globe's own settings. This document lists what 0sfs adds to
 that registry, where each flight setting lives, and which flight constants
@@ -273,26 +272,16 @@ Done with FOSS Earth's detail focus stage (its stage 3):
   aircraft refined whichever way the camera looks. From FOSS Earth's stage 4,
   2D terrain is chosen by the view, so it would otherwise coarsen there too.
 - The headless check is `scripts/validation/map-focus/check-focus-orbit.mjs`.
-  On the 2D map at the default 10 km radius, one turn made 203 map requests
-  with View and none with Around the aircraft
-  ([evidence](../../validation/evidence/map-focus/orbit-2026-09-26/README.md)).
+  At the default 10 km radius, with Around the aircraft one turn made no map
+  request on either map. With View it made 280 requests on the 2D map and 148
+  on Google ([evidence](../../validation/evidence/map-focus/orbit-2026-09-26/README.md)).
+  The check found two FOSS Earth defects, fixed there before it passed:
+  - Flights on Google started from −23,569 ft to 42,999 ft, because terrain
+    preparation took coarse tiles as the ground. This predates the settings
+    work and was fixed in `48ebc30` and `770ca40`.
+  - Around on the 2D map loaded elevation tiles on a turn. Fixed in `c1841bb`.
 
 ### Not done
 
-- The Google half of the orbit check. With Around the aircraft, flights on
-  Google still start at 42,999 ft, where no ground lies within the radius, so
-  a turn's zero proves nothing. FOSS Earth `48ebc30` fixed the start with View
-  and with View and aircraft, the flight's default (5,762 ft), though one View
-  start at `15159c5` was 1,700 ft low. The wrong start is a FOSS Earth terrain
-  preparation defect that predates this work, and FOSS Earth has been told.
-- From FOSS Earth's stage 4 (`c7db4fd`), 2D terrain in Around mode still
-  follows the camera a little: one turn on the 2D map requested 6 elevation
-  tiles and no imagery, and the camera kept still for as long (`--no-turn`)
-  requested none. Stage 3 made no request. FOSS Earth has been told. The kept
-  evidence is from stage 3.
-- A larger radius is not in the evidence. Earlier runs that seemed to load
-  during a turn, 41 requests at 30 km and 19 at 10 km, had counted a 5 s pause
-  in requests as settled. The check now also waits for the map chip to stop
-  showing tiles streaming, about 28 s instead of 11.
 - [Presets](#presets) wait for FOSS Earth's preset stage; the ground profiles and
   the phone camera's Original and Recommended move into them then.

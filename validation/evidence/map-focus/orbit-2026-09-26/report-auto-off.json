@@ -1,0 +1,165 @@
+{
+  "generatedAt": "2026-09-26T19:55:43.786Z",
+  "quietSeconds": 5,
+  "settleLimitSeconds": 180,
+  "afterSeconds": 5,
+  "turnPx": 1257,
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "extraSettings": {
+    "set.map.auto.terrainDetail": "false",
+    "set.map.auto.imageryDetail": "false"
+  },
+  "checkouts": {
+    "0sfs": {
+      "commit": "f90775a686e38103e6abb1504dcc5ed42e5e8a0e",
+      "uncommittedChanges": false
+    },
+    "foss-earth": {
+      "commit": "770ca40494f020caedddca6e1be521a1d6ca1e06",
+      "uncommittedChanges": false
+    }
+  },
+  "runs": {
+    "raster-around": {
+      "map": "raster",
+      "mode": "around",
+      "altitudeFt": 5854,
+      "settledAfterSeconds": 29.104,
+      "requestsBeforeTurn": 1135,
+      "requestsDuringTurn": 0,
+      "duringTurnByHost": {},
+      "exceptions": [],
+      "loading": [
+        {
+          "elapsedMs": 1,
+          "phase": "app",
+          "state": "loading",
+          "detail": "Downloading application code",
+          "pendingTiles": null
+        },
+        {
+          "elapsedMs": 136,
+          "phase": "app",
+          "state": "ready",
+          "detail": null,
+          "pendingTiles": null
+        },
+        {
+          "elapsedMs": 137,
+          "phase": "world",
+          "state": "loading",
+          "detail": "Preparing the map renderer",
+          "pendingTiles": null
+        },
+        {
+          "elapsedMs": 137,
+          "phase": "flight",
+          "state": "loading",
+          "detail": "Loading flight physics",
+          "pendingTiles": null
+        },
+        {
+          "elapsedMs": 414,
+          "phase": "world",
+          "state": "ready",
+          "detail": null,
+          "pendingTiles": null
+        },
+        {
+          "elapsedMs": 416,
+          "phase": "terrain",
+          "state": "loading",
+          "detail": "Waiting for terrain to cover the aircraft's location.",
+          "pendingTiles": 252
+        },
+        {
+          "elapsedMs": 452,
+          "phase": "flight",
+          "state": "loading",
+          "detail": "Loading flight data: 0 of 5 files",
+          "pendingTiles": null
+        },
+        {
+          "elapsedMs": 459,
+          "phase": "flight",
+          "state": "loading",
+          "detail": "Loading flight data: 1 of 5 files",
+          "pendingTiles": null
+        },
+        {
+          "elapsedMs": 459,
+          "phase": "flight",
+          "state": "loading",
+          "detail": "Loading flight data: 2 of 5 files",
+          "pendingTiles": null
+        },
+        {
+          "elapsedMs": 459,
+          "phase": "flight",
+          "state": "loading",
+          "detail": "Loading flight data: 3 of 5 files",
+          "pendingTiles": null
+        },
+        {
+          "elapsedMs": 460,
+          "phase": "flight",
+          "state": "loading",
+          "detail": "Loading flight data: 4 of 5 files",
+          "pendingTiles": null
+        },
+        {
+          "elapsedMs": 460,
+          "phase": "flight",
+          "state": "loading",
+          "detail": "Loading flight data: 5 of 5 files",
+          "pendingTiles": null
+        },
+        {
+          "elapsedMs": 487,
+          "phase": "flight",
+          "state": "loading",
+          "detail": "Preparing flight physics",
+          "pendingTiles": null
+        },
+        {
+          "elapsedMs": 514,
+          "phase": "flight",
+          "state": "ready",
+          "detail": null,
+          "pendingTiles": null
+        },
+        {
+          "elapsedMs": 518,
+          "phase": "assets",
+          "state": "loading",
+          "detail": "Loading your aircraft",
+          "pendingTiles": null
+        },
+        {
+          "elapsedMs": 607,
+          "phase": "assets",
+          "state": "ready",
+          "detail": null,
+          "pendingTiles": null
+        },
+        {
+          "elapsedMs": 1031,
+          "phase": "terrain",
+          "state": "loading",
+          "detail": "Waiting for finer elevation data before flight can start safely.",
+          "pendingTiles": 296
+        },
+        {
+          "elapsedMs": 2079,
+          "phase": "terrain",
+          "state": "ready",
+          "detail": "Terrain ready for flight.",
+          "pendingTiles": 284
+        }
+      ]
+    }
+  }
+}
