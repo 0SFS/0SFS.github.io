@@ -2,6 +2,8 @@
 
 OSFS means **Open Source Flight Simulator**. The product was renamed to OSFS on 2026-09-09. It is hosted as the 0SFS organization site so its public address is `https://0sfs.github.io/`.
 
+Since 2026-09-26 the site's title and information page, the README and the GitHub profiles spell the name 0SFS, with a zero, as the address does, so that a search for the name finds the site. The simulator, the phone controller and the other docs still say OSFS. See [Getting 0SFS found on Google](docs/search-visibility.md#spelling).
+
 ## Completed changes
 
 | Location | Current value | Required change |
