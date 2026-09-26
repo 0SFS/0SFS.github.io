@@ -18,6 +18,7 @@
  *
  * Usage: node scripts/validation/map-focus/check-focus-orbit.mjs
  *   [--maps=raster,google] [--modes=view,around] [--quiet=5] [--settle-limit=180] [--after=5] [--out=dir] [--no-build]
+ *   [--set.<parameter id>=<value> …, passed to every run as ?set.<id>=]
  * Output: build/validation/map-focus/<local time>/report.json, and per run a
  * screenshot at the half turn (the camera faces the aircraft) and one after it.
  */
@@ -42,6 +43,8 @@ const quietSeconds = Number(arg("quiet", "5"));
 const settleLimitSeconds = Number(arg("settle-limit", "180"));
 /** Requests are still counted this long after the turn, for loading it set off late. */
 const afterSeconds = Number(arg("after", "5"));
+const extraSettings = Object.fromEntries(process.argv.filter(value => value.startsWith("--set.") && value.includes("="))
+  .map(value => [value.slice(2, value.indexOf("=")), value.slice(value.indexOf("=") + 1)]));
 
 const MAPS = {
   raster: { basemap: "usgs-imagery" },
@@ -155,7 +158,7 @@ async function screenshot(sessionId, file) {
 
 const report = {
   generatedAt: new Date().toISOString(), quietSeconds, settleLimitSeconds, afterSeconds,
-  turnPx: TURN_PX, viewport: { width: WIDTH, height: HEIGHT },
+  turnPx: TURN_PX, viewport: { width: WIDTH, height: HEIGHT }, extraSettings,
   checkouts: { "0sfs": checkout(root), "foss-earth": checkout(path.join(root, "../foss-earth")) },
   runs: {},
 };
@@ -182,6 +185,7 @@ try {
         "set.input.mode": "mouse",
         "set.input.sensitivity.mouse.orbit": "1",
         "set.input.orbit.recenterMode": "hold",
+        ...extraSettings,
         ...(map === "google" ? { key } : {}),
       });
       await chrome.send("Page.navigate", { url: `${ORIGIN}/fly/?${query}` }, sessionId);
@@ -194,16 +198,20 @@ try {
       // Paused, the aircraft stays where it is; the camera still orbits and the map still loads.
       await evaluate(chrome, sessionId, `window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyP" })), true`);
       const settledAfter = await settle(current);
+      // Where the aircraft is, to say whether any ground lies within the focus radius.
+      const altitudeFt = await evaluate(chrome, sessionId, `Number(document.querySelector('[data-metric="alt"]')?.textContent)`);
+      const loading = await evaluate(chrome, sessionId, `(window.osfsLoadingDiagnostics?.().history ?? [])
+        .map(({ elapsedMs, phase, update }) => ({ elapsedMs: Math.round(elapsedMs), phase, state: update.state, detail: update.detail ?? null }))`);
       const before = current.requests.length;
       await orbitOneTurn(sessionId, () => screenshot(sessionId, `${name}-half-turn.png`));
       await sleep(afterSeconds * 1000);
       const during = current.requests.slice(before);
       await screenshot(sessionId, `${name}.png`);
       report.runs[name] = {
-        map, mode, settledAfterSeconds: settledAfter, requestsBeforeTurn: before,
-        requestsDuringTurn: during.length, duringTurnByHost: countByHost(during), exceptions: current.exceptions,
+        map, mode, altitudeFt, settledAfterSeconds: settledAfter, requestsBeforeTurn: before,
+        requestsDuringTurn: during.length, duringTurnByHost: countByHost(during), exceptions: current.exceptions, loading,
       };
-      console.log(`settled after ${settledAfter === null ? `more than ${settleLimitSeconds} s (not settled)` : `${settledAfter.toFixed(1)} s`};`
+      console.log(`${altitudeFt} ft; settled after ${settledAfter === null ? `more than ${settleLimitSeconds} s (not settled)` : `${settledAfter.toFixed(1)} s`};`
         + ` ${before} map requests before the turn, ${during.length} during it and the ${afterSeconds} s after.`);
       if (current.exceptions.length) console.log(`  exceptions: ${current.exceptions.join(" | ")}`);
       await chrome.send("Target.closeTarget", { targetId });
@@ -213,5 +221,7 @@ try {
 } finally {
   await chrome.close();
 }
-await writeFile(path.join(out, "report.json"), JSON.stringify(report, null, 2));
+// Nothing the page reported may carry the key.
+const json = JSON.stringify(report, null, 2);
+await writeFile(path.join(out, "report.json"), key ? json.replaceAll(key, "<key>") : json);
 console.log(`\nReport: ${path.relative(root, path.join(out, "report.json"))}`);
