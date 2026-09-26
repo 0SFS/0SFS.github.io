@@ -323,7 +323,6 @@ export async function createFlightSimApp(
     preferGoogleTiles: mapConfig.preferGoogleTiles,
     rasterBaseMap: mapConfig.rasterBaseMap,
     terrainSource: mapConfig.terrainSource,
-    rasterQuality: mapConfig.rasterQuality,
     rasterImagery: mapConfig.rasterImagery,
     simMode: true,
   }).then(runtime => {

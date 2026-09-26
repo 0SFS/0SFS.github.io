@@ -32,7 +32,6 @@ function createTestHud(overrides: Partial<FlightHudBarOptions> = {}) {
     runtimeStatus: {
       mode: "raster-basemap",
       terrainSource: { id: "mapterhorn", label: "Mapterhorn Terrain" },
-      rasterQuality: { setting: "auto", activeProfile: "balanced" },
     } as BabylonRuntimeStatus,
     onPausedChange: vi.fn(),
     mapDetail: createMapDetailController({ storage: null }),
@@ -110,7 +109,6 @@ describe("flight input method selector", () => {
         mode: "raster-basemap",
         rasterBaseMap: { id: "usgs-imagery", label: "USGS Imagery" },
         terrainSource: { id: "mapterhorn", label: "Mapterhorn Terrain" },
-        rasterQuality: { setting: "auto", activeProfile: "balanced" },
       } as BabylonRuntimeStatus,
       onPausedChange: vi.fn(),
       mapDetail,
@@ -188,7 +186,6 @@ describe("flight input method selector", () => {
     hud.update({ latDeg: 0, lonDeg: 0, headingRad: 0 } as never, {
       mode: "raster-basemap",
       terrainSource: { id: "mapterhorn", label: "Mapterhorn Terrain" },
-      rasterQuality: { setting: "auto", activeProfile: "balanced" },
     } as BabylonRuntimeStatus, 59.6, false);
     expect(container.querySelector("#flightFps")?.textContent).toBe("FPS 60");
     expect(container.querySelector("#flightFps")).toBeInstanceOf(HTMLButtonElement);
@@ -196,7 +193,6 @@ describe("flight input method selector", () => {
     hud.update({ latDeg: 0, lonDeg: 0, headingRad: 0 } as never, {
       mode: "raster-basemap",
       terrainSource: { id: "mapterhorn", label: "Mapterhorn Terrain" },
-      rasterQuality: { setting: "auto", activeProfile: "balanced" },
     } as BabylonRuntimeStatus, 59.6, true);
     expect(container.querySelector("#flightFps")?.textContent).toBe("FPS 60");
     container.querySelector<HTMLButtonElement>("#flightFps")!.click();

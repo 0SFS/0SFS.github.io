@@ -40,7 +40,7 @@ const mocks = vi.hoisted(() => {
         mocks.runtime.googleTerrainDetail.errorTarget = errorTarget ?? mocks.runtime.googleTerrainDetail.defaultErrorTarget;
         mocks.runtime.googleTerrainDetail.overrideErrorTarget = errorTarget;
       }),
-      setSimRunning: vi.fn(), requestRender: vi.fn(), setMapSource: vi.fn(), setTerrainSource: vi.fn(), setRasterQuality: vi.fn(), destroy: vi.fn(),
+      setSimRunning: vi.fn(), requestRender: vi.fn(), setMapSource: vi.fn(), setTerrainSource: vi.fn(), destroy: vi.fn(),
     },
     collisionOverlay: { setEnabled: vi.fn(), update: vi.fn(), dispose: vi.fn() },
     wheelOverlay: { setEnabled: vi.fn(), update: vi.fn(), dispose: vi.fn() },
@@ -73,7 +73,7 @@ const mocks = vi.hoisted(() => {
 });
 vi.mock("foss-earth/runtime", () => ({
   createBabylonRuntime: async () => mocks.runtime,
-  RASTER_BASE_MAP_SOURCES: [], TERRAIN_SOURCES: [], resolveTerrainSource: vi.fn(), resolveRasterBaseMapSource: vi.fn(), resolveMapRuntimeConfig: () => ({}), applyRendererChoice: vi.fn(), setMapSourcePreference: vi.fn(), setTerrainSourcePreference: vi.fn(), setRasterQualityPreference: vi.fn(),
+  RASTER_BASE_MAP_SOURCES: [], TERRAIN_SOURCES: [], resolveTerrainSource: vi.fn(), resolveRasterBaseMapSource: vi.fn(), resolveMapRuntimeConfig: () => ({}), applyRendererChoice: vi.fn(), setMapSourcePreference: vi.fn(), setTerrainSourcePreference: vi.fn(),
 }));
 const shellCapture = vi.hoisted(() => ({ mapPanel: null as null | {
   onMapSourceChange(sourceId: string): void;
