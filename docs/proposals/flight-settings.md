@@ -1,8 +1,8 @@
 # Flight settings
 
-Status: stage 1 implemented (2026-09-25), with the sound tiers' internal
-parameters, and the aircraft as a detail focus point (2026-09-26), whose orbit
-check passes on Google and on a 2D map. Presets are not done. What was done and
+Status: implemented. Stage 1 (2026-09-25) came with the sound tiers' internal
+parameters. The aircraft as a detail focus point (2026-09-26) passes its orbit
+check on Google and on a 2D map. Presets came on 2026-09-26. What was done and
 where it differs from this text: [Implementation](#implementation). Builds on FOSS Earth's [Settings](../../../foss-earth/docs/proposals/settings.md)
 spec, which defines the registry, the controls, presets, automatic adjustment,
 persistence and the globe's own settings. This document lists what 0sfs adds to
@@ -22,7 +22,7 @@ Each moves to the tab where its effect is seen, and the tab is removed.
 | Flight terrain → Allow coarser terrain for this session | Map → Detail, beside the Flight minimum | It suspends that marker |
 | Map cache | Map → Loading and memory (FOSS Earth) | It is the globe's HTTP tile cache |
 | Attitude indicator renderer | Renderer → Instruments | It chooses a renderer backend |
-| (new) whole-record export, import and reset | Debug → Saved settings | FOSS Earth keeps it in a Settings tab 0sfs no longer has |
+| (new) whole-record export, import and reset | Settings → Saved settings, beside Settings → Presets (FOSS Earth's shared Settings tab) | Both span every tab; the shared tab holds nothing else |
 | Ground impacts (Arcade ground launches) and Ground interaction | Aircraft → Ground handling | They change the aircraft's physics |
 
 The Aircraft tab's **Camera** choice (Cockpit, Chase) stays where it is, with
@@ -175,8 +175,9 @@ copy, "Custom" after any edit.
 
 ## Acceptance
 
-- The flight panel has no Settings tab; each moved section appears once, in its
-  new home, and existing saved values survive the move.
+- The flight panel's own Settings tab is gone; each moved section appears once,
+  in its new home, and existing saved values survive the move. The shared
+  Settings tab holds only Presets and Saved settings.
 - The Flight minimum is a red marker on the Map → Detail Google track, draggable,
   saved, and shown on the HUD rail while a hold is active.
 - With **Around the aircraft**, orbiting the chase camera through 360° at a fixed
@@ -281,7 +282,35 @@ Done with FOSS Earth's detail focus stage (its stage 3):
     work and was fixed in `48ebc30` and `770ca40`.
   - Around on the 2D map loaded elevation tiles on a turn. Fixed in `c1841bb`.
 
-### Not done
+### Presets (2026-09-26)
 
-- [Presets](#presets) wait for FOSS Earth's preset stage; the ground profiles and
-  the phone camera's Original and Recommended move into them then.
+Done with FOSS Earth's preset stage (its stage 5):
+
+- The flight's presets are `src/flight/presets/*.json`, listed after FOSS
+  Earth's in Settings → Presets. There are six:
+  - **Low and slow sightseeing**: Around the aircraft within 20 km, the finest
+    detail on each map, a 512 MiB imagery budget, and a start 1,000 ft above
+    the ground at 80 kt.
+  - **Fast jet**: View only, coarser detail on each map, and a Flight minimum
+    of 16,384 px.
+  - **Ground: Minimal** and **Ground: Landing feedback**, the two ground
+    profiles that can run today. Ground handling and Rough terrain need coupled
+    rigid wheels and footprint contact, which are not implemented. The old
+    dropdown showed them disabled, and they come back as presets when those
+    choices run.
+  - **Phone camera: original** and **Phone camera: recommended**, which
+    replace the two buttons in Remote Control.
+- The ground panel's Profile dropdown and Named profiles are gone. The
+  section's status line says which preset it matches, and **Save as preset**
+  keeps a mix. Named profiles saved before are moved once into presets of the
+  pilot's, with every `osfs.ground.*` value each held; the old key stays for
+  rollback. For that move, and for bringing an exported preset back, FOSS
+  Earth gained `importPreset` and **Import a preset…** (`70beeb3`).
+- The pilot chose where presets live: FOSS Earth's shared Settings tab, with
+  only Presets and Saved settings, which moved there from Debug. The tab the
+  proposal removed held unrelated settings with no other home; this one holds
+  what spans every tab. An Interface tab now holds FOSS Earth's Log and Search
+  sections, which the flight uses as the globe does. The globe's toolbar and
+  theme are not the flight's, so they are left out.
+- A test checks that the app takes every value in every flight preset, and
+  that a fresh flight matches Ground: Minimal and Phone camera: original.

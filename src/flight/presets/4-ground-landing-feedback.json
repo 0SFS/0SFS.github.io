@@ -1,0 +1,14 @@
+{
+  "id": "osfs-ground-landing-feedback",
+  "name": "Ground: Landing feedback",
+  "description": "Wheels that spin up with finite inertia and a tire slip cue on touchdown, over JSBSim's own ground forces: a little more work for hearing the landing.",
+  "values": {
+    "osfs.ground.rotation": "inertia",
+    "osfs.ground.forceModel": "jsbsim",
+    "osfs.ground.contactModel": "shared",
+    "osfs.ground.backend": "auto",
+    "osfs.ground.tireAudio": "slip",
+    "osfs.ground.haptics": "off",
+    "osfs.ground.wheelVisuals": "off"
+  }
+}

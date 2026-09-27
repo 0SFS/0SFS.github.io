@@ -1,55 +1,31 @@
-import { useState } from "react";
 import {
-  GROUND_CHOICE_LABELS, GROUND_CHOICES, GROUND_FIELD_LABELS, GROUND_PRESETS, groundChoiceUnavailable,
-  type GroundCapabilities, type GroundInteractionSettingsV1, type GroundLockableKey, type GroundPresetId,
-  type GroundResolution,
+  GROUND_CHOICE_LABELS, GROUND_CHOICES, GROUND_FIELD_LABELS, groundChoiceUnavailable,
+  type GroundCapabilities, type GroundInteractionSettingsV1, type GroundLockableKey, type GroundResolution,
 } from "../settings/groundInteractionSettings";
 
 export interface GroundInteractionPanelState {
   settings: GroundInteractionSettingsV1;
   resolution: GroundResolution;
   capabilities: GroundCapabilities;
-  profiles: readonly string[];
   readOnlyReason: string | null;
-  /** Result of the latest profile/import action. */
+  /** Result of the latest action. */
   message: { text: string; error: boolean } | null;
-  exportText: string | null;
   /** Session-only Debug A/B override, described for the pilot. */
   experimentOverride: string | null;
   hapticDevices: { gamepad: string; phone: string };
 }
 
 export type GroundInteractionAction =
-  | { type: "preset"; preset: GroundPresetId }
-  | { type: "set"; patch: Partial<Omit<GroundInteractionSettingsV1, "version" | "profile" | "locked">> }
+  | { type: "set"; patch: Partial<Omit<GroundInteractionSettingsV1, "version" | "locked">> }
   | { type: "lock"; key: GroundLockableKey; locked: boolean }
-  | { type: "save-profile"; name: string }
-  | { type: "load-profile"; name: string }
-  | { type: "delete-profile"; name: string }
-  | { type: "export" }
-  | { type: "import"; text: string }
   | { type: "keep-experiment" }
   | { type: "discard-experiment" };
 
 const ROW_LABELS = GROUND_FIELD_LABELS;
 
-const PRESET_LABELS: Record<GroundPresetId, string> = {
-  "minimal": "Minimal", "landing-feedback": "Landing feedback",
-  "ground-handling": "Ground handling", "rough-terrain": "Rough terrain",
-};
-
 /** Structural unavailability only; dependencies such as audio → inertia stay selectable. */
 function unimplemented<K extends GroundLockableKey>(key: K, value: GroundInteractionSettingsV1[K], capabilities: GroundCapabilities) {
   return groundChoiceUnavailable(key, value, { rotation: "inertia" }, capabilities);
-}
-
-function presetUnavailable(preset: GroundPresetId, capabilities: GroundCapabilities): string | null {
-  const fields = GROUND_PRESETS[preset];
-  for (const key of ["forceModel", "contactModel", "tireAudio", "haptics"] as const) {
-    const reason = unimplemented(key, fields[key] as never, capabilities);
-    if (reason) return reason;
-  }
-  return null;
 }
 
 function ChoiceRow<K extends GroundLockableKey>({ field, state, onAction }: {
@@ -86,27 +62,13 @@ function ChoiceRow<K extends GroundLockableKey>({ field, state, onAction }: {
 export function GroundInteractionSettingsPanel({ state, onAction }: {
   state: GroundInteractionPanelState; onAction(action: GroundInteractionAction): void;
 }) {
-  const [profileName, setProfileName] = useState("");
-  const [savedProfile, setSavedProfile] = useState("");
-  const [importText, setImportText] = useState("");
   const settings = state.settings;
-  const selectedSaved = state.profiles.includes(savedProfile) ? savedProfile : state.profiles[0] ?? "";
   return (
     <fieldset className="flight-panel__fieldset" aria-label="Ground interaction">
       <legend>Ground interaction</legend>
-      <label className="flight-panel__field">
-        <span>Profile</span>
-        <select aria-label="Ground interaction profile" value={settings.profile}
-          onChange={event => onAction({ type: "preset", preset: event.target.value as GroundPresetId })}>
-          {(Object.keys(PRESET_LABELS) as GroundPresetId[]).map(preset => {
-            const reason = presetUnavailable(preset, state.capabilities);
-            return <option key={preset} value={preset} disabled={reason !== null}>
-              {PRESET_LABELS[preset]}{reason ? ` — ${reason}` : ""}
-            </option>;
-          })}
-          <option value="custom" disabled>Custom</option>
-        </select>
-      </label>
+      <p className="flight-panel__hint">
+        Named sets of these choices, such as Ground: Minimal and Ground: Landing feedback, are presets, in Settings → Presets.
+      </p>
       <div className="flight-panel__segmented" role="group" aria-label="Ground interaction selection">
         {(["auto", "manual"] as const).map(selection => <button key={selection} type="button"
           className={settings.selection === selection ? "is-active" : ""} aria-pressed={settings.selection === selection}
@@ -151,38 +113,6 @@ export function GroundInteractionSettingsPanel({ state, onAction }: {
           Return to saved settings
         </button>
       </div>}
-      <details>
-        <summary>Named profiles</summary>
-        <label className="flight-panel__field">
-          <span>Save current as</span>
-          <input type="text" aria-label="Profile name" maxLength={40} value={profileName}
-            onChange={event => setProfileName(event.target.value)} />
-        </label>
-        <button className="flight-panel__command" type="button"
-          onClick={() => onAction({ type: "save-profile", name: profileName })}>Save as…</button>
-        {state.profiles.length > 0 && <>
-          <label className="flight-panel__field">
-            <span>Saved profiles</span>
-            <select aria-label="Saved profiles" value={selectedSaved} onChange={event => setSavedProfile(event.target.value)}>
-              {state.profiles.map(name => <option key={name} value={name}>{name}</option>)}
-            </select>
-          </label>
-          <button className="flight-panel__command" type="button"
-            onClick={() => onAction({ type: "load-profile", name: selectedSaved })}>Use profile</button>
-          <button className="flight-panel__command" type="button"
-            onClick={() => onAction({ type: "delete-profile", name: selectedSaved })}>Delete</button>
-        </>}
-        <label className="flight-panel__field">
-          <span>Import / export</span>
-          <textarea aria-label="Profile text" rows={3} value={importText || state.exportText || ""}
-            onChange={event => setImportText(event.target.value)} />
-        </label>
-        <button className="flight-panel__command" type="button" onClick={() => { setImportText(""); onAction({ type: "export" }); }}>
-          Export current
-        </button>
-        <button className="flight-panel__command" type="button"
-          onClick={() => onAction({ type: "import", text: importText || state.exportText || "" })}>Import</button>
-      </details>
       {state.message && <p className={`flight-panel__hint${state.message.error ? " is-error" : ""}`} role="status">{state.message.text}</p>}
       {state.readOnlyReason && <p className="flight-panel__hint is-error" role="status">{state.readOnlyReason}</p>}
     </fieldset>

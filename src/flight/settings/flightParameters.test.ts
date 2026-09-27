@@ -3,6 +3,7 @@ import { existsSync } from "node:fs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createSettingsRegistry, getAppSettings, resetAppSettings, validateValue } from "foss-earth/settings";
 import { FLIGHT_SECTION_TITLES, flightParameterDefaults, OSFS_PARAMETERS } from "./flightParameters";
+import { FLIGHT_PRESETS } from "./flightPresets";
 import { registerFlightSettings } from "./registerFlightSettings";
 
 afterEach(() => { vi.unstubAllGlobals(); resetAppSettings(); });
@@ -97,5 +98,20 @@ describe("flight parameter catalogue", () => {
     const again = getAppSettings();
     registerFlightSettings(again);
     expect(again.get("osfs.flight.minimum")).toBe(1024);
+  });
+
+  it("has presets whose every value the app takes, named and described, the defaults among them", () => {
+    const settings = getAppSettings();
+    registerFlightSettings(settings);
+    expect(new Set(FLIGHT_PRESETS.map(preset => preset.id)).size).toBe(FLIGHT_PRESETS.length);
+    for (const preset of FLIGHT_PRESETS) {
+      expect(preset.id, preset.id).toMatch(/^osfs-[a-z-]+$/);
+      expect(preset.description.length, preset.id).toBeGreaterThan(20);
+      expect(settings.diffPreset(preset).rejected, preset.id).toEqual([]);
+      expect(settings.listPresets().some(listed => listed.id === preset.id), preset.id).toBe(true);
+    }
+    // A fresh flight matches the presets that stand for the defaults.
+    expect(settings.matchingPreset({ tab: "aircraft", section: "ground" })?.id).toBe("osfs-ground-minimal");
+    expect(settings.matchingPreset({ tab: "remote", section: "camera", prefix: "osfs.camera.phone." })?.id).toBe("osfs-phone-camera-original");
   });
 });

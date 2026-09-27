@@ -1,0 +1,13 @@
+{
+  "id": "osfs-phone-camera-original",
+  "name": "Phone camera: original",
+  "description": "The phone camera trackpad as it first worked: sent on each touch and a 60 Hz timer, lost movement dropped, drawn as it arrives.",
+  "values": {
+    "osfs.camera.phone.send": "timer",
+    "osfs.camera.phone.source": "delta",
+    "osfs.camera.phone.present": "arrival",
+    "osfs.camera.phone.bufferMs": 12,
+    "osfs.camera.phone.catchUp": 2,
+    "osfs.camera.phone.predictMs": 0
+  }
+}

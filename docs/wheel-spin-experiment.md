@@ -4,10 +4,12 @@ Research checked 2026-09-10. The experiment adds a small wheel-rotation model an
 
 ## Try it
 
-The durable way is **Aircraft → Ground handling**: choose **Landing
-feedback** (finite-inertia wheels plus the slip cue) or build a Custom mix of
-wheel response, tire audio, volume, haptics and strength. These choices persist,
-can be saved as named profiles and exported/imported as text. Wheel-response
+The durable way is the preset **Ground: Landing feedback** in **Settings →
+Presets** (finite-inertia wheels plus the slip cue), or a Custom mix of wheel
+response, tire audio, volume, haptics and strength in **Aircraft → Ground
+handling**. These choices persist; **Save as preset** in that section keeps a
+mix under a name, and Settings → Presets exports and imports presets as JSON.
+Named profiles saved before presets existed became presets of yours. Wheel-response
 changes made while flying wait until you pause or reset; volume, haptic strength
 and audio/haptic modes change immediately. Unimplemented options (coupled or
 compliant tires, footprint contact, geometry audio, asset wheel rotation,

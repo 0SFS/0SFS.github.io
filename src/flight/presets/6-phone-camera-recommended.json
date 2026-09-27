@@ -1,0 +1,13 @@
+{
+  "id": "osfs-phone-camera-recommended",
+  "name": "Phone camera: recommended",
+  "description": "What the measurements recommend: sent once per touch frame, lost movement recovered from the running total, and drawn on the phone's timeline; only the 12 ms buffer adds delay.",
+  "values": {
+    "osfs.camera.phone.send": "batch",
+    "osfs.camera.phone.source": "total",
+    "osfs.camera.phone.present": "playout",
+    "osfs.camera.phone.bufferMs": 12,
+    "osfs.camera.phone.catchUp": 2,
+    "osfs.camera.phone.predictMs": 0
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "osfs-fast-jet",
+  "name": "Fast jet",
+  "description": "Only what the view sees, at coarser detail, and a coarser Flight minimum for a spawn near the ground: less to load for each second of fast flight, for a softer map.",
+  "values": {
+    "map.focus.mode": "view",
+    "map.detail.imagery.range": { "min": -3, "max": 0 },
+    "map.detail.imagery.default": -1,
+    "map.detail.google.range": { "min": 4, "max": 64 },
+    "map.detail.google.default": 16,
+    "map.detail.terrain.range": { "min": 4, "max": 32 },
+    "map.detail.terrain.default": 8,
+    "osfs.flight.minimum": 16384
+  }
+}

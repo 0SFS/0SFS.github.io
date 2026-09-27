@@ -68,7 +68,6 @@ import { probeWheelContactCapability } from "./physics/wheelContact";
 import { createSlipAudioSink, createWheelCueBus, type WheelCueResetReason } from "./feedback/wheelCueBus";
 import { createGamepadHapticOutput, createHapticsController, readHapticTuning, type HapticOutput } from "./feedback/haptics";
 import {
-  applyGroundPreset,
   createGroundSettingsStore,
   GROUND_CHOICE_LABELS,
   GROUND_BOUNDARY_KEYS,
@@ -153,9 +152,13 @@ import {
   createGameLog,
   createMapDetailController,
   createMapSourcePanel,
+  createParameterSection,
+  createPresetsSection,
   createRendererPanel,
+  createSavedSettingsSection,
   type GameLog,
   type MapDetailController,
+  type PanelSection,
 } from "foss-earth/shell";
 import { createFlightDetailRequirements, importLegacyWorldDetail } from "./worldDetail";
 import { appHref } from "../appRoute";
@@ -557,9 +560,7 @@ export async function createFlightSimApp(
   };
   // Ground interaction: persistent requests resolve to what can actually run.
   // The Debug A/B experiment is a session-only override layered on top.
-  const groundStore = createGroundSettingsStore(parameters, (() => {
-    try { return window.localStorage; } catch { return null; }
-  })());
+  const groundStore = createGroundSettingsStore(parameters);
   const contactCapability = probeWheelContactCapability(jsbsim.sdk);
   const groundCapabilities: GroundCapabilities = {
     // Even a detected bridge stays unavailable until the coupled solver is integrated with it.
@@ -575,7 +576,6 @@ export async function createFlightSimApp(
   let groundResolution = resolveGroundInteraction(groundStore.settings, groundCapabilities, appliedGroundBoundary);
   let wheelExperiment: { rotation: WheelSpinMode | "off" | null; tireSound: boolean | null } = { rotation: null, tireSound: null };
   let groundMessage: GroundInteractionPanelState["message"] = null;
-  let groundExportText: string | null = null;
   let wheelSpinMode: WheelSpinMode | "off" = "off";
   let tireSoundEnabled = false;
   let hapticsActive = false;
@@ -1160,21 +1160,10 @@ export async function createFlightSimApp(
       groundMessage = error ? { text: error, error: true } : { text: success, error: false };
     };
     switch (action.type) {
-      case "preset": commit(applyGroundPreset(groundStore.settings, action.preset)); break;
       case "set": commit(patchGroundSettings(groundStore.settings, action.patch)); break;
       case "lock":
         commit(patchGroundSettings(groundStore.settings, { locked: { ...groundStore.settings.locked, [action.key]: action.locked } }));
         break;
-      case "save-profile": report(groundStore.saveProfile(action.name), "Profile saved."); break;
-      case "load-profile": {
-        const error = groundStore.loadProfile(action.name);
-        report(error, "Profile applied.");
-        if (safeBoundary) applyGroundBoundary(); else applyGroundRuntime();
-        break;
-      }
-      case "delete-profile": groundStore.deleteProfile(action.name); report(null, "Profile deleted."); break;
-      case "export": groundExportText = groundStore.exportProfile(); report(null, "Copy this text to keep or share the profile."); break;
-      case "import": report(groundStore.importProfile(action.text), "Profile imported. Choose it under Saved profiles."); break;
       case "keep-experiment": {
         const patch: Partial<GroundInteractionSettingsV1> = {};
         if (wheelExperiment.rotation !== null) patch.rotation = wheelExperiment.rotation;
@@ -1219,10 +1208,8 @@ export async function createFlightSimApp(
         settings: groundStore.settings,
         resolution: groundResolution,
         capabilities: groundCapabilities,
-        profiles: groundStore.profiles.map(profile => profile.name),
         readOnlyReason: groundStore.readOnlyReason,
         message: groundMessage,
-        exportText: groundExportText,
         experimentOverride: describeWheelExperiment(),
         hapticDevices: {
           gamepad: gamepadHaptics.describe(),
@@ -1447,11 +1434,27 @@ export async function createFlightSimApp(
     onMapSourceChange: setMapSourcePreference,
     onTerrainSourceChange: setTerrainSourcePreference,
   });
+  // Settings holds what spans every tab, the presets and the saved record; the
+  // Interface tab the log and place search, which the flight uses as the globe
+  // does. The globe's toolbar and theme are not the flight's, so they stay out.
+  const presetsSection = createPresetsSection(settings);
+  const savedSettingsSection = createSavedSettingsSection(settings);
+  const interfaceParameterSections = (["log", "search"] as const)
+    .map(section => ({ section, handle: createParameterSection(settings, { tab: "interface", section }) }));
+  const settingsSections: PanelSection[] = [
+    { id: "presets", title: "Presets", element: presetsSection.element },
+    { id: "saved-settings", title: "Saved settings", element: savedSettingsSection.element },
+  ];
+  const interfaceSections: PanelSection[] = interfaceParameterSections.map(({ section, handle }) => ({
+    id: section, title: settings.getSectionTitle("interface", section), element: handle.element,
+  }));
   controlPanel = createFlightControlPanel(panelRoot, createPanelSnapshot(), {
     settings,
     parameters,
     mapTab: mapPanel.element,
     rendererTab: rendererPanel.element,
+    settingsSections,
+    interfaceSections,
     initialWeather: weather,
     gamepadBindings,
     onLocationApply: teleportToLocation,
@@ -1887,6 +1890,9 @@ export async function createFlightSimApp(
       hudBar?.destroy();
       statusOverlay?.destroy();
       controlPanel?.destroy();
+      presetsSection.destroy();
+      savedSettingsSection.destroy();
+      for (const { handle } of interfaceParameterSections) handle.destroy();
       mapPanel.destroy();
       detailRequirements?.releaseAll();
       disconnectMapDetail();

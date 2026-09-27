@@ -1,6 +1,6 @@
 import "foss-earth/windowing.css";
 
-import { createParameterSection, createSavedSettingsSection, WindowOverlay, type WindowOverlayHandle } from "foss-earth/shell";
+import { createParameterSection, WindowOverlay, type PanelSection, type WindowOverlayHandle } from "foss-earth/shell";
 import type { SettingsRegistry } from "foss-earth/settings";
 import {
   type GeodeticLocation,
@@ -141,6 +141,10 @@ export interface FlightControlPanelOptions {
   mapTab: HTMLElement;
   /** The shared Renderer tab's contents, from `createRendererPanel`. */
   rendererTab: HTMLElement;
+  /** The shared Settings tab: presets and the saved record. */
+  settingsSections: readonly PanelSection[];
+  /** The shared Interface tab: the log and place search. */
+  interfaceSections: readonly PanelSection[];
   initialWeather: FlightWeatherState;
   gamepadBindings?: GamepadBindingsMount;
   onLocationApply(location: GeodeticLocation): void;
@@ -302,26 +306,6 @@ function ParameterSection({ settings, tab, section, covers, children }: {
     <div className="flight-panel__parameter-section" ref={host} />
     {children !== undefined && createPortal(children, main)}
   </>;
-}
-
-/**
- * Debug → Saved settings: every value this device keeps, at once. Export,
- * import and reset of the whole record, and "Keep these values" for values a
- * link set for this visit.
- */
-function SavedSettings({ settings }: { settings: SettingsRegistry }) {
-  const host = useRef<HTMLDivElement>(null);
-  useLayoutEffect(() => {
-    const handle = createSavedSettingsSection(settings);
-    host.current?.append(handle.element);
-    return () => handle.destroy();
-  }, [settings]);
-  return (
-    <fieldset className="flight-panel__fieldset">
-      <legend>Saved settings</legend>
-      <div ref={host} />
-    </fieldset>
-  );
 }
 
 interface AircraftPanelProps extends FlightControlPanelProps {
@@ -709,8 +693,8 @@ function KeyboardStickSettingsPanel({ parameters }: { parameters: FlightParamete
   );
 }
 
-function DebugPanel({ settings, snapshot, onCollisionDebugChange, onWheelSpinModeChange, onTireSoundChange }: Pick<FlightControlPanelProps,
-  "settings" | "snapshot" | "onCollisionDebugChange" | "onWheelSpinModeChange" | "onTireSoundChange">) {
+function DebugPanel({ snapshot, onCollisionDebugChange, onWheelSpinModeChange, onTireSoundChange }: Pick<FlightControlPanelProps,
+  "snapshot" | "onCollisionDebugChange" | "onWheelSpinModeChange" | "onTireSoundChange">) {
   return (
     <div className="flight-panel__content">
       <div className="flight-panel__metrics">
@@ -795,7 +779,6 @@ function DebugPanel({ settings, snapshot, onCollisionDebugChange, onWheelSpinMod
           Clear log
         </button>
       </fieldset>
-      <SavedSettings settings={settings} />
     </div>
   );
 }
@@ -833,6 +816,8 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
       overlayApiRef={props.overlayApiRef}
       mapTab={props.mapTab}
       rendererTab={props.rendererTab}
+      settingsSections={props.settingsSections}
+      interfaceSections={props.interfaceSections}
       getViewState={() => props.snapshot.flightState}
       setViewState={props.onLocationApply}
       locationSearchProvider={props.locationSearchProvider}
@@ -889,7 +874,7 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
                 <ParameterSection settings={props.settings} tab="engine" section="engine" />
               </>
               : tabId === "logging" ? <LoggingPanel state={props.snapshot.logging} onAction={props.onLoggingAction} />
-              : <DebugPanel settings={props.settings} snapshot={props.snapshot} onCollisionDebugChange={props.onCollisionDebugChange}
+              : <DebugPanel snapshot={props.snapshot} onCollisionDebugChange={props.onCollisionDebugChange}
                 onWheelSpinModeChange={props.onWheelSpinModeChange} onTireSoundChange={props.onTireSoundChange} />}
         </>;
       }}

@@ -1,0 +1,14 @@
+{
+  "id": "osfs-ground-minimal",
+  "name": "Ground: Minimal",
+  "description": "JSBSim's own ground forces, with no wheel rotation, tire audio, haptics or wheel visuals: the least work.",
+  "values": {
+    "osfs.ground.rotation": "off",
+    "osfs.ground.forceModel": "jsbsim",
+    "osfs.ground.contactModel": "shared",
+    "osfs.ground.backend": "auto",
+    "osfs.ground.tireAudio": "off",
+    "osfs.ground.haptics": "off",
+    "osfs.ground.wheelVisuals": "off"
+  }
+}

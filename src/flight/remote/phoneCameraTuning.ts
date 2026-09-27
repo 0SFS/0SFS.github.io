@@ -87,10 +87,6 @@ export function phoneCameraTuningValues(tuning: Partial<PhoneCameraTuning>): Par
 
 export const DEFAULT_PHONE_CAMERA_TUNING: Readonly<PhoneCameraTuning> = Object.freeze(readPhoneCameraTuning(flightParameterDefaults()));
 
-/** What the measurements recommend: every part of it costs no delay but the 12 ms buffer. */
-export const RECOMMENDED_PHONE_CAMERA_TUNING: Readonly<PhoneCameraTuning> = Object.freeze({
-  ...DEFAULT_PHONE_CAMERA_TUNING, send: "batch", source: "total", present: "playout", bufferMs: 12, catchUp: 2,
-});
 
 function oneOf<T>(value: unknown, options: readonly T[], fallback: T): T {
   return options.includes(value as T) ? value as T : fallback;
@@ -115,10 +111,6 @@ export function normalizePhoneCameraTuning(partial: Partial<PhoneCameraTuning> |
     predictMs: within("predictMs", partial?.predictMs),
     chaseFrame: oneOf(partial?.chaseFrame, ["attitude", "no-roll", "heading"] as const, base.chaseFrame),
   };
-}
-
-export function samePhoneCameraTuning(left: PhoneCameraTuning, right: PhoneCameraTuning): boolean {
-  return (Object.keys(DEFAULT_PHONE_CAMERA_TUNING) as Array<keyof PhoneCameraTuning>).every(key => left[key] === right[key]);
 }
 
 /**

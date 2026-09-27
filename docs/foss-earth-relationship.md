@@ -39,8 +39,8 @@ These local dependencies are convenient for developing the repositories together
 
 | Export | Purpose |
 | --- | --- |
-| `foss-earth/shell` | Configurable bottom HUD ending in the map source (provider, credit link, download speed, detail rail), responsive two-sided WindowOverlay with its Location, Map and Renderer tabs, the runtime status log, page fullscreen with its remembered choices, `createParameterSection` for each settings section of the flight's tabs, the Saved settings section, and the detail controller's track markers (the Flight minimum) |
-| `foss-earth/settings` | The app's settings registry: FOSS Earth's parameters and the flight's `osfs.*` ones in one record, with their migration from the old keys |
+| `foss-earth/shell` | Configurable bottom HUD ending in the map source (provider, credit link, download speed, detail rail), responsive two-sided WindowOverlay with its Location, Map, Renderer, Settings and Interface tabs, the runtime status log, page fullscreen with its remembered choices, `createParameterSection` for each settings section of the flight's tabs (with its preset status and Save as preset), the Presets and Saved settings sections of the shared Settings tab, and the detail controller's track markers (the Flight minimum) |
+| `foss-earth/settings` | The app's settings registry: FOSS Earth's parameters and the flight's `osfs.*` ones in one record, with their migration from the old keys, and FOSS Earth's presets with the flight's |
 | `foss-earth/shell.css` | Shared shell styling |
 | `foss-earth/input` | Input mode and sensitivity preferences, Safari gesture support, globe gamepad navigation, and orbit inversion |
 | `foss-earth/windowing` | Panel, tab, and workspace primitives |

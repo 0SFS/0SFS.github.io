@@ -222,7 +222,7 @@ it("defaults to passive impacts and applies the persistent arcade override to bo
   } finally { await act(async () => app.destroy()); }
 });
 
-it("keeps autopilot configuration on the Autopilot tab, and has no Settings tab", async () => {
+it("keeps autopilot configuration on the Autopilot tab, and only presets and the saved record in Settings", async () => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
   vi.stubGlobal("localStorage", { getItem: () => null, setItem: vi.fn() });
   Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
@@ -234,13 +234,21 @@ it("keeps autopilot configuration on the Autopilot tab, and has no Settings tab"
     await openTab(root, "Aircraft");
     expect(root.querySelector('[aria-label="Autopilot backend"]')).toBeNull();
     expect(root.querySelector('[data-parameter="osfs.ground.arcadeLaunches"]')).not.toBeNull();
-    const launcher = root.querySelector<HTMLButtonElement>('.foss-earth-tab-strip [aria-label="Open new tab"]')!;
-    await act(async () => launcher.click());
-    const items = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="menuitem"]'));
-    expect(items.map(item => item.textContent)).not.toContain("Settings");
-    await act(async () => items.find(item => item.textContent === "Autopilot")!.click());
+    await openTab(root, "Autopilot");
     expect(root.querySelector('[aria-label="Autopilot backend"]')).not.toBeNull();
     expect(root.querySelector('[aria-label="ArduPilot status"]')!.textContent).toMatch(/LOITER/);
+
+    const sectionTitles = () => [...root.querySelectorAll(".foss-earth-panel-section__title")].map(title => title.textContent);
+    await openTab(root, "Settings");
+    expect(sectionTitles()).toEqual(["Presets", "Saved settings"]);
+    // The flight's presets are listed beside FOSS Earth's.
+    expect(root.querySelector('[data-preset="osfs-low-and-slow"]')).not.toBeNull();
+    expect(root.querySelector('[data-preset="sharpest"]')).not.toBeNull();
+    await openTab(root, "Interface");
+    expect(sectionTitles()).toEqual([getAppSettings().getSectionTitle("interface", "log"), getAppSettings().getSectionTitle("interface", "search")]);
+    expect(root.querySelector('[data-parameter="interface.log.maxLines"]')).not.toBeNull();
+    await openTab(root, "Debug");
+    expect(root.textContent).not.toContain("Saved settings");
   } finally { await act(async () => app.destroy()); }
 });
 

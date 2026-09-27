@@ -1,32 +1,30 @@
 import { describe, expect, it } from "vitest";
-import { flightParameterDefaults, type FlightParameterStore } from "./flightParameters";
+import { createSettingsRegistry } from "foss-earth/settings";
+import { flightParameterDefaults, OSFS_PARAMETERS } from "./flightParameters";
 import {
-  applyGroundPreset, createGroundSettingsStore as createStore, DEFAULT_GROUND_INTERACTION_SETTINGS, GROUND_PROFILES_STORAGE_KEY,
-  MAX_IMPORT_BYTES, MAX_NAMED_PROFILES, migrateGroundSettings, parseGroundInteractionSettings, patchGroundSettings,
-  PROFILE_EXPORT_FORMAT, resolveGroundInteraction, type GroundCapabilities, type GroundInteractionSettingsV1, type GroundStorage,
+  createGroundSettingsStore, DEFAULT_GROUND_INTERACTION_SETTINGS, GROUND_PROFILES_STORAGE_KEY, groundProfilesMigration,
+  migrateGroundSettings, parseGroundInteractionSettings, patchGroundSettings, resolveGroundInteraction,
+  type GroundCapabilities, type GroundInteractionSettingsV1,
 } from "./groundInteractionSettings";
-
-/** Settings in their parameters; named profiles in `storage`. */
-function createGroundSettingsStore(storage: GroundStorage | null, parameters: FlightParameterStore = flightParameterDefaults()) {
-  return createStore(parameters, storage);
-}
 
 const CAPABILITIES: GroundCapabilities = {
   contactBridgeUnavailable: "installed JSBSim WASM has no per-wheel contact packet",
   audioUnavailable: null,
 };
 
-function memoryStorage(initial: Record<string, string> = {}) {
-  const map = new Map(Object.entries(initial));
-  return { map, getItem: (key: string) => map.get(key) ?? null, setItem: (key: string, value: string) => { map.set(key, value); } };
-}
+/** The choices of the Ground: Landing feedback preset. */
+const LANDING_FEEDBACK = { rotation: "inertia", tireAudio: "slip" } as const;
+/** Choices none of which run today: footprint contact, and what needs it. */
+const ROUGH_TERRAIN = {
+  rotation: "inertia", forceModel: "coupled-rigid", contactModel: "footprint", tireAudio: "geometry", haptics: "roughness",
+} as const;
 
 const base = (): GroundInteractionSettingsV1 => ({ ...DEFAULT_GROUND_INTERACTION_SETTINGS, locked: {} });
 
 describe("settings migration", () => {
-  it("defaults to Minimal: manual, no wheel feedback, JSBSim/shared terrain on CPU", () => {
-    const store = createGroundSettingsStore(memoryStorage());
-    expect(store.settings).toMatchObject({ version: 1, profile: "minimal", selection: "manual", rotation: "off",
+  it("defaults to the least work: manual, no wheel feedback, JSBSim/shared terrain on CPU", () => {
+    const store = createGroundSettingsStore(flightParameterDefaults());
+    expect(store.settings).toMatchObject({ version: 1, selection: "manual", rotation: "off",
       forceModel: "jsbsim", contactModel: "shared", backend: "auto", tireAudio: "off", haptics: "off", wheelVisuals: "off" });
     expect(resolveGroundInteraction(store.settings, CAPABILITIES).active.backend).toBe("cpu-js");
   });
@@ -35,9 +33,9 @@ describe("settings migration", () => {
     const parameters = flightParameterDefaults(migrateGroundSettings(JSON.stringify({
       rotation: "inertia", tireAudio: "slip", tireAudioVolume: 7, haptics: "vibrate-everything", locked: { rotation: true, bogus: true },
     }))!);
-    const store = createGroundSettingsStore(null, parameters);
+    const store = createGroundSettingsStore(parameters);
     expect(store.settings).toMatchObject({ version: 1, rotation: "inertia", tireAudio: "slip", tireAudioVolume: 1,
-      haptics: "off", selection: "manual", forceModel: "jsbsim", profile: "landing-feedback", locked: { rotation: true } });
+      haptics: "off", selection: "manual", forceModel: "jsbsim", locked: { rotation: true } });
     expect(store.settings.locked).not.toHaveProperty("bogus");
     expect(parameters.get("osfs.ground.lock.rotation")).toBe(true);
   });
@@ -47,37 +45,23 @@ describe("settings migration", () => {
     expect(migrateGroundSettings("{nope")).toBeNull();
   });
 
-  it("keeps the settings in the osfs.ground parameters, and survives storage exceptions", () => {
+  it("keeps the settings in the osfs.ground parameters", () => {
     const parameters = flightParameterDefaults();
-    const failing = { getItem: () => { throw new Error("denied"); }, setItem: () => { throw new Error("full"); } };
-    const store = createGroundSettingsStore(failing, parameters);
-    expect(() => store.set(applyGroundPreset(store.settings, "landing-feedback"))).not.toThrow();
-    expect(store.settings.profile).toBe("landing-feedback");
+    const store = createGroundSettingsStore(parameters);
+    store.set(patchGroundSettings(store.settings, LANDING_FEEDBACK));
     expect(parameters.get("osfs.ground.rotation")).toBe("inertia");
-    expect(store.saveProfile("Laptop")).toMatch(/storage/);
-    expect(store.profiles).toHaveLength(0);
-    expect(createGroundSettingsStore(null).settings.profile).toBe("minimal");
+    expect(createGroundSettingsStore(parameters).settings).toMatchObject(LANDING_FEEDBACK);
   });
 
-  it("derives the profile instead of trusting a stored label", () => {
+  it("ignores a stored profile label: named sets are presets now", () => {
     const parsed = parseGroundInteractionSettings({ ...base(), profile: "landing-feedback" });
-    expect(parsed.ok && parsed.settings.profile).toBe("minimal");
-    expect(parsed.ok && parsed.migrated).toBe(true);
-  });
-});
-
-describe("presets and custom edits", () => {
-  it("marks any mode change away from a preset as Custom, but not volume or strength", () => {
-    const landing = applyGroundPreset(base(), "landing-feedback");
-    expect(patchGroundSettings(landing, { tireAudioVolume: 0.2, hapticStrength: 0.1 }).profile).toBe("landing-feedback");
-    expect(patchGroundSettings(landing, { tireAudio: "off" }).profile).toBe("custom");
-    expect(patchGroundSettings(patchGroundSettings(landing, { tireAudio: "off" }), { tireAudio: "slip" }).profile).toBe("landing-feedback");
+    expect(parsed.ok && parsed.settings).not.toHaveProperty("profile");
   });
 });
 
 describe("requested → active → reason", () => {
   it("leaves unimplemented Manual requests inactive with a plain dependency", () => {
-    const resolution = resolveGroundInteraction(applyGroundPreset(base(), "rough-terrain"), CAPABILITIES);
+    const resolution = resolveGroundInteraction(patchGroundSettings(base(), ROUGH_TERRAIN), CAPABILITIES);
     expect(resolution.active).toMatchObject({ forceModel: "jsbsim", contactModel: "shared", tireAudio: "off", haptics: "off" });
     expect(resolution.entries.forceModel.reason).toMatch(/native per-wheel contact.*no per-wheel contact packet/);
     expect(resolution.entries.contactModel.reason).toMatch(/per-wheel ground support/);
@@ -86,7 +70,7 @@ describe("requested → active → reason", () => {
   });
 
   it("lets Auto fall back only for unlocked choices, and never to a higher tier", () => {
-    const rough = { ...applyGroundPreset(base(), "rough-terrain"), selection: "auto" as const };
+    const rough = { ...patchGroundSettings(base(), ROUGH_TERRAIN), selection: "auto" as const };
     const auto = resolveGroundInteraction(rough, CAPABILITIES);
     expect(auto.active).toMatchObject({ forceModel: "jsbsim", tireAudio: "slip", haptics: "landing" });
     expect(auto.entries.tireAudio.reason).toBe("Auto: requires footprint contact");
@@ -100,7 +84,7 @@ describe("requested → active → reason", () => {
     const resolution = resolveGroundInteraction(slipWithoutInertia, CAPABILITIES);
     expect(resolution.entries.tireAudio).toMatchObject({ active: "off", reason: "Requires Finite inertia wheel response" });
     expect(resolution.entries.haptics.active).toBe("landing");
-    const noAudio = resolveGroundInteraction(applyGroundPreset(base(), "landing-feedback"),
+    const noAudio = resolveGroundInteraction(patchGroundSettings(base(), LANDING_FEEDBACK),
       { ...CAPABILITIES, audioUnavailable: "Web Audio is unavailable in this browser" });
     expect(noAudio.entries.tireAudio.reason).toBe("Web Audio is unavailable in this browser");
     expect(noAudio.active.rotation).toBe("inertia");
@@ -115,7 +99,7 @@ describe("requested → active → reason", () => {
   });
 
   it("reports boundary choices as pending until applied, while immediate choices change now", () => {
-    const requested = applyGroundPreset(base(), "landing-feedback");
+    const requested = patchGroundSettings(base(), LANDING_FEEDBACK);
     const resolution = resolveGroundInteraction(requested, CAPABILITIES, base());
     expect(resolution.entries.rotation).toMatchObject({ requested: "inertia", active: "off", pending: true });
     expect(resolution.entries.tireAudio).toMatchObject({ active: "off", reason: "Requires Finite inertia wheel response" });
@@ -124,67 +108,26 @@ describe("requested → active → reason", () => {
 });
 
 describe("named profiles", () => {
-  it("saves, loads, overwrites and deletes named profiles separately from the active settings", () => {
-    const storage = memoryStorage();
-    const store = createGroundSettingsStore(storage);
-    store.set(applyGroundPreset(store.settings, "landing-feedback"));
-    expect(store.saveProfile("  Laptop,   runway  ")).toBeNull();
-    store.set(applyGroundPreset(store.settings, "minimal"));
-    expect(store.saveProfile("Laptop, runway")).toBeNull();
-    expect(store.profiles).toHaveLength(1);
-    expect(store.loadProfile("Laptop, runway")).toBeNull();
-    expect(store.settings.profile).toBe("minimal");
-    const reloaded = createGroundSettingsStore(storage);
-    expect(reloaded.profiles.map(profile => profile.name)).toEqual(["Laptop, runway"]);
-    reloaded.deleteProfile("Laptop, runway");
-    expect(createGroundSettingsStore(storage).profiles).toEqual([]);
-  });
-
-  it("caps profile count and rejects invalid names", () => {
-    const store = createGroundSettingsStore(memoryStorage());
-    expect(store.saveProfile("")).toMatch(/name/);
-    expect(store.saveProfile("x".repeat(41))).toMatch(/name/);
-    expect(store.saveProfile("bad\u0007name")).toMatch(/name/);
-    for (let index = 0; index < MAX_NAMED_PROFILES; index++) expect(store.saveProfile(`P${index}`)).toBeNull();
-    expect(store.saveProfile("one more")).toMatch(/At most/);
-    expect(store.saveProfile("P0")).toBeNull();
-  });
-
-  it("ignores malformed stored profiles and truncates an oversized list", () => {
-    const valid = { name: "VR, silent", settings: applyGroundPreset(base(), "landing-feedback") };
-    const stored = [{ name: "", settings: base() }, { name: "Bad", settings: "x" }, valid, valid,
-      ...Array.from({ length: 20 }, (_, index) => ({ name: `Extra ${index}`, settings: base() }))];
-    const store = createGroundSettingsStore(memoryStorage({ [GROUND_PROFILES_STORAGE_KEY]: JSON.stringify(stored) }));
-    expect(store.profiles.length).toBeLessThanOrEqual(MAX_NAMED_PROFILES);
-    expect(store.profiles[0]).toEqual(valid);
-  });
-
-  it("round-trips export/import and validates enums, numbers, format and version before writing", () => {
-    const storage = memoryStorage();
-    const store = createGroundSettingsStore(storage);
-    store.set(applyGroundPreset(store.settings, "landing-feedback"));
-    const exported = store.exportProfile();
-    const fresh = createGroundSettingsStore(memoryStorage());
-    expect(fresh.importProfile(exported)).toBeNull();
-    expect(fresh.profiles[0].settings.rotation).toBe("inertia");
-
-    const envelope = JSON.parse(exported);
-    const cases: [unknown, RegExp][] = [
-      ["not json", /valid JSON/],
-      [{ ...envelope, format: "other" }, /Not a 0SFS/],
-      [{ ...envelope, version: 2 }, /Unsupported profile version/],
-      [{ ...envelope, settings: { ...envelope.settings, version: undefined } }, /missing a version/],
-      [{ ...envelope, settings: { ...envelope.settings, forceModel: "fea" } }, /forceModel/],
-      [{ ...envelope, settings: { ...envelope.settings, hapticStrength: 3 } }, /hapticStrength/],
-      [{ ...envelope, settings: { ...envelope.settings, tireAudioVolume: "loud" } }, /tireAudioVolume/],
-      [{ ...envelope, settings: { ...envelope.settings, selection: "yolo" } }, /selection/],
-      [{ ...envelope, padding: "x".repeat(MAX_IMPORT_BYTES) }, /too large/],
-    ];
-    const before = storage.map.get(GROUND_PROFILES_STORAGE_KEY);
-    for (const [input, error] of cases) {
-      expect(store.importProfile(typeof input === "string" ? input : JSON.stringify(input))).toMatch(error);
-    }
-    expect(storage.map.get(GROUND_PROFILES_STORAGE_KEY)).toBe(before);
-    expect(envelope.format).toBe(PROFILE_EXPORT_FORMAT);
+  it("become presets of the pilot's, once, with every ground value each held, and the old key stays", () => {
+    const valid = { name: "  VR,   silent ", settings: { ...patchGroundSettings(base(), LANDING_FEEDBACK), tireAudioVolume: 0.3, locked: { haptics: true } } };
+    const stored = JSON.stringify([{ name: "", settings: base() }, { name: "Bad", settings: "x" }, valid, { ...valid, name: "VR, silent" }]);
+    const data = new Map([[GROUND_PROFILES_STORAGE_KEY, stored]]);
+    const storage = { getItem: (key: string) => data.get(key) ?? null, setItem: (key: string, value: string) => { data.set(key, value); } };
+    const start = () => {
+      const registry = createSettingsRegistry({ storage });
+      registry.register(OSFS_PARAMETERS);
+      registry.migrateLegacy([groundProfilesMigration(registry)]);
+      return registry;
+    };
+    const registry = start();
+    const presets = registry.listPresets();
+    expect(presets.map(preset => preset.name)).toEqual(["VR, silent"]);
+    expect(presets[0].values).toMatchObject({
+      "osfs.ground.rotation": "inertia", "osfs.ground.tireAudio": "slip", "osfs.ground.tireAudioVolume": 0.3,
+      "osfs.ground.lock.haptics": true, "osfs.ground.selection": "manual",
+    });
+    expect(registry.diffPreset(presets[0]).rejected).toEqual([]);
+    expect(start().listPresets()).toHaveLength(1);
+    expect(data.get(GROUND_PROFILES_STORAGE_KEY)).toBe(stored);
   });
 });

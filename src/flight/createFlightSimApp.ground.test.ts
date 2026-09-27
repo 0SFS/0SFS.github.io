@@ -110,8 +110,15 @@ it("queues wheel-model changes until pause, applies audio immediately, and resto
   const storage = environment();
   const view = await mount();
   try {
+    // Named sets of ground choices are presets, applied in Settings → Presets.
+    await view.openTab("Settings");
+    const preset = view.root.querySelector<HTMLElement>('[data-preset="osfs-ground-landing-feedback"]')!;
+    const button = (text: string) => [...preset.querySelectorAll<HTMLButtonElement>("button")].find(item => item.textContent === text)!;
+    await act(async () => button("Apply…").click());
+    await act(async () => button("Apply these changes").click());
     await view.openTab("Aircraft");
-    await view.choose("Ground interaction profile", "landing-feedback");
+    expect([...view.root.querySelectorAll(".foss-earth-preset-status")].map(status => status.textContent))
+      .toContain("Matches Ground: Landing feedback");
     // Running: the wheel model waits for a safe boundary.
     view.onStep();
     expect(mocks.wheelSpin.step).not.toHaveBeenCalled();
