@@ -1,4 +1,4 @@
-import type { FrameProfiler } from "foss-earth/perf";
+import type { FrameProfiler, FrameProfileSession } from "foss-earth/perf";
 
 /**
  * The running flight's frame profiler, for the Debug tab and DevTools.
@@ -7,6 +7,8 @@ import type { FrameProfiler } from "foss-earth/perf";
 
 export interface ActiveFrameProfile {
   profiler: FrameProfiler;
+  /** The runtime's profiling session, which the Debug tab's frame budget shows. */
+  session: FrameProfileSession;
   /** Starts or stops measuring; starting begins a fresh window. */
   setEnabled(enabled: boolean): void;
   /** Whether the globe's renderer can time its GPU work; if not, there are no GPU rows. */

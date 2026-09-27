@@ -1,3 +1,4 @@
+import { frameProfilingParameters } from "foss-earth/perf";
 import type { SettingsRegistry } from "foss-earth/settings";
 import { OSFS_LEGACY_MIGRATIONS } from "./flightMigrations";
 import { FLIGHT_PRESETS } from "./flightPresets";
@@ -23,6 +24,8 @@ export const AIRCRAFT_FOCUS_POINT = "aircraft";
 export function registerFlightSettings(registry: SettingsRegistry): FlightParameterStore {
   if (!registry.has(OSFS_PARAMETERS[0].id)) {
     registry.register(OSFS_PARAMETERS);
+    // Debug → Frame budget is the frame profiling's one home in the flight.
+    registry.register(frameProfilingParameters({ tab: "debug", section: "frame-budget" }));
     for (const [tab, section, title] of FLIGHT_SECTION_TITLES) registry.setSectionTitle(tab, section, title);
     registry.setSourceBase("osfs.", OSFS_SOURCE_BASE);
     // Google's mesh refines by distance from the aircraft, not the chase camera.

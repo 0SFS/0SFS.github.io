@@ -1,6 +1,6 @@
 import "foss-earth/shell.css";
 import type { WebGPUEngine } from "@babylonjs/core";
-import { canTimeGpuFrames, createFrameProfiler, profileBabylonScene } from "foss-earth/perf";
+import { bindFrameProfileSettings, FRAME_PROFILING_IDS } from "foss-earth/perf";
 import { setActiveFrameProfile } from "./diagnostics/frameProfile";
 import { getAppSettings } from "foss-earth/settings";
 import { describeAttitudeRendererStatus } from "./hud/attitudeRenderer";
@@ -682,23 +682,19 @@ export async function createFlightSimApp(
   const flightPerformance = isFlightPerformanceCaptureEnabled()
     ? createFlightPerformanceCapture() : null;
   if (flightPerformance) setActiveFlightPerformanceCapture(flightPerformance);
-  // Where each frame's time goes (Debug → Frame budget). `flightPerf=1` starts
-  // it on; otherwise it is off until the Debug tab switches it on. Off, it
-  // leaves nothing attached to the scene.
-  const frameProfiler = createFrameProfiler();
-  let stopSceneProfiling: (() => void) | null = null;
-  const setFrameProfiling = (enabled: boolean): void => {
-    frameProfiler.enabled = enabled;
-    if (enabled && !stopSceneProfiling) stopSceneProfiling = profileBabylonScene(frameProfiler, runtime.scene, runtime.engine);
-    if (!enabled && stopSceneProfiling) {
-      stopSceneProfiling();
-      stopSceneProfiling = null;
-    }
-  };
+  // Where each frame's time goes (Debug → Frame budget). The runtime owns the
+  // profiler and closes each frame; the flight adds its sections. `flightPerf=1`
+  // starts it on; otherwise it is off until the Debug tab switches it on. Off,
+  // it leaves nothing attached to the scene.
+  const frameProfile = runtime.frameProfile;
+  const frameProfiler = frameProfile.profiler;
+  const unbindFrameProfile = bindFrameProfileSettings(settings, frameProfile);
+  const setFrameProfiling = (enabled: boolean): void => { settings.set(FRAME_PROFILING_IDS.enabled, enabled); };
   setActiveFrameProfile({
     profiler: frameProfiler,
+    session: frameProfile,
     setEnabled: setFrameProfiling,
-    gpuTimed: () => canTimeGpuFrames(runtime.engine),
+    gpuTimed: () => frameProfile.gpuTimed(),
   });
   if (flightPerformance) setFrameProfiling(true);
   // The same idea for the phone's camera trackpad (`phoneCameraTrace=1`): every
@@ -1606,8 +1602,7 @@ export async function createFlightSimApp(
     if (disposed || worldLoading) return;
     flightSurface.beginFrame();
     const frameIntervalMs = deltaSeconds * 1000;
-    // One frame per sim tick; Babylon's render of the tick lands in the same frame.
-    frameProfiler.frame();
+    // The runtime has closed the previous frame; this tick and Babylon's render of it land in the new one.
     const flightTickStarted = frameProfiler.clock();
     let sectionStarted = flightTickStarted;
     // Do not integrate the time spent idle when resuming the simulation.
@@ -1884,7 +1879,7 @@ export async function createFlightSimApp(
       for (const stop of stopWatching.splice(0)) stop();
       removeFlightMinimumMarker();
       inputManager.dispose();
-      setFrameProfiling(false);
+      unbindFrameProfile();
       setActiveFrameProfile(null);
       if (phoneCameraTrace) setActivePhoneCameraTrace(null);
       hudBar?.destroy();

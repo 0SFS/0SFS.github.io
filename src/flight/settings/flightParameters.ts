@@ -62,6 +62,7 @@ export const FLIGHT_SECTION_TITLES: readonly (readonly [tab: string, section: st
   ["controls", "gamepad", "Gamepad"],
   ["controls", "keyboard", "Keyboard response"],
   ["controls", "feedback", "Feedback"],
+  ["debug", "frame-budget", "Frame budget"],
 ];
 
 const FAMILY_VARIANTS = AIRCRAFT_FAMILIES.flatMap(family => family.variants);

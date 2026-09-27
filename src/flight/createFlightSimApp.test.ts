@@ -72,7 +72,13 @@ const mocks = vi.hoisted(() => {
   };
 });
 vi.mock("foss-earth/runtime", () => ({
-  createBabylonRuntime: async () => mocks.runtime,
+  // The runtime's profiling session is real: off, it attaches nothing to the scene.
+  createBabylonRuntime: async () => {
+    const { createFrameProfileSession } = await import("foss-earth/perf");
+    // Every scene observable the profiler attaches to, never notified.
+    const scene = new Proxy({}, { get: () => ({ add: () => null, remove: () => true }) });
+    return Object.assign(mocks.runtime, { frameProfile: createFrameProfileSession({ scene: scene as never, engine: { getCaps: () => ({}) } as never }) });
+  },
   RASTER_BASE_MAP_SOURCES: [], TERRAIN_SOURCES: [], resolveTerrainSource: vi.fn(), resolveRasterBaseMapSource: vi.fn(), resolveMapRuntimeConfig: () => ({}), applyRendererChoice: vi.fn(), setMapSourcePreference: vi.fn(), setTerrainSourcePreference: vi.fn(),
 }));
 const shellCapture = vi.hoisted(() => ({ mapPanel: null as null | {
@@ -121,6 +127,7 @@ vi.mock("./hud/createFlightHudBar", () => ({
   },
 }));
 
+import type { FrameProfileSession } from "foss-earth/perf";
 import { getAppSettings, resetAppSettings, SETTINGS_STORAGE_KEY } from "foss-earth/settings";
 import { setMapSourcePreference } from "foss-earth/runtime";
 import { createFlightSimApp } from "./createFlightSimApp";
@@ -902,4 +909,49 @@ it("keeps flight recording in Logging, off until started, and warns before closi
     await act(async () => root.querySelector<HTMLButtonElement>('[aria-label="Close Logging tab"]')!.click());
     expect(root.querySelector(".foss-earth-tab-button")).toBeNull();
   } finally { await act(async () => app.destroy()); }
+});
+
+it("keeps flightPerf=1, the DevTools aliases and Debug → Frame budget, on the runtime's profiler", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  vi.stubGlobal("localStorage", { getItem: () => null, setItem: vi.fn() });
+  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
+  mocks.physics.getFault = () => null;
+  // What the flightPerf=1 capture reads each tick.
+  Object.assign(mocks.runtime, { getTileMetrics: () => null, isStreamingTiles: () => false, getMapDownloadBytesPerSecond: () => 0 });
+  window.history.replaceState(null, "", "?flightPerf=1");
+  const root = document.createElement("div"); document.body.append(root);
+  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
+  await act(async () => { app = await createFlightSimApp(root); });
+  const session = (mocks.runtime as unknown as { frameProfile: FrameProfileSession }).frameProfile;
+  try {
+    expect(window.osfsFrameProfiler).toBe(session.profiler);
+    expect(window.osfsFrameProfiler!.enabled).toBe(true);
+    expect(window.osfsFrameProfile!.gpuTimed()).toBe(false);
+    // The runtime closes each frame; the flight's sections land in it.
+    const tick = mocks.runtime.setSimTick.mock.calls.at(-1)![0] as (dt: number) => void;
+    session.frame();
+    await act(async () => tick(1 / 60));
+    session.frame();
+    const sections = window.osfsFrameProfiler!.summary().sections.map(section => section.section);
+    expect(sections).toContain("flight");
+    expect(sections).toContain("flight/physics");
+
+    await act(async () => window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyP" })));
+    await act(async () => root.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')!.click());
+    const debug = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')).find(button => button.textContent === "Debug")!;
+    await act(async () => debug.click());
+    const measure = root.querySelector<HTMLInputElement>('[data-parameter="renderer.profiling.enabled"] input')!;
+    expect(measure.checked).toBe(true);
+    expect(root.textContent).toContain("Copy frame budget");
+    await act(async () => window.osfsFrameProfile!.setEnabled(false));
+    expect(getAppSettings().get("renderer.profiling.enabled")).toBe(false);
+    expect(session.enabled).toBe(false);
+    await act(async () => measure.click());
+    expect(session.enabled).toBe(true);
+  } finally {
+    await act(async () => app.destroy());
+    window.history.replaceState(null, "", "/");
+  }
+  expect(window.osfsFrameProfiler).toBeUndefined();
+  expect(window.osfsFrameProfile).toBeUndefined();
 });
