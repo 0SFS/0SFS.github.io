@@ -129,6 +129,19 @@ FOSS Earth owns:
 - The phone remote control end to end: pairing, WebRTC transport, connection
   diagnostics, control protocol and phone UI.
 
+FOSS Earth has a second consumer: the University of Minnesota campus tour
+(`../UMN-VR/UMN-VR.github.io`), a FOSS Earth scene of 360° photographs. Each concern
+has one home:
+
+- **The tour's repository:** the tour's scene, photographs, placements and build.
+- **FOSS Earth:** the panorama scene format, its viewer and its tools.
+- **0SFS:** neither.
+
+0SFS's typecheck still reads FOSS Earth's scene code. `foss-earth/shell` and
+`foss-earth/settings` re-export the Scenes tab and its parameters, and FOSS Earth ships
+TypeScript source, so that code reaches 0SFS through FOSS Earth's own modules. None
+of it is tour code.
+
 For a shared-runtime change:
 
 1. Implement and test it in FOSS Earth.
