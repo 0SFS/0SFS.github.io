@@ -110,6 +110,18 @@ Rules only. Details live in the linked docs; update those, not this file.
 - Spec and reasons, shared with FOSS Earth:
   [../foss-earth/docs/ui-layout.md](../foss-earth/docs/ui-layout.md).
 
+## Camera motion
+
+- Every camera a person steers, the globe's and the flight cameras alike, is a
+  physical thing with mass and momentum. It never jumps: a camera move cut short
+  stays where it got to and glides on at the velocity it had, slowed by
+  `camera.inertiaDecay`, never snapped to its start or end or stopped dead.
+- The person's input acts at once and keeps acting; the gesture that interrupts
+  goes on moving the camera. A trackpad's momentum is not input, and a gesture
+  from before a handover does not follow the camera over.
+- Spec, reasons and a checklist, shared with FOSS Earth:
+  [../foss-earth/docs/camera-motion.md](../foss-earth/docs/camera-motion.md).
+
 ## Settings
 
 - The user decides how their machine's compute, memory and bandwidth are spent,
