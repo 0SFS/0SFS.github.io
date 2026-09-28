@@ -103,3 +103,12 @@ model ships as the `hd` level, off by default. It is modelled gear-up, so
 parked it hovers 0.67 m over the runway with nothing underneath — right in
 flight, wrong on the ground. Either model a gear for it, hide it while the
 aircraft is on the ground, or leave it as the flight-only option it is.
+
+## branding
+
+**A script that renders the 0SFS logo.** The logo is to be a rendering of a Vision Jet G3
+climbing over the University of Minnesota campus, from a camera position the user has already
+found. The script comes once the G3 model is finished. It needs a way to copy the current
+camera state rather than typing it out by hand. That button belongs to FOSS Earth, since any
+globe application wants to copy or share a view, and is on its TODO.md. The script and the
+logo belong here.
