@@ -51,11 +51,16 @@ The site root is an information page. The flight simulator is `/fly/`:
 http://127.0.0.1:5173/fly/?mapSource=osm-standard
 ```
 
-To use Google Photorealistic 3D Tiles, pass your own key:
+To use Google Photorealistic 3D Tiles, pass your own key once, or paste it in Map → Source:
 
 ```text
 http://127.0.0.1:5173/fly/?key=YOUR_GOOGLE_MAPS_API_KEY
 ```
+
+FOSS Earth's settings registry saves the key in this origin's local storage and removes it from the
+address bar, so later visits need no `?key=` and copied links do not carry it. The basemap and
+elevation provider chosen in the Map tab are written back to the URL as `mapSource` and
+`elevationSource`.
 
 Vite may choose a different port when `5173` is occupied. `/rc/` loads the phone controller route
 on its own. `?mode=flight` redirects to `/fly/` and `?mode=remote` redirects to `/rc/`, keeping other

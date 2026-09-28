@@ -44,7 +44,8 @@ describe("application route", () => {
       log: expect.objectContaining({ print: expect.any(Function) }),
     });
     expect(document.getElementById("app-log")!.textContent).toContain("Application ready");
-    expect(`${window.location.pathname}${window.location.search}`).toBe("/fly/?mapSource=google&key=test-key");
+    // The route keeps the query; FOSS Earth's registry saves the key and takes it off the address bar.
+    expect(`${window.location.pathname}${window.location.search}`).toBe("/fly/?mapSource=google");
   });
 
   it.each(["/fly", "/fly/", "/?mode=flight"])("loads the flight simulator at %s", async (route) => {

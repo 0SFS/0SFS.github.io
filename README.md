@@ -78,8 +78,9 @@ npm run dev
 ```
 
 The simulator is at `/fly/` on the URL Vite prints, for example `http://127.0.0.1:5173/fly/`. To use
-Google Photorealistic 3D Tiles, add `?key=YOUR_GOOGLE_MAPS_API_KEY`; to choose a basemap, add
-`?mapSource=osm-standard`. JSBSim comes from a tarball in `deps/`, so it needs no separate checkout.
+Google Photorealistic 3D Tiles, add `?key=YOUR_GOOGLE_MAPS_API_KEY` once: the key is saved in your
+browser and removed from the URL. To choose a basemap, add `?mapSource=osm-standard`; a basemap
+chosen in the Map tab is written to the URL the same way. JSBSim comes from a tarball in `deps/`, so it needs no separate checkout.
 [Development](docs/development.md) covers the folder layout, tests and building your own copy.
 
 ## Limits
