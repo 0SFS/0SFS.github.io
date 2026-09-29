@@ -15,6 +15,9 @@
     {
       "name": "Gamepad input and bindings",
       "path": "../Felipegalind0/gamepad-tools"
+    },
+    {
+      "path": "../UMN-VR/UMN-VR.github.io"
     }
   ],
   "settings": {}
