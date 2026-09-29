@@ -127,8 +127,8 @@ App-specific input adapters stay in each app: the flight actions and profiles in
 `src/flight/input/gamepadToolsAdapter.ts` here, and the globe actions and profile
 in `src/input/globeNavigation.ts` in FOSS Earth.
 
-The [flight development workspace](../flight-development.code-workspace) names
-the four active repository roots explicitly. Engine and SDK work share one
+A local, gitignored flight development workspace (`flight-development.code-workspace`)
+can name the active repository roots. Engine and SDK work share one
 JSBSim checkout on `master`. The old separate SDK was reversibly moved under
 `gh/.preservation/jsbsim-in-tree-20260913T233508Z/retired-jsbsim-wasm`; it remains
 a migration/PR reference outside the active workspace. The user's preferred layout is `gh/owner/repo`, with work on ordinary branches in the canonical repositories. Do not recreate special task-named repository copies/worktrees. The app path above is the actual path used in this work, not a request to relocate it.

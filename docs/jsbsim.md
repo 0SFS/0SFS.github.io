@@ -496,8 +496,8 @@ Use the canonical repositories and ordinary branches:
 - App/aircraft/evidence: `/Users/felg/gh/0sfs`.
 - Reusable terrain/rendering: `/Users/felg/gh/foss-earth`.
 
-Open [flight-development.code-workspace](../flight-development.code-workspace)
-for the four labeled roots: 0sfs, JSBSim, FOSS Earth, and gamepad-tools. The old separate
+A local, gitignored `flight-development.code-workspace` can open these roots
+together with gamepad-tools. The old separate
 SDK checkout was reversibly moved to
 `/Users/felg/gh/.preservation/jsbsim-in-tree-20260913T233508Z/retired-jsbsim-wasm`;
 its history and the fork.1/fork.2 tarballs remain migration/PR references. SDK

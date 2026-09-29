@@ -3,6 +3,9 @@ dist/
 GOOGLE_3D_TILES.local.md
 .DS_Store
 
+# Editor workspaces, such as the local flight-development.code-workspace.
+*.code-workspace
+
 # Local build/validation artifacts; identities and outcomes are documented.
 # Generated benchmark fixtures belong here (e.g. build/benchmarks/audio/).
 /build/
