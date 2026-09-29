@@ -3,12 +3,10 @@
 Every pull request we have open against a project we do not own, what each one
 is waiting on, and the replies we owe. Six are open on `JSBSim-Team/jsbsim`.
 
-Live PR bodies, comments, reviews and check runs were read on 2026-09-18, and
-each PR's diff was reviewed at its head. Upstream `master` was
-`29d2d6b8031569655560e260850c42314ab83ef0` then; a read-only refresh on
-2026-09-19 for the turbine work found `a6f86ae93256eb00c2c990b711faa5bbb72ecb20`,
-one commit ahead, touching only `tests/TestActuator.py` for Python 3.14. The
-heads of #1505 and #1508 were re-read at the same time and are unchanged.
+Live PR comments, reviews, review threads, heads and check runs were refreshed
+on **2026-09-26**, including the turbine discussion that day and discussions
+#984/#1501. All six published heads are unchanged from the previous snapshot.
+This refresh assessed review status; it did not run tests or requalify the code.
 
 This is the living tracker. The
 [2026-09-14 review](validation/jsbsim-open-pr-review-2026-09-14.md) remains the
@@ -20,44 +18,65 @@ where the two disagree on current state, this file is newer.
 
 | PR | Head | Size | CI | Waiting on |
 | --- | --- | --- | --- | --- |
-| [#1502](https://github.com/JSBSim-Team/jsbsim/pull/1502) wheel spin DOF | `499c3832` | +978/−26, 8 files | Last verified: 26 passed, 1 running, 1 skipped; final result unconfirmed | Maintainers. Current round answered |
-| [#1505](https://github.com/JSBSim-Team/jsbsim/pull/1505) turbine trim spool | `07eba55f` | +69/−1, 3 files | Passed | **Us.** Shut-off-engine fix reviewed and committed locally (`6f95bfb0`), not pushed; reply to the steady-state/trim discussion drafted in the stage-1 report, not posted |
-| [#1506](https://github.com/JSBSim-Team/jsbsim/pull/1506) model reload lifetime | `a25956a2` | +112/−2, 4 files | Passed | Maintainers |
+| [#1502](https://github.com/JSBSim-Team/jsbsim/pull/1502) wheel spin DOF | `499c3832` | +978/−26, 8 files | Passed | **Us.** September 20 changes requested; 17 unresolved threads |
+| [#1505](https://github.com/JSBSim-Team/jsbsim/pull/1505) turbine trim spool | `07eba55f` | +69/−1, 3 files | Passed | **Us.** September 26 design discussion questions both turbine PRs; local repair `6f95bfb0` remains unpublished |
+| [#1506](https://github.com/JSBSim-Team/jsbsim/pull/1506) model reload lifetime | `a25956a2` | +112/−2, 4 files | Passed | **Us.** September 19 changes requested: reload defaults and regressions |
 | [#1507](https://github.com/JSBSim-Team/jsbsim/pull/1507) in-tree WASM package | `3d01786e` | +6421/−2, 49 files | Passed | **Us** (body, Pyodide), then scope |
-| [#1508](https://github.com/JSBSim-Team/jsbsim/pull/1508) turbine trim fuel flow | `7511df10` | +168/−4, 4 files | Passed | **Us.** Off-engine fuel fix reviewed locally at `482da811` (production correction `8945b0e3`), not pushed; reply drafted, not posted |
-| [#1511](https://github.com/JSBSim-Team/jsbsim/pull/1511) tank temperature property | `2a2383ae` | +239/−1, 4 files | Passed | Maintainers. Sean: "Looks good" |
+| [#1508](https://github.com/JSBSim-Team/jsbsim/pull/1508) turbine trim fuel flow | `7511df10` | +168/−4, 4 files | Passed | **Us.** Same design discussion in #1505; local repair `482da811` remains unpublished |
+| [#1511](https://github.com/JSBSim-Team/jsbsim/pull/1511) tank temperature property | `2a2383ae` | +239/−1, 4 files | Passed | **Us.** September 19 changes requested: thermal test validity and f-strings |
 
-All six are non-draft and reported cleanly mergeable. #1502 is the only one
-with a review decision. #1502 received its reviewed follow-up commits and replies on 2026-09-19.
-The #1505 acknowledgment was verified on 2026-09-19, and #1505 was read again
-later that day: head unchanged at `07eba55f`, 28 checks successful and 5
-skipped, with a
-[second comment from Sean](https://github.com/JSBSim-Team/jsbsim/pull/1505#issuecomment-5745172993)
-correcting his own earlier wording. A further API read on 2026-09-19 confirms
-the head is still `07eba55f`, open and mergeable, and includes bcoconni's
-`GetTrimStatus()` proposal and Sean's response about steady thrust outside
-aircraft trim; see below. Checks were not rerun or refreshed in that read.
-#1508's comment thread was also reread, with no new discussion. The other
-PR entries retain their previously recorded snapshots.
+All six are open, non-draft and reported cleanly mergeable. **#1502, #1506
+and #1511 have `CHANGES_REQUESTED`; none has an approving review decision.**
+Each has 27 successful checks and 5 skipped, except #1507 with 29 successful
+and 5 skipped. No check is pending or failing. Green CI and automatic
+mergeability do not resolve the review requests.
 
 Two are stacked: #1508 contains #1505's commit, and #1507 contains #1506's.
 
-## What changed since 2026-09-16
+## What changed since the September 19 snapshot
 
-- **#1502 has changes requested.** bcoconni submitted a review on 2026-09-18
-  with nine inline comments. He says they should remove the `moment` lambda,
-  `LeverArm` and `UseMomentJacobian`, and that he will have more comments once
-  these are settled.
-- **#1511:** Sean commented "Looks good to me" on 2026-09-18. It is a comment,
-  not an approving review.
-- **#1507's force-push is explained.** Sean squash-merged #1504 at 07:40 on
-  2026-09-15, and bcoconni rebased #1507 onto it at 08:49, dropping our copy of
-  the #1504 commit. The tree is unchanged. The local `feature/wasm-package`
-  (`c6d4063a`) is still the pre-rebase copy.
-- **A comment was missing from this file.** Sean's 2026-09-14 comment on #1505
-  is now under that PR.
+- **#1502:** bcoconni returned on September 20. Eight of the original nine
+  threads are resolved; sixteen new threads and the remaining frame-wording
+  thread await us. The first response round is complete, the second is not.
+- **#1506 and #1511:** September 19 reviews request changes. The previous
+  "waiting on maintainers" entries were stale.
+- **#1505/#1508:** September 20/26 comments propose replacing the separate
+  turbine trim calculation with the running calculation and explicit trim
+  detection. The old draft replies and publication order need revision.
+- **#1507:** no new PR comments or reviews; the body, Pyodide response and
+  smaller-PR plan remain outstanding.
 
 ## #1502: wheel spin DOF
+
+**Current: September 20 second review awaits us.** bcoconni's
+[review](https://github.com/JSBSim-Team/jsbsim/pull/1502#pullrequestreview-5260342609)
+acknowledges the first round and requests these follow-ups:
+
+- [Move spin acceleration into `FGLGear`](https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4056710766),
+  where wheel state lives, and remove shared `WheelSpinDOF::Accel` plus its
+  accumulation/reset plumbing in `FGAccelerations`.
+- [Explicitly name ECEF](https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4056676177)
+  in the rate comment. He accepts our frame interpretation and corrects his
+  earlier NED implication; "ground reference frame" remains too vague.
+- Answer [why `WheelJacobian` belongs to each constraint row](https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4056724161).
+  Our assessment is that the roll and brake rows need different coefficients
+  for the same wheel; this is a question to explain, not a settled removal.
+- Simplify references, RHS calculation, wheel setup, bounds and brake
+  registration, remove redundant initialization, and reuse the side axis.
+  See [bounds/registration](https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4056808463)
+  and [axis reuse](https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4056846538).
+- [Nest wheel properties inside BOGEY](https://github.com/JSBSim-Team/jsbsim/pull/1502#discussion_r4056792373)
+  and discuss whether to retain the existing `wheel-speed-fps` property after
+  checking its semantics and consumers.
+
+Eight original threads are resolved; sixteen new threads plus the frame thread
+remain unresolved, with no author replies to this round. Prepare and validate
+a bounded second-round patch, preserving update timing and checking contact
+loss and multiplier lifetime. The review's illustrative `ftBrake` spelling is
+`ftWheelBrake` in this PR. Row reordering also deserves numerical comparison;
+finite solver iteration counts need not give identical results in a new order.
+
+The following is the historical first-round record.
 
 **2026-09-19: review round published and verified.** The
 [plan](pr1502/plan.md) and [final review](../validation/evidence/jsbsim/wheel-spin-review/final/review.md)
@@ -74,8 +93,7 @@ read back and verified. Threads remain open for the maintainer's next round.
 GitHub confirms head `499c3832`; the latest check snapshot has 26 successful,
 one running and one skipped, with no failures. See the
 [publication record](../validation/evidence/jsbsim/wheel-spin-review/final/publication-actions.json).
-The final CI result remains unconfirmed because the subsequent read-only
-refresh was blocked by the account usage limit.
+The September 26 refresh confirms final CI: 27 successful and 5 skipped.
 
 The round removes the duplicate solver and obsolete lever-arm representation,
 configures wheel bounds before clamping, names the directions correctly,
@@ -91,10 +109,52 @@ exactly. Base/final differ in 60 of 102 files across 31 successful simulations;
 large contact-force and post-impact differences are disclosed. The revised
 body withdraws the old “unaffected” claim.
 
-Publication is complete; follow CI and further maintainer comments. This
-completes our current review response,
-not upstream acceptance. Bringing the changes to fork master, packaging and
-wiring the 0sfs wheel meshes remain separate work, as noted in the plan.
+First-round publication is complete; the second round above remains open.
+Fork `master` now includes the first-round changes through merge `59336c99`.
+Packaging and wiring the 0sfs wheel meshes remain separate work.
+
+## #1505/#1508: current design discussion
+
+**A design response comes before the previously planned publication.** On
+[September 20](https://github.com/JSBSim-Team/jsbsim/pull/1505#issuecomment-5749453145),
+Sean noted that these PRs synchronize spool and fuel while leaving other
+states inconsistent. He proposed sharing the running calculations and making
+`Seek()` reach its target during steady evaluation, instead of maintaining a
+separate `Trim()` calculation.
+
+On [September 26](https://github.com/JSBSim-Team/jsbsim/pull/1505#issuecomment-5849449704),
+bcoconni questioned whether either PR should proceed in its current form. His
+combined proposal uses `GetTrimStatus()`, routes to `tpRun`, makes `Seek()`
+return the target during trim, and removes `FGTurbine::Trim()`. He considers
+the repeated `RunIC()` steady evaluation an accidental consequence of using
+zero dt to detect trim. He subsequently
+[corrected his claim](https://github.com/JSBSim-Team/jsbsim/pull/1505#issuecomment-5849528886)
+that `Trim()` never runs during actual aircraft trim; that correction does
+not withdraw the consolidation proposal. Discussion
+[#1501 was directed here](https://github.com/JSBSim-Team/jsbsim/discussions/1501#discussioncomment-18617124)
+the same day. #1508 itself has no new comments.
+
+Recommended next steps:
+
+1. Reply briefly on #1505, leading with agreement on shared calculations and
+   explaining the actual initialize/start/change-throttle/reinitialize use case.
+   Existing behavior and downstream dependence do not prove intended upstream
+   semantics; identify the compatibility requirement explicitly.
+2. Use our characterization precisely: it tested only the one-line
+   `GetTrimStatus()` change while keeping `tpTrim` and `Trim()`. It broke
+   programmatic `InitRunning()`. **It did not test or refute the new combined
+   `tpRun`/`Seek()`/removal proposal.**
+3. Evaluate that combined proposal against startup, actual trim, repeated
+   initialization and off-engine behavior. Settle whether to revise/supersede
+   the PRs or retain the narrow fixes as an interim contribution.
+4. Rewrite both old drafts before posting. Keep unrelated lifecycle findings
+   out of this immediate reply. Preserve the existing regression cases.
+
+The local repairs below are still valid retained work. Fork `master` is now
+`b49541fe`, containing equivalent spool/fuel fixes at `0062cdc9`/`b30fb56b`
+and follow-up coverage at `b49541fe`; neither published PR includes them.
+The larger plan still awaits acceptance of its revised stage-1 contract,
+with stages 3–7 pending. A unified implementation is not complete.
 
 ## #1505 and #1508: engines that are shut off
 
@@ -245,7 +305,8 @@ revised contract.
 
 - [x] Carry this discussion into the
       [stage-1 brief](turbine-initialization/tasks/01-characterization.md).
-- [ ] Post the reply. It is corrected against the stage-1 review and sits in the
+- [ ] Rewrite the reply for the September 26 discussion before posting. The
+      older draft is corrected against the stage-1 review and sits in the
       [stage-1 report](turbine-initialization/reports/01-characterization.md):
       it keeps the non-trim steady-thrust path, reports what the proposed
       condition does on its own, offers the `Trim()` rename as a separate
@@ -274,15 +335,24 @@ exactly that point, as does the SF50 cruise fuel-flow sweep.
       immediate-readback requirement is now measured rather than asserted, and
       the suggestion's cost is concrete: the post-trim block runs a frame late
       and is skipped entirely while the executive stays suspended.
-- [ ] Post the reply. It is drafted at [`pr1508/reply-draft.md`](pr1508/reply-draft.md)
-      and explains the immediate readback, the guarded correction, the
+- [ ] Rewrite the reply after settling the shared direction with #1505. The
+      older draft at [`pr1508/reply-draft.md`](pr1508/reply-draft.md)
+      explains the immediate readback, the guarded correction, the
       unchanged thrust, and the one deliberate side effect — a configured
       `<tsfc>` with `copyto` is no longer evaluated during an off-engine trim.
       Nothing has been posted on #1508 as part of planning or implementation.
 
 ## #1507: in-tree WASM package
 
+September 26 refresh: no human PR comments or reviews and no new head commit.
+The following body and scope work remains ours. #1506 now needs revisions,
+so its carried dependency will also need updating here.
+
 ### After the rebase
+
+Sean squash-merged #1504 on September 15; bcoconni then rebased #1507 onto it,
+dropping our copy of that commit without changing the tree. The local
+`feature/wasm-package` at `c6d4063a` remains the pre-rebase copy.
 
 - [ ] Update the PR body. It still says the branch carries #1504's commit and
       that we will "rebase it as those fixes merge". Its comparison link points
@@ -318,19 +388,43 @@ decide. Expect a request to discuss or split before line-by-line review.
       package-name questions in the same post, so they are answered before
       anyone reviews code.
 
-## Waiting on maintainers
+## #1506: model reload lifetime
 
-- **#1506**: no human comments. Its 66 % patch coverage is the best of the
-  batch. #1507 carries the same diff, so this should land first. Nothing owed.
-  - [ ] If it is still silent when #1507's scope discussion starts, point out
-        that landing it first shrinks #1507.
-- **#1511**: Sean
-  [commented "Looks good to me"](https://github.com/JSBSim-Team/jsbsim/pull/1511#issuecomment-5734915804)
-  on 2026-09-18, not as an approving review. Nothing owed. The diff also
-  corrects the tank debug log, which printed the initial temperature as
-  Fahrenheit although `Calculate()` compares it with TAT in °C.
-  - [ ] Once it merges, check that the fork's `master`, which merged its own
-        copy (`f0d1023a`), matches the squash-merged version.
+bcoconni [requested changes on September 19](https://github.com/JSBSim-Team/jsbsim/pull/1506#pullrequestreview-5257591791).
+Six threads remain unresolved. The lifetime fix is useful, but replacement
+must also restore executive defaults instead of inheriting state from the
+previous model or script.
+
+- [ ] Audit and [reset replacement state](https://github.com/JSBSim-Team/jsbsim/pull/1506#discussion_r4054708327):
+      timestep, time/frame, holding and termination, random seed, trim state,
+      child/template state and owned IC/script/trim objects. Inspect ownership
+      and load sequencing before applying the suggested reset list.
+- [ ] [Remove obsolete `modelLoaded`](https://github.com/JSBSim-Team/jsbsim/pull/1506#discussion_r4054655070).
+- [ ] Test defaults immediately after replacement, **before overwriting them**:
+      [dt](https://github.com/JSBSim-Team/jsbsim/pull/1506#discussion_r4054720132),
+      [random seed](https://github.com/JSBSim-Team/jsbsim/pull/1506#discussion_r4054722673)
+      and other state. Preserve the unbind-before-destruction regressions and
+      run affected reload/lifecycle/sanitizer checks on the revised candidate.
+- [ ] Reply to the review and update #1507's carried dependency once revised.
+
+## #1511: fuel tank temperature property
+
+Sean's [September 18 positive comment](https://github.com/JSBSim-Team/jsbsim/pull/1511#issuecomment-5734915804)
+is followed by bcoconni's [September 19 changes requested](https://github.com/JSBSim-Team/jsbsim/pull/1511#pullrequestreview-5255187136).
+Two threads remain unresolved; both concern the new Python test.
+
+- [ ] [Use f-strings](https://github.com/JSBSim-Team/jsbsim/pull/1511#discussion_r4052742628)
+      throughout the new Python code.
+- [ ] [Repair the thermal test's assumptions](https://github.com/JSBSim-Team/jsbsim/pull/1511#discussion_r4052846021).
+      The fixture starts an engine despite the engine-off/stationary comment,
+      so fuel and conditions change. The present bounds would collapse for the
+      claimed constant conditions. Our recommendation is to make the fixture
+      and oracle agree, accounting for integration error or checking the
+      discrete update; changing only the comment would miss the validity issue.
+- [ ] Reply after validating the corrected test. No inline objection was made
+      to the property binding or debug-temperature correction themselves.
+- [ ] Once it merges, check that fork `master`'s copy (`f0d1023a`) matches the
+      actual upstream merge.
 
 ## Merged, with follow-ups still owed
 
@@ -373,14 +467,19 @@ where the test list has moved; the fix is one added line.
 
 ## Suggested order
 
-1. **#1502.** bcoconni is mid-review and has said more comments follow. Answer
-   this round while he is engaged; most of it is mechanical.
-2. **#1505 and #1508.** One small fix clears the defect on both, and two replies
-   to Sean are four days old. His placement question is the same decision.
-3. **#1507.** The PR body fix takes minutes. Then answer Pyodide and post the
-   smaller-PRs plan before the scope conversation starts without us.
-4. **#1504 follow-ups:** the logging PR.
-5. **Idle fuel flow:** rebase and open it.
+1. **#1505/#1508: design reply first.** The active September 26 conversation
+   changes the proposed contribution direction. Rewrite the old drafts and
+   evaluate the combined proposal before choosing how to publish the repairs.
+2. **#1511: finish the bounded test revision.** It has the smallest review scope.
+3. **#1506: complete reload semantics and regressions.** This also clears a
+   dependency carried by #1507.
+4. **#1502: second review round.** Group the seventeen threads into the bounded
+   tasks above, validate the solver changes, then reply thread by thread.
+5. **#1507: body and scope response.** Correct the stale dependency description,
+   answer Pyodide, and post the smaller-PR plan. The body correction can happen
+   independently; the code must track #1506's eventual revision.
+6. **Older follow-ups:** #1504 logging, SDK #8 cache-only benchmark, and the
+   independent idle-fuel-flow contribution.
 
 ## Refreshing this file
 
@@ -393,7 +492,8 @@ gh search prs --author Felipegalind0 --state open --json number,title,repository
 Then per PR: `gh pr view <n> --repo JSBSim-Team/jsbsim --json statusCheckRollup,reviewDecision`,
 `gh api repos/JSBSim-Team/jsbsim/issues/<n>/comments`, and
 `gh api repos/JSBSim-Team/jsbsim/pulls/<n>/reviews`. Inline review comments live
-at `pulls/<n>/comments` and are a separate endpoint; #1502 has nine. Discussion
+at `pulls/<n>/comments` and are a separate endpoint. Use GraphQL `reviewThreads`
+for resolution state; counting comments alone does not count remaining work. Discussion
 threads are GraphQL only, and #984 and #1501 both carry PR-relevant comments
 that none of the PR endpoints return. A force-push shows in
 `issues/<n>/timeline` as `head_ref_force_pushed`, with the actor.
