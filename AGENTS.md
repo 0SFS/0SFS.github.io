@@ -69,6 +69,11 @@ Rules only. Details live in the linked docs; update those, not this file.
   For GPU benchmarks, confirm the real GPU is in use.
 - Never start a dev, preview or watch server unless asked; give the user the command.
   Stop a server you were asked to start once the check is done.
+- Let headless Chrome exit by itself: `await chrome.close()`, or Playwright's
+  `browser.close()`, in a `finally`, and no signal after it. A killed Chrome leaves a
+  1.4 GB clone of itself under `/private/var/folders` until the Mac restarts; after
+  stopping a run part way, check for one. Why and how, shared with FOSS Earth:
+  [../foss-earth/docs/validation/chrome-code-sign-clones.md](../foss-earth/docs/validation/chrome-code-sign-clones.md).
 
 ## Checks
 
