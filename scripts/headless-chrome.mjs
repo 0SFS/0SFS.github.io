@@ -64,7 +64,12 @@ export async function openHeadlessChrome(profileDirectory, explicitBinary = proc
     onEvent(listener) { listeners.add(listener); return () => listeners.delete(listener); },
     async close() {
       if (closed) return;
+      const exited = new Promise(resolve => child.once("exit", resolve));
       try { await send("Browser.close"); } catch { /* Chrome may close its pipe first. */ }
+      // Chrome deletes its code-sign clone under /var/folders as it shuts down; a signal now would strand it.
+      let timer;
+      await Promise.race([exited, new Promise(resolve => { timer = setTimeout(resolve, 10000); })]);
+      clearTimeout(timer);
       if (!closed) child.kill();
     },
   };
