@@ -41,11 +41,12 @@ A WASM rebuild is a full Emscripten compile and does not reproduce the same hash
 | `verify` | 1.8 GB | Snapshot trees from a 2026-09-24 commit verification. | Finished. |
 | `attitude-indicator`, `phone-layout` | 95 MB | Contact sheets and dated screenshots. | Finished, except the latest of each. |
 
-## FOSS Earth (`/Users/felg/gh/foss-earth/build`, 265 MB)
+## FOSS Earth (`/Users/felg/gh/foss-earth/build`, 23 GB on 2026-10-02)
 
 | Folder | Size | For | Could go when |
 | --- | --- | --- | --- |
 | `map-detail` | 150 MB | The map detail investigation and release runs. The specification links `validation/evidence/map-detail/`, which was never assembled from `final2-binding` and `final2-sweep`. | The evidence is assembled. |
 | `benchmarks` | 63 MB | `raster-repro`, the reproduction of the raster bounds defect in `docs/performance-pass.md`, and the map detail binding runs. | The user says so. |
 | `benchmarks/spherical-image-representation` | 670 MB (2026-10-02) | Scratch of the [spherical image representation benchmark](../../foss-earth/benchmarks/spherical-image-representation/README.md), whose results are tracked. `gpu` (614 MB) is nine runs' Chrome profiles, bundles and prepared textures. `logs` has the log of every run and the kernel's memory events from the evening the machine swapped; `previous-timing` has the first timing results, which a re-run replaced; `gpu-diagnostic` and `memory-probe` have the runs behind the report's caveats on the processor's idle state and on memory. | `gpu`, `workers`, `smoke`, `plot-png` and `codec-probe` hold nothing the report cites. The other four are the only record behind its caveats. |
+| `benchmarks/eac-progressive-prototype` | 15 GB (2026-10-02) | Scratch of the [progressive 360° prototype](../../foss-earth/benchmarks/eac-progressive-prototype/README.md), whose results are tracked. `http/2026-10-02_192534` (90 MB) is the raw output of the 186 browser runs that `results/http.*` were rebuilt from: the only copy. `logs` has every run's log; `http-browser-runs.log` is the record of which rounds the quiet guard kept as disturbed. `http/2026-10-02_203134` (8.1 GB) and `gpu-checks` (6.1 GB) are read-back frames. `dataset*` (400 MB) are generated tiles that `build-dataset.mjs` remakes in minutes; `package` is the phone package. | `http/2026-10-02_203134`, `gpu-checks`, the other `http/` folders, `screens`, `package-check` and `tls` hold nothing the report cites. Keep `http/2026-10-02_192534` and `logs`. |
 | `tools` | 13 MB | Playwright. | Kept. |
