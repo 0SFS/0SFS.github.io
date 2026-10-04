@@ -41,7 +41,7 @@ A WASM rebuild is a full Emscripten compile and does not reproduce the same hash
 | `verify` | 1.8 GB | Snapshot trees from a 2026-09-24 commit verification. | Finished. |
 | `attitude-indicator`, `phone-layout` | 95 MB | Contact sheets and dated screenshots. | Finished, except the latest of each. |
 
-## FOSS Earth (`/Users/felg/gh/foss-earth/build`, 26 GB on 2026-10-03)
+## FOSS Earth (`/Users/felg/gh/foss-earth/build`, 27 GB on 2026-10-03)
 
 | Folder | Size | For | Could go when |
 | --- | --- | --- | --- |
@@ -57,4 +57,6 @@ A WASM rebuild is a full Emscripten compile and does not reproduce the same hash
 | `validation/preview-sheet` | 141 MB (2026-10-03) | Runs of [`preview-sheet.mjs`](../../foss-earth/scripts/validation/preview-sheet.mjs): an orb from a preview sheet against the orb from its files, on three renderers. `2026-10-03_165856` is the run on the final build. | The profiles now. |
 | `bug-checks` | 262 MB (2026-10-03) | `north-button.mjs` and its run, the measurement in FOSS Earth's `bugs/north-button-in-panorama.md`. `sheet-ab.mjs` and its runs are the scratch that became `preview-sheet.mjs`; the first three compared the ground compass, not the orb, and mean nothing. | `sheet-ab*` now. Keep the north button's run until the bug is fixed. |
 | `sheet-cli-check` | 2 MB (2026-10-03) | A copy of an example scene that `build-preview-sheets.mjs` was tried on. | Now. |
+| `validation/app-files` | 61 MB (2026-10-03) | Runs of [`app-files.mjs`](../../foss-earth/scripts/validation/app-files.mjs), whether the app's own files are downloaded once: each a Chrome profile, `report.json` and `summary.md`, one with a build of the app. `2026-10-03_203150` (the tour's build) and `2026-10-03_203216` (FOSS Earth's) are the ones FOSS Earth's `docs/app-files.md` reports. | Once a later run replaces them. |
+| `app-files-check` | 238 MB (2026-10-03) | `sw-check.mjs` and `sw-check-page-level.mjs`, the scratch that became `app-files.mjs`, with their runs: the first showed the worker's navigation preload failing under interception, the second that per-page interception leaves the worker unregistered. A copy of the TODO staged for a commit. | Now. |
 | `tools` | 13 MB | Playwright. | Kept. |
