@@ -6,6 +6,25 @@ planned work, and the only copies of runs that the docs cite. Nothing is deleted
 from it without the user agreeing to each folder. This page says what the large
 folders are for and what would have to be true before each could go.
 
+Several sessions update this page at once, and one's rows often sit uncommitted in the
+working tree while another commits. To commit only your own rows, write the page as `HEAD` has
+it with your rows to a copy, such as `build/build-scratch.staged.md`, and commit the copy
+through an index of its own, so that neither the other session's rows nor what it has staged
+go in:
+
+```sh
+export GIT_INDEX_FILE="$PWD/build/commit-index.tmp"
+git read-tree HEAD
+git update-index --cacheinfo 100644,"$(git hash-object -w build/build-scratch.staged.md)",docs/build-scratch.md
+git update-ref refs/heads/main "$(git commit-tree "$(git write-tree)" -p HEAD -m "…")" HEAD
+unset GIT_INDEX_FILE
+git update-index --cacheinfo 100644,"$(git rev-parse HEAD:docs/build-scratch.md)",docs/build-scratch.md
+```
+
+The last line matters: the usual index still holds the page as it was before, so the other
+session's next commit would take your rows out again without a word. Apply the same rows to
+the working copy as well, beside theirs.
+
 Sizes as of 2026-09-25.
 
 ## JSBSim (`/Users/felg/gh/Felipegalind0/jsbsim/build`, 18 GB)
