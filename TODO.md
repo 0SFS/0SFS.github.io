@@ -69,6 +69,114 @@ under the floating origin. When it happens, the Debug tab logs
 `Ignoring a surface sample …` with the mesh id, revision and tile quality to
 chase it with.
 
+## collision
+
+**The collision overlay shows the C172's geometry on every aircraft.**
+Debug → Collision geometry always draws `BODY_COLLISION_PROBES` and
+`C172_GROUND_CONTACTS`, whatever aircraft is loaded
+(`src/flight/diagnostics/createCollisionDebugOverlay.ts`). The jet's physics
+sweeps `SF50_BODY_COLLISION_PROBES` instead (`bodyProbes` in
+`createFlightSimApp.ts`), and the jet stands on its own package's three gear
+contacts. The panel's legend counts are hard-coded. Its hint, "Shows the current
+C172 physics geometry, including when a different visual aircraft is selected",
+stopped being true when the jet got probes of its own. To fix:
+
+- Hand the overlay the same probe array the physics gets.
+- Read the ground contacts from the loaded package instead of a constant. The
+  test that checks `C172_GROUND_CONTACTS` against `c172p.xml` shows the way.
+- Count the legend from the data.
+- Add a test that fails if the overlay and the physics ever read different
+  arrays.
+
+Do this first: it is how the generator below gets looked at.
+
+**Collision geometry is written by hand for each aircraft.** The jet's six body
+points were read off a three-view, and every other airframe gets five generic
+ones. Nothing checks either list against the mesh. The jet's points are fixed
+offsets from its empty CG, so they shift against the airframe as fuel moves
+the CG. Every aircraft added means another list.
+
+Plan: generate the points from the aircraft's mesh within a budget, as one file
+that both the physics and the overlay read.
+[docs/proposals/generated-collision-geometry.md](docs/proposals/generated-collision-geometry.md).
+The C172 is out of scope until the jet's is done; then it is a matter of
+running the script.
+
+**The Vision Jet has no structure contacts.** Its packages (`sf50`, `sf50-g2`,
+`sf50-g3`) declare only the three gear contacts. The C172's also declares a nose
+skid, a tail skid and both wing tips. A jet whose wing tip or tail touches the
+runway never reaches JSBSim's ground reactions. Only the swept body points see
+it, and they answer with a rewind and a bounce, not a contact force with
+friction. The proposal above generates these contacts from the mesh, and is
+where to decide whether the packages take them.
+
+## debug views
+
+The rule for all of these comes from the collision overlay: a debug view draws
+the numbers the simulation used this step, read from the same place. It never
+draws a copy kept for drawing. Arrows, markers, labels and strip charts drawn
+over the scene belong to FOSS Earth (its TODO.md, "Debug drawing"). The
+flight's own views are listed here.
+
+**An aero forces overlay, like KSP's.** Draw these as arrows:
+
+- lift, drag and side force at the aerodynamic reference point (`AERORP`);
+- thrust at each engine;
+- weight at the CG;
+- the net force;
+- the three moments, as arcs.
+
+Their scale is a setting in newtons per metre of arrow. Read the forces from
+JSBSim's wind-axis forces (`forces/fwx-aero-lbs` and its siblings) and from
+`propulsion/engine[i]/thrust-lbs`.
+
+JSBSim has no parts, so KSP's arrow on each part would be invented here. The
+honest split is per term. The SF50 package names 24 aerodynamic terms under
+`aero/coefficient/*`, among them `CLalpha`, `CLflap`, `CD0`, `CDi` and
+`CDgear`. A table beside the arrows gives each term's share this step. Where the
+model has a term per surface, as the jet does for each ruddervator, that term
+can be drawn at the surface.
+
+**A JSBSim property browser.** It would let you:
+
+- search the property tree and see live values;
+- pin properties to a watch list and plot the pinned ones as strip charts;
+- set a value. The change is marked as a change to the simulation, with the old
+  value kept so it can be put back.
+
+FlightGear has one. Nothing in 0SFS shows a property that no panel already
+shows. The property source belongs here; the strip chart belongs to FOSS Earth.
+
+**Time controls.** Pause, step one physics step (1/120 s), and slow motion at a
+rate the user sets on a continuous control. Add a rewind of a few seconds, using
+a ring of the snapshots `captureSimulation` takes (`safeFlightState.ts`);
+nothing keeps a history of them today. Watching a touchdown or a collision at a
+tenth of the speed is how the overlays become readable.
+
+**Control surface labels.** Label each surface with its commanded and actual
+deflection, with an arrow showing which way it should move. This closes
+"Control surface deflection directions are unverified in flight" above, because
+a wrong `sign` would show at once.
+
+**Contact and collision events.** These views would show:
+
+- at each gear contact, the force JSBSim applies (normal and friction), the
+  compression and weight on wheels;
+- at each body hit, the point, the normal, and the velocity before and after,
+  left in the world for a while;
+- the segment each body point swept this step;
+- the surface samples terrain contact used, with `Ignoring a surface sample`
+  events as markers where they happened. This feeds the ground fault under
+  "map".
+
+**Smaller ones:**
+
+- the velocity vector, the relative wind with alpha and beta arcs, and the wind;
+- a trail of the flight path, coloured by speed or load factor;
+- mass and balance: the CG on its envelope, and the fuel in each tank;
+- an opacity setting for the aircraft, so markers inside it read clearly;
+- autopilot targets against actual values, with each controller's terms.
+
 ## aircraft
 
 **Create SR20 and SR22 aircraft models.** Add dedicated SR20 and SR22 aircraft
