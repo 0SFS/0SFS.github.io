@@ -524,7 +524,7 @@ OSFS_EXPORT int osfs_audio_get_shed(void) { return gShed; }
 
 OSFS_EXPORT void osfs_audio_set_gains(double master, double engine, double tire,
                                       double airframe, double reducedRange) {
-  gMasterGain = clamp01(sanitize(master));
+  gMasterGain = clamp(sanitize(master), 0.0, 8.0);
   gEngineGain = clamp(sanitize(engine), 0.0, 8.0);
   gTireGain = clamp01(sanitize(tire));
   gAirframeGain = clamp01(sanitize(airframe));
