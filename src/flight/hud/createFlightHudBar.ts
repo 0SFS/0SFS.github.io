@@ -2,7 +2,7 @@ import type { HudInputMode, InputSensitivitySettings } from "foss-earth/input";
 import "foss-earth/shell.css";
 import "foss-earth/input-mode.css";
 
-import { attachRendererActivity, createInputModeHud, createHudBar, createMapSourceHud, canRequestFullscreen, getRendererLabel, isFullscreen, onFullscreenChange, toggleFullscreen, type HudBarHandle, type MapDetailController, type RenderActivitySource, type TileStreamingSource, type MapDownloadSource } from "foss-earth/shell";
+import { attachFullscreenButton, attachRendererActivity, createInputModeHud, createHudBar, createMapSourceHud, getRendererLabel, type HudBarHandle, type MapDetailController, type RenderActivitySource, type TileStreamingSource, type MapDownloadSource } from "foss-earth/shell";
 import type { BabylonRuntimeStatus, RendererMode } from "foss-earth/runtime";
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
 
@@ -103,23 +103,12 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
 
   const fullscreenButton = hudBar.getElement<HTMLButtonElement>("flightFullscreenButton");
   const logButton = hudBar.getElement<HTMLButtonElement>("flightLogButton");
-  const syncFullscreenButton = (): void => {
-    if (!fullscreenButton) return;
-    const on = isFullscreen();
-    fullscreenButton.title = on ? "Leave fullscreen" : "Enter fullscreen";
-    fullscreenButton.setAttribute("aria-label", fullscreenButton.title);
-    fullscreenButton.setAttribute("aria-pressed", String(on));
-  };
-  const onFullscreenClick = (): void => { void toggleFullscreen().catch(() => {}); };
+  const detachFullscreen = fullscreenButton ? attachFullscreenButton(fullscreenButton) : () => {};
   const onLogClick = (): void => { logButton?.setAttribute("aria-pressed", String(options.onLogToggle?.() ?? false)); };
-  if (fullscreenButton) fullscreenButton.hidden = !canRequestFullscreen();
   if (logButton) {
     logButton.hidden = !options.onLogToggle;
     logButton.setAttribute("aria-pressed", "false");
   }
-  syncFullscreenButton();
-  const detachFullscreen = onFullscreenChange(syncFullscreenButton);
-  fullscreenButton?.addEventListener("click", onFullscreenClick);
   logButton?.addEventListener("click", onLogClick);
 
   pauseButton.addEventListener("click", onPauseClick);
@@ -139,7 +128,6 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
       statusElement.textContent = `${Math.abs(state.latDeg).toFixed(4)}°${state.latDeg >= 0 ? "N" : "S"} ${Math.abs(state.lonDeg).toFixed(4)}°${state.lonDeg >= 0 ? "E" : "W"} h${heading}°`;
     },
     destroy(): void {
-      fullscreenButton?.removeEventListener("click", onFullscreenClick);
       logButton?.removeEventListener("click", onLogClick);
       detachFullscreen();
       pauseButton.removeEventListener("click", onPauseClick);
