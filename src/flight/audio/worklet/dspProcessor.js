@@ -10,7 +10,7 @@
 // WebAssembly.Module arrives by postMessage and is instantiated synchronously.
 
 /** Kept in sync with ../audioSnapshot.ts by audioSnapshot.test.ts. */
-const SNAPSHOT_SIZE = 29;
+const SNAPSHOT_SIZE = 30;
 const EVENT_SIZE = 4;
 const EVENT_CAPACITY = 32;
 const BATCH_SNAPSHOTS = 8;
@@ -42,6 +42,7 @@ class OsfsDspProcessor extends AudioWorkletProcessor {
     this.pendingGains = null;
     this.pendingTier = null;
     this.pendingLimits = null;
+    this.pendingProfile = null;
     this.silentBlocks = 0;
 
     this.port.onmessage = (event) => this.onMessage(event);
@@ -71,12 +72,14 @@ class OsfsDspProcessor extends AudioWorkletProcessor {
       // already has it; a port message can land after rendering has begun.
       const initial = settings.initial || null;
       if (initial) {
+        if (initial.profile) this.applyProfile(initial.profile);
         if (initial.gains) this.applyGains(initial.gains);
         if (initial.limits) this.applyLimits(initial.limits);
         if (typeof initial.tier === "number") this.exports.osfs_audio_set_tier(initial.tier);
         if (typeof initial.tireWatts === "number") this.exports.osfs_audio_set_tire(initial.tireWatts);
       }
       if (this.pendingGains) this.applyGains(this.pendingGains);
+      if (this.pendingProfile) this.applyProfile(this.pendingProfile);
       if (this.pendingLimits) this.applyLimits(this.pendingLimits);
       if (this.pendingTier !== null) this.exports.osfs_audio_set_tier(this.pendingTier);
       this.ready = true;
@@ -115,6 +118,14 @@ class OsfsDspProcessor extends AudioWorkletProcessor {
     this.exports.osfs_audio_set_gains(gains.master, gains.engine, gains.tire, airframe, gains.reducedRange);
   }
 
+  /** Setup only: fixed size, no allocation or memory growth in the DSP. */
+  applyProfile(values) {
+    const size = this.exports.osfs_audio_profile_size();
+    if (!Array.isArray(values) || values.length !== size) throw new Error("Acoustic profile ABI mismatch");
+    new Float64Array(this.exports.memory.buffer, this.exports.osfs_audio_profile_ptr(), size).set(values);
+    if (!this.exports.osfs_audio_commit_profile()) throw new Error("Invalid acoustic profile");
+  }
+
   /** The pilot's limits for each tier, by tier index (osfs.sound.<tier>.*). */
   applyLimits(limits) {
     for (const entry of limits) {
@@ -132,6 +143,9 @@ class OsfsDspProcessor extends AudioWorkletProcessor {
         return;
       case "gains":
         if (this.exports) this.applyGains(message); else this.pendingGains = message;
+        return;
+      case "profile":
+        if (this.exports) this.applyProfile(message.values); else this.pendingProfile = message.values;
         return;
       case "tier":
         if (this.exports) this.exports.osfs_audio_set_tier(message.tier);

@@ -7,7 +7,7 @@
  * mantissa, and one uniform element type keeps the transport a single copy.
  */
 
-export const AUDIO_SNAPSHOT_VERSION = 1;
+export const AUDIO_SNAPSHOT_VERSION = 2;
 
 /**
  * Slot order. Renaming, reordering or inserting a field is a breaking ABI
@@ -29,7 +29,9 @@ export const AUDIO_SNAPSHOT_FIELDS = [
 
   "n1Pct",
   "n2Pct",
+  /** Native main-engine thrust, lbf. The core profile owns normalization. */
   "thrustLbf",
+  /** Native main-engine fuel flow, lbm/s. */
   "fuelFlowPps",
   "throttleNorm",
   /** 1 when the adapter trusts that fuel is burning, else 0. Not `set-running`. */
@@ -51,6 +53,8 @@ export const AUDIO_SNAPSHOT_FIELDS = [
   "exterior",
   /** Ground-image reflection path difference in metres; <0 means unavailable. */
   "groundReflectionM",
+  /** Native turbine augmentation observer, 0/1; unavailable if its bit is clear. */
+  "augmentation",
 ] as const;
 
 export type AudioSnapshotField = typeof AUDIO_SNAPSHOT_FIELDS[number];
@@ -73,6 +77,7 @@ export const AVAILABILITY = Object.freeze({
   AIRSPEED: 1 << 7,
   CONFIG: 1 << 8,
   POSE: 1 << 9,
+  AUGMENTATION: 1 << 10,
 });
 
 /**
@@ -141,6 +146,7 @@ export interface AudioSnapshotInit {
   soundSpeedMps?: number;
   exterior?: number;
   groundReflectionM?: number;
+  augmentation?: boolean;
 }
 
 /** Non-finite input is refused rather than written: a NaN target de-tunes the core. */
@@ -182,6 +188,7 @@ export function writeAudioSnapshot(target: Float64Array, offset: number, init: A
   target[offset + s.soundSpeedMps] = finite(init.soundSpeedMps, 343);
   target[offset + s.exterior] = finite(init.exterior, 0);
   target[offset + s.groundReflectionM] = finite(init.groundReflectionM, -1);
+  target[offset + s.augmentation] = init.augmentation ? 1 : 0;
 }
 
 export function readAudioSnapshotField(

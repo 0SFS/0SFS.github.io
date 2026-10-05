@@ -147,6 +147,8 @@ Smoother gSpatial, gPan, gColourHz, gCombustion, gRangeFade;
 double gDelaySamples = 0.0;
 bool gDelaySeeded = false;
 Smoother gN1, gN2, gThrust, gFuel, gKias, gGear, gFlap, gExterior;
+Smoother gAugmentation;
+AcousticProfile gProfileSetup;
 
 double gTireWatts = 0.0;
 double gFade = 0.0;
@@ -275,7 +277,7 @@ void resetVoices() {
   gPartIndex = 0;
   for (int i = 0; i < kPartition; ++i) { gWetIn[i] = 0.0; gWetOut[i] = 0.0; }
   Smoother* smoothers[] = {&gN1, &gN2, &gThrust, &gFuel, &gKias, &gGear,
-                           &gFlap, &gExterior, &gCombustion, &gSpatial, &gPan};
+                           &gFlap, &gExterior, &gCombustion, &gSpatial, &gPan, &gAugmentation};
   for (Smoother* s : smoothers) s->reset(0.0);
   gColourHz.reset(1200.0);
   gRangeFade.reset(1.0);
@@ -414,6 +416,7 @@ bool interpolateAt(double frame, double* out) {
   out[kRunning] = a.values[kRunning];
   out[kStarter] = a.values[kStarter];
   out[kCutoff] = a.values[kCutoff];
+  out[kAugmentation] = a.values[kAugmentation];
   return true;
 }
 
@@ -441,7 +444,7 @@ OSFS_EXPORT int osfs_audio_init(double sampleRate, int maxBlockFrames, unsigned 
   gConvolver.configure(gIrSpectra, gIrFdl, gIrScratch);
   for (Smoother* s : {&gN1, &gN2, &gThrust, &gFuel, &gKias, &gGear, &gFlap,
                       &gExterior, &gCombustion, &gSpatial, &gPan, &gColourHz,
-                      &gRangeFade}) {
+                      &gRangeFade, &gAugmentation}) {
     s->configure(sampleRate, kSmoothTau);
   }
   gIrSeconds = -1.0;
@@ -462,6 +465,13 @@ OSFS_EXPORT void osfs_audio_reset(void) {
   gResyncRequested = false;
   gFade = 0.0;
   beginFade(1.0, kTransitionFadeSeconds);
+}
+
+/** Fixed-size setup transaction, separate from raw physical snapshots. */
+OSFS_EXPORT double* osfs_audio_profile_ptr(void) { return gProfileSetup.values; }
+OSFS_EXPORT int osfs_audio_profile_size(void) { return kProfileSize; }
+OSFS_EXPORT int osfs_audio_commit_profile(void) {
+  return gEngine.setProfile(gProfileSetup.values) ? 1 : 0;
 }
 
 OSFS_EXPORT void osfs_audio_set_tier(int tier) {
@@ -684,9 +694,12 @@ OSFS_EXPORT void osfs_audio_process(double blockStartFrame, int frames) {
     in.n1 = gN1.process((availability & kAvailN1) ? clamp01(interpolated[kN1Pct] / 100.0) : 0.0);
     in.n2 = gN2.process((availability & kAvailN2) ? clamp01(interpolated[kN2Pct] / 100.0) : 0.0);
     in.thrustNorm = gThrust.process(
-        (availability & kAvailThrust) ? clamp01(interpolated[kThrustLbf] / 1846.0) : 0.0);
+        (availability & kAvailThrust) ? clamp(interpolated[kThrustLbf] / gEngine.thrustReference(),
+            0.0, gEngine.thrustCeiling()) : 0.0);
     in.fuelNorm = gFuel.process(
-        (availability & kAvailFuelFlow) ? clamp01(interpolated[kFuelFlowPps] / 0.25) : 0.0);
+        (availability & kAvailFuelFlow) ? clamp01(interpolated[kFuelFlowPps] / gEngine.fuelReference()) : 0.0);
+    in.augmentation = gAugmentation.process(
+        (availability & kAvailAugmentation) ? clamp01(interpolated[kAugmentation]) : 0.0);
     in.kias = gKias.process((availability & kAvailAirspeed) ? std::fmax(0.0, interpolated[kKias]) : 0.0);
     in.gear = gGear.process((availability & kAvailConfig) ? clamp01(interpolated[kGearNorm]) : 0.0);
     in.flap = gFlap.process((availability & kAvailConfig) ? clamp01(interpolated[kFlapNorm]) : 0.0);

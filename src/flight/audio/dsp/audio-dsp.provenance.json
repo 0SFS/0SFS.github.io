@@ -23,12 +23,16 @@
   },
   "sources": [
     {
+      "file": "acoustic_profile.h",
+      "sha256": "97ab350833b94d939a023529089f688c602038ea2d46f2aca0cb160a3ec525d8"
+    },
+    {
       "file": "convolver.h",
       "sha256": "5565dd79ad94832a24693171c04fb3aaafa8402afd967406c60e1f232e382dba"
     },
     {
       "file": "core.cpp",
-      "sha256": "806451f709e0170d1ba87749ff1d005a16a9e80aee7ae45c78cc29d26ed4aec8"
+      "sha256": "39ddfc6d2ef1bd570d182da49c95f14d57ed1271c3e145f9600ee20f21375b57"
     },
     {
       "file": "granular.h",
@@ -40,16 +44,16 @@
     },
     {
       "file": "snapshot.h",
-      "sha256": "a744b56e4ec5dd951c41f9db502e70e56f7bfca6e2751cb182164c2041b21774"
+      "sha256": "181bcd199b2aefceac83fe4dd29e35b523b9db281558835130ae5740b6437cf3"
     },
     {
       "file": "turbofan.h",
-      "sha256": "8cf0e801fef3f76470619291e72e767f391eab7069f5a3521c2e6d43d76d69da"
+      "sha256": "67ce211744fa18281912bf84f964f37f6ff9b0ffdc49cafb497b63c47f09eabe"
     }
   ],
   "wasm": {
-    "bytes": 43478,
-    "sha256": "9cfbc9ce8e02690c63cccbd68d13978a53d48af99ec7bc7fbd3218f473d43924"
+    "bytes": 47680,
+    "sha256": "e6816679136929aafc41d638f29d82dd0794437f52d7bc3535d84fbb70b1a259"
   },
   "imports": [
     "env.emscripten_notify_memory_growth"
@@ -66,11 +70,14 @@
     "osfs_audio_batch_length",
     "osfs_audio_batch_ptr",
     "osfs_audio_commit_batch",
+    "osfs_audio_commit_profile",
     "osfs_audio_get_shed",
     "osfs_audio_get_tier",
     "osfs_audio_init",
     "osfs_audio_out",
     "osfs_audio_process",
+    "osfs_audio_profile_ptr",
+    "osfs_audio_profile_size",
     "osfs_audio_reset",
     "osfs_audio_set_epoch",
     "osfs_audio_set_gains",
@@ -82,5 +89,5 @@
     "osfs_audio_stats",
     "osfs_audio_stats_count"
   ],
-  "builtUtc": "2026-09-26T04:11:01.036Z"
+  "builtUtc": "2026-10-05T20:26:40.819Z"
 }

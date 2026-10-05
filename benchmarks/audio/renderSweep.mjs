@@ -88,6 +88,7 @@ export function readAbi(header = readFileSync(HEADER_PATH, "utf8")) {
   };
   const abi = {
     slot: Object.fromEntries(fields.map((name, index) => [name, index])),
+    version: constant("kSnapshotVersion"),
     snapshotSize: fields.length,
     allAvailability: availability,
     events,
@@ -113,12 +114,13 @@ function writeSnapshot(abi, view, offset, row, epoch) {
   const exterior = row.view === "exterior";
   const source = exterior ? row.sourceMetres : COCKPIT_SOURCE;
   const velocity = exterior ? row.sourceVelocityMps : [0, 0, 0];
-  put("version", 1); put("sequence", row.sequence); put("epoch", epoch); put("simTimeS", row.time);
+  put("version", abi.version); put("sequence", row.sequence); put("epoch", epoch); put("simTimeS", row.time);
   put("availability", abi.allAvailability);
   put("n1Pct", row.n1); put("n2Pct", row.n2); put("thrustLbf", row.thrustLbf);
   put("fuelFlowPps", row.fuelLbPerSec); put("throttleNorm", row.throttle);
   put("combustion", +row.combustion); put("running", +row.running);
   put("starter", +row.starter); put("cutoff", +row.cutoff);
+  if (abi.slot.augmentation !== undefined) put("augmentation", 0);
   put("kias", row.kias); put("gearNorm", row.gear); put("flapNorm", row.flap);
   put("sourceX", source[0]); put("sourceY", source[1]); put("sourceZ", source[2]);
   put("sourceVelX", velocity[0]); put("sourceVelY", velocity[1]); put("sourceVelZ", velocity[2]);

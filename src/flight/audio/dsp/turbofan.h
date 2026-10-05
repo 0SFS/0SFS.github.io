@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (C) 2026 the 0sfs authors.
 //
-// Original turbofan-lite source model for the Williams FJ33-5A installation.
+// Shared procedural engine voice; FJ33 reference setup is the exact default.
 //
 // EVIDENCE STATUS: every frequency and gain below is the *initial synthetic
 // reference* from sound.md §3, not an FJ33 measurement. `2500 x n1` is not a
@@ -11,6 +11,7 @@
 #pragma once
 
 #include "primitives.h"
+#include "acoustic_profile.h"
 
 namespace osfs_audio {
 
@@ -18,8 +19,9 @@ namespace osfs_audio {
 struct EngineInput {
   double n1 = 0.0;          // 0..1
   double n2 = 0.0;          // 0..1
-  double thrustNorm = 0.0;  // thrust / 1846 lbf, 0..1
-  double fuelNorm = 0.0;    // clamp01(lbm/s / 0.25)
+  double thrustNorm = 0.0;  // native thrust / profile dry thrust (up to 2 with AB)
+  double fuelNorm = 0.0;    // clamp01(native lbm/s / profile fuel reference)
+  double augmentation = 0.0; // smoothed native active/inactive observer, never throttle
   double combustion = 0.0;  // 0..1, crossfaded at light-off/flameout
   double kias = 0.0;
   double gear = 0.0;
@@ -86,10 +88,18 @@ class TurbofanVoice {
     windShape_.reset();
     turbulence_.reset();
     jetFrequency_.configure(sampleRate_, 0.020);
-    jetFrequency_.reset(800.0);
+    jetFrequency_.reset(profile_.at(kProfileJetBaseHz));
   }
 
   void setCaps(const EngineCaps& caps) { caps_ = caps; }
+  bool setProfile(const double* values) {
+    if (!profile_.set(values)) return false;
+    reset();
+    return true;
+  }
+  double thrustReference() const { return profile_.at(kProfileThrustReferenceLbf); }
+  double fuelReference() const { return profile_.at(kProfileFuelReferencePps); }
+  double thrustCeiling() const { return profile_.at(kProfileAfterburnerJetGain) > 0.0 ? 2.0 : 1.0; }
 
   /**
    * Generates at unshifted frequencies. Doppler is applied downstream by the
@@ -102,8 +112,8 @@ class TurbofanVoice {
   double process(const EngineInput& in, double cullScale, double* airframeOut) {
     const double n1 = clamp01(in.n1);
     const double n2 = clamp01(in.n2);
-    // u from sound.md: 0 at model idle N1 24.3%, 1 at 100%.
-    const double u = clamp01((n1 * 100.0 - 24.3) / 75.7);
+    const double u = clamp01((n1 * 100.0 - profile_.at(kProfileIdleN1Pct))
+                             / profile_.at(kProfileIdleN1SpanPct));
 
     // The bypass weight balances FAN/BYPASS content against CORE content, which
     // is what a bypass ratio describes. Weighting tones against noise instead
@@ -118,7 +128,8 @@ class TurbofanVoice {
       const double shaft = p.shaft == 0 ? n1 : n2;
       if (shaft <= 1e-4) continue;
       // Initial synthetic references, NOT measured blade-pass frequencies.
-      const double reference = p.shaft == 0 ? 2500.0 * shaft : 6000.0 * shaft;
+      const double reference = (p.shaft == 0 ? profile_.at(kProfileN1ReferenceHz)
+                                            : profile_.at(kProfileN2ReferenceHz)) * shaft;
       const double frequency = reference * p.order;
       const double shaftGain = p.shaft == 0 ? (0.15 + 0.85 * u * u) : (n2 * n2);
       const double value =
@@ -127,8 +138,8 @@ class TurbofanVoice {
     }
     // Normalising by the fundamental pair keeps the tonal bed at a comparable
     // level across tiers, so shedding partials changes timbre, not loudness.
-    fanTones *= 0.30;
-    coreTones *= 0.30;
+    fanTones *= profile_.at(kProfileFanToneGain);
+    coreTones *= profile_.at(kProfileCoreToneGain);
 
     // Physically separate sources get separate noise. One shared white stream
     // makes the bands coherent, so adding a band (the burner, say) could cancel
@@ -143,25 +154,45 @@ class TurbofanVoice {
     const double turbulenceWhite = rngTurbulence_.uniform();
 
     // Fan/bypass turbulence rises with fan speed; band follows the fundamental.
-    fanWake_.bandpass(sampleRate_, clamp(2500.0 * n1 * 0.8, 80.0, 16000.0), 0.7);
-    double fanNoise = fanWake_.process(fanWhite) * (0.10 + 0.55 * u) * (n1 > 1e-4 ? 1.0 : 0.0);
+    fanWake_.bandpass(sampleRate_, clamp(profile_.at(kProfileN1ReferenceHz) * n1 * 0.8, 80.0, 16000.0), 0.7);
+    double fanNoise = fanWake_.process(fanWhite)
+        * (profile_.at(kProfileFanNoiseBaseGain) + profile_.at(kProfileFanNoisePowerGain) * u)
+        * (n1 > 1e-4 ? 1.0 : 0.0);
 
     if (caps_.bypassBand) {
-      bypass_.bandpass(sampleRate_, clamp(900.0 + 1800.0 * u, 120.0, 16000.0), 0.5);
-      fanNoise += bypass_.process(bypassWhite) * 0.28 * u;
+      bypass_.bandpass(sampleRate_, clamp(profile_.at(kProfileBypassCenterHz)
+          + profile_.at(kProfileBypassPowerHz) * u, 120.0, 16000.0), 0.5);
+      fanNoise += bypass_.process(bypassWhite) * profile_.at(kProfileBypassGain) * u;
     }
 
     // Jet mixing: amplitude t^1.5, low-pass 800 + 5200t. Thrust is a proxy.
     const double t = clamp01(in.thrustNorm);
-    jet_.lowpass(sampleRate_, jetFrequency_.process(800.0 + 5200.0 * t), 0.6);
-    double coreNoise = jet_.process(jetWhite) * 0.42 * std::pow(t, 1.5);
+    const double jetPower = std::pow(t, 1.5);
+    double jetHz = profile_.at(kProfileJetBaseHz) + profile_.at(kProfileJetPowerHz) * t;
+    double jetGain = profile_.at(kProfileJetGain) * jetPower;
+    // Augmentation morphs the SAME exhaust noise/filter. No extra voice, noise
+    // source or oscillator is created. The engine's native boolean permits
+    // this contribution; native above-dry thrust then supplies its headroom.
+    // Keep the legacy zero-augmentation arithmetic path exact.
+    const bool augmenting = in.augmentation > 0.0 && profile_.at(kProfileAfterburnerJetGain) > 0.0;
+    if (augmenting) {
+      const double a = clamp01(in.augmentation);
+      jetHz += (profile_.at(kProfileAfterburnerJetHz) - jetHz) * a;
+      jetGain += profile_.at(kProfileAfterburnerJetGain) * a
+          * (1.0 + std::fmax(0.0, in.thrustNorm - 1.0));
+    }
+    jet_.lowpass(sampleRate_, jetFrequency_.process(jetHz), 0.6);
+    const double jetSample = jet_.process(jetWhite);
+    double coreNoise = augmenting ? jetSample * jetGain
+        : jetSample * profile_.at(kProfileJetGain) * jetPower;
 
     // Combustor rumble, 40-400 Hz, only while fuel is actually burning.
     if (in.combustion > 1e-4 && in.fuelNorm > 1e-6) {
-      combustor_.bandpass(sampleRate_, 90.0, 0.35);
-      combustorShape_.lowpass(sampleRate_, 400.0, 0.7);
+      combustor_.bandpass(sampleRate_, profile_.at(kProfileCombustorHz), 0.35);
+      combustorShape_.lowpass(sampleRate_, profile_.at(kProfileCombustorHighHz), 0.7);
       const double rumble = combustorShape_.process(combustor_.process(combustorWhite));
-      coreNoise += rumble * 0.55 * std::sqrt(clamp01(in.fuelNorm)) * clamp01(in.combustion);
+      coreNoise += rumble * profile_.at(kProfileCombustorGain)
+          * std::sqrt(clamp01(in.fuelNorm)) * clamp01(in.combustion);
     }
 
     // Airframe wind and configuration turbulence sit OUTSIDE the engine split:
@@ -185,14 +216,15 @@ class TurbofanVoice {
 
     // Bypass ratio 3.3 -> 0.77 weight on the fan/bypass side. sound.md is
     // explicit that this split is artistic, not an acoustic energy ratio.
-    constexpr double kBypassWeight = 3.3 / (1.0 + 3.3);
+    const double kBypassWeight = profile_.at(kProfileFanMix);
     return sanitize(kBypassWeight * (fanTones + fanNoise)
-                    + (1.0 - kBypassWeight) * (coreTones + coreNoise)) * 0.9;
+                    + (1.0 - kBypassWeight) * (coreTones + coreNoise)) * profile_.at(kProfileOutputGain);
   }
 
  private:
   double sampleRate_ = 48000.0;
   EngineCaps caps_;
+  AcousticProfile profile_;
   Rng rngFan_, rngBypass_, rngJet_, rngCombustor_, rngWind_, rngTurbulence_;
   Oscillator oscillators_[kMaxPartials];
   Biquad fanWake_, bypass_, jet_, combustor_, combustorShape_, wind_, windShape_, turbulence_;
