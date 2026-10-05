@@ -1031,9 +1031,9 @@ only if the level above it is too expensive to run all the way out.
 Those sizes are targets, not walls. The right count is the one where the
 wireframe shows density only where a feature is; a level that is 30% over
 because its windows are round is a better level than one that hits a number
-with rectangles. The SF50 sits at 1514 / 856 / 442 — over the targets at the
-top and the bottom, spent on window shape, and the wireframe accounts for all
-of it.
+with rectangles. The SF50 sits at 1654 / 926 / 438 — over the targets at the
+top, spent on window shape and an engine that is open at both ends, and the
+wireframe accounts for all of it.
 
 **The glazing LAYOUT is a silhouette feature. Do not paint it on.** The far
 levels of both airframes started out replacing the window shapes with a plain

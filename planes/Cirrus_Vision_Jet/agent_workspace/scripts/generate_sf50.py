@@ -67,6 +67,23 @@ DIHEDRAL = math.radians(4.81)
 WING_INCIDENCE = 0.0                # not measurable from the three view
 WING_TC = 1.0                       # the section table already carries t/c
 
+# wing tip: a cap from TIP_ROOT out, read off the plan and front views. The
+# plan view draws its joint as a line at x = 5.51; outboard of it the leading
+# edge rounds back, 0.12 m by x = 5.71, 0.31 by 5.81 and 0.90 at the tip,
+# which is a quarter ellipse to within 3 cm, while the trailing edge runs
+# straight on to the tip. The front view draws its lower surface sweeping up
+# by 0.10 m over the cap and its end standing up 6 cm above the upper one.
+#
+# Every section keeps the chord plane level. The cap this replaces shortened
+# the section from BOTH ends and halved its thickness about the chord line,
+# so the loft from the last full section to it turned the surface about the
+# span: the tip read as twisted, and none of the three sources has a twist.
+TIP_ROOT = 5.50
+TIP_LE_BACK = 0.903                 # LE set back at the tip, straight LE = 0
+TIP_RISE = 0.15                     # chord plane raised at the tip: its
+                                    # end then stands 6 cm above the upper
+                                    # surface it continues, as drawn
+
 # V-tail: span from the published 14.7 ft, which the front view confirms and
 # the plan view does not - see measurements/sf50_reference.md
 VT_SEMI = 4.481 / 2.0               # 2.2405, PROJECTED semi-span
@@ -86,16 +103,45 @@ VT_ROOT_ETA = 0.0                   # the panels run to the centreline, deep
 RUDDERVATOR_HINGE = 0.70            # chord fraction
 RUDDERVATOR_SPAN = (0.10, 0.99)     # span fraction of the moving surface
 
-# engine: dorsal pod, on the centreline
+# engine: dorsal pod, on the centreline.
+#
+# Each station is the pod's own section, an ellipse; where its lower half
+# meets the crown it is carried down into the fuselage instead (see
+# build_nacelle). Read off the side and plan views with `profile_drawing.py
+# side runs` and `plan runs`, the photograph N50SF and the hd model agreeing:
+#
+# - The intake IS the front of the pod. The side view draws the lip as one
+#   line from z = 2.285 up to the rounded top at 2.62, and the plan view draws
+#   it 0.62 m across: 90% of the pod's widest section, not the 0.23 m slot an
+#   earlier reading took from the lower part of that line alone. Read that
+#   way, the front of the pod tapered into a nose with a hole in it.
+# - The aft end is the exhaust, not a closed tail: a vertical line from 1.94
+#   to 2.26 at Y = -7.12, 0.32 m across in plan, which is the round nozzle the
+#   photograph shows open and dark.
 NAC_STATIONS = [
     # (y, z_bottom, z_top, half_width)
-    (-4.86, 2.270, 2.500, 0.300),   # intake lip: a wide, shallow dorsal opening
-    (-5.02, 2.230, 2.665, 0.330),   # the cowl rises fast behind the lip
-    (-5.55, 2.140, 2.620, 0.343),
-    (-6.30, 2.010, 2.490, 0.310),
-    (-7.12, 1.930, 2.220, 0.130),   # aft end
+    (-4.86, 2.285, 2.625, 0.310),   # intake lip: nearly the full section
+    (-5.02, 2.235, 2.665, 0.332),   # the cowl swells just behind the lip
+    (-5.55, 2.170, 2.610, 0.345),   # widest
+    (-6.30, 2.030, 2.480, 0.305),
+    (-7.12, 1.940, 2.260, 0.160),   # exhaust nozzle exit, round
 ]
-INTAKE_INSET = 0.09                 # how far the dark bore sits inside the lip
+# The intake lip: the ring the dark duct starts from, as a fraction of the
+# outer lip, and how far behind the lip face it sits. The duct runs back to a
+# dark cone at the fan face, as deep as the hd model's, which is what reads as
+# a hole rather than a black disc stuck on the front.
+INTAKE_LIP = 0.86
+INTAKE_LIP_DEPTH = 0.03
+INTAKE_DEPTH = 0.40
+# The exhaust the same way, from the aft end forward: a nozzle wall, then the
+# dark tail pipe.
+NOZZLE_LIP = 0.84
+NOZZLE_LIP_DEPTH = 0.02
+NOZZLE_DEPTH = 0.35
+# How far below the fuselage skin a pod vertex is carried where the pod meets
+# the crown. Through, not onto: a vertex left on the surface leaves a hairline
+# wherever the faceted crown bulges above the chord between two of them.
+NAC_SINK = 0.03
 
 # The main gear bay is cut into the WING, between two spanwise stations added
 # for it, and it is one face row of the aerofoil deep. The leg comes down at
@@ -488,11 +534,15 @@ STATIONS = [
     (-7.00, 1.075, 1.470, 1.863, 0.394, 2.3, 2.5, 2),
     (-7.50, 1.170, 1.480, 1.845, 0.375, 2.2, 2.4, 0),
     # tail cone: the body pinches hard just ahead of the V-tail roots - 0.375 m
-    # of half-width becomes 0.175 in 35 cm - and stays a thin, deep blade to
-    # the tail. Missing that pinch left the plan view with a fat tail wedge.
+    # of half-width becomes 0.175 in 35 cm. Missing that pinch left the plan
+    # view with a fat tail wedge. Aft of it the cone is round, about 0.25 m
+    # across: the side view's lowest line from here back is the ventral fins
+    # (see VFIN_OUTLINE), not the cone, and the belly and side photographs show
+    # a round cone with the fins under it. The bottoms here put the fins' root
+    # line, where each leaves the cone, at the 1.47 the drawing draws it.
     (-7.85, 1.250, 1.450, 1.650, 0.175, 2.2, 2.3, 0),
-    (-8.40, 1.205, 1.400, 1.590, 0.120, 2.2, 2.2, 0),
-    (-9.00, 1.180, 1.400, 1.615, 0.095, 2.2, 2.2, 2),
+    (-8.40, 1.330, 1.465, 1.590, 0.120, 2.2, 2.2, 0),
+    (-9.00, 1.390, 1.500, 1.615, 0.095, 2.2, 2.2, 2),
     # the very end of the tail cone sweeps UP, not down: the drawing puts its
     # tip 0.2 m above where a straight taper would leave it
     (-9.357, 1.555, 1.610, 1.665, 0.016, 2.2, 2.2, 0),
@@ -719,28 +769,39 @@ RING_SPEC = {
 # cabin windows, not one painted band. A band was what the far level used to
 # carry, and it read as a jet with no windscreen at all.
 #
-# `trim` is the small stuff that is geometry rather than shape: the ventral
-# keel and the two main gear doors. They are 200 mm details, so the far level
-# does without them.
+# `trim` is the small stuff that is geometry rather than shape: the two main
+# gear doors and the two ventral fins under the tail cone. They are 200-400 mm
+# details, so the far level does without them.
+#
+# `nac_st` picks the pod's stations by index and `nac_ring` its points per
+# ring. The ring is 12, 8, 4 rather than 8, 6, 4: at 8 the faces of the near
+# level's pod met at 45 deg, the angle the smoothing stops at, so it was drawn
+# as a faceted box, and an intake is the one place a round thing has to look
+# round. `intake` is the lip, duct and tail pipe; the far level leaves both
+# ends of the pod open instead, which reads as an open intake and an open
+# exhaust for no triangles at all.
+#
+# `tip_st` is the rounded wing tip, from the tip cap's joint outboard. The far
+# level keeps a plain tip: 0.4 m of rounding is two pixels from 170 m.
 # ----------------------------------------------------------------------------
 LODP = {
     1: dict(ring=6, pane_detail='coarse', wheel=4,
-            wing_st=(0.0, SEMI),
+            wing_st=(0.0, SEMI), tip_st=(),
             vt_st=(VT_ROOT_ETA, 1.0), gear_n=3,
             ctrl=False, af='mid', nac_ring=4,
-            pillars=False, intake=False, nac_st=3,
+            pillars=False, intake=False, nac_st=(0, 2, 4),
             tip_cap=True, gear_cap=True, trim=False, bays=False),
     2: dict(ring=11, st_level=0, pane_detail='coarse', wheel=6,
-            wing_st=(0.0, 1.30, SEMI),
+            wing_st=(0.0, 1.30, TIP_ROOT), tip_st=(TIP_ROOT, SEMI),
             vt_st=(VT_ROOT_ETA, 1.0), gear_n=4,
-            ctrl=True, af='full', nac_ring=6,
-            pillars=True, intake=True, nac_st=4,
+            ctrl=True, af='full', nac_ring=8,
+            pillars=True, intake=True, nac_st=(0, 2, 3, 4),
             tip_cap=True, gear_cap=True, trim=True, bays=False),
     3: dict(ring=11, st_level=2, pane_detail='fine', wheel=8,
-            wing_st=(0.0, 1.30, 3.20, 5.60, SEMI),
+            wing_st=(0.0, 1.30, 3.20, TIP_ROOT), tip_st=(TIP_ROOT, 5.75, SEMI),
             vt_st=(VT_ROOT_ETA, 0.55, 1.0), gear_n=4,
-            ctrl=True, af='full', nac_ring=8,
-            pillars=True, intake=True, nac_st=5,
+            ctrl=True, af='full', nac_ring=12,
+            pillars=True, intake=True, nac_st=(0, 1, 2, 3, 4),
             tip_cap=True, gear_cap=True, trim=True, bays=True),
 }
 P = LODP[LOD]
@@ -783,16 +844,18 @@ def mat(name, rgba, rough=0.45, metal=0.0, alpha=1.0, spec=None):
 
 M_PAINT = mat("SF50_Paint", (0.905, 0.910, 0.915, 1.0), 0.32)
 M_GLASS = mat("SF50_Glass", (0.030, 0.045, 0.068, 1.0), 0.38, spec=0.12)
-M_DARK = mat("SF50_Dark", (0.085, 0.088, 0.095, 1.0), 0.55)   # intake bore, bays
+M_DARK = mat("SF50_Dark", (0.085, 0.088, 0.095, 1.0), 0.55)   # gear bays
 # Tyres make their own material - planes/shared/tyres.py. It is BLACKER than
 # the bays, because a tyre reads as rubber only if it is nearly black; the bay
 # grey is a shadowed cavity, which is a different thing.
 M_METAL = mat("SF50_Metal", (0.545, 0.555, 0.575, 1.0), 0.32, metal=0.85)
-# The windscreen's centre post. Not M_DARK, which is for tyres and the intake
-# bore: those are matte and deep inside the aircraft, so their specular level
-# never shows. The post sits on the crown facing the sky, and at M_DARK's
-# default specular it came back a light grey bar - lighter than the glass it
-# divides, which is the one thing it must not be. Low specular, like the glass.
+# The windscreen's centre post, and the engine's duct and tail pipe. Not
+# M_DARK, which is for the gear bays: those are matte and deep inside the
+# aircraft, so their specular level never shows. The post sits on the crown
+# facing the sky, and at M_DARK's default specular it came back a light grey
+# bar - lighter than the glass it divides, which is the one thing it must not
+# be; the open intake faces the light the same way. Low specular, like the
+# glass.
 M_POST = mat("SF50_Post", (0.020, 0.021, 0.024, 1.0), 0.62, spec=0.05)
 
 # Fuselage material slots. The skin carries three and the mesh carries one set
@@ -1690,10 +1753,12 @@ TAIL_AF = {'full': AF_TAIL, 'mid': AF6_TAIL}[P["af"]]
 
 # The three view draws no hinge lines, so these spans are conventional rather
 # than measured.  The flap starts inboard of the fuselage side (0.673 m at the
-# wing trailing edge) and the aileron runs almost to the tip, so the truncated
-# wing panel is never left with an open trailing edge anyone can see.
+# wing trailing edge). The aileron runs out to the tip cap's joint, which the
+# plan view does draw: outboard of it the cap carries the trailing edge, so the
+# wing is never left with an open trailing edge anyone can see. The far level
+# has no separate surfaces and no cap, and does not read these.
 WING_FLAP = (0.62, 2.55)
-WING_AILERON = (2.70, 5.84)
+WING_AILERON = (2.70, TIP_ROOT)
 WING_HINGE = 0.72
 
 
@@ -1747,7 +1812,7 @@ def build_wing(side):
     for x in stations:
         le_y, chord, z = wing_geom(x)
         tip_f = 1.0
-        if x >= SEMI - 1e-6:                    # rounded tip cap
+        if x >= SEMI - 1e-6:                    # the far level's plain tip
             le_y -= 0.19 * chord
             chord *= 0.62
             tip_f = 0.50
@@ -1756,7 +1821,8 @@ def build_wing(side):
             rings.append([pts[0], pts[1], pts[2], pts[3], pts[5], pts[6], pts[7]])
         else:
             rings.append(pts)
-    verts, faces = loft(rings, cap_start=False, cap_end=P["tip_cap"])
+    verts, faces = loft(rings, cap_start=False,
+                        cap_end=P["tip_cap"] and not P["tip_st"])
     if P["bays"]:
         n = len(rings[0])
         row = WING_BAY_ROW
@@ -1850,7 +1916,36 @@ def build_wing(side):
             door=[verts[i] for i in door],
             rim=arc3 + [verts[i] for i in (a_aft, b_aft, ib * n + k, b_fwd,
                                            a_fwd, ij * n + k)])
+    if P["tip_st"]:
+        # The tip cap is a loft of its own, on the WHOLE section: the aileron
+        # stops at its joint, so outboard of it the wing runs to the trailing
+        # edge itself. Its first ring is the last ring above plus the trailing
+        # edge vertex, and make() welds the seven they share.
+        tip = [tip_section(x, sgn) for x in P["tip_st"]]
+        base = len(verts)
+        tv, tf = loft(tip, cap_start=False, cap_end=True)
+        verts += tv
+        faces += [[base + i for i in f] for f in tf]
+        # The face the aileron's end sits against, where the cap begins.
+        faces.append([base + HINGE_UP, base + 4, base + HINGE_LO])
     return make(f"Wing_{side}", verts, faces, M_PAINT)
+
+
+def tip_section(x, sgn):
+    """The wing section at x on the tip cap, from TIP_ROOT out.
+
+    The leading edge comes back on a quarter ellipse and the trailing edge
+    stays on the wing's, so the section shortens from the front only; it
+    keeps its own thickness ratio on that chord, which is what rounds the
+    cap's lower surface up into it. Its chord plane rises with the cube of
+    the distance out, so the cap stays flat where the drawing has it flat and
+    turns up at its end, and stays level across the chord: no twist.
+    """
+    le_y, chord, z = wing_geom(x)
+    u = min(1.0, max(0.0, (x - TIP_ROOT) / (SEMI - TIP_ROOT)))
+    back = TIP_LE_BACK * (1.0 - math.sqrt(max(0.0, 1.0 - u * u)))
+    return af_points(WING_AF, chord - back, 1.0, le_y - back,
+                     z + TIP_RISE * u ** 3, sgn * x, WING_INCIDENCE)
 
 
 def build_ctrl(name, sgn, x0, x1, extra=()):
@@ -1905,7 +2000,53 @@ def build_vtail(side):
         else:
             rings.append(pts)
     verts, faces = loft(rings, cap_start=(LOD == 3), cap_end=P["tip_cap"])
+    if P["trim"]:
+        fv, ff = ventral_fin(sgn)
+        base = len(verts)
+        verts += fv
+        faces += [[base + i for i in f] for f in ff]
     return make(f"VTail_{side}", verts, faces, M_PAINT)
+
+
+# The ventral fins: the two V-tail planes carried on through the tail cone and
+# out under it on the far side, an inverted V below the V. The side view draws
+# them as one shape hanging under the cone - its two projections coincide - and
+# `profile_drawing.py side runs` reads it: a line at z = 1.47 from Y = -7.8 to
+# -9.0, where each fin leaves the cone's flank, and a lower edge falling from
+# 1.37 at -7.2 to 1.16 at -8.6, flat from there to a square trailing edge at
+# -9.04 to -9.09. The photographs N50SF and N914AF show the fin under the tail
+# and the hd model carries the pair.
+#
+# Earlier builds read that lower edge as the tail cone's own belly, which is
+# why the cone used to stay "a thin deep blade" to the tail: the blade was the
+# cone and both fins drawn as one. The cone above them is round (STATIONS).
+#
+# Each fin lies in its panel's plane, so its span is measured along that
+# plane from the centreline: s = (VT_Z0 - z) / sin(dihedral). The drawn lower
+# edge is the tip's projection, which puts the leading edge on a straight line
+# from s = 0 at Y = -6.12, deep in the fuselage, to the tip at -8.55. The fin is
+# hidden inside the body until the cone pinches, and the root edge stays on the
+# centreline inside the cone, so it is left open like the panels' own roots.
+VFIN_OUTLINE = [(-6.12, 0.0), (-8.55, 0.548), (-9.09, 0.548), (-9.04, 0.0)]
+VFIN_HALF_T = 0.015
+
+
+def ventral_fin(sgn):
+    """The fin continuing panel `sgn` through the cone: a plate, 10 triangles.
+
+    It hangs on the OTHER side: the right panel's plane, carried down through
+    the centreline, comes out under the cone on the left.
+    """
+    ca, sa = math.cos(VT_DIHEDRAL), math.sin(VT_DIHEDRAL)
+    verts = []
+    for t in (VFIN_HALF_T, -VFIN_HALF_T):
+        for (y, s) in VFIN_OUTLINE:
+            # span runs along -(sgn*ca, sa), thickness along the panel's own
+            # normal, (-sgn*sa, ca), as vt_points has it
+            verts.append((-sgn * (s * ca + t * sa), y, VT_Z0 - s * sa + t * ca))
+    faces = [[0, 1, 2, 3], [7, 6, 5, 4],
+             [0, 4, 5, 1], [1, 5, 6, 2], [2, 6, 7, 3]]
+    return verts, faces
 
 
 def build_ruddervator(side):
@@ -1939,26 +2080,42 @@ def build_ruddervator(side):
 # ----------------------------------------------------------------------------
 # engine nacelle
 # ----------------------------------------------------------------------------
-def fuselage_top(y):
-    """Measured fuselage crown height at station y, linearly interpolated."""
-    pts = [(s[0], s[3]) for s in STATIONS]
-    if y >= pts[0][0]:
-        return pts[0][1]
-    for (y0, z0), (y1, z1) in zip(pts, pts[1:]):
-        if y1 <= y <= y0:
-            t = (y - y0) / (y1 - y0) if y1 != y0 else 0.0
-            return z0 + (z1 - z0) * t
-    return pts[-1][1]
+def fuselage_surface():
+    """(x, y) -> z of the fuselage skin's top there, as this level built it.
+
+    Read off the mesh rather than the station table: the pod has to meet the
+    faceted skin this level actually draws, and at the far level's six-point
+    ring that is several centimetres off the measured section. Seating the pod
+    on the table's crown height is what left the far level's pod standing
+    clear of the body.
+    """
+    from mathutils.bvhtree import BVHTree
+    fus = next(o for o in BUILT if o.name == "Fuselage")
+    me = fus.data
+    bvh = BVHTree.FromPolygons([v.co.copy() for v in me.vertices],
+                               [list(p.vertices) for p in me.polygons])
+    down = Vector((0.0, 0.0, -1.0))
+
+    def z_at(x, y):
+        hit = bvh.ray_cast(Vector((x, y, 5.0)), down)[0]
+        return None if hit is None else hit.z
+    return z_at
 
 
 def build_nacelle():
-    """Dorsal pod, open where the fuselage closes it.
+    """Dorsal pod: an open intake, an open exhaust, seated on the crown.
 
-    The drawing leaves a 7-13 cm gap between the pod and the crown, too small
-    to be worth a pylon at this budget, so the pod is seated on the fuselage
-    instead. Faces whose centre falls below the crown line would then be sealed
-    inside the body and never seen, so they are not built - the same rule that
-    opens the Cessna's roof under its wing.
+    The pod's lower half is carried straight down through the fuselage skin at
+    every station but the intake lip, which is the fairing the drawing and the
+    photographs show under it: the side view leaves a few centimetres between
+    the pod and the crown only at the lip. Faces that end up wholly under the
+    skin are never seen, so they are not built - the same rule that opens the
+    Cessna's roof under its wing.
+
+    Both ends are open. At the intake a lip ring stands just inside the
+    outer one and a near-black cone runs back from it to the fan face; at the
+    exhaust the same, the other way, round the nozzle. The far level leaves
+    both ends as plain openings.
     """
     # The pod gets an evenly spaced ring rather than the fuselage's chosen
     # angles: it is a plain body of revolution with no window sill or keel for
@@ -1966,42 +2123,98 @@ def build_nacelle():
     # count must stay EVEN - an odd ring straddles the centreline instead of
     # mirroring across it, and showed up as 0.21 m of symmetry error.
     n = P["nac_ring"]
-    keep = NAC_STATIONS
-    if P["nac_st"] < len(NAC_STATIONS):
-        idx = [0] + sorted(set(
-            round(i * (len(NAC_STATIONS) - 1) / (P["nac_st"] - 1))
-            for i in range(1, P["nac_st"])))
-        keep = [NAC_STATIONS[i] for i in idx]
+    angles = [2 * math.pi * i / n + math.pi / n for i in range(n)]
+    keep = [NAC_STATIONS[i] for i in P["nac_st"]]
+    skin_z = fuselage_surface()
+
+    def ellipse(y, zb, zt, hw, scale=1.0):
+        zm, hh = (zb + zt) / 2.0, (zt - zb) / 2.0
+        return [(hw * scale * math.cos(t), y, zm + hh * scale * math.sin(t))
+                for t in angles]
+
+    def below(p):
+        s = skin_z(p[0], p[1])
+        return s is not None and p[2] < s - 0.001
+
     rings = []
-    for (y, zb, zt, hw) in keep:
-        zb = min(zb, fuselage_top(y) - 0.05)     # seat it on the crown
-        zm = (zb + zt) / 2.0
-        ring = []
-        for i in range(n):
-            t = 2 * math.pi * i / n + math.pi / n
-            ring.append((hw * math.cos(t), y, zm + (zt - zm) * math.sin(t)))
+    for i, st in enumerate(keep):
+        ring = ellipse(*st)
+        if i > 0:
+            # Below the waist, down through the skin. The lip stays round:
+            # it is the intake.
+            for j, t in enumerate(angles):
+                if math.sin(t) < -0.3:
+                    x, y, z = ring[j]
+                    s = skin_z(x, y)
+                    if s is not None:
+                        ring[j] = (x, y, min(z, s - NAC_SINK))
         rings.append(ring)
 
-    verts = []
-    for r in rings:
-        verts.extend(r)
-    faces = []
-    buried = 0
-    for i in range(len(rings) - 1):
-        a, b = i * n, (i + 1) * n
+    verts, faces, mats = [], [], []
+
+    def add_ring(ring):
+        verts.extend(ring)
+        return len(verts) - n
+
+    def add_band(a, b, mat_index):
         for j in range(n):
             k = (j + 1) % n
-            quad = [a + j, a + k, b + k, b + j]
-            zc = sum(verts[v][2] for v in quad) / 4.0
-            yc = sum(verts[v][1] for v in quad) / 4.0
-            if zc < fuselage_top(yc):
-                buried += 1
-                continue
-            faces.append(quad)
-    o = (len(rings) - 1) * n
-    faces.append([o + j for j in range(n)])
-    print(f"###NACELLE### rings={len(rings)} ring={n} open_on_the_crown={buried}")
-    return make("Nacelle", verts, faces, M_PAINT, smooth_angle=45.0)
+            faces.append([a + j, a + k, b + k, b + j])
+            mats.append(mat_index)
+
+    def add_cone(a, apex, mat_index):
+        verts.append(apex)
+        c = len(verts) - 1
+        for j in range(n):
+            faces.append([a + j, a + (j + 1) % n, c])
+            mats.append(mat_index)
+
+    starts = [add_ring(r) for r in rings]
+    for a, b in zip(starts, starts[1:]):
+        add_band(a, b, 0)
+    if P["intake"]:
+        y, zb, zt, hw = keep[0]
+        lip = add_ring(ellipse(y - INTAKE_LIP_DEPTH, zb, zt, hw, INTAKE_LIP))
+        add_band(starts[0], lip, 0)
+        add_cone(lip, (0.0, y - INTAKE_DEPTH, (zb + zt) / 2.0), 1)
+        y, zb, zt, hw = keep[-1]
+        noz = add_ring(ellipse(y + NOZZLE_LIP_DEPTH, zb, zt, hw, NOZZLE_LIP))
+        add_band(starts[-1], noz, 0)
+        add_cone(noz, (0.0, y + NOZZLE_DEPTH, (zb + zt) / 2.0), 1)
+
+    shown, shown_mats, buried = [], [], 0
+    for f, m in zip(faces, mats):
+        pts = [verts[v] for v in f]
+        centre = tuple(sum(p[c] for p in pts) / len(pts) for c in range(3))
+        if all(below(p) for p in pts) and below(centre):
+            buried += 1
+            continue
+        shown.append(f)
+        shown_mats.append(m)
+    print(f"###NACELLE### rings={len(rings)} ring={n} "
+          f"intake={P['intake']} buried_in_the_crown={buried}")
+    # Faces meet at 30 deg on the near level's ring and 45 on the middle
+    # one's: both are one curved surface, so the smoothing has to reach past
+    # 45 or the pod is drawn as a faceted box. The lip and the pod's ends are
+    # creases at 70 deg and more, and stay sharp.
+    # The duct and the tail pipe are M_POST, not M_DARK: they face straight
+    # out of the aeroplane, into the light, and M_DARK's specular drew them
+    # mid grey - the windscreen post's problem again. M_POST is already in
+    # every level that has them, so they add no material and no draw call.
+    ob = make("Nacelle", verts, shown, M_PAINT, smooth_angle=50.0,
+              extra_mats=[M_POST] if P["intake"] else None,
+              face_mats=shown_mats if P["intake"] else None)
+    # recalc_face_normals is a coin toss on an open shell. The crown of the
+    # pod faces the sky, whatever the rest of it does.
+    top = max(ob.data.polygons, key=lambda p: p.center.z)
+    if top.normal.z < 0.0:
+        bm = bmesh.new()
+        bm.from_mesh(ob.data)
+        bmesh.ops.reverse_faces(bm, faces=bm.faces)
+        bm.to_mesh(ob.data)
+        bm.free()
+        ob.data.update()
+    return ob
 
 
 def build_keel():
@@ -2017,27 +2230,6 @@ def build_keel():
     faces.append(list(range(n - 1, -1, -1)))
     faces.append([n + j for j in range(n)])
     return make("Keel", verts, faces, M_PAINT, smooth_angle=20.0)
-
-
-def build_intake():
-    """The dark bore, as a dished cap set inside the lip ring.
-
-    It is the only way to read an intake without either a hole in the hull or a
-    black decal floating in front of it: one ring plus a centre vertex.
-    """
-    if not P["intake"]:
-        return None
-    n = P["nac_ring"]
-    y, zb, zt, hw = NAC_STATIONS[0]
-    zm = (zb + zt) / 2.0
-    r_scale = 0.72
-    verts = [(0.0, y - INTAKE_INSET - 0.10, zm)]
-    for i in range(n):
-        t = 2 * math.pi * i / n + math.pi / n
-        verts.append((hw * r_scale * math.cos(t), y - INTAKE_INSET,
-                      zm + (zt - zm) * r_scale * math.sin(t)))
-    faces = [[0, 1 + i, 1 + (i + 1) % n] for i in range(n)]
-    return make("Intake", verts, faces, M_DARK, smooth_angle=60.0)
 
 
 # ----------------------------------------------------------------------------
@@ -2310,7 +2502,6 @@ for side, sgn in (("Left", -1.0), ("Right", 1.0)):
 
 
 build_nacelle()
-build_intake()
 build_nose_gear()
 for _bay in GEAR_BAYS:
     build_gear_bay(_bay)

@@ -3,7 +3,7 @@
  "objects": 12,
  "empties": 1,
  "meshes": 12,
- "triangles": 442,
+ "triangles": 438,
  "vertices": 254,
  "materials": 4,
  "material_names": [
@@ -58,8 +58,12 @@
    "Wheel_Right"
   ]
  },
- "non_manifold_edges": 28,
+ "non_manifold_edges": 34,
  "open_boundary_by_object": [
+  {
+   "name": "Nacelle",
+   "boundary_edges": 10
+  },
   {
    "name": "Wing_Left",
    "boundary_edges": 6
@@ -75,10 +79,6 @@
   {
    "name": "VTail_Right",
    "boundary_edges": 6
-  },
-  {
-   "name": "Nacelle",
-   "boundary_edges": 4
   }
  ],
  "degenerate_faces": 0,
@@ -129,31 +129,6 @@
      0.955,
      4.0,
      2.466
-    ]
-   ]
-  },
-  {
-   "name": "Nacelle",
-   "tris": 18,
-   "verts": 12,
-   "mats": [
-    "SF50_Paint"
-   ],
-   "origin": [
-    0.0,
-    0.0,
-    0.0
-   ],
-   "bbox": [
-    [
-     -0.2425,
-     -3.12,
-     1.8689
-    ],
-    [
-     0.2425,
-     -0.86,
-     2.5269
     ]
    ]
   },
@@ -254,6 +229,31 @@
      2.2516,
      -3.575,
      3.3219
+    ]
+   ]
+  },
+  {
+   "name": "Nacelle",
+   "tris": 14,
+   "verts": 12,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "bbox": [
+    [
+     -0.244,
+     -3.12,
+     1.7348
+    ],
+    [
+     0.244,
+     -0.86,
+     2.5752
     ]
    ]
   },

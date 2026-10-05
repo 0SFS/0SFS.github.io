@@ -2,7 +2,7 @@
 
 A measured reconstruction of the SF50 (G2) built to
 `docs/creating-an-aircraft-model.md`, generated procedurally from a table of
-cross-section stations. Three levels of detail, 1514 / 856 / 442 triangles,
+cross-section stations. Three levels of detail, 1654 / 926 / 438 triangles,
 wired into `AIRCRAFT_CATALOG` as `cirrus-vision-jet`.
 
 Levels are numbered **coarsest first**: LOD1 is the far mesh and each step up
@@ -12,9 +12,9 @@ not need one.
 
 | level | triangles | vertices | objects | takes over at |
 | --- | --- | --- | --- | --- |
-| LOD3 | 1514 | 888 | 26 | 0 m |
-| LOD2 | 856 | 480 | 19 | 65 m |
-| LOD1 | 442 | 255 | 12 | 170 m |
+| LOD3 | 1654 | 957 | 25 | 0 m |
+| LOD2 | 926 | 519 | 18 | 65 m |
+| LOD1 | 438 | 254 | 12 | 170 m |
 
 Overall length, wingspan and height are **identical at every level and exactly
 equal to the published figures**, and every level's lowest vertex is at
@@ -146,9 +146,12 @@ rather than by looking at either alone:
   (0.575 m) under the wing box, and then sweeps up hard. Almost all the
   tail-cone taper is in the belly, not the crown.
 - **The tail cone pinches abruptly.** 0.375 m of half-width becomes 0.175 m in
-  35 cm, just ahead of the V-tail roots, and then stays a thin deep blade to the
-  tail. The first pass interpolated smoothly through that and the plan view had
-  a fat wedge where the drawing has a spindle.
+  35 cm, just ahead of the V-tail roots, and then runs on as a round cone about
+  0.25 m across, with the two ventral fins under it. The first pass interpolated
+  smoothly through the pinch and the plan view had a fat wedge where the
+  drawing has a spindle. Until 2026-10-05 the cone aft of the pinch was a thin
+  deep blade, because the fins' outline had been read as the cone's belly; see
+  "The engine, the wing tips and the ventral fins".
 - **The wing root fairing is big.** The body blends out to 0.97 m of half-width
   at the wing trailing edge against 0.67 m for the body itself, and the front
   view confirms it independently — ±0.94 at the wing chord plane against ±0.81
@@ -358,12 +361,12 @@ Other things measurement changed from the first blockout:
   material it rendered as a light grey bar - lighter than the glass it divides,
   which is the one thing it must not be. `SF50_Post` is near-black at the
   glass's low specular. `renders/WINDSCREEN_front_lod3.png` is the check.
-- **The nacelle is open where the fuselage closes it.** The drawing leaves a
-  7–13 cm gap between the pod and the crown, too small to be worth a pylon at
-  this budget, so the pod is seated on the fuselage and the four faces that
-  would then be sealed inside the body are not built.
-- **The intake is a dished cap, not a hole.** One ring plus a centre vertex in
-  the dark material, set 9 cm inside the lip — eight triangles at LOD3.
+- **The nacelle is open where the fuselage closes it.** Its lower half is
+  carried down through the fuselage skin, which is the fairing under the pod,
+  and the faces that end up wholly inside the body are not built.
+- **The engine is open at both ends.** A lip ring inside the intake's outer
+  ring, a near-black cone back to the fan face, and the same round the exhaust
+  nozzle; see "The engine, the wing tips and the ventral fins".
 
 The one thing added purely as geometry rather than material is the **ventral
 keel** under the nose gear bay and the **main gear doors** — 28 and 24
@@ -716,6 +719,84 @@ closes at once, which looks like the door passing through the leg.
 
 `renders/bays/BAY_COMPARE_belly.png` is the pair that matters.
 
+## The engine, the wing tips and the ventral fins
+
+Rebuilt on 2026-10-05, against the hd model, the photographs and the drawing,
+after the user found all three wrong at LOD3. `renders/DETAIL_before_after_hd.png`
+stacks them: before, after, and the hd model, for the engine from ahead and
+behind, the tail from behind and the side, and the right wing tip from ahead
+and above. Nothing about the airframe's dimensions moved: length, span and
+height are exactly the published figures at every level, as before.
+
+![before, after, hd](renders/DETAIL_before_after_hd.png)
+
+**The intake closed at the front.** The pod's first ring was 0.23 m tall and
+the next one, 16 cm behind it, 0.43 m, so the pod tapered into a nose with a
+small dark disc set in it. The side view draws the lip as one line from 2.285
+up to a rounded top at 2.62, and the plan view draws it 0.62 m across - 90% of
+the widest section; the old ring had taken the line's straight lower part for
+the whole of it. The photograph N50SF and the hd model agree: the intake is the
+front of the pod. It is now that, with a lip ring 3 cm inside the outer one and
+a near-black cone 0.40 m deep back to the fan face, as deep as the hd model's
+duct. `SF50_Post`, not `SF50_Dark`: the duct faces out into the light, and the
+dark material's specular drew it mid grey, which was the windscreen post's
+problem before it.
+
+**The exhaust was a flat cap.** The side view's aft end is a vertical line from
+1.94 to 2.26 at Y = -7.12 and the plan view puts it 0.32 m across: a round
+nozzle, which the photographs show open. It is now a nozzle wall and a
+near-black tail pipe 0.35 m deep, the intake's construction the other way
+round.
+
+**The pod stood clear of the body at LOD1.** It was seated on the crown height
+in the station table, interpolated along the centreline, but the far level's
+six-point fuselage ring sits several centimetres off that section, and the
+pod's four-point ring has its bottom corners out at ±0.22 m, where the crown
+has already fallen away. Every level now reads the height of its own fuselage
+mesh under each pod vertex, by casting a ray at it, and carries the pod's lower
+half 3 cm through it. That is the fairing the drawing and the photographs show
+under the pod, and the gap is gone. The far level's pod stays the open box the
+user liked, now with its rear open as well.
+
+**The pod was faceted.** At eight points a ring its faces met at 45°, exactly
+where the smoothing stops, so it was drawn as an octagonal box. The near level's
+ring is 12 and the middle level's 8, both smoothed to 50°.
+
+**The wing tips were twisted.** The tip ring was shortened from both ends -
+the leading edge pulled back 19% of the chord and the trailing edge brought
+forward - and halved in thickness about the chord line, so the loft out to it
+turned the surface about the span. None of the three sources has a twist. The
+plan view draws the tip cap's joint as a line at x = 5.51 and its leading edge
+rounding back from there, 0.12 m by 5.71, 0.31 by 5.81 and 0.90 at the tip -
+a quarter ellipse to within 3 cm - while the trailing edge runs straight on.
+The front view draws the cap's lower surface sweeping up 0.10 m and its end
+standing 6 cm above the upper surface. The cap is now a loft of its own on the
+whole section, from 5.50 out, with the leading edge on that ellipse, the
+trailing edge on the wing's, every section level across its chord, and the
+chord plane rising with the cube of the distance out. The aileron stops at
+the joint instead of 5.84, where it used to leave a notch at the tip. LOD1
+keeps its plain tip: the rounding is two pixels from 170 m.
+
+**The tail had no ventral fins, and its cone was a blade.** The SF50's two
+V-tail planes carry on through the tail cone and out under it on the far side,
+an inverted V below the V, and the side view draws the pair as one shape:
+`profile_drawing.py side runs` finds a line at z = 1.47 from Y = -7.8 to -9.0,
+where each fin leaves the cone's flank, and a lower edge falling from 1.37 at
+-7.2 to 1.16 at -8.6, flat from there to a square trailing edge at -9.04 to
+-9.09. The station table had taken that lower edge for the cone's belly, which
+is why the cone "stayed a thin deep blade to the tail". The cone aft of the
+pinch is now round, about 0.25 m across, with the bottoms of its two stations
+set so the fins leave its flanks at the 1.47 the drawing draws, and each fin is
+a 3 cm plate in its panel's plane, ten triangles. Each is built into the
+V-tail object whose plane it continues, so the pair costs no draw call. LOD1
+leaves them out with the other trim; its tail cone never had the blade.
+
+The cost: 140 triangles at LOD3 (1514 → 1654), 70 at LOD2 (856 → 926) and 4
+fewer at LOD1 (442 → 438), and no draw calls at any level - the separate
+`Intake` object is gone into `Nacelle`, which carries two materials as the pair
+did, and LOD2 now ships one material fewer, since nothing there uses
+`SF50_Dark` any more.
+
 ---
 
 ## Levels of detail
@@ -724,8 +805,8 @@ Generated from the same parameterised script, never decimated.
 
 | dropped at | what goes |
 | --- | --- |
-| LOD2 | the nose gear bay - its mouth, pocket and pair of doors - 7 pane columns → 5, fewer fuselage stations, coarser nacelle and wheels, the wing's mid-span station. The ring stays at 11 points: the body is the same shape, the panes are less round |
-| LOD1 | ring → 6 points, 9 base stations, 6-point aerofoils, control surfaces merged into their panels, coarser wheels, the intake, the ventral keel and the two gear doors. **The glazing layout stays**: the windscreen and all three cabin windows are still cut as panes |
+| LOD2 | the nose gear bay - its mouth, pocket and pair of doors - 7 pane columns → 5, fewer fuselage stations, the nacelle's ring 12 → 8 and one of its stations, coarser wheels, the wing's mid-span station and the tip cap's middle one. The ring stays at 11 points: the body is the same shape, the panes are less round |
+| LOD1 | ring → 6 points, 9 base stations, 6-point aerofoils, control surfaces merged into their panels, coarser wheels, the rounded wing tips, the intake lip and duct and the tail pipe - the pod is left open at both ends instead - the ventral fins and the two gear doors. **The glazing layout stays**: the windscreen and all three cabin windows are still cut as panes |
 
 The station table carries the level each one survives to, and which stations
 those are is a shape decision rather than an every-other-one rule: the nose and
@@ -806,7 +887,7 @@ the model carries no physics mesh.
 
 | check | LOD3 | LOD2 | LOD1 |
 | --- | --- | --- | --- |
-| triangles | 1514 | 856 | 442 |
+| triangles | 1654 | 926 | 438 |
 | length 9.357 m | 9.357 | 9.357 | 9.357 |
 | span 11.796 m | 11.796 | 11.796 | 11.796 |
 | height 3.322 m | 3.3227 | 3.3227 | 3.3219 |
@@ -816,26 +897,26 @@ the model carries no physics mesh.
 | unapplied transforms | 0 | 0 | 0 |
 | symmetry error, max | 0.0 | 0.0 | 0.0 |
 | textures | 1 | 1 | 0 |
-| materials | 8 | 8 | 4 |
+| materials | 6 | 5 | 4 |
 
 **Symmetry is exactly zero** and should be: unlike the Cessna there is no
 propeller, so this airframe has no genuinely asymmetric part. Anything non-zero
 here would be a real defect.
 
 **Open boundary edges are all intentional**, and they are the only two lists in
-the report that flag correct things. The fuselage is no longer among them: it is
-watertight at every level, and so is every edge in it — no edge carries more or
-fewer than two faces.
+the report that flag correct things. Every one of them is a clean loop, each
+vertex on it carrying exactly two open edges, which `scripts/boundary_loops.py`
+prints; a loop that does not close that way is a T-junction.
 
-| object | edges | why it is open |
+| object | edges (LOD3 / 2 / 1) | why it is open |
 | --- | --- | --- |
-| Fuselage | 14 / – / – | the nose bay mouth, and exactly it. Anything else here is a T-junction |
-| GearBay_Nose | 14 / – / – | a pocket is a tube, open at the mouth the fuselage opened for it |
-| BayDoor_Nose_* | 11, 11 / – / – | a door is a zero-thickness panel; every edge of it is a boundary |
-| Nacelle | 16 / 6 / 4 | the faces buried in the fuselage crown are not built |
-| Intake | 8 / 6 | the bore is a dished cap, open at its rim inside the lip |
-| Wing_Left / _Right | 7 / 6 | root ribs, uncapped inside the fuselage |
-| VTail_Left / _Right | 7 / 6 | roots run to the centreline, uncapped deep inside the tail cone |
+| Fuselage | 34 / – / – | the nose bay mouth (10) and the two main wells' bites (12 each), and exactly those |
+| GearBay_Nose | 10 / – / – | a pocket is a tube, open at the mouth the fuselage opened for it |
+| WingBay_* | 21 / – / – | the main well's pocket, open at the mouth the wing opened for it |
+| BayDoor_* | 7 or 3 / – / – | a door is a zero-thickness panel; every edge of it is a boundary |
+| Nacelle | 12 / 10 / 10 | the faces buried in the fuselage crown are not built; at LOD1 the intake and the exhaust are open too |
+| Wing_Left / _Right | 28 / 7 / 6 | root ribs, uncapped inside the fuselage, and at LOD3 the gear bay's mouth |
+| VTail_Left / _Right | 4 / 11 / 6 | the panel roots run to the centreline, uncapped deep inside the tail cone (LOD2 and LOD1; LOD3 caps them), and the ventral fin's root, likewise (LOD3 and LOD2) |
 
 ---
 
@@ -879,7 +960,7 @@ because the validator reports it, not because the model looks lopsided.
 
 `src/flight/aircraft/aircraftCatalog.ts`:
 
-- Three levels of ours — 1514 / 856 / 442 triangles — at `autoFromMeters` of
+- Three levels of ours — 1654 / 926 / 438 triangles — at `autoFromMeters` of
   40 / 65 / 170, plus hilos run's opt-in `hd` at 0. The two coarse thresholds
   are the Cessna's scaled by the span ratio, so the two airframes switch at the
   same apparent size; the fourth threshold is gone with the level it selected,

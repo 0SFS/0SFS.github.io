@@ -185,15 +185,15 @@ const CIRRUS_LODS: readonly AircraftLodDefinition[] = [
   // 40 m rather than 0 because HD covers the close range when it is switched
   // on. With it off, the finest level available always covers the close range,
   // so this still starts at the camera - see selectAutoLod.
-  { id: "lod3", label: "LOD3 — near", triangles: 1514, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD3.glb", autoFromMeters: 40, credit: PROCEDURAL },
-  { id: "lod2", label: "LOD2 — medium", triangles: 856, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD2.glb", autoFromMeters: 65, credit: PROCEDURAL },
+  { id: "lod3", label: "LOD3 — near", triangles: 1654, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD3.glb", autoFromMeters: 40, credit: PROCEDURAL },
+  { id: "lod2", label: "LOD2 — medium", triangles: 926, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD2.glb", autoFromMeters: 65, credit: PROCEDURAL },
   // The bottom of this ladder, and it runs all the way out: there is no
   // silhouette level under it. The one that used to be there was 98 triangles,
   // and the level above it was little better - both painted their glazing on
   // as one band down each side, so the aeroplane had no windscreen at all.
   // This one cuts the windscreen and the three cabin windows as real panes,
   // which is what makes it read as this aeroplane rather than a white dart.
-  { id: "lod1", label: "LOD1 — far", triangles: 442, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD1.glb", autoFromMeters: 170, credit: PROCEDURAL },
+  { id: "lod1", label: "LOD1 — far", triangles: 438, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD1.glb", autoFromMeters: 170, credit: PROCEDURAL },
 ];
 
 const C172_LODS: readonly AircraftLodDefinition[] = [

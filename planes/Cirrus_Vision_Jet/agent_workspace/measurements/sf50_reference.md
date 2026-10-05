@@ -212,6 +212,23 @@ strake excluded. Run edges, so depths carry about +0.02 m of line weight.
   0.57 m deep and 0.62 m wide.
 - A thin **ventral strake** runs under the nose from about Y = -0.2 to -1.44 at
   z ~ 0.61-0.68, below the fuselage line.
+- **The belly figures aft of Y = -8.0 are the ventral fins, not the cone**
+  (read 2026-10-05). The two V-tail planes carry on through the tail cone and
+  out under it, and the side view draws the pair as one shape: a line at
+  z = 1.47 from -7.8 to -9.0, where each fin leaves the cone's flank, and a
+  lower edge falling from 1.37 at -7.2 to 1.16 at -8.6, flat from there to a
+  square trailing edge at -9.04 to -9.09. The -8.80 row's 1.16 is that lower
+  edge. The cone above it is round, about 0.25 m across.
+- **The engine pod** (`side runs` and `plan runs`, 2026-10-05): the intake lip is
+  one line from z = 2.285 up to a rounded top at 2.62 at Y = -4.86 to -4.92, and
+  0.62 m across in plan; the top line runs 2.665 at -5.0, 2.60 at -5.6, 2.50 at
+  -6.2, 2.28 at -7.0; the widest section is ±0.345 at -5.5; the aft end is the
+  exhaust nozzle, a vertical line from 1.94 to 2.26 at -7.12, ±0.16 in plan.
+- **The wing tip** (`plan runs` and `front runs`, 2026-10-05): the tip cap's
+  joint is a line at x = 5.51. Outboard of it the leading edge rounds back
+  0.12 m by x = 5.71, 0.31 by 5.81, 0.49 by 5.85 and 0.90 at the tip, and the
+  trailing edge runs straight on. In the front view the cap's lower surface
+  rises about 0.10 m over it, and its end stands 6 cm above the upper surface.
 
 ## Fuselage plan half-width (plan view row scans)
 

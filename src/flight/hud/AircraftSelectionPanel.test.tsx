@@ -19,7 +19,7 @@ function activeSnapshot(overrides: Partial<FlightControlPanelSnapshot> = {}): Fl
   return {
     aircraftId: "cirrus-vision-jet-g2", generationId: "g2", lodId: "auto",
     optInLodsEnabled: false, modelStatus: "ready", modelActiveLodId: "lod3",
-    modelTriangles: 1514, modelError: null, ...overrides,
+    modelTriangles: 1654, modelError: null, ...overrides,
   } as FlightControlPanelSnapshot;
 }
 

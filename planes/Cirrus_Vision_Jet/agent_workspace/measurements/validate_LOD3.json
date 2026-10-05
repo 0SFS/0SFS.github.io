@@ -1,10 +1,10 @@
 {
  "file": "sf50_lod3.blend",
- "objects": 26,
+ "objects": 25,
  "empties": 1,
- "meshes": 26,
- "triangles": 1514,
- "vertices": 888,
+ "meshes": 25,
+ "triangles": 1654,
+ "vertices": 957,
  "materials": 6,
  "material_names": [
   "SF50_Dark",
@@ -62,7 +62,7 @@
    "Wheel_Right"
   ]
  },
- "non_manifold_edges": 186,
+ "non_manifold_edges": 182,
  "open_boundary_by_object": [
   {
    "name": "Fuselage",
@@ -86,15 +86,11 @@
   },
   {
    "name": "Nacelle",
-   "boundary_edges": 16
+   "boundary_edges": 12
   },
   {
    "name": "GearBay_Nose",
    "boundary_edges": 10
-  },
-  {
-   "name": "Intake",
-   "boundary_edges": 8
   },
   {
    "name": "BayDoor_Nose_Left",
@@ -103,6 +99,14 @@
   {
    "name": "BayDoor_Nose_Right",
    "boundary_edges": 7
+  },
+  {
+   "name": "VTail_Left",
+   "boundary_edges": 4
+  },
+  {
+   "name": "VTail_Right",
+   "boundary_edges": 4
   },
   {
    "name": "BayDoor_Main_Left",
@@ -134,7 +138,6 @@
   "Flap_Right",
   "Fuselage",
   "GearBay_Nose",
-  "Intake",
   "LandingGear_Left",
   "LandingGear_Nose",
   "LandingGear_Right",
@@ -176,6 +179,82 @@
      0.955,
      4.0,
      2.466
+    ]
+   ]
+  },
+  {
+   "name": "Nacelle",
+   "tris": 150,
+   "verts": 82,
+   "mats": [
+    "SF50_Paint",
+    "SF50_Post"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "bbox": [
+    [
+     -0.3332,
+     -3.12,
+     1.8134
+    ],
+    [
+     0.3332,
+     -0.86,
+     2.6577
+    ]
+   ]
+  },
+  {
+   "name": "Wing_Left",
+   "tris": 76,
+   "verts": 52,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "bbox": [
+    [
+     -5.898,
+     -1.0467,
+     0.6479
+    ],
+    [
+     0.0,
+     0.703,
+     1.4314
+    ]
+   ]
+  },
+  {
+   "name": "Wing_Right",
+   "tris": 76,
+   "verts": 52,
+   "mats": [
+    "SF50_Paint"
+   ],
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "bbox": [
+    [
+     0.0,
+     -1.0467,
+     0.6479
+    ],
+    [
+     5.898,
+     0.703,
+     1.4314
     ]
    ]
   },
@@ -230,84 +309,9 @@
    ]
   },
   {
-   "name": "Nacelle",
-   "tris": 62,
-   "verts": 40,
-   "mats": [
-    "SF50_Paint"
-   ],
-   "origin": [
-    0.0,
-    0.0,
-    0.0
-   ],
-   "bbox": [
-    [
-     -0.3169,
-     -3.12,
-     1.8243
-    ],
-    [
-     0.3169,
-     -0.86,
-     2.6443
-    ]
-   ]
-  },
-  {
-   "name": "Wing_Left",
-   "tris": 56,
-   "verts": 42,
-   "mats": [
-    "SF50_Paint"
-   ],
-   "origin": [
-    0.0,
-    0.0,
-    0.0
-   ],
-   "bbox": [
-    [
-     -5.898,
-     -0.7134,
-     0.6479
-    ],
-    [
-     0.0,
-     0.703,
-     1.3509
-    ]
-   ]
-  },
-  {
-   "name": "Wing_Right",
-   "tris": 56,
-   "verts": 42,
-   "mats": [
-    "SF50_Paint"
-   ],
-   "origin": [
-    0.0,
-    0.0,
-    0.0
-   ],
-   "bbox": [
-    [
-     0.0,
-     -0.7134,
-     0.6479
-    ],
-    [
-     5.898,
-     0.703,
-     1.3509
-    ]
-   ]
-  },
-  {
    "name": "VTail_Left",
-   "tris": 38,
-   "verts": 21,
+   "tris": 48,
+   "verts": 29,
    "mats": [
     "SF50_Paint"
    ],
@@ -320,19 +324,19 @@
     [
      -2.2523,
      -5.1299,
-     1.4567
+     1.1587
     ],
     [
-     0.0451,
-     -3.575,
+     0.4371,
+     -2.12,
      3.3227
     ]
    ]
   },
   {
    "name": "VTail_Right",
-   "tris": 38,
-   "verts": 21,
+   "tris": 48,
+   "verts": 29,
    "mats": [
     "SF50_Paint"
    ],
@@ -343,13 +347,13 @@
    ],
    "bbox": [
     [
-     -0.0451,
+     -0.4371,
      -5.1299,
-     1.4567
+     1.1587
     ],
     [
      2.2523,
-     -3.575,
+     -2.12,
      3.3227
     ]
    ]
@@ -612,20 +616,20 @@
     "SF50_Paint"
    ],
    "origin": [
-    -4.27,
-    -0.7134,
-    1.1431
+    -4.1,
+    -0.7133,
+    1.1292
    ],
    "bbox": [
     [
-     -5.84,
+     -5.5,
      -1.1573,
      0.9416
     ],
     [
      -2.7,
      -0.7133,
-     1.3243
+     1.2986
     ]
    ]
   },
@@ -712,9 +716,9 @@
     "SF50_Paint"
    ],
    "origin": [
-    4.27,
-    -0.7134,
-    1.1431
+    4.1,
+    -0.7133,
+    1.1292
    ],
    "bbox": [
     [
@@ -723,9 +727,9 @@
      0.9416
     ],
     [
-     5.84,
+     5.5,
      -0.7133,
-     1.3243
+     1.2986
     ]
    ]
   },
@@ -776,31 +780,6 @@
      2.4026,
      0.0334,
      0.8549
-    ]
-   ]
-  },
-  {
-   "name": "Intake",
-   "tris": 8,
-   "verts": 9,
-   "mats": [
-    "SF50_Dark"
-   ],
-   "origin": [
-    0.0,
-    0.0,
-    0.0
-   ],
-   "bbox": [
-    [
-     -0.1996,
-     -1.05,
-     2.3085
-    ],
-    [
-     0.1996,
-     -0.95,
-     2.4615
     ]
    ]
   }

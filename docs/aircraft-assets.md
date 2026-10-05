@@ -95,9 +95,9 @@ Cirrus Vision Jet:
 
 | Level | Triangles | Vertices | Meshes | Intended range |
 | --- | --- | --- | --- | --- |
-| LOD3 | 1514 | 888 | 26 | Close / cockpit |
-| LOD2 | 856 | 480 | 19 | Medium |
-| LOD1 | 442 | 254 | 12 | Far, and all the way out |
+| LOD3 | 1654 | 957 | 25 | Close / cockpit |
+| LOD2 | 926 | 519 | 18 | Medium |
+| LOD1 | 438 | 254 | 12 | Far, and all the way out |
 
 LOD3 and LOD2 of the C172 carry a `Propeller_Disc` swept from the blade sections
 (140 and 100 triangles). It is never drawn at the same time as the blades, so the
