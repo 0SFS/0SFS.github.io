@@ -1,7 +1,21 @@
-import { AssetContainer, Mesh, NullEngine, Scene, TransformNode } from "@babylonjs/core";
+import { AssetContainer, Mesh, MeshBuilder, NullEngine, Scene, TransformNode, type AbstractMesh, type ISceneLoaderProgressEvent } from "@babylonjs/core";
 import { describe, expect, it, vi } from "vitest";
 import { createAircraftModel, type AircraftModelState } from "./createAircraftModel";
 import { getFdmProfile } from "../jsbsim/fdmProfiles";
+
+// The readiness wait is FOSS Earth's, covered there; the runtime it comes with
+// does not load under this environment. Tests that care pass `whenReady`.
+vi.mock("foss-earth/runtime", () => ({ whenMeshesReady: async () => {} }));
+
+/** A readiness wait each test releases by hand, as compiling shaders would. */
+function readinessGate() {
+  const waits: Array<{ meshes: readonly AbstractMesh[]; release(): void; signal: AbortSignal }> = [];
+  const whenReady = vi.fn((meshes: readonly AbstractMesh[], signal: AbortSignal) => new Promise<void>((resolve, reject) => {
+    waits.push({ meshes, release: resolve, signal });
+    signal.addEventListener("abort", () => reject(signal.reason), { once: true });
+  }));
+  return { waits, whenReady, releaseLast: () => waits[waits.length - 1].release() };
+}
 
 function setup() {
   const engine = new NullEngine();
@@ -67,7 +81,8 @@ describe("aircraft model loader", () => {
     expect(t.urls[0]).toContain("Cessna_172_LOD2.glb");
     expect(model.getState().triangles).toBe(778);
     expect(model.getState().activeLodId).toBe("lod2");
-    expect(t.containers[0].rootNodes[0].parent).toBe(model.root);
+    // Under a node of its own, which shows or hides all of it.
+    expect(t.containers[0].rootNodes[0].parent?.parent).toBe(model.root);
     // The aircraft must never be a pick target: the terrain probe and the
     // chase camera both raycast the scene.
     expect(t.containers[0].meshes.every((mesh) => mesh.isPickable === false)).toBe(true);
@@ -77,28 +92,193 @@ describe("aircraft model loader", () => {
     t.teardown();
   });
 
-  it("will not load an opt-in level until it is switched on, and swaps when it is", async () => {
+  it("loads an opt-in level only when it is chosen, never from Auto", async () => {
     const t = setup();
     const model = createAircraftModel(t.scene, t.parent, {
       aircraftId: "cirrus-vision-jet",
-      lodId: "hd",
+      lodId: "auto",
       loadContainer: t.loadContainer,
     });
-    // The stored choice is a level the user has not enabled, so the finest one
-    // they have takes its place rather than the aircraft going missing.
     await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
     expect(model.getState().activeLodId).toBe("lod3");
     expect(t.urls.some((url) => url.includes("HilosRun"))).toBe(false);
 
-    model.setOptInEnabled(true);
+    // Choosing it is the opt-in: no other switch stands in front of it.
+    model.setLod("hd");
     await vi.waitFor(() => expect(model.getState().activeLodId).toBe("hd"));
     expect(t.urls[t.urls.length - 1]).toContain("Cirrus_Vision_Jet_HilosRun.glb");
     expect(model.getState().triangles).toBe(7294);
-    expect(model.getState().optInEnabled).toBe(true);
 
-    // ...and switching it back off puts the cheap mesh back.
-    model.setOptInEnabled(false);
+    // ...and going back to Auto puts the cheap mesh back.
+    model.setLod("auto");
     await vi.waitFor(() => expect(model.getState().activeLodId).toBe("lod3"));
+
+    model.dispose();
+    t.teardown();
+  });
+
+  it("shows a model only once it can be drawn whole, in one frame, and draws nothing while it gets ready", async () => {
+    const t = setup();
+    const gate = readinessGate();
+    const requestRender = vi.fn();
+    const model = createAircraftModel(t.scene, t.parent, {
+      aircraftId: "cessna-172", lodId: "lod3", loadContainer: t.loadContainer,
+      whenReady: gate.whenReady, requestRender,
+    });
+    await vi.waitFor(() => expect(gate.waits).toHaveLength(1));
+    // In the scene, so it compiles for the scene's lights, but hidden.
+    const mesh = t.containers[0].meshes[0];
+    expect(t.scene.meshes).toContain(mesh);
+    expect(mesh.isEnabled()).toBe(false);
+    expect(model.getState().status).toBe("loading");
+    expect(requestRender).not.toHaveBeenCalled();
+
+    gate.releaseLast();
+    await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
+    expect(mesh.isEnabled()).toBe(true);
+    expect(requestRender).toHaveBeenCalledOnce();
+
+    model.dispose();
+    t.teardown();
+  });
+
+  it("takes the old mesh away at once for a level the user chooses, and shows the new one in a second frame", async () => {
+    const t = setup();
+    const gate = readinessGate();
+    const requestRender = vi.fn();
+    const model = createAircraftModel(t.scene, t.parent, {
+      aircraftId: "cirrus-vision-jet", lodId: "lod3", loadContainer: t.loadContainer,
+      whenReady: gate.whenReady, requestRender,
+    });
+    await vi.waitFor(() => expect(gate.waits).toHaveLength(1));
+    gate.releaseLast();
+    await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
+    const old = t.containers[0].meshes[0];
+    requestRender.mockClear();
+
+    model.setLod("hd");
+    // Frame one: no aircraft, and the download's progress to show meanwhile.
+    expect(old.isDisposed()).toBe(true);
+    expect(requestRender).toHaveBeenCalledOnce();
+    expect(model.getState()).toMatchObject({ status: "loading", activeLodId: null });
+    expect(model.getState().download).toMatchObject({ lodId: "hd", chosen: true });
+
+    await vi.waitFor(() => expect(gate.waits).toHaveLength(2));
+    expect(requestRender).toHaveBeenCalledOnce();
+    gate.releaseLast();
+    // Frame two: the new aircraft, whole.
+    await vi.waitFor(() => expect(model.getState().activeLodId).toBe("hd"));
+    expect(requestRender).toHaveBeenCalledTimes(2);
+    expect(model.getState().download).toBeNull();
+
+    model.dispose();
+    t.teardown();
+  });
+
+  it("keeps the old mesh in view while Auto's next level gets ready, then swaps them in one frame", async () => {
+    const t = setup();
+    const gate = readinessGate();
+    const requestRender = vi.fn();
+    let distance = 10;
+    const model = createAircraftModel(t.scene, t.parent, {
+      aircraftId: "cessna-172", lodId: "auto", getChaseDistanceMeters: () => distance,
+      loadContainer: t.loadContainer, whenReady: gate.whenReady, requestRender,
+    });
+    await vi.waitFor(() => expect(gate.waits).toHaveLength(1));
+    gate.releaseLast();
+    await vi.waitFor(() => expect(model.getState().activeLodId).toBe("lod3"));
+    const near = t.containers[0].meshes[0];
+    requestRender.mockClear();
+
+    distance = 400;
+    model.refreshAutoLod();
+    await vi.waitFor(() => expect(gate.waits).toHaveLength(2));
+    expect(near.isDisposed()).toBe(false);
+    expect(near.isEnabled()).toBe(true);
+    expect(model.getState().activeLodId).toBe("lod3");
+    expect(model.getState().download).toMatchObject({ lodId: "lod0", chosen: false });
+    expect(requestRender).not.toHaveBeenCalled();
+
+    gate.releaseLast();
+    await vi.waitFor(() => expect(model.getState().activeLodId).toBe("lod0"));
+    expect(near.isDisposed()).toBe(true);
+    expect(requestRender).toHaveBeenCalledOnce();
+
+    model.dispose();
+    t.teardown();
+  });
+
+  it("reports download progress without asking for a frame", async () => {
+    const t = setup();
+    const requestRender = vi.fn();
+    const states: AircraftModelState[] = [];
+    let progress: ((event: ISceneLoaderProgressEvent) => void) | null = null;
+    let finish: (() => void) | null = null;
+    const model = createAircraftModel(t.scene, t.parent, {
+      aircraftId: "cessna-172", lodId: "lod3", requestRender,
+      onStateChange: state => states.push(state),
+      loadContainer: (url, scene, onProgress) => new Promise(resolve => {
+        progress = onProgress;
+        finish = () => {
+          const container = new AssetContainer(scene);
+          const mesh = MeshBuilder.CreateBox("loaded", { size: 1 }, scene);
+          scene.removeMesh(mesh);
+          container.meshes.push(mesh);
+          container.rootNodes.push(mesh);
+          resolve(container);
+        };
+      }),
+    });
+    progress!({ lengthComputable: true, loaded: 40_000, total: 80_000 });
+    progress!({ lengthComputable: false, loaded: 60_000, total: 0 });
+    expect(states.map(state => state.download)).toEqual([
+      { lodId: "lod3", loaded: 0, total: null, chosen: true },
+      { lodId: "lod3", loaded: 40_000, total: 80_000, chosen: true },
+      { lodId: "lod3", loaded: 60_000, total: null, chosen: true },
+    ]);
+    expect(requestRender).not.toHaveBeenCalled();
+    finish!();
+    await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
+    expect(requestRender).toHaveBeenCalledOnce();
+
+    model.dispose();
+    t.teardown();
+  });
+
+  it("drops a level that is still loading when another is chosen, and never shows it", async () => {
+    const t = setup();
+    const gate = readinessGate();
+    const model = createAircraftModel(t.scene, t.parent, {
+      aircraftId: "cessna-172", lodId: "lod3", loadContainer: t.loadContainer, whenReady: gate.whenReady,
+    });
+    await vi.waitFor(() => expect(gate.waits).toHaveLength(1));
+    model.setLod("lod1");
+    expect(gate.waits[0].signal.aborted).toBe(true);
+    await vi.waitFor(() => expect(gate.waits).toHaveLength(2));
+    gate.releaseLast();
+    await vi.waitFor(() => expect(model.getState().activeLodId).toBe("lod1"));
+    expect(t.containers[0].meshes.every(mesh => mesh.isDisposed())).toBe(true);
+    expect(t.containers[1].meshes[0].isEnabled()).toBe(true);
+
+    model.dispose();
+    t.teardown();
+  });
+
+  it("keeps the mesh it shows when the level Auto was moving to fails", async () => {
+    const t = setup();
+    let distance = 10;
+    let fail = false;
+    const model = createAircraftModel(t.scene, t.parent, {
+      aircraftId: "cessna-172", lodId: "auto", getChaseDistanceMeters: () => distance,
+      loadContainer: (url, scene, onProgress) => fail ? Promise.reject(new Error("offline")) : t.loadContainer(url, scene, onProgress),
+    });
+    await vi.waitFor(() => expect(model.getState().activeLodId).toBe("lod3"));
+    fail = true;
+    distance = 400;
+    model.refreshAutoLod();
+    await vi.waitFor(() => expect(model.getState().error).toBe("offline"));
+    expect(model.getState()).toMatchObject({ status: "ready", activeLodId: "lod3" });
+    expect(t.containers[0].meshes[0].isDisposed()).toBe(false);
 
     model.dispose();
     t.teardown();

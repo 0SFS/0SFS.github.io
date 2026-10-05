@@ -411,8 +411,13 @@
   accent-color: var(--flight-panel-accent);
 }
 
+/* A dropdown is as wide as its own text - its longest option - and never
+   stretched to its row or column; it may shrink to fit a narrow panel. See
+   ../foss-earth/docs/ui-layout.md. */
 .flight-panel__field select {
-  width: 100%;
+  justify-self: start;
+  width: auto;
+  max-width: 100%;
   padding: 8px 10px;
   border-radius: 6px;
   border: 1px solid var(--flight-panel-line);
@@ -556,7 +561,8 @@
 }
 
 .flight-panel__generation-field {
-  grid-template-columns: minmax(0, 1fr) minmax(88px, 112px);
+  grid-template-columns: auto auto;
+  justify-content: start;
   align-items: center;
 }
 
@@ -879,7 +885,9 @@
 }
 
 .flight-panel__select {
-  width: 100%;
+  justify-self: start;
+  width: auto;
+  max-width: 100%;
   min-height: 34px;
   padding: 0 9px;
   border: 1px solid rgba(255, 255, 255, 0.14);

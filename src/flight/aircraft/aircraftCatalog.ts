@@ -76,7 +76,6 @@ export interface AircraftFamilyVariantDefinition {
 export interface AircraftSelection {
   aircraftId: AircraftId;
   lodId: AircraftLodId;
-  optInLodsEnabled: boolean;
   generationId?: string;
 }
 
@@ -91,11 +90,11 @@ export interface AircraftLodDefinition {
   autoFromMeters: number;
   credit: AircraftModelCredit;
   /**
-   * Levels that are off until the user asks for them. A level is opt-in when
-   * loading it is a decision rather than a default - a third-party mesh whose
-   * licence has to be honoured, or one heavy enough that nobody should pay for
-   * it without choosing to. While it is off it is neither offered in the panel
-   * nor reachable from "Auto".
+   * A level "Auto" never picks. A level is opt-in when loading it is a
+   * decision rather than a default - a third-party mesh whose licence has to be
+   * honoured, or one heavy enough that nobody should pay for it without
+   * choosing to. Choosing it in the level list is that decision: it is offered
+   * there like any other level, and loads only when chosen.
    */
   optIn?: boolean;
 }
@@ -180,12 +179,9 @@ const HILOS_RUN: AircraftModelCredit = {
 };
 
 const CIRRUS_LODS: readonly AircraftLodDefinition[] = [
-  // Off by default: 3.4 MB of textured mesh, and a licence to honour.
+  // Loaded only when chosen: 3.4 MB of textured mesh, and a licence to honour.
   { id: "hd", label: "HD — highest detail", triangles: 7294, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_HilosRun.glb", autoFromMeters: 0, credit: HILOS_RUN, optIn: true },
-  // 40 m rather than 0 because HD covers the close range when it is switched
-  // on. With it off, the finest level available always covers the close range,
-  // so this still starts at the camera - see selectAutoLod.
-  { id: "lod3", label: "LOD3 — near", triangles: 1654, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD3.glb", autoFromMeters: 40, credit: PROCEDURAL },
+  { id: "lod3", label: "LOD3 — near", triangles: 1654, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD3.glb", autoFromMeters: 0, credit: PROCEDURAL },
   { id: "lod2", label: "LOD2 — medium", triangles: 926, path: "aircraft/cirrus-vision-jet/Cirrus_Vision_Jet_LOD2.glb", autoFromMeters: 65, credit: PROCEDURAL },
   // The bottom of this ladder, and it runs all the way out: there is no
   // silhouette level under it. The one that used to be there was 98 triangles,
@@ -243,12 +239,9 @@ export function isAircraftLodId(value: unknown): value is AircraftLodId {
   return typeof value === "string" && (AIRCRAFT_LOD_IDS as readonly string[]).includes(value);
 }
 
-/** The levels the user can actually get right now, finest first. */
-export function availableLods(
-  definition: AircraftDefinition,
-  optInEnabled: boolean,
-): readonly AircraftLodDefinition[] {
-  return optInEnabled ? definition.lods : definition.lods.filter((lod) => !lod.optIn);
+/** The levels "Auto" chooses between, finest first: every level but the opt-in ones. */
+export function autoLods(definition: AircraftDefinition): readonly AircraftLodDefinition[] {
+  return definition.lods.filter((lod) => !lod.optIn);
 }
 
 /** Keep staged and restored presentation choices valid for the selected package. */
@@ -259,36 +252,27 @@ export function normalizeAircraftSelection(selection: AircraftSelection): Aircra
     ?? family.variants.find((entry) => entry.aircraftId === selection.aircraftId)
     ?? family.variants[0];
   const normalizedDefinition = getAircraftDefinition(familyVariant.aircraftId);
-  // This existing preference survives families without optional meshes; their
-  // hidden flag has no effect, and returning to an opted-in family retains it.
-  const optInLodsEnabled = selection.optInLodsEnabled;
   const lodId = selection.lodId === "auto"
-    || availableLods(normalizedDefinition, optInLodsEnabled).some((lod) => lod.id === selection.lodId)
+    || normalizedDefinition.lods.some((lod) => lod.id === selection.lodId)
     ? selection.lodId
     : "auto";
   return {
     aircraftId: normalizedDefinition.id,
     lodId,
-    optInLodsEnabled,
     generationId: familyVariant.id,
   };
 }
 
 /**
- * Coarsest available level whose `autoFromMeters` threshold the distance has
- * reached, and the finest available one inside that.
- *
- * The finest level available always covers the close range, whatever its own
- * threshold says. That is what lets an opt-in level be switched on and off
- * without rewriting the thresholds under it: with HD on, LOD3 starts at its
- * own 40 m; with HD off, LOD3 is the finest there is and starts at the camera.
+ * Coarsest level "Auto" uses whose `autoFromMeters` threshold the distance has
+ * reached, and the finest one inside that. The finest always covers the close
+ * range, whatever its own threshold says.
  */
 export function selectAutoLod(
   definition: AircraftDefinition,
   chaseDistanceMeters: number,
-  optInEnabled = false,
 ): AircraftLodDefinition | null {
-  const lods = availableLods(definition, optInEnabled);
+  const lods = autoLods(definition);
   let selected: AircraftLodDefinition | null = lods[0] ?? null;
   for (const lod of lods) {
     if (chaseDistanceMeters >= lod.autoFromMeters) selected = lod;
@@ -301,12 +285,9 @@ export function resolveLod(
   definition: AircraftDefinition,
   lodId: AircraftLodId,
   chaseDistanceMeters: number,
-  optInEnabled = false,
 ): AircraftLodDefinition | null {
-  const lods = availableLods(definition, optInEnabled);
-  if (lods.length === 0) return null;
-  if (lodId === "auto") return selectAutoLod(definition, chaseDistanceMeters, optInEnabled);
-  // A level that was chosen and then switched off falls back to the finest one
-  // still available rather than leaving the aircraft invisible.
-  return lods.find((lod) => lod.id === lodId) ?? lods[0] ?? null;
+  if (lodId === "auto") return selectAutoLod(definition, chaseDistanceMeters);
+  // A level this airframe does not have, such as the Cessna asked for "hd",
+  // falls back to the finest one it has rather than leaving it invisible.
+  return definition.lods.find((lod) => lod.id === lodId) ?? autoLods(definition)[0] ?? definition.lods[0] ?? null;
 }

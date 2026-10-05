@@ -4,40 +4,63 @@ import {
   LoadAssetContainerAsync,
   Quaternion,
   TransformNode,
+  type AbstractMesh,
   type AssetContainer,
+  type ISceneLoaderProgressEvent,
   type Scene,
 } from "@babylonjs/core";
+import { whenMeshesReady } from "foss-earth/runtime";
 import { bindAircraftRig, disposeAircraftRig, type AircraftRig } from "./aircraftAnimation";
 import {
   getAircraftDefinition,
   resolveLod,
   type AircraftId,
   type AircraftLodId,
+  type AircraftLodMeshId,
 } from "./aircraftCatalog";
 
 export type AircraftModelStatus = "placeholder" | "loading" | "ready" | "error";
+
+/** A mesh being fetched: bytes so far, and the total when the server gives one. */
+export interface AircraftModelDownload {
+  lodId: AircraftLodMeshId;
+  loaded: number;
+  total: number | null;
+  /**
+   * A level or aircraft the user chose, which nothing stands in for until it
+   * is ready; false for one "Auto" picked, while the old mesh stays in view.
+   */
+  chosen: boolean;
+}
 
 export interface AircraftModelState {
   aircraftId: AircraftId;
   lodId: AircraftLodId;
   /** The mesh actually in the scene, which differs from lodId under "auto". */
   activeLodId: AircraftLodId | null;
-  /** Whether opt-in levels are switched on. See `optIn` in the catalog. */
-  optInEnabled: boolean;
   status: AircraftModelStatus;
   triangles: number | null;
   error: string | null;
+  /** The mesh being loaded to replace or follow the one shown, or null. */
+  download: AircraftModelDownload | null;
 }
 
 export interface AircraftModelOptions {
   aircraftId: AircraftId;
   lodId: AircraftLodId;
-  optInEnabled?: boolean;
   /** Chase distance drives "auto" level selection. */
   getChaseDistanceMeters?(): number;
   onStateChange?(state: AircraftModelState): void;
+  /**
+   * Asked once each time what the model shows changes: a mesh shown, or one
+   * taken away. Nothing else here needs a frame - a download's progress is
+   * text, and a mesh getting ready is hidden until it is.
+   */
+  requestRender?(): void;
   /** Overridable so tests can avoid a real network fetch. */
-  loadContainer?(url: string, scene: Scene): Promise<AssetContainer>;
+  loadContainer?(url: string, scene: Scene, onProgress: (event: ISceneLoaderProgressEvent) => void): Promise<AssetContainer>;
+  /** Overridable so tests need no compiled materials: resolves when the meshes can be drawn. */
+  whenReady?(meshes: readonly AbstractMesh[], signal: AbortSignal): Promise<void>;
 }
 
 export interface AircraftModelHandle {
@@ -46,10 +69,7 @@ export interface AircraftModelHandle {
   /** Moving parts of the loaded mesh, or null while none is in the scene. */
   getRig(): AircraftRig | null;
   setAircraft(id: AircraftId): void;
-  /** Apply staged mesh settings with one resolution/load. */
-  setPresentation(lodId: AircraftLodId, optInEnabled: boolean): void;
   setLod(id: AircraftLodId): void;
-  setOptInEnabled(enabled: boolean): void;
   /** Re-evaluate "auto" against the current chase distance. Cheap to call. */
   refreshAutoLod(): void;
   dispose(): void;
@@ -60,6 +80,30 @@ function resolveAssetUrl(path: string): string {
   return `${base.endsWith("/") ? base : `${base}/`}${path}`;
 }
 
+/** A mesh in the scene, under a node of its own that shows or hides all of it. */
+interface LoadedModel {
+  key: string;
+  lodId: AircraftLodMeshId;
+  triangles: number;
+  container: AssetContainer;
+  holder: TransformNode;
+}
+
+/**
+ * The aircraft's visual mesh, at the level of detail chosen or picked by
+ * distance.
+ *
+ * The scene renders on demand, so a model change is drawn in as few frames as
+ * it can be and never in one that shows nothing new. A mesh is fetched, added
+ * to the scene hidden, and shown only once every material in it has compiled
+ * and every texture has loaded, so the frame that shows it draws all of it:
+ *
+ * - A level the user chooses, or another aircraft, takes the old mesh away at
+ *   once - one frame, with the download's progress in `download` meanwhile -
+ *   and shows the new one in a second frame when it is ready.
+ * - A level "Auto" picks as the camera moves keeps the old mesh in view until
+ *   the new one is ready, and swaps them in one frame.
+ */
 export function createAircraftModel(
   scene: Scene,
   parent: TransformNode,
@@ -68,21 +112,24 @@ export function createAircraftModel(
   const root = new TransformNode("aircraft-model", scene);
   root.parent = parent;
 
-  const loadContainer = options.loadContainer ?? ((url, target) => LoadAssetContainerAsync(url, target));
+  const loadContainer = options.loadContainer
+    ?? ((url, target, onProgress) => LoadAssetContainerAsync(url, target, { onProgress }));
+  const whenReady = options.whenReady ?? ((meshes, signal) => whenMeshesReady(meshes, { signal }));
   const getChaseDistance = options.getChaseDistanceMeters ?? (() => 0);
+  const requestRender = (): void => options.requestRender?.();
 
-  let container: AssetContainer | null = null;
+  let shown: LoadedModel | null = null;
   let rig: AircraftRig | null = null;
-  let loadToken = 0;
-  let activeKey: string | null = null;
+  let pending: { key: string; controller: AbortController } | null = null;
+  let disposed = false;
   let state: AircraftModelState = {
     aircraftId: options.aircraftId,
     lodId: options.lodId,
     activeLodId: null,
-    optInEnabled: options.optInEnabled ?? false,
     status: "placeholder",
     triangles: null,
     error: null,
+    download: null,
   };
 
   const publish = (partial: Partial<AircraftModelState>): void => {
@@ -90,67 +137,124 @@ export function createAircraftModel(
     options.onStateChange?.(state);
   };
 
-  const clearContainer = (): void => {
-    if (rig) disposeAircraftRig(rig);
-    container?.dispose();
-    container = null;
-    rig = null;
+  const disposeModel = (model: LoadedModel): void => {
+    model.container.dispose();
+    model.holder.dispose();
   };
 
-  const apply = (): void => {
+  /** Takes the shown mesh away. The caller asks for the frame. */
+  const clearShown = (): void => {
+    if (rig) disposeAircraftRig(rig);
+    rig = null;
+    if (shown) disposeModel(shown);
+    shown = null;
+  };
+
+  const cancelPending = (): void => {
+    pending?.controller.abort();
+    pending = null;
+  };
+
+  const load = (key: string, lodId: AircraftLodMeshId, path: string, triangles: number, chosen: boolean): void => {
+    const controller = new AbortController();
+    const current = { key, controller };
+    pending = current;
+    const isCurrent = (): boolean => pending === current && !disposed;
     const definition = getAircraftDefinition(state.aircraftId);
-    const lod = resolveLod(definition, state.lodId, getChaseDistance(), state.optInEnabled);
+    publish({ status: "loading", error: null, download: { lodId, loaded: 0, total: null, chosen } });
+
+    let loaded: LoadedModel | null = null;
+    void (async () => {
+      try {
+        const container = await loadContainer(resolveAssetUrl(path), scene, (event) => {
+          if (!isCurrent()) return;
+          publish({ download: { lodId, loaded: event.loaded, total: event.lengthComputable ? event.total : null, chosen } });
+        });
+        if (!isCurrent()) {
+          container.dispose();
+          return;
+        }
+        // Into the scene hidden, so its materials compile for the lights that
+        // will shine on it while nothing is drawn.
+        const holder = new TransformNode(`aircraft-model-${lodId}`, scene);
+        holder.parent = root;
+        holder.setEnabled(false);
+        loaded = { key, lodId, triangles, container, holder };
+        for (const node of container.rootNodes) node.parent = holder;
+        container.addAllToScene();
+        // The aircraft is never a pick or collision target; the sim raycasts
+        // terrain only, and leaving these pickable would let the chase camera
+        // and the visible-mesh collision probe hit the aircraft itself.
+        for (const mesh of container.meshes) mesh.isPickable = false;
+        await whenReady(container.meshes, controller.signal);
+        if (!isCurrent()) {
+          disposeModel(loaded);
+          return;
+        }
+        // One frame: the mesh it replaces goes and this one shows, whole.
+        clearShown();
+        shown = loaded;
+        root.rotationQuaternion = Quaternion.RotationYawPitchRoll(definition.modelYawRad, 0, 0);
+        root.position.set(definition.modelOffset.x, definition.modelOffset.y, definition.modelOffset.z);
+        loaded.holder.setEnabled(true);
+        rig = bindAircraftRig(container.transformNodes.concat(container.meshes), {
+          scene,
+          propellerBlades: definition.propellerBlades,
+        });
+        pending = null;
+        publish({ activeLodId: lodId, status: "ready", triangles, error: null, download: null });
+        requestRender();
+      } catch (error: unknown) {
+        if (loaded && shown !== loaded) disposeModel(loaded);
+        if (!isCurrent()) return;
+        pending = null;
+        const message = error instanceof Error ? error.message : String(error);
+        // A level Auto was moving to failed: the one shown stays, and says why.
+        if (shown) publish({ activeLodId: shown.lodId, status: "ready", triangles: shown.triangles, error: message, download: null });
+        else publish({ activeLodId: null, status: "error", triangles: null, error: message, download: null });
+      }
+    })();
+  };
+
+  /**
+   * Shows the level the state asks for. `chosen` is a choice the user made: it
+   * takes the shown mesh away at once rather than leaving the old choice on
+   * screen while the new one loads.
+   */
+  const apply = (chosen: boolean): void => {
+    if (disposed) return;
+    const definition = getAircraftDefinition(state.aircraftId);
+    const lod = resolveLod(definition, state.lodId, getChaseDistance());
 
     if (!lod) {
-      loadToken += 1;
-      clearContainer();
-      activeKey = null;
-      publish({ activeLodId: null, status: "placeholder", triangles: null, error: null });
+      cancelPending();
+      const hadModel = shown !== null;
+      clearShown();
+      publish({ activeLodId: null, status: "placeholder", triangles: null, error: null, download: null });
+      if (hadModel) requestRender();
       return;
     }
 
     const key = `${definition.id}:${lod.id}`;
-    if (key === activeKey && state.status === "ready") return;
-
-    const token = ++loadToken;
-    publish({ status: "loading", error: null });
-
-    loadContainer(resolveAssetUrl(lod.path), scene)
-      .then((next) => {
-        if (token !== loadToken) {
-          next.dispose();
-          return;
-        }
-        clearContainer();
-        container = next;
-        next.addAllToScene();
-        for (const node of next.rootNodes) node.parent = root;
-        // The aircraft is never a pick or collision target; the sim raycasts
-        // terrain only, and leaving these pickable would let the chase camera
-        // and the visible-mesh collision probe hit the aircraft itself.
-        for (const mesh of next.meshes) mesh.isPickable = false;
-        rig = bindAircraftRig(next.transformNodes.concat(next.meshes), {
-          scene,
-          propellerBlades: definition.propellerBlades,
-        });
-        root.rotationQuaternion = Quaternion.RotationYawPitchRoll(definition.modelYawRad, 0, 0);
-        root.position.set(definition.modelOffset.x, definition.modelOffset.y, definition.modelOffset.z);
-        activeKey = key;
-        publish({ activeLodId: lod.id, status: "ready", triangles: lod.triangles, error: null });
-      })
-      .catch((error: unknown) => {
-        if (token !== loadToken) return;
-        activeKey = null;
-        publish({
-          activeLodId: null,
-          status: "error",
-          triangles: null,
-          error: error instanceof Error ? error.message : String(error),
-        });
-      });
+    if (pending?.key === key) return;
+    if (shown?.key === key) {
+      // Back to what is on screen while something else was loading.
+      if (pending) {
+        cancelPending();
+        publish({ activeLodId: shown.lodId, status: "ready", triangles: shown.triangles, error: null, download: null });
+      }
+      return;
+    }
+    cancelPending();
+    if (chosen && shown) {
+      clearShown();
+      publish({ activeLodId: null, triangles: null });
+      requestRender();
+    }
+    load(key, lod.id, lod.path, lod.triangles, chosen || !shown);
   };
 
-  apply();
+  apply(true);
 
   return {
     root,
@@ -159,32 +263,21 @@ export function createAircraftModel(
     setAircraft(id): void {
       if (id === state.aircraftId) return;
       state = { ...state, aircraftId: id };
-      activeKey = null;
-      clearContainer();
-      apply();
-    },
-    setPresentation(lodId, optInEnabled): void {
-      if (lodId === state.lodId && optInEnabled === state.optInEnabled) return;
-      state = { ...state, lodId, optInEnabled };
-      apply();
+      apply(true);
     },
     setLod(id): void {
       if (id === state.lodId) return;
       state = { ...state, lodId: id };
-      apply();
-    },
-    setOptInEnabled(enabled): void {
-      if (enabled === state.optInEnabled) return;
-      state = { ...state, optInEnabled: enabled };
-      apply();
+      apply(true);
     },
     refreshAutoLod(): void {
       if (state.lodId !== "auto") return;
-      apply();
+      apply(false);
     },
     dispose(): void {
-      loadToken += 1;
-      clearContainer();
+      disposed = true;
+      cancelPending();
+      clearShown();
       root.dispose();
     },
   };

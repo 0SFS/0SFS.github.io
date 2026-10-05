@@ -925,7 +925,8 @@ prints; a loop that does not close that way is a T-junction.
 `tests/cirrus_vision_Sf50/` turned out to be hilos run's Sketchfab model — its
 root node is `Sketchfab_model` and its counts match the page. It is **CC
 Attribution**, so it can ship, and it now does: as the Vision Jet's `hd` level,
-**off by default**, switched on from the panel.
+which `Auto` never picks and which loads only when chosen from the panel's level
+list.
 
 | | hd (hilos run) | our LOD3 |
 | --- | --- | --- |
@@ -961,13 +962,10 @@ because the validator reports it, not because the model looks lopsided.
 `src/flight/aircraft/aircraftCatalog.ts`:
 
 - Three levels of ours — 1654 / 926 / 438 triangles — at `autoFromMeters` of
-  40 / 65 / 170, plus hilos run's opt-in `hd` at 0. The two coarse thresholds
-  are the Cessna's scaled by the span ratio, so the two airframes switch at the
-  same apparent size; the fourth threshold is gone with the level it selected,
-  so LOD1 runs from 170 m all the way out. LOD3's is 40 rather than 0 because
-  `hd` covers the close range when it is on; with `hd` off, `selectAutoLod`
-  gives the close range to the finest level available, so LOD3 still starts at
-  the camera. There is one threshold table, not one per setting.
+  0 / 65 / 170, plus hilos run's opt-in `hd`, which `Auto` never picks. The two
+  coarse thresholds are the Cessna's scaled by the span ratio, so the two
+  airframes switch at the same apparent size; the fourth threshold is gone with
+  the level it selected, so LOD1 runs from 170 m all the way out.
 - Every level names its artist. Ours are `felipegalin0`, "measured
   reconstruction, designed explicitly for max runtime speed"; `hd` is
   `hilos run` with its licence and a link, which the panel shows whenever that

@@ -112,8 +112,24 @@ Rules only. Details live in the linked docs; update those, not this file.
 - Every setting has one home, a section of a tab. A toolbar button toggles that
   tab, showing it or closing it; nothing pops up a menu or a second copy, and
   nothing floats in a screen corner.
+- A dropdown is as wide as its own text, its longest option, and never stretched
+  to its row, column or panel.
 - Spec and reasons, shared with FOSS Earth:
   [../foss-earth/docs/ui-layout.md](../foss-earth/docs/ui-layout.md).
+
+## Rendering and compute
+
+- Compute something once; compute it twice only when that is the cheapest way.
+  Draw a frame only when what it shows has changed, draw each change once, and
+  draw nothing while nothing changes.
+- Meshes and lights entering or leaving the scene, and content becoming ready to
+  draw, ask for their own frame. Any other change to what is shown calls
+  `requestRender()` once; progress and anything hidden ask for none.
+- Show new content only when all of it can be drawn: prepare it hidden, wait for
+  `whenMeshesReady`, then show it and take away what it replaces in one task. The
+  aircraft model is the example: [docs/aircraft-assets.md](docs/aircraft-assets.md).
+- Spec, reasons and a checklist, shared with FOSS Earth:
+  [../foss-earth/docs/render-on-demand.md](../foss-earth/docs/render-on-demand.md).
 
 ## Camera motion
 

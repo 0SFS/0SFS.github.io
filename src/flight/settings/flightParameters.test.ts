@@ -57,7 +57,6 @@ describe("flight parameter catalogue", () => {
       "flight-sim.aircraft": "cessna-172",
       "osfs.aircraft-generation": "g2+",
       "osfs.aircraft-lod": "hd",
-      "osfs.aircraft-opt-in-lods": "on",
     };
     const storage = new Map(Object.entries(old));
     vi.stubGlobal("localStorage", {
@@ -75,7 +74,7 @@ describe("flight parameter catalogue", () => {
       "osfs.autopilot.axes.gear", "osfs.autopilot.throttleMode", "osfs.camera.phone.send", "osfs.camera.phone.bufferMs",
       "osfs.camera.phone.catchUp", "osfs.camera.chaseFrame", "osfs.sound.quality", "osfs.sound.masterVolume",
       "osfs.engineMonitor.fuelFlowUnit", "osfs.ground.rotation", "osfs.ground.tireAudio", "osfs.ground.lock.haptics",
-      "osfs.aircraft.id", "osfs.aircraft.generation", "osfs.aircraft.lod", "osfs.aircraft.optInLods",
+      "osfs.aircraft.id", "osfs.aircraft.generation", "osfs.aircraft.lod",
     ].map(id => [id, settings.get(id)]))).toEqual({
       "osfs.flight.minimum": 8192, "map.focus.refineFrom": "camera", "osfs.renderer.attitudeIndicator": "canvas2d",
       "osfs.ground.arcadeLaunches": true, "osfs.assist.autoTrim": false, "osfs.assist.autoRollTrim": false,
@@ -88,7 +87,6 @@ describe("flight parameter catalogue", () => {
       "osfs.ground.tireAudio": "slip", "osfs.ground.lock.haptics": true,
       // The newer key wins over the older one.
       "osfs.aircraft.id": "cirrus-vision-jet-g2", "osfs.aircraft.generation": "g2+", "osfs.aircraft.lod": "hd",
-      "osfs.aircraft.optInLods": true,
     });
     for (const [key, value] of Object.entries(old)) expect(storage.get(key), key).toBe(value);
 

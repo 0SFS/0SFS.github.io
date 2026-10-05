@@ -2,7 +2,6 @@ import { Plane } from "lucide-react";
 import { useId, useState } from "react";
 import {
   AIRCRAFT_FAMILIES,
-  availableLods,
   getAircraftDefinition,
   getAircraftFamilyForAircraft,
   normalizeAircraftSelection,
@@ -80,13 +79,12 @@ export function AircraftSelectionPanel({
   const isActiveAircraft = selection.aircraftId === snapshot.aircraftId;
   const hasChanges = !isActiveAircraft
     || selection.lodId !== activeSelection.lodId
-    || selection.optInLodsEnabled !== activeSelection.optInLodsEnabled
     || selection.generationId !== activeSelection.generationId;
-  const offered = availableLods(definition, selection.optInLodsEnabled);
-  const optInLods = definition.lods.filter(lod => lod.optIn);
+  // Every level is offered, the opt-in ones too: choosing one is the opt-in.
+  // Their credit and licence show with the others below, since they are offered.
+  const offered = definition.lods;
   const currentModelLod = activeDefinition.lods.find(lod => lod.id === snapshot.modelActiveLodId);
   const activeLod = isActiveAircraft ? currentModelLod : undefined;
-  // Include a still-loaded opt-in mesh's attribution while staging its removal.
   const credited = [...offered, ...(activeLod ? [activeLod] : [])].reduce<AircraftModelCredit[]>((keep, lod) => {
     if (!keep.some(credit => credit.artist === lod.credit.artist
       && credit.sourceUrl === lod.credit.sourceUrl && credit.licence === lod.credit.licence)) {
@@ -207,21 +205,6 @@ export function AircraftSelectionPanel({
               ))}
             </select>
           </label>
-          {optInLods.length > 0 ? (
-            <>
-              <label className="flight-panel__field flight-panel__field--inline">
-                <input
-                  type="checkbox"
-                  checked={selection.optInLodsEnabled}
-                  onChange={event => updateSelection({ ...selection, optInLodsEnabled: event.target.checked })}
-                />
-                <span>{`Higher-detail models (${optInLods.map(lod => `${lod.triangles.toLocaleString()} tris`).join(", ")})`}</span>
-              </label>
-              {!selection.optInLodsEnabled ? optInLods.filter(lod => !credited.includes(lod.credit)).map(lod => (
-                <ModelCredit key={lod.id} credit={lod.credit} prefix="Optional model: " />
-              )) : null}
-            </>
-          ) : null}
         </fieldset>
         <button
           className="flight-panel__command"

@@ -126,18 +126,6 @@ export const OSFS_PARAMETERS = [
     appliesLive: true,
     source: "src/flight/aircraft/aircraftCatalog.ts",
   },
-  {
-    id: "osfs.aircraft.optInLods",
-    label: "Opt-in models",
-    description: "Offers the models an aircraft marks as opt-in, such as the Vision Jet's HD mesh, to Auto and to the model choice.",
-    unit: "none",
-    kind: "boolean",
-    default: false,
-    defaultReason: "Opt-in models cost more to download and draw; the pilot chooses them.",
-    home: all(MODEL),
-    appliesLive: true,
-    source: "src/flight/aircraft/aircraftCatalog.ts",
-  },
 
   // Map → Detail: the low-spawn hold, a requirement on World detail.
   {

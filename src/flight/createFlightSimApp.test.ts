@@ -60,7 +60,7 @@ const mocks = vi.hoisted(() => {
         status: "ready", triangles: 876, error: null,
       }),
       getRig: () => mocks.rig,
-      setAircraft: vi.fn(), setLod: vi.fn(), setPresentation: vi.fn(), refreshAutoLod: vi.fn(), dispose: vi.fn(),
+      setAircraft: vi.fn(), setLod: vi.fn(), refreshAutoLod: vi.fn(), dispose: vi.fn(),
     },
     rig: { parts: [], propeller: null, propellerAngleRad: 0, bound: [] },
     surfaceState: { elevatorRad: 0.1 },
@@ -487,22 +487,21 @@ it("stages all Vision Jet generations and applies a complete package once", asyn
       expect(t.root.textContent).toContain("Currently flying Cessna 172 Skyhawk until you apply.");
       expect(t.setItem).not.toHaveBeenCalled();
       expect(t.reload).not.toHaveBeenCalled();
-      expect(mocks.aircraftModel.setPresentation).not.toHaveBeenCalled();
+      expect(mocks.aircraftModel.setLod).not.toHaveBeenCalled();
     }
     await changeSelect(t.root, generationSelector, "g2+");
-    await act(async () => selectionControl<HTMLInputElement>(t.root, '.flight-panel__model-controls input[type="checkbox"]').click());
     await changeSelect(t.root, lodSelector, "hd");
     await act(async () => selectionControl<HTMLButtonElement>(t.root, applySelector).click());
     // One write of the whole choice, before the reload that activates it.
     expect(t.setItem).toHaveBeenCalledOnce();
     expect(savedSettings(t.storage)).toMatchObject({
       "osfs.aircraft.id": "cirrus-vision-jet-g2", "osfs.aircraft.generation": "g2+",
-      "osfs.aircraft.lod": "hd", "osfs.aircraft.optInLods": true,
+      "osfs.aircraft.lod": "hd",
     });
     expect(t.reload).toHaveBeenCalledOnce();
     expect(t.setItem.mock.invocationCallOrder.at(-1)).toBeLessThan(t.reload.mock.invocationCallOrder[0]);
     expect(mocks.aircraftModel.setAircraft).not.toHaveBeenCalled();
-    expect(mocks.aircraftModel.setPresentation).not.toHaveBeenCalled();
+    expect(mocks.aircraftModel.setLod).not.toHaveBeenCalled();
     expect(createJsbsimRuntime).toHaveBeenCalledTimes(1);
     await act(async () => selectionControl<HTMLButtonElement>(t.root, applySelector).click());
     expect(t.reload).toHaveBeenCalledOnce();
@@ -514,16 +513,15 @@ it("applies presentation changes once after staging and retains per-family draft
   const t = await mountAircraftSelection();
   try {
     await changeSelect(t.root, lodSelector, "lod2");
-    expect(mocks.aircraftModel.setPresentation).not.toHaveBeenCalled();
+    expect(mocks.aircraftModel.setLod).not.toHaveBeenCalled();
     expect(t.setItem).not.toHaveBeenCalled();
     await act(async () => selectionControl<HTMLButtonElement>(t.root, applySelector).click());
-    expect(mocks.aircraftModel.setPresentation).toHaveBeenCalledExactlyOnceWith("lod2", false);
+    expect(mocks.aircraftModel.setLod).toHaveBeenCalledExactlyOnceWith("lod2");
     expect(t.reload).not.toHaveBeenCalled();
     expect(selectionControl<HTMLButtonElement>(t.root, applySelector).disabled).toBe(true);
 
     await act(async () => selectionControl<HTMLInputElement>(t.root, 'input[name="flight-aircraft"][value="cirrus-vision-jet"]').click());
     await changeSelect(t.root, generationSelector, "g3");
-    await act(async () => selectionControl<HTMLInputElement>(t.root, '.flight-panel__model-controls input[type="checkbox"]').click());
     await changeSelect(t.root, lodSelector, "hd");
     await act(async () => selectionControl<HTMLInputElement>(t.root, 'input[name="flight-aircraft"][value="cessna-172"]').click());
     expect(t.root.querySelector(generationSelector)).toBeNull();
@@ -534,8 +532,7 @@ it("applies presentation changes once after staging and retains per-family draft
     await act(async () => selectionControl<HTMLInputElement>(t.root, 'input[name="flight-aircraft"][value="cirrus-vision-jet"]').click());
     expect(selectionControl<HTMLSelectElement>(t.root, generationSelector).value).toBe("g3");
     expect(selectionControl<HTMLSelectElement>(t.root, lodSelector).value).toBe("hd");
-    expect(selectionControl<HTMLInputElement>(t.root, '.flight-panel__model-controls input[type="checkbox"]').checked).toBe(true);
-    expect(mocks.aircraftModel.setPresentation).toHaveBeenCalledTimes(1);
+    expect(mocks.aircraftModel.setLod).toHaveBeenCalledTimes(1);
     expect(t.setItem).toHaveBeenCalledOnce();
     await act(async () => selectionControl<HTMLButtonElement>(t.root, ".flight-panel__command--secondary").click());
     expect(selectionControl<HTMLInputElement>(t.root, 'input[name="flight-aircraft"][value="cessna-172"]').checked).toBe(true);
@@ -560,7 +557,7 @@ it("takes back an aircraft choice that could not be saved, and does not reload",
     expect(getAppSettings().get("osfs.aircraft.id")).toBe("cessna-172");
     expect(getAppSettings().get("osfs.aircraft.lod")).toBe("lod2");
     expect(t.reload).not.toHaveBeenCalled();
-    expect(mocks.aircraftModel.setPresentation).not.toHaveBeenCalled();
+    expect(mocks.aircraftModel.setLod).not.toHaveBeenCalled();
     expect(mocks.aircraftModel.setAircraft).not.toHaveBeenCalled();
     await changeSelect(t.root, generationSelector, "g1");
     expect(t.root.querySelector('[role="alert"]')).toBeNull();

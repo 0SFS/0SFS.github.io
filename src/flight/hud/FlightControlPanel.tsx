@@ -110,8 +110,6 @@ export interface FlightControlPanelSnapshot {
   aircraftId: AircraftId;
   generationId?: string;
   lodId: AircraftLodId;
-  /** Whether the opt-in levels are switched on. */
-  optInLodsEnabled: boolean;
   modelStatus: AircraftModelStatus;
   /** Level actually in the scene; differs from lodId while "Auto" is selected. */
   modelActiveLodId: AircraftLodId | null;
@@ -795,7 +793,6 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
       family.id === activeFamily.id ? props.snapshot : {
         aircraftId: family.defaultAircraftId,
         lodId: props.snapshot.lodId,
-        optInLodsEnabled: props.snapshot.optInLodsEnabled,
       },
     ));
   });

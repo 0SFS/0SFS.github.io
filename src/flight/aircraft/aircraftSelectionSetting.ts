@@ -7,7 +7,6 @@ export const AIRCRAFT_SELECTION_PARAMETER_IDS: readonly FlightParameterId[] = [
   "osfs.aircraft.id",
   "osfs.aircraft.generation",
   "osfs.aircraft.lod",
-  "osfs.aircraft.optInLods",
 ];
 
 /** The saved aircraft choice, kept consistent with the aircraft's package. */
@@ -19,7 +18,6 @@ export function readAircraftSelection(parameters: FlightParameters): AircraftSel
     aircraftId: isAircraftId(aircraftId) ? aircraftId : "cessna-172",
     generationId: parameters.get("osfs.aircraft.generation"),
     lodId: isAircraftLodId(lodId) ? lodId : "auto",
-    optInLodsEnabled: parameters.get("osfs.aircraft.optInLods"),
   });
 }
 
@@ -30,6 +28,5 @@ export function aircraftSelectionValues(selection: AircraftSelection): Partial<F
     "osfs.aircraft.id": normalized.aircraftId,
     ...(normalized.generationId !== undefined ? { "osfs.aircraft.generation": normalized.generationId } : {}),
     "osfs.aircraft.lod": normalized.lodId,
-    "osfs.aircraft.optInLods": normalized.optInLodsEnabled,
   };
 }

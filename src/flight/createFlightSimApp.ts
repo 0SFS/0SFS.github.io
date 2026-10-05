@@ -41,6 +41,7 @@ import {
 import { readDeviceHints } from "foss-earth/mapDetailPolicy";
 import { createPlaceholderAircraft } from "./aircraft/createPlaceholderAircraft";
 import {
+  getAircraftDefinition,
   getAircraftFamilyForAircraft,
   normalizeAircraftSelection,
   type AircraftId,
@@ -845,28 +846,25 @@ export async function createFlightSimApp(
   const aircraftId: AircraftId = initialAircraftId;
   let aircraftLodId: AircraftLodId = initialAircraftSelection.lodId;
   let aircraftGenerationId: string = initialAircraftSelection.generationId ?? getAircraftFamilyForAircraft(aircraftId).variants[0]?.id ?? "cessna-172";
-  let optInLodsEnabled = initialAircraftSelection.optInLodsEnabled;
   // The model and its detail change live, from the chooser or Show all
   // parameters; another aircraft loads on the next start.
   const followAircraftPresentation = (): void => {
     const next = readAircraftSelection(parameters);
     if (next.aircraftId !== aircraftId) return;
     const generationId = next.generationId ?? aircraftGenerationId;
-    if (next.lodId === aircraftLodId && next.optInLodsEnabled === optInLodsEnabled && generationId === aircraftGenerationId) return;
+    if (next.lodId === aircraftLodId && generationId === aircraftGenerationId) return;
     aircraftLodId = next.lodId;
     aircraftGenerationId = generationId;
-    optInLodsEnabled = next.optInLodsEnabled;
-    aircraftModel?.setPresentation(next.lodId, next.optInLodsEnabled);
+    // The model asks for its own frames, and only when what it shows changes.
+    aircraftModel?.setLod(next.lodId);
     if (aircraftModel) modelState = aircraftModel.getState();
     controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
-    runtime.requestRender();
   };
   for (const id of AIRCRAFT_SELECTION_PARAMETER_IDS) stopWatching.push(parameters.watch(id, followAircraftPresentation));
   let aircraftReloadRequested = false;
   let modelState: AircraftModelState = {
     aircraftId, lodId: aircraftLodId, activeLodId: null,
-    optInEnabled: optInLodsEnabled,
-    status: "placeholder", triangles: null, error: null,
+    status: "placeholder", triangles: null, error: null, download: null,
   };
   let hudBar: FlightHudBarHandle | null = null;
   let statusOverlay: FlightStatusOverlayHandle | null = null;
@@ -992,10 +990,28 @@ export async function createFlightSimApp(
   const weather: FlightWeatherState = { windDirectionDeg: 0, windSpeedKts: 0 };
 
   loading.setPhase("assets", { state: "loading", detail: "Loading your aircraft" });
+  // The placeholder blocks stand in only when there is no mesh to show: none
+  // exists for the airframe, or it failed to load. While a chosen mesh loads
+  // nothing stands in, and the log carries its progress.
+  let blocksStandIn: boolean | null = null;
   const onModelState = (state: AircraftModelState): void => {
     modelState = state;
-    aircraft?.setModelLoaded(state.status === "ready");
-    if (state.status === "ready") {
+    const standIn = state.status === "placeholder" || state.status === "error";
+    if (standIn !== blocksStandIn) {
+      blocksStandIn = standIn;
+      aircraft?.setModelLoaded(!standIn);
+      runtime.requestRender();
+    }
+    const download = state.download;
+    if (state.status === "loading" && download?.chosen) {
+      const label = getAircraftDefinition(state.aircraftId).lods.find(lod => lod.id === download.lodId)?.label ?? download.lodId;
+      const megabytes = (bytes: number) => (bytes / 1_000_000).toFixed(1);
+      loading.setPhase("assets", {
+        state: "loading",
+        detail: download.total ? `Loading ${label}, ${megabytes(download.loaded)} of ${megabytes(download.total)} MB` : `Loading ${label}`,
+        progress: download.total ? download.loaded / download.total : null,
+      });
+    } else if (state.status === "ready") {
       loading.setPhase("assets", { state: "ready" });
     } else if (state.status === "placeholder") {
       // The placeholder is a complete, flyable aircraft. A visual mesh should
@@ -1022,13 +1038,12 @@ export async function createFlightSimApp(
     aircraftModel = createAircraftModel(runtime.scene, aircraft.modelRoot, {
       aircraftId,
       lodId: aircraftLodId,
-      optInEnabled: optInLodsEnabled,
       getChaseDistanceMeters: () => aircraft?.getChaseDistanceMeters() ?? 0,
       onStateChange: (state) => {
         onModelState(state);
         if (controlPanel) controlPanel.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
-        runtime.requestRender();
       },
+      requestRender: () => runtime.requestRender(),
     });
 
     onModelState(aircraftModel.getState());
@@ -1189,7 +1204,6 @@ export async function createFlightSimApp(
       aircraftId,
       generationId: aircraftGenerationId,
       lodId: aircraftLodId,
-      optInLodsEnabled,
       modelStatus: modelState.status,
       modelActiveLodId: modelState.activeLodId,
       modelTriangles: modelState.triangles,

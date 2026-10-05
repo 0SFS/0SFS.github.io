@@ -18,7 +18,7 @@ function activeSnapshot(overrides: Partial<FlightControlPanelSnapshot> = {}): Fl
   // Only the aircraft selector's snapshot fields are consumed by this component.
   return {
     aircraftId: "cirrus-vision-jet-g2", generationId: "g2", lodId: "auto",
-    optInLodsEnabled: false, modelStatus: "ready", modelActiveLodId: "lod3",
+    modelStatus: "ready", modelActiveLodId: "lod3",
     modelTriangles: 1654, modelError: null, ...overrides,
   } as FlightControlPanelSnapshot;
 }
@@ -58,7 +58,7 @@ describe("aircraft selection panel", () => {
     await act(async () => radios[0].focus());
     expect(scroll).toHaveBeenCalledWith({ block: "nearest", inline: "nearest" });
     expect(t.onApply).not.toHaveBeenCalled();
-    expect(t.host.textContent).toContain("Optional model: hilos run");
+    expect(t.host.textContent).toContain("hilos run — Sketchfab model");
   });
 
   it.each([
@@ -77,10 +77,10 @@ describe("aircraft selection panel", () => {
 
   it("retains the active licensed model's attribution while another package is staged", async () => {
     const snapshot = activeSnapshot({
-      modelStatus: "error", modelError: "Active G2 diagnostic", modelActiveLodId: "hd", optInLodsEnabled: true,
+      modelStatus: "error", modelError: "Active G2 diagnostic", modelActiveLodId: "hd",
     });
     const t = await mount(snapshot, {
-      aircraftId: "cirrus-vision-jet-g3", generationId: "g3", lodId: "auto", optInLodsEnabled: false,
+      aircraftId: "cirrus-vision-jet-g3", generationId: "g3", lodId: "auto",
     });
     expect(t.host.querySelector(".flight-panel__model-status")).toBeNull();
     expect(t.host.textContent).not.toContain("Active G2 diagnostic");
@@ -94,7 +94,7 @@ describe("aircraft selection panel", () => {
 
   it("keeps the C172 selectable when its thumbnail fails and shows no generation or HD controls", async () => {
     const t = await mount(activeSnapshot(), {
-      aircraftId: "cessna-172", generationId: "cessna-172", lodId: "auto", optInLodsEnabled: true,
+      aircraftId: "cessna-172", generationId: "cessna-172", lodId: "auto",
     });
     const card = t.host.querySelector<HTMLInputElement>('input[value="cessna-172"]')!.closest("label")!;
     await act(async () => card.querySelector("img")!.dispatchEvent(new Event("error")));
@@ -103,15 +103,34 @@ describe("aircraft selection panel", () => {
     expect(card.textContent).toContain("Cessna 172 Skyhawk");
     expect(t.host.querySelector(".flight-panel__generation-field")).toBeNull();
     expect(t.host.querySelector('.flight-panel__model-controls input[type="checkbox"]')).toBeNull();
+    const levels = Array.from(t.host.querySelectorAll<HTMLOptionElement>(".flight-panel__model-controls option"));
+    expect(levels.map(option => option.value)).toEqual(["auto", "lod3", "lod2", "lod1", "lod0"]);
     const jet = t.host.querySelector<HTMLInputElement>('input[value="cirrus-vision-jet"]')!;
     await act(async () => jet.click());
     expect(t.onFamilyChange).toHaveBeenCalledWith("cirrus-vision-jet");
     expect(t.onApply).not.toHaveBeenCalled();
   });
 
+  it("offers the HD model in the level list itself, with its credit, and no switch to unlock it", async () => {
+    const t = await mount(activeSnapshot());
+    expect(t.host.querySelector('.flight-panel__model-controls input[type="checkbox"]')).toBeNull();
+    const select = t.host.querySelector<HTMLSelectElement>(".flight-panel__model-controls select")!;
+    expect(Array.from(select.options).map(option => option.value)).toEqual(["auto", "hd", "lod3", "lod2", "lod1"]);
+    // Offered, so its licence is shown with the others.
+    expect(t.host.textContent).toContain("hilos run");
+    expect(t.host.textContent).toContain("CC Attribution");
+    await act(async () => {
+      select.value = "hd";
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    expect(t.onSelectionChange).toHaveBeenCalledWith({
+      aircraftId: "cirrus-vision-jet-g2", generationId: "g2", lodId: "hd",
+    });
+  });
+
   it("presents Apply errors and clears them when the staged generation is edited", async () => {
     const t = await mount(activeSnapshot(), {
-      aircraftId: "cirrus-vision-jet-g3", generationId: "g3", lodId: "lod2", optInLodsEnabled: false,
+      aircraftId: "cirrus-vision-jet-g3", generationId: "g3", lodId: "lod2",
     });
     t.onApply.mockReturnValue("Could not save your aircraft choice.");
     await act(async () => t.host.querySelector<HTMLButtonElement>(".flight-panel__aircraft-controls > button")!.click());
@@ -122,7 +141,7 @@ describe("aircraft selection panel", () => {
       generation.dispatchEvent(new Event("change", { bubbles: true }));
     });
     expect(t.onSelectionChange).toHaveBeenCalledWith({
-      aircraftId: "cirrus-vision-jet-g2", generationId: "g2+", lodId: "lod2", optInLodsEnabled: false,
+      aircraftId: "cirrus-vision-jet-g2", generationId: "g2+", lodId: "lod2",
     });
     expect(t.host.querySelector('[role="alert"]')).toBeNull();
     expect(t.onApply).toHaveBeenCalledOnce();

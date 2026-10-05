@@ -18,10 +18,14 @@ await mkdir(fixtureRoot);
 const importPath = relative => JSON.stringify(path.join(root, relative));
 const fixture = [
   "import {createFlightControlPanel} from " + importPath("src/flight/hud/createFlightControlPanel.tsx") + ";",
+  "import {DEFAULT_GROUND_INTERACTION_SETTINGS,resolveGroundInteraction} from " + importPath("src/flight/settings/groundInteractionSettings.ts") + ";",
+  // Every tab renders with the panel, the Ground one included, so the snapshot carries its state.
+  "const groundCapabilities={contactBridgeUnavailable:'not in this fixture',audioUnavailable:null};",
+  "const groundInteraction={settings:DEFAULT_GROUND_INTERACTION_SETTINGS,resolution:resolveGroundInteraction(DEFAULT_GROUND_INTERACTION_SETTINGS,groundCapabilities,DEFAULT_GROUND_INTERACTION_SETTINGS),capabilities:groundCapabilities,readOnlyReason:null,message:null,experimentOverride:null,hapticDevices:{gamepad:'none',phone:'Not paired'}};",
   "import " + importPath("src/styles/globe.css") + ";",
   "import " + importPath("src/styles/flight.css") + ";",
   "const noop=()=>{};",
-  "const snapshot={flightState:{latDeg:45,lonDeg:-93,altMeters:1500,headingRad:0,airspeedKts:150,throttleNorm:.5},fps:60,paused:true,viewMode:'third',runtimeStatus:{message:'Static UI acceptance fixture'},rendererMode:'webgl2',googleTerrainDetail:null,aircraftId:'cirrus-vision-jet',generationId:'g1',lodId:'auto',optInLodsEnabled:false,modelStatus:'ready',modelActiveLodId:'lod3',modelTriangles:1514,modelError:null};",
+  "const snapshot={flightState:{latDeg:45,lonDeg:-93,altMeters:1500,headingRad:0,airspeedKts:150,throttleNorm:.5},fps:60,paused:true,viewMode:'third',runtimeStatus:{message:'Static UI acceptance fixture'},rendererMode:'webgl2',googleTerrainDetail:null,aircraftId:'cirrus-vision-jet',generationId:'g1',lodId:'auto',modelStatus:'ready',modelActiveLodId:'lod3',modelTriangles:1654,modelError:null,groundInteraction};",
   "window.__aircraftFixture={applied:[],scope:'React aircraft controls and shell with a static snapshot; no FDM'};",
   "const panel=createFlightControlPanel(document.getElementById('panel'),snapshot,{initialWeather:{windDirectionDeg:0,windSpeedKts:0},onLocationApply:noop,onWeatherChange:noop,onPausedChange:noop,onViewModeChange:noop,onAircraftApply:selection=>{window.__aircraftFixture.applied.push(selection);Object.assign(snapshot,selection);panel.update({...snapshot});return null;},onGoogleTerrainDetailChange:noop,onAutomaticGoogleTerrainDetailChange:noop,onFlightTerrainRequirementChange:noop,onTerrainDetailOverrideChange:noop,onTerrainDetailAnchorChange:noop,onKeyboardStickSettingsChange:noop,onOrbitInvertChange:noop,onArcadeGroundLaunchesChange:noop,onCollisionDebugChange:noop,onWheelSpinModeChange:noop,onTireSoundChange:noop,onGroundInteractionAction:noop});",
   "const opening=setInterval(()=>{panel.openOrSelectTab('aircraft');if(document.querySelector('.flight-panel__aircraft-gallery'))clearInterval(opening);},25);setTimeout(()=>clearInterval(opening),2000);",
@@ -69,6 +73,11 @@ const detach = chrome.onEvent(message => {
 // Intersect focus bounds with each clipping ancestor as well as the viewport;
 // an offscreen control can still be programmatically clicked in Chromium.
 const focusGeometry = `(() => {const e=document.activeElement,r=e.getBoundingClientRect();let clip={top:0,left:0,right:innerWidth,bottom:innerHeight};for(let p=e.parentElement;p;p=p.parentElement){const s=getComputedStyle(p),b=p.getBoundingClientRect();if(/auto|scroll|hidden|clip/.test(s.overflowY)){clip.top=Math.max(clip.top,b.top+p.clientTop);clip.bottom=Math.min(clip.bottom,b.top+p.clientTop+p.clientHeight);}if(/auto|scroll|hidden|clip/.test(s.overflowX)){clip.left=Math.max(clip.left,b.left+p.clientLeft);clip.right=Math.min(clip.right,b.left+p.clientLeft+p.clientWidth);}}const s=getComputedStyle(e),outline=s.outlineStyle==='none'?0:parseFloat(s.outlineWidth)+parseFloat(s.outlineOffset);const contained=pad=>r.top-pad>=clip.top-1&&r.bottom+pad<=clip.bottom+1&&r.left-pad>=clip.left-1&&r.right+pad<=clip.right+1;return {tag:e.tagName,text:e.textContent?.trim(),visible:contained(0),outlineStyle:s.outlineStyle,outlineFullyVisible:contained(Math.max(0,outline)),clip,bounds:{top:r.top,bottom:r.bottom,left:r.left,right:r.right},isApply:e.matches('.flight-panel__aircraft-controls > button')};})()`;
+// Every dropdown is as wide as its own text, its longest option, and never
+// stretched to its row: its width as laid out is its natural width - measured
+// in place, with nothing that sizes it allowed to - or the room it has when
+// that is less.
+const dropdownGeometry = `(() => Array.from(document.querySelectorAll('.flight-panel__aircraft-controls select')).map(select => {const width=select.getBoundingClientRect().width,room=select.parentElement.getBoundingClientRect().width,saved=select.getAttribute('style');select.style.cssText+=';width:max-content;max-width:none;min-width:0;flex:none;justify-self:start;align-self:flex-start';const natural=select.getBoundingClientRect().width;if(saved===null)select.removeAttribute('style');else select.setAttribute('style',saved);return {label:select.closest('label')?.querySelector('span')?.textContent??select.getAttribute('aria-label')??'',options:Array.from(select.options,o=>o.value),natural,width,room,fitsText:Math.abs(width-Math.min(natural,room))<=1,stretched:width>natural+1};}))()`;
 const results = [];
 try {
   for (const viewport of [
@@ -94,6 +103,8 @@ try {
     await waitForExpression(chrome, sessionId, "!document.querySelector('.flight-panel__generation-field')");
     await key("ArrowRight", 39);
     await waitForExpression(chrome, sessionId, "Boolean(document.querySelector('.flight-panel__generation-field'))");
+    const dropdowns = await evaluate(chrome, sessionId, dropdownGeometry);
+    const tickboxes = await evaluate(chrome, sessionId, "document.querySelectorAll('.flight-panel__model-controls input[type=checkbox]').length");
     const geometry = await evaluate(chrome, sessionId, "(() => {const gallery=document.querySelector('.flight-panel__aircraft-gallery'),controls=document.querySelector('.flight-panel__aircraft-controls'),focus=document.activeElement;const g=gallery.getBoundingClientRect(),c=controls.getBoundingClientRect(),f=focus.getBoundingClientRect();return {controlsOutsideGallery:!gallery.contains(controls),controlsBelowGallery:c.top>=g.bottom,documentFits:document.documentElement.scrollWidth<=innerWidth,focusVisible:f.top>=Math.max(0,g.top)&&f.bottom<=Math.min(innerHeight,g.bottom)&&f.left>=0&&f.right<=innerWidth,galleryHeight:g.height,galleryScrollHeight:gallery.scrollHeight,galleryClientHeight:gallery.clientHeight,overflowY:getComputedStyle(gallery).overflowY,focusedFamily:focus.value,focusOutline:getComputedStyle(focus.closest('label')).outlineStyle};})()");
     await evaluate(chrome, sessionId, "(() => {const select=document.querySelector('.flight-panel__generation-field select');select.value='g2+';select.dispatchEvent(new Event('change',{bubbles:true}));})()");
     await waitForExpression(chrome, sessionId, "document.querySelector('.flight-panel__generation-field select').value==='g2+'");
@@ -115,11 +126,14 @@ try {
     await key("Enter", 13);
     await waitForExpression(chrome, sessionId, "window.__aircraftFixture.applied.length===1");
     const applied = await evaluate(chrome, sessionId, "window.__aircraftFixture.applied[0]");
-    const passed = geometry.controlsOutsideGallery && geometry.controlsBelowGallery && geometry.documentFits && geometry.focusVisible
+    const levels = dropdowns.find(dropdown => dropdown.options.includes("lod3"));
+    const passed = dropdowns.length === 2 && dropdowns.every(dropdown => dropdown.fitsText && !dropdown.stretched)
+      && tickboxes === 0 && levels?.options.includes("hd")
+      && geometry.controlsOutsideGallery && geometry.controlsBelowGallery && geometry.documentFits && geometry.focusVisible
       && geometry.overflowY === "auto" && geometry.focusOutline !== "none" && controlFocus.visible
       && applyFocus.visible && applyFocus.outlineStyle !== "none"
       && appliedBefore === 0 && applied.aircraftId === "cirrus-vision-jet-g2" && applied.generationId === "g2+";
-    results.push({ ...viewport, passed, geometry, controlFocus, applyFocus, appliedBefore, applied, screenshot: viewport.name + ".png", applyScreenshot: viewport.name + "-apply.png" });
+    results.push({ ...viewport, passed, dropdowns, tickboxes, geometry, controlFocus, applyFocus, appliedBefore, applied, screenshot: viewport.name + ".png", applyScreenshot: viewport.name + "-apply.png" });
     await chrome.send("Target.closeTarget", { targetId });
   }
 } catch (error) { failures.push(error.stack ?? error.message); } finally { detach(); await chrome.close(); }

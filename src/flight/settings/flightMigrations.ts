@@ -91,5 +91,4 @@ export const OSFS_LEGACY_MIGRATIONS: readonly LegacyMigration[] = [
   { key: "osfs.aircraft-generation", migrate: raw => raw === "" ? null : { "osfs.aircraft.generation": raw } },
   { key: "osfs.aircraft-lod", migrate: raw => ({ "osfs.aircraft.lod": raw }) },
   { key: "flight-sim.aircraft-lod", migrate: raw => ({ "osfs.aircraft.lod": raw }) },
-  { key: "osfs.aircraft-opt-in-lods", migrate: onOff("osfs.aircraft.optInLods") },
 ];

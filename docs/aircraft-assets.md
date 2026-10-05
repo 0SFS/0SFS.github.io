@@ -137,26 +137,29 @@ obligation is met at the point of use rather than in a file nobody opens.
 Our own meshes are credited to `felipegalin0`: measured reconstructions,
 designed explicitly for max runtime speed.
 
-### Levels the user has to switch on
+### Levels that load only when chosen
 
-A level marked `optIn` is off until asked for. That is for a mesh whose loading
-is a decision rather than a default — a third-party asset with a licence to
-honour, or one heavy enough that nobody should pay for it without choosing to.
-While it is off it is neither listed in the panel nor reachable from `Auto`, and
-a stored selection of one falls back to the finest level that *is* available
-rather than leaving the aircraft invisible.
+A level marked `optIn` is one `Auto` never picks. That is for a mesh whose
+loading is a decision rather than a default — a third-party asset with a licence
+to honour, or one heavy enough that nobody should pay for it without choosing
+to. Choosing it in the level list is that decision: it is listed there like any
+other level, with its credit and licence shown beside the others, and nothing
+else stands in front of it. Until 2026-10-05 a separate "Higher-detail models"
+tickbox had to be ticked before the level was even listed; picking the level is
+enough to say it is wanted, so the tickbox and its parameter are gone.
 
 The Vision Jet has one: **HD, 7,294 triangles, by hilos run**, CC Attribution,
-from Sketchfab. It sits above our LOD3 and covers the close range when it is
-switched on, with our own LOD3 taking over at 40 m — so the 3.4 MB textured
-mesh is never drawn at distance.
+from Sketchfab. Chosen, it is drawn at every distance; under `Auto` our own
+levels are drawn instead, so the 3.4 MB textured mesh is never downloaded
+unless someone picks it.
 
-`selectAutoLod` has one rule that makes this work without rewriting thresholds
-whenever the flag changes: **the finest level available always covers the close
-range**, whatever its own `autoFromMeters` says. With HD on, LOD3 starts at its
-own 40 m; with HD off, LOD3 is the finest there is and starts at the camera.
+`selectAutoLod` chooses among the levels that are not `optIn`, and the finest of
+those always covers the close range, whatever its own `autoFromMeters` says. A
+stored choice of a level the airframe does not have, such as the Cessna asked for
+`hd`, falls back to the finest level it does have rather than leaving the
+aircraft invisible.
 
-The choice persists to `localStorage` under `osfs.aircraft-opt-in-lods`.
+The choice persists as the `osfs.aircraft.lod` parameter.
 
 ## Runtime
 
@@ -165,20 +168,40 @@ triangle counts, auto-switch distances, and the orientation and offset values
 above. It has no Babylon dependency, which keeps it trivially testable.
 
 `createAircraftModel.ts` owns loading. It pulls a level through an
-`AssetContainer`, parents the result under the aircraft root, marks every mesh
-non-pickable — the terrain probe and the chase camera both raycast the scene, so
-a pickable aircraft would hit itself — and disposes the level it replaces. The
-container loader is injectable so tests never touch the network.
+`AssetContainer`, marks every mesh non-pickable — the terrain probe and the
+chase camera both raycast the scene, so a pickable aircraft would hit itself —
+and disposes the level it replaces. The container loader is injectable so tests
+never touch the network.
+
+The scene renders on demand ([Render on demand](../../foss-earth/docs/render-on-demand.md)),
+so a model change costs as few frames as it can. Each level is added to the
+scene under a hidden node of its own, so its materials compile for the scene's
+lights while nothing is drawn, and FOSS Earth's `whenMeshesReady` says when
+every material has compiled and every texture has loaded. Only then is it shown,
+so the frame that shows it draws all of it. Before 2026-10-05 a level was shown
+the moment it loaded: Babylon skipped it on that frame while its shaders
+compiled, nothing asked for another, and the aircraft stayed invisible until the
+camera moved.
+
+- A level the user chooses, or another aircraft, takes the old mesh away at
+  once: one frame with no aircraft, and the download's progress as a line in the
+  log. The new mesh is shown in a second frame when it is ready.
+- A level `Auto` picks as the chase camera moves keeps the old mesh in view until
+  the new one is ready, and swaps them in one frame, with nothing in the log.
+
+The model asks for those frames itself (`requestRender`); a download's progress
+asks for none.
 
 `createPlaceholderAircraft.ts` keeps the cameras and chase-orbit behaviour and
-exposes a `modelRoot` slot. The placeholder blocks are drawn only while no real
-mesh is present, and the model follows the same cockpit/chase visibility rules.
+exposes a `modelRoot` slot. The placeholder blocks stand in only when there is
+no mesh to show — the airframe has none, or it failed to load — not while a
+chosen one is loading, and the model follows the same cockpit/chase visibility
+rules.
 
-Selections persist to `localStorage` under `osfs.aircraft`,
-`osfs.aircraft-lod` and `osfs.aircraft-opt-in-lods`. 0SFS reads the former
-`flight-sim.*` keys as a migration fallback so existing local selections are
-retained; the opt-in flag has no legacy key because nothing before it stored
-one.
+Selections persist as the `osfs.aircraft.id`, `osfs.aircraft.generation` and
+`osfs.aircraft.lod` parameters. 0SFS migrates the former `osfs.aircraft`,
+`osfs.aircraft-lod` and `flight-sim.*` keys into them once, so existing local
+selections are retained.
 
 ## Control surfaces and propeller
 
@@ -392,7 +415,7 @@ console.
    up along +Z in Blender, with the origin on the ground below the CG.
 2. Add an entry to `AIRCRAFT_CATALOG` with its levels, triangle counts,
    auto-switch distances, and a `credit` on every level. Mark any level
-   `optIn` that should not load unless asked for.
+   `optIn` that `Auto` should never load.
 3. Check the parked stance and adjust `modelOffset.y` if needed.
 
 Adding a level by **someone else** needs three more things: its licence must

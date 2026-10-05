@@ -6,6 +6,10 @@ import { createAircraftModel } from "./createAircraftModel";
 // catalog entry does before its mesh exists - is no longer reachable through
 // the real catalog. Mocking the lookup keeps the branch covered without adding
 // a seam to production code that exists only for a test.
+// The readiness wait is FOSS Earth's, covered there; the runtime it comes with
+// does not load under this environment.
+vi.mock("foss-earth/runtime", () => ({ whenMeshesReady: async () => {} }));
+
 vi.mock("./aircraftCatalog", async (importOriginal) => {
   const actual = await importOriginal<typeof import("./aircraftCatalog")>();
   return {
