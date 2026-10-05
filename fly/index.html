@@ -10,8 +10,21 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="OSFS" />
-    <title>OSFS — Open Source Flight Simulator</title>
+    <meta name="apple-mobile-web-app-title" content="0SFS" />
+    <title>Fly — 0SFS</title>
+    <!-- Search and link previews. The build rewrites these for /fly/ and /rc/ (vite.config.ts); see docs/search-visibility.md. -->
+    <meta name="description" content="0SFS is a free, open-source flight simulator that runs in a browser tab, with JSBSim flight physics over real-world scenery. Nothing to install, no account." />
+    <link rel="canonical" href="https://0sfs.github.io/fly/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="0SFS" />
+    <meta property="og:title" content="Fly — 0SFS" />
+    <meta property="og:description" content="A free, open-source flight simulator in the browser, with JSBSim flight physics over real-world scenery. Nothing to install, no account." />
+    <meta property="og:url" content="https://0sfs.github.io/fly/" />
+    <meta property="og:image" content="https://0sfs.github.io/preview.jpg" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="720" />
+    <meta property="og:image:alt" content="A Cessna 172 in the chase view over Minneapolis, with the flight instruments" />
+    <meta name="twitter:card" content="summary_large_image" />
     <script>
       (function () {
         var base = "/";
@@ -43,7 +56,7 @@
         // opens /rc/ and can sit beside the simulator's on one Home Screen.
         if (route === "remote") {
           document.querySelector('link[rel="manifest"]').setAttribute("href", base + "rc.webmanifest");
-          document.querySelector('meta[name="apple-mobile-web-app-title"]').setAttribute("content", "OSFS RC");
+          document.querySelector('meta[name="apple-mobile-web-app-title"]').setAttribute("content", "0SFS RC");
         }
         function canonical(segment) {
           var next = new URL(base + segment + "/", location.origin);
@@ -80,26 +93,28 @@
       #info-first-paint { display: none; box-sizing: border-box; padding: calc(48px + env(safe-area-inset-top, 0px)) 24px 48px; color: #ecf1f4; font: 18px/1.5 system-ui, sans-serif; max-width: 40rem; }
       html[data-route="info"] #info-first-paint { display: block; }
       #info-first-paint p { margin: 0 0 12px; }
-      #info-first-paint .info-first-paint__title { font-size: 28px; font-weight: 650; letter-spacing: 0.04em; }
-      #info-first-paint a { display: inline-block; margin-top: 8px; padding: 12px 20px; border-radius: 8px; background: #e8b647; color: #080e14; font-weight: 650; text-decoration: none; }
+      #info-first-paint .info-first-paint__title { margin: 0 0 12px; font-size: 28px; font-weight: 650; letter-spacing: 0.04em; }
+      #info-first-paint a { color: #e8b647; }
+      #info-first-paint .info-first-paint__start { display: inline-block; margin-top: 8px; padding: 12px 20px; border-radius: 8px; background: #e8b647; color: #080e14; font-weight: 650; text-decoration: none; }
       #info-first-paint a:focus-visible { outline: 3px solid #79d9ff; outline-offset: 3px; }
     </style>
-    <script type="module" crossorigin src="/assets/index-D-4xi28n.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-H2f9DcvI.css">
+    <script type="module" crossorigin src="/assets/index-DY_Hvp1Y.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-C4tn1-Gq.css">
   </head>
   <body>
     <div id="root"></div>
     <div id="info-first-paint">
-      <p class="info-first-paint__title">OSFS — Open Source Flight Simulator</p>
+      <h1 class="info-first-paint__title">0SFS — Open Source Flight Simulator</h1>
       <p>A real-world browser flight simulator. Nothing to install, no account.</p>
-      <a href="/fly/">Start flying</a>
-      <noscript><p>OSFS needs JavaScript enabled.</p></noscript>
+      <p>0SFS runs the JSBSim flight dynamics model in WebAssembly, over real-world scenery streamed as you fly: free maps draped over elevation data, or Google Photorealistic 3D Tiles with your own key. It is free software under the AGPL-3.0, and the source is <a href="https://github.com/0SFS/0SFS.github.io">on GitHub</a>.</p>
+      <a class="info-first-paint__start" href="/fly/">Start flying</a>
+      <noscript><p>0SFS needs JavaScript enabled.</p></noscript>
     </div>
     <div id="app-log" class="game-log" role="log" aria-label="Game log" aria-relevant="additions">
       <div id="app-log-error" class="game-log__line" data-tone="error" hidden>The application could not download. Check your connection, then <a href="">reload and try again</a>.</div>
       <div class="game-log__line">Downloading the application…</div>
-      <div class="game-log__line">OSFS · Open Source Flight Simulator</div>
-      <noscript><div class="game-log__line">OSFS needs JavaScript enabled to load the simulator.</div></noscript>
+      <div class="game-log__line">0SFS · Open Source Flight Simulator</div>
+      <noscript><div class="game-log__line">0SFS needs JavaScript enabled to load the simulator.</div></noscript>
     </div>
   </body>
 </html>
