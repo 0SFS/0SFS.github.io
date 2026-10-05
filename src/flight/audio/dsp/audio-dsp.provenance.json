@@ -32,7 +32,7 @@
     },
     {
       "file": "core.cpp",
-      "sha256": "39ddfc6d2ef1bd570d182da49c95f14d57ed1271c3e145f9600ee20f21375b57"
+      "sha256": "378342768093606552979d403eadde6365ddd41f8f69013cca4db2fad3b632d3"
     },
     {
       "file": "granular.h",
@@ -48,12 +48,12 @@
     },
     {
       "file": "turbofan.h",
-      "sha256": "67ce211744fa18281912bf84f964f37f6ff9b0ffdc49cafb497b63c47f09eabe"
+      "sha256": "9014b55b93e16c8367452116b59ff7323fd648c47ced62a35ad5cbf7be8bcd97"
     }
   ],
   "wasm": {
-    "bytes": 47680,
-    "sha256": "e6816679136929aafc41d638f29d82dd0794437f52d7bc3535d84fbb70b1a259"
+    "bytes": 47901,
+    "sha256": "35959477639e04bdd5d1992817be2b96d1b5fef323438f3672bc827fbeff985f"
   },
   "imports": [
     "env.emscripten_notify_memory_growth"
@@ -79,6 +79,7 @@
     "osfs_audio_profile_ptr",
     "osfs_audio_profile_size",
     "osfs_audio_reset",
+    "osfs_audio_set_afterburner_volume",
     "osfs_audio_set_epoch",
     "osfs_audio_set_gains",
     "osfs_audio_set_limits",
@@ -89,5 +90,5 @@
     "osfs_audio_stats",
     "osfs_audio_stats_count"
   ],
-  "builtUtc": "2026-10-05T20:26:40.819Z"
+  "builtUtc": "2026-10-05T21:19:57.113Z"
 }

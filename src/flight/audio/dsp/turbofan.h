@@ -22,6 +22,7 @@ struct EngineInput {
   double thrustNorm = 0.0;  // native thrust / profile dry thrust (up to 2 with AB)
   double fuelNorm = 0.0;    // clamp01(native lbm/s / profile fuel reference)
   double augmentation = 0.0; // smoothed native active/inactive observer, never throttle
+  double afterburnerVolume = 1.0; // independent, already-smoothed pilot gain
   double combustion = 0.0;  // 0..1, crossfaded at light-off/flameout
   double kias = 0.0;
   double gear = 0.0;
@@ -178,8 +179,9 @@ class TurbofanVoice {
     if (augmenting) {
       const double a = clamp01(in.augmentation);
       jetHz += (profile_.at(kProfileAfterburnerJetHz) - jetHz) * a;
-      jetGain += profile_.at(kProfileAfterburnerJetGain) * a
+      const double addedGain = profile_.at(kProfileAfterburnerJetGain) * a
           * (1.0 + std::fmax(0.0, in.thrustNorm - 1.0));
+      jetGain += addedGain * in.afterburnerVolume;
     }
     jet_.lowpass(sampleRate_, jetFrequency_.process(jetHz), 0.6);
     const double jetSample = jet_.process(jetWhite);

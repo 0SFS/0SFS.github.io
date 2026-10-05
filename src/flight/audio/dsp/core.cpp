@@ -90,6 +90,8 @@ double gMasterGain = 1.0;
 double gEngineGain = 1.0;
 double gTireGain = 1.0;
 double gAirframeGain = 1.0;
+/** Pilot gain for the augmentation contribution; separate from physical state. */
+double gAfterburnerVolume = 1.0;
 
 QueueEntry gQueue[kQueueCapacity];
 int gQueueHead = 0;
@@ -148,6 +150,7 @@ double gDelaySamples = 0.0;
 bool gDelaySeeded = false;
 Smoother gN1, gN2, gThrust, gFuel, gKias, gGear, gFlap, gExterior;
 Smoother gAugmentation;
+Smoother gAfterburnerVolumeSmooth;
 AcousticProfile gProfileSetup;
 
 double gTireWatts = 0.0;
@@ -281,6 +284,7 @@ void resetVoices() {
   for (Smoother* s : smoothers) s->reset(0.0);
   gColourHz.reset(1200.0);
   gRangeFade.reset(1.0);
+  gAfterburnerVolumeSmooth.reset(gAfterburnerVolume);
   gDelaySamples = 0.0;
   gDelaySeeded = false;
 }
@@ -435,6 +439,7 @@ using namespace osfs_audio;
 OSFS_EXPORT int osfs_audio_init(double sampleRate, int maxBlockFrames, unsigned seed) {
   if (!(sampleRate > 8000.0) || sampleRate > kMaxSampleRate) return 0;
   gSampleRate = sampleRate;
+  gAfterburnerVolume = 1.0;
   gMaxBlock = (maxBlockFrames > 0 && maxBlockFrames <= kMaxBlock) ? maxBlockFrames : kPartition;
   gEngine.configure(sampleRate, seed ? seed : 0x53463530u);
   gTire.configure(sampleRate, 0x74697265u);
@@ -444,7 +449,7 @@ OSFS_EXPORT int osfs_audio_init(double sampleRate, int maxBlockFrames, unsigned 
   gConvolver.configure(gIrSpectra, gIrFdl, gIrScratch);
   for (Smoother* s : {&gN1, &gN2, &gThrust, &gFuel, &gKias, &gGear, &gFlap,
                       &gExterior, &gCombustion, &gSpatial, &gPan, &gColourHz,
-                      &gRangeFade, &gAugmentation}) {
+                      &gRangeFade, &gAugmentation, &gAfterburnerVolumeSmooth}) {
     s->configure(sampleRate, kSmoothTau);
   }
   gIrSeconds = -1.0;
@@ -520,10 +525,15 @@ OSFS_EXPORT int osfs_audio_get_shed(void) { return gShed; }
 OSFS_EXPORT void osfs_audio_set_gains(double master, double engine, double tire,
                                       double airframe, double reducedRange) {
   gMasterGain = clamp01(sanitize(master));
-  gEngineGain = clamp01(sanitize(engine));
+  gEngineGain = clamp(sanitize(engine), 0.0, 8.0);
   gTireGain = clamp01(sanitize(tire));
   gAirframeGain = clamp01(sanitize(airframe));
   gDynamics.setReducedRange(clamp01(sanitize(reducedRange)));
+}
+
+/** Live AB-only gain: no profile transaction, physical-state change or voice reset. */
+OSFS_EXPORT void osfs_audio_set_afterburner_volume(double volume) {
+  gAfterburnerVolume = clamp01(sanitize(volume));
 }
 
 OSFS_EXPORT void osfs_audio_set_epoch(int epoch, double simTimeS, double audioFrame) {
@@ -700,6 +710,7 @@ OSFS_EXPORT void osfs_audio_process(double blockStartFrame, int frames) {
         (availability & kAvailFuelFlow) ? clamp01(interpolated[kFuelFlowPps] / gEngine.fuelReference()) : 0.0);
     in.augmentation = gAugmentation.process(
         (availability & kAvailAugmentation) ? clamp01(interpolated[kAugmentation]) : 0.0);
+    in.afterburnerVolume = gAfterburnerVolumeSmooth.process(gAfterburnerVolume);
     in.kias = gKias.process((availability & kAvailAirspeed) ? std::fmax(0.0, interpolated[kKias]) : 0.0);
     in.gear = gGear.process((availability & kAvailConfig) ? clamp01(interpolated[kGearNorm]) : 0.0);
     in.flap = gFlap.process((availability & kAvailConfig) ? clamp01(interpolated[kFlapNorm]) : 0.0);
