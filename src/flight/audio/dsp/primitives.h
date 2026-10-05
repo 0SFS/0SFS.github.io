@@ -65,6 +65,19 @@ class Smoother {
   double value_ = 0.0;
 };
 
+/** One-pole low-pass: high-frequency power falls as f^-2 below Nyquist. */
+class OnePoleLowpass {
+ public:
+  void reset() { value_ = 0.0; }
+  double process(double x, double sampleRate, double frequency) {
+    const double a = std::exp(-2.0 * kPi * clamp(frequency, 1.0, sampleRate * 0.45) / sampleRate);
+    value_ = x + (value_ - x) * a;
+    return value_;
+  }
+ private:
+  double value_ = 0.0;
+};
+
 /** Transposed direct form II biquad. */
 class Biquad {
  public:

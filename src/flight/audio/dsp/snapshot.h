@@ -7,7 +7,7 @@
 
 namespace osfs_audio {
 
-constexpr int kSnapshotVersion = 2;
+constexpr int kSnapshotVersion = 3;
 
 // AUDIO_SNAPSHOT_FIELDS
 enum SnapshotSlot {
@@ -38,6 +38,7 @@ enum SnapshotSlot {
   kExterior,
   kGroundReflectionM,
   kAugmentation,
+  kSourceAxisX, kSourceAxisY, kSourceAxisZ,
 
   kSnapshotSize,
 };
@@ -56,6 +57,7 @@ enum Availability {
   kAvailConfig = 1 << 8,
   kAvailPose = 1 << 9,
   kAvailAugmentation = 1 << 10,
+  kAvailSourceAxis = 1 << 11,
 };
 // END AVAILABILITY
 

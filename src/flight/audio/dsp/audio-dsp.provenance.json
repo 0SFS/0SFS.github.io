@@ -24,7 +24,7 @@
   "sources": [
     {
       "file": "acoustic_profile.h",
-      "sha256": "97ab350833b94d939a023529089f688c602038ea2d46f2aca0cb160a3ec525d8"
+      "sha256": "1c88eabc0d1c47d68a096d5593b657c2495bf980e509785f0d5433162bb2c52b"
     },
     {
       "file": "convolver.h",
@@ -32,7 +32,7 @@
     },
     {
       "file": "core.cpp",
-      "sha256": "e3f92ac7540a1c89af38dae6e618886e48c311ef5bb6a14d4dfc83417a04d37f"
+      "sha256": "98b455384d8d77f67a8cacefa661381dd990dd1bfe3693e04df23452982b4fe2"
     },
     {
       "file": "granular.h",
@@ -40,20 +40,20 @@
     },
     {
       "file": "primitives.h",
-      "sha256": "13549deb09915ab3847190cd1257884b905316db716b2f79aa833761e1db1f40"
+      "sha256": "c2280ccf199af4f05fc02d74a4c4336b270a92034ebd937a35b72e127cdec93a"
     },
     {
       "file": "snapshot.h",
-      "sha256": "181bcd199b2aefceac83fe4dd29e35b523b9db281558835130ae5740b6437cf3"
+      "sha256": "0cbebb4abcf67432fc190914bbba5091e978dd722101e600e1f0ae66f770f129"
     },
     {
       "file": "turbofan.h",
-      "sha256": "9014b55b93e16c8367452116b59ff7323fd648c47ced62a35ad5cbf7be8bcd97"
+      "sha256": "6075f78e69a44fa008651b4abb69c6419377a6a544d98df1b52b632ce9aa6d65"
     }
   ],
   "wasm": {
-    "bytes": 47901,
-    "sha256": "b51feb881229cf8ba3aec0bacf929e93ded81a61d5c161caa0b26555f24549af"
+    "bytes": 50836,
+    "sha256": "7a876882d8cf38ec043e97b7d84fc58c7b12faec730db4087059b6eb66458339"
   },
   "imports": [
     "env.emscripten_notify_memory_growth"
@@ -90,5 +90,5 @@
     "osfs_audio_stats",
     "osfs_audio_stats_count"
   ],
-  "builtUtc": "2026-10-05T21:45:02.084Z"
+  "builtUtc": "2026-10-05T23:24:35.159Z"
 }

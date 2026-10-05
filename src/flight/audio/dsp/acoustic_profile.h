@@ -16,6 +16,9 @@ enum AcousticProfileSlot {
   kProfileBypassGain, kProfileJetBaseHz, kProfileJetPowerHz, kProfileJetGain,
   kProfileCombustorHz, kProfileCombustorHighHz, kProfileCombustorGain,
   kProfileOutputGain, kProfileAfterburnerJetGain, kProfileAfterburnerJetHz,
+  kProfileHighFineMixGain, kProfileHighFineMixHz, kProfileHighShockGain, kProfileHighShockHz,
+  kProfileHighRearMixDirectivity, kProfileHighShockDirectivity,
+  kProfileHighCockpitGain, kProfileHighCockpitHz,
   kProfileSize,
 };
 // END ACOUSTIC_PROFILE_FIELDS
@@ -26,6 +29,7 @@ struct AcousticProfile {
     24.3, 75.7, 1846.0, 0.25, 2500.0, 6000.0, 3.3 / (1.0 + 3.3),
     0.30, 0.30, 0.10, 0.55, 900.0, 1800.0, 0.28,
     800.0, 5200.0, 0.42, 90.0, 400.0, 0.55, 0.9, 0.0, 6000.0,
+    0.16, 4200.0, 0.0, 1500.0, 0.25, 0.0, 0.12589254117941673, 1400.0,
   };
 
   bool set(const double* input) {
@@ -38,8 +42,15 @@ struct AcousticProfile {
         || input[kProfileFuelReferencePps] <= 0.0 || input[kProfileFanMix] > 1.0) return false;
     for (int i : {kProfileFanToneGain, kProfileCoreToneGain, kProfileFanNoiseBaseGain,
                   kProfileFanNoisePowerGain, kProfileBypassGain, kProfileJetGain,
-                  kProfileCombustorGain, kProfileOutputGain, kProfileAfterburnerJetGain}) {
+                  kProfileCombustorGain, kProfileOutputGain, kProfileAfterburnerJetGain,
+                  kProfileHighFineMixGain, kProfileHighShockGain}) {
       if (input[i] > 16.0) return false;
+    }
+    for (int i : {kProfileHighRearMixDirectivity, kProfileHighShockDirectivity, kProfileHighCockpitGain}) {
+      if (input[i] > 1.0) return false;
+    }
+    for (int i : {kProfileHighFineMixHz, kProfileHighShockHz, kProfileHighCockpitHz}) {
+      if (input[i] < 20.0 || input[i] > 20000.0) return false;
     }
     for (int i = 0; i < kProfileSize; ++i) values[i] = input[i];
     return true;

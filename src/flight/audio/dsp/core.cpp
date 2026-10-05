@@ -69,6 +69,7 @@ int gMaxBlock = kMaxBlock;
 bool gReady = false;
 
 int gTier = kTierOff;
+int gPendingTier = -1;
 /** 0 = full tier; each stage sheds detail in the documented order. */
 int gShed = 0;
 
@@ -79,7 +80,7 @@ int gShed = 0;
  */
 struct TierLimits {
   int partials = 12;
-  int noiseBands = 5;
+  int noiseBands = 8;
   int grains = kMaxGrains;
   double startsPerSecond = 160.0;
   double irSeconds = 0.040;
@@ -147,16 +148,21 @@ Smoother gSpatial, gPan, gColourHz, gCombustion, gRangeFade;
  * osfs_audio_process() for why the distance cannot drive it directly.
  */
 double gDelaySamples = 0.0;
+double gDelayAlternate = 0.0;
+double gDelayBlend = 0.0;
+bool gDelayCrossfading = false;
 bool gDelaySeeded = false;
 Smoother gN1, gN2, gThrust, gFuel, gKias, gGear, gFlap, gExterior;
 Smoother gAugmentation;
 Smoother gAfterburnerVolumeSmooth;
+Smoother gSourceCosine, gSourceDirectionWeight;
 AcousticProfile gProfileSetup;
 
 double gTireWatts = 0.0;
 double gFade = 0.0;
 double gFadeTarget = 1.0;
 double gFadeStep = 1.0;
+bool gCapsPending = false;
 
 constexpr int kStatCount = 25;
 double gStats[kStatCount];
@@ -201,22 +207,25 @@ void applyCaps() {
   switch (gTier) {
     case kTierLow:
       caps.partials = 4;    // + 1 tire squeal = 5 oscillators
-      caps.noiseBands = 4;  // + 1 tire noise  = 5 noise sources
+      caps.noiseBands = 5;  // fan, jet, combustor, wind, config + tire = 6
       caps.bypassBand = false;
       break;
     case kTierMed:
       caps.partials = 12;   // + 1 tire squeal = 13 oscillators
-      caps.noiseBands = 5;  // + 1 tire noise  = 6 noise sources
+      caps.noiseBands = 6;  // Low + bypass + tire = 7 noise sources
       caps.bypassBand = true;
       irSeconds = 0.020;
       break;
     case kTierHigh:
       caps.partials = 12;
-      caps.noiseBands = 5;
+      caps.noiseBands = 8;  // Med + fine mixing + shock surrogate + tire <= 9
       caps.bypassBand = true;
+      caps.highFidelity = true;
       irSeconds = 0.040;
-      grains = kMaxGrains;
-      starts = 160.0;
+      // Shipping High is entirely procedural. A full recording cannot be
+      // added to this component synthesis path as an unspecified residual.
+      grains = 0;
+      starts = 0.0;
       break;
     default:
       break;
@@ -229,6 +238,9 @@ void applyCaps() {
   grains = grains < limit.grains ? grains : limit.grains;
   starts = std::fmin(starts, limit.startsPerSecond);
   irSeconds = std::fmin(irSeconds, limit.irSeconds);
+  // Duration and padded-tap ceilings both apply at elevated context rates.
+  const int tierIrTaps = gTier == kTierMed ? 1024 : kMaxIrTaps;
+  irSeconds = std::fmin(irSeconds, static_cast<double>(tierIrTaps) / gSampleRate);
 
   // Shedding order (sound.md §1): oscillator count, grain density, IR length,
   // then internal sample rate. Half-rate synthesis is deliberately NOT wired
@@ -259,6 +271,8 @@ void applyCaps() {
           generateCabinImpulse(gIrTaps, kMaxIrTaps, gSampleRate, irSeconds, 0x53463530u);
       gConvolver.setImpulse(gIrTaps, taps);
     }
+    gPartIndex = 0;
+    for (int i = 0; i < kPartition; ++i) { gWetIn[i] = 0.0; gWetOut[i] = 0.0; }
   }
   gStats[kStatTier] = gTier;
   gStats[kStatShed] = gShed;
@@ -267,6 +281,29 @@ void applyCaps() {
   gStats[kStatGrainCap] = grains;
   gStats[kStatGrainStarts] = starts;
   gStats[kStatIrMs] = irSeconds * 1000.0;
+}
+
+void applyPendingCaps() {
+  if (gPendingTier >= 0) {
+    gTier = gPendingTier;
+    gPendingTier = -1;
+    gShed = 0;
+    gDelaySeeded = false;
+  }
+  applyCaps();
+  gCapsPending = false;
+}
+
+/** Live cap edits use one engine: fade down, apply the latest limits, fade up.
+ * Setup (before any rendered frame) is immediate. The tire path is untouched.
+ * No source pool grows to overlap old and new limits. */
+void requestCaps() {
+  if (gReady && gStats[kStatFrames] > 0.0) {
+    gCapsPending = true;
+    beginFade(0.0, kTransitionFadeSeconds * 0.5);
+  } else {
+    applyPendingCaps();
+  }
 }
 
 void resetVoices() {
@@ -280,12 +317,17 @@ void resetVoices() {
   gPartIndex = 0;
   for (int i = 0; i < kPartition; ++i) { gWetIn[i] = 0.0; gWetOut[i] = 0.0; }
   Smoother* smoothers[] = {&gN1, &gN2, &gThrust, &gFuel, &gKias, &gGear,
-                           &gFlap, &gExterior, &gCombustion, &gSpatial, &gPan, &gAugmentation};
+                           &gFlap, &gExterior, &gCombustion, &gSpatial, &gPan, &gAugmentation,
+                           &gSourceCosine, &gSourceDirectionWeight};
   for (Smoother* s : smoothers) s->reset(0.0);
   gColourHz.reset(1200.0);
   gRangeFade.reset(1.0);
   gAfterburnerVolumeSmooth.reset(gAfterburnerVolume);
   gDelaySamples = 0.0;
+  gDelayAlternate = 0.0;
+  gDelayBlend = 0.0;
+  gDelayCrossfading = false;
+  gCapsPending = false;
   gDelaySeeded = false;
 }
 
@@ -439,6 +481,7 @@ using namespace osfs_audio;
 OSFS_EXPORT int osfs_audio_init(double sampleRate, int maxBlockFrames, unsigned seed) {
   if (!(sampleRate > 8000.0) || sampleRate > kMaxSampleRate) return 0;
   gSampleRate = sampleRate;
+  gPendingTier = -1;
   gAfterburnerVolume = 1.0;
   gMaxBlock = (maxBlockFrames > 0 && maxBlockFrames <= kMaxBlock) ? maxBlockFrames : kPartition;
   gEngine.configure(sampleRate, seed ? seed : 0x53463530u);
@@ -449,7 +492,8 @@ OSFS_EXPORT int osfs_audio_init(double sampleRate, int maxBlockFrames, unsigned 
   gConvolver.configure(gIrSpectra, gIrFdl, gIrScratch);
   for (Smoother* s : {&gN1, &gN2, &gThrust, &gFuel, &gKias, &gGear, &gFlap,
                       &gExterior, &gCombustion, &gSpatial, &gPan, &gColourHz,
-                      &gRangeFade, &gAugmentation, &gAfterburnerVolumeSmooth}) {
+                      &gRangeFade, &gAugmentation, &gAfterburnerVolumeSmooth,
+                      &gSourceCosine, &gSourceDirectionWeight}) {
     s->configure(sampleRate, kSmoothTau);
   }
   gIrSeconds = -1.0;
@@ -466,6 +510,7 @@ OSFS_EXPORT int osfs_audio_init(double sampleRate, int maxBlockFrames, unsigned 
 OSFS_EXPORT void osfs_audio_reset(void) {
   clearQueue();
   resetVoices();
+  applyPendingCaps();
   gAnchored = false;
   gResyncRequested = false;
   gFade = 0.0;
@@ -481,9 +526,17 @@ OSFS_EXPORT int osfs_audio_commit_profile(void) {
 
 OSFS_EXPORT void osfs_audio_set_tier(int tier) {
   const int next = (tier < kTierOff) ? kTierOff : (tier > kTierHigh ? kTierHigh : tier);
-  if (next == gTier) return;
+  if (next == gPendingTier || (next == gTier && gPendingTier < 0)) return;
+  if (gReady && next != kTierOff && gTier != kTierOff && gStats[kStatFrames] > 0.0 && gFade > 0.0) {
+    gPendingTier = next;
+    gCapsPending = true;
+    beginFade(0.0, kTransitionFadeSeconds * 0.5);
+    return;
+  }
   gTier = next;
+  gPendingTier = -1;
   gShed = 0;
+  gCapsPending = false;
   applyCaps();
   // Low does not run the delay line, so its tap is stale on the way back into
   // Med. The fade below covers re-seating it from the current geometry.
@@ -504,20 +557,24 @@ OSFS_EXPORT void osfs_audio_set_limits(int tier, int partials, int noiseBands, i
                                        double startsPerSecond, double irMilliseconds) {
   if (tier <= kTierOff || tier > kTierHigh) return;
   TierLimits& limit = gLimits[tier];
+  const TierLimits previous = limit;
   limit.partials = partials < 2 ? 2 : (partials > 12 ? 12 : partials);
-  limit.noiseBands = noiseBands < 0 ? 0 : (noiseBands > 5 ? 5 : noiseBands);
+  limit.noiseBands = noiseBands < 0 ? 0 : (noiseBands > 8 ? 8 : noiseBands);
   limit.grains = grains < 0 ? 0 : (grains > kMaxGrains ? kMaxGrains : grains);
   limit.startsPerSecond = std::isfinite(startsPerSecond) ? std::fmin(std::fmax(startsPerSecond, 0.0), 160.0) : 160.0;
   const double irSeconds = irMilliseconds / 1000.0;
   limit.irSeconds = std::isfinite(irSeconds) ? std::fmin(std::fmax(irSeconds, 0.0), 0.040) : 0.040;
-  if (tier == gTier) applyCaps();
+  if (limit.partials == previous.partials && limit.noiseBands == previous.noiseBands
+      && limit.grains == previous.grains && limit.startsPerSecond == previous.startsPerSecond
+      && limit.irSeconds == previous.irSeconds) return;
+  if (tier == gTier) requestCaps();
 }
 
 OSFS_EXPORT void osfs_audio_set_shed(int level) {
   const int next = level < 0 ? 0 : (level > 8 ? 8 : level);
   if (next == gShed) return;
   gShed = next;
-  applyCaps();
+  requestCaps();
 }
 
 OSFS_EXPORT int osfs_audio_get_shed(void) { return gShed; }
@@ -544,6 +601,9 @@ OSFS_EXPORT void osfs_audio_set_epoch(int epoch, double simTimeS, double audioFr
   gResyncRequested = false;
   clearQueue();
   gStats[kStatEpoch] = epoch;
+  if (gCapsPending) {
+    applyPendingCaps();
+  }
   // A reset, a seek or a model replacement is a discontinuity: mute, rebase,
   // and come back up rather than gliding through unrelated state. That includes
   // re-seating the propagation delay, so a teleport lands on its new range
@@ -670,7 +730,6 @@ OSFS_EXPORT void osfs_audio_process(double blockStartFrame, int frames) {
   gFreshSnapshots = false;
 
   double interpolated[kSnapshotSize] = {};
-  const bool spatialTier = gTier >= kTierMed;
   const double ceilingDelay = gSampleRate * 0.42;   // fade out before the 0.5 s cap
 
   for (int i = 0; i < count; ++i) {
@@ -691,10 +750,20 @@ OSFS_EXPORT void osfs_audio_process(double blockStartFrame, int frames) {
         beginFade(0.0, kStaleFadeSeconds);
         gStats[kStatStaleFades] += 1.0;
       }
-    } else if (gFadeTarget == 0.0 && !gResyncRequested) {
+    } else if (gFadeTarget == 0.0 && !gResyncRequested && !gCapsPending) {
       beginFade(1.0, kTransitionFadeSeconds);
     }
     gFade += clamp(gFadeTarget - gFade, -gFadeStep, gFadeStep);
+    if (gCapsPending && gFade <= 0.0) {
+      applyPendingCaps();
+      if (haveTelemetry && staleSeconds <= kStaleSeconds) beginFade(1.0, kTransitionFadeSeconds * 0.5);
+    }
+    if (gTier == kTierOff) {
+      gOutLeft[i] = 0.0f;
+      gOutRight[i] = 0.0f;
+      continue;
+    }
+    const bool spatialTier = gTier >= kTierMed;
 
     const int availability = static_cast<int>(interpolated[kAvailability]);
     EngineInput in;
@@ -731,6 +800,20 @@ OSFS_EXPORT void osfs_audio_process(double blockStartFrame, int frames) {
     const double sz = interpolated[kSourceZ];
     const double distance = std::sqrt(sx * sx + sy * sy + sz * sz);
     const double soundSpeed = std::fmax(50.0, interpolated[kSoundSpeedMps]);
+    double sourceCosine = 0.0;
+    bool directionKnown = false;
+    if ((availability & kAvailSourceAxis) && (availability & kAvailPose) && distance > 1e-3) {
+      const double ax = interpolated[kSourceAxisX];
+      const double ay = interpolated[kSourceAxisY];
+      const double az = interpolated[kSourceAxisZ];
+      const double length = std::sqrt(ax * ax + ay * ay + az * az);
+      if (length > 1e-6) {
+        sourceCosine = clamp(-(ax * sx + ay * sy + az * sz) / (length * distance), -1.0, 1.0);
+        directionKnown = true;
+      }
+    }
+    in.downstreamCosine = gSourceCosine.process(sourceCosine);
+    in.directionWeight = gSourceDirectionWeight.process(directionKnown ? exterior : 0.0);
 
     double doppler = 1.0;
     // Range rate along the source -> listener line, positive when opening.
@@ -755,12 +838,11 @@ OSFS_EXPORT void osfs_audio_process(double blockStartFrame, int frames) {
     double mono = gEngine.process(in, spatialTier ? doppler : 1.0, &airframeNoise) * gEngineGain
         + airframeNoise * gAirframeGain;
 
-    if (gTier == kTierHigh && gGrains.ready()) {
-      const double density = 0.25 + 0.75 * clamp01(in.n1);
-      mono += gGrains.process(in.n1, exterior, density, 1.0) * gEngineGain;
-      gStats[kStatActiveGrains] = gGrains.activeGrains();
-      gStats[kStatGrainDrops] = gGrains.droppedStarts();
-    }
+    // Legacy test-bank storage remains an ABI capability, but recordings are
+    // never mixed into procedural High. In particular, no grain can keep an
+    // otherwise stopped aircraft audible.
+    gStats[kStatActiveGrains] = 0.0;
+    gStats[kStatGrainDrops] = 0.0;
 
     // ---- propagation ----------------------------------------------------
     double direct = mono;
@@ -792,20 +874,42 @@ OSFS_EXPORT void osfs_audio_process(double blockStartFrame, int frames) {
       // covers it.
       if (gDelaySeeded) {
         gDelaySamples += 1.0 - doppler;
+        if (gDelayCrossfading) gDelayAlternate += 1.0 - doppler;
       } else {
         gDelaySamples = wanted;
+        gDelayCrossfading = false;
+        gDelayBlend = 0.0;
         gDelaySeeded = true;
       }
-      // The 0.5 s cap (sound.md §2) is a storage limit, and storage is all it
-      // may cost. The direct tap simply pins there: a pinned tap plays the
-      // right sound at the right level and only loses its absolute propagation
-      // lag, which has no audible reference, while fading it out would silence
-      // an engine that sound.md §3's own 1/d law says is still there - you can
-      // hear a jet from half a kilometre. Level at range is that law's job
-      // alone, exactly as at Low.
-      gDelaySamples = clamp(gDelaySamples, 1.0, gSampleRate * 0.5 - 2.0);
+      // A pinned tap has read speed 1, so clamping it silently loses Doppler.
+      // Before exhausting the finite history, crossfade onto another tap
+      // travelling at the SAME Doppler ratio. Distance still never drives the
+      // tap rate, preserving the no-pitch-bend camera zoom contract. This loses
+      // exact long-range propagation age, not the sustained frequency shift.
+      // Recentring is a bounded-history approximation, not sonic-boom physics.
+      const double maxDelay = gSampleRate * 0.5 - 2.0;
+      const double crossfadeFrames = gSampleRate * kTransitionFadeSeconds;
+      const double guard = std::fabs(1.0 - doppler) * crossfadeFrames + 4.0;
+      gDelaySamples = clamp(gDelaySamples, 1.0, maxDelay);
+      if (!gDelayCrossfading && ((doppler < 1.0 && gDelaySamples > maxDelay - guard)
+          || (doppler > 1.0 && gDelaySamples < 1.0 + guard))) {
+        gDelayAlternate = maxDelay * 0.5;
+        gDelayBlend = 0.0;
+        gDelayCrossfading = true;
+      }
       const double delaySamples = gDelaySamples;
       direct = gDelay.read(delaySamples);
+      double alternateWeight = 0.0;
+      double directWeight = 1.0;
+      if (gDelayCrossfading) {
+        gDelayBlend = std::fmin(1.0, gDelayBlend + 1.0 / crossfadeFrames);
+        // Complementary raised-cosine weights never boost correlated taps.
+        // Independent broadband energy can dip briefly, and periodic tones
+        // can interfere: finite-history recentering is explicitly approximate.
+        directWeight = 0.5 + 0.5 * std::cos(gDelayBlend * kPi);
+        alternateWeight = 1.0 - directWeight;
+        direct = direct * directWeight + gDelay.read(gDelayAlternate) * alternateWeight;
+      }
 
       const double pathDifference = interpolated[kGroundReflectionM];
       if (pathDifference >= 0.0) {
@@ -817,7 +921,16 @@ OSFS_EXPORT void osfs_audio_process(double blockStartFrame, int frames) {
         const double reflectedDelay = delaySamples + pathDifference / soundSpeed * gSampleRate;
         const double reflectedFade = gRangeFade.process(
             1.0 - clamp01((reflectedDelay - ceilingDelay) / (gSampleRate * 0.06)));
-        direct += gDelay.read(reflectedDelay) * 0.25 * reflectedFade;
+        direct += gDelay.read(reflectedDelay) * 0.25 * reflectedFade * directWeight;
+        if (gDelayCrossfading) {
+          const double alternateReflected = gDelayAlternate + pathDifference / soundSpeed * gSampleRate;
+          const double alternateFade = 1.0 - clamp01((alternateReflected - ceilingDelay) / (gSampleRate * 0.06));
+          direct += gDelay.read(alternateReflected) * 0.25 * alternateFade * alternateWeight;
+        }
+      }
+      if (gDelayCrossfading && gDelayBlend >= 1.0) {
+        gDelaySamples = gDelayAlternate;
+        gDelayCrossfading = false;
       }
     }
 
@@ -826,13 +939,14 @@ OSFS_EXPORT void osfs_audio_process(double blockStartFrame, int frames) {
     // -18 dB installation gain instead of the 1/d law, and the two land at a
     // comparable level near 10 m, so switching view is not a loudness jump.
     const double freeField = std::fmin(1.0, 1.0 / std::fmax(distance, 1e-3));
-    constexpr double kCockpitGain = 0.12589254117941673;  // -18 dB
+    const double cockpitGain = gTier == kTierHigh ? gEngine.highCockpitGain() : 0.12589254117941673;
+    const double cockpitHz = gTier == kTierHigh ? gEngine.highCockpitHz() : 1200.0;
     const double absorption = clamp(18000.0 / (1.0 + distance / 200.0), 500.0, 18000.0);
-    const double colourHz = gColourHz.process(1200.0 + (absorption - 1200.0) * exterior);
+    const double colourHz = gColourHz.process(cockpitHz + (absorption - cockpitHz) * exterior);
     // Without pose the source stays where it was last placed rather than
     // jumping to the listener, which would be a loud artefact.
     const double spatialGain =
-        gSpatial.process(kCockpitGain + (freeField - kCockpitGain) * exterior);
+        gSpatial.process(cockpitGain + (freeField - cockpitGain) * exterior);
     gColour.lowpass(gSampleRate, colourHz, 0.707);
     double coloured = gColour.process(direct) * spatialGain;
 
@@ -844,7 +958,10 @@ OSFS_EXPORT void osfs_audio_process(double blockStartFrame, int frames) {
         gConvolver.process(gWetIn, gWetOut);
         gPartIndex = 0;
       }
-      coloured = coloured * 0.65 + wet * 0.35;
+      // High treats the generated IR as cockpit-only colour. Applying a cabin
+      // IR to free-field jet sound would invent an installation at the mic.
+      const double wetGain = 0.35 * (gTier == kTierHigh ? 1.0 - exterior : 1.0);
+      coloured = coloured * (1.0 - wetGain) + wet * wetGain;
     }
 
     // ---- pan and tire ---------------------------------------------------
