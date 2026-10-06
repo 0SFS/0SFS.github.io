@@ -48,12 +48,12 @@
     },
     {
       "file": "turbofan.h",
-      "sha256": "6075f78e69a44fa008651b4abb69c6419377a6a544d98df1b52b632ce9aa6d65"
+      "sha256": "3557fe55749103329c9d5e89feb1f2fecf4af24e72052be3a24c8994d6e720c7"
     }
   ],
   "wasm": {
-    "bytes": 50836,
-    "sha256": "7a876882d8cf38ec043e97b7d84fc58c7b12faec730db4087059b6eb66458339"
+    "bytes": 50902,
+    "sha256": "0aea1d9488f7208a8d8aa28ab1e8ed9d6f741787f4b1242cbca92ac87bbc91a1"
   },
   "imports": [
     "env.emscripten_notify_memory_growth"
@@ -90,5 +90,5 @@
     "osfs_audio_stats",
     "osfs_audio_stats_count"
   ],
-  "builtUtc": "2026-10-05T23:24:35.159Z"
+  "builtUtc": "2026-10-06T03:07:31.886Z"
 }

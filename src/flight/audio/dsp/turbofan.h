@@ -125,6 +125,13 @@ class TurbofanVoice {
   double process(const EngineInput& in, double cullScale, double* airframeOut) {
     const double n1 = clamp01(in.n1);
     const double n2 = clamp01(in.n2);
+    // The idle fan bed must not switch on at the first nonzero shaft sample.
+    // Below idle, machinery grows linearly with speed while wake turbulence
+    // grows quadratically, leaving a clean rising spool tone during motoring.
+    // These are continuous synthesis envelopes, not a combustion RPM gate or
+    // calibrated aeroacoustic exponents. At/above idle the old gains are exact.
+    const double idleN1 = profile_.at(kProfileIdleN1Pct) / 100.0;
+    const double fanRotation = idleN1 > 0.0 ? clamp01(n1 / idleN1) : n1;
     const double u = clamp01((n1 * 100.0 - profile_.at(kProfileIdleN1Pct))
                              / profile_.at(kProfileIdleN1SpanPct));
 
@@ -139,12 +146,12 @@ class TurbofanVoice {
     for (int i = 0; i < active; ++i) {
       const Partial& p = table[i];
       const double shaft = p.shaft == 0 ? n1 : n2;
-      if (shaft <= 1e-4) continue;
+      if (shaft <= 0.0) continue;
       // Initial synthetic references, NOT measured blade-pass frequencies.
       const double reference = (p.shaft == 0 ? profile_.at(kProfileN1ReferenceHz)
                                             : profile_.at(kProfileN2ReferenceHz)) * shaft;
       const double frequency = reference * p.order;
-      const double shaftGain = p.shaft == 0 ? (0.15 + 0.85 * u * u) : (n2 * n2);
+      const double shaftGain = p.shaft == 0 ? (0.15 + 0.85 * u * u) * fanRotation : (n2 * n2);
       const double value =
           oscillators_[i].process(sampleRate_, frequency, cullScale) * p.gain * shaftGain;
       if (p.shaft == 0) fanTones += value; else coreTones += value;
@@ -195,7 +202,7 @@ class TurbofanVoice {
       fanWake_.bandpass(sampleRate_, clamp(profile_.at(kProfileN1ReferenceHz) * n1 * 0.8, 80.0, 16000.0), 0.7);
       fanNoise = fanWake_.process(fanWhite)
           * (profile_.at(kProfileFanNoiseBaseGain) + profile_.at(kProfileFanNoisePowerGain) * u)
-          * (n1 > 1e-4 ? 1.0 : 0.0);
+          * fanRotation * fanRotation;
     }
 
     if (bypassOn) {
