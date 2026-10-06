@@ -594,13 +594,18 @@ export function createFlightInputManager(options: {
         keysDown.clear();
       };
 
-      target.addEventListener("keydown", onKeyDown);
+      // Capture, so a flight key is marked handled before any bubbling window
+      // listener sees it. VS Code's built-in browser registers one before the
+      // page loads and hands every Ctrl or Cmd chord nobody prevented to the
+      // editor: Ctrl+W, throttling down while pitching up, opened its window
+      // switcher.
+      target.addEventListener("keydown", onKeyDown, { capture: true });
       target.addEventListener("keyup", onKeyUp);
       target.addEventListener("blur", onBlur);
       target.addEventListener("focusin", onBlur);
 
       return () => {
-        target.removeEventListener("keydown", onKeyDown);
+        target.removeEventListener("keydown", onKeyDown, { capture: true });
         target.removeEventListener("keyup", onKeyUp);
         target.removeEventListener("blur", onBlur);
         target.removeEventListener("focusin", onBlur);

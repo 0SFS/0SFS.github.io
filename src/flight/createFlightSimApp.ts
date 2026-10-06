@@ -1079,7 +1079,9 @@ export async function createFlightSimApp(
     phoneSession?.syncStatus();
   };
 
-  window.addEventListener("keydown", onViewKeyDown);
+  // Capture, like the flight keys, so a Ctrl chord with V is not handed on by
+  // an embedding browser's own window listener.
+  window.addEventListener("keydown", onViewKeyDown, { capture: true });
 
   const flightGamepadSource = createBrowserInputSource({ target: window });
   const flightGamepadPolling = createGamepadPollingController(parameters);
@@ -1882,7 +1884,7 @@ export async function createFlightSimApp(
       document.removeEventListener("visibilitychange", onVisibilityChange);
       unbindRecorderMark();
       runtime.setSimTick(null);
-      window.removeEventListener("keydown", onViewKeyDown);
+      window.removeEventListener("keydown", onViewKeyDown, { capture: true });
       flightGamepadSource.stop();
       detachGamepadProfileInput();
       flightGamepadRuntime.dispose();

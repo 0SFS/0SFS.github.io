@@ -176,6 +176,25 @@ describe("flightInputManager keyboard roll", () => {
     detach();
   });
 
+  it("marks a Ctrl chord handled before a window listener registered earlier sees it", () => {
+    // VS Code's built-in browser forwards unprevented Ctrl chords to the
+    // editor from a window listener it adds before the page loads.
+    const seenPrevented: boolean[] = [];
+    const embedder = (event: KeyboardEvent): void => { seenPrevented.push(event.defaultPrevented); };
+    window.addEventListener("keydown", embedder);
+    const input = createFlightInputManager();
+    const detach = input.attach(window);
+
+    document.body.dispatchEvent(new KeyboardEvent("keydown", {
+      code: "KeyW", key: "w", ctrlKey: true, bubbles: true, cancelable: true,
+    }));
+
+    expect(seenPrevented).toEqual([true]);
+    expect(input.poll(1).elevator).toBe(1);
+    detach();
+    window.removeEventListener("keydown", embedder);
+  });
+
   it("releases held controls and allows typing in the Location panel without flying or pausing", () => {
     const input = createFlightInputManager();
     const detach = input.attach(window);

@@ -69,6 +69,29 @@ query parameters and the invitation hash. `?mode=globe` leaves 0SFS and opens
 
 Restart `npm run dev` after changing the FOSS Earth package manifest or exports.
 
+### Flying in VS Code's built-in browser
+
+VS Code's built-in browser injects a script into every page that adds a `keydown` listener to
+`window` before the page's own scripts run. It hands VS Code every key press the page has not
+already called `preventDefault()` on, if the press is a Ctrl or Cmd chord, Escape, a function key or
+a media key, or, outside the Mac, an Alt chord. The page still receives the key. A modifier pressed
+alone is not handed on. On a Mac, Option chords, Ctrl+Space, and Cmd with A, C, V, X, Z, an arrow,
+Backspace or Delete also stay with the page. A page listener added to `window` later runs
+after VS Code's, so the page prevents the key too late: holding Ctrl to throttle down while pressing
+W opened VS Code's window switcher (Ctrl+W on a Mac), and Ctrl+R for flaps up opened Open Recent.
+
+So every flight key listener on `window` runs in the capture phase,
+`addEventListener("keydown", handler, { capture: true })`, and calls `preventDefault()` on the keys
+it handles. A capture listener on `window` runs before any bubbling listener there, whenever
+it was added. A new keyboard shortcut needs the same pattern. Keys typed into a text field are not
+prevented, so they reach VS Code as they should. A key rebound in gamepad-tools away from the default
+flight keys is not prevented. If one of those chords gets in the way, unbind it in VS Code's
+Keyboard Shortcuts: Ctrl+W is `workbench.action.switchWindow`.
+
+The script is `out/vs/platform/browserView/electron-browser/preload-browserView.js` inside the
+VS Code app; this was read from version 1.140. VS Code's main process forwards keys itself only while
+the browser view is hidden, crashed or paused in the debugger.
+
 ## Quality checks
 
 ```sh
