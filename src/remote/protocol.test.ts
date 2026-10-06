@@ -22,6 +22,9 @@ const accepted: RemoteMessage[] = [
   { ...envelope, type: "handoff", controls: neutralize(controls), lease: 5, requestId: 6 },
   { ...envelope, type: "handoffAck", requestId: 6 },
   { ...envelope, type: "granted", requestId: 6, status: { ...status, owner: "phone" } },
+  { ...envelope, type: "granted", requestId: 7, status: { ...status, owner: "phone", paused: true }, resume: true },
+  { ...envelope, type: "status", status: { ...status, handBack: "now" }, message: "Desktop hidden · Simulation paused" },
+  { ...envelope, type: "heartbeat", lease: 13, status: { ...status, handBack: "idle" } },
   { ...envelope, type: "action", id: 1, lease: 2, action: "requestControl" },
   { ...envelope, type: "action", id: 2, lease: 3, action: "releaseControl" },
   { ...envelope, type: "action", id: 3, lease: 3, action: "setPaused", value: true },
@@ -214,6 +217,15 @@ describe("phone protocol parsing", () => {
     expect(isEngineStatus({ phase: "OFF", n1: -0.4 })).toBe(true);
     expect(isEngineStatus({ phase: "RUNNING", rpm: 2400, thrustLbf: 310, fuelFlowPph: 60, fuelFlowGph: 9.2 })).toBe(true);
     expect(isEngineStatus({ phase: "OFF", state: "stopped", start: 0 })).toBe(true);
+  });
+
+  it("drops a malformed offer or resume on its own: neither ever costs a status its message", () => {
+    for (const handBack of ["later", true, 1, null, ""]) {
+      const parsed = parseMessage({ ...envelope, type: "status", message: "Desktop controls", status: { ...status, handBack } });
+      expect(parsed, JSON.stringify(handBack)).toEqual({ ...envelope, type: "status", message: "Desktop controls", status });
+    }
+    const granted = { ...envelope, type: "granted", requestId: 6, status: { ...status, owner: "phone" } } as const;
+    for (const resume of [false, 1, "true", null]) expect(parseMessage({ ...granted, resume })).toEqual(granted);
   });
 
   it("drops a starter flag that is anything but 1 without costing the frame its controls", () => {

@@ -152,6 +152,7 @@ import {
   readPhoneCameraTuning,
   type PhoneCameraTuning,
 } from "./remote/phoneCameraTuning";
+import { CONTROL_SHARING_PARAMETER_IDS, readControlSharing, type ControlSharing } from "./remote/controlSharing";
 import type { MountPhonePairing } from "./hud/RemoteControlTab";
 import { createFlightInputManager } from "./input/flightInputManager";
 import {
@@ -533,7 +534,7 @@ export async function createFlightSimApp(
     // waiting for the next frame is what keeps the two in step while the
     // simulation is paused and the render loop is idle.
     onGearChange: (down) => { flightHud.setGearDown(down); runtime.requestRender(); },
-    onLocalInput: () => phoneSession?.takeControl(),
+    onLocalInput: () => phoneSession?.noteLocalInput(),
     keyboardStickSettings: readKeyboardStickSettings(parameters),
     getBodyRates: () => ({
       rollRateRad: jsbsim.sdk.getPropertyValue("velocities/p-rad_sec"),
@@ -890,11 +891,11 @@ export async function createFlightSimApp(
       getReading: () => engineControl.reading(),
       // Holding the lever is pilot input, like moving it: it takes the controls back from a phone.
       onStartHold: (held) => {
-        if (held) phoneSession?.takeControl();
+        if (held) phoneSession?.noteLocalInput();
         localStartHeld = held;
       },
       onShutdown: () => {
-        phoneSession?.takeControl();
+        phoneSession?.noteLocalInput();
         engineControl.shutdown();
       },
     },
@@ -1186,6 +1187,12 @@ export async function createFlightSimApp(
       phoneCameraVariant = describePhoneCameraTuning(phoneCameraTuning);
       runtime.requestRender();
     }));
+  }
+  // Who flies when a paired phone and this computer both could (Remote Control
+  // tab). Read live by the phone session at every decision.
+  let controlSharing: ControlSharing = readControlSharing(parameters);
+  for (const id of CONTROL_SHARING_PARAMETER_IDS) {
+    stopWatching.push(parameters.watch(id, () => { controlSharing = readControlSharing(parameters); }));
   }
   let chaseFrameApplied: PhoneCameraTuning["chaseFrame"] = "attitude";
   let orbitStateYaw = orbitRestoreYaw();
@@ -1788,8 +1795,9 @@ export async function createFlightSimApp(
           engine: toEngineStatus(engineMonitor.getReading(), engineControl.reading()),
         };
       },
-      hasActiveLocalInput: () => inputManager.hasActiveFlightInput(),
+      hasActiveLocalInput: () => inputManager.hasActiveFlightInput() || localStartHeld || flightHud.isPilotHolding(),
       isPageVisible: () => !document.hidden,
+      getSharing: () => controlSharing,
       onOwnershipChange: (owner, controls) => {
         inputManager.adoptControls(controls);
         inputManager.setRemoteOwned(owner === "phone");

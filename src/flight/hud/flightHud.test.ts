@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createFlightHud, type FlightHudControls, type FlightHudOptions } from "./flightHud";
+import { createFlightInputManager } from "../input/flightInputManager";
 import type { FlightState } from "../physics/flightState";
 
 const STATE: FlightState = {
@@ -442,6 +443,72 @@ describe("flight HUD yaw-throttle cluster", () => {
     const vs = tapes.findIndex((node) => node.querySelector('[data-metric="vs"]'));
     const aoa = tapes.findIndex((node) => node.classList.contains("flight-hud__aoa"));
     expect(aoa).toBe(vs + 1);
+    t.hud.destroy();
+  });
+});
+
+describe("flight HUD and a paired phone", () => {
+  function capturePointers(pad: HTMLElement): void {
+    const captured = new Set<number>();
+    Object.assign(pad, {
+      setPointerCapture: (id: number) => { captured.add(id); },
+      hasPointerCapture: (id: number) => captured.has(id),
+      releasePointerCapture: (id: number) => { captured.delete(id); },
+    });
+  }
+  const pointer = (type: string, init: PointerEventInit = {}) => new PointerEvent(type, {
+    pointerId: 1, button: 0, pointerType: "mouse", bubbles: true, cancelable: true, ...init,
+  });
+
+  // The reported defect: with a phone flying, clicking another application
+  // blurred the window, the stick pad let go of a stick nobody held, and that
+  // "release" reached the controls as local input, which takes them from a phone.
+  it("moves no control when the window loses focus, resizes or hides with nothing held", () => {
+    const onLocalInput = vi.fn();
+    const input = createFlightInputManager({ onLocalInput });
+    const onRudderChange = vi.fn();
+    const onThrottleChange = vi.fn();
+    const t = mount({ onStickChange: (aileron, elevator) => input.setStick(aileron, elevator), onRudderChange, onThrottleChange });
+    window.dispatchEvent(new Event("blur"));
+    window.dispatchEvent(new Event("resize"));
+    vi.spyOn(document, "hidden", "get").mockReturnValue(true);
+    document.dispatchEvent(new Event("visibilitychange"));
+    t.hud.destroy();
+    expect(onLocalInput).not.toHaveBeenCalled();
+    expect(onRudderChange).not.toHaveBeenCalled();
+    expect(onThrottleChange).not.toHaveBeenCalled();
+  });
+
+  it("still lets go of a held stick when the window loses focus, and only takes control for the deflection", () => {
+    const onLocalInput = vi.fn();
+    const input = createFlightInputManager({ onLocalInput });
+    const t = mount({ onStickChange: (aileron, elevator) => input.setStick(aileron, elevator) });
+    const pad = t.host.querySelector<HTMLElement>(".flight-hud__attitude")!;
+    capturePointers(pad);
+    vi.spyOn(pad, "getBoundingClientRect").mockReturnValue(new DOMRect(0, 0, 200, 200));
+    pad.dispatchEvent(pointer("pointerdown", { clientX: 190, clientY: 100 }));
+    expect(onLocalInput).toHaveBeenCalledOnce();
+    expect(input.poll(0).aileron).toBeGreaterThan(0.5);
+    window.dispatchEvent(new Event("blur"));
+    expect(input.poll(0).aileron).toBe(0);
+    expect(input.hasActiveFlightInput()).toBe(false);
+    // Letting go is not flying: it does not take control again.
+    expect(onLocalInput).toHaveBeenCalledOnce();
+    t.hud.destroy();
+  });
+
+  it("reports a finger resting on a flight control until it lifts, and nothing for the instruments", () => {
+    const t = mount();
+    expect(t.hud.isPilotHolding()).toBe(false);
+    t.pitchTrim.dispatchEvent(pointer("pointerdown"));
+    expect(t.hud.isPilotHolding()).toBe(true);
+    window.dispatchEvent(pointer("pointerup"));
+    expect(t.hud.isPilotHolding()).toBe(false);
+    t.host.querySelector('[data-metric="ias"]')!.dispatchEvent(pointer("pointerdown", { pointerId: 2 }));
+    expect(t.hud.isPilotHolding()).toBe(false);
+    t.rollTrim.dispatchEvent(pointer("pointerdown", { pointerId: 3 }));
+    window.dispatchEvent(new Event("blur"));
+    expect(t.hud.isPilotHolding()).toBe(false);
     t.hud.destroy();
   });
 });

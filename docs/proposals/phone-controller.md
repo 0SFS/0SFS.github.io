@@ -21,7 +21,7 @@ Both interfaces remain static files deployed to GitHub Pages. Use **free PeerJS 
 | Primary network | Phone and computer on a reachable home LAN, with Internet access for page loading and signaling. |
 | Transport | Direct WebRTC, 60 Hz full control snapshots, no retransmission of controls. |
 | Controller | Touch pitch/roll, rudder, throttle, trim, flaps, brake, pause, and camera view. |
-| Lost input | Pause and return control to the desktop; never resume automatically. |
+| Lost input | Pause and return control to the desktop. Control goes back to the phone as [Sharing the controls](#sharing-the-controls) sets, and only the phone lifts the pause. |
 | Infrastructure | Existing GitHub Pages + PeerJS Cloud + public STUN. No application backend or paid service. |
 | Relay policy | Explicit STUN-only configuration in v1; no TURN relay or HTTP/WebSocket control fallback. Failed direct connections receive a clear error. |
 | Later work | Tilt steering, relay connectivity, automatic transport reconnection, multiple phones, video streaming, and autopilot integration. |
@@ -252,7 +252,7 @@ Persistent settings transfer unchanged; transient controls begin neutral. This d
 
 ### Returning to desktop
 
-Take control or a deliberate local flight input immediately revokes phone authority and changes epoch. Seed local persistent controls from the last applied state, clear old held keys/transient state, then apply the new intentional input. Existing `resetControls()` clears trim/flaps, so add a dedicated state-adoption method.
+Take control or a deliberate local flight input immediately revokes phone authority and changes epoch, unless control is latched to the phone ([Sharing the controls](#sharing-the-controls)). Centring a control is letting go of it, not input: only a deflection takes over. Seed local persistent controls from the last applied state, clear old held keys/transient state, then apply the new intentional input. Existing `resetControls()` clears trim/flaps, so add a dedicated state-adoption method.
 
 An attached idle gamepad must not overwrite phone input or a transferred throttle. Detect deliberate axis movement relative to its takeover baseline outside a tested deadband; treat new button presses as activity. Camera gestures and small resting noise do not take over. Local throttle/trim slider interaction does.
 
@@ -269,9 +269,9 @@ A watchdog runs separately from render callbacks, with the same check immediatel
 
 If detected inside the physics callback, return `false` as well as setting pause; otherwise [the current loop](../../src/flight/physics/fixedStepLoop.ts#L35) could still execute one step. During a main-thread stall timers cannot run, so check freshness before any subsequent physics advancement.
 
-If channels remain healthy after an input timeout, remain paired and permit a fresh Fly handoff after recovery. Never reactivate or resume just because packets return. If either channel closes, require re-pairing. Signaling-only disconnection does not revoke a healthy direct session; attempt bounded signaling reconnection without recreating/destroying the healthy peer connection.
+If channels remain healthy after an input timeout, remain paired and permit a fresh Fly handoff after recovery. Never reactivate an old epoch because packets return: authority comes back only through a new handoff, and the flight resumes only when the phone that received it says so ([Sharing the controls](#sharing-the-controls)). If either channel closes, require re-pairing. Signaling-only disconnection does not revoke a healthy direct session; attempt bounded signaling reconnection without recreating/destroying the healthy peer connection.
 
-Phone hide/page exit sends a best-effort release; the receiver watchdog covers undelivered messages. Pointer up/cancel/lost capture releases affected controls. Rotation cancels gestures before resizing. Desktop hiding while phone-owned explicitly pauses and revokes ownership. Returning either tab to the foreground does not resume flight.
+Phone hide/page exit sends a final centred frame and then nothing; the receiver watchdog pauses within the stale limit. Hiding is not Release, so the phone's claim stands. Pointer up/cancel/lost capture releases affected controls. Rotation cancels gestures before resizing. Desktop hiding while phone-owned explicitly pauses and revokes ownership. Returning either tab to the foreground resumes flight only through the hand-back, which the phone completes.
 
 Reset/reposition invalidates input and returns ownership to desktop before using the existing reset flow. Resynchronize the paired phone; departure presets retain their existing paused behavior. Teardown closes both channels and PeerJS, cancels timers/listeners/wake locks, and invalidates async callbacks.
 
@@ -280,6 +280,46 @@ Reset/reposition invalidates input and returns ownership to desktop before using
 Phone analog controls bypass [keyboard smoothing](../../src/flight/input/flightInputManager.ts#L112). Its current rate of 8 takes about 268 ms to reach 90% of a step at 60 FPS, calculated from the recurrence. Preserve local keyboard behavior; start phone controls with a deadzone/response curve but no time filter.
 
 [120 Hz physics](../../src/flight/physics/fixedStepLoop.ts#L6) is driven by render callbacks. Incoming network handlers cannot interleave with synchronous substeps on the same thread, so it does not guarantee an 8.3 ms input response. Preserve the physics driver for v1 and measure rendering contention. A Worker is outside this feature.
+
+## Sharing the controls
+
+Added 2026-10-06. The first release handed control back to the phone only when its pilot tapped Take
+control, after every loss. On a real desk that made the remote unusable: each stray key, hidden tab or
+dropped frame needed a tap on the phone. Worse, one of those losses was not real — the HUD's stick pad
+released its stick on every window blur and resize, whether or not anyone held it, and the release
+reached the controls as local flight input. Clicking another application took control from a flying
+phone. A release of a control nobody holds now moves nothing, and centring a control is never takeover
+input.
+
+**The claim.** A phone that is granted control holds a claim to it until its pilot taps Release, Take
+control is pressed in the Remote Control tab, or the session ends. Losing control otherwise — a hidden
+desktop tab, stale phone input, local flight input, a reset — leaves the claim standing.
+
+**Control changes hands** (`osfs.remote.handover`) decides what a standing claim does:
+
+| Value | Local flight input | Hand-back |
+| --- | --- | --- |
+| `auto` (default) | Revokes | Once local input has rested for `osfs.remote.returnIdle` (1 s), local controls are centred, and the tab is visible |
+| `stay` | Revokes, and ends the claim | None: the phone's pilot taps Take control. The first release's behaviour |
+| `phone` | Ignored while the phone flies | As soon as the tab is visible |
+| `computer` | — | None; a flying phone is revoked and `requestControl` is refused |
+
+**The offer.** While a hand-back is due, every status the desktop sends carries `handBack`: `now` when it
+would grant a request at once, `idle` while it waits for local controls to rest. A phone that sees `now`
+while it could tap Take control sends the ordinary `requestControl`, at most every 500 ms, and the
+ordinary centred handoff follows. The offer is advice, never authority: a malformed value is dropped
+on its own, and the request is checked exactly as a tap's is.
+
+**Resuming.** If the loss paused a running flight, the `granted` message carries `resume: true`. The
+desktop never resumes by itself; the phone sends `setPaused(false)` once the grant reaches it, so a
+flight cannot run under a phone that has not heard it is flying. A pause anyone chose in between clears
+the mark. A grant that never reaches the phone leaves the flight paused, and the handoff's own timeout
+returns control to the desktop.
+
+**Compatibility.** Both fields are additive on v1. An older phone ignores them: it shows Take control
+and keeps the pause, as before. An older desktop never offers; a newer phone then asks only when its
+pilot taps. Because a newer phone no longer sends Release when hidden, an older desktop pauses on the
+silence instead, within the stale limit.
 
 ## Errors and operating limits
 
@@ -291,7 +331,7 @@ Phone analog controls bypass [keyboard smoothing](../../src/flight/input/flightI
 | Unsupported protocol | Tell the user to reload both devices; do not accept controls. |
 | Phone already paired | Reject the new connection without interrupting the current phone. |
 | Poor connection | Show stale/lagging status; freshness rules determine whether flight must pause. |
-| Stale controls | Pause only if phone-owned; remain paused until explicit recovery. |
+| Stale controls | Pause only if phone-owned; remain paused until the hand-back, which only the phone completes, or explicit recovery. |
 | Unavailable browser API | Explain that phone control is unsupported; preserve local flight. |
 
 V1 introduces no paid infrastructure. Free services can change or become unavailable. A TURN solution can be specified later if connection success requires it; do not embed paid relay credentials in public static assets or claim all networks are supported.

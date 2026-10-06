@@ -43,6 +43,7 @@ const FORCES = { tab: "debug", section: "forces" } as const;
 const AIRCRAFT_VISUALS = { tab: "debug", section: "aircraft-visuals" } as const;
 const CAMERA = { tab: "aircraft", section: "camera" } as const;
 const START = { tab: "aircraft", section: "start" } as const;
+const REMOTE_CONTROL = { tab: "remote", section: "control" } as const;
 const PHONE_CAMERA = { tab: "remote", section: "camera" } as const;
 const SOUND = { tab: "sound", section: "sound" } as const;
 const ENGINE = { tab: "engine", section: "engine" } as const;
@@ -67,6 +68,7 @@ export const FLIGHT_SECTION_TITLES: readonly (readonly [tab: string, section: st
   ["aircraft", "mesh-inspector", "Mesh inspector"],
   ["aircraft", "camera", "Camera"],
   ["aircraft", "start", "Start"],
+  ["remote", "control", "Who flies"],
   ["remote", "camera", "Phone camera trackpad"],
   ["sound", "sound", "Sound"],
   ["engine", "engine", "Engine"],
@@ -660,6 +662,41 @@ export const OSFS_PARAMETERS = [
     home: main(CAMERA),
     appliesLive: true,
     source: "src/flight/createFlightSimApp.ts",
+  },
+
+  // Remote Control → Who flies: how control passes between a paired phone and
+  // this computer. Spec: docs/proposals/phone-controller.md → Sharing the controls.
+  {
+    id: "osfs.remote.handover",
+    label: "Control changes hands",
+    description: "Which device flies when both the phone and this computer could. Take control in this tab always takes it here on purpose.",
+    unit: "none",
+    kind: "choice",
+    choices: [
+      { id: "auto", label: "Automatically", description: "Flight input here takes control. It goes back to the phone as soon as these controls rest, this tab is showing and the phone is heard from." },
+      { id: "stay", label: "Only when taken", description: "Whichever device has control keeps it until the other takes it: flight input here, or Take control on the phone." },
+      { id: "phone", label: "Latched to the phone", description: "The phone flies whenever it is heard from. Flight input here does not take control from it." },
+      { id: "computer", label: "Latched to this computer", description: "This computer flies. The phone cannot take control." },
+    ],
+    default: "auto",
+    defaultReason: "A remote that has to be taken back by hand after every stray key, hidden tab or dropped frame cannot be flown.",
+    home: main(REMOTE_CONTROL),
+    appliesLive: true,
+    source: "src/flight/remote/createPhoneControlSession.ts",
+  },
+  {
+    id: "osfs.remote.returnIdle",
+    label: "Rest before returning",
+    description: "With Automatically: how long this computer's flight controls must rest before control goes back to the phone.",
+    unit: "s",
+    kind: "number",
+    step: 0.1,
+    bounds: within(0, 10),
+    default: 1,
+    defaultReason: "Long enough that keys tapped here keep control between taps; short enough that a stray touch hands it straight back.",
+    home: main(REMOTE_CONTROL),
+    appliesLive: true,
+    source: "src/flight/remote/createPhoneControlSession.ts",
   },
 
   // Remote Control → Phone camera trackpad: an A/B of how a phone's swipe

@@ -87,7 +87,16 @@ export interface AircraftStatus {
   gearDown?: boolean;
   /** Absent from a host with no engine reading yet, and from one that predates this field. */
   engine?: EngineStatus;
+  /**
+   * The computer holds control that this phone flew and never let go of, and
+   * gives it back by itself: `now` — ask for it, as if the pilot had tapped
+   * Take control; `idle` — once the computer's own flight controls rest.
+   * Absent: control comes back only when the pilot asks. Additive on v1 like
+   * `gearDown`: an older phone ignores it and shows Take control as before.
+   */
+  handBack?: HandBack;
 }
+export type HandBack = "now" | "idle";
 /**
  * What the camera trackpad did since the last frame, not where it is: `yaw` and
  * `pitch` are the swipe as a fraction of the pad, and `zoom` is the ratio a
@@ -210,7 +219,14 @@ export type RemoteMessage =
   | (Envelope & { type: "status"; status: AircraftStatus; message: string })
   | (Envelope & { type: "handoff"; controls: ControlSurfaceState; lease: number; requestId: number })
   | (Envelope & { type: "handoffAck"; requestId: number })
-  | (Envelope & { type: "granted"; requestId: number; status: AircraftStatus })
+  /**
+   * `resume`: taking control from this phone paused a running flight, and the
+   * pause is this phone's to lift now that control is back, which a phone that
+   * understands it does at once with `setPaused(false)`. The computer never
+   * resumes by itself, so a flight cannot run under a phone that has not yet
+   * heard it is flying. Additive on v1; an older phone keeps the pause.
+   */
+  | (Envelope & { type: "granted"; requestId: number; status: AircraftStatus; resume?: true })
   | ActionMessage
   | (Envelope & { type: "ack"; id: number; ok: boolean; message: string; status: AircraftStatus })
   | ControlFrame
@@ -280,11 +296,15 @@ export function isEngineStatus(value: unknown): value is EngineStatus {
     .every(key => value[key] === undefined || finite(value[key]));
 }
 function status(value: unknown): value is AircraftStatus {
-  return record(value) && (value.owner === "local" || value.owner === "phone")
+  const valid = record(value) && (value.owner === "local" || value.owner === "phone")
     && typeof value.paused === "boolean" && (value.viewMode === "first" || value.viewMode === "third")
     && isControls(value.controls) && finite(value.airspeedKts) && finite(value.altitudeFt) && finite(value.headingDeg)
     && (value.gearDown === undefined || typeof value.gearDown === "boolean")
     && (value.engine === undefined || isEngineStatus(value.engine));
+  // An offer, never authority: a malformed one is dropped on its own, and the
+  // phone then simply waits to be asked, as it would from an older computer.
+  if (valid && value.handBack !== undefined && value.handBack !== "now" && value.handBack !== "idle") delete value.handBack;
+  return valid;
 }
 
 function parseBoundedRecord(input: unknown): Record<string, unknown> | null {
@@ -318,7 +338,9 @@ export function parseMessage(input: unknown): RemoteMessage | null {
     case "status": valid = status(value.status) && boundedString(value.message); break;
     case "handoff": valid = isControls(value.controls) && isCounter(value.lease) && isCounter(value.requestId); break;
     case "handoffAck": valid = isCounter(value.requestId); break;
-    case "granted": valid = isCounter(value.requestId) && status(value.status); break;
+    case "granted": valid = isCounter(value.requestId) && status(value.status);
+      if (valid && value.resume !== undefined && value.resume !== true) delete value.resume;
+      break;
     case "ack": valid = isCounter(value.id) && typeof value.ok === "boolean" && boundedString(value.message) && status(value.status); break;
     case "controls":
       valid = isCounter(value.seq) && isCounter(value.lease) && isControls(value.controls);

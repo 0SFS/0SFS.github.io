@@ -238,6 +238,23 @@ describe('phone controller screen', () => {
     expect(button('Pause simulation')).toBeDefined()
   })
 
+  it('says when control is coming back by itself, beside why it left', () => {
+    mount({ status: { owner: 'local', handBack: 'idle' }, snapshot: { canFly: true, canControl: false, message: 'Desktop controls · Back to the phone when these controls rest' } })
+    const details = () => [...container.querySelectorAll('.phone-popup--control .phone-popup__detail')].map(node => node.textContent)
+    expect(details()).toEqual([
+      'Desktop controls · Back to the phone when these controls rest',
+      'Control comes back to this phone once the computer’s controls rest.',
+    ])
+    // Still a button for whoever would rather not wait.
+    expect(button('Take control')?.disabled).toBe(false)
+    remount({ status: { owner: 'local', handBack: 'now' }, snapshot: { canFly: true, canControl: false, message: 'Phone input lost · Simulation paused' } })
+    expect(details()).toEqual(['Phone input lost · Simulation paused', 'Control is coming back to this phone.'])
+    // Asked for: the title says so, and the offer needs no second line.
+    remount({ status: { owner: 'local', handBack: 'now' }, snapshot: { canFly: false, canControl: false, requestingControl: true, message: 'Taking control…' } })
+    expect(text('.phone-popup__title')).toBe('Taking control…')
+    expect(details()).toEqual([])
+  })
+
   it('offers the page\'s own QR scanner as the way back from an ended session', () => {
     const ended = { phase: 'disconnected', canFly: false, canControl: false, message: 'The computer ended the session.' } as const
     mount({ snapshot: ended })

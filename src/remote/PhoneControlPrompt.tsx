@@ -27,11 +27,18 @@ export function PhoneControlPrompt({ state, onTakeControl, onScan }: {
     : !connected ? 'Connecting to the computer'
       : state.requestingControl ? 'Taking control…'
         : 'The computer is flying'
+  // Control this phone never let go of comes back by itself; say so, so
+  // nobody taps the button for something that is already on its way.
+  const returning = connected && !state.requestingControl && state.status?.owner === 'local'
+    ? state.status.handBack === 'idle' ? 'Control comes back to this phone once the computer’s controls rest.'
+      : state.status.handBack === 'now' ? 'Control is coming back to this phone.' : null
+    : null
   const detail = ROUTINE.has(state.message) ? null : state.message
   return <div className="phone-popup phone-popup--control" role="dialog" aria-labelledby="phone-control-title">
     <div className="phone-popup__card">
       <p id="phone-control-title" className="phone-popup__title">{title}</p>
       {detail && <p className="phone-popup__detail" role="status">{detail}</p>}
+      {returning && <p className="phone-popup__detail">{returning}</p>}
       {ended
         ? <>
           <p className="phone-popup__detail">{RECOVERY}</p>

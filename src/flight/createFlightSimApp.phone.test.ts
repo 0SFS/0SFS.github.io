@@ -11,7 +11,7 @@ const mocks = vi.hoisted(() => {
   const engineVisualValues = new Map<string, number>();
   const phone = {
     subscribe: vi.fn(() => vi.fn()), getSnapshot: () => snapshot,
-    beforeStep: vi.fn(), takeControl: vi.fn(), cancelHandoff: vi.fn(), reset: vi.fn(), isStarterHeld: vi.fn(() => false),
+    beforeStep: vi.fn(), takeControl: vi.fn(), noteLocalInput: vi.fn(), cancelHandoff: vi.fn(), reset: vi.fn(), isStarterHeld: vi.fn(() => false),
     takeCameraAim: vi.fn(() => null as { yaw: number; pitch: number; zoom?: number } | null),
     isCameraActive: vi.fn(() => false),
     hasPendingCameraAim: vi.fn(() => false),
@@ -62,7 +62,7 @@ const mocks = vi.hoisted(() => {
     physics: {
       reset: vi.fn(), setPaused: vi.fn(), update: vi.fn(), getLatestState: () => state, getFault: () => null,
     },
-    createHud: vi.fn(() => ({ update: vi.fn(), refreshFlaps: vi.fn(), destroy: vi.fn() })),
+    createHud: vi.fn(() => ({ update: vi.fn(), refreshFlaps: vi.fn(), isPilotHolding: vi.fn(() => false), destroy: vi.fn() })),
     createPanel: vi.fn(() => ({ update: vi.fn(), openOrSelectTab: vi.fn(), toggleTab: vi.fn(), destroy: vi.fn() })),
     createHudBar: vi.fn(() => ({ update: vi.fn(), destroy: vi.fn() })),
   };
@@ -130,6 +130,8 @@ beforeEach(() => {
     mocks.snapshot.owner = "local";
     options.onOwnershipChange("local", controls);
   });
+  // Flight input here takes control, as the default Automatically does.
+  mocks.phone.noteLocalInput.mockImplementation(() => mocks.phone.takeControl());
   mocks.phone.reset.mockImplementation(() => mocks.phone.takeControl());
 });
 
@@ -179,7 +181,7 @@ describe("0SFS phone integration", () => {
       expect(getAppSettings().get("osfs.assist.autoFlaps")).toBe(false);
       expect(mocks.sdk.setPropertyValue).toHaveBeenCalledWith("fcs/flap-cmd-norm", 0.8);
       expect(mocks.snapshot.owner).toBe("phone");
-      expect(mocks.phone.takeControl).not.toHaveBeenCalled();
+      expect(mocks.phone.noteLocalInput).not.toHaveBeenCalled();
     } finally { mocks.sdk.getPropertyValue.mockImplementation(previousRead); }
   });
 
@@ -231,7 +233,7 @@ describe("0SFS phone integration", () => {
     expect(options.getStatus().controls).toEqual(mocks.phoneControls);
 
     window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyD" }));
-    expect(mocks.phone.takeControl).toHaveBeenCalledOnce();
+    expect(mocks.phone.noteLocalInput).toHaveBeenCalledOnce();
     expect(options.getStatus().owner).toBe("local");
     expect(options.getStatus().controls).toEqual({ ...mocks.phoneControls, elevator: 0, aileron: 0, rudder: 0, brake: 0 });
     tick(0.1);
@@ -376,7 +378,7 @@ describe("0SFS phone integration", () => {
     await mount();
     grant();
     window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyV" }));
-    expect(mocks.phone.takeControl).not.toHaveBeenCalled();
+    expect(mocks.phone.noteLocalInput).not.toHaveBeenCalled();
     expect(mocks.phone.syncStatus).toHaveBeenCalledOnce();
     const callbacks = mocks.createPanel.mock.calls[0][2] as { onViewModeChange(mode: "first"): void };
     callbacks.onViewModeChange("first");
@@ -396,7 +398,7 @@ describe("0SFS phone integration", () => {
     expect(mocks.phone.destroy).toHaveBeenCalledOnce();
     expect(mocks.runtime.setSimTick).toHaveBeenLastCalledWith(null);
     expect(mocks.sdk.setPropertyValue).toHaveBeenCalledTimes(writes);
-    expect(mocks.phone.takeControl).not.toHaveBeenCalled();
+    expect(mocks.phone.noteLocalInput).not.toHaveBeenCalled();
     expect(mocks.phone.onHidden).not.toHaveBeenCalled();
     expect(mocks.disposeSdk).toHaveBeenCalledOnce();
     expect(root.children).toHaveLength(0);

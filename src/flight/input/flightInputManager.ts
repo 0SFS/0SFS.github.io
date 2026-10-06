@@ -870,9 +870,10 @@ export function createFlightInputManager(options: {
       if (rebaseline) refreshGamepadBindingControls();
     },
     setRudder(value: number): void {
-      options.onLocalInput?.();
-      if (remoteOwned) return;
       const clamped = Math.min(1, Math.max(-1, value));
+      // Centring is letting go, not flying: only a deflection takes the controls.
+      if (Math.abs(clamped) >= 0.001) options.onLocalInput?.();
+      if (remoteOwned) return;
       rudderOverride = Math.abs(clamped) < 0.001 ? null : clamped;
       if (rudderOverride !== null) {
         smoothed.rudder = rudderOverride;
@@ -883,12 +884,13 @@ export function createFlightInputManager(options: {
       }
     },
     setStick(aileron: number, elevator: number): void {
-      options.onLocalInput?.();
-      if (remoteOwned) return;
       const clamped = {
         aileron: Math.min(1, Math.max(-1, aileron)),
         elevator: Math.min(1, Math.max(-1, elevator)),
       };
+      // Centring is letting go, not flying: only a deflection takes the controls.
+      if (clamped.aileron !== 0 || clamped.elevator !== 0) options.onLocalInput?.();
+      if (remoteOwned) return;
       stickOverride = clamped.aileron === 0 && clamped.elevator === 0 ? null : clamped;
       if (stickOverride) {
         smoothed.aileron = stickOverride.aileron;

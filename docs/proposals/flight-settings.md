@@ -394,6 +394,18 @@ These are engineering gains; they appear only under **Show all parameters**.
 | `osfs.feedback.minMagnitude` | ratio | 0.03 |
 | `osfs.feedback.touchdownReference` / `.slipReference` | N·s / J | 300 / 1,200 |
 
+### Remote Control → Who flies
+
+| Parameter | Unit | Default |
+| --- | --- | --- |
+| `osfs.remote.handover` | choice | Automatically (`auto`); also `stay`, `phone`, `computer` |
+| `osfs.remote.returnIdle` | s | 1 |
+
+How control passes between a paired phone and this computer. Before these
+existed, every hand-back needed the phone's pilot to tap Take control, which is
+now **Only when taken**. Spec: [Phone controller](phone-controller.md) →
+*Sharing the controls*.
+
 ### Aircraft → Ground handling
 
 Ground interaction already follows this spec's model: presets that show their

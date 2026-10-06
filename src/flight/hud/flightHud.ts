@@ -111,6 +111,12 @@ export interface FlightHudHandle {
   refreshVtolConversion(): void;
   refreshFlaps(): void;
   setAttitudeRenderer(preference: AttitudeRendererPreference): void;
+  /**
+   * A pointer is down on one of the flight controls. A finger resting on a
+   * lever is still flying, though it sends nothing until it moves, so control
+   * must not go back to a phone underneath it.
+   */
+  isPilotHolding(): boolean;
   destroy(): void;
 }
 
@@ -456,11 +462,16 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
     if (capturedPointer !== null && pad.hasPointerCapture(capturedPointer)) {
       pad.releasePointerCapture(capturedPointer);
     }
+    const held = capturedPointer !== null || stickKeys.size > 0 || stickX !== 0 || stickY !== 0;
     capturedPointer = null;
     stickKeys.clear();
     stickActive = false;
     pad.removeAttribute("data-active");
-    applyStick(0, 0);
+    // Letting go of a stick nobody holds is not pilot input. The window losing
+    // focus or resizing lands here, and any stick input takes the controls
+    // from a phone: clicking another application handed the aircraft back to
+    // this computer mid-flight.
+    if (held) applyStick(0, 0);
   };
 
   const moveStick = (clientX: number, clientY: number): void => {
@@ -536,6 +547,17 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   window.addEventListener("blur", onBlur);
   window.addEventListener("resize", onBlur);
   document.addEventListener("visibilitychange", onVisibilityChange);
+
+  // Pointers down on a flight control, wherever they are lifted.
+  const heldPointers = new Set<number>();
+  const controlGroups = [...root.querySelectorAll<HTMLElement>(".flight-hud__attitude-cluster, .flight-hud__yaw-throttle")];
+  const onHoldStart = (event: PointerEvent): void => { heldPointers.add(event.pointerId); };
+  const onHoldEnd = (event: PointerEvent): void => { heldPointers.delete(event.pointerId); };
+  const clearHeld = (): void => heldPointers.clear();
+  for (const group of controlGroups) group.addEventListener("pointerdown", onHoldStart, { capture: true });
+  window.addEventListener("pointerup", onHoldEnd, { capture: true });
+  window.addEventListener("pointercancel", onHoldEnd, { capture: true });
+  window.addEventListener("blur", clearHeld);
 
   const setGearDown = (next: boolean): void => {
     if (next === gearDown) return;
@@ -650,7 +672,12 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
       window.removeEventListener("blur", onBlur);
       window.removeEventListener("resize", onBlur);
       document.removeEventListener("visibilitychange", onVisibilityChange);
+      for (const group of controlGroups) group.removeEventListener("pointerdown", onHoldStart, { capture: true });
+      window.removeEventListener("pointerup", onHoldEnd, { capture: true });
+      window.removeEventListener("pointercancel", onHoldEnd, { capture: true });
+      window.removeEventListener("blur", clearHeld);
       root.innerHTML = "";
     },
+    isPilotHolding: () => heldPointers.size > 0,
   };
 }

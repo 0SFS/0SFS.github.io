@@ -69,6 +69,8 @@ export interface PhoneControllerClient {
 export const PHONE_HAPTICS_PREFERENCE_KEY = 'osfs.phone-haptics'
 // A new pulse may replace the running one, but not faster than the host heartbeat.
 const MIN_PULSE_INTERVAL_MS = 45
+/** Between automatic requests for control the computer offers back, so a refusal is not repeated at heartbeat rate. */
+export const ASK_BACK_INTERVAL_MS = 500
 /**
  * The controls the screen draws a number for. Each of these has to reach the
  * snapshot, because its slider is React-controlled: a value that only moves in
@@ -202,6 +204,7 @@ export function createPhoneControllerClient(
   let lastFeedbackId = -1
   let lastPulseAt = -Infinity
   let vibratingUntil = -Infinity
+  let lastAskedBackAt = -Infinity
   snapshot = { ...snapshot, hapticsSupported: vibrate !== null, hapticsEnabled }
 
   function stopVibration(): void {
@@ -489,6 +492,8 @@ export function createPhoneControllerClient(
       updateStatus(message.status, true)
       emit({ message: message.status.paused ? 'Phone controls · Simulation paused' : 'Phone controls' })
       sendControls()
+      // Losing control paused the flight; now that it is back, lift that pause.
+      if (message.resume === true && message.status.paused) sendAction('setPaused', false)
       return
     }
     if (message.type === 'ack' && !pending.has(message.id)) return
@@ -503,6 +508,7 @@ export function createPhoneControllerClient(
       if (request && message.status.owner === 'local' && message.epoch !== (handoffEpoch ?? request.epoch)) clearPending()
       updateStatus(message.status, true)
       emit({ message: message.message, controls: { ...controls } })
+      askBack()
     } else if (message.type === 'ack') {
       // Successful requestControl is complete only when the centered handoff is granted.
       if (message.id === requestId && message.ok) return
@@ -510,6 +516,7 @@ export function createPhoneControllerClient(
       if (message.id === requestId || message.epoch > previousEpoch) { requestId = null; handoffEpoch = null }
       updateStatus(message.status, true)
       emit({ message: message.message, controls: { ...controls } })
+      askBack()
     }
   }
 
@@ -535,6 +542,7 @@ export function createPhoneControllerClient(
         appliedSeq: message.appliedSeq ?? snapshot.appliedSeq,
         receiveToApplyMs: message.receiveToApplyMs ?? snapshot.receiveToApplyMs,
       })
+      askBack()
     } else if (message.epoch === epoch && message.type === 'ping') {
       transport?.sendNative({ ...envelope(), type: 'pong', id: message.id, sentAt: message.sentAt })
     } else if (message.epoch === epoch && message.type === 'pong' && outstandingPing?.id === message.id && message.sentAt === outstandingPing.sentAt) {
@@ -545,8 +553,10 @@ export function createPhoneControllerClient(
   }
 
   function hide(): void {
+    // A centred last frame, then silence. Hiding is not Release: the computer
+    // notices the silence within its stale limit, pauses, and keeps this
+    // phone's claim, so it can hand control back when the page returns.
     cancelTransientControls()
-    if (snapshot.status?.owner === 'phone' || requestId !== null) sendAction('releaseControl')
     blockedAuthorityEpoch = Math.max(blockedAuthorityEpoch, epoch)
     authorityEpoch = -1
     stopVibration()
@@ -557,7 +567,19 @@ export function createPhoneControllerClient(
   }
   function visibilityChange(): void {
     if (doc?.hidden) hide()
-    else { suspended = false; emit(); if (snapshot.phase === 'ready') void acquireWakeLock() }
+    else { suspended = false; emit(); if (snapshot.phase === 'ready') void acquireWakeLock(); askBack() }
+  }
+
+  /**
+   * The computer offers back control this phone flew and never let go of:
+   * ask for it, as if the pilot had tapped Take control. The request runs the
+   * same centred handoff a tap does. A refused or timed-out one is asked again
+   * no sooner than `ASK_BACK_INTERVAL_MS`, while the offer stands.
+   */
+  function askBack(): void {
+    if (finished || snapshot.status?.handBack !== 'now' || !snapshot.canFly || now() - lastAskedBackAt < ASK_BACK_INTERVAL_MS) return
+    lastAskedBackAt = now()
+    sendAction('requestControl')
   }
 
   doc?.addEventListener('visibilitychange', visibilityChange)
@@ -571,6 +593,7 @@ export function createPhoneControllerClient(
       if (!fresh) stopVibration()
       cancelTransientControls()
       emit({ message: fresh ? snapshot.message : 'Connection delayed · Waiting for the computer' })
+      askBack()
     }
     // Batch sending keeps the stream alive from here only while no input is:
     // a timer frame just before a touch frame would hold that frame back.

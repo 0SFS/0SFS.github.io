@@ -916,6 +916,7 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
                 <ParameterSection settings={props.settings} tab="controls" section="feedback" />
               </div>
               : tabId === "remote" ? <RemoteControlTab loadPhonePairing={props.loadPhonePairing} onUseAsRemote={props.onUseAsRemote}
+                sharing={<ParameterSection settings={props.settings} tab="remote" section="control" />}
                 cameraTuning={<ParameterSection settings={props.settings} tab="remote" section="camera">
                   <PhoneCameraTuningPanel parameters={props.parameters} />
                 </ParameterSection>} />

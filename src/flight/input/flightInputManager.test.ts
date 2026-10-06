@@ -339,6 +339,18 @@ describe("flightInputManager phone handoff", () => {
     expect(input.poll(1).rollTrim).toBeCloseTo(0.27);
   });
 
+  it("takes control only for a deflection: centring the stick or rudder is letting go", () => {
+    const onLocalInput = vi.fn();
+    const input = createFlightInputManager({ onLocalInput });
+    input.setRemoteOwned(true);
+    input.setStick(0, 0);
+    input.setRudder(0);
+    expect(onLocalInput).not.toHaveBeenCalled();
+    input.setStick(0.2, 0);
+    input.setRudder(-0.3);
+    expect(onLocalInput).toHaveBeenCalledTimes(2);
+  });
+
   it("applies HUD stick input and clears it on release", () => {
     const input = createFlightInputManager();
     input.setStick(0.6, -0.4);

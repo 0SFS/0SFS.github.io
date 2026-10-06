@@ -23,7 +23,8 @@ the tab leads with that button and makes no QR until asked. The icon still opens
 time; an icon made from `/rc/` is named *0SFS RC* and always opens the controller.
 
 **Take control** preserves the simulator's current pause state; if the flight is paused, tap **▶** (Resume)
-in the grid separately. The touch controller provides pitch/roll, rudder, throttle, trim, flaps, brake, pause,
+in the grid separately. The one exception is a pause that losing control caused, which lifts when control
+comes back (see [Who flies](#who-flies)). The touch controller provides pitch/roll, rudder, throttle, trim, flaps, brake, pause,
 camera view, and release.
 
 The controls sit where the desktop flight HUD puts them, so muscle memory carries between
@@ -40,12 +41,32 @@ side by side, so the two groups stack there, each keeping its own internal geome
 on wider screens they sit side by side exactly as the desktop does.
 
 The QR expires after two minutes and admits one phone. Leaving the tab hides it; **Disconnect**
-invalidates the invitation or ends the session. Desktop flight inputs or **Take control** immediately
-reclaim control from the phone.
+invalidates the invitation or ends the session.
 
-Lost or delayed phone inputs, a hidden desktop tab, or a phone disconnection all pause the simulation
-and return control to the desktop. Resuming or handing control back to the phone always requires an
-explicit action — the simulator never silently resumes under a control source it cannot hear from.
+### Who flies
+
+Once the phone has taken control, it keeps its claim to the controls until its pilot taps **Release**.
+Control can still be taken from it for a while: by flight input on the computer, by the desktop tab
+being hidden, or by phone input that stops arriving — the phone's screen locking, the controller going
+to the background, a dropped connection. The last two pause the flight. What happens next is
+Remote Control → **Who flies** → **Control changes hands**:
+
+| Choice | Flight input on the computer | Control goes back to the phone |
+| --- | --- | --- |
+| **Automatically** (default) | Takes control | By itself, once the computer's controls have rested for **Rest before returning** (1 s), the desktop tab is showing and the phone is heard from |
+| **Only when taken** | Takes control | When the phone's pilot taps **Take control**; a pause stays until someone resumes |
+| **Latched to the phone** | Does nothing while the phone flies | By itself, without waiting for the computer's controls to rest |
+| **Latched to this computer** | — | Never: the phone cannot take control |
+
+In every mode **Take control** in the Remote Control tab takes control here on purpose — while control
+is waiting to go back, the button reads **Keep control here** — and the phone then waits for its pilot
+to tap **Take control**. A phone disconnection pauses the flight and ends the session.
+
+The computer never resumes the flight by itself. When control goes back after a pause that losing it
+caused, the computer tells the phone that the pause is the phone's to lift, and the phone lifts it once
+it has heard that it is flying, so nothing flies under a phone that does not know it has the controls.
+A pause anyone chose in the meantime stays. A phone page loaded before this behaviour existed asks for
+nothing and keeps the pause; reload it.
 
 ## When pairing fails: read the connection details
 

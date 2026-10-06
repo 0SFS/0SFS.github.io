@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPhoneControlSession } from '../flight/remote/createPhoneControlSession'
-import { createPhoneControllerClient, type PhoneControllerClient } from './phoneControllerClient'
+import { ASK_BACK_INTERVAL_MS, createPhoneControllerClient, type PhoneControllerClient } from './phoneControllerClient'
 import { parsePairingUrl } from './pairing'
 import { DEFAULT_PHONE_CAMERA_TUNING } from '../flight/remote/phoneCameraTuning'
 import { NEUTRAL_CONTROLS, type AircraftStatus, type ControlFrame, type RemoteMessage } from './protocol'
@@ -380,8 +380,8 @@ describe('phone controller', () => {
     expect(h.phoneLink.last('controls').controls).toMatchObject({ throttle: .91, elevator: 0 })
   })
 
-  it('rejects malformed/replayed heartbeats, disables stale input, and never regains authority from old epochs', async () => {
-    const h = await setup()
+  it.each(['stay', 'auto'] as const)('rejects malformed/replayed heartbeats, disables stale input, and never regains authority from old epochs (%s)', async (handover) => {
+    const h = await setup({}, { getSharing: () => ({ handover, returnIdleMs: 1000 }) })
     await advance(50)
     await h.fly()
     const old = h.hostLink.last('handoff')
@@ -400,8 +400,14 @@ describe('phone controller', () => {
     expect(h.client.getSnapshot().canControl).toBe(false)
     h.hostLink.dropNative = false
     await advance(60)
-    expect(h.client.getSnapshot().canFly).toBe(true)
-    expect(h.state.paused).toBe(true)
+    if (handover === 'stay') {
+      expect(h.client.getSnapshot().canFly).toBe(true)
+      expect(h.state.paused).toBe(true)
+    } else {
+      // Back through a fresh handoff in a newer epoch, never the replayed grant.
+      expect(h.state).toMatchObject({ owner: 'phone', paused: false })
+      expect(h.hostLink.last('granted').epoch).toBeGreaterThan(old.epoch)
+    }
   })
 
   it('bounds an incomplete handoff without retrying or accepting its delayed grant', async () => {
@@ -435,11 +441,12 @@ describe('phone controller', () => {
     expect(h.client.getSnapshot()).toMatchObject({ requestingControl: false, canControl: true })
   })
 
-  it('does not restore hidden-phone authority from a late status when best-effort release fails', async () => {
-    const h = await setup()
+  it('does not restore hidden-phone authority from a late status', async () => {
+    // Only when taken: nothing comes back by itself, so what is left is the
+    // late status, and the pause the silence caused.
+    const h = await setup({}, { getSharing: () => ({ handover: 'stay', returnIdleMs: 1000 }) })
     await advance(50)
     await h.fly()
-    vi.spyOn(h.phoneLink, 'sendReliable').mockImplementationOnce(() => false)
     h.win.dispatchEvent(new Event('pagehide'))
     h.doc.dispatchEvent(new Event('visibilitychange'))
     // A reliable status already in flight still describes the old phone epoch.
@@ -454,23 +461,58 @@ describe('phone controller', () => {
     expect(h.state.paused).toBe(true)
   })
 
-  it('does not reactivate a timed-out Fly request from a late granted or status message', async () => {
+  it('hiding is not Release: the computer pauses on the silence and hands control back when the page returns', async () => {
     const h = await setup()
     await advance(50)
-    h.hostLink.holdGranted = true
-    expect(h.client.requestControl()).toBe(true)
-    await flush()
-    expect(h.state.owner).toBe('phone')
-    expect(h.client.getSnapshot().requestingControl).toBe(true)
-    await advance(2005)
-    expect(h.client.getSnapshot()).toMatchObject({ requestingControl: false, canControl: false })
-    h.hostLink.flushHeld()
-    h.host.syncStatus()
-    await flush()
-    expect(h.client.getSnapshot().canControl).toBe(false)
-    await advance(300)
+    await h.fly()
+    Object.defineProperty(h.doc, 'hidden', { value: true, writable: true })
+    h.doc.dispatchEvent(new Event('visibilitychange'))
+    await advance(350)
+    expect(h.phoneLink.reliable.some(message => message.type === 'action' && message.action === 'releaseControl')).toBe(false)
     expect(h.state).toMatchObject({ owner: 'local', paused: true })
-    expect(h.client.getSnapshot().canFly).toBe(true)
+    // Offered back, but a hidden page asks for nothing.
+    expect(h.client.getSnapshot()).toMatchObject({ canFly: false, requestingControl: false, status: { handBack: 'now' } })
+    Object.defineProperty(h.doc, 'hidden', { value: false, writable: true })
+    h.doc.dispatchEvent(new Event('visibilitychange'))
+    await advance(50)
+    expect(h.state).toMatchObject({ owner: 'phone', paused: false })
+    expect(h.client.getSnapshot()).toMatchObject({ canControl: true, status: { owner: 'phone', paused: false } })
+  })
+
+  it('asks for control back once the computer offers it after flight input there', async () => {
+    const h = await setup()
+    await advance(50)
+    await h.fly()
+    h.host.noteLocalInput()
+    await advance(100)
+    expect(h.state.owner).toBe('local')
+    expect(h.client.getSnapshot()).toMatchObject({ canControl: false, requestingControl: false, status: { handBack: 'idle' } })
+    await advance(1000)
+    expect(h.state).toMatchObject({ owner: 'phone', paused: false })
+    expect(h.client.getSnapshot().canControl).toBe(true)
+    expect(h.phoneLink.reliable.filter(message => message.type === 'action' && message.action === 'requestControl')).toHaveLength(2)
+  })
+
+  it('asks again no faster than its interval while the computer keeps refusing', async () => {
+    const h = await setup({}, { getSharing: () => ({ handover: 'computer', returnIdleMs: 1000 }) })
+    await advance(50)
+    const askedAt: number[] = []
+    const send = h.phoneLink.sendReliable.bind(h.phoneLink)
+    vi.spyOn(h.phoneLink, 'sendReliable').mockImplementation(value => {
+      const message = value as RemoteMessage
+      if (message.type === 'action' && message.action === 'requestControl') askedAt.push(Date.now())
+      return send(value)
+    })
+    // A second of offers that the computer, latched to itself, refuses each time.
+    for (let step = 0; step < 20; step += 1) {
+      const { session, epoch } = h.hostLink.last('heartbeat')
+      h.phoneLink.receiveReliable({ v: 1, type: 'status', session, epoch, message: 'Offered', status: { ...h.state, owner: 'local', handBack: 'now' } })
+      await advance(50)
+    }
+    expect(askedAt.length).toBeGreaterThanOrEqual(2)
+    for (let index = 1; index < askedAt.length; index += 1) expect(askedAt[index] - askedAt[index - 1]).toBeGreaterThanOrEqual(ASK_BACK_INTERVAL_MS)
+    expect(h.state.owner).toBe('local')
+    expect(h.hostLink.last('ack')).toMatchObject({ ok: false })
   })
 
   it('recovers Fly after a refused takeover status and a newer heartbeat overtaking its retry', async () => {
@@ -515,8 +557,8 @@ describe('phone controller', () => {
     expect(h.host.beforeStep(h.state.controls)).toMatchObject({ rudder: 0 })
   })
 
-  it('releases on page hide, preserves pause on return, survives signaling-only loss, and tears down after closure', async () => {
-    const h = await setup()
+  it('pauses on page hide, preserves pause on return, survives signaling-only loss, and tears down after closure', async () => {
+    const h = await setup({}, { getSharing: () => ({ handover: 'stay', returnIdleMs: 1000 }) })
     await advance(50)
     await h.fly()
     h.signal(false)
@@ -525,7 +567,7 @@ describe('phone controller', () => {
     await advance(20)
     h.win.dispatchEvent(new Event('pagehide'))
     expect(h.client.getSnapshot().canControl).toBe(false)
-    await flush()
+    await advance(300)
     expect(h.state).toMatchObject({ owner: 'local', paused: true })
     h.doc.dispatchEvent(new Event('visibilitychange'))
     await advance(50)

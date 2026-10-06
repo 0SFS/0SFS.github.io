@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPhoneControlSession } from './createPhoneControlSession'
 import { DEFAULT_PHONE_CAMERA_TUNING } from './phoneCameraTuning'
+import { DEFAULT_CONTROL_SHARING, type ControlSharing } from './controlSharing'
 import { parsePairingUrl } from '../../remote/pairing'
 import { PROTOCOL_MISMATCH_MESSAGE, type AircraftStatus, type ControlSurfaceState, type RemoteMessage } from '../../remote/protocol'
 import type { createPeerEndpoint, SessionTransport } from '../../remote/peerTransport'
@@ -60,6 +61,7 @@ function setup(extra: Partial<Parameters<typeof createPhoneControlSession>[0]> =
   let time = 0
   let localActive = false
   let pageVisible = true
+  let sharing: ControlSharing = { ...DEFAULT_CONTROL_SHARING }
   const state: AircraftStatus = {
     owner: 'local', paused: false, viewMode: 'third', airspeedKts: 100, altitudeFt: 4000, headingDeg: 90,
     controls: { elevator: 0, aileron: 0, rudder: 0, throttle: .67, pitchTrim: -.12, rollTrim: .08, flaps: 1 / 3, brake: 0 },
@@ -76,7 +78,7 @@ function setup(extra: Partial<Parameters<typeof createPhoneControlSession>[0]> =
   const view = vi.fn((mode: 'first' | 'third') => { state.viewMode = mode })
   const session = createPhoneControlSession({
     getStatus: () => ({ ...state, controls: { ...state.controls } }), hasActiveLocalInput: () => localActive,
-    isPageVisible: () => pageVisible,
+    isPageVisible: () => pageVisible, getSharing: () => sharing,
     onOwnershipChange: ownership, setPaused: pause, setViewMode: view, createEndpoint, now: () => time, ...extra,
   })
   allSessions.push(session)
@@ -107,6 +109,7 @@ function setup(extra: Partial<Parameters<typeof createPhoneControlSession>[0]> =
   }
   return { session, state, endpoints, ownership, pause, view, advance, pair, requestControl, grant,
     setVisible(value: boolean) { pageVisible = value },
+    setSharing(patch: Partial<ControlSharing>) { sharing = { ...sharing, ...patch } },
     setLocalActive(value: boolean) { localActive = value }, jump(ms: number) { time += ms } }
 }
 
@@ -591,5 +594,180 @@ describe('reliable authority status recovery', () => {
     await h.advance(1000)
     expect(transport.sendReliable).toHaveBeenCalledTimes(sent)
     expect(h.session.getSnapshot()).toBe(closed)
+  })
+})
+
+describe('handing control back to the phone', () => {
+  /** What the newest status-bearing heartbeat offered the phone. */
+  const offered = (transport: Transport) => transport.native
+    .findLast((message): message is Extract<RemoteMessage, { type: 'heartbeat' }> => message.type === 'heartbeat' && message.status !== undefined)
+    ?.status?.handBack
+  const release = (transport: Transport, handoff: { session: string; epoch: number; lease: number }, id = 2) => {
+    transport.receive({ v: 1, type: 'action', session: handoff.session, epoch: handoff.epoch, lease: handoff.lease, id, action: 'releaseControl' })
+  }
+  /** What a phone does with a grant marked `resume`. */
+  const lift = (transport: Transport, handoff: { session: string; epoch: number; lease: number }, id = 9) => {
+    transport.receive({ v: 1, type: 'action', session: handoff.session, epoch: handoff.epoch, lease: handoff.lease, id, action: 'setPaused', value: false })
+  }
+
+  it('gives control back by itself after flight input here, once these controls rest', async () => {
+    const h = setup()
+    const transport = await h.pair()
+    h.grant(transport)
+    h.setLocalActive(true)
+    h.session.noteLocalInput()
+    expect(h.session.getSnapshot()).toMatchObject({ owner: 'local', returning: true })
+    expect(h.pause).not.toHaveBeenCalled()
+    await h.advance(100)
+    expect(offered(transport)).toBe('idle')
+    h.setLocalActive(false)
+    await h.advance(500)
+    expect(offered(transport)).toBe('idle')
+    await h.advance(600)
+    expect(offered(transport)).toBe('now')
+    // What a phone does on `now`: the same centred handoff as a tap.
+    h.grant(transport, 2)
+    expect(h.session.getSnapshot()).toMatchObject({ owner: 'phone', returning: false })
+    expect(h.pause).not.toHaveBeenCalled()
+  })
+
+  it('resumes the flight that hiding this tab paused, once the tab shows again', async () => {
+    const h = setup()
+    const transport = await h.pair()
+    h.grant(transport)
+    h.setVisible(false)
+    h.session.onHidden()
+    expect(h.state.paused).toBe(true)
+    await h.advance(100)
+    expect(offered(transport)).toBeUndefined()
+    h.setVisible(true)
+    await h.advance(100)
+    expect(offered(transport)).toBe('now')
+    const handoff = h.grant(transport, 2)
+    expect(h.session.getSnapshot().owner).toBe('phone')
+    // The computer never resumes by itself: the phone lifts the pause once it
+    // has heard that it is flying.
+    expect(transport.last('granted')).toMatchObject({ resume: true, status: { owner: 'phone', paused: true } })
+    expect(h.state.paused).toBe(true)
+    lift(transport, handoff)
+    expect(h.state.paused).toBe(false)
+  })
+
+  it('resumes after lost phone input once the phone is heard from again', async () => {
+    const h = setup()
+    const transport = await h.pair()
+    h.grant(transport)
+    await h.advance(300)
+    expect(h.session.getSnapshot().owner).toBe('local')
+    expect(h.state.paused).toBe(true)
+    expect(offered(transport)).toBe('now')
+    const handoff = h.grant(transport, 2)
+    expect(h.session.getSnapshot().owner).toBe('phone')
+    expect(transport.last('granted').resume).toBe(true)
+    lift(transport, handoff)
+    expect(h.state.paused).toBe(false)
+  })
+
+  it('keeps a pause chosen while the phone was away', async () => {
+    const h = setup()
+    const transport = await h.pair()
+    h.grant(transport)
+    h.session.onHidden()
+    // The pilot here resumes, then pauses again: that pause is theirs.
+    h.state.paused = false
+    h.session.syncStatus()
+    h.state.paused = true
+    h.session.syncStatus()
+    await h.advance(100)
+    h.grant(transport, 2)
+    expect(h.session.getSnapshot().owner).toBe('phone')
+    expect(transport.last('granted').resume).toBeUndefined()
+    expect(h.state.paused).toBe(true)
+  })
+
+  it.each(['release', 'take control here'] as const)('offers nothing back after %s', async (kind) => {
+    const h = setup()
+    const transport = await h.pair()
+    const handoff = h.grant(transport)
+    if (kind === 'release') release(transport, handoff)
+    else h.session.takeControl()
+    await h.advance(2000)
+    expect(h.session.getSnapshot()).toMatchObject({ owner: 'local', returning: false })
+    expect(offered(transport)).toBeUndefined()
+  })
+
+  it('lets this computer keep control it is waiting to hand back', async () => {
+    const h = setup()
+    const transport = await h.pair()
+    h.grant(transport)
+    h.session.onHidden()
+    expect(h.session.getSnapshot().returning).toBe(true)
+    h.session.takeControl()
+    await h.advance(100)
+    expect(h.session.getSnapshot().returning).toBe(false)
+    expect(offered(transport)).toBeUndefined()
+  })
+
+  it('a release counts even over a stale connection', async () => {
+    const h = setup()
+    const transport = await h.pair()
+    const handoff = h.grant(transport)
+    h.jump(300)
+    release(transport, handoff)
+    expect(transport.last('ack')).toMatchObject({ id: 2, ok: false })
+    await h.advance(100)
+    expect(h.session.getSnapshot().owner).toBe('local')
+    expect(offered(transport)).toBeUndefined()
+  })
+
+  it('only when taken: waits for Take control on the phone, which keeps the pause', async () => {
+    const h = setup()
+    h.setSharing({ handover: 'stay' })
+    const transport = await h.pair()
+    h.grant(transport)
+    h.session.noteLocalInput()
+    await h.advance(2000)
+    expect(h.session.getSnapshot()).toMatchObject({ owner: 'local', returning: false })
+    expect(offered(transport)).toBeUndefined()
+    h.grant(transport, 2)
+    h.session.onHidden()
+    await h.advance(100)
+    expect(offered(transport)).toBeUndefined()
+    h.grant(transport, 3)
+    expect(h.session.getSnapshot().owner).toBe('phone')
+    expect(transport.last('granted').resume).toBeUndefined()
+    expect(h.state.paused).toBe(true)
+  })
+
+  it('latched to the phone: flight input here neither takes control nor holds up its return', async () => {
+    const h = setup()
+    h.setSharing({ handover: 'phone' })
+    const transport = await h.pair()
+    h.grant(transport)
+    h.setLocalActive(true)
+    h.session.noteLocalInput()
+    expect(h.session.getSnapshot().owner).toBe('phone')
+    await h.advance(300)
+    expect(h.session.getSnapshot().owner).toBe('local')
+    expect(offered(transport)).toBe('now')
+    h.grant(transport, 2)
+    expect(h.session.getSnapshot().owner).toBe('phone')
+    expect(transport.last('granted').resume).toBe(true)
+  })
+
+  it('latched to this computer: a flying phone is taken off and cannot ask again until unlatched', async () => {
+    const h = setup()
+    const transport = await h.pair()
+    h.grant(transport)
+    h.setSharing({ handover: 'computer' })
+    await h.advance(50)
+    expect(h.session.getSnapshot().owner).toBe('local')
+    expect(h.pause).not.toHaveBeenCalled()
+    expect(offered(transport)).toBeUndefined()
+    h.requestControl(transport, 2)
+    expect(transport.last('ack')).toMatchObject({ id: 2, ok: false })
+    h.setSharing({ handover: 'auto' })
+    await h.advance(100)
+    expect(offered(transport)).toBe('now')
   })
 })

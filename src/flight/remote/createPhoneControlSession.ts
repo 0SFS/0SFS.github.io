@@ -1,27 +1,33 @@
 import { createPeerEndpoint, type SessionTransport, type PeerEndpoint } from "../../remote/peerTransport";
 import { createConnectionLog, describeIceFailure, type ConnectionLog } from "../../remote/connectionDiagnostics";
 import { createJoinSecret, createPairingUrl, createSessionId, INVITATION_TTL_MS } from "../../remote/pairing";
+import { DEFAULT_CONTROL_SHARING, type ControlSharing } from "./controlSharing";
 import { createPhoneCameraReceiver } from "./phoneCameraPlayout";
 import { DEFAULT_PHONE_CAMERA_TUNING, type PhoneCameraTuning } from "./phoneCameraTuning";
 import {
   HANDOFF_MS, HAPTIC_FEEDBACK_TTL_MS, HAPTIC_FEEDBACK_VERSION, HEARTBEAT_MS, MAX_HAPTIC_PULSE_MS, STALE_MS,
   PROTOCOL_MISMATCH_MESSAGE, isCentered, isProtocolVersionMismatch, neutralize, parseMessage,
   type ActionMessage, type AircraftStatus, type CameraAim, type ControlFrame, type ControlSurfaceState,
-  type HapticFeedbackFrame, type RemoteMessage,
+  type HandBack, type HapticFeedbackFrame, type RemoteMessage,
 } from "../../remote/protocol";
 
 export interface PhoneSessionSnapshot {
   phase: "off" | "preparing" | "invitation" | "authenticating" | "paired" | "error" | "expired";
   message: string;
   owner: "local" | "phone";
+  /** This computer holds control the phone flew and never let go of, and gives it back by itself. */
+  returning: boolean;
   invitationUrl: string | null;
   expiresAt: number | null;
   signalingAvailable: boolean;
 }
 export interface PhoneControlSessionOptions {
   getStatus(): AircraftStatus;
+  /** Flight input on this computer is held or moving now: keys, a deflected stick, a HUD control under a finger. */
   hasActiveLocalInput(): boolean;
   isPageVisible?(): boolean;
+  /** Who flies when both devices could; read at every decision. Defaults to the catalogue's defaults. */
+  getSharing?(): ControlSharing;
   onOwnershipChange(owner: "local" | "phone", controls: ControlSurfaceState): void;
   setPaused(paused: boolean): void;
   setViewMode(mode: "first" | "third"): void;
@@ -68,7 +74,8 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
   const transports = new Set<SessionTransport>();
   const cleanup = new Map<SessionTransport, () => void>();
   let snapshot: PhoneSessionSnapshot = {
-    phase: "off", message: "No phone paired.", owner: "local", invitationUrl: null, expiresAt: null, signalingAvailable: true,
+    phase: "off", message: "No phone paired.", owner: "local", returning: false,
+    invitationUrl: null, expiresAt: null, signalingAvailable: true,
   };
   let endpoint: PeerEndpoint | null = null;
   let active: SessionTransport | null = null;
@@ -95,13 +102,50 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
   // One latest-value haptic slot; never a queue of impacts.
   let feedback: { id: number; pulseMs: number; queuedAt: number; epoch: number } | null = null;
   let feedbackId = 0;
+  /**
+   * The phone flew and has not let go: only its Release, Take control here, or
+   * the end of the session ends this. While it stands, control that a hidden
+   * tab, lost input or flight input here took away goes back by itself, as
+   * `ControlSharing.handover` allows.
+   */
+  let claim = false;
+  /** Taking control away paused a running flight, so handing it back resumes it. */
+  let resumeOnReturn = false;
+  /** When flight input here last happened; the return waits for these controls to rest. */
+  let lastLocalInputAt = -Infinity;
+  const sharing = (): ControlSharing => options.getSharing?.() ?? DEFAULT_CONTROL_SHARING;
+  const letGo = () => { claim = false; resumeOnReturn = false; };
 
+  const returning = (owner = snapshot.owner) => {
+    const { handover } = sharing();
+    return claim && owner === "local" && (handover === "auto" || handover === "phone");
+  };
   const publish = (patch: Partial<PhoneSessionSnapshot> = {}) => {
-    snapshot = { ...snapshot, ...patch };
+    const next = { ...snapshot, ...patch };
+    snapshot = { ...next, returning: returning(next.owner) };
     listeners.forEach(listener => listener());
   };
   const envelope = () => ({ v: 1 as const, session, epoch });
-  const status = (): AircraftStatus => ({ ...options.getStatus(), owner: snapshot.owner });
+  /**
+   * Whether control goes back to the phone now, once these controls rest, or
+   * only when its pilot asks (undefined). The phone asks by itself on `now`.
+   */
+  const handBack = (current: AircraftStatus): HandBack | undefined => {
+    if (!claim || snapshot.owner === "phone" || pending || !isPageVisible()) return undefined;
+    const { handover, returnIdleMs } = sharing();
+    if (handover === "stay" || handover === "computer") return undefined;
+    // Never offer what the request would refuse: the same rest and centring.
+    if (handover === "auto" && (options.hasActiveLocalInput() || !isCentered(current.controls)
+      || now() - lastLocalInputAt < returnIdleMs)) return "idle";
+    return "now";
+  };
+  /** Flight input here keeps the phone waiting, except when control is latched to it. */
+  const localInputBlocks = () => sharing().handover !== "phone";
+  const status = (): AircraftStatus => {
+    const current = options.getStatus();
+    const back = handBack(current);
+    return { ...current, owner: snapshot.owner, ...(back ? { handBack: back } : {}) };
+  };
   const send = (message: RemoteMessage) => {
     const sent = active?.sendReliable(message) ?? false;
     // A delivered authoritative response supersedes any older status retry.
@@ -174,12 +218,18 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     const controls = neutralize(options.getStatus().controls);
     newEpoch();
     snapshot = { ...snapshot, owner: "local" };
+    // Only taken back by hand: the phone waits for its pilot to ask again.
+    if (sharing().handover === "stay") letGo();
     if (wasPhone) options.onOwnershipChange("local", controls);
-    if (pause && wasPhone) options.setPaused(true);
+    if (pause && wasPhone) {
+      if (claim && !options.getStatus().paused) resumeOnReturn = true;
+      options.setPaused(true);
+    }
     if (canceled !== undefined) acknowledge(canceled, false, message);
     publishStatus(message);
   };
   const closeAll = () => {
+    letGo();
     clearTimeout(setupTimer); setupTimer = undefined;
     active = null;
     for (const detach of cleanup.values()) detach();
@@ -212,9 +262,16 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     }
     const { id, baseline } = pending;
     pending = null;
+    claim = true;
     snapshot = { ...snapshot, owner: "phone" };
     options.onOwnershipChange("phone", baseline);
-    const result: RemoteMessage = { ...envelope(), type: "granted", requestId: id, status: status() };
+    // Handing control back resumes the flight that taking it away paused, and
+    // only that: a pause anyone chose in between cleared this. The phone lifts
+    // it once the grant reaches it, so nothing flies under a phone that does
+    // not yet know it is flying.
+    const resume = resumeOnReturn && options.getStatus().paused;
+    resumeOnReturn = false;
+    const result: RemoteMessage = { ...envelope(), type: "granted", requestId: id, status: status(), ...(resume ? { resume: true as const } : {}) };
     actions.set(id, result);
     send(result);
     publish({ message: options.getStatus().paused ? "Phone controls · Simulation paused" : "Phone controls" });
@@ -222,19 +279,26 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
   const handoffChanged = () => {
     if (!pending) return false;
     const current = options.getStatus();
-    return !isPageVisible() || options.hasActiveLocalInput() || !isCentered(current.controls) || current.paused !== pending.paused
+    return !isPageVisible() || (localInputBlocks() && (options.hasActiveLocalInput() || !isCentered(current.controls)))
+      || current.paused !== pending.paused
       || (["throttle", "pitchTrim", "rollTrim", "flaps"] as const).some(key => current.controls[key] !== pending!.baseline[key]);
   };
   const handleAction = (message: ActionMessage) => {
     if (actions.has(message.id)) { send(actions.get(message.id)!); return; }
     if (pending?.id === message.id || message.id <= maxActionId) return;
     maxActionId = message.id;
+    // Release is the phone letting go on purpose, so nothing hands control
+    // back. It only ever removes authority, so it counts even when stale.
+    if (message.action === "releaseControl") letGo();
     if (!freshLease(message.lease)) { acknowledge(message.id, false, "Connection is stale. Try again."); return; }
     if (message.action === "requestControl") {
       if (snapshot.owner === "phone" || pending) { acknowledge(message.id, false, "Control request already active."); return; }
+      if (sharing().handover === "computer") {
+        acknowledge(message.id, false, "Control is latched to the computer. Its Remote Control tab can change that."); return;
+      }
       if (!isPageVisible()) { acknowledge(message.id, false, "Return to the desktop tab before taking control."); return; }
       const baseline = neutralize(options.getStatus().controls);
-      if (options.hasActiveLocalInput() || !isCentered(options.getStatus().controls)) {
+      if (localInputBlocks() && (options.hasActiveLocalInput() || !isCentered(options.getStatus().controls))) {
         acknowledge(message.id, false, "Center controls to take over."); return;
       }
       newEpoch();
@@ -417,6 +481,10 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     if (pending && (now() >= pending.deadline || handoffChanged())) revoke("Control transfer canceled. Tap Fly again.", false);
     if (snapshot.owner === "phone" && !isPageVisible()) revoke("Desktop hidden · Simulation paused", true);
     if (snapshot.owner === "phone" && !freshInput()) revoke("Phone input lost · Simulation paused", true);
+    if (snapshot.owner === "phone" && sharing().handover === "computer") revoke("Control latched to the computer", false);
+    // Someone resumed in between: a pause chosen after that is theirs to keep.
+    if (resumeOnReturn && !options.getStatus().paused) resumeOnReturn = false;
+    if (returning() !== snapshot.returning) publish();
     retryStatus();
     if (!active || !localReady || !remoteReady) return;
     const lease = issueLease();
@@ -460,10 +528,33 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
       }
     },
     disconnect,
-    takeControl(message = "Desktop controls") { revoke(message, false); },
+    /**
+     * Take control here on purpose: the Remote Control tab's button. The phone
+     * then waits for its pilot to tap Take control, whatever `handover` says.
+     */
+    takeControl(message = "Desktop controls") {
+      const held = claim;
+      letGo();
+      if (snapshot.owner === "phone" || pending) revoke(message, false);
+      else if (held) publishStatus(message);
+    },
+    /**
+     * Flight input on this computer: a key, a gamepad, a HUD control. It takes
+     * control from the phone unless control is latched to the phone, and holds
+     * off handing control back until these controls have rested.
+     */
+    noteLocalInput() {
+      lastLocalInputAt = now();
+      const { handover } = sharing();
+      if (handover === "phone") return;
+      revoke(handover === "auto" && claim ? "Desktop controls · Back to the phone when these controls rest" : "Desktop controls", false);
+    },
     cancelHandoff(message = "Flight settings changed. Tap Fly again.") { if (pending) revoke(message, false); },
     reset() { revoke("Aircraft reset · Desktop controls", false, true); },
-    syncStatus() { if (active) publishStatus(snapshot.owner === "phone" ? "Phone controls" : "Phone paired · Desktop controls"); },
+    syncStatus() {
+      if (resumeOnReturn && !options.getStatus().paused) resumeOnReturn = false;
+      if (active) publishStatus(snapshot.owner === "phone" ? "Phone controls" : "Phone paired · Desktop controls");
+    },
     beforeStep(localControls: ControlSurfaceState): ControlSurfaceState | false {
       if (snapshot.owner !== "phone") return localControls;
       if (!isPageVisible()) { revoke("Desktop hidden · Simulation paused", true); return false; }
