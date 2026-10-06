@@ -28,6 +28,14 @@
       "aircraft/sf50-g3/sf50-g3.xml",
       "engine/fj33_5a.xml",
       "engine/direct.xml"
+    ],
+    "f-35b": [
+      "aircraft/F-35B-jsbsim/F-35B-jsbsim.xml",
+      "aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+      "aircraft/F-35B-jsbsim/Engines/direct.xml",
+      "aircraft/F-35B-jsbsim/Engines/liftfan.xml",
+      "aircraft/F-35B-jsbsim/Engines/sidefan.xml",
+      "aircraft/F-35B-jsbsim/Systems/pushback.xml"
     ]
   }
 }
