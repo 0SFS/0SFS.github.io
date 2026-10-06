@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-06",
+  "status": "passed",
+  "scope": "Engine static fixture, isolated nozzle presentation, parameter histories; research/documentation correction only to the optical profile. No native engine, thermal or plume-rendering numerical changes.",
+  "checks": {
+    "ci": {
+      "command": "npm run ci",
+      "passed": true,
+      "testFiles": 166,
+      "passedTests": 1791,
+      "existingExpectedFailures": 1,
+      "log": "checks/ci.log"
+    },
+    "typecheck": {
+      "command": "npx tsc -b",
+      "passed": true,
+      "log": "checks/typecheck-last.log"
+    },
+    "related": {
+      "initial": "checks/bench-related.log",
+      "initialFailure": "Asset test mistakenly counted 16 petal objects as 16 primitives; each petal has two primitives. Corrected test count/name, with no production change.",
+      "correctedFile": "checks/model-related-fix.log",
+      "composition": "checks/bench-composition-last.log",
+      "history": "checks/history-focused.log"
+    },
+    "lint": {
+      "passed": true,
+      "log": "checks/bench-lint.log"
+    },
+    "opticsSourceCorrection": {
+      "command": "npm run build:exhaust",
+      "log": "checks/exhaust-source-correction.log",
+      "numericalChange": false
+    }
+  },
+  "sourceSha256": {
+    "src/flight/engineTestStand.ts": "a5d55e14ec22e0be2ea998845488964e6a3d8fea5ce5f4f86ce4ef10002219a3",
+    "src/flight/engineTestStand.test.ts": "ff6898260af8cede7f06b3c9db357841409ad38cd234fa9f1ca7a2a729a271cd",
+    "src/flight/engineTestStand.integration.test.ts": "af3197055b8c786f10894a7091d27b6ddafd26118ab9654550e5c6d3fcf37226",
+    "src/flight/createFlightSimApp.ts": "4fcf5511fa26429cbad7adf312fc1be4cadcc980bf9403ea975d4f121c75d9e8",
+    "src/flight/createFlightSimApp.test.ts": "8b764e762af3ee4449b81c01c9d30723fdf5663138b5bdf7499ac760fc3711ae",
+    "src/flight/jsbsim/bootstrapC172.ts": "fe71b1fc1aa86e1648f075b93e33f656cc63e36d86b8b69ee560fec26a5ea927",
+    "src/flight/aircraft/aircraftCatalog.ts": "c35dcacd3fed48e202d820b567518433068727ccbb8acd81e8a724d9c0c126e5",
+    "src/flight/aircraft/createAircraftModel.ts": "b01d2b435332829e68109f0e80e9b820eae677184b5cc46213e437457c291c1e",
+    "src/flight/aircraft/createAircraftModel.test.ts": "4ae6ef7ebcc8595b582b41de5daa3a6be7ed72c2f86289145dd89cc8b01137ab",
+    "src/flight/aircraft/createPlaceholderAircraft.ts": "13fc99846691db236f95d598cd2ab854519fb84e6617bffd43d9ca916cb9db77",
+    "src/flight/aircraft/createPlaceholderAircraft.test.ts": "89af8e934da09e43fcb55146dfa35367c4e7fc3c68aa0382dabb3d600bf496aa",
+    "src/flight/hud/engineMonitor.ts": "d1ebed28d85397ca6f57e3288187f50a5becd519b7d5619c8d58c5bc3824c1e6",
+    "src/flight/hud/engineMonitor.test.ts": "4aa0f1435fd8e71df7c46cdd55274710bf1837acb598eb2ead08ff41597d1dfa",
+    "src/flight/hud/engineMonitor.css": "06669c722f9e5400beef93671fbee3d360c5e916aaac62068d3740a08361132c",
+    "src/flight/hud/engineHistory.ts": "33442f4353f8630794e229f3b739f87025efaecc93b2a9fa68e7393a07426775",
+    "src/flight/hud/engineHistory.test.ts": "b4fe1c59baf21d53ae8a665533261e22ce21a69ad983369bc856def50c1a8b98",
+    "src/flight/hud/FlightControlPanel.tsx": "14f4431e155bcab52eb2a5c002720a8870705930976f777e1da2bee43ba90835",
+    "src/flight/settings/flightParameters.ts": "edeae4c8a9631815f509ac2973dc9aedf7afd9830a5c278dc826932c2d4a74fe",
+    "scripts/validation/aircraft/check-turbine-thermal.mjs": "71e1aa71c3787de89cc2a6f84cb98d61fae94729a59ad04e9394c3fa4a66c410",
+    "scripts/exhaustOptics/f135-visible-approximation.json": "5d217a55cce2c1a4191bd4b21b94ed93c8b71a33d63e21d2e780815bc9c6e9c2",
+    "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json": "838b00a85b3c82a70f01f046d0de4851ce4a21bdf4724ddf651ac6b687d0089f",
+    "src/flight/aircraft/generated/f135-exhaust-lut.png": "99f06d738d15a56038105eb59eb19984b6fa92c4d9bde983c877950efbfbaed3",
+    "src/flight/aircraft/generated/f135ExhaustOpticalData.ts": "1bd440defd8d579cc5c3655b5af9124bf6e382b1759fd3546d4eb7ebde27687c"
+  },
+  "qualificationLimits": [
+    "No GPU/browser screenshot or device performance qualification in this change.",
+    "Actual installed-SDK integration tests cover SF50 and F135 static engine, time, fuel and thermal response with stationary propagation.",
+    "No measured F135 thermal calibration, full engine asset, multiple heat states or spectral calibration introduced.",
+    "Research videos are qualitative only; the exact eight-spot count and hardware identity remain unverified."
+  ]
+}

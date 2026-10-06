@@ -27,6 +27,9 @@ const TURBINE_ONLY_PROPERTIES: ReadonlySet<string> = new Set([
   "propulsion/engine/n1", "propulsion/engine/n2", "propulsion/engine/MaxN1", "propulsion/engine/MaxN2",
   "propulsion/engine/tsfc", "propulsion/engine/bleed-factor", "propulsion/engine/injection_cmd",
   "propulsion/engine/seized", "propulsion/engine/stalled", "propulsion/cutoff_cmd",
+  "propulsion/engine/egt-degc",
+  "propulsion/engine/thermal/nozzle-gas-temperature-k", "propulsion/engine/thermal/metal-temperature-k",
+  "propulsion/engine/thermal/core/metal-temperature-k",
 ]);
 const PISTON_ONLY_PROPERTIES: ReadonlySet<string> = new Set([
   "propulsion/engine/engine-rpm", "propulsion/engine/propeller-rpm", "propulsion/engine/power-hp",
@@ -36,7 +39,7 @@ const PISTON_ONLY_PROPERTIES: ReadonlySet<string> = new Set([
 
 /** A diagnostic catalog may retain unrelated nodes; curated gauges must not. */
 export function enginePropertyApplies(path: string, definition?: EngineMonitorDefinition): boolean {
-  return definition?.kind === "piston" ? !TURBINE_ONLY_PROPERTIES.has(path)
+  return definition?.kind === "piston" ? !TURBINE_ONLY_PROPERTIES.has(path) && !/^propulsion\/engine(?:\[\d+\])?\/thermal\//.test(path)
     : definition?.kind === "turbine" ? !PISTON_ONLY_PROPERTIES.has(path) : true;
 }
 
@@ -311,9 +314,15 @@ export function formatValue(value: number): string {
 export interface EngineRow {
   label: string;
   path: string;
+  /** Explains the native observation in addition to its property path. */
+  description?: string;
+  /** Native flags required for a meaningful current observation. */
+  validityProperties?: readonly string[];
   unit?: string;
   /** Multiplier applied before display, e.g. lbm/s to lb/h. */
   scale?: number;
+  /** Added after scaling, e.g. Kelvin to Celsius. */
+  offset?: number;
   digits?: number;
   flag?: boolean;
 }
@@ -321,11 +330,53 @@ export interface EngineRow {
 export function formatRowValue(row: EngineRow, value: number): string {
   if (!Number.isFinite(value)) return "n/a";
   if (row.flag) return value > 0.5 ? "on" : "off";
-  const text = (value * (row.scale ?? 1)).toFixed(row.digits ?? 2);
+  const text = (value * (row.scale ?? 1) + (row.offset ?? 0)).toFixed(row.digits ?? 2);
   return row.unit ? `${text} ${row.unit}` : text;
 }
 
 /** Curated sections. A row appears only when the loaded model publishes its property. */
+/** Published native solid regions, rather than an aircraft-specific thermal dashboard. */
+export function discoverThermalBalanceRows(available: ReadonlySet<string>, definition?: EngineMonitorDefinition): (EngineRow & { engineIndex: number })[] {
+  if (definition?.kind === "piston") return [];
+  const fields = [
+    ["gas-heat-flow-w", "gas heat", "W"],
+    ["coolant-heat-flow-w", "coolant heat", "W"],
+    ["surroundings-radiation-heat-flow-w", "surroundings radiation", "W"],
+    ["flame-radiation-heat-flow-w", "flame radiation", "W"],
+    ["net-heat-flow-w", "net heat", "W"],
+    ["heat-capacity-j-k", "heat capacity", "J/K"],
+    ["gas-bath-temperature-k", "gas bath", "K"],
+    ["coolant-bath-temperature-k", "coolant bath", "K"],
+    ["surroundings-bath-temperature-k", "surroundings bath", "K"],
+    ["step-seconds", "accepted step", "s"],
+    ["step-stored-energy-j", "step stored energy", "J"],
+    ["step-heat-transfer-j", "step transferred heat", "J"],
+    ["step-energy-residual-j", "step balance residual", "J"],
+    ["initialization-energy-j", "initialization energy", "J"],
+  ] as const;
+  const rows: (EngineRow & { engineIndex: number })[] = [];
+  for (const flag of [...available].sort()) {
+    const match = /^(propulsion\/engine(?:\[(\d+)\])?\/thermal\/)(?:([a-z0-9-]+)\/)?heat-balance-valid$/.exec(flag);
+    if (!match) continue;
+    const prefix = flag.slice(0, -"heat-balance-valid".length);
+    const engineIndex = Number(match[2] ?? 0);
+    const name = match[3] ? match[3][0].toUpperCase() + match[3].slice(1).replaceAll("-", " ") : "Primary solid";
+    for (const [property, label, unit] of fields) {
+      const path = prefix + property;
+      if (!available.has(path)) continue;
+      const seed = property === "initialization-energy-j";
+      rows.push({ engineIndex, label: `${engineIndex ? `E${engineIndex + 1} ` : ""}${name} ${label}`, path, unit,
+        digits: property === "step-seconds" ? 6 : 3,
+        validityProperties: seed ? [match[1] + "valid", prefix + "initialized"] : [flag],
+        description: seed
+          ? "Stored energy assigned by initialization, separate from heat integrated over accepted native time. Not combustion heat."
+          : "Native accepted-step observation. Heat rates are signed into this solid; negative values cool it. Step energies belong only to their accepted timestep and must not be summed across repeated display reads. Prescribed baths do not close the entire engine energy budget.",
+      });
+    }
+  }
+  return rows;
+}
+
 export const ENGINE_SECTIONS: readonly { id: string; title: string; rows: readonly EngineRow[] }[] = [
   {
     id: "spools", title: "Spools and thrust", rows: [
@@ -345,6 +396,28 @@ export const ENGINE_SECTIONS: readonly { id: string; title: string; rows: readon
   },
   {
     id: "temperatures", title: "Temperatures and oil", rows: [
+      {
+        label: "EGT (exhaust gas)", path: "propulsion/engine/egt-degc", unit: "°C", digits: 0,
+        description: "Modeled exhaust-gas temperature from JSBSim; not a nozzle-metal or afterburner-exit measurement.",
+      },
+      {
+        label: "Nozzle gas temperature", path: "propulsion/engine/thermal/nozzle-gas-temperature-k",
+        unit: "°C", offset: -273.15, digits: 0,
+        validityProperties: ["propulsion/engine/thermal/valid"],
+        description: "Modeled nozzle-inlet gas temperature, including native afterburner heating when active; not expanded plume or metal temperature.",
+      },
+      {
+        label: "Core-facing metal temperature", path: "propulsion/engine/thermal/core/metal-temperature-k",
+        unit: "°C", offset: -273.15, digits: 0,
+        validityProperties: ["propulsion/engine/thermal/valid", "propulsion/engine/thermal/core/initialized"],
+        description: "Independent modeled core-facing solid with heat capacity, gas heating, cooling and radiation; provisional, not measured F135 hardware temperature.",
+      },
+      {
+        label: "Nozzle metal temperature", path: "propulsion/engine/thermal/metal-temperature-k",
+        unit: "°C", offset: -273.15, digits: 0,
+        validityProperties: ["propulsion/engine/thermal/valid", "propulsion/engine/thermal/initialized"],
+        description: "Modeled nozzle-metal temperature with heat capacity, convection and radiation; not a measured hardware temperature.",
+      },
       { label: "EGT", path: "propulsion/engine/egt-degF", unit: "°F", digits: 0 },
       { label: "CHT", path: "propulsion/engine/cht-degF", unit: "°F", digits: 0 },
       { label: "Oil temperature", path: "propulsion/engine/oil-temperature-degF", unit: "°F", digits: 0 },

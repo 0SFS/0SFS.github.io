@@ -1,0 +1,1741 @@
+{
+  "schema": "0sfs-plume-geometric-visibility/1",
+  "inputs": [
+    {
+      "path": "src/flight/aircraft/createEngineExhaust.ts",
+      "sha256": "0e1d28a829f1e1b2fa4133f3ea1c1525aad15e85fabfa62cbf4bd2fe0ce5d3c6"
+    },
+    {
+      "path": "src/flight/aircraft/engineNozzleRig.ts",
+      "sha256": "0c070c616f6b9508de3cba5ccd24818b9ad679bb938e9d86acf1287f381f0996"
+    },
+    {
+      "path": "src/flight/aircraft/engineGasOptics.ts",
+      "sha256": "17881e149e4942f3463f7af065e8845d2052aa855de29b3ee043927e546b7699"
+    },
+    {
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-full.glb",
+      "sha256": "0fc8083a3a4d5d5d76946ea3602d4a23ebc508e58301145e489c59c1801ff71f"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/trace.csv",
+      "sha256": "6c11afe6f6f9abdef19ee4a3265b7c35087b956a37bc03b2c046da70bcf957e2"
+    }
+  ],
+  "observations": [
+    {
+      "scenario": "powered-lift",
+      "phase": "powered-lift-full-command",
+      "timeS": 117.5250000000396,
+      "phaseTimeS": 90,
+      "ambientK": 286.4991319989687,
+      "pressurePsf": 2053.2761045974676,
+      "egtC": 729.9781319989688,
+      "gasK": 1003.1281319989688,
+      "thermalValid": 1,
+      "fuelKgSec": 4.420049982197244,
+      "suppliedAbKgSec": 0,
+      "burnedAbKgSec": 0,
+      "n1Pct": 99.3,
+      "n2Pct": 99.6,
+      "nativeRunning": 1,
+      "augmentation": 0,
+      "nozzleNorm": 0.01000000000000012,
+      "nozzlePitchRad": 1.5707963267948966,
+      "nozzleYawRad": 1.829907617578383e-15,
+      "conversion": 1,
+      "throttleCmd": 1,
+      "throttlePosition": 0.99,
+      "coreK": 956.7228132202761,
+      "linerK": 664.0542773824793,
+      "visualRunning": 1,
+      "opticsValid": 1,
+      "radiusM": 0.40161378548650467,
+      "lengthM": 1.2000000000000002,
+      "throatAreaM2": 0.3837808557176592,
+      "exitAreaM2": 0.505376278459852,
+      "absorptionPerM": 0.025,
+      "effectiveVolumeM3": 0.05750901070800853,
+      "fuelPowerW": 191388164.22914067,
+      "particlePowerBoundW": 330.19711437995056,
+      "excitedPowerW": 0,
+      "totalSourcePowerBoundW": 330.19711437995056,
+      "sourceYcdM3": 0.07225058133963451,
+      "continuumYcdM3": 0.07225058133963451,
+      "excitedYcdM3": 0,
+      "sourceRcdM3": 0.3294826063418601,
+      "continuumRcdM3": 0.3294826063418601,
+      "excitedRcdM3": 0,
+      "sourceGcdM3": 0.003079668947644074,
+      "continuumGcdM3": 0.003079668947644074,
+      "excitedGcdM3": 0,
+      "sourceBcdM3": 0,
+      "continuumBcdM3": 0,
+      "excitedBcdM3": 0,
+      "rearAxisEffectivePathM": 0.1554349487816348,
+      "rearAxisRadianceYcdM2": 0.011208473948786117,
+      "rearAxisSceneYAtWhite1000": 0.000011208473948786118,
+      "rearOffsetEffectivePathM": 0.24934040931433413,
+      "rearOffsetRadianceYcdM2": 0.01795895769908881,
+      "rearOffsetSceneYAtWhite1000": 0.00001795895769908881,
+      "sideNearExitEffectivePathM": 0.27392730219705375,
+      "sideNearExitRadianceYcdM2": 0.019723793675489796,
+      "sideNearExitSceneYAtWhite1000": 0.000019723793675489795,
+      "coreEmissionYcdM2": 0.7440404138222306,
+      "linerEmissionYcdM2": 0.000019412325560617317,
+      "flowProxyKgSec": 115.83348372656143,
+      "directionX": -1.829907617578383e-15,
+      "directionY": -1,
+      "directionZ": 6.123233995736766e-17
+    },
+    {
+      "scenario": "cold-cycle",
+      "phase": "afterburner",
+      "timeS": 212.7416666666375,
+      "phaseTimeS": 0.225,
+      "ambientK": 286.49913199893183,
+      "pressurePsf": 2053.2761045960788,
+      "egtC": 733.5491319989319,
+      "gasK": 1032.871444247841,
+      "thermalValid": 1,
+      "fuelKgSec": 3.0454213411263558,
+      "suppliedAbKgSec": 0.08722828803913768,
+      "burnedAbKgSec": 0.08722828803913768,
+      "n1Pct": 100,
+      "n2Pct": 100,
+      "nativeRunning": 1,
+      "augmentation": 1,
+      "nozzleNorm": 0.1854230624180668,
+      "nozzlePitchRad": 0,
+      "nozzleYawRad": 0,
+      "conversion": 0,
+      "throttleCmd": 1,
+      "throttlePosition": 1,
+      "coreK": 956.9864882732925,
+      "linerK": 664.2617500189258,
+      "visualRunning": 1,
+      "opticsValid": 1,
+      "radiusM": 0.4301057335494914,
+      "lengthM": 6,
+      "throatAreaM2": 0.4178642981029783,
+      "exitAreaM2": 0.5807952848793299,
+      "absorptionPerM": 0.08,
+      "effectiveVolumeM3": 0.32979125984699087,
+      "fuelPowerW": 131866744.0707712,
+      "particlePowerBoundW": 6810.608865343055,
+      "excitedPowerW": 3.7769848720946615,
+      "totalSourcePowerBoundW": 6814.38585021515,
+      "sourceYcdM3": 260.6834813487282,
+      "continuumYcdM3": 0.45438843417258934,
+      "excitedYcdM3": 260.2290929145556,
+      "sourceRcdM3": 53.64454044178805,
+      "continuumRcdM3": 2.0249622261683826,
+      "excitedRcdM3": 51.61957821561967,
+      "sourceGcdM3": 307.43924937132357,
+      "continuumGcdM3": 0.03339130996810846,
+      "excitedGcdM3": 307.40585806135545,
+      "sourceBcdM3": 407.1759127483859,
+      "continuumBcdM3": 0,
+      "excitedBcdM3": 407.1759127483859,
+      "rearAxisEffectivePathM": 0.777174743908174,
+      "rearAxisRadianceYcdM2": 196.42702138084672,
+      "rearAxisSceneYAtWhite1000": 0.19642702138084672,
+      "rearOffsetEffectivePathM": 1.2467020465716705,
+      "rearOffsetRadianceYcdM2": 309.31340325967807,
+      "rearOffsetSceneYAtWhite1000": 0.30931340325967804,
+      "sideNearExitEffectivePathM": 0.2933607050066164,
+      "sideNearExitRadianceYcdM2": 75.58388698899833,
+      "sideNearExitSceneYAtWhite1000": 0.07558388698899833,
+      "coreEmissionYcdM2": 0.7490782267877785,
+      "linerEmissionYcdM2": 0.000019617610176348516,
+      "flowProxyKgSec": 116.76574140587502,
+      "directionX": 0,
+      "directionY": 0,
+      "directionZ": 1
+    }
+  ],
+  "checks": [
+    {
+      "pitchDeg": 0,
+      "yawDeg": -10,
+      "nativeAugmentation": false,
+      "meshEnabled": true,
+      "start": [
+        -5.188725005211836e-9,
+        2.1816544482959856,
+        4.459811687469482
+      ],
+      "end": [
+        -3.01594935692151e-8,
+        2.18165445825919,
+        10.459811687469482
+      ],
+      "outerBoxRadiusMeters": 0.8216137814927308,
+      "exitRadiusMeters": 0.40161378548650467,
+      "lengthMeters": 6,
+      "axis": [
+        -4.1617947606672106e-9,
+        1.6605340806089921e-9,
+        1
+      ],
+      "nativeAxisError": 4.4808379866695686e-9,
+      "exitError": 4.981602241826977e-9
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 0,
+      "nativeAugmentation": false,
+      "meshEnabled": true,
+      "start": [
+        -3.764477618517503e-9,
+        2.181654453277588,
+        4.459811687469482
+      ],
+      "end": [
+        -3.764477618517503e-9,
+        2.181654453277588,
+        10.459811687469482
+      ],
+      "outerBoxRadiusMeters": 0.8216137886047363,
+      "exitRadiusMeters": 0.40161378548650467,
+      "lengthMeters": 6,
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "nativeAxisError": 0,
+      "exitError": 0
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 10,
+      "nativeAugmentation": false,
+      "meshEnabled": true,
+      "start": [
+        -5.188725005211836e-9,
+        2.18165445825919,
+        4.459811687469482
+      ],
+      "end": [
+        -3.01594935692151e-8,
+        2.1816544482959856,
+        10.459811687469482
+      ],
+      "outerBoxRadiusMeters": 0.8216137814927308,
+      "exitRadiusMeters": 0.40161378548650467,
+      "lengthMeters": 6,
+      "axis": [
+        -4.1617947606672106e-9,
+        -1.6605340806089921e-9,
+        1
+      ],
+      "nativeAxisError": 4.4808379866695686e-9,
+      "exitError": 4.981602241826977e-9
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": -10,
+      "nativeAugmentation": false,
+      "meshEnabled": true,
+      "start": [
+        0.13454294204711914,
+        1.4186233282089233,
+        4.178426027297974
+      ],
+      "end": [
+        0.871269702911377,
+        -2.759562134742737,
+        8.421066999435425
+      ],
+      "outerBoxRadiusMeters": 0.8216138123817728,
+      "exitRadiusMeters": 0.40161378548650467,
+      "lengthMeters": 6.000000208454458,
+      "axis": [
+        0.12278778921143262,
+        -0.6963642196319056,
+        0.7071068041229809
+      ],
+      "nativeAxisError": 3.423248449170604e-8,
+      "exitError": 2.6656007498500226e-7
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 0,
+      "nativeAugmentation": false,
+      "meshEnabled": true,
+      "start": [
+        -5.7452254509371414e-8,
+        1.4068523049354553,
+        4.178426027297974
+      ],
+      "end": [
+        -3.3362469764597336e-7,
+        -2.8357881903648376,
+        8.421066999435425
+      ],
+      "outerBoxRadiusMeters": 0.8216138345664683,
+      "exitRadiusMeters": 0.40161378548650467,
+      "lengthMeters": 6.000000065901784,
+      "axis": [
+        -4.6028740017204316e-8,
+        -0.7071067414501163,
+        0.7071068209229752
+      ],
+      "nativeAxisError": 7.26402956050736e-8,
+      "exitError": 2.457562461863555e-7
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 10,
+      "nativeAugmentation": false,
+      "meshEnabled": true,
+      "start": [
+        -0.13454297184944153,
+        1.4186235070228577,
+        4.178426027297974
+      ],
+      "end": [
+        -0.8712700307369232,
+        -2.7595619559288025,
+        8.421066999435425
+      ],
+      "outerBoxRadiusMeters": 0.8216138315854604,
+      "exitRadiusMeters": 0.40161378548650467,
+      "lengthMeters": 6.000000245048078,
+      "axis": [
+        -0.12278783813309299,
+        -0.6963642153848246,
+        0.7071067998103815
+      ],
+      "nativeAxisError": 4.621469689281022e-8,
+      "exitError": 2.4755668231600746e-7
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": -10,
+      "nativeAugmentation": false,
+      "meshEnabled": true,
+      "start": [
+        0.2041013240814209,
+        1.0241382122039795,
+        3.4832613338889464
+      ],
+      "end": [
+        1.245990514755249,
+        -4.884708642959595,
+        3.4832613597450868
+      ],
+      "outerBoxRadiusMeters": 0.8216138085704284,
+      "exitRadiusMeters": 0.40161378548650467,
+      "lengthMeters": 6.000000353618275,
+      "axis": [
+        0.17364818821144257,
+        -0.9848077511529261,
+        4.309356469338323e-9
+      ],
+      "nativeAxisError": 1.1541846486176729e-8,
+      "exitError": 1.2928070169948569e-8
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 0,
+      "nativeAugmentation": false,
+      "meshEnabled": true,
+      "start": [
+        -9.835101622002185e-9,
+        1.006281852722168,
+        3.4832613338889464
+      ],
+      "end": [
+        -4.38544098813054e-8,
+        -4.99371862411499,
+        3.4832613597450868
+      ],
+      "outerBoxRadiusMeters": 0.8216138066115407,
+      "exitRadiusMeters": 0.40161378548650467,
+      "lengthMeters": 6.000000476837158,
+      "axis": [
+        -5.669884259281953e-9,
+        -1,
+        4.309356380839315e-9
+      ],
+      "nativeAxisError": 7.1216668977838215e-9,
+      "exitError": 1.2928070169948569e-8
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 10,
+      "nativeAugmentation": false,
+      "meshEnabled": true,
+      "start": [
+        -0.20410138368606567,
+        1.024138331413269,
+        3.4832613338889464
+      ],
+      "end": [
+        -1.2459906935691833,
+        -4.884709000587463,
+        3.4832613597450868
+      ],
+      "outerBoxRadiusMeters": 0.8216138157724022,
+      "exitRadiusMeters": 0.40161378548650467,
+      "lengthMeters": 6.000000843911682,
+      "axis": [
+        -0.17364819388989639,
+        -0.9848077501516613,
+        4.309356117196862e-9
+      ],
+      "nativeAxisError": 1.7027563083374206e-8,
+      "exitError": 1.2083060174660286e-7
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": -10,
+      "nativeAugmentation": false,
+      "meshEnabled": true,
+      "start": [
+        0.20606368780136108,
+        1.0130093097686768,
+        3.3952746093273163
+      ],
+      "end": [
+        1.2439879775047302,
+        -4.873352289199829,
+        2.8723402321338654
+      ],
+      "outerBoxRadiusMeters": 0.8216138350677931,
+      "exitRadiusMeters": 0.40161378548650467,
+      "lengthMeters": 6.000000005651501,
+      "axis": [
+        0.17298738145428846,
+        -0.9810602655706738,
+        -0.08715572945014838
+      ],
+      "nativeAxisError": 1.8541058493312464e-8,
+      "exitError": 4.2146848510894035e-8
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 0,
+      "nativeAugmentation": false,
+      "meshEnabled": true,
+      "start": [
+        1.8410854031635296e-16,
+        0.994981050491333,
+        3.3952746093273163
+      ],
+      "end": [
+        1.111446987233939e-15,
+        -4.982187509536743,
+        2.8723402321338654
+      ],
+      "outerBoxRadiusMeters": 0.821613833615434,
+      "exitRadiusMeters": 0.40161378548650467,
+      "lengthMeters": 6.000000363153223,
+      "axis": [
+        1.5455639846498865e-16,
+        -0.9961946997094601,
+        -0.0871557242570948
+      ],
+      "nativeAxisError": 1.856119437551029e-8,
+      "exitError": 6.664001874625056e-8
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 10,
+      "nativeAugmentation": false,
+      "meshEnabled": true,
+      "start": [
+        -0.20606368780136108,
+        1.0130093097686768,
+        3.3952746093273163
+      ],
+      "end": [
+        -1.2439879775047302,
+        -4.873352289199829,
+        2.8723402321338654
+      ],
+      "outerBoxRadiusMeters": 0.8216138350677931,
+      "exitRadiusMeters": 0.40161378548650467,
+      "lengthMeters": 6.000000005651501,
+      "axis": [
+        -0.17298738145428846,
+        -0.9810602655706738,
+        -0.08715572945014838
+      ],
+      "nativeAxisError": 1.8541058493312464e-8,
+      "exitError": 4.2146848510894035e-8
+    }
+  ],
+  "depthCases": [
+    {
+      "pitchDeg": 0,
+      "yawDeg": -10,
+      "view": "rear",
+      "cameraMeters": [
+        -3.848308309054952e-8,
+        2.1816544615802584,
+        12.459811687469482
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 289,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": -10,
+      "view": "oblique",
+      "cameraMeters": [
+        2.6939509626788913,
+        4.179810616420447,
+        11.45981168393249
+      ],
+      "supportRays": 288,
+      "unoccludedSupportRays": 199,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 2,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": -10,
+      "view": "aircraft-side",
+      "cameraMeters": [
+        6,
+        4,
+        5
+      ],
+      "supportRays": 287,
+      "unoccludedSupportRays": 189,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 8,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 1,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 1,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 0,
+      "view": "rear",
+      "cameraMeters": [
+        -3.764477618517503e-9,
+        2.181654453277588,
+        12.459811687469482
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 289,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 0,
+      "view": "oblique",
+      "cameraMeters": [
+        2.999999996235522,
+        3.681654453277588,
+        11.459811687469482
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 196,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 2,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 1,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 0,
+      "view": "aircraft-side",
+      "cameraMeters": [
+        6,
+        4,
+        5
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 189,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 3,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 1,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 1,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 10,
+      "view": "rear",
+      "cameraMeters": [
+        -3.848308309054952e-8,
+        2.1816544449749173,
+        12.459811687469482
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 289,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 10,
+      "view": "oblique",
+      "cameraMeters": [
+        3.214895489079397,
+        3.1379215503351627,
+        11.459811691006475
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 196,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 2,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 10,
+      "view": "aircraft-side",
+      "cameraMeters": [
+        6,
+        4,
+        5
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 189,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 6,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 1,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": -10,
+      "view": "rear",
+      "cameraMeters": [
+        1.116845268536411,
+        -4.152290501426435,
+        9.835280533981603
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 289,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": -10,
+      "view": "oblique",
+      "cameraMeters": [
+        4.299390241132113,
+        -2.886181123159757,
+        9.1152978634156
+      ],
+      "supportRays": 285,
+      "unoccludedSupportRays": 204,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": -10,
+      "view": "aircraft-side",
+      "cameraMeters": [
+        6,
+        4,
+        5
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 202,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 2,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 0,
+      "view": "rear",
+      "cameraMeters": [
+        -4.25682176163694e-7,
+        -4.250001649965273,
+        9.835280617981574
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 289,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 0,
+      "view": "oblique",
+      "cameraMeters": [
+        3.3540521580163025,
+        -3.5557707181910163,
+        9.115297925189891
+      ],
+      "supportRays": 287,
+      "unoccludedSupportRays": 199,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 2,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 0,
+      "view": "aircraft-side",
+      "cameraMeters": [
+        6,
+        4,
+        5
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 204,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 5,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 1,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 10,
+      "view": "rear",
+      "cameraMeters": [
+        -1.1168456919586474,
+        -4.1522903013770955,
+        9.835280512418606
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 289,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 10,
+      "view": "oblique",
+      "cameraMeters": [
+        2.3068032571052983,
+        -4.051031235804409,
+        9.115297882094703
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 199,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 4,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 1,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 10,
+      "view": "aircraft-side",
+      "cameraMeters": [
+        6,
+        4,
+        5
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 202,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 3,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": -10,
+      "view": "rear",
+      "cameraMeters": [
+        1.5932868604755477,
+        -6.854323971142438,
+        3.4832613683637987
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 289,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": -10,
+      "view": "oblique",
+      "cameraMeters": [
+        3.8069796804367146,
+        -5.448563772482698,
+        1.1652014106374886
+      ],
+      "supportRays": 287,
+      "unoccludedSupportRays": 195,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 4,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": -10,
+      "view": "aircraft-side",
+      "cameraMeters": [
+        6,
+        4,
+        5
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 188,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 6,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 1,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 1,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 1,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 0,
+      "view": "rear",
+      "cameraMeters": [
+        -5.519417704806356e-8,
+        -6.993718385696411,
+        3.4832613683637983
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 289,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 0,
+      "view": "oblique",
+      "cameraMeters": [
+        2.424169494380773,
+        -5.993718637027527,
+        1.1652013945102881
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 193,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 4,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 0,
+      "view": "aircraft-side",
+      "cameraMeters": [
+        6,
+        4,
+        5
+      ],
+      "supportRays": 287,
+      "unoccludedSupportRays": 187,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 1,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 10,
+      "view": "rear",
+      "cameraMeters": [
+        -1.5932870080771064,
+        -6.854324085345404,
+        3.4832613683637974
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 289,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 10,
+      "view": "oblique",
+      "cameraMeters": [
+        0.9677021724023516,
+        -6.290469231610892,
+        1.165201469930135
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 196,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 2,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 10,
+      "view": "aircraft-side",
+      "cameraMeters": [
+        6,
+        4,
+        5
+      ],
+      "supportRays": 286,
+      "unoccludedSupportRays": 188,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 6,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 1,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": -10,
+      "view": "rear",
+      "cameraMeters": [
+        1.589962739924488,
+        -6.835472817568945,
+        2.698028773479849
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 289,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": -10,
+      "view": "oblique",
+      "cameraMeters": [
+        2.848783706160198,
+        -5.3364453394791544,
+        -0.20339958025060037
+      ],
+      "supportRays": 287,
+      "unoccludedSupportRays": 194,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 3,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": -10,
+      "view": "aircraft-side",
+      "cameraMeters": [
+        6,
+        4,
+        5
+      ],
+      "supportRays": 285,
+      "unoccludedSupportRays": 190,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 3,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 0,
+      "view": "rear",
+      "cameraMeters": [
+        1.4205597561000892e-15,
+        -6.974576728070005,
+        2.698028799445117
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 289,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 0,
+      "view": "oblique",
+      "cameraMeters": [
+        1.5000000000000013,
+        -5.716914852111353,
+        -0.20339957512189144
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 193,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 3,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 1,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 0,
+      "view": "aircraft-side",
+      "cameraMeters": [
+        6,
+        4,
+        5
+      ],
+      "supportRays": 285,
+      "unoccludedSupportRays": 187,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 3,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 10,
+      "view": "rear",
+      "cameraMeters": [
+        -1.589962739924488,
+        -6.835472817568945,
+        2.698028773479849
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 289,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 10,
+      "view": "oblique",
+      "cameraMeters": [
+        0.10563955992051532,
+        -5.85738983253093,
+        -0.20339960097182638
+      ],
+      "supportRays": 289,
+      "unoccludedSupportRays": 196,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 5,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 10,
+      "view": "aircraft-side",
+      "cameraMeters": [
+        6,
+        4,
+        5
+      ],
+      "supportRays": 286,
+      "unoccludedSupportRays": 188,
+      "partiallyOccludedSupportRays": 0,
+      "firstDepth": {
+        "4": {
+          "missedThinSupport": 4,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "8": {
+          "missedThinSupport": 1,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "16": {
+          "missedThinSupport": 1,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        },
+        "32": {
+          "missedThinSupport": 0,
+          "hardwareFalseHidden": 0,
+          "behindHardware": 0
+        }
+      }
+    }
+  ],
+  "errors": [],
+  "limits": [
+    "NullEngine does not compile or execute fragment shaders; positive tracer measures geometry support, not actual gas radiance or density field.",
+    "Actual full-engine triangles are included; ground, airframe and atmosphere are not. Aircraft-side names a camera position, not an airframe qualification.",
+    "First-depth diagnostic uses a positive tracer strictly inside the declared conical support and the documented midpoint method; actual new spatial fields can differ.",
+    "No GPU/day-night/exposure or screenshot reproduction is claimed."
+  ],
+  "status": "passed"
+}

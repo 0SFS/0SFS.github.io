@@ -157,7 +157,7 @@ describe("aircraft selection panel", () => {
     const active = await mount(snapshot);
     expect(active.host.querySelector('[aria-label="Current model for Lockheed Martin F-35B Lightning II"]')?.textContent)
       .toContain("Mesh loaded");
-    expect(active.host.textContent).toContain("Auto selected HD — source model");
+    expect(active.host.textContent).toContain("Auto selected HD — reconstructed engine");
     const staged = await mount(snapshot, normalizeAircraftSelection({ aircraftId: "cessna-172", lodId: "auto" }));
     const credit = Array.from(staged.host.querySelectorAll("p"))
       .find(p => p.textContent?.startsWith("Currently flying Lockheed Martin F-35B Lightning II: AF267"));

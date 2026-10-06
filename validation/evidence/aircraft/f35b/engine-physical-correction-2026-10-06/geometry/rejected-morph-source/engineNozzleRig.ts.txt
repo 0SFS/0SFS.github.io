@@ -1,0 +1,82 @@
+import { BoundingInfo, Mesh, Quaternion, Vector3, type MorphTarget, type TransformNode } from "@babylonjs/core";
+
+/** 0sfs owns articulated aircraft engine visuals; this never integrates an actuator. */
+export interface EngineNozzleRigDefinition {
+  bearingNames: readonly [string, string, string];
+  /** Equal half-cut angle; four times this is the maximum bend, radians. */
+  bearingInclinationRad: number;
+  apertureTargetName: string;
+}
+
+const Z = new Vector3(0, 0, 1);
+
+/** Two inclined circular joints with counter-rotation; the first bearing supplies yaw. */
+export function threeBearingAngles(pitch: number, yaw: number, beta: number): readonly [number, number, number] {
+  // Rz(a) Ry(beta) Rz(b) Ry(-2beta) Rz(-b) Ry(beta).
+  // This stable half-angle inverse matches native direction
+  // [-sin(p)sin(y), -sin(p)cos(y), cos(p)] without a near-zero acos singularity.
+  // End roll is mechanically coupled, not a separately invented actuator.
+  const middle = 2 * Math.asin(Math.min(1, Math.max(0, Math.sin(pitch / 4) / Math.sin(beta))));
+  const compensation = Math.atan2(Math.cos(beta) * Math.sin(middle / 2), Math.cos(middle / 2));
+  return [-yaw - compensation, middle, -middle];
+}
+
+export function bindEngineNozzleRig(nodes: readonly TransformNode[], definition: EngineNozzleRigDefinition) {
+  const bearings = definition.bearingNames.map(name => nodes.find(node => node.name === name));
+  if (bearings.some(node => !node)) throw new Error("Engine asset is missing a declared swivel bearing");
+  const parts = bearings.map(node => ({ node: node!, rest: node!.rotationQuaternion?.clone()
+    ?? Quaternion.FromEulerVector(node!.rotation) }));
+  const targets = new Set<MorphTarget>();
+  for (const node of nodes) {
+    if (!(node instanceof Mesh) || !node.morphTargetManager) continue;
+    const manager = node.morphTargetManager;
+    const minimum = node.getBoundingInfo().boundingBox.minimum.clone();
+    const maximum = node.getBoundingInfo().boundingBox.maximum.clone();
+    let hasAperture = false;
+    for (let i = 0; i < manager.numTargets; i++) {
+      const target = manager.getTarget(i);
+      if (target.name === definition.apertureTargetName) {
+        targets.add(target); hasAperture = true;
+        // The convex union of both endpoints encloses every linear morph pose.
+        // glTF's base POSITION bounds alone can cull an opened nozzle too early.
+        const positions = target.getPositions();
+        if (positions) for (let j = 0; j < positions.length; j += 3) {
+          minimum.x = Math.min(minimum.x, positions[j]); maximum.x = Math.max(maximum.x, positions[j]);
+          minimum.y = Math.min(minimum.y, positions[j + 1]); maximum.y = Math.max(maximum.y, positions[j + 1]);
+          minimum.z = Math.min(minimum.z, positions[j + 2]); maximum.z = Math.max(maximum.z, positions[j + 2]);
+        }
+      }
+    }
+    if (hasAperture) {
+      node.setBoundingInfo(new BoundingInfo(minimum, maximum));
+      // Compile the same shader at closed and open aperture. The default skips
+      // zero-weight targets, otherwise the first movement recompiles after reveal.
+      manager.areUpdatesFrozen = true;
+      manager.optimizeInfluencers = false;
+      manager.areUpdatesFrozen = false;
+      manager.synchronize();
+    }
+  }
+  if (!targets.size) throw new Error("Engine asset is missing its declared nozzle aperture morph");
+  let lastPitch = Number.NaN, lastYaw = Number.NaN, lastAperture = Number.NaN;
+  return {
+    update(pitch: number | undefined, yaw: number | undefined, aperture: number | undefined): void {
+      // Missing native values preserve the authored/last valid state. Render-only
+      // frames with the same observations perform no mesh/morph writes.
+      if (pitch !== undefined && yaw !== undefined && Number.isFinite(pitch) && Number.isFinite(yaw)
+        && (pitch !== lastPitch || yaw !== lastYaw)) {
+        const angles = threeBearingAngles(pitch, yaw, definition.bearingInclinationRad);
+        for (let i = 0; i < parts.length; i++) parts[i].node.rotationQuaternion =
+          parts[i].rest.multiply(Quaternion.RotationAxis(Z, angles[i]));
+        lastPitch = pitch; lastYaw = yaw;
+      }
+      if (aperture !== undefined && Number.isFinite(aperture)) {
+        const bounded = Math.max(0, Math.min(1, aperture));
+        if (bounded === lastAperture) return;
+        for (const target of targets) target.influence = bounded;
+        lastAperture = bounded;
+      }
+    },
+    targetCount: targets.size,
+  };
+}

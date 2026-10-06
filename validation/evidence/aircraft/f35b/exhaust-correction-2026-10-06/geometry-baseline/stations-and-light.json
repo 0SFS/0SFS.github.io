@@ -1,0 +1,529 @@
+{
+  "stations": [
+    {
+      "pitchDeg": 0,
+      "aperture": 0,
+      "apertureGeometry": {
+        "u": 0,
+        "convergent": 0.5235987755982989,
+        "divergent": 0.16744807921968935,
+        "throatRadius": 0.35,
+        "throatZ": 0.25980762113533157,
+        "exitRadius": 0.39999999999999997,
+        "exitZ": 0.5556116102903124,
+        "sealHingeSlide": 0.301480078815621,
+        "sealConvergent": 0.5320404488970522,
+        "sealDivergent": 0.1706658407560547,
+        "sealBaseRadius": 0.4998499607351763,
+        "sealThroatRadius": 0.3469112870039285,
+        "sealThroatZ": 0.25980762113533157,
+        "fairingAngle": -0.23079438331268173,
+        "fairingSealAngle": -0.23515255639842209,
+        "fairingSealBaseRadius": 0.5484425702370364,
+        "fairingSlotDistance": 0.5479744948787753
+      },
+      "stationsInEngineFrame": {
+        "F135_Engine": [
+          0,
+          0,
+          0
+        ],
+        "F135_Bearing1": [
+          0,
+          0,
+          0
+        ],
+        "F135_Bearing2": [
+          0,
+          0,
+          0.28
+        ],
+        "F135_Bearing3": [
+          0,
+          0,
+          0.76
+        ],
+        "F135_Nozzle": [
+          0,
+          0,
+          1.04
+        ],
+        "F135_Exhaust": [
+          -5.551115123125783e-17,
+          0,
+          1.5956116102903126
+        ]
+      },
+      "fullInstalledMaxDifference": 0
+    },
+    {
+      "pitchDeg": 0,
+      "aperture": 0.5,
+      "apertureGeometry": {
+        "u": 0.5,
+        "convergent": 0.36247834819431485,
+        "divergent": 0.29861175526210854,
+        "throatRadius": 0.3936222118300703,
+        "throatZ": 0.2805062676377723,
+        "exitRadius": 0.48188031627007977,
+        "exitZ": 0.5672300144754843,
+        "sealHingeSlide": 0.30074530682473005,
+        "sealConvergent": 0.36895777461984214,
+        "sealDivergent": 0.3041109071051049,
+        "sealBaseRadius": 0.4998499607351763,
+        "sealThroatRadius": 0.3913881084873585,
+        "sealThroatZ": 0.2805062676377723,
+        "fairingAngle": -0.08143615058423577,
+        "fairingSealAngle": -0.08302432746159066,
+        "fairingSealBaseRadius": 0.5484425702370364,
+        "fairingSlotDistance": 0.5436769674695968
+      },
+      "stationsInEngineFrame": {
+        "F135_Engine": [
+          0,
+          0,
+          0
+        ],
+        "F135_Bearing1": [
+          0,
+          0,
+          0
+        ],
+        "F135_Bearing2": [
+          0,
+          0,
+          0.28
+        ],
+        "F135_Bearing3": [
+          0,
+          0,
+          0.76
+        ],
+        "F135_Nozzle": [
+          0,
+          0,
+          1.04
+        ],
+        "F135_Exhaust": [
+          1.6653345369377348e-16,
+          0,
+          1.6072300144754845
+        ]
+      },
+      "fullInstalledMaxDifference": 0
+    },
+    {
+      "pitchDeg": 0,
+      "aperture": 1,
+      "apertureGeometry": {
+        "u": 1,
+        "convergent": 0.20135792079033077,
+        "divergent": 0.4297754313045277,
+        "throatRadius": 0.44,
+        "throatZ": 0.29393876913398137,
+        "exitRadius": 0.565,
+        "exitZ": 0.5666565719998742,
+        "sealHingeSlide": 0.30023730292491585,
+        "sealConvergent": 0.20519396314533914,
+        "sealDivergent": 0.43717077823923106,
+        "sealBaseRadius": 0.4998499607351763,
+        "sealThroatRadius": 0.43867449124267716,
+        "sealThroatZ": 0.29393876913398137,
+        "fairingAngle": 0.06997787067943603,
+        "fairingSealAngle": 0.07134421528060965,
+        "fairingSealBaseRadius": 0.5484425702370364,
+        "fairingSlotDistance": 0.5395604537545543
+      },
+      "stationsInEngineFrame": {
+        "F135_Engine": [
+          0,
+          0,
+          0
+        ],
+        "F135_Bearing1": [
+          0,
+          0,
+          0
+        ],
+        "F135_Bearing2": [
+          0,
+          0,
+          0.28
+        ],
+        "F135_Bearing3": [
+          0,
+          0,
+          0.76
+        ],
+        "F135_Nozzle": [
+          0,
+          0,
+          1.04
+        ],
+        "F135_Exhaust": [
+          -5.551115123125783e-17,
+          0,
+          1.6066565719998742
+        ]
+      },
+      "fullInstalledMaxDifference": 0
+    },
+    {
+      "pitchDeg": 90,
+      "aperture": 0,
+      "apertureGeometry": {
+        "u": 0,
+        "convergent": 0.5235987755982989,
+        "divergent": 0.16744807921968935,
+        "throatRadius": 0.35,
+        "throatZ": 0.25980762113533157,
+        "exitRadius": 0.39999999999999997,
+        "exitZ": 0.5556116102903124,
+        "sealHingeSlide": 0.301480078815621,
+        "sealConvergent": 0.5320404488970522,
+        "sealDivergent": 0.1706658407560547,
+        "sealBaseRadius": 0.4998499607351763,
+        "sealThroatRadius": 0.3469112870039285,
+        "sealThroatZ": 0.25980762113533157,
+        "fairingAngle": -0.23079438331268173,
+        "fairingSealAngle": -0.23515255639842209,
+        "fairingSealBaseRadius": 0.5484425702370364,
+        "fairingSlotDistance": 0.5479744948787753
+      },
+      "stationsInEngineFrame": {
+        "F135_Engine": [
+          0,
+          0,
+          0
+        ],
+        "F135_Bearing1": [
+          0,
+          0,
+          0
+        ],
+        "F135_Bearing2": [
+          0,
+          0,
+          0.28
+        ],
+        "F135_Bearing3": [
+          -2.7755575615628914e-17,
+          -0.3394112549695428,
+          0.6194112549695427
+        ],
+        "F135_Nozzle": [
+          0,
+          -0.6194112549695427,
+          0.6194112549695429
+        ],
+        "F135_Exhaust": [
+          0,
+          -1.175022865259855,
+          0.6194112549695427
+        ]
+      },
+      "fullInstalledMaxDifference": 0
+    },
+    {
+      "pitchDeg": 90,
+      "aperture": 0.5,
+      "apertureGeometry": {
+        "u": 0.5,
+        "convergent": 0.36247834819431485,
+        "divergent": 0.29861175526210854,
+        "throatRadius": 0.3936222118300703,
+        "throatZ": 0.2805062676377723,
+        "exitRadius": 0.48188031627007977,
+        "exitZ": 0.5672300144754843,
+        "sealHingeSlide": 0.30074530682473005,
+        "sealConvergent": 0.36895777461984214,
+        "sealDivergent": 0.3041109071051049,
+        "sealBaseRadius": 0.4998499607351763,
+        "sealThroatRadius": 0.3913881084873585,
+        "sealThroatZ": 0.2805062676377723,
+        "fairingAngle": -0.08143615058423577,
+        "fairingSealAngle": -0.08302432746159066,
+        "fairingSealBaseRadius": 0.5484425702370364,
+        "fairingSlotDistance": 0.5436769674695968
+      },
+      "stationsInEngineFrame": {
+        "F135_Engine": [
+          0,
+          0,
+          0
+        ],
+        "F135_Bearing1": [
+          0,
+          0,
+          0
+        ],
+        "F135_Bearing2": [
+          0,
+          0,
+          0.28
+        ],
+        "F135_Bearing3": [
+          -2.7755575615628914e-17,
+          -0.3394112549695428,
+          0.6194112549695427
+        ],
+        "F135_Nozzle": [
+          0,
+          -0.6194112549695427,
+          0.6194112549695429
+        ],
+        "F135_Exhaust": [
+          -1.1102230246251565e-16,
+          -1.1866412694450272,
+          0.6194112549695426
+        ]
+      },
+      "fullInstalledMaxDifference": 0
+    },
+    {
+      "pitchDeg": 90,
+      "aperture": 1,
+      "apertureGeometry": {
+        "u": 1,
+        "convergent": 0.20135792079033077,
+        "divergent": 0.4297754313045277,
+        "throatRadius": 0.44,
+        "throatZ": 0.29393876913398137,
+        "exitRadius": 0.565,
+        "exitZ": 0.5666565719998742,
+        "sealHingeSlide": 0.30023730292491585,
+        "sealConvergent": 0.20519396314533914,
+        "sealDivergent": 0.43717077823923106,
+        "sealBaseRadius": 0.4998499607351763,
+        "sealThroatRadius": 0.43867449124267716,
+        "sealThroatZ": 0.29393876913398137,
+        "fairingAngle": 0.06997787067943603,
+        "fairingSealAngle": 0.07134421528060965,
+        "fairingSealBaseRadius": 0.5484425702370364,
+        "fairingSlotDistance": 0.5395604537545543
+      },
+      "stationsInEngineFrame": {
+        "F135_Engine": [
+          0,
+          0,
+          0
+        ],
+        "F135_Bearing1": [
+          0,
+          0,
+          0
+        ],
+        "F135_Bearing2": [
+          0,
+          0,
+          0.28
+        ],
+        "F135_Bearing3": [
+          -2.7755575615628914e-17,
+          -0.3394112549695428,
+          0.6194112549695427
+        ],
+        "F135_Nozzle": [
+          0,
+          -0.6194112549695427,
+          0.6194112549695429
+        ],
+        "F135_Exhaust": [
+          0,
+          -1.186067826969417,
+          0.6194112549695427
+        ]
+      },
+      "fullInstalledMaxDifference": 0
+    },
+    {
+      "pitchDeg": 95,
+      "aperture": 0,
+      "apertureGeometry": {
+        "u": 0,
+        "convergent": 0.5235987755982989,
+        "divergent": 0.16744807921968935,
+        "throatRadius": 0.35,
+        "throatZ": 0.25980762113533157,
+        "exitRadius": 0.39999999999999997,
+        "exitZ": 0.5556116102903124,
+        "sealHingeSlide": 0.301480078815621,
+        "sealConvergent": 0.5320404488970522,
+        "sealDivergent": 0.1706658407560547,
+        "sealBaseRadius": 0.4998499607351763,
+        "sealThroatRadius": 0.3469112870039285,
+        "sealThroatZ": 0.25980762113533157,
+        "fairingAngle": -0.23079438331268173,
+        "fairingSealAngle": -0.23515255639842209,
+        "fairingSealBaseRadius": 0.5484425702370364,
+        "fairingSlotDistance": 0.5479744948787753
+      },
+      "stationsInEngineFrame": {
+        "F135_Engine": [
+          0,
+          0,
+          0
+        ],
+        "F135_Bearing1": [
+          0,
+          0,
+          0
+        ],
+        "F135_Bearing2": [
+          0,
+          0,
+          0.28
+        ],
+        "F135_Bearing3": [
+          5.551115123125783e-17,
+          -0.3538931216688595,
+          0.6042832996555169
+        ],
+        "F135_Nozzle": [
+          0,
+          -0.6328276371345483,
+          0.5798796916861726
+        ],
+        "F135_Exhaust": [
+          0,
+          -1.1863249775039746,
+          0.5314549491120981
+        ]
+      },
+      "fullInstalledMaxDifference": 0
+    },
+    {
+      "pitchDeg": 95,
+      "aperture": 0.5,
+      "apertureGeometry": {
+        "u": 0.5,
+        "convergent": 0.36247834819431485,
+        "divergent": 0.29861175526210854,
+        "throatRadius": 0.3936222118300703,
+        "throatZ": 0.2805062676377723,
+        "exitRadius": 0.48188031627007977,
+        "exitZ": 0.5672300144754843,
+        "sealHingeSlide": 0.30074530682473005,
+        "sealConvergent": 0.36895777461984214,
+        "sealDivergent": 0.3041109071051049,
+        "sealBaseRadius": 0.4998499607351763,
+        "sealThroatRadius": 0.3913881084873585,
+        "sealThroatZ": 0.2805062676377723,
+        "fairingAngle": -0.08143615058423577,
+        "fairingSealAngle": -0.08302432746159066,
+        "fairingSealBaseRadius": 0.5484425702370364,
+        "fairingSlotDistance": 0.5436769674695968
+      },
+      "stationsInEngineFrame": {
+        "F135_Engine": [
+          0,
+          0,
+          0
+        ],
+        "F135_Bearing1": [
+          0,
+          0,
+          0
+        ],
+        "F135_Bearing2": [
+          0,
+          0,
+          0.28
+        ],
+        "F135_Bearing3": [
+          5.551115123125783e-17,
+          -0.3538931216688595,
+          0.6042832996555169
+        ],
+        "F135_Nozzle": [
+          0,
+          -0.6328276371345483,
+          0.5798796916861726
+        ],
+        "F135_Exhaust": [
+          0,
+          -1.1978991701535295,
+          0.5304423384657967
+        ]
+      },
+      "fullInstalledMaxDifference": 0
+    },
+    {
+      "pitchDeg": 95,
+      "aperture": 1,
+      "apertureGeometry": {
+        "u": 1,
+        "convergent": 0.20135792079033077,
+        "divergent": 0.4297754313045277,
+        "throatRadius": 0.44,
+        "throatZ": 0.29393876913398137,
+        "exitRadius": 0.565,
+        "exitZ": 0.5666565719998742,
+        "sealHingeSlide": 0.30023730292491585,
+        "sealConvergent": 0.20519396314533914,
+        "sealDivergent": 0.43717077823923106,
+        "sealBaseRadius": 0.4998499607351763,
+        "sealThroatRadius": 0.43867449124267716,
+        "sealThroatZ": 0.29393876913398137,
+        "fairingAngle": 0.06997787067943603,
+        "fairingSealAngle": 0.07134421528060965,
+        "fairingSealBaseRadius": 0.5484425702370364,
+        "fairingSlotDistance": 0.5395604537545543
+      },
+      "stationsInEngineFrame": {
+        "F135_Engine": [
+          0,
+          0,
+          0
+        ],
+        "F135_Bearing1": [
+          0,
+          0,
+          0
+        ],
+        "F135_Bearing2": [
+          0,
+          0,
+          0.28
+        ],
+        "F135_Bearing3": [
+          5.551115123125783e-17,
+          -0.3538931216688595,
+          0.6042832996555169
+        ],
+        "F135_Nozzle": [
+          0,
+          -0.6328276371345483,
+          0.5798796916861726
+        ],
+        "F135_Exhaust": [
+          0,
+          -1.1973279097996663,
+          0.5304923172706819
+        ]
+      },
+      "fullInstalledMaxDifference": 0
+    }
+  ],
+  "lightBaseline": {
+    "source": "previous spatial-optics report actual Float32 fullfield isotropic integral",
+    "intensityRgbCd": [
+      0.00012727855515893836,
+      0,
+      0
+    ],
+    "intensityYcd": 0.000027068699433461384,
+    "groundHeightAssumption": "Flat terrain at held stand initial placement: native CG=terrain+stance+.17m and visual root offset=−stance. No terrain query performed.",
+    "exitHeightMeters": 1.176281774525723,
+    "pointLightHeightMeters": 0.816281774525723,
+    "pointSourceDistanceBelowExitMeters": 0.36,
+    "pointDirectlyUnderLightIlluminanceLux": 0.000040624421531030624,
+    "rhoPoint2LambertianReflectedLuminanceCdM2": 0.000002586230998764939,
+    "actualRasterReceiverResponse": "zero dynamic light response; material.disableLighting=true"
+  },
+  "limits": [
+    "Source-derived coordinates, not scene pixels.",
+    "Point source has no shadow generator/occlusion and is not a volume/deck radiation solution.",
+    "No dry brightness correction or calibrated deck albedo assumed."
+  ]
+}

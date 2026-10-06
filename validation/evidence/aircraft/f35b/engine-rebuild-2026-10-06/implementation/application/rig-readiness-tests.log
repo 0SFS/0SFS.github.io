@@ -1,0 +1,50 @@
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+(node:37650) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:37648) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:37649) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/flight/aircraft/engineNozzleRig.test.ts (2 tests | 1 failed) 7ms
+     × follows native pitch/yaw through full conversion without residual roll 2ms
+stdout | src/flight/aircraft/aircraftAnimation.f35b.test.ts > AF267 F-35B authored rig > clears the engine bay doors early while the reconstructed nozzle follows independent native angles
+BJS - [13:30:19]: Babylon.js v8.56.2 - Null engine
+
+ ❯ src/flight/aircraft/aircraftAnimation.f35b.test.ts (17 tests | 1 failed) 333ms
+     × clears the engine bay doors early while the reconstructed nozzle follows independent native angles 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/flight/aircraft/aircraftAnimation.f35b.test.ts > AF267 F-35B authored rig > clears the engine bay doors early while the reconstructed nozzle follows independent native angles
+AssertionError: expected 1.0000000510035072 to be close to 1, received difference is 5.100350719544622e-8, but expected 5e-13
+ ❯ src/flight/aircraft/aircraftAnimation.f35b.test.ts:346:102
+    344|       const full = doors.map(node => node.rotationQuaternion!.clone());
+    345|       applyAircraftRig(t.rig, { ...NEUTRAL_CONTROL_SURFACES, stovlPosi…
+    346|       doors.forEach((node, i) => expect(Math.abs(Quaternion.Dot(node.r…
+       |                                                                                                      ^
+    347|       applyAircraftRig(t.rig, { ...NEUTRAL_CONTROL_SURFACES, stovlPosi…
+    348|       doors.forEach((node, i) => expect(Math.abs(Quaternion.Dot(node.r…
+ ❯ src/flight/aircraft/aircraftAnimation.f35b.test.ts:346:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/flight/aircraft/engineNozzleRig.test.ts > three-bearing engine nozzle > follows native pitch/yaw through full conversion without residual roll
+AssertionError: expected 1.5536958025771075e-8 to be close to +0, received difference is 1.5536958025771075e-8, but expected 5e-13
+ ❯ src/flight/aircraft/engineNozzleRig.test.ts:20:27
+     18|       expect(Math.abs(Quaternion.Dot(actual, expected))).toBeCloseTo(1…
+     19|       const direction = Z.applyRotationQuaternion(actual);
+     20|       expect(direction.x).toBeCloseTo(-Math.sin(pitch) * Math.sin(yaw)…
+       |                           ^
+     21|       expect(direction.y).toBeCloseTo(-Math.sin(pitch) * Math.cos(yaw)…
+     22|       expect(direction.z).toBeCloseTo(Math.cos(pitch), 12);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  2 failed | 44 passed | 1 expected fail (47)
+   Start at  13:30:18
+   Duration  3.11s (transform 179ms, setup 0ms, import 1.31s, tests 2.87s, environment 0ms)
+

@@ -1,0 +1,111 @@
+{
+  "id": "f135-pw600-rigid-aperture-v2",
+  "owner": "0sfs",
+  "license": "AGPL-3.0-only",
+  "units": "metres, radians",
+  "coordinates": "+Y up, +Z aft; engine source root is forward swivel bearing",
+  "attachment": [
+    0,
+    2.18165447,
+    2.86385
+  ],
+  "geometry": {
+    "circumferentialSegments": 96,
+    "petals": 16,
+    "bearingTiltDegrees": 23.75,
+    "forwardBearingLength": 0.28,
+    "middleBearingLength": 0.48,
+    "ductInnerRadius": 0.5,
+    "ductOuterRadius": 0.53,
+    "nozzleLength": 0.55,
+    "closedThroatRadius": 0.35,
+    "openThroatRadius": 0.44,
+    "closedExitRadius": 0.4,
+    "openExitRadius": 0.565,
+    "inletRadius": 0.545,
+    "inletStation": -3.85,
+    "coreFacingAnnulusStation": -0.38,
+    "coreFacingAnnulusInnerRadius": 0.28,
+    "coreFacingAnnulusOuterRadius": 0.47,
+    "aftBearingLength": 0.28
+  },
+  "provenance": {
+    "manufacturer": {
+      "url": "https://filecache.mediaroom.com/mr5mr_prattwhitney/177487/download/F135-engine-S16208.pdf",
+      "accessed": "2026-10-06",
+      "observations": "Manufacturer 2017 sheet distinguishes CTOL/CV versus STOVL ratings. Its dimensions are grouped into conventional engine and combined STOVL system columns; do not assign 9.37 m whole-system length to the isolated PW-600 main engine. Family inlet 43 in (1.09 m) supplies an approximate fan diameter only.",
+      "unresolved": "No primary dimensioned PW-600 main-engine drawing, B-specific nozzle length or A8/A9 schedule was found. The source uses a nominal 5.44 m inlet-plane-to-exit span and an overall 5.58 m extent including the forward spinner. These are explicit proportion hypotheses, not manufacturer PW-600 dimensions."
+    },
+    "kinematics": {
+      "url": "https://www.codeonemagazine.com/c5_article.html?item_id=137",
+      "author": "Kevin Renshaw, Lockheed ASTOVL engineer",
+      "accessed": "2026-10-06",
+      "observations": "The B uses a compact axisymmetric nozzle; A/C flaps are longer. A three-bearing swivel duct uses inclined airtight circular bearings and a center segment rotating 180 degrees relative to the forward/aft segments; the first bearing supplies yaw. Total direction travel is 95 degrees. Cooling liner continuity is required across joints.",
+      "unresolved": "The symmetric 23.75-degree joint cuts (95/4), bearing lengths, ring radii, detailed actuator proportions and coupled roll are reconstructed mechanism inputs, not measured PW-600 parts."
+    },
+    "integration": {
+      "url": "https://onlinelibrary.wiley.com/doi/full/10.1002/9780470686652.eae490",
+      "authors": "Hamstra and McCallum",
+      "section": "6.2.2",
+      "observations": "Shorter STOVL nozzle, overlapping convergent/divergent flow-path and fairing flaps; A8 throat and A9 exit are distinct."
+    },
+    "qualitativeReferences": [
+      "validation/evidence/aircraft/f35b/engine-rebuild-2026-10-06/user-reference/provenance.json",
+      "validation/evidence/aircraft/f35b/engine-rebuild-2026-10-06/turbosquid/manifest.json"
+    ],
+    "modelingHypotheses": [
+      "All component stations, casing sections, panel counts, fan-blade count, accessories, aperture endpoints and material appearance are original visual hypotheses, not component drawings or counted engineering facts.",
+      "Sixteen rigid convergent flaps and sixteen divergent flaps hinge at a moving throat, with separate rigid gap seals, fairings and fairing seals. Fixed-size metal pieces move through rotations and translations only. Native normalized command drives an explicitly approximate linear angle cam; this is not a recovered PW-600 mechanism or calibrated A8/A9 schedule.",
+      "The upstream annulus and dark centerbody create real rear-view depth. They are core-facing hot hardware; neither identifies the main combustor nor establishes eight injectors.",
+      "No third-party image, mesh or texture is included in either runtime engine export. Stand-only external casing/accessories are excluded from the installed export. The inlet face and internal occluder are retained for airframe intake views.",
+      "The two oblique circular joints use half-angle geometry and a finite aft straightener. The open throat radius .44 m remains smaller than the neutral joint axial projection radius (.50*cos23.75 degrees = .458 m); neither flow area nor losses are calibrated. The authored engine installation is 0.10 m below the old nozzle axis to fit the source airframe across conversion and yaw."
+    ],
+    "patent": {
+      "url": "https://patents.google.com/patent/EP1775485B1/en",
+      "assignee": "Rolls-Royce",
+      "title": "Apparatus for moving rotatable components",
+      "supports": "Three adjacent duct sections, upstream bearing to engine, two opposed scarfed circular bearing planes, aft section fixed to variable-area outlet, contra-rotation. Patent example planes 65 degrees to duct axis (normal tilt 25 degrees).",
+      "limits": "Patent topology is not a production F135 drawing. Equal23.75-degree cuts derive from published95-degree full vector with180-degree relative rotation; all detailed dimensions are original hypotheses."
+    },
+    "apertureMechanism": {
+      "url": "https://patents.google.com/patent/US5232158A/en",
+      "assignee": "United Technologies / Pratt & Whitney",
+      "supports": "Generic axisymmetric convergent/divergent flaps, interposed gap seals, hinge seals, centered sliding seal restraints and external drive links. Hamstra/McCallum section 2.2.1 separately supports internal CD flaps and external fairing flaps.",
+      "limits": "Generic patent does not establish production F135-PW-600 counts, dimensions, pivot coordinates or actuator law. Rigid bisector seals and slotted outer fairings are original reduced kinematics. Nominal plate thickness and 8200 kg/m3 density only supply a declared geometric mass hypothesis; no actual alloy or mass calibration, and no relation to native effective thermal capacities."
+    }
+  },
+  "aperture": {
+    "kind": "rigid-cd-flaps-v1",
+    "segmentCount": 16,
+    "inletRadius": 0.5,
+    "convergentLength": 0.3,
+    "divergentLength": 0.3,
+    "closedConvergentRad": 0.5235987755982989,
+    "openConvergentRad": 0.2013579207903308,
+    "closedDivergentRad": 0.16744807921968935,
+    "openDivergentRad": 0.4297754313045277,
+    "convergentSealLength": 0.295,
+    "divergentSealLength": 0.315,
+    "fairingBaseRadius": 0.55,
+    "fairingBaseZ": 0.018,
+    "fairingLength": 0.585,
+    "flapThicknessMeters": 0.002,
+    "sealThicknessMeters": 0.0007,
+    "materialDensityKgM3": 8200,
+    "sealHalfWidth": 0.05,
+    "convergentBaseHalfWidth": 0.082,
+    "convergentTipHalfWidth": 0.06,
+    "divergentBaseHalfWidth": 0.058,
+    "divergentTipHalfWidth": 0.07,
+    "fairingBaseHalfWidth": 0.09,
+    "fairingTipHalfWidth": 0.071,
+    "fairingThicknessMeters": 0.0015,
+    "fairingSealHalfWidth": 0.062,
+    "fairingSealLength": 0.6,
+    "fairingFollowerNormalOffset": 0.025,
+    "throatShoeLength": 0.02,
+    "fairingSlotStart": 0.518,
+    "fairingSlotEnd": 0.568,
+    "fairingSlotHalfWidth": 0.007
+  }
+}

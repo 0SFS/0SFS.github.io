@@ -1,0 +1,300 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-06",
+  "status": "passed",
+  "checks": {
+    "fullCi": {
+      "command": "npm run ci",
+      "attempts": 1,
+      "exitCode": 0,
+      "log": "ci.log",
+      "files": 168,
+      "testsPassed": 1817,
+      "expectedFailures": 1,
+      "expectedFailure": "Existing AF267 main gear envelope development fixture, unrelated to engine rebuild",
+      "includes": [
+        "Incremental ESLint",
+        "Full Vitest suite with configured maxWorkers50%",
+        "Installed JSBSim identity",
+        "Audio and exhaust deterministic artifacts",
+        "Reproducible engine exports",
+        "Incremental TypeScript",
+        "Vite production build",
+        "Distributed JSBSim/audio artifact checks"
+      ]
+    },
+    "focusedFinalGeometry": {
+      "command": "npx vitest run src/flight/aircraft/engineNozzleRig.test.ts src/flight/aircraft/aircraftAnimation.f35b.test.ts src/flight/aircraft/createAircraftModel.test.ts src/flight/physics/safeFlightState.test.ts --maxWorkers=50%",
+      "log": "final-geometry-runtime-tests.log",
+      "files": 4,
+      "testsPassed": 52,
+      "expectedFailures": 1
+    },
+    "typecheck": {
+      "command": "npx tsc -b",
+      "log": "typecheck-revised-geometry.log",
+      "exitCode": 0
+    },
+    "lint": {
+      "command": "npm run lint",
+      "log": "lint-final.log",
+      "exitCode": 0
+    }
+  },
+  "contracts": [
+    "Full stand export loads alone; flight loads airframe plus installed export and never the complete engine. Exact resource counts come from asset manifest.",
+    "Both exports load through the actual Babylon GLB loader and yield matching nozzle origins/directions through native pitch/yaw.",
+    "Hidden preparation fixes morph influencer layout and bounds before reveal; partial loading failure/cancellation disposes all acquired containers.",
+    "Core and liner observers batch together but remain independently available; hot surface material selection is scoped to whole engine root while gas follows outlet.",
+    "Native-temperature snapshot discovery accepts flat legacy and named region properties without inventing missing values.",
+    "The existing Earth-backed stand, Location relocation, hold-down, controls, history/CSV and saved-flight isolation remain covered by app/native tests.",
+    "Door local virtual hinge preserves exact rest shape and stays fixed through its staged90degree opening."
+  ],
+  "retainedEarlierFailures": {
+    "related-tests.log": "Outdated fixture assertions for new asset/attachment contract; corrected in related-corrected-fixtures.log.",
+    "related-integration.log": "Two fixture expectations for batched core path and new detail label; corrected in related-integration-corrections.log.",
+    "rig-readiness-tests.log": "Quaternion comparison assumed exactly unit length for float32 source rest rotation; fixed comparison, native-vector-tests.log passed."
+  },
+  "limitations": [
+    "NullEngine validates data/readiness/lifecycle contracts, not GPU shader compilation or visual quality.",
+    "No server, browser qualification, GPU benchmark or performance/energy claim.",
+    "CI retains existing jsdom canvas/localStorage warnings and production chunk-size advisory; no new failing tests."
+  ],
+  "logs": [
+    {
+      "path": "ci.log",
+      "bytes": 82256,
+      "sha256": "fdb0590333265a9801c3846ec2fbf8c2a41351a6f9cc1125263ebc2cadb76466"
+    },
+    {
+      "path": "exported-rig-tests.log",
+      "bytes": 384,
+      "sha256": "c216227cb7d4115409b015ae887db05ed964ce823fa578f45c0409191132bba6"
+    },
+    {
+      "path": "final-geometry-runtime-tests.log",
+      "bytes": 769,
+      "sha256": "1093b917dcbfe6d649f1bf0f80dfabc1617c486a95592145d895b79a24b090b5"
+    },
+    {
+      "path": "initial-diff-stat.log",
+      "bytes": 3821,
+      "sha256": "20ccc84697bca30c3f95937a7501c8531ce7151da1c475027ea28da6670b93a1"
+    },
+    {
+      "path": "lint-final.log",
+      "bytes": 109,
+      "sha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e"
+    },
+    {
+      "path": "lint.log",
+      "bytes": 109,
+      "sha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e"
+    },
+    {
+      "path": "native-vector-tests.log",
+      "bytes": 586,
+      "sha256": "83b841e04eb7ca9047968872c1dadd92c87d8ab8fbb3a3fb940bbd56e1ba6794"
+    },
+    {
+      "path": "related-corrected-fixtures.log",
+      "bytes": 387,
+      "sha256": "286e0bc66e69df376c44c7e39884b5c4bc22a60666aa2817835f649a42b89b81"
+    },
+    {
+      "path": "related-integration-corrections.log",
+      "bytes": 9953,
+      "sha256": "3285f29e7d4009e039459352d7591efb51bb3dc3bd2fda58866dcb83273033a5"
+    },
+    {
+      "path": "related-integration.log",
+      "bytes": 25647,
+      "sha256": "2a03ef013ed17ffe05f36ba72fe574218d95218b403941a39a6d4bf2b1aa4488"
+    },
+    {
+      "path": "related-tests.log",
+      "bytes": 4910,
+      "sha256": "c19135bee3960541552151d424d9a425c4ae7542498ccda5df41a0e04966c0d7"
+    },
+    {
+      "path": "rig-readiness-tests.log",
+      "bytes": 3337,
+      "sha256": "58429d9ede205b3f82d54b00fe8c8aa807ebc3aafeca7fae467b36566c2f2592"
+    },
+    {
+      "path": "typecheck-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "typecheck-revised-geometry.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "typecheck.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "post-intake-build.log",
+      "bytes": 58347,
+      "sha256": "8ce8bee7dd77ca0ccd080cc5cc3e23fe6996fd13ad73420ad02bfcb55c027cdc"
+    },
+    {
+      "path": "post-intake-loading-tests.log",
+      "bytes": 569,
+      "sha256": "66f1a30bd3a6afe0cc8cca739bfc7ca26520150ed0313df8b1cc446accb609e1"
+    }
+  ],
+  "sourceInputsAtFullCi": [
+    {
+      "path": "src/flight/aircraft/engineNozzleRig.ts",
+      "sha256": "61d190036c06c76ff03b720520d5f61f3111eafa6ffb6714f36c4c6050afbeac"
+    },
+    {
+      "path": "src/flight/aircraft/aircraftAnimation.ts",
+      "sha256": "5b5263061dfe574a9ed25ae3a048babbf3750e307e2d799090af8d0fdf3a735e"
+    },
+    {
+      "path": "src/flight/aircraft/createAircraftModel.ts",
+      "sha256": "93174a56aa6dd3e587f81b64f0a106fc2c4ebc3242b572c97dbab796cbdf731c"
+    },
+    {
+      "path": "src/flight/aircraft/aircraftCatalog.ts",
+      "sha256": "14ca31a184aabe9246cc743099defcd383dbf945dbfe8088668cb3c16440afe2"
+    },
+    {
+      "path": "src/flight/aircraft/createAircraftEngineVisuals.ts",
+      "sha256": "f63cbc03a06acd0d2b632f979511b886c0d9f7c95ca705d7286f147fd834363e"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineExhaust.ts",
+      "sha256": "c30da3eec95523d12cce7dbfef759a30441db36718fbad0a79251e1ea50bbb56"
+    },
+    {
+      "path": "src/flight/aircraft/engineExhaustProfiles.ts",
+      "sha256": "1acd6e4d28f04eb69699a083fcd8adc2775ffdaa76386f8336ceed3df518aa6e"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135EngineData.ts",
+      "sha256": "ca4177d7641f630d364d6d61e405ce52bc60b9ba0ee6d25ca335f23ac44ed87e"
+    },
+    {
+      "path": "src/flight/physics/safeFlightState.ts",
+      "sha256": "ce340189aad19303ebe7dade2ec72d3f0ad8392a486ba7589de93ecfb492f333"
+    },
+    {
+      "path": "src/flight/hud/engineHistory.ts",
+      "sha256": "869348fd4f618b1e8180ce5c53e5990a83f795b177c7ac926801f18c40c1a3f1"
+    },
+    {
+      "path": "src/flight/hud/engineMonitorModel.ts",
+      "sha256": "43f965d016584fa2cf5aa254dde98debc6916657642f0992b85f649b72202ba0"
+    },
+    {
+      "path": "src/flight/createFlightSimApp.ts",
+      "sha256": "b26671d0fc2e6e46a56c69667d1309ad090d14fb22fe8bd6b104ba648d09c85b"
+    },
+    {
+      "path": "src/flight/settings/flightParameters.ts",
+      "sha256": "365728926658e5196047f1d3c1a5c42d288068696ea3bfbc487211ba9ec84952"
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+      "sha256": "04cea10d3c135cb79247bbf7794a81359070e2bdc9afc9782502b538444eac16"
+    },
+    {
+      "path": "package.json",
+      "sha256": "59c5c815aeb87174623869f15483dd9f7bf99e84628fed8c293133dfdc6cb04c"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "93d10dd5e15f5354fad97ca83976f1de59a57ecd38ebc2c195770bf3c5126c06"
+    }
+  ],
+  "sourceInputsFinal": [
+    {
+      "path": "src/flight/aircraft/engineNozzleRig.ts",
+      "sha256": "61d190036c06c76ff03b720520d5f61f3111eafa6ffb6714f36c4c6050afbeac"
+    },
+    {
+      "path": "src/flight/aircraft/aircraftAnimation.ts",
+      "sha256": "5b5263061dfe574a9ed25ae3a048babbf3750e307e2d799090af8d0fdf3a735e"
+    },
+    {
+      "path": "src/flight/aircraft/createAircraftModel.ts",
+      "sha256": "93174a56aa6dd3e587f81b64f0a106fc2c4ebc3242b572c97dbab796cbdf731c"
+    },
+    {
+      "path": "src/flight/aircraft/aircraftCatalog.ts",
+      "sha256": "14ca31a184aabe9246cc743099defcd383dbf945dbfe8088668cb3c16440afe2"
+    },
+    {
+      "path": "src/flight/aircraft/createAircraftEngineVisuals.ts",
+      "sha256": "f63cbc03a06acd0d2b632f979511b886c0d9f7c95ca705d7286f147fd834363e"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineExhaust.ts",
+      "sha256": "c30da3eec95523d12cce7dbfef759a30441db36718fbad0a79251e1ea50bbb56"
+    },
+    {
+      "path": "src/flight/aircraft/engineExhaustProfiles.ts",
+      "sha256": "1acd6e4d28f04eb69699a083fcd8adc2775ffdaa76386f8336ceed3df518aa6e"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135EngineData.ts",
+      "sha256": "df84a99925475b4efa0d98a41780e4363b021528063c27689fc7e4c71cb9e69e"
+    },
+    {
+      "path": "src/flight/physics/safeFlightState.ts",
+      "sha256": "ce340189aad19303ebe7dade2ec72d3f0ad8392a486ba7589de93ecfb492f333"
+    },
+    {
+      "path": "src/flight/hud/engineHistory.ts",
+      "sha256": "869348fd4f618b1e8180ce5c53e5990a83f795b177c7ac926801f18c40c1a3f1"
+    },
+    {
+      "path": "src/flight/hud/engineMonitorModel.ts",
+      "sha256": "43f965d016584fa2cf5aa254dde98debc6916657642f0992b85f649b72202ba0"
+    },
+    {
+      "path": "src/flight/createFlightSimApp.ts",
+      "sha256": "b26671d0fc2e6e46a56c69667d1309ad090d14fb22fe8bd6b104ba648d09c85b"
+    },
+    {
+      "path": "src/flight/settings/flightParameters.ts",
+      "sha256": "365728926658e5196047f1d3c1a5c42d288068696ea3bfbc487211ba9ec84952"
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+      "sha256": "04cea10d3c135cb79247bbf7794a81359070e2bdc9afc9782502b538444eac16"
+    },
+    {
+      "path": "package.json",
+      "sha256": "59c5c815aeb87174623869f15483dd9f7bf99e84628fed8c293133dfdc6cb04c"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "93d10dd5e15f5354fad97ca83976f1de59a57ecd38ebc2c195770bf3c5126c06"
+    }
+  ],
+  "postCiAssetCompletion": {
+    "reason": "Final front projection exposed missing inner intake barrel; added 192 triangles to existing intake mesh in both exports. No runtime, thermal or nozzle logic changed. The validation CLI also adds the front view and fails on clearance regressions.",
+    "affectedGeometryChecks": "../../reconstruction/acceptance.json",
+    "assetLoading": {
+      "command": "npx vitest run src/flight/aircraft/engineNozzleRig.test.ts src/flight/aircraft/createAircraftModel.test.ts --maxWorkers=50%",
+      "log": "post-intake-loading-tests.log",
+      "files": 2,
+      "testsPassed": 31,
+      "exitCode": 0
+    },
+    "finalProductionBuild": {
+      "command": "npm run build",
+      "log": "post-intake-build.log",
+      "exitCode": 0,
+      "scope": "Rechecks installed JSBSim/audio/optics/engine identities, incremental TypeScript, production bundling and distributed native/audio artifacts with final engine exports."
+    },
+    "fullCiRepetition": "Full CI ran once; only affected validation and final production build repeated after the intake correction."
+  }
+}

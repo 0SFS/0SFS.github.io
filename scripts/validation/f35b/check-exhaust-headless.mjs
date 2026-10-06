@@ -44,10 +44,10 @@ import {flightParameterDefaults} from ${importPath("src/flight/settings/flightPa
 const DT=1/120, mode=new URL(location.href).searchParams.get('renderer');
 const status=window.__exhaust={ready:false,error:null,renderRequests:0,frames:0};
 const definition=getAircraftDefinition('f-35b'),profile=getFdmProfile('f-35b'),parameters=flightParameterDefaults();
-let settings={enabled:parameters.get('osfs.exhaust.enabled'),sampleCount:parameters.get('osfs.exhaust.sampleCount'),maxDistanceMeters:parameters.get('osfs.exhaust.maxDistanceMeters'),intensity:parameters.get('osfs.exhaust.intensity')};
+let settings={enabled:parameters.get('osfs.exhaust.enabled'),sampleCount:parameters.get('osfs.exhaust.sampleCount'),maxDistanceMeters:parameters.get('osfs.exhaust.maxDistanceMeters'),intensity:parameters.get('osfs.exhaust.intensity'),surfaceReferenceNits:parameters.get('osfs.exhaust.surfaceReferenceNits')};
 let smokeSettings={enabled:false,maxParticles:parameters.get('osfs.exhaust.smoke.maxParticles'),emissionPerSecond:parameters.get('osfs.exhaust.smoke.emissionPerSecond'),lifetimeSeconds:parameters.get('osfs.exhaust.smoke.lifetimeSeconds'),maxDistanceMeters:parameters.get('osfs.exhaust.smoke.maxDistanceMeters'),opacity:parameters.get('osfs.exhaust.smoke.opacity')};
 let forceSettings={enabled:false,newtonsPerMeter:parameters.get('osfs.forces.newtonsPerMeter'),maxArrowMeters:parameters.get('osfs.forces.maxArrowMeters'),labels:parameters.get('osfs.forces.labels'),labelRefreshHz:parameters.get('osfs.forces.labelRefreshHz')};
-let engine,scene,camera,runtime,model,visual,overlay,parent,frontTarget;
+let engine,scene,camera,runtime,model,visual,overlay,parent,frontTarget,temperatureBatch;
 const reference=Matrix.Identity(),worldFromEcef={m:new Float64Array([1,0,0,0,0,1,0,0,0,0,1,0,-6378137,0,0,1])};
 const pixelReferences=new Map();
 const read=p=>runtime.sdk.getPropertyValue(p);
@@ -57,11 +57,38 @@ const smokeMeshes=()=>scene.meshes.filter(mesh=>mesh.name.startsWith('engine-smo
 const smokeState=()=>smokeMeshes().map(mesh=>({name:mesh.name,enabled:mesh.isEnabled(),count:mesh.thinInstanceCount,shaderReady:mesh.material?.getEffect()?.isReady(),matrices:Array.from({length:mesh.thinInstanceCount},(_,index)=>Array.from(mesh._thinInstanceDataStorage.matrixData.slice(index*16,index*16+16)))}));
 const forceLabelState=()=>scene.meshes.filter(mesh=>mesh.metadata?.debugVector?.kind==='label'&&mesh.isEnabled()).map(mesh=>{const id=mesh.metadata.debugVector.id,force=overlay.getSnapshot().forces.find(force=>force.id===id);const v=[-force.bodyNewtons[1],-force.bodyNewtons[2],force.bodyNewtons[0]],magnitude=Math.hypot(...v),length=Math.min(magnitude/forceSettings.newtonsPerMeter,forceSettings.maxArrowMeters)+.35;const local=Vector3.FromArray(force.anchorMeters).addInPlace(Vector3.FromArray(v).scaleInPlace(length/magnitude));const expected=Vector3.TransformCoordinates(local,parent.getWorldMatrix()),actual=mesh.getWorldMatrix().getTranslation();return {id,label:force.label,expectedWorld:expected.asArray(),actualWorld:actual.asArray(),worldErrorMeters:Vector3.Distance(expected,actual)};});
 const glowState=()=>scene.materials.filter(material=>material.name==='darkmet2-engine-thermal').map(material=>({name:material.name,emissive:material.emissiveColor.asArray()}));
-const telemetry=()=>({augmentation:visual.afterburnerActive(),nozzlePositionNorm:visual.nozzlePositionNorm(),conversion:read(profile.stovl.positionProperty),n1Pct:read('propulsion/engine[0]/n1'),n2Pct:read('propulsion/engine[0]/n2'),thrustLbf:read('propulsion/engine[0]/thrust-lbs'),fuelFlowPps:read('propulsion/engine[0]/fuel-flow-rate-pps'),simulationTimeS:runtime.sdk.getSimTime()});
+const temperatureDescriptors={gas:definition.exhaustSources[0].gasTemperature,metal:definition.exhaustSources[0].hotSurfaceTemperature};
+const temperaturePaths=[...new Set(Object.values(temperatureDescriptors).flatMap(descriptor=>descriptor?[descriptor.property,...(descriptor.availableWhen??[])]:[]))];
+const temperatureObservation=()=>{
+ // Copy the native batch view before any other SDK call can grow WASM memory.
+ const values=temperatureBatch?Array.from(temperatureBatch.read()):[];
+ const observe=descriptor=>{
+  if(!descriptor)return null;
+  const value=values[temperaturePaths.indexOf(descriptor.property)];
+  const flags=(descriptor.availableWhen??[]).map(property=>{const nativeValue=values[temperaturePaths.indexOf(property)];return {property,nativeValue:Number.isFinite(nativeValue)?nativeValue:null,active:Number.isFinite(nativeValue)&&nativeValue>.5};});
+  const kelvin=descriptor.unit==='degC'?value+273.15:descriptor.unit==='degF'?(value-32)*5/9+273.15:value;
+  const available=flags.every(flag=>flag.active)&&Number.isFinite(kelvin)&&kelvin>0;
+  return {property:descriptor.property,unit:descriptor.unit,nativeValue:Number.isFinite(value)?value:null,flags,available,temperatureKelvin:available?kelvin:null};
+ };
+ return {gas:observe(temperatureDescriptors.gas),metal:observe(temperatureDescriptors.metal),interpretation:'Distinct native nozzle-inlet gas observation and dynamic metal wall state; neither is a measured F135 temperature or expanded plume field.'};
+};
+const thermalEmission=kelvin=>{
+ const table=status.optical.surfaceEmission,range=table.temperatureKelvinRange;
+ if(kelvin===null||!Number.isFinite(kelvin)||kelvin<range[0]||!settings.enabled||!Number.isFinite(settings.surfaceReferenceNits)||settings.surfaceReferenceNits<=0)return [0,0,0];
+ const gain=Math.min(8,Math.max(0,settings.intensity))/settings.surfaceReferenceNits;
+ const position=Math.min(1,(kelvin-range[0])/(range[1]-range[0]))*(table.samples.length-1),low=Math.floor(position),high=Math.min(table.samples.length-1,low+1),fraction=position-low;
+ return table.samples[low].map((value,channel)=>(value+(table.samples[high][channel]-value)*fraction)*gain);
+};
+const gasLookup=native=>{
+ const bankName=native.augmentation?'afterburner':'dry',bank=status.optical[bankName],kelvin=native.temperature.gas?.temperatureKelvin;
+ const temperatureNorm=kelvin!==null&&Number.isFinite(kelvin)?Math.min(1,Math.max(0,(kelvin-bank.temperatureKelvinRange[0])/(bank.temperatureKelvinRange[1]-bank.temperatureKelvinRange[0]))):null;
+ return {bank:bankName,temperatureKelvinRange:bank.temperatureKelvinRange,temperatureNorm,lutBank:[bank.firstRow,bank.rowCount]};
+};
+const telemetry=()=>({augmentation:visual.afterburnerActive(),nativeRunning:read('propulsion/engine[0]/set-running'),nozzlePositionNorm:visual.nozzlePositionNorm(),conversion:read(profile.stovl.positionProperty),n1Pct:read('propulsion/engine[0]/n1'),n2Pct:read('propulsion/engine[0]/n2'),thrustLbf:read('propulsion/engine[0]/thrust-lbs'),fuelFlowPps:read('propulsion/engine[0]/fuel-flow-rate-pps'),simulationTimeS:runtime.sdk.getSimTime(),temperature:temperatureObservation()});
 const update=()=>{visual.read();const rig=model.getRig();if(rig)applyAircraftRig(rig,{...readControlSurfaceState(runtime.sdk,'f-35b'),nozzlePositionNorm:visual.nozzlePositionNorm()},DT);visual.updateRig(rig??null,true);overlay?.update(true);};
 const frame=()=>new Promise(resolve=>requestAnimationFrame(()=>{engine.beginFrame();const before=engine._drawCalls?.current??0;scene.render();status.lastFrameDrawCalls=(engine._drawCalls?.current??0)-before;engine.endFrame();status.frames++;resolve();}));
 const paint=async()=>{update();for(let count=0;count<3;count++)await frame();};
-const settle=async()=>{for(let count=0;count<180;count++){await paint();const meshes=plumeMeshes();if((!settings.enabled||meshes.length===1&&meshes[0].isEnabled()&&meshes[0].isReady())&&(!smokeSettings.enabled||smokeMeshes().length===1&&smokeMeshes()[0].isReady()))return;}throw new Error('Exhaust did not become ready with texture and shader');};
+const settle=async()=>{for(let count=0;count<180;count++){await paint();const meshes=plumeMeshes(),native=telemetry(),running=native.fuelFlowPps>0&&native.n2Pct>0;if((!settings.enabled||meshes.length===1&&(!running||meshes[0].isEnabled())&&meshes[0].isReady())&&(!smokeSettings.enabled||smokeMeshes().length===1&&smokeMeshes()[0].isReady()))return;}throw new Error('Exhaust did not become ready with texture and shader');};
 status.phase=async(seconds,throttle,conversion)=>{
  const controls={elevator:0,aileron:0,rudder:0,throttle,pitchTrim:profile.initialProperties['fcs/pitch-trim-cmd-norm'],rollTrim:0,flaps:0,brake:0};
  let augmentationDuringConversion=0;
@@ -85,12 +112,13 @@ status.capture=async(name,view,compareTo)=>{
  let pixelDifference=null;
  if(compareTo){const before=pixelReferences.get(compareTo);if(!before||before.length!==pixels.length)throw new Error('Missing matching pixel reference');let changedPixels=0,sumRgbDifference=0,maxChannelDifference=0;for(let offset=0;offset<pixels.length;offset+=4){let changed=false;for(let channel=0;channel<3;channel++){const delta=Math.abs(pixels[offset+channel]-before[offset+channel]);sumRgbDifference+=delta;maxChannelDifference=Math.max(maxChannelDifference,delta);changed ||= delta>2;}if(changed)changedPixels++;}pixelDifference={changedPixels,sumRgbDifference,maxChannelDifference};}
  pixelReferences.set(name,pixels.slice());
- return {name,view,native,settings:{...settings},smokeSettings:{...smokeSettings},plume:{count:meshes.length,visible:meshes.filter(mesh=>mesh.isEnabled()).length,triangles:meshes.reduce((sum,mesh)=>sum+mesh.getTotalIndices()/3,0),shaderReady:meshes.every(mesh=>mesh.material?.getEffect()?.isReady()),positions:meshes.map(mesh=>mesh.getAbsolutePosition().asArray())},smoke:smokeState(),glow:glowState(),forceMeshes:scene.meshes.filter(mesh=>mesh.metadata?.debugVector&&mesh.isEnabled()).length,forceLabels:forceLabelState(),drawCalls:status.lastFrameDrawCalls??null,renderRequests:status.renderRequests,frames:status.frames,pixelDifference};
+ return {name,view,native,settings:{...settings},smokeSettings:{...smokeSettings},plume:{count:meshes.length,visible:meshes.filter(mesh=>mesh.isEnabled()).length,triangles:meshes.reduce((sum,mesh)=>sum+mesh.getTotalIndices()/3,0),shaderReady:meshes.every(mesh=>mesh.material?.getEffect()?.isReady()),positions:meshes.map(mesh=>mesh.getAbsolutePosition().asArray()),opticalUniforms:meshes.map(mesh=>{const data=mesh.material.serialize();return {temperatureNorm:data.floats.temperatureNorm,lutBank:data.vectors2.lutBank};})},gasExpectedLookup:gasLookup(native),smoke:smokeState(),glow:glowState(),thermalExpectedEmission:thermalEmission(native.temperature.metal?.temperatureKelvin),forceMeshes:scene.meshes.filter(mesh=>mesh.metadata?.debugVector&&mesh.isEnabled()).length,forceLabels:forceLabelState(),drawCalls:status.lastFrameDrawCalls??null,renderRequests:status.renderRequests,frames:status.frames,pixelDifference};
 };
 status.setEnabled=async enabled=>{settings={...settings,enabled};visual.setSettings(settings);await paint();};
 status.setSmokeEnabled=async enabled=>{smokeSettings={...smokeSettings,enabled};visual.setSmokeSettings(smokeSettings);await settle();};
 status.setForcesEnabled=async enabled=>{forceSettings={...forceSettings,enabled};overlay.setSettings(forceSettings);await overlay.ready;await paint();};
-status.pauseCheck=async()=>{const before=telemetry(),smokeBefore=smokeState(),requests=status.renderRequests;await paint();await paint();return {before,after:telemetry(),smokeBefore,smokeAfter:smokeState(),renderRequestsBefore:requests,renderRequestsAfter:status.renderRequests};};
+status.pauseCheck=async()=>{const before=telemetry(),smokeBefore=smokeState(),glowBefore=glowState(),requests=status.renderRequests;await paint();await paint();return {before,after:telemetry(),smokeBefore,smokeAfter:smokeState(),glowBefore,glowAfter:glowState(),renderRequestsBefore:requests,renderRequestsAfter:status.renderRequests};};
+status.cutoff=()=>{runtime.sdk.setPropertyValue('propulsion/active_engine',0);runtime.sdk.setPropertyValue('propulsion/cutoff_cmd',1);};
 status.frameProjectionCheck=async()=>{
  const before=smokeState(),angle=.23,c=Math.cos(angle),s=Math.sin(angle);
  reference.copyFrom(Matrix.RotationY(angle));reference.setTranslationFromFloats(2,1,-3);
@@ -101,7 +129,7 @@ status.frameProjectionCheck=async()=>{
  for(let i=0;i<before[0].count;i++){const a=before[0].matrices[i],b=after[0].matrices[i],expected=[c*a[12]+s*a[14]+2,a[13]+1,-s*a[12]+c*a[14]-3];for(let j=0;j<3;j++)maxError=Math.max(maxError,Math.abs(expected[j]-b[12+j]));}
  return {native:telemetry(),rotationRadians:angle,translationMeters:[2,1,-3],maxProjectionErrorMeters:maxError,instances:after[0].count};
 };
-status.finish=()=>{overlay?.dispose();visual?.dispose();model?.dispose();runtime?.dispose();scene?.dispose();engine?.dispose();return true;};
+status.finish=()=>{overlay?.dispose();visual?.dispose();model?.dispose();temperatureBatch?.dispose();runtime?.dispose();scene?.dispose();engine?.dispose();return true;};
 (async()=>{try{
  const canvas=document.querySelector('canvas');
  if(mode==='webgpu'){
@@ -120,7 +148,13 @@ status.finish=()=>{overlay?.dispose();visual?.dispose();model?.dispose();runtime
  new HemisphericLight('light',new Vector3(.3,1,-.5),scene);
  parent=new TransformNode('fixed-aircraft-reference',scene);
  runtime=await createJsbsimRuntime({aircraftId:'f-35b',bootstrap:{latDeg:0,lonDeg:0,altFt:10000},onLog:()=>{}});
+ if(!temperatureDescriptors.gas||!temperatureDescriptors.metal)throw new Error('Separate F35 gas and metal observations are not declared');
+ temperatureBatch=runtime.sdk.createPropertyBatch(temperaturePaths,{create:false});
+ if(temperatureBatch.missing.length)throw new Error('Native temperature observer unavailable: '+temperatureBatch.missing.join(','));
  await new Promise((resolve,reject)=>{model=createAircraftModel(scene,parent,{aircraftId:'f-35b',lodId:'auto',requestRender:()=>{},onStateChange:state=>{if(state.status==='ready')resolve();else if(state.status==='error')reject(new Error(state.error));}});});
+ status.surfaceBaseline=scene.materials.find(material=>material.name==='darkmet2')?.emissiveColor.asArray();
+ if(!status.surfaceBaseline)throw new Error('Original nozzle thermal material unavailable');
+ status.temperatureObserver={gas:temperatureDescriptors.gas,metal:temperatureDescriptors.metal,paths:temperaturePaths,create:false,missing:[...temperatureBatch.missing]};
  visual=createAircraftEngineVisuals(runtime.sdk,scene,definition,{settings,smokeSettings,getWorldFromEcef:()=>worldFromEcef,requestRender:()=>{status.renderRequests++;},onError:message=>{status.error=message;}});
  overlay=createForcesDebugOverlay(scene,parent,runtime.sdk,{settings:forceSettings,engineLabels:profile.forceEngineLabels,requestRender:()=>{status.renderRequests++;},onUnavailable:message=>{status.error=message;}});
  const optical=getEngineExhaustOpticalProfile(definition.exhaustSources[0].opticalProfileId);
@@ -171,30 +205,46 @@ try {
       await chrome.send("Emulation.setDeviceMetricsOverride",{width:1000,height:700,deviceScaleFactor:1,mobile:false},sessionId);
       await chrome.send("Page.navigate",{url:"https://0sfs.test/?renderer="+renderer},sessionId);
       await waitForExpression(chrome,sessionId,"window.__exhaust?.ready===true",45000);
-      run.initial=await evaluate(chrome,sessionId,"({error:window.__exhaust.error,gpu:window.__exhaust.gpu,asset:window.__exhaust.asset,sdkIdentity:window.__exhaust.sdkIdentity,optical:window.__exhaust.optical,opticalProvenance:window.__exhaust.opticalProvenance,smokeProfile:window.__exhaust.smokeProfile,smokeProvenance:window.__exhaust.smokeProvenance})");
+      run.initial=await evaluate(chrome,sessionId,"({error:window.__exhaust.error,gpu:window.__exhaust.gpu,asset:window.__exhaust.asset,sdkIdentity:window.__exhaust.sdkIdentity,optical:window.__exhaust.optical,opticalProvenance:window.__exhaust.opticalProvenance,smokeProfile:window.__exhaust.smokeProfile,smokeProvenance:window.__exhaust.smokeProvenance,surfaceBaseline:window.__exhaust.surfaceBaseline,temperatureObserver:window.__exhaust.temperatureObserver})");
       if(run.initial.error)throw new Error(run.initial.error);
       if(run.initial.asset.triangles!==12259||!run.initial.asset.meshReady)throw new Error("Actual GLB failed geometry/readiness check");
       if(!run.initial.gpu||run.initial.gpu.fallback||/swiftshader|llvmpipe|software/i.test(JSON.stringify(run.initial.gpu)))throw new Error("Hardware GPU not confirmed");
       const capture=async(name,view,compareTo)=>{
         const result=await evaluate(chrome,sessionId,"window.__exhaust.capture("+[name,view,compareTo].map(value=>JSON.stringify(value??null)).join(",")+")");
+        if(result.plume.visible){
+          const expected=result.gasExpectedLookup;
+          if(expected.temperatureNorm===null||!result.plume.opticalUniforms.length||result.plume.opticalUniforms.some(value=>Math.abs(value.temperatureNorm-expected.temperatureNorm)>1e-9||JSON.stringify(value.lutBank)!==JSON.stringify(expected.lutBank)))throw new Error("Gas shader did not select its native Kelvin row/bank: "+JSON.stringify({expected,actual:result.plume.opticalUniforms}));
+        }
         const shot=await chrome.send("Page.captureScreenshot",{format:"png",captureBeyondViewport:false},sessionId);
         await writeFile(path.join(out,renderer+"-"+name+".png"),Buffer.from(shot.data,"base64"));run.captures.push(result);return result;
+      };
+      const assertThermal=capture=>{
+        if(!capture.native.temperature.metal?.available||!Number.isFinite(capture.native.temperature.metal.temperatureKelvin)||!capture.glow.length)throw new Error("Bound valid/initialized native metal observation or scoped material missing");
+        if(run.initial.optical.surfaceEmission.unit!=="cd/m2"||!Number.isFinite(capture.settings.surfaceReferenceNits)||capture.settings.surfaceReferenceNits<=0)throw new Error("Hardware photometric table/reference contract missing");
+        const expected=capture.thermalExpectedEmission.map((value,index)=>value+run.initial.surfaceBaseline[index]);
+        const error=Math.max(...capture.glow.flatMap(material=>material.emissive.map((value,index)=>Math.abs(value-expected[index]))));
+        if(error>1e-9)throw new Error("Hardware emission does not follow the native Kelvin lookup: "+JSON.stringify({actual:capture.glow,expected,error}));
+        return {temperature:capture.native.temperature.metal,gas:capture.native.temperature.gas,referenceLuminanceCdPerSquareMeter:capture.settings.surfaceReferenceNits,expectedAdditionalEmission:capture.thermalExpectedEmission,maxMaterialError:error};
       };
       if(!forceOnly){
       const dry=await capture("dry-rear","rear");
       if(!Number.isFinite(dry.native.nozzlePositionNorm)||dry.native.augmentation!==false||dry.plume.visible!==1||dry.plume.triangles!==12||!dry.plume.shaderReady)throw new Error("Dry exhaust native/render contract failed");
+      run.dryThermal=assertThermal(dry);
       await evaluate(chrome,sessionId,"window.__exhaust.setEnabled(false)");
       const dryDisabled=await capture("dry-disabled","rear","dry-rear");
       if(dryDisabled.plume.count!==0||dryDisabled.glow.length)throw new Error("Disabling exhaust did not release its volume/glow clones");
-      if(!dry.glow.length||!dry.glow.some(material=>material.emissive.some(value=>value>0))||dryDisabled.pixelDifference.changedPixels<10)throw new Error("Dry native power did not produce visible hot hardware");
+      // Temperature/radiance may be below pixel sensitivity; never demand a
+      // fabricated brightness floor from the modeled metal temperature.
+      run.dryThermal.visiblePixelDifference=dryDisabled.pixelDifference;
       await evaluate(chrome,sessionId,"window.__exhaust.setEnabled(true)");
       run.afterburner=await evaluate(chrome,sessionId,"window.__exhaust.phase(12,1,0)");
       if(run.afterburner.augmentation!==true)throw new Error("Actual native afterburner did not activate");
       const augmented=await capture("afterburner-rear","rear");
+      run.augmentedThermal=assertThermal(augmented);
       await capture("afterburner-side","side");
       await capture("afterburner-front","front");
       run.pause=await evaluate(chrome,sessionId,"window.__exhaust.pauseCheck()");
-      if(run.pause.before.simulationTimeS!==run.pause.after.simulationTimeS||run.pause.renderRequestsBefore!==run.pause.renderRequestsAfter)throw new Error("Paused native state caused new time or render work");
+      if(run.pause.before.simulationTimeS!==run.pause.after.simulationTimeS||JSON.stringify(run.pause.before.temperature)!==JSON.stringify(run.pause.after.temperature)||JSON.stringify(run.pause.glowBefore)!==JSON.stringify(run.pause.glowAfter)||run.pause.renderRequestsBefore!==run.pause.renderRequestsAfter)throw new Error("Paused native state caused new time, thermal emission or render work");
       await evaluate(chrome,sessionId,"window.__exhaust.setEnabled(false)");
       const frontOff=await capture("afterburner-front-disabled","front","afterburner-front");
       if(!frontOff.pixelDifference||frontOff.pixelDifference.changedPixels>5)throw new Error("Front airframe did not occlude the exhaust: "+JSON.stringify(frontOff.pixelDifference));
@@ -236,6 +286,37 @@ try {
       const forcesOff=await capture("native-forces-disabled",forceView,"native-forces-side");
       if(forcesOff.forceMeshes||forcesOff.pixelDifference.changedPixels<10)throw new Error("Force overlay disable contract failed");
       run.forceBudget={enabledGlyphMeshes:forces.forceMeshes,addedDraws:forces.drawCalls-forcesOff.drawCalls,labels:true,maxLabelWorldErrorMeters:Math.max(...forces.forceLabels.map(label=>label.worldErrorMeters))};
+      if(!forceOnly){
+        // A native cutoff changes fuel/running independently of the thermal
+        // wall state. Keep the fixed visual reference and qualify the actual
+        // metal-to-material response without writing a temperature/local timer.
+        await evaluate(chrome,sessionId,"window.__exhaust.phase(5,.99,0)");
+        const hot=await capture("thermal-before-cutoff","rear");
+        assertThermal(hot);
+        await evaluate(chrome,sessionId,"window.__exhaust.cutoff()");
+        await evaluate(chrome,sessionId,"window.__exhaust.phase(1/120,0,0)");
+        const firstOff=await capture("thermal-first-cutoff-step","rear");
+        assertThermal(firstOff);
+        if(firstOff.native.nativeRunning!==0||firstOff.native.augmentation!==false||Math.abs(firstOff.native.temperature.metal.temperatureKelvin-hot.native.temperature.metal.temperatureKelvin)>.02*hot.native.temperature.metal.temperatureKelvin)throw new Error("Cutoff did not preserve a continuous hot native wall while turning off native Running/AB");
+        const fuelRundown=[firstOff.native];
+        for(let second=0;second<20&&fuelRundown.at(-1).fuelFlowPps>1e-8;second++){
+          const row=await evaluate(chrome,sessionId,"window.__exhaust.phase(1,0,0)");
+          if(row.fuelFlowPps>fuelRundown.at(-1).fuelFlowPps+1e-8||row.nativeRunning!==0||row.augmentation!==false)throw new Error("Native cutoff fuel rundown did not remain stopped and decreasing");
+          fuelRundown.push(row);
+        }
+        const stopped=await capture("thermal-after-cutoff","rear");
+        const stoppedThermal=assertThermal(stopped);
+        if(stopped.native.fuelFlowPps>1e-8||stopped.plume.visible!==0||stopped.native.augmentation!==false)throw new Error("Native cutoff did not stop the gas plume");
+        if(!(stopped.thermalExpectedEmission[0]>0))throw new Error("Native cutoff sample has no remaining thermal emission to qualify");
+        await evaluate(chrome,sessionId,"window.__exhaust.phase(4,0,0)");
+        const cooling=await capture("thermal-cooling","rear","thermal-after-cutoff");
+        const coolingThermal=assertThermal(cooling);
+        const metalDeltaKelvin=cooling.native.temperature.metal.temperatureKelvin-stopped.native.temperature.metal.temperatureKelvin;
+        // Residual hot gas can briefly keep heating metal after cutoff. Native
+        // physical cooldown is qualified separately; this check asserts the
+        // exact displayed response, without imposing a renderer cooling law.
+        run.thermalCooldown={beforeCutoff:hot.native.temperature,firstCutoffStep:firstOff.native,firstCutoffPlumeVisible:firstOff.plume.visible,fuelRundown,stopped:stoppedThermal,cooling:coolingThermal,metalDeltaKelvin,emissionChanged:JSON.stringify(cooling.thermalExpectedEmission)!==JSON.stringify(stopped.thermalExpectedEmission),gasPlumeVisibleAfterSettledCutoff:stopped.plume.visible,visiblePixelDifference:cooling.pixelDifference,qualification:'Native dynamic metal Kelvin→baked surface cd/m²→display white reference, including a stopped hot source; separate native nozzle-inlet gas Kelvin selects the gas bank. The active gas resource gate uses finite shaft/fuel observations: existing native fuel rundown may retain a faint dry core before PPS reaches zero, so immediate first-cutoff plume extinction is not asserted. No measured F135 wall temperature, calibrated scene exposure or physical plume spectrum claim.'};
+      }
       const error=await evaluate(chrome,sessionId,"window.__exhaust.error");if(error)throw new Error(error);
       run.passed=true;
     }catch(error){run.failures.push(error.stack??error.message);run.passed=false;}
@@ -252,7 +333,7 @@ finally{
     if(exit&&(exit.code!==0||exit.signal!==null))failures.push("Chrome did not exit normally: "+JSON.stringify(exit));
   }
 }
-const report={schemaVersion:2,generatedAt:new Date().toISOString(),scope:forceOnly?"Installed SDK native force observation, actual F35 GLB, shared labeled force glyph readiness, hardware shader/pixel and disable checks. Fixed aircraft CG reference; no globe, flight performance or timing qualification.":"Installed SDK native telemetry and rig, actual F35 GLB, baked optical LUT/smoke sprite, native force glyphs, dry hot hardware, shared exhaust/smoke shader compilation and rendered pixels on the requested GPU backends. Fixed aircraft reference for framing; no globe, flight performance, collision, physical spectrum or timing benchmark qualification.",serverStarted:false,visibleBrowserUsed:false,renderersRequested:renderers,checks:forceOnly?"forces-only":"exhaust-smoke-forces",systemGpu,chromeExit:exit,runs,network,browserErrors,failures,passed:runs.length===renderers.length&&runs.every(run=>run.passed)&&failures.length===0&&browserErrors.length===0};
+const report={schemaVersion:4,generatedAt:new Date().toISOString(),scope:forceOnly?"Installed SDK native force observation, actual F35 GLB, shared labeled force glyph readiness, hardware shader/pixel and disable checks. Fixed aircraft CG reference; no globe, flight performance or timing qualification.":"Installed SDK separate native gas/metal telemetry and rig, actual F35 GLB, baked Kelvin-indexed optical LUT/smoke sprite, native force glyphs, metal-driven photometric material emission through a display white reference, shared exhaust/smoke shader compilation and rendered pixels on the requested GPU backends. Fixed aircraft reference for framing; no globe, flight performance, collision, measured F135 wall temperature, calibrated scene radiance/exposure, physical plume spectrum or timing benchmark qualification.",serverStarted:false,visibleBrowserUsed:false,renderersRequested:renderers,checks:forceOnly?"forces-only":"exhaust-smoke-forces-thermal",systemGpu,chromeExit:exit,runs,network,browserErrors,failures,passed:runs.length===renderers.length&&runs.every(run=>run.passed)&&failures.length===0&&browserErrors.length===0};
 await writeFile(path.join(out,"report.json"),JSON.stringify(report,null,2)+"\n");
 console.log(JSON.stringify({passed:report.passed,report:path.join(out,"report.json"),chromeExit:exit}));
 if(!report.passed)process.exitCode=1;

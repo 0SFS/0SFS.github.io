@@ -1,0 +1,92 @@
+{
+  "output": "build/validation/f35b-nozzle-gaps/2026-10-06_130501",
+  "report": "geometry-report.json",
+  "sourceGlbSha256": "8324d792711a8aecd74988dd9e314b3b4e6f1f3a819591ce60f34caa004d7fbd",
+  "sections": [
+    {
+      "apertureNorm": 0,
+      "stationOffsetMeters": 0.0833057403564465,
+      "coveredDegrees": 360,
+      "uncoveredDegrees": 0,
+      "status": "measured"
+    },
+    {
+      "apertureNorm": 0,
+      "stationOffsetMeters": 0.333222961425786,
+      "coveredDegrees": 360,
+      "uncoveredDegrees": 0,
+      "status": "measured"
+    },
+    {
+      "apertureNorm": 0,
+      "stationOffsetMeters": 0.5831401824951254,
+      "coveredDegrees": 360,
+      "uncoveredDegrees": 0,
+      "status": "measured"
+    },
+    {
+      "apertureNorm": 0,
+      "stationOffsetMeters": 0.7080987930297953,
+      "coveredDegrees": 360,
+      "uncoveredDegrees": 0,
+      "status": "measured"
+    },
+    {
+      "apertureNorm": 0.5,
+      "stationOffsetMeters": 0.0833057403564465,
+      "coveredDegrees": 360,
+      "uncoveredDegrees": 0,
+      "status": "measured"
+    },
+    {
+      "apertureNorm": 0.5,
+      "stationOffsetMeters": 0.333222961425786,
+      "coveredDegrees": 360,
+      "uncoveredDegrees": 0,
+      "status": "measured"
+    },
+    {
+      "apertureNorm": 0.5,
+      "stationOffsetMeters": 0.5831401824951254,
+      "coveredDegrees": 360,
+      "uncoveredDegrees": 0,
+      "status": "measured"
+    },
+    {
+      "apertureNorm": 0.5,
+      "stationOffsetMeters": 0.7080987930297953,
+      "coveredDegrees": 331.62167404745895,
+      "uncoveredDegrees": 28.3783259525411,
+      "status": "measured"
+    },
+    {
+      "apertureNorm": 1,
+      "stationOffsetMeters": 0.0833057403564465,
+      "coveredDegrees": 360,
+      "uncoveredDegrees": 0,
+      "status": "measured"
+    },
+    {
+      "apertureNorm": 1,
+      "stationOffsetMeters": 0.333222961425786,
+      "coveredDegrees": 360,
+      "uncoveredDegrees": 0,
+      "status": "measured"
+    },
+    {
+      "apertureNorm": 1,
+      "stationOffsetMeters": 0.5831401824951254,
+      "coveredDegrees": 322.3959684090654,
+      "uncoveredDegrees": 37.60403159093458,
+      "status": "measured"
+    },
+    {
+      "apertureNorm": 1,
+      "stationOffsetMeters": 0.7080987930297953,
+      "coveredDegrees": 288.68751553077107,
+      "uncoveredDegrees": 71.3124844692289,
+      "status": "measured"
+    }
+  ],
+  "qualification": "Measured angular diagnostic only; not real F135 or watertight-seal acceptance. No geometry was modified."
+}

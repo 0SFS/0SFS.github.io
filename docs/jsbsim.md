@@ -7,8 +7,131 @@ bindings, native lifetime, generic diagnostics and SDK build tooling belong in
 `wasm/`. 0SFS owns aircraft data, initial conditions, controls and scheduling.
 FOSS Earth remains the separate terrain/rendering dependency.
 
-**Installed adoption, 2026-10-05:** clean in-tree package
-`1.2.4-fork.11` is installed and locked at `c1d57a2c`. It repairs stopped-turbine
+**Installed adoption, 2026-10-06:** clean in-tree package
+`1.2.4-fork.16` is installed and locked at `97fe6ddf`. It adds read-only signed
+heat accounting for every existing turbine solid without changing the thermal
+solve, F135 coefficients, fuel, thrust, spool or nozzle schedules. Each region
+publishes imposed bath temperatures, effective capacity, gas/coolant/radiative
+rates in W, accepted step duration, stored/transferred energy and residual in J.
+Positive power enters the solid. An explicit warm initialization records assigned
+initial energy separately from integrated heat; a true cold start keeps finite lag.
+
+The [native contract](../validation/evidence/jsbsim/adoption/fork16/native-thermal-model.md)
+defines all property names and cached-receipt semantics: only accepted native
+steps may accumulate energy, never repeated hold or render reads. Reset, zero-time
+calls, warm/cold state restoration and the two-solid atomic solver remain intact.
+These are local wall balances driven by imposed reservoirs, not a closed engine
+energy budget. The core's 1,800 J/K and liner's 12,000 J/K are effective capacities;
+neither is calibrated from the visual shells, their volume or an alloy density.
+
+Twenty-five native thermal methods, five related turbine targets, 52 SDK cases,
+59 identity/artifact cases and all 14 installed distribution files pass. Exact
+source/archive hashes and logs are in the
+[fork.16 adoption record](../validation/evidence/jsbsim/adoption/fork16-adoption.json).
+The [installed physical thermal checks](../validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/native/report.json)
+audit 133,577 native steps across separate cold start, already-running seed,
+hot restart, lifecycle restoration, powered lift and timestep convergence.
+Maximum step residual is below 2.74e-9 J. Independent RK4 cooldown comparison
+shows halving error with halving timestep; 240 Hz errors are 0.00370 K liner and
+0.00792 K core. This verifies the declared reduced equations, not measured F135
+hardware temperatures or radiance. Full application CI and any rendered visual
+qualification belong to the combined physical-correction record.
+Fork.15 declarations and its matching F135 XML are retained for rollback.
+
+**Prior adoption, 2026-10-06:** clean in-tree package
+`1.2.4-fork.15` was installed and locked at `b58a1855`. It adds optional named
+solid thermal regions using one shared native bounded solver. The existing
+wall properties and fork.14 lifecycle remain intact; each added region has its
+own capacity, gas/coolant/radiation inputs, initialization and validated state
+restoration. All candidate states commit only after every region validates.
+No render clock advances heat and no thrust/fuel/spool/EGT/nozzle schedule changes.
+
+The F135 now selects two provisional regions: the retained cooled downstream
+liner/nozzle and a smaller, less-cooled core-facing region whose gas bath is
+upstream of afterburner heat addition. New properties are
+`propulsion/engine[0]/thermal/core/metal-temperature-k`,
+`thermal/core/metal-temperature-state-k` and `thermal/core/initialized` beneath
+the same engine prefix. Capture and restore both solids independently. Shared
+`thermal/valid` and each region's `initialized` gate observations.
+
+Twenty native thermal methods, five related turbine targets, all 52 SDK cases,
+58 identity/artifact cases and all 14 installed distribution files pass. The
+[fork.15 adoption record](../validation/evidence/jsbsim/adoption/fork15-adoption.json)
+retains exact source/artifact identity and logs; the
+[native model contract](../validation/evidence/jsbsim/adoption/fork15/native-thermal-model.md)
+describes configuration and lifecycle. The
+[propulsion/thermal audit](../validation/evidence/aircraft/f35b/engine-rebuild-2026-10-06/propulsion-thermal-audit.json)
+records coefficients and why the coupled 28k/43k development ratings remain
+unchanged. Eleven [installed two-solid lifecycle scenarios](../validation/evidence/aircraft/f35b/engine-rebuild-2026-10-06/implementation/native/acceptance.json)
+pass, including stopped-hot runway relocation and powered-lift transients with
+AB inhibited. The prior failed harness call and its targeted correction remain
+retained. No measured F135 thermal/optical calibration is claimed. Combined
+visual acceptance and full CI belong to the engine rebuild.
+Fork.14 declarations and its single-solid engine XML are retained for rollback.
+
+**Prior adoption, 2026-10-06:** clean in-tree package
+`1.2.4-fork.14` was installed and locked at `399a5173`. It adds an optional,
+data-driven native turbine thermal model: separate nozzle-gas energy balance,
+persistent metal temperature and a validated native state property for recovery.
+Existing thrust, fuel, spool and legacy EGT calculations retain their behavior.
+Actual augmentation gates estimated excess burner fuel; an optional declared
+stoichiometric ratio limits heat-releasing fuel while retaining all supplied
+mass. The wall integrates convection, coolant and radiation with a bounded
+backward-Euler solve on accepted native simulation time. Cold initialization,
+first warm initialization, trim, zero-time RunIC, reset and state restoration are
+explicit; no render clock advances heat.
+
+The 15-method native temperature/thermal target passes; three existing related
+turbine targets passed on the thermal feature source before its suspension-only
+follow-up. The one clean locked-toolchain SDK build passes all 52
+cases; 57 identity/artifact cases and all 14 installed files verify. The actual
+public F135 profile at 1000 ft static hold-down reaches about 2,362 K gas and
+1,270 K wall after sustained afterburner; after shutdown the gas approaches
+ambient while the wall remains warm. These authored thermal coefficients are
+estimates, not measured F135 station/material data. Exact contracts, hashes,
+retained initial failures and qualification status are in the
+[fork.14 adoption record](../validation/evidence/jsbsim/adoption/fork14-adoption.json)
+and its [native model contract](../validation/evidence/jsbsim/adoption/fork14/native-thermal-model.md).
+Eight actual installed thermal lifecycle scenarios pass, including exact wall
+restoration through the application snapshot and free/runway relocation helpers.
+The next accepted step is checked for bounded continuity rather than exact
+trajectory parity. Another 52 focused application regressions pass. Final full
+application CI passes 1,767 tests across 163 files, with one existing expected
+stowed-gear envelope failure; lint, typecheck, production build and installed/
+emitted artifact checks pass. The [combined thermal acceptance record](../validation/evidence/aircraft/f35b/thermal-model-2026-10-06/acceptance.json)
+retains those checks. No new GPU or aircraft calibration is claimed.
+
+Fork.13 was rejected during qualification: `InitRunning` suspended executive
+integration but used a cached positive engine-input timestep, advancing metal
+state by 0.006512 K at unchanged simulation time. Fork.14 adds the executive
+suspension guard and a positive-input native regression; the actual public-model
+probe now requires exact same-time wall equality. The immutable fork.13 artifact
+and [failed-candidate record](../validation/evidence/jsbsim/adoption/fork13-adoption.json)
+remain retained, but the stable identity gate rejects it. The last accepted
+pre-thermal rollback is fork.12.
+
+**Prior adoption, 2026-10-06:** clean in-tree package
+`1.2.4-fork.12` was installed and locked at `6a25a521`. It adds the read-only
+indexed `propulsion/engine[n]/egt-degc` observation of existing
+`FGTurbine::GetEGT()` in degrees Celsius, without changing temperature, fuel,
+thrust or phase calculations. Three direct C++ regressions compare the getter
+and property across start, run, augmentation, shutdown, Trim and reset, including
+nonzero engine index and rejected writes. The successful locked-toolchain SDK
+build passes 52 cases; 55 identity/artifact cases and all 14 installed files verify.
+The installed F135 trace proves heating before Running and gradual ordinary
+shutdown cooling. It also records unchanged model limits: no extra afterburner
+heat and a temperature jump following hot-stopped RunIC. This is a generic gas
+temperature proxy, not measured F135 metal temperature. Exact hashes, failed
+attempts, trace, primary thermal context and acceptance scope are in the
+[fork.12 adoption record](../validation/evidence/jsbsim/adoption/fork12-adoption.json).
+The full application CI run passes 1,749 tests across 162 files, with one existing
+expected gear-envelope failure; lint, typecheck, production build and installed/
+emitted artifact checks pass. The [temperature-glow acceptance record](../validation/evidence/aircraft/f35b/temperature-glow-2026-10-06/acceptance.json)
+retains the combined software checks. No new GPU or aircraft thermal calibration
+is claimed.
+
+**Prior adoption, 2026-10-05:** clean in-tree package
+`1.2.4-fork.11` was installed and locked at `c1d57a2c`. It repairs stopped-turbine
 phantom thrust during zero-time initialization. Native Running=false now returns
 zero thrust while preserving stopped spool/fuel state; running idle and normal
 trim remain unchanged. The legacy trim-to-run startup initialization is preserved.
@@ -84,8 +207,9 @@ rejects a renamed package claiming an older version. A full rollback restores
 that release's declaration, lock and identity module together from
 [`validation/evidence/jsbsim/rollback/`](../validation/evidence/jsbsim/rollback);
 fork.5 and fork.6 are at commits `f9a27c0d` and `9e22e168` instead, and
-fork.7 through fork.10 pre-upgrade declarations are retained for rollback; fork.11
-is the installed declaration.
+fork.7 through fork.15 pre-upgrade declarations are retained for rollback; fork.16
+is the installed declaration. The fork.12 rollback also retains the matching
+pre-thermal F35 aircraft data, verified against its installed trace.
 
 ## Build and installation chain
 
@@ -96,7 +220,7 @@ uses native TypeScript stripping. This integration was exercised with
 The application declares:
 
 ```json
-"@felipegalind0/jsbsim": "file:deps/felipegalind0-jsbsim-1.2.4-fork.11.tgz"
+"@felipegalind0/jsbsim": "file:deps/felipegalind0-jsbsim-1.2.4-fork.16.tgz"
 ```
 
 The package scope and API imports stay the same. The wrapper version does not
@@ -150,10 +274,17 @@ That produces an identified dirty diagnostic candidate; it cannot qualify for
 release packing or stable app adoption. Default native CMake builds leave
 `BUILD_WASM_MODULE=OFF` and do not require Node or Emscripten. The owning build
 contract is `wasm/docs/centralized-builds.md` in JSBSim.
+Use the locked tool versions even if Homebrew has upgraded the system Node.
+The fork.16 build used the verified Node 26.8.2 retained under JSBSim's
+`build/tools/node-26.8.2-20261005/`, with npm 11.19.1. Operational caches stayed
+inside that checkout: `EM_CACHE="$PWD/build/emscripten-cache"` and
+`npm_config_cache="$PWD/build/npm-cache"`. The former reuses the retained
+6.0.9-git cache; no Homebrew cache or toolchain-lock mutation was needed.
+
 
 A WASM build is a full Emscripten compile and its hash differs between builds of
 one commit, so build only when the engine or SDK changed. `wasm/build/` keeps the
-selected fork.11 artifact, its build descriptor and captured source, which `pack:build`
+selected fork.16 artifact, its build descriptor and captured source, which `pack:build`
 and the demo read through `wasm/build/last-build.json`.
 
 Build native changes in one build directory for `master` (now
@@ -229,33 +360,32 @@ The accepted application artifact is:
 
 | Identity | Value |
 | --- | --- |
-| Common native/SDK commit | `c1d57a2c3860ae9ae47f2b27b84f37912042c19c` |
-| Repository content SHA-256 | `fec8d16c38fd80da1446cde2b1f5523796d737eef6bac5426a7df4b11c2e2021` |
-| SDK subtree content SHA-256 | `d40290a03a3c40552b8dce8c3dfb6aeb5f19587f406d7083c461bc5ec2dfb5a4` |
-| Build input SHA-256 | `d353cac279c53cbc55c05b5231680ae85c26ae62b8b6c68a7e388fed90e0e7bc` |
-| Package tarball SHA-256 | `1add69a5e13980af743a788f1e8f8856338ffd01b80e95a8dbaa23f7df0dd71a` |
+| Common native/SDK commit | `399a5173fb5d597f499103df8611a2132945f4a8` |
+| Repository content SHA-256 | `1783bae2c7379e18e2435c3385d56f5c857553ebd9a0bd3278b9d48a55f9cc3a` |
+| SDK subtree content SHA-256 | `044ebb2a6d6ff33f23ec3b7aac47b8c8b7c27775844a7c51d2b462c00321ab8e` |
+| Build input SHA-256 | `917dffaef91d7279fdcbcbf1b5bcee356e8381005e1eb73720a75a4f8f708906` |
+| Package tarball SHA-256 | `02a1080dc325f2fff399d94b38aff03dee8e8ac12cfc32ce1398910c5bf84485` |
 | Installed loader SHA-256 | `784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2` |
-| Installed WASM SHA-256 | `ad1a8a1288ba7895c24e9f8701c754f4f7266703b7ea4f7d6325e5974132b1f3` |
+| Installed WASM SHA-256 | `1221e1ff73a0105744048bf223d413f0274803e3ba383a0009945d029a505260` |
 
-That is fork.11, packed from clean `master`. Its native change since fork.10
-is the stopped-turbine zero-time thrust guard. Indexed cached force observations,
-resolved aerodynamic anchors/split, turbine nozzle and actual augmentation
-observers, earlier fuel/spool corrections and prior native features remain
-included. Source adoption is separate from aircraft calibration.
+That is fork.14, packed from clean `master`. It includes the generic opt-in
+thermal balance and executive-suspension correction described above. Earlier EGT,
+stopped-turbine zero-time thrust, indexed cached force, resolved aerodynamic
+anchor/split, nozzle/augmentation and fuel/spool changes remain included.
+Source adoption is separate from aircraft calibration.
 
 The installed distribution's 14 recorded files and archive SHA-512 lock
 integrity are verified. The
-[verified installed artifact](../validation/evidence/jsbsim/adoption/fork11/verified-installed-artifact.json),
-[focused installed initial run](../validation/evidence/jsbsim/adoption/fork11/installed-regressions-initial.log),
-[corrected failed-file rerun](../validation/evidence/jsbsim/adoption/fork11/installed-yaw-final.log)
-and [SDK build log](../validation/evidence/jsbsim/adoption/fork11/sdk-build-validation.log)
+[verified installed artifact](../validation/evidence/jsbsim/adoption/fork14/verified-installed-artifact.json),
+[57-case installed identity checks](../validation/evidence/jsbsim/adoption/fork14/installed-identity-regressions.log),
+[actual native public F135 thermal trace](../validation/evidence/jsbsim/adoption/fork14/native-f135-final-profile.json)
+and [successful SDK build log](../validation/evidence/jsbsim/adoption/fork14/sdk-build.log)
 are retained with the
-[fork.11 adoption record](../validation/evidence/jsbsim/adoption/fork11-adoption.json).
-The final app CI and emitted loader/WASM checks pass in the
-[combined acceptance record](../validation/evidence/aircraft/f35b/final-acceptance-2026-10-05/acceptance.json).
-The separate [hardware browser checks](../validation/evidence/aircraft/f35b/exhaust-smoke-gpu-2026-10-05/acceptance.json)
-instantiate the installed SDK; matching emitted hashes alone do not establish
-browser instantiation of the full globe application.
+[fork.14 adoption record](../validation/evidence/jsbsim/adoption/fork14-adoption.json).
+The earlier fork.11 app CI and hardware browser receipts remain historical:
+[prior combined acceptance](../validation/evidence/aircraft/f35b/final-acceptance-2026-10-05/acceptance.json)
+and [prior hardware check](../validation/evidence/aircraft/f35b/exhaust-smoke-gpu-2026-10-05/acceptance.json).
+They do not establish full application/browser acceptance of the new artifact.
 
 All app imports, type imports, mocks and SDK assets use the fork scope.
 `createJsbsimRuntime` imports `JSBSimSdk` and `buildIdentity` from the package,
@@ -305,7 +435,7 @@ exceptions. External terrain/font requests were blocked, the no-Google-key
 warning was recorded and terrain stayed unready. Production builds retain the
 large renderer-chunk warning; some jsdom app tests retain React act warnings.
 These historical checks exclude terrain readiness, GPU performance and aircraft
-fidelity and do not qualify the current fork.11/F-35B application.
+fidelity and do not qualify the current fork.14/F-35B application.
 
 ## Adopted IDBFS and native-exception corrections
 
@@ -589,7 +719,7 @@ paths before release, including non-root deployments.
 
 What the Fuel tab and the throttle lever rely on, read from the fork's source and
 held by `fuelTanks.integration.test.ts` and `engineControl.integration.test.ts`
-against the installed SDK (fork.11).
+against the installed SDK (fork.11 at the time of that retained check).
 
 Fuel tanks:
 
@@ -630,6 +760,16 @@ Starting and stopping, as `engineControl.ts` drives them:
   SF50 after about 22 s (3–4 s dry to 15% N2, then 2%/s to its 53.4% idle) and
   the F-35B after about 27 s. These turbines use JSBSim's default `n2spinup` 3
   and `n2startrate` 2.
+
+The [2026-10-06 shutdown comparison](../validation/evidence/jsbsim/turbine-shutdown-2026-10-06/acceptance.json)
+uses the installed SDK and application engine control, with native hold-down
+at zero airspeed. F-35B aborted starts near 59% N2 and shutdowns from idle or
+full power have the same normalized decay. They reach 1% N2 after 8.14, 8.18
+and 9.19 simulated seconds respectively; the SF50 comparison also agrees.
+These are model observations, not real-engine coast-down calibration. The
+reported faster shutdown in the live app remains unreproduced; no spin-down
+parameters were changed. Reproduce the controlled comparison with
+`node scripts/validation/aircraft/check-turbine-shutdown.mjs`.
 
 ## Ownership, notices and continued work
 

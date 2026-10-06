@@ -29,6 +29,8 @@ export const HAPTIC_FEEDBACK_TTL_MS = 90;
 export interface EngineOrbSettings {
   fps: number;
   turnsPerSecond: number;
+  /** Optional on older hosts; clients use their shared default when absent. */
+  maxPatternStep?: number;
   pixelRatio: number;
   renderer: "auto" | "webgpu" | "webgl2" | "webgl1" | "off";
 }
@@ -44,6 +46,8 @@ export interface EngineStatus {
   maxRpm?: number;
   /** The desktop's visible animation budgets also apply to the phone widget. */
   orbs?: EngineOrbSettings;
+  /** Aircraft visual accent, present only while its native afterburner is active. */
+  afterburnerColor?: string;
   n1?: number;
   n2?: number;
   /** A piston engine's shaft speed; a turbine shows its spools instead. */
@@ -249,6 +253,8 @@ export function isEngineStatus(value: unknown): value is EngineStatus {
   if (typeof value.phase !== "string" || !/^[A-Z][A-Z ]{0,15}$/.test(value.phase)) return false;
   if (value.state !== undefined && !ENGINE_RUN_STATES.includes(value.state as EngineRunState)) return false;
   if (value.kind !== undefined && value.kind !== "piston" && value.kind !== "turbine") return false;
+  if (value.afterburnerColor !== undefined
+    && !(typeof value.afterburnerColor === "string" && /^#[0-9a-f]{6}$/i.test(value.afterburnerColor))) return false;
   if (value.rotorBlades !== undefined) {
     if (!record(value.rotorBlades)) return false;
     const blades = value.rotorBlades;
@@ -261,8 +267,9 @@ export function isEngineStatus(value: unknown): value is EngineStatus {
   if (value.orbs !== undefined) {
     if (!record(value.orbs)) return false;
     const orbs = value.orbs;
-    if (!(finite(orbs.fps) && orbs.fps >= 0 && orbs.fps <= 60
+    if (!(finite(orbs.fps) && orbs.fps >= 0 && orbs.fps <= 1000
       && finite(orbs.turnsPerSecond) && orbs.turnsPerSecond >= 0 && orbs.turnsPerSecond <= 4
+      && (orbs.maxPatternStep === undefined || (finite(orbs.maxPatternStep) && orbs.maxPatternStep >= 0.05 && orbs.maxPatternStep <= 0.49))
       && finite(orbs.pixelRatio) && orbs.pixelRatio >= 1 && orbs.pixelRatio <= 3
       && ["auto", "webgpu", "webgl2", "webgl1", "off"].includes(orbs.renderer as string))) return false;
   }

@@ -11,9 +11,10 @@ import { engineSummaryFromStatus } from './engineSummaryFromStatus'
 import { PhoneEngine } from './PhoneEngine'
 import { parseMessage, type EngineStatus } from './protocol'
 
-const orbRenderer = vi.hoisted(() => ({ draw: vi.fn(), configure: vi.fn(), destroy: vi.fn() }))
+const orbRenderer = vi.hoisted(() => ({ draw: vi.fn(), configure: vi.fn(), setAccentColor: vi.fn(), destroy: vi.fn() }))
 vi.mock('../flight/hud/engineSpoolRenderer', () => ({
-  createEngineSpoolRenderer: vi.fn(() => ({ ...orbRenderer, ready: Promise.resolve() })),
+  createEngineSpoolRenderer: vi.fn(() => ({ ...orbRenderer, canDraw: () => true,
+    getMotionStatus: () => ({ fps: null, maxTurnsPerSecond: null, limited: false }), ready: Promise.resolve() })),
 }))
 
 let root: Root
@@ -45,10 +46,10 @@ describe('phone engine widget', () => {
     const engine: EngineStatus = { phase: 'RUNNING', kind: 'piston', rpm: 1350, maxRpm: 2700, simTimeS: 1 }
     act(() => root.render(<PhoneEngine engine={engine} />))
     expect(createEngineSpoolRenderer).toHaveBeenCalledWith(expect.any(HTMLElement), {
-      preference: 'off', maxFps: 0, pixelRatio: 1, outerBlades: 0, innerBlades: 0,
+      preference: 'off', maxFps: 0, pixelRatio: 1, maxPatternStep: 0.45, outerBlades: 0, innerBlades: 0,
     })
     act(() => root.render(<PhoneEngine engine={{ ...engine, simTimeS: 2 }} />))
-    expect(orbRenderer.configure).toHaveBeenLastCalledWith({ preference: 'off', maxFps: 0, pixelRatio: 1,
+    expect(orbRenderer.configure).toHaveBeenLastCalledWith({ preference: 'off', maxFps: 0, pixelRatio: 1, maxPatternStep: 0.45,
       outerBlades: 0, innerBlades: 0 })
     expect(requestFrame).not.toHaveBeenCalled()
     expect(container.querySelector('.flight-engine__rpm .flight-engine__spool-value')?.textContent).toBe('1350')
@@ -59,7 +60,8 @@ describe('phone engine widget', () => {
     document.body.append(desktop)
     const rotorBlades = { outer: 20, inner: 40, outerEstimated: true, innerEstimated: true }
     const monitor = createEngineMonitor(desktop, { storage: null, refreshIntervalMs: 0,
-      definition: { kind: 'turbine', rotorBlades } })
+      definition: { kind: 'turbine', rotorBlades },
+      afterburner: { accentColor: '#ff9450', getActive: () => true } })
     monitor.update(reader({
       'simulation/sim-time-sec': 12,
       'propulsion/engine/n1': 50.83,
@@ -81,9 +83,11 @@ describe('phone engine widget', () => {
     expect(parsed?.type).toBe('status')
     const engine = parsed && 'status' in parsed && parsed.status ? parsed.status.engine : undefined
     expect(engine?.rotorBlades).toEqual(rotorBlades)
+    expect(engine?.afterburnerColor).toBe('#ff9450')
     expect(engineSummaryFromStatus(engine!).rotorBlades).toEqual(rotorBlades)
     act(() => root.render(<PhoneEngine engine={engine!} />))
     expect(orbRenderer.configure).toHaveBeenLastCalledWith(expect.objectContaining({ outerBlades: 20, innerBlades: 40 }))
+    expect(orbRenderer.setAccentColor).toHaveBeenLastCalledWith('#ff9450')
 
     const face = (host: Element) => [...host.querySelectorAll(
       '.flight-engine__flow, .flight-engine__spools, .flight-engine__phase, .flight-engine__values')]
@@ -92,6 +96,13 @@ describe('phone engine widget', () => {
     expect(container.querySelector('.flight-engine__phase')?.textContent).toBe('RUNNING')
     monitor.destroy()
     desktop.remove()
+  })
+
+  it('restores normal shaft colors when active afterburner color disappears from the status', () => {
+    act(() => root.render(<PhoneEngine engine={{ phase: 'RUNNING', afterburnerColor: '#ff9450' }} />))
+    expect(orbRenderer.setAccentColor).toHaveBeenLastCalledWith('#ff9450')
+    act(() => root.render(<PhoneEngine engine={{ phase: 'RUNNING' }} />))
+    expect(orbRenderer.setAccentColor).toHaveBeenLastCalledWith(null)
   })
 
   it('recovers every phase colour from its label', () => {
@@ -157,9 +168,13 @@ describe('phone engine widget', () => {
     expect(callbacks.size).toBe(1)
     tick(125)
     const halfway = { ...orbRenderer.draw.mock.lastCall![0] }
-    const displayRate = 30 / (4 * 40)
+    const displayRate = 2
     expect(halfway.outerAngle).toBeCloseTo(Math.PI * displayRate * 0.05)
     expect(halfway.innerAngle).toBeCloseTo(Math.PI * displayRate * 0.075)
+    // A status heartbeat with the same fixed-step time must not reset playback.
+    now = 130
+    act(() => root.render(<PhoneEngine engine={{ ...next }} />))
+    expect(callbacks.size).toBe(1)
     tick(150)
     expect(callbacks.size).toBe(0)
     const stopped = { ...orbRenderer.draw.mock.lastCall![0] }
@@ -167,7 +182,32 @@ describe('phone engine widget', () => {
     act(() => root.render(<PhoneEngine engine={next} paused />))
     expect(callbacks.size).toBe(0)
     expect(orbRenderer.draw.mock.lastCall![0]).toEqual(stopped)
-    expect(orbRenderer.configure).toHaveBeenLastCalledWith({ preference: 'webgl1', maxFps: 30, pixelRatio: 1,
+    expect(orbRenderer.configure).toHaveBeenLastCalledWith({ preference: 'webgl1', maxFps: 30, pixelRatio: 1, maxPatternStep: 0.45,
       outerBlades: 28, innerBlades: 40 })
+  })
+
+  it('cancels phone playback immediately when paused between heartbeat frames', () => {
+    let now = 0
+    vi.spyOn(performance, 'now').mockImplementation(() => now)
+    let nextId = 0
+    const callbacks = new Map<number, FrameRequestCallback>()
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      callbacks.set(++nextId, callback)
+      return nextId
+    })
+    vi.stubGlobal('cancelAnimationFrame', (id: number) => callbacks.delete(id))
+    const engine: EngineStatus = { phase: 'RUNNING', kind: 'piston', rpm: 2700, maxRpm: 2700, simTimeS: 1,
+      rotorBlades: { outer: 2, inner: null, outerEstimated: false, innerEstimated: false },
+      orbs: { fps: 120, turnsPerSecond: 2, pixelRatio: 1, renderer: 'webgl1' } }
+    act(() => root.render(<PhoneEngine engine={engine} />))
+    now = 50
+    const next = { ...engine, simTimeS: 1.05 }
+    act(() => root.render(<PhoneEngine engine={next} />))
+    expect(callbacks.size).toBe(1)
+    const beforePause = { ...orbRenderer.draw.mock.lastCall![0] }
+    now = 55
+    act(() => root.render(<PhoneEngine engine={next} paused />))
+    expect(callbacks.size).toBe(0)
+    expect(orbRenderer.draw.mock.lastCall![0]).toEqual(beforePause)
   })
 })

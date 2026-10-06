@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-06",
+  "status": "passed-native-diagnosis-and-uniform-baseline-only",
+  "report": "report.json",
+  "trace": "trace.csv",
+  "stationAudit": "native-station-audit.json",
+  "auditedSteps": 82925,
+  "sampledRows": 4171,
+  "checks": [
+    {
+      "name": "cold-cycle",
+      "passed": true
+    },
+    {
+      "name": "powered-lift",
+      "passed": true
+    },
+    {
+      "name": "prior-native-milestones",
+      "passed": true
+    }
+  ],
+  "nativeAndAircraftInputsUnchanged": true,
+  "priorNativeRecord": "../../engine-physical-correction-2026-10-06/native/report.json",
+  "priorReportSha256": "6c51271ac29f89db50586e45fe9467b128fc82470b684617988c0675e37e5f57",
+  "priorMilestoneMaximumDifference": 0,
+  "sourceHashesStableDuringRun": true,
+  "snapshotFiles": [
+    "qualification-helpers.mjs.txt",
+    "qualification-helpers.ts.txt",
+    "baseline-optical-manifest.json",
+    "baseline-shader.ts.txt",
+    "baseline-spatial.png"
+  ],
+  "plots": [
+    "baseline-native-cycle.svg",
+    "baseline-ab-transitions.svg",
+    "baseline-rays-and-support.svg"
+  ],
+  "diagnosis": "Dry powered lift is active, directed down and supplied with valid fuel/temperature; current grey continuum and short support produce very small modeled visible radiance. Early AB bands dominate a faint thermal continuum and are applied uniformly; sustained modeled emission becomes continuum dominated. These are physical-source/CPU findings, not reproduction of the uncaptured display.",
+  "notQualified": [
+    "User camera/exposure/settings or exact reported display",
+    "Geometry/depth interaction by this native tool",
+    "New spatial-field output (separate final-field check)",
+    "GPU pixels, day/night rendered appearance or performance",
+    "Measured F135 station, soot or species calibration"
+  ]
+}

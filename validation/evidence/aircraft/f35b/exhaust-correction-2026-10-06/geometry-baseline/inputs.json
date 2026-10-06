@@ -1,0 +1,84 @@
+[
+  {
+    "path": "src/flight/aircraft/createEngineExhaust.ts",
+    "snapshot": "00-createEngineExhaust.ts.txt",
+    "sha256": "a752a27a5a4354be1fbcbdb70ad456c09770573d4c75573cd03dc905f42c8418"
+  },
+  {
+    "path": "src/flight/aircraft/createAircraftEngineVisuals.ts",
+    "snapshot": "01-createAircraftEngineVisuals.ts.txt",
+    "sha256": "ba3b5ba7b8c82612537a79e76c554c80d59b5959ce175392fb31ece05587741e"
+  },
+  {
+    "path": "src/flight/aircraft/engineGasOptics.ts",
+    "snapshot": "02-engineGasOptics.ts.txt",
+    "sha256": "4c1f891eda1db2a041afe33c89758ef79dc31a204faa54da26e9200e027a2956"
+  },
+  {
+    "path": "src/flight/aircraft/engineNozzleRig.ts",
+    "snapshot": "03-engineNozzleRig.ts.txt",
+    "sha256": "0c070c616f6b9508de3cba5ccd24818b9ad679bb938e9d86acf1287f381f0996"
+  },
+  {
+    "path": "src/flight/aircraft/aircraftCatalog.ts",
+    "snapshot": "04-aircraftCatalog.ts.txt",
+    "sha256": "925a26dd883ef20a4d713e8e86dd5a56bfbc8a66be06b4bbefc787c5320c6242"
+  },
+  {
+    "path": "src/flight/engineTestStand.ts",
+    "snapshot": "05-engineTestStand.ts.txt",
+    "sha256": "750fb6ecc44f1eb5a7b53725c24ed7af4647eed939a0526b8268e2be646fb183"
+  },
+  {
+    "path": "src/flight/createFlightSimApp.ts",
+    "snapshot": "06-createFlightSimApp.ts.txt",
+    "sha256": "04710d5fdc336616e226ae4c1ea9105fc4b5394bd85a58127a5b7e874cae7f7f"
+  },
+  {
+    "path": "scripts/f135Engine/source.mjs",
+    "snapshot": "07-source.mjs.txt",
+    "sha256": "6a57b46fcdbd2abf90c617ab59cc16944428e77b4fd3787deed890f7eb36d3cb"
+  },
+  {
+    "path": "scripts/f135Engine/profile.json",
+    "snapshot": "08-profile.json.txt",
+    "sha256": "fd31d20c7e4ff1bf39887f2af9ebfade6f2174b591c38ad2be6c21a01f37d1f5"
+  },
+  {
+    "path": "scripts/f135Engine/mechanism.mjs",
+    "snapshot": "09-mechanism.mjs.txt",
+    "sha256": "8b5b7870f02a7b2d49ab862a0f2fa573983f11e1152c0f5df85443c1f2b26e76"
+  },
+  {
+    "path": "src/flight/aircraft/generated/f135EngineData.ts",
+    "snapshot": "10-f135EngineData.ts.txt",
+    "sha256": "08545c3e51892acb63ea27c8283445aef1a1e4d1a432768af1b492ba0fd48ddb"
+  },
+  {
+    "path": "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json",
+    "snapshot": "11-f135-exhaust-lut.manifest.json.txt",
+    "sha256": "3da9c058348d432aca82b1f4f6a5b95163abe7484ae74e9d3cdec2e024e7e7c4"
+  },
+  {
+    "path": "../foss-earth/src/engine/babylon/createRasterTilesRuntime.ts",
+    "snapshot": "12-createRasterTilesRuntime.ts.txt",
+    "sha256": "9b68b8f6d7cbb7e872fcbbd546a87d4f75094b7397913d5290fcfcb2693f9be3"
+  },
+  {
+    "path": "../foss-earth/src/engine/babylon/createTilesRuntime.ts",
+    "snapshot": "13-createTilesRuntime.ts.txt",
+    "sha256": "e96684f2c55f7086e747f78dc5165776b2443bb9fdbda2f30af32a056246f9f6"
+  },
+  {
+    "path": "public/aircraft/f-35b/engine/F135-PW-600-full.glb",
+    "sha256": "0fc8083a3a4d5d5d76946ea3602d4a23ebc508e58301145e489c59c1801ff71f",
+    "bytes": 1864272,
+    "snapshot": null
+  },
+  {
+    "path": "public/aircraft/f-35b/engine/F135-PW-600-installed.glb",
+    "sha256": "4e7d837e2ab5303ab9d90a3b3321baa469e5fc204acad7e0b2f59185990aa341",
+    "bytes": 1037840,
+    "snapshot": null
+  }
+]

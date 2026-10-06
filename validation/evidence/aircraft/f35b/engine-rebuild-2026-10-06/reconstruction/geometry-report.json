@@ -1,0 +1,5539 @@
+{
+  "schema": "0sfs-f135-exported-geometry/1",
+  "artifacts": [
+    {
+      "variant": "installed",
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-installed.glb",
+      "sha256": "8003120dfcb0c78e187797bd99d83cee21b2084ed7bf36ee528b4c15779f8fa9"
+    },
+    {
+      "variant": "full",
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-full.glb",
+      "sha256": "0a8055b3fa42cbe36528a234afcaee44bf3611289209217a407bcf31877c7974"
+    }
+  ],
+  "tolerances": {
+    "weldMeters": 0.00001,
+    "angularDegrees": 0.00001,
+    "minimumTriangleAreaM2": 1e-10,
+    "reason": "Weld threshold exceeds float32 roundoff for metre-scale geometry and is far below the 3 mm explicit seal offset."
+  },
+  "sections": [
+    {
+      "aperture": 0,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.05,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.05,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.05,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.05,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.05,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.05,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.05,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.05,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.1,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.1,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.1,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.1,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.1,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.1,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.1,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.1,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.15,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.15,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.15,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.15,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.15,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.15,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.15,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.15,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.2,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.2,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.2,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.2,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.2,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.2,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.2,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.2,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.25,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.25,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.25,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.25,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.25,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.25,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.25,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.25,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.3,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.3,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.3,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.3,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.3,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.3,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.3,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.3,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.35,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.35,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.35,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.35,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.35,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.35,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.35,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.35,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.4,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.4,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.4,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.4,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.4,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.4,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.4,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.4,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.45,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.45,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.45,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.45,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.45,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.45,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.45,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.45,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.5,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.5,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.5,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.5,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.5,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.5,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.5,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.5,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.55,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.55,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.55,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.55,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.55,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.55,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.55,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.55,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.6,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.6,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.6,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.6,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.6,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.6,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.6,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.6,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.65,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.65,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.65,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.65,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.65,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.65,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.65,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.65,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.7,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.7,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.7,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.7,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.7,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.7,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.7,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.7,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.75,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.75,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.75,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.75,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.75,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.75,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.75,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.75,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.8,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.8,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.8,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.8,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.8,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.8,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.8,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.8,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.85,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.85,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.85,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.85,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.85,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.85,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.85,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.85,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.9,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.9,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.9,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.9,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.9,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.9,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.9,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.9,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.95,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.95,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.95,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.95,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.95,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.95,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.95,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 0.95,
+      "z": 0.54,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 1,
+      "z": 0.015,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 1,
+      "z": 0.075,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 1,
+      "z": 0.14,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 1,
+      "z": 0.23,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 1,
+      "z": 0.28,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 1,
+      "z": 0.37,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 1,
+      "z": 0.46,
+      "coveredDegrees": 360
+    },
+    {
+      "aperture": 1,
+      "z": 0.54,
+      "coveredDegrees": 360
+    }
+  ],
+  "seams": [
+    {
+      "aperture": 0,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 0.05,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 0.1,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 0.15,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 0.2,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 0.25,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 0.3,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 0.35,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 0.4,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 0.45,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 0.5,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 0.55,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 0.6,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 0.65,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 0.7,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 0.75,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 0.8,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 0.85,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 0.9,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 0.95,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    },
+    {
+      "aperture": 1,
+      "boundaryEdges": 192,
+      "unintendedBoundaryEdges": 0
+    }
+  ],
+  "normals": [
+    {
+      "aperture": 0,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.0010448520366793986,
+      "minNormalAgreement": 0.9999999999993553,
+      "minNormalLength": 0.9999999715618382,
+      "maxNormalLength": 1.0000000310339077
+    },
+    {
+      "aperture": 0,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.0002818178261505864,
+      "minNormalAgreement": 0.9999999999934615,
+      "minNormalLength": 0.9999999649310548,
+      "maxNormalLength": 1.0000000335854011
+    },
+    {
+      "aperture": 0,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.00011370769268510968,
+      "minNormalAgreement": 0.9999999999974002,
+      "minNormalLength": 0.9999999690400627,
+      "maxNormalLength": 1.0000000290815154
+    },
+    {
+      "aperture": 0,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.001061807909140229,
+      "minNormalAgreement": 0.9999897430474394,
+      "minNormalLength": 0.9946796163686346,
+      "maxNormalLength": 1.0000000296227312
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.00028636119339011816,
+      "minNormalAgreement": 0.9999897228384366,
+      "minNormalLength": 0.9946763914769524,
+      "maxNormalLength": 0.9992503406396825
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.00011553071887279652,
+      "minNormalAgreement": 0.999999756213376,
+      "minNormalLength": 0.9954423363534446,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0.05,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.0010792325768830102,
+      "minNormalAgreement": 0.9999617331081445,
+      "minNormalLength": 0.9898950545218674,
+      "maxNormalLength": 1.0000000296227312
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.00029103089589712597,
+      "minNormalAgreement": 0.9999616569114531,
+      "minNormalLength": 0.98988891549766,
+      "maxNormalLength": 0.9985790856388138
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.00011734215127031853,
+      "minNormalAgreement": 0.9999991501448973,
+      "minNormalLength": 0.9913466936207341,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0.1,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.0010971361093541348,
+      "minNormalAgreement": 0.9999202983450232,
+      "minNormalLength": 0.9856540951215709,
+      "maxNormalLength": 1.0000000296227312
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.00029582961868666766,
+      "minNormalAgreement": 0.9999201378182756,
+      "minNormalLength": 0.9856453611238037,
+      "maxNormalLength": 0.9979864268570923
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.00011914212939842635,
+      "minNormalAgreement": 0.9999983422974652,
+      "minNormalLength": 0.9877187878763869,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0.15,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.0011155280348412024,
+      "minNormalAgreement": 0.9998699362226995,
+      "minNormalLength": 0.98196378141379,
+      "maxNormalLength": 1.0000000296227312
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.0003007599010743834,
+      "minNormalAgreement": 0.999869671254821,
+      "minNormalLength": 0.9819527801278595,
+      "maxNormalLength": 0.9974725043908391
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.0001209307978321252,
+      "minNormalAgreement": 0.9999973908584834,
+      "minNormalLength": 0.9845637896644968,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0.2,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.0011344173425776307,
+      "minNormalAgreement": 0.999815196100535,
+      "minNormalLength": 0.9788303414292446,
+      "maxNormalLength": 1.0000000296227312
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.00030582413729525996,
+      "minNormalAgreement": 0.9998148153808613,
+      "minNormalLength": 0.9788174081579306,
+      "maxNormalLength": 0.9970374399938492
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.00012270830596404928,
+      "minNormalAgreement": 0.9999963658684187,
+      "minNormalLength": 0.9818862576369585,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0.25,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.0011538124873262678,
+      "minNormalAgreement": 0.9997605444694628,
+      "minNormalLength": 0.9762591372745193,
+      "maxNormalLength": 1.0000000296227312
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.00031102457778864627,
+      "minNormalAgreement": 0.9997600457708826,
+      "minNormalLength": 0.9762446139372061,
+      "maxNormalLength": 0.9966813369338533
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.00012447480779313288,
+      "minNormalAgreement": 0.9999953851098717,
+      "minNormalLength": 0.9796901066038117,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0.3,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.0011737213962733479,
+      "minNormalAgreement": 0.9997102153226967,
+      "minNormalLength": 0.9742546204339811,
+      "maxNormalLength": 1.0000000296227312
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.0003163633311037259,
+      "minNormalAgreement": 0.9997096054417485,
+      "minNormalLength": 0.974238854483857,
+      "maxNormalLength": 0.9964042798703886
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.00012623046173548003,
+      "minNormalAgreement": 0.9999945275897665,
+      "minNormalLength": 0.9779785795413637,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0.35,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.0011941514780476072,
+      "minNormalAgreement": 0.9996680492293617,
+      "minNormalLength": 0.9728202939276132,
+      "maxNormalLength": 1.0000000296227312
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.0003218423663752292,
+      "minNormalAgreement": 0.9996673435349813,
+      "minNormalLength": 0.9728036371986126,
+      "maxNormalLength": 0.9962063347544078
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.00012797543045473927,
+      "minNormalAgreement": 0.9999938583304643,
+      "minNormalLength": 0.9767542240140958,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0.4,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.001215109633666996,
+      "minNormalAgreement": 0.9996373257778322,
+      "minNormalLength": 0.9719586820607808,
+      "maxNormalLength": 1.0000000296227312
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.00032746351631587596,
+      "minNormalAgreement": 0.9996365473210312,
+      "minNormalLength": 0.9719414895578337,
+      "maxNormalLength": 0.9960875487499099
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.0001297098807096374,
+      "minNormalAgreement": 0.9999934263487528,
+      "minNormalLength": 0.9760188734037334,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0.45,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.0012366022692071191,
+      "minNormalAgreement": 0.9996205950511508,
+      "minNormalLength": 0.9716713083675605,
+      "maxNormalLength": 1.0000000296227312
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.00033322848066985,
+      "minNormalAgreement": 0.9996197732212783,
+      "minNormalLength": 0.971653937015216,
+      "maxNormalLength": 0.9960479501778046
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.00013143398321662742,
+      "minNormalAgreement": 0.9999932630335657,
+      "minNormalLength": 0.9757736332646457,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0.5,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.0012586353098377313,
+      "minNormalAgreement": 0.9996195147201457,
+      "minNormalLength": 0.971958682193641,
+      "maxNormalLength": 1.0000000296227312
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.0003391388291753252,
+      "minNormalAgreement": 0.9996186834353007,
+      "minNormalLength": 0.9719414895592512,
+      "maxNormalLength": 0.9960875484821692
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.00013314791252585476,
+      "minNormalAgreement": 0.99999338099157,
+      "minNormalLength": 0.9760188730408657,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0.55,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.001281214213718089,
+      "minNormalAgreement": 0.999634699986068,
+      "minNormalLength": 0.9728202941930983,
+      "maxNormalLength": 1.0000000296227312
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.00034519600772539306,
+      "minNormalAgreement": 0.9996338954353075,
+      "minNormalLength": 0.9728036372014457,
+      "maxNormalLength": 0.9962063342189903
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.000134851846908871,
+      "minNormalAgreement": 0.9999937734126688,
+      "minNormalLength": 0.9767542232889064,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0.6,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.0013043439939568419,
+      "minNormalAgreement": 0.9996655939868733,
+      "minNormalLength": 0.9742546208316227,
+      "maxNormalLength": 1.0000000296227312
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.00035140134233036706,
+      "minNormalAgreement": 0.9996648519656156,
+      "minNormalLength": 0.9742388544881001,
+      "maxNormalLength": 0.9964042790674218
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.000136545968256709,
+      "minNormalAgreement": 0.9999944139871475,
+      "minNormalLength": 0.9779785784549415,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0.65,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.0013280292306235245,
+      "minNormalAgreement": 0.9997103662814688,
+      "minNormalLength": 0.9762591378036194,
+      "maxNormalLength": 1.0000000296227312
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.00035775604262674353,
+      "minNormalAgreement": 0.9997097191881703,
+      "minNormalLength": 0.9762446139428518,
+      "maxNormalLength": 0.9966813358635288
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.00013823046198709806,
+      "minNormalAgreement": 0.9999952573825915,
+      "minNormalLength": 0.9796901051577793,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0.7,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.0013522740906907243,
+      "minNormalAgreement": 0.9997658465960344,
+      "minNormalLength": 0.9788303420888825,
+      "maxNormalLength": 1.0000000296227312
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.00036426120748734935,
+      "minNormalAgreement": 0.9997653201848402,
+      "minNormalLength": 0.9788174081649693,
+      "maxNormalLength": 0.9970374386564212
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.00013990551695974073,
+      "minNormalAgreement": 0.9999962402729827,
+      "minNormalLength": 0.9818862558334612,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0.75,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.0013770823466949572,
+      "minNormalAgreement": 0.9998275001164443,
+      "minNormalLength": 0.9819637822028295,
+      "maxNormalLength": 1.0000000296227312
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.0003709178300698452,
+      "minNormalAgreement": 0.9998271101252721,
+      "minNormalLength": 0.9819527801362788,
+      "maxNormalLength": 0.9974725027866258
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.00014157132539869194,
+      "minNormalAgreement": 0.9999972828729977,
+      "minNormalLength": 0.9845637875061856,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0.8,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.0014024573957315547,
+      "minNormalAgreement": 0.999889449232513,
+      "minNormalLength": 0.9856540960386704,
+      "maxNormalLength": 1.0000000296227312
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.0003777268029519611,
+      "minNormalAgreement": 0.9998891980268714,
+      "minNormalLength": 0.9856453611335898,
+      "maxNormalLength": 0.9979864249864737
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.000143228082820992,
+      "minNormalAgreement": 0.9999982909283843,
+      "minNormalLength": 0.9877187853664001,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0.85,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.0014284022786227807,
+      "minNormalAgreement": 0.9999445448111769,
+      "minNormalLength": 0.9898950555654907,
+      "maxNormalLength": 1.0000000296227312
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.00038468892331022943,
+      "minNormalAgreement": 0.9999444181989117,
+      "minNormalLength": 0.9898889155087961,
+      "maxNormalLength": 0.9985790835022327
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.00014487598797079514,
+      "minNormalAgreement": 0.9999991580876317,
+      "minNormalLength": 0.9913466907626758,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0.9,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.0014549196991121849,
+      "minNormalAgreement": 0.9999844878650997,
+      "minNormalLength": 0.9946796175370632,
+      "maxNormalLength": 1.0000000296227312
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.0003918048981027191,
+      "minNormalAgreement": 0.9999844522442719,
+      "minNormalLength": 0.9946763914894203,
+      "maxNormalLength": 0.9992503382376435
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.00014651524275831703,
+      "minNormalAgreement": 0.9999997685651119,
+      "minNormalLength": 0.9954423331513579,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 0.95,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_ForwardLiner",
+      "minimumTriangleAreaM2": 0.0018308500373880824,
+      "minNormalAgreement": 0.9999999999995769,
+      "minNormalLength": 0.9999999698142346,
+      "maxNormalLength": 1.0000000356277707
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_ForwardSwivelShell",
+      "minimumTriangleAreaM2": 0.0017674754782218219,
+      "minNormalAgreement": 0.999999999999312,
+      "minNormalLength": 0.9999999588552796,
+      "maxNormalLength": 1.0000000387380237
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_ForwardBearingRings",
+      "minimumTriangleAreaM2": 0.0003762690434133631,
+      "minNormalAgreement": 0.9999999999991912,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_MiddleLiner",
+      "minimumTriangleAreaM2": 0.001263718915947066,
+      "minNormalAgreement": 0.9999999999993661,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_MiddleSwivelShell",
+      "minimumTriangleAreaM2": 0.0009205342163675696,
+      "minNormalAgreement": 0.9999999999991885,
+      "minNormalLength": 0.9999999733739884,
+      "maxNormalLength": 1.000000028968966
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_MiddleBearingRings",
+      "minimumTriangleAreaM2": 0.0003762689579291242,
+      "minNormalAgreement": 0.9999999999989084,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_AftLiner",
+      "minimumTriangleAreaM2": 0.0014604842312799166,
+      "minNormalAgreement": 0.9999999999996202,
+      "minNormalLength": 0.9999999612863643,
+      "maxNormalLength": 1.0000000408882244
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_AftSwivelShell",
+      "minimumTriangleAreaM2": 0.0013913871525663216,
+      "minNormalAgreement": 0.9999999999991832,
+      "minNormalLength": 0.999999962761538,
+      "maxNormalLength": 1.0000000385813932
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_AftBearingRings",
+      "minimumTriangleAreaM2": 0.00037626899743823105,
+      "minNormalAgreement": 0.9999999999978664,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_FlowPath",
+      "minimumTriangleAreaM2": 0.0014820120429525118,
+      "minNormalAgreement": 0.9999999999996517,
+      "minNormalLength": 0.9999999661980766,
+      "maxNormalLength": 1.0000000354041685
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_SlidingSeals",
+      "minimumTriangleAreaM2": 0.0003990753492201778,
+      "minNormalAgreement": 0.9999999999914899,
+      "minNormalLength": 0.9999999673194209,
+      "maxNormalLength": 1.000000031519249
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_OuterPanels",
+      "minimumTriangleAreaM2": 0.0001481460522029977,
+      "minNormalAgreement": 0.9999999999984389,
+      "minNormalLength": 0.9999999654984042,
+      "maxNormalLength": 1.0000000283219765
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_NozzleActuators",
+      "minimumTriangleAreaM2": 0.00024199966955196217,
+      "minNormalAgreement": 1,
+      "minNormalLength": 1,
+      "maxNormalLength": 1
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_NozzleCollar",
+      "minimumTriangleAreaM2": 0.0005235051333888627,
+      "minNormalAgreement": 0.9999999999992378,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_AugmentorLiner",
+      "minimumTriangleAreaM2": 0.01226965098102432,
+      "minNormalAgreement": 0.9999999999996856,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_CoreFacingAnnulus",
+      "minimumTriangleAreaM2": 0.00032701535247015023,
+      "minNormalAgreement": 0.9999999999962056,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.000000028110732
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_Centerbody",
+      "minimumTriangleAreaM2": 0.000016318076003534787,
+      "minNormalAgreement": 0.9999999999995606,
+      "minNormalLength": 0.9999999747221657,
+      "maxNormalLength": 1.000000023613903
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_InletLip",
+      "minimumTriangleAreaM2": 0.0006573662851554474,
+      "minNormalAgreement": 0.999999999999706,
+      "minNormalLength": 0.999999966009255,
+      "maxNormalLength": 1.0000000273147278
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_FanFace",
+      "minimumTriangleAreaM2": 0.00001248636725518881,
+      "minNormalAgreement": 0.9999999999991678,
+      "minNormalLength": 0.9999999717164982,
+      "maxNormalLength": 1.0000000280721215
+    },
+    {
+      "aperture": 1,
+      "mesh": "F135_IntakeOccluder",
+      "minimumTriangleAreaM2": 0.000017789646265994287,
+      "minNormalAgreement": 0.9999999999994873,
+      "minNormalLength": 0.999999987635341,
+      "maxNormalLength": 1.0000000305382428
+    }
+  ],
+  "poses": [
+    {
+      "pitchDeg": 0,
+      "yawDeg": -10,
+      "bearingsRad": [
+        0.17453292519943295,
+        0,
+        0
+      ],
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "exitLocalMeters": [
+        5.4667812111175885e-17,
+        9.639410251501298e-18,
+        1.59
+      ],
+      "directionError": 0,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 0,
+      "bearingsRad": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "exitLocalMeters": [
+        5.551115123125783e-17,
+        0,
+        1.59
+      ],
+      "directionError": 0,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 10,
+      "bearingsRad": [
+        -0.17453292519943295,
+        0,
+        0
+      ],
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "exitLocalMeters": [
+        5.4667812111175885e-17,
+        -9.639410251501298e-18,
+        1.59
+      ],
+      "directionError": 0,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 10,
+      "yawDeg": -10,
+      "bearingsRad": [
+        0.07514232700033156,
+        0.21703525863741638,
+        -0.21703525863741638
+      ],
+      "direction": [
+        0.030153689607045793,
+        -0.1710100716628344,
+        0.984807753012208
+      ],
+      "exitLocalMeters": [
+        0.0322920916064906,
+        -0.18313755204531956,
+        1.5755638900841706
+      ],
+      "directionError": 8.391472671209643e-17,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 10,
+      "yawDeg": 0,
+      "bearingsRad": [
+        -0.09939059819910138,
+        0.21703525863741638,
+        -0.21703525863741638
+      ],
+      "direction": [
+        -2.0816681711721685e-17,
+        -0.1736481776669304,
+        0.984807753012208
+      ],
+      "exitLocalMeters": [
+        3.8163916471489756e-17,
+        -0.18596274398242818,
+        1.5755638900841706
+      ],
+      "directionError": 5.928593550334434e-17,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 10,
+      "yawDeg": 10,
+      "bearingsRad": [
+        -0.2739235233985343,
+        0.21703525863741638,
+        -0.21703525863741638
+      ],
+      "direction": [
+        -0.030153689607045824,
+        -0.1710100716628344,
+        0.984807753012208
+      ],
+      "exitLocalMeters": [
+        -0.03229209160649052,
+        -0.18313755204531962,
+        1.5755638900841706
+      ],
+      "directionError": 8.582937747229195e-17,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": -10,
+      "bearingsRad": [
+        -0.07700952175561401,
+        0.5474321582526632,
+        -0.5474321582526632
+      ],
+      "direction": [
+        0.07338689100003826,
+        -0.4161977407267834,
+        0.9063077870366499
+      ],
+      "exitLocalMeters": [
+        0.07895160490696874,
+        -0.44775680153853237,
+        1.5008575466579877
+      ],
+      "directionError": 1.3877787807814457e-17,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": 0,
+      "bearingsRad": [
+        -0.25154244695504696,
+        0.5474321582526632,
+        -0.5474321582526632
+      ],
+      "direction": [
+        1.3877787807814457e-17,
+        -0.42261826174069933,
+        0.9063077870366499
+      ],
+      "exitLocalMeters": [
+        -3.469446951953614e-17,
+        -0.4546641719350699,
+        1.5008575466579877
+      ],
+      "directionError": 1.1188630228279524e-16,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": 10,
+      "bearingsRad": [
+        -0.4260753721544799,
+        0.5474321582526632,
+        -0.5474321582526632
+      ],
+      "direction": [
+        -0.0733868910000382,
+        -0.4161977407267834,
+        0.9063077870366499
+      ],
+      "exitLocalMeters": [
+        -0.07895160490696881,
+        -0.4477568015385324,
+        1.5008575466579877
+      ],
+      "directionError": 4.163336342344337e-17,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": -10,
+      "bearingsRad": [
+        -0.29454359001092023,
+        1.0113534149170953,
+        -1.0113534149170953
+      ],
+      "direction": [
+        0.12278780396897282,
+        -0.6963642403200188,
+        0.7071067811865476
+      ],
+      "exitLocalMeters": [
+        0.13381097200793884,
+        -0.758879732813998,
+        1.3103608039902523
+      ],
+      "directionError": 1.1102230246251565e-16,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 0,
+      "bearingsRad": [
+        -0.46907651521035315,
+        1.0113534149170953,
+        -1.0113534149170953
+      ],
+      "direction": [
+        0,
+        -0.7071067811865472,
+        0.7071067811865476
+      ],
+      "exitLocalMeters": [
+        0,
+        -0.7705866759200775,
+        1.3103608039902523
+      ],
+      "directionError": 2.220446049250313e-16,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 10,
+      "bearingsRad": [
+        -0.6436094404097861,
+        1.0113534149170953,
+        -1.0113534149170953
+      ],
+      "direction": [
+        -0.12278780396897276,
+        -0.6963642403200188,
+        0.7071067811865476
+      ],
+      "exitLocalMeters": [
+        -0.1338109720079388,
+        -0.758879732813998,
+        1.3103608039902523
+      ],
+      "directionError": 1.2412670766236366e-16,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": -10,
+      "bearingsRad": [
+        -0.5495166296727162,
+        1.5362877945969207,
+        -1.5362877945969207
+      ],
+      "direction": [
+        0.15737869562426277,
+        -0.8925389352890303,
+        0.42261826174069916
+      ],
+      "exitLocalMeters": [
+        0.17540884433641712,
+        -0.9947929898852752,
+        1.0356010512349654
+      ],
+      "directionError": 4.475452091311811e-16,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": 0,
+      "bearingsRad": [
+        -0.7240495548721492,
+        1.5362877945969207,
+        -1.5362877945969207
+      ],
+      "direction": [
+        0,
+        -0.9063077870366502,
+        0.42261826174069916
+      ],
+      "exitLocalMeters": [
+        0,
+        -1.010139275246895,
+        1.0356010512349654
+      ],
+      "directionError": 3.554447978966673e-16,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": 10,
+      "bearingsRad": [
+        -0.8985824800715821,
+        1.5362877945969207,
+        -1.5362877945969207
+      ],
+      "direction": [
+        -0.15737869562426265,
+        -0.8925389352890303,
+        0.42261826174069916
+      ],
+      "exitLocalMeters": [
+        -0.175408844336417,
+        -0.9947929898852752,
+        1.0356010512349654
+      ],
+      "directionError": 4.335559509131368e-16,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 85,
+      "yawDeg": -10,
+      "bearingsRad": [
+        -0.9093774866649804,
+        2.2391519587430806,
+        -2.2391519587430806
+      ],
+      "direction": [
+        0.17298739392508955,
+        -0.9810602621904068,
+        0.08715574274765825
+      ],
+      "exitLocalMeters": [
+        0.199890740990824,
+        -1.1336367252911719,
+        0.7062323881494159
+      ],
+      "directionError": 1.9229626863835638e-16,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 85,
+      "yawDeg": 0,
+      "bearingsRad": [
+        -1.0839104118644134,
+        2.2391519587430806,
+        -2.2391519587430806
+      ],
+      "direction": [
+        5.551115123125783e-17,
+        -0.9961946980917453,
+        0.08715574274765825
+      ],
+      "exitLocalMeters": [
+        1.1102230246251565e-16,
+        -1.1511248990716658,
+        0.7062323881494159
+      ],
+      "directionError": 2.5438405243138006e-16,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 85,
+      "yawDeg": 10,
+      "bearingsRad": [
+        -1.2584433370638464,
+        2.2391519587430806,
+        -2.2391519587430806
+      ],
+      "direction": [
+        -0.17298739392508938,
+        -0.9810602621904068,
+        0.08715574274765825
+      ],
+      "exitLocalMeters": [
+        -0.19989074099082382,
+        -1.1336367252911719,
+        0.7062323881494159
+      ],
+      "directionError": 1.6653345369377348e-16,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": -10,
+      "bearingsRad": [
+        -1.052141113389796,
+        2.507650944302505,
+        -2.507650944302505
+      ],
+      "direction": [
+        0.17364817766693041,
+        -0.9848077530122079,
+        -1.1102230246251565e-16
+      ],
+      "exitLocalMeters": [
+        0.20306613336865925,
+        -1.1516452703537419,
+        0.6194112549695426
+      ],
+      "directionError": 2.212034386691903e-16,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 0,
+      "bearingsRad": [
+        -1.226674038589229,
+        2.507650944302505,
+        -2.507650944302505
+      ],
+      "direction": [
+        5.551115123125783e-17,
+        -0.9999999999999999,
+        -1.1102230246251565e-16
+      ],
+      "exitLocalMeters": [
+        5.551115123125783e-17,
+        -1.1694112549695428,
+        0.6194112549695426
+      ],
+      "directionError": 2.1231839625972065e-16,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 10,
+      "bearingsRad": [
+        -1.401206963788662,
+        2.507650944302505,
+        -2.507650944302505
+      ],
+      "direction": [
+        -0.1736481776669303,
+        -0.9848077530122079,
+        -1.1102230246251565e-16
+      ],
+      "exitLocalMeters": [
+        -0.20306613336865914,
+        -1.1516452703537416,
+        0.6194112549695426
+      ],
+      "directionError": 2.068042201141821e-16,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": -10,
+      "bearingsRad": [
+        -1.3962634015954636,
+        3.141592653589793,
+        -3.141592653589793
+      ],
+      "direction": [
+        0.17298739392508944,
+        -0.9810602621904067,
+        -0.08715574274765825
+      ],
+      "exitLocalMeters": [
+        0.20503243262448295,
+        -1.162796707575223,
+        0.5319440331749605
+      ],
+      "directionError": 2.2247786310271853e-16,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 0,
+      "bearingsRad": [
+        -1.5707963267948966,
+        3.141592653589793,
+        -3.141592653589793
+      ],
+      "direction": [
+        -5.643918332686555e-18,
+        -0.9961946980917453,
+        -0.08715574274765825
+      ],
+      "exitLocalMeters": [
+        -6.689425622457491e-18,
+        -1.1807347210850083,
+        0.5319440331749605
+      ],
+      "directionError": 2.225494403158498e-16,
+      "inside95DegreeCone": true
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 10,
+      "bearingsRad": [
+        -1.7453292519943295,
+        3.141592653589793,
+        -3.141592653589793
+      ],
+      "direction": [
+        -0.17298739392508944,
+        -0.9810602621904067,
+        -0.08715574274765825
+      ],
+      "exitLocalMeters": [
+        -0.205032432624483,
+        -1.162796707575223,
+        0.5319440331749605
+      ],
+      "directionError": 2.2247786310271853e-16,
+      "inside95DegreeCone": true
+    }
+  ],
+  "jointCoverage": [
+    {
+      "pitchDeg": 0,
+      "yawDeg": -10,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": -10,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": -10,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": -10,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 0,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 0,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 0,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 0,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 10,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 10,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 10,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 10,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 10,
+      "yawDeg": -10,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 10,
+      "yawDeg": -10,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 10,
+      "yawDeg": -10,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 10,
+      "yawDeg": -10,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 10,
+      "yawDeg": 0,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 10,
+      "yawDeg": 0,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 10,
+      "yawDeg": 0,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 10,
+      "yawDeg": 0,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 10,
+      "yawDeg": 10,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 10,
+      "yawDeg": 10,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 10,
+      "yawDeg": 10,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 10,
+      "yawDeg": 10,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": -10,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": -10,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": -10,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": -10,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": 0,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": 0,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": 0,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": 0,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": 10,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": 10,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": 10,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": 10,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": -10,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": -10,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": -10,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": -10,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 0,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 0,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 0,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 0,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 10,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 10,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 10,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 10,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": -10,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": -10,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": -10,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": -10,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": 0,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": 0,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": 0,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": 0,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": 10,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": 10,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": 10,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": 10,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 85,
+      "yawDeg": -10,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 85,
+      "yawDeg": -10,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 85,
+      "yawDeg": -10,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 85,
+      "yawDeg": -10,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 85,
+      "yawDeg": 0,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 85,
+      "yawDeg": 0,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 85,
+      "yawDeg": 0,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 85,
+      "yawDeg": 0,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 85,
+      "yawDeg": 10,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 85,
+      "yawDeg": 10,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 85,
+      "yawDeg": 10,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 85,
+      "yawDeg": 10,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": -10,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": -10,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": -10,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": -10,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 0,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 0,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 0,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 0,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 10,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 10,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 10,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 10,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": -10,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": -10,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": -10,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": -10,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 0,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 0,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 0,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 0,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 10,
+      "joint": "F135_Bearing1",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 10,
+      "joint": "F135_Bearing2",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 10,
+      "joint": "F135_Bearing3",
+      "rays": 192,
+      "misses": 0
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 10,
+      "joint": "F135_Nozzle",
+      "rays": 192,
+      "misses": 0
+    }
+  ],
+  "views": [
+    "installed-rear-aperture-0.svg",
+    "installed-oblique-aperture-0.svg",
+    "installed-rear-aperture-0.5.svg",
+    "installed-oblique-aperture-0.5.svg",
+    "installed-rear-aperture-1.svg",
+    "installed-oblique-aperture-1.svg",
+    "full-front.svg",
+    "full-side.svg",
+    "full-oblique.svg",
+    "full-converted.svg"
+  ],
+  "errors": [],
+  "qualification": {
+    "verified": [
+      "Actual exported continuous flow wall angular coverage and welded interior topology at 21 aperture positions",
+      "Nondegenerate triangles, finite unit endpoint normals and non-inverted interpolated morph normals at all sampled aperture positions",
+      "Bit-identical full/installed shared meshes and materials",
+      "Compound direction and exhaust origin from the authored three-bearing hierarchy",
+      "Radial-ray coverage across all four actual exported mating rings at three axial seal offsets"
+    ],
+    "unqualified": [
+      "Photorealism, radiance, exposure, reference-image camera matching and GPU pixels",
+      "Measured PW-600 dimensions, actuator and area schedules",
+      "Airframe intersection and rigid segment self-intersection require separate check"
+    ]
+  }
+}

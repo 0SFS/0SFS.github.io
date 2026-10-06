@@ -61,6 +61,8 @@ Location content uses `LocationPanel` from `foss-earth/windowing`. Its structure
 
 The shared overlay supplies the Location tab with coordinate entry and its existing Nominatim place search. Hosts can override the search provider through `FlightSimAppOptions.locationSearchProvider`.
 
+FOSS Earth also owns Location's device persistence: search text, results and loaded nearby-airport groups, coordinate entries, selected airport, Departure/Arrival and runway survive closing the tab or reloading without a lookup or flight reset. The results retain group expansion and previously resolved airport details. Its built-in place, nearby-airport, runway and elevation lookups share a persistent response cache controlled by Interface → Search. 0SFS receives the restored runway preset only when the user presses Go.
+
 Flight controls, JSBSim integration, aircraft behavior, instruments, and flight-specific UI remain local to 0SFS.
 
 ## Updating From Upstream

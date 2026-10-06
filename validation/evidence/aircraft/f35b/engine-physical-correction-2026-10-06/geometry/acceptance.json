@@ -1,0 +1,164 @@
+{
+  "status": "passed terminal geometry; flight-render appearance unqualified",
+  "profile": "f135-pw600-rigid-aperture-v2",
+  "rigTransformCount": 112,
+  "rigidMeshCount": 128,
+  "rejection": [
+    {
+      "mesh": "F135_FlowPath",
+      "maxEdgeStrain": 0.4125002001645439,
+      "baseAreaM2": 1.5292137664933052,
+      "openAreaM2": 1.7949283841791692,
+      "areaRatio": 1.1737589756958464,
+      "rigidAcceptancePassed": false
+    },
+    {
+      "mesh": "F135_SlidingSeals",
+      "maxEdgeStrain": 0.4094303592757651,
+      "baseAreaM2": 0.21761055512473343,
+      "openAreaM2": 0.26492116369521485,
+      "areaRatio": 1.2174095302654928,
+      "rigidAcceptancePassed": false
+    },
+    {
+      "mesh": "F135_OuterPanels",
+      "maxEdgeStrain": 0.4054057181495898,
+      "baseAreaM2": 1.665001787015076,
+      "openAreaM2": 1.9028746868575455,
+      "areaRatio": 1.1428664531759543,
+      "rigidAcceptancePassed": false
+    }
+  ],
+  "sweep": {
+    "apertures": 21,
+    "convertedYawPosesPerAperture": 24,
+    "rigidPoses": 504,
+    "wallRays": 134400,
+    "wallMisses": 0,
+    "leafSelfIntersections": 0,
+    "maximumEdgeLengthChangeMeters": 1.186550857568136e-15,
+    "maximumTriangleAreaChangeM2": 2.5673907444456745e-16,
+    "maximumClosedSolidSignedVolumeChangeM3": 2.524564758632497e-16,
+    "minimumSealEdgeOverlapMeters": 0.009237272637031661,
+    "maximumSealPlaneErrorMeters": 1.3877787807814457e-16,
+    "maximumMainHingeErrorMeters": 7.850462293418876e-17
+  },
+  "runtimeValidation": {
+    "files": 2,
+    "tests": 7,
+    "productionRigComparison": {
+      "states": 168,
+      "parts": 112,
+      "basisPointsPerPart": 4,
+      "worldPositionToleranceMeters": 2e-06
+    },
+    "lastFocusedCheckBeforeFinalEdit": "Only the 16 external fairing seal windings changed afterward; final actual-export normals/coverage/rigidity and bytecheck pass. Parent final related checks/CI cover final bytes."
+  },
+  "areaMeaning": "Actual geometry sections at throat hinge and primary divergent flap tips; not a calibrated aerodynamic A8/A9 schedule. Seals extend slightly beyond divergent tips, so the terminal boundary is staggered.",
+  "massMeaning": "Nominal geometry-only estimate from declared 8200 kg/m3 density and thickness; no actual alloy/mass calibration. Surface seals do not have a physical closed volume; declared mass uses surface area times thickness. Unrelated to native effective lumped heat capacities.",
+  "nominalMovingMetalMassKg": 52.581586993777776,
+  "independentAreaIntegral": "512 radial rays into actual exported surfaces; polygonal area error <0.01%, evaluated 10 micrometres either side of exact shared triangle-edge planes.",
+  "clearanceReport": "clearance-report.json",
+  "sourceInputs": [
+    {
+      "path": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/geometry/source/build-f135-engine.mjs.txt",
+      "sha256": "f3368f25f92d283992d326b8903bc76b1491b5fe2366b7c4be2a5523892a7a74",
+      "originalPath": "scripts/build-f135-engine.mjs"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/geometry/source/build-f135-engine.test.mjs.txt",
+      "sha256": "20264cbc754d9647aebf1a16d2b669f92238bcf158fa846d3860a39fc33f9c27",
+      "originalPath": "scripts/build-f135-engine.test.mjs"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/geometry/source/check-f135-clearance.mjs.txt",
+      "sha256": "fd2ea97bc8ebeaf5ac533f5285e454d4897e63d5417420e6dd62e5d7bb5ff8d5",
+      "originalPath": "scripts/validation/f35b/check-f135-clearance.mjs"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/geometry/source/check-f135-reconstruction.mjs.txt",
+      "sha256": "d4c39b7b7c0274dd0610f95952f4314dd935a15857f7e744bd9348191dfa5738",
+      "originalPath": "scripts/validation/f35b/check-f135-reconstruction.mjs"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/geometry/source/engineNozzleRig.test.ts.txt",
+      "sha256": "af6109ba21f78858151715335ee8ba0f49b0321f0bf4dab6681f9f59141c29e8",
+      "originalPath": "src/flight/aircraft/engineNozzleRig.test.ts"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/geometry/source/engineNozzleRig.ts.txt",
+      "sha256": "0c070c616f6b9508de3cba5ccd24818b9ad679bb938e9d86acf1287f381f0996",
+      "originalPath": "src/flight/aircraft/engineNozzleRig.ts"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/geometry/source/f135EngineData.ts.txt",
+      "sha256": "08545c3e51892acb63ea27c8283445aef1a1e4d1a432768af1b492ba0fd48ddb",
+      "originalPath": "src/flight/aircraft/generated/f135EngineData.ts"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/geometry/source/glb.mjs.txt",
+      "sha256": "cb9d81855febdd817579c76f6a944359fc352786b46b049007a90b00a56fff10",
+      "originalPath": "scripts/f135Engine/glb.mjs"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/geometry/source/mechanism.mjs.txt",
+      "sha256": "8b5b7870f02a7b2d49ab862a0f2fa573983f11e1152c0f5df85443c1f2b26e76",
+      "originalPath": "scripts/f135Engine/mechanism.mjs"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/geometry/source/profile.json",
+      "sha256": "fd31d20c7e4ff1bf39887f2af9ebfade6f2174b591c38ad2be6c21a01f37d1f5",
+      "originalPath": "scripts/f135Engine/profile.json"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/geometry/source/source.mjs.txt",
+      "sha256": "6a57b46fcdbd2abf90c617ab59cc16944428e77b4fd3787deed890f7eb36d3cb",
+      "originalPath": "scripts/f135Engine/source.mjs"
+    }
+  ],
+  "artifacts": [
+    {
+      "variant": "installed",
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-installed.glb",
+      "sha256": "4e7d837e2ab5303ab9d90a3b3321baa469e5fc204acad7e0b2f59185990aa341"
+    },
+    {
+      "variant": "full",
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-full.glb",
+      "sha256": "0fc8083a3a4d5d5d76946ea3602d4a23ebc508e58301145e489c59c1801ff71f"
+    }
+  ],
+  "unqualified": [
+    "Photorealism, radiance, exposure and GPU pixels",
+    "Measured PW-600 dimensions, actuator schedule, actual alloy density and thickness",
+    "Declared nominal plate mass is a geometric hypothesis; native thermal capacity is an independent effective lumped parameter",
+    "Airframe and nonadjacent rigid assembly intersection use the separate clearance check"
+  ],
+  "clearance": {
+    "cases": 150,
+    "failures": [],
+    "engineAirframeIntersections": 0,
+    "grossSwivelFairingIntersections": 0,
+    "openedDoorFuselageIntersections": 0,
+    "preservedClosedSourceSeam": "The unmodified fully closed authored doors retain two triangle crossings with fuselage, maximum door-vertex straddle5.676mm. This baseline source seam is not changed or qualified as a physical fit."
+  },
+  "retainedReportHashes": [
+    {
+      "path": "geometry-report.json",
+      "sha256": "69924f66b5c46326625a520ec4ec3d5c29d9d9597cd784691290eeaecdd295be"
+    },
+    {
+      "path": "clearance-report.json",
+      "sha256": "bc97dc27ee7cdca98587c04619c0a20fa55824506a2bed156252fbb751cfef6e"
+    },
+    {
+      "path": "rejected-morph-measurements.json",
+      "sha256": "0359648e727d4e49f4d5ce75e5aa5a9ccdaf3d4cb3b4416639b32d16fcd9e971"
+    },
+    {
+      "path": "manifest.json",
+      "sha256": "193593ec1fe14f40c92f07ca11d408cde040d2b79b823e22f60345553e00f29f"
+    }
+  ],
+  "archiveRepair": "Retained code snapshots use .txt suffixes, preserving their exact bytes, to exclude archived test copies from Vitest discovery. Full CI had executed two archived snapshots before this naming repair; the parent receipt records the unchanged active test results."
+}

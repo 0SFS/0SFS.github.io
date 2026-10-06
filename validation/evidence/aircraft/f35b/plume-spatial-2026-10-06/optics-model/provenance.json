@@ -1,0 +1,103 @@
+{
+  "recordedDate": "2026-10-06",
+  "status": "model and bake frozen; final runtime default change covered by root final related/CI, not this earlier focused run",
+  "ownership": "0sfs aircraft optical approximation; no engine heat/transport dynamics added",
+  "defaultFieldSamples": {
+    "axial": 64,
+    "radial": 32,
+    "rgbaFloat32Bytes": 32768
+  },
+  "checks": [
+    {
+      "command": "npx vitest run src/flight/aircraft/engineGasOptics.test.ts src/flight/aircraft/engineExhaustProfiles.test.ts scripts/build-exhaust-optics.test.mjs --maxWorkers=50%",
+      "log": "focused.log",
+      "result": "passed",
+      "files": 3,
+      "tests": 13,
+      "limit": "Executed before the final default-only change from 32x16 to shared 64x32 constants and its resource assertion. Root final related/CI covers those."
+    },
+    {
+      "log": "lint.log",
+      "result": "passed",
+      "limit": "Same pre-default-change source checkpoint as focused tests; final lint is in combined acceptance.",
+      "description": "Targeted ESLint check of owned optics code. The successful empty log does not embed its command; the combined final lint is authoritative."
+    },
+    {
+      "command": "node scripts/build-exhaust-optics.mjs --install",
+      "log": "bake.log",
+      "result": "passed",
+      "limit": "No model parameters or generator code changed after this bake."
+    }
+  ],
+  "inputsAndOutputs": [
+    {
+      "path": "scripts/exhaustOptics/f135-visible-approximation.json",
+      "bytes": 14782,
+      "sha256": "788581df85e576b56bac25156e6cd27ade1c87e67148ca39bb48329102948a2f",
+      "snapshot": "optical-parameters.json"
+    },
+    {
+      "path": "scripts/exhaustOptics/bake.mjs",
+      "bytes": 21910,
+      "sha256": "0b3c82a6c06569a1d2361d7960e5d0bcca1555a88797b1f4debdf8180aa08901",
+      "snapshot": "bake.mjs.txt"
+    },
+    {
+      "path": "scripts/build-exhaust-optics.mjs",
+      "bytes": 7239,
+      "sha256": "e2f4b2559b041475786dfe7cdef32f1bf4b3463226b9671c0268fabdd2dde9ef",
+      "snapshot": "build-exhaust-optics.mjs.txt"
+    },
+    {
+      "path": "src/flight/aircraft/engineGasOptics.ts",
+      "bytes": 24987,
+      "sha256": "4c1f891eda1db2a041afe33c89758ef79dc31a204faa54da26e9200e027a2956",
+      "snapshot": "engineGasOptics.ts.txt"
+    },
+    {
+      "path": "scripts/exhaustOptics/data/CIE_xyz_1931_2deg.csv",
+      "bytes": 24021,
+      "sha256": "fa663e3535a7e0763a745993a1f0a192eb0275ac46ad2d1befd7626841e713c1",
+      "snapshot": null
+    },
+    {
+      "path": "scripts/exhaustOptics/data/CIE_xyz_1931_2deg.csv_metadata.json",
+      "bytes": 3787,
+      "sha256": "03abcaecf4e63d77045ef57c4514b52c8bb1a46dd18e1f93a50044a0f4f481c8",
+      "snapshot": null
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135ExhaustOpticalData.ts",
+      "bytes": 540162,
+      "sha256": "7fa9b0062dc5f70d3506a4cee22f2a2aa12a4ffa12cae83e13877f49160f09bb",
+      "snapshot": null
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json",
+      "bytes": 621651,
+      "sha256": "3da9c058348d432aca82b1f4f6a5b95163abe7484ae74e9d3cdec2e024e7e7c4",
+      "snapshot": null
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.png",
+      "bytes": 471,
+      "sha256": "d9d460fbfbfe3ec0d099659646a176fa892e2afa81713f92469d0c75f4c47189",
+      "snapshot": null
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-spatial.png",
+      "bytes": 24424,
+      "sha256": "27110d47433281963a653695116feb79cf80e314a6553c3c9c753f2f6a6a530e",
+      "snapshot": null
+    }
+  ],
+  "independentValidation": "../spatial-optics/report.json",
+  "combinedAcceptance": "../acceptance.json",
+  "limitations": [
+    "No browser, GPU, server or performance qualification.",
+    "Station static mapping, Mach, spatial particle loading and exterior excited-species production remain provisional; no F135 calibration.",
+    "6 m support can truncate nonzero residual opacity/source before authored 24-exit-radius fade.",
+    "Dry powered-lift night-glow mismatch is not solved by the new restrictive particle-temperature field.",
+    "Grid and ray convergence are separate from node spectral integration accuracy. See independent report."
+  ]
+}

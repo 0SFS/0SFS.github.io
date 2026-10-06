@@ -1,0 +1,42 @@
+(lldb) target create "build/master-20260925/tests/unit_tests/FGTurbineTemperatureTest1"
+Current executable set to '/Users/felg/gh/Felipegalind0/jsbsim/build/master-20260925/tests/unit_tests/FGTurbineTemperatureTest1' (arm64).
+(lldb) run
+Running cxxtest tests (3 tests)
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[2]/IdleThrust
+    Function: propulsion/engine[2]/MilThrust
+    Function: propulsion/engine[2]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+Process 75533 launched: '/Users/felg/gh/Felipegalind0/jsbsim/build/master-20260925/tests/unit_tests/FGTurbineTemperatureTest1' (arm64)
+Process 75533 stopped
+* thread #1, queue = 'com.apple.main-thread', stop reason = EXC_BAD_ACCESS (code=1, address=0x10)
+       frame #0: 0x00000001000166ac FGTurbineTemperatureTest1`SGRawValueMethods<JSBSim::FGStandardAtmosphere, double>::getValue() const + 32
+FGTurbineTemperatureTest1`SGRawValueMethods<JSBSim::FGStandardAtmosphere, double>::getValue:
+->  0x1000166ac <+32>: ldr    x1, [x8, w1, uxtw]
+    0x1000166b0 <+36>: br     x1
+    0x1000166b4 <+40>: movi.2d v0, #0000000000000000
+    0x1000166b8 <+44>: ret    
+Target 0: (FGTurbineTemperatureTest1) stopped.
+(lldb) thread backtrace
+* thread #1, queue = 'com.apple.main-thread', stop reason = EXC_BAD_ACCESS (code=1, address=0x10)
+   * frame #0: 0x00000001000166ac FGTurbineTemperatureTest1`SGRawValueMethods<JSBSim::FGStandardAtmosphere, double>::getValue() const + 32
+     frame #1: 0x000000010010aa84 FGTurbineTemperatureTest1`SGPropertyNode::untie() + 476
+     frame #2: 0x00000001000595d8 FGTurbineTemperatureTest1`JSBSim::FGPropertyManager::Unbind() + 72
+     frame #3: 0x000000010000dc1c FGTurbineTemperatureTest1`JSBSim::FGFDMExec::~FGFDMExec() + 48
+     frame #4: 0x0000000100008738 FGTurbineTemperatureTest1`FGTurbineTemperatureTest::testReadOnlyIndexedCelsiusGetter() + 712
+     frame #5: 0x000000010000ab40 FGTurbineTemperatureTest1`CxxTest::TestRunner::runTest(CxxTest::TestDescription&) + 104
+     frame #6: 0x000000010000aa50 FGTurbineTemperatureTest1`CxxTest::TestRunner::runSuite(CxxTest::SuiteDescription&) + 168
+     frame #7: 0x000000010000a938 FGTurbineTemperatureTest1`CxxTest::TestRunner::runWorld() + 200
+     frame #8: 0x000000010000a860 FGTurbineTemperatureTest1`CxxTest::TestRunner::runAllTests(CxxTest::TestListener&) + 104
+     frame #9: 0x0000000100001708 FGTurbineTemperatureTest1`int CxxTest::Main<CxxTest::ErrorPrinter>(CxxTest::ErrorPrinter&, int, char**) + 1580
+     frame #10: 0x0000000100001080 FGTurbineTemperatureTest1`main + 160
+     frame #11: 0x000000018f757e80 dyld`start + 6688

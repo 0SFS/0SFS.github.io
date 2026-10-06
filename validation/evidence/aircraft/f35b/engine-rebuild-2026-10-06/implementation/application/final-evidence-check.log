@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "sha256Checks": 42,
+  "finalDistributedGeometry": "matches final source exports",
+  "provenanceCorrection": "Manifest wording corrected to 5.44 m inlet-to-exit / 5.58 m with spinner. All GLBs unchanged; static distributed manifest synchronized without rebundling code.",
+  "manifestSha256": "cdebdd3cf80a5c25a83beb67d832d78b7b2abf183ca3bcbce7aeb65a6885fe1e"
+}

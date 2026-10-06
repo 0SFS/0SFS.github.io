@@ -1,0 +1,156 @@
+{
+  "schema": "0sfs-engine-orb-afterburner/1",
+  "date": "2026-10-06",
+  "owner": "0sfs",
+  "scope": "Afterburner blade accent on desktop and phone from the existing aircraft visual profile and cached native augmentation state.",
+  "color": {
+    "source": "f135-visible-approximation-v1 hudAccentHex",
+    "hex": "#ff9450",
+    "activation": "Only confirmed native augmentation via the existing engineVisuals batch; false or unknown restores the normal per-ring colors.",
+    "phone": "Optional afterburnerColor is a validated six-digit hex. Missing state restores normal colors.",
+    "brightness": "Existing rotor-local two-hotspot multiplier retained; no size or opacity change."
+  },
+  "rendering": {
+    "uniformBytes": 48,
+    "drawCallsPerChange": 1,
+    "extraNativeReads": 0,
+    "unchangedColor": "No repaint; repeated identical input also skips parsing.",
+    "colorOnlyChange": "Paints existing visible phases; preserves pending skipped motion, accepted timing and draw deadline."
+  },
+  "checks": [
+    {
+      "command": "npx tsc -b",
+      "status": "passed",
+      "log": "typecheck.log"
+    },
+    {
+      "command": "npm run lint",
+      "status": "passed",
+      "log": "lint.log"
+    },
+    {
+      "command": "npx vitest related --run src/flight/hud/engineSpoolRenderer.ts src/flight/hud/engineMonitor.ts src/flight/createFlightSimApp.ts src/flight/remote/engineStatus.ts src/remote/protocol.ts src/remote/PhoneEngine.tsx --maxWorkers=50%",
+      "status": "313 passed, one new F-35 app fixture failed before assertions because external tank visuals used a mocked scene. Mocked that visual boundary; production unchanged.",
+      "log": "related-tests.log"
+    },
+    {
+      "command": "npx vitest run src/flight/createFlightSimApp.phone.test.ts --maxWorkers=50%",
+      "status": "passed",
+      "tests": 16,
+      "log": "focused-tests.log"
+    },
+    {
+      "command": "node scripts/validation/audio/check-engine-orbs.mjs",
+      "status": "passed",
+      "cases": 12,
+      "accentRoundTrips": 3,
+      "log": "gpu-check.log",
+      "report": "gpu-report.json",
+      "preview": "afterburner-blades.png"
+    },
+    {
+      "command": "VITEST_MAX_WORKERS=5 npm run ci",
+      "status": "passed",
+      "files": 162,
+      "testsPassed": 1734,
+      "expectedFailures": 1,
+      "log": "ci.log"
+    }
+  ],
+  "gpu": {
+    "adapter": {
+      "vendor": "apple",
+      "architecture": "metal-3",
+      "device": "",
+      "description": ""
+    },
+    "backends": [
+      "webgpu",
+      "webgl2",
+      "webgl1"
+    ],
+    "accentRoundTrips": [
+      {
+        "backend": "webgpu",
+        "hex": "#ff9450",
+        "pass": true,
+        "unchangedActiveGeometryAndAlpha": true,
+        "unchangedRestoredGeometryAndAlpha": true
+      },
+      {
+        "backend": "webgl2",
+        "hex": "#ff9450",
+        "pass": true,
+        "unchangedActiveGeometryAndAlpha": true,
+        "unchangedRestoredGeometryAndAlpha": true
+      },
+      {
+        "backend": "webgl1",
+        "hex": "#ff9450",
+        "pass": true,
+        "unchangedActiveGeometryAndAlpha": true,
+        "unchangedRestoredGeometryAndAlpha": true
+      }
+    ],
+    "visualReview": "Native 68 CSS px preview inspected: F-35 outer and inner blades use the warm orange accent with retained opposite hotspots; other aircraft retain their normal palettes."
+  },
+  "limitations": "Untimed rendering correctness, not performance qualification. The GPU harness forces accent independently of its numeric readouts; cached native-state activation and desktop-to-phone propagation are tested separately. This change does not address the unreproduced shutdown-speed report.",
+  "sourceHashes": [
+    {
+      "file": "src/flight/hud/engineSpoolRenderer.ts",
+      "sha256": "f5e155c500778b168765403ac30aaca619f8d3639424b25ecb5143684587b64d"
+    },
+    {
+      "file": "src/flight/hud/engineSpoolRenderer.test.ts",
+      "sha256": "c6f273d3c7114a49dc069cd1e909f146f7f089a8127c5bfb2f9feb7f3937d2e1"
+    },
+    {
+      "file": "src/flight/hud/engineMonitor.ts",
+      "sha256": "d20b984feb224faa4824af016facb48eae1a8d58af0988cf5022025552f95c4c"
+    },
+    {
+      "file": "src/flight/hud/engineMonitor.test.ts",
+      "sha256": "1cb152032f5c5a993baccea9446ad8040cd289687dc07474132182fc1cf84a51"
+    },
+    {
+      "file": "src/flight/createFlightSimApp.ts",
+      "sha256": "0677fdaaba1cd3d00c36fd669d69ebdae17bf2e93fb19136c218067fb1e198c0"
+    },
+    {
+      "file": "src/flight/createFlightSimApp.phone.test.ts",
+      "sha256": "638485deb0f7e4327facef59c79d0a9c46bbca0dbd316c5a0b2ced9d0ddef641"
+    },
+    {
+      "file": "src/flight/remote/engineStatus.ts",
+      "sha256": "92136ceebcb282c1a3e7f5357f2a23ba7ee4fffab38e8f5bcb239ac2240bb802"
+    },
+    {
+      "file": "src/remote/PhoneEngine.tsx",
+      "sha256": "9b937dafa793817c0b45321646d31694981395570223c895f079acb0fc9b0677"
+    },
+    {
+      "file": "src/remote/PhoneEngine.test.tsx",
+      "sha256": "4667d89d5ae3b6fb004204507235590edde2f196b213dec0098756e17b834b2f"
+    },
+    {
+      "file": "src/remote/PhoneController.test.tsx",
+      "sha256": "a0f5aefa1906ab1b1046bc63ccbeeac566ad7811c30c5d93373c0879914759d7"
+    },
+    {
+      "file": "src/remote/protocol.ts",
+      "sha256": "a49d358008d25750a5076e2d948b73f47ce9b5247b0e2ee4c2f80e147a89cc68"
+    },
+    {
+      "file": "src/remote/protocol.test.ts",
+      "sha256": "db5e33bb4757f477c4ad30a7e1e012c9438a28dff94cec337a06f2d17f9f4fed"
+    },
+    {
+      "file": "scripts/validation/audio/check-engine-orbs.mjs",
+      "sha256": "121e5de6b8c6dff28863346efe5c8d0f4e6fe77d4df2f5bdb223161fe4c6ae5d"
+    },
+    {
+      "file": "src/flight/aircraft/generated/f135ExhaustOpticalData.ts",
+      "sha256": "972aa71b408b6e49411ef667044801b8987b1f48171273acbbc76f745294c6b3"
+    }
+  ]
+}

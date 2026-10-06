@@ -17,6 +17,8 @@ export interface C172BootstrapOptions {
   airspeedKts?: number;
   /** Start with engine running. */
   engineRunning?: boolean;
+  /** Native static test stand: restrains motion while propulsion keeps advancing. */
+  holdDown?: boolean;
   /** Throttle command, 0..1. Default: the aircraft profile's. */
   throttleNorm?: number;
 }
@@ -27,7 +29,7 @@ type JsbsimTimingApi = JSBSimSdk & {
 };
 
 const catalogue = flightParameterDefaults();
-const DEFAULT_OPTIONS: Required<Omit<C172BootstrapOptions, "throttleNorm">> = {
+const DEFAULT_OPTIONS: Required<Omit<C172BootstrapOptions, "throttleNorm" | "holdDown">> = {
   latDeg: catalogue.get("osfs.start.latitude"),
   lonDeg: catalogue.get("osfs.start.longitude"),
   // Temporary initial state; flight placement adds the loaded ground height.
@@ -74,6 +76,7 @@ export async function bootstrapAircraft(
   if (!sdk.loadModel(profile.model)) {
     throw new Error(`JSBSim failed to load the ${aircraftId} aircraft model (${profile.model}).`);
   }
+  if (opts.holdDown) sdk.setHoldDown(true);
 
   if (profile.requiredReadOnlyModelProperties?.length) {
     // A model expression can create an absent native property as an ordinary
@@ -93,13 +96,16 @@ export async function bootstrapAircraft(
   sdk.setPropertyValue("ic/lat-geod-deg", opts.latDeg);
   sdk.setPropertyValue("ic/long-gc-deg", opts.lonDeg);
   sdk.setPropertyValue("ic/h-sl-ft", opts.altFt);
+  // A hold-down fixture is not supported by the aircraft's ground contacts.
+  // Keep their synthetic floor below it; pressure still uses the requested MSL altitude.
+  if (opts.holdDown) sdk.setPropertyValue("ic/terrain-elevation-ft", opts.altFt - 1000 / 0.3048);
   sdk.setPropertyValue("ic/psi-true-deg", opts.headingDeg);
-  sdk.setPropertyValue("ic/theta-deg", profile.initialPitchDeg ?? 0);
+  sdk.setPropertyValue("ic/theta-deg", opts.holdDown ? 0 : profile.initialPitchDeg ?? 0);
   sdk.setPropertyValue("ic/phi-deg", 0);
   sdk.setPropertyValue("ic/vc-kts", options.airspeedKts ?? profile.initialAirspeedKts ?? opts.airspeedKts);
   if (profile.initialPitchDeg !== undefined) {
     sdk.setPropertyValue("ic/gamma-deg", 0);
-    sdk.setPropertyValue("ic/alpha-deg", profile.initialPitchDeg);
+    sdk.setPropertyValue("ic/alpha-deg", opts.holdDown ? 0 : profile.initialPitchDeg);
   }
   // Commands and physical actuator positions must agree before RunIC, which
   // already evaluates the FCS and ground contacts. These are not IC properties.

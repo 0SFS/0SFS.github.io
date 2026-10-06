@@ -1,0 +1,61 @@
+{
+  "mode": "check",
+  "output": null,
+  "artifacts": [
+    {
+      "variant": "full",
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-full.glb",
+      "triangles": 24024,
+      "meshes": 150,
+      "standOnlyMeshes": [
+        "F135_ExternalCasing",
+        "F135_CasingFlanges",
+        "F135_Accessories",
+        "F135_ExternalPlumbing",
+        "F135_MountsAndDriveHousing"
+      ],
+      "morphMeshes": [],
+      "bytes": 1864272,
+      "sha256": "0fc8083a3a4d5d5d76946ea3602d4a23ebc508e58301145e489c59c1801ff71f"
+    },
+    {
+      "variant": "installed",
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-installed.glb",
+      "triangles": 12592,
+      "meshes": 145,
+      "standOnlyMeshes": [],
+      "morphMeshes": [],
+      "bytes": 1037840,
+      "sha256": "4e7d837e2ab5303ab9d90a3b3321baa469e5fc204acad7e0b2f59185990aa341"
+    },
+    {
+      "variant": "airframe",
+      "path": "public/aircraft/f-35b/F-35B_AF267-airframe.glb",
+      "removedNodes": [
+        "vtol",
+        "feather.001",
+        "feather.002",
+        "feather.003",
+        "feather.004",
+        "feather.005",
+        "feather.006",
+        "feather.007",
+        "feather.008",
+        "feather.009",
+        "feather.010",
+        "feather.011",
+        "feather.012",
+        "feather.013",
+        "feather.014",
+        "feather.015",
+        "feather.016"
+      ],
+      "removedExtrasEngineTriangles": 124,
+      "retainedViewsIdentical": 434,
+      "triangles": 11467,
+      "meshes": 85,
+      "bytes": 1444788,
+      "sha256": "76c76d6230fcf3259e2552d793f95f5421a2ab3cc35f39a5ebf01817b38d5814"
+    }
+  ]
+}

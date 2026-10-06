@@ -1,7 +1,8 @@
-/** Aircraft shaft markers: one small transparent GPU draw, driven by the existing HUD tick. */
+/** Aircraft shaft markers: one small transparent GPU draw, driven by the caller's frame cadence. */
+import { DEFAULT_MAX_PATTERN_STEP, type EngineSpoolFrame } from "./engineSpoolMotion";
+export type { EngineSpoolFrame } from "./engineSpoolMotion";
 export type EngineSpoolPreference = "auto" | "webgpu" | "webgl2" | "webgl1" | "off";
 export type EngineSpoolBackend = "webgpu" | "webgl2" | "webgl1" | "off";
-export interface EngineSpoolFrame { outerAngle: number; innerAngle: number | null }
 export interface EngineSpoolConfiguration {
   preference: EngineSpoolPreference;
   maxFps: number;
@@ -9,6 +10,13 @@ export interface EngineSpoolConfiguration {
   /** One marker per represented rotating blade. Missing counts draw no markers. */
   outerBlades?: number;
   innerBlades?: number;
+  /** Maximum movement at full shaft speed, in brightness-pattern pitches per accepted draw. */
+  maxPatternStep?: number;
+}
+export interface EngineSpoolMotionStatus {
+  fps: number | null;
+  maxTurnsPerSecond: number | null;
+  limited: boolean;
 }
 export interface EngineSpoolStatus {
   preference: EngineSpoolPreference;
@@ -24,6 +32,12 @@ export interface EngineSpoolOptions extends EngineSpoolConfiguration {
 export interface EngineSpoolRenderer {
   readonly ready: Promise<EngineSpoolBackend>;
   readonly status: EngineSpoolStatus;
+  /** Shares the renderer's existing visibility observation with its animation driver. */
+  canDraw(): boolean;
+  /** Measured between accepted moving frames, excluding unchanged forced redraws. */
+  getMotionStatus(): EngineSpoolMotionStatus;
+  /** A six-digit #RRGGBB accent for both shafts; null or invalid restores their normal colors. */
+  setAccentColor(color: string | null): void;
   draw(frame: EngineSpoolFrame, nowMs: number): void;
   configure(configuration: EngineSpoolConfiguration): void;
   destroy(): void;
@@ -39,13 +53,22 @@ interface Painter {
 // Leave room for markers straddling the outer circle instead of clipping them at the canvas edge.
 const CANVAS_SCALE = 1.08;
 const TAU = 2 * Math.PI;
+const ACCENT_COLOR = /^#[\da-f]{6}$/i;
+const wrapAngle = (angle: number): number => ((angle % TAU) + TAU) % TAU;
+const maxPatternStep = (value: number | undefined): number => value !== undefined && Number.isFinite(value)
+  ? Math.min(.49, Math.max(.05, value)) : DEFAULT_MAX_PATTERN_STEP;
 const bladeCount = (count: number | undefined): number => typeof count === "number" && Number.isFinite(count)
   ? Math.min(128, Math.max(0, Math.round(count))) : 0;
 const drawingDisabled = (config: EngineSpoolConfiguration): boolean => config.preference === "off" || config.maxFps <= 0
   || ((config.outerBlades ?? 0) === 0 && (config.innerBlades ?? 0) === 0);
 
-// Three vec4s: each ring's phase/radius/blade count/marker radius, then backing side.
+// Three vec4s: each ring's phase/radius/blade count/marker radius, then backing
+// side/accent RGB. A negative red channel selects the normal two-color palette.
 // The nearest angular sector identifies a single marker in constant work, whatever the blade count.
+// Each blade keeps its rotor-local brightness and size. Two identical brightness
+// lobes, half a revolution apart, move with the shaft rather than pulsing in place.
+// This continuous 360-degree map is sampled at each blade angle, for even or odd
+// counts. With an odd count, one maximum lies between neighboring blade samples.
 const GPU_SHADER = `
 struct Frame { outer: vec4f, inner: vec4f, view: vec4f }
 @group(0) @binding(0) var<uniform> frame: Frame;
@@ -53,21 +76,25 @@ struct Frame { outer: vec4f, inner: vec4f, view: vec4f }
   let p = array<vec2f, 3>(vec2f(-1., -1.), vec2f(3., -1.), vec2f(-1., 3.));
   return vec4f(p[i], 0., 1.);
 }
-fn blades(p: vec2f, ring: vec4f) -> f32 {
-  if (ring.z < .5) { return 0.; }
+fn blades(p: vec2f, ring: vec4f) -> vec2f {
+  if (ring.z < .5) { return vec2f(0.); }
   let aa = min(1. / frame.view.x, ring.w * .45);
-  if (abs(length(p) - ring.y) > ring.w + aa) { return 0.; }
+  if (abs(length(p) - ring.y) > ring.w + aa) { return vec2f(0.); }
   let sectorAngle = 6.28318530718 / ring.z;
-  let angle = floor((atan2(p.x, -p.y) - ring.x) / sectorAngle + .5) * sectorAngle + ring.x;
+  let localAngle = floor((atan2(p.x, -p.y) - ring.x) / sectorAngle + .5) * sectorAngle;
+  let angle = localAngle + ring.x;
   let centre = vec2f(sin(angle), -cos(angle)) * ring.y;
-  return 1. - smoothstep(ring.w - aa, ring.w + aa, distance(p, centre));
+  let alpha = 1. - smoothstep(ring.w - aa, ring.w + aa, distance(p, centre));
+  return vec2f(alpha, .65 + .35 * cos(2. * localAngle));
 }
 @fragment fn fragment(@builtin(position) at: vec4f) -> @location(0) vec4f {
   let p = at.xy / frame.view.x - vec2f(.5);
   let a = blades(p, frame.outer);
   let b = blades(p, frame.inner);
-  let rgb = vec3f(.74, .84, .91) * a + vec3f(.91, .71, .28) * b * (1. - a);
-  return vec4f(rgb, a + b * (1. - a));
+  let outerColor = select(vec3f(.74, .84, .91), frame.view.yzw, frame.view.y >= 0.);
+  let innerColor = select(vec3f(.91, .71, .28), frame.view.yzw, frame.view.y >= 0.);
+  let rgb = outerColor * a.x * a.y + innerColor * b.x * b.y * (1. - a.x);
+  return vec4f(rgb, a.x + b.x * (1. - a.x));
 }`;
 
 function glSources(webgl2: boolean): [string, string] {
@@ -84,21 +111,25 @@ uniform vec4 outerRing;
 uniform vec4 innerRing;
 uniform vec4 view;
 ${webgl2 ? "out vec4 colour;" : ""}
-float blades(vec2 p, vec4 ring) {
-  if (ring.z < .5) { return 0.0; }
+vec2 blades(vec2 p, vec4 ring) {
+  if (ring.z < .5) { return vec2(0.0); }
   float aa = min(1.0 / view.x, ring.w * .45);
-  if (abs(length(p) - ring.y) > ring.w + aa) { return 0.0; }
+  if (abs(length(p) - ring.y) > ring.w + aa) { return vec2(0.0); }
   float sectorAngle = 6.28318530718 / ring.z;
-  float angle = floor((atan(p.x, -p.y) - ring.x) / sectorAngle + .5) * sectorAngle + ring.x;
+  float localAngle = floor((atan(p.x, -p.y) - ring.x) / sectorAngle + .5) * sectorAngle;
+  float angle = localAngle + ring.x;
   vec2 centre = vec2(sin(angle), -cos(angle)) * ring.y;
-  return 1.0 - smoothstep(ring.w - aa, ring.w + aa, distance(p, centre));
+  float alpha = 1.0 - smoothstep(ring.w - aa, ring.w + aa, distance(p, centre));
+  return vec2(alpha, .65 + .35 * cos(2.0 * localAngle));
 }
 void main() {
   vec2 p = vec2(gl_FragCoord.x, view.x - gl_FragCoord.y) / view.x - vec2(0.5);
-  float a = blades(p, outerRing);
-  float b = blades(p, innerRing);
-  vec3 rgb = vec3(.74, .84, .91) * a + vec3(.91, .71, .28) * b * (1.0 - a);
-  ${webgl2 ? "colour" : "gl_FragColor"} = vec4(rgb, a + b * (1.0 - a));
+  vec2 a = blades(p, outerRing);
+  vec2 b = blades(p, innerRing);
+  vec3 outerColor = view.y < 0.0 ? vec3(.74, .84, .91) : view.yzw;
+  vec3 innerColor = view.y < 0.0 ? vec3(.91, .71, .28) : view.yzw;
+  vec3 rgb = outerColor * a.x * a.y + innerColor * b.x * b.y * (1.0 - a.x);
+  ${webgl2 ? "colour" : "gl_FragColor"} = vec4(rgb, a.x + b.x * (1.0 - a.x));
 }`,
   ];
 }
@@ -204,7 +235,7 @@ function glPainter(canvas: HTMLCanvasElement, kind: "webgl2" | "webgl1", onLoss:
         gl.viewport(0, 0, side, side);
         gl.uniform4f(outer, data[0], data[1], data[2], data[3]);
         gl.uniform4f(inner, data[4], data[5], data[6], data[7]);
-        gl.uniform4f(view, data[8], data[9], 0, 0);
+        gl.uniform4f(view, data[8], data[9], data[10], data[11]);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
       },
       destroy: release,
@@ -212,9 +243,10 @@ function glPainter(canvas: HTMLCanvasElement, kind: "webgl2" | "webgl1", onLoss:
   } catch (error) { release(); throw error; }
 }
 
-/** No RAF or timer: callers own simulation time and the existing HUD frame cadence. */
+/** No RAF or timer: callers own simulation time and animation cadence. */
 export function createEngineSpoolRenderer(host: HTMLElement, options: EngineSpoolOptions): EngineSpoolRenderer {
-  let config: EngineSpoolConfiguration = { ...options, outerBlades: bladeCount(options.outerBlades), innerBlades: bladeCount(options.innerBlades) };
+  let config: EngineSpoolConfiguration = { ...options, outerBlades: bladeCount(options.outerBlades),
+    innerBlades: bladeCount(options.innerBlades), maxPatternStep: maxPatternStep(options.maxPatternStep) };
   let status: EngineSpoolStatus = { preference: config.preference, backend: null, reason: null };
   let painter: Painter | null = null;
   let generation = 0;
@@ -223,18 +255,30 @@ export function createEngineSpoolRenderer(host: HTMLElement, options: EngineSpoo
   let inView = true;
   let last: { frame: EngineSpoolFrame; now: number } | null = null;
   let lastDrawTime = Number.NEGATIVE_INFINITY;
+  let nextDrawTime = Number.NEGATIVE_INFINITY;
+  let cadenceOrigin = 0;
   let drawnOuter = NaN;
   let drawnInner: number | null = NaN;
   let drawnSide = 0;
   let drawnOuterBlades = -1;
   let drawnInnerBlades = -1;
+  let accent: number | null = null;
+  let lastAccentInput: string | null = null;
+  let accentRed = -1;
+  let accentGreen = 0;
+  let accentBlue = 0;
+  let drawnAccent: number | null | undefined;
+  let accepted: (EngineSpoolFrame & { now: number; outerBlades: number; innerBlades: number }) | null = null;
+  let displayedOuter = 0;
+  let displayedInner: number | null = null;
+  let motionStatus: EngineSpoolMotionStatus = { fps: null, maxTurnsPerSecond: null, limited: false };
   let ownedDevice: GPUDevice | null = null;
   let devicePromise: Promise<GPUDevice | null> | null = null;
   let gpuUnavailable = false;
   const data = new Float32Array(12);
   const ring = (angle: number, radius: number, count: number, offset: number): void => {
     const scaledRadius = radius / CANVAS_SCALE;
-    data[offset] = ((angle % TAU) + TAU) % TAU;
+    data[offset] = wrapAngle(angle);
     data[offset + 1] = scaledRadius;
     data[offset + 2] = count;
     // Dense blade rows retain gaps, including the antialias footprint. Every blade in a row is equal.
@@ -259,7 +303,9 @@ export function createEngineSpoolRenderer(host: HTMLElement, options: EngineSpoo
     drawnInner = NaN;
     drawnSide = 0;
     drawnOuterBlades = drawnInnerBlades = -1;
+    drawnAccent = undefined;
     lastDrawTime = Number.NEGATIVE_INFINITY;
+    nextDrawTime = Number.NEGATIVE_INFINITY;
   };
   const freshCanvas = (): HTMLCanvasElement => {
     const canvas = host.ownerDocument.createElement("canvas");
@@ -272,22 +318,92 @@ export function createEngineSpoolRenderer(host: HTMLElement, options: EngineSpoo
     && cssSize > 0 && !host.closest("[hidden]");
   const draw = (frame: EngineSpoolFrame, now: number, force = false): void => {
     if (destroyed || !Number.isFinite(now) || !Number.isFinite(frame.outerAngle)
-      || (frame.innerAngle !== null && !Number.isFinite(frame.innerAngle))) return;
-    if (last) { last.frame.outerAngle = frame.outerAngle; last.frame.innerAngle = frame.innerAngle; last.now = now; }
+      || (frame.innerAngle !== null && !Number.isFinite(frame.innerAngle))
+      || (frame.maxAngle !== undefined && !Number.isFinite(frame.maxAngle))) return;
+    if (last) {
+      last.frame.outerAngle = frame.outerAngle; last.frame.innerAngle = frame.innerAngle;
+      last.frame.maxAngle = frame.maxAngle; last.now = now;
+    }
     else last = { frame: { ...frame }, now };
     if (!painter || config.maxFps <= 0 || !visible()) return;
     const ratio = Math.min(Math.max(.1, globalThis.devicePixelRatio || 1), Math.max(.1, config.pixelRatio));
     const side = Math.max(1, Math.round(cssSize * CANVAS_SCALE * ratio));
     const outerBlades = config.outerBlades ?? 0;
     const innerBlades = frame.innerAngle === null ? 0 : config.innerBlades ?? 0;
-    const outerAngle = outerBlades ? frame.outerAngle : 0;
-    const innerAngle = innerBlades ? frame.innerAngle : null;
+    const requestedOuter = outerBlades ? frame.outerAngle : 0;
+    const requestedInner = innerBlades ? frame.innerAngle : null;
+    const sameRequest = accepted?.outerAngle === requestedOuter && accepted?.innerAngle === requestedInner;
+    if (sameRequest && drawnSide === side
+      && drawnOuterBlades === outerBlades && drawnInnerBlades === innerBlades && drawnAccent === accent) return;
+    const interval = 1000 / config.maxFps;
+    // Keep the deadline's phase instead of restarting a full interval on every
+    // draw. Otherwise small RAF jitter makes a 60 Hz cap repeatedly skip frames
+    // on a 60 Hz display. The tolerance only covers floating-point roundoff.
+    const timingTolerance = Number.EPSILON * Math.max(1, Math.abs(now), interval) * 8;
+    if (!force && now >= lastDrawTime && now + timingTolerance < nextDrawTime) return;
+    let outerAngle = accepted ? displayedOuter : wrapAngle(requestedOuter);
+    let innerAngle = requestedInner === null ? null : accepted && displayedInner !== null
+      ? displayedInner : wrapAngle(requestedInner);
+    const preserveMotion = force && accepted !== null;
+    let nextMotionStatus = motionStatus;
+    const topologyChanged = accepted !== null && (accepted.outerBlades !== outerBlades || accepted.innerBlades !== innerBlades);
+    if (accepted && !preserveMotion && !sameRequest && !topologyChanged) {
+      const outerDelta = requestedOuter - accepted.outerAngle;
+      const innerDelta = requestedInner !== null && accepted.innerAngle !== null ? requestedInner - accepted.innerAngle : 0;
+      const referenceDelta = frame.maxAngle !== undefined && accepted.maxAngle !== undefined
+        ? frame.maxAngle - accepted.maxAngle : null;
+      const changedReference = (frame.maxAngle === undefined) !== (accepted.maxAngle === undefined);
+      if (now <= accepted.now || outerDelta < 0 || innerDelta < 0
+        || (referenceDelta !== null && referenceDelta < 0) || changedReference) {
+        // A new clock/reference rebases the requests while retaining the visible
+        // phase. Never interpret a reset as a backwards spin or catch-up debt.
+        nextMotionStatus = { fps: null, maxTurnsPerSecond: null, limited: false };
+      } else {
+        // Apply the limit only here, after the renderer's FPS gate. Source updates
+        // and skipped RAF callbacks can otherwise accumulate an aliased jump.
+        // The 100% reference keeps 50% RPM at half the displayed maximum, even
+        // when the client cadence limits the speed. One factor preserves N1/N2.
+        // The two fixed rotor-local brightness lobes identify the orientation;
+        // adding more represented blades does not repeat that whole pattern.
+        const outerRepeats = outerBlades > 0 ? 2 : 0;
+        const innerRepeats = innerBlades > 0 ? 2 : 0;
+        const pitchDemand = Math.max((referenceDelta ?? 0) * Math.max(outerRepeats, innerRepeats),
+          outerDelta * outerRepeats, innerDelta * innerRepeats);
+        const factor = pitchDemand > 0 ? Math.min(1, TAU * config.maxPatternStep! / pitchDemand) : 1;
+        outerAngle = wrapAngle(outerAngle + outerDelta * factor);
+        if (innerAngle !== null) innerAngle = wrapAngle(innerAngle + innerDelta * factor);
+        const seconds = (now - accepted.now) / 1000;
+        nextMotionStatus = {
+          fps: 1 / seconds,
+          maxTurnsPerSecond: referenceDelta === null ? null : referenceDelta * factor / TAU / seconds,
+          limited: factor < 1,
+        };
+      }
+    } else if (topologyChanged && !preserveMotion) {
+      nextMotionStatus = { fps: null, maxTurnsPerSecond: null, limited: false };
+    }
+    const rememberRequest = (): void => {
+      // A resize/backend restore may see a pending request skipped by the FPS
+      // gate. Only the next normal draw may consume it and move the markers.
+      if (preserveMotion) return;
+      if (!accepted || !sameRequest || topologyChanged) {
+        // Excess requested rotation is discarded, never replayed after a stall.
+        accepted = { outerAngle: requestedOuter, innerAngle: requestedInner, maxAngle: frame.maxAngle,
+          now, outerBlades, innerBlades };
+      }
+      motionStatus = nextMotionStatus;
+    };
     if (drawnOuter === outerAngle && drawnInner === innerAngle && drawnSide === side
-      && drawnOuterBlades === outerBlades && drawnInnerBlades === innerBlades) return;
-    if (!force && now >= lastDrawTime && now - lastDrawTime < 1000 / config.maxFps) return;
+      && drawnOuterBlades === outerBlades && drawnInnerBlades === innerBlades && drawnAccent === accent) {
+      rememberRequest();
+      return;
+    }
     ring(outerAngle, .48, outerBlades, 0);
     ring(innerAngle ?? 0, .28, innerBlades, 4);
     data[8] = side;
+    data[9] = accentRed;
+    data[10] = accentGreen;
+    data[11] = accentBlue;
     if (painter.canvas.width !== side || painter.canvas.height !== side) {
       painter.canvas.width = painter.canvas.height = side;
     }
@@ -297,9 +413,24 @@ export function createEngineSpoolRenderer(host: HTMLElement, options: EngineSpoo
     }
     drawnOuter = outerAngle;
     drawnInner = innerAngle;
+    displayedOuter = outerAngle;
+    displayedInner = innerAngle;
+    rememberRequest();
     drawnSide = side;
     drawnOuterBlades = outerBlades;
     drawnInnerBlades = innerBlades;
+    drawnAccent = accent;
+    if (preserveMotion) return;
+    if (force || !Number.isFinite(nextDrawTime) || now < lastDrawTime) {
+      cadenceOrigin = now;
+      nextDrawTime = now + interval;
+    } else {
+      // Missed slots are discarded in one step: a stalled tab never owes a
+      // burst of catch-up draws, and a late frame retains only its remainder.
+      // Derive deadlines from the origin to avoid accumulating rounding error.
+      const nextSlot = Math.floor((now + timingTolerance - cadenceOrigin) / interval) + 1;
+      nextDrawTime = cadenceOrigin + nextSlot * interval;
+    }
     lastDrawTime = now;
   };
   const redraw = (): void => { if (last) draw(last.frame, last.now, true); };
@@ -395,17 +526,33 @@ export function createEngineSpoolRenderer(host: HTMLElement, options: EngineSpoo
   return {
     get ready() { return ready; },
     get status() { return { ...status }; },
+    canDraw: () => !destroyed && painter !== null && !drawingDisabled(config) && visible(),
+    getMotionStatus: () => ({ ...motionStatus }),
+    setAccentColor(color) {
+      if (destroyed || color === lastAccentInput) return;
+      lastAccentInput = color;
+      const next = typeof color === "string" && ACCENT_COLOR.test(color) ? Number.parseInt(color.slice(1), 16) : null;
+      if (accent === next) return;
+      accent = next;
+      accentRed = next === null ? -1 : ((next >>> 16) & 255) / 255;
+      accentGreen = next === null ? 0 : ((next >>> 8) & 255) / 255;
+      accentBlue = next === null ? 0 : (next & 255) / 255;
+      redraw();
+    },
     draw,
     configure(next) {
       if (destroyed) return;
       const nextOuterBlades = bladeCount(next.outerBlades);
       const nextInnerBlades = bladeCount(next.innerBlades);
+      const nextMaxPatternStep = maxPatternStep(next.maxPatternStep);
       if (config.preference === next.preference && config.maxFps === next.maxFps && config.pixelRatio === next.pixelRatio
-        && config.outerBlades === nextOuterBlades && config.innerBlades === nextInnerBlades) return;
-      const nextConfig = { ...next, outerBlades: nextOuterBlades, innerBlades: nextInnerBlades };
+        && config.outerBlades === nextOuterBlades && config.innerBlades === nextInnerBlades
+        && config.maxPatternStep === nextMaxPatternStep) return;
+      const nextConfig = { ...next, outerBlades: nextOuterBlades, innerBlades: nextInnerBlades, maxPatternStep: nextMaxPatternStep };
       const wasDisabled = drawingDisabled(config);
       const disabled = drawingDisabled(nextConfig);
       const switchBackend = config.preference !== next.preference || wasDisabled !== disabled;
+      if (config.maxFps !== nextConfig.maxFps) nextDrawTime = Number.NEGATIVE_INFINITY;
       config = nextConfig;
       if (switchBackend) ready = choose();
       else redraw();

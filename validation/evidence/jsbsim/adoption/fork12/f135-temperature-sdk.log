@@ -1,0 +1,11 @@
+Engine location ignored, only thruster location is used.
+Engine orientation ignored, only thruster orientation is used.
+Engine location ignored, only thruster location is used.
+Engine orientation ignored, only thruster orientation is used.
+Engine location ignored, only thruster location is used.
+Engine orientation ignored, only thruster orientation is used.
+Engine location ignored, only thruster location is used.
+Engine orientation ignored, only thruster orientation is used.
+In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 304
+      Property /sim/model/pushback/target-speed-fps is already defined.
+      Its value (0) will not be overridden.

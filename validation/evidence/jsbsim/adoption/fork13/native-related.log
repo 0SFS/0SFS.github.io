@@ -1,0 +1,13 @@
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/master-20260925
+    Start 40: TestTurbineTrimFuelFlow
+    Start 38: TestTurbineAugmentation
+    Start 39: TestTurbineTrimSpool
+    Start 88: FGTurbineTemperatureTest1
+1/4 Test #88: FGTurbineTemperatureTest1 ........   Passed    0.01 sec
+2/4 Test #39: TestTurbineTrimSpool .............   Passed    0.42 sec
+3/4 Test #40: TestTurbineTrimFuelFlow ..........   Passed    0.46 sec
+4/4 Test #38: TestTurbineAugmentation ..........   Passed    0.48 sec
+
+100% tests passed out of 4
+
+Total Test time (real) =   0.48 sec

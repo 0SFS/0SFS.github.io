@@ -1,6 +1,8 @@
 import { GOOGLE_ERROR_TARGET_BOUNDS } from "foss-earth/mapDetailPolicy";
 import { AIRCRAFT_FAMILIES, AIRCRAFT_LOD_IDS } from "../aircraft/aircraftCatalog";
 import { AIRCRAFT_IDS } from "../aircraft/aircraftIds";
+import { DEFAULT_ENGINE_GAS_AXIAL_SAMPLES, DEFAULT_ENGINE_GAS_RADIAL_SAMPLES } from "../aircraft/engineGasOptics";
+import { DEFAULT_MAX_PATTERN_STEP } from "../hud/engineSpoolMotion";
 import {
   DEFAULT_GROUND_INTERACTION_SETTINGS,
   GROUND_CHOICE_LABELS,
@@ -44,6 +46,8 @@ const START = { tab: "aircraft", section: "start" } as const;
 const PHONE_CAMERA = { tab: "remote", section: "camera" } as const;
 const SOUND = { tab: "sound", section: "sound" } as const;
 const ENGINE = { tab: "engine", section: "engine" } as const;
+const ENGINE_HISTORY = { tab: "engine", section: "history" } as const;
+const ENGINE_TEST = { tab: "engine", section: "test" } as const;
 const ASSISTS = { tab: "aircraft", section: "assists" } as const;
 const FLIGHT_CONTROLS = { tab: "aircraft", section: "flight-controls" } as const;
 const GROUND = { tab: "aircraft", section: "ground" } as const;
@@ -66,6 +70,8 @@ export const FLIGHT_SECTION_TITLES: readonly (readonly [tab: string, section: st
   ["remote", "camera", "Phone camera trackpad"],
   ["sound", "sound", "Sound"],
   ["engine", "engine", "Engine"],
+  ["engine", "history", "History sampling"],
+  ["engine", "test", "Test stand conditions"],
   ["aircraft", "assists", "Assists"],
   ["aircraft", "flight-controls", "Flight controls"],
   ["aircraft", "ground", "Ground handling"],
@@ -279,17 +285,65 @@ export const OSFS_PARAMETERS = [
     source: "src/flight/aircraft/createEngineExhaust.ts",
   },
   {
+    id: "osfs.exhaust.contributionView",
+    label: "Engine light contribution",
+    description: "Isolate a contribution on the engine for diagnosis. Thermal and fuel states continue unchanged. Scene exposure and ambient fill are in Renderer → Lighting and exposure.",
+    unit: "none", kind: "choice",
+    choices: [
+      { id: "combined", label: "Combined", description: "All enabled engine light contributions." },
+      { id: "solid", label: "Solid emission", description: "Material self-emission with its direct/environment reflection suppressed; gas and nearby light off." },
+      { id: "gas", label: "Gas emission", description: "Only gas/particle emission; hot hardware emission/reflection and nearby light off." },
+      { id: "reflection", label: "Reflected light", description: "Engine material reflection from the existing scene; gas, self-emission and the exhaust scene light off." },
+      { id: "scene-light", label: "Nearby scene light", description: "The exhaust light on other lit scene surfaces; gas and self-emission off. The emitting engine is excluded from this light." },
+    ],
+    default: "combined",
+    defaultReason: "Show normal combined appearance; individual contributions make thermal color and reflected light distinguishable.",
+    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineExhaust.ts",
+  },
+  {
     id: "osfs.exhaust.sampleCount",
     label: "Exhaust samples",
-    description: "Samples through each visible exhaust pixel. More samples improve the volume's smoothness and use more GPU time.",
+    description: "Samples through each visible exhaust pixel. Localized emission needs more samples; lower counts can miss narrow regions and alter apparent color. More samples use more GPU time.",
     unit: { id: "samples/pixel", text: "samples/pixel" },
     kind: "number",
-    step: 1, bounds: within(4, 32),
-    default: 8,
-    defaultReason: "A short bounded lookup loop for a small plume; increase only if visible steps need smoothing.",
+    step: 1, bounds: within(4, 128),
+    default: 32,
+    defaultReason: "Bound the default pixel work at 32 steps; 128 remains available for detailed inspection. The retained posed-ray comparison found up to 18.51% error at 32 versus 0.761% at 128, and GPU cost remains unqualified.",
     home: main(EXHAUST),
     appliesLive: true,
     source: "src/flight/aircraft/createEngineExhaust.ts",
+  },
+  {
+    id: "osfs.exhaust.depthOcclusionEnabled",
+    label: "Exhaust opaque occlusion",
+    description: "Render an opaque-depth pass to stop gas integration at hardware and scenery. Disabling saves the pass but can show light from behind an opaque surface.",
+    unit: "none", kind: "boolean", default: true,
+    defaultReason: "Interior gas must stop at the visible metal surface rather than accumulating light behind it.",
+    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/engineExhaustDepth.ts",
+  },
+  {
+    id: "osfs.exhaust.depthResolutionScale",
+    label: "Exhaust depth resolution",
+    description: "Width and height of the exhaust depth buffer relative to the viewport. Smaller buffers use fewer pixels and less memory, but can misplace thin hardware edges.",
+    unit: "ratio", kind: "number", step: 0.01, bounds: within(0.25, 1), default: 1,
+    defaultReason: "One depth texel per viewport pixel preserves hardware boundaries. This adds one depth pass; GPU cost is unqualified.",
+    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/engineExhaustDepth.ts",
+  },
+  {
+    id: "osfs.exhaust.axialFieldSamples",
+    label: "Exhaust axial field samples",
+    description: "Source-table samples along the plume. More samples resolve localized emission and increase CPU updates and texture memory; ray samples control separate pixel work.",
+    unit: { id: "samples/axis", text: "samples/axis" }, kind: "number", step: 1, bounds: within(8, 64), default: DEFAULT_ENGINE_GAS_AXIAL_SAMPLES,
+    defaultReason: "Retain 64 axial samples across the combined internal/external field; 64 × 32 RGBA32F samples use 32 KiB per engine. Current checks cover selected rays, not every view or GPU performance.",
+    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineExhaust.ts",
+  },
+  {
+    id: "osfs.exhaust.radialFieldSamples",
+    label: "Exhaust radial field samples",
+    description: "Source-table samples from plume axis to edge. More samples resolve the annulus and mixing layer, increasing CPU updates and texture memory.",
+    unit: { id: "samples/axis", text: "samples/axis" }, kind: "number", step: 1, bounds: within(8, 64), default: DEFAULT_ENGINE_GAS_RADIAL_SAMPLES,
+    defaultReason: "Thirty-two radial samples resolve the narrow annulus more closely; axial × radial × 16 bytes gives the texture allocation per engine.",
+    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineExhaust.ts",
   },
   {
     id: "osfs.exhaust.maxDistanceMeters",
@@ -306,8 +360,8 @@ export const OSFS_PARAMETERS = [
   },
   {
     id: "osfs.exhaust.intensity",
-    label: "Exhaust brightness",
-    description: "Visual emission gain for the approximate optical profile. This changes neither engine power nor afterburner engagement.",
+    label: "Exhaust display gain",
+    description: "Display gain after physical gas emission has been evaluated. This changes neither emitted physical power nor engine temperature, fuel or afterburner engagement.",
     unit: "ratio",
     kind: "number",
     step: 0.01, bounds: within(0, 8),
@@ -316,6 +370,51 @@ export const OSFS_PARAMETERS = [
     home: main(EXHAUST),
     appliesLive: true,
     source: "src/flight/aircraft/createEngineExhaust.ts",
+  },
+  {
+    id: "osfs.exhaust.gasReferenceNits",
+    label: "Gas emission white reference",
+    description: "Gas luminance mapped to unit linear scene intensity before shared exposure and tone mapping. The physical emission calculation retains absolute units; this reference changes only display mapping.",
+    unit: { id: "cd/m²", text: "cd/m²" }, kind: "number", step: 1, bounds: within(1, 100000), default: 1000,
+    defaultReason: "Use the same provisional luminance reference as hot hardware; the scene is not radiometrically calibrated.",
+    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineExhaust.ts",
+  },
+  {
+    id: "osfs.exhaust.surfaceReferenceNits",
+    label: "Nozzle glow white reference",
+    description: "Metal luminance mapped to display white. Lower values brighten hot hardware without changing its temperature or the flame. Scene exposure is not physically calibrated.",
+    unit: { id: "cd/m²", text: "cd/m²" },
+    kind: "number",
+    step: 1, bounds: within(1, 100000),
+    default: 1000,
+    defaultReason: "A provisional display reference for visible thermal emission; tune to the scene lighting, not engine temperature.",
+    home: main(EXHAUST),
+    appliesLive: true,
+    source: "src/flight/aircraft/createEngineHotSurfaceGlow.ts",
+  },
+  {
+    id: "osfs.exhaust.light.enabled",
+    label: "Exhaust scene light",
+    description: "One unshadowed light per visible engine represents its bounded gas-emission power on other lit scene surfaces. It cannot illuminate the emitting engine itself.",
+    unit: "none", kind: "boolean", default: true,
+    defaultReason: "Retained night footage shows scene illumination. One isotropic approximation uses the evaluated optical power; geometry, occlusion and engine coefficients remain uncalibrated.",
+    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineExhaust.ts",
+  },
+  {
+    id: "osfs.exhaust.light.gain",
+    label: "Exhaust light display gain",
+    description: "Gain on the isotropic candela estimate derived from the bounded optical source. This adjusts scene presentation, not physical emitted power or thermal state.",
+    unit: "ratio", kind: "number", step: .01, bounds: within(0, 8), default: 1,
+    defaultReason: "Use the evaluated optical source with unit gain; no independent arbitrary candela reference.",
+    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineExhaust.ts",
+  },
+  {
+    id: "osfs.exhaust.light.rangeMeters",
+    label: "Exhaust light range",
+    description: "Maximum scene-light range from each visible engine. Larger ranges involve more nearby surfaces in lighting work.",
+    unit: "m", kind: "number", step: 0.1, bounds: within(0, 100), default: 12,
+    defaultReason: "Keep the provisional interaction near the aircraft and deck; this is a rendering limit rather than a physical radiation cutoff.",
+    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineExhaust.ts",
   },
   {
     id: "osfs.exhaust.smoke.enabled",
@@ -1073,6 +1172,41 @@ export const OSFS_PARAMETERS = [
 
   // Engine.
   {
+    id: "osfs.engineTest.zoomLimits", label: "Test stand zoom limits",
+    description: "The nearest and farthest inspection camera distances from the isolated engine assembly.",
+    unit: "m", kind: "range", scale: "log2", step: 0.1, bounds: within(0.2, 1000), default: { min: 1, max: 100 },
+    defaultReason: "The isolated nozzle can be inspected much closer than the full aircraft.",
+    home: main(ENGINE_TEST), appliesLive: true, source: "src/flight/aircraft/createPlaceholderAircraft.ts",
+  },
+  {
+    id: "osfs.engineTest.viewDistanceMeters", label: "Test stand starting view distance",
+    description: "Initial camera distance from the isolated engine geometry when opening the test stand. Normal orbit and zoom controls remain available.",
+    unit: { id: "m", text: "m" }, kind: "number", step: 0.1, bounds: within(1, 100), default: 6,
+    defaultReason: "Six metres frames the nozzle and its exhaust for inspection.",
+    home: main(ENGINE_TEST), appliesLive: false, source: "src/flight/createFlightSimApp.ts",
+  },
+  {
+    id: "osfs.engineMonitor.historySeconds", label: "Engine history window",
+    description: "Simulation time retained for the Engine tab's plots and CSV export. The buffer is bounded by this window and the sampling rate; resetting simulation time starts a new history.",
+    unit: { id: "s", text: "s" }, kind: "number", step: 1, bounds: within(1, 600), default: 60,
+    defaultReason: "One minute shows spool transients while bounding diagnostic memory.",
+    home: main(ENGINE_HISTORY), appliesLive: true, source: "src/flight/hud/engineHistory.ts",
+  },
+  {
+    id: "osfs.engineMonitor.historyHz", label: "Engine history sampling ceiling",
+    description: "Maximum samples per simulated second, limited by available model updates. Zero clears and disables history. Hidden plots do not draw; pause adds no samples.",
+    unit: { id: "Hz", text: "Hz" }, kind: "number", step: 0.5, bounds: within(0, 30), default: 5,
+    defaultReason: "Five samples per second resolve slow spool and thermal trends with a small buffer. These plots do not measure combustion or acoustic oscillations.",
+    home: main(ENGINE_HISTORY), appliesLive: true, source: "src/flight/hud/engineHistory.ts",
+  },
+  {
+    id: "osfs.engineMonitor.thermalHistory", label: "Record solid heat balances",
+    description: "Add available native per-solid heat rates, bath temperatures and timestep energy receipts to plots and CSV. Changing the recorded columns clears the history. Display samples cannot reconstruct every fixed-step energy transfer.",
+    unit: "none", kind: "boolean", default: false,
+    defaultReason: "Keep ordinary history compact; enable the additional series when diagnosing native heating. The live values remain in Solid heat balances.",
+    home: main(ENGINE_HISTORY), appliesLive: true, source: "src/flight/hud/engineHistory.ts",
+  },
+  {
     id: "osfs.engineMonitor.fuelFlowUnit",
     label: "Fuel flow unit",
     description: "The unit the HUD engine line and the Engine tab show fuel flow in; clicking the HUD's fuel flow switches it.",
@@ -1090,17 +1224,24 @@ export const OSFS_PARAMETERS = [
   },
 
   {
-    id: "osfs.engineMonitor.orbFps", label: "Shaft animation frame rate",
-    description: "Maximum draws per second for the shaft dots. Zero disables their renderer. Hidden, paused and unchanged indicators do not draw.",
-    unit: { id: "frames/s", text: "frames/s" }, kind: "number", step: 1, bounds: within(0, 60), default: 30,
-    defaultReason: "Thirty updates per second keeps slow visual rotation readable at a bounded draw rate.",
+    id: "osfs.engineMonitor.orbFps", label: "Shaft animation FPS ceiling",
+    description: "Shaft dots follow this screen's animation frames up to this ceiling, independently of globe drawing and numeric readouts. Zero disables their renderer. Hidden, paused and unchanged indicators do not draw.",
+    unit: { id: "frames/s", text: "frames/s" }, kind: "number", step: 1, bounds: within(0, 1000), default: 1000,
+    defaultReason: "A high ceiling lets the browser use the screen's refresh cadence, including 60, 120, 144 and 240 Hz. It does not request 1000 frames/s from the browser; lower it to spend less GPU work.",
     home: main(ENGINE), appliesLive: true, source: "src/flight/hud/engineSpoolRenderer.ts",
   },
   {
     id: "osfs.engineMonitor.orbTurnsPerSecond", label: "Maximum displayed shaft speed",
-    description: "Requested visual revolutions per simulated second at maximum modeled speed. Dense blade rows are slowed further to allow at least four configured frames per blade pitch; the Engine tab shows the effective limit. This is a slowed speed cue, not real turbine RPM.",
+    description: "Requested upper limit in visual revolutions per simulated second at maximum modeled speed. Both shafts share a scale limited by this client's actual drawing cadence and the hotspot pattern step limit; the Engine tab shows the effective speed and reason. This is a scaled speed cue, not real turbine RPM.",
     unit: { id: "rev/s", text: "rev/s" }, kind: "number", step: 0.05, bounds: within(0, 4), default: 2,
-    defaultReason: "Two revolutions per second is readable for a propeller; blade-dense turbine rows share a slower limit derived from their count and the selected frame rate.",
+    defaultReason: "A two-revolution ceiling makes high engine speed visibly fast; the pattern step limit protects the two rotating hotspots when the client draws too slowly to show that speed.",
+    home: main(ENGINE), appliesLive: true, source: "src/flight/hud/engineSpoolMotion.ts",
+  },
+  {
+    id: "osfs.engineMonitor.orbMaxPatternStep", label: "Maximum hotspot pattern step per frame",
+    description: "Maximum advance of the two-hotspot pattern per actual drawn frame, in pattern pitches. One pitch is half a revolution. Both shafts share the resulting speed scale. Staying below half a pitch preserves the hotspot cue's forward direction between submitted frames; individual blades may still alias. The Engine tab shows the effective limit.",
+    unit: { id: "pattern pitches/frame", text: "pattern pitches/frame" }, kind: "number", step: 0.01, bounds: within(0.05, 0.49), default: DEFAULT_MAX_PATTERN_STEP,
+    defaultReason: "A 0.45-pitch limit uses most of the available hotspot motion range while leaving a margin below the ambiguous half-pitch boundary.",
     home: main(ENGINE), appliesLive: true, source: "src/flight/hud/engineSpoolMotion.ts",
   },
   {

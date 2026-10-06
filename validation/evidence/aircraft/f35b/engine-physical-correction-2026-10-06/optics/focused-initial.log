@@ -1,0 +1,144 @@
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+ ❯ src/flight/aircraft/engineGasOptics.test.ts (4 tests | 1 failed) 5ms
+     × rejects invalid/out-of-domain inputs and retains exact table endpoints 2ms
+ ❯ scripts/build-exhaust-optics.test.mjs (4 tests | 1 failed) 191ms
+     × matches an independent frequency-form Planck reference and preserves photopic units 18ms
+(node:51132) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:51133) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/flight/aircraft/createEngineHotSurfaceGlow.test.ts > declared engine hot hardware > replaces only selected submaterials and restores their original MultiMaterial binding
+BJS - [14:12:50]: Babylon.js v8.56.2 - Null engine
+
+stdout | src/flight/aircraft/createEngineHotSurfaceGlow.test.ts > declared engine hot hardware > interpolates continuously in Kelvin, clamps the declared range and clears missing observations
+BJS - [14:12:50]: Babylon.js v8.56.2 - Null engine
+
+stdout | src/flight/aircraft/createEngineHotSurfaceGlow.test.ts > declared engine hot hardware > maps declared cd/m2 through the exposed display reference without changing temperature
+BJS - [14:12:50]: Babylon.js v8.56.2 - Null engine
+
+ ❯ src/flight/aircraft/createEngineHotSurfaceGlow.test.ts (11 tests | 3 failed) 26ms
+     × replaces only selected submaterials and restores their original MultiMaterial binding 5ms
+     × interpolates continuously in Kelvin, clamps the declared range and clears missing observations 1ms
+     × maps declared cd/m2 through the exposed display reference without changing temperature 1ms
+stdout | src/flight/aircraft/createEngineExhaust.test.ts > shared engine exhaust renderer > keeps hot hardware when gas telemetry is unavailable and changes display reference without heating it
+BJS - [14:12:50]: Babylon.js v8.56.2 - Null engine
+
+ ❯ src/flight/aircraft/createEngineExhaust.test.ts (29 tests | 1 failed) 43ms
+     × keeps hot hardware when gas telemetry is unavailable and changes display reference without heating it 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  scripts/build-exhaust-optics.test.mjs > dimensional offline exhaust optical bake > matches an independent frequency-form Planck reference and preserves photopic units
+AssertionError: expected 0.4999999999987084 to be close to 0.5, received difference is 1.2915779556976759e-12, but expected 5e-13
+ ❯ scripts/build-exhaust-optics.test.mjs:51:103
+     49|     expect(surface.samples.every(rgb => rgb[0] >= rgb[1] && rgb[1] >= …
+     50|     const half = bakeSurfaceEmission({ ...profile.surfaceEmission, vis…
+     51|     for (const i of [0, 100, 511]) expect(luminance(half.samples[i]) /…
+       |                                                                                                       ^
+     52|   });
+     53|   it("bakes dimensional source terms and explicit sensitivity hypothes…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/flight/aircraft/createEngineExhaust.test.ts > shared engine exhaust renderer > keeps hot hardware when gas telemetry is unavailable and changes display reference without heating it
+AssertionError: expected 0.5 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0.5
+
+ ❯ src/flight/aircraft/createEngineExhaust.test.ts:289:55
+    287|     t.handle.update(state, { ...settings, surfaceReferenceNits: 2 });
+    288|     expect(t.emission().r).toBeCloseTo(t.restEmission.r + 0.2);
+    289|     expect(materialData(t.material).floats.intensity).toBe(1);
+       |                                                       ^
+    290|   });
+    291|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  src/flight/aircraft/createEngineHotSurfaceGlow.test.ts > declared engine hot hardware > replaces only selected submaterials and restores their original MultiMaterial binding
+AssertionError: expected 0.2499999999999999 to be 0.25 // Object.is equality
+
+- Expected
++ Received
+
+- 0.25
++ 0.2499999999999999
+
+ ❯ src/flight/aircraft/createEngineHotSurfaceGlow.test.ts:81:66
+     79|     expect(hot.subMaterials[0]).not.toBe(t.material);
+     80|     handle.update(1400, true, 1, 1000);
+     81|     expect((hot.subMaterials[0] as PBRMaterial).emissiveColor.r).toBe(…
+       |                                                                  ^
+     82|     handle.update(Number.NaN, true, 1, 1000);
+     83|     expect((hot.subMaterials[0] as PBRMaterial).emissiveColor.equals(C…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  src/flight/aircraft/createEngineHotSurfaceGlow.test.ts > declared engine hot hardware > interpolates continuously in Kelvin, clamps the declared range and clears missing observations
+AssertionError: expected 0.2499999999999999 to be 0.25 // Object.is equality
+
+- Expected
++ Received
+
+- 0.25
++ 0.2499999999999999
+
+ ❯ src/flight/aircraft/createEngineHotSurfaceGlow.test.ts:128:33
+    126|     expect(hot.emissiveColor.r - before).toBeCloseTo(0.25 * 2 / 1100, …
+    127|     handle.update(1600, true, 1, 1000);
+    128|     expect(hot.emissiveColor.r).toBe(0.25);
+       |                                 ^
+    129|     for (const temperature of [299, -1, undefined, Number.NaN, Number.…
+    130|       handle.update(1400, true, 1, 1000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  src/flight/aircraft/createEngineHotSurfaceGlow.test.ts > declared engine hot hardware > maps declared cd/m2 through the exposed display reference without changing temperature
+AssertionError: expected [ 0.2499999999999999, …(2) ] to deeply equal [ 0.25, 0.05, 0.001 ]
+
+- Expected
++ Received
+
+  [
+-   0.25,
+-   0.05,
++   0.2499999999999999,
++   0.049999999999999996,
+    0.001,
+  ]
+
+ ❯ src/flight/aircraft/createEngineHotSurfaceGlow.test.ts:156:41
+    154|     const hot = t.liner.material as PBRMaterial;
+    155|     handle.update(1400, true, 1, 1000);
+    156|     expect(hot.emissiveColor.asArray()).toEqual([0.25, 0.05, 0.001]);
+       |                                         ^
+    157|     handle.update(1400, true, 1, 250);
+    158|     expect(hot.emissiveColor.asArray()).toEqual([1, 0.2, 0.004]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  src/flight/aircraft/engineGasOptics.test.ts > dimensional gas optical transfer > rejects invalid/out-of-domain inputs and retains exact table endpoints
+AssertionError: expected 86101579.6297001 to be close to 86101579.6297, received difference is 8.940696716308594e-8, but expected 5e-8
+ ❯ src/flight/aircraft/engineGasOptics.test.ts:26:69
+     24|     for (const t of [300, 3200]) {
+     25|       const expected = data.blackbody.samples[t === 300 ? 0 : data.bla…
+     26|       interpolateGasBlackbody(data, t)!.forEach((v, i) => expect(v).to…
+       |                                                                     ^
+     27|     }
+     28|   });
+ ❯ src/flight/aircraft/engineGasOptics.test.ts:26:41
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  4 failed | 1 passed (5)
+      Tests  6 failed | 43 passed (49)
+   Start at  14:12:50
+   Duration  799ms (transform 207ms, setup 0ms, import 1.43s, tests 268ms, environment 0ms)
+

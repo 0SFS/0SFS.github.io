@@ -1,0 +1,37 @@
+{
+  "mode": "--install",
+  "success": true,
+  "artifacts": [
+    {
+      "name": "f135-exhaust-lut.png",
+      "bytes": 3185,
+      "sha256": "07891f040deccd0455683beb341e54a72bbbbebd115e3a0df503be8dfa5a9265"
+    },
+    {
+      "name": "f135-exhaust-spatial.png",
+      "bytes": 24424,
+      "sha256": "27110d47433281963a653695116feb79cf80e314a6553c3c9c753f2f6a6a530e"
+    },
+    {
+      "name": "f135ExhaustOpticalData.ts",
+      "bytes": 12521,
+      "sha256": "653e3436759bd39ab41dac7aaf72ad04b890d1f082b5fa4af600af66cbb793fb"
+    },
+    {
+      "name": "f135-exhaust-lut.manifest.json",
+      "bytes": 28543,
+      "sha256": "cb325fb2105541af5c7af1de32f9095f2a7578f6347e7405cd80dc0f6fea66b8"
+    },
+    {
+      "name": "engine-smoke-flipbook.png",
+      "bytes": 7900,
+      "sha256": "73c447a6b283841a81373d4d7fcb591b027fcdab1dd402d57315603285985590"
+    },
+    {
+      "name": "engine-smoke-flipbook.manifest.json",
+      "bytes": 1489,
+      "sha256": "d5f26b100290f9fa5c1ac58d65e7755ea62e23732385807a73335b8682fa253b"
+    }
+  ],
+  "outputDirectory": "/Users/felg/gh/0sfs/build/exhaust-optics/2026-10-06_131709"
+}

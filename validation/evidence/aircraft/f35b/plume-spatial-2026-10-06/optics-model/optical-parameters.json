@@ -1,0 +1,262 @@
+{
+  "id": "f135-visible-approximation-v1",
+  "wavelengthRangeNm": [
+    360,
+    830
+  ],
+  "wavelengthStepNm": 1,
+  "surfaceEmission": {
+    "sampleCount": 512,
+    "temperatureKelvinRange": [
+      300,
+      1800
+    ],
+    "visibleGrayEmissivity": 0.8,
+    "visibleGrayEmissivitySensitivityRange": [
+      0.3,
+      0.95
+    ]
+  },
+  "assumptions": [
+    "Native gas K and separate native solid K retain separate physical meaning. No N1/N2-to-temperature conversion, color ramp, startup fade or render-time heat integrator exists. Gas and solid temperatures and material/particle inputs remain not measured F135 quantities.",
+    "The gas reduced transfer equation is dL_lambda/ds = j_lambda - kappa L_lambda, with gray particle j_lambda=kappa B_lambda(T) and independent optional excited-species emission. kappa has units m^-1, B_lambda is W sr^-1 m^-3, and the runtime integrated RGB Y is cd/m2 before display scaling. Scattering, line absorption and non-gray soot optics are not solved.",
+    "The spatial field is quasi-steady and axisymmetric. Native gas K is an imposed station enthalpy-temperature proxy, assumed total for the explicit isentropic static conversion T=Tstation/[1+(gamma-1)M^2/2]. Provisional gamma1.33 and exit Mach0.8 dry/1.1 AB are not measurements and are not inferred from generic EPR. Local particles share the mixed static gas temperature; no hotter particle reservoir or thermal/transport state is invented.",
+    "The absorption coefficients 0.025/m dry and 0.08/m AB are unmeasured gray particle loading hypotheses. Sensitivity covers 0..0.3/m. Across 1 m homogeneous path they imply optical depths 0.025/0.08 before density variation and fuel-budget caps; temperature alone does not fix opacity or particle loading.",
+    "Unattenuated bolometric particle source power is 4*sigma*integral(kappa(x)*Tparticle(x)^4 dV). Effective kappa is reduced when the complete interpolated field source exceeds its declared fraction of actual total fuel mass flow times43.3MJ/kg. Particle caps remain0.3% dry/1.5% AB. Exact bilinear volume weights also integrate photometric intensity and separately normalized local reaction power; Float32 rounding uses a sub-ppm budget guard, not a brightness retune.",
+    "CH*/C2* band shapes retain visible watts from fraction*actually burned AB fuel kg/s*LHV. Default total fraction remains1e-6 and equal per-band energy weights remain uncertain. CH and C2 have distinct compact annular reaction-region basis fields near the nozzle exit; these describe unresolved possible local excited-species production, not long-lived radicals advected through metres or all supplied unburned fuel burning externally. No dry chemical source is assumed. Missing burned AB fuel gives zero bands. This is not a unique computed F135 color.",
+    "Actual fuel flow bounds the optical energy source; missing/invalid fuel suppresses gas. No optical power is subtracted from native gas/solid reservoirs, which are externally imposed inputs. The source-power upper bound includes photons subsequently reabsorbed; escaped power is no greater. Local bounds do not establish global energy conservation or close fuel, exhaust enthalpy, walls and radiation together.",
+    "Absolute Planck/CIE tables retain amplitude; no physical gas or solid spectrum is peak-normalized. Local Planck emission is interpolated cheaply, then spatial source/extinction are placed in a user-sized RGBA32F axisymmetric grid. Photometric color is a result of temperature and independent particle/CH/C2 inputs. The complete bilinear field is bounded, with grid interpolation error tested independently. Cold gas table extends to150K; below-table local continuum is negligible and truncated tozero without bright normalization.",
+    "Hot metal uses visible gray emissivity 0.8, with uncertainty range 0.3..0.95 pending alloy/coating/oxidation measurements. The same provisional spectrum is assigned to the two distinct material regions, each driven by its own native temperature. Visible emissivity is not substituted for native bolometric heat-loss emissivity. Planck solids do not develop a purple high-temperature ramp.",
+    "Gas and solid luminance have independent explicit cd/m2 display references. Shared scene exposure, tone mapping, curves/grading and encoding apply once. The transfer calculation is linear; exact radiance addition/absorption over the rendered background requires shared linear HDR postprocessing. Material-local display-space composition remains a renderer approximation, not an energy-conservation result.",
+    "One optional unshadowed point light uses the source-volume integral in candela, an upper-bound isotropic far-field approximation that omits plume self-absorption and near-field geometry. A dimensionless display gain defaults 1. It excludes the emitting engine meshes to avoid tinting its own cold hardware. Unlit raster terrain cannot receive it. Gas, solid, environmental reflection and nearby-light isolation are diagnostics, not separate physical energy sources.",
+    "Warm night powered-lift and pink/violet test-cell observations remain qualitative constraints with unknown camera response. Band population sensitivities can produce violet, but there is no forced warm-nozzle/purple-tail mixture schedule. The reported startup transition was not captured with native state; prior AB bank switching plus normalized band-rich spectrum and scene-light reflection are plausible contributors, not an established diagnosis.",
+    "Temperature excess decreases by a declared entrainment/mixing basis in axial distance divided by exit radius and across radius. The plume support spreads linearly at assumed slope0.07; particle loading dilutes with cross-sectional area and has an uncertain loss length. Physical support is the declared6m for dry and AB, not a requirement for visible light throughout it. Geometry, density and reactions have separate inputs; no decorative hue schedule, shock train or turbulence is imposed.",
+    "The present axisymmetric field supersedes the earlier eight-lobe mask in the active gas shader. That mask remains archived for comparison; its provisional count is neither confirmed nor reassigned to chemistry. Quasi-steady changes are instantaneous when native state changes, including cutoff; there is no downstream residence-time inventory, retained radical lifetime or render-time fade.",
+    "The powered-lift observation remains unresolved. Expansion/mixing can further reduce modeled dry thermal radiance. This is an explicit restrictive particle-temperature hypothesis, not proof that the photographed external night glow is impossible and not permission to boost all gas or enable AB."
+  ],
+  "sources": [
+    {
+      "url": "https://www.nist.gov/pml/sensor-science/optical-radiation/realization-candela",
+      "title": "NIST, Realization of the candela",
+      "supports": "The photometric conversion integrates spectral radiance with the photopic observer and luminous efficacy factor. This supports luminance units and conversion, not an F135 visible emissivity or renderer exposure."
+    },
+    {
+      "url": "https://www.nist.gov/programs-projects/spectroradiometry-sources",
+      "title": "NIST, Spectroradiometry of sources",
+      "supports": "Planck spectral radiance is the physical blackbody reference. An assumed visible-grey emissivity scales the hardware table; it does not establish the actual F135 wall temperature or spectral emissivity."
+    },
+    {
+      "url": "https://ntrs.nasa.gov/citations/19730007232",
+      "title": "NASA-TM-X-2711, Comparison of primary zone combustor liner wall temperatures with calculated predictions",
+      "supports": "A main-combustor liner experiment supports separate radiative/convective heat balance and film cooling. It is not an afterburner-liner study and supplies no F135 downstream metal temperatures or calibrated coefficients."
+    },
+    {
+      "url": "https://extapps.ksc.nasa.gov/Reliability/Documents/Preferred_Practices/at9.pdf",
+      "title": "NASA Kennedy Space Center, Thermography, Technique AT-9",
+      "supports": "Page 2 explains surface thermal radiation and visible emission from sufficiently hot solids. It supports a heated-hardware glow mechanism, not F135 nozzle temperatures or display brightness."
+    },
+    {
+      "url": "https://www.dvidshub.net/image/9578175/us-marine-corps-f-35b-performs-during-luke-days-2026",
+      "title": "56th Fighter Wing, U.S. Marine Corps F-35B performs during Luke Days 2026",
+      "supports": "The caption identifies actual F-35B afterburner use; the daylight photograph shows warm visible emission. It is a qualitative representative reference, not a spectral calibration or universal hue."
+    },
+    {
+      "url": "https://ntrs.nasa.gov/citations/20140000730",
+      "title": "NASA/TM-2013-217884, Comparing a Fischer-Tropsch Alternate Fuel to JP-8 and Their 50-50 Blend",
+      "supports": "Section 4.1 describes CH* near 432 nm, C2* near 473/516/573 nm and soot-associated orange emission in jet-fuel combustor imaging. This supplies band locations and mechanisms, not F135 afterburner weights."
+    },
+    {
+      "url": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir6783.pdf",
+      "title": "NISTIR 6783, Fire Dynamics Simulator Technical Reference Guide",
+      "supports": "Section 4 treats Planck emission, absorption and continuous soot radiation; it also warns that a grey approximation can overpredict optically thin emission. The simplified continuum here is an assumption."
+    },
+    {
+      "url": "https://cie.co.at/datatable/cie-1931-colour-matching-functions-2-degree-observer",
+      "title": "CIE 2019, Colour-matching functions of CIE 1931 standard colorimetric observer",
+      "doi": "10.25039/CIE.DS.xvudnb9b",
+      "supports": "Official 1 nm observer functions used to integrate the assumed emission spectrum into XYZ."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=Cztrk6K0Klo&t=92s",
+      "title": "Retained F-35A rear-view sequence at 1:32",
+      "supports": "Qualitative uneven bright annulus and darker center. Eight lobes are unresolved; no B geometry or calibrated temperature inference. Retained frame in validation/evidence/aircraft/f35b/engine-review-2026-10-06/frames/rear-92.png."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=rIroDPghWF4&t=162s",
+      "title": "Royal Navy powered-lift night footage via Navy Lookout",
+      "supports": "External red/orange exhaust-region emission and deck illumination. Species, staging telemetry, exposure and white balance unavailable; operational hover AB remains inhibited."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=sahwo4JdVzs&t=760s",
+      "title": "P&W-sponsored F135 factory and test-cell video",
+      "supports": "Pink/violet photographed plume exists. Does not prove a universal spectrum or identify B-specific calibrated optical mixture."
+    },
+    {
+      "url": "https://www.grc.nasa.gov/www/k-12/airplane/isentrop.html",
+      "title": "NASA Glenn, Isentropic Flow Equations",
+      "supports": "Equation8 defines static/total temperature from Mach and gamma. Native station identification and local Mach here remain assumptions, not an F135 nozzle solution."
+    },
+    {
+      "url": "https://www.grc.nasa.gov/www/k-12/airplane/turbab.html",
+      "title": "NASA Glenn, Afterburning Jet Thrust",
+      "supports": "Fuel is added to turbine exhaust and burns in the augmentor upstream of the exit. It supplies no calibrated external F135 reaction-region distribution or excited-state populations."
+    }
+  ],
+  "spatialEmission": {
+    "size": 128,
+    "ringRadiusFraction": 0.68,
+    "ringWidthFraction": 0.16,
+    "centerEmission": 0.015,
+    "lobeCount": 8,
+    "lobeContrast": 0.35,
+    "phaseRadians": 0.2,
+    "downstreamMixFraction": 0.65
+  },
+  "gasEmission": {
+    "sampleCount": 1024,
+    "temperatureKelvinRange": [
+      150,
+      3200
+    ],
+    "fuelHeatingValueJPerKg": 43300000,
+    "dry": {
+      "absorptionPerMeter": 0.025,
+      "particleFuelPowerFraction": 0.003,
+      "excitedFuelPowerFraction": 0
+    },
+    "afterburner": {
+      "absorptionPerMeter": 0.08,
+      "particleFuelPowerFraction": 0.015,
+      "excitedFuelPowerFraction": 1e-06
+    },
+    "excitedBands": [
+      {
+        "species": "CH*",
+        "centerNm": 432,
+        "sigmaNm": 3,
+        "relativeEnergy": 1
+      },
+      {
+        "species": "C2*",
+        "centerNm": 473,
+        "sigmaNm": 5,
+        "relativeEnergy": 1
+      },
+      {
+        "species": "C2*",
+        "centerNm": 516,
+        "sigmaNm": 5,
+        "relativeEnergy": 1
+      },
+      {
+        "species": "C2*",
+        "centerNm": 573,
+        "sigmaNm": 5,
+        "relativeEnergy": 1
+      }
+    ],
+    "sensitivity": {
+      "absorptionPerMeter": [
+        0,
+        0.3
+      ],
+      "particleFuelPowerFraction": [
+        0,
+        0.02
+      ],
+      "excitedFuelPowerFraction": [
+        0,
+        0.0001
+      ],
+      "bandRelativeEnergy": [
+        0,
+        1
+      ]
+    },
+    "spatialField": {
+      "model": "axisymmetric-mixing-v1",
+      "axialSamples": 97,
+      "radialSamples": 33,
+      "axialRadiusRange": [
+        0,
+        24
+      ],
+      "spreadingSlope": 0.07,
+      "specificHeatRatio": 1.33,
+      "exitMach": {
+        "dry": 0.8,
+        "afterburner": 1.1
+      },
+      "supportLengthScale": {
+        "dry": 1,
+        "afterburner": 1
+      },
+      "ambientTemperatureKelvinRange": [
+        150,
+        500
+      ],
+      "temperature": {
+        "axialMixingPerRadius": 0.16,
+        "radialMixing": 1.8,
+        "initialShearFraction": 0.08
+      },
+      "particles": {
+        "annulusRadius": 0.68,
+        "annulusWidth": 0.16,
+        "centerLoading": 0.015,
+        "mixingRadiusLength": 4,
+        "lossRadiusLength": 12
+      },
+      "chReaction": {
+        "radius": 0.58,
+        "width": 0.18,
+        "axialDecayRadii": 0.55,
+        "axialSupportRadii": 2.2
+      },
+      "c2Reaction": {
+        "radius": 0.72,
+        "width": 0.13,
+        "axialDecayRadii": 0.9,
+        "axialSupportRadii": 3.0
+      },
+      "sensitivity": {
+        "spreadingSlope": [
+          0,
+          0.14
+        ],
+        "specificHeatRatio": [
+          1.25,
+          1.4
+        ],
+        "exitMach": [
+          0,
+          1.5
+        ],
+        "axialMixingPerRadius": [
+          0,
+          0.3
+        ],
+        "radialMixing": [
+          0,
+          3
+        ],
+        "reactionAxialScaleMultiplier": [
+          0.5,
+          2
+        ],
+        "reactionRadius": [
+          0.3,
+          0.85
+        ],
+        "reactionWidth": [
+          0.08,
+          0.3
+        ],
+        "particleLossRadiusLength": [
+          4,
+          24
+        ]
+      }
+    }
+  }
+}

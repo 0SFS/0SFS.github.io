@@ -1,0 +1,11 @@
+stopped-hot-runway-relocation: Engine location ignored, only thruster location is used.
+stopped-hot-runway-relocation: Engine orientation ignored, only thruster orientation is used.
+stopped-hot-runway-relocation: Engine location ignored, only thruster location is used.
+stopped-hot-runway-relocation: Engine orientation ignored, only thruster orientation is used.
+stopped-hot-runway-relocation: Engine location ignored, only thruster location is used.
+stopped-hot-runway-relocation: Engine orientation ignored, only thruster orientation is used.
+stopped-hot-runway-relocation: Engine location ignored, only thruster location is used.
+stopped-hot-runway-relocation: Engine orientation ignored, only thruster orientation is used.
+stopped-hot-runway-relocation: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 304
+stopped-hot-runway-relocation:       Property /sim/model/pushback/target-speed-fps is already defined.
+stopped-hot-runway-relocation:       Its value (0) will not be overridden.

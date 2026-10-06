@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "status": "passed-numerical-correction-only",
+  "report": "report.json",
+  "milestones": 8,
+  "errors": [],
+  "criteria": {
+    "independentSpectralPeakRelative": 0.01,
+    "independentCompleteVolumeRelative": 0.00002,
+    "referenceRayConvergenceRelative": 0.005,
+    "exitBoundaryRelativeAcross2eMinus7Meters": 0.0001,
+    "flagOnlyPhysicalChange": 0
+  },
+  "sourceHashesStable": true,
+  "flagsExactlyInvariant": true,
+  "nativeRerun": false,
+  "physicalAppearanceQualified": false,
+  "posedHardwareAndGpuQualification": "Separate geometry and application records; these rays use straightened physical path coordinates",
+  "figures": [
+    "source-comparison.svg",
+    "receiver-bounds.svg"
+  ]
+}

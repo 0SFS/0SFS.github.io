@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-06T06:46:35.354Z",
+  "qualification": "Deterministic offline bake completed. Focused tests, native model adoption, application checks and GPU qualification are pending; no device or F135 photometric calibration claim.",
+  "owner": "0sfs aircraft visuals",
+  "rawBuildDirectory": "build/checks/f35b-thermal-optics/2026-10-06_014457",
+  "retainedBakeLog": {
+    "path": "optical-bake.log",
+    "sha256": "7f2d2f37a8f5de398bbd43a9f0dfeb4fc4045da50d561315ce54478f8d7decfa"
+  },
+  "identity": {
+    "date": "2026-10-06T06:44:57.553Z",
+    "mode": "approved optical bake only; no test suite",
+    "status": 0,
+    "before": [
+      {
+        "name": "f135-exhaust-lut.png",
+        "bytes": 2856,
+        "sha256": "208ae6cb513beedeb2a5e2b1f0f2ca17952ca66c2ca682733570e3f469af39a6"
+      },
+      {
+        "name": "f135ExhaustOpticalData.ts",
+        "bytes": 5211,
+        "sha256": "2c234f513e8f688c9d67c93d8aac34297003b49df367dc118e63395f35028df1"
+      },
+      {
+        "name": "f135-exhaust-lut.manifest.json",
+        "bytes": 15119,
+        "sha256": "bcb2a9c4045bfbb4ec5f75b3806bdf3b26ca06ceb42ad563ab4002ce7ad50b10"
+      },
+      {
+        "name": "engine-smoke-flipbook.png",
+        "bytes": 7900,
+        "sha256": "73c447a6b283841a81373d4d7fcb591b027fcdab1dd402d57315603285985590"
+      },
+      {
+        "name": "engine-smoke-flipbook.manifest.json",
+        "bytes": 1489,
+        "sha256": "8eea7a8149b3fa3e8e76a06a4599bfa0566df3e53fc0c0525d600f009114072c"
+      }
+    ],
+    "after": [
+      {
+        "name": "f135-exhaust-lut.png",
+        "bytes": 3053,
+        "sha256": "99f06d738d15a56038105eb59eb19984b6fa92c4d9bde983c877950efbfbaed3"
+      },
+      {
+        "name": "f135ExhaustOpticalData.ts",
+        "bytes": 10172,
+        "sha256": "1bd440defd8d579cc5c3655b5af9124bf6e382b1759fd3546d4eb7ebde27687c"
+      },
+      {
+        "name": "f135-exhaust-lut.manifest.json",
+        "bytes": 23131,
+        "sha256": "a8f1b191ad26161428f70abddd9c3da5a35228f219415a0cc876050b1c2fb048"
+      },
+      {
+        "name": "engine-smoke-flipbook.png",
+        "bytes": 7900,
+        "sha256": "73c447a6b283841a81373d4d7fcb591b027fcdab1dd402d57315603285985590"
+      },
+      {
+        "name": "engine-smoke-flipbook.manifest.json",
+        "bytes": 1489,
+        "sha256": "d3d506b942ee21ffa7b331c8427185ae91de32bbbc75b1d32cdda246e2f2e1a8"
+      }
+    ]
+  },
+  "contracts": {
+    "gas": "Native Kelvin maps within each bank. Native augmentation selects the burning bank. Gas soot/chemistry/optical depth and shock envelope remain provisional.",
+    "hardware": {
+      "rangeKelvin": [
+        300,
+        1800
+      ],
+      "sampleCount": 128,
+      "visibleGrayEmissivity": 0.8,
+      "unit": "cd/m2",
+      "photopicConversion": "683 * 1e-9 * 0.8 * sum(B_lambda(T)*CIE_y_lambda) at 1 nm spacing; clipped linear-sRGB is rescaled to preserve this Y.",
+      "displayReference": {
+        "parameter": "osfs.exhaust.surfaceReferenceNits",
+        "unit": "cd/m2",
+        "default": 1000,
+        "bounds": [
+          1,
+          100000
+        ]
+      },
+      "state": "Declared native metal Kelvin; require initialized and valid. No gas/EGT/N2 substitution, running gate or visual thermal timer."
+    }
+  },
+  "independentPhotopicExamples": [
+    {
+      "temperatureKelvin": 300,
+      "luminanceCdPerSquareMeter": 8.232807524792162e-22
+    },
+    {
+      "temperatureKelvin": 651,
+      "luminanceCdPerSquareMeter": 0.000009868242730759958
+    },
+    {
+      "temperatureKelvin": 1008,
+      "luminanceCdPerSquareMeter": 2.590415273603976
+    },
+    {
+      "temperatureKelvin": 1400,
+      "luminanceCdPerSquareMeter": 1950.5220625692154
+    },
+    {
+      "temperatureKelvin": 1800,
+      "luminanceCdPerSquareMeter": 93976.63036989515
+    }
+  ],
+  "sourceHashes": [
+    {
+      "path": "scripts/exhaustOptics/f135-visible-approximation.json",
+      "sha256": "735a8f44beeaac3c3315e290bcdb023c44dcdce2f564f558e6c5035b52759546"
+    },
+    {
+      "path": "scripts/exhaustOptics/bake.mjs",
+      "sha256": "489debc053b3159cadd9ee62a3606188798440d7caa4c0b99649ce412158cd6b"
+    },
+    {
+      "path": "scripts/build-exhaust-optics.mjs",
+      "sha256": "4571c5fab7d88b59af210b4ee21282182121ba9a39064e57340b8d047fd5a90c"
+    },
+    {
+      "path": "src/flight/aircraft/engineExhaustProfiles.ts",
+      "sha256": "f3fb7926284ac3673cd369963504257af09bd7d369248af9bf3f4f4331a73a97"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineHotSurfaceGlow.ts",
+      "sha256": "0fc93ee0f2d4d94eb02974d7124fe3f37628cf2b130acdc2906604c4c1e7f3b9"
+    }
+  ],
+  "limitations": [
+    "Visible-gray emissivity .8 is provisional, distinct from native bolometric cooling and effective incident flame coupling.",
+    "Native wall/gas reduced-model inputs do not constitute measured F135 temperatures or calibrated optics.",
+    "Gas color is temperature-indexed but also depends on explicitly assumed species/soot spectra; temperature alone does not determine a transparent flame.",
+    "The display reference is presentation calibration; retained PBR material factors, lighting/exposure and screen response remain part of the rendering pipeline.",
+    "The lookup dimensions and shader sample loops are unchanged; no measured runtime performance or energy claim."
+  ]
+}

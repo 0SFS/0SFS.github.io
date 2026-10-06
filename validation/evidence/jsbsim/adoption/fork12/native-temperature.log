@@ -1,0 +1,27 @@
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/master-20260925
+    Start 88: FGTurbineTemperatureTest1
+1/1 Test #88: FGTurbineTemperatureTest1 ........***Exception: SegFault  0.02 sec
+Running cxxtest tests (3 tests)
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[2]/IdleThrust
+    Function: propulsion/engine[2]/MilThrust
+    Function: propulsion/engine[2]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   0.02 sec
+
+The following tests FAILED:
+	 88 - FGTurbineTemperatureTest1 (SEGFAULT)
+Errors while running CTest

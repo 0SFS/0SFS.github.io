@@ -925,6 +925,8 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
               : tabId === "engine" ? <>
                 <EngineDetailsHost attach={props.attachEngineDetails} />
                 <ParameterSection settings={props.settings} tab="engine" section="engine" />
+                <ParameterSection settings={props.settings} tab="engine" section="history" />
+                <ParameterSection settings={props.settings} tab="engine" section="test" />
               </>
               : tabId === "logging" ? <LoggingPanel state={props.snapshot.logging} onAction={props.onLoggingAction} />
               : <DebugPanel snapshot={props.snapshot} settings={props.settings} onCollisionDebugChange={props.onCollisionDebugChange}

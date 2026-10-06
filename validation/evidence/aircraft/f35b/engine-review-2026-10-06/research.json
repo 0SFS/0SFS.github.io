@@ -1,0 +1,198 @@
+{
+  "date": "2026-10-06",
+  "kind": "source-and-observation-ledger",
+  "qualification": "Qualitative review only; no physical or photometric F135 calibration.",
+  "videos": [
+    {
+      "id": "sahwo4JdVzs",
+      "url": "https://www.youtube.com/watch?v=sahwo4JdVzs",
+      "title": "How The World's Most Powerful Fighter Jet Engine Is Made",
+      "publisher": "Sam Eckholm; description credits Pratt & Whitney sponsorship",
+      "samplesSeconds": [
+        720,
+        760,
+        810,
+        820
+      ],
+      "cadenceSeconds": 10,
+      "observations": [
+        "A contracted nozzle is visible at 720 s.",
+        "Pink/violet external emission is visible at 760, 810 and 820 s."
+      ],
+      "limitations": [
+        "Storyboard samples, not measured spectra or synchronized engine telemetry.",
+        "Video includes discussion of multiple variants; no PW-600 nozzle control calibration established."
+      ],
+      "storyboards": [
+        {
+          "name": "video-L3-M8.jpg",
+          "sha256": "b45ec901fafc1fce039cb0a65d2dc5d240a09d5b12a2e61e8d868efdd15a2815"
+        },
+        {
+          "name": "video-L3-M9.jpg",
+          "sha256": "bd16fb98e7003f60c8361e41892fff0473c84d876e435f3023f694ba5d719b90"
+        }
+      ]
+    },
+    {
+      "id": "rIroDPghWF4",
+      "url": "https://www.youtube.com/watch?v=rIroDPghWF4",
+      "title": "Back in the game - Flying the F-35 from HMS Queen Elizabeth",
+      "publisher": "Navy Lookout; description credits Royal Navy video by LPhot Dan Shepherd",
+      "userTimesSeconds": [
+        158,
+        161
+      ],
+      "samplesSeconds": [
+        158,
+        161,
+        162,
+        162.8
+      ],
+      "cadenceSeconds": null,
+      "observations": [
+        "At158s a red/orange external trail is visible behind the nozzle.",
+        "At161s the aircraft is in the ski-jump ramp shot; the vertical-landing close-up follows around162.8s.",
+        "At162.8s a downward nozzle, external luminous region and bright deck patch are clearly visible.",
+        "The current simulator does not reproduce the reported non-AB powered-lift appearance."
+      ],
+      "limitations": [
+        "No augmentation telemetry. Manufacturer states hover uses no afterburner; footage is not proof of AB in hover.",
+        "Pixels do not separate gas/particle self-emission from scattered/reflected light or heated deck emission.",
+        "Exposure, white balance, camera curve and grading are unknown."
+      ],
+      "storyboards": [
+        {
+          "name": "vtol-video-L2-M3.jpg",
+          "sha256": "132b861bdddc61b04df0de71eea869f9a543c5c3d3e16172f6b4a193b57cd247"
+        }
+      ],
+      "method": "1080p video extract requested from 156 to 163 s; individual frames sought at relative 2, 5, 6 and 6.8 s. Timestamps are approximate to a video frame.",
+      "frames": [
+        {
+          "path": "frames/vtol-158.png",
+          "sha256": "fe9e2912d63483ea3a901974622ab35e9acf50d4ec6f6b82863f8576f2917018"
+        },
+        {
+          "path": "frames/vtol-161.png",
+          "sha256": "932d109664eac25e647a3813cfb89f331d0531d3921005a54829c5aa30717c18"
+        },
+        {
+          "path": "frames/vtol-162p8.png",
+          "sha256": "7aeb50620d0dd6bb04f542b2fd20d6e6f04dbac8a2b39c02d14734f5ef2847d6"
+        }
+      ]
+    },
+    {
+      "id": "Cztrk6K0Klo",
+      "url": "https://www.youtube.com/watch?v=Cztrk6K0Klo",
+      "title": "Amazing Back View! at Afterburner Take-Off - F-35A, F-15E, F-16 and EA-18G",
+      "publisher": "USA Military Channel; credits U.S. Air Force footage",
+      "samplesSeconds": [
+        45,
+        50,
+        75,
+        90
+      ],
+      "userTimesSeconds": [
+        92
+      ],
+      "cadenceSeconds": 5,
+      "observations": [
+        "The first 111 s identifies F-35A, not F-35B.",
+        "Rear-view sequence shows a bright annular region with a darker center and nonuniform brightness.",
+        "User identifies eight bright spots at 92 s; reviewer cannot independently resolve the exact count in the small, distorted nozzle image."
+      ],
+      "limitations": [
+        "Eight-spot count remains a hypothesis, not hardware identification.",
+        "Heat shimmer, pixel resolution, exposure and perspective limit spatial measurement.",
+        "Brightness does not measure velocity or identify flameholder/spraybar count.",
+        "No synchronized dry-power/augmentation telemetry."
+      ],
+      "storyboards": [
+        {
+          "name": "rear-video-L3-M0.jpg",
+          "sha256": "7b18bd252cd14b9b2545f6653b213915aee33bbf53fa068a3f4b6bbbeb102d1e"
+        },
+        {
+          "name": "rear-video-L3-M1.jpg",
+          "sha256": "5b78ae50ee3cb258eebea1d2f41e4ebc0095dc76871c1022e8fac85b7ff17689"
+        },
+        {
+          "name": "rear-video-L3-M2.jpg",
+          "sha256": "c6f82cd719850d3f41226aea958639c72d7d79b3327f51629b0e17e0f5937e1d"
+        }
+      ],
+      "method": "1080p video extract requested from 90 to 94 s; inspected 92 s and half-second samples across the interval.",
+      "frames": [
+        {
+          "path": "frames/rear-92.png",
+          "sha256": "74c9d787e8a8ecd422fd8401e24434398097f676ba3b6af5df562d50439581c8"
+        }
+      ]
+    }
+  ],
+  "primarySources": [
+    {
+      "url": "https://www.hqmc.marines.mil/LinkClick.aspx?fileticket=7A2LJuIKWCg%3D&mid=155018&portalid=61&tabid=16139",
+      "location": "Enclosure 25, printed p80 / PDF p32",
+      "supports": "F135-PW-600 augmented two-spool layout; component stage counts."
+    },
+    {
+      "url": "https://www.codeonemagazine.com/c5_article.html?item_id=137",
+      "supports": "Designer distinguishes a historic deflected-AB ground rig from operational X-35B/F-35B hover without AB; also documents cooling and nozzle variants."
+    },
+    {
+      "url": "https://www.rolls-royce.com/media/our-stories/innovation/2016/liftsystem.aspx/1000",
+      "supports": "Swivel module supports afterburning in conventional flight."
+    },
+    {
+      "url": "https://onlinelibrary.wiley.com/doi/full/10.1002/9780470686652.eae490",
+      "location": "Sections 2.2.1 and 6.2",
+      "supports": "A8/A9 control and compact STOVL versus CTOL/CV nozzle."
+    },
+    {
+      "url": "https://ntrs.nasa.gov/citations/20140000730",
+      "location": "4.1",
+      "supports": "Jet-fuel CH/C2 bands and soot-continuum mechanisms; not F135 weights."
+    },
+    {
+      "url": "https://ntrs.nasa.gov/citations/19730007232",
+      "supports": "Main-combustor liner radiation/convection/film-cooling example; corrects earlier mislabel as an afterburner-liner experiment."
+    },
+    {
+      "url": "https://www.faa.gov/sites/faa.gov/files/aircraft/air_cert/design_approvals/engine_prop/engine_malf_report.pdf",
+      "location": "pp39-40",
+      "supports": "N1/N2 identify rotor speeds, not temperatures."
+    },
+    {
+      "url": "https://helpx.adobe.com/camera-raw/desktop/using/make-color-tonal-adjustments-camera.html",
+      "supports": "Whitebalance/tint, exposure and clipping affect rendered photographs; no recovery of missing camera calibration claimed."
+    },
+    {
+      "url": "https://www.faa.gov/sites/faa.gov/files/regulations_policies/handbooks_manuals/aviation/00-80T-80.pdf",
+      "location": "p129",
+      "supports": "Main burner and downstream afterburner are separate stations."
+    },
+    {
+      "url": "https://ntrs.nasa.gov/citations/19780003163",
+      "supports": "Experimental downstream ring flameholders and discrete mixers establish possible spatial mechanisms, not F135 hardware identity or an eight-spot count."
+    },
+    {
+      "url": "https://ntrs.nasa.gov/citations/19820051508",
+      "supports": "Recirculating flameholder wakes stabilize combustion; a bright region does not establish fastest axial flow."
+    }
+  ],
+  "simulationEvidence": [
+    "../thermal-model-2026-10-06/dry99-cycle/acceptance.json",
+    "../nozzle-area-2026-10-05/source-geometry.json",
+    "../temperature-ui-audit-2026-10-06/geometry-report.json"
+  ],
+  "openDiscrepancies": [
+    "Full-resolution powered-lift close-up confirms light outside the downward nozzle and on the deck; current non-AB exhaust/deck-light appearance is incomplete.",
+    "Dry 99% metal heats but remains almost dark with the assumed cooled single region.",
+    "Soot-biased warm gas profile does not represent all observed F135 hues.",
+    "Nozzle authored minimum and generic N2 schedule are uncalibrated.",
+    "Flat interior cap and uniform thermal region omit spatial features seen in the rear-view video."
+  ]
+}

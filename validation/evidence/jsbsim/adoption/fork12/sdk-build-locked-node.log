@@ -1,0 +1,168 @@
+
+> @felipegalind0/jsbsim@1.2.4-fork.12 build
+> node scripts/build.mjs
+
+
+added 53 packages in 386ms
+Generated 90 method bindings.
+Detected 2 enum type map(s) and 1 flag map(s).
+- generated/FGFDMExecBindings.cpp
+- src/generated/fgfdmexec-api.ts
+- src/generated/jsbsim-api.ts
+emcmake: cmake -S /Users/felg/gh/Felipegalind0/jsbsim/wasm/build/sources/repository/5b8a50d093bf8ab58dc81e11ff902fc638db17c7700d95a79881dd323d96fe38 -B /Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/b6f08358df71-eGz7gJ/wasm -DBUILD_WASM_MODULE=ON -DBUILD_DOCS=OFF -DBUILD_PYTHON_MODULE=OFF -DBUILD_JULIA_PACKAGE=OFF -DBUILD_MATLAB_SFUNCTION=OFF -DBUILD_SHARED_LIBS=OFF -DSYSTEM_EXPAT=OFF -DJSBSIM_WASM_BINDINGS=/Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/b6f08358df71-eGz7gJ/sdk/generated/FGFDMExecBindings.cpp -DJSBSIM_BINDINGS_MANIFEST=/Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/b6f08358df71-eGz7gJ/sdk/generated/bindings-manifest.json -DJSBSIM_WASM_EXTENSION_DIR=/Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/b6f08358df71-eGz7gJ/sdk/bindings -DJSBSIM_BUILD_INPUT_SHA256=b6f08358df7165212c0df27cab91d39197c8a84559b593a684bd0798ef47633d -DJSBSIM_NATIVE_CONTENT_SHA256=5b8a50d093bf8ab58dc81e11ff902fc638db17c7700d95a79881dd323d96fe38 -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/opt/homebrew/Cellar/emscripten/6.0.9_1/libexec/cmake/Modules/Platform/Emscripten.cmake -DCMAKE_CROSSCOMPILING_EMULATOR=/opt/homebrew/opt/node/bin/node in directory /Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/b6f08358df71-eGz7gJ/sdk
+-- Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE) 
+-- Could NOT find CxxTest (missing: CXXTEST_INCLUDE_DIR) 
+CMake Warning at CMakeLists.txt:176 (message):
+  -- Could NOT find LSB_Release (missing: LSB_RELEASE_EXECUTABLE)
+
+
+-- Configuring done (0.4s)
+-- Generating done (0.1s)
+-- Build files have been written to: /Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/b6f08358df71-eGz7gJ/wasm
+[  2%] Building CXX object src/GeographicLib/CMakeFiles/GeographicLib.dir/Geodesic.cpp.o
+[  2%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGGroundCallback.cpp.o
+[  3%] Building CXX object src/initialization/CMakeFiles/Init.dir/FGInitialCondition.cpp.o
+[  4%] Building CXX object src/models/CMakeFiles/Models.dir/FGAerodynamics.cpp.o
+[  5%] Building CXX object src/math/CMakeFiles/Math.dir/FGColumnVector3.cpp.o
+[  7%] Building CXX object src/GeographicLib/CMakeFiles/GeographicLib.dir/GeodesicLine.cpp.o
+[  7%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGPropertyManager.cpp.o
+[  8%] Building CXX object src/math/CMakeFiles/Math.dir/FGFunction.cpp.o
+[  8%] Building CXX object src/GeographicLib/CMakeFiles/GeographicLib.dir/Math.cpp.o
+[  9%] Building CXX object src/models/CMakeFiles/Models.dir/FGAircraft.cpp.o
+[ 10%] Building CXX object src/initialization/CMakeFiles/Init.dir/FGTrim.cpp.o
+[ 11%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGScript.cpp.o
+[ 11%] Built target GeographicLib
+[ 12%] Building CXX object src/models/atmosphere/CMakeFiles/Atmosphere.dir/FGMSIS.cpp.o
+[ 12%] Building CXX object src/models/CMakeFiles/Models.dir/FGAtmosphere.cpp.o
+[ 12%] Building CXX object src/initialization/CMakeFiles/Init.dir/FGTrimAxis.cpp.o
+[ 14%] Building CXX object src/models/atmosphere/CMakeFiles/Atmosphere.dir/FGMars.cpp.o
+[ 15%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGXMLElement.cpp.o
+[ 16%] Building CXX object src/models/CMakeFiles/Models.dir/FGAuxiliary.cpp.o
+[ 17%] Building CXX object src/models/atmosphere/CMakeFiles/Atmosphere.dir/FGStandardAtmosphere.cpp.o
+[ 18%] Building CXX object src/initialization/CMakeFiles/Init.dir/FGLinearization.cpp.o
+[ 18%] Building CXX object src/math/CMakeFiles/Math.dir/FGLocation.cpp.o
+[ 20%] Building CXX object src/models/CMakeFiles/Models.dir/FGFCS.cpp.o
+[ 20%] Building CXX object src/models/atmosphere/CMakeFiles/Atmosphere.dir/FGWinds.cpp.o
+[ 21%] Building CXX object src/math/CMakeFiles/Math.dir/FGMatrix33.cpp.o
+[ 22%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGXMLParse.cpp.o
+[ 22%] Built target Init
+[ 22%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGElectric.cpp.o
+[ 23%] Building CXX object src/math/CMakeFiles/Math.dir/FGPropertyValue.cpp.o
+[ 23%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGfdmSocket.cpp.o
+[ 24%] Building CXX object src/models/CMakeFiles/Models.dir/FGSurface.cpp.o
+[ 25%] Building C object src/models/atmosphere/CMakeFiles/Atmosphere.dir/MSIS/nrlmsise-00.c.o
+[ 27%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGEngine.cpp.o
+[ 28%] Building C object src/models/atmosphere/CMakeFiles/Atmosphere.dir/MSIS/nrlmsise-00_data.c.o
+[ 28%] Built target Atmosphere
+[ 29%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGDeadBand.cpp.o
+[ 30%] Building CXX object src/math/CMakeFiles/Math.dir/FGQuaternion.cpp.o
+[ 31%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGXMLFileRead.cpp.o
+[ 31%] Building CXX object src/models/CMakeFiles/Models.dir/FGGroundReactions.cpp.o
+[ 32%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGForce.cpp.o
+[ 32%] Building CXX object src/math/CMakeFiles/Math.dir/FGRealValue.cpp.o
+[ 32%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGFCSComponent.cpp.o
+[ 34%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGOutputType.cpp.o
+[ 35%] Building CXX object src/models/CMakeFiles/Models.dir/FGInertial.cpp.o
+[ 36%] Building CXX object src/math/CMakeFiles/Math.dir/FGTable.cpp.o
+[ 37%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGNozzle.cpp.o
+[ 38%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGFilter.cpp.o
+[ 40%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGOutputFG.cpp.o
+[ 41%] Building CXX object src/models/CMakeFiles/Models.dir/FGLGear.cpp.o
+[ 41%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGPiston.cpp.o
+[ 42%] Building CXX object src/math/CMakeFiles/Math.dir/FGCondition.cpp.o
+[ 43%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGGain.cpp.o
+[ 43%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGOutputSocket.cpp.o
+[ 44%] Building CXX object src/models/CMakeFiles/Models.dir/FGMassBalance.cpp.o
+[ 45%] Building CXX object src/math/CMakeFiles/Math.dir/FGRungeKutta.cpp.o
+[ 47%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGPropeller.cpp.o
+[ 48%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGKinemat.cpp.o
+[ 49%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGOutputFile.cpp.o
+[ 49%] Building CXX object src/math/CMakeFiles/Math.dir/FGModelFunctions.cpp.o
+[ 49%] Building CXX object src/models/CMakeFiles/Models.dir/FGModel.cpp.o
+[ 50%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGRocket.cpp.o
+[ 50%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGSummer.cpp.o
+[ 51%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGOutputTextFile.cpp.o
+[ 52%] Building CXX object src/math/CMakeFiles/Math.dir/FGTemplateFunc.cpp.o
+[ 54%] Building CXX object src/models/CMakeFiles/Models.dir/FGOutput.cpp.o
+[ 55%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGSwitch.cpp.o
+[ 56%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGTank.cpp.o
+[ 57%] Building CXX object src/math/CMakeFiles/Math.dir/FGStateSpace.cpp.o
+[ 58%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGPropertyReader.cpp.o
+[ 60%] Building CXX object src/models/CMakeFiles/Models.dir/FGPropagate.cpp.o
+[ 61%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGFCSFunction.cpp.o
+[ 61%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGThruster.cpp.o
+[ 61%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGModelLoader.cpp.o
+[ 61%] Built target Math
+[ 62%] Building CXX object src/simgear/props/CMakeFiles/Properties.dir/props.cxx.o
+[ 63%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGSensor.cpp.o
+[ 64%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGTurbine.cpp.o
+[ 65%] Building CXX object src/models/CMakeFiles/Models.dir/FGPropulsion.cpp.o
+[ 67%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGInputType.cpp.o
+[ 67%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGPID.cpp.o
+[ 67%] Built target Properties
+[ 68%] Building CXX object src/simgear/magvar/CMakeFiles/Magvar.dir/coremag.cxx.o
+[ 69%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGInputSocket.cpp.o
+[ 69%] Built target Magvar
+[ 69%] Building CXX object src/simgear/misc/CMakeFiles/Misc.dir/sg_path.cxx.o
+[ 70%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGTurboProp.cpp.o
+[ 70%] Building CXX object src/models/CMakeFiles/Models.dir/FGInput.cpp.o
+[ 71%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGActuator.cpp.o
+[ 72%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGUDPInputSocket.cpp.o
+[ 74%] Building CXX object src/simgear/misc/CMakeFiles/Misc.dir/strutils.cxx.o
+[ 74%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGTransmission.cpp.o
+[ 75%] Building CXX object src/models/CMakeFiles/Models.dir/FGExternalReactions.cpp.o
+[ 76%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGAccelerometer.cpp.o
+[ 76%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/string_utilities.cpp.o
+[ 76%] Built target Misc
+[ 77%] Building CXX object src/simgear/xml/CMakeFiles/Xml.dir/easyxml.cxx.o
+[ 78%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGRotor.cpp.o
+[ 80%] Building CXX object src/models/CMakeFiles/Models.dir/FGExternalForce.cpp.o
+[ 80%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGGyro.cpp.o
+[ 80%] Building C object src/simgear/xml/CMakeFiles/Xml.dir/xmlparse.c.o
+[ 81%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGBrushLessDCMotor.cpp.o
+[ 81%] Building CXX object src/models/CMakeFiles/Models.dir/FGBuoyantForces.cpp.o
+[ 82%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGLog.cpp.o
+[ 83%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGMagnetometer.cpp.o
+[ 84%] Building C object src/simgear/xml/CMakeFiles/Xml.dir/xmltok.c.o
+[ 85%] Building CXX object src/models/CMakeFiles/Models.dir/FGGasCell.cpp.o
+[ 85%] Built target Propulsion
+[ 87%] Building C object src/simgear/xml/CMakeFiles/Xml.dir/xmlrole.c.o
+[ 87%] Built target InputOutput
+[ 88%] Building CXX object src/simgear/io/iostreams/CMakeFiles/IOStreams.dir/sgstream.cxx.o
+[ 89%] Building CXX object src/models/CMakeFiles/Models.dir/FGAccelerations.cpp.o
+[ 89%] Built target Xml
+[ 90%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGAngles.cpp.o
+[ 91%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGWaypoint.cpp.o
+[ 91%] Built target IOStreams
+[ 91%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGDistributor.cpp.o
+[ 92%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGLinearActuator.cpp.o
+[ 92%] Built target Models
+[ 92%] Built target FlightControl
+[ 95%] Building CXX object src/CMakeFiles/libJSBSim.dir/FGFDMExec.cpp.o
+[ 95%] Building CXX object src/CMakeFiles/libJSBSim.dir/FGJSBBase.cpp.o
+[ 96%] Linking CXX static library libJSBSim.a
+[ 96%] Built target libJSBSim
+[100%] Building CXX object wasm/CMakeFiles/jsbsim_wasm.dir/Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/b6f08358df71-eGz7gJ/sdk/bindings/GearContactBindings.cpp.o
+[100%] Building CXX object wasm/CMakeFiles/jsbsim_wasm.dir/Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/b6f08358df71-eGz7gJ/sdk/bindings/PropertyBatchBindings.cpp.o
+[100%] Building CXX object wasm/CMakeFiles/jsbsim_wasm.dir/Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/b6f08358df71-eGz7gJ/sdk/generated/FGFDMExecBindings.cpp.o
+[100%] Linking CXX executable ../jsbsim_wasm.mjs
+em++: warning: WASM_BIGINT is deprecated (no longer needed. Should only ever be implicitly disabled by -sWASM=0). Please open a bug if you have a continuing need for this setting [-Wdeprecated]
+em++: error: cache directory "/opt/homebrew/Cellar/emscripten/6.0.9_1/libexec/cache" is not writable while accessing cache for: sysroot/lib/wasm32-emscripten/libembind-rtti.a (see https://emscripten.org/docs/tools_reference/emcc.html for info on setting the cache directory)
+make[3]: *** [jsbsim_wasm.mjs] Error 1
+make[2]: *** [wasm/CMakeFiles/jsbsim_wasm.dir/all] Error 2
+make[1]: *** [wasm/CMakeFiles/jsbsim_wasm.dir/rule] Error 2
+make: *** [jsbsim_wasm] Error 2
+file:///Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/b6f08358df71-eGz7gJ/sdk/scripts/build-wasm.mjs:20
+  if (result.status !== 0) throw new Error(command + " failed with " + (result.signal ?? result.status));
+                                 ^
+
+Error: cmake failed with 2
+    at run (file:///Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/b6f08358df71-eGz7gJ/sdk/scripts/build-wasm.mjs:20:34)
+    at file:///Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/b6f08358df71-eGz7gJ/sdk/scripts/build-wasm.mjs:36:1
+
+Node.js v26.8.2
+Error: bash scripts/build-wasm.sh failed with 1
+    at command (file:///Users/felg/gh/Felipegalind0/jsbsim/wasm/scripts/build.mjs:31:34)
+    at run (file:///Users/felg/gh/Felipegalind0/jsbsim/wasm/scripts/build.mjs:170:30)
+    at build (file:///Users/felg/gh/Felipegalind0/jsbsim/wasm/scripts/build.mjs:174:3)
+    at async file:///Users/felg/gh/Felipegalind0/jsbsim/wasm/scripts/build.mjs:185:7

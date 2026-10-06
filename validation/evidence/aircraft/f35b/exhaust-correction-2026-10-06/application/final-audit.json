@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "checks": "documentation links, final source/snapshot hashes, whitespace",
+  "localLinksChecked": 31,
+  "sourceSnapshotsChecked": 29,
+  "errors": [],
+  "notes": "Documentation-only reconciliation after CI; no suite rerun."
+}

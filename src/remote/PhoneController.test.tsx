@@ -5,7 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 /** The camera has its own tests; here only what the controller hands it matters. */
 const scanner = vi.hoisted(() => ({ props: null as null | { onScan(url: string): void; onClose(): void } }))
 vi.mock('../flight/hud/engineSpoolRenderer', () => ({
-  createEngineSpoolRenderer: () => ({ draw() {}, configure() {}, destroy() {}, ready: Promise.resolve() }),
+  createEngineSpoolRenderer: () => ({ draw() {}, configure() {}, setAccentColor() {}, destroy() {}, canDraw: () => true,
+    getMotionStatus: () => ({ fps: null, maxTurnsPerSecond: null, limited: false }), ready: Promise.resolve() }),
 }))
 vi.mock('./PhoneQrScanner', async () => {
   const { createElement } = await import('react')

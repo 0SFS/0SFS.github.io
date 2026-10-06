@@ -26,6 +26,10 @@ describe("engine catalog discovery", () => {
       maxN1Pct: null, maxN2Pct: null, rotorBlades });
     expect(deriveEnginePhase(piston)).toMatchObject({ phase: "running", derived: false });
     expect(enginePropertyApplies("propulsion/engine/n1", { kind: "piston" })).toBe(false);
+    expect(enginePropertyApplies("propulsion/engine/egt-degc", { kind: "piston" })).toBe(false);
+    expect(enginePropertyApplies("propulsion/engine/egt-degc", { kind: "turbine" })).toBe(true);
+    expect(enginePropertyApplies("propulsion/engine/thermal/metal-temperature-k", { kind: "piston" })).toBe(false);
+    expect(enginePropertyApplies("propulsion/engine/thermal/nozzle-gas-temperature-k", { kind: "turbine" })).toBe(true);
     expect(enginePropertyApplies("propulsion/engine/engine-rpm", { kind: "piston" })).toBe(true);
     expect(readEngineSample(reader, available, { kind: "turbine" })).toMatchObject({
       kind: "turbine", rpm: null, n1Pct: 87, n2Pct: 92, maxN1Pct: 100, maxN2Pct: 110,
@@ -35,13 +39,13 @@ describe("engine catalog discovery", () => {
 
   it("lists every readable property under the queried prefixes and skips write-only ones", () => {
     const catalog: Record<string, string> = {
-      propulsion: "propulsion/engine/n1 (RW)\npropulsion/set-running (W)\npropulsion/tank/contents-lbs (RW)\n",
+      propulsion: "propulsion/engine/n1 (RW)\npropulsion/engine/egt-degc (R)\npropulsion/set-running (W)\npropulsion/tank/contents-lbs (RW)\n",
       "fcs/throttle": "fcs/throttle-cmd-norm (RW)\nfcs/throttle-pos-norm (R)\n",
       "aero/qbar-psf": "No matches found\n",
     };
     const reader = { getPropertyValue: () => 0, queryPropertyCatalog: (query: string) => catalog[query] ?? "" };
     expect(discoverReadableProperties(reader, ["propulsion", "fcs/throttle", "aero/qbar-psf"])).toEqual([
-      "fcs/throttle-cmd-norm", "fcs/throttle-pos-norm", "propulsion/engine/n1", "propulsion/tank/contents-lbs",
+      "fcs/throttle-cmd-norm", "fcs/throttle-pos-norm", "propulsion/engine/egt-degc", "propulsion/engine/n1", "propulsion/tank/contents-lbs",
     ]);
   });
 
@@ -124,6 +128,10 @@ describe("formatting", () => {
     expect(formatValue(0.0474441)).toBe("0.0474");
     expect(formatRowValue({ label: "Fuel flow", path: "p", unit: "lb/h", scale: 3600, digits: 0 }, 0.0474441))
       .toBe("171 lb/h");
+    expect(formatRowValue({ label: "Metal", path: "p", unit: "°C", offset: -273.15, digits: 1 }, 1000))
+      .toBe("726.9 °C");
+    expect(formatRowValue({ label: "Metal", path: "p", unit: "°C", offset: -273.15 }, Number.NaN))
+      .toBe("n/a");
     expect(formatRowValue({ label: "Cutoff", path: "p", flag: true }, 1)).toBe("on");
   });
 

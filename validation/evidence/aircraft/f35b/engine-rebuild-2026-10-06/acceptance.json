@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-06",
+  "status": "passed",
+  "scope": "Earth-backed engine stand at MSP runway35; existing Location-tab relocation; native hold-down and stopped/hot state preservation; source-backed reconstruction handoff and reference acquisition. No replacement engine geometry or thermal/optical numerical model change.",
+  "checks": {
+    "typecheck": {
+      "passed": true,
+      "command": "npx tsc -b",
+      "log": "checks/typecheck.log"
+    },
+    "related": {
+      "initialLog": "checks/related.log",
+      "passedInitially": 644,
+      "failedInitially": 1,
+      "failure": "App fixture used obsolete osfs.aircraft key instead of osfs.aircraft.id and therefore selected the default C172 while asserting F35B. Corrected the test data and strengthened the actual selected-aircraft assertion; no production fix was needed.",
+      "correctedFileLog": "checks/app-corrected.log",
+      "correctedFilePassed": 53
+    },
+    "lint": {
+      "passed": true,
+      "command": "npm run lint",
+      "log": "checks/lint.log"
+    },
+    "ci": {
+      "passed": true,
+      "command": "npm run ci",
+      "log": "checks/ci.log",
+      "testFiles": 166,
+      "passedTests": 1795,
+      "existingExpectedFailures": 1,
+      "includes": [
+        "lint",
+        "full Vitest suite at maxWorkers50%",
+        "incremental TypeScript build",
+        "production build",
+        "installed and emitted JSBSim/audio artifact verification",
+        "exhaust/smoke generated artifact verification"
+      ]
+    }
+  },
+  "coverage": [
+    "App tests load normal terrain at FAA runway35 coordinates without disabling the Earth root.",
+    "Real existing Location-tab coordinate submission dispatches terrain preparation and hold-down relocation without writing the saved flight.",
+    "Actual installed SDK test preserves stopped/hot F135 engine, fuel and hold-down across departure and arrival runway relocations and subsequent accepted physics steps.",
+    "Two native installed-engine fixtures advance spool/thrust/fuel/thermal behavior while stationary."
+  ],
+  "sourceSha256": {
+    "src/flight/engineTestStand.ts": "dcb5d3497cf2a922f08681cecd28650f7573df1e3a143a487743c726985d175c",
+    "src/flight/engineTestStand.test.ts": "79354cc707a606e8076c1b4810e470055947f70089076b208e43215bd128768b",
+    "src/flight/engineTestStand.integration.test.ts": "1459e601286389a162a668fd3d520d5808641f02d4c95fe13ea9831f784edfbe",
+    "src/flight/createFlightSimApp.ts": "8496b4c30cbe44322f9acbc9b7d7135e11fc718c1378b877068da66231f2e2c3",
+    "src/flight/createFlightSimApp.test.ts": "de780ba29e4509602e5c4f565ca9689c6fa431e1f1ff9767cdbfc7907c4e5398",
+    "src/flight/jsbsim/resetFlightLocation.ts": "f773acbd2f08dcdf64a279b70eeac3793b4531426494b0008347108da70267b1",
+    "src/flight/jsbsim/resetFlightLocation.test.ts": "8186b797d87649097e3e88ca4a5f7eb0c55672e89bce5bc9643d025aad78cb72",
+    "src/flight/settings/flightParameters.ts": "444df758d08f0a6ef537c936b8190cd0c742eb943069a2e6f3fa57c47f85d230",
+    "scripts/validation/f35b/inspect-nozzle-gaps.mjs": "597900419db0d88f0514cb8694847501a01a02ab099cb261be5a52e6df58b0f9"
+  },
+  "references": {
+    "runwayDefault": "https://www.faa.gov/air_traffic/publications/atpubs/aip_html/part3_ad_2.0_minnesota.html",
+    "geometry": "geometry-receipt.json",
+    "gallery": "turbosquid/manifest.json",
+    "userImage": "user-reference/provenance.json"
+  },
+  "qualificationLimits": [
+    "No flight-app GPU/browser appearance or performance qualification was run.",
+    "Gallery downloader used a normal headless page visit only for public page access; it returned403/CAPTCHA and Chrome exited normally. This is not a sim graphics check.",
+    "All23 publicly indexed images were downloaded; completeness against inaccessible live gallery and full turntable sequences is unverified.",
+    "Geometry angular coverage is a diagnostic of the existing asset, not a real F135 seal test or qualified replacement.",
+    "Existing expected gear-arm envelope failure remains unrelated to this work."
+  ]
+}

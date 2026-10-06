@@ -1,0 +1,1678 @@
+{
+  "schemaVersion": 1,
+  "scope": "Offline parallel rear-ray projection of baked gas emission through normalized plume; no hardware, exposure, scene background or GPU rendering.",
+  "reference": "validation/evidence/aircraft/f35b/engine-review-2026-10-06/frames/rear-92.png",
+  "referenceVariant": "F-35A, qualitative annulus only; not a calibrated F135-PW-600 match",
+  "acceptance": "A ratio above 2 checks a clearly darker center under all allowed sample budgets; it is an implementation criterion, not a measured video contrast.",
+  "provisionalSpatialInputs": {
+    "size": 128,
+    "ringRadiusFraction": 0.68,
+    "ringWidthFraction": 0.16,
+    "centerEmission": 0.015,
+    "lobeCount": 8,
+    "lobeContrast": 0.35,
+    "phaseRadians": 0.2,
+    "downstreamMixFraction": 0.65
+  },
+  "angularCountStatus": "Eight is an explicit provisional profile hypothesis; no eight lights, thermal states or engineering component-count claim.",
+  "imageProcessingContract": {
+    "owner": "scene.imageProcessingConfiguration",
+    "babylonVersion": "8.56.2",
+    "behavior": "Gas uses Babylon's GLSL/WGSL image-processing helpers and public configuration prepareDefines/PrepareUniforms/PrepareSamplers/bind. Shared exposure, tone mapping, curves and grading apply once locally, or raw linear gas RGB goes to the configured postprocess using the PBR final-clamp convention. No private Reinhard or gamma step remains.",
+    "qualification": "Configuration/software contract covered by NullEngine tests; GPU shader appearance and matched exposure comparison not qualified."
+  },
+  "sceneInteraction": "One optional unshadowed light samples dry/AB gas RGB; default 1000 cd reference and 12 m render range. These are display assumptions. It affects lit materials only; FOSS Earth's raster basemap explicitly disables material lighting. Raster deck illumination, impingement/scattering and light occlusion are not reconstructed.",
+  "afterburnerSpectralSamples": [
+    {
+      "axialFraction": 0,
+      "gasTemperatureKelvin": 2500,
+      "peakNormalizedLinearRgb": [
+        1,
+        0.35924371252444515,
+        0.2108293971054028
+      ]
+    },
+    {
+      "axialFraction": 0.35,
+      "gasTemperatureKelvin": 2500,
+      "peakNormalizedLinearRgb": [
+        0.41268837348312365,
+        0.03951759695255249,
+        1
+      ]
+    },
+    {
+      "axialFraction": 0.8,
+      "gasTemperatureKelvin": 2500,
+      "peakNormalizedLinearRgb": [
+        0.1815218591954235,
+        0,
+        1
+      ]
+    }
+  ],
+  "limits": [
+    "No matched rear/oblique GPU capture was requested or performed.",
+    "No day/night exposure or white-balance comparison; hold physical state fixed when qualifying display changes.",
+    "Dry luminosity, angular pattern, relative spectra and scene-light intensity remain provisional; no temperature inferred from RGB."
+  ],
+  "success": true,
+  "cases": [
+    {
+      "mode": "dry",
+      "temperatureKelvin": 1000,
+      "sampleCount": 4,
+      "annulusToCenterContrast": 2.7397222838021063,
+      "passes": true,
+      "radialProjection": [
+        {
+          "radiusFraction": 0,
+          "relativeLinearRgb": [
+            0.009506051666518795,
+            0.000022361526457801644,
+            0
+          ],
+          "relativePhotopicY": 0.00203767147031004
+        },
+        {
+          "radiusFraction": 0.05,
+          "relativeLinearRgb": [
+            0.009423476633858651,
+            0.000022202541399060835,
+            0
+          ],
+          "relativePhotopicY": 0.002019996300132087
+        },
+        {
+          "radiusFraction": 0.1,
+          "relativeLinearRgb": [
+            0.009250633262032413,
+            0.000021890130199717007,
+            0
+          ],
+          "relativePhotopicY": 0.0019830137774435068
+        },
+        {
+          "radiusFraction": 0.15,
+          "relativeLinearRgb": [
+            0.00901950621908625,
+            0.000021605291234336622,
+            0
+          ],
+          "relativePhotopicY": 0.0019336556157389844
+        },
+        {
+          "radiusFraction": 0.2,
+          "relativeLinearRgb": [
+            0.008825504311774403,
+            0.000021568268839538936,
+            0
+          ],
+          "relativePhotopicY": 0.001892370190858354
+        },
+        {
+          "radiusFraction": 0.25,
+          "relativeLinearRgb": [
+            0.008921354435265027,
+            0.000022650590200966748,
+            0
+          ],
+          "relativePhotopicY": 0.0019135289390891954
+        },
+        {
+          "radiusFraction": 0.3,
+          "relativeLinearRgb": [
+            0.009526349519709546,
+            0.00002545606500674687,
+            0
+          ],
+          "relativePhotopicY": 0.0020442013396631546
+        },
+        {
+          "radiusFraction": 0.35,
+          "relativeLinearRgb": [
+            0.011032709929549692,
+            0.000031384540022337675,
+            0
+          ],
+          "relativePhotopicY": 0.0023688031384190918
+        },
+        {
+          "radiusFraction": 0.4,
+          "relativeLinearRgb": [
+            0.013617745715440775,
+            0.00004115822989220101,
+            0
+          ],
+          "relativePhotopicY": 0.0029255598714208776
+        },
+        {
+          "radiusFraction": 0.45,
+          "relativeLinearRgb": [
+            0.017263465056548126,
+            0.00005513990961400891,
+            0
+          ],
+          "relativePhotopicY": 0.0037109046052930133
+        },
+        {
+          "radiusFraction": 0.5,
+          "relativeLinearRgb": [
+            0.021226778965421647,
+            0.0000709584782452683,
+            0
+          ],
+          "relativePhotopicY": 0.004565106752060977
+        },
+        {
+          "radiusFraction": 0.55,
+          "relativeLinearRgb": [
+            0.02447498300469755,
+            0.00008506278770119605,
+            0
+          ],
+          "relativePhotopicY": 0.005265998452822385
+        },
+        {
+          "radiusFraction": 0.6,
+          "relativeLinearRgb": [
+            0.025936936645576,
+            0.0000930856407143808,
+            0
+          ],
+          "relativePhotopicY": 0.005582653934276219
+        },
+        {
+          "radiusFraction": 0.65,
+          "relativeLinearRgb": [
+            0.02503041545075045,
+            0.00009225747309021276,
+            0
+          ],
+          "relativePhotopicY": 0.005389269176962812
+        },
+        {
+          "radiusFraction": 0.7,
+          "relativeLinearRgb": [
+            0.021522580107400543,
+            0.00008213179252386459,
+            0
+          ],
+          "relativePhotopicY": 0.00463600625903657
+        },
+        {
+          "radiusFraction": 0.75,
+          "relativeLinearRgb": [
+            0.01682396694789959,
+            0.00006559945880371283,
+            0
+          ],
+          "relativePhotopicY": 0.00362491543759624
+        },
+        {
+          "radiusFraction": 0.8,
+          "relativeLinearRgb": [
+            0.010213544826434098,
+            0.00004005311696640823,
+            0
+          ],
+          "relativePhotopicY": 0.00220078827223312
+        },
+        {
+          "radiusFraction": 0.85,
+          "relativeLinearRgb": [
+            0.003954325299481004,
+            0.00001550715803718041,
+            0
+          ],
+          "relativePhotopicY": 0.0008520678071700309
+        },
+        {
+          "radiusFraction": 0.9,
+          "relativeLinearRgb": [
+            0.0007461279985068958,
+            0.000002925992151007435,
+            0
+          ],
+          "relativePhotopicY": 0.00016077373493763293
+        },
+        {
+          "radiusFraction": 0.95,
+          "relativeLinearRgb": [
+            0,
+            0,
+            0
+          ],
+          "relativePhotopicY": 0
+        },
+        {
+          "radiusFraction": 1,
+          "relativeLinearRgb": [
+            0,
+            0,
+            0
+          ],
+          "relativePhotopicY": 0
+        }
+      ]
+    },
+    {
+      "mode": "dry",
+      "temperatureKelvin": 1000,
+      "sampleCount": 8,
+      "annulusToCenterContrast": 3.479403674449845,
+      "passes": true,
+      "radialProjection": [
+        {
+          "radiusFraction": 0,
+          "relativeLinearRgb": [
+            0.008216477390352823,
+            0.000009760513014594977,
+            0
+          ],
+          "relativePhotopicY": 0.001754402326746283
+        },
+        {
+          "radiusFraction": 0.05,
+          "relativeLinearRgb": [
+            0.008148272003073597,
+            0.00000970051216895129,
+            0
+          ],
+          "relativePhotopicY": 0.001739853979501223
+        },
+        {
+          "radiusFraction": 0.1,
+          "relativeLinearRgb": [
+            0.008008957943803094,
+            0.000009587225373746781,
+            0
+          ],
+          "relativePhotopicY": 0.0017101446372045717
+        },
+        {
+          "radiusFraction": 0.15,
+          "relativeLinearRgb": [
+            0.00786251753318684,
+            0.000009667500873369709,
+            0
+          ],
+          "relativePhotopicY": 0.0016790581396017837
+        },
+        {
+          "radiusFraction": 0.2,
+          "relativeLinearRgb": [
+            0.007740668544445187,
+            0.000009878998439024931,
+            0
+          ],
+          "relativePhotopicY": 0.001653295414753402
+        },
+        {
+          "radiusFraction": 0.25,
+          "relativeLinearRgb": [
+            0.007980576854227095,
+            0.000011164792734118538,
+            0
+          ],
+          "relativePhotopicY": 0.0017052369493477024
+        },
+        {
+          "radiusFraction": 0.3,
+          "relativeLinearRgb": [
+            0.008733198466289196,
+            0.000013616401293973487,
+            0
+          ],
+          "relativePhotopicY": 0.0018670524434427434
+        },
+        {
+          "radiusFraction": 0.35,
+          "relativeLinearRgb": [
+            0.010510584952169338,
+            0.000018742119744532406,
+            0
+          ],
+          "relativePhotopicY": 0.00224872005064218
+        },
+        {
+          "radiusFraction": 0.4,
+          "relativeLinearRgb": [
+            0.0134584357077006,
+            0.000026972979431450194,
+            0
+          ],
+          "relativePhotopicY": 0.0028815343370011954
+        },
+        {
+          "radiusFraction": 0.45,
+          "relativeLinearRgb": [
+            0.017550411213753375,
+            0.0000387936009033138,
+            0
+          ],
+          "relativePhotopicY": 0.003760240178053377
+        },
+        {
+          "radiusFraction": 0.5,
+          "relativeLinearRgb": [
+            0.022144799243538477,
+            0.00005308060370641469,
+            0
+          ],
+          "relativePhotopicY": 0.004747559385559105
+        },
+        {
+          "radiusFraction": 0.55,
+          "relativeLinearRgb": [
+            0.02618348267570812,
+            0.00006737598929914163,
+            0
+          ],
+          "relativePhotopicY": 0.005616701279717063
+        },
+        {
+          "radiusFraction": 0.6,
+          "relativeLinearRgb": [
+            0.028440310436966643,
+            0.00007801221140676293,
+            0
+          ],
+          "relativePhotopicY": 0.006104273902144374
+        },
+        {
+          "radiusFraction": 0.65,
+          "relativeLinearRgb": [
+            0.02815371059092454,
+            0.00008207377045487314,
+            0
+          ],
+          "relativePhotopicY": 0.0060462265146357325
+        },
+        {
+          "radiusFraction": 0.7,
+          "relativeLinearRgb": [
+            0.02521305577068651,
+            0.000078105180226078,
+            0
+          ],
+          "relativePhotopicY": 0.005417990780083711
+        },
+        {
+          "radiusFraction": 0.75,
+          "relativeLinearRgb": [
+            0.02034001480686755,
+            0.00006722594386312219,
+            0
+          ],
+          "relativePhotopicY": 0.00437384671667025
+        },
+        {
+          "radiusFraction": 0.8,
+          "relativeLinearRgb": [
+            0.014143924303936246,
+            0.00005196729559683036,
+            0
+          ],
+          "relativePhotopicY": 0.0030451939248727264
+        },
+        {
+          "radiusFraction": 0.85,
+          "relativeLinearRgb": [
+            0.006884617317626832,
+            0.000026994921978972656,
+            0
+          ],
+          "relativePhotopicY": 0.0014834770081720101
+        },
+        {
+          "radiusFraction": 0.9,
+          "relativeLinearRgb": [
+            0.002327821400053239,
+            0.000009699255833555163,
+            0
+          ],
+          "relativePhotopicY": 0.0005020009719791123
+        },
+        {
+          "radiusFraction": 0.95,
+          "relativeLinearRgb": [
+            0.00024824494277348987,
+            0.0000010343539282228742,
+            0
+          ],
+          "relativePhotopicY": 0.000053534692377319363
+        },
+        {
+          "radiusFraction": 1,
+          "relativeLinearRgb": [
+            0,
+            0,
+            0
+          ],
+          "relativePhotopicY": 0
+        }
+      ]
+    },
+    {
+      "mode": "dry",
+      "temperatureKelvin": 1000,
+      "sampleCount": 16,
+      "annulusToCenterContrast": 3.6500927013349638,
+      "passes": true,
+      "radialProjection": [
+        {
+          "radiusFraction": 0,
+          "relativeLinearRgb": [
+            0.00811658572978588,
+            0.000011802786577618657,
+            0
+          ],
+          "relativePhotopicY": 0.0017346186140392939
+        },
+        {
+          "radiusFraction": 0.05,
+          "relativeLinearRgb": [
+            0.008049176644288891,
+            0.000011733476220416075,
+            0
+          ],
+          "relativePhotopicY": 0.0017202329608858652
+        },
+        {
+          "radiusFraction": 0.1,
+          "relativeLinearRgb": [
+            0.007910776711625944,
+            0.000011602009357345978,
+            0
+          ],
+          "relativePhotopicY": 0.0016907050270302797
+        },
+        {
+          "radiusFraction": 0.15,
+          "relativeLinearRgb": [
+            0.007771461349477409,
+            0.000011828815220382403,
+            0
+          ],
+          "relativePhotopicY": 0.001661238625659524
+        },
+        {
+          "radiusFraction": 0.2,
+          "relativeLinearRgb": [
+            0.007658296746403259,
+            0.000012233112237436833,
+            0
+          ],
+          "relativePhotopicY": 0.0016374607152475956
+        },
+        {
+          "radiusFraction": 0.25,
+          "relativeLinearRgb": [
+            0.007921168154977922,
+            0.000014319971572462788,
+            0
+          ],
+          "relativePhotopicY": 0.0016948587620807885
+        },
+        {
+          "radiusFraction": 0.3,
+          "relativeLinearRgb": [
+            0.008715094605658082,
+            0.000018173073408866053,
+            0
+          ],
+          "relativePhotopicY": 0.0018664609569887729
+        },
+        {
+          "radiusFraction": 0.35,
+          "relativeLinearRgb": [
+            0.010550490141268644,
+            0.000026152644408802107,
+            0
+          ],
+          "relativePhotopicY": 0.0022625064559497845
+        },
+        {
+          "radiusFraction": 0.4,
+          "relativeLinearRgb": [
+            0.013616219964792087,
+            0.00003896426726549242,
+            0
+          ],
+          "relativePhotopicY": 0.0029236663684065363
+        },
+        {
+          "radiusFraction": 0.45,
+          "relativeLinearRgb": [
+            0.017854793471858057,
+            0.0000571723826816312,
+            0
+          ],
+          "relativePhotopicY": 0.0038381176618151316
+        },
+        {
+          "radiusFraction": 0.5,
+          "relativeLinearRgb": [
+            0.022644596775057608,
+            0.00007952837661213204,
+            0
+          ],
+          "relativePhotopicY": 0.004872766958978743
+        },
+        {
+          "radiusFraction": 0.55,
+          "relativeLinearRgb": [
+            0.026905320020562156,
+            0.00010236679325091152,
+            0
+          ],
+          "relativePhotopicY": 0.005795240271601347
+        },
+        {
+          "radiusFraction": 0.6,
+          "relativeLinearRgb": [
+            0.029367271452061767,
+            0.00012010863968174892,
+            0
+          ],
+          "relativePhotopicY": 0.006331518742704597
+        },
+        {
+          "radiusFraction": 0.65,
+          "relativeLinearRgb": [
+            0.029244914083949775,
+            0.00012809776935907903,
+            0
+          ],
+          "relativePhotopicY": 0.006311210090056679
+        },
+        {
+          "radiusFraction": 0.7,
+          "relativeLinearRgb": [
+            0.02640615813480995,
+            0.00012389762914530983,
+            0
+          ],
+          "relativePhotopicY": 0.005704479890446676
+        },
+        {
+          "radiusFraction": 0.75,
+          "relativeLinearRgb": [
+            0.021383680985858976,
+            0.00010855312963166389,
+            0
+          ],
+          "relativePhotopicY": 0.004625361457410457
+        },
+        {
+          "radiusFraction": 0.8,
+          "relativeLinearRgb": [
+            0.014992856533857403,
+            0.00008522681037339929,
+            0
+          ],
+          "relativePhotopicY": 0.0032495244192769215
+        },
+        {
+          "radiusFraction": 0.85,
+          "relativeLinearRgb": [
+            0.007818433102875057,
+            0.00004955789901696392,
+            0
+          ],
+          "relativePhotopicY": 0.0016982102819537964
+        },
+        {
+          "radiusFraction": 0.9,
+          "relativeLinearRgb": [
+            0.00276210666743701,
+            0.0000193898095217046,
+            0
+          ],
+          "relativePhotopicY": 0.0006012919000101926
+        },
+        {
+          "radiusFraction": 0.95,
+          "relativeLinearRgb": [
+            0.0004978352654044362,
+            0.000003904590316897539,
+            0
+          ],
+          "relativePhotopicY": 0.0001086684459710591
+        },
+        {
+          "radiusFraction": 1,
+          "relativeLinearRgb": [
+            0,
+            0,
+            0
+          ],
+          "relativePhotopicY": 0
+        }
+      ]
+    },
+    {
+      "mode": "dry",
+      "temperatureKelvin": 1000,
+      "sampleCount": 32,
+      "annulusToCenterContrast": 3.6440214085891536,
+      "passes": true,
+      "radialProjection": [
+        {
+          "radiusFraction": 0,
+          "relativeLinearRgb": [
+            0.008135648561631714,
+            0.000011916807254919068,
+            0
+          ],
+          "relativePhotopicY": 0.0017387543039083767
+        },
+        {
+          "radiusFraction": 0.05,
+          "relativeLinearRgb": [
+            0.008067291337910546,
+            0.0000118464148839089,
+            0
+          ],
+          "relativePhotopicY": 0.0017241662336446558
+        },
+        {
+          "radiusFraction": 0.1,
+          "relativeLinearRgb": [
+            0.007925900622416252,
+            0.000011712352398873766,
+            0
+          ],
+          "relativePhotopicY": 0.0016940003850662991
+        },
+        {
+          "radiusFraction": 0.15,
+          "relativeLinearRgb": [
+            0.007782739946773856,
+            0.000011944296816808344,
+            0
+          ],
+          "relativePhotopicY": 0.0016637198645722351
+        },
+        {
+          "radiusFraction": 0.2,
+          "relativeLinearRgb": [
+            0.007663003382634006,
+            0.000012358615958696631,
+            0
+          ],
+          "relativePhotopicY": 0.0016385514434864008
+        },
+        {
+          "radiusFraction": 0.25,
+          "relativeLinearRgb": [
+            0.007918728317958125,
+            0.000014482427033223286,
+            0
+          ],
+          "relativePhotopicY": 0.0016944560552464257
+        },
+        {
+          "radiusFraction": 0.3,
+          "relativeLinearRgb": [
+            0.008704457631573773,
+            0.000018439003353386756,
+            0
+          ],
+          "relativePhotopicY": 0.0018643889412479078
+        },
+        {
+          "radiusFraction": 0.35,
+          "relativeLinearRgb": [
+            0.010531070052020962,
+            0.000026552662005302338,
+            0
+          ],
+          "relativePhotopicY": 0.0022586624027153973
+        },
+        {
+          "radiusFraction": 0.4,
+          "relativeLinearRgb": [
+            0.01357865297760069,
+            0.00003957856891678322,
+            0
+          ],
+          "relativePhotopicY": 0.002916116207473663
+        },
+        {
+          "radiusFraction": 0.45,
+          "relativeLinearRgb": [
+            0.01780703596249569,
+            0.000058123832712511655,
+            0
+          ],
+          "relativePhotopicY": 0.003828641365385034
+        },
+        {
+          "radiusFraction": 0.5,
+          "relativeLinearRgb": [
+            0.02260098737543392,
+            0.00008092211825185539,
+            0
+          ],
+          "relativePhotopicY": 0.0048644891588933955
+        },
+        {
+          "radiusFraction": 0.55,
+          "relativeLinearRgb": [
+            0.026872320326402244,
+            0.00010415182081545193,
+            0
+          ],
+          "relativePhotopicY": 0.005789498697335088
+        },
+        {
+          "radiusFraction": 0.6,
+          "relativeLinearRgb": [
+            0.029381302601926083,
+            0.00012228316935820196,
+            0
+          ],
+          "relativePhotopicY": 0.006336057907718656
+        },
+        {
+          "radiusFraction": 0.65,
+          "relativeLinearRgb": [
+            0.029313047179479995,
+            0.0001305205608365426,
+            0
+          ],
+          "relativePhotopicY": 0.006327432817724319
+        },
+        {
+          "radiusFraction": 0.7,
+          "relativeLinearRgb": [
+            0.026527521725771216,
+            0.00012628000430719904,
+            0
+          ],
+          "relativePhotopicY": 0.005731994398129072
+        },
+        {
+          "radiusFraction": 0.75,
+          "relativeLinearRgb": [
+            0.0215485196723211,
+            0.0001107000568573122,
+            0
+          ],
+          "relativePhotopicY": 0.00466195355862121
+        },
+        {
+          "radiusFraction": 0.8,
+          "relativeLinearRgb": [
+            0.015196840520592022,
+            0.00008693878830067194,
+            0
+          ],
+          "relativePhotopicY": 0.003294130610070375
+        },
+        {
+          "radiusFraction": 0.85,
+          "relativeLinearRgb": [
+            0.008029545281513874,
+            0.00005103483109183134,
+            0
+          ],
+          "relativePhotopicY": 0.0017441643524328235
+        },
+        {
+          "radiusFraction": 0.9,
+          "relativeLinearRgb": [
+            0.002923854460650204,
+            0.00002039021518963433,
+            0
+          ],
+          "relativePhotopicY": 0.0006364067145757552
+        },
+        {
+          "radiusFraction": 0.95,
+          "relativeLinearRgb": [
+            0.000568207958158338,
+            0.000004402247763540393,
+            0
+          ],
+          "relativePhotopicY": 0.00012399071143765337
+        },
+        {
+          "radiusFraction": 1,
+          "relativeLinearRgb": [
+            0,
+            0,
+            0
+          ],
+          "relativePhotopicY": 0
+        }
+      ]
+    },
+    {
+      "mode": "afterburner",
+      "temperatureKelvin": 2500,
+      "sampleCount": 4,
+      "annulusToCenterContrast": 3.2845615790031175,
+      "passes": true,
+      "radialProjection": [
+        {
+          "radiusFraction": 0,
+          "relativeLinearRgb": [
+            0.023727673470283754,
+            0.005079955504173618,
+            0.03459321381915795
+          ],
+          "relativePhotopicY": 0.011175939689287907
+        },
+        {
+          "radiusFraction": 0.05,
+          "relativeLinearRgb": [
+            0.023537027630435595,
+            0.005042745858118023,
+            0.03427722075496742
+          ],
+          "relativePhotopicY": 0.011085977126008633
+        },
+        {
+          "radiusFraction": 0.1,
+          "relativeLinearRgb": [
+            0.02314874960540182,
+            0.004969371350051715,
+            0.03360342691036457
+          ],
+          "relativePhotopicY": 0.010902295900816678
+        },
+        {
+          "radiusFraction": 0.15,
+          "relativeLinearRgb": [
+            0.022684671385583652,
+            0.004896444257839271,
+            0.03264989938957594
+          ],
+          "relativePhotopicY": 0.010682624220732859
+        },
+        {
+          "radiusFraction": 0.2,
+          "relativeLinearRgb": [
+            0.02238152512062167,
+            0.004874246812180177,
+            0.031764892478538746
+          ],
+          "relativePhotopicY": 0.010538403299537636
+        },
+        {
+          "radiusFraction": 0.25,
+          "relativeLinearRgb": [
+            0.022986693295265495,
+            0.005090798932822932,
+            0.03175553783001263
+          ],
+          "relativePhotopicY": 0.010821298723961804
+        },
+        {
+          "radiusFraction": 0.3,
+          "relativeLinearRgb": [
+            0.025084128929328296,
+            0.005679986877152757,
+            0.03338490660475661
+          ],
+          "relativePhotopicY": 0.011806325188739378
+        },
+        {
+          "radiusFraction": 0.35,
+          "relativeLinearRgb": [
+            0.02985049718106442,
+            0.006941772038268806,
+            0.03789222795211126
+          ],
+          "relativePhotopicY": 0.014047686899448847
+        },
+        {
+          "radiusFraction": 0.4,
+          "relativeLinearRgb": [
+            0.03784581319717105,
+            0.009026181730481768,
+            0.04581907735066724
+          ],
+          "relativePhotopicY": 0.017810864475438892
+        },
+        {
+          "radiusFraction": 0.45,
+          "relativeLinearRgb": [
+            0.04917884876739386,
+            0.011996360699548514,
+            0.05696649850453406
+          ],
+          "relativePhotopicY": 0.02314978916186348
+        },
+        {
+          "radiusFraction": 0.5,
+          "relativeLinearRgb": [
+            0.06172186099873522,
+            0.015333063255163835,
+            0.06890350404909346
+          ],
+          "relativePhotopicY": 0.029065151496410816
+        },
+        {
+          "radiusFraction": 0.55,
+          "relativeLinearRgb": [
+            0.07242808200268044,
+            0.01827075806487771,
+            0.07832234704794487
+          ],
+          "relativePhotopicY": 0.034122778464898314
+        },
+        {
+          "radiusFraction": 0.6,
+          "relativeLinearRgb": [
+            0.07787682366401626,
+            0.019892287564692707,
+            0.08201952152897128
+          ],
+          "relativePhotopicY": 0.0367080621126911
+        },
+        {
+          "radiusFraction": 0.65,
+          "relativeLinearRgb": [
+            0.07606225797649438,
+            0.019629063730393127,
+            0.07837739149975567
+          ],
+          "relativePhotopicY": 0.03587103732663491
+        },
+        {
+          "radiusFraction": 0.7,
+          "relativeLinearRgb": [
+            0.06644747422944532,
+            0.017376482250505178,
+            0.06650439371111126
+          ],
+          "relativePhotopicY": 0.03135836116786059
+        },
+        {
+          "radiusFraction": 0.75,
+          "relativeLinearRgb": [
+            0.0524622364582351,
+            0.013831470091933829,
+            0.05154250035085034
+          ],
+          "relativePhotopicY": 0.02476898219636189
+        },
+        {
+          "radiusFraction": 0.8,
+          "relativeLinearRgb": [
+            0.03193420017868547,
+            0.008437516615838954,
+            0.031218028777619367
+          ],
+          "relativePhotopicY": 0.015078808758560016
+        },
+        {
+          "radiusFraction": 0.85,
+          "relativeLinearRgb": [
+            0.012363799036593142,
+            0.0032667096474135794,
+            0.012086522661140136
+          ],
+          "relativePhotopicY": 0.005837984360306305
+        },
+        {
+          "radiusFraction": 0.9,
+          "relativeLinearRgb": [
+            0.0023328825856399533,
+            0.0006163841733627131,
+            0.002280564262947293
+          ],
+          "relativePhotopicY": 0.0011015491281512937
+        },
+        {
+          "radiusFraction": 0.95,
+          "relativeLinearRgb": [
+            0,
+            0,
+            0
+          ],
+          "relativePhotopicY": 0
+        },
+        {
+          "radiusFraction": 1,
+          "relativeLinearRgb": [
+            0,
+            0,
+            0
+          ],
+          "relativePhotopicY": 0
+        }
+      ]
+    },
+    {
+      "mode": "afterburner",
+      "temperatureKelvin": 2500,
+      "sampleCount": 8,
+      "annulusToCenterContrast": 3.0863413626932408,
+      "passes": true,
+      "radialProjection": [
+        {
+          "radiusFraction": 0,
+          "relativeLinearRgb": [
+            0.018336802421512657,
+            0.003376602376657436,
+            0.031816158008729674
+          ],
+          "relativePhotopicY": 0.008610856770181977
+        },
+        {
+          "radiusFraction": 0.05,
+          "relativeLinearRgb": [
+            0.01818080636507732,
+            0.003351257119488665,
+            0.031509853007464936
+          ],
+          "relativePhotopicY": 0.008537447356581216
+        },
+        {
+          "radiusFraction": 0.1,
+          "relativeLinearRgb": [
+            0.01785756127648099,
+            0.0033007523908888748,
+            0.030848510163854835
+          ],
+          "relativePhotopicY": 0.008384850898672577
+        },
+        {
+          "radiusFraction": 0.15,
+          "relativeLinearRgb": [
+            0.017485870058216623,
+            0.00326353026025176,
+            0.02988885620871834
+          ],
+          "relativePhotopicY": 0.008209919736553963
+        },
+        {
+          "radiusFraction": 0.2,
+          "relativeLinearRgb": [
+            0.017149023345561277,
+            0.0032474248127286154,
+            0.02884108963583799
+          ],
+          "relativePhotopicY": 0.008051141170692283
+        },
+        {
+          "radiusFraction": 0.25,
+          "relativeLinearRgb": [
+            0.01750590268322471,
+            0.0034196899150340477,
+            0.028428441481817425
+          ],
+          "relativePhotopicY": 0.008220452620763765
+        },
+        {
+          "radiusFraction": 0.3,
+          "relativeLinearRgb": [
+            0.01891453728620417,
+            0.0038456227827023143,
+            0.02926398351502892
+          ],
+          "relativePhotopicY": 0.008884943100432065
+        },
+        {
+          "radiusFraction": 0.35,
+          "relativeLinearRgb": [
+            0.022364234718523925,
+            0.004788937921631295,
+            0.03232228249183179
+          ],
+          "relativePhotopicY": 0.010513946883035174
+        },
+        {
+          "radiusFraction": 0.4,
+          "relativeLinearRgb": [
+            0.02815376332756193,
+            0.006332616520378401,
+            0.03787005891925435
+          ],
+          "relativePhotopicY": 0.013249598631588389
+        },
+        {
+          "radiusFraction": 0.45,
+          "relativeLinearRgb": [
+            0.03614878589986827,
+            0.008496656319901744,
+            0.045304971364983945
+          ],
+          "relativePhotopicY": 0.017034155896893447
+        },
+        {
+          "radiusFraction": 0.5,
+          "relativeLinearRgb": [
+            0.04497341293874428,
+            0.010975186929679212,
+            0.05277394946623782
+          ],
+          "relativePhotopicY": 0.021222515033477315
+        },
+        {
+          "radiusFraction": 0.55,
+          "relativeLinearRgb": [
+            0.0524378862447147,
+            0.013226685785755211,
+            0.057793237370673614
+          ],
+          "relativePhotopicY": 0.024782437683153524
+        },
+        {
+          "radiusFraction": 0.6,
+          "relativeLinearRgb": [
+            0.05614732372861835,
+            0.01459105307483574,
+            0.058194742593005035
+          ],
+          "relativePhotopicY": 0.026576043418039763
+        },
+        {
+          "radiusFraction": 0.65,
+          "relativeLinearRgb": [
+            0.05473594753643715,
+            0.014639471136114078,
+            0.053209644325043944
+          ],
+          "relativePhotopicY": 0.025950708765810473
+        },
+        {
+          "radiusFraction": 0.7,
+          "relativeLinearRgb": [
+            0.04814168310112823,
+            0.013256334126184387,
+            0.043598416854509534
+          ],
+          "relativePhotopicY": 0.022865443606748
+        },
+        {
+          "radiusFraction": 0.75,
+          "relativeLinearRgb": [
+            0.03796304831473454,
+            0.010782386091850145,
+            0.03162153004912787
+          ],
+          "relativePhotopicY": 0.018067042644066545
+        },
+        {
+          "radiusFraction": 0.8,
+          "relativeLinearRgb": [
+            0.025225105134085386,
+            0.007485258821402938,
+            0.018346701804268756
+          ],
+          "relativePhotopicY": 0.012041968778089641
+        },
+        {
+          "radiusFraction": 0.85,
+          "relativeLinearRgb": [
+            0.011888843210386399,
+            0.00362590635023144,
+            0.00783664284527187
+          ],
+          "relativePhotopicY": 0.005687119363917668
+        },
+        {
+          "radiusFraction": 0.9,
+          "relativeLinearRgb": [
+            0.0038880999575203815,
+            0.0012188430994285705,
+            0.002290214760517367
+          ],
+          "relativePhotopicY": 0.0018638480678072383
+        },
+        {
+          "radiusFraction": 0.95,
+          "relativeLinearRgb": [
+            0.0004146371158157496,
+            0.0001299806056687117,
+            0.000244234472692206
+          ],
+          "relativePhotopicY": 0.00019876561703604295
+        },
+        {
+          "radiusFraction": 1,
+          "relativeLinearRgb": [
+            0,
+            0,
+            0
+          ],
+          "relativePhotopicY": 0
+        }
+      ]
+    },
+    {
+      "mode": "afterburner",
+      "temperatureKelvin": 2500,
+      "sampleCount": 16,
+      "annulusToCenterContrast": 3.7264334387115348,
+      "passes": true,
+      "radialProjection": [
+        {
+          "radiusFraction": 0,
+          "relativeLinearRgb": [
+            0.01862750473516026,
+            0.0035809053313256593,
+            0.030863888431736555
+          ],
+          "relativePhotopicY": 0.008750058925040124
+        },
+        {
+          "radiusFraction": 0.05,
+          "relativeLinearRgb": [
+            0.01847259050574393,
+            0.003554879832169823,
+            0.0305687738297952
+          ],
+          "relativePhotopicY": 0.008677200777246376
+        },
+        {
+          "radiusFraction": 0.1,
+          "relativeLinearRgb": [
+            0.018151638631024616,
+            0.0035031318651677196,
+            0.029930367791413996
+          ],
+          "relativePhotopicY": 0.008525858383022139
+        },
+        {
+          "radiusFraction": 0.15,
+          "relativeLinearRgb": [
+            0.01782878841678125,
+            0.003479848082593836,
+            0.02901796087157518
+          ],
+          "relativePhotopicY": 0.00837469247392198
+        },
+        {
+          "radiusFraction": 0.2,
+          "relativeLinearRgb": [
+            0.017575317794602387,
+            0.0034865797397951232,
+            0.028056095476467077
+          ],
+          "relativePhotopicY": 0.008256177666203617
+        },
+        {
+          "radiusFraction": 0.25,
+          "relativeLinearRgb": [
+            0.018186439098158452,
+            0.0037415699288599743,
+            0.027770850973234607
+          ],
+          "relativePhotopicY": 0.008547915878750005
+        },
+        {
+          "radiusFraction": 0.3,
+          "relativeLinearRgb": [
+            0.020037642494715673,
+            0.004317171301336426,
+            0.028768824119280445
+          ],
+          "relativePhotopicY": 0.009425287973251092
+        },
+        {
+          "radiusFraction": 0.35,
+          "relativeLinearRgb": [
+            0.024311956475226396,
+            0.005548708048890349,
+            0.03204192579220321
+          ],
+          "relativePhotopicY": 0.011451291050634083
+        },
+        {
+          "radiusFraction": 0.4,
+          "relativeLinearRgb": [
+            0.031460325431612514,
+            0.007564915681967853,
+            0.03795498840188162
+          ],
+          "relativePhotopicY": 0.0148402260251644
+        },
+        {
+          "radiusFraction": 0.45,
+          "relativeLinearRgb": [
+            0.0413902189254703,
+            0.010392301741898756,
+            0.04598596972648508
+          ],
+          "relativePhotopicY": 0.01955369270930644
+        },
+        {
+          "radiusFraction": 0.5,
+          "relativeLinearRgb": [
+            0.052668894371088834,
+            0.013704761325862172,
+            0.05428115282878404
+          ],
+          "relativePhotopicY": 0.024919978923775878
+        },
+        {
+          "radiusFraction": 0.55,
+          "relativeLinearRgb": [
+            0.06277855195797756,
+            0.016840409916644844,
+            0.06032483723484103
+          ],
+          "relativePhotopicY": 0.029748698030918792
+        },
+        {
+          "radiusFraction": 0.6,
+          "relativeLinearRgb": [
+            0.06870567660358742,
+            0.018930075464854482,
+            0.06174979652735755
+          ],
+          "relativePhotopicY": 0.032606512168965825
+        },
+        {
+          "radiusFraction": 0.65,
+          "relativeLinearRgb": [
+            0.06857449864000043,
+            0.019369145505694768,
+            0.057621010667096496
+          ],
+          "relativePhotopicY": 0.03259462095723036
+        },
+        {
+          "radiusFraction": 0.7,
+          "relativeLinearRgb": [
+            0.06204978080902711,
+            0.017959174238585396,
+            0.04851776094837408
+          ],
+          "relativePhotopicY": 0.029541619192376713
+        },
+        {
+          "radiusFraction": 0.75,
+          "relativeLinearRgb": [
+            0.050420640100753374,
+            0.014988425029522813,
+            0.03613856562844643
+          ],
+          "relativePhotopicY": 0.024050409858714938
+        },
+        {
+          "radiusFraction": 0.8,
+          "relativeLinearRgb": [
+            0.03508729469981211,
+            0.010793909454394415,
+            0.02216112934696034
+          ],
+          "relativePhotopicY": 0.016780884320491497
+        },
+        {
+          "radiusFraction": 0.85,
+          "relativeLinearRgb": [
+            0.018291487366189164,
+            0.00580580936651263,
+            0.010102819298625177
+          ],
+          "relativePhotopicY": 0.008771311987601196
+        },
+        {
+          "radiusFraction": 0.9,
+          "relativeLinearRgb": [
+            0.006404617832676241,
+            0.0020973193731967338,
+            0.003017772046137843
+          ],
+          "relativePhotopicY": 0.0030797989091412344
+        },
+        {
+          "radiusFraction": 0.95,
+          "relativeLinearRgb": [
+            0.0011925231357543399,
+            0.0004014535605290652,
+            0.00047573050706670525
+          ],
+          "relativePhotopicY": 0.0005750535999557028
+        },
+        {
+          "radiusFraction": 1,
+          "relativeLinearRgb": [
+            0,
+            0,
+            0
+          ],
+          "relativePhotopicY": 0
+        }
+      ]
+    },
+    {
+      "mode": "afterburner",
+      "temperatureKelvin": 2500,
+      "sampleCount": 32,
+      "annulusToCenterContrast": 3.8037431272443,
+      "passes": true,
+      "radialProjection": [
+        {
+          "radiusFraction": 0,
+          "relativeLinearRgb": [
+            0.018518197504702096,
+            0.0035493786326994685,
+            0.030910886959882405
+          ],
+          "relativePhotopicY": 0.008707657970235289
+        },
+        {
+          "radiusFraction": 0.05,
+          "relativeLinearRgb": [
+            0.018363927264642387,
+            0.0035235913950685113,
+            0.03061435807023527
+          ],
+          "relativePhotopicY": 0.00863500509856411
+        },
+        {
+          "radiusFraction": 0.1,
+          "relativeLinearRgb": [
+            0.018043764110336615,
+            0.0034722264860238172,
+            0.029971661681724264
+          ],
+          "relativePhotopicY": 0.008483794732517858
+        },
+        {
+          "radiusFraction": 0.15,
+          "relativeLinearRgb": [
+            0.01772955746810044,
+            0.0034524400895075418,
+            0.029052414278666103
+          ],
+          "relativePhotopicY": 0.00833647452839982
+        },
+        {
+          "radiusFraction": 0.2,
+          "relativeLinearRgb": [
+            0.017480343409463934,
+            0.003461709877706497,
+            0.028077062124807924
+          ],
+          "relativePhotopicY": 0.008219706719548126
+        },
+        {
+          "radiusFraction": 0.25,
+          "relativeLinearRgb": [
+            0.01811371631921371,
+            0.003726765434982358,
+            0.027775855335179445
+          ],
+          "relativePhotopicY": 0.008522223437912674
+        },
+        {
+          "radiusFraction": 0.3,
+          "relativeLinearRgb": [
+            0.02000070561578041,
+            0.0043198453182194405,
+            0.02874525939248069
+          ],
+          "relativePhotopicY": 0.009417644044990932
+        },
+        {
+          "radiusFraction": 0.35,
+          "relativeLinearRgb": [
+            0.02433458044449751,
+            0.005579210458707263,
+            0.03198911403988925
+          ],
+          "relativePhotopicY": 0.011474104733051091
+        },
+        {
+          "radiusFraction": 0.4,
+          "relativeLinearRgb": [
+            0.03156179098987812,
+            0.007636110236413538,
+            0.03784146467047767
+          ],
+          "relativePhotopicY": 0.01490452636661664
+        },
+        {
+          "radiusFraction": 0.45,
+          "relativeLinearRgb": [
+            0.041625466375510234,
+            0.010527221316565761,
+            0.04580853372289925
+          ],
+          "relativePhotopicY": 0.019687405053811405
+        },
+        {
+          "radiusFraction": 0.5,
+          "relativeLinearRgb": [
+            0.05309837039900417,
+            0.013927234967363212,
+            0.05403908456843103
+          ],
+          "relativePhotopicY": 0.025152948073583613
+        },
+        {
+          "radiusFraction": 0.55,
+          "relativeLinearRgb": [
+            0.06340000578516791,
+            0.017150671412259632,
+            0.06000508669628762
+          ],
+          "relativePhotopicY": 0.030079670614607576
+        },
+        {
+          "radiusFraction": 0.6,
+          "relativeLinearRgb": [
+            0.06957130918586905,
+            0.019339119593177585,
+            0.061406933051122846
+          ],
+          "relativePhotopicY": 0.033058391397444264
+        },
+        {
+          "radiusFraction": 0.65,
+          "relativeLinearRgb": [
+            0.0695947453051352,
+            0.019841631388010327,
+            0.05723576738687087
+          ],
+          "relativePhotopicY": 0.03312169415867653
+        },
+        {
+          "radiusFraction": 0.7,
+          "relativeLinearRgb": [
+            0.06314235173831535,
+            0.018457188215638732,
+            0.04811393620825833
+          ],
+          "relativePhotopicY": 0.030100989161066724
+        },
+        {
+          "radiusFraction": 0.75,
+          "relativeLinearRgb": [
+            0.051475934981975335,
+            0.015458121235403391,
+            0.035793074077558024
+          ],
+          "relativePhotopicY": 0.02458581090374135
+        },
+        {
+          "radiusFraction": 0.8,
+          "relativeLinearRgb": [
+            0.036017074715012344,
+            0.01120039425853637,
+            0.02186903184209183
+          ],
+          "relativePhotopicY": 0.01724823969722098
+        },
+        {
+          "radiusFraction": 0.85,
+          "relativeLinearRgb": [
+            0.019150523749962723,
+            0.00616258376028046,
+            0.009930830713119664
+          ],
+          "relativePhotopicY": 0.009196740462991704
+        },
+        {
+          "radiusFraction": 0.9,
+          "relativeLinearRgb": [
+            0.006955236056577878,
+            0.0023113146167481374,
+            0.003011148588414552
+          ],
+          "relativePhotopicY": 0.0033494616047653894
+        },
+        {
+          "radiusFraction": 0.95,
+          "relativeLinearRgb": [
+            0.0014415429207966354,
+            0.0004945110848944467,
+            0.0004987376638622182
+          ],
+          "relativePhotopicY": 0.0006962241946161967
+        },
+        {
+          "radiusFraction": 1,
+          "relativeLinearRgb": [
+            0,
+            0,
+            0
+          ],
+          "relativePhotopicY": 0
+        }
+      ]
+    }
+  ],
+  "identities": [
+    {
+      "path": "scripts/exhaustOptics/f135-visible-approximation.json",
+      "bytes": 11692,
+      "sha256": "fd0a97da0a975cb90182f816238c8b009ffbbbc9f3bcd17321e468fe76e70ba5"
+    },
+    {
+      "path": "scripts/exhaustOptics/bake.mjs",
+      "bytes": 13312,
+      "sha256": "75c1aeadf3f9bf61b4ca6e646cd336b326a7b5e457a525bf903ce34c237438c7"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineExhaust.ts",
+      "bytes": 30184,
+      "sha256": "c30da3eec95523d12cce7dbfef759a30441db36718fbad0a79251e1ea50bbb56"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.png",
+      "bytes": 3185,
+      "sha256": "07891f040deccd0455683beb341e54a72bbbbebd115e3a0df503be8dfa5a9265"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-spatial.png",
+      "bytes": 24424,
+      "sha256": "27110d47433281963a653695116feb79cf80e314a6553c3c9c753f2f6a6a530e"
+    },
+    {
+      "path": "scripts/validation/f35b/check-reconstructed-optics.mjs",
+      "bytes": 6415,
+      "sha256": "31bdad18d2037e1080be94c5a5ed9a46226f2a7172ab6d53efe1a65b994aff3b"
+    }
+  ]
+}

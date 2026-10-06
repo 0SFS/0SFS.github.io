@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-06",
+  "status": "implemented-terminal-checks-passed",
+  "scope": "Original F135-PW-600 visual reconstruction, native two-solid thermal observation, offline optics and full/installed runtime composition. Browser/GPU appearance and measured-engine calibration are unqualified.",
+  "implementationReport": "../../../../../docs/validation/f135-engine-reconstruction.md",
+  "source": {
+    "engine": "../../../../../scripts/f135Engine/source.mjs",
+    "profile": "../../../../../scripts/f135Engine/profile.json",
+    "manifest": "../../../../../public/aircraft/f-35b/engine/manifest.json",
+    "nativeCommit": "b58a1855d137466fe8d9f6bc12d4cfd9efcb4b1b",
+    "nativePackage": "1.2.4-fork.15"
+  },
+  "assets": [
+    {
+      "variant": "full",
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-full.glb",
+      "triangles": 24536,
+      "meshes": 25,
+      "standOnlyMeshes": [
+        "F135_ExternalCasing",
+        "F135_CasingFlanges",
+        "F135_Accessories",
+        "F135_ExternalPlumbing",
+        "F135_MountsAndDriveHousing"
+      ],
+      "morphMeshes": [
+        "F135_FlowPath",
+        "F135_SlidingSeals",
+        "F135_OuterPanels"
+      ],
+      "bytes": 1939040,
+      "sha256": "0a8055b3fa42cbe36528a234afcaee44bf3611289209217a407bcf31877c7974"
+    },
+    {
+      "variant": "installed",
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-installed.glb",
+      "triangles": 13104,
+      "meshes": 20,
+      "standOnlyMeshes": [],
+      "morphMeshes": [
+        "F135_FlowPath",
+        "F135_SlidingSeals",
+        "F135_OuterPanels"
+      ],
+      "bytes": 1112632,
+      "sha256": "8003120dfcb0c78e187797bd99d83cee21b2084ed7bf36ee528b4c15779f8fa9"
+    },
+    {
+      "variant": "airframe",
+      "path": "public/aircraft/f-35b/F-35B_AF267-airframe.glb",
+      "removedNodes": [
+        "vtol",
+        "feather.001",
+        "feather.002",
+        "feather.003",
+        "feather.004",
+        "feather.005",
+        "feather.006",
+        "feather.007",
+        "feather.008",
+        "feather.009",
+        "feather.010",
+        "feather.011",
+        "feather.012",
+        "feather.013",
+        "feather.014",
+        "feather.015",
+        "feather.016"
+      ],
+      "removedExtrasEngineTriangles": 124,
+      "retainedViewsIdentical": 434,
+      "triangles": 11467,
+      "meshes": 85,
+      "bytes": 1444788,
+      "sha256": "76c76d6230fcf3259e2552d793f95f5421a2ab3cc35f39a5ebf01817b38d5814"
+    }
+  ],
+  "runtimeInventory": {
+    "stand": [
+      "public/aircraft/f-35b/engine/F135-PW-600-full.glb"
+    ],
+    "flight": [
+      "public/aircraft/f-35b/F-35B_AF267-airframe.glb",
+      "public/aircraft/f-35b/engine/F135-PW-600-installed.glb"
+    ],
+    "flightTriangles": 24571,
+    "flightAssetBytes": 2557420,
+    "standOnlyMeshesDownloadedInFlight": 0,
+    "sharedEngineTextures": 0,
+    "verification": "Actual Babylon GLB loader, intercepted loader paths, shared byte/material comparison, partial failure/cancellation and hidden readiness tests; no network/GPU benchmark."
+  },
+  "checks": {
+    "geometry": {
+      "record": "reconstruction/acceptance.json",
+      "aperturePositions": 21,
+      "axialSections": 168,
+      "maxMissingAngularDegrees": 0,
+      "nozzleInternalBoundaryEdges": 0,
+      "normalAndAreaMeshPoseChecks": 420,
+      "minimumNormalizedNormalAgreement": 0.9996186834353007,
+      "vectorPoses": 24,
+      "jointSealRays": 18432,
+      "jointSealRayMisses": 0,
+      "clearancePoses": 90,
+      "engineAirframeTriangleCrossings": 0,
+      "grossSwivelShellCrossings": 0,
+      "openedDoorFuselageTriangleCrossings": 0,
+      "preservedClosedDoorFuselageTriangleCrossingsPerPose": 2,
+      "preservedClosedDoorMaximumPlaneStraddleMeters": 0.00567576948672896,
+      "focusedTests": 3,
+      "artifactByteReproduction": "passed",
+      "incrementalTypecheck": "passed",
+      "targetedLint": "passed"
+    },
+    "nativeThermal": {
+      "record": "implementation/native/acceptance.json",
+      "scenarios": 11,
+      "passed": true
+    },
+    "optics": {
+      "record": "implementation/optics/README.md",
+      "projection": "implementation/optics/optics-report.json",
+      "scope": "Actual offline spectral/spatial bake, annulus/center contrast, independent native solid bindings, shared exposure/tone-mapping contract and bounded lifecycle."
+    },
+    "application": {
+      "record": "implementation/application/acceptance.json",
+      "fullCiAttempts": 1,
+      "fullCiExitCode": 0,
+      "testFiles": 168,
+      "testsPassed": 1817,
+      "expectedFailures": 1,
+      "postCiAssetCorrection": "A final front-view inspection found the intake barrel gap. The final mesh passed all affected geometry/normal/clearance/reproducibility checks, 31 actual-loader/rig tests and a fresh production build. No runtime behavior changed after full CI."
+    }
+  },
+  "briefAcceptance": {
+    "1SourceExportsProvenance": "passed; reproducible original source, full/installed exports, notices, hashes and retained rejected source",
+    "2Geometry": "passed sampled actual-mesh criteria; closed original door/fuselage seam retained and explicitly quantified, no new engine crossings or opened-door crossings",
+    "3SharedVariantsResourceSeparation": "passed; identical common mesh/material/pivot contract and runtime path inventory",
+    "4NativeTracesLifecycle": "passed; eleven real-WASM scenarios, plotted gas/core/liner plus fuel/augmentation/spools/nozzle, exact independent restore and native hold/zero-time behavior",
+    "5ReferenceAppearance": "provisional geometry/reference fitting and offline contrast evaluated; matched day/night rear/oblique GPU render comparisons remain unperformed as instructed",
+    "6EarthStand": "app/native regressions pass; MSP runway35, Location relocation, native hold-down, normal controls/history/CSV and saved-flight isolation preserved",
+    "7ChecksPreservation": "related checks plus one full CI passed; late intake-only correction separately validated. Existing unrelated dirty work preserved."
+  },
+  "declaredHypotheses": [
+    "PW-600 compact layered nozzle supported by identified B engineering accounts; exact stations, panel/fan counts, accessories, materials and aperture schedule are not measured production data.",
+    "Two opposed circular bearing normals use 23.75 degrees as a symmetric reconstruction of 95-degree travel; Rolls-Royce patent supports topology, not those dimensions. Native thrust direction is preserved through conversion and yaw.",
+    "Engine installation lowered 0.10 m to fit retained airframe. Engine bay doors use original 90-degree opening around provisional 6 cm outboard hinges, staged over first quarter of conversion. Exact closed mesh remains unchanged.",
+    "Two native solids separate upstream core-facing hardware from cooled augmented-flow liner; capacities, cooling and emissivities are provisional. No render-time thermal integrator.",
+    "Eight uneven emission lobes and warmer/pink-violet downstream spectra are hypotheses. Gas emission permits dry powered lift while native augmentation remains inhibited."
+  ],
+  "preservation": {
+    "originalEngine": "Original AF267 source/runtime GLB and earlier evidence retained unchanged.",
+    "airframe": "Old vtol/feather subtree and identified 124-triangle static engine tube removed; 434 retained vertex/image byte slices are identical. Unrelated gear/controls/meshes retained.",
+    "native": "Previous fork.14 archive and matching rollback declaration retained; native change committed in owning JSBSim master. No remote push or publication.",
+    "unrelatedWork": "No ground collision, unrelated phone UI, flight-instrument customization, sound DSP or FOSS Earth source changes in this reconstruction task."
+  },
+  "limits": [
+    "No browser/server/GPU qualification, device benchmark, performance, energy-saving or acoustic-tier claim.",
+    "No calibrated PW-600 geometry, heat transfer, species fractions, luminous intensity, temperature inference from photographed RGB, or OEM FADEC area schedule.",
+    "The source airframe has two existing closed-door/fuselage triangle crossings with maximum 5.676 mm plane straddle. Open-door and engine sweeps pass; general non-watertight containment and coplanar contacts remain unqualified.",
+    "One optional scene light affects lit materials; FOSS Earth emissive raster terrain cannot receive its ground patch. No deck impingement, scattering or occlusion model.",
+    "Matched reference camera, power, exposure, white balance and day/night GPU appearance remain to be evaluated under a separately requested visual check. Shared GLSL/WGSL image-processing paths have software tests, not GPU shader compilation."
+  ],
+  "retainedRejectedHypotheses": "reconstruction/comparisons/",
+  "evidenceRecords": [
+    {
+      "path": "reconstruction/geometry-report.json",
+      "sha256": "0ae42c81a2bc855584a851cb1000d88ed90391a78ddfb0e3777a0b15d1484947"
+    },
+    {
+      "path": "reconstruction/clearance-report.json",
+      "sha256": "369427492267a6033ce4159c240f98803135d2a320b1f90b7aebc920af9a5bbb"
+    },
+    {
+      "path": "implementation/native/acceptance.json",
+      "sha256": "8f7515936164201698769f82489a5fd0264b1b9b291aab36e40c2708ba509f0e"
+    },
+    {
+      "path": "implementation/optics/optics-report.json",
+      "sha256": "b707ab40d50ff58238cb62a75fe7227605e394b51ebf9d8955a5004876453c09"
+    },
+    {
+      "path": "implementation/application/acceptance.json",
+      "sha256": "62efa553536aa6eab17c1d7b2ad6b248d48ef3765bf8a8ad8cd549c5158b1066"
+    }
+  ],
+  "finalEvidenceConsistency": {
+    "status": "passed",
+    "sha256Checks": 42,
+    "log": "implementation/application/final-evidence-check.log",
+    "manifestSha256": "cdebdd3cf80a5c25a83beb67d832d78b7b2abf183ca3bcbce7aeb65a6885fe1e",
+    "scope": "Source input and retained-record hashes match; final distributed geometry matches source exports. A provenance-only wording correction left every GLB unchanged; the distributed static manifest was synchronized."
+  }
+}

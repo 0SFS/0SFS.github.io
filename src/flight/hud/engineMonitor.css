@@ -235,6 +235,12 @@
   width: auto;
 }
 
+.flight-engine__pair select {
+  width: max-content;
+  max-width: 100%;
+  flex: none;
+}
+
 .flight-engine__label {
   opacity: 0.7;
   white-space: nowrap;
@@ -277,3 +283,46 @@
   outline: 2px solid #e8b647;
   outline-offset: 1px;
 }
+
+/* Each plot keeps its own width and wraps as a paragraph, like the controls. */
+.flight-engine__plots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8em;
+  margin-top: 0.6em;
+}
+
+.flight-engine__plot {
+  box-sizing: border-box;
+  width: 25em;
+  max-width: 100%;
+  margin: 0;
+  padding: 0.5em;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 5px;
+}
+
+.flight-engine__plot figcaption {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.flight-engine__plot svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0.4em 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  color: #86c6ef;
+}
+
+.flight-engine__plot-range,
+.flight-engine__plot-times {
+  margin: 0;
+  font-size: 0.9em;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.flight-engine__plot-times { opacity: 0.65; }
+.flight-engine__button:disabled { opacity: 0.45; cursor: default; }

@@ -1,0 +1,111 @@
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+ ❯ src/flight/aircraft/createAircraftEngineVisuals.test.ts (12 tests | 2 failed) 15ms
+     × observes gas and metal independently and requires declared native validity flags 6ms
+     × reports a missing installation attachment once instead of silently creating a fallback 1ms
+(node:35830) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:35837) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:35831) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/flight/aircraft/createAircraftModel.test.ts > aircraft model loader > loads only the complete engine in the Earth stand and prepares it before reveal
+BJS - [13:21:53]: Babylon.js v8.56.2 - Null engine
+
+stderr | src/flight/aircraft/createAircraftModel.test.ts > aircraft model loader > loads only the complete engine in the Earth stand and prepares it before reveal
+BJS - [13:21:53]: Node __root__ has a parent that is not in the container.
+BJS - [13:21:53]: SceneSerializer.addAllToScene: The Asset Container hierarchy is not valid.
+
+ ❯ src/flight/aircraft/createAircraftModel.test.ts (26 tests | 1 failed) 2406ms
+     × loads only the complete engine in the Earth stand and prepares it before reveal 117ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/flight/aircraft/createAircraftEngineVisuals.test.ts > aircraft engine visual observations > observes gas and metal independently and requires declared native validity flags
+AssertionError: expected last "vi.fn()" call to have been called with [ ObjectContaining{…}, …(1) ]
+
+- Expected
++ Received
+
+@@ -1,13 +1,18 @@
+  [
+    {
++     "augmentation": false,
+      "gasTemperatureKelvin": 1600,
+      "hotSurfaceTemperaturesKelvin": [
+        1123.15,
+-       973.15,
++       undefined,
+      ],
+      "metalTemperatureKelvin": undefined,
++     "nozzlePositionNorm": 0.2,
++     "powerNorm": 0.98,
++     "running": true,
++     "simulationTimeSeconds": 42,
+    },
+    {
+      "enabled": true,
+      "intensity": 1,
+      "maxDistanceMeters": 2000,
+
+ ❯ src/flight/aircraft/createAircraftEngineVisuals.test.ts:152:32
+    150|       t.values.set("propulsion/engine[0]/thermal/initialized", 0);
+    151|       t.visual.read(); t.visual.updateRig(t.rig);
+    152|       expect(t.plume().update).toHaveBeenLastCalledWith(expect.objectC…
+       |                                ^
+    153|         metalTemperatureKelvin: undefined, gasTemperatureKelvin: 1600,
+    154|         hotSurfaceTemperaturesKelvin: [1123.15, 973.15],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/flight/aircraft/createAircraftEngineVisuals.test.ts > aircraft engine visual observations > reports a missing installation attachment once instead of silently creating a fallback
+AssertionError: expected "vi.fn()" to be called once with arguments: [ Array(1) ]
+
+Received:
+
+  1st vi.fn() call:
+
+  [
+-   "Exhaust main-exhaust: missing attachment vtol",
++   "Exhaust main-exhaust: missing attachment F135_Exhaust",
+  ]
+
+
+Number of calls: 1
+
+ ❯ src/flight/aircraft/createAircraftEngineVisuals.test.ts:207:33
+    205|       t.visual.updateRig(missing);
+    206|       expect(createEngineExhaust).not.toHaveBeenCalled();
+    207|       expect(t.options.onError).toHaveBeenCalledExactlyOnceWith("Exhau…
+       |                                 ^
+    208|     } finally { t.visual.dispose(); }
+    209|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/flight/aircraft/createAircraftModel.test.ts > aircraft model loader > loads only the complete engine in the Earth stand and prepares it before reveal
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/flight/aircraft/createAircraftModel.test.ts:113:72
+    111|       expect(model.getRig()!.getNode("vtol")).toBeNull();
+    112|       expect(model.getRig()!.engineNozzle!.targetCount).toBe(3);
+    113|       expect(t.scene.meshes.some(mesh => mesh.name === "F135_Casing"))…
+       |                                                                        ^
+    114|       expect(t.scene.meshes.every(mesh => !mesh.isPickable)).toBe(true…
+    115|       expect(requestRender).toHaveBeenCalledOnce();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  2 failed | 6 passed (8)
+      Tests  3 failed | 87 passed (90)
+   Start at  13:21:52
+   Duration  3.61s (transform 508ms, setup 0ms, import 2.71s, tests 3.18s, environment 556ms)
+

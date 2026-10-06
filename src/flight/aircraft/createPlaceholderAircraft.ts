@@ -59,6 +59,11 @@ export interface AircraftPresentationOptions {
   cockpitOffset?: { x: number; y: number; z: number };
   /** Keep a supplied cockpit interior visible while looking from the pilot eye. */
   showModelInCockpit?: boolean;
+  /** A declared engine assembly can be inspected with the same flight camera. */
+  chaseTargetOffset?: { x: number; y: number; z: number };
+  /** Initial only; subsequent zoom retains the normal physical camera controls. */
+  chaseDistanceMeters?: number;
+  chaseZoomLimits?: () => { min: number; max: number };
 }
 
 /**
@@ -124,11 +129,15 @@ export function createPlaceholderAircraft(
   let viewMode: FlightViewMode = "third";
   let chaseYaw = 0;
   let chasePitch = Math.atan2(chaseOffset.y, -chaseOffset.z);
-  let chaseDistance = chaseOffset.length();
+  const chaseTarget = options.chaseTargetOffset ? new Vector3(options.chaseTargetOffset.x, options.chaseTargetOffset.y, options.chaseTargetOffset.z) : Vector3.Zero();
+  const zoomLimits = (): { min: number; max: number } => options.chaseZoomLimits?.() ?? parameters.get("osfs.camera.chaseZoomLimits");
+  const initialLimits = zoomLimits();
+  let chaseDistance = Math.max(initialLimits.min, Math.min(initialLimits.max, options.chaseDistanceMeters ?? chaseOffset.length()));
   const updateChaseCamera = (): void => {
     const horizontal = chaseDistance * Math.cos(chasePitch);
     thirdPersonCamera.position.set(Math.sin(chaseYaw) * horizontal, Math.sin(chasePitch) * chaseDistance, -Math.cos(chaseYaw) * horizontal);
-    thirdPersonCamera.setTarget(Vector3.Zero());
+    thirdPersonCamera.position.addInPlace(chaseTarget);
+    thirdPersonCamera.setTarget(chaseTarget);
   };
   updateChaseCamera();
 
@@ -185,7 +194,7 @@ export function createPlaceholderAircraft(
     },
     zoomChaseCamera(factor): void {
       if (viewMode !== "third" || !Number.isFinite(factor) || factor <= 0) return;
-      const limits = parameters.get("osfs.camera.chaseZoomLimits");
+      const limits = zoomLimits();
       chaseDistance = Math.max(limits.min, Math.min(limits.max, chaseDistance * factor));
       updateChaseCamera();
     },

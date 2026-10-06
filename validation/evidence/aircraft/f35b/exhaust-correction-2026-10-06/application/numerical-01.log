@@ -1,0 +1,50 @@
+{
+  "out": "build/f135-emission-correction-2026-10-06/numerical-01",
+  "status": "passed-numerical-correction-only",
+  "cases": 8,
+  "errors": [],
+  "thermalBounds": [
+    {
+      "region": "gas",
+      "nativeTemperatureK": 1003.1281319989688,
+      "assumedVisibleEmissivity": 1,
+      "sourceLuminanceCdPerM2": 2.8914463323023414,
+      "hemisphericThermalCeilingCdPerM2": 2.8914463323023414,
+      "filledExitDiskIlluminanceLux": 0.9483589295149618,
+      "diffuseReceiverRadianceCdPerM2": 0.06037440458305782,
+      "fullHemisphereDiffuseReceiverCeilingCdPerM2": 0.5782892664604683
+    },
+    {
+      "region": "core",
+      "nativeTemperatureK": 956.7228132202761,
+      "assumedVisibleEmissivity": 0.8,
+      "sourceLuminanceCdPerM2": 0.7443808162325739,
+      "hemisphericThermalCeilingCdPerM2": 0.9304760202907173,
+      "filledExitDiskIlluminanceLux": 0.24414777689188022,
+      "diffuseReceiverRadianceCdPerM2": 0.015542930214895985,
+      "fullHemisphereDiffuseReceiverCeilingCdPerM2": 0.1488761632465148,
+      "actualSurfaceTableRgbCdPerM2": [
+        3.499719726351038,
+        0,
+        0
+      ]
+    },
+    {
+      "region": "liner",
+      "nativeTemperatureK": 664.0542773824793,
+      "assumedVisibleEmissivity": 0.8,
+      "sourceLuminanceCdPerM2": 0.00001942197004415031,
+      "hemisphericThermalCeilingCdPerM2": 0.000024277462555187886,
+      "filledExitDiskIlluminanceLux": 0.000006370167937883096,
+      "diffuseReceiverRadianceCdPerM2": 4.055374862558402e-7,
+      "fullHemisphereDiffuseReceiverCeilingCdPerM2": 0.0000038843940088300625,
+      "actualSurfaceTableRgbCdPerM2": [
+        0.00009130915127289424,
+        0,
+        0
+      ]
+    }
+  ]
+}
+(node:70620) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)

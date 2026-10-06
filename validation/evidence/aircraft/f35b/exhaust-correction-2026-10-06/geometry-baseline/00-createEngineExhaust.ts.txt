@@ -1,0 +1,704 @@
+import {
+  AbstractMesh, Constants, ImageProcessingConfiguration, Light, Matrix, Mesh, MultiMaterial, PBRMaterial, MeshBuilder, PointLight, Quaternion, RawTexture, ShaderLanguage, ShaderMaterial, Texture,
+  TransformNode, Vector3, Vector4, type Scene,
+} from "@babylonjs/core";
+import "@babylonjs/core/Shaders/ShadersInclude/helperFunctions";
+import "@babylonjs/core/Shaders/ShadersInclude/imageProcessingDeclaration";
+import "@babylonjs/core/Shaders/ShadersInclude/imageProcessingFunctions";
+import "@babylonjs/core/ShadersWGSL/ShadersInclude/helperFunctions";
+import "@babylonjs/core/ShadersWGSL/ShadersInclude/imageProcessingDeclaration";
+import "@babylonjs/core/ShadersWGSL/ShadersInclude/imageProcessingFunctions";
+import { whenMeshesReady } from "foss-earth/runtime";
+import type { EngineExhaustOpticalProfile } from "./engineExhaustProfiles";
+import { DEFAULT_ENGINE_GAS_AXIAL_SAMPLES, DEFAULT_ENGINE_GAS_RADIAL_SAMPLES,
+  engineGasSupportLength, evaluateEngineGasOptics, validateEngineGasOpticalData } from "./engineGasOptics";
+import { createEngineHotSurfaceGlow } from "./createEngineHotSurfaceGlow";
+
+/** 0sfs owns aircraft engine light; this renderer writes no flight properties. */
+export interface EngineExhaustSettings {
+  enabled: boolean;
+  /** Bounded integration work per covered fragment, 4..32. */
+  sampleCount: number;
+  /** Spatial source-table work/storage per engine, 8..64 samples per axis. */
+  axialFieldSamples?: number;
+  radialFieldSamples?: number;
+  maxDistanceMeters: number;
+  /** Artistic emission amplitude, not measured radiance/SPL, 0..8. */
+  intensity: number;
+  /** Display white reference for photometric hardware emission, in cd/m². */
+  surfaceReferenceNits: number;
+  /** One unshadowed nearby gas light; unset disables it for legacy consumers. */
+  lightEnabled?: boolean;
+  /** Dimensionless display gain on the bounded isotropic source intensity. */
+  lightGain?: number;
+  /** Explicit physical-luminance to renderer-white conversion, cd/m². */
+  gasReferenceNits?: number;
+  contributionView?: "combined" | "solid" | "gas" | "reflection" | "scene-light";
+  lightRangeMeters?: number;
+}
+
+export interface EngineExhaustState {
+  /** Actual burning/shaft observation; missing telemetry is false. */
+  running: boolean;
+  fuelFlowKgPerSecond?: number;
+  afterburnerBurnedFuelFlowKgPerSecond?: number;
+  /** Genuine native augmentation, never inferred from throttle. */
+  augmentation: boolean;
+  powerNorm: number;
+  nozzlePositionNorm?: number;
+  /** Actual rigid-linkage exit radius, when available. */
+  exitRadiusMeters?: number;
+  /** Native metal thermal state; independent of the instantaneous gas temperature. */
+  metalTemperatureKelvin?: number;
+  /** One independent native temperature per declared solid region. */
+  hotSurfaceTemperaturesKelvin?: readonly (number | undefined)[];
+  /** Native gas temperature selects the gas optical lookup. */
+  gasTemperatureKelvin?: number;
+  /** Native ambient static temperature for the reduced mixing field. */
+  ambientTemperatureKelvin?: number;
+  /** Native clock supplied by the owner; a steady baked plume has no independent timer. */
+  simulationTimeSeconds: number;
+}
+
+export interface EngineExhaustOptions {
+  attachment: TransformNode;
+  /** Authored attachment-local coordinates, before the model's conversion scale. */
+  exitPosition: readonly [number, number, number];
+  direction: readonly [number, number, number];
+  closedRadiusMeters: number;
+  openRadiusMeters: number;
+  lengthMeters: number;
+  opticalProfile: EngineExhaustOpticalProfile;
+  /** Only matching materials beneath this attachment receive hardware glow. */
+  hotSurfaceMaterialNames?: readonly string[];
+  hotSurfaceRegions?: readonly { readonly materialNames: readonly string[] }[];
+  /** Complete hot-hardware subtree when the gas attachment is a leaf at the nozzle tip. */
+  hotSurfaceAttachment?: TransformNode;
+  settings: EngineExhaustSettings;
+  requestRender?(): void;
+  /** Setup seams; production waits for the texture and both shader stages. */
+  createTexture?(profile: EngineExhaustOpticalProfile, scene: Scene): Texture;
+  createSpatialTexture?(profile: EngineExhaustOpticalProfile, scene: Scene): Texture;
+  whenReady?(meshes: readonly Mesh[], signal: AbortSignal): Promise<void>;
+}
+
+export interface EngineExhaustHandle {
+  readonly ready: Promise<void>;
+  /** One static 12-triangle volume, exposed for diagnostics/qualification. */
+  readonly mesh: Mesh;
+  update(state: EngineExhaustState, settings?: EngineExhaustSettings): void;
+  dispose(): void;
+}
+
+const MAX_SAMPLES = 32;
+const unit = (value: number): number => Math.min(1, Math.max(0, value));
+const fieldSamples = (value: number | undefined, fallback: number): number =>
+  Number.isFinite(value) ? Math.max(8, Math.min(64, Math.round(value!))) : fallback;
+
+export const ENGINE_EXHAUST_GLSL_VERTEX = /* glsl */ `
+precision highp float;
+attribute vec3 position;
+uniform mat4 worldViewProjection;
+varying vec3 vLocal;
+void main() {
+  vLocal = position + vec3(0.0, 0.0, 0.5);
+  gl_Position = worldViewProjection * vec4(position, 1.0);
+}
+`;
+
+export const ENGINE_EXHAUST_GLSL_FRAGMENT = /* glsl */ `
+precision highp float;
+uniform mat4 worldViewProjection;
+uniform sampler2D spatialLut;
+uniform sampler2D sourceField;
+uniform vec4 fieldShape;
+uniform vec4 spatialShape;
+uniform vec3 cameraLocal;
+uniform vec3 volumeMeters;
+uniform vec3 sourceRadiance;
+uniform float absorptionPerMeter;
+uniform float intensity;
+uniform int sampleCount;
+varying vec3 vLocal;
+#include<helperFunctions>
+#include<imageProcessingDeclaration>
+#include<imageProcessingFunctions>
+// Explicit bilinear filtering keeps RGBA32F usable without float-linear support.
+vec4 sampleSourceField(vec2 uv) {
+  vec2 cell = clamp(uv, 0.0, 1.0) * (fieldShape.xy - 1.0);
+  vec2 low = floor(cell), f = cell - low;
+  vec2 a = (low + 0.5) / fieldShape.xy;
+  vec2 b = (min(low + 1.0, fieldShape.xy - 1.0) + 0.5) / fieldShape.xy;
+  return mix(mix(texture2D(sourceField, a), texture2D(sourceField, vec2(b.x, a.y)), f.x),
+    mix(texture2D(sourceField, vec2(a.x, b.y)), texture2D(sourceField, b), f.x), f.y);
+}
+void main() {
+  vec3 delta = vLocal - cameraLocal;
+  if (dot(delta, delta) < 0.0000000001) discard;
+  vec3 ray = normalize(delta);
+  vec3 safe = vec3(ray.x < 0.0 ? -max(abs(ray.x), 0.00001) : max(abs(ray.x), 0.00001),
+    ray.y < 0.0 ? -max(abs(ray.y), 0.00001) : max(abs(ray.y), 0.00001),
+    ray.z < 0.0 ? -max(abs(ray.z), 0.00001) : max(abs(ray.z), 0.00001));
+  vec3 a = (vec3(-1.0, -1.0, 0.0) - cameraLocal) / safe;
+  vec3 b = (vec3(1.0) - cameraLocal) / safe;
+  vec3 near = min(a, b);
+  vec3 far = max(a, b);
+  float begin = max(0.0, max(max(near.x, near.y), near.z));
+  float end = min(min(far.x, far.y), far.z);
+  if (end <= begin) discard;
+  float span = end - begin;
+  float zBegin = cameraLocal.z + ray.z * begin;
+  float zEnd = cameraLocal.z + ray.z * end;
+  float sampleWarp = fieldShape.w > 0.5 ? clamp(abs(zEnd - zBegin), 0.0, 1.0) : 0.0;
+  float warpDirection = zBegin <= zEnd ? -1.0 : 1.0;
+  float metresPerRayUnit = length(ray * volumeMeters);
+  vec3 emission = vec3(0.0);
+  float transmittance = 1.0;
+  vec3 firstLight = vec3(0.0);
+  bool hasLight = false;
+  for (int i = 0; i < ${MAX_SAMPLES}; i++) {
+    if (i >= sampleCount) break;
+    // Cluster segment boundaries toward the near-nozzle axial end. Each
+    // segment retains its own physical length; this is quadrature, not a fade.
+    float u0 = float(i) / float(sampleCount), u1 = float(i + 1) / float(sampleCount);
+    float f0 = u0 + warpDirection * sampleWarp * u0 * (1.0 - u0);
+    float f1 = u1 + warpDirection * sampleWarp * u1 * (1.0 - u1);
+    float pathMetres = span * (f1 - f0) * metresPerRayUnit;
+    vec3 p = cameraLocal + ray * (begin + 0.5 * (f0 + f1) * span);
+    float axial = clamp(p.z, 0.0, 1.0);
+    vec3 localSource;
+    float localAbsorption;
+    if (fieldShape.w > 0.5) {
+      float radialFraction = length(p.xy) * (1.0 + fieldShape.z) / (1.0 + fieldShape.z * axial);
+      if (radialFraction > 1.0) continue;
+      vec4 localField = sampleSourceField(vec2(axial, radialFraction));
+      localSource = localField.rgb;
+      localAbsorption = localField.a;
+    } else {
+      // Legacy uniform-temperature profiles retain their declared density mask.
+      float radius = max(0.12, 1.0 - 0.6 * axial);
+      float radial = max(0.0, 1.0 - dot(p.xy, p.xy) / (radius * radius));
+      float density = radial * radial;
+      if (spatialShape.w > 0.5) {
+        vec2 crossSection = clamp(p.xy / radius * 0.5 + 0.5, 0.0, 1.0);
+        vec2 mask = texture2D(spatialLut, (0.5 + crossSection * (spatialShape.xy - 1.0)) / spatialShape.xy).rg;
+        density = mix(mask.r, mask.g, clamp(axial / spatialShape.z, 0.0, 1.0));
+      }
+      density *= (1.0 - axial) * (1.0 - axial);
+      localSource = sourceRadiance * density;
+      localAbsorption = absorptionPerMeter * density;
+    }
+    float tau = localAbsorption * pathMetres;
+    float opacity = 1.0 - exp(-tau);
+    float segment = tau < 0.001 ? pathMetres * (1.0 - 0.5 * tau + tau * tau / 6.0)
+      : opacity / localAbsorption;
+    vec3 contribution = transmittance * localSource * segment;
+    transmittance *= exp(-tau);
+    if (!hasLight && (max(max(contribution.r, contribution.g), contribution.b) > 0.0 || tau > 0.0)) {
+      firstLight = p;
+      hasLight = true;
+    }
+    // j [cd/m³] integrated with extinction [m⁻¹] gives radiance [cd/m²].
+    emission += contribution;
+  }
+  emission *= intensity;
+  if (!hasLight) discard;
+  vec4 color = vec4(emission, 1.0 - transmittance);
+  // Match PBR's image-processing contract: linear emission reaches the shared
+  // postprocess unchanged, or shared material processing applies exactly once.
+#ifdef IMAGEPROCESSINGPOSTPROCESS
+#ifndef SKIPFINALCOLORCLAMP
+  color.rgb = clamp(color.rgb, 0.0, 30.0);
+#endif
+#else
+  color = applyImageProcessing(color);
+#endif
+  gl_FragColor = color;
+  vec4 clip = worldViewProjection * vec4(firstLight - vec3(0.0, 0.0, 0.5), 1.0);
+  if (abs(clip.w) < 0.000001) discard;
+  gl_FragDepthEXT = clamp(0.5 * clip.z / clip.w + 0.5, 0.0, 1.0);
+}
+`;
+
+export const ENGINE_EXHAUST_WGSL_VERTEX = /* wgsl */ `
+attribute position : vec3<f32>;
+uniform worldViewProjection : mat4x4<f32>;
+varying vLocal : vec3<f32>;
+@vertex
+fn main(input : VertexInputs) -> FragmentInputs {
+  vertexOutputs.vLocal = vertexInputs.position + vec3<f32>(0.0, 0.0, 0.5);
+  vertexOutputs.position = uniforms.worldViewProjection * vec4<f32>(vertexInputs.position, 1.0);
+}
+`;
+
+export const ENGINE_EXHAUST_WGSL_FRAGMENT = /* wgsl */ `
+uniform worldViewProjection : mat4x4<f32>;
+uniform cameraLocal : vec3<f32>;
+uniform volumeMeters : vec3<f32>;
+uniform sourceRadiance : vec3<f32>;
+uniform absorptionPerMeter : f32;
+uniform intensity : f32;
+uniform sampleCount : i32;
+uniform spatialShape : vec4<f32>;
+uniform fieldShape : vec4<f32>;
+var sourceField : texture_2d<f32>;
+var sourceFieldSampler : sampler;
+var spatialLut : texture_2d<f32>;
+var spatialLutSampler : sampler;
+varying vLocal : vec3<f32>;
+#include<helperFunctions>
+#include<imageProcessingDeclaration>
+#include<imageProcessingFunctions>
+fn sampleSourceField(uv: vec2<f32>) -> vec4<f32> {
+  let cell = clamp(uv, vec2<f32>(0.0), vec2<f32>(1.0)) * (uniforms.fieldShape.xy - vec2<f32>(1.0));
+  let low = floor(cell);
+  let f = cell - low;
+  let a = (low + vec2<f32>(0.5)) / uniforms.fieldShape.xy;
+  let b = (min(low + vec2<f32>(1.0), uniforms.fieldShape.xy - vec2<f32>(1.0)) + vec2<f32>(0.5)) / uniforms.fieldShape.xy;
+  return mix(mix(textureSampleLevel(sourceField, sourceFieldSampler, a, 0.0),
+    textureSampleLevel(sourceField, sourceFieldSampler, vec2<f32>(b.x, a.y), 0.0), f.x),
+    mix(textureSampleLevel(sourceField, sourceFieldSampler, vec2<f32>(a.x, b.y), 0.0),
+    textureSampleLevel(sourceField, sourceFieldSampler, b, 0.0), f.x), f.y);
+}
+@fragment
+fn main(input : FragmentInputs) -> FragmentOutputs {
+  let delta = fragmentInputs.vLocal - uniforms.cameraLocal;
+  if (dot(delta, delta) < 0.0000000001) { discard; }
+  let ray = normalize(delta);
+  let safe = select(max(abs(ray), vec3<f32>(0.00001)), -max(abs(ray), vec3<f32>(0.00001)), ray < vec3<f32>(0.0));
+  let a = (vec3<f32>(-1.0, -1.0, 0.0) - uniforms.cameraLocal) / safe;
+  let b = (vec3<f32>(1.0) - uniforms.cameraLocal) / safe;
+  let near = min(a, b);
+  let far = max(a, b);
+  let begin = max(0.0, max(max(near.x, near.y), near.z));
+  let end = min(min(far.x, far.y), far.z);
+  if (end <= begin) { discard; }
+  let span = end - begin;
+  let zBegin = uniforms.cameraLocal.z + ray.z * begin;
+  let zEnd = uniforms.cameraLocal.z + ray.z * end;
+  let sampleWarp = select(0.0, clamp(abs(zEnd - zBegin), 0.0, 1.0), uniforms.fieldShape.w > 0.5);
+  let warpDirection = select(1.0, -1.0, zBegin <= zEnd);
+  let metresPerRayUnit = length(ray * uniforms.volumeMeters);
+  var emission = vec3<f32>(0.0);
+  var transmittance = 1.0;
+  var firstLight = vec3<f32>(0.0);
+  var hasLight = false;
+  for (var i: i32 = 0; i < ${MAX_SAMPLES}; i = i + 1) {
+    if (i >= uniforms.sampleCount) { break; }
+    let u0 = f32(i) / f32(uniforms.sampleCount);
+    let u1 = f32(i + 1) / f32(uniforms.sampleCount);
+    let f0 = u0 + warpDirection * sampleWarp * u0 * (1.0 - u0);
+    let f1 = u1 + warpDirection * sampleWarp * u1 * (1.0 - u1);
+    let pathMetres = span * (f1 - f0) * metresPerRayUnit;
+    let p = uniforms.cameraLocal + ray * (begin + 0.5 * (f0 + f1) * span);
+    let axial = clamp(p.z, 0.0, 1.0);
+    var localSource: vec3<f32>;
+    var localAbsorption: f32;
+    if (uniforms.fieldShape.w > 0.5) {
+      let radialFraction = length(p.xy) * (1.0 + uniforms.fieldShape.z) / (1.0 + uniforms.fieldShape.z * axial);
+      if (radialFraction > 1.0) { continue; }
+      let localField = sampleSourceField(vec2<f32>(axial, radialFraction));
+      localSource = localField.rgb;
+      localAbsorption = localField.a;
+    } else {
+      let radius = max(0.12, 1.0 - 0.6 * axial);
+      let radial = max(0.0, 1.0 - dot(p.xy, p.xy) / (radius * radius));
+      var density = radial * radial;
+      if (uniforms.spatialShape.w > 0.5) {
+        let crossSection = clamp(p.xy / radius * 0.5 + 0.5, vec2<f32>(0.0), vec2<f32>(1.0));
+        let mask = textureSampleLevel(spatialLut, spatialLutSampler,
+          (vec2<f32>(0.5) + crossSection * (uniforms.spatialShape.xy - vec2<f32>(1.0))) / uniforms.spatialShape.xy, 0.0).rg;
+        density = mix(mask.r, mask.g, clamp(axial / uniforms.spatialShape.z, 0.0, 1.0));
+      }
+      density = density * (1.0 - axial) * (1.0 - axial);
+      localSource = uniforms.sourceRadiance * density;
+      localAbsorption = uniforms.absorptionPerMeter * density;
+    }
+    let tau = localAbsorption * pathMetres;
+    let opacity = 1.0 - exp(-tau);
+    var segment = pathMetres * (1.0 - 0.5 * tau + tau * tau / 6.0);
+    if (tau >= 0.001) { segment = opacity / localAbsorption; }
+    let contribution = transmittance * localSource * segment;
+    transmittance = transmittance * exp(-tau);
+    if (!hasLight && (max(max(contribution.r, contribution.g), contribution.b) > 0.0 || tau > 0.0)) {
+      firstLight = p;
+      hasLight = true;
+    }
+    // j [cd/m³] integrated with extinction [m⁻¹] gives radiance [cd/m²].
+    emission = emission + contribution;
+  }
+  emission = emission * uniforms.intensity;
+  if (!hasLight) { discard; }
+  var color = vec4<f32>(emission, 1.0 - transmittance);
+#ifdef IMAGEPROCESSINGPOSTPROCESS
+#ifndef SKIPFINALCOLORCLAMP
+  color = vec4<f32>(clamp(color.rgb, vec3<f32>(0.0), vec3<f32>(30.0)), color.a);
+#endif
+#else
+  color = applyImageProcessing(color);
+#endif
+  fragmentOutputs.color = color;
+  let clip = uniforms.worldViewProjection * vec4<f32>(firstLight - vec3<f32>(0.0, 0.0, 0.5), 1.0);
+  if (abs(clip.w) < 0.000001) { discard; }
+  fragmentOutputs.fragDepth = clamp(clip.z / clip.w, 0.0, 1.0);
+}
+`;
+
+/** One source-field volume and bounded transfer integration; no runtime spectroscopy. */
+export function createEngineExhaust(scene: Scene, options: EngineExhaustOptions): EngineExhaustHandle {
+  for (const value of [options.closedRadiusMeters, options.openRadiusMeters, options.lengthMeters]) {
+    if (!Number.isFinite(value) || value <= 0) throw new Error("Engine exhaust needs finite positive metre dimensions");
+  }
+  const direction = new Vector3(...options.direction);
+  if (!options.exitPosition.every(Number.isFinite) || !options.direction.every(Number.isFinite)
+    || direction.lengthSquared() < 1e-12) throw new Error("Engine exhaust needs a finite attachment and direction");
+  direction.normalize();
+  const metresPerUnit = Vector3.TransformNormal(direction, options.attachment.computeWorldMatrix(true)).length();
+  if (!Number.isFinite(metresPerUnit) || metresPerUnit <= 1e-9) throw new Error("Engine exhaust attachment has invalid scale");
+  // A cylinder under nonuniform scale becomes elliptical. Reject that asset
+  // declaration rather than silently assign incorrect metre radii.
+  const axes = [Vector3.Right(), Vector3.Up(), Vector3.Forward()].map(axis =>
+    Vector3.TransformNormal(axis, options.attachment.getWorldMatrix()));
+  if (axes.some(axis => Math.abs(axis.length() - metresPerUnit) > metresPerUnit * 1e-5)
+    || Math.abs(Vector3.Dot(axes[0], axes[1])) > metresPerUnit * metresPerUnit * 1e-5
+    || Math.abs(Vector3.Dot(axes[0], axes[2])) > metresPerUnit * metresPerUnit * 1e-5
+    || Math.abs(Vector3.Dot(axes[1], axes[2])) > metresPerUnit * metresPerUnit * 1e-5) {
+    throw new Error("Engine exhaust attachment requires uniform unsheared model scale");
+  }
+  const profile = options.opticalProfile;
+  if (profile.colorSpace !== "linear-srgb" || !Number.isInteger(profile.width) || !Number.isInteger(profile.height)
+    || profile.width < 1 || profile.height < 1
+    || [profile.dry, profile.afterburner].some(bank => !Number.isInteger(bank.firstRow) || !Number.isInteger(bank.rowCount)
+      || bank.firstRow < 0 || bank.rowCount < 1 || bank.firstRow + bank.rowCount > profile.height
+      || bank.temperatureKelvinRange?.length !== 2
+      || bank.temperatureKelvinRange.some(value => !Number.isFinite(value) || value <= 0)
+      || bank.temperatureKelvinRange[1] <= bank.temperatureKelvinRange[0])) {
+    throw new Error("Unsupported exhaust optical data");
+  }
+  if (profile.gasEmission) validateEngineGasOpticalData(profile.gasEmission);
+  const envelope = profile.temporalEmission;
+  if (envelope && (!Number.isFinite(envelope.periodSeconds) || envelope.periodSeconds <= 0 || envelope.samples.length < 2
+    || envelope.samples.some(value => !Number.isFinite(value) || value < 0))) {
+    throw new Error("Unsupported exhaust temporal emission data");
+  }
+  // The spatial physical field already contains local source and extinction.
+  // Its legacy angular preview is not another density factor or runtime asset.
+  const spatial = profile.gasEmission?.spatialField ? undefined : profile.spatialEmission;
+  if (spatial && (!Number.isInteger(spatial.width) || !Number.isInteger(spatial.height)
+    || spatial.width < 2 || spatial.height < 2 || !Number.isFinite(spatial.downstreamMixFraction)
+    || spatial.downstreamMixFraction <= 0 || spatial.downstreamMixFraction > 1)) {
+    throw new Error("Unsupported exhaust spatial emission data");
+  }
+  if (options.attachment.isDisposed()) throw new Error("Engine exhaust attachment is disposed");
+  const regions = options.hotSurfaceRegions ?? (options.hotSurfaceMaterialNames?.length
+    ? [{ materialNames: options.hotSurfaceMaterialNames }] : []);
+  // Prepare every declared engine PBR binding before reveal, allowing gas/solid
+  // diagnostics to suppress reflected cold casing as well as hot regions.
+  const reflectionNames = new Set<string>();
+  if (options.hotSurfaceAttachment) {
+    const hotNames = new Set(regions.flatMap(region => [...region.materialNames]));
+    const hardware = options.hotSurfaceAttachment.getChildMeshes();
+    if (options.hotSurfaceAttachment instanceof AbstractMesh) hardware.unshift(options.hotSurfaceAttachment);
+    for (const mesh of hardware) {
+      const materials = mesh.material instanceof MultiMaterial ? mesh.material.subMaterials : [mesh.material];
+      for (const material of materials) if (material instanceof PBRMaterial && !hotNames.has(material.name)) reflectionNames.add(material.name);
+    }
+  }
+  const bindingRegions = [...regions, ...(reflectionNames.size ? [{ materialNames: [...reflectionNames] }] : [])];
+  const hotSurfaces: ReturnType<typeof createEngineHotSurfaceGlow>[] = [];
+  try {
+    for (const region of bindingRegions) hotSurfaces.push(createEngineHotSurfaceGlow(options.hotSurfaceAttachment ?? options.attachment, region.materialNames, profile,
+      options.whenReady ? { compile: async () => {} } : {}));
+  } catch (error) {
+    for (const surface of hotSurfaces) surface.dispose();
+    throw error;
+  }
+
+  const anchor = new TransformNode("engine-exhaust-anchor", scene);
+  anchor.parent = options.attachment;
+  anchor.position = new Vector3(...options.exitPosition);
+  anchor.rotationQuaternion = Quaternion.Identity();
+  Quaternion.FromUnitVectorsToRef(Vector3.Forward(), direction, anchor.rotationQuaternion);
+  const mesh = MeshBuilder.CreateBox("engine-exhaust", { width: 2, height: 2, depth: 1, sideOrientation: Mesh.BACKSIDE }, scene);
+  mesh.parent = anchor;
+  mesh.isPickable = false;
+  mesh.receiveShadows = false;
+  mesh.metadata = { aircraftVisualOnly: true, castsShadows: false, opticalProfileId: profile.id };
+  mesh.setEnabled(false);
+  const webGpu = scene.getEngine().isWebGPU;
+  const material = new ShaderMaterial("engine-exhaust", scene, {
+    vertexSource: webGpu ? ENGINE_EXHAUST_WGSL_VERTEX : ENGINE_EXHAUST_GLSL_VERTEX,
+    fragmentSource: webGpu ? ENGINE_EXHAUST_WGSL_FRAGMENT : ENGINE_EXHAUST_GLSL_FRAGMENT,
+  }, {
+    attributes: ["position"], uniforms: ["worldViewProjection", "cameraLocal", "spatialShape", "volumeMeters", "fieldShape", "sourceRadiance", "absorptionPerMeter", "intensity", "sampleCount"],
+    samplers: ["spatialLut", "sourceField"], shaderLanguage: webGpu ? ShaderLanguage.WGSL : ShaderLanguage.GLSL,
+    needAlphaBlending: true,
+  });
+  material.alphaMode = Constants.ALPHA_PREMULTIPLIED_PORTERDUFF;
+  material.disableDepthWrite = true;
+  material.backFaceCulling = true;
+  mesh.material = material;
+  const imageProcessing = scene.imageProcessingConfiguration;
+  const imageDefines = {
+    IMAGEPROCESSING: false, VIGNETTE: false, VIGNETTEBLENDMODEMULTIPLY: false, VIGNETTEBLENDMODEOPAQUE: false,
+    TONEMAPPING: 0, CONTRAST: false, EXPOSURE: false, COLORCURVES: false, COLORGRADING: false, COLORGRADING3D: false,
+    SAMPLER3DGREENDEPTH: false, SAMPLER3DBGRMAP: false, DITHER: false, IMAGEPROCESSINGPOSTPROCESS: false, SKIPFINALCOLORCLAMP: false,
+  };
+  const baseUniforms = [...material.options.uniforms];
+  const baseSamplers = [...material.options.samplers];
+  const prepareImageProcessing = (): void => {
+    imageProcessing.prepareDefines(imageDefines);
+    material.options.defines = Object.entries(imageDefines).flatMap(([name, value]) =>
+      value === false ? [] : [typeof value === "number" ? `#define ${name} ${value}` : `#define ${name}`]);
+    const uniforms = [...baseUniforms], samplers = [...baseSamplers];
+    ImageProcessingConfiguration.PrepareUniforms(uniforms, imageDefines);
+    ImageProcessingConfiguration.PrepareSamplers(samplers, imageDefines);
+    material.options.uniforms = uniforms;
+    material.options.samplers = samplers;
+    // Shared color-grading texture participates in normal material readiness,
+    // but belongs to the scene configuration and is never disposed here.
+    if (imageDefines.COLORGRADING && imageProcessing.colorGradingTexture) {
+      material.setTexture("txColorTransform", imageProcessing.colorGradingTexture);
+    } else material.removeTexture("txColorTransform");
+  };
+  prepareImageProcessing();
+  const texture = options.createSpatialTexture?.(profile, scene) ?? options.createTexture?.(profile, scene)
+    ?? (spatial ? new Texture(spatial.textureUrl, scene, {
+      noMipmap: true, invertY: false, samplingMode: Texture.BILINEAR_SAMPLINGMODE, gammaSpace: false,
+      useSRGBBuffer: false,
+      onError: message => queueMicrotask(() => fail(new Error(`Engine spatial texture failed: ${message ?? spatial.textureUrl}`))),
+    }) : RawTexture.CreateRGBATexture(new Uint8Array([255, 255, 255, 255]), 1, 1, scene, false, false));
+  texture.gammaSpace = false;
+  texture.wrapU = texture.wrapV = Texture.CLAMP_ADDRESSMODE;
+  material.setTexture("spatialLut", texture);
+  let sourceTexture = RawTexture.CreateRGBATexture(new Float32Array(4), 1, 1, scene, false, false,
+    Texture.NEAREST_SAMPLINGMODE, Constants.TEXTURETYPE_FLOAT);
+  sourceTexture.name = "engine-exhaust-source-field";
+  sourceTexture.gammaSpace = false;
+  sourceTexture.wrapU = sourceTexture.wrapV = Texture.CLAMP_ADDRESSMODE;
+  material.setTexture("sourceField", sourceTexture);
+  material.setVector4("fieldShape", new Vector4(1, 1, 0, 0));
+  material.setVector4("spatialShape", spatial ? new Vector4(spatial.width, spatial.height, spatial.downstreamMixFraction, 1)
+    : new Vector4(1, 1, 1, 0));
+  material.setVector3("volumeMeters", new Vector3(1, 1, 1));
+  material.setVector3("sourceRadiance", Vector3.Zero());
+  material.setFloat("absorptionPerMeter", 0);
+  material.setFloat("intensity", 0);
+  material.setInt("sampleCount", 4);
+  const cameraLocal = Vector3.Zero();
+  const inverse = Matrix.Identity();
+  material.setVector3("cameraLocal", cameraLocal);
+  material.onBindObservable.add(() => {
+    if (!scene.activeCamera || mesh.isDisposed()) return;
+    mesh.computeWorldMatrix(true).invertToRef(inverse);
+    Vector3.TransformCoordinatesToRef(scene.activeCamera.globalPosition, inverse, cameraLocal);
+    cameraLocal.z += 0.5;
+    material.setVector3("cameraLocal", cameraLocal);
+    // ShaderMaterial's stored-uniform upload precedes onBindObservable. The
+    // current draw needs this camera, rather than the preceding draw's view.
+    const effect = material.getEffect();
+    if (effect) {
+      effect.setVector3("cameraLocal", cameraLocal);
+      imageProcessing.bind(effect);
+    }
+  });
+
+  const controller = new AbortController();
+  let disposed = false;
+  let settled = false;
+  let settings = options.settings;
+  let state: EngineExhaustState | null = null;
+  let lastKey = "";
+  let failed: Error | null = null;
+  let resolveTerminal!: () => void;
+  let rejectTerminal!: (error: Error) => void;
+  const terminal = new Promise<void>((resolve, reject) => { resolveTerminal = resolve; rejectTerminal = reject; });
+  let lastAperture = 0;
+  let nearbyLight: PointLight | null = null;
+  // Pure physical evaluation is independent of camera, native clock alone and
+  // display controls. Hidden updates defer field work until it can be drawn.
+  let physicalKey = "";
+  let fieldRevision = 0;
+  let gas = evaluateEngineGasOptics(profile, { augmentation: false,
+    radiusMeters: options.closedRadiusMeters, lengthMeters: options.lengthMeters });
+  const synchronize = (): void => {
+    if (disposed) return;
+    const inputFinite = state && Number.isFinite(state.powerNorm) && Number.isFinite(state.simulationTimeSeconds);
+    const power = inputFinite ? unit(state!.powerNorm) : 0;
+    if (Number.isFinite(state?.nozzlePositionNorm)) lastAperture = unit(state!.nozzlePositionNorm!);
+    const aperture = lastAperture;
+    const samples = Number.isFinite(settings.sampleCount) ? Math.max(4, Math.min(MAX_SAMPLES, Math.round(settings.sampleCount))) : 4;
+    const intensity = Number.isFinite(settings.intensity) ? Math.min(8, Math.max(0, settings.intensity)) : 0;
+    const surfaceReferenceNits = settings.surfaceReferenceNits;
+    const distance = Number.isFinite(settings.maxDistanceMeters) ? Math.min(20_000, Math.max(1, settings.maxDistanceMeters)) : 0;
+    const camera = scene.activeCamera;
+    const source = anchor.getAbsolutePosition();
+    const inRange = camera && Vector3.DistanceSquared(camera.globalPosition, source) <= distance * distance;
+    const hardwareVisible = Boolean(settled && !failed && settings.enabled && intensity > 0 && inRange
+      && !options.attachment.isDisposed() && options.attachment.isEnabled());
+    const augmented = state?.augmentation === true;
+    const view = settings.contributionView ?? "combined";
+    const length = engineGasSupportLength(profile, options.lengthMeters, power, augmented);
+    const radius = Number.isFinite(state?.exitRadiusMeters) && state!.exitRadiusMeters! > 0 ? state!.exitRadiusMeters!
+      : options.closedRadiusMeters + aperture * (options.openRadiusMeters - options.closedRadiusMeters);
+    const axialSamples = fieldSamples(settings.axialFieldSamples, DEFAULT_ENGINE_GAS_AXIAL_SAMPLES);
+    const radialSamples = fieldSamples(settings.radialFieldSamples, DEFAULT_ENGINE_GAS_RADIAL_SAMPLES);
+    const nextPhysicalKey = [state?.gasTemperatureKelvin, state?.ambientTemperatureKelvin, augmented,
+      state?.fuelFlowKgPerSecond, state?.afterburnerBurnedFuelFlowKgPerSecond,
+      radius, length, axialSamples, radialSamples].join("/");
+    const needsGasSource = view === "combined" || view === "gas" || view === "scene-light" && settings.lightEnabled;
+    if (hardwareVisible && needsGasSource && inputFinite && state!.running && physicalKey !== nextPhysicalKey) {
+      physicalKey = nextPhysicalKey;
+      gas = evaluateEngineGasOptics(profile, { temperatureKelvin: state?.gasTemperatureKelvin,
+        ambientTemperatureKelvin: state?.ambientTemperatureKelvin,
+        augmentation: augmented, fuelFlowKgPerSecond: state?.fuelFlowKgPerSecond,
+        afterburnerBurnedFuelFlowKgPerSecond: state?.afterburnerBurnedFuelFlowKgPerSecond,
+        radiusMeters: radius, lengthMeters: length, axialSamples, radialSamples });
+      const field = gas.field;
+      if (field) {
+        const size = sourceTexture.getSize();
+        if (size.width === field.width && size.height === field.height) sourceTexture.update(field.rgba);
+        else {
+          const previous = sourceTexture;
+          sourceTexture = RawTexture.CreateRGBATexture(field.rgba, field.width, field.height, scene, false, false,
+            Texture.NEAREST_SAMPLINGMODE, Constants.TEXTURETYPE_FLOAT);
+          sourceTexture.name = "engine-exhaust-source-field";
+          sourceTexture.gammaSpace = false;
+          sourceTexture.wrapU = sourceTexture.wrapV = Texture.CLAMP_ADDRESSMODE;
+          material.setTexture("sourceField", sourceTexture);
+          previous.dispose();
+        }
+        material.setVector4("fieldShape", new Vector4(field.width, field.height, field.radiusExpansionRatio, 1));
+      } else material.setVector4("fieldShape", new Vector4(1, 1, 0, 0));
+      fieldRevision++;
+    }
+    const gasReference = settings.gasReferenceNits ?? 1000;
+    const gasGain = Number.isFinite(gasReference) && gasReference > 0 ? intensity / gasReference : 0;
+    const sourceVisible = Boolean(hardwareVisible && inputFinite && state!.running && gas.valid && gasGain > 0
+      && (gas.absorptionPerMeter > 0 || Math.max(...gas.sourceRgbCdPerM3) > 0));
+    const visible = sourceVisible && (view === "combined" || view === "gas");
+    // Hot hardware follows its thermal observation even after fuel cutoff.
+    // Combustion, shaft power and flame flicker do not switch off residual heat.
+    // Update before the plume's key guard: temperature can change alone.
+    let surfaceChanged = false;
+    for (const [index, surface] of hotSurfaces.entries()) {
+      const temperature = index >= regions.length ? undefined
+        : options.hotSurfaceRegions ? state?.hotSurfaceTemperaturesKelvin?.[index] : state?.metalTemperatureKelvin;
+      surfaceChanged = surface.setReflectionEnabled(view === "combined" || view === "reflection") || surfaceChanged;
+      surfaceChanged = surface.update(temperature, hardwareVisible && (view === "combined" || view === "solid"), intensity, surfaceReferenceNits) || surfaceChanged;
+    }
+    const lightGain = Number.isFinite(settings.lightGain) ? Math.max(0, Math.min(100, settings.lightGain!)) : 1;
+    const lightRange = Number.isFinite(settings.lightRangeMeters) ? Math.max(0, Math.min(100, settings.lightRangeMeters!)) : 0;
+    const lightVisible = Boolean(sourceVisible && Math.max(...gas.isotropicIntensityRgbCd) > 1e-12 && settings.lightEnabled && lightGain > 0 && lightRange > 0
+      && (view === "combined" || view === "scene-light"));
+    const key = [visible, view, samples, gasGain, length, radius, fieldRevision, gas.absorptionPerMeter, ...gas.sourceRgbCdPerM3,
+      lightVisible, lightGain, lightRange].join("/");
+    if (key === lastKey) {
+      if (surfaceChanged) options.requestRender?.();
+      return;
+    }
+    lastKey = key;
+    const lightWasVisible = nearbyLight?.isEnabled() ?? false;
+    if (lightVisible) {
+      if (!nearbyLight) {
+        nearbyLight = new PointLight("engine-exhaust-scene-light", Vector3.Zero(), scene);
+        nearbyLight.setEnabled(false);
+        nearbyLight.parent = anchor;
+        nearbyLight.intensityMode = Light.INTENSITYMODE_LUMINOUSINTENSITY;
+        nearbyLight.falloffType = Light.FALLOFF_PHYSICAL;
+        // Self-illumination is already represented by source emission. Keep an
+        // approximate point source from coloring its own cold hardware.
+        const engineRoot = options.hotSurfaceAttachment ?? options.attachment;
+        nearbyLight.excludedMeshes = engineRoot.getChildMeshes();
+        if (engineRoot instanceof AbstractMesh) nearbyLight.excludedMeshes.unshift(engineRoot);
+      }
+      const rgb = gas.isotropicIntensityRgbCd;
+      const peak = Math.max(...rgb);
+      nearbyLight.diffuse.set(...rgb.map(value => peak > 0 ? value / peak : 0) as [number, number, number]);
+      nearbyLight.specular.copyFrom(nearbyLight.diffuse);
+      nearbyLight.intensity = peak * lightGain * intensity;
+      nearbyLight.range = lightRange;
+      nearbyLight.position.z = length * 0.06 / metresPerUnit;
+      nearbyLight.setEnabled(peak > 0);
+    } else if (nearbyLight) {
+      nearbyLight.dispose();
+      nearbyLight = null;
+    }
+    const supportRadius = radius * (1 + (gas.field?.radiusExpansionRatio ?? 0));
+    mesh.scaling.set(supportRadius / metresPerUnit, supportRadius / metresPerUnit, length / metresPerUnit);
+    mesh.position.z = length / metresPerUnit / 2;
+    mesh.computeWorldMatrix(true);
+    material.setVector3("sourceRadiance", Vector3.FromArray(gas.sourceRgbCdPerM3));
+    material.setFloat("absorptionPerMeter", gas.absorptionPerMeter);
+    material.setFloat("intensity", gasGain);
+    material.setInt("sampleCount", samples);
+    material.setVector3("volumeMeters", new Vector3(supportRadius, supportRadius, length));
+    const wasVisible = mesh.isEnabled();
+    mesh.setEnabled(visible);
+    if (visible || wasVisible || surfaceChanged || lightVisible || lightWasVisible) options.requestRender?.();
+  };
+  function fail(error: Error): void {
+    if (disposed) return;
+    failed = error;
+    rejectTerminal(error);
+    cleanup();
+  }
+  function cleanup(external?: TransformNode): void {
+    if (disposed) return;
+    disposed = true;
+    options.attachment.onDisposeObservable.remove(attachmentDisposed);
+    imageProcessing.onUpdateParameters.remove(imageProcessingChanged);
+    mesh.onDisposeObservable.remove(meshDisposed);
+    controller.abort();
+    resolveTerminal();
+    const wasVisible = mesh.isEnabled();
+    // Model/LOD removal may already be recursively disposing a child. Never
+    // re-enter that node's disposal; materials/textures are owned here.
+    if (external !== mesh && !mesh.isDisposed()) mesh.dispose();
+    material.dispose();
+    texture.dispose();
+    sourceTexture.dispose();
+    const lightWasVisible = nearbyLight?.isEnabled();
+    nearbyLight?.dispose();
+    let surfaceWasVisible = false;
+    for (const surface of hotSurfaces) surfaceWasVisible = surface.dispose() || surfaceWasVisible;
+    if (external !== options.attachment && !anchor.isDisposed()) anchor.dispose();
+    if (wasVisible || surfaceWasVisible || lightWasVisible) options.requestRender?.();
+  }
+  const attachmentDisposed = options.attachment.onDisposeObservable.add(() => cleanup(options.attachment));
+  const meshDisposed = mesh.onDisposeObservable.add(() => cleanup(mesh));
+  const imageProcessingChanged = imageProcessing.onUpdateParameters.add(() => {
+    prepareImageProcessing();
+    if (mesh.isEnabled()) options.requestRender?.();
+  });
+  material.onError = (_effect, reason) => fail(new Error(`Engine exhaust shader failed: ${reason}`));
+  const prepare = options.whenReady ?? ((meshes: readonly Mesh[], signal: AbortSignal) => whenMeshesReady(meshes, { signal }));
+  const prepared = Promise.all([...hotSurfaces.map(surface => surface.ready), Promise.resolve().then(() => prepare([mesh], controller.signal))]);
+  const ready = Promise.race([terminal, prepared]).then(() => {
+    if (disposed) return;
+    if (failed) throw failed;
+    settled = true;
+    for (const surface of hotSurfaces) surface.activate();
+    synchronize();
+  }).catch(error => {
+    if (disposed && !failed) return;
+    const reason = failed ?? (error instanceof Error ? error : new Error(String(error)));
+    fail(reason);
+    throw reason;
+  });
+  // The consumer can attach its error handler later in the same task; an
+  // async texture failure during replacement must not become unhandled.
+  void ready.catch(() => {});
+
+  return {
+    ready, mesh,
+    update(next, nextSettings) {
+      if (disposed) return;
+      state = next;
+      if (nextSettings) settings = nextSettings;
+      anchor.computeWorldMatrix(true);
+      synchronize();
+    },
+    dispose: () => cleanup(),
+  };
+}

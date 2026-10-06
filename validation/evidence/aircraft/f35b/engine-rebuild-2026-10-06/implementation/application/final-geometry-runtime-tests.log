@@ -1,0 +1,15 @@
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+(node:40167) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:40166) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:40165) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  4 passed (4)
+      Tests  52 passed | 1 expected fail (53)
+   Start at  13:44:58
+   Duration  3.36s (transform 254ms, setup 0ms, import 2.10s, tests 3.18s, environment 0ms)
+

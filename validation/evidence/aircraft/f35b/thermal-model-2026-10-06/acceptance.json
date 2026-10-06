@@ -1,0 +1,161 @@
+{
+  "schema": "0sfs-f35b-separate-thermal-model/1",
+  "date": "2026-10-06",
+  "status": "software-accepted",
+  "purpose": "Separate native nozzle gas and dynamic metal temperatures; metal luminance lookup and temperature-indexed flame lookup, with explicit scene display reference.",
+  "artifact": {
+    "package": "@felipegalind0/jsbsim@1.2.4-fork.14",
+    "sourceCommit": "399a5173fb5d597f499103df8611a2132945f4a8",
+    "adoption": "../../../jsbsim/adoption/fork14-adoption.json",
+    "tarballSha256": "02a1080dc325f2fff399d94b38aff03dee8e8ac12cfc32ce1398910c5bf84485"
+  },
+  "checks": {
+    "incrementalTypecheck": {
+      "command": "npx tsc -b",
+      "passed": true,
+      "log": "typecheck.log"
+    },
+    "related": {
+      "command": "npx vitest related --run --maxWorkers=50% <changed aircraft, application, UI, lifecycle and bake files>",
+      "passed": true,
+      "files": 74,
+      "tests": 883,
+      "log": "related.log"
+    },
+    "lint": {
+      "command": "npm run lint",
+      "passed": true,
+      "log": "lint.log"
+    },
+    "finalCi": {
+      "command": "npm run ci",
+      "passed": true,
+      "testFiles": 163,
+      "testsPassed": 1767,
+      "expectedFailures": 1,
+      "expectedFailure": "Existing F35 stowed main-gear arm containment case; unrelated to thermals.",
+      "productionBuild": true,
+      "installedAndDistArtifactChecks": true,
+      "log": "ci.log"
+    },
+    "installedThermalLifecycle": {
+      "record": "fork14-installed/acceptance.json",
+      "passed": true,
+      "scenarios": 8,
+      "focusedAppTests": 52
+    },
+    "nativeAndSdk": {
+      "record": "../../../jsbsim/adoption/fork14-adoption.json",
+      "nativeThermalMethods": 15,
+      "sdkTests": 52,
+      "identityRegressions": 57
+    },
+    "opticalBake": {
+      "record": "optical-bake.json",
+      "deterministicOutputVerifiedInCi": true
+    },
+    "browserGpu": {
+      "executed": false,
+      "harness": "scripts/validation/f35b/check-exhaust-headless.mjs",
+      "scope": "Updated for gas/metal observations, Kelvin row selection, cd/m\u00b2 display mapping and finite native fuel rundown; no new pixel/device qualification claimed."
+    }
+  },
+  "observedNativeStaticCase": {
+    "source": "../../../jsbsim/adoption/fork14/native-f135-final-profile.json",
+    "conditions": "1000 ft, zero airspeed/wind, hold-down, 120 Hz; provisional profile, not measured F135 temperatures",
+    "dry98": {
+      "phase": "dry98-end",
+      "time": 180.99999999999972,
+      "n2": 99.2,
+      "egtC": 726.0768949883068,
+      "running": 1,
+      "augmentation": 0,
+      "fuelFlowPps": 6.249439955881203,
+      "gasK": 999.2268949883068,
+      "metalK": 661.7147269422283,
+      "initialized": 1,
+      "valid": 1,
+      "suppliedABKgSec": 0,
+      "burnedABKgSec": 0
+    },
+    "fullAfterburner": {
+      "phase": "AB-end",
+      "time": 300.9999999998906,
+      "n2": 100,
+      "egtC": 733.2188949888011,
+      "running": 1,
+      "augmentation": 1,
+      "fuelFlowPps": 19.93680666656408,
+      "gasK": 2361.8185386206856,
+      "metalK": 1269.7336836444151,
+      "initialized": 1,
+      "valid": 1,
+      "suppliedABKgSec": 6.099131199974914,
+      "burnedABKgSec": 4.752389777274471
+    },
+    "stopped180Seconds": {
+      "phase": "shutdown-end",
+      "time": 600.9999999996178,
+      "n2": 4.883238792915152e-24,
+      "egtC": 13.018894988505943,
+      "running": 0,
+      "augmentation": 0,
+      "fuelFlowPps": 0,
+      "gasK": 286.16889498850594,
+      "metalK": 429.4347337707343,
+      "initialized": 1,
+      "valid": 1,
+      "suppliedABKgSec": 0,
+      "burnedABKgSec": 0
+    },
+    "sameTimeInitRunningWallDeltaK": 0,
+    "fullAbMetalLookupEmissionAtDefaultReference": [
+      1.2540766531252627,
+      0.09408524062699362,
+      0.0
+    ]
+  },
+  "interface": {
+    "temperatures": "Engine \u2192 Temperatures and oil \u2192 EGT (exhaust gas), Nozzle gas temperature, Nozzle metal temperature; \u00b0C",
+    "displayReference": "Renderer \u2192 Aircraft exhaust \u2192 Nozzle glow white reference; 1000 cd/m\u00b2 default, lower is brighter",
+    "state": "Native metal state advances only on accepted nonsuspended nontrim steps; restored across app recovery/relocation."
+  },
+  "sourceHashes": {
+    "src/flight/aircraft/aircraftCatalog.ts": "c4ac2048bc64d55155f8824b9e53d083eb6c526ae7785164af5ee3cf9b029508",
+    "src/flight/aircraft/createAircraftEngineVisuals.ts": "7d3279375adc199d1a642088ff1c64720a6a4e18697732db1624c2b3859dfa8f",
+    "src/flight/aircraft/createEngineExhaust.ts": "0615872198ee0f5cd6220ae2726cd999df41d81b7efe211224360e32ed58165a",
+    "src/flight/aircraft/createEngineHotSurfaceGlow.ts": "0fc93ee0f2d4d94eb02974d7124fe3f37628cf2b130acdc2906604c4c1e7f3b9",
+    "src/flight/aircraft/engineExhaustProfiles.ts": "f3fb7926284ac3673cd369963504257af09bd7d369248af9bf3f4f4331a73a97",
+    "src/flight/settings/flightParameters.ts": "3d46014ddc54699e8e09cbd975a181b6e943d566f02d1cc4069b8f61424ab7ad",
+    "src/flight/createFlightSimApp.ts": "a617d52e0e60cf64a216762f2eb6cdbf2340a0c3d5961168fa06b15793787264",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml": "e1cb66a141c8686e550535eb8ef3eab0bf2a660954cb557fdcea5efbe2f1cd0c",
+    "scripts/validation/f35b/check-exhaust-headless.mjs": "eda71f17c5d43d1c1adaecf4686fb2c8ccdcdff1b2b412d00772b44e1be71dd9",
+    "scripts/validation/aircraft/check-turbine-thermal.mjs": "5c369cfd3c5a76b4f7f745b7b1749129535fa9fe699c18c241289f513ad38be6"
+  },
+  "logs": {
+    "typecheck.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "related.log": {
+      "bytes": 20712,
+      "sha256": "464727081b2b2fdb78757324cd8f3d86aaf17803fa02b64e33d317390d8713f6"
+    },
+    "lint.log": {
+      "bytes": 109,
+      "sha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e"
+    },
+    "ci.log": {
+      "bytes": 79307,
+      "sha256": "c19f270268733a3b3db6c896d94f1d3a736925bd18da0033c359a3f4a5605a74"
+    }
+  },
+  "limitations": [
+    "F135 gas flow, constant effective specific heat, cooling, heat capacity and radiation inputs are declared estimates; no measured F135 thermal station, alloy, coating or spatial wall calibration.",
+    "One uniform effective metal state cannot represent distinct liner, flameholder and petal temperatures. Dry operation may legitimately have little visible incandescence.",
+    "Surface spectral integration produces physical luminance for an assumed grey emissivity, but scene exposure and display reference are not photometrically calibrated.",
+    "Flame composition, soot contribution, spatial expansion and band weights remain assumed; temperature alone cannot determine a unique flame spectrum.",
+    "Native legacy EGT and finite fuel-flow rundown are unchanged. The existing renderer fuel/spool gate can retain faint dry gas emission during rundown; hardware heat is independent.",
+    "Full app CI and native/material tests pass; current GPU pixels, device performance and real-aircraft agreement have not been qualified."
+  ]
+}

@@ -1,0 +1,14 @@
+{"pass":true,"passedCases":12,"totalCases":12,"errors":[]}
+webgpu F-35B: PASS
+webgpu SF50: PASS
+webgpu C172: PASS
+webgpu Synthetic 23/37: PASS
+webgl2 F-35B: PASS
+webgl2 SF50: PASS
+webgl2 C172: PASS
+webgl2 Synthetic 23/37: PASS
+webgl1 F-35B: PASS
+webgl1 SF50: PASS
+webgl1 C172: PASS
+webgl1 Synthetic 23/37: PASS
+Detailed report and native-size preview: /Users/felg/gh/0sfs/build/validation/engine-orbs-gpu/2026-10-06_001529

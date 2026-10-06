@@ -1,0 +1,264 @@
+{
+  "report": "/Users/felg/gh/0sfs/build/research/f35b-nozzle-axis/2026-10-06_012046/report.json",
+  "axisDarkmetHits": [
+    {
+      "node": "vtol",
+      "mesh": "Cylinder",
+      "primitive": 0,
+      "triangle": 79,
+      "material": "darkmet2",
+      "alphaMode": "OPAQUE",
+      "doubleSided": true,
+      "zMeters": 0.4208382392520207,
+      "barycentric": [
+        0.49999999999993594,
+        3.9516091100778674e-7,
+        0.49999960483915307
+      ],
+      "normalZ": 0.41546333233058474
+    }
+  ],
+  "nearest": {
+    "node": "vtol",
+    "mesh": "Cylinder",
+    "primitive": 0,
+    "triangle": 79,
+    "material": "darkmet2",
+    "alphaMode": "OPAQUE",
+    "doubleSided": true,
+    "zMeters": 0.4208382392520207,
+    "barycentric": [
+      0.49999999999993594,
+      3.9516091100778674e-7,
+      0.49999960483915307
+    ],
+    "normalZ": 0.41546333233058474
+  },
+  "nearestVisibleFace": {
+    "node": "vtol",
+    "mesh": "Cylinder",
+    "primitive": 0,
+    "triangle": 79,
+    "material": "darkmet2",
+    "alphaMode": "OPAQUE",
+    "doubleSided": true,
+    "zMeters": 0.4208382392520207,
+    "barycentric": [
+      0.49999999999993594,
+      3.9516091100778674e-7,
+      0.49999960483915307
+    ],
+    "normalZ": 0.41546333233058474
+  },
+  "probeSummary": [
+    {
+      "offset": [
+        0,
+        0
+      ],
+      "darkmetHits": 1,
+      "first": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 79,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.49999999999993594,
+          3.9516091100778674e-7,
+          0.49999960483915307
+        ],
+        "normalZ": 0.41546333233058474
+      }
+    },
+    {
+      "offset": [
+        0.001,
+        0
+      ],
+      "darkmetHits": 1,
+      "first": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 79,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.4984485649062731,
+          0.0015518302545738604,
+          0.49999960483915307
+        ],
+        "normalZ": 0.41546333233058474
+      }
+    },
+    {
+      "offset": [
+        -0.001,
+        0
+      ],
+      "darkmetHits": 1,
+      "first": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 78,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.4984485649064012,
+          0.0015510399327518449,
+          0.5000003951608469
+        ],
+        "normalZ": 0.41546333233058474
+      }
+    },
+    {
+      "offset": [
+        0,
+        0.001
+      ],
+      "darkmetHits": 1,
+      "first": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 78,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.5000000000000641,
+          0.0015510402107162338,
+          0.4984489597892197
+        ],
+        "normalZ": 0.41546333233058474
+      }
+    },
+    {
+      "offset": [
+        0,
+        -0.001
+      ],
+      "darkmetHits": 1,
+      "first": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 79,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.49999999999993594,
+          0.0015518305325382493,
+          0.4984481694675258
+        ],
+        "normalZ": 0.41546333233058474
+      }
+    },
+    {
+      "offset": [
+        0.04,
+        0
+      ],
+      "darkmetHits": 1,
+      "first": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 79,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.420838239252021,
+        "barycentric": [
+          0.43794259625342147,
+          0.06205779890742545,
+          0.49999960483915307
+        ],
+        "normalZ": 0.41546333233058474
+      }
+    },
+    {
+      "offset": [
+        -0.04,
+        0
+      ],
+      "darkmetHits": 1,
+      "first": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 78,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520203,
+        "barycentric": [
+          0.43794259625354964,
+          0.06205700858560344,
+          0.5000003951608468
+        ],
+        "normalZ": 0.41546333233058474
+      }
+    },
+    {
+      "offset": [
+        0,
+        0.04
+      ],
+      "darkmetHits": 1,
+      "first": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 78,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.5000000000000641,
+          0.06205701970417785,
+          0.43794298029575807
+        ],
+        "normalZ": 0.41546333233058474
+      }
+    },
+    {
+      "offset": [
+        0,
+        -0.04
+      ],
+      "darkmetHits": 1,
+      "first": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 79,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.49999999999993594,
+          0.062057810025999936,
+          0.43794218997406414
+        ],
+        "normalZ": 0.41546333233058474
+      }
+    }
+  ]
+}
+(node:85512) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)

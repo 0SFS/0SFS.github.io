@@ -17,6 +17,12 @@ put every run there, use it as a default output directory, or ignore it in Git.
 New run output uses a dated build directory; 0sfs Node tools use
 `scripts/outputDirectory.mjs`. JSBSim simulations use JSBSim `build/`.
 
+Third-party media whose reuse rights are unknown, such as marketplace previews,
+user-supplied images and video frames, stays out of Git, even inside an evidence
+folder: list the files in `.gitignore` and commit the record beside them, with
+each source URL and SHA-256, so another checkout can fetch and verify them.
+Material whose license permits redistribution is committed with its credit.
+
 Examples:
 
 - The fetched PR snapshot belongs at

@@ -1,0 +1,76 @@
+#!/usr/bin/env node
+// 0sfs owns posed aircraft-gas support diagnostics. No GPU or visual qualification.
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { rolldown } from 'rolldown';
+import '@babylonjs/loaders/glTF/index.js';
+import { LoadAssetContainerAsync, NullEngine, Scene } from '@babylonjs/core';
+import { newOutputDirectory } from '../../outputDirectory.mjs';
+import { sha256 } from '../../f135Engine/glb.mjs';
+const root = fileURLToPath(new URL('../../../', import.meta.url));
+const specified = process.argv.find(a => a.startsWith('--out='))?.slice(6), out = specified ? path.resolve(specified) : newOutputDirectory('validation', 'exhaust-continuity');
+if (specified) await mkdir(out);
+const entry = path.join(out, 'entry.ts');
+await writeFile(entry, `export * from ${JSON.stringify(path.join(root, 'src/flight/aircraft/engineGasSupport.ts'))};\nexport {bindEngineNozzleRig} from ${JSON.stringify(path.join(root, 'src/flight/aircraft/engineNozzleRig.ts'))};\nexport {F135_ENGINE_GEOMETRY} from ${JSON.stringify(path.join(root, 'src/flight/aircraft/generated/f135EngineData.ts'))};\n`);
+const bundle = await rolldown({ input: entry, external: id => !id.startsWith('.') && !path.isAbsolute(id) });
+try { await bundle.write({ file: path.join(out, 'entry.mjs'), format: 'esm' }); } finally { await bundle.close(); }
+const { bindEngineGasSupport, F135_ENGINE_GAS_SUPPORT, engineGasSectionPoint, sampleEngineGasSection, sampleEngineGasSupport, engineGasSectionVolume, bindEngineNozzleRig, F135_ENGINE_GEOMETRY: g } = await import(pathToFileURL(path.join(out, 'entry.mjs')));
+const engine = new NullEngine(), scene = new Scene(engine); scene.useRightHandedSystem = true;
+const errors = [], poses = [], cases = [], assert = (ok, message) => { if (!ok) errors.push(message); };
+const physicalDomains = new Map();
+const tracePath = 'validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/trace.csv';
+const [headers, ...rows] = (await readFile(path.join(root, tracePath), 'utf8')).trim().split('\n').map(row => row.split(','));
+const trace = rows.map(row => Object.fromEntries(headers.map((key, i) => [key, Number.isFinite(Number(row[i])) ? Number(row[i]) : row[i]])));
+const at = (scenario, time) => trace.filter(row => row.scenario === scenario).sort((a, b) => Math.abs(a.timeS - time) - Math.abs(b.timeS - time))[0];
+const observations = [['cold', trace.find(r => r.scenario === 'cold-cycle')], ['idle', at('cold-cycle', 92.5166667)], ['dry99', at('cold-cycle', 212.5166667)], ['ab-onset', at('cold-cycle', 212.75)], ['ab-sustained', at('cold-cycle', 272.5166667)], ['ab-cutoff', at('cold-cycle', 272.525)], ['powered-lift', at('powered-lift', 117.525)], ['shutdown', trace.filter(r => r.scenario === 'cold-cycle').at(-1)]];
+try {
+  const containers = await Promise.all(g.assets.slice(0, 2).map(async asset => LoadAssetContainerAsync(new Uint8Array(await readFile(path.join(root, 'public', asset.path))), scene, { pluginExtension: '.glb' })));
+  const handles = containers.map(container => {
+    container.addAllToScene(); const nodes = container.transformNodes.concat(container.meshes);
+    return { rig: bindEngineNozzleRig(nodes, { bearingNames: ['F135_Bearing1', 'F135_Bearing2', 'F135_Bearing3'], bearingInclinationRad: g.bearingTiltDegrees * Math.PI / 180, apertureMechanism: g.aperture }),
+      support: bindEngineGasSupport(nodes.find(n => n.name === 'F135_Engine'), F135_ENGINE_GAS_SUPPORT) };
+  });
+  for (const pitchDeg of [0, 45, 90, 95]) for (const yawDeg of [-10, 0, 10]) for (const aperture of [0, .5, 1]) {
+    const snapshots = handles.map(({ rig, support }) => { rig.update(pitchDeg * Math.PI / 180, yawDeg * Math.PI / 180, aperture); return support.update(rig.apertureGeometry, 6, .07); });
+    let interfacePositionError = 0, interfaceFlowError = 0, maximumInverseError = 0;
+    const snapshot = snapshots[0]; assert(JSON.stringify(snapshot) === JSON.stringify(snapshots[1]), `Variant mismatch ${pitchDeg}/${yawDeg}/${aperture}`);
+    const physicalDomain = JSON.stringify(snapshot.flowDomain);
+    if (physicalDomains.has(aperture)) assert(physicalDomain === physicalDomains.get(aperture), `Physical domain changed with pose at aperture ${aperture}`);
+    else physicalDomains.set(aperture, physicalDomain);
+    for (const [index, section] of snapshot.sections.entries()) {
+      for (const t of [.05, .5, .95]) for (let i = 0; i < 24; i++) {
+        const point = engineGasSectionPoint(section, t, .8, i * Math.PI / 12), sample = sampleEngineGasSection(section, point);
+        assert(Boolean(sample), `Lost interior point ${pitchDeg}/${yawDeg}/${aperture}/${section.id}`);
+        if (sample) maximumInverseError = Math.max(maximumInverseError, Math.abs(sample.fraction - t), Math.abs(sample.radialFraction - .8));
+        assert(!sampleEngineGasSection(section, engineGasSectionPoint(section, t, 1.05, i * Math.PI / 12)), `Accepted outside point ${section.id}`);
+      }
+      if (index === snapshot.sections.length - 1) continue;
+      const next = snapshot.sections[index + 1];
+      interfacePositionError = Math.max(interfacePositionError, Math.hypot(...section.endCenter.map((v, i) => v - next.startCenter[i])));
+      for (let i = 0; i < 24; i++) {
+        const point = engineGasSectionPoint(section, 1, .8, i * Math.PI / 12), sample = sampleEngineGasSection(next, point);
+        assert(Boolean(sample), `Broken bearing/nozzle join ${pitchDeg}/${yawDeg}/${aperture}/${section.id}`);
+        if (sample) interfaceFlowError = Math.max(interfaceFlowError, Math.abs(sample.distanceMeters - section.endDistance));
+      }
+    }
+    assert(!sampleEngineGasSupport(snapshot, [0, 0, -.4]), 'Gas assigned inside opaque centrebody');
+    assert(interfacePositionError < 1e-6 && interfaceFlowError < 1e-6 && maximumInverseError < 1e-5, `Continuity tolerance ${pitchDeg}/${yawDeg}/${aperture}`);
+    poses.push({ pitchDeg, yawDeg, aperture, interfacePositionError, interfaceFlowError, maximumInverseError, circularEnvelopeVolumeM3: snapshot.sections.reduce((sum, section) => sum + engineGasSectionVolume(section), 0), support: snapshot });
+  }
+  for (const [name, native] of observations) {
+    const { rig, support } = handles[0]; rig.update(native.nozzlePitchRad, native.nozzleYawRad, native.nozzleNorm);
+    const snapshot = support.update(rig.apertureGeometry, 6, .07);
+    cases.push({ name, native, apertureGeometry: rig.apertureGeometry, flowDomain: snapshot.flowDomain, support: snapshot });
+  }
+  containers.forEach(container => container.dispose());
+} finally { scene.dispose(); engine.dispose(); }
+const sourcePaths = ['src/flight/aircraft/engineGasSupport.ts', 'src/flight/aircraft/engineNozzleRig.ts', 'src/flight/aircraft/aircraftCatalog.ts', 'scripts/validation/f35b/check-exhaust-continuity.mjs', tracePath, ...g.assets.slice(0, 2).map(asset => `public/${asset.path}`)];
+const inputs = await Promise.all(sourcePaths.map(async (p, i) => { const bytes = await readFile(path.join(root, p)), snapshot = p.endsWith('.glb') || p.endsWith('.csv') ? undefined : `source-${i}-${path.basename(p)}.txt`; if (snapshot) await writeFile(path.join(out, snapshot), bytes); return { path: p, sha256: sha256(bytes), snapshot }; }));
+const report = { schema: '0sfs-engine-gas-continuity/1', inputs, poses, cases, errors, status: errors.length ? 'failed' : 'passed', limits: [
+  'Actual exported rigid transforms with authored circular duct lofts; nozzle support is a conservative circular subset additionally clipped by seal planes.',
+  'Circular-envelope volume subtracts the centrebody. Seal clips and opaque ring/strut hardware only reduce escaped radiance; the shared circular optical budget is an upper bound.',
+  'This diagnostic checks geometry, inverse mapping and shared signed flow distance. It does not execute GPU shaders or qualify chemistry, radiance, scene depth, terrain response or real-world appearance.',
+] };
+await writeFile(path.join(out, 'report.json'), JSON.stringify(report, null, 2) + '\n');
+console.log(JSON.stringify({ out: path.relative(root, out), poses: poses.length, nativeCases: cases.length, errors }, null, 2)); if (errors.length) process.exitCode = 1;

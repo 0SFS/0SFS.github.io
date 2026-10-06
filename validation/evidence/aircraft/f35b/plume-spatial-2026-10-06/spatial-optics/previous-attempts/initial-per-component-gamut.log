@@ -1,0 +1,31 @@
+{
+  "out": "build/validation/spatial-plume/2026-10-06_145308",
+  "cases": 8,
+  "errors": [],
+  "images": [
+    "powered-lift-rear-day.png",
+    "powered-lift-rear-night.png",
+    "powered-lift-oblique-day.png",
+    "powered-lift-oblique-night.png",
+    "previous-powered-lift-rear-day.png",
+    "previous-powered-lift-rear-night.png",
+    "previous-powered-lift-oblique-day.png",
+    "previous-powered-lift-oblique-night.png",
+    "ab-onset-rear-day.png",
+    "ab-onset-rear-night.png",
+    "ab-onset-oblique-day.png",
+    "ab-onset-oblique-night.png",
+    "previous-ab-onset-rear-day.png",
+    "previous-ab-onset-rear-night.png",
+    "previous-ab-onset-oblique-day.png",
+    "previous-ab-onset-oblique-night.png",
+    "ab-sustained-rear-day.png",
+    "ab-sustained-rear-night.png",
+    "ab-sustained-oblique-day.png",
+    "ab-sustained-oblique-night.png",
+    "previous-ab-sustained-rear-day.png",
+    "previous-ab-sustained-rear-night.png",
+    "previous-ab-sustained-oblique-day.png",
+    "previous-ab-sustained-oblique-night.png"
+  ]
+}

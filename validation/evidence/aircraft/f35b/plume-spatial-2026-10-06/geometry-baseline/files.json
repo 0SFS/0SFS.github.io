@@ -1,0 +1,47 @@
+[
+  {
+    "path": "README.md",
+    "sha256": "34fbc61b667601d02648941364ebaf13c888c0eafe000e5991737c996b7176a6",
+    "bytes": 1829
+  },
+  {
+    "path": "check-plume-geometry.mjs.txt",
+    "sha256": "3fd86a5d57db1ebbdfd9cb80ee5a2eb13d22ee25a3da3d62f6ba07dc8d59471d",
+    "bytes": 11709
+  },
+  {
+    "path": "compiled-audit-entry.mjs.txt",
+    "sha256": "dfe2c0c98d6ab836960121a67310bb1454b9b26a2d73dc6f50072fdcd7d0c376",
+    "bytes": 105622
+  },
+  {
+    "path": "engineGasOptics.ts.txt",
+    "sha256": "fcfa614fe84ce012c3a789825bb257071c497507bb02a7bb940b9de6f56aa9fa",
+    "bytes": 7001
+  },
+  {
+    "path": "engineNozzleRig.ts.txt",
+    "sha256": "0c070c616f6b9508de3cba5ccd24818b9ad679bb938e9d86acf1287f381f0996",
+    "bytes": 7454
+  },
+  {
+    "path": "lint.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "report.json",
+    "sha256": "3ab3bfebcd53cdf48d1cb6b147eef9a45d99f681b20339342d1b143ca2a3ee1e",
+    "bytes": 44277
+  },
+  {
+    "path": "run.log",
+    "sha256": "3fcc73581a3e2af30295c1927b5423f1ea9ee74e5b0b2085ec72c5feb3c80da8",
+    "bytes": 344
+  },
+  {
+    "path": "snapshots.json",
+    "sha256": "e6dc6ae858e0e93e361b44c910e29af8b58ae325551906eea4c3963a08200fc9",
+    "bytes": 877
+  }
+]

@@ -1,0 +1,58 @@
+{
+  "schema": "0sfs-exhaust-geometry-optics-evidence/1",
+  "status": "CPU geometry and selected-ray integration passed; physical and GPU appearance acceptance open",
+  "geometryReport": "geometry/report.json",
+  "imageReport": "posed-optics/image-render-report.json",
+  "finalRayReport": "posed-optics/final-ray-comparison/report.json",
+  "runtimeDefaultRaySteps": 128,
+  "rayTolerance": {
+    "relativePeakErrorLimit": 0.01,
+    "minimumReferencePeakCdM2": 1e-08,
+    "raysPerBudget": 96,
+    "referenceSteps": 4096,
+    "convergenceSteps": 2048,
+    "maximumSelectedRayError": 0.007603737608149793
+  },
+  "imageCount": 64,
+  "assetBytesUnchanged": true,
+  "inputs": [
+    {
+      "path": "src/flight/aircraft/engineGasSupport.ts",
+      "sha256": "ed08bd8c181802242486857f980b20e045452dd61e1d53fdf59b7c3522e286b5"
+    },
+    {
+      "path": "src/flight/aircraft/engineGasSupport.test.ts",
+      "sha256": "534a0506cf5b3f250bd0cd62bb3e714d4595e22c0c054b28b673d6c7073d9078"
+    },
+    {
+      "path": "scripts/validation/f35b/check-exhaust-continuity.mjs",
+      "sha256": "c6073f0a0fc5fbce6f0f5e3a2a3cb2df57bed912da01a3c67cdd31724cac3a9b"
+    },
+    {
+      "path": "scripts/validation/f35b/render-exhaust-continuity.mjs",
+      "sha256": "60707d415dcb9eb770577779bf561f1e60604966f16dfc1a1f52fc0949a2f8f6"
+    },
+    {
+      "path": "src/flight/aircraft/engineGasOptics.ts",
+      "sha256": "ceb5fd6b2e2ddaaa16384c0520aa768cba1c63aa98de474fe544420c47df8fcf"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json",
+      "sha256": "6d65ba31efcf198dbd42a1f5f78bbe5ec98f0e5ec0a8ed9bb02d9565900d360b"
+    },
+    {
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-full.glb",
+      "sha256": "0fc8083a3a4d5d5d76946ea3602d4a23ebc508e58301145e489c59c1801ff71f"
+    },
+    {
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-installed.glb",
+      "sha256": "4e7d837e2ab5303ab9d90a3b3321baa469e5fc204acad7e0b2f59185990aa341"
+    }
+  ],
+  "limitations": [
+    "Selected rays do not bound every pixel, pose or user setting.",
+    "CPU scalar integration with actual GLB opaque triangles does not execute GLSL/WGSL or the depth-texture pipeline.",
+    "Dry powered-lift images remain very dim at declared exposure; appearance objective remains open.",
+    "No terrain/airframe/metal emission/reflection/impingement included in these images."
+  ]
+}

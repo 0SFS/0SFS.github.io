@@ -1,0 +1,5807 @@
+{
+  "schema": "0sfs-independent-spatial-plume/1",
+  "inputs": [
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json",
+      "sha256": "3da9c058348d432aca82b1f4f6a5b95163abe7484ae74e9d3cdec2e024e7e7c4"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/trace.csv",
+      "sha256": "6c11afe6f6f9abdef19ee4a3265b7c35087b956a37bc03b2c046da70bcf957e2"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/optics/f135-exhaust-lut.manifest.json",
+      "sha256": "4368d2d8cf1d24f5860727ec6639602a0533eb2e5baf02598830346a10461727"
+    },
+    {
+      "path": "scripts/exhaustOptics/f135-visible-approximation.json",
+      "sha256": "788581df85e576b56bac25156e6cd27ade1c87e67148ca39bb48329102948a2f"
+    },
+    {
+      "path": "scripts/exhaustOptics/spatialReference.mjs",
+      "sha256": "140ece2e25ac6ff97554ae2dcad87e7fc00fed28cacdcd519407500e6491ec8a"
+    },
+    {
+      "path": "scripts/exhaustOptics/reference.mjs",
+      "sha256": "8fb085647f7520a8f4222e8be207023d881ad0a186fa3d4721fa8f7e5c9b5cb8"
+    },
+    {
+      "path": "scripts/validation/f35b/check-spatial-plume.mjs",
+      "sha256": "881052eeed45ebeeb48124bc7ff0eab6dcf692dc04b55cf90ead62ac5213a695"
+    },
+    {
+      "path": "src/flight/aircraft/engineGasOptics.ts",
+      "sha256": "17881e149e4942f3463f7af065e8845d2052aa855de29b3ee043927e546b7699"
+    }
+  ],
+  "availablePhases": [
+    "cold-cycle/initial-zero-time",
+    "cold-cycle/cold-soak",
+    "cold-cycle/starter",
+    "cold-cycle/idle",
+    "cold-cycle/dry99-before-ab",
+    "cold-cycle/afterburner",
+    "cold-cycle/dry99-after-ab",
+    "cold-cycle/shutdown",
+    "cold-cycle/cooling",
+    "powered-lift/initial-zero-time",
+    "powered-lift/starter",
+    "powered-lift/powered-lift-full-command",
+    "powered-lift/after-hold"
+  ],
+  "cases": [
+    {
+      "name": "cold",
+      "native": {
+        "scenario": "cold-cycle",
+        "phase": "initial-zero-time",
+        "timeS": 0,
+        "phaseTimeS": 0,
+        "ambientK": 286.49913199972883,
+        "pressurePsf": 2053.276104626099,
+        "egtC": 14.999999999999968,
+        "gasK": 288.1499999999999,
+        "thermalValid": 1,
+        "fuelKgSec": 0,
+        "suppliedAbKgSec": 0,
+        "burnedAbKgSec": 0,
+        "n1Pct": 0,
+        "n2Pct": 0,
+        "nativeRunning": 0,
+        "augmentation": 0,
+        "nozzleNorm": 1,
+        "nozzlePitchRad": 0,
+        "nozzleYawRad": 0,
+        "conversion": 0,
+        "throttleCmd": 0,
+        "throttlePosition": 0,
+        "coreK": 288.1499999999999,
+        "linerK": 288.1499999999999,
+        "visualRunning": 0,
+        "opticsValid": 0,
+        "radiusM": 0.565,
+        "lengthM": 1.2000000000000002,
+        "throatAreaM2": 0.6081944545000423,
+        "exitAreaM2": 1.0080083129331545,
+        "absorptionPerM": 0,
+        "effectiveVolumeM3": 0,
+        "fuelPowerW": 0,
+        "particlePowerBoundW": 0,
+        "excitedPowerW": 0,
+        "totalSourcePowerBoundW": 0,
+        "sourceYcdM3": 0,
+        "continuumYcdM3": 0,
+        "excitedYcdM3": 0,
+        "sourceRcdM3": 0,
+        "continuumRcdM3": 0,
+        "excitedRcdM3": 0,
+        "sourceGcdM3": 0,
+        "continuumGcdM3": 0,
+        "excitedGcdM3": 0,
+        "sourceBcdM3": 0,
+        "continuumBcdM3": 0,
+        "excitedBcdM3": 0,
+        "rearAxisEffectivePathM": 0.1554349487816348,
+        "rearAxisRadianceYcdM2": 0,
+        "rearAxisSceneYAtWhite1000": 0,
+        "rearOffsetEffectivePathM": 0.24934040931433413,
+        "rearOffsetRadianceYcdM2": 0,
+        "rearOffsetSceneYAtWhite1000": 0,
+        "sideNearExitEffectivePathM": 0.38536756290338053,
+        "sideNearExitRadianceYcdM2": 0,
+        "sideNearExitSceneYAtWhite1000": 0,
+        "coreEmissionYcdM2": 0,
+        "linerEmissionYcdM2": 0,
+        "flowProxyKgSec": 0,
+        "directionX": 0,
+        "directionY": 0,
+        "directionZ": 1
+      },
+      "input": {
+        "temperatureKelvin": 288.1499999999999,
+        "ambientTemperatureKelvin": 286.49913199972883,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0,
+        "afterburnerBurnedFuelFlowKgPerSecond": 0,
+        "radiusMeters": 0.565,
+        "lengthMeters": 6,
+        "axialSamples": 32,
+        "radialSamples": 16
+      },
+      "valid": false,
+      "sourcePowerUpperBoundW": 0,
+      "excitedPowerW": 0,
+      "allowedPowerW": 0
+    },
+    {
+      "name": "idle",
+      "native": {
+        "scenario": "cold-cycle",
+        "phase": "idle",
+        "timeS": 92.51666666668636,
+        "phaseTimeS": 60,
+        "ambientK": 286.4991319989687,
+        "pressurePsf": 2053.2761045974676,
+        "egtC": 376.44913199896877,
+        "gasK": 649.5991319989687,
+        "thermalValid": 1,
+        "fuelKgSec": 0.3250735484001666,
+        "suppliedAbKgSec": 0,
+        "burnedAbKgSec": 0,
+        "n1Pct": 30,
+        "n2Pct": 60,
+        "nativeRunning": 1,
+        "augmentation": 0,
+        "nozzleNorm": 1,
+        "nozzlePitchRad": 0,
+        "nozzleYawRad": 0,
+        "conversion": 0,
+        "throttleCmd": 0,
+        "throttlePosition": 0,
+        "coreK": 622.2472103832645,
+        "linerK": 460.0985412222676,
+        "visualRunning": 1,
+        "opticsValid": 1,
+        "radiusM": 0.565,
+        "lengthM": 1.2000000000000002,
+        "throatAreaM2": 0.6081944545000423,
+        "exitAreaM2": 1.0080083129331545,
+        "absorptionPerM": 0.025,
+        "effectiveVolumeM3": 0.11381921057125212,
+        "fuelPowerW": 14075684.645727213,
+        "particlePowerBoundW": 114.92355436454154,
+        "excitedPowerW": 0,
+        "totalSourcePowerBoundW": 114.92355436454154,
+        "sourceYcdM3": 2.8607605881331217e-7,
+        "continuumYcdM3": 2.8607605881331217e-7,
+        "excitedYcdM3": 0,
+        "sourceRcdM3": 0.000001345607049921506,
+        "continuumRcdM3": 0.000001345607049921506,
+        "excitedRcdM3": 0,
+        "sourceGcdM3": 0,
+        "continuumGcdM3": 0,
+        "excitedGcdM3": 0,
+        "sourceBcdM3": 0,
+        "continuumBcdM3": 0,
+        "excitedBcdM3": 0,
+        "rearAxisEffectivePathM": 0.1554349487816348,
+        "rearAxisRadianceYcdM2": 4.4379934294334006e-8,
+        "rearAxisSceneYAtWhite1000": 4.4379934294334004e-11,
+        "rearOffsetEffectivePathM": 0.24934040931433413,
+        "rearOffsetRadianceYcdM2": 7.110846367864402e-8,
+        "rearOffsetSceneYAtWhite1000": 7.110846367864402e-11,
+        "sideNearExitEffectivePathM": 0.38536756290338053,
+        "sideNearExitRadianceYcdM2": 1.097150770687366e-7,
+        "sideNearExitSceneYAtWhite1000": 1.0971507706873661e-10,
+        "coreEmissionYcdM2": 0.0000020231588853467564,
+        "linerEmissionYcdM2": 9.332386497510086e-12,
+        "flowProxyKgSec": 42.03566690614074,
+        "directionX": 0,
+        "directionY": 0,
+        "directionZ": 1
+      },
+      "input": {
+        "temperatureKelvin": 649.5991319989687,
+        "ambientTemperatureKelvin": 286.4991319989687,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0.3250735484001666,
+        "afterburnerBurnedFuelFlowKgPerSecond": 0,
+        "radiusMeters": 0.565,
+        "lengthMeters": 6,
+        "axialSamples": 32,
+        "radialSamples": 16
+      },
+      "valid": true,
+      "sourcePowerUpperBoundW": 267.50507858527396,
+      "excitedPowerW": 0,
+      "allowedPowerW": 42227.05393718164
+    },
+    {
+      "name": "dry99",
+      "native": {
+        "scenario": "cold-cycle",
+        "phase": "dry99-before-ab",
+        "timeS": 212.51666666663772,
+        "phaseTimeS": 120,
+        "ambientK": 286.49913199893183,
+        "pressurePsf": 2053.2761045960788,
+        "egtC": 729.9781319989319,
+        "gasK": 1003.1281319989318,
+        "thermalValid": 1,
+        "fuelKgSec": 2.902623743163389,
+        "suppliedAbKgSec": 0,
+        "burnedAbKgSec": 0,
+        "n1Pct": 99.3,
+        "n2Pct": 99.6,
+        "nativeRunning": 1,
+        "augmentation": 0,
+        "nozzleNorm": 0.01000000000000012,
+        "nozzlePitchRad": 0,
+        "nozzleYawRad": 0,
+        "conversion": 0,
+        "throttleCmd": 0.99,
+        "throttlePosition": 0.99,
+        "coreK": 956.7228132202479,
+        "linerK": 664.0706928782042,
+        "visualRunning": 1,
+        "opticsValid": 1,
+        "radiusM": 0.40161378548650467,
+        "lengthM": 1.2000000000000002,
+        "throatAreaM2": 0.3837808557176592,
+        "exitAreaM2": 0.505376278459852,
+        "absorptionPerM": 0.025,
+        "effectiveVolumeM3": 0.05750901070800853,
+        "fuelPowerW": 125683608.07897474,
+        "particlePowerBoundW": 330.1971143799019,
+        "excitedPowerW": 0,
+        "totalSourcePowerBoundW": 330.1971143799019,
+        "sourceYcdM3": 0.07225058133957177,
+        "continuumYcdM3": 0.07225058133957177,
+        "excitedYcdM3": 0,
+        "sourceRcdM3": 0.3294826063415841,
+        "continuumRcdM3": 0.3294826063415841,
+        "excitedRcdM3": 0,
+        "sourceGcdM3": 0.0030796689476384094,
+        "continuumGcdM3": 0.0030796689476384094,
+        "excitedGcdM3": 0,
+        "sourceBcdM3": 0,
+        "continuumBcdM3": 0,
+        "excitedBcdM3": 0,
+        "rearAxisEffectivePathM": 0.1554349487816348,
+        "rearAxisRadianceYcdM2": 0.011208473948776384,
+        "rearAxisSceneYAtWhite1000": 0.000011208473948776384,
+        "rearOffsetEffectivePathM": 0.24934040931433413,
+        "rearOffsetRadianceYcdM2": 0.017958957699073214,
+        "rearOffsetSceneYAtWhite1000": 0.000017958957699073213,
+        "sideNearExitEffectivePathM": 0.27392730219705375,
+        "sideNearExitRadianceYcdM2": 0.019723793675472667,
+        "sideNearExitSceneYAtWhite1000": 0.000019723793675472668,
+        "coreEmissionYcdM2": 0.7440404138216922,
+        "linerEmissionYcdM2": 0.000019428489382561538,
+        "flowProxyKgSec": 115.83348372649053,
+        "directionX": 0,
+        "directionY": 0,
+        "directionZ": 1
+      },
+      "input": {
+        "temperatureKelvin": 1003.1281319989318,
+        "ambientTemperatureKelvin": 286.49913199893183,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 2.902623743163389,
+        "afterburnerBurnedFuelFlowKgPerSecond": 0,
+        "radiusMeters": 0.40161378548650467,
+        "lengthMeters": 6,
+        "axialSamples": 32,
+        "radialSamples": 16
+      },
+      "valid": true,
+      "sourcePowerUpperBoundW": 373.11549721661527,
+      "excitedPowerW": 0,
+      "allowedPowerW": 377050.82423692424
+    },
+    {
+      "name": "ab-onset",
+      "native": {
+        "scenario": "cold-cycle",
+        "phase": "afterburner",
+        "timeS": 212.74999999997084,
+        "phaseTimeS": 0.23333333333333334,
+        "ambientK": 286.49913199893183,
+        "pressurePsf": 2053.2761045960788,
+        "egtC": 733.5491319989319,
+        "gasK": 1034.445401445685,
+        "thermalValid": 1,
+        "fuelKgSec": 3.050671252816171,
+        "suppliedAbKgSec": 0.09247819972895266,
+        "burnedAbKgSec": 0.09247819972895266,
+        "n1Pct": 100,
+        "n2Pct": 100,
+        "nativeRunning": 1,
+        "augmentation": 1,
+        "nozzleNorm": 0.19208972908473346,
+        "nozzlePitchRad": 0,
+        "nozzleYawRad": 0,
+        "conversion": 0,
+        "throttleCmd": 1,
+        "throttlePosition": 1,
+        "coreK": 956.9960710964606,
+        "linerK": 664.2769055129672,
+        "visualRunning": 1,
+        "opticsValid": 1,
+        "radiusM": 0.43119478141166534,
+        "lengthM": 6,
+        "throatAreaM2": 0.4192080577253797,
+        "exitAreaM2": 0.5837805536831635,
+        "absorptionPerM": 0.08,
+        "effectiveVolumeM3": 0.33146346805757104,
+        "fuelPowerW": 132094065.24694021,
+        "particlePowerBoundW": 6886.961865986885,
+        "excitedPowerW": 4.00430604826365,
+        "totalSourcePowerBoundW": 6890.966172035149,
+        "sourceYcdM3": 274.96975619883887,
+        "continuumYcdM3": 0.47039545596460025,
+        "excitedYcdM3": 274.4993607428743,
+        "sourceRcdM3": 56.544067162531775,
+        "continuumRcdM3": 2.0938092635932124,
+        "excitedRcdM3": 54.45025789893856,
+        "sourceGcdM3": 324.2984806366343,
+        "continuumGcdM3": 0.03530705610274505,
+        "excitedGcdM3": 324.26317358053154,
+        "sourceBcdM3": 429.5043513679195,
+        "continuumBcdM3": 0,
+        "excitedBcdM3": 429.5043513679195,
+        "rearAxisEffectivePathM": 0.777174743908174,
+        "rearAxisRadianceYcdM2": 207.19184008326903,
+        "rearAxisSceneYAtWhite1000": 0.20719184008326902,
+        "rearOffsetEffectivePathM": 1.2467020465716705,
+        "rearOffsetRadianceYcdM2": 326.26475081314834,
+        "rearOffsetSceneYAtWhite1000": 0.3262647508131483,
+        "sideNearExitEffectivePathM": 0.2941035080518042,
+        "sideNearExitRadianceYcdM2": 79.92562655186408,
+        "sideNearExitSceneYAtWhite1000": 0.07992562655186408,
+        "coreEmissionYcdM2": 0.7492619585446448,
+        "linerEmissionYcdM2": 0.000019632690644135592,
+        "flowProxyKgSec": 116.76574140587502,
+        "directionX": 0,
+        "directionY": 0,
+        "directionZ": 1
+      },
+      "input": {
+        "temperatureKelvin": 1034.445401445685,
+        "ambientTemperatureKelvin": 286.49913199893183,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 3.050671252816171,
+        "afterburnerBurnedFuelFlowKgPerSecond": 0.09247819972895266,
+        "radiusMeters": 0.43119478141166534,
+        "lengthMeters": 6,
+        "axialSamples": 32,
+        "radialSamples": 16
+      },
+      "valid": true,
+      "sourcePowerUpperBoundW": 1248.541188153148,
+      "excitedPowerW": 4.004305093562691,
+      "allowedPowerW": 1981543.07276935
+    },
+    {
+      "name": "ab-sustained",
+      "native": {
+        "scenario": "cold-cycle",
+        "phase": "afterburner",
+        "timeS": 272.51666666658315,
+        "phaseTimeS": 60,
+        "ambientK": 286.49913199899083,
+        "pressurePsf": 2053.2761045982993,
+        "egtC": 733.5491319989909,
+        "gasK": 2363.1028843899676,
+        "thermalValid": 1,
+        "fuelKgSec": 9.071065908566188,
+        "suppliedAbKgSec": 6.112872855476447,
+        "burnedAbKgSec": 4.780720234907427,
+        "n1Pct": 100,
+        "n2Pct": 100,
+        "nativeRunning": 1,
+        "augmentation": 1,
+        "nozzleNorm": 1,
+        "nozzlePitchRad": 0,
+        "nozzleYawRad": 0,
+        "conversion": 0,
+        "throttleCmd": 1,
+        "throttlePosition": 1,
+        "coreK": 960.0948913476973,
+        "linerK": 1270.1751745836332,
+        "visualRunning": 1,
+        "opticsValid": 1,
+        "radiusM": 0.565,
+        "lengthM": 6,
+        "throatAreaM2": 0.6081944545000423,
+        "exitAreaM2": 1.0080083129331545,
+        "absorptionPerM": 0.08,
+        "effectiveVolumeM3": 0.5690960528562605,
+        "fuelPowerW": 392777153.840916,
+        "particlePowerBoundW": 322016.2658277257,
+        "excitedPowerW": 207.00518617149157,
+        "totalSourcePowerBoundW": 322223.2710138972,
+        "sourceYcdM3": 259870.5542658833,
+        "continuumYcdM3": 251605.50594492268,
+        "excitedYcdM3": 8265.048320960603,
+        "sourceRcdM3": 548193.0308930905,
+        "continuumRcdM3": 546553.5589052303,
+        "excitedRcdM3": 1639.4719878602773,
+        "sourceGcdM3": 196428.59624154939,
+        "continuumGcdM3": 186665.1826179324,
+        "excitedGcdM3": 9763.413623616972,
+        "sourceBcdM3": 39321.10617806266,
+        "continuumBcdM3": 26388.929547444244,
+        "excitedBcdM3": 12932.176630618418,
+        "rearAxisEffectivePathM": 0.777174743908174,
+        "rearAxisRadianceYcdM2": 195814.4745303256,
+        "rearAxisSceneYAtWhite1000": 195.81447453032558,
+        "rearOffsetEffectivePathM": 1.2467020465716705,
+        "rearOffsetRadianceYcdM2": 308348.8264430122,
+        "rearOffsetSceneYAtWhite1000": 308.34882644301223,
+        "sideNearExitEffectivePathM": 0.38536756290338053,
+        "sideNearExitRadianceYcdM2": 98617.70869749266,
+        "sideNearExitSceneYAtWhite1000": 98.61770869749266,
+        "coreEmissionYcdM2": 0.8107940364998062,
+        "linerEmissionYcdM2": 335.64770873328575,
+        "flowProxyKgSec": 116.76574140598927,
+        "directionX": 0,
+        "directionY": 0,
+        "directionZ": 1
+      },
+      "input": {
+        "temperatureKelvin": 2363.1028843899676,
+        "ambientTemperatureKelvin": 286.49913199899083,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 9.071065908566188,
+        "afterburnerBurnedFuelFlowKgPerSecond": 4.780720234907427,
+        "radiusMeters": 0.565,
+        "lengthMeters": 6,
+        "axialSamples": 32,
+        "radialSamples": 16
+      },
+      "valid": true,
+      "sourcePowerUpperBoundW": 45214.20470971911,
+      "excitedPowerW": 207.0051368176092,
+      "allowedPowerW": 5892050.08476758
+    },
+    {
+      "name": "ab-cutoff",
+      "native": {
+        "scenario": "cold-cycle",
+        "phase": "dry99-after-ab",
+        "timeS": 272.5249999999165,
+        "phaseTimeS": 0.008333333333333333,
+        "ambientK": 286.49913199899083,
+        "pressurePsf": 2053.2761045982993,
+        "egtC": 729.9781319989909,
+        "gasK": 1003.1281319989909,
+        "thermalValid": 1,
+        "fuelKgSec": 9.071065908566188,
+        "suppliedAbKgSec": 0,
+        "burnedAbKgSec": 0,
+        "n1Pct": 99.56061399213404,
+        "n2Pct": 99.6,
+        "nativeRunning": 1,
+        "augmentation": 0,
+        "nozzleNorm": 1,
+        "nozzlePitchRad": 0,
+        "nozzleYawRad": 0,
+        "conversion": 0,
+        "throttleCmd": 0.99,
+        "throttlePosition": 0.99,
+        "coreK": 960.0845726776033,
+        "linerK": 1269.5570747808442,
+        "visualRunning": 1,
+        "opticsValid": 1,
+        "radiusM": 0.565,
+        "lengthM": 1.2000000000000002,
+        "throatAreaM2": 0.6081944545000423,
+        "exitAreaM2": 1.0080083129331545,
+        "absorptionPerM": 0.025,
+        "effectiveVolumeM3": 0.11381921057125212,
+        "fuelPowerW": 392777153.840916,
+        "particlePowerBoundW": 653.5110659867611,
+        "excitedPowerW": 0,
+        "totalSourcePowerBoundW": 653.5110659867611,
+        "sourceYcdM3": 0.07225058133967188,
+        "continuumYcdM3": 0.07225058133967188,
+        "excitedYcdM3": 0,
+        "sourceRcdM3": 0.3294826063420246,
+        "continuumRcdM3": 0.3294826063420246,
+        "excitedRcdM3": 0,
+        "sourceGcdM3": 0.0030796689476474525,
+        "continuumGcdM3": 0.0030796689476474525,
+        "excitedGcdM3": 0,
+        "sourceBcdM3": 0,
+        "continuumBcdM3": 0,
+        "excitedBcdM3": 0,
+        "rearAxisEffectivePathM": 0.1554349487816348,
+        "rearAxisRadianceYcdM2": 0.011208473948791915,
+        "rearAxisSceneYAtWhite1000": 0.000011208473948791915,
+        "rearOffsetEffectivePathM": 0.24934040931433413,
+        "rearOffsetRadianceYcdM2": 0.0179589576990981,
+        "rearOffsetSceneYAtWhite1000": 0.0000179589576990981,
+        "sideNearExitEffectivePathM": 0.38536756290338053,
+        "sideNearExitRadianceYcdM2": 0.027709337624495588,
+        "sideNearExitSceneYAtWhite1000": 0.000027709337624495586,
+        "coreEmissionYcdM2": 0.8105811946144265,
+        "linerEmissionYcdM2": 332.5747851925912,
+        "flowProxyKgSec": 115.83348372660386,
+        "directionX": 0,
+        "directionY": 0,
+        "directionZ": 1
+      },
+      "input": {
+        "temperatureKelvin": 1003.1281319989909,
+        "ambientTemperatureKelvin": 286.49913199899083,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 9.071065908566188,
+        "afterburnerBurnedFuelFlowKgPerSecond": 0,
+        "radiusMeters": 0.565,
+        "lengthMeters": 6,
+        "axialSamples": 32,
+        "radialSamples": 16
+      },
+      "valid": true,
+      "sourcePowerUpperBoundW": 968.9453676621097,
+      "excitedPowerW": 0,
+      "allowedPowerW": 1178331.461522748
+    },
+    {
+      "name": "powered-lift",
+      "native": {
+        "scenario": "powered-lift",
+        "phase": "powered-lift-full-command",
+        "timeS": 117.5250000000396,
+        "phaseTimeS": 90,
+        "ambientK": 286.4991319989687,
+        "pressurePsf": 2053.2761045974676,
+        "egtC": 729.9781319989688,
+        "gasK": 1003.1281319989688,
+        "thermalValid": 1,
+        "fuelKgSec": 4.420049982197244,
+        "suppliedAbKgSec": 0,
+        "burnedAbKgSec": 0,
+        "n1Pct": 99.3,
+        "n2Pct": 99.6,
+        "nativeRunning": 1,
+        "augmentation": 0,
+        "nozzleNorm": 0.01000000000000012,
+        "nozzlePitchRad": 1.5707963267948966,
+        "nozzleYawRad": 1.829907617578383e-15,
+        "conversion": 1,
+        "throttleCmd": 1,
+        "throttlePosition": 0.99,
+        "coreK": 956.7228132202761,
+        "linerK": 664.0542773824793,
+        "visualRunning": 1,
+        "opticsValid": 1,
+        "radiusM": 0.40161378548650467,
+        "lengthM": 1.2000000000000002,
+        "throatAreaM2": 0.3837808557176592,
+        "exitAreaM2": 0.505376278459852,
+        "absorptionPerM": 0.025,
+        "effectiveVolumeM3": 0.05750901070800853,
+        "fuelPowerW": 191388164.22914067,
+        "particlePowerBoundW": 330.19711437995056,
+        "excitedPowerW": 0,
+        "totalSourcePowerBoundW": 330.19711437995056,
+        "sourceYcdM3": 0.07225058133963451,
+        "continuumYcdM3": 0.07225058133963451,
+        "excitedYcdM3": 0,
+        "sourceRcdM3": 0.3294826063418601,
+        "continuumRcdM3": 0.3294826063418601,
+        "excitedRcdM3": 0,
+        "sourceGcdM3": 0.003079668947644074,
+        "continuumGcdM3": 0.003079668947644074,
+        "excitedGcdM3": 0,
+        "sourceBcdM3": 0,
+        "continuumBcdM3": 0,
+        "excitedBcdM3": 0,
+        "rearAxisEffectivePathM": 0.1554349487816348,
+        "rearAxisRadianceYcdM2": 0.011208473948786117,
+        "rearAxisSceneYAtWhite1000": 0.000011208473948786118,
+        "rearOffsetEffectivePathM": 0.24934040931433413,
+        "rearOffsetRadianceYcdM2": 0.01795895769908881,
+        "rearOffsetSceneYAtWhite1000": 0.00001795895769908881,
+        "sideNearExitEffectivePathM": 0.27392730219705375,
+        "sideNearExitRadianceYcdM2": 0.019723793675489796,
+        "sideNearExitSceneYAtWhite1000": 0.000019723793675489795,
+        "coreEmissionYcdM2": 0.7440404138222306,
+        "linerEmissionYcdM2": 0.000019412325560617317,
+        "flowProxyKgSec": 115.83348372656143,
+        "directionX": -1.829907617578383e-15,
+        "directionY": -1,
+        "directionZ": 6.123233995736766e-17
+      },
+      "input": {
+        "temperatureKelvin": 1003.1281319989688,
+        "ambientTemperatureKelvin": 286.4991319989687,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 4.420049982197244,
+        "afterburnerBurnedFuelFlowKgPerSecond": 0,
+        "radiusMeters": 0.40161378548650467,
+        "lengthMeters": 6,
+        "axialSamples": 32,
+        "radialSamples": 16
+      },
+      "valid": true,
+      "sourcePowerUpperBoundW": 373.11549721669974,
+      "excitedPowerW": 0,
+      "allowedPowerW": 574164.492687422
+    },
+    {
+      "name": "shutdown",
+      "native": {
+        "scenario": "cold-cycle",
+        "phase": "cooling",
+        "timeS": 573.5166666663094,
+        "phaseTimeS": 180,
+        "ambientK": 286.4991319993156,
+        "pressurePsf": 2053.276104610534,
+        "egtC": 13.349131999315615,
+        "gasK": 286.4991319993156,
+        "thermalValid": 1,
+        "fuelKgSec": 0,
+        "suppliedAbKgSec": 0,
+        "burnedAbKgSec": 0,
+        "n1Pct": 2.7837606647015364e-24,
+        "n2Pct": 1.8558404431343576e-24,
+        "nativeRunning": 0,
+        "augmentation": 0,
+        "nozzleNorm": 1,
+        "nozzlePitchRad": 0,
+        "nozzleYawRad": 0,
+        "conversion": 0,
+        "throttleCmd": 0,
+        "throttlePosition": 0,
+        "coreK": 422.685020301491,
+        "linerK": 477.3936800890442,
+        "visualRunning": 0,
+        "opticsValid": 0,
+        "radiusM": 0.565,
+        "lengthM": 1.2000000000000002,
+        "throatAreaM2": 0.6081944545000423,
+        "exitAreaM2": 1.0080083129331545,
+        "absorptionPerM": 0,
+        "effectiveVolumeM3": 0,
+        "fuelPowerW": 0,
+        "particlePowerBoundW": 0,
+        "excitedPowerW": 0,
+        "totalSourcePowerBoundW": 0,
+        "sourceYcdM3": 0,
+        "continuumYcdM3": 0,
+        "excitedYcdM3": 0,
+        "sourceRcdM3": 0,
+        "continuumRcdM3": 0,
+        "excitedRcdM3": 0,
+        "sourceGcdM3": 0,
+        "continuumGcdM3": 0,
+        "excitedGcdM3": 0,
+        "sourceBcdM3": 0,
+        "continuumBcdM3": 0,
+        "excitedBcdM3": 0,
+        "rearAxisEffectivePathM": 0.1554349487816348,
+        "rearAxisRadianceYcdM2": 0,
+        "rearAxisSceneYAtWhite1000": 0,
+        "rearOffsetEffectivePathM": 0.24934040931433413,
+        "rearOffsetRadianceYcdM2": 0,
+        "rearOffsetSceneYAtWhite1000": 0,
+        "sideNearExitEffectivePathM": 0.38536756290338053,
+        "sideNearExitRadianceYcdM2": 0,
+        "sideNearExitSceneYAtWhite1000": 0,
+        "coreEmissionYcdM2": 1.6668175076864146e-13,
+        "linerEmissionYcdM2": 4.9560738023672436e-11,
+        "flowProxyKgSec": 4.0215799852329117e-50,
+        "directionX": 0,
+        "directionY": 0,
+        "directionZ": 1
+      },
+      "input": {
+        "temperatureKelvin": 286.4991319993156,
+        "ambientTemperatureKelvin": 286.4991319993156,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0,
+        "afterburnerBurnedFuelFlowKgPerSecond": 0,
+        "radiusMeters": 0.565,
+        "lengthMeters": 6,
+        "axialSamples": 32,
+        "radialSamples": 16
+      },
+      "valid": false,
+      "sourcePowerUpperBoundW": 0,
+      "excitedPowerW": 0,
+      "allowedPowerW": 0
+    }
+  ],
+  "integrals": [
+    {
+      "name": "idle",
+      "independentPowerW": {
+        "particle": 267.5050785852739,
+        "CH": 0,
+        "C2": 0
+      },
+      "totalIndependentW": 267.5050785852739,
+      "reportedTotalW": 267.50507858527396,
+      "allowedPowerW": 42227.05393718164,
+      "relativePowerError": 2.220446049250313e-16,
+      "integratedIsotropicRgbCd": [
+        5.240689979603688e-10,
+        0,
+        0
+      ],
+      "fieldDimensions": [
+        32,
+        16
+      ],
+      "radiusExpansionRatio": 0.7433628318584072
+    },
+    {
+      "name": "dry99",
+      "independentPowerW": {
+        "particle": 373.11549721661595,
+        "CH": 0,
+        "C2": 0
+      },
+      "totalIndependentW": 373.11549721661595,
+      "reportedTotalW": 373.11549721661527,
+      "allowedPowerW": 377050.82423692424,
+      "relativePowerError": 1.7763568394002505e-15,
+      "integratedIsotropicRgbCd": [
+        0.00021852105896537667,
+        0,
+        0
+      ],
+      "fieldDimensions": [
+        32,
+        16
+      ],
+      "radiusExpansionRatio": 1.0457808351653637
+    },
+    {
+      "name": "ab-onset",
+      "independentPowerW": {
+        "particle": 1244.5368830595883,
+        "CH": 1.0010762733906742,
+        "C2": 3.0032288201720263
+      },
+      "totalIndependentW": 1248.541188153151,
+      "reportedTotalW": 1248.541188153148,
+      "allowedPowerW": 1981543.07276935,
+      "relativePowerError": 2.4424906541753444e-15,
+      "integratedIsotropicRgbCd": [
+        17.45803421116829,
+        108.09026033451003,
+        138.07154548336538
+      ],
+      "fieldDimensions": [
+        32,
+        16
+      ],
+      "radiusExpansionRatio": 0.9740377622961592
+    },
+    {
+      "name": "ab-sustained",
+      "independentPowerW": {
+        "particle": 45007.19957290159,
+        "CH": 51.751284204402324,
+        "C2": 155.25385261320727
+      },
+      "totalIndependentW": 45214.2047097192,
+      "reportedTotalW": 45214.20470971911,
+      "allowedPowerW": 5892050.08476758,
+      "relativePowerError": 1.9984014443252818e-15,
+      "integratedIsotropicRgbCd": [
+        3252.9588750442344,
+        6041.313606561897,
+        7347.595673291651
+      ],
+      "fieldDimensions": [
+        32,
+        16
+      ],
+      "radiusExpansionRatio": 0.7433628318584072
+    },
+    {
+      "name": "ab-cutoff",
+      "independentPowerW": {
+        "particle": 968.9453676621084,
+        "CH": 0,
+        "C2": 0
+      },
+      "totalIndependentW": 968.9453676621084,
+      "reportedTotalW": 968.9453676621097,
+      "allowedPowerW": 1178331.461522748,
+      "relativePowerError": 1.3322676295501878e-15,
+      "integratedIsotropicRgbCd": [
+        0.000458917506567989,
+        0,
+        0
+      ],
+      "fieldDimensions": [
+        32,
+        16
+      ],
+      "radiusExpansionRatio": 0.7433628318584072
+    },
+    {
+      "name": "powered-lift",
+      "independentPowerW": {
+        "particle": 373.1154972166996,
+        "CH": 0,
+        "C2": 0
+      },
+      "totalIndependentW": 373.1154972166996,
+      "reportedTotalW": 373.11549721669974,
+      "allowedPowerW": 574164.492687422,
+      "relativePowerError": 3.3306690738754696e-16,
+      "integratedIsotropicRgbCd": [
+        0.00021852105896537667,
+        0,
+        0
+      ],
+      "fieldDimensions": [
+        32,
+        16
+      ],
+      "radiusExpansionRatio": 1.0457808351653637
+    }
+  ],
+  "spectral": [
+    {
+      "name": "idle",
+      "x": 0,
+      "y": 1,
+      "temperatureKelvin": 587.3559905385367,
+      "kappaPerMeter": 0.0003914319968316704,
+      "actualRgbCdPerM3": [
+        5.615040654660675e-10,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          2.9379910478711204e-10,
+          1.1945902597004382e-10,
+          4.8316886526809285e-14
+        ],
+        "rawRgb": [
+          7.683933875874991e-10,
+          -6.066105236676574e-11,
+          -7.97367234932869e-12
+        ],
+        "rgb": [
+          5.617030941414907e-10,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0003543307443008717
+    },
+    {
+      "name": "idle",
+      "x": 10,
+      "y": 1,
+      "temperatureKelvin": 479.6364966222952,
+      "kappaPerMeter": 0.007047480437904596,
+      "actualRgbCdPerM3": [
+        2.529904454331988e-12,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          1.4091620818106794e-12,
+          5.383195959654968e-13,
+          7.02991224580605e-17
+        ],
+        "rawRgb": [
+          3.7388183639012115e-12,
+          -3.5595659715506863e-13,
+          -3.134624866767194e-14
+        ],
+        "rgb": [
+          2.53120917599514e-12,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0005154539085608163
+    },
+    {
+      "name": "idle",
+      "x": 21,
+      "y": 1,
+      "temperatureKelvin": 425.3719736526732,
+      "kappaPerMeter": 0.005036030896008015,
+      "actualRgbCdPerM3": [
+        6.727451610382979e-15,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          3.8427085071931745e-15,
+          1.4314055405764563e-15,
+          8.605625517298472e-20
+        ],
+        "rawRgb": [
+          1.0251809454231098e-14,
+          -1.0392708744780887e-15,
+          -7.813145629035885e-17
+        ],
+        "rgb": [
+          6.730549781267177e-15,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0004603146822895242
+    },
+    {
+      "name": "idle",
+      "x": 0,
+      "y": 8,
+      "temperatureKelvin": 575.4691165871702,
+      "kappaPerMeter": 0.016328636556863785,
+      "actualRgbCdPerM3": [
+        1.0793734794845022e-8,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          5.689571079482217e-9,
+          2.296368109552909e-9,
+          8.310385434196749e-13
+        ],
+        "rawRgb": [
+          1.4906544370532186e-8,
+          -1.2066618929908597e-9,
+          -1.5105289598849542e-10
+        ],
+        "rgb": [
+          1.0797652684253185e-8,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0003628464002991971
+    },
+    {
+      "name": "idle",
+      "x": 10,
+      "y": 8,
+      "temperatureKelvin": 412.11686636205775,
+      "kappaPerMeter": 0.0069479807280004025,
+      "actualRgbCdPerM3": [
+        1.944772400302823e-15,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          1.116181989375118e-15,
+          4.1362765584806655e-16,
+          1.974742507831938e-20
+        ],
+        "rawRgb": [
+          2.981123776254672e-15,
+          -3.059064819400106e-16,
+          -2.2261716366268692e-17
+        ],
+        "rgb": [
+          1.9449006236716884e-15,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.00006592797971514099
+    },
+    {
+      "name": "idle",
+      "x": 21,
+      "y": 8,
+      "temperatureKelvin": 372.20806510713726,
+      "kappaPerMeter": 0.0032172061037272215,
+      "actualRgbCdPerM3": [
+        4.549253486664012e-18,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          2.6447211217134334e-18,
+          9.676656496596574e-19,
+          1.9879403069590512e-23
+        ],
+        "rawRgb": [
+          7.082651630958991e-18,
+          -7.480862270996854e-19,
+          -5.0246562801060893e-20
+        ],
+        "rgb": [
+          4.550018595033299e-18,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.00016815499833830428
+    },
+    {
+      "name": "idle",
+      "x": 0,
+      "y": 14,
+      "temperatureKelvin": 552.0585349648163,
+      "kappaPerMeter": 0.0013772232923656702,
+      "actualRgbCdPerM3": [
+        1.809744715197681e-10,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          9.675941670943287e-11,
+          3.849997675478595e-11,
+          1.1114524963408588e-14
+        ],
+        "rawRgb": [
+          2.5435912080705505e-10,
+          -2.1558778729358382e-11,
+          -2.4592189237672815e-12
+        ],
+        "rgb": [
+          1.8102906743071616e-10,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0003015864342833381
+    },
+    {
+      "name": "idle",
+      "x": 10,
+      "y": 14,
+      "temperatureKelvin": 337.505454061979,
+      "kappaPerMeter": 0.00030983088072389364,
+      "actualRgbCdPerM3": [
+        1.853905017342227e-21,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          1.0842696028942579e-21,
+          3.9385541871015937e-22,
+          3.006944857226989e-27
+        ],
+        "rawRgb": [
+          2.9081141620415943e-21,
+          -3.120685168235241e-22,
+          -2.0021080032652692e-23
+        ],
+        "rgb": [
+          1.8519304467572475e-21,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0010662228640588981
+    },
+    {
+      "name": "idle",
+      "x": 21,
+      "y": 14,
+      "temperatureKelvin": 317.6792230385868,
+      "kappaPerMeter": 0.00007230905612232164,
+      "actualRgbCdPerM3": [
+        1.2038245394474249e-23,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          7.056393057871379e-24,
+          2.5565742423056127e-24,
+          9.542953995642715e-30
+        ],
+        "rawRgb": [
+          1.8936105067811652e-23,
+          -2.0433605874966168e-24,
+          -1.289555701754138e-25
+        ],
+        "rgb": [
+          1.2021156632112567e-23,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0014215572498266814
+    },
+    {
+      "name": "dry99",
+      "x": 0,
+      "y": 1,
+      "temperatureKelvin": 906.9083446996391,
+      "kappaPerMeter": 0.0003914319968316704,
+      "actualRgbCdPerM3": [
+        0.00044860783964395523,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          0.000191154196047683,
+          0.00009541706569647574,
+          4.511462982414601e-7
+        ],
+        "rawRgb": [
+          0.00047253226159558846,
+          -0.000006257069399885777,
+          -0.000008354120076335358
+        ],
+        "rgb": [
+          0.00044865643763956643,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.00010831895306545939
+    },
+    {
+      "name": "dry99",
+      "x": 10,
+      "y": 1,
+      "temperatureKelvin": 634.4635965779595,
+      "kappaPerMeter": 0.00653408607468009,
+      "actualRgbCdPerM3": [
+        1.548645371940438e-7,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          7.863885611019122e-8,
+          3.294639852315924e-8,
+          2.034104534452259e-11
+        ],
+        "rawRgb": [
+          2.0417229330936048e-7,
+          -1.4413324763469465e-8,
+          -2.3246802186318495e-9
+        ],
+        "rgb": [
+          1.5491582859480096e-7,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.000331092059619732
+    },
+    {
+      "name": "dry99",
+      "x": 21,
+      "y": 1,
+      "temperatureKelvin": 521.6152467270915,
+      "kappaPerMeter": 0.003359264926984906,
+      "actualRgbCdPerM3": [
+        4.428582500715095e-11,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          2.4107932840659814e-11,
+          9.422636857156919e-12,
+          1.9911556297986395e-15
+        ],
+        "rawRgb": [
+          6.363576168857539e-11,
+          -5.689948379767185e-12,
+          -5.789095150196965e-13
+        ],
+        "rgb": [
+          4.430577124380642e-11,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0004501949993311883
+    },
+    {
+      "name": "dry99",
+      "x": 0,
+      "y": 8,
+      "temperatureKelvin": 882.3959365549865,
+      "kappaPerMeter": 0.016328636556863785,
+      "actualRgbCdPerM3": [
+        0.009184377267956734,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          0.003973425542292082,
+          0.0019535581458114946,
+          0.000007913534107576909
+        ],
+        "rawRgb": [
+          0.009868868903754593,
+          -0.000186081246881564,
+          -0.00016911516440195636
+        ],
+        "rgb": [
+          0.00918574085279081,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.00014844582009536375
+    },
+    {
+      "name": "dry99",
+      "x": 10,
+      "y": 8,
+      "temperatureKelvin": 506.7165607525819,
+      "kappaPerMeter": 0.005143249873071909,
+      "actualRgbCdPerM3": [
+        2.0081039261987677e-11,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          1.1023731477355648e-11,
+          4.272683244117097e-12,
+          7.67344757120501e-16
+        ],
+        "rawRgb": [
+          2.9153808507175975e-11,
+          -2.6692963154091613e-12,
+          -2.575288879945036e-13
+        ],
+        "rgb": [
+          2.0090398184804446e-11,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.00046584058367981084
+    },
+    {
+      "name": "dry99",
+      "x": 21,
+      "y": 8,
+      "temperatureKelvin": 429.27741621811015,
+      "kappaPerMeter": 0.001902274088934064,
+      "actualRgbCdPerM3": [
+        3.963010509219853e-15,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          2.2599992281928263e-15,
+          8.432031843792869e-16,
+          5.4054658901894747e-20
+        ],
+        "rawRgb": [
+          6.027276965017423e-15,
+          -6.086798851282092e-16,
+          -4.6224099574256734e-17
+        ],
+        "rgb": [
+          3.9647890463678584e-15,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0004485830462113794
+    },
+    {
+      "name": "dry99",
+      "x": 0,
+      "y": 14,
+      "temperatureKelvin": 834.1200202814009,
+      "kappaPerMeter": 0.0013772232923656702,
+      "actualRgbCdPerM3": [
+        0.00016988393326755613,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          0.00007576621819070809,
+          0.00003613610974278331,
+          1.0616954521526398e-7
+        ],
+        "rawRgb": [
+          0.00018991782557632557,
+          -0.000005641475111767179,
+          -0.000003044567208823171
+        ],
+        "rgb": [
+          0.00016991403109085977,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.00017713559680981655
+    },
+    {
+      "name": "dry99",
+      "x": 10,
+      "y": 14,
+      "temperatureKelvin": 370.9404414809022,
+      "kappaPerMeter": 0.00017648290668148547,
+      "actualRgbCdPerM3": [
+        2.0769962343929537e-19,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          1.20728000151434e-19,
+          4.4158145761435645e-20,
+          8.7920878539567e-25
+        ],
+        "rawRgb": [
+          3.233359308966137e-19,
+          -3.417635090195205e-20,
+          -2.290759505997808e-21
+        ],
+        "rgb": [
+          2.0763409800419164e-19,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.000315581283293903
+    },
+    {
+      "name": "dry99",
+      "x": 21,
+      "y": 14,
+      "temperatureKelvin": 336.70905416614784,
+      "kappaPerMeter": 0.0000274399972113315,
+      "actualRgbCdPerM3": [
+        1.431200931607935e-22,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          8.375838407177841e-23,
+          3.042101883608359e-23,
+          2.2620760861526965e-28
+        ],
+        "rawRgb": [
+          2.2465377541684233e-22,
+          -2.4113984611936735e-23,
+          -1.5458353263050526e-24
+        ],
+        "rgb": [
+          1.43041350525072e-22,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0005504886204754788
+    },
+    {
+      "name": "ab-onset",
+      "x": 0,
+      "y": 1,
+      "temperatureKelvin": 861.911613612442,
+      "kappaPerMeter": 0.0012525824131444097,
+      "actualRgbCdPerM3": [
+        0.31212055683135986,
+        0,
+        2.260634660720825
+      ],
+      "reference": {
+        "xyz": [
+          4.905390425437358,
+          0.22958875823029568,
+          24.068357432471924
+        ],
+        "rawRgb": [
+          3.5439513607946598,
+          -3.323732504639539,
+          25.671784548787578
+        ],
+        "rgb": [
+          0.3121548366846746,
+          0,
+          2.2611968668311677
+        ],
+        "negativeChannels": 1
+      },
+      "relativeToPeakError": 0.00024863209329066327
+    },
+    {
+      "name": "ab-onset",
+      "x": 10,
+      "y": 1,
+      "temperatureKelvin": 619.1648447060768,
+      "kappaPerMeter": 0.021456530317664146,
+      "actualRgbCdPerM3": [
+        2.1361546487241867e-7,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          1.095428795918383e-7,
+          4.5445383820917314e-8,
+          2.4524140584635478e-11
+        ],
+        "rawRgb": [
+          2.8510060908091813e-7,
+          -2.0919138747090462e-8,
+          -3.150769529193179e-9
+        ],
+        "rgb": [
+          2.1368676413834255e-7,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0003336625280062594
+    },
+    {
+      "name": "ab-onset",
+      "x": 21,
+      "y": 1,
+      "temperatureKelvin": 514.2308220444496,
+      "kappaPerMeter": 0.011882070451974869,
+      "actualRgbCdPerM3": [
+        8.639997051140824e-11,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          4.722588519595293e-11,
+          1.8381206159557205e-11,
+          3.5868207082514275e-15
+        ],
+        "rawRgb": [
+          1.2477707022490173e-10,
+          -1.1290954514063325e-11,
+          -1.1186412322360702e-12
+        ],
+        "rgb": [
+          8.642947060747845e-11,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.00034131987460835913
+    },
+    {
+      "name": "ab-onset",
+      "x": 0,
+      "y": 8,
+      "temperatureKelvin": 839.1770292250853,
+      "kappaPerMeter": 0.05225164070725441,
+      "actualRgbCdPerM3": [
+        227.21743774414062,
+        437.8325500488281,
+        1706.6734619140625
+      ],
+      "reference": {
+        "xyz": [
+          558.1636004895184,
+          484.6121480284384,
+          1678.134854196519
+        ],
+        "rawRgb": [
+          227.1846749397838,
+          437.8651951214662,
+          1706.3511476899287
+        ],
+        "rgb": [
+          227.18466213899015,
+          437.86517044981076,
+          1706.3510515450237
+        ],
+        "negativeChannels": 0
+      },
+      "relativeToPeakError": 0.00018894726776586018
+    },
+    {
+      "name": "ab-onset",
+      "x": 10,
+      "y": 8,
+      "temperatureKelvin": 498.127437400148,
+      "kappaPerMeter": 0.017636528238654137,
+      "actualRgbCdPerM3": [
+        3.313582394581793e-11,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          1.8275050754634578e-11,
+          7.049954611542688e-12,
+          1.1484807240851601e-15
+        ],
+        "rawRgb": [
+          4.838213576271072e-11,
+          -4.487546627712783e-12,
+          -4.202731726554966e-13
+        ],
+        "rgb": [
+          3.314928517710854e-11,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.00040607908190751213
+    },
+    {
+      "name": "ab-onset",
+      "x": 21,
+      "y": 8,
+      "temperatureKelvin": 425.21086765134135,
+      "kappaPerMeter": 0.006868345197290182,
+      "actualRgbCdPerM3": [
+        9.007470333846634e-15,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          5.145192317243543e-15,
+          1.916453915551264e-15,
+          1.1490872449036414e-19
+        ],
+        "rawRgb": [
+          1.372684767154268e-14,
+          -1.3917669581419654e-15,
+          -1.0458875634433023e-16
+        ],
+        "rgb": [
+          9.011274664290862e-15,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.00042217450759806144
+    },
+    {
+      "name": "ab-onset",
+      "x": 0,
+      "y": 14,
+      "temperatureKelvin": 794.4024446178921,
+      "kappaPerMeter": 0.00440711434930563,
+      "actualRgbCdPerM3": [
+        10.10132884979248,
+        80.97554779052734,
+        81.62442016601562
+      ],
+      "reference": {
+        "xyz": [
+          47.848714221363345,
+          65.94811278835354,
+          87.40737151656101
+        ],
+        "rawRgb": [
+          10.104864501424707,
+          80.97354072282762,
+          81.6166179130302
+        ],
+        "rgb": [
+          10.104864005457932,
+          80.97353674848577,
+          81.61661390712484
+        ],
+        "negativeChannels": 0
+      },
+      "relativeToPeakError": 0.00009564546379814684
+    },
+    {
+      "name": "ab-onset",
+      "x": 10,
+      "y": 14,
+      "temperatureKelvin": 368.5315349021945,
+      "kappaPerMeter": 0.0006432730588130653,
+      "actualRgbCdPerM3": [
+        5.318313287451767e-19,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          3.094190886282116e-19,
+          1.1310575566366783e-19,
+          2.120001622904064e-24
+        ],
+        "rawRgb": [
+          8.287981168158665e-19,
+          -8.772169509232269e-20,
+          -5.857132159145121e-21
+        ],
+        "rgb": [
+          5.318296579567393e-19,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.000003141585679451476
+    },
+    {
+      "name": "ab-onset",
+      "x": 21,
+      "y": 14,
+      "temperatureKelvin": 335.5881749120152,
+      "kappaPerMeter": 0.00010898426262428984,
+      "actualRgbCdPerM3": [
+        4.685245097450898e-22,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          2.741804012672098e-22,
+          9.956508774750479e-23,
+          7.131504501169571e-28
+        ],
+        "rawRgb": [
+          7.354233476835551e-22,
+          -7.896853126171661e-23,
+          -5.05677293576452e-24
+        ],
+        "rgb": [
+          4.681606718463179e-22,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.000777164594661433
+    },
+    {
+      "name": "ab-sustained",
+      "x": 0,
+      "y": 1,
+      "temperatureKelvin": 1968.722662926173,
+      "kappaPerMeter": 0.0012525824131444097,
+      "actualRgbCdPerM3": [
+        1302.8944091796875,
+        225.44346618652344,
+        611.9420776367188
+      ],
+      "reference": {
+        "xyz": [
+          728.3925968188684,
+          482.4894538006934,
+          633.4599999085283
+        ],
+        "rawRgb": [
+          1302.870033731193,
+          225.47331122416355,
+          611.79977066493
+        ],
+        "rgb": [
+          1302.8698241684292,
+          225.47327495745313,
+          611.7996722587594
+        ],
+        "negativeChannels": 0
+      },
+      "relativeToPeakError": 0.00010930130955349037
+    },
+    {
+      "name": "ab-sustained",
+      "x": 10,
+      "y": 1,
+      "temperatureKelvin": 1366.4154119460966,
+      "kappaPerMeter": 0.02255193702876568,
+      "actualRgbCdPerM3": [
+        126.79440307617188,
+        12.590726852416992,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          56.6150831218708,
+          35.97110185110181,
+          1.3202123775930585
+        ],
+        "rawRgb": [
+          127.5078510179667,
+          12.661963148927017,
+          -2.79301891803591
+        ],
+        "rgb": [
+          126.7972392975448,
+          12.59139698891927,
+          0
+        ],
+        "negativeChannels": 1
+      },
+      "relativeToPeakError": 0.000022368163444595233
+    },
+    {
+      "name": "ab-sustained",
+      "x": 21,
+      "y": 1,
+      "temperatureKelvin": 1062.998505058361,
+      "kappaPerMeter": 0.016115300357341766,
+      "actualRgbCdPerM3": [
+        0.7618351578712463,
+        0.018122484907507896,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          0.3199664272096082,
+          0.17499694597487045,
+          0.0019552854400556492
+        ],
+        "rawRgb": [
+          0.7668672386821452,
+          0.01824483542187233,
+          -0.015832712463559287
+        ],
+        "rgb": [
+          0.7618919202024609,
+          0.01812646569337899,
+          0
+        ],
+        "negativeChannels": 1
+      },
+      "relativeToPeakError": 0.00007450181542739036
+    },
+    {
+      "name": "ab-sustained",
+      "x": 0,
+      "y": 8,
+      "temperatureKelvin": 1902.2579023512556,
+      "kappaPerMeter": 0.05225164070725441,
+      "actualRgbCdPerM3": [
+        39157.88671875,
+        17991.330078125,
+        40137.1875
+      ],
+      "reference": {
+        "xyz": [
+          29825.265426804897,
+          24091.316822845583,
+          41036.954188479016
+        ],
+        "rawRgb": [
+          39157.505790992785,
+          17992.28649495896,
+          40129.62867658923
+        ],
+        "rgb": [
+          39157.50138601521,
+          17992.284470937848,
+          40129.62416225384
+        ],
+        "negativeChannels": 0
+      },
+      "relativeToPeakError": 0.0001884726783281892
+    },
+    {
+      "name": "ab-sustained",
+      "x": 10,
+      "y": 8,
+      "temperatureKelvin": 988.8833477789894,
+      "kappaPerMeter": 0.022233538329601288,
+      "actualRgbCdPerM3": [
+        0.2114795297384262,
+        0.0012605107622221112,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          0.08751084590540255,
+          0.045882632796728384,
+          0.0003496511429604654
+        ],
+        "rawRgb": [
+          0.21287261473268893,
+          0.0012695571946476168,
+          -0.004122184448122743
+        ],
+        "rgb": [
+          0.2115011163947531,
+          0.0012613776757153194,
+          0
+        ],
+        "negativeChannels": 1
+      },
+      "relativeToPeakError": 0.00010206403018038688
+    },
+    {
+      "name": "ab-sustained",
+      "x": 21,
+      "y": 8,
+      "temperatureKelvin": 765.7356193608452,
+      "kappaPerMeter": 0.010295059531927109,
+      "actualRgbCdPerM3": [
+        0.0001087697601178661,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          0.00005069572854490394,
+          0.000023137403776889927,
+          4.151474877257165e-8
+        ],
+        "rawRgb": [
+          0.00012869109594406468,
+          -0.000005729901467498576,
+          -0.000001855856488953827
+        ],
+        "rgb": [
+          0.00010879338071230481,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.00021711426084985462
+    },
+    {
+      "name": "ab-sustained",
+      "x": 0,
+      "y": 14,
+      "temperatureKelvin": 1771.3590042208157,
+      "kappaPerMeter": 0.00440711434930563,
+      "actualRgbCdPerM3": [
+        1403.162841796875,
+        2114.093017578125,
+        1900.221435546875
+      ],
+      "reference": {
+        "xyz": [
+          1677.5567672225643,
+          1947.4404755833762,
+          2084.7227277528473
+        ],
+        "rawRgb": [
+          1403.2604005288179,
+          2114.053364687301,
+          1900.0380692869953
+        ],
+        "rgb": [
+          1403.2602956312285,
+          2114.053206655975,
+          1900.0379272539035
+        ],
+        "negativeChannels": 0
+      },
+      "relativeToPeakError": 0.00008680400871356721
+    },
+    {
+      "name": "ab-sustained",
+      "x": 10,
+      "y": 14,
+      "temperatureKelvin": 571.697999051448,
+      "kappaPerMeter": 0.000991458771750331,
+      "actualRgbCdPerM3": [
+        5.0937204454371e-10,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          2.6913503892173217e-10,
+          1.0837345893355957e-10,
+          3.7842458421024164e-14
+        ],
+        "rawRgb": [
+          7.05515885482371e-10,
+          -5.7552090661595244e-11,
+          -7.095395869622358e-12
+        ],
+        "rgb": [
+          5.095781311749619e-10,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0004044259724740532
+    },
+    {
+      "name": "ab-sustained",
+      "x": 21,
+      "y": 14,
+      "temperatureKelvin": 460.8407876883824,
+      "kappaPerMeter": 0.0002313889708602801,
+      "actualRgbCdPerM3": [
+        1.3672238322504256e-14,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          7.686605512794345e-15,
+          2.90896593043933e-15,
+          2.976788268073028e-19
+        ],
+        "rawRgb": [
+          2.0436461188568694e-14,
+          -1.993101506286564e-15,
+          -1.6548081327939377e-16
+        ],
+        "rgb": [
+          1.3678122273403569e-14,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0004301724156066657
+    },
+    {
+      "name": "ab-cutoff",
+      "x": 0,
+      "y": 1,
+      "temperatureKelvin": 906.9083446996924,
+      "kappaPerMeter": 0.0003914319968316704,
+      "actualRgbCdPerM3": [
+        0.00044860783964395523,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          0.00019115419604796467,
+          0.00009541706569661972,
+          4.511462982422895e-7
+        ],
+        "rawRgb": [
+          0.0004725322615962794,
+          -0.000006257069399888644,
+          -0.000008354120076348182
+        ],
+        "rgb": [
+          0.0004486564376402434,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.00010831895457419179
+    },
+    {
+      "name": "ab-cutoff",
+      "x": 10,
+      "y": 1,
+      "temperatureKelvin": 684.7755778500243,
+      "kappaPerMeter": 0.007047480437904596,
+      "actualRgbCdPerM3": [
+        0.000002241360107291257,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          0.0000011014680060131226,
+          4.768054893863384e-7,
+          4.5119283446660714e-10
+        ],
+        "rawRgb": [
+          0.0000028361156177083297,
+          -1.7310449095882993e-7,
+          -3.5514231816540026e-8
+        ],
+        "rgb": [
+          0.0000022419663689465765,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0002704151425805677
+    },
+    {
+      "name": "ab-cutoff",
+      "x": 21,
+      "y": 1,
+      "temperatureKelvin": 572.8744892838994,
+      "kappaPerMeter": 0.005036030896008015,
+      "actualRgbCdPerM3": [
+        2.8001485574691287e-9,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          1.4782764796326903e-9,
+          5.956934095109165e-10,
+          2.1034536652131026e-13
+        ],
+        "rawRgb": [
+          3.8745190894614135e-9,
+          -3.15307119464306e-10,
+          -3.90581721105501e-11
+        ],
+        "rgb": [
+          2.8009840911132377e-9,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0002983000320351204
+    },
+    {
+      "name": "ab-cutoff",
+      "x": 0,
+      "y": 8,
+      "temperatureKelvin": 882.3959365550401,
+      "kappaPerMeter": 0.016328636556863785,
+      "actualRgbCdPerM3": [
+        0.009184377267956734,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          0.003973425542298299,
+          0.0019535581458146145,
+          0.000007913534107592277
+        ],
+        "rawRgb": [
+          0.009868868903769938,
+          -0.00018608124688173638,
+          -0.0001691151644022307
+        ],
+        "rgb": [
+          0.00918574085280548,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.00014844582169222772
+    },
+    {
+      "name": "ab-cutoff",
+      "x": 10,
+      "y": 8,
+      "temperatureKelvin": 545.540591302137,
+      "kappaPerMeter": 0.0069479807280004025,
+      "actualRgbCdPerM3": [
+        5.691606075330924e-10,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          3.0552779672272e-10,
+          1.2109498049559241e-10,
+          3.276339236068686e-14
+        ],
+        "rawRgb": [
+          8.038927418504976e-10,
+          -6.896085266719023e-11,
+          -7.671268692893488e-12
+        ],
+        "rgb": [
+          5.693954448149831e-10,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.00041243266701400654
+    },
+    {
+      "name": "ab-cutoff",
+      "x": 21,
+      "y": 8,
+      "temperatureKelvin": 463.2430226624058,
+      "kappaPerMeter": 0.0032172061037272215,
+      "actualRgbCdPerM3": [
+        2.4121091408979556e-13,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          1.3542227011628726e-13,
+          5.130975658429974e-14,
+          5.42354252133791e-18
+        ],
+        "rawRgb": [
+          3.5995675789425574e-13,
+          -3.500231918828284e-14,
+          -2.9274298150772314e-15
+        ],
+        "rgb": [
+          2.412613764344199e-13,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.00020916047719746173
+    },
+    {
+      "name": "ab-cutoff",
+      "x": 0,
+      "y": 14,
+      "temperatureKelvin": 834.1200202814549,
+      "kappaPerMeter": 0.0013772232923656702,
+      "actualRgbCdPerM3": [
+        0.00016988393326755613,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          0.00007576621819084088,
+          0.000036136109742847914,
+          1.0616954521549329e-7
+        ],
+        "rawRgb": [
+          0.0001899178255766564,
+          -0.000005641475111774691,
+          -0.0000030445672088287206
+        ],
+        "rgb": [
+          0.00016991403109116354,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.00017713559859726478
+    },
+    {
+      "name": "ab-cutoff",
+      "x": 10,
+      "y": 14,
+      "temperatureKelvin": 391.68135143544345,
+      "kappaPerMeter": 0.00030983088072389364,
+      "actualRgbCdPerM3": [
+        6.503464788688396e-18,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          3.758336722740316e-18,
+          1.3829069450094858e-18,
+          4.425630910082459e-23
+        ],
+        "rawRgb": [
+          1.0052976447966894e-17,
+          -1.0484777985556326e-18,
+          -7.297541158844196e-20
+        ],
+        "rgb": [
+          6.502506642874979e-18,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0001473502244656669
+    },
+    {
+      "name": "ab-cutoff",
+      "x": 21,
+      "y": 14,
+      "temperatureKelvin": 350.7968708895986,
+      "kappaPerMeter": 0.00007230905612232164,
+      "actualRgbCdPerM3": [
+        3.9171461024875404e-21,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          2.2874671036225544e-21,
+          8.328649421474952e-22,
+          9.620953373393052e-27
+        ],
+        "rawRgb": [
+          6.1321988190729994e-21,
+          -6.547000634414041e-22,
+          -4.2633400852025037e-23
+        ],
+        "rgb": [
+          3.9161780468855944e-21,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.00024719397084507706
+    },
+    {
+      "name": "powered-lift",
+      "x": 0,
+      "y": 1,
+      "temperatureKelvin": 906.9083446996726,
+      "kappaPerMeter": 0.0003914319968316704,
+      "actualRgbCdPerM3": [
+        0.00044860783964395523,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          0.00019115419604786034,
+          0.0000954170656965665,
+          4.511462982419823e-7
+        ],
+        "rawRgb": [
+          0.0004725322615960233,
+          -0.0000062570693998873825,
+          -0.000008354120076343454
+        ],
+        "rgb": [
+          0.0004486564376399931,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0001083189540163909
+    },
+    {
+      "name": "powered-lift",
+      "x": 10,
+      "y": 1,
+      "temperatureKelvin": 634.4635965779945,
+      "kappaPerMeter": 0.00653408607468009,
+      "actualRgbCdPerM3": [
+        1.548645371940438e-7,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          7.86388561103424e-8,
+          3.294639852322325e-8,
+          2.03410453445684e-11
+        ],
+        "rawRgb": [
+          2.04172293309752e-7,
+          -1.4413324763495933e-8,
+          -2.3246802186364466e-9
+        ],
+        "rgb": [
+          1.5491582859510192e-7,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0003310920615618302
+    },
+    {
+      "name": "powered-lift",
+      "x": 21,
+      "y": 1,
+      "temperatureKelvin": 521.6152467271271,
+      "kappaPerMeter": 0.003359264926984906,
+      "actualRgbCdPerM3": [
+        4.428582500715095e-11,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          2.4107932840727414e-11,
+          9.422636857183506e-12,
+          1.9911556298050206e-15
+        ],
+        "rawRgb": [
+          6.363576168875357e-11,
+          -5.689948379782827e-12,
+          -5.78909515021353e-13
+        ],
+        "rgb": [
+          4.430577124393144e-11,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.00045019500215168564
+    },
+    {
+      "name": "powered-lift",
+      "x": 0,
+      "y": 8,
+      "temperatureKelvin": 882.3959365550202,
+      "kappaPerMeter": 0.016328636556863785,
+      "actualRgbCdPerM3": [
+        0.009184377267956734,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          0.0039734255422959885,
+          0.001953558145813457,
+          0.00000791353410758657
+        ],
+        "rawRgb": [
+          0.009868868903764231,
+          -0.00018608124688166853,
+          -0.00016911516440212918
+        ],
+        "rgb": [
+          0.009185740852800035,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0001484458210995168
+    },
+    {
+      "name": "powered-lift",
+      "x": 10,
+      "y": 8,
+      "temperatureKelvin": 506.7165607526176,
+      "kappaPerMeter": 0.005143249873071909,
+      "actualRgbCdPerM3": [
+        2.0081039261987677e-11,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          1.1023731477388377e-11,
+          4.272683244129873e-12,
+          7.673447571231009e-16
+        ],
+        "rawRgb": [
+          2.915380850726239e-11,
+          -2.669296315416916e-12,
+          -2.575288879952863e-13
+        ],
+        "rgb": [
+          2.009039818486452e-11,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0004658405866686021
+    },
+    {
+      "name": "powered-lift",
+      "x": 21,
+      "y": 8,
+      "temperatureKelvin": 429.2774162181463,
+      "kappaPerMeter": 0.001902274088934064,
+      "actualRgbCdPerM3": [
+        3.963010509219853e-15,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          2.2599992282020008e-15,
+          8.432031843827246e-16,
+          5.405465890214693e-20
+        ],
+        "rawRgb": [
+          6.027276965041867e-15,
+          -6.086798851306523e-16,
+          -4.6224099574447373e-17
+        ],
+        "rgb": [
+          3.964789046384022e-15,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.00044858305028637783
+    },
+    {
+      "name": "powered-lift",
+      "x": 0,
+      "y": 14,
+      "temperatureKelvin": 834.1200202814348,
+      "kappaPerMeter": 0.0013772232923656702,
+      "actualRgbCdPerM3": [
+        0.00016988393326755613,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          0.00007576621819079141,
+          0.00003613610974282386,
+          1.0616954521540792e-7
+        ],
+        "rawRgb": [
+          0.0001899178255765332,
+          -0.000005641475111771862,
+          -0.000003044567208826655
+        ],
+        "rgb": [
+          0.00016991403109105043,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0001771355979316967
+    },
+    {
+      "name": "powered-lift",
+      "x": 10,
+      "y": 14,
+      "temperatureKelvin": 370.94044148093866,
+      "kappaPerMeter": 0.00017648290668148547,
+      "actualRgbCdPerM3": [
+        2.0769962343929537e-19,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          1.2072800015207253e-19,
+          4.415814576166976e-20,
+          8.792087854011255e-25
+        ],
+        "rawRgb": [
+          3.2333593089832293e-19,
+          -3.417635090213174e-20,
+          -2.2907595060100386e-21
+        ],
+        "rgb": [
+          2.0763409800529247e-19,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0003155812779904153
+    },
+    {
+      "name": "powered-lift",
+      "x": 21,
+      "y": 14,
+      "temperatureKelvin": 336.7090541661845,
+      "kappaPerMeter": 0.0000274399972113315,
+      "actualRgbCdPerM3": [
+        1.431200931607935e-22,
+        0,
+        0
+      ],
+      "reference": {
+        "xyz": [
+          8.375838407230684e-23,
+          3.042101883627571e-23,
+          2.262076086169736e-28
+        ],
+        "rawRgb": [
+          2.2465377541825937e-22,
+          -2.4113984612088515e-23,
+          -1.5458353263148449e-24
+        ],
+        "rgb": [
+          1.4304135052597538e-22,
+          0,
+          0
+        ],
+        "negativeChannels": 2
+      },
+      "relativeToPeakError": 0.0005504886141565738
+    }
+  ],
+  "sampler": [
+    {
+      "name": "idle",
+      "maximumRelativeToPeakError": 2.5820042151185553e-16
+    },
+    {
+      "name": "dry99",
+      "maximumRelativeToPeakError": 2.1659960482998887e-16
+    },
+    {
+      "name": "ab-onset",
+      "maximumRelativeToPeakError": 2.547621644546038e-16
+    },
+    {
+      "name": "ab-sustained",
+      "maximumRelativeToPeakError": 2.064008526927891e-16
+    },
+    {
+      "name": "ab-cutoff",
+      "maximumRelativeToPeakError": 2.5820042151185553e-16
+    },
+    {
+      "name": "powered-lift",
+      "maximumRelativeToPeakError": 2.1659960482998887e-16
+    }
+  ],
+  "chromaticity": [
+    {
+      "name": "idle",
+      "meaningfulNodes": 61,
+      "normalizedRgbRanges": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "dry99",
+      "meaningfulNodes": 47,
+      "normalizedRgbRanges": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "ab-onset",
+      "meaningfulNodes": 74,
+      "normalizedRgbRanges": [
+        0.08697230098592452,
+        0.6528330612894442,
+        0.5668371550431696
+      ]
+    },
+    {
+      "name": "ab-sustained",
+      "meaningfulNodes": 142,
+      "normalizedRgbRanges": [
+        0.8905041319299962,
+        0.6528330091087309,
+        0.6756586682846972
+      ]
+    },
+    {
+      "name": "ab-cutoff",
+      "meaningfulNodes": 62,
+      "normalizedRgbRanges": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "powered-lift",
+      "meaningfulNodes": 47,
+      "normalizedRgbRanges": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "rays": [
+    {
+      "name": "idle",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 4,
+      "radiance": [
+        3.0643524568246773e-10,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        5.425294654600854e-10,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.43517308240097313,
+      "referenceConvergence": 2.961201123462437e-7
+    },
+    {
+      "name": "idle",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 8,
+      "radiance": [
+        5.870638096457589e-10,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        5.425294654600854e-10,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.08208649856078644,
+      "referenceConvergence": 2.961201123462437e-7
+    },
+    {
+      "name": "idle",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 16,
+      "radiance": [
+        6.124013814522148e-10,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        5.425294654600854e-10,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.12878916342889404,
+      "referenceConvergence": 2.961201123462437e-7
+    },
+    {
+      "name": "idle",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 32,
+      "radiance": [
+        5.420171196985944e-10,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        5.425294654600854e-10,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.0009443648577806585,
+      "referenceConvergence": 2.961201123462437e-7
+    },
+    {
+      "name": "idle",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 4,
+      "radiance": [
+        9.692223638000534e-12,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        9.503442524880771e-10,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.9898013550220086,
+      "referenceConvergence": 0.000001020064714584112
+    },
+    {
+      "name": "idle",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 8,
+      "radiance": [
+        6.20222688178927e-11,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        9.503442524880771e-10,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.9347370506471593,
+      "referenceConvergence": 0.000001020064714584112
+    },
+    {
+      "name": "idle",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 16,
+      "radiance": [
+        2.6105778961113283e-10,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        9.503442524880771e-10,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.7253018693724271,
+      "referenceConvergence": 0.000001020064714584112
+    },
+    {
+      "name": "idle",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 32,
+      "radiance": [
+        9.400034029337653e-10,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        9.503442524880771e-10,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.010881161776102353,
+      "referenceConvergence": 0.000001020064714584112
+    },
+    {
+      "name": "idle",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 4,
+      "radiance": [
+        2.289319540081988e-13,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        6.043904406349849e-10,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.9996212184399083,
+      "referenceConvergence": 0.0000013900147634728757
+    },
+    {
+      "name": "idle",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 8,
+      "radiance": [
+        3.884299226915411e-12,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        6.043904406349849e-10,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.9935731954614728,
+      "referenceConvergence": 0.0000013900147634728757
+    },
+    {
+      "name": "idle",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 16,
+      "radiance": [
+        9.484505390696431e-11,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        6.043904406349849e-10,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.8430732064403299,
+      "referenceConvergence": 0.0000013900147634728757
+    },
+    {
+      "name": "idle",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 32,
+      "radiance": [
+        6.23043415968712e-10,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        6.043904406349849e-10,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.030862459231039308,
+      "referenceConvergence": 0.0000013900147634728757
+    },
+    {
+      "name": "idle",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 4,
+      "radiance": [
+        1.805372767189104e-14,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        1.0381027831476679e-13,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.8260892084582444,
+      "referenceConvergence": 1.2212293761184985e-7
+    },
+    {
+      "name": "idle",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 8,
+      "radiance": [
+        9.453467510122504e-14,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        1.0381027831476679e-13,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.0893514916260687,
+      "referenceConvergence": 1.2212293761184985e-7
+    },
+    {
+      "name": "idle",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 16,
+      "radiance": [
+        1.037872743856196e-13,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        1.0381027831476679e-13,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.00022159587201410404,
+      "referenceConvergence": 1.2212293761184985e-7
+    },
+    {
+      "name": "idle",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 32,
+      "radiance": [
+        1.0363023380317349e-13,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        1.0381027831476679e-13,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.0017343611299006122,
+      "referenceConvergence": 1.2212293761184985e-7
+    },
+    {
+      "name": "idle",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 4,
+      "radiance": [
+        1.0615778373962525e-15,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        4.733008797627369e-15,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.7757076137427813,
+      "referenceConvergence": 1.2202246473173178e-8
+    },
+    {
+      "name": "idle",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 8,
+      "radiance": [
+        4.4775032850409435e-15,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        4.733008797627369e-15,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.05398373920507167,
+      "referenceConvergence": 1.2202246473173178e-8
+    },
+    {
+      "name": "idle",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 16,
+      "radiance": [
+        4.7562940142303414e-15,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        4.733008797627369e-15,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.00491974927548094,
+      "referenceConvergence": 1.2202246473173178e-8
+    },
+    {
+      "name": "idle",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 32,
+      "radiance": [
+        4.723052078487729e-15,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        4.733008797627369e-15,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.0021036764488229147,
+      "referenceConvergence": 1.2202246473173178e-8
+    },
+    {
+      "name": "idle",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 4,
+      "radiance": [
+        1.9930893935171174e-10,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        5.598483525428068e-10,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.6439947738589223,
+      "referenceConvergence": 2.3319671777972273e-7
+    },
+    {
+      "name": "idle",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 8,
+      "radiance": [
+        8.61138543275736e-10,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        5.598483525428068e-10,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.5381639320085203,
+      "referenceConvergence": 2.3319671777972273e-7
+    },
+    {
+      "name": "idle",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 16,
+      "radiance": [
+        5.198794452092795e-10,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        5.598483525428068e-10,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.07139238179766064,
+      "referenceConvergence": 2.3319671777972273e-7
+    },
+    {
+      "name": "idle",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 32,
+      "radiance": [
+        5.730861355184363e-10,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        5.598483525428068e-10,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.023645301295438275,
+      "referenceConvergence": 2.3319671777972273e-7
+    },
+    {
+      "name": "dry99",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 4,
+      "radiance": [
+        0.00010162199883363757,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0003314897376885188,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.6934384770332597,
+      "referenceConvergence": 3.270804020777626e-7
+    },
+    {
+      "name": "dry99",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 8,
+      "radiance": [
+        0.0003273471528998975,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0003314897376885188,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.012496871901699184,
+      "referenceConvergence": 3.270804020777626e-7
+    },
+    {
+      "name": "dry99",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 16,
+      "radiance": [
+        0.0003952612086246726,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0003314897376885188,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.19237841684280452,
+      "referenceConvergence": 3.270804020777626e-7
+    },
+    {
+      "name": "dry99",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 32,
+      "radiance": [
+        0.0003311822160533427,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0003314897376885188,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.0009276957933009959,
+      "referenceConvergence": 3.270804020777626e-7
+    },
+    {
+      "name": "dry99",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 4,
+      "radiance": [
+        0.0000019429547843904,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0007540189334631366,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.9974232015959246,
+      "referenceConvergence": 0.0000010874586678500317
+    },
+    {
+      "name": "dry99",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 8,
+      "radiance": [
+        0.000020067694776851834,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0007540189334631366,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.973385688493679,
+      "referenceConvergence": 0.0000010874586678500317
+    },
+    {
+      "name": "dry99",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 16,
+      "radiance": [
+        0.0001424743906295335,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0007540189334631366,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.8110466669912885,
+      "referenceConvergence": 0.0000010874586678500317
+    },
+    {
+      "name": "dry99",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 32,
+      "radiance": [
+        0.0007425812424621368,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0007540189334631366,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.015168970556836784,
+      "referenceConvergence": 0.0000010874586678500317
+    },
+    {
+      "name": "dry99",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 4,
+      "radiance": [
+        2.136684134878483e-8,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0005480162506731684,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.9999610105698097,
+      "referenceConvergence": 0.0000014279003650870014
+    },
+    {
+      "name": "dry99",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 8,
+      "radiance": [
+        7.261668793246678e-7,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0005480162506731684,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.9986749172521204,
+      "referenceConvergence": 0.0000014279003650870014
+    },
+    {
+      "name": "dry99",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 16,
+      "radiance": [
+        0.00007909584463454959,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0005480162506731684,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.8556687971617806,
+      "referenceConvergence": 0.0000014279003650870014
+    },
+    {
+      "name": "dry99",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 32,
+      "radiance": [
+        0.0005684333807413284,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0005480162506731684,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.03725643179938562,
+      "referenceConvergence": 0.0000014279003650870014
+    },
+    {
+      "name": "dry99",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 4,
+      "radiance": [
+        1.3034687012595868e-10,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        1.971411020397352e-9,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.933881433766315,
+      "referenceConvergence": 2.048358696607136e-8
+    },
+    {
+      "name": "dry99",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 8,
+      "radiance": [
+        1.5985955972616687e-9,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        1.971411020397352e-9,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.18911095620259824,
+      "referenceConvergence": 2.048358696607136e-8
+    },
+    {
+      "name": "dry99",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 16,
+      "radiance": [
+        1.985752070376522e-9,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        1.971411020397352e-9,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.007274510404369911,
+      "referenceConvergence": 2.048358696607136e-8
+    },
+    {
+      "name": "dry99",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 32,
+      "radiance": [
+        1.9698703965216924e-9,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        1.971411020397352e-9,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.0007814828362626042,
+      "referenceConvergence": 2.048358696607136e-8
+    },
+    {
+      "name": "dry99",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 4,
+      "radiance": [
+        3.293784085076173e-12,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        2.3941241704304602e-11,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.8624221698374167,
+      "referenceConvergence": 1.3628404102820918e-7
+    },
+    {
+      "name": "dry99",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 8,
+      "radiance": [
+        2.099967491490919e-11,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        2.3941241704304602e-11,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.12286609131332248,
+      "referenceConvergence": 1.3628404102820918e-7
+    },
+    {
+      "name": "dry99",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 16,
+      "radiance": [
+        2.397296034757701e-11,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        2.3941241704304602e-11,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.001324853725807599,
+      "referenceConvergence": 1.3628404102820918e-7
+    },
+    {
+      "name": "dry99",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 32,
+      "radiance": [
+        2.398843088191313e-11,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        2.3941241704304602e-11,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.001971041359982673,
+      "referenceConvergence": 1.3628404102820918e-7
+    },
+    {
+      "name": "dry99",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 4,
+      "radiance": [
+        0.000039593368856276156,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.000028613391471980848,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.3837356153690224,
+      "referenceConvergence": 1.5496083924558543e-7
+    },
+    {
+      "name": "dry99",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 8,
+      "radiance": [
+        0.000027345919285728158,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.000028613391471980848,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.04429646822865579,
+      "referenceConvergence": 1.5496083924558543e-7
+    },
+    {
+      "name": "dry99",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 16,
+      "radiance": [
+        0.00003035010920836746,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.000028613391471980848,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.060695976500627746,
+      "referenceConvergence": 1.5496083924558543e-7
+    },
+    {
+      "name": "dry99",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 32,
+      "radiance": [
+        0.000028730532819109642,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.000028613391471980848,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.004093934381861121,
+      "referenceConvergence": 1.5496083924558543e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 4,
+      "radiance": [
+        0.0012501070950515353,
+        0,
+        0.008976365871987387
+      ],
+      "referenceRadiance": [
+        0.019268739982007017,
+        3.6195442997540216e-8,
+        0.13933816856338146
+      ],
+      "relativeToReferencePeakError": 0.9355785570849938,
+      "referenceConvergence": 2.2942693580308958e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 8,
+      "radiance": [
+        0.010929176370447994,
+        1.1387691676587439e-7,
+        0.07890609558344022
+      ],
+      "referenceRadiance": [
+        0.019268739982007017,
+        3.6195442997540216e-8,
+        0.13933816856338146
+      ],
+      "relativeToReferencePeakError": 0.43370796102040193,
+      "referenceConvergence": 2.2942693580308958e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 16,
+      "radiance": [
+        0.016374270102836777,
+        1.539307493356423e-8,
+        0.11833335913676957
+      ],
+      "referenceRadiance": [
+        0.019268739982007017,
+        3.6195442997540216e-8,
+        0.13933816856338146
+      ],
+      "relativeToReferencePeakError": 0.1507469894514749,
+      "referenceConvergence": 2.2942693580308958e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 32,
+      "radiance": [
+        0.019253578782283565,
+        3.61586090513675e-8,
+        0.13922855080176152
+      ],
+      "referenceRadiance": [
+        0.019268739982007017,
+        3.6195442997540216e-8,
+        0.13933816856338146
+      ],
+      "relativeToReferencePeakError": 0.0007867030459071786,
+      "referenceConvergence": 2.2942693580308958e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 4,
+      "radiance": [
+        2.2818972090365026,
+        10.958134440666052,
+        17.75367550847046
+      ],
+      "referenceRadiance": [
+        37.262748220206596,
+        51.3473266683844,
+        277.9808513112493
+      ],
+      "relativeToReferencePeakError": 0.9361334587446384,
+      "referenceConvergence": 2.1596687165155648e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 8,
+      "radiance": [
+        20.094789144869683,
+        35.47738626773843,
+        150.637899065718
+      ],
+      "referenceRadiance": [
+        37.262748220206596,
+        51.3473266683844,
+        277.9808513112493
+      ],
+      "relativeToReferencePeakError": 0.4580997275346426,
+      "referenceConvergence": 2.1596687165155648e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 16,
+      "radiance": [
+        31.3509132461136,
+        45.897699527661004,
+        234.13360176894187
+      ],
+      "referenceRadiance": [
+        37.262748220206596,
+        51.3473266683844,
+        277.9808513112493
+      ],
+      "relativeToReferencePeakError": 0.15773478401651697,
+      "referenceConvergence": 2.1596687165155648e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 32,
+      "radiance": [
+        37.04246658997815,
+        50.111167162592864,
+        276.2504065153524
+      ],
+      "referenceRadiance": [
+        37.262748220206596,
+        51.3473266683844,
+        277.9808513112493
+      ],
+      "relativeToReferencePeakError": 0.006225050350534298,
+      "referenceConvergence": 2.1596687165155648e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 4,
+      "radiance": [
+        8.49841892569507,
+        117.47893804650383,
+        73.28629001219103
+      ],
+      "referenceRadiance": [
+        46.9243117536933,
+        385.0859372402542,
+        380.01107797181425
+      ],
+      "relativeToReferencePeakError": 0.7965099690676534,
+      "referenceConvergence": 8.218729402466583e-8
+    },
+    {
+      "name": "ab-onset",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 8,
+      "radiance": [
+        34.5784522107391,
+        318.4356809766101,
+        283.2725832455823
+      ],
+      "referenceRadiance": [
+        46.9243117536933,
+        385.0859372402542,
+        380.01107797181425
+      ],
+      "relativeToReferencePeakError": 0.2512127433671435,
+      "referenceConvergence": 8.218729402466583e-8
+    },
+    {
+      "name": "ab-onset",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 16,
+      "radiance": [
+        42.799459522650075,
+        363.9010977178663,
+        347.7930422914859
+      ],
+      "referenceRadiance": [
+        46.9243117536933,
+        385.0859372402542,
+        380.01107797181425
+      ],
+      "relativeToReferencePeakError": 0.08366453449643263,
+      "referenceConvergence": 8.218729402466583e-8
+    },
+    {
+      "name": "ab-onset",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 32,
+      "radiance": [
+        47.343602745230115,
+        386.7805290089469,
+        383.24332150606114
+      ],
+      "referenceRadiance": [
+        46.9243117536933,
+        385.0859372402542,
+        380.01107797181425
+      ],
+      "relativeToReferencePeakError": 0.008393564193517411,
+      "referenceConvergence": 8.218729402466583e-8
+    },
+    {
+      "name": "ab-onset",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 4,
+      "radiance": [
+        2.6120636208745385e-10,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        3.290676936068173e-9,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.9206223013798635,
+      "referenceConvergence": 1.0935782429315102e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 8,
+      "radiance": [
+        2.731639435786229e-9,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        3.290676936068173e-9,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.1698852580010189,
+      "referenceConvergence": 1.0935782429315102e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 16,
+      "radiance": [
+        3.305970707744255e-9,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        3.290676936068173e-9,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.0046476065482002745,
+      "referenceConvergence": 1.0935782429315102e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 32,
+      "radiance": [
+        3.2861956758951773e-9,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        3.290676936068173e-9,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.0013618049599089172,
+      "referenceConvergence": 1.0935782429315102e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 4,
+      "radiance": [
+        7.0539711218572395e-12,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        4.9566203296510434e-11,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.8576858695498703,
+      "referenceConvergence": 1.1480348346026165e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 8,
+      "radiance": [
+        4.323988540480649e-11,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        4.9566203296510434e-11,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.12763369939511446,
+      "referenceConvergence": 1.1480348346026165e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 16,
+      "radiance": [
+        4.91191877723507e-11,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        4.9566203296510434e-11,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.009018554870657364,
+      "referenceConvergence": 1.1480348346026165e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 32,
+      "radiance": [
+        4.9686697606697156e-11,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        4.9566203296510434e-11,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.002430977201661228,
+      "referenceConvergence": 1.1480348346026165e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 4,
+      "radiance": [
+        47.19208762580915,
+        410.7533337070104,
+        384.3768056435486
+      ],
+      "referenceRadiance": [
+        19.414041235635054,
+        134.32928419779168,
+        154.87831301909125
+      ],
+      "relativeToReferencePeakError": 1.78478215652533,
+      "referenceConvergence": 4.1303346303320475e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 8,
+      "radiance": [
+        12.937160419286911,
+        60.143510451584135,
+        100.46767708195561
+      ],
+      "referenceRadiance": [
+        19.414041235635054,
+        134.32928419779168,
+        154.87831301909125
+      ],
+      "relativeToReferencePeakError": 0.4789939424060162,
+      "referenceConvergence": 4.1303346303320475e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 16,
+      "radiance": [
+        19.666231783453508,
+        134.45171026730807,
+        156.7440647035475
+      ],
+      "referenceRadiance": [
+        19.414041235635054,
+        134.32928419779168,
+        154.87831301909125
+      ],
+      "relativeToReferencePeakError": 0.012046565126431048,
+      "referenceConvergence": 4.1303346303320475e-7
+    },
+    {
+      "name": "ab-onset",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 32,
+      "radiance": [
+        19.46796064705292,
+        134.51649608762062,
+        155.2903269127027
+      ],
+      "referenceRadiance": [
+        19.414041235635054,
+        134.32928419779168,
+        154.87831301909125
+      ],
+      "relativeToReferencePeakError": 0.0026602426484376236,
+      "referenceConvergence": 4.1303346303320475e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 4,
+      "radiance": [
+        3123.839920179532,
+        544.8444510155563,
+        0
+      ],
+      "referenceRadiance": [
+        3078.129625310594,
+        583.9406853600094,
+        38.11142353322609
+      ],
+      "relativeToReferencePeakError": 0.014850022719340713,
+      "referenceConvergence": 1.6448497275769123e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 8,
+      "radiance": [
+        3486.1686370264442,
+        670.5979188185244,
+        17.554728196770945
+      ],
+      "referenceRadiance": [
+        3078.129625310594,
+        583.9406853600094,
+        38.11142353322609
+      ],
+      "relativeToReferencePeakError": 0.1325606980163085,
+      "referenceConvergence": 1.6448497275769123e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 16,
+      "radiance": [
+        3283.3354755306473,
+        633.1810980849159,
+        34.47126509960238
+      ],
+      "referenceRadiance": [
+        3078.129625310594,
+        583.9406853600094,
+        38.11142353322609
+      ],
+      "relativeToReferencePeakError": 0.06666575979539766,
+      "referenceConvergence": 1.6448497275769123e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 32,
+      "radiance": [
+        3075.3685721413244,
+        583.4154358034675,
+        38.08000974828587
+      ],
+      "referenceRadiance": [
+        3078.129625310594,
+        583.9406853600094,
+        38.11142353322609
+      ],
+      "relativeToReferencePeakError": 0.0008969905447015789,
+      "referenceConvergence": 1.6448497275769123e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 4,
+      "radiance": [
+        575.2525573178979,
+        647.3673565298943,
+        1743.952815053438
+      ],
+      "referenceRadiance": [
+        4632.171303847579,
+        2209.890437423425,
+        8181.131199021309
+      ],
+      "relativeToReferencePeakError": 0.7868323129615543,
+      "referenceConvergence": 2.8503614071428916e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 8,
+      "radiance": [
+        1799.9660404979995,
+        1266.0613612518086,
+        5737.450703991148
+      ],
+      "referenceRadiance": [
+        4632.171303847579,
+        2209.890437423425,
+        8181.131199021309
+      ],
+      "relativeToReferencePeakError": 0.34618748855762027,
+      "referenceConvergence": 2.8503614071428916e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 16,
+      "radiance": [
+        3007.884339346894,
+        1738.9296909947482,
+        7412.240547402591
+      ],
+      "referenceRadiance": [
+        4632.171303847579,
+        2209.890437423425,
+        8181.131199021309
+      ],
+      "relativeToReferencePeakError": 0.19854063270553526,
+      "referenceConvergence": 2.8503614071428916e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 32,
+      "radiance": [
+        4590.920362686484,
+        2172.457980215555,
+        8145.928462154852
+      ],
+      "referenceRadiance": [
+        4632.171303847579,
+        2209.890437423425,
+        8181.131199021309
+      ],
+      "relativeToReferencePeakError": 0.005042205064017328,
+      "referenceConvergence": 2.8503614071428916e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 4,
+      "radiance": [
+        600.3400247771993,
+        6367.9398781957,
+        4854.736737256535
+      ],
+      "referenceRadiance": [
+        3965.181308873607,
+        11865.77947115857,
+        11261.041423980394
+      ],
+      "relativeToReferencePeakError": 0.5398975012383531,
+      "referenceConvergence": 2.680613229874011e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 8,
+      "radiance": [
+        1325.6884352684558,
+        10181.104860820698,
+        9619.691982231767
+      ],
+      "referenceRadiance": [
+        3965.181308873607,
+        11865.77947115857,
+        11261.041423980394
+      ],
+      "relativeToReferencePeakError": 0.22244580560601238,
+      "referenceConvergence": 2.680613229874011e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 16,
+      "radiance": [
+        2007.6549157921086,
+        11156.378104053972,
+        10780.228836107563
+      ],
+      "referenceRadiance": [
+        3965.181308873607,
+        11865.77947115857,
+        11261.041423980394
+      ],
+      "relativeToReferencePeakError": 0.16497242324783964,
+      "referenceConvergence": 2.680613229874011e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 32,
+      "radiance": [
+        4036.4760890482285,
+        11911.206278217123,
+        11319.22175167597
+      ],
+      "referenceRadiance": [
+        3965.181308873607,
+        11865.77947115857,
+        11261.041423980394
+      ],
+      "relativeToReferencePeakError": 0.006008436306094617,
+      "referenceConvergence": 2.680613229874011e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 4,
+      "radiance": [
+        1.9314197808986935,
+        0.06438922168778564,
+        0
+      ],
+      "referenceRadiance": [
+        8.750079889787571,
+        0.5398055523884504,
+        0
+      ],
+      "relativeToReferencePeakError": 0.7792683260923252,
+      "referenceConvergence": 1.1185287018568272e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 8,
+      "radiance": [
+        8.279081016516324,
+        0.4873201871400996,
+        0
+      ],
+      "referenceRadiance": [
+        8.750079889787571,
+        0.5398055523884504,
+        0
+      ],
+      "relativeToReferencePeakError": 0.053827951196304076,
+      "referenceConvergence": 1.1185287018568272e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 16,
+      "radiance": [
+        8.726394895500198,
+        0.5392985459436785,
+        0
+      ],
+      "referenceRadiance": [
+        8.750079889787571,
+        0.5398055523884504,
+        0
+      ],
+      "relativeToReferencePeakError": 0.0027068317759037733,
+      "referenceConvergence": 1.1185287018568272e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 32,
+      "radiance": [
+        8.747315633995763,
+        0.5389331387992335,
+        0
+      ],
+      "referenceRadiance": [
+        8.750079889787571,
+        0.5398055523884504,
+        0
+      ],
+      "relativeToReferencePeakError": 0.0003159120632754905,
+      "referenceConvergence": 1.1185287018568272e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 4,
+      "radiance": [
+        0.11005052872962903,
+        0.0005088294948284085,
+        0
+      ],
+      "referenceRadiance": [
+        0.5227448558705672,
+        0.013569365033726721,
+        0
+      ],
+      "relativeToReferencePeakError": 0.7894756352095451,
+      "referenceConvergence": 2.006364969124932e-8
+    },
+    {
+      "name": "ab-sustained",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 8,
+      "radiance": [
+        0.4993866384561724,
+        0.011894841858689512,
+        0
+      ],
+      "referenceRadiance": [
+        0.5227448558705672,
+        0.013569365033726721,
+        0
+      ],
+      "relativeToReferencePeakError": 0.044683782445825354,
+      "referenceConvergence": 2.006364969124932e-8
+    },
+    {
+      "name": "ab-sustained",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 16,
+      "radiance": [
+        0.5248427292590021,
+        0.013706287405462165,
+        0
+      ],
+      "referenceRadiance": [
+        0.5227448558705672,
+        0.013569365033726721,
+        0
+      ],
+      "relativeToReferencePeakError": 0.004013188011082717,
+      "referenceConvergence": 2.006364969124932e-8
+    },
+    {
+      "name": "ab-sustained",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 32,
+      "radiance": [
+        0.521801345266671,
+        0.013511127105167303,
+        0
+      ],
+      "referenceRadiance": [
+        0.5227448558705672,
+        0.013569365033726721,
+        0
+      ],
+      "relativeToReferencePeakError": 0.0018049160949176455,
+      "referenceConvergence": 2.006364969124932e-8
+    },
+    {
+      "name": "ab-sustained",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 4,
+      "radiance": [
+        4184.09251603349,
+        4481.783037597014,
+        10923.499959438861
+      ],
+      "referenceRadiance": [
+        4838.92809005217,
+        6659.308456945471,
+        8911.35087014927
+      ],
+      "relativeToReferencePeakError": 0.24435413340558795,
+      "referenceConvergence": 2.474041463928316e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 8,
+      "radiance": [
+        5901.474621174054,
+        8902.247900531547,
+        10475.985456677397
+      ],
+      "referenceRadiance": [
+        4838.92809005217,
+        6659.308456945471,
+        8911.35087014927
+      ],
+      "relativeToReferencePeakError": 0.25169466181601546,
+      "referenceConvergence": 2.474041463928316e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 16,
+      "radiance": [
+        4798.732892907343,
+        6833.628636640291,
+        9030.190855761339
+      ],
+      "referenceRadiance": [
+        4838.92809005217,
+        6659.308456945471,
+        8911.35087014927
+      ],
+      "relativeToReferencePeakError": 0.019561588611525484,
+      "referenceConvergence": 2.474041463928316e-7
+    },
+    {
+      "name": "ab-sustained",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 32,
+      "radiance": [
+        4889.144981199087,
+        6732.879240591543,
+        8964.984202716303
+      ],
+      "referenceRadiance": [
+        4838.92809005217,
+        6659.308456945471,
+        8911.35087014927
+      ],
+      "relativeToReferencePeakError": 0.008255850848889216,
+      "referenceConvergence": 2.474041463928316e-7
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 4,
+      "radiance": [
+        0.0002995493873570845,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.00048806089153295473,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.3862458710505831,
+      "referenceConvergence": 3.006749812020506e-7
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 8,
+      "radiance": [
+        0.0005396931892674494,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.00048806089153295473,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.10579068847807566,
+      "referenceConvergence": 3.006749812020506e-7
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 16,
+      "radiance": [
+        0.000548656948295685,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.00048806089153295473,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.1241567554663182,
+      "referenceConvergence": 3.006749812020506e-7
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 32,
+      "radiance": [
+        0.00048759935246942313,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.00048806089153295473,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.0009456587723756108,
+      "referenceConvergence": 3.006749812020506e-7
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 4,
+      "radiance": [
+        0.000009098714501409623,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0008146967083788215,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.9888317770185725,
+      "referenceConvergence": 9.94762182361975e-7
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 8,
+      "radiance": [
+        0.00006097250330473902,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0008146967083788215,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.925159261504727,
+      "referenceConvergence": 9.94762182361975e-7
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 16,
+      "radiance": [
+        0.0002416181084532118,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0008146967083788215,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.7034256969885005,
+      "referenceConvergence": 9.94762182361975e-7
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 32,
+      "radiance": [
+        0.0008055105870261631,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0008146967083788215,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.011275510577350939,
+      "referenceConvergence": 9.94762182361975e-7
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 4,
+      "radiance": [
+        1.488748626820973e-7,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.000539941651204886,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.9997242760169549,
+      "referenceConvergence": 0.0000013777247234163935
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 8,
+      "radiance": [
+        0.000003581709093715182,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.000539941651204886,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.9933664886090514,
+      "referenceConvergence": 0.0000013777247234163935
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 16,
+      "radiance": [
+        0.00008524111802607236,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.000539941651204886,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.8421290192452169,
+      "referenceConvergence": 0.0000013777247234163935
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 32,
+      "radiance": [
+        0.0005562257557004842,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.000539941651204886,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.030159007846977687,
+      "referenceConvergence": 0.0000013777247234163935
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 4,
+      "radiance": [
+        8.803700170861856e-9,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        7.133908223298891e-8,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.8765935880404302,
+      "referenceConvergence": 1.3144605034792074e-7
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 8,
+      "radiance": [
+        6.304351697511736e-8,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        7.133908223298891e-8,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.11628359937094175,
+      "referenceConvergence": 1.3144605034792074e-7
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 16,
+      "radiance": [
+        7.144745005159005e-8,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        7.133908223298891e-8,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.0015190526035534133,
+      "referenceConvergence": 1.3144605034792074e-7
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 32,
+      "radiance": [
+        7.114595265297376e-8,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        7.133908223298891e-8,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.0027072058396322525,
+      "referenceConvergence": 1.3144605034792074e-7
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 4,
+      "radiance": [
+        2.874779527211684e-10,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        2.039415215687814e-9,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.8590390272124093,
+      "referenceConvergence": 1.257785458417325e-8
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 8,
+      "radiance": [
+        1.860988696649975e-9,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        2.039415215687814e-9,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.08748905944475019,
+      "referenceConvergence": 1.257785458417325e-8
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 16,
+      "radiance": [
+        2.0554604389264e-9,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        2.039415215687814e-9,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.007867560816042236,
+      "referenceConvergence": 1.257785458417325e-8
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 32,
+      "radiance": [
+        2.0328774230043934e-9,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        2.039415215687814e-9,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.003205719283219061,
+      "referenceConvergence": 1.257785458417325e-8
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 4,
+      "radiance": [
+        0.00019716485702035645,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.000515304311009548,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.6173817047365955,
+      "referenceConvergence": 2.3611103291576983e-7
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 8,
+      "radiance": [
+        0.0007747542070273703,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.000515304311009548,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.5034886968236811,
+      "referenceConvergence": 2.3611103291576983e-7
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 16,
+      "radiance": [
+        0.0004825633223840578,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.000515304311009548,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.0635371913759976,
+      "referenceConvergence": 2.3611103291576983e-7
+    },
+    {
+      "name": "ab-cutoff",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 32,
+      "radiance": [
+        0.0005268465150327768,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.000515304311009548,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.022398811297767142,
+      "referenceConvergence": 2.3611103291576983e-7
+    },
+    {
+      "name": "powered-lift",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 4,
+      "radiance": [
+        0.00010162199883363757,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0003314897376885188,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.6934384770332597,
+      "referenceConvergence": 3.270804020777626e-7
+    },
+    {
+      "name": "powered-lift",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 8,
+      "radiance": [
+        0.0003273471528998975,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0003314897376885188,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.012496871901699184,
+      "referenceConvergence": 3.270804020777626e-7
+    },
+    {
+      "name": "powered-lift",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 16,
+      "radiance": [
+        0.0003952612086246726,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0003314897376885188,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.19237841684280452,
+      "referenceConvergence": 3.270804020777626e-7
+    },
+    {
+      "name": "powered-lift",
+      "view": "rear",
+      "x": 0,
+      "y": 0,
+      "samples": 32,
+      "radiance": [
+        0.0003311822160533427,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0003314897376885188,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.0009276957933009959,
+      "referenceConvergence": 3.270804020777626e-7
+    },
+    {
+      "name": "powered-lift",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 4,
+      "radiance": [
+        0.0000019429547843904,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0007540189334631366,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.9974232015959246,
+      "referenceConvergence": 0.0000010874586678500317
+    },
+    {
+      "name": "powered-lift",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 8,
+      "radiance": [
+        0.000020067694776851834,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0007540189334631366,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.973385688493679,
+      "referenceConvergence": 0.0000010874586678500317
+    },
+    {
+      "name": "powered-lift",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 16,
+      "radiance": [
+        0.0001424743906295335,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0007540189334631366,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.8110466669912885,
+      "referenceConvergence": 0.0000010874586678500317
+    },
+    {
+      "name": "powered-lift",
+      "view": "rear",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 32,
+      "radiance": [
+        0.0007425812424621368,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0007540189334631366,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.015168970556836784,
+      "referenceConvergence": 0.0000010874586678500317
+    },
+    {
+      "name": "powered-lift",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 4,
+      "radiance": [
+        2.136684134878483e-8,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0005480162506731684,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.9999610105698097,
+      "referenceConvergence": 0.0000014279003650870014
+    },
+    {
+      "name": "powered-lift",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 8,
+      "radiance": [
+        7.261668793246678e-7,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0005480162506731684,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.9986749172521204,
+      "referenceConvergence": 0.0000014279003650870014
+    },
+    {
+      "name": "powered-lift",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 16,
+      "radiance": [
+        0.00007909584463454959,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0005480162506731684,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.8556687971617806,
+      "referenceConvergence": 0.0000014279003650870014
+    },
+    {
+      "name": "powered-lift",
+      "view": "rear",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 32,
+      "radiance": [
+        0.0005684333807413284,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.0005480162506731684,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.03725643179938562,
+      "referenceConvergence": 0.0000014279003650870014
+    },
+    {
+      "name": "powered-lift",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 4,
+      "radiance": [
+        1.3034687012595868e-10,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        1.971411020397352e-9,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.933881433766315,
+      "referenceConvergence": 2.048358696607136e-8
+    },
+    {
+      "name": "powered-lift",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 8,
+      "radiance": [
+        1.5985955972616687e-9,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        1.971411020397352e-9,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.18911095620259824,
+      "referenceConvergence": 2.048358696607136e-8
+    },
+    {
+      "name": "powered-lift",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 16,
+      "radiance": [
+        1.985752070376522e-9,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        1.971411020397352e-9,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.007274510404369911,
+      "referenceConvergence": 2.048358696607136e-8
+    },
+    {
+      "name": "powered-lift",
+      "view": "oblique",
+      "x": 0,
+      "y": 0,
+      "samples": 32,
+      "radiance": [
+        1.9698703965216924e-9,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        1.971411020397352e-9,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.0007814828362626042,
+      "referenceConvergence": 2.048358696607136e-8
+    },
+    {
+      "name": "powered-lift",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 4,
+      "radiance": [
+        3.293784085076173e-12,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        2.3941241704304602e-11,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.8624221698374167,
+      "referenceConvergence": 1.3628404102820918e-7
+    },
+    {
+      "name": "powered-lift",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 8,
+      "radiance": [
+        2.099967491490919e-11,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        2.3941241704304602e-11,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.12286609131332248,
+      "referenceConvergence": 1.3628404102820918e-7
+    },
+    {
+      "name": "powered-lift",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 16,
+      "radiance": [
+        2.397296034757701e-11,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        2.3941241704304602e-11,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.001324853725807599,
+      "referenceConvergence": 1.3628404102820918e-7
+    },
+    {
+      "name": "powered-lift",
+      "view": "oblique",
+      "x": 0.22,
+      "y": 0.1,
+      "samples": 32,
+      "radiance": [
+        2.398843088191313e-11,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        2.3941241704304602e-11,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.001971041359982673,
+      "referenceConvergence": 1.3628404102820918e-7
+    },
+    {
+      "name": "powered-lift",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 4,
+      "radiance": [
+        0.000039593368856276156,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.000028613391471980848,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.3837356153690224,
+      "referenceConvergence": 1.5496083924558543e-7
+    },
+    {
+      "name": "powered-lift",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 8,
+      "radiance": [
+        0.000027345919285728158,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.000028613391471980848,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.04429646822865579,
+      "referenceConvergence": 1.5496083924558543e-7
+    },
+    {
+      "name": "powered-lift",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 16,
+      "radiance": [
+        0.00003035010920836746,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.000028613391471980848,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.060695976500627746,
+      "referenceConvergence": 1.5496083924558543e-7
+    },
+    {
+      "name": "powered-lift",
+      "view": "oblique",
+      "x": -0.35,
+      "y": -0.1,
+      "samples": 32,
+      "radiance": [
+        0.000028730532819109642,
+        0,
+        0
+      ],
+      "referenceRadiance": [
+        0.000028613391471980848,
+        0,
+        0
+      ],
+      "relativeToReferencePeakError": 0.004093934381861121,
+      "referenceConvergence": 1.5496083924558543e-7
+    }
+  ],
+  "homogeneous": {
+    "actual": {
+      "radiance": [
+        27.190386999135498,
+        7.25076986643611,
+        3.625384933218055
+      ],
+      "transmittance": 0.8187307506379731
+    },
+    "analytic": [
+      27.190387038302724,
+      7.250769876880727,
+      3.6253849384403636
+    ],
+    "relativeError": 1.4404838433179634e-9
+  },
+  "display": {
+    "gasReferenceNits": 1000,
+    "intensity": 1,
+    "exposure": 1,
+    "toneMapping": "Reinhard per channel then sRGB; diagnostic only",
+    "backgroundCdPerM2": {
+      "day": [
+        40,
+        50,
+        70
+      ],
+      "night": [
+        0.002,
+        0.003,
+        0.005
+      ]
+    },
+    "resolution": [
+      192,
+      128
+    ],
+    "raySamples": 96
+  },
+  "images": [
+    {
+      "file": "powered-lift-rear-day.png",
+      "state": "powered-lift",
+      "view": "rear",
+      "lighting": "day",
+      "pixelsAboveDisplayWhite": 0,
+      "maxRadianceRgbCdPerM2": 0.0009317624420016415,
+      "maxLuminanceCdPerM2": 0.0001981606206515709,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "powered-lift-rear-night.png",
+      "state": "powered-lift",
+      "view": "rear",
+      "lighting": "night",
+      "pixelsAboveDisplayWhite": 0,
+      "maxRadianceRgbCdPerM2": 0.0009317624420016415,
+      "maxLuminanceCdPerM2": 0.0001981606206515709,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "powered-lift-oblique-day.png",
+      "state": "powered-lift",
+      "view": "oblique",
+      "lighting": "day",
+      "pixelsAboveDisplayWhite": 0,
+      "maxRadianceRgbCdPerM2": 0.0011230425206709184,
+      "maxLuminanceCdPerM2": 0.00023884070969439416,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "powered-lift-oblique-night.png",
+      "state": "powered-lift",
+      "view": "oblique",
+      "lighting": "night",
+      "pixelsAboveDisplayWhite": 0,
+      "maxRadianceRgbCdPerM2": 0.0011230425206709184,
+      "maxLuminanceCdPerM2": 0.00023884070969439416,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "previous-powered-lift-rear-day.png",
+      "state": "previous-powered-lift",
+      "view": "rear",
+      "lighting": "day",
+      "pixelsAboveDisplayWhite": 0,
+      "maxRadianceRgbCdPerM2": 0.05083301963893071,
+      "maxLuminanceCdPerM2": 0.011150599878848753,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "previous-powered-lift-rear-night.png",
+      "state": "previous-powered-lift",
+      "view": "rear",
+      "lighting": "night",
+      "pixelsAboveDisplayWhite": 0,
+      "maxRadianceRgbCdPerM2": 0.05083301963893071,
+      "maxLuminanceCdPerM2": 0.011150599878848753,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "previous-powered-lift-oblique-day.png",
+      "state": "previous-powered-lift",
+      "view": "oblique",
+      "lighting": "day",
+      "pixelsAboveDisplayWhite": 0,
+      "maxRadianceRgbCdPerM2": 0.05393828103608152,
+      "maxLuminanceCdPerM2": 0.01183176199526527,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "previous-powered-lift-oblique-night.png",
+      "state": "previous-powered-lift",
+      "view": "oblique",
+      "lighting": "night",
+      "pixelsAboveDisplayWhite": 0,
+      "maxRadianceRgbCdPerM2": 0.05393828103608152,
+      "maxLuminanceCdPerM2": 0.01183176199526527,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "ab-onset-rear-day.png",
+      "state": "ab-onset",
+      "view": "rear",
+      "lighting": "day",
+      "pixelsAboveDisplayWhite": 0,
+      "maxRadianceRgbCdPerM2": 420.8892658814302,
+      "maxLuminanceCdPerM2": 313.3051595278799,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "ab-onset-rear-night.png",
+      "state": "ab-onset",
+      "view": "rear",
+      "lighting": "night",
+      "pixelsAboveDisplayWhite": 0,
+      "maxRadianceRgbCdPerM2": 420.8892658814302,
+      "maxLuminanceCdPerM2": 313.3051595278799,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "ab-onset-oblique-day.png",
+      "state": "ab-onset",
+      "view": "oblique",
+      "lighting": "day",
+      "pixelsAboveDisplayWhite": 0,
+      "maxRadianceRgbCdPerM2": 517.9844305086841,
+      "maxLuminanceCdPerM2": 370.9858973800225,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "ab-onset-oblique-night.png",
+      "state": "ab-onset",
+      "view": "oblique",
+      "lighting": "night",
+      "pixelsAboveDisplayWhite": 0,
+      "maxRadianceRgbCdPerM2": 517.9844305086841,
+      "maxLuminanceCdPerM2": 370.9858973800225,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "previous-ab-onset-rear-day.png",
+      "state": "previous-ab-onset",
+      "view": "rear",
+      "lighting": "day",
+      "pixelsAboveDisplayWhite": 0,
+      "maxRadianceRgbCdPerM2": 322.925427920385,
+      "maxLuminanceCdPerM2": 206.7210347181065,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "previous-ab-onset-rear-night.png",
+      "state": "previous-ab-onset",
+      "view": "rear",
+      "lighting": "night",
+      "pixelsAboveDisplayWhite": 0,
+      "maxRadianceRgbCdPerM2": 322.925427920385,
+      "maxLuminanceCdPerM2": 206.7210347181065,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "previous-ab-onset-oblique-day.png",
+      "state": "previous-ab-onset",
+      "view": "oblique",
+      "lighting": "day",
+      "pixelsAboveDisplayWhite": 0,
+      "maxRadianceRgbCdPerM2": 93.18178065493757,
+      "maxLuminanceCdPerM2": 59.6504099100562,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "previous-ab-onset-oblique-night.png",
+      "state": "previous-ab-onset",
+      "view": "oblique",
+      "lighting": "night",
+      "pixelsAboveDisplayWhite": 0,
+      "maxRadianceRgbCdPerM2": 93.18178065493757,
+      "maxLuminanceCdPerM2": 59.6504099100562,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "ab-sustained-rear-day.png",
+      "state": "ab-sustained",
+      "view": "rear",
+      "lighting": "day",
+      "pixelsAboveDisplayWhite": 3196,
+      "maxRadianceRgbCdPerM2": 12389.964107679847,
+      "maxLuminanceCdPerM2": 10185.989473340032,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "ab-sustained-rear-night.png",
+      "state": "ab-sustained",
+      "view": "rear",
+      "lighting": "night",
+      "pixelsAboveDisplayWhite": 3188,
+      "maxRadianceRgbCdPerM2": 12389.964107679847,
+      "maxLuminanceCdPerM2": 10185.989473340032,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "ab-sustained-oblique-day.png",
+      "state": "ab-sustained",
+      "view": "oblique",
+      "lighting": "day",
+      "pixelsAboveDisplayWhite": 337,
+      "maxRadianceRgbCdPerM2": 15678.703335321641,
+      "maxLuminanceCdPerM2": 12294.56640133489,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "ab-sustained-oblique-night.png",
+      "state": "ab-sustained",
+      "view": "oblique",
+      "lighting": "night",
+      "pixelsAboveDisplayWhite": 332,
+      "maxRadianceRgbCdPerM2": 15678.703335321641,
+      "maxLuminanceCdPerM2": 12294.56640133489,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "previous-ab-sustained-rear-day.png",
+      "state": "previous-ab-sustained",
+      "view": "rear",
+      "lighting": "day",
+      "pixelsAboveDisplayWhite": 2756,
+      "maxRadianceRgbCdPerM2": 412162.2939290784,
+      "maxLuminanceCdPerM2": 195407.5190788381,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "previous-ab-sustained-rear-night.png",
+      "state": "previous-ab-sustained",
+      "view": "rear",
+      "lighting": "night",
+      "pixelsAboveDisplayWhite": 2748,
+      "maxRadianceRgbCdPerM2": 412162.2939290784,
+      "maxLuminanceCdPerM2": 195407.5190788381,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "previous-ab-sustained-oblique-day.png",
+      "state": "previous-ab-sustained",
+      "view": "oblique",
+      "lighting": "day",
+      "pixelsAboveDisplayWhite": 1241,
+      "maxRadianceRgbCdPerM2": 149656.36227624718,
+      "maxLuminanceCdPerM2": 70952.58106980877,
+      "clippedEncodedChannels": 0
+    },
+    {
+      "file": "previous-ab-sustained-oblique-night.png",
+      "state": "previous-ab-sustained",
+      "view": "oblique",
+      "lighting": "night",
+      "pixelsAboveDisplayWhite": 1237,
+      "maxRadianceRgbCdPerM2": 149656.36227624718,
+      "maxLuminanceCdPerM2": 70952.58106980877,
+      "clippedEncodedChannels": 0
+    }
+  ],
+  "baselineComparison": {
+    "sourceManifest": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/optics/f135-exhaust-lut.manifest.json",
+    "description": "Retained native global RGB/extinction and old contracting density, with the old eight-lobe mask averaged over angle; legacy angular detail and PNG quantization omitted. Same six-metre framing and same display for old/new. This comparison isolates uniform source chromaticity, not a screenshot reproduction.",
+    "oldSupportMeters": [
+      {
+        "name": "cold",
+        "length": 1.2000000000000002
+      },
+      {
+        "name": "idle",
+        "length": 1.2000000000000002
+      },
+      {
+        "name": "dry99",
+        "length": 1.2000000000000002
+      },
+      {
+        "name": "ab-onset",
+        "length": 6
+      },
+      {
+        "name": "ab-sustained",
+        "length": 6
+      },
+      {
+        "name": "ab-cutoff",
+        "length": 1.2000000000000002
+      },
+      {
+        "name": "powered-lift",
+        "length": 1.2000000000000002
+      },
+      {
+        "name": "shutdown",
+        "length": 1.2000000000000002
+      }
+    ],
+    "newSupportMeters": 6
+  },
+  "uniformInputCheck": {
+    "uniformPhysicalRanges": [
+      0,
+      0,
+      0
+    ],
+    "variablePhysicalRanges": [
+      0.11950456213336269,
+      0.11950456213336264,
+      0
+    ],
+    "description": "Identical temperature-retention/loading bases and zero chemical source, then an axial temperature-retention variation only; no color ramp or per-channel mask."
+  },
+  "causal": [
+    {
+      "burnedFuelFactor": 0,
+      "excitedPowerW": 0,
+      "chPowerW": 0,
+      "c2PowerW": 0
+    },
+    {
+      "burnedFuelFactor": 0.25,
+      "excitedPowerW": 1.0010762733906728,
+      "chPowerW": 0.2502690683476682,
+      "c2PowerW": 0.7508072050430046
+    },
+    {
+      "burnedFuelFactor": 0.5,
+      "excitedPowerW": 2.0021525467813457,
+      "chPowerW": 0.5005381366953364,
+      "c2PowerW": 1.5016144100860092
+    },
+    {
+      "burnedFuelFactor": 1,
+      "excitedPowerW": 4.004305093562691,
+      "chPowerW": 1.0010762733906728,
+      "c2PowerW": 3.0032288201720183
+    }
+  ],
+  "resolution": [
+    {
+      "name": "powered-lift",
+      "view": "rear",
+      "coarse": [
+        32,
+        16
+      ],
+      "refined": [
+        64,
+        64
+      ],
+      "relativeToRefinedPeakError": 0.6003210738718221,
+      "coarseRadiance": [
+        0.0007540197534275615,
+        0,
+        0
+      ],
+      "refinedRadiance": [
+        0.00047116779609936876,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "powered-lift",
+      "view": "oblique",
+      "coarse": [
+        32,
+        16
+      ],
+      "refined": [
+        64,
+        64
+      ],
+      "relativeToRefinedPeakError": 0.06864551563141671,
+      "coarseRadiance": [
+        2.3941238441495436e-11,
+        0,
+        0
+      ],
+      "refinedRadiance": [
+        2.2403348997679166e-11,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "ab-sustained",
+      "view": "rear",
+      "coarse": [
+        32,
+        16
+      ],
+      "refined": [
+        64,
+        64
+      ],
+      "relativeToRefinedPeakError": 0.05833053066859537,
+      "coarseRadiance": [
+        4632.173635765643,
+        2209.8907359397485,
+        8181.131918134871
+      ],
+      "refinedRadiance": [
+        4153.991946272757,
+        1982.608355863043,
+        8197.794259916356
+      ]
+    },
+    {
+      "name": "ab-sustained",
+      "view": "oblique",
+      "coarse": [
+        32,
+        16
+      ],
+      "refined": [
+        64,
+        64
+      ],
+      "relativeToRefinedPeakError": 0.028038046505943045,
+      "coarseRadiance": [
+        0.5227448453823975,
+        0.013569365562063063,
+        0
+      ],
+      "refinedRadiance": [
+        0.5084878396855865,
+        0.012880102964686287,
+        0
+      ]
+    }
+  ],
+  "errors": [],
+  "qualification": [
+    "Numerical SI source/field and CPU ray transfer only; image backgrounds and simple display operator are controlled diagnostics, not the app or camera reproduction.",
+    "No measured F135 particle loading, static temperature field, excited-species population or radiation efficiency calibration.",
+    "No hardware, airframe, ground, reflection or scattering appears in these field-only images. Geometry/depth acceptance is separate."
+  ]
+}

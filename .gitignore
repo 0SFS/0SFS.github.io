@@ -13,3 +13,11 @@ GOOGLE_3D_TILES.local.md
 # Python bytecode, written whenever Blender or a script imports a module.
 __pycache__/
 *.pyc
+
+# Third-party images whose reuse rights are unknown: TurboSquid previews, a
+# user-supplied reference and YouTube stills. They stay on the machine that
+# collected them; the records beside them keep each source URL and SHA-256.
+/validation/evidence/aircraft/f35b/engine-rebuild-2026-10-06/turbosquid/*.jpg
+/validation/evidence/aircraft/f35b/engine-rebuild-2026-10-06/user-reference/*.webp
+/validation/evidence/aircraft/f35b/engine-review-2026-10-06/frames/
+/validation/evidence/aircraft/f35b/night-climb-comparison-2026-10-06/*.png

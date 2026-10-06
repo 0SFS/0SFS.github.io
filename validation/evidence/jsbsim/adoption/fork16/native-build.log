@@ -1,0 +1,18 @@
+[  1%] Built target GeographicLib
+[  5%] Built target Init
+[ 17%] Built target Math
+[ 33%] Built target InputOutput
+[ 50%] Built target Models
+[ 55%] Built target Atmosphere
+[ 55%] Built target Magvar
+[ 67%] Built target Propulsion
+[ 69%] Built target Properties
+[ 71%] Built target Misc
+[ 87%] Built target FlightControl
+[ 91%] Built target Xml
+[ 92%] Built target IOStreams
+[ 96%] Built target libJSBSim
+[ 98%] Generating FGTurbineTemperatureTest.cpp
+[ 98%] Building CXX object tests/unit_tests/CMakeFiles/FGTurbineTemperatureTest1.dir/FGTurbineTemperatureTest.cpp.o
+[100%] Linking CXX executable FGTurbineTemperatureTest1
+[100%] Built target FGTurbineTemperatureTest1

@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-06",
+  "source": {
+    "url": "https://www.youtube.com/watch?v=JX-loX8NGm0",
+    "title": "F-35B AFTERBURNER AT NIGHT !!!",
+    "uploader": "spencerhughes2255",
+    "duration": 73,
+    "upload_date": "20170319",
+    "description": "2017 MCAS Yuma Air Show \nFriday March 17th, 2017 7:40pm",
+    "videoFormat": "137, 1920x1080 AVC video-only",
+    "downloadSha256": "fcf4abb45ebb4ba2abc54ce826fa302d10320655608eb837b5f50f9da94c14f6"
+  },
+  "method": "Decoded selected frames with ffmpeg 7.1, accurate input seek at stated time, one PNG frame without scale/crop/color filters. Times approximate to one source frame. Full downloaded video retained only in gitignored build working material. No GPU renderer run.",
+  "frames": [
+    {
+      "path": "climb-65p5.png",
+      "requestedSeconds": 65.5,
+      "sha256": "4d903911453826c1e46fb87abce2b78a04e78e333634687ba2f8f0026f561474"
+    },
+    {
+      "path": "climb-65p75.png",
+      "requestedSeconds": 65.75,
+      "sha256": "3c8330d39f7f1dde715a589773ad439d4c8609b5ae95b203bb992589050a02cb"
+    },
+    {
+      "path": "climb-66.png",
+      "requestedSeconds": 66.0,
+      "sha256": "d4ab2867993a9599618f2fde58abaa3056f9615bb79764c27ab05f8665609e01"
+    },
+    {
+      "path": "climb-67.png",
+      "requestedSeconds": 67.0,
+      "sha256": "d72081bb71d28e50a200d590dc526de4088863120ac94041615814e6c60d59da"
+    }
+  ],
+  "observations": [
+    "65.5s: bright tapered white/pink plume, tiny navigation lights, aircraft body largely unresolved.",
+    "65.75s: bright plume still visible.",
+    "66s: much dimmer yellow/orange tail remains; navigation lights visible.",
+    "67s: no readily discernible plume in original full frame; navigation lights remain."
+  ],
+  "interpretation": "Rapid loss of the bright plume is consistent with augmentation cutoff, not confirmed telemetry. It does not measure dry throttle, exhaust temperature, absolute emitted light or camera exposure. Both comparison videos are night footage.",
+  "limits": [
+    "No camera response/exposure/white-balance telemetry.",
+    "No engine telemetry or view-angle solution.",
+    "No physical radiance inferred from encoded pixels.",
+    "Footage provides a nondetection in this capture, not a proof of zero source emission."
+  ]
+}

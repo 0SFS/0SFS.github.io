@@ -1,0 +1,90 @@
+{
+  "out": "/Users/felg/gh/0sfs/build/f135-physical-native-sensitivity-20261006",
+  "bounds": [
+    {
+      "phase": "idle",
+      "solid": "liner",
+      "nominalEquilibriumK": 470.24609321204946,
+      "singleParameterEquilibriumRangeK": [
+        418.32378975716324,
+        525.3389615771564
+      ],
+      "nominalLocalRelaxationSeconds": 23.416073522753653,
+      "singleParameterLocalRelaxationRangeSeconds": [
+        11.708036761376826,
+        46.832147045507305
+      ]
+    },
+    {
+      "phase": "idle",
+      "solid": "core",
+      "nominalEquilibriumK": 622.2773037036338,
+      "singleParameterEquilibriumRangeK": [
+        531.6617312264741,
+        711.4696707477294
+      ],
+      "nominalLocalRelaxationSeconds": 7.281024862380926,
+      "singleParameterLocalRelaxationRangeSeconds": [
+        3.640512431190463,
+        14.562049724761852
+      ]
+    },
+    {
+      "phase": "dry",
+      "solid": "liner",
+      "nominalEquilibriumK": 664.071071108762,
+      "singleParameterEquilibriumRangeK": [
+        566.5324083271744,
+        767.4746340729682
+      ],
+      "nominalLocalRelaxationSeconds": 8.934699516550031,
+      "singleParameterLocalRelaxationRangeSeconds": [
+        4.467349758275016,
+        17.869399033100063
+      ]
+    },
+    {
+      "phase": "dry",
+      "solid": "core",
+      "nominalEquilibriumK": 956.7228132202708,
+      "singleParameterEquilibriumRangeK": [
+        866.3169298421003,
+        1045.8786945495776
+      ],
+      "nominalLocalRelaxationSeconds": 2.715658109328774,
+      "singleParameterLocalRelaxationRangeSeconds": [
+        1.357829054664387,
+        5.431316218657548
+      ]
+    },
+    {
+      "phase": "ab",
+      "solid": "liner",
+      "nominalEquilibriumK": 1270.438893598703,
+      "singleParameterEquilibriumRangeK": [
+        999.7629320257472,
+        1539.1936732374597
+      ],
+      "nominalLocalRelaxationSeconds": 7.078297501112204,
+      "singleParameterLocalRelaxationRangeSeconds": [
+        3.539148750556102,
+        14.156595002224408
+      ]
+    },
+    {
+      "phase": "ab",
+      "solid": "core",
+      "nominalEquilibriumK": 960.0948913484276,
+      "singleParameterEquilibriumRangeK": [
+        869.6966294951378,
+        1049.244504874599
+      ],
+      "nominalLocalRelaxationSeconds": 2.694124398602387,
+      "singleParameterLocalRelaxationRangeSeconds": [
+        1.3470621993011935,
+        5.388248797204774
+      ]
+    }
+  ],
+  "cases": 108
+}

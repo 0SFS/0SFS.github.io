@@ -1,0 +1,141 @@
+{
+  "schema": "0sfs-f135-exhaust-source-correction/1",
+  "date": "2026-10-06",
+  "implementationStatus": "Corrected unsupported source assumptions and extended continuous thermal support; physical appearance objective remains open",
+  "softwareChecks": "passed",
+  "numericalApproximationChecks": "passed within the stated domains",
+  "physicalSourceQualified": false,
+  "visualAppearanceAccepted": false,
+  "gpuExecutionQualified": false,
+  "nativeContract": {
+    "meaning": "imposed EGT-based constant-cp enthalpy-mixture gas bath proxy, not established static or total nozzle-exit temperature",
+    "retainedRowsAudited": 4171,
+    "maximumReconstructionErrorK": 1.1368683772161603e-13,
+    "report": "native/report.json"
+  },
+  "sourceCorrection": {
+    "modeOnlyFieldAndPowerExactlyInvariant": true,
+    "extraMachConversionRemoved": true,
+    "chemicalSourceStatus": "unavailable; numerical zero is not a measured physical zero",
+    "formerExteriorFuelFractionRemoved": true,
+    "hueBan": false,
+    "renderTimeStartupFade": false,
+    "dryBrightnessBoost": false,
+    "particleTemperature": "imposed gas-bath boundary hypothesis, not measured particle temperature",
+    "interiorHypothesis": "homogeneous continuation of exit source through actual rigid duct support, not an augmentor chemistry solution",
+    "wholeDomainPowerBoundedOnce": true,
+    "nearbyLightUsesExteriorIntegralOnly": true,
+    "spectralTablesPrecomputed": true,
+    "geometryWeightsCached": true
+  },
+  "acceptanceCriteria": [
+    {
+      "requirement": "Temperature meaning before expansion",
+      "result": "Native audit completed; unsupported consumer expansion removed. Physical exit flow state remains unavailable."
+    },
+    {
+      "requirement": "AB-only assumed Mach change",
+      "result": "Removed; exact source byte/power invariance at frozen physical inputs verified."
+    },
+    {
+      "requirement": "Emission location/strength/spectrum",
+      "result": "Unsupported exterior chemical allocation removed; supported particle transfer remains provisional. Quantitative chemical source is unavailable, so physical appearance is open."
+    },
+    {
+      "requirement": "Dry powered lift and deck illumination",
+      "result": "Investigated separately using native dry state, posed gas projections and receiver bounds. AB inhibit preserved; observed free-jet and deck light remain unexplained."
+    },
+    {
+      "requirement": "Interior/nozzle/exterior continuity",
+      "result": "36 posed geometries and numerical source/transfer checks passed. Optional depth clipping implemented; actual GPU execution remains unqualified."
+    },
+    {
+      "requirement": "Rear/oblique day/night appearance",
+      "result": "64 gas-only CPU projections retained and selected images inspected. Browser/GPU comparison was not authorized; visual acceptance remains open."
+    }
+  ],
+  "validation": {
+    "nativeRerun": false,
+    "nativeOrWasmBuild": false,
+    "browserOrGpuRun": false,
+    "serverStarted": false,
+    "benchmarkRun": false,
+    "cpuImageCount": 64,
+    "posedRayComparison": {
+      "relativePeakErrorLimit": 0.01,
+      "minimumReferencePeakCdM2": 1e-08,
+      "raysPerBudget": 96,
+      "referenceSteps": 4096,
+      "convergenceSteps": 2048,
+      "maximumSelectedRayError": 0.007603737608149793
+    },
+    "rayDefaultSamples": 128,
+    "rayAllowedSamples": [
+      4,
+      128
+    ],
+    "fieldDefaultSamples": [
+      64,
+      32
+    ],
+    "fieldTextureBytes": 32768,
+    "typecheck": {
+      "command": "npx tsc -b",
+      "status": "passed",
+      "log": "application/typecheck-final.log"
+    },
+    "related": {
+      "command": "npx vitest related --run --maxWorkers=50% <changed sources and added tests>",
+      "files": 66,
+      "passedTests": 789,
+      "initialFailedTimerAssertions": 2,
+      "log": "application/related-final.log",
+      "repair": "Three isolated depth regression tests passed; all final tests covered by CI",
+      "repairLog": "application/depth-regression-recheck.log"
+    },
+    "lint": {
+      "command": "npm run lint",
+      "status": "passed",
+      "log": "application/lint-final.log"
+    },
+    "ci": {
+      "command": "npm run ci",
+      "runs": 1,
+      "status": "passed",
+      "testFiles": 172,
+      "passedTests": 1841,
+      "expectedFailures": 1,
+      "log": "application/ci-final.log"
+    },
+    "testDiscovery": {
+      "files": 172,
+      "archivedSnapshotTests": 0,
+      "log": "application/test-discovery.log"
+    },
+    "finalSources": "application/inputs.json",
+    "preservation": "application/preservation.json"
+  },
+  "unresolved": [
+    "No calibrated F135 exit total/static temperature, pressure, velocity or reacting composition.",
+    "No validated excited-state production/quenching/populations or particle size/loading/temperature distribution.",
+    "Dry powered-lift native thermal proxy does not resolve shaft-extraction heat balance.",
+    "Homogeneous interior and reduced exterior mixing are hypotheses; no transient gas transport or impingement solver.",
+    "Unlit raster terrain does not receive the approximate point light; hot-metal/deck scattering and heating are not implemented.",
+    "128-step error bound covers the selected CPU rays only; GPU cost, shader/depth execution and actual camera/HDR output remain unqualified.",
+    "Corrected early-AB/dry CPU images remain nearly black at recorded exposure, and sustained-AB images show substantial display compression. The user-reported appearance requirements remain open."
+  ],
+  "records": {
+    "native": {
+      "path": "native/acceptance.json",
+      "sha256": "898c6586831061f9745b6f989429d3e39e5e8782f96a368cb54bec247402c568"
+    },
+    "numerical": {
+      "path": "numerical/acceptance.json",
+      "sha256": "575ab6b47fb41a2da14a587fd321e895c4a4239eea2945957cde91746a2e33d7"
+    },
+    "geometryOptics": {
+      "path": "geometry-optics-acceptance.json",
+      "sha256": "f2910cde0081c2fe758a8fb0f50875ba7c1d076ddc3bcaabd312cc2fc857d032"
+    }
+  }
+}

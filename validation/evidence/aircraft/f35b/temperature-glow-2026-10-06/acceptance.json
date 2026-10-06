@@ -1,0 +1,251 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-06T06:10:10.515Z",
+  "scope": "Temperature-driven 3D nozzle-interior hardware glow, read-only native turbine temperature observation, reusable unit-aware aircraft metadata and offline thermal lookup.",
+  "status": "software checks passed; rendered thermal brightness not newly GPU-qualified",
+  "behavior": [
+    "Read declared native engine temperature in the existing create:false property batch and convert Celsius/Fahrenheit/Kelvin to Kelvin.",
+    "Interpolate the offline 64-sample 300–1400 K Planck/CIE table; running, fuel flow, power, afterburner and flame flicker do not gate the hardware emission.",
+    "Observe ordinary native shutdown cooldown; hold unchanged observations without an independent clock or repeated lookup.",
+    "Temperature-only changes and visible warm-material disposal request a frame; missing thermal observations restore the original emissive color.",
+    "Existing enable, intensity, distance, attachment visibility, material isolation and readiness gates remain in effect."
+  ],
+  "checks": {
+    "typecheck": {
+      "command": "npx tsc -b",
+      "exitCode": 0,
+      "log": "typecheck.log",
+      "note": "Final source also typechecked in full CI."
+    },
+    "related": {
+      "command": "npx vitest related --run --maxWorkers=50% <thermal sources and tests>",
+      "log": "related.log",
+      "initial": {
+        "exitCode": 1,
+        "passed": 736,
+        "failed": 1,
+        "files": 61
+      },
+      "correction": "Added the new egt-degc read to the existing app integration fixture and asserted no writes.",
+      "rerun": {
+        "command": "npx vitest run --maxWorkers=50% src/flight/createFlightSimApp.test.ts",
+        "exitCode": 0,
+        "passed": 51,
+        "log": "app-fixture-rerun.log"
+      }
+    },
+    "lint": {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "log": "lint.log"
+    },
+    "ci": {
+      "command": "npm run ci",
+      "exitCode": 0,
+      "log": "ci.log",
+      "passed": 1749,
+      "expectedFailures": 1,
+      "files": 162,
+      "fullRuns": 1,
+      "expectedFailure": "Existing F-35B main-strut exterior-envelope case."
+    },
+    "nativeSdk": {
+      "record": "../../../jsbsim/adoption/fork12-adoption.json",
+      "sha256": "903748673fe66426415124f2ff5ed4ea7c6835fd2c20d6ef1fb3a6c440d07c2d",
+      "nativeTests": 3,
+      "sdkTests": 52,
+      "installedIdentityTests": 55,
+      "verifiedFiles": 14
+    },
+    "bake": {
+      "record": "bake-acceptance.json",
+      "sha256": "f04f7bff9f4a9a4b6ec2468591fccf38e7809b01b62d0085e936d217af8792dd",
+      "plumeTextureByteIdentical": true
+    },
+    "gpu": {
+      "run": false,
+      "note": "Future headless fixture updated and syntax checked. Prior GPU receipts cover the old power-driven glow, not this thermal brightness."
+    }
+  },
+  "nativeSample": {
+    "coldC": 13.018894981694396,
+    "preShutdownC": 733.2188949880485,
+    "firstStoppedC": 733.1580616547152,
+    "after15SecondsStoppedC": 623.7188949880458
+  },
+  "limitations": [
+    "Generic native gas EGT is a provisional proxy, not measured F135 nozzle-metal temperature; no wall thermal inertia or absolute optical calibration.",
+    "Native running EGT has no extra afterburner heating; native startup/Trim/reset discontinuities remain visible and recorded in the adoption trace.",
+    "No new GPU, device performance or visual-brightness qualification; afterburner/smoke texture bytes remain unchanged."
+  ],
+  "artifactPathBase": "repository root",
+  "artifacts": [
+    {
+      "path": "src/flight/aircraft/aircraftCatalog.ts",
+      "bytes": 17670,
+      "sha256": "0eb9a9d48dbb05ee4025d228bc353944dd8a265eb57370b8dfdf85f22d02ff3e"
+    },
+    {
+      "path": "src/flight/aircraft/createAircraftEngineVisuals.ts",
+      "bytes": 10567,
+      "sha256": "e4816be2c8469f8fb6d4a611f09ff9366d85e87cb1e8c09c5395a1a48e573992"
+    },
+    {
+      "path": "src/flight/aircraft/createAircraftEngineVisuals.test.ts",
+      "bytes": 11830,
+      "sha256": "57f8e0964ec4a6598185d90762559bacb3f17bfae80163524e8476e87b97feeb"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineExhaust.ts",
+      "bytes": 21037,
+      "sha256": "e5e3d204f8e025d80109dde78ba13cf7a3079ecb9139f4af024170ff640ed8ff"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineExhaust.test.ts",
+      "bytes": 21701,
+      "sha256": "23eb3f7aa97374aaec480b8963fc750396bc98d32d92a9bc085768046406fe33"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineHotSurfaceGlow.ts",
+      "bytes": 8011,
+      "sha256": "7d0a829e68146cee6aeeb05ff391b11efe4d3938e5d0674d9aeb760050fb5277"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineHotSurfaceGlow.test.ts",
+      "bytes": 10747,
+      "sha256": "96c00ecdbafbf5b600f8b6dc19294a93437355af5fef3b18d676ce2a3ec95ffb"
+    },
+    {
+      "path": "src/flight/aircraft/engineExhaustProfiles.ts",
+      "bytes": 1808,
+      "sha256": "99865beab7bdf04ce30be809a6c5b24b68a02ec41ba74975fbfc7bb138dfe8b3"
+    },
+    {
+      "path": "src/flight/createFlightSimApp.test.ts",
+      "bytes": 95999,
+      "sha256": "f6f13ec31f2b0277951e528cb3cd9c60be3a035762bebf93aa9830f5f72590a9"
+    },
+    {
+      "path": "scripts/build-exhaust-optics.mjs",
+      "bytes": 6127,
+      "sha256": "731c0d500e671db57a83b11ac6b514b6e8cca7439e611d88740d5491859db83d"
+    },
+    {
+      "path": "scripts/build-exhaust-optics.test.mjs",
+      "bytes": 8892,
+      "sha256": "c76840fa2162f668bb347909af509a6d324fe56e0194348bce999a8e6910c1c4"
+    },
+    {
+      "path": "scripts/exhaustOptics/bake.mjs",
+      "bytes": 9558,
+      "sha256": "181045d640d768619d9286aabd130581ad0f0ac5c4d535ca05b03f23eec40c9a"
+    },
+    {
+      "path": "scripts/exhaustOptics/f135-visible-approximation.json",
+      "bytes": 6705,
+      "sha256": "abd39171749ca2f24ae2974fc513d3f205d97e4c527fcc481da2894194e54799"
+    },
+    {
+      "path": "scripts/validation/f35b/check-exhaust-headless.mjs",
+      "bytes": 34560,
+      "sha256": "c8d1114136099330f1e0d18762b9afa2cb3075f0f7af666ad5fd24f1494a0764"
+    },
+    {
+      "path": "scripts/validation/aircraft/check-turbine-temperature.mjs",
+      "bytes": 6296,
+      "sha256": "2d85fd926f99f04bb0d5dd56ef1542e533e3a25631ac64c50c44eb66af29e112"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135ExhaustOpticalData.ts",
+      "bytes": 5211,
+      "sha256": "2c234f513e8f688c9d67c93d8aac34297003b49df367dc118e63395f35028df1"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.png",
+      "bytes": 2856,
+      "sha256": "208ae6cb513beedeb2a5e2b1f0f2ca17952ca66c2ca682733570e3f469af39a6"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json",
+      "bytes": 15119,
+      "sha256": "bcb2a9c4045bfbb4ec5f75b3806bdf3b26ca06ceb42ad563ab4002ce7ad50b10"
+    },
+    {
+      "path": "src/flight/aircraft/generated/engine-smoke-flipbook.manifest.json",
+      "bytes": 1489,
+      "sha256": "8eea7a8149b3fa3e8e76a06a4599bfa0566df3e53fc0c0525d600f009114072c"
+    },
+    {
+      "path": "package.json",
+      "bytes": 2546,
+      "sha256": "390f8d044d1552a2835e37589040c2e5fcdddb4f307475bda71ab7d94f95b291"
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 172661,
+      "sha256": "4a8c2bd8df8c0e4554f3ea15173aebfb83e41c83c64669cd9d2124a87acb7a8c"
+    },
+    {
+      "path": "src/flight/jsbsim/jsbsimBuildIdentity.ts",
+      "bytes": 5424,
+      "sha256": "7ba9a5bce95512b3030706847a96c6d7963923b42ec73ce563ef3e63ac0465a4"
+    },
+    {
+      "path": "src/flight/jsbsim/jsbsimBuildIdentity.test.ts",
+      "bytes": 5751,
+      "sha256": "e57963bb9cbbaa083f6d32523adb7bf4b16a16f7b6c64076b1c1ed4afe2b724c"
+    },
+    {
+      "path": "scripts/verify-jsbsim-artifact.test.mjs",
+      "bytes": 11729,
+      "sha256": "41f555267c903ebfc8043a56b151a0e1e1c9a2dce7c58a8d75dfe4312a121a20"
+    },
+    {
+      "path": "docs/jsbsim.md",
+      "bytes": 42188,
+      "sha256": "9948297b7e05ca26eb320b0ff00bb7841b75352d2f646f80549f270b4e991e98"
+    },
+    {
+      "path": "docs/proposals/f35b-fdm.md",
+      "bytes": 40588,
+      "sha256": "d3daf8324e473aee1d87d688867f7e26be79c71a8c9e062a4d9533508a529360"
+    },
+    {
+      "path": "planes/Lockheed_Martin_F-35B/README.md",
+      "bytes": 11984,
+      "sha256": "6c89e1baa562e7b8758f9f38d1edb86e04553d005296092552597fbfd1635e78"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "typecheck.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "related.log",
+      "bytes": 21286,
+      "sha256": "53465b45eac9b6083b97ab6322cd9dfb6c0d14ff975a86f864af88b5a396fc28"
+    },
+    {
+      "path": "app-fixture-rerun.log",
+      "bytes": 9189,
+      "sha256": "93ade4cdf76d6ac32b4024dc91ca056814165898fb0b451dbf6f7fce5963c708"
+    },
+    {
+      "path": "lint.log",
+      "bytes": 109,
+      "sha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e"
+    },
+    {
+      "path": "ci.log",
+      "bytes": 79345,
+      "sha256": "2f31941b3771e397365996009d92e5c768a0a627f62cf7c9c2c74a204debe564"
+    },
+    {
+      "path": "bake-acceptance.json",
+      "bytes": 4592,
+      "sha256": "f04f7bff9f4a9a4b6ec2468591fccf38e7809b01b62d0085e936d217af8792dd"
+    }
+  ]
+}

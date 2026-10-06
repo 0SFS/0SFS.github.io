@@ -50,6 +50,8 @@ export interface AircraftModelOptions {
   lodId: AircraftLodId;
   /** Debug override: draw wheel/arm geometry even with the native gear fully stowed. */
   renderStowedGear?: boolean;
+  /** Initial isolated view of catalog-declared engine-test assemblies; preserves their hierarchy. */
+  engineOnly?: boolean;
   /** Chase distance drives "auto" level selection. */
   getChaseDistanceMeters?(): number;
   onStateChange?(state: AircraftModelState): void;
@@ -93,9 +95,11 @@ interface LoadedModel {
   key: string;
   lodId: AircraftLodMeshId;
   triangles: number;
-  container: AssetContainer;
+  containers: AssetContainer[];
   holder: TransformNode;
   stowedGearMeshes: { mesh: AbstractMesh; originalVisibility: boolean }[];
+  /** Null for the normal view; otherwise only these meshes can become visible. */
+  engineTestMeshes: ReadonlySet<AbstractMesh> | null;
 }
 
 /**
@@ -149,7 +153,7 @@ export function createAircraftModel(
   };
 
   const disposeModel = (model: LoadedModel): void => {
-    model.container.dispose();
+    for (const container of model.containers) container.dispose();
     model.holder.dispose();
   };
 
@@ -172,7 +176,8 @@ export function createAircraftModel(
     const hidden = !renderStowedGear && actualGearDownNorm === 0;
     let changed = false;
     for (const { mesh, originalVisibility } of model.stowedGearMeshes) {
-      const visible = !hidden && originalVisibility;
+      const visible = !hidden && originalVisibility
+        && (model.engineTestMeshes === null || model.engineTestMeshes.has(mesh));
       if (mesh.isVisible === visible) continue;
       mesh.isVisible = visible;
       changed = true;
@@ -189,15 +194,50 @@ export function createAircraftModel(
     publish({ status: "loading", error: null, download: { lodId, loaded: 0, total: null, chosen } });
 
     let loaded: LoadedModel | null = null;
+    let preparedRig: AircraftRig | null = null;
     void (async () => {
       try {
-        const container = await loadContainer(resolveAssetUrl(path), scene, (event) => {
-          if (!isCurrent()) return;
-          publish({ download: { lodId, loaded: event.loaded, total: event.lengthComputable ? event.total : null, chosen } });
-        });
+        if (options.engineOnly && !definition.engineTestNodeNames?.length) {
+          throw new Error(`${definition.label} has no declared engine-test assembly.`);
+        }
+        const assets = definition.engineAssets;
+        const paths = assets ? options.engineOnly ? [assets.full.path] : [path, assets.installed.path] : [path];
+        const progress = paths.map(() => ({ loaded: 0, total: null as number | null }));
+        const results = await Promise.allSettled(paths.map((assetPath, index) =>
+          loadContainer(resolveAssetUrl(assetPath), scene, (event) => {
+            if (!isCurrent()) return;
+            progress[index] = { loaded: event.loaded, total: event.lengthComputable ? event.total : null };
+            publish({ download: { lodId, loaded: progress.reduce((sum, item) => sum + item.loaded, 0),
+              total: progress.every(item => item.total !== null) ? progress.reduce((sum, item) => sum + item.total!, 0) : null,
+              chosen } });
+          })));
+        const containers = results.flatMap(result => result.status === "fulfilled" ? [result.value] : []);
+        const failed = results.find(result => result.status === "rejected");
+        if (failed) {
+          for (const container of containers) container.dispose();
+          throw failed.reason;
+        }
         if (!isCurrent()) {
-          container.dispose();
+          for (const container of containers) container.dispose();
           return;
+        }
+        const meshes = containers.flatMap(container => container.meshes);
+        const nodes = containers.flatMap(container => container.transformNodes.concat(container.meshes));
+        const roots = containers.flatMap(container => container.rootNodes);
+        let engineTestMeshes: Set<AbstractMesh> | null = null;
+        if (options.engineOnly) {
+          const roots = definition.engineTestNodeNames!.map(name => nodes.find(node => node.name === name));
+          const missing = definition.engineTestNodeNames!.filter((_name, index) => roots[index] === undefined);
+          if (missing.length) {
+            for (const container of containers) container.dispose();
+            throw new Error(`Engine-test assembly missing from ${definition.label}: ${missing.join(", ")}.`);
+          }
+          engineTestMeshes = new Set(meshes.filter(mesh => roots.some(node =>
+            node !== undefined && (mesh === node || mesh.isDescendantOf(node)))));
+          if (!engineTestMeshes.size) {
+            for (const container of containers) container.dispose();
+            throw new Error(`Engine-test assembly in ${definition.label} has no mesh geometry.`);
+          }
         }
         // Into the scene hidden, so its materials compile for the lights that
         // will shine on it while nothing is drawn.
@@ -206,19 +246,36 @@ export function createAircraftModel(
         holder.setEnabled(false);
         const stowedGearNames = new Set(definition.stowedGearNodeNames ?? []);
         loaded = {
-          key, lodId, triangles, container, holder,
-          stowedGearMeshes: container.meshes
+          key, lodId, triangles, containers, holder, engineTestMeshes,
+          stowedGearMeshes: meshes
             .filter(mesh => stowedGearNames.has(mesh.name) || stowedGearNames.has(mesh.name.replace(/_primitive\d+$/, "")))
             .map(mesh => ({ mesh, originalVisibility: mesh.isVisible })),
         };
-        for (const node of container.rootNodes) node.parent = holder;
-        container.addAllToScene();
+        for (const node of roots) node.parent = holder;
+        for (const container of containers) container.addAllToScene();
+        // Hide geometry only: every transform and selected ancestor stays in
+        // place for native-driven rigging, exhaust attachment and inspection.
+        // Apply before readiness/reveal so no full airframe flashes in this view.
+        if (engineTestMeshes) {
+          for (const mesh of meshes) {
+            if (!engineTestMeshes.has(mesh)) mesh.isVisible = false;
+          }
+        }
         // The aircraft is never a pick or collision target; the sim raycasts
         // terrain only, and leaving these pickable would let the chase camera
         // and the visible-mesh collision probe hit the aircraft itself.
-        for (const mesh of container.meshes) mesh.isPickable = false;
-        await whenReady(container.meshes, controller.signal);
+        for (const mesh of meshes) mesh.isPickable = false;
+        // Bind the mechanical hierarchy before preparing hidden meshes. Aperture
+        // movement only changes rigid transforms, never a material's shader layout.
+        preparedRig = bindAircraftRig(nodes, {
+          scene,
+          propellerBlades: definition.propellerBlades,
+          aircraftId: definition.id,
+          engineNozzle: definition.engineAssets?.rig,
+        });
+        await whenReady(meshes, controller.signal);
         if (!isCurrent()) {
+          disposeAircraftRig(preparedRig);
           disposeModel(loaded);
           return;
         }
@@ -231,16 +288,13 @@ export function createAircraftModel(
         // never flashes extended geometry while the native gear is stowed.
         applyGearVisibility(loaded);
         loaded.holder.setEnabled(true);
-        rig = bindAircraftRig(container.transformNodes.concat(container.meshes), {
-          scene,
-          propellerBlades: definition.propellerBlades,
-          aircraftId: definition.id,
-        });
-        options.onMeshRootsChange?.(container.rootNodes.filter((node): node is TransformNode => node instanceof TransformNode));
+        rig = preparedRig;
+        options.onMeshRootsChange?.(roots.filter((node): node is TransformNode => node instanceof TransformNode));
         pending = null;
         publish({ activeLodId: lodId, status: "ready", triangles, error: null, download: null });
         requestRender();
       } catch (error: unknown) {
+        if (preparedRig && preparedRig !== rig) disposeAircraftRig(preparedRig);
         if (loaded && shown !== loaded) disposeModel(loaded);
         if (!isCurrent()) return;
         pending = null;
@@ -287,7 +341,8 @@ export function createAircraftModel(
       publish({ activeLodId: null, triangles: null });
       requestRender();
     }
-    load(key, lod.id, lod.path, lod.triangles, chosen || !shown);
+    const triangles = definition.engineAssets && options.engineOnly ? definition.engineAssets.full.triangles : lod.triangles;
+    load(key, lod.id, lod.path, triangles, chosen || !shown);
   };
 
   apply(true);

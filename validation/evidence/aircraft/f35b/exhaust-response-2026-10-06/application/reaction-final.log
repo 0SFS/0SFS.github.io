@@ -1,0 +1,9 @@
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+
+ Test Files  2 passed (2)
+      Tests  8 passed (8)
+   Start at  16:44:54
+   Duration  485ms (transform 161ms, setup 0ms, import 188ms, tests 325ms, environment 0ms)
+

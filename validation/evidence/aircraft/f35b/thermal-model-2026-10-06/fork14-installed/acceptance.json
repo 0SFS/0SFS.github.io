@@ -1,0 +1,117 @@
+{
+  "schema": "0sfs-turbine-thermal-acceptance/1",
+  "artifact": {
+    "schemaVersion": 1,
+    "identity": {
+      "schemaVersion": 2,
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.14"
+      },
+      "native": {
+        "origin": "https://github.com/Felipegalind0/jsbsim",
+        "commit": "399a5173fb5d597f499103df8611a2132945f4a8",
+        "contentSha256": "1783bae2c7379e18e2435c3385d56f5c857553ebd9a0bd3278b9d48a55f9cc3a",
+        "dirty": false
+      },
+      "sdk": {
+        "commit": "399a5173fb5d597f499103df8611a2132945f4a8",
+        "contentSha256": "044ebb2a6d6ff33f23ec3b7aac47b8c8b7c27775844a7c51d2b462c00321ab8e",
+        "dirty": false,
+        "path": "wasm"
+      },
+      "build": {
+        "mode": "in-tree",
+        "inputSha256": "917dffaef91d7279fdcbcbf1b5bcee356e8381005e1eb73720a75a4f8f708906",
+        "toolchain": {
+          "node": "v26.8.2",
+          "npm": "11.19.1",
+          "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+          "cmake": "cmake version 4.4.3",
+          "clang": "clang version 24.0.0git",
+          "platform": "darwin",
+          "arch": "arm64",
+          "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+        },
+        "options": {
+          "buildType": "Release",
+          "cxxStandard": 17,
+          "sdkTarget": "es2022"
+        }
+      }
+    },
+    "files": {
+      "index.d.ts": "3b39572862a0e3c8ceabb81f32f159f9af7e6b61bd8f2332eb6629dc5796d83d",
+      "index.js": "b357c19e8168dde6368276eb80fb63840e53df5f17007aee0357fd1c7d453618",
+      "index.js.map": "ef228f9ed0a261ae8472866f280b4f35a454410982a86fa2413d54d5db2aff7e",
+      "licenses/README.txt": "d88e0fd70e7a622d677f1931690bcf386022cd569cd84175ca5c223c51bff926",
+      "licenses/jsbsim/AUTHORS": "ca8556894da80f81f773893a9c1009021aac2972d7bb6a39c2f981b4fd00aa9a",
+      "licenses/jsbsim/COPYING": "1e7e6bae5a5bde32f1ae5a7c37a082d1ab03cf89354f7f936ac40be9e39a6531",
+      "licenses/jsbsim/src/GeographicLib/LICENSE.txt": "90d25298be0c5d7f5219ae20009d18910150b3a4ea0ca86dda5df04cfb8d3823",
+      "licenses/jsbsim/src/simgear/xml/COPYING": "8c6b5b6de8fae20b317f4992729abc0e520bfba4c7606cd1e9eeb87418eebdec",
+      "licenses/sdk-LICENSE": "15e2d343fc930439fb82351d7c30f3d151b4c42ca3132c13ff1a60da527a1259",
+      "wasm.d.ts": "b7bbbab6f5e6b0b297dfeff117351e53d4d8598fecde7e805ea9aee7b2923353",
+      "wasm.js": "758d98989301d86ec3aa589fa851d6416b305eca58bb1e6b9579780ea339e09b",
+      "wasm.js.map": "d75a89efd5b3cf07ebfbe70d321f55c01bd8cdde1be50a15d1dcfad21a7ca763",
+      "wasm/jsbsim_wasm.mjs": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+      "wasm/jsbsim_wasm.wasm": "1221e1ff73a0105744048bf223d413f0274803e3ba383a0009945d029a505260"
+    },
+    "validation": {
+      "status": "passed",
+      "commands": [
+        "tsc --noEmit (frozen SDK workspace)",
+        "node --test --test-concurrency=5 test/*.test.mjs (frozen SDK workspace and resolved native fixtures)"
+      ]
+    },
+    "packageArchive": {
+      "path": "deps/felipegalind0-jsbsim-1.2.4-fork.14.tgz",
+      "sha256": "02a1080dc325f2fff399d94b38aff03dee8e8ac12cfc32ce1398910c5bf84485",
+      "integrity": "sha512-w6wUocxKygI0kM3N3z8eEXyERKhwlkVZG7EucU6JXatbyqBajH4qDtHpQtA4YYAjXebc8kgdQmFQyD4vdBuTzg=="
+    }
+  },
+  "installedQualification": {
+    "report": "installed-report.json",
+    "passed": true,
+    "scenarios": 8,
+    "boundEvaluations": 2640,
+    "maxBurnedLimitErrorKgSec": 2.6645352591003757e-15,
+    "sourceIdentityStable": true
+  },
+  "applicationRegressions": {
+    "command": "npx vitest run --maxWorkers=50% src/flight/physics/safeFlightState.test.ts src/flight/jsbsim/resetFlightLocation.test.ts src/flight/hud/engineMonitorModel.test.ts src/flight/hud/engineMonitor.test.ts",
+    "log": "application-thermal.log",
+    "testFilesPassed": 4,
+    "testsPassed": 52
+  },
+  "retainedFiles": {
+    "installed-report.json": {
+      "bytes": 196818,
+      "sha256": "d308f3b739e27ce8ea03faf752312154056fafb76bb601ec2a778707e7b2d50a"
+    },
+    "installed-sdk.log": {
+      "bytes": 13487,
+      "sha256": "e2676caf91f109723f655de053cf4ac79968be854e47647011ea3ee2a0606a8a"
+    },
+    "application-helpers.mjs": {
+      "bytes": 110415,
+      "sha256": "b1ef06a47e8f7c2c11d1707b01017c5357a7a6e605b3f39faedf7cd08c355a07"
+    },
+    "installed-check.log": {
+      "bytes": 1078,
+      "sha256": "c90af9db25713d311bca747a32d1e4ee8a46fe619e5ff8b69b4c67841af94624"
+    },
+    "application-thermal.log": {
+      "bytes": 388,
+      "sha256": "811cea4b44115245cfaed0d9ef6578c510f793b92263ebe246979dc119e161fd"
+    }
+  },
+  "browserLoadedAssetsVerified": false,
+  "fullAppCiExecutedByThisRecord": false,
+  "limitations": [
+    "Actual installed SDK and public F135 dependency; inputs are provisional aircraft configuration, not measured F135 station, material or cooling parameters.",
+    "Native hold-down isolates thermal lifecycle from flight, ground/collision and structural dynamics; relocation calls are the actual app helpers.",
+    "The mass-flow input expression is read and checked against this XML schedule, not measured or inferred from a real F135. Native equation/closed-form checks are separately owned by JSBSim.",
+    "The 2% next-step continuity guard detects lost state/warm reseeding at120Hz; it is a software lifecycle guard, not a calibrated F135 heating-rate tolerance.",
+    "No browser/GPU render, timing benchmark, device qualification or physically calibrated visible-spectrum claim."
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "source": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/geometry/rejected-morph-source/F135-PW-600-installed.glb",
+  "rejected": [
+    {
+      "mesh": "F135_FlowPath",
+      "maxEdgeStrain": 0.4125002001645439,
+      "baseAreaM2": 1.5292137664933052,
+      "openAreaM2": 1.7949283841791692,
+      "areaRatio": 1.1737589756958464,
+      "rigidAcceptancePassed": false
+    },
+    {
+      "mesh": "F135_SlidingSeals",
+      "maxEdgeStrain": 0.4094303592757651,
+      "baseAreaM2": 0.21761055512473343,
+      "openAreaM2": 0.26492116369521485,
+      "areaRatio": 1.2174095302654928,
+      "rigidAcceptancePassed": false
+    },
+    {
+      "mesh": "F135_OuterPanels",
+      "maxEdgeStrain": 0.4054057181495898,
+      "baseAreaM2": 1.665001787015076,
+      "openAreaM2": 1.9028746868575455,
+      "areaRatio": 1.1428664531759543,
+      "rigidAcceptancePassed": false
+    }
+  ]
+}

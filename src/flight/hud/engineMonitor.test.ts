@@ -6,8 +6,10 @@ import { flightParameterDefaults } from "../settings/flightParameters";
 import { closestUprightRingAngle, createEngineMonitor, type EngineMonitorOptions } from "./engineMonitor";
 import { createEngineSummary, engineRotorSpeeds, type EngineSummaryView } from "./engineSummary";
 import { createEngineSpoolRenderer } from "./engineSpoolRenderer";
+import { F135_ROTOR_BLADES } from "../aircraft/engineRotorDefinitions";
 
-const orbRenderer = vi.hoisted(() => ({ draw: vi.fn(), configure: vi.fn(), destroy: vi.fn() }));
+const orbRenderer = vi.hoisted(() => ({ draw: vi.fn(), configure: vi.fn(), setAccentColor: vi.fn(), destroy: vi.fn(), canDraw: () => true,
+  getMotionStatus: vi.fn(() => ({ fps: null as number | null, maxTurnsPerSecond: null as number | null, limited: false })) }));
 vi.mock("./engineSpoolRenderer", () => ({
   createEngineSpoolRenderer: vi.fn(() => ({ ...orbRenderer, ready: Promise.resolve() })),
 }));
@@ -66,8 +68,34 @@ function memoryStorage() {
 
 describe("engine monitor", () => {
   let root: HTMLElement;
-  beforeEach(() => vi.clearAllMocks());
-  afterEach(() => root?.remove());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    orbRenderer.getMotionStatus.mockReturnValue({ fps: null, maxTurnsPerSecond: null, limited: false });
+  });
+  afterEach(() => { root?.remove(); vi.unstubAllGlobals(); vi.restoreAllMocks(); });
+
+  const animationClock = () => {
+    let time = 0;
+    let id = 0;
+    const callbacks = new Map<number, FrameRequestCallback>();
+    vi.spyOn(document, "hidden", "get").mockReturnValue(false);
+    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
+      callbacks.set(++id, callback);
+      return id;
+    });
+    vi.stubGlobal("cancelAnimationFrame", (key: number) => callbacks.delete(key));
+    return {
+      now: () => time,
+      set: (value: number) => { time = value; },
+      tick(value: number) {
+        time = value;
+        const pending = [...callbacks.values()];
+        callbacks.clear();
+        for (const callback of pending) callback(value);
+      },
+      pending: () => callbacks.size,
+    };
+  };
 
   const mount = (options: EngineMonitorOptions = {}) => {
     root ??= document.createElement("div");
@@ -81,6 +109,109 @@ describe("engine monitor", () => {
       pair.querySelector(".flight-engine__label")?.textContent,
       pair.querySelector(".flight-engine__value")?.textContent,
     ]));
+
+  it("records bounded cached native histories with separate thermal units and renders them only in the visible Engine tab", () => {
+    vi.spyOn(document, "hidden", "get").mockReturnValue(false);
+    root = document.createElement("div");
+    const monitor = mount({ definition: { kind: "turbine" } });
+    const valid = "propulsion/engine/thermal/valid";
+    const gas = "propulsion/engine/thermal/nozzle-gas-temperature-k";
+    const metal = "propulsion/engine/thermal/metal-temperature-k";
+    const reader = fakeReader({ ...sf50Values(), [gas]: 1800, [metal]: 1000,
+      [valid]: 1, "propulsion/engine/thermal/initialized": 1,
+      "propulsion/engine/nozzle-pos-norm": .3, "propulsion/engine/augmentation": 0 });
+    const read = vi.spyOn(reader, "getPropertyValue");
+    monitor.update(reader);
+    expect(read.mock.calls.filter(([path]) => path === "propulsion/engine/n1")).toHaveLength(1);
+    expect(read.mock.calls.filter(([path]) => path === valid)).toHaveLength(1);
+    expect(root.querySelector(".flight-engine__plots")).toBeNull();
+    const detach = showDetails(monitor);
+    const plot = root.querySelector<HTMLElement>(`[data-property="${metal}"]`)!;
+    const path = plot.querySelector("path")!;
+    expect(plot.querySelector("figcaption")?.textContent).toBe("Engine 1 · Nozzle metal temperature (°C)");
+    expect(plot.querySelector(".flight-engine__plot-range")?.textContent).toContain("Latest 727 °C");
+    expect(root.querySelector(`[data-property="${gas}"]`)?.textContent).toContain("1527 °C");
+    expect(root.querySelector('[data-property="propulsion/engine/nozzle-pos-norm"]')?.textContent).toContain("30.0 %");
+    const initialPath = path.getAttribute("d");
+    detach();
+    reader.values["simulation/sim-time-sec"] = 12.2;
+    reader.values[metal] = 1100;
+    monitor.update(reader);
+    expect(path.getAttribute("d")).toBe(initialPath);
+    showDetails(monitor);
+    expect(path.getAttribute("d")).not.toBe(initialPath);
+    expect(plot.querySelector(".flight-engine__plot-range")?.textContent).toContain("Latest 827 °C");
+    monitor.destroy();
+  });
+
+  it("does not add plot data or redraw unchanged traces while paused and applies zero-Hz immediately", () => {
+    vi.spyOn(document, "hidden", "get").mockReturnValue(false);
+    root = document.createElement("div");
+    const parameters = flightParameterDefaults();
+    const monitor = mount({ parameters });
+    const reader = fakeReader(sf50Values());
+    monitor.update(reader);
+    showDetails(monitor);
+    const plots = root.querySelector(".flight-engine__plots")!;
+    const observer = new MutationObserver(() => {});
+    observer.observe(plots, { subtree: true, attributes: true, childList: true, characterData: true });
+    for (let i = 0; i < 10; i++) monitor.update(reader, true);
+    expect(observer.takeRecords()).toEqual([]);
+    expect(root.querySelector('[data-section="history"]')?.textContent).toContain("1 samples");
+    const clear = [...root.querySelectorAll<HTMLButtonElement>("button")].find(button => button.textContent === "Clear history")!;
+    clear.click();
+    expect(root.querySelector('[data-section="history"]')?.textContent).toContain("0 samples");
+    for (let i = 0; i < 5; i++) monitor.update(reader, true);
+    expect(plots.querySelector("path")?.getAttribute("d")).toBe("");
+    parameters.set("osfs.engineMonitor.historyHz", 0);
+    expect(root.querySelector('[data-section="history"]')?.textContent).toContain("History capture is off.");
+    reader.values["simulation/sim-time-sec"] = 20;
+    monitor.update(reader, false);
+    expect(plots.querySelector("path")?.getAttribute("d")).toBe("");
+    observer.disconnect();
+    monitor.destroy();
+  });
+
+  it.each([false, true])("navigates the Engine test stand only on explicit click (active=%s)", active => {
+    root = document.createElement("div");
+    const onChange = vi.fn();
+    const monitor = mount({ testStand: { active, description: "Native static engine test; hold-down prevents aircraft motion.", onChange } });
+    monitor.update(fakeReader(sf50Values()));
+    showDetails(monitor);
+    expect(onChange).not.toHaveBeenCalled();
+    const button = root.querySelector<HTMLButtonElement>('[data-section="test-stand"] button')!;
+    expect(button.textContent).toBe(active ? "Return to flight" : "Open engine test stand");
+    expect(root.querySelector('[data-section="test-stand"]')?.textContent).toContain("hold-down prevents aircraft motion");
+    button.click();
+    expect(onChange).toHaveBeenCalledExactlyOnceWith(!active);
+    monitor.destroy();
+    button.click();
+    expect(onChange).toHaveBeenCalledTimes(1);
+  });
+
+  it("labels warm initialization and reinitializes only on a deliberate button click", () => {
+    root = document.createElement("div");
+    const onStart = vi.fn(), onChange = vi.fn();
+    const monitor = mount({ testStand: { active: true, description: "Engine stand",
+      onChange, initialization: { state: "running", onStart } } });
+    monitor.update(fakeReader(sf50Values(), WRITE_ONLY));
+    showDetails(monitor);
+    const section = root.querySelector('[data-section="test-stand"]')!;
+    expect(section.textContent).toContain("not a cold-start experiment");
+    const select = section.querySelector<HTMLSelectElement>("select")!;
+    expect(select.value).toBe("running");
+    select.value = "cold";
+    select.dispatchEvent(new Event("change"));
+    expect(onStart).not.toHaveBeenCalled();
+    const buttons = section.querySelectorAll<HTMLButtonElement>("button");
+    buttons[0].click();
+    expect(onStart).toHaveBeenCalledExactlyOnceWith("cold");
+    buttons[1].click();
+    expect(onChange).toHaveBeenCalledExactlyOnceWith(false);
+    monitor.destroy();
+    buttons[0].click();
+    expect(onStart).toHaveBeenCalledTimes(1);
+  });
 
   it("starts as a HUD chip with the diagram, phase under it, and padded fuel flow", () => {
     root = document.createElement("div");
@@ -107,6 +238,98 @@ describe("engine monitor", () => {
     expect(root.querySelector(".flight-engine__spools")?.hidden).toBe(false);
     expect(root.querySelector(".flight-engine__summary")?.getAttribute("aria-expanded")).toBe("false");
     expect(root.querySelector(".flight-engine__details")).toBeNull();
+  });
+
+  it("shows native exhaust-gas Celsius in Engine temperatures while the stopped engine cools", () => {
+    root = document.createElement("div");
+    const monitor = mount({ definition: { kind: "turbine" } });
+    showDetails(monitor);
+    const reader = fakeReader({
+      ...sf50Values(), "propulsion/engine/egt-degc": 720.4,
+      "propulsion/engine/set-running": 0, "propulsion/cutoff_cmd": 1,
+      "propulsion/engine/fuel-flow-rate-pps": 0,
+    }, { ...WRITE_ONLY, "propulsion/engine/egt-degc": "R" });
+    monitor.update(reader);
+    const section = root.querySelector('[data-section="temperatures"]');
+    expect(section?.querySelector("summary")?.textContent).toBe("Temperatures and oil");
+    const label = [...section!.querySelectorAll<HTMLElement>(".flight-engine__label")]
+      .find(node => node.textContent === "EGT (exhaust gas)")!;
+    expect(label.title).toContain("propulsion/engine/egt-degc");
+    expect(label.title).toContain("Modeled exhaust-gas temperature");
+    expect(label.title).toContain("not a nozzle-metal or afterburner-exit measurement");
+    expect(rows()["EGT (exhaust gas)"]).toBe("720 °C");
+    const summary = text(".flight-engine__summary");
+    reader.values["propulsion/engine/egt-degc"] = 660.6;
+    monitor.update(reader, true);
+    expect(rows()["EGT (exhaust gas)"]).toBe("661 °C");
+    expect(text(".flight-engine__summary")).toBe(summary);
+    reader.values["propulsion/engine/egt-degc"] = Number.NaN;
+    monitor.update(reader, true);
+    expect(rows()["EGT (exhaust gas)"]).toBe("n/a");
+    monitor.destroy();
+  });
+
+  it("keeps legacy Fahrenheit EGT and never reads an unpublished Celsius property", () => {
+    root = document.createElement("div");
+    const monitor = mount({ definition: { kind: "piston" } });
+    showDetails(monitor);
+    const reader = fakeReader({
+      "propulsion/engine/engine-rpm": 2200,
+      "propulsion/engine/egt-degF": 1250,
+    });
+    const read = vi.spyOn(reader, "getPropertyValue");
+    monitor.update(reader);
+    expect(rows().EGT).toBe("1250 °F");
+    expect(rows()["EGT (exhaust gas)"]).toBeUndefined();
+    expect(read).not.toHaveBeenCalledWith("propulsion/engine/egt-degc");
+    expect(rows()["Nozzle gas temperature"]).toBeUndefined();
+    expect(rows()["Nozzle metal temperature"]).toBeUndefined();
+    expect(read).not.toHaveBeenCalledWith("propulsion/engine/thermal/nozzle-gas-temperature-k");
+    expect(read).not.toHaveBeenCalledWith("propulsion/engine/thermal/metal-temperature-k");
+    monitor.destroy();
+  });
+
+  it("shows separate native nozzle gas and metal Celsius only when their thermal states are valid", () => {
+    root = document.createElement("div");
+    const monitor = mount({ definition: { kind: "turbine" } });
+    showDetails(monitor);
+    const gas = "propulsion/engine/thermal/nozzle-gas-temperature-k";
+    const metal = "propulsion/engine/thermal/metal-temperature-k";
+    const valid = "propulsion/engine/thermal/valid";
+    const initialized = "propulsion/engine/thermal/initialized";
+    const reader = fakeReader({
+      ...sf50Values(), "propulsion/engine/egt-degc": 720,
+      [gas]: 1800, [metal]: 1000, [valid]: 1, [initialized]: 0,
+    }, { [gas]: "R", [metal]: "R", [valid]: "R", [initialized]: "R" });
+    const read = vi.spyOn(reader, "getPropertyValue");
+    monitor.update(reader);
+    expect(rows()["EGT (exhaust gas)"]).toBe("720 °C");
+    expect(rows()["Nozzle gas temperature"]).toBe("1527 °C");
+    expect(rows()["Nozzle metal temperature"]).toBe("n/a");
+    expect(read).not.toHaveBeenCalledWith(metal);
+
+    reader.values[initialized] = 1;
+    read.mockClear();
+    monitor.update(reader);
+    expect(rows()["Nozzle metal temperature"]).toBe("727 °C");
+    expect(read.mock.calls.filter(([path]) => path === valid)).toHaveLength(1);
+
+    // A stale finite Kelvin value is not proof of a valid native observation.
+    reader.values[valid] = 0;
+    read.mockClear();
+    monitor.update(reader, true);
+    expect(rows()["Nozzle gas temperature"]).toBe("n/a");
+    expect(rows()["Nozzle metal temperature"]).toBe("n/a");
+    expect(read).not.toHaveBeenCalledWith(gas);
+    expect(read).not.toHaveBeenCalledWith(metal);
+    reader.values[valid] = 1;
+    reader.values[gas] = 700;
+    reader.values[metal] = 900;
+    monitor.update(reader, true);
+    expect(rows()["Nozzle gas temperature"]).toBe("427 °C");
+    expect(rows()["Nozzle metal temperature"]).toBe("627 °C");
+    expect(rows()["EGT (exhaust gas)"]).toBe("720 °C");
+    monitor.destroy();
   });
 
   it("prints 100 instead of 100.0 on the spool diagram", () => {
@@ -163,7 +386,13 @@ describe("engine monitor", () => {
     const description = "One marker per blade: N1 fan row 28; N2 core compressor rotor 40 (estimated).";
     expect(root.querySelector<HTMLElement>(".flight-engine__spools")?.title).toContain(description);
     expect(root.querySelector(".flight-engine__details")?.textContent).toContain(description);
-    expect(root.querySelector(".flight-engine__details")?.textContent).toContain("Visual speed limit 0.15 rev/s");
+    expect(root.querySelector(".flight-engine__details")?.textContent).toContain("Requested maximum: 2.00 rev/s");
+    orbRenderer.getMotionStatus.mockReturnValue({ fps: 6, maxTurnsPerSecond: 1.35, limited: true });
+    monitor.update(fakeReader(sf50Values()));
+    expect(root.querySelector(".flight-engine__details")?.textContent).toContain("full-scale display speed 1.35 rev/s");
+    expect(root.querySelector(".flight-engine__details")?.textContent).toContain("Limited to 0.45 pattern pitch per drawn frame");
+    parameters.set("osfs.engineMonitor.orbMaxPatternStep", 0.4);
+    expect(orbRenderer.configure).toHaveBeenLastCalledWith(expect.objectContaining({ maxPatternStep: 0.4 }));
     monitor.destroy();
   });
 
@@ -176,6 +405,31 @@ describe("engine monitor", () => {
     }));
     expect(text(".flight-engine__spool--n2 .flight-engine__spool-value")).toBe("69.7");
     expect(root.querySelector<HTMLElement>(".flight-engine__spools")?.title).toContain("Blade counts unavailable; numeric readouts only.");
+    monitor.destroy();
+  });
+
+  it("uses the shared accent only for confirmed native afterburner activity, independently of DOM refresh", () => {
+    root = document.createElement("div");
+    const getActive = vi.fn<() => boolean | null>(() => false);
+    const monitor = mount({ now: () => 0, refreshIntervalMs: 1000,
+      afterburner: { accentColor: "#ff9450", getActive } });
+    const reader = fakeReader({ ...sf50Values(), "fcs/throttle-cmd-norm": 1 });
+    for (const active of [false, true, null, false] as const) {
+      getActive.mockReturnValue(active);
+      monitor.update(reader);
+      expect(orbRenderer.setAccentColor).toHaveBeenLastCalledWith(active === true ? "#ff9450" : null);
+      expect(monitor.getReading()?.afterburnerColor).toBe(active === true ? "#ff9450" : undefined);
+    }
+    expect(getActive).toHaveBeenCalledTimes(4);
+    monitor.destroy();
+  });
+
+  it("retains normal blade colors when the aircraft has no afterburner", () => {
+    root = document.createElement("div");
+    const monitor = mount();
+    monitor.update(fakeReader({ ...sf50Values(), "fcs/throttle-cmd-norm": 1 }));
+    expect(orbRenderer.setAccentColor).toHaveBeenLastCalledWith(null);
+    expect(monitor.getReading()).not.toHaveProperty("afterburnerColor");
     monitor.destroy();
   });
 
@@ -195,22 +449,76 @@ describe("engine monitor", () => {
     expect(summary.spools.title).toContain("scaled model percent speed, not physical shaft RPM");
   });
 
+  it("supplies unwrapped requested motion and a full-scale reference for the client frame limit", () => {
+    root = document.createElement("div");
+    const parameters = flightParameterDefaults();
+    const clock = animationClock();
+    const monitor = mount({ parameters, now: clock.now, definition: { kind: "turbine", rotorBlades: F135_ROTOR_BLADES } });
+    const reader = fakeReader({ "simulation/sim-time-sec": 0,
+      "propulsion/engine/n1": 99, "propulsion/engine/n2": 99,
+      "propulsion/engine/MaxN1": 100, "propulsion/engine/MaxN2": 100 });
+    monitor.update(reader);
+    for (const [index, fps] of [30, 15, 60].entries()) {
+      parameters.set("osfs.engineMonitor.orbFps", fps);
+      clock.set((index + 1) * 100);
+      reader.values["simulation/sim-time-sec"] = (index + 1) * 0.1;
+      monitor.update(reader);
+      clock.tick((index + 2) * 100);
+      const expectedAngle = 2 * Math.PI * 1.98 * (index + 1) * 0.1;
+      expect(orbRenderer.draw.mock.lastCall![0].outerAngle).toBeCloseTo(expectedAngle);
+      expect(orbRenderer.draw.mock.lastCall![0].innerAngle).toBeCloseTo(expectedAngle);
+      expect(orbRenderer.draw.mock.lastCall![0].maxAngle).toBeCloseTo(2 * Math.PI * 2 * (index + 1) * 0.1);
+    }
+    monitor.destroy();
+  });
+
   it("advances orb phase with simulation time and keeps a paused engine still", () => {
     root = document.createElement("div");
-    const monitor = mount({ definition: { kind: "piston", maxRpm: 2700,
+    const clock = animationClock();
+    const monitor = mount({ now: clock.now, definition: { kind: "piston", maxRpm: 2700,
       rotorBlades: { outer: 2, inner: null, outerEstimated: false, innerEstimated: false } } });
     const reader = fakeReader({ "simulation/sim-time-sec": 0, "propulsion/engine/engine-rpm": 1350 });
     monitor.update(reader);
-    expect(orbRenderer.draw).toHaveBeenLastCalledWith({ outerAngle: 0, innerAngle: null }, expect.any(Number));
+    expect(orbRenderer.draw).toHaveBeenLastCalledWith(expect.objectContaining({ outerAngle: 0, innerAngle: null }), expect.any(Number));
+    clock.set(250);
     reader.values["simulation/sim-time-sec"] = 0.25;
     monitor.update(reader);
+    clock.tick(500);
     const advanced = { ...orbRenderer.draw.mock.lastCall![0] };
     expect(advanced.outerAngle).toBeCloseTo(Math.PI / 2);
     expect(advanced.innerAngle).toBeNull();
-    monitor.update(reader);
+    monitor.update(reader, true);
     expect(orbRenderer.draw.mock.lastCall![0]).toEqual(advanced);
+    expect(clock.pending()).toBe(0);
     monitor.destroy();
     expect(orbRenderer.destroy).toHaveBeenCalledOnce();
+  });
+
+  it("animates only the canvas between source samples and leaves unchanged readouts alone", () => {
+    root = document.createElement("div");
+    const clock = animationClock();
+    const monitor = mount({ now: clock.now, soundStatus: () => status(),
+      definition: { kind: "turbine", rotorBlades: F135_ROTOR_BLADES } });
+    const reader = fakeReader({ ...sf50Values(), "simulation/sim-time-sec": 0,
+      "propulsion/engine/MaxN1": 100, "propulsion/engine/MaxN2": 100 });
+    const reads = vi.spyOn(reader, "getPropertyValue");
+    monitor.update(reader);
+    showDetails(monitor);
+    const observer = new MutationObserver(() => {});
+    observer.observe(root, { subtree: true, childList: true, attributes: true, characterData: true });
+    clock.set(100);
+    reader.values["simulation/sim-time-sec"] = 0.1;
+    monitor.update(reader);
+    expect(observer.takeRecords()).toEqual([]);
+    const sourceReads = reads.mock.calls.length;
+    const draws = orbRenderer.draw.mock.calls.length;
+    for (let frame = 1; frame <= 12; frame++) clock.tick(100 + frame * 1000 / 120);
+    expect(orbRenderer.draw.mock.calls.length - draws).toBe(12);
+    expect(reads.mock.calls.length).toBe(sourceReads);
+    expect(observer.takeRecords()).toEqual([]);
+    expect(clock.pending()).toBe(0);
+    observer.disconnect();
+    monitor.destroy();
   });
 
   it("pads HUD thrust to four digits", () => {

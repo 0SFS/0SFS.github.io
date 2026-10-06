@@ -1,0 +1,58 @@
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+(node:70807) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:70806) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/flight/aircraft/createEngineExhaust.test.ts > shared engine exhaust renderer > uses shared exposure/tone/color processing exactly once without changing gas state (WebGPU=false)
+BJS - [15:51:35]: Babylon.js v8.56.2 - Null engine
+
+stdout | src/flight/aircraft/createEngineExhaust.test.ts > shared engine exhaust renderer > uses shared exposure/tone/color processing exactly once without changing gas state (WebGPU=true)
+BJS - [15:51:35]: Babylon.js v8.56.2 - Null engine
+
+stdout | src/flight/aircraft/createEngineExhaust.test.ts > shared engine exhaust renderer > uploads the current camera to the bound effect without a frame of view lag
+BJS - [15:51:35]: Babylon.js v8.56.2 - Null engine
+
+ ❯ src/flight/aircraft/createEngineExhaust.test.ts (33 tests | 3 failed) 48ms
+     × uses shared exposure/tone/color processing exactly once without changing gas state (WebGPU=false) 3ms
+     × uses shared exposure/tone/color processing exactly once without changing gas state (WebGPU=true) 1ms
+     × uploads the current camera to the bound effect without a frame of view lag 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/flight/aircraft/createEngineExhaust.test.ts > shared engine exhaust renderer > uses shared exposure/tone/color processing exactly once without changing gas state (WebGPU=false)
+ FAIL  src/flight/aircraft/createEngineExhaust.test.ts > shared engine exhaust renderer > uses shared exposure/tone/color processing exactly once without changing gas state (WebGPU=true)
+TypeError: effect.setVector2 is not a function
+ ❯ Observer.callback src/flight/aircraft/createEngineExhaust.ts:594:14
+    592|     if (effect) {
+    593|       effect.setVector3("cameraLocal", cameraLocal);
+    594|       effect.setVector2("depthOptions", depthOptions);
+       |              ^
+    595|       imageProcessing.bind(effect);
+    596|     }
+ ❯ Observable.notifyObservers dev/core/src/Misc/observable.ts:439:48
+ ❯ src/flight/aircraft/createEngineExhaust.test.ts:625:33
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/flight/aircraft/createEngineExhaust.test.ts > shared engine exhaust renderer > uploads the current camera to the bound effect without a frame of view lag
+TypeError: effect.setVector2 is not a function
+ ❯ Observer.callback src/flight/aircraft/createEngineExhaust.ts:594:14
+    592|     if (effect) {
+    593|       effect.setVector3("cameraLocal", cameraLocal);
+    594|       effect.setVector2("depthOptions", depthOptions);
+       |              ^
+    595|       imageProcessing.bind(effect);
+    596|     }
+ ❯ Observable.notifyObservers dev/core/src/Misc/observable.ts:439:48
+ ❯ src/flight/aircraft/createEngineExhaust.test.ts:682:35
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  3 failed | 44 passed (47)
+   Start at  15:51:34
+   Duration  728ms (transform 167ms, setup 0ms, import 1.11s, tests 53ms, environment 0ms)
+

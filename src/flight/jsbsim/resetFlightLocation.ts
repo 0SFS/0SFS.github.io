@@ -4,9 +4,14 @@ import type { AircraftId } from "../aircraft/aircraftIds";
 import { readFlightState } from "../bridge/ecefBridge";
 import type { FlightState } from "../physics/flightState";
 import { EMPTY_FLIGHT_STATE } from "../physics/flightState";
-import { captureSimulation, validFlightState } from "../physics/safeFlightState";
+import { captureSimulation, restoreEngineThermalState, validFlightState } from "../physics/safeFlightState";
 import { getFdmProfile } from "./fdmProfiles";
 import { fuelTankContentsPath, fuelTankIndices } from "./fuelTanks";
+
+export interface ResetFlightLocationOptions {
+  /** Static engine fixture: use runway geometry without applying flight controls. */
+  holdDown?: boolean;
+}
 
 /** Apply coordinates or a runway preset to the selected aircraft model. */
 export function resetFlightLocation(
@@ -14,6 +19,7 @@ export function resetFlightLocation(
   location: GeodeticLocation,
   terrainHeightMeters?: number,
   aircraftId: AircraftId = "cessna-172",
+  options: ResetFlightLocationOptions = {},
 ): FlightState {
   if (!Number.isFinite(location.latDeg) || Math.abs(location.latDeg) > 90
     || !Number.isFinite(location.lonDeg) || Math.abs(location.lonDeg) > 180
@@ -26,12 +32,17 @@ export function resetFlightLocation(
     || location.altMeters === undefined)) throw new Error("Invalid airport flight preset.");
   if (terrainHeightMeters !== undefined && !Number.isFinite(terrainHeightMeters)) throw new Error("Invalid terrain height");
   const profile = getFdmProfile(aircraftId);
-  const runway = preset ? profile.runwayPresets[preset.mode] : null;
+  const held = options.holdDown === true;
+  // A runway selection can orient a static fixture without starting its engine
+  // or replacing the throttle, conversion and other test controls.
+  const runway = preset && !held ? profile.runwayPresets[preset.mode] : null;
   const rawState = readFlightState(sdk);
   const state = validFlightState(rawState)
     ? rawState
     : { ...EMPTY_FLIGHT_STATE, altMeters: 1000, airspeedKts: 100, throttleNorm: profile.initialThrottleNorm };
   const saved = captureSimulation(sdk);
+  const controlEntries = Object.entries(saved.controls).filter(([property, value]) => Number.isFinite(value)
+    && !/^propulsion\/engine(?:\[\d+\])?\/thermal\//.test(property));
   const storeAttachments = Object.entries(saved.controls).filter(([property, value]) =>
     /^stores\/external-tank(?:\[\d+\])?\/attached$/.test(property) && Number.isFinite(value));
   const restoreStoreAttachments = (): void => {
@@ -53,8 +64,13 @@ export function resetFlightLocation(
   const restoreControlLaw = (): void => {
     if (profile.controlLaw && controlLawMode !== undefined) sdk.setPropertyValue(profile.controlLaw.commandProperty, controlLawMode);
   };
-  const departure = preset?.mode === "departure";
+  const departure = !held && preset?.mode === "departure";
   sdk.resetToInitialConditions(2);
+  if (held) sdk.setHoldDown(true);
+  // Moving the same aircraft does not make its nozzle metal cold. Restore
+  // native wall state before RunIC/InitRunning can seed a new warm engine,
+  // including runway presets which replace the pilot controls below.
+  restoreEngineThermalState(sdk, saved.controls);
   restoreStoreAttachments();
   const terrain = terrainHeightMeters ?? preset?.groundElevationMeters;
   // Unknown destination terrain must not inherit the previous airport's floor.
@@ -63,7 +79,7 @@ export function resetFlightLocation(
   // Preserve the model's static CG-to-ground height and a small settling
   // margin instead of assuming the C172's stance for every airframe.
   const clearanceMeters = profile.stance.staticMeters + 0.17;
-  const requested = departure
+  const requested = preset?.mode === "departure"
     ? (terrain ?? preset.groundElevationMeters) + clearanceMeters
     : location.altMeters ?? state.altMeters;
   const altitude = terrain === undefined ? requested : Math.max(requested, terrain + clearanceMeters);
@@ -72,14 +88,15 @@ export function resetFlightLocation(
   sdk.setPropertyValue("ic/lat-geod-deg", location.latDeg);
   sdk.setPropertyValue("ic/long-gc-deg", location.lonDeg);
   sdk.setPropertyValue("ic/psi-true-deg", preset?.headingDeg ?? state.headingRad * 180 / Math.PI);
-  const pitchDeg = runway?.pitchDeg ?? profile.initialPitchDeg ?? profile.stance.staticPitchRad * 180 / Math.PI;
+  const pitchDeg = held ? 0 : runway?.pitchDeg ?? profile.initialPitchDeg ?? profile.stance.staticPitchRad * 180 / Math.PI;
   sdk.setPropertyValue("ic/theta-deg", pitchDeg);
   sdk.setPropertyValue("ic/phi-deg", 0);
-  sdk.setPropertyValue("ic/vc-kts", runway?.airspeedKts ?? state.airspeedKts);
-  sdk.setPropertyValue("ic/gamma-deg", preset?.flightPathDeg ?? 0);
-  if (preset?.mode === "arrival") sdk.setPropertyValue("ic/alpha-deg", 6);
+  sdk.setPropertyValue("ic/vc-kts", held ? 0 : runway?.airspeedKts ?? state.airspeedKts);
+  sdk.setPropertyValue("ic/gamma-deg", held ? 0 : preset?.flightPathDeg ?? 0);
+  if (held) sdk.setPropertyValue("ic/alpha-deg", 0);
+  else if (preset?.mode === "arrival") sdk.setPropertyValue("ic/alpha-deg", 6);
   else if (!runway && profile.initialPitchDeg !== undefined) sdk.setPropertyValue("ic/alpha-deg", pitchDeg);
-  if (departure) sdk.setPropertyValue("ic/vg-fps", 0);
+  if (departure || held) sdk.setPropertyValue("ic/vg-fps", 0);
   if (runway) {
     sdk.setPropertyValue("fcs/elevator-cmd-norm", 0);
     sdk.setPropertyValue("fcs/aileron-cmd-norm", 0);
@@ -99,7 +116,7 @@ export function resetFlightLocation(
       if (contents !== undefined && Number.isFinite(contents)) sdk.setPropertyValue(path, contents);
     }
   } else {
-    for (const [property, value] of Object.entries(saved.controls)) if (Number.isFinite(value)) sdk.setPropertyValue(property, value);
+    for (const [property, value] of controlEntries) sdk.setPropertyValue(property, value);
     if (Number.isFinite(flapPosition)) sdk.setPropertyValue(profile.flapPosition.property, flapPosition);
   }
   restoreConversion();
@@ -111,7 +128,7 @@ export function resetFlightLocation(
   else sdk.setPropertyValue("propulsion/engine/set-running", 0);
   if (!runway) {
     // Reapply after native initialization, including a partially moved gear.
-    for (const [property, value] of Object.entries(saved.controls)) if (Number.isFinite(value)) sdk.setPropertyValue(property, value);
+    for (const [property, value] of controlEntries) sdk.setPropertyValue(property, value);
     if (Number.isFinite(flapPosition)) sdk.setPropertyValue(profile.flapPosition.property, flapPosition);
   } else {
     if (profile.engine === "piston") {
@@ -129,7 +146,7 @@ export function resetFlightLocation(
   if (!runway) {
     // RunIC also evaluates actuator nodes. Keep the saved physical positions
     // and controls intact until the first normal simulation step.
-    for (const [property, value] of Object.entries(saved.controls)) if (Number.isFinite(value)) sdk.setPropertyValue(property, value);
+    for (const [property, value] of controlEntries) sdk.setPropertyValue(property, value);
     if (Number.isFinite(flapPosition)) sdk.setPropertyValue(profile.flapPosition.property, flapPosition);
   }
   restoreConversion();

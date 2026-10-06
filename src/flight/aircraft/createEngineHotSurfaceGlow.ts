@@ -1,5 +1,6 @@
 import { AbstractMesh, Color3, Mesh, MultiMaterial, PBRMaterial, type BaseTexture, type Material, type TransformNode } from "@babylonjs/core";
 import { whenMeshesReady } from "foss-earth/runtime";
+import { interpolateAbsoluteEmission } from "./engineGasOptics";
 import type { EngineExhaustOpticalProfile } from "./engineExhaustProfiles";
 
 /** 0sfs owns engine thermal display on declared aircraft hardware. */
@@ -9,21 +10,33 @@ export function createEngineHotSurfaceGlow(attachment: TransformNode, names: rea
     compile?(material: PBRMaterial, mesh: AbstractMesh): Promise<void>;
   } = {}) {
   const samples = profile.surfaceEmission?.samples;
+  const temperatures = profile.surfaceEmission?.temperatureKelvinRange;
   if (!samples || samples.length < 2 || samples.some(sample => sample.length !== 3
     || sample.some(value => !Number.isFinite(value) || value < 0))) {
     throw new Error("Declared hot engine hardware needs a finite baked thermal surface table");
+  }
+  if (profile.surfaceEmission?.unit !== "cd/m2") {
+    throw new Error("Declared hot engine hardware needs surface luminance in cd/m2");
+  }
+  if (!temperatures || temperatures.length !== 2 || temperatures.some(value => !Number.isFinite(value) || value < 0)
+    || temperatures[1] <= temperatures[0]) {
+    throw new Error("Declared hot engine hardware needs finite increasing Kelvin bounds");
   }
   const allowed = new Set(names);
   const meshes = attachment.getChildMeshes();
   if (attachment instanceof AbstractMesh) meshes.unshift(attachment);
   const replacements: { mesh: AbstractMesh; original: Material; replacement: Material }[] = [];
-  const clones = new Map<PBRMaterial, { material: PBRMaterial; meshes: Set<AbstractMesh>; rest: Color3 }>();
+  const clones = new Map<PBRMaterial, { material: PBRMaterial; meshes: Set<AbstractMesh>; rest: Color3; direct: number; environment: number; specular: number; ambient: Color3 }>();
   const multiClones: MultiMaterial[] = [];
   const ownedTextures = new Set<BaseTexture>();
   let disposed = false;
   let active = false;
   let prepared = false;
   let lastEmission = "";
+  let reflectionEnabled = true;
+  let lastTemperature = Number.NaN;
+  let lastGain = Number.NaN;
+  const black = [0, 0, 0];
   const controller = new AbortController();
   let cancel!: () => void;
   const cancellation = new Promise<void>(resolve => { cancel = resolve; });
@@ -35,7 +48,9 @@ export function createEngineHotSurfaceGlow(attachment: TransformNode, names: rea
     const sourceTextures = new Set(original.getActiveTextures());
     const material = original.clone(`${original.name}-engine-thermal`);
     for (const texture of material.getActiveTextures()) if (!sourceTextures.has(texture)) ownedTextures.add(texture);
-    clones.set(original, { material, meshes: new Set([mesh]), rest: original.emissiveColor.clone() });
+    clones.set(original, { material, meshes: new Set([mesh]), rest: original.emissiveColor.clone(),
+      direct: original.directIntensity, environment: original.environmentIntensity, specular: original.specularIntensity,
+      ambient: original.ambientColor.clone() });
     return material;
   };
   try {
@@ -95,16 +110,43 @@ export function createEngineHotSurfaceGlow(attachment: TransformNode, names: rea
       for (const { mesh, replacement } of replacements) if (!mesh.isDisposed()) mesh.material = replacement;
       active = true;
     },
+    /** Uniform-only diagnostic switch: preserves compiled shader variants/readiness. */
+    setReflectionEnabled(enabled: boolean): boolean {
+      if (disposed || !active || enabled === reflectionEnabled) return false;
+      reflectionEnabled = enabled;
+      for (const { material, direct, environment, specular, ambient } of clones.values()) {
+        material.directIntensity = enabled ? direct : 0;
+        material.environmentIntensity = enabled ? environment : 0;
+        material.specularIntensity = enabled ? specular : 0;
+        material.ambientColor.copyFrom(enabled ? ambient : Color3.Black());
+      }
+      return replacements.some(({ mesh }) => mesh.isEnabled() && mesh.isVisible && mesh.visibility > 0);
+    },
     /** Returns whether the visible hardware's emission changed. */
-    update(powerNorm: number, visible: boolean, amplitude: number): boolean {
+    update(temperatureKelvin: number | undefined, visible: boolean, amplitude: number,
+      referenceLuminanceCdPerSquareMeter: number): boolean {
       if (disposed || !active) return false;
-      const finitePower = Number.isFinite(powerNorm);
-      const position = (finitePower ? Math.min(1, Math.max(0, powerNorm)) : 0) * (samples.length - 1);
-      const lower = Math.floor(position);
-      const upper = Math.min(samples.length - 1, lower + 1);
-      const fraction = position - lower;
-      const gain = visible && finitePower && Number.isFinite(amplitude) ? Math.max(0, amplitude) : 0;
-      const rgb = samples[lower].map((value, channel) => (value + (samples[upper][channel] - value) * fraction) * gain);
+      // The declared native wall state owns thermal behavior; this renderer
+      // adds no thermal time step or gas-to-metal temperature substitution.
+      // Fuel, running, power, augmentation and artistic plume flicker do not
+      // gate hardware incandescence. Resource visibility/intensity still do.
+      const validTemperature = temperatureKelvin !== undefined && Number.isFinite(temperatureKelvin)
+        && temperatureKelvin >= temperatures[0];
+      // A cd/m²-to-display reference is a presentation parameter, not a
+      // calibrated F135 camera/exposure model. Invalid references clear heat.
+      const candidateGain = visible && validTemperature && Number.isFinite(amplitude)
+        && Number.isFinite(referenceLuminanceCdPerSquareMeter) && referenceLuminanceCdPerSquareMeter > 0
+        ? Math.max(0, amplitude) / referenceLuminanceCdPerSquareMeter : 0;
+      const gain = Number.isFinite(candidateGain) ? candidateGain : 0;
+      const temperature = gain > 0 ? Math.min(temperatures[1], temperatureKelvin!) : 0;
+      if (temperature === lastTemperature && gain === lastGain) return false;
+      lastTemperature = temperature;
+      lastGain = gain;
+      const interpolated = gain > 0
+        ? interpolateAbsoluteEmission(profile.surfaceEmission!, temperature)!.map(value => value * gain) : black;
+      // Invalid/out-of-contract presentation inputs cannot send infinities
+      // into a material even when their ratio itself was still finite.
+      const rgb = interpolated.every(Number.isFinite) ? interpolated : black;
       const key = rgb.join("/");
       if (key === lastEmission) return false;
       const hadLight = lastEmission !== "" && lastEmission !== "0/0/0";
@@ -114,12 +156,17 @@ export function createEngineHotSurfaceGlow(attachment: TransformNode, names: rea
       }
       return visible || hadLight;
     },
-    dispose(): void {
-      if (disposed) return;
+    /** Whether restoring a visible binding changed emission or isolated reflection. */
+    dispose(): boolean {
+      if (disposed) return false;
+      const removedVisibleEmission = active && (!reflectionEnabled || (lastEmission !== "" && lastEmission !== "0/0/0"))
+        && replacements.some(({ mesh, replacement }) => !mesh.isDisposed() && mesh.material === replacement
+          && mesh.isEnabled() && mesh.isVisible && mesh.visibility > 0);
       disposed = true;
       controller.abort();
       cancel();
       release();
+      return removedVisibleEmission;
     },
   };
 }

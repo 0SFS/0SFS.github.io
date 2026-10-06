@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "scope": "Task-entry preservation audit, not a claim that the repository began clean",
+  "trackedPatchesUnchanged": [
+    "docs/foss-earth-relationship.md",
+    "docs/jsbsim.md",
+    "docs/phone-controller-ui.md",
+    "docs/proposals/flight-settings.md",
+    "package-lock.json",
+    "package.json",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+    "scripts/validation/audio/check-engine-orbs.mjs",
+    "scripts/validation/f35b/check-exhaust-headless.mjs",
+    "scripts/verify-jsbsim-artifact.test.mjs",
+    "src/flight/aircraft/aircraftAnimation.f35b.test.ts",
+    "src/flight/aircraft/aircraftAnimation.ts",
+    "src/flight/aircraft/aircraftCatalog.test.ts",
+    "src/flight/aircraft/createAircraftModel.test.ts",
+    "src/flight/aircraft/createAircraftModel.ts",
+    "src/flight/aircraft/createEngineHotSurfaceGlow.test.ts",
+    "src/flight/aircraft/createEngineHotSurfaceGlow.ts",
+    "src/flight/aircraft/createPlaceholderAircraft.test.ts",
+    "src/flight/aircraft/createPlaceholderAircraft.ts",
+    "src/flight/aircraft/engineExhaustProfiles.ts",
+    "src/flight/aircraft/generated/f135-exhaust-lut.png",
+    "src/flight/createFlightSimApp.phone.test.ts",
+    "src/flight/createFlightSimApp.test.ts",
+    "src/flight/hud/AircraftSelectionPanel.test.tsx",
+    "src/flight/hud/FlightControlPanel.tsx",
+    "src/flight/hud/engineMonitor.css",
+    "src/flight/hud/engineMonitor.test.ts",
+    "src/flight/hud/engineMonitor.ts",
+    "src/flight/hud/engineMonitorModel.test.ts",
+    "src/flight/hud/engineMonitorModel.ts",
+    "src/flight/hud/engineSpoolMotion.test.ts",
+    "src/flight/hud/engineSpoolMotion.ts",
+    "src/flight/hud/engineSpoolRenderer.test.ts",
+    "src/flight/hud/engineSpoolRenderer.ts",
+    "src/flight/hud/engineSummary.ts",
+    "src/flight/jsbsim/bootstrapC172.ts",
+    "src/flight/jsbsim/jsbsimBuildIdentity.test.ts",
+    "src/flight/jsbsim/jsbsimBuildIdentity.ts",
+    "src/flight/jsbsim/resetFlightLocation.test.ts",
+    "src/flight/jsbsim/resetFlightLocation.ts",
+    "src/flight/physics/safeFlightState.ts",
+    "src/flight/remote/engineStatus.ts",
+    "src/remote/PhoneController.test.tsx",
+    "src/remote/PhoneEngine.test.tsx",
+    "src/remote/PhoneEngine.tsx",
+    "src/remote/protocol.test.ts",
+    "src/remote/protocol.ts"
+  ],
+  "trackedPatchesChangedByThisTask": [
+    "docs/proposals/f35b-fdm.md",
+    "planes/Lockheed_Martin_F-35B/README.md",
+    "scripts/build-exhaust-optics.mjs",
+    "scripts/build-exhaust-optics.test.mjs",
+    "scripts/exhaustOptics/README.md",
+    "scripts/exhaustOptics/bake.mjs",
+    "scripts/exhaustOptics/f135-visible-approximation.json",
+    "src/flight/aircraft/aircraftCatalog.ts",
+    "src/flight/aircraft/createAircraftEngineVisuals.test.ts",
+    "src/flight/aircraft/createAircraftEngineVisuals.ts",
+    "src/flight/aircraft/createEngineExhaust.test.ts",
+    "src/flight/aircraft/createEngineExhaust.ts",
+    "src/flight/aircraft/engineExhaustProfiles.test.ts",
+    "src/flight/aircraft/generated/engine-smoke-flipbook.manifest.json",
+    "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json",
+    "src/flight/aircraft/generated/f135ExhaustOpticalData.ts",
+    "src/flight/createFlightSimApp.ts",
+    "src/flight/settings/flightParameters.ts"
+  ],
+  "retainedIdentityChecks": [
+    {
+      "path": "src/flight/aircraft/engineNozzleRig.ts",
+      "taskEntrySha256": "0c070c616f6b9508de3cba5ccd24818b9ad679bb938e9d86acf1287f381f0996",
+      "currentSha256": "0c070c616f6b9508de3cba5ccd24818b9ad679bb938e9d86acf1287f381f0996",
+      "unchanged": true
+    },
+    {
+      "path": "src/flight/engineTestStand.ts",
+      "taskEntrySha256": "750fb6ecc44f1eb5a7b53725c24ed7af4647eed939a0526b8268e2be646fb183",
+      "currentSha256": "750fb6ecc44f1eb5a7b53725c24ed7af4647eed939a0526b8268e2be646fb183",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/f135Engine/source.mjs",
+      "taskEntrySha256": "6a57b46fcdbd2abf90c617ab59cc16944428e77b4fd3787deed890f7eb36d3cb",
+      "currentSha256": "6a57b46fcdbd2abf90c617ab59cc16944428e77b4fd3787deed890f7eb36d3cb",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/f135Engine/profile.json",
+      "taskEntrySha256": "fd31d20c7e4ff1bf39887f2af9ebfade6f2174b591c38ad2be6c21a01f37d1f5",
+      "currentSha256": "fd31d20c7e4ff1bf39887f2af9ebfade6f2174b591c38ad2be6c21a01f37d1f5",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/f135Engine/mechanism.mjs",
+      "taskEntrySha256": "8b5b7870f02a7b2d49ab862a0f2fa573983f11e1152c0f5df85443c1f2b26e76",
+      "currentSha256": "8b5b7870f02a7b2d49ab862a0f2fa573983f11e1152c0f5df85443c1f2b26e76",
+      "unchanged": true
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135EngineData.ts",
+      "taskEntrySha256": "08545c3e51892acb63ea27c8283445aef1a1e4d1a432768af1b492ba0fd48ddb",
+      "currentSha256": "08545c3e51892acb63ea27c8283445aef1a1e4d1a432768af1b492ba0fd48ddb",
+      "unchanged": true
+    },
+    {
+      "path": "../foss-earth/src/engine/babylon/createRasterTilesRuntime.ts",
+      "taskEntrySha256": "9b68b8f6d7cbb7e872fcbbd546a87d4f75094b7397913d5290fcfcb2693f9be3",
+      "currentSha256": "9b68b8f6d7cbb7e872fcbbd546a87d4f75094b7397913d5290fcfcb2693f9be3",
+      "unchanged": true
+    },
+    {
+      "path": "../foss-earth/src/engine/babylon/createTilesRuntime.ts",
+      "taskEntrySha256": "e96684f2c55f7086e747f78dc5165776b2443bb9fdbda2f30af32a056246f9f6",
+      "currentSha256": "e96684f2c55f7086e747f78dc5165776b2443bb9fdbda2f30af32a056246f9f6",
+      "unchanged": true
+    },
+    {
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-full.glb",
+      "taskEntrySha256": "0fc8083a3a4d5d5d76946ea3602d4a23ebc508e58301145e489c59c1801ff71f",
+      "currentSha256": "0fc8083a3a4d5d5d76946ea3602d4a23ebc508e58301145e489c59c1801ff71f",
+      "unchanged": true
+    },
+    {
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-installed.glb",
+      "taskEntrySha256": "4e7d837e2ab5303ab9d90a3b3321baa469e5fc204acad7e0b2f59185990aa341",
+      "currentSha256": "4e7d837e2ab5303ab9d90a3b3321baa469e5fc204acad7e0b2f59185990aa341",
+      "unchanged": true
+    },
+    {
+      "path": "../Felipegalind0/jsbsim/src/models/propulsion/FGTurbine.cpp",
+      "taskEntrySha256": "5a51543d54589c0467c8f492abd86ca1025401d4bc5de4bdb542d10be6ac90a3",
+      "currentSha256": "5a51543d54589c0467c8f492abd86ca1025401d4bc5de4bdb542d10be6ac90a3",
+      "unchanged": true
+    },
+    {
+      "path": "../Felipegalind0/jsbsim/src/models/propulsion/FGTurbine.h",
+      "taskEntrySha256": "20c4393a023df1906d7e4aa92ca29f76e236c4923b7e4436bd1f64e33beb64cf",
+      "currentSha256": "20c4393a023df1906d7e4aa92ca29f76e236c4923b7e4436bd1f64e33beb64cf",
+      "unchanged": true
+    },
+    {
+      "path": "../Felipegalind0/jsbsim/doc/turbine-thermal-model.md",
+      "taskEntrySha256": "a8205d2bd136d4515f004d8fe2f558ad4661190f2e908fcfe8858e2ea6865afc",
+      "currentSha256": "a8205d2bd136d4515f004d8fe2f558ad4661190f2e908fcfe8858e2ea6865afc",
+      "unchanged": true
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+      "taskEntrySha256": "04cea10d3c135cb79247bbf7794a81359070e2bdc9afc9782502b538444eac16",
+      "currentSha256": "04cea10d3c135cb79247bbf7794a81359070e2bdc9afc9782502b538444eac16",
+      "unchanged": true
+    },
+    {
+      "path": "deps/felipegalind0-jsbsim-1.2.4-fork.16.tgz",
+      "taskEntrySha256": "98ee9387c57b871a3851aac83b5eb3a4f858d618e12a2fb9b59eaa0c59dbf61b",
+      "currentSha256": "98ee9387c57b871a3851aac83b5eb3a4f858d618e12a2fb9b59eaa0c59dbf61b",
+      "unchanged": true
+    }
+  ],
+  "nativeGitStatus": "",
+  "nativeRevision": "97fe6ddf1c8a7d9e10dad46a88e60e79e69fae28"
+}

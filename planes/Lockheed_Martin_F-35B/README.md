@@ -5,11 +5,39 @@ JSBSim flight model, animated controls, gear and lift-system parts, and a
 geometry-based cockpit view. 0sfs owns this aircraft integration; JSBSim remains
 the dynamics backend. Ground collision work is separate.
 
+The [sourced findings, video timestamps, hypotheses and unresolved appearance
+discrepancies](../../docs/proposals/f35b-fdm.md#observations-hypotheses-and-unresolved-discrepancies-2026-10-06)
+cover pink/violet exhaust, visible emission during powered lift, dry/AB thermal
+behavior, camera effects and nozzle contraction. These observations do not
+establish measured F135 temperatures or a validated control schedule.
+
+**Engine → Engine test stand → Open engine test stand** opens a cold-soaked,
+stopped native-engine session with the complete reconstructed PW-600 main engine **on Earth at
+MSP runway 35**. Move it and choose altitude through the existing **Location** tab.
+**Engine history** plots native readings and exports CSV. Starting camera distance,
+zoom range, history duration and sampling rate are in the Engine tab.
+The stand loads the full engine; flight loads only the installed geometry from
+the same authored source. The core-facing interior, compact layered nozzle and
+three-bearing swivel are original approximations, not measured CAD. Gas and two
+independent native solid temperatures appear in histories/CSV. **Initial engine
+state** offers a separate already-running initialization; normal start/stop
+retains heat for hot restarts. **Solid heat balances** exposes native signed heat
+terms, with optional history/CSV columns. See the
+[physical-correction report](../../docs/validation/f135-engine-physical-correction.md)
+for precise cold-cycle steps, evidence and remaining GPU/appearance limits.
+
+The nozzle/interior has been reconstructed. The [engine rebuild
+brief](../../docs/proposals/f135-engine-rebuild.md) records the rejected shape and
+open-petal gaps, source-backed A/B differences, complete versus installed model
+architecture, local reference images and acceptance criteria. Its original
+[implementation prompt](../../docs/f135-engine-rebuild-prompt.md) remains retained.
+
 ## Try it
 
 Open **Aircraft**, select **Lockheed Martin F-35B Lightning II**, and **Apply**.
 The aircraft change reloads the app and activates the matching mesh and flight
-data. **Auto** loads the supplied 12,259-triangle mesh.
+data. **Auto** loads the airframe and compact installed engine; the Aircraft panel
+shows their combined triangle count.
 
 The development start is conventional flight at **300 kt**, **48% throttle**,
 gear up and **5,000 lb fuel**. Saved Start settings take precedence over profile
@@ -56,41 +84,58 @@ AF267's model is licensed under CC BY 4.0. Runtime attribution and modifications
 are recorded in [the mesh notice](../../public/aircraft/f-35b/NOTICE.md) and
 [export provenance](../../public/aircraft/f-35b/F-35B_AF267.provenance.json).
 
-The GLB preserves 102 named mesh objects and their authored pivots, embeds all
-four textures, uses standard glTF axes and a uniform scale matching the published
-35 ft span. Its ground origin is below the trial FDM's assumed longitudinal CG.
-The source proportions, CG/datum, gear travel and pilot-eye position are
-development assumptions, not verified aircraft geometry.
+The retained source GLB has 102 named mesh objects and their authored pivots,
+four embedded textures, standard glTF axes and a uniform scale matching the
+published 35 ft span. The active airframe export removes its old nozzle and
+internal engine tube, retaining unrelated mesh data. Its ground origin is below
+the trial FDM's assumed longitudinal CG. Source proportions, CG/datum, gear
+travel and pilot-eye position remain development assumptions.
 
-The sixteen retained `feather.001`–`feather.016` nozzle petals hinge about their
-local tangential axes while inheriting the VTOL swivel assembly's pitch/yaw.
-Their hinge positions and scale stay fixed. The model owner's noncreating
-native observer supplies `propulsion/engine[0]/nozzle-pos-norm`; visual travel
-follows that observed position directly and holds its partial pose while
-physics is paused. Missing observations leave the authored/last observed pose.
-The display range runs from the authored tapered shape to approximately
-axis-parallel petals, about 12.5° of hinge travel. This is geometry-based
-presentation of JSBSim's generic turbine nozzle-display schedule, not a
-calibrated F135 throat/exit-area schedule or measured actuator travel. The
-[source geometry and actual-model checks](../../validation/evidence/aircraft/f35b/nozzle-area-2026-10-05/source-geometry.json)
-record all sixteen tip paths, fixed hinges and retained vectoring hierarchy;
-native SDK/app integration qualification is tracked separately.
+The active engine comes from one original source with separate full and installed
+exports. Convergent/divergent flaps, sliding seals, throat shoes and external
+fairings move as rigid parts at constant scale. Three circular swivel bearings
+follow native pitch/yaw; aperture follows `propulsion/engine[0]/nozzle-pos-norm`
+and holds while physics is paused. Missing observations preserve the last pose.
+Throat A8, exit A9 and native command remain distinct: dimensions and linkage are
+explicit hypotheses, not a calibrated PW-600 FADEC schedule. The engine-bay doors
+retain their provisional 6 cm outboard hinge and early opening during conversion,
+with unchanged closed geometry. The [geometry evidence](../../validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/geometry/README.md)
+records rigid shape/volume, attachment, overlap, occlusion and clearance checks.
 
-The exhaust is a shared renderer attached to that moving nozzle. A small baked
-optical texture supplies faint dry glow and afterburner emission; the flame and
-shock-cell pattern use the genuine native augmentation observer. A tiny baked
-brightness envelope follows simulation time and holds while paused. It uses one
-static 12-triangle volume per declared exhaust source, bounded sampling and
-physical metre path lengths, with no particle spawning or runtime spectroscopy.
-The retained inner-nozzle liner has separate baked hot-surface emission while
-the engine runs dry. Only that nozzle's declared material binding is cloned;
-the gear/fuselage materials sharing its original material and all geometry stay
-unchanged. This local thermal display does not brighten the dry exhaust tail,
-and its assumed temperature/brightness table has no F135 radiometric calibration.
-**Renderer → Aircraft exhaust** exposes enable, sample count, draw distance and
-intensity. The THR fire indicator and warm accent report actual afterburner
-activity. Color, extent, shock structure and brightness variation are explicit
-visual approximations, with no calibrated F135 radiance or heat distortion.
+The gas support follows the authored augmentor, curved rigid duct, throat,
+nozzle exit and free plume. One field and source-power bound cover the complete
+support; no rigid asset changes shape. The native temperature is explicitly an
+imposed thermal-bath proxy, with no additional assumed Mach expansion. The
+continuum uses precomputed absolute particle spectra; internal gas continues
+the same boundary hypothesis upstream rather than inventing an augmentor flame.
+The unsupported exterior CH*/C2* fuel allocation is removed. Chemical emission
+is recorded as unavailable because native reactant/population state is absent,
+not asserted to be physically zero or forbidden blue. See the
+[source-contract correction](../../docs/validation/f135-exhaust-source-correction.md).
+The night powered-lift light remains unexplained and appearance is not accepted.
+
+Core-facing hardware and the cooled nozzle liner have independent native solid
+temperatures, estimated heat capacities, gas/coolant transfer and radiation.
+Gas and solids remain separate observations. Metal retains heat after cutoff and
+through pause, recovery and relocation. Read-only native accounting reports each
+solid's existing discrete heat balance; prescribed reservoirs do not close the entire
+engine budget. Absolute material emission includes the assumed grey emissivity,
+then uses an explicit display reference and the shared scene exposure/tone mapping.
+No arbitrary bright idle or startup color sequence is imposed.
+
+**Engine → Temperatures and oil** shows EGT, nozzle gas, core-facing metal and
+nozzle metal in °C. **Renderer → Aircraft exhaust** exposes contribution views
+(combined, solid, gas, reflection, nearby scene light), ray samples, axial/radial
+field samples, opaque-depth occlusion and its resolution, draw distance,
+display gain, gas/metal white references and the single nearby light's gain/range.
+The default is 128 ray samples and a 64 × 32 source field (32 KiB GPU texture per
+engine); lower budgets may miss narrow emission. The optional depth pass stops
+ray integration at opaque hardware/scenery. The approximate light uses only the
+exterior source bound and excludes its own engine meshes; the emissive raster basemap does not
+receive it. Display gains never change physical temperature, fuel or source power.
+The THR fire indicator reports actual AB activity; powered-lift inhibition stays
+native. Optical depth, species fractions, temperature calibration and rendered
+brightness remain unqualified against measured F135 data.
 The same settings home offers optional faint smoke with a particle budget,
 emission rate, lifetime, distance and opacity. One static billboard batch uses
 a baked sixteen-frame alpha sprite. Its history stays in double-precision ECEF
@@ -98,8 +143,10 @@ coordinates through origin translation/rotation; native time freezes births
 and ages while paused, and relocation clears the trail. This is an artistic
 aerosol appearance, with no measured F135 soot rate, contrail or wake simulation.
 The [renderer method and sources](../../docs/proposals/f35b-fdm.md#baked-exhaust-renderer)
-and [glow/smoke GPU acceptance record](../../validation/evidence/aircraft/f35b/exhaust-smoke-gpu-2026-10-05/acceptance.json)
-track rendered GPU checks and the remaining qualification limits.
+and [source-correction acceptance record](../../validation/evidence/aircraft/f35b/exhaust-correction-2026-10-06/acceptance.json)
+track current optical/application checks and their calibration limits. The
+[earlier glow/smoke GPU record](../../validation/evidence/aircraft/f35b/exhaust-smoke-gpu-2026-10-05/acceptance.json)
+concerns the preceding implementation; current GPU pixels remain unqualified.
 The [combined acceptance record](../../validation/evidence/aircraft/f35b/final-acceptance-2026-10-05/acceptance.json)
 also retains application CI, Auto-flap coverage and shared force-overlay checks.
 

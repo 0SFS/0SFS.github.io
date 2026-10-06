@@ -1,0 +1,22 @@
+cold-cycle: Engine location ignored, only thruster location is used.
+cold-cycle: Engine orientation ignored, only thruster orientation is used.
+cold-cycle: Engine location ignored, only thruster location is used.
+cold-cycle: Engine orientation ignored, only thruster orientation is used.
+cold-cycle: Engine location ignored, only thruster location is used.
+cold-cycle: Engine orientation ignored, only thruster orientation is used.
+cold-cycle: Engine location ignored, only thruster location is used.
+cold-cycle: Engine orientation ignored, only thruster orientation is used.
+cold-cycle: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 304
+cold-cycle:       Property /sim/model/pushback/target-speed-fps is already defined.
+cold-cycle:       Its value (0) will not be overridden.
+powered-lift: Engine location ignored, only thruster location is used.
+powered-lift: Engine orientation ignored, only thruster orientation is used.
+powered-lift: Engine location ignored, only thruster location is used.
+powered-lift: Engine orientation ignored, only thruster orientation is used.
+powered-lift: Engine location ignored, only thruster location is used.
+powered-lift: Engine orientation ignored, only thruster orientation is used.
+powered-lift: Engine location ignored, only thruster location is used.
+powered-lift: Engine orientation ignored, only thruster orientation is used.
+powered-lift: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 304
+powered-lift:       Property /sim/model/pushback/target-speed-fps is already defined.
+powered-lift:       Its value (0) will not be overridden.

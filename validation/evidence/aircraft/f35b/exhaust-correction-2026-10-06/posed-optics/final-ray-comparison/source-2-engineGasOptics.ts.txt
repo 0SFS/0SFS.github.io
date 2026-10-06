@@ -1,0 +1,545 @@
+/** 0sfs owns the dimensional aircraft gas optical approximation, not engine heat dynamics. */
+export const DEFAULT_ENGINE_GAS_AXIAL_SAMPLES = 64;
+export const DEFAULT_ENGINE_GAS_RADIAL_SAMPLES = 32;
+
+export interface EngineGasOpticalData {
+  readonly model: "gray-emission-absorption-v1" | "imposed-gas-bath-v2";
+  readonly temperatureMeaning?: "imposed-native-gas-bath-proxy";
+  readonly chemistryStatus?: "unavailable";
+  readonly spatialField?: EngineGasSpatialData;
+  readonly blackbody: { readonly temperatureKelvinRange: readonly [number, number]; readonly unit: "cd/m2";
+    readonly samples: readonly (readonly [number, number, number])[] };
+  readonly fuelHeatingValueJPerKg: number;
+  readonly normalizedDensityVolume: number;
+  readonly excitedRgbLumensPerWatt: readonly [number, number, number];
+  readonly dry: EngineGasMode;
+  readonly afterburner: EngineGasMode;
+}
+export interface EngineGasSpatialData {
+  readonly model: "axisymmetric-mixing-v1" | "axisymmetric-gas-bath-v2";
+  readonly width: number;
+  readonly height: number;
+  readonly axialRadiusRange: readonly [number, number];
+  readonly spreadingSlope: number;
+  readonly specificHeatRatio?: number;
+  readonly exitMach?: { readonly dry: number; readonly afterburner: number };
+  readonly supportLengthScale: { readonly dry: number; readonly afterburner: number };
+  readonly ambientTemperatureKelvinRange: readonly [number, number];
+  readonly excitedSpecies: { readonly ch: EngineGasSpecies; readonly c2: EngineGasSpecies };
+  /** Raw XYZ is mixed before the single output gamut map. Y retains cd/m². */
+  readonly blackbodyXyz: EngineGasOpticalData["blackbody"];
+  /** Row-major radius, then axial distance/exit radius: θ, κ loading, CH, C2. */
+  readonly basisSamples: readonly (readonly [number, number, number, number])[];
+}
+interface EngineGasSpecies {
+  readonly powerFraction: number;
+  readonly rgbLumensPerWatt: readonly [number, number, number];
+  readonly xyzLumensPerWatt: readonly [number, number, number];
+}
+export interface EngineGasField {
+  readonly width: number;
+  readonly height: number;
+  /** U=z/L; V=r/[Rexit*(1+radiusExpansionRatio*U)]. Texels include endpoints. */
+  readonly rgba: Float32Array;
+  readonly radiusExpansionRatio: number;
+  readonly axialDistanceRangeMeters: readonly [number, number];
+  readonly sections: readonly EngineGasFlowSection[];
+  readonly maxSourceCdPerM3: number;
+  readonly maxAbsorptionPerMeter: number;
+  readonly particleTemperatureKelvin: Float64Array;
+  /** Signed linear RGB components before the one combined Y-preserving gamut map. */
+  readonly particleSourceRgbCdPerM3: Float64Array;
+  readonly chSourceRgbCdPerM3: Float64Array;
+  readonly c2SourceRgbCdPerM3: Float64Array;
+  readonly particlePowerDensityWPerM3: Float64Array;
+  readonly chPowerDensityWPerM3: Float64Array;
+  readonly c2PowerDensityWPerM3: Float64Array;
+  /** Exact integral weights of each bilinear grid node in the expanding support. */
+  readonly volumeWeightsM3: Float64Array;
+  /** Same nodal basis integrated only over the exterior s >= 0. */
+  readonly exteriorVolumeWeightsM3: Float64Array;
+}
+export interface EngineGasOpticalResult {
+  readonly valid: boolean;
+  readonly mode: "dry" | "afterburner";
+  readonly fuelPowerW: number;
+  readonly emittingVolumeM3: number;
+  readonly absorptionPerMeter: number;
+  readonly particlePowerUpperBoundW: number;
+  readonly excitedPowerW: number;
+  readonly totalSourcePowerUpperBoundW: number;
+  readonly allowedPowerW: number;
+  readonly absorptionWasCapped: boolean;
+  readonly blackbodyRgbCdPerM2: readonly number[];
+  /** Spatial profiles return a volume average, not a uniform local source. */
+  readonly sourceRgbCdPerM3: readonly number[];
+  readonly isotropicIntensityRgbCd: readonly number[];
+  /** Exterior-only upper bound for the unoccluded approximate nearby light. */
+  readonly exteriorIsotropicIntensityRgbCd: readonly number[];
+  readonly temperatureMeaning: "imposed-native-gas-bath-proxy" | "legacy-static-exit-hypothesis";
+  readonly chemistryStatus: "unavailable" | "legacy-imposed";
+  readonly sourceBoundaryTemperatureKelvin: number;
+  /** Present only for archived v1's unqualified expansion hypothesis. */
+  readonly staticExitTemperatureKelvin?: number;
+  readonly chPowerW: number;
+  readonly c2PowerW: number;
+  readonly field?: EngineGasField;
+}
+interface EngineGasMode {
+  readonly absorptionPerMeter: number;
+  readonly particleFuelPowerFraction: number;
+  readonly excitedFuelPowerFraction: number;
+}
+export interface EngineGasFlowSection {
+  readonly distanceMeters: number;
+  readonly radiusMeters: number;
+  readonly innerRadiusMeters?: number;
+  /** Ruled oblique-circle volume Jacobian relative to centerline distance. */
+  readonly areaFactor?: number;
+}
+export interface EngineGasFlowDomain {
+  /** Signed path distance: upstream < 0, exit = 0, exterior > 0. */
+  readonly axialDistanceRangeMeters: readonly [number, number];
+  readonly sections: readonly EngineGasFlowSection[];
+}
+export interface EngineGasOpticalInputs {
+  temperatureKelvin?: number;
+  ambientTemperatureKelvin?: number;
+  axialSamples?: number;
+  radialSamples?: number;
+  augmentation: boolean;
+  fuelFlowKgPerSecond?: number;
+  afterburnerBurnedFuelFlowKgPerSecond?: number;
+  radiusMeters: number;
+  lengthMeters: number;
+  flowDomain?: EngineGasFlowDomain;
+}
+
+interface GasGeometryWeights { total: Float64Array; exterior: Float64Array }
+/** One last geometry entry per live profile; collected with the profile. */
+const geometryWeightCache = new WeakMap<EngineGasOpticalData, { key: string; weights: GasGeometryWeights }>();
+
+function cachedGasGeometryWeights(data: EngineGasOpticalData, width: number, height: number,
+  domain: EngineGasFlowDomain, explicitFlowDomain: boolean, input: EngineGasOpticalInputs,
+  radiusExpansionRatio: number): GasGeometryWeights {
+  // Value signature also handles fresh equivalent no-domain wrappers and detects
+  // edited section values without trusting caller object identity or key order.
+  const key = JSON.stringify([width, height, explicitFlowDomain, ...domain.axialDistanceRangeMeters,
+    ...domain.sections.flatMap(s => [s.distanceMeters, s.radiusMeters, s.innerRadiusMeters ?? 0, s.areaFactor ?? 1])]);
+  const cached = geometryWeightCache.get(data);
+  if (cached?.key === key) return cached.weights;
+  const total = explicitFlowDomain ? undefined
+    : gasFieldVolumeWeights(width, height, input.radiusMeters, input.lengthMeters, radiusExpansionRatio);
+  const weights = total ? { total, exterior: total } : integrateGasFlowFieldVolumeWeights(width, height, domain);
+  geometryWeightCache.set(data, { key, weights });
+  return weights;
+}
+
+/** Profile validation happens once at resource construction, never per frame. */
+export function validateEngineGasOpticalData(data: EngineGasOpticalData): void {
+  const table = data.blackbody;
+  if (!["gray-emission-absorption-v1", "imposed-gas-bath-v2"].includes(data.model) || table.unit !== "cd/m2"
+    || table.temperatureKelvinRange.length !== 2 || table.temperatureKelvinRange.some(v => !Number.isFinite(v) || v <= 0)
+    || table.temperatureKelvinRange[1] <= table.temperatureKelvinRange[0] || table.samples.length < 2
+    || table.samples.some(rgb => rgb.length !== 3 || rgb.some(v => !Number.isFinite(v) || v < 0))
+    || !Number.isFinite(data.fuelHeatingValueJPerKg) || data.fuelHeatingValueJPerKg <= 0
+    || !Number.isFinite(data.normalizedDensityVolume) || data.normalizedDensityVolume <= 0
+    || data.excitedRgbLumensPerWatt.length !== 3 || data.excitedRgbLumensPerWatt.some(v => !Number.isFinite(v) || v < 0)
+    || [data.dry, data.afterburner].some(p => ![p.absorptionPerMeter, p.particleFuelPowerFraction, p.excitedFuelPowerFraction]
+      .every(v => Number.isFinite(v) && v >= 0) || p.particleFuelPowerFraction + p.excitedFuelPowerFraction > 1)) {
+    throw new RangeError("Invalid dimensional gas optical data");
+  }
+  const corrected = data.model === "imposed-gas-bath-v2";
+  if (corrected && (data.temperatureMeaning !== "imposed-native-gas-bath-proxy" || data.chemistryStatus !== "unavailable"
+    || !data.spatialField || data.dry.excitedFuelPowerFraction !== 0 || data.afterburner.excitedFuelPowerFraction !== 0
+    || data.dry.absorptionPerMeter !== data.afterburner.absorptionPerMeter
+    || data.dry.particleFuelPowerFraction !== data.afterburner.particleFuelPowerFraction)) {
+    throw new RangeError("Corrected gas optics require explicit proxy meaning and unavailable chemistry");
+  }
+  const field = data.spatialField;
+  if (field && (field.model !== (corrected ? "axisymmetric-gas-bath-v2" : "axisymmetric-mixing-v1") || !Number.isInteger(field.width) || !Number.isInteger(field.height)
+    || field.width < 2 || field.height < 2 || field.basisSamples.length !== field.width * field.height
+    || field.basisSamples.some(row => row.length !== 4 || row.some(v => !Number.isFinite(v) || v < 0) || row[0] > 1)
+    || field.axialRadiusRange[0] !== 0 || !Number.isFinite(field.axialRadiusRange[1]) || field.axialRadiusRange[1] <= 0
+    || !Number.isFinite(field.spreadingSlope) || field.spreadingSlope < 0 || field.spreadingSlope > 1
+    || (!corrected && (!Number.isFinite(field.specificHeatRatio) || field.specificHeatRatio! <= 1 || field.specificHeatRatio! > 2
+      || !field.exitMach || Object.values(field.exitMach).some(v => !Number.isFinite(v) || v < 0 || v > 5)))
+    || Object.values(field.supportLengthScale).some(v => !Number.isFinite(v) || v <= 0 || v > 1)
+    || field.ambientTemperatureKelvinRange.length !== 2 || field.ambientTemperatureKelvinRange.some(v => !Number.isFinite(v) || v <= 0)
+    || field.ambientTemperatureKelvinRange[1] <= field.ambientTemperatureKelvinRange[0]
+    || Object.values(field.excitedSpecies).some(v => !Number.isFinite(v.powerFraction) || v.powerFraction < 0 || v.powerFraction > 1
+      || v.rgbLumensPerWatt.length !== 3 || v.rgbLumensPerWatt.some(c => !Number.isFinite(c) || c < 0)
+      || v.xyzLumensPerWatt.length !== 3 || v.xyzLumensPerWatt.some(c => !Number.isFinite(c) || c < 0))
+    || field.blackbodyXyz.unit !== "cd/m2" || field.blackbodyXyz.samples.length !== data.blackbody.samples.length
+    || field.blackbodyXyz.temperatureKelvinRange.some((v, i) => v !== data.blackbody.temperatureKelvinRange[i])
+    || field.blackbodyXyz.samples.some(rgb => rgb.length !== 3 || rgb.some(v => !Number.isFinite(v) || v < 0))
+    || Math.abs(field.excitedSpecies.ch.powerFraction + field.excitedSpecies.c2.powerFraction - (corrected ? 0 : 1)) > 1e-10)) {
+    throw new RangeError("Invalid spatial gas optical data");
+  }
+}
+
+/** Log interpolation preserves positive absolute amplitude over the Planck tail. */
+export function interpolateGasBlackbody(data: EngineGasOpticalData, kelvin: number): readonly [number, number, number] | null {
+  return interpolateAbsoluteEmission(data.blackbody, kelvin);
+}
+
+/** Absolute RGB interpolation shared by independent solid regions and gas continuum. */
+export function interpolateAbsoluteEmission(table: EngineGasOpticalData["blackbody"], kelvin: number): readonly [number, number, number] | null {
+  const { temperatureKelvinRange: range, samples } = table;
+  if (!Number.isFinite(kelvin) || kelvin < range[0] || kelvin > range[1] || samples.length < 2) return null;
+  const position = (kelvin - range[0]) / (range[1] - range[0]) * (samples.length - 1);
+  if (kelvin === range[0]) return samples[0];
+  if (kelvin === range[1]) return samples[samples.length - 1];
+  const lower = Math.floor(position), upper = Math.min(lower + 1, samples.length - 1), f = position - lower;
+  return samples[lower].map((a, c) => {
+    const b = samples[upper][c];
+    return a > 0 && b > 0 ? Math.exp(Math.log(a) + (Math.log(b) - Math.log(a)) * f) : a + (b - a) * f;
+  }) as [number, number, number];
+}
+
+/** Upper-bound isotropic source accounting; not a closed engine-energy solution. */
+export function evaluateEngineGasOptics(profile: { readonly gasEmission?: EngineGasOpticalData }, input: EngineGasOpticalInputs): EngineGasOpticalResult {
+  const data = profile.gasEmission;
+  const mode = input.augmentation ? "afterburner" : "dry";
+  const corrected = data?.model === "imposed-gas-bath-v2";
+  const zero: EngineGasOpticalResult = { valid: false, mode, fuelPowerW: 0, emittingVolumeM3: 0, absorptionPerMeter: 0,
+    particlePowerUpperBoundW: 0, excitedPowerW: 0, totalSourcePowerUpperBoundW: 0, allowedPowerW: 0,
+    absorptionWasCapped: false, blackbodyRgbCdPerM2: [0, 0, 0], sourceRgbCdPerM3: [0, 0, 0], isotropicIntensityRgbCd: [0, 0, 0], exteriorIsotropicIntensityRgbCd: [0, 0, 0],
+    temperatureMeaning: corrected ? "imposed-native-gas-bath-proxy" : "legacy-static-exit-hypothesis",
+    chemistryStatus: corrected ? "unavailable" : "legacy-imposed", sourceBoundaryTemperatureKelvin: 0,
+    ...(corrected ? {} : { staticExitTemperatureKelvin: 0 }), chPowerW: 0, c2PowerW: 0 };
+  if (!data || !Number.isFinite(input.fuelFlowKgPerSecond) || input.fuelFlowKgPerSecond! <= 0
+    || !Number.isFinite(input.radiusMeters) || input.radiusMeters <= 0 || !Number.isFinite(input.lengthMeters) || input.lengthMeters <= 0) return zero;
+  const blackbody = interpolateGasBlackbody(data, input.temperatureKelvin ?? Number.NaN);
+  if (!blackbody) return zero;
+  if (data.spatialField) return evaluateSpatialGasOptics(data, input, zero);
+  if (corrected) return zero;
+  const parameters = data[mode];
+  const fuelPowerW = input.fuelFlowKgPerSecond! * data.fuelHeatingValueJPerKg;
+  const emittingVolumeM3 = input.radiusMeters ** 2 * input.lengthMeters * data.normalizedDensityVolume;
+  const sigma = 5.670374419e-8;
+  const particlePowerPerAbsorption = 4 * sigma * input.temperatureKelvin! ** 4 * emittingVolumeM3;
+  const particleBudgetW = fuelPowerW * parameters.particleFuelPowerFraction;
+  const absorptionPerMeter = Math.min(parameters.absorptionPerMeter, particleBudgetW / particlePowerPerAbsorption);
+  const particlePowerUpperBoundW = absorptionPerMeter * particlePowerPerAbsorption;
+  const burned = input.augmentation && Number.isFinite(input.afterburnerBurnedFuelFlowKgPerSecond)
+    ? Math.max(0, Math.min(input.fuelFlowKgPerSecond!, input.afterburnerBurnedFuelFlowKgPerSecond!)) : 0;
+  const excitedPowerW = burned * data.fuelHeatingValueJPerKg * parameters.excitedFuelPowerFraction;
+  const sourceRgbCdPerM3 = blackbody.map((value, channel) => absorptionPerMeter * value
+    + excitedPowerW / (4 * Math.PI * emittingVolumeM3) * data.excitedRgbLumensPerWatt[channel]);
+  if (![fuelPowerW, emittingVolumeM3, absorptionPerMeter, particlePowerUpperBoundW, excitedPowerW, ...sourceRgbCdPerM3].every(Number.isFinite)) return zero;
+  return { valid: true, mode, fuelPowerW, emittingVolumeM3, absorptionPerMeter, particlePowerUpperBoundW, excitedPowerW,
+    totalSourcePowerUpperBoundW: particlePowerUpperBoundW + excitedPowerW,
+    allowedPowerW: fuelPowerW * (parameters.particleFuelPowerFraction + parameters.excitedFuelPowerFraction),
+    absorptionWasCapped: absorptionPerMeter < parameters.absorptionPerMeter,
+    blackbodyRgbCdPerM2: blackbody, sourceRgbCdPerM3,
+    isotropicIntensityRgbCd: sourceRgbCdPerM3.map(value => value * emittingVolumeM3),
+    exteriorIsotropicIntensityRgbCd: sourceRgbCdPerM3.map(value => value * emittingVolumeM3),
+    temperatureMeaning: "legacy-static-exit-hypothesis", chemistryStatus: "legacy-imposed",
+    sourceBoundaryTemperatureKelvin: input.temperatureKelvin!, staticExitTemperatureKelvin: input.temperatureKelvin!, chPowerW: 0, c2PowerW: 0 };
+}
+
+/** Homogeneous-segment solution, including the zero-extinction limit. */
+export function integrateGasSegment(sourceRgbCdPerM3: readonly number[], absorptionPerMeter: number, pathMeters: number) {
+  if (sourceRgbCdPerM3.length !== 3 || sourceRgbCdPerM3.some(value => !Number.isFinite(value) || value < 0)
+    || !Number.isFinite(absorptionPerMeter) || absorptionPerMeter < 0 || !Number.isFinite(pathMeters) || pathMeters < 0) {
+    throw new RangeError("Gas transfer needs finite nonnegative dimensional inputs");
+  }
+  const opacity = -Math.expm1(-absorptionPerMeter * pathMeters);
+  const effectivePathMeters = absorptionPerMeter > 0 ? opacity / absorptionPerMeter : pathMeters;
+  return { transmittance: 1 - opacity, radianceRgbCdPerM2: sourceRgbCdPerM3.map(value => value * effectivePathMeters) };
+}
+
+/** Declared computational support; brightness is determined by local fields. */
+export function engineGasSupportLength(profile: { readonly gasEmission?: EngineGasOpticalData }, baseLength: number,
+  power: number, augmentation: boolean): number {
+  const mode = augmentation ? "afterburner" : "dry";
+  const scale = profile.gasEmission?.spatialField?.supportLengthScale[mode];
+  return baseLength * (scale ?? (augmentation ? 0.7 + 0.3 * Math.max(0, Math.min(1, power)) : 0.2));
+}
+
+/** Offline bases are interpolated in physical axial distance / exit radius. */
+export function sampleGasSpatialBasis(data: EngineGasSpatialData, axialRadii: number, radialFraction: number): readonly number[] {
+  if (!Number.isFinite(axialRadii) || !Number.isFinite(radialFraction) || axialRadii < 0
+    || axialRadii > data.axialRadiusRange[1] || radialFraction < 0 || radialFraction > 1) return [0, 0, 0, 0];
+  const x = axialRadii / data.axialRadiusRange[1] * (data.width - 1), y = radialFraction * (data.height - 1);
+  const x0 = Math.floor(x), x1 = Math.min(data.width - 1, x0 + 1), y0 = Math.floor(y), y1 = Math.min(data.height - 1, y0 + 1);
+  const fx = x - x0, fy = y - y0;
+  return [0, 1, 2, 3].map(c => (1 - fy) * ((1 - fx) * data.basisSamples[y0 * data.width + x0][c]
+    + fx * data.basisSamples[y0 * data.width + x1][c])
+    + fy * ((1 - fx) * data.basisSamples[y1 * data.width + x0][c] + fx * data.basisSamples[y1 * data.width + x1][c]));
+}
+
+/** Integral of a piecewise-linear nodal hat times coordinate^power on [0,1]. */
+function hatMoment(index: number, count: number, power: number): number {
+  const h = 1 / (count - 1), u = index * h;
+  const integral = (lo: number, hi: number, p: number): number => (hi ** (p + 1) - lo ** (p + 1)) / (p + 1);
+  let value = 0;
+  if (index > 0) value += (integral(u - h, u, power + 1) - (u - h) * integral(u - h, u, power)) / h;
+  if (index < count - 1) value += ((u + h) * integral(u, u + h, power) - integral(u, u + h, power + 1)) / h;
+  return value;
+}
+
+/** Exact weights for the actual bilinear source field, including expanding area. */
+export function gasFieldVolumeWeights(width: number, height: number, radiusMeters: number,
+  lengthMeters: number, radiusExpansionRatio: number): Float64Array {
+  const axial = Float64Array.from({ length: width }, (_, x) => hatMoment(x, width, 0)
+    + 2 * radiusExpansionRatio * hatMoment(x, width, 1) + radiusExpansionRatio ** 2 * hatMoment(x, width, 2));
+  const radial = Float64Array.from({ length: height }, (_, y) => hatMoment(y, height, 1));
+  const scale = 2 * Math.PI * radiusMeters ** 2 * lengthMeters;
+  return Float64Array.from({ length: width * height }, (_, index) => scale * axial[index % width] * radial[Math.floor(index / width)]);
+}
+
+export function validEngineGasFlowDomain(domain: EngineGasFlowDomain): boolean {
+  const [lo, hi] = domain.axialDistanceRangeMeters;
+  return Number.isFinite(lo) && Number.isFinite(hi) && lo <= 0 && hi > 0 && hi > lo
+    && domain.sections.length >= 2 && domain.sections[0].distanceMeters === lo
+    && domain.sections[domain.sections.length - 1].distanceMeters === hi
+    && domain.sections.every((s, i) => Number.isFinite(s.distanceMeters)
+      && (!i || s.distanceMeters >= domain.sections[i - 1].distanceMeters)
+      && Number.isFinite(s.radiusMeters) && s.radiusMeters > 0
+      && Number.isFinite(s.innerRadiusMeters ?? 0) && (s.innerRadiusMeters ?? 0) >= 0
+      && (s.innerRadiusMeters ?? 0) < s.radiusMeters
+      && Number.isFinite(s.areaFactor ?? 1) && (s.areaFactor ?? 1) > 0 && (s.areaFactor ?? 1) <= 1);
+}
+
+/** Linear authored cross sections; s is physical path distance, not a world axis. */
+export function sampleEngineGasFlowSection(domain: EngineGasFlowDomain, distanceMeters: number) {
+  const sections = domain.sections;
+  let i = 1;
+  // Duplicate stations encode a zero-measure geometric step; use its right side.
+  while (i < sections.length - 1 && distanceMeters >= sections[i].distanceMeters) i++;
+  const a = sections[i - 1], b = sections[i];
+  const f = b.distanceMeters === a.distanceMeters ? 1
+    : Math.max(0, Math.min(1, (distanceMeters - a.distanceMeters) / (b.distanceMeters - a.distanceMeters)));
+  const mix = (x: number, y: number) => x + (y - x) * f;
+  return { radiusMeters: mix(a.radiusMeters, b.radiusMeters),
+    innerRadiusMeters: mix(a.innerRadiusMeters ?? 0, b.innerRadiusMeters ?? 0),
+    areaFactor: mix(a.areaFactor ?? 1, b.areaFactor ?? 1) };
+}
+
+/** Integral of v times a radial nodal hat above the solid centerbody. */
+function radialHatAbove(index: number, count: number, innerFraction: number): number {
+  const h = 1 / (count - 1), v = index * h;
+  const primitive = (a: number, b: number, slope: number, intercept: number) =>
+    slope * (b ** 3 - a ** 3) / 3 + intercept * (b ** 2 - a ** 2) / 2;
+  let result = 0;
+  if (index > 0 && innerFraction < v) {
+    const lo = Math.max(v - h, innerFraction);
+    result += primitive(lo, v, 1 / h, -(v - h) / h);
+  }
+  if (index < count - 1 && innerFraction < v + h) {
+    const lo = Math.max(v, innerFraction);
+    result += primitive(lo, v + h, -1 / h, (v + h) / h);
+  }
+  return Math.max(0, result);
+}
+
+/**
+ * Integrates the actual bilinear source over ruled annular sections. Without a
+ * centerbody the integrand is polynomial and Gauss8 is exact. With a hole, split
+ * at every radial-hat crossing; the smooth rational remainder has an independent
+ * convergence check. This is offline-per-state geometry work, not ray work.
+ */
+export function gasFlowFieldVolumeWeights(width: number, height: number, domain: EngineGasFlowDomain): Float64Array {
+  return integrateGasFlowFieldVolumeWeights(width, height, domain).total;
+}
+
+function integrateGasFlowFieldVolumeWeights(width: number, height: number, domain: EngineGasFlowDomain): GasGeometryWeights {
+  const [lo, hi] = domain.axialDistanceRangeMeters, length = hi - lo;
+  const splits = [0, ...domain.sections.map(s => s.distanceMeters),
+    ...Array.from({ length: width }, (_, i) => lo + length * i / (width - 1))];
+  for (let i = 1; i < domain.sections.length; i++) {
+    const a = domain.sections[i - 1], b = domain.sections[i];
+    for (let y = 1; y < height - 1; y++) {
+      const v = y / (height - 1);
+      const start = (a.innerRadiusMeters ?? 0) - v * a.radiusMeters;
+      const end = (b.innerRadiusMeters ?? 0) - v * b.radiusMeters;
+      if (start * end < 0) splits.push(a.distanceMeters + (b.distanceMeters - a.distanceMeters) * start / (start - end));
+    }
+  }
+  splits.sort((a, b) => a - b);
+  const points = [...new Set(splits)];
+  const nodes = [-0.9602898564975363, -0.7966664774136267, -0.525532409916329, -0.1834346424956498,
+    0.1834346424956498, 0.525532409916329, 0.7966664774136267, 0.9602898564975363];
+  const quadrature = [0.1012285362903763, 0.2223810344533745, 0.3137066458778873, 0.362683783378362,
+    0.362683783378362, 0.3137066458778873, 0.2223810344533745, 0.1012285362903763];
+  const weights = new Float64Array(width * height);
+  const exterior = new Float64Array(width * height);
+  for (let i = 1; i < points.length; i++) {
+    const half = (points[i] - points[i - 1]) / 2, center = (points[i] + points[i - 1]) / 2;
+    for (let q = 0; q < nodes.length; q++) {
+      const s = center + half * nodes[q], section = sampleEngineGasFlowSection(domain, s);
+      const x = (s - lo) / length * (width - 1), x0 = Math.min(width - 2, Math.floor(x)), f = x - x0;
+      const scale = 2 * Math.PI * section.radiusMeters ** 2 * section.areaFactor * half * quadrature[q];
+      for (let y = 0; y < height; y++) {
+        const w = scale * radialHatAbove(y, height, section.innerRadiusMeters / section.radiusMeters);
+        weights[y * width + x0] += w * (1 - f);
+        weights[y * width + x0 + 1] += w * f;
+        if (s >= 0) {
+          exterior[y * width + x0] += w * (1 - f);
+          exterior[y * width + x0 + 1] += w * f;
+        }
+      }
+    }
+  }
+  return { total: weights, exterior };
+}
+
+function evaluateSpatialGasOptics(data: EngineGasOpticalData, input: EngineGasOpticalInputs,
+  zero: EngineGasOpticalResult): EngineGasOpticalResult {
+  const spatial = data.spatialField!;
+  const ambient = input.ambientTemperatureKelvin;
+  const width = input.axialSamples ?? DEFAULT_ENGINE_GAS_AXIAL_SAMPLES;
+  const height = input.radialSamples ?? DEFAULT_ENGINE_GAS_RADIAL_SAMPLES;
+  if (ambient === undefined || !Number.isFinite(ambient) || ambient < spatial.ambientTemperatureKelvinRange[0]
+    || ambient > spatial.ambientTemperatureKelvinRange[1] || !Number.isInteger(width) || !Number.isInteger(height)
+    || width < 8 || width > 64 || height < 8 || height > 64) return zero;
+  const corrected = data.model === "imposed-gas-bath-v2";
+  const mode = input.augmentation ? "afterburner" : "dry", parameters = data[corrected ? "dry" : mode];
+  const mach = spatial.exitMach?.[mode] ?? 0;
+  const sourceBoundaryTemperatureKelvin = corrected ? input.temperatureKelvin!
+    : input.temperatureKelvin! / (1 + 0.5 * (spatial.specificHeatRatio! - 1) * mach * mach);
+  const radiusExpansionRatio = spatial.spreadingSlope * input.lengthMeters / input.radiusMeters;
+  const domain: EngineGasFlowDomain = corrected && input.flowDomain ? input.flowDomain : {
+    axialDistanceRangeMeters: [0, input.lengthMeters], sections: [
+      { distanceMeters: 0, radiusMeters: input.radiusMeters },
+      { distanceMeters: input.lengthMeters, radiusMeters: input.radiusMeters * (1 + radiusExpansionRatio) }] };
+  if (!validEngineGasFlowDomain(domain)) return zero;
+  const domainWeights = cachedGasGeometryWeights(data, width, height, domain,
+    corrected && Boolean(input.flowDomain), input, radiusExpansionRatio);
+  const volumeWeightsM3 = domainWeights.total;
+  const exteriorVolumeWeightsM3 = domainWeights.exterior;
+  if (!Number.isFinite(radiusExpansionRatio) || volumeWeightsM3.some(v => !Number.isFinite(v) || v < 0)) return zero;
+  const count = width * height, rgba = new Float32Array(count * 4);
+  const particleTemperatureKelvin = new Float64Array(count);
+  const particlePhotopicYCdPerM3 = new Float64Array(count);
+  const particleSourceRgbCdPerM3 = new Float64Array(count * 3);
+  const chSourceRgbCdPerM3 = new Float64Array(count * 3), c2SourceRgbCdPerM3 = new Float64Array(count * 3);
+  const particlePowerDensityWPerM3 = new Float64Array(count);
+  const chPowerDensityWPerM3 = new Float64Array(count), c2PowerDensityWPerM3 = new Float64Array(count);
+  const sigma = 5.670374419e-8;
+  let emittingVolumeM3 = 0, particlePowerPerAbsorption = 0, chBasisVolume = 0, c2BasisVolume = 0;
+  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
+    const index = y * width + x, weight = volumeWeightsM3[index];
+    const [start, end] = domain.axialDistanceRangeMeters;
+    const distance = start + x / (width - 1) * (end - start);
+    // Upstream is a homogeneous continuation of the exit boundary hypothesis,
+    // not a new augmentor chemistry or thermodynamic solution.
+    const basis = sampleGasSpatialBasis(spatial, Math.max(0, distance) / input.radiusMeters, y / (height - 1));
+    const kelvin = ambient + (sourceBoundaryTemperatureKelvin - ambient) * basis[0];
+    particleTemperatureKelvin[index] = kelvin;
+    // Mixed/static temperatures below the cold table remain physically cold;
+    // their negligible visible tail is zero, never normalized or rejected hot.
+    const xyz = interpolateAbsoluteEmission(spatial.blackbodyXyz, kelvin) ?? [0, 0, 0];
+    const rgb = signedLinearRgbFromXyz(xyz);
+    particlePhotopicYCdPerM3[index] = basis[1] * xyz[1];
+    for (let c = 0; c < 3; c++) particleSourceRgbCdPerM3[index * 3 + c] = basis[1] * rgb[c];
+    rgba[index * 4 + 3] = basis[1];
+    particlePowerDensityWPerM3[index] = 4 * sigma * basis[1] * kelvin ** 4;
+    chPowerDensityWPerM3[index] = basis[2];
+    c2PowerDensityWPerM3[index] = basis[3];
+    emittingVolumeM3 += weight;
+    particlePowerPerAbsorption += weight * particlePowerDensityWPerM3[index];
+    chBasisVolume += weight * basis[2]; c2BasisVolume += weight * basis[3];
+  }
+  const fuelPowerW = input.fuelFlowKgPerSecond! * data.fuelHeatingValueJPerKg;
+  // Four Float32 ulps of headroom keep shader storage rounding inside the
+  // allocated complete-field bound. This is numerical, not a display gain.
+  const storageMargin = 1 - 2 ** -22;
+  const particleBudgetW = fuelPowerW * parameters.particleFuelPowerFraction;
+  const absorptionPerMeter = Math.min(parameters.absorptionPerMeter,
+    particlePowerPerAbsorption > 0 ? particleBudgetW * storageMargin / particlePowerPerAbsorption : parameters.absorptionPerMeter);
+  const particlePowerUpperBoundW = absorptionPerMeter * particlePowerPerAbsorption;
+  const burned = !corrected && input.augmentation && Number.isFinite(input.afterburnerBurnedFuelFlowKgPerSecond)
+    ? Math.max(0, Math.min(input.fuelFlowKgPerSecond!, input.afterburnerBurnedFuelFlowKgPerSecond!)) : 0;
+  const excitedAllocationW = burned * data.fuelHeatingValueJPerKg * parameters.excitedFuelPowerFraction * storageMargin;
+  const chPowerW = chBasisVolume > 0 ? excitedAllocationW * spatial.excitedSpecies.ch.powerFraction : 0;
+  const c2PowerW = c2BasisVolume > 0 ? excitedAllocationW * spatial.excitedSpecies.c2.powerFraction : 0;
+  const excitedPowerW = chPowerW + c2PowerW;
+  const isotropicIntensityRgbCd = [0, 0, 0];
+  const exteriorIsotropicIntensityRgbCd = [0, 0, 0];
+  const chRgb = signedLinearRgbFromXyz(spatial.excitedSpecies.ch.xyzLumensPerWatt);
+  const c2Rgb = signedLinearRgbFromXyz(spatial.excitedSpecies.c2.xyzLumensPerWatt);
+  let maxSourceCdPerM3 = 0, maxAbsorptionPerMeter = 0;
+  for (let index = 0; index < count; index++) {
+    particlePowerDensityWPerM3[index] *= absorptionPerMeter;
+    chPowerDensityWPerM3[index] *= chBasisVolume > 0 ? chPowerW / chBasisVolume : 0;
+    c2PowerDensityWPerM3[index] *= c2BasisVolume > 0 ? c2PowerW / c2BasisVolume : 0;
+    rgba[index * 4 + 3] *= absorptionPerMeter;
+    maxAbsorptionPerMeter = Math.max(maxAbsorptionPerMeter, rgba[index * 4 + 3]);
+    const mixed = [0, 0, 0];
+    for (let c = 0; c < 3; c++) {
+      const offset = index * 3 + c;
+      particleSourceRgbCdPerM3[offset] *= absorptionPerMeter;
+      chSourceRgbCdPerM3[offset] = chPowerDensityWPerM3[index] / (4 * Math.PI) * chRgb[c];
+      c2SourceRgbCdPerM3[offset] = c2PowerDensityWPerM3[index] / (4 * Math.PI) * c2Rgb[c];
+      mixed[c] = particleSourceRgbCdPerM3[offset] + chSourceRgbCdPerM3[offset] + c2SourceRgbCdPerM3[offset];
+    }
+    const photopicY = particlePhotopicYCdPerM3[index] * absorptionPerMeter
+      + (chPowerDensityWPerM3[index] * spatial.excitedSpecies.ch.xyzLumensPerWatt[1]
+        + c2PowerDensityWPerM3[index] * spatial.excitedSpecies.c2.xyzLumensPerWatt[1]) / (4 * Math.PI);
+    const source = gamutMapEngineEmission(mixed, photopicY);
+    for (let c = 0; c < 3; c++) {
+      rgba[index * 4 + c] = source[c];
+      maxSourceCdPerM3 = Math.max(maxSourceCdPerM3, rgba[index * 4 + c]);
+      isotropicIntensityRgbCd[c] += rgba[index * 4 + c] * volumeWeightsM3[index];
+      exteriorIsotropicIntensityRgbCd[c] += rgba[index * 4 + c] * exteriorVolumeWeightsM3[index];
+    }
+  }
+  if (![emittingVolumeM3, fuelPowerW, absorptionPerMeter, particlePowerUpperBoundW, excitedPowerW,
+    maxSourceCdPerM3, maxAbsorptionPerMeter, ...isotropicIntensityRgbCd].every(Number.isFinite) || emittingVolumeM3 <= 0) return zero;
+  return { valid: true, mode, fuelPowerW, emittingVolumeM3, absorptionPerMeter, particlePowerUpperBoundW, excitedPowerW,
+    totalSourcePowerUpperBoundW: particlePowerUpperBoundW + excitedPowerW,
+    allowedPowerW: fuelPowerW * (parameters.particleFuelPowerFraction + parameters.excitedFuelPowerFraction),
+    absorptionWasCapped: absorptionPerMeter < parameters.absorptionPerMeter,
+    blackbodyRgbCdPerM2: interpolateAbsoluteEmission(data.blackbody, sourceBoundaryTemperatureKelvin) ?? [0, 0, 0],
+    sourceRgbCdPerM3: isotropicIntensityRgbCd.map(v => v / emittingVolumeM3), isotropicIntensityRgbCd, exteriorIsotropicIntensityRgbCd,
+    temperatureMeaning: corrected ? "imposed-native-gas-bath-proxy" : "legacy-static-exit-hypothesis",
+    chemistryStatus: corrected ? "unavailable" : "legacy-imposed", sourceBoundaryTemperatureKelvin,
+    ...(corrected ? {} : { staticExitTemperatureKelvin: sourceBoundaryTemperatureKelvin }), chPowerW, c2PowerW,
+    field: { width, height, rgba, radiusExpansionRatio, axialDistanceRangeMeters: domain.axialDistanceRangeMeters,
+      sections: domain.sections, maxSourceCdPerM3, maxAbsorptionPerMeter, particleTemperatureKelvin,
+      particleSourceRgbCdPerM3, chSourceRgbCdPerM3, c2SourceRgbCdPerM3,
+      particlePowerDensityWPerM3, chPowerDensityWPerM3, c2PowerDensityWPerM3, volumeWeightsM3, exteriorVolumeWeightsM3 } };
+}
+
+/** XYZ → signed linear sRGB: retain out-of-gamut contributions until mixed. */
+export function signedLinearRgbFromXyz(xyz: readonly number[]): readonly number[] {
+  return [3.2404542 * xyz[0] - 1.5371385 * xyz[1] - 0.4985314 * xyz[2],
+    -0.969266 * xyz[0] + 1.8760108 * xyz[1] + 0.041556 * xyz[2],
+    0.0556434 * xyz[0] - 0.2040259 * xyz[1] + 1.0572252 * xyz[2]];
+}
+
+/** Apply once after local spectral components mix, preserving their photopic Y. */
+export function gamutMapEngineEmission(rgb: readonly number[], photopicY: number): readonly number[] {
+  const clipped = rgb.map(v => Math.max(0, v));
+  const y = 0.2126729 * clipped[0] + 0.7151522 * clipped[1] + 0.072175 * clipped[2];
+  return clipped.map(v => y > 0 ? v * photopicY / y : 0);
+}
+
+/** Match the renderer's endpoint-aligned manual bilinear field sampling. */
+export function sampleEngineGasField(result: Pick<EngineGasOpticalResult, "field">, axialFraction: number, radialFraction: number) {
+  const field = result.field;
+  const zero = { inside: false, sourceRgbCdPerM3: [0, 0, 0], absorptionPerMeter: 0,
+    particleTemperatureKelvin: 0, particleSourceRgbCdPerM3: [0, 0, 0], chSourceRgbCdPerM3: [0, 0, 0], c2SourceRgbCdPerM3: [0, 0, 0],
+    particlePowerDensityWPerM3: 0, chPowerDensityWPerM3: 0, c2PowerDensityWPerM3: 0 };
+  if (!field || !Number.isFinite(axialFraction) || !Number.isFinite(radialFraction)
+    || axialFraction < 0 || axialFraction > 1 || radialFraction < 0 || radialFraction > 1) return zero;
+  const [lo, hi] = field.axialDistanceRangeMeters;
+  const section = sampleEngineGasFlowSection(field, lo + axialFraction * (hi - lo));
+  if (radialFraction * section.radiusMeters < section.innerRadiusMeters) return zero;
+  const x = axialFraction * (field.width - 1), y = radialFraction * (field.height - 1);
+  const x0 = Math.floor(x), y0 = Math.floor(y), x1 = Math.min(x0 + 1, field.width - 1), y1 = Math.min(y0 + 1, field.height - 1);
+  const fx = x - x0, fy = y - y0;
+  const sample = (array: Float32Array | Float64Array, stride: number, c: number): number =>
+    (1 - fy) * ((1 - fx) * array[(y0 * field.width + x0) * stride + c] + fx * array[(y0 * field.width + x1) * stride + c])
+    + fy * ((1 - fx) * array[(y1 * field.width + x0) * stride + c] + fx * array[(y1 * field.width + x1) * stride + c]);
+  return { inside: true, sourceRgbCdPerM3: [0, 1, 2].map(c => sample(field.rgba, 4, c)), absorptionPerMeter: sample(field.rgba, 4, 3),
+    particleTemperatureKelvin: sample(field.particleTemperatureKelvin, 1, 0),
+    particleSourceRgbCdPerM3: [0, 1, 2].map(c => sample(field.particleSourceRgbCdPerM3, 3, c)),
+    chSourceRgbCdPerM3: [0, 1, 2].map(c => sample(field.chSourceRgbCdPerM3, 3, c)),
+    c2SourceRgbCdPerM3: [0, 1, 2].map(c => sample(field.c2SourceRgbCdPerM3, 3, c)),
+    particlePowerDensityWPerM3: sample(field.particlePowerDensityWPerM3, 1, 0),
+    chPowerDensityWPerM3: sample(field.chPowerDensityWPerM3, 1, 0), c2PowerDensityWPerM3: sample(field.c2PowerDensityWPerM3, 1, 0) };
+}

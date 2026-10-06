@@ -1,9 +1,15 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createEngineSpoolRenderer, type EngineSpoolConfiguration } from "./engineSpoolRenderer";
+import { createEngineSpoolMotion } from "./engineSpoolMotion";
 
 const CONFIG: EngineSpoolConfiguration = { preference: "auto", maxFps: 30, pixelRatio: 2, outerBlades: 22, innerBlades: 40 };
 const STILL = { outerAngle: 0, innerAngle: 0 };
+const TAU = 2 * Math.PI;
+const forwardAngle = (from: number, to: number): number => ((to - from) % TAU + TAU) % TAU;
+const renderedAngles = (gl: ReturnType<typeof fakeGl>): [number, number][] =>
+  gl.uniform4f.mock.calls.filter((_, index) => index % 3 === 0)
+    .map((call, index) => [call[1], gl.uniform4f.mock.calls[index * 3 + 1][1]]);
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
@@ -89,7 +95,7 @@ describe("engine spool GPU renderer", () => {
     expect(data[2]).toBe(22);
     expect(data[4]).toBe(0);
     expect(data[6]).toBe(40);
-    expect(data[9]).toBe(0);
+    expect(data[9]).toBe(-1);
     expect(t.canvas().getAttribute("aria-hidden")).toBe("true");
     expect(t.canvas().style.pointerEvents).toBe("none");
     renderer.destroy();
@@ -207,6 +213,327 @@ describe("engine spool GPU renderer", () => {
     renderer.destroy();
   });
 
+  it.each([
+    [60, 60], [120, 120], [144, 144], [60, 240], [120, 240], [144, 240], [240, 240],
+  ])("draws every %i Hz frame within a %i FPS cap despite timestamp roundoff", async (refreshRate, maxFps) => {
+    const gl = fakeGl();
+    const t = fixture({ webgl2: gl });
+    const renderer = createEngineSpoolRenderer(t.host, { ...CONFIG, maxFps, device: null });
+    await renderer.ready;
+    for (let index = 0; index <= refreshRate * 3; index++) {
+      renderer.draw({ outerAngle: index / 1000, innerAngle: index / 2000 }, index * 1000 / refreshRate);
+    }
+    expect(gl.drawArrays).toHaveBeenCalledTimes(refreshRate * 3 + 1);
+    renderer.destroy();
+  });
+
+  it("carries the timing remainder across jitter instead of dropping below the selected cadence", async () => {
+    const gl = fakeGl();
+    const t = fixture({ webgl2: gl });
+    const renderer = createEngineSpoolRenderer(t.host, { ...CONFIG, maxFps: 30, device: null });
+    await renderer.ready;
+    const jitter = [0, .2, -.2, .1, -.1];
+    for (let index = 0; index <= 180; index++) {
+      renderer.draw({ outerAngle: index / 1000, innerAngle: null }, index * 1000 / 60 + jitter[index % jitter.length]);
+    }
+    // Three seconds at a 30 FPS cap, allowing one slot at either endpoint.
+    expect(gl.drawArrays.mock.calls.length).toBeGreaterThanOrEqual(90);
+    expect(gl.drawArrays.mock.calls.length).toBeLessThanOrEqual(91);
+    renderer.destroy();
+  });
+
+  it("discards all missed draw slots after a stall instead of accumulating catch-up work", async () => {
+    const gl = fakeGl();
+    const t = fixture({ webgl2: gl });
+    const renderer = createEngineSpoolRenderer(t.host, { ...CONFIG, maxFps: 60, device: null });
+    await renderer.ready;
+    renderer.draw(STILL, 0);
+    renderer.draw({ outerAngle: 1, innerAngle: 2 }, 2000);
+    for (let index = 1; index <= 10; index++) {
+      renderer.draw({ outerAngle: 1 + index / 100, innerAngle: 2 }, 2000 + index / 10);
+    }
+    expect(gl.drawArrays).toHaveBeenCalledTimes(2);
+    renderer.draw({ outerAngle: 2, innerAngle: 3 }, 2000 + 1000 / 60);
+    expect(gl.drawArrays).toHaveBeenCalledTimes(3);
+    renderer.destroy();
+  });
+
+  it("applies an increased frame cap without waiting for the previous interval", async () => {
+    const gl = fakeGl();
+    const t = fixture({ webgl2: gl });
+    const renderer = createEngineSpoolRenderer(t.host, { ...CONFIG, maxFps: 1, device: null });
+    await renderer.ready;
+    renderer.draw(STILL, 0);
+    renderer.configure({ ...CONFIG, maxFps: 120 });
+    renderer.draw({ outerAngle: .1, innerAngle: .2 }, 1000 / 120);
+    expect(gl.drawArrays).toHaveBeenCalledTimes(2);
+    expect(gl.createProgram).toHaveBeenCalledOnce();
+    renderer.destroy();
+  });
+
+  it.each([[60, 22, 36], [120, 22, 36], [60, 23, 37], [120, 23, 37]])(
+    "uses %i accepted FPS with %i/%i blades and preserves 50% versus 99% RPM", async (refreshRate, outerBlades, innerBlades) => {
+    const gl = fakeGl();
+    const t = fixture({ webgl2: gl });
+    const renderer = createEngineSpoolRenderer(t.host, {
+      ...CONFIG, maxFps: 1000, outerBlades, innerBlades, maxPatternStep: .45, device: null,
+    });
+    const motion = createEngineSpoolMotion();
+    await renderer.ready;
+    for (let index = 0; index <= refreshRate; index++) {
+      renderer.draw(motion.update(index / refreshRate, { outer: .5, inner: .99 }, 60), index * 1000 / refreshRate);
+    }
+    const frames = renderedAngles(gl);
+    expect(frames).toHaveLength(refreshRate + 1);
+    for (let index = 1; index < frames.length; index++) {
+      const outer = forwardAngle(frames[index - 1][0], frames[index][0]);
+      const inner = forwardAngle(frames[index - 1][1], frames[index][1]);
+      expect(outer).toBeCloseTo(TAU * .45 / 2 * .5, 5);
+      expect(inner).toBeCloseTo(TAU * .45 / 2 * .99, 5);
+      expect(outer / inner).toBeCloseTo(.5 / .99, 4);
+      expect(inner * 2 / TAU).toBeLessThan(.5);
+    }
+    expect(renderer.getMotionStatus()).toEqual({
+      fps: expect.closeTo(refreshRate), maxTurnsPerSecond: expect.closeTo(refreshRate * .45 / 2), limited: true,
+    });
+    renderer.destroy();
+  });
+
+  it("limits consecutive accepted draws at a 30 FPS cap on a 120 Hz client", async () => {
+    const gl = fakeGl();
+    const t = fixture({ webgl2: gl });
+    const renderer = createEngineSpoolRenderer(t.host, { ...CONFIG, innerBlades: 36, device: null });
+    const motion = createEngineSpoolMotion();
+    await renderer.ready;
+    for (let index = 0; index <= 120; index++) {
+      renderer.draw(motion.update(index / 120, { outer: .5, inner: 1 }, 60), index * 1000 / 120);
+    }
+    const frames = renderedAngles(gl);
+    expect(frames).toHaveLength(31);
+    for (let index = 1; index < frames.length; index++) {
+      expect(forwardAngle(frames[index - 1][0], frames[index][0])).toBeCloseTo(TAU * .45 / 2 * .5, 5);
+      expect(forwardAngle(frames[index - 1][1], frames[index][1])).toBeCloseTo(TAU * .45 / 2, 5);
+    }
+    expect(renderer.getMotionStatus()).toEqual({
+      fps: expect.closeTo(30), maxTurnsPerSecond: expect.closeTo(6.75), limited: true,
+    });
+    renderer.destroy();
+  });
+
+  it("keeps every jittered or stalled frame forward and discards excess rotation", async () => {
+    const gl = fakeGl();
+    const t = fixture({ webgl2: gl });
+    const renderer = createEngineSpoolRenderer(t.host, {
+      ...CONFIG, maxFps: 1000, innerBlades: 36, maxPatternStep: .3, device: null,
+    });
+    const motion = createEngineSpoolMotion();
+    await renderer.ready;
+    const timestamps = [0, 16, 33.7, 49, 1000, 1017, 1033];
+    for (const at of timestamps) renderer.draw(motion.update(at / 1000, { outer: .6, inner: 1 }, 60), at);
+    const frames = renderedAngles(gl);
+    expect(frames).toHaveLength(timestamps.length);
+    for (let index = 1; index < frames.length; index++) {
+      const outer = forwardAngle(frames[index - 1][0], frames[index][0]);
+      const inner = forwardAngle(frames[index - 1][1], frames[index][1]);
+      expect(inner).toBeCloseTo(TAU * .3 / 2, 5);
+      expect(outer / inner).toBeCloseTo(.6, 4);
+    }
+    // A slower new command after the stall does not replay the discarded turns.
+    const maxAngle = TAU * 60 * 1.033;
+    renderer.draw({ outerAngle: maxAngle * .6 + .0006, innerAngle: maxAngle + .001, maxAngle: maxAngle + .001 }, 1050);
+    const following = renderedAngles(gl).at(-1)!;
+    expect(forwardAngle(frames.at(-1)![1], following[1])).toBeCloseTo(.001, 5);
+    expect(renderer.getMotionStatus().limited).toBe(false);
+    renderer.destroy();
+  });
+
+  it.each([2, 22, 23, 36, 37])("keeps the selected speed with %i blades when the two-lobe pattern permits it", async count => {
+    const gl = fakeGl();
+    const t = fixture({ webgl2: gl });
+    const renderer = createEngineSpoolRenderer(t.host, {
+      ...CONFIG, maxFps: 1000, outerBlades: count, innerBlades: 0, device: null,
+    });
+    const motion = createEngineSpoolMotion();
+    await renderer.ready;
+    renderer.draw(motion.update(0, { outer: .99, inner: null }, 2), 0);
+    renderer.draw(motion.update(1 / 60, { outer: .99, inner: null }, 2), 1000 / 60);
+    expect(renderedAngles(gl).at(-1)![0]).toBeCloseTo(TAU * 2 * .99 / 60);
+    expect(renderer.getMotionStatus()).toEqual({ fps: expect.closeTo(60), maxTurnsPerSecond: expect.closeTo(2), limited: false });
+    renderer.destroy();
+  });
+
+  it("retains full-turn information in huge requested angles while packing only wrapped display phases", async () => {
+    const gl = fakeGl();
+    const t = fixture({ webgl2: gl });
+    const renderer = createEngineSpoolRenderer(t.host, { ...CONFIG, maxFps: 1000, innerBlades: 36, device: null });
+    await renderer.ready;
+    const start = TAU * 1e6 + .25;
+    renderer.draw({ outerAngle: start * .5, innerAngle: start, maxAngle: start }, 0);
+    renderer.draw({ outerAngle: start * .5 + 5 * TAU, innerAngle: start + 10 * TAU, maxAngle: start + 10 * TAU }, 1000 / 60);
+    const frames = renderedAngles(gl);
+    expect(forwardAngle(frames[0][0], frames[1][0])).toBeCloseTo(TAU * .45 / 2 * .5, 5);
+    expect(forwardAngle(frames[0][1], frames[1][1])).toBeCloseTo(TAU * .45 / 2, 5);
+    for (const frame of frames) for (const angle of frame) {
+      expect(angle).toBeGreaterThanOrEqual(0);
+      expect(angle).toBeLessThan(TAU);
+    }
+    renderer.destroy();
+  });
+
+  it("limits legacy frames without a full-scale reference and rebases reset phases without reversing", async () => {
+    const gl = fakeGl();
+    const t = fixture({ webgl2: gl });
+    const renderer = createEngineSpoolRenderer(t.host, { ...CONFIG, maxFps: 1000, innerBlades: 36, device: null });
+    await renderer.ready;
+    renderer.draw(STILL, 0);
+    renderer.draw({ outerAngle: 5, innerAngle: 10 }, 17);
+    const frame = renderedAngles(gl).at(-1)!;
+    expect(frame[0]).toBeCloseTo(TAU * .45 / 2 * .5, 5);
+    expect(frame[1]).toBeCloseTo(TAU * .45 / 2, 5);
+    expect(renderer.getMotionStatus().maxTurnsPerSecond).toBeNull();
+    renderer.draw(STILL, 1);
+    expect(renderedAngles(gl)).toHaveLength(2);
+    renderer.draw({ outerAngle: .01, innerAngle: .02 }, 18);
+    const next = renderedAngles(gl).at(-1)!;
+    expect(forwardAngle(frame[0], next[0])).toBeCloseTo(.01, 5);
+    expect(forwardAngle(frame[1], next[1])).toBeCloseTo(.02, 5);
+    renderer.destroy();
+  });
+
+  it("redraws changed geometry without advancing the displayed phase or its measured cadence", async () => {
+    const gl = fakeGl();
+    const t = fixture({ webgl2: gl });
+    vi.stubGlobal("devicePixelRatio", 2);
+    const settings = { ...CONFIG, maxFps: 1000, innerBlades: 36, device: null };
+    const renderer = createEngineSpoolRenderer(t.host, settings);
+    const motion = createEngineSpoolMotion();
+    await renderer.ready;
+    renderer.draw(motion.update(0, { outer: .5, inner: .99 }, 60), 0);
+    renderer.draw(motion.update(1 / 60, { outer: .5, inner: .99 }, 60), 1000 / 60);
+    const previous = renderedAngles(gl).at(-1);
+    const status = renderer.getMotionStatus();
+    renderer.configure({ ...settings, pixelRatio: 1 });
+    expect(renderedAngles(gl)).toHaveLength(3);
+    expect(renderedAngles(gl).at(-1)).toEqual(previous);
+    expect(renderer.getMotionStatus()).toEqual(status);
+    renderer.draw(motion.update(2 / 60, { outer: .5, inner: .99 }, 60), 2000 / 60);
+    expect(forwardAngle(previous![1], renderedAngles(gl).at(-1)![1])).toBeCloseTo(TAU * .45 / 2 * .99, 5);
+    expect(renderer.getMotionStatus().fps).toBeCloseTo(60);
+    renderer.destroy();
+  });
+
+  it("does not consume a skipped motion request when a forced geometry redraw occurs", async () => {
+    const gl = fakeGl();
+    const t = fixture({ webgl2: gl });
+    vi.stubGlobal("devicePixelRatio", 2);
+    const settings = { ...CONFIG, innerBlades: 36, device: null };
+    const renderer = createEngineSpoolRenderer(t.host, settings);
+    const motion = createEngineSpoolMotion();
+    await renderer.ready;
+    renderer.draw(motion.update(0, { outer: .5, inner: .99 }, 60), 0);
+    renderer.draw(motion.update(.01, { outer: .5, inner: .99 }, 60), 10);
+    expect(renderedAngles(gl)).toHaveLength(1);
+    const status = renderer.getMotionStatus();
+    renderer.configure({ ...settings, pixelRatio: 1 });
+    expect(renderedAngles(gl)).toEqual([[0, 0], [0, 0]]);
+    expect(renderer.getMotionStatus()).toEqual(status);
+    // The forced draw neither consumes the pending rotation nor shifts the FPS
+    // deadline from 33.33 ms to 43.33 ms.
+    renderer.draw(motion.update(.034, { outer: .5, inner: .99 }, 60), 34);
+    const frames = renderedAngles(gl);
+    expect(frames).toHaveLength(3);
+    expect(frames[2][0]).toBeCloseTo(TAU * .45 / 2 * .5, 5);
+    expect(frames[2][1]).toBeCloseTo(TAU * .45 / 2 * .99, 5);
+    expect(renderer.getMotionStatus().fps).toBeCloseTo(1000 / 34);
+    renderer.destroy();
+  });
+
+  it.each(["webgl2", "webgl1"] as const)("updates both shaft colors through the existing %s uniforms without changing their phases or geometry", async preference => {
+    const gl = fakeGl();
+    const t = fixture({ [preference === "webgl1" ? "webgl" : "webgl2"]: gl });
+    const renderer = createEngineSpoolRenderer(t.host, { ...CONFIG, preference, device: null });
+    await renderer.ready;
+    renderer.draw({ outerAngle: .7, innerAngle: 1.1, maxAngle: 2 }, 0);
+    const rings = gl.uniform4f.mock.calls.slice(0, 2).map(call => call.slice(1));
+    const status = renderer.getMotionStatus();
+    renderer.setAccentColor("#Ff8000");
+    expect(gl.drawArrays).toHaveBeenCalledTimes(2);
+    expect(gl.uniform4f.mock.calls.slice(-3, -1).map(call => call.slice(1))).toEqual(rings);
+    expect(gl.uniform4f.mock.calls.at(-1)?.slice(1)).toEqual([
+      108, 1, expect.closeTo(128 / 255), 0,
+    ]);
+    expect(renderer.getMotionStatus()).toEqual(status);
+    renderer.setAccentColor("#ff8000");
+    expect(gl.drawArrays).toHaveBeenCalledTimes(2);
+    renderer.setAccentColor("#abc");
+    expect(gl.drawArrays).toHaveBeenCalledTimes(3);
+    expect(gl.uniform4f.mock.calls.at(-1)?.slice(1)).toEqual([108, -1, 0, 0]);
+    for (const color of ["orange", "#1234567", " #123456", "#gg0000", null]) renderer.setAccentColor(color);
+    expect(gl.drawArrays).toHaveBeenCalledTimes(3);
+    renderer.setAccentColor("#000000");
+    expect(gl.uniform4f.mock.calls.at(-1)?.slice(1)).toEqual([108, 0, 0, 0]);
+    renderer.setAccentColor(null);
+    expect(gl.drawArrays).toHaveBeenCalledTimes(5);
+    expect(gl.uniform4f.mock.calls.slice(-3, -1).map(call => call.slice(1))).toEqual(rings);
+    expect(gl.createProgram).toHaveBeenCalledOnce();
+    expect(gl.bufferData).toHaveBeenCalledOnce();
+    renderer.destroy();
+    renderer.setAccentColor("#123456");
+    expect(gl.drawArrays).toHaveBeenCalledTimes(5);
+  });
+
+  it("packs a pending accent into the existing 48-byte WebGPU uniform allocation", async () => {
+    const gpu = fakeGpu();
+    const t = fixture({ webgpu: gpu.context });
+    const renderer = createEngineSpoolRenderer(t.host, { ...CONFIG, device: gpu.device });
+    renderer.setAccentColor("#2468ac");
+    renderer.draw(STILL, 0);
+    await renderer.ready;
+    expect(gpu.raw.createBuffer).toHaveBeenCalledExactlyOnceWith({ size: 48, usage: 64 | 8 });
+    const data = gpu.raw.queue.writeBuffer.mock.calls.at(-1)?.[2] as unknown as Float32Array;
+    expect(data.byteLength).toBe(48);
+    expect([...data.slice(9)]).toEqual([expect.closeTo(36 / 255), expect.closeTo(104 / 255), expect.closeTo(172 / 255)]);
+    expect(gpu.pass.draw).toHaveBeenCalledExactlyOnceWith(3);
+    renderer.setAccentColor("#2468AC");
+    expect(gpu.raw.queue.writeBuffer).toHaveBeenCalledOnce();
+    renderer.setAccentColor(null);
+    expect([...data.slice(9)]).toEqual([-1, 0, 0]);
+    expect(gpu.raw.queue.writeBuffer).toHaveBeenCalledTimes(2);
+    expect(gpu.raw.createBuffer).toHaveBeenCalledOnce();
+    renderer.destroy();
+  });
+
+  it("changes only color while a motion request is waiting for its FPS deadline", async () => {
+    const gl = fakeGl();
+    const t = fixture({ webgl2: gl });
+    const renderer = createEngineSpoolRenderer(t.host, { ...CONFIG, device: null });
+    const motion = createEngineSpoolMotion();
+    await renderer.ready;
+    renderer.draw(motion.update(0, { outer: .5, inner: .99 }, 60), 0);
+    renderer.draw(motion.update(.01, { outer: .5, inner: .99 }, 60), 10);
+    const status = renderer.getMotionStatus();
+    expect(renderedAngles(gl)).toEqual([[0, 0]]);
+    renderer.setAccentColor("#ff6600");
+    expect(renderedAngles(gl)).toEqual([[0, 0], [0, 0]]);
+    expect(renderer.getMotionStatus()).toEqual(status);
+    renderer.draw(motion.update(.034, { outer: .5, inner: .99 }, 60), 34);
+    const moving = renderedAngles(gl).at(-1)!;
+    expect(renderedAngles(gl)).toHaveLength(3);
+    expect(moving[0]).toBeCloseTo(TAU * .45 / 2 * .5, 5);
+    expect(moving[1]).toBeCloseTo(TAU * .45 / 2 * .99, 5);
+    expect(renderer.getMotionStatus().fps).toBeCloseTo(1000 / 34);
+    const movingStatus = renderer.getMotionStatus();
+    renderer.setAccentColor(null);
+    expect(renderedAngles(gl).at(-1)).toEqual(moving);
+    expect(renderer.getMotionStatus()).toEqual(movingStatus);
+    renderer.draw(motion.update(.05, { outer: .5, inner: .99 }, 60), 50);
+    expect(renderedAngles(gl)).toHaveLength(4);
+    renderer.draw(motion.update(.067, { outer: .5, inner: .99 }, 60), 67);
+    expect(renderedAngles(gl)).toHaveLength(5);
+    expect(forwardAngle(moving[1], renderedAngles(gl).at(-1)![1])).toBeCloseTo(TAU * .45 / 2 * .99, 5);
+    renderer.destroy();
+  });
+
   it("falls through a rejected GPU pipeline and GL2 compile failure to GL1 on fresh canvases", async () => {
     const gpu = fakeGpu();
     gpu.raw.createRenderPipelineAsync.mockRejectedValueOnce(new Error("GPU unavailable"));
@@ -273,16 +600,20 @@ describe("engine spool GPU renderer", () => {
     await renderer.ready;
     renderer.draw(STILL, 0);
     expect(t.canvas().width).toBe(216);
+    expect(renderer.canDraw()).toBe(true);
     intersected([{ isIntersecting: false } as IntersectionObserverEntry], {} as IntersectionObserver);
+    expect(renderer.canDraw()).toBe(false);
     renderer.draw({ outerAngle: .5, innerAngle: null }, 50);
     expect(gl.drawArrays).toHaveBeenCalledOnce();
     resized([{ contentRect: { width: 200, height: 200 } } as ResizeObserverEntry], {} as ResizeObserver);
     expect(gl.drawArrays).toHaveBeenCalledOnce();
     intersected([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver);
+    expect(renderer.canDraw()).toBe(true);
     expect(gl.drawArrays).toHaveBeenCalledTimes(2);
     expect(t.canvas().width).toBe(432);
-    expect(gl.uniform4f.mock.calls.at(-1)?.slice(1)).toEqual([432, 0, 0, 0]);
+    expect(gl.uniform4f.mock.calls.at(-1)?.slice(1)).toEqual([432, -1, 0, 0]);
     renderer.destroy();
+    expect(renderer.canDraw()).toBe(false);
     expect(disconnectResize).toHaveBeenCalledOnce();
     expect(disconnectIntersection).toHaveBeenCalledOnce();
   });

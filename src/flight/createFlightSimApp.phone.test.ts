@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => {
   const state = { latDeg: 1, lonDeg: 2, altMeters: 1000, headingRad: 0, airspeedKts: 110 };
   const snapshot = { owner: "local" as "local" | "phone", phase: "paired" };
   const phoneControls = { elevator: -0.4, aileron: 0.6, rudder: 0.5, throttle: 0.83, pitchTrim: -0.2, rollTrim: 0.15, flaps: 1 / 3, brake: 1 };
+  const engineVisualValues = new Map<string, number>();
   const phone = {
     subscribe: vi.fn(() => vi.fn()), getSnapshot: () => snapshot,
     beforeStep: vi.fn(), takeControl: vi.fn(), cancelHandoff: vi.fn(), reset: vi.fn(), isStarterHeld: vi.fn(() => false),
@@ -17,12 +18,19 @@ const mocks = vi.hoisted(() => {
     onHidden: vi.fn(), syncStatus: vi.fn(), destroy: vi.fn(),
   };
   return {
-    state, snapshot, phoneControls, phone,
+    state, snapshot, phoneControls, phone, engineVisualValues,
     createPhoneSession: vi.fn(() => phone),
     pairingPanel: { destroy: vi.fn() }, createPairingPanel: vi.fn(),
     resetLocation: vi.fn(() => state),
     sdk: {
       setPropertyValue: vi.fn(), run: vi.fn(),
+      createPropertyBatch: vi.fn((paths: readonly string[]) => ({
+        read: vi.fn((target = new Float64Array(paths.length)) => {
+          paths.forEach((path, index) => { target[index] = engineVisualValues.get(path) ?? Number.NaN; });
+          return target;
+        }),
+        dispose: vi.fn(),
+      })),
       // The engine runs, as a flight starts: an engine that is off holds the throttle at idle.
       getPropertyValue: vi.fn((property: string) => property === "fcs/throttle-cmd-norm" ? 0.65 : property === "gear/gear-cmd-norm" ? 1
         : property.endsWith("/set-running") ? 1 : 0),
@@ -78,6 +86,10 @@ vi.mock("./bridge/ecefBridge", () => ({ readFlightState: () => mocks.state }));
 vi.mock("./bridge/floatingOrigin", () => ({ createFloatingOrigin: () => ({ aircraftRoot: { setEnabled: vi.fn() }, apply: vi.fn(), dispose: vi.fn() }) }));
 vi.mock("./aircraft/createPlaceholderAircraft", () => ({ createPlaceholderAircraft: () => mocks.aircraft }));
 vi.mock("./aircraft/createAircraftModel", () => ({ createAircraftModel: () => mocks.aircraftModel }));
+vi.mock("./aircraft/createExternalTankVisuals", () => ({ createExternalTankVisuals: () => ({
+  ready: Promise.resolve(), sync: vi.fn(), jettison: vi.fn(), update: vi.fn(),
+  setLifetimeSeconds: vi.fn(), setMaxDetachedTanks: vi.fn(), resetDetached: vi.fn(), dispose: vi.fn(),
+}) }));
 vi.mock("./aircraft/aircraftAnimation", () => ({ applyAircraftRig: vi.fn(), readControlSurfaceState: vi.fn(() => ({ gearDownNorm: 1 })) }));
 vi.mock("./physics/fixedStepLoop", () => ({ FIXED_DT: 1 / 120, createFixedStepPhysicsLoop: () => mocks.physics }));
 vi.mock("./physics/terrainContact", () => ({ createTerrainContact: () => mocks.terrainContact }));
@@ -92,6 +104,8 @@ vi.mock("./hud/createPhonePairingPanel", () => ({ createPhonePairingPanel: mocks
 
 import { getAppSettings, resetAppSettings } from "foss-earth/settings";
 import { createFlightSimApp } from "./createFlightSimApp";
+import { registerFlightSettings } from "./settings/registerFlightSettings";
+import { getAircraftDefinition } from "./aircraft/aircraftCatalog";
 
 let app: Awaited<ReturnType<typeof createFlightSimApp>> | null = null;
 let tick: (dt: number) => void;
@@ -99,6 +113,7 @@ let options: PhoneControlSessionOptions;
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mocks.engineVisualValues.clear();
   Object.defineProperty(navigator, "getGamepads", { configurable: true, value: vi.fn(() => []) });
   mocks.snapshot.owner = "local";
   mocks.createPairingPanel.mockReturnValue(mocks.pairingPanel);
@@ -314,8 +329,30 @@ describe("0SFS phone integration", () => {
       phase: expect.stringMatching(/^[A-Z][A-Z ]*$/), state: "running", start: 1,
       kind: "piston", maxRpm: 2700,
       rotorBlades: { outer: 2, inner: null, outerEstimated: false, innerEstimated: false },
-      orbs: { fps: 30, turnsPerSecond: 2, pixelRatio: 2, renderer: "auto" },
+      orbs: { fps: 1000, turnsPerSecond: 2, maxPatternStep: 0.45, pixelRatio: 2, renderer: "auto" },
     });
+  });
+
+  it("shares the F-35 afterburner accent through cached native visuals and the phone status", async () => {
+    const parameters = registerFlightSettings(getAppSettings());
+    const previousAircraft = parameters.get("osfs.aircraft.id");
+    parameters.set("osfs.aircraft.id", "f-35b");
+    try {
+      await mount();
+      grant();
+      const accent = getAircraftDefinition("f-35b").afterburner!.accentColor;
+      for (const observed of [0, 1, Number.NaN, 0]) {
+        mocks.engineVisualValues.set("propulsion/engine[0]/augmentation", observed);
+        tick(1 / 60);
+        expect(options.getStatus().engine?.afterburnerColor).toBe(observed === 1 ? accent : undefined);
+      }
+      expect(mocks.sdk.createPropertyBatch).toHaveBeenCalledOnce();
+      expect(mocks.sdk.createPropertyBatch.mock.results[0].value.read).toHaveBeenCalledTimes(4);
+      expect(mocks.sdk.getPropertyValue).not.toHaveBeenCalledWith("propulsion/engine[0]/augmentation");
+    } finally {
+      app?.destroy(); app = null;
+      parameters.set("osfs.aircraft.id", previousAircraft);
+    }
   });
 
   it("adopts reset state and clears a held local key before a general reposition", async () => {

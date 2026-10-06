@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "inputTrace": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/native/trace.csv",
+  "inputSha256": "1e2679c40f11cf11065dcc0a7ba30a65f4264327e058be61cd1327e0e78422a4",
+  "outputSha256": "1e2679c40f11cf11065dcc0a7ba30a65f4264327e058be61cd1327e0e78422a4",
+  "rows": 4750,
+  "sourceHashes": {
+    "src/flight/aircraft/engineNozzleRig.ts": "0c070c616f6b9508de3cba5ccd24818b9ad679bb938e9d86acf1287f381f0996",
+    "src/flight/aircraft/generated/f135EngineData.ts": "a43cd30246008be4c413ea7b530774c4ce63ceafa72e4e60315b16122a0aecf5",
+    "src/flight/aircraft/engineGasOptics.ts": "fcfa614fe84ce012c3a789825bb257071c497507bb02a7bb940b9de6f56aa9fa",
+    "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json": "4368d2d8cf1d24f5860727ec6639602a0533eb2e5baf02598830346a10461727"
+  },
+  "scriptSha256": "713d11ceb0d6882670beea55e6fb41085a7215c8d977c9cfb4153116ad497c28",
+  "apertureProfile": {
+    "kind": "rigid-cd-flaps-v1",
+    "segmentCount": 16,
+    "inletRadius": 0.5,
+    "convergentLength": 0.3,
+    "divergentLength": 0.3,
+    "closedConvergentRad": 0.5235987755982989,
+    "openConvergentRad": 0.2013579207903308,
+    "closedDivergentRad": 0.16744807921968935,
+    "openDivergentRad": 0.4297754313045277,
+    "convergentSealLength": 0.295,
+    "divergentSealLength": 0.315,
+    "fairingBaseRadius": 0.55,
+    "fairingBaseZ": 0.018,
+    "fairingLength": 0.585,
+    "flapThicknessMeters": 0.002,
+    "sealThicknessMeters": 0.0007,
+    "materialDensityKgM3": 8200,
+    "sealHalfWidth": 0.05,
+    "convergentBaseHalfWidth": 0.082,
+    "convergentTipHalfWidth": 0.06,
+    "divergentBaseHalfWidth": 0.058,
+    "divergentTipHalfWidth": 0.07,
+    "fairingBaseHalfWidth": 0.09,
+    "fairingTipHalfWidth": 0.071,
+    "fairingThicknessMeters": 0.0015,
+    "fairingSealHalfWidth": 0.062,
+    "fairingSealLength": 0.6,
+    "fairingFollowerNormalOffset": 0.025,
+    "throatShoeLength": 0.02,
+    "fairingSlotStart": 0.518,
+    "fairingSlotEnd": 0.568,
+    "fairingSlotHalfWidth": 0.007
+  },
+  "changes": {
+    "optical.valid": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.radiusM": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.throatAreaM2": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.exitAreaM2": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.absorptionPerMeter": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.emittingVolumeM3": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.fuelPowerW": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.particlePowerBoundW": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.excitedPowerW": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.sourcePowerBoundW": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.sourceCdM3R": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.sourceCdM3G": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.sourceCdM3B": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "core.emissionCdM2R": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "core.emissionCdM2G": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "core.emissionCdM2B": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "core.emissionLuminanceCdM2": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "liner.emissionCdM2R": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "liner.emissionCdM2G": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "liner.emissionCdM2B": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "liner.emissionLuminanceCdM2": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    }
+  },
+  "nativeFieldsPreservedExactly": true,
+  "thermalStepsRerun": 0,
+  "interpretation": "Recomputed optical observations only. Same retained temperatures, fuel/staging, shaft speed and heat receipts. Geometric area remains an approximation, not a native A8/A9 schedule or heat capacity. No exposure enters physical power.",
+  "scope": "Pure CPU optical/geometry evaluation, not an image, camera response or GPU qualification."
+}

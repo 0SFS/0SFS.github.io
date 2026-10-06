@@ -2,11 +2,15 @@ import { describe, expect, it, vi } from "vitest";
 import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import type { Scene, TransformNode } from "@babylonjs/core";
 import type { AircraftRig } from "./aircraftAnimation";
-import { getAircraftDefinition } from "./aircraftCatalog";
+import { getAircraftDefinition, type AircraftDefinition } from "./aircraftCatalog";
 import { createAircraftEngineVisuals } from "./createAircraftEngineVisuals";
 import { createEngineExhaust } from "./createEngineExhaust";
 import { createEngineSmoke } from "./createEngineSmoke";
 
+vi.mock("./engineGasSupport", async (original) => ({
+  ...await original<typeof import("./engineGasSupport")>(),
+  bindEngineGasSupport: vi.fn((root: TransformNode) => ({ root, update: vi.fn() })),
+}));
 vi.mock("./createEngineExhaust", () => ({ createEngineExhaust: vi.fn(() => ({
   ready: Promise.resolve(), update: vi.fn(), dispose: vi.fn(),
 })) }));
@@ -14,15 +18,24 @@ vi.mock("./createEngineSmoke", () => ({ createEngineSmoke: vi.fn(() => ({
   ready: Promise.resolve(), update: vi.fn(), resetEpoch: vi.fn(), dispose: vi.fn(),
 })) }));
 
-const settings = { enabled: true, sampleCount: 8, maxDistanceMeters: 2000, intensity: 1 };
+const settings = { enabled: true, sampleCount: 8, maxDistanceMeters: 2000, intensity: 1, surfaceReferenceNits: 1 };
 
-function fixture(smokeEnabled = false) {
+function fixture(smokeEnabled = false, definition: AircraftDefinition = getAircraftDefinition("f-35b")) {
   vi.mocked(createEngineExhaust).mockClear();
   vi.mocked(createEngineSmoke).mockClear();
   const values = new Map<string, number>([
     ["propulsion/engine[0]/augmentation", 0], ["propulsion/engine[0]/nozzle-pos-norm", 0.2],
     ["propulsion/engine[0]/n2", 98], ["propulsion/engine[0]/fuel-flow-rate-pps", 4],
+    ["propulsion/engine[0]/thermal/metal-temperature-k", 973.15],
+    ["propulsion/engine[0]/thermal/nozzle-gas-temperature-k", 1600],
+    ["propulsion/engine[0]/thermal/core/metal-temperature-k", 1123.15],
+    ["propulsion/engine[0]/thermal/core/initialized", 1],
+    ["propulsion/engine[0]/thermal/afterburner-burned-fuel-flow-kg-sec", 0],
+    ["propulsion/engine[0]/thermal/initialized", 1], ["propulsion/engine[0]/thermal/valid", 1],
     ["simulation/sim-time-sec", 42],
+    ["atmosphere/T-R", 518.67],
+    ["atmosphere/P-psf", 2116.22],
+    ["propulsion/engine[0]/egt-degc", 730],
   ]);
   const batch = { read: vi.fn(), dispose: vi.fn() };
   const createPropertyBatch = vi.fn((paths: readonly string[]) => {
@@ -36,7 +49,7 @@ function fixture(smokeEnabled = false) {
   const smokeSettings = { enabled: true, maxParticles: 64, emissionPerSecond: 8, lifetimeSeconds: 2, maxDistanceMeters: 1000, opacity: 0.025 };
   const options = { settings, requestRender: vi.fn(), onError: vi.fn(),
     ...(smokeEnabled ? { smokeSettings, getWorldFromEcef: () => null } : {}) };
-  const visual = createAircraftEngineVisuals(sdk, {} as Scene, getAircraftDefinition("f-35b"), options);
+  const visual = createAircraftEngineVisuals(sdk, {} as Scene, definition, options);
   const attachment = {} as TransformNode;
   const getNode = vi.fn(() => attachment);
   const rig = { getNode } as unknown as AircraftRig;
@@ -61,13 +74,19 @@ describe("aircraft engine visual observations", () => {
       expect(t.visual.nozzlePositionNorm()).toBe(0.2);
       expect(t.plume().update).toHaveBeenLastCalledWith({
         running: true, augmentation: false, powerNorm: 0.98,
-        nozzlePositionNorm: 0.2, simulationTimeSeconds: 42,
+        nozzlePositionNorm: 0.2, simulationTimeSeconds: 42, metalTemperatureKelvin: 973.15, gasTemperatureKelvin: 1600,
+        hotSurfaceTemperaturesKelvin: [1123.15, 973.15],
+        fuelFlowKgPerSecond: 4 * 0.45359237, afterburnerBurnedFuelFlowKgPerSecond: 0,
+        exitRadiusMeters: undefined,
+        ambientTemperatureKelvin: 518.67 * 5 / 9,
+        upstreamGasTemperatureKelvin: 1003.15,
+        ambientPressurePascal: 2116.22 * 47.88025898033584,
       }, settings);
       t.values.set("propulsion/engine[0]/augmentation", 1);
       t.visual.read(); t.visual.updateRig(t.rig);
       expect(t.visual.afterburnerActive()).toBe(true);
       expect(t.plume().update).toHaveBeenLastCalledWith(expect.objectContaining({ augmentation: true }), settings);
-      expect(t.getNode).toHaveBeenCalledOnce();
+      expect(t.getNode).toHaveBeenCalledTimes(3);
       expect(createEngineExhaust).toHaveBeenCalledOnce();
       // Camera/requested frames during pause use the same native clock.
       t.visual.read(); t.visual.updateRig(t.rig);
@@ -75,6 +94,84 @@ describe("aircraft engine visual observations", () => {
     } finally { t.visual.dispose(); }
     expect(t.batch.dispose).toHaveBeenCalledOnce();
     expect(t.plume().dispose).toHaveBeenCalledOnce();
+  });
+
+  it("passes supplied and burned fuel independently in SI units without inventing absent energy sources", () => {
+    const t = fixture();
+    try {
+      t.values.set("propulsion/engine[0]/augmentation", 1);
+      t.values.set("propulsion/engine[0]/thermal/afterburner-burned-fuel-flow-kg-sec", .6);
+      t.visual.read(); t.visual.updateRig(t.rig);
+      expect(t.plume().update).toHaveBeenLastCalledWith(expect.objectContaining({
+        augmentation: true, fuelFlowKgPerSecond: 1.81436948, afterburnerBurnedFuelFlowKgPerSecond: .6,
+      }), settings);
+      for (const invalid of [Number.NaN, Number.POSITIVE_INFINITY, -1]) {
+        t.values.set("propulsion/engine[0]/fuel-flow-rate-pps", invalid);
+        t.values.set("propulsion/engine[0]/thermal/afterburner-burned-fuel-flow-kg-sec", invalid);
+        t.visual.read(); t.visual.updateRig(t.rig);
+        expect(t.plume().update).toHaveBeenLastCalledWith(expect.objectContaining({
+          running: false, fuelFlowKgPerSecond: undefined, afterburnerBurnedFuelFlowKgPerSecond: undefined,
+        }), settings);
+      }
+    } finally { t.visual.dispose(); }
+  });
+
+  it("converts native ambient Rankine once and leaves unavailable mixing temperatures absent", () => {
+    const t = fixture();
+    try {
+      t.visual.read(); t.visual.updateRig(t.rig);
+      expect(vi.mocked(t.plume().update).mock.lastCall![0].ambientTemperatureKelvin).toBeCloseTo(288.15);
+      expect(vi.mocked(t.plume().update).mock.lastCall![0].upstreamGasTemperatureKelvin).toBeCloseTo(1003.15);
+      expect(vi.mocked(t.plume().update).mock.lastCall![0].ambientPressurePascal).toBeCloseTo(101325, -1);
+      for (const invalid of [Number.NaN, Infinity, 0, -1]) {
+        t.values.set("atmosphere/T-R", invalid);
+        t.values.set("atmosphere/P-psf", invalid);
+        t.visual.read(); t.visual.updateRig(t.rig);
+        expect(vi.mocked(t.plume().update).mock.lastCall![0].ambientTemperatureKelvin).toBeUndefined();
+        expect(vi.mocked(t.plume().update).mock.lastCall![0].ambientPressurePascal).toBeUndefined();
+      }
+    } finally { t.visual.dispose(); }
+  });
+
+  it("preserves observed heat after fuel cutoff and rejects unavailable or impossible temperatures", () => {
+    const t = fixture();
+    try {
+      t.values.set("propulsion/engine[0]/fuel-flow-rate-pps", 0);
+      t.values.set("propulsion/engine[0]/n2", 0);
+      t.visual.read(); t.visual.updateRig(t.rig);
+      expect(t.plume().update).toHaveBeenLastCalledWith(expect.objectContaining({
+        running: false, powerNorm: 0, metalTemperatureKelvin: 973.15,
+      }), settings);
+      t.values.set("propulsion/engine[0]/thermal/metal-temperature-k", 723.15);
+      t.visual.read(); t.visual.updateRig(t.rig);
+      expect(t.plume().update).toHaveBeenLastCalledWith(expect.objectContaining({
+        running: false, metalTemperatureKelvin: 723.15,
+      }), settings);
+      for (const invalid of [Number.NaN, Number.POSITIVE_INFINITY, -300]) {
+        t.values.set("propulsion/engine[0]/thermal/metal-temperature-k", invalid);
+        t.visual.read(); t.visual.updateRig(t.rig);
+        expect(t.plume().update).toHaveBeenLastCalledWith(expect.objectContaining({ metalTemperatureKelvin: undefined }), settings);
+      }
+      t.values.delete("propulsion/engine[0]/thermal/metal-temperature-k");
+      t.visual.read(); t.visual.updateRig(t.rig);
+      expect(t.plume().update).toHaveBeenLastCalledWith(expect.objectContaining({ metalTemperatureKelvin: undefined }), settings);
+    } finally { t.visual.dispose(); }
+  });
+
+  it.each([["K", 1000], ["degC", 726.85], ["degF", 1340.33]] as const)("uses declared %s units and property paths without aircraft-name assumptions", (unit, value) => {
+    const aircraft = getAircraftDefinition("f-35b");
+    const temperatureProperty = "propulsion/engine[0]/test-temperature";
+    const t = fixture(false, { ...aircraft, exhaustSources: aircraft.exhaustSources!.map(source => ({
+      ...source, hotSurfaceRegions: undefined, hotSurfaceTemperature: { property: temperatureProperty, unit },
+    })) });
+    try {
+      t.values.set(temperatureProperty, value);
+      t.visual.read(); t.visual.updateRig(t.rig);
+      const temperature = vi.mocked(t.plume().update).mock.calls.at(-1)![0].metalTemperatureKelvin;
+      expect(temperature).toBeCloseTo(1000, 8);
+      expect(t.createPropertyBatch.mock.calls[0][0]).toContain(temperatureProperty);
+      expect(t.createPropertyBatch.mock.calls[0][0]).not.toContain("propulsion/engine[0]/thermal/metal-temperature-k");
+    } finally { t.visual.dispose(); }
   });
 
   it("does not substitute high power for missing augmentation and hides missing/cutoff fuel", () => {
@@ -93,6 +190,31 @@ describe("aircraft engine visual observations", () => {
         t.values.set("propulsion/engine[0]/fuel-flow-rate-pps", fuel);
         t.visual.read(); t.visual.updateRig(t.rig);
         expect(t.plume().update).toHaveBeenLastCalledWith(expect.objectContaining({ running: false }), settings);
+      }
+    } finally { t.visual.dispose(); }
+  });
+
+  it("observes gas and metal independently and requires declared native validity flags", () => {
+    const t = fixture();
+    try {
+      t.values.set("propulsion/engine[0]/thermal/initialized", 0);
+      t.visual.read(); t.visual.updateRig(t.rig);
+      expect(t.plume().update).toHaveBeenLastCalledWith(expect.objectContaining({
+        metalTemperatureKelvin: undefined, gasTemperatureKelvin: 1600,
+        hotSurfaceTemperaturesKelvin: [1123.15, undefined],
+      }), settings);
+      t.values.set("propulsion/engine[0]/thermal/initialized", 1);
+      t.values.set("propulsion/engine[0]/thermal/nozzle-gas-temperature-k", 2200);
+      t.visual.read(); t.visual.updateRig(t.rig);
+      expect(t.plume().update).toHaveBeenLastCalledWith(expect.objectContaining({
+        metalTemperatureKelvin: 973.15, gasTemperatureKelvin: 2200,
+      }), settings);
+      for (const valid of [0, Number.NaN]) {
+        t.values.set("propulsion/engine[0]/thermal/valid", valid);
+        t.visual.read(); t.visual.updateRig(t.rig);
+        expect(t.plume().update).toHaveBeenLastCalledWith(expect.objectContaining({
+          metalTemperatureKelvin: undefined, gasTemperatureKelvin: undefined,
+        }), settings);
       }
     } finally { t.visual.dispose(); }
   });
@@ -132,7 +254,7 @@ describe("aircraft engine visual observations", () => {
       t.visual.updateRig(null);
       t.visual.updateRig(missing);
       expect(createEngineExhaust).not.toHaveBeenCalled();
-      expect(t.options.onError).toHaveBeenCalledExactlyOnceWith("Exhaust main-exhaust: missing attachment vtol");
+      expect(t.options.onError).toHaveBeenCalledExactlyOnceWith("Exhaust main-exhaust: missing attachment F135_Exhaust");
     } finally { t.visual.dispose(); }
   });
 
@@ -141,7 +263,7 @@ describe("aircraft engine visual observations", () => {
     try {
       t.visual.read(); t.visual.updateRig(t.rig);
       const trail = t.smoke();
-      expect(t.getNode).toHaveBeenCalledOnce();
+      expect(t.getNode).toHaveBeenCalledTimes(3);
       expect(trail.update).toHaveBeenLastCalledWith(expect.objectContaining({ running: true, simulationTimeSeconds: 42 }), t.smokeSettings);
       t.visual.setSettings({ ...settings, enabled: false });
       expect(t.plume().dispose).toHaveBeenCalledOnce();
@@ -163,7 +285,7 @@ describe("aircraft engine visual observations", () => {
     try {
       t.visual.read(); t.visual.updateRig(t.rig); t.visual.updateRig(t.rig);
       expect(createEngineExhaust).toHaveBeenCalledOnce();
-      expect(t.getNode).toHaveBeenCalledOnce();
+      expect(t.getNode).toHaveBeenCalledTimes(3);
       expect(t.options.onError).toHaveBeenCalledExactlyOnceWith("Exhaust main-exhaust: invalid declared dimensions");
     } finally { t.visual.dispose(); }
   });

@@ -225,7 +225,8 @@ The aircraft's engine type decides which gauges exist; stray turbine property
 nodes cannot turn the C172 into an N1/N2 display. Their orbiting dots share the
 same GPU renderer: WebGPU when available, then WebGL2 and WebGL1 in Auto.
 The status frame carries the desktop's renderer preference, frame-rate and
-resolution budgets, visual speed, native maximum percentages or piston RPM,
+resolution budgets, requested visual speed, maximum pattern step per drawn frame,
+native maximum percentages or piston RPM,
 and simulation time. Turbine motion is explicitly **scaled model percent
 speed**, because the models do not publish physical shaft RPM; the larger of
 MaxN1 and MaxN2 is the shared display maximum. The C172 uses the 2700 RPM
@@ -236,15 +237,53 @@ dots. The status carries each rotor's blade count and whether it is estimated;
 tooltips use those same flags on both screens. Missing counts allocate no orb
 backend. Counts and their source limits are documented under
 [Engine shaft indicators](proposals/flight-settings.md#engine-shaft-indicators).
-Both shafts share a reduced visual speed limit when necessary to allow four
-configured frames per blade pitch; this keeps a dense repeated pattern readable
-without changing the numeric instrument readings.
+Both shafts share a speed scale limited by this client's actual drawing
+cadence and the two opposite hotspots attached to each shaft. The maximum
+advance defaults to 0.45 pattern pitches per actual drawn frame, below the
+half-pitch boundary where the hotspot cue becomes directionally ambiguous.
+One pattern pitch is half a revolution, regardless of blade count. The limit
+is adjustable from 0.05 to 0.49 in the host's Engine tab and travels as optional
+`orbs.maxPatternStep`; older hosts without that field use the shared 0.45
+default. The requested visual speed is an upper ceiling. At steady cadence
+and normal simulation speed the full-scale limit is
+`min(requested rev/s, drawn FPS × max pattern step / 2)`. At 60 or 120 FPS,
+the default requested 2 rev/s remains available; at 5 FPS, the pattern limit
+reduces the shared maximum to 1.125 rev/s. N1/N2 retain their proportions
+within that shared scale.
 
-The phone interpolates only simulation time it has already received, with at
-most one heartbeat (50 ms) of display delay. That short animation ends when it
-catches up, and pause, hidden-page state, zero speed or disabled dots keep it
-from scheduling a continuing animation. A lost connection cannot leave dots
-spinning on predicted time. The desktop uses its existing update loop.
+Each blade's brightness is fixed by its rotor-local angle as
+`0.65 + 0.35 × cos(2 × angle)`, producing two opposite hotspots that move with
+the shaft. Each blade keeps its brightness, hue, size and opacity throughout
+rotation. This full-circle map is sampled at each blade's fixed rotor-local
+angle, so odd counts work too: a maximum can fall between neighboring blades,
+without requiring opposite blade pairs or changing the count. The two C172
+propeller markers both receive full brightness and
+themselves form the twice-per-revolution pattern. The limit guards the hotspot
+cue; individual evenly spaced blades can still alias or appear to reverse.
+
+When native afterburner activity is confirmed, the host also sends optional
+`afterburnerColor`, a six-digit hex accent from the aircraft's existing visual
+profile. Both shaft rows use that accent while preserving their brightness
+pattern and marker size. Off, inhibited or unknown activity omits the field,
+restoring normal row colors; older hosts therefore retain normal colors too.
+The host shares its cached aircraft-visual observation without another model
+read or inferring afterburner activity from throttle position.
+
+The phone and desktop share an independent display-paced shaft animation loop.
+The phone interpolates only simulation time it has already received, over one
+heartbeat (50 ms). That short animation ends when it catches up, and pause,
+hidden/offscreen state, zero speed or disabled dots keep it from scheduling a
+continuing animation. A lost connection cannot leave dots spinning on predicted
+time. The desktop interpolates over its source sampling interval, so a lower
+globe frame rate does not cap the shaft canvas. The default 1000 FPS ceiling
+allows each browser's actual display cadence, including 60/120/144/240 Hz;
+it does not ask the browser to run at 1000 Hz. A saved lower ceiling still applies.
+The canvas loop does not refresh other widgets, and the shared numeric readout
+writes only changed values. Only accepted GPU draws advance visible motion;
+a stalled or skipped frame cannot accumulate an unsafe jump or a catch-up
+burst. Desktop and phone each enforce the hotspot limit using their own
+submitted-frame cadence. Compositor-dropped frames are not observable, so
+this does not guarantee every frame the physical display presents.
 
 It sits just above the throttle it answers to, and it is both wider than the
 throttle and taller than yaw. Given a grid cell of its own it made both sliders

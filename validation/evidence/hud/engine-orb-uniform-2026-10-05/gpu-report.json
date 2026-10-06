@@ -1,0 +1,1081 @@
+{
+  "gpu": {
+    "vendor": "apple",
+    "architecture": "metal-3",
+    "device": "",
+    "description": ""
+  },
+  "cases": [
+    {
+      "requested": "webgpu",
+      "label": "F-35B",
+      "piston": false,
+      "rotorBlades": {
+        "outer": 22,
+        "inner": 36,
+        "outerEstimated": true,
+        "innerEstimated": true
+      },
+      "markers": {
+        "outer": {
+          "count": 22,
+          "minArea": 2459,
+          "maxArea": 2467,
+          "interiorPixels": 50706,
+          "interiorMarkers": 22,
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ]
+        },
+        "inner": {
+          "count": 36,
+          "minArea": 486,
+          "maxArea": 493,
+          "interiorPixels": 15148,
+          "interiorMarkers": 36,
+          "minRgb": [
+            232,
+            181,
+            71
+          ],
+          "maxRgb": [
+            233,
+            182,
+            71
+          ]
+        }
+      },
+      "movedMarkers": {
+        "outer": {
+          "count": 22,
+          "minArea": 2458,
+          "maxArea": 2467,
+          "interiorPixels": 50718,
+          "interiorMarkers": 22,
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ]
+        },
+        "inner": {
+          "count": 36,
+          "minArea": 491,
+          "maxArea": 493,
+          "interiorPixels": 15172,
+          "interiorMarkers": 36,
+          "minRgb": [
+            232,
+            181,
+            71
+          ],
+          "maxRgb": [
+            233,
+            182,
+            71
+          ]
+        }
+      },
+      "motion": {
+        "simulatedIntervalS": 0.1,
+        "normalizedSpeed": 0.99,
+        "turnsPerSecond": 2,
+        "expectedAdvance": 1.2440706908215582
+      },
+      "uniformColour": {
+        "outer": {
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ],
+          "maxChannelDifference": 1
+        },
+        "inner": {
+          "minRgb": [
+            232,
+            181,
+            71
+          ],
+          "maxRgb": [
+            233,
+            182,
+            71
+          ],
+          "maxChannelDifference": 1
+        }
+      },
+      "backend": "webgpu",
+      "status": {
+        "preference": "webgpu",
+        "backend": "webgpu",
+        "reason": null
+      },
+      "canvases": 1,
+      "outerSize": 68,
+      "innerVisible": true,
+      "rpmVisible": false
+    },
+    {
+      "requested": "webgpu",
+      "label": "SF50",
+      "piston": false,
+      "rotorBlades": {
+        "outer": 16,
+        "inner": 30,
+        "outerEstimated": false,
+        "innerEstimated": true
+      },
+      "markers": {
+        "outer": {
+          "count": 16,
+          "minArea": 2457,
+          "maxArea": 2465,
+          "interiorPixels": 36900,
+          "interiorMarkers": 16,
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ]
+        },
+        "inner": {
+          "count": 30,
+          "minArea": 698,
+          "maxArea": 709,
+          "interiorPixels": 18662,
+          "interiorMarkers": 30,
+          "minRgb": [
+            232,
+            181,
+            71
+          ],
+          "maxRgb": [
+            233,
+            182,
+            71
+          ]
+        }
+      },
+      "movedMarkers": {
+        "outer": {
+          "count": 16,
+          "minArea": 2459,
+          "maxArea": 2464,
+          "interiorPixels": 36900,
+          "interiorMarkers": 16,
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ]
+        },
+        "inner": {
+          "count": 30,
+          "minArea": 700,
+          "maxArea": 709,
+          "interiorPixels": 18668,
+          "interiorMarkers": 30,
+          "minRgb": [
+            232,
+            181,
+            71
+          ],
+          "maxRgb": [
+            233,
+            182,
+            71
+          ]
+        }
+      },
+      "motion": {
+        "simulatedIntervalS": 0.1,
+        "normalizedSpeed": 0.99,
+        "turnsPerSecond": 2,
+        "expectedAdvance": 1.2440706908215582
+      },
+      "uniformColour": {
+        "outer": {
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ],
+          "maxChannelDifference": 1
+        },
+        "inner": {
+          "minRgb": [
+            232,
+            181,
+            71
+          ],
+          "maxRgb": [
+            233,
+            182,
+            71
+          ],
+          "maxChannelDifference": 1
+        }
+      },
+      "backend": "webgpu",
+      "status": {
+        "preference": "webgpu",
+        "backend": "webgpu",
+        "reason": null
+      },
+      "canvases": 1,
+      "outerSize": 68,
+      "innerVisible": true,
+      "rpmVisible": false
+    },
+    {
+      "requested": "webgpu",
+      "label": "C172",
+      "piston": true,
+      "rotorBlades": {
+        "outer": 2,
+        "inner": null,
+        "outerEstimated": false,
+        "innerEstimated": false
+      },
+      "markers": {
+        "outer": {
+          "count": 2,
+          "minArea": 2463,
+          "maxArea": 2463,
+          "interiorPixels": 4612,
+          "interiorMarkers": 2,
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ]
+        },
+        "inner": {
+          "count": 0,
+          "minArea": 0,
+          "maxArea": 0,
+          "interiorPixels": 0,
+          "interiorMarkers": 0,
+          "minRgb": null,
+          "maxRgb": null
+        }
+      },
+      "movedMarkers": {
+        "outer": {
+          "count": 2,
+          "minArea": 2464,
+          "maxArea": 2464,
+          "interiorPixels": 4614,
+          "interiorMarkers": 2,
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ]
+        },
+        "inner": {
+          "count": 0,
+          "minArea": 0,
+          "maxArea": 0,
+          "interiorPixels": 0,
+          "interiorMarkers": 0,
+          "minRgb": null,
+          "maxRgb": null
+        }
+      },
+      "motion": {
+        "simulatedIntervalS": 0.1,
+        "normalizedSpeed": 0.99,
+        "turnsPerSecond": 2,
+        "expectedAdvance": 1.2440706908215582
+      },
+      "uniformColour": {
+        "outer": {
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ],
+          "maxChannelDifference": 1
+        },
+        "inner": null
+      },
+      "backend": "webgpu",
+      "status": {
+        "preference": "webgpu",
+        "backend": "webgpu",
+        "reason": null
+      },
+      "canvases": 1,
+      "outerSize": 68,
+      "innerVisible": false,
+      "rpmVisible": true
+    },
+    {
+      "requested": "webgl2",
+      "label": "F-35B",
+      "piston": false,
+      "rotorBlades": {
+        "outer": 22,
+        "inner": 36,
+        "outerEstimated": true,
+        "innerEstimated": true
+      },
+      "markers": {
+        "outer": {
+          "count": 22,
+          "minArea": 2459,
+          "maxArea": 2467,
+          "interiorPixels": 50706,
+          "interiorMarkers": 22,
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ]
+        },
+        "inner": {
+          "count": 36,
+          "minArea": 486,
+          "maxArea": 493,
+          "interiorPixels": 15148,
+          "interiorMarkers": 36,
+          "minRgb": [
+            232,
+            181,
+            71
+          ],
+          "maxRgb": [
+            233,
+            182,
+            71
+          ]
+        }
+      },
+      "movedMarkers": {
+        "outer": {
+          "count": 22,
+          "minArea": 2458,
+          "maxArea": 2467,
+          "interiorPixels": 50718,
+          "interiorMarkers": 22,
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ]
+        },
+        "inner": {
+          "count": 36,
+          "minArea": 491,
+          "maxArea": 493,
+          "interiorPixels": 15172,
+          "interiorMarkers": 36,
+          "minRgb": [
+            232,
+            181,
+            71
+          ],
+          "maxRgb": [
+            233,
+            182,
+            71
+          ]
+        }
+      },
+      "motion": {
+        "simulatedIntervalS": 0.1,
+        "normalizedSpeed": 0.99,
+        "turnsPerSecond": 2,
+        "expectedAdvance": 1.2440706908215582
+      },
+      "uniformColour": {
+        "outer": {
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ],
+          "maxChannelDifference": 1
+        },
+        "inner": {
+          "minRgb": [
+            232,
+            181,
+            71
+          ],
+          "maxRgb": [
+            233,
+            182,
+            71
+          ],
+          "maxChannelDifference": 1
+        }
+      },
+      "backend": "webgl2",
+      "status": {
+        "preference": "webgl2",
+        "backend": "webgl2",
+        "reason": null
+      },
+      "canvases": 1,
+      "outerSize": 68,
+      "innerVisible": true,
+      "rpmVisible": false
+    },
+    {
+      "requested": "webgl2",
+      "label": "SF50",
+      "piston": false,
+      "rotorBlades": {
+        "outer": 16,
+        "inner": 30,
+        "outerEstimated": false,
+        "innerEstimated": true
+      },
+      "markers": {
+        "outer": {
+          "count": 16,
+          "minArea": 2457,
+          "maxArea": 2465,
+          "interiorPixels": 36900,
+          "interiorMarkers": 16,
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ]
+        },
+        "inner": {
+          "count": 30,
+          "minArea": 698,
+          "maxArea": 709,
+          "interiorPixels": 18662,
+          "interiorMarkers": 30,
+          "minRgb": [
+            232,
+            181,
+            71
+          ],
+          "maxRgb": [
+            233,
+            182,
+            71
+          ]
+        }
+      },
+      "movedMarkers": {
+        "outer": {
+          "count": 16,
+          "minArea": 2459,
+          "maxArea": 2464,
+          "interiorPixels": 36900,
+          "interiorMarkers": 16,
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ]
+        },
+        "inner": {
+          "count": 30,
+          "minArea": 700,
+          "maxArea": 709,
+          "interiorPixels": 18668,
+          "interiorMarkers": 30,
+          "minRgb": [
+            232,
+            181,
+            71
+          ],
+          "maxRgb": [
+            233,
+            182,
+            71
+          ]
+        }
+      },
+      "motion": {
+        "simulatedIntervalS": 0.1,
+        "normalizedSpeed": 0.99,
+        "turnsPerSecond": 2,
+        "expectedAdvance": 1.2440706908215582
+      },
+      "uniformColour": {
+        "outer": {
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ],
+          "maxChannelDifference": 1
+        },
+        "inner": {
+          "minRgb": [
+            232,
+            181,
+            71
+          ],
+          "maxRgb": [
+            233,
+            182,
+            71
+          ],
+          "maxChannelDifference": 1
+        }
+      },
+      "backend": "webgl2",
+      "status": {
+        "preference": "webgl2",
+        "backend": "webgl2",
+        "reason": null
+      },
+      "canvases": 1,
+      "outerSize": 68,
+      "innerVisible": true,
+      "rpmVisible": false
+    },
+    {
+      "requested": "webgl2",
+      "label": "C172",
+      "piston": true,
+      "rotorBlades": {
+        "outer": 2,
+        "inner": null,
+        "outerEstimated": false,
+        "innerEstimated": false
+      },
+      "markers": {
+        "outer": {
+          "count": 2,
+          "minArea": 2463,
+          "maxArea": 2463,
+          "interiorPixels": 4612,
+          "interiorMarkers": 2,
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ]
+        },
+        "inner": {
+          "count": 0,
+          "minArea": 0,
+          "maxArea": 0,
+          "interiorPixels": 0,
+          "interiorMarkers": 0,
+          "minRgb": null,
+          "maxRgb": null
+        }
+      },
+      "movedMarkers": {
+        "outer": {
+          "count": 2,
+          "minArea": 2464,
+          "maxArea": 2464,
+          "interiorPixels": 4614,
+          "interiorMarkers": 2,
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ]
+        },
+        "inner": {
+          "count": 0,
+          "minArea": 0,
+          "maxArea": 0,
+          "interiorPixels": 0,
+          "interiorMarkers": 0,
+          "minRgb": null,
+          "maxRgb": null
+        }
+      },
+      "motion": {
+        "simulatedIntervalS": 0.1,
+        "normalizedSpeed": 0.99,
+        "turnsPerSecond": 2,
+        "expectedAdvance": 1.2440706908215582
+      },
+      "uniformColour": {
+        "outer": {
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ],
+          "maxChannelDifference": 1
+        },
+        "inner": null
+      },
+      "backend": "webgl2",
+      "status": {
+        "preference": "webgl2",
+        "backend": "webgl2",
+        "reason": null
+      },
+      "canvases": 1,
+      "outerSize": 68,
+      "innerVisible": false,
+      "rpmVisible": true
+    },
+    {
+      "requested": "webgl1",
+      "label": "F-35B",
+      "piston": false,
+      "rotorBlades": {
+        "outer": 22,
+        "inner": 36,
+        "outerEstimated": true,
+        "innerEstimated": true
+      },
+      "markers": {
+        "outer": {
+          "count": 22,
+          "minArea": 2459,
+          "maxArea": 2467,
+          "interiorPixels": 50706,
+          "interiorMarkers": 22,
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ]
+        },
+        "inner": {
+          "count": 36,
+          "minArea": 486,
+          "maxArea": 493,
+          "interiorPixels": 15148,
+          "interiorMarkers": 36,
+          "minRgb": [
+            232,
+            181,
+            71
+          ],
+          "maxRgb": [
+            233,
+            182,
+            71
+          ]
+        }
+      },
+      "movedMarkers": {
+        "outer": {
+          "count": 22,
+          "minArea": 2458,
+          "maxArea": 2467,
+          "interiorPixels": 50718,
+          "interiorMarkers": 22,
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ]
+        },
+        "inner": {
+          "count": 36,
+          "minArea": 491,
+          "maxArea": 493,
+          "interiorPixels": 15172,
+          "interiorMarkers": 36,
+          "minRgb": [
+            232,
+            181,
+            71
+          ],
+          "maxRgb": [
+            233,
+            182,
+            71
+          ]
+        }
+      },
+      "motion": {
+        "simulatedIntervalS": 0.1,
+        "normalizedSpeed": 0.99,
+        "turnsPerSecond": 2,
+        "expectedAdvance": 1.2440706908215582
+      },
+      "uniformColour": {
+        "outer": {
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ],
+          "maxChannelDifference": 1
+        },
+        "inner": {
+          "minRgb": [
+            232,
+            181,
+            71
+          ],
+          "maxRgb": [
+            233,
+            182,
+            71
+          ],
+          "maxChannelDifference": 1
+        }
+      },
+      "backend": "webgl1",
+      "status": {
+        "preference": "webgl1",
+        "backend": "webgl1",
+        "reason": null
+      },
+      "canvases": 1,
+      "outerSize": 68,
+      "innerVisible": true,
+      "rpmVisible": false
+    },
+    {
+      "requested": "webgl1",
+      "label": "SF50",
+      "piston": false,
+      "rotorBlades": {
+        "outer": 16,
+        "inner": 30,
+        "outerEstimated": false,
+        "innerEstimated": true
+      },
+      "markers": {
+        "outer": {
+          "count": 16,
+          "minArea": 2457,
+          "maxArea": 2465,
+          "interiorPixels": 36900,
+          "interiorMarkers": 16,
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ]
+        },
+        "inner": {
+          "count": 30,
+          "minArea": 698,
+          "maxArea": 709,
+          "interiorPixels": 18662,
+          "interiorMarkers": 30,
+          "minRgb": [
+            232,
+            181,
+            71
+          ],
+          "maxRgb": [
+            233,
+            182,
+            71
+          ]
+        }
+      },
+      "movedMarkers": {
+        "outer": {
+          "count": 16,
+          "minArea": 2459,
+          "maxArea": 2464,
+          "interiorPixels": 36900,
+          "interiorMarkers": 16,
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ]
+        },
+        "inner": {
+          "count": 30,
+          "minArea": 700,
+          "maxArea": 709,
+          "interiorPixels": 18668,
+          "interiorMarkers": 30,
+          "minRgb": [
+            232,
+            181,
+            71
+          ],
+          "maxRgb": [
+            233,
+            182,
+            71
+          ]
+        }
+      },
+      "motion": {
+        "simulatedIntervalS": 0.1,
+        "normalizedSpeed": 0.99,
+        "turnsPerSecond": 2,
+        "expectedAdvance": 1.2440706908215582
+      },
+      "uniformColour": {
+        "outer": {
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ],
+          "maxChannelDifference": 1
+        },
+        "inner": {
+          "minRgb": [
+            232,
+            181,
+            71
+          ],
+          "maxRgb": [
+            233,
+            182,
+            71
+          ],
+          "maxChannelDifference": 1
+        }
+      },
+      "backend": "webgl1",
+      "status": {
+        "preference": "webgl1",
+        "backend": "webgl1",
+        "reason": null
+      },
+      "canvases": 1,
+      "outerSize": 68,
+      "innerVisible": true,
+      "rpmVisible": false
+    },
+    {
+      "requested": "webgl1",
+      "label": "C172",
+      "piston": true,
+      "rotorBlades": {
+        "outer": 2,
+        "inner": null,
+        "outerEstimated": false,
+        "innerEstimated": false
+      },
+      "markers": {
+        "outer": {
+          "count": 2,
+          "minArea": 2463,
+          "maxArea": 2463,
+          "interiorPixels": 4612,
+          "interiorMarkers": 2,
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ]
+        },
+        "inner": {
+          "count": 0,
+          "minArea": 0,
+          "maxArea": 0,
+          "interiorPixels": 0,
+          "interiorMarkers": 0,
+          "minRgb": null,
+          "maxRgb": null
+        }
+      },
+      "movedMarkers": {
+        "outer": {
+          "count": 2,
+          "minArea": 2464,
+          "maxArea": 2464,
+          "interiorPixels": 4614,
+          "interiorMarkers": 2,
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ]
+        },
+        "inner": {
+          "count": 0,
+          "minArea": 0,
+          "maxArea": 0,
+          "interiorPixels": 0,
+          "interiorMarkers": 0,
+          "minRgb": null,
+          "maxRgb": null
+        }
+      },
+      "motion": {
+        "simulatedIntervalS": 0.1,
+        "normalizedSpeed": 0.99,
+        "turnsPerSecond": 2,
+        "expectedAdvance": 1.2440706908215582
+      },
+      "uniformColour": {
+        "outer": {
+          "minRgb": [
+            188,
+            214,
+            232
+          ],
+          "maxRgb": [
+            189,
+            215,
+            233
+          ],
+          "maxChannelDifference": 1
+        },
+        "inner": null
+      },
+      "backend": "webgl1",
+      "status": {
+        "preference": "webgl1",
+        "backend": "webgl1",
+        "reason": null
+      },
+      "canvases": 1,
+      "outerSize": 68,
+      "innerVisible": false,
+      "rpmVisible": true
+    }
+  ],
+  "errors": [],
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/154.0.8037.98",
+    "revision": "@b859317bf11f6be47f9b7799ec690a0a42a1fb33",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+    "jsVersion": "15.4.80.20"
+  },
+  "kind": "untimed-engine-orb-shader-and-presentation-check",
+  "createdUtc": "2026-10-06T04:32:25.194Z",
+  "limitations": "No frame/GPU timing or device performance qualification. Screenshot requires visual review.",
+  "pass": true
+}

@@ -1,0 +1,46 @@
+(node:3664) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+{
+  "out": "/Users/felg/gh/0sfs/build/validation/turbine-thermal/2026-10-06_111944",
+  "pass": false,
+  "checks": [
+    {
+      "name": "warm-shortcut-after-cold-accepted-step",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: InitRunning changed an established cold wall at zero elapsed time: 286.1754072250146 differs from 286.1688949816944\n    at close (file:///Users/felg/gh/0sfs/scripts/validation/aircraft/check-turbine-thermal.mjs:81:71)\n    at file:///Users/felg/gh/0sfs/scripts/validation/aircraft/check-turbine-thermal.mjs:158:3\n    at withAircraft (file:///Users/felg/gh/0sfs/scripts/validation/aircraft/check-turbine-thermal.mjs:143:11)\n    at async file:///Users/felg/gh/0sfs/scripts/validation/aircraft/check-turbine-thermal.mjs:151:1"
+    },
+    {
+      "name": "cold-start-heating-and-cutoff",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: Stopped source still supplies fuel: 19.913658518266303 differs from 0\n    at close (file:///Users/felg/gh/0sfs/scripts/validation/aircraft/check-turbine-thermal.mjs:81:71)\n    at file:///Users/felg/gh/0sfs/scripts/validation/aircraft/check-turbine-thermal.mjs:191:68\n    at withAircraft (file:///Users/felg/gh/0sfs/scripts/validation/aircraft/check-turbine-thermal.mjs:143:11)\n    at async file:///Users/felg/gh/0sfs/scripts/validation/aircraft/check-turbine-thermal.mjs:163:1"
+    },
+    {
+      "name": "zero-time-hold-read-and-native-state-restore",
+      "passed": true
+    },
+    {
+      "name": "application-snapshot-recovery",
+      "passed": true
+    },
+    {
+      "name": "relocation-free",
+      "passed": true
+    },
+    {
+      "name": "relocation-departure",
+      "passed": true
+    },
+    {
+      "name": "relocation-arrival",
+      "passed": true
+    },
+    {
+      "name": "cold-reset-and-model-reload",
+      "passed": true
+    }
+  ],
+  "boundEvaluations": 2640,
+  "maxBurnedLimitErrorKgSec": 2.6645352591003757e-15,
+  "limitedFuelSeen": true,
+  "sourceIdentityStable": true
+}

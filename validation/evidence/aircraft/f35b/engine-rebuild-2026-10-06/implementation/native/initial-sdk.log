@@ -1,0 +1,186 @@
+warm-shortcut-after-cold-accepted-step: Engine location ignored, only thruster location is used.
+warm-shortcut-after-cold-accepted-step: Engine orientation ignored, only thruster orientation is used.
+warm-shortcut-after-cold-accepted-step: Engine location ignored, only thruster location is used.
+warm-shortcut-after-cold-accepted-step: Engine orientation ignored, only thruster orientation is used.
+warm-shortcut-after-cold-accepted-step: Engine location ignored, only thruster location is used.
+warm-shortcut-after-cold-accepted-step: Engine orientation ignored, only thruster orientation is used.
+warm-shortcut-after-cold-accepted-step: Engine location ignored, only thruster location is used.
+warm-shortcut-after-cold-accepted-step: Engine orientation ignored, only thruster orientation is used.
+warm-shortcut-after-cold-accepted-step: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 304
+warm-shortcut-after-cold-accepted-step:       Property /sim/model/pushback/target-speed-fps is already defined.
+warm-shortcut-after-cold-accepted-step:       Its value (0) will not be overridden.
+cold-start-heating-and-cutoff: Engine location ignored, only thruster location is used.
+cold-start-heating-and-cutoff: Engine orientation ignored, only thruster orientation is used.
+cold-start-heating-and-cutoff: Engine location ignored, only thruster location is used.
+cold-start-heating-and-cutoff: Engine orientation ignored, only thruster orientation is used.
+cold-start-heating-and-cutoff: Engine location ignored, only thruster location is used.
+cold-start-heating-and-cutoff: Engine orientation ignored, only thruster orientation is used.
+cold-start-heating-and-cutoff: Engine location ignored, only thruster location is used.
+cold-start-heating-and-cutoff: Engine orientation ignored, only thruster orientation is used.
+cold-start-heating-and-cutoff: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 304
+cold-start-heating-and-cutoff:       Property /sim/model/pushback/target-speed-fps is already defined.
+cold-start-heating-and-cutoff:       Its value (0) will not be overridden.
+zero-time-hold-read-and-native-state-restore: Engine location ignored, only thruster location is used.
+zero-time-hold-read-and-native-state-restore: Engine orientation ignored, only thruster orientation is used.
+zero-time-hold-read-and-native-state-restore: Engine location ignored, only thruster location is used.
+zero-time-hold-read-and-native-state-restore: Engine orientation ignored, only thruster orientation is used.
+zero-time-hold-read-and-native-state-restore: Engine location ignored, only thruster location is used.
+zero-time-hold-read-and-native-state-restore: Engine orientation ignored, only thruster orientation is used.
+zero-time-hold-read-and-native-state-restore: Engine location ignored, only thruster location is used.
+zero-time-hold-read-and-native-state-restore: Engine orientation ignored, only thruster orientation is used.
+zero-time-hold-read-and-native-state-restore: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 304
+zero-time-hold-read-and-native-state-restore:       Property /sim/model/pushback/target-speed-fps is already defined.
+zero-time-hold-read-and-native-state-restore:       Its value (0) will not be overridden.
+application-snapshot-recovery: Engine location ignored, only thruster location is used.
+application-snapshot-recovery: Engine orientation ignored, only thruster orientation is used.
+application-snapshot-recovery: Engine location ignored, only thruster location is used.
+application-snapshot-recovery: Engine orientation ignored, only thruster orientation is used.
+application-snapshot-recovery: Engine location ignored, only thruster location is used.
+application-snapshot-recovery: Engine orientation ignored, only thruster orientation is used.
+application-snapshot-recovery: Engine location ignored, only thruster location is used.
+application-snapshot-recovery: Engine orientation ignored, only thruster orientation is used.
+application-snapshot-recovery: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 304
+application-snapshot-recovery:       Property /sim/model/pushback/target-speed-fps is already defined.
+application-snapshot-recovery:       Its value (0) will not be overridden.
+relocation-free: Engine location ignored, only thruster location is used.
+relocation-free: Engine orientation ignored, only thruster orientation is used.
+relocation-free: Engine location ignored, only thruster location is used.
+relocation-free: Engine orientation ignored, only thruster orientation is used.
+relocation-free: Engine location ignored, only thruster location is used.
+relocation-free: Engine orientation ignored, only thruster orientation is used.
+relocation-free: Engine location ignored, only thruster location is used.
+relocation-free: Engine orientation ignored, only thruster orientation is used.
+relocation-free: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 304
+relocation-free:       Property /sim/model/pushback/target-speed-fps is already defined.
+relocation-free:       Its value (0) will not be overridden.
+relocation-departure: Engine location ignored, only thruster location is used.
+relocation-departure: Engine orientation ignored, only thruster orientation is used.
+relocation-departure: Engine location ignored, only thruster location is used.
+relocation-departure: Engine orientation ignored, only thruster orientation is used.
+relocation-departure: Engine location ignored, only thruster location is used.
+relocation-departure: Engine orientation ignored, only thruster orientation is used.
+relocation-departure: Engine location ignored, only thruster location is used.
+relocation-departure: Engine orientation ignored, only thruster orientation is used.
+relocation-departure: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 304
+relocation-departure:       Property /sim/model/pushback/target-speed-fps is already defined.
+relocation-departure:       Its value (0) will not be overridden.
+relocation-arrival: Engine location ignored, only thruster location is used.
+relocation-arrival: Engine orientation ignored, only thruster orientation is used.
+relocation-arrival: Engine location ignored, only thruster location is used.
+relocation-arrival: Engine orientation ignored, only thruster orientation is used.
+relocation-arrival: Engine location ignored, only thruster location is used.
+relocation-arrival: Engine orientation ignored, only thruster orientation is used.
+relocation-arrival: Engine location ignored, only thruster location is used.
+relocation-arrival: Engine orientation ignored, only thruster orientation is used.
+relocation-arrival: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 304
+relocation-arrival:       Property /sim/model/pushback/target-speed-fps is already defined.
+relocation-arrival:       Its value (0) will not be overridden.
+cold-reset-and-model-reload: Engine location ignored, only thruster location is used.
+cold-reset-and-model-reload: Engine orientation ignored, only thruster orientation is used.
+cold-reset-and-model-reload: Engine location ignored, only thruster location is used.
+cold-reset-and-model-reload: Engine orientation ignored, only thruster orientation is used.
+cold-reset-and-model-reload: Engine location ignored, only thruster location is used.
+cold-reset-and-model-reload: Engine orientation ignored, only thruster orientation is used.
+cold-reset-and-model-reload: Engine location ignored, only thruster location is used.
+cold-reset-and-model-reload: Engine orientation ignored, only thruster orientation is used.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 304
+cold-reset-and-model-reload:       Property /sim/model/pushback/target-speed-fps is already defined.
+cold-reset-and-model-reload:       Its value (0) will not be overridden.
+cold-reset-and-model-reload: Engine location ignored, only thruster location is used.
+cold-reset-and-model-reload: Engine orientation ignored, only thruster orientation is used.
+cold-reset-and-model-reload: Engine location ignored, only thruster location is used.
+cold-reset-and-model-reload: Engine orientation ignored, only thruster orientation is used.
+cold-reset-and-model-reload: Engine location ignored, only thruster location is used.
+cold-reset-and-model-reload: Engine orientation ignored, only thruster orientation is used.
+cold-reset-and-model-reload: Engine location ignored, only thruster location is used.
+cold-reset-and-model-reload: Engine orientation ignored, only thruster orientation is used.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 298
+cold-reset-and-model-reload:       Property stores/external-tank[0]/attached is already defined.
+cold-reset-and-model-reload:       Its value (1) will not be overridden.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 299
+cold-reset-and-model-reload:       Property propulsion/tank[2]/external-store-index is already defined.
+cold-reset-and-model-reload:       Its value (0) will not be overridden.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 300
+cold-reset-and-model-reload:       Property stores/external-tank[1]/attached is already defined.
+cold-reset-and-model-reload:       Its value (1) will not be overridden.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 301
+cold-reset-and-model-reload:       Property propulsion/tank[3]/external-store-index is already defined.
+cold-reset-and-model-reload:       Its value (1) will not be overridden.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 304
+cold-reset-and-model-reload:       Property /sim/model/pushback/target-speed-fps is already defined.
+cold-reset-and-model-reload:       Its value (0) will not be overridden.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 305
+cold-reset-and-model-reload:       Property /sim/model/pushback/position-norm is already defined.
+cold-reset-and-model-reload:       Its value (0) will not be overridden.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 306
+cold-reset-and-model-reload:       Property /sim/model/pushback/kp is already defined.
+cold-reset-and-model-reload:       Its value (100) will not be overridden.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 307
+cold-reset-and-model-reload:       Property /sim/model/pushback/ki is already defined.
+cold-reset-and-model-reload:       Its value (25) will not be overridden.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 308
+cold-reset-and-model-reload:       Property /sim/model/pushback/kd is already defined.
+cold-reset-and-model-reload:       Its value (0) will not be overridden.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 309
+cold-reset-and-model-reload:       Property /gear/gear/wow is already defined.
+cold-reset-and-model-reload:       Its value (0) will not be overridden.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 310
+cold-reset-and-model-reload:       Property fcs/throttle1 is already defined.
+cold-reset-and-model-reload:       Its value (1) will not be overridden.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 311
+cold-reset-and-model-reload:       Property fcs/throttle2 is already defined.
+cold-reset-and-model-reload:       Its value (1) will not be overridden.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 312
+cold-reset-and-model-reload:       Property fcs/throttle3 is already defined.
+cold-reset-and-model-reload:       Its value (1) will not be overridden.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 313
+cold-reset-and-model-reload:       Property fcs/stovl-cmd-norm is already defined.
+cold-reset-and-model-reload:       Its value (0) will not be overridden.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 314
+cold-reset-and-model-reload:       Property fcs/stovl-pos-norm is already defined.
+cold-reset-and-model-reload:       Its value (0) will not be overridden.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 315
+cold-reset-and-model-reload:       Property fcs/stovl-augmentation-inhibit is already defined.
+cold-reset-and-model-reload:       Its value (0) will not be overridden.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 316
+cold-reset-and-model-reload:       Property fcs/control-law-mode is already defined.
+cold-reset-and-model-reload:       Its value (0) will not be overridden.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 317
+cold-reset-and-model-reload:       Property fcs/fbw-enabled is already defined.
+cold-reset-and-model-reload:       Its value (1) will not be overridden.
+cold-reset-and-model-reload: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 318
+cold-reset-and-model-reload:       Property fcs/flaps-auto-enabled is already defined.
+cold-reset-and-model-reload:       Its value (1) will not be overridden.
+stopped-hot-runway-relocation: Engine location ignored, only thruster location is used.
+stopped-hot-runway-relocation: Engine orientation ignored, only thruster orientation is used.
+stopped-hot-runway-relocation: Engine location ignored, only thruster location is used.
+stopped-hot-runway-relocation: Engine orientation ignored, only thruster orientation is used.
+stopped-hot-runway-relocation: Engine location ignored, only thruster location is used.
+stopped-hot-runway-relocation: Engine orientation ignored, only thruster orientation is used.
+stopped-hot-runway-relocation: Engine location ignored, only thruster location is used.
+stopped-hot-runway-relocation: Engine orientation ignored, only thruster orientation is used.
+stopped-hot-runway-relocation: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 304
+stopped-hot-runway-relocation:       Property /sim/model/pushback/target-speed-fps is already defined.
+stopped-hot-runway-relocation:       Its value (0) will not be overridden.
+dry-99-cycle: Engine location ignored, only thruster location is used.
+dry-99-cycle: Engine orientation ignored, only thruster orientation is used.
+dry-99-cycle: Engine location ignored, only thruster location is used.
+dry-99-cycle: Engine orientation ignored, only thruster orientation is used.
+dry-99-cycle: Engine location ignored, only thruster location is used.
+dry-99-cycle: Engine orientation ignored, only thruster orientation is used.
+dry-99-cycle: Engine location ignored, only thruster location is used.
+dry-99-cycle: Engine orientation ignored, only thruster orientation is used.
+dry-99-cycle: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 304
+dry-99-cycle:       Property /sim/model/pushback/target-speed-fps is already defined.
+dry-99-cycle:       Its value (0) will not be overridden.
+powered-lift-without-afterburner: Engine location ignored, only thruster location is used.
+powered-lift-without-afterburner: Engine orientation ignored, only thruster orientation is used.
+powered-lift-without-afterburner: Engine location ignored, only thruster location is used.
+powered-lift-without-afterburner: Engine orientation ignored, only thruster orientation is used.
+powered-lift-without-afterburner: Engine location ignored, only thruster location is used.
+powered-lift-without-afterburner: Engine orientation ignored, only thruster orientation is used.
+powered-lift-without-afterburner: Engine location ignored, only thruster location is used.
+powered-lift-without-afterburner: Engine orientation ignored, only thruster orientation is used.
+powered-lift-without-afterburner: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 304
+powered-lift-without-afterburner:       Property /sim/model/pushback/target-speed-fps is already defined.
+powered-lift-without-afterburner:       Its value (0) will not be overridden.

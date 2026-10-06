@@ -1,0 +1,238 @@
+import type { JSBSimSdk } from "@felipegalind0/jsbsim";
+import type { Scene, TransformNode } from "@babylonjs/core";
+import type { AircraftDefinition, AircraftTemperatureObservation } from "./aircraftCatalog";
+import type { AircraftRig } from "./aircraftAnimation";
+import { createEngineExhaust, type EngineExhaustHandle, type EngineExhaustSettings, type EngineExhaustState } from "./createEngineExhaust";
+import { getEngineExhaustOpticalProfile } from "./engineExhaustProfiles";
+import { createEngineSmoke, type EngineSmokeFrame, type EngineSmokeHandle, type EngineSmokeSettings } from "./createEngineSmoke";
+import { bindEngineGasSupport } from "./engineGasSupport";
+import { getEngineSmokeProfile } from "./engineSmokeProfiles";
+
+/** 0sfs owns engine observations and their aircraft-attached visual consumers. */
+export function createAircraftEngineVisuals(sdk: JSBSimSdk, scene: Scene,
+  definition: AircraftDefinition, options: {
+    settings: EngineExhaustSettings;
+    smokeSettings?: EngineSmokeSettings;
+    getWorldFromEcef?(): EngineSmokeFrame | null;
+    requestRender(): void;
+    onError(message: string): void;
+  }) {
+  const paths: string[] = [];
+  const slot = (path: string): number => {
+    const existing = paths.indexOf(path);
+    if (existing >= 0) return existing;
+    return paths.push(path) - 1;
+  };
+  const augmentationPath = (index: number) => `propulsion/engine[${index}]/augmentation`;
+  const nozzlePath = (index: number) => `propulsion/engine[${index}]/nozzle-pos-norm`;
+  const afterburnerSlots = definition.afterburner?.engineIndices.map(index => slot(augmentationPath(index))) ?? [];
+  const nozzleSlot = definition.nozzlePositionEngineIndex === undefined ? -1 : slot(nozzlePath(definition.nozzlePositionEngineIndex));
+  const temperatureSlots = (observation?: AircraftTemperatureObservation) => ({
+    value: observation ? slot(observation.property) : -1,
+    required: observation?.availableWhen?.map(slot) ?? [],
+    scale: observation?.unit === "degF" ? 5 / 9 : 1,
+    offset: observation?.unit === "degC" ? 273.15 : observation?.unit === "degF" ? 273.15 - 32 * 5 / 9 : 0,
+  });
+  const sources = definition.exhaustSources?.map(installation => ({
+    installation,
+    augmentationSlot: slot(augmentationPath(installation.engineIndex)),
+    nozzleSlot: slot(nozzlePath(installation.engineIndex)),
+    powerSlot: slot(installation.powerProperty),
+    fuelSlot: slot(installation.fuelFlowProperty),
+    burnedFuelSlot: installation.afterburnerBurnedFuelFlowProperty ? slot(installation.afterburnerBurnedFuelFlowProperty) : -1,
+    metalTemperature: temperatureSlots(installation.hotSurfaceTemperature),
+    regionTemperatures: installation.hotSurfaceRegions?.map(region => temperatureSlots(region.temperature)),
+    gasTemperature: temperatureSlots(installation.gasTemperature),
+    state: { running: false, augmentation: false, powerNorm: 0, simulationTimeSeconds: 0 } as EngineExhaustState,
+    attachment: null as TransformNode | null,
+    attachmentResolved: false,
+  })) ?? [];
+  const timeSlot = sources.length ? slot("simulation/sim-time-sec") : -1;
+  const ambientSlot = sources.length ? slot("atmosphere/T-R") : -1;
+  // Native batches resolve once and never create absent properties. Copy each
+  // read out of WASM memory before another SDK call can invalidate its view.
+  const batch = paths.length ? sdk.createPropertyBatch(paths, { create: false }) : null;
+  const values = new Float64Array(paths.length).fill(Number.NaN);
+  const temperature = (observation: ReturnType<typeof temperatureSlots>): number | undefined => {
+    if (!observation.required.every(index => Number.isFinite(values[index]) && values[index] > 0.5)) return undefined;
+    const kelvin = values[observation.value] * observation.scale + observation.offset;
+    return Number.isFinite(kelvin) && kelvin > 0 ? kelvin : undefined;
+  };
+  const warned = new Set<string>();
+  const reportOnce = (key: string, message: string): void => {
+    if (warned.has(key)) return;
+    warned.add(key);
+    options.onError(message);
+  };
+  for (const path of batch?.missing ?? []) {
+    reportOnce(path, `Engine visual observation unavailable: ${path}`);
+  }
+  let settings = options.settings;
+  let smokeSettings = options.smokeSettings;
+  let rig: AircraftRig | null = null;
+  let boundRig: AircraftRig | null = null;
+  let disposed = false;
+  let frameWillDraw = false;
+  const requestRender = (): void => { if (!frameWillDraw) options.requestRender(); };
+  const plumes: { source: typeof sources[number]; handle: EngineExhaustHandle }[] = [];
+  const smoke: { source: typeof sources[number]; handle: EngineSmokeHandle }[] = [];
+  let plumeBindingAttempted = false;
+  let smokeBindingAttempted = false;
+  const clearPlumes = (): void => {
+    for (const plume of plumes) plume.handle.dispose();
+    plumes.length = 0;
+    plumeBindingAttempted = false;
+  };
+  const clearSmoke = (): void => {
+    for (const trail of smoke) trail.handle.dispose();
+    smoke.length = 0;
+    smokeBindingAttempted = false;
+  };
+  const clearSources = (): void => {
+    clearPlumes(); clearSmoke();
+    for (const source of sources) { source.attachment = null; source.attachmentResolved = false; }
+    boundRig = null;
+  };
+  const afterburnerActive = (): boolean | null => {
+    let known = afterburnerSlots.length > 0;
+    for (const index of afterburnerSlots) {
+      const value = values[index];
+      if (Number.isFinite(value) && value > 0.5) return true;
+      if (!Number.isFinite(value)) known = false;
+    }
+    return known ? false : null;
+  };
+  const synchronizeRig = (next: AircraftRig | null): void => {
+    if (disposed) return;
+    rig = next;
+    if (!rig || !settings.enabled && !smokeSettings?.enabled) { clearSources(); return; }
+    if (boundRig !== rig) {
+      clearSources();
+      boundRig = rig;
+    }
+    if (!settings.enabled) clearPlumes();
+    if (!smokeSettings?.enabled) clearSmoke();
+    const attachmentFor = (source: typeof sources[number]): TransformNode | null => {
+      if (!source.attachmentResolved) {
+        source.attachment = rig!.getNode(source.installation.attachmentNode);
+        source.attachmentResolved = true;
+      }
+      return source.attachment;
+    };
+    if (settings.enabled && !plumeBindingAttempted) {
+      plumeBindingAttempted = true;
+      for (const source of sources) {
+        const installation = source.installation;
+        const attachment = attachmentFor(source);
+        const opticalProfile = getEngineExhaustOpticalProfile(installation.opticalProfileId);
+        if (!attachment || !opticalProfile) {
+          const reason = !attachment ? `attachment ${installation.attachmentNode}` : `optical profile ${installation.opticalProfileId}`;
+          reportOnce(`${installation.id}/${reason}`, `Exhaust ${installation.id}: missing ${reason}`);
+          continue;
+        }
+        let handle: EngineExhaustHandle;
+        try {
+          const supportRoot = installation.gasSupport ? rig!.getNode(installation.gasSupport.rootNode) : null;
+          const support = supportRoot && installation.gasSupport ? bindEngineGasSupport(supportRoot, installation.gasSupport) : undefined;
+          if (installation.gasSupport && !support) throw new Error(`Missing gas support root ${installation.gasSupport.rootNode}`);
+          handle = createEngineExhaust(scene, {
+          attachment, exitPosition: installation.exitPosition, direction: installation.direction,
+          hotSurfaceMaterialNames: installation.hotSurfaceMaterialNames,
+          hotSurfaceAttachment: installation.hotSurfaceAttachmentNode
+            ? rig!.getNode(installation.hotSurfaceAttachmentNode) ?? undefined : undefined,
+          hotSurfaceRegions: installation.hotSurfaceRegions,
+          closedRadiusMeters: installation.closedRadiusMeters, openRadiusMeters: installation.openRadiusMeters,
+          lengthMeters: installation.lengthMeters, opticalProfile, settings, requestRender,
+          flowSupport: support ? { root: support.root, snapshot: () => rig?.engineNozzle
+            ? support.update(rig.engineNozzle.apertureGeometry, installation.lengthMeters,
+              opticalProfile.gasEmission?.spatialField?.spreadingSlope ?? 0) : undefined } : undefined,
+        }); } catch (error) {
+          reportOnce(`${installation.id}/optical-setup`, `Exhaust ${installation.id}: ${error instanceof Error ? error.message : String(error)}`);
+          continue;
+        }
+        plumes.push({ source, handle });
+        void handle.ready.catch(error => {
+          if (!disposed && plumes.some(plume => plume.handle === handle)) {
+            options.onError(`Exhaust ${installation.id}: ${error instanceof Error ? error.message : String(error)}`);
+          }
+        });
+      }
+    }
+    if (smokeSettings?.enabled && !smokeBindingAttempted && options.getWorldFromEcef) {
+      smokeBindingAttempted = true;
+      for (const source of sources) {
+        const installation = source.installation;
+        if (!installation.smokeProfileId) continue;
+        const attachment = attachmentFor(source);
+        const profile = getEngineSmokeProfile(installation.smokeProfileId);
+        if (!attachment || !profile) {
+          const reason = !attachment ? `attachment ${installation.attachmentNode}` : `smoke profile ${installation.smokeProfileId}`;
+          reportOnce(`${installation.id}/${reason}`, `Exhaust ${installation.id}: missing ${reason}`);
+          continue;
+        }
+        let handle: EngineSmokeHandle;
+        try { handle = createEngineSmoke(scene, { attachment, exitPosition: installation.exitPosition,
+          direction: installation.direction, profile, settings: smokeSettings,
+          getWorldFromEcef: options.getWorldFromEcef, requestRender }); } catch (error) {
+          reportOnce(`${installation.id}/smoke-setup`, `Smoke ${installation.id}: ${error instanceof Error ? error.message : String(error)}`);
+          continue;
+        }
+        smoke.push({ source, handle });
+        void handle.ready.catch(error => {
+          if (!disposed && smoke.some(trail => trail.handle === handle)) {
+            options.onError(`Smoke ${installation.id}: ${error instanceof Error ? error.message : String(error)}`);
+          }
+        });
+      }
+    }
+    for (const source of sources) {
+      const power = values[source.powerSlot] / source.installation.powerFullScale;
+      const fuel = values[source.fuelSlot];
+      const burnedFuel = values[source.burnedFuelSlot];
+      const augmentation = values[source.augmentationSlot];
+      const time = values[timeSlot];
+      source.state.running = Number.isFinite(power) && power > 0 && Number.isFinite(fuel) && fuel > 0 && Number.isFinite(time);
+      source.state.fuelFlowKgPerSecond = Number.isFinite(fuel) && fuel >= 0 ? fuel * 0.45359237 : undefined;
+      source.state.afterburnerBurnedFuelFlowKgPerSecond = Number.isFinite(burnedFuel) && burnedFuel >= 0 ? burnedFuel : undefined;
+      source.state.augmentation = Number.isFinite(augmentation) && augmentation > 0.5;
+      source.state.powerNorm = Number.isFinite(power) ? Math.min(1, Math.max(0, power)) : 0;
+      source.state.nozzlePositionNorm = Number.isFinite(values[source.nozzleSlot]) ? values[source.nozzleSlot] : undefined;
+      source.state.exitRadiusMeters = rig?.engineNozzle?.apertureGeometry.exitRadius;
+      source.state.simulationTimeSeconds = Number.isFinite(time) ? time : 0;
+      source.state.metalTemperatureKelvin = temperature(source.metalTemperature);
+      if (source.regionTemperatures) {
+        const temperatures = source.state.hotSurfaceTemperaturesKelvin as (number | undefined)[] | undefined
+          ?? new Array<number | undefined>(source.regionTemperatures.length);
+        for (let i = 0; i < temperatures.length; i++) temperatures[i] = temperature(source.regionTemperatures[i]);
+        source.state.hotSurfaceTemperaturesKelvin = temperatures;
+      }
+      source.state.gasTemperatureKelvin = temperature(source.gasTemperature);
+      const ambientKelvin = values[ambientSlot] * 5 / 9;
+      source.state.ambientTemperatureKelvin = Number.isFinite(ambientKelvin) && ambientKelvin > 0 ? ambientKelvin : undefined;
+    }
+    for (const plume of plumes) plume.handle.update(plume.source.state, settings);
+    if (smokeSettings) for (const trail of smoke) trail.handle.update(trail.source.state, smokeSettings);
+  };
+  return {
+    read(): void { if (!disposed) batch?.read(values); },
+    afterburnerActive,
+    nozzlePositionNorm(): number | undefined {
+      return nozzleSlot >= 0 && Number.isFinite(values[nozzleSlot]) ? values[nozzleSlot] : undefined;
+    },
+    /** During the app's view update, this frame already draws synchronous changes. */
+    updateRig(next: AircraftRig | null, withinScheduledFrame = false): void {
+      frameWillDraw = withinScheduledFrame;
+      try { synchronizeRig(next); } finally { frameWillDraw = false; }
+    },
+    setSettings(next: EngineExhaustSettings): void { settings = next; synchronizeRig(rig); },
+    setSmokeSettings(next: EngineSmokeSettings): void { smokeSettings = next; synchronizeRig(rig); },
+    resetSmoke(): void { for (const trail of smoke) trail.handle.resetEpoch(); },
+    dispose(): void {
+      if (disposed) return;
+      disposed = true;
+      clearSources();
+      batch?.dispose();
+      rig = null;
+    },
+  };
+}

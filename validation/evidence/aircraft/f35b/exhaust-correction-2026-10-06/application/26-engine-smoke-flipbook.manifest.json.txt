@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "faint-aircraft-aerosol-v1",
+  "assetLicense": "AGPL-3.0-only",
+  "method": "Original deterministic procedural alpha flipbook; 16 frames, one sample per covered fragment.",
+  "orientation": "PNG first/top row is frame 0; invertY=false, no mipmaps, clamp, bilinear. Texel-centred tile UVs prevent bleed.",
+  "assumptions": [
+    "Uncalibrated faint aircraft aerosol appearance, not a measured F135 soot rate or contrail.",
+    "Radius growth and ambient-frame drift are artistic transport; no wind, buoyancy, chemistry or CFD.",
+    "Alpha blending and screen coverage affect cost. No energy saving is claimed without device measurement."
+  ],
+  "sources": [
+    {
+      "url": "https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-6-fire-vulcan-demo",
+      "purpose": "Precomputed animated smoke sprites and alpha blending method; no source imagery copied."
+    }
+  ],
+  "inputs": [
+    {
+      "path": "scripts/build-engine-smoke.mjs",
+      "sha256": "600602a5a381524ac2212c1e6a72bf70cde9fecd0545c812bb2477d13b3df774"
+    },
+    {
+      "path": "scripts/exhaustOptics/bake.mjs",
+      "sha256": "ea5ee20d828e5d0870d77e2a1205f8d80384abd97c0a75918ee2471509620a8b"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "engine-smoke-flipbook.png",
+      "width": 128,
+      "height": 128,
+      "columns": 4,
+      "rows": 4,
+      "bytes": 7900,
+      "sha256": "73c447a6b283841a81373d4d7fcb591b027fcdab1dd402d57315603285985590"
+    }
+  ]
+}

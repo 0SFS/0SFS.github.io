@@ -1,0 +1,212 @@
+[
+  {
+    "path": "README.md",
+    "sha256": "f2013f1124eebcfb3b8a714ee8cce54ad987455e9fd0e1dc84483abb108c752f",
+    "bytes": 6604
+  },
+  {
+    "path": "ab-onset-oblique-day.png",
+    "sha256": "07ab04c2b248c43f4f6c11e0535db725121438a790bf6d49e28e5b5b2d1628ce",
+    "bytes": 1363
+  },
+  {
+    "path": "ab-onset-oblique-night.png",
+    "sha256": "cba4a97b4c5f2e8b09d23317455d554609282c0cd86e2bebddeb3e7ca8c44b83",
+    "bytes": 1430
+  },
+  {
+    "path": "ab-onset-rear-day.png",
+    "sha256": "4725925c22f2093013076a21ad06bf34fdd6691c5ae4e368a2db61aa9f1c2c7b",
+    "bytes": 4874
+  },
+  {
+    "path": "ab-onset-rear-night.png",
+    "sha256": "f220e2aaf42b96f058a01ab11b300a8b9b962b302e1c7b3e8a093fa73b3f228e",
+    "bytes": 5526
+  },
+  {
+    "path": "ab-sustained-oblique-day.png",
+    "sha256": "d15ac9af916aa197ae0b881a1529506b40f5bd7f4924791ec6cd4dc9077a7cac",
+    "bytes": 2718
+  },
+  {
+    "path": "ab-sustained-oblique-night.png",
+    "sha256": "5b4f74cb085f07bbb6c632d59e96204f1fe4f2d4f48e62a7ee6dcf5364ee7411",
+    "bytes": 2949
+  },
+  {
+    "path": "ab-sustained-rear-day.png",
+    "sha256": "9b8653be89609d07a5647a94fbe80bfab3f8821f3cfb1d41503c3d50f5f097f0",
+    "bytes": 6561
+  },
+  {
+    "path": "ab-sustained-rear-night.png",
+    "sha256": "664a809bc1635ad0ddd82e06565952451a32a68d5397d047204e404dcfa5d671",
+    "bytes": 7058
+  },
+  {
+    "path": "field-resolution-comparison.log",
+    "sha256": "be380f180ecea403121fce2beae27f40133bcdfe6271175464a24a271dcd4aa5",
+    "bytes": 5994
+  },
+  {
+    "path": "lint.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "powered-lift-oblique-day.png",
+    "sha256": "007b6238e32eecea12cdb5db2ac03cd7dbeb6abccc4c9541b9d2a1621a1de454",
+    "bytes": 387
+  },
+  {
+    "path": "powered-lift-oblique-night.png",
+    "sha256": "dceb724735880f600f590044131d15dcfa80720c98ee1aaba2194c49e96d01b6",
+    "bytes": 324
+  },
+  {
+    "path": "powered-lift-rear-day.png",
+    "sha256": "51b20990988683858b1b326d90d4c9c0b9e88ac326b80907b4678c3e56a62cfb",
+    "bytes": 640
+  },
+  {
+    "path": "powered-lift-rear-night.png",
+    "sha256": "dceb724735880f600f590044131d15dcfa80720c98ee1aaba2194c49e96d01b6",
+    "bytes": 324
+  },
+  {
+    "path": "previous-ab-onset-oblique-day.png",
+    "sha256": "b97b73acd16782c5377c3d4852997dfa9362763b4d31b8d4bdc7937ca5e882fb",
+    "bytes": 1264
+  },
+  {
+    "path": "previous-ab-onset-oblique-night.png",
+    "sha256": "7b48afbdef99e434a2070bc58a117f494155ef01b2b9c2b8bcd69239db902e90",
+    "bytes": 2136
+  },
+  {
+    "path": "previous-ab-onset-rear-day.png",
+    "sha256": "a25dce0121c7b1acc82a9949dc246451b6154e267df2a274426ca1e2b7e6145d",
+    "bytes": 2614
+  },
+  {
+    "path": "previous-ab-onset-rear-night.png",
+    "sha256": "525134feecef1648292eee824e7fbfdad9e954eeda513e5c636c7ea293e86137",
+    "bytes": 3223
+  },
+  {
+    "path": "previous-ab-sustained-oblique-day.png",
+    "sha256": "4111e7f2ff94fd767c74b0a0e120f9d3b54a96fdb25ac7f924210234fdc75ca5",
+    "bytes": 3754
+  },
+  {
+    "path": "previous-ab-sustained-oblique-night.png",
+    "sha256": "190e69ff76407fc6a08bb63672899030a0f676fc44a9be7938b58acb22f2ac3d",
+    "bytes": 4080
+  },
+  {
+    "path": "previous-ab-sustained-rear-day.png",
+    "sha256": "f5f9fdc9a604f051cbdbc540a660b89263ffd4e1e4b442bbe238879cd39969fb",
+    "bytes": 2783
+  },
+  {
+    "path": "previous-ab-sustained-rear-night.png",
+    "sha256": "0b6cc7613a9e422223747957d61391286090c9e88a0042e616411f055197511c",
+    "bytes": 2838
+  },
+  {
+    "path": "previous-attempts/combined-xyz-32x16.json",
+    "sha256": "759b444afa39b85311bd412a3bbf7852c3aa57dcaae6c5214452b658291fe656",
+    "bytes": 140825
+  },
+  {
+    "path": "previous-attempts/combined-xyz-32x16.log",
+    "sha256": "73a1084aaa37e81f95eaffd2234c0cd47517c381f1e043b623f8d99d5c4a8b78",
+    "bytes": 1040
+  },
+  {
+    "path": "previous-attempts/combined-xyz-64x32-uniform-rays.json",
+    "sha256": "e761a244f8304dfa2f03423cf27eb3836c6a1715e77039e46a874b431dc47594",
+    "bytes": 192455
+  },
+  {
+    "path": "previous-attempts/combined-xyz-64x32-uniform-rays.log",
+    "sha256": "1d239255cbeb567969ec0492b71a621c0e513d9d2a72eca3cd370983b2818b53",
+    "bytes": 1040
+  },
+  {
+    "path": "previous-attempts/initial-per-component-gamut.json",
+    "sha256": "0b3a7d7f2a51037ec89798ff56a6deb20aca7a015da552ba3f220eb6f2b37723",
+    "bytes": 121148
+  },
+  {
+    "path": "previous-attempts/initial-per-component-gamut.log",
+    "sha256": "06dec247bfb1f44cf8cdb0de879b24330c278ee0b703549e5b5a9863da9ee06d",
+    "bytes": 1040
+  },
+  {
+    "path": "previous-powered-lift-oblique-day.png",
+    "sha256": "145a95e07b8805590bcf17e67d2d17427028d64e61a19563141b41dcfa9fbd80",
+    "bytes": 330
+  },
+  {
+    "path": "previous-powered-lift-oblique-night.png",
+    "sha256": "dceb724735880f600f590044131d15dcfa80720c98ee1aaba2194c49e96d01b6",
+    "bytes": 324
+  },
+  {
+    "path": "previous-powered-lift-rear-day.png",
+    "sha256": "145a95e07b8805590bcf17e67d2d17427028d64e61a19563141b41dcfa9fbd80",
+    "bytes": 330
+  },
+  {
+    "path": "previous-powered-lift-rear-night.png",
+    "sha256": "dceb724735880f600f590044131d15dcfa80720c98ee1aaba2194c49e96d01b6",
+    "bytes": 324
+  },
+  {
+    "path": "report.json",
+    "sha256": "8f37c6d7d93b55596a12b13d7acfe4d6f2e11e867a747f88af4e1fdd1c297b72",
+    "bytes": 342192
+  },
+  {
+    "path": "run.log",
+    "sha256": "2666136eba28cbecaee759068f9a61dc71ff4748b9365a751fecfc7c6ceb9c6f",
+    "bytes": 1040
+  },
+  {
+    "path": "source-0-f135-exhaust-lut.manifest.json.txt",
+    "sha256": "3da9c058348d432aca82b1f4f6a5b95163abe7484ae74e9d3cdec2e024e7e7c4",
+    "bytes": 621651
+  },
+  {
+    "path": "source-1-f135-exhaust-lut.manifest.json.txt",
+    "sha256": "4368d2d8cf1d24f5860727ec6639602a0533eb2e5baf02598830346a10461727",
+    "bytes": 104281
+  },
+  {
+    "path": "source-2-f135-visible-approximation.json.txt",
+    "sha256": "788581df85e576b56bac25156e6cd27ade1c87e67148ca39bb48329102948a2f",
+    "bytes": 14782
+  },
+  {
+    "path": "source-3-spatialReference.mjs.txt",
+    "sha256": "d18d930cb5505ea5ea7f168bccccc4fc392320b2a152c466fdceb734ebae8790",
+    "bytes": 6197
+  },
+  {
+    "path": "source-4-reference.mjs.txt",
+    "sha256": "8fb085647f7520a8f4222e8be207023d881ad0a186fa3d4721fa8f7e5c9b5cb8",
+    "bytes": 1652
+  },
+  {
+    "path": "source-5-check-spatial-plume.mjs.txt",
+    "sha256": "4285548b307d986dbc39eb6fe82a30b9ac3394b30f5bbdff3db2273c65ce900d",
+    "bytes": 19078
+  },
+  {
+    "path": "source-6-engineGasOptics.ts.txt",
+    "sha256": "4c1f891eda1db2a041afe33c89758ef79dc31a204faa54da26e9200e027a2956",
+    "bytes": 24987
+  }
+]

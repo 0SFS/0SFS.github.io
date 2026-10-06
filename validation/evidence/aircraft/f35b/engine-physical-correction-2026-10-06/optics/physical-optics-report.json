@@ -1,0 +1,2472 @@
+{
+  "schemaVersion": 1,
+  "scope": "CPU numerical/NullEngine software evidence; no rendered day/night/rear/oblique qualification",
+  "spectralReferences": [
+    {
+      "kelvin": 300,
+      "wavelengthNm": 360,
+      "radianceWPerSrPerM3": 2.7394839565109572e-42,
+      "referenceWPerSrPerM3": 2.739483956510956e-42,
+      "relativeError": 4.440892098500626e-16
+    },
+    {
+      "kelvin": 300,
+      "wavelengthNm": 500,
+      "radianceWPerSrPerM3": 8.398856670693533e-27,
+      "referenceWPerSrPerM3": 8.398856670693653e-27,
+      "relativeError": 1.4210854715202004e-14
+    },
+    {
+      "kelvin": 300,
+      "wavelengthNm": 830,
+      "radianceWPerSrPerM3": 2.432454112707451e-11,
+      "referenceWPerSrPerM3": 2.4324541127074507e-11,
+      "relativeError": 2.220446049250313e-16
+    },
+    {
+      "kelvin": 650,
+      "wavelengthNm": 360,
+      "radianceWPerSrPerM3": 3.902126210859445e-11,
+      "referenceWPerSrPerM3": 3.9021262108594716e-11,
+      "relativeError": 6.772360450213455e-15
+    },
+    {
+      "kelvin": 650,
+      "wavelengthNm": 500,
+      "radianceWPerSrPerM3": 0.00022637872339807571,
+      "referenceWPerSrPerM3": 0.00022637872339807571,
+      "relativeError": 0
+    },
+    {
+      "kelvin": 650,
+      "wavelengthNm": 830,
+      "radianceWPerSrPerM3": 791.523099953065,
+      "referenceWPerSrPerM3": 791.523099953065,
+      "relativeError": 0
+    },
+    {
+      "kelvin": 1000,
+      "wavelengthNm": 360,
+      "radianceWPerSrPerM3": 0.0865747163652868,
+      "referenceWPerSrPerM3": 0.0865747163652874,
+      "relativeError": 6.8833827526759706e-15
+    },
+    {
+      "kelvin": 1000,
+      "wavelengthNm": 500,
+      "radianceWPerSrPerM3": 1213.4453938883935,
+      "referenceWPerSrPerM3": 1213.4453938883976,
+      "relativeError": 3.3306690738754696e-15
+    },
+    {
+      "kelvin": 1000,
+      "wavelengthNm": 830,
+      "radianceWPerSrPerM3": 8957550.97057325,
+      "referenceWPerSrPerM3": 8957550.970573248,
+      "relativeError": 2.220446049250313e-16
+    },
+    {
+      "kelvin": 1400,
+      "wavelengthNm": 360,
+      "radianceWPerSrPerM3": 7880.263664877945,
+      "referenceWPerSrPerM3": 7880.263664877998,
+      "relativeError": 6.661338147750939e-15
+    },
+    {
+      "kelvin": 1400,
+      "wavelengthNm": 500,
+      "radianceWPerSrPerM3": 4514482.785874741,
+      "referenceWPerSrPerM3": 4514482.785874757,
+      "relativeError": 3.552713678800501e-15
+    },
+    {
+      "kelvin": 1400,
+      "wavelengthNm": 830,
+      "radianceWPerSrPerM3": 1268082708.3621113,
+      "referenceWPerSrPerM3": 1268082708.3621156,
+      "relativeError": 3.3306690738754696e-15
+    },
+    {
+      "kelvin": 1800,
+      "wavelengthNm": 360,
+      "radianceWPerSrPerM3": 4483569.432150937,
+      "referenceWPerSrPerM3": 4483569.432150935,
+      "relativeError": 4.440892098500626e-16
+    },
+    {
+      "kelvin": 1800,
+      "wavelengthNm": 500,
+      "radianceWPerSrPerM3": 434778358.8888753,
+      "referenceWPerSrPerM3": 434778358.888876,
+      "relativeError": 1.6653345369377348e-15
+    },
+    {
+      "kelvin": 1800,
+      "wavelengthNm": 830,
+      "radianceWPerSrPerM3": 19867815528.65016,
+      "referenceWPerSrPerM3": 19867815528.650196,
+      "relativeError": 1.7763568394002505e-15
+    },
+    {
+      "kelvin": 2500,
+      "wavelengthNm": 360,
+      "radianceWPerSrPerM3": 2247012232.9676275,
+      "referenceWPerSrPerM3": 2247012232.9676304,
+      "relativeError": 1.2212453270876722e-15
+    },
+    {
+      "kelvin": 2500,
+      "wavelengthNm": 500,
+      "radianceWPerSrPerM3": 38217202657.43482,
+      "referenceWPerSrPerM3": 38217202657.43482,
+      "relativeError": 0
+    },
+    {
+      "kelvin": 2500,
+      "wavelengthNm": 830,
+      "radianceWPerSrPerM3": 294863624690.2433,
+      "referenceWPerSrPerM3": 294863624690.24347,
+      "relativeError": 6.661338147750939e-16
+    },
+    {
+      "kelvin": 3200,
+      "wavelengthNm": 360,
+      "radianceWPerSrPerM3": 74190211612.86214,
+      "referenceWPerSrPerM3": 74190211612.86224,
+      "relativeError": 1.4432899320127035e-15
+    },
+    {
+      "kelvin": 3200,
+      "wavelengthNm": 500,
+      "radianceWPerSrPerM3": 474024789376.8772,
+      "referenceWPerSrPerM3": 474024789376.87714,
+      "relativeError": 2.220446049250313e-16
+    },
+    {
+      "kelvin": 3200,
+      "wavelengthNm": 830,
+      "radianceWPerSrPerM3": 1348530933574.266,
+      "referenceWPerSrPerM3": 1348530933574.267,
+      "relativeError": 7.771561172376096e-16
+    }
+  ],
+  "bolometric": [
+    {
+      "kelvin": 300,
+      "integratedExitanceWPerM2": 459.30032795133883,
+      "stefanBoltzmannWPerM2": 459.300327939,
+      "relativeError": 2.6864510616064763e-11
+    },
+    {
+      "kelvin": 1000,
+      "integratedExitanceWPerM2": 56703.744191835736,
+      "stefanBoltzmannWPerM2": 56703.74419,
+      "relativeError": 3.2374103398069565e-11
+    },
+    {
+      "kelvin": 3200,
+      "integratedExitanceWPerM2": 5945818.526970551,
+      "stefanBoltzmannWPerM2": 5945818.526777344,
+      "relativeError": 3.2494673618543857e-11
+    }
+  ],
+  "interpolation": [
+    {
+      "kind": "gas",
+      "sampleCount": 512,
+      "testedTemperatures": 513,
+      "maximumYError": 0.003278081981340941,
+      "maximumRgbErrorRelativeToPeak": 0.0032780819813408727,
+      "worstKelvin": 300,
+      "reference": "independent frequency Planck; 0.25 nm trapezoid with interpolated CIE"
+    },
+    {
+      "kind": "solid",
+      "sampleCount": 512,
+      "testedTemperatures": 513,
+      "maximumYError": 0.003278081980822911,
+      "maximumRgbErrorRelativeToPeak": 0.003278081980822934,
+      "worstKelvin": 300,
+      "reference": "independent frequency Planck; 0.25 nm trapezoid with interpolated CIE"
+    }
+  ],
+  "volumeCheck": {
+    "baked": 0.2971237908769993,
+    "reference": 0.29712379082424734,
+    "relativeError": 1.7754198111674668e-10
+  },
+  "transferCases": [
+    {
+      "absorptionPerMeter": 0,
+      "transmittance": 1,
+      "radianceRgbCdPerM2": [
+        30,
+        8,
+        4
+      ],
+      "relativeError": 1.0191847366058937e-13
+    },
+    {
+      "absorptionPerMeter": 1e-14,
+      "transmittance": 0.99999999999998,
+      "radianceRgbCdPerM2": [
+        29.9999999999997,
+        7.99999999999992,
+        3.99999999999996
+      ],
+      "relativeError": 9.192646643896296e-14
+    },
+    {
+      "absorptionPerMeter": 0.025,
+      "transmittance": 0.951229424500714,
+      "radianceRgbCdPerM2": [
+        29.262345299571592,
+        7.803292079885758,
+        3.901646039942879
+      ],
+      "relativeError": 2.62456723021387e-13
+    },
+    {
+      "absorptionPerMeter": 0.08,
+      "transmittance": 0.8521437889662113,
+      "radianceRgbCdPerM2": [
+        27.72303956883537,
+        7.392810551689433,
+        3.6964052758447163
+      ],
+      "relativeError": 2.6618707238412753e-12
+    },
+    {
+      "absorptionPerMeter": 0.3,
+      "transmittance": 0.5488116360940265,
+      "radianceRgbCdPerM2": [
+        22.559418195298676,
+        6.015844852079647,
+        3.0079224260398236
+      ],
+      "relativeError": 3.750155741499839e-11
+    },
+    {
+      "absorptionPerMeter": 10,
+      "transmittance": 2.0611535811454473e-9,
+      "radianceRgbCdPerM2": [
+        1.4999999969082696,
+        0.3999999991755386,
+        0.1999999995877693
+      ],
+      "relativeError": 4.166667721960948e-8
+    }
+  ],
+  "baselineComparison": {
+    "baselinePath": "validation/evidence/aircraft/f35b/engine-rebuild-2026-10-06/implementation/optics/f135-exhaust-lut.manifest.json",
+    "kelvin": 400,
+    "previousPeakNormalizedRgbMaximum": 1,
+    "previousIndependentRelativeEmissionPerMeter": 0.03666666666666667,
+    "revisedSourceRgbCdPerM3": [
+      1.5458083240575464e-15,
+      0,
+      0
+    ],
+    "revisedOneMeterRadianceRgbCdPerM2": [
+      1.5266457403326585e-15,
+      0,
+      0
+    ],
+    "previousHasFuelInputOrPhysicalPowerBound": false,
+    "revisedMissingFuelSuppressed": true,
+    "interpretation": "Prior normalized gas has no SI conversion, so no physical brightness ratio is claimed. A nonzero guessed 400 K display row and no fuel-source bound fail the new cold/source criteria. The endpoint at 300 K happened to be zero because its separate envelope was zero."
+  },
+  "budgetCases": [
+    {
+      "input": {
+        "temperatureKelvin": 300,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0.000001,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "dry",
+      "fuelPowerW": 43.3,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.00011016946125684448,
+      "particlePowerUpperBoundW": 0.1299,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 0.1299,
+      "allowedPowerW": 0.1299,
+      "absorptionWasCapped": true,
+      "blackbodyRgbCdPerM2": [
+        4.83889080649e-21,
+        0,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        5.33097993231701e-25,
+        0,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        3.421355687811157e-25,
+        0,
+        0
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 300,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0.1,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "dry",
+      "fuelPowerW": 4330000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.025,
+      "particlePowerUpperBoundW": 29.477315791069486,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 29.477315791069486,
+      "allowedPowerW": 12990,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        4.83889080649e-21,
+        0,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        1.2097227016225002e-22,
+        0,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        7.763847732346516e-23,
+        0,
+        0
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 300,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 3,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "dry",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.025,
+      "particlePowerUpperBoundW": 29.477315791069486,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 29.477315791069486,
+      "allowedPowerW": 389700,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        4.83889080649e-21,
+        0,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        1.2097227016225002e-22,
+        0,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        7.763847732346516e-23,
+        0,
+        0
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 650,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0.000001,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "dry",
+      "fuelPowerW": 43.3,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.00000499911143828544,
+      "particlePowerUpperBoundW": 0.1299,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 0.1299,
+      "allowedPowerW": 0.1299,
+      "absorptionWasCapped": true,
+      "blackbodyRgbCdPerM2": [
+        0.000054982891818050286,
+        0,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        2.748656033976261e-10,
+        0,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        1.7640527773650445e-10,
+        0,
+        0
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 650,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0.1,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "dry",
+      "fuelPowerW": 4330000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.025,
+      "particlePowerUpperBoundW": 649.6154446826663,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 649.6154446826663,
+      "allowedPowerW": 12990,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        0.000054982891818050286,
+        0,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        0.0000013745722954512571,
+        0,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        8.821831635193888e-7,
+        0,
+        0
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 650,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 3,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "dry",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.025,
+      "particlePowerUpperBoundW": 649.6154446826663,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 649.6154446826663,
+      "allowedPowerW": 389700,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        0.000054982891818050286,
+        0,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        0.0000013745722954512571,
+        0,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        8.821831635193888e-7,
+        0,
+        0
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 1000,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0.000001,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "dry",
+      "fuelPowerW": 43.3,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 8.923726361804403e-7,
+      "particlePowerUpperBoundW": 0.1299,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 0.1299,
+      "allowedPowerW": 0.1299,
+      "absorptionWasCapped": true,
+      "blackbodyRgbCdPerM2": [
+        12.27678747123363,
+        0.10541542733787526,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        0.000010955469199531757,
+        9.40698427875874e-8,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        0.000007031081965106336,
+        6.037283871990286e-8,
+        0
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 1000,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0.1,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "dry",
+      "fuelPowerW": 4330000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.025,
+      "particlePowerUpperBoundW": 3639.1747890209244,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 3639.1747890209244,
+      "allowedPowerW": 12990,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        12.27678747123363,
+        0.10541542733787526,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        0.3069196867808408,
+        0.0026353856834468816,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        0.19697718419518612,
+        0.001691357294927612,
+        0
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 1000,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 3,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "dry",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.025,
+      "particlePowerUpperBoundW": 3639.1747890209244,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 3639.1747890209244,
+      "allowedPowerW": 389700,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        12.27678747123363,
+        0.10541542733787526,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        0.3069196867808408,
+        0.0026353856834468816,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        0.19697718419518612,
+        0.001691357294927612,
+        0
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 1800,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0.000001,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "dry",
+      "fuelPowerW": 43.3,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 8.500730035250347e-8,
+      "particlePowerUpperBoundW": 0.1299,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 0.1299,
+      "allowedPowerW": 0.1299,
+      "absorptionWasCapped": true,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        0.027630026479817583,
+        0.005746223081970001,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        0.017732602532984993,
+        0.003687853504334057,
+        0
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 1800,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0.1,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "dry",
+      "fuelPowerW": 4330000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.008500730035250348,
+      "particlePowerUpperBoundW": 12990,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 12990,
+      "allowedPowerW": 12990,
+      "absorptionWasCapped": true,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        2763.0026479817584,
+        574.6223081970002,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        1773.2602532984993,
+        368.78535043340577,
+        0
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 1800,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 3,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "dry",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.025,
+      "particlePowerUpperBoundW": 38202.60126522605,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 38202.60126522605,
+      "allowedPowerW": 389700,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        8125.780481571273,
+        1689.9204709895175,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        5215.0234331205775,
+        1084.5696455014672,
+        0
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 2500,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0.000001,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "dry",
+      "fuelPowerW": 43.3,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 2.2844739486219272e-8,
+      "particlePowerUpperBoundW": 0.1299,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 0.1299,
+      "allowedPowerW": 0.1299,
+      "absorptionWasCapped": true,
+      "blackbodyRgbCdPerM2": [
+        11627341.556388207,
+        4326685.8968736995,
+        784768.7107554455
+      ],
+      "sourceRgbCdPerM3": [
+        0.2656235887729799,
+        0.09884201215277864,
+        0.017927836754144316
+      ],
+      "isotropicIntensityRgbCd": [
+        0.17047386930797487,
+        0.06343555683328711,
+        0.011505859528209175
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 2500,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0.1,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "dry",
+      "fuelPowerW": 4330000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.0022844739486219275,
+      "particlePowerUpperBoundW": 12990,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 12990,
+      "allowedPowerW": 12990,
+      "absorptionWasCapped": true,
+      "blackbodyRgbCdPerM2": [
+        11627341.556388207,
+        4326685.8968736995,
+        784768.7107554455
+      ],
+      "sourceRgbCdPerM3": [
+        26562.358877297997,
+        9884.201215277866,
+        1792.7836754144319
+      ],
+      "isotropicIntensityRgbCd": [
+        17047.38693079749,
+        6343.555683328712,
+        1150.5859528209176
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 2500,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 3,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "dry",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.025,
+      "particlePowerUpperBoundW": 142155.26519612985,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 142155.26519612985,
+      "allowedPowerW": 389700,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        11627341.556388207,
+        4326685.8968736995,
+        784768.7107554455
+      ],
+      "sourceRgbCdPerM3": [
+        290683.5389097052,
+        108167.1474218425,
+        19619.217768886137
+      ],
+      "isotropicIntensityRgbCd": [
+        186557.02925700962,
+        69420.31104311084,
+        12591.366532270922
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 3200,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0.000001,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "dry",
+      "fuelPowerW": 43.3,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 8.510328637890247e-9,
+      "particlePowerUpperBoundW": 0.1299,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 0.1299,
+      "allowedPowerW": 0.1299,
+      "absorptionWasCapped": true,
+      "blackbodyRgbCdPerM2": [
+        86101579.6297,
+        44393429.8465,
+        16707313.0683
+      ],
+      "sourceRgbCdPerM3": [
+        0.7327527388902235,
+        0.3778026773568406,
+        0.14218472486735145
+      ],
+      "isotropicIntensityRgbCd": [
+        0.47027146655786534,
+        0.2424689935914478,
+        0.09125236322796375
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 3200,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0.1,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "dry",
+      "fuelPowerW": 4330000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.0008510328637890247,
+      "particlePowerUpperBoundW": 12990,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 12990,
+      "allowedPowerW": 12990,
+      "absorptionWasCapped": true,
+      "blackbodyRgbCdPerM2": [
+        86101579.6297,
+        44393429.8465,
+        16707313.0683
+      ],
+      "sourceRgbCdPerM3": [
+        73275.27388902236,
+        37780.26773568406,
+        14218.472486735147
+      ],
+      "isotropicIntensityRgbCd": [
+        47027.146655786535,
+        24246.89935914478,
+        9125.236322796376
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 3200,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 3,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "dry",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.025,
+      "particlePowerUpperBoundW": 381595.13435724046,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 381595.13435724046,
+      "allowedPowerW": 389700,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        86101579.6297,
+        44393429.8465,
+        16707313.0683
+      ],
+      "sourceRgbCdPerM3": [
+        2152539.4907425004,
+        1109835.7461625,
+        417682.82670750003
+      ],
+      "isotropicIntensityRgbCd": [
+        1381472.697964012,
+        712278.5849653071,
+        268063.5704879949
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 300,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 0.000001,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 43.3,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.0005508473062842224,
+      "particlePowerUpperBoundW": 0.6495,
+      "excitedPowerW": 0.000043299999999999995,
+      "totalSourcePowerUpperBoundW": 0.6495432999999999,
+      "allowedPowerW": 0.6495432999999999,
+      "absorptionWasCapped": true,
+      "blackbodyRgbCdPerM2": [
+        4.83889080649e-21,
+        0,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        0.0003040920495986667,
+        0.0018109345459205672,
+        0.0023986820918540154
+      ],
+      "isotropicIntensityRgbCd": [
+        0.0001951624423129947,
+        0.0011622349525983186,
+        0.0015394439150793412
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 300,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 0.1,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 4330000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.08,
+      "particlePowerUpperBoundW": 94.32741053142236,
+      "excitedPowerW": 4.33,
+      "totalSourcePowerUpperBoundW": 98.65741053142236,
+      "allowedPowerW": 64954.329999999994,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        4.83889080649e-21,
+        0,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        30.409204959866678,
+        181.09345459205673,
+        239.86820918540155
+      ],
+      "isotropicIntensityRgbCd": [
+        19.516244231299474,
+        116.22349525983186,
+        153.94439150793414
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 300,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 3,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.08,
+      "particlePowerUpperBoundW": 94.32741053142236,
+      "excitedPowerW": 43.3,
+      "totalSourcePowerUpperBoundW": 137.62741053142236,
+      "allowedPowerW": 1948629.9,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        4.83889080649e-21,
+        0,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        304.0920495986668,
+        1810.9345459205674,
+        2398.6820918540157
+      ],
+      "isotropicIntensityRgbCd": [
+        195.16244231299476,
+        1162.2349525983186,
+        1539.4439150793414
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 650,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 0.000001,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 43.3,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.0000249955571914272,
+      "particlePowerUpperBoundW": 0.6495,
+      "excitedPowerW": 0.000043299999999999995,
+      "totalSourcePowerUpperBoundW": 0.6495432999999999,
+      "allowedPowerW": 0.6495432999999999,
+      "absorptionWasCapped": true,
+      "blackbodyRgbCdPerM2": [
+        0.000054982891818050286,
+        0,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        0.0003040934239266837,
+        0.0018109345459205672,
+        0.0023986820918540154
+      ],
+      "isotropicIntensityRgbCd": [
+        0.00019516332433938338,
+        0.0011622349525983186,
+        0.0015394439150793412
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 650,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 0.1,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 4330000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.08,
+      "particlePowerUpperBoundW": 2078.769422984532,
+      "excitedPowerW": 4.33,
+      "totalSourcePowerUpperBoundW": 2083.099422984532,
+      "allowedPowerW": 64954.329999999994,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        0.000054982891818050286,
+        0,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        30.409209358498025,
+        181.09345459205673,
+        239.86820918540155
+      ],
+      "isotropicIntensityRgbCd": [
+        19.5162470542856,
+        116.22349525983186,
+        153.94439150793414
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 650,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 3,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.08,
+      "particlePowerUpperBoundW": 2078.769422984532,
+      "excitedPowerW": 43.3,
+      "totalSourcePowerUpperBoundW": 2122.069422984532,
+      "allowedPowerW": 1948629.9,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        0.000054982891818050286,
+        0,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        304.09205399729814,
+        1810.9345459205674,
+        2398.6820918540157
+      ],
+      "isotropicIntensityRgbCd": [
+        195.16244513598087,
+        1162.2349525983186,
+        1539.4439150793414
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 1000,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 0.000001,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 43.3,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.000004461863180902201,
+      "particlePowerUpperBoundW": 0.6494999999999999,
+      "excitedPowerW": 0.000043299999999999995,
+      "totalSourcePowerUpperBoundW": 0.6495432999999998,
+      "allowedPowerW": 0.6495432999999999,
+      "absorptionWasCapped": true,
+      "blackbodyRgbCdPerM2": [
+        12.27678747123363,
+        0.10541542733787526,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        0.0003588693955963255,
+        0.0018114048951345051,
+        0.0023986820918540154
+      ],
+      "isotropicIntensityRgbCd": [
+        0.00023031785213852636,
+        0.001162536816791918,
+        0.0015394439150793412
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 1000,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 0.1,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 4330000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.08,
+      "particlePowerUpperBoundW": 11645.359324866957,
+      "excitedPowerW": 4.33,
+      "totalSourcePowerUpperBoundW": 11649.689324866957,
+      "allowedPowerW": 64954.329999999994,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        12.27678747123363,
+        0.10541542733787526,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        31.39134795756537,
+        181.10188782624377,
+        239.86820918540155
+      ],
+      "isotropicIntensityRgbCd": [
+        20.14657122072407,
+        116.22890760317564,
+        153.94439150793414
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 1000,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 3,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.08,
+      "particlePowerUpperBoundW": 11645.359324866957,
+      "excitedPowerW": 43.3,
+      "totalSourcePowerUpperBoundW": 11688.659324866956,
+      "allowedPowerW": 1948629.9,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        12.27678747123363,
+        0.10541542733787526,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        305.0741925963655,
+        1810.9429791547545,
+        2398.6820918540157
+      ],
+      "isotropicIntensityRgbCd": [
+        195.79276930241934,
+        1162.2403649416626,
+        1539.4439150793414
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 1800,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 0.000001,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 43.3,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 4.2503650176251734e-7,
+      "particlePowerUpperBoundW": 0.6495,
+      "excitedPowerW": 0.000043299999999999995,
+      "totalSourcePowerUpperBoundW": 0.6495432999999999,
+      "allowedPowerW": 0.6495432999999999,
+      "absorptionWasCapped": true,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        0.13845422444868657,
+        0.030542049955770572,
+        0.0023986820918540154
+      ],
+      "isotropicIntensityRgbCd": [
+        0.08885817510723795,
+        0.019601502474268603,
+        0.0015394439150793412
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 1800,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 0.1,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 4330000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.04250365017625174,
+      "particlePowerUpperBoundW": 64950,
+      "excitedPowerW": 4.33,
+      "totalSourcePowerUpperBoundW": 64954.33,
+      "allowedPowerW": 64954.329999999994,
+      "absorptionWasCapped": true,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        13845.42244486866,
+        3054.2049955770576,
+        239.86820918540155
+      ],
+      "isotropicIntensityRgbCd": [
+        8885.817510723797,
+        1960.1502474268607,
+        153.94439150793414
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 1800,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 3,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.08,
+      "particlePowerUpperBoundW": 122248.32404872336,
+      "excitedPowerW": 43.3,
+      "totalSourcePowerUpperBoundW": 122291.62404872336,
+      "allowedPowerW": 1948629.9,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        26306.589590626743,
+        7218.680053087022,
+        2398.6820918540157
+      ],
+      "isotropicIntensityRgbCd": [
+        16883.237428298846,
+        4632.857818203013,
+        1539.4439150793414
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 2500,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 0.000001,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 43.3,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 1.1422369743109636e-7,
+      "particlePowerUpperBoundW": 0.6495,
+      "excitedPowerW": 0.000043299999999999995,
+      "totalSourcePowerUpperBoundW": 0.6495432999999999,
+      "allowedPowerW": 0.6495432999999999,
+      "absorptionWasCapped": true,
+      "blackbodyRgbCdPerM2": [
+        11627341.556388207,
+        4326685.8968736995,
+        784768.7107554455
+      ],
+      "sourceRgbCdPerM3": [
+        1.3284220359144983,
+        0.4960209953098138,
+        0.0920378658625756
+      ],
+      "isotropicIntensityRgbCd": [
+        0.8525645089821873,
+        0.31834001911903387,
+        0.059068741556125216
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 2500,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 0.1,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 4330000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.011422369743109638,
+      "particlePowerUpperBoundW": 64950.00000000001,
+      "excitedPowerW": 4.33,
+      "totalSourcePowerUpperBoundW": 64954.33000000001,
+      "allowedPowerW": 64954.329999999994,
+      "absorptionWasCapped": true,
+      "blackbodyRgbCdPerM2": [
+        11627341.556388207,
+        4326685.8968736995,
+        784768.7107554455
+      ],
+      "sourceRgbCdPerM3": [
+        132842.20359144986,
+        49602.09953098139,
+        9203.78658625756
+      ],
+      "isotropicIntensityRgbCd": [
+        85256.45089821875,
+        31834.00191190339,
+        5906.8741556125215
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 2500,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 3,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.08,
+      "particlePowerUpperBoundW": 454896.8486276155,
+      "excitedPowerW": 43.3,
+      "totalSourcePowerUpperBoundW": 454940.1486276155,
+      "allowedPowerW": 1948629.9,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        11627341.556388207,
+        4326685.8968736995,
+        784768.7107554455
+      ],
+      "sourceRgbCdPerM3": [
+        930491.4165606552,
+        347945.80629581655,
+        65180.17895228966
+      ],
+      "isotropicIntensityRgbCd": [
+        597177.6560647438,
+        223307.23029055298,
+        41831.81681834629
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 3200,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 0.000001,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 43.3,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 4.255164318945124e-8,
+      "particlePowerUpperBoundW": 0.6495,
+      "excitedPowerW": 0.000043299999999999995,
+      "totalSourcePowerUpperBoundW": 0.6495432999999999,
+      "allowedPowerW": 0.6495432999999999,
+      "absorptionWasCapped": true,
+      "blackbodyRgbCdPerM2": [
+        86101579.6297,
+        44393429.8465,
+        16707313.0683
+      ],
+      "sourceRgbCdPerM3": [
+        3.6640677865007163,
+        1.8908243213301237,
+        0.7133223064286114
+      ],
+      "isotropicIntensityRgbCd": [
+        2.3515524952316396,
+        1.2135072029098375,
+        0.45780126005489813
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 3200,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 0.1,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 4330000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.004255164318945124,
+      "particlePowerUpperBoundW": 64950.00000000001,
+      "excitedPowerW": 4.33,
+      "totalSourcePowerUpperBoundW": 64954.33000000001,
+      "allowedPowerW": 64954.329999999994,
+      "absorptionWasCapped": true,
+      "blackbodyRgbCdPerM2": [
+        86101579.6297,
+        44393429.8465,
+        16707313.0683
+      ],
+      "sourceRgbCdPerM3": [
+        366406.7786500717,
+        189082.4321330124,
+        71332.23064286115
+      ],
+      "isotropicIntensityRgbCd": [
+        235155.249523164,
+        121350.72029098377,
+        45780.126005489816
+      ],
+      "sourceWithinAllocation": true
+    },
+    {
+      "input": {
+        "temperatureKelvin": 3200,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 3,
+        "afterburnerBurnedFuelFlowKgPerSecond": 1,
+        "radiusMeters": 0.6,
+        "lengthMeters": 6
+      },
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "absorptionPerMeter": 0.08,
+      "particlePowerUpperBoundW": 1221104.4299431695,
+      "excitedPowerW": 43.3,
+      "totalSourcePowerUpperBoundW": 1221147.7299431695,
+      "allowedPowerW": 1948629.9,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        86101579.6297,
+        44393429.8465,
+        16707313.0683
+      ],
+      "sourceRgbCdPerM3": [
+        6888430.462425599,
+        3553285.3222659207,
+        1338983.727555854
+      ],
+      "isotropicIntensityRgbCd": [
+        4420907.79592715,
+        2280453.7068415815,
+        859342.869476663
+      ],
+      "sourceWithinAllocation": true
+    }
+  ],
+  "sensitivities": [
+    {
+      "absorptionPerMeter": 0,
+      "excitedFuelPowerFraction": 0,
+      "bands": "equal-energy",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 0,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 0,
+      "allowedPowerW": 1948500,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        0,
+        0,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        0,
+        0,
+        0
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "absorptionPerMeter": 0,
+      "excitedFuelPowerFraction": 0,
+      "bands": "CH-only",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 0,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 0,
+      "allowedPowerW": 1948500,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        0,
+        0,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        0,
+        0,
+        0
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "absorptionPerMeter": 0,
+      "excitedFuelPowerFraction": 0.000001,
+      "bands": "equal-energy",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 0,
+      "excitedPowerW": 43.3,
+      "totalSourcePowerUpperBoundW": 43.3,
+      "allowedPowerW": 1948629.9,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        304.0920495986668,
+        1810.9345459205674,
+        2398.6820918540157
+      ],
+      "isotropicIntensityRgbCd": [
+        195.16244231299476,
+        1162.2349525983186,
+        1539.4439150793414
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        304.0920495986668,
+        1810.9345459205674,
+        2398.6820918540157
+      ]
+    },
+    {
+      "absorptionPerMeter": 0,
+      "excitedFuelPowerFraction": 0.000001,
+      "bands": "CH-only",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 0,
+      "excitedPowerW": 43.3,
+      "totalSourcePowerUpperBoundW": 43.3,
+      "allowedPowerW": 1948629.9,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        68.57081052109446,
+        0,
+        496.6921658087449
+      ],
+      "isotropicIntensityRgbCd": [
+        44.007881397557796,
+        0,
+        318.770767880643
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        68.57081052109446,
+        0,
+        496.6921658087449
+      ]
+    },
+    {
+      "absorptionPerMeter": 0,
+      "excitedFuelPowerFraction": 0.0001,
+      "bands": "equal-energy",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 0,
+      "excitedPowerW": 4330,
+      "totalSourcePowerUpperBoundW": 4330,
+      "allowedPowerW": 1961489.9999999998,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        30409.204959866674,
+        181093.45459205675,
+        239868.20918540156
+      ],
+      "isotropicIntensityRgbCd": [
+        19516.24423129947,
+        116223.49525983188,
+        153944.39150793414
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        30409.204959866674,
+        181093.45459205675,
+        239868.20918540156
+      ]
+    },
+    {
+      "absorptionPerMeter": 0,
+      "excitedFuelPowerFraction": 0.0001,
+      "bands": "CH-only",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 0,
+      "excitedPowerW": 4330,
+      "totalSourcePowerUpperBoundW": 4330,
+      "allowedPowerW": 1961489.9999999998,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        6857.081052109445,
+        0,
+        49669.21658087449
+      ],
+      "isotropicIntensityRgbCd": [
+        4400.788139755779,
+        0,
+        31877.076788064303
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        6857.081052109445,
+        0,
+        49669.21658087449
+      ]
+    },
+    {
+      "absorptionPerMeter": 0.025,
+      "excitedFuelPowerFraction": 0,
+      "bands": "equal-energy",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 38202.60126522605,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 38202.60126522605,
+      "allowedPowerW": 1948500,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        8125.780481571273,
+        1689.9204709895175,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        5215.0234331205775,
+        1084.5696455014672,
+        0
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        8025.049397138083,
+        1668.971403754107,
+        0
+      ]
+    },
+    {
+      "absorptionPerMeter": 0.025,
+      "excitedFuelPowerFraction": 0,
+      "bands": "CH-only",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 38202.60126522605,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 38202.60126522605,
+      "allowedPowerW": 1948500,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        8125.780481571273,
+        1689.9204709895175,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        5215.0234331205775,
+        1084.5696455014672,
+        0
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        8025.049397138083,
+        1668.971403754107,
+        0
+      ]
+    },
+    {
+      "absorptionPerMeter": 0.025,
+      "excitedFuelPowerFraction": 0.000001,
+      "bands": "equal-energy",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 38202.60126522605,
+      "excitedPowerW": 43.3,
+      "totalSourcePowerUpperBoundW": 38245.90126522605,
+      "allowedPowerW": 1948629.9,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        8429.87253116994,
+        3500.855016910085,
+        2398.6820918540157
+      ],
+      "isotropicIntensityRgbCd": [
+        5410.185875433573,
+        2246.804598099786,
+        1539.4439150793414
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        8325.37177538111,
+        3457.456733742517,
+        2368.946874557547
+      ]
+    },
+    {
+      "absorptionPerMeter": 0.025,
+      "excitedFuelPowerFraction": 0.000001,
+      "bands": "CH-only",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 38202.60126522605,
+      "excitedPowerW": 43.3,
+      "totalSourcePowerUpperBoundW": 38245.90126522605,
+      "allowedPowerW": 1948629.9,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        8194.351292092368,
+        1689.9204709895175,
+        496.6921658087449
+      ],
+      "isotropicIntensityRgbCd": [
+        5259.031314518135,
+        1084.5696455014672,
+        318.770767880643
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        8092.770170900257,
+        1668.971403754107,
+        490.53493074623555
+      ]
+    },
+    {
+      "absorptionPerMeter": 0.025,
+      "excitedFuelPowerFraction": 0.0001,
+      "bands": "equal-energy",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 38202.60126522605,
+      "excitedPowerW": 4330,
+      "totalSourcePowerUpperBoundW": 42532.60126522605,
+      "allowedPowerW": 1961489.9999999998,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        38534.98544143795,
+        182783.37506304626,
+        239868.20918540156
+      ],
+      "isotropicIntensityRgbCd": [
+        24731.26766442005,
+        117308.06490533333,
+        153944.39150793414
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        38057.287221440914,
+        180517.50440259508,
+        236894.68745575467
+      ]
+    },
+    {
+      "absorptionPerMeter": 0.025,
+      "excitedFuelPowerFraction": 0.0001,
+      "bands": "CH-only",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 38202.60126522605,
+      "excitedPowerW": 4330,
+      "totalSourcePowerUpperBoundW": 42532.60126522605,
+      "allowedPowerW": 1961489.9999999998,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        14982.86153368072,
+        1689.9204709895175,
+        49669.21658087449
+      ],
+      "isotropicIntensityRgbCd": [
+        9615.811572876357,
+        1084.5696455014672,
+        31877.076788064303
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        14797.1267733555,
+        1668.971403754107,
+        49053.493074623555
+      ]
+    },
+    {
+      "absorptionPerMeter": 0.08,
+      "excitedFuelPowerFraction": 0,
+      "bands": "equal-energy",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 122248.32404872336,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 122248.32404872336,
+      "allowedPowerW": 1948500,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        26002.497541028075,
+        5407.745507166455,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        16688.074985985848,
+        3470.6228656046947,
+        0
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        24989.587675334464,
+        5197.090405027654,
+        0
+      ]
+    },
+    {
+      "absorptionPerMeter": 0.08,
+      "excitedFuelPowerFraction": 0,
+      "bands": "CH-only",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 122248.32404872336,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 122248.32404872336,
+      "allowedPowerW": 1948500,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        26002.497541028075,
+        5407.745507166455,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        16688.074985985848,
+        3470.6228656046947,
+        0
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        24989.587675334464,
+        5197.090405027654,
+        0
+      ]
+    },
+    {
+      "absorptionPerMeter": 0.08,
+      "excitedFuelPowerFraction": 0.000001,
+      "bands": "equal-energy",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 122248.32404872336,
+      "excitedPowerW": 43.3,
+      "totalSourcePowerUpperBoundW": 122291.62404872336,
+      "allowedPowerW": 1948629.9,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        26306.589590626743,
+        7218.680053087022,
+        2398.6820918540157
+      ],
+      "isotropicIntensityRgbCd": [
+        16883.237428298846,
+        4632.857818203013,
+        1539.4439150793414
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        25281.83402293349,
+        6937.481209340553,
+        2305.24303848355
+      ]
+    },
+    {
+      "absorptionPerMeter": 0.08,
+      "excitedFuelPowerFraction": 0.000001,
+      "bands": "CH-only",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 122248.32404872336,
+      "excitedPowerW": 43.3,
+      "totalSourcePowerUpperBoundW": 122291.62404872336,
+      "allowedPowerW": 1948629.9,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        26071.06835154917,
+        5407.745507166455,
+        496.6921658087449
+      ],
+      "isotropicIntensityRgbCd": [
+        16732.082867383408,
+        3470.6228656046947,
+        318.770767880643
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        25055.48735588561,
+        5197.090405027654,
+        477.34385535639007
+      ]
+    },
+    {
+      "absorptionPerMeter": 0.08,
+      "excitedFuelPowerFraction": 0.0001,
+      "bands": "equal-energy",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 122248.32404872336,
+      "excitedPowerW": 4330,
+      "totalSourcePowerUpperBoundW": 126578.32404872336,
+      "allowedPowerW": 1961489.9999999998,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        56411.70250089475,
+        186501.2000992232,
+        239868.20918540156
+      ],
+      "isotropicIntensityRgbCd": [
+        36204.31921728532,
+        119694.11812543657,
+        153944.39150793414
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        54214.2224352368,
+        179236.17083631756,
+        230524.30384835502
+      ]
+    },
+    {
+      "absorptionPerMeter": 0.08,
+      "excitedFuelPowerFraction": 0.0001,
+      "bands": "CH-only",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 122248.32404872336,
+      "excitedPowerW": 4330,
+      "totalSourcePowerUpperBoundW": 126578.32404872336,
+      "allowedPowerW": 1961489.9999999998,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        32859.57859313752,
+        5407.745507166455,
+        49669.21658087449
+      ],
+      "isotropicIntensityRgbCd": [
+        21088.863125741627,
+        3470.6228656046947,
+        31877.076788064303
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        31579.55573044879,
+        5197.090405027654,
+        47734.38553563901
+      ]
+    },
+    {
+      "absorptionPerMeter": 0.3,
+      "excitedFuelPowerFraction": 0,
+      "bands": "equal-energy",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 458431.2151827126,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 458431.2151827126,
+      "allowedPowerW": 1948500,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        97509.36577885528,
+        20279.045651874207,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        62580.28119744694,
+        13014.835746017605,
+        0
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        84242.16974253641,
+        17519.8637830981,
+        0
+      ]
+    },
+    {
+      "absorptionPerMeter": 0.3,
+      "excitedFuelPowerFraction": 0,
+      "bands": "CH-only",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 458431.2151827126,
+      "excitedPowerW": 0,
+      "totalSourcePowerUpperBoundW": 458431.2151827126,
+      "allowedPowerW": 1948500,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        97509.36577885528,
+        20279.045651874207,
+        0
+      ],
+      "isotropicIntensityRgbCd": [
+        62580.28119744694,
+        13014.835746017605,
+        0
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        84242.16974253641,
+        17519.8637830981,
+        0
+      ]
+    },
+    {
+      "absorptionPerMeter": 0.3,
+      "excitedFuelPowerFraction": 0.000001,
+      "bands": "equal-energy",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 458431.2151827126,
+      "excitedPowerW": 43.3,
+      "totalSourcePowerUpperBoundW": 458474.5151827126,
+      "allowedPowerW": 1948629.9,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        97813.45782845395,
+        22089.980197794775,
+        2398.6820918540157
+      ],
+      "isotropicIntensityRgbCd": [
+        62775.44363975993,
+        14177.070698615924,
+        1539.4439150793414
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        84504.88680417482,
+        19084.401242566895,
+        2072.315641952076
+      ]
+    },
+    {
+      "absorptionPerMeter": 0.3,
+      "excitedFuelPowerFraction": 0.000001,
+      "bands": "CH-only",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 458431.2151827126,
+      "excitedPowerW": 43.3,
+      "totalSourcePowerUpperBoundW": 458474.5151827126,
+      "allowedPowerW": 1948629.9,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        97577.93658937638,
+        20279.045651874207,
+        496.6921658087449
+      ],
+      "isotropicIntensityRgbCd": [
+        62624.28907884449,
+        13014.835746017605,
+        318.770767880643
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        84301.41075813692,
+        17519.8637830981,
+        429.11186435920575
+      ]
+    },
+    {
+      "absorptionPerMeter": 0.3,
+      "excitedFuelPowerFraction": 0.0001,
+      "bands": "equal-energy",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 458431.2151827126,
+      "excitedPowerW": 4330,
+      "totalSourcePowerUpperBoundW": 462761.2151827126,
+      "allowedPowerW": 1961489.9999999998,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        127918.57073872196,
+        201372.50024393096,
+        239868.20918540156
+      ],
+      "isotropicIntensityRgbCd": [
+        82096.5254287464,
+        129238.33100584948,
+        153944.39150793414
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        110513.87590637834,
+        173973.60972997744,
+        207231.5641952076
+      ]
+    },
+    {
+      "absorptionPerMeter": 0.3,
+      "excitedFuelPowerFraction": 0.0001,
+      "bands": "CH-only",
+      "valid": true,
+      "mode": "afterburner",
+      "fuelPowerW": 129900000,
+      "emittingVolumeM3": 0.6417873882943186,
+      "particlePowerUpperBoundW": 458431.2151827126,
+      "excitedPowerW": 4330,
+      "totalSourcePowerUpperBoundW": 462761.2151827126,
+      "allowedPowerW": 1961489.9999999998,
+      "absorptionWasCapped": false,
+      "blackbodyRgbCdPerM2": [
+        325031.21926285094,
+        67596.8188395807,
+        0
+      ],
+      "sourceRgbCdPerM3": [
+        104366.44683096472,
+        20279.045651874207,
+        49669.21658087449
+      ],
+      "isotropicIntensityRgbCd": [
+        66981.06933720272,
+        13014.835746017605,
+        31877.076788064303
+      ],
+      "oneMeterRadianceRgbCdPerM2": [
+        90166.27130258775,
+        17519.8637830981,
+        42911.18643592057
+      ]
+    }
+  ],
+  "invalidInputs": [
+    {
+      "fuel": "undefined",
+      "suppressed": true
+    },
+    {
+      "fuel": "0",
+      "suppressed": true
+    },
+    {
+      "fuel": "-1",
+      "suppressed": true
+    },
+    {
+      "fuel": "NaN",
+      "suppressed": true
+    },
+    {
+      "fuel": "Infinity",
+      "suppressed": true
+    }
+  ],
+  "energyMeaning": "Gray LTE particle source upper bound 4κσT⁴∫ρdV plus independently fuel-bounded excited visible power; reabsorption reduces escaped power. No withdrawal from imposed native reservoirs and no global engine conservation claim.",
+  "display": {
+    "referenceUnit": "cd/m2",
+    "physicalSourceUnaffectedByDisplay": true,
+    "chain": "native gas K/fuel -> absolute spectrum table/source cd/m3 and extinction /m -> ray transfer cd/m2 -> named gas reference + gain -> premultiplied blend -> shared exposure/tone/encoding. Native core/liner K -> epsilon B_lambda/CIE -> cd/m2 -> solid reference + gain -> corresponding PBR emissive binding -> shared processing.",
+    "limits": "Background transfer exact only with linear HDR composition. Material-local tone/gamma blending is approximate. One unshadowed far-field source light omits self-absorption, near-field geometry and shadowing; emitter-engine meshes excluded. Unlit raster map cannot receive it."
+  },
+  "success": true,
+  "identities": [
+    {
+      "path": "scripts/exhaustOptics/f135-visible-approximation.json",
+      "bytes": 10796,
+      "sha256": "0c0bd9b645b094e66d30a24c600d517745773f9a0b7a32137bb7a664a185bf4d"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json",
+      "bytes": 104281,
+      "sha256": "4368d2d8cf1d24f5860727ec6639602a0533eb2e5baf02598830346a10461727"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/engine-rebuild-2026-10-06/implementation/optics/f135-exhaust-lut.manifest.json",
+      "bytes": 28543,
+      "sha256": "cb325fb2105541af5c7af1de32f9095f2a7578f6347e7405cd80dc0f6fea66b8"
+    },
+    {
+      "path": "scripts/exhaustOptics/bake.mjs",
+      "bytes": 16510,
+      "sha256": "aaba015bb683e22fcdee76fcdf25e31a0ff8bd61f4e7507dab8d295944b00eaa"
+    },
+    {
+      "path": "scripts/exhaustOptics/reference.mjs",
+      "bytes": 1652,
+      "sha256": "8fb085647f7520a8f4222e8be207023d881ad0a186fa3d4721fa8f7e5c9b5cb8"
+    },
+    {
+      "path": "src/flight/aircraft/engineGasOptics.ts",
+      "bytes": 7001,
+      "sha256": "fcfa614fe84ce012c3a789825bb257071c497507bb02a7bb940b9de6f56aa9fa"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineExhaust.ts",
+      "bytes": 30455,
+      "sha256": "800b300fcf76d1a352adc8edda63f391798b59d17b7dc521604ad2be7c13dcc1"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineHotSurfaceGlow.ts",
+      "bytes": 9590,
+      "sha256": "b55c3a390e7d29a78ab8e0030021917b6bfd5a3457cd2faba8605ebdd2f0b582"
+    },
+    {
+      "path": "scripts/validation/f35b/check-physical-optics.mjs",
+      "bytes": 11447,
+      "sha256": "ea5ed12a2f3208cd277d4648be0b74a50c1ef6a4ba74ae540737bf83e7b054fa"
+    }
+  ]
+}

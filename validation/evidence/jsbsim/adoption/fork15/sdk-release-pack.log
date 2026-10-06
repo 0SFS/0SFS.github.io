@@ -1,0 +1,53 @@
+
+> @felipegalind0/jsbsim@1.2.4-fork.15 pack:build
+> node scripts/pack-build.mjs --release
+
+{
+  "schemaVersion": 1,
+  "tarball": "/Users/felg/gh/Felipegalind0/jsbsim/wasm/build/packages/8c7f2981b6388b74dcd5587bd3b3b31567b03bd13b7aa56a3af19d79dad67ade/felipegalind0-jsbsim-1.2.4-fork.15.tgz",
+  "sha256": "6861e9fe0f74e02fef9c2df6d6a3022f5f98a51a8e94a3dbfd205217c02c3d49",
+  "integrity": "sha512-ro8k8fPXUyYC36bsoNdQ7NLGlBl7fLX+FhL5n2d6mACMY3u6AKfR44ncg9NTH2R9xSg0xvz90cC+q6s9BxNrYA==",
+  "package": {
+    "name": "@felipegalind0/jsbsim",
+    "version": "1.2.4-fork.15"
+  },
+  "identity": {
+    "schemaVersion": 2,
+    "package": {
+      "name": "@felipegalind0/jsbsim",
+      "version": "1.2.4-fork.15"
+    },
+    "native": {
+      "origin": "https://github.com/Felipegalind0/jsbsim",
+      "commit": "b58a1855d137466fe8d9f6bc12d4cfd9efcb4b1b",
+      "contentSha256": "a1b7bbd81805afc5fd95e2d776b1b763e65af5db3313666f259192458516f2d3",
+      "dirty": false
+    },
+    "sdk": {
+      "commit": "b58a1855d137466fe8d9f6bc12d4cfd9efcb4b1b",
+      "contentSha256": "292780ed081c71ffec844196cd39587b58c870b1821f7b9f2c791429b9ff9040",
+      "dirty": false,
+      "path": "wasm"
+    },
+    "build": {
+      "mode": "in-tree",
+      "inputSha256": "668e78f691ea855ee174da2e877d9fc3e87dd544a5f855aba5d76d17f7670030",
+      "toolchain": {
+        "node": "v26.8.2",
+        "npm": "11.19.1",
+        "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+        "cmake": "cmake version 4.4.3",
+        "clang": "clang version 24.0.0git",
+        "platform": "darwin",
+        "arch": "arm64",
+        "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+      },
+      "options": {
+        "buildType": "Release",
+        "cxxStandard": 17,
+        "sdkTarget": "es2022"
+      }
+    }
+  },
+  "releaseEligible": true
+}

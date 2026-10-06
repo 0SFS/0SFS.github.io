@@ -1,0 +1,189 @@
+{
+  "schema": "0sfs-engine-orb-hotspots/1",
+  "date": "2026-10-06",
+  "owner": "0sfs",
+  "scope": "Two opposite shaft-attached brightness hotspots sampled from a full-circle map at each blade angle, with a per-client accepted-frame movement limit on desktop and phone.",
+  "appearance": {
+    "brightness": "0.65 + 0.35 * cos(2 * rotor-local blade angle)",
+    "range": [
+      0.3,
+      1
+    ],
+    "periodDegrees": 180,
+    "evenAndOdd": "A continuous 360-degree map is sampled per blade. Odd blade counts may place a hotspot between neighboring blades; the represented count is unchanged.",
+    "invariants": "Each blade retains its own brightness, hue, opacity, size, and radius during motion.",
+    "draw": "One fullscreen triangle, 48 bytes of frame uniforms, no per-blade CPU loop or DOM nodes."
+  },
+  "limit": {
+    "parameter": "osfs.engineMonitor.orbMaxPatternStep",
+    "unit": "pattern pitches/frame",
+    "bounds": [
+      0.05,
+      0.49
+    ],
+    "default": 0.45,
+    "patternPitchDegrees": 180,
+    "maximumAdvanceDegreesAtFullScale": 81,
+    "formulaAtSteadyNormalSimulationSpeed": "min(requested rev/s, accepted drawn FPS * maxPatternStep / 2)",
+    "requestedRate": {
+      "default": 2,
+      "bounds": [
+        0,
+        4
+      ],
+      "unit": "rev/s of simulation time"
+    },
+    "reference": "Unwrapped full-scale phase; same reduction preserves fractional RPM response and N1/N2 proportions.",
+    "stalls": "Apply after the draw-rate gate; discard excess requested rotation with no later catch-up. Forced resize/backend redraws keep the displayed phase and do not consume pending motion."
+  },
+  "checks": [
+    {
+      "command": "npx tsc -b",
+      "status": "passed",
+      "log": "typecheck.log"
+    },
+    {
+      "command": "npm run lint",
+      "status": "passed",
+      "log": "lint.log",
+      "note": "Final CI also linted the corrected GPU checker."
+    },
+    {
+      "command": "npx vitest related --run src/flight/hud/engineSpoolMotion.ts src/flight/hud/engineSpoolRenderer.ts src/flight/hud/engineSummary.ts src/flight/hud/engineMonitor.ts src/flight/settings/flightParameters.ts src/remote/PhoneEngine.tsx src/remote/protocol.ts --maxWorkers=50%",
+      "status": "passed",
+      "files": 57,
+      "tests": 753,
+      "log": "related-tests.log"
+    },
+    {
+      "command": "VITEST_MAX_WORKERS=5 npm run ci",
+      "status": "passed",
+      "files": 162,
+      "testsPassed": 1725,
+      "expectedFailures": 1,
+      "log": "ci.log"
+    },
+    {
+      "command": "node scripts/validation/audio/check-engine-orbs.mjs",
+      "status": "passed",
+      "cases": 12,
+      "log": "gpu-check-final.log",
+      "report": "gpu-report.json",
+      "preview": "hotspots.png"
+    }
+  ],
+  "gpu": {
+    "adapter": {
+      "vendor": "apple",
+      "architecture": "metal-3",
+      "device": "",
+      "description": ""
+    },
+    "backends": [
+      "webgpu",
+      "webgl2",
+      "webgl1"
+    ],
+    "fixtures": [
+      "F-35B 22/36 representative blades",
+      "SF50 16/30 representative blades",
+      "C172 two propeller blades",
+      "Synthetic odd 23/37 blades"
+    ],
+    "syntheticDrawIntervalMs": 100,
+    "requestedRevPerSecond": 6,
+    "normalizedShaftSpeed": 0.99,
+    "expectedReferenceRevPerSecond": 2.25,
+    "maxMeasuredPhaseErrorRadians": 0.0002899776724145653,
+    "maxExpectedRgbErrorBytes": 0.48698542867950323,
+    "visualReview": "Native 68 CSS px preview inspected; two opposite brightness regions are visible with even and odd counts, C172 retains one RPM ring with two equal-size opposite propeller markers.",
+    "checkerCorrection": "Initial run failed only the new radius assertion, which compared canvas-relative centroids against UI-relative radii. Corrected for the existing 1.08 canvas overscan and reran; no production renderer changes were needed."
+  },
+  "deterministicCoverage": [
+    "60/120 Hz accepted-frame limits with even22/36 and odd23/37 blade counts",
+    "30 FPS limit on a 120 Hz source",
+    "50% versus 99% normalized speed proportions",
+    "Jitter, long stalls, pending skipped frames and forced geometry redraws",
+    "Unwrapped full revolutions and clock/reference resets",
+    "Independent cadence and unchanged numeric DOM regression coverage"
+  ],
+  "limitations": "Individual evenly spaced blades may still alias or appear to reverse. The limit guards the two-hotspot orientation cue between submitted frames, not unobservable compositor-dropped presentation. GPU checks use synthetic timestamps and are correctness checks, not a frame-rate benchmark or device performance qualification.",
+  "sourceHashes": [
+    {
+      "file": "src/flight/hud/engineSpoolMotion.ts",
+      "sha256": "36d7e91eceeef8d63ab0b9c31a4ac43bb40e5536a528d9357f7570a16a1a087e"
+    },
+    {
+      "file": "src/flight/hud/engineSpoolMotion.test.ts",
+      "sha256": "0b3c2cff6fdb8bfa7b6c7d7e5169dae9c33fd3cbed6991820676495bb7202fd1"
+    },
+    {
+      "file": "src/flight/hud/engineSpoolRenderer.ts",
+      "sha256": "689a50412c688a97811d9ffa111a49dfc8b25d51e8216c976aa3836e99fb6acf"
+    },
+    {
+      "file": "src/flight/hud/engineSpoolRenderer.test.ts",
+      "sha256": "ed91f75a7851c11033f29d12ed52197652289a2024b893c30c271c02847e94c0"
+    },
+    {
+      "file": "src/flight/hud/engineSpoolAnimation.ts",
+      "sha256": "dd2184191e84cd51b30acba4d85eca586e537652793e9d7ffaff9e243534821a"
+    },
+    {
+      "file": "src/flight/hud/engineSpoolAnimation.test.ts",
+      "sha256": "0289bb05a66cd81cf56b798c10b7c46bf0d89551a4f54fa3887457f40075ac82"
+    },
+    {
+      "file": "src/flight/hud/engineSummary.ts",
+      "sha256": "8be26db457b93709ba63d156f391d1ef4002465fafcc482a15f4b0239d938285"
+    },
+    {
+      "file": "src/flight/hud/engineSummary.test.ts",
+      "sha256": "8a68ce27a5a2a464be70ecbc7a8cd3458e24736cbb2a5abe24600ef2f0420f25"
+    },
+    {
+      "file": "src/flight/hud/engineMonitor.ts",
+      "sha256": "175b54d178b29439bf40fbaf53c88c2da7aae0881690cf93a1f389483c50506c"
+    },
+    {
+      "file": "src/flight/hud/engineMonitor.test.ts",
+      "sha256": "d01b62819122f82a84fbae652148d5ca16a3676baaca462f4e8aa5ba35a0d8c1"
+    },
+    {
+      "file": "src/flight/createFlightSimApp.ts",
+      "sha256": "c9d89f5aed1090b648ef9bc50ce160dd3435c8b0a90fb13a12fc14e4d8b2f11d"
+    },
+    {
+      "file": "src/flight/createFlightSimApp.phone.test.ts",
+      "sha256": "7c506d842fb7aea23436faca08aa38242803295f23fd10ae93f3a91455b5c734"
+    },
+    {
+      "file": "src/flight/settings/flightParameters.ts",
+      "sha256": "63053fdea23489d73351bf3bd86d4def4cf85c0411e4b2995e54675402660a32"
+    },
+    {
+      "file": "src/remote/PhoneEngine.tsx",
+      "sha256": "1cf6bdea0c7114c70ab105a273651a6e49aa62247d7a4f392c2012029b27c8cb"
+    },
+    {
+      "file": "src/remote/PhoneEngine.test.tsx",
+      "sha256": "167d291aed3a56e1515eed2926a237dae163d343208ba48960f12e612cd5d865"
+    },
+    {
+      "file": "src/remote/PhoneController.test.tsx",
+      "sha256": "0838c75e7345b07055a13d7c435828e055317a0a11052bd35249afc944cd0fad"
+    },
+    {
+      "file": "src/remote/protocol.ts",
+      "sha256": "b4fb28b57450b96f0bc126b2bedfd950d6d067596f2f8237ba4db7648ec790ae"
+    },
+    {
+      "file": "src/remote/protocol.test.ts",
+      "sha256": "4da8c59d05ad7f315b75ca962f9146665d2f762e3a6d0d4533f33ab5d534cd79"
+    },
+    {
+      "file": "scripts/validation/audio/check-engine-orbs.mjs",
+      "sha256": "d9989609c278996224104b39b08b58d194e3da3ec9d463788318d85f415c513d"
+    }
+  ]
+}

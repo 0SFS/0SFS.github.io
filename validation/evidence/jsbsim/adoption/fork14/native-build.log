@@ -1,0 +1,37 @@
+[  1%] Built target GeographicLib
+[  5%] Built target Init
+[ 21%] Built target InputOutput
+[ 26%] Built target Atmosphere
+[ 28%] Built target Properties
+[ 41%] Built target Math
+[ 41%] Built target Magvar
+[ 57%] Built target FlightControl
+[ 73%] Built target Models
+[ 75%] Built target Misc
+[ 76%] Built target IOStreams
+[ 80%] Built target Xml
+[ 82%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGTurbine.cpp.o
+[ 92%] Built target Propulsion
+[ 94%] Linking CXX static library libJSBSim.a
+[ 96%] Built target libJSBSim
+[ 98%] Generating FGTurbineTemperatureTest.cpp
+[ 98%] Building CXX object tests/unit_tests/CMakeFiles/FGTurbineTemperatureTest1.dir/FGTurbineTemperatureTest.cpp.o
+[100%] Linking CXX executable FGTurbineTemperatureTest1
+[100%] Built target FGTurbineTemperatureTest1
+[  1%] Built target GeographicLib
+[  5%] Built target Init
+[ 17%] Built target Math
+[ 33%] Built target InputOutput
+[ 50%] Built target Models
+[ 55%] Built target Atmosphere
+[ 55%] Built target Magvar
+[ 57%] Built target Properties
+[ 58%] Built target Misc
+[ 75%] Built target FlightControl
+[ 80%] Built target IOStreams
+[ 80%] Built target Xml
+[ 92%] Built target Propulsion
+[ 96%] Built target libJSBSim
+[ 96%] Building CXX object python/CMakeFiles/_jsbsim.dir/_jsbsim.cxx.o
+[ 96%] Linking CXX shared module ../tests/jsbsim/_jsbsim.so
+[100%] Built target _jsbsim

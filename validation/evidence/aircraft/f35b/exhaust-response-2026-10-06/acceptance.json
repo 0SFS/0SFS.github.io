@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-06",
+  "scope": "Conditional F135 internal afterburner emission, unresolved temperature mixture and rendering-work reductions.",
+  "status": {
+    "software": "passed",
+    "userAppearanceFeedback": "Improved appearance; smaller residual sound lead remains.",
+    "userUsabilityFeedback": "Performance reported usable, without a measured frame-rate or energy claim.",
+    "physicalCalibration": "unqualified",
+    "dryPoweredLiftAppearance": "unresolved",
+    "gpuQualification": "not run; user declined GPU testing"
+  },
+  "native": {
+    "sdk": "1.2.4-fork.16",
+    "commit": "97fe6ddf1c8a7d9e10dad46a88e60e79e69fae28",
+    "nativeChanges": false,
+    "aircraftEngineXmlChanges": false
+  },
+  "checks": [
+    {
+      "log": "application/ci.log",
+      "command": "npm run ci",
+      "status": "passed",
+      "files": 174,
+      "passedTests": 1850,
+      "expectedFailures": 1
+    },
+    {
+      "log": "application/typecheck-final.log",
+      "command": "npx tsc -b",
+      "status": "passed"
+    },
+    {
+      "log": "application/lint.log",
+      "command": "npm run lint",
+      "status": "passed"
+    },
+    {
+      "log": "application/related.log",
+      "status": "initial failure; two stale expectations repaired",
+      "files": 65,
+      "passedTests": 791,
+      "failedTests": 2
+    },
+    {
+      "log": "application/corrected-tests.log",
+      "status": "passed",
+      "files": 3,
+      "passedTests": 58
+    },
+    {
+      "log": "application/renderer-focused.log",
+      "status": "initial failure; same-render-ID matrix freshness repaired",
+      "files": 5,
+      "passedTests": 45,
+      "failedTests": 3
+    },
+    {
+      "log": "application/renderer-corrected.log",
+      "status": "passed",
+      "files": 2,
+      "passedTests": 6
+    },
+    {
+      "log": "application/depth-final.log",
+      "status": "passed",
+      "files": 1,
+      "passedTests": 4
+    },
+    {
+      "log": "application/reaction-cache.log",
+      "status": "passed",
+      "files": 1,
+      "passedTests": 36
+    },
+    {
+      "log": "application/reaction-final.log",
+      "status": "passed",
+      "files": 2,
+      "passedTests": 8
+    }
+  ],
+  "evidenceManifest": "application/files.json",
+  "parcelEvidence": "../combustion-parcel-2026-10-06/README.md",
+  "limits": [
+    "Source snapshots identify this checkpoint, not future edits.",
+    "A rate-derived surrogate CH yield does not calibrate F135 composition, pressure, spectral distribution or reaction geometry.",
+    "Constant-cp mean-temperature identity is not a coupled species-dependent engine energy budget.",
+    "32 ray samples remain user-editable and are not qualified by the earlier 128-sample accuracy bound.",
+    "No browser, GPU benchmark or device energy qualification.",
+    "No invented startup flash, warm dry temperature or dry brightness gain."
+  ]
+}

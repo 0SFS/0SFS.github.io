@@ -1,0 +1,24 @@
+
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+Engine location ignored, only thruster location is used.
+Engine orientation ignored, only thruster orientation is used.
+Engine location ignored, only thruster location is used.
+Engine orientation ignored, only thruster orientation is used.
+Engine location ignored, only thruster location is used.
+Engine orientation ignored, only thruster orientation is used.
+Engine location ignored, only thruster location is used.
+Engine orientation ignored, only thruster orientation is used.
+
+In file /Users/felg/gh/0sfs/public/jsbsim-data/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 304
+      Property /sim/model/pushback/target-speed-fps is already defined.
+      Its value (0) will not be overridden.
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/build/checks/turbine-thermal/2026-10-06_014641/probe-exact-f135.py", line 9, in <module>
+    assert f.run_ic(); f.set_hold_down(True)
+                       ^^^^^^^^^^^^^^^
+AttributeError: '_jsbsim.FGFDMExec' object has no attribute 'set_hold_down'

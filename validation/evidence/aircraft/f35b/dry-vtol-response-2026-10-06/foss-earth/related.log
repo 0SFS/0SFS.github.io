@@ -1,0 +1,64 @@
+
+ RUN  v4.1.6 /Users/felg/gh/foss-earth
+
+(node:88783) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/app/createGlobeApp.test.ts > createGlobeApp smoke behavior > splits its sections between the Controls, Interface, Renderer and Settings tabs
+[app] runtime initialized renderer=webgl mode=raster-basemap googleApiKeyProvided=false
+
+ ❯ src/app/createGlobeApp.test.ts (25 tests | 1 failed) 2363ms
+     × splits its sections between the Controls, Interface, Renderer and Settings tabs 64ms
+(node:88791) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/shell/choicePanels.test.ts (7 tests | 1 failed) 131ms
+     × homes exposure and ambient fill once in the shared Lighting and exposure section 10ms
+(node:88792) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:88820) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/app/createGlobeApp.test.ts > createGlobeApp smoke behavior > splits its sections between the Controls, Interface, Renderer and Settings tabs
+AssertionError: expected [ 'renderer.backend', …(5) ] to deeply equal [ 'renderer.backend', …(4) ]
+
+- Expected
++ Received
+
+  [
+    "renderer.backend",
+    "renderer.frame",
++   "renderer.lighting",
+    "renderer.clipping",
+    "renderer.experiments",
+    "renderer.performance",
+  ]
+
+ ❯ src/app/createGlobeApp.test.ts:502:30
+    500|     // The Renderer tab ends with Performance debug.
+    501|     const rendererSections = [...app.rendererTab.querySelectorAll<HTML…
+    502|     expect(rendererSections).toEqual(["renderer.backend", "renderer.fr…
+       |                              ^
+    503|     const performance = performanceSection(app);
+    504|     expect(performance.querySelector('[data-parameter^="interface.perf…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/shell/choicePanels.test.ts > Renderer tab > homes exposure and ambient fill once in the shared Lighting and exposure section
+AssertionError: expected null not to be null
+ ❯ src/shell/choicePanels.test.ts:110:62
+    108|         const field = control.querySelector<HTMLInputElement>('input[t…
+    109|         expect(Number(field.value)).toBe(initial);
+    110|         expect(control.querySelector('[role="slider"]')).not.toBeNull(…
+       |                                                              ^
+    111|         field.value = String(next);
+    112|         field.dispatchEvent(new Event("change", { bubbles: true }));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 45 passed (47)
+      Tests  2 failed | 429 passed (431)
+   Start at  17:16:34
+   Duration  8.36s (transform 1.34s, setup 1.64s, import 5.65s, tests 19.31s, environment 8.21s)
+

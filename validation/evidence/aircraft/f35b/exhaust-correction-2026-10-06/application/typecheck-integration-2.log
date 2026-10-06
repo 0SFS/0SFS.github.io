@@ -1,0 +1,1 @@
+src/flight/aircraft/createEngineExhaust.ts(642,31): error TS2367: This comparison appears to be unintentional because the types '"axisymmetric-gas-bath-v2" | "axisymmetric-mixing-v1" | undefined' and '"imposed-bath-continuum-v2"' have no overlap.

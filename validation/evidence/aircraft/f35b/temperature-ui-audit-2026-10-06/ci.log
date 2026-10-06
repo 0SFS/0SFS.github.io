@@ -1,0 +1,926 @@
+
+> osfs@0.0.0 ci
+> npm run lint && npm run test && npm run build
+
+
+> osfs@0.0.0 lint
+> eslint . --cache --cache-strategy content --cache-location node_modules/.cache/eslint/
+
+
+> osfs@0.0.0 test
+> vitest run --passWithNoTests
+
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+(node:85754) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:85750) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:85753) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:85751) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:85752) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+(node:85755) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+(node:85756) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+(node:85757) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+(node:85760) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:85762) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:85766) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:85768) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:85770) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+(node:85779) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+(node:85780) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:85784) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+(node:86449) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+(node:86451) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86453) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86454) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+(node:86458) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86460) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86459) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86466) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86469) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86471) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86473) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86475) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86477) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86478) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86479) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86487) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86486) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86492) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86502) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86498) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86504) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86506) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86505) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86511) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86512) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86516) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86519) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86517) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86520) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86522) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86529) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86537) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86539) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86542) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86586) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  162 passed (162)
+      Tests  1751 passed | 1 expected fail (1752)
+   Start at  01:21:54
+   Duration  19.40s (transform 2.66s, setup 0ms, import 23.31s, tests 40.01s, environment 12.39s)
+
+
+> osfs@0.0.0 build
+> npm run verify:jsbsim && npm run verify:audio && npm run verify:exhaust && tsc -b && vite build && node scripts/verify-jsbsim-artifact.mjs --dist=dist && node scripts/verify-audio-artifact.mjs --dist=dist
+
+
+> osfs@0.0.0 verify:jsbsim
+> node scripts/verify-jsbsim-artifact.mjs
+
+{
+  "package": {
+    "name": "@felipegalind0/jsbsim",
+    "version": "1.2.4-fork.12"
+  },
+  "mode": "in-tree",
+  "inputSha256": "b6f08358df7165212c0df27cab91d39197c8a84559b593a684bd0798ef47633d",
+  "verifiedFiles": 14,
+  "packageArchive": {
+    "path": "deps/felipegalind0-jsbsim-1.2.4-fork.12.tgz",
+    "sha256": "23f69b883184a656fd7d612476b622fb520e5539b016a9f4a20df627b924fd03",
+    "integrity": "sha512-y30Lsv5zZx5Picrwh44Vv52ooJyxcyzz/2jUxqc8rhlTUfREUiXEUjJ7v0/EHrtKN/gQXuAkpgEB10wv3owe2Q=="
+  }
+}
+
+> osfs@0.0.0 verify:audio
+> node scripts/verify-audio-artifact.mjs
+
+{
+  "artifact": "audio-dsp.wasm",
+  "license": "AGPL-3.0-only",
+  "bytes": 50902,
+  "sha256": "0aea1d9488f7208a8d8aa28ab1e8ed9d6f741787f4b1242cbca92ac87bbc91a1",
+  "toolchain": {
+    "compiler": "emcc",
+    "version": "6.0.9",
+    "flags": [
+      "-O3",
+      "-std=c++17",
+      "--no-entry",
+      "-sSTANDALONE_WASM=1",
+      "-sALLOW_MEMORY_GROWTH=1",
+      "-sINITIAL_MEMORY=2097152",
+      "-sSTACK_SIZE=131072",
+      "-sMALLOC=emmalloc",
+      "-sERROR_ON_UNDEFINED_SYMBOLS=1",
+      "-sFILESYSTEM=0",
+      "-fno-exceptions",
+      "-fno-rtti",
+      "-fno-fast-math"
+    ]
+  },
+  "sources": 7,
+  "imports": [
+    "env.emscripten_notify_memory_growth"
+  ]
+}
+
+> osfs@0.0.0 verify:exhaust
+> node scripts/build-exhaust-optics.mjs --check
+
+{
+  "mode": "--check",
+  "success": true,
+  "artifacts": [
+    {
+      "name": "f135-exhaust-lut.png",
+      "bytes": 2856,
+      "sha256": "208ae6cb513beedeb2a5e2b1f0f2ca17952ca66c2ca682733570e3f469af39a6"
+    },
+    {
+      "name": "f135ExhaustOpticalData.ts",
+      "bytes": 5211,
+      "sha256": "2c234f513e8f688c9d67c93d8aac34297003b49df367dc118e63395f35028df1"
+    },
+    {
+      "name": "f135-exhaust-lut.manifest.json",
+      "bytes": 15119,
+      "sha256": "bcb2a9c4045bfbb4ec5f75b3806bdf3b26ca06ceb42ad563ab4002ce7ad50b10"
+    },
+    {
+      "name": "engine-smoke-flipbook.png",
+      "bytes": 7900,
+      "sha256": "73c447a6b283841a81373d4d7fcb591b027fcdab1dd402d57315603285985590"
+    },
+    {
+      "name": "engine-smoke-flipbook.manifest.json",
+      "bytes": 1489,
+      "sha256": "8eea7a8149b3fa3e8e76a06a4599bfa0566df3e53fc0c0525d600f009114072c"
+    }
+  ],
+  "outputDirectory": "/Users/felg/gh/0sfs/build/exhaust-optics/2026-10-06_012214"
+}
+vite v8.0.13 building client environment for production...
+[2Ktransforming...✓ 4495 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/assets/imageryDecodeWorker-CNZt1PLg.js                              1.54 kB
+dist/assets/engine-smoke-flipbook-LU3ukRVc.png                           7.90 kB
+dist/index.html                                                          8.55 kB │ gzip:   3.09 kB
+dist/assets/dspProcessor-Bf4mjszY.js                                    10.86 kB
+dist/assets/f135-exhaust-lut.manifest-D9pQYhdF.json                     15.11 kB │ gzip:   4.89 kB
+dist/assets/audio-dsp-chAEGHjy.wasm                                     50.90 kB │ gzip:  23.38 kB
+dist/assets/jsbsim_wasm-DAhL615P.mjs                                   135.09 kB
+dist/assets/jsbsim_wasm-Dj6DuD_W.wasm                                2,210.25 kB │ gzip: 581.46 kB
+dist/assets/createPhonePairingPanel-CUZwpwy7.css                         1.31 kB │ gzip:   0.57 kB
+dist/assets/createFullscreenNotice-k1miaR4J.css                          2.09 kB │ gzip:   0.79 kB
+dist/assets/createInfoPage-Dozu9w-x.css                                  3.41 kB │ gzip:   1.28 kB
+dist/assets/throttleLever-B7W5sfl9.css                                   4.50 kB │ gzip:   1.19 kB
+dist/assets/createPhoneControllerApp-BhORdlAY.css                       26.81 kB │ gzip:   5.66 kB
+dist/assets/index-CMs2Dlxv.css                                          34.31 kB │ gzip:   6.98 kB
+dist/assets/createFlightSimApp-B7atyClF.css                             50.62 kB │ gzip:   9.94 kB
+dist/assets/engine.multiRender-CTSDKUmR.js                               0.04 kB │ gzip:   0.06 kB
+dist/assets/typeStore-DdCVjSWS.js                                        0.08 kB │ gzip:   0.08 kB
+dist/assets/flowGraphGLTFDataProvider-G9Vfm1In.js                        0.09 kB │ gzip:   0.10 kB
+dist/assets/pbrMaterialLoadingAdapter-C1DFIluT.js                        0.09 kB │ gzip:   0.10 kB
+dist/assets/openpbrMaterialLoadingAdapter-DcVAZeH4.js                    0.09 kB │ gzip:   0.11 kB
+dist/assets/abstractAudioBus-B-CQhrYZ.js                                 0.11 kB │ gzip:   0.13 kB
+dist/assets/devTools-DcPgrQTs.js                                         0.15 kB │ gzip:   0.14 kB
+dist/assets/guid-DEAs0ZK6.js                                             0.15 kB │ gzip:   0.14 kB
+dist/assets/flowGraphExecutionBlockWithOutSignal-WqHnOFcD.js             0.15 kB │ gzip:   0.15 kB
+dist/assets/dataBuffer-BAz0mhUJ.js                                       0.17 kB │ gzip:   0.15 kB
+dist/assets/kernelBlurVaryingDeclaration-CygPh2Uz.js                     0.17 kB │ gzip:   0.15 kB
+dist/assets/fogVertex-BOtcyq3L.js                                        0.17 kB │ gzip:   0.16 kB
+dist/assets/fogVertexDeclaration-KPTLcNXg.js                             0.18 kB │ gzip:   0.16 kB
+dist/assets/kernelBlurVaryingDeclaration-DKokPBE8.js                     0.18 kB │ gzip:   0.16 kB
+dist/assets/meshVertexDeclaration-BMTYtpTb.js                            0.18 kB │ gzip:   0.16 kB
+dist/assets/mainUVVaryingDeclaration-MjvJZFmc.js                         0.19 kB │ gzip:   0.16 kB
+dist/assets/fogVertexDeclaration-DodqqZJc.js                             0.19 kB │ gzip:   0.17 kB
+dist/assets/mainUVVaryingDeclaration-GAV-8lbE.js                         0.20 kB │ gzip:   0.17 kB
+dist/assets/pointCloudVertex-Lj8njxOA.js                                 0.20 kB │ gzip:   0.18 kB
+dist/assets/logDepthFragment-CjeWn_xY.js                                 0.23 kB │ gzip:   0.19 kB
+dist/assets/logDepthDeclaration-pX0SKwcK.js                              0.23 kB │ gzip:   0.20 kB
+dist/assets/meshUboDeclaration-pqASoc0l.js                               0.24 kB │ gzip:   0.21 kB
+dist/assets/flowGraphEventBlock-DmJrPKPb.js                              0.24 kB │ gzip:   0.21 kB
+dist/assets/logDepthDeclaration-CpoI9b8K.js                              0.24 kB │ gzip:   0.20 kB
+dist/assets/glTFLoaderAnimation-CovVYABi.js                              0.24 kB │ gzip:   0.17 kB
+dist/assets/fogFragment-BiROhISf.js                                      0.25 kB │ gzip:   0.20 kB
+dist/assets/logDepthVertex-BWJfC1Rj.js                                   0.27 kB │ gzip:   0.22 kB
+dist/assets/logDepthFragment-Duvyqzvv.js                                 0.27 kB │ gzip:   0.22 kB
+dist/assets/math.axis-BrUwitHR.js                                        0.28 kB │ gzip:   0.21 kB
+dist/assets/fogFragment-BtWAhLTi.js                                      0.28 kB │ gzip:   0.22 kB
+dist/assets/sceneVertexDeclaration-4RmMSD7L.js                           0.29 kB │ gzip:   0.20 kB
+dist/assets/fogVertex-DwTHL8Li.js                                        0.29 kB │ gzip:   0.20 kB
+dist/assets/sceneFragmentDeclaration-DMlzfoo2.js                         0.29 kB │ gzip:   0.20 kB
+dist/assets/bumpVertexDeclaration-B_RBtuI_.js                            0.30 kB │ gzip:   0.23 kB
+dist/assets/flowGraphUnaryOperationBlock-WU_4WjYL.js                     0.30 kB │ gzip:   0.22 kB
+dist/assets/sceneUboDeclaration-CldpS112.js                              0.30 kB │ gzip:   0.23 kB
+dist/assets/meshUboDeclaration-cBHPcoQ-.js                               0.30 kB │ gzip:   0.23 kB
+dist/assets/morphTargetsVertexGlobal-GMU8G9Ut.js                         0.33 kB │ gzip:   0.24 kB
+dist/assets/logDepthVertex-Bpf4mIw3.js                                   0.33 kB │ gzip:   0.24 kB
+dist/assets/morphTargetsVertexGlobal-BTzS8jTT.js                         0.34 kB │ gzip:   0.25 kB
+dist/assets/decalFragment-B7N0oFWC.js                                    0.35 kB │ gzip:   0.22 kB
+dist/assets/bumpVertexDeclaration-BmiVhZrj.js                            0.35 kB │ gzip:   0.24 kB
+dist/assets/fresnelFunction-C6qDI9Qc.js                                  0.35 kB │ gzip:   0.26 kB
+dist/assets/sceneUboDeclaration-C6zEgy7a.js                              0.36 kB │ gzip:   0.24 kB
+dist/assets/pass.fragment-DxyfW7Ee.js                                    0.36 kB │ gzip:   0.28 kB
+dist/assets/flowGraphBinaryOperationBlock-C5PhRw5C.js                    0.37 kB │ gzip:   0.24 kB
+dist/assets/oitFinalSimpleBlend.fragment-D_aC71h2.js                     0.38 kB │ gzip:   0.25 kB
+dist/assets/precisionDate-CoSBJOsZ.js                                    0.39 kB │ gzip:   0.23 kB
+dist/assets/vertexColorMixing-BVxYbAwQ.js                                0.39 kB │ gzip:   0.25 kB
+dist/assets/oitBackBlend.fragment-D7jxvg2o.js                            0.39 kB │ gzip:   0.28 kB
+dist/assets/lightProxy.fragment-C-1IrPb5.js                              0.40 kB │ gzip:   0.28 kB
+dist/assets/displayPass.fragment-DcJ3POk6.js                             0.40 kB │ gzip:   0.29 kB
+dist/assets/shadowMapFragmentSoftTransparentShadow-D9FxAAKs.js           0.42 kB │ gzip:   0.30 kB
+dist/assets/boundingBoxRendererUboDeclaration-B93qnGvh.js                0.42 kB │ gzip:   0.26 kB
+dist/assets/decalFragment-Cs9JC3bd.js                                    0.44 kB │ gzip:   0.25 kB
+dist/assets/oitFinalSimpleBlend.fragment-Bn5-cjGg.js                     0.45 kB │ gzip:   0.29 kB
+dist/assets/shadowMapFragmentSoftTransparentShadow-Uw6g980L.js           0.45 kB │ gzip:   0.31 kB
+dist/assets/rgbdEncode.fragment-CUSH-yEo.js                              0.45 kB │ gzip:   0.33 kB
+dist/assets/rgbdDecode.fragment-CpPItPmm.js                              0.46 kB │ gzip:   0.33 kB
+dist/assets/oitBackBlend.fragment-B9tUeQAq.js                            0.46 kB │ gzip:   0.30 kB
+dist/assets/shaderStore-DSzASZqB.js                                      0.46 kB │ gzip:   0.17 kB
+dist/assets/fluidRenderingParticleDiffuse.fragment-DhPfxczM.js           0.48 kB │ gzip:   0.31 kB
+dist/assets/bumpVertex-DqxkDHgK.js                                       0.48 kB │ gzip:   0.30 kB
+dist/assets/flowGraphSceneReadyEventBlock-BMTx2Q5j.js                    0.48 kB │ gzip:   0.30 kB
+dist/assets/glowMapMerge.vertex-C5Bt1Hic.js                              0.48 kB │ gzip:   0.32 kB
+dist/assets/boundingBoxRenderer.fragment-BwutiAbr.js                     0.48 kB │ gzip:   0.31 kB
+dist/assets/filter.fragment-DZcnKNip.js                                  0.49 kB │ gzip:   0.33 kB
+dist/assets/lensFlare.fragment-Bg4yUiFT.js                               0.49 kB │ gzip:   0.32 kB
+dist/assets/pass.fragment-B0x7sRaP.js                                    0.50 kB │ gzip:   0.32 kB
+dist/assets/fluidRenderingParticleThickness.fragment-CNIOVbll.js         0.50 kB │ gzip:   0.33 kB
+dist/assets/postprocess.vertex-DtNe8h5Y.js                               0.51 kB │ gzip:   0.33 kB
+dist/assets/lensFlare.vertex-B28Uva8B.js                                 0.52 kB │ gzip:   0.34 kB
+dist/assets/procedural.vertex-B0yKSOSj.js                                0.52 kB │ gzip:   0.33 kB
+dist/assets/createFullscreenNotice-CXWxor1M.js                           0.53 kB │ gzip:   0.36 kB
+dist/assets/flowGraphConstantBlock-CT9wgUN6.js                           0.53 kB │ gzip:   0.31 kB
+dist/assets/vertexColorMixing-DtDasHaH.js                                0.53 kB │ gzip:   0.27 kB
+dist/assets/flowGraphCodeExecutionBlock-BPaJGDLt.js                      0.53 kB │ gzip:   0.30 kB
+dist/assets/bloomMerge.fragment-ULyA_1xC.js                              0.53 kB │ gzip:   0.34 kB
+dist/assets/flowGraphPauseAnimationBlock-D6sYWUkd.js                     0.54 kB │ gzip:   0.31 kB
+dist/assets/iblCdfx.fragment-CzH-yJx1.js                                 0.54 kB │ gzip:   0.38 kB
+dist/assets/hdrFiltering.vertex-C5hzOUdv.js                              0.55 kB │ gzip:   0.34 kB
+dist/assets/utils-DQsdJJlx.js                                            0.56 kB │ gzip:   0.27 kB
+dist/assets/fluidRenderingParticleDiffuse.fragment-Du09yl1C.js           0.56 kB │ gzip:   0.35 kB
+dist/assets/blackAndWhite.fragment-DEduDnwe.js                           0.57 kB │ gzip:   0.37 kB
+dist/assets/flowGraphGetVariableBlock-Dzf615cL.js                        0.57 kB │ gzip:   0.33 kB
+dist/assets/displayPass.fragment-DJKE-Mnp.js                             0.57 kB │ gzip:   0.34 kB
+dist/assets/hdrIrradianceFiltering.vertex-D3xtYZuc.js                    0.57 kB │ gzip:   0.35 kB
+dist/assets/flowGraphContextBlock-I1JOTIiX.js                            0.58 kB │ gzip:   0.32 kB
+dist/assets/anaglyph.fragment-BEvfN2ud.js                                0.58 kB │ gzip:   0.35 kB
+dist/assets/depthBoxBlur.fragment-DhkeGIAw.js                            0.58 kB │ gzip:   0.38 kB
+dist/assets/clipPlaneFragmentDeclaration-DM58AF4r.js                     0.59 kB │ gzip:   0.27 kB
+dist/assets/rgbdEncode.fragment-B7x9ffXG.js                              0.59 kB │ gzip:   0.37 kB
+dist/assets/fluidRenderingParticleThickness.fragment-DkCyPlLs.js         0.59 kB │ gzip:   0.37 kB
+dist/assets/packingFunctions-Cs9yg0kV.js                                 0.59 kB │ gzip:   0.32 kB
+dist/assets/clipPlaneFragmentDeclaration-BTauCBnv.js                     0.59 kB │ gzip:   0.27 kB
+dist/assets/glowMapMerge.vertex-FQdGpUya.js                              0.59 kB │ gzip:   0.36 kB
+dist/assets/rgbdDecode.fragment-CUppuOBb.js                              0.60 kB │ gzip:   0.38 kB
+dist/assets/fluidRenderingParticleThickness.vertex-C5SCI8bs.js           0.60 kB │ gzip:   0.35 kB
+dist/assets/picking.fragment-9-Hq8Esc.js                                 0.60 kB │ gzip:   0.37 kB
+dist/assets/volumetricLightingRenderVolume.vertex-ClBvUIbM.js            0.61 kB │ gzip:   0.34 kB
+dist/assets/flowGraphBranchBlock-CZ6-ZnrK.js                             0.61 kB │ gzip:   0.33 kB
+dist/assets/iblCdfx.fragment-DyX-2ZRM.js                                 0.61 kB │ gzip:   0.41 kB
+dist/assets/ssaoCombine.fragment-BZjIVnfZ.js                             0.62 kB │ gzip:   0.36 kB
+dist/assets/boundingBoxRenderer.fragment-DtwdjS4d.js                     0.62 kB │ gzip:   0.35 kB
+dist/assets/extractHighlights.fragment-CPuN9J49.js                       0.62 kB │ gzip:   0.40 kB
+dist/assets/layer.vertex-IeE7ZVd5.js                                     0.62 kB │ gzip:   0.38 kB
+dist/assets/volumetricLightingRenderVolume.vertex-qbIIJ7c5.js            0.62 kB │ gzip:   0.36 kB
+dist/assets/lod.fragment-BPvHVxSM.js                                     0.63 kB │ gzip:   0.38 kB
+dist/assets/packingFunctions-B8WNOJGH.js                                 0.63 kB │ gzip:   0.34 kB
+dist/assets/clipPlaneVertex-fJTMDi18.js                                  0.63 kB │ gzip:   0.27 kB
+dist/assets/postprocess.vertex-NVvtDR2X.js                               0.63 kB │ gzip:   0.38 kB
+dist/assets/samplerFragmentDeclaration-BSf9UZnO.js                       0.63 kB │ gzip:   0.27 kB
+dist/assets/flowGraphIndexOfBlock-DbqvDChu.js                            0.64 kB │ gzip:   0.35 kB
+dist/assets/lensFlare.vertex-CzeQszAh.js                                 0.64 kB │ gzip:   0.39 kB
+dist/assets/lensFlare.fragment-B6zmOBC3.js                               0.65 kB │ gzip:   0.37 kB
+dist/assets/backgroundUboDeclaration-dKbVLXDF.js                         0.65 kB │ gzip:   0.33 kB
+dist/assets/flowGraphConditionalDataBlock-Dtt2gqTX.js                    0.65 kB │ gzip:   0.33 kB
+dist/assets/bumpVertex-qLAYcYd8.js                                       0.66 kB │ gzip:   0.35 kB
+dist/assets/filter.fragment-DhflcIB4.js                                  0.66 kB │ gzip:   0.39 kB
+dist/assets/procedural.vertex-eh3bIclr.js                                0.66 kB │ gzip:   0.37 kB
+dist/assets/flowGraphAsyncExecutionBlock-Ca_JX5pT.js                     0.66 kB │ gzip:   0.34 kB
+dist/assets/flowGraphSendCustomEventBlock-49yUljRj.js                    0.66 kB │ gzip:   0.38 kB
+dist/assets/backgroundUboDeclaration-6dK3kU7G.js                         0.68 kB │ gzip:   0.35 kB
+dist/assets/samplerFragmentDeclaration-BbiTb0Ln.js                       0.69 kB │ gzip:   0.29 kB
+dist/assets/flowGraphCachedOperationBlock-C5Um3yYs.js                    0.69 kB │ gzip:   0.33 kB
+dist/assets/flowGraphSceneTickEventBlock-D-lk3OR0.js                     0.71 kB │ gzip:   0.36 kB
+dist/assets/hdrFiltering.vertex-DSqAcofh.js                              0.71 kB │ gzip:   0.40 kB
+dist/assets/flowGraphArrayIndexBlock-b2qa1zBf.js                         0.71 kB │ gzip:   0.39 kB
+dist/assets/flowGraphCancelDelayBlock-DheehP70.js                        0.71 kB │ gzip:   0.44 kB
+dist/assets/hdrFiltering.fragment-URFA5LfT.js                            0.71 kB │ gzip:   0.40 kB
+dist/assets/lightProxy.fragment-DVhkgK_M.js                              0.71 kB │ gzip:   0.40 kB
+dist/assets/grain.fragment-Cyd7P-Nj.js                                   0.71 kB │ gzip:   0.44 kB
+dist/assets/lod.fragment-kVJ6zkU2.js                                     0.72 kB │ gzip:   0.41 kB
+dist/assets/morphTargetsVertexDeclaration-CW6uChmt.js                    0.72 kB │ gzip:   0.35 kB
+dist/assets/clusteredLightingFunctions-Dj8QWZwy.js                       0.72 kB │ gzip:   0.32 kB
+dist/assets/flowGraphCounterBlock-Biu-6LOZ.js                            0.72 kB │ gzip:   0.38 kB
+dist/assets/hdrIrradianceFiltering.vertex-Cj91eT1f.js                    0.73 kB │ gzip:   0.41 kB
+dist/assets/clipPlaneVertexDeclaration-DwjGqzY4.js                       0.73 kB │ gzip:   0.29 kB
+dist/assets/flowGraphFunctionReferenceBlock-ox4-Le79.js                  0.73 kB │ gzip:   0.38 kB
+dist/assets/flowGraphAssetsContext-ChiUnkQ8.js                           0.73 kB │ gzip:   0.27 kB
+dist/assets/blackAndWhite.fragment-DQIGAZA6.js                           0.73 kB │ gzip:   0.43 kB
+dist/assets/line.fragment-B5ne3pgQ.js                                    0.74 kB │ gzip:   0.42 kB
+dist/assets/flowGraphGetAssetBlock-CaCOWR-f.js                           0.75 kB │ gzip:   0.40 kB
+dist/assets/clusteredLightingFunctions-Cog45qqv.js                       0.75 kB │ gzip:   0.33 kB
+dist/assets/line.fragment-T6-Qr2r8.js                                    0.75 kB │ gzip:   0.39 kB
+dist/assets/pointerEvents-tk_OFa2D.js                                    0.75 kB │ gzip:   0.39 kB
+dist/assets/copyTextureToTexture.fragment-Uca5N5Mq.js                    0.76 kB │ gzip:   0.44 kB
+dist/assets/flowGraphFlipFlopBlock-CWx4ye5a.js                           0.76 kB │ gzip:   0.40 kB
+dist/assets/depthBoxBlur.fragment-PvL7sltX.js                            0.76 kB │ gzip:   0.44 kB
+dist/assets/layer.fragment-BVETml6m.js                                   0.76 kB │ gzip:   0.44 kB
+dist/assets/layer.vertex-DZVKMCe5.js                                     0.76 kB │ gzip:   0.44 kB
+dist/assets/fluidRenderingParticleThickness.vertex-D8F6jfN9.js           0.77 kB │ gzip:   0.41 kB
+dist/assets/clipPlaneVertexDeclaration-hXuWCxkY.js                       0.77 kB │ gzip:   0.30 kB
+dist/assets/morphTargetsVertexDeclaration-cBGD6QK5.js                    0.77 kB │ gzip:   0.37 kB
+dist/assets/clipPlaneVertex-C8KtYBez.js                                  0.78 kB │ gzip:   0.30 kB
+dist/assets/clipPlaneFragment-CqophYYX.js                                0.78 kB │ gzip:   0.30 kB
+dist/assets/bloomMerge.fragment-BGJCCQNk.js                              0.79 kB │ gzip:   0.40 kB
+dist/assets/fluidRenderingStandardBlur.fragment-DiGP2VOv.js              0.79 kB │ gzip:   0.46 kB
+dist/assets/anaglyph.fragment-C9eyOzNp.js                                0.80 kB │ gzip:   0.40 kB
+dist/assets/picking.fragment-CTOamdkv.js                                 0.81 kB │ gzip:   0.43 kB
+dist/assets/sharpen.fragment-C5lg5DP9.js                                 0.81 kB │ gzip:   0.42 kB
+dist/assets/kernelBlur.vertex-UJwMduQs.js                                0.81 kB │ gzip:   0.45 kB
+dist/assets/volumetricLightingBlendVolume.fragment-CxEuek6z.js           0.81 kB │ gzip:   0.45 kB
+dist/assets/flowGraphSequenceBlock-B6DWdO7r.js                           0.81 kB │ gzip:   0.40 kB
+dist/assets/fluidRenderingParticleDepth.vertex-BwY-8vEj.js               0.82 kB │ gzip:   0.45 kB
+dist/assets/extractHighlights.fragment-CL151WTY.js                       0.83 kB │ gzip:   0.46 kB
+dist/assets/instancesVertex-BdFqGrFr.js                                  0.84 kB │ gzip:   0.29 kB
+dist/assets/hdrIrradianceFiltering.fragment-taUVXcHC.js                  0.84 kB │ gzip:   0.45 kB
+dist/assets/vrDistortionCorrection.fragment-D9JA_IPI.js                  0.85 kB │ gzip:   0.47 kB
+dist/assets/glowMapMerge.fragment-CSkDzx8K.js                            0.85 kB │ gzip:   0.45 kB
+dist/assets/engineStore-8SkS--Nh.js                                      0.85 kB │ gzip:   0.41 kB
+dist/assets/ssaoCombine.fragment-BMD9amjg.js                             0.85 kB │ gzip:   0.43 kB
+dist/assets/flowGraphDebounceBlock-WuIDI94y.js                           0.86 kB │ gzip:   0.41 kB
+dist/assets/circleOfConfusion.fragment-BLb5K4E4.js                       0.86 kB │ gzip:   0.48 kB
+dist/assets/flowGraphDoNBlock-2FN0w-aJ.js                                0.87 kB │ gzip:   0.43 kB
+dist/assets/passCube.fragment-Dfg-ENP2.js                                0.87 kB │ gzip:   0.38 kB
+dist/assets/hdrFiltering.fragment-MvYAFL0f.js                            0.88 kB │ gzip:   0.46 kB
+dist/assets/imageProcessing.fragment-DqZE_CWJ.js                         0.88 kB │ gzip:   0.48 kB
+dist/assets/clipPlaneFragment-Cism3ywL.js                                0.88 kB │ gzip:   0.32 kB
+dist/assets/instancesDeclaration-euysXSnV.js                             0.89 kB │ gzip:   0.31 kB
+dist/assets/imageProcessingDeclaration-B8BwM7uW.js                       0.89 kB │ gzip:   0.44 kB
+dist/assets/shadowMapVertexMetric-BVIq0eNL.js                            0.90 kB │ gzip:   0.44 kB
+dist/assets/outline.fragment-DDs0tqTP.js                                 0.90 kB │ gzip:   0.49 kB
+dist/assets/layer.fragment-BEp6hmxW.js                                   0.90 kB │ gzip:   0.50 kB
+dist/assets/taa.fragment-C4tlsIpg.js                                     0.91 kB │ gzip:   0.48 kB
+dist/assets/fogFragmentDeclaration-CgGH6qzF.js                           0.92 kB │ gzip:   0.44 kB
+dist/assets/iblDominantDirection.fragment-CHmpGndv.js                    0.93 kB │ gzip:   0.52 kB
+dist/assets/iblScaledLuminance.fragment-BRhxRc9x.js                      0.93 kB │ gzip:   0.51 kB
+dist/assets/color.fragment-ZgjDqnAQ.js                                   0.93 kB │ gzip:   0.43 kB
+dist/assets/flowGraphPointerOutEventBlock-C5t01jul.js                    0.93 kB │ gzip:   0.46 kB
+dist/assets/flowGraphGetPropertyBlock-N2j5-nhu.js                        0.93 kB │ gzip:   0.45 kB
+dist/assets/flowGraphPointerOverEventBlock-Csxu0xqs.js                   0.94 kB │ gzip:   0.47 kB
+dist/assets/flowGraphDataSwitchBlock-CFyxBI38.js                         0.95 kB │ gzip:   0.47 kB
+dist/assets/kernelBlur.vertex-BuLULPMz.js                                0.96 kB │ gzip:   0.49 kB
+dist/assets/webAudioMainBus-Cfw_swtI.js                                  0.97 kB │ gzip:   0.44 kB
+dist/assets/boundingBoxRenderer.vertex-ChppRp1w.js                       0.97 kB │ gzip:   0.46 kB
+dist/assets/shadowsVertex-Ca1L5USP.js                                    0.98 kB │ gzip:   0.42 kB
+dist/assets/mesh.vertexData.functions-CwDvW4st.js                        0.98 kB │ gzip:   0.52 kB
+dist/assets/outline.fragment-BoS7FR-p.js                                 0.99 kB │ gzip:   0.50 kB
+dist/assets/selection.fragment-BeeD_1Ld.js                               0.99 kB │ gzip:   0.48 kB
+dist/assets/flowGraphBezierCurveEasingBlock-BYjhtT3m.js                  0.99 kB │ gzip:   0.46 kB
+dist/assets/imageProcessingDeclaration-D3WeIzzM.js                       0.99 kB │ gzip:   0.46 kB
+dist/assets/flowGraphWhileLoopBlock-AvUJt05X.js                          0.99 kB │ gzip:   0.48 kB
+dist/assets/instancesDeclaration-DQbrxKFQ.js                             1.00 kB │ gzip:   0.33 kB
+dist/assets/grain.fragment-DxNK_HlZ.js                                   1.00 kB │ gzip:   0.51 kB
+dist/assets/volumetricLightingBlendVolume.fragment-DkEmPeaR.js           1.01 kB │ gzip:   0.51 kB
+dist/assets/flowGraphTransformCoordinatesSystemBlock-CIdCsLve.js         1.01 kB │ gzip:   0.45 kB
+dist/assets/copyTextureToTexture.fragment-CqIMqCml.js                    1.01 kB │ gzip:   0.52 kB
+dist/assets/fogFragmentDeclaration-BrM3amjy.js                           1.02 kB │ gzip:   0.48 kB
+dist/assets/fluidRenderingParticleDepth.fragment-cXaL8eyd.js             1.02 kB │ gzip:   0.52 kB
+dist/assets/color.fragment-DWd-eeYK.js                                   1.03 kB │ gzip:   0.47 kB
+dist/assets/circleOfConfusion.fragment-HLHcLuCJ.js                       1.04 kB │ gzip:   0.55 kB
+dist/assets/lodCube.fragment-Qaflh7yW.js                                 1.04 kB │ gzip:   0.44 kB
+dist/assets/fxaa.vertex-C9_VH12F.js                                      1.05 kB │ gzip:   0.42 kB
+dist/assets/fluidRenderingParticleDepth.vertex-NUhWVFva.js               1.05 kB │ gzip:   0.51 kB
+dist/assets/imageProcessing.fragment-CiCkU25V.js                         1.05 kB │ gzip:   0.53 kB
+dist/assets/iblDominantDirection.fragment-BjY5lyr6.js                    1.05 kB │ gzip:   0.56 kB
+dist/assets/bonesDeclaration-D2FNKCeJ.js                                 1.06 kB │ gzip:   0.53 kB
+dist/assets/hdrIrradianceFiltering.fragment-xDOy5OTA.js                  1.06 kB │ gzip:   0.52 kB
+dist/assets/iblScaledLuminance.fragment-DoVYdYpn.js                      1.07 kB │ gzip:   0.54 kB
+dist/assets/taa.fragment-CFRPU568.js                                     1.07 kB │ gzip:   0.54 kB
+dist/assets/shadowMapFragment-Ceun_f01.js                                1.08 kB │ gzip:   0.48 kB
+dist/assets/fluidRenderingStandardBlur.fragment-4BTw9HzB.js              1.08 kB │ gzip:   0.53 kB
+dist/assets/harmonicsFunctions-DR2Bz89h.js                               1.08 kB │ gzip:   0.47 kB
+dist/assets/glowMapMerge.fragment-DknOJkqA.js                            1.11 kB │ gzip:   0.53 kB
+dist/assets/fluidRenderingParticleDepth.fragment-C0_H5eOR.js             1.11 kB │ gzip:   0.55 kB
+dist/assets/shadowMapVertexMetric-CMgEKD4P.js                            1.12 kB │ gzip:   0.47 kB
+dist/assets/instancesVertex-C9u09dY-.js                                  1.13 kB │ gzip:   0.37 kB
+dist/assets/sharpen.fragment-636phOg8.js                                 1.13 kB │ gzip:   0.48 kB
+dist/assets/vrDistortionCorrection.fragment-Bj1yYPkd.js                  1.14 kB │ gzip:   0.57 kB
+dist/assets/depth.fragment-C72Cto7g.js                                   1.14 kB │ gzip:   0.54 kB
+dist/assets/lightVxUboDeclaration-B6M9_pRz.js                            1.15 kB │ gzip:   0.52 kB
+dist/assets/boundingBoxRenderer.vertex-NNr2dCKG.js                       1.15 kB │ gzip:   0.52 kB
+dist/assets/colorCorrection.fragment-BZzWK1JH.js                         1.16 kB │ gzip:   0.56 kB
+dist/assets/glowBlurPostProcess.fragment-CvlAYXZl.js                     1.17 kB │ gzip:   0.61 kB
+dist/assets/flowGraphConsoleLogBlock--B5bxzsy.js                         1.18 kB │ gzip:   0.59 kB
+dist/assets/passCube.fragment-mfYSUWi1.js                                1.18 kB │ gzip:   0.43 kB
+dist/assets/defaultUboDeclaration-phfEJ9Mx.js                            1.18 kB │ gzip:   0.50 kB
+dist/assets/selection.fragment-BqkRPo6d.js                               1.20 kB │ gzip:   0.54 kB
+dist/assets/convolution.fragment-BbVT4X4A.js                             1.21 kB │ gzip:   0.47 kB
+dist/assets/iblCdfy.fragment-Bdt8BpKX.js                                 1.21 kB │ gzip:   0.64 kB
+dist/assets/morphTargetsVertexGlobalDeclaration-DBQHpXZh.js              1.22 kB │ gzip:   0.48 kB
+dist/assets/fluidRenderingBilateralBlur.fragment-BfOu4x5x.js             1.22 kB │ gzip:   0.59 kB
+dist/assets/flowGraphForLoopBlock-CrHMeOn7.js                            1.23 kB │ gzip:   0.55 kB
+dist/assets/lightVxFragmentDeclaration-E7FprVOe.js                       1.23 kB │ gzip:   0.51 kB
+dist/assets/flowGraphSwitchBlock-hk4OAOv6.js                             1.24 kB │ gzip:   0.54 kB
+dist/assets/gaussianSplatting.fragment-F7mQYxMH.js                       1.27 kB │ gzip:   0.57 kB
+dist/assets/flowGraphTypeToTypeBlocks-BJcv3h1E.js                        1.29 kB │ gzip:   0.45 kB
+dist/assets/ddsTextureLoader-CZ6AQSqg.js                                 1.30 kB │ gzip:   0.64 kB
+dist/assets/iblCdfy.fragment-6TqeBPWO.js                                 1.31 kB │ gzip:   0.67 kB
+dist/assets/shadowMapFragment-By330fAX.js                                1.34 kB │ gzip:   0.51 kB
+dist/assets/colorCorrection.fragment-Drj5_6XC.js                         1.36 kB │ gzip:   0.60 kB
+dist/assets/depth.fragment-DNqGSPp5.js                                   1.36 kB │ gzip:   0.59 kB
+dist/assets/harmonicsFunctions-ByMEJqBd.js                               1.38 kB │ gzip:   0.50 kB
+dist/assets/picking.vertex-CGkUtKVl.js                                   1.38 kB │ gzip:   0.55 kB
+dist/assets/lightVxUboDeclaration-BG-fRk-x.js                            1.40 kB │ gzip:   0.58 kB
+dist/assets/bonesDeclaration-7d-1sv4a.js                                 1.40 kB │ gzip:   0.62 kB
+dist/assets/flowGraphSetVariableBlock-BHvC7oKj.js                        1.40 kB │ gzip:   0.64 kB
+dist/assets/tonemap.fragment-C9yt7DTw.js                                 1.40 kB │ gzip:   0.71 kB
+dist/assets/sprites.vertex-Br2INhA8.js                                   1.44 kB │ gzip:   0.69 kB
+dist/assets/gaussianSplatting.fragment-DYZf5CoH.js                       1.44 kB │ gzip:   0.62 kB
+dist/assets/sprites.fragment-BwrmXl_D.js                                 1.44 kB │ gzip:   0.75 kB
+dist/assets/flowGraphThrottleBlock-DoIvNG9S.js                           1.45 kB │ gzip:   0.55 kB
+dist/assets/glowBlurPostProcess.fragment-CDNHTYPc.js                     1.46 kB │ gzip:   0.68 kB
+dist/assets/greasedLine.fragment-BYWCDf_4.js                             1.46 kB │ gzip:   0.57 kB
+dist/assets/lodCube.fragment-DViHyKlF.js                                 1.46 kB │ gzip:   0.49 kB
+dist/assets/flowGraphSetPropertyBlock-CQwURMgX.js                        1.47 kB │ gzip:   0.69 kB
+dist/assets/abstractSoundSource-D8nYeQz4.js                              1.48 kB │ gzip:   0.48 kB
+dist/assets/screenSpaceCurvature.fragment-DvPnHDwU.js                    1.48 kB │ gzip:   0.63 kB
+dist/assets/fxaa.vertex-BJkpnTbI.js                                      1.49 kB │ gzip:   0.48 kB
+dist/assets/picking.vertex-COveejkD.js                                   1.50 kB │ gzip:   0.60 kB
+dist/assets/fluidRenderingBilateralBlur.fragment-BzB-v_-7.js             1.53 kB │ gzip:   0.68 kB
+dist/assets/defaultUboDeclaration-CbiivrRw.js                            1.53 kB │ gzip:   0.49 kB
+dist/assets/color.vertex-COW-a99a.js                                     1.55 kB │ gzip:   0.65 kB
+dist/assets/flowGraphMeshPickEventBlock-BVlRpGM4.js                      1.57 kB │ gzip:   0.62 kB
+dist/assets/chromaticAberration.fragment-D38jH_S3.js                     1.58 kB │ gzip:   0.62 kB
+dist/assets/screenSpaceCurvature.fragment-CWnMjkbO.js                    1.59 kB │ gzip:   0.65 kB
+dist/assets/volumetricLightingRenderVolume.fragment-DrNo6Y3x.js          1.60 kB │ gzip:   0.77 kB
+dist/assets/spatialWebAudioUpdaterComponent-BjcAC3aW.js                  1.61 kB │ gzip:   0.61 kB
+dist/assets/flowGraphWaitAllBlock-D0pSomiG.js                            1.62 kB │ gzip:   0.65 kB
+dist/assets/color.vertex-CQIwFR53.js                                     1.62 kB │ gzip:   0.66 kB
+dist/assets/tonemap.fragment-CSgxE-X_.js                                 1.62 kB │ gzip:   0.78 kB
+dist/assets/bilateralBlur.fragment-CvatFMnD.js                           1.65 kB │ gzip:   0.67 kB
+dist/assets/flowGraphEasingBlock-B6HP9BP0.js                             1.67 kB │ gzip:   0.75 kB
+dist/assets/sprites.fragment-DPk2EnbJ.js                                 1.68 kB │ gzip:   0.79 kB
+dist/assets/rsmFullGlobalIllumination.fragment-k5wEnIMt.js               1.70 kB │ gzip:   0.80 kB
+dist/assets/pbrUboDeclaration-DzuMgMph.js                                1.72 kB │ gzip:   0.62 kB
+dist/assets/bilateralBlurQuality.fragment-B0BbWRCn.js                    1.72 kB │ gzip:   0.69 kB
+dist/assets/webAudioSoundSource-DhxPeCA6.js                              1.73 kB │ gzip:   0.68 kB
+dist/assets/depthOfFieldMerge.fragment-CnetkPzc.js                       1.73 kB │ gzip:   0.59 kB
+dist/assets/flowGraphMultiGateBlock-Dk2Qs_gv.js                          1.73 kB │ gzip:   0.74 kB
+dist/assets/morphTargetsVertexGlobalDeclaration-DiifcWOO.js              1.74 kB │ gzip:   0.54 kB
+dist/assets/sprites.vertex-D9VqDPi3.js                                   1.78 kB │ gzip:   0.76 kB
+dist/assets/math.plane-CDiGUh_P.js                                       1.79 kB │ gzip:   0.76 kB
+dist/assets/convolution.fragment-CGbAgytK.js                             1.82 kB │ gzip:   0.55 kB
+dist/assets/volumetricLightingRenderVolume.fragment-Qmryhahi.js          1.82 kB │ gzip:   0.84 kB
+dist/assets/glowMapGeneration.fragment-BybShpSK.js                       1.86 kB │ gzip:   0.72 kB
+dist/assets/logger-BrIfMtPw.js                                           1.88 kB │ gzip:   0.82 kB
+dist/assets/chromaticAberration.fragment-sJFHfCAN.js                     1.94 kB │ gzip:   0.70 kB
+dist/assets/flowGraphStopAnimationBlock-CRPYG5GI.js                      1.99 kB │ gzip:   0.72 kB
+dist/assets/lightProxy.vertex-C-i1B0Lu.js                                2.00 kB │ gzip:   0.87 kB
+dist/assets/lightProxy.vertex-DItOBI1V.js                                2.01 kB │ gzip:   0.86 kB
+dist/assets/bumpFragmentFunctions-CPhFccbC.js                            2.02 kB │ gzip:   0.83 kB
+dist/assets/rgbdTextureTools-BPNRPiIJ.js                                 2.02 kB │ gzip:   0.95 kB
+dist/assets/line.vertex-HUQNd-r0.js                                      2.03 kB │ gzip:   0.81 kB
+dist/assets/outline.vertex-C2_KY2wd.js                                   2.03 kB │ gzip:   0.75 kB
+dist/assets/morphTargetsVertex-C3fNBdA9.js                               2.05 kB │ gzip:   0.59 kB
+dist/assets/decorators-CuTd-0UI.js                                       2.06 kB │ gzip:   0.82 kB
+dist/assets/line.vertex-CXdZVr84.js                                      2.07 kB │ gzip:   0.79 kB
+dist/assets/math.scalar.functions-D2_HDkhq.js                            2.08 kB │ gzip:   0.96 kB
+dist/assets/particles.fragment-BmBXzDY1.js                               2.11 kB │ gzip:   0.87 kB
+dist/assets/easing-DSSfPTEb.js                                           2.11 kB │ gzip:   0.83 kB
+dist/assets/rsmFullGlobalIllumination.fragment-DQ00ZVm7.js               2.12 kB │ gzip:   0.89 kB
+dist/assets/minmaxRedux.fragment-DuuNwA5S.js                             2.13 kB │ gzip:   0.65 kB
+dist/assets/motionBlur.fragment-CyO3Fvc2.js                              2.13 kB │ gzip:   0.86 kB
+dist/assets/bonesVertex-DPGIkqgo.js                                      2.15 kB │ gzip:   0.49 kB
+dist/assets/flowGraphInterpolationBlock-XOdJJtxX.js                      2.15 kB │ gzip:   0.88 kB
+dist/assets/bumpFragmentFunctions-Cy4zKbc4.js                            2.18 kB │ gzip:   0.87 kB
+dist/assets/kernelBlur.fragment-oDjBdRW4.js                              2.18 kB │ gzip:   0.74 kB
+dist/assets/bilateralBlur.fragment-DdUYHg6A.js                           2.24 kB │ gzip:   0.77 kB
+dist/assets/outline.vertex-Bs9zixb4.js                                   2.26 kB │ gzip:   0.82 kB
+dist/assets/greasedLine.fragment-Fex-Nscl.js                             2.28 kB │ gzip:   0.88 kB
+dist/assets/greasedLine.vertex-f2VNhUp_.js                               2.28 kB │ gzip:   0.88 kB
+dist/assets/pbrUboDeclaration-DnqvmzYT.js                                2.31 kB │ gzip:   0.62 kB
+dist/assets/shadowMap.fragment-DW4IurbW.js                               2.31 kB │ gzip:   0.93 kB
+dist/assets/bilateralBlurQuality.fragment-DqmuUrK_.js                    2.32 kB │ gzip:   0.79 kB
+dist/assets/webAudioBus-CprIojFc.js                                      2.33 kB │ gzip:   0.78 kB
+dist/assets/depthOfFieldMerge.fragment-J17vtH9Y.js                       2.35 kB │ gzip:   0.60 kB
+dist/assets/shadowsVertex-SCNfcU1X.js                                    2.36 kB │ gzip:   0.51 kB
+dist/assets/selection.vertex-0U_qZ-Sh.js                                 2.38 kB │ gzip:   0.83 kB
+dist/assets/oitFragment-EtBzypf3.js                                      2.38 kB │ gzip:   0.81 kB
+dist/assets/flowGraphExecutionBlock-XVghIq1e.js                          2.38 kB │ gzip:   0.84 kB
+dist/assets/particles.fragment-b-IUNUQO.js                               2.41 kB │ gzip:   0.90 kB
+dist/assets/depth.vertex-4mx5V6d_.js                                     2.43 kB │ gzip:   0.90 kB
+dist/assets/minmaxRedux.fragment-33PShoB3.js                             2.44 kB │ gzip:   0.69 kB
+dist/assets/bumpFragment-Cs26jZnb.js                                     2.44 kB │ gzip:   0.92 kB
+dist/assets/screenSpaceReflection2Blur.fragment-DOolFXxA.js              2.45 kB │ gzip:   0.75 kB
+dist/assets/oitFragment-Dvpv53_6.js                                      2.45 kB │ gzip:   0.89 kB
+dist/assets/glowMapGeneration.fragment-DvK-j6hY.js                       2.48 kB │ gzip:   0.82 kB
+dist/assets/depth.vertex-BWSbBWTX.js                                     2.50 kB │ gzip:   0.88 kB
+dist/assets/iblIcdf.fragment-ClHqt3qA.js                                 2.51 kB │ gzip:   0.98 kB
+dist/assets/cubemapToSphericalPolynomial-CKUmJ4w3.js                     2.53 kB │ gzip:   1.15 kB
+dist/assets/glowMapGeneration.vertex-D3WtUfuV.js                         2.60 kB │ gzip:   0.83 kB
+dist/assets/shadowMap.fragment-BBv5p-fG.js                               2.60 kB │ gzip:   1.00 kB
+dist/assets/morphTargetsVertex-CtPs8Rl1.js                               2.61 kB │ gzip:   0.65 kB
+dist/assets/screenSpaceReflection2BlurCombiner.fragment-BGwZb01Z.js      2.61 kB │ gzip:   1.04 kB
+dist/assets/abstractSoundInstance-BTapjT_3.js                            2.62 kB │ gzip:   0.83 kB
+dist/assets/bumpFragmentMainFunctions-DxzzwZBJ.js                        2.65 kB │ gzip:   1.18 kB
+dist/assets/pickingInfo-C8PmhVts.js                                      2.67 kB │ gzip:   0.90 kB
+dist/assets/selection.vertex-CZrVnbvB.js                                 2.71 kB │ gzip:   0.91 kB
+dist/assets/kernelBlur.fragment-Ca7Sd8OF.js                              2.71 kB │ gzip:   0.82 kB
+dist/assets/iblCdfDebug.fragment-BZK_8Wyq.js                             2.72 kB │ gzip:   0.99 kB
+dist/assets/rsmGlobalIllumination.fragment-B8OUZRui.js                   2.73 kB │ gzip:   1.24 kB
+dist/assets/iesTextureLoader-B6LVBXG1.js                                 2.73 kB │ gzip:   1.18 kB
+dist/assets/screenSpaceReflection2Blur.fragment-BIr7g6NQ.js              2.74 kB │ gzip:   0.75 kB
+dist/assets/bonesVertex-BjwZ1Tew.js                                      2.80 kB │ gzip:   0.53 kB
+dist/assets/lightUboDeclaration-Cg9WjZqB.js                              2.80 kB │ gzip:   0.93 kB
+dist/assets/bumpFragmentMainFunctions-BcTPxMHC.js                        2.83 kB │ gzip:   1.17 kB
+dist/assets/motionBlur.fragment-CjLBHDXh.js                              2.86 kB │ gzip:   0.98 kB
+dist/assets/iblIcdf.fragment-cr0AYQeS.js                                 2.89 kB │ gzip:   1.04 kB
+dist/assets/lightFragmentDeclaration-C0R5tOfD.js                         2.90 kB │ gzip:   0.92 kB
+dist/assets/webRequest-B8JYqB6a.js                                       2.93 kB │ gzip:   1.06 kB
+dist/assets/glowMapGeneration.vertex-BEvDy0y5.js                         3.02 kB │ gzip:   0.91 kB
+dist/assets/flowGraphJsonPointerParserBlock-54aKPyle.js                  3.07 kB │ gzip:   1.24 kB
+dist/assets/iblCdfDebug.fragment-DlCHxqma.js                             3.10 kB │ gzip:   1.03 kB
+dist/assets/screenSpaceReflection2BlurCombiner.fragment-DABrVEcD.js      3.23 kB │ gzip:   1.17 kB
+dist/assets/observable-TGoMsoUe.js                                       3.26 kB │ gzip:   1.12 kB
+dist/assets/bumpFragment-CcaM4jY4.js                                     3.27 kB │ gzip:   1.02 kB
+dist/assets/greasedLine.vertex-B42x3pvc.js                               3.32 kB │ gzip:   1.15 kB
+dist/assets/bakedVertexAnimation-CIGvy_ye.js                             3.35 kB │ gzip:   0.89 kB
+dist/assets/openpbrUboDeclaration-B850xnWb.js                            3.44 kB │ gzip:   0.92 kB
+dist/assets/rsmGlobalIllumination.fragment-BqVIrGRo.js                   3.46 kB │ gzip:   1.38 kB
+dist/assets/tgaTextureLoader-BsCdzl6K.js                                 3.47 kB │ gzip:   1.38 kB
+dist/assets/bakedVertexAnimation-DjF5vj-h.js                             3.55 kB │ gzip:   0.82 kB
+dist/assets/lightUboDeclaration-BGr4cr5f.js                              3.57 kB │ gzip:   1.06 kB
+dist/assets/flowGraphMatrixMathBlocks-7ZBPbznw.js                        3.60 kB │ gzip:   1.00 kB
+dist/assets/viewer-De4QmZA8.js                                           3.60 kB │ gzip:   1.76 kB
+dist/assets/dumpTools-Douu2fYT.js                                        3.61 kB │ gzip:   1.71 kB
+dist/assets/samplerVertexImplementation-BxEVOKwL.js                      3.65 kB │ gzip:   0.96 kB
+dist/assets/flowGraphPlayAnimationBlock-CxiDmO5n.js                      3.72 kB │ gzip:   1.21 kB
+dist/assets/shadowMap.vertex-BbKeji9p.js                                 3.92 kB │ gzip:   1.34 kB
+dist/assets/shadowMap.vertex-tL4ywik0.js                                 3.94 kB │ gzip:   1.35 kB
+dist/assets/webAudioParameterComponent-DDOoo487.js                       3.99 kB │ gzip:   1.67 kB
+dist/assets/imageProcessingFunctions-DKM0HLEA.js                         4.00 kB │ gzip:   1.58 kB
+dist/assets/background.vertex-BcXaNHTo.js                                4.08 kB │ gzip:   1.31 kB
+dist/assets/reflectionFunction-DE0gS4KI.js                               4.11 kB │ gzip:   0.99 kB
+dist/assets/background.vertex-CJ7KmDQx.js                                4.12 kB │ gzip:   1.39 kB
+dist/assets/searchAirports-BWvTkWoy.js                                   4.24 kB │ gzip:   1.92 kB
+dist/assets/samplerVertexImplementation-DLbu9A-M.js                      4.29 kB │ gzip:   0.99 kB
+dist/assets/hdrTextureLoader-B3Y58zgs.js                                 4.49 kB │ gzip:   1.94 kB
+dist/assets/reflectionFunction-CJFneeFX.js                               4.63 kB │ gzip:   1.04 kB
+dist/assets/openpbrUboDeclaration-Cn-B_BSi.js                            4.64 kB │ gzip:   0.94 kB
+dist/assets/particles.vertex-CYM2g56V.js                                 4.67 kB │ gzip:   1.35 kB
+dist/assets/imageProcessingFunctions-DaWL7aY0.js                         4.81 kB │ gzip:   1.82 kB
+dist/assets/selectionOutline.fragment-cIzROK8a.js                        4.81 kB │ gzip:   0.99 kB
+dist/assets/flowGraphSetDelayBlock-B66JkSxs.js                           4.85 kB │ gzip:   1.66 kB
+dist/assets/geometry.fragment-BJTnq6TU.js                                4.90 kB │ gzip:   1.60 kB
+dist/assets/fluidRenderingRender.fragment-B2VnE-cV.js                    5.06 kB │ gzip:   1.66 kB
+dist/assets/ssao2.fragment-Ca53MnVk.js                                   5.26 kB │ gzip:   1.68 kB
+dist/assets/flowGraphVectorMathBlocks-DHjXF_DV.js                        5.37 kB │ gzip:   1.69 kB
+dist/assets/math.size-D0Q46S9q.js                                        5.58 kB │ gzip:   2.06 kB
+dist/assets/fxaa.fragment-CeEVxGGL.js                                    5.60 kB │ gzip:   1.68 kB
+dist/assets/particles.vertex-4901d2w9.js                                 5.76 kB │ gzip:   1.45 kB
+dist/assets/helperFunctions-BZAYCKDB.js                                  5.97 kB │ gzip:   2.04 kB
+dist/assets/ltcHelperFunctions-DUZ9FwhH.js                               6.00 kB │ gzip:   1.51 kB
+dist/assets/geometry.fragment-DJlf4DQp.js                                6.06 kB │ gzip:   1.69 kB
+dist/assets/selectionOutline.fragment-CjUz46Ds.js                        6.09 kB │ gzip:   1.11 kB
+dist/assets/geometry.vertex-Rv4vytnB.js                                  6.12 kB │ gzip:   1.54 kB
+dist/assets/fluidRenderingRender.fragment-DgWzE3oV.js                    6.15 kB │ gzip:   1.77 kB
+dist/assets/buffer-Bb6Tw_Pd.js                                           6.23 kB │ gzip:   2.05 kB
+dist/assets/helperFunctions-DV4ysQVZ.js                                  6.32 kB │ gzip:   2.15 kB
+dist/assets/fxaa.fragment-axW8ABRL.js                                    6.48 kB │ gzip:   1.75 kB
+dist/assets/createInfoPage-w3xFTmDq.js                                   6.55 kB │ gzip:   2.81 kB
+dist/assets/ltcHelperFunctions-C5VEDq9X.js                               6.59 kB │ gzip:   1.81 kB
+dist/assets/ssao2.fragment-otzj9I1T.js                                   6.74 kB │ gzip:   1.84 kB
+dist/assets/screenSpaceReflection2.fragment-C-2ipre8.js                  6.96 kB │ gzip:   2.42 kB
+dist/assets/geometry.vertex-Ce9jsLze.js                                  7.15 kB │ gzip:   1.63 kB
+dist/assets/useFullscreenOffer-DpWOg3Kd.js                               7.16 kB │ gzip:   2.87 kB
+dist/assets/lightsFragmentFunctions-zqCGlEjY.js                          7.33 kB │ gzip:   1.75 kB
+dist/assets/webAudioBaseSubGraph-L8qCwgTH.js                             7.49 kB │ gzip:   1.99 kB
+dist/assets/envTextureLoader-Bgwd-EYS.js                                 7.52 kB │ gzip:   3.19 kB
+dist/assets/screenSpaceReflection2.fragment-DriKEm88.js                  7.78 kB │ gzip:   2.54 kB
+dist/assets/screenSpaceRayTrace-CEH2UzBh.js                              7.83 kB │ gzip:   2.73 kB
+dist/assets/default.vertex-DS8JD7cF.js                                   8.06 kB │ gzip:   2.16 kB
+dist/assets/flowGraphMathCombineExtractBlocks-DRssQaqC.js                8.08 kB │ gzip:   1.14 kB
+dist/assets/lightsFragmentFunctions-C89hx_wD.js                          8.15 kB │ gzip:   1.87 kB
+dist/assets/webAudioStreamingSound-DhyiUaVt.js                           8.34 kB │ gzip:   2.44 kB
+dist/assets/basisTextureLoader-T1n6ZIKb.js                               8.40 kB │ gzip:   3.25 kB
+dist/assets/screenSpaceRayTrace-CKYb1Q-m.js                              8.43 kB │ gzip:   2.90 kB
+dist/assets/effectRenderer-z1t5Cbkf.js                                   8.53 kB │ gzip:   2.54 kB
+dist/assets/hdrFilteringFunctions-BCUG9fK8.js                            8.54 kB │ gzip:   2.50 kB
+dist/assets/default.vertex-Dnb-6vVX.js                                   8.55 kB │ gzip:   2.25 kB
+dist/assets/hdrFilteringFunctions-wD8-3gwi.js                            8.61 kB │ gzip:   2.47 kB
+dist/assets/webAudioStaticSound-lc3ageP9.js                              8.73 kB │ gzip:   2.46 kB
+dist/assets/dds-mDjMnWBX.js                                              9.29 kB │ gzip:   3.58 kB
+dist/assets/node-Cdaoaf-z.js                                             9.66 kB │ gzip:   2.65 kB
+dist/assets/background.fragment-CcYrREwu.js                              9.83 kB │ gzip:   2.94 kB
+dist/assets/gaussianSplatting.vertex-Dpu_Z8KT.js                         9.91 kB │ gzip:   3.25 kB
+dist/assets/gaussianSplatting.vertex-DkaThxPq.js                         9.99 kB │ gzip:   3.19 kB
+dist/assets/constants-CXYtwqoJ.js                                       10.03 kB │ gzip:   2.92 kB
+dist/assets/background.fragment-ubBjm2TJ.js                             10.04 kB │ gzip:   2.87 kB
+dist/assets/pbrBRDFFunctions-D_R-1K_R.js                                11.58 kB │ gzip:   3.98 kB
+dist/assets/math.path-DsDBJc9D.js                                       11.67 kB │ gzip:   3.78 kB
+dist/assets/spatialWebAudio-BgvJpQBa.js                                 11.82 kB │ gzip:   2.75 kB
+dist/assets/pbrBRDFFunctions-COgGyDqN.js                                12.33 kB │ gzip:   4.16 kB
+dist/assets/math.color-_xNs_mbQ.js                                      12.44 kB │ gzip:   2.90 kB
+dist/assets/createPhoneControlSession-4zUUlQGx.js                       12.47 kB │ gzip:   5.04 kB
+dist/assets/flowGraphBlock-DVFiZ1hw.js                                  13.20 kB │ gzip:   3.81 kB
+dist/assets/pbr.vertex-C3O4_f1j.js                                      13.55 kB │ gzip:   2.90 kB
+dist/assets/flowGraphReceiveCustomEventBlock-phZ5FSAB.js                14.94 kB │ gzip:   3.91 kB
+dist/assets/exrTextureLoader-DO-AjcS-.js                                14.98 kB │ gzip:   5.58 kB
+dist/assets/openpbr.vertex-B014J7Pt.js                                  15.59 kB │ gzip:   3.07 kB
+dist/assets/lightConstants-Ct_sNyLF.js                                  15.82 kB │ gzip:   3.50 kB
+dist/assets/ktxTextureLoader-CndnR3Ye.js                                15.87 kB │ gzip:   4.65 kB
+dist/assets/floatingOriginMatrixOverrides-BrzQS-3c.js                   16.26 kB │ gzip:   3.89 kB
+dist/assets/math.frustum-CZ-fkeNJ.js                                    16.62 kB │ gzip:   4.26 kB
+dist/assets/default.fragment-BAqLZdd7.js                                16.79 kB │ gzip:   4.25 kB
+dist/assets/pbr.vertex-B7crIbGD.js                                      17.05 kB │ gzip:   3.50 kB
+dist/assets/subMesh-CMWuyYSl.js                                         17.20 kB │ gzip:   4.87 kB
+dist/assets/default.fragment-B56M_9yQ.js                                17.23 kB │ gzip:   3.99 kB
+dist/assets/animation-gdtGRT3f.js                                       17.45 kB │ gzip:   4.72 kB
+dist/assets/flowGraphMathBlocks-BulUA40s.js                             18.85 kB │ gzip:   3.80 kB
+dist/assets/openpbr.vertex-JRQ4ORx5.js                                  19.36 kB │ gzip:   3.75 kB
+dist/assets/lightFragment-sdK9qlnJ.js                                   19.59 kB │ gzip:   3.10 kB
+dist/assets/spotLight-CCqEpLHw.js                                       21.31 kB │ gzip:   5.30 kB
+dist/assets/lightFragment-FTt2BnQX.js                                   22.24 kB │ gzip:   3.29 kB
+dist/assets/shadowsFragmentFunctions-CYGQxnnd.js                        25.96 kB │ gzip:   3.99 kB
+dist/assets/createPhonePairingPanel-C5acHM81.js                         27.43 kB │ gzip:  10.36 kB
+dist/assets/texture-BZJjLZCw.js                                         27.57 kB │ gzip:   6.98 kB
+dist/assets/shadowsFragmentFunctions--8PfSGF4.js                        28.50 kB │ gzip:   3.95 kB
+dist/assets/tools-AtXKFQ8d.js                                           30.74 kB │ gzip:  10.08 kB
+dist/assets/pbrDebug-IfgQ7hF6.js                                        32.01 kB │ gzip:   6.82 kB
+dist/assets/throttleLever-CESgmeaZ.js                                   34.72 kB │ gzip:  12.98 kB
+dist/assets/pbrDebug-UK_ZK-GW.js                                        39.67 kB │ gzip:   8.43 kB
+dist/assets/createPhoneControllerApp-mZYHzliw.js                        44.48 kB │ gzip:  14.42 kB
+dist/assets/animationGroup-BmYBmO0c.js                                  45.89 kB │ gzip:  11.11 kB
+dist/assets/openpbrMaterial-BY36xKzM.js                                 55.13 kB │ gzip:  13.06 kB
+dist/assets/math.vector-DNbgaflQ.js                                     64.38 kB │ gzip:  15.70 kB
+dist/assets/thinEngine-BMCT6IFh.js                                      64.87 kB │ gzip:  16.54 kB
+dist/assets/phoneCameraTuning-BMkZMXIG.js                               76.91 kB │ gzip:  25.39 kB
+dist/assets/tools.functions-BYClJ5Yi.js                                 78.96 kB │ gzip:  19.94 kB
+dist/assets/openpbr.fragment-DQZ7qeRY.js                                80.48 kB │ gzip:  15.77 kB
+dist/assets/openpbr.fragment-CW3BZ4_5.js                                81.89 kB │ gzip:  15.59 kB
+dist/assets/pbr.fragment-CmjuG3Gu.js                                    90.03 kB │ gzip:  15.46 kB
+dist/assets/pbr.fragment-BkkpAn3f.js                                    93.70 kB │ gzip:  17.01 kB
+dist/assets/pushMaterial-D_6f7NjB.js                                   100.42 kB │ gzip:  43.78 kB
+dist/assets/pbrMaterial-DKoUf2Dr.js                                    108.46 kB │ gzip:  21.38 kB
+dist/assets/protocol-Cqz0bks-.js                                       114.48 kB │ gzip:  32.44 kB
+dist/assets/scene-z9i01NkB.js                                          119.36 kB │ gzip:  25.45 kB
+dist/assets/jsQR-BgYz03aF.js                                           129.98 kB │ gzip:  47.49 kB
+dist/assets/textureTools-HMQkJij0.js                                   141.28 kB │ gzip:  36.88 kB
+dist/assets/client-etcTUvYB.js                                         178.27 kB │ gzip:  56.30 kB
+dist/assets/engine.multiRender-2Eeilb_X.js                             323.85 kB │ gzip:  79.53 kB
+dist/assets/index-D9GDjkuH.js                                          359.22 kB │ gzip: 114.22 kB
+dist/assets/createFlightSimApp-dGwUzIMM.js                             910.69 kB │ gzip: 276.09 kB
+dist/assets/core-DrI4b2vk.js                                         3,476.00 kB │ gzip: 752.59 kB
+
+✓ built in 585ms
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+{
+  "package": {
+    "name": "@felipegalind0/jsbsim",
+    "version": "1.2.4-fork.12"
+  },
+  "mode": "in-tree",
+  "inputSha256": "b6f08358df7165212c0df27cab91d39197c8a84559b593a684bd0798ef47633d",
+  "verifiedFiles": 14,
+  "packageArchive": {
+    "path": "deps/felipegalind0-jsbsim-1.2.4-fork.12.tgz",
+    "sha256": "23f69b883184a656fd7d612476b622fb520e5539b016a9f4a20df627b924fd03",
+    "integrity": "sha512-y30Lsv5zZx5Picrwh44Vv52ooJyxcyzz/2jUxqc8rhlTUfREUiXEUjJ7v0/EHrtKN/gQXuAkpgEB10wv3owe2Q=="
+  },
+  "emitted": {
+    "assets/jsbsim_wasm-DAhL615P.mjs": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+    "assets/jsbsim_wasm-Dj6DuD_W.wasm": "011b29ca3901fbd8a16e4d99ca7b81a4bc95388193bd7cf0cd92d5452bf5f661"
+  }
+}
+{
+  "artifact": "audio-dsp.wasm",
+  "license": "AGPL-3.0-only",
+  "bytes": 50902,
+  "sha256": "0aea1d9488f7208a8d8aa28ab1e8ed9d6f741787f4b1242cbca92ac87bbc91a1",
+  "toolchain": {
+    "compiler": "emcc",
+    "version": "6.0.9",
+    "flags": [
+      "-O3",
+      "-std=c++17",
+      "--no-entry",
+      "-sSTANDALONE_WASM=1",
+      "-sALLOW_MEMORY_GROWTH=1",
+      "-sINITIAL_MEMORY=2097152",
+      "-sSTACK_SIZE=131072",
+      "-sMALLOC=emmalloc",
+      "-sERROR_ON_UNDEFINED_SYMBOLS=1",
+      "-sFILESYSTEM=0",
+      "-fno-exceptions",
+      "-fno-rtti",
+      "-fno-fast-math"
+    ]
+  },
+  "sources": 7,
+  "imports": [
+    "env.emscripten_notify_memory_growth"
+  ],
+  "dist": {
+    "base": "/",
+    "wasm": [
+      "assets/audio-dsp-chAEGHjy.wasm"
+    ],
+    "worklet": [
+      "assets/dspProcessor-Bf4mjszY.js"
+    ]
+  }
+}

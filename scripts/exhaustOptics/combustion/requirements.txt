@@ -1,0 +1,4 @@
+cantera==3.2.0
+numpy==2.5.3
+ruamel.yaml==0.19.1
+typing_extensions==4.16.0

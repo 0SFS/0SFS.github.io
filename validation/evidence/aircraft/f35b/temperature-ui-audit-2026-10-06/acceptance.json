@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-06T06:23:07.646Z",
+  "request": "Explain barely visible nozzle glow and expose exhaust temperature in the Engine tab.",
+  "implementation": {
+    "home": "Engine → Temperatures and oil → EGT (exhaust gas)",
+    "path": "propulsion/engine/egt-degc",
+    "unit": "°C",
+    "behavior": "Shows catalog-present native read-only Celsius EGT; updates through cooling; nonfinite reads show n/a. Legacy Fahrenheit remains optional. Tooltip distinguishes modeled gas from nozzle-metal and afterburner-exit measurements.",
+    "unchanged": "No optical table, native temperature equation, material selection, geometry, brightness gain, orb/summary or phone behavior changed in this follow-up."
+  },
+  "audit": {
+    "nativeEgtC": 733.2188949880485,
+    "kelvin": 1006.3688949880485,
+    "nativeSample": "../../../jsbsim/adoption/fork12/f135-temperature-trace.json",
+    "surfaceLookupLinearRgb": [
+      0.0004290888177486287,
+      0.000004523285300633541,
+      0
+    ],
+    "upperReferenceKelvin": 1400,
+    "upperReferenceRedEmission": 0.25,
+    "formerFullPowerToCurrentRedRatio": 582.6299583189242,
+    "interpretation": "The chosen upper-reference display normalization makes ordinary modeled full-power heat much dimmer. The pipeline follows the specified lookup, but this does not establish realistic F135 appearance.",
+    "geometry": "Exact and neighboring nozzle-axis rays hit the opaque double-sided darkmet2 center cap first. The existing glow material includes that cap. Vertex radii alone would have missed the spanning cap triangles.",
+    "geometryRecord": "geometry-report.json",
+    "limits": [
+      "Native EGT is generic modeled gas temperature, not measured F135 hardware temperature.",
+      "The .25 display reference is arbitrary; material emissivity and gas-to-metal relationship are not calibrated.",
+      "The scene uses uncalibrated hemispheric lighting/exposure, so relative Planck radiance alone cannot establish on-screen physical brightness.",
+      "No new GPU run or pixel measurement; numerical brightness estimates are not rendered-image qualification."
+    ]
+  },
+  "primarySources": [
+    {
+      "url": "https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#additional-textures",
+      "supports": "Emissive color and physical light-to-pixel interpretation depend on camera exposure."
+    },
+    {
+      "url": "https://www.nist.gov/programs-projects/spectroradiometry-sources",
+      "supports": "Blackbody spectral-radiance calibration and Planck law."
+    }
+  ],
+  "checks": {
+    "typecheck": {
+      "command": "npx tsc -b",
+      "exitCode": 0,
+      "log": "typecheck.log"
+    },
+    "related": {
+      "command": "npx vitest related --run --maxWorkers=50% <four Engine monitor source/test files>",
+      "exitCode": 0,
+      "files": 12,
+      "passed": 165,
+      "log": "related.log"
+    },
+    "lint": {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "log": "lint.log"
+    },
+    "ci": {
+      "command": "npm run ci",
+      "exitCode": 0,
+      "files": 162,
+      "passed": 1751,
+      "expectedFailures": 1,
+      "log": "ci.log",
+      "expectedFailure": "Existing F35B stowed main-strut envelope case.",
+      "fullRuns": 1
+    },
+    "gpu": {
+      "run": false
+    },
+    "nativeRebuild": {
+      "run": false,
+      "reason": "The installed fork.12 already provides the observation."
+    }
+  },
+  "artifactPathBase": "repository root",
+  "artifacts": [
+    {
+      "path": "src/flight/hud/engineMonitorModel.ts",
+      "bytes": 17870,
+      "sha256": "346509793f57e882ee6fbec30126691a1844cdb7e6c8136e657317a096c412bf"
+    },
+    {
+      "path": "src/flight/hud/engineMonitorModel.test.ts",
+      "bytes": 7768,
+      "sha256": "65e1c35a68b82fd408b536653adff7d6b8b8234597dddc260b4c85602eadefa3"
+    },
+    {
+      "path": "src/flight/hud/engineMonitor.ts",
+      "bytes": 18296,
+      "sha256": "192bec2b562d7ac649770e1d5e5eed046bb1c2408a6e9770a19634fc091b815f"
+    },
+    {
+      "path": "src/flight/hud/engineMonitor.test.ts",
+      "bytes": 30276,
+      "sha256": "e44cb59186b69db472f7bfcf858725a8cb6dc8bbc1c4a6eae91ae22dab623c20"
+    },
+    {
+      "path": "docs/proposals/f35b-fdm.md",
+      "bytes": 41911,
+      "sha256": "dae2e40aed30b9358836b1549196c3252ad7effe18cc40e373e295321d210b6a"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json",
+      "bytes": 15119,
+      "sha256": "bcb2a9c4045bfbb4ec5f75b3806bdf3b26ca06ceb42ad563ab4002ce7ad50b10"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "typecheck.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "related.log",
+      "bytes": 14885,
+      "sha256": "875b0b1e2194071131d6a8a456285fa8e752b534c15495b14a7647e5555e75cc"
+    },
+    {
+      "path": "lint.log",
+      "bytes": 109,
+      "sha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e"
+    },
+    {
+      "path": "ci.log",
+      "bytes": 79345,
+      "sha256": "2fba22263e12f8298e6e5a04bf2a69cc7696e3bc0ae182c7f0c03208c2db4618"
+    },
+    {
+      "path": "geometry-report.json",
+      "bytes": 55196,
+      "sha256": "0bcf4acd7c8da8ecb2f738859bd848f43065daaa7be1e3c3e8e35190b0284bb7"
+    },
+    {
+      "path": "geometry.log",
+      "bytes": 6063,
+      "sha256": "8a3b370c5764ef25cd7362972b11176d4f1746927ef937b6d02789bf48526472"
+    }
+  ]
+}

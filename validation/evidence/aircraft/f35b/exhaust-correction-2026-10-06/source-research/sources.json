@@ -1,0 +1,108 @@
+{
+  "accessDate": "2026-10-06",
+  "type": "primary-source constraints; no F135 calibration claimed",
+  "sources": [
+    {
+      "id": "kathrotia2012",
+      "title": "Experimental and numerical study of chemiluminescent species in low-pressure flames",
+      "authors": "Kathrotia, Riedel, Seipel, Moshammer, Brockhinke",
+      "year": 2012,
+      "doi": "10.1007/s00340-012-5002-0",
+      "url": "https://elib.dlr.de/75430/1/Kathrotia2012apb571_manuscript.pdf",
+      "reviewed": "Sections 2, 4, 7 and Table 5; full author manuscript",
+      "domain": "Primarily methane/oxygen/argon and methane/hydrogen/oxygen/argon premixed flames at 0.05 bar; no soot model.",
+      "supports": "Separate production and radiative/collisional loss; precursor sensitivity; Table 5 radiative rates CH(A) 1.86e6/s and C2(d) 1e7/s.",
+      "doesNotSupport": "A fuel-to-visible efficiency, equal CH/C2 powers, F135 populations or external reaction distribution.",
+      "caution": "Table 5 C2 collider list does not establish nitrogen quenching. The manuscript also gives different band-averaged coefficients for experimental intensity conversion; those must not be interchanged with total electronic-state loss."
+    },
+    {
+      "id": "dlrMechanism",
+      "title": "Chemiluminescence (Kathrotia 2012)",
+      "url": "https://www.dlr.de/de/vt/ueber-uns/abteilungen/abteilung-chemische-analytik-und-kinetik/reaktionsmechanismen/chemiluminescence-kathrotia-2012",
+      "reviewed": "Official mechanism landing page",
+      "supports": "The institute offers the excited-species submechanism alone and with C1-C4 chemistry.",
+      "doesNotSupport": "Validated kerosene/F135 chemistry from bulk fuel flow alone.",
+      "implementationStatus": "Not downloaded, installed or incorporated during this audit."
+    },
+    {
+      "id": "renfro2002",
+      "title": "Cross sections for quenching of CH A2Delta, v=0, by N2 and H2O from 1740 to 2160 K",
+      "authors": "Renfro, Venkatesan, Laurendeau",
+      "year": 2002,
+      "doi": "10.1016/S1540-7489(02)80328-5",
+      "url": "https://www.sciencedirect.com/science/article/pii/S1540748902803285",
+      "reviewed": "Publisher-indexed abstract; direct open returned 403",
+      "domain": "77 atmospheric-pressure methane-based counterflow diffusion flames, 1740-2160 K.",
+      "supports": "Nitrogen quenching differs by a factor of three from an earlier extrapolated correlation; water is important too.",
+      "doesNotSupport": "Using a universal quantum yield or extrapolating a coefficient to all cold/engine conditions.",
+      "implementationStatus": "Numerical cross-section formula not adopted because its units and full applicability were not independently inspected in the full paper."
+    },
+    {
+      "id": "smith2005",
+      "title": "C2 Swan band laser-induced fluorescence and chemiluminescence in low-pressure hydrocarbon flames",
+      "authors": "Smith, Park, Schneiderman, Luque",
+      "year": 2005,
+      "doi": "10.1016/j.combustflame.2004.12.010",
+      "url": "https://www.sciencedirect.com/science/article/abs/pii/S0010218005000064",
+      "reviewed": "Publisher abstract and indexed paper sections",
+      "domain": "Low-pressure methane, ethane and ethylene premixed flames.",
+      "supports": "Measured fluorescence loss and absolute emission must be combined with ground-state kinetics to infer production.",
+      "doesNotSupport": "Equally weighted Swan bands or a universal F135 excited-state abundance."
+    },
+    {
+      "id": "brooke2013",
+      "title": "Line strengths and updated molecular constants for the C2 Swan system",
+      "authors": "Brooke, Bernath, Schmidt, Bacskay",
+      "year": 2013,
+      "doi": "10.1016/j.jqsrt.2013.02.025",
+      "url": "https://arxiv.org/abs/1212.2102",
+      "reviewed": "Author preprint metadata/abstract and author software example",
+      "companionUrl": "https://pgopher.chemistry.bristol.ac.uk/Help/c2swan.htm",
+      "supports": "Available measured/modelled line positions and Einstein A coefficients can replace arbitrary equal band energies in an offline spectral basis.",
+      "doesNotSupport": "The upper-state rotational/vibrational populations, absolute F135 source power or CH-to-C2 ratio.",
+      "implementationStatus": "Line list not downloaded or baked in this audit; per-population spectrum needs an explicit level-population model and data license/provenance."
+    },
+    {
+      "id": "nasaSoot1986",
+      "title": "Optical and probe determination of soot concentrations in a model gas turbine combustor",
+      "authors": "Eckerle, Rosfjord",
+      "year": 1986,
+      "report": "NASA-CR-175030",
+      "url": "https://ntrs.nasa.gov/citations/19860006746",
+      "reviewed": "NASA-indexed report abstract; direct page open returned 403",
+      "domain": "Generic 12.7 cm combustor; four fuels, three fuel-air ratios.",
+      "supports": "Soot loading, particle optical properties and luminous radiation were separately measured; secondary-zone oxidation depends strongly on temperature.",
+      "doesNotSupport": "This F135 opacity, spatial loading, particle temperature or AB-state multiplier."
+    },
+    {
+      "id": "aircraftSoot2011",
+      "title": "Direct Measurement of Aircraft Engine Soot Emissions Using a Cavity-Attenuated Phase Shift (CAPS)-Based Extinction Monitor",
+      "authors": "Yu and colleagues",
+      "year": 2011,
+      "doi": "10.1080/02786826.2011.592873",
+      "url": "https://digitalcommons.unl.edu/nasapub/205/",
+      "reviewed": "Author/government-work repository abstract",
+      "domain": "V2527 high-bypass turbofan at 40-80 m downstream; about 630 nm optics.",
+      "supports": "Measured idle soot emission index 225\u00b135 mg/kg and scattering albedo 0.05\u00b10.02, with distribution peaking near 60 nm mobility diameter.",
+      "doesNotSupport": "Copying an idle civil-engine measurement into F135 exit soot mass, optical depth or hot particle temperature."
+    },
+    {
+      "id": "nanosoot2020",
+      "title": "Candle flame soot sizing by planar time-resolved laser-induced incandescence",
+      "year": 2020,
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7347618/",
+      "reviewed": "Primary study results and thermal-model methods",
+      "domain": "Laser-heated soot in a candle flame; modeled primary diameters 1-105 nm.",
+      "supports": "Particle temperature is governed by a size-dependent heat balance; measured/modelled cooling is on nanosecond to microsecond scales under these conditions.",
+      "doesNotSupport": "An F135 particle cooling time or a long-lived hotter-than-gas reservoir without size, heating and transfer inputs."
+    },
+    {
+      "id": "nasaAugmentor",
+      "title": "Afterburning Jet Thrust",
+      "url": "https://www.grc.nasa.gov/www/k-12/airplane/turbab.html",
+      "reviewed": "NASA engine-layout explanation retained in preceding source audit",
+      "supports": "Augmentor fuel burns in the engine aft duct before the nozzle.",
+      "doesNotSupport": "An exterior reaction location or visible-photon fraction."
+    }
+  ]
+}

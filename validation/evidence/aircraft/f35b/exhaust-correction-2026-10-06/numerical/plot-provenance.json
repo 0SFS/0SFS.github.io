@@ -1,0 +1,7 @@
+{
+  "report": "/Users/felg/gh/0sfs/build/f135-emission-correction-2026-10-06/numerical-01/report.json",
+  "reportSha256": "b007ff53e1c65c36dfbec04a8d0ee6ef4d4bbcb726dde8aa9b06761aca239a17",
+  "scriptSha256": "e02e941809fe5b83826ab934df8ad459527bd9e172e7c879ea9335bfc0bf8478",
+  "python": "build/tools/f135-plot-python/bin/python",
+  "renderer": "Matplotlib; scientific data figures, not flight-app screenshots"
+}

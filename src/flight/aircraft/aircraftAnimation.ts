@@ -12,6 +12,7 @@ import {
 } from "@babylonjs/core";
 import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import type { AircraftId } from "./aircraftIds";
+import { bindEngineNozzleRig, type EngineNozzleRigDefinition } from "./engineNozzleRig";
 
 /**
  * Drives the model's moving parts from JSBSim.
@@ -217,6 +218,14 @@ interface RetractingGear {
   window: readonly [number, number];
   /** Intrinsic local rotations applied in order after the authored rest pose. */
   rotations?: readonly { axis: Vector3; rad: number }[];
+  /** Fixed virtual hinge, expressed in the node's authored local coordinates. */
+  pivot?: {
+    local: Vector3;
+    scaledLocal: Vector3;
+    restPosition: Vector3;
+    restOffset: Vector3;
+    posedOffset: Vector3;
+  };
 }
 
 interface GearBinding {
@@ -226,6 +235,7 @@ interface GearBinding {
   rad?: number;
   window?: readonly [number, number];
   rotations?: RetractingGear["rotations"];
+  pivot?: Vector3;
 }
 
 /** Local aperture geometry, independent of the native engine's position schedule. */
@@ -284,9 +294,10 @@ export interface AircraftRig {
   wheelBlurred: boolean;
   gear: RetractingGear[];
   /** Conversion doors and nozzle, posed from the FDM's physical actuator. */
-  stovl: (Omit<RetractingGear, "window"> & { nozzle?: boolean })[];
+  stovl: (Omit<RetractingGear, "window"> & { nozzle?: boolean; window?: readonly [number, number] })[];
   /** Variable-area petals retain their hinge origins and their vectoring parent. */
   nozzleArea: NozzlePetal[];
+  engineNozzle?: ReturnType<typeof bindEngineNozzleRig>;
   propeller: Propeller | null;
   propellerAngleRad: number;
   /** Smoothed frame interval; the sampling rate the blades are judged against. */
@@ -306,6 +317,7 @@ export interface BindRigOptions {
   aircraftId?: AircraftId;
   /** Another asset can supply aperture hinges without an airframe-specific animation branch. */
   nozzleAreaBindings?: readonly NozzleAreaBinding[];
+  engineNozzle?: EngineNozzleRigDefinition;
 }
 
 /** Hysteresis, so a propeller sitting on the threshold does not flicker. */
@@ -549,12 +561,18 @@ const F35B_GEAR_BINDINGS: readonly GearBinding[] = [
 ];
 // Lift-system quarter-turn end poses remain development poses; the source
 // has no keyframes or verified travel limits for those assemblies.
-const F35B_STOVL_BINDINGS = [
+const F35B_STOVL_BINDINGS: readonly GearBinding[] = [
   { name: "topLiftDoor", axis: SPAN_AXIS, sign: 1 },
   { name: "leftLiftDoor", axis: LOCAL_FORE_AXIS, sign: 1 },
   { name: "rightLiftDoor", axis: LOCAL_FORE_AXIS, sign: -1 },
-  { name: "leftEngineDoor", axis: LOCAL_FORE_AXIS, sign: 1 },
-  { name: "rightEngineDoor", axis: LOCAL_FORE_AXIS, sign: -1 },
+  // Clear the articulated duct before its main travel. This geometric
+  // sequencing is provisional; it does not change native nozzle commands.
+  // A 6 cm outboard virtual hinge clears both the duct and the fuselage at
+  // the original 90° opening without moving the closed mesh. Local source
+  // units include the conversion root's .83305745 scale. This is an asset
+  // fit, not measured PW-600 door geometry; see the reconstruction evidence.
+  { name: "leftEngineDoor", axis: LOCAL_FORE_AXIS, sign: 1, window: [0, .25], pivot: new Vector3(-.07202384233474732, 0, 0) },
+  { name: "rightEngineDoor", axis: LOCAL_FORE_AXIS, sign: -1, window: [0, .25], pivot: new Vector3(.07202384233474732, 0, 0) },
   { name: "leftExhaustDoor", axis: LOCAL_FORE_AXIS, sign: -1 },
   { name: "rightExhaustDoor", axis: LOCAL_FORE_AXIS, sign: 1 },
   { name: "vtol", axis: SPAN_AXIS, sign: 1 },
@@ -648,9 +666,18 @@ export function bindAircraftRig(
   if (f35b) for (const binding of F35B_STOVL_BINDINGS) {
     const node = byName.get(binding.name);
     if (!node) continue;
+    const rest = restRotation(node);
+    const scaledLocal = binding.pivot?.multiply(node.scaling);
+    const restOffset = Vector3.Zero();
+    scaledLocal?.rotateByQuaternionToRef(rest, restOffset);
     stovl.push({
-      node, rest: restRotation(node), axis: binding.axis, sign: binding.sign,
-      rad: GEAR_RETRACT_RAD, nozzle: binding.name === "vtol",
+      node, rest, axis: binding.axis, sign: binding.sign,
+      rad: binding.rad ?? GEAR_RETRACT_RAD, nozzle: binding.name === "vtol",
+      window: binding.window,
+      ...(binding.pivot && scaledLocal ? { pivot: {
+        local: binding.pivot, scaledLocal, restPosition: node.position.clone(),
+        restOffset, posedOffset: Vector3.Zero(),
+      } } : {}),
     });
     bound.push(binding.name);
   }
@@ -690,6 +717,7 @@ export function bindAircraftRig(
     gear,
     stovl,
     nozzleArea,
+    engineNozzle: options.engineNozzle ? bindEngineNozzleRig(nodes, options.engineNozzle) : undefined,
     propeller: propNode
       ? { node: propNode, rest: restRotation(propNode), disc, discFromMesh: baked !== null, blades }
       : null,
@@ -835,7 +863,8 @@ export function applyAircraftRig(
   const conversion = Number.isFinite(conversionPosition)
     ? Math.min(1, Math.max(0, conversionPosition)) : 0;
   for (const part of rig.stovl) {
-    const angle = conversion * part.rad * part.sign;
+    const travel = part.window ? Math.max(0, Math.min(1, (conversion - part.window[0]) / (part.window[1] - part.window[0]))) : conversion;
+    const angle = travel * part.rad * part.sign;
     if (part.nozzle) {
       const pitch = Number.isFinite(state.nozzlePitchRad) ? state.nozzlePitchRad! : angle;
       const yaw = Number.isFinite(state.nozzleYawRad) ? state.nozzleYawRad! : 0;
@@ -847,6 +876,11 @@ export function applyAircraftRig(
     } else {
       part.node.rotationQuaternion = part.rest.multiply(Quaternion.RotationAxis(part.axis, angle));
     }
+    if (part.pivot) {
+      const pivot = part.pivot;
+      pivot.scaledLocal.rotateByQuaternionToRef(part.node.rotationQuaternion, pivot.posedOffset);
+      part.node.position.copyFrom(pivot.restPosition).addInPlace(pivot.restOffset).subtractInPlace(pivot.posedOffset);
+    }
   }
   if (Number.isFinite(state.nozzlePositionNorm)) {
     const aperture = Math.min(1, Math.max(0, state.nozzlePositionNorm!));
@@ -857,6 +891,7 @@ export function applyAircraftRig(
   }
   // Missing telemetry leaves the authored/last observed pose; no display-time
   // actuator invents travel while physics is paused, resetting or unavailable.
+  rig.engineNozzle?.update(state.nozzlePitchRad, state.nozzleYawRad, state.nozzlePositionNorm);
   applyWheels(rig, state, deltaSeconds, held);
 
   const propeller = rig.propeller;

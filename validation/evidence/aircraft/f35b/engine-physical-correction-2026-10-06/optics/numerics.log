@@ -1,0 +1,45 @@
+{
+  "output": "/Users/felg/gh/0sfs/build/validation/f135-physical-optics/2026-10-06_142441",
+  "success": true,
+  "interpolation": [
+    {
+      "kind": "gas",
+      "sampleCount": 512,
+      "testedTemperatures": 513,
+      "maximumYError": 0.003278081981340941,
+      "maximumRgbErrorRelativeToPeak": 0.0032780819813408727,
+      "worstKelvin": 300,
+      "reference": "independent frequency Planck; 0.25 nm trapezoid with interpolated CIE"
+    },
+    {
+      "kind": "solid",
+      "sampleCount": 512,
+      "testedTemperatures": 513,
+      "maximumYError": 0.003278081980822911,
+      "maximumRgbErrorRelativeToPeak": 0.003278081980822934,
+      "worstKelvin": 300,
+      "reference": "independent frequency Planck; 0.25 nm trapezoid with interpolated CIE"
+    }
+  ],
+  "baselineComparison": {
+    "baselinePath": "validation/evidence/aircraft/f35b/engine-rebuild-2026-10-06/implementation/optics/f135-exhaust-lut.manifest.json",
+    "kelvin": 400,
+    "previousPeakNormalizedRgbMaximum": 1,
+    "previousIndependentRelativeEmissionPerMeter": 0.03666666666666667,
+    "revisedSourceRgbCdPerM3": [
+      1.5458083240575464e-15,
+      0,
+      0
+    ],
+    "revisedOneMeterRadianceRgbCdPerM2": [
+      1.5266457403326585e-15,
+      0,
+      0
+    ],
+    "previousHasFuelInputOrPhysicalPowerBound": false,
+    "revisedMissingFuelSuppressed": true,
+    "interpretation": "Prior normalized gas has no SI conversion, so no physical brightness ratio is claimed. A nonzero guessed 400 K display row and no fuel-source bound fail the new cold/source criteria. The endpoint at 300 K happened to be zero because its separate envelope was zero."
+  },
+  "maxSpectralError": 1.4210854715202004e-14,
+  "maxBolometricError": 3.2494673618543857e-11
+}

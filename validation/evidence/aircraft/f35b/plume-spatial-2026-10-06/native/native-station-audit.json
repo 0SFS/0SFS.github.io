@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-06",
+  "nativeCommit": "97fe6ddf1c8a7d9e10dad46a88e60e79e69fae28",
+  "sdk": {
+    "name": "@felipegalind0/jsbsim",
+    "version": "1.2.4-fork.16"
+  },
+  "nativeChanges": false,
+  "packageChanges": false,
+  "aircraftXmlChanges": false,
+  "scope": "Installed native observations and interpretation of available flow inputs; no new native flow or downstream dynamics.",
+  "sourceOwnership": "JSBSim owns engine/thermal dynamics. 0sfs only records native observations and evaluates the frozen optical baseline.",
+  "properties": [
+    {
+      "name": "propulsion/engine/egt-degc",
+      "unit": "degC",
+      "meaning": "Existing generic turbine EGT proxy. Running schedule is TAT_c + 363.1 + N2norm*357.1; phase-specific start/off logic differs. Not a measured F135 station temperature."
+    },
+    {
+      "name": "propulsion/engine/thermal/nozzle-gas-temperature-k",
+      "unit": "K",
+      "meaning": "Constant-effective-cp mixture enthalpy proxy: base EGT plus current actual AB heat addition; supplied excess fuel mass appears in the denominator. No kinetic energy, static/total transformation or spatial field is solved."
+    },
+    {
+      "name": "propulsion/engine/thermal/afterburner-fuel-flow-kg-sec",
+      "unit": "kg/s",
+      "meaning": "Actual augmentation-gated excess above estimated dry demand; not injector-resolved fuel mass."
+    },
+    {
+      "name": "propulsion/engine/thermal/afterburner-burned-fuel-flow-kg-sec",
+      "unit": "kg/s",
+      "meaning": "Heat-releasing subset limited by declared remaining oxygen capacity. This is an algebraic instantaneous cap, not transported chemical composition."
+    },
+    {
+      "name": "propulsion/tat-c, propulsion/pt-lbs_sqft",
+      "unit": "degC, lbf/ft2",
+      "meaning": "Incoming aircraft total-air temperature and pressure inputs, not turbine/nozzle exit stagnation conditions."
+    },
+    {
+      "name": "propulsion/engine/nozzle-pos-norm",
+      "unit": "dimensionless",
+      "meaning": "Generic scheduled actuator observation. Its visual A8/A9 linkage is an uncalibrated geometric hypothesis."
+    },
+    {
+      "name": "propulsion/engine/n1, propulsion/engine/n2",
+      "unit": "percent",
+      "meaning": "Spool speed. Neither is gas temperature, mixture composition, exit Mach nor exhaust velocity."
+    },
+    {
+      "name": "propulsion/engine/fuel-flow-rate-pps",
+      "unit": "lb/s",
+      "meaning": "Native fuel flow. The app converts using 0.45359237 kg/lb. It decays during Off(), so a fuel/N2-derived visual-active flag can outlast native set-running."
+    }
+  ],
+  "flowProxy": {
+    "expression": "120*(N2/100)^2*(pt_lbf_ft2/2116.22)*sqrt(288.15/TAT_K)",
+    "unit": "kg/s",
+    "source": "F135 XML thermal/gas-mass-flow-kg-sec function",
+    "publishedProperty": false,
+    "diagnosticOnly": true,
+    "dry99AndPoweredLiftKgSec": 115.83348372656,
+    "sustainedAbKgSec": 116.76574140599,
+    "limitation": "An imposed reference-flow schedule. It supplies no independent pressure, velocity, species fractions or mass-conserving plume transport."
+  },
+  "unavailableExitState": [
+    "Nozzle-exit static pressure",
+    "Nozzle-exit total pressure",
+    "Nozzle-exit total/static station distinction",
+    "Exit Mach and velocity",
+    "Calibrated nozzle discharge coefficient or branch selection",
+    "Particle temperature and loading",
+    "Species/reaction progress and lifetime",
+    "Downstream transport, finite plume inventory or entrainment state"
+  ],
+  "epr": {
+    "nativeImplementation": "FGTurbine::Run uses 1 + bleed-scaled model dry thrust/MilThrust in its dry branch; no independent pressure solution. EPR is not exposed in the installed property catalog.",
+    "decision": "Do not treat this thrust-derived internal value as a measured nozzle pressure ratio."
+  },
+  "gasBudget": {
+    "cpJkgK": 1150,
+    "LHVJkg": 43300000,
+    "efficiency": 0.95,
+    "referenceK": 298.15,
+    "stoichiometricFuelAirRatio": 0.068,
+    "sustainedAbSuppliedKgSec": 6.112872855476447,
+    "sustainedAbBurnedKgSec": 4.780720234907427,
+    "sustainedAbDifferenceKgSec": 1.33215262056902,
+    "limitation": "The algebraic unburned difference is not evidence of exterior reaction or a transported fuel plume. No exterior burning is added to force dry or AB visibility."
+  },
+  "staticTotalInterpretation": {
+    "finding": "The code never establishes whether this imposed gas bath is a local static or stagnation temperature at a calibrated station. It must not be silently labeled a measured exit temperature.",
+    "quasiSteadyAllowance": "A profile may explicitly hypothesize a station-to-exit mapping and mixing field, with stated Mach/gamma uncertainty. This is an optical boundary approximation, not a newly solved native engine state. Avoid applying an expansion correction while claiming the input already is exit static temperature.",
+    "physics": "For a calorically perfect isentropic gas T/Tt=1/(1+(gamma-1)M^2/2). Compression shocks can raise static T while retaining total T in an adiabatic no-work shock; neither fact supplies F135 shock locations or permits arbitrary temperature peaks.",
+    "noGlowInference": "An assumed expansion generally lowers the particle/gas thermal boundary. It does not explain a brighter dry plume by itself; hotter dry particles, species populations or exterior reactions require separate evidence."
+  },
+  "transportInterpretation": {
+    "nativeObservation": "At the first accepted AB cutoff step, burned AB fuel becomes zero and gas proxy returns to the dry bath, while solids retain heat and total fuel ramps down. No native gas travel time is present.",
+    "quasiSteady": "An instantaneous spatial field can follow this boundary as a quasi-steady approximation. It must not claim advected downstream persistence or replace the missing gas inventory with an arbitrary render-time fade.",
+    "phaseTimes": "Dense 120 Hz samples resolve the first three seconds of AB onset/cutoff, one second of shutdown and five seconds of powered-lift conversion."
+  },
+  "sources": [
+    {
+      "title": "NASA Glenn: isentropic flow relations",
+      "url": "https://www.grc.nasa.gov/www/k-12/airplane/isentrop.html",
+      "consulted": "2026-10-06",
+      "scope": "Static/total distinction and ideal-gas relation only; no F135 calibration."
+    },
+    {
+      "title": "NASA Glenn: normal shock equations",
+      "url": "https://www.grc.nasa.gov/www/k-12/airplane/normal.html",
+      "consulted": "2026-10-06",
+      "scope": "Static changes versus retained total temperature across an adiabatic no-work shock; no plume shock placement."
+    },
+    {
+      "title": "NASA Glenn: afterburning jet thrust",
+      "url": "https://www.grc.nasa.gov/www/k-12/airplane/turbab.html",
+      "consulted": "2026-10-06",
+      "scope": "Afterburner adds fuel to turbine exhaust upstream of nozzle discharge; no F135 species or exterior reaction distribution."
+    },
+    {
+      "title": "Native FGTurbine.cpp",
+      "repository": "https://github.com/Felipegalind0/jsbsim",
+      "commit": "97fe6ddf1c8a7d9e10dad46a88e60e79e69fae28",
+      "path": "src/models/propulsion/FGTurbine.cpp",
+      "sections": [
+        "Run",
+        "Off",
+        "UpdateThermal",
+        "bindmodel"
+      ]
+    },
+    {
+      "title": "Current aircraft thermal profile",
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+      "sha256": "04cea10d3c135cb79247bbf7794a81359070e2bdc9afc9782502b538444eac16"
+    }
+  ]
+}

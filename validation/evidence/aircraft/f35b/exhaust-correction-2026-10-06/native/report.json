@@ -1,0 +1,428 @@
+{
+  "schemaVersion": 1,
+  "status": "native-audit-and-reduced-contract-proposal",
+  "date": "2026-10-06",
+  "scriptSha256": "f8c3cb9c72f262d94f9481dbb1af46c114baf6c65147316b825d63623e0b2c4b",
+  "nativeRevision": "97fe6ddf1c8a7d9e10dad46a88e60e79e69fae28",
+  "nativeDirty": "",
+  "installedArtifact": {
+    "schemaVersion": 1,
+    "identity": {
+      "schemaVersion": 2,
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.16"
+      },
+      "native": {
+        "origin": "https://github.com/Felipegalind0/jsbsim",
+        "commit": "97fe6ddf1c8a7d9e10dad46a88e60e79e69fae28",
+        "contentSha256": "a360665b71ec7e70f1ed3c0636b8a150c63b40108b2e87b62a76ca89370a124b",
+        "dirty": false
+      },
+      "sdk": {
+        "commit": "97fe6ddf1c8a7d9e10dad46a88e60e79e69fae28",
+        "contentSha256": "9f5a9dc1ee239ffbbd2ecd1c60a596d6d791a031494e4e326f76dfffce12353a",
+        "dirty": false,
+        "path": "wasm"
+      },
+      "build": {
+        "mode": "in-tree",
+        "inputSha256": "b2206897753d2c4a62d646a544d022426acc9b5cec34efcd39a43f880d4e756c",
+        "toolchain": {
+          "node": "v26.8.2",
+          "npm": "11.19.1",
+          "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+          "cmake": "cmake version 4.4.3",
+          "clang": "clang version 24.0.0git",
+          "platform": "darwin",
+          "arch": "arm64",
+          "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+        },
+        "options": {
+          "buildType": "Release",
+          "cxxStandard": 17,
+          "sdkTarget": "es2022"
+        }
+      }
+    },
+    "files": {
+      "index.d.ts": "b4ec3f5dd4ff2583a81a4ed5ee28a0031730e78a4f3520e533c8deb3c5f3006b",
+      "index.js": "a3c840d269684809f0263710a7e8f1ad67e0c7698322472d8d21aeb5b7b4678f",
+      "index.js.map": "019562edab7ce784ff8fbd0dce92f56ceed6ad85f1b6f1acffe618aecb638d41",
+      "licenses/README.txt": "4a42a0f62e7d630a0861561209143f0d90809518c1ec95f0e513d6c175ee09ce",
+      "licenses/jsbsim/AUTHORS": "ca8556894da80f81f773893a9c1009021aac2972d7bb6a39c2f981b4fd00aa9a",
+      "licenses/jsbsim/COPYING": "1e7e6bae5a5bde32f1ae5a7c37a082d1ab03cf89354f7f936ac40be9e39a6531",
+      "licenses/jsbsim/src/GeographicLib/LICENSE.txt": "90d25298be0c5d7f5219ae20009d18910150b3a4ea0ca86dda5df04cfb8d3823",
+      "licenses/jsbsim/src/simgear/xml/COPYING": "8c6b5b6de8fae20b317f4992729abc0e520bfba4c7606cd1e9eeb87418eebdec",
+      "licenses/sdk-LICENSE": "15e2d343fc930439fb82351d7c30f3d151b4c42ca3132c13ff1a60da527a1259",
+      "wasm.d.ts": "b7bbbab6f5e6b0b297dfeff117351e53d4d8598fecde7e805ea9aee7b2923353",
+      "wasm.js": "758d98989301d86ec3aa589fa851d6416b305eca58bb1e6b9579780ea339e09b",
+      "wasm.js.map": "d75a89efd5b3cf07ebfbe70d321f55c01bd8cdde1be50a15d1dcfad21a7ca763",
+      "wasm/jsbsim_wasm.mjs": "da4278fc1c03249e2b5da838425d8e46c80e792a51b6892a8e8910c44605e806",
+      "wasm/jsbsim_wasm.wasm": "80cf2596dd4d13bc39c8058fc791d73188059d82001b9de0ba0b7cce16c98a86"
+    },
+    "validation": {
+      "status": "passed",
+      "commands": [
+        "tsc --noEmit (frozen SDK workspace)",
+        "node --test --test-concurrency=5 test/*.test.mjs (frozen SDK workspace and resolved native fixtures)"
+      ]
+    },
+    "packageArchive": {
+      "path": "deps/felipegalind0-jsbsim-1.2.4-fork.16.tgz",
+      "sha256": "98ee9387c57b871a3851aac83b5eb3a4f858d618e12a2fb9b59eaa0c59dbf61b",
+      "integrity": "sha512-nxw9q31sDAit/27ckXz0eUmsZYDY5bZtLVjTIHXCIXHT2Xnjtj/UebiSlRGNnbjdcNQPZbox0WcSQSAxcDxKfg=="
+    }
+  },
+  "sources": [
+    {
+      "owner": "native",
+      "file": "src/models/propulsion/FGTurbine.cpp",
+      "sha256": "5a51543d54589c0467c8f492abd86ca1025401d4bc5de4bdb542d10be6ac90a3",
+      "snapshot": "0-native-FGTurbine.cpp.txt"
+    },
+    {
+      "owner": "native",
+      "file": "src/models/propulsion/FGTurbine.h",
+      "sha256": "20c4393a023df1906d7e4aa92ca29f76e236c4923b7e4436bd1f64e33beb64cf",
+      "snapshot": "1-native-FGTurbine.h.txt"
+    },
+    {
+      "owner": "native",
+      "file": "doc/turbine-thermal-model.md",
+      "sha256": "a8205d2bd136d4515f004d8fe2f558ad4661190f2e908fcfe8858e2ea6865afc",
+      "snapshot": "2-native-turbine-thermal-model.md.txt"
+    },
+    {
+      "owner": "app",
+      "file": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+      "sha256": "04cea10d3c135cb79247bbf7794a81359070e2bdc9afc9782502b538444eac16",
+      "snapshot": "3-app-F135-PW-600.xml.txt"
+    },
+    {
+      "owner": "app",
+      "file": "public/jsbsim-data/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml",
+      "sha256": "638f1c1100e2cc85778d7498b6ae59dd552cf592c6dfab534f33a6f3b24217b8",
+      "snapshot": "4-app-F-35B-jsbsim.xml.txt"
+    },
+    {
+      "owner": "app",
+      "file": "validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/trace.csv",
+      "sha256": "6c11afe6f6f9abdef19ee4a3265b7c35087b956a37bc03b2c046da70bcf957e2",
+      "snapshot": "5-app-trace.csv.txt"
+    },
+    {
+      "owner": "app",
+      "file": "validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/report.json",
+      "sha256": "21b8d101a27c836bf96c035b0690d60173515edc85b91ea31e43bf943de1de65",
+      "snapshot": "6-app-report.json.txt"
+    },
+    {
+      "owner": "app",
+      "file": "validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/property-catalog.txt",
+      "sha256": "de7f7ce99a99c6c99a0786ba61e8aeb580781c1d4971c3079a49b5117ede51a8",
+      "snapshot": "7-app-property-catalog.txt.txt"
+    },
+    {
+      "owner": "app",
+      "file": "validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/spatial-optics/source-0-f135-exhaust-lut.manifest.json.txt",
+      "sha256": "3da9c058348d432aca82b1f4f6a5b95163abe7484ae74e9d3cdec2e024e7e7c4",
+      "snapshot": "8-app-source-0-f135-exhaust-lut.manifest.json.txt.txt"
+    }
+  ],
+  "rowsChecked": 4171,
+  "nativeRerun": false,
+  "nativeSourceModified": false,
+  "wasmBuild": false,
+  "reconstruction": {
+    "maximumTemperatureReconstructionErrorK": 1.1368683772161603e-13,
+    "maximumBurnedFuelReconstructionErrorKgSec": 2.6645352591003757e-15
+  },
+  "temperatureContract": {
+    "observer": "propulsion/engine[0]/thermal/nozzle-gas-temperature-k",
+    "unit": "K",
+    "meaning": "Imposed constant-cp gas-bath enthalpy-mixture proxy; named nozzle observer does not establish a calibrated nozzle station",
+    "base": "Configured base-gas-temperature-k or generic legacy EGT + 273.15 K; F135 uses fallback",
+    "gasTimeIntegration": false,
+    "includesKineticEnergyConversion": false,
+    "includesShaftWork": false,
+    "calibratedStaticTemperature": false,
+    "calibratedTotalTemperature": false,
+    "activeOpticalContractProposal": "Use this imposed bath as an explicit optical particle-bath hypothesis without another expansion transform; never rename it static exit temperature"
+  },
+  "stationCases": [
+    {
+      "name": "idle",
+      "timeS": 92.51666666668636,
+      "phaseTimeS": 60,
+      "mode": "dry",
+      "gasBathProxyK": 649.5991319989687,
+      "legacyEgtK": 649.5991319989687,
+      "totalFuelKgSec": 0.3250735484001666,
+      "suppliedAbKgSec": 0,
+      "burnedAbKgSec": 0,
+      "incomingDryFlowProxyKgSec": 42.03566690614074,
+      "nativeNozzlePosition": 1,
+      "authoredVisualExitAreaM2": 1.0080083129331545,
+      "oldAssumedMach": 0.8,
+      "oldExpandedTemperatureK": 587.5534840801091,
+      "conditionalNotObserved": {
+        "gasConstantJPerKgK": 285.3383458646617,
+        "velocityMetersPerSecond": 377.7631403583162,
+        "staticPressurePa": 18507.24581732853,
+        "pressureToStandAmbientRatio": 0.18825128509949474
+      }
+    },
+    {
+      "name": "dry99",
+      "timeS": 212.51666666663772,
+      "phaseTimeS": 120,
+      "mode": "dry",
+      "gasBathProxyK": 1003.1281319989318,
+      "legacyEgtK": 1003.1281319989318,
+      "totalFuelKgSec": 2.902623743163389,
+      "suppliedAbKgSec": 0,
+      "burnedAbKgSec": 0,
+      "incomingDryFlowProxyKgSec": 115.83348372649053,
+      "nativeNozzlePosition": 0.01000000000000012,
+      "authoredVisualExitAreaM2": 0.505376278459852,
+      "oldAssumedMach": 0.8,
+      "oldExpandedTemperatureK": 907.3156041958499,
+      "conditionalNotObserved": {
+        "gasConstantJPerKgK": 285.3383458646617,
+        "velocityMetersPerSecond": 469.4345683341695,
+        "staticPressurePa": 126404.55301744526,
+        "pressureToStandAmbientRatio": 1.2857569290886655
+      }
+    },
+    {
+      "name": "firstAb",
+      "timeS": 212.52499999997104,
+      "phaseTimeS": 0.008333333333333333,
+      "mode": "afterburner",
+      "gasBathProxyK": 1004.7625564094402,
+      "legacyEgtK": 1004.7625564094402,
+      "totalFuelKgSec": 2.9089236371911666,
+      "suppliedAbKgSec": 0,
+      "burnedAbKgSec": 0,
+      "incomingDryFlowProxyKgSec": 116.25970852823797,
+      "nativeNozzlePosition": 0.012089729084733561,
+      "authoredVisualExitAreaM2": 0.506239126339691,
+      "oldAssumedMach": 1.1,
+      "oldExpandedTemperatureK": 837.5464147121578,
+      "conditionalNotObserved": {
+        "gasConstantJPerKgK": 285.3383458646617,
+        "velocityMetersPerSecond": 620.1589521273957,
+        "staticPressurePa": 88499.23727227759,
+        "pressureToStandAmbientRatio": 0.9001931087576307
+      }
+    },
+    {
+      "name": "onset",
+      "timeS": 212.74999999997084,
+      "phaseTimeS": 0.23333333333333334,
+      "mode": "afterburner",
+      "gasBathProxyK": 1034.445401445685,
+      "legacyEgtK": 1006.6991319989319,
+      "totalFuelKgSec": 3.050671252816171,
+      "suppliedAbKgSec": 0.09247819972895266,
+      "burnedAbKgSec": 0.09247819972895266,
+      "incomingDryFlowProxyKgSec": 116.76574140587502,
+      "nativeNozzlePosition": 0.19208972908473346,
+      "authoredVisualExitAreaM2": 0.5837805536831635,
+      "oldAssumedMach": 1.1,
+      "oldExpandedTemperatureK": 862.2893355942858,
+      "conditionalNotObserved": {
+        "gasConstantJPerKgK": 285.3383458646617,
+        "velocityMetersPerSecond": 629.2526928493975,
+        "staticPressurePa": 78270.42873056233,
+        "pressureToStandAmbientRatio": 0.7961481108134772
+      }
+    },
+    {
+      "name": "sustainedAb",
+      "timeS": 272.51666666658315,
+      "phaseTimeS": 60,
+      "mode": "afterburner",
+      "gasBathProxyK": 2363.1028843899676,
+      "legacyEgtK": 1006.6991319989909,
+      "totalFuelKgSec": 9.071065908566188,
+      "suppliedAbKgSec": 6.112872855476447,
+      "burnedAbKgSec": 4.780720234907427,
+      "incomingDryFlowProxyKgSec": 116.76574140598927,
+      "nativeNozzlePosition": 1,
+      "authoredVisualExitAreaM2": 1.0080083129331545,
+      "oldAssumedMach": 1.1,
+      "oldExpandedTemperatureK": 1969.8269365147896,
+      "conditionalNotObserved": {
+        "gasConstantJPerKgK": 285.3383458646617,
+        "velocityMetersPerSecond": 951.0702813740471,
+        "staticPressurePa": 72042.33679059662,
+        "pressureToStandAmbientRatio": 0.7327974468084616
+      }
+    },
+    {
+      "name": "firstCutoff",
+      "timeS": 272.5249999999165,
+      "phaseTimeS": 0.008333333333333333,
+      "mode": "dry",
+      "gasBathProxyK": 1003.1281319989909,
+      "legacyEgtK": 1003.1281319989909,
+      "totalFuelKgSec": 9.071065908566188,
+      "suppliedAbKgSec": 0,
+      "burnedAbKgSec": 0,
+      "incomingDryFlowProxyKgSec": 115.83348372660386,
+      "nativeNozzlePosition": 1,
+      "authoredVisualExitAreaM2": 1.0080083129331545,
+      "oldAssumedMach": 0.8,
+      "oldExpandedTemperatureK": 907.3156041959033,
+      "conditionalNotObserved": {
+        "gasConstantJPerKgK": 285.3383458646617,
+        "velocityMetersPerSecond": 469.4345683341833,
+        "staticPressurePa": 63374.341029505194,
+        "pressureToStandAmbientRatio": 0.644628663761665
+      }
+    },
+    {
+      "name": "poweredLift",
+      "timeS": 117.5250000000396,
+      "phaseTimeS": 90,
+      "mode": "dry",
+      "gasBathProxyK": 1003.1281319989688,
+      "legacyEgtK": 1003.1281319989688,
+      "totalFuelKgSec": 4.420049982197244,
+      "suppliedAbKgSec": 0,
+      "burnedAbKgSec": 0,
+      "incomingDryFlowProxyKgSec": 115.83348372656143,
+      "nativeNozzlePosition": 0.01000000000000012,
+      "authoredVisualExitAreaM2": 0.505376278459852,
+      "oldAssumedMach": 0.8,
+      "oldExpandedTemperatureK": 907.3156041958833,
+      "conditionalNotObserved": {
+        "gasConstantJPerKgK": 285.3383458646617,
+        "velocityMetersPerSecond": 469.43456833417815,
+        "staticPressurePa": 126404.55301752496,
+        "pressureToStandAmbientRatio": 1.2857569290886066
+      }
+    }
+  ],
+  "flagOnly": {
+    "heldGasBathProxyK": 1003.1281319989318,
+    "heldBurnedAbFuelKgSec": 0,
+    "oldOpticalDryTemperatureK": 907.3156041958499,
+    "oldOpticalAbTemperatureK": 836.1839969982343,
+    "oldOpticalAbMinusDryTemperatureK": -71.13160719761561,
+    "nativeGasTemperatureChangeAtZeroExcessFuelK": 0,
+    "nativeOptionalWallFlameExchangeJumpW": 2319.4646232413043,
+    "nativeFlameScope": "Configured grey wall exchange gated by native augmentation; not emitted plume power or a chemical species population",
+    "oldParticleExtinctionPerMeter": {
+      "dry": 0.025,
+      "afterburner": 0.08
+    },
+    "oldParticleFuelPowerFraction": {
+      "dry": 0.003,
+      "afterburner": 0.015
+    }
+  },
+  "dryStovl": {
+    "sameSpoolAndInletMeansSameGasProxy": true,
+    "dryGasProxyK": 1003.1281319989318,
+    "poweredLiftGasProxyK": 1003.1281319989688,
+    "dryFuelKgSec": 2.902623743163389,
+    "poweredLiftFuelKgSec": 4.420049982197244,
+    "publishedLiftFanShaftPowerHp": 29000,
+    "publishedLiftFanShaftPowerW": 21625296.27588584,
+    "illustrativeTemperatureEquivalentK": 162.34170683912535,
+    "limitation": "Shaft power rating is not this operating point. Temperature equivalent is only dimensional scale; do not subtract it from a proxy with no calibrated upstream station. Existing thrust/fuel surrogates are not an enthalpy balance."
+  },
+  "observedEngineProperties": [
+    "propulsion/engine/IdleThrust (R)",
+    "propulsion/engine/MilThrust (R)",
+    "propulsion/engine/AugThrust (R)",
+    "propulsion/engine/x-reference-position (R)",
+    "propulsion/engine/y-reference-position (R)",
+    "propulsion/engine/z-reference-position (R)",
+    "propulsion/engine/x-position (RW)",
+    "propulsion/engine/y-position (RW)",
+    "propulsion/engine/z-position (RW)",
+    "propulsion/engine/body-force-x-lbs (R)",
+    "propulsion/engine/body-force-y-lbs (R)",
+    "propulsion/engine/body-force-z-lbs (R)",
+    "propulsion/engine/pitch-angle-rad (RW)",
+    "propulsion/engine/yaw-angle-rad (RW)",
+    "propulsion/engine/reverser-angle-rad (RW)",
+    "propulsion/engine/set-running (RW)",
+    "propulsion/engine/thrust-lbs (R)",
+    "propulsion/engine/fuel-flow-rate-pps (R)",
+    "propulsion/engine/fuel-flow-rate-gph (R)",
+    "propulsion/engine/fuel-used-lbs (R)",
+    "propulsion/engine/n1 (RW)",
+    "propulsion/engine/n2 (RW)",
+    "propulsion/engine/egt-degc (R)",
+    "propulsion/engine/augmentation (R)",
+    "propulsion/engine/nozzle-pos-norm (R)",
+    "propulsion/engine/injection_cmd (RW)",
+    "propulsion/engine/seized (RW)",
+    "propulsion/engine/stalled (RW)",
+    "propulsion/engine/bleed-factor (RW)",
+    "propulsion/engine/MaxN1 (RW)",
+    "propulsion/engine/MaxN2 (RW)",
+    "propulsion/engine/InjectionTimer (RW)",
+    "propulsion/engine/InjWaterNorm (RW)",
+    "propulsion/engine/InjN1increment (RW)",
+    "propulsion/engine/InjN2increment (RW)",
+    "propulsion/engine/atsfc (R)",
+    "propulsion/engine/tsfc (R)",
+    "propulsion/engine/thermal/nozzle-gas-temperature-k (R)",
+    "propulsion/engine/thermal/metal-temperature-k (R)",
+    "propulsion/engine/thermal/metal-temperature-state-k (RW)",
+    "propulsion/engine/thermal/initialized (R)",
+    "propulsion/engine/thermal/valid (R)",
+    "propulsion/engine/thermal/afterburner-fuel-flow-kg-sec (R)",
+    "propulsion/engine/thermal/afterburner-burned-fuel-flow-kg-sec (R)",
+    "propulsion/engine/thermal/gas-bath-temperature-k (R)",
+    "propulsion/engine/thermal/coolant-bath-temperature-k (R)",
+    "propulsion/engine/thermal/surroundings-bath-temperature-k (R)",
+    "propulsion/engine/thermal/heat-capacity-j-k (R)",
+    "propulsion/engine/thermal/gas-heat-flow-w (R)",
+    "propulsion/engine/thermal/coolant-heat-flow-w (R)",
+    "propulsion/engine/thermal/surroundings-radiation-heat-flow-w (R)",
+    "propulsion/engine/thermal/flame-radiation-heat-flow-w (R)",
+    "propulsion/engine/thermal/net-heat-flow-w (R)",
+    "propulsion/engine/thermal/step-seconds (R)",
+    "propulsion/engine/thermal/step-stored-energy-j (R)",
+    "propulsion/engine/thermal/step-heat-transfer-j (R)",
+    "propulsion/engine/thermal/step-energy-residual-j (R)",
+    "propulsion/engine/thermal/initialization-energy-j (R)",
+    "propulsion/engine/thermal/heat-balance-valid (R)",
+    "propulsion/engine/thermal/core/gas-bath-temperature-k (R)",
+    "propulsion/engine/thermal/core/coolant-bath-temperature-k (R)",
+    "propulsion/engine/thermal/core/surroundings-bath-temperature-k (R)",
+    "propulsion/engine/thermal/core/heat-capacity-j-k (R)",
+    "propulsion/engine/thermal/core/gas-heat-flow-w (R)",
+    "propulsion/engine/thermal/core/coolant-heat-flow-w (R)",
+    "propulsion/engine/thermal/core/surroundings-radiation-heat-flow-w (R)",
+    "propulsion/engine/thermal/core/flame-radiation-heat-flow-w (R)",
+    "propulsion/engine/thermal/core/net-heat-flow-w (R)",
+    "propulsion/engine/thermal/core/step-seconds (R)",
+    "propulsion/engine/thermal/core/step-stored-energy-j (R)",
+    "propulsion/engine/thermal/core/step-heat-transfer-j (R)",
+    "propulsion/engine/thermal/core/step-energy-residual-j (R)",
+    "propulsion/engine/thermal/core/initialization-energy-j (R)",
+    "propulsion/engine/thermal/core/heat-balance-valid (R)",
+    "propulsion/engine/thermal/core/metal-temperature-k (R)",
+    "propulsion/engine/thermal/core/metal-temperature-state-k (RW)",
+    "propulsion/engine/thermal/core/initialized (R)"
+  ],
+  "unavailable": [
+    "calibrated nozzle inlet total temperature and pressure",
+    "solved exhaust mass flow",
+    "physical throat/exit area linked to native thermodynamics",
+    "nozzle exit static pressure/temperature/velocity",
+    "shaft extraction power and core/bypass split",
+    "reacting species concentrations and source/loss rates",
+    "soot loading/particle sizes/particle temperature",
+    "gas inventory and downstream residence time"
+  ],
+  "recommendation": "No native correction/build: current observer follows its declared equations. Correct unsupported app station mapping, preserve metal dynamics, and keep missing physical inputs explicit."
+}

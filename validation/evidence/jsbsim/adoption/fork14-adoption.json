@@ -1,0 +1,310 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-06",
+  "purpose": "Optional native turbine nozzle-gas enthalpy and persistent hardware thermal balance; no thrust/fuel/spool/legacy EGT feedback.",
+  "source": {
+    "repository": "https://github.com/Felipegalind0/jsbsim",
+    "branch": "master",
+    "commit": "399a5173fb5d597f499103df8611a2132945f4a8",
+    "dirty": false,
+    "previousPackageCommit": "6a25a5214c4d80b0f25e68e44205681df844e202",
+    "scope": "FGTurbine opt-in SI thermal data/functions, actual augmentation fuel partition/optional stoichiometric limit, bounded backward-Euler wall state, validated RW recovery property; FGEngine safe null initialization before rejected model unwind; tests/docs/version only.",
+    "upstreamPublicationForThisWork": false,
+    "featureCommit": "7d05e168548b3254c2fad2f9a2bfbc888c132f8b",
+    "correctiveCommit": "399a5173fb5d597f499103df8611a2132945f4a8"
+  },
+  "identity": {
+    "package": "@felipegalind0/jsbsim@1.2.4-fork.14",
+    "previousAcceptedPackage": "@felipegalind0/jsbsim@1.2.4-fork.12",
+    "rejectedCandidatePackage": "@felipegalind0/jsbsim@1.2.4-fork.13",
+    "repositoryContentSha256": "1783bae2c7379e18e2435c3385d56f5c857553ebd9a0bd3278b9d48a55f9cc3a",
+    "sdkSubtreeSha256": "044ebb2a6d6ff33f23ec3b7aac47b8c8b7c27775844a7c51d2b462c00321ab8e",
+    "buildInputSha256": "917dffaef91d7279fdcbcbf1b5bcee356e8381005e1eb73720a75a4f8f708906",
+    "tarballSha256": "02a1080dc325f2fff399d94b38aff03dee8e8ac12cfc32ce1398910c5bf84485",
+    "tarballIntegrity": "sha512-w6wUocxKygI0kM3N3z8eEXyERKhwlkVZG7EucU6JXatbyqBajH4qDtHpQtA4YYAjXebc8kgdQmFQyD4vdBuTzg==",
+    "loaderSha256": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+    "wasmSha256": "1221e1ff73a0105744048bf223d413f0274803e3ba383a0009945d029a505260",
+    "record": "fork14/verified-installed-artifact.json"
+  },
+  "thermal": {
+    "configuration": "Optional <thermal>; fields fixed SI literals or unnamed FGFunction with engine-index substitution.",
+    "nativeContract": "fork14/native-thermal-model.md",
+    "paths": {
+      "prefix": "propulsion/engine[n]/thermal/",
+      "readOnly": [
+        "nozzle-gas-temperature-k",
+        "metal-temperature-k",
+        "initialized",
+        "valid",
+        "afterburner-fuel-flow-kg-sec",
+        "afterburner-burned-fuel-flow-kg-sec"
+      ],
+      "readWrite": [
+        "metal-temperature-state-k"
+      ]
+    },
+    "suppliedFuel": "max(current native total fuel minus dry thrust*TSFC demand floored by idle fuel,0), active augmentation only; estimated transient partition.",
+    "burnedFuel": "Optional declared FAR bounds remaining burning capacity after core fuel; all supplied fuel mass stays in gas energy denominator. No native consumption feedback.",
+    "wall": "Native accepted positive non-trim simulation dt only; implicit monotone solve of gas/coolant/radiation/effective flame exchange. Reset explicitly cold; one-shot pending warm seed; native exact state restore cancels seed.",
+    "availability": "Wall valid only when catalog-present, initialized and numerically valid; gas gated by valid. Absent thermal block adds no thermal state/bindings."
+  },
+  "checks": {
+    "nativeThermal": {
+      "status": "passed",
+      "target": "FGTurbineTemperatureTest1",
+      "methods": 15,
+      "log": "fork14/native-thermal.log",
+      "scope": "Existing 3 EGT observer cases plus 11 thermal cases: exact legacy dynamics parity, nonzero indexed R/RW state, cold ambient initial-condition refresh, pending warm/trim/zero-time/reset/restore, analytic 30/60/120Hz convergence, large dt/no overshoot, energy residual, radiation/capacity, AB supplied/burned energy and rich limit, dynamic invalid/zero/vanishing flow, invalid constant safe rejection. Corrective case sets both executive and cached engine dt positive, checks uninitialized warm InitRunning remains pending, restored InitRunning remains exact, and explicit suspension prevents aging.",
+      "failureHistory": "Fork13 and retained installed reproduction advanced wall by0.006512K at unchanged time because InitRunning suspended executive dt but used cached positive propulsion input dt. Corrective observer guard and meaningful positive-input regression pass; see retained rejected candidate record."
+    },
+    "nativeRelated": {
+      "status": "ancestor-passed-unaffected",
+      "targets": [
+        "TestTurbineAugmentation",
+        "TestTurbineTrimSpool",
+        "TestTurbineTrimFuelFlow"
+      ],
+      "log": "fork13/native-oxygen-related.log",
+      "scope": "All three passed on opt-in thermal feature source7d05e168; suspension-only followup touches enabled thermal wall update and is covered by15-method target. Mandatory52SDKtests also pass on exact399a5173."
+    },
+    "sdkBuildValidation": {
+      "status": "passed",
+      "tests": 52,
+      "suites": 9,
+      "log": "fork14/sdk-build.log",
+      "sourceDateEpoch": 1791303716,
+      "toolchain": {
+        "node": "v26.8.2",
+        "npm": "11.19.1",
+        "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+        "cmake": "cmake version 4.4.3",
+        "clang": "clang version 24.0.0git",
+        "platform": "darwin",
+        "arch": "arm64",
+        "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+      },
+      "compileJobs": 5,
+      "testWorkers": 5,
+      "attempts": 1,
+      "scope": "One clean frozen-source locked-toolchain SDK build; mandatory TypeScript and SDK checks passed. Repository-contained compiler/npm caches."
+    },
+    "releasePacking": {
+      "status": "passed",
+      "log": "fork14/sdk-release-pack.log",
+      "releaseEligible": true
+    },
+    "installedArtifactIdentity": {
+      "status": "passed",
+      "verifiedFiles": 14,
+      "log": "fork14/verify-fork14.log"
+    },
+    "installedIdentityRegressions": {
+      "status": "passed",
+      "tests": 57,
+      "files": 2,
+      "log": "fork14/installed-identity-regressions.log",
+      "scope": "Exact14 artifact plus explicit stable rejection of retained13candidate."
+    },
+    "nativePublicF135Trace": {
+      "status": "passed",
+      "record": "fork14/native-f135-final-profile.json",
+      "log": "fork14/native-f135-final-profile.log",
+      "xmlSha256": "e1cb66a141c8686e550535eb8ef3eab0bf2a660954cb557fdcea5efbe2f1cd0c",
+      "scope": "Actual public XML in native Python module; zero wind/airspeed,1000ft hold-down,dt1/120; accepted steps dry/AB/cutoff. Not a measured/calibrated F135 model.",
+      "failureHistory": "Prior failed-method/cutoff probe and initial cooling coefficient investigation are retained underfork13; final14probe succeeds with same-time strict wall equality and actualcutoff_cmd.",
+      "coefficientReview": "Initial provisional full-speed coolant conductance150W/K yielded wall1630.51K. Root revised effective cooling estimate to700W/K before final XML, yielding1269.73K; neither is measured F135 data and no optical brightness was used to choose temperatures.",
+      "sameTimeColdToInitRunningWallDeltaK": 0
+    },
+    "installedThermalLifecycle": {
+      "status": "passed",
+      "scenarios": 8,
+      "record": "../../aircraft/f35b/thermal-model-2026-10-06/fork14-installed/acceptance.json",
+      "report": "../../aircraft/f35b/thermal-model-2026-10-06/fork14-installed/installed-report.json",
+      "script": "scripts/validation/aircraft/check-turbine-thermal.mjs",
+      "scriptSha256": "5c369cfd3c5a76b4f7f745b7b1749129535fa9fe699c18c241289f513ad38be6",
+      "scope": "Actual installed public F135 model, native starter/cutoff, hot afterburner and cooldown, zero-time/held reads, exact native RW restoration, real app snapshot/free/departure/arrival recovery and cold reload.",
+      "exactStateToleranceK": 1e-8,
+      "nextAcceptedStepContinuityFraction": 0.02,
+      "nextStepLimit": "Bounded continuity detects reseeding at120Hz; not exact trajectory parity or calibrated thermal tolerance.",
+      "boundEvaluations": 2640,
+      "maxBurnedLimitErrorKgSec": 2.6645352591003757e-15,
+      "sourceIdentityStable": true
+    },
+    "fullApplicationCi": {
+      "status": "passed",
+      "command": "npm run ci",
+      "exitCode": 0,
+      "testsPassed": 1767,
+      "expectedFailures": 1,
+      "testFilesPassed": 163,
+      "expectedFailure": "Existing F35 stowed main-strut exterior-envelope case; not introduced by thermal work.",
+      "log": "../../aircraft/f35b/thermal-model-2026-10-06/ci.log",
+      "logSha256": "c19f270268733a3b3db6c896d94f1d3a736925bd18da0033c359a3f4a5605a74",
+      "combinedAcceptance": "../../aircraft/f35b/thermal-model-2026-10-06/acceptance.json",
+      "scope": "Lint, tests, incremental typecheck, production build, installed and emitted artifact verification. No additional browser/GPU/device/aircraft thermal qualification."
+    },
+    "applicationThermalRegressions": {
+      "status": "passed",
+      "tests": 52,
+      "files": 4,
+      "log": "../../aircraft/f35b/thermal-model-2026-10-06/fork14-installed/application-thermal.log",
+      "scope": "Native thermal state capture/restore ordering, relocation and engine monitor validity rows."
+    }
+  },
+  "findings": {
+    "dry98": {
+      "phase": "dry98-end",
+      "time": 180.99999999999972,
+      "n2": 99.2,
+      "egtC": 726.0768949883068,
+      "running": 1,
+      "augmentation": 0,
+      "fuelFlowPps": 6.249439955881203,
+      "gasK": 999.2268949883068,
+      "metalK": 661.7147269422283,
+      "initialized": 1,
+      "valid": 1,
+      "suppliedABKgSec": 0,
+      "burnedABKgSec": 0
+    },
+    "fullAfterburner": {
+      "phase": "AB-end",
+      "time": 300.9999999998906,
+      "n2": 100,
+      "egtC": 733.2188949888011,
+      "running": 1,
+      "augmentation": 1,
+      "fuelFlowPps": 19.93680666656408,
+      "gasK": 2361.8185386206856,
+      "metalK": 1269.7336836444151,
+      "initialized": 1,
+      "valid": 1,
+      "suppliedABKgSec": 6.099131199974914,
+      "burnedABKgSec": 4.752389777274471
+    },
+    "afterburnerOff": {
+      "phase": "AB-off-end",
+      "time": 420.99999999978144,
+      "n2": 79.2,
+      "egtC": 547.5268949887349,
+      "running": 1,
+      "augmentation": 0,
+      "fuelFlowPps": 2.3099034945947987,
+      "gasK": 820.6768949887348,
+      "metalK": 562.0022940747629,
+      "initialized": 1,
+      "valid": 1,
+      "suppliedABKgSec": 0,
+      "burnedABKgSec": 0
+    },
+    "stopped180Seconds": {
+      "phase": "shutdown-end",
+      "time": 600.9999999996178,
+      "n2": 4.883238792915152e-24,
+      "egtC": 13.018894988505943,
+      "running": 0,
+      "augmentation": 0,
+      "fuelFlowPps": 0,
+      "gasK": 286.16889498850594,
+      "metalK": 429.4347337707343,
+      "initialized": 1,
+      "valid": 1,
+      "suppliedABKgSec": 0,
+      "burnedABKgSec": 0
+    }
+  },
+  "preservation": {
+    "previousArtifact": "Accepted fork12 and rejected fork13 immutable tarballs both retained; all earlier tarballs unchanged",
+    "rollbackDeclaration": "validation/evidence/jsbsim/rollback/fork12/",
+    "matchingAircraftData": "Pre-thermal F35 aircraft closure + manifest retained and verified against fork12 installed trace hashes; rollback restores data and dependency declarations together.",
+    "earlierRecords": "Unchanged"
+  },
+  "limitations": [
+    "Effective gas flow/cp/efficiency/cooling/capacity/radiation parameters are authored estimates, not F135 station/material calibration.",
+    "Base gas follows unchanged legacy EGT schedule, including phase discontinuities; wall remains continuous under accepted integration.",
+    "Fuel split is native-demand excess, not measured burner flow. Optional representative stoichiometric ratio is not a species/dissociation chemistry model; fuel sensible enthalpy is neglected.",
+    "Thermal numerical validity does not qualify material survival, aircraft flight performance, visible gas composition or renderer radiometry.",
+    "No render-side thermal clock, upstream submission/push, publication or new GPU/performance claim."
+  ],
+  "primaryContext": [
+    {
+      "url": "https://www.grc.nasa.gov/www/k-12/airplane/turbab.html",
+      "supports": "Afterburner adds heat downstream of turbine."
+    },
+    {
+      "url": "https://ntrs.nasa.gov/api/citations/19730007232/downloads/19730007232.pdf",
+      "supports": "Pages6–8 describe wall convection, flame radiation and coolant cooling with uncertain temperatures/emissivity/film effectiveness."
+    },
+    {
+      "url": "https://ntrs.nasa.gov/api/citations/20140000730/downloads/20140000730.pdf",
+      "supports": "Table2 measured JP8 fuel heat43.3MJ/kg; reference fuel data, not F135 measurement."
+    },
+    {
+      "url": "https://ntrs.nasa.gov/api/citations/20050198965/downloads/20050198965.pdf",
+      "supports": "Molnar/Marek AIAA2005-0549 Jet-A surrogate C12H23 onp2 and representative stoichiometric FAR.068 onp4; not actual F135 fuel."
+    }
+  ],
+  "evidence": [
+    {
+      "path": "fork14/native-build.log",
+      "bytes": 1373,
+      "sha256": "becece418cc983640ccc0f41a67ba03683bad2d37af3094225ac1dbcb65c3821"
+    },
+    {
+      "path": "fork14/native-thermal.log",
+      "bytes": 246,
+      "sha256": "1b8a31c542e40fd7a252d3d771a273c2666b68297b8de311eaef2cdd4ebbf9aa"
+    },
+    {
+      "path": "fork14/native-f135-final-profile.log",
+      "bytes": 3640,
+      "sha256": "b37d08e3a675316f4a149538e41e5ffdf9f5d6dcea92f4352655f7548abcbb78"
+    },
+    {
+      "path": "fork14/native-f135-final-profile.json",
+      "bytes": 237619,
+      "sha256": "0a221810b695cb637876057436186f44a2174075f977f501986f8febf9b919eb"
+    },
+    {
+      "path": "fork14/sdk-build.log",
+      "bytes": 20184,
+      "sha256": "178f04d5f36fab816f62c61d4b0cd9c933940eb453571a9a4077fbd12c063979"
+    },
+    {
+      "path": "fork14/sdk-release-pack.log",
+      "bytes": 1890,
+      "sha256": "399026c2169a399f502789a1a7d58682b27fca8b26acbe1e768cd541a75c922e"
+    },
+    {
+      "path": "fork14/install.log",
+      "bytes": 28,
+      "sha256": "f4b4ae1f2df36758bc616a669ea6ed445a15cde8b16bc1d5c23bac5e974f747d"
+    },
+    {
+      "path": "fork14/verify-fork14.log",
+      "bytes": 574,
+      "sha256": "00094db7d2c7cf963f145f2f8764882d28e9cc5d72334b11430d57a2879bb3ba"
+    },
+    {
+      "path": "fork14/installed-identity-regressions.log",
+      "bytes": 203,
+      "sha256": "47143ab8f56a59239c2c55abf2dd7d3f9c13c8b2b6bd60b114e0342bae930ffe"
+    },
+    {
+      "path": "fork14/native-thermal-model.md",
+      "bytes": 6392,
+      "sha256": "a7035a1bb7c10019e25c0887f8070c2db48c688dccc217c3f432f5b6af8ef356"
+    }
+  ],
+  "adoption": {
+    "status": "accepted",
+    "acceptedRollbackPackage": "1.2.4-fork.12",
+    "rejectedCandidate": {
+      "package": "1.2.4-fork.13",
+      "record": "fork13-adoption.json",
+      "reason": "InitRunning suspends executive integration but direct Calculate used cached positive propulsion input dt, advancing established wall state at unchanged simulation time.",
+      "wallDeltaK": 0.006512243322390532
+    },
+    "correction": "Executive IntegrationSuspended guard prevents cached positive engine input dt from aging the wall during InitRunning. No balance/equation changes."
+  }
+}

@@ -1,0 +1,51 @@
+(node:81100) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+{
+  "out": "/Users/felg/gh/0sfs/build/validation/turbine-temperature/2026-10-06_010439",
+  "pass": true,
+  "findings": {
+    "coldC": 13.018894981694396,
+    "heatedBeforeRunning": true,
+    "maxRunFormulaErrorC": 0,
+    "beforeShutdown": {
+      "phase": "before-shutdown",
+      "time": 57.52499999999738,
+      "egtC": 733.2188949880485,
+      "tatC": 13.018894988048418,
+      "n1": 100,
+      "n2": 100,
+      "running": 1,
+      "augmentation": 1,
+      "fuelFlowPps": 13.121972438339562
+    },
+    "firstOff": {
+      "phase": "shutdown",
+      "time": 57.53333333333071,
+      "egtC": 733.1580616547152,
+      "tatC": 13.018894988055807,
+      "n1": 99.58333333333333,
+      "n2": 99.58333333333333,
+      "running": 0,
+      "augmentation": 0,
+      "fuelFlowPps": 13.098824290191413
+    },
+    "hotStopped": {
+      "phase": "hot-stopped",
+      "time": 72.52500000000379,
+      "egtC": 623.7188949880458,
+      "tatC": 13.018894988188631,
+      "n1": 0.05444858849603242,
+      "n2": 0.05444858849603242,
+      "running": 0,
+      "augmentation": 0,
+      "fuelFlowPps": 0
+    },
+    "largestJump": {
+      "phase": "first-step-after-stopped-RunIC",
+      "previousPhase": "hot-stopped-RunIC",
+      "time": 72.53333333333713,
+      "deltaC": -610.7000000063514
+    },
+    "afterburnerTemperature": "Matches the same native N2/TAT schedule as dry power; no additional AB heat is modeled."
+  }
+}

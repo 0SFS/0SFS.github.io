@@ -1,0 +1,646 @@
+{
+  "gpu": {
+    "vendor": "apple",
+    "architecture": "metal-3",
+    "device": "",
+    "description": ""
+  },
+  "cases": [
+    {
+      "requested": "webgpu",
+      "label": "F-35B",
+      "piston": false,
+      "rotorBlades": {
+        "outer": 22,
+        "inner": 36,
+        "outerEstimated": true,
+        "innerEstimated": true
+      },
+      "markers": {
+        "outer": {
+          "count": 22,
+          "minArea": 2459,
+          "maxArea": 2467,
+          "brightnessAngle": 1.0999752252938773,
+          "brightnessStrength": 0.2690451799099877
+        },
+        "inner": {
+          "count": 36,
+          "minArea": 486,
+          "maxArea": 493,
+          "brightnessAngle": -2.0831669915345503,
+          "brightnessStrength": 0.2689536263884815
+        }
+      },
+      "movedMarkers": {
+        "outer": {
+          "count": 22,
+          "minArea": 2458,
+          "maxArea": 2467,
+          "brightnessAngle": 2.344159469292636,
+          "brightnessStrength": 0.26913171612194275
+        },
+        "inner": {
+          "count": 36,
+          "minArea": 491,
+          "maxArea": 493,
+          "brightnessAngle": -0.8392047412307593,
+          "brightnessStrength": 0.26896085341974624
+        }
+      },
+      "motion": {
+        "simulatedIntervalS": 0.1,
+        "normalizedSpeed": 0.99,
+        "turnsPerSecond": 2,
+        "expectedAdvance": 1.2440706908215582,
+        "outer": {
+          "advance": 1.244184243998759,
+          "error": 0.00011355317720074254,
+          "beforeStrength": 0.2690451799099877,
+          "afterStrength": 0.26913171612194275
+        },
+        "inner": {
+          "advance": 1.243962250303791,
+          "error": 0.00010844051776714991,
+          "beforeStrength": 0.2689536263884815,
+          "afterStrength": 0.26896085341974624
+        }
+      },
+      "backend": "webgpu",
+      "status": {
+        "preference": "webgpu",
+        "backend": "webgpu",
+        "reason": null
+      },
+      "canvases": 1,
+      "outerSize": 68,
+      "innerVisible": true,
+      "rpmVisible": false
+    },
+    {
+      "requested": "webgpu",
+      "label": "SF50",
+      "piston": false,
+      "rotorBlades": {
+        "outer": 16,
+        "inner": 30,
+        "outerEstimated": false,
+        "innerEstimated": true
+      },
+      "markers": {
+        "outer": {
+          "count": 16,
+          "minArea": 2457,
+          "maxArea": 2465,
+          "brightnessAngle": 1.1000148383498798,
+          "brightnessStrength": 0.2687359729252036
+        },
+        "inner": {
+          "count": 30,
+          "minArea": 698,
+          "maxArea": 709,
+          "brightnessAngle": -2.082686727610478,
+          "brightnessStrength": 0.26931770860328036
+        }
+      },
+      "movedMarkers": {
+        "outer": {
+          "count": 16,
+          "minArea": 2459,
+          "maxArea": 2464,
+          "brightnessAngle": 2.344036016248309,
+          "brightnessStrength": 0.26873687114473616
+        },
+        "inner": {
+          "count": 30,
+          "minArea": 700,
+          "maxArea": 709,
+          "brightnessAngle": -0.8391015718929529,
+          "brightnessStrength": 0.2692144319101377
+        }
+      },
+      "motion": {
+        "simulatedIntervalS": 0.1,
+        "normalizedSpeed": 0.99,
+        "turnsPerSecond": 2,
+        "expectedAdvance": 1.2440706908215582,
+        "outer": {
+          "advance": 1.2440211778984291,
+          "error": 0.00004951292312904698,
+          "beforeStrength": 0.2687359729252036,
+          "afterStrength": 0.26873687114473616
+        },
+        "inner": {
+          "advance": 1.243585155717525,
+          "error": 0.00048553510403315236,
+          "beforeStrength": 0.26931770860328036,
+          "afterStrength": 0.2692144319101377
+        }
+      },
+      "backend": "webgpu",
+      "status": {
+        "preference": "webgpu",
+        "backend": "webgpu",
+        "reason": null
+      },
+      "canvases": 1,
+      "outerSize": 68,
+      "innerVisible": true,
+      "rpmVisible": false
+    },
+    {
+      "requested": "webgpu",
+      "label": "C172",
+      "piston": true,
+      "rotorBlades": {
+        "outer": 2,
+        "inner": null,
+        "outerEstimated": false,
+        "innerEstimated": false
+      },
+      "markers": {
+        "outer": {
+          "count": 2,
+          "minArea": 2463,
+          "maxArea": 2463,
+          "brightnessAngle": 1.0999847754625252,
+          "brightnessStrength": 0.5372189965484689
+        },
+        "inner": {
+          "count": 0,
+          "minArea": 0,
+          "maxArea": 0,
+          "brightnessAngle": 0,
+          "brightnessStrength": 0
+        }
+      },
+      "movedMarkers": {
+        "outer": {
+          "count": 2,
+          "minArea": 2464,
+          "maxArea": 2464,
+          "brightnessAngle": 2.3440254349085072,
+          "brightnessStrength": 0.5372244210022241
+        },
+        "inner": {
+          "count": 0,
+          "minArea": 0,
+          "maxArea": 0,
+          "brightnessAngle": 0,
+          "brightnessStrength": 0
+        }
+      },
+      "motion": {
+        "simulatedIntervalS": 0.1,
+        "normalizedSpeed": 0.99,
+        "turnsPerSecond": 2,
+        "expectedAdvance": 1.2440706908215582,
+        "outer": {
+          "advance": 1.244040659445982,
+          "error": 0.000030031375576111685,
+          "beforeStrength": 0.5372189965484689,
+          "afterStrength": 0.5372244210022241
+        },
+        "inner": null
+      },
+      "backend": "webgpu",
+      "status": {
+        "preference": "webgpu",
+        "backend": "webgpu",
+        "reason": null
+      },
+      "canvases": 1,
+      "outerSize": 68,
+      "innerVisible": false,
+      "rpmVisible": true
+    },
+    {
+      "requested": "webgl2",
+      "label": "F-35B",
+      "piston": false,
+      "rotorBlades": {
+        "outer": 22,
+        "inner": 36,
+        "outerEstimated": true,
+        "innerEstimated": true
+      },
+      "markers": {
+        "outer": {
+          "count": 22,
+          "minArea": 2459,
+          "maxArea": 2467,
+          "brightnessAngle": 1.0999752252938773,
+          "brightnessStrength": 0.2690451799099877
+        },
+        "inner": {
+          "count": 36,
+          "minArea": 486,
+          "maxArea": 493,
+          "brightnessAngle": -2.0831669915345503,
+          "brightnessStrength": 0.2689536263884815
+        }
+      },
+      "movedMarkers": {
+        "outer": {
+          "count": 22,
+          "minArea": 2458,
+          "maxArea": 2467,
+          "brightnessAngle": 2.344159469292636,
+          "brightnessStrength": 0.26913171612194275
+        },
+        "inner": {
+          "count": 36,
+          "minArea": 491,
+          "maxArea": 493,
+          "brightnessAngle": -0.8392047412307593,
+          "brightnessStrength": 0.26896085341974624
+        }
+      },
+      "motion": {
+        "simulatedIntervalS": 0.1,
+        "normalizedSpeed": 0.99,
+        "turnsPerSecond": 2,
+        "expectedAdvance": 1.2440706908215582,
+        "outer": {
+          "advance": 1.244184243998759,
+          "error": 0.00011355317720074254,
+          "beforeStrength": 0.2690451799099877,
+          "afterStrength": 0.26913171612194275
+        },
+        "inner": {
+          "advance": 1.243962250303791,
+          "error": 0.00010844051776714991,
+          "beforeStrength": 0.2689536263884815,
+          "afterStrength": 0.26896085341974624
+        }
+      },
+      "backend": "webgl2",
+      "status": {
+        "preference": "webgl2",
+        "backend": "webgl2",
+        "reason": null
+      },
+      "canvases": 1,
+      "outerSize": 68,
+      "innerVisible": true,
+      "rpmVisible": false
+    },
+    {
+      "requested": "webgl2",
+      "label": "SF50",
+      "piston": false,
+      "rotorBlades": {
+        "outer": 16,
+        "inner": 30,
+        "outerEstimated": false,
+        "innerEstimated": true
+      },
+      "markers": {
+        "outer": {
+          "count": 16,
+          "minArea": 2457,
+          "maxArea": 2465,
+          "brightnessAngle": 1.1000148383498798,
+          "brightnessStrength": 0.2687359729252036
+        },
+        "inner": {
+          "count": 30,
+          "minArea": 698,
+          "maxArea": 709,
+          "brightnessAngle": -2.082686727610478,
+          "brightnessStrength": 0.26931770860328036
+        }
+      },
+      "movedMarkers": {
+        "outer": {
+          "count": 16,
+          "minArea": 2459,
+          "maxArea": 2464,
+          "brightnessAngle": 2.344036016248309,
+          "brightnessStrength": 0.26873687114473616
+        },
+        "inner": {
+          "count": 30,
+          "minArea": 700,
+          "maxArea": 709,
+          "brightnessAngle": -0.8391015718929529,
+          "brightnessStrength": 0.2692144319101377
+        }
+      },
+      "motion": {
+        "simulatedIntervalS": 0.1,
+        "normalizedSpeed": 0.99,
+        "turnsPerSecond": 2,
+        "expectedAdvance": 1.2440706908215582,
+        "outer": {
+          "advance": 1.2440211778984291,
+          "error": 0.00004951292312904698,
+          "beforeStrength": 0.2687359729252036,
+          "afterStrength": 0.26873687114473616
+        },
+        "inner": {
+          "advance": 1.243585155717525,
+          "error": 0.00048553510403315236,
+          "beforeStrength": 0.26931770860328036,
+          "afterStrength": 0.2692144319101377
+        }
+      },
+      "backend": "webgl2",
+      "status": {
+        "preference": "webgl2",
+        "backend": "webgl2",
+        "reason": null
+      },
+      "canvases": 1,
+      "outerSize": 68,
+      "innerVisible": true,
+      "rpmVisible": false
+    },
+    {
+      "requested": "webgl2",
+      "label": "C172",
+      "piston": true,
+      "rotorBlades": {
+        "outer": 2,
+        "inner": null,
+        "outerEstimated": false,
+        "innerEstimated": false
+      },
+      "markers": {
+        "outer": {
+          "count": 2,
+          "minArea": 2463,
+          "maxArea": 2463,
+          "brightnessAngle": 1.0999847754625252,
+          "brightnessStrength": 0.5372189965484689
+        },
+        "inner": {
+          "count": 0,
+          "minArea": 0,
+          "maxArea": 0,
+          "brightnessAngle": 0,
+          "brightnessStrength": 0
+        }
+      },
+      "movedMarkers": {
+        "outer": {
+          "count": 2,
+          "minArea": 2464,
+          "maxArea": 2464,
+          "brightnessAngle": 2.3440254349085072,
+          "brightnessStrength": 0.5372244210022241
+        },
+        "inner": {
+          "count": 0,
+          "minArea": 0,
+          "maxArea": 0,
+          "brightnessAngle": 0,
+          "brightnessStrength": 0
+        }
+      },
+      "motion": {
+        "simulatedIntervalS": 0.1,
+        "normalizedSpeed": 0.99,
+        "turnsPerSecond": 2,
+        "expectedAdvance": 1.2440706908215582,
+        "outer": {
+          "advance": 1.244040659445982,
+          "error": 0.000030031375576111685,
+          "beforeStrength": 0.5372189965484689,
+          "afterStrength": 0.5372244210022241
+        },
+        "inner": null
+      },
+      "backend": "webgl2",
+      "status": {
+        "preference": "webgl2",
+        "backend": "webgl2",
+        "reason": null
+      },
+      "canvases": 1,
+      "outerSize": 68,
+      "innerVisible": false,
+      "rpmVisible": true
+    },
+    {
+      "requested": "webgl1",
+      "label": "F-35B",
+      "piston": false,
+      "rotorBlades": {
+        "outer": 22,
+        "inner": 36,
+        "outerEstimated": true,
+        "innerEstimated": true
+      },
+      "markers": {
+        "outer": {
+          "count": 22,
+          "minArea": 2459,
+          "maxArea": 2467,
+          "brightnessAngle": 1.0999752252938773,
+          "brightnessStrength": 0.2690451799099877
+        },
+        "inner": {
+          "count": 36,
+          "minArea": 486,
+          "maxArea": 493,
+          "brightnessAngle": -2.0831669915345503,
+          "brightnessStrength": 0.2689536263884815
+        }
+      },
+      "movedMarkers": {
+        "outer": {
+          "count": 22,
+          "minArea": 2458,
+          "maxArea": 2467,
+          "brightnessAngle": 2.344159469292636,
+          "brightnessStrength": 0.26913171612194275
+        },
+        "inner": {
+          "count": 36,
+          "minArea": 491,
+          "maxArea": 493,
+          "brightnessAngle": -0.8392047412307593,
+          "brightnessStrength": 0.26896085341974624
+        }
+      },
+      "motion": {
+        "simulatedIntervalS": 0.1,
+        "normalizedSpeed": 0.99,
+        "turnsPerSecond": 2,
+        "expectedAdvance": 1.2440706908215582,
+        "outer": {
+          "advance": 1.244184243998759,
+          "error": 0.00011355317720074254,
+          "beforeStrength": 0.2690451799099877,
+          "afterStrength": 0.26913171612194275
+        },
+        "inner": {
+          "advance": 1.243962250303791,
+          "error": 0.00010844051776714991,
+          "beforeStrength": 0.2689536263884815,
+          "afterStrength": 0.26896085341974624
+        }
+      },
+      "backend": "webgl1",
+      "status": {
+        "preference": "webgl1",
+        "backend": "webgl1",
+        "reason": null
+      },
+      "canvases": 1,
+      "outerSize": 68,
+      "innerVisible": true,
+      "rpmVisible": false
+    },
+    {
+      "requested": "webgl1",
+      "label": "SF50",
+      "piston": false,
+      "rotorBlades": {
+        "outer": 16,
+        "inner": 30,
+        "outerEstimated": false,
+        "innerEstimated": true
+      },
+      "markers": {
+        "outer": {
+          "count": 16,
+          "minArea": 2457,
+          "maxArea": 2465,
+          "brightnessAngle": 1.1000148383498798,
+          "brightnessStrength": 0.2687359729252036
+        },
+        "inner": {
+          "count": 30,
+          "minArea": 698,
+          "maxArea": 709,
+          "brightnessAngle": -2.082686727610478,
+          "brightnessStrength": 0.26931770860328036
+        }
+      },
+      "movedMarkers": {
+        "outer": {
+          "count": 16,
+          "minArea": 2459,
+          "maxArea": 2464,
+          "brightnessAngle": 2.344036016248309,
+          "brightnessStrength": 0.26873687114473616
+        },
+        "inner": {
+          "count": 30,
+          "minArea": 700,
+          "maxArea": 709,
+          "brightnessAngle": -0.8391015718929529,
+          "brightnessStrength": 0.2692144319101377
+        }
+      },
+      "motion": {
+        "simulatedIntervalS": 0.1,
+        "normalizedSpeed": 0.99,
+        "turnsPerSecond": 2,
+        "expectedAdvance": 1.2440706908215582,
+        "outer": {
+          "advance": 1.2440211778984291,
+          "error": 0.00004951292312904698,
+          "beforeStrength": 0.2687359729252036,
+          "afterStrength": 0.26873687114473616
+        },
+        "inner": {
+          "advance": 1.243585155717525,
+          "error": 0.00048553510403315236,
+          "beforeStrength": 0.26931770860328036,
+          "afterStrength": 0.2692144319101377
+        }
+      },
+      "backend": "webgl1",
+      "status": {
+        "preference": "webgl1",
+        "backend": "webgl1",
+        "reason": null
+      },
+      "canvases": 1,
+      "outerSize": 68,
+      "innerVisible": true,
+      "rpmVisible": false
+    },
+    {
+      "requested": "webgl1",
+      "label": "C172",
+      "piston": true,
+      "rotorBlades": {
+        "outer": 2,
+        "inner": null,
+        "outerEstimated": false,
+        "innerEstimated": false
+      },
+      "markers": {
+        "outer": {
+          "count": 2,
+          "minArea": 2463,
+          "maxArea": 2463,
+          "brightnessAngle": 1.0999847754625252,
+          "brightnessStrength": 0.5372189965484689
+        },
+        "inner": {
+          "count": 0,
+          "minArea": 0,
+          "maxArea": 0,
+          "brightnessAngle": 0,
+          "brightnessStrength": 0
+        }
+      },
+      "movedMarkers": {
+        "outer": {
+          "count": 2,
+          "minArea": 2464,
+          "maxArea": 2464,
+          "brightnessAngle": 2.3440254349085072,
+          "brightnessStrength": 0.5372244210022241
+        },
+        "inner": {
+          "count": 0,
+          "minArea": 0,
+          "maxArea": 0,
+          "brightnessAngle": 0,
+          "brightnessStrength": 0
+        }
+      },
+      "motion": {
+        "simulatedIntervalS": 0.1,
+        "normalizedSpeed": 0.99,
+        "turnsPerSecond": 2,
+        "expectedAdvance": 1.2440706908215582,
+        "outer": {
+          "advance": 1.244040659445982,
+          "error": 0.000030031375576111685,
+          "beforeStrength": 0.5372189965484689,
+          "afterStrength": 0.5372244210022241
+        },
+        "inner": null
+      },
+      "backend": "webgl1",
+      "status": {
+        "preference": "webgl1",
+        "backend": "webgl1",
+        "reason": null
+      },
+      "canvases": 1,
+      "outerSize": 68,
+      "innerVisible": false,
+      "rpmVisible": true
+    }
+  ],
+  "errors": [],
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/154.0.8037.98",
+    "revision": "@b859317bf11f6be47f9b7799ec690a0a42a1fb33",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+    "jsVersion": "15.4.80.20"
+  },
+  "kind": "untimed-engine-orb-shader-and-presentation-check",
+  "createdUtc": "2026-10-06T04:00:04.888Z",
+  "limitations": "No frame/GPU timing or device performance qualification. Screenshot requires visual review.",
+  "pass": true
+}

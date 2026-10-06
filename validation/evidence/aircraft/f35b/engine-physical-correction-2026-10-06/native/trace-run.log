@@ -1,0 +1,106 @@
+(node:51433) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+{
+  "out": "/Users/felg/gh/0sfs/build/f135-physical-native-attempt1-20261006",
+  "pass": true,
+  "checks": [
+    {
+      "name": "cold-cycle",
+      "passed": true
+    },
+    {
+      "name": "running-initialization",
+      "passed": true
+    },
+    {
+      "name": "hot-restart",
+      "passed": true
+    },
+    {
+      "name": "lifecycle",
+      "passed": true
+    },
+    {
+      "name": "powered-lift",
+      "passed": true
+    },
+    {
+      "name": "cooling-convergence-30",
+      "passed": true
+    },
+    {
+      "name": "cooling-convergence-60",
+      "passed": true
+    },
+    {
+      "name": "cooling-convergence-120",
+      "passed": true
+    },
+    {
+      "name": "cooling-convergence-240",
+      "passed": true
+    },
+    {
+      "name": "convergence",
+      "passed": true
+    }
+  ],
+  "auditedSteps": 133577,
+  "maxErrors": {
+    "heatRateW": 5.820766091346741e-11,
+    "nativeResidualJ": 2.732363668656035e-9,
+    "independentlyReconstructedStepJ": 2.7322499818183132e-9,
+    "gasBathK": 4.547473508864641e-13
+  },
+  "convergence": {
+    "durationSeconds": 30,
+    "initialSolidK": 1000,
+    "ambientK": 286.49913193810625,
+    "referenceHz": 1920,
+    "refinementHz": 3840,
+    "coarseReference": {
+      "linerK": 854.3967340114588,
+      "coreK": 763.4426472868608
+    },
+    "fineReference": {
+      "linerK": 854.396734011469,
+      "coreK": 763.4426472868662
+    },
+    "numerical": [
+      {
+        "hz": 30,
+        "ambientK": 286.49913193810625,
+        "coreK": 763.5059812654017,
+        "linerK": 854.4263154442065,
+        "linerErrorK": 0.029581432737472824,
+        "coreErrorK": 0.0633339785355247
+      },
+      {
+        "hz": 60,
+        "ambientK": 286.4991319843195,
+        "coreK": 763.4743208941813,
+        "linerK": 854.4115270883726,
+        "linerErrorK": 0.014793076903629299,
+        "coreErrorK": 0.031673607315156005
+      },
+      {
+        "hz": 120,
+        "ambientK": 286.4991319958691,
+        "coreK": 763.4584857502457,
+        "linerK": 854.4041311423018,
+        "linerErrorK": 0.007397130832828225,
+        "coreErrorK": 0.01583846337950945
+      },
+      {
+        "hz": 240,
+        "ambientK": 286.49913199876204,
+        "coreK": 763.4505669381504,
+        "linerK": 854.4004327270789,
+        "linerErrorK": 0.0036987156098575724,
+        "coreErrorK": 0.00791965128416905
+      }
+    ],
+    "scope": "Backward-Euler convergence for the actual two F135 constant-bath cooling equations; coefficients are held by off/stationary/native state. This is a numerical test, not calibration."
+  },
+  "sourceIdentityStable": true
+}

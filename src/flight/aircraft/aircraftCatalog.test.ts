@@ -159,7 +159,7 @@ describe("aircraft catalog", () => {
   it("loads the F-35B's credited exterior in Auto at every distance", () => {
     expect(f35b.lods).toHaveLength(1);
     const exterior = f35b.lods[0];
-    expect(exterior.path).toBe("aircraft/f-35b/F-35B_AF267.glb");
+    expect(exterior.path).toBe("aircraft/f-35b/F-35B_AF267-airframe.glb");
     expect(exterior.optIn).toBeUndefined();
     expect(autoLods(f35b)).toEqual([exterior]);
     for (const distance of [0, 100, 5000]) {

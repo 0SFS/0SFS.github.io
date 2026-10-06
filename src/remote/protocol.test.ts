@@ -49,6 +49,15 @@ const accepted: RemoteMessage[] = [
 ];
 
 describe("phone protocol parsing", () => {
+  it("accepts an optional six-digit aircraft afterburner accent and rejects arbitrary colors", () => {
+    for (const afterburnerColor of [undefined, "#ff9450", "#A0B1C2"]) {
+      expect(isEngineStatus({ phase: "RUNNING", afterburnerColor })).toBe(true);
+    }
+    for (const afterburnerColor of [null, 1, "orange", "#f90", "ff9450", "#ff945000", "#gg9450", "#ff9450;"]) {
+      expect(isEngineStatus({ phase: "RUNNING", afterburnerColor })).toBe(false);
+    }
+  });
+
   it("validates per-row blade counts without requiring them from older hosts", () => {
     const rotorBlades = { outer: 28, inner: 40, outerEstimated: false, innerEstimated: true };
     expect(isEngineStatus({ phase: "RUNNING", rotorBlades })).toBe(true);
@@ -66,9 +75,18 @@ describe("phone protocol parsing", () => {
   it("carries explicit engine type, native limits, simulation time and bounded orb budgets", () => {
     const orbs = { fps: 30, turnsPerSecond: 2, pixelRatio: 2, renderer: "auto" };
     expect(isEngineStatus({ phase: "RUNNING", kind: "piston", simTimeS: 12.125, rpm: 1350, maxRpm: 2700, orbs })).toBe(true);
+    for (const fps of [60, 120, 144, 240, 1000]) {
+      expect(isEngineStatus({ phase: "RUNNING", orbs: { ...orbs, fps } })).toBe(true);
+    }
+    for (const maxPatternStep of [0.05, 0.45, 0.49]) {
+      expect(isEngineStatus({ phase: "RUNNING", orbs: { ...orbs, maxPatternStep } })).toBe(true);
+    }
+    for (const maxPatternStep of [0, 0.049, 0.5, NaN, Infinity, null, "0.45"]) {
+      expect(isEngineStatus({ phase: "RUNNING", orbs: { ...orbs, maxPatternStep } })).toBe(false);
+    }
     expect(isEngineStatus({ phase: "RUNNING", kind: "turbine", maxN1: 100, maxN2: 110 })).toBe(true);
     for (const invalid of [{ kind: "jet" }, { simTimeS: -1 }, { simTimeS: Infinity }, { maxN1: 0 },
-      { maxN2: -100 }, { maxRpm: NaN }, { orbs: { ...orbs, fps: 61 } },
+      { maxN2: -100 }, { maxRpm: NaN }, { orbs: { ...orbs, fps: 1001 } },
       { orbs: { ...orbs, turnsPerSecond: 4.1 } }, { orbs: { ...orbs, pixelRatio: 0.5 } },
       { orbs: { ...orbs, renderer: "canvas2d" } }]) {
       expect(isEngineStatus({ phase: "RUNNING", ...invalid })).toBe(false);

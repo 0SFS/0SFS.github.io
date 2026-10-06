@@ -1,0 +1,80 @@
+import { Constants, DepthRenderer, Texture, type Scene, type Mesh, type AbstractMesh } from "@babylonjs/core";
+import "@babylonjs/core/Rendering/depthRendererSceneComponent";
+
+/** 0sfs owns this optional opaque-depth pass used only by aircraft gas integration. */
+export function createEngineExhaustDepth(scene: Scene, plume: Mesh, requestRender: () => void) {
+  const renderer = new DepthRenderer(scene, Constants.TEXTURETYPE_FLOAT, null, false,
+    Texture.NEAREST_SAMPLINGMODE, true, "engine-exhaust-opaque-depth");
+  const texture = renderer.getDepthMap();
+  // This is privately scheduled. Never replace/disable another consumer's depth renderer.
+  let active = false, disposed = false, ready = false, scale = 1;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let pending: AbstractMesh[] = [];
+  const eligible = (mesh: AbstractMesh) => mesh !== plume && mesh.isEnabled() && mesh.isVisible && !mesh.infiniteDistance;
+  const pendingNow = () => {
+    const engine = scene.getEngine(), previousPass = engine.currentRenderPassId;
+    try {
+      // DepthRenderer selects the draw wrapper using the current render-pass ID.
+      // Preflight must never replace a main-pass effect with a depth effect.
+      engine.currentRenderPassId = texture.renderPassId;
+      return scene.meshes.filter(mesh => eligible(mesh) && mesh.subMeshes?.some(sub => {
+        const material = sub.getMaterial();
+        if (!material || material.disableDepthWrite || material.needAlphaBlendingForMesh(mesh) || sub.verticesCount === 0) return false;
+        return !renderer.isReady(sub, Boolean(mesh.hasThinInstances || mesh.hasInstances));
+      }));
+    } finally { engine.currentRenderPassId = previousPass; }
+  };
+  const poll = () => {
+    timer = undefined;
+    if (!active || disposed) return;
+    pending = pendingNow();
+    if (pending.length) timer = setTimeout(poll, 50);
+    else { ready = true; requestRender(); }
+  };
+  const cancel = () => { if (timer !== undefined) clearTimeout(timer); timer = undefined; };
+  const resize = () => {
+    const engine = scene.getEngine(), width = Math.max(1, Math.round(engine.getRenderWidth() * scale));
+    const height = Math.max(1, Math.round(engine.getRenderHeight() * scale)), size = texture.getSize();
+    if (size.width !== width || size.height !== height) texture.resize({ width, height });
+  };
+  const resizeObserver = scene.getEngine().onResizeObservable.add(() => { if (active) resize(); });
+  // Check just before the render target pass, including newly arrived opaque content.
+  const before = scene.onBeforeRenderObservable.add(() => {
+    if (!active) return;
+    pending = pendingNow();
+    if (pending.length) {
+      ready = false;
+      if (timer === undefined) timer = setTimeout(poll, 50);
+    } else ready = true;
+  });
+  return {
+    texture,
+    get ready() { return active && ready; },
+    setActive(enabled: boolean, resolutionScale: number) {
+      if (disposed) return;
+      scale = Math.max(0.25, Math.min(1, Number.isFinite(resolutionScale) ? resolutionScale : 1));
+      if (enabled) resize();
+      if (active === enabled) return;
+      active = enabled;
+      if (enabled) {
+        scene.customRenderTargets.push(texture);
+        pending = pendingNow(); ready = pending.length === 0;
+        if (!ready) timer = setTimeout(poll, 50);
+      } else {
+        const index = scene.customRenderTargets.indexOf(texture);
+        if (index >= 0) scene.customRenderTargets.splice(index, 1);
+        ready = false; cancel(); pending = [];
+      }
+    },
+    dispose() {
+      if (disposed) return;
+      this.setActive(false, scale); disposed = true; cancel();
+      scene.onBeforeRenderObservable.remove(before);
+      scene.getEngine().onResizeObservable.remove(resizeObserver);
+      renderer.dispose();
+      // Privately scheduled instances are not in Scene._depthRenderer; Babylon
+      // only disposes the texture for entries registered in that dictionary.
+      texture.dispose();
+    },
+  };
+}

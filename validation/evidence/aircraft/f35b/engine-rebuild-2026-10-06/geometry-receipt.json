@@ -1,0 +1,26 @@
+{
+  "schema": "0sfs-engine-rebuild-geometry-receipt/1",
+  "command": "node scripts/validation/f35b/inspect-nozzle-gaps.mjs",
+  "exitCode": 0,
+  "execution": "One terminal-only NullEngine diagnostic; no suite, browser, GPU or physics run.",
+  "scratchDirectory": "build/validation/f35b-nozzle-gaps/2026-10-06_130501",
+  "files": [
+    {
+      "path": "geometry-report.json",
+      "sha256": "9dc9c573ddb9c21fb4914fe32b6e33acb62b1bc21095bfac29425265af8b4d0d"
+    },
+    {
+      "path": "geometry.log",
+      "sha256": "9f3218b9498f7f6a1e4b14db8a5500ad8f5cccfabd3f7c8df3e4b6ebba0d39b6"
+    },
+    {
+      "path": "executed-algorithm.source.txt",
+      "sha256": "43e888e3c9ae23ee78a0954a3dc7c7ece133a6100891711e8b93033f366032ee"
+    }
+  ],
+  "scope": "Angular coverage of actual selected petal triangles posed by the production rig. A diagnostic snapshot, not a watertight-seal or calibrated F135 acceptance. Source and algorithm hashes are in geometry-report.json.",
+  "followup": {
+    "description": "After the single run, current script scope text was clarified to refer to aperturePositionsNorm so overridden --poses is described correctly. Algorithm, inputs and numerical results are unchanged. Retained report/log and executed-source snapshot remain the original run.",
+    "currentScriptSha256": "597900419db0d88f0514cb8694847501a01a02ab099cb261be5a52e6df58b0f9"
+  }
+}

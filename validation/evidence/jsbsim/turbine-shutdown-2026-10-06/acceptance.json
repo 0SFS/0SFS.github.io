@@ -1,0 +1,39 @@
+{
+  "schema": "0sfs-turbine-shutdown-investigation/1",
+  "date": "2026-10-06",
+  "status": "Controlled comparison passed; reported live-app discrepancy remains unreproduced.",
+  "command": "node scripts/validation/aircraft/check-turbine-shutdown.mjs",
+  "cases": 6,
+  "report": "comparison.json",
+  "log": "reproduction.log",
+  "conditions": "Native hold-down, zero airspeed/wind, 1000 ft, no reset during rundown. No wall-clock timing measurements.",
+  "f35SecondsToOnePercentN2": {
+    "abort-below-idle": 8.141666666666666,
+    "shutdown-from-idle": 8.175,
+    "shutdown-from-full-power": 9.191666666666666
+  },
+  "comparisons": [
+    {
+      "aircraftId": "f-35b",
+      "maxNormalizedDecayDifference": 6.661338147750939e-16,
+      "maxAbsQbarPsf": 6.329747398990324e-23
+    },
+    {
+      "aircraftId": "cirrus-vision-jet",
+      "maxNormalizedDecayDifference": 6.661338147750939e-16,
+      "maxAbsQbarPsf": 3.5661104088070056e-19
+    }
+  ],
+  "changes": "Added reproducible integration diagnostic only; no engine, startup, shutdown or audio calibration changed.",
+  "limitations": "Tests equal native decay across control paths, not F135/FJ33 physical coast-down calibration or the live app's ground-recovery path. Awaiting whether user observation concerns numeric N2, sound or spinning markers; no live browser trace was captured.",
+  "sourceHashes": [
+    {
+      "file": "scripts/validation/aircraft/check-turbine-shutdown.mjs",
+      "sha256": "b45819f716b9cc82e164cc5749f4014e10af1f70600e56ff8007d3906b2e0a3b"
+    },
+    {
+      "file": "src/flight/jsbsim/engineControl.ts",
+      "sha256": "6bbfc9b7d5e684763cae2529b7a1a7fc9ebbd0488791189738ab199fd1233698"
+    }
+  ]
+}

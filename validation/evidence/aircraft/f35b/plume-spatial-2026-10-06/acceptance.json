@@ -1,0 +1,321 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-06",
+  "status": "implemented; numerical/software checks passed; dry night-glow mismatch unresolved; GPU appearance unqualified",
+  "task": "docs/f135-plume-physical-followup-prompt.md",
+  "report": "docs/validation/f135-plume-spatial.md",
+  "ownership": {
+    "0sfs": "Aircraft emission profile, offline basis/spectra, local field, renderer and validation",
+    "JSBSim": "Existing native state/thermal dynamics unchanged; no downstream transport added",
+    "FOSSEarth": "Existing scene exposure/HDR composition unchanged"
+  },
+  "native": {
+    "version": "1.2.4-fork.16",
+    "commit": "97fe6ddf1c8a7d9e10dad46a88e60e79e69fae28",
+    "archiveSha256": "98ee9387c57b871a3851aac83b5eb3a4f858d618e12a2fb9b59eaa0c59dbf61b",
+    "auditedSteps": 82925,
+    "retainedRows": 4171,
+    "priorMilestonesMaximumDifference": 0
+  },
+  "evidence": {
+    "native": "native/acceptance.json",
+    "nativeState": "native/report.json",
+    "baselineGeometry": "geometry-baseline/report.json",
+    "finalGeometry": "geometry/report.json",
+    "opticalModel": "optics-model/provenance.json",
+    "independentOptics": "spatial-optics/report.json",
+    "cpuComparisons": "spatial-optics/README.md",
+    "application": "application/README.md"
+  },
+  "acceptance": [
+    {
+      "criterion": "Reproduce dry VTOL and AB onset with actual native inputs; distinguish physical source and display",
+      "result": "passed-native-and-CPU-diagnosis",
+      "evidence": "native/README.md",
+      "scope": "82925 steps; old continuum/band powers, fuel, station validity, solids, nozzle and display settings recorded. Actual user pixels/settings were not captured."
+    },
+    {
+      "criterion": "Distinct local temperature, particle/extinction and chemical sources",
+      "result": "implemented-provisional-model",
+      "evidence": "optics-model/README.md",
+      "scope": "97x33 offline axisymmetric basis, 64x32 default local source texture, expansion/mixing and separate CH/C2 weights; unmeasured station, Mach, loading and reactions explicit."
+    },
+    {
+      "criterion": "Offline spectral work and bounded interpolation and whole-field source power",
+      "result": "passed-finite-numerical-scope",
+      "evidence": "spatial-optics/report.json",
+      "scope": "Independent local spectra max0.158% of peak channel; complete-field source and Float32 intensity integrals; declared fuel power caps; field refinement max0.425% on checked bright rays."
+    },
+    {
+      "criterion": "Investigate missing dry glow with separated contributions and geometry",
+      "result": "diagnosed-in-part-appearance-unresolved",
+      "evidence": "geometry/README.md",
+      "scope": "36 views/12 poses preserve positive support through full engine hardware. Gas/solid/reflection/light software modes retained. No airframe/ground/reflection image qualification. The new cooler field remains dimmer than the baseline."
+    },
+    {
+      "criterion": "Native-state transitions, independent transfer and nonuniform local emission",
+      "result": "passed-software-and-numerical-scope",
+      "evidence": "spatial-optics/report.json",
+      "scope": "Eight native milestones; homogeneous analytic transfer, nonuniform temperature/composition, proportional actual burned-fuel changes; 480 ray comparisons, default bright-ray error <=0.396%. No downstream transport modeled or arbitrary time fade."
+    },
+    {
+      "criterion": "Rear/oblique daylight/night fixed-exposure appearance and onset gamut/clipping",
+      "result": "CPU-comparisons-retained-GPU-unqualified",
+      "evidence": "spatial-optics/README.md",
+      "scope": "24 independent CPU projections and signed-gamut metrics; no actual application GPU run. Dry night-glow footage mismatch unresolved."
+    },
+    {
+      "criterion": "Lifecycle, physical/display separation and user-controlled resources",
+      "result": "passed-software-contract",
+      "evidence": "application/related-final.log",
+      "scope": "Actual texture data/update/disposal and hidden reveal; no time-only/exposure/gain recomputation; native ambient batch; render request for first light; controls in existing exhaust section."
+    }
+  ],
+  "checks": {
+    "typecheck": {
+      "command": "npx tsc -b",
+      "status": "passed",
+      "log": "application/typecheck-final.log"
+    },
+    "related": {
+      "command": "npx vitest related --run --maxWorkers=50% <changed files>",
+      "status": "passed",
+      "files": 63,
+      "tests": 782,
+      "inputs": [
+        "src/flight/aircraft/createEngineExhaust.ts",
+        "src/flight/aircraft/engineGasOptics.ts",
+        "src/flight/aircraft/engineExhaustProfiles.ts",
+        "src/flight/aircraft/createAircraftEngineVisuals.ts",
+        "src/flight/createFlightSimApp.ts",
+        "src/flight/settings/flightParameters.ts",
+        "scripts/build-exhaust-optics.mjs",
+        "scripts/exhaustOptics/bake.mjs"
+      ],
+      "log": "application/related-final.log"
+    },
+    "lint": {
+      "command": "npm run lint",
+      "status": "passed",
+      "log": "application/lint-final.log"
+    },
+    "discovery": {
+      "command": "npx vitest list --filesOnly",
+      "status": "passed",
+      "activeFiles": 169,
+      "archivedFiles": 0,
+      "log": "application/test-discovery-final.log"
+    },
+    "ci": {
+      "command": "npm run ci",
+      "attempts": 1,
+      "status": "passed",
+      "files": 169,
+      "passedTests": 1832,
+      "expectedFailures": 1,
+      "scope": "Full lint/tests; production build; JSBSim/audio/exhaust/engine artifact verification and distributed JSBSim/audio checks",
+      "log": "application/ci-final.log"
+    },
+    "existingExpectedFailure": "F-35 main-gear selected-skin containment; unrelated, preserved",
+    "legacyEvaluator": {
+      "status": "passed",
+      "rows": 4171,
+      "maximumRelativeDifference": 0,
+      "nativeRerun": false,
+      "log": "native/legacy-evaluator-recheck.log"
+    },
+    "evidenceAudit": {
+      "status": "passed",
+      "log": "application/evidence-audit.log"
+    },
+    "diffWhitespace": {
+      "status": "passed",
+      "log": "application/diff-check-final.log"
+    }
+  },
+  "sourceHashes": {
+    "scripts/build-exhaust-optics.mjs": "e2f4b2559b041475786dfe7cdef32f1bf4b3463226b9671c0268fabdd2dde9ef",
+    "scripts/build-exhaust-optics.test.mjs": "53ed550df0cf4514c1b9790475e97196282956ded75780da228433d1c4498682",
+    "scripts/exhaustOptics/bake.mjs": "0b3c82a6c06569a1d2361d7960e5d0bcca1555a88797b1f4debdf8180aa08901",
+    "scripts/exhaustOptics/f135-visible-approximation.json": "788581df85e576b56bac25156e6cd27ade1c87e67148ca39bb48329102948a2f",
+    "scripts/exhaustOptics/reference.mjs": "8fb085647f7520a8f4222e8be207023d881ad0a186fa3d4721fa8f7e5c9b5cb8",
+    "scripts/exhaustOptics/spatialReference.mjs": "d18d930cb5505ea5ea7f168bccccc4fc392320b2a152c466fdceb734ebae8790",
+    "scripts/validation/f35b/check-plume-geometry.mjs": "e5a762f770e473d444bc5003ee65ad7bf7b84e50422d0a82440196fdd20e5fee",
+    "scripts/validation/f35b/check-spatial-plume.mjs": "4285548b307d986dbc39eb6fe82a30b9ac3394b30f5bbdff3db2273c65ce900d",
+    "scripts/validation/f35b/plot-f135-plume-state.mjs": "abf143509df81d3406676d3be86f36f00fa1e84b15b9a6998ddc75a28b3a72c7",
+    "scripts/validation/f35b/trace-f135-plume-state.mjs": "f3cd41c849a8cef51e869cb6470b8d42ab536cea97ca36ff5e5b9aa2e4887b1a",
+    "src/flight/aircraft/createAircraftEngineVisuals.test.ts": "3011a9e36d43f9233f75f722efa2ec42f2e9f74a5fd65e147a32b46b327742e9",
+    "src/flight/aircraft/createAircraftEngineVisuals.ts": "ba3b5ba7b8c82612537a79e76c554c80d59b5959ce175392fb31ece05587741e",
+    "src/flight/aircraft/createEngineExhaust.test.ts": "55ab5dd19fe21aca3a986bc10de416dd9b553727d097a296aaa35bbff9159b1f",
+    "src/flight/aircraft/createEngineExhaust.ts": "a752a27a5a4354be1fbcbdb70ad456c09770573d4c75573cd03dc905f42c8418",
+    "src/flight/aircraft/engineExhaustProfiles.test.ts": "1edaeb5a298f2219605c38db35c19731ca8a77678490272bee3c05c28a20edca",
+    "src/flight/aircraft/engineExhaustProfiles.ts": "d202d915b4fd227c57baf0fc643d3c497de1426598579d43df56afa0c0a08cd2",
+    "src/flight/aircraft/engineGasOptics.test.ts": "f436ac16b72d146e707268c2907c0f3ebc0626d363406649a9f20c9b8d0322e3",
+    "src/flight/aircraft/engineGasOptics.ts": "4c1f891eda1db2a041afe33c89758ef79dc31a204faa54da26e9200e027a2956",
+    "src/flight/aircraft/generated/engine-smoke-flipbook.manifest.json": "469e66519755567f6986aa0e540000053e3f6d48d37a831fc0df4f815047dc60",
+    "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json": "3da9c058348d432aca82b1f4f6a5b95163abe7484ae74e9d3cdec2e024e7e7c4",
+    "src/flight/aircraft/generated/f135-exhaust-lut.png": "d9d460fbfbfe3ec0d099659646a176fa892e2afa81713f92469d0c75f4c47189",
+    "src/flight/aircraft/generated/f135-exhaust-spatial.png": "27110d47433281963a653695116feb79cf80e314a6553c3c9c753f2f6a6a530e",
+    "src/flight/aircraft/generated/f135ExhaustOpticalData.ts": "7fa9b0062dc5f70d3506a4cee22f2a2aa12a4ffa12cae83e13877f49160f09bb",
+    "src/flight/createFlightSimApp.test.ts": "18bc2d1c2f05e5fe7197a43664aad450da6f2578200e3afac904d100bff4819b",
+    "src/flight/createFlightSimApp.ts": "04710d5fdc336616e226ae4c1ea9105fc4b5394bd85a58127a5b7e874cae7f7f",
+    "src/flight/settings/flightParameters.ts": "299754a3e88c64c105a9087f616e832e66357be5e00bf67e390cca75fd2dfd01"
+  },
+  "integrationSnapshots": [
+    {
+      "source": "src/flight/aircraft/createAircraftEngineVisuals.ts",
+      "snapshot": "application/createAircraftEngineVisuals.ts.txt",
+      "sha256": "ba3b5ba7b8c82612537a79e76c554c80d59b5959ce175392fb31ece05587741e"
+    },
+    {
+      "source": "src/flight/aircraft/createAircraftEngineVisuals.test.ts",
+      "snapshot": "application/createAircraftEngineVisuals.test.ts.txt",
+      "sha256": "3011a9e36d43f9233f75f722efa2ec42f2e9f74a5fd65e147a32b46b327742e9"
+    },
+    {
+      "source": "src/flight/aircraft/createEngineExhaust.test.ts",
+      "snapshot": "application/createEngineExhaust.test.ts.txt",
+      "sha256": "55ab5dd19fe21aca3a986bc10de416dd9b553727d097a296aaa35bbff9159b1f"
+    },
+    {
+      "source": "src/flight/settings/flightParameters.ts",
+      "snapshot": "application/flightParameters.ts.txt",
+      "sha256": "299754a3e88c64c105a9087f616e832e66357be5e00bf67e390cca75fd2dfd01"
+    }
+  ],
+  "applicationLogHashes": {
+    "application/typecheck-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "application/related-final.log": "e8d0e29835d8e0a8a0680b173ea3a2b0ab3ece44e8a18606f8e12f316ce2724b",
+    "application/lint-final.log": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e",
+    "application/test-discovery-final.log": "b6b3fdaf67dbd6cb242ba8770c7fd593482f801bed4756871620e899c0fc2f3a",
+    "application/ci-final.log": "84b4161c7f350f058fd8bc2c6c3849fbe5cf0e780eab4a298dc221cf483a51b9",
+    "application/renderer-focused.log": "0cad348c97359413a2ba88d3fa5d5bd530a7c25b9406d43c108c326010831ece",
+    "application/typecheck-integration.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "application/diff-check-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "application/native-status-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "application/evidence-audit.log": "7cfb4df879a28df98a93c9122e356112a5b8c7a4d35a4b41f08373e5d1284a03"
+  },
+  "preservation": {
+    "unrelatedTrackedDiffsByteIdentical": 45,
+    "baseline": "Task-entry tracked diff and status captured in local build scratch; preserved evidence identities follow.",
+    "unchangedIdentities": [
+      {
+        "path": "package.json",
+        "sha256": "f9951db0340a291ca798ce5d2a3488fc8bbc49bea094a5394da20e81b687beee",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/acceptance.json"
+      },
+      {
+        "path": "package-lock.json",
+        "sha256": "0226d1b4832f308bf7b82622d12cd43ecf449bf9f437521c30434eb6b8761a76",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/acceptance.json"
+      },
+      {
+        "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+        "sha256": "04cea10d3c135cb79247bbf7794a81359070e2bdc9afc9782502b538444eac16",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/acceptance.json"
+      },
+      {
+        "path": "scripts/build-f135-engine.mjs",
+        "sha256": "f3368f25f92d283992d326b8903bc76b1491b5fe2366b7c4be2a5523892a7a74",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/acceptance.json"
+      },
+      {
+        "path": "scripts/build-f135-engine.test.mjs",
+        "sha256": "20264cbc754d9647aebf1a16d2b669f92238bcf158fa846d3860a39fc33f9c27",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/acceptance.json"
+      },
+      {
+        "path": "scripts/f135Engine/glb.mjs",
+        "sha256": "cb9d81855febdd817579c76f6a944359fc352786b46b049007a90b00a56fff10",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/acceptance.json"
+      },
+      {
+        "path": "scripts/f135Engine/intersections.mjs",
+        "sha256": "8342512a2a769646203e93d5c7304bfa022bc3df2dade6cba6c39b8c82cd1e4c",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/acceptance.json"
+      },
+      {
+        "path": "scripts/f135Engine/mechanism.mjs",
+        "sha256": "8b5b7870f02a7b2d49ab862a0f2fa573983f11e1152c0f5df85443c1f2b26e76",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/acceptance.json"
+      },
+      {
+        "path": "scripts/f135Engine/profile.json",
+        "sha256": "fd31d20c7e4ff1bf39887f2af9ebfade6f2174b591c38ad2be6c21a01f37d1f5",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/acceptance.json"
+      },
+      {
+        "path": "scripts/f135Engine/source.mjs",
+        "sha256": "6a57b46fcdbd2abf90c617ab59cc16944428e77b4fd3787deed890f7eb36d3cb",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/acceptance.json"
+      },
+      {
+        "path": "src/flight/aircraft/createEngineHotSurfaceGlow.ts",
+        "sha256": "b55c3a390e7d29a78ab8e0030021917b6bfd5a3457cd2faba8605ebdd2f0b582",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/acceptance.json"
+      },
+      {
+        "path": "src/flight/aircraft/createEngineHotSurfaceGlow.test.ts",
+        "sha256": "53ce95fbc4357967671b3acf4d2f8f4ee4b2e36f9697494bfd65696a66d7297f",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/acceptance.json"
+      },
+      {
+        "path": "src/flight/aircraft/engineNozzleRig.ts",
+        "sha256": "0c070c616f6b9508de3cba5ccd24818b9ad679bb938e9d86acf1287f381f0996",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/acceptance.json"
+      },
+      {
+        "path": "src/flight/aircraft/engineNozzleRig.test.ts",
+        "sha256": "af6109ba21f78858151715335ee8ba0f49b0321f0bf4dab6681f9f59141c29e8",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/acceptance.json"
+      },
+      {
+        "path": "src/flight/aircraft/generated/f135EngineData.ts",
+        "sha256": "08545c3e51892acb63ea27c8283445aef1a1e4d1a432768af1b492ba0fd48ddb",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/acceptance.json"
+      },
+      {
+        "path": "src/flight/engineTestStand.ts",
+        "sha256": "750fb6ecc44f1eb5a7b53725c24ed7af4647eed939a0526b8268e2be646fb183",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/acceptance.json"
+      },
+      {
+        "path": "src/flight/engineTestStand.test.ts",
+        "sha256": "62222c3280ce55ee3c631e069ee4a1fa9a4b095c38a5d07a70bb3aa36947bd14",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/acceptance.json"
+      },
+      {
+        "path": "src/flight/engineTestStand.integration.test.ts",
+        "sha256": "27c3452b6f0ee24518cb95d0e5a46e14f0e8573217c0a7d47cab56d8f7f5a91e",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/acceptance.json"
+      },
+      {
+        "variant": "installed",
+        "path": "public/aircraft/f-35b/engine/F135-PW-600-installed.glb",
+        "sha256": "4e7d837e2ab5303ab9d90a3b3321baa469e5fc204acad7e0b2f59185990aa341",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/geometry/acceptance.json"
+      },
+      {
+        "variant": "full",
+        "path": "public/aircraft/f-35b/engine/F135-PW-600-full.glb",
+        "sha256": "0fc8083a3a4d5d5d76946ea3602d4a23ebc508e58301145e489c59c1801ff71f",
+        "baseline": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/geometry/acceptance.json"
+      },
+      {
+        "path": "deps/felipegalind0-jsbsim-1.2.4-fork.16.tgz",
+        "sha256": "98ee9387c57b871a3851aac83b5eb3a4f858d618e12a2fb9b59eaa0c59dbf61b",
+        "baseline": "validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/report.json"
+      }
+    ],
+    "noCommitsOrPushes": true
+  },
+  "limitations": [
+    "No browser, GPU, dev/preview server or benchmark; actual shader execution and flight appearance unqualified.",
+    "Dry powered-lift external red/orange night light remains unexplained; no forced brightness, AB or external fuel burning.",
+    "Quasi-steady axisymmetric approximation, not CFD or F135 calibration; no shocks, turbulence, scattering, transport state or ground impingement.",
+    "Finite 6m support may truncate residual source/extinction; lower sample budgets can miss thin emission.",
+    "First-interaction depth approximate; geometry test excludes ground and airframe.",
+    "Source caps do not demonstrate global engine energy conservation.",
+    "CPU display operator is not the application HDR pipeline or a measured camera."
+  ]
+}

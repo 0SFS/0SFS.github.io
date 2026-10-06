@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-06",
+  "status": "passed-local-native-thermal-and-numerical-scope",
+  "nativeSdk": "@felipegalind0/jsbsim@1.2.4-fork.16",
+  "sourceCommit": "97fe6ddf1c8a7d9e10dad46a88e60e79e69fae28",
+  "artifacts": {
+    "report": "report.json",
+    "trace": "trace.csv",
+    "audit": "thermal-audit.json",
+    "sensitivity": "sensitivity.json",
+    "plots": [
+      "thermal-cycle.svg",
+      "startup-paths.svg",
+      "heat-balance.svg",
+      "cooldown-convergence.svg"
+    ],
+    "plotProvenance": "plot-provenance.json",
+    "frozenQualificationModule": "qualification-helpers.mjs.txt",
+    "frozenQualificationEntry": "qualification-helpers.ts.txt",
+    "lateOpticsRecheck": "optical-recheck.json",
+    "nativeSdkAdoption": "../../../../jsbsim/adoption/fork16-adoption.json"
+  },
+  "checks": [
+    {
+      "name": "cold-cycle",
+      "passed": true
+    },
+    {
+      "name": "running-initialization",
+      "passed": true
+    },
+    {
+      "name": "hot-restart",
+      "passed": true
+    },
+    {
+      "name": "lifecycle",
+      "passed": true
+    },
+    {
+      "name": "powered-lift",
+      "passed": true
+    },
+    {
+      "name": "cooling-convergence-30",
+      "passed": true
+    },
+    {
+      "name": "cooling-convergence-60",
+      "passed": true
+    },
+    {
+      "name": "cooling-convergence-120",
+      "passed": true
+    },
+    {
+      "name": "cooling-convergence-240",
+      "passed": true
+    },
+    {
+      "name": "convergence",
+      "passed": true
+    }
+  ],
+  "auditedNativeSteps": 133577,
+  "maxErrors": {
+    "heatRateW": 5.820766091346741e-11,
+    "nativeResidualJ": 2.732363668656035e-09,
+    "independentlyReconstructedStepJ": 2.7322499818183132e-09,
+    "gasBathK": 4.547473508864641e-13
+  },
+  "sampledRows": 4750,
+  "sampling": "Quarter-second output plus scenario boundaries; energy is audited and accumulated at every accepted step, not by integrating the decimated CSV.",
+  "coldCycleAccumulatedResidualJ": {
+    "liner": 6.444752216339111e-07,
+    "core": -5.441834218800068e-07
+  },
+  "nativeTimestepHz": [
+    30,
+    60,
+    120,
+    240
+  ],
+  "finestTimestepErrorK": {
+    "core": 0.00791965128416905,
+    "liner": 0.0036987156098575724
+  },
+  "sensitivityCases": 108,
+  "lateOpticalChanges": {
+    "explanation": "After the native run, the shared absolute-emission interpolation helper and geometry/source metadata were completed. Pure optical recomputation against those updated files preserved every one of 4750 rows byte-for-byte; no native thermal rerun was required. Exact old helper bundle is retained.",
+    "outputTraceIdentical": true,
+    "sourceHashRecord": "optical-recheck.json",
+    "allNativeFieldsPreservedExactly": true,
+    "finalGeometryMetadataRecheck": "After final fixed seal winding and generated asset metadata, the same offline recheck again preserved all 4750 CSV rows byte-for-byte. Earlier recheck retained in optical-recheck-before-final-geometry.json."
+  },
+  "initializationFinding": "Cold start takes finite starter/spool/heating time. Explicit running initialization assigns initial equilibrium energy (core 601429.15 J, liner 2185153.12 J) separately from integrated heat. Hot restart retains existing temperatures. No arbitrary visual warmup delay added.",
+  "energyBoundary": "Separate local constant-capacity solid balances driven by imposed gas/coolant/surroundings reservoirs; no global engine conservation claim. Optical powers are observers, not extra thermal sinks.",
+  "capacityCaveat": "1800 and 12000 J/K are provisional effective capacities. Rendered rigid shell geometry is not a calibrated mass or heat-capacity model.",
+  "renderedEvidence": "No browser, GPU, photograph or live scene capture in this evidence. Native plots are Matplotlib scientific data plots, not rendered engine appearance.",
+  "fullApplicationCi": {
+    "status": "application tests and remaining build passed after archival filename repair",
+    "record": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/acceptance.json",
+    "fullCiInvocations": 1,
+    "applicationFiles": 169,
+    "passedTests": 1824,
+    "expectedFailures": 1,
+    "note": "Full CI command stopped on two archived source import failures; unchanged bytes renamed.txt,169-file discovery verified,remaining production build passed. Suite not repeated."
+  }
+}

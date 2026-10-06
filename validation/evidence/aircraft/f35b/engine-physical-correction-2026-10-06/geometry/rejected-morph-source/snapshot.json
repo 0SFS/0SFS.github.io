@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-06",
+  "reason": "Pre-correction morphing engine source and actual runtime assets, retained unchanged for rejection measurements. This snapshot remains software-tested but is rejected as rigid aperture mechanics.",
+  "files": [
+    {
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-full.glb",
+      "retained": "F135-PW-600-full.glb",
+      "sha256": "0a8055b3fa42cbe36528a234afcaee44bf3611289209217a407bcf31877c7974",
+      "bytes": 1939040
+    },
+    {
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-installed.glb",
+      "retained": "F135-PW-600-installed.glb",
+      "sha256": "8003120dfcb0c78e187797bd99d83cee21b2084ed7bf36ee528b4c15779f8fa9",
+      "bytes": 1112632
+    },
+    {
+      "path": "public/aircraft/f-35b/engine/manifest.json",
+      "retained": "manifest.json",
+      "sha256": "cdebdd3cf80a5c25a83beb67d832d78b7b2abf183ca3bcbce7aeb65a6885fe1e",
+      "bytes": 7498
+    },
+    {
+      "path": "scripts/f135Engine/source.mjs",
+      "retained": "source.mjs.txt",
+      "sha256": "5181906256f5b27fb965ccca3859b14d3dfafd342f0f5a60c380537e6022d5b5",
+      "bytes": 11916
+    },
+    {
+      "path": "scripts/f135Engine/profile.json",
+      "retained": "profile.json",
+      "sha256": "2dc706c635e09798d0ab2cc332f3745c9aca808a89c3002222d844f7e7973611",
+      "bytes": 4962
+    },
+    {
+      "path": "scripts/f135Engine/glb.mjs",
+      "retained": "glb.mjs.txt",
+      "sha256": "a3c928da01bbd77a4a6c734364b98cd7cc257594609158dfeb9d2d43b2d42157",
+      "bytes": 8993
+    },
+    {
+      "path": "scripts/build-f135-engine.mjs",
+      "retained": "build-f135-engine.mjs.txt",
+      "sha256": "42351924599aa59d57e30ad085aaf84bbb3e31039f921337d16cf23de7675f0e",
+      "bytes": 3175
+    },
+    {
+      "path": "src/flight/aircraft/engineNozzleRig.ts",
+      "retained": "engineNozzleRig.ts.txt",
+      "sha256": "61d190036c06c76ff03b720520d5f61f3111eafa6ffb6714f36c4c6050afbeac",
+      "bytes": 4484
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135EngineData.ts",
+      "retained": "f135EngineData.ts.txt",
+      "sha256": "df84a99925475b4efa0d98a41780e4363b021528063c27689fc7e4c71cb9e69e",
+      "bytes": 1462
+    }
+  ]
+}

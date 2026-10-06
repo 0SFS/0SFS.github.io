@@ -1,5 +1,22 @@
 # Flight settings
 
+The Engine tab also owns live-history retention (1–600 simulated seconds,
+default 60) and capture ceiling (0–30 Hz, default 5; zero disables it), plus
+starting view distance (1–100 m,
+default 6), and the test camera's single-track zoom range (0.2–1,000 m bounds,
+default 1–100 m). These are declared in `flightParameters.ts`. The test stand is
+an explicit, nonpersistent `engineTest=1` page mode, entered/exited in the Engine
+tab. Earth stays loaded and the existing **Location** tab owns moves and altitude,
+including runway selections. The default fixture is MSP runway 35's threshold,
+at 44.8661768° N, 93.2366446° W, facing 350° true; its published elevation is
+833.3 ft MSL. Loaded terrain and the aircraft's stance supply final clearance.
+These defaults come from [FAA AIP, Minnesota, AD 2.12](https://www.faa.gov/air_traffic/publications/atpubs/aip_html/part3_ad_2.0_minnesota.html),
+read 2026-10-06. The separate test-altitude setting was removed so altitude has
+one home. Native hold-down remains active after a move; runway choices retain
+the bench's throttle, engine state and native metal temperature instead of
+applying flight departure/arrival controls.
+[Behavior, sources and qualification limits](f35b-fdm.md#engine-test-stand-and-live-history).
+
 Status: implemented. Stage 1 (2026-09-25) came with the sound tiers' internal
 parameters. The aircraft as a detail focus point (2026-09-26) passes its orbit
 check on Google and on a 2D map. Presets came on 2026-09-26. What was done and
@@ -86,8 +103,11 @@ existing tabs.
 
 Aircraft exhaust lives in Renderer → Aircraft exhaust. The shared flight-only
 renderer reads `osfs.exhaust.enabled` (default on), `sampleCount` (8, bounded
-4–32 samples/pixel), `maxDistanceMeters` (2,000, bounded 1–20,000 m), and
-`intensity` (1×, bounded 0–8×). They apply live and persist through the registry.
+4–32 samples/pixel), `maxDistanceMeters` (2,000, bounded 1–20,000 m),
+`intensity` (1×, bounded 0–8×), and `surfaceReferenceNits` (1,000, bounded
+1–100,000 cd/m²). They apply live and persist through the registry.
+The last value maps modeled metal luminance to display white; lowering it
+brightens the nozzle without changing gas/metal temperatures or the flame.
 The default is one bounded volume draw per configured engine with a baked
 optical lookup; off releases those resources. These controls do not change
 engine power or native afterburner engagement. See the
@@ -152,8 +172,9 @@ counts; visible stationary inlet guide vanes in front photographs must not
 be counted as rotating fan blades. This metadata changes the visualization
 only, never the acoustic reference frequencies or flight dynamics.
 
-Engine → Engine owns `osfs.engineMonitor.orbFps` (0–60 frames/s, default 30),
-`orbTurnsPerSecond` (0–4 visual rev/s at the scale maximum, default 2), and
+Engine → Engine owns `osfs.engineMonitor.orbFps` (0–1000 frames/s, default 1000),
+`orbTurnsPerSecond` (0–4 visual rev/s ceiling at the scale maximum, default 2),
+`orbMaxPatternStep` (0.05–0.49 pattern pitches per drawn frame, default 0.45), and
 `orbPixelRatio` (1–3 drawing pixels/CSS pixel, default 2, capped by display
 density). Renderer → Instruments owns `osfs.renderer.engineOrbs`
 (Auto/WebGPU/WebGL2/WebGL1/Off, default Auto), alongside a note naming the active
@@ -161,25 +182,115 @@ backend. These same choices travel to the phone. Off or zero frame rate releases
 the orb renderer and retains the numeric gauges. Missing blade metadata also
 allocates no orb graphics backend.
 
-To keep repeated blades from appearing stationary or reversing at the selected
-cadence, both shafts share an effective visual speed ceiling of
-`min(requested rev/s, configured frames/s / (4 × largest blade count))`.
-The Engine tab reports that ceiling. This preserves the ratio between the
-shaft indications with at least four configured frames per blade pitch;
-actual browser stalls can still cause strobing. The numeric readings and
-simulation time are unaffected.
+The FPS value is a ceiling, not a requested browser refresh rate. At the default,
+the shaft canvas follows each client's `requestAnimationFrame` cadence (for
+example 60, 120, 144 or 240 Hz) without the former 30 FPS throttle. Lower ceilings
+remain available to reduce drawing work; zero disables it. Explicitly saved
+ceilings remain in effect. Draw deadlines carry fractional timing remainder so
+minor timestamp jitter cannot repeatedly halve the selected draw rate, and
+stalls discard missed draws instead of triggering catch-up bursts.
+
+Both shafts share a maximum visual speed determined by the client's actual
+drawn frames and the two-hotspot pattern, bounded above by
+`orbTurnsPerSecond`. Each accepted GPU draw advances the full-scale reference
+by at most `orbMaxPatternStep / 2` revolutions; both shafts' advances receive
+the same reduction. One pattern pitch is half a revolution, independent of
+the rotor's blade count. At steady cadence and normal simulation speed, the
+resulting limit is `min(requested rev/s, drawn FPS × max pattern step / 2)`.
+The default 0.45-pitch limit allows 13.5 rev/s at 60 FPS and 27 rev/s at
+120 FPS, so the requested 2 rev/s ceiling applies at both cadences. A shaft at
+99% therefore turns at 1.98 rev/s, preserving N1/N2 speed proportions. At
+5 FPS the pattern limit reduces the shared maximum to 1.125 rev/s. The Engine
+tab reports the last submitted motion cadence, effective maximum speed and why
+it is limited.
+Each client derives its own limit from its submitted frames.
+
+Each blade has a fixed brightness given by
+`0.65 + 0.35 × cos(2 × rotor-local blade angle)`. This makes two opposite
+hotspots attached to the shaft. A blade's brightness does not change as it
+rotates; its hue, size and opacity remain constant too. The hotspots form the
+low-frequency shaft cue. The map covers the full 360° circle and is sampled
+at each blade's fixed rotor-local angle. With an odd blade count, a hotspot's
+maximum can fall between neighboring blades; exact opposite blade pairs are
+unnecessary and the represented blade count is unchanged. The C172's two opposite propeller markers themselves
+repeat twice per turn and both receive full brightness.
+
+While the aircraft's native afterburner state is confirmed active, both blade
+rows use the same accent as its throttle indicator and exhaust optical profile.
+The F135 profile supplies `#ff9450`; the renderer does not choose an aircraft
+palette. This state change preserves every blade's fixed relative brightness,
+size and opacity. Off, inhibited or unavailable afterburner state restores the
+normal row colors. The monitor shares the aircraft visuals' cached observation,
+so coloring requires no additional JSBSim reads. The active accent travels to
+the phone as optional `afterburnerColor`; its absence retains normal colors.
+
+The hotspot pattern becomes directionally ambiguous at half a pattern pitch
+per frame. The configurable limit stays strictly below that boundary for every
+submitted frame, including a frame following a stall. Skipped draws do not
+advance the visible reference, and any excess advance at the next drawn frame
+is discarded rather than caught up later. This guards the two-hotspot cue;
+individual evenly spaced blade markers can still alias or appear to reverse.
+The application cannot observe compositor-dropped frames, so the submitted-frame
+limit is not a guarantee about every frame the physical display presents.
 
 The desktop reuses the globe's WebGPU device when present, with WebGL2 then
 WebGL1 fallback. The small transparent surface draws the dots in one draw call;
-text and ring layout remain ordinary accessible DOM. Simulation time advances
-the angles. The instrument does not create a desktop animation loop or ask the
-globe to render for its own animation. Draws are capped and unchanged, hidden or
-paused frames cost no GPU submissions. This architecture and the correctness
-checks do not establish a device performance qualification.
+text and ring layout remain ordinary accessible DOM. A shared aircraft instrument
+animation controller runs the shaft canvas independently of the globe's render
+cadence on both desktop and phone. It interpolates only simulation time already
+received, over the source sample's wall-clock interval on desktop or one 50 ms
+heartbeat on the phone. It never reads JSBSim, updates text or requests a globe
+frame from that animation loop. Duplicate fixed-step timestamps preserve ongoing
+playback; pause, hidden/offscreen state, disabled rendering, zero shaft speed,
+and reaching the last received sample stop the loop. Rewinds rebase motion.
+Numeric readouts and engine detail cells write only changed displayed values;
+their refresh checks are independent of shaft drawing. This architecture and
+the correctness checks do not establish a device performance qualification.
 
-The [blade-marker acceptance record](../../validation/evidence/hud/engine-blade-markers-2026-10-05/acceptance.json)
+The [afterburner-accent record](../../validation/evidence/hud/engine-orb-afterburner-2026-10-06/acceptance.json)
+verifies color activation and removal on desktop and phone, with no extra native
+reads. All three GPU backends preserve blade geometry and opacity through a
+color change and restore the normal palette afterwards. Full CI passed 1734
+tests and one expected failure.
+
+The [two-hotspot validation record](../../validation/evidence/hud/engine-orb-hotspots-2026-10-06/acceptance.json)
+and [native-size preview](../../validation/evidence/hud/engine-orb-hotspots-2026-10-06/hotspots.png)
+cover all three aircraft plus synthetic 23/37-blade rings on WebGPU, WebGL2
+and WebGL1. All 12 checks recover the exact counts, fixed per-blade brightness,
+unchanged sizes and radii, and forward hotspot motion under a synthetic frame
+limit. Full CI passed 162 files, 1725 tests and one expected failure. These
+checks validate the even/odd mapping and submitted-frame limit, not sustained
+refresh performance.
+
+The historical [independent-cadence record](../../validation/evidence/hud/engine-orb-cadence-2026-10-05/acceptance.json)
+retains deterministic tests for 60/120/144/240 Hz delivery, slower model sampling,
+pause and visibility lifecycles, and unchanged DOM. Full CI passed 162 files,
+1709 tests and one expected failure. These checks do not measure a particular
+device's delivered refresh rate under load. That record predates the per-draw
+pattern-step limit; its independent animation loop remains in use.
+
+The historical [uniform-marker check](../../validation/evidence/hud/engine-orb-uniform-2026-10-05/acceptance.json)
+and [uniform preview](../../validation/evidence/hud/engine-orb-uniform-2026-10-05/uniform-blades.png)
+verify constant color and brightness across every blade and two rotation
+phases, with the same counts and marker sizes, on all three backends. The
+maximum measured interior RGB variation was one byte value from canvas
+rounding. The uniform appearance and unrestricted speed scaling in that record
+have been superseded by the pattern of two fixed hotspots and the client-dependent
+pattern-step limit.
+
+The historical [speed correction record](../../validation/evidence/hud/engine-orb-speed-2026-10-05/acceptance.json)
+verifies direct speed scaling at 99%, independence from drawing cadence, and
+the rotating brightness cue on all three backends. Nine aircraft/backend
+checks recovered the correct blade counts at both phases and measured the
+brightness direction within 0.00049 radians of its expected advance. Related
+tests passed 52 files / 652 tests; full CI passed 160 files with 1684 passing
+tests and one expected failure. Its [preview](../../validation/evidence/hud/engine-orb-speed-2026-10-05/blade-speed-cue.png)
+shows the brightness cue subsequently removed at the user's request. The
+direct speed scaling in that historical record has also been superseded.
+
+The prior [blade-marker acceptance record](../../validation/evidence/hud/engine-blade-markers-2026-10-05/acceptance.json)
 retains source hashes, nine backend/aircraft pixel-count checks and the
-[updated preview](../../validation/evidence/hud/engine-blade-markers-2026-10-05/blade-markers.png).
+[earlier preview](../../validation/evidence/hud/engine-blade-markers-2026-10-05/blade-markers.png).
 Every requested count was recovered from the rendered pixels in WebGPU,
 WebGL2 and WebGL1, and marker areas within each ring stayed within 15% at the
 enlarged validation size. The actual 68px HUD was visually inspected separately.

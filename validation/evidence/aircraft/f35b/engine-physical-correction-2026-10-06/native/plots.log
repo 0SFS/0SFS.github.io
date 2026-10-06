@@ -1,0 +1,17 @@
+Matplotlib is building the font cache; this may take a moment.
+{
+  "out": "/Users/felg/gh/0sfs/build/f135-physical-native-plots-final-20261006",
+  "schemaVersion": 1,
+  "matplotlib": "3.11.2",
+  "plots": [
+    "thermal-cycle",
+    "startup-paths",
+    "heat-balance",
+    "cooldown-convergence"
+  ],
+  "inputReport": "validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/native/report.json",
+  "reportSha256": "6c51271ac29f89db50586e45fe9467b128fc82470b684617988c0675e37e5f57",
+  "traceSha256": "1e2679c40f11cf11065dcc0a7ba30a65f4264327e058be61cd1327e0e78422a4",
+  "scriptSha256": "fadd79537a60bc01bfb87b7f403c4612115da5545df1bb4790f1ecffc4c39681",
+  "scope": "Standalone Matplotlib plots from retained native data; no physics rerun, browser or GPU rendering."
+}

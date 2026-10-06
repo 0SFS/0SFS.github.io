@@ -1,0 +1,179 @@
+// Original 0sfs aircraft geometry. All lengths below come from profile.json or
+// explicitly approximate casing/detail proportions. No preview mesh/texture copied.
+import { readFileSync } from 'node:fs';
+import { apertureState, apertureFrames, partName, partPose } from './mechanism.mjs';
+export const profile = JSON.parse(readFileSync(new URL('./profile.json', import.meta.url), 'utf8'));
+export const TAU = Math.PI * 2;
+export const add = (a, b) => a.map((v, i) => v + b[i]);
+export const sub = (a, b) => a.map((v, i) => v - b[i]);
+export const mul = (a, s) => a.map(v => v * s);
+export const dot = (a, b) => a.reduce((s, v, i) => s + v * b[i], 0);
+export const cross = (a, b) => [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
+export const unit = a => mul(a, 1 / Math.hypot(...a));
+export const ry = (a, p) => [Math.cos(a)*p[0]+Math.sin(a)*p[2],p[1],-Math.sin(a)*p[0]+Math.cos(a)*p[2]];
+export const rz = (a, p) => [Math.cos(a)*p[0]-Math.sin(a)*p[1],Math.sin(a)*p[0]+Math.cos(a)*p[1],p[2]];
+export function solveBearings(pitch, yaw) {
+  const beta = profile.geometry.bearingTiltDegrees*Math.PI/180;
+  const p = Math.max(0,Math.min(4*beta,pitch));
+  const b = 2*Math.asin(Math.max(0,Math.min(1,Math.sin(p/4)/Math.sin(beta))));
+  const halfPlane = Math.atan2(Math.cos(beta)*Math.sin(b/2),Math.cos(b/2));
+  return [-yaw-halfPlane,b,-b];
+}
+export function bearingFrames(pitch = 0, yaw = 0, aperture = 0) {
+  const [a,b,c] = solveBearings(pitch,yaw), g=profile.geometry, beta=g.bearingTiltDegrees*Math.PI/180;
+  const r1=p=>rz(a,p), r2=p=>r1(ry(beta,rz(b,p))), r3=p=>r2(ry(-2*beta,rz(c,p))), rn=p=>r3(ry(beta,p));
+  const p2=[0,0,g.forwardBearingLength], p3=add(p2,r2(ry(-beta,[0,0,g.middleBearingLength]))),pn=add(p3,r3(ry(beta,[0,0,g.aftBearingLength])));
+  const apertureFrame=apertureFrames(aperture,profile.aperture);
+  const articulated=Object.fromEntries(Object.entries(apertureFrame).map(([name,frame])=>[name,p=>add(pn,rn(frame(p)))]));
+  return { ...articulated, F135_Engine:p=>p, F135_Bearing1:r1, F135_Bearing2:p=>add(p2,r2(p)), F135_Bearing3:p=>add(p3,r3(p)), F135_Nozzle:p=>add(pn,rn(p)), direction:rn([0,0,1]), exit:add(pn,rn([0,0,apertureState(aperture,profile.aperture).exitZ])) };
+}
+const materials = [
+  ['F135_Outer',[0.24,0.255,0.28,1],0.85,0.37],
+  ['F135_LinerHot',[0.105,0.085,0.066,1],0.72,0.58],
+  ['F135_CoreHot',[0.14,0.105,0.067,1],0.67,0.63],
+  ['F135_Casing',[0.39,0.40,0.40,1],0.82,0.38],
+  ['F135_Dark',[0.035,0.041,0.044,1],0.7,0.59],
+  ['F135_Pipe',[0.29,0.25,0.19,1],0.82,0.38],
+  ['F135_Fan',[0.34,0.32,0.26,1],0.85,0.32],
+].map(([name,baseColorFactor,metallicFactor,roughnessFactor])=>({name,pbrMetallicRoughness:{baseColorFactor,metallicFactor,roughnessFactor},doubleSided:false}));
+function mesh(name, material, parent, standOnly=false, morph=false) { return {name,material,parent,standOnly,positions:[],normals:[],...(morph?{openPositions:[],openNormals:[]}:{}),extras:{semantic:name,standOnly}}; }
+function tri(m, a,b,c, oa=a,ob=b,oc=c) {
+  const n=unit(cross(sub(b,a),sub(c,a)));
+  if (!n.every(Number.isFinite)) throw new Error(`Degenerate source triangle ${m.name}`);
+  m.positions.push(...a,...b,...c); m.normals.push(...n,...n,...n);
+  if(m.openPositions) {const on=unit(cross(sub(ob,oa),sub(oc,oa)));m.openPositions.push(...oa,...ob,...oc);m.openNormals.push(...on,...on,...on);}
+}
+function polygon(m,points) {
+  const unique=points.filter((p,i)=>Math.hypot(...sub(p,points[(i+points.length-1)%points.length]))>1e-12);
+  for(let i=1;i<unique.length-1;i++)tri(m,unique[0],unique[i],unique[i+1]);
+}
+function quad(m,points,open=points,inside=false) {
+  const order=inside?[0,2,1,0,3,2]:[0,1,2,0,2,3];
+  for(let i=0;i<6;i+=3) tri(m,...order.slice(i,i+3).map(j=>points[j]),...order.slice(i,i+3).map(j=>open[j]));
+}
+function skin(m, sections, {segments=profile.geometry.circumferentialSegments, from=0,to=TAU,inside=false}={}) {
+  for(let j=0;j<sections.length-1;j++) for(let i=0;i<segments;i++) {
+    const ts=[from+(to-from)*i/segments,from+(to-from)*(i+1)/segments];
+    const point=(section,t,open)=>section(t,open);
+    const points=flag=>[point(sections[j],ts[0],flag),point(sections[j],ts[1],flag),point(sections[j+1],ts[1],flag),point(sections[j+1],ts[0],flag)];
+    quad(m,points(false),points(true),inside);
+  }
+}
+const circle=(z,r,openR=r,tilt=0,offset=[0,0,0])=>(t,open)=>add(offset,ry(tilt,[(open?openR:r)*Math.cos(t),(open?openR:r)*Math.sin(t),z]));
+function ring(m,z,inner,outer,width=0.018, tilt=0,offset=[0,0,0]) {
+  skin(m,[circle(z-width/2,inner,inner,tilt,offset),circle(z-width/2,outer,outer,tilt,offset),circle(z+width/2,outer,outer,tilt,offset),circle(z+width/2,inner,inner,tilt,offset),circle(z-width/2,inner,inner,tilt,offset)]);
+}
+function box(m,center,size) {
+  const p=[]; for(let z=-1;z<=1;z+=2)for(let y=-1;y<=1;y+=2)for(let x=-1;x<=1;x+=2)p.push(add(center,[x*size[0]/2,y*size[1]/2,z*size[2]/2]));
+  for(const f of [[0,2,3,1],[4,5,7,6],[0,1,5,4],[2,6,7,3],[0,4,6,2],[1,3,7,5]])quad(m,f.map(i=>p[i]));
+}
+function pipe(m, points, radius=0.012, sides=8) {
+  const sections=points.map((p,i)=>{const tangent=unit(sub(points[Math.min(i+1,points.length-1)],points[Math.max(0,i-1)]));const a=unit(cross(tangent,Math.abs(tangent[1])<.9?[0,1,0]:[1,0,0])),b=cross(tangent,a);return t=>add(p,add(mul(a,radius*Math.cos(t)),mul(b,radius*Math.sin(t))));});
+  skin(m,sections,{segments:sides});
+}
+export function buildSource() {
+  const g=profile.geometry,beta=g.bearingTiltDegrees*Math.PI/180, meshes=[];
+  const make=(...args)=>{const m=mesh(...args);meshes.push(m);return m;};
+  const transforms=[
+    {name:'F135_Engine',translation:profile.attachment},
+    {name:'F135_Bearing1',parent:'F135_Engine'},
+    {name:'F135_Bearing2',parent:'F135_Bearing1',translation:[0,0,g.forwardBearingLength],rotation:[0,Math.sin(beta/2),0,Math.cos(beta/2)]},
+    {name:'F135_Bearing3',parent:'F135_Bearing2',translation:ry(-beta,[0,0,g.middleBearingLength]),rotation:[0,-Math.sin(beta),0,Math.cos(beta)]},
+    {name:'F135_Nozzle',parent:'F135_Bearing3',translation:ry(beta,[0,0,g.aftBearingLength]),rotation:[0,Math.sin(beta/2),0,Math.cos(beta/2)]},
+    {name:'F135_Exhaust',parent:'F135_Nozzle',translation:[0,0,apertureState(0,profile.aperture).exitZ]},
+  ];
+  // Circular mating surfaces are exactly shared by adjacent rigid segments;
+  // each parent rotates around the circular interface normal, never a bent pipe.
+  for(const [name,parent,sections,ends] of [
+    ['Forward','F135_Bearing1',[circle(-.025,g.ductInnerRadius),circle(0,g.ductInnerRadius,undefined,beta,[0,0,g.forwardBearingLength])],[[0,0,[0,0,0]],[0,beta,[0,0,g.forwardBearingLength]]]],
+    ['Middle','F135_Bearing2',[circle(0,g.ductInnerRadius),circle(0,g.ductInnerRadius,undefined,-2*beta,ry(-beta,[0,0,g.middleBearingLength]))],[[0,0,[0,0,0]],[0,-2*beta,ry(-beta,[0,0,g.middleBearingLength])]]],
+    ['Aft','F135_Bearing3',[circle(0,g.ductInnerRadius),circle(g.aftBearingLength,g.ductInnerRadius,undefined,beta)],[[0,0,[0,0,0]],[g.aftBearingLength,beta,[0,0,0]]]],
+  ]) {
+    const inner=make(`F135_${name}Liner`,'F135_LinerHot',parent); skin(inner,sections,{inside:true});
+    const outer=make(`F135_${name}SwivelShell`,'F135_Outer',parent);
+    const outerSections=sections.map(s=>(t,o)=>{const p=s(t,o),center=s(t+Math.PI,o);return add(mul(add(p,center),.5),mul(sub(p,center),g.ductOuterRadius/g.ductInnerRadius*.5));});skin(outer,outerSections);
+    const bearings=make(`F135_${name}BearingRings`,'F135_Casing',parent);
+    for(const [z,tilt,offset]of ends)ring(bearings,z,g.ductInnerRadius,g.ductOuterRadius+.017,.023,tilt,offset);
+  }
+  const ap=profile.aperture, neutral=apertureState(0,ap);
+  // Distinct rigid plates. Flat gap seals have a bisector angle; both long
+  // edges remain on adjacent flap planes while their longitudinal guides slide.
+  // A short rigid shoe slides over each fixed convergent seal and ends exactly
+  // at the throat hinge; this preserves contact without an inward overhang.
+  for(let i=0;i<ap.segmentCount;i++) for(const role of ['Convergent','Divergent','ConvergentSeal','DivergentSeal','ConvergentSealShoe','Fairing','FairingSeal']) {
+    const name=partName(role,i),seal=role.includes('Seal'),fairing=role.startsWith('Fairing');
+    transforms.push({name,parent:'F135_Nozzle',...partPose(role,i,neutral,ap)});
+    const m=make(`${name}_Metal`,fairing?'F135_Outer':'F135_LinerHot',name);
+    const length=role==='Convergent'?ap.convergentLength:role==='Divergent'?ap.divergentLength:role==='ConvergentSeal'?ap.convergentSealLength:role==='DivergentSeal'?ap.divergentSealLength:role==='FairingSeal'?ap.fairingSealLength:role==='ConvergentSealShoe'?ap.throatShoeLength:ap.fairingLength;
+    const base=seal?(fairing?ap.fairingSealHalfWidth:ap.sealHalfWidth):fairing?ap.fairingBaseHalfWidth:role==='Convergent'?ap.convergentBaseHalfWidth:ap.divergentBaseHalfWidth;
+    const tip=seal?(fairing?ap.fairingSealHalfWidth:ap.sealHalfWidth):fairing?ap.fairingTipHalfWidth:role==='Convergent'?ap.convergentTipHalfWidth:ap.divergentTipHalfWidth;
+    const thickness=seal?ap.sealThicknessMeters:fairing?ap.fairingThicknessMeters:ap.flapThicknessMeters;
+    const face=[[-base,0,0],[base,0,0],[tip,0,length],[-tip,0,length]];
+    if(role==='ConvergentSealShoe')face.forEach(p=>p[2]-=length);
+    let faces=[face];
+    if(role==='Fairing'){
+      const z0=ap.fairingSlotStart,z1=ap.fairingSlotEnd,w0=base+(tip-base)*z0/length,w1=base+(tip-base)*z1/length,h=ap.fairingSlotHalfWidth;
+      faces=[[[ -base,0,0],[base,0,0],[w0,0,z0],[-w0,0,z0]],
+        [[-w1,0,z1],[w1,0,z1],[tip,0,length],[-tip,0,length]],
+        [[-w0,0,z0],[-h,0,z0],[-h,0,z1],[-w1,0,z1]],
+        [[h,0,z0],[w0,0,z0],[w1,0,z1],[h,0,z1]]];
+    }
+    if(role==='Convergent'||role==='Divergent'){
+      // Relieve solid backs at the shared gas-side hinge, leaving the gas wall
+      // continuous while removing the impossible overlap of two square ends.
+      const relief=.004, zs=role==='Convergent'?[0,length-relief,length]:[0,relief,length],ts=role==='Convergent'?[thickness,thickness,0]:[0,thickness,thickness];
+      const sections=zs.map((z,j)=>{const w=base+(tip-base)*z/length;return[[-w,0,z],[w,0,z],[w,ts[j],z],[-w,ts[j],z]];});
+      for(let j=0;j<sections.length-1;j++)for(let k=0;k<4;k++)polygon(m,[sections[j][k],sections[j][(k+1)%4],sections[j+1][(k+1)%4],sections[j+1][k]]);
+      polygon(m,[...sections[0]].reverse());polygon(m,sections.at(-1));
+      faces=[];
+    }
+    for(const front of faces){
+      quad(m,role==='FairingSeal'?[...front].reverse():front);
+      if(!seal){const back=front.map(v=>add(v,[0,thickness,0]));quad(m,[...back].reverse());
+        for(let j=0;j<4;j++)quad(m,[front[j],back[j],back[(j+1)%4],front[(j+1)%4]]);}
+    }
+    if(role==='Divergent') {
+      const follower=make(`${name}_Follower`,'F135_Casing',name);
+      box(follower,[0,(ap.fairingFollowerNormalOffset+ap.flapThicknessMeters)/2,length],[.012,ap.fairingFollowerNormalOffset-ap.flapThicknessMeters,.012]);
+      follower.extras={...follower.extras,rigidPart:true,mechanicalRole:'Follower',closedSolid:true,thicknessMeters:null,materialDensityKgM3:ap.materialDensityKgM3,nominalMassKg:.012*(ap.fairingFollowerNormalOffset-ap.flapThicknessMeters)*.012*ap.materialDensityKgM3};
+    }
+    const signedVolume=m.positions.reduce((sum,_,i)=>i%9?sum:sum+dot(m.positions.slice(i,i+3),cross(m.positions.slice(i+3,i+6),m.positions.slice(i+6,i+9)))/6,0);
+    m.extras={...m.extras,rigidPart:true,mechanicalRole:role,closedSolid:!seal,thicknessMeters:thickness,materialDensityKgM3:ap.materialDensityKgM3,nominalMassKg:(seal?length*(base+tip)*thickness:signedVolume)*ap.materialDensityKgM3};
+  }
+  const fasteners=make('F135_NozzleActuators','F135_Casing','F135_Nozzle');
+  for(let i=0;i<ap.segmentCount;i++){const t=TAU*i/ap.segmentCount;box(fasteners,[.543*Math.cos(t),.543*Math.sin(t),.035],[.022,.022,.035]);}
+  const collar=make('F135_NozzleCollar','F135_Outer','F135_Nozzle');ring(collar,0,.50,.552,.032);
+  // Deep view path, annular hardware, concentric flameholder approximation and
+  // a three-dimensional dark centerbody. No opaque, glowing rear cap.
+  const liner=make('F135_AugmentorLiner','F135_LinerHot','F135_Engine');skin(liner,[circle(-.75,.5),circle(0,.5)],{inside:true});
+  const hot=make('F135_CoreFacingAnnulus','F135_CoreHot','F135_Engine');
+  ring(hot,g.coreFacingAnnulusStation,g.coreFacingAnnulusInnerRadius,g.coreFacingAnnulusOuterRadius,.065);
+  ring(hot,-.16,.40,.425,.025);
+  for(let i=0;i<12;i++){const t=TAU*i/12;pipe(hot,[[.29*Math.cos(t),.29*Math.sin(t),-.41],[.46*Math.cos(t+.03),.46*Math.sin(t+.03),-.29]],.009,6);}
+  const dark=make('F135_Centerbody','F135_Dark','F135_Engine');skin(dark,[circle(-.75,.29),circle(-.43,.26),circle(-.15,.15),circle(-.08,.015)]);skin(dark,[circle(-.75,.001),circle(-.75,.5)],{inside:true});
+  const inlet=make('F135_InletLip','F135_Casing','F135_Engine');ring(inlet,g.inletStation,g.inletRadius-.016,g.inletRadius+.022,.095);
+  const fan=make('F135_FanFace','F135_Fan','F135_Engine');
+  skin(fan,[circle(g.inletStation-.14,.002),circle(g.inletStation+.01,.12),circle(g.inletStation+.16,.18)]);
+  for(let i=0;i<24;i++){
+    const t=TAU*i/24;
+    const p=(radius,angle,z)=>[radius*Math.cos(angle),radius*Math.sin(angle),z];
+    const a=[p(.17,t,g.inletStation+.11),p(.51,t+.11,g.inletStation+.14),p(.52,t+.22,g.inletStation+.23),p(.17,t+.18,g.inletStation+.21)];
+    quad(fan,a);quad(fan,[a[3],a[2],a[1],a[0]].map(v=>add(v,[0,0,.005])));
+  }
+  const inletShade=make('F135_IntakeOccluder','F135_Dark','F135_Engine');skin(inletShade,[circle(g.inletStation+.28,.001),circle(g.inletStation+.28,g.inletRadius)]);skin(inletShade,[circle(g.inletStation-.04,g.inletRadius-.016),circle(g.inletStation+.28,g.inletRadius)],{inside:true});
+  // Complete external engine is authored once, omitted structurally at export.
+  const casing=make('F135_ExternalCasing','F135_Casing','F135_Engine',true);
+  const cs=[[-3.83,.548],[-3.38,.555],[-2.82,.51],[-2.42,.46],[-2.0,.48],[-1.64,.53],[-1.22,.53],[-.93,.505],[-.1,.545]];
+  skin(casing,cs.map(([z,r])=>circle(z,r)));
+  const ribs=make('F135_CasingFlanges','F135_Outer','F135_Engine',true);
+  for(const [z,r]of cs)ring(ribs,z,r,r+.025,.045);
+  const details=make('F135_Accessories','F135_Casing','F135_Engine',true);
+  box(details,[0,-.59,-2.9],[.67,.23,.63]);box(details,[.37,-.44,-3.08],[.28,.36,.39]);box(details,[-.43,-.39,-2.1],[.21,.31,.54]);
+  for(let i=0;i<18;i++){const t=i*TAU/18;for(const [z,r]of cs)box(details,[(r+.023)*Math.cos(t),(r+.023)*Math.sin(t),z],[.019,.019,.026]);}
+  const plumbing=make('F135_ExternalPlumbing','F135_Pipe','F135_Engine',true);
+  for(let i=0;i<10;i++) {const t=i*TAU/10;pipe(plumbing,cs.slice(0,-1).map(([z,r],j)=>[(r+.05+.015*Math.sin(j))*Math.cos(t+.035*j),(r+.05+.015*Math.sin(j))*Math.sin(t+.035*j),z]),.009,6);}
+  pipe(plumbing,[[-.30,-.55,-3.1],[-.45,-.67,-3.25],[-.5,-.64,-2.5],[-.55,-.25,-2.15],[-.5,.19,-1.7]],.033,10);
+  pipe(plumbing,[[.27,.49,-3.25],[.38,.67,-3.1],[.37,.68,-2.5],[.29,.57,-1.65]],.039,10);
+  const mounts=make('F135_MountsAndDriveHousing','F135_Outer','F135_Engine',true);box(mounts,[0,-.42,-3.4],[.25,.3,.33]);box(mounts,[0,.54,-2.25],[.21,.17,.32]);
+  return {transforms,meshes,materials};
+}

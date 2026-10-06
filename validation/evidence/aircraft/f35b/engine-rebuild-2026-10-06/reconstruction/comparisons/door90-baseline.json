@@ -1,0 +1,6101 @@
+{
+  "schema": "0sfs-f135-clearance/1",
+  "inputs": {
+    "airframeSha256": "76c76d6230fcf3259e2552d793f95f5421a2ab3cc35f39a5ebf01817b38d5814",
+    "installedSha256": "63fb8ff7f1eb2a5f47d990aaa1c59233517aff6fd68b636cff6345f3cc76156a"
+  },
+  "method": "Actual exported airframe triangles posed by production rig; actual exported engine triangles posed by matching source three-bearing solver. BVH + bidirectional segment/triangle penetration. Tangential contact, coplanar overlap and shared seams ignored at 1e-6 m. All material visibility ignored. Sliding mating-ring contacts within 1 mm of bearing2 plane are separately counted (96-segment chord sag at radius .53 m is 0.284 mm); gross self-intersections must be zero. Forward airframe outside engine aft envelope is not checked here.",
+  "cases": [
+    {
+      "pitchDeg": 0,
+      "yawDeg": -10,
+      "aperture": 0,
+      "doorFuselageIntersectionCount": 2,
+      "doorPlaneStraddleDepthMaxMeters": 0.00567576948672896,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -8.142213489796288e-7,
+            1.4488339367546033,
+            2.4828985422750294
+          ],
+          "planeStraddleDepthMeters": 0.00567576948672896
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6325878119694187,
+            1.8437881148748165,
+            3.775970852996242
+          ],
+          "planeStraddleDepthMeters": 2.3503027868354565e-7
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 0,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": -10,
+      "aperture": 0.5,
+      "doorFuselageIntersectionCount": 2,
+      "doorPlaneStraddleDepthMaxMeters": 0.00567576948672896,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -8.142213489796288e-7,
+            1.4488339367546033,
+            2.4828985422750294
+          ],
+          "planeStraddleDepthMeters": 0.00567576948672896
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6325878119694187,
+            1.8437881148748165,
+            3.775970852996242
+          ],
+          "planeStraddleDepthMeters": 2.3503027868354565e-7
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 0,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": -10,
+      "aperture": 1,
+      "doorFuselageIntersectionCount": 2,
+      "doorPlaneStraddleDepthMaxMeters": 0.00567576948672896,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -8.142213489796288e-7,
+            1.4488339367546033,
+            2.4828985422750294
+          ],
+          "planeStraddleDepthMeters": 0.00567576948672896
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6325878119694187,
+            1.8437881148748165,
+            3.775970852996242
+          ],
+          "planeStraddleDepthMeters": 2.3503027868354565e-7
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 0,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 0,
+      "aperture": 0,
+      "doorFuselageIntersectionCount": 2,
+      "doorPlaneStraddleDepthMaxMeters": 0.00567576948672896,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -8.142213489796288e-7,
+            1.4488339367546033,
+            2.4828985422750294
+          ],
+          "planeStraddleDepthMeters": 0.00567576948672896
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6325878119694187,
+            1.8437881148748165,
+            3.775970852996242
+          ],
+          "planeStraddleDepthMeters": 2.3503027868354565e-7
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 0,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 0,
+      "aperture": 0.5,
+      "doorFuselageIntersectionCount": 2,
+      "doorPlaneStraddleDepthMaxMeters": 0.00567576948672896,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -8.142213489796288e-7,
+            1.4488339367546033,
+            2.4828985422750294
+          ],
+          "planeStraddleDepthMeters": 0.00567576948672896
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6325878119694187,
+            1.8437881148748165,
+            3.775970852996242
+          ],
+          "planeStraddleDepthMeters": 2.3503027868354565e-7
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 0,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 0,
+      "aperture": 1,
+      "doorFuselageIntersectionCount": 2,
+      "doorPlaneStraddleDepthMaxMeters": 0.00567576948672896,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -8.142213489796288e-7,
+            1.4488339367546033,
+            2.4828985422750294
+          ],
+          "planeStraddleDepthMeters": 0.00567576948672896
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6325878119694187,
+            1.8437881148748165,
+            3.775970852996242
+          ],
+          "planeStraddleDepthMeters": 2.3503027868354565e-7
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 0,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 10,
+      "aperture": 0,
+      "doorFuselageIntersectionCount": 2,
+      "doorPlaneStraddleDepthMaxMeters": 0.00567576948672896,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -8.142213489796288e-7,
+            1.4488339367546033,
+            2.4828985422750294
+          ],
+          "planeStraddleDepthMeters": 0.00567576948672896
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6325878119694187,
+            1.8437881148748165,
+            3.775970852996242
+          ],
+          "planeStraddleDepthMeters": 2.3503027868354565e-7
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 0,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 10,
+      "aperture": 0.5,
+      "doorFuselageIntersectionCount": 2,
+      "doorPlaneStraddleDepthMaxMeters": 0.00567576948672896,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -8.142213489796288e-7,
+            1.4488339367546033,
+            2.4828985422750294
+          ],
+          "planeStraddleDepthMeters": 0.00567576948672896
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6325878119694187,
+            1.8437881148748165,
+            3.775970852996242
+          ],
+          "planeStraddleDepthMeters": 2.3503027868354565e-7
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 0,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 0,
+      "yawDeg": 10,
+      "aperture": 1,
+      "doorFuselageIntersectionCount": 2,
+      "doorPlaneStraddleDepthMaxMeters": 0.00567576948672896,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -8.142213489796288e-7,
+            1.4488339367546033,
+            2.4828985422750294
+          ],
+          "planeStraddleDepthMeters": 0.00567576948672896
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6325878119694187,
+            1.8437881148748165,
+            3.775970852996242
+          ],
+          "planeStraddleDepthMeters": 2.3503027868354565e-7
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 0,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": -10,
+      "aperture": 0,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 17,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": -10,
+      "aperture": 0.5,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 17,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": -10,
+      "aperture": 1,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 17,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": 0,
+      "aperture": 0,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 17,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": 0,
+      "aperture": 0.5,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 17,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": 0,
+      "aperture": 1,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 17,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": 10,
+      "aperture": 0,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 17,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": 10,
+      "aperture": 0.5,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 17,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 25,
+      "yawDeg": 10,
+      "aperture": 1,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 17,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": -10,
+      "aperture": 0,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 16,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": -10,
+      "aperture": 0.5,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 4,
+      "airframeGroups": {
+        "F135_OuterPanels / rightEngineDoor": 4
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6385122737649872,
+            1.74588943291762,
+            3.7421042726803244
+          ],
+          "planeStraddleDepthMeters": 0.013774579595460504
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6384969990215745,
+            1.7466524890646848,
+            3.7431417294651426
+          ],
+          "planeStraddleDepthMeters": 0.013348875030118388
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6385719699133993,
+            1.743353130868144,
+            3.7387346017360685
+          ],
+          "planeStraddleDepthMeters": 0.01570427136235627
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6386530384103729,
+            1.7399087851401462,
+            3.734158525359427
+          ],
+          "planeStraddleDepthMeters": 0.011705140421359478
+        }
+      ],
+      "bearingSeamContactCount": 16,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": -10,
+      "aperture": 1,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 8,
+      "airframeGroups": {
+        "F135_OuterPanels / rightEngineDoor": 8
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6406275960731791,
+            1.7370938591600449,
+            3.7150677533900205
+          ],
+          "planeStraddleDepthMeters": 0.021085870301399343
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6404101274245068,
+            1.727312386942926,
+            3.7056736810591078
+          ],
+          "planeStraddleDepthMeters": 0.005858024951110069
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6402883511963653,
+            1.7589896159064555,
+            3.74274127053445
+          ],
+          "planeStraddleDepthMeters": 0.020891256678059474
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6404556657429206,
+            1.7481906935908653,
+            3.7290927740878863
+          ],
+          "planeStraddleDepthMeters": 0.02092247102425681
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6532339790511836,
+            1.7250959753973023,
+            3.7726681429250224
+          ],
+          "planeStraddleDepthMeters": 0.005858024951110069
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.639800922025744,
+            1.7662574765960894,
+            3.75494212950149
+          ],
+          "planeStraddleDepthMeters": 0.020891256678059474
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.639598076637452,
+            1.7695552083384318,
+            3.760623950569918
+          ],
+          "planeStraddleDepthMeters": 0.02048909437822057
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6532339790511836,
+            1.7250959753973023,
+            3.7726681429250224
+          ],
+          "planeStraddleDepthMeters": 0.0006801000099729282
+        }
+      ],
+      "bearingSeamContactCount": 16,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 0,
+      "aperture": 0,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 16,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 0,
+      "aperture": 0.5,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 16,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 0,
+      "aperture": 1,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 16,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 10,
+      "aperture": 0,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 16,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 10,
+      "aperture": 0.5,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 2,
+      "airframeGroups": {
+        "F135_OuterPanels / leftEngineDoor": 2
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6386546014620462,
+            1.7399284261070118,
+            3.734202480031982
+          ],
+          "planeStraddleDepthMeters": 0.015784624650433926
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6393393281788167,
+            1.7413020046208547,
+            3.7423507794997457
+          ],
+          "planeStraddleDepthMeters": 0.012775667313023736
+        }
+      ],
+      "bearingSeamContactCount": 16,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 45,
+      "yawDeg": 10,
+      "aperture": 1,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 9,
+      "airframeGroups": {
+        "F135_OuterPanels / leftEngineDoor": 9
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6403094868830458,
+            1.7589379073000524,
+            3.742795045124453
+          ],
+          "planeStraddleDepthMeters": 0.020939571300735774
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6397773636855508,
+            1.7669033856589829,
+            3.7561836726057747
+          ],
+          "planeStraddleDepthMeters": 0.020939571300735774
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6406369773066237,
+            1.7370707093543,
+            3.715091352678434
+          ],
+          "planeStraddleDepthMeters": 0.022922550876615516
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6456712561746569,
+            1.7246477610769038,
+            3.7277555081612603
+          ],
+          "planeStraddleDepthMeters": 0.0058618590609741394
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6404756365796551,
+            1.747843757549015,
+            3.728739795913559
+          ],
+          "planeStraddleDepthMeters": 0.022922550876615516
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6476826214866461,
+            1.7247709150234936,
+            3.7397057223512475
+          ],
+          "planeStraddleDepthMeters": 0.0058618590609741394
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6404130294031521,
+            1.727322291135533,
+            3.7056956168226343
+          ],
+          "planeStraddleDepthMeters": 0.0210212155260837
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6456712561746568,
+            1.724647761076904,
+            3.72775550816126
+          ],
+          "planeStraddleDepthMeters": 0.011701347291954045
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.653233072310849,
+            1.7251107643909578,
+            3.77268286469444
+          ],
+          "planeStraddleDepthMeters": 0.0006762510254515741
+        }
+      ],
+      "bearingSeamContactCount": 16,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": -10,
+      "aperture": 0,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 8,
+      "airframeGroups": {
+        "F135_OuterPanels / rightEngineDoor": 8
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.651956572832651,
+            1.647767274406137,
+            3.5221698193742728
+          ],
+          "planeStraddleDepthMeters": 0.01005178903643332
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6521144510944039,
+            1.6434052425756014,
+            3.5159303984503443
+          ],
+          "planeStraddleDepthMeters": 0.00931350290432291
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6500621176935661,
+            1.6619840429089074,
+            3.5536056669315057
+          ],
+          "planeStraddleDepthMeters": 0.0082011249992988
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6505821432754084,
+            1.6590348312808694,
+            3.555002122192411
+          ],
+          "planeStraddleDepthMeters": 0.00960081800662306
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6514762866721291,
+            1.6513715387765893,
+            3.5301395000568716
+          ],
+          "planeStraddleDepthMeters": 0.008102570673205231
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6518779558858181,
+            1.6491982481560876,
+            3.5323191344457596
+          ],
+          "planeStraddleDepthMeters": 0.00931350290432291
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6490561950982763,
+            1.6653295787966944,
+            3.56550896002547
+          ],
+          "planeStraddleDepthMeters": 0.008545869192359667
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6490561950982762,
+            1.6653295787966946,
+            3.565508960025471
+          ],
+          "planeStraddleDepthMeters": 0.009353816365631845
+        }
+      ],
+      "bearingSeamContactCount": 11,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": -10,
+      "aperture": 0.5,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 14,
+      "airframeGroups": {
+        "F135_OuterPanels / rightEngineDoor": 14
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6537229236142877,
+            1.632824194156379,
+            3.490937035200227
+          ],
+          "planeStraddleDepthMeters": 0.014041071238301263
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6537216897650744,
+            1.6318831067413417,
+            3.4898748355737714
+          ],
+          "planeStraddleDepthMeters": 0.006987713384572616
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6527919612294669,
+            1.6519613282511922,
+            3.5202277582812904
+          ],
+          "planeStraddleDepthMeters": 0.01005178903643332
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6561951454127886,
+            1.63913694140617,
+            3.526331898955212
+          ],
+          "planeStraddleDepthMeters": 0.00931350290432291
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6534926914585737,
+            1.6375569132223655,
+            3.4981807930467546
+          ],
+          "planeStraddleDepthMeters": 0.01005178903643332
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6546258937699688,
+            1.634058272232584,
+            3.5017420095419336
+          ],
+          "planeStraddleDepthMeters": 0.006987713384572616
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6509022822647174,
+            1.6662698845788928,
+            3.5517297533799126
+          ],
+          "planeStraddleDepthMeters": 0.0082011249992988
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6544950489250738,
+            1.6527465916098036,
+            3.558249217405373
+          ],
+          "planeStraddleDepthMeters": 0.00960081800662306
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6523954946763026,
+            1.6549633532293448,
+            3.526837075003919
+          ],
+          "planeStraddleDepthMeters": 0.008102570673205231
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6555758087132286,
+            1.6440948684779477,
+            3.537959216818623
+          ],
+          "planeStraddleDepthMeters": 0.00931350290432291
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6474933943774649,
+            1.676533143342311,
+            3.5908441222435794
+          ],
+          "planeStraddleDepthMeters": 0.011202735755873213
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6474933943774649,
+            1.676533143342311,
+            3.5908441222435794
+          ],
+          "planeStraddleDepthMeters": 0.009353816365631845
+        }
+      ],
+      "bearingSeamContactCount": 11,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": -10,
+      "aperture": 1,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 42,
+      "airframeGroups": {
+        "F135_OuterPanels / rightEngineDoor": 42
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6544449914956316,
+            1.6363915615903477,
+            3.489192609366947
+          ],
+          "planeStraddleDepthMeters": 0.014041071238301263
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6545652735128639,
+            1.625835537884907,
+            3.476199175708635
+          ],
+          "planeStraddleDepthMeters": 0.006987713384572616
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6533715195119121,
+            1.65487099117228,
+            3.518880435771495
+          ],
+          "planeStraddleDepthMeters": 0.01005178903643332
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6628147808986669,
+            1.6284071049813411,
+            3.5315440565195573
+          ],
+          "planeStraddleDepthMeters": 0.00931350290432291
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.654215921111657,
+            1.6403349246037648,
+            3.495527755080979
+          ],
+          "planeStraddleDepthMeters": 0.01005178903643332
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6605596538148536,
+            1.6257797738037563,
+            3.510518575442761
+          ],
+          "planeStraddleDepthMeters": 0.006987713384572616
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6514851879744128,
+            1.6692433991331446,
+            3.550428245606714
+          ],
+          "planeStraddleDepthMeters": 0.0082011249992988
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6613069181298147,
+            1.6417995691148897,
+            3.5639019956388394
+          ],
+          "planeStraddleDepthMeters": 0.009423995736614982
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6530326390692202,
+            1.657453001305278,
+            3.5245480157311917
+          ],
+          "planeStraddleDepthMeters": 0.008102570673205231
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6620553071666613,
+            1.6351525599883632,
+            3.5478419532924246
+          ],
+          "planeStraddleDepthMeters": 0.00931350290432291
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6842059592579918,
+            1.529646002181614,
+            3.499604080309869
+          ],
+          "planeStraddleDepthMeters": 0.014289952702761455
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.684159481539722,
+            1.5096516640065656,
+            3.481892801135923
+          ],
+          "planeStraddleDepthMeters": 0.015556676998951802
+        }
+      ],
+      "bearingSeamContactCount": 11,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": 0,
+      "aperture": 0,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 11,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": 0,
+      "aperture": 0.5,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 11,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": 0,
+      "aperture": 1,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 11,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": 10,
+      "aperture": 0,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 8,
+      "airframeGroups": {
+        "F135_OuterPanels / leftEngineDoor": 8
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6490634161570653,
+            1.665307840371779,
+            3.5654593375090418
+          ],
+          "planeStraddleDepthMeters": 0.011260260078622436
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6496471179067721,
+            1.6632523073537118,
+            3.5625197831971276
+          ],
+          "planeStraddleDepthMeters": 0.009350100009724333
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6519599931113572,
+            1.6477478770416922,
+            3.522179004049719
+          ],
+          "planeStraddleDepthMeters": 0.008259256635123724
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6523893919974183,
+            1.64531263494581,
+            3.5233320941176007
+          ],
+          "planeStraddleDepthMeters": 0.009597106209125211
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.650549366963038,
+            1.6583342144493909,
+            3.5455908010492494
+          ],
+          "planeStraddleDepthMeters": 0.008259256635123724
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6511001035091114,
+            1.6550996813974532,
+            3.5459007550010613
+          ],
+          "planeStraddleDepthMeters": 0.009597106209125211
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6521150528709352,
+            1.6434307174031981,
+            3.515987540380866
+          ],
+          "planeStraddleDepthMeters": 0.008159448156740051
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6523893919974183,
+            1.64531263494581,
+            3.5233320941176007
+          ],
+          "planeStraddleDepthMeters": 0.009309809468031047
+        }
+      ],
+      "bearingSeamContactCount": 11,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": 10,
+      "aperture": 0.5,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 14,
+      "airframeGroups": {
+        "F135_OuterPanels / leftEngineDoor": 14
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6502899317225171,
+            1.6690538148683491,
+            3.559961367336455
+          ],
+          "planeStraddleDepthMeters": 0.011260260078622436
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6534527803581601,
+            1.6571496575695397,
+            3.565718450063186
+          ],
+          "planeStraddleDepthMeters": 0.009350100009724333
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6480366438523956,
+            1.6750781640179602,
+            3.584869230797112
+          ],
+          "planeStraddleDepthMeters": 0.011260260078622436
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6488376216639141,
+            1.6721621963072029,
+            3.585161489730964
+          ],
+          "planeStraddleDepthMeters": 0.007088562822691255
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.652801938041946,
+            1.6519237321365483,
+            3.5202456532477595
+          ],
+          "planeStraddleDepthMeters": 0.008259256635123724
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6561919268010197,
+            1.6391490702596807,
+            3.5263261258738994
+          ],
+          "planeStraddleDepthMeters": 0.009597106209125211
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6513127404088941,
+            1.6632012033577155,
+            3.545077905878409
+          ],
+          "planeStraddleDepthMeters": 0.008259256635123724
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.655116107708946,
+            1.6477611983956217,
+            3.546523158867007
+          ],
+          "planeStraddleDepthMeters": 0.009597106209125211
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6537257777591982,
+            1.6328134119996962,
+            3.4909421015788853
+          ],
+          "planeStraddleDepthMeters": 0.010105870700629557
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6539604234139427,
+            1.6319269867151802,
+            3.4913586199319173
+          ],
+          "planeStraddleDepthMeters": 0.009309809468031047
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6530057832818619,
+            1.647707040056931,
+            3.5137798245888807
+          ],
+          "planeStraddleDepthMeters": 0.008159448156740051
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6554540132971394,
+            1.636760871575215,
+            3.5147630709168753
+          ],
+          "planeStraddleDepthMeters": 0.009309809468031047
+        }
+      ],
+      "bearingSeamContactCount": 11,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 65,
+      "yawDeg": 10,
+      "aperture": 1,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 42,
+      "airframeGroups": {
+        "F135_OuterPanels / leftEngineDoor": 42
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.64653997490923,
+            1.683398340539106,
+            3.606368261205753
+          ],
+          "planeStraddleDepthMeters": 0.015950414785688954
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6518198338864529,
+            1.6707157438237359,
+            3.5978885317184606
+          ],
+          "planeStraddleDepthMeters": 0.007088562822691255
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6509021247658971,
+            1.6721513691553238,
+            3.5586258269262654
+          ],
+          "planeStraddleDepthMeters": 0.011260260078622436
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6600756034139655,
+            1.646529490855233,
+            3.5712849460251825
+          ],
+          "planeStraddleDepthMeters": 0.009350100009724333
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6486754377071804,
+            1.6792305476093148,
+            3.5845314414141227
+          ],
+          "planeStraddleDepthMeters": 0.011260260078622436
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6553572560118799,
+            1.6603524463791333,
+            3.586489456260072
+          ],
+          "planeStraddleDepthMeters": 0.007088562822691255
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6821128544432875,
+            1.583218651993007,
+            3.65749266462022
+          ],
+          "planeStraddleDepthMeters": 0.019416849029223943
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6824000997489295,
+            1.5842792693456274,
+            3.6442774269927556
+          ],
+          "planeStraddleDepthMeters": 0.012995068800043637
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6868179147553423,
+            1.5720885491161507,
+            3.6477892315520624
+          ],
+          "planeStraddleDepthMeters": 0.016288066929019324
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.680227738418797,
+            1.5899699451309783,
+            3.599218478330393
+          ],
+          "planeStraddleDepthMeters": 0.006845097424283818
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6947519839423313,
+            1.5485900265404784,
+            3.619630279902902
+          ],
+          "planeStraddleDepthMeters": 0.019370456347976822
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6818365198354958,
+            1.5861266737518622,
+            3.634020107450853
+          ],
+          "planeStraddleDepthMeters": 0.006845097424283818
+        }
+      ],
+      "bearingSeamContactCount": 11,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": -10,
+      "aperture": 0,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 24,
+      "airframeGroups": {
+        "F135_OuterPanels / rightEngineDoor": 16,
+        "F135_NozzleActuators / rightEngineDoor": 8
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6723069635601876,
+            1.5323544734509396,
+            3.2269826311588186
+          ],
+          "planeStraddleDepthMeters": 0.0027137653557405828
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6723899277379446,
+            1.5307029851844591,
+            3.224433801526382
+          ],
+          "planeStraddleDepthMeters": 0.0027137653557405828
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.67019805335694,
+            1.5477874770602207,
+            3.2615291996961213
+          ],
+          "planeStraddleDepthMeters": 0.007503073973308724
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6706548934597567,
+            1.5444443214603394,
+            3.254045591385895
+          ],
+          "planeStraddleDepthMeters": 0.007503073973308724
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6727529023551346,
+            1.5234775978241974,
+            3.2132824771219295
+          ],
+          "planeStraddleDepthMeters": 0.00410831417232374
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6708779302619223,
+            1.5088917072577515,
+            3.211748437081415
+          ],
+          "planeStraddleDepthMeters": 0.00975614159800929
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6739132276158518,
+            1.5194332372545476,
+            3.2615115368279324
+          ],
+          "planeStraddleDepthMeters": 0.007138293110636275
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6724219343327867,
+            1.5115606706368232,
+            3.2288098421080624
+          ],
+          "planeStraddleDepthMeters": 0.007138293110636275
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6661857179472633,
+            1.5573098510699257,
+            3.3046538230801508
+          ],
+          "planeStraddleDepthMeters": 0.0106030026032169
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6686332835545893,
+            1.543429016738777,
+            3.3046538230801508
+          ],
+          "planeStraddleDepthMeters": 0.00623193263529713
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6672872349947722,
+            1.5550790486220876,
+            3.293251491157237
+          ],
+          "planeStraddleDepthMeters": 0.0106030026032169
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6696753151407601,
+            1.5395710683431587,
+            3.298828871054505
+          ],
+          "planeStraddleDepthMeters": 0.00623193263529713
+        }
+      ],
+      "bearingSeamContactCount": 2,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": -10,
+      "aperture": 0.5,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 64,
+      "airframeGroups": {
+        "F135_OuterPanels / rightEngineDoor": 56,
+        "F135_NozzleActuators / rightEngineDoor": 8
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6749596161045737,
+            1.538080525666156,
+            3.191826719595739
+          ],
+          "planeStraddleDepthMeters": 0.0036057802358027344
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6751601508567617,
+            1.5350599920543795,
+            3.1879266746505195
+          ],
+          "planeStraddleDepthMeters": 0.0036057802358027344
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6730834912201704,
+            1.5566058694467049,
+            3.226739267017182
+          ],
+          "planeStraddleDepthMeters": 0.008410936354979703
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6736070561554107,
+            1.551436053358198,
+            3.216996319832143
+          ],
+          "planeStraddleDepthMeters": 0.008410936354979703
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6711303544513054,
+            1.5666374577195934,
+            3.2615877264750512
+          ],
+          "planeStraddleDepthMeters": 0.011065690114773433
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6719034264977425,
+            1.5626668493774825,
+            3.2477943401610214
+          ],
+          "planeStraddleDepthMeters": 0.011065690114773433
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6880045539859208,
+            1.3780320742377108,
+            3.158985263697255
+          ],
+          "planeStraddleDepthMeters": 0.008262298170013112
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6760837692694022,
+            1.497930819263236,
+            3.1573841234865876
+          ],
+          "planeStraddleDepthMeters": 0.01707205944384277
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6750737655756667,
+            1.478812176877253,
+            3.1437281406363327
+          ],
+          "planeStraddleDepthMeters": 0.017449381976257852
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6879584668113636,
+            1.3733783386349754,
+            3.1566158958544306
+          ],
+          "planeStraddleDepthMeters": 0.02929017239793799
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6758923598560781,
+            1.5240311688864012,
+            3.1736865090699595
+          ],
+          "planeStraddleDepthMeters": 0.003330798590836969
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6882433343848732,
+            1.41951804686894,
+            3.1886592579264375
+          ],
+          "planeStraddleDepthMeters": 0.013693744373771048
+        }
+      ],
+      "bearingSeamContactCount": 2,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": -10,
+      "aperture": 1,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 156,
+      "airframeGroups": {
+        "F135_FlowPath / rightEngineDoor": 30,
+        "F135_SlidingSeals / rightEngineDoor": 23,
+        "F135_OuterPanels / rightEngineDoor": 95,
+        "F135_NozzleActuators / rightEngineDoor": 8
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7215116746162338,
+            1.190350495839158,
+            3.1788421413159336
+          ],
+          "planeStraddleDepthMeters": 0.03727138120901637
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7192663200901734,
+            1.1892230908142127,
+            3.1608906429778334
+          ],
+          "planeStraddleDepthMeters": 0.03727138120901637
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7188640235884993,
+            1.189656143121352,
+            3.1593944290870217
+          ],
+          "planeStraddleDepthMeters": 0.01450106808664986
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.726001152877145,
+            1.1891106845374353,
+            3.2145211011063637
+          ],
+          "planeStraddleDepthMeters": 0.035438340640966536
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7234891694507074,
+            1.191343408899942,
+            3.1946521147884774
+          ],
+          "planeStraddleDepthMeters": 0.03727138120901637
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7453305383039134,
+            1.1453693831985143,
+            3.257834769405573
+          ],
+          "planeStraddleDepthMeters": 0.017827368994516736
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7279691616557843,
+            1.187361447432272,
+            3.230087420944622
+          ],
+          "planeStraddleDepthMeters": 0.035438340640966536
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7414878158125399,
+            1.154166750069094,
+            3.2341696492452083
+          ],
+          "planeStraddleDepthMeters": 0.023386796112919835
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7295807788682079,
+            1.183748141467193,
+            3.242701102897378
+          ],
+          "planeStraddleDepthMeters": 0.01091880406524906
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7509061615957161,
+            1.1274053491618947,
+            3.2974308790219067
+          ],
+          "planeStraddleDepthMeters": 0.012541818143246918
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7466493371876088,
+            1.1423501899621924,
+            3.2659564939622987
+          ],
+          "planeStraddleDepthMeters": 0.017827368994516736
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7485466901026772,
+            1.136018118651545,
+            3.2776648885393085
+          ],
+          "planeStraddleDepthMeters": 0.01976721197677858
+        }
+      ],
+      "bearingSeamContactCount": 2,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 0,
+      "aperture": 0,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 2,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 0,
+      "aperture": 0.5,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 2,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 0,
+      "aperture": 1,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 2,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 10,
+      "aperture": 0,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 24,
+      "airframeGroups": {
+        "F135_OuterPanels / leftEngineDoor": 16,
+        "F135_NozzleActuators / leftEngineDoor": 8
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6661961051709135,
+            1.5572509421972822,
+            3.3046538230801508
+          ],
+          "planeStraddleDepthMeters": 0.010648082191922925
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6686312566100722,
+            1.543440512112366,
+            3.3046538230801508
+          ],
+          "planeStraddleDepthMeters": 0.006235504887196139
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6646569953947252,
+            1.5572024492828436,
+            3.316890470289261
+          ],
+          "planeStraddleDepthMeters": 0.010838471483510685
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6657580438044428,
+            1.5522445182608167,
+            3.3150970174949848
+          ],
+          "planeStraddleDepthMeters": 0.01423677804391929
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6695372478990191,
+            1.550449774738847,
+            3.270166437022895
+          ],
+          "planeStraddleDepthMeters": 0.008395185132583458
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6685273005974368,
+            1.5525056045196213,
+            3.280591146567375
+          ],
+          "planeStraddleDepthMeters": 0.010648082191922925
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6739654828838962,
+            1.5236914084877,
+            3.2748355761659047
+          ],
+          "planeStraddleDepthMeters": 0.006235504887196139
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6739654828838962,
+            1.5236914084877,
+            3.2748355761659047
+          ],
+          "planeStraddleDepthMeters": 0.0009763967690309405
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6723278335409213,
+            1.5322361139086302,
+            3.2269826311588186
+          ],
+          "planeStraddleDepthMeters": 0.002692839176966083
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6721025736277301,
+            1.5338845988111962,
+            3.2306729965252643
+          ],
+          "planeStraddleDepthMeters": 0.007510539367878363
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6727654817029087,
+            1.5234798159026097,
+            3.213441235453471
+          ],
+          "planeStraddleDepthMeters": 0.002692839176966083
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6723474661484167,
+            1.5111698307326513,
+            3.227160597443817
+          ],
+          "planeStraddleDepthMeters": 0.0071347661617023675
+        }
+      ],
+      "bearingSeamContactCount": 2,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 10,
+      "aperture": 0.5,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 64,
+      "airframeGroups": {
+        "F135_OuterPanels / leftEngineDoor": 56,
+        "F135_NozzleActuators / leftEngineDoor": 8
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6625887042079788,
+            1.568345319069535,
+            3.3461932946299013
+          ],
+          "planeStraddleDepthMeters": 0.017967759693549773
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6661301098901337,
+            1.5595633313004955,
+            3.339662172950984
+          ],
+          "planeStraddleDepthMeters": 0.008660108960263188
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6679468268655366,
+            1.5697531063180106,
+            3.305015160784812
+          ],
+          "planeStraddleDepthMeters": 0.017774774746136077
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6658646991592407,
+            1.5696286959149324,
+            3.321501585316659
+          ],
+          "planeStraddleDepthMeters": 0.017967759693549773
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6792142163530391,
+            1.5246169018128573,
+            3.3078710907793574
+          ],
+          "planeStraddleDepthMeters": 0.008660108960263188
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6706340076037526,
+            1.5678075638928557,
+            3.2702879514189593
+          ],
+          "planeStraddleDepthMeters": 0.011387999726248332
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6697132601695049,
+            1.567562575148315,
+            3.2859116544261036
+          ],
+          "planeStraddleDepthMeters": 0.011387999726248332
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6679468268655367,
+            1.5697531063180103,
+            3.305015160784812
+          ],
+          "planeStraddleDepthMeters": 0.017774774746136077
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.669108065603914,
+            1.568001209676307,
+            3.29373084553033
+          ],
+          "planeStraddleDepthMeters": 0.016267109938924447
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6865852730397402,
+            1.4530424300042868,
+            3.3048378518012207
+          ],
+          "planeStraddleDepthMeters": 0.012038119243272895
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6792142163530391,
+            1.5246169018128573,
+            3.3078710907793574
+          ],
+          "planeStraddleDepthMeters": 0.0006783239795741247
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6886970910034029,
+            1.4316206575798702,
+            3.304685702113045
+          ],
+          "planeStraddleDepthMeters": 0.04188406287361712
+        }
+      ],
+      "bearingSeamContactCount": 2,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 90,
+      "yawDeg": 10,
+      "aperture": 1,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 147,
+      "airframeGroups": {
+        "F135_FlowPath / leftEngineDoor": 30,
+        "F135_SlidingSeals / leftEngineDoor": 22,
+        "F135_OuterPanels / leftEngineDoor": 87,
+        "F135_NozzleActuators / leftEngineDoor": 8
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7568790095701279,
+            1.1001512120031443,
+            3.340242593873912
+          ],
+          "planeStraddleDepthMeters": 0.0014938381626485447
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7571676606490458,
+            1.098565304540715,
+            3.3420676595262306
+          ],
+          "planeStraddleDepthMeters": 0.0014938381626485447
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7576919567302925,
+            1.0967440586696187,
+            3.3431902641466955
+          ],
+          "planeStraddleDepthMeters": 0.001301432838042113
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7519980311066783,
+            1.122648727603515,
+            3.306861168727556
+          ],
+          "planeStraddleDepthMeters": 0.012537787073027662
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7567883262683197,
+            1.100649444145242,
+            3.3396692269578625
+          ],
+          "planeStraddleDepthMeters": 0.011558606977907109
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7529359846372929,
+            1.117701247874368,
+            3.315334357359591
+          ],
+          "planeStraddleDepthMeters": 0.012537787073027662
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7477815853480356,
+            1.1385750603637959,
+            3.2729185124521436
+          ],
+          "planeStraddleDepthMeters": 0.01782335749345202
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.748548838423101,
+            1.1360144951724775,
+            3.2776531426814994
+          ],
+          "planeStraddleDepthMeters": 0.01782335749345202
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7515208251944386,
+            1.1251658811450955,
+            3.302550231996822
+          ],
+          "planeStraddleDepthMeters": 0.019763205095160614
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7279732470802888,
+            1.1873513779707352,
+            3.230087321623998
+          ],
+          "planeStraddleDepthMeters": 0.03543435061693884
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7422838509143148,
+            1.1523436490977885,
+            3.239047180089541
+          ],
+          "planeStraddleDepthMeters": 0.023382809028086177
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7414893044918003,
+            1.1541626447196331,
+            3.234154045573275
+          ],
+          "planeStraddleDepthMeters": 0.0027876673643399963
+        }
+      ],
+      "bearingSeamContactCount": 2,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": -10,
+      "aperture": 0,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 18,
+      "airframeGroups": {
+        "F135_OuterPanels / rightEngineDoor": 10,
+        "F135_NozzleActuators / rightEngineDoor": 8
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6707366908098583,
+            1.5315000014127178,
+            3.238640894830256
+          ],
+          "planeStraddleDepthMeters": 0.002901066779002648
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6710452942351712,
+            1.5308568905687305,
+            3.2354257445814802
+          ],
+          "planeStraddleDepthMeters": 0.002901066779002648
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6677400064782458,
+            1.531387174006316,
+            3.2626185237334306
+          ],
+          "planeStraddleDepthMeters": 0.003963377319765524
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6677400064782458,
+            1.531387174006316,
+            3.26261852373343
+          ],
+          "planeStraddleDepthMeters": 0.006664467699035351
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6738737244707408,
+            1.5249626132964949,
+            3.205958060720507
+          ],
+          "planeStraddleDepthMeters": 0.00023040754111275374
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6716839092946892,
+            1.5156495021604783,
+            3.23709139063537
+          ],
+          "planeStraddleDepthMeters": 0.011554891584006716
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6726299595122005,
+            1.5143688840319889,
+            3.2038944465421486
+          ],
+          "planeStraddleDepthMeters": 0.00023040754111275374
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.671493421032482,
+            1.5052993154494463,
+            3.204282921118315
+          ],
+          "planeStraddleDepthMeters": 0.011554891584006716
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6711768914637,
+            1.520625872395136,
+            3.2494214738310743
+          ],
+          "planeStraddleDepthMeters": 0.0034430467976606233
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6716495121907161,
+            1.515987103685638,
+            3.2379278716406836
+          ],
+          "planeStraddleDepthMeters": 0.0034430467976606233
+        },
+        {
+          "a": "F135_NozzleActuators",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6803731649410514,
+            1.4631134119548967,
+            3.0832136192965502
+          ],
+          "planeStraddleDepthMeters": 0.003982906084869772
+        },
+        {
+          "a": "F135_NozzleActuators",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6789764616513517,
+            1.4619833651152745,
+            3.093161695685568
+          ],
+          "planeStraddleDepthMeters": 0.003982906084869772
+        }
+      ],
+      "bearingSeamContactCount": 0,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": -10,
+      "aperture": 0.5,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 72,
+      "airframeGroups": {
+        "F135_OuterPanels / rightEngineDoor": 64,
+        "F135_NozzleActuators / rightEngineDoor": 8
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.675989980784893,
+            1.5469112687447413,
+            3.1616188585705833
+          ],
+          "planeStraddleDepthMeters": 0.0027988688141940693
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6763142035257639,
+            1.5441756376926168,
+            3.1563397994433737
+          ],
+          "planeStraddleDepthMeters": 0.0027988688141940693
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6751011725761242,
+            1.5516235844908697,
+            3.191609719601396
+          ],
+          "planeStraddleDepthMeters": 0.004221340401439644
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6747849251281962,
+            1.5530857240271267,
+            3.197226068766941
+          ],
+          "planeStraddleDepthMeters": 0.006743608816713613
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6751933135746527,
+            1.5511350678988083,
+            3.188500626531121
+          ],
+          "planeStraddleDepthMeters": 0.004221340401439644
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.689216481108646,
+            1.356837911982921,
+            3.077526522008102
+          ],
+          "planeStraddleDepthMeters": 0.004246851206969652
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6792832745800281,
+            1.4569482388034534,
+            3.084957386061065
+          ],
+          "planeStraddleDepthMeters": 0.02956751686546545
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.678987383177853,
+            1.4507558374930536,
+            3.080282983815853
+          ],
+          "planeStraddleDepthMeters": 0.0309763776529847
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6912927621762736,
+            1.3359124257713293,
+            3.075973291205457
+          ],
+          "planeStraddleDepthMeters": 0.006580029066031418
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6891415631071691,
+            1.3481351567265247,
+            3.0725356333389384
+          ],
+          "planeStraddleDepthMeters": 0.004246851206969652
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6908004623263012,
+            1.335713318485216,
+            3.0735876992951994
+          ],
+          "planeStraddleDepthMeters": 0.006580029066031418
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6787353286031063,
+            1.5151009044841728,
+            3.1238789827665805
+          ],
+          "planeStraddleDepthMeters": 0.00929490587922412
+        }
+      ],
+      "bearingSeamContactCount": 0,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": -10,
+      "aperture": 1,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 152,
+      "airframeGroups": {
+        "F135_FlowPath / rightEngineDoor": 40,
+        "F135_SlidingSeals / rightEngineDoor": 16,
+        "F135_OuterPanels / rightEngineDoor": 88,
+        "F135_NozzleActuators / rightEngineDoor": 8
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6998698937533498,
+            1.2471290166103481,
+            3.080724051621401
+          ],
+          "planeStraddleDepthMeters": 0.02770128626465574
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.6993274308867066,
+            1.2449102321056358,
+            3.06940701356023
+          ],
+          "planeStraddleDepthMeters": 0.02770128626465574
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7014452392805028,
+            1.2523132233579906,
+            3.1147303220777873
+          ],
+          "planeStraddleDepthMeters": 0.023751324507049153
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7078014352890925,
+            1.2370759175459327,
+            3.1157593815387274
+          ],
+          "planeStraddleDepthMeters": 0.01322570169079846
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7116544777552973,
+            1.227839263061856,
+            3.1163831838566383
+          ],
+          "planeStraddleDepthMeters": 0.03538584959001846
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7010307626806823,
+            1.251877211036149,
+            3.1049424775838204
+          ],
+          "planeStraddleDepthMeters": 0.023751324507049153
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7078014352890926,
+            1.2370759175459325,
+            3.1157593815387274
+          ],
+          "planeStraddleDepthMeters": 0.01322570169079846
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7109428813477949,
+            1.2283080852137105,
+            3.1078566159535437
+          ],
+          "planeStraddleDepthMeters": 0.03538584959001846
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7144749534806613,
+            1.2237390643313568,
+            3.15146384611604
+          ],
+          "planeStraddleDepthMeters": 0.03699845088608163
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7133925661874574,
+            1.2266941391822066,
+            3.1372095055971987
+          ],
+          "planeStraddleDepthMeters": 0.035108392651173895
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7230026020206346,
+            1.1983359083150233,
+            3.191205678320155
+          ],
+          "planeStraddleDepthMeters": 0.03766346309329165
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "rightEngineDoor",
+          "point": [
+            0.7210163639103093,
+            1.203899849641912,
+            3.188100996974382
+          ],
+          "planeStraddleDepthMeters": 0.012807299504289417
+        }
+      ],
+      "bearingSeamContactCount": 0,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 0,
+      "aperture": 0,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 0,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 0,
+      "aperture": 0.5,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 0,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 0,
+      "aperture": 1,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 0,
+      "airframeGroups": {},
+      "intersectionExamples": [],
+      "bearingSeamContactCount": 0,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 10,
+      "aperture": 0,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 16,
+      "airframeGroups": {
+        "F135_OuterPanels / leftEngineDoor": 8,
+        "F135_NozzleActuators / leftEngineDoor": 8
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6707513481343743,
+            1.5314168755946667,
+            3.2386335100724657
+          ],
+          "planeStraddleDepthMeters": 0.0028931603112706816
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6703007205555116,
+            1.5314105245243357,
+            3.2422252141685712
+          ],
+          "planeStraddleDepthMeters": 0.003992523457699876
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6711781826438578,
+            1.5206271627502117,
+            3.249409511817268
+          ],
+          "planeStraddleDepthMeters": 0.006668020405506674
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6738535941586201,
+            1.5249195617946791,
+            3.2064027110235727
+          ],
+          "planeStraddleDepthMeters": 0.0028931603112706816
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6711781826438578,
+            1.5206271627502117,
+            3.249409511817268
+          ],
+          "planeStraddleDepthMeters": 0.0034395136834341755
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6738535941586201,
+            1.5249195617946791,
+            3.206402711023572
+          ],
+          "planeStraddleDepthMeters": 0.00027402608794390576
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6716791800999948,
+            1.5153572367146761,
+            3.236145400192476
+          ],
+          "planeStraddleDepthMeters": 0.011551378384165999
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6716791800999948,
+            1.5153572367146764,
+            3.236145400192476
+          ],
+          "planeStraddleDepthMeters": 0.0034395136834341755
+        },
+        {
+          "a": "F135_NozzleActuators",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6785088363282352,
+            1.4615977492675802,
+            3.0965741971374325
+          ],
+          "planeStraddleDepthMeters": 0.0039680580880611035
+        },
+        {
+          "a": "F135_NozzleActuators",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6799561156133161,
+            1.478321954972601,
+            3.097226849607159
+          ],
+          "planeStraddleDepthMeters": 0.0028679447328478977
+        },
+        {
+          "a": "F135_NozzleActuators",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6785088363282352,
+            1.4615977492675802,
+            3.0965741971374325
+          ],
+          "planeStraddleDepthMeters": 0.0039680580880611035
+        },
+        {
+          "a": "F135_NozzleActuators",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6798242321529055,
+            1.4709910559329749,
+            3.0968455364939085
+          ],
+          "planeStraddleDepthMeters": 0.0037263519601415246
+        }
+      ],
+      "bearingSeamContactCount": 0,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 10,
+      "aperture": 0.5,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 70,
+      "airframeGroups": {
+        "F135_OuterPanels / leftEngineDoor": 62,
+        "F135_NozzleActuators / leftEngineDoor": 8
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6686029694986522,
+            1.548470719502586,
+            3.275357599990873
+          ],
+          "planeStraddleDepthMeters": 0.01115257292537706
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6670498741941157,
+            1.5464920638880526,
+            3.285491476110753
+          ],
+          "planeStraddleDepthMeters": 0.01115257292537706
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6760173805361711,
+            1.5193535463497736,
+            3.273350730215973
+          ],
+          "planeStraddleDepthMeters": 0.009558844384861057
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6722161673835426,
+            1.5526114343755513,
+            3.2409144272010377
+          ],
+          "planeStraddleDepthMeters": 0.007705117826062709
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6716063041936581,
+            1.5496782138320648,
+            3.2508145868375062
+          ],
+          "planeStraddleDepthMeters": 0.007705117826062709
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6686029694986523,
+            1.548470719502586,
+            3.275357599990873
+          ],
+          "planeStraddleDepthMeters": 0.01115257292537706
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6712122213372582,
+            1.5489529361861152,
+            3.2550717457555867
+          ],
+          "planeStraddleDepthMeters": 0.009954099487770249
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6742782415771487,
+            1.554057057589517,
+            3.2060692365789873
+          ],
+          "planeStraddleDepthMeters": 0.007203410435019576
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6736659920290465,
+            1.5536278376134494,
+            3.216415106805919
+          ],
+          "planeStraddleDepthMeters": 0.007705117826062709
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6760173805361711,
+            1.5193535463497736,
+            3.273350730215973
+          ],
+          "planeStraddleDepthMeters": 0.00008989951129778628
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6871578889412137,
+            1.425173638580392,
+            3.2484690144763855
+          ],
+          "planeStraddleDepthMeters": 0.012494701769472814
+        },
+        {
+          "a": "F135_OuterPanels",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.6851697445194156,
+            1.4684370719194861,
+            3.2332920088227737
+          ],
+          "planeStraddleDepthMeters": 0.00892987405940954
+        }
+      ],
+      "bearingSeamContactCount": 0,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    },
+    {
+      "pitchDeg": 95,
+      "yawDeg": 10,
+      "aperture": 1,
+      "doorFuselageIntersectionCount": 12,
+      "doorPlaneStraddleDepthMaxMeters": 0.03306615075206253,
+      "doorExamples": [
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6657924322666512,
+            1.6564972517525143,
+            3.1418297074056585
+          ],
+          "planeStraddleDepthMeters": 0.03306615075206253
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.653710704609218,
+            1.7220282753898006,
+            3.363906064834252
+          ],
+          "planeStraddleDepthMeters": 0.03306595111258798
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6696070038052234,
+            1.6357327004363116,
+            3.07109274765839
+          ],
+          "planeStraddleDepthMeters": 0.03290771012683136
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6696025681385245,
+            1.6357365261798993,
+            3.0711086436005988
+          ],
+          "planeStraddleDepthMeters": 0.03290691400959955
+        },
+        {
+          "a": "rightEngineDoor",
+          "b": "fuselage",
+          "point": [
+            0.6729972153444609,
+            1.6116688764298122,
+            2.990362653169961
+          ],
+          "planeStraddleDepthMeters": 0.013367703998318506
+        },
+        {
+          "a": "leftEngineDoor",
+          "b": "fuselage",
+          "point": [
+            -0.6736492867012391,
+            1.6070807454327503,
+            2.9748968489244008
+          ],
+          "planeStraddleDepthMeters": 0.013367511669225896
+        }
+      ],
+      "airframeIntersectionCount": 143,
+      "airframeGroups": {
+        "F135_FlowPath / leftEngineDoor": 36,
+        "F135_SlidingSeals / leftEngineDoor": 17,
+        "F135_OuterPanels / leftEngineDoor": 82,
+        "F135_NozzleActuators / leftEngineDoor": 8
+      },
+      "intersectionExamples": [
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7463657111722986,
+            1.1036902260111927,
+            3.2740661053027673
+          ],
+          "planeStraddleDepthMeters": 0.006698682674772041
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7485932874301636,
+            1.0874360525710491,
+            3.2881724368646594
+          ],
+          "planeStraddleDepthMeters": 0.006698682674772041
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7429152426901245,
+            1.1300782141602412,
+            3.2431835807306926
+          ],
+          "planeStraddleDepthMeters": 0.01710841425045355
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.746008464061246,
+            1.10629698571443,
+            3.271803805110968
+          ],
+          "planeStraddleDepthMeters": 0.018463554920100086
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7435606751845231,
+            1.12620744837521,
+            3.247186922685429
+          ],
+          "planeStraddleDepthMeters": 0.01710841425045355
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.745901453345701,
+            1.1069460615204114,
+            3.2711268700547325
+          ],
+          "planeStraddleDepthMeters": 0.018707848714377244
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7266153644449262,
+            1.1814488349228833,
+            3.2189111254060054
+          ],
+          "planeStraddleDepthMeters": 0.03765949373272724
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7273773060460035,
+            1.1773641563693362,
+            3.2247289187429895
+          ],
+          "planeStraddleDepthMeters": 0.03765949373272724
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7419664813883171,
+            1.1357680899490652,
+            3.237298819840973
+          ],
+          "planeStraddleDepthMeters": 0.0267406517873909
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7390077213156728,
+            1.1500435572041459,
+            3.218988219758274
+          ],
+          "planeStraddleDepthMeters": 0.0037320606038303283
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7160271713813325,
+            1.2195022520084327,
+            3.1718590167025305
+          ],
+          "planeStraddleDepthMeters": 0.04105189912069401
+        },
+        {
+          "a": "F135_FlowPath",
+          "b": "leftEngineDoor",
+          "point": [
+            -0.7211666714090389,
+            1.2034819662826706,
+            3.1883195044597517
+          ],
+          "planeStraddleDepthMeters": 0.019964829464028194
+        }
+      ],
+      "bearingSeamContactCount": 0,
+      "grossSelfIntersectionCount": 0,
+      "selfExamples": []
+    }
+  ],
+  "unqualified": [
+    "Source CAD dimensional fidelity",
+    "Full containment in non-watertight airframe volumes",
+    "Sub-micrometre and coplanar contacts"
+  ]
+}

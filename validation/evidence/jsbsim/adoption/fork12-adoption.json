@@ -1,0 +1,295 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-06",
+  "purpose": "Expose the existing native turbine exhaust-gas temperature as read-only indexed telemetry, without changing engine dynamics.",
+  "source": {
+    "repository": "https://github.com/Felipegalind0/jsbsim",
+    "branch": "master",
+    "commit": "6a25a5214c4d80b0f25e68e44205681df844e202",
+    "dirty": false,
+    "previousPackageCommit": "c1d57a2c3860ae9ae47f2b27b84f37912042c19c",
+    "scope": "FGTurbine::bindmodel ties egt-degc to existing const GetEGT; documentation, direct C++ regression and wrapper version only. No EGT/thrust/fuel/phase formula changes.",
+    "upstreamPublicationForThisWork": false
+  },
+  "observer": {
+    "path": "propulsion/engine[index]/egt-degc",
+    "unit": "degC",
+    "quantity": "exhaust-gas-temperature",
+    "access": "read-only",
+    "source": "FGTurbine::GetEGT()",
+    "kelvinConversion": "degC + 273.15",
+    "availability": "Catalog-present read-only property and finite native value; zero or negative Celsius is valid.",
+    "semanticLimit": "Generic turbine gas-temperature estimate. Engine station is unspecified; it is not metal temperature or a calibrated F135/afterburner/nozzle-exit temperature."
+  },
+  "identity": {
+    "package": "@felipegalind0/jsbsim@1.2.4-fork.12",
+    "previousPackage": "@felipegalind0/jsbsim@1.2.4-fork.11",
+    "repositoryContentSha256": "5b8a50d093bf8ab58dc81e11ff902fc638db17c7700d95a79881dd323d96fe38",
+    "sdkSubtreeSha256": "d96d99f5080ddc2d3f71866e3deaba3829766307fce125206539dd36769d681e",
+    "buildInputSha256": "b6f08358df7165212c0df27cab91d39197c8a84559b593a684bd0798ef47633d",
+    "tarballSha256": "23f69b883184a656fd7d612476b622fb520e5539b016a9f4a20df627b924fd03",
+    "tarballIntegrity": "sha512-y30Lsv5zZx5Picrwh44Vv52ooJyxcyzz/2jUxqc8rhlTUfREUiXEUjJ7v0/EHrtKN/gQXuAkpgEB10wv3owe2Q==",
+    "loaderSha256": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+    "wasmSha256": "011b29ca3901fbd8a16e4d99ca7b81a4bc95388193bd7cf0cd92d5452bf5f661",
+    "record": "fork12/verified-installed-artifact.json"
+  },
+  "checks": {
+    "nativeTemperatureObserver": {
+      "status": "passed",
+      "target": "FGTurbineTemperatureTest1",
+      "methods": 3,
+      "log": "fork12/native-temperature-rerun.log",
+      "scope": "Actual const getter/property equality, index2, READ/notWRITE, rejected write, cold/reset Celsius, fuel-start heating before Running, idle/full dry power/augmentation, stopped cooldown and Trim retention.",
+      "failureHistory": "Initial inline fixture destroyed externally owned engine before all pointer/function/thruster ties were removed; fixed fixture-only teardown to unbind while objects remain alive. Initial and debugger logs retained."
+    },
+    "sdkBuildValidation": {
+      "status": "passed",
+      "tests": 52,
+      "suites": 9,
+      "log": "fork12/sdk-build-repo-cache.log",
+      "commands": [
+        "tsc --noEmit (frozen SDK workspace)",
+        "node --test --test-concurrency=5 test/*.test.mjs (frozen SDK workspace and resolved native fixtures)"
+      ],
+      "sourceDateEpoch": 1791266411,
+      "scope": "One successful frozen-source build, locked toolchain, 5 compile jobs and 5 Node test workers.",
+      "toolchain": {
+        "node": "v26.8.2",
+        "npm": "11.19.1",
+        "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+        "cmake": "cmake version 4.4.3",
+        "clang": "clang version 24.0.0git",
+        "platform": "darwin",
+        "arch": "arm64",
+        "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+      },
+      "failureHistory": [
+        "Default Node 26.9.0 rejected before compile; successful build uses retained verified Node 26.8.2 binary.",
+        "Locked-node attempt reached link, but Homebrew Emscripten cache was outside writable roots; successful build reuses prior repo-contained 6.0.9 cache. No global cache writes or lock changes."
+      ]
+    },
+    "releasePacking": {
+      "status": "passed",
+      "log": "fork12/sdk-release-pack-repo-cache.log",
+      "releaseEligible": true,
+      "failureHistory": "Default npm cache denied a write outside writable roots; final packing uses repo-contained cache."
+    },
+    "installedArtifactIdentity": {
+      "status": "passed",
+      "verifiedFiles": 14,
+      "log": "fork12/verify-fork12.log"
+    },
+    "installedIdentityRegressions": {
+      "status": "passed",
+      "tests": 55,
+      "files": 2,
+      "log": "fork12/installed-identity-regressions.log"
+    },
+    "installedF135TemperatureTrace": {
+      "status": "passed",
+      "script": "../../../../scripts/validation/aircraft/check-turbine-temperature.mjs",
+      "scriptSha256": "2d85fd926f99f04bb0d5dd56ef1542e533e3a25631ac64c50c44eb66af29e112",
+      "record": "fork12/f135-temperature-trace.json",
+      "log": "fork12/installed-temperature.log",
+      "nativeRunFormulaMaxErrorC": 0,
+      "heatedBeforeRunning": true,
+      "conditions": "Real installed SDK, application engineControl, native hold-down, zero wind/airspeed, 1000 ft, dt 1/120; no timing/performance claims."
+    },
+    "fullApplicationCi": {
+      "status": "passed",
+      "command": "npm run ci",
+      "exitCode": 0,
+      "testsPassed": 1749,
+      "expectedFailures": 1,
+      "testFilesPassed": 162,
+      "expectedFailure": "Existing F-35B stowed main-strut exterior-envelope case; not introduced by this thermal change.",
+      "scope": "Lint, tests, typecheck, production build and installed/emitted artifact verification; no GPU run.",
+      "log": "../../aircraft/f35b/temperature-glow-2026-10-06/ci.log",
+      "logSha256": "2f31941b3771e397365996009d92e5c768a0a627f62cf7c9c2c74a204debe564",
+      "combinedAcceptance": "../../aircraft/f35b/temperature-glow-2026-10-06/acceptance.json"
+    }
+  },
+  "findings": {
+    "coldC": 13.018894981694396,
+    "heatedBeforeRunning": true,
+    "maxRunFormulaErrorC": 0,
+    "beforeShutdown": {
+      "phase": "before-shutdown",
+      "time": 57.52499999999738,
+      "egtC": 733.2188949880485,
+      "tatC": 13.018894988048418,
+      "n1": 100,
+      "n2": 100,
+      "running": 1,
+      "augmentation": 1,
+      "fuelFlowPps": 13.121972438339562
+    },
+    "firstOff": {
+      "phase": "shutdown",
+      "time": 57.53333333333071,
+      "egtC": 733.1580616547152,
+      "tatC": 13.018894988055807,
+      "n1": 99.58333333333333,
+      "n2": 99.58333333333333,
+      "running": 0,
+      "augmentation": 0,
+      "fuelFlowPps": 13.098824290191413
+    },
+    "hotStopped": {
+      "phase": "hot-stopped",
+      "time": 72.52500000000379,
+      "egtC": 623.7188949880458,
+      "tatC": 13.018894988188631,
+      "n1": 0.05444858849603242,
+      "n2": 0.05444858849603242,
+      "running": 0,
+      "augmentation": 0,
+      "fuelFlowPps": 0
+    },
+    "largestJump": {
+      "phase": "first-step-after-stopped-RunIC",
+      "previousPhase": "hot-stopped-RunIC",
+      "time": 72.53333333333713,
+      "deltaC": -610.7000000063514
+    },
+    "afterburnerTemperature": "Matches the same native N2/TAT schedule as dry power; no additional AB heat is modeled."
+  },
+  "preservation": {
+    "previousArtifact": "deps/felipegalind0-jsbsim-1.2.4-fork.11.tgz retained; all earlier immutable tarballs unchanged",
+    "rollbackDeclaration": "validation/evidence/jsbsim/rollback/fork11/",
+    "aircraftData": "No aircraft XML/data/manifest changes in this release; earlier below-fork10 rollbacks still require their matching aircraft data.",
+    "earlierRecords": "Unchanged"
+  },
+  "limitations": [
+    "Run EGT follows TAT+363.1+(N2-IdleN2)/(MaxN2-IdleN2)*357.1. Augmentation has no additional temperature term.",
+    "Ordinary shutdown retains a hot native gas estimate and cools toward TAT at 7.3°C/s; this is an existing generic schedule, not a measured metal cooling curve.",
+    "Existing Start-to-Run schedule and stopped Trim-to-Off handover can jump temperature. Installed hot-stopped RunIC trace records the subsequent accepted-step drop of 610.7°C; observer release does not repair phase behavior.",
+    "No oil/ITT/metal observer is added, and turboprop/piston thermal properties are not assumed to belong to turbine engines.",
+    "No upstream submission/push or package publication; software contracts do not qualify aircraft thermal/optical fidelity."
+  ],
+  "primaryThermalContext": [
+    {
+      "url": "https://www.faa.gov/sites/faa.gov/files/2022-06/amt_airframe_hb_vol_2.pdf",
+      "supports": "Chapter10 EGT section: turbine exhaust-gas temperature is a gas measurement, distinct from metal temperature."
+    },
+    {
+      "url": "https://www.grc.nasa.gov/WWW/k-12/VirtualAero/BottleRocket/airplane/turbdraw.html",
+      "supports": "Engine stations place the afterburner downstream of turbine exit, not at a generic turbine gas sensor."
+    },
+    {
+      "url": "https://ntrs.nasa.gov/citations/19810002531",
+      "supports": "NASA TP1754 turbine-blade surface temperature is measured optically with background-radiation corrections."
+    },
+    {
+      "url": "https://www.nist.gov/programs-projects/spectroradiometry-sources",
+      "supports": "Blackbody spectral radiance calibration uses Planck law; this does not calibrate a JSBSim gas proxy to F135 metal temperature."
+    }
+  ],
+  "evidence": [
+    {
+      "path": "fork12/f135-temperature-sdk.log",
+      "bytes": 662,
+      "sha256": "9edb9655d39092ae6984d56f179373364352ac815111ba091475acf54fa7c2d3"
+    },
+    {
+      "path": "fork12/f135-temperature-trace.json",
+      "bytes": 2365375,
+      "sha256": "3194d84534f4ecd92c36bcd606f25ebf078bdcf6984a927479ab600c9d5b9251"
+    },
+    {
+      "path": "fork12/install.log",
+      "bytes": 28,
+      "sha256": "f2665052a513a786c9262f496de1f9e844287886353b70736e6d1823e0ceb72a"
+    },
+    {
+      "path": "fork12/installed-identity-regressions.log",
+      "bytes": 203,
+      "sha256": "0cb5e9196670b2648a669409cf249e510dd4ccf17cd7c30b85d27ac64e95628b"
+    },
+    {
+      "path": "fork12/installed-temperature.log",
+      "bytes": 1589,
+      "sha256": "bca10c9463125b5523a607a6f4bde900a69c976cd2c07a4f38274b1a57c63452"
+    },
+    {
+      "path": "fork12/native-build.log",
+      "bytes": 1122,
+      "sha256": "bc1e964e7b8918fff16dfd4a0a347f2af4fd1836b9d0566ec79de33df7861bd7"
+    },
+    {
+      "path": "fork12/native-configure.log",
+      "bytes": 267,
+      "sha256": "fde2f7e690387229cf468971fed16ed42081a89793dd662838b9e1361dc515be"
+    },
+    {
+      "path": "fork12/native-fixture-backtrace-full.log",
+      "bytes": 2745,
+      "sha256": "d1dad9e0fdaa2bb27d95d71f76b22f237c49c735b0373fb4ee548cc3cf484b53"
+    },
+    {
+      "path": "fork12/native-fixture-backtrace-permitted.log",
+      "bytes": 1332,
+      "sha256": "2a9536363bcaa59a4495e1a672d0a166e3b6c1797e29aa53077feae308a1a428"
+    },
+    {
+      "path": "fork12/native-fixture-backtrace.log",
+      "bytes": 292,
+      "sha256": "c5dae08f1ab7172a85c5b33f63a797cb60526a2000a24b11d8c0f640d7f31988"
+    },
+    {
+      "path": "fork12/native-fixture-build.log",
+      "bytes": 671,
+      "sha256": "af9a2f70136d00dc782ef63359adf76e3b0fca837651b22f0bcbf18678d986b0"
+    },
+    {
+      "path": "fork12/native-temperature-rerun.log",
+      "bytes": 246,
+      "sha256": "4beadf5df53f8f33efeac86ad6db11190cce08fc85ed6144db10cc9fbc7f1860"
+    },
+    {
+      "path": "fork12/native-temperature.log",
+      "bytes": 750,
+      "sha256": "301ce3718fb7cea8983209ef95b4a412514622fa71edb2d8d7af8238dafc7c67"
+    },
+    {
+      "path": "fork12/sdk-build-locked-node.log",
+      "bytes": 13924,
+      "sha256": "35d45cfba2c41e79065acd25142944e7e0f9e17641b8cb071f8cbca279df8a57"
+    },
+    {
+      "path": "fork12/sdk-build-repo-cache.log",
+      "bytes": 20181,
+      "sha256": "3bf58d06ac88a2956c4d556c8c0f4de9bc47037f0aa513947502ea17b3361015"
+    },
+    {
+      "path": "fork12/sdk-build-validation.log",
+      "bytes": 527,
+      "sha256": "3642b877a02c3a3e98ecd363e64a5dd8d1a54ce122b92154a5233d50817d9c01"
+    },
+    {
+      "path": "fork12/sdk-dependencies.log",
+      "bytes": 474,
+      "sha256": "0a3bb080f8385998969baca445118987e10e4fd063e802fd6512514301046430"
+    },
+    {
+      "path": "fork12/sdk-release-pack-repo-cache.log",
+      "bytes": 1890,
+      "sha256": "42a19e7bb194feff3d1890dd128cc131da86c2ac777bfeca1ba03cdf3853f569"
+    },
+    {
+      "path": "fork12/sdk-release-pack.log",
+      "bytes": 929,
+      "sha256": "06b054afaaa6ea26cc3bdb386a4bbd4c9a980730011baae20b131bb9e07c596e"
+    },
+    {
+      "path": "fork12/verified-installed-artifact.json",
+      "bytes": 3170,
+      "sha256": "4963d1ef5825021e6271a7490a69f6de926aa5a77eb8f7fdeefa58225269e63b"
+    },
+    {
+      "path": "fork12/verify-fork12.log",
+      "bytes": 574,
+      "sha256": "ae72061dba3738df734dd54987cff7f353354fdc2258ce5e252d6618d405925f"
+    }
+  ]
+}

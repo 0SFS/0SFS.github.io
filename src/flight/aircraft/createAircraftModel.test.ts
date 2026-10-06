@@ -1,8 +1,9 @@
 import { readFileSync } from "node:fs";
-import { AssetContainer, Mesh, MeshBuilder, NullEngine, Scene, TransformNode, type AbstractMesh, type ISceneLoaderProgressEvent } from "@babylonjs/core";
+import { AssetContainer, LoadAssetContainerAsync, Matrix, Mesh, MeshBuilder, NullEngine, Quaternion, Scene, TransformNode, type AbstractMesh, type ISceneLoaderProgressEvent } from "@babylonjs/core";
 import { describe, expect, it, vi } from "vitest";
 import { createAircraftModel, type AircraftModelState } from "./createAircraftModel";
 import { getFdmProfile } from "../jsbsim/fdmProfiles";
+import * as aircraftCatalog from "./aircraftCatalog";
 
 // The readiness wait is FOSS Earth's, covered there; the runtime it comes with
 // does not load under this environment. Tests that care pass `whenReady`.
@@ -43,9 +44,10 @@ function setup() {
 
 /** Reproduce the distributed GLB's hierarchy and Babylon's multi-primitive mesh names. */
 function f35bVisibilityContainer(scene: Scene): AssetContainer {
-  const bytes = readFileSync("public/aircraft/f-35b/F-35B_AF267.glb");
+  const bytes = readFileSync("public/aircraft/f-35b/F-35B_AF267-airframe.glb");
   const gltf = JSON.parse(bytes.subarray(20, 20 + bytes.readUInt32LE(12)).toString()) as {
-    nodes: { name: string; mesh?: number; children?: number[] }[];
+    nodes: { name: string; mesh?: number; children?: number[]; translation?: number[];
+      rotation?: number[]; scale?: number[]; matrix?: number[] }[];
     meshes: { primitives: unknown[] }[];
   };
   const container = new AssetContainer(scene);
@@ -66,11 +68,20 @@ function f35bVisibilityContainer(scene: Scene): AssetContainer {
     return node;
   });
   gltf.nodes.forEach((definition, index) => {
+    const node = nodes[index];
+    node.position.fromArray(definition.translation ?? [0, 0, 0]);
+    node.scaling.fromArray(definition.scale ?? [1, 1, 1]);
+    node.rotationQuaternion = Quaternion.FromArray(definition.rotation ?? [0, 0, 0, 1]);
+    if (definition.matrix) Matrix.FromArray(definition.matrix).decompose(node.scaling, node.rotationQuaternion, node.position);
     for (const child of definition.children ?? []) nodes[child].parent = nodes[index];
   });
   container.rootNodes.push(...nodes.filter(node => node.parent === null));
   container.removeAllFromScene();
   return container;
+}
+
+async function loadEngineFixture(url: string, scene: Scene): Promise<AssetContainer> {
+  return LoadAssetContainerAsync(new Uint8Array(readFileSync(`public${url}`)), scene, { pluginExtension: ".glb" });
 }
 
 function gearMeshes(container: AssetContainer): AbstractMesh[] {
@@ -79,6 +90,166 @@ function gearMeshes(container: AssetContainer): AbstractMesh[] {
 }
 
 describe("aircraft model loader", () => {
+  it("loads only the complete engine in the Earth stand and prepares it before reveal", async () => {
+    const t = setup();
+    const gate = readinessGate();
+    const requestRender = vi.fn();
+    const urls: string[] = [];
+    const model = createAircraftModel(t.scene, t.parent, {
+      aircraftId: "f-35b", lodId: "hd", engineOnly: true,
+      loadContainer: async (url, scene) => { urls.push(url); return loadEngineFixture(url, scene); },
+      whenReady: gate.whenReady, requestRender,
+    });
+    try {
+      await vi.waitFor(() => expect(gate.waits).toHaveLength(1));
+      expect(urls).toEqual(["/aircraft/f-35b/engine/F135-PW-600-full.glb"]);
+      expect(gate.waits[0].meshes.every(mesh => !mesh.isEnabled())).toBe(true);
+      const morphs = gate.waits[0].meshes.filter((mesh): mesh is Mesh => mesh instanceof Mesh && mesh.morphTargetManager !== null);
+      expect(morphs).toHaveLength(0);
+      expect(requestRender).not.toHaveBeenCalled();
+      gate.releaseLast();
+      await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
+      expect(model.getRig()!.getNode("F135_Engine")).not.toBeNull();
+      expect(model.getRig()!.getNode("vtol")).toBeNull();
+      expect(model.getRig()!.engineNozzle!.partCount).toBe(112);
+      expect(t.scene.meshes.some(mesh => mesh.name === "F135_ExternalCasing")).toBe(true);
+      expect(t.scene.meshes.every(mesh => !mesh.isPickable)).toBe(true);
+      expect(requestRender).toHaveBeenCalledOnce();
+    } finally { model.dispose(); t.teardown(); }
+  });
+
+  it("requests installed geometry with the airframe and never requests or draws stand-only geometry in flight", async () => {
+    const t = setup();
+    const airframe = f35bVisibilityContainer(t.scene);
+    const urls: string[] = [];
+    const model = createAircraftModel(t.scene, t.parent, {
+      aircraftId: "f-35b", lodId: "hd",
+      loadContainer: async (url, scene) => { urls.push(url); return url.includes("/engine/")
+        ? loadEngineFixture(url, scene) : airframe; },
+    });
+    try {
+      await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
+      expect(urls).toEqual(["/aircraft/f-35b/F-35B_AF267-airframe.glb", "/aircraft/f-35b/engine/F135-PW-600-installed.glb"]);
+      expect(model.getRig()!.getNode("vtol")).toBeNull();
+      expect(model.getRig()!.getNode("F135_ExternalCasing")).toBeNull();
+      expect(model.getRig()!.getNode("F135_Engine")).not.toBeNull();
+      const definition = aircraftCatalog.getAircraftDefinition("f-35b");
+      expect(model.getState().triangles).toBe(definition.lods[0].triangles);
+    } finally { model.dispose(); t.teardown(); }
+  });
+
+  it("isolates arbitrary declared assemblies and composes their original and gear visibility", async () => {
+    const t = setup();
+    const container = new AssetContainer(t.scene);
+    const body = new Mesh("airframe-parent", t.scene);
+    const assembly = new TransformNode("custom-engine-assembly", t.scene);
+    assembly.parent = body;
+    const rotor = new Mesh("custom-rotor", t.scene);
+    rotor.parent = assembly;
+    const hiddenPart = new Mesh("originally-hidden-part", t.scene);
+    hiddenPart.parent = assembly;
+    hiddenPart.isVisible = false;
+    container.meshes.push(body, rotor, hiddenPart);
+    container.transformNodes.push(assembly);
+    container.rootNodes.push(body);
+    container.removeAllFromScene();
+    const definition = { ...aircraftCatalog.getAircraftDefinition("cessna-172"),
+      engineTestNodeNames: [assembly.name], stowedGearNodeNames: [body.name, rotor.name, hiddenPart.name] };
+    const catalog = vi.spyOn(aircraftCatalog, "getAircraftDefinition").mockReturnValue(definition);
+    const requestRender = vi.fn();
+    const model = createAircraftModel(t.scene, t.parent, {
+      aircraftId: "cessna-172", lodId: "lod3", engineOnly: true,
+      loadContainer: async () => container, requestRender,
+    });
+    try {
+      await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
+      expect(body.isVisible).toBe(false);
+      expect(body.isEnabled()).toBe(true);
+      expect(rotor.isVisible).toBe(true);
+      expect(hiddenPart.isVisible).toBe(false);
+      model.updateGearVisibility(0);
+      expect(rotor.isVisible).toBe(false);
+      model.updateGearVisibility(1);
+      expect(rotor.isVisible).toBe(true);
+      expect(body.isVisible).toBe(false);
+      expect(hiddenPart.isVisible).toBe(false);
+      model.setRenderStowedGear(true);
+      expect(body.isVisible).toBe(false);
+      expect(rotor.parent).toBe(assembly);
+      expect(assembly.parent).toBe(body);
+    } finally { model.dispose(); catalog.mockRestore(); t.teardown(); }
+  });
+
+  it("releases an acquired airframe if its separate installed engine fails", async () => {
+    const t = setup();
+    const airframe = f35bVisibilityContainer(t.scene);
+    const release = vi.spyOn(airframe, "dispose");
+    const whenReady = vi.fn(async () => {});
+    const model = createAircraftModel(t.scene, t.parent, {
+      aircraftId: "f-35b", lodId: "hd", whenReady,
+      loadContainer: async url => {
+        if (url.includes("/engine/")) throw new Error("engine unavailable");
+        return airframe;
+      },
+    });
+    try {
+      await vi.waitFor(() => expect(model.getState().status).toBe("error"));
+      expect(release).toHaveBeenCalledOnce();
+      expect(whenReady).not.toHaveBeenCalled();
+      expect(model.getRig()).toBeNull();
+    } finally { model.dispose(); t.teardown(); }
+  });
+
+  it("disposes both pending containers when cancelled between their downloads", async () => {
+    const t = setup();
+    const airframe = f35bVisibilityContainer(t.scene), engine = new AssetContainer(t.scene);
+    const releaseAirframe = vi.spyOn(airframe, "dispose"), releaseEngine = vi.spyOn(engine, "dispose");
+    let finish!: (container: AssetContainer) => void;
+    const whenReady = vi.fn(async () => {});
+    const model = createAircraftModel(t.scene, t.parent, {
+      aircraftId: "f-35b", lodId: "hd", whenReady,
+      loadContainer: url => url.includes("/engine/") ? new Promise(resolve => { finish = resolve; }) : Promise.resolve(airframe),
+    });
+    try {
+      model.dispose();
+      finish(engine);
+      await vi.waitFor(() => expect(releaseEngine).toHaveBeenCalledOnce());
+      expect(releaseAirframe).toHaveBeenCalledOnce();
+      expect(whenReady).not.toHaveBeenCalled();
+    } finally { t.teardown(); }
+  });
+
+  it("rejects an isolated view without declaration instead of displaying a substitute full aircraft", () => {
+    const t = setup();
+    const model = createAircraftModel(t.scene, t.parent, {
+      aircraftId: "cessna-172", lodId: "lod3", engineOnly: true, loadContainer: t.loadContainer,
+    });
+    try {
+      expect(model.getState().status).toBe("error");
+      expect(model.getState().error).toContain("no declared engine-test assembly");
+      expect(t.loadContainer).not.toHaveBeenCalled();
+    } finally { model.dispose(); t.teardown(); }
+  });
+
+  it("rejects and releases a loaded asset whose declared engine-test root is absent", async () => {
+    const t = setup();
+    const container = await loadEngineFixture("/aircraft/f-35b/engine/F135-PW-600-full.glb", t.scene);
+    container.transformNodes.find(node => node.name === "F135_Engine")!.name = "missing-engine";
+    const release = vi.spyOn(container, "dispose");
+    const whenReady = vi.fn(async () => {});
+    const model = createAircraftModel(t.scene, t.parent, {
+      aircraftId: "f-35b", lodId: "hd", engineOnly: true,
+      loadContainer: async () => container, whenReady,
+    });
+    try {
+      await vi.waitFor(() => expect(model.getState().status).toBe("error"));
+      expect(model.getState().error).toContain("F135_Engine");
+      expect(release).toHaveBeenCalledOnce();
+      expect(whenReady).not.toHaveBeenCalled();
+      expect(model.getRig()).toBeNull();
+    } finally { model.dispose(); t.teardown(); }
+  });
+
   it("publishes only ready mesh hierarchies and detaches inspection before replacing or disposing them", async () => {
     const t = setup();
     const gate = readinessGate();
@@ -122,7 +293,7 @@ describe("aircraft model loader", () => {
     doors[0].parent = container.transformNodes.find(node => node.name === "leftGear")!;
     const requestRender = vi.fn();
     const model = createAircraftModel(t.scene, t.parent, {
-      aircraftId: "f-35b", lodId: "hd", loadContainer: async () => container, requestRender,
+      aircraftId: "f-35b", lodId: "hd", loadContainer: (url, scene) => url.includes("/engine/") ? loadEngineFixture(url, scene) : Promise.resolve(container), requestRender,
     });
     await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
     expect(gear.every(mesh => mesh.isVisible)).toBe(true); // Unknown physical position.
@@ -153,7 +324,7 @@ describe("aircraft model loader", () => {
     originallyHidden.isVisible = false;
     const requestRender = vi.fn();
     const model = createAircraftModel(t.scene, t.parent, {
-      aircraftId: "f-35b", lodId: "hd", loadContainer: async () => container, requestRender,
+      aircraftId: "f-35b", lodId: "hd", loadContainer: (url, scene) => url.includes("/engine/") ? loadEngineFixture(url, scene) : Promise.resolve(container), requestRender,
     });
     await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
     requestRender.mockClear();
@@ -187,7 +358,7 @@ describe("aircraft model loader", () => {
     const requestRender = vi.fn();
     const model = createAircraftModel(t.scene, t.parent, {
       aircraftId: "f-35b", lodId: "hd", renderStowedGear: !renderStowedGear,
-      loadContainer: async () => container, whenReady: gate.whenReady, requestRender,
+      loadContainer: (url, scene) => url.includes("/engine/") ? loadEngineFixture(url, scene) : Promise.resolve(container), whenReady: gate.whenReady, requestRender,
       onStateChange: state => {
         if (state.status === "ready") expect(gear.every(mesh => mesh.isVisible === renderStowedGear)).toBe(true);
       },
@@ -276,9 +447,10 @@ describe("aircraft model loader", () => {
 
   it("binds the F-35B's authored part names when Auto loads its exterior", async () => {
     const t = setup();
-    const loadContainer = vi.fn(async () => {
+    const loadContainer = vi.fn(async (url: string) => {
+      if (url.includes("/engine/")) return loadEngineFixture(url, t.scene);
       const container = new AssetContainer(t.scene);
-      for (const name of ["leftElevator", "rightElevator", "leftFlaperon", "rightFlaperon", "leftRudder", "rightRudder", "vtol"]) {
+      for (const name of ["leftElevator", "rightElevator", "leftFlaperon", "rightFlaperon", "leftRudder", "rightRudder"]) {
         const node = new TransformNode(name, t.scene);
         t.scene.removeTransformNode(node);
         container.transformNodes.push(node);
@@ -290,7 +462,7 @@ describe("aircraft model loader", () => {
     await vi.waitFor(() => expect(model.getState().status).toBe("ready"));
     expect(model.getState().activeLodId).toBe("hd");
     expect(model.getRig()?.parts).toHaveLength(6);
-    expect(model.getRig()?.stovl.map(part => part.node.name)).toEqual(["vtol"]);
+    expect(model.getRig()?.stovl.map(part => part.node.name)).toEqual([]);
     model.dispose();
     t.teardown();
   });

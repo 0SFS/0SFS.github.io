@@ -1,0 +1,210 @@
+import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { evaluateEngineGasOptics, integrateGasSegment, interpolateGasBlackbody, engineGasSupportLength,
+  sampleEngineGasField, gasFieldVolumeWeights, gasFlowFieldVolumeWeights, validateEngineGasOpticalData,
+  DEFAULT_ENGINE_GAS_AXIAL_SAMPLES, DEFAULT_ENGINE_GAS_RADIAL_SAMPLES, type EngineGasOpticalData, type EngineGasFlowDomain } from "./engineGasOptics";
+import { f135ExhaustOpticalData as profile } from "./generated/f135ExhaustOpticalData";
+
+const input = { temperatureKelvin: 1800, ambientTemperatureKelvin: 288.15, augmentation: true, fuelFlowKgPerSecond: 3,
+  afterburnerBurnedFuelFlowKgPerSecond: 1, radiusMeters: 0.6, lengthMeters: 6 };
+const legacyProfile = JSON.parse(readFileSync(new URL("../../../validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/spatial-optics/source-0-f135-exhaust-lut.manifest.json.txt", import.meta.url), "utf8")).profile;
+describe("dimensional gas optical transfer", () => {
+  it("retains negligible cold Planck amplitude without normalizing it bright", () => {
+    const cold = evaluateEngineGasOptics(profile, { ...input, temperatureKelvin: 300, augmentation: false });
+    const hot = evaluateEngineGasOptics(profile, input);
+    expect(cold.valid).toBe(true);
+    expect(Math.max(...cold.sourceRgbCdPerM3)).toBeLessThan(1e-15);
+    expect(Math.max(...hot.sourceRgbCdPerM3)).toBeGreaterThan(1);
+    expect(cold.excitedPowerW).toBe(0);
+  });
+  it("rejects invalid/out-of-domain inputs and retains exact table endpoints", () => {
+    const data = profile.gasEmission;
+    for (const temperatureKelvin of [undefined, -1, 149, 3201, NaN, Infinity])
+      expect(evaluateEngineGasOptics(profile, { ...input, temperatureKelvin }).valid).toBe(false);
+    for (const fuelFlowKgPerSecond of [undefined, 0, -1, NaN, Infinity])
+      expect(evaluateEngineGasOptics(profile, { ...input, fuelFlowKgPerSecond }).sourceRgbCdPerM3).toEqual([0, 0, 0]);
+    for (const radiusMeters of [0, -1, NaN, Infinity])
+      expect(evaluateEngineGasOptics(profile, { ...input, radiusMeters }).valid).toBe(false);
+    for (const t of [150, 3200]) {
+      const expected = data.blackbody.samples[t === 150 ? 0 : data.blackbody.samples.length - 1];
+      interpolateGasBlackbody(data, t)!.forEach((v, i) => expect(v).toBeCloseTo(expected[i], 7));
+    }
+  });
+  it("bounds particle source and marks chemical production unavailable without inventing an emission yield", () => {
+    for (const temperatureKelvin of [300, 1000, 1800, 2500, 3200]) for (const fuelFlowKgPerSecond of [1e-6, 0.1, 3]) {
+      const result = evaluateEngineGasOptics(profile, { ...input, temperatureKelvin, fuelFlowKgPerSecond });
+      expect(result.totalSourcePowerUpperBoundW).toBeLessThanOrEqual(result.allowedPowerW * (1 + 1e-12));
+      expect(result.allowedPowerW).toBeLessThan(result.fuelPowerW);
+      expect(result.absorptionPerMeter).toBeLessThanOrEqual(profile.gasEmission.afterburner.absorptionPerMeter);
+      expect(result.chemistryStatus).toBe("unavailable");
+      expect(result.excitedPowerW).toBe(0);
+    }
+    expect(evaluateEngineGasOptics(profile, { ...input, fuelFlowKgPerSecond: 1e-6 }).absorptionWasCapped).toBe(true);
+    expect(evaluateEngineGasOptics(profile, { ...input, afterburnerBurnedFuelFlowKgPerSecond: undefined }).excitedPowerW).toBe(0);
+    expect(evaluateEngineGasOptics(profile, { ...input, augmentation: false }).excitedPowerW).toBe(0);
+  });
+  it("uses the imposed native bath directly and has no source discontinuity from the AB boolean", () => {
+    const dry = evaluateEngineGasOptics(profile, { ...input, augmentation: false });
+    const ab = evaluateEngineGasOptics(profile, { ...input, augmentation: true });
+    expect(dry.temperatureMeaning).toBe("imposed-native-gas-bath-proxy");
+    expect(dry.sourceBoundaryTemperatureKelvin).toBe(input.temperatureKelvin);
+    expect(dry.staticExitTemperatureKelvin).toBeUndefined();
+    expect(ab.sourceRgbCdPerM3).toEqual(dry.sourceRgbCdPerM3);
+    expect(ab.field!.rgba).toEqual(dry.field!.rgba);
+    expect(ab.allowedPowerW).toBe(dry.allowedPowerW);
+    expect(ab.totalSourcePowerUpperBoundW).toBe(dry.totalSourcePowerUpperBoundW);
+    const near = sampleEngineGasField(ab, 0, 0.6), tail = sampleEngineGasField(ab, 0.5, 0.6);
+    expect(near.particleTemperatureKelvin).toBeGreaterThan(tail.particleTemperatureKelvin);
+    expect(near.sourceRgbCdPerM3[1] / near.sourceRgbCdPerM3[0]).toBeGreaterThan(tail.sourceRgbCdPerM3[1] / tail.sourceRgbCdPerM3[0]);
+  });
+  it("requires valid ambient state and bounds field resources without changing the fuel source", () => {
+    const defaults = evaluateEngineGasOptics(profile, input).field!;
+    expect(defaults.width).toBe(DEFAULT_ENGINE_GAS_AXIAL_SAMPLES);
+    expect(defaults.height).toBe(DEFAULT_ENGINE_GAS_RADIAL_SAMPLES);
+    expect(defaults.rgba.byteLength).toBe(32 * 1024);
+    for (const ambientTemperatureKelvin of [undefined, NaN, Infinity, 0, 149, 501])
+      expect(evaluateEngineGasOptics(profile, { ...input, ambientTemperatureKelvin }).valid).toBe(false);
+    for (const axialSamples of [0, 7, 65, 16.5, NaN])
+      expect(evaluateEngineGasOptics(profile, { ...input, axialSamples }).valid).toBe(false);
+    const result = evaluateEngineGasOptics(profile, { ...input, axialSamples: 64, radialSamples: 8 });
+    expect(result.field?.rgba).toHaveLength(64 * 8 * 4);
+    expect(result.field?.rgba.every(v => Number.isFinite(v) && v >= 0)).toBe(true);
+    const cold = evaluateEngineGasOptics(profile, { ...input, temperatureKelvin: 200, ambientTemperatureKelvin: 150, augmentation: false });
+    expect(cold.valid).toBe(true);
+    expect(cold.field!.maxSourceCdPerM3).toBeLessThan(1e-30);
+    expect(sampleEngineGasField(result, -0.01, 0.5).inside).toBe(false);
+    expect(sampleEngineGasField(result, 0.5, 1.01).sourceRgbCdPerM3).toEqual([0, 0, 0]);
+  });
+  it("reuses immutable geometry weights across thermal updates and equivalent domain wrappers", () => {
+    const first = evaluateEngineGasOptics(profile, input);
+    const saved = first.field!.volumeWeightsM3.slice();
+    const warmer = evaluateEngineGasOptics(profile, { ...input, temperatureKelvin: 2200, fuelFlowKgPerSecond: 4 });
+    expect(warmer.field!.volumeWeightsM3).toBe(first.field!.volumeWeightsM3);
+    expect(warmer.field!.exteriorVolumeWeightsM3).toBe(first.field!.exteriorVolumeWeightsM3);
+    expect(warmer.field!.rgba).not.toEqual(first.field!.rgba);
+    expect(first.field!.volumeWeightsM3).toEqual(saved);
+
+    const domain: EngineGasFlowDomain = { axialDistanceRangeMeters: [-1, 6], sections: [
+      { distanceMeters: -1, radiusMeters: 0.5, innerRadiusMeters: 0.2 },
+      { distanceMeters: 0, radiusMeters: 0.6 }, { distanceMeters: 6, radiusMeters: 1.02 }] };
+    const inside = evaluateEngineGasOptics(profile, { ...input, flowDomain: domain });
+    const equivalent = evaluateEngineGasOptics(profile, { ...input, temperatureKelvin: 2300,
+      flowDomain: { ...domain, sections: domain.sections.map(s => ({ ...s })) } });
+    expect(equivalent.field!.volumeWeightsM3).toBe(inside.field!.volumeWeightsM3);
+    expect(equivalent.field!.exteriorVolumeWeightsM3).toBe(inside.field!.exteriorVolumeWeightsM3);
+    const revised = evaluateEngineGasOptics(profile, { ...input, flowDomain: { ...domain,
+      sections: domain.sections.map((s, i) => i ? s : { ...s, innerRadiusMeters: 0.1 }) } });
+    expect(revised.field!.volumeWeightsM3).not.toBe(inside.field!.volumeWeightsM3);
+    expect(revised.emittingVolumeM3).toBeGreaterThan(inside.emittingVolumeM3);
+    const resized = evaluateEngineGasOptics(profile, { ...input, flowDomain: domain, axialSamples: 32 });
+    expect(resized.field!.volumeWeightsM3).toHaveLength(32 * DEFAULT_ENGINE_GAS_RADIAL_SAMPLES);
+    expect(resized.field!.volumeWeightsM3).not.toBe(inside.field!.volumeWeightsM3);
+  });
+  it("integrates every field node with exact expanding-volume weights and preserves whole-source budgets", () => {
+    for (const expansion of [0, 0.7, 2]) {
+      const weights = gasFieldVolumeWeights(32, 16, 0.6, 6, expansion);
+      const volume = weights.reduce((sum, v) => sum + v, 0);
+      expect(volume).toBeCloseTo(Math.PI * 0.6 ** 2 * 6 * (1 + expansion + expansion ** 2 / 3), 10);
+      expect(weights.every(v => v > 0)).toBe(true);
+    }
+    const r = evaluateEngineGasOptics(profile, { ...input, temperatureKelvin: 3200, fuelFlowKgPerSecond: 1e-5 });
+    const f = r.field!;
+    const integrate = (array: Float64Array) => array.reduce((sum, v, i) => sum + v * f.volumeWeightsM3[i], 0);
+    expect(integrate(f.particlePowerDensityWPerM3)).toBeCloseTo(r.particlePowerUpperBoundW, 10);
+    expect(integrate(f.chPowerDensityWPerM3)).toBeCloseTo(r.chPowerW, 10);
+    expect(integrate(f.c2PowerDensityWPerM3)).toBeCloseTo(r.c2PowerW, 10);
+    for (let c = 0; c < 3; c++) {
+      const actual = f.volumeWeightsM3.reduce((sum, weight, i) => sum + weight * f.rgba[i * 4 + c], 0);
+      expect(actual).toBeCloseTo(r.isotropicIntensityRgbCd[c], 12);
+      expect(r.exteriorIsotropicIntensityRgbCd[c]).toBe(r.isotropicIntensityRgbCd[c]);
+    }
+    expect(r.totalSourcePowerUpperBoundW).toBeLessThanOrEqual(r.allowedPowerW);
+  });
+  it("retains the archived v1 chemical/expansion hypothesis for reproducible old evidence", () => {
+    const r = evaluateEngineGasOptics(legacyProfile, { ...input, temperatureKelvin: 2363 });
+    expect(r.chemistryStatus).toBe("legacy-imposed");
+    expect(r.staticExitTemperatureKelvin).toBeLessThan(2363);
+    expect(r.excitedPowerW).toBeGreaterThan(0);
+    const near = sampleEngineGasField(r, 0, 0.6), mixed = sampleEngineGasField(r, 0.2, 0.6), tail = sampleEngineGasField(r, 0.8, 0.6);
+    expect(near.particleTemperatureKelvin).toBeGreaterThan(mixed.particleTemperatureKelvin);
+    expect(mixed.particleTemperatureKelvin).toBeGreaterThan(tail.particleTemperatureKelvin);
+    expect(near.chPowerDensityWPerM3).toBeGreaterThan(mixed.chPowerDensityWPerM3);
+    expect(tail.chPowerDensityWPerM3).toBe(0);
+    expect(tail.c2PowerDensityWPerM3).toBe(0);
+    expect(near.chPowerDensityWPerM3 / near.c2PowerDensityWPerM3)
+      .not.toBeCloseTo(mixed.chPowerDensityWPerM3 / mixed.c2PowerDensityWPerM3, 2);
+    expect(near.sourceRgbCdPerM3[2] / near.sourceRgbCdPerM3[0])
+      .not.toBeCloseTo(mixed.sourceRgbCdPerM3[2] / mixed.sourceRgbCdPerM3[0], 2);
+    // Signed CH/continuum components must survive until the one combined map.
+    expect(near.chSourceRgbCdPerM3[1]).toBeLessThan(0);
+    expect(near.particleSourceRgbCdPerM3[2]).toBeLessThan(0);
+    const mixedSigned = [0, 1, 2].map(c => near.particleSourceRgbCdPerM3[c] + near.chSourceRgbCdPerM3[c] + near.c2SourceRgbCdPerM3[c]);
+    const y = (rgb: readonly number[]) => 0.2126729 * rgb[0] + 0.7151522 * rgb[1] + 0.072175 * rgb[2];
+    expect(y(near.sourceRgbCdPerM3) / y(mixedSigned)).toBeCloseTo(1, 5);
+  });
+  it("gives uniform chromaticity for uniform physical fields and preserves the legacy profile path", () => {
+    const d: EngineGasOpticalData = { ...profile.gasEmission, spatialField: { ...profile.gasEmission.spatialField,
+      spreadingSlope: 0, exitMach: { dry: 0, afterburner: 0 },
+      basisSamples: profile.gasEmission.spatialField.basisSamples.map(() => [1, 0.3, 0.4, 0.8] as const) } };
+    const r = evaluateEngineGasOptics({ gasEmission: d }, input);
+    const first = sampleEngineGasField(r, 0, 0).sourceRgbCdPerM3;
+    for (const [u, v] of [[1, 1], [0.37, 0.61], [0.2, 0.8]])
+      expect(sampleEngineGasField(r, u, v).sourceRgbCdPerM3).toEqual(first);
+    const legacy = { gasEmission: { ...legacyProfile.gasEmission, spatialField: undefined } };
+    expect(evaluateEngineGasOptics(legacy, { ...input, ambientTemperatureKelvin: undefined }).field).toBeUndefined();
+    expect(engineGasSupportLength(profile, 6, 0.8, false)).toBe(6);
+    expect(engineGasSupportLength(legacy, 6, 0.8, false)).toBeCloseTo(1.2);
+    expect(() => validateEngineGasOpticalData({ ...d, spatialField: { ...d.spatialField!, basisSamples: [[2, 1, 1, 1]] } })).toThrow();
+  });
+  it("integrates signed ruled annular domains once and continues emission across the exit", () => {
+    const domain: EngineGasFlowDomain = { axialDistanceRangeMeters: [-2, 6], sections: [
+      { distanceMeters: -2, radiusMeters: 0.8, innerRadiusMeters: 0.3, areaFactor: 0.9 },
+      { distanceMeters: 0, radiusMeters: 0.6, innerRadiusMeters: 0, areaFactor: 1 },
+      { distanceMeters: 6, radiusMeters: 1.02, innerRadiusMeters: 0, areaFactor: 1 }] };
+    let volume = 0;
+    for (let i = 1; i < domain.sections.length; i++) {
+      const a = domain.sections[i - 1], b = domain.sections[i];
+      const area = (f: number) => {
+        const r = a.radiusMeters + f * (b.radiusMeters - a.radiusMeters);
+        const inner = (a.innerRadiusMeters ?? 0) + f * ((b.innerRadiusMeters ?? 0) - (a.innerRadiusMeters ?? 0));
+        const factor = (a.areaFactor ?? 1) + f * ((b.areaFactor ?? 1) - (a.areaFactor ?? 1));
+        return Math.PI * (r * r - inner * inner) * factor;
+      };
+      volume += (b.distanceMeters - a.distanceMeters) / 6 * (area(0) + 4 * area(0.5) + area(1));
+    }
+    expect(gasFlowFieldVolumeWeights(64, 32, domain).reduce((s, v) => s + v, 0)).toBeCloseTo(volume, 10);
+    const r = evaluateEngineGasOptics(profile, { ...input, flowDomain: domain });
+    expect(r.emittingVolumeM3).toBeCloseTo(volume, 10);
+    const exteriorVolume = Math.PI * 6 * (0.6 ** 2 + 0.6 * 1.02 + 1.02 ** 2) / 3;
+    expect(r.field!.exteriorVolumeWeightsM3.reduce((sum, w) => sum + w, 0)).toBeCloseTo(exteriorVolume, 10);
+    r.exteriorIsotropicIntensityRgbCd.forEach((v, c) => {
+      expect(v).toBeLessThanOrEqual(r.isotropicIntensityRgbCd[c]);
+      const field = r.field!;
+      expect(field.exteriorVolumeWeightsM3.reduce((sum, w, i) => sum + w * field.rgba[i * 4 + c], 0)).toBeCloseTo(v, 12);
+    });
+    expect(r.exteriorIsotropicIntensityRgbCd[0]).toBeLessThan(r.isotropicIntensityRgbCd[0]);
+    expect(r.totalSourcePowerUpperBoundW).toBeLessThanOrEqual(r.allowedPowerW);
+    expect(sampleEngineGasField(r, 0, 0.1).inside).toBe(false);
+    expect(sampleEngineGasField(r, 0, 0.6).inside).toBe(true);
+    const before = sampleEngineGasField(r, 0.25 - 1e-8, 0.6), after = sampleEngineGasField(r, 0.25 + 1e-8, 0.6);
+    before.sourceRgbCdPerM3.forEach((v, c) => expect(Math.abs(v - after.sourceRgbCdPerM3[c]) / Math.max(v, 1e-30)).toBeLessThan(1e-5));
+    for (const sections of [[], [domain.sections[0], domain.sections[0]],
+      [{ ...domain.sections[0], innerRadiusMeters: 1 }, ...domain.sections.slice(1)],
+      [{ ...domain.sections[0], areaFactor: NaN }, ...domain.sections.slice(1)]])
+      expect(evaluateEngineGasOptics(profile, { ...input, flowDomain: { ...domain, sections } }).valid).toBe(false);
+  });
+  it("matches homogeneous transfer, thin and zero limits and successive segments", () => {
+    const source = [12, 3, 1], k = 0.4, d = 2;
+    const whole = integrateGasSegment(source, k, d);
+    const half = integrateGasSegment(source, k, d / 2);
+    whole.radianceRgbCdPerM2.forEach((v, c) => {
+      expect(v).toBeCloseTo(source[c] / k * (1 - Math.exp(-k * d)), 12);
+      expect(v).toBeCloseTo(half.radianceRgbCdPerM2[c] * (1 + half.transmittance), 12);
+    });
+    expect(integrateGasSegment(source, 0, d).radianceRgbCdPerM2).toEqual([24, 6, 2]);
+    expect(integrateGasSegment(source, 1e-14, d).radianceRgbCdPerM2[0]).toBeCloseTo(24, 11);
+    expect(integrateGasSegment(source, k, 0).transmittance).toBe(1);
+    expect(() => integrateGasSegment([NaN, 0, 0], k, d)).toThrow();
+    expect(() => integrateGasSegment(source, -1, d)).toThrow();
+  });
+});

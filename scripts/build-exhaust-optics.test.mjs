@@ -2,9 +2,12 @@ import { readFileSync } from "node:fs";
 import { inflateSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import { checkGeneratedExhaustArtifacts, generateExhaustArtifacts } from "./build-exhaust-optics.mjs";
-import { assumedSpectrum, bakeOpticalLut, bakeSurfaceEmission, bakeTemporalEmission, parseObserverCsv, planckRadiance, spectralLinearRgb } from "./exhaustOptics/bake.mjs";
+import { bakeDimensionalGas, bakeGasSpatialField, bakeSpatialEmission, bakeSurfaceEmission, parseObserverCsv, planckRadiance } from "./exhaustOptics/bake.mjs";
+
+import { referenceRadiance, referencePhotometricRgb, luminance } from "./exhaustOptics/reference.mjs";
 
 const profile = JSON.parse(readFileSync(new URL("./exhaustOptics/f135-visible-approximation.json", import.meta.url)));
+const legacyProfile = JSON.parse(readFileSync(new URL("../validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/spatial-optics/source-2-f135-visible-approximation.json.txt", import.meta.url)));
 const observer = parseObserverCsv(readFileSync(new URL("./exhaustOptics/data/CIE_xyz_1931_2deg.csv", import.meta.url)));
 
 function decodePng(bytes) {
@@ -33,83 +36,64 @@ function decodePng(bytes) {
   return { width, height, rgba };
 }
 
-describe("offline exhaust optical bake", () => {
-  it("retains the official observer and produces a finite thermal continuum with increasing radiance", () => {
-    expect(observer[0]).toEqual([360, 0.0001299, 0.000003917, 0.0006061]);
-    expect(observer.at(-1)[0]).toBe(830);
-    expect(planckRadiance(500, 2500)).toBeGreaterThan(planckRadiance(500, 1800));
-    expect(() => planckRadiance(500, Number.NaN)).toThrow(/finite/);
-    const thermal = spectralLinearRgb(assumedSpectrum(profile, "dry", 1, 0, observer), observer);
-    expect(thermal[0]).toBe(1);
-    expect(thermal[0]).toBeGreaterThan(thermal[1]);
-    expect(thermal[1]).toBeGreaterThan(thermal[2]);
+describe("dimensional offline exhaust optical bake", () => {
+  it("keeps a finite unmixed thermal core, grows its shear layer and cools only by ambient mixing", () => {
+    const p = { ...profile.gasEmission.spatialField, axialSamples: 97, radialSamples: 33 };
+    const field = bakeGasSpatialField(p, observer, [], {});
+    const at = (xi, radial) => field.basisSamples[Math.round(radial * (p.radialSamples - 1)) * p.axialSamples
+      + Math.round(xi / p.axialRadiusRange[1] * (p.axialSamples - 1))][0];
+    // Temperature excess on the axis remains the native boundary value inside
+    // the core. A photon gain or warmer boundary cannot satisfy this invariant.
+    for (const xi of [0, 2, 4, 6]) expect(at(xi, 0)).toBe(1);
+    expect(at(8, 0)).toBeLessThan(1);
+    expect(at(12, 0)).toBeLessThan(at(8, 0));
+    expect(at(0, 0.75)).toBe(1);
+    expect(at(2, 0.75)).toBeLessThan(at(0, 0.75));
+    expect(at(4, 0.75)).toBeLessThan(at(2, 0.75));
+    for (const xi of [0, 2, 6, 12, 24]) expect(at(xi, 1)).toBe(0);
+    expect(field.basisSamples.every(row => row[0] >= 0 && row[0] <= 1)).toBe(true);
+    expect(() => bakeGasSpatialField({ ...p, temperature: { ...p.temperature, potentialCoreLengthRadii: 0 } }, observer, [], {})).toThrow();
   });
-
-  it("the declared radical-band component produces a different blue/violet spectrum from soot", () => {
-    const radicalOnly = structuredClone(profile);
-    radicalOnly.afterburner.sootEnergyFractionAtNozzle = 0;
-    radicalOnly.afterburner.sootEnergyFractionAtTail = 0;
-    const bands = assumedSpectrum(radicalOnly, "afterburner", 1, 0.35, observer);
-    const peakWavelength = observer[bands.indexOf(Math.max(...bands))][0];
-    expect(peakWavelength).toBe(432);
-    const rgb = spectralLinearRgb(bands, observer);
-    expect(rgb[2]).toBe(1);
-    expect(rgb[2]).toBeGreaterThan(rgb[0]);
-    expect(rgb.every(value => Number.isFinite(value) && value >= 0 && value <= 1)).toBe(true);
-    const warmReference = spectralLinearRgb(assumedSpectrum(profile, "afterburner", 1, 0.35, observer), observer);
-    expect(warmReference[0]).toBe(1);
-    expect(warmReference[1]).toBeGreaterThan(warmReference[2]);
-    expect(warmReference[2]).toBeLessThan(0.15);
+  it("matches an independent frequency-form Planck reference and preserves photopic units", () => {
+    const surface = bakeSurfaceEmission(profile.surfaceEmission, observer);
+    expect(surface.samples).toHaveLength(512);
+    for (const kelvin of [300, 650, 1000, 1800, 3200]) {
+      for (const nm of [360, 500, 830]) expect(planckRadiance(nm, kelvin) / referenceRadiance(nm, kelvin)).toBeCloseTo(1, 12);
+      const exact = bakeSurfaceEmission({ sampleCount: 2, temperatureKelvinRange: [kelvin, kelvin + 1], visibleGrayEmissivity: 0.8 }, observer).samples[0];
+      const reference = referencePhotometricRgb(observer, kelvin, 0.8);
+      expect(Math.abs(luminance(exact) / luminance(reference) - 1)).toBeLessThan(0.005);
+    }
+    expect(Math.max(...surface.samples[0])).toBeLessThan(1e-15);
+    expect(surface.samples.every(rgb => rgb[0] >= rgb[1] && rgb[1] >= rgb[2])).toBe(true);
+    const half = bakeSurfaceEmission({ ...profile.surfaceEmission, visibleGrayEmissivity: 0.4 }, observer);
+    for (const i of [0, 100, 511]) expect(luminance(half.samples[i]) / luminance(surface.samples[i])).toBeCloseTo(0.5, 10);
   });
-
-  it("decodes the installed PNG into the expected top-first dry and actual-afterburner banks", () => {
-    const decoded = decodePng(readFileSync(new URL("../src/flight/aircraft/generated/f135-exhaust-lut.png", import.meta.url)));
-    const baked = bakeOpticalLut(profile, observer);
-    expect(decoded.width).toBe(64);
-    expect(decoded.height).toBe(32);
-    expect(decoded.rgba).toEqual(baked.rgba);
-    const alphas = Array.from(decoded.rgba).filter((_, i) => i % 4 === 3);
-    expect(alphas.slice(0, 64).every(value => value === 0)).toBe(true);
-    expect(Math.max(...alphas.slice(0, 64 * 16))).toBeLessThanOrEqual(4);
-    expect(Math.max(...alphas.slice(64 * 16))).toBeGreaterThan(240);
-    for (let row = 0; row < 32; row++) expect(alphas[row * 64 + 63]).toBe(0);
+  it("bakes dimensional source terms and explicit sensitivity hypotheses without brightness normalization", () => {
+    const spatial = bakeSpatialEmission(profile.spatialEmission);
+    const gas = bakeDimensionalGas(profile.gasEmission, observer, spatial);
+    expect(gas.blackbody.unit).toBe("cd/m2");
+    expect(gas.normalizedDensityVolume).toBeGreaterThan(0);
+    expect(gas.normalizedDensityVolume).toBeLessThan(Math.PI / 3);
+    expect(gas.excitedRgbLumensPerWatt.every(v => Number.isFinite(v) && v >= 0)).toBe(true);
+    expect(gas.model).toBe("imposed-gas-bath-v2");
+    expect(gas.chemistryStatus).toBe("unavailable");
+    expect(gas.excitedRgbLumensPerWatt).toEqual([0, 0, 0]);
+    expect(gas.spatialField.basisSamples.every(row => row[2] === 0 && row[3] === 0)).toBe(true);
+    const ch = structuredClone(legacyProfile.gasEmission);
+    ch.excitedBands = ch.excitedBands.filter(band => band.species === "CH*");
+    const blue = bakeDimensionalGas(ch, observer, spatial).excitedRgbLumensPerWatt;
+    expect(blue[2]).toBeGreaterThan(blue[0]);
+    expect(blue[0]).toBeGreaterThan(blue[1]);
+    expect(() => bakeDimensionalGas({ ...ch, fuelHeatingValueJPerKg: NaN }, observer, spatial)).toThrow();
+    expect(() => bakeDimensionalGas({ ...ch, dry: { ...ch.dry, particleFuelPowerFraction: 2 } }, observer, spatial)).toThrow();
+    expect(() => bakeSurfaceEmission({ ...profile.surfaceEmission, visibleGrayEmissivity: 1.1 }, observer)).toThrow();
+    expect(() => bakeSurfaceEmission({ ...profile.surfaceEmission, temperatureKelvinRange: [1400, 300] }, observer)).toThrow();
   });
-
-  it("bakes assumed shock contrast only into the afterburner envelope", () => {
-    const smooth = structuredClone(profile);
-    delete smooth.afterburner.assumedShockCells;
-    const a = bakeOpticalLut(profile, observer).rgba;
-    const b = bakeOpticalLut(smooth, observer).rgba;
-    const boundary = 64 * 16 * 4;
-    expect(a.subarray(0, boundary)).toEqual(b.subarray(0, boundary));
-    expect(a.subarray(boundary)).not.toEqual(b.subarray(boundary));
-    // The continuum/band colors themselves are unaffected by this brightness approximation.
-    for (let i = boundary; i < a.length; i++) if (i % 4 !== 3) expect(a[i]).toBe(b[i]);
-  });
-
-  it("bakes a bounded periodic brightness sequence without changing the optical lookup", () => {
-    const sequence = bakeTemporalEmission(profile.temporalEmission);
-    expect(sequence.periodSeconds).toBe(0.8);
-    expect(sequence.samples).toHaveLength(32);
-    expect(Math.min(...sequence.samples)).toBeGreaterThanOrEqual(0.96);
-    expect(Math.max(...sequence.samples)).toBeLessThanOrEqual(1.04);
-    expect(Math.max(...sequence.samples) - Math.min(...sequence.samples)).toBeGreaterThan(0.04);
-    expect(sequence.samples.reduce((sum, value) => sum + value, 0) / sequence.samples.length).toBeCloseTo(1, 7);
-    expect(bakeTemporalEmission(profile.temporalEmission)).toEqual(sequence);
-    expect(() => bakeTemporalEmission({ ...profile.temporalEmission, amplitude: 0.1 })).toThrow(/Invalid/);
-    expect(() => bakeTemporalEmission({ ...profile.temporalEmission,
-      harmonics: [{ cycles: 16, weight: 1, phaseRadians: 0 }] })).toThrow(/sampleable/);
-    // Animation is a scalar metadata addition, not a new spectrum/texture bake.
-    const withoutAnimation = structuredClone(profile);
-    delete withoutAnimation.temporalEmission;
-    expect(bakeOpticalLut(profile, observer).rgba).toEqual(bakeOpticalLut(withoutAnimation, observer).rgba);
-  });
-
   it("reproduces the retained artifact and fails stale data verification", () => {
     const first = generateExhaustArtifacts();
     const second = generateExhaustArtifacts();
     for (const name of Object.keys(first)) expect(first[name].equals(second[name])).toBe(true);
-    expect(Object.keys(checkGeneratedExhaustArtifacts())).toHaveLength(3);
+    expect(Object.keys(checkGeneratedExhaustArtifacts())).toHaveLength(4);
     expect(() => checkGeneratedExhaustArtifacts(name => name.endsWith(".png")
       ? Buffer.from("stale image") : first[name])).toThrow(/is stale/);
     const manifest = JSON.parse(first["f135-exhaust-lut.manifest.json"]);
@@ -119,19 +103,28 @@ describe("offline exhaust optical bake", () => {
     expect(manifest.profile.hudAccentHex).toMatch(/^#[0-9a-f]{6}$/);
   });
 
-  it("bakes a separate hot-surface table without changing the existing gas/plume lookup", () => {
-    const surface = bakeSurfaceEmission(profile.surfaceEmission, observer);
-    expect(surface.samples).toHaveLength(16);
-    expect(surface.samples.every(rgb => rgb.length === 3 && rgb.every(value => Number.isFinite(value) && value >= 0))).toBe(true);
-    expect(surface.samples[0][0]).toBeCloseTo(0.02);
-    expect(surface.samples.at(-1)[0]).toBeCloseTo(0.25);
-    // Very cool visible continuum clips tiny green/blue channels to zero in
-    // linear sRGB; every sample remains red-dominated, without demanding a
-    // nonzero channel below the numerical/color-gamut floor.
-    expect(surface.samples.every(rgb => rgb[0] > rgb[1] && rgb[1] >= rgb[2])).toBe(true);
-    const withoutSurface = structuredClone(profile);
-    delete withoutSurface.surfaceEmission;
-    expect(bakeOpticalLut(profile, observer).rgba).toEqual(bakeOpticalLut(withoutSurface, observer).rgba);
-    expect(() => bakeSurfaceEmission({ ...profile.surfaceEmission, assumedTemperatureK: [900, Number.NaN] }, observer)).toThrow(/thermal/);
+  it("bakes an annular gas mask with the declared provisional angular pattern and downstream mixing", () => {
+    const mask = bakeSpatialEmission(profile.spatialEmission);
+    const decoded = decodePng(readFileSync(new URL("../src/flight/aircraft/generated/f135-exhaust-spatial.png", import.meta.url)));
+    expect(decoded.rgba).toEqual(mask.rgba);
+    const sample = (x, y, channel = 0) => mask.rgba[(Math.round((y + 1) / 2 * (mask.height - 1)) * mask.width
+      + Math.round((x + 1) / 2 * (mask.width - 1))) * 4 + channel];
+    const ring = Array.from({ length: 256 }, (_, index) => {
+      const theta = 2 * Math.PI * index / 256;
+      return sample(0.68 * Math.cos(theta), 0.68 * Math.sin(theta));
+    });
+    expect(Math.min(...ring)).toBeGreaterThan(20 * sample(0, 0));
+    expect(Math.max(...ring) - Math.min(...ring)).toBeGreaterThan(70);
+    // Use broad sampled angular neighborhoods, avoiding nearest-pixel extrema.
+    const lobes = Array.from({ length: 32 }, (_, index) => ring[index * 8]);
+    expect(lobes.filter((value, index) => value > lobes[(index + 31) % 32]
+      && value > lobes[(index + 1) % 32])).toHaveLength(8);
+    expect(sample(0, 0, 1)).toBeGreaterThan(250);
+    expect(sample(1, 0)).toBe(0);
+    expect(sample(1, 1, 1)).toBe(0);
+    const uniform = bakeSpatialEmission({ ...profile.spatialEmission, lobeContrast: 0 });
+    expect(uniform.rgba).not.toEqual(mask.rgba);
+    expect(() => bakeSpatialEmission({ ...profile.spatialEmission, lobeCount: 0.5 })).toThrow(/spatial/);
   });
+
 });

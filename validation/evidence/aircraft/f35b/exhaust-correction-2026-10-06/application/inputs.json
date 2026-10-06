@@ -1,0 +1,225 @@
+{
+  "schemaVersion": 1,
+  "sourceSnapshots": [
+    {
+      "path": "scripts/build-exhaust-optics.mjs",
+      "sha256": "a69ecefa8c81502239e9b87b5ae239db73ad12a7f9c1f3a6aa70c90efd3bcba6",
+      "snapshot": "02-build-exhaust-optics.mjs.txt"
+    },
+    {
+      "path": "scripts/build-exhaust-optics.test.mjs",
+      "sha256": "4c57afb3c5d0e8f741ad661659d3de0e60e041caf137583964404e65d4dc061d",
+      "snapshot": "03-build-exhaust-optics.test.mjs.txt"
+    },
+    {
+      "path": "scripts/exhaustOptics/README.md",
+      "sha256": "4212765916454836b1712e1ed3aed51b699da926fdce627aa30537962c00141c",
+      "snapshot": "04-README.md.txt"
+    },
+    {
+      "path": "scripts/exhaustOptics/bake.mjs",
+      "sha256": "ea5ee20d828e5d0870d77e2a1205f8d80384abd97c0a75918ee2471509620a8b",
+      "snapshot": "05-bake.mjs.txt"
+    },
+    {
+      "path": "scripts/exhaustOptics/f135-visible-approximation.json",
+      "sha256": "24bbce5b5356e222d80334870e112fc6906c68e68c20fd92b456eb6e4551935d",
+      "snapshot": "06-f135-visible-approximation.json.txt"
+    },
+    {
+      "path": "scripts/validation/f35b/audit-f135-native-exhaust-contract.mjs",
+      "sha256": "f8c3cb9c72f262d94f9481dbb1af46c114baf6c65147316b825d63623e0b2c4b",
+      "snapshot": "07-audit-f135-native-exhaust-contract.mjs.txt"
+    },
+    {
+      "path": "scripts/validation/f35b/check-exhaust-continuity.mjs",
+      "sha256": "c6073f0a0fc5fbce6f0f5e3a2a3cb2df57bed912da01a3c67cdd31724cac3a9b",
+      "snapshot": "08-check-exhaust-continuity.mjs.txt"
+    },
+    {
+      "path": "scripts/validation/f35b/check-f135-emission-correction.mjs",
+      "sha256": "a898ada6125de25298cda1f51e281f3fb96542c5ed76586258a69bf969ca0de2",
+      "snapshot": "09-check-f135-emission-correction.mjs.txt"
+    },
+    {
+      "path": "scripts/validation/f35b/plot-f135-emission-correction.mjs",
+      "sha256": "e02e941809fe5b83826ab934df8ad459527bd9e172e7c879ea9335bfc0bf8478",
+      "snapshot": "10-plot-f135-emission-correction.mjs.txt"
+    },
+    {
+      "path": "scripts/validation/f35b/render-exhaust-continuity.mjs",
+      "sha256": "60707d415dcb9eb770577779bf561f1e60604966f16dfc1a1f52fc0949a2f8f6",
+      "snapshot": "11-render-exhaust-continuity.mjs.txt"
+    },
+    {
+      "path": "src/flight/aircraft/aircraftCatalog.ts",
+      "sha256": "55470f4e9fa20a8ede3e03e2d73c6a9732d0ec99e414a111ca73f11ca01f01ab",
+      "snapshot": "12-aircraftCatalog.ts.txt"
+    },
+    {
+      "path": "src/flight/aircraft/createAircraftEngineVisuals.test.ts",
+      "sha256": "fd81a621b8234959cefa1ac1231fd1b67ea06d775d2c0046a5dab3e3582234d6",
+      "snapshot": "13-createAircraftEngineVisuals.test.ts.txt"
+    },
+    {
+      "path": "src/flight/aircraft/createAircraftEngineVisuals.ts",
+      "sha256": "c64a988b91d74ca56caacf9573f7f0df86489824c818d0eb089cee10e3821bfc",
+      "snapshot": "14-createAircraftEngineVisuals.ts.txt"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineExhaust.test.ts",
+      "sha256": "78a6c57c4e68fa6d414b48aef4d6691966930e81f7245addec459bf244f276ca",
+      "snapshot": "15-createEngineExhaust.test.ts.txt"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineExhaust.ts",
+      "sha256": "a0a2b03979316db2a4540dfce37f1c18d04cea319b6de9bbde957bab997236a6",
+      "snapshot": "16-createEngineExhaust.ts.txt"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineExhaustDomain.test.ts",
+      "sha256": "35cae3404a8d759d3a985ad91f0ded5735f2c2a06298a9bb743d185c8d324882",
+      "snapshot": "17-createEngineExhaustDomain.test.ts.txt"
+    },
+    {
+      "path": "src/flight/aircraft/engineExhaustDepth.test.ts",
+      "sha256": "eab53c2fb0aedc41fc44bd1e85e811b618d2528fd0423c17834f7096f73a12f0",
+      "snapshot": "18-engineExhaustDepth.test.ts.txt"
+    },
+    {
+      "path": "src/flight/aircraft/engineExhaustDepth.ts",
+      "sha256": "d005dc58e44a8f5875387aa8c181c50e10ef5357ce3eb4dae79b330cd5ed0d88",
+      "snapshot": "19-engineExhaustDepth.ts.txt"
+    },
+    {
+      "path": "src/flight/aircraft/engineExhaustProfiles.test.ts",
+      "sha256": "3bc43755654f67193f0262716eaf6d37662c1c41322200bcaf392d78585fd900",
+      "snapshot": "20-engineExhaustProfiles.test.ts.txt"
+    },
+    {
+      "path": "src/flight/aircraft/engineGasOptics.test.ts",
+      "sha256": "93040b6628333af92dbb15c447a10df1da7da9b96c7e94476e87106bf0141249",
+      "snapshot": "21-engineGasOptics.test.ts.txt"
+    },
+    {
+      "path": "src/flight/aircraft/engineGasOptics.ts",
+      "sha256": "9cffa5afb298b02a0c4abb624486b2ee26aa5675b3246785bd6041c13e27d375",
+      "snapshot": "22-engineGasOptics.ts.txt"
+    },
+    {
+      "path": "src/flight/aircraft/engineGasSupport.test.ts",
+      "sha256": "534a0506cf5b3f250bd0cd62bb3e714d4595e22c0c054b28b673d6c7073d9078",
+      "snapshot": "23-engineGasSupport.test.ts.txt"
+    },
+    {
+      "path": "src/flight/aircraft/engineGasSupport.ts",
+      "sha256": "ed08bd8c181802242486857f980b20e045452dd61e1d53fdf59b7c3522e286b5",
+      "snapshot": "24-engineGasSupport.ts.txt"
+    },
+    {
+      "path": "src/flight/aircraft/engineGasSupportShader.ts",
+      "sha256": "2bee916774b46c67bdf49d173add179f167b4a1d14d359fd2f9a35016b8cf999",
+      "snapshot": "25-engineGasSupportShader.ts.txt"
+    },
+    {
+      "path": "src/flight/aircraft/generated/engine-smoke-flipbook.manifest.json",
+      "sha256": "0caebcbfb5d0fc1f0dd8e3fc8e2731ff7e944da5faee089767648ae6ca11187f",
+      "snapshot": "26-engine-smoke-flipbook.manifest.json.txt"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json",
+      "sha256": "6d65ba31efcf198dbd42a1f5f78bbe5ec98f0e5ec0a8ed9bb02d9565900d360b",
+      "snapshot": "27-f135-exhaust-lut.manifest.json.txt"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135ExhaustOpticalData.ts",
+      "sha256": "9d93652dc604618642dab08995f8f3deb1b8b375d1caff5536287eb6bbcdbe3a",
+      "snapshot": "28-f135ExhaustOpticalData.ts.txt"
+    },
+    {
+      "path": "src/flight/createFlightSimApp.ts",
+      "sha256": "836f99d63cf94c3c6114959de20f0a25837fb74aca12f64c92e7b1dfa7750513",
+      "snapshot": "29-createFlightSimApp.ts.txt"
+    },
+    {
+      "path": "src/flight/settings/flightParameters.ts",
+      "sha256": "1f0b7a662a58d2598e9625780208a299003a49593bc67c7f5e03df1518c8bdf4",
+      "snapshot": "30-flightParameters.ts.txt"
+    }
+  ],
+  "logs": [
+    {
+      "file": "ci-final.log",
+      "sha256": "68e493b81336e9f594f035b26d502b347a2d5881d621fdfb15209c564588ccb9"
+    },
+    {
+      "file": "depth-regression-recheck.log",
+      "sha256": "b6d8286512b9f4d6db4c9720edbe574d876d9c1260e6b59499681d943ec7a26a"
+    },
+    {
+      "file": "diff-check.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "domain-integration-focused.log",
+      "sha256": "e5bafef5996e3c663f5866bbcafcc530dbba0b08ee4bf12e4a01f71fc4238df1"
+    },
+    {
+      "file": "lint-final.log",
+      "sha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e"
+    },
+    {
+      "file": "native-audit.log",
+      "sha256": "1efce977a90e73cab6f1057529782f199e93dd4e8c0fd94329626fc7b5e0f24a"
+    },
+    {
+      "file": "numerical-01.log",
+      "sha256": "57f88e089c24b6e25fbbc9e1ffa8bb01a68016c9159fee0336c156fc7627aa96"
+    },
+    {
+      "file": "numerical-plots-02.log",
+      "sha256": "2ee78e024193ca26d63e34212134d29ed78e5338fb1b497703244090134443d5"
+    },
+    {
+      "file": "numerical-plots.log",
+      "sha256": "2ee78e024193ca26d63e34212134d29ed78e5338fb1b497703244090134443d5"
+    },
+    {
+      "file": "related-final.log",
+      "sha256": "1eae53f78dc013240d240136fe7e3e85f7fb38620913efec56152c93fb5a4648"
+    },
+    {
+      "file": "renderer-focused-2.log",
+      "sha256": "f28cec387e90fda7e3b27a4e4b4fcaa0c07ccb625874f6e07b5790c45a27acc0"
+    },
+    {
+      "file": "renderer-focused.log",
+      "sha256": "0452e7b74c007ecf3b1a39aa2c5db6468ff5517d8f54327e462412204dbb90ac"
+    },
+    {
+      "file": "root-targeted-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "test-discovery.log",
+      "sha256": "76d73a7f4e6e9d63228c594bf330f889d98a74d15d930a443ad78d5bf549fb95"
+    },
+    {
+      "file": "typecheck-final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "typecheck-integration-2.log",
+      "sha256": "861f65ba30cf1d960081eb69c14fe1e172913194bd63d31d0321d25ca7d5b8fd"
+    },
+    {
+      "file": "typecheck-integration-3.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "typecheck-integration.log",
+      "sha256": "119ae8565798f37af8ccd80c819ae51cd1401203d0d4550b113c09db17b25ae1"
+    }
+  ],
+  "lineage": "Final integration sources. Following CI, two comment-only annotations were corrected: ray bounds4..128 and signed-domain texture coordinates. No executable changes followed the passing CI. Earlier numerical snapshots predate geometry-weight caching; integration formulas are unchanged."
+}

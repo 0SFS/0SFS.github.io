@@ -1,0 +1,37 @@
+{
+  "source": "kathrotia2012, Table 5",
+  "assumptions": [
+    "No further local production; uniform illustrative velocity 2000 m/s, not a measured F135 velocity.",
+    "Collisional loss set to zero, so this is the maximum electronic-state survival under the listed radiative rates.",
+    "Electronic-state loss and band-specific emission coefficients are distinct.",
+    "No initial population assumed; this calculation cannot determine absolute radiance."
+  ],
+  "equations": {
+    "tau": "1/A",
+    "efoldingDistance": "u/A",
+    "survival": "exp(-A*z/u)"
+  },
+  "rows": [
+    {
+      "species": "CH(A)",
+      "radiativeDecayPerSecond": 1860000.0,
+      "radiativeOnlyLifetimeSeconds": 5.376344086021506e-07,
+      "illustrativeVelocityMetersPerSecond": 2000,
+      "radiativeOnlyEFoldingDistanceMeters": 0.001075268817204301,
+      "logSurvivalAtOneCentimeter": -9.3,
+      "survivalAtOneCentimeter": 9.142423147817327e-05,
+      "logSurvivalAtOneMeter": -930.0
+    },
+    {
+      "species": "C2(d)",
+      "radiativeDecayPerSecond": 10000000.0,
+      "radiativeOnlyLifetimeSeconds": 1e-07,
+      "illustrativeVelocityMetersPerSecond": 2000,
+      "radiativeOnlyEFoldingDistanceMeters": 0.0002,
+      "logSurvivalAtOneCentimeter": -50.0,
+      "survivalAtOneCentimeter": 1.9287498479639178e-22,
+      "logSurvivalAtOneMeter": -5000.0
+    }
+  ],
+  "implication": "These emitting electronic states cannot be passively advected over metres at the illustrative speed. Persistent downstream bands need local production; internal photon transport is a separate mechanism."
+}

@@ -1,0 +1,92 @@
+{
+  "schema": "0sfs-engine-orb-speed/1",
+  "date": "2026-10-05",
+  "owner": "0sfs",
+  "scope": "Remove the blade-count-dependent speed cap on desktop and phone; make full rotor orientation visible with blade-fixed brightness while preserving equal marker geometry and alpha.",
+  "speed": {
+    "defaultMaxRevPerSimSecond": 2,
+    "f135At99Percent": {
+      "beforeRevPerSimSecond": 0.20625,
+      "afterRevPerSimSecond": 1.98
+    },
+    "formula": "normalized model speed * selected rev/s; positive drawing FPS and blade count do not reduce speed"
+  },
+  "rendering": {
+    "drawCallsPerChangedFrame": 1,
+    "uniformBytes": 48,
+    "brightness": "0.65 + 0.35 * cos(blade-local angle)",
+    "note": "One additional cosine per evaluated ring fragment; no per-blade loop, extra draw, mesh, DOM node, or uniform. Hidden/unchanged/paused frames and configured drawing budgets retain prior behavior."
+  },
+  "checks": [
+    {
+      "command": "npx tsc -b",
+      "status": "passed",
+      "log": "typecheck.log"
+    },
+    {
+      "command": "npx vitest related --run src/flight/hud/engineSpoolMotion.ts src/flight/hud/engineSpoolRenderer.ts src/flight/hud/engineMonitor.ts src/flight/settings/flightParameters.ts src/remote/PhoneEngine.test.tsx --maxWorkers=50%",
+      "status": "passed",
+      "files": 52,
+      "tests": 652,
+      "log": "related-tests.log"
+    },
+    {
+      "command": "npm run lint",
+      "status": "passed",
+      "log": "lint.log"
+    },
+    {
+      "command": "node scripts/validation/audio/check-engine-orbs.mjs",
+      "status": "passed",
+      "cases": 9,
+      "log": "gpu-report.json",
+      "screenshot": "blade-speed-cue.png",
+      "acceptance": "Exact blade counts and equal alpha-mask areas at both phases; brightness-centroid phase advance matches 99% of 2 rev/s over 0.1 simulated seconds within 0.04 radians. Tested on WebGPU, WebGL2, WebGL1 with F-35B, SF50, C172. Native HUD screenshot visually reviewed.",
+      "maxMeasuredPhaseErrorRadians": 0.00048553510403315236
+    },
+    {
+      "command": "VITEST_MAX_WORKERS=5 npm run ci",
+      "status": "passed",
+      "files": 160,
+      "testsPassed": 1684,
+      "expectedFailures": 1,
+      "log": "ci.log"
+    }
+  ],
+  "sourceHashes": [
+    {
+      "file": "src/flight/hud/engineSpoolMotion.ts",
+      "sha256": "ac91b1607dc69c98197c134dd9985eb25cc093215915d24f12e6a9c0cc9c26d9"
+    },
+    {
+      "file": "src/flight/hud/engineSpoolMotion.test.ts",
+      "sha256": "d54b39251557074e35c30a53734b3516a71b205aa1ab5f9c375b852359c2383e"
+    },
+    {
+      "file": "src/flight/hud/engineSpoolRenderer.ts",
+      "sha256": "f2bb447fef2503c6636a5d90de61f28f2217ca62494d408a5b295c969b7981f3"
+    },
+    {
+      "file": "src/flight/hud/engineMonitor.ts",
+      "sha256": "1d6da433b347173e15576a0ac8f2e2af66492da34ffcde7fb50c1b4da8a04449"
+    },
+    {
+      "file": "src/flight/hud/engineMonitor.test.ts",
+      "sha256": "8a5b88d8fb78670da937b371f353e05a0990310b7e5ed54404fafe02167d4f1d"
+    },
+    {
+      "file": "src/flight/settings/flightParameters.ts",
+      "sha256": "4a499a8f0017f40054f68c291ef7ba431529c68669e429bf500da884ad64b1cc"
+    },
+    {
+      "file": "src/remote/PhoneEngine.test.tsx",
+      "sha256": "0271a8c5d37a1751eb2b984a1167dd42a6db72ea1f459ea03cabcc3e8fdd92f3"
+    },
+    {
+      "file": "scripts/validation/audio/check-engine-orbs.mjs",
+      "sha256": "c26d8a385b4ad759999ac89c3c4a59e149f2ac76d10fc5ff6a1684169b839049"
+    }
+  ],
+  "limitations": "Untimed correctness checks only; no GPU performance or acoustic qualification. Repeated blade positions can still strobe, and sufficiently low drawing cadence or browser stalls can alias the brightness cue. Numeric turbine percentages are model speed, not physical shaft RPM.",
+  "previousRecord": "../engine-blade-markers-2026-10-05/acceptance.json"
+}

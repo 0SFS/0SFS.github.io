@@ -1,0 +1,167 @@
+{
+  "schema": "0sfs-f135-reconstruction-acceptance/1",
+  "date": "2026-10-06",
+  "status": "software-geometry-passed-with-preserved-closed-airframe-seam",
+  "owner": "0sfs",
+  "assets": [
+    {
+      "variant": "full",
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-full.glb",
+      "triangles": 24536,
+      "meshes": 25,
+      "standOnlyMeshes": [
+        "F135_ExternalCasing",
+        "F135_CasingFlanges",
+        "F135_Accessories",
+        "F135_ExternalPlumbing",
+        "F135_MountsAndDriveHousing"
+      ],
+      "morphMeshes": [
+        "F135_FlowPath",
+        "F135_SlidingSeals",
+        "F135_OuterPanels"
+      ],
+      "bytes": 1939040,
+      "sha256": "0a8055b3fa42cbe36528a234afcaee44bf3611289209217a407bcf31877c7974"
+    },
+    {
+      "variant": "installed",
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-installed.glb",
+      "triangles": 13104,
+      "meshes": 20,
+      "standOnlyMeshes": [],
+      "morphMeshes": [
+        "F135_FlowPath",
+        "F135_SlidingSeals",
+        "F135_OuterPanels"
+      ],
+      "bytes": 1112632,
+      "sha256": "8003120dfcb0c78e187797bd99d83cee21b2084ed7bf36ee528b4c15779f8fa9"
+    },
+    {
+      "variant": "airframe",
+      "path": "public/aircraft/f-35b/F-35B_AF267-airframe.glb",
+      "removedNodes": [
+        "vtol",
+        "feather.001",
+        "feather.002",
+        "feather.003",
+        "feather.004",
+        "feather.005",
+        "feather.006",
+        "feather.007",
+        "feather.008",
+        "feather.009",
+        "feather.010",
+        "feather.011",
+        "feather.012",
+        "feather.013",
+        "feather.014",
+        "feather.015",
+        "feather.016"
+      ],
+      "removedExtrasEngineTriangles": 124,
+      "retainedViewsIdentical": 434,
+      "triangles": 11467,
+      "meshes": 85,
+      "bytes": 1444788,
+      "sha256": "76c76d6230fcf3259e2552d793f95f5421a2ab3cc35f39a5ebf01817b38d5814"
+    }
+  ],
+  "checks": {
+    "aperturePositions": 21,
+    "axialSections": 168,
+    "maxMissingAngularDegrees": 0,
+    "nozzleInternalBoundaryEdges": 0,
+    "normalAndAreaMeshPoseChecks": 420,
+    "minimumNormalizedNormalAgreement": 0.9996186834353007,
+    "vectorPoses": 24,
+    "jointSealRays": 18432,
+    "jointSealRayMisses": 0,
+    "clearancePoses": 90,
+    "engineAirframeTriangleCrossings": 0,
+    "grossSwivelShellCrossings": 0,
+    "openedDoorFuselageTriangleCrossings": 0,
+    "preservedClosedDoorFuselageTriangleCrossingsPerPose": 2,
+    "preservedClosedDoorMaximumPlaneStraddleMeters": 0.00567576948672896,
+    "focusedTests": 3,
+    "artifactByteReproduction": "passed",
+    "incrementalTypecheck": "passed",
+    "targetedLint": "passed"
+  },
+  "rejectedHypotheses": [
+    "A single 47.5-degree inclined bearing created excessive apparent axial restriction. It was replaced by two opposed 23.75-degree joints and a finite aft transition, supported in topology by Rolls-Royce EP1775485B1. Exact production angles remain unknown.",
+    "A trial 105-degree bay-door opening increased the source-fuselage plane straddle from 33.1 to 81.1 mm. It was replaced by the original 90-degree opening around a virtual hinge 6 cm outboard, preserving the exact closed pose.",
+    "A front projection revealed a missing inner intake wall after full CI. A continuous inward barrel was added to the existing IntakeOccluder. Focused tests, typecheck, lint, reproducibility and all geometry and clearance checks passed again afterward."
+  ],
+  "limits": [
+    "No browser or GPU qualification, calibrated lighting, exposure, day/night or radiance matching. CPU projections use an arbitrary fixed light and orthographic camera.",
+    "Provisional PW-600 dimensions, panel and fan counts, accessories, aperture range and material appearance. No claim of an OEM engineering drawing or measured actuator law.",
+    "The preserved fully closed source doors already cross the fuselage in two triangles, with a maximum 5.676 mm plane straddle. There are no new open-door or engine crossings.",
+    "Triangle intersection checks omit coplanar contact and do not establish watertight containment in a non-watertight source airframe. Sliding bearing polygon contacts below 1 mm are intentional and separately counted.",
+    "Full CI preceded the late intake-wall closure. The parent receipt records that boundary. All affected focused checks were repeated afterward.",
+    "The resource inventory shows excluded stand-only meshes and bytes, not measured energy or performance savings."
+  ],
+  "inputs": [
+    {
+      "path": "scripts/f135Engine/source.mjs",
+      "sha256": "5181906256f5b27fb965ccca3859b14d3dfafd342f0f5a60c380537e6022d5b5"
+    },
+    {
+      "path": "scripts/f135Engine/profile.json",
+      "sha256": "2dc706c635e09798d0ab2cc332f3745c9aca808a89c3002222d844f7e7973611"
+    },
+    {
+      "path": "scripts/f135Engine/glb.mjs",
+      "sha256": "a3c928da01bbd77a4a6c734364b98cd7cc257594609158dfeb9d2d43b2d42157"
+    },
+    {
+      "path": "scripts/f135Engine/intersections.mjs",
+      "sha256": "8342512a2a769646203e93d5c7304bfa022bc3df2dade6cba6c39b8c82cd1e4c"
+    },
+    {
+      "path": "scripts/f135Engine/raster.mjs",
+      "sha256": "99665bcc54d02eeb91b14478a340af86eaa23a55ef2c6035f1474337d058b63f"
+    },
+    {
+      "path": "scripts/build-f135-engine.mjs",
+      "sha256": "42351924599aa59d57e30ad085aaf84bbb3e31039f921337d16cf23de7675f0e"
+    },
+    {
+      "path": "scripts/build-f135-engine.test.mjs",
+      "sha256": "b06f3a74a4a61961687fbd60795fe7c0c83aa792129aec57596a11c8d1674790"
+    },
+    {
+      "path": "scripts/validation/f35b/check-f135-reconstruction.mjs",
+      "sha256": "6f7d23acc513f75c8793be977650b7e67eb8cf6475cac6c7a1a78854dfaa6d76"
+    },
+    {
+      "path": "scripts/validation/f35b/check-f135-clearance.mjs",
+      "sha256": "d411b12a73b5cf3e23d798df2d90efe2d6546f746013b03384fff0592883bbfb"
+    },
+    {
+      "path": "src/flight/aircraft/aircraftAnimation.ts",
+      "sha256": "5b5263061dfe574a9ed25ae3a048babbf3750e307e2d799090af8d0fdf3a735e"
+    }
+  ],
+  "provenanceCorrection": {
+    "description": "Clarified nominal inlet-plane-to-exit span of 5.44 m versus overall 5.58 m including the spinner. Regenerated manifest and verified artifact reproduction. All three GLBs are byte-identical to the validated assets. No test suite was repeated.",
+    "glbComparison": [
+      {
+        "variant": "full",
+        "unchanged": true,
+        "sha256": "0a8055b3fa42cbe36528a234afcaee44bf3611289209217a407bcf31877c7974"
+      },
+      {
+        "variant": "installed",
+        "unchanged": true,
+        "sha256": "8003120dfcb0c78e187797bd99d83cee21b2084ed7bf36ee528b4c15779f8fa9"
+      },
+      {
+        "variant": "airframe",
+        "unchanged": true,
+        "sha256": "76c76d6230fcf3259e2552d793f95f5421a2ab3cc35f39a5ebf01817b38d5814"
+      }
+    ]
+  }
+}

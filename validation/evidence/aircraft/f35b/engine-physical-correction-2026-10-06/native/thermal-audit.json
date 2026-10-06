@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-06",
+  "scope": "Physical-correction accounting audit; existing F135 XML and thermal equations deliberately retained.",
+  "xml": {
+    "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+    "sha256": "04cea10d3c135cb79247bbf7794a81359070e2bdc9afc9782502b538444eac16",
+    "unchangedFromFork15": true
+  },
+  "coefficientProvenance": "All numerical gas/capacity/conductance/area/emissivity values are reduced-model hypotheses authored in the preceding thermal/rebuild work. Public references do not measure these F135 quantities. No fitting to desired glow was done here.",
+  "config": {
+    "liner": {
+      "prefix": "propulsion/engine/thermal/",
+      "capacityJK": 12000,
+      "gasConductanceWK": [
+        20,
+        580
+      ],
+      "coolantConductanceWK": [
+        20,
+        680
+      ],
+      "areaM2": 1,
+      "emissivity": 0.8,
+      "flameAreaM2": 1,
+      "flameEmissivity": 0.05
+    },
+    "core": {
+      "prefix": "propulsion/engine/thermal/core/",
+      "capacityJK": 1800,
+      "gasConductanceWK": [
+        10,
+        590
+      ],
+      "coolantConductanceWK": [
+        5,
+        30
+      ],
+      "areaM2": 0.22,
+      "emissivity": 0.75,
+      "flameAreaM2": 0,
+      "flameEmissivity": 0
+    }
+  },
+  "gasConfig": {
+    "cp": 1150,
+    "lhv": 43300000,
+    "efficiency": 0.95,
+    "stoichiometricRatio": 0.068
+  },
+  "equations": {
+    "n": "N2/100; shaft-speed fraction, not temperature or color.",
+    "nozzleMassFlowKgPerS": "120*n^2*(pt/2116.22)*sqrt(288.15/TATK); scheduled flow proxy, not a solved compressor map.",
+    "coreGasBathK": "Existing native legacy EGT(degC)+273.15; run schedule includes ambient+363.1+normalized_N2*357.1; phase logic supplies starting/off behavior. This is a turbine-exit proxy, not combustor temperature.",
+    "linerGasBathK": "Nozzle mixture energy estimate with actual AB-gated excess fuel, declared cp 1150 J/(kg K), LHV 43.3 MJ/kg, AB efficiency 0.95, reference 298.15 K and oxygen-limit FAR 0.068; supplied but unburned excess remains in mixture mass.",
+    "coolantBathK": "TATK+100*n^2, shared imposed reservoir.",
+    "solidTransient": "C*(Tnew-Told) = dt*[Hg*(Tgas-Tnew)+Hc*(Tcoolant-Tnew)+sigma*eps*A*(Tsur^4-Tnew^4)+AB*sigma*epsFlame*AFlame*(Tgas^4-Tnew^4)].",
+    "stefanBoltzmannConstant": "5.670374419e-8 W/(m^2 K^4)",
+    "radiationSurroundings": "TATK reservoir; effective bolometric area/view coupling, not ray-traced geometry. Core flame area 0; liner flame area 1 m2 and epsFlame 0.05 while actually augmented."
+  },
+  "capacities": {
+    "coreJK": 1800,
+    "linerJK": 12000,
+    "meaning": "Effective lumped C, constant in this F135 model. No density/alloy cp or mesh mass is supplied or inferred.",
+    "priorIllustration": "The preceding audit illustrated 1800 J/K as 3 kg * 600 J/(kg K). That dimensional factorization is not a measured mass, material identification or calibration and does not associate rendered geometry volume with stored energy."
+  },
+  "energyBoundary": {
+    "solved": "Separate local signed heat/storage balances and an optional independent AB nozzle gas mixing estimate.",
+    "imposed": "Gas, coolant and surroundings temperatures; no finite reservoir depletion. Solid heat is not subtracted from gas or native fuel.",
+    "absent": [
+      "Direct core-to-liner conduction or radiation/view-factor network",
+      "Coolant mass flow and return enthalpy",
+      "Detailed compressor/turbine/combustor cycle balance",
+      "Temperature-dependent material heat capacity",
+      "Dissociation/recombination and detailed nozzle flow",
+      "Feedback from emitted visible-light shader power into native heat"
+    ],
+    "doubleCounting": "Native flame absorption and surroundings loss are already in each wall balance. Optical emitted-power diagnostics are observers, not additional wall losses. No sum of native fuel W, gas bath W, wall radiation W and optical bounds is labeled a closed global budget.",
+    "opticalEmissivity": "The visible optical grey-body table is a separate spectral approximation. Native eps 0.8/0.75 are bolometric effective exchange coefficients; agreement of full optical and thermal spectra is not established."
+  },
+  "initialization": {
+    "constructionTemperatureK": 288.1499999999999,
+    "coldAcceptedAmbientK": 286.4991319958691,
+    "cold": "Stopped, uninitialized native engine. First real step refreshes local ambient; recorded assigned initialization energy separates this refresh from integrated heat. Then actual starter/spool/legacy EGT drive both solids.",
+    "running": "Explicit engineRunning:true invokes InitRunning. First accepted step seeds thermal equilibrium; externally assigned energy is recorded, transient integrated heat zero. This is not a cold-start experiment.",
+    "hotRestart": "Existing initialized hot state retained through shutdown and real starter; no new equilibrium seed.",
+    "pause": "Same-time native hold/suspension/RunIC/render reads retain state and do not integrate heat. Hold may retain cached prior receipt; consumer must use accepted simulation time.",
+    "location": "Application stopped-hot hold-down runway relocation preserves both solid temperatures and stopped/fuel-zero state; next-step continuity checked."
+  },
+  "uncertainty": {
+    "record": "sensitivity.json",
+    "cases": 108,
+    "brackets": "Individual factors 0.5\u20132 for C,Hg,Hc,A and coolant rise; bolometric eps 0.4\u20130.95; gas bath\u00b1100K; flame eps 0, 0.025, 0.1. These are deliberate sensitivity stress brackets, not measured confidence intervals.",
+    "result": "Capacity affects lag/storage but not steady equilibrium. Weak cooling and hot bath choices dominate core equilibrium; AB gas/flame hypotheses dominate liner. No parameters retuned."
+  },
+  "preserved": "28k/43k development propulsion ratings, coupled powered-lift allocations, throttle/fuel/spool/EGT/nozzle schedules and operational AB inhibition unchanged. Prior rating discrepancy remains in reconstruction audit.",
+  "qualification": {
+    "report": "report.json",
+    "csv": "trace.csv",
+    "checks": "All 133577 accepted steps independently reconstruct rates and energy; four timestep cooldowns compared with separately refined explicit RK4.",
+    "scope": "Software/local numerical balance and documented assumptions, not measured hardware, global energy, GPU or photographed-color acceptance."
+  }
+}

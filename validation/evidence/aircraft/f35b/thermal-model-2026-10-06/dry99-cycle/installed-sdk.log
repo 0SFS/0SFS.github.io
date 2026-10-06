@@ -1,0 +1,11 @@
+dry-99-cycle: Engine location ignored, only thruster location is used.
+dry-99-cycle: Engine orientation ignored, only thruster orientation is used.
+dry-99-cycle: Engine location ignored, only thruster location is used.
+dry-99-cycle: Engine orientation ignored, only thruster orientation is used.
+dry-99-cycle: Engine location ignored, only thruster location is used.
+dry-99-cycle: Engine orientation ignored, only thruster orientation is used.
+dry-99-cycle: Engine location ignored, only thruster location is used.
+dry-99-cycle: Engine orientation ignored, only thruster orientation is used.
+dry-99-cycle: In file /runtime/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 304
+dry-99-cycle:       Property /sim/model/pushback/target-speed-fps is already defined.
+dry-99-cycle:       Its value (0) will not be overridden.

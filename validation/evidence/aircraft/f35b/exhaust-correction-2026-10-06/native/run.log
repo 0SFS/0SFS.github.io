@@ -1,0 +1,182 @@
+{
+  "out": "/Users/felg/gh/0sfs/build/f135-emission-correction-2026-10-06/native-audit",
+  "rowsChecked": 4171,
+  "reconstruction": {
+    "maximumTemperatureReconstructionErrorK": 1.1368683772161603e-13,
+    "maximumBurnedFuelReconstructionErrorKgSec": 2.6645352591003757e-15
+  },
+  "flagOnly": {
+    "heldGasBathProxyK": 1003.1281319989318,
+    "heldBurnedAbFuelKgSec": 0,
+    "oldOpticalDryTemperatureK": 907.3156041958499,
+    "oldOpticalAbTemperatureK": 836.1839969982343,
+    "oldOpticalAbMinusDryTemperatureK": -71.13160719761561,
+    "nativeGasTemperatureChangeAtZeroExcessFuelK": 0,
+    "nativeOptionalWallFlameExchangeJumpW": 2319.4646232413043,
+    "nativeFlameScope": "Configured grey wall exchange gated by native augmentation; not emitted plume power or a chemical species population",
+    "oldParticleExtinctionPerMeter": {
+      "dry": 0.025,
+      "afterburner": 0.08
+    },
+    "oldParticleFuelPowerFraction": {
+      "dry": 0.003,
+      "afterburner": 0.015
+    }
+  },
+  "stationCases": [
+    {
+      "name": "idle",
+      "timeS": 92.51666666668636,
+      "phaseTimeS": 60,
+      "mode": "dry",
+      "gasBathProxyK": 649.5991319989687,
+      "legacyEgtK": 649.5991319989687,
+      "totalFuelKgSec": 0.3250735484001666,
+      "suppliedAbKgSec": 0,
+      "burnedAbKgSec": 0,
+      "incomingDryFlowProxyKgSec": 42.03566690614074,
+      "nativeNozzlePosition": 1,
+      "authoredVisualExitAreaM2": 1.0080083129331545,
+      "oldAssumedMach": 0.8,
+      "oldExpandedTemperatureK": 587.5534840801091,
+      "conditionalNotObserved": {
+        "gasConstantJPerKgK": 285.3383458646617,
+        "velocityMetersPerSecond": 377.7631403583162,
+        "staticPressurePa": 18507.24581732853,
+        "pressureToStandAmbientRatio": 0.18825128509949474
+      }
+    },
+    {
+      "name": "dry99",
+      "timeS": 212.51666666663772,
+      "phaseTimeS": 120,
+      "mode": "dry",
+      "gasBathProxyK": 1003.1281319989318,
+      "legacyEgtK": 1003.1281319989318,
+      "totalFuelKgSec": 2.902623743163389,
+      "suppliedAbKgSec": 0,
+      "burnedAbKgSec": 0,
+      "incomingDryFlowProxyKgSec": 115.83348372649053,
+      "nativeNozzlePosition": 0.01000000000000012,
+      "authoredVisualExitAreaM2": 0.505376278459852,
+      "oldAssumedMach": 0.8,
+      "oldExpandedTemperatureK": 907.3156041958499,
+      "conditionalNotObserved": {
+        "gasConstantJPerKgK": 285.3383458646617,
+        "velocityMetersPerSecond": 469.4345683341695,
+        "staticPressurePa": 126404.55301744526,
+        "pressureToStandAmbientRatio": 1.2857569290886655
+      }
+    },
+    {
+      "name": "firstAb",
+      "timeS": 212.52499999997104,
+      "phaseTimeS": 0.008333333333333333,
+      "mode": "afterburner",
+      "gasBathProxyK": 1004.7625564094402,
+      "legacyEgtK": 1004.7625564094402,
+      "totalFuelKgSec": 2.9089236371911666,
+      "suppliedAbKgSec": 0,
+      "burnedAbKgSec": 0,
+      "incomingDryFlowProxyKgSec": 116.25970852823797,
+      "nativeNozzlePosition": 0.012089729084733561,
+      "authoredVisualExitAreaM2": 0.506239126339691,
+      "oldAssumedMach": 1.1,
+      "oldExpandedTemperatureK": 837.5464147121578,
+      "conditionalNotObserved": {
+        "gasConstantJPerKgK": 285.3383458646617,
+        "velocityMetersPerSecond": 620.1589521273957,
+        "staticPressurePa": 88499.23727227759,
+        "pressureToStandAmbientRatio": 0.9001931087576307
+      }
+    },
+    {
+      "name": "onset",
+      "timeS": 212.74999999997084,
+      "phaseTimeS": 0.23333333333333334,
+      "mode": "afterburner",
+      "gasBathProxyK": 1034.445401445685,
+      "legacyEgtK": 1006.6991319989319,
+      "totalFuelKgSec": 3.050671252816171,
+      "suppliedAbKgSec": 0.09247819972895266,
+      "burnedAbKgSec": 0.09247819972895266,
+      "incomingDryFlowProxyKgSec": 116.76574140587502,
+      "nativeNozzlePosition": 0.19208972908473346,
+      "authoredVisualExitAreaM2": 0.5837805536831635,
+      "oldAssumedMach": 1.1,
+      "oldExpandedTemperatureK": 862.2893355942858,
+      "conditionalNotObserved": {
+        "gasConstantJPerKgK": 285.3383458646617,
+        "velocityMetersPerSecond": 629.2526928493975,
+        "staticPressurePa": 78270.42873056233,
+        "pressureToStandAmbientRatio": 0.7961481108134772
+      }
+    },
+    {
+      "name": "sustainedAb",
+      "timeS": 272.51666666658315,
+      "phaseTimeS": 60,
+      "mode": "afterburner",
+      "gasBathProxyK": 2363.1028843899676,
+      "legacyEgtK": 1006.6991319989909,
+      "totalFuelKgSec": 9.071065908566188,
+      "suppliedAbKgSec": 6.112872855476447,
+      "burnedAbKgSec": 4.780720234907427,
+      "incomingDryFlowProxyKgSec": 116.76574140598927,
+      "nativeNozzlePosition": 1,
+      "authoredVisualExitAreaM2": 1.0080083129331545,
+      "oldAssumedMach": 1.1,
+      "oldExpandedTemperatureK": 1969.8269365147896,
+      "conditionalNotObserved": {
+        "gasConstantJPerKgK": 285.3383458646617,
+        "velocityMetersPerSecond": 951.0702813740471,
+        "staticPressurePa": 72042.33679059662,
+        "pressureToStandAmbientRatio": 0.7327974468084616
+      }
+    },
+    {
+      "name": "firstCutoff",
+      "timeS": 272.5249999999165,
+      "phaseTimeS": 0.008333333333333333,
+      "mode": "dry",
+      "gasBathProxyK": 1003.1281319989909,
+      "legacyEgtK": 1003.1281319989909,
+      "totalFuelKgSec": 9.071065908566188,
+      "suppliedAbKgSec": 0,
+      "burnedAbKgSec": 0,
+      "incomingDryFlowProxyKgSec": 115.83348372660386,
+      "nativeNozzlePosition": 1,
+      "authoredVisualExitAreaM2": 1.0080083129331545,
+      "oldAssumedMach": 0.8,
+      "oldExpandedTemperatureK": 907.3156041959033,
+      "conditionalNotObserved": {
+        "gasConstantJPerKgK": 285.3383458646617,
+        "velocityMetersPerSecond": 469.4345683341833,
+        "staticPressurePa": 63374.341029505194,
+        "pressureToStandAmbientRatio": 0.644628663761665
+      }
+    },
+    {
+      "name": "poweredLift",
+      "timeS": 117.5250000000396,
+      "phaseTimeS": 90,
+      "mode": "dry",
+      "gasBathProxyK": 1003.1281319989688,
+      "legacyEgtK": 1003.1281319989688,
+      "totalFuelKgSec": 4.420049982197244,
+      "suppliedAbKgSec": 0,
+      "burnedAbKgSec": 0,
+      "incomingDryFlowProxyKgSec": 115.83348372656143,
+      "nativeNozzlePosition": 0.01000000000000012,
+      "authoredVisualExitAreaM2": 0.505376278459852,
+      "oldAssumedMach": 0.8,
+      "oldExpandedTemperatureK": 907.3156041958833,
+      "conditionalNotObserved": {
+        "gasConstantJPerKgK": 285.3383458646617,
+        "velocityMetersPerSecond": 469.43456833417815,
+        "staticPressurePa": 126404.55301752496,
+        "pressureToStandAmbientRatio": 1.2857569290886066
+      }
+    }
+  ]
+}

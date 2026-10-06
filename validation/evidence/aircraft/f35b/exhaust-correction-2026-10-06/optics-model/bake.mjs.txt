@@ -1,0 +1,385 @@
+import { deflateSync } from "node:zlib";
+
+// SI constants are exact; the returned spectral radiance is W sr^-1 m^-3.
+export function planckRadiance(wavelengthNm, temperatureK) {
+  if (!Number.isFinite(wavelengthNm) || wavelengthNm <= 0
+    || !Number.isFinite(temperatureK) || temperatureK <= 0) {
+    throw new RangeError("Planck wavelength and temperature must be finite and positive.");
+  }
+  const wavelength = wavelengthNm * 1e-9;
+  const h = 6.62607015e-34;
+  const c = 299792458;
+  const k = 1.380649e-23;
+  return 2 * h * c * c / (wavelength ** 5 * Math.expm1(h * c / (wavelength * k * temperatureK)));
+}
+
+export function parseObserverCsv(bytes) {
+  const rows = bytes.toString().trim().split(/\r?\n/).map(line => line.split(",").map(Number));
+  if (rows.length !== 471 || rows.some((row, i) => row.length !== 4
+    || row[0] !== 360 + i || row.some(value => !Number.isFinite(value) || value < 0))) {
+    throw new Error("Expected the official CIE 360–830 nm observer at 1 nm intervals.");
+  }
+  return rows;
+}
+
+const lerp = (a, b, t) => a + (b - a) * t;
+
+function normalizeEnergy(spectrum) {
+  const energy = spectrum.reduce((sum, value) => sum + value, 0);
+  if (!(energy > 0) || !Number.isFinite(energy)) throw new Error("Invalid assumed spectral energy.");
+  return spectrum.map(value => value / energy);
+}
+
+export function assumedSpectrum(profile, mode, gasTemperatureKelvin, axialFraction, observer) {
+  const parameters = profile[mode];
+  // This explicitly assumes continuum emitters share the supplied gas
+  // temperature. Axial cooling, loading and excited-state weights remain
+  // optical assumptions; temperature alone cannot determine a flame spectrum.
+  const temperatureK = gasTemperatureKelvin * (1 - parameters.axialCoolingFraction * axialFraction);
+  const continuum = normalizeEnergy(observer.map(row => planckRadiance(row[0], temperatureK)));
+  if (!parameters.assumedBands) return continuum;
+  const bands = parameters.assumedBands;
+  const radicals = normalizeEnergy(observer.map(([nm]) => bands.reduce((sum, band) => sum
+    + band.relativeEnergy / band.sigmaNm * Math.exp(-0.5 * ((nm - band.centerNm) / band.sigmaNm) ** 2), 0)));
+  const sootFraction = parameters.sootEnergyFractionAtTail
+    + (parameters.sootEnergyFractionAtNozzle - parameters.sootEnergyFractionAtTail)
+      * Math.exp(-parameters.sootMixFalloff * axialFraction);
+  return continuum.map((value, i) => sootFraction * value + (1 - sootFraction) * radicals[i]);
+}
+
+function spectralXyz(spectrum, observer) {
+  const xyz = [0, 0, 0];
+  for (let i = 0; i < observer.length; i++) {
+    for (let channel = 0; channel < 3; channel++) xyz[channel] += spectrum[i] * observer[i][channel + 1];
+  }
+  return xyz;
+}
+
+function xyzToClippedLinearRgb(xyz) {
+  // CIE XYZ to linear sRGB, D65 primaries. Emission has no illuminant adaptation.
+  return [
+    3.2404542 * xyz[0] - 1.5371385 * xyz[1] - 0.4985314 * xyz[2],
+    -0.969266 * xyz[0] + 1.8760108 * xyz[1] + 0.041556 * xyz[2],
+    0.0556434 * xyz[0] - 0.2040259 * xyz[1] + 1.0572252 * xyz[2],
+  ].map(value => Math.max(0, value));
+}
+
+/** Preserve photopic Y after gamut clipping; never normalize physical amplitude. */
+export function spectralPhotometricRgb(spectrum, observer, scale = 683e-9) {
+  const xyz = spectralXyz(spectrum, observer).map(value => value * scale);
+  const rgb = xyzToClippedLinearRgb(xyz);
+  const y = 0.2126729 * rgb[0] + 0.7151522 * rgb[1] + 0.072175 * rgb[2];
+  return rgb.map(value => y > 0 ? value * xyz[1] / y : 0);
+}
+
+/** Offline physical-input bases; no RGB or hue is authored into this field. */
+export function bakeGasSpatialField(parameters, observer, bands, blackbodyXyz) {
+  const p = parameters;
+  const corrected = p.model === "axisymmetric-gas-bath-v2";
+  if (!["axisymmetric-mixing-v1", "axisymmetric-gas-bath-v2"].includes(p.model) || !Number.isInteger(p.axialSamples) || p.axialSamples < 2
+    || !Number.isInteger(p.radialSamples) || p.radialSamples < 2 || p.axialRadiusRange?.[0] !== 0
+    || !(p.axialRadiusRange[1] > 0) || !Number.isFinite(p.axialRadiusRange[1])
+    || !Number.isFinite(p.spreadingSlope) || p.spreadingSlope < 0 || p.spreadingSlope > 1
+    || (!corrected && (!Number.isFinite(p.specificHeatRatio) || p.specificHeatRatio <= 1 || p.specificHeatRatio > 2
+      || !p.exitMach || Object.values(p.exitMach).some(v => !Number.isFinite(v) || v < 0 || v > 5)))
+    || Object.values(p.supportLengthScale).some(v => !Number.isFinite(v) || v <= 0 || v > 1)
+    || p.ambientTemperatureKelvinRange?.length !== 2 || p.ambientTemperatureKelvinRange.some(v => !Number.isFinite(v) || v <= 0)
+    || p.ambientTemperatureKelvinRange[1] <= p.ambientTemperatureKelvinRange[0]
+    || Object.values(p.temperature).some(v => !Number.isFinite(v) || v < 0)
+    || !Number.isFinite(p.particles.annulusRadius) || p.particles.annulusRadius < 0 || p.particles.annulusRadius > 1
+    || !Number.isFinite(p.particles.annulusWidth) || p.particles.annulusWidth <= 0
+    || !Number.isFinite(p.particles.centerLoading) || p.particles.centerLoading < 0 || p.particles.centerLoading > 1
+    || ![p.particles.mixingRadiusLength, p.particles.lossRadiusLength].every(v => Number.isFinite(v) && v > 0)) {
+    throw new RangeError("Invalid spatial gas field parameters");
+  }
+  for (const reaction of corrected ? [] : [p.chReaction, p.c2Reaction]) {
+    if (![reaction.radius, reaction.width, reaction.axialDecayRadii, reaction.axialSupportRadii].every(Number.isFinite)
+      || reaction.radius < 0 || reaction.radius > 1 || reaction.width <= 0 || reaction.axialDecayRadii <= 0 || reaction.axialSupportRadii <= 0) {
+      throw new RangeError("Invalid localized reaction field");
+    }
+  }
+  const speciesEnergy = species => bands.filter(b => b.species === species).reduce((sum, b) => sum + b.relativeEnergy, 0);
+  const totalEnergy = speciesEnergy("CH*") + speciesEnergy("C2*");
+  if ((!corrected && !(totalEnergy > 0)) || bands.some(b => !["CH*", "C2*"].includes(b.species))) throw new RangeError("Unknown spatial excited species");
+  const response = species => {
+    const energy = speciesEnergy(species);
+    if (energy === 0) return { powerFraction: 0, rgbLumensPerWatt: [0, 0, 0], xyzLumensPerWatt: [0, 0, 0] };
+    const weights = normalizeEnergy(observer.map(([nm]) => bands.filter(b => b.species === species).reduce((sum, b) => sum
+      + b.relativeEnergy / b.sigmaNm * Math.exp(-0.5 * ((nm - b.centerNm) / b.sigmaNm) ** 2), 0)));
+    return { powerFraction: energy / totalEnergy, rgbLumensPerWatt: spectralPhotometricRgb(weights, observer, 683),
+      xyzLumensPerWatt: spectralXyz(weights, observer).map(v => v * 683) };
+  };
+  const reactionWeight = (reaction, xi, radius) => {
+    if (xi >= reaction.axialSupportRadii || radius >= 1) return 0;
+    const end = 1 - (xi / reaction.axialSupportRadii) ** 2;
+    return Math.exp(-xi / reaction.axialDecayRadii - 0.5 * ((radius - reaction.radius) / reaction.width) ** 2)
+      * end * end * (1 - radius ** 8) ** 2;
+  };
+  const basisSamples = [];
+  for (let y = 0; y < p.radialSamples; y++) for (let x = 0; x < p.axialSamples; x++) {
+    const r = y / (p.radialSamples - 1), xi = p.axialRadiusRange[1] * x / (p.axialSamples - 1);
+    const radiusRatio = 1 + p.spreadingSlope * xi;
+    const excess = Math.exp(-p.temperature.radialMixing * r * r
+      * (p.temperature.initialShearFraction + xi / (1 + xi))) / (1 + p.temperature.axialMixingPerRadius * xi);
+    const ring = p.particles.centerLoading + (1 - p.particles.centerLoading)
+      * Math.exp(-0.5 * ((r - p.particles.annulusRadius) / p.particles.annulusWidth) ** 2);
+    const mix = 1 - Math.exp(-xi / p.particles.mixingRadiusLength);
+    const edge = Math.max(0, 1 - r ** 8) ** 2;
+    const tail = Math.max(0, 1 - (xi / p.axialRadiusRange[1]) ** 8) ** 2;
+    const density = ((1 - mix) * ring + mix * Math.max(0, 1 - r * r) ** 2)
+      * edge * tail * Math.exp(-xi / p.particles.lossRadiusLength) / (radiusRatio * radiusRatio);
+    basisSamples.push([excess, density, corrected ? 0 : reactionWeight(p.chReaction, xi, r), corrected ? 0 : reactionWeight(p.c2Reaction, xi, r)]
+      .map(value => Number(value.toPrecision(9))));
+  }
+  return { model: p.model, width: p.axialSamples, height: p.radialSamples, axialRadiusRange: p.axialRadiusRange,
+    spreadingSlope: p.spreadingSlope,
+    ...(corrected ? {} : { specificHeatRatio: p.specificHeatRatio, exitMach: p.exitMach }),
+    supportLengthScale: p.supportLengthScale, ambientTemperatureKelvinRange: p.ambientTemperatureKelvinRange,
+    excitedSpecies: { ch: response("CH*"), c2: response("C2*") }, blackbodyXyz, basisSamples };
+}
+
+/** Dimensional continuum source table and unit-power excited-band response. */
+export function bakeDimensionalGas(parameters, observer, spatial) {
+  const corrected = parameters.model === "imposed-gas-bath-v2";
+  const blackbody = bakeSurfaceEmission({ sampleCount: parameters.sampleCount,
+    temperatureKelvinRange: parameters.temperatureKelvinRange, visibleGrayEmissivity: 1 }, observer);
+  const bands = parameters.excitedBands;
+  if (!Array.isArray(bands) || (!corrected && !bands.length) || bands.some(band => !Number.isFinite(band.centerNm) || band.centerNm < 360 || band.centerNm > 830
+    || !Number.isFinite(band.sigmaNm) || band.sigmaNm <= 0 || !Number.isFinite(band.relativeEnergy) || band.relativeEnergy < 0)) {
+    throw new RangeError("Invalid excited-species band parameters");
+  }
+  const weights = corrected ? observer.map(() => 0) : normalizeEnergy(observer.map(([nm]) => bands.reduce((sum, band) => sum
+    + band.relativeEnergy / band.sigmaNm * Math.exp(-0.5 * ((nm - band.centerNm) / band.sigmaNm) ** 2), 0)));
+  if (!(parameters.fuelHeatingValueJPerKg > 0) || !Number.isFinite(parameters.fuelHeatingValueJPerKg)) throw new RangeError("Invalid fuel heating value");
+  for (const mode of ["dry", "afterburner"]) {
+    const p = parameters[mode];
+    if (![p.absorptionPerMeter, p.particleFuelPowerFraction, p.excitedFuelPowerFraction].every(Number.isFinite)
+      || p.absorptionPerMeter < 0 || p.particleFuelPowerFraction < 0 || p.excitedFuelPowerFraction < 0
+      || p.particleFuelPowerFraction + p.excitedFuelPowerFraction > 1) throw new RangeError("Invalid optical power budget");
+  }
+  if (corrected && (parameters.temperatureMeaning !== "imposed-native-gas-bath-proxy" || parameters.chemistryStatus !== "unavailable"
+    || bands.length || parameters.dry.excitedFuelPowerFraction !== 0 || parameters.afterburner.excitedFuelPowerFraction !== 0
+    || parameters.dry.absorptionPerMeter !== parameters.afterburner.absorptionPerMeter
+    || parameters.dry.particleFuelPowerFraction !== parameters.afterburner.particleFuelPowerFraction)) {
+    throw new RangeError("Corrected optics need unavailable chemistry and mode-independent particle assumptions");
+  }
+  // Bilinear cross-section integral: trapezoid integrates each texel cell exactly.
+  const areas = [0, 1].map(channel => {
+    let sum = 0;
+    for (let y = 0; y < spatial.height; y++) for (let x = 0; x < spatial.width; x++) {
+      const weight = (x === 0 || x === spatial.width - 1 ? 0.5 : 1) * (y === 0 || y === spatial.height - 1 ? 0.5 : 1);
+      sum += weight * spatial.rgba[(y * spatial.width + x) * 4 + channel] / 255;
+    }
+    return sum * 4 / ((spatial.width - 1) * (spatial.height - 1));
+  });
+  // Simpson quadrature of the declared dimensionless density field. Physical
+  // volume is this integral * exitRadius^2 * plumeLength, including contraction.
+  let integral = 0;
+  const slices = 4096;
+  for (let i = 0; i <= slices; i++) {
+    const z = i / slices, mix = Math.min(1, z / spatial.downstreamMixFraction);
+    const area = areas[0] + (areas[1] - areas[0]) * mix;
+    integral += (i === 0 || i === slices ? 1 : i % 2 ? 4 : 2) * area * (1 - 0.6 * z) ** 2 * (1 - z) ** 2;
+  }
+  return { model: corrected ? "imposed-gas-bath-v2" : "gray-emission-absorption-v1",
+    ...(corrected ? { temperatureMeaning: parameters.temperatureMeaning, chemistryStatus: parameters.chemistryStatus } : {}),
+    blackbody, fuelHeatingValueJPerKg: parameters.fuelHeatingValueJPerKg,
+    excitedRgbLumensPerWatt: spectralPhotometricRgb(weights, observer, 683),
+    normalizedDensityVolume: integral / (3 * slices),
+    dry: parameters.dry, afterburner: parameters.afterburner,
+    ...(parameters.spatialField ? { spatialField: bakeGasSpatialField(parameters.spatialField, observer, bands, {
+      temperatureKelvinRange: [...parameters.temperatureKelvinRange], unit: "cd/m2",
+      samples: Array.from({ length: parameters.sampleCount }, (_, index) => {
+        const temperature = lerp(...parameters.temperatureKelvinRange, index / (parameters.sampleCount - 1));
+        return spectralXyz(observer.map(row => planckRadiance(row[0], temperature)), observer).map(v => Number((v * 683e-9).toPrecision(12)));
+      }),
+    }) } : {}) };
+}
+
+export function spectralLinearRgb(spectrum, observer) {
+  const rgb = xyzToClippedLinearRgb(spectralXyz(spectrum, observer));
+  const peak = Math.max(...rgb);
+  if (!(peak > 0)) throw new Error("Spectrum produced no visible RGB emission.");
+  return rgb.map(value => value / peak);
+}
+
+export function linearRgbToHex(rgb) {
+  return "#" + rgb.map(value => {
+    const srgb = value <= 0.0031308 ? 12.92 * value : 1.055 * value ** (1 / 2.4) - 0.055;
+    return Math.round(Math.min(1, Math.max(0, srgb)) * 255).toString(16).padStart(2, "0");
+  }).join("");
+}
+
+export function bakeOpticalLut(profile, observer) {
+  const { width, rowsPerMode } = profile;
+  if (!Number.isInteger(width) || width < 2 || !Number.isInteger(rowsPerMode) || rowsPerMode < 2) {
+    throw new RangeError("The optical LUT needs at least two columns and two rows per mode.");
+  }
+  const height = rowsPerMode * 2;
+  const rgba = new Uint8Array(width * height * 4);
+  for (const [modeIndex, mode] of ["dry", "afterburner"].entries()) {
+    const parameters = profile[mode];
+    const temperatureRange = parameters.temperatureKelvinRange;
+    if (temperatureRange?.length !== 2
+      || temperatureRange.some(value => !Number.isFinite(value) || value <= 0)
+      || temperatureRange[1] <= temperatureRange[0]
+      || !Number.isFinite(parameters.axialCoolingFraction)
+      || parameters.axialCoolingFraction < 0 || parameters.axialCoolingFraction >= 1) {
+      throw new RangeError("Gas banks need increasing Kelvin bounds and a finite axial cooling fraction in [0, 1).");
+    }
+    for (let row = 0; row < rowsPerMode; row++) {
+      const temperatureFraction = row / (rowsPerMode - 1);
+      const temperature = lerp(...temperatureRange, temperatureFraction);
+      for (let column = 0; column < width; column++) {
+        const axial = column / (width - 1);
+        const rgb = spectralLinearRgb(assumedSpectrum(profile, mode, temperature, axial, observer), observer);
+        const shocks = parameters.assumedShockCells;
+        const cellModulation = shocks ? 1 - 0.5 * shocks.contrast * Math.exp(-shocks.axialDamping * axial)
+          * (1 - Math.cos(2 * Math.PI * lerp(...shocks.countAtTemperatureRange, temperatureFraction) * axial + shocks.phaseRadians)) : 1;
+        const envelope = lerp(...parameters.relativeEmission, temperatureFraction)
+          * cellModulation
+          * Math.exp(-parameters.axialFalloff * axial) * (1 - axial) ** 2;
+        const offset = ((modeIndex * rowsPerMode + row) * width + column) * 4;
+        for (let i = 0; i < 3; i++) rgba[offset + i] = Math.round(rgb[i] * 255);
+        rgba[offset + 3] = Math.round(Math.min(1, Math.max(0, envelope)) * 255);
+      }
+    }
+  }
+  const sample = profile.hudAccentSample;
+  const hudAccentRgb = spectralLinearRgb(
+    assumedSpectrum(profile, sample.mode, sample.temperatureKelvin, sample.axialFraction, observer), observer);
+  const hudAccentHex = linearRgbToHex(hudAccentRgb.map(value => lerp(value, 1, sample.neutralDisplayMix)));
+  return { width, height, rgba, hudAccentHex };
+}
+
+/**
+ * Absolute visible grey-body surface emission, separate from gas emission.
+ * RGB channels have an equivalent photopic-luminance scale: their weighted Y
+ * equals 683 integral(L_lambda V(lambda) d_lambda), in cd/m^2. The renderer
+ * supplies an explicit display reference rather than normalizing a hot row.
+ */
+export function bakeSurfaceEmission(parameters, observer) {
+  if (!Number.isInteger(parameters.sampleCount) || parameters.sampleCount < 2
+    || parameters.temperatureKelvinRange?.length !== 2
+    || parameters.temperatureKelvinRange.some(value => !Number.isFinite(value) || value <= 0)
+    || parameters.temperatureKelvinRange[1] <= parameters.temperatureKelvinRange[0]
+    || !Number.isFinite(parameters.visibleGrayEmissivity)
+    || parameters.visibleGrayEmissivity < 0 || parameters.visibleGrayEmissivity > 1) {
+    throw new RangeError("Invalid thermal surface profile.");
+  }
+  const temperatures = parameters.temperatureKelvinRange;
+  // Observer samples are spaced by 1 nm; Planck is per metre of wavelength.
+  const photometricScale = 683 * 1e-9 * parameters.visibleGrayEmissivity;
+  return { temperatureKelvinRange: [...temperatures], unit: "cd/m2",
+    samples: Array.from({ length: parameters.sampleCount }, (_, index) => {
+      const temperature = lerp(...temperatures, index / (parameters.sampleCount - 1));
+      const xyz = spectralXyz(observer.map(row => planckRadiance(row[0], temperature)), observer)
+        .map(value => value * photometricScale);
+      const rgb = xyzToClippedLinearRgb(xyz);
+      // Cold thermal spectra can lie outside sRGB. Preserve photopic Y after
+      // gamut clipping so clipping changes chromaticity, not total luminance.
+      const clippedY = 0.2126729 * rgb[0] + 0.7151522 * rgb[1] + 0.072175 * rgb[2];
+      const yCorrection = clippedY > 0 ? xyz[1] / clippedY : 0;
+      // Significant digits preserve the very small physical cold-end values.
+      return rgb.map(value => Number((value * yCorrection).toPrecision(12)));
+    }) };
+}
+
+/** Offline artistic animation only; runtime interpolates these scalars using native time. */
+export function bakeTemporalEmission(parameters) {
+  if (!Number.isFinite(parameters.periodSeconds) || parameters.periodSeconds <= 0
+    || !Number.isInteger(parameters.sampleCount) || parameters.sampleCount < 2
+    || !Number.isFinite(parameters.amplitude) || parameters.amplitude < 0 || parameters.amplitude > 0.05
+    || !parameters.harmonics.length) throw new RangeError("Invalid bounded temporal emission profile.");
+  let weightSum = 0;
+  for (const harmonic of parameters.harmonics) {
+    if (!Number.isInteger(harmonic.cycles) || harmonic.cycles < 1 || harmonic.cycles >= parameters.sampleCount / 2
+      || !Number.isFinite(harmonic.weight) || harmonic.weight < 0 || !Number.isFinite(harmonic.phaseRadians)) {
+      throw new RangeError("Temporal harmonics need finite weights, phases and sampleable periodic cycles.");
+    }
+    weightSum += harmonic.weight;
+  }
+  if (!(weightSum > 0)) throw new RangeError("Temporal emission needs positive harmonic weight.");
+  const samples = Array.from({ length: parameters.sampleCount }, (_, index) => {
+    const variation = parameters.harmonics.reduce((sum, harmonic) => sum
+      + harmonic.weight / weightSum * Math.sin(2 * Math.PI * harmonic.cycles * index / parameters.sampleCount + harmonic.phaseRadians), 0);
+    return Number((1 + parameters.amplitude * variation).toFixed(8));
+  });
+  return { periodSeconds: parameters.periodSeconds, samples };
+}
+
+/** Cartesian cross-section: expensive angular/radial hypotheses are baked once. */
+export function bakeSpatialEmission(parameters) {
+  const { size, ringRadiusFraction: radius, ringWidthFraction: width, centerEmission,
+    lobeCount, lobeContrast, phaseRadians, downstreamMixFraction } = parameters;
+  if (!Number.isInteger(size) || size < 16 || size > 512 || !Number.isInteger(lobeCount)
+    || lobeCount < 0 || lobeCount > size / 4 || !Number.isFinite(phaseRadians)
+    || ![radius, width, centerEmission, lobeContrast, downstreamMixFraction].every(Number.isFinite)
+    || radius <= 0 || radius >= 1 || width <= 0 || width >= 1 || centerEmission < 0 || centerEmission > 1
+    || lobeContrast < 0 || lobeContrast > 1 || downstreamMixFraction <= 0 || downstreamMixFraction > 1) {
+    throw new RangeError("Invalid provisional spatial emission profile.");
+  }
+  const rgba = new Uint8Array(size * size * 4);
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    const px = x / (size - 1) * 2 - 1;
+    const py = y / (size - 1) * 2 - 1;
+    const r = Math.hypot(px, py);
+    const edge = Math.max(0, Math.min(1, (1 - r) / width));
+    const angular = 1 - lobeContrast * (1 - Math.cos(lobeCount * Math.atan2(py, px) + phaseRadians)) / 2;
+    const annulus = Math.exp(-0.5 * ((r - radius) / width) ** 2) * angular;
+    const offset = (y * size + x) * 4;
+    rgba[offset] = Math.round(255 * edge * Math.min(1, centerEmission + (1 - centerEmission) * annulus));
+    rgba[offset + 1] = Math.round(255 * Math.max(0, 1 - r * r) ** 2);
+    rgba[offset + 3] = 255;
+  }
+  return { width: size, height: size, rgba, downstreamMixFraction };
+}
+
+/** Relative gas-light RGB at an explicit axial location; never a solid temperature. */
+export function bakeSceneEmission(lut, rowsPerMode, axialFraction) {
+  if (!Number.isFinite(axialFraction) || axialFraction < 0 || axialFraction > 1) {
+    throw new RangeError("Scene emission needs an axial fraction in [0, 1].");
+  }
+  const column = Math.round(axialFraction * (lut.width - 1));
+  return Object.fromEntries(["dry", "afterburner"].map((mode, bank) => [mode,
+    Array.from({ length: rowsPerMode }, (_, row) => {
+      const offset = ((bank * rowsPerMode + row) * lut.width + column) * 4;
+      return [0, 1, 2].map(channel => Number((lut.rgba[offset + channel] * lut.rgba[offset + 3] / (255 * 255)).toFixed(8)));
+    })]));
+}
+
+function crc32(bytes) {
+  let crc = 0xffffffff;
+  for (const byte of bytes) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit++) crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+function pngChunk(name, bytes) {
+  const type = Buffer.from(name);
+  const header = Buffer.alloc(4);
+  header.writeUInt32BE(bytes.length);
+  const checksum = Buffer.alloc(4);
+  checksum.writeUInt32BE(crc32(Buffer.concat([type, bytes])));
+  return Buffer.concat([header, type, bytes, checksum]);
+}
+
+/** No timestamps, color-space conversion chunks, ancillary metadata or external encoder. */
+export function encodeRgbaPng(width, height, rgba) {
+  if (rgba.length !== width * height * 4) throw new RangeError("PNG data dimensions do not match.");
+  const header = Buffer.alloc(13);
+  header.writeUInt32BE(width, 0);
+  header.writeUInt32BE(height, 4);
+  header[8] = 8;
+  header[9] = 6;
+  const scanlines = Buffer.alloc((width * 4 + 1) * height);
+  for (let y = 0; y < height; y++) scanlines.set(rgba.subarray(y * width * 4, (y + 1) * width * 4), y * (width * 4 + 1) + 1);
+  return Buffer.concat([
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    pngChunk("IHDR", header),
+    pngChunk("IDAT", deflateSync(scanlines, { level: 9 })),
+    pngChunk("IEND", Buffer.alloc(0)),
+  ]);
+}

@@ -1,0 +1,170 @@
+{
+  "recordedDate": "2026-10-06",
+  "model": "imposed-gas-bath-v2",
+  "temperatureMeaning": "imposed-native-gas-bath-proxy",
+  "chemistryStatus": "unavailable",
+  "checks": [
+    {
+      "command": "npx vitest run src/flight/aircraft/engineGasOptics.test.ts src/flight/aircraft/engineExhaustProfiles.test.ts scripts/build-exhaust-optics.test.mjs --maxWorkers=50%",
+      "log": "focused.log",
+      "result": "passed",
+      "testFiles": 3,
+      "tests": 15,
+      "limit": "This focused run preceded the exterior-only light integral addition and its assertions. Root final related/CI covers the final implementation."
+    },
+    {
+      "command": "npx eslint src/flight/aircraft/engineGasOptics.ts src/flight/aircraft/engineGasOptics.test.ts src/flight/aircraft/engineExhaustProfiles.test.ts scripts/exhaustOptics/bake.mjs scripts/build-exhaust-optics.mjs scripts/build-exhaust-optics.test.mjs",
+      "log": "lint.log",
+      "result": "passed",
+      "limit": "This targeted lint preceded the exterior-only light integral addition. Root final lint covers it."
+    },
+    {
+      "command": "node scripts/build-exhaust-optics.mjs --install",
+      "log": "bake.log",
+      "result": "passed",
+      "limit": "This bake preceded the wording-only profile clarification for the exterior light. The final bake is retained separately; physical source arrays are unchanged."
+    }
+  ],
+  "inputsAndOutputs": [
+    {
+      "path": "src/flight/aircraft/engineGasOptics.ts",
+      "bytes": 33496,
+      "sha256": "401ef1fba8383f8d1d3426b59a850a5066e569694e3330828e5f8fe19188af3a",
+      "snapshot": "engineGasOptics.ts.txt"
+    },
+    {
+      "path": "scripts/exhaustOptics/bake.mjs",
+      "bytes": 23014,
+      "sha256": "ea5ee20d828e5d0870d77e2a1205f8d80384abd97c0a75918ee2471509620a8b",
+      "snapshot": "bake.mjs.txt"
+    },
+    {
+      "path": "scripts/exhaustOptics/f135-visible-approximation.json",
+      "bytes": 13774,
+      "sha256": "df05e31381efcfd338c755f35bb2b96205a4dc3d83f61f106d7d276b4196cd53",
+      "snapshot": "optical-parameters.json"
+    },
+    {
+      "path": "scripts/build-exhaust-optics.mjs",
+      "bytes": 7472,
+      "sha256": "a69ecefa8c81502239e9b87b5ae239db73ad12a7f9c1f3a6aa70c90efd3bcba6",
+      "snapshot": "build-exhaust-optics.mjs.txt"
+    },
+    {
+      "path": "src/flight/aircraft/engineGasOptics.test.ts",
+      "bytes": 12957,
+      "sha256": "fa5883b1d26063167a9e19b4aa97fef139edc0458c963aedb50deb92fadcaa07",
+      "snapshot": null
+    },
+    {
+      "path": "src/flight/aircraft/engineExhaustProfiles.test.ts",
+      "bytes": 1474,
+      "sha256": "3bc43755654f67193f0262716eaf6d37662c1c41322200bcaf392d78585fd900",
+      "snapshot": null
+    },
+    {
+      "path": "scripts/build-exhaust-optics.test.mjs",
+      "bytes": 7039,
+      "sha256": "4c57afb3c5d0e8f741ad661659d3de0e60e041caf137583964404e65d4dc061d",
+      "snapshot": null
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135ExhaustOpticalData.ts",
+      "bytes": 532089,
+      "sha256": "9d93652dc604618642dab08995f8f3deb1b8b375d1caff5536287eb6bbcdbe3a",
+      "snapshot": null
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json",
+      "bytes": 612796,
+      "sha256": "13d9bba7c455e9e983d9535321abbb59bc9a8f4f8fb2bdfd743a902d776a1061",
+      "snapshot": null
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.png",
+      "bytes": 471,
+      "sha256": "d9d460fbfbfe3ec0d099659646a176fa892e2afa81713f92469d0c75f4c47189",
+      "snapshot": null
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-spatial.png",
+      "bytes": 24424,
+      "sha256": "27110d47433281963a653695116feb79cf80e314a6553c3c9c753f2f6a6a530e",
+      "snapshot": null
+    }
+  ],
+  "preservedBaseline": "../../plume-spatial-2026-10-06/spatial-optics/source-0-f135-exhaust-lut.manifest.json.txt",
+  "domainContract": {
+    "axialDistance": "signed physical path metres; negative upstream, zero exit, positive exterior",
+    "radialFraction": "radius divided by piecewise outer radius",
+    "sectionFields": [
+      "distanceMeters",
+      "radiusMeters",
+      "innerRadiusMeters (default0)",
+      "areaFactor (default1)"
+    ],
+    "duplicates": "right-continuous zero-measure section steps permitted",
+    "budget": "one full-domain source upper bound, excluding centerbody; additional renderer cap clips can only reduce it"
+  },
+  "limitations": [
+    "No optional species-population source was fabricated: meaningful spectra, populations and quenching inputs are missing.",
+    "Upstream temperature/loading continuation is homogeneous and provisional, not an augmentor flame simulation.",
+    "Particle loading and 0.3% supplied-fuel ceiling remain uncertain hypotheses, now independent of AB mode.",
+    "No browser, GPU, server, benchmark or appearance qualification performed.",
+    "Independent full-domain numerical checks and root final related/CI are separate records."
+  ],
+  "finalSourceCheckpoint": {
+    "notes": "Adds separate exterior-only intensity using the same quadrature pass; physical source fields/formulas unchanged. Independent numerical record covers this final checkpoint. Earlier snapshots/logs remain intact.",
+    "files": [
+      {
+        "path": "src/flight/aircraft/engineGasOptics.ts",
+        "bytes": 34642,
+        "sha256": "85c1f773b72542cdde867e68d81f9ed94df8036df6c71924e94722f451668cfa",
+        "snapshot": "engineGasOptics-final.ts.txt"
+      },
+      {
+        "path": "scripts/exhaustOptics/f135-visible-approximation.json",
+        "bytes": 13784,
+        "sha256": "24bbce5b5356e222d80334870e112fc6906c68e68c20fd92b456eb6e4551935d",
+        "snapshot": "optical-parameters-final.json"
+      },
+      {
+        "path": "src/flight/aircraft/generated/f135ExhaustOpticalData.ts",
+        "bytes": 532089,
+        "sha256": "9d93652dc604618642dab08995f8f3deb1b8b375d1caff5536287eb6bbcdbe3a",
+        "snapshot": null
+      },
+      {
+        "path": "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json",
+        "bytes": 612806,
+        "sha256": "6d65ba31efcf198dbd42a1f5f78bbe5ec98f0e5ec0a8ed9bb02d9565900d360b",
+        "snapshot": null
+      },
+      {
+        "path": "src/flight/aircraft/engineGasOptics.test.ts",
+        "bytes": 13613,
+        "sha256": "9403cc599b1c918dc26dc3564c968948ee98796e464b9fdf4ee912aad2704134",
+        "snapshot": null
+      }
+    ],
+    "bakeLog": "bake-final.log",
+    "independentRecord": "../numerical/report.json"
+  },
+  "geometryCacheRevision": {
+    "description": "Efficiency-only cache of the unchanged total/exterior volume weights by one numeric domain/resolution signature per live profile. Source arrays, integration formulas and generated artifacts unchanged. New identity/nonmutation/invalidation assertions await root final related suite; prior focused run is not attributed to this revision.",
+    "independentNumericalRerun": false,
+    "reason": "No numerical-method change; root requested no rerun. Frozen independent diagnostic source predates this cache.",
+    "files": [
+      {
+        "path": "src/flight/aircraft/engineGasOptics.ts",
+        "sha256": "ceb5fd6b2e2ddaaa16384c0520aa768cba1c63aa98de474fe544420c47df8fcf",
+        "snapshot": "engineGasOptics-cached.ts.txt"
+      },
+      {
+        "path": "src/flight/aircraft/engineGasOptics.test.ts",
+        "sha256": "93040b6628333af92dbb15c447a10df1da7da9b96c7e94476e87106bf0141249",
+        "snapshot": "engineGasOptics-cached.test.ts.txt"
+      }
+    ]
+  }
+}

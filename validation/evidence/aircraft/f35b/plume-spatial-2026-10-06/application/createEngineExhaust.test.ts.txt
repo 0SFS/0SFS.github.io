@@ -1,0 +1,744 @@
+import {
+  Color3, FreeCamera, ImageProcessingConfiguration, MeshBuilder, NullEngine, PBRMaterial, PointLight, Quaternion, RawTexture, Scene, ShaderLanguage, ShaderMaterial,
+  TransformNode, Vector3,
+} from "@babylonjs/core";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { createEngineExhaust, ENGINE_EXHAUST_GLSL_FRAGMENT, ENGINE_EXHAUST_WGSL_FRAGMENT,
+  type EngineExhaustOptions, type EngineExhaustSettings, type EngineExhaustState } from "./createEngineExhaust";
+import { evaluateEngineGasOptics } from "./engineGasOptics";
+import { getEngineExhaustOpticalProfile, type EngineExhaustOpticalProfile } from "./engineExhaustProfiles";
+
+vi.mock("foss-earth/runtime", () => ({ whenMeshesReady: async () => {} }));
+
+const settings: EngineExhaustSettings = { enabled: true, sampleCount: 8, maxDistanceMeters: 2_000, intensity: 1, surfaceReferenceNits: 1, gasReferenceNits: 1 };
+const running: EngineExhaustState = { running: true, augmentation: false, powerNorm: 0.8, nozzlePositionNorm: 0,
+  fuelFlowKgPerSecond: 1, afterburnerBurnedFuelFlowKgPerSecond: 0.5, gasTemperatureKelvin: 1000, simulationTimeSeconds: 10 };
+const profile: EngineExhaustOpticalProfile = {
+  id: "test-linear-emission", textureUrl: "test.png", provenanceUrl: "test.json", width: 2, height: 4,
+  gasEmission: { model: "gray-emission-absorption-v1", blackbody: { temperatureKelvinRange: [300, 3200], unit: "cd/m2",
+    samples: [[1e-20, 1e-21, 1e-22], [100, 20, 3], [1e6, 2e5, 3e4], [1e8, 2e7, 3e6]] }, fuelHeatingValueJPerKg: 43300000,
+    normalizedDensityVolume: 0.2, excitedRgbLumensPerWatt: [100, 40, 80],
+    dry: { absorptionPerMeter: 0.025, particleFuelPowerFraction: 0.003, excitedFuelPowerFraction: 0 },
+    afterburner: { absorptionPerMeter: 0.08, particleFuelPowerFraction: 0.015, excitedFuelPowerFraction: 1e-6 } },
+  colorSpace: "linear-srgb", dry: { firstRow: 0, rowCount: 2, temperatureKelvinRange: [600, 1400] },
+  afterburner: { firstRow: 2, rowCount: 2, temperatureKelvinRange: [1000, 3000] }, hudAccentHex: "#ff9450",
+};
+const engines: NullEngine[] = [];
+afterEach(() => { for (const engine of engines.splice(0)) engine.dispose(); });
+
+function fixture(overrides: Partial<EngineExhaustOptions> = {}, webGpu = false, withHotHardware = false) {
+  const engine = new NullEngine();
+  engines.push(engine);
+  if (webGpu) Object.defineProperty(engine, "isWebGPU", { value: true });
+  const scene = new Scene(engine);
+  scene.useRightHandedSystem = true;
+  const camera = new FreeCamera("camera", new Vector3(0, 0, 20), scene);
+  scene.activeCamera = camera;
+  camera.computeWorldMatrix();
+  const attachment = new TransformNode("vectoring-nozzle", scene);
+  const requestRender = vi.fn();
+  const texture = RawTexture.CreateRGBATexture(new Uint8Array(2 * 4 * 4).fill(255), 2, 4, scene, false, false);
+  const options: EngineExhaustOptions = {
+    attachment, exitPosition: [0, 0, 1], direction: [0, 0, 1], closedRadiusMeters: 0.4,
+    openRadiusMeters: 0.6, lengthMeters: 6, opticalProfile: profile, settings, requestRender,
+    createTexture: () => texture, whenReady: async () => {}, ...overrides,
+  };
+  const liner = withHotHardware ? MeshBuilder.CreateCylinder("nozzle-liner", {}, scene) : null;
+  const hardwareMaterial = withHotHardware ? new PBRMaterial("nozzle-metal", scene) : null;
+  if (liner && hardwareMaterial) {
+    liner.parent = options.attachment;
+    hardwareMaterial.emissiveColor = new Color3(0.001, 0.0002, 0.00003);
+    liner.material = hardwareMaterial;
+  }
+  const handle = createEngineExhaust(scene, options);
+  const material = handle.mesh.material as ShaderMaterial;
+  return { scene, camera, attachment: options.attachment, requestRender, texture, handle, material, liner, hardwareMaterial };
+}
+
+function thermalFixture() {
+  const t = fixture({
+    hotSurfaceMaterialNames: ["nozzle-metal"],
+    opticalProfile: {
+      ...profile,
+      surfaceEmission: { temperatureKelvinRange: [600, 1400], unit: "cd/m2", samples: [[0, 0, 0], [0.4, 0.1, 0.01]] },
+      temporalEmission: { periodSeconds: 1, samples: [1, 1.04, 1, 0.96] },
+    },
+  }, false, true);
+  return {
+    ...t,
+    emission: () => (t.liner!.material as PBRMaterial).emissiveColor.clone(),
+    restEmission: t.hardwareMaterial!.emissiveColor.clone(),
+  };
+}
+
+function materialData(material: ShaderMaterial): {
+  floats: Record<string, number>; ints: Record<string, number>;
+  vectors2: Record<string, number[]>; vectors3: Record<string, number[]>;
+} {
+  return material.serialize();
+}
+
+describe("shared engine exhaust renderer", () => {
+  it("uploads the local absolute source field once per changed physical state and releases resized resources", async () => {
+    const physicalProfile = getEngineExhaustOpticalProfile("f135-visible-approximation-v1")!;
+    const t = fixture({ opticalProfile: physicalProfile });
+    const state = { ...running, augmentation: true, gasTemperatureKelvin: 2200, ambientTemperatureKelvin: 288.15 };
+    t.handle.update(state);
+    expect(t.handle.mesh.isEnabled()).toBe(false);
+    await t.handle.ready;
+    const field = () => t.scene.textures.find(texture => texture.name === "engine-exhaust-source-field") as RawTexture;
+    const original = field();
+    expect(original.getSize()).toEqual({ width: 64, height: 32 });
+    expect(original.samplingMode).toBe(RawTexture.NEAREST_SAMPLINGMODE);
+    expect(t.material.serialize().vectors4.fieldShape.slice(0, 2)).toEqual([64, 32]);
+    expect(t.material.serialize().vectors4.fieldShape[3]).toBe(1);
+    const uploaded = original.getInternalTexture()!._bufferView as Float32Array;
+    const redFractions: number[] = [];
+    for (let i = 0; i < uploaded.length; i += 4) {
+      const sum = uploaded[i] + uploaded[i + 1] + uploaded[i + 2];
+      if (sum > 1e-8) redFractions.push(uploaded[i] / sum);
+    }
+    // Actual uploaded RGB must vary in composition, not just one RGB times density.
+    expect(Math.max(...redFractions) - Math.min(...redFractions)).toBeGreaterThan(0.1);
+    const update = vi.spyOn(original, "update");
+    const dispose = vi.spyOn(original, "dispose");
+    t.requestRender.mockClear();
+    t.handle.update({ ...state, simulationTimeSeconds: 20 });
+    expect(update).not.toHaveBeenCalled();
+    expect(t.requestRender).not.toHaveBeenCalled();
+    t.handle.update(state, { ...settings, gasReferenceNits: 100, intensity: 2 });
+    t.scene.imageProcessingConfiguration.exposure = 2;
+    expect(update).not.toHaveBeenCalled();
+    const hotter = { ...state, gasTemperatureKelvin: 2300 };
+    t.handle.update(hotter);
+    expect(update).toHaveBeenCalledOnce();
+    t.handle.update(hotter);
+    expect(update).toHaveBeenCalledOnce();
+    t.handle.update(hotter, { ...settings, contributionView: "solid" });
+    t.handle.update(state);
+    expect(update).toHaveBeenCalledOnce();
+    t.handle.update(state, settings);
+    expect(update).toHaveBeenCalledTimes(2);
+    t.handle.update(state, { ...settings, axialFieldSamples: 100, radialFieldSamples: 1 });
+    expect(dispose).toHaveBeenCalledOnce();
+    expect(field().getSize()).toEqual({ width: 64, height: 8 });
+    const finalDispose = vi.spyOn(field(), "dispose");
+    t.handle.dispose();
+    expect(finalDispose).toHaveBeenCalledOnce();
+  });
+
+  it("does not substitute a fabricated ambient temperature for the spatial field", async () => {
+    const t = fixture({ opticalProfile: getEngineExhaustOpticalProfile("f135-visible-approximation-v1")! });
+    await t.handle.ready;
+    for (const ambientTemperatureKelvin of [undefined, Number.NaN, -1, 0]) {
+      t.handle.update({ ...running, ambientTemperatureKelvin });
+      expect(t.handle.mesh.isEnabled()).toBe(false);
+    }
+    t.handle.update({ ...running, ambientTemperatureKelvin: 288.15 });
+    expect(t.handle.mesh.isEnabled()).toBe(true);
+  });
+
+  it("prepares one static visual-only volume hidden and reveals it with one frame when ready", async () => {
+    let release!: () => void;
+    const t = fixture({ whenReady: () => new Promise(resolve => { release = resolve; }) });
+    t.handle.update(running);
+    await Promise.resolve();
+    expect(t.handle.mesh.isEnabled()).toBe(false);
+    expect(t.requestRender).not.toHaveBeenCalled();
+    expect(t.handle.mesh.getTotalIndices() / 3).toBe(12);
+    expect(t.handle.mesh.isPickable).toBe(false);
+    expect(t.handle.mesh.receiveShadows).toBe(false);
+    expect(t.handle.mesh.metadata.aircraftVisualOnly).toBe(true);
+    expect(t.material.disableDepthWrite).toBe(true);
+    expect(t.texture.gammaSpace).toBe(false);
+    release();
+    await t.handle.ready;
+    expect(t.handle.mesh.isEnabled()).toBe(true);
+    expect(t.requestRender).toHaveBeenCalledTimes(1);
+    const geometry = t.handle.mesh.geometry;
+    t.handle.update({ ...running, augmentation: true, powerNorm: 1, nozzlePositionNorm: 1 });
+    expect(t.handle.mesh.geometry).toBe(geometry);
+    expect(t.handle.mesh.getTotalIndices()).toBe(36);
+  });
+
+  it("selects dry emission without augmentation and AB emission only from the native boolean", async () => {
+    const t = fixture();
+    await t.handle.ready;
+    t.handle.update({ ...running, powerNorm: 1 });
+    expect(materialData(t.material).floats.absorptionPerMeter).toBeCloseTo(0.025);
+    expect(materialData(t.material).vectors3.volumeMeters.slice(0, 2)).toEqual([0.4, 0.4]);
+    expect(materialData(t.material).vectors3.volumeMeters[2]).toBeCloseTo(1.2);
+    t.handle.update({ ...running, augmentation: true });
+    expect(materialData(t.material).vectors3.sourceRadiance[2]).toBeGreaterThan(0);
+    expect(materialData(t.material).vectors3.volumeMeters[2]).toBeCloseTo(5.64);
+    t.handle.update({ ...running, augmentation: true, running: false });
+    expect(t.handle.mesh.isEnabled()).toBe(false);
+    // A live dry engine remains visible through the faint, smooth dry bank.
+    t.handle.update(running);
+    expect(t.handle.mesh.isEnabled()).toBe(true);
+    expect(materialData(t.material).floats.absorptionPerMeter).toBeCloseTo(0.025);
+  });
+
+  it("prepares the baked gas mask with the plume and releases its texture on cancellation", async () => {
+    const spatialTextures: RawTexture[] = [];
+    const t = fixture({
+      opticalProfile: { ...profile, spatialEmission: { textureUrl: "mask.png", width: 128, height: 128, downstreamMixFraction: 0.65 } },
+      createSpatialTexture: (_profile, scene) => {
+        const texture = RawTexture.CreateRGBATexture(new Uint8Array(16), 2, 2, scene, false, false);
+        spatialTextures.push(texture);
+        return texture;
+      },
+    });
+    const dispose = vi.spyOn(spatialTextures[0], "dispose");
+    await t.handle.ready;
+    t.handle.update(running);
+    expect(t.material.serialize().vectors4.spatialShape).toEqual([128, 128, 0.65, 1]);
+    expect(spatialTextures[0].gammaSpace).toBe(false);
+    t.handle.dispose();
+    expect(dispose).toHaveBeenCalledOnce();
+  });
+
+  it("derives one scenery light from bounded gas power, excludes hardware and disposes it", async () => {
+    const lightSettings = { ...settings, lightEnabled: true, lightGain: 1, lightRangeMeters: 12 };
+    const t = thermalFixture();
+    t.handle.update(running, lightSettings);
+    expect(t.scene.lights).toHaveLength(0);
+    await t.handle.ready;
+    const light = t.scene.lights[0] as PointLight;
+    const gas = evaluateEngineGasOptics(profile, { ...running, temperatureKelvin: 1000, radiusMeters: 0.4, lengthMeters: 1.2 });
+    expect(light.intensity).toBeCloseTo(Math.max(...gas.isotropicIntensityRgbCd));
+    expect(light.excludedMeshes).toContain(t.liner);
+    expect(light.range).toBe(12);
+    t.requestRender.mockClear();
+    t.handle.update({ ...running, simulationTimeSeconds: 11 }, lightSettings);
+    expect(t.scene.lights[0]).toBe(light);
+    expect(t.requestRender).not.toHaveBeenCalled();
+    t.handle.update(running, { ...lightSettings, lightEnabled: false });
+    expect(t.scene.lights).toHaveLength(0);
+    t.handle.update(running, lightSettings);
+    expect(t.scene.lights).toHaveLength(1);
+    t.handle.update({ ...running, fuelFlowKgPerSecond: undefined }, lightSettings);
+    expect(t.scene.lights).toHaveLength(0);
+    t.handle.update(running, lightSettings);
+    t.handle.dispose();
+    expect(t.scene.lights).toHaveLength(0);
+  });
+
+  it("isolates the four contributions without changing state or reconfiguring PBR shaders", async () => {
+    const t = thermalFixture();
+    await t.handle.ready;
+    const state = { ...running, metalTemperatureKelvin: 1400 };
+    const config = { ...settings, lightEnabled: true, lightGain: 1, lightRangeMeters: 12 };
+    t.handle.update(state, { ...config, contributionView: "solid" });
+    const metal = t.liner!.material as PBRMaterial;
+    expect(metal.emissiveColor.r).toBeGreaterThan(t.restEmission.r);
+    expect(metal.directIntensity).toBe(0);
+    expect(metal.environmentIntensity).toBe(0);
+    expect(t.handle.mesh.isEnabled()).toBe(false);
+    expect(t.scene.lights).toHaveLength(0);
+    t.handle.update(state, { ...config, contributionView: "gas" });
+    expect(t.handle.mesh.isEnabled()).toBe(true);
+    expect(metal.emissiveColor.equals(t.restEmission)).toBe(true);
+    expect(metal.environmentIntensity).toBe(0);
+    t.handle.update(state, { ...config, contributionView: "reflection" });
+    expect(t.handle.mesh.isEnabled()).toBe(false);
+    expect(metal.emissiveColor.equals(t.restEmission)).toBe(true);
+    expect(metal.environmentIntensity).toBe(t.hardwareMaterial!.environmentIntensity);
+    t.handle.update(state, { ...config, contributionView: "scene-light" });
+    expect(t.handle.mesh.isEnabled()).toBe(false);
+    expect(t.scene.lights).toHaveLength(1);
+    expect((t.scene.lights[0] as PointLight).excludedMeshes).toContain(t.liner);
+    expect(metal.environmentIntensity).toBe(0);
+    expect(metal.directIntensity).toBe(0);
+    t.handle.update(state, { ...config, contributionView: "combined" });
+    expect(t.handle.mesh.isEnabled()).toBe(true);
+    expect(metal.emissiveColor.r).toBeGreaterThan(t.restEmission.r);
+    expect(state.metalTemperatureKelvin).toBe(1400);
+  });
+
+  it("requests exactly one frame when the nearby-light-only view gains its first light", async () => {
+    const config: EngineExhaustSettings = { ...settings, contributionView: "scene-light", lightEnabled: false, lightGain: 1, lightRangeMeters: 12 };
+    const t = fixture({ settings: config });
+    await t.handle.ready;
+    t.handle.update(running);
+    expect(t.handle.mesh.isEnabled()).toBe(false);
+    expect(t.scene.lights).toHaveLength(0);
+    t.requestRender.mockClear();
+    t.handle.update(running, { ...config, lightEnabled: true });
+    expect(t.scene.lights).toHaveLength(1);
+    expect(t.requestRender).toHaveBeenCalledOnce();
+    t.handle.update({ ...running, simulationTimeSeconds: 11 });
+    expect(t.requestRender).toHaveBeenCalledOnce();
+  });
+
+  it("keeps two native solid temperatures independent of each other and gas/augmentation", async () => {
+    const t = fixture({}, false, true);
+    t.handle.dispose();
+    const core = MeshBuilder.CreateCylinder("hot-core", {}, t.scene);
+    core.parent = t.attachment;
+    core.material = new PBRMaterial("core-metal", t.scene);
+    const casing = MeshBuilder.CreateBox("cold-casing", {}, t.scene);
+    casing.parent = t.attachment;
+    const casingOriginal = new PBRMaterial("casing-metal", t.scene);
+    casing.material = casingOriginal;
+    const exit = new TransformNode("nozzle-tip", t.scene);
+    exit.parent = t.attachment;
+    const handle = createEngineExhaust(t.scene, {
+      attachment: exit, hotSurfaceAttachment: t.attachment,
+      exitPosition: [0, 0, 1], direction: [0, 0, 1], closedRadiusMeters: 0.4,
+      openRadiusMeters: 0.6, lengthMeters: 6, settings, requestRender: t.requestRender,
+      hotSurfaceRegions: [{ materialNames: ["core-metal"] }, { materialNames: ["nozzle-metal"] }],
+      opticalProfile: { ...profile, surfaceEmission: { temperatureKelvinRange: [600, 1400], unit: "cd/m2",
+        samples: [[0, 0, 0], [0.4, 0.1, 0.01]] } },
+      createTexture: () => RawTexture.CreateRGBATexture(new Uint8Array(32), 2, 4, t.scene, false, false), whenReady: async () => {},
+    });
+    await handle.ready;
+    const emission = () => [(core.material as PBRMaterial).emissiveColor.r,
+      (t.liner!.material as PBRMaterial).emissiveColor.r - t.hardwareMaterial!.emissiveColor.r];
+    handle.update({ ...running, hotSurfaceTemperaturesKelvin: [1400, 1000] });
+    expect(emission()).toEqual([0.4, 0.2]);
+    handle.update({ ...running, running: false, augmentation: false, hotSurfaceTemperaturesKelvin: [1200, 1400] });
+    expect(emission()[0]).toBeCloseTo(0.3);
+    expect(emission()[1]).toBeCloseTo(0.4);
+    // A missing region never falls back to another region's temperature.
+    handle.update({ ...running, metalTemperatureKelvin: 1400, hotSurfaceTemperaturesKelvin: [undefined, 1400] });
+    expect(emission()).toEqual([0, 0.4]);
+    handle.update({ ...running, hotSurfaceTemperaturesKelvin: [1000, 1400] }, { ...settings, contributionView: "gas" });
+    expect(casing.material).not.toBe(casingOriginal);
+    expect((casing.material as PBRMaterial).environmentIntensity).toBe(0);
+    expect((casing.material as PBRMaterial).directIntensity).toBe(0);
+    expect((casing.material as PBRMaterial).emissiveColor.equals(Color3.Black())).toBe(true);
+    handle.dispose();
+    expect(casing.material).toBe(casingOriginal);
+    expect((core.material as PBRMaterial).name).toBe("core-metal");
+    expect(t.liner!.material).toBe(t.hardwareMaterial);
+  });
+
+  it("preserves physical metre dimensions and follows vectoring/floating-origin transforms", async () => {
+    const t = fixture();
+    const root = new TransformNode("converted-model", t.scene);
+    root.scaling.setAll(0.83305745);
+    t.attachment.parent = root;
+    // Recreate after the authored conversion scale is established.
+    t.handle.dispose();
+    const handle = createEngineExhaust(t.scene, {
+      attachment: t.attachment, exitPosition: [0, 0, 1], direction: [0, 0, 1],
+      closedRadiusMeters: 0.4, openRadiusMeters: 0.6, lengthMeters: 6, opticalProfile: profile,
+      settings, createTexture: () => RawTexture.CreateRGBATexture(new Uint8Array(32), 2, 4, t.scene, false, false), whenReady: async () => {},
+    });
+    await handle.ready;
+    t.attachment.rotationQuaternion = Quaternion.RotationAxis(Vector3.Right(), Math.PI / 2);
+    handle.update({ ...running, augmentation: true, powerNorm: 1, nozzlePositionNorm: 1 });
+    const matrix = handle.mesh.computeWorldMatrix(true);
+    const inlet = Vector3.TransformCoordinates(new Vector3(0, 0, -0.5), matrix);
+    const outlet = Vector3.TransformCoordinates(new Vector3(0, 0, 0.5), matrix);
+    expect(Vector3.Distance(inlet, outlet)).toBeCloseTo(6, 5);
+    expect(Vector3.TransformNormal(Vector3.Right(), matrix).length()).toBeCloseTo(0.6, 5);
+    expect(outlet.y).toBeLessThan(inlet.y - 5.99);
+    expect(Math.abs(outlet.z - inlet.z)).toBeLessThan(1e-5);
+    root.position.set(300, 200, -100);
+    handle.update({ ...running, augmentation: true, powerNorm: 1, nozzlePositionNorm: 1 });
+    const shifted = Vector3.TransformCoordinates(new Vector3(0, 0, 0.5), handle.mesh.computeWorldMatrix(true));
+    expect(Vector3.Distance(shifted.subtract(outlet), root.position)).toBeLessThan(1e-4);
+  });
+
+  it("retains dimensional source amplitude independently of spool/display gain and uses actual exit radius", async () => {
+    const t = fixture();
+    await t.handle.ready;
+    t.handle.update(running);
+    const source = materialData(t.material).vectors3.sourceRadiance;
+    t.handle.update({ ...running, powerNorm: 1 });
+    expect(materialData(t.material).vectors3.sourceRadiance).toEqual(source);
+    t.handle.update({ ...running, exitRadiusMeters: 0.51 }, { ...settings, gasReferenceNits: 10 });
+    expect(materialData(t.material).vectors3.volumeMeters[0]).toBe(0.51);
+    expect(materialData(t.material).vectors3.sourceRadiance).toEqual(source);
+    expect(materialData(t.material).floats.intensity).toBe(0.1);
+    t.requestRender.mockClear();
+    t.handle.update({ ...running, gasTemperatureKelvin: 1200 });
+    expect(materialData(t.material).vectors3.sourceRadiance[0]).toBeGreaterThan(source[0]);
+    expect(t.requestRender).toHaveBeenCalledOnce();
+  });
+
+  it("keeps hot hardware when gas telemetry is unavailable and changes display reference without heating it", async () => {
+    const t = thermalFixture();
+    await t.handle.ready;
+    const state = { ...running, metalTemperatureKelvin: 1400 };
+    t.handle.update(state);
+    const heat = t.emission();
+    for (const gasTemperatureKelvin of [undefined, Number.NaN, 0, -1]) {
+      t.handle.update({ ...state, gasTemperatureKelvin });
+      expect(t.handle.mesh.isEnabled()).toBe(false);
+      expect(t.emission().equals(heat)).toBe(true);
+    }
+    t.handle.update(state, { ...settings, surfaceReferenceNits: 2 });
+    expect(t.emission().r).toBeCloseTo(t.restEmission.r + 0.2);
+    expect(materialData(t.material).floats.intensity).toBe(1);
+  });
+
+  it("bounds shader work, rejects invalid telemetry, and culls outside the explicit distance", async () => {
+    const t = fixture();
+    await t.handle.ready;
+    t.handle.update({ ...running, powerNorm: 2, gasTemperatureKelvin: 2000 }, { ...settings, sampleCount: 100, intensity: 100 });
+    expect(materialData(t.material).ints.sampleCount).toBe(32);
+    expect(materialData(t.material).floats.intensity).toBe(8);
+    t.handle.update(running, { ...settings, sampleCount: -2 });
+    expect(materialData(t.material).ints.sampleCount).toBe(4);
+    t.handle.update({ ...running, powerNorm: Number.NaN });
+    expect(t.handle.mesh.isEnabled()).toBe(false);
+    t.handle.update({ ...running, simulationTimeSeconds: Number.NaN });
+    expect(t.handle.mesh.isEnabled()).toBe(false);
+    t.handle.update(running, { ...settings, maxDistanceMeters: 1 });
+    expect(t.handle.mesh.isEnabled()).toBe(false);
+    t.handle.update(running, settings);
+    expect(t.handle.mesh.isEnabled()).toBe(true);
+    t.handle.update(running, { ...settings, enabled: false });
+    expect(t.handle.mesh.isEnabled()).toBe(false);
+  });
+
+  it("retains last observed aperture and does not draw unchanged clock-only or hidden updates", async () => {
+    const t = fixture();
+    await t.handle.ready;
+    t.handle.update({ ...running, nozzlePositionNorm: 0.5 });
+    const scale = t.handle.mesh.scaling.clone();
+    t.requestRender.mockClear();
+    t.handle.update({ ...running, nozzlePositionNorm: undefined, simulationTimeSeconds: 11 });
+    expect(t.handle.mesh.scaling.equals(scale)).toBe(true);
+    expect(t.requestRender).not.toHaveBeenCalled();
+    t.handle.update({ ...running, running: false });
+    expect(t.requestRender).toHaveBeenCalledTimes(1);
+    t.requestRender.mockClear();
+    t.handle.update({ ...running, running: false, powerNorm: 0.2 });
+    expect(t.requestRender).not.toHaveBeenCalled();
+  });
+
+  it("does not create optical energy from a time-only envelope or missing fuel", async () => {
+    const t = fixture({ opticalProfile: { ...profile, temporalEmission: { periodSeconds: 1, samples: [1, 2] } } });
+    await t.handle.ready;
+    t.handle.update(running);
+    const source = materialData(t.material).vectors3.sourceRadiance;
+    t.requestRender.mockClear();
+    t.handle.update({ ...running, simulationTimeSeconds: 123 });
+    expect(materialData(t.material).vectors3.sourceRadiance).toEqual(source);
+    expect(t.requestRender).not.toHaveBeenCalled();
+    for (const fuelFlowKgPerSecond of [undefined, 0, -1, Number.NaN, Infinity]) {
+      t.handle.update({ ...running, fuelFlowKgPerSecond });
+      expect(t.handle.mesh.isEnabled()).toBe(false);
+    }
+  });
+
+  it("keeps native-temperature hardware hot after combustion stops, then draws temperature-only cooling", async () => {
+    const t = thermalFixture();
+    await t.handle.ready;
+    t.handle.update({ ...running, metalTemperatureKelvin: 1400 });
+    const hot = t.emission();
+    expect(hot.r).toBeCloseTo(t.restEmission.r + 0.4);
+    expect(hot.g).toBeCloseTo(t.restEmission.g + 0.1);
+    t.requestRender.mockClear();
+
+    // Fuel cutoff stops the plume; the native temperature observation still
+    // represents a hot engine. The renderer adds no cooling clock of its own.
+    const stopped: EngineExhaustState = {
+      ...running, running: false, augmentation: false, powerNorm: 0,
+      simulationTimeSeconds: 11, metalTemperatureKelvin: 1400,
+    };
+    t.handle.update(stopped);
+    expect(t.handle.mesh.isEnabled()).toBe(false);
+    expect(t.emission().equals(hot)).toBe(true);
+    expect(t.requestRender).toHaveBeenCalledOnce();
+    t.requestRender.mockClear();
+
+    // Everything used by the flame remains identical. A temperature-only
+    // change must still update the existing material and request its frame.
+    t.handle.update({ ...stopped, metalTemperatureKelvin: 1000 });
+    expect(t.emission().r).toBeCloseTo(t.restEmission.r + 0.2);
+    expect(t.emission().g).toBeCloseTo(t.restEmission.g + 0.05);
+    expect(t.handle.mesh.isEnabled()).toBe(false);
+    expect(t.requestRender).toHaveBeenCalledOnce();
+    t.requestRender.mockClear();
+    t.handle.update({ ...stopped, metalTemperatureKelvin: 600 });
+    expect(t.emission().equals(t.restEmission)).toBe(true);
+    expect(t.requestRender).toHaveBeenCalledOnce();
+    t.requestRender.mockClear();
+    t.handle.update({ ...stopped, metalTemperatureKelvin: 600 });
+    expect(t.requestRender).not.toHaveBeenCalled();
+  });
+
+  it("holds hardware emission at fixed temperature across power, AB and plume modulation changes", async () => {
+    const t = thermalFixture();
+    await t.handle.ready;
+    const dry: EngineExhaustState = {
+      ...running, powerNorm: 0.2, simulationTimeSeconds: 0.125, metalTemperatureKelvin: 1000,
+    };
+    t.handle.update(dry);
+    const heat = t.emission();
+    expect(heat.r).toBeCloseTo(t.restEmission.r + 0.2);
+    expect(materialData(t.material).floats.intensity).toBeCloseTo(1);
+    t.handle.update({ ...dry, augmentation: true, powerNorm: 1, simulationTimeSeconds: 0.75 });
+    expect(materialData(t.material).vectors3.sourceRadiance[2]).toBeGreaterThan(0);
+    expect(materialData(t.material).floats.intensity).toBeCloseTo(1);
+    expect(t.emission().equals(heat)).toBe(true);
+
+    // Invalid flame observations do not invalidate an independent, finite
+    // native temperature; missing clock/power cannot masquerade as cooling.
+    t.handle.update({ ...dry, powerNorm: Number.NaN, simulationTimeSeconds: Number.NaN });
+    expect(t.handle.mesh.isEnabled()).toBe(false);
+    expect(t.emission().equals(heat)).toBe(true);
+  });
+
+  it("removes thermal emission when native temperature is unavailable without hiding valid AB", async () => {
+    const t = thermalFixture();
+    await t.handle.ready;
+    for (const metalTemperatureKelvin of [undefined, Number.NaN, Number.POSITIVE_INFINITY]) {
+      t.handle.update({ ...running, augmentation: true, metalTemperatureKelvin: 1000 });
+      expect(t.emission().r).toBeGreaterThan(t.restEmission.r);
+      t.handle.update({ ...running, augmentation: true, metalTemperatureKelvin });
+      expect(t.emission().equals(t.restEmission)).toBe(true);
+      expect(t.handle.mesh.isEnabled()).toBe(true);
+      expect(materialData(t.material).vectors3.sourceRadiance[2]).toBeGreaterThan(0);
+    }
+  });
+
+  it("does no thermal redraw work for held or rewound native time until observed temperature changes", async () => {
+    const t = thermalFixture();
+    await t.handle.ready;
+    const stopped: EngineExhaustState = {
+      ...running, running: false, powerNorm: 0, metalTemperatureKelvin: 1000, simulationTimeSeconds: 5,
+    };
+    t.handle.update(stopped);
+    const heat = t.emission();
+    t.requestRender.mockClear();
+    for (const simulationTimeSeconds of [5, 5, 6, -1]) {
+      t.handle.update({ ...stopped, simulationTimeSeconds });
+      expect(t.emission().equals(heat)).toBe(true);
+      expect(t.requestRender).not.toHaveBeenCalled();
+    }
+    t.handle.update({ ...stopped, simulationTimeSeconds: -1, metalTemperatureKelvin: 800 });
+    expect(t.emission().r).toBeCloseTo(t.restEmission.r + 0.1);
+    expect(t.requestRender).toHaveBeenCalledOnce();
+  });
+
+  it("honors thermal resource and attachment gates without repeated hidden redraws", async () => {
+    const t = thermalFixture();
+    await t.handle.ready;
+    const hot: EngineExhaustState = { ...running, running: false, powerNorm: 0, metalTemperatureKelvin: 1000 };
+    t.handle.update(hot);
+    expect(t.handle.mesh.isEnabled()).toBe(false);
+    expect(t.emission().r).toBeGreaterThan(t.restEmission.r);
+    for (const hiddenSettings of [
+      { ...settings, enabled: false },
+      { ...settings, intensity: 0 },
+      { ...settings, maxDistanceMeters: 1 },
+    ]) {
+      t.requestRender.mockClear();
+      t.handle.update(hot, hiddenSettings);
+      expect(t.emission().equals(t.restEmission)).toBe(true);
+      expect(t.requestRender).toHaveBeenCalledOnce();
+      t.requestRender.mockClear();
+      t.handle.update({ ...hot, metalTemperatureKelvin: 1100 }, hiddenSettings);
+      expect(t.emission().equals(t.restEmission)).toBe(true);
+      expect(t.requestRender).not.toHaveBeenCalled();
+      t.handle.update(hot, settings);
+      expect(t.emission().r).toBeCloseTo(t.restEmission.r + 0.2);
+      expect(t.requestRender).toHaveBeenCalledOnce();
+    }
+    t.requestRender.mockClear();
+    t.attachment.setEnabled(false);
+    t.handle.update(hot);
+    expect(t.emission().equals(t.restEmission)).toBe(true);
+    expect(t.requestRender).toHaveBeenCalledOnce();
+    t.requestRender.mockClear();
+    t.handle.update(hot);
+    expect(t.requestRender).not.toHaveBeenCalled();
+    t.attachment.setEnabled(true);
+    t.handle.update(hot);
+    expect(t.emission().r).toBeCloseTo(t.restEmission.r + 0.2);
+    expect(t.requestRender).toHaveBeenCalledOnce();
+  });
+
+  it("draws removal of a warm stopped engine's hardware glow once even with its plume hidden", async () => {
+    const t = thermalFixture();
+    await t.handle.ready;
+    t.handle.update({ ...running, running: false, powerNorm: 0, metalTemperatureKelvin: 1000 });
+    expect(t.handle.mesh.isEnabled()).toBe(false);
+    expect(t.liner!.material).not.toBe(t.hardwareMaterial);
+    expect(t.emission().r).toBeGreaterThan(t.restEmission.r);
+    t.requestRender.mockClear();
+
+    t.handle.dispose();
+    expect(t.liner!.isDisposed()).toBe(false);
+    expect(t.liner!.material).toBe(t.hardwareMaterial);
+    expect(t.emission().equals(t.restEmission)).toBe(true);
+    expect(t.requestRender).toHaveBeenCalledOnce();
+    t.requestRender.mockClear();
+    t.handle.dispose();
+    t.handle.update({ ...running, running: false, metalTemperatureKelvin: 1200 });
+    expect(t.requestRender).not.toHaveBeenCalled();
+
+    const cold = thermalFixture();
+    await cold.handle.ready;
+    cold.handle.update({ ...running, running: false, powerNorm: 0, metalTemperatureKelvin: 500 });
+    cold.requestRender.mockClear();
+    cold.handle.dispose();
+    expect(cold.liner!.material).toBe(cold.hardwareMaterial);
+    expect(cold.requestRender).not.toHaveBeenCalled();
+  });
+
+  it("requests restoration of reflection-only cold hardware when disposing an isolated view", async () => {
+    const t = thermalFixture();
+    await t.handle.ready;
+    t.handle.update({ ...running, running: false, metalTemperatureKelvin: 300 }, { ...settings, contributionView: "solid" });
+    expect(t.emission().equals(t.restEmission)).toBe(true);
+    expect(t.handle.mesh.isEnabled()).toBe(false);
+    expect((t.liner!.material as PBRMaterial).directIntensity).toBe(0);
+    t.requestRender.mockClear();
+    t.handle.dispose();
+    expect(t.liner!.material).toBe(t.hardwareMaterial);
+    expect(t.requestRender).toHaveBeenCalledOnce();
+  });
+
+  it.each([false, true])("chooses an explicit compatible shader language (WebGPU=%s)", async webGpu => {
+    const t = fixture({}, webGpu);
+    await t.handle.ready;
+    expect(t.material.shaderLanguage).toBe(webGpu ? ShaderLanguage.WGSL : ShaderLanguage.GLSL);
+  });
+
+  it.each([false, true])("uses shared exposure/tone/color processing exactly once without changing gas state (WebGPU=%s)", async webGpu => {
+    const t = fixture({}, webGpu);
+    await t.handle.ready;
+    t.handle.update(running);
+    const original = materialData(t.material);
+    const processing = t.scene.imageProcessingConfiguration;
+    t.requestRender.mockClear();
+    processing.exposure = 2;
+    expect(t.requestRender).toHaveBeenCalledOnce();
+    expect(t.material.options.defines).toContain("#define EXPOSURE");
+    expect(t.material.options.uniforms).toContain("exposureLinear");
+    processing.toneMappingEnabled = true;
+    processing.toneMappingType = ImageProcessingConfiguration.TONEMAPPING_ACES;
+    processing.contrast = 1.2;
+    processing.colorCurvesEnabled = true;
+    expect(t.material.options.defines).toContain("#define TONEMAPPING 2");
+    expect(t.material.options.defines).toContain("#define CONTRAST");
+    expect(t.material.options.defines).toContain("#define COLORCURVES");
+    const effect = { setVector3: vi.fn(), setFloat: vi.fn(), setFloat4: vi.fn() };
+    vi.spyOn(t.material, "getEffect").mockReturnValue(effect as unknown as ReturnType<ShaderMaterial["getEffect"]>);
+    t.material.onBindObservable.notifyObservers(t.material);
+    expect(effect.setFloat).toHaveBeenCalledWith("exposureLinear", 2);
+    expect(effect.setFloat).toHaveBeenCalledWith("contrast", 1.2);
+    expect(effect.setFloat4).toHaveBeenCalledWith("vCameraColorCurveNeutral", expect.any(Number), expect.any(Number), expect.any(Number), expect.any(Number));
+    expect(materialData(t.material).floats.intensity).toBe(original.floats.intensity);
+
+    // Raw linear emission reaches a configured postprocess. Local tone mapping
+    // and gamma are absent, so the shared pass does not receive pre-mapped RGB.
+    processing.applyByPostProcess = true;
+    expect(t.material.options.defines).toContain("#define IMAGEPROCESSINGPOSTPROCESS");
+    expect(t.material.options.defines).not.toContain("#define EXPOSURE");
+    expect(t.material.options.defines).not.toContain("#define COLORCURVES");
+    expect(t.material.options.defines).toContain("#define TONEMAPPING 0");
+    expect(t.material.options.uniforms).not.toContain("exposureLinear");
+    const shader = webGpu ? ENGINE_EXHAUST_WGSL_FRAGMENT : ENGINE_EXHAUST_GLSL_FRAGMENT;
+    expect(shader).toContain("#include<imageProcessingFunctions>");
+    expect(shader).toContain("color = applyImageProcessing(color)");
+    expect(shader).not.toContain("encodeOutput");
+    expect(shader).not.toContain("emission / (");
+    processing.applyByPostProcess = false;
+    expect(t.material.options.defines).toContain("#define EXPOSURE");
+    expect(t.material.options.defines).toContain("#define TONEMAPPING 2");
+    expect(new Set(t.material.options.uniforms).size).toBe(t.material.options.uniforms.length);
+    t.handle.dispose();
+    t.requestRender.mockClear();
+    processing.exposure = 3;
+    expect(t.requestRender).not.toHaveBeenCalled();
+  });
+
+  it("tracks shared grading texture readiness without owning it or redrawing a hidden plume", async () => {
+    const t = fixture();
+    await t.handle.ready;
+    const processing = t.scene.imageProcessingConfiguration;
+    const grading = RawTexture.CreateRGBATexture(new Uint8Array(16), 2, 2, t.scene, false, false);
+    const dispose = vi.spyOn(grading, "dispose");
+    t.requestRender.mockClear();
+    processing.colorGradingTexture = grading;
+    processing.colorGradingEnabled = true;
+    expect(t.material.getActiveTextures()).toContain(grading);
+    expect(t.material.options.samplers).toContain("txColorTransform");
+    expect(t.requestRender).not.toHaveBeenCalled();
+    processing.colorGradingEnabled = false;
+    expect(t.material.getActiveTextures()).not.toContain(grading);
+    processing.colorGradingEnabled = true;
+    t.handle.dispose();
+    expect(dispose).not.toHaveBeenCalled();
+  });
+
+  it("uploads the current camera to the bound effect without a frame of view lag", async () => {
+    const t = fixture();
+    await t.handle.ready;
+    t.handle.update({ ...running, augmentation: true, powerNorm: 1 });
+    const setVector3 = vi.fn();
+    vi.spyOn(t.material, "getEffect").mockReturnValue({ setVector3, setFloat: vi.fn() } as unknown as ReturnType<ShaderMaterial["getEffect"]>);
+    for (const position of [new Vector3(0, 0, 20), new Vector3(10, 4, -2)]) {
+      t.camera.position.copyFrom(position);
+      t.camera.computeWorldMatrix();
+      t.material.onBindObservable.notifyObservers(t.material);
+      const expected = Vector3.TransformCoordinates(position, t.handle.mesh.computeWorldMatrix(true).clone().invert());
+      expected.z += 0.5;
+      const [name, actual] = setVector3.mock.lastCall!;
+      expect(name).toBe("cameraLocal");
+      expect(Vector3.Distance(actual, expected)).toBeLessThan(1e-5);
+    }
+  });
+
+  it.each(["handle", "attachment", "mesh"])("cancels async reveal and releases owned GPU resources on %s disposal", async owner => {
+    let release!: () => void;
+    let signal!: AbortSignal;
+    const t = fixture({ whenReady: (_meshes, nextSignal) => {
+      signal = nextSignal;
+      return new Promise(resolve => { release = resolve; });
+    } });
+    const textureDisposed = vi.spyOn(t.texture, "dispose");
+    const materialDisposed = vi.spyOn(t.material, "dispose");
+    t.handle.update(running);
+    await Promise.resolve();
+    if (owner === "handle") t.handle.dispose();
+    else if (owner === "attachment") t.attachment.dispose();
+    else t.handle.mesh.dispose();
+    await t.handle.ready;
+    expect(signal.aborted).toBe(true);
+    expect(t.handle.mesh.isDisposed()).toBe(true);
+    expect(textureDisposed).toHaveBeenCalledTimes(1);
+    expect(materialDisposed).toHaveBeenCalledTimes(1);
+    release();
+    await Promise.resolve();
+    t.handle.update(running);
+    t.handle.dispose();
+    expect(t.requestRender).not.toHaveBeenCalled();
+    expect(textureDisposed).toHaveBeenCalledTimes(1);
+  });
+
+  it("rejects preparation failures and shader failures without revealing partial content", async () => {
+    const preparation = fixture({ whenReady: async () => { throw new Error("missing LUT"); } });
+    preparation.handle.update(running);
+    await expect(preparation.handle.ready).rejects.toThrow("missing LUT");
+    expect(preparation.handle.mesh.isDisposed()).toBe(true);
+    const shader = fixture({ whenReady: () => new Promise(() => {}) });
+    shader.handle.update(running);
+    shader.material.onError?.(null!, "incompatible shader");
+    await expect(shader.handle.ready).rejects.toThrow("incompatible shader");
+    expect(shader.handle.mesh.isDisposed()).toBe(true);
+    expect(shader.requestRender).not.toHaveBeenCalled();
+  });
+
+  it("rejects invalid dimensions, bank bounds and nonuniform model scale rather than fabricate geometry", () => {
+    expect(() => fixture({ lengthMeters: Number.NaN })).toThrow("finite positive");
+    expect(() => fixture({ opticalProfile: { ...profile, gasEmission: { ...profile.gasEmission!, normalizedDensityVolume: NaN } } })).toThrow("dimensional gas");
+    expect(() => fixture({ opticalProfile: { ...profile, afterburner: { ...profile.afterburner, firstRow: 3 } } })).toThrow("optical data");
+    const t = fixture();
+    t.handle.dispose();
+    t.attachment.scaling.set(1, 2, 1);
+    expect(() => createEngineExhaust(t.scene, {
+      attachment: t.attachment, exitPosition: [0, 0, 0], direction: [0, 0, 1],
+      closedRadiusMeters: 0.4, openRadiusMeters: 0.6, lengthMeters: 6,
+      opticalProfile: profile, settings,
+    })).toThrow("uniform unsheared");
+  });
+});

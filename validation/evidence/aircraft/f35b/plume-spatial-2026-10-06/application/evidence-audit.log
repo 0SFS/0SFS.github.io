@@ -1,0 +1,244 @@
+PASS spatial-optics diagnostic has no errors
+PASS spatial-optics current input src/flight/aircraft/generated/f135-exhaust-lut.manifest.json
+PASS spatial-optics current input validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/trace.csv
+PASS spatial-optics current input validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/optics/f135-exhaust-lut.manifest.json
+PASS spatial-optics current input scripts/exhaustOptics/f135-visible-approximation.json
+PASS spatial-optics current input scripts/exhaustOptics/spatialReference.mjs
+PASS spatial-optics current input scripts/exhaustOptics/reference.mjs
+PASS spatial-optics current input scripts/validation/f35b/check-spatial-plume.mjs
+PASS spatial-optics current input src/flight/aircraft/engineGasOptics.ts
+PASS spatial-optics retained snapshot source-0-f135-exhaust-lut.manifest.json.txt
+PASS spatial-optics retained snapshot source-1-f135-exhaust-lut.manifest.json.txt
+PASS spatial-optics retained snapshot source-2-f135-visible-approximation.json.txt
+PASS spatial-optics retained snapshot source-3-spatialReference.mjs.txt
+PASS spatial-optics retained snapshot source-4-reference.mjs.txt
+PASS spatial-optics retained snapshot source-5-check-spatial-plume.mjs.txt
+PASS spatial-optics retained snapshot source-6-engineGasOptics.ts.txt
+PASS geometry diagnostic has no errors
+PASS geometry current input scripts/validation/f35b/check-plume-geometry.mjs
+PASS geometry input snapshot source-0-check-plume-geometry.mjs.txt
+PASS geometry current input src/flight/aircraft/generated/f135-exhaust-lut.manifest.json
+PASS geometry input snapshot source-1-f135-exhaust-lut.manifest.json.txt
+PASS geometry current input src/flight/aircraft/engineExhaustProfiles.ts
+PASS geometry input snapshot source-2-engineExhaustProfiles.ts.txt
+PASS geometry current input src/flight/aircraft/createEngineExhaust.ts
+PASS geometry input snapshot source-3-createEngineExhaust.ts.txt
+PASS geometry current input src/flight/aircraft/engineNozzleRig.ts
+PASS geometry input snapshot source-4-engineNozzleRig.ts.txt
+PASS geometry current input src/flight/aircraft/engineGasOptics.ts
+PASS geometry input snapshot source-5-engineGasOptics.ts.txt
+PASS geometry current input public/aircraft/f-35b/engine/F135-PW-600-full.glb
+PASS geometry current input validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/trace.csv
+PASS spatial-optics inventory README.md
+PASS spatial-optics inventory ab-onset-oblique-day.png
+PASS spatial-optics inventory ab-onset-oblique-night.png
+PASS spatial-optics inventory ab-onset-rear-day.png
+PASS spatial-optics inventory ab-onset-rear-night.png
+PASS spatial-optics inventory ab-sustained-oblique-day.png
+PASS spatial-optics inventory ab-sustained-oblique-night.png
+PASS spatial-optics inventory ab-sustained-rear-day.png
+PASS spatial-optics inventory ab-sustained-rear-night.png
+PASS spatial-optics inventory field-resolution-comparison.log
+PASS spatial-optics inventory lint.log
+PASS spatial-optics inventory powered-lift-oblique-day.png
+PASS spatial-optics inventory powered-lift-oblique-night.png
+PASS spatial-optics inventory powered-lift-rear-day.png
+PASS spatial-optics inventory powered-lift-rear-night.png
+PASS spatial-optics inventory previous-ab-onset-oblique-day.png
+PASS spatial-optics inventory previous-ab-onset-oblique-night.png
+PASS spatial-optics inventory previous-ab-onset-rear-day.png
+PASS spatial-optics inventory previous-ab-onset-rear-night.png
+PASS spatial-optics inventory previous-ab-sustained-oblique-day.png
+PASS spatial-optics inventory previous-ab-sustained-oblique-night.png
+PASS spatial-optics inventory previous-ab-sustained-rear-day.png
+PASS spatial-optics inventory previous-ab-sustained-rear-night.png
+PASS spatial-optics inventory previous-attempts/combined-xyz-32x16.json
+PASS spatial-optics inventory previous-attempts/combined-xyz-32x16.log
+PASS spatial-optics inventory previous-attempts/combined-xyz-64x32-uniform-rays.json
+PASS spatial-optics inventory previous-attempts/combined-xyz-64x32-uniform-rays.log
+PASS spatial-optics inventory previous-attempts/initial-per-component-gamut.json
+PASS spatial-optics inventory previous-attempts/initial-per-component-gamut.log
+PASS spatial-optics inventory previous-powered-lift-oblique-day.png
+PASS spatial-optics inventory previous-powered-lift-oblique-night.png
+PASS spatial-optics inventory previous-powered-lift-rear-day.png
+PASS spatial-optics inventory previous-powered-lift-rear-night.png
+PASS spatial-optics inventory report.json
+PASS spatial-optics inventory run.log
+PASS spatial-optics inventory source-0-f135-exhaust-lut.manifest.json.txt
+PASS spatial-optics inventory source-1-f135-exhaust-lut.manifest.json.txt
+PASS spatial-optics inventory source-2-f135-visible-approximation.json.txt
+PASS spatial-optics inventory source-3-spatialReference.mjs.txt
+PASS spatial-optics inventory source-4-reference.mjs.txt
+PASS spatial-optics inventory source-5-check-spatial-plume.mjs.txt
+PASS spatial-optics inventory source-6-engineGasOptics.ts.txt
+PASS geometry inventory README.md
+PASS geometry inventory entry.mjs.txt
+PASS geometry inventory entry.ts.txt
+PASS geometry inventory lint.log
+PASS geometry inventory previous-new-field-uniform-rays.json
+PASS geometry inventory previous-new-field-uniform-rays.log
+PASS geometry inventory report.json
+PASS geometry inventory run.log
+PASS geometry inventory source-0-check-plume-geometry.mjs.txt
+PASS geometry inventory source-1-f135-exhaust-lut.manifest.json.txt
+PASS geometry inventory source-2-engineExhaustProfiles.ts.txt
+PASS geometry inventory source-3-createEngineExhaust.ts.txt
+PASS geometry inventory source-4-engineNozzleRig.ts.txt
+PASS geometry inventory source-5-engineGasOptics.ts.txt
+PASS geometry-baseline inventory README.md
+PASS geometry-baseline inventory check-plume-geometry.mjs.txt
+PASS geometry-baseline inventory compiled-audit-entry.mjs.txt
+PASS geometry-baseline inventory engineGasOptics.ts.txt
+PASS geometry-baseline inventory engineNozzleRig.ts.txt
+PASS geometry-baseline inventory lint.log
+PASS geometry-baseline inventory report.json
+PASS geometry-baseline inventory run.log
+PASS geometry-baseline inventory snapshots.json
+PASS optics bake input/output scripts/exhaustOptics/f135-visible-approximation.json
+PASS optics snapshot optical-parameters.json
+PASS optics bake input/output scripts/exhaustOptics/bake.mjs
+PASS optics snapshot bake.mjs.txt
+PASS optics bake input/output scripts/build-exhaust-optics.mjs
+PASS optics snapshot build-exhaust-optics.mjs.txt
+PASS optics bake input/output src/flight/aircraft/engineGasOptics.ts
+PASS optics snapshot engineGasOptics.ts.txt
+PASS optics bake input/output scripts/exhaustOptics/data/CIE_xyz_1931_2deg.csv
+PASS optics bake input/output scripts/exhaustOptics/data/CIE_xyz_1931_2deg.csv_metadata.json
+PASS optics bake input/output src/flight/aircraft/generated/f135ExhaustOpticalData.ts
+PASS optics bake input/output src/flight/aircraft/generated/f135-exhaust-lut.manifest.json
+PASS optics bake input/output src/flight/aircraft/generated/f135-exhaust-lut.png
+PASS optics bake input/output src/flight/aircraft/generated/f135-exhaust-spatial.png
+PASS preserved prior source package.json
+PASS preserved prior source package-lock.json
+PASS preserved prior source public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml
+PASS preserved prior source scripts/build-f135-engine.mjs
+PASS preserved prior source scripts/build-f135-engine.test.mjs
+PASS preserved prior source scripts/f135Engine/glb.mjs
+PASS preserved prior source scripts/f135Engine/intersections.mjs
+PASS preserved prior source scripts/f135Engine/mechanism.mjs
+PASS preserved prior source scripts/f135Engine/profile.json
+PASS preserved prior source scripts/f135Engine/source.mjs
+PASS preserved prior source src/flight/aircraft/createEngineHotSurfaceGlow.ts
+PASS preserved prior source src/flight/aircraft/createEngineHotSurfaceGlow.test.ts
+PASS preserved prior source src/flight/aircraft/engineNozzleRig.ts
+PASS preserved prior source src/flight/aircraft/engineNozzleRig.test.ts
+PASS preserved prior source src/flight/aircraft/generated/f135EngineData.ts
+PASS preserved prior source src/flight/engineTestStand.ts
+PASS preserved prior source src/flight/engineTestStand.test.ts
+PASS preserved prior source src/flight/engineTestStand.integration.test.ts
+PASS preserved rigid asset public/aircraft/f-35b/engine/F135-PW-600-installed.glb
+PASS preserved rigid asset public/aircraft/f-35b/engine/F135-PW-600-full.glb
+PASS native data unchanged aircraft/F-35B-jsbsim/F-35B-jsbsim.xml
+PASS native data unchanged aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml
+PASS native data unchanged aircraft/F-35B-jsbsim/Engines/direct.xml
+PASS native data unchanged aircraft/F-35B-jsbsim/Engines/liftfan.xml
+PASS native data unchanged aircraft/F-35B-jsbsim/Engines/sidefan.xml
+PASS native data unchanged aircraft/F-35B-jsbsim/Systems/pushback.xml
+PASS installed native archive unchanged
+PASS native canonical checkout clean
+PASS prior native report unchanged
+PASS legacy evaluator exact on 4171 archived rows
+PASS 169 active tests; no evidence/build discovery
+PASS final CI recorded expected test counts
+PASS git diff whitespace check passed
+PASS pre-existing unrelated tracked diff preserved docs/foss-earth-relationship.md
+PASS pre-existing unrelated tracked diff preserved docs/jsbsim.md
+PASS pre-existing unrelated tracked diff preserved docs/phone-controller-ui.md
+PASS pre-existing unrelated tracked diff preserved docs/proposals/flight-settings.md
+PASS pre-existing unrelated tracked diff preserved package-lock.json
+PASS pre-existing unrelated tracked diff preserved package.json
+PASS pre-existing unrelated tracked diff preserved public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml
+PASS pre-existing unrelated tracked diff preserved scripts/validation/audio/check-engine-orbs.mjs
+PASS pre-existing unrelated tracked diff preserved scripts/validation/f35b/check-exhaust-headless.mjs
+PASS pre-existing unrelated tracked diff preserved scripts/verify-jsbsim-artifact.test.mjs
+PASS pre-existing unrelated tracked diff preserved src/flight/aircraft/aircraftAnimation.f35b.test.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/aircraft/aircraftAnimation.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/aircraft/aircraftCatalog.test.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/aircraft/aircraftCatalog.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/aircraft/createAircraftModel.test.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/aircraft/createAircraftModel.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/aircraft/createEngineHotSurfaceGlow.test.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/aircraft/createEngineHotSurfaceGlow.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/aircraft/createPlaceholderAircraft.test.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/aircraft/createPlaceholderAircraft.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/createFlightSimApp.phone.test.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/hud/AircraftSelectionPanel.test.tsx
+PASS pre-existing unrelated tracked diff preserved src/flight/hud/FlightControlPanel.tsx
+PASS pre-existing unrelated tracked diff preserved src/flight/hud/engineMonitor.css
+PASS pre-existing unrelated tracked diff preserved src/flight/hud/engineMonitor.test.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/hud/engineMonitor.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/hud/engineMonitorModel.test.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/hud/engineMonitorModel.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/hud/engineSpoolMotion.test.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/hud/engineSpoolMotion.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/hud/engineSpoolRenderer.test.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/hud/engineSpoolRenderer.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/hud/engineSummary.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/jsbsim/bootstrapC172.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/jsbsim/jsbsimBuildIdentity.test.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/jsbsim/jsbsimBuildIdentity.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/jsbsim/resetFlightLocation.test.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/jsbsim/resetFlightLocation.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/physics/safeFlightState.ts
+PASS pre-existing unrelated tracked diff preserved src/flight/remote/engineStatus.ts
+PASS pre-existing unrelated tracked diff preserved src/remote/PhoneController.test.tsx
+PASS pre-existing unrelated tracked diff preserved src/remote/PhoneEngine.test.tsx
+PASS pre-existing unrelated tracked diff preserved src/remote/PhoneEngine.tsx
+PASS pre-existing unrelated tracked diff preserved src/remote/protocol.test.ts
+PASS pre-existing unrelated tracked diff preserved src/remote/protocol.ts
+PASS local link docs/validation/f135-plume-spatial.md -> ../f135-plume-physical-followup-prompt.md
+PASS local link docs/validation/f135-plume-spatial.md -> ../../validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/acceptance.json
+PASS local link docs/validation/f135-plume-spatial.md -> ../../validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/README.md
+PASS local link docs/validation/f135-plume-spatial.md -> ../../validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/geometry-baseline/README.md
+PASS local link docs/validation/f135-plume-spatial.md -> ../../validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/spatial-optics/README.md
+PASS local link docs/validation/f135-plume-spatial.md -> ../../validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/geometry/README.md
+PASS local link docs/validation/f135-plume-spatial.md -> ../../validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/application/README.md
+PASS local link docs/validation/f135-plume-spatial.md -> ../proposals/f35b-fdm.md
+PASS local link docs/f135-plume-physical-followup-prompt.md -> validation/f135-engine-physical-correction.md
+PASS local link docs/f135-plume-physical-followup-prompt.md -> validation/f135-plume-spatial.md
+PASS local link docs/f135-plume-physical-followup-prompt.md -> ../src/flight/aircraft/engineGasOptics.ts
+PASS local link docs/f135-plume-physical-followup-prompt.md -> ../src/flight/aircraft/createEngineExhaust.ts
+PASS local link docs/f135-plume-physical-followup-prompt.md -> ../scripts/exhaustOptics/f135-visible-approximation.json
+PASS local link docs/f135-plume-physical-followup-prompt.md -> ../validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/native/trace.csv
+PASS local link docs/f135-plume-physical-followup-prompt.md -> proposals/f35b-fdm.md
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/application/README.md -> typecheck-final.log
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/application/README.md -> related-final.log
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/application/README.md -> lint-final.log
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/application/README.md -> test-discovery-final.log
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/application/README.md -> ci-final.log
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/application/README.md -> diff-check-final.log
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/application/README.md -> renderer-focused.log
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/application/README.md -> typecheck-integration.log
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/application/README.md -> ../acceptance.json
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/application/README.md -> evidence-audit.log
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/application/README.md -> native-status-final.log
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/application/README.md -> ../native/legacy-evaluator-recheck.log
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/README.md -> acceptance.json
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/README.md -> report.json
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/README.md -> trace.csv
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/README.md -> qualification-helpers.mjs.txt
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/README.md -> qualification-helpers.ts.txt
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/README.md -> baseline-optical-manifest.json
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/README.md -> baseline-shader.ts.txt
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/README.md -> baseline-spatial.png
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/README.md -> native-station-audit.json
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/README.md -> baseline-native-cycle.svg
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/README.md -> baseline-ab-transitions.svg
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/README.md -> baseline-rays-and-support.svg
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/README.md -> plot-provenance.json
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/README.md -> qualification-trace-script.mjs.txt
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/spatial-optics/README.md -> report.json
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/spatial-optics/README.md -> ../native/trace.csv
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/spatial-optics/README.md -> files.json
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/spatial-optics/README.md -> previous-attempts
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/geometry/README.md -> report.json
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/geometry/README.md -> ../native/trace.csv
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/geometry/README.md -> files.json
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/geometry/README.md -> previous-new-field-uniform-rays.json
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/geometry/README.md -> ../geometry-baseline/README.md
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/geometry-baseline/README.md -> report.json
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/geometry-baseline/README.md -> compiled-audit-entry.mjs.txt
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/geometry-baseline/README.md -> snapshots.json
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/optics-model/README.md -> ../../../../../../docs/validation/f135-plume-spatial.md
+PASS local link validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/optics-model/README.md -> ../spatial-optics/
+PASS evidence audit complete; 55 local links, 45 unrelated tracked diffs preserved

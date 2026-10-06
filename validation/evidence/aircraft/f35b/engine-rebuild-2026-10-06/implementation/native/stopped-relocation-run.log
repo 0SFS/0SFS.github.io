@@ -1,0 +1,17 @@
+(node:36070) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+{
+  "out": "/Users/felg/gh/0sfs/build/f135-rebuild-thermal-stopped-20261006",
+  "pass": true,
+  "checks": [
+    {
+      "name": "stopped-hot-runway-relocation",
+      "passed": true
+    }
+  ],
+  "dryHeating": null,
+  "boundEvaluations": 3600,
+  "maxBurnedLimitErrorKgSec": 3.552713678800501e-15,
+  "limitedFuelSeen": true,
+  "sourceIdentityStable": true
+}

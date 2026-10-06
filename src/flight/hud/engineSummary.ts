@@ -1,6 +1,7 @@
 import "./engineMonitor.css";
 import type { EngineKind, EnginePhase, EnginePhaseReading, EngineSample } from "./engineMonitorModel";
 import type { EngineRotorBladeCounts } from "../aircraft/engineRotorDefinitions";
+import type { EngineSpoolMotionStatus } from "./engineSpoolRenderer";
 
 /**
  * The engine monitor's compact face — fuel flow, turbine N1/N2 and thrust or
@@ -16,6 +17,8 @@ export type FuelFlowUnit = "lb/h" | "gal/h";
 export interface EngineSummaryView {
   kind?: EngineKind | null;
   rotorBlades?: EngineRotorBladeCounts;
+  /** This screen's last submitted animation cadence and adaptive visual speed. */
+  rotorMotionDescription?: string;
   simTimeS?: number | null;
   maxN1Pct?: number | null;
   maxN2Pct?: number | null;
@@ -83,6 +86,14 @@ export function engineRotorDescription(view: EngineSummaryView): string {
   return `One marker per blade: N1 fan row ${count(blades.outer, blades.outerEstimated)}`
     + (blades.inner === null ? "." : `; N2 core compressor rotor ${count(blades.inner, blades.innerEstimated)}.`)
     + " Each count represents a single rotor, not all stages.";
+}
+
+export function engineRotorMotionDescription(status: EngineSpoolMotionStatus, maxPatternStep: number): string {
+  const pattern = "Two opposite brightness hotspots rotate with each shaft. Individual blades can still appear to reverse.";
+  if (status.fps === null || status.maxTurnsPerSecond === null) return `${pattern} Waiting for shaft animation cadence.`;
+  return `${pattern} Last motion cadence ${status.fps.toFixed(0)} frames/s; full-scale display speed ${status.maxTurnsPerSecond.toFixed(2)} rev/s.`
+    + (status.limited ? ` Limited to ${maxPatternStep.toFixed(2)} pattern pitch per drawn frame to preserve the hotspots' forward motion.`
+      : " Within the requested speed ceiling and pattern-step limit.");
 }
 
 /**
@@ -167,8 +178,23 @@ export function closestUprightRingAngle(
 }
 
 function placeOnRing(node: HTMLElement, radiusPx: number, angleDeg: number): void {
-  node.style.transform =
-    `translate(-50%, -50%) rotate(${angleDeg}deg) translateY(${-radiusPx}px) rotate(${-angleDeg}deg)`;
+  const transform = `translate(-50%, -50%) rotate(${angleDeg}deg) translateY(${-radiusPx}px) rotate(${-angleDeg}deg)`;
+  if (node.style.transform !== transform) node.style.transform = transform;
+}
+
+/** Keep unchanged readouts independent of the orb canvas's animation cadence. */
+function updateText(node: HTMLElement, text: string): boolean {
+  if (node.textContent === text) return false;
+  node.textContent = text;
+  return true;
+}
+
+function updateHidden(node: HTMLElement, hidden: boolean): void {
+  if (node.hidden !== hidden) node.hidden = hidden;
+}
+
+function updateTitle(node: HTMLElement, title: string): void {
+  if (node.title !== title) node.title = title;
 }
 
 function ringRadiusPx(spools: HTMLElement): number {
@@ -265,49 +291,53 @@ export function createEngineSummary(): EngineSummary {
     flow,
     spools,
     render(view, unit) {
-      phaseChip.textContent = view.label;
-      if (view.phase === null) delete phaseChip.dataset.phase;
-      else phaseChip.dataset.phase = view.phase;
+      updateText(phaseChip, view.label);
+      if (view.phase === null) {
+        if (phaseChip.dataset.phase !== undefined) delete phaseChip.dataset.phase;
+      } else if (phaseChip.dataset.phase !== view.phase) phaseChip.dataset.phase = view.phase;
       const kind = summaryKind(view);
       const turbine = kind === "turbine";
       const piston = kind === "piston";
-      spools.hidden = kind === null;
-      spools.dataset.kind = kind ?? "unknown";
-      n1Readout.hidden = !turbine;
-      n2Core.hidden = !turbine;
-      thrustReadout.hidden = !turbine;
-      rpmCore.hidden = !piston;
+      updateHidden(spools, kind === null);
+      if (spools.dataset.kind !== (kind ?? "unknown")) spools.dataset.kind = kind ?? "unknown";
+      updateHidden(n1Readout, !turbine);
+      updateHidden(n2Core, !turbine);
+      updateHidden(thrustReadout, !turbine);
+      updateHidden(rpmCore, !piston);
       if (turbine) {
-        n1Value.textContent = view.n1Pct === null ? "—" : formatSpoolPct(view.n1Pct);
-        n2Value.textContent = view.n2Pct === null ? "—" : formatSpoolPct(view.n2Pct);
-        thrustValue.textContent = view.thrustLbf === null ? "0000" : formatThrustLbf(view.thrustLbf);
-        spools.title = `N1 ${n1Value.textContent}% · N2 ${n2Value.textContent}%`
+        const n1Changed = updateText(n1Value, view.n1Pct === null ? "—" : formatSpoolPct(view.n1Pct));
+        updateText(n2Value, view.n2Pct === null ? "—" : formatSpoolPct(view.n2Pct));
+        const thrustChanged = updateText(thrustValue, view.thrustLbf === null ? "0000" : formatThrustLbf(view.thrustLbf));
+        updateTitle(spools, `N1 ${n1Value.textContent}% · N2 ${n2Value.textContent}%`
           + (view.thrustLbf === null ? "" : ` · thrust ${Math.round(view.thrustLbf)} lbf`)
-          + " · Orb motion: scaled model percent speed, not physical shaft RPM. " + engineRotorDescription(view);
+          + " · Orb motion: scaled model percent speed, not physical shaft RPM. " + engineRotorDescription(view)
+          + (view.rotorMotionDescription ? ` ${view.rotorMotionDescription}` : ""));
+        if (n1Changed || thrustChanged) spoolRingPacked = false;
         packSpoolRingOnce();
       } else if (piston) {
-        rpmValue.textContent = view.rpm === null ? "—" : Math.round(view.rpm).toString();
-        spools.title = `${rpmValue.textContent} RPM · Orb motion: scaled shaft speed`
+        updateText(rpmValue, view.rpm === null ? "—" : Math.round(view.rpm).toString());
+        updateTitle(spools, `${rpmValue.textContent} RPM · Orb motion: scaled shaft speed`
           + (view.maxRpm != null && view.maxRpm > 0 ? `, maximum ${view.maxRpm} RPM.` : ", maximum unavailable.")
-          + " " + engineRotorDescription(view);
+          + " " + engineRotorDescription(view)
+          + (view.rotorMotionDescription ? ` ${view.rotorMotionDescription}` : ""));
       }
       const hasFlow = view.fuelFlowPph !== null || view.fuelFlowGph !== null;
-      flow.hidden = !hasFlow;
+      updateHidden(flow, !hasFlow);
       if (hasFlow) {
         if (unit === "gal/h") {
           const gph = view.fuelFlowGph ?? (view.fuelFlowPph !== null ? view.fuelFlowPph / LB_PER_US_GAL : 0);
-          flowValue.textContent = padFuelFlow(gph);
-          flowUnit.textContent = "gal/h";
+          updateText(flowValue, padFuelFlow(gph));
+          updateText(flowUnit, "gal/h");
         } else {
           const pph = view.fuelFlowPph ?? (view.fuelFlowGph !== null ? view.fuelFlowGph * LB_PER_US_GAL : 0);
-          flowValue.textContent = padFuelFlow(pph);
-          flowUnit.textContent = "lb/h";
+          updateText(flowValue, padFuelFlow(pph));
+          updateText(flowUnit, "lb/h");
         }
       }
       const parts: string[] = [];
       if (kind === null && view.thrustLbf !== null) parts.push(`THR ${Math.round(view.thrustLbf)} lbf`);
-      values.hidden = parts.length === 0;
-      values.textContent = parts.join("  ");
+      updateHidden(values, parts.length === 0);
+      updateText(values, parts.join("  "));
     },
   };
 }

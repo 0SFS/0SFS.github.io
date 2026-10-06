@@ -1,0 +1,129 @@
+
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+Engine location ignored, only thruster location is used.
+Engine orientation ignored, only thruster orientation is used.
+Engine location ignored, only thruster location is used.
+Engine orientation ignored, only thruster orientation is used.
+Engine location ignored, only thruster location is used.
+Engine orientation ignored, only thruster orientation is used.
+Engine location ignored, only thruster location is used.
+Engine orientation ignored, only thruster orientation is used.
+
+In file /Users/felg/gh/0sfs/public/jsbsim-data/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml: line 304
+      Property /sim/model/pushback/target-speed-fps is already defined.
+      Its value (0) will not be overridden.
+{
+  "xmlSHA256": "ec89d3da28c3bd64e69f8932fe09d8c27888bddb587012e10b2d93c44c4652bc",
+  "phases": [
+    {
+      "phase": "cold-RunIC",
+      "time": 0.0,
+      "n2": 0.0,
+      "egtC": 14.999999999999968,
+      "running": 0.0,
+      "augmentation": 0.0,
+      "fuelFlowPps": 0.0,
+      "gasK": 288.1499999999999,
+      "metalK": 288.1499999999999,
+      "initialized": 0.0,
+      "valid": 1.0,
+      "suppliedABKgSec": 0.0,
+      "burnedABKgSec": 0.0
+    },
+    {
+      "phase": "cold-end",
+      "time": 0.9999999999999989,
+      "n2": 4.2444489193200236e-24,
+      "egtC": 13.018894988070587,
+      "running": 0.0,
+      "augmentation": 0.0,
+      "fuelFlowPps": 0.0,
+      "gasK": 286.1688949880706,
+      "metalK": 286.16889498172145,
+      "initialized": 1.0,
+      "valid": 1.0,
+      "suppliedABKgSec": 0.0,
+      "burnedABKgSec": 0.0
+    },
+    {
+      "phase": "dry48-end",
+      "time": 60.99999999999718,
+      "n2": 79.2,
+      "egtC": 547.5268949880559,
+      "running": 1.0,
+      "augmentation": 0.0,
+      "fuelFlowPps": 2.309903494575836,
+      "gasK": 820.6768949880559,
+      "metalK": 671.1428705533635,
+      "initialized": 1.0,
+      "valid": 1.0,
+      "suppliedABKgSec": 0.0,
+      "burnedABKgSec": 0.0
+    },
+    {
+      "phase": "dry98-end",
+      "time": 180.99999999999972,
+      "n2": 99.2,
+      "egtC": 726.0768949883068,
+      "running": 1.0,
+      "augmentation": 0.0,
+      "fuelFlowPps": 6.249439955881203,
+      "gasK": 999.2268949883068,
+      "metalK": 845.1704451296657,
+      "initialized": 1.0,
+      "valid": 1.0,
+      "suppliedABKgSec": 0.0,
+      "burnedABKgSec": 0.0
+    },
+    {
+      "phase": "AB-end",
+      "time": 300.9999999998906,
+      "n2": 100.0,
+      "egtC": 733.2188949888011,
+      "running": 1.0,
+      "augmentation": 1.0,
+      "fuelFlowPps": 19.93680666656408,
+      "gasK": 2361.8185386206856,
+      "metalK": 1630.507020773609,
+      "initialized": 1.0,
+      "valid": 1.0,
+      "suppliedABKgSec": 6.099131199974914,
+      "burnedABKgSec": 4.752389777274471
+    },
+    {
+      "phase": "AB-off-end",
+      "time": 420.99999999978144,
+      "n2": 79.2,
+      "egtC": 547.5268949887349,
+      "running": 1.0,
+      "augmentation": 0.0,
+      "fuelFlowPps": 2.3099034945947987,
+      "gasK": 820.6768949887348,
+      "metalK": 703.0612220007843,
+      "initialized": 1.0,
+      "valid": 1.0,
+      "suppliedABKgSec": 0.0,
+      "burnedABKgSec": 0.0
+    },
+    {
+      "phase": "shutdown-end",
+      "time": 600.9999999996178,
+      "n2": 79.2,
+      "egtC": 547.526894988506,
+      "running": 1.0,
+      "augmentation": 0.0,
+      "fuelFlowPps": 2.309903494588408,
+      "gasK": 820.676894988506,
+      "metalK": 700.1418657161316,
+      "initialized": 1.0,
+      "valid": 1.0,
+      "suppliedABKgSec": 0.0,
+      "burnedABKgSec": 0.0
+    }
+  ]
+}

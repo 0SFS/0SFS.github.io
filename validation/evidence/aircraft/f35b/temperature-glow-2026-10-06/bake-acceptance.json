@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-06T06:08:11.356Z",
+  "scope": "Offline thermal-table bake identity and retained provenance. Parent separately owns software/native acceptance; no new GPU qualification.",
+  "commands": [
+    {
+      "command": "node scripts/build-exhaust-optics.mjs --install",
+      "exitCode": 0,
+      "log": "bake-initial.log"
+    },
+    {
+      "command": "node scripts/build-exhaust-optics.mjs --install",
+      "exitCode": 0,
+      "reason": "Correct gas/plume versus hardware normalization wording in provenance.",
+      "log": "bake-provenance-followup.log"
+    },
+    {
+      "command": "node --check scripts/validation/f35b/check-exhaust-headless.mjs",
+      "exitCode": 0,
+      "qualification": "Syntax only; harness not bundled or executed."
+    }
+  ],
+  "surfaceEmission": {
+    "temperatureKelvinRange": [
+      300,
+      1400
+    ],
+    "sampleCount": 64,
+    "referencePeakEmission": 0.25,
+    "normalization": "Raw Planck/CIE linear RGB normalized once at the upper reference. No per-temperature peak normalization.",
+    "nativeMeaning": "Declared native gas EGT is an uncalibrated hardware-temperature proxy. No renderer gas-to-metal offset, inertia, running gate or artistic flicker."
+  },
+  "plumePngByteIdentical": true,
+  "plumePngSha256": "208ae6cb513beedeb2a5e2b1f0f2ca17952ca66c2ca682733570e3f469af39a6",
+  "qualification": {
+    "offlineBakePassed": true,
+    "softwareChecks": "Parent-managed checks in progress; this receipt makes no pass claim.",
+    "nativeTemperatureBinding": "Parent-managed fork.12 adoption/checks; separate native receipt.",
+    "gpuThermalEpisode": "Not run. Future harness records native temperature, material lookup, cutoff/cooldown and pause."
+  },
+  "artifacts": [
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.png",
+      "bytes": 2856,
+      "sha256": "208ae6cb513beedeb2a5e2b1f0f2ca17952ca66c2ca682733570e3f469af39a6"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135ExhaustOpticalData.ts",
+      "bytes": 5211,
+      "sha256": "2c234f513e8f688c9d67c93d8aac34297003b49df367dc118e63395f35028df1"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json",
+      "bytes": 15119,
+      "sha256": "bcb2a9c4045bfbb4ec5f75b3806bdf3b26ca06ceb42ad563ab4002ce7ad50b10"
+    },
+    {
+      "path": "scripts/exhaustOptics/f135-visible-approximation.json",
+      "bytes": 6705,
+      "sha256": "abd39171749ca2f24ae2974fc513d3f205d97e4c527fcc481da2894194e54799"
+    },
+    {
+      "path": "scripts/exhaustOptics/bake.mjs",
+      "bytes": 9558,
+      "sha256": "181045d640d768619d9286aabd130581ad0f0ac5c4d535ca05b03f23eec40c9a"
+    },
+    {
+      "path": "scripts/build-exhaust-optics.mjs",
+      "bytes": 6127,
+      "sha256": "731c0d500e671db57a83b11ac6b514b6e8cca7439e611d88740d5491859db83d"
+    },
+    {
+      "path": "src/flight/aircraft/engineExhaustProfiles.ts",
+      "bytes": 1808,
+      "sha256": "99865beab7bdf04ce30be809a6c5b24b68a02ec41ba74975fbfc7bb138dfe8b3"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineHotSurfaceGlow.ts",
+      "bytes": 8011,
+      "sha256": "7d0a829e68146cee6aeeb05ff391b11efe4d3938e5d0674d9aeb760050fb5277"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineHotSurfaceGlow.test.ts",
+      "bytes": 10747,
+      "sha256": "96c00ecdbafbf5b600f8b6dc19294a93437355af5fef3b18d676ce2a3ec95ffb"
+    },
+    {
+      "path": "scripts/build-exhaust-optics.test.mjs",
+      "bytes": 8892,
+      "sha256": "c76840fa2162f668bb347909af509a6d324fe56e0194348bce999a8e6910c1c4"
+    },
+    {
+      "path": "scripts/validation/f35b/check-exhaust-headless.mjs",
+      "bytes": 34560,
+      "sha256": "c8d1114136099330f1e0d18762b9afa2cb3075f0f7af666ad5fd24f1494a0764"
+    }
+  ],
+  "retained": [
+    {
+      "path": "bake-initial.log",
+      "bytes": 960,
+      "sha256": "7690af2682639ebc28c13e734e208145d030c9e60383bdf52743a2b24d24f248"
+    },
+    {
+      "path": "bake-provenance-followup.log",
+      "bytes": 960,
+      "sha256": "e0497d978c29092077a17caf732e81df5c37673446400f13fd2b93854cf9afb3"
+    },
+    {
+      "path": "bake-initial-identity.json",
+      "bytes": 758,
+      "sha256": "136bce21711104a789bb02d0dd67d91c398370b696b3b3fe6d368c2d138760e2"
+    },
+    {
+      "path": "before-f135-exhaust-lut.png",
+      "bytes": 2856,
+      "sha256": "208ae6cb513beedeb2a5e2b1f0f2ca17952ca66c2ca682733570e3f469af39a6"
+    },
+    {
+      "path": "before-f135-exhaust-lut.manifest.json",
+      "bytes": 11006,
+      "sha256": "f6265447eb2f07cbe96098388bf2ae967d0c4c1039ba97ccaa23c7b1e6bdb5ea"
+    }
+  ]
+}

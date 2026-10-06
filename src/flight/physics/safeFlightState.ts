@@ -32,6 +32,57 @@ const controls = ["fcs/throttle-cmd-norm", "fcs/mixture-cmd-norm", "fcs/elevator
   "atmosphere/wind-north-fps", "atmosphere/wind-east-fps", "atmosphere/wind-down-fps"];
 const optionalAircraftControls = ["fcs/stovl-cmd-norm", "fcs/stovl-pos-norm", "fcs/control-law-mode"];
 const modelControls = new WeakMap<JSBSimSdk, readonly string[]>();
+const modelEngineThermalState = new WeakMap<JSBSimSdk, readonly { state: string; initialized: string }[]>();
+
+function engineThermalStateProperties(sdk: JSBSimSdk): readonly { state: string; initialized: string }[] {
+  const cached = modelEngineThermalState.get(sdk);
+  if (cached) return cached;
+  const catalog = new Map<string, string>();
+  if (typeof sdk.queryPropertyCatalog === "function") {
+    for (const line of sdk.queryPropertyCatalog("propulsion/engine").split(/\r?\n/)) {
+      const match = /^(\S+)\s+\(([RW]+)\)\s*$/.exec(line.trim());
+      if (match) catalog.set(match[1], match[2]);
+    }
+  }
+  const properties = [...catalog].flatMap(([state, access]) => {
+    if (!/^propulsion\/engine(?:\[\d+\])?\/thermal\/(?:[a-z0-9-]+\/)?metal-temperature-state-k$/.test(state)
+      || !access.includes("R") || !access.includes("W")) return [];
+    const initialized = state.replace(/metal-temperature-state-k$/, "initialized");
+    return catalog.get(initialized)?.includes("R") ? [{ state, initialized }] : [];
+  });
+  // One SDK owns one model. Preserve the native catalogue's index spelling
+  // and never create thermal nodes for engines without this capability.
+  modelEngineThermalState.set(sdk, properties);
+  return properties;
+}
+
+function captureEngineThermalState(sdk: JSBSimSdk): [string, number][] {
+  return engineThermalStateProperties(sdk).flatMap(({ state, initialized }) => {
+    // A pending native seed is not a hot state. Restoring a positive Kelvin
+    // value marks it initialized, so omit pending engines to retain that state.
+    const ready = sdk.getPropertyValue(initialized);
+    if (!Number.isFinite(ready) || ready <= 0.5) return [];
+    const temperature = sdk.getPropertyValue(state);
+    return Number.isFinite(temperature) && temperature > 0 ? [[state, temperature] as [string, number]] : [];
+  });
+}
+
+/** Restore observed native wall state before RunIC or warm engine initialization. */
+export function restoreEngineThermalState(sdk: JSBSimSdk, snapshotControls: Readonly<Record<string, number>>): void {
+  for (const { state } of engineThermalStateProperties(sdk)) {
+    const temperature = snapshotControls[state];
+    if (Number.isFinite(temperature) && temperature > 0) sdk.setPropertyValue(state, temperature);
+  }
+}
+
+function restoreControls(sdk: JSBSimSdk, snapshotControls: Readonly<Record<string, number>>): void {
+  for (const [property, value] of Object.entries(snapshotControls)) {
+    // Native thermal state has its own capability and validation boundary;
+    // an old/foreign snapshot must not invent nodes on another engine model.
+    if (/^propulsion\/engine(?:\[\d+\])?\/thermal\//.test(property)) continue;
+    sdk.setPropertyValue(property, value);
+  }
+}
 
 function controlsForModel(sdk: JSBSimSdk): readonly string[] {
   const cached = modelControls.get(sdk);
@@ -62,7 +113,12 @@ const initialProperties: Record<string, string> = {
 export function captureSimulation(sdk: JSBSimSdk) {
   const timing = sdk as JSBSimSdk & { getSimTime?: () => number };
   return { initial: Object.fromEntries(Object.entries(initialProperties).map(([ic, property]) => [ic, sdk.getPropertyValue(property)])),
-    controls: Object.fromEntries(controlsForModel(sdk).map(property => [property, sdk.getPropertyValue(property)])),
+    // The existing snapshot record includes restorable native state alongside
+    // pilot controls. These values are observed, never synthesized by the app.
+    controls: Object.fromEntries([
+      ...controlsForModel(sdk).map(property => [property, sdk.getPropertyValue(property)] as [string, number]),
+      ...captureEngineThermalState(sdk),
+    ]),
     running: sdk.getPropertyValue("propulsion/engine/set-running") > 0.5,
     // Contact recovery rebuilds model state at zero integration time, but it is
     // still part of the current flight. Preserve the public simulation clock so
@@ -77,6 +133,7 @@ export type SimulationSnapshot = ReturnType<typeof captureSimulation>;
 export function restoreSimulation(sdk: JSBSimSdk, snapshot: SimulationSnapshot): void {
   if (![...Object.values(snapshot.initial), ...Object.values(snapshot.controls), snapshot.simTimeS].every(Number.isFinite)) throw new Error("Invalid simulation snapshot");
   sdk.resetToInitialConditions(2);
+  restoreEngineThermalState(sdk, snapshot.controls);
   // ResetToInitialConditions rewinds the executive. This is state recovery
   // within one flight, so zero-time model evaluation belongs at the captured
   // time and the next accepted step must advance from it.
@@ -84,19 +141,19 @@ export function restoreSimulation(sdk: JSBSimSdk, snapshot: SimulationSnapshot):
   timing.setSimTime?.(snapshot.simTimeS);
   // Terrain MUST be set before RunIC: even a zero-time initialization evaluates contacts.
   for (const [property, value] of Object.entries(snapshot.initial)) sdk.setPropertyValue(property, value);
-  for (const [property, value] of Object.entries(snapshot.controls)) sdk.setPropertyValue(property, value);
+  restoreControls(sdk, snapshot.controls);
   if (!sdk.runIc()) throw new Error("Flight state reinitialization failed");
   // The global command takes an engine INDEX: 0 starts engine zero, it does
   // not mean false. Starting also initializes RPM, which the per-engine
   // boolean alone does not do after a reset.
   if (snapshot.running) sdk.setPropertyValue("propulsion/set-running", -1);
   else sdk.setPropertyValue("propulsion/engine/set-running", 0);
-  for (const [property, value] of Object.entries(snapshot.controls)) sdk.setPropertyValue(property, value);
+  restoreControls(sdk, snapshot.controls);
   // Startup evaluates full power internally; the restored commands must be
   // reflected in native engine state before returning a recovered snapshot.
   if (!sdk.runIc()) throw new Error("Flight engine reinitialization failed");
   // Preserve physical actuator positions evaluated by RunIC until stepping.
-  for (const [property, value] of Object.entries(snapshot.controls)) sdk.setPropertyValue(property, value);
+  restoreControls(sdk, snapshot.controls);
 }
 
 export interface AircraftClearanceStance {

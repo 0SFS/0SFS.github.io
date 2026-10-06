@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-06",
+  "status": "implemented; terminal checks passed after evidence-discovery repair; GPU appearance unqualified",
+  "task": "docs/f135-engine-physical-correction-prompt.md",
+  "report": "docs/validation/f135-engine-physical-correction.md",
+  "ownership": {
+    "0sfs": "Assets, rigid animation, dimensional optical approximation, test-stand integration, instrumentation and validation",
+    "JSBSim": "Native solid state, energy receipts and packaged SDK",
+    "FOSSEarth": "Existing shared scene color management unchanged"
+  },
+  "native": {
+    "version": "1.2.4-fork.16",
+    "commit": "97fe6ddf1c8a7d9e10dad46a88e60e79e69fae28",
+    "adoption": "validation/evidence/jsbsim/adoption/fork16-adoption.json",
+    "archiveSha256": "98ee9387c57b871a3851aac83b5eb3a4f858d618e12a2fb9b59eaa0c59dbf61b"
+  },
+  "evidence": {
+    "mechanics": "geometry/acceptance.json",
+    "thermal": "native/acceptance.json",
+    "optics": "optics/physical-optics-report.json"
+  },
+  "acceptance": [
+    {
+      "criterion": "Reject stretching; preserve rigid shapes and actual flow-path coverage",
+      "result": "passed-reduced-mechanism",
+      "evidence": "geometry/acceptance.json",
+      "scope": "112 transforms,128 rigid meshes,504 poses,134400 wall rays,zero leaf crossings,150 clearance cases; source morphs fail strain criterion; measured F135 mechanics unqualified"
+    },
+    {
+      "criterion": "Cold start, already-running initialization, hot restart, powered lift and lifecycle",
+      "result": "passed-installed-native",
+      "evidence": "native/report.json",
+      "scope": "133577 accepted steps; actual fuel/staging,solid/gas temperatures,nozzle and optical bank recorded; warm assigned energy distinct"
+    },
+    {
+      "criterion": "Independent local energy balance and timestep convergence",
+      "result": "passed-local-only",
+      "evidence": "native/acceptance.json",
+      "maximumStepResidualJ": 2.733e-09,
+      "scope": "Independent signed heat and RK4 checks; imposed reservoirs, no global conservation claim"
+    },
+    {
+      "criterion": "Dimensional emission/absorption and bounded source power",
+      "result": "passed-numerical-software-scope",
+      "evidence": "optics/physical-optics-report.json",
+      "scope": "Absolute Planck/CIE solids and gas; source bounds from actual fuel; no normalized cold amplitude; uncertain optical inputs and composition limits retained"
+    },
+    {
+      "criterion": "Contribution isolation and physical/display independence",
+      "result": "passed-software-contract",
+      "evidence": "application/related-final.log",
+      "scope": "Solid/gas/reflection/scene-light modes; engine excluded from local light; tests cover material lifecycle,display-only gain and missing inputs"
+    },
+    {
+      "criterion": "Matched rear/oblique day/night GPU appearance",
+      "result": "unqualified-not-run",
+      "scope": "No server/browser/GPU authorization; CPU mesh images and numerical plots cannot establish rendered hue, exposure or radiance; original red-to-purple event remains undiagnosed"
+    }
+  ],
+  "checks": {
+    "typecheck": {
+      "command": "npx tsc -b",
+      "status": "passed",
+      "log": "application/typecheck-final.log"
+    },
+    "related": {
+      "command": "npx vitest related --run --maxWorkers=50% <changed files>",
+      "status": "passed",
+      "files": 73,
+      "passedTests": 899,
+      "expectedFailures": 1,
+      "log": "application/related-final.log"
+    },
+    "lint": {
+      "command": "npm run lint",
+      "status": "passed",
+      "log": "application/lint-final.log"
+    },
+    "fullCi": {
+      "command": "npm run ci",
+      "attempts": 1,
+      "status": "application tests passed; command stopped on two archived-source discovery failures",
+      "passedApplicationFiles": 169,
+      "passedTests": 1824,
+      "expectedFailures": 1,
+      "archiveImportFailures": 2,
+      "log": "application/ci.log",
+      "repair": "Archived source bytes retained with .txt suffix; discovery now exactly169 application test files. No application code changed afterward, no suite rerun."
+    },
+    "discoveryAfterRepair": {
+      "command": "npx vitest list --filesOnly",
+      "status": "passed",
+      "files": 169,
+      "archivedFiles": 0,
+      "log": "application/test-discovery-final.log"
+    },
+    "remainingProductionBuild": {
+      "command": "npm run build",
+      "status": "passed",
+      "log": "application/production-build.log",
+      "scope": "Final source/assets: JSBSim,audio,exhaust,engine bytechecks; incremental TypeScript; Vite; distributed SDK/audio verification"
+    },
+    "earlierApplicationFailure": {
+      "log": "application/integration-focused.log",
+      "scope": "104 of105 passed; new UI test omitted attaching the details region",
+      "repair": "Fixture corrected; engine monitor28tests passed in application/monitor-fixture-correction.log, then related/full checks passed"
+    },
+    "expectedFailure": "Existing F35 main-gear selected-skin containment condition; unrelated and preserved",
+    "evidenceAudit": {
+      "status": "passed",
+      "log": "application/evidence-audit.log",
+      "scope": "Source/log hashes, geometry report/artifact/source hashes, final optical helper hashes, unchanged4750-rowCSV, local evidence links and169-file discovery"
+    },
+    "diffWhitespace": {
+      "status": "passed",
+      "log": "application/diff-check-final.log"
+    }
+  },
+  "sourceHashes": {
+    "package-lock.json": "0226d1b4832f308bf7b82622d12cd43ecf449bf9f437521c30434eb6b8761a76",
+    "package.json": "f9951db0340a291ca798ce5d2a3488fc8bbc49bea094a5394da20e81b687beee",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml": "04cea10d3c135cb79247bbf7794a81359070e2bdc9afc9782502b538444eac16",
+    "scripts/build-exhaust-optics.mjs": "be454abfd264fb26e125df1af000794e5ab954b25cbf43d275ed5c2440c4f9b8",
+    "scripts/build-exhaust-optics.test.mjs": "53ed550df0cf4514c1b9790475e97196282956ded75780da228433d1c4498682",
+    "scripts/build-f135-engine.mjs": "f3368f25f92d283992d326b8903bc76b1491b5fe2366b7c4be2a5523892a7a74",
+    "scripts/build-f135-engine.test.mjs": "20264cbc754d9647aebf1a16d2b669f92238bcf158fa846d3860a39fc33f9c27",
+    "scripts/exhaustOptics/bake.mjs": "aaba015bb683e22fcdee76fcdf25e31a0ff8bd61f4e7507dab8d295944b00eaa",
+    "scripts/exhaustOptics/f135-visible-approximation.json": "0c0bd9b645b094e66d30a24c600d517745773f9a0b7a32137bb7a664a185bf4d",
+    "scripts/exhaustOptics/reference.mjs": "8fb085647f7520a8f4222e8be207023d881ad0a186fa3d4721fa8f7e5c9b5cb8",
+    "scripts/f135Engine/glb.mjs": "cb9d81855febdd817579c76f6a944359fc352786b46b049007a90b00a56fff10",
+    "scripts/f135Engine/intersections.mjs": "8342512a2a769646203e93d5c7304bfa022bc3df2dade6cba6c39b8c82cd1e4c",
+    "scripts/f135Engine/mechanism.mjs": "8b5b7870f02a7b2d49ab862a0f2fa573983f11e1152c0f5df85443c1f2b26e76",
+    "scripts/f135Engine/profile.json": "fd31d20c7e4ff1bf39887f2af9ebfade6f2174b591c38ad2be6c21a01f37d1f5",
+    "scripts/f135Engine/raster.mjs": "99665bcc54d02eeb91b14478a340af86eaa23a55ef2c6035f1474337d058b63f",
+    "scripts/f135Engine/source.mjs": "6a57b46fcdbd2abf90c617ab59cc16944428e77b4fd3787deed890f7eb36d3cb",
+    "scripts/validation/f35b/analyze-f135-thermal-uncertainty.mjs": "933053c3d56ea03163b84fad659a799357f58072ade4710fbd4d0327687e32dc",
+    "scripts/validation/f35b/check-f135-clearance.mjs": "fd2ea97bc8ebeaf5ac533f5285e454d4897e63d5417420e6dd62e5d7bb5ff8d5",
+    "scripts/validation/f35b/check-f135-physical-thermal.mjs": "00ad27e6ea4bac2617b5451e6eb357d0cc80945a94a795e8c9569408b1e61c77",
+    "scripts/validation/f35b/check-f135-reconstruction.mjs": "d4c39b7b7c0274dd0610f95952f4314dd935a15857f7e744bd9348191dfa5738",
+    "scripts/validation/f35b/check-physical-optics.mjs": "ea5ed12a2f3208cd277d4648be0b74a50c1ef6a4ba74ae540737bf83e7b054fa",
+    "scripts/validation/f35b/plot-f135-physical-thermal.mjs": "fadd79537a60bc01bfb87b7f403c4612115da5545df1bb4790f1ecffc4c39681",
+    "scripts/validation/f35b/recompute-f135-trace-optics.mjs": "713d11ceb0d6882670beea55e6fb41085a7215c8d977c9cfb4153116ad497c28",
+    "scripts/verify-jsbsim-artifact.test.mjs": "59bdff1ecc603d6296ffc7c06122dd46af2bf4eade03ab511e3c080eaad4385e",
+    "src/flight/aircraft/aircraftCatalog.ts": "925a26dd883ef20a4d713e8e86dd5a56bfbc8a66be06b4bbefc787c5320c6242",
+    "src/flight/aircraft/createAircraftEngineVisuals.test.ts": "52268526989c9f88ef1ac096588f567d18420e3c6ed0d02f6012f5d0893707c8",
+    "src/flight/aircraft/createAircraftEngineVisuals.ts": "d54b10415ffc1ed2de5873b60ed2731d32f8e6b8080a8745c25c0bd3f3e0e913",
+    "src/flight/aircraft/createAircraftModel.test.ts": "57f3d5b1bf20f6040c440e95b1908d573e6c1a27a97138078e3a54aefc846e23",
+    "src/flight/aircraft/createAircraftModel.ts": "c5888d1e4b63c4de537e0d4487c111afa406020518ea0739ae267f217b84195a",
+    "src/flight/aircraft/createEngineExhaust.test.ts": "46612eb9f27f9e5893cb96a606d142a303dc923b86d6bb1c019e9495c0316d8c",
+    "src/flight/aircraft/createEngineExhaust.ts": "800b300fcf76d1a352adc8edda63f391798b59d17b7dc521604ad2be7c13dcc1",
+    "src/flight/aircraft/createEngineHotSurfaceGlow.test.ts": "53ce95fbc4357967671b3acf4d2f8f4ee4b2e36f9697494bfd65696a66d7297f",
+    "src/flight/aircraft/createEngineHotSurfaceGlow.ts": "b55c3a390e7d29a78ab8e0030021917b6bfd5a3457cd2faba8605ebdd2f0b582",
+    "src/flight/aircraft/engineExhaustProfiles.test.ts": "20885e3de4b29d064818d8ebe46973ad119e0e1bc3a284b953063c7a9298e0c3",
+    "src/flight/aircraft/engineExhaustProfiles.ts": "96ce2e292db08d9f527c3dbddf494b3402a18a48381a903ae2ca450bdce7f9f1",
+    "src/flight/aircraft/engineGasOptics.test.ts": "a37711a3317d86bc60fc6f59c89c99d8a997c33585924046543b4f432c4e3161",
+    "src/flight/aircraft/engineGasOptics.ts": "fcfa614fe84ce012c3a789825bb257071c497507bb02a7bb940b9de6f56aa9fa",
+    "src/flight/aircraft/engineNozzleRig.test.ts": "af6109ba21f78858151715335ee8ba0f49b0321f0bf4dab6681f9f59141c29e8",
+    "src/flight/aircraft/engineNozzleRig.ts": "0c070c616f6b9508de3cba5ccd24818b9ad679bb938e9d86acf1287f381f0996",
+    "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json": "4368d2d8cf1d24f5860727ec6639602a0533eb2e5baf02598830346a10461727",
+    "src/flight/aircraft/generated/f135-exhaust-lut.png": "73b1a3dfb0a7b4aed8b7c2edb730c88c444a05095374c3169f5ac44d8649b3f7",
+    "src/flight/aircraft/generated/f135-exhaust-spatial.png": "27110d47433281963a653695116feb79cf80e314a6553c3c9c753f2f6a6a530e",
+    "src/flight/aircraft/generated/f135EngineData.ts": "08545c3e51892acb63ea27c8283445aef1a1e4d1a432768af1b492ba0fd48ddb",
+    "src/flight/aircraft/generated/f135ExhaustOpticalData.ts": "d50fa28e6d87a2b99724ccc52b10ee484ddad07fde7724aea523aca78d46d6f1",
+    "src/flight/createFlightSimApp.test.ts": "16e6880a4c30019f7df74d9a60c6d31d65f02cedc03ac10789f5b6b6eefa1688",
+    "src/flight/createFlightSimApp.ts": "944d5481cfe05c4f122704456b2ca996756336476fc6365803cf6f4d2eb833ef",
+    "src/flight/engineTestStand.integration.test.ts": "27c3452b6f0ee24518cb95d0e5a46e14f0e8573217c0a7d47cab56d8f7f5a91e",
+    "src/flight/engineTestStand.test.ts": "62222c3280ce55ee3c631e069ee4a1fa9a4b095c38a5d07a70bb3aa36947bd14",
+    "src/flight/engineTestStand.ts": "750fb6ecc44f1eb5a7b53725c24ed7af4647eed939a0526b8268e2be646fb183",
+    "src/flight/hud/engineHistory.test.ts": "b2dd058a84b5c34d460788ad2db56cfbf9c0312de4cef6a213bfda0136d96978",
+    "src/flight/hud/engineHistory.ts": "20d9654c23810c3eb90a77c99da286166a10cd20bc667a6deefdf829dd34c353",
+    "src/flight/hud/engineMonitor.css": "eecbe2ff4e4de95c0de93956f9984ff0416a52358f48fb8d298a9eec5d0df0f4",
+    "src/flight/hud/engineMonitor.test.ts": "3d04c7f05c7342b8f44dd57b1ed99bdf121cf87f59f37dd275b41a0dc1ca4d78",
+    "src/flight/hud/engineMonitor.ts": "04635209280b9d4b55bab32672790d0aee41d692f96ab06ec2be99da47267e8f",
+    "src/flight/hud/engineMonitorModel.ts": "ddd24e13cd332d1e641e8176cc06a303b584b79f96c77d4fe19a13b46e07b756",
+    "src/flight/jsbsim/jsbsimBuildIdentity.test.ts": "b5e6ae7c8b1d09cb3285f554384a3adbb973d6004c37df7f46290d2363900885",
+    "src/flight/jsbsim/jsbsimBuildIdentity.ts": "ea7941986bb88f8a496ad4f88a012b88053ad3cee935b8bf44f05c88302c3214",
+    "src/flight/settings/flightParameters.ts": "4e9335e39bdb127de3bcdd5bb35e7e0507259e7821ce612cc9afb505761d41d2"
+  },
+  "applicationLogHashes": {
+    "typecheck-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "related-final.log": "94c77f9a1d66b467fb40a6a5e97bf08a6c3ed0630f714bd10b7d674094399a3d",
+    "lint-final.log": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e",
+    "ci.log": "25265d73f1c1c4b46cd1e67bda9c1e841c5daeb935d7dbf1651a2e14be990ad3",
+    "production-build.log": "5f62c13f2dab86d7ee3df468707fd041af106d3b8629ceaef41c1de3a8dbcd99",
+    "test-discovery-final.log": "dfe2250a73239393808964a2500b023b3c9bf623c9b07c91ad8f402c2047555a",
+    "integration-focused.log": "6d197eb6cb121bf438da2246c45d2334182e57e3e25bd119a2a716491ca1db41",
+    "monitor-fixture-correction.log": "41f9629d96aa494155824039d2ddbd6f3f2c845d232872438c6050b0adb9ca89",
+    "evidence-audit.log": "e1e5967bdfb5846e8e992da16588807f84d1b0151278830bc66c90ea6e61127a",
+    "diff-check-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "preservation": "Initial dirty tree inspected and retained. No unrelated work reverted; previous evidence, source assets, SDK archives and build folders preserved. Native commit clean; no push.",
+  "limitations": [
+    "Mechanism dimensions,count,sliding constraints,density and native A8/A9 schedule are hypotheses, not PW-600 drawings.",
+    "Native effective capacities/conductances/baths and temperatures remain uncalibrated.",
+    "Optical depth,species fractions,alloy emissivity and spatial lobe pattern remain uncertain; source caps are not whole-engine energy closure.",
+    "Material-local tone/gamma composition,point-light near field and volume depth are approximations.",
+    "No browser/GPU appearance,benchmark,device,audio-tier or photographed-color qualification."
+  ]
+}

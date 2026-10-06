@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-06",
+  "file": "PRATT-and-WHITNEY-Turbine-Jet-Engine-F135-F119-34.webp",
+  "sha256": "6c503adb1f47b44332770468f728cc18b2d0bc690108342129c8adf2d2f69002",
+  "bytes": 46266,
+  "source": "User-supplied local image; original web URL not provided.",
+  "originalFilename": "PRATT-and-WHITNEY-Turbine-Jet-Engine-F135-F119-34.webp",
+  "observedContent": "Rendered/CAD-style oblique rear nozzle view showing separate outer panels and internal flow-path hardware; no visible scale or authenticated variant label.",
+  "userPurpose": "Illustrates desired layered nozzle form and objection to current long tapered petals and large holes when open.",
+  "evidenceClass": "Qualitative modeling reference, not authenticated engine engineering geometry.",
+  "rights": "Unknown; retained as supplied research reference, not a licensed runtime texture/model.",
+  "limitations": [
+    "Filename includes F135 and F119 and cannot identify the variant.",
+    "Do not assume F-35B nozzle length, dimensions, seal geometry, material or kinematics from this image alone."
+  ]
+}

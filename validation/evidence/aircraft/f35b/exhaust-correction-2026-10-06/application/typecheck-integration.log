@@ -1,0 +1,3 @@
+src/flight/aircraft/createEngineExhaust.ts(719,23): error TS2551: Property 'exteriorIsotropicIntensityRgbCd' does not exist on type 'EngineGasOpticalResult'. Did you mean 'isotropicIntensityRgbCd'?
+src/flight/aircraft/createEngineExhaust.ts(721,42): error TS7006: Parameter 'value' implicitly has an 'any' type.
+src/flight/aircraft/engineExhaustDepth.ts(16,97): error TS2551: Property 'instances' does not exist on type 'AbstractMesh'. Did you mean 'hasInstances'?

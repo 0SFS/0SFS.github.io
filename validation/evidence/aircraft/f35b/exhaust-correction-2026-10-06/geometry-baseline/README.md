@@ -1,0 +1,13 @@
+# Retained pre-correction geometry and receiver audit
+
+These snapshots precede the unified interior/exterior gas support. `inputs.json` identifies exact source bytes and the unchanged full/installed GLBs. `stations-and-light.json` records authored station coordinates and the previous source-only point-light estimate. This is a code/CPU audit, not a reproduction of the user's GPU pixels.
+
+The previous source volume began exactly at `F135_Exhaust`, the moving rigid exit. There was no luminous gas volume in the augmentor, three bearing ducts, or convergent/divergent nozzle. A perceived visual gap therefore did not establish a displaced attachment: the model omitted the interior source and relied on separately glowing metal. The retained exporter defines the liner at engine-root z −0.75 to 0 m, its core-facing annular hardware at z −0.38 m, a smaller ring at −0.16 m, and the opaque centrebody ending at −0.08 m. These are reconstruction hypotheses, not measured F135 flameholder stations.
+
+The unchanged straight engine has bearing centres at z 0, 0.28 and 0.76 m, the nozzle base at 1.04 m, and the aperture-dependent exit near 1.60 m. `stations-and-light.json` shows these same interfaces posed at 90 and 95 degrees for both asset variants. A single cylinder extended upstream from the moving exit would not follow these rigid ducts during conversion.
+
+The Earth-backed stand creates no separate lit deck receiver. The retained FOSS Earth raster runtime sets `material.disableLighting = true`; its response to the engine point light is zero. The previous point light had no shadow/occlusion solution, excluded engine meshes, and represented free gas only. It did not calculate solid-surface radiation, impingement, deck heating or deck incandescence. Google 3D material response is not qualified by this audit.
+
+For the retained dry powered-lift state and an explicitly hypothetical flat ground at the stand's held initial placement, the exit is 1.17628 m above ground and the point light is 0.81628 m above it. Previous spatial-v1 source intensity is 2.70687e−5 cd in luminance. The unoccluded point estimate directly beneath it is 4.06244e−5 lux; a hypothetical diffuse receiver with reflectance 0.2 would return 2.58623e−6 cd/m². These are source/receiver calculations, not terrain pixels or a calibrated deck prediction. The current correction's independent receiver bounds are retained separately in the numerical evidence.
+
+The Navy footage remains an unresolved appearance constraint. Thermal deck loading and visible reflected/incandescent luminance are different observables; neither this audit nor the point approximation identifies the footage's mechanism.

@@ -1,0 +1,23 @@
+[
+  {
+    "path": "src/flight/aircraft/createEngineExhaust.ts",
+    "sha256": "da327933e02f7a004cb0a9dcf93a4b1c35540c1de76540ea2c0ab0c144cddc3c",
+    "sameAsAudit": false
+  },
+  {
+    "path": "src/flight/aircraft/engineNozzleRig.ts",
+    "sha256": "0c070c616f6b9508de3cba5ccd24818b9ad679bb938e9d86acf1287f381f0996",
+    "sameAsAudit": true
+  },
+  {
+    "path": "src/flight/aircraft/engineGasOptics.ts",
+    "sha256": "fcfa614fe84ce012c3a789825bb257071c497507bb02a7bb940b9de6f56aa9fa",
+    "sameAsAudit": true
+  },
+  {
+    "path": "build/validation/plume-geometry/2026-10-06_144357/entry.mjs",
+    "retained": "compiled-audit-entry.mjs.txt",
+    "sha256": "dfe2c0c98d6ab836960121a67310bb1454b9b26a2d73dc6f50072fdcd7d0c376",
+    "reason": "Exact compiled production module used by the baseline audit; renderer source changed concurrently before source snapshot retention."
+  }
+]

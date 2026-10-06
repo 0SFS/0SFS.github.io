@@ -1,0 +1,80 @@
+{
+  "thresholds": {
+    "finitePeakChannelCdM2": 1e-08,
+    "brightPeakChannelCdM2": 1
+  },
+  "budgets": [
+    {
+      "samples": 32,
+      "maxRelativePeakError": 0.18509731923319397,
+      "maxBrightRelativePeakError": 0.18509731923319397,
+      "worstCase": {
+        "name": "ab-sustained",
+        "view": "rear",
+        "x": -0.35,
+        "y": -0.1
+      },
+      "worstBrightCase": {
+        "name": "ab-sustained",
+        "view": "rear",
+        "x": -0.35,
+        "y": -0.1
+      },
+      "maxReferenceConvergence": 0.0010684789214939765
+    },
+    {
+      "samples": 64,
+      "maxRelativePeakError": 0.12972840682910472,
+      "maxBrightRelativePeakError": 0.08726025592099845,
+      "worstCase": {
+        "name": "ab-cutoff",
+        "view": "rear",
+        "x": -0.35,
+        "y": -0.1
+      },
+      "worstBrightCase": {
+        "name": "ab-sustained",
+        "view": "rear",
+        "x": -0.35,
+        "y": -0.1
+      },
+      "maxReferenceConvergence": 0.0010684789214939765
+    },
+    {
+      "samples": 96,
+      "maxRelativePeakError": 0.02731458505755253,
+      "maxBrightRelativePeakError": 0.01875909122242324,
+      "worstCase": {
+        "name": "ab-cutoff",
+        "view": "rear",
+        "x": -0.35,
+        "y": -0.1
+      },
+      "worstBrightCase": {
+        "name": "ab-sustained",
+        "view": "rear",
+        "x": 0.12,
+        "y": 0
+      },
+      "maxReferenceConvergence": 0.0010684789214939765
+    },
+    {
+      "samples": 128,
+      "maxRelativePeakError": 0.007603737608149793,
+      "maxBrightRelativePeakError": 0.007103260726708019,
+      "worstCase": {
+        "name": "ab-onset",
+        "view": "rear",
+        "x": 0.12,
+        "y": 0
+      },
+      "worstBrightCase": {
+        "name": "ab-sustained",
+        "view": "rear",
+        "x": 0.12,
+        "y": 0
+      },
+      "maxReferenceConvergence": 0.0010684789214939765
+    }
+  ]
+}

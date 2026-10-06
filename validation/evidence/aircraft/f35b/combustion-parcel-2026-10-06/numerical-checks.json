@@ -1,0 +1,79 @@
+{
+  "qualification": "Selected numerical checks only; no measured engine calibration or GPU appearance result.",
+  "artifactSha256": "71b0399cbe3377e7ec1b05b90264a7225f4e3d5ebb29ca568ae7989ba562167d",
+  "refinedIntegration": [
+    {
+      "temperatureKelvin": 800,
+      "pressureAtmospheres": 1,
+      "equivalenceRatio": 1.0,
+      "relativeYieldDifference": 3.0126015536646733e-06,
+      "baselineYieldJoulesPerKg": 11.803226355972644,
+      "refinedYieldJoulesPerKg": 11.803190797554585
+    },
+    {
+      "temperatureKelvin": 1000,
+      "pressureAtmospheres": 3,
+      "equivalenceRatio": 1.0,
+      "relativeYieldDifference": 1.2556304194166756e-06,
+      "baselineYieldJoulesPerKg": 10.80441281835066,
+      "refinedYieldJoulesPerKg": 10.80439925200126
+    },
+    {
+      "temperatureKelvin": 1200,
+      "pressureAtmospheres": 0.2,
+      "equivalenceRatio": 1.0,
+      "relativeYieldDifference": 2.6900188412337656e-06,
+      "baselineYieldJoulesPerKg": 510.835305578046,
+      "refinedYieldJoulesPerKg": 510.8339314214492
+    }
+  ],
+  "offGridInterpolation": [
+    {
+      "temperatureKelvin": 900,
+      "pressureAtmospheres": 1.7320508075688772,
+      "equivalenceRatio": 0.9,
+      "chBandEnergyJoulesPerKgFuel": {
+        "direct": 10.269886204145685,
+        "interpolated": 9.57618365983196,
+        "relativeDifference": 0.06754724741094942
+      },
+      "productTemperatureKelvin": {
+        "direct": 2198.4418261718274,
+        "interpolated": 2169.5869069215414,
+        "relativeDifference": 0.013125168429192202
+      }
+    },
+    {
+      "temperatureKelvin": 1100,
+      "pressureAtmospheres": 3.872983346207417,
+      "equivalenceRatio": 0.9,
+      "chBandEnergyJoulesPerKgFuel": {
+        "direct": 12.42195192968615,
+        "interpolated": 12.009863545847962,
+        "relativeDifference": 0.03317420532383275
+      },
+      "productTemperatureKelvin": {
+        "direct": 2354.978493589586,
+        "interpolated": 2337.7118986218557,
+        "relativeDifference": 0.007331954416879394
+      }
+    },
+    {
+      "temperatureKelvin": 900,
+      "pressureAtmospheres": 0.4472135954999579,
+      "equivalenceRatio": 1.0,
+      "chBandEnergyJoulesPerKgFuel": {
+        "direct": 56.26856737642155,
+        "interpolated": 52.4455875835242,
+        "relativeDifference": 0.06794165856974188
+      },
+      "productTemperatureKelvin": {
+        "direct": 2226.3696649239055,
+        "interpolated": 2199.34894459931,
+        "relativeDifference": 0.012136672876163601
+      }
+    }
+  ],
+  "maxChToFuelEnergyRatio": 1.1797582114966421e-05,
+  "maxRateSetRatio": 4.285050296874794
+}

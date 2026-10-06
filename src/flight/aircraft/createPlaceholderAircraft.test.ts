@@ -5,6 +5,24 @@ import { createPlaceholderAircraft } from "./createPlaceholderAircraft";
 import { getAircraftDefinition } from "./aircraftCatalog";
 
 describe("aircraft chase camera", () => {
+  it("orbits and zooms around a declared engine focus without losing its offset", () => {
+    const engine = new NullEngine();
+    const scene = new Scene(engine);
+    const origin = new TransformNode("origin", scene);
+    const focus = new Vector3(0, 1, -4.5);
+    const aircraft = createPlaceholderAircraft(scene, origin, undefined, {
+      chaseTargetOffset: focus, chaseDistanceMeters: 6, chaseZoomLimits: () => ({ min: 1, max: 100 }),
+    });
+    try {
+      expect(Vector3.Distance(aircraft.thirdPersonCamera.position, focus)).toBeCloseTo(6);
+      aircraft.orbitChaseCamera(0.4, 0.2);
+      expect(Vector3.Distance(aircraft.thirdPersonCamera.position, focus)).toBeCloseTo(6);
+      aircraft.zoomChaseCamera(0.5);
+      expect(Vector3.Distance(aircraft.thirdPersonCamera.position, focus)).toBeCloseTo(3);
+      aircraft.zoomChaseCamera(0.01);
+      expect(Vector3.Distance(aircraft.thirdPersonCamera.position, focus)).toBeCloseTo(1);
+    } finally { aircraft.dispose(); scene.dispose(); engine.dispose(); }
+  });
   it.each([0, Math.PI / 2, Math.PI, 3 * Math.PI / 2])("keeps both cameras facing heading %s with east on the correct side", (heading) => {
     const engine = new NullEngine();
     const scene = new Scene(engine);

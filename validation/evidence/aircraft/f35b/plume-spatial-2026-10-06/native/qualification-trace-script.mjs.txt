@@ -1,0 +1,204 @@
+#!/usr/bin/env node
+// 0sfs owns this aircraft-specific observer experiment. Native dynamics stay in JSBSim.
+import assert from 'node:assert/strict';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { inflateSync } from 'node:zlib';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { isDeepStrictEqual } from 'node:util';
+import { rolldown } from 'rolldown';
+import { JSBSimSdk } from '@felipegalind0/jsbsim';
+import { wasmModuleUrl, wasmBinaryUrl } from '@felipegalind0/jsbsim/wasm';
+import { verifyInstalledSdk } from '../../verify-jsbsim-artifact.mjs';
+import { newOutputDirectory } from '../../outputDirectory.mjs';
+
+const root = fileURLToPath(new URL('../../../', import.meta.url));
+const args = process.argv.slice(2);
+if (args.includes('--help')) {
+  console.log('Usage: node scripts/validation/f35b/trace-f135-plume-state.mjs [--out=build/new-directory] [--sample-seconds=0.25]');
+  process.exit(0);
+}
+assert.ok(args.every(a => /^(--out=|--sample-seconds=)/.test(a)));
+const option = name => { const matches = args.filter(a => a.startsWith(name + '=')); assert.ok(matches.length <= 1); return matches[0]?.slice(name.length + 1); };
+const sampleSeconds = Number(option('--sample-seconds') ?? .25);
+assert.ok(Number.isFinite(sampleSeconds) && sampleSeconds >= 1 / 120 && sampleSeconds <= 1);
+const out = option('--out') ? path.resolve(option('--out')) : newOutputDirectory('validation','f135-plume-state');
+assert.ok(out.startsWith(path.join(root,'build') + path.sep));
+if (option('--out')) await mkdir(out);
+const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+const artifact = await verifyInstalledSdk(root), scriptSha256 = hash(await readFile(fileURLToPath(import.meta.url)));
+const entry = path.join(out,'helpers.ts');
+await writeFile(entry, [
+  ['bootstrapAircraft','src/flight/jsbsim/bootstrapC172.ts'],
+  ['createEngineControl','src/flight/jsbsim/engineControl.ts'],
+  ['engineTestStandBootstrapOptions','src/flight/engineTestStand.ts'],
+  ['getFdmProfile','src/flight/jsbsim/fdmProfiles.ts'],
+  ['resolveAircraftDataFiles','src/flight/jsbsim/hydrateJsbsimData.ts'],
+  ['nozzleApertureGeometry','src/flight/aircraft/engineNozzleRig.ts'],
+  ['F135_ENGINE_GEOMETRY','src/flight/aircraft/generated/f135EngineData.ts'],
+  ['evaluateEngineGasOptics,interpolateAbsoluteEmission','src/flight/aircraft/engineGasOptics.ts'],
+].map(([names,file]) => `export {${names}} from ${JSON.stringify(path.join(root,file))};`).join('\n'));
+const builder = await rolldown({input:entry,external:id => !id.startsWith('.') && !path.isAbsolute(id),
+  plugins:[{name:'base-url',transform(code){return code.includes('import.meta.env.BASE_URL') ? {code:code.replaceAll('import.meta.env.BASE_URL',JSON.stringify('/')),map:null} : null;}}]});
+let built; try { built = await builder.write({file:path.join(out,'helpers.mjs'),format:'esm'}); } finally { await builder.close(); }
+const sourceFiles = [...new Set(built.output.flatMap(c => c.type === 'chunk' ? Object.keys(c.modules) : []))]
+  .filter(f => path.isAbsolute(f) && f.startsWith(root) && !f.startsWith(out));
+const sourceHashes = Object.fromEntries(await Promise.all(sourceFiles.map(async f => [path.relative(root,f),hash(await readFile(f))])));
+const helpers = await import(pathToFileURL(path.join(out,'helpers.mjs')).href);
+const opticalFile = 'src/flight/aircraft/generated/f135-exhaust-lut.manifest.json';
+const opticalBytes = await readFile(path.join(root,opticalFile)); sourceHashes[opticalFile] = hash(opticalBytes);
+const profile = JSON.parse(opticalBytes).profile;
+assert.equal(profile.gasEmission.model,'gray-emission-absorption-v1','This diagnosis retains the uniform-source baseline');
+await writeFile(path.join(out,'baseline-optical-manifest.json'),opticalBytes);
+const shaderFile = 'src/flight/aircraft/createEngineExhaust.ts';
+const shaderBytes = await readFile(path.join(root,shaderFile)); sourceHashes[shaderFile] = hash(shaderBytes);
+await writeFile(path.join(out,'baseline-shader.ts.txt'),shaderBytes);
+const pngFile = 'src/flight/aircraft/generated/f135-exhaust-spatial.png';
+const png = await readFile(path.join(root,pngFile)); sourceHashes[pngFile] = hash(png);
+await writeFile(path.join(out,'baseline-spatial.png'),png);
+// The repository's deterministic encoder emits 8-bit RGBA, noninterlaced, filter 0.
+const idat = []; let width, height;
+for (let i=8;i<png.length;) {
+  const size=png.readUInt32BE(i),name=png.toString('ascii',i+4,i+8),chunk=png.subarray(i+8,i+8+size);
+  if(name==='IHDR'){width=chunk.readUInt32BE(0);height=chunk.readUInt32BE(4);assert.equal(chunk[8],8);assert.equal(chunk[9],6);assert.equal(chunk[12],0);}
+  if(name==='IDAT')idat.push(chunk);i+=size+12;
+}
+const raw=inflateSync(Buffer.concat(idat)), rgba=Buffer.alloc(width*height*4);
+for(let y=0;y<height;y++){assert.equal(raw[y*(width*4+1)],0);rgba.set(raw.subarray(y*(width*4+1)+1,(y+1)*(width*4+1)),y*width*4);}
+const sampleMask=(x,y,channel)=>{
+  x=Math.min(width-1,Math.max(0,x*(width-1)));y=Math.min(height-1,Math.max(0,y*(height-1)));
+  const loX=Math.floor(x),loY=Math.floor(y),hiX=Math.min(width-1,loX+1),hiY=Math.min(height-1,loY+1),fx=x-loX,fy=y-loY;
+  const p=(xx,yy)=>rgba[(yy*width+xx)*4+channel]/255;
+  return (p(loX,loY)*(1-fx)+p(hiX,loY)*fx)*(1-fy)+(p(loX,hiY)*(1-fx)+p(hiX,hiY)*fx)*fy;
+};
+const density=(x,y,z)=>{
+  const radius=1-.6*z,mix=Math.min(1,z/profile.spatialEmission.downstreamMixFraction);
+  return ((1-mix)*sampleMask(x/radius*.5+.5,y/radius*.5+.5,0)+mix*sampleMask(x/radius*.5+.5,y/radius*.5+.5,1))*(1-z)**2;
+};
+const integral=(f,a,b,n)=>{let sum=0;for(let i=0;i<=n;i++)sum+=(i===0||i===n?.5:1)*f(a+(b-a)*i/n);return sum*(b-a)/n;};
+const pathDensity=n=>({rearAxis:integral(z=>density(0,0,z),0,1,n),
+  rearOffset:integral(z=>density(.55,0,z),0,1,n),sideNearExit:integral(x=>density(x,0,.05),-1,1,n)});
+const densityIntegrals=pathDensity(8192),coarseDensityIntegrals=pathDensity(4096);
+for(const name of Object.keys(densityIntegrals))assert.ok(Math.abs(densityIntegrals[name]-coarseDensityIntegrals[name])<1e-6);
+const luminance=rgb=>.2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2];
+const manifestBytes=await readFile(path.join(root,'public/jsbsim-data/manifest.json'));
+sourceHashes['public/jsbsim-data/manifest.json']=hash(manifestBytes);
+const files=await Promise.all(helpers.resolveAircraftDataFiles(JSON.parse(manifestBytes),'f-35b').map(async f=>[f,await readFile(path.join(root,'public/jsbsim-data',f))]));
+const dataHashes=Object.fromEntries(files.map(([file,bytes])=>[file,hash(bytes)]));
+const priorFile='validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/native/report.json';
+const prior=JSON.parse(await readFile(path.join(root,priorFile),'utf8'));
+assert.deepEqual(dataHashes,prior.dataHashes,'Prior and current native aircraft data differ; review before comparison');
+assert.deepEqual(artifact.identity,prior.artifact.identity,'Prior and current SDK differ; review before comparison');
+const trace=[],summaries=[],checks=[],failures=[],logs=[];let auditedSteps=0;let propertyCatalog;
+const mappings={ambientK:'propulsion/tat-c',pressurePsf:'propulsion/pt-lbs_sqft',egtC:'propulsion/engine/egt-degc',
+  gasK:'propulsion/engine/thermal/nozzle-gas-temperature-k',thermalValid:'propulsion/engine/thermal/valid',
+  fuelKgSec:'propulsion/engine/fuel-flow-rate-pps',suppliedAbKgSec:'propulsion/engine/thermal/afterburner-fuel-flow-kg-sec',
+  burnedAbKgSec:'propulsion/engine/thermal/afterburner-burned-fuel-flow-kg-sec',n1Pct:'propulsion/engine/n1',n2Pct:'propulsion/engine/n2',
+  nativeRunning:'propulsion/engine/set-running',augmentation:'propulsion/engine/augmentation',nozzleNorm:'propulsion/engine/nozzle-pos-norm',
+  nozzlePitchRad:'fcs/nozzle-pitch-rad',nozzleYawRad:'fcs/nozzle-yaw-rad',conversion:'fcs/stovl-pos-norm',
+  throttleCmd:'fcs/throttle-cmd-norm',throttlePosition:'fcs/throttle-pos-norm',
+  coreK:'propulsion/engine/thermal/core/metal-temperature-k',linerK:'propulsion/engine/thermal/metal-temperature-k'};
+function optics(row){
+  const geometry=helpers.nozzleApertureGeometry(row.nozzleNorm,helpers.F135_ENGINE_GEOMETRY.aperture);
+  const length=6*(row.augmentation?.7+.3*Math.min(1,Math.max(0,row.n2Pct/100)):.2);
+  const gas=helpers.evaluateEngineGasOptics(profile,{temperatureKelvin:row.gasK,augmentation:Boolean(row.augmentation),fuelFlowKgPerSecond:row.fuelKgSec,
+    afterburnerBurnedFuelFlowKgPerSecond:row.burnedAbKgSec,radiusMeters:geometry.exitRadius,lengthMeters:length});
+  const continuum=gas.blackbodyRgbCdPerM2.map(v=>v*gas.absorptionPerMeter);
+  const excited=gas.sourceRgbCdPerM3.map((v,c)=>v-continuum[c]);
+  Object.assign(row,{visualRunning:Number(row.n2Pct>0&&row.fuelKgSec>0),opticsValid:Number(gas.valid),radiusM:geometry.exitRadius,lengthM:length,
+    throatAreaM2:geometry.throatArea,exitAreaM2:geometry.exitArea,absorptionPerM:gas.absorptionPerMeter,
+    effectiveVolumeM3:gas.emittingVolumeM3,fuelPowerW:gas.fuelPowerW,particlePowerBoundW:gas.particlePowerUpperBoundW,
+    excitedPowerW:gas.excitedPowerW,totalSourcePowerBoundW:gas.totalSourcePowerUpperBoundW,
+    sourceYcdM3:luminance(gas.sourceRgbCdPerM3),continuumYcdM3:luminance(continuum),excitedYcdM3:luminance(excited)});
+  for(const [c,name]of ['R','G','B'].entries()){row['source'+name+'cdM3']=gas.sourceRgbCdPerM3[c];row['continuum'+name+'cdM3']=continuum[c];row['excited'+name+'cdM3']=excited[c];}
+  for(const [name,value]of Object.entries(densityIntegrals)){
+    const effectivePath=value*(name==='sideNearExit'?geometry.exitRadius:length);
+    const integral=gas.absorptionPerMeter>0?-Math.expm1(-gas.absorptionPerMeter*effectivePath)/gas.absorptionPerMeter:effectivePath;
+    row[name+'EffectivePathM']=effectivePath;row[name+'RadianceYcdM2']=row.sourceYcdM3*integral;
+    row[name+'SceneYAtWhite1000']=row[name+'RadianceYcdM2']/1000;
+  }
+  for(const solid of ['core','liner'])row[solid+'EmissionYcdM2']=luminance(helpers.interpolateAbsoluteEmission(profile.surfaceEmission,row[solid+'K'])??[0,0,0]);
+  row.flowProxyKgSec=120*(row.n2Pct/100)**2*row.pressurePsf/2116.22*Math.sqrt(288.15/row.ambientK);
+  row.directionX=-Math.sin(row.nozzlePitchRad)*Math.sin(row.nozzleYawRad);
+  row.directionY=-Math.sin(row.nozzlePitchRad)*Math.cos(row.nozzleYawRad);row.directionZ=Math.cos(row.nozzlePitchRad);
+  return row;
+}
+async function scenario(name,run){
+  const sdk=await JSBSimSdk.create({moduleUrl:wasmModuleUrl,wasmUrl:wasmBinaryUrl,persistence:{enabled:false},log:{console:false}});
+  sdk.on('stderr',({message})=>logs.push(name+': '+message));
+  try{
+    for(const[file,bytes]of files)sdk.writeDataFile(file,bytes.toString('utf8'));
+    const initialOptions=helpers.engineTestStandBootstrapOptions('cold');await helpers.bootstrapAircraft(sdk,'f-35b',initialOptions);sdk.setDt(1/120);sdk.setHoldDown(true);
+    const get=p=>sdk.getPropertyValue(p),set=(p,v)=>sdk.setPropertyValue(p,v),control=helpers.createEngineControl(sdk,helpers.getFdmProfile('f-35b'));
+    propertyCatalog??=sdk.queryPropertyCatalog('');
+    const propertyNames=new Set(propertyCatalog.split('\n').map(line=>line.trim().replace(/ \([^)]*\)$/,'')));
+    for(const property of Object.values(mappings))assert.ok(propertyNames.has(property),'Missing required property '+property);
+    const read=(phase,phaseTimeS=0)=>{const row={scenario:name,phase,timeS:sdk.getSimTime(),phaseTimeS,...Object.fromEntries(Object.entries(mappings).map(([key,p])=>[key,get(p)]))};row.ambientK+=273.15;row.fuelKgSec*=.45359237;return row;};
+    let count=0;const initial=optics(read('initial-zero-time'));trace.push(initial);
+    const step=(phase,phaseTimeS,startHeld=false,dense=false)=>{
+      const before=sdk.getSimTime();control.step(startHeld);assert.equal(sdk.run(),true);const row=read(phase,phaseTimeS);
+      assert.ok(Math.abs(row.timeS-before-1/120)<1e-9);assert.equal(row.thermalValid,1);
+      assert.ok(row.burnedAbKgSec>=0&&row.burnedAbKgSec<=row.suppliedAbKgSec+1e-10&&row.suppliedAbKgSec<=row.fuelKgSec+1e-10);
+      if(!row.augmentation)assert.equal(row.burnedAbKgSec,0);
+      if(name==='powered-lift')assert.equal(row.augmentation,0,'No AB during dry powered lift, at every fixed step');
+      auditedSteps++;if(++count%Math.round(sampleSeconds*120)===0||dense)trace.push(optics(row));return row;
+    };
+    const advance=(phase,seconds,throttle,denseSeconds=0)=>{if(throttle!==undefined)set('fcs/throttle-cmd-norm',throttle);let row;
+      for(let i=0;i<Math.round(seconds*120);i++)row=step(phase,(i+1)/120,false,i<Math.round(denseSeconds*120)||i===0);
+      optics(row);if(trace.at(-1)!==row)trace.push(row);return row;};
+    const start=()=>{let row;for(let i=0;i<60*120;i++){row=step('starter',(i+1)/120,true);if(row.nativeRunning)break;}
+      assert.equal(row.nativeRunning,1);optics(row);if(trace.at(-1)!==row)trace.push(row);return row;};
+    const result=await run({sdk,get,set,control,read,step,advance,start});
+    summaries.push({name,initialOptions,initial,result,final:optics(read('final'))});checks.push({name,passed:true});
+  }catch(error){checks.push({name,passed:false,error:error.stack});failures.push(name+': '+error.message);}finally{sdk.destroy();}
+}
+await scenario('cold-cycle',({advance,start,control})=>{
+  const cold=advance('cold-soak',5,0),started=start(),idle=advance('idle',60,0),dry=advance('dry99-before-ab',120,.99);
+  const ab=advance('afterburner',60,1,3),returnedDry=advance('dry99-after-ab',120,.99,3);
+  control.shutdown();const cutoff=advance('shutdown',1,0,1),cooled=advance('cooling',180,0);
+  assert.equal(dry.augmentation,0);assert.equal(ab.augmentation,1);assert.equal(returnedDry.augmentation,0);assert.equal(cooled.fuelKgSec,0);
+  return {cold,started,idle,dry,ab,returnedDry,cutoff,cooled};
+});
+await scenario('powered-lift',({sdk,step,start,set,advance,read})=>{
+  step('cold-first-step',1/120);start();set('fcs/stovl-cmd-norm',1);const lifted=advance('powered-lift-full-command',90,1,5);
+  assert.ok(lifted.conversion>.99);assert.ok(Math.abs(lifted.nozzlePitchRad-Math.PI/2)<1e-9);assert.equal(lifted.augmentation,0);assert.ok(lifted.opticsValid);
+  const before=read('before-hold');sdk.hold();try{for(let i=0;i<50;i++)sdk.run();}finally{sdk.resume();}
+  const after=read('after-hold');assert.deepEqual(after,{...before,phase:'after-hold'});trace.push(optics(after));
+  return {lifted,holdIterations:50,holdStateExactlyPreserved:true};
+});
+const comparison=[];
+try{
+  for(const[name,points]of [['cold-cycle',['started','idle','dry','ab','returnedDry','cutoff','cooled']],['powered-lift',['lifted']]]){
+    const old=prior.summaries.find(s=>s.name===name),now=summaries.find(s=>s.name===name);assert.ok(old&&now);
+    for(const point of points){const a=now.result[point],b=old.result[point],differences={};
+      for(const[key,oldKey]of [['timeS','timeS'],['gasK','gasK'],['fuelKgSec','fuelKgSec'],['burnedAbKgSec','burnedAbKgSec'],['n2Pct','n2Pct'],['augmentation','augmentation'],['nozzleNorm','nozzleNorm'],['conversion','conversion']])differences[key]=a[key]-b[oldKey];
+      differences.coreK=a.coreK-b.core.temperatureK;differences.linerK=a.linerK-b.liner.temperatureK;
+      assert.ok(Object.values(differences).every(v=>Math.abs(v)<1e-9),'Native behavior changed from retained physical correction');comparison.push({scenario:name,point,differences});
+    }
+  }
+  checks.push({name:'prior-native-milestones',passed:true});
+}catch(error){checks.push({name:'prior-native-milestones',passed:false,error:error.stack});failures.push(error.message);}
+const finalDataHashes=Object.fromEntries(await Promise.all(Object.keys(dataHashes).map(async f=>[f,hash(await readFile(path.join(root,'public/jsbsim-data',f)))])));
+assert.deepEqual(dataHashes,finalDataHashes);assert.deepEqual(artifact,await verifyInstalledSdk(root));
+const changedAfterSnapshot=[];
+for(const[file,sha256]of Object.entries(sourceHashes))if(hash(await readFile(path.join(root,file)))!==sha256)changedAfterSnapshot.push(file);
+const nativeSourcesChanged=changedAfterSnapshot.filter(f=>f.startsWith('src/flight/jsbsim/')||f==='src/flight/engineTestStand.ts'||f.startsWith('public/jsbsim-data/'));
+if(nativeSourcesChanged.length)failures.push('Native helper sources changed during run: '+nativeSourcesChanged.join(', '));
+const result={schemaVersion:1,artifact,scriptSha256,sourceHashes,dataHashes,changedAfterSnapshot,nativeSourcesChanged,
+  baselineOptics:'Frozen uniform-source implementation and manifest captured before the new spatial-field implementation; source snapshot and files are retained.',
+  checks,failures,pass:failures.length===0,auditedSteps,traceRows:trace.length,sampleSeconds,
+  denseSampling:'Every 120 Hz step for first3 s AB onset/cutoff, first1 s shutdown and first5 s powered-lift transition; quarter-second samples otherwise.',
+  summaries,comparison,priorRecord:priorFile,densityIntegrals,coarseDensityIntegrals,
+  rayScope:'CPU integration of actual baseline spatial PNG with existing contracting support and grey homogeneous source. Rear axis, offset0.55R and side chord at0.05L. No geometry/depth, camera, scene, tone mapping or GPU rendering is simulated.',
+  display:{gasReferenceCdM2:1000,gain:1,exposure:null,note:'Recorded application defaults, not captured user settings. Scene Y is only pre-exposure source scaling.'},
+  limits:['Native gas is an imposed enthalpy-temperature proxy, not a calibrated local static nozzle-exit state.',
+    'The scheduled flow proxy is reproduced from XML solely for diagnosis; no new native or app dynamics are introduced.',
+    'Uniform baseline j and grey extinction preserve source chromaticity along every ray before background/display processing.',
+    'No dry hot-particle population, exterior reaction, AB bypass, pressure-ratio inference or measured F135 radiance is assumed.',
+    'No browser/GPU/appearance/performance qualification.']};
+await writeFile(path.join(out,'report.json'),JSON.stringify(result,null,2)+'\n');
+const columns=Object.keys(trace[0]);await writeFile(path.join(out,'trace.csv'),[columns.join(','),...trace.map(row=>columns.map(c=>row[c]).join(','))].join('\n')+'\n');
+await writeFile(path.join(out,'property-catalog.txt'),propertyCatalog??'');await writeFile(path.join(out,'sdk.log'),logs.join('\n')+'\n');
+console.log(JSON.stringify({out,pass:result.pass,checks,auditedSteps,traceRows:trace.length,densityIntegrals,changedAfterSnapshot},null,2));
+if(!result.pass)process.exitCode=1;

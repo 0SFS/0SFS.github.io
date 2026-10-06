@@ -1,0 +1,142 @@
+{
+  "schema": "0sfs-engine-orb-cadence/1",
+  "date": "2026-10-05",
+  "owner": "0sfs",
+  "scope": "Independent display-paced shaft animation on desktop and phone; retain constant marker appearance and direct speed scaling. Avoid unchanged numeric/detail DOM writes and recover fractional draw-cap cadence.",
+  "settings": {
+    "fpsCeiling": {
+      "bounds": [
+        0,
+        1000
+      ],
+      "default": 1000,
+      "zero": "disabled",
+      "cadence": "Browser requestAnimationFrame, bounded by selected ceiling. Does not request 1000 Hz. Explicit saved lower limits remain effective."
+    }
+  },
+  "behavior": {
+    "source": "Only received simulation time is interpolated; no future prediction.",
+    "desktop": "Uses source wall-clock interval; RAF draws only shaft canvas, without SDK reads, DOM refreshes or scene requests.",
+    "phone": "Uses one 50 ms heartbeat interval.",
+    "idle": "Pause, no remaining received interval, stopped shafts, hidden/offscreen, unavailable or disabled renderer, and disposal stop scheduling.",
+    "renderer": "Fixed-origin draw deadlines preserve timing remainder; stalled slots are discarded.",
+    "dom": "Only changed formatted values or attributes are written. Sound detail rows rebuild only when changed."
+  },
+  "deterministicCoverage": [
+    "120 Hz shaft frames from 30 Hz source samples",
+    "60/120/144/240 Hz renderer delivery and floating-point roundoff",
+    "Jitter, stall recovery and live cap changes",
+    "Duplicate fixed-step timestamps, pause, rewind, missing time, hidden/offscreen, topology and disposal",
+    "No physics reads or DOM writes during twelve independent 120 Hz shaft frames",
+    "Unchanged formatted engine readouts cause no DOM mutations",
+    "Phone protocol accepts extended visible FPS ceilings"
+  ],
+  "checks": [
+    {
+      "command": "npx tsc -b",
+      "status": "passed",
+      "log": "typecheck.log"
+    },
+    {
+      "command": "npm run lint",
+      "status": "passed",
+      "log": "lint.log"
+    },
+    {
+      "command": "npx vitest related --run src/flight/hud/engineSpoolAnimation.ts src/flight/hud/engineSpoolRenderer.ts src/flight/hud/engineSummary.ts src/flight/hud/engineMonitor.ts src/flight/createFlightSimApp.ts src/flight/settings/flightParameters.ts src/remote/PhoneEngine.tsx src/remote/protocol.ts --maxWorkers=50%",
+      "status": "732 passed; one fixture still expected the old 30 FPS default. Fixture corrected to 1000.",
+      "log": "related-tests.log"
+    },
+    {
+      "command": "npx vitest run src/flight/createFlightSimApp.phone.test.ts src/flight/hud/engineSpoolAnimation.test.ts src/flight/hud/engineSpoolRenderer.test.ts --maxWorkers=50%",
+      "status": "passed",
+      "files": 3,
+      "tests": 51,
+      "log": "focused-tests.log",
+      "note": "One redundant offscreen assertion case was removed before final CI."
+    },
+    {
+      "command": "VITEST_MAX_WORKERS=5 npm run ci",
+      "status": "passed",
+      "files": 162,
+      "testsPassed": 1709,
+      "expectedFailures": 1,
+      "log": "ci.log"
+    }
+  ],
+  "aliasing": {
+    "f135RepresentativeCoreMarkers": 36,
+    "displayRevPerSecondAt99": 1.98,
+    "bladePitchesPerSecond": 71.28,
+    "unambiguousDirectionRequiresFpsAbove": 142.56,
+    "note": "Identical markers can appear stationary/reversed on 60/120 Hz screens or dropped frames. No appearance or hidden speed changes compensate."
+  },
+  "sourceHashes": [
+    {
+      "file": "src/flight/hud/engineSpoolAnimation.ts",
+      "sha256": "dd2184191e84cd51b30acba4d85eca586e537652793e9d7ffaff9e243534821a"
+    },
+    {
+      "file": "src/flight/hud/engineSpoolAnimation.test.ts",
+      "sha256": "0289bb05a66cd81cf56b798c10b7c46bf0d89551a4f54fa3887457f40075ac82"
+    },
+    {
+      "file": "src/flight/hud/engineSpoolRenderer.ts",
+      "sha256": "3788424a457a943d3a5d13f34ea1df7f9f81b85eb9bd5bc8a448c31b91c7ad91"
+    },
+    {
+      "file": "src/flight/hud/engineSpoolRenderer.test.ts",
+      "sha256": "3b1a9dbb64471a5fb028ece935c8f7fd88de0fa05ad568c5a3e903b191ee1ef1"
+    },
+    {
+      "file": "src/flight/hud/engineMonitor.ts",
+      "sha256": "6cdaf70df9696c996f272f200e9a840627a5d91d7662d4749b5b726d14066c08"
+    },
+    {
+      "file": "src/flight/hud/engineMonitor.test.ts",
+      "sha256": "0d3eb889ac012b725712c61590963131772fcf4a03b950270a697f37d9e3853f"
+    },
+    {
+      "file": "src/flight/hud/engineSummary.ts",
+      "sha256": "12f1868d66c4e6e07e5141ee0b7a6b5600961d1b955be094e9a26a3c21780708"
+    },
+    {
+      "file": "src/flight/hud/engineSummary.test.ts",
+      "sha256": "8a68ce27a5a2a464be70ecbc7a8cd3458e24736cbb2a5abe24600ef2f0420f25"
+    },
+    {
+      "file": "src/flight/createFlightSimApp.ts",
+      "sha256": "c9d89f5aed1090b648ef9bc50ce160dd3435c8b0a90fb13a12fc14e4d8b2f11d"
+    },
+    {
+      "file": "src/flight/createFlightSimApp.phone.test.ts",
+      "sha256": "760abb7ee3f76ba8d18f340dbcdb212564c3b839a68d9c1f22b36919ece0931c"
+    },
+    {
+      "file": "src/flight/settings/flightParameters.ts",
+      "sha256": "8fe33c519129d56b29a667d287384601a7b0903ded73f001980ddd2e10c39647"
+    },
+    {
+      "file": "src/remote/PhoneEngine.tsx",
+      "sha256": "73e0b4bf309f1ca9740bb9f0e08bab771454e6458ee22f22f2bca14f03c42ad5"
+    },
+    {
+      "file": "src/remote/PhoneEngine.test.tsx",
+      "sha256": "266500413e9556410fed0107036648ec84095af545d2b9923a2d9e245e22bfc3"
+    },
+    {
+      "file": "src/remote/PhoneController.test.tsx",
+      "sha256": "b09e8c36075c5e47f2f4c0e84cd63b435360ba587bb9dd07b66cadcd531d5361"
+    },
+    {
+      "file": "src/remote/protocol.ts",
+      "sha256": "a0e180f053857c35997e57691e0ed43eb9b3f937f40e91c75d0870a42e3a167e"
+    },
+    {
+      "file": "src/remote/protocol.test.ts",
+      "sha256": "aa33befb48513a3487d1c75d43ea39db2c56efdc81d4f442fbe56013c937a9cf"
+    }
+  ],
+  "limitations": "Deterministic scheduling and DOM correctness only; actual refresh delivery under load has not been benchmarked or device-qualified. Shaders and marker appearance unchanged from the preceding uniform-marker GPU check.",
+  "appearanceEvidence": "../engine-orb-uniform-2026-10-05/acceptance.json"
+}

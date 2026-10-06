@@ -1,0 +1,649 @@
+{
+  "schema": "0sfs-f35b-nozzle-angular-coverage/1",
+  "owner": "0sfs engine visual validation",
+  "createdAt": "2026-10-06T18:05:01.459Z",
+  "command": [
+    "node",
+    "scripts/validation/f35b/inspect-nozzle-gaps.mjs"
+  ],
+  "inputs": [
+    {
+      "path": "public/aircraft/f-35b/F-35B_AF267.glb",
+      "sha256": "8324d792711a8aecd74988dd9e314b3b4e6f1f3a819591ce60f34caa004d7fbd"
+    },
+    {
+      "path": "src/flight/aircraft/aircraftAnimation.ts",
+      "sha256": "aab8d32a6f0626808359a59e60c5797cf39c07c735f320122d793baf82bd3f06"
+    },
+    {
+      "path": "scripts/validation/f35b/inspect-nozzle-gaps.mjs",
+      "sha256": "43e888e3c9ae23ee78a0954a3dc7c7ece133a6100891711e8b93033f366032ee"
+    },
+    {
+      "path": "scripts/outputDirectory.mjs",
+      "sha256": "08a05fe4cf44da531352d1ae412c3f792767b92af16d310f82df0da8f3c51188"
+    }
+  ],
+  "algorithm": {
+    "id": "triangle-plane-intersection-angular-union-v1",
+    "description": "Intersect each posed petal triangle with a nozzle-local constant-Z plane. Project each non-axis-crossing segment into its minor polar-angle interval about the hinge-ring axis, split wraparound, and merge interval coverage. This measures radial triangle presence, not connected watertightness or gas sealing.",
+    "coordinateToleranceNozzleLocal": 1e-9,
+    "intervalMergeToleranceRadians": 1e-7,
+    "angleConvention": "0 degrees is nozzle-local +Y; increases toward +X about local +Z.",
+    "coordinateConvention": "Authored vtol-local frame, +Z toward exhaust; hinge-ring mean from the 16 direct-child origins. Actual production bind/apply rig poses, no source edits, loader yaw, stance offset, hiding, material, lighting or emission changes. Uniform parent conversion converts local station offsets to metres."
+  },
+  "scope": {
+    "assembly": "vtol",
+    "selectedMeshes": [
+      "feather.001",
+      "feather.002",
+      "feather.003",
+      "feather.004",
+      "feather.005",
+      "feather.006",
+      "feather.007",
+      "feather.008",
+      "feather.009",
+      "feather.010",
+      "feather.011",
+      "feather.012",
+      "feather.013",
+      "feather.014",
+      "feather.015",
+      "feather.016"
+    ],
+    "hingeRingCenterNozzleLocal": [
+      9.874377547500202e-7,
+      0.2873800507787019,
+      0.8079499483321497
+    ],
+    "uniformConversionScale": 0.833057403564465,
+    "stationOffsetsNozzleLocal": [
+      0.1,
+      0.4,
+      0.7,
+      0.85
+    ],
+    "aperturePositionsNorm": [
+      0,
+      0.5,
+      1
+    ],
+    "poses": "Native display position supplied directly at0/.5/1; actual nozzle pitch/yaw remain neutral. It is not an F135 A8/A9 schedule.",
+    "limits": [
+      "Positive uncovered angle establishes absent selected-petal triangles at that section; it does not alone identify real-engine leakage or prove every visible slot erroneous.",
+      "Zero uncovered angle does not prove overlapping seals, a continuous connected wall, correct hardware, or calibrated internal flow geometry.",
+      "Real serrated trailing edges have intentional notches. Future rebuild acceptance must distinguish upstream sealing sections from intended exit serrations.",
+      "No exact F135B nozzle length, A8/A9 range, seal linkage or numeric hardware schedule is established by this diagnostic.",
+      "All geometry is included regardless of authored visibility or material. Coplanar triangles and axis-crossing segments make the selected section inconclusive."
+    ]
+  },
+  "sourceContext": [
+    {
+      "url": "https://onlinelibrary.wiley.com/doi/full/10.1002/9780470686652.eae490",
+      "supports": "Lockheed authors describe overlapping CD flow-path/fairing flaps, A8 throat/A9 exit, and shorter STOVL nozzle versus common A/C. No numeric F135 schedule."
+    },
+    {
+      "url": "https://www.codeonemagazine.com/article.html?item_id=137",
+      "supports": "Lockheed ASTOVL engineer distinguishes compact B nozzle from longer A/C flaps and separate three-bearing swivel duct."
+    }
+  ],
+  "geometry": {
+    "petalPrimitiveCount": 32,
+    "housingAxialBoundsNozzleLocal": [
+      -0.9046818614006042,
+      0.8148206472396851
+    ],
+    "petalBindings": [
+      {
+        "name": "feather.001",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "closedAngleRad": 0,
+        "openAngleRad": -0.2182253497604993
+      },
+      {
+        "name": "feather.002",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "closedAngleRad": 0,
+        "openAngleRad": -0.2182253497604993
+      },
+      {
+        "name": "feather.003",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "closedAngleRad": 0,
+        "openAngleRad": -0.2182253497604993
+      },
+      {
+        "name": "feather.004",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "closedAngleRad": 0,
+        "openAngleRad": -0.2182253497604993
+      },
+      {
+        "name": "feather.005",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "closedAngleRad": 0,
+        "openAngleRad": -0.2182253497604993
+      },
+      {
+        "name": "feather.006",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "closedAngleRad": 0,
+        "openAngleRad": -0.2182253497604993
+      },
+      {
+        "name": "feather.007",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "closedAngleRad": 0,
+        "openAngleRad": -0.2182253497604993
+      },
+      {
+        "name": "feather.008",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "closedAngleRad": 0,
+        "openAngleRad": -0.2182253497604993
+      },
+      {
+        "name": "feather.009",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "closedAngleRad": 0,
+        "openAngleRad": -0.2182253497604993
+      },
+      {
+        "name": "feather.010",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "closedAngleRad": 0,
+        "openAngleRad": -0.2182253497604993
+      },
+      {
+        "name": "feather.011",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "closedAngleRad": 0,
+        "openAngleRad": -0.2182253497604993
+      },
+      {
+        "name": "feather.012",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "closedAngleRad": 0,
+        "openAngleRad": -0.2182253497604993
+      },
+      {
+        "name": "feather.013",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "closedAngleRad": 0,
+        "openAngleRad": -0.2182253497604993
+      },
+      {
+        "name": "feather.014",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "closedAngleRad": 0,
+        "openAngleRad": -0.2182253497604993
+      },
+      {
+        "name": "feather.015",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "closedAngleRad": 0,
+        "openAngleRad": -0.2182253497604993
+      },
+      {
+        "name": "feather.016",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "closedAngleRad": 0,
+        "openAngleRad": -0.2182253497604993
+      }
+    ]
+  },
+  "sections": [
+    {
+      "apertureNorm": 0,
+      "stationOffsetNozzleLocal": 0.1,
+      "stationOffsetMeters": 0.0833057403564465,
+      "planeZNozzleLocal": 0.9079499483321497,
+      "selectedTriangleCount": 320,
+      "housingPresentAtPlane": false,
+      "status": "measured",
+      "intersectingTriangles": 192,
+      "coplanarTriangles": 0,
+      "axisCrossingSegments": 0,
+      "coveredDegrees": 360,
+      "uncoveredDegrees": 0,
+      "coveredFraction": 1,
+      "uncoveredIntervalsDegrees": []
+    },
+    {
+      "apertureNorm": 0,
+      "stationOffsetNozzleLocal": 0.4,
+      "stationOffsetMeters": 0.333222961425786,
+      "planeZNozzleLocal": 1.2079499483321499,
+      "selectedTriangleCount": 320,
+      "housingPresentAtPlane": false,
+      "status": "measured",
+      "intersectingTriangles": 192,
+      "coplanarTriangles": 0,
+      "axisCrossingSegments": 0,
+      "coveredDegrees": 360,
+      "uncoveredDegrees": 0,
+      "coveredFraction": 1,
+      "uncoveredIntervalsDegrees": []
+    },
+    {
+      "apertureNorm": 0,
+      "stationOffsetNozzleLocal": 0.7,
+      "stationOffsetMeters": 0.5831401824951254,
+      "planeZNozzleLocal": 1.5079499483321497,
+      "selectedTriangleCount": 320,
+      "housingPresentAtPlane": false,
+      "status": "measured",
+      "intersectingTriangles": 192,
+      "coplanarTriangles": 0,
+      "axisCrossingSegments": 0,
+      "coveredDegrees": 360,
+      "uncoveredDegrees": 0,
+      "coveredFraction": 1,
+      "uncoveredIntervalsDegrees": []
+    },
+    {
+      "apertureNorm": 0,
+      "stationOffsetNozzleLocal": 0.85,
+      "stationOffsetMeters": 0.7080987930297953,
+      "planeZNozzleLocal": 1.6579499483321496,
+      "selectedTriangleCount": 320,
+      "housingPresentAtPlane": false,
+      "status": "measured",
+      "intersectingTriangles": 192,
+      "coplanarTriangles": 0,
+      "axisCrossingSegments": 0,
+      "coveredDegrees": 360,
+      "uncoveredDegrees": 0,
+      "coveredFraction": 1,
+      "uncoveredIntervalsDegrees": []
+    },
+    {
+      "apertureNorm": 0.5,
+      "stationOffsetNozzleLocal": 0.1,
+      "stationOffsetMeters": 0.0833057403564465,
+      "planeZNozzleLocal": 0.9079499483321497,
+      "selectedTriangleCount": 320,
+      "housingPresentAtPlane": false,
+      "status": "measured",
+      "intersectingTriangles": 192,
+      "coplanarTriangles": 0,
+      "axisCrossingSegments": 0,
+      "coveredDegrees": 360,
+      "uncoveredDegrees": 0,
+      "coveredFraction": 1,
+      "uncoveredIntervalsDegrees": []
+    },
+    {
+      "apertureNorm": 0.5,
+      "stationOffsetNozzleLocal": 0.4,
+      "stationOffsetMeters": 0.333222961425786,
+      "planeZNozzleLocal": 1.2079499483321499,
+      "selectedTriangleCount": 320,
+      "housingPresentAtPlane": false,
+      "status": "measured",
+      "intersectingTriangles": 192,
+      "coplanarTriangles": 0,
+      "axisCrossingSegments": 0,
+      "coveredDegrees": 360,
+      "uncoveredDegrees": 0,
+      "coveredFraction": 1,
+      "uncoveredIntervalsDegrees": []
+    },
+    {
+      "apertureNorm": 0.5,
+      "stationOffsetNozzleLocal": 0.7,
+      "stationOffsetMeters": 0.5831401824951254,
+      "planeZNozzleLocal": 1.5079499483321497,
+      "selectedTriangleCount": 320,
+      "housingPresentAtPlane": false,
+      "status": "measured",
+      "intersectingTriangles": 192,
+      "coplanarTriangles": 0,
+      "axisCrossingSegments": 0,
+      "coveredDegrees": 360,
+      "uncoveredDegrees": 0,
+      "coveredFraction": 1,
+      "uncoveredIntervalsDegrees": []
+    },
+    {
+      "apertureNorm": 0.5,
+      "stationOffsetNozzleLocal": 0.85,
+      "stationOffsetMeters": 0.7080987930297953,
+      "planeZNozzleLocal": 1.6579499483321496,
+      "selectedTriangleCount": 320,
+      "housingPresentAtPlane": false,
+      "status": "measured",
+      "intersectingTriangles": 192,
+      "coplanarTriangles": 0,
+      "axisCrossingSegments": 0,
+      "coveredDegrees": 331.62167404745895,
+      "uncoveredDegrees": 28.3783259525411,
+      "coveredFraction": 0.921171316798497,
+      "uncoveredIntervalsDegrees": [
+        [
+          10.363085133650905,
+          12.136849239695753
+        ],
+        [
+          32.86319487554264,
+          34.63686108518733
+        ],
+        [
+          55.36319180181528,
+          57.13687450533061
+        ],
+        [
+          77.86321595684933,
+          79.63688441719597
+        ],
+        [
+          100.36322512373057,
+          102.1368613322539
+        ],
+        [
+          122.8632118395337,
+          124.63688524067827
+        ],
+        [
+          145.36323328761594,
+          147.13689125608101
+        ],
+        [
+          167.86324890579078,
+          169.63691948892287
+        ],
+        [
+          190.36327466233013,
+          192.13686113176544
+        ],
+        [
+          212.86323146114987,
+          214.63685335965914
+        ],
+        [
+          235.3632070806667,
+          237.13686463769403
+        ],
+        [
+          257.8632230781249,
+          259.6368574595542
+        ],
+        [
+          280.3632147956233,
+          282.13686240880224
+        ],
+        [
+          302.8632309534534,
+          304.6368883104127
+        ],
+        [
+          325.3632543634845,
+          327.136841322911
+        ],
+        [
+          347.86322638572653,
+          349.6367404614854
+        ]
+      ]
+    },
+    {
+      "apertureNorm": 1,
+      "stationOffsetNozzleLocal": 0.1,
+      "stationOffsetMeters": 0.0833057403564465,
+      "planeZNozzleLocal": 0.9079499483321497,
+      "selectedTriangleCount": 320,
+      "housingPresentAtPlane": false,
+      "status": "measured",
+      "intersectingTriangles": 192,
+      "coplanarTriangles": 0,
+      "axisCrossingSegments": 0,
+      "coveredDegrees": 360,
+      "uncoveredDegrees": 0,
+      "coveredFraction": 1,
+      "uncoveredIntervalsDegrees": []
+    },
+    {
+      "apertureNorm": 1,
+      "stationOffsetNozzleLocal": 0.4,
+      "stationOffsetMeters": 0.333222961425786,
+      "planeZNozzleLocal": 1.2079499483321499,
+      "selectedTriangleCount": 320,
+      "housingPresentAtPlane": false,
+      "status": "measured",
+      "intersectingTriangles": 192,
+      "coplanarTriangles": 0,
+      "axisCrossingSegments": 0,
+      "coveredDegrees": 360,
+      "uncoveredDegrees": 0,
+      "coveredFraction": 1,
+      "uncoveredIntervalsDegrees": []
+    },
+    {
+      "apertureNorm": 1,
+      "stationOffsetNozzleLocal": 0.7,
+      "stationOffsetMeters": 0.5831401824951254,
+      "planeZNozzleLocal": 1.5079499483321497,
+      "selectedTriangleCount": 320,
+      "housingPresentAtPlane": false,
+      "status": "measured",
+      "intersectingTriangles": 192,
+      "coplanarTriangles": 0,
+      "axisCrossingSegments": 0,
+      "coveredDegrees": 322.3959684090654,
+      "uncoveredDegrees": 37.60403159093458,
+      "coveredFraction": 0.8955443566918484,
+      "uncoveredIntervalsDegrees": [
+        [
+          10.074793824679794,
+          12.425148854159271
+        ],
+        [
+          32.574889173373286,
+          34.92516006757728
+        ],
+        [
+          55.074886824683645,
+          57.42517341902288
+        ],
+        [
+          77.57490965437002,
+          79.92517768086556
+        ],
+        [
+          100.07491273405556,
+          102.42515916544279
+        ],
+        [
+          122.5749026663351,
+          124.92518131627087
+        ],
+        [
+          145.07492306270032,
+          147.42518755481694
+        ],
+        [
+          167.5749377804706,
+          169.9252112138501
+        ],
+        [
+          190.0749603187112,
+          192.4251604851171
+        ],
+        [
+          212.57492318867972,
+          214.92515344386942
+        ],
+        [
+          235.07490123111282,
+          237.42516550028205
+        ],
+        [
+          257.57491715412664,
+          259.9251598928272
+        ],
+        [
+          280.07491050729385,
+          282.4251602705791
+        ],
+        [
+          302.5749204281586,
+          304.92518397889444
+        ],
+        [
+          325.0749417523781,
+          327.4251440656385
+        ],
+        [
+          347.5749186486943,
+          349.9250536315448
+        ]
+      ]
+    },
+    {
+      "apertureNorm": 1,
+      "stationOffsetNozzleLocal": 0.85,
+      "stationOffsetMeters": 0.7080987930297953,
+      "planeZNozzleLocal": 1.6579499483321496,
+      "selectedTriangleCount": 320,
+      "housingPresentAtPlane": false,
+      "status": "measured",
+      "intersectingTriangles": 192,
+      "coplanarTriangles": 0,
+      "axisCrossingSegments": 0,
+      "coveredDegrees": 288.68751553077107,
+      "uncoveredDegrees": 71.3124844692289,
+      "coveredFraction": 0.8019097653632531,
+      "uncoveredIntervalsDegrees": [
+        [
+          9.021405513008135,
+          13.478537583790882
+        ],
+        [
+          31.521500308696297,
+          35.9785481162643
+        ],
+        [
+          54.02149864203335,
+          58.478562086063256
+        ],
+        [
+          76.52152105223962,
+          80.97856626178695
+        ],
+        [
+          99.02152414860842,
+          103.47854771588052
+        ],
+        [
+          121.52151322629237,
+          125.97856999469279
+        ],
+        [
+          144.02153390248196,
+          148.4785767996053
+        ],
+        [
+          166.52154835943895,
+          170.97860020868143
+        ],
+        [
+          189.02157107406688,
+          193.4785505269752
+        ],
+        [
+          211.5215337741638,
+          215.97854257010027
+        ],
+        [
+          234.0215121390876,
+          238.4785547894725
+        ],
+        [
+          256.5215278567158,
+          260.97854913295134
+        ],
+        [
+          279.02152125985316,
+          283.47855038107923
+        ],
+        [
+          301.52153100775774,
+          305.97857358993144
+        ],
+        [
+          324.0215520343899,
+          328.4785347042725
+        ],
+        [
+          346.52152828135956,
+          350.97844258787467
+        ]
+      ]
+    }
+  ]
+}

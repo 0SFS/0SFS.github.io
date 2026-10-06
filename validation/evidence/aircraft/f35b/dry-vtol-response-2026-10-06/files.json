@@ -1,0 +1,271 @@
+{
+  "recordedDate": "2026-10-06",
+  "scope": "Retained completed finite-thermal-core numerical analysis, software checks, source snapshots and public NASA references; no new browser, GPU, engine-dynamics or benchmark run.",
+  "repositories": {
+    "0sfs": {
+      "head": "6b3dd0bbad88d6aeb26d7973ff7d97b4389d1395",
+      "state": "Dirty working tree; retained file hashes identify this checkpoint."
+    },
+    "foss-earth": {
+      "head": "e900f3a8c0e799b296964cdd74785029a9fe9340",
+      "state": "Dirty working tree; retained file hashes identify this checkpoint."
+    }
+  },
+  "referenceProvenance": [
+    {
+      "file": "references/raman2017.pdf",
+      "sourceUrl": "https://ntrs.nasa.gov/api/citations/20170005666/downloads/20170005666.pdf",
+      "title": "Rotational Raman-Based Temperature Measurements in a High-Velocity Turbulent Jet",
+      "report": "NASA/TM-2017-219504/REV1",
+      "retrievedDate": "2026-10-06",
+      "derivedImages": [
+        {
+          "file": "references/raman-fig15.png",
+          "printedPage": 16,
+          "figure": 15
+        },
+        {
+          "file": "references/raman-fig17.png",
+          "printedPage": 18,
+          "figure": 17
+        }
+      ],
+      "limit": "Images retained from research extraction; extraction command is not available in this checkpoint. Original PDF is authoritative."
+    },
+    {
+      "file": "references/nasa-temperature2020.pdf",
+      "sourceUrl": "https://ntrs.nasa.gov/api/citations/20205007805/downloads/TM-20205007805.pdf",
+      "retrievedDate": "2026-10-06"
+    }
+  ],
+  "files": [
+    {
+      "file": "numerical/report.json",
+      "source": "build/validation/dry-exhaust-visibility/2026-10-06_172236/report.json",
+      "bytes": 26450,
+      "sha256": "57ad29b99e2cb991a456d3ac6e0b21695e76e08afaace616f7e77a164bee8728"
+    },
+    {
+      "file": "numerical/source-0-f135-exhaust-lut.manifest.json.txt",
+      "source": "build/validation/dry-exhaust-visibility/2026-10-06_172236/source-0-f135-exhaust-lut.manifest.json.txt",
+      "bytes": 617375,
+      "sha256": "c33df624e7856be891d222ab6d12043483c9562c9883dbacb73f2147a90c838b"
+    },
+    {
+      "file": "numerical/source-1-f135-exhaust-lut.manifest.json.txt.txt",
+      "source": "build/validation/dry-exhaust-visibility/2026-10-06_172236/source-1-f135-exhaust-lut.manifest.json.txt.txt",
+      "bytes": 619287,
+      "sha256": "77e3ec685465830993a71f47f88ae5ad5f226a698cfdc3bb89c085455fcb543b"
+    },
+    {
+      "file": "numerical/source-2-report.json.txt",
+      "source": "build/validation/dry-exhaust-visibility/2026-10-06_172236/source-2-report.json.txt",
+      "bytes": 124565,
+      "sha256": "b007ff53e1c65c36dfbec04a8d0ee6ef4d4bbcb726dde8aa9b06761aca239a17"
+    },
+    {
+      "file": "numerical/source-3-CIE_xyz_1931_2deg.csv.txt",
+      "source": "build/validation/dry-exhaust-visibility/2026-10-06_172236/source-3-CIE_xyz_1931_2deg.csv.txt",
+      "bytes": 24021,
+      "sha256": "fa663e3535a7e0763a745993a1f0a192eb0275ac46ad2d1befd7626841e713c1"
+    },
+    {
+      "file": "numerical/source-4-engineGasOptics.ts.txt",
+      "source": "build/validation/dry-exhaust-visibility/2026-10-06_172236/source-4-engineGasOptics.ts.txt",
+      "bytes": 39975,
+      "sha256": "d0ddf67e86d21ae5a7a2f2f4d914615a2f7993059f95f8b59a97f4ed86bceba1"
+    },
+    {
+      "file": "numerical/source-5-engineReactionEmission.ts.txt",
+      "source": "build/validation/dry-exhaust-visibility/2026-10-06_172236/source-5-engineReactionEmission.ts.txt",
+      "bytes": 4203,
+      "sha256": "1d0e736b8a5b816a66d68a57c5674ce7f0af0a9a457fe4faaeaa6eccca8cec91"
+    },
+    {
+      "file": "numerical/source-6-bake.mjs.txt",
+      "source": "build/validation/dry-exhaust-visibility/2026-10-06_172236/source-6-bake.mjs.txt",
+      "bytes": 24305,
+      "sha256": "694c20b075267b29e5d6a64f27e3daf134a07701cce5310b2894aef1c57854cd"
+    },
+    {
+      "file": "numerical/source-7-reference.mjs.txt",
+      "source": "build/validation/dry-exhaust-visibility/2026-10-06_172236/source-7-reference.mjs.txt",
+      "bytes": 1652,
+      "sha256": "8fb085647f7520a8f4222e8be207023d881ad0a186fa3d4721fa8f7e5c9b5cb8"
+    },
+    {
+      "file": "numerical/source-8-f135-visible-approximation.json.txt",
+      "source": "build/validation/dry-exhaust-visibility/2026-10-06_172236/source-8-f135-visible-approximation.json.txt",
+      "bytes": 17834,
+      "sha256": "fafa051fc44480acd9d41079fe30dd714ce34cc4d7a628f5dc538dd9b5a32d5a"
+    },
+    {
+      "file": "numerical/source-9-analyze-dry-exhaust-visibility.mjs.txt",
+      "source": "build/validation/dry-exhaust-visibility/2026-10-06_172236/source-9-analyze-dry-exhaust-visibility.mjs.txt",
+      "bytes": 8453,
+      "sha256": "eaa4a2655f2454027a2e5d99f4bb97cbaac0a1e653036427a41f5c3d64793034"
+    },
+    {
+      "file": "application/ci.log",
+      "source": "build/dry-vtol-response/ci.log",
+      "bytes": 87907,
+      "sha256": "0a7bba7fa1f845b4faa59913013786e5a1697aa13ccf6a9abfcbc24ebbaf91be"
+    },
+    {
+      "file": "application/typecheck.log",
+      "source": "build/dry-vtol-response/typecheck.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "application/lint.log",
+      "source": "build/dry-vtol-response/lint.log",
+      "bytes": 109,
+      "sha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e"
+    },
+    {
+      "file": "application/related.log",
+      "source": "build/dry-vtol-response/related.log",
+      "bytes": 24752,
+      "sha256": "a9176b5d93b7bb9bf32bae3d63d57d4fcd42172d1d273f54e34db63b22b24bd7"
+    },
+    {
+      "file": "application/bake-final.log",
+      "source": "build/dry-vtol-response/bake-final.log",
+      "bytes": 1201,
+      "sha256": "8aee7c4f54e5f0f0dd1c5a5a866327f7b085e0a0e49f2ba7e481a502f28b741d"
+    },
+    {
+      "file": "application/numerical-complete.log",
+      "source": "build/dry-vtol-response/numerical-complete.log",
+      "bytes": 11599,
+      "sha256": "4e0c813725404730985ef303b5e413c3b45b22460898abc8cffc05ffa28c863a"
+    },
+    {
+      "file": "foss-earth/ci.log",
+      "source": "../foss-earth/build/validation/lighting-controls-2026-10-06/ci.log",
+      "bytes": 44787,
+      "sha256": "371592892c08451694a3a034b91bc76bbb1de49fc3b19ffcbc1b1dd18553c865"
+    },
+    {
+      "file": "foss-earth/typecheck.log",
+      "source": "../foss-earth/build/validation/lighting-controls-2026-10-06/typecheck.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "foss-earth/lint.log",
+      "source": "../foss-earth/build/validation/lighting-controls-2026-10-06/lint.log",
+      "bytes": 115,
+      "sha256": "d8d26621c0569c296fc680b25fe14f8b1f9b684c3446c56df2bf932172384034"
+    },
+    {
+      "file": "foss-earth/related.log",
+      "source": "../foss-earth/build/validation/lighting-controls-2026-10-06/related.log",
+      "bytes": 3292,
+      "sha256": "032d57992e89ad52c5aedf21721c4759c93ec0225aba91220f74211c148f3485"
+    },
+    {
+      "file": "foss-earth/corrected-tests.log",
+      "source": "../foss-earth/build/validation/lighting-controls-2026-10-06/corrected-tests.log",
+      "bytes": 215,
+      "sha256": "6025aad86840b2793aa3544043eff73689879c714ff9e0c27a459dd55cbce90e"
+    },
+    {
+      "file": "application/source/engineGasOptics.test.ts.txt",
+      "source": "src/flight/aircraft/engineGasOptics.test.ts",
+      "bytes": 15582,
+      "sha256": "823b4bdebdc1d34002520b0ca95acb98e66dea2be1cef2dbe2fd05c20e2f37a8"
+    },
+    {
+      "file": "application/source/createEngineExhaust.ts.txt",
+      "source": "src/flight/aircraft/createEngineExhaust.ts",
+      "bytes": 46924,
+      "sha256": "ca957f0282da794aa55794836e35032064f74f335827a6be1d5114f5dc0284ca"
+    },
+    {
+      "file": "application/source/f135ExhaustOpticalData.ts.txt",
+      "source": "src/flight/aircraft/generated/f135ExhaustOpticalData.ts",
+      "bytes": 532043,
+      "sha256": "fdbf8dda260aed9a6ee04b61aae295185ff5d5dfd1548fead020132cb6143a28"
+    },
+    {
+      "file": "application/source/f135-exhaust-lut.png",
+      "source": "src/flight/aircraft/generated/f135-exhaust-lut.png",
+      "bytes": 471,
+      "sha256": "d9d460fbfbfe3ec0d099659646a176fa892e2afa81713f92469d0c75f4c47189"
+    },
+    {
+      "file": "application/source/f135-exhaust-spatial.png",
+      "source": "src/flight/aircraft/generated/f135-exhaust-spatial.png",
+      "bytes": 24424,
+      "sha256": "27110d47433281963a653695116feb79cf80e314a6553c3c9c753f2f6a6a530e"
+    },
+    {
+      "file": "foss-earth/source/src/settings/catalogue/renderer.ts.txt",
+      "source": "../foss-earth/src/settings/catalogue/renderer.ts",
+      "bytes": 9157,
+      "sha256": "4989d5b36aca3b0198492e67a8bb6cd3ba66c12e1987631c6ad7c2c3ed61c805"
+    },
+    {
+      "file": "foss-earth/source/src/settings/catalogue/index.ts.txt",
+      "source": "../foss-earth/src/settings/catalogue/index.ts",
+      "bytes": 12820,
+      "sha256": "c0ce5ebbc269e1cc6dff3082c5fa3bead4ec2f35d786d687554e2c4e844343b7"
+    },
+    {
+      "file": "foss-earth/source/src/engine/babylon/createBabylonRuntime.ts.txt",
+      "source": "../foss-earth/src/engine/babylon/createBabylonRuntime.ts",
+      "bytes": 98777,
+      "sha256": "5d87d7db5d824e7c54bcf45710b52d274a1dffdc2d66119a1ec8ea5ac2fa1675"
+    },
+    {
+      "file": "foss-earth/source/src/engine/babylon/createBabylonRuntime.sim.test.ts.txt",
+      "source": "../foss-earth/src/engine/babylon/createBabylonRuntime.sim.test.ts",
+      "bytes": 50115,
+      "sha256": "b81d281180babf965c7744e0311a5aa7e317b3bc89647610b7bb8b394b8f6a70"
+    },
+    {
+      "file": "foss-earth/source/src/shell/choicePanels.test.ts.txt",
+      "source": "../foss-earth/src/shell/choicePanels.test.ts",
+      "bytes": 7301,
+      "sha256": "a8d3d2a4d2d9541db1ba1b2dc68b2cf6b744b8d8df15115a3056e4c2ad76a114"
+    },
+    {
+      "file": "foss-earth/source/src/app/createGlobeApp.test.ts.txt",
+      "source": "../foss-earth/src/app/createGlobeApp.test.ts",
+      "bytes": 40388,
+      "sha256": "8b5987f9a48ed8238df82ef4b24a6c2b8f884ab8c2922c619f438cdf7059da47"
+    },
+    {
+      "file": "foss-earth/source/docs/proposals/settings.md.txt",
+      "source": "../foss-earth/docs/proposals/settings.md",
+      "bytes": 49338,
+      "sha256": "974c8dc3255fda99f052006132e380af39d7212486b808732e8734ee204fbb08"
+    },
+    {
+      "file": "references/raman2017.pdf",
+      "source": "build/f135-dry-vtol-research-2026-10-06/raman2017.pdf",
+      "bytes": 2761106,
+      "sha256": "4adebcb5aefc41ff04d36b81fdf5a622195e11e24eef735b92d2b693b526df7d"
+    },
+    {
+      "file": "references/raman-fig15.png",
+      "source": "build/f135-dry-vtol-research-2026-10-06/raman-fig15.png",
+      "bytes": 659959,
+      "sha256": "6744b0df3bbebebd2adf263276b2f53774855c8775bd8fa6977ce355c30967ad"
+    },
+    {
+      "file": "references/raman-fig17.png",
+      "source": "build/f135-dry-vtol-research-2026-10-06/raman-fig17.png",
+      "bytes": 492912,
+      "sha256": "251938f5176ebd4fb57e04d4d2943ba3d2e76153dd4dc26ddebce482b0cc5ff8"
+    },
+    {
+      "file": "references/nasa-temperature2020.pdf",
+      "source": "build/f135-dry-vtol-research-2026-10-06/nasa-temperature2020.pdf",
+      "bytes": 5964386,
+      "sha256": "4f0790165f7588dff554bedb40d4c7d64f7890d85ffc057688220b67b64c45d2"
+    }
+  ]
+}

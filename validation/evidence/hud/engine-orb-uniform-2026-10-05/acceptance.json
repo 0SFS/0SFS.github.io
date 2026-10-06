@@ -1,0 +1,72 @@
+{
+  "schema": "0sfs-engine-orb-uniform/1",
+  "date": "2026-10-05",
+  "owner": "0sfs",
+  "scope": "Remove the blade-fixed brightness gradient. Markers only move, with uniform color, brightness and size per row. Retain faster direct speed scaling on desktop and phone.",
+  "speed": {
+    "defaultMaxRevPerSimSecond": 2,
+    "f135At99PercentRevPerSimSecond": 1.98
+  },
+  "rendering": {
+    "drawCallsPerChangedFrame": 1,
+    "uniformBytes": 48,
+    "brightnessModulation": false,
+    "sizeModulation": false,
+    "colorModulation": false
+  },
+  "checks": [
+    {
+      "command": "npx tsc -b",
+      "status": "passed",
+      "log": "typecheck.log"
+    },
+    {
+      "command": "npx vitest related --run src/flight/hud/engineSpoolRenderer.ts --maxWorkers=50%",
+      "status": "passed",
+      "files": 10,
+      "tests": 151,
+      "log": "related-tests.log"
+    },
+    {
+      "command": "npm run lint",
+      "status": "passed",
+      "log": "lint.log"
+    },
+    {
+      "command": "node scripts/validation/audio/check-engine-orbs.mjs",
+      "status": "passed",
+      "cases": 9,
+      "log": "gpu-report.json",
+      "screenshot": "uniform-blades.png",
+      "acceptance": "Exact blade counts, opaque interiors for every marker, marker areas within 15% across both phases, per-ring interior RGB spread no more than two byte values across all blades and phases. Measured maximum RGB spread: one byte value. WebGPU/WebGL2/WebGL1 with F-35B, SF50 and C172. Native HUD screenshot visually reviewed."
+    },
+    {
+      "command": "VITEST_MAX_WORKERS=5 npm run ci",
+      "status": "passed",
+      "files": 160,
+      "testsPassed": 1684,
+      "expectedFailures": 1,
+      "log": "ci.log"
+    }
+  ],
+  "sourceHashes": [
+    {
+      "file": "src/flight/hud/engineSpoolRenderer.ts",
+      "sha256": "a716aa828f7835c96f081840d237d6bc14925262a78a3c69859d3386a17dc096"
+    },
+    {
+      "file": "src/flight/hud/engineSpoolMotion.ts",
+      "sha256": "ac91b1607dc69c98197c134dd9985eb25cc093215915d24f12e6a9c0cc9c26d9"
+    },
+    {
+      "file": "src/flight/hud/engineMonitor.test.ts",
+      "sha256": "8a5b88d8fb78670da937b371f353e05a0990310b7e5ed54404fafe02167d4f1d"
+    },
+    {
+      "file": "scripts/validation/audio/check-engine-orbs.mjs",
+      "sha256": "db831e7aa55ee7ac016b88b6edeee22223230fb91f44bdb449aa355d51339838"
+    }
+  ],
+  "limitations": "Untimed correctness checks only; no performance qualification. Pixel tests use enlarged markers to distinguish geometry from antialiasing. Identical repeated blade positions can strobe between frames; this does not change the selected shaft animation speed.",
+  "supersededAppearanceRecord": "../engine-orb-speed-2026-10-05/acceptance.json"
+}

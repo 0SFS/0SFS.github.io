@@ -1,0 +1,332 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-06",
+  "status": "passed",
+  "scope": "Installed fork.15 real-WASM F135 two-solid thermal lifecycle at 120 Hz with native hold-down and actual app helpers. Terminal only.",
+  "artifact": {
+    "schemaVersion": 1,
+    "identity": {
+      "schemaVersion": 2,
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.15"
+      },
+      "native": {
+        "origin": "https://github.com/Felipegalind0/jsbsim",
+        "commit": "b58a1855d137466fe8d9f6bc12d4cfd9efcb4b1b",
+        "contentSha256": "a1b7bbd81805afc5fd95e2d776b1b763e65af5db3313666f259192458516f2d3",
+        "dirty": false
+      },
+      "sdk": {
+        "commit": "b58a1855d137466fe8d9f6bc12d4cfd9efcb4b1b",
+        "contentSha256": "292780ed081c71ffec844196cd39587b58c870b1821f7b9f2c791429b9ff9040",
+        "dirty": false,
+        "path": "wasm"
+      },
+      "build": {
+        "mode": "in-tree",
+        "inputSha256": "668e78f691ea855ee174da2e877d9fc3e87dd544a5f855aba5d76d17f7670030",
+        "toolchain": {
+          "node": "v26.8.2",
+          "npm": "11.19.1",
+          "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+          "cmake": "cmake version 4.4.3",
+          "clang": "clang version 24.0.0git",
+          "platform": "darwin",
+          "arch": "arm64",
+          "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+        },
+        "options": {
+          "buildType": "Release",
+          "cxxStandard": 17,
+          "sdkTarget": "es2022"
+        }
+      }
+    },
+    "files": {
+      "index.d.ts": "d2a18cc6b2e512f6416ebdc78cc02b6ea2ce5520aec4bc0fed1de8ca7fd85054",
+      "index.js": "c8c662154d36e1b6ed1a5eba8459d6947fc63b50d075d8116d3e6bfc770148aa",
+      "index.js.map": "31d8ff552d8706ff26db12f740748ce6427d70681ec7746e90b7d5eb1de78a4e",
+      "licenses/README.txt": "84b665ef80f7847f9d55365c1a6d458c56f8a2cbdf427354d08611e72a1effc5",
+      "licenses/jsbsim/AUTHORS": "ca8556894da80f81f773893a9c1009021aac2972d7bb6a39c2f981b4fd00aa9a",
+      "licenses/jsbsim/COPYING": "1e7e6bae5a5bde32f1ae5a7c37a082d1ab03cf89354f7f936ac40be9e39a6531",
+      "licenses/jsbsim/src/GeographicLib/LICENSE.txt": "90d25298be0c5d7f5219ae20009d18910150b3a4ea0ca86dda5df04cfb8d3823",
+      "licenses/jsbsim/src/simgear/xml/COPYING": "8c6b5b6de8fae20b317f4992729abc0e520bfba4c7606cd1e9eeb87418eebdec",
+      "licenses/sdk-LICENSE": "15e2d343fc930439fb82351d7c30f3d151b4c42ca3132c13ff1a60da527a1259",
+      "wasm.d.ts": "b7bbbab6f5e6b0b297dfeff117351e53d4d8598fecde7e805ea9aee7b2923353",
+      "wasm.js": "758d98989301d86ec3aa589fa851d6416b305eca58bb1e6b9579780ea339e09b",
+      "wasm.js.map": "d75a89efd5b3cf07ebfbe70d321f55c01bd8cdde1be50a15d1dcfad21a7ca763",
+      "wasm/jsbsim_wasm.mjs": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+      "wasm/jsbsim_wasm.wasm": "276e50da28d3d58473e389cd8a478881f71fabeac77b441a9e6f1b3435e12196"
+    },
+    "validation": {
+      "status": "passed",
+      "commands": [
+        "tsc --noEmit (frozen SDK workspace)",
+        "node --test --test-concurrency=5 test/*.test.mjs (frozen SDK workspace and resolved native fixtures)"
+      ]
+    },
+    "packageArchive": {
+      "path": "deps/felipegalind0-jsbsim-1.2.4-fork.15.tgz",
+      "sha256": "6861e9fe0f74e02fef9c2df6d6a3022f5f98a51a8e94a3dbfd205217c02c3d49",
+      "integrity": "sha512-ro8k8fPXUyYC36bsoNdQ7NLGlBl7fLX+FhL5n2d6mACMY3u6AKfR44ncg9NTH2R9xSg0xvz90cC+q6s9BxNrYA=="
+    }
+  },
+  "nativeAdoption": "../../../../../jsbsim/adoption/fork15-adoption.json",
+  "cases": [
+    {
+      "name": "warm-shortcut-after-cold-accepted-step",
+      "passed": true
+    },
+    {
+      "name": "cold-start-heating-and-cutoff",
+      "passed": true
+    },
+    {
+      "name": "zero-time-hold-read-and-native-state-restore",
+      "passed": true
+    },
+    {
+      "name": "application-snapshot-recovery",
+      "passed": true
+    },
+    {
+      "name": "relocation-free",
+      "passed": true
+    },
+    {
+      "name": "relocation-departure",
+      "passed": true
+    },
+    {
+      "name": "relocation-arrival",
+      "passed": true
+    },
+    {
+      "name": "cold-reset-and-model-reload",
+      "passed": true
+    },
+    {
+      "name": "dry-99-cycle",
+      "passed": true
+    },
+    {
+      "name": "powered-lift-without-afterburner",
+      "passed": true
+    },
+    {
+      "name": "stopped-hot-runway-relocation",
+      "passed": true
+    }
+  ],
+  "runs": [
+    {
+      "report": "initial-report.json",
+      "status": "10-passed-1-harness-failure",
+      "sourceIdentityStable": true,
+      "toolSha256": "7f2df6d4026761a7fe69d889c97765b3740ea11b2e5c67eadc3a311a7cd1cf5e"
+    },
+    {
+      "report": "stopped-relocation-report.json",
+      "status": "passed-targeted-rerun",
+      "sourceIdentityStable": true,
+      "toolSha256": "69c9822e89d55f8e4b29836a4c75ad0d752aa2c44cfe4b8399fd1e6f530a1aea"
+    }
+  ],
+  "failureResolution": {
+    "case": "stopped-hot-runway-relocation",
+    "classification": "Fixture invoked ordinary flight runway preset instead of static engine stand",
+    "symptom": "Engine correctly started after a flight departure preset; fixture incorrectly expected stopped behavior.",
+    "change": "Pass { holdDown: true } to resetFlightLocation, as actual engine stand does.",
+    "codeScope": "One argument in the new stopped-hot scenario only; no native or application implementation change.",
+    "rerunPolicy": "Only the failed scenario was rerun; all ten unaffected initial scenarios retained.",
+    "evidence": "Initial report/error and full log retained; corrected exact same-time two-solid restoration and 120 subsequent stopped steps pass."
+  },
+  "traces": {
+    "csv": "trace.csv",
+    "plot": "thermal-cycle.svg",
+    "stoppedCsv": "stopped-relocation-trace.csv",
+    "observations": {
+      "cold": {
+        "timeS": 0.008333333333333333,
+        "gasK": 286.1688949816944,
+        "coreK": 286.1688949816944,
+        "metalK": 286.1688949816944,
+        "n1Pct": 1.3566009267792531e-42,
+        "n2Pct": 9.044006178528353e-43,
+        "fuelFlowPps": 0,
+        "augmentation": 0,
+        "nozzlePositionNorm": 1,
+        "nozzlePitchRad": 0,
+        "stovlPositionNorm": 0,
+        "coreRadianceCdM2": 0,
+        "linerRadianceCdM2": 0
+      },
+      "idle": {
+        "timeS": 87.52500000001572,
+        "gasK": 649.268894988196,
+        "coreK": 621.9278212822871,
+        "metalK": 459.7752165876018,
+        "n1Pct": 30,
+        "n2Pct": 60,
+        "fuelFlowPps": 0.7172233848488745,
+        "augmentation": 0,
+        "nozzlePositionNorm": 1,
+        "nozzlePitchRad": 0,
+        "stovlPositionNorm": 0,
+        "coreRadianceCdM2": 2.0794928059169735e-06,
+        "linerRadianceCdM2": 1.0556052278853363e-11
+      },
+      "dry": {
+        "timeS": 207.5249999999756,
+        "gasK": 1002.797894988314,
+        "coreK": 956.4084591776464,
+        "metalK": 663.7524645467122,
+        "n1Pct": 99.3,
+        "n2Pct": 99.6,
+        "fuelFlowPps": 6.368636520145963,
+        "augmentation": 0,
+        "nozzlePositionNorm": 0.01000000000000012,
+        "nozzlePitchRad": 0,
+        "stovlPositionNorm": 0,
+        "coreRadianceCdM2": 0.7458700593799324,
+        "linerRadianceCdM2": 1.960050449211784e-05
+      },
+      "augmented": {
+        "timeS": 267.524999999921,
+        "gasK": 2361.818538620371,
+        "coreK": 959.7805831993212,
+        "metalK": 1269.4704938968885,
+        "n1Pct": 100,
+        "n2Pct": 100,
+        "fuelFlowPps": 19.93680666654898,
+        "augmentation": 1,
+        "nozzlePositionNorm": 1,
+        "nozzlePitchRad": 0,
+        "stovlPositionNorm": 0,
+        "coreRadianceCdM2": 0.8083992744100276,
+        "linerRadianceCdM2": 332.6009487375765
+      },
+      "firstDry": {
+        "timeS": 267.53333333325435,
+        "gasK": 1002.7978949887125,
+        "coreK": 959.7702648916038,
+        "metalK": 1268.852909492416,
+        "n1Pct": 99.56265439977808,
+        "n2Pct": 99.6,
+        "fuelFlowPps": 19.93680666654898,
+        "augmentation": 0,
+        "nozzlePositionNorm": 1,
+        "nozzlePitchRad": 0,
+        "stovlPositionNorm": 0,
+        "coreRadianceCdM2": 0.808207942276967,
+        "linerRadianceCdM2": 329.3335448407196
+      },
+      "returnedDry": {
+        "timeS": 387.5333333331452,
+        "gasK": 1002.7978949887716,
+        "coreK": 956.408459178064,
+        "metalK": 663.7536781879094,
+        "n1Pct": 99.3,
+        "n2Pct": 99.6,
+        "fuelFlowPps": 6.3686365201882325,
+        "augmentation": 0,
+        "nozzlePositionNorm": 0.01000000000000012,
+        "nozzlePitchRad": 0,
+        "stovlPositionNorm": 0,
+        "coreRadianceCdM2": 0.745870059387679,
+        "linerRadianceCdM2": 1.960151485562861e-05
+      },
+      "stopped": {
+        "timeS": 507.53333333303607,
+        "gasK": 286.1688949882993,
+        "coreK": 529.9379653739261,
+        "metalK": 535.0503279489271,
+        "n1Pct": 7.036777550684984e-24,
+        "n2Pct": 4.691185033789989e-24,
+        "fuelFlowPps": 0,
+        "augmentation": 0,
+        "nozzlePositionNorm": 1,
+        "nozzlePitchRad": 0,
+        "stovlPositionNorm": 0,
+        "coreRadianceCdM2": 4.749207546814823e-09,
+        "linerRadianceCdM2": 6.552585530061672e-09
+      }
+    }
+  },
+  "checksDetail": [
+    "Both solids start at ambient during ordinary cold initialization, lag the gas bath, preserve heat through cutoff, and cool after shutdown.",
+    "Repeated property reads, native hold, suspended integration, zero-time RunIC, repeated InitRunning, and positive-dt trim retain both solid states.",
+    "State properties are independent RW; temperature and initialized observations reject writes. Restoring core does not initialize liner.",
+    "Native reset/reload clears both states; exact restoration cancels warm seeding, and each next accepted step stays within the declared continuity bound.",
+    "Application snapshot/free/departure/arrival relocation preserves both temperatures exactly before advancing.",
+    "Static stopped-hot runway relocation retains both temperatures and remains stopped with zero fuel over 120 accepted steps.",
+    "Dry99 heats both solids from idle; afterburner heats downstream gas/liner while core sees its unchanged upstream EGT bath. Both hot/cold histories return to the same dry99 equilibria.",
+    "Every accepted powered-lift step keeps augmentation off, including conversion transient, while dry gas and both solids remain heated."
+  ],
+  "tolerances": {
+    "exactStateKelvin": 1e-08,
+    "nextStepFraction": 0.02,
+    "dryEquilibriumAgreementKelvin": 1,
+    "reason": "Exact state tolerates floating-point transport only. 2% at 120 Hz detects lost state/reseeding, not a calibrated heating-rate bound. 1 K checks convergence of this reduced model only."
+  },
+  "boundEvaluations": 17040,
+  "maximumBurnedFuelBoundErrorKgSec": 4.440892098500626e-15,
+  "limitations": [
+    "Actual installed SDK and public F135 dependency; inputs are provisional aircraft configuration, not measured F135 station, material or cooling parameters.",
+    "Native hold-down isolates thermal lifecycle from flight, ground/collision and structural dynamics; relocation calls are the actual app helpers.",
+    "The mass-flow input expression is read and checked against this XML schedule, not measured or inferred from a real F135. Native equation/closed-form checks are separately owned by JSBSim.",
+    "The 2% next-step continuity guard detects lost state/warm reseeding at120Hz; it is a software lifecycle guard, not a calibrated F135 heating-rate tolerance.",
+    "No browser/GPU render, timing benchmark, device qualification or physically calibrated visible-spectrum claim.",
+    "Radiance is offline-table/material input only; neither SVG nor CSV is a rendered visual comparison.",
+    "Core-facing dry temperature/radiance demonstrate the declared model, not measured F135 equilibrium.",
+    "Full CI, asset loading/coverage and Earth-backed composition acceptance are recorded by the parent reconstruction task."
+  ],
+  "evidence": [
+    {
+      "path": "initial-report.json",
+      "bytes": 1751624,
+      "sha256": "0e7177b8d0a23e3476fabe4f69e10d24f8c213fde611ed3a8c0f52c2dab16b2b"
+    },
+    {
+      "path": "initial-run.log",
+      "bytes": 13823,
+      "sha256": "b30639f503bb3d2662920406c629bec382917a12b79de58d2c7be67c7d8f62ac"
+    },
+    {
+      "path": "initial-sdk.log",
+      "bytes": 16342,
+      "sha256": "cceac16660fe84ef09c7b4660830bf23a4e71cb079423635979ffc94d8130e52"
+    },
+    {
+      "path": "stopped-relocation-report.json",
+      "bytes": 194970,
+      "sha256": "f9c3d6577ef7b6355e71a1c0db29c08c30adf616b1e58408a9ce6f7886002831"
+    },
+    {
+      "path": "stopped-relocation-run.log",
+      "bytes": 538,
+      "sha256": "44f9a74b568c59c3d3d559887e268db422eba1346b18dd0cce1aef0956c829d8"
+    },
+    {
+      "path": "stopped-relocation-sdk.log",
+      "bytes": 1003,
+      "sha256": "e4f9e2b2c4cb25999d38c67aa2f9def3a25981cdfab2ac1c9cd54698d595b06c"
+    },
+    {
+      "path": "stopped-relocation-trace.csv",
+      "bytes": 18376,
+      "sha256": "6bfd3095beb7d4ef07d779976bb92812f0f89bd9cc8834918486b2eac2f92c7d"
+    },
+    {
+      "path": "thermal-cycle.svg",
+      "bytes": 124979,
+      "sha256": "f6a9bc913e2d1446d0cced9779c942139c9304b12bd3bd262f25c530e3864148"
+    },
+    {
+      "path": "trace.csv",
+      "bytes": 173178,
+      "sha256": "0c8b158e16e9b0f7e64feaba9e8a82efbfc5cdab158943510cb86ebcf51444a2"
+    }
+  ]
+}

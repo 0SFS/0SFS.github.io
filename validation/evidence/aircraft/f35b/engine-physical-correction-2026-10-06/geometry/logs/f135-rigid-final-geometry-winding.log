@@ -1,0 +1,18 @@
+{
+  "out": "build/validation/f135-reconstruction/2026-10-06_142501",
+  "coverageSections": 525,
+  "rigidPoses": 504,
+  "errors": [],
+  "views": [
+    "installed-rear-aperture-0.svg",
+    "installed-oblique-aperture-0.svg",
+    "installed-rear-aperture-0.5.svg",
+    "installed-oblique-aperture-0.5.svg",
+    "installed-rear-aperture-1.svg",
+    "installed-oblique-aperture-1.svg",
+    "full-front.svg",
+    "full-side.svg",
+    "full-oblique.svg",
+    "full-converted.svg"
+  ]
+}

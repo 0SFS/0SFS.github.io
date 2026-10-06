@@ -1,0 +1,103 @@
+/** 0sfs owns the dimensional aircraft gas optical approximation, not engine heat dynamics. */
+export interface EngineGasOpticalData {
+  readonly model: "gray-emission-absorption-v1";
+  readonly blackbody: { readonly temperatureKelvinRange: readonly [number, number]; readonly unit: "cd/m2";
+    readonly samples: readonly (readonly [number, number, number])[] };
+  readonly fuelHeatingValueJPerKg: number;
+  readonly normalizedDensityVolume: number;
+  readonly excitedRgbLumensPerWatt: readonly [number, number, number];
+  readonly dry: EngineGasMode;
+  readonly afterburner: EngineGasMode;
+}
+interface EngineGasMode {
+  readonly absorptionPerMeter: number;
+  readonly particleFuelPowerFraction: number;
+  readonly excitedFuelPowerFraction: number;
+}
+export interface EngineGasOpticalInputs {
+  temperatureKelvin?: number;
+  augmentation: boolean;
+  fuelFlowKgPerSecond?: number;
+  afterburnerBurnedFuelFlowKgPerSecond?: number;
+  radiusMeters: number;
+  lengthMeters: number;
+}
+
+/** Profile validation happens once at resource construction, never per frame. */
+export function validateEngineGasOpticalData(data: EngineGasOpticalData): void {
+  const table = data.blackbody;
+  if (data.model !== "gray-emission-absorption-v1" || table.unit !== "cd/m2"
+    || table.temperatureKelvinRange.length !== 2 || table.temperatureKelvinRange.some(v => !Number.isFinite(v) || v <= 0)
+    || table.temperatureKelvinRange[1] <= table.temperatureKelvinRange[0] || table.samples.length < 2
+    || table.samples.some(rgb => rgb.length !== 3 || rgb.some(v => !Number.isFinite(v) || v < 0))
+    || !Number.isFinite(data.fuelHeatingValueJPerKg) || data.fuelHeatingValueJPerKg <= 0
+    || !Number.isFinite(data.normalizedDensityVolume) || data.normalizedDensityVolume <= 0
+    || data.excitedRgbLumensPerWatt.length !== 3 || data.excitedRgbLumensPerWatt.some(v => !Number.isFinite(v) || v < 0)
+    || [data.dry, data.afterburner].some(p => ![p.absorptionPerMeter, p.particleFuelPowerFraction, p.excitedFuelPowerFraction]
+      .every(v => Number.isFinite(v) && v >= 0) || p.particleFuelPowerFraction + p.excitedFuelPowerFraction > 1)) {
+    throw new RangeError("Invalid dimensional gas optical data");
+  }
+}
+
+/** Log interpolation preserves positive absolute amplitude over the Planck tail. */
+export function interpolateGasBlackbody(data: EngineGasOpticalData, kelvin: number): readonly [number, number, number] | null {
+  return interpolateAbsoluteEmission(data.blackbody, kelvin);
+}
+
+/** Absolute RGB interpolation shared by independent solid regions and gas continuum. */
+export function interpolateAbsoluteEmission(table: EngineGasOpticalData["blackbody"], kelvin: number): readonly [number, number, number] | null {
+  const { temperatureKelvinRange: range, samples } = table;
+  if (!Number.isFinite(kelvin) || kelvin < range[0] || kelvin > range[1] || samples.length < 2) return null;
+  const position = (kelvin - range[0]) / (range[1] - range[0]) * (samples.length - 1);
+  if (kelvin === range[0]) return samples[0];
+  if (kelvin === range[1]) return samples[samples.length - 1];
+  const lower = Math.floor(position), upper = Math.min(lower + 1, samples.length - 1), f = position - lower;
+  return samples[lower].map((a, c) => {
+    const b = samples[upper][c];
+    return a > 0 && b > 0 ? Math.exp(Math.log(a) + (Math.log(b) - Math.log(a)) * f) : a + (b - a) * f;
+  }) as [number, number, number];
+}
+
+/** Upper-bound isotropic source accounting; not a closed engine-energy solution. */
+export function evaluateEngineGasOptics(profile: { readonly gasEmission?: EngineGasOpticalData }, input: EngineGasOpticalInputs) {
+  const data = profile.gasEmission;
+  const mode = input.augmentation ? "afterburner" : "dry";
+  const zero = { valid: false, mode, fuelPowerW: 0, emittingVolumeM3: 0, absorptionPerMeter: 0,
+    particlePowerUpperBoundW: 0, excitedPowerW: 0, totalSourcePowerUpperBoundW: 0, allowedPowerW: 0,
+    absorptionWasCapped: false, blackbodyRgbCdPerM2: [0, 0, 0], sourceRgbCdPerM3: [0, 0, 0], isotropicIntensityRgbCd: [0, 0, 0] };
+  if (!data || !Number.isFinite(input.fuelFlowKgPerSecond) || input.fuelFlowKgPerSecond! <= 0
+    || !Number.isFinite(input.radiusMeters) || input.radiusMeters <= 0 || !Number.isFinite(input.lengthMeters) || input.lengthMeters <= 0) return zero;
+  const blackbody = interpolateGasBlackbody(data, input.temperatureKelvin ?? Number.NaN);
+  if (!blackbody) return zero;
+  const parameters = data[mode];
+  const fuelPowerW = input.fuelFlowKgPerSecond! * data.fuelHeatingValueJPerKg;
+  const emittingVolumeM3 = input.radiusMeters ** 2 * input.lengthMeters * data.normalizedDensityVolume;
+  const sigma = 5.670374419e-8;
+  const particlePowerPerAbsorption = 4 * sigma * input.temperatureKelvin! ** 4 * emittingVolumeM3;
+  const particleBudgetW = fuelPowerW * parameters.particleFuelPowerFraction;
+  const absorptionPerMeter = Math.min(parameters.absorptionPerMeter, particleBudgetW / particlePowerPerAbsorption);
+  const particlePowerUpperBoundW = absorptionPerMeter * particlePowerPerAbsorption;
+  const burned = input.augmentation && Number.isFinite(input.afterburnerBurnedFuelFlowKgPerSecond)
+    ? Math.max(0, Math.min(input.fuelFlowKgPerSecond!, input.afterburnerBurnedFuelFlowKgPerSecond!)) : 0;
+  const excitedPowerW = burned * data.fuelHeatingValueJPerKg * parameters.excitedFuelPowerFraction;
+  const sourceRgbCdPerM3 = blackbody.map((value, channel) => absorptionPerMeter * value
+    + excitedPowerW / (4 * Math.PI * emittingVolumeM3) * data.excitedRgbLumensPerWatt[channel]);
+  if (![fuelPowerW, emittingVolumeM3, absorptionPerMeter, particlePowerUpperBoundW, excitedPowerW, ...sourceRgbCdPerM3].every(Number.isFinite)) return zero;
+  return { valid: true, mode, fuelPowerW, emittingVolumeM3, absorptionPerMeter, particlePowerUpperBoundW, excitedPowerW,
+    totalSourcePowerUpperBoundW: particlePowerUpperBoundW + excitedPowerW,
+    allowedPowerW: fuelPowerW * (parameters.particleFuelPowerFraction + parameters.excitedFuelPowerFraction),
+    absorptionWasCapped: absorptionPerMeter < parameters.absorptionPerMeter,
+    blackbodyRgbCdPerM2: blackbody, sourceRgbCdPerM3,
+    isotropicIntensityRgbCd: sourceRgbCdPerM3.map(value => value * emittingVolumeM3) };
+}
+
+/** Homogeneous-segment solution, including the zero-extinction limit. */
+export function integrateGasSegment(sourceRgbCdPerM3: readonly number[], absorptionPerMeter: number, pathMeters: number) {
+  if (sourceRgbCdPerM3.length !== 3 || sourceRgbCdPerM3.some(value => !Number.isFinite(value) || value < 0)
+    || !Number.isFinite(absorptionPerMeter) || absorptionPerMeter < 0 || !Number.isFinite(pathMeters) || pathMeters < 0) {
+    throw new RangeError("Gas transfer needs finite nonnegative dimensional inputs");
+  }
+  const opacity = -Math.expm1(-absorptionPerMeter * pathMeters);
+  const effectivePathMeters = absorptionPerMeter > 0 ? opacity / absorptionPerMeter : pathMeters;
+  return { transmittance: 1 - opacity, radianceRgbCdPerM2: sourceRgbCdPerM3.map(value => value * effectivePathMeters) };
+}

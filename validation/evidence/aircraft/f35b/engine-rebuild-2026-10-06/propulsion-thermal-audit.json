@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-06",
+  "scope": "Native two-solid thermal reconstruction and audit of coupled propulsion assumptions; no rating or area-schedule retune.",
+  "xml": {
+    "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+    "sha256": "04cea10d3c135cb79247bbf7794a81359070e2bdc9afc9782502b538444eac16",
+    "priorSha256": "e1cb66a141c8686e550535eb8ef3eab0bf2a660954cb557fdcea5efbe2f1cd0c",
+    "propulsionOutsideThermalUnchanged": true
+  },
+  "ratings": {
+    "currentDryLbf": 28000,
+    "currentAugmentedLbf": 43000,
+    "published2017STOVLClassesLbf": [
+      27000,
+      41000
+    ],
+    "reference": "https://filecache.mediaroom.com/mr5mr_prattwhitney/177487/download/F135-engine-S16208.pdf",
+    "referenceScope": "Published manufacturer classes retained in proposal, not a complete installed-engine performance deck.",
+    "decision": "Retain existing development ratings. Requalification must jointly consider rear extraction, fan allocation, roll-post allocation, fuel model and flight-control authority.",
+    "dependencies": [
+      {
+        "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+        "constraint": "Dry thrust multiplied by 1 - (10000/28000)*conversion; TSFC multiplied by 1 + 1.328*conversion. Isolated 28000\u219227000 substitution changes the residual rear force and fuel."
+      },
+      {
+        "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/liftfan.xml",
+        "constraint": "20000 lbf atmospheric capacity, allocated from actual native main-nozzle upward force and longitudinal moment arms; no independent fuel."
+      },
+      {
+        "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/sidefan.xml",
+        "constraint": "1950 lbf per-post capacity, native main-nozzle upward-force ratio 0.10833333 and roll allocation; no independent fuel."
+      }
+    ]
+  },
+  "nozzleSchedule": {
+    "retained": true,
+    "path": "propulsion/engine[0]/nozzle-pos-norm",
+    "meaning": "Legacy native display actuator schedule, not A8, A9 or measured PW-600 throat area. Geometry defines visual radius; no thrust feedback.",
+    "operationalHoverABInhibitRetained": true,
+    "inhibitAssumption": "Current XML inhibits when commanded or actual conversion is greater than zero; not a measured FADEC transition threshold."
+  },
+  "solidRegions": [
+    {
+      "name": "cooled downstream liner/nozzle",
+      "property": "propulsion/engine[0]/thermal/metal-temperature-k",
+      "stateProperty": "propulsion/engine[0]/thermal/metal-temperature-state-k",
+      "capacityJK": 12000,
+      "maxGasConductanceWK": 600,
+      "maxCoolantConductanceWK": 700,
+      "radiationAreaM2": 1,
+      "bolometricEmissivity": 0.8,
+      "gasBath": "Nozzle gas including native actual-AB heat estimate.",
+      "change": "None; fork.14 coefficients retained."
+    },
+    {
+      "name": "core-facing turbine-exit hardware",
+      "property": "propulsion/engine[0]/thermal/core/metal-temperature-k",
+      "stateProperty": "propulsion/engine[0]/thermal/core/metal-temperature-state-k",
+      "capacityJK": 1800,
+      "maxGasConductanceWK": 600,
+      "maxCoolantConductanceWK": 35,
+      "radiationAreaM2": 0.22,
+      "bolometricEmissivity": 0.75,
+      "gasBath": "Existing native EGT + 273.15 K, upstream of afterburner heat addition.",
+      "modelingChoice": "Lower effective mass/area and weaker cooling than downstream liner are a distinct reduced hardware hypothesis. 1800 J/K = 3 kg * 600 J/(kg K). No separate petal region is supported."
+    }
+  ],
+  "limitations": [
+    "All capacities, gas flow, transfer and radiation coefficients are provisional engine-profile inputs, not F135 calibration.",
+    "Visible annular lobes are spatial optical hypotheses, not native heat zones.",
+    "The core bath is the existing scheduled EGT observation, with its existing phase behavior; no direct conversion of N1/N2 to red color.",
+    "The two solids do not directly exchange heat; each sees declared baths.",
+    "Bolometric heat-loss emissivity does not specify visible spectral emissivity.",
+    "Thermal observers retain legacy thrust/fuel/spool/EGT/nozzle behavior; they do not close an engine-cycle energy balance."
+  ]
+}

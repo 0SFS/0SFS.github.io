@@ -1,0 +1,406 @@
+{
+  "out": "/Users/felg/gh/0sfs/build/validation/dry-exhaust-visibility/2026-10-06_172236",
+  "previous": {
+    "exteriorPhotopicIntensityCd": 0.00026123929429404337,
+    "particlePowerUpperBoundW": 3570.3361021012274,
+    "chPowerW": 0,
+    "allowedPowerW": 574164.492687422,
+    "absorptionPerMeter": 0.025
+  },
+  "current": {
+    "exteriorPhotopicIntensityCd": 0.011378629343048037,
+    "particlePowerUpperBoundW": 5112.419656242847,
+    "chPowerW": 0,
+    "allowedPowerW": 574164.492687422,
+    "absorptionPerMeter": 0.025
+  },
+  "stations": [
+    {
+      "distanceMeters": 0,
+      "previousAxisTemperatureK": 995.6193465570748,
+      "currentAxisTemperatureK": 1003.1281319989689,
+      "previous": {
+        "rgbCdM2": [
+          0.02055864630408144,
+          0.000033205208491521897,
+          0
+        ],
+        "luminanceCdM2": 0.0043960137074674525,
+        "transmittance": 0.9934866059476993
+      },
+      "current": {
+        "rgbCdM2": [
+          0.0847622660110216,
+          0.0007902969023592096,
+          0
+        ],
+        "luminanceCdM2": 0.018591819491510772,
+        "transmittance": 0.9934866059476993
+      },
+      "convergence": 4.249024059631529e-7,
+      "midpointBudgets": [
+        {
+          "samples": 32,
+          "luminanceCdM2": 0.01855529009059307,
+          "relativeLuminanceError": 0.001964386366109865
+        },
+        {
+          "samples": 64,
+          "luminanceCdM2": 0.018603411504209445,
+          "relativeLuminanceError": 0.0006239258797815419
+        },
+        {
+          "samples": 128,
+          "luminanceCdM2": 0.0185953222267719,
+          "relativeLuminanceError": 0.00018882694401618663
+        }
+      ],
+      "sceneYAtWhite1000EV0": 0.000018591819491510772,
+      "exposureEVForSceneY002": 10.07111631790503
+    },
+    {
+      "distanceMeters": 0.25,
+      "previousAxisTemperatureK": 938.6744407720662,
+      "currentAxisTemperatureK": 1003.1281319989689,
+      "previous": {
+        "rgbCdM2": [
+          0.0021281080088207697,
+          0,
+          0
+        ],
+        "luminanceCdM2": 0.0004525909017491387,
+        "transmittance": 0.9935329495009433
+      },
+      "current": {
+        "rgbCdM2": [
+          0.07864269087786273,
+          0.0007234269450246744,
+          0
+        ],
+        "luminanceCdM2": 0.017242529504072287,
+        "transmittance": 0.9935329495009433
+      },
+      "convergence": 4.1214960904253795e-7,
+      "midpointBudgets": [
+        {
+          "samples": 32,
+          "luminanceCdM2": 0.017250729877301915,
+          "relativeLuminanceError": 0.00047600226575015246
+        },
+        {
+          "samples": 64,
+          "luminanceCdM2": 0.017253340575925168,
+          "relativeLuminanceError": 0.0006274127475263293
+        },
+        {
+          "samples": 128,
+          "luminanceCdM2": 0.017246063537428073,
+          "relativeLuminanceError": 0.0002053724955665294
+        }
+      ],
+      "sceneYAtWhite1000EV0": 0.000017242529504072287,
+      "exposureEVForSceneY002": 10.179812849255443
+    },
+    {
+      "distanceMeters": 0.5,
+      "previousAxisTemperatureK": 884.5285371109715,
+      "currentAxisTemperatureK": 1003.1281319989689,
+      "previous": {
+        "rgbCdM2": [
+          0.000564373819430277,
+          0,
+          0
+        ],
+        "luminanceCdM2": 0.00012002701686231335,
+        "transmittance": 0.9937053821153558
+      },
+      "current": {
+        "rgbCdM2": [
+          0.06528885425279575,
+          0.0005806559526459241,
+          0
+        ],
+        "luminanceCdM2": 0.014300427353597234,
+        "transmittance": 0.9937053821153558
+      },
+      "convergence": 0.0000011597730179841095,
+      "midpointBudgets": [
+        {
+          "samples": 32,
+          "luminanceCdM2": 0.014296735245278852,
+          "relativeLuminanceError": 0.00025702220358291044
+        },
+        {
+          "samples": 64,
+          "luminanceCdM2": 0.014311806209174023,
+          "relativeLuminanceError": 0.0007968610826586858
+        },
+        {
+          "samples": 128,
+          "luminanceCdM2": 0.014294822949800981,
+          "relativeLuminanceError": 0.00039074531887280063
+        }
+      ],
+      "sceneYAtWhite1000EV0": 0.000014300427353597234,
+      "exposureEVForSceneY002": 10.449726023553318
+    },
+    {
+      "distanceMeters": 1,
+      "previousAxisTemperatureK": 799.18413533497,
+      "currentAxisTemperatureK": 1003.1281319989689,
+      "previous": {
+        "rgbCdM2": [
+          0.000041806211708390584,
+          0,
+          0
+        ],
+        "luminanceCdM2": 0.00000889104828203738,
+        "transmittance": 0.9942146967113962
+      },
+      "current": {
+        "rgbCdM2": [
+          0.04428617620767293,
+          0.000384162256808274,
+          0
+        ],
+        "luminanceCdM2": 0.009693204007110207,
+        "transmittance": 0.9942146967113962
+      },
+      "convergence": 6.285313761677633e-7,
+      "midpointBudgets": [
+        {
+          "samples": 32,
+          "luminanceCdM2": 0.009693009928529459,
+          "relativeLuminanceError": 0.000019393610176838142
+        },
+        {
+          "samples": 64,
+          "luminanceCdM2": 0.009698363110307785,
+          "relativeLuminanceError": 0.0005328680712076029
+        },
+        {
+          "samples": 128,
+          "luminanceCdM2": 0.009692124415831976,
+          "relativeLuminanceError": 0.00011074764063007895
+        }
+      ],
+      "sceneYAtWhite1000EV0": 0.000009693204007110206,
+      "exposureEVForSceneY002": 11.010738764359445
+    },
+    {
+      "distanceMeters": 1.5,
+      "previousAxisTemperatureK": 735.1095011450266,
+      "currentAxisTemperatureK": 1003.1281319989689,
+      "previous": {
+        "rgbCdM2": [
+          0.0000034543212761149786,
+          0,
+          0
+        ],
+        "luminanceCdM2": 7.346405233230733e-7,
+        "transmittance": 0.9948185377783706
+      },
+      "current": {
+        "rgbCdM2": [
+          0.03217943724292391,
+          0.0002724375279854395,
+          0
+        ],
+        "luminanceCdM2": 0.00703852853632198,
+        "transmittance": 0.9948185377783706
+      },
+      "convergence": 0.000001217068009454404,
+      "midpointBudgets": [
+        {
+          "samples": 32,
+          "luminanceCdM2": 0.007042710967055181,
+          "relativeLuminanceError": 0.0005930016840088315
+        },
+        {
+          "samples": 64,
+          "luminanceCdM2": 0.007031888962629794,
+          "relativeLuminanceError": 0.0009445343504657054
+        },
+        {
+          "samples": 128,
+          "luminanceCdM2": 0.007040660929834173,
+          "relativeLuminanceError": 0.00030174269210526267
+        }
+      ],
+      "sceneYAtWhite1000EV0": 0.000007038528536321981,
+      "exposureEVForSceneY002": 11.472438526714994
+    },
+    {
+      "distanceMeters": 2,
+      "previousAxisTemperatureK": 685.4210235922169,
+      "currentAxisTemperatureK": 1003.1281319989689,
+      "previous": {
+        "rgbCdM2": [
+          3.6346196944671437e-7,
+          0,
+          0
+        ],
+        "luminanceCdM2": 7.729851108194415e-8,
+        "transmittance": 0.9954277619647144
+      },
+      "current": {
+        "rgbCdM2": [
+          0.020475230835481868,
+          0.0001556357237732309,
+          0
+        ],
+        "luminanceCdM2": 0.00446582995020637,
+        "transmittance": 0.9954277619647144
+      },
+      "convergence": 6.682212399422281e-7,
+      "midpointBudgets": [
+        {
+          "samples": 32,
+          "luminanceCdM2": 0.004470248563020088,
+          "relativeLuminanceError": 0.000988758136318106
+        },
+        {
+          "samples": 64,
+          "luminanceCdM2": 0.004461473478038287,
+          "relativeLuminanceError": 0.000976179896688838
+        },
+        {
+          "samples": 128,
+          "luminanceCdM2": 0.0044645292608285975,
+          "relativeLuminanceError": 0.00029192170001704156
+        }
+      ],
+      "sceneYAtWhite1000EV0": 0.00000446582995020637,
+      "exposureEVForSceneY002": 12.128784062259362
+    },
+    {
+      "distanceMeters": 3,
+      "previousAxisTemperatureK": 613.0225862537467,
+      "currentAxisTemperatureK": 867.0600114474722,
+      "previous": {
+        "rgbCdM2": [
+          6.354534666938975e-9,
+          0,
+          0
+        ],
+        "luminanceCdM2": 1.351437315768446e-9,
+        "transmittance": 0.9965240731453557
+      },
+      "current": {
+        "rgbCdM2": [
+          0.00027521433897677295,
+          0,
+          0
+        ],
+        "luminanceCdM2": 0.00005853063159177334,
+        "transmittance": 0.9965240731453557
+      },
+      "convergence": 1.6422395109069074e-7,
+      "midpointBudgets": [
+        {
+          "samples": 32,
+          "luminanceCdM2": 0.00005869133987228404,
+          "relativeLuminanceError": 0.0027455477177793126
+        },
+        {
+          "samples": 64,
+          "luminanceCdM2": 0.00005847351690110254,
+          "relativeLuminanceError": 0.0009759726124466442
+        },
+        {
+          "samples": 128,
+          "luminanceCdM2": 0.000058483359716009735,
+          "relativeLuminanceError": 0.0008078074479321701
+        }
+      ],
+      "sceneYAtWhite1000EV0": 5.8530631591773336e-8,
+      "exposureEVForSceneY002": 18.382376722752387
+    },
+    {
+      "distanceMeters": 4,
+      "previousAxisTemperatureK": 562.8225555515899,
+      "currentAxisTemperatureK": 725.2430390072127,
+      "previous": {
+        "rgbCdM2": [
+          1.973114308136854e-10,
+          0,
+          0
+        ],
+        "luminanceCdM2": 4.1962794194295834e-11,
+        "transmittance": 0.9973974525274648
+      },
+      "current": {
+        "rgbCdM2": [
+          0.000001154558198831654,
+          0,
+          0
+        ],
+        "luminanceCdM2": 2.4554324036430444e-7,
+        "transmittance": 0.9973974525274648
+      },
+      "convergence": 1.4558480689257664e-7,
+      "midpointBudgets": [
+        {
+          "samples": 32,
+          "luminanceCdM2": 2.4624351457969633e-7,
+          "relativeLuminanceError": 0.0028517924787440727
+        },
+        {
+          "samples": 64,
+          "luminanceCdM2": 2.453036584411743e-7,
+          "relativeLuminanceError": 0.0009758673676391038
+        },
+        {
+          "samples": 128,
+          "luminanceCdM2": 2.4534026372412354e-7,
+          "relativeLuminanceError": 0.0008267886246618288
+        }
+      ],
+      "sceneYAtWhite1000EV0": 2.455432403643044e-10,
+      "exposureEVForSceneY002": 26.279447652416334
+    },
+    {
+      "distanceMeters": 5,
+      "previousAxisTemperatureK": 526.0440748360397,
+      "currentAxisTemperatureK": 639.2632092225025,
+      "previous": {
+        "rgbCdM2": [
+          1.0109091708185432e-11,
+          0,
+          0
+        ],
+        "luminanceCdM2": 2.1499298499457496e-12,
+        "transmittance": 0.9980694429337745
+      },
+      "current": {
+        "rgbCdM2": [
+          1.3572801300711306e-8,
+          0,
+          0
+        ],
+        "luminanceCdM2": 2.8865670137460454e-9,
+        "transmittance": 0.9980694429337745
+      },
+      "convergence": 1.421748954668782e-7,
+      "midpointBudgets": [
+        {
+          "samples": 32,
+          "luminanceCdM2": 2.8947740973541445e-9,
+          "relativeLuminanceError": 0.0028430561302798915
+        },
+        {
+          "samples": 64,
+          "luminanceCdM2": 2.883750666922712e-9,
+          "relativeLuminanceError": 0.0009758154953165857
+        },
+        {
+          "samples": 128,
+          "luminanceCdM2": 2.8841709136797697e-9,
+          "relativeLuminanceError": 0.0008302284726325382
+        }
+      ],
+      "sceneYAtWhite1000EV0": 2.8865670137460456e-12,
+      "exposureEVForSceneY002": 32.68992622992778
+    }
+  ]
+}

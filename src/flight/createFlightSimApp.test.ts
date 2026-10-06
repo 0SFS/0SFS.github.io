@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => {
       getSnapshot: () => meshSnapshot, subscribe: () => () => {},
     },
     resetLocation: vi.fn(() => state),
+    worldRoot: { setEnabled: vi.fn() },
     applyOrigin: vi.fn(),
     originEcef: { x: 1, y: 2, z: 3 },
     unregisterFocusPoint: vi.fn(),
@@ -26,7 +27,7 @@ const mocks = vi.hoisted(() => {
       engine: { getFps: () => 60 }, geospatialCamera: null,
       prepareTerrain: vi.fn(async (request: { altitudeMeters?: number }) => ({ groundHeightMeters: 250, altitudeMeters: request.altitudeMeters ?? 1774 })),
       surface: { sample: vi.fn(() => null) },
-      getWorldRoot: () => ({}), setSimViewState: vi.fn(), setSimTick: vi.fn(),
+      getWorldRoot: () => mocks.worldRoot, setSimViewState: vi.fn(), setSimTick: vi.fn(),
       registerFocusPoint: vi.fn<(point: { id: string; label: string; getPosition: () => unknown }) => () => void>(() => mocks.unregisterFocusPoint),
       googleTerrainDetail: {
         defaultErrorTarget: 20,
@@ -762,7 +763,12 @@ it("observes native engine visuals with sound off and releases its model-bound r
   try {
     expect(createBatch).toHaveBeenCalledWith([
       "propulsion/engine[0]/augmentation", "propulsion/engine[0]/nozzle-pos-norm",
-      "propulsion/engine[0]/n2", "propulsion/engine[0]/fuel-flow-rate-pps", "simulation/sim-time-sec",
+      "propulsion/engine[0]/n2", "propulsion/engine[0]/fuel-flow-rate-pps",
+      "propulsion/engine[0]/thermal/afterburner-burned-fuel-flow-kg-sec",
+      "propulsion/engine[0]/thermal/metal-temperature-k", "propulsion/engine[0]/thermal/initialized",
+      "propulsion/engine[0]/thermal/valid", "propulsion/engine[0]/thermal/core/metal-temperature-k",
+      "propulsion/engine[0]/thermal/core/initialized", "propulsion/engine[0]/thermal/nozzle-gas-temperature-k", "propulsion/engine[0]/egt-degc", "simulation/sim-time-sec",
+      "atmosphere/T-R", "atmosphere/P-psf",
     ], { create: false });
     const tick = mocks.runtime.setSimTick.mock.calls.at(-1)![0] as (dt: number) => void;
     const output = t.root.querySelector<HTMLOutputElement>('[data-output="throttle"]')!;
@@ -781,6 +787,7 @@ it("observes native engine visuals with sound off and releases its model-bound r
     expect(batch.read).toHaveBeenCalledTimes(4);
     expect(runtime.sdk.setPropertyValue).not.toHaveBeenCalledWith("propulsion/engine[0]/augmentation", expect.anything());
     expect(runtime.sdk.setPropertyValue).not.toHaveBeenCalledWith("propulsion/engine[0]/nozzle-pos-norm", expect.anything());
+    expect(runtime.sdk.setPropertyValue).not.toHaveBeenCalledWith("propulsion/engine[0]/egt-degc", expect.anything());
   } finally { await act(async () => t.app.destroy()); canvas.mockRestore(); }
   expect(batch.dispose).toHaveBeenCalledOnce();
 });
@@ -1443,6 +1450,78 @@ describe("pause while loading and resumed flights", () => {
       running: true, simTimeS: 12,
     },
     ...overrides,
+  });
+
+  it("loads Earth at MSP runway 35 and isolates the static engine session from flight assists and the saved flight", async () => {
+    const pageWindow = window;
+    pageWindow.history.replaceState(null, "", "/?engineTest=1");
+    const saved = JSON.stringify(savedFlight());
+    let mounted: Awaited<ReturnType<typeof mountAircraftSelection>> | undefined;
+    try {
+      mounted = await mountAircraftSelection([
+        [SAVED_FLIGHT_STORAGE_KEY, saved],
+        [SETTINGS_STORAGE_KEY, JSON.stringify({ version: 1, values: { "osfs.aircraft.id": "f-35b" } })],
+      ]);
+      expect(vi.mocked(createJsbsimRuntime).mock.calls.at(-1)![0]).toMatchObject({
+        aircraftId: "f-35b",
+        bootstrap: { airspeedKts: 0, throttleNorm: 0, engineRunning: false, holdDown: true, altFt: 833.3,
+          latDeg: 44.866176833333334, lonDeg: -93.23664458333333, headingDeg: 350 },
+      });
+      expect(mocks.runtime.prepareTerrain).toHaveBeenCalledWith(expect.objectContaining({
+        latDeg: 44.866176833333334, lonDeg: -93.23664458333333,
+        altitudeMeters: 833.3 * 0.3048, clearanceMeters: 0,
+      }));
+      expect(mocks.worldRoot.setEnabled).not.toHaveBeenCalledWith(false);
+      expect(restoreSavedFlight).not.toHaveBeenCalled();
+      expect(mocks.resetLocation).toHaveBeenCalledWith(expect.anything(), {
+        latDeg: 44.866176833333334, lonDeg: -93.23664458333333, altMeters: 250,
+      }, 250, "f-35b", { holdDown: true });
+      expect(vi.mocked(createAircraftModel).mock.calls.at(-1)![2]).toMatchObject({ engineOnly: true });
+      expect(mocks.aircraft.setModelLoaded).toHaveBeenCalledWith(true);
+      const tick = mocks.runtime.setSimTick.mock.calls.at(-1)![0] as (dt: number) => void;
+      await act(async () => { tick(1 / 60); pressPause(); });
+      expect(mocks.physics.update).toHaveBeenCalled();
+      expect(mocks.terrainContact.update).not.toHaveBeenCalled();
+      expect(mocks.visibleMeshCollision.update).not.toHaveBeenCalled();
+      expect(captureSavedFlight).not.toHaveBeenCalled();
+      expect(mounted.storage.get(SAVED_FLIGHT_STORAGE_KEY)).toBe(saved);
+    } finally {
+      if (mounted) await act(async () => mounted!.app.destroy());
+      pageWindow.history.replaceState(null, "", "/");
+    }
+  });
+
+  it("moves the held engine stand with the existing Location tab and keeps the saved flight intact", async () => {
+    const pageWindow = window;
+    pageWindow.history.replaceState(null, "", "/?engineTest=1");
+    const saved = JSON.stringify(savedFlight());
+    let mounted: Awaited<ReturnType<typeof mountAircraftSelection>> | undefined;
+    try {
+      mounted = await mountAircraftSelection([[SAVED_FLIGHT_STORAGE_KEY, saved]]);
+      await openPanelTab(mounted.root, "Location");
+      const inputs = mounted.root.querySelectorAll<HTMLInputElement>('.foss-earth-location-panel input[type="number"]');
+      await act(async () => {
+        for (const [index, value] of ["46.8", "-92.1", "500"].entries()) {
+          Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(inputs[index], value);
+          inputs[index].dispatchEvent(new Event("input", { bubbles: true }));
+        }
+      });
+      await act(async () => inputs[0].form!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })));
+      expect(mocks.runtime.prepareTerrain).toHaveBeenLastCalledWith(expect.objectContaining({
+        latDeg: 46.8, lonDeg: -92.1, altitudeMeters: 500, clearanceMeters: 0,
+      }));
+      expect(mocks.resetLocation).toHaveBeenLastCalledWith(expect.anything(), {
+        latDeg: 46.8, lonDeg: -92.1, altMeters: 500,
+      }, 250, "cessna-172", { holdDown: true });
+      expect(mocks.physics.reset).toHaveBeenCalledTimes(2);
+      expect(mocks.worldRoot.setEnabled).not.toHaveBeenCalledWith(false);
+      expect(captureSavedFlight).not.toHaveBeenCalled();
+      expect(mounted.storage.get(SAVED_FLIGHT_STORAGE_KEY)).toBe(saved);
+      expect(mocks.runtime.setSimRunning).toHaveBeenLastCalledWith(true);
+    } finally {
+      if (mounted) await act(async () => mounted!.app.destroy());
+      pageWindow.history.replaceState(null, "", "/");
+    }
   });
 
   /** Starts the app with terrain preparation held, so a test can act while it loads. */

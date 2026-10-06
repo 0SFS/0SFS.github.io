@@ -35,6 +35,7 @@ export function toEngineStatus(reading: EngineReading | null, control?: EngineCo
     maxN2: positive(sample.maxN2Pct),
     maxRpm: positive(sample.maxRpm),
     orbs: reading.orbSettings,
+    ...(reading.afterburnerColor ? { afterburnerColor: reading.afterburnerColor } : {}),
     n1: round(sample.n1Pct, 1),
     n2: round(sample.n2Pct, 1),
     rpm: round(sample.rpm),

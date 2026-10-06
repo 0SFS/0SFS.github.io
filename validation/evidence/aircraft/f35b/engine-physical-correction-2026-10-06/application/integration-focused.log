@@ -1,0 +1,30 @@
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+(node:51503) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:51504) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/flight/hud/engineMonitor.test.ts (28 tests | 1 failed) 348ms
+     × labels warm initialization and reinitializes only on a deliberate button click 15ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/flight/hud/engineMonitor.test.ts > engine monitor > labels warm initialization and reinitializes only on a deliberate button click
+TypeError: Cannot read properties of null (reading 'textContent')
+ ❯ src/flight/hud/engineMonitor.test.ts:199:20
+    197|     monitor.update(fakeReader(sf50Values(), WRITE_ONLY));
+    198|     const section = root.querySelector('[data-section="test-stand"]')!;
+    199|     expect(section.textContent).toContain("not a cold-start experiment…
+       |                    ^
+    200|     const select = section.querySelector<HTMLSelectElement>("select")!;
+    201|     expect(select.value).toBe("running");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 6 passed (7)
+      Tests  1 failed | 104 passed (105)
+   Start at  14:14:28
+   Duration  3.22s (transform 445ms, setup 0ms, import 1.48s, tests 3.78s, environment 824ms)
+

@@ -1,0 +1,28 @@
+(node:58714) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+{
+  "out": "/Users/felg/gh/0sfs/build/f135-plume-native-trace-20261006",
+  "pass": true,
+  "checks": [
+    {
+      "name": "cold-cycle",
+      "passed": true
+    },
+    {
+      "name": "powered-lift",
+      "passed": true
+    },
+    {
+      "name": "prior-native-milestones",
+      "passed": true
+    }
+  ],
+  "auditedSteps": 82925,
+  "traceRows": 4171,
+  "densityIntegrals": {
+    "rearAxis": 0.12952912398469565,
+    "rearOffset": 0.20778367442861173,
+    "sideNearExit": 0.6820664830148329
+  },
+  "changedAfterSnapshot": []
+}

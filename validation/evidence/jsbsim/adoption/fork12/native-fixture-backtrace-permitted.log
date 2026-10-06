@@ -1,0 +1,28 @@
+(lldb) target create "build/master-20260925/tests/unit_tests/FGTurbineTemperatureTest1"
+Current executable set to '/Users/felg/gh/Felipegalind0/jsbsim/build/master-20260925/tests/unit_tests/FGTurbineTemperatureTest1' (arm64).
+(lldb) run
+Running cxxtest tests (3 tests)
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[2]/IdleThrust
+    Function: propulsion/engine[2]/MilThrust
+    Function: propulsion/engine[2]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+Process 75274 launched: '/Users/felg/gh/Felipegalind0/jsbsim/build/master-20260925/tests/unit_tests/FGTurbineTemperatureTest1' (arm64)
+Process 75274 stopped
+* thread #1, queue = 'com.apple.main-thread', stop reason = EXC_BAD_ACCESS (code=1, address=0x10)
+       frame #0: 0x00000001000166ac FGTurbineTemperatureTest1`SGRawValueMethods<JSBSim::FGStandardAtmosphere, double>::getValue() const + 32
+FGTurbineTemperatureTest1`SGRawValueMethods<JSBSim::FGStandardAtmosphere, double>::getValue:
+->  0x1000166ac <+32>: ldr    x1, [x8, w1, uxtw]
+    0x1000166b0 <+36>: br     x1
+    0x1000166b4 <+40>: movi.2d v0, #0000000000000000
+    0x1000166b8 <+44>: ret    
+Target 0: (FGTurbineTemperatureTest1) stopped.

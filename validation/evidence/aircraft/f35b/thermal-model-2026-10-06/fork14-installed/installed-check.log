@@ -1,0 +1,44 @@
+(node:8713) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+{
+  "out": "/Users/felg/gh/0sfs/build/validation/turbine-thermal/2026-10-06_112435",
+  "pass": true,
+  "checks": [
+    {
+      "name": "warm-shortcut-after-cold-accepted-step",
+      "passed": true
+    },
+    {
+      "name": "cold-start-heating-and-cutoff",
+      "passed": true
+    },
+    {
+      "name": "zero-time-hold-read-and-native-state-restore",
+      "passed": true
+    },
+    {
+      "name": "application-snapshot-recovery",
+      "passed": true
+    },
+    {
+      "name": "relocation-free",
+      "passed": true
+    },
+    {
+      "name": "relocation-departure",
+      "passed": true
+    },
+    {
+      "name": "relocation-arrival",
+      "passed": true
+    },
+    {
+      "name": "cold-reset-and-model-reload",
+      "passed": true
+    }
+  ],
+  "boundEvaluations": 2640,
+  "maxBurnedLimitErrorKgSec": 2.6645352591003757e-15,
+  "limitedFuelSeen": true,
+  "sourceIdentityStable": true
+}

@@ -1,0 +1,15 @@
+{
+  "command": "node scripts/build-exhaust-optics.mjs --install",
+  "exitCode": 0,
+  "before": {
+    "f135-exhaust-lut.png": "208ae6cb513beedeb2a5e2b1f0f2ca17952ca66c2ca682733570e3f469af39a6",
+    "f135ExhaustOpticalData.ts": "972aa71b408b6e49411ef667044801b8987b1f48171273acbbc76f745294c6b3",
+    "f135-exhaust-lut.manifest.json": "f6265447eb2f07cbe96098388bf2ae967d0c4c1039ba97ccaa23c7b1e6bdb5ea"
+  },
+  "after": {
+    "f135-exhaust-lut.png": "208ae6cb513beedeb2a5e2b1f0f2ca17952ca66c2ca682733570e3f469af39a6",
+    "f135ExhaustOpticalData.ts": "2c234f513e8f688c9d67c93d8aac34297003b49df367dc118e63395f35028df1",
+    "f135-exhaust-lut.manifest.json": "4e738d523fae9252bf1eb93316630aa5714863d0f2185bf8923084bb0c960ff0"
+  },
+  "plumePngByteIdentical": true
+}

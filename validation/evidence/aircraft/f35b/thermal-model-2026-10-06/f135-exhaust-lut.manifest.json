@@ -1,0 +1,914 @@
+{
+  "schemaVersion": 1,
+  "profile": {
+    "id": "f135-visible-approximation-v1",
+    "width": 64,
+    "height": 32,
+    "colorSpace": "linear-srgb",
+    "dry": {
+      "firstRow": 0,
+      "rowCount": 16,
+      "temperatureKelvinRange": [
+        300,
+        1800
+      ]
+    },
+    "afterburner": {
+      "firstRow": 16,
+      "rowCount": 16,
+      "temperatureKelvinRange": [
+        1000,
+        3000
+      ]
+    },
+    "hudAccentHex": "#ff9450",
+    "surfaceEmission": {
+      "temperatureKelvinRange": [
+        300,
+        1800
+      ],
+      "unit": "cd/m2",
+      "samples": [
+        [
+          3.87111264519e-21,
+          0,
+          0
+        ],
+        [
+          4.28157741619e-20,
+          0,
+          0
+        ],
+        [
+          4.05877848699e-19,
+          0,
+          0
+        ],
+        [
+          3.35052287291e-18,
+          0,
+          0
+        ],
+        [
+          2.44123607706e-17,
+          0,
+          0
+        ],
+        [
+          1.58813148182e-16,
+          0,
+          0
+        ],
+        [
+          9.31636620955e-16,
+          0,
+          0
+        ],
+        [
+          4.97081859068e-15,
+          0,
+          0
+        ],
+        [
+          2.43055922853e-14,
+          0,
+          0
+        ],
+        [
+          1.0964208592e-13,
+          0,
+          0
+        ],
+        [
+          4.59009757302e-13,
+          0,
+          0
+        ],
+        [
+          1.79290147044e-12,
+          0,
+          0
+        ],
+        [
+          6.56556984723e-12,
+          0,
+          0
+        ],
+        [
+          2.26395707723e-11,
+          0,
+          0
+        ],
+        [
+          7.38029387064e-11,
+          0,
+          0
+        ],
+        [
+          2.28281505743e-10,
+          0,
+          0
+        ],
+        [
+          6.72217746092e-10,
+          0,
+          0
+        ],
+        [
+          1.89027327948e-9,
+          0,
+          0
+        ],
+        [
+          5.0902877089e-9,
+          0,
+          0
+        ],
+        [
+          1.31612062064e-8,
+          0,
+          0
+        ],
+        [
+          3.27514797982e-8,
+          0,
+          0
+        ],
+        [
+          7.86168926982e-8,
+          0,
+          0
+        ],
+        [
+          1.82409298946e-7,
+          0,
+          0
+        ],
+        [
+          4.09878847279e-7,
+          0,
+          0
+        ],
+        [
+          8.9353834156e-7,
+          0,
+          0
+        ],
+        [
+          0.00000189294171987,
+          0,
+          0
+        ],
+        [
+          0.00000390296724414,
+          0,
+          0
+        ],
+        [
+          0.000007843458312,
+          0,
+          0
+        ],
+        [
+          0.0000153834805181,
+          0,
+          0
+        ],
+        [
+          0.0000294833300989,
+          0,
+          0
+        ],
+        [
+          0.0000552813109366,
+          0,
+          0
+        ],
+        [
+          0.000101515445011,
+          0,
+          0
+        ],
+        [
+          0.000182759409304,
+          0,
+          0
+        ],
+        [
+          0.000322875500796,
+          0,
+          0
+        ],
+        [
+          0.000560255626414,
+          0,
+          0
+        ],
+        [
+          0.000955646605686,
+          0,
+          0
+        ],
+        [
+          0.00160365313135,
+          0,
+          0
+        ],
+        [
+          0.0026493975964,
+          0,
+          0
+        ],
+        [
+          0.00431231011129,
+          0,
+          0
+        ],
+        [
+          0.00691964621616,
+          0,
+          0
+        ],
+        [
+          0.0109531080896,
+          0,
+          0
+        ],
+        [
+          0.0171129035276,
+          0,
+          0
+        ],
+        [
+          0.0264047433561,
+          0,
+          0
+        ],
+        [
+          0.0402566812346,
+          0,
+          0
+        ],
+        [
+          0.0606743697398,
+          0,
+          0
+        ],
+        [
+          0.0904452730019,
+          0,
+          0
+        ],
+        [
+          0.133404668294,
+          0,
+          0
+        ],
+        [
+          0.19477891477,
+          0,
+          0
+        ],
+        [
+          0.281624492888,
+          0,
+          0
+        ],
+        [
+          0.403384745873,
+          0,
+          0
+        ],
+        [
+          0.572590104167,
+          0,
+          0
+        ],
+        [
+          0.805731859935,
+          0,
+          0
+        ],
+        [
+          1.12434429101,
+          0,
+          0
+        ],
+        [
+          1.55633511598,
+          0,
+          0
+        ],
+        [
+          2.13760989183,
+          0,
+          0
+        ],
+        [
+          2.91404203329,
+          0,
+          0
+        ],
+        [
+          3.94384662219,
+          0,
+          0
+        ],
+        [
+          5.2606785878,
+          0.0118192639634,
+          0
+        ],
+        [
+          6.95766069358,
+          0.035114248198,
+          0
+        ],
+        [
+          9.14274229396,
+          0.0718450408615,
+          0
+        ],
+        [
+          11.9392510346,
+          0.127513047204,
+          0
+        ],
+        [
+          15.4973129291,
+          0.209405908079,
+          0
+        ],
+        [
+          19.9986986575,
+          0.327067582704,
+          0
+        ],
+        [
+          25.6623584544,
+          0.492867353065,
+          0
+        ],
+        [
+          32.7507132009,
+          0.722683593521,
+          0
+        ],
+        [
+          41.5767720162,
+          1.03671984112,
+          0
+        ],
+        [
+          52.5121490095,
+          1.46047245726,
+          0
+        ],
+        [
+          65.9960538461,
+          2.02587097811,
+          0
+        ],
+        [
+          82.5453323788,
+          2.77261409659,
+          0
+        ],
+        [
+          102.765634759,
+          3.74972608894,
+          0
+        ],
+        [
+          127.363789136,
+          5.01736037878,
+          0
+        ],
+        [
+          157.161459277,
+          6.64887880503,
+          0
+        ],
+        [
+          193.110164123,
+          8.73323701092,
+          0
+        ],
+        [
+          236.307736499,
+          11.3777081821,
+          0
+        ],
+        [
+          288.016296831,
+          14.7109791159,
+          0
+        ],
+        [
+          349.681815844,
+          18.8866542829,
+          0
+        ],
+        [
+          422.955337768,
+          24.0872051298,
+          0
+        ],
+        [
+          509.71593267,
+          30.5284033511,
+          0
+        ],
+        [
+          612.095442985,
+          38.4642782138,
+          0
+        ],
+        [
+          732.50508541,
+          48.1926392298,
+          0
+        ],
+        [
+          873.663964799,
+          60.061206533,
+          0
+        ],
+        [
+          1038.62955181,
+          74.4743922075,
+          0
+        ],
+        [
+          1230.83017069,
+          91.9007765226,
+          0
+        ],
+        [
+          1454.09953774,
+          112.881323549,
+          0
+        ],
+        [
+          1712.71338512,
+          138.038380942,
+          0
+        ],
+        [
+          2011.42819776,
+          168.085508797,
+          0
+        ],
+        [
+          2355.52208492,
+          203.838182347,
+          0
+        ],
+        [
+          2750.83780047,
+          246.225412971,
+          0
+        ],
+        [
+          3203.82791913,
+          296.3023314,
+          0
+        ],
+        [
+          3721.60216823,
+          355.263776242,
+          0
+        ],
+        [
+          4311.97690727,
+          424.458929923,
+          0
+        ],
+        [
+          4983.52673997,
+          505.407042928,
+          0
+        ],
+        [
+          5745.63823576,
+          599.814285748,
+          0
+        ],
+        [
+          6608.56573023,
+          709.591766278,
+          0
+        ],
+        [
+          7583.48916645,
+          836.874748544,
+          0
+        ],
+        [
+          8682.57393164,
+          984.043106514,
+          0
+        ],
+        [
+          9919.03263634,
+          1153.7430445,
+          0
+        ],
+        [
+          11307.1887761,
+          1348.9101132,
+          0
+        ],
+        [
+          12862.5422086,
+          1572.79354773,
+          0
+        ],
+        [
+          14601.8363734,
+          1828.98195128,
+          0
+        ],
+        [
+          16543.1271723,
+          2121.43034508,
+          0
+        ],
+        [
+          18705.8534269,
+          2454.48860211,
+          0
+        ],
+        [
+          21110.9088187,
+          2832.93127906,
+          0
+        ],
+        [
+          23780.7152155,
+          3261.98885755,
+          0
+        ],
+        [
+          26739.2972819,
+          3747.38040215,
+          0
+        ],
+        [
+          30012.3582651,
+          4295.34763966,
+          0
+        ],
+        [
+          33627.3568456,
+          4912.69045988,
+          0
+        ],
+        [
+          37613.5849361,
+          5606.80383537,
+          0
+        ],
+        [
+          42002.2463108,
+          6385.71615329,
+          0
+        ],
+        [
+          46826.5359405,
+          7258.12894937,
+          0
+        ],
+        [
+          52121.7199116,
+          8233.45803011,
+          0
+        ],
+        [
+          57925.2157986,
+          9321.87596583,
+          0
+        ],
+        [
+          64276.6733638,
+          10534.3559336,
+          0
+        ],
+        [
+          71218.0554515,
+          11882.7168853,
+          0
+        ],
+        [
+          78793.7189474,
+          13379.6700138,
+          0
+        ],
+        [
+          87050.4956694,
+          15038.8664838,
+          0
+        ],
+        [
+          96037.7730587,
+          16874.9463948,
+          0
+        ],
+        [
+          105807.574539,
+          18903.5889375,
+          0
+        ],
+        [
+          116414.639414,
+          21141.5637015,
+          0
+        ],
+        [
+          127916.502167,
+          23606.7830916,
+          0
+        ],
+        [
+          140373.571046,
+          26318.3558051,
+          0
+        ],
+        [
+          153849.205793,
+          29296.6413204,
+          0
+        ],
+        [
+          168409.794399,
+          32563.3053442,
+          0
+        ],
+        [
+          184124.828767,
+          36141.3761629,
+          0
+        ],
+        [
+          201066.979151,
+          40055.3018412,
+          0
+        ],
+        [
+          219312.167265,
+          44331.0082071,
+          0
+        ],
+        [
+          238939.637939,
+          48995.9575643,
+          0
+        ],
+        [
+          260032.029219,
+          54079.2080664,
+          0
+        ]
+      ]
+    },
+    "temporalEmission": {
+      "periodSeconds": 0.8,
+      "samples": [
+        1.020521,
+        1.01902484,
+        1.01541466,
+        1.01791022,
+        1.02024696,
+        1.01407798,
+        1.00523472,
+        1.00666866,
+        1.01861519,
+        1.02754827,
+        1.02582603,
+        1.02112685,
+        1.02147446,
+        1.02087689,
+        1.00923438,
+        0.99053833,
+        0.979479,
+        0.98097516,
+        0.98458534,
+        0.98208978,
+        0.97975304,
+        0.98592202,
+        0.99476528,
+        0.99333134,
+        0.98138481,
+        0.97245173,
+        0.97417397,
+        0.97887315,
+        0.97852554,
+        0.97912311,
+        0.99076562,
+        1.00946167
+      ]
+    }
+  },
+  "assetLicense": "CC-BY-SA-4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "attribution": "CIE 2019, Colour-matching functions of CIE 1931 standard colorimetric observer, International Commission on Illumination (CIE), Vienna, AT, DOI:10.25039/CIE.DS.xvudnb9b. Adapted by 0sfs into an assumed emission RGB lookup.",
+  "rgbMeaning": "Gas/plume lookup: peak-normalized linear-sRGB emission at declared gas Kelvin, with separately assumed alpha, continuum loading and radical weights; no absolute gas-radiance calibration. Hot hardware: absolute grey-body visible linear-RGB equivalent luminance in cd/m2, weighted Y=683*integral(L_lambda*V_lambda*d_lambda), with photopic Y preserved after gamut clipping. Divide hardware values by the explicit renderer display-reference luminance; assumed visible emissivity and F135 wall-temperature inputs remain uncalibrated.",
+  "uvMeaning": "U axial fraction: (0.5+axial*(width-1))/width. V within selected bank: temperatureFraction=clamp((nativeGasKelvin-minKelvin)/(maxKelvin-minKelvin),0,1); V=(firstRow+0.5+temperatureFraction*(rowCount-1))/height. Clamp axes; do not filter across banks.",
+  "orientation": "PNG first/top scanline is dry bank row 0. Use Babylon invertY=false; texture V=0 addresses that first/top row.",
+  "assumptions": [
+    "Native gas temperature selects a row over the declared dry 300–1800 K or afterburner 1000–3000 K range. Native metal temperature independently selects the surface table. Both native reduced-model inputs and optical assumptions are not measured F135 exhaust quantities.",
+    "There is no N2-to-temperature, throttle-to-temperature or gas-to-metal substitution in the optical renderer. The soot continuum assumes particles share the local gas temperature; a declared fractional axial cooling curve is provisional rather than a solved plume energy balance.",
+    "A grey-soot Planck continuum and simplified Gaussian radical bands represent shared hydrocarbon emission mechanisms, not resolved molecular spectroscopy or combustion kinetics.",
+    "Each component spectrum is normalized by its integrated visible radiant energy over 360–830 nm before mixing. Soot fractions describe relative energy in this window, not soot mass fraction, molecular abundance or all-wavelength radiation.",
+    "The default is an openly assumed soot-dominated warm reference, qualitatively consistent with a documented daylight F-35B afterburner photo. Available JP-8 laboratory evidence does not determine these F135 fractions. Other fractions can produce blue or violet, so this is not a unique computed F135 color.",
+    "The dry bank contains only very faint thermal continuum; the afterburner bank must be selected only from actual native augmentation and an operating engine.",
+    "The separate hot-hardware table contains 128 uniform absolute 300–1800 K samples of visible-grey-body Planck radiance. The provisional visible spectral emissivity is 0.8, constant over the observer window; it is distinct from the native model's bolometric wall heat-loss emissivity and incident flame-radiation coupling. Integrating the official CIE observer with 683 lm/W and 1 nm intervals gives absolute photopic luminance in cd/m2. Linear sRGB gamut clipping preserves that luminance. No per-row or upper-temperature display normalization is applied.",
+    "Native wall temperature selects hardware emission only when the thermal state is initialized and valid, without running, power, augmentation or plume-flicker gates. The display reference converts baked cd/m2 to renderer emission (default 1000 cd/m2); it is an exposed presentation parameter, not a measured exposure or a calibrated F135 material/thermal prediction. This binding applies only to declared nozzle-interior materials, adds no draw and never brightens the dry exhaust tail.",
+    "Optical depth, soot loading, excited-state populations, pressure, mixing and shock-cell spectral effects are unknown. Static shock-cell spacing and contrast are a baked visual assumption indexed by the gas-temperature range, not a pressure-derived solution. The afterburner envelope starts at zero at 1000 K rather than imposing a bright cold floor, but its linear temperature amplitude remains an artistic visibility/optical-depth assumption. Gas spectra are not a blackbody-temperature-only solution or absolutely calibrated radiance.",
+    "The optional 32-sample, 0.8-second periodic emission multiplier is an artistic brightness fluctuation bounded within plus/minus 4 percent. It is not measured F135 combustion instability, vibration or acoustic physics. Playback uses native simulation time and holds on pause.",
+    "The gas/plume lookup uses linear sRGB with negative out-of-gamut channels clipped and each spectrum normalized by its largest RGB channel. Alpha supplies a separately assumed relative envelope. The separate hot-hardware table instead retains absolute photopic luminance after gamut clipping. Exposure and tone mapping belong to the renderer.",
+    "The HUD samples the same assumed afterburner spectrum and applies sRGB display encoding without a separate whitening or recoloring step. This display accent is not a photometric exhaust-color measurement."
+  ],
+  "opticalParameters": {
+    "dry": {
+      "temperatureKelvinRange": [
+        300,
+        1800
+      ],
+      "axialCoolingFraction": 0.21,
+      "relativeEmission": [
+        0,
+        0.012
+      ],
+      "axialFalloff": 9
+    },
+    "afterburner": {
+      "temperatureKelvinRange": [
+        1000,
+        3000
+      ],
+      "axialCoolingFraction": 0.36,
+      "relativeEmission": [
+        0,
+        1
+      ],
+      "axialFalloff": 2.6,
+      "sootEnergyFractionAtNozzle": 0.995,
+      "sootEnergyFractionAtTail": 0.985,
+      "sootMixFalloff": 2,
+      "assumedShockCells": {
+        "countAtTemperatureRange": [
+          4,
+          7
+        ],
+        "contrast": 0.6,
+        "axialDamping": 1.8,
+        "phaseRadians": 0.15
+      },
+      "assumedBands": [
+        {
+          "species": "CH*",
+          "centerNm": 432,
+          "sigmaNm": 3,
+          "relativeEnergy": 1
+        },
+        {
+          "species": "C2*",
+          "centerNm": 473,
+          "sigmaNm": 5,
+          "relativeEnergy": 0.45
+        },
+        {
+          "species": "C2*",
+          "centerNm": 516,
+          "sigmaNm": 5,
+          "relativeEnergy": 0.015
+        },
+        {
+          "species": "C2*",
+          "centerNm": 573,
+          "sigmaNm": 5,
+          "relativeEnergy": 0.005
+        }
+      ]
+    },
+    "hudAccentSample": {
+      "mode": "afterburner",
+      "temperatureKelvin": 2500,
+      "axialFraction": 0.35,
+      "neutralDisplayMix": 0
+    }
+  },
+  "temporalParameters": {
+    "periodSeconds": 0.8,
+    "sampleCount": 32,
+    "amplitude": 0.04,
+    "harmonics": [
+      {
+        "cycles": 1,
+        "weight": 0.55,
+        "phaseRadians": 0.2
+      },
+      {
+        "cycles": 3,
+        "weight": 0.3,
+        "phaseRadians": 1.1
+      },
+      {
+        "cycles": 7,
+        "weight": 0.15,
+        "phaseRadians": 2
+      }
+    ]
+  },
+  "surfaceParameters": {
+    "sampleCount": 128,
+    "temperatureKelvinRange": [
+      300,
+      1800
+    ],
+    "visibleGrayEmissivity": 0.8
+  },
+  "sources": [
+    {
+      "url": "https://www.nist.gov/pml/sensor-science/optical-radiation/realization-candela",
+      "title": "NIST, Realization of the candela",
+      "supports": "The photometric conversion integrates spectral radiance with the photopic observer and luminous efficacy factor. This supports luminance units and conversion, not an F135 visible emissivity or renderer exposure."
+    },
+    {
+      "url": "https://www.nist.gov/programs-projects/spectroradiometry-sources",
+      "title": "NIST, Spectroradiometry of sources",
+      "supports": "Planck spectral radiance is the physical blackbody reference. An assumed visible-grey emissivity scales the hardware table; it does not establish the actual F135 wall temperature or spectral emissivity."
+    },
+    {
+      "url": "https://ntrs.nasa.gov/citations/19730007232",
+      "title": "NASA-TM-X-2711, Comparison of theoretical and experimental heat-transfer characteristics of a film-cooled afterburner liner",
+      "supports": "Separate gas/liner heat transfer, radiation and film cooling motivate a distinct persistent metal temperature. Historical liner data do not calibrate F135 thermal inputs or optics."
+    },
+    {
+      "url": "https://extapps.ksc.nasa.gov/Reliability/Documents/Preferred_Practices/at9.pdf",
+      "title": "NASA Kennedy Space Center, Thermography, Technique AT-9",
+      "supports": "Page 2 explains surface thermal radiation and visible emission from sufficiently hot solids. It supports a heated-hardware glow mechanism, not F135 nozzle temperatures or display brightness."
+    },
+    {
+      "url": "https://www.dvidshub.net/image/9578175/us-marine-corps-f-35b-performs-during-luke-days-2026",
+      "title": "56th Fighter Wing, U.S. Marine Corps F-35B performs during Luke Days 2026",
+      "supports": "The caption identifies actual F-35B afterburner use; the daylight photograph shows warm visible emission. It is a qualitative representative reference, not a spectral calibration or universal hue."
+    },
+    {
+      "url": "https://ntrs.nasa.gov/citations/20140000730",
+      "title": "NASA/TM-2013-217884, Comparing a Fischer-Tropsch Alternate Fuel to JP-8 and Their 50-50 Blend",
+      "supports": "Section 4.1 describes CH* near 432 nm, C2* near 473/516/573 nm and soot-associated orange emission in jet-fuel combustor imaging. This supplies band locations and mechanisms, not F135 afterburner weights."
+    },
+    {
+      "url": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir6783.pdf",
+      "title": "NISTIR 6783, Fire Dynamics Simulator Technical Reference Guide",
+      "supports": "Section 4 treats Planck emission, absorption and continuous soot radiation; it also warns that a grey approximation can overpredict optically thin emission. The simplified continuum here is an assumption."
+    },
+    {
+      "url": "https://cie.co.at/datatable/cie-1931-colour-matching-functions-2-degree-observer",
+      "title": "CIE 2019, Colour-matching functions of CIE 1931 standard colorimetric observer",
+      "doi": "10.25039/CIE.DS.xvudnb9b",
+      "supports": "Official 1 nm observer functions used to integrate the assumed emission spectrum into XYZ."
+    }
+  ],
+  "inputs": [
+    {
+      "path": "scripts/exhaustOptics/f135-visible-approximation.json",
+      "bytes": 8724,
+      "sha256": "735a8f44beeaac3c3315e290bcdb023c44dcdce2f564f558e6c5035b52759546"
+    },
+    {
+      "path": "scripts/exhaustOptics/data/CIE_xyz_1931_2deg.csv",
+      "bytes": 24021,
+      "sha256": "fa663e3535a7e0763a745993a1f0a192eb0275ac46ad2d1befd7626841e713c1"
+    },
+    {
+      "path": "scripts/exhaustOptics/data/CIE_xyz_1931_2deg.csv_metadata.json",
+      "bytes": 3787,
+      "sha256": "03abcaecf4e63d77045ef57c4514b52c8bb1a46dd18e1f93a50044a0f4f481c8"
+    },
+    {
+      "path": "scripts/exhaustOptics/bake.mjs",
+      "bytes": 10923,
+      "sha256": "489debc053b3159cadd9ee62a3606188798440d7caa4c0b99649ce412158cd6b"
+    },
+    {
+      "path": "scripts/build-exhaust-optics.mjs",
+      "bytes": 6633,
+      "sha256": "4571c5fab7d88b59af210b4ee21282182121ba9a39064e57340b8d047fd5a90c"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "f135-exhaust-lut.png",
+      "bytes": 3053,
+      "sha256": "99f06d738d15a56038105eb59eb19984b6fa92c4d9bde983c877950efbfbaed3"
+    },
+    {
+      "path": "f135ExhaustOpticalData.ts",
+      "bytes": 10172,
+      "sha256": "1bd440defd8d579cc5c3655b5af9124bf6e382b1759fd3546d4eb7ebde27687c"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "source": "Pre-thermal HEAD bytes verified against retained fork12 installed trace",
+  "sha256": {
+    "public/jsbsim-data/manifest.json": "448049a4e922630c251ebfa2f5245457799fed5502380cb4db6f35cf5ea45d42",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml": "638f1c1100e2cc85778d7498b6ae59dd552cf592c6dfab534f33a6f3b24217b8",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml": "09b7eb9c8c9ea5ca720ae1974f4d1ef5d7fb35e6b8248415c6cfcc307c57891c",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/direct.xml": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/liftfan.xml": "9ded9a6a93eeab2dac35c779b51945b9e5cf0807591737b67262b27c5ab67287",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/sidefan.xml": "90e1017803f4d9f46285ee09b2aed37d01cee82053e612ffabcf7a19816571ae",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/Systems/pushback.xml": "868928e9b2b12440daec283260aebb1562d05154f69438f5d95043444378a4bc"
+  }
+}

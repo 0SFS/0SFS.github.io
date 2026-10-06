@@ -1,15 +1,19 @@
 import "./engineMonitor.css";
 import type { FlightAudioStatus } from "../audio/createFlightAudio";
 import {
-  createTransitionLog, deriveEnginePhase, discoverReadableProperties, discreteEngineState, ENGINE_SECTIONS,
+  createTransitionLog, deriveEnginePhase, discoverReadableProperties, discoverThermalBalanceRows, discreteEngineState, ENGINE_SECTIONS,
   enginePropertyApplies, formatRowValue, formatValue, readEngineSample, tankRows,
   type EngineMonitorDefinition, type EnginePhaseReading, type EngineReader, type EngineRow, type EngineSample,
 } from "./engineMonitorModel";
-import { createEngineSummary, engineRotorDescription, engineRotorSpeeds, engineSummaryView, type EngineSummaryView, type FuelFlowUnit } from "./engineSummary";
+import { createEngineSummary, engineRotorDescription, engineRotorMotionDescription, engineRotorSpeeds, engineSummaryView, type EngineSummaryView, type FuelFlowUnit } from "./engineSummary";
 import { flightParameterDefaults, type FlightParameterStore } from "../settings/flightParameters";
-import { createEngineSpoolMotion, engineSpoolDisplayRate } from "./engineSpoolMotion";
+import { DEFAULT_MAX_PATTERN_STEP, engineSpoolDisplayRate } from "./engineSpoolMotion";
+import { createEngineSpoolAnimation } from "./engineSpoolAnimation";
 import { createEngineSpoolRenderer, type EngineSpoolRendererStatus } from "./engineSpoolRenderer";
 import type { EngineOrbSettings } from "../../remote/protocol";
+import { createEngineHistory, discoverEngineHistoryMetrics, engineHistoryCsv, engineHistoryPlot,
+  readEngineHistoryValues, type EngineHistoryMetric } from "./engineHistory";
+import type { EngineTestStandInitialState } from "../engineTestStand";
 
 export { closestUprightRingAngle } from "./engineSummary";
 
@@ -25,6 +29,15 @@ export interface EngineMonitorOptions {
   gpuDevice?: GPUDevice | null;
   onOrbStatus?: (status: EngineSpoolRendererStatus) => void;
   soundStatus?: () => FlightAudioStatus | null;
+  /** Shares the aircraft's cached native afterburner state and existing visual accent. */
+  afterburner?: { accentColor: string; getActive(): boolean | null };
+  /** Explicit same-page navigation into/out of the native engine test stand. */
+  testStand?: {
+    active: boolean;
+    description: string;
+    onChange(active: boolean): void;
+    initialization?: { state: EngineTestStandInitialState; onStart(state: EngineTestStandInitialState): void };
+  };
   /** Remembers which detail sections are open: the panel's memory, not a setting. Defaults to localStorage. */
   storage?: Pick<Storage, "getItem" | "setItem"> | null;
   /** Holds osfs.engineMonitor.fuelFlowUnit. The catalogue's defaults, in memory, when absent. */
@@ -37,11 +50,17 @@ export interface EngineMonitorOptions {
 }
 
 /** The latest reading, for a second surface that shows the engine — the phone controller. */
-export interface EngineReading { sample: EngineSample; phase: EnginePhaseReading; orbSettings?: EngineOrbSettings }
+export interface EngineReading {
+  sample: EngineSample;
+  phase: EnginePhaseReading;
+  orbSettings?: EngineOrbSettings;
+  /** Present only while the native afterburner is confirmed active. */
+  afterburnerColor?: string;
+}
 
 export interface EngineMonitorHandle {
-  /** Call every rendered frame; readings are cheap and the DOM refreshes at `refreshIntervalMs`. */
-  update(reader: EngineReader): void;
+  /** Supplies model samples; shaft animation has its own display-paced loop. DOM checks are throttled. */
+  update(reader: EngineReader, held?: boolean): void;
   /** What `update` last read, or null before the first frame. Never re-reads the model. */
   getReading(): EngineReading | null;
   /** Move the detail view into a tab host. Detach with the returned function. */
@@ -51,7 +70,7 @@ export interface EngineMonitorHandle {
 
 const STORAGE_KEY = "osfs.engineMonitor.v1";
 /** Sections closed until opened; everything else starts open. */
-const CLOSED_BY_DEFAULT: ReadonlySet<string> = new Set(["all"]);
+const CLOSED_BY_DEFAULT: ReadonlySet<string> = new Set(["all", "heat-balance"]);
 
 interface Layout { open: Record<string, boolean> }
 
@@ -81,6 +100,10 @@ function element<K extends keyof HTMLElementTagNameMap>(
   return node;
 }
 
+function setText(node: HTMLElement, text: string): void {
+  if (node.textContent !== text) node.textContent = text;
+}
+
 let instanceCount = 0;
 
 export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOptions = {}): EngineMonitorHandle {
@@ -91,6 +114,9 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
   const parameters = options.parameters ?? flightParameterDefaults();
   const flowUnit = (): FuelFlowUnit => parameters.get("osfs.engineMonitor.fuelFlowUnit");
   const log = createTransitionLog();
+  const historySettings = () => ({ seconds: parameters.get("osfs.engineMonitor.historySeconds"),
+    hz: parameters.get("osfs.engineMonitor.historyHz") });
+  const history = createEngineHistory(historySettings());
 
   const container = element("section", "flight-engine");
   container.setAttribute("aria-label", "Engine monitor");
@@ -99,10 +125,10 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
   toggle.title = "Open engine details";
   toggle.setAttribute("aria-expanded", "false");
   const summary = createEngineSummary();
-  const motion = createEngineSpoolMotion();
   const readOrbSettings = (): EngineOrbSettings => ({
     fps: parameters.get("osfs.engineMonitor.orbFps"),
     turnsPerSecond: parameters.get("osfs.engineMonitor.orbTurnsPerSecond"),
+    maxPatternStep: parameters.get("osfs.engineMonitor.orbMaxPatternStep"),
     pixelRatio: parameters.get("osfs.engineMonitor.orbPixelRatio"),
     renderer: parameters.get("osfs.renderer.engineOrbs"),
   });
@@ -110,9 +136,13 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
   const orbs = createEngineSpoolRenderer(summary.spools, {
     device: options.gpuDevice ?? null,
     preference: orbSettings.renderer, maxFps: orbSettings.fps, pixelRatio: orbSettings.pixelRatio,
+    maxPatternStep: orbSettings.maxPatternStep,
     outerBlades: options.definition?.rotorBlades?.outer ?? 0,
     innerBlades: options.definition?.rotorBlades?.inner ?? 0,
     onStatus: options.onOrbStatus,
+  });
+  const animation = createEngineSpoolAnimation({
+    draw: (frame, time) => orbs.draw(frame, time), canDraw: () => orbs.canDraw(), now,
   });
   toggle.append(summary.diagram, summary.values);
   const panel = element("div", "flight-engine__details");
@@ -125,6 +155,7 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
   let detailsHost: HTMLElement | null = null;
   let destroyed = false;
   let lastReader: EngineReader | null = null;
+  let held = false;
   let available: Set<string> | null = null;
   let properties: string[] = [];
   let lastRender = Number.NEGATIVE_INFINITY;
@@ -132,8 +163,15 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
   let detailLine: HTMLElement | null = null;
   let rotorLine: HTMLElement | null = null;
   let soundGrid: HTMLElement | null = null;
+  let lastSoundRows: [string, string][] | null = null;
   let logList: HTMLOListElement | null = null;
   let allSection: HTMLDetailsElement | null = null;
+  let historySection: HTMLDetailsElement | null = null;
+  let historyStatus: HTMLElement | null = null;
+  let historyExport: HTMLButtonElement | null = null;
+  let historyRendered = -1;
+  let historyMetrics: EngineHistoryMetric[] = [];
+  const historyPlots: { metric: EngineHistoryMetric; path: SVGPathElement; range: HTMLElement; times: HTMLElement }[] = [];
   const rowCells: { row: EngineRow; cell: HTMLElement }[] = [];
   const allCells: { path: string; cell: HTMLElement }[] = [];
 
@@ -143,7 +181,7 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
 
   const refreshNow = (): void => {
     lastRender = Number.NEGATIVE_INFINITY;
-    if (lastReader) handle.update(lastReader);
+    if (lastReader) handle.update(lastReader, held);
   };
 
   const detachDetails = (): void => {
@@ -187,23 +225,113 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
     panel.replaceChildren();
     rowCells.length = 0;
     allCells.length = 0;
+    historyPlots.length = 0;
+    if (options.testStand) {
+      const section = addSection("test-stand", "Engine test stand");
+      section.append(element("p", "flight-engine__muted", options.testStand.description));
+      const controls = addGrid(section);
+      const initialization = options.testStand.initialization;
+      if (initialization) {
+        const label = element("label", "flight-engine__pair", "Initial engine state ");
+        const select = element("select");
+        select.setAttribute("aria-label", "Initial engine state");
+        for (const [value, text] of [["cold", "Cold-soaked and stopped"], ["running", "Already-running idle"]]) {
+          const choice = element("option", undefined, text);
+          choice.value = value;
+          select.append(choice);
+        }
+        select.value = initialization.state;
+        label.append(select);
+        controls.append(label);
+        const start = element("button", "flight-engine__button", options.testStand.active ? "Reinitialize engine" : "Open engine test stand");
+        start.type = "button";
+        start.title = "Reload the stand with the selected initial state. This clears its current engine heat and history.";
+        start.addEventListener("click", () => {
+          if (!destroyed) initialization.onStart(select.value === "running" ? "running" : "cold");
+        });
+        controls.append(start);
+        if (options.testStand.active) section.append(element("p", "flight-engine__muted",
+          initialization.state === "cold"
+            ? "This run began cold-soaked and stopped. Use the normal start/stop control for a start or hot restart; reinitializing clears retained heat."
+            : "This run began with an already-running idle initialization. Its initial stored heat was assigned by the native initialization; this is not a cold-start experiment."));
+      }
+      if (!initialization || options.testStand.active) {
+        const open = element("button", "flight-engine__button",
+          options.testStand.active ? "Return to flight" : "Open engine test stand");
+        open.type = "button";
+        open.addEventListener("click", () => { if (!destroyed) options.testStand!.onChange(!options.testStand!.active); });
+        controls.append(open);
+      }
+    }
     if (properties.length === 0) {
       panel.append(element("p", "flight-engine__muted", "This flight model publishes no engine properties."));
     } else {
       detailLine = element("p", "flight-engine__detail");
       rotorLine = element("p", "flight-engine__muted");
       panel.append(detailLine, rotorLine);
-      for (const spec of ENGINE_SECTIONS) {
+      for (const spec of [...ENGINE_SECTIONS, { id: "heat-balance", title: "Solid heat balances",
+        rows: discoverThermalBalanceRows(available!, options.definition) }]) {
         const rows = [
-          ...spec.rows.filter((row) => available!.has(row.path) && enginePropertyApplies(row.path, options.definition)),
+          ...spec.rows.filter((row) => available!.has(row.path) && enginePropertyApplies(row.path, options.definition)
+            && (row.validityProperties?.every(path => available!.has(path)) ?? true)),
           ...(spec.id === "fuel" ? tankRows(properties) : []),
         ];
         if (rows.length === 0) continue;
         const grid = addGrid(addSection(spec.id, spec.title));
-        for (const row of rows) rowCells.push({ row, cell: addPair(grid, row.label, row.path) });
+        for (const row of rows) rowCells.push({
+          row, cell: addPair(grid, row.label, row.description ? `${row.path}\n${row.description}` : row.path),
+        });
       }
     }
-    if (options.soundStatus) soundGrid = addGrid(addSection("sound", "Sound: what the audio core hears"));
+    historyMetrics = discoverEngineHistoryMetrics(available!, options.definition, parameters.get("osfs.engineMonitor.thermalHistory"));
+    if (historyMetrics.length) {
+      historySection = addSection("history", "Engine history");
+      historyStatus = element("p", "flight-engine__muted");
+      historySection.append(historyStatus, element("p", "flight-engine__muted",
+        "Native samples against simulation time. Each trace has its own measured range; unavailable values leave gaps. Gas and metal are different temperatures."));
+      const controls = addGrid(historySection);
+      const clear = element("button", "flight-engine__button", "Clear history");
+      clear.type = "button";
+      clear.addEventListener("click", () => { history.clear(); refreshNow(); });
+      historyExport = element("button", "flight-engine__button", "Download CSV");
+      historyExport.type = "button";
+      historyExport.addEventListener("click", () => {
+        if (destroyed) return;
+        const url = URL.createObjectURL(new Blob([engineHistoryCsv(historyMetrics, history.frames())], { type: "text/csv;charset=utf-8" }));
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "engine-history.csv";
+        try { link.click(); } finally { URL.revokeObjectURL(url); }
+      });
+      controls.append(clear, historyExport);
+      const plots = element("div", "flight-engine__plots");
+      historySection.append(plots);
+      for (const metric of historyMetrics) {
+        const figure = element("figure", "flight-engine__plot");
+        figure.dataset.property = metric.path;
+        const caption = element("figcaption", undefined, `${metric.title}${metric.unit ? ` (${metric.unit})` : ""}`);
+        caption.title = metric.description ? `${metric.path}\n${metric.description}` : metric.path;
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("viewBox", "0 0 300 64");
+        svg.setAttribute("role", "img");
+        svg.setAttribute("aria-label", `${metric.title} history${metric.unit ? ` in ${metric.unit}` : ""}`);
+        const path = document.createElementNS(svg.namespaceURI, "path") as SVGPathElement;
+        path.setAttribute("fill", "none");
+        path.setAttribute("stroke", "currentColor");
+        path.setAttribute("stroke-width", "1.5");
+        path.setAttribute("vector-effect", "non-scaling-stroke");
+        svg.append(path);
+        const range = element("p", "flight-engine__plot-range");
+        const times = element("p", "flight-engine__plot-times");
+        figure.append(caption, svg, range, times);
+        plots.append(figure);
+        historyPlots.push({ metric, path, range, times });
+      }
+    }
+    if (options.soundStatus) {
+      soundGrid = addGrid(addSection("sound", "Sound: what the audio core hears"));
+      lastSoundRows = null;
+    }
 
     const logSection = addSection("log", "Transitions, newest first");
     const clear = element("button", "flight-engine__button", "Clear");
@@ -264,19 +392,34 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
     summary.render(view, flowUnit());
     if (!panel.isConnected) return;
     if (detailLine) {
-      detailLine.textContent = `${phase.label}${phase.derived ? " (derived from JSBSim's turbine rules)" : ""}: ${phase.detail}`;
+      setText(detailLine, `${phase.label}${phase.derived ? " (derived from JSBSim's turbine rules)" : ""}: ${phase.detail}`);
     }
     if (rotorLine) {
       const rate = engineSpoolDisplayRate(orbSettings.turnsPerSecond, orbSettings.fps, view.rotorBlades);
-      rotorLine.textContent = engineRotorDescription(view)
-        + ` Visual speed limit ${rate.toFixed(2)} rev/s (limited for readable blade motion).`;
+      setText(rotorLine, engineRotorDescription(view)
+        + ` Requested maximum: ${rate.toFixed(2)} rev/s of simulation time. ${view.rotorMotionDescription ?? ""}`);
     }
-    for (const { row, cell } of rowCells) cell.textContent = formatRowValue(row, reader.getPropertyValue(row.path));
+    const validity = new Map<string, boolean>();
+    for (const { row, cell } of rowCells) {
+      const valid = row.validityProperties?.every(path => {
+        if (!validity.has(path)) {
+          const value = reader.getPropertyValue(path);
+          validity.set(path, Number.isFinite(value) && value > 0.5);
+        }
+        return validity.get(path);
+      }) ?? true;
+      setText(cell, formatRowValue(row, valid ? reader.getPropertyValue(row.path) : Number.NaN));
+    }
     if (soundGrid) {
-      soundGrid.replaceChildren();
-      for (const [label, value] of soundRows(status)) {
-        const wide = value.length > 24;
-        addPair(soundGrid, label, undefined, wide).textContent = value;
+      const rows = soundRows(status);
+      if (!lastSoundRows || rows.length !== lastSoundRows.length
+        || rows.some(([label, value], index) => label !== lastSoundRows![index][0] || value !== lastSoundRows![index][1])) {
+        lastSoundRows = rows;
+        soundGrid.replaceChildren();
+        for (const [label, value] of rows) {
+          const wide = value.length > 24;
+          addPair(soundGrid, label, undefined, wide).textContent = value;
+        }
       }
     }
     if (logList && logDirty) {
@@ -288,23 +431,50 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
           `${entry.simTimeS === null ? "t=?" : `t=${entry.simTimeS.toFixed(2)}s`}  ${entry.text}`))));
     }
     // The full list is read only while someone is looking at it.
-    if (allSection?.open) for (const { path, cell } of allCells) cell.textContent = formatValue(reader.getPropertyValue(path));
+    if (allSection?.open) for (const { path, cell } of allCells) setText(cell, formatValue(reader.getPropertyValue(path)));
+    if (historySection?.open && !document.hidden && historyRendered !== history.revision()) {
+      historyRendered = history.revision();
+      const frames = history.frames();
+      const settings = historySettings();
+      setText(historyStatus!, settings.hz === 0 ? "History capture is off."
+        : `${frames.length} samples · up to ${settings.hz} Hz · ${settings.seconds} s history. The available monitor updates limit the actual sample rate.`);
+      historyExport!.disabled = frames.length === 0;
+      historyPlots.forEach(({ metric, path, range, times }, index) => {
+        const plot = engineHistoryPlot(frames, index, metric.flag);
+        path.setAttribute("d", plot.path);
+        const value = (number: number | null) => number === null ? "n/a" : metric.flag
+          ? number > .5 ? "on" : "off" : `${number.toFixed(metric.digits ?? 2)}${metric.unit ? ` ${metric.unit}` : ""}`;
+        setText(range, `Latest ${value(plot.latest)} · min ${value(plot.minimum)} · max ${value(plot.maximum)}`);
+        setText(times, plot.firstTime === null ? "Waiting for native simulation time…"
+          : `t=${plot.firstTime.toFixed(2)}–${plot.lastTime!.toFixed(2)} s`);
+      });
+    }
   };
 
   let reading: EngineReading | null = null;
   const handle: EngineMonitorHandle = {
     getReading: () => reading,
-    update(reader) {
+    update(reader, nextHeld = false) {
       if (destroyed) return;
+      held = nextHeld;
       lastReader = reader;
       if (!available) {
         properties = discoverReadableProperties(reader);
         available = new Set(properties);
         build();
       }
-      const sample = readEngineSample(reader, available, options.definition);
+      // Curated rows, history and the HUD share each property read this update.
+      const values = new Map<string, number>();
+      const cached: EngineReader = { getPropertyValue(path) {
+        if (!values.has(path)) values.set(path, reader.getPropertyValue(path));
+        return values.get(path)!;
+      } };
+      const sample = readEngineSample(cached, available, options.definition);
+      history.observe(sample.simTimeS, held, () => readEngineHistoryValues(cached, historyMetrics));
       const phase = deriveEnginePhase(sample);
-      reading = { sample, phase, orbSettings };
+      const afterburnerColor = options.afterburner?.getActive() === true ? options.afterburner.accentColor : undefined;
+      orbs.setAccentColor(afterburnerColor ?? null);
+      reading = { sample, phase, orbSettings, ...(afterburnerColor ? { afterburnerColor } : {}) };
       const state = discreteEngineState(sample, phase);
       const time = now();
       const due = time - lastRender >= refreshMs;
@@ -321,13 +491,14 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
       }
       if (log.observe(sample.simTimeS, state)) logDirty = true;
       const view = engineSummaryView(sample, phase);
-      const frame = motion.update(sample.simTimeS, engineRotorSpeeds(view),
-        engineSpoolDisplayRate(orbSettings.turnsPerSecond, orbSettings.fps, view.rotorBlades));
       if (due) {
+        view.rotorMotionDescription = engineRotorMotionDescription(orbs.getMotionStatus(), orbSettings.maxPatternStep ?? DEFAULT_MAX_PATTERN_STEP);
         lastRender = time;
-        render(reader, view, phase, status);
+        render(cached, view, phase, status);
       }
-      orbs.draw(frame, time);
+      animation.update({ simTimeS: sample.simTimeS, speeds: engineRotorSpeeds(view), held,
+        turnsPerSecond: engineSpoolDisplayRate(orbSettings.turnsPerSecond, orbSettings.fps, view.rotorBlades),
+        enabled: orbSettings.fps > 0 && orbSettings.renderer !== "off" && view.rotorBlades !== undefined });
     },
     attachDetails(host) {
       if (destroyed) return () => {};
@@ -347,17 +518,31 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
       destroyed = true;
       stopFlowUnit();
       for (const stop of stopOrbs) stop();
+      for (const stop of stopHistory) stop();
+      animation.destroy();
       orbs.destroy();
       reading = null;
+      history.clear();
       detachDetails();
       container.remove();
     },
   };
   // The HUD click and the Engine tab both change the unit; either redraws at once.
   const stopFlowUnit = parameters.watch("osfs.engineMonitor.fuelFlowUnit", refreshNow);
+  const syncHistory = () => { history.configure(historySettings()); refreshNow(); };
+  const stopHistory = [
+    parameters.watch("osfs.engineMonitor.historySeconds", syncHistory),
+    parameters.watch("osfs.engineMonitor.historyHz", syncHistory),
+    parameters.watch("osfs.engineMonitor.thermalHistory", () => {
+      history.clear();
+      if (available) build();
+      refreshNow();
+    }),
+  ];
   const syncOrbs = (): void => {
     orbSettings = readOrbSettings();
     orbs.configure({ preference: orbSettings.renderer, maxFps: orbSettings.fps, pixelRatio: orbSettings.pixelRatio,
+      maxPatternStep: orbSettings.maxPatternStep,
       outerBlades: options.definition?.rotorBlades?.outer ?? 0,
       innerBlades: options.definition?.rotorBlades?.inner ?? 0 });
     refreshNow();
@@ -365,6 +550,7 @@ export function createEngineMonitor(root: HTMLElement, options: EngineMonitorOpt
   const stopOrbs = [
     parameters.watch("osfs.engineMonitor.orbFps", syncOrbs),
     parameters.watch("osfs.engineMonitor.orbTurnsPerSecond", syncOrbs),
+    parameters.watch("osfs.engineMonitor.orbMaxPatternStep", syncOrbs),
     parameters.watch("osfs.engineMonitor.orbPixelRatio", syncOrbs),
     parameters.watch("osfs.renderer.engineOrbs", syncOrbs),
   ];

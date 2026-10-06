@@ -1,0 +1,2013 @@
+{
+  "schemaVersion": 1,
+  "source": "public/aircraft/f-35b/F-35B_AF267.glb",
+  "sourceSha256": "8324d792711a8aecd74988dd9e314b3b4e6f1f3a819591ce60f34caa004d7fbd",
+  "attachment": "vtol",
+  "coordinateSpace": "authored glTF attachment local, all node transforms applied",
+  "pose": "authored rest, no rig rotations/visibility changes",
+  "method": "Projected XY barycentric triangle inclusion, interpolated Z, from declared nozzle exit toward interior along -Z. Double-sided hits retained; closest front-facing/double-sided hit separately identified. No vertex-radius inference.",
+  "allTriangles": 12259,
+  "darkmet2VtolTriangles": 110,
+  "axisProbe": {
+    "offsetMeters": [
+      0,
+      0
+    ],
+    "rayOriginAttachmentMeters": [
+      0,
+      0.28737974,
+      1.79
+    ],
+    "rayDirection": [
+      0,
+      0,
+      -1
+    ],
+    "darkmet2AttachmentHits": [
+      {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 79,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.49999999999993594,
+          3.9516091100778674e-7,
+          0.49999960483915307
+        ],
+        "normalZ": 0.41546333233058474
+      }
+    ],
+    "nearestGeometryHit": {
+      "node": "vtol",
+      "mesh": "Cylinder",
+      "primitive": 0,
+      "triangle": 79,
+      "material": "darkmet2",
+      "alphaMode": "OPAQUE",
+      "doubleSided": true,
+      "zMeters": 0.4208382392520207,
+      "barycentric": [
+        0.49999999999993594,
+        3.9516091100778674e-7,
+        0.49999960483915307
+      ],
+      "normalZ": 0.41546333233058474
+    },
+    "nearestFrontFacingOrDoubleSidedHit": {
+      "node": "vtol",
+      "mesh": "Cylinder",
+      "primitive": 0,
+      "triangle": 79,
+      "material": "darkmet2",
+      "alphaMode": "OPAQUE",
+      "doubleSided": true,
+      "zMeters": 0.4208382392520207,
+      "barycentric": [
+        0.49999999999993594,
+        3.9516091100778674e-7,
+        0.49999960483915307
+      ],
+      "normalZ": 0.41546333233058474
+    },
+    "allHits": [
+      {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 79,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.49999999999993594,
+          3.9516091100778674e-7,
+          0.49999960483915307
+        ],
+        "normalZ": 0.41546333233058474
+      },
+      {
+        "node": "extras",
+        "mesh": "Cube",
+        "primitive": 1,
+        "triangle": 280,
+        "material": "livery",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": -0.3241415023803711,
+        "barycentric": [
+          0.4999974238334026,
+          0.0000024669943154035935,
+          0.500000109172282
+        ],
+        "normalZ": 0.9423170930578095
+      },
+      {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 1,
+        "triangle": 109,
+        "material": "livery",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": -0.9046816801434261,
+        "barycentric": [
+          0.5000008184656709,
+          0.0000011574813795281875,
+          0.4999980240529496
+        ],
+        "normalZ": -0.01700757692728172
+      },
+      {
+        "node": "extras",
+        "mesh": "Cube",
+        "primitive": 1,
+        "triangle": 235,
+        "material": "livery",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": -0.9709444046020508,
+        "barycentric": [
+          0.49999786651929545,
+          0.0000031560316526260022,
+          0.4999989774490519
+        ],
+        "normalZ": -1.120574839577566
+      },
+      {
+        "node": "fuselage",
+        "mesh": "Cube.001",
+        "primitive": 1,
+        "triangle": 286,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": -8.107035291283568,
+        "barycentric": [
+          0.000005720764081691338,
+          0.39793565268507675,
+          0.6020586265508416
+        ],
+        "normalZ": -0.3074303949880852
+      },
+      {
+        "node": "fuselage",
+        "mesh": "Cube.001",
+        "primitive": 1,
+        "triangle": 337,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": -9.453359472658928,
+        "barycentric": [
+          0.388244243618536,
+          0.000005720761695243064,
+          0.6117500356197687
+        ],
+        "normalZ": 0.3151091765834882
+      },
+      {
+        "node": "Cube",
+        "mesh": "Cube.079",
+        "primitive": 0,
+        "triangle": 150,
+        "material": "dark",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": -10.016992433567921,
+        "barycentric": [
+          0.000007643323610427053,
+          0.6337608967406708,
+          0.3662314599357187
+        ],
+        "normalZ": 0.036511181437076344
+      },
+      {
+        "node": "Cube",
+        "mesh": "Cube.079",
+        "primitive": 0,
+        "triangle": 235,
+        "material": "dark",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": -12.514194355994949,
+        "barycentric": [
+          0.6337685400642812,
+          0.000009548777764413087,
+          0.3662219111579544
+        ],
+        "normalZ": -0.036511181437076344
+      },
+      {
+        "node": "fuselage",
+        "mesh": "Cube.001",
+        "primitive": 0,
+        "triangle": 77,
+        "material": "livery",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": -14.430771335633466,
+        "barycentric": [
+          0.000016077523895443305,
+          0.7135576678982525,
+          0.2864262545778521
+        ],
+        "normalZ": -0.019274853883641425
+      }
+    ]
+  },
+  "nearAxisProbes": [
+    {
+      "offsetMeters": [
+        0.001,
+        0
+      ],
+      "rayOriginAttachmentMeters": [
+        0.001,
+        0.28737974,
+        1.79
+      ],
+      "rayDirection": [
+        0,
+        0,
+        -1
+      ],
+      "darkmet2AttachmentHits": [
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 0,
+          "triangle": 79,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": 0.4208382392520207,
+          "barycentric": [
+            0.4984485649062731,
+            0.0015518302545738604,
+            0.49999960483915307
+          ],
+          "normalZ": 0.41546333233058474
+        }
+      ],
+      "nearestGeometryHit": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 79,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.4984485649062731,
+          0.0015518302545738604,
+          0.49999960483915307
+        ],
+        "normalZ": 0.41546333233058474
+      },
+      "nearestFrontFacingOrDoubleSidedHit": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 79,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.4984485649062731,
+          0.0015518302545738604,
+          0.49999960483915307
+        ],
+        "normalZ": 0.41546333233058474
+      },
+      "allHits": [
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 0,
+          "triangle": 79,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": 0.4208382392520207,
+          "barycentric": [
+            0.4984485649062731,
+            0.0015518302545738604,
+            0.49999960483915307
+          ],
+          "normalZ": 0.41546333233058474
+        },
+        {
+          "node": "extras",
+          "mesh": "Cube",
+          "primitive": 1,
+          "triangle": 281,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.3241415023803711,
+          "barycentric": [
+            0.4989724237978668,
+            0.0010276853744151057,
+            0.4999998908277181
+          ],
+          "normalZ": 0.9423170930578095
+        },
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 1,
+          "triangle": 108,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.9046816801434261,
+          "barycentric": [
+            0.4929149308147945,
+            0.010017491006989922,
+            0.4970675781782157
+          ],
+          "normalZ": -0.01700757797899044
+        },
+        {
+          "node": "extras",
+          "mesh": "Cube",
+          "primitive": 1,
+          "triangle": 234,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.9709444046020508,
+          "barycentric": [
+            0.4991293733760586,
+            0.0012311131159168812,
+            0.49963951350802444
+          ],
+          "normalZ": -1.1205749049426093
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 1,
+          "triangle": 295,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -8.107166680495697,
+          "barycentric": [
+            0.39794136688393117,
+            0.0057339112926469695,
+            0.5963247218234219
+          ],
+          "normalZ": -0.3074305377563904
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 1,
+          "triangle": 320,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -9.45322807930463,
+          "barycentric": [
+            0.005733913254208806,
+            0.38254777418701524,
+            0.611718312558776
+          ],
+          "normalZ": 0.3151090803640872
+        },
+        {
+          "node": "Cube",
+          "mesh": "Cube.079",
+          "primitive": 0,
+          "triangle": 19,
+          "material": "dark",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -10.016992433365106,
+          "barycentric": [
+            0.0037545646787310043,
+            0.3662314599357188,
+            0.6300139753855502
+          ],
+          "normalZ": 0.036511181437076344
+        },
+        {
+          "node": "Cube",
+          "mesh": "Cube.079",
+          "primitive": 0,
+          "triangle": 110,
+          "material": "dark",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -12.514194355792132,
+          "barycentric": [
+            0.6337685400642812,
+            0.36247880071114175,
+            0.0037526592245770707
+          ],
+          "normalZ": -0.036511181437076344
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 0,
+          "triangle": 823,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -14.430359777275463,
+          "barycentric": [
+            0.014543964410429483,
+            0.28566771569508675,
+            0.6997883198944838
+          ],
+          "normalZ": -0.0192748538836413
+        }
+      ]
+    },
+    {
+      "offsetMeters": [
+        -0.001,
+        0
+      ],
+      "rayOriginAttachmentMeters": [
+        -0.001,
+        0.28737974,
+        1.79
+      ],
+      "rayDirection": [
+        0,
+        0,
+        -1
+      ],
+      "darkmet2AttachmentHits": [
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 0,
+          "triangle": 78,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": 0.4208382392520207,
+          "barycentric": [
+            0.4984485649064012,
+            0.0015510399327518449,
+            0.5000003951608469
+          ],
+          "normalZ": 0.41546333233058474
+        }
+      ],
+      "nearestGeometryHit": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 78,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.4984485649064012,
+          0.0015510399327518449,
+          0.5000003951608469
+        ],
+        "normalZ": 0.41546333233058474
+      },
+      "nearestFrontFacingOrDoubleSidedHit": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 78,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.4984485649064012,
+          0.0015510399327518449,
+          0.5000003951608469
+        ],
+        "normalZ": 0.41546333233058474
+      },
+      "allHits": [
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 0,
+          "triangle": 78,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": 0.4208382392520207,
+          "barycentric": [
+            0.4984485649064012,
+            0.0015510399327518449,
+            0.5000003951608469
+          ],
+          "normalZ": 0.41546333233058474
+        },
+        {
+          "node": "extras",
+          "mesh": "Cube",
+          "primitive": 1,
+          "triangle": 280,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.3241415023803711,
+          "barycentric": [
+            0.4989672714646722,
+            0.001032619363045854,
+            0.5000001091722819
+          ],
+          "normalZ": 0.9423170930578095
+        },
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 1,
+          "triangle": 109,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.9046816801434261,
+          "barycentric": [
+            0.49291656818416063,
+            0.010019806589207208,
+            0.49706362522663217
+          ],
+          "normalZ": -0.01700757692728172
+        },
+        {
+          "node": "extras",
+          "mesh": "Cube",
+          "primitive": 1,
+          "triangle": 235,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.9709444046020508,
+          "barycentric": [
+            0.4991251063373425,
+            0.001237425251035112,
+            0.4996374684116224
+          ],
+          "normalZ": -1.120574839577566
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 1,
+          "triangle": 286,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -8.107166942994512,
+          "barycentric": [
+            0.005745355483594549,
+            0.39220260484908165,
+            0.6020520396673238
+          ],
+          "normalZ": -0.3074303949880852
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 1,
+          "triangle": 337,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -9.453227816898977,
+          "barycentric": [
+            0.388244243618536,
+            0.00574535302673407,
+            0.6060104033547299
+          ],
+          "normalZ": 0.3151091765834882
+        },
+        {
+          "node": "Cube",
+          "mesh": "Cube.079",
+          "primitive": 0,
+          "triangle": 150,
+          "material": "dark",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -10.016992433770737,
+          "barycentric": [
+            0.0037698513259518587,
+            0.6299986887383293,
+            0.3662314599357188
+          ],
+          "normalZ": 0.036511181437076344
+        },
+        {
+          "node": "Cube",
+          "mesh": "Cube.079",
+          "primitive": 0,
+          "triangle": 235,
+          "material": "dark",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -12.514194356197764,
+          "barycentric": [
+            0.6337685400642812,
+            0.003771756780105845,
+            0.362459703155613
+          ],
+          "normalZ": -0.036511181437076344
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 0,
+          "triangle": 77,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -14.430358866359873,
+          "barycentric": [
+            0.014576119458220274,
+            0.6997578437456422,
+            0.28566603679613756
+          ],
+          "normalZ": -0.019274853883641425
+        }
+      ]
+    },
+    {
+      "offsetMeters": [
+        0,
+        0.001
+      ],
+      "rayOriginAttachmentMeters": [
+        0,
+        0.28837974,
+        1.79
+      ],
+      "rayDirection": [
+        0,
+        0,
+        -1
+      ],
+      "darkmet2AttachmentHits": [
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 0,
+          "triangle": 78,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": 0.4208382392520207,
+          "barycentric": [
+            0.5000000000000641,
+            0.0015510402107162338,
+            0.4984489597892197
+          ],
+          "normalZ": 0.41546333233058474
+        }
+      ],
+      "nearestGeometryHit": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 78,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.5000000000000641,
+          0.0015510402107162338,
+          0.4984489597892197
+        ],
+        "normalZ": 0.41546333233058474
+      },
+      "nearestFrontFacingOrDoubleSidedHit": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 78,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.5000000000000641,
+          0.0015510402107162338,
+          0.4984489597892197
+        ],
+        "normalZ": 0.41546333233058474
+      },
+      "allHits": [
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 0,
+          "triangle": 78,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": 0.4208382392520207,
+          "barycentric": [
+            0.5000000000000641,
+            0.0015510402107162338,
+            0.4984489597892197
+          ],
+          "normalZ": 0.41546333233058474
+        },
+        {
+          "node": "extras",
+          "mesh": "Cube",
+          "primitive": 1,
+          "triangle": 280,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.3241415023803711,
+          "barycentric": [
+            0.4999974238334026,
+            0.001032619363045854,
+            0.49896995680355155
+          ],
+          "normalZ": 0.9423170930578095
+        },
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 1,
+          "triangle": 108,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.9046816801434261,
+          "barycentric": [
+            0.5029335801792407,
+            0.004148697221861179,
+            0.4929177225988981
+          ],
+          "normalZ": -0.01700757797899044
+        },
+        {
+          "node": "extras",
+          "mesh": "Cube",
+          "primitive": 1,
+          "triangle": 234,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.9709444046020508,
+          "barycentric": [
+            0.5003636425500396,
+            0.0005080950832326931,
+            0.4991282623667277
+          ],
+          "normalZ": -1.1205749049426093
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 1,
+          "triangle": 286,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -8.107035291283566,
+          "barycentric": [
+            0.000005720764081691338,
+            0.39850237321151305,
+            0.6014919060244053
+          ],
+          "normalZ": -0.3074303949880852
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 1,
+          "triangle": 337,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -9.45335947265893,
+          "barycentric": [
+            0.3887971541738076,
+            0.000005720761695243064,
+            0.6111971250644972
+          ],
+          "normalZ": 0.3151091765834882
+        },
+        {
+          "node": "Cube",
+          "mesh": "Cube.079",
+          "primitive": 0,
+          "triangle": 150,
+          "material": "dark",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -10.016992433567921,
+          "barycentric": [
+            0.000007643323610427053,
+            0.6264808978862242,
+            0.37351145879016534
+          ],
+          "normalZ": 0.036511181437076344
+        },
+        {
+          "node": "Cube",
+          "mesh": "Cube.079",
+          "primitive": 0,
+          "triangle": 235,
+          "material": "dark",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -12.514194355994949,
+          "barycentric": [
+            0.6264885412098345,
+            0.000009548777764413087,
+            0.373501910012401
+          ],
+          "normalZ": -0.036511181437076344
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 0,
+          "triangle": 77,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -14.428838032931537,
+          "barycentric": [
+            0.000016077523895224903,
+            0.7171209177826416,
+            0.28286300469346315
+          ],
+          "normalZ": -0.019274853883641425
+        }
+      ]
+    },
+    {
+      "offsetMeters": [
+        0,
+        -0.001
+      ],
+      "rayOriginAttachmentMeters": [
+        0,
+        0.28637974,
+        1.79
+      ],
+      "rayDirection": [
+        0,
+        0,
+        -1
+      ],
+      "darkmet2AttachmentHits": [
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 0,
+          "triangle": 79,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": 0.4208382392520207,
+          "barycentric": [
+            0.49999999999993594,
+            0.0015518305325382493,
+            0.4984481694675258
+          ],
+          "normalZ": 0.41546333233058474
+        }
+      ],
+      "nearestGeometryHit": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 79,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.49999999999993594,
+          0.0015518305325382493,
+          0.4984481694675258
+        ],
+        "normalZ": 0.41546333233058474
+      },
+      "nearestFrontFacingOrDoubleSidedHit": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 79,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.49999999999993594,
+          0.0015518305325382493,
+          0.4984481694675258
+        ],
+        "normalZ": 0.41546333233058474
+      },
+      "allHits": [
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 0,
+          "triangle": 79,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": 0.4208382392520207,
+          "barycentric": [
+            0.49999999999993594,
+            0.0015518305325382493,
+            0.4984481694675258
+          ],
+          "normalZ": 0.41546333233058474
+        },
+        {
+          "node": "extras",
+          "mesh": "Cube",
+          "primitive": 1,
+          "triangle": 281,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.3241415023803711,
+          "barycentric": [
+            0.5000025761665974,
+            0.0010276853744151057,
+            0.4989697384589875
+          ],
+          "normalZ": 0.9423170930578095
+        },
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 1,
+          "triangle": 109,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.9046816801434261,
+          "barycentric": [
+            0.5029352172919883,
+            0.004151012441166006,
+            0.4929137702668457
+          ],
+          "normalZ": -0.01700757692728172
+        },
+        {
+          "node": "extras",
+          "mesh": "Cube",
+          "primitive": 1,
+          "triangle": 235,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.9709444046020508,
+          "barycentric": [
+            0.500359375556725,
+            0.0005144071761759985,
+            0.49912621726709894
+          ],
+          "normalZ": -1.120574839577566
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 1,
+          "triangle": 286,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -8.107035291283566,
+          "barycentric": [
+            0.000005720764081691338,
+            0.3973689321586405,
+            0.6026253470772778
+          ],
+          "normalZ": -0.3074303949880852
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 1,
+          "triangle": 337,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -9.45335947265893,
+          "barycentric": [
+            0.3876913330632643,
+            0.000005720761695243064,
+            0.6123029461750404
+          ],
+          "normalZ": 0.3151091765834882
+        },
+        {
+          "node": "Cube",
+          "mesh": "Cube.079",
+          "primitive": 0,
+          "triangle": 150,
+          "material": "dark",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -10.016992433567921,
+          "barycentric": [
+            0.000007643323610427053,
+            0.6410408955951173,
+            0.3589514610812722
+          ],
+          "normalZ": 0.036511181437076344
+        },
+        {
+          "node": "Cube",
+          "mesh": "Cube.079",
+          "primitive": 0,
+          "triangle": 235,
+          "material": "dark",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -12.514194355994949,
+          "barycentric": [
+            0.6410485389187278,
+            0.000009548777764413087,
+            0.35894191230350775
+          ],
+          "normalZ": -0.036511181437076344
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 0,
+          "triangle": 77,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -14.432704638335391,
+          "barycentric": [
+            0.000016077523895661708,
+            0.7099944180138634,
+            0.2899895044622409
+          ],
+          "normalZ": -0.019274853883641425
+        }
+      ]
+    },
+    {
+      "offsetMeters": [
+        0.04,
+        0
+      ],
+      "rayOriginAttachmentMeters": [
+        0.04,
+        0.28737974,
+        1.79
+      ],
+      "rayDirection": [
+        0,
+        0,
+        -1
+      ],
+      "darkmet2AttachmentHits": [
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 0,
+          "triangle": 79,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": 0.420838239252021,
+          "barycentric": [
+            0.43794259625342147,
+            0.06205779890742545,
+            0.49999960483915307
+          ],
+          "normalZ": 0.41546333233058474
+        }
+      ],
+      "nearestGeometryHit": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 79,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.420838239252021,
+        "barycentric": [
+          0.43794259625342147,
+          0.06205779890742545,
+          0.49999960483915307
+        ],
+        "normalZ": 0.41546333233058474
+      },
+      "nearestFrontFacingOrDoubleSidedHit": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 79,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.420838239252021,
+        "barycentric": [
+          0.43794259625342147,
+          0.06205779890742545,
+          0.49999960483915307
+        ],
+        "normalZ": 0.41546333233058474
+      },
+      "allHits": [
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 0,
+          "triangle": 79,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": 0.420838239252021,
+          "barycentric": [
+            0.43794259625342147,
+            0.06205779890742545,
+            0.49999960483915307
+          ],
+          "normalZ": 0.41546333233058474
+        },
+        {
+          "node": "extras",
+          "mesh": "Cube",
+          "primitive": 1,
+          "triangle": 281,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.32414150238037076,
+          "barycentric": [
+            0.45879648141737794,
+            0.04120362775490403,
+            0.499999890827718
+          ],
+          "normalZ": 0.9423170930578095
+        },
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 1,
+          "triangle": 108,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.9046816801434256,
+          "barycentric": [
+            0.21662915275097236,
+            0.40074478205060776,
+            0.38262606519841985
+          ],
+          "normalZ": -0.01700757797899044
+        },
+        {
+          "node": "extras",
+          "mesh": "Cube",
+          "primitive": 1,
+          "triangle": 234,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.9709444046020506,
+          "barycentric": [
+            0.4650917293025958,
+            0.04936760986394908,
+            0.48554066083345515
+          ],
+          "normalZ": -1.1205749049426093
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 1,
+          "triangle": 295,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -8.112301094838188,
+          "barycentric": [
+            0.39794136688393117,
+            0.22957956140145433,
+            0.3724790717146146
+          ],
+          "normalZ": -0.3074305377563904
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 1,
+          "triangle": 320,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -9.44809350309867,
+          "barycentric": [
+            0.22957963994259384,
+            0.1601638135435671,
+            0.6102565465138391
+          ],
+          "normalZ": 0.3151090803640872
+        },
+        {
+          "node": "Cube",
+          "mesh": "Cube.079",
+          "primitive": 0,
+          "triangle": 19,
+          "material": "dark",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -10.016992425455285,
+          "barycentric": [
+            0.15048067677004684,
+            0.3662314599357188,
+            0.48328786329423434
+          ],
+          "normalZ": 0.036511181437076344
+        },
+        {
+          "node": "Cube",
+          "mesh": "Cube.079",
+          "primitive": 0,
+          "triangle": 110,
+          "material": "dark",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -12.514194347882311,
+          "barycentric": [
+            0.6337685400642812,
+            0.21575268861982594,
+            0.15047877131589288
+          ],
+          "normalZ": -0.036511181437076344
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 0,
+          "triangle": 823,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -14.414273475605363,
+          "barycentric": [
+            0.5823855998491017,
+            0.2560192222082221,
+            0.16159517794267625
+          ],
+          "normalZ": -0.0192748538836413
+        }
+      ]
+    },
+    {
+      "offsetMeters": [
+        -0.04,
+        0
+      ],
+      "rayOriginAttachmentMeters": [
+        -0.04,
+        0.28737974,
+        1.79
+      ],
+      "rayDirection": [
+        0,
+        0,
+        -1
+      ],
+      "darkmet2AttachmentHits": [
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 0,
+          "triangle": 78,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": 0.4208382392520203,
+          "barycentric": [
+            0.43794259625354964,
+            0.06205700858560344,
+            0.5000003951608468
+          ],
+          "normalZ": 0.41546333233058474
+        }
+      ],
+      "nearestGeometryHit": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 78,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520203,
+        "barycentric": [
+          0.43794259625354964,
+          0.06205700858560344,
+          0.5000003951608468
+        ],
+        "normalZ": 0.41546333233058474
+      },
+      "nearestFrontFacingOrDoubleSidedHit": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 78,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520203,
+        "barycentric": [
+          0.43794259625354964,
+          0.06205700858560344,
+          0.5000003951608468
+        ],
+        "normalZ": 0.41546333233058474
+      },
+      "allHits": [
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 0,
+          "triangle": 78,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": 0.4208382392520203,
+          "barycentric": [
+            0.43794259625354964,
+            0.06205700858560344,
+            0.5000003951608468
+          ],
+          "normalZ": 0.41546333233058474
+        },
+        {
+          "node": "extras",
+          "mesh": "Cube",
+          "primitive": 1,
+          "triangle": 280,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.3241415023803714,
+          "barycentric": [
+            0.4587913290841833,
+            0.04120856174353477,
+            0.5000001091722819
+          ],
+          "normalZ": 0.9423170930578095
+        },
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 1,
+          "triangle": 109,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.9046816801434265,
+          "barycentric": [
+            0.21663080720526043,
+            0.40074712179448546,
+            0.38262207100025414
+          ],
+          "normalZ": -0.01700757692728172
+        },
+        {
+          "node": "extras",
+          "mesh": "Cube",
+          "primitive": 1,
+          "triangle": 235,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.970944404602051,
+          "barycentric": [
+            0.4650874592411788,
+            0.04937392480695133,
+            0.48553861595186987
+          ],
+          "normalZ": -1.120574839577566
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 1,
+          "triangle": 286,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -8.112301359721387,
+          "barycentric": [
+            0.229591109544596,
+            0.16861373924527204,
+            0.601795151210132
+          ],
+          "normalZ": -0.3074303949880852
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 1,
+          "triangle": 337,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -9.448093242260875,
+          "barycentric": [
+            0.388244243618536,
+            0.22959101136324833,
+            0.3821647450182156
+          ],
+          "normalZ": 0.3151091765834882
+        },
+        {
+          "node": "Cube",
+          "mesh": "Cube.079",
+          "primitive": 0,
+          "triangle": 150,
+          "material": "dark",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -10.016992441680557,
+          "barycentric": [
+            0.15049596341726768,
+            0.4832725766470135,
+            0.3662314599357188
+          ],
+          "normalZ": 0.036511181437076344
+        },
+        {
+          "node": "Cube",
+          "mesh": "Cube.079",
+          "primitive": 0,
+          "triangle": 235,
+          "material": "dark",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -12.514194364107585,
+          "barycentric": [
+            0.6337685400642812,
+            0.1504978688714217,
+            0.21573359106429713
+          ],
+          "normalZ": -0.036511181437076344
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 0,
+          "triangle": 77,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -14.414272564689771,
+          "barycentric": [
+            0.5824177548968886,
+            0.16156470179383825,
+            0.2560175433092731
+          ],
+          "normalZ": -0.019274853883641425
+        }
+      ]
+    },
+    {
+      "offsetMeters": [
+        0,
+        0.04
+      ],
+      "rayOriginAttachmentMeters": [
+        0,
+        0.32737974,
+        1.79
+      ],
+      "rayDirection": [
+        0,
+        0,
+        -1
+      ],
+      "darkmet2AttachmentHits": [
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 0,
+          "triangle": 78,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": 0.4208382392520207,
+          "barycentric": [
+            0.5000000000000641,
+            0.06205701970417785,
+            0.43794298029575807
+          ],
+          "normalZ": 0.41546333233058474
+        }
+      ],
+      "nearestGeometryHit": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 78,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.5000000000000641,
+          0.06205701970417785,
+          0.43794298029575807
+        ],
+        "normalZ": 0.41546333233058474
+      },
+      "nearestFrontFacingOrDoubleSidedHit": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 78,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.5000000000000641,
+          0.06205701970417785,
+          0.43794298029575807
+        ],
+        "normalZ": 0.41546333233058474
+      },
+      "allHits": [
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 0,
+          "triangle": 78,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": 0.4208382392520207,
+          "barycentric": [
+            0.5000000000000641,
+            0.06205701970417785,
+            0.43794298029575807
+          ],
+          "normalZ": 0.41546333233058474
+        },
+        {
+          "node": "extras",
+          "mesh": "Cube",
+          "primitive": 1,
+          "triangle": 280,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.3241415023803711,
+          "barycentric": [
+            0.4999974238334026,
+            0.041208561743534836,
+            0.45879401442306256
+          ],
+          "normalZ": 0.9423170930578095
+        },
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 1,
+          "triangle": 108,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.9046816801434261,
+          "barycentric": [
+            0.6173751273288215,
+            0.16599303064545806,
+            0.21663184202572044
+          ],
+          "normalZ": -0.01700757797899044
+        },
+        {
+          "node": "extras",
+          "mesh": "Cube",
+          "primitive": 1,
+          "triangle": 234,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.9709444046020508,
+          "barycentric": [
+            0.5144624962618359,
+            0.020446888556580115,
+            0.46509061518158396
+          ],
+          "normalZ": -1.1205749049426093
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 1,
+          "triangle": 409,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -5.587225615977883,
+          "barycentric": [
+            0.000006005543960728573,
+            0.027821578617414494,
+            0.9721724158386248
+          ],
+          "normalZ": -0.20163589610287588
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 1,
+          "triangle": 446,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -6.705973625183105,
+          "barycentric": [
+            0.02692297688618481,
+            0.000006264668801217086,
+            0.9730707584450139
+          ],
+          "normalZ": 0.19979024868846104
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 1,
+          "triangle": 286,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -8.107035291283566,
+          "barycentric": [
+            0.000005720764081691338,
+            0.4206044737425284,
+            0.5793898054933899
+          ],
+          "normalZ": -0.3074303949880852
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 1,
+          "triangle": 337,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -9.45335947265893,
+          "barycentric": [
+            0.41036066582940234,
+            0.000005720761695243064,
+            0.5896336134089024
+          ],
+          "normalZ": 0.3151091765834882
+        },
+        {
+          "node": "Cube",
+          "mesh": "Cube.079",
+          "primitive": 0,
+          "triangle": 150,
+          "material": "dark",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -10.016992433567921,
+          "barycentric": [
+            0.000007643323610427053,
+            0.3425609425628073,
+            0.6574314141135822
+          ],
+          "normalZ": 0.036511181437076344
+        },
+        {
+          "node": "Cube",
+          "mesh": "Cube.079",
+          "primitive": 0,
+          "triangle": 235,
+          "material": "dark",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -12.514194355994949,
+          "barycentric": [
+            0.3425685858864177,
+            0.000009548777764413087,
+            0.6574218653358179
+          ],
+          "normalZ": -0.036511181437076344
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 0,
+          "triangle": 77,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -14.353439227556372,
+          "barycentric": [
+            0.000016077523886707133,
+            0.8560876632738158,
+            0.14389625920229754
+          ],
+          "normalZ": -0.019274853883641425
+        }
+      ]
+    },
+    {
+      "offsetMeters": [
+        0,
+        -0.04
+      ],
+      "rayOriginAttachmentMeters": [
+        0,
+        0.24737974,
+        1.79
+      ],
+      "rayDirection": [
+        0,
+        0,
+        -1
+      ],
+      "darkmet2AttachmentHits": [
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 0,
+          "triangle": 79,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": 0.4208382392520207,
+          "barycentric": [
+            0.49999999999993594,
+            0.062057810025999936,
+            0.43794218997406414
+          ],
+          "normalZ": 0.41546333233058474
+        }
+      ],
+      "nearestGeometryHit": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 79,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.49999999999993594,
+          0.062057810025999936,
+          0.43794218997406414
+        ],
+        "normalZ": 0.41546333233058474
+      },
+      "nearestFrontFacingOrDoubleSidedHit": {
+        "node": "vtol",
+        "mesh": "Cylinder",
+        "primitive": 0,
+        "triangle": 79,
+        "material": "darkmet2",
+        "alphaMode": "OPAQUE",
+        "doubleSided": true,
+        "zMeters": 0.4208382392520207,
+        "barycentric": [
+          0.49999999999993594,
+          0.062057810025999936,
+          0.43794218997406414
+        ],
+        "normalZ": 0.41546333233058474
+      },
+      "allHits": [
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 0,
+          "triangle": 79,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": 0.4208382392520207,
+          "barycentric": [
+            0.49999999999993594,
+            0.062057810025999936,
+            0.43794218997406414
+          ],
+          "normalZ": 0.41546333233058474
+        },
+        {
+          "node": "extras",
+          "mesh": "Cube",
+          "primitive": 1,
+          "triangle": 281,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.3241415023803711,
+          "barycentric": [
+            0.5000025761665974,
+            0.041203627754904146,
+            0.45879379607849846
+          ],
+          "normalZ": 0.9423170930578095
+        },
+        {
+          "node": "vtol",
+          "mesh": "Cylinder",
+          "primitive": 1,
+          "triangle": 109,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.9046816801434261,
+          "barycentric": [
+            0.6173767715183665,
+            0.16599535587283745,
+            0.2166278726087961
+          ],
+          "normalZ": -0.01700757692728172
+        },
+        {
+          "node": "extras",
+          "mesh": "Cube",
+          "primitive": 1,
+          "triangle": 235,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -0.9709444046020508,
+          "barycentric": [
+            0.5144582280164774,
+            0.02045320181258728,
+            0.4650885701709353
+          ],
+          "normalZ": -1.120574839577566
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 1,
+          "triangle": 286,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -8.107035291283566,
+          "barycentric": [
+            0.000005720764081691338,
+            0.3752668316276251,
+            0.6247274476082932
+          ],
+          "normalZ": -0.3074303949880852
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 1,
+          "triangle": 337,
+          "material": "darkmet2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -9.45335947265893,
+          "barycentric": [
+            0.36612782140766964,
+            0.000005720761695243064,
+            0.6338664578306351
+          ],
+          "normalZ": 0.3151091765834882
+        },
+        {
+          "node": "Cube",
+          "mesh": "Cube.079",
+          "primitive": 0,
+          "triangle": 150,
+          "material": "dark",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -10.01699243356792,
+          "barycentric": [
+            0.000007643323610427053,
+            0.9249608509185344,
+            0.07503150575785511
+          ],
+          "normalZ": 0.036511181437076344
+        },
+        {
+          "node": "Cube",
+          "mesh": "Cube.079",
+          "primitive": 0,
+          "triangle": 235,
+          "material": "dark",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -12.51419435599495,
+          "barycentric": [
+            0.924968494242145,
+            0.000009548777764413087,
+            0.07502195698009059
+          ],
+          "normalZ": -0.036511181437076344
+        },
+        {
+          "node": "fuselage",
+          "mesh": "Cube.001",
+          "primitive": 0,
+          "triangle": 77,
+          "material": "livery",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "zMeters": -14.508103443710558,
+          "barycentric": [
+            0.00001607752390417948,
+            0.5710276725226892,
+            0.42895624995340664
+          ],
+          "normalZ": -0.019274853883641425
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Geometric ray audit only; it does not qualify shaded pixels, camera exposure, hot-surface temperatures or material-dependent thermal radiation.",
+    "Authored rest includes source geometry that runtime may hide, including ladder/extras; hit identity is reported explicitly."
+  ],
+  "coveringCapTriangles": [
+    {
+      "triangle": 78,
+      "indices": [
+        55,
+        80,
+        72
+      ],
+      "verticesAttachmentMeters": [
+        [
+          0.32228225469589233,
+          0.6096622347831726,
+          0.42083805799484253
+        ],
+        [
+          -0.32228225469589233,
+          0.6096622347831726,
+          0.42083805799484253
+        ],
+        [
+          -0.32228225469589233,
+          -0.03490215912461281,
+          0.42083805799484253
+        ]
+      ]
+    },
+    {
+      "triangle": 79,
+      "indices": [
+        72,
+        63,
+        55
+      ],
+      "verticesAttachmentMeters": [
+        [
+          -0.32228225469589233,
+          -0.03490215912461281,
+          0.42083805799484253
+        ],
+        [
+          0.32228225469589233,
+          -0.03490215912461281,
+          0.42083805799484253
+        ],
+        [
+          0.32228225469589233,
+          0.6096622347831726,
+          0.42083805799484253
+        ]
+      ]
+    }
+  ],
+  "correction": "The previous no-center-disk assertion based only on vertex radii was wrong. Perimeter-only vertices form triangles that cover the exhaust axis.",
+  "generatedAt": "2026-10-06T06:21:30.520Z",
+  "auditScriptSha256": "d48d9796e1bcad922c64764dabc5062f49bb10bcdeb0878057ffb90e4f557742",
+  "qualification": "Read-only actual triangle geometry in authored rest. No GPU/render or temperature/brightness calibration."
+}

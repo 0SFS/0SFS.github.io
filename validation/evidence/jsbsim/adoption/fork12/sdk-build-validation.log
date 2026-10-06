@@ -1,0 +1,9 @@
+
+> @felipegalind0/jsbsim@1.2.4-fork.12 build
+> node scripts/build.mjs
+
+Error: Toolchain mismatch for node: expected v26.8.2, found v26.9.0
+    at checkToolchain (file:///Users/felg/gh/Felipegalind0/jsbsim/wasm/scripts/build-system/toolchain.mjs:7:13)
+    at createDescriptor (file:///Users/felg/gh/Felipegalind0/jsbsim/wasm/scripts/build.mjs:63:3)
+    at async build (file:///Users/felg/gh/Felipegalind0/jsbsim/wasm/scripts/build.mjs:162:22)
+    at async file:///Users/felg/gh/Felipegalind0/jsbsim/wasm/scripts/build.mjs:185:7

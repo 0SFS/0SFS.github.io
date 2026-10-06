@@ -1,0 +1,113 @@
+(node:53421) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+{
+  "out": "/Users/felg/gh/0sfs/build/f135-physical-native-optical-recheck-20261006",
+  "rows": 4750,
+  "changes": {
+    "optical.valid": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.radiusM": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.throatAreaM2": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.exitAreaM2": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.absorptionPerMeter": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.emittingVolumeM3": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.fuelPowerW": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.particlePowerBoundW": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.excitedPowerW": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.sourcePowerBoundW": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.sourceCdM3R": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.sourceCdM3G": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "optical.sourceCdM3B": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "core.emissionCdM2R": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "core.emissionCdM2G": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "core.emissionCdM2B": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "core.emissionLuminanceCdM2": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "liner.emissionCdM2R": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "liner.emissionCdM2G": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "liner.emissionCdM2B": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    },
+    "liner.emissionLuminanceCdM2": {
+      "maxAbsoluteDifference": 0,
+      "maxRelativeDifference": 0,
+      "changedRows": 0
+    }
+  }
+}

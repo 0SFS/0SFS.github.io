@@ -1,0 +1,339 @@
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/master-20260925
+    Start 40: TestTurbineTrimFuelFlow
+    Start 38: TestTurbineAugmentation
+    Start 39: TestTurbineTrimSpool
+    Start 88: FGTurbineTemperatureTest1
+1/4 Test #88: FGTurbineTemperatureTest1 ........***Failed    0.01 sec
+Running cxxtest tests (14 tests)
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[2]/IdleThrust
+    Function: propulsion/engine[2]/MilThrust
+    Function: propulsion/engine[2]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+.
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[0]/IdleThrust
+    Function: propulsion/engine[0]/MilThrust
+    Function: propulsion/engine[0]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+.
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[0]/IdleThrust
+    Function: propulsion/engine[0]/MilThrust
+    Function: propulsion/engine[0]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+.
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[0]/IdleThrust
+    Function: propulsion/engine[0]/MilThrust
+    Function: propulsion/engine[0]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[0]/IdleThrust
+    Function: propulsion/engine[0]/MilThrust
+    Function: propulsion/engine[0]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+.
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[0]/IdleThrust
+    Function: propulsion/engine[0]/MilThrust
+    Function: propulsion/engine[0]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+.
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[0]/IdleThrust
+    Function: propulsion/engine[0]/MilThrust
+    Function: propulsion/engine[0]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+.
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[2]/IdleThrust
+    Function: propulsion/engine[2]/MilThrust
+    Function: propulsion/engine[2]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+.
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[0]/IdleThrust
+    Function: propulsion/engine[0]/MilThrust
+    Function: propulsion/engine[0]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+.
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[0]/IdleThrust
+    Function: propulsion/engine[0]/MilThrust
+    Function: propulsion/engine[0]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[0]/IdleThrust
+    Function: propulsion/engine[0]/MilThrust
+    Function: propulsion/engine[0]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[0]/IdleThrust
+    Function: propulsion/engine[0]/MilThrust
+    Function: propulsion/engine[0]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[0]/IdleThrust
+    Function: propulsion/engine[0]/MilThrust
+    Function: propulsion/engine[0]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+.
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[0]/IdleThrust
+    Function: propulsion/engine[0]/MilThrust
+    Function: propulsion/engine[0]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[0]/IdleThrust
+    Function: propulsion/engine[0]/MilThrust
+    Function: propulsion/engine[0]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[0]/IdleThrust
+    Function: propulsion/engine[0]/MilThrust
+    Function: propulsion/engine[0]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+.
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[0]/IdleThrust
+    Function: propulsion/engine[0]/MilThrust
+    Function: propulsion/engine[0]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+
+In FGTurbineTemperatureTest::testAfterburnerUsesActualExcessFuelAndDoesNotResetWall:
+/Users/felg/gh/Felipegalind0/jsbsim/build/master-20260925/tests/unit_tests/../../../../tests/unit_tests/FGTurbineTemperatureTest.h:332: Error: Expected (f.engine->GetAfterburnerBurnedFuelFlowKgSec() == abFuel), found (2.2361 != 2.2361)
+
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[0]/IdleThrust
+    Function: propulsion/engine[0]/MilThrust
+    Function: propulsion/engine[0]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+.
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+    Function: propulsion/engine[0]/IdleThrust
+    Function: propulsion/engine[0]/MilThrust
+    Function: propulsion/engine[0]/AugThrust
+      X = 0
+      Y = 0
+      Z = 0
+      Pitch = 0 degrees
+      Yaw = 0 degrees
+.
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+In file : line 9
+Invalid <wall-heat-capacity-j-k>: require finite positive SI value.
+
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+In file : line 9
+Invalid <gas-conductance-w-k>: require finite nonnegative SI value.
+
+
+     JSBSim Flight Dynamics Model v1.3.2.dev1 Oct  5 2026 15:20:14
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+In file : line 9
+Invalid <emissivity>: require finite nonnegative value no greater than one.
+.
+Failed 1 and Skipped 0 of 14 tests
+Success rate: 92%
+
+2/4 Test #39: TestTurbineTrimSpool .............   Passed    0.36 sec
+3/4 Test #40: TestTurbineTrimFuelFlow ..........   Passed    0.40 sec
+4/4 Test #38: TestTurbineAugmentation ..........   Passed    0.42 sec
+
+75% tests passed, 1 tests failed out of 4
+
+Total Test time (real) =   0.42 sec
+
+The following tests FAILED:
+	 88 - FGTurbineTemperatureTest1 (Failed)
+Errors while running CTest

@@ -1,0 +1,457 @@
+(node:35857) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+{
+  "out": "/Users/felg/gh/0sfs/build/f135-rebuild-thermal-installed-20261006",
+  "pass": false,
+  "checks": [
+    {
+      "name": "warm-shortcut-after-cold-accepted-step",
+      "passed": true
+    },
+    {
+      "name": "cold-start-heating-and-cutoff",
+      "passed": true
+    },
+    {
+      "name": "zero-time-hold-read-and-native-state-restore",
+      "passed": true
+    },
+    {
+      "name": "application-snapshot-recovery",
+      "passed": true
+    },
+    {
+      "name": "relocation-free",
+      "passed": true
+    },
+    {
+      "name": "relocation-departure",
+      "passed": true
+    },
+    {
+      "name": "relocation-arrival",
+      "passed": true
+    },
+    {
+      "name": "cold-reset-and-model-reload",
+      "passed": true
+    },
+    {
+      "name": "stopped-hot-runway-relocation",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 0\n\n    at file:///Users/felg/gh/0sfs/scripts/validation/aircraft/check-turbine-thermal.mjs:373:12\n    at withAircraft (file:///Users/felg/gh/0sfs/scripts/validation/aircraft/check-turbine-thermal.mjs:180:11)\n    at async file:///Users/felg/gh/0sfs/scripts/validation/aircraft/check-turbine-thermal.mjs:357:1"
+    },
+    {
+      "name": "dry-99-cycle",
+      "passed": true
+    },
+    {
+      "name": "powered-lift-without-afterburner",
+      "passed": true
+    }
+  ],
+  "dryHeating": {
+    "stopped": {
+      "scenario": "dry-99-cycle",
+      "phase": "cycle-shutdown-cooling",
+      "timeS": 507.53333333303607,
+      "gasK": 286.1688949882993,
+      "metalK": 535.0503279489271,
+      "coreK": 529.9379653739261,
+      "coreStateK": 529.9379653739261,
+      "coreInitialized": 1,
+      "stateK": 535.0503279489271,
+      "initialized": 1,
+      "valid": 1,
+      "suppliedAbFuelKgSec": 0,
+      "burnedAbFuelKgSec": 0,
+      "ambientK": 286.1688949882993,
+      "totalPressurePsf": 2040.8672643988739,
+      "egtC": 13.01889498829935,
+      "n1Pct": 7.036777550684984e-24,
+      "nozzlePositionNorm": 1,
+      "nozzlePitchRad": 0,
+      "stovlPositionNorm": 0,
+      "n2Pct": 4.691185033789989e-24,
+      "fuelFlowPps": 0,
+      "running": 0,
+      "augmentation": 0,
+      "coreVisibleEmission": {
+        "luminanceCdPerSquareMeter": 4.749207546814823e-9,
+        "equivalentLinearRgbCdPerSquareMeter": [
+          2.2331042398043298e-8,
+          0,
+          0
+        ],
+        "expectedLinearEmissionRgb": [
+          2.2331042398043297e-11,
+          0,
+          0
+        ],
+        "expectedLinearEmissionY": 4.749207546814823e-12,
+        "temperatureClampedAtTableMaximum": false
+      },
+      "metalVisibleEmission": {
+        "luminanceCdPerSquareMeter": 6.552585530061672e-9,
+        "equivalentLinearRgbCdPerSquareMeter": [
+          3.08106276354988e-8,
+          0,
+          0
+        ],
+        "expectedLinearEmissionRgb": [
+          3.08106276354988e-11,
+          0,
+          0
+        ],
+        "expectedLinearEmissionY": 6.5525855300616715e-12,
+        "temperatureClampedAtTableMaximum": false
+      }
+    },
+    "cold": {
+      "scenario": "dry-99-cycle",
+      "phase": "cold-first-accepted-step",
+      "timeS": 0.008333333333333333,
+      "gasK": 286.1688949816944,
+      "metalK": 286.1688949816944,
+      "coreK": 286.1688949816944,
+      "coreStateK": 286.1688949816944,
+      "coreInitialized": 1,
+      "stateK": 286.1688949816944,
+      "initialized": 1,
+      "valid": 1,
+      "suppliedAbFuelKgSec": 0,
+      "burnedAbFuelKgSec": 0,
+      "ambientK": 286.1688949816944,
+      "totalPressurePsf": 2040.8672641512987,
+      "egtC": 13.018894981694396,
+      "n1Pct": 1.3566009267792531e-42,
+      "nozzlePositionNorm": 1,
+      "nozzlePitchRad": 0,
+      "stovlPositionNorm": 0,
+      "n2Pct": 9.044006178528353e-43,
+      "fuelFlowPps": 0,
+      "running": 0,
+      "augmentation": 0,
+      "coreVisibleEmission": {
+        "luminanceCdPerSquareMeter": 0,
+        "equivalentLinearRgbCdPerSquareMeter": [
+          0,
+          0,
+          0
+        ],
+        "expectedLinearEmissionRgb": [
+          0,
+          0,
+          0
+        ],
+        "expectedLinearEmissionY": 0,
+        "temperatureClampedAtTableMaximum": false
+      },
+      "metalVisibleEmission": {
+        "luminanceCdPerSquareMeter": 0,
+        "equivalentLinearRgbCdPerSquareMeter": [
+          0,
+          0,
+          0
+        ],
+        "expectedLinearEmissionRgb": [
+          0,
+          0,
+          0
+        ],
+        "expectedLinearEmissionY": 0,
+        "temperatureClampedAtTableMaximum": false
+      }
+    },
+    "idle": {
+      "scenario": "dry-99-cycle",
+      "phase": "idle-settled",
+      "timeS": 87.52500000001572,
+      "gasK": 649.268894988196,
+      "metalK": 459.7752165876018,
+      "coreK": 621.9278212822871,
+      "coreStateK": 621.9278212822871,
+      "coreInitialized": 1,
+      "stateK": 459.7752165876018,
+      "initialized": 1,
+      "valid": 1,
+      "suppliedAbFuelKgSec": 0,
+      "burnedAbFuelKgSec": 0,
+      "ambientK": 286.168894988196,
+      "totalPressurePsf": 2040.8672643950017,
+      "egtC": 376.118894988196,
+      "n1Pct": 30,
+      "nozzlePositionNorm": 1,
+      "nozzlePitchRad": 0,
+      "stovlPositionNorm": 0,
+      "n2Pct": 60,
+      "fuelFlowPps": 0.7172233848488745,
+      "running": 1,
+      "augmentation": 0,
+      "coreVisibleEmission": {
+        "luminanceCdPerSquareMeter": 0.0000020794928059169735,
+        "equivalentLinearRgbCdPerSquareMeter": [
+          0.000009777892744759551,
+          0,
+          0
+        ],
+        "expectedLinearEmissionRgb": [
+          9.77789274475955e-9,
+          0,
+          0
+        ],
+        "expectedLinearEmissionY": 2.0794928059169733e-9,
+        "temperatureClampedAtTableMaximum": false
+      },
+      "metalVisibleEmission": {
+        "luminanceCdPerSquareMeter": 1.0556052278853363e-11,
+        "equivalentLinearRgbCdPerSquareMeter": [
+          4.9635154638194913e-11,
+          0,
+          0
+        ],
+        "expectedLinearEmissionRgb": [
+          4.9635154638194915e-14,
+          0,
+          0
+        ],
+        "expectedLinearEmissionY": 1.0556052278853363e-14,
+        "temperatureClampedAtTableMaximum": false
+      }
+    },
+    "dry": {
+      "scenario": "dry-99-cycle",
+      "phase": "99-percent-dry-from-idle",
+      "timeS": 207.5249999999756,
+      "gasK": 1002.797894988314,
+      "metalK": 663.7524645467122,
+      "coreK": 956.4084591776464,
+      "coreStateK": 956.4084591776464,
+      "coreInitialized": 1,
+      "stateK": 663.7524645467122,
+      "initialized": 1,
+      "valid": 1,
+      "suppliedAbFuelKgSec": 0,
+      "burnedAbFuelKgSec": 0,
+      "ambientK": 286.16889498831404,
+      "totalPressurePsf": 2040.8672643994273,
+      "egtC": 729.6478949883141,
+      "n1Pct": 99.3,
+      "nozzlePositionNorm": 0.01000000000000012,
+      "nozzlePitchRad": 0,
+      "stovlPositionNorm": 0,
+      "n2Pct": 99.6,
+      "fuelFlowPps": 6.368636520145963,
+      "running": 1,
+      "augmentation": 0,
+      "coreVisibleEmission": {
+        "luminanceCdPerSquareMeter": 0.7458700593799324,
+        "equivalentLinearRgbCdPerSquareMeter": [
+          3.5071231895550983,
+          0,
+          0
+        ],
+        "expectedLinearEmissionRgb": [
+          0.003507123189555098,
+          0,
+          0
+        ],
+        "expectedLinearEmissionY": 0.0007458700593799324,
+        "temperatureClampedAtTableMaximum": false
+      },
+      "metalVisibleEmission": {
+        "luminanceCdPerSquareMeter": 0.00001960050449211784,
+        "equivalentLinearRgbCdPerSquareMeter": [
+          0.0000921626803044386,
+          0,
+          0
+        ],
+        "expectedLinearEmissionRgb": [
+          9.21626803044386e-8,
+          0,
+          0
+        ],
+        "expectedLinearEmissionY": 1.960050449211784e-8,
+        "temperatureClampedAtTableMaximum": false
+      }
+    },
+    "augmented": {
+      "scenario": "dry-99-cycle",
+      "phase": "afterburner-from-dry",
+      "timeS": 267.524999999921,
+      "gasK": 2361.818538620371,
+      "metalK": 1269.4704938968885,
+      "coreK": 959.7805831993212,
+      "coreStateK": 959.7805831993212,
+      "coreInitialized": 1,
+      "stateK": 1269.4704938968885,
+      "initialized": 1,
+      "valid": 1,
+      "suppliedAbFuelKgSec": 6.099131199971534,
+      "burnedAbFuelKgSec": 4.7523897772675285,
+      "ambientK": 286.16889498871996,
+      "totalPressurePsf": 2040.8672644146418,
+      "egtC": 733.21889498872,
+      "n1Pct": 100,
+      "nozzlePositionNorm": 1,
+      "nozzlePitchRad": 0,
+      "stovlPositionNorm": 0,
+      "n2Pct": 100,
+      "fuelFlowPps": 19.93680666654898,
+      "running": 1,
+      "augmentation": 1,
+      "coreVisibleEmission": {
+        "luminanceCdPerSquareMeter": 0.8083992744100276,
+        "equivalentLinearRgbCdPerSquareMeter": [
+          3.801139093932643,
+          0,
+          0
+        ],
+        "expectedLinearEmissionRgb": [
+          0.003801139093932643,
+          0,
+          0
+        ],
+        "expectedLinearEmissionY": 0.0008083992744100276,
+        "temperatureClampedAtTableMaximum": false
+      },
+      "metalVisibleEmission": {
+        "luminanceCdPerSquareMeter": 332.6009487375765,
+        "equivalentLinearRgbCdPerSquareMeter": [
+          1249.1014528187789,
+          93.61772273425662,
+          0
+        ],
+        "expectedLinearEmissionRgb": [
+          1.249101452818779,
+          0.09361772273425661,
+          0
+        ],
+        "expectedLinearEmissionY": 0.3326009487375765,
+        "temperatureClampedAtTableMaximum": false
+      }
+    },
+    "firstDry": {
+      "scenario": "dry-99-cycle",
+      "phase": "99-percent-first-step-from-ab",
+      "timeS": 267.53333333325435,
+      "gasK": 1002.7978949887125,
+      "metalK": 1268.852909492416,
+      "coreK": 959.7702648916038,
+      "coreStateK": 959.7702648916038,
+      "coreInitialized": 1,
+      "stateK": 1268.852909492416,
+      "initialized": 1,
+      "valid": 1,
+      "suppliedAbFuelKgSec": 0,
+      "burnedAbFuelKgSec": 0,
+      "ambientK": 286.16889498871257,
+      "totalPressurePsf": 2040.8672644143649,
+      "egtC": 729.6478949887126,
+      "n1Pct": 99.56265439977808,
+      "nozzlePositionNorm": 1,
+      "nozzlePitchRad": 0,
+      "stovlPositionNorm": 0,
+      "n2Pct": 99.6,
+      "fuelFlowPps": 19.93680666654898,
+      "running": 1,
+      "augmentation": 0,
+      "coreVisibleEmission": {
+        "luminanceCdPerSquareMeter": 0.808207942276967,
+        "equivalentLinearRgbCdPerSquareMeter": [
+          3.8002394394253667,
+          0,
+          0
+        ],
+        "expectedLinearEmissionRgb": [
+          0.0038002394394253667,
+          0,
+          0
+        ],
+        "expectedLinearEmissionY": 0.000808207942276967,
+        "temperatureClampedAtTableMaximum": false
+      },
+      "metalVisibleEmission": {
+        "luminanceCdPerSquareMeter": 329.3335448407196,
+        "equivalentLinearRgbCdPerSquareMeter": [
+          1237.4269626561183,
+          92.52067483600155,
+          0
+        ],
+        "expectedLinearEmissionRgb": [
+          1.2374269626561183,
+          0.09252067483600154,
+          0
+        ],
+        "expectedLinearEmissionY": 0.3293335448407196,
+        "temperatureClampedAtTableMaximum": false
+      }
+    },
+    "returnedDry": {
+      "scenario": "dry-99-cycle",
+      "phase": "99-percent-dry-from-ab",
+      "timeS": 387.5333333331452,
+      "gasK": 1002.7978949887716,
+      "metalK": 663.7536781879094,
+      "coreK": 956.408459178064,
+      "coreStateK": 956.408459178064,
+      "coreInitialized": 1,
+      "stateK": 663.7536781879094,
+      "initialized": 1,
+      "valid": 1,
+      "suppliedAbFuelKgSec": 0,
+      "burnedAbFuelKgSec": 0,
+      "ambientK": 286.1688949887716,
+      "totalPressurePsf": 2040.8672644165788,
+      "egtC": 729.6478949887717,
+      "n1Pct": 99.3,
+      "nozzlePositionNorm": 0.01000000000000012,
+      "nozzlePitchRad": 0,
+      "stovlPositionNorm": 0,
+      "n2Pct": 99.6,
+      "fuelFlowPps": 6.3686365201882325,
+      "running": 1,
+      "augmentation": 0,
+      "coreVisibleEmission": {
+        "luminanceCdPerSquareMeter": 0.745870059387679,
+        "equivalentLinearRgbCdPerSquareMeter": [
+          3.5071231895915234,
+          0,
+          0
+        ],
+        "expectedLinearEmissionRgb": [
+          0.0035071231895915235,
+          0,
+          0
+        ],
+        "expectedLinearEmissionY": 0.0007458700593876791,
+        "temperatureClampedAtTableMaximum": false
+      },
+      "metalVisibleEmission": {
+        "luminanceCdPerSquareMeter": 0.00001960151485562861,
+        "equivalentLinearRgbCdPerSquareMeter": [
+          0.00009216743109079066,
+          0,
+          0
+        ],
+        "expectedLinearEmissionRgb": [
+          9.216743109079065e-8,
+          0,
+          0
+        ],
+        "expectedLinearEmissionY": 1.960151485562861e-8,
+        "temperatureClampedAtTableMaximum": false
+      }
+    },
+    "dryTailSpanKelvin": 0.0007204791684216616,
+    "dryCoreTailSpanKelvin": 6.821210263296962e-13,
+    "returnedTailSpanKelvin": 0.0015905158959412802,
+    "sameDryEquilibriumErrorKelvin": 0.001213641197182369,
+    "conditions": "Same native hold-down, zero wind/airspeed, 1000 ft; 60s idle, 120s 99% dry, 60s AB, 120s 99% dry, after an actual cold starter sequence.",
+    "interpretation": "99% dry heats metal from a colder idle state but cools hotter AB metal toward the same modeled dry equilibrium. Visible luminance is reported separately from native temperature; no scene visibility or F135 temperature calibration is inferred."
+  },
+  "boundEvaluations": 13440,
+  "maxBurnedLimitErrorKgSec": 4.440892098500626e-15,
+  "limitedFuelSeen": true,
+  "sourceIdentityStable": true
+}

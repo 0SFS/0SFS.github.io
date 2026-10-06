@@ -1,0 +1,9 @@
+(node:73417) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+BJS - [16:04:32]: Babylon.js v8.56.2 - Null engine
+{
+  "out": "build/validation/exhaust-continuity-images/2026-10-06_160432",
+  "images": 0,
+  "rays": 384,
+  "errors": []
+}

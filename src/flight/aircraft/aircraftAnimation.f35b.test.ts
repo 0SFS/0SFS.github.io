@@ -293,14 +293,14 @@ describe("AF267 F-35B authored rig", () => {
         { name: "rightExhaustDoor", point: new Vector3(-0.65, 0, 0), up: true },
       ];
       const closed = freeEdges.map(edge => point(t.byName.get(edge.name)!, edge.point));
-      const hinges = t.rig.stovl.map(part => point(part.node, part.axis));
+      const hinges = t.rig.stovl.map(part => point(part.node, part.pivot?.local ?? part.axis));
       applyAircraftRig(t.rig, { ...NEUTRAL_CONTROL_SURFACES, stovlPositionNorm: 1 }, 0);
       freeEdges.forEach((edge, index) => {
         const open = point(t.byName.get(edge.name)!, edge.point);
         if (edge.up) expect(open.y).toBeGreaterThan(closed[index].y);
         else expect(open.y).toBeLessThan(closed[index].y);
       });
-      t.rig.stovl.forEach((part, index) => expect(Vector3.Distance(point(part.node, part.axis), hinges[index])).toBeLessThan(1e-6));
+      t.rig.stovl.forEach((part, index) => expect(Vector3.Distance(point(part.node, part.pivot?.local ?? part.axis), hinges[index])).toBeLessThan(1e-6));
       const nozzle = t.byName.get("vtol")!;
       const outlet = point(nozzle, new Vector3(0, 0, 1)).subtract(point(nozzle)).normalize();
       expect(outlet.y).toBeLessThan(-0.999);
@@ -334,6 +334,32 @@ describe("AF267 F-35B authored rig", () => {
       stovlPositionNorm: 0.35, gearDownNorm: 0.6,
       nozzlePitchRad: 0.5, nozzleYawRad: -0.1,
     });
+  });
+
+  it("clears the engine bay doors early while the reconstructed nozzle follows independent native angles", () => {
+    const t = f35bRig();
+    try {
+      const doors = ["leftEngineDoor", "rightEngineDoor"].map(name => t.byName.get(name)!);
+      const closedPositions = doors.map(node => node.position.clone());
+      const closedWorld = doors.map(node => point(node));
+      applyAircraftRig(t.rig, { ...NEUTRAL_CONTROL_SURFACES, stovlPositionNorm: 1 }, 0);
+      const full = doors.map(node => node.rotationQuaternion!.clone());
+      const openPositions = doors.map(node => node.position.clone());
+      // The offset is an actual fixed hinge: its original origin swings
+      // outboard by 6 cm; a translated aircraft carries the same local fit.
+      expect(point(doors[0]).x - closedWorld[0].x).toBeCloseTo(-.06, 6);
+      expect(point(doors[1]).x - closedWorld[1].x).toBeCloseTo(.06, 6);
+      applyAircraftRig(t.rig, { ...NEUTRAL_CONTROL_SURFACES, stovlPositionNorm: .25, nozzlePitchRad: .2, nozzleYawRad: 0 }, 0);
+      doors.forEach((node, i) => {
+        expect(node.rotationQuaternion!.subtract(full[i]).length()).toBeLessThan(1e-12);
+        expect(Vector3.Distance(node.position, openPositions[i])).toBeLessThan(1e-12);
+      });
+      applyAircraftRig(t.rig, { ...NEUTRAL_CONTROL_SURFACES, stovlPositionNorm: 0 }, 0);
+      doors.forEach((node, i) => {
+        expect(Math.abs(Quaternion.Dot(node.rotationQuaternion!, full[i]))).toBeLessThan(.8);
+        expect(Vector3.Distance(node.position, closedPositions[i])).toBeLessThan(1e-12);
+      });
+    } finally { t.dispose(); }
   });
 
   it.each([0, 0.4, 1])("opens and closes all sixteen actual petal tips under vectoring position %s without moving their hinges", conversion => {

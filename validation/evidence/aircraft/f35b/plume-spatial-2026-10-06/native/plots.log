@@ -1,0 +1,16 @@
+Matplotlib is building the font cache; this may take a moment.
+{
+  "out": "/Users/felg/gh/0sfs/build/f135-plume-native-plots-20261006",
+  "schemaVersion": 1,
+  "matplotlib": "3.11.2",
+  "plots": [
+    "baseline-native-cycle",
+    "baseline-ab-transitions",
+    "baseline-rays-and-support"
+  ],
+  "inputReport": "build/f135-plume-native-trace-20261006/report.json",
+  "reportSha256": "21b8d101a27c836bf96c035b0690d60173515edc85b91ea31e43bf943de1de65",
+  "traceSha256": "6c11afe6f6f9abdef19ee4a3265b7c35087b956a37bc03b2c046da70bcf957e2",
+  "scriptSha256": "abf143509df81d3406676d3be86f36f00fa1e84b15b9a6998ddc75a28b3a72c7",
+  "scope": "Matplotlib plots of retained native state and frozen uniform optical baseline; no physics rerun or rendered appearance evidence."
+}

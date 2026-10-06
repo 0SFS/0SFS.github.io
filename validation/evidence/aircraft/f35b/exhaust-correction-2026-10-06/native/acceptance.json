@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-06",
+  "status": "passed-source-and-retained-trace-audit-only",
+  "report": "report.json",
+  "scope": "Native gas temperature semantics, missing physical flow/chemistry inputs and optical flag-only temperature discontinuity",
+  "rowsChecked": 4171,
+  "reconstruction": {
+    "maximumTemperatureReconstructionErrorK": 1.1368683772161603e-13,
+    "maximumBurnedFuelReconstructionErrorKgSec": 2.6645352591003757e-15
+  },
+  "nativeRerun": false,
+  "nativeSourceModified": false,
+  "wasmBuild": false,
+  "physicalAppearanceQualified": false,
+  "recommendation": "No native correction/build: current observer follows its declared equations. Correct unsupported app station mapping, preserve metal dynamics, and keep missing physical inputs explicit."
+}

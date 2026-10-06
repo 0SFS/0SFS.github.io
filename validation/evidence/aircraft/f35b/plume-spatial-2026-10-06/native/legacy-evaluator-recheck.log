@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "rows": 4171,
+  "maxRelativeDifference": 0,
+  "nativeRerun": false,
+  "scope": "Current pure evaluator legacy fallback on archived uniform profile and retained native CSV"
+}
