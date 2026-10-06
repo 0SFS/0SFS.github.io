@@ -1,0 +1,168 @@
+{
+  "schema": "0sfs-sound-controls-acceptance/1",
+  "date": "2026-10-05",
+  "status": "software-checks-passed",
+  "owner": "0sfs",
+  "dspCommit": "83cd3f97",
+  "scope": {
+    "engineVolume": {
+      "min": 0,
+      "max": 8,
+      "default": 0.8,
+      "savedValuesPreserved": true
+    },
+    "afterburnerVolume": {
+      "min": 0,
+      "max": 1,
+      "default": 0.5,
+      "extraGainOnly": true,
+      "smoothingMs": 10
+    },
+    "listenerCockpitBlend": {
+      "min": 0,
+      "max": 1,
+      "default": 1,
+      "endpoints": [
+        "Camera",
+        "Cockpit"
+      ],
+      "worldPositionInterpolation": "linear",
+      "orientationInterpolation": "quaternion-slerp",
+      "cabinBlend": true
+    },
+    "newNoiseStreams": 0,
+    "newOscillators": 0,
+    "snapshotAbiChanged": false,
+    "deviceQualified": false,
+    "acousticallyCalibrated": false,
+    "browserListeningTestPerformed": false
+  },
+  "checks": {
+    "audioBuild": {
+      "passed": true,
+      "compiler": "emcc 6.0.9",
+      "bytes": 47901
+    },
+    "initialRelated": {
+      "passed": 546,
+      "failed": 1,
+      "files": 49,
+      "failure": "Inactive cockpit parent retained a same-frame cached transform; fixed with conditional stale-parent refresh."
+    },
+    "correctedPose": {
+      "passed": 10,
+      "failed": 0,
+      "files": 1
+    },
+    "finalCi": {
+      "command": "npm run ci",
+      "exitCode": 0,
+      "passed": 1337,
+      "failed": 0,
+      "skipped": 0,
+      "files": 133,
+      "lint": true,
+      "incrementalTypecheck": true,
+      "productionBuild": true,
+      "installedAndEmittedArtifacts": true
+    },
+    "devDependencyScan": {
+      "entries": [
+        "index.html"
+      ],
+      "optimizedDependencies": 14,
+      "unwantedDependencies": [],
+      "serverStarted": false
+    },
+    "coverage": [
+      "afterburner attenuation at 0/50/100 percent",
+      "dry engine output unchanged by afterburner control",
+      "live gain smoothing without voice reset",
+      "engine gain above unity, ceiling and limiter",
+      "exact retained SF50 reference hashes at 44.1/48 kHz",
+      "persisted sliders and older settings migration",
+      "cockpit default while chase is active and inactive parent movement",
+      "midpoint position and orientation without local-vector collapse",
+      "equal aircraft source/listener velocity without artificial Doppler",
+      "unchanged views emit no camera notifications",
+      "one common root computation per movement",
+      "facade boot/live/import changes and real-WASM worklet gain transport"
+    ]
+  },
+  "sources": [
+    {
+      "file": "src/flight/audio/audioSettings.ts",
+      "sha256": "ffd71640a378bc6d05f053f8ca00b55c34551a956943607e275c642cf261e557"
+    },
+    {
+      "file": "src/flight/settings/flightParameters.ts",
+      "sha256": "5ea5c7043a2eb86a0e913bde2f762460bde5a7dbbe8b0074f281a2d6b110d4ea"
+    },
+    {
+      "file": "src/flight/hud/SoundSettingsPanel.tsx",
+      "sha256": "0e81c76b20141f1612095b39852aff24e5bb185ea0645f43c957122ed730d1bc"
+    },
+    {
+      "file": "src/flight/audio/audioPose.ts",
+      "sha256": "f98b4cd90dc67ec34aa2464028295317d56d6f1ef2747c9aa84b8776576ce5b0"
+    },
+    {
+      "file": "src/flight/createFlightSimApp.ts",
+      "sha256": "0601a8d18608cbb48eb477b3916c7bb9e90283a09c2e15f7b0a77377513d79c1"
+    },
+    {
+      "file": "src/flight/audio/createFlightAudio.ts",
+      "sha256": "258e508f14dbd1be932ba9fb1a2f036ef8db4d6d109e769144ce879e50a3b79d"
+    },
+    {
+      "file": "src/flight/audio/worklet/dspProcessor.js",
+      "sha256": "820580be9cfe34ea44a0376fc290f425efaaecf6ed2985c28f88771878e1f74c"
+    },
+    {
+      "file": "src/flight/audio/dsp/core.cpp",
+      "sha256": "378342768093606552979d403eadde6365ddd41f8f69013cca4db2fad3b632d3"
+    },
+    {
+      "file": "src/flight/audio/dsp/turbofan.h",
+      "sha256": "9014b55b93e16c8367452116b59ff7323fd648c47ced62a35ad5cbf7be8bcd97"
+    },
+    {
+      "file": "src/flight/audio/dsp/audio-dsp.wasm",
+      "sha256": "35959477639e04bdd5d1992817be2b96d1b5fef323438f3672bc827fbeff985f"
+    },
+    {
+      "file": "src/flight/audio/dsp/audio-dsp.provenance.json",
+      "sha256": "a87ce10519eff6e05b1df14d4382d679e1b1404655d228ef96b8a94964aebd3b"
+    },
+    {
+      "file": "scripts/build-audio-wasm.mjs",
+      "sha256": "f99ef9dd06f49ed77e751bcf3f456fd7475c25e0d292494e9475b23fbc0b6889"
+    },
+    {
+      "file": "vite.config.ts",
+      "sha256": "5894386d170bafde68a7b3d76544563b0df7d603fd78c3587c7462c6a18d8ec9"
+    }
+  ],
+  "logs": [
+    {
+      "file": "final-ci.log",
+      "sha256": "2c7a12b3a6ae2e641dfb11be00ba3254c7eb1e612e06503259a7ea96949f1327"
+    },
+    {
+      "file": "initial-related.log",
+      "sha256": "b88a5221f64f78e21c011a5376f06604c1f571d14c1f9df13e78e5566607d664"
+    },
+    {
+      "file": "audio-pose-fix.log",
+      "sha256": "0e06bd0299bb103e41c444de507d8eca7d49432698eff8c2afa3f1eaba63b5ff"
+    },
+    {
+      "file": "build-audio.log",
+      "sha256": "657c1f09e9a555ac37be49035a2c294baf74b55c46a5c95f7585876457f537f3"
+    },
+    {
+      "file": "vite-optimizer.log",
+      "sha256": "bb24a20c68774cbdc4ecc2f5dc8e6ce9ff0e9756b3b4d3319bb7a3aed0e15018"
+    }
+  ]
+}

@@ -1,9 +1,48 @@
-import { Vector3 } from "@babylonjs/core";
+import { NullEngine, Scene, TransformNode, Vector3 } from "@babylonjs/core";
 import { describe, expect, it } from "vitest";
 import { geodeticToEcef } from "foss-earth/cameraMath";
-import { buildEcefToEnuMatrix, buildWorldShiftMatrix } from "./enuFrame";
+import { buildEcefToEnuMatrix, buildWorldShiftFrame, buildWorldShiftMatrix } from "./enuFrame";
+import { createFloatingOrigin } from "./floatingOrigin";
+import type { FlightState } from "../physics/flightState";
 
 describe("enuFrame", () => {
+  it("lazily caches one precise frame per applied aircraft state and clears it on disposal", () => {
+    const engine = new NullEngine();
+    try {
+      const scene = new Scene(engine);
+      const origin = createFloatingOrigin(scene, new TransformNode("world", scene));
+      expect(origin.getWorldFromEcef()).toBeNull();
+      const state = { latDeg: 44.9, lonDeg: -93.2, altMeters: 500, rollRad: 0, pitchRad: 0, headingRad: 0 } as FlightState;
+      origin.apply(state);
+      const first = origin.getWorldFromEcef()!;
+      expect(first.m).toBeInstanceOf(Float64Array);
+      expect(origin.getWorldFromEcef()).toBe(first);
+      origin.apply({ ...state, altMeters: 500.031 });
+      const next = origin.getWorldFromEcef()!;
+      expect(next).not.toBe(first);
+      expect(origin.getWorldFromEcef()).toBe(next);
+      expect(next.m[13] - first.m[13]).toBeCloseTo(-0.031, 7);
+      origin.dispose();
+      expect(origin.getWorldFromEcef()).toBeNull();
+    } finally { engine.dispose(); }
+  });
+  it("preserves centimetre offsets and orientation before an Earth-radius Float32 matrix rounding", () => {
+    const latitude = 0.71123456789, longitude = -1.6323456789, altitude = 256.1234;
+    const origin = geodeticToEcef(latitude, longitude, altitude);
+    const frame = buildWorldShiftFrame(latitude, longitude, altitude);
+    const east = [-Math.sin(longitude), Math.cos(longitude), 0];
+    const up = [Math.cos(latitude) * Math.cos(longitude), Math.cos(latitude) * Math.sin(longitude), Math.sin(latitude)];
+    const south = [Math.sin(latitude) * Math.cos(longitude), Math.sin(latitude) * Math.sin(longitude), -Math.cos(latitude)];
+    const ecef = [origin.x, origin.y, origin.z].map((value, index) => value + 0.031 * east[index] + 0.047 * up[index] - 0.019 * south[index]);
+    const m = frame.m;
+    const projected = [0, 1, 2].map(row => m[row] * ecef[0] + m[4 + row] * ecef[1] + m[8 + row] * ecef[2] + m[12 + row]);
+    expect(m).toBeInstanceOf(Float64Array);
+    expect(projected[0]).toBeCloseTo(0.031, 8);
+    expect(projected[1]).toBeCloseTo(0.047, 8);
+    expect(projected[2]).toBeCloseTo(-0.019, 8);
+    const rendered = buildWorldShiftMatrix(latitude, longitude, altitude);
+    for (const index of [0, 1, 2, 4, 5, 6, 8, 9, 10]) expect(m[index]).toBeCloseTo(rendered.m[index], 6);
+  });
   it.each([[0, 0], [0.7, -1.2], [-0.6, 2.4]])(
     "preserves orientation and maps geographic directions at %s, %s",
     (latRad, lonRad) => {

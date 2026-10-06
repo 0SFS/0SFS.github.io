@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-05",
+  "purpose": "Adopt the native read-only turbine nozzle display observer for aircraft animation; preserve prior engine behavior and release artifacts.",
+  "source": {
+    "repository": "https://github.com/Felipegalind0/jsbsim",
+    "branch": "master",
+    "commit": "718b07c0da34ceac7e5025bab700e06720082832",
+    "dirty": false,
+    "previousPackageCommit": "942879838729dc2e147cc4139086d69111623b12",
+    "scope": "Two-line binding of existing GetNozzle(), header documentation, native and real-WASM regressions, wrapper version metadata. No native thrust/fuel or nozzle scheduling changes.",
+    "upstreamPublicationForThisWork": false,
+    "observation": {
+      "path": "propulsion/engine[n]/nozzle-pos-norm",
+      "type": "Read-only numeric native display schedule",
+      "meaning": "Nominal 0 tight / 1 open. Dry Run seeks 1 - N2norm; afterburning Run and Off open it; reset starts at 1. Zero-time Trim retains position. Not a nozzle command, vectoring angle or calibrated F135 area."
+    }
+  },
+  "identity": {
+    "package": "@felipegalind0/jsbsim@1.2.4-fork.9",
+    "previousPackage": "@felipegalind0/jsbsim@1.2.4-fork.8",
+    "repositoryContentSha256": "97a91c5313f15ccbd6bec86c63dc7e51b6a5f7df2abef9d1d8357c519b6a18ef",
+    "sdkSubtreeSha256": "d86ed251e7806449b4cc18baee8c5cc02ce5561114180f462ea9799de16a8f85",
+    "buildInputSha256": "c5fa3a29dcc6f5138718cb5b74c7df3975b8affeee6c4b582eecf96dc95af581",
+    "tarballSha256": "2d529297e0a9e8b634b6a2435a3739e22ffbb67264b789f2b8f2f37462d9ae0e",
+    "tarballIntegrity": "sha512-mp0i90QiTTpnVJG8b+bPK6/ItDDqz1i5ZwNmuzXAVqrGfJPIStBuWO76KGRLL92NlaTKohoi++7+3oaaNghEKA==",
+    "installedLoaderSha256": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+    "installedWasmSha256": "f301efce403783e12c5fde57dcb264bae00f6370a2929759e6b9ae252541bd94",
+    "record": "fork9/verified-installed-artifact.json"
+  },
+  "checks": {
+    "nativeNozzleObservers": {
+      "status": "passed",
+      "target": "TestTurbineAugmentation",
+      "methods": 7,
+      "addedNozzleMethods": 2,
+      "log": "fork9/native-nozzle-observers.log",
+      "scope": "Indexed read-only property; distinct engine settings; dry/afterburning/shutdown/reset display schedule and existing augmentation tests."
+    },
+    "sdkBuildValidation": {
+      "status": "passed",
+      "tests": 51,
+      "suites": 9,
+      "log": "fork9/sdk-build-validation.log",
+      "commands": [
+        "tsc --noEmit (frozen SDK workspace)",
+        "node --test --test-concurrency=5 test/*.test.mjs (frozen SDK workspace and resolved native fixtures)"
+      ],
+      "sourceDateEpoch": 1791237935,
+      "scope": "One clean frozen-source build with locked toolchain, 5 compile jobs and 5 concurrent Node test workers."
+    },
+    "releasePacking": {
+      "status": "passed",
+      "log": "fork9/sdk-release-pack.log",
+      "releaseEligible": true
+    },
+    "installedArtifactIdentity": {
+      "status": "passed",
+      "verifiedFiles": 14,
+      "log": "fork9/verify-fork9.log"
+    },
+    "installedRegressions": {
+      "status": "passed",
+      "tests": 97,
+      "files": 5,
+      "log": "fork9/installed-regressions.log",
+      "command": "npx vitest run src/flight/jsbsim/f35b.integration.test.ts src/flight/jsbsim/f35bYaw.integration.test.ts src/flight/audio/f35bAudio.integration.test.ts src/flight/jsbsim/jsbsimBuildIdentity.test.ts scripts/verify-jsbsim-artifact.test.mjs --maxWorkers=50%",
+      "scope": "F35 control/conversion/interlock/nozzle/reset/reload, yaw/mode, actual augmentation audio, identity and artifact contracts."
+    },
+    "fullApplicationCi": {
+      "status": "pending parent final combined application run"
+    },
+    "browserLoadedAssets": {
+      "status": "not attempted in SDK adoption",
+      "note": "The separate exhaust headless task is not an SDK browser artifact acceptance run."
+    }
+  },
+  "aircraftData": {
+    "change": "F35 conversion augmentation boundary and zero-time recovery interlock; new-flight latch initialization. Sustained full-conversion afterburner report withdrawn, not reproduced.",
+    "xmlSha256": "f0b3d2be84023771bc78982eee96e2f350e2a94b5df9e3bc40975fe5eaa73b3b",
+    "xmlBytes": 49594,
+    "evidence": "../../aircraft/f35b/augmentation-2026-10-05/README.md",
+    "nativeEngineBehaviorChanged": false
+  },
+  "preservation": {
+    "earlierRecords": "Prior adoption records unchanged.",
+    "previousArtifact": "deps/felipegalind0-jsbsim-1.2.4-fork.8.tgz retained.",
+    "rollbackDeclaration": "validation/evidence/jsbsim/rollback/fork8/"
+  },
+  "limitations": [
+    "Native nozzle schedule is generic and not calibrated F135 area, exhaust flow or plume dynamics.",
+    "No EGT property was added; C++ EGT remains unavailable through the current property catalog.",
+    "No upstream PR, comment, push or npm publication.",
+    "Software tests do not establish aircraft performance or acoustic calibration.",
+    "Application full CI and emitted artifact verification remain pending at this record creation."
+  ],
+  "evidence": [
+    {
+      "path": "fork9/installed-regressions.log",
+      "bytes": 753,
+      "sha256": "346c927f6a1efcbefb132ded38cfd9d077c776b7921019271ae70c88798b22bd"
+    },
+    {
+      "path": "fork9/native-nozzle-observers.log",
+      "bytes": 244,
+      "sha256": "edc8022d7f5a4726b01bbba38e0e9fbd00afd62f82ea02b5ab0451f3e5d81ea9"
+    },
+    {
+      "path": "fork9/sdk-build-validation.log",
+      "bytes": 20062,
+      "sha256": "1714f67428835e29e81ef750a998adcaa2c8fa4df5ff1d7daee67f2267c42221"
+    },
+    {
+      "path": "fork9/sdk-release-pack.log",
+      "bytes": 1886,
+      "sha256": "c157a5560132d17d37de6ffeff8b82fb1d5009fbb3c7ec8e98eb75c8568ad8b2"
+    },
+    {
+      "path": "fork9/verified-installed-artifact.json",
+      "bytes": 3168,
+      "sha256": "986ad24ec228a92ae58f1fe44c746c8a67722eb859a617923d6d169b0ca31a42"
+    },
+    {
+      "path": "fork9/verify-fork9.log",
+      "bytes": 572,
+      "sha256": "8cc8ecffea2017e829e3cd109f21d77aa0acbd2901eb9dd5265e4686c6f8dccf"
+    }
+  ]
+}

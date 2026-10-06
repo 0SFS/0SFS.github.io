@@ -19,6 +19,7 @@ const mocks = vi.hoisted(() => {
       isStreamingTiles: () => false,
       onTilesStreamingChange: vi.fn(() => () => {}),
       onRasterDetailFeedback: vi.fn(() => () => {}),
+      onDetailAdjusted: vi.fn(() => () => {}),
       getRasterDetailFeedback: vi.fn(() => null),
       setRasterDetailTarget: vi.fn(),
       setGoogleTerrainDetailTarget: vi.fn(),
@@ -34,7 +35,7 @@ const mocks = vi.hoisted(() => {
     },
     aircraftModel: {
       getState: () => ({ aircraftId: "cessna-172", lodId: "auto", activeLodId: "lod3", status: "ready", triangles: 876, error: null }),
-      getRig: () => null, setAircraft: vi.fn(), setLod: vi.fn(), refreshAutoLod: vi.fn(), dispose: vi.fn(),
+      getRig: () => null, setAircraft: vi.fn(), setLod: vi.fn(), setRenderStowedGear: vi.fn(), updateGearVisibility: vi.fn(), refreshAutoLod: vi.fn(), dispose: vi.fn(),
     },
     terrainContact: { reset: vi.fn(), update: vi.fn(() => true) },
     visibleMeshCollision: { reset: vi.fn(), update: vi.fn(() => false) },
@@ -59,7 +60,7 @@ vi.mock("./diagnostics/createWheelSpinDebugOverlay", () => ({ createWheelSpinDeb
 vi.mock("./physics/createWheelSpinExperiment", () => ({ createWheelSpinExperiment: () => mocks.wheelSpin }));
 vi.mock("./audio/createTireAudio", () => ({ createTireAudio: () => mocks.tireAudio }));
 vi.mock("./aircraft/createAircraftModel", () => ({ createAircraftModel: () => mocks.aircraftModel }));
-vi.mock("./aircraft/aircraftAnimation", () => ({ applyAircraftRig: vi.fn(), readControlSurfaceState: () => ({}) }));
+vi.mock("./aircraft/aircraftAnimation", () => ({ applyAircraftRig: vi.fn(), readControlSurfaceState: () => ({ gearDownNorm: 1 }) }));
 vi.mock("./physics/fixedStepLoop", () => ({ FIXED_DT: 1 / 120, createFixedStepPhysicsLoop: vi.fn(() => mocks.physics) }));
 vi.mock("./physics/terrainContact", () => ({ createTerrainContact: () => mocks.terrainContact }));
 vi.mock("./physics/visibleMeshCollision", () => ({ createVisibleMeshCollision: vi.fn(() => mocks.visibleMeshCollision) }));

@@ -1,0 +1,59 @@
+
+> osfs@0.0.0 build
+> npm run verify:jsbsim && npm run verify:audio && tsc -b && vite build && node scripts/verify-jsbsim-artifact.mjs --dist=dist && node scripts/verify-audio-artifact.mjs --dist=dist
+
+
+> osfs@0.0.0 verify:jsbsim
+> node scripts/verify-jsbsim-artifact.mjs
+
+{
+  "package": {
+    "name": "@felipegalind0/jsbsim",
+    "version": "1.2.4-fork.8"
+  },
+  "mode": "in-tree",
+  "inputSha256": "5b9b87511213d11f5d2fb18654dabdd9347bbf0b7fe73f4b15222b03e178816f",
+  "verifiedFiles": 14,
+  "packageArchive": {
+    "path": "deps/felipegalind0-jsbsim-1.2.4-fork.8.tgz",
+    "sha256": "c0ce83394de7608c2663e5364aa6f4b810771a6547fa4dad5d27e7b8a300a213",
+    "integrity": "sha512-0tyt0sEkmkEc5cA5vAnqIoXXjRDBqX2f3WogVrlyxSDBBwYbgsmuF37g3T3tX/fB2PjtKYU67gTx6bsVU358ow=="
+  }
+}
+
+> osfs@0.0.0 verify:audio
+> node scripts/verify-audio-artifact.mjs
+
+{
+  "artifact": "audio-dsp.wasm",
+  "license": "AGPL-3.0-only",
+  "bytes": 47680,
+  "sha256": "e6816679136929aafc41d638f29d82dd0794437f52d7bc3535d84fbb70b1a259",
+  "toolchain": {
+    "compiler": "emcc",
+    "version": "6.0.9",
+    "flags": [
+      "-O3",
+      "-std=c++17",
+      "--no-entry",
+      "-sSTANDALONE_WASM=1",
+      "-sALLOW_MEMORY_GROWTH=1",
+      "-sINITIAL_MEMORY=2097152",
+      "-sSTACK_SIZE=131072",
+      "-sMALLOC=emmalloc",
+      "-sERROR_ON_UNDEFINED_SYMBOLS=1",
+      "-sFILESYSTEM=0",
+      "-fno-exceptions",
+      "-fno-rtti",
+      "-fno-fast-math"
+    ]
+  },
+  "sources": 7,
+  "imports": [
+    "env.emscripten_notify_memory_growth"
+  ]
+}
+src/flight/audio/createFlightAudio.ts(11,15): error TS2724: '"./audioBank"' has no exported member named 'AudioBankInstallation'. Did you mean 'AudioBankInstallBand'?
+src/flight/audio/createFlightAudio.ts(225,39): error TS2322: Type 'boolean | undefined' is not assignable to type 'boolean'.
+  Type 'undefined' is not assignable to type 'boolean'.
+src/flight/audio/createFlightAudio.ts(870,34): error TS7006: Parameter 'band' implicitly has an 'any' type.

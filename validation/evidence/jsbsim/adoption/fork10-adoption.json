@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-05",
+  "purpose": "Expose actual cached native thruster vectors and aerodynamic application-point/split observations for aircraft force diagnostics.",
+  "source": {
+    "repository": "https://github.com/Felipegalind0/jsbsim",
+    "branch": "master",
+    "commit": "c8228c4db04fa4b3054feb1c98734a309043082b",
+    "dirty": false,
+    "previousPackageCommit": "718b07c0da34ceac7e5025bab700e06720082832",
+    "scope": "Read-only cached force getters/ties; consistent aero observer cache initialization; focused native and real-WASM regressions; wrapper version metadata. No native force allocation or integration change.",
+    "upstreamPublicationForThisWork": false
+  },
+  "identity": {
+    "package": "@felipegalind0/jsbsim@1.2.4-fork.10",
+    "previousPackage": "@felipegalind0/jsbsim@1.2.4-fork.9",
+    "repositoryContentSha256": "eb84d677701a155535b7422c6509a10da35616556e9d72f1dc0bbfc3651a4d73",
+    "sdkSubtreeSha256": "0d9ce8ef3631487dc1a0b6228286ac294ed84c795b09374067f1e1a1218bf09a",
+    "buildInputSha256": "09b502fda6ce0031076ba38cbfa1e9c73d5c263ea9a0c19c34a8a901ef63f4b7",
+    "tarballSha256": "ad6944c64db183d527133012455e815901f63ce4f243587c999813ea597052ba",
+    "tarballIntegrity": "sha512-7wtnuglP82JbTqO+12QSay0oDdkfYN9GdvbN9R5xmS4z0PnI0vdFfNuSmgCOIpA/BbiAY+4+skOT6kxXSegjNA==",
+    "installedLoaderSha256": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+    "installedWasmSha256": "5c76a456367d0870b4880fbeab7c0c812eee692b4261a7ea21ffc5f248596cdc",
+    "record": "fork10/verified-installed-artifact.json"
+  },
+  "observations": {
+    "thruster": "propulsion/engine[n]/body-force-x/y/z-lbs, resolved cached body force in pounds; reads do not call transform/moment calculation.",
+    "aerodynamics": "aero/rp-body-x/y/z-ft relative to CG, including native RP shift; forces/fbx/y/z-aero-rp-lbs and -aero-cg-lbs preserve apply_at_cg distinction.",
+    "net": "Existing native applied-total plus native weight may be shown as an explicitly labeled exact vector sum. Applied total includes native friction/contact and excludes gravity."
+  },
+  "checks": {
+    "nativeForceObservers": {
+      "status": "passed",
+      "target": "TestForceObservations",
+      "methods": 3,
+      "log": "fork10/native-force-observers.log"
+    },
+    "nativeAeroFrames": {
+      "status": "passed",
+      "target": "TestAeroFuncFrame",
+      "methods": 6,
+      "log": "fork10/native-aero-frames.log"
+    },
+    "sdkBuildValidation": {
+      "status": "passed",
+      "tests": 52,
+      "suites": 9,
+      "log": "fork10/sdk-build-validation.log",
+      "commands": [
+        "tsc --noEmit (frozen SDK workspace)",
+        "node --test --test-concurrency=5 test/*.test.mjs (frozen SDK workspace and resolved native fixtures)"
+      ],
+      "sourceDateEpoch": 1791240132,
+      "scope": "One clean frozen-source build, locked toolchain; 5 compile jobs and 5 Node test workers."
+    },
+    "releasePacking": {
+      "status": "passed",
+      "log": "fork10/sdk-release-pack.log",
+      "releaseEligible": true
+    },
+    "installedArtifactIdentity": {
+      "status": "passed",
+      "verifiedFiles": 14,
+      "log": "fork10/verify-fork10.log"
+    },
+    "installedRegressions": {
+      "status": "passed",
+      "tests": 12,
+      "log": "fork10/installed-force-regressions.log",
+      "scope": "Native aircraft force reader/overlay and actual C172/F35 aggregate/split/anchor observations; no aircraft handling qualification."
+    },
+    "fullApplicationCi": {
+      "status": "superseded by necessary fork11 stopped-thrust repair before full app acceptance"
+    },
+    "browserLoadedAssets": {
+      "status": "not attempted for fork10 at record creation"
+    }
+  },
+  "preservation": {
+    "previousArtifact": "deps/felipegalind0-jsbsim-1.2.4-fork.9.tgz retained",
+    "rollbackDeclaration": "validation/evidence/jsbsim/rollback/fork9/",
+    "earlierRecords": "Unchanged"
+  },
+  "limitations": [
+    "No force reconstruction from scalar thrust/angles occurs in the observer.",
+    "Native cached vectors show the last evaluated state, not a future command.",
+    "No upstream submission/push or package publication.",
+    "F35 aircraft allocation/handling qualification is separate.",
+    "A separate existing off-turbine zero-time Trim thrust defect was discovered downstream after this immutable build; recorded separately for a following correction."
+  ],
+  "evidence": [
+    {
+      "path": "fork10/native-force-observers.log",
+      "bytes": 242,
+      "sha256": "529e7141a1c4582876202039dac7b91b9ce337add30f4a33ccc922ecffa03896"
+    },
+    {
+      "path": "fork10/native-aero-frames.log",
+      "bytes": 238,
+      "sha256": "cdb9cc52d655878e60832582da6e08c65e4e7a2ca803aac6f6ca448555f5ece6"
+    },
+    {
+      "path": "fork10/sdk-build-validation.log",
+      "bytes": 20179,
+      "sha256": "9205aa04a72aac8e1efdd272086273f6c7c8a8d617bb588d31a041c31c0633eb"
+    },
+    {
+      "path": "fork10/sdk-release-pack.log",
+      "bytes": 1890,
+      "sha256": "bf9443ebb3bc3d362e82dfce51cd65436aae33442f6a1d9dcecfe88efb7b5de1"
+    },
+    {
+      "path": "fork10/verify-fork10.log",
+      "bytes": 574,
+      "sha256": "b428d4513697369fe14c4c5e655b612c42818141be40c9b361d992821d09f76f"
+    },
+    {
+      "path": "fork10/verified-installed-artifact.json",
+      "bytes": 3170,
+      "sha256": "fe09f5e583daf2443a5e9126527a71e5980f7deda886f66f734dc95d78dad124"
+    },
+    {
+      "path": "fork10/installed-force-regressions.log",
+      "bytes": 571,
+      "sha256": "0ea0dfe4a3810df947a37bb298a8b191b847d8242cd6b59d11ab2156aa649b6c"
+    }
+  ]
+}

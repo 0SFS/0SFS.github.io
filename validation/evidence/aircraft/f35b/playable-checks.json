@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-05T18:40:11.507579+00:00",
+  "status": "Experimental F-35B playable; aircraft performance uncalibrated",
+  "owner": "0sfs",
+  "groundCollisionWorkIncluded": false,
+  "checks": {
+    "incrementalTypecheck": "passed",
+    "lint": "passed",
+    "fullCi": {
+      "command": "npm run ci",
+      "passed": true,
+      "testFiles": 128,
+      "tests": 1245,
+      "workerLimit": 5,
+      "workerEnvironment": "VITEST_MAX_WORKERS",
+      "productionBuild": "passed",
+      "sdkAndAudioArtifacts": "verified",
+      "summary": "repository-ci-summary.log",
+      "fullLogSha256": "594c76c033362d51dfd61295fad829ab3eda7fe6f4c983e919cd6bffd61fcce4"
+    },
+    "originalSourcesAndFinalRuntime": {
+      "originalAssetEntries": 6,
+      "originalFdmEntries": 10,
+      "runtimeEntries": 7,
+      "browserFinalDataHashesMatch": true,
+      "builtAssetsMatch": true,
+      "relativeDocLinksVerified": 32,
+      "passed": true
+    },
+    "installedSdkAcceptance": "installed-sdk-acceptance.json",
+    "browserAcceptance": "playable-headless.json",
+    "browserNormalExit": {
+      "code": 0,
+      "signal": null
+    }
+  },
+  "scope": "Installed-SDK airborne tests, actual browser SDK/GLB/input/rig fixture and app composition tests; full globe manual flight awaits user testing.",
+  "limitations": [
+    "Experimental aerodynamics, CG/force arms, shared propulsion/fuel and transition envelope.",
+    "Converted98%throttle fixture climbs; operational hover power/hold not established.",
+    "Ground collision and F-35B audio qualification remain separate."
+  ]
+}

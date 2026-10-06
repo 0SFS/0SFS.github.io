@@ -1,0 +1,192 @@
+/* Fuel tab: the total gauge, and the aircraft from above with a gauge in every tank. */
+
+.flight-fuel__gauge {
+  position: relative;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid rgba(232, 182, 71, 0.5);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.55);
+  /* The percentage hides itself in a box too small to hold it. */
+  container-type: size;
+}
+
+.flight-fuel__gauge:hover {
+  border-color: var(--flight-panel-accent);
+}
+
+.flight-fuel__gauge.is-detached {
+  border-style: dashed;
+  opacity: 0.5;
+}
+
+.flight-fuel__gauge.is-detached .flight-fuel__level {
+  display: none;
+}
+
+.flight-fuel__gauge.is-detached input[type="range"] {
+  cursor: default;
+}
+
+.flight-fuel__gauge:has(input:focus-visible) {
+  outline: 2px solid var(--flight-panel-accent);
+  outline-offset: 2px;
+}
+
+.flight-fuel__total {
+  height: 30px;
+  border-radius: 6px;
+}
+
+.flight-fuel__tank {
+  position: absolute;
+}
+
+/* The edge of the fuel is the slider's handle. */
+.flight-fuel__level {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-right: 2px solid var(--flight-panel-accent);
+  background: linear-gradient(90deg, rgba(232, 182, 71, 0.35), rgba(232, 182, 71, 0.7));
+  pointer-events: none;
+}
+
+.flight-fuel__gauge.is-vertical .flight-fuel__level {
+  top: auto;
+  right: 0;
+  border-right: 0;
+  border-top: 2px solid var(--flight-panel-accent);
+  background: linear-gradient(0deg, rgba(232, 182, 71, 0.35), rgba(232, 182, 71, 0.7));
+}
+
+.flight-fuel__gauge .flight-fuel__percent {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  /* Centred even inside a panel field, whose spans space their content apart. */
+  place-content: center;
+  color: #f4f6f7;
+  font: 600 11px "SF Mono", Menlo, monospace;
+  text-shadow: 0 1px 2px #000;
+  pointer-events: none;
+}
+
+@container (max-width: 30px) {
+  .flight-fuel__gauge .flight-fuel__percent { display: none; }
+}
+
+@container (max-height: 13px) {
+  .flight-fuel__gauge .flight-fuel__percent { display: none; }
+}
+
+/* The native slider covers the whole gauge, invisible: a press anywhere sets the level there. */
+.flight-fuel__gauge input[type="range"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.flight-fuel__gauge input[type="range"]:focus {
+  outline: none;
+}
+
+.flight-fuel__gauge.is-vertical input[type="range"] {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  cursor: ns-resize;
+}
+
+.flight-fuel__gauge input[type="range"]::-webkit-slider-runnable-track {
+  height: 100%;
+  background: transparent;
+}
+
+/* A thumb two pixels thick, so the level under a press is the level drawn there. */
+.flight-fuel__gauge input[type="range"]::-webkit-slider-thumb {
+  width: 2px;
+  height: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+
+.flight-fuel__gauge.is-vertical input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+}
+
+.flight-fuel__gauge.is-vertical input[type="range"]::-webkit-slider-thumb {
+  width: 100%;
+  height: 2px;
+}
+
+.flight-fuel__gauge input[type="range"]::-moz-range-track {
+  background: transparent;
+}
+
+.flight-fuel__gauge input[type="range"]::-moz-range-thumb {
+  width: 2px;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.flight-fuel__gauge.is-vertical input[type="range"]::-moz-range-thumb {
+  width: 100%;
+  height: 2px;
+}
+
+/* As wide as the panel allows, short enough that the whole aircraft stays in view. */
+.flight-fuel__aircraft {
+  position: relative;
+  justify-self: center;
+  width: min(100%, calc(62vh * var(--flight-fuel-aspect)));
+  aspect-ratio: var(--flight-fuel-aspect);
+}
+
+.flight-fuel__outline {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.flight-fuel__outline polygon {
+  fill: rgba(208, 220, 224, 0.07);
+  stroke: rgba(208, 220, 224, 0.55);
+  stroke-width: 1.25;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.flight-fuel__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--flight-panel-muted);
+  font-size: 11px;
+}
+
+.flight-fuel__legend li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.flight-fuel__legend strong {
+  color: #cad3d5;
+  font-weight: 600;
+}

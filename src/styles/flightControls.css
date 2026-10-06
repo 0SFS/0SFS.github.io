@@ -26,6 +26,8 @@
   --ctl-accent-edge: rgba(255, 210, 80, 0.55);
   --ctl-focus: rgba(255, 210, 80, 0.45);
   --ctl-focus-soft: rgba(255, 210, 80, 0.18);
+  /* Engine off, and the ring that shuts it down. */
+  --ctl-danger: #e8776f;
   /* The button in the tape row; also the width of a lever's meta column. */
   --ctl-chip-size: 28px;
   --ctl-lever-thickness: 16px;
@@ -258,6 +260,132 @@
 .flight-hud__slider-control input[type="range"]:disabled {
   cursor: default;
   opacity: 0.9;
+}
+
+/* ---- The throttle lever (`throttleLever.ts`): a slider that also starts
+   and stops the engine. Drawn rather than native, so the ring can sit exactly
+   round the handle; it keeps the native lever's look. The host sets
+   `--throttle-handle` for its size. ---- */
+
+.flight-throttle {
+  --throttle-handle: 14px;
+  --throttle-value: 0;
+  position: relative;
+  width: var(--throttle-handle);
+  align-self: stretch;
+  min-height: 0;
+  margin: 0;
+  border-radius: calc(var(--throttle-handle) / 2);
+  cursor: ns-resize;
+  outline: none;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.flight-throttle:focus-visible {
+  box-shadow: 0 0 0 2px var(--ctl-focus);
+}
+
+.flight-throttle__track {
+  position: absolute;
+  top: calc(var(--throttle-handle) / 2);
+  bottom: calc(var(--throttle-handle) / 2);
+  left: 50%;
+  width: 4px;
+  transform: translateX(-50%);
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--ctl-line-strong);
+}
+
+.flight-throttle__fill {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: calc(var(--throttle-value) * 100%);
+  background: var(--ctl-accent);
+}
+
+.flight-throttle__handle {
+  position: absolute;
+  bottom: calc(var(--throttle-value) * (100% - var(--throttle-handle)));
+  left: 50%;
+  width: var(--throttle-handle);
+  height: var(--throttle-handle);
+  margin-left: calc(var(--throttle-handle) / -2);
+  border-radius: 50%;
+  background: var(--ctl-accent);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* The ring round the handle: a start's spool-up, or the hold that shuts it down. */
+.flight-throttle__ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: none;
+  width: calc(var(--throttle-handle) + 12px);
+  height: calc(var(--throttle-handle) + 12px);
+  overflow: visible;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  pointer-events: none;
+}
+
+[data-engine="starting"] .flight-throttle__ring,
+[data-hold] .flight-throttle__ring {
+  display: block;
+}
+
+.flight-throttle__ring circle {
+  fill: none;
+  stroke-width: 3;
+}
+
+.flight-throttle__ring-back {
+  stroke: rgba(0, 0, 0, 0.6);
+}
+
+.flight-throttle__ring-fill {
+  stroke: var(--ctl-accent);
+  stroke-linecap: round;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: calc(1 - var(--throttle-ring, 0));
+  /* Status frames reach the phone ten times a second; ease between them. */
+  transition: stroke-dashoffset 150ms linear;
+}
+
+[data-hold="shutdown"] .flight-throttle__ring-fill {
+  stroke: var(--ctl-danger);
+  transition: none;
+  animation: flight-throttle-ring var(--throttle-hold-ms, 1500ms) linear forwards;
+}
+
+@keyframes flight-throttle-ring {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Engine off: the lever rests at idle, dimmed, until it is held to start. */
+[data-engine="stopped"] .flight-throttle {
+  cursor: pointer;
+}
+
+[data-engine="stopped"]:not([data-hold]) .flight-throttle__handle {
+  background: var(--ctl-muted);
+}
+
+[data-engine="stopped"]:not([data-hold]) output {
+  color: var(--ctl-danger);
+  opacity: 1;
+}
+
+.flight-throttle[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.6;
 }
 
 /* ---- The same control turned horizontal (roll trim). ---- */

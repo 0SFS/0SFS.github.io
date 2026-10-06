@@ -8,6 +8,9 @@
   font-family: "SF Mono", "Menlo", "Consolas", monospace;
 }
 
+/* Component display rules must not override the HTML hidden attribute. */
+.flight-engine [hidden] { display: none; }
+
 .flight-engine__summary {
   display: flex;
   flex-wrap: wrap;
@@ -92,7 +95,18 @@
   width: var(--size);
   height: var(--size);
   flex: none;
+  position: relative;
 }
+
+.flight-engine__rpm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.15;
+}
+
+.flight-engine__rpm .flight-engine__spool-value { font-size: 14px; }
 
 .flight-engine__spool--n1,
 .flight-engine__spool--n2 {

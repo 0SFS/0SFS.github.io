@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "path": "public/aircraft/f-35b/F-35B_AF267.glb",
+    "sha256": "8324d792711a8aecd74988dd9e314b3b4e6f1f3a819591ce60f34caa004d7fbd"
+  },
+  "output": {
+    "path": "public/aircraft/thumbnails/f-35b.png",
+    "sha256": "156ee16ae944981f9af9bb5e9a7a5ef42fff9a2b3ca3fce2ca670ca68d885206",
+    "sizePixels": [
+      640,
+      400
+    ],
+    "bytes": 266856
+  },
+  "blenderVersion": "5.2.2 LTS",
+  "renderer": "Blender Workbench, textures and studio light",
+  "camera": {
+    "type": "orthographic",
+    "azimuthDegrees": -35,
+    "elevationDegrees": 18,
+    "margin": 1.12,
+    "scale": 13.690250396728516
+  },
+  "groundFrameBoundsMeters": {
+    "min": [
+      -5.334000587463379,
+      -6.035899639129639,
+      2.0730573169203126e-07
+    ],
+    "max": [
+      5.333999156951904,
+      9.360406875610352,
+      4.714280128479004
+    ],
+    "size": [
+      10.667999267578125,
+      15.396306991577148,
+      4.714280128479004
+    ]
+  },
+  "credit": {
+    "artist": "AF267",
+    "note": "0sfs gallery render of AF267's F-35B model",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "sourceUrl": "https://sketchfab.com/3d-models/lockheed-martin-f-35b-lightning-ii-5d54a6af45974ad386ae74d42b33374a"
+  }
+}

@@ -1,10 +1,15 @@
 import { readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { AUDIO_BATCH_HEADER, AUDIO_BATCH_SNAPSHOTS, AUDIO_EVENT, AUDIO_EVENT_SIZE, AUDIO_SNAPSHOT_SIZE } from "./audioSnapshot";
+import { FreeCamera, NullEngine, Scene, TransformNode, Vector3 } from "@babylonjs/core";
+import { AUDIO_BATCH_HEADER, AUDIO_BATCH_SNAPSHOTS, AUDIO_EVENT, AUDIO_EVENT_SIZE, AUDIO_SNAPSHOT_SIZE, AUDIO_SNAPSHOT_SLOT, AVAILABILITY } from "./audioSnapshot";
 import { flightParameterDefaults } from "../settings/flightParameters";
 import { audioSettingsValues, createAudioSettingsStore, DEFAULT_AUDIO_SETTINGS, patchAudioSettings } from "./audioSettings";
 import { createFlightAudio, type FlightAudioHandle } from "./createFlightAudio";
 import type { AudioAdapter, AudioAdapterReading } from "./jsbsimAudioAdapter";
+import { acousticProfileValues, getAircraftAudioProfile } from "./aircraftAudioProfiles";
+import type { AudioBankInstallBand, AudioBankInstallation } from "./audioBank";
+import { QUALIFIED_PROFILES, type AudioQualificationContext, type QualifiedProfile } from "./audioQuality";
 
 /**
  * SYNTHETIC Web Audio fakes. These check the facade's lifecycle decisions —
@@ -58,30 +63,36 @@ function savedParameters(initial?: object) {
   return flightParameterDefaults(audioSettingsValues(patchAudioSettings(DEFAULT_AUDIO_SETTINGS, initial)));
 }
 
-function fakeAdapter() {
+function fakeAdapter(logDisposal = true) {
   const reading: AudioAdapterReading = {
     simTimeS: 0, availability: 0, n1Pct: 20, n2Pct: 45, thrustLbf: 0, fuelFlowPps: 0, throttleNorm: 0,
     combustion: false, running: false, starter: true, cutoff: true, kias: 0, gearNorm: 1, flapNorm: 0,
-    velocity: [0, 0, 0], soundSpeedMps: 343,
+    velocity: [0, 0, 0], soundSpeedMps: 343, augmentation: false,
   };
-  const dispose = vi.fn(() => { log.push("adapter.dispose"); });
+  const dispose = vi.fn(() => { if (logDisposal) log.push("adapter.dispose"); });
   const adapter: AudioAdapter = {
     read: () => reading,
-    diagnostics: { missing: [], combustionSource: "fuel-flow", sourceOffset: [0, 2, -2] },
+    diagnostics: { missing: [], combustionSource: "fuel-flow", sourceOffset: [0, 2, -2],
+      profile: getAircraftAudioProfile("cirrus-vision-jet"), telemetryAvailable: true,
+      engineIndex: 0, sourceId: "main-exhaust" },
     dispose,
   };
   return { adapter, reading, dispose };
 }
 
 const handles: FlightAudioHandle[] = [];
+const qualificationRecords = QUALIFIED_PROFILES as QualifiedProfile[];
+const realQualificationCount = qualificationRecords.length;
 function create(options: {
   stored?: object; inGesture?: boolean; unlockTarget?: EventTarget; loadWasm?: () => Promise<BufferSource>;
   suspendDelayMs?: number;
+  qualificationContext?: () => AudioQualificationContext | undefined;
 } = {}) {
   const store = createAudioSettingsStore(savedParameters(options.stored));
   const audio = createFlightAudio({
     settings: store,
     suspendDelayMs: options.suspendDelayMs,
+    qualificationContext: options.qualificationContext,
     unlockTarget: options.unlockTarget ?? null,
     loadWasm: options.loadWasm ?? (async () => wasm),
     workletModuleUrl: "dspProcessor.js",
@@ -89,7 +100,12 @@ function create(options: {
     inGesture: () => options.inGesture ?? true,
   });
   handles.push(audio);
+  audio.attachAdapter(fakeAdapter(false).adapter);
   return { audio, store };
+}
+
+function bank(bands: readonly AudioBankInstallBand[]): AudioBankInstallation {
+  return { engineDefinitionId: "fj33-reference", rendererId: "procedural-jet-v1", bands };
 }
 
 async function booted(count = 1): Promise<FakeWorkletNode> {
@@ -107,9 +123,106 @@ beforeEach(() => {
 afterEach(() => {
   for (const handle of handles.splice(0)) handle.dispose();
   vi.unstubAllGlobals();
+  qualificationRecords.splice(realQualificationCount);
 });
 
 describe("flight audio lifecycle (synthetic fakes)", () => {
+  it.each([false, true])("checks qualification against the compiled bytes (matching hash: %s)", async matching => {
+    // SYNTHETIC qualification fixture, removed after this case; no device claim.
+    const identified: AudioQualificationContext = {
+      device: "fixture", browserBuild: "fixture", osBuild: "fixture", outputRoute: "fixture",
+      sampleRateHz: 48_000, transport: "port", engineDefinitionId: "fj33-reference", rendererId: "procedural-jet-v1",
+      dspSha256: matching ? createHash("sha256").update(wasm).digest("hex") : "0".repeat(64),
+    };
+    qualificationRecords.push({ ...identified, tier: "high", evidence: "synthetic unit-test record only" });
+    const { audio } = create({ stored: { requested: "auto" }, qualificationContext: () => identified });
+    audio.setEnabled(true);
+    await booted();
+    expect(audio.getStatus().effective).toBe(matching ? "high" : "low");
+    expect(audio.getStatus().availability.high.state).toBe(matching ? "available" : "unvalidated");
+  });
+
+  it("applies the saved afterburner mix at boot and live without replacing setup or native augmentation", async () => {
+    const { audio, store } = create({ stored: { afterburnerVolume: 0.3, masterVolume: 3 } });
+    const { adapter, reading } = fakeAdapter();
+    adapter.diagnostics.profile = getAircraftAudioProfile("f-35b");
+    Object.assign(reading, { augmentation: true, availability: AVAILABILITY.AUGMENTATION });
+    audio.attachAdapter(adapter);
+    audio.setEnabled(true);
+    const node = await booted();
+    expect(node.options.processorOptions.initial).toMatchObject({ gains: { afterburner: 0.3, master: 3 } });
+    const profileMessages = node.port.ofType("profile").length;
+    const resets = node.port.ofType("reset").length;
+    audio.patchSettings({ afterburnerVolume: 0, masterVolume: 8 });
+    expect(node.port.last("gains")).toMatchObject({ afterburner: 0, engine: 0.8, airframe: 0.6, master: 8 });
+    audio.publishStep();
+    const snapshot = new Float64Array(node.port.last("batch")!.buffer as ArrayBuffer);
+    expect(snapshot[AUDIO_BATCH_HEADER + AUDIO_SNAPSHOT_SLOT.augmentation]).toBe(1);
+    store.update({ afterburnerVolume: 0.75, engineVolume: 3.5, masterVolume: 6 });
+    audio.followSettings();
+    expect(node.port.last("gains")).toMatchObject({ afterburner: 0.75, engine: 3.5, master: 6 });
+    audio.patchSettings({ engineMuted: true });
+    expect(node.port.last("gains")).toMatchObject({ engine: 0, afterburner: 0.75 });
+    expect(node.port.ofType("profile")).toHaveLength(profileMessages);
+    expect(node.port.ofType("reset")).toHaveLength(resets);
+    expect(FakeWorkletNode.instances).toHaveLength(1);
+  });
+
+  it("uses the cockpit by default and follows live and imported listener blends in published poses", async () => {
+    const engine = new NullEngine();
+    try {
+      const scene = new Scene(engine);
+      const camera = new FreeCamera("chase", new Vector3(0, 0, -100), scene);
+      const cockpitCamera = new FreeCamera("cockpit", new Vector3(0, 0, 5), scene);
+      const aircraftRoot = new TransformNode("aircraft", scene);
+      const { audio, store } = create();
+      const { adapter, reading } = fakeAdapter();
+      audio.attachAdapter(adapter);
+      audio.setEnabled(true);
+      const node = await booted();
+      const publish = () => {
+        audio.updateView({ camera, cockpitCamera, aircraftRoot, exterior: 1, heightAboveGroundM: null });
+        audio.publishStep();
+        reading.simTimeS += 1 / 60;
+        return new Float64Array(node.port.last("batch")!.buffer as ArrayBuffer);
+      };
+      const cockpit = publish();
+      expect(cockpit[AUDIO_BATCH_HEADER + AUDIO_SNAPSHOT_SLOT.sourceZ]).toBeCloseTo(-7);
+      expect(cockpit[AUDIO_BATCH_HEADER + AUDIO_SNAPSHOT_SLOT.exterior]).toBe(0);
+      audio.patchSettings({ listenerCockpitBlend: 0 });
+      const chase = publish();
+      expect(chase[AUDIO_BATCH_HEADER + AUDIO_SNAPSHOT_SLOT.sourceZ]).toBeCloseTo(98);
+      expect(chase[AUDIO_BATCH_HEADER + AUDIO_SNAPSHOT_SLOT.exterior]).toBe(1);
+      store.update({ listenerCockpitBlend: 0.5 });
+      audio.followSettings();
+      const middle = publish();
+      expect(middle[AUDIO_BATCH_HEADER + AUDIO_SNAPSHOT_SLOT.sourceZ]).toBeCloseTo(45.5);
+      expect(middle[AUDIO_BATCH_HEADER + AUDIO_SNAPSHOT_SLOT.exterior]).toBe(0.5);
+    } finally {
+      engine.dispose();
+    }
+  });
+
+  it("configures F135 separately and transports native engine telemetry", async () => {
+    const { audio } = create();
+    audio.setEnabled(true);
+    const node = await booted();
+    const { adapter, reading } = fakeAdapter();
+    adapter.diagnostics.profile = getAircraftAudioProfile("f-35b");
+    Object.assign(reading, { simTimeS: 0, n1Pct: 75, n2Pct: 85, thrustLbf: 14_000, fuelFlowPps: 4, combustion: true, running: true });
+    audio.attachAdapter(adapter);
+    audio.publishStep();
+    const view = new Float64Array(node.port.last("batch")!.buffer as ArrayBuffer);
+    expect(view[AUDIO_BATCH_HEADER + AUDIO_SNAPSHOT_SLOT.thrustLbf]).toBe(14_000);
+    expect(view[AUDIO_BATCH_HEADER + AUDIO_SNAPSHOT_SLOT.fuelFlowPps]).toBe(4);
+    expect(view[AUDIO_BATCH_HEADER + AUDIO_SNAPSHOT_SLOT.n1Pct]).toBe(75);
+    expect(audio.getStatus().engine).toMatchObject({ n1Pct: 75, n2Pct: 85, fuelFlowPps: 4 });
+    expect(audio.getStatus().telemetry).toMatchObject({ profileLabel: "Approximate F135 procedural sound" });
+    expect(node.port.last("profile")).toEqual({ type: "profile", values: acousticProfileValues(adapter.diagnostics.profile) });
+    audio.attachAdapter(fakeAdapter().adapter);
+    expect(node.port.last("profile")).toEqual({ type: "profile", values: acousticProfileValues() });
+  });
+
   it("allocates nothing until sound is asked for", () => {
     const { audio } = create();
     expect(FakeAudioContext.instances).toHaveLength(0);
@@ -126,25 +239,37 @@ describe("flight audio lifecycle (synthetic fakes)", () => {
     expect(node.name).toBe("osfs-dsp");
     expect(node.options.processorOptions.module).toBeInstanceOf(WebAssembly.Module);
     // The first quantum must not wait on a port message for its tier and gains.
-    expect(node.options.processorOptions.initial).toMatchObject({ tier: 1, gains: { master: 0.7, engine: 0.8 } });
-    // Auto with no qualification evidence resolves to Low.
-    expect(node.port.last("tier")).toEqual({ type: "tier", tier: 1 });
-    expect(node.port.last("gains")).toMatchObject({ master: 0.7, engine: 0.8, airframe: 0.6, tire: 0 });
-    expect(audio.getStatus()).toMatchObject({ effective: "low", requested: "auto", mode: "sound", gestureLocked: false });
+    expect(node.options.processorOptions.initial).toMatchObject({ tier: 2, gains: { master: 2, engine: 0.8 } });
+    expect(node.options.processorOptions.initial).toMatchObject({ profile: acousticProfileValues() });
+    // Med is the default, and runs although no device has qualified it.
+    expect(node.port.last("tier")).toEqual({ type: "tier", tier: 2 });
+    expect(node.port.last("gains")).toMatchObject({ master: 2, engine: 0.8, airframe: 0.6, tire: 0 });
+    expect(audio.getStatus()).toMatchObject({ effective: "med", requested: "med", mode: "sound", gestureLocked: false });
   });
 
-  it("runs an unvalidated Med request as Low and keeps the request visible", async () => {
-    const { audio } = create({ stored: { requested: "med" } });
+  it("runs Med the moment it is chosen, with no further step, and still calls it unvalidated", async () => {
+    const { audio, store } = create({ stored: { requested: "low" } });
     audio.setEnabled(true);
     const node = await booted();
     expect(node.port.last("tier")).toEqual({ type: "tier", tier: 1 });
-    expect(audio.getStatus()).toMatchObject({ requested: "med", effective: "low" });
+    audio.setQuality("med");
+    expect(node.port.last("tier")).toEqual({ type: "tier", tier: 2 });
+    expect(audio.getStatus()).toMatchObject({ requested: "med", effective: "med" });
     expect(audio.getStatus().availability.med.state).toBe("unvalidated");
+    expect(store.settings.requested).toBe("med");
+  });
+
+  it("keeps Auto at Low while no device has qualified a higher tier", async () => {
+    const { audio } = create({ stored: { requested: "auto" } });
+    audio.setEnabled(true);
+    const node = await booted();
+    expect(node.port.last("tier")).toEqual({ type: "tier", tier: 1 });
+    expect(audio.getStatus()).toMatchObject({ requested: "auto", effective: "low" });
   });
 
   it("waits for a gesture instead of autoplaying a restored preference", async () => {
     const target = new EventTarget();
-    const { audio } = create({ stored: { enabled: true }, unlockTarget: target });
+    const { audio } = create({ stored: { enabled: true }, unlockTarget: target, inGesture: false });
     expect(FakeAudioContext.instances).toHaveLength(0);
     expect(audio.getStatus()).toMatchObject({ gestureLocked: true, effective: "off" });
     target.dispatchEvent(new Event("pointerdown"));
@@ -178,7 +303,7 @@ describe("flight audio lifecycle (synthetic fakes)", () => {
     const resets = node.port.ofType("reset").length;
     audio.setHeld(false, "pause");
     expect(audio.getStatus().held).toBe(false);
-    expect(node.port.last("tier")).toEqual({ type: "tier", tier: 1 });
+    expect(node.port.last("tier")).toEqual({ type: "tier", tier: 2 });
     expect(node.port.ofType("reset")).toHaveLength(resets + 1);
   });
 
@@ -192,7 +317,7 @@ describe("flight audio lifecycle (synthetic fakes)", () => {
     expect(node.port.last("tire")).toEqual({ type: "tire", watts: 900 });
 
     audio.setEnabled(true);
-    expect(node.port.last("gains")).toMatchObject({ master: 0.7, engine: 0.8, tire: 0.4 });
+    expect(node.port.last("gains")).toMatchObject({ master: 2, engine: 0.8, tire: 0.4 });
     audio.setEnabled(false);
     expect(node.disconnect).not.toHaveBeenCalled();
     expect(node.port.last("gains")).toMatchObject({ master: 1, engine: 0, tire: 0.4 });
@@ -254,6 +379,49 @@ describe("flight audio lifecycle (synthetic fakes)", () => {
     expect(node.port.last("epoch")).toMatchObject({ simTimeS: 0.5 });
   });
 
+  it("publishes a copied native source axis only while its pose marks it available", async () => {
+    const { audio } = create();
+    audio.setEnabled(true);
+    const node = await booted();
+    const { adapter, reading } = fakeAdapter();
+    audio.attachAdapter(adapter);
+    const axis: [number, number, number] = [0, 0, -1];
+    reading.sourceAxis = [0, 0, -1];
+    const next = { source: [0, 0, 2] as [number, number, number], sourceAxis: axis, sourceAxisValid: true,
+      sourceVelocity: [0, 0, 0] as [number, number, number], listenerVelocity: [0, 0, 0] as [number, number, number],
+      exterior: 1, groundReflectionM: -1, valid: true };
+    audio.setListenerPose(next);
+    axis[2] = 1;
+    audio.publishStep();
+    let buffer = node.port.last("batch")!.buffer as ArrayBuffer;
+    let snapshot = new Float64Array(buffer);
+    expect(snapshot[AUDIO_BATCH_HEADER + AUDIO_SNAPSHOT_SLOT.sourceAxisZ]).toBe(-1);
+    expect(snapshot[AUDIO_BATCH_HEADER + AUDIO_SNAPSHOT_SLOT.availability] & AVAILABILITY.SOURCE_AXIS).toBe(AVAILABILITY.SOURCE_AXIS);
+    node.port.deliver({ type: "recycle", buffer });
+    audio.setListenerPose({ ...next, sourceAxisValid: false });
+    reading.simTimeS = 1 / 60;
+    audio.publishStep();
+    buffer = node.port.last("batch")!.buffer as ArrayBuffer;
+    snapshot = new Float64Array(buffer);
+    expect(snapshot[AUDIO_BATCH_HEADER + AUDIO_SNAPSHOT_SLOT.availability] & AVAILABILITY.SOURCE_AXIS).toBe(0);
+    node.port.deliver({ type: "recycle", buffer });
+    // A native observer becoming unavailable cannot reuse the prior frame's axis.
+    audio.setListenerPose(next);
+    reading.sourceAxis = [Number.NaN, 0, -1];
+    reading.simTimeS += 1 / 60;
+    audio.publishStep();
+    buffer = node.port.last("batch")!.buffer as ArrayBuffer;
+    snapshot = new Float64Array(buffer);
+    expect(snapshot[AUDIO_BATCH_HEADER + AUDIO_SNAPSHOT_SLOT.availability] & AVAILABILITY.SOURCE_AXIS).toBe(0);
+    node.port.deliver({ type: "recycle", buffer });
+    reading.sourceAxis = [0, 0, -1];
+    audio.beginEpoch();
+    reading.simTimeS += 1 / 60;
+    audio.publishStep();
+    snapshot = new Float64Array(node.port.last("batch")!.buffer as ArrayBuffer);
+    expect(snapshot[AUDIO_BATCH_HEADER + AUDIO_SNAPSHOT_SLOT.availability] & (AVAILABILITY.SOURCE_AXIS | AVAILABILITY.POSE)).toBe(0);
+  });
+
   it("drops to Off on a processor fault and restarts only when the pilot switches sound again", async () => {
     const target = new EventTarget();
     const { audio } = create({ unlockTarget: target });
@@ -270,45 +438,87 @@ describe("flight audio lifecycle (synthetic fakes)", () => {
     await booted(2);
   });
 
-  it("installs a bank into the running core, yet a bank alone does not admit High", async () => {
-    const { audio } = create();
+  it.each(["cirrus-vision-jet", "f-35b"] as const)("runs procedural High for %s without installing a sample bank", async (aircraft) => {
+    const { audio } = create({ stored: { requested: "high" } });
+    const { adapter } = fakeAdapter();
+    adapter.diagnostics.profile = getAircraftAudioProfile(aircraft);
+    audio.attachAdapter(adapter);
     audio.setEnabled(true);
     const node = await booted();
-    expect(audio.getStatus().availability.high.state).toBe("pack-unavailable");
-    // ORIGINAL SYNTHETIC FIXTURE: two short noise bands, not a recording.
-    const bands = [0, 1].map((index) => ({
-      index, samples: new Float32Array(480).fill(0.01 * (index + 1)), n1: 0.5, exterior: index as 0 | 1,
-    }));
-    const installing = audio.installBank(bands);
-    expect(node.port.ofType("bandClear")).toHaveLength(1);
-    for (const message of node.port.ofType("band")) {
-      node.port.deliver({ type: "band", index: message.index, accepted: true });
-    }
-    await expect(installing).resolves.toBe(true);
-    expect(bands[1].samples[0]).toBeCloseTo(0.02);
-    // With no qualified profile, High moves from "Audio pack unavailable" to "Not yet validated".
-    expect(audio.getStatus().availability.high.state).toBe("unvalidated");
-    audio.setEnabled(false);
-    expect(audio.getStatus().availability.high.state).toBe("pack-unavailable");
+    expect(audio.getStatus()).toMatchObject({ requested: "high", effective: "high",
+      availability: { high: { state: "unvalidated" } } });
+    expect(node.port.last("tier")).toMatchObject({ tier: 3 });
+    expect(node.port.ofType("band")).toHaveLength(0);
+    audio.setQuality("med");
+    expect(audio.getStatus().effective).toBe("med");
+    audio.setQuality("auto");
+    expect(audio.getStatus().effective).toBe("low");
   });
 
-  it("clears a partially accepted bank", async () => {
-    const { audio } = create();
+  it("rejects legacy full-recording banks without changing procedural High or transferring PCM", async () => {
+    const { audio } = create({ stored: { requested: "high" } });
     audio.setEnabled(true);
     const node = await booted();
-    const installing = audio.installBank([
-      { index: 0, samples: new Float32Array(10), n1: 0.2, exterior: 0 },
-      { index: 1, samples: new Float32Array(10), n1: 0.8, exterior: 0 },
-    ]);
-    node.port.deliver({ type: "band", index: 0, accepted: true });
-    node.port.deliver({ type: "band", index: 1, accepted: false });
-    await expect(installing).resolves.toBe(false);
-    expect(node.port.ofType("bandClear")).toHaveLength(2);
-    expect(audio.getStatus().availability.high.state).toBe("pack-unavailable");
+    const installation = bank([{ index: 0, samples: new Float32Array(480), n1: 0.5, exterior: 0 }]);
+    for (const candidate of [installation, { ...installation, engineDefinitionId: "f135-approximation" },
+      { ...installation, rendererId: "another-binary" }]) {
+      await expect(audio.installBank(candidate)).resolves.toBe(false);
+    }
+    node.port.deliver({ type: "band", index: 0, requestId: 1, accepted: true });
+    expect(node.port.ofType("band")).toHaveLength(0);
+    expect(audio.getStatus()).toMatchObject({ effective: "high", availability: { high: { state: "unvalidated" } } });
+  });
+
+  it("retains procedural High when replacing supported engines, with no recording readiness to inherit", async () => {
+    const { audio } = create({ stored: { requested: "high" } });
+    audio.setEnabled(true);
+    const node = await booted();
+    const { adapter } = fakeAdapter();
+    adapter.diagnostics.profile = getAircraftAudioProfile("f-35b");
+    audio.attachAdapter(adapter);
+    expect(node.port.ofType("bandClear")).toHaveLength(1);
+    expect(node.port.ofType("band")).toHaveLength(0);
+    expect(audio.getStatus().effective).toBe("high");
+  });
+
+  it("continues reading after unavailable required telemetry and recovers engine publication", async () => {
+    const { audio } = create();
+    const { adapter, reading } = fakeAdapter();
+    const read = vi.fn(() => reading);
+    adapter.read = read;
+    audio.attachAdapter(adapter);
+    audio.setEnabled(true);
+    const node = await booted();
+    Object.assign(reading, { availability: AVAILABILITY.N1 | AVAILABILITY.N2 | AVAILABILITY.THRUST
+      | AVAILABILITY.FUEL_FLOW | AVAILABILITY.COMBUSTION | AVAILABILITY.RUNNING,
+    combustion: true, running: true, fuelFlowPps: 0.2, thrustLbf: 1000 });
+    adapter.diagnostics.telemetryAvailable = false;
+    audio.publishStep();
+    let view = new Float64Array(node.port.last("batch")!.buffer as ArrayBuffer);
+    expect(view[AUDIO_BATCH_HEADER + AUDIO_SNAPSHOT_SLOT.availability] & AVAILABILITY.COMBUSTION).toBe(0);
+    expect(audio.isEngineActive()).toBe(false);
+    adapter.diagnostics.telemetryAvailable = true;
+    reading.simTimeS = 1 / 60;
+    audio.publishStep();
+    view = new Float64Array(node.port.last("batch")!.buffer as ArrayBuffer);
+    expect(view[AUDIO_BATCH_HEADER + AUDIO_SNAPSHOT_SLOT.availability] & AVAILABILITY.COMBUSTION).toBe(AVAILABILITY.COMBUSTION);
+    expect(read).toHaveBeenCalledTimes(2);
+    expect(audio.isEngineActive()).toBe(true);
+  });
+
+  it("refuses an engine without explicit acoustic setup instead of using the reference sound", async () => {
+    const { audio } = create();
+    const { adapter, dispose } = fakeAdapter();
+    adapter.diagnostics.profile = undefined;
+    audio.setEnabled(true);
+    audio.attachAdapter(adapter);
+    expect(FakeWorkletNode.instances).toHaveLength(0);
+    expect(audio.getStatus().message).toMatch(/explicit definition/);
+    expect(dispose).toHaveBeenCalledOnce();
   });
 
   it("drops a tier on a counted underrun and keeps the downgrade until re-test", async () => {
-    const { audio, store } = create();
+    const { audio, store } = create({ stored: { requested: "auto" } });
     audio.setEnabled(true);
     const node = await booted();
     const context = FakeAudioContext.instances[0] as FakeAudioContext & { playbackStats: { underrunEvents: number } };
@@ -324,6 +534,23 @@ describe("flight audio lifecycle (synthetic fakes)", () => {
     audio.retest();
     expect(store.settings).toMatchObject({ requested: "auto", downgradedFrom: null });
     await booted(2);
+  });
+
+  it("drops the default Med to Low on a counted underrun, and Low keeps playing until re-test", async () => {
+    const { audio, store } = create();
+    audio.setEnabled(true);
+    const node = await booted();
+    const context = FakeAudioContext.instances[0] as FakeAudioContext & { playbackStats: { underrunEvents: number } };
+    context.playbackStats = { underrunEvents: 0 };
+    node.port.deliver({ type: "stats", values: new Array(20).fill(0) });
+    context.playbackStats.underrunEvents = 1;
+    node.port.deliver({ type: "stats", values: new Array(20).fill(0) });
+    expect(store.settings).toMatchObject({ requested: "low", downgradedFrom: "med" });
+    expect(node.port.last("tier")).toEqual({ type: "tier", tier: 1 });
+    expect(node.disconnect).not.toHaveBeenCalled();
+    audio.retest();
+    expect(store.settings).toMatchObject({ requested: "med", downgradedFrom: null });
+    expect(node.port.last("tier")).toEqual({ type: "tier", tier: 2 });
   });
 
   it("keeps the context running through a brief hold and suspends only when the hold persists", async () => {
@@ -355,19 +582,6 @@ describe("flight audio lifecycle (synthetic fakes)", () => {
     audio.setTireHeld(false);
     audio.setTireSlipWatts(5_000);
     expect(node.port.last("tire")).toEqual({ type: "tire", watts: 5_000 });
-  });
-
-  it("runs Med only while unvalidated tiers are allowed this session, and never saves that", async () => {
-    const { audio, store } = create({ stored: { requested: "med" } });
-    audio.setEnabled(true);
-    const node = await booted();
-    expect(node.port.last("tier")).toEqual({ type: "tier", tier: 1 });
-    audio.setAllowUnvalidated(true);
-    expect(node.port.last("tier")).toEqual({ type: "tier", tier: 2 });
-    expect(audio.getStatus()).toMatchObject({ effective: "med", allowUnvalidated: true });
-    expect(JSON.stringify(store.settings)).not.toMatch(/unvalidated/i);
-    audio.setAllowUnvalidated(false);
-    expect(node.port.last("tier")).toEqual({ type: "tier", tier: 1 });
   });
 
   it("restores a downgraded request only on an explicit re-test", () => {

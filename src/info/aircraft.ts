@@ -1,5 +1,7 @@
+import type { AircraftFamilyId } from "../flight/aircraft/aircraftIds";
+
 export interface InfoAircraft {
-  id: "cessna-172" | "cirrus-vision-jet";
+  id: AircraftFamilyId;
   label: string;
   summary: string;
   thumbnail: string;
@@ -21,5 +23,13 @@ export const INFO_AIRCRAFT: readonly InfoAircraft[] = [
     thumbnail: "aircraft/thumbnails/cirrus-vision-jet.png",
     developmentNote:
       "G1, G2 and G3 have separate runtime packages. G2+ is currently mapped to the G2 runtime while separate physics/package support is not yet implemented. Choosing a generation does not provide calibrated generation-specific performance, a new cabin or complete generation-specific avionics.",
+  },
+  {
+    id: "f-35b",
+    label: "Lockheed Martin F-35B Lightning II",
+    summary: "STOVL fighter. Experimental flight model and AF267 exterior model.",
+    thumbnail: "aircraft/thumbnails/f-35b.png",
+    developmentNote:
+      "Experimental F-16/Aeromatic-derived JSBSim flight model. F-35B performance and STOVL behavior are not validated.",
   },
 ];

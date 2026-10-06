@@ -1,21 +1,21 @@
-# Implementation handoff: SF50 sound for 0sfs
+# Implementation handoff for SF50 and F-35B sound
 
-Prepared 2026-09-14. Companion specification: [sound.md](sound.md). This handoff assigns implementation work; it does not report that synthesis, device qualification or recording acquisition has been completed.
+Prepared 2026-09-14; High scope revised 2026-10-05. Companion specifications: [sound.md](sound.md) and [High aircraft sound](proposals/high-aircraft-sound.md). This handoff assigns implementation work; delivered checks are recorded in the [implementation ledger](validation/audio-implementation-ledger.md).
 
 ## Assignment and delivery scope
 
-Implement the selectable SF50 sound system described in **sound.md** in `/Users/felg/gh/0sfs`. Deliver application integration, original C++/WASM DSP, build tooling, meaningful tests, benchmark tooling and honest validation records. The specification is authoritative for tier budgets, acoustic assumptions, licensing, transport, fallback and release gates; this handoff supplies repository entry points and execution order. Keep the specification synchronized with evidence-backed implementation changes instead of maintaining conflicting copies of its tables.
+Implement the selectable SF50/FJ33 and F-35B/F135 sound system described in **sound.md** in `/Users/felg/gh/0sfs`. Deliver application integration, original C++/WASM DSP, build tooling, meaningful tests, benchmark tooling and honest validation records. The specification is authoritative for tier budgets, acoustic assumptions, licensing, transport, fallback and release gates; this handoff supplies repository entry points and execution order. Keep the specification synchronized with evidence-backed implementation changes instead of maintaining conflicting copies of its tables.
 
-The first working delivery is **Tier 0 + Tier 1 in the actual flight application**, including the existing tire cue in one shared runtime. Continue to **Tier 2** and the independently implementable **Tier 3 runtime/cache/qualification tooling**. Activate High only after its licensed bank and qualification gates pass. Tier X remains disabled research; implementing/training a neural model is outside this assignment. Do not stop after another design document, a standalone oscillator demo, a JS-only substitute, or a settings panel with no audio integration.
+The existing Off/Low/Med runtime is the baseline. Deliver **procedural High for both engine definitions**, with spectral directionality, independent source components and approximate cockpit treatment. A bank is not required. Explicit High runs with **Not yet validated** until device evidence exists; Auto still requires qualification. Main-nozzle orientation may follow conversion, but crackle and independent LiftFan/impingement sound are later milestones. Optional licensed residuals and Tier X remain separate work. Do not stop after another design document, a standalone oscillator demo, a JS-only substitute, or a settings panel with no audio integration.
 
-Unavailable recording rights or physical devices block the corresponding release gates, not unrelated implementation. Finish the available source, fixture, integration and build work; record precisely which checks remain unverified. Distinguish **implemented**, **software-verified** and **qualified on a named device/profile**. Neither synthetic audio nor an offline timing proxy establishes SF50 realism or real-time physical output.
+Unavailable recording rights block only an optional recorded extension. Unavailable reference measurements or physical devices leave the corresponding qualification gates pending. Finish source, fixture, integration and build work; record precisely which checks remain unverified. Distinguish **implemented**, **software-verified**, **acoustically calibrated** and **qualified on a named device/profile**. Neither synthetic audio nor an offline timing proxy establishes aircraft realism or real-time physical output.
 
 ## Start here
 
 1. Read [AGENTS.md](../AGENTS.md), [sound.md](sound.md), [JSBSim integration](jsbsim.md) and the applicable instructions in any repository you need to modify.
 2. Check repository identity, branch and working-tree changes. At preparation time there are substantial unrelated gamepad/autopilot/UI edits, and both sound documents are untracked. Preserve that work; do not reset, stash, broadly format or stage unrelated changes. Reinspect current files rather than relying on this snapshot's line numbers.
 3. Run `npm run verify:jsbsim`. Preparation verified **@felipegalind0/jsbsim 1.2.4-fork.7**, archive `deps/felipegalind0-jsbsim-1.2.4-fork.7.tgz`, SHA-256 `58afaf9fa575ec61838ba794b7b4a0919b8eaf516c7261e571700e8367b5217b`. This identifies the inspected artifact, not a requirement to undo a later accepted upgrade. Record the actual installed identity in new evidence.
-4. Establish relevant test/build baselines and inspect available Node, compiler and browser tooling. Select and pin the audio compiler with exact version/config/flags and document how to install it. There is no existing audio-WASM build pipeline to assume.
+4. Establish relevant test/build baselines and inspect the existing audio-WASM pipeline, compiler provenance and current tests. Use `npm run build:audio` after DSP edits and retain the generated WASM with its provenance file. Do not replace accepted tooling without a task-related reason.
 5. Create a short execution ledger with task IDs below, current owner, status, evidence path and next action. The implementation agent owns DSP, FDM adapter, Perf tooling and Release bookkeeping unless delegated. Owner roles are not a reason to wait for four people.
 
 ## Ownership and constraints
@@ -26,7 +26,7 @@ Native engine and generic SDK changes belong in `/Users/felg/gh/Felipegalind0/js
 
 Use existing public foss-earth services for scene/camera integration. Add a reusable public hook there only if the application cannot obtain the required state through supported surfaces. No gamepad, phone authority, autopilot, aerodynamics, fuel-map or terrain-quality redesign is needed for audio.
 
-The app is **AGPL-3.0-only**. Write original DSP. No Wwise/FMOD, incompatible code or unlicensed assets. Recordist recordings/demos must not be embedded, redistributed or used for training without specifically negotiated rights. High stays unavailable without cleared assets; X stays flagged with training data unresolved. Follow the precise FlightGear/license distinctions in sound.md rather than inferring permission from a repository's existence.
+The app is **AGPL-3.0-only**. Write original DSP. No Wwise/FMOD, incompatible code or unlicensed assets. Recordist recordings/demos must not be embedded, redistributed or used for training without specifically negotiated rights. Procedural High uses no recordings; any future recorded extension remains gated on its own cleared assets. X stays flagged with training data unresolved. Follow the precise FlightGear/license distinctions in sound.md rather than inferring permission from a repository's existence.
 
 Use terminal/headless verification. [AGENTS.md](../AGENTS.md) currently states: **“Never start a development, preview, watch, or other long-running server unless the user explicitly asks the agent to start it.”** Prefer build-file/request-interception harnesses for checks that can use them. If a remaining check truly needs a server, complete independent work, provide the exact command and explain that this repository instruction requires the user to start or authorize it. A request to test does not itself authorize a server. Do not take over the cursor; verify actual hardware GPU use for integrated performance evidence. Publishing, deployment and messages to others require applicable authorization; they are not implied by this implementation assignment.
 
@@ -85,22 +85,23 @@ Keep requested preference, effective tier, temporary hold/autoplay lock and fail
 | **SND-02 — telemetry/state** | Read finite catalog-checked values after accepted steps; implement epochs, clock mapping, both transports, event queue and smoothing. Establish trusted fueled-start/combustion handling. | Deterministic start/abort/shutdown tests, including fueled Start while `running=false`; batch-lifetime, missing-field, event-overflow, pause/seek and stale-input cases. |
 | **SND-03 — Off/Low vertical slice** | Original turbofan-lite DSP, shared tire cue, cockpit/exterior treatment, compressor/limiter, lifecycle and settings in the real app. | Actual WASM renders finite bounded audio at 44.1/48 kHz; changing N1/N2 and view changes output; mute/holds/disposal work; tire regression behavior preserved; no recorded sample assets. |
 | **SND-04 — qualification/fallback** | Extract the runnable sweep from sound.md into the versioned generator; add full-count, real-time and separate fault runs, result schema and fallback controller. | Reproducible fixture, timing provenance, positive-control dropout detector, forced downgrade/error recovery, honest `n/a`/`unknown` UI and eligibility tests. |
-| **SND-05 — Med** | Add the bounded procedural bank, short generated convolver and exterior propagation specified in sound.md. | Measured or explicitly unverified resource results; correct state carryover, rate independence and transition caps; Med cannot enter normal use without its qualification gate. |
-| **SND-06 — High** | Pooled granular renderer, lazy bank manifest/decode, HTTP/IndexedDB cache and fallback. Use original synthetic fixtures for software tests. | Grain/memory caps, codec/network/quota/eviction failure tests and complete asset manifest schema; synthetic fixtures remain test-only. Enable High only with a cleared bank and real qualification. |
+| **SND-05 — Med** | Add the bounded procedural sources, short generated convolver and exterior propagation specified in sound.md. | Measured or explicitly unverified resource results; correct state carryover, rate independence and transition caps; explicit Med remains available unqualified, while Auto requires its qualification gate. |
+| **SND-06 — High** | Engine-specific procedural components for FJ33 and F135, exhaust direction telemetry, spectral directionality, independent cockpit parameters and actual source-cap enforcement. | Actual-WASM state/direction/spectral checks for both engines at 44.1/48 kHz; profile replacement clears state; engine zero-volume isolation; bounded source/memory counts. Explicit High needs no bank; crackle, acoustic and device qualification remain separate pending gates. |
 | **SND-07 — delivery** | Run relevant regressions/full checks; collect available physical evidence; update sound.md and the implementation/validation ledger. | Per-tier implemented/verified/qualified status, exact commands/artifacts, remaining owner/action blockers and a reviewer-ready change summary. |
 
-Do not wait for an unavailable phone before implementing Med or the High backend. Keep uncertified options gated and finish portable validation. Conversely, do not mark the overall release qualified merely because implementation packages are complete. Half-rate shedding is enabled only after its full resampler-inclusive path saves measured time; experimental GPU/neural paths cannot replace the required WASM core.
+Do not wait for an unavailable phone or recording bank before implementing procedural High. Keep Auto qualification gates and finish portable validation; explicit unqualified choices remain available as specified in sound.md. Do not mark the overall release qualified merely because implementation packages are complete. Half-rate shedding is enabled only after its full resampler-inclusive path saves measured time; experimental GPU/neural paths cannot replace the required WASM core.
 
 ## Decisions that must survive implementation
 
 - **Combustion:** neither starter/cutoff command state nor `running` alone establishes fueled startup. Use the verified adapter/binding path from SND-02. Never write propulsion properties from sound or substitute throttle for measured spools.
-- **Budgets:** sound.md's limits include tires, common effects and transitions. A single mono source feeding two channels is not permission to double oscillator/grain/convolver counts when views change. Bound callback sizes and storage explicitly; no grow/allocate/wait in the render loop.
+- **Budgets:** sound.md's limits include tires, common effects and transitions. Count the tire noise source: Low/Med/High totals are 6/7/9, respectively; Low's filter ceiling is 9. A single mono source feeding two channels is not permission to double oscillator/source/convolver counts when views change. Bound callback sizes and storage explicitly; no grow/allocate/wait in the render loop. Exposed caps must control actual processing, not only diagnostic counts.
 - **Transport:** port is the shipping static-host baseline; SAB is optional after deployed isolation checks. Maintain exclusive buffer ownership and the bounded discrete-event queue. Neither path may silently lose shutdown or spin waiting for physics.
 - **Timing:** implement epoch anchoring, the specified telemetry lag and per-sample smoothing. Account for batched steps, simulation holds, clock drift and accumulated time discarded by the fixed-step loop; sustained skew must resynchronize under a fade rather than leave an ever-growing stale backlog.
 - **Fallback:** repeated over-budget windows shed detail; observed deadline misses/underruns drop a tier immediately. Upgrade lockout never delays another downgrade. Fatal `processorerror` requires a new node or Off, not an attempted recovery within the permanently failed node.
 - **Diagnostics:** timeline counters are not CPU timers; CDP graph load is not DSP p95. Missing measurements are unavailable, not zero. Qualified profiles include device, browser/OS build, rate, output route and transport; no automatic certification from UA strings or an offline kernel benchmark.
-- **Settings:** implement the exact labels/reasons and stats format from sound.md; distinguish unavailable pack, missing capability, failed benchmark, absent validation and autoplay lock. Volume/quality persistence must not override a mute or unexpectedly restore loud sound.
-- **Unsupported aircraft:** scope the turbine mapping to the SF50 family; do not feed C172 RPM into a turbofan preset. Preserve tire-only operation and all existing aircraft startup/reset behavior.
+- **Settings:** implement the labels/reasons and stats format from sound.md; distinguish missing capability, failed benchmark, absent validation and autoplay lock. A missing optional future pack must not block procedural High. Volume/quality persistence must not override a mute or unexpectedly restore loud sound.
+- **Engine evidence:** preserve independent FJ33/F135 parameters. Percent N1/N2 is not blade RPM and F-35B paper ETR is not N1 or normalized throttle. Dry broadband shock-associated noise must not be gated on augmentation. Model source, propagation and receiver separately; preserve evidence-domain limitations in the proposal.
+- **Unsupported aircraft:** admit only declared compatible engine definitions and installations; do not feed C172 RPM into a turbofan preset. Preserve tire-only operation and all existing aircraft startup/reset behavior. The first High increment does not implement independent LiftFan/roll-post/impingement sound.
 
 ## Verification and completion record
 
@@ -110,17 +111,25 @@ Preserve or replace equivalent coverage in [tire audio tests](../src/flight/audi
 
 Focused acceptance includes independent spool changes, combustion before running, standstill/windmilling, two sample rates, phase/filter continuity, grain/IR caps, limiter bounds, no NaNs, both transports, ownership/overflow, resets/model replacement, stale telemetry, origin/camera discontinuities, user-gesture unlock, pause/background/terrain/fault holds, pending initialization cancellation, settings/storage failure, downgrade hysteresis and fatal-node recovery. Compare sonic behavior with metrics/listening rather than asserting cross-platform floating-point byte identity.
 
-Current repository commands, from `0sfs`:
+Current repository checks, from `0sfs`, with every run logged under `build/`:
 
 ```sh
 npm run verify:jsbsim
-npm test -- src/flight/audio src/flight/physics/fixedStepLoop.test.ts src/flight/settings/groundInteractionSettings.test.ts src/flight/jsbsim/sf50.integration.test.ts src/flight/aircraft/createPlaceholderAircraft.test.ts src/flight/createFlightSimApp.test.ts
+npm run build:audio
+npx tsc -b
+npx vitest related --run <changed-files> --maxWorkers=50%
 npm run lint
-npm test
-npm run build
+npm run ci
 ```
 
-Add documented audio build/verification/benchmark commands in SND-01/SND-04; do not claim they already exist. Diagnose unrelated baseline failures and report them separately without changing unrelated work. Full application builds must retain JSBSim artifact checks. Do not run deploy scripts as part of verification.
+Run `build:audio` after DSP edits and the full `ci` once when work is finished;
+use the current package scripts for artifact verification. Do not run another
+suite while another session has one active. Documentation-only edits require
+no typecheck, tests or build. Benchmarks, headless GPU runs and physical-device
+qualification run only when requested. Diagnose unrelated baseline failures
+and report them separately without changing unrelated work. Full application
+builds must retain JSBSim artifact checks. Do not run deploy scripts as part of
+verification.
 
 For each performance report, use the full **sound.md §5** protocol: fixed hashes/fixtures, cold versus cached bytes, resident/peak RAM, warmup and thermal soak, repeated distributions, detector positive control, real output route, integrated physics/rendering and named devices. Record timer resolution, trace method, exclusions and missing metrics. OfflineAudioContext, virtual audio sinks and software-rendered GPU scenes cannot pass the corresponding physical gates. Preserve zero observed dropouts as an evidenced result, not a default field value.
 

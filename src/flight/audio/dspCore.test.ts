@@ -335,7 +335,7 @@ describe("DSP core, running the compiled WASM", () => {
       return { partials: stats.partials, noiseBands: stats.noiseBands, grains: stats.grainCap, starts: stats.grainStarts, irMs: stats.irMs };
     };
     harness.exports.osfs_audio_set_tier(TIER.med);
-    expect(caps()).toEqual({ partials: 12, noiseBands: 5, grains: 0, starts: 0, irMs: 20 });
+    expect(caps()).toEqual({ partials: 12, noiseBands: 6, grains: 0, starts: 0, irMs: 20 });
     harness.exports.osfs_audio_set_limits(TIER.med, 6, 3, 12, 160, 15);
     expect(caps()).toEqual({ partials: 6, noiseBands: 3, grains: 0, starts: 0, irMs: 15 });
     // Shedding works down from the limits: oscillators first, then the impulse response.
@@ -346,12 +346,12 @@ describe("DSP core, running the compiled WASM", () => {
     // A limit above the budget, or below the two fundamentals, is held to them.
     harness.exports.osfs_audio_set_limits(TIER.low, 40, 9, 12, 160, 40);
     harness.exports.osfs_audio_set_tier(TIER.low);
-    expect(caps()).toEqual({ partials: 4, noiseBands: 4, grains: 0, starts: 0, irMs: 0 });
+    expect(caps()).toEqual({ partials: 4, noiseBands: 5, grains: 0, starts: 0, irMs: 0 });
     harness.exports.osfs_audio_set_limits(TIER.low, 0, 0, 0, 0, 0);
     expect(caps()).toMatchObject({ partials: 2, noiseBands: 0 });
     harness.exports.osfs_audio_set_tier(TIER.high);
     harness.exports.osfs_audio_set_limits(TIER.high, 12, 5, 6, 80, 30);
-    expect(caps()).toEqual({ partials: 12, noiseBands: 5, grains: 6, starts: 80, irMs: 30 });
+    expect(caps()).toEqual({ partials: 12, noiseBands: 5, grains: 0, starts: 0, irMs: 30 });
   });
 
   it.each([44_100, 48_000])("shifts the whole source through the propagation delay at Med (%i Hz)", async (sampleRate) => {
@@ -391,8 +391,9 @@ describe("DSP core, running the compiled WASM", () => {
     const switched = run(harness, 0.2, () => engine, harness.frame / harness.sampleRate);
     expect(harness.exports.osfs_audio_get_tier()).toBe(TIER.med);
     expect(switched.left.every(Number.isFinite)).toBe(true);
-    // sound.md §1: fade down, switch, fade up over 50 ms. The first quantum is near silence.
-    expect(peak(switched.left.subarray(0, 128)))
+    // The first quantum preserves the prior signal; the midpoint is faded
+    // down before changing tier rather than jumping immediately to silence.
+    expect(peak(switched.left.subarray(Math.round(0.024 * 48_000), Math.round(0.027 * 48_000))))
       .toBeLessThan(peak(switched.left.subarray(Math.round(0.1 * 48_000))) * 0.2);
   });
 
@@ -454,7 +455,7 @@ describe("DSP core, running the compiled WASM", () => {
     expect(peak(left)).toBeLessThanOrEqual(0.8912509381337456 + 1e-6);
   });
 
-  it("keeps the grain pool inside its caps and reports drops", async () => {
+  it("never mixes legacy test-bank storage into procedural High", async () => {
     const harness = await createDspHarness();
     // ORIGINAL SYNTHETIC FIXTURE. No licensed bank exists; this is filtered
     // noise generated here purely to exercise the pool.
@@ -476,7 +477,8 @@ describe("DSP core, running the compiled WASM", () => {
     }));
     expect(left.every(Number.isFinite)).toBe(true);
     expect(peak(left)).toBeLessThanOrEqual(0.8912509381337456 + 1e-6);
-    expect(harness.stats().activeGrains).toBeLessThanOrEqual(12);
+    expect(harness.stats().activeGrains).toBe(0);
+    expect(harness.stats().grainCap).toBe(0);
 
     harness.exports.osfs_audio_band_clear();
     expect(harness.exports.osfs_audio_bands_ready()).toBe(0);

@@ -1,0 +1,249 @@
+{
+  "schema": 1,
+  "date": "2026-10-05",
+  "kind": "Installed-SDK functional acceptance; not aircraft calibration",
+  "sdkArtifact": {
+    "schemaVersion": 1,
+    "identity": {
+      "schemaVersion": 2,
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.7"
+      },
+      "native": {
+        "origin": "https://github.com/Felipegalind0/jsbsim",
+        "commit": "fea688020fb683c0696aa8339dbed9cdb238a39d",
+        "contentSha256": "688091cc93ad332d8e55ca376393dea3d544a80de0711a4781e10c7e1539ec35",
+        "dirty": false
+      },
+      "sdk": {
+        "commit": "fea688020fb683c0696aa8339dbed9cdb238a39d",
+        "contentSha256": "b5d8ff6d2cc76d2b96c92aef1a3228bf6cfebe5dd8ddc4e571c6b713f3d5a93d",
+        "dirty": false,
+        "path": "wasm"
+      },
+      "build": {
+        "mode": "in-tree",
+        "inputSha256": "733a60a62ef3061dc254f6d4a3c8f3cf7f162a213b444e423e4ac3d6b18553f0",
+        "toolchain": {
+          "node": "v26.8.2",
+          "npm": "11.19.1",
+          "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+          "cmake": "cmake version 4.4.3",
+          "clang": "clang version 24.0.0git",
+          "platform": "darwin",
+          "arch": "arm64",
+          "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+        },
+        "options": {
+          "buildType": "Release",
+          "cxxStandard": 17,
+          "sdkTarget": "es2022"
+        }
+      }
+    },
+    "files": {
+      "index.d.ts": "4021db027f6d90aa0ada9f8581b128dac9cdf97e06e710e91cabd2f156f8e27a",
+      "index.js": "8876d3467c6ebb32a9fe38d42a03fb8e0ee491d6353580347ba47d71af8036f3",
+      "index.js.map": "7bce5725a434ae51f8cb3e9823c956b7c40fba613eb1e3149b9fc9fad3f03029",
+      "licenses/README.txt": "4a7e892a7ea73b245c8e8918e3f7c47af46ea5dc58303b866d8747d2580e8fde",
+      "licenses/jsbsim/AUTHORS": "ca8556894da80f81f773893a9c1009021aac2972d7bb6a39c2f981b4fd00aa9a",
+      "licenses/jsbsim/COPYING": "1e7e6bae5a5bde32f1ae5a7c37a082d1ab03cf89354f7f936ac40be9e39a6531",
+      "licenses/jsbsim/src/GeographicLib/LICENSE.txt": "90d25298be0c5d7f5219ae20009d18910150b3a4ea0ca86dda5df04cfb8d3823",
+      "licenses/jsbsim/src/simgear/xml/COPYING": "8c6b5b6de8fae20b317f4992729abc0e520bfba4c7606cd1e9eeb87418eebdec",
+      "licenses/sdk-LICENSE": "15e2d343fc930439fb82351d7c30f3d151b4c42ca3132c13ff1a60da527a1259",
+      "wasm.d.ts": "b7bbbab6f5e6b0b297dfeff117351e53d4d8598fecde7e805ea9aee7b2923353",
+      "wasm.js": "758d98989301d86ec3aa589fa851d6416b305eca58bb1e6b9579780ea339e09b",
+      "wasm.js.map": "d75a89efd5b3cf07ebfbe70d321f55c01bd8cdde1be50a15d1dcfad21a7ca763",
+      "wasm/jsbsim_wasm.mjs": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+      "wasm/jsbsim_wasm.wasm": "6eae23db0fc26d4e02daa27eb95fba12932265164e4bb194cb3e183d04882806"
+    },
+    "validation": {
+      "status": "passed",
+      "commands": [
+        "tsc --noEmit (frozen SDK workspace)",
+        "node --test test/*.test.mjs (frozen SDK workspace and resolved native fixtures)"
+      ]
+    },
+    "packageArchive": {
+      "path": "deps/felipegalind0-jsbsim-1.2.4-fork.7.tgz",
+      "sha256": "58afaf9fa575ec61838ba794b7b4a0919b8eaf516c7261e571700e8367b5217b",
+      "integrity": "sha512-lYi/DfCul0C9UjITvOzUvYXk862s0WRNTBL4vE7QlJRb++9DiU4nOemAxxIboCZU3aWTGEiVt0I3NF6I3Wnn7g=="
+    }
+  },
+  "finalRun": {
+    "command": "npx vitest run src/flight/jsbsim/f35b.integration.test.ts --maxWorkers=50%",
+    "result": "passed",
+    "files": 1,
+    "tests": 12,
+    "log": "installed-sdk-final-tests.log",
+    "note": "Includes corrected physical-conversion gating on auxiliary military thrust."
+  },
+  "earlierRun": {
+    "command": "npx vitest run src/flight/jsbsim/f35b.integration.test.ts src/flight/jsbsim/bootstrapC172.test.ts src/flight/jsbsim/resetFlightLocation.test.ts --maxWorkers=50%",
+    "result": "passed",
+    "files": 3,
+    "tests": 18,
+    "log": "installed-sdk-baseline-tests.log",
+    "note": "Before final auxiliary retraction correction; full F35 file subsequently rerun."
+  },
+  "configuration": {
+    "startAltitudeMslFt": 5000,
+    "terrainRelocationMeters": 600,
+    "startAirspeedKts": 300,
+    "throttleNorm": 0.48,
+    "pitchDeg": 1.92,
+    "pitchTrimNorm": -0.059,
+    "initialGearDown": false,
+    "initialFuelLb": 5000,
+    "fixedStepSeconds": 0.008333333333333333
+  },
+  "assertions": {
+    "appBootstrapAndRelocation": "60s finite flight with adopted native trim, auto trim both enabled and disabled; max altitude excursion<200m, speed>250kt, absolute roll<0.1rad at one-second samples.",
+    "normalControls": "Positive pilot aileron rolls right, rudder yaws right, elevator pitches down.",
+    "conversion": "2.5s full-stroke rate; lever and intermediate physical position preserved by relocation and snapshot restore.",
+    "convertedFixture": "Zero-speed1000ft, full conversion,98%throttle,zero pitchtrim; native vertical propulsion force>35000lbf, nearzero axialforce, finite state and pitch/roll each<0.1rad for60s; altitude>200m.",
+    "convertedControls": "Positive pilot aileron/rudder/elevator produce expected native roll/yaw/pitch rates.",
+    "fuel": "Auxiliary turbine force surrogates have zero fuel flow; shared main estimate consumes fuel.",
+    "retraction": "Commands conversion0 from full vertical fixture; physical position0.5 at1.25s and0 at2.5s; auxiliary forces and physical nozzle pitch reachzero within1e-8 tolerance."
+  },
+  "runtimeFiles": [
+    {
+      "path": "F-35B-jsbsim.xml",
+      "sourceArchivePath": "F-35B/F-35B-jsbsim.xml",
+      "sourceBytes": 37491,
+      "sourceSha256": "0f1cbe9f4d0232c3cbd36a64f1cfe046af947834a68e6053ddaa3eb7aa389e7d",
+      "bytes": 44403,
+      "sha256": "8d45445cac03d2d7323846e8a8780ded8f88c12bab099f2dbe36b5596e582722",
+      "modified": true,
+      "changes": [
+        "Explicit FlightGear external defaults and model-specific control defaults.",
+        "Development internal fuel2500lb/tank, total5000lb; source capacity/empty mass/CG/inertias/aero unchanged.",
+        "Provisional inspected fan/nozzle force points.",
+        "Fixed-step experimental STOVL FCS allocation, attitude damping, vector nozzle orientation and2.5s actuator.",
+        "Fan-door aerodynamic mixture position and conversion augmentation cap."
+      ]
+    },
+    {
+      "path": "Engines/F135-PW-600.xml",
+      "sourceArchivePath": "F-35B/Engines/F135-PW-600.xml",
+      "sourceBytes": 3615,
+      "sourceSha256": "77e5494173485bc24f8e3754a9ba31dd93f5aebc651285eb477184aff8169c6e",
+      "bytes": 4769,
+      "sha256": "09b7eb9c8c9ea5ca720ae1974f4d1ef5d7fb35e6b8248415c6cfcc307c57891c",
+      "modified": true,
+      "changes": [
+        "Native automatic augmentation in conventional flight.",
+        "Progressive dry-thrust reduction to18klbf full-conversion reference before source bleed.",
+        "Conversion-dependent approximate main fuel accounting for auxiliary power."
+      ]
+    },
+    {
+      "path": "Engines/direct.xml",
+      "sourceArchivePath": "F-35B/Engines/direct.xml",
+      "sourceBytes": 114,
+      "sourceSha256": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc",
+      "bytes": 114,
+      "sha256": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc",
+      "modified": false,
+      "changes": []
+    },
+    {
+      "path": "Engines/liftfan.xml",
+      "sourceArchivePath": "F-35B/Engines/liftfan.xml",
+      "sourceBytes": 2168,
+      "sourceSha256": "926c3ebefdf753f8cf2797b02d662a665a46dbd4257858deff4ce0945ccd46a2",
+      "bytes": 2488,
+      "sha256": "4878bb23bb5e5fb86a76ca4dc68e33b1a1386e25157acaf34c32726fbdb184ea",
+      "modified": true,
+      "changes": [
+        "Zero separate TSFC/idle fuel flow/bleed for force surrogate.",
+        "Idle and military thrust gated by physical conversion to remove closed-inlet force."
+      ]
+    },
+    {
+      "path": "Engines/sidefan.xml",
+      "sourceArchivePath": "F-35B/Engines/sidefan.xml",
+      "sourceBytes": 2236,
+      "sourceSha256": "e0ad665eb77db712e4f106c32009760dcf2a6ecb0cd9aab069562d2a6fdb6122",
+      "bytes": 2556,
+      "sha256": "e811bd3bb7417a349422f57909d268e5b0c56a386b9e58cd2ada74a98c1e5a79",
+      "modified": true,
+      "changes": [
+        "Zero separate TSFC/idle fuel flow/bleed for force surrogate.",
+        "Idle and military thrust gated by physical conversion to remove closed-door force."
+      ]
+    },
+    {
+      "path": "Systems/pushback.xml",
+      "sourceArchivePath": "F-35B/Systems/pushback.xml",
+      "sourceBytes": 1127,
+      "sourceSha256": "868928e9b2b12440daec283260aebb1562d05154f69438f5d95043444378a4bc",
+      "bytes": 1127,
+      "sha256": "868928e9b2b12440daec283260aebb1562d05154f69438f5d95043444378a4bc",
+      "modified": false,
+      "changes": []
+    },
+    {
+      "path": "License.txt",
+      "sourceArchivePath": "F-35B/License.txt",
+      "sourceBytes": 35147,
+      "sourceSha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "bytes": 35147,
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "modified": false,
+      "changes": []
+    }
+  ],
+  "code": [
+    {
+      "path": "src/flight/jsbsim/f35b.integration.test.ts",
+      "bytes": 10208,
+      "sha256": "bb5d9dc0dfb9ce4628f10eb64a49a2b8fd24d67cce77b9881e8b64a58cdab4e8"
+    },
+    {
+      "path": "src/flight/jsbsim/bootstrapC172.ts",
+      "bytes": 5197,
+      "sha256": "8e81b502c15b4523c10fb676dfb050dad19f4a2a133fcc1fc0c53867e2768028"
+    },
+    {
+      "path": "src/flight/jsbsim/resetFlightLocation.ts",
+      "bytes": 6905,
+      "sha256": "d36efe6c2fb9b526a5b200d3d63e8fb7903d56552a1ca2be3041b5c678e6b4e8"
+    },
+    {
+      "path": "src/flight/jsbsim/fdmProfiles.ts",
+      "bytes": 5906,
+      "sha256": "b515d5bbedea977dab2bd53445a7f4f6bf8ff4059bc7ba58e253fd8194919aba"
+    },
+    {
+      "path": "src/flight/physics/safeFlightState.ts",
+      "bytes": 7333,
+      "sha256": "72507ed1f65e0a5a404c7fef9914d87ee8e14bcd84920ebd1188dafd9ac5219d"
+    },
+    {
+      "path": "src/flight/input/applyFlightControls.ts",
+      "bytes": 2045,
+      "sha256": "4b7a41fa764328feb9bcaf30d4744969dcd94a85376a4519119369921bfe83ae"
+    },
+    {
+      "path": "src/flight/input/autoTrim.ts",
+      "bytes": 7112,
+      "sha256": "9b044b4bf578b97017945f6cf567fe2f5df7b819de2b42bb152cfdf5a91de1dd"
+    },
+    {
+      "path": "src/flight/input/flightInputManager.ts",
+      "bytes": 32959,
+      "sha256": "c563f1138878eb9ed08424563d9db974fcf213e24fe00cdc845b8d31f14101e1"
+    }
+  ],
+  "limitations": [
+    "Source trial F16/Aeromatic-derived aerodynamic model remains uncalibrated.",
+    "Force arms use visible model fan/nozzle and an unverified source CG/nose datum assumption.",
+    "Development fuel load is not a published aircraft trim/hover specification.",
+    "Auxiliary turbines and main TSFC correction approximate coupled LiftSystem propulsion; no shaft/clutch/bypass-flow model.",
+    "98% converted throttle fixture climbs; no altitude hold or operational hover procedure established.",
+    "Transition envelope, disturbances, aircraft performance and ground collisions not qualified by these tests."
+  ],
+  "runtimeBase": "public/jsbsim-data/aircraft/F-35B-jsbsim/"
+}

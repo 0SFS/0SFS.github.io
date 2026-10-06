@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-05",
+  "completedAtUtc": "2026-10-06T03:32:43Z",
+  "scope": "Read-only research into F-35B secondary landing-gear retraction motion and the supplied model author's intended animation. No implementation change or test suite was performed for this research.",
+  "conclusion": "Primary B evidence supports forward/upward main-leg retraction at an intermediate pose. The searched primary sources do not establish B wheel-swivel angles, inward translation, strut shortening, or a complete kinematic schedule. Public GeoFS setup supplies a compound model-author pose; it is not proof of the real aircraft mechanism.",
+  "sources": [
+    {
+      "id": "usmc-b-retracting-photo",
+      "kind": "Official photograph",
+      "variant": "F-35B",
+      "publisher": "U.S. Marine Corps / Marine Corps Air Station Yuma / DVIDS",
+      "title": "Simultaneous Launch of Four F-35B Lightning II Aircraft",
+      "url": "https://www.dvidshub.net/image/997094/simultaneous-launch-four-f-35b-lightning-ii-aircraft",
+      "dateTaken": "2013-08-15",
+      "virin": "130815-M-TE786-001",
+      "access": "Official page and previously retained 2000-pixel still inspected.",
+      "retainedImage": "../gear-source-b-retracting.jpg",
+      "sha256": "23f6f2addf4e80a2733e1be02e1da01fbee55359460a5ef5fb9566b03377d5d0",
+      "verified": "Caption explicitly identifies a B retracting its landing gear after takeoff. Visual interpretation: main wheels are forward of their strut attachments and lifting toward the bays at this intermediate pose.",
+      "notVerified": "A single perspective image cannot qualify the complete trajectory, lateral displacement, wheel swivel, oleo shortening, travel limits, or final enclosure.",
+      "rights": "DVIDS declares public domain subject to its published restrictions; credit U.S. Marine Corps photo by Cpl. William Waterstreet."
+    },
+    {
+      "id": "navy-b-conventional-takeoff",
+      "kind": "Official video",
+      "variant": "F-35B",
+      "publisher": "U.S. Navy / DVIDS",
+      "title": "F-35B Lightning II",
+      "url": "https://www.dvidshub.net/video/786600/f-35b-lightning-ii",
+      "dateTaken": "2021-03-05",
+      "virin": "210305-N-AS200-1910",
+      "access": "Official public embed and its publicly playable 1024x576 MP4 inspected without login. Only scratch working copies were made; the complete video is not retained here.",
+      "inspectedMedia": {
+        "durationSeconds": 12.245,
+        "bytes": 2939744,
+        "sha256": "d0ac9af4ffe040ad7dfe3cf0b8288b686be904c17e745c506f5e74f2ab3364bd",
+        "frameTimesSeconds": [0.05, 1.05, 2.05, 3.05, 4.05, 5.05, 6.05, 7.05, 8.05, 9.05, 10.05, 11.05],
+        "method": "Headless Chrome decoded the local video; frames were drawn into a contact sheet. No server or visible browser was used.",
+        "normalChromeExit": { "code": 0, "signal": null }
+      },
+      "verified": "Official caption identifies a Marine Corps B conventional takeoff at NAF El Centro. Extended single-wheel gear is visible around 4-6 seconds.",
+      "notVerified": "Later views are too distant to resolve secondary retraction. This clip supplies no usable wheel-swivel or strut-shortening measurement.",
+      "rights": "DVIDS declares public domain subject to its published restrictions; credit U.S. Navy video by Drew Verbis."
+    },
+    {
+      "id": "lm-b-engineering-investigation",
+      "kind": "Manufacturer engineering report hosted by USMC",
+      "variant": "F-35B, BUNO 169591 / BF-66",
+      "publisher": "Lockheed Martin Flight Safety / Headquarters Marine Corps FOIA",
+      "title": "F-35 Mishap Command Investigation, 18 January 2024, Part 2 of 3, Enclosure 25",
+      "url": "https://www.hqmc.marines.mil/Portals/61/Docs/FOIA/F-35%20Mishap%20CI%20-%2018%20Jan%2024%20Part%202%20of%203.pdf",
+      "locator": "PDF page 55 / engineering report page 103; subsequent report pages 104-107 are redacted.",
+      "access": "Public PDF text read. The full report was not retained in this evidence directory.",
+      "verified": "Identifies B nose/main gear, doors, steering and brakes. Normal landing-gear hydraulic power is system B; emergency extension power is system A.",
+      "notVerified": "The accessible gear description does not disclose the wheel-swivel or strut-shortening mechanism, dimensions or schedule. Redacted pages cannot be used to infer them."
+    },
+    {
+      "id": "lm-stovl-nose-attachments",
+      "kind": "Manufacturer conference presentation, public-release copy on a mirror",
+      "variant": "STOVL / CTOL / CV comparison",
+      "publisher": "Lockheed Martin Aeronautics Company",
+      "title": "Overview of the Full Scale Durability Tests on F-35 Lightning II Program, Marguerite E. Christian, 2012 ASIP Conference",
+      "url": "https://manuals.plus/m/b734bc20fe7d2171b8628fa0401e9845da0ecde9d1bf29e67e0a3f2521f62314.pdf",
+      "locator": "Slide 20, STOVL Nose Landing Gear Retract Actuator Backup",
+      "access": "Public PDF read; cover identifies the OEM author and approved unlimited public release. Full presentation not retained here.",
+      "verified": "The STOVL nose-retract actuator lug configuration differs significantly from the CTOL and CV configurations.",
+      "notVerified": "Different attachment structure does not establish a particular secondary swivel or compression motion. It does not justify transferring an A/C animation to B."
+    }
+  ],
+  "historicalVariantBoundary": {
+    "priorRecord": "../gear-retraction.json",
+    "aReportUrl": "https://www.afjag.af.mil/Portals/77/AIB-Reports/2020/19MAY20%20Eglin%20AFB%20F35A%20AIB%20Report.pdf",
+    "access": "Prior retained research records indexed A-specific forward-retraction text and direct-PDF HTTP403. It was not requalified as B evidence in this follow-up.",
+    "rule": "A forward-retraction description and C-specific shrink mechanisms do not qualify B secondary motions. No B shortening claim is made, and failure to find one is not proof that none exists."
+  },
+  "modelAuthorObservations": {
+    "kind": "Independently summarized public configuration and coordinate-code observations; not copied source",
+    "variantLabel": "F-35B model",
+    "definitionUrl": "https://www.geo-fs.com/models/aircraft/load.php?id=5229",
+    "indexUrl": "https://www.geo-fs.com/geofs.php",
+    "coordinateCodeUrl": "https://www.geo-fs.com/js/geofs.js?kc=3910",
+    "access": "Public unauthenticated responses fetched with neutral User-Agent 0sfs-check/1.0. Base64 definition inspected locally; source copies remain scratch only.",
+    "identity": { "id": "5229", "name": "F-35B Lightning II", "rootModel": "f3-7.glb" },
+    "observedResponseSha256": {
+      "record": "abe59b6e7ae7e7ec72e4cd179235788beb8be81e02e959779bea680b102349c6",
+      "decodedDefinition": "9dd4d6090d803e49f7010230772d6007312be5cf6b69c2f8b305026dcd755c56",
+      "coordinateCode": "1e20e0c091661b01f66db70128c5ccbe6fd2b5bab67130bc17a6a2822396c4a4"
+    },
+    "coordinateInterpretation": "gearPosition is 0 down and 1 up. Part-local rotations execute in listed order relative to authored rest transforms. Root uses model rather than gltf2model and does not enable forceZup. GeoFS's column-major rotation matrices have opposite input-angle sign from conventional right-handed local glTF rotations.",
+    "convertedIntrinsicPoseDegrees": {
+      "leftGear": { "order": "X,Y,Z", "angles": [120, -50, 35] },
+      "rightGear": { "order": "X,Y,Z", "angles": [120, 50, -35] },
+      "noseGear": { "order": "X", "angles": [110] },
+      "leftPiston": { "order": "X", "angles": [-100] },
+      "rightPiston": { "order": "X", "angles": [-100] },
+      "nosePiston": { "order": "X", "angles": [-90] }
+    },
+    "otherMotion": "Main retraction uses a delayed compound leg pose. Nose steering follows yaw/steering. Suspension translations follow contact compression; wheel rotations follow rolling, not retraction. No retraction-driven oleo shortening or separate wheel-swivel schedule was found.",
+    "concealment": "Both whole main-gear nodes are hidden above gearPosition 0.98. The author setup therefore does not qualify physical containment of the final main-leg pose.",
+    "rightsBoundary": {
+      "configuration": "The public definition's comment assigns aircraft-JSON rights to NeoAD. This record contains factual observations only; no source definition is distributed.",
+      "modelAndTextures": "The configuration describes the model/textures as open source. The independently supplied Sketchfab model has a separate CC BY 4.0 source/license record.",
+      "modelSourceUrl": "https://sketchfab.com/3d-models/lockheed-martin-f-35b-lightning-ii-5d54a6af45974ad386ae74d42b33374a",
+      "modelLicenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "qualification": "These are model-author animation observations, not OEM/measured B kinematics. Published GeoFS model revision is not asserted identical to the supplied source asset."
+  },
+  "recommendation": "Evaluate the documented compound author poses and piston articulation against the actual supplied geometry, retaining the deployed pose. Label any resulting animation as a source-informed visual approximation; do not claim calibrated B wheel swivel, inward translation or shortening. Geometry containment and real-mechanism qualification are separate questions.",
+  "unknowns": [
+    "Real B main-wheel swivel axis, angle and sequence, if present.",
+    "Real B main/nose oleo shortening or compression during stow, if present.",
+    "Real B full retraction trajectory, travel limits, timings and lateral wheel displacement.",
+    "Whether remaining containment errors originate in unmodeled articulation, source geometry or model-author approximation."
+  ],
+  "retention": "This research record retains source links and independently summarized findings only. No complete report, video, GeoFS script or reserved aircraft definition is distributed with it. Existing official retraction still remains referenced separately."
+}

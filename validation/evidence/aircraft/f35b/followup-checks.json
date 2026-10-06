@@ -1,0 +1,162 @@
+{
+  "schema": 1,
+  "date": "2026-10-05",
+  "owner": "0sfs",
+  "scope": [
+    "F-35B procedural main-engine sound",
+    "Forward/upward main-gear animation",
+    "Optional VTOL command slider beside THR",
+    "Saved deferred flight-instrument customization TODO"
+  ],
+  "checks": {
+    "typecheck": {
+      "command": "npx tsc -b",
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "lint": {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "logSha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e"
+    },
+    "related": {
+      "command": "npx vitest related --run <changed runtime files> --maxWorkers=50%",
+      "exitCode": 0,
+      "files": 48,
+      "tests": 521,
+      "logSha256": "638bffb915e855be52c3bb4efabc92f28efa214b0f071f6c17cd000c5610f691"
+    },
+    "ci": {
+      "command": "VITEST_MAX_WORKERS=5 npm run ci",
+      "runs": 1,
+      "exitCode": 0,
+      "files": 129,
+      "tests": 1261,
+      "logSha256": "33bd30ad6db8620033926e3b75b4d02a26ff9fd05add4527f0e286e0b5d0928a",
+      "summary": "followup-ci-summary.log"
+    }
+  },
+  "assertions": {
+    "sound": "Actual installed F-35B SDK telemetry produces finite, nonzero main-engine-only Low/Med samples at 44.1/48 kHz in the unchanged shipped DSP; raw telemetry remains native.",
+    "gear": "Actual distributed GLB wheel centers move forward/up across four retraction positions, retaining lateral position, authored hinges, extension restoration and held-frame invariance. The existing nose-wheel forward/up endpoint is also checked; all three gear legs use the forward-folding binding.",
+    "vtol": "Native range control is adjacent to THR only on aircraft with powered-lift capability; it uses the existing saved registry command and shows physical position separately. App checks cover pause, location reset, reload, FDM command writes and no actuator overwrite.",
+    "regression": "Existing C172/SF50 controls and SF50 reference sound remain covered by the full suite.",
+    "artifact": "Built F-35B GLB and six XML files match source assets; audio acceptance hashes match current code, FDM and unchanged DSP."
+  },
+  "gearReference": {
+    "url": "https://www.dvidshub.net/image/997094/simultaneous-launch-four-f-35b-lightning-ii-aircraft",
+    "imageVirin": "130815-M-TE786-001",
+    "date": "2013-08-15",
+    "credit": "U.S. Marine Corps photo by Cpl. William Waterstreet",
+    "interpretation": "Caption identifies F-35B gear retraction after takeoff. Visible main-wheel pose supports forward/upward folding; exact actuator angles, travel, timing and wheel clocking are not established by a still.",
+    "additionalPilotVideo": "https://www.youtube.com/watch?v=vsKwBzt7rDY&t=315s"
+  },
+  "audioEvidence": "f35b-audio-acceptance.json",
+  "deferredTodo": "docs/proposals/flight-settings.md#todo-custom-flight-instruments-and-world-space-cues",
+  "limitations": [
+    "Procedural F135 approximation; no separate lift-fan or afterburner layer and no acoustic/device qualification.",
+    "Gear direction is referenced, but travel limits and wheel clocking remain development assumptions.",
+    "Experimental FDM calibration/hover handling remain as recorded in the aircraft README.",
+    "Ground collision work remains separate."
+  ],
+  "code": [
+    {
+      "path": "src/flight/audio/aircraftAudioProfiles.ts",
+      "bytes": 2657,
+      "sha256": "1fcec2ff9603706376ef48d01d35144da7c19d77ae3083afada5ac1ff5386c8e"
+    },
+    {
+      "path": "src/flight/audio/jsbsimAudioAdapter.ts",
+      "bytes": 12636,
+      "sha256": "1abf897e2bbac32dce2f83f712690d48f8a577def775dee2fa4728a736bcf9f0"
+    },
+    {
+      "path": "src/flight/audio/createFlightAudio.ts",
+      "bytes": 34178,
+      "sha256": "94faaa658bbe6ac5021148c64a90e77ca10d55f43c331fc6e09badce0968cf48"
+    },
+    {
+      "path": "src/flight/audio/f35bAudio.integration.test.ts",
+      "bytes": 7198,
+      "sha256": "eae9f0e62fd7b6bea5bff16871084dae7ed03589a84d2b78ad8909f17b765383"
+    },
+    {
+      "path": "src/flight/audio/createFlightAudio.test.ts",
+      "bytes": 19915,
+      "sha256": "b0e4e858e4aa82d5bd07fd9ae83806584fe430cab70dc7b6a47e3ccbfb62c526"
+    },
+    {
+      "path": "src/flight/hud/SoundSettingsPanel.tsx",
+      "bytes": 8136,
+      "sha256": "67700678eb7aa9c15e1a22242ac227653748c706cd08b62e0d73e2b1d9784bf6"
+    },
+    {
+      "path": "src/flight/hud/SoundSettingsPanel.test.tsx",
+      "bytes": 5156,
+      "sha256": "d92fe1216270789cb6955242ce9bc5e59a043283677d7bc8f373b366f385d8c0"
+    },
+    {
+      "path": "src/flight/hud/flightHud.ts",
+      "bytes": 25051,
+      "sha256": "3da9ded0cf622013fba939e0bce0f86d31390173475962072d6550cd0126a262"
+    },
+    {
+      "path": "src/flight/hud/flightHud.test.ts",
+      "bytes": 14440,
+      "sha256": "57731746e40dc42b3f2f00219e178ff4c49eb6f454f9e2bde033aa1ea1eeeac5"
+    },
+    {
+      "path": "src/flight/hud/FlightControlPanel.tsx",
+      "bytes": 36571,
+      "sha256": "743fd4dc927265d79e8b26e80a73fc0d65fae3e2b8f72340b67b5297e151eb1a"
+    },
+    {
+      "path": "src/flight/createFlightSimApp.ts",
+      "bytes": 95146,
+      "sha256": "850743b4cdbd6afd85761d5ec4f1eef391956c289d04e2629282a184f804a029"
+    },
+    {
+      "path": "src/flight/createFlightSimApp.test.ts",
+      "bytes": 62511,
+      "sha256": "9b970b2e2b6c3a39068c6469031c44db6bc5e63be1889436aad91e352b10f3ce"
+    },
+    {
+      "path": "src/flight/settings/flightParameters.ts",
+      "bytes": 52585,
+      "sha256": "a8352f070665bf031c5edf360dc7202deedcc2b8baa498e7dea7325f8f46e237"
+    },
+    {
+      "path": "src/flight/aircraft/aircraftAnimation.ts",
+      "bytes": 33080,
+      "sha256": "b092ea338e7a84183f90f6c985198931080374abba0d5b4f7a0332874c33ec27"
+    },
+    {
+      "path": "src/flight/aircraft/aircraftAnimation.f35b.test.ts",
+      "bytes": 11372,
+      "sha256": "703b618e5e402716e6b90e0f4fb4d7db5a2b43320d7ee4b190d7303249a4996c"
+    },
+    {
+      "path": "src/styles/flight.css",
+      "bytes": 23038,
+      "sha256": "fa99b797a076fd7806915ba9ef4ea6136ae15ca73dcebf544530acae510cbb94"
+    }
+  ],
+  "assets": [
+    {
+      "path": "public/aircraft/f-35b/F-35B_AF267.glb",
+      "bytes": 1504592,
+      "sha256": "8324d792711a8aecd74988dd9e314b3b4e6f1f3a819591ce60f34caa004d7fbd"
+    },
+    {
+      "path": "src/flight/audio/dsp/audio-dsp.wasm",
+      "bytes": 43478,
+      "sha256": "9cfbc9ce8e02690c63cccbd68d13978a53d48af99ec7bc7fbd3218f473d43924"
+    }
+  ],
+  "gearEvidence": "gear-retraction.json",
+  "finalIntegrity": {
+    "codeHashesMatchCheckedTree": true,
+    "gearPhotoHashVerified": true,
+    "localDocumentationLinksVerified": 45
+  }
+}

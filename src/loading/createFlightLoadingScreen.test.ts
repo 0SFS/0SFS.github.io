@@ -2,7 +2,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createGameLog } from "foss-earth/shell";
-import { createFlightLoadingScreen, type FlightLoadingScreen } from "./createFlightLoadingScreen";
+import { createFlightLoadingScreen, LOADING_LIVE_ATTRIBUTE, type FlightLoadingScreen } from "./createFlightLoadingScreen";
 
 let screen: FlightLoadingScreen;
 const lines = () => [...document.querySelectorAll<HTMLElement>("#app-log .game-log__line")];
@@ -34,6 +34,36 @@ describe("flight loading log", () => {
     expect(root.hasAttribute("inert")).toBe(false);
     expect(root.hasAttribute("aria-busy")).toBe(false);
     expect(log.hidden).toBe(false);
+  });
+
+  it("leaves a live control usable, including one the app builds while loading shows", async () => {
+    const root = document.getElementById("root")!;
+    screen = createFlightLoadingScreen();
+    expect(root.hasAttribute("inert")).toBe(true);
+
+    // The app's HUD arrives during loading, with its pause button marked live.
+    root.insertAdjacentHTML("beforeend", `
+      <div id="app"><canvas id="canvas"></canvas>
+        <div id="bar"><button id="pause" ${LOADING_LIVE_ATTRIBUTE}>Pause</button><button id="settings">Settings</button></div>
+        <div id="panel"><button>Teleport</button></div>
+      </div>`);
+    await Promise.resolve();
+
+    const byId = (id: string) => document.getElementById(id)!;
+    const inert = (element: Element): boolean => element.closest("[inert]") !== null;
+    expect(inert(byId("pause"))).toBe(false);
+    for (const id of ["previous-focus", "canvas", "settings", "panel"]) expect(inert(byId(id))).toBe(true);
+    expect(root.getAttribute("aria-busy")).toBe("true");
+
+    screen.hide();
+    expect(document.querySelector("[inert]")).toBeNull();
+
+    // A teleport holds the app again around the same live control.
+    screen.show({ title: "Preparing your destination", reset: true });
+    expect(inert(byId("pause"))).toBe(false);
+    expect(inert(byId("panel"))).toBe(true);
+    screen.hide();
+    expect(document.querySelector("[inert]")).toBeNull();
   });
 
   it("reports measured progress in place and finishes with the elapsed time", () => {

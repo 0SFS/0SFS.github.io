@@ -165,6 +165,74 @@ describe('phone controller', () => {
     expect(h.clientEndpoint).toHaveBeenCalledTimes(1)
   })
 
+  it('holds the starter on the wire only while the lever is held, and lets go when the phone drops off', async () => {
+    const h = await setup()
+    h.state.engine = { phase: 'OFF', state: 'stopped', start: 0 }
+    await advance(50)
+    // Not flying: holding the lever does nothing.
+    h.client.setStarterHeld(true)
+    await h.fly()
+    await advance(20)
+    expect(h.phoneLink.last('controls').starter).toBeUndefined()
+    expect(h.host.isStarterHeld()).toBe(false)
+    h.client.setStarterHeld(true)
+    await advance(20)
+    expect(h.phoneLink.last('controls').starter).toBe(1)
+    expect(h.host.isStarterHeld()).toBe(true)
+    h.client.setStarterHeld(false)
+    await advance(20)
+    expect(h.phoneLink.last('controls').starter).toBeUndefined()
+    expect(h.host.isStarterHeld()).toBe(false)
+    h.client.setStarterHeld(true)
+    await advance(20)
+    expect(h.host.isStarterHeld()).toBe(true)
+    // Frames stop arriving: the starter goes with them.
+    h.phoneLink.dropNative = true
+    await advance(300)
+    expect(h.host.isStarterHeld()).toBe(false)
+  })
+
+  it('cancels a held starter with the other transient controls', async () => {
+    const h = await setup()
+    await advance(50)
+    await h.fly()
+    h.client.setStarterHeld(true)
+    await advance(20)
+    h.client.cancelTransientControls()
+    await advance(20)
+    expect(h.phoneLink.last('controls').starter).toBeUndefined()
+    expect(h.host.isStarterHeld()).toBe(false)
+  })
+
+  it('asks the host to shut the engine down only when the host says it can', async () => {
+    const shutdownEngine = vi.fn()
+    const h = await setup({}, { shutdownEngine })
+    h.state.engine = { phase: 'RUNNING' }
+    await advance(50)
+    await h.fly()
+    await advance(150)
+    // A host that reports no engine state cannot start or stop it.
+    expect(h.client.shutdownEngine()).toBe(false)
+    h.state.engine = { phase: 'RUNNING', state: 'running', start: 1 }
+    await advance(150)
+    expect(h.client.getSnapshot().status?.engine?.state).toBe('running')
+    expect(h.client.shutdownEngine()).toBe(true)
+    await flush()
+    expect(shutdownEngine).toHaveBeenCalledOnce()
+    expect(h.hostLink.last('ack')).toMatchObject({ ok: true })
+  })
+
+  it('is refused by a host that cannot shut its engine down', async () => {
+    const h = await setup()
+    h.state.engine = { phase: 'RUNNING', state: 'running', start: 1 }
+    await advance(50)
+    await h.fly()
+    await advance(150)
+    expect(h.client.shutdownEngine()).toBe(true)
+    await flush()
+    expect(h.hostLink.last('ack')).toMatchObject({ ok: false, message: 'This simulator cannot shut its engine down.' })
+  })
+
   it('sums camera gestures until a frame carries them, then hands each one over once', async () => {
     const h = await setup()
     await advance(50)

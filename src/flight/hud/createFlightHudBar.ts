@@ -5,6 +5,7 @@ import "foss-earth/input-mode.css";
 import { attachFullscreenButton, attachRendererActivity, createInputModeHud, createHudBar, createMapSourceHud, getRendererLabel, type HudBarHandle, type MapDetailController, type RenderActivitySource, type TileStreamingSource, type MapDownloadSource } from "foss-earth/shell";
 import type { BabylonRuntimeStatus, RendererMode } from "foss-earth/runtime";
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
+import { LOADING_LIVE_ATTRIBUTE } from "../../loading/createFlightLoadingScreen";
 
 export interface FlightHudBarOptions {
   renderActivity: RenderActivitySource & TileStreamingSource & MapDownloadSource;
@@ -62,6 +63,8 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     hudBar.destroy();
     throw new Error("Flight HUD bar failed to mount.");
   }
+  // Pausing works while the world loads too; the flight then starts paused.
+  pauseButton.setAttribute(LOADING_LIVE_ATTRIBUTE, "");
 
   // The World detail rail, then the download speed and basemap as one button,
   // then its credit link, sit at the bar's right end, shared with FOSS Earth.

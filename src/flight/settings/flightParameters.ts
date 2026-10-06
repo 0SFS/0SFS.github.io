@@ -33,36 +33,50 @@ const KNOTS = { id: "kt", text: "kt" } as const;
 
 const MAP_DETAIL = { tab: "map", section: "detail" } as const;
 const MODEL = { tab: "aircraft", section: "model" } as const;
+const MESH_INSPECTOR = { tab: "aircraft", section: "mesh-inspector" } as const;
 const INSTRUMENTS = { tab: "renderer", section: "instruments" } as const;
+const EXHAUST = { tab: "renderer", section: "aircraft-exhaust" } as const;
+const EXTERNAL_TANKS = { tab: "renderer", section: "external-tanks" } as const;
+const FORCES = { tab: "debug", section: "forces" } as const;
+const AIRCRAFT_VISUALS = { tab: "debug", section: "aircraft-visuals" } as const;
 const CAMERA = { tab: "aircraft", section: "camera" } as const;
 const START = { tab: "aircraft", section: "start" } as const;
 const PHONE_CAMERA = { tab: "remote", section: "camera" } as const;
 const SOUND = { tab: "sound", section: "sound" } as const;
 const ENGINE = { tab: "engine", section: "engine" } as const;
 const ASSISTS = { tab: "aircraft", section: "assists" } as const;
+const FLIGHT_CONTROLS = { tab: "aircraft", section: "flight-controls" } as const;
 const GROUND = { tab: "aircraft", section: "ground" } as const;
 const AUTOPILOT = { tab: "autopilot", section: "package" } as const;
 const GAMEPAD = { tab: "controls", section: "gamepad" } as const;
 const KEYBOARD = { tab: "controls", section: "keyboard" } as const;
 const ORBIT = { tab: "controls", section: "orbit" } as const;
 const FEEDBACK = { tab: "controls", section: "feedback" } as const;
+const STOVL = { tab: "controls", section: "stovl" } as const;
 
 /** Section titles for the sections 0sfs adds, by tab and section id. */
 export const FLIGHT_SECTION_TITLES: readonly (readonly [tab: string, section: string, title: string])[] = [
   ["renderer", "instruments", "Instruments"],
+  ["renderer", "aircraft-exhaust", "Aircraft exhaust"],
+  ["renderer", "external-tanks", "Released fuel tanks"],
   ["aircraft", "model", "Aircraft"],
+  ["aircraft", "mesh-inspector", "Mesh inspector"],
   ["aircraft", "camera", "Camera"],
   ["aircraft", "start", "Start"],
   ["remote", "camera", "Phone camera trackpad"],
   ["sound", "sound", "Sound"],
   ["engine", "engine", "Engine"],
   ["aircraft", "assists", "Assists"],
+  ["aircraft", "flight-controls", "Flight controls"],
   ["aircraft", "ground", "Ground handling"],
   ["autopilot", "package", "Autopilot"],
   ["controls", "gamepad", "Gamepad"],
   ["controls", "keyboard", "Keyboard response"],
   ["controls", "feedback", "Feedback"],
+  ["controls", "stovl", "F-35B STOVL"],
   ["debug", "frame-budget", "Frame budget"],
+  ["debug", "forces", "Forces"],
+  ["debug", "aircraft-visuals", "Aircraft visuals"],
 ];
 
 const FAMILY_VARIANTS = AIRCRAFT_FAMILIES.flatMap(family => family.variants);
@@ -86,6 +100,55 @@ const within = (min: number, max: number) => () => ({ min, max });
 const KEYBOARD_STICK_SOURCE = "src/flight/input/keyboardStickResponse.ts";
 
 export const OSFS_PARAMETERS = [
+  {
+    id: "osfs.aircraft.wireframe", label: "Show polygon edges",
+    description: "Draw orange triangle edges over selected parts of the loaded aircraft. Select parts in the mesh tree; deselecting leaves their surfaces visible. Turning this off releases the edge drawing resources.",
+    unit: "none", kind: "boolean", default: false,
+    defaultReason: "Inspecting model geometry is optional; normal flight needs no extra edge draws.",
+    home: main(MESH_INSPECTOR), appliesLive: true, source: "src/flight/createFlightSimApp.ts",
+  },
+  {
+    id: "osfs.debug.renderStowedGear", label: "Render stowed landing gear",
+    description: "Keep enclosed wheels and struts drawable at full retraction to inspect their stowed pose. Bay doors remain visible in either mode.",
+    unit: "none", kind: "boolean", default: false,
+    defaultReason: "Fully enclosed landing gear needs no draw calls during normal flight.",
+    home: main(AIRCRAFT_VISUALS), appliesLive: true, source: "src/flight/aircraft/createAircraftModel.ts",
+  },
+  {
+    id: "osfs.forces.enabled", label: "Show aircraft forces",
+    description: "Draw native force vectors at their observed application points. Off releases the overlay and stops its native reads.",
+    unit: "none", kind: "boolean", default: false,
+    defaultReason: "Force arrows are an optional flight-model diagnostic.",
+    home: main(FORCES), appliesLive: true, source: "src/flight/diagnostics/createForcesDebugOverlay.ts",
+  },
+  {
+    id: "osfs.forces.newtonsPerMeter", label: "Arrow force scale",
+    description: "Force represented by one metre of arrow length. Smaller values magnify forces without changing the simulation.",
+    unit: { id: "N/m", text: "N/m" }, kind: "number", step: 100, bounds: within(100, 200000), default: 20000,
+    defaultReason: "A 200 kN force is ten metres long; lower this for smaller aircraft.",
+    home: main(FORCES), appliesLive: true, source: "src/flight/diagnostics/createForcesDebugOverlay.ts",
+  },
+  {
+    id: "osfs.forces.maxArrowMeters", label: "Maximum arrow length",
+    description: "Caps displayed arrows at this length. Labels retain the actual force and mark capped arrows.",
+    unit: "m", kind: "number", step: 1, bounds: within(1, 100), default: 20,
+    defaultReason: "Keeps diagnostic arrows near the aircraft when a force spikes.",
+    home: main(FORCES), appliesLive: true, source: "src/flight/diagnostics/createForcesDebugOverlay.ts",
+  },
+  {
+    id: "osfs.forces.labels", label: "Force labels",
+    description: "Show each native force's name and magnitude in kilonewtons beside its arrow.",
+    unit: "none", kind: "boolean", default: true,
+    defaultReason: "Names distinguish the lift fan, roll posts and aerodynamic components.",
+    home: main(FORCES), appliesLive: true, source: "src/flight/diagnostics/createForcesDebugOverlay.ts",
+  },
+  {
+    id: "osfs.forces.labelRefreshHz", label: "Force label refresh",
+    description: "Maximum label texture updates per simulation second. Arrows still follow the latest accepted native forces each frame.",
+    unit: "Hz", kind: "number", step: 1, bounds: within(1, 20), default: 5,
+    defaultReason: "Readable numbers with bounded text and texture upload work; paused native time holds their values.",
+    home: main(FORCES), appliesLive: true, source: "src/flight/diagnostics/createForcesDebugOverlay.ts",
+  },
   // Aircraft: which aircraft flies, and which of its models is drawn.
   {
     id: "osfs.aircraft.id",
@@ -185,6 +248,125 @@ export const OSFS_PARAMETERS = [
     session: true,
   },
 
+  {
+    id: "osfs.externalTanks.debrisLifetimeSeconds",
+    label: "Released tank lifetime",
+    description: "How long a jettisoned fuel tank remains visible, in simulated seconds. Zero hides it as soon as it is released.",
+    unit: "s", kind: "number", step: 0.1, bounds: within(0, 120), default: 15,
+    defaultReason: "Fifteen seconds shows the separation while bounding the time spent updating falling tanks.",
+    home: main(EXTERNAL_TANKS), appliesLive: true, source: "src/flight/aircraft/createExternalTankVisuals.ts",
+  },
+  {
+    id: "osfs.externalTanks.maxDetachedTanks",
+    label: "Released tank limit",
+    description: "Maximum released fuel tanks kept visible at once. Zero hides released tanks; installed tanks still appear on the aircraft.",
+    unit: { id: "tanks", text: "tanks" }, kind: "number", step: 1, bounds: within(0, 2), default: 2,
+    defaultReason: "One released tank per station shows both separations and bounds retained geometry and update work.",
+    home: main(EXTERNAL_TANKS), appliesLive: true, source: "src/flight/aircraft/createExternalTankVisuals.ts",
+  },
+
+  // Renderer → Aircraft exhaust. Shared across engines with an optical profile.
+  {
+    id: "osfs.exhaust.enabled",
+    label: "Aircraft exhaust",
+    description: "Draw hot exhaust and afterburner on aircraft with an exhaust profile. Turning this off releases its rendering resources.",
+    unit: "none",
+    kind: "boolean",
+    default: true,
+    defaultReason: "Show the configured engine's visual state alongside its moving nozzle.",
+    home: main(EXHAUST),
+    appliesLive: true,
+    source: "src/flight/aircraft/createEngineExhaust.ts",
+  },
+  {
+    id: "osfs.exhaust.sampleCount",
+    label: "Exhaust samples",
+    description: "Samples through each visible exhaust pixel. More samples improve the volume's smoothness and use more GPU time.",
+    unit: { id: "samples/pixel", text: "samples/pixel" },
+    kind: "number",
+    step: 1, bounds: within(4, 32),
+    default: 8,
+    defaultReason: "A short bounded lookup loop for a small plume; increase only if visible steps need smoothing.",
+    home: main(EXHAUST),
+    appliesLive: true,
+    source: "src/flight/aircraft/createEngineExhaust.ts",
+  },
+  {
+    id: "osfs.exhaust.maxDistanceMeters",
+    label: "Exhaust draw distance",
+    description: "Stop drawing exhaust farther than this distance from the viewing camera.",
+    unit: "m",
+    kind: "number",
+    step: 1, bounds: within(1, 20000),
+    default: 2000,
+    defaultReason: "Avoid shading a tiny plume at long range while retaining exterior chase and flyby views.",
+    home: main(EXHAUST),
+    appliesLive: true,
+    source: "src/flight/aircraft/createEngineExhaust.ts",
+  },
+  {
+    id: "osfs.exhaust.intensity",
+    label: "Exhaust brightness",
+    description: "Visual emission gain for the approximate optical profile. This changes neither engine power nor afterburner engagement.",
+    unit: "ratio",
+    kind: "number",
+    step: 0.01, bounds: within(0, 8),
+    default: 1,
+    defaultReason: "Use the profile's reference display brightness; the F135 profile is not radiometrically calibrated.",
+    home: main(EXHAUST),
+    appliesLive: true,
+    source: "src/flight/aircraft/createEngineExhaust.ts",
+  },
+  {
+    id: "osfs.exhaust.smoke.enabled",
+    label: "Exhaust smoke",
+    description: "Draws sparse smoke sprites for engines with a smoke profile; off releases the particle resources.",
+    unit: "none", kind: "boolean", default: true,
+    defaultReason: "A faint short trail complements the nozzle glow; appearance is an approximation, not a soot-emissions measurement.",
+    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineSmoke.ts",
+  },
+  {
+    id: "osfs.exhaust.smoke.maxParticles",
+    label: "Smoke particle budget",
+    description: "Maximum live smoke sprites per configured engine. This bounds geometry, history memory and particle update work.",
+    unit: { id: "particles/engine", text: "particles/engine" }, kind: "number", step: 1,
+    bounds: within(0, 512), default: 64,
+    defaultReason: "A small fixed pool leaves room for short trails without an unbounded particle history.",
+    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineSmoke.ts",
+  },
+  {
+    id: "osfs.exhaust.smoke.emissionPerSecond",
+    label: "Smoke emission",
+    description: "Maximum emitted smoke sprites each simulated second per running configured engine.",
+    unit: "per-s", kind: "number", step: 0.1, bounds: within(0, 128), default: 8,
+    defaultReason: "Sparse emission keeps translucent overlap small at the default short lifetime.",
+    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineSmoke.ts",
+  },
+  {
+    id: "osfs.exhaust.smoke.lifetimeSeconds",
+    label: "Smoke lifetime",
+    description: "How long a smoke sprite remains in the world before returning to the fixed pool, in simulated seconds.",
+    unit: "s", kind: "number", step: 0.1, bounds: within(0.1, 10), default: 2,
+    defaultReason: "A short trail limits translucent screen coverage and keeps the main exhaust readable.",
+    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineSmoke.ts",
+  },
+  {
+    id: "osfs.exhaust.smoke.maxDistanceMeters",
+    label: "Smoke draw distance",
+    description: "Maximum camera distance at which engine smoke is emitted and drawn, in metres.",
+    unit: "m", kind: "number", step: 1, bounds: within(1, 20_000), default: 1_000,
+    defaultReason: "The sparse default smoke is intended for nearby aircraft views.",
+    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineSmoke.ts",
+  },
+  {
+    id: "osfs.exhaust.smoke.opacity",
+    label: "Smoke opacity",
+    description: "Peak per-sprite opacity before the engine profile and lifetime fade. Higher values make overlapping sprites more apparent.",
+    unit: "ratio", kind: "number", step: 0.001, bounds: within(0, 1), default: 0.025,
+    defaultReason: "Modern jet exhaust is not a dense rocket smoke trail; this is a restrained visual approximation.",
+    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineSmoke.ts",
+  },
+
   // Renderer → Instruments.
   {
     id: "osfs.renderer.attitudeIndicator",
@@ -202,6 +384,22 @@ export const OSFS_PARAMETERS = [
     home: main(INSTRUMENTS),
     appliesLive: true,
     source: "src/flight/hud/attitudeRenderer.ts",
+  },
+
+  {
+    id: "osfs.renderer.engineOrbs",
+    label: "Engine shaft indicators",
+    description: "The graphics API used for the rotating shaft dots; numeric engine readings remain visible when off.",
+    unit: "none", kind: "choice",
+    choices: [
+      { id: "auto", label: "Auto", description: "Shared WebGPU device, then WebGL2, then WebGL1." },
+      { id: "webgpu", label: "WebGPU", description: "Uses the shared device where available, with WebGL fallback." },
+      { id: "webgl2", label: "WebGL2", description: "Uses WebGL2, falling back to WebGL1." },
+      { id: "webgl1", label: "WebGL1", description: "Uses the basic WebGL backend." },
+      { id: "off", label: "Off", description: "Static engine readings without an orb rendering context." },
+    ],
+    default: "auto", defaultReason: "Reuses the globe's GPU device when available.",
+    home: main(INSTRUMENTS), appliesLive: true, source: "src/flight/hud/engineSpoolRenderer.ts",
   },
 
   // Aircraft → Camera.
@@ -286,6 +484,20 @@ export const OSFS_PARAMETERS = [
     bounds: within(2, 5_000),
     default: { min: 8, max: 500 },
     defaultReason: "The original limits.",
+    home: all(CAMERA),
+    appliesLive: true,
+    source: "src/flight/aircraft/createPlaceholderAircraft.ts",
+  },
+  {
+    id: "osfs.camera.nearClipMeters",
+    label: "Camera near clip",
+    description: "The closest distance either flight camera draws. A small distance keeps the F-35B cockpit panel visible; larger distances reduce depth precision artifacts in distant scenery.",
+    unit: "m",
+    kind: "number",
+    step: 0.01,
+    bounds: within(0.01, 2),
+    default: 0.05,
+    defaultReason: "Five centimetres keeps nearby cockpit geometry visible.",
     home: all(CAMERA),
     appliesLive: true,
     source: "src/flight/aircraft/createPlaceholderAircraft.ts",
@@ -530,8 +742,46 @@ export const OSFS_PARAMETERS = [
     appliesLive: false,
     source: "src/flight/jsbsim/bootstrapC172.ts",
   },
+  {
+    id: "osfs.start.resume",
+    label: "Resume last flight",
+    description: "A new session carries on from the last saved flight: its place, attitude, speed, controls, fuel and pause. Off, or when the page address gives a start position, flights start at the start position.",
+    unit: "none",
+    kind: "boolean",
+    default: true,
+    defaultReason: "Reloading the page or changing aircraft should not undo the flight in progress.",
+    home: main(START),
+    appliesLive: false,
+    source: "src/flight/jsbsim/savedFlight.ts",
+  },
+  {
+    id: "osfs.start.saveInterval",
+    label: "Save the flight every",
+    description: "How often the flight in progress is saved for the next session while it runs. Pausing, and leaving or hiding the page, save it too.",
+    unit: "s",
+    kind: "number",
+    step: 1,
+    bounds: within(1, 600),
+    default: 5,
+    defaultReason: "A browser that crashes loses at most 5 s of flight, for one write of about 2 KB to browser storage each time.",
+    home: all(START),
+    appliesLive: true,
+    source: "src/flight/createFlightSimApp.ts",
+  },
 
   // Aircraft → Assists.
+  {
+    id: "osfs.assist.autoFlaps",
+    label: "Auto flaps",
+    description: "Uses the aircraft's automatic flap controls, or a speed-based pilot assist where none is fitted. Moving a flap control takes over manually.",
+    unit: "none",
+    kind: "boolean",
+    default: true,
+    defaultReason: "Automatic flaps on every aircraft by default; the HUD Auto button edits this same setting.",
+    home: main(ASSISTS),
+    appliesLive: true,
+    source: "src/flight/input/autoFlaps.ts",
+  },
   {
     id: "osfs.assist.autoTrim",
     label: "Auto pitch trim",
@@ -734,18 +984,36 @@ export const OSFS_PARAMETERS = [
       { id: "off", label: "Off" },
       { id: "low", label: "Low", description: "Procedural, light." },
       { id: "med", label: "Med", description: "Procedural, with a cabin impulse response." },
-      { id: "high", label: "High", description: "Hybrid granular, with recorded grains." },
+      { id: "high", label: "High", description: "Procedural engine spectra and directionality; acoustic calibration pending." },
       { id: "auto", label: "Auto" },
     ],
-    default: "auto",
-    defaultReason: "No tier is qualified on a device yet, so the program starts at the cheapest and waits for evidence.",
+    default: "med",
+    defaultReason: "Med, for now: the owner flew with it and chose it. No tier is qualified on a device yet, so Auto still stays at Low.",
     home: main(SOUND),
     appliesLive: true,
     source: "src/flight/audio/audioQuality.ts",
   },
-  soundVolume("masterVolume", "Master volume", "Scales every flight sound.", 0.7),
-  soundVolume("engineVolume", "Engine volume", "Scales the engine, independently of the airframe.", 0.8),
+  soundVolume("masterVolume", "Master volume", "Scales the flight sound mix up to eight times the previous master maximum, before output limiting.", 2,
+    "Twice the previous master maximum, chosen by the pilot after testing all volume sliders at maximum.", 8),
+  soundVolume("engineVolume", "Engine volume", "Scales the engine and its afterburner sound, independently of the airframe, up to eight times its original level.", 0.8,
+    "The original level is preserved; extra headroom is available for a quiet engine.", 8),
+  soundVolume("afterburnerVolume", "Afterburner volume", "Scales the extra afterburner roar; one keeps its original level. Native afterburner spectrum and thrust response remain.", 0.5,
+    "Half the previous added afterburner contribution after pilot feedback that it was too loud."),
   soundVolume("airframeVolume", "Airframe volume", "Scales wind and gear and flap turbulence, independently of the engine.", 0.6),
+  {
+    id: "osfs.sound.listenerCockpitBlend",
+    label: "Sound position",
+    description: "Blends the acoustic viewpoint from Camera (0) to Cockpit (1), including listener position, motion and cabin/exterior treatment. Intermediate viewpoints are artistic.",
+    unit: "fraction",
+    kind: "number",
+    step: 0.01,
+    bounds: within(0, 1),
+    default: 1,
+    defaultReason: "Cockpit sound stays at the pilot even when the visual camera moves outside the aircraft.",
+    home: main(SOUND),
+    appliesLive: true,
+    source: "src/flight/audio/audioPose.ts",
+  },
   {
     id: "osfs.sound.engineMuted",
     label: "Mute engine",
@@ -795,14 +1063,12 @@ export const OSFS_PARAMETERS = [
   // sound.md §1; these can only lower them, and shedding under load works
   // down from here.
   soundLimit("low", "partials", "Low: engine oscillators", "How many engine partials Low synthesises; the N1 and N2 fundamentals come first.", "count", 2, 4, 1),
-  soundLimit("low", "noiseBands", "Low: noise sources", "How many engine and airframe noise bands Low synthesises.", "count", 0, 4, 1),
+  soundLimit("low", "noiseBands", "Low: noise sources", "How many engine and airframe noise bands Low synthesises, excluding the separate tire source.", "count", 0, 5, 1),
   soundLimit("med", "partials", "Med: engine oscillators", "How many engine partials Med synthesises; the N1 and N2 fundamentals come first.", "count", 2, 12, 1),
-  soundLimit("med", "noiseBands", "Med: noise sources", "How many engine and airframe noise bands Med synthesises.", "count", 0, 5, 1),
+  soundLimit("med", "noiseBands", "Med: noise sources", "How many engine and airframe noise bands Med synthesises, excluding the separate tire source.", "count", 0, 6, 1),
   soundLimit("med", "irMs", "Med: cabin impulse response", "The length of the cabin and airframe colouring Med convolves with.", "ms", 0, 20, 1),
   soundLimit("high", "partials", "High: engine oscillators", "How many engine partials High synthesises; the N1 and N2 fundamentals come first.", "count", 2, 12, 1),
-  soundLimit("high", "noiseBands", "High: noise sources", "How many engine and airframe noise bands High synthesises.", "count", 0, 5, 1),
-  soundLimit("high", "grains", "High: grains", "How many recorded grains High plays at once.", "count", 0, 12, 1),
-  soundLimit("high", "grainStarts", "High: grain starts", "How many grains High starts per second at most.", "per-s", 0, 160, 5),
+  soundLimit("high", "noiseBands", "High: noise sources", "How many engine and airframe noise bands High synthesises, excluding the separate tire source.", "count", 0, 8, 1),
   soundLimit("high", "irMs", "High: cabin impulse response", "The length of the cabin and airframe colouring High convolves with.", "ms", 0, 40, 1),
 
   // Engine.
@@ -821,6 +1087,28 @@ export const OSFS_PARAMETERS = [
     home: main(ENGINE),
     appliesLive: true,
     source: "src/flight/hud/engineMonitor.ts",
+  },
+
+  {
+    id: "osfs.engineMonitor.orbFps", label: "Shaft animation frame rate",
+    description: "Maximum draws per second for the shaft dots. Zero disables their renderer. Hidden, paused and unchanged indicators do not draw.",
+    unit: { id: "frames/s", text: "frames/s" }, kind: "number", step: 1, bounds: within(0, 60), default: 30,
+    defaultReason: "Thirty updates per second keeps slow visual rotation readable at a bounded draw rate.",
+    home: main(ENGINE), appliesLive: true, source: "src/flight/hud/engineSpoolRenderer.ts",
+  },
+  {
+    id: "osfs.engineMonitor.orbTurnsPerSecond", label: "Maximum displayed shaft speed",
+    description: "Requested visual revolutions per simulated second at maximum modeled speed. Dense blade rows are slowed further to allow at least four configured frames per blade pitch; the Engine tab shows the effective limit. This is a slowed speed cue, not real turbine RPM.",
+    unit: { id: "rev/s", text: "rev/s" }, kind: "number", step: 0.05, bounds: within(0, 4), default: 2,
+    defaultReason: "Two revolutions per second is readable for a propeller; blade-dense turbine rows share a slower limit derived from their count and the selected frame rate.",
+    home: main(ENGINE), appliesLive: true, source: "src/flight/hud/engineSpoolMotion.ts",
+  },
+  {
+    id: "osfs.engineMonitor.orbPixelRatio", label: "Shaft indicator resolution",
+    description: "Maximum drawing pixels per CSS pixel for the shaft dots, capped by the display's pixel density. More pixels increase GPU work and memory.",
+    unit: { id: "px/CSSpx", text: "px/CSSpx" }, kind: "number", step: 0.1, bounds: within(1, 3), default: 2,
+    defaultReason: "A two-times density cap keeps the small dots clear with a small drawing surface.",
+    home: main(ENGINE), appliesLive: true, source: "src/flight/hud/engineSpoolRenderer.ts",
   },
 
   // Aircraft → Ground handling: requests; what runs is resolved against what
@@ -851,6 +1139,39 @@ export const OSFS_PARAMETERS = [
   groundLevel("tireAudioVolume", "Tire audio volume", "Scales the tyre sounds.", DEFAULT_GROUND_INTERACTION_SETTINGS.tireAudioVolume),
   groundLevel("hapticStrength", "Haptic strength", "Scales every ground vibration.", DEFAULT_GROUND_INTERACTION_SETTINGS.hapticStrength),
   ...GROUND_LOCKABLE_KEYS.map(groundLock),
+
+  {
+    id: "osfs.aircraft.stovlConversion",
+    label: "STOVL conversion",
+    description: "F-35B only: 0% is conventional flight; 100% opens the lift fan and turns the rear nozzle downward. Conversion takes time. Throttle controls lift; the stick and rudder control attitude. Experimental flight model.",
+    unit: "fraction",
+    kind: "number",
+    step: 0.01,
+    bounds: within(0, 1),
+    default: 0,
+    defaultReason: "Start in conventional flight with the lift fan closed.",
+    home: all(STOVL),
+    appliesLive: true,
+    source: "src/flight/input/applyFlightControls.ts",
+  },
+
+  {
+    id: "osfs.aircraft.controlLaw",
+    label: "Aircraft control law",
+    description: "Auto uses the aircraft's default law. Manual sends stick, rudder and trim through the actuators without aircraft stabilization. Fly-by-wire enables the aircraft's native stabilization. Available on the F-35B; autopilot and input assists have their own settings.",
+    unit: "none",
+    kind: "choice",
+    choices: [
+      { id: "auto", label: "Auto" },
+      { id: "manual", label: "Manual" },
+      { id: "fly-by-wire", label: "Fly-by-wire" },
+    ],
+    default: "auto",
+    defaultReason: "Use each aircraft's standard control law; the F-35B defaults to fly-by-wire.",
+    home: main(FLIGHT_CONTROLS),
+    appliesLive: true,
+    source: "src/flight/input/applyFlightControls.ts",
+  },
 
   // Controls → Gamepad.
   {
@@ -1166,7 +1487,8 @@ function soundLimit<Tier extends string, Field extends string>(
   };
 }
 
-function soundVolume<Field extends string>(field: Field, label: string, description: string, value: number) {
+function soundVolume<Field extends string>(field: Field, label: string, description: string, value: number,
+  defaultReason = "The original level.", maximum = 1) {
   return {
     id: `osfs.sound.${field}` as const,
     label,
@@ -1174,9 +1496,9 @@ function soundVolume<Field extends string>(field: Field, label: string, descript
     unit: "fraction" as const,
     kind: "number" as const,
     step: 0.05,
-    bounds: within(0, 1),
+    bounds: within(0, maximum),
     default: value,
-    defaultReason: "The original level.",
+    defaultReason,
     home: main(SOUND),
     appliesLive: true,
     source: "src/flight/audio/createFlightAudio.ts",

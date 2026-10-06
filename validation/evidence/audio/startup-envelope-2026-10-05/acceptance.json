@@ -1,0 +1,135 @@
+{
+  "schema": "0sfs-audio-startup-envelope/1",
+  "date": "2026-10-05",
+  "owner": "0sfs",
+  "scope": "Untimed software/DSP and native-JSBSim checks. No physical route, listening, acoustic or performance qualification.",
+  "dspCommit": "5ad00228",
+  "dspBytes": 50902,
+  "dspSha256": "0aea1d9488f7208a8d8aa28ab1e8ed9d6f741787f4b1242cbca92ac87bbc91a1",
+  "nativeArtifact": {
+    "version": "1.2.4-fork.11",
+    "file": "deps/felipegalind0-jsbsim-1.2.4-fork.11.tgz",
+    "sha256": "1add69a5e13980af743a788f1e8f8856338ffd01b80e95a8dbaa23f7df0dd71a"
+  },
+  "cause": "The fan wake switched to full idle base gain whenever N1 exceeded 0.01 percent; the fan tone also had a nonzero base. F135 N1 turns with N2 during native starter motoring. Combustion was false and not the source of the early static.",
+  "change": "Below the profile idle N1, fan tones receive r=clamp01(N1/idleN1), wake receives r^2. Existing N2^2 gain and native fuel/running combustion decision remain. At or above idle these added multipliers equal one. No new sources, filters, memory or setup ABI fields.",
+  "acceptance": [
+    "At N1=N2=0.1 percent, standalone engine output peak is below 1e-4 in both aircraft and all three audible tiers.",
+    "Across each low-speed decade (0.01, 0.1, 1 percent) wake amplitude falls by more than 50x; no constant floor remains.",
+    "F135 pre-lightoff core whine follows 5/10/14 percent N2 at 190/380/532 Hz, 44.1/48 kHz, all tiers; tone RMS exceeds separated wake by at least 4x.",
+    "A real cold native F135 start has zero fuel/thrust and combustion false at initial N2 below 0.1 percent and at 10 percent motoring, then fueled combustion before running. Captured initial rotation, motoring, first-lightoff and running states replay through all three tiers.",
+    "Eight legacy SF50 Low/Med reference fixtures are bit-identical in both channels over the settled 0.4-0.8 second window; retained whole-output changes are restricted to initial sub-idle smoothing and downstream filter tails."
+  ],
+  "checks": [
+    {
+      "command": "npx vitest run src/flight/audio/startupAudio.test.ts --maxWorkers=50%",
+      "status": "expected regression failures on old DSP",
+      "passed": 3,
+      "failed": 5,
+      "log": "startup-before.log"
+    },
+    {
+      "command": "TMPDIR=<repository scratch>/tmp EM_FROZEN_CACHE=1 npm run build:audio",
+      "status": "passed",
+      "log": "build-audio.log"
+    },
+    {
+      "command": "npx vitest run src/flight/audio/startupAudio.test.ts src/flight/audio/acousticProfiles.test.ts --maxWorkers=50%",
+      "status": "startup behavior passed; old full-transient golden intentionally changed and then audited",
+      "passed": 19,
+      "failed": 1,
+      "log": "startup-after.log"
+    },
+    {
+      "command": "npx vitest related --run src/flight/audio/startupAudio.test.ts src/flight/audio/f35bAudio.integration.test.ts src/flight/audio/acousticProfiles.test.ts src/flight/audio/jsbsimAudioAdapter.ts src/flight/audio/dspCore.test.ts src/flight/audio/highAudio.test.ts src/flight/audio/dspProcessor.test.ts --maxWorkers=50%",
+      "status": "audio checks passed; concurrent HUD change left one phone-status exact-object fixture pending in parent work",
+      "passed": 220,
+      "failed": 1,
+      "files": 15,
+      "log": "related-audio.log"
+    },
+    {
+      "command": "npx vitest run src/flight/audio/f35bAudio.integration.test.ts src/flight/audio/startupAudio.test.ts src/flight/audio/acousticProfiles.test.ts --maxWorkers=50%",
+      "status": "passed",
+      "passed": 31,
+      "failed": 0,
+      "files": 3,
+      "log": "startup-final.log"
+    },
+    {
+      "command": "node scripts/verify-audio-artifact.mjs",
+      "status": "passed",
+      "log": "verify-audio.log"
+    }
+  ],
+  "remainingCombinedChecks": "Complete: incremental checks, 81 files / 953 related tests, final phone and catalog-fixture checks, and final once-only CI 160 files / 1658 tests passed. See combinedAcceptance.",
+  "sources": [
+    {
+      "file": "src/flight/audio/dsp/turbofan.h",
+      "sha256": "3557fe55749103329c9d5e89feb1f2fecf4af24e72052be3a24c8994d6e720c7"
+    },
+    {
+      "file": "src/flight/audio/dsp/audio-dsp.wasm",
+      "sha256": "0aea1d9488f7208a8d8aa28ab1e8ed9d6f741787f4b1242cbca92ac87bbc91a1"
+    },
+    {
+      "file": "src/flight/audio/dsp/audio-dsp.provenance.json",
+      "sha256": "38f1534f89b3e81a0ad278d038a8be8d7b368c2370db2e583f542849d446d9e6"
+    },
+    {
+      "file": "src/flight/audio/startupAudio.test.ts",
+      "sha256": "f93bc5c82c33d31152468f045d4b80b49653b6f2c79092f6677c12a4917508f8"
+    },
+    {
+      "file": "src/flight/audio/f35bAudio.integration.test.ts",
+      "sha256": "29756e8055107c8738da6a5075de6638884c71d2bedaf575ebf8051c0b24bbdc"
+    },
+    {
+      "file": "src/flight/audio/acousticProfiles.test.ts",
+      "sha256": "633cd58d5b7fd5a71a607e75fafc2b9a2fccbca6e9f6822e96e2324f4b22d0b7"
+    },
+    {
+      "file": "src/flight/audio/jsbsimAudioAdapter.ts",
+      "sha256": "772c866253b4a11438a9a13c5a3b40212b7d6b3b39183d9b8810d68972060b2d"
+    },
+    {
+      "file": "src/flight/audio/engineAcousticDefinitions.ts",
+      "sha256": "356f5b3824aeb4eb1435b4d55b6b3b63c860bb3c70d10f9f792f0ef2cee0003a"
+    }
+  ],
+  "evidence": [
+    {
+      "file": "startup-before.log",
+      "sha256": "6bec25080f06e05eb0973ab788c0afbe9ec04e00f3bb4659a920bba7d7afe13c"
+    },
+    {
+      "file": "startup-after.log",
+      "sha256": "ce256f127ad6787ca333190b9d4d0e535ebb8771254fd069f2705f3121f97c65"
+    },
+    {
+      "file": "native-startup.log",
+      "sha256": "886eebd04a9bf59c192ea619614234a85d6c846274680565e1498e9071511850"
+    },
+    {
+      "file": "startup-final.log",
+      "sha256": "44499a7a8675400b76fc8b6de2e3b6c22be0b08b7a29389c43ec1ee089584bc0"
+    },
+    {
+      "file": "related-audio.log",
+      "sha256": "eef085df5f05ef86c2c888c030cb4bb5ac1a0c6302a78dd0b09d5f637b7cf5b8"
+    },
+    {
+      "file": "build-audio.log",
+      "sha256": "be436238c82e5b4b5fc7e76c3381481b003c74c6b49dc8141a4446afff6cfbac"
+    },
+    {
+      "file": "sf50-reference.json",
+      "sha256": "617911fd03ca86a845c6ceab3fdb40aaebdedfba439ba71e462e473527225de6"
+    },
+    {
+      "file": "verify-audio.log",
+      "sha256": "f874237c3e01d9e71379b63a5358dfd6630f7c8c0b098e404cd44c240431a4e7"
+    }
+  ],
+  "combinedAcceptance": "../../hud/engine-orbs-2026-10-05/acceptance.json"
+}

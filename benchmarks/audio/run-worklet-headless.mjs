@@ -46,19 +46,42 @@ const cases = [
   { name: "off-is-silent", tier: 0, tireWatts: 15_000, sampleRate: 48_000 },
   { name: "low-tire-cue-48k", tier: 1, tireWatts: 15_000, sampleRate: 48_000 },
   { name: "low-tire-cue-44k1", tier: 1, tireWatts: 15_000, sampleRate: 44_100 },
+  // Med, the default, boots the same way. With no telemetry its engine path runs silent, so these
+  // check that Med's delay line and convolver run in the worklet, not what Med sounds like.
+  { name: "med-tire-cue-48k", tier: 2, tireWatts: 15_000, sampleRate: 48_000 },
+  { name: "med-tire-cue-44k1", tier: 2, tireWatts: 15_000, sampleRate: 44_100 },
 ];
 try {
   const page = await browser.newPage();
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => {
+    if (message.type() === "error" || message.type() === "warning") console.error(`page ${message.type()}: ${message.text()}`);
+  });
   await page.goto(pathToFileURL(path.join(outputDirectory, "index.html")).href);
   await page.addScriptTag({ path: path.join(outputDirectory, "bundle.js") });
   const runs = [];
+  // A one-second offline render takes well under a second. A case that has not
+  // settled in this long is stuck: it fails naming the step it reached, and the
+  // browser still closes cleanly, which a hung run stopped by hand does not.
+  // On 2026-10-03 the first case stuck at addModule (audio implementation ledger §15).
+  const stallMs = 30_000;
   for (const check of cases) {
-    const rendered = await page.evaluate((input) => window.runWorkletCheck(input), {
-      wasmBase64: wasm.toString("base64"), workletSource, seconds: 1, ...check,
+    let timer;
+    const stalled = new Promise((_, reject) => {
+      timer = setTimeout(() => {
+        page.evaluate(() => window.workletCheckStep).then(
+          (step) => reject(new Error(`${check.name} stalled at ${step} for ${stallMs / 1000} s`)), reject);
+      }, stallMs);
     });
-    runs.push({ ...check, ...rendered });
+    try {
+      const rendered = await Promise.race([page.evaluate((input) => window.runWorkletCheck(input), {
+        wasmBase64: wasm.toString("base64"), workletSource, seconds: 1, ...check,
+      }), stalled]);
+      runs.push({ ...check, ...rendered });
+    } finally {
+      clearTimeout(timer);
+    }
   }
   if (errors.length) throw new Error(errors.join("\n"));
   const failures = runs.filter((run) => run.nonFinite > 0 || run.messages.includes("failed") || run.messages.includes("processorerror")

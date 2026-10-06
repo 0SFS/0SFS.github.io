@@ -1,8 +1,8 @@
-export const AIRCRAFT_IDS = ["cessna-172", "cirrus-vision-jet", "cirrus-vision-jet-g2", "cirrus-vision-jet-g3"] as const;
+export const AIRCRAFT_IDS = ["cessna-172", "cirrus-vision-jet", "cirrus-vision-jet-g2", "cirrus-vision-jet-g3", "f-35b"] as const;
 export type AircraftId = (typeof AIRCRAFT_IDS)[number];
 
 /** Gallery choices group runtime variants without changing their saved IDs. */
-export const AIRCRAFT_FAMILY_IDS = ["cessna-172", "cirrus-vision-jet"] as const;
+export const AIRCRAFT_FAMILY_IDS = ["cessna-172", "cirrus-vision-jet", "f-35b"] as const;
 export type AircraftFamilyId = (typeof AIRCRAFT_FAMILY_IDS)[number];
 
 export function isAircraftId(value: unknown): value is AircraftId {

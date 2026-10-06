@@ -11,6 +11,7 @@ import {
   type Scene,
 } from "@babylonjs/core";
 import type { JSBSimSdk } from "@felipegalind0/jsbsim";
+import type { AircraftId } from "./aircraftIds";
 
 /**
  * Drives the model's moving parts from JSBSim.
@@ -49,13 +50,20 @@ export interface ControlSurfaceState {
   groundSpeedMps: number;
   /** True while any gear unit carries weight. */
   onGround: boolean;
+  /** Physical STOVL conversion position; absent on aircraft without lift systems. */
+  stovlPositionNorm?: number;
+  /** Physical nozzle angles; pitch tips the exhaust down, positive thrust yaw tips it port. */
+  nozzlePitchRad?: number;
+  nozzleYawRad?: number;
+  /** Native variable-area nozzle display position: 0 tight, 1 open; absent is unavailable. */
+  nozzlePositionNorm?: number;
 }
 
 export const NEUTRAL_CONTROL_SURFACES: ControlSurfaceState = {
   aileronLeftRad: 0, aileronRightRad: 0, elevatorRad: 0,
   rudderRad: 0, ruddervatorLeftRad: 0, ruddervatorRightRad: 0,
   flapRad: 0, propellerRadPerSec: 0, gearDownNorm: 1,
-  groundSpeedMps: 0, onGround: false,
+  groundSpeedMps: 0, onGround: false, stovlPositionNorm: 0,
 };
 
 const DEG_TO_RAD = Math.PI / 180;
@@ -85,6 +93,15 @@ function readNumber(sdk: JSBSimSdk, property: string): number {
     return Number.isFinite(value) ? value : 0;
   } catch {
     return 0;
+  }
+}
+
+function readOptionalNumber(sdk: JSBSimSdk, property: string): number | undefined {
+  try {
+    const value = sdk.getPropertyValue(property);
+    return Number.isFinite(value) ? value : undefined;
+  } catch {
+    return undefined;
   }
 }
 
@@ -137,25 +154,39 @@ export function resetPropellerRpmProperty(): void {
   resolvedRpmProperty = null;
 }
 
-export function readControlSurfaceState(sdk: JSBSimSdk): ControlSurfaceState {
+/** Observers resolved by the model owner with a noncreating native batch. */
+export type ControlSurfaceObservations = Pick<ControlSurfaceState, "nozzlePositionNorm">;
+
+export function readControlSurfaceState(sdk: JSBSimSdk, aircraftId?: AircraftId,
+  observations: ControlSurfaceObservations = {}): ControlSurfaceState {
+  const aileronLeftRad = readNumber(sdk, "fcs/left-aileron-pos-rad");
+  const f35b = aircraftId === "f-35b";
+  const nozzlePositionNorm = observations.nozzlePositionNorm;
   return {
-    aileronLeftRad: readNumber(sdk, "fcs/left-aileron-pos-rad"),
-    aileronRightRad: readNumber(sdk, "fcs/right-aileron-pos-rad"),
+    aileronLeftRad,
+    // The trial F-35B FCS reports one differential aileron, not two properties.
+    aileronRightRad: f35b ? -aileronLeftRad : readNumber(sdk, "fcs/right-aileron-pos-rad"),
     elevatorRad: readNumber(sdk, "fcs/elevator-pos-rad"),
     rudderRad: readNumber(sdk, "fcs/rudder-pos-rad"),
     ruddervatorLeftRad: readNumber(sdk, "fcs/left-ruddervator-pos-rad"),
     ruddervatorRightRad: readNumber(sdk, "fcs/right-ruddervator-pos-rad"),
-    flapRad: readNumber(sdk, "fcs/flap-pos-deg") * DEG_TO_RAD,
+    flapRad: f35b ? readNumber(sdk, "fcs/tef-pos-rad") : readNumber(sdk, "fcs/flap-pos-deg") * DEG_TO_RAD,
     propellerRadPerSec: readPropellerRpm(sdk) * RPM_TO_RAD_PER_SEC,
     gearDownNorm: readGearPosition(sdk),
     // Wheels roll at ground speed, not airspeed: a headwind does not spin them.
     groundSpeedMps: readNumber(sdk, "velocities/vg-fps") * FEET_TO_METERS,
     onGround: WOW_PROPERTIES.some((property) => readNumber(sdk, property) > 0),
+    stovlPositionNorm: f35b ? Math.min(1, Math.max(0, readNumber(sdk, "fcs/stovl-pos-norm"))) : 0,
+    ...(f35b ? {
+      nozzlePitchRad: readOptionalNumber(sdk, "fcs/nozzle-pitch-rad"),
+      nozzleYawRad: readOptionalNumber(sdk, "fcs/nozzle-yaw-rad"),
+    } : {}),
+    ...(Number.isFinite(nozzlePositionNorm) ? { nozzlePositionNorm } : {}),
   };
 }
 
 type SurfaceKey = keyof Omit<ControlSurfaceState,
-  "propellerRadPerSec" | "gearDownNorm" | "groundSpeedMps" | "onGround">;
+  "propellerRadPerSec" | "gearDownNorm" | "groundSpeedMps" | "onGround" | "stovlPositionNorm" | "nozzlePitchRad" | "nozzleYawRad" | "nozzlePositionNorm">;
 
 interface HingedPart {
   node: TransformNode;
@@ -163,6 +194,16 @@ interface HingedPart {
   axis: Vector3;
   sign: number;
   key: SurfaceKey;
+  /** A flaperon combines the physical flap and differential roll deflections. */
+  addKey?: SurfaceKey;
+}
+
+interface SurfaceBinding {
+  name: string;
+  key: SurfaceKey;
+  addKey?: SurfaceKey;
+  axis: Vector3;
+  sign: number;
 }
 
 interface RetractingGear {
@@ -170,10 +211,37 @@ interface RetractingGear {
   rest: Quaternion;
   axis: Vector3;
   sign: number;
-  /** Full travel in radians; a leg turns a quarter, a door rather less. */
+  /** Full travel in radians for a single-axis binding. */
   rad: number;
   /** The slice of the gear cycle this part moves in. */
   window: readonly [number, number];
+  /** Intrinsic local rotations applied in order after the authored rest pose. */
+  rotations?: readonly { axis: Vector3; rad: number }[];
+}
+
+interface GearBinding {
+  name: string;
+  axis: Vector3;
+  sign: number;
+  rad?: number;
+  window?: readonly [number, number];
+  rotations?: RetractingGear["rotations"];
+}
+
+/** Local aperture geometry, independent of the native engine's position schedule. */
+export interface NozzleAreaBinding {
+  readonly name: string;
+  readonly axis: Vector3;
+  readonly closedAngleRad: number;
+  readonly openAngleRad: number;
+}
+
+interface NozzlePetal {
+  node: TransformNode;
+  rest: Quaternion;
+  axis: Vector3;
+  closedAngleRad: number;
+  openAngleRad: number;
 }
 
 /**
@@ -215,6 +283,10 @@ export interface AircraftRig {
   /** True while the tyres are drawing the blurred half of their atlas. */
   wheelBlurred: boolean;
   gear: RetractingGear[];
+  /** Conversion doors and nozzle, posed from the FDM's physical actuator. */
+  stovl: (Omit<RetractingGear, "window"> & { nozzle?: boolean })[];
+  /** Variable-area petals retain their hinge origins and their vectoring parent. */
+  nozzleArea: NozzlePetal[];
   propeller: Propeller | null;
   propellerAngleRad: number;
   /** Smoothed frame interval; the sampling rate the blades are judged against. */
@@ -222,12 +294,18 @@ export interface AircraftRig {
   discVisible: boolean;
   /** Node names present in the loaded mesh, for diagnostics. */
   bound: string[];
+  /** Exact authored names; numbered parts must not collapse into one suffix-free name. */
+  getNode(name: string): TransformNode | null;
 }
 
 export interface BindRigOptions {
   /** Needed only to build the propeller disc. */
   scene?: Scene;
   propellerBlades?: number;
+  /** Select the imported airframe's authored pivots and local hinge axes. */
+  aircraftId?: AircraftId;
+  /** Another asset can supply aperture hinges without an airframe-specific animation branch. */
+  nozzleAreaBindings?: readonly NozzleAreaBinding[];
 }
 
 /** Hysteresis, so a propeller sitting on the threshold does not flicker. */
@@ -387,10 +465,7 @@ const DOOR_RAD = (deg: number): number => (deg * Math.PI) / 180;
 const LEG_WINDOW: readonly [number, number] = [0, 0.78];
 const DOOR_WINDOW: readonly [number, number] = [0.62, 1];
 
-const GEAR_BINDINGS: readonly {
-  name: string; axis: Vector3; sign: number; rad?: number;
-  window?: readonly [number, number];
-}[] = [
+const GEAR_BINDINGS: readonly GearBinding[] = [
   { name: "LandingGear_Left", axis: THRUST_AXIS, sign: 1 },
   { name: "LandingGear_Right", axis: THRUST_AXIS, sign: -1 },
   // The nose leg folds FORWARD, not aft, so its sign is the opposite of what
@@ -413,7 +488,7 @@ const GEAR_BINDINGS: readonly {
   { name: "BayDoor_Main_Left", axis: WING_DOOR_HINGE, sign: 1, rad: DOOR_RAD(125), window: DOOR_WINDOW },
   { name: "BayDoor_Main_Right", axis: WING_DOOR_HINGE, sign: -1, rad: DOOR_RAD(125), window: DOOR_WINDOW },
 ];
-const SURFACE_BINDINGS: readonly { name: string; key: SurfaceKey; axis: Vector3; sign: number }[] = [
+const SURFACE_BINDINGS: readonly SurfaceBinding[] = [
   { name: "Aileron_Left", key: "aileronLeftRad", axis: SPAN_AXIS, sign: 1 },
   { name: "Aileron_Right", key: "aileronRightRad", axis: SPAN_AXIS, sign: 1 },
   { name: "Elevator", key: "elevatorRad", axis: SPAN_AXIS, sign: 1 },
@@ -424,6 +499,80 @@ const SURFACE_BINDINGS: readonly { name: string; key: SurfaceKey; axis: Vector3;
   { name: "Ruddervator_Left", key: "ruddervatorLeftRad", axis: LEFT_RUDDERVATOR_HINGE_AXIS, sign: -1 },
   { name: "Ruddervator_Right", key: "ruddervatorRightRad", axis: RIGHT_RUDDERVATOR_HINGE_AXIS, sign: 1 },
 ];
+
+// AF267's nodes keep their authored local rotations, including swept
+// flaperons and canted rudders. In each node's local glTF frame, Blender's
+// hinge X is +X and hinge Y is -Z. See the distributed GLB provenance and
+// validation/evidence/aircraft/f35b/source-inspection.json.
+const LOCAL_FORE_AXIS = new Vector3(0, 0, -1);
+const F35B_SURFACE_BINDINGS: readonly SurfaceBinding[] = [
+  { name: "leftElevator", key: "elevatorRad", axis: SPAN_AXIS, sign: 1 },
+  { name: "rightElevator", key: "elevatorRad", axis: SPAN_AXIS, sign: 1 },
+  { name: "leftFlaperon", key: "aileronLeftRad", addKey: "flapRad", axis: SPAN_AXIS, sign: 1 },
+  { name: "rightFlaperon", key: "aileronRightRad", addKey: "flapRad", axis: SPAN_AXIS, sign: 1 },
+  // The authored hinge points down each fin. Positive rotation sends both
+  // trailing edges left, matching the trial FDM's negative rudder yaw moment.
+  { name: "leftRudder", key: "rudderRad", axis: LOCAL_FORE_AXIS, sign: 1 },
+  { name: "rightRudder", key: "rudderRad", axis: LOCAL_FORE_AXIS, sign: 1 },
+];
+const F35B_MAIN_WINDOW: readonly [number, number] = [0, 0.8];
+const FULL_GEAR_WINDOW: readonly [number, number] = [0, 1];
+const F35B_GEAR_BINDINGS: readonly GearBinding[] = [
+  // Independent asset calibration from numerical poses in AF267's public
+  // GeoFS setup (load.php?id=5229), with column-major rotation signs converted
+  // to glTF. No source code is copied. Main legs combine forward/up rotation,
+  // inward cant and local twist; pistons fold separately. The main window
+  // [0,.8] reproduces the author's 1.25 travel ratio, not measured timing.
+  // These are the model author's
+  // approximation, not verified real F-35B linkages/kinematics. Official B
+  // imagery supports forward/upward retraction only. The actual tire meshes
+  // fit the selected exterior envelope; small main-leg clearance remains
+  // unresolved. See validation/evidence/aircraft/f35b/gear-stow-2026-10-05/.
+  { name: "leftGear", axis: SPAN_AXIS, sign: 1, window: F35B_MAIN_WINDOW, rotations: [
+    { axis: SPAN_AXIS, rad: DOOR_RAD(120) },
+    { axis: VERTICAL_AXIS, rad: DOOR_RAD(-50) },
+    { axis: THRUST_AXIS, rad: DOOR_RAD(35) },
+  ] },
+  { name: "rightGear", axis: SPAN_AXIS, sign: 1, window: F35B_MAIN_WINDOW, rotations: [
+    { axis: SPAN_AXIS, rad: DOOR_RAD(120) },
+    { axis: VERTICAL_AXIS, rad: DOOR_RAD(50) },
+    { axis: THRUST_AXIS, rad: DOOR_RAD(-35) },
+  ] },
+  { name: "noseGear", axis: SPAN_AXIS, sign: 1, rad: DOOR_RAD(110), window: FULL_GEAR_WINDOW },
+  { name: "leftPiston", axis: SPAN_AXIS, sign: -1, rad: DOOR_RAD(100), window: F35B_MAIN_WINDOW },
+  { name: "rightPiston", axis: SPAN_AXIS, sign: -1, rad: DOOR_RAD(100), window: F35B_MAIN_WINDOW },
+  { name: "nosePiston", axis: SPAN_AXIS, sign: -1, rad: DOOR_RAD(90), window: FULL_GEAR_WINDOW },
+  { name: "leftDoor", axis: LOCAL_FORE_AXIS, sign: -1, window: DOOR_WINDOW },
+  { name: "rightDoor", axis: LOCAL_FORE_AXIS, sign: 1, window: DOOR_WINDOW },
+  { name: "leftNoseDoor", axis: LOCAL_FORE_AXIS, sign: -1, window: DOOR_WINDOW },
+  { name: "rightNoseDoor", axis: LOCAL_FORE_AXIS, sign: 1, window: DOOR_WINDOW },
+];
+// Lift-system quarter-turn end poses remain development poses; the source
+// has no keyframes or verified travel limits for those assemblies.
+const F35B_STOVL_BINDINGS = [
+  { name: "topLiftDoor", axis: SPAN_AXIS, sign: 1 },
+  { name: "leftLiftDoor", axis: LOCAL_FORE_AXIS, sign: 1 },
+  { name: "rightLiftDoor", axis: LOCAL_FORE_AXIS, sign: -1 },
+  { name: "leftEngineDoor", axis: LOCAL_FORE_AXIS, sign: 1 },
+  { name: "rightEngineDoor", axis: LOCAL_FORE_AXIS, sign: -1 },
+  { name: "leftExhaustDoor", axis: LOCAL_FORE_AXIS, sign: -1 },
+  { name: "rightExhaustDoor", axis: LOCAL_FORE_AXIS, sign: 1 },
+  { name: "vtol", axis: SPAN_AXIS, sign: 1 },
+];
+const F35B_WHEELS = new Set(["leftWheel", "rightWheel", "noseWheel"]);
+
+// AF267 authored sixteen tapered petals with local X tangential to the ring.
+// The inner free tip is [~0,-0.21494995,0.96930504] relative to its hinge.
+// Negative local-X rotation opens it; this bound brings that tip level with
+// the hinge radius (approximately axis-parallel), preserving model geometry.
+// It is a geometric display range, not a calibrated F135 area/travel schedule.
+const F35B_NOZZLE_OPEN_RAD = -Math.atan2(0.21494995057582855, 0.9693050384521484);
+const F35B_NOZZLE_AREA_BINDINGS: readonly NozzleAreaBinding[] = Array.from({ length: 16 }, (_, index) => ({
+  name: `feather.${String(index + 1).padStart(3, "0")}`,
+  axis: SPAN_AXIS,
+  closedAngleRad: 0,
+  openAngleRad: F35B_NOZZLE_OPEN_RAD,
+}));
 
 /** Strip Babylon's de-duplication suffix, e.g. "Elevator.001" -> "Elevator". */
 function baseName(name: string): string {
@@ -444,19 +593,23 @@ export function bindAircraftRig(
   options: BindRigOptions = {},
 ): AircraftRig {
   const byName = new Map<string, TransformNode>();
+  const exactByName = new Map<string, TransformNode>();
   for (const node of nodes) {
+    if (!exactByName.has(node.name)) exactByName.set(node.name, node);
     const key = baseName(node.name);
     if (!byName.has(key)) byName.set(key, node);
   }
 
   const parts: HingedPart[] = [];
   const bound: string[] = [];
+  const f35b = options.aircraftId === "f-35b";
 
-  for (const binding of SURFACE_BINDINGS) {
+  for (const binding of f35b ? F35B_SURFACE_BINDINGS : SURFACE_BINDINGS) {
     const node = byName.get(binding.name);
     if (!node) continue;
     parts.push({
       node, rest: restRotation(node), axis: binding.axis, sign: binding.sign, key: binding.key,
+      addKey: binding.addKey,
     });
     bound.push(binding.name);
   }
@@ -464,24 +617,51 @@ export function bindAircraftRig(
   const wheels: RollingWheel[] = [];
   const tyreTextures = new Set<Texture>();
   for (const [key, node] of byName) {
-    if (!key.startsWith("Wheel_")) continue;
-    const radius = nodeRadius(node);
+    if (f35b ? !F35B_WHEELS.has(key) : !key.startsWith("Wheel_")) continue;
+    // The imported F-35B has a uniform scale on its conversion root. Wheel
+    // speed uses metres, while the mesh's local bounds retain source units.
+    const scale = f35b ? Vector3.TransformNormal(SPAN_AXIS, node.computeWorldMatrix(true)).length() : 1;
+    const radius = nodeRadius(node) * scale;
     if (radius <= 0) continue;
     wheels.push({ node, rest: restRotation(node), radius });
     bound.push(key);
-    for (const texture of tyreAtlases(node)) tyreTextures.add(texture);
+    // Only our procedural tyres use the two-half blur atlas. AF267's shared
+    // texture also paints the airframe, so shifting it would move the livery.
+    if (!f35b) for (const texture of tyreAtlases(node)) tyreTextures.add(texture);
   }
   for (const texture of tyreTextures) texture.uOffset = TYRE_SHARP_U;
 
   const gear: RetractingGear[] = [];
-  for (const binding of GEAR_BINDINGS) {
+  for (const binding of f35b ? F35B_GEAR_BINDINGS : GEAR_BINDINGS) {
     const node = byName.get(binding.name);
     if (!node) continue;
     gear.push({
       node, rest: restRotation(node), axis: binding.axis, sign: binding.sign,
-      rad: binding.rad ?? GEAR_RETRACT_RAD,
+      rad: "rad" in binding ? binding.rad ?? GEAR_RETRACT_RAD : GEAR_RETRACT_RAD,
       window: binding.window ?? LEG_WINDOW,
+      rotations: binding.rotations,
     });
+    bound.push(binding.name);
+  }
+
+  const stovl: AircraftRig["stovl"] = [];
+  if (f35b) for (const binding of F35B_STOVL_BINDINGS) {
+    const node = byName.get(binding.name);
+    if (!node) continue;
+    stovl.push({
+      node, rest: restRotation(node), axis: binding.axis, sign: binding.sign,
+      rad: GEAR_RETRACT_RAD, nozzle: binding.name === "vtol",
+    });
+    bound.push(binding.name);
+  }
+
+  const nozzleArea: NozzlePetal[] = [];
+  for (const binding of options.nozzleAreaBindings ?? (f35b ? F35B_NOZZLE_AREA_BINDINGS : [])) {
+    // Numbered feathers are distinct authored parts, not Babylon name suffixes.
+    const node = exactByName.get(binding.name);
+    if (!node) continue;
+    nozzleArea.push({ node, rest: restRotation(node), axis: binding.axis,
+      closedAngleRad: binding.closedAngleRad, openAngleRad: binding.openAngleRad });
     bound.push(binding.name);
   }
 
@@ -508,6 +688,8 @@ export function bindAircraftRig(
     tyreTextures: [...tyreTextures],
     wheelBlurred: false,
     gear,
+    stovl,
+    nozzleArea,
     propeller: propNode
       ? { node: propNode, rest: restRotation(propNode), disc, discFromMesh: baked !== null, blades }
       : null,
@@ -515,6 +697,7 @@ export function bindAircraftRig(
     frameSeconds: DEFAULT_FRAME_SECONDS,
     discVisible: false,
     bound,
+    getNode: name => exactByName.get(name) ?? null,
   };
 }
 
@@ -556,9 +739,17 @@ function applyGear(rig: AircraftRig, position: number): void {
   for (const leg of rig.gear) {
     const [from, to] = leg.window;
     const part = Math.min(1, Math.max(0, (travel - from) / (to - from)));
-    leg.node.rotationQuaternion = leg.rest.multiply(
-      Quaternion.RotationAxis(leg.axis, part * leg.rad * leg.sign),
-    );
+    if (leg.rotations) {
+      let rotation = leg.rest;
+      for (const step of leg.rotations) {
+        rotation = rotation.multiply(Quaternion.RotationAxis(step.axis, part * step.rad));
+      }
+      leg.node.rotationQuaternion = rotation;
+    } else {
+      leg.node.rotationQuaternion = leg.rest.multiply(
+        Quaternion.RotationAxis(leg.axis, part * leg.rad * leg.sign),
+      );
+    }
   }
 }
 
@@ -627,7 +818,7 @@ export function applyAircraftRig(
 ): void {
   const held = options.simulationHeld === true;
   for (const part of rig.parts) {
-    const angle = state[part.key] * part.sign;
+    const angle = state[part.key] * part.sign + (part.addKey ? state[part.addKey] : 0);
     part.node.rotationQuaternion = part.rest.multiply(Quaternion.RotationAxis(part.axis, angle));
   }
 
@@ -640,6 +831,32 @@ export function applyAircraftRig(
   }
 
   applyGear(rig, state.gearDownNorm);
+  const conversionPosition = state.stovlPositionNorm ?? 0;
+  const conversion = Number.isFinite(conversionPosition)
+    ? Math.min(1, Math.max(0, conversionPosition)) : 0;
+  for (const part of rig.stovl) {
+    const angle = conversion * part.rad * part.sign;
+    if (part.nozzle) {
+      const pitch = Number.isFinite(state.nozzlePitchRad) ? state.nozzlePitchRad! : angle;
+      const yaw = Number.isFinite(state.nozzleYawRad) ? state.nozzleYawRad! : 0;
+      // Yaw is local to the pitched nozzle, so lateral aim remains visible at
+      // full conversion. Native JSBSim Euler yaw can jump to 90 degrees near
+      // vertical; the physical FCS angles preserve the actual nozzle vector.
+      part.node.rotationQuaternion = part.rest.multiply(Quaternion.RotationAxis(SPAN_AXIS, pitch))
+        .multiply(Quaternion.RotationAxis(VERTICAL_AXIS, -yaw));
+    } else {
+      part.node.rotationQuaternion = part.rest.multiply(Quaternion.RotationAxis(part.axis, angle));
+    }
+  }
+  if (Number.isFinite(state.nozzlePositionNorm)) {
+    const aperture = Math.min(1, Math.max(0, state.nozzlePositionNorm!));
+    for (const petal of rig.nozzleArea) {
+      const angle = petal.closedAngleRad + aperture * (petal.openAngleRad - petal.closedAngleRad);
+      petal.node.rotationQuaternion = petal.rest.multiply(Quaternion.RotationAxis(petal.axis, angle));
+    }
+  }
+  // Missing telemetry leaves the authored/last observed pose; no display-time
+  // actuator invents travel while physics is paused, resetting or unavailable.
   applyWheels(rig, state, deltaSeconds, held);
 
   const propeller = rig.propeller;

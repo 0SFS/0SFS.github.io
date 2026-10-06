@@ -76,11 +76,32 @@ hosted WASM CI, preserved branches, and the restored downstream environment.
 This supersedes the **not submitted** states below for these specific scopes.
 Child APIs from SDK #8 and its requested benchmark remain separate. The full
 working integration remains preserved. The IDBFS and native-exception build
-corrections were later adopted into the app as fork.4, and the app now installs
-fork.7.
+corrections were later adopted into the app as fork.4. The app now installs
+fork.8; see the dated local adoption update below.
 
 [PR #1508](https://github.com/JSBSim-Team/jsbsim/pull/1508) (turbine trim fuel
 flow) was opened on 2026-09-14 on top of #1505.
+
+## Local adoption update: 2026-10-05
+
+The app installs the clean `master` package `1.2.4-fork.8` at `94287983`,
+including the local off-engine spool/fuel repairs and an actual turbine
+augmentation observation. This updates downstream adoption only; the dated
+upstream review below remains historical. No upstream PR or comment was
+published for this work.
+
+`propulsion/engine[n]/augmentation` is read-only and reports whether the native
+calculation applied augmentation, independently of the older C++ command flag.
+It resets through dry, cutoff, startup and zero-time paths. The existing C++
+setter/getter command semantics remain intact. Five native regression methods
+and the real-WASM indexed property/reset/reload test cover the new observation.
+The implementation also prevents a non-augmented engine from entering the
+method-2 augmentation branch. The app's sound consumes this state instead of
+guessing it from throttle. This is a separate contribution candidate; a future
+upstream extraction must omit local package-version and build-tool changes.
+The remaining phase/cranking/gauge observations below are still unimplemented.
+Artifact identity and downstream checks are in the
+[fork.8 adoption record](../validation/evidence/jsbsim/adoption/fork8-adoption.json).
 
 ## Open PR review: 2026-09-14
 

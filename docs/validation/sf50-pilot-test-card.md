@@ -28,11 +28,10 @@ device, and no claim of fidelity is made.
    the recording. A mark with a sentence is worth more to us than a perfect
    description afterwards. At the end, **Save CSV**.
 6. Sound is off until you ask for it, and it is Vision Jet only. Open the
-   **Sound** tab, press **Enable sound**, set **Sound quality** to **Med**, then
-   press **Run Med anyway (testing)**. Med has no device evidence behind it and
-   runs as Low until you press that; the switch lasts this session only. Leave it
-   on for the whole flight and judge the sound as you go — Card 8 is only the
-   handful of checks that need you to do something specific.
+   **Sound** tab and press **Enable sound**. **Sound quality** is **Med** by
+   default; leave it there. Leave sound on for the whole flight and judge it as
+   you go — Card 8 is only the handful of checks that need you to do something
+   specific.
 
 ## Known — please do not spend time on these
 

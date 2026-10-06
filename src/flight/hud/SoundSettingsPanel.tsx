@@ -8,13 +8,13 @@ export type SoundAction =
   | { type: "enable"; enabled: boolean }
   | { type: "quality"; quality: AudioQualityId }
   | { type: "settings"; patch: Partial<Pick<AudioSettingsV1,
-    "masterVolume" | "engineVolume" | "airframeVolume" | "engineMuted" | "reducedDynamicRange">> }
-  | { type: "retest" }
-  | { type: "allow-unvalidated"; allowed: boolean };
+    "masterVolume" | "engineVolume" | "afterburnerVolume" | "listenerCockpitBlend"
+    | "airframeVolume" | "engineMuted" | "reducedDynamicRange">> }
+  | { type: "retest" };
 
 const percent = (value: number): string => Number.isFinite(value) ? `${value.toFixed(0)}%` : "n/a";
 
-/** Says what the core is hearing, so "the engine went quiet" can be told apart from a sound fault. */
+/** Shows native engine state, so "the engine went quiet" can be told apart from a sound fault. */
 function engineLine(engine: NonNullable<FlightAudioStatus["engine"]>): string {
   const turning = (Number.isFinite(engine.n1Pct) && engine.n1Pct > 1) || (Number.isFinite(engine.n2Pct) && engine.n2Pct > 1);
   const state = engine.combustion
@@ -36,7 +36,7 @@ const COMBUSTION_SOURCE_LABELS: Record<string, string> = {
  * sound.md §6 labels, exactly: "Unsupported on this device" only for a concrete
  * missing capability, "Not yet validated" for absent device evidence, "Audio
  * pack unavailable" for missing licensed assets. An unvalidated tier stays
- * selectable and runs the best available tier below it, saying so.
+ * selectable and runs as soon as it is chosen; only Auto waits for evidence.
  */
 function qualityOption(state: FlightAudioStatus, id: AudioQualityId) {
   if (!TIERS.includes(id)) return { label: AUDIO_QUALITY_LABELS[id], disabled: false, reason: null };
@@ -50,6 +50,8 @@ function qualityOption(state: FlightAudioStatus, id: AudioQualityId) {
 }
 
 const tierLabel = (tier: TierId): string => tier === "off" ? "Off" : AUDIO_QUALITY_LABELS[tier];
+const positionLabel = (cockpit: number): string => cockpit === 0 ? "Camera" : cockpit === 1 ? "Cockpit"
+  : `${Math.round(cockpit * 100)}% Cockpit / ${Math.round((1 - cockpit) * 100)}% Camera`;
 
 export function SoundSettingsPanel({ state, onAction }: {
   state: FlightAudioStatus;
@@ -57,13 +59,7 @@ export function SoundSettingsPanel({ state, onAction }: {
 }) {
   const { settings } = state;
   const audible = state.mode === "sound" && state.effective !== "off" && !state.gestureLocked;
-  const requestedAvailability = TIERS.includes(settings.requested)
-    ? state.availability[settings.requested as TierId] : null;
-  // An explicit request for a tier that only lacks device evidence can be run for testing.
-  const unvalidatedRequest = requestedAvailability?.state === "unvalidated";
-  const requestedLabel = AUDIO_QUALITY_LABELS[settings.requested];
-  const fallbackPhrase = state.effective === "off" ? "would run as Low" : `is running as ${tierLabel(state.effective)}`;
-  const requestedReason = unvalidatedRequest ? null : qualityOption(state, settings.requested).reason;
+  const requestedReason = qualityOption(state, settings.requested).reason;
   return (
     <fieldset className="flight-panel__fieldset">
       <legend>Sound</legend>
@@ -87,27 +83,9 @@ export function SoundSettingsPanel({ state, onAction }: {
         {state.held ? " · held while paused or hidden" : ""}
       </p>
       {requestedReason && <p className="flight-panel__hint">{requestedReason}</p>}
-      {unvalidatedRequest && !state.allowUnvalidated && <>
-        <p className="flight-panel__hint">
-          {requestedLabel} has no device validation yet, so it {fallbackPhrase}. You can run it anyway to hear and
-          test it; that lasts until you reload and is never saved.
-        </p>
-        <button className="flight-panel__command" type="button"
-          onClick={() => onAction({ type: "allow-unvalidated", allowed: true })}>
-          Run {requestedLabel} anyway (testing)
-        </button>
-      </>}
-      {state.allowUnvalidated && <>
-        <p className="flight-panel__hint" role="status">
-          {unvalidatedRequest
-            ? `Testing unvalidated ${requestedLabel} this session.`
-            : "Unvalidated quality is allowed this session, but Auto only picks validated tiers. Choose Med to test it."}
-        </p>
-        <button className="flight-panel__command" type="button"
-          onClick={() => onAction({ type: "allow-unvalidated", allowed: false })}>
-          Stop testing unvalidated quality
-        </button>
-      </>}
+      {settings.requested === "high" && <p className="flight-panel__hint">
+        High synthesises engine spectra and directionality. Acoustic calibration is pending.
+      </p>}
       {state.message && <p className="flight-panel__hint" role="alert">{state.message}</p>}
       {settings.downgradedFrom && <>
         <p className="flight-panel__hint">
@@ -119,15 +97,33 @@ export function SoundSettingsPanel({ state, onAction }: {
         </button>
       </>}
       <label className="flight-panel__field">
-        <span>Master volume</span>
-        <input type="range" aria-label="Master volume" min={0} max={1} step={0.05} value={settings.masterVolume}
+        <span>Master volume · {percent(settings.masterVolume * 100)}</span>
+        <input type="range" aria-label="Master volume" min={0} max={8} step={0.05} value={settings.masterVolume}
           onChange={event => onAction({ type: "settings", patch: { masterVolume: Number(event.target.value) } })} />
       </label>
       <label className="flight-panel__field">
-        <span>Engine volume</span>
-        <input type="range" aria-label="Engine volume" min={0} max={1} step={0.05} value={settings.engineVolume}
+        <span>Engine volume · {percent(settings.engineVolume * 100)}</span>
+        <input type="range" aria-label="Engine volume" min={0} max={8} step={0.05} value={settings.engineVolume}
           onChange={event => onAction({ type: "settings", patch: { engineVolume: Number(event.target.value) } })} />
       </label>
+      <label className="flight-panel__field">
+        <span>Afterburner volume · {percent(settings.afterburnerVolume * 100)}</span>
+        <input type="range" aria-label="Afterburner volume" min={0} max={1} step={0.05} value={settings.afterburnerVolume}
+          onChange={event => onAction({ type: "settings", patch: { afterburnerVolume: Number(event.target.value) } })} />
+      </label>
+      <p className="flight-panel__hint">
+        Scales the extra afterburner roar; 100% keeps its original level. Engine volume also scales it.
+      </p>
+      <label className="flight-panel__field">
+        <span>Sound position · {positionLabel(settings.listenerCockpitBlend)}</span>
+        <input type="range" aria-label="Sound position" aria-valuetext={positionLabel(settings.listenerCockpitBlend)}
+          min={0} max={1} step={0.01} value={settings.listenerCockpitBlend}
+          onChange={event => onAction({ type: "settings", patch: { listenerCockpitBlend: Number(event.target.value) } })} />
+        <span>Camera ↔ Cockpit</span>
+      </label>
+      <p className="flight-panel__hint">
+        Listen from Camera, Cockpit, or a position between them.
+      </p>
       <label className="flight-panel__field">
         <span>Airframe wind volume</span>
         <input type="range" aria-label="Airframe wind volume" min={0} max={1} step={0.05} value={settings.airframeVolume}
@@ -147,6 +143,7 @@ export function SoundSettingsPanel({ state, onAction }: {
         <span>Reduced dynamic range</span>
       </label>
       <p className="flight-panel__hint">
+        {state.telemetry?.profileLabel && <>{state.telemetry.profileLabel}. </>}
         {state.telemetry
           ? `Engine sound follows the flight model. Combustion is read from ${
             COMBUSTION_SOURCE_LABELS[state.telemetry.combustionSource] ?? state.telemetry.combustionSource}.`
@@ -154,6 +151,7 @@ export function SoundSettingsPanel({ state, onAction }: {
         {" "}Tire sound and its volume are under Aircraft → Ground handling. For live engine data, click
         ENGINE on the flight display. Muting sound never hides engine gauges or warnings.
       </p>
+      {state.telemetry?.approximation && <p className="flight-panel__hint">{state.telemetry.approximation}</p>}
       {state.telemetry && state.telemetry.missing.length > 0 && <p className="flight-panel__hint">
         Not published by this model, so left silent rather than guessed: {state.telemetry.missing.join(", ")}.
       </p>}

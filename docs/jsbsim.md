@@ -7,8 +7,33 @@ bindings, native lifetime, generic diagnostics and SDK build tooling belong in
 `wasm/`. 0SFS owns aircraft data, initial conditions, controls and scheduling.
 FOSS Earth remains the separate terrain/rendering dependency.
 
-**Application acceptance, 2026-09-14:** clean in-tree package
-`1.2.4-fork.7` is installed and locked. It adds the configurable turbine idle
+**Installed adoption, 2026-10-05:** clean in-tree package
+`1.2.4-fork.11` is installed and locked at `c1d57a2c`. It repairs stopped-turbine
+phantom thrust during zero-time initialization. Native Running=false now returns
+zero thrust while preserving stopped spool/fuel state; running idle and normal
+trim remain unchanged. The legacy trim-to-run startup initialization is preserved.
+The one locked-toolchain SDK build passes all 52 tests. The native stopped-thrust
+regression passes eight methods; existing spool/fuel trim regressions also pass.
+All 14 installed files and archive integrity verify. Across six focused installed
+files, all 132 unique cases pass after correcting one old Manual-flaps fixture
+and rerunning only that file. The final application suite passes 1,536 tests;
+its build verifies the installed and emitted artifacts. The
+[combined acceptance record](../validation/evidence/aircraft/f35b/final-acceptance-2026-10-05/acceptance.json)
+retains that run and the shared renderer follow-up. Exact hashes, logs and limits are in the
+[fork.11 adoption record](../validation/evidence/jsbsim/adoption/fork11-adoption.json).
+
+Fork.10's read-only cached indexed thruster vectors and resolved aerodynamic
+reference point/RP/CG split remain included. They observe native state without
+recomputing transforms or moments. Its separate immutable package and native/
+SDK checks are in the
+[fork.10 record](../validation/evidence/jsbsim/adoption/fork10-adoption.json).
+Fork.9's generic turbine nozzle display observer, fork.8's actual augmentation
+observer and earlier spool/fuel corrections remain included. Earlier packages,
+records and matching rollback declarations are retained. No aircraft, device
+sound or optical calibration is claimed by SDK adoption.
+
+**Earlier application acceptance, 2026-09-14:** clean in-tree package
+`1.2.4-fork.7` was installed and locked. It added the configurable turbine idle
 fuel flow described in [Idle fuel flow](#idle-fuel-flow) on top of fork.6's
 turbine trim fuel-flow fix, described in [Trim fuel flow](#trim-fuel-flow), the
 IDBFS-linkage
@@ -59,7 +84,8 @@ rejects a renamed package claiming an older version. A full rollback restores
 that release's declaration, lock and identity module together from
 [`validation/evidence/jsbsim/rollback/`](../validation/evidence/jsbsim/rollback);
 fork.5 and fork.6 are at commits `f9a27c0d` and `9e22e168` instead, and
-fork.7 is the installed declaration.
+fork.7 through fork.10 pre-upgrade declarations are retained for rollback; fork.11
+is the installed declaration.
 
 ## Build and installation chain
 
@@ -70,7 +96,7 @@ uses native TypeScript stripping. This integration was exercised with
 The application declares:
 
 ```json
-"@felipegalind0/jsbsim": "file:deps/felipegalind0-jsbsim-1.2.4-fork.7.tgz"
+"@felipegalind0/jsbsim": "file:deps/felipegalind0-jsbsim-1.2.4-fork.11.tgz"
 ```
 
 The package scope and API imports stay the same. The wrapper version does not
@@ -127,7 +153,7 @@ contract is `wasm/docs/centralized-builds.md` in JSBSim.
 
 A WASM build is a full Emscripten compile and its hash differs between builds of
 one commit, so build only when the engine or SDK changed. `wasm/build/` keeps the
-fork.7 artifact, its build descriptor and captured source, which `pack:build`
+selected fork.11 artifact, its build descriptor and captured source, which `pack:build`
 and the demo read through `wasm/build/last-build.json`.
 
 Build native changes in one build directory for `master` (now
@@ -203,29 +229,33 @@ The accepted application artifact is:
 
 | Identity | Value |
 | --- | --- |
-| Common native/SDK commit | `fea688020fb683c0696aa8339dbed9cdb238a39d` |
-| Repository content SHA-256 | `688091cc93ad332d8e55ca376393dea3d544a80de0711a4781e10c7e1539ec35` |
-| SDK subtree content SHA-256 | `b5d8ff6d2cc76d2b96c92aef1a3228bf6cfebe5dd8ddc4e571c6b713f3d5a93d` |
-| Build input SHA-256 | `733a60a62ef3061dc254f6d4a3c8f3cf7f162a213b444e423e4ac3d6b18553f0` |
-| Package tarball SHA-256 | `58afaf9fa575ec61838ba794b7b4a0919b8eaf516c7261e571700e8367b5217b` |
-| Emitted/browser loader SHA-256 | `784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2` |
-| Emitted/browser WASM SHA-256 | `6eae23db0fc26d4e02daa27eb95fba12932265164e4bb194cb3e183d04882806` |
+| Common native/SDK commit | `c1d57a2c3860ae9ae47f2b27b84f37912042c19c` |
+| Repository content SHA-256 | `fec8d16c38fd80da1446cde2b1f5523796d737eef6bac5426a7df4b11c2e2021` |
+| SDK subtree content SHA-256 | `d40290a03a3c40552b8dce8c3dfb6aeb5f19587f406d7083c461bc5ec2dfb5a4` |
+| Build input SHA-256 | `d353cac279c53cbc55c05b5231680ae85c26ae62b8b6c68a7e388fed90e0e7bc` |
+| Package tarball SHA-256 | `1add69a5e13980af743a788f1e8f8856338ffd01b80e95a8dbaa23f7df0dd71a` |
+| Installed loader SHA-256 | `784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2` |
+| Installed WASM SHA-256 | `ad1a8a1288ba7895c24e9f8701c754f4f7266703b7ea4f7d6325e5974132b1f3` |
 
-That is fork.7, packed from `feature/jsbsim-package-rename`. The JSBSim checkout's
-`master` merged that commit with JSBSim-Team `master` in `f9082ee1`, and has since
-taken the tank temperature property, the #1502 review round and the local #1505
-and #1508 off-engine repairs. Earlier
-fork identities remain in
-[the adoption records](../validation/evidence/jsbsim/adoption/) and the
-[historical in-tree execution record](old/jsbsim-in-tree-integration-2026-09-13.md).
+That is fork.11, packed from clean `master`. Its native change since fork.10
+is the stopped-turbine zero-time thrust guard. Indexed cached force observations,
+resolved aerodynamic anchors/split, turbine nozzle and actual augmentation
+observers, earlier fuel/spool corrections and prior native features remain
+included. Source adoption is separate from aircraft calibration.
 
 The installed distribution's 14 recorded files and archive SHA-512 lock
-integrity were verified. The current adoption record is
-[`validation/evidence/jsbsim/adoption/fork7-adoption.json`](../validation/evidence/jsbsim/adoption/fork7-adoption.json).
-Command logs, earlier per-fork browser and UI reports and screenshots stay in
-the local, undistributed tree under `build/validation/jsbsim-in-tree-20260913/`.
-Those ignored files are local evidence; they keep per-fork name prefixes.
-The identities and outcomes above remain in documentation.
+integrity are verified. The
+[verified installed artifact](../validation/evidence/jsbsim/adoption/fork11/verified-installed-artifact.json),
+[focused installed initial run](../validation/evidence/jsbsim/adoption/fork11/installed-regressions-initial.log),
+[corrected failed-file rerun](../validation/evidence/jsbsim/adoption/fork11/installed-yaw-final.log)
+and [SDK build log](../validation/evidence/jsbsim/adoption/fork11/sdk-build-validation.log)
+are retained with the
+[fork.11 adoption record](../validation/evidence/jsbsim/adoption/fork11-adoption.json).
+The final app CI and emitted loader/WASM checks pass in the
+[combined acceptance record](../validation/evidence/aircraft/f35b/final-acceptance-2026-10-05/acceptance.json).
+The separate [hardware browser checks](../validation/evidence/aircraft/f35b/exhaust-smoke-gpu-2026-10-05/acceptance.json)
+instantiate the installed SDK; matching emitted hashes alone do not establish
+browser instantiation of the full globe application.
 
 All app imports, type imports, mocks and SDK assets use the fork scope.
 `createJsbsimRuntime` imports `JSBSimSdk` and `buildIdentity` from the package,
@@ -267,14 +297,15 @@ serves actual `dist/` bytes through headless Chrome request interception, boots
 each runtime aircraft and compares diagnostic identity and fetched
 loader/WASM/XML hashes to the installed package and build manifest.
 
-The current component check passed all three viewports. It still records a
+The earlier component check passed all three viewports. It records a
 clipped lower LOD-select focus outline in wide/narrow shells; control bounds
-and keyboard-reached Apply/outline remain visible. The actual built-app check
-passed all four runtime aircraft with no missing local assets or runtime
+and keyboard-reached Apply/outline remain visible. That earlier built-app check
+passed the four then-supported runtime aircraft with no missing local assets or runtime
 exceptions. External terrain/font requests were blocked, the no-Google-key
 warning was recorded and terrain stayed unready. Production builds retain the
 large renderer-chunk warning; some jsdom app tests retain React act warnings.
-These checks exclude terrain readiness, GPU performance and aircraft fidelity.
+These historical checks exclude terrain readiness, GPU performance and aircraft
+fidelity and do not qualify the current fork.11/F-35B application.
 
 ## Adopted IDBFS and native-exception corrections
 
@@ -359,25 +390,50 @@ idle fuel flow, which fork.7 addresses below.
 Full results and hashes are in
 [`validation/evidence/jsbsim/adoption/fork6-adoption.json`](../validation/evidence/jsbsim/adoption/fork6-adoption.json).
 
-### Known defect: shut-off engines after a zero-time reset
+### Off-engine zero-time reset repair, adopted in fork.8
 
-Found on 2026-09-14 and not fixed. `Calculate()` enters `Trim()` for every
-zero-time evaluation, running or not. The spool change (`fc13a97b`, PR #1505)
-and this fuel-flow change (PR #1508) assign N1, N2 and fuel flow there for every
-engine. A shut-off engine therefore comes out of RunIC spooled to its throttle
-setting, then winds down once time advances, burning a little fuel while the
-fuel flow bleeds off.
+Found on 2026-09-14 and now repaired in the installed fork.8. `Calculate()`
+enters `Trim()` for every zero-time evaluation, running or not. Earlier spool
+(`fc13a97b`, PR #1505) and fuel-flow (PR #1508) changes assigned N1, N2 and fuel
+flow there for every engine. A shut-off engine therefore came out of RunIC
+spooled to its throttle setting, then wound down once time advanced, burning a
+little fuel while the fuel flow bled off.
 
-The app hits this when `resetFlightLocation.ts` applies a location whose saved
-engine is not running. On the SF50 at 5,000 ft and 150 kt with throttle 0.6:
-- fork.5 comes out of the reset at N1 69.7 % and N2 81.4 %;
-- fork.7 shows the same spool and also 344.7 lb/h of fuel flow.
+Before the repair, the app hit this when `resetFlightLocation.ts` applied a
+location whose saved engine was not running. On the SF50 at 5,000 ft and 150 kt
+with throttle 0.6:
 
-The audio adapter reads that fuel flow as combustion for the first few steps.
-Upstream `master` leaves the engine at rest. Evidence and the proposed direction
-(assign only when `Running`) are in
+- fork.5 came out of the reset at N1 69.7 % and N2 81.4 %;
+- fork.7 showed the same spool and also 344.7 lb/h of fuel flow.
+
+The historical audio adapter read that invented fuel flow as combustion for the
+first few steps. The adopted repairs assign running spool and fuel targets only
+when `Running`, preserving an off engine's possibly windmilling spools and
+existing fuel state through zero-time evaluation. They do not force residual
+fuel flow to zero or change normal shutdown decay. Original findings are in
 [the open PR review](validation/jsbsim-open-pr-review-2026-09-14.md).
-Do not add an app-level workaround; fix it in the engine and in both PRs.
+The local engine repairs are included in the
+[fork.8 adoption record](../validation/evidence/jsbsim/adoption/fork8-adoption.json).
+Upstream review/publication remains tracked separately in the contribution
+policy; no app workaround is used.
+
+## Native turbine augmentation observation
+
+Fork.8 publishes `propulsion/engine[n]/augmentation` as a read-only boolean.
+It reports whether an installed afterburner contributes at the current native
+evaluation point, rather than exposing the existing C++ command flag. Native
+method 1 waits for its spool threshold; method 2 uses its native augmentation
+range. Non-augmented engines cannot enter the method-2 augmentation branch.
+Dry, off, cutoff, stalled, seized and reset paths report inactive. Existing
+`SetAugmentation`/`GetAugmentation` command semantics remain intact.
+
+Five native regression methods cover indexed read-only behavior, spool lag,
+running/off zero-time paths, non-augmented engines and stall/seizure. The frozen
+real-WASM SDK test checks catalog visibility, property batches, cutoff, reset
+and reload lifetime. The app's audio observes this field with an availability
+bit; an absent observer is unavailable, and throttle is not an afterburner
+observation. This boolean is not continuous augmentation amount or exhaust-flow
+telemetry. The adoption adds no upstream PR, comment or npm publication.
 
 ## Idle fuel flow
 
@@ -440,6 +496,42 @@ executive and repeated destruction is safe. These checks passed against the
 current in-tree package in the 144-test installed-app run; exact results remain
 attached to that artifact in the execution record.
 
+## Native turbine nozzle display observation
+
+Fork.9 exposes `propulsion/engine[n]/nozzle-pos-norm` as read-only native state.
+The existing generic schedule uses nominal 0 tight / 1 open, slews toward
+`1 - N2norm` in dry Run, opens while afterburning or off, and starts open on
+reset. Zero-time Trim retains the prior nozzle value. This is an animation
+schedule, not a calibrated F135 nozzle area, thrust-vectoring angle, command
+or exhaust-flow model. Aircraft presentation reads it without creating missing
+properties. EGT remains unavailable through the property catalog; no observer
+for it is invented by the app.
+
+## Native force observations and stopped zero-time evaluation
+
+Fork.10 adds read-only `propulsion/engine[n]/body-force-x-lbs` (and y/z),
+the vector cached by the native thruster evaluation for any thruster family.
+Existing acting-location properties use structural inches. `aero/rp-body-x-ft`
+(and y/z) uses body feet relative to CG, including the native RP shift.
+`forces/fbx-aero-rp-lbs` and `forces/fbx-aero-cg-lbs` (and y/z) distinguish
+reference-point forces from functions applied directly at CG. Their sum is the
+native aerodynamic total. Existing native applied-total vectors include contact/
+friction and exclude gravity; adding the separately observed weight vector gives
+an explicitly labeled net sum, without reconstructing a thruster from scalar
+thrust and angles. Body axes are X forward, Y right, Z down.
+
+Fork.11 fixes a separately reproduced stopped-turbine `RunIC()` defect: after
+cutoff removed real thrust, zero-time Trim still returned a steady throttle-derived
+force despite Running=false. Stopped Trim now returns zero and retains actual
+spool/fuel state. Running idle/start-complete and ordinary running Trim are
+unchanged. The legacy trim-to-run initialization still sets Cutoff=false as
+before; this release does not change startup command semantics. Regression
+shutdowns leave Trim through an accepted step before commanding cutoff.
+
+The F35 coupled aircraft data requires the read-only native vector observation.
+A deliberate rollback below fork.10 must restore compatible aircraft data too;
+restoring the SDK declaration alone does not restore its aircraft-model contract.
+
 ## Aircraft loading and initialization
 
 The SDK does not bundle 0SFS aircraft data into its virtual filesystem.
@@ -454,12 +546,17 @@ Only the selected files are written to Emscripten MEMFS with `writeDataFile`.
 | `cirrus-vision-jet` | `sf50` | Legacy/default G1 |
 | `cirrus-vision-jet-g2` | `sf50-g2` | Original G2 development model; G2+ UI label retains this runtime alias |
 | `cirrus-vision-jet-g3` | `sf50-g3` | Provisional G3 development model |
+| `f-35b` | `F-35B-jsbsim` | Experimental FlightGear F-16/Aeromatic-derived trial with native conversion and selectable control law |
 
 Family selection, generation labels, staged drafts, atomic Apply/persistence,
 credits and presentation preferences remain app-owned. A G2+ label does not
 make G2+ performance tables applicable to original G2 or G3. All three SF50
 packages still share development physics and exterior meshes; selectable
 packages and runtime agreement do not establish distinct calibration.
+The F-35B source, loading assumptions, physical conversion and limitations are
+documented in [its FDM proposal](proposals/f35b-fdm.md); the retained
+[yaw/mode regression](../validation/evidence/aircraft/f35b/yaw-2026-10-05/README.md)
+qualifies development control limits rather than real F-35 handling.
 
 `bootstrapAircraft` configures paths, loads the selected model, sets and checks
 native `setDt(1 / 120)`, and initializes geodetic `ic/lat-geod-deg`. Gear/flap
@@ -487,6 +584,52 @@ bridge, ground contact handling and 120 Hz fixed-step scheduling remain
 separate from streamed map data and optional phone pairing. Hydration derives
 its base from Vite `BASE_URL`; verify the deployed manifest and XML request
 paths before release, including non-root deployments.
+
+## Fuel tanks, and starting and stopping engines
+
+What the Fuel tab and the throttle lever rely on, read from the fork's source and
+held by `fuelTanks.integration.test.ts` and `engineControl.integration.test.ts`
+against the installed SDK (fork.11).
+
+Fuel tanks:
+
+- A tank publishes its contents, `pct-full`, density and position
+  (`x-position` etc.: the full tank's location in structural inches), but no
+  capacity. `FGTank::SetContents` caps a write at the capacity, so
+  `discoverFuelTanks` writes 1e9 lb, reads the capacity back and restores the
+  contents before anything steps. It does not floor a write at zero, so
+  `writeFuelTanks` clamps both ends. A read-only `capacity-lbs` tie in FGTank
+  would replace the probe; it needs a WASM build.
+- The catalogue lists tank 0 as `propulsion/tank/…`. The app always writes
+  `propulsion/tank[0]/…`, the spelling saved flights already carried.
+- `ResetToInitialConditions` puts every tank back to its definition's contents.
+  Flight snapshots therefore carry every tank the catalogue lists, and a runway
+  preset writes the loaded fuel back. Until 2026-10-05 snapshots carried tanks 0
+  and 1 only, so the F-35B's tanks 2 and 3 went back to empty on every terrain
+  recovery.
+
+Starting and stopping, as `engineControl.ts` drives them:
+
+- Turbine: `starter_cmd` 1 with `cutoff_cmd` 1 spins N2 dry toward the ignition
+  N2. FGTurbine enters its start phase only above 15% N2 with cutoff 0, so the
+  cutoff is released there. Letting go of the starter before N2 reaches idle
+  aborts the start (below 30 psf of ram air), and JSBSim lets go of it at idle
+  itself, so a start has to be held to the end. Shutdown is cutoff 1.
+- Piston: it runs with spark and fuel above 80% of `idlerpm`. `magneto_cmd` is
+  write-only, and JSBSim never releases a piston's starter. Shutdown is magnetos 0.
+- The first step after any RunIC sets a turbine's `Cutoff` from whether it was
+  running, which undoes a cutoff written before that step. The control repeats a
+  shutdown until no engine reads running.
+- With no active engine selected, `starter_cmd` and `cutoff_cmd` set every engine
+  and read back as the AND over all of them. The F-35B's lift fan and roll posts
+  are turbines too, and start and stop with the main engine.
+- A stopped engine is kept stopped, whatever stopped it, with cutoff 1 or
+  magnetos 0. A windmilling turbine above 15% N2 would otherwise relight on ram
+  air alone.
+- Held from a stopped engine at idle throttle: the C172 runs after about 2 s, the
+  SF50 after about 22 s (3–4 s dry to 15% N2, then 2%/s to its 53.4% idle) and
+  the F-35B after about 27 s. These turbines use JSBSim's default `n2spinup` 3
+  and `n2startrate` 2.
 
 ## Ownership, notices and continued work
 

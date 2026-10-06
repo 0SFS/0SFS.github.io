@@ -20,11 +20,12 @@ import { getFdmProfile } from "../jsbsim/fdmProfiles";
 
 const c172 = getAircraftDefinition("cessna-172");
 const cirrus = getAircraftDefinition("cirrus-vision-jet");
+const f35b = getAircraftDefinition("f-35b");
 
 describe("aircraft catalog", () => {
-  it("exposes four runtime packages and falls back to the first for unknown ids", () => {
+  it("exposes every runtime package and falls back to the first for unknown ids", () => {
     expect(AIRCRAFT_CATALOG.map((entry) => entry.id)).toEqual([
-      "cessna-172", "cirrus-vision-jet", "cirrus-vision-jet-g2", "cirrus-vision-jet-g3",
+      "cessna-172", "cirrus-vision-jet", "cirrus-vision-jet-g2", "cirrus-vision-jet-g3", "f-35b",
     ]);
     expect(AIRCRAFT_CATALOG.map((entry) => entry.id)).toEqual(AIRCRAFT_IDS);
     expect(getAircraftDefinition("nope" as never).id).toBe("cessna-172");
@@ -40,9 +41,9 @@ describe("aircraft catalog", () => {
     expect(isAircraftLodId("lod9")).toBe(false);
   });
 
-  it("groups every runtime package under one of the two family cards", () => {
+  it("groups every runtime package under its family card", () => {
     expect(AIRCRAFT_FAMILIES.map((family) => family.id)).toEqual([
-      "cessna-172", "cirrus-vision-jet",
+      "cessna-172", "cirrus-vision-jet", "f-35b",
     ]);
     expect(AIRCRAFT_FAMILIES.map((family) => family.id)).toEqual(AIRCRAFT_FAMILY_IDS);
     for (const family of AIRCRAFT_FAMILIES) {
@@ -155,6 +156,37 @@ describe("aircraft catalog", () => {
     expect(selectAutoLod(cirrus, 0)?.id).toBe("lod3");
   });
 
+  it("loads the F-35B's credited exterior in Auto at every distance", () => {
+    expect(f35b.lods).toHaveLength(1);
+    const exterior = f35b.lods[0];
+    expect(exterior.path).toBe("aircraft/f-35b/F-35B_AF267.glb");
+    expect(exterior.optIn).toBeUndefined();
+    expect(autoLods(f35b)).toEqual([exterior]);
+    for (const distance of [0, 100, 5000]) {
+      expect(resolveLod(f35b, "auto", distance)).toBe(exterior);
+    }
+    expect(exterior.credit.artist).toBe("AF267");
+    expect(exterior.credit.licence).toBe("CC BY 4.0");
+    expect(exterior.credit.sourceUrl).toContain("5d54a6af45974ad386ae74d42b33374a");
+    expect(f35b.propellerBlades).toBe(0);
+    const family = getAircraftFamilyForAircraft("f-35b");
+    expect(family.thumbnail.path).toBe("aircraft/thumbnails/f-35b.png");
+    expect(family.thumbnail.credit.artist).toBe("AF267");
+    expect(family.developmentNote).toContain("Experimental");
+    expect(family.developmentNote).toContain("not validated");
+  });
+
+  it("restores an F-35B choice without inheriting a Vision Jet generation", () => {
+    const family = getAircraftFamily("f-35b");
+    expect(family.variantLabel).toBeUndefined();
+    expect(family.variants).toHaveLength(1);
+    expect(normalizeAircraftSelection({
+      aircraftId: "f-35b", generationId: "g2+", lodId: "lod2",
+    })).toEqual({ aircraftId: "f-35b", generationId: "f-35b", lodId: "auto" });
+    expect(normalizeAircraftSelection({ aircraftId: "f-35b", lodId: "hd" }))
+      .toEqual({ aircraftId: "f-35b", generationId: "f-35b", lodId: "hd" });
+  });
+
   it("loads an opt-in level whenever it is chosen, at any distance", () => {
     expect(resolveLod(cirrus, "hd", 0)?.id).toBe("hd");
     expect(resolveLod(cirrus, "hd", 9999)?.id).toBe("hd");
@@ -166,8 +198,8 @@ describe("aircraft catalog", () => {
   });
 
   it("drops every model by the stance the simulator holds the aircraft at", () => {
-    // Both meshes put their origin on the ground between the wheels, so both
-    // are dropped by STATIC_STANCE_METERS. See docs/ground-contact.md.
+    // The exterior meshes use a ground-plane origin below the aircraft
+    // reference point. See docs/ground-contact.md.
     for (const definition of AIRCRAFT_CATALOG) {
       const profile = getFdmProfile(definition.id);
       expect(definition.modelOffset).toEqual({ x: 0, y: -profile.stance.staticMeters, z: 0 });

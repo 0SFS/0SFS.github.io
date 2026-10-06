@@ -29,6 +29,13 @@ const PHASE_LABELS: Record<FlightLoadingPhase, string> = {
 
 const DEFAULT_TITLE = "Preparing your flight";
 
+/**
+ * Marks a control that stays usable while loading holds the rest of the app,
+ * such as the pause button: pausing during loading starts the flight paused.
+ */
+export const LOADING_LIVE_ATTRIBUTE = "data-loading-live";
+const LIVE_SELECTOR = `[${LOADING_LIVE_ATTRIBUTE}]`;
+
 interface PhaseLine {
   line: GameLogLine;
   startedAt: number;
@@ -65,15 +72,17 @@ function describeTerrain(progress: TerrainPreparationProgress | undefined): stri
 }
 
 /**
- * Loading progress as game-log lines over a visible world. Only the renderer
- * root is made inert, so flight input still waits for safe terrain.
+ * Loading progress as game-log lines over a visible world. The app under the
+ * log is made inert, so flight input still waits for safe terrain, except for
+ * the controls marked live and the elements that contain them.
  */
 export function createFlightLoadingScreen(sharedLog?: GameLog): FlightLoadingScreen {
   const log = sharedLog ?? createGameLog();
   const root = document.getElementById("root");
   const phases = new Map<FlightLoadingPhase, PhaseLine>();
   let failure: { line: GameLogLine; entry: GameLogEntry } | null = null;
-  let previousInert = false;
+  // Each element the hold made inert, with whether it was inert already.
+  const held = new Map<Element, boolean>();
   let previousBusy: string | null = null;
   let visible = false;
   let destroyed = false;
@@ -113,11 +122,42 @@ export function createFlightLoadingScreen(sharedLog?: GameLog): FlightLoadingScr
   };
   const reportAction = { label: "Copy loading report", onClick: () => { void copyReport(); } };
 
+  const holdElement = (element: Element): void => {
+    if (held.has(element)) return;
+    held.set(element, element.hasAttribute("inert"));
+    element.setAttribute("inert", "");
+  };
+  const releaseElement = (element: Element): void => {
+    const wasInert = held.get(element);
+    if (wasInert === undefined) return;
+    held.delete(element);
+    element.toggleAttribute("inert", wasInert);
+  };
+  // Inert can only be added below an element, never taken away, so the hold
+  // goes around a live control: each element containing one stays usable and
+  // its other children are held.
+  const holdTree = (element: Element): void => {
+    if (element.matches(LIVE_SELECTOR)) {
+      releaseElement(element);
+    } else if (element.querySelector(LIVE_SELECTOR) === null) {
+      holdElement(element);
+    } else {
+      releaseElement(element);
+      for (const child of Array.from(element.children)) holdTree(child);
+    }
+  };
+  // The app builds its controls while loading shows; each one is held as it arrives.
+  const observer = root && typeof MutationObserver === "function"
+    ? new MutationObserver(() => { if (visible) holdTree(root); })
+    : null;
+
   const holdRoot = (): void => {
     if (visible) return;
-    previousInert = root?.hasAttribute("inert") ?? false;
     previousBusy = root?.getAttribute("aria-busy") ?? null;
-    root?.setAttribute("inert", "");
+    if (root) {
+      holdTree(root);
+      observer?.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: [LOADING_LIVE_ATTRIBUTE] });
+    }
     root?.setAttribute("aria-busy", "true");
     visible = true;
     log.element.setAttribute("data-loading-details", "");
@@ -167,8 +207,9 @@ export function createFlightLoadingScreen(sharedLog?: GameLog): FlightLoadingScr
     visible = false;
     stoppedAt ??= performance.now();
     log.element.removeAttribute("data-loading-details");
+    observer?.disconnect();
+    for (const element of Array.from(held.keys())) releaseElement(element);
     if (root) {
-      root.toggleAttribute("inert", previousInert);
       if (previousBusy === null) root.removeAttribute("aria-busy");
       else root.setAttribute("aria-busy", previousBusy);
     }

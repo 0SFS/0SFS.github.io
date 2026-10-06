@@ -84,7 +84,153 @@ refinement, which remains a separate choice from what is loaded.
 Values are today's; all are hardcoded unless noted. Homes are sections of the
 existing tabs.
 
+Aircraft exhaust lives in Renderer → Aircraft exhaust. The shared flight-only
+renderer reads `osfs.exhaust.enabled` (default on), `sampleCount` (8, bounded
+4–32 samples/pixel), `maxDistanceMeters` (2,000, bounded 1–20,000 m), and
+`intensity` (1×, bounded 0–8×). They apply live and persist through the registry.
+The default is one bounded volume draw per configured engine with a baked
+optical lookup; off releases those resources. These controls do not change
+engine power or native afterburner engagement. See the
+[F-35B exhaust implementation](f35b-fdm.md#baked-exhaust-renderer) for physical
+assumptions and qualification limits.
+
+### Stowed landing gear
+
+Debug → Aircraft visuals owns `osfs.debug.renderStowedGear` (boolean, default
+off, persistent and live). Aircraft metadata names the enclosed wheels and
+struts eligible to stop drawing. These parts remain drawable throughout gear
+travel; at physical position zero the model hides their meshes, keeping bay
+doors visible. Any extension restores them immediately. Unconfigured aircraft
+keep their existing rendering, including exposed stowed wheels.
+
+The debug override keeps those meshes drawable in their actual animated pose
+at full retraction. It does not make the airframe transparent or alter physics.
+This lets stowage checks inspect the underlying geometry independently of the
+normal visibility optimization. Setting changes update a paused view too;
+unchanged state does not request another frame.
+
+### Engine shaft indicators
+
+The engine HUD and phone show two concentric shaft rings for turbines and one
+RPM ring for the C172. Aircraft engine metadata selects the instrument; readable
+property names alone cannot identify an engine, because JSBSim may retain nodes
+created by other readers. The C172's scale uses the installed IO320 definition's
+2,700 rated RPM. Turbine dots use a common denominator of the larger native
+`MaxN1` and `MaxN2` percentage limits. Their tooltips identify this as **scaled
+percentage speed**, not physical turbine RPM. Missing limits leave dots still.
+Numeric readings remain unclamped, including an overspeed.
+
+Each ring now has **one equally sized, equally spaced marker per blade** of a
+representative rotor on that shaft. The former large/small marker pair is
+removed. A multi-stage shaft does not have one universal blade count: the
+outer turbine ring represents its fan rotor; the inner ring represents a core
+compressor rotor. The C172 ring represents its propeller. Tooltips and Engine
+details show the counts and identify estimates.
+
+| Aircraft | Outer ring | Inner ring | Evidence |
+| --- | --- | --- | --- |
+| SF50 / FJ33-5A | 16 fan blades | 30 impeller rim blades, **estimated** | Published fan part description; representative centrifugal impeller for the unreported core count |
+| F-35B / F135 | 22 fan blades, **estimated** | 36 core compressor blades, **estimated** | Representative transonic rotor rows; neither count is confirmed F135 data |
+| C172P | 2 propeller blades | None | Installed `public/jsbsim-data/engine/prop_75in2f.xml`, `<numblades>2</numblades>` |
+
+The [Williams FJ33-5A Illustrated Parts Catalog](https://www.scribd.com/document/924928927/FJ33-5A-IPC),
+2024-12-09, module 72-00-31 page 2, names P/N 79408 as a 16-blade swept fan
+rotor; this is a public mirror of the manufacturer document, corroborated by a
+[Williams engine record](https://www.underwriterssalvagecompany.com/Media/DisplayPDF/9fe3747d-6254-4ce2-aa61-a30561bd7ae2).
+The [Williams family specification](https://www.williams-int.com/wp-content/uploads/2026/01/Fanjet-Family-Specsheets-IND-11262018-01222026.pdf)
+identifies a centrifugal HP compressor. Its actual impeller count was not
+established: the 30-marker estimate represents 15 full and 15 splitter blades
+at the rim, using the component class illustrated in
+[NASA TM 107515](https://ntrs.nasa.gov/api/citations/19970025160/downloads/19970025160.pdf).
+It does not assert 30 full-length FJ33 blades.
+
+The F135 estimates use [NASA Rotor 67's 22-blade transonic fan](https://ntrs.nasa.gov/api/citations/19980000490/downloads/19980000490.pdf)
+and [Rotor 37's 36-blade core compressor inlet rotor](https://ntrs.nasa.gov/api/citations/20090011785/downloads/20090011785.pdf)
+as representative visual defaults. These research rotors are **not F135
+components**. A bounded public-source search did not establish its actual
+counts; visible stationary inlet guide vanes in front photographs must not
+be counted as rotating fan blades. This metadata changes the visualization
+only, never the acoustic reference frequencies or flight dynamics.
+
+Engine → Engine owns `osfs.engineMonitor.orbFps` (0–60 frames/s, default 30),
+`orbTurnsPerSecond` (0–4 visual rev/s at the scale maximum, default 2), and
+`orbPixelRatio` (1–3 drawing pixels/CSS pixel, default 2, capped by display
+density). Renderer → Instruments owns `osfs.renderer.engineOrbs`
+(Auto/WebGPU/WebGL2/WebGL1/Off, default Auto), alongside a note naming the active
+backend. These same choices travel to the phone. Off or zero frame rate releases
+the orb renderer and retains the numeric gauges. Missing blade metadata also
+allocates no orb graphics backend.
+
+To keep repeated blades from appearing stationary or reversing at the selected
+cadence, both shafts share an effective visual speed ceiling of
+`min(requested rev/s, configured frames/s / (4 × largest blade count))`.
+The Engine tab reports that ceiling. This preserves the ratio between the
+shaft indications with at least four configured frames per blade pitch;
+actual browser stalls can still cause strobing. The numeric readings and
+simulation time are unaffected.
+
+The desktop reuses the globe's WebGPU device when present, with WebGL2 then
+WebGL1 fallback. The small transparent surface draws the dots in one draw call;
+text and ring layout remain ordinary accessible DOM. Simulation time advances
+the angles. The instrument does not create a desktop animation loop or ask the
+globe to render for its own animation. Draws are capped and unchanged, hidden or
+paused frames cost no GPU submissions. This architecture and the correctness
+checks do not establish a device performance qualification.
+
+The [blade-marker acceptance record](../../validation/evidence/hud/engine-blade-markers-2026-10-05/acceptance.json)
+retains source hashes, nine backend/aircraft pixel-count checks and the
+[updated preview](../../validation/evidence/hud/engine-blade-markers-2026-10-05/blade-markers.png).
+Every requested count was recovered from the rendered pixels in WebGPU,
+WebGL2 and WebGL1, and marker areas within each ring stayed within 15% at the
+enlarged validation size. The actual 68px HUD was visually inspected separately.
+Related checks passed 73 files / 886 tests, plus typecheck, lint, production
+build and artifact verification. The one full-suite run caught an unrelated,
+concurrently added Aircraft-panel test fixture; its cause and follow-up are
+preserved in the record. After its redundant tab click was removed, that file
+passed all 51 tests. The [earlier two-marker record](../../validation/evidence/hud/engine-orbs-2026-10-05/acceptance.json)
+describes the superseded presentation. Lifecycle tests cover fallback, context
+loss, cleanup, draw limits, missing counts, hidden/static frames and pause;
+native integration covers the C172 with unrelated N1/N2 nodes present.
+The phone does not import the full aircraft
+settings catalog for defaults: an older host without orb settings keeps a
+numeric-only display and allocates no graphics backend for it.
+
 ### Controls
+
+**Automatic flaps (2026-10-05).** `osfs.assist.autoFlaps` is on by default for
+every aircraft, with its home in Aircraft → Assists. The FLAPS Auto button edits
+that same saved value. The slider and percentage observe physical native flap
+travel, including the F-35B's negative reflex position, rather than displaying
+an unused manual demand. Dragging leaves the handle under the pilot's finger;
+the percentage continues to report the actuator. Slider, keyboard, controller
+or phone flap commands take manual ownership. Turning Auto off without moving
+a control starts from the observed position. Autopilot flap ownership takes
+precedence while engaged.
+Feedback and input handoff do not count as flap commands: an unchanged phone
+lever leaves Auto enabled even as the physical flaps move. While a focused
+slider is being edited with the keyboard, it retains the requested position
+(including while paused), and its percentage continues to show actual travel.
+The Auto button distinguishes the saved request from current autopilot ownership.
+
+The F-35B uses its existing native airspeed/Mach schedule through the independent
+`fcs/flaps-auto-enabled` switch. This does not change the selected flight control
+law. The C172 and SF50 use an explicitly simulated pilot assist from declarative
+`FdmProfile.automaticFlaps` data; their real aircraft are not claimed to have
+this feature. The assist interpolates approach commands, caps them at the
+takeoff configuration during high-power/climb or gear-up operation, retracts
+through the declared takeoff speed band, and retains landing flap through a
+low-power ground rollout. Native actuators still determine the actual motion;
+this is not an overspeed protection guarantee.
+
+The C172P curve reaches at most 10° by 80 KIAS and retracts by 105 KIAS. Its
+published limits are 110 KIAS at 10° and 85 KIAS beyond 10° in the
+[manufacturer's POH, section 2](https://www.glasscockpitaviation.com/wp-content/uploads/2022/07/cessna-n54829-poh.pdf).
+The SF50 curve reaches at most half flap by 140 KIAS and retracts by 180 KIAS;
+its half/full limits are 190/150 KIAS in the
+[manufacturer's AFM, section 2](https://flightsimcoach.com/wp-content/uploads/2020/12/SF50-POH.pdf).
+The interpolation points and 70% high-power threshold are conservative simulator
+assist choices, not manufacturer automatic-control schedules. SF50 variants
+share this assist; variant-specific automatic flap behavior is not asserted.
 
 | Parameter | Unit | Today |
 | --- | --- | --- |
@@ -113,6 +259,8 @@ existing tabs.
 | --- | --- | --- |
 | `osfs.start.location` | lat, lon | Minneapolis (44.9778, −93.2650) |
 | `osfs.start.heightAboveGround` | m | 1,524 (5,000 ft) |
+| `osfs.start.resume` | on/off | On: a new session resumes the last saved flight |
+| `osfs.start.saveInterval` | s | 5 |
 
 ### Aircraft → Assists
 
@@ -149,6 +297,26 @@ a discrete choice ([sound spec](../sound.md)). The parameters inside each tier
 that trade quality for work (oscillator and grain counts, impulse-response
 length, internal sample rate) are defined in that spec and join the registry
 under `osfs.sound.*`.
+
+The same Sound section holds continuous, live, persistent listening controls:
+
+| Parameter | Unit | Bounds / default |
+| --- | --- | --- |
+| `osfs.sound.masterVolume` | mix amplitude ratio, shown as % | 0–8 / 2 (0–800%, default 200% of the previous master maximum) |
+| `osfs.sound.engineVolume` | amplitude ratio, shown as % | 0–8 / 0.8 (0–800%, default 80%) |
+| `osfs.sound.afterburnerVolume` | extra-roar gain ratio, shown as % | 0–1 / 0.5 (default 50%; 100% is the previous extra-roar gain) |
+| `osfs.sound.listenerCockpitBlend` | acoustic-viewpoint blend | 0–1 / 1 (Camera 0, Cockpit 1; default Cockpit) |
+
+Master gain uses the old maximum of 1 as its reference; its default is now 2
+and maximum 8. Existing saved values keep their level until changed or reset.
+Engine boost preserves existing saved gains and also scales the engine's
+afterburner component; the separate afterburner control can reduce its extra
+roar. A zero extra-roar gain retains native augmented spectrum and thrust
+response. Camera–Cockpit positions blend listener geometry, motion and
+cabin/exterior treatment; intermediate viewpoints are artistic. The visual
+camera remains independently controlled. These settings have no second home
+under Camera or Controls. Integrated software checks for this 2026-10-05 follow-up
+pass; see the [sound ledger](../validation/audio-implementation-ledger.md#163-pilot-sound-controls-2026-10-05-follow-up).
 
 ## Presets
 
@@ -314,3 +482,99 @@ Done with FOSS Earth's preset stage (its stage 5):
   theme are not the flight's, so they are left out.
 - A test checks that the app takes every value in every flight preset, and
   that a fresh flight matches Ground: Minimal and Phone camera: original.
+
+### Resuming the last flight (2026-10-05)
+
+Every session used to start at the start position, so a reload or a change of
+aircraft undid the flight in progress.
+
+- The flight is saved to browser storage (`osfs.saved-flight.v1`, about 2 KB):
+  every `osfs.start.saveInterval` seconds of flight, on pause, after a
+  placement, and when the page is hidden or left. A faulted or loading flight
+  is not saved; the previous save stands. The record is the fixed-step loop's
+  recovery snapshot (position, attitude, velocities, controls, fuel, engine)
+  with the aircraft, the pause and the height above the ground
+  (`src/flight/jsbsim/savedFlight.ts`).
+- With `osfs.start.resume` on, a new session prepares the ground under the
+  saved flight, puts the aircraft back at its saved height above that ground
+  (so a parked aircraft stays parked when the map's ground differs), and
+  starts paused if it was saved paused. Another aircraft takes the position
+  and motion but keeps its own controls and engine. The saved wind is not
+  restored, because the Weather tab starts calm every session.
+- A start position in the page address (`?set.osfs.start.latitude=…`) wins
+  over the saved flight. Turning resuming off forgets the saved flight.
+  Aircraft → Start says when the flight was last saved and where, and
+  **Start a new flight** discards it and reloads at the start position.
+- Pause also works while the flight loads. Until the simulator exists, the
+  starting bindings (P, and the controller's Start button) choose whether the
+  flight starts paused, and a log line says which. Once the HUD exists, its
+  pause button is the one control the loading hold leaves usable.
+
+## TODO: custom flight instruments and world-space cues
+
+Requested 2026-10-05; deliberately deferred to a fresh conversation after the
+F-35B work. Owner: 0sfs, because these controls and cues need an aircraft.
+
+- [ ] Add a flight UI customization section with saved, independent choices
+  for which instruments and flight controls are shown.
+- [ ] Allow the attitude-indicator joystick to be disabled or hidden, keeping
+  keyboard, gamepad and other flight controls usable. Decide separately whether
+  its attitude display remains visible when its steering interaction is off.
+- [ ] Offer prograde, retrograde, normal, anti-normal, radial-in and radial-out
+  indicators projected into the actual flight view, together with pitch and
+  heading cues, as an alternative to relying on the attitude instrument.
+- [ ] Define cockpit/chase behaviour, off-screen and undefined-vector handling,
+  readable cue placement, and pointer pass-through before implementing them.
+
+Start from `src/flight/hud/flightHud.ts` and the marker definitions in
+`src/flight/hud/attitudeIndicator.ts`. Project through the active flight camera
+and respect floating-origin changes. Each setting has one home and uses the
+existing settings registry; turning a feature off stops its own drawing and
+work. Verify that hiding the joystick leaves all other levers accessible and
+that world-space cues follow the flight vector through camera changes, without
+intercepting aircraft or camera input. None of this TODO is implemented by the
+F-35B sound, gear or VTOL-slider changes.
+
+## TODO: hold the idle throttle handle to stop or start the engine
+
+Requested 2026-10-05; deferred to a fresh conversation. Owner: 0sfs flight
+controls and engine lifecycle. At **0% throttle**, hovering over the slider
+handle should expose a press-and-hold start/stop action. Draw a completing
+circle around that handle: **black while commanding shutdown**, **blue while
+commanding restart**. Complete the command only when the hold completes;
+release or cancellation must leave the engine unchanged.
+
+- [ ] Define the hold duration as a visible parameter in seconds, together
+  with pointer, touch and keyboard access and a cancel path.
+- [ ] Keep normal throttle dragging usable; distinguish handle holding from
+  moving the slider. Do not shut down merely because throttle reaches idle.
+- [ ] Use the selected aircraft's real cutoff/starter sequence and observe
+  native engine state. Separate completion of the gesture from completion of
+  engine spool-down or startup; expose unavailable or failed starts clearly.
+- [ ] Test incomplete holds, dragging, blur/cancellation, repeat commands,
+  paused/reset state, and different supported engine types.
+
+Start from `src/flight/hud/flightHud.ts` and the backend's engine-control API.
+This gesture and its progress circle are not implemented in the current pass.
+## Aircraft mesh inspection
+
+Aircraft → Mesh inspector contains the live **Show polygon edges** switch
+(`osfs.aircraft.wireframe`, default off). Its mesh tree selects the loaded model's
+parts for orange triangle-edge highlights; selection does not hide geometry.
+Selection is local to the loaded model and resets on replacement, while the
+global switch is saved. [Aircraft assets](../aircraft-assets.md#inspecting-the-mesh)
+describes the rendering and resource lifecycle.
+
+## Aircraft control law
+
+The F-35B exposes Aircraft → Flight controls → Aircraft control law, saved as
+`osfs.aircraft.controlLaw`. Auto selects the aircraft's native default (currently
+fly-by-wire for the F-35B); Manual bypasses its pitch, roll and yaw stabilization;
+Fly-by-wire explicitly enables it. Manual retains the physical actuator limits,
+trim and VTOL conversion. The setting displays the observed active law, which
+can lag a new request while physics is paused. Other aircraft do not expose a
+selector or acquire synthetic FCS properties.
+
+This choice controls the aircraft's native law. Autopilot and the visible input
+and auto-trim assists remain independently configured. The prototype laws are
+experimental; these modes do not reproduce a real F-35 cockpit control selector.

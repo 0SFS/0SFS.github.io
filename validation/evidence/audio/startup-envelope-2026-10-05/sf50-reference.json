@@ -1,0 +1,333 @@
+{
+  "purpose": "Old SF50 fixture begins with the smoother below idle: startup changes are intentional; retain explicit bounded transient differences and post-settling identity.",
+  "cases": [
+    {
+      "sampleRate": 44100,
+      "tier": 1,
+      "exterior": 0,
+      "beforeWasmSha256": "7a876882d8cf38ec043e97b7d84fc58c7b12faec730db4087059b6eb66458339",
+      "afterWasmSha256": "0aea1d9488f7208a8d8aa28ab1e8ed9d6f741787f4b1242cbca92ac87bbc91a1",
+      "beforeOutputSha256": "4856405677877bc2e10ece508a4cc10522abf77da67d580d8b5a57a52e8f2c3c",
+      "afterOutputSha256": "db51784ec2ab60c99e7650f1381d5104fe58e83cd89e16c59b32d2f210a52e54",
+      "beforeSettledSha256": "c9cf022d65f373101786fd748f4bb389a0eecbb61addaa8d4caac69ff8a60823",
+      "afterSettledSha256": "c9cf022d65f373101786fd748f4bb389a0eecbb61addaa8d4caac69ff8a60823",
+      "windows": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 0.1,
+          "changedSamples": 8810,
+          "maxAbsoluteDifference": 0.00041637360118329525,
+          "rmsDifference": 0.00007257210263556371
+        },
+        {
+          "startSeconds": 0.1,
+          "endSeconds": 0.2,
+          "changedSamples": 1404,
+          "maxAbsoluteDifference": 9.313225746154785e-10,
+          "rmsDifference": 1.2145670243166157e-10
+        },
+        {
+          "startSeconds": 0.2,
+          "endSeconds": 0.4,
+          "changedSamples": 0,
+          "maxAbsoluteDifference": 0,
+          "rmsDifference": 0
+        },
+        {
+          "startSeconds": 0.4,
+          "endSeconds": 0.8,
+          "changedSamples": 0,
+          "maxAbsoluteDifference": 0,
+          "rmsDifference": 0
+        }
+      ]
+    },
+    {
+      "sampleRate": 44100,
+      "tier": 1,
+      "exterior": 1,
+      "beforeWasmSha256": "7a876882d8cf38ec043e97b7d84fc58c7b12faec730db4087059b6eb66458339",
+      "afterWasmSha256": "0aea1d9488f7208a8d8aa28ab1e8ed9d6f741787f4b1242cbca92ac87bbc91a1",
+      "beforeOutputSha256": "6be5fc85c2cf7c6a29e629fc22d7fae0ddf74574fe04029e606813c689b027e7",
+      "afterOutputSha256": "975f7fa51e101142ecfebb43ab53cc1a3f8e5e7dd7c2bcf0495018bfb13fd19f",
+      "beforeSettledSha256": "7231e37a893369afe64c6216363a4ad737d1da089bac51ba403a364e9f4b898f",
+      "afterSettledSha256": "7231e37a893369afe64c6216363a4ad737d1da089bac51ba403a364e9f4b898f",
+      "windows": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 0.1,
+          "changedSamples": 8804,
+          "maxAbsoluteDifference": 0.00039034930523484945,
+          "rmsDifference": 0.00005895358084138271
+        },
+        {
+          "startSeconds": 0.1,
+          "endSeconds": 0.2,
+          "changedSamples": 1246,
+          "maxAbsoluteDifference": 9.313225746154785e-10,
+          "rmsDifference": 7.187957940800294e-11
+        },
+        {
+          "startSeconds": 0.2,
+          "endSeconds": 0.4,
+          "changedSamples": 0,
+          "maxAbsoluteDifference": 0,
+          "rmsDifference": 0
+        },
+        {
+          "startSeconds": 0.4,
+          "endSeconds": 0.8,
+          "changedSamples": 0,
+          "maxAbsoluteDifference": 0,
+          "rmsDifference": 0
+        }
+      ]
+    },
+    {
+      "sampleRate": 44100,
+      "tier": 2,
+      "exterior": 0,
+      "beforeWasmSha256": "7a876882d8cf38ec043e97b7d84fc58c7b12faec730db4087059b6eb66458339",
+      "afterWasmSha256": "0aea1d9488f7208a8d8aa28ab1e8ed9d6f741787f4b1242cbca92ac87bbc91a1",
+      "beforeOutputSha256": "76098a2fb75545c22de090a859bc433e5902bf4d61cc796066bf5502b94354d0",
+      "afterOutputSha256": "0083533b820d3b07a398062de3941299e996424e4ae754f7ea55ce1cd9110754",
+      "beforeSettledSha256": "e39189b4c377e29da0abcd55a7748f7dd14f2162aa829fe86a8366064e7d47a2",
+      "afterSettledSha256": "e39189b4c377e29da0abcd55a7748f7dd14f2162aa829fe86a8366064e7d47a2",
+      "windows": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 0.1,
+          "changedSamples": 7750,
+          "maxAbsoluteDifference": 0.002256319159641862,
+          "rmsDifference": 0.0003407239603495916
+        },
+        {
+          "startSeconds": 0.1,
+          "endSeconds": 0.2,
+          "changedSamples": 2616,
+          "maxAbsoluteDifference": 2.3283064365386963e-9,
+          "rmsDifference": 5.054637016751748e-10
+        },
+        {
+          "startSeconds": 0.2,
+          "endSeconds": 0.4,
+          "changedSamples": 0,
+          "maxAbsoluteDifference": 0,
+          "rmsDifference": 0
+        },
+        {
+          "startSeconds": 0.4,
+          "endSeconds": 0.8,
+          "changedSamples": 0,
+          "maxAbsoluteDifference": 0,
+          "rmsDifference": 0
+        }
+      ]
+    },
+    {
+      "sampleRate": 44100,
+      "tier": 2,
+      "exterior": 1,
+      "beforeWasmSha256": "7a876882d8cf38ec043e97b7d84fc58c7b12faec730db4087059b6eb66458339",
+      "afterWasmSha256": "0aea1d9488f7208a8d8aa28ab1e8ed9d6f741787f4b1242cbca92ac87bbc91a1",
+      "beforeOutputSha256": "9d0a2f369502dde1da64499e79848f5c553c8cb65e4ad5d5467cc4a06d3834dd",
+      "afterOutputSha256": "7be3cb6a958445b35742632391b2dab985587798a8dcb1b2c933b5a3dce65c8e",
+      "beforeSettledSha256": "4f2eef491f69df383cb074f2d4365ba16f309b11885bcf25bbc97dac296b4782",
+      "afterSettledSha256": "4f2eef491f69df383cb074f2d4365ba16f309b11885bcf25bbc97dac296b4782",
+      "windows": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 0.1,
+          "changedSamples": 5530,
+          "maxAbsoluteDifference": 0.00476066442206502,
+          "rmsDifference": 0.000496962293485421
+        },
+        {
+          "startSeconds": 0.1,
+          "endSeconds": 0.2,
+          "changedSamples": 7107,
+          "maxAbsoluteDifference": 0.0000056908465921878815,
+          "rmsDifference": 5.028911537253149e-7
+        },
+        {
+          "startSeconds": 0.2,
+          "endSeconds": 0.4,
+          "changedSamples": 93,
+          "maxAbsoluteDifference": 4.656612873077393e-10,
+          "rmsDifference": 8.279554523350763e-12
+        },
+        {
+          "startSeconds": 0.4,
+          "endSeconds": 0.8,
+          "changedSamples": 0,
+          "maxAbsoluteDifference": 0,
+          "rmsDifference": 0
+        }
+      ]
+    },
+    {
+      "sampleRate": 48000,
+      "tier": 1,
+      "exterior": 0,
+      "beforeWasmSha256": "7a876882d8cf38ec043e97b7d84fc58c7b12faec730db4087059b6eb66458339",
+      "afterWasmSha256": "0aea1d9488f7208a8d8aa28ab1e8ed9d6f741787f4b1242cbca92ac87bbc91a1",
+      "beforeOutputSha256": "b8d3e927b5cc2c0059c3f72ec1c51e4b9f4961b5a246bf7ac0bf7717114e44fb",
+      "afterOutputSha256": "35c52c29d93e288c3c6ad90eb737ede66e2d57e9b67b8c72a6f821bca358d8f2",
+      "beforeSettledSha256": "bd697558f8a414fae805850fb52f23db45a2923c26f1155a2020c86722ff0732",
+      "afterSettledSha256": "bd697558f8a414fae805850fb52f23db45a2923c26f1155a2020c86722ff0732",
+      "windows": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 0.1,
+          "changedSamples": 9528,
+          "maxAbsoluteDifference": 0.00036750774597749114,
+          "rmsDifference": 0.00008151629110044102
+        },
+        {
+          "startSeconds": 0.1,
+          "endSeconds": 0.2,
+          "changedSamples": 992,
+          "maxAbsoluteDifference": 9.313225746154785e-10,
+          "rmsDifference": 9.518946523331169e-11
+        },
+        {
+          "startSeconds": 0.2,
+          "endSeconds": 0.4,
+          "changedSamples": 0,
+          "maxAbsoluteDifference": 0,
+          "rmsDifference": 0
+        },
+        {
+          "startSeconds": 0.4,
+          "endSeconds": 0.8,
+          "changedSamples": 0,
+          "maxAbsoluteDifference": 0,
+          "rmsDifference": 0
+        }
+      ]
+    },
+    {
+      "sampleRate": 48000,
+      "tier": 1,
+      "exterior": 1,
+      "beforeWasmSha256": "7a876882d8cf38ec043e97b7d84fc58c7b12faec730db4087059b6eb66458339",
+      "afterWasmSha256": "0aea1d9488f7208a8d8aa28ab1e8ed9d6f741787f4b1242cbca92ac87bbc91a1",
+      "beforeOutputSha256": "996e477a14e93b260cb7707ec89e5b4a1ab8d0e296f23c400d3dc76f9db1bffd",
+      "afterOutputSha256": "de5cacab8701fd51743d5eeacd719996c400152143bfcc98bd7e378c33308a7b",
+      "beforeSettledSha256": "a2fdea2859ac7ce6c722d3140a192520a91a48e15eef85076ff167d409090263",
+      "afterSettledSha256": "a2fdea2859ac7ce6c722d3140a192520a91a48e15eef85076ff167d409090263",
+      "windows": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 0.1,
+          "changedSamples": 9513,
+          "maxAbsoluteDifference": 0.00039669324178248644,
+          "rmsDifference": 0.00006537346339193778
+        },
+        {
+          "startSeconds": 0.1,
+          "endSeconds": 0.2,
+          "changedSamples": 995,
+          "maxAbsoluteDifference": 9.313225746154785e-10,
+          "rmsDifference": 5.174596458457843e-11
+        },
+        {
+          "startSeconds": 0.2,
+          "endSeconds": 0.4,
+          "changedSamples": 0,
+          "maxAbsoluteDifference": 0,
+          "rmsDifference": 0
+        },
+        {
+          "startSeconds": 0.4,
+          "endSeconds": 0.8,
+          "changedSamples": 0,
+          "maxAbsoluteDifference": 0,
+          "rmsDifference": 0
+        }
+      ]
+    },
+    {
+      "sampleRate": 48000,
+      "tier": 2,
+      "exterior": 0,
+      "beforeWasmSha256": "7a876882d8cf38ec043e97b7d84fc58c7b12faec730db4087059b6eb66458339",
+      "afterWasmSha256": "0aea1d9488f7208a8d8aa28ab1e8ed9d6f741787f4b1242cbca92ac87bbc91a1",
+      "beforeOutputSha256": "5d92208fa14bb14a1dc5168cd4d46a740615fd90be9edaac51b64a3a2d545ed2",
+      "afterOutputSha256": "2500f53bd71b9690ef0981877c9bafc9036dba76202733c3c0066dc653aae984",
+      "beforeSettledSha256": "45bd69cd4f72d9dc38d1259126538577c3c01ef572a9d3c7c06c92c7c9b53098",
+      "afterSettledSha256": "45bd69cd4f72d9dc38d1259126538577c3c01ef572a9d3c7c06c92c7c9b53098",
+      "windows": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 0.1,
+          "changedSamples": 8436,
+          "maxAbsoluteDifference": 0.001893303109682165,
+          "rmsDifference": 0.0003687722077915759
+        },
+        {
+          "startSeconds": 0.1,
+          "endSeconds": 0.2,
+          "changedSamples": 2994,
+          "maxAbsoluteDifference": 3.259629011154175e-9,
+          "rmsDifference": 6.342899657504822e-10
+        },
+        {
+          "startSeconds": 0.2,
+          "endSeconds": 0.4,
+          "changedSamples": 0,
+          "maxAbsoluteDifference": 0,
+          "rmsDifference": 0
+        },
+        {
+          "startSeconds": 0.4,
+          "endSeconds": 0.8,
+          "changedSamples": 0,
+          "maxAbsoluteDifference": 0,
+          "rmsDifference": 0
+        }
+      ]
+    },
+    {
+      "sampleRate": 48000,
+      "tier": 2,
+      "exterior": 1,
+      "beforeWasmSha256": "7a876882d8cf38ec043e97b7d84fc58c7b12faec730db4087059b6eb66458339",
+      "afterWasmSha256": "0aea1d9488f7208a8d8aa28ab1e8ed9d6f741787f4b1242cbca92ac87bbc91a1",
+      "beforeOutputSha256": "5458f653f1044595d24302ccf81a3e3446fc1b76d3403c4c234decac10fc6c38",
+      "afterOutputSha256": "b48c12592abc3c62eeff88d3893194903fa752e5fdff1b7c78de842f7cd11d5b",
+      "beforeSettledSha256": "8ebb4c42be6a7755db9400fd22021d9645020fdbe88e12181397f14718175efd",
+      "afterSettledSha256": "8ebb4c42be6a7755db9400fd22021d9645020fdbe88e12181397f14718175efd",
+      "windows": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 0.1,
+          "changedSamples": 6018,
+          "maxAbsoluteDifference": 0.004218016751110554,
+          "rmsDifference": 0.0005695862275399815
+        },
+        {
+          "startSeconds": 0.1,
+          "endSeconds": 0.2,
+          "changedSamples": 7157,
+          "maxAbsoluteDifference": 0.000004293164238333702,
+          "rmsDifference": 4.060499997153762e-7
+        },
+        {
+          "startSeconds": 0.2,
+          "endSeconds": 0.4,
+          "changedSamples": 34,
+          "maxAbsoluteDifference": 9.313225746154785e-10,
+          "rmsDifference": 7.663077162287159e-12
+        },
+        {
+          "startSeconds": 0.4,
+          "endSeconds": 0.8,
+          "changedSamples": 0,
+          "maxAbsoluteDifference": 0,
+          "rmsDifference": 0
+        }
+      ]
+    }
+  ]
+}

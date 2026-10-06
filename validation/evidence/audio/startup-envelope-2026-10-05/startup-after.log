@@ -1,0 +1,30 @@
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+ ❯ src/flight/audio/acousticProfiles.test.ts (12 tests | 1 failed) 1109ms
+     × matches every retained SF50 legacy output hash at 44.1/48 kHz in Low/Med and both views 15ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/flight/audio/acousticProfiles.test.ts > shared engine acoustic setup (actual shipped WASM) > matches every retained SF50 legacy output hash at 44.1/48 kHz in Low/Med and both views
+AssertionError: expected 'db51784ec2ab60c99e7650f1381d5104fe58e…' to be '4856405677877bc2e10ece508a4cc10522abf…' // Object.is equality
+
+Expected: "4856405677877bc2e10ece508a4cc10522abf77da67d580d8b5a57a52e8f2c3c"
+Received: "db51784ec2ab60c99e7650f1381d5104fe58e83cd89e16c59b32d2f210a52e54"
+
+ ❯ src/flight/audio/acousticProfiles.test.ts:88:36
+     86|     for (const configuration of reference.cases) {
+     87|       const current = await renderReference("src/flight/audio/dsp/audi…
+     88|       expect(current.outputSha256).toBe(configuration.referenceOutputS…
+       |                                    ^
+     89|     }
+     90|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 19 passed (20)
+   Start at  22:07:40
+   Duration  1.26s (transform 73ms, setup 0ms, import 95ms, tests 2.08s, environment 0ms)
+

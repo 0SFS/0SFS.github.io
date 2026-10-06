@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-05T23:06:46.729Z",
+  "scope": "hot hardware and sparse aircraft aerosol follow-up",
+  "softwareQualification": {
+    "uniqueCasesPassed": 50,
+    "fullCi": "pending parent final combined check",
+    "initialRun": {
+      "files": 7,
+      "passedCases": 43,
+      "failedCases": 5,
+      "totalCases": 48,
+      "rawLogPath": "build/checks/engine-glow-smoke/2026-10-05_180059/focused.log",
+      "rawLogSha256": "4c7e81b0536ffa75cae18e80618af1a89e399f68081fa20efdbbd9c9812eb044",
+      "correctedFailures": [
+        "Test readout uses the actual submitted instance matrix source instead of Babylon-cleared buffer CPU data.",
+        "MultiMaterial identity assertions account for Babylon array hook methods.",
+        "Very cool thermal RGB permits green/blue channels below the linear-sRGB gamut floor."
+      ],
+      "retainedLog": "glow-smoke-focused-initial.log",
+      "retainedLogBytes": 1240588,
+      "retainedLogSha256": "4c7e81b0536ffa75cae18e80618af1a89e399f68081fa20efdbbd9c9812eb044"
+    },
+    "passingFollowups": [
+      {
+        "log": "glow-smoke-failed-files-rerun.log",
+        "files": 3,
+        "cases": 19
+      },
+      {
+        "log": "glow-smoke-preparation-frame-final.log",
+        "files": 2,
+        "cases": 13,
+        "newCases": 2
+      },
+      {
+        "log": "glow-smoke-smoke-attributes-final.log",
+        "files": 1,
+        "cases": 8
+      }
+    ],
+    "caseCounts": {
+      "plume": 14,
+      "hotSurface": 5,
+      "smoke": 8,
+      "orchestration": 7,
+      "enuAndFrameCache": 8,
+      "opticalBake": 7,
+      "smokeBake": 1
+    },
+    "typecheck": {
+      "exitCode": 0,
+      "log": "glow-smoke-typecheck.log",
+      "note": "Passed before unrelated app edits; later app-only narrowing error is owned by parent."
+    },
+    "lint": {
+      "exitCode": 0,
+      "log": "glow-smoke-lint-final.log"
+    }
+  },
+  "resourceContract": {
+    "smoke": {
+      "staticTriangles": 2,
+      "drawBatchesPerEngine": 1,
+      "maxInstances": 512,
+      "defaultInstances": 64,
+      "defaultRatePerSecond": 8,
+      "defaultLifetimeSeconds": 2,
+      "defaultOpacity": 0.025,
+      "defaultMaxDistanceMeters": 1000,
+      "textureWidth": 128,
+      "textureHeight": 128,
+      "frames": 16,
+      "simulationStorage": "Float64 ECEF",
+      "uploadStorage": "Float32 after double current-frame projection"
+    },
+    "hardwareGlow": "Scoped PBR clones; preserves author geometry and material bindings outside the attachment."
+  },
+  "unchangedAfterburnerLutSha256": "208ae6cb513beedeb2a5e2b1f0f2ca17952ca66c2ca682733570e3f469af39a6",
+  "limits": [
+    "Final hardware shader/render check pending; no new device performance or energy measurement.",
+    "900–1400 K surface table is an assumed display model, not measured F135 temperature or radiance.",
+    "Aerosol is original procedural artwork with artistic growth/drift, not CFD, calibrated soot or contrail physics.",
+    "Afterburner texture and optical volume appearance have not been retuned in this pass."
+  ],
+  "files": [
+    {
+      "path": "src/flight/aircraft/createEngineExhaust.ts",
+      "bytes": 20484,
+      "sha256": "f45761a1332d58607a39021ec2ec4eb13aac9795180507ad8a2a596d855edb4b"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineHotSurfaceGlow.ts",
+      "bytes": 6428,
+      "sha256": "e4b4af18b4eab4e27cf7eb8df0babf82cc269d714fbe29b38eed0a1625d6b424"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineSmoke.ts",
+      "bytes": 18891,
+      "sha256": "c0176d9ed5aa3dfdc51840ddd930eb9f7aa7fc0ef253d7e0abe5c75eb61602d6"
+    },
+    {
+      "path": "src/flight/aircraft/engineSmokeProfiles.ts",
+      "bytes": 1189,
+      "sha256": "49f176acd3e71a98c96c08743bfdf0ef1adba8b0aab5407b4623375a151b9f9b"
+    },
+    {
+      "path": "src/flight/aircraft/createAircraftEngineVisuals.ts",
+      "bytes": 9969,
+      "sha256": "9d11cc2044639a206eb1b08207266a1036ff6cd4d11b8b0414f5f360d71284a6"
+    },
+    {
+      "path": "src/flight/bridge/enuFrame.ts",
+      "bytes": 3136,
+      "sha256": "2326ef2fa857dd15827f3808994b63b0d9c10dab189e934d6803164c6811e9d2"
+    },
+    {
+      "path": "src/flight/bridge/floatingOrigin.ts",
+      "bytes": 2823,
+      "sha256": "ce95252dd4080f1300d90418d2f3e214eb8d6591c0c254b6d753b4437966f622"
+    },
+    {
+      "path": "scripts/build-engine-smoke.mjs",
+      "bytes": 4365,
+      "sha256": "600602a5a381524ac2212c1e6a72bf70cde9fecd0545c812bb2477d13b3df774"
+    },
+    {
+      "path": "scripts/build-exhaust-optics.mjs",
+      "bytes": 5981,
+      "sha256": "a89f1fd44c12dc6eb65d331aba3b1ce74bf2e0879b9fcb28a35fca4257e5e365"
+    },
+    {
+      "path": "scripts/exhaustOptics/bake.mjs",
+      "bytes": 8970,
+      "sha256": "0aff8329987f1eb324e70c917d3272467f3fa4575f80b7600ed870b7bc6bad4a"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.png",
+      "bytes": 2856,
+      "sha256": "208ae6cb513beedeb2a5e2b1f0f2ca17952ca66c2ca682733570e3f469af39a6"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json",
+      "bytes": 11006,
+      "sha256": "f6265447eb2f07cbe96098388bf2ae967d0c4c1039ba97ccaa23c7b1e6bdb5ea"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135ExhaustOpticalData.ts",
+      "bytes": 2159,
+      "sha256": "972aa71b408b6e49411ef667044801b8987b1f48171273acbbc76f745294c6b3"
+    },
+    {
+      "path": "src/flight/aircraft/generated/engine-smoke-flipbook.png",
+      "bytes": 7900,
+      "sha256": "73c447a6b283841a81373d4d7fcb591b027fcdab1dd402d57315603285985590"
+    },
+    {
+      "path": "src/flight/aircraft/generated/engine-smoke-flipbook.manifest.json",
+      "bytes": 1489,
+      "sha256": "85ced3ece6cc4763b736320f5567bee9e646ccda1eb198ff7c79546109041b30"
+    }
+  ]
+}

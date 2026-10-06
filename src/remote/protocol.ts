@@ -1,6 +1,8 @@
 import type { ControlSurfaceState } from "../flight/input/flightInputManager";
+import type { EngineRunState } from "../flight/jsbsim/engineControl";
+import type { EngineRotorBladeCounts } from "../flight/aircraft/engineRotorDefinitions";
 
-export type { ControlSurfaceState };
+export type { ControlSurfaceState, EngineRunState };
 export const PROTOCOL_VERSION = 1;
 export const PROTOCOL_MISMATCH_MESSAGE = "Unsupported phone protocol. Reload both devices.";
 export const MAX_MESSAGE_BYTES = 2048;
@@ -24,8 +26,24 @@ export const HAPTIC_FEEDBACK_TTL_MS = 90;
  * not as an id: a phase added to the flight model still prints on an older
  * controller, which only loses the colour it cannot look up.
  */
+export interface EngineOrbSettings {
+  fps: number;
+  turnsPerSecond: number;
+  pixelRatio: number;
+  renderer: "auto" | "webgpu" | "webgl2" | "webgl1" | "off";
+}
+
 export interface EngineStatus {
   phase: string;
+  kind?: "piston" | "turbine";
+  /** Per-row blade counts; absent from older hosts, which retain numeric readouts. */
+  rotorBlades?: EngineRotorBladeCounts;
+  simTimeS?: number;
+  maxN1?: number;
+  maxN2?: number;
+  maxRpm?: number;
+  /** The desktop's visible animation budgets also apply to the phone widget. */
+  orbs?: EngineOrbSettings;
   n1?: number;
   n2?: number;
   /** A piston engine's shaft speed; a turbine shows its spools instead. */
@@ -34,7 +52,19 @@ export interface EngineStatus {
   fuelFlowPph?: number;
   /** Only when the model publishes volume flow; otherwise the widget converts. */
   fuelFlowGph?: number;
+  /**
+   * What the throttle lever shows and lets the pilot do: held to start while
+   * `stopped`, ringed while `starting`, held at idle to shut down while
+   * `running`. Absent from a host that cannot start or stop its engine, and
+   * the phone then draws a plain throttle; additive on v1 like `gearDown`.
+   */
+  state?: EngineRunState;
+  /** How far a start has got, 0 to 1; 1 only once the engine runs. */
+  start?: number;
+  /** Why a start cannot finish now, such as an empty tank. */
+  blocked?: string;
 }
+export const ENGINE_RUN_STATES: readonly EngineRunState[] = ["running", "starting", "stopped"];
 
 export interface AircraftStatus {
   owner: "local" | "phone";
@@ -152,14 +182,21 @@ export function isControlTrace(value: unknown): value is ControlTrace {
 }
 
 export interface Envelope { v: 1; session: string; epoch: number }
-export type ActionName = "requestControl" | "releaseControl" | "setPaused" | "setViewMode" | "setGearDown";
+export type ActionName = "requestControl" | "releaseControl" | "setPaused" | "setViewMode" | "setGearDown" | "shutdownEngine";
 export type ActionMessage = Envelope & {
   type: "action"; id: number; lease: number; action: ActionName; value?: boolean | "first" | "third";
 };
 /** Latest-value presentation cue; pulseMs 0 means stop now. Never a history of impacts. */
 export interface HapticFeedbackFrame { v: 1; id: number; pulseMs: number; ttlMs: number }
+/**
+ * `starter: 1` while the phone holds its throttle lever to start the engine,
+ * absent otherwise. A held control like the brake, not an action: it ends
+ * when the frames that carry it stop, so a phone that drops off cannot leave
+ * the starter turning. Additive on v1; an older host ignores it.
+ */
 export type ControlFrame = Envelope & {
   type: "controls"; seq: number; lease: number; controls: ControlSurfaceState; camera?: CameraAim; aim?: CameraTotal; trace?: ControlTrace;
+  starter?: 1;
 };
 export type RemoteMessage =
   | { v: 1; type: "hello"; secret: string }
@@ -210,6 +247,28 @@ export function isEngineStatus(value: unknown): value is EngineStatus {
   if (!record(value)) return false;
   // A label, not free text: bounded and printable, because the phone renders it.
   if (typeof value.phase !== "string" || !/^[A-Z][A-Z ]{0,15}$/.test(value.phase)) return false;
+  if (value.state !== undefined && !ENGINE_RUN_STATES.includes(value.state as EngineRunState)) return false;
+  if (value.kind !== undefined && value.kind !== "piston" && value.kind !== "turbine") return false;
+  if (value.rotorBlades !== undefined) {
+    if (!record(value.rotorBlades)) return false;
+    const blades = value.rotorBlades;
+    const validCount = (count: unknown): boolean => finite(count) && Number.isInteger(count) && count >= 1 && count <= 128;
+    if (!validCount(blades.outer) || !(blades.inner === null || validCount(blades.inner))
+      || typeof blades.outerEstimated !== "boolean" || typeof blades.innerEstimated !== "boolean") return false;
+  }
+  if (value.simTimeS !== undefined && !(finite(value.simTimeS) && value.simTimeS >= 0)) return false;
+  if (!["maxN1", "maxN2", "maxRpm"].every(key => value[key] === undefined || (finite(value[key]) && value[key] > 0))) return false;
+  if (value.orbs !== undefined) {
+    if (!record(value.orbs)) return false;
+    const orbs = value.orbs;
+    if (!(finite(orbs.fps) && orbs.fps >= 0 && orbs.fps <= 60
+      && finite(orbs.turnsPerSecond) && orbs.turnsPerSecond >= 0 && orbs.turnsPerSecond <= 4
+      && finite(orbs.pixelRatio) && orbs.pixelRatio >= 1 && orbs.pixelRatio <= 3
+      && ["auto", "webgpu", "webgl2", "webgl1", "off"].includes(orbs.renderer as string))) return false;
+  }
+  if (value.start !== undefined && !(finite(value.start) && value.start >= 0 && value.start <= 1)) return false;
+  // Shown on the phone as it comes: a short sentence, never markup.
+  if (value.blocked !== undefined && !(typeof value.blocked === "string" && /^[A-Za-z0-9 ,.'-]{1,60}$/.test(value.blocked))) return false;
   return (["n1", "n2", "rpm", "thrustLbf", "fuelFlowPph", "fuelFlowGph"] as const)
     .every(key => value[key] === undefined || finite(value[key]));
 }
@@ -261,6 +320,7 @@ export function parseMessage(input: unknown): RemoteMessage | null {
       if (valid && value.camera !== undefined && !isCameraAim(value.camera)) delete value.camera;
       if (valid && value.aim !== undefined && !isCameraTotal(value.aim)) delete value.aim;
       if (valid && value.trace !== undefined && !isControlTrace(value.trace)) delete value.trace;
+      if (valid && value.starter !== undefined && value.starter !== 1) delete value.starter;
       break;
     case "heartbeat": valid = isCounter(value.lease) && (value.status === undefined || status(value.status))
       && (value.appliedSeq === undefined || isCounter(value.appliedSeq))
@@ -272,7 +332,7 @@ export function parseMessage(input: unknown): RemoteMessage | null {
       break;
     case "ping": case "pong": valid = isCounter(value.id) && finite(value.sentAt) && value.sentAt >= 0; break;
     case "action": valid = isCounter(value.id) && isCounter(value.lease) && (
-      ((value.action === "requestControl" || value.action === "releaseControl") && value.value === undefined)
+      ((value.action === "requestControl" || value.action === "releaseControl" || value.action === "shutdownEngine") && value.value === undefined)
       || ((value.action === "setPaused" || value.action === "setGearDown") && typeof value.value === "boolean")
       || (value.action === "setViewMode" && (value.value === "first" || value.value === "third"))
     ); break;

@@ -3,6 +3,7 @@ import {
   AUDIO_BATCH_HEADER, AUDIO_BATCH_LENGTH, AUDIO_BATCH_SNAPSHOTS, AUDIO_EVENT_SIZE,
   AUDIO_SNAPSHOT_SIZE, writeAudioSnapshot, type AudioEventType, type AudioSnapshotInit,
 } from "./audioSnapshot";
+import { acousticProfileValues, type AircraftAudioProfile } from "./aircraftAudioProfiles";
 
 /**
  * Node-side driver for the ACTUAL compiled WASM core.
@@ -18,6 +19,9 @@ export interface DspExports {
   _initialize(): void;
   osfs_audio_init(sampleRate: number, maxBlockFrames: number, seed: number): number;
   osfs_audio_reset(): void;
+  osfs_audio_profile_ptr(): number;
+  osfs_audio_profile_size(): number;
+  osfs_audio_commit_profile(): number;
   osfs_audio_set_tier(tier: number): void;
   osfs_audio_get_tier(): number;
   osfs_audio_set_shed(level: number): void;
@@ -25,6 +29,7 @@ export interface DspExports {
     startsPerSecond: number, irMilliseconds: number): void;
   osfs_audio_get_shed(): number;
   osfs_audio_set_gains(master: number, engine: number, tire: number, airframe: number, reduced: number): void;
+  osfs_audio_set_afterburner_volume(volume: number): void;
   osfs_audio_set_epoch(epoch: number, simTimeS: number, audioFrame: number): void;
   osfs_audio_batch_ptr(): number;
   osfs_audio_batch_length(): number;
@@ -72,6 +77,7 @@ export interface DspHarness {
   anchor(epoch: number, simTimeS: number): void;
   stats(): Record<keyof typeof STAT, number>;
   loadBand(index: number, samples: Float32Array, n1: number, exterior: number): boolean;
+  setProfile(profile?: AircraftAudioProfile): void;
 }
 
 export async function createDspHarness(options: {
@@ -97,6 +103,12 @@ export async function createDspHarness(options: {
     exports,
     sampleRate,
     frame: 0,
+    setProfile(profile) {
+      const values = acousticProfileValues(profile);
+      if (values.length !== exports.osfs_audio_profile_size()) throw new Error("Acoustic profile ABI mismatch");
+      new Float64Array(exports.memory.buffer, exports.osfs_audio_profile_ptr(), values.length).set(values);
+      if (!exports.osfs_audio_commit_profile()) throw new Error("Invalid acoustic profile");
+    },
     render(frames) {
       exports.osfs_audio_process(harness.frame, frames);
       harness.frame += frames;

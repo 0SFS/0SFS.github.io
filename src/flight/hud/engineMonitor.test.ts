@@ -1,9 +1,16 @@
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { FlightAudioStatus } from "../audio/createFlightAudio";
 import type { FlightRecorderPropertyReader } from "../diagnostics/flightRecorder";
 import { flightParameterDefaults } from "../settings/flightParameters";
 import { closestUprightRingAngle, createEngineMonitor, type EngineMonitorOptions } from "./engineMonitor";
+import { createEngineSummary, engineRotorSpeeds, type EngineSummaryView } from "./engineSummary";
+import { createEngineSpoolRenderer } from "./engineSpoolRenderer";
+
+const orbRenderer = vi.hoisted(() => ({ draw: vi.fn(), configure: vi.fn(), destroy: vi.fn() }));
+vi.mock("./engineSpoolRenderer", () => ({
+  createEngineSpoolRenderer: vi.fn(() => ({ ...orbRenderer, ready: Promise.resolve() })),
+}));
 
 function fakeReader(values: Record<string, number>, access: Record<string, string> = {}) {
   const reader: FlightRecorderPropertyReader & { values: Record<string, number> } = {
@@ -43,7 +50,7 @@ function status(overrides: Partial<FlightAudioStatus> = {}): FlightAudioStatus {
     enabled: true, requested: "auto", effective: "low", mode: "sound", gestureLocked: false, message: null,
     tireMessage: null, availability: {} as FlightAudioStatus["availability"], stats: "Audio: low (requested auto)",
     transport: "port", sampleRateHz: 48_000, held: false, settings: {} as FlightAudioStatus["settings"],
-    readOnlyReason: null, allowUnvalidated: false,
+    readOnlyReason: null,
     engine: { n1Pct: 50.8, n2Pct: 69.7, fuelFlowPps: 0.0474, combustion: true, running: true },
     core: { epoch: 2, resyncs: 1, staleFades: 0, snapshotsDropped: 0, eventsDropped: 0 },
     running: null,
@@ -59,6 +66,7 @@ function memoryStorage() {
 
 describe("engine monitor", () => {
   let root: HTMLElement;
+  beforeEach(() => vi.clearAllMocks());
   afterEach(() => root?.remove());
 
   const mount = (options: EngineMonitorOptions = {}) => {
@@ -110,6 +118,99 @@ describe("engine monitor", () => {
     monitor.update(fakeReader(values, WRITE_ONLY));
     expect(text(".flight-engine__spool-n1 .flight-engine__spool-value")).toBe("100");
     expect(text(".flight-engine__spool--n2 .flight-engine__spool-value")).toBe("100");
+  });
+
+  it("shows one RPM circle for the C172 even when the property tree has turbine nodes", () => {
+    root = document.createElement("div");
+    const rotorBlades = { outer: 2, inner: null, outerEstimated: false, innerEstimated: false };
+    const monitor = mount({ definition: { kind: "piston", maxRpm: 2700, rotorBlades } });
+    showDetails(monitor);
+    monitor.update(fakeReader({ ...sf50Values(), "propulsion/engine/engine-rpm": 2415 }));
+    expect(root.querySelector<HTMLElement>(".flight-engine__spools")?.hidden).toBe(false);
+    expect(root.querySelector<HTMLElement>(".flight-engine__rpm")?.hidden).toBe(false);
+    expect(text(".flight-engine__rpm .flight-engine__spool-value")).toBe("2415");
+    expect(text(".flight-engine__rpm .flight-engine__spool-label")).toBe("RPM");
+    expect(root.querySelector<HTMLElement>(".flight-engine__spool--n2")?.hidden).toBe(true);
+    expect(root.querySelector<HTMLElement>(".flight-engine__spool-n1")?.hidden).toBe(true);
+    expect(root.querySelector<HTMLElement>(".flight-engine__spool-thrust")?.hidden).toBe(true);
+    expect(text(".flight-engine__values")).toBe("");
+    expect(rows().N1).toBeUndefined();
+    expect(rows().N2).toBeUndefined();
+    expect(monitor.getReading()?.phase.derived).toBe(false);
+    expect(monitor.getReading()?.sample.rotorBlades).toEqual(rotorBlades);
+    expect(createEngineSpoolRenderer).toHaveBeenCalledWith(expect.any(HTMLElement), expect.objectContaining({
+      outerBlades: 2, innerBlades: 0,
+    }));
+    expect(root.querySelector<HTMLElement>(".flight-engine__spools")?.title).toContain("One marker per propeller blade: 2.");
+    expect(root.querySelector(".flight-engine__details")?.textContent).toContain("One marker per propeller blade: 2.");
+    monitor.destroy();
+  });
+
+  it("forwards aircraft row counts on creation and settings changes, with estimates explained", () => {
+    root = document.createElement("div");
+    const parameters = flightParameterDefaults();
+    const rotorBlades = { outer: 28, inner: 40, outerEstimated: false, innerEstimated: true };
+    const monitor = mount({ parameters, definition: { kind: "turbine", rotorBlades } });
+    showDetails(monitor);
+    monitor.update(fakeReader(sf50Values()));
+    expect(createEngineSpoolRenderer).toHaveBeenCalledWith(expect.any(HTMLElement), expect.objectContaining({
+      outerBlades: 28, innerBlades: 40,
+    }));
+    parameters.set("osfs.engineMonitor.orbFps", 24);
+    expect(orbRenderer.configure).toHaveBeenLastCalledWith(expect.objectContaining({
+      maxFps: 24, outerBlades: 28, innerBlades: 40,
+    }));
+    const description = "One marker per blade: N1 fan row 28; N2 core compressor rotor 40 (estimated).";
+    expect(root.querySelector<HTMLElement>(".flight-engine__spools")?.title).toContain(description);
+    expect(root.querySelector(".flight-engine__details")?.textContent).toContain(description);
+    expect(root.querySelector(".flight-engine__details")?.textContent).toContain("Visual speed limit 0.15 rev/s");
+    monitor.destroy();
+  });
+
+  it("keeps missing blade counts numeric-only instead of inventing a marker", () => {
+    root = document.createElement("div");
+    const monitor = mount({ definition: { kind: "turbine" } });
+    monitor.update(fakeReader(sf50Values()));
+    expect(createEngineSpoolRenderer).toHaveBeenCalledWith(expect.any(HTMLElement), expect.objectContaining({
+      outerBlades: 0, innerBlades: 0,
+    }));
+    expect(text(".flight-engine__spool--n2 .flight-engine__spool-value")).toBe("69.7");
+    expect(root.querySelector<HTMLElement>(".flight-engine__spools")?.title).toContain("Blade counts unavailable; numeric readouts only.");
+    monitor.destroy();
+  });
+
+  it("normalizes both turbine rings to a shared model-percent maximum, and piston RPM to its XML limit", () => {
+    const view: EngineSummaryView = { kind: "turbine", phase: "running", label: "RUNNING",
+      n1Pct: 50, n2Pct: 75, maxN1Pct: 100, maxN2Pct: 125, rpm: null, thrustLbf: 1,
+      fuelFlowPph: 0, fuelFlowGph: null };
+    expect(engineRotorSpeeds(view)).toEqual({ outer: 0.4, inner: 0.6 });
+    expect(engineRotorSpeeds({ ...view, kind: "piston", rpm: 1350, maxRpm: 2700 }))
+      .toEqual({ outer: 0.5, inner: null });
+    expect(engineRotorSpeeds({ ...view, n1Pct: -10, n2Pct: 130 })).toEqual({ outer: 0, inner: 1 });
+    expect(engineRotorSpeeds({ ...view, maxN2Pct: null })).toEqual({ outer: 0, inner: 0 });
+    expect(engineRotorSpeeds({ ...view, kind: "piston", rpm: 0, maxRpm: 2700 }))
+      .toEqual({ outer: 0, inner: null });
+    const summary = createEngineSummary();
+    summary.render(view, "lb/h");
+    expect(summary.spools.title).toContain("scaled model percent speed, not physical shaft RPM");
+  });
+
+  it("advances orb phase with simulation time and keeps a paused engine still", () => {
+    root = document.createElement("div");
+    const monitor = mount({ definition: { kind: "piston", maxRpm: 2700,
+      rotorBlades: { outer: 2, inner: null, outerEstimated: false, innerEstimated: false } } });
+    const reader = fakeReader({ "simulation/sim-time-sec": 0, "propulsion/engine/engine-rpm": 1350 });
+    monitor.update(reader);
+    expect(orbRenderer.draw).toHaveBeenLastCalledWith({ outerAngle: 0, innerAngle: null }, expect.any(Number));
+    reader.values["simulation/sim-time-sec"] = 0.25;
+    monitor.update(reader);
+    const advanced = { ...orbRenderer.draw.mock.lastCall![0] };
+    expect(advanced.outerAngle).toBeCloseTo(Math.PI / 2);
+    expect(advanced.innerAngle).toBeNull();
+    monitor.update(reader);
+    expect(orbRenderer.draw.mock.lastCall![0]).toEqual(advanced);
+    monitor.destroy();
+    expect(orbRenderer.destroy).toHaveBeenCalledOnce();
   });
 
   it("pads HUD thrust to four digits", () => {

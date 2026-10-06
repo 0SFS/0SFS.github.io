@@ -16,7 +16,7 @@ export type FlightViewMode = "first" | "third";
 export interface AircraftEntity {
   root: TransformNode;
   cockpit: TransformNode;
-  /** Parent for an external aircraft mesh; hidden in cockpit view. */
+  /** Parent for an external aircraft mesh; may include a cockpit interior. */
   modelRoot: TransformNode;
   /** Hide the block placeholder once a real mesh is in `modelRoot`. */
   setModelLoaded(loaded: boolean): void;
@@ -35,6 +35,8 @@ export interface AircraftEntity {
   setChaseFrame(rotation: Quaternion | null): void;
   /** Both flight cameras' vertical field of view, in degrees. */
   setFieldOfView(degrees: number): void;
+  /** Both flight cameras' near clipping plane, in metres. */
+  setNearClipMeters(meters: number): void;
   setViewMode(mode: FlightViewMode): void;
   toggleViewMode(): FlightViewMode;
   getViewMode(): FlightViewMode;
@@ -44,12 +46,19 @@ export interface AircraftEntity {
 const FIRST_PERSON_OFFSET = new Vector3(0, 0.2, 0.6);
 const RADIANS_PER_DEGREE = Math.PI / 180;
 
-function configureFlightCamera(camera: UniversalCamera, fieldOfViewDeg: number): void {
+function configureFlightCamera(camera: UniversalCamera, fieldOfViewDeg: number, nearClipMeters: number): void {
   camera.rotationQuaternion = Quaternion.RotationYawPitchRoll(Math.PI, 0, 0);
-  camera.minZ = 0.5;
+  camera.minZ = nearClipMeters;
   camera.maxZ = 250_000;
   camera.fov = fieldOfViewDeg * RADIANS_PER_DEGREE;
   camera.inertia = 0.92;
+}
+
+export interface AircraftPresentationOptions {
+  /** Pilot eye in body axes, including the camera's own position offset. */
+  cockpitOffset?: { x: number; y: number; z: number };
+  /** Keep a supplied cockpit interior visible while looking from the pilot eye. */
+  showModelInCockpit?: boolean;
 }
 
 /**
@@ -60,6 +69,7 @@ export function createPlaceholderAircraft(
   scene: Scene,
   parent: TransformNode,
   parameters: FlightParameters = flightParameterDefaults(),
+  options: AircraftPresentationOptions = {},
 ): AircraftEntity {
   const root = new TransformNode("aircraft-visual", scene);
   root.parent = parent;
@@ -91,12 +101,16 @@ export function createPlaceholderAircraft(
   const cockpit = new TransformNode("cockpit", scene);
   cockpit.parent = root;
   cockpit.position = new Vector3(0, 1.1, 1.8);
+  if (options.cockpitOffset) {
+    const { x, y, z } = options.cockpitOffset;
+    cockpit.position.set(x, y, z);
+  }
   cockpit.rotationQuaternion = Quaternion.Identity();
 
   const firstPersonCamera = new UniversalCamera("cockpit-camera", Vector3.Zero(), scene);
   firstPersonCamera.parent = cockpit;
-  firstPersonCamera.position = FIRST_PERSON_OFFSET.clone();
-  configureFlightCamera(firstPersonCamera, parameters.get("osfs.camera.fieldOfView"));
+  firstPersonCamera.position = options.cockpitOffset ? Vector3.Zero() : FIRST_PERSON_OFFSET.clone();
+  configureFlightCamera(firstPersonCamera, parameters.get("osfs.camera.fieldOfView"), parameters.get("osfs.camera.nearClipMeters"));
 
   const thirdPersonCamera = new UniversalCamera("chase-camera", Vector3.Zero(), scene);
   thirdPersonCamera.parent = root;
@@ -105,7 +119,7 @@ export function createPlaceholderAircraft(
   chasePivot.rotationQuaternion = Quaternion.Identity();
   const chaseOffset = new Vector3(0, parameters.get("osfs.camera.chaseHeight"), -parameters.get("osfs.camera.chaseDistance"));
   thirdPersonCamera.position = chaseOffset.clone();
-  configureFlightCamera(thirdPersonCamera, parameters.get("osfs.camera.fieldOfView"));
+  configureFlightCamera(thirdPersonCamera, parameters.get("osfs.camera.fieldOfView"), parameters.get("osfs.camera.nearClipMeters"));
 
   let viewMode: FlightViewMode = "third";
   let chaseYaw = 0;
@@ -127,7 +141,7 @@ export function createPlaceholderAircraft(
     for (const mesh of meshes) {
       mesh.isVisible = exterior && !modelLoaded;
     }
-    modelRoot.setEnabled(exterior);
+    modelRoot.setEnabled(exterior || options.showModelInCockpit === true);
   };
 
   setViewMode("third");
@@ -164,6 +178,10 @@ export function createPlaceholderAircraft(
     setFieldOfView(degrees): void {
       firstPersonCamera.fov = degrees * RADIANS_PER_DEGREE;
       thirdPersonCamera.fov = degrees * RADIANS_PER_DEGREE;
+    },
+    setNearClipMeters(meters): void {
+      firstPersonCamera.minZ = meters;
+      thirdPersonCamera.minZ = meters;
     },
     zoomChaseCamera(factor): void {
       if (viewMode !== "third" || !Number.isFinite(factor) || factor <= 0) return;

@@ -1,0 +1,110 @@
+{
+  "schema": "0sfs-master-volume-acceptance/1",
+  "date": "2026-10-05",
+  "owner": "0sfs",
+  "status": "software-checks-passed",
+  "dspCommit": "bb1d0743",
+  "master": {
+    "minimum": 0,
+    "default": 2,
+    "maximum": 8,
+    "reference": "previous master maximum 1, other controls held fixed",
+    "savedValuesPreserved": true
+  },
+  "otherGainDefaultsAndRangesChanged": false,
+  "newSourcesOrVoices": false,
+  "changesOutputLimiter": false,
+  "deviceQualified": false,
+  "acousticallyCalibrated": false,
+  "checks": {
+    "related": {
+      "files": 44,
+      "passed": 497,
+      "failed": 0
+    },
+    "ci": {
+      "command": "npm run ci",
+      "exitCode": 0,
+      "files": 133,
+      "passed": 1341,
+      "failed": 0,
+      "skipped": 0,
+      "lint": true,
+      "incrementalTypecheck": true,
+      "productionBuild": true,
+      "installedAndEmittedArtifacts": true
+    },
+    "actualWasm": [
+      "master 1/2/8 amplitude ratios below dynamics threshold",
+      "maximum8 clamp and finite limited loud output",
+      "retained legacy SF50 output hashes",
+      "unchanged engine and afterburner gain regressions"
+    ],
+    "controlIntegration": [
+      "default2 and range0..8",
+      "saved0..8 values retained across migration and reload",
+      "visible percentage and independent live slider action",
+      "initial/live/imported master gain transport"
+    ]
+  },
+  "sources": [
+    {
+      "file": "src/flight/audio/audioSettings.ts",
+      "sha256": "c02b22a80db08fad7fc4c39edd23830ab7e1431acd7132c49ee00bda024620b1"
+    },
+    {
+      "file": "src/flight/settings/flightParameters.ts",
+      "sha256": "e18ba594e4e64f69462e1351717dd5cbd61aa6bdb4908e12e2f9e58d2853475b"
+    },
+    {
+      "file": "src/flight/hud/SoundSettingsPanel.tsx",
+      "sha256": "6e1307de51a82ca59da8587502b39d59dd40432b0e72802c5dcbb83ab3b04ab5"
+    },
+    {
+      "file": "src/flight/audio/dsp/core.cpp",
+      "sha256": "e3f92ac7540a1c89af38dae6e618886e48c311ef5bb6a14d4dfc83417a04d37f"
+    },
+    {
+      "file": "src/flight/audio/dsp/audio-dsp.wasm",
+      "sha256": "b51feb881229cf8ba3aec0bacf929e93ded81a61d5c161caa0b26555f24549af"
+    },
+    {
+      "file": "src/flight/audio/dsp/audio-dsp.provenance.json",
+      "sha256": "c97c39b2798f26558c07139173b2d24113a6acbaa120c6c18599a4deb8839fa2"
+    },
+    {
+      "file": "src/flight/audio/acousticProfiles.test.ts",
+      "sha256": "84d8b747cde724d3fb171e3532a0be63845f1cf1dcf33fa6b9cbda729820de28"
+    },
+    {
+      "file": "src/flight/audio/createFlightAudio.test.ts",
+      "sha256": "96ebb228d76db2ed1bcf945a74e27f0089db41b00566c901846ef36d17721113"
+    },
+    {
+      "file": "src/flight/audio/audioSettings.test.ts",
+      "sha256": "5469588e2fe4c2143fb6f96c4aeaf7bba9a5e485f6e1cc6e31772df9799c0660"
+    },
+    {
+      "file": "src/flight/settings/flightParameters.test.ts",
+      "sha256": "f1f599d2f88dfcbc63f51d4ed0ddc5b1799d4a9be941c3c5372e5638d8173167"
+    },
+    {
+      "file": "src/flight/hud/SoundSettingsPanel.test.tsx",
+      "sha256": "92f729907e9a651e04f1888f91d2459f06e4528f74819635acdc51e357fc0eef"
+    }
+  ],
+  "logs": [
+    {
+      "file": "final-ci.log",
+      "sha256": "ce3b3beb0c5881440f7be0e4624bac9f0baa19e0a0cad04118144e2c55835738"
+    },
+    {
+      "file": "related.log",
+      "sha256": "b6d0cb16f369b45be1fee84ad58db8cc68b8688be1b5a4afb0202ba2df095074"
+    },
+    {
+      "file": "build-audio.log",
+      "sha256": "c9df4b4b1879f54f144a2e5cf2ee30bbe7824048a88609fdac1d07b98e20271c"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+# Preserve the imported archive bytes, including original line endings.
+*.xml -text
+*.nas -text
+License.txt -text

@@ -1,0 +1,102 @@
+aircraft-collision: output build/validation/collision/cost-quality/2026-10-05_154129
+aircraft-collision: c172/ground-dense complete (9 candidates)
+aircraft-collision: c172/pole complete (8 candidates)
+aircraft-collision: c172/corner complete (8 candidates)
+aircraft-collision: c172/wall complete (8 candidates)
+aircraft-collision: c172/far-miss complete (9 candidates)
+aircraft-collision: c172/pole-outside complete (8 candidates)
+aircraft-collision: c172/corner-outside complete (8 candidates)
+aircraft-collision: c172/wall-outside complete (8 candidates)
+aircraft-collision: sf50/ground-dense complete (9 candidates)
+aircraft-collision: sf50/pole complete (8 candidates)
+aircraft-collision: sf50/corner complete (8 candidates)
+aircraft-collision: sf50/wall complete (8 candidates)
+aircraft-collision: sf50/far-miss complete (9 candidates)
+aircraft-collision: sf50/pole-outside complete (8 candidates)
+aircraft-collision: sf50/corner-outside complete (8 candidates)
+aircraft-collision: sf50/wall-outside complete (8 candidates)
+aircraft-collision: sf50-hilosrun/ground-dense complete (9 candidates)
+aircraft-collision: sf50-hilosrun/pole complete (8 candidates)
+aircraft-collision: sf50-hilosrun/corner complete (8 candidates)
+aircraft-collision: sf50-hilosrun/wall complete (8 candidates)
+aircraft-collision: sf50-hilosrun/far-miss complete (9 candidates)
+aircraft-collision: sf50-hilosrun/pole-outside complete (8 candidates)
+aircraft-collision: sf50-hilosrun/corner-outside complete (8 candidates)
+aircraft-collision: sf50-hilosrun/wall-outside complete (8 candidates)
+┌─────────┬─────────────────┬──────────────────┬───────────────────┬───────────────┬────────┬───────┬───────┐
+│ (index) │ aircraft        │ workload         │ candidate         │ microseconds  │ missed │ extra │ early │
+├─────────┼─────────────────┼──────────────────┼───────────────────┼───────────────┼────────┼───────┼───────┤
+│ 0       │ 'c172'          │ 'ground-dense'   │ 'exact-triangles' │ '132.42'      │ 0      │ 0     │ 0     │
+│ 1       │ 'c172'          │ 'ground-dense'   │ 'hulls-16'        │ '72.40'       │ 0      │ 0     │ 0     │
+│ 2       │ 'c172'          │ 'ground-dense'   │ 'points-24'       │ '4.09'        │ 3      │ 0     │ 0     │
+│ 3       │ 'c172'          │ 'pole'           │ 'exact-triangles' │ '1.58'        │ 0      │ 0     │ 0     │
+│ 4       │ 'c172'          │ 'pole'           │ 'hulls-16'        │ '1.63'        │ 0      │ 0     │ 65    │
+│ 5       │ 'c172'          │ 'pole'           │ 'points-24'       │ '3.26'        │ 110    │ 0     │ 0     │
+│ 6       │ 'c172'          │ 'corner'         │ 'exact-triangles' │ '1.99'        │ 0      │ 0     │ 0     │
+│ 7       │ 'c172'          │ 'corner'         │ 'hulls-16'        │ '1.72'        │ 0      │ 4     │ 66    │
+│ 8       │ 'c172'          │ 'corner'         │ 'points-24'       │ '3.43'        │ 86     │ 0     │ 0     │
+│ 9       │ 'c172'          │ 'wall'           │ 'exact-triangles' │ '339.84'      │ 0      │ 0     │ 0     │
+│ 10      │ 'c172'          │ 'wall'           │ 'hulls-16'        │ '8.31'        │ 0      │ 0     │ 0     │
+│ 11      │ 'c172'          │ 'wall'           │ 'points-24'       │ '3.54'        │ 5      │ 0     │ 0     │
+│ 12      │ 'c172'          │ 'far-miss'       │ 'exact-triangles' │ '0.23'        │ 0      │ 0     │ 0     │
+│ 13      │ 'c172'          │ 'far-miss'       │ 'hulls-16'        │ '0.23'        │ 0      │ 0     │ 0     │
+│ 14      │ 'c172'          │ 'far-miss'       │ 'points-24'       │ '3.38'        │ 0      │ 0     │ 0     │
+│ 15      │ 'c172'          │ 'pole-outside'   │ 'exact-triangles' │ '1.84'        │ 0      │ 0     │ 0     │
+│ 16      │ 'c172'          │ 'pole-outside'   │ 'hulls-16'        │ '1.33'        │ 0      │ 0     │ 65    │
+│ 17      │ 'c172'          │ 'pole-outside'   │ 'points-24'       │ '3.36'        │ 106    │ 0     │ 0     │
+│ 18      │ 'c172'          │ 'corner-outside' │ 'exact-triangles' │ '2.41'        │ 0      │ 0     │ 0     │
+│ 19      │ 'c172'          │ 'corner-outside' │ 'hulls-16'        │ '1.74'        │ 0      │ 12    │ 67    │
+│ 20      │ 'c172'          │ 'corner-outside' │ 'points-24'       │ '3.41'        │ 85     │ 0     │ 0     │
+│ 21      │ 'c172'          │ 'wall-outside'   │ 'exact-triangles' │ '328.13'      │ 0      │ 0     │ 0     │
+│ 22      │ 'c172'          │ 'wall-outside'   │ 'hulls-16'        │ '7.95'        │ 0      │ 0     │ 1     │
+│ 23      │ 'c172'          │ 'wall-outside'   │ 'points-24'       │ '5.56'        │ 0      │ 0     │ 0     │
+│ 24      │ 'sf50'          │ 'ground-dense'   │ 'exact-triangles' │ '224.22'      │ 0      │ 0     │ 0     │
+│ 25      │ 'sf50'          │ 'ground-dense'   │ 'hulls-16'        │ '96.09'       │ 0      │ 0     │ 0     │
+│ 26      │ 'sf50'          │ 'ground-dense'   │ 'points-24'       │ '4.09'        │ 6      │ 0     │ 0     │
+│ 27      │ 'sf50'          │ 'pole'           │ 'exact-triangles' │ '2.77'        │ 0      │ 0     │ 0     │
+│ 28      │ 'sf50'          │ 'pole'           │ 'hulls-16'        │ '2.48'        │ 0      │ 2     │ 81    │
+│ 29      │ 'sf50'          │ 'pole'           │ 'points-24'       │ '3.28'        │ 120    │ 0     │ 0     │
+│ 30      │ 'sf50'          │ 'corner'         │ 'exact-triangles' │ '2.78'        │ 0      │ 0     │ 0     │
+│ 31      │ 'sf50'          │ 'corner'         │ 'hulls-16'        │ '2.04'        │ 0      │ 3     │ 66    │
+│ 32      │ 'sf50'          │ 'corner'         │ 'points-24'       │ '3.42'        │ 88     │ 0     │ 0     │
+│ 33      │ 'sf50'          │ 'wall'           │ 'exact-triangles' │ '617.19'      │ 0      │ 0     │ 0     │
+│ 34      │ 'sf50'          │ 'wall'           │ 'hulls-16'        │ '8.98'        │ 0      │ 0     │ 1     │
+│ 35      │ 'sf50'          │ 'wall'           │ 'points-24'       │ '3.55'        │ 10     │ 0     │ 0     │
+│ 36      │ 'sf50'          │ 'far-miss'       │ 'exact-triangles' │ '0.24'        │ 0      │ 0     │ 0     │
+│ 37      │ 'sf50'          │ 'far-miss'       │ 'hulls-16'        │ '0.25'        │ 0      │ 0     │ 0     │
+│ 38      │ 'sf50'          │ 'far-miss'       │ 'points-24'       │ '3.54'        │ 0      │ 0     │ 0     │
+│ 39      │ 'sf50'          │ 'pole-outside'   │ 'exact-triangles' │ '3.57'        │ 0      │ 0     │ 0     │
+│ 40      │ 'sf50'          │ 'pole-outside'   │ 'hulls-16'        │ '2.30'        │ 0      │ 0     │ 85    │
+│ 41      │ 'sf50'          │ 'pole-outside'   │ 'points-24'       │ '3.48'        │ 107    │ 0     │ 0     │
+│ 42      │ 'sf50'          │ 'corner-outside' │ 'exact-triangles' │ 'unqualified' │ 0      │ 0     │ 0     │
+│ 43      │ 'sf50'          │ 'corner-outside' │ 'hulls-16'        │ 'unqualified' │ 0      │ 7     │ 69    │
+│ 44      │ 'sf50'          │ 'corner-outside' │ 'points-24'       │ 'unqualified' │ 83     │ 0     │ 0     │
+│ 45      │ 'sf50'          │ 'wall-outside'   │ 'exact-triangles' │ '597.66'      │ 0      │ 0     │ 0     │
+│ 46      │ 'sf50'          │ 'wall-outside'   │ 'hulls-16'        │ '8.47'        │ 0      │ 0     │ 1     │
+│ 47      │ 'sf50'          │ 'wall-outside'   │ 'points-24'       │ '5.56'        │ 0      │ 0     │ 0     │
+│ 48      │ 'sf50-hilosrun' │ 'ground-dense'   │ 'exact-triangles' │ '857.81'      │ 0      │ 0     │ 0     │
+│ 49      │ 'sf50-hilosrun' │ 'ground-dense'   │ 'hulls-16'        │ '73.96'       │ 0      │ 0     │ 0     │
+│ 50      │ 'sf50-hilosrun' │ 'ground-dense'   │ 'points-24'       │ '4.02'        │ 17     │ 0     │ 0     │
+│ 51      │ 'sf50-hilosrun' │ 'pole'           │ 'exact-triangles' │ '7.50'        │ 0      │ 0     │ 0     │
+│ 52      │ 'sf50-hilosrun' │ 'pole'           │ 'hulls-16'        │ '2.31'        │ 0      │ 0     │ 104   │
+│ 53      │ 'sf50-hilosrun' │ 'pole'           │ 'points-24'       │ '3.38'        │ 114    │ 0     │ 0     │
+│ 54      │ 'sf50-hilosrun' │ 'corner'         │ 'exact-triangles' │ '5.22'        │ 0      │ 0     │ 0     │
+│ 55      │ 'sf50-hilosrun' │ 'corner'         │ 'hulls-16'        │ '2.19'        │ 0      │ 4     │ 53    │
+│ 56      │ 'sf50-hilosrun' │ 'corner'         │ 'points-24'       │ '3.46'        │ 87     │ 0     │ 0     │
+│ 57      │ 'sf50-hilosrun' │ 'wall'           │ 'exact-triangles' │ '2745.31'     │ 0      │ 0     │ 0     │
+│ 58      │ 'sf50-hilosrun' │ 'wall'           │ 'hulls-16'        │ '12.32'       │ 1      │ 0     │ 0     │
+│ 59      │ 'sf50-hilosrun' │ 'wall'           │ 'points-24'       │ '3.54'        │ 21     │ 0     │ 0     │
+│ 60      │ 'sf50-hilosrun' │ 'far-miss'       │ 'exact-triangles' │ '0.23'        │ 0      │ 0     │ 0     │
+│ 61      │ 'sf50-hilosrun' │ 'far-miss'       │ 'hulls-16'        │ '0.24'        │ 0      │ 0     │ 0     │
+│ 62      │ 'sf50-hilosrun' │ 'far-miss'       │ 'points-24'       │ '3.42'        │ 0      │ 0     │ 0     │
+│ 63      │ 'sf50-hilosrun' │ 'pole-outside'   │ 'exact-triangles' │ '8.55'        │ 0      │ 0     │ 0     │
+│ 64      │ 'sf50-hilosrun' │ 'pole-outside'   │ 'hulls-16'        │ '2.47'        │ 0      │ 0     │ 105   │
+│ 65      │ 'sf50-hilosrun' │ 'pole-outside'   │ 'points-24'       │ '3.37'        │ 106    │ 0     │ 0     │
+│ 66      │ 'sf50-hilosrun' │ 'corner-outside' │ 'exact-triangles' │ '6.66'        │ 0      │ 0     │ 0     │
+│ 67      │ 'sf50-hilosrun' │ 'corner-outside' │ 'hulls-16'        │ '2.33'        │ 0      │ 6     │ 55    │
+│ 68      │ 'sf50-hilosrun' │ 'corner-outside' │ 'points-24'       │ '3.48'        │ 86     │ 0     │ 0     │
+│ 69      │ 'sf50-hilosrun' │ 'wall-outside'   │ 'exact-triangles' │ '2674.22'     │ 0      │ 0     │ 0     │
+│ 70      │ 'sf50-hilosrun' │ 'wall-outside'   │ 'hulls-16'        │ '11.67'       │ 0      │ 0     │ 1     │
+│ 71      │ 'sf50-hilosrun' │ 'wall-outside'   │ 'points-24'       │ '5.60'        │ 0      │ 0     │ 0     │
+└─────────┴─────────────────┴──────────────────┴───────────────────┴───────────────┴────────┴───────┴───────┘
+aircraft-collision: retained raw results build/validation/collision/cost-quality/2026-10-05_154129/results.json

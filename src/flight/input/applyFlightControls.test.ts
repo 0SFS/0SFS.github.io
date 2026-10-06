@@ -3,6 +3,15 @@ import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import { applyFlightControls } from "./applyFlightControls";
 
 describe("applyFlightControls", () => {
+  it.each([["auto", 0], ["manual", 1], ["fly-by-wire", 2]] as const)("selects native %s without injecting pilot input", (mode, value) => {
+    const setPropertyValue = vi.fn();
+    applyFlightControls({ setPropertyValue } as unknown as JSBSimSdk, {
+      elevator: 0, aileron: 0, rudder: 0, throttle: 0.5, pitchTrim: 0, rollTrim: 0, flaps: 0, brake: 0,
+    }, 0, -1, undefined, { commandProperty: "fcs/control-law-mode", mode });
+    expect(setPropertyValue).toHaveBeenCalledWith("fcs/control-law-mode", value);
+    expect(setPropertyValue).toHaveBeenCalledWith("fcs/rudder-cmd-norm", -0);
+    expect(setPropertyValue).not.toHaveBeenCalledWith("fcs/fbw-enabled", expect.anything());
+  });
   it("applies all normalized controls directly, converting yaw exactly once", () => {
     const setPropertyValue = vi.fn();
     applyFlightControls({ setPropertyValue } as unknown as JSBSimSdk, {
@@ -32,5 +41,19 @@ describe("applyFlightControls", () => {
     };
     applyFlightControls({ setPropertyValue } as unknown as JSBSimSdk, controls, 0);
     expect(setPropertyValue).toHaveBeenLastCalledWith("gear/gear-cmd-norm", 0);
+  });
+
+  it("commands conversion without overwriting the physical actuator", () => {
+    const setPropertyValue = vi.fn();
+    const controls = { elevator: 0, aileron: 0, rudder: 0, throttle: 0.8,
+      pitchTrim: 0, rollTrim: 0, flaps: 0, brake: 0 };
+    const sdk = { setPropertyValue } as unknown as JSBSimSdk;
+    applyFlightControls(sdk, controls, 0, 1, { commandProperty: "fcs/stovl-cmd-norm", commandNorm: 0.7 });
+    expect(setPropertyValue).toHaveBeenCalledWith("fcs/stovl-cmd-norm", 0.7);
+    expect(setPropertyValue).not.toHaveBeenCalledWith("fcs/stovl-pos-norm", expect.anything());
+    setPropertyValue.mockClear();
+    expect(() => applyFlightControls(sdk, controls, 0, 1,
+      { commandProperty: "fcs/stovl-cmd-norm", commandNorm: NaN })).toThrow(RangeError);
+    expect(setPropertyValue).not.toHaveBeenCalled();
   });
 });

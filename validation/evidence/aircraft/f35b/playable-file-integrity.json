@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "scope": "Post-run read-only hashes compare six FDM XML files served to actual browser against final public source manifest and current files. GLB current bytes match browser-loaded bytes.",
+  "browserEvidence": "playable-headless.json",
+  "fdmFiles": [
+    {
+      "path": "/jsbsim-data/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml",
+      "sha256": "8d45445cac03d2d7323846e8a8780ded8f88c12bab099f2dbe36b5596e582722",
+      "matchesBrowserBytesAndSourceManifest": true
+    },
+    {
+      "path": "/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+      "sha256": "09b7eb9c8c9ea5ca720ae1974f4d1ef5d7fb35e6b8248415c6cfcc307c57891c",
+      "matchesBrowserBytesAndSourceManifest": true
+    },
+    {
+      "path": "/jsbsim-data/aircraft/F-35B-jsbsim/Engines/direct.xml",
+      "sha256": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc",
+      "matchesBrowserBytesAndSourceManifest": true
+    },
+    {
+      "path": "/jsbsim-data/aircraft/F-35B-jsbsim/Engines/liftfan.xml",
+      "sha256": "4878bb23bb5e5fb86a76ca4dc68e33b1a1386e25157acaf34c32726fbdb184ea",
+      "matchesBrowserBytesAndSourceManifest": true
+    },
+    {
+      "path": "/jsbsim-data/aircraft/F-35B-jsbsim/Engines/sidefan.xml",
+      "sha256": "e811bd3bb7417a349422f57909d268e5b0c56a386b9e58cd2ada74a98c1e5a79",
+      "matchesBrowserBytesAndSourceManifest": true
+    },
+    {
+      "path": "/jsbsim-data/aircraft/F-35B-jsbsim/Systems/pushback.xml",
+      "sha256": "868928e9b2b12440daec283260aebb1562d05154f69438f5d95043444378a4bc",
+      "matchesBrowserBytesAndSourceManifest": true
+    }
+  ],
+  "glb": {
+    "path": "/aircraft/f-35b/F-35B_AF267.glb",
+    "bytes": 1504592,
+    "sha256": "8324d792711a8aecd74988dd9e314b3b4e6f1f3a819591ce60f34caa004d7fbd"
+  }
+}

@@ -1,4 +1,5 @@
 import type { FlightRecorderPropertyReader } from "../diagnostics/flightRecorder";
+import type { EngineRotorBladeCounts } from "../aircraft/engineRotorDefinitions";
 
 /**
  * What the loaded engine publishes, and what JSBSim is doing with it.
@@ -11,6 +12,33 @@ import type { FlightRecorderPropertyReader } from "../diagnostics/flightRecorder
  */
 
 export type EngineReader = FlightRecorderPropertyReader;
+
+export type EngineKind = "piston" | "turbine";
+
+/** Aircraft metadata, rather than the presence of writable property-tree nodes. */
+export interface EngineMonitorDefinition {
+  kind: EngineKind;
+  rotorBlades?: EngineRotorBladeCounts;
+  /** Configured piston maxrpm from its native engine XML; not a governor or physical clamp. */
+  maxRpm?: number;
+}
+
+const TURBINE_ONLY_PROPERTIES: ReadonlySet<string> = new Set([
+  "propulsion/engine/n1", "propulsion/engine/n2", "propulsion/engine/MaxN1", "propulsion/engine/MaxN2",
+  "propulsion/engine/tsfc", "propulsion/engine/bleed-factor", "propulsion/engine/injection_cmd",
+  "propulsion/engine/seized", "propulsion/engine/stalled", "propulsion/cutoff_cmd",
+]);
+const PISTON_ONLY_PROPERTIES: ReadonlySet<string> = new Set([
+  "propulsion/engine/engine-rpm", "propulsion/engine/propeller-rpm", "propulsion/engine/power-hp",
+  "propulsion/engine/map-inhg", "propulsion/engine/cht-degF", "propulsion/engine/AFR",
+  "propulsion/engine/starter-norm", "fcs/mixture-cmd-norm",
+]);
+
+/** A diagnostic catalog may retain unrelated nodes; curated gauges must not. */
+export function enginePropertyApplies(path: string, definition?: EngineMonitorDefinition): boolean {
+  return definition?.kind === "piston" ? !TURBINE_ONLY_PROPERTIES.has(path)
+    : definition?.kind === "turbine" ? !PISTON_ONLY_PROPERTIES.has(path) : true;
+}
 
 /** Catalog prefixes the monitor discovers. Everything readable under them is listed. */
 export const ENGINE_CATALOG_QUERIES: readonly string[] = [
@@ -25,6 +53,8 @@ export const ENGINE_PATHS = {
   simTime: "simulation/sim-time-sec",
   n1: "propulsion/engine/n1",
   n2: "propulsion/engine/n2",
+  maxN1: "propulsion/engine/MaxN1",
+  maxN2: "propulsion/engine/MaxN2",
   rpm: "propulsion/engine/engine-rpm",
   thrust: "propulsion/engine/thrust-lbs",
   fuelFlowPps: "propulsion/engine/fuel-flow-rate-pps",
@@ -59,6 +89,11 @@ export function discoverReadableProperties(
 
 /** One reading. `null` means the model does not publish that value, never zero. */
 export interface EngineSample {
+  kind?: EngineKind | null;
+  rotorBlades?: EngineRotorBladeCounts;
+  maxN1Pct?: number | null;
+  maxN2Pct?: number | null;
+  maxRpm?: number | null;
   simTimeS: number | null;
   n1Pct: number | null;
   n2Pct: number | null;
@@ -77,7 +112,9 @@ export interface EngineSample {
   kcas: number | null;
 }
 
-export function readEngineSample(reader: EngineReader, available: ReadonlySet<string>): EngineSample {
+export function readEngineSample(
+  reader: EngineReader, available: ReadonlySet<string>, definition?: EngineMonitorDefinition,
+): EngineSample {
   const number = (path: string): number | null => {
     if (!available.has(path)) return null;
     const value = reader.getPropertyValue(path);
@@ -87,11 +124,22 @@ export function readEngineSample(reader: EngineReader, available: ReadonlySet<st
     const value = number(path);
     return value === null ? null : value > 0.5;
   };
+  // JSBSim creates readable nodes for paths read by other consumers. Such a
+  // node is not proof that the engine implements a spool. Aircraft metadata
+  // wins; old callers with no definition prefer a real crankshaft reading.
+  const rpm = definition?.kind === "turbine" ? null : number(ENGINE_PATHS.rpm);
+  const kind = definition?.kind ?? (rpm !== null ? "piston"
+    : available.has(ENGINE_PATHS.n1) || available.has(ENGINE_PATHS.n2) ? "turbine" : null);
   return {
+    kind,
+    rotorBlades: definition?.rotorBlades,
+    maxN1Pct: kind === "turbine" ? number(ENGINE_PATHS.maxN1) : null,
+    maxN2Pct: kind === "turbine" ? number(ENGINE_PATHS.maxN2) : null,
+    maxRpm: definition?.maxRpm ?? null,
     simTimeS: number(ENGINE_PATHS.simTime),
-    n1Pct: number(ENGINE_PATHS.n1),
-    n2Pct: number(ENGINE_PATHS.n2),
-    rpm: number(ENGINE_PATHS.rpm),
+    n1Pct: kind === "turbine" ? number(ENGINE_PATHS.n1) : null,
+    n2Pct: kind === "turbine" ? number(ENGINE_PATHS.n2) : null,
+    rpm,
     thrustLbf: number(ENGINE_PATHS.thrust),
     fuelFlowPps: number(ENGINE_PATHS.fuelFlowPps),
     fuelFlowGph: number(ENGINE_PATHS.fuelFlowGph),
@@ -135,7 +183,8 @@ export interface EnginePhaseReading {
 export function deriveEnginePhase(sample: EngineSample): EnginePhaseReading {
   const reading = (phase: EnginePhase, detail: string, derived = true): EnginePhaseReading =>
     ({ phase, label: ENGINE_PHASE_LABELS[phase], detail, derived });
-  const turbine = sample.n1Pct !== null || sample.n2Pct !== null;
+  const turbine = sample.kind === "turbine" || (sample.kind === undefined
+    && sample.rpm === null && (sample.n1Pct !== null || sample.n2Pct !== null));
 
   if (!turbine) {
     if (sample.running === null && sample.rpm === null) {

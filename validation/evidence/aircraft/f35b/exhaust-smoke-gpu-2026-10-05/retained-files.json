@@ -1,0 +1,347 @@
+[
+  {
+    "file": "acceptance.json",
+    "bytes": 26240,
+    "sha256": "34e2ce479d7efa275af566835eb989f9ae74e9d2bf18c80eb342dc41fc825b6a"
+  },
+  {
+    "file": "attempt-1-report.json",
+    "bytes": 122794,
+    "sha256": "0de6ed694843f1a4d914d902450c583e0dde6b6f9bf471f57fe3972ad3a3a022"
+  },
+  {
+    "file": "attempt-1.log",
+    "bytes": 146,
+    "sha256": "359420340286e83a71a11227a3058ad2bc64fa311717d3bb6ebe1e542c3d2a78"
+  },
+  {
+    "file": "attempt-2-report.json",
+    "bytes": 86690,
+    "sha256": "6a8037c0fb140c41f9b4563dde32e492ebc8cd88858bebbe4182b25f59e55f55"
+  },
+  {
+    "file": "attempt-2.log",
+    "bytes": 146,
+    "sha256": "ce861e4b64f2890707f58628cd8b2db81f27589e6fa097309220190a3429b293"
+  },
+  {
+    "file": "attempt-3-report.json",
+    "bytes": 141315,
+    "sha256": "be4eff78512d3430e71ecebf91712f66443f33642408fc3b1cec962f57e16a7f"
+  },
+  {
+    "file": "attempt-3.log",
+    "bytes": 146,
+    "sha256": "02d86e1fda071a238595a00eb2dde6d331d802b7af23131707d6299f95e528a8"
+  },
+  {
+    "file": "combined-report.json",
+    "bytes": 141315,
+    "sha256": "be4eff78512d3430e71ecebf91712f66443f33642408fc3b1cec962f57e16a7f"
+  },
+  {
+    "file": "final-webgl2-force-base.png",
+    "bytes": 20492,
+    "sha256": "8f7682cfd00d594cb6f4b790f2004f85032bb80d292486d93d1f3e2da80cb845"
+  },
+  {
+    "file": "final-webgl2-native-forces-disabled.png",
+    "bytes": 20492,
+    "sha256": "8f7682cfd00d594cb6f4b790f2004f85032bb80d292486d93d1f3e2da80cb845"
+  },
+  {
+    "file": "final-webgl2-native-forces-side.png",
+    "bytes": 28248,
+    "sha256": "41eedf30475c443ba5c4179bee98c693ee337e889119da7faca6df9e1438b23f"
+  },
+  {
+    "file": "final-webgpu-force-base.png",
+    "bytes": 20698,
+    "sha256": "950bd8f1247728c970c27b78417abdc6512e518ebaf16459e10f316c541a4f9d"
+  },
+  {
+    "file": "final-webgpu-native-forces-disabled.png",
+    "bytes": 20698,
+    "sha256": "950bd8f1247728c970c27b78417abdc6512e518ebaf16459e10f316c541a4f9d"
+  },
+  {
+    "file": "final-webgpu-native-forces-side.png",
+    "bytes": 28313,
+    "sha256": "ccc6b9f36cc17ac15d8e4deaed6a7eaa89269ee016b1959e880d79f0af6ac550"
+  },
+  {
+    "file": "force-anchor-orientation-failed-report.json",
+    "bytes": 73693,
+    "sha256": "3798a9672de77bcd02326dfa1ba82f43787946525981109ada92c600fbf3f8d3"
+  },
+  {
+    "file": "force-anchor-orientation-failed.log",
+    "bytes": 146,
+    "sha256": "affc45c3fa329330312c8578e4c574314e8904db00bb7fc3a1e084899597d56f"
+  },
+  {
+    "file": "forces-final-fixture.txt",
+    "bytes": 13440,
+    "sha256": "93fe300bbd8b3799de0501e86798eca6d808487d035b8e06039e5b54c855cfab"
+  },
+  {
+    "file": "forces-final-report.json",
+    "bytes": 73971,
+    "sha256": "1a182efdbb3f96ae5eecc6b78bad1b5a4812cf4a2211d87062c9d0415194025c"
+  },
+  {
+    "file": "forces-final.log",
+    "bytes": 145,
+    "sha256": "73c6ae33837faa28ad7bf1c07f886e98dfb69dbd31e1708019802eb03bf5931a"
+  },
+  {
+    "file": "forces-only-fixture.txt",
+    "bytes": 12542,
+    "sha256": "20757db6471cf4f89886d7424bf8b9d0ffb9782f63ad195c62ad8832cd111f3a"
+  },
+  {
+    "file": "forces-only-report.json",
+    "bytes": 67152,
+    "sha256": "545a26de7f5a782dd723c766842d2efbb4b269b38ea7e9b1df264ec40c992497"
+  },
+  {
+    "file": "forces-only.log",
+    "bytes": 145,
+    "sha256": "fa4189d0bee4d943016b5e272f6418824714215ae610062620f7d7f83fae18ae"
+  },
+  {
+    "file": "native-capabilities-focused.log",
+    "bytes": 568,
+    "sha256": "5a389ec1643e3e996dbccc3abbae4f5e64ab91aa500284bb25bd2dd1537c6254"
+  },
+  {
+    "file": "orientation-failed-webgl2-force-base.png",
+    "bytes": 20492,
+    "sha256": "8f7682cfd00d594cb6f4b790f2004f85032bb80d292486d93d1f3e2da80cb845"
+  },
+  {
+    "file": "orientation-failed-webgl2-native-forces-side.png",
+    "bytes": 28076,
+    "sha256": "1b244e6cb4d94e0eb4b66bebabc0d7d4136193e87217b7610b25a09ce542563e"
+  },
+  {
+    "file": "orientation-failed-webgpu-force-base.png",
+    "bytes": 20698,
+    "sha256": "950bd8f1247728c970c27b78417abdc6512e518ebaf16459e10f316c541a4f9d"
+  },
+  {
+    "file": "orientation-failed-webgpu-native-forces-side.png",
+    "bytes": 28137,
+    "sha256": "484602ba1623611c440685f29c9c23799512cfd386139c4bbcfbd56e1cd319b1"
+  },
+  {
+    "file": "owner-anchor-build.log",
+    "bytes": 43588,
+    "sha256": "e27827ca7f95f8d026eb9e5df33c885d08d4ef5536898f60651d61dd2aa95216"
+  },
+  {
+    "file": "owner-anchor-focused-rerun.log",
+    "bytes": 209,
+    "sha256": "c99d62f2b53e8fe0c4ecba21cafe17a58ad8ed12038232a4ae80536f2eac6708"
+  },
+  {
+    "file": "owner-anchor-lint.log",
+    "bytes": 115,
+    "sha256": "d8d26621c0569c296fc680b25fe14f8b1f9b684c3446c56df2bf932172384034"
+  },
+  {
+    "file": "owner-anchor-typecheck.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "file": "owner-direction-build.log",
+    "bytes": 43588,
+    "sha256": "e2c320cc0c64ce9f51efba247960ad6e439ad255b1cb9d7607bb765e41e82f33"
+  },
+  {
+    "file": "owner-direction-focused.log",
+    "bytes": 212,
+    "sha256": "657fe8824747305846b21651ceb633e61dd020b43eef8a48a42eeab9972056c3"
+  },
+  {
+    "file": "owner-direction-lint.log",
+    "bytes": 115,
+    "sha256": "d8d26621c0569c296fc680b25fe14f8b1f9b684c3446c56df2bf932172384034"
+  },
+  {
+    "file": "owner-direction-typecheck.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "file": "owner-label-final.json",
+    "bytes": 5263,
+    "sha256": "0978e511bd978aa2cd6bd698776be52e2552b326a33ba9af59cf35e142c78b35"
+  },
+  {
+    "file": "owner-label-focused.log",
+    "bytes": 210,
+    "sha256": "40b6a33e137840de32b33bd912348fc15e5cca6d7b49c16873924fb5da6b62b0"
+  },
+  {
+    "file": "owner-label-lint.log",
+    "bytes": 115,
+    "sha256": "d8d26621c0569c296fc680b25fe14f8b1f9b684c3446c56df2bf932172384034"
+  },
+  {
+    "file": "owner-label-readiness.json",
+    "bytes": 1570,
+    "sha256": "e6b958a93fc26c14efced6d462a26ca6f99220f051712b552caf07c1b9ecf143"
+  },
+  {
+    "file": "owner-label-typecheck.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "file": "qualification-fixture.txt",
+    "bytes": 12542,
+    "sha256": "20757db6471cf4f89886d7424bf8b9d0ffb9782f63ad195c62ad8832cd111f3a"
+  },
+  {
+    "file": "webgl2-afterburner-disabled.png",
+    "bytes": 20425,
+    "sha256": "288f28ba12e0d1f7223d6880fc0441388f124796efac39281ff96a60733da054"
+  },
+  {
+    "file": "webgl2-afterburner-front-disabled.png",
+    "bytes": 22924,
+    "sha256": "0e686fe17654298dfa8ae3e5ae0e76a33b409b6f4bf3e94bc6070b1decf1c558"
+  },
+  {
+    "file": "webgl2-afterburner-front.png",
+    "bytes": 22924,
+    "sha256": "0e686fe17654298dfa8ae3e5ae0e76a33b409b6f4bf3e94bc6070b1decf1c558"
+  },
+  {
+    "file": "webgl2-afterburner-rear.png",
+    "bytes": 25790,
+    "sha256": "546681f5ec6ee9111e8e0412ff94238afda14135eedd7cd3a7f9ec1f3df06766"
+  },
+  {
+    "file": "webgl2-afterburner-side.png",
+    "bytes": 35065,
+    "sha256": "86aa76a39a2e40a3ae94895e679353110af3fba45623845451359abe8d48f30b"
+  },
+  {
+    "file": "webgl2-converted-dry-side.png",
+    "bytes": 33473,
+    "sha256": "34225be897ccf741112d63e8d8607ef6eea372c9c5acc54b72bad64baba9f19e"
+  },
+  {
+    "file": "webgl2-dry-disabled.png",
+    "bytes": 20953,
+    "sha256": "eeaf4260045b98ad89d3432980aec3890dddc0cf7b0c7cc84a6bb42d3294d473"
+  },
+  {
+    "file": "webgl2-dry-rear.png",
+    "bytes": 21722,
+    "sha256": "795027019370cd08adf22e78892bff887fbeaef963dfe1eed5a80e1a8afdd7c6"
+  },
+  {
+    "file": "webgl2-dry-smoke-disabled.png",
+    "bytes": 30636,
+    "sha256": "7b7ceb2bc7a321bfecf53792cbb575155098d9b664e995a48c583168c6aeaef9"
+  },
+  {
+    "file": "webgl2-dry-smoke-rebased.png",
+    "bytes": 31170,
+    "sha256": "61ce227b3187e31df58304f511cf7dba62375c9489f29ecb8009c002861f598d"
+  },
+  {
+    "file": "webgl2-dry-smoke-side.png",
+    "bytes": 30811,
+    "sha256": "7fef78635fd90653f1c4067abdcd79f563cf50694dd4ec5eea418f1fde9fb8ee"
+  },
+  {
+    "file": "webgl2-force-base.png",
+    "bytes": 30261,
+    "sha256": "f23960aae8ceb4da3c0cf003744cb976bda8401a6fd690e0cb980f1c8f86595a"
+  },
+  {
+    "file": "webgl2-native-forces-disabled.png",
+    "bytes": 30261,
+    "sha256": "f23960aae8ceb4da3c0cf003744cb976bda8401a6fd690e0cb980f1c8f86595a"
+  },
+  {
+    "file": "webgl2-native-forces-side.png",
+    "bytes": 40278,
+    "sha256": "a52a1d416b8e00ceb040a0fd3a1a39891308def14d7ae625b5321fab9c1716d8"
+  },
+  {
+    "file": "webgpu-afterburner-disabled.png",
+    "bytes": 20361,
+    "sha256": "322ce28fc612382b7e5300f3e5e6d849effd5c62b33c9d61df7acc8c4ffad010"
+  },
+  {
+    "file": "webgpu-afterburner-front-disabled.png",
+    "bytes": 22964,
+    "sha256": "15bc0d8584e8375e6090bc62b75aeaf89d18bd4051c1b985d8ed24a01ca9b786"
+  },
+  {
+    "file": "webgpu-afterburner-front.png",
+    "bytes": 22964,
+    "sha256": "15bc0d8584e8375e6090bc62b75aeaf89d18bd4051c1b985d8ed24a01ca9b786"
+  },
+  {
+    "file": "webgpu-afterburner-rear.png",
+    "bytes": 25714,
+    "sha256": "c5ecb3da18dfe38d483953ad5b000177d79197a44e723f45a24261421cf9eaaa"
+  },
+  {
+    "file": "webgpu-afterburner-side.png",
+    "bytes": 35226,
+    "sha256": "a16e19dd9060ceb3d84ab7d6039ee2b8acd3086a8496d9abdd2402d67f66f91e"
+  },
+  {
+    "file": "webgpu-converted-dry-side.png",
+    "bytes": 33755,
+    "sha256": "61bc0686561bb1deb3921bd2580bbaf33b038251319530bff40aa177afe89e6e"
+  },
+  {
+    "file": "webgpu-dry-disabled.png",
+    "bytes": 20860,
+    "sha256": "1add42afdcd7741c1cf1bf02293b5c39e24384b46ce200e4969c2e529fc9801e"
+  },
+  {
+    "file": "webgpu-dry-rear.png",
+    "bytes": 21702,
+    "sha256": "c6ec3dd9bf2f16f690c1c37a054d11af0a767bdcb3fc94879a108b9bb93ca52d"
+  },
+  {
+    "file": "webgpu-dry-smoke-disabled.png",
+    "bytes": 30873,
+    "sha256": "b185b2321ce0524a543534d11e1c5c4b7f09b896e395c8e0dba1fe42e25ccd9c"
+  },
+  {
+    "file": "webgpu-dry-smoke-rebased.png",
+    "bytes": 31435,
+    "sha256": "01546a8336b4e244c53a89f64beeb5062f9a724205d2c5ca026aefc2b33ef2dd"
+  },
+  {
+    "file": "webgpu-dry-smoke-side.png",
+    "bytes": 30995,
+    "sha256": "44490e281d798a2922c13877da7006b993fa4d59f7cd7d59378a915266946535"
+  },
+  {
+    "file": "webgpu-force-base.png",
+    "bytes": 30464,
+    "sha256": "00cb6f6914011098816e2d0a61314308b13e97782ebc08e60db85686726b48a6"
+  },
+  {
+    "file": "webgpu-native-forces-disabled.png",
+    "bytes": 30464,
+    "sha256": "00cb6f6914011098816e2d0a61314308b13e97782ebc08e60db85686726b48a6"
+  },
+  {
+    "file": "webgpu-native-forces-side.png",
+    "bytes": 40497,
+    "sha256": "7960b9f6233fd53e9740f0af40a0ae0dc4d1587d2be674b54a317b8e10438d96"
+  }
+]

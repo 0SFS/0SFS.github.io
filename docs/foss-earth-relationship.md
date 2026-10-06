@@ -47,11 +47,12 @@ These local dependencies are convenient for developing the repositories together
 | `foss-earth/windowing.css` | Shared windowing structure |
 | `foss-earth/runtime` | Babylon runtime, renderer/map types, map selection, detail policy types, simulation hooks, and focus points (the aircraft, for Map → Detail's Load around) |
 | `foss-earth/perf` | Frame profiling: the runtime's `frameProfile` session (one profiler, whose frames the runtime closes), `bindFrameProfileSettings`, and the `renderer.profiling.*` parameters, which 0SFS homes in Debug → Frame budget |
+| `foss-earth/diagnostics` | Shared diagnostic drawing, including the mesh inspector's geometry-sharing polygon-edge overlay and selection state; its tree UI is `MeshInspectorPanel` from `foss-earth/shell` |
 | `foss-earth/cameraMath` | Shared WGS84/ECEF conversion and angle constants |
 | `foss-earth/mapDetailPolicy` | Map detail policy types and pure helpers, without the renderer, for the flight's World detail import |
 | `foss-earth` | Globe application and public globe APIs |
 
-The HUD is adapted in `src/flight/hud/createFlightHudBar.ts`. `FlightControlPanel.tsx` supplies the flight's tabs (Weather, Aircraft, Autopilot, Controls, Remote Control, Sound, Engine, Logging, Debug) to the shared `WindowOverlay`. Flight parameters homed in FOSS Earth's tabs (Map → Detail, Renderer → Instruments, Controls → Orbit) are drawn there by FOSS Earth; see [Flight settings](proposals/flight-settings.md). Debug → Frame budget wraps FOSS Earth's frame budget panel; the flight adds its `flight/*` sections to the runtime's profiler, and `flightPerf=1`, `window.osfsFrameProfiler` and `window.osfsFrameProfile` work as before. FOSS Earth owns both window slots, responsive fit, launchers, tab movement, minimize/restore behavior, and window styling.
+The HUD is adapted in `src/flight/hud/createFlightHudBar.ts`. `FlightControlPanel.tsx` supplies the flight's tabs (Weather, Aircraft, Fuel, Autopilot, Controls, Remote Control, Sound, Engine, Logging, Debug) to the shared `WindowOverlay`. Flight parameters homed in FOSS Earth's tabs (Map → Detail, Renderer → Instruments, Controls → Orbit) are drawn there by FOSS Earth; see [Flight settings](proposals/flight-settings.md). Debug → Frame budget wraps FOSS Earth's frame budget panel; the flight adds its `flight/*` sections to the runtime's profiler, and `flightPerf=1`, `window.osfsFrameProfiler` and `window.osfsFrameProfile` work as before. FOSS Earth owns both window slots, responsive fit, launchers, tab movement, minimize/restore behavior, and window styling.
 
 The standalone globe lives at [foss-earth.github.io](https://foss-earth.github.io/). 0SFS used to
 host a copy behind `?mode=globe`; that query now redirects there.
@@ -179,7 +180,8 @@ aircraft in the scene" test and should have started in FOSS Earth:
   record (`src/flight/worldDetail.ts`) and keeps only what needs the aircraft: the
   Flight minimum, the aircraft anchor, the session waiver, and a low-spawn
   requirement that holds Google mesh finer until departure without editing the
-  saved preference.
+  saved preference. Automatic adjustments reach the flight's visible log through
+  FOSS Earth's public `connectMapDetailLog` helper.
 
 ### A case that stays in 0SFS
 

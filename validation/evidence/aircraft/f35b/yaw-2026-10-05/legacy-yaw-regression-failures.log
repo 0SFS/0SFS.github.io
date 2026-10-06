@@ -1,0 +1,80 @@
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+(node:83511) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/flight/jsbsim/f35bYaw.integration.test.ts (11 tests | 5 failed) 1399ms
+     × damps 'rate' at 450 kt and +0 conversion without actuator hunting 122ms
+     × damps 'release' at 450 kt and +0 conversion without actuator hunting 132ms
+     × damps 'rate' at 600 kt and +0 conversion without actuator hunting 119ms
+     × damps 'release' at 600 kt and +0 conversion without actuator hunting 126ms
+     × damps 'release' at 160 kt and 0.5 conversion without actuator hunting 120ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/flight/jsbsim/f35bYaw.integration.test.ts > F-35B native yaw damping after disturbance/control release > damps 'rate' at 450 kt and +0 conversion without actuator hunting
+AssertionError: expected 1.280640723172749 to be less than 0.15
+ ❯ src/flight/jsbsim/f35bYaw.integration.test.ts:84:22
+     82|     // previous source loop reached1.2–2.4rad/s and repeatedly saturat…
+     83|     //450/600kt from a0.05rad/s disturbance or a half-second rudder pu…
+     84|     expect(peakRate).toBeLessThan(0.15);
+       |                      ^
+     85|     expect(Math.sqrt(lateSquares / lateSamples)).toBeLessThan(0.005);
+     86|     expect(lateSaturations / lateSamples).toBeLessThan(0.01);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/flight/jsbsim/f35bYaw.integration.test.ts > F-35B native yaw damping after disturbance/control release > damps 'release' at 450 kt and +0 conversion without actuator hunting
+AssertionError: expected 1.2338148179180093 to be less than 0.15
+ ❯ src/flight/jsbsim/f35bYaw.integration.test.ts:84:22
+     82|     // previous source loop reached1.2–2.4rad/s and repeatedly saturat…
+     83|     //450/600kt from a0.05rad/s disturbance or a half-second rudder pu…
+     84|     expect(peakRate).toBeLessThan(0.15);
+       |                      ^
+     85|     expect(Math.sqrt(lateSquares / lateSamples)).toBeLessThan(0.005);
+     86|     expect(lateSaturations / lateSamples).toBeLessThan(0.01);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  src/flight/jsbsim/f35bYaw.integration.test.ts > F-35B native yaw damping after disturbance/control release > damps 'rate' at 600 kt and +0 conversion without actuator hunting
+AssertionError: expected 2.5538806793438513 to be less than 0.15
+ ❯ src/flight/jsbsim/f35bYaw.integration.test.ts:84:22
+     82|     // previous source loop reached1.2–2.4rad/s and repeatedly saturat…
+     83|     //450/600kt from a0.05rad/s disturbance or a half-second rudder pu…
+     84|     expect(peakRate).toBeLessThan(0.15);
+       |                      ^
+     85|     expect(Math.sqrt(lateSquares / lateSamples)).toBeLessThan(0.005);
+     86|     expect(lateSaturations / lateSamples).toBeLessThan(0.01);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  src/flight/jsbsim/f35bYaw.integration.test.ts > F-35B native yaw damping after disturbance/control release > damps 'release' at 600 kt and +0 conversion without actuator hunting
+AssertionError: expected 2.354842623132481 to be less than 0.15
+ ❯ src/flight/jsbsim/f35bYaw.integration.test.ts:84:22
+     82|     // previous source loop reached1.2–2.4rad/s and repeatedly saturat…
+     83|     //450/600kt from a0.05rad/s disturbance or a half-second rudder pu…
+     84|     expect(peakRate).toBeLessThan(0.15);
+       |                      ^
+     85|     expect(Math.sqrt(lateSquares / lateSamples)).toBeLessThan(0.005);
+     86|     expect(lateSaturations / lateSamples).toBeLessThan(0.01);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  src/flight/jsbsim/f35bYaw.integration.test.ts > F-35B native yaw damping after disturbance/control release > damps 'release' at 160 kt and 0.5 conversion without actuator hunting
+AssertionError: expected 1.0369099204699181 to be less than 0.15
+ ❯ src/flight/jsbsim/f35bYaw.integration.test.ts:84:22
+     82|     // previous source loop reached1.2–2.4rad/s and repeatedly saturat…
+     83|     //450/600kt from a0.05rad/s disturbance or a half-second rudder pu…
+     84|     expect(peakRate).toBeLessThan(0.15);
+       |                      ^
+     85|     expect(Math.sqrt(lateSquares / lateSamples)).toBeLessThan(0.005);
+     86|     expect(lateSaturations / lateSamples).toBeLessThan(0.01);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 6 passed (11)
+   Start at  15:12:30
+   Duration  2.36s (transform 53ms, setup 0ms, import 560ms, tests 1.40s, environment 294ms)
+

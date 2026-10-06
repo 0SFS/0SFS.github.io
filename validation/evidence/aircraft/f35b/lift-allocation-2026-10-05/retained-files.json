@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 2869,
+      "sha256": "f5c8f174a2653bce5d1a40096c55420323b7f6d02a21d40bdd11d0b1a74a1fbe"
+    },
+    {
+      "path": "acceptance.json",
+      "bytes": 466401,
+      "sha256": "6536bf8f6a18001c9acd8acc247b88acc465e75c9e787dad0c6823d4f71b685c"
+    },
+    {
+      "path": "baseline-entry-60.csv",
+      "bytes": 1130124,
+      "sha256": "2929d1af16a83dbedff551c9639d0a1c4ccfd136565d20d9b1f690cf45dc1ebd"
+    },
+    {
+      "path": "baseline-grid-0-0.48-0.5.csv",
+      "bytes": 1142430,
+      "sha256": "476e1898326184476a4650fe69a881b0cbb489cfc02834af70dfec38aa5eebaf"
+    },
+    {
+      "path": "baseline-hover-auto-neutral.csv",
+      "bytes": 1252905,
+      "sha256": "6ce64d85c907bd94b1f811e99f62706bf742aa97345c6a2157607b313f120fb3"
+    },
+    {
+      "path": "baseline-partial-60.csv",
+      "bytes": 1124607,
+      "sha256": "2a9a2f9decbdef7dc3bce5789e4d49ce80696c56c91498a4573fcf624e8325d2"
+    },
+    {
+      "path": "baseline-report.json",
+      "bytes": 1338777,
+      "sha256": "ee321a389bdb2eadda5cbca93c91ecf73bb3853af835bf03aedeea3b9ad0104a"
+    },
+    {
+      "path": "baseline-xml/F-35B-jsbsim.xml",
+      "bytes": 49663,
+      "sha256": "7fb3afb20e15ce494a651e55059b18b224f03267979cd7ea09869bc9be2cfd1d"
+    },
+    {
+      "path": "baseline-xml/liftfan.xml",
+      "bytes": 2488,
+      "sha256": "4878bb23bb5e5fb86a76ca4dc68e33b1a1386e25157acaf34c32726fbdb184ea"
+    },
+    {
+      "path": "baseline-xml/sidefan.xml",
+      "bytes": 2556,
+      "sha256": "e811bd3bb7417a349422f57909d268e5b0c56a386b9e58cd2ada74a98c1e5a79"
+    },
+    {
+      "path": "coupled-entry-60.csv",
+      "bytes": 1141905,
+      "sha256": "fb36d2a007e2e6e1f766aa27ec8d9465deaf1a74db6e84173ff7a33710491184"
+    },
+    {
+      "path": "coupled-grid-0-0.48-0.5.csv",
+      "bytes": 1120395,
+      "sha256": "0b4f2e8e6098bf11e71cd978da79c0b80db39cf9c3ba10cd88ec9e352309923c"
+    },
+    {
+      "path": "coupled-hover-auto-neutral.csv",
+      "bytes": 1146798,
+      "sha256": "1e873e18287013fca11a920e6dd9bb95a5e611def66d1bba22e608ac05cfb576"
+    },
+    {
+      "path": "coupled-partial-60.csv",
+      "bytes": 1101574,
+      "sha256": "55de1fb07ea62c78db3a3c9afe9abe300463ab9ea186724213d75b18cdec5655"
+    },
+    {
+      "path": "coupled-report.json",
+      "bytes": 1313397,
+      "sha256": "6d2b2df25d0d7c9e204ac36d02b97267022b999f59a636e8ef207c1979107e63"
+    }
+  ]
+}

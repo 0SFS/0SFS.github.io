@@ -1,0 +1,54 @@
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/master-20260925
+    Start 36: TestTurbine
+    Start 39: TestTurbineTrimFuelFlow
+    Start 40: TestTurbineIdleFuelFlow
+    Start 38: TestTurbineTrimSpool
+    Start  5: TestModelReload
+1/7 Test #38: TestTurbineTrimSpool .............   Passed    0.39 sec
+    Start 34: TestEngineIndexedProps
+2/7 Test #40: TestTurbineIdleFuelFlow ..........   Passed    0.40 sec
+    Start 37: TestTurbineAugmentation
+3/7 Test  #5: TestModelReload ..................   Passed    0.44 sec
+4/7 Test #39: TestTurbineTrimFuelFlow ..........   Passed    0.44 sec
+5/7 Test #36: TestTurbine ......................   Passed    0.51 sec
+6/7 Test #37: TestTurbineAugmentation ..........***Failed    0.24 sec
+test_method_one_waits_for_native_spool_threshold (__main__.TestTurbineAugmentation.test_method_one_waits_for_native_spool_threshold) ... ok
+test_property_is_boolean_read_only_and_engine_indexed (__main__.TestTurbineAugmentation.test_property_is_boolean_read_only_and_engine_indexed) ... ok
+test_stalled_or_seized_engine_does_not_report_afterburning (__main__.TestTurbineAugmentation.test_stalled_or_seized_engine_does_not_report_afterburning) ... ok
+test_trim_tracks_each_method_and_engine_off (__main__.TestTurbineAugmentation.test_trim_tracks_each_method_and_engine_off) ... 
+  test_trim_tracks_each_method_and_engine_off (__main__.TestTurbineAugmentation.test_trim_tracks_each_method_and_engine_off) (method=1) ... FAIL
+  test_trim_tracks_each_method_and_engine_off (__main__.TestTurbineAugmentation.test_trim_tracks_each_method_and_engine_off) (method=2) ... FAIL
+test_turbine_without_afterburner_never_reports_augmentation (__main__.TestTurbineAugmentation.test_turbine_without_afterburner_never_reports_augmentation) ... ok
+
+======================================================================
+FAIL: test_trim_tracks_each_method_and_engine_off (__main__.TestTurbineAugmentation.test_trim_tracks_each_method_and_engine_off) (method=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineAugmentation.py", line 111, in test_trim_tracks_each_method_and_engine_off
+    self.assertEqual(fdm[ENGINE + "augmentation"], 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1.0 != 0
+
+======================================================================
+FAIL: test_trim_tracks_each_method_and_engine_off (__main__.TestTurbineAugmentation.test_trim_tracks_each_method_and_engine_off) (method=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestTurbineAugmentation.py", line 111, in test_trim_tracks_each_method_and_engine_off
+    self.assertEqual(fdm[ENGINE + "augmentation"], 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1.0 != 0
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.037s
+
+FAILED (failures=2)
+
+7/7 Test #34: TestEngineIndexedProps ...........   Passed    7.30 sec
+
+86% tests passed, 1 tests failed out of 7
+
+Total Test time (real) =   7.70 sec
+
+The following tests FAILED:
+	 37 - TestTurbineAugmentation (Failed)
+Errors while running CTest

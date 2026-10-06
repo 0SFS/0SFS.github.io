@@ -1,0 +1,20 @@
+F-35B sound, forward main-gear folding and optional VTOL lever — 2026-10-05
+0sfs: incremental checks followed by one final npm run ci, five Vitest workers.
+npx tsc -b: exit 0; npm run lint: exit 0.
+Related tests: 521 passed across 48 files.
+> osfs@0.0.0 ci
+> npm run lint && npm run test && npm run build
+> osfs@0.0.0 lint
+> eslint . --cache --cache-strategy content --cache-location node_modules/.cache/eslint/
+> osfs@0.0.0 test
+> vitest run --passWithNoTests
+ Test Files  129 passed (129)
+      Tests  1261 passed (1261)
+   Duration  14.45s (transform 2.12s, setup 0ms, import 19.05s, tests 25.12s, environment 10.56s)
+> osfs@0.0.0 build
+> npm run verify:jsbsim && npm run verify:audio && tsc -b && vite build && node scripts/verify-jsbsim-artifact.mjs --dist=dist && node scripts/verify-audio-artifact.mjs --dist=dist
+> osfs@0.0.0 verify:jsbsim
+> osfs@0.0.0 verify:audio
+✓ built in 577ms
+Full CI exit 0; JSBSim and audio source/dist artifact verification passed.
+No DSP rebuild, FDM edits, server launch, browser/device audio qualification or ground-collision implementation in this follow-up.

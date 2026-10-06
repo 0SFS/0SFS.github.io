@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-05T23:19:35.013Z",
+  "owner": "foss-earth",
+  "defect": "DynamicTexture was first uploaded after material readiness; readiness waited for that unuploaded texture.",
+  "behavior": "Paint and upload initial formatted label while the glyph remains hidden, before readiness. Refresh changed pending observations before atomic reveal, without duplicate unchanged uploads.",
+  "softwareChecks": {
+    "focusedCasesPassed": 8,
+    "focusedLog": "focused-rerun.log",
+    "typecheckExitCode": 0,
+    "typecheckLog": "typecheck.log",
+    "lintExitCode": 0,
+    "lintLog": "lint.log"
+  },
+  "unitReadinessContract": "NullEngine does not mark DynamicTexture uploads ready. Regression models the GPU upload flag and asserts upload/readiness, hidden geometry and zero frame requests before releasing the wait.",
+  "initialUnitFailure": {
+    "log": "focused.log",
+    "reason": "NullEngine does not implement the real GPU texture-ready flag; corrected the qualification seam without changing the production fix."
+  },
+  "hardwareCheck": "Pending consumer force-only WebGL2/WebGPU qualification.",
+  "finalCi": "Parent coordinates one combined full CI.",
+  "files": [
+    {
+      "path": "src/diagnostics/createVectorDebugDrawing.ts",
+      "bytes": 13084,
+      "sha256": "d79defacdb5776e366a831d42b7a99fad3554ab6f3b79657fb5a728e4139a82b"
+    },
+    {
+      "path": "src/diagnostics/createVectorDebugDrawing.test.ts",
+      "bytes": 10038,
+      "sha256": "a7930fa9ce4ea65e720d73ebac016fc2e61330c874615dd80250bfab9e38dc9d"
+    }
+  ]
+}

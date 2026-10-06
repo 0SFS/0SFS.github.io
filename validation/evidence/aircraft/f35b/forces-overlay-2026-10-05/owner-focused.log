@@ -1,0 +1,9 @@
+
+ RUN  v4.1.6 /Users/felg/gh/foss-earth
+
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  17:52:29
+   Duration  746ms (transform 111ms, setup 124ms, import 505ms, tests 15ms, environment 0ms)
+

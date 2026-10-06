@@ -1,0 +1,35 @@
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+(node:63315) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/flight/jsbsim/f35b.integration.test.ts (50 tests | 1 failed) 3132ms
+     × limits auxiliary force to actual idle power and removes it after main-only cutoff, including RunIC and reload 40ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/flight/jsbsim/f35b.integration.test.ts > F-35B native lift allocation, not LiftSystem calibration > limits auxiliary force to actual idle power and removes it after main-only cutoff, including RunIC and reload
+AssertionError: expected 14999.211862412883 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 14999.211862412883
+
+ ❯ src/flight/jsbsim/f35b.integration.test.ts:129:112
+    127|     for (const engine of [0, 1, 2, 3]) expect(sdk.getPropertyValue(`pr…
+    128|     expect(sdk.runIc()).toBe(true);
+    129|     for (const engine of [0, 1, 2, 3]) expect(sdk.getPropertyValue(`pr…
+       |                                                                                                                ^
+    130|     await bootstrapAircraft(sdk, aircraftId);
+    131|     expect(sdk.getPropertyValue("fcs/stovl-pos-norm")).toBe(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 49 passed (50)
+   Start at  17:50:59
+   Duration  4.34s (transform 106ms, setup 0ms, import 805ms, tests 3.13s, environment 271ms)
+

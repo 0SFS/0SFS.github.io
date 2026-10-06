@@ -1,0 +1,15 @@
+{
+  "method": "macOS DYLD_INTERPOSE for libc++ hardware_concurrency plus embedded oneTBB global_control",
+  "workers": 5,
+  "maximumWorkers": 5,
+  "sources": {
+    "scripts/validation/collision/native/thread-budget.cpp": "0415c6cc25385c1688179194a8a952a4ad5f016a17fd088579b76004b051c2d1",
+    "scripts/validation/collision/native/concurrency-probe.cpp": "46cc5b5ac0253274a8d897768ead16f8206e5d9f89e1e18cb173676921c5398c",
+    "scripts/validation/collision/coacd-proxies.py": "544ca21a65a5b95cf025ea45f0761f4c665944052bb9d3b91114f81b70647d8f"
+  },
+  "nativeLibraries": {
+    "interposerSha256": "399ab43032f9e6f8c9e9a73cb3fe2f8f75f9d263057095ae7a4d9dd06f778149",
+    "concurrencyProbeSha256": "2af2b153dc065a4f9b667dc2db21dedaea269fb9fa717a05813f84131186d001"
+  },
+  "verification": "Python checks the separate native probe and active embedded TBB limit before generating hulls."
+}

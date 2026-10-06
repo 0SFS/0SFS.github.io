@@ -1,0 +1,412 @@
+{
+  "schemaVersion": 1,
+  "recordedUtc": "2026-10-05T23:38:03.816589+00:00",
+  "status": "passed software and bounded hardware-render checks",
+  "scope": "F35B dry glow/smoke and native powered-lift correction; shared force overlay; default automatic flaps with physical feedback and manual takeover on every aircraft.",
+  "owners": {
+    "0sfs": "Aircraft data, control assists, native observations, aircraft visuals and app wiring",
+    "foss-earth": "Generic vector glyphs and labels",
+    "jsbsim": "Native cached observations and stopped-turbine initialization correction"
+  },
+  "checks": {
+    "applicationCi": {
+      "passed": true,
+      "files": 148,
+      "tests": 1536,
+      "command": "npm run ci",
+      "log": "app-ci.log",
+      "origin": "Completed concurrent-session run reused after audio/source audit; all identified app/audio inputs predate its start.",
+      "audit": "validation/evidence/audio/abi-recovery-2026-10-05/acceptance.json"
+    },
+    "initialApplicationAttempt": {
+      "passed": false,
+      "passedTests": 1492,
+      "failedTests": 43,
+      "log": "initial-app-ci.log",
+      "resolved": "Stale audio WASM/profile interface, stale snapshot-version assertion and missing runtime mock; later complete run passes all 1536 tests."
+    },
+    "sharedOwnerCi": {
+      "passed": true,
+      "files": 129,
+      "tests": 1072,
+      "command": "VITEST_MAX_WORKERS=5 npm run ci",
+      "log": "foss-earth-ci.log",
+      "scope": "Before later label placement/direction fixes; final source covered by follow-up below."
+    },
+    "sharedOwnerFinalFollowup": {
+      "passed": true,
+      "focusedTests": 12,
+      "typecheck": true,
+      "lint": true,
+      "build": true,
+      "receipt": "../foss-earth/validation/evidence/diagnostics/vector-label-readiness-2026-10-05/acceptance.json"
+    },
+    "finalConsumerBuild": {
+      "passed": true,
+      "lintLog": "final-lint.log",
+      "buildLog": "final-build.log",
+      "covers": "Final shared renderer; incremental TypeScript, Vite build, installed/emitted JSBSim and audio identity, optical and smoke bake freshness."
+    },
+    "hardwareGraphics": {
+      "passed": true,
+      "backends": [
+        "WebGL2",
+        "WebGPU"
+      ],
+      "device": "Apple M5 / Metal",
+      "receipt": "validation/evidence/aircraft/f35b/exhaust-smoke-gpu-2026-10-05/acceptance.json",
+      "scope": "Real shaders/pixels, dry glow, AB occlusion, native VTOL inhibit, bounded smoke and floating frame, pause, force labels/native direction and cleanup. Separate narrow follow-ups retain initial failures."
+    }
+  },
+  "behavior": {
+    "automaticFlaps": "Defaults on for every aircraft; native F35 schedule, declared simulator-assist curves for C172/SF50. Actual native flap feedback including reflex, manual takeover, unchanged phone/handoff preservation, paused keyboard editing, AP ownership and saved-start restoration covered.",
+    "liftAllocation": "Native force carriers follow current main upward thrust and CG arms; removes duplicate conversion gating and fictitious auxiliary spool lag. Main-off/RunIC/reload and partial-conversion control cases covered.",
+    "exhaust": "Original AB LUT bytes preserved; hot inner-nozzle materials separately emissive. One plume draw and one bounded smoke batch per configured engine; native-time pause, Float64 world history and small GPU coordinates.",
+    "forces": "Actual cached native observations at native anchors; default off. Lift/drag/side, CG aero, engines, weight and resultants; no invented per-part forces."
+  },
+  "identities": {
+    "jsbsim": {
+      "package": "@felipegalind0/jsbsim@1.2.4-fork.11",
+      "previousPackage": "@felipegalind0/jsbsim@1.2.4-fork.10",
+      "repositoryContentSha256": "fec8d16c38fd80da1446cde2b1f5523796d737eef6bac5426a7df4b11c2e2021",
+      "sdkSubtreeSha256": "d40290a03a3c40552b8dce8c3dfb6aeb5f19587f406d7083c461bc5ec2dfb5a4",
+      "buildInputSha256": "d353cac279c53cbc55c05b5231680ae85c26ae62b8b6c68a7e388fed90e0e7bc",
+      "tarballSha256": "1add69a5e13980af743a788f1e8f8856338ffd01b80e95a8dbaa23f7df0dd71a",
+      "tarballIntegrity": "sha512-kJNRRxbmG22N7wPTvLweMN16VBIAuch8DD2PLdYf0mwUnK9cOrm/R+UERGyIKRpb7vwReS7s150uLjOYANzXXQ==",
+      "installedLoaderSha256": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+      "installedWasmSha256": "ad1a8a1288ba7895c24e9f8701c754f4f7266703b7ea4f7d6325e5974132b1f3",
+      "record": "validation/evidence/jsbsim/adoption/fork11/verified-installed-artifact.json"
+    },
+    "audioArtifactSha256": "7a876882d8cf38ec043e97b7d84fc58c7b12faec730db4087059b6eb66458339",
+    "unchangedAfterburnerLutSha256": "208ae6cb513beedeb2a5e2b1f0f2ca17952ca66c2ca682733570e3f469af39a6"
+  },
+  "relatedReceipts": [
+    "validation/evidence/aircraft/f35b/lift-allocation-2026-10-05/acceptance.json",
+    "validation/evidence/aircraft/f35b/exhaust-2026-10-05/glow-smoke-software.json",
+    "validation/evidence/aircraft/f35b/forces-overlay-2026-10-05/acceptance.json",
+    "validation/evidence/aircraft/f35b/nozzle-area-2026-10-05/source-geometry.json",
+    "validation/evidence/jsbsim/adoption/fork11-adoption.json",
+    "validation/evidence/audio/abi-recovery-2026-10-05/acceptance.json"
+  ],
+  "limits": [
+    "Working trees include concurrent changes; complete logs and current source hashes are retained, not a clean committed application revision.",
+    "F35 aerodynamics, CG, shaft/clutch/bleed allocation and transition envelope remain experimental; no real-aircraft calibration or hover procedure qualification.",
+    "Optical temperatures, emission and aerosol appearance are assumptions; no measured F135 radiance/soot or thermal-inertia/CFD model.",
+    "Hardware runs use standalone aircraft scenes; they do not qualify the full globe, ground collisions, sound devices, frame timing or energy consumption.",
+    "KSP1 mod sources support the documented mesh/particle techniques; precise stock KSP2 smoke implementation remains unverified.",
+    "Gear stowage protrusion, engine start/stop gesture, world-space flight HUD, moment arcs and per-surface force attribution remain deferred."
+  ],
+  "logs": [
+    {
+      "path": "initial-app-ci.log",
+      "bytes": 57649,
+      "sha256": "f5b5b55529e1638b9795f328fc1896018b8ae18ea9dbf5483dcc03936c3e5f32"
+    },
+    {
+      "path": "app-ci.log",
+      "bytes": 65381,
+      "sha256": "3df3f5dbf3a13ecd295427493660bbf9a77b4fa4b12d803116370d8f4ddde2ad"
+    },
+    {
+      "path": "foss-earth-ci.log",
+      "bytes": 44605,
+      "sha256": "be8edecf845de908e70d7d2585de821433857262b44db2edced5056fd7c88157"
+    },
+    {
+      "path": "final-lint.log",
+      "bytes": 109,
+      "sha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e"
+    },
+    {
+      "path": "final-build.log",
+      "bytes": 56200,
+      "sha256": "46e1fad5475161a0e163e0c602f2b6387e7a4a2795864585ada1e3f4e603e194"
+    }
+  ],
+  "sourceFiles": [
+    {
+      "path": "package.json",
+      "bytes": 2546,
+      "sha256": "fd16ac084478f54f4fd11f154b0a97a6406bfe72689435495373c2222b8a0d34"
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 172661,
+      "sha256": "f02e62cf61a7790222f39a67ac55f9d506a961cb50f9fc9eebb04c2dd71f0add"
+    },
+    {
+      "path": "src/flight/createFlightSimApp.ts",
+      "bytes": 110077,
+      "sha256": "7b41ea2680724307ca2146aed02d2eb9ac7968df0b51972ab41b4bff8e80d375"
+    },
+    {
+      "path": "src/flight/createFlightSimApp.test.ts",
+      "bytes": 86735,
+      "sha256": "cdbad7e5ed84b2ed93bd3e224679257db9e7a0ed444427430b65bf18eee8c964"
+    },
+    {
+      "path": "src/flight/createFlightSimApp.phone.test.ts",
+      "bytes": 19228,
+      "sha256": "adf5e74cae4208b8205ae3f018589e173adebd7bc72d3b872ae690f348942c21"
+    },
+    {
+      "path": "src/flight/createFlightSimApp.autopilot.test.ts",
+      "bytes": 8702,
+      "sha256": "8cfae59251749b41965696c17847702be45f73cadbda42dc4d2e9235fce546c7"
+    },
+    {
+      "path": "src/flight/input/autoFlaps.ts",
+      "bytes": 2226,
+      "sha256": "cabf76ae5c15dfcd949a5ce4ff51ab786a5a801fd35126c23700a46318e689f1"
+    },
+    {
+      "path": "src/flight/input/autoFlaps.test.ts",
+      "bytes": 2363,
+      "sha256": "21abd3bc8c214303b0fa2fa933ca9116daf5318ef7d2bb6a757fdfd943f6613c"
+    },
+    {
+      "path": "src/flight/input/flightInputManager.ts",
+      "bytes": 35160,
+      "sha256": "2a2fe22392451d6e7d78fbcd962db3d98df314d9c0701b79234dd7d49711f809"
+    },
+    {
+      "path": "src/flight/input/flightInputManager.test.ts",
+      "bytes": 19744,
+      "sha256": "7e6139fc84fd0a2e89e13ee43347c52b08d459363109477f2f62a6d0572ac84c"
+    },
+    {
+      "path": "src/flight/input/gamepadProfiles.test.ts",
+      "bytes": 8627,
+      "sha256": "323a24bf7f0d3367ada151b05430fef6aecff71c038432591554e1a546cd45be"
+    },
+    {
+      "path": "src/flight/input/applyFlightControls.ts",
+      "bytes": 2636,
+      "sha256": "41c6af1798f2bc819d63f16032623cc701f71679a639124c2ed4d3b69081f657"
+    },
+    {
+      "path": "src/flight/hud/flightHud.ts",
+      "bytes": 30322,
+      "sha256": "008257748d0624d07d5c0970b350f44d62ecc5d7517bc9a6b62f1233fbacaa6a"
+    },
+    {
+      "path": "src/flight/hud/flightHud.test.ts",
+      "bytes": 20514,
+      "sha256": "cc7191c229eabad883f7dd7d8b72adb3d93e5dcd215993b838bfa2fe3896cc1a"
+    },
+    {
+      "path": "src/flight/hud/FlightControlPanel.tsx",
+      "bytes": 38758,
+      "sha256": "8c58e1822e0e8285a5ab3e9ad0c6558d807e7500c9165552c204b7c385d60cad"
+    },
+    {
+      "path": "src/flight/settings/flightParameters.ts",
+      "bytes": 63879,
+      "sha256": "fd19b1002819d62c9b75bb5a2d672bd43e6ec5c1eb9c098b825664aa78041d41"
+    },
+    {
+      "path": "src/styles/flight.css",
+      "bytes": 23485,
+      "sha256": "634ccabe463b66c43063e92d68d4cf573f235797da5c22f8b206632846d56a5f"
+    },
+    {
+      "path": "src/flight/jsbsim/bootstrapC172.ts",
+      "bytes": 6036,
+      "sha256": "2bbd8179f32497dba0249a860410ca57585898e2b86411ddaa569b9a30959fac"
+    },
+    {
+      "path": "src/flight/jsbsim/fdmProfiles.ts",
+      "bytes": 8049,
+      "sha256": "1eef14b77cde9d6d873d6818104a14871e59f370b012a9b07a1b49e186493c39"
+    },
+    {
+      "path": "src/flight/jsbsim/f35b.integration.test.ts",
+      "bytes": 22588,
+      "sha256": "e774bf2aaf394bbc7c0ff7e03054c4d3d2988f451d003a3f372c82080d2b3aec"
+    },
+    {
+      "path": "src/flight/jsbsim/f35bYaw.integration.test.ts",
+      "bytes": 9959,
+      "sha256": "7adb25efeb1696f68e6516d2804692d83ba32f1e1300a43d95709897d047ee51"
+    },
+    {
+      "path": "src/flight/aircraft/aircraftCatalog.ts",
+      "bytes": 16811,
+      "sha256": "1697e071c663d86d65e2e19903aaceec6b0e87656e89850c0fb4675dcfeb9fd2"
+    },
+    {
+      "path": "src/flight/aircraft/aircraftAnimation.ts",
+      "bytes": 36308,
+      "sha256": "b553c678f07b17b815c77f5d87d5785fa390287e988eb21a819034833445cc15"
+    },
+    {
+      "path": "src/flight/aircraft/aircraftAnimation.f35b.test.ts",
+      "bytes": 18496,
+      "sha256": "7c88b6060874c84177fdb58fb8c1eef020d278063602c13a27b8c507d8cb7e17"
+    },
+    {
+      "path": "src/flight/aircraft/createAircraftEngineVisuals.ts",
+      "bytes": 9969,
+      "sha256": "9d11cc2044639a206eb1b08207266a1036ff6cd4d11b8b0414f5f360d71284a6"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineExhaust.ts",
+      "bytes": 20484,
+      "sha256": "f45761a1332d58607a39021ec2ec4eb13aac9795180507ad8a2a596d855edb4b"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineHotSurfaceGlow.ts",
+      "bytes": 6428,
+      "sha256": "e4b4af18b4eab4e27cf7eb8df0babf82cc269d714fbe29b38eed0a1625d6b424"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineSmoke.ts",
+      "bytes": 18891,
+      "sha256": "c0176d9ed5aa3dfdc51840ddd930eb9f7aa7fc0ef253d7e0abe5c75eb61602d6"
+    },
+    {
+      "path": "src/flight/aircraft/engineExhaustProfiles.ts",
+      "bytes": 1646,
+      "sha256": "23665821d844a0bcdab58e80db82f4e4f09932e4d5e955dccc6babad74c4ac7b"
+    },
+    {
+      "path": "src/flight/aircraft/engineSmokeProfiles.ts",
+      "bytes": 1189,
+      "sha256": "49f176acd3e71a98c96c08743bfdf0ef1adba8b0aab5407b4623375a151b9f9b"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135ExhaustOpticalData.ts",
+      "bytes": 2159,
+      "sha256": "972aa71b408b6e49411ef667044801b8987b1f48171273acbbc76f745294c6b3"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.png",
+      "bytes": 2856,
+      "sha256": "208ae6cb513beedeb2a5e2b1f0f2ca17952ca66c2ca682733570e3f469af39a6"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json",
+      "bytes": 11006,
+      "sha256": "f6265447eb2f07cbe96098388bf2ae967d0c4c1039ba97ccaa23c7b1e6bdb5ea"
+    },
+    {
+      "path": "src/flight/aircraft/generated/engine-smoke-flipbook.png",
+      "bytes": 7900,
+      "sha256": "73c447a6b283841a81373d4d7fcb591b027fcdab1dd402d57315603285985590"
+    },
+    {
+      "path": "src/flight/aircraft/generated/engine-smoke-flipbook.manifest.json",
+      "bytes": 1489,
+      "sha256": "85ced3ece6cc4763b736320f5567bee9e646ccda1eb198ff7c79546109041b30"
+    },
+    {
+      "path": "src/flight/bridge/enuFrame.ts",
+      "bytes": 3136,
+      "sha256": "2326ef2fa857dd15827f3808994b63b0d9c10dab189e934d6803164c6811e9d2"
+    },
+    {
+      "path": "src/flight/bridge/floatingOrigin.ts",
+      "bytes": 2823,
+      "sha256": "ce95252dd4080f1300d90418d2f3e214eb8d6591c0c254b6d753b4437966f622"
+    },
+    {
+      "path": "src/flight/diagnostics/aircraftForces.ts",
+      "bytes": 7994,
+      "sha256": "110a1962d328c167b3ff1280eb97e6f470563059e8f7edc854772ee8dfd982e7"
+    },
+    {
+      "path": "src/flight/diagnostics/createForcesDebugOverlay.ts",
+      "bytes": 3096,
+      "sha256": "0d4313601af15198a0dae0987d56af0344cbb5878a3316d983b161e8dcf767d5"
+    },
+    {
+      "path": "scripts/build-exhaust-optics.mjs",
+      "bytes": 5981,
+      "sha256": "a89f1fd44c12dc6eb65d331aba3b1ce74bf2e0879b9fcb28a35fca4257e5e365"
+    },
+    {
+      "path": "scripts/build-engine-smoke.mjs",
+      "bytes": 4365,
+      "sha256": "600602a5a381524ac2212c1e6a72bf70cde9fecd0545c812bb2477d13b3df774"
+    },
+    {
+      "path": "scripts/exhaustOptics/bake.mjs",
+      "bytes": 8970,
+      "sha256": "0aff8329987f1eb324e70c917d3272467f3fa4575f80b7600ed870b7bc6bad4a"
+    },
+    {
+      "path": "scripts/validation/f35b/check-exhaust-headless.mjs",
+      "bytes": 29265,
+      "sha256": "1f47fbd439ab6387fe77039f3895acb8c9f2f5a48900b4ffd1f594f230e9334d"
+    },
+    {
+      "path": "public/jsbsim-data/manifest.json",
+      "bytes": 1098,
+      "sha256": "448049a4e922630c251ebfa2f5245457799fed5502380cb4db6f35cf5ea45d42"
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/source-manifest.json",
+      "bytes": 6142,
+      "sha256": "d30cd84feb847d536b2b0b0e6189a044128b2af076bdd07f86bf31e2041bc412"
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+      "bytes": 4769,
+      "sha256": "09b7eb9c8c9ea5ca720ae1974f4d1ef5d7fb35e6b8248415c6cfcc307c57891c"
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/direct.xml",
+      "bytes": 114,
+      "sha256": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc"
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/liftfan.xml",
+      "bytes": 3298,
+      "sha256": "9ded9a6a93eeab2dac35c779b51945b9e5cf0807591737b67262b27c5ab67287"
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/sidefan.xml",
+      "bytes": 3052,
+      "sha256": "90e1017803f4d9f46285ee09b2aed37d01cee82053e612ffabcf7a19816571ae"
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml",
+      "bytes": 49653,
+      "sha256": "77a35afdc925c45dba63c237bf258f5706a06ea951816c946d882d0c2ec2055b"
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Systems/pushback.xml",
+      "bytes": 1127,
+      "sha256": "868928e9b2b12440daec283260aebb1562d05154f69438f5d95043444378a4bc"
+    }
+  ],
+  "sharedSourceFiles": [
+    {
+      "path": "foss-earth/src/diagnostics/createVectorDebugDrawing.ts",
+      "bytes": 13921,
+      "sha256": "7420a3114b32ab1e1edf5cbc2b6c232e9c0a18aee13e694cb6acd8437e82f5ed"
+    },
+    {
+      "path": "foss-earth/src/diagnostics/createVectorDebugDrawing.test.ts",
+      "bytes": 13757,
+      "sha256": "e26cfb0d48030398eb553f9546bce5eb64745adb05b75808e03f7cea07ef1c67"
+    },
+    {
+      "path": "foss-earth/src/diagnostics/index.ts",
+      "bytes": 729,
+      "sha256": "09a339eea15896ba85d74f7d4ea3570b8c3302f4269a5dca5c5f558bf0483172"
+    }
+  ],
+  "supportingRecords": [
+    {
+      "path": "validation/evidence/aircraft/f35b/exhaust-smoke-gpu-2026-10-05/acceptance.json",
+      "bytes": 26240,
+      "sha256": "34e2ce479d7efa275af566835eb989f9ae74e9d2bf18c80eb342dc41fc825b6a"
+    },
+    {
+      "path": "../foss-earth/validation/evidence/diagnostics/vector-label-readiness-2026-10-05/acceptance.json",
+      "bytes": 5794,
+      "sha256": "560ae2ed4b4a8bdbb8e67f699f24279381ad4adacbdf83a329aeb5708421cb8d"
+    }
+  ]
+}

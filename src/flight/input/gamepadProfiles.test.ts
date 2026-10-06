@@ -63,6 +63,29 @@ function harness(
 }
 
 describe("flight profiles through browser sampling and evaluation", () => {
+  it("requires fresh absolute flap-lever movement after automatic actuator feedback", () => {
+    const factory = () => {
+      const profile = createStandardFlightProfile();
+      const axisBinding = profile.bindings.find(binding => binding.actionId === "flight.aileron" && binding.kind === "single")!;
+      return { ...profile, bindings: [...profile.bindings, {
+        ...axisBinding, id: "absolute-flaps", actionId: "flight.flaps", semantics: "value" as const,
+        transform: { ...axisBinding.transform, outputRange: [0, 1] as [number, number] },
+      }] };
+    };
+    const t = harness(factory);
+    t.step();
+    const baselineRevision = t.input.getFlapsInputRevision();
+    axis(0, 0.8);
+    expect(t.step().flaps).toBeGreaterThan(0.5);
+    expect(t.input.getFlapsInputRevision()).toBeGreaterThan(baselineRevision);
+    const manualRevision = t.input.getFlapsInputRevision();
+    t.input.replaceFlaps(0.25);
+    expect(t.step().flaps).toBe(0.25);
+    expect(t.input.getFlapsInputRevision()).toBe(manualRevision);
+    axis(0, -0.8);
+    expect(t.step().flaps).toBeLessThan(0.25);
+    expect(t.input.getFlapsInputRevision()).toBeGreaterThan(manualRevision);
+  });
   it.each([createStandardFlightProfile, createLegacyFlightProfile])(
     "applies small stick motion on the very next flight step with one deadzone",
     (factory) => {

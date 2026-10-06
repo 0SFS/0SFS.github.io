@@ -4,6 +4,7 @@ import { PhoneBrake, PhoneCameraPad, PhoneStick } from "./PhoneStick";
 import { PhoneControlPrompt } from "./PhoneControlPrompt";
 import { PhoneQrScanner } from "./PhoneQrScanner";
 import { PhoneEngine } from "./PhoneEngine";
+import { PhoneThrottle } from "./PhoneThrottle";
 import { PhoneViewSwitch } from "./PhoneViewSwitch";
 import { PhoneFullscreenButton, PhoneFullscreenPrompt } from "./PhoneFullscreenPrompt";
 import { useFullscreenOffer } from "./useFullscreenOffer";
@@ -41,6 +42,9 @@ export function PhoneController({ client, onPair }: { client: PhoneControllerCli
   // The desktop's own drag signs: right orbits right, down lifts the camera.
   const camera = useCallback((gesture: { yaw: number; pitch: number; zoom?: number }, input?: InputTiming) => client.nudgeCamera(gesture, input), [client]);
   const brake = useCallback((held: boolean) => client.updateControls({ brake: held ? 1 : 0 }), [client]);
+  const throttle = useCallback((value: number) => client.updateControls({ throttle: value }), [client]);
+  const starter = useCallback((held: boolean) => client.setStarterHeld(held), [client]);
+  const shutdown = useCallback(() => { client.shutdownEngine(); }, [client]);
   const ended = state.phase === "error" || state.phase === "disconnected";
   const connected = state.phase === "ready";
   const locked = !state.canControl;
@@ -117,7 +121,7 @@ export function PhoneController({ client, onPair }: { client: PhoneControllerCli
         <PhoneYaw value={state.controls.rudder} disabled={locked} settings={yaw} onChange={rudder} />
         {/* The desktop HUD's engine widget, just above the throttle it answers to,
             notched into the camera pad's corner rather than widening the column. */}
-        {engine && <PhoneEngine engine={engine} />}
+        {engine && <PhoneEngine engine={engine} paused={status?.paused ?? true} />}
         {/* The slot the desktop HUD gives its engine monitor, spent on the view:
             the phone's engine widget sits over the throttle instead. */}
         {/* The view switch sits over the pad's corner, not inside it: a switch
@@ -126,12 +130,9 @@ export function PhoneController({ client, onPair }: { client: PhoneControllerCli
           <PhoneCameraPad disabled={locked} onGesture={camera} />
           <PhoneViewSwitch mode={status?.viewMode} disabled={locked} onChange={mode => client.setViewMode(mode)} />
         </div>
-        <label className="flight-hud__slider-control phone-throttle">
-          <span>THR</span>
-          <output>{percent(state.controls.throttle)}</output>
-          <input type="range" min="0" max="1" step=".01" value={state.controls.throttle} disabled={locked}
-            aria-label="Throttle" onChange={event => client.updateControls({ throttle: Number(event.target.value) })} />
-        </label>
+        {/* The desktop HUD's own throttle lever, engine start and shutdown included. */}
+        <PhoneThrottle value={state.controls.throttle} engine={engine} disabled={locked}
+          onChange={throttle} onStartHold={starter} onShutdown={shutdown} />
       </div>
       {/* Everything that is not a flight surface, in one chip grid at FOSS Earth
           HUD density: instruments first, then the buttons. Below the controls

@@ -118,8 +118,12 @@ export interface FlightInputManager {
   setRemoteOwned(value: boolean): void;
   hasActiveFlightInput(): boolean;
   getControls(): ControlSurfaceState;
+  /** Monotonic local flap input revision; feedback, resets and handoffs never increment it. */
+  getFlapsInputRevision(): number;
   resetControls(throttle: number): void;
   setThrottle(value: number): void;
+  /** The app moving the throttle, not the pilot: an engine that is off holds it at idle. */
+  replaceThrottle(value: number): void;
   setPitchTrim(value: number): void;
   setRollTrim(value: number): void;
   /**
@@ -127,6 +131,8 @@ export interface FlightInputManager {
    * uses this while a phone owns the stick.
    */
   replacePitchTrim(value: number): void;
+  /** Tracks automatic actuator feedback without counting it as pilot input. */
+  replaceFlaps(value: number): void;
   replaceRollTrim(value: number): void;
   setFlaps(value: number): void;
   setRudder(value: number): void;
@@ -159,6 +165,8 @@ export function createFlightInputManager(options: {
   initialThrottle?: number;
   initialGearDown?: boolean;
   rudderSign?: 1 | -1;
+  /** Paused before this input existed, during loading or by a saved flight. */
+  initialPaused?: boolean;
   onPausedChange?: (paused: boolean) => void;
   /** Fires on the G key so the HUD's gear button can follow it. */
   onGearChange?: (down: boolean) => void;
@@ -183,9 +191,10 @@ export function createFlightInputManager(options: {
     brake: 0,
   };
   let throttleTarget = initialThrottle;
-  let paused = false;
+  let paused = options.initialPaused ?? false;
   let gearDown = options.initialGearDown ?? true;
   let remoteOwned = false;
+  let flapsInputRevision = 0;
   let gamepadToolsActive = false;
   let bindingCaptureActive = false;
   let selectedGamepadSlot = 0;
@@ -333,6 +342,7 @@ export function createFlightInputManager(options: {
     primeBindingCommands = false;
     const nextValues = new Map<string, BindingIntentValue>();
     let hasLocalContinuousInput = false;
+    let flapInputChanged = false;
     for (const intent of frame.intents) {
       if (intent.kind === "command") {
         if (intent.edge !== "press" || suppressCommands) continue;
@@ -355,7 +365,8 @@ export function createFlightInputManager(options: {
         if (!persistentValue && value === 0) armedBindingSources.add(bindingId);
         continue;
       }
-      if (!armedBindingSources.has(bindingId)) {
+      const newlyArmed = !armedBindingSources.has(bindingId);
+      if (newlyArmed) {
         if (!persistentValue && value === 0) {
           armedBindingSources.add(bindingId);
         } else if (Math.abs(value - baseline) > takeoverDeadband()) {
@@ -369,12 +380,19 @@ export function createFlightInputManager(options: {
         value,
         inputKind: intent.source.inputKind,
       });
+      if (intent.actionId === "flight.flaps" || intent.actionId === "flight.flapsRate") {
+        const changed = value !== (bindingIntentValues.get(bindingId)?.value ?? baseline);
+        flapInputChanged ||= intent.actionId === "flight.flaps"
+          ? changed || (newlyArmed && value !== 0)
+          : value !== 0 && (changed || newlyArmed);
+      }
       hasLocalContinuousInput ||= Math.abs(value) > 0.001
         && Math.abs(value - (bindingIntentValues.get(bindingId)?.value ?? 0)) > 0.001;
     }
 
-    if (hasLocalContinuousInput) options.onLocalInput?.();
+    if (hasLocalContinuousInput || flapInputChanged) options.onLocalInput?.();
     if (remoteOwned) return;
+    if (flapInputChanged) flapsInputRevision++;
     // A synchronous phone handoff can clear the maps above. Restore this
     // frame's initiating input afterwards, and drop any disconnected sources.
     bindingIntentValues.clear();
@@ -410,7 +428,9 @@ export function createFlightInputManager(options: {
         throttleTarget = Math.min(1, Math.max(0, throttleTarget + binding.throttle * parameters.get("osfs.input.throttleRate") * dt));
       }
       if (binding.flaps !== undefined) {
-        flaps = Math.min(1, Math.max(0, flaps + binding.flaps * dt * 0.5));
+        const next = Math.min(1, Math.max(0, flaps + binding.flaps * dt * 0.5));
+        if (next !== flaps) flapsInputRevision++;
+        flaps = next;
       }
       if (binding.brake !== undefined) brake = binding.brake;
     }
@@ -534,6 +554,7 @@ export function createFlightInputManager(options: {
       0,
       1,
     );
+    if (flaps !== smoothed.flaps) flapsInputRevision++;
 
     smoothed = {
       elevator,
@@ -584,6 +605,7 @@ export function createFlightInputManager(options: {
           if (!event.repeat) options.onLocalInput?.();
           event.preventDefault();
           if (remoteOwned) return;
+          if (!event.repeat && KEY_BINDINGS[event.code].flaps !== undefined) flapsInputRevision++;
           keysDown.add(event.code);
         }
       };
@@ -751,6 +773,7 @@ export function createFlightInputManager(options: {
     getControls(): ControlSurfaceState {
       return { ...smoothed };
     },
+    getFlapsInputRevision(): number { return flapsInputRevision; },
     resetControls(throttle: number): void {
       keysDown.clear();
       stickOverride = null;
@@ -807,6 +830,10 @@ export function createFlightInputManager(options: {
       throttleTarget = Math.min(1, Math.max(0, value));
       smoothed.throttle = throttleTarget;
     },
+    replaceThrottle(value: number): void {
+      throttleTarget = Math.min(1, Math.max(0, value));
+      smoothed.throttle = throttleTarget;
+    },
     setPitchTrim(value: number): void {
       options.onLocalInput?.();
       if (remoteOwned) return;
@@ -826,7 +853,21 @@ export function createFlightInputManager(options: {
     setFlaps(value: number): void {
       options.onLocalInput?.();
       if (remoteOwned) return;
+      flapsInputRevision++;
       smoothed.flaps = Math.min(1, Math.max(0, value));
+    },
+    replaceFlaps(value: number): void {
+      smoothed.flaps = Math.min(1, Math.max(0, value));
+      // Auto owns flap position. A stationary absolute hardware lever must
+      // wait for fresh movement, using the existing takeover deadband.
+      let rebaseline = false;
+      for (const [id, entry] of bindingIntentValues) if (entry.actionId === "flight.flaps") {
+        bindingBaselines.set(id, entry.value);
+        armedBindingSources.delete(id);
+        bindingIntentValues.delete(id);
+        rebaseline = true;
+      }
+      if (rebaseline) refreshGamepadBindingControls();
     },
     setRudder(value: number): void {
       options.onLocalInput?.();

@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "sourceArchiveSha256": "caf3c591c838148ccdeec8fc61a23fd09f17574aeb36e0071e84a132dd25ebd6",
+  "sourceUrl": "https://fgaddon.b-cdn.net/Aircraft-trunk/F-35B.zip",
+  "sourceRevision": 15340,
+  "license": "GPL-3.0",
+  "generator": "scripts/build-external-tank-model.mjs",
+  "sourceFiles": [
+    {
+      "path": "planes/Lockheed_Martin_F-35B/tests/flightgear-external-tanks/Tank.ac",
+      "bytes": 345628,
+      "sha256": "059134fd3f48132a35854db43083a8d57e2b4898f6d9b9deb574149dbac793b4"
+    },
+    {
+      "path": "planes/Lockheed_Martin_F-35B/tests/flightgear-external-tanks/Tank.png",
+      "bytes": 775,
+      "sha256": "0b35ecd6e7fe733211681d80f1fa1c356a53054380dadcfe165580180773d2de"
+    },
+    {
+      "path": "planes/Lockheed_Martin_F-35B/tests/flightgear-external-tanks/pylons.ac",
+      "bytes": 61611,
+      "sha256": "2b5dc40f28e1862e3eb3fc23cdf10d1d0b41f6fb3a15b2aa51b0b2ccf45b0137"
+    }
+  ],
+  "export": {
+    "path": "public/aircraft/f-35b/ExternalTank_FlightGear.glb",
+    "bytes": 476212,
+    "sha256": "59198a169e59c1baef61cd3dd980b6206d01bb3016248cbff875c808cb31cd13"
+  },
+  "frame": "metres, +X left, +Y up, +Z forward; tank source origin approximately at its geometric centre",
+  "modifications": [
+    "Triangulated source polygons, generated area-weighted vertex normals and converted axes and texture V convention.",
+    "Retained source tank geometry and texture; extracted inner pylon Station3 and moved it relative to the tank using source payload offsets.",
+    "Runtime mounts copies at the declared development store locations; no certification or measured aerodynamic properties are asserted."
+  ],
+  "meshes": [
+    {
+      "name": "Tank",
+      "sourceObject": "Tank",
+      "sourceVertices": 2402,
+      "triangles": 4800,
+      "bounds": {
+        "min": [
+          -0.33261135597200003,
+          -0.3326199999999999,
+          -2.30643
+        ],
+        "max": [
+          0.332610644028,
+          0.33260999999999985,
+          2.3064220000000004
+        ]
+      }
+    },
+    {
+      "name": "Pylon",
+      "sourceObject": "Station3",
+      "sourceVertices": 68,
+      "triangles": 132,
+      "bounds": {
+        "min": [
+          -0.05162999999999984,
+          0.30067,
+          -1.68018
+        ],
+        "max": [
+          0.05820999999999987,
+          0.78874,
+          0.6794
+        ]
+      }
+    }
+  ]
+}

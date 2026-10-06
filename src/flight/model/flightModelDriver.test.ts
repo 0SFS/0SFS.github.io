@@ -74,6 +74,60 @@ function create(backend: FlightDynamicsBackend) {
 }
 
 describe("private flight model driver", () => {
+  it("selects a native control law independently of its observed active state", () => {
+    const { backend, properties } = backendFixture();
+    properties["fcs/control-law-mode"] = 0;
+    properties["fcs/fbw-enabled"] = 1;
+    const driver = FlightModelDriver.create(backend, {
+      modelName: "F-35B-jsbsim", fixedDtSec: 1 / 120, rudderSign: -1,
+      flapPosition: { property: "fcs/flap-pos-norm", fullTravel: 1 },
+      controlLaw: { commandProperty: "fcs/control-law-mode", enabledProperty: "fcs/fbw-enabled" },
+    }, {});
+    driver.initialize({ ...initial, controls: { ...initial.controls, controlLawMode: "manual" } });
+    expect(driver.observe().diagnostics.controlLawMode).toBe(1);
+    expect(driver.observe().diagnostics.flyByWireEnabled).toBe(1);
+    expect(backend.setPropertyValue).not.toHaveBeenCalledWith("fcs/fbw-enabled", expect.anything());
+    driver.applyControls({ ...initial.controls, controlLawMode: "fly-by-wire" });
+    expect(driver.observe().diagnostics.controlLawMode).toBe(2);
+    driver.initialize(initial);
+    expect(driver.observe().diagnostics.controlLawMode).toBe(0);
+    driver.dispose();
+  });
+
+  it("rejects explicit stabilization modes on aircraft without that capability", () => {
+    const { backend } = backendFixture();
+    const driver = create(backend);
+    driver.initialize(initial);
+    expect(() => driver.applyControls({ ...initial.controls, controlLawMode: "fly-by-wire" })).toThrow("no selectable control law");
+    expect(() => driver.applyControls({ ...initial.controls, controlLawMode: "manual" })).toThrow("no selectable control law");
+    driver.dispose();
+  });
+  it("drives a discovered STOVL lever while preserving the observed actuator during conversion", () => {
+    const { backend, properties } = backendFixture();
+    properties["fcs/stovl-cmd-norm"] = 0;
+    properties["fcs/stovl-pos-norm"] = 0.25;
+    const driver = FlightModelDriver.create(backend, {
+      modelName: "F-35B-jsbsim", fixedDtSec: 1 / 120, rudderSign: 1,
+      flapPosition: { property: "fcs/flap-pos-norm", fullTravel: 1 },
+      stovl: { commandProperty: "fcs/stovl-cmd-norm", positionProperty: "fcs/stovl-pos-norm" },
+    }, {});
+    driver.initialize({ ...initial, controls: { ...initial.controls, stovlNorm: 0.5 } });
+    driver.applyControls({ ...initial.controls, stovlNorm: 1 });
+    expect(driver.observe().diagnostics.stovlCommandNorm).toBe(1);
+    expect(driver.observe().diagnostics.stovlPositionNorm).toBe(0.25);
+    expect(() => driver.applyControls({ ...initial.controls, stovlNorm: 1.1 })).toThrow(RangeError);
+    driver.initialize(initial);
+    expect(driver.observe().diagnostics.stovlCommandNorm).toBe(0);
+    driver.dispose();
+  });
+
+  it("rejects conversion on an aircraft without a STOVL actuator", () => {
+    const { backend } = backendFixture();
+    const driver = create(backend);
+    driver.initialize(initial);
+    expect(() => driver.applyControls({ ...initial.controls, stovlNorm: 1 })).toThrow("no STOVL actuator");
+    driver.dispose();
+  });
   it("initializes positive pitch on a descending path at idle without advancing time", () => {
     const { backend, properties } = backendFixture();
     properties["propulsion/engine/thrust-lbs"] = 0;

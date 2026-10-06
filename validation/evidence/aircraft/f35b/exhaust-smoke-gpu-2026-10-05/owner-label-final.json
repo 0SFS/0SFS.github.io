@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-05T23:19:35.013Z",
+  "owner": "foss-earth",
+  "defect": "DynamicTexture was first uploaded after material readiness; readiness waited for that unuploaded texture.",
+  "behavior": "Paint and upload initial formatted label while the glyph remains hidden, before readiness. Refresh changed pending observations before atomic reveal, without duplicate unchanged uploads.",
+  "softwareChecks": {
+    "focusedCasesPassed": 8,
+    "focusedLog": "focused-rerun.log",
+    "typecheckExitCode": 0,
+    "typecheckLog": "typecheck.log",
+    "lintExitCode": 0,
+    "lintLog": "lint.log"
+  },
+  "unitReadinessContract": "NullEngine does not mark DynamicTexture uploads ready. Regression models the GPU upload flag and asserts upload/readiness, hidden geometry and zero frame requests before releasing the wait.",
+  "initialUnitFailure": {
+    "log": "focused.log",
+    "reason": "NullEngine does not implement the real GPU texture-ready flag; corrected the qualification seam without changing the production fix."
+  },
+  "hardwareCheck": "Pending consumer force-only WebGL2/WebGPU qualification.",
+  "finalCi": "Parent coordinates one combined full CI.",
+  "files": [
+    {
+      "path": "src/diagnostics/createVectorDebugDrawing.ts",
+      "bytes": 13084,
+      "sha256": "d79defacdb5776e366a831d42b7a99fad3554ab6f3b79657fb5a728e4139a82b"
+    },
+    {
+      "path": "src/diagnostics/createVectorDebugDrawing.test.ts",
+      "bytes": 10038,
+      "sha256": "a7930fa9ce4ea65e720d73ebac016fc2e61330c874615dd80250bfab9e38dc9d"
+    }
+  ],
+  "anchorFollowup": {
+    "recordedAt": "2026-10-05T23:29:30.610Z",
+    "defect": "Babylon billboard composition ignores its parent orientation for a nonzero child offset, moving label origins above downward/lateral arrows.",
+    "behavior": "A non-billboard tip TransformNode under the rotated glyph carries the offset. Its zero-position billboard child changes facing while retaining the actual transformed tip anchor.",
+    "placement": "parent-local anchor + normalized vector * (min(magnitude/valuePerMeter,maxArrowMeters)+0.35m)",
+    "softwareChecks": {
+      "casesPassed": 9,
+      "log": "anchor-focused-rerun.log",
+      "typecheckExitCode": 0,
+      "typecheckLog": "anchor-typecheck.log",
+      "lintExitCode": 0,
+      "lintLog": "anchor-lint.log",
+      "buildExitCode": 0,
+      "buildLog": "anchor-build.log",
+      "fullCiRepeated": false
+    },
+    "regression": "Active camera, downward/lateral vectors, nonuniform parent scale, rotation and rebasing; actual absolute label position within 0.1 mm of the transformed vector tip, with billboard normal still aligned with the camera.",
+    "initialToleranceFailure": {
+      "log": "anchor-focused.log",
+      "errorMeters": 0.000010902433017053897,
+      "reason": "Float32 hierarchical matrices at approximately 300 m offsets cannot promise 10 micrometre accuracy; the final assertion remains below 0.1 mm."
+    },
+    "addedDraws": 0,
+    "addedTransformNodesPerLabel": 1,
+    "hardwarePlacementQualification": "Pending final consumer force-only WebGL2/WebGPU capture.",
+    "files": [
+      {
+        "path": "src/diagnostics/createVectorDebugDrawing.ts",
+        "bytes": 13594,
+        "sha256": "0fdf8df6da65fb9f112dd889e82c89069b30bd0cc25c365681d0243a2a14c68f"
+      },
+      {
+        "path": "src/diagnostics/createVectorDebugDrawing.test.ts",
+        "bytes": 12560,
+        "sha256": "6e998537637248bfe5a91ba7ecf13042df75a2e6f48cacfcfee4f8d9bdb41cfc"
+      }
+    ]
+  },
+  "directionFollowup": {
+    "recordedAt": "2026-10-05T23:34:29.771Z",
+    "defect": "Babylon default antiparallel epsilon 0.001 snaps normalized directions within approximately 2.56 degrees of down to exactly down.",
+    "hardwareReproduction": "Consumer assertion measured approximately 0.315 m label/expected-vector-tip error for a 2.1 degree tilted native weight vector on both GPU backends.",
+    "behavior": "Pass 4 * Number.EPSILON explicitly to the helper comparison of 1 + normalized dot product. Preserve measurable near-down components while keeping the finite exact-down fallback.",
+    "oppositeDotThreshold": 8.881784197001252e-16,
+    "softwareChecks": {
+      "casesPassed": 12,
+      "log": "direction-focused.log",
+      "typecheckExitCode": 0,
+      "typecheckLog": "direction-typecheck.log",
+      "lintExitCode": 0,
+      "lintLog": "direction-lint.log",
+      "buildExitCode": 0,
+      "buildLog": "direction-build.log",
+      "fullCiRepeated": false
+    },
+    "regression": "Actual arrow-head tips and normalized directions for 2.1 degree near-down, sub-microradian near-down and exact-down inputs. Active-camera, rotated/scaled/rebased label anchoring also includes the near-down vector.",
+    "hardwareDirectionQualification": "Pending final consumer force-only WebGL2/WebGPU direction and position capture.",
+    "files": [
+      {
+        "path": "src/diagnostics/createVectorDebugDrawing.ts",
+        "bytes": 13921,
+        "sha256": "7420a3114b32ab1e1edf5cbc2b6c232e9c0a18aee13e694cb6acd8437e82f5ed"
+      },
+      {
+        "path": "src/diagnostics/createVectorDebugDrawing.test.ts",
+        "bytes": 13757,
+        "sha256": "e26cfb0d48030398eb553f9546bce5eb64745adb05b75808e03f7cea07ef1c67"
+      }
+    ]
+  }
+}

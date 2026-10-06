@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "checkedOn": "2026-10-05",
+  "scope": "Aircraft source acquisition, provenance, documentation and inspection tooling; no runtime F-35B integration.",
+  "sourceIntegrity": {
+    "sketchfabArchiveAndExtractedFiles": "passed; original archive and all five source members match archive-manifest.json",
+    "flightgearCandidate": "passed; all 10 files match manifest.json and the exact members of the pinned official archive",
+    "flightgearXmlParsing": "passed"
+  },
+  "checks": [
+    { "command": "npx tsc -b", "exitCode": 0 },
+    { "command": "npm run lint", "exitCode": 0 },
+    { "command": "npx vitest related --run --passWithNoTests --maxWorkers=50% scripts/inspect-f35b-source.py", "exitCode": 0, "note": "No related Vitest tests exist for the Python inspection script." },
+    { "command": "Python ast.parse of scripts/inspect-f35b-source.py", "exitCode": 0 },
+    { "command": "Resolve local links in the four new Markdown documents", "exitCode": 0, "linksChecked": 18 },
+    { "command": "npm run ci", "exitCode": 0, "testFilesPassed": 125, "testsPassed": 1215, "note": "Full existing repository suite, lint and production build passed with the concurrent workspace changes present." }
+  ],
+  "blenderInspection": {
+    "versionReported": "5.2.2 LTS",
+    "initialExitCode": 139,
+    "initialOutcome": "Crashed at startup in the sandbox before producing inspection JSON.",
+    "retryOutcome": "Retry outside the sandbox was aborted while awaiting approval; no completed inspection or export.",
+    "inspectionJsonProduced": false,
+    "glbProduced": false
+  },
+  "limits": [
+    "Source mesh scale, axes, CG origin, material export and animation pivots remain unverified.",
+    "No new flight-model or hover validation was run; the earlier FlightGear smoke result is retained separately.",
+    "No ground-collision implementation was changed."
+  ]
+}

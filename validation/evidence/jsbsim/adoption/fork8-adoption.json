@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-05",
+  "purpose": "Adopt actual turbine augmentation observation and accumulated native/SDK integration changes into the installed 0sfs tarball; preserve earlier adoption records.",
+  "behaviourChange": "Native turbine observer plus off-engine zero-time spool/fuel repairs and master changes integrated since fork7. Aircraft-data yaw scheduling and mode selection remain 0sfs-owned, independent changes.",
+  "source": {
+    "repository": "https://github.com/Felipegalind0/jsbsim",
+    "branch": "master",
+    "commit": "942879838729dc2e147cc4139086d69111623b12",
+    "dirty": false,
+    "previousPackageCommit": "fea688020fb683c0696aa8339dbed9cdb238a39d",
+    "newObserverCommit": "942879838729dc2e147cc4139086d69111623b12",
+    "offEngineSpoolCommit": "0062cdc9e34aece1727319de612179af2be83dde",
+    "offEngineFuelCommit": "b30fb56b2ad52627eb7b89f113a113ece9d293fb",
+    "offEngineResidualFuelRegressionCommit": "b49541fe",
+    "upstreamPublicationForThisWork": false,
+    "additionalIntegratedChanges": [
+      {
+        "commit": "f9082ee1",
+        "change": "Merge accepted fork7 package branch and upstream master."
+      },
+      {
+        "commit": "f0d1023a",
+        "change": "Revised fuel tank temperature property."
+      },
+      {
+        "commit": "59336c99",
+        "change": "Wheel-spin review revisions, including moment Jacobians, friction bounds and relative spin reporting."
+      },
+      {
+        "commit": "4e695159",
+        "change": "Upstream Emscripten portability fix."
+      },
+      {
+        "commit": "14c19022",
+        "change": "Upstream external-force Add API."
+      },
+      {
+        "commit": "ab31829d",
+        "change": "Upstream per-model execution-enable property."
+      }
+    ],
+    "observation": {
+      "path": "propulsion/engine[n]/augmentation",
+      "type": "Read-only boolean",
+      "meaning": "An installed afterburner contributes at the current native evaluation point, independently of the existing command flag.",
+      "reset": "Cleared at ResetToIC and each Calculate; dry, off, cutoff, stalled and seized paths report inactive.",
+      "commandSemantics": "Existing C++ SetAugmentation/GetAugmentation command semantics preserved; this observer cannot command an engine.",
+      "nonAugmentedEngine": "The method 2 augmentation branch requires installed augmentation, as does method 1 automatic activation.",
+      "remainingUnavailable": "This is not an augmentation amount, burner phase, exhaust-flow or general engine descriptor API."
+    },
+    "offEngineTrim": "Zero-time trim updates running spool/normalized-spool/fuel targets only when Running. An off engine preserves its possibly windmilling spools and current fuel state. This does not force residual fuel flow to zero or alter dynamic shutdown decay."
+  },
+  "identity": {
+    "package": "@felipegalind0/jsbsim@1.2.4-fork.8",
+    "previousPackage": "@felipegalind0/jsbsim@1.2.4-fork.7",
+    "repositoryContentSha256": "43a5020321e81cdb48101db77d18b25789db8711be2d452624f30d6179950474",
+    "sdkSubtreeSha256": "e4492b269879fc30e16729b581f64fa2662885cd771637b4a5ec9acfad4c780a",
+    "buildInputSha256": "5b9b87511213d11f5d2fb18654dabdd9347bbf0b7fe73f4b15222b03e178816f",
+    "tarballSha256": "c0ce83394de7608c2663e5364aa6f4b810771a6547fa4dad5d27e7b8a300a213",
+    "tarballIntegrity": "sha512-0tyt0sEkmkEc5cA5vAnqIoXXjRDBqX2f3WogVrlyxSDBBwYbgsmuF37g3T3tX/fB2PjtKYU67gTx6bsVU358ow==",
+    "installedLoaderSha256": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+    "installedWasmSha256": "0ade23b492c477ab96e01115031f1c3e2f0bf6952eb0191b9ab6137a596f4235",
+    "record": "fork8/verified-installed-artifact.json",
+    "emittedRecord": "fork8/emitted-jsbsim-artifact.json"
+  },
+  "checks": {
+    "nativeAffectedTargets": {
+      "status": "passed across retained initial and final runs",
+      "targets": [
+        "TestTurbine",
+        "TestTurbineTrimFuelFlow",
+        "TestTurbineIdleFuelFlow",
+        "TestTurbineTrimSpool",
+        "TestModelReload",
+        "TestEngineIndexedProps",
+        "TestTurbineAugmentation"
+      ],
+      "initialLog": "fork8/native-affected-targets-initial.log",
+      "finalAugmentationLog": "fork8/native-augmentation-final.log",
+      "sequence": "Six targets pass in the initial run. The augmentation target initially fails its off-trim assertions; after test fixture correction, only that affected target is rerun and passes. No claim of a fresh 7/7 single CTest run."
+    },
+    "nativeAugmentationMethods": {
+      "status": "passed",
+      "methods": 5,
+      "scope": "Read-only per-engine boolean; native method 1 spool threshold; running/off zero-time behavior for methods 1 and 2; non-augmented engines; stall/seizure inactivity."
+    },
+    "sdkBuildValidation": {
+      "status": "passed",
+      "tests": 51,
+      "suites": 9,
+      "log": "fork8/sdk-build-validation.log",
+      "commands": [
+        "tsc --noEmit (frozen SDK workspace)",
+        "node --test --test-concurrency=5 test/*.test.mjs (frozen SDK workspace and resolved native fixtures)"
+      ],
+      "scope": "Frozen-source SDK compile and native-backed tests; augmentation property, spool lag, cutoff, reset and model-reload lifetime included."
+    },
+    "installedArtifactIdentity": {
+      "status": "passed",
+      "command": "npm run verify:jsbsim",
+      "verifiedFiles": 14,
+      "log": "fork8/verify-fork8.log",
+      "scope": "Repository tarball, lock integrity, installed distribution hashes and clean coherent native/SDK identity; no live SDK symlink."
+    },
+    "focusedControlsAndArtifact": {
+      "status": "passed",
+      "command": "npx vitest run --maxWorkers=50% src/flight/jsbsim/f35bYaw.integration.test.ts src/flight/jsbsim/f35b.integration.test.ts src/flight/input/applyFlightControls.test.ts src/flight/model/flightModelDriver.test.ts src/flight/jsbsim/jsbsimBuildIdentity.test.ts scripts/verify-jsbsim-artifact.test.mjs",
+      "files": 6,
+      "tests": 98,
+      "log": "fork8/controls-fork8.log",
+      "scope": "Installed fork.8 aircraft controls/yaw/hover/setup and artifact contracts; not aircraft calibration."
+    },
+    "fullApplicationCi": {
+      "status": "passed",
+      "command": "npm run ci",
+      "exitCode": 0,
+      "files": 133,
+      "tests": 1312,
+      "log": "fork8/ci-final.log",
+      "stages": [
+        "Incremental ESLint",
+        "Full Vitest suite",
+        "Installed JSBSim artifact verification",
+        "Source DSP artifact verification",
+        "Incremental TypeScript build",
+        "Vite production build",
+        "Emitted JSBSim loader/WASM verification",
+        "Emitted DSP/worklet artifact verification"
+      ],
+      "scope": "Application software, build and artifact contracts; does not establish aircraft performance, acoustic calibration or browser/device qualification."
+    },
+    "browserLoadedAssets": {
+      "status": "not attempted",
+      "note": "No fork.8 browser, GPU benchmark or device sound qualification was run for this adoption."
+    },
+    "emittedSdkArtifact": {
+      "status": "passed",
+      "record": "fork8/emitted-jsbsim-artifact.json",
+      "emitted": {
+        "assets/jsbsim_wasm-DAhL615P.mjs": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+        "assets/jsbsim_wasm-B1DhV9Z6.wasm": "0ade23b492c477ab96e01115031f1c3e2f0bf6952eb0191b9ab6137a596f4235"
+      },
+      "browserLoadedAssetsVerified": false,
+      "scope": "Production emitted loader/WASM hashes match the installed clean fork.8 package; no browser instantiation check."
+    }
+  },
+  "preservation": {
+    "earlierRecords": "fork4/fork5/fork6/fork7 adoption records unchanged.",
+    "previousArtifact": "deps/felipegalind0-jsbsim-1.2.4-fork.7.tgz retained.",
+    "rollbackDeclaration": "validation/evidence/jsbsim/rollback/fork7/"
+  },
+  "evidence": [
+    {
+      "path": "fork8/verified-installed-artifact.json",
+      "bytes": 3168,
+      "sha256": "ce745c0a791a6b316fba08aef88ee3eeffae21dcd2b990f700653761ed973316"
+    },
+    {
+      "path": "fork8/native-affected-targets-initial.log",
+      "bytes": 3299,
+      "sha256": "0eb530cae655bc71f1d24a0ff1548559da04b0523f7cad0567a54dd8e0807bc0"
+    },
+    {
+      "path": "fork8/native-augmentation-final.log",
+      "bytes": 244,
+      "sha256": "edc8022d7f5a4726b01bbba38e0e9fbd00afd62f82ea02b5ab0451f3e5d81ea9"
+    },
+    {
+      "path": "fork8/sdk-build-validation.log",
+      "bytes": 23655,
+      "sha256": "bd0b51b8c641c4af270d2d75dd00285bc38f68e0eaaac8b81795a6449edaf571"
+    },
+    {
+      "path": "fork8/controls-fork8.log",
+      "bytes": 571,
+      "sha256": "b0e100aa6c5bd5b740956aed947abba25e6d44acb494c4a2be31e7b179a17584"
+    },
+    {
+      "path": "fork8/verify-fork8.log",
+      "bytes": 572,
+      "sha256": "dcdbca2b3420053292c435f22a1740042e7bc2151b8ed167aeb1d7c57ed9be81"
+    },
+    {
+      "path": "fork8/ci-final.log",
+      "bytes": 62859,
+      "sha256": "63a9e3c55b358e5991ee797b3bc67534b0bf12896d17dbaf51464e744973a875"
+    },
+    {
+      "path": "fork8/emitted-jsbsim-artifact.json",
+      "bytes": 3442,
+      "sha256": "511f4b53621e700f327562aaf431c837b78adddd81652e1b730b0db57109b868"
+    }
+  ],
+  "limitations": [
+    "Software and artifact contracts do not establish F-35B or SF50 performance or acoustic calibration.",
+    "Native observer is boolean actual state; it does not expose continuous augmentation amount or substitute for missing engine phase/flow telemetry.",
+    "Off-engine zero-time repair preserves residual fuel state rather than masking dynamic fuel-flow decay.",
+    "Affected native tests are a retained multi-run sequence, not a newly executed full native suite.",
+    "Full application CI passed; no new browser artifact qualification, native/WASM parity study or device sound qualification claimed.",
+    "No upstream PR, comment or npm publication was performed for this local adoption."
+  ]
+}

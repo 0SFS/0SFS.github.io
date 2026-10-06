@@ -91,6 +91,13 @@ Rules only. Details live in the linked docs; update those, not this file.
   and don't run a suite while another session is running one.
 - Benchmarks, headless-browser GPU runs, phone-layout checks and WASM builds run
   only when the task asks for them.
+- Assume the user is using the Mac while benchmarks run. Account for P/E core
+  scheduling and fanless thermal changes as well as other activity. Record interference,
+  qualify enough comparable samples, and keep disturbed or unobservable timing
+  unqualified. Never pretend to subtract other applications' cost. If a metric
+  cannot be measured reliably during parallel use, defer it until the user can
+  offer exclusive time; continue useful untimed work. Shared policy:
+  [../foss-earth/docs/validation/benchmark-interference.md](../foss-earth/docs/validation/benchmark-interference.md).
 - JSBSim: one build directory per branch with ccache, only the targets the tests
   need, and `ctest -R` for the tests the change affects; see
   [docs/jsbsim.md](docs/jsbsim.md).

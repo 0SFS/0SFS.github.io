@@ -54,6 +54,13 @@ export interface PhoneControllerClient {
   setViewMode(mode: 'first' | 'third'): boolean
   /** Only offered when the host advertises `gearDown`; older hosts cannot move it. */
   setGearDown(down: boolean): boolean
+  /**
+   * Holding the throttle lever to start the engine. Carried on every control
+   * frame while held, like the brake, so it ends when the phone does.
+   */
+  setStarterHeld(held: boolean): void
+  /** The throttle ring filled at idle. Only offered when the host reports an engine `state`. */
+  shutdownEngine(): boolean
   releaseControl(): boolean
   setHapticsEnabled(enabled: boolean): void
   destroy(): void
@@ -122,6 +129,8 @@ export function createPhoneControllerClient(
     hapticsSupported: false, hapticsEnabled: false,
   }
   let controls = { ...NEUTRAL_CONTROLS }
+  // Held like the brake, but not a flight surface, so it travels beside them.
+  let starterHeld = false
   // Gesture movement not yet on the wire. It clears when a frame carrying it is
   // actually sent, and on a blur, so an abandoned swipe never arrives late.
   let camera: CameraAim = { ...NEUTRAL_CAMERA_AIM }
@@ -246,6 +255,7 @@ export function createPhoneControllerClient(
 
   function adoptControls(next: ControlSurfaceState): void {
     controls = neutralize(next)
+    starterHeld = false
     snapshot = { ...snapshot, controls: { ...controls } }
   }
 
@@ -290,7 +300,8 @@ export function createPhoneControllerClient(
       at: tenth(time), by, gated: traceGated, buf: transport.nativeBufferedAmount,
       cam: aged(traceCam, time), ctl: aged(traceCtl, time), drop: traceDrop.map(tenth),
     } } : null
-    const sent = transport.sendNative({ ...envelope(), type: 'controls', seq: sequence++, lease, controls: { ...controls }, ...gesture, ...total, ...trace })
+    const starter = starterHeld ? { starter: 1 as const } : null
+    const sent = transport.sendNative({ ...envelope(), type: 'controls', seq: sequence++, lease, controls: { ...controls }, ...gesture, ...total, ...trace, ...starter })
     // Only a delta that left the device has been spent.
     if (sent && gesture) camera = { ...NEUTRAL_CAMERA_AIM }
     if (sent && total) { aimSent = { ...aimTotal }; aimStamp = stamp; aimMovedAt = null }
@@ -668,6 +679,13 @@ export function createPhoneControllerClient(
     setPaused: value => sendAction('setPaused', value),
     setViewMode: value => sendAction('setViewMode', value),
     setGearDown: value => (snapshot.status?.gearDown === undefined ? false : sendAction('setGearDown', value)),
+    setStarterHeld(held) {
+      const next = held && snapshot.canControl && !finished
+      if (next === starterHeld) return
+      starterHeld = next
+      inputChanged()
+    },
+    shutdownEngine: () => (snapshot.status?.engine?.state === undefined ? false : sendAction('shutdownEngine')),
     releaseControl() { cancelTransientControls(); return sendAction('releaseControl') },
     setHapticsEnabled(enabled) {
       if (destroyed) return

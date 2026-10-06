@@ -11,6 +11,31 @@ when hover over POI and move mouse into overlaid UI the tooltip remains active u
 
 ## performance
 
+**Benchmarks must work while the user uses the Mac.** Apply the shared
+[benchmark interference policy](../foss-earth/docs/validation/benchmark-interference.md)
+to aircraft collision, audio and other performance tools. FOSS Earth owns the
+shared recorder and qualification helper; 0sfs consumes it. Preserve raw samples,
+record relevant CPU, memory, thermal and GPU/audio interference, interleave
+comparable candidates, and report accepted counts and uncertainty. Use bounded
+retries; insufficient or unobservable samples stay unqualified. Do not estimate
+isolated performance by subtracting other applications' activity. Ask for
+exclusive time only for a metric that cannot be attributed reliably, and keep
+untimed validation moving meanwhile.
+
+This fanless Mac has heterogeneous P/E cores. Record observable cluster
+residency, migration, effective frequency and thermal pressure, with bounded
+warm-up and drift checks. Core topology and aggregate CPU utilization do not
+identify the core or clock that ran a measurement; exclusive access alone does
+not remove these effects.
+
+The collision experiment already records load, memory pressure and input and
+rejects disturbed rounds. Remaining work is a shared helper, explicit minimum
+sample qualification in each harness, finer measurement windows, thermal and
+relevant GPU/audio observation, paired uncertainty and migration of existing
+benchmarks. See the
+[collision measurements](docs/validation/collision-geometry-cost-quality.md);
+filtered rounds reduce interference but do not prove isolation.
+
 **Frame rate drops close to the ground on approach.** Noticeable enough to
 interfere with landing. Needs profiling before any fix — the plausible causes
 pull in different directions:
@@ -96,11 +121,23 @@ ones. Nothing checks either list against the mesh. The jet's points are fixed
 offsets from its empty CG, so they shift against the airframe as fuel moves
 the CG. Every aircraft added means another list.
 
-Plan: generate the points from the aircraft's mesh within a budget, as one file
-that both the physics and the overlay read.
-[docs/proposals/generated-collision-geometry.md](docs/proposals/generated-collision-geometry.md).
-The C172 is out of scope until the jet's is done; then it is a matter of
-running the script.
+Plan: generate a ladder of complete collision representations from a stable
+aircraft mesh, as one data source shared by physics and the overlay. Select the
+best combinations of bounds, fitted primitives, convex regions and source
+triangle leaves for escalating work, memory and error budgets. Proven plane
+support is a fast path at every budget; it is not a coarse approximation rung.
+
+The [initial proposal](docs/proposals/generated-collision-geometry.md) needs
+revision around this portfolio rather than a prefix of point rays. The
+[measurements and proposed ladder](docs/validation/collision-geometry-cost-quality.md#compute-budget-ladder)
+rule out point count as general coverage and leave precise speed rankings
+provisional. Compare semantic part fits and localized refinement next; preserve
+complete coverage, nested bounds and explicit possible-contact results when
+the compute budget ends. Validate rotating/articulated poses, live CG mapping
+and numerical rejection before runtime adoption. Fit cost, runtime work and
+resident memory are separate budgets.
+
+Integrate the jet first; the C172 follows using the same generator and checks.
 
 **The Vision Jet has no structure contacts.** Its packages (`sf50`, `sf50-g2`,
 `sf50-g3`) declare only the three gear contacts. The C172's also declares a nose
@@ -118,22 +155,18 @@ draws a copy kept for drawing. Arrows, markers, labels and strip charts drawn
 over the scene belong to FOSS Earth (its TODO.md, "Debug drawing"). The
 flight's own views are listed here.
 
-**An aero forces overlay, like KSP's.** Draw these as arrows:
-
-- lift, drag and side force at the aerodynamic reference point (`AERORP`);
-- thrust at each engine;
-- weight at the CG;
-- the net force;
-- the three moments, as arcs.
-
-Their scale is a setting in newtons per metre of arrow. Read the forces from
-JSBSim's wind-axis forces (`forces/fwx-aero-lbs` and its siblings) and from
-`propulsion/engine[i]/thrust-lbs`.
+**An aero forces overlay, like KSP's.** Debug → Forces now draws native lift,
+drag and side force at the resolved aerodynamic reference point, a separate
+CG aerodynamic contribution, each engine's actual body-force vector at its
+acting point, weight, applied total and net force including gravity. Its
+scale, arrow length cap, labels and label refresh are settings.
+[Aircraft forces](docs/aircraft-forces.md) records the exact sources, coordinate
+conversions and missing-observation fallbacks. Moment arcs remain to be built.
 
 JSBSim has no parts, so KSP's arrow on each part would be invented here. The
-honest split is per term. The SF50 package names 24 aerodynamic terms under
+next useful split is per term. The SF50 package names 24 aerodynamic terms under
 `aero/coefficient/*`, among them `CLalpha`, `CLflap`, `CD0`, `CDi` and
-`CDgear`. A table beside the arrows gives each term's share this step. Where the
+`CDgear`. A future table beside the arrows would give each term's share this step. Where the
 model has a term per surface, as the jet does for each ruddervator, that term
 can be drawn at the surface.
 
@@ -178,6 +211,14 @@ a wrong `sign` would show at once.
 - autopilot targets against actual values, with each controller's terms.
 
 ## aircraft
+
+**F-35B retracted gear fit and visibility.** The original wheel-protrusion
+report and stowage-test requirements are in the
+[F-35B aircraft work list](docs/proposals/f35b-fdm.md#deferred-aircraft-work-requested-2026-10-05).
+The source-informed tire pose, independent geometry checks and full-retraction
+render culling with a debug override are implemented. About 2.7 cm of main-leg
+geometry remains outside the selected exterior envelope; real B-specific
+secondary motion and internal bay clearance still need verification.
 
 **Create SR20 and SR22 aircraft models.** Add dedicated SR20 and SR22 aircraft
 variants with their own geometry, flight model tuning, gear/stance settings, and

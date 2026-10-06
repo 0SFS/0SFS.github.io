@@ -1,0 +1,18 @@
+{
+  "status": "rejected-experiment-not-shipped",
+  "date": "2026-10-05",
+  "experimentalWasmSha256": "4553d0a8dcfbf470ae2e2221e573d1cbb9b9370d0a5a1605810ff2d881165e30",
+  "hypothesis": "A bounded x * backwardDerivative correction after low-pass mixing synthesis would increase output pressure-derivative skewness below the output compressor threshold.",
+  "sourceModel": "F135 procedural High with only fan and large-scale mixing noise admitted; N1/N2 zero isolate broadband behavior. This synthetic state is not an engine operating point.",
+  "method": "Compare identical deterministic renders with the candidate correction enabled and strength zero. Render 2 s, measure from 0.7 s to the end, subtract the finite-difference derivative mean and compute its standardized third moment. Engine gain 0.25; the fixture's output peak was verified below 0.25 before comparing skewness.",
+  "minimumExpectedSkewnessIncrease": 0.02,
+  "results": [
+    { "sampleRateHz": 44100, "derivativeSkewnessChange": -0.30017843380626924, "passed": false },
+    { "sampleRateHz": 48000, "derivativeSkewnessChange": -0.2605083306127714, "passed": false }
+  ],
+  "decision": "Remove the waveform correction and its unused profile parameter. Do not invert the hypothesis or claim crackle. Revisit with defined pressure sign, measurement bandwidth and source/propagation/receiver validation.",
+  "log": "rejected-waveform-tests.log",
+  "acousticCalibration": false,
+  "physicalListening": false,
+  "deviceQualification": false
+}

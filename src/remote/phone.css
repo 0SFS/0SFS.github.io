@@ -349,7 +349,7 @@ button { touch-action: manipulation; }
 }
 .phone-engine .flight-engine__summary:hover { border-color: var(--ctl-line); }
 .phone-engine .flight-engine__flow { cursor: pointer; }
-.phone-throttle input[type="range"] { width: 26px; }
+.phone-throttle .flight-throttle { --throttle-handle: 26px; }
 
 /* ---- Buttons: outlined, never filled, except the one primary action. ---- */
 

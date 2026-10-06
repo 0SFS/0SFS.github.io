@@ -1,26 +1,24 @@
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
-import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
+import { cp, mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
-import { afterEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
+import { newOutputDirectory } from "./outputDirectory.mjs";
 import { verifyBuiltSdk, verifyInstalledSdk, verifySdkDirectory } from "./verify-jsbsim-artifact.mjs";
 
 const runFile = promisify(execFile);
-const roots = [];
+const runRoot = newOutputDirectory("tests", "sdk-artifact");
 const digest = (data, algorithm = "sha256", encoding = "hex") => createHash(algorithm).update(data).digest(encoding);
 // Retained rollback tarballs keep the name they were published under, so the
 // fixture derives the name from the version the way the identity gate does.
-const POST_RENAME_VERSIONS = new Set(["1.2.4-fork.5", "1.2.4-fork.6", "1.2.4-fork.7"]);
+const POST_RENAME_VERSIONS = new Set(["1.2.4-fork.5", "1.2.4-fork.6", "1.2.4-fork.7", "1.2.4-fork.8", "1.2.4-fork.9", "1.2.4-fork.10", "1.2.4-fork.11"]);
 const nameFor = version => POST_RENAME_VERSIONS.has(version) ? "@felipegalind0/jsbsim" : "@felipegalind0/jsbsim-wasm";
-afterEach(async () => { await Promise.all(roots.splice(0).map(root => rm(root, { recursive: true, force: true }))); });
 
 async function fixture({ schemaVersion = 2, mode = schemaVersion === 2 ? "in-tree" : "pinned", dirty = false,
-  version = schemaVersion === 2 ? "1.2.4-fork.7" : "1.2.4-fork.1" } = {}) {
+  version = schemaVersion === 2 ? "1.2.4-fork.11" : "1.2.4-fork.1", missingDeclaration = false } = {}) {
   const pkgName = nameFor(version);
-  const root = await mkdtemp(path.join(tmpdir(), "osfs-sdk-artifact-test-"));
-  roots.push(root);
+  const root = await mkdtemp(path.join(runRoot, "fixture-"));
   const source = path.join(root, "package");
   const dist = path.join(source, "dist");
   await mkdir(path.join(dist, "wasm"), { recursive: true });
@@ -50,7 +48,10 @@ async function fixture({ schemaVersion = 2, mode = schemaVersion === 2 ? "in-tre
     } } : {}),
     validation: { status: "passed", commands: ["fixture-only source-contract test"] },
   };
-  for (const [name, text] of Object.entries(contents)) await writeFile(path.join(dist, name), text);
+  for (const [name, text] of Object.entries(contents)) {
+    if (missingDeclaration && name === "index.d.ts") continue;
+    await writeFile(path.join(dist, name), text);
+  }
   await writeFile(path.join(dist, "build-metadata.json"), JSON.stringify(metadata));
   await writeFile(path.join(source, "package.json"), JSON.stringify({ name: pkgName, version, type: "module" }));
   const packageRoot = path.join(root, "node_modules", pkgName);
@@ -136,9 +137,8 @@ describe("packaged JSBSim artifact verification", () => {
 
   it.each(["modified-wasm", "missing-declaration", "unrecorded-file", "unsafe-path", "missing-validation", "export-mismatch"])(
     "rejects %s before a native runtime is constructed", async failure => {
-      const t = await fixture();
+      const t = await fixture({ missingDeclaration: failure === "missing-declaration" });
       if (failure === "modified-wasm") await writeFile(path.join(t.dist, "wasm/jsbsim_wasm.wasm"), "different bytes");
-      if (failure === "missing-declaration") await rm(path.join(t.dist, "index.d.ts"));
       if (failure === "unrecorded-file") await writeFile(path.join(t.dist, "unexpected.js"), "unrecorded");
       if (failure === "unsafe-path") t.metadata.files["../outside"] = "f".repeat(64);
       if (failure === "missing-validation") t.metadata.validation.status = "pending";

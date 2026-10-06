@@ -12,6 +12,18 @@ afterEach(() => { vi.unstubAllGlobals(); resetAppSettings(); });
 const FOSS_EARTH_SECTIONS = new Set(["map/detail", "controls/orbit"]);
 
 describe("flight parameter catalogue", () => {
+  it("bounds sound sources by their actual counts without unused grain controls", () => {
+    const settings = createSettingsRegistry({ storage: null });
+    settings.register(OSFS_PARAMETERS);
+    for (const [tier, maximum] of [["low", 5], ["med", 6], ["high", 8]] as const) {
+      const id = `osfs.sound.${tier}.noiseBands`;
+      expect(settings.get(id)).toBe(maximum);
+      expect(settings.inspect(id).bounds).toMatchObject({ min: 0, max: maximum });
+      expect(settings.set(id, maximum + 1).ok).toBe(false);
+    }
+    expect(OSFS_PARAMETERS.some(spec => /\.sound\.high\.(grains|grainStarts)$/.test(spec.id))).toBe(false);
+  });
+
   it("registers in a FOSS Earth registry with every default valid, and the same defaults in memory", () => {
     const registry = createSettingsRegistry({ storage: null });
     registry.register(OSFS_PARAMETERS);
@@ -50,7 +62,7 @@ describe("flight parameter catalogue", () => {
       "osfs.keyboard-stick": JSON.stringify({ mode: "rate", expo: 0.25, rateTimeToFull: 1.2 }),
       "osfs.autopilot.v1": JSON.stringify({ version: 1, backend: "ardupilot", axes: { gear: false }, throttleMode: "hold" }),
       "osfs.phone-camera-tuning": JSON.stringify({ send: "batch", present: "playout", bufferMs: 16, catchUp: 0, chaseFrame: "heading" }),
-      "osfs.audio.settings.v1": JSON.stringify({ version: 1, requested: "med", masterVolume: 0.4 }),
+      "osfs.audio.settings.v1": JSON.stringify({ version: 1, requested: "low", masterVolume: 0.4 }),
       "osfs.engineMonitor.v1": JSON.stringify({ open: { all: true }, flowUnit: "gal/h" }),
       "osfs.ground-interaction.v1": JSON.stringify({ version: 1, rotation: "inertia", tireAudio: "slip", locked: { haptics: true } }),
       "osfs.aircraft": "cirrus-vision-jet-g2",
@@ -82,7 +94,7 @@ describe("flight parameter catalogue", () => {
       "osfs.input.gamepadDeadzoneMode": "scaled", "osfs.input.keyboard.mode": "rate", "osfs.input.keyboard.expo": 0.25,
       "osfs.input.keyboard.rateTimeToFull": 1.2, "osfs.autopilot.backend": "ardupilot", "osfs.autopilot.axes.gear": false,
       "osfs.autopilot.throttleMode": "hold", "osfs.camera.phone.send": "batch", "osfs.camera.phone.bufferMs": 16,
-      "osfs.camera.phone.catchUp": "jump", "osfs.camera.chaseFrame": "heading", "osfs.sound.quality": "med",
+      "osfs.camera.phone.catchUp": "jump", "osfs.camera.chaseFrame": "heading", "osfs.sound.quality": "low",
       "osfs.sound.masterVolume": 0.4, "osfs.engineMonitor.fuelFlowUnit": "gal/h", "osfs.ground.rotation": "inertia",
       "osfs.ground.tireAudio": "slip", "osfs.ground.lock.haptics": true,
       // The newer key wins over the older one.
@@ -111,5 +123,37 @@ describe("flight parameter catalogue", () => {
     // A fresh flight matches the presets that stand for the defaults.
     expect(settings.matchingPreset({ tab: "aircraft", section: "ground" })?.id).toBe("osfs-ground-minimal");
     expect(settings.matchingPreset({ tab: "remote", section: "camera", prefix: "osfs.camera.phone." })?.id).toBe("osfs-phone-camera-original");
+  });
+
+  it("persists live afterburner and viewpoint controls with one Sound home and fraction bounds", () => {
+    const storage = new Map<string, string>();
+    vi.stubGlobal("localStorage", {
+      getItem: (key: string) => storage.get(key) ?? null,
+      setItem: (key: string, value: string) => { storage.set(key, value); },
+      removeItem: (key: string) => { storage.delete(key); },
+    });
+    const settings = getAppSettings();
+    registerFlightSettings(settings);
+    expect(settings.inspect("osfs.sound.engineVolume").bounds).toMatchObject({ min: 0, max: 8 });
+    expect(settings.get("osfs.sound.masterVolume")).toBe(2);
+    expect(settings.inspect("osfs.sound.masterVolume").bounds).toMatchObject({ min: 0, max: 8 });
+    settings.set("osfs.sound.masterVolume", 6);
+    settings.set("osfs.sound.engineVolume", 4);
+    for (const [id, value] of [["osfs.sound.afterburnerVolume", 0.2], ["osfs.sound.listenerCockpitBlend", 0.65]] as const) {
+      const inspected = settings.inspect(id);
+      expect(inspected.spec.home).toMatchObject({ tab: "sound", section: "sound" });
+      expect(inspected.spec).toMatchObject({ unit: "fraction", kind: "number", appliesLive: true });
+      expect(inspected.bounds).toMatchObject({ min: 0, max: 1 });
+      expect(validateValue(inspected.spec, -0.01, inspected.bounds, inspected.choices)).not.toBeNull();
+      expect(validateValue(inspected.spec, 1.01, inspected.bounds, inspected.choices)).not.toBeNull();
+      settings.set(id, value);
+    }
+    resetAppSettings();
+    const reloaded = getAppSettings();
+    registerFlightSettings(reloaded);
+    expect(reloaded.get("osfs.sound.masterVolume")).toBe(6);
+    expect(reloaded.get("osfs.sound.engineVolume")).toBe(4);
+    expect(reloaded.get("osfs.sound.afterburnerVolume")).toBe(0.2);
+    expect(reloaded.get("osfs.sound.listenerCockpitBlend")).toBe(0.65);
   });
 });

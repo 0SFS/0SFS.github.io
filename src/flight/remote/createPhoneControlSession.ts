@@ -27,6 +27,8 @@ export interface PhoneControlSessionOptions {
   setViewMode(mode: "first" | "third"): void;
   /** Absent hosts simply never advertise `gearDown`, so no phone offers the control. */
   setGearDown?(down: boolean): void;
+  /** The phone's throttle ring filled at idle. Hosts without it never advertise an engine `state`. */
+  shutdownEngine?(): void;
   /**
    * Called when a camera gesture arrives. A paused host renders only on
    * request, so without this the pad would be dead exactly when someone wants
@@ -258,6 +260,9 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     } else if (message.action === "setGearDown") {
       if (!options.setGearDown) { acknowledge(message.id, false, "This simulator cannot move the gear."); return; }
       options.setGearDown(message.value as boolean);
+    } else if (message.action === "shutdownEngine") {
+      if (!options.shutdownEngine) { acknowledge(message.id, false, "This simulator cannot shut its engine down."); return; }
+      options.shutdownEngine();
     }
     acknowledge(message.id, true, "Applied");
     publishStatus(snapshot.owner === "phone" ? "Phone controls" : "Desktop controls");
@@ -467,6 +472,11 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
       lastAppliedSeq = latest!.frame.seq;
       return { ...latest!.frame.controls };
     },
+    /**
+     * Whether the phone, flying, is holding its throttle lever to start the
+     * engine. Only fresh frames count, so the starter lets go with the phone.
+     */
+    isStarterHeld: () => snapshot.owner === "phone" && freshInput() && latest!.frame.starter === 1,
     /** The gesture movement to draw this frame, if any is owed. */
     takeCameraAim(): CameraAim | null {
       const movement = aim.take(now());

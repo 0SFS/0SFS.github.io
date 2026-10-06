@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "recordedRunDate": "2026-09-19",
+  "extractedDate": "2026-10-05",
+  "newValidationRun": false,
+  "sourceRecord": "validation/evidence/aircraft/flightgear-inventory-2026-09-19/smoke-flightgear.json",
+  "sourceRecordSha256": "aace9c14dfd880aea5dd0fb3c0de2595de02a89ae8b43efba6aa6802ae01523d",
+  "dtSeconds": 0.008333333333333333,
+  "qualification": "Generic FlightGear stand-in, untrimmed heuristic 30-second flight smoke; no STOVL or aircraft-fidelity validation.",
+  "result": {
+    "variant": "F-35B-jsbsim",
+    "aero": "F-35B-jsbsim",
+    "load": "ok",
+    "createdProperties": 8,
+    "engines": 4,
+    "gearUnits": 5,
+    "groundTrim": "ok",
+    "ground": {
+      "ok": true,
+      "cgAglM": 1.267,
+      "pitchDeg": 1.18,
+      "rollDeg": 0,
+      "wheelsDown": 3
+    },
+    "trim": null,
+    "flight": {
+      "ok": true,
+      "trimmed": false,
+      "startKts": 120,
+      "thrustLbs": 40492,
+      "maxAltErrorFt": 804,
+      "speedChangeKts": 3,
+      "maxRollDeg": 0,
+      "msPerSimSecond": 2.86
+    },
+    "logTail": [
+      "    Loading Component \"systems/pushback/speed-error\" of type: SUMMER",
+      "      OUTPUT: speed-error",
+      "      INPUT: speed-error",
+      "    Loading Component \"roll trim error\" of type: SUMMER",
+      "      OUTPUT: roll-trim-error",
+      "      INPUT: roll-trim-error",
+      "      INPUT: roll-trim-error",
+      "      INPUT: roll-trim-error"
+    ]
+  }
+}

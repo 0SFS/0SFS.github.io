@@ -1,0 +1,537 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-05",
+  "completedAtUtc": "2026-10-06T03:42:43.975014+00:00",
+  "scope": "Actual distributed F-35B vertices/indices, authored hierarchy and production gear rig; no browser, source-asset mutation, visibility concealment or ground-collision qualification.",
+  "result": "Wheel exterior-envelope defect corrected by source-informed asset calibration. Main-leg clearance remains open; real linkage and internal bay containment unqualified.",
+  "research": "research.json",
+  "method": {
+    "frame": "Standard exported glTF metres: +Y up, -Z nose. No loader yaw or stance offset.",
+    "skinMeshNames": [
+      "fuselage",
+      "canopy",
+      "leftDoor",
+      "rightDoor",
+      "leftNoseDoor",
+      "rightNoseDoor"
+    ],
+    "sampling": "All serialized vertex positions of each of 18 named gear meshes, regardless of visibility/enabled state; indexed selected exterior triangles; vertical min/max intersections.",
+    "limits": [
+      "Selected-skin envelope is not a watertight internal bay/cavity solver. Overlapping, concave and interior surfaces can classify false inside.",
+      "Triangle interiors of gear meshes are not sampled. Unsampled exterior surfaces can affect small above-envelope classifications.",
+      "No exact F-35B swivel, shortening, timings or mechanical articulation verified by available primary evidence. Zero exterior violations do not prove internal structural clearance."
+    ]
+  },
+  "animation": {
+    "basis": "Independently implemented numerical observations of the public model-author configuration; reserved JSON/code not distributed. Official B photo supports only forward/up direction.",
+    "mainLocalIntrinsicDegrees": {
+      "left": [
+        120,
+        -50,
+        35
+      ],
+      "right": [
+        120,
+        50,
+        -35
+      ]
+    },
+    "noseLocalXDegrees": 110,
+    "pistonLocalXDegrees": {
+      "main": -100,
+      "nose": -90
+    },
+    "mainTravelWindow": [
+      0,
+      0.8
+    ],
+    "mainWindowBasis": "Author 1.25 travel ratio (negative delay -.2), not physically verified sequencing.",
+    "noseTravelWindow": [
+      0,
+      1
+    ],
+    "doorPoses": "Previous production door bindings retained.",
+    "preserved": [
+      "Authored fully deployed geometry/rest rotations and positions",
+      "Model origin/pivot positions",
+      "Wheel roll independent of gear retraction",
+      "Physical gear-pos-norm observation; no new visual clock",
+      "Source BLEND and distributed GLB bytes"
+    ]
+  },
+  "baselineWheels": [
+    {
+      "name": "leftWheel",
+      "centerMeters": [
+        -2.1492881774902344,
+        1.8177778720855713,
+        -0.787441611289978
+      ],
+      "above": 5,
+      "below": 247,
+      "inside": 372,
+      "insufficientIntersections": 0,
+      "worstBelowMeters": 0.47056822085300043
+    },
+    {
+      "name": "noseWheel",
+      "centerMeters": [
+        1.8372828662904794e-06,
+        1.598002314567566,
+        -6.498990058898926
+      ],
+      "above": 0,
+      "below": 160,
+      "inside": 464,
+      "insufficientIntersections": 0,
+      "worstBelowMeters": 0.2315767909637121
+    },
+    {
+      "name": "rightWheel",
+      "centerMeters": [
+        2.1492879390716553,
+        1.8177779912948608,
+        -0.7874399423599243
+      ],
+      "above": 5,
+      "below": 247,
+      "inside": 372,
+      "insufficientIntersections": 0,
+      "worstBelowMeters": 0.4705680175031126
+    }
+  ],
+  "currentWheels": [
+    {
+      "name": "leftWheel",
+      "centerMeters": [
+        -1.4673161506652832,
+        2.126612901687622,
+        -0.770382821559906
+      ],
+      "above": 0,
+      "below": 0,
+      "inside": 624,
+      "insufficientIntersections": 0,
+      "worstBelowMeters": 0
+    },
+    {
+      "name": "noseWheel",
+      "centerMeters": [
+        1.7980627262659254e-06,
+        1.9796756505966187,
+        -6.396125793457031
+      ],
+      "above": 0,
+      "below": 0,
+      "inside": 624,
+      "insufficientIntersections": 0,
+      "worstBelowMeters": 0
+    },
+    {
+      "name": "rightWheel",
+      "centerMeters": [
+        1.467315673828125,
+        2.1266136169433594,
+        -0.7703819274902344
+      ],
+      "above": 0,
+      "below": 0,
+      "inside": 624,
+      "insufficientIntersections": 0,
+      "worstBelowMeters": 0
+    }
+  ],
+  "knownRemainingProtrusions": [
+    {
+      "name": "leftGear",
+      "verticesBelow": 12,
+      "worstBelowMeters": 0.026832414070408817
+    },
+    {
+      "name": "rightGear",
+      "verticesBelow": 12,
+      "worstBelowMeters": 0.026832453903497644
+    }
+  ],
+  "strictProbe": {
+    "command": "node scripts/validation/f35b/inspect-gear-stow.mjs --check-stowed",
+    "exitCode": 1,
+    "result": "Expected current failure; small main-leg below-envelope violations remain. Raw geometry check ignores render visibility.",
+    "geometry": "current-visible-geometry.json",
+    "log": "current-stowed-inspection.log"
+  },
+  "authorComparison": {
+    "command": "node scripts/validation/f35b/inspect-gear-stow.mjs --author-pose --check-stowed",
+    "exitCode": 1,
+    "result": "All tire vertices fit selected envelope; same small main-leg failure. Exploratory pose precedes production calibration; no author hide or contact compression used.",
+    "geometry": "author-pose-comparison.json"
+  },
+  "historicalCorrection": {
+    "file": "baseline-fuselage-only-history.json",
+    "qualification": "Superseded by baseline-visible-geometry.json including the exterior canopy. Interior cockpit-floor intersections previously produced an invalid above-skin nose classification."
+  },
+  "checks": {
+    "related": {
+      "command": "Vitest related --run, parent-selected rig/geometry changes, --maxWorkers=50% (exact result retained in log)",
+      "files": 10,
+      "passed": 187,
+      "expectedFailures": 1,
+      "total": 188,
+      "exitCode": 0,
+      "log": "rig-related.log",
+      "sourceState": "Pre-review implementation; followed by bounded regression changes below."
+    },
+    "typecheck": {
+      "command": "npx tsc -b",
+      "exitCode": 0,
+      "log": "rig-typecheck.log"
+    },
+    "lint": {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "log": "rig-lint.log"
+    },
+    "fullCi": {
+      "command": "VITEST_MAX_WORKERS=5 npm run ci",
+      "exitCode": 1,
+      "lintPassed": true,
+      "testFiles": 160,
+      "passed": 1681,
+      "expectedFailures": 1,
+      "total": 1682,
+      "unexpectedTestFailures": 0,
+      "log": "ci.log",
+      "buildResult": "Failed because concurrently added createMeshInspector import was not yet exported by the FOSS Earth source entry. The other session subsequently completed that export; no owner workaround or source edit by this gear task."
+    },
+    "visibilityAndUiRelated": {
+      "command": "npx vitest related --run src/flight/aircraft/createAircraftModel.ts src/flight/aircraft/aircraftCatalog.ts src/flight/createFlightSimApp.ts src/flight/hud/FlightControlPanel.tsx src/flight/settings/flightParameters.ts --maxWorkers=50%",
+      "files": 56,
+      "passed": 682,
+      "failed": 1,
+      "exitCode": 1,
+      "log": "related.log",
+      "failure": "New app test expected a stored false value; registry correctly elides values equal to the default. Assertion corrected; no production fix needed."
+    },
+    "correctedAppTest": {
+      "files": 1,
+      "passed": 50,
+      "exitCode": 0,
+      "log": "app-rerun.log"
+    },
+    "buildFollowup": {
+      "command": "npm run build",
+      "exitCode": 0,
+      "log": "build-followup.log",
+      "checks": "Installed and emitted JSBSim/audio identities, exhaust freshness, incremental TypeScript and Vite build passed."
+    },
+    "concurrentIntegration": {
+      "command": "npx vitest run [four app files and two model files] --maxWorkers=50%",
+      "files": 6,
+      "passed": 93,
+      "failed": 1,
+      "exitCode": 1,
+      "log": "concurrent-integration.log",
+      "reason": "Concurrent mesh-inspector hooks landed after full-CI tests. This follow-up passed all gear cases but exposed the other session's new polygon-edge test toggling an already-open Aircraft tab closed; its owner corrected the fixture while this task was running."
+    },
+    "concurrentAppFollowup": {
+      "command": "npx vitest run src/flight/createFlightSimApp.test.ts --maxWorkers=50%",
+      "files": 1,
+      "passed": 51,
+      "exitCode": 0,
+      "log": "concurrent-app-followup.log",
+      "scope": "Includes the gear debug setting/physical feedback test and corrected mesh-inspector integration case. Only the failed file was rerun."
+    }
+  },
+  "regressions": [
+    "All three visible tires satisfy selected-skin exterior envelope using every actual serialized vertex.",
+    "Main centers move inward/up while retaining forward endpoint, authored origins and reset/held behavior.",
+    "Wheel roll remains independent of compound gear pose and separately folding piston children.",
+    "Detector ignores both mesh visibility and enabled state.",
+    "it.fails tracks desired zero main-leg protrusion; unexpected success requires review/removal of the expected-failure annotation."
+  ],
+  "sourceHashes": [
+    {
+      "file": "src/flight/aircraft/aircraftAnimation.ts",
+      "sha256": "aab8d32a6f0626808359a59e60c5797cf39c07c735f320122d793baf82bd3f06"
+    },
+    {
+      "file": "src/flight/aircraft/aircraftAnimation.f35b.test.ts",
+      "sha256": "899e236de6d3294de04aafddc919fbb4eac9f3f33e422ee52568a6e474736098"
+    },
+    {
+      "file": "scripts/validation/f35b/gearGeometry.mjs",
+      "sha256": "d9dca702d121863a63b9764a67b7d1aba0b1fd5b8dec2fa940a7e8fd06577411"
+    },
+    {
+      "file": "scripts/validation/f35b/inspect-gear-stow.mjs",
+      "sha256": "f458e9bae66914ef765327f92fa72c12fb268da172fed1622e3b7f6bd33dbfdb"
+    },
+    {
+      "file": "public/aircraft/f-35b/F-35B_AF267.glb",
+      "sha256": "8324d792711a8aecd74988dd9e314b3b4e6f1f3a819591ce60f34caa004d7fbd"
+    }
+  ],
+  "retainedFiles": [
+    {
+      "file": "app-rerun.log",
+      "bytes": 8989,
+      "sha256": "79ee2dcd4c0d047704fe81dac8e04dc5d2e64276caf57641e338f5819cb7d3bb"
+    },
+    {
+      "file": "author-pose-comparison.json",
+      "bytes": 338377,
+      "sha256": "b4d4ce13b58d7a1848008457b06455245b6eb43e8099a5f60900211bcefd86cf"
+    },
+    {
+      "file": "author-pose-inspection.log",
+      "bytes": 1879,
+      "sha256": "ac93ee1dd79b39d7e3b63a6f29319db5a8a90f1dbf8772621b8a43f23a28ba35"
+    },
+    {
+      "file": "baseline-fuselage-only-history.json",
+      "bytes": 295292,
+      "sha256": "14046bb4c80d69582a2694085828fc82def8252f1bbb0b9dc5a3ca15fe25261d"
+    },
+    {
+      "file": "baseline-visible-geometry.json",
+      "bytes": 377618,
+      "sha256": "ff55a57c51451776b53f46d0d070d39ad2df7d6f2233f963b5bd76febbad0a9d"
+    },
+    {
+      "file": "build-followup.log",
+      "bytes": 56200,
+      "sha256": "8e61cd7198de483d6cebe3664fce3a4106018adf6cfe0e280e4f4b7bad974844"
+    },
+    {
+      "file": "ci.log",
+      "bytes": 27507,
+      "sha256": "5d115944944992311c3c20f7f8a28c05090f35bd43b4a76f0121b4de04da150f"
+    },
+    {
+      "file": "concurrent-app-followup.log",
+      "bytes": 9189,
+      "sha256": "e0d5a5d3517daea1bdedee6c0ec9e8f49ff490f6e5c5182197b7f1c4c4a4d5ac"
+    },
+    {
+      "file": "concurrent-integration.log",
+      "bytes": 15734,
+      "sha256": "7e16a576ad758f43e9e6e7ac045e99512d004c6c496682d138a930956bc82e4f"
+    },
+    {
+      "file": "current-stowed-inspection.log",
+      "bytes": 1879,
+      "sha256": "13d8239ebcfe012ac45d14759c7e99ded70f8e52f1a666766c916d29069595af"
+    },
+    {
+      "file": "current-visible-geometry.json",
+      "bytes": 338224,
+      "sha256": "dcc7fcbf6cd15a43907b56eb00c11903e923358a3175e0af64bd53fe5f22ef4d"
+    },
+    {
+      "file": "lint.log",
+      "bytes": 109,
+      "sha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e"
+    },
+    {
+      "file": "related.log",
+      "bytes": 20091,
+      "sha256": "67e2aa9f288a7b9f5a8ad2aa4b03c5e8cbe33e3a0e36feb63885bde07e5d2160"
+    },
+    {
+      "file": "research.json",
+      "bytes": 10003,
+      "sha256": "0f3890afa212fbc65a24742ef8d06c743ec620e4241e6b3f2ae6651f5c912b86"
+    },
+    {
+      "file": "review-lint.log",
+      "bytes": 109,
+      "sha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e"
+    },
+    {
+      "file": "review-typecheck.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "rig-lint.log",
+      "bytes": 109,
+      "sha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e"
+    },
+    {
+      "file": "rig-related.log",
+      "bytes": 15049,
+      "sha256": "00c8399bdd098dec9dd4440aef56c0ff0b30e04fdea920381572f9ccb2981ad0"
+    },
+    {
+      "file": "rig-review.log",
+      "bytes": 404,
+      "sha256": "ff0139368cde0285d4fef58872f97a7f7fb7384a8e28d4b9b734e0cb6168ee7a"
+    },
+    {
+      "file": "rig-typecheck.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "typecheck.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "initialSourceHashes": [
+    {
+      "file": "src/flight/aircraft/aircraftAnimation.ts",
+      "sha256": "aab8d32a6f0626808359a59e60c5797cf39c07c735f320122d793baf82bd3f06"
+    },
+    {
+      "file": "src/flight/aircraft/aircraftAnimation.f35b.test.ts",
+      "sha256": "0d109ac5b1324ddd624b78dc200c326028c715f184483faedbe0271bffd23432"
+    },
+    {
+      "file": "scripts/validation/f35b/gearGeometry.mjs",
+      "sha256": "d9dca702d121863a63b9764a67b7d1aba0b1fd5b8dec2fa940a7e8fd06577411"
+    },
+    {
+      "file": "scripts/validation/f35b/inspect-gear-stow.mjs",
+      "sha256": "f458e9bae66914ef765327f92fa72c12fb268da172fed1622e3b7f6bd33dbfdb"
+    },
+    {
+      "file": "public/aircraft/f-35b/F-35B_AF267.glb",
+      "sha256": "8324d792711a8aecd74988dd9e314b3b4e6f1f3a819591ce60f34caa004d7fbd"
+    }
+  ],
+  "reviewFollowup": {
+    "completedAtUtc": "2026-10-06T03:38:33.311196+00:00",
+    "findings": "Independent review found no production composition/clock defect; two test hardening suggestions applied.",
+    "changes": [
+      "Normal regression verifies usable vertical intersections for every vertex of all18gear meshes, outside it.fails.",
+      "Tire envelope evaluated at retained wheel roll0,.73,pi/2 with simulationHeld true.",
+      "Expected-failure case now only asserts desired zero main-arm envelope violation."
+    ],
+    "checks": {
+      "focused": {
+        "command": "npx vitest run src/flight/aircraft/aircraftAnimation.f35b.test.ts --maxWorkers=50%",
+        "passed": 15,
+        "expectedFailures": 1,
+        "total": 16,
+        "exitCode": 0,
+        "log": "rig-review.log"
+      },
+      "typecheck": {
+        "command": "npx tsc -b",
+        "exitCode": 0,
+        "log": "review-typecheck.log"
+      },
+      "lint": {
+        "command": "npm run lint",
+        "exitCode": 0,
+        "log": "review-lint.log"
+      }
+    },
+    "sourceHashes": [
+      {
+        "file": "src/flight/aircraft/aircraftAnimation.ts",
+        "sha256": "aab8d32a6f0626808359a59e60c5797cf39c07c735f320122d793baf82bd3f06"
+      },
+      {
+        "file": "src/flight/aircraft/aircraftAnimation.f35b.test.ts",
+        "sha256": "899e236de6d3294de04aafddc919fbb4eac9f3f33e422ee52568a6e474736098"
+      },
+      {
+        "file": "scripts/validation/f35b/gearGeometry.mjs",
+        "sha256": "d9dca702d121863a63b9764a67b7d1aba0b1fd5b8dec2fa940a7e8fd06577411"
+      },
+      {
+        "file": "scripts/validation/f35b/inspect-gear-stow.mjs",
+        "sha256": "f458e9bae66914ef765327f92fa72c12fb268da172fed1622e3b7f6bd33dbfdb"
+      },
+      {
+        "file": "public/aircraft/f-35b/F-35B_AF267.glb",
+        "sha256": "8324d792711a8aecd74988dd9e314b3b4e6f1f3a819591ce60f34caa004d7fbd"
+      }
+    ]
+  },
+  "visibility": {
+    "owner": "0sfs aircraft visuals; catalog metadata selects enclosed gear only",
+    "authoredParts": 18,
+    "renderMeshes": 21,
+    "physicalHiddenPosition": 0,
+    "anyPositivePositionRestores": true,
+    "debugParameter": "osfs.debug.renderStowedGear",
+    "debugHome": "Debug / Aircraft visuals",
+    "default": false,
+    "persistent": true,
+    "liveWhilePaused": true,
+    "preservesDoors": true,
+    "geometryIndependentOfVisibility": true,
+    "invariants": [
+      "Cache physical position while model loads; apply before reveal",
+      "Preserve originally hidden meshes",
+      "No redundant render requests for unchanged visibility",
+      "Reuse the existing physical control-surface snapshot during a frame",
+      "Remove setting subscription on teardown",
+      "Wireframe inspection copies original mesh visibility and cannot expose culled gear"
+    ],
+    "performanceQualification": "21 selected render meshes are excluded at full stow. No GPU timing or energy benchmark was run."
+  },
+  "finalStatus": {
+    "tireExteriorEnvelope": "pass for all three tires at retained wheel-roll phases 0, 0.73, pi/2 radians",
+    "gearVisibilityAndLiveDebugControl": "pass",
+    "applicationBuild": "pass after concurrent export completion",
+    "fullTestRun": "1681 passed + 1 explicitly expected main-arm clearance failure; subsequent changed app/model checks qualified separately",
+    "fullGearClearance": "still fails: about 26.83 mm main-arm protrusion",
+    "realF35BKinematicCalibration": "not established by available primary sources"
+  },
+  "integrationSourceHashes": [
+    {
+      "file": "src/flight/aircraft/aircraftCatalog.ts",
+      "sha256": "94333bb4c096b6579d52adfe17d807bcffc8fe9b419297bb17154b354648eaff",
+      "modifiedAtUtc": "2026-10-06T03:26:06.255034+00:00"
+    },
+    {
+      "file": "src/flight/aircraft/createAircraftModel.ts",
+      "sha256": "3b20904359e37b378b6c6797aa0d1b7cc84e866054060933584578290dd19928",
+      "modifiedAtUtc": "2026-10-06T03:38:27.230260+00:00"
+    },
+    {
+      "file": "src/flight/aircraft/createAircraftModel.test.ts",
+      "sha256": "28227eb57aa3be9946f10a650c294812b145d70fd95445f29a669c7f9819bfa9",
+      "modifiedAtUtc": "2026-10-06T03:39:15.557457+00:00"
+    },
+    {
+      "file": "src/flight/createFlightSimApp.ts",
+      "sha256": "d2ec028bf062282e762f773aeac33fba9ab69be6b2bfc7c816988da067f160c6",
+      "modifiedAtUtc": "2026-10-06T03:38:27.305117+00:00"
+    },
+    {
+      "file": "src/flight/createFlightSimApp.test.ts",
+      "sha256": "40f4988426e97fa9640232b1de125c2a157fa500e1f300b2585b27dd16d41964",
+      "modifiedAtUtc": "2026-10-06T03:41:26.755003+00:00"
+    },
+    {
+      "file": "src/flight/createFlightSimApp.phone.test.ts",
+      "sha256": "8a8217f77e276bee5c86361a81e12bf90edfa41c4862021c41e4f21be1286663",
+      "modifiedAtUtc": "2026-10-06T03:34:01.754337+00:00"
+    },
+    {
+      "file": "src/flight/createFlightSimApp.autopilot.test.ts",
+      "sha256": "40c78c686b1abb212fc6e9f39749385d3704e25d54782280ad279834febcb1ac",
+      "modifiedAtUtc": "2026-10-06T03:26:58.197503+00:00"
+    },
+    {
+      "file": "src/flight/createFlightSimApp.ground.test.ts",
+      "sha256": "490d5a3b04111567c2e87ae3b7e07d72758cc4c8fbb85733e34db89b4dd25383",
+      "modifiedAtUtc": "2026-10-06T03:26:58.197626+00:00"
+    },
+    {
+      "file": "src/flight/hud/FlightControlPanel.tsx",
+      "sha256": "baa38912f69d57a39c65fe86afb2538bbf97ad28af02bd502bb28852ea2b9d01",
+      "modifiedAtUtc": "2026-10-06T03:39:37.469039+00:00"
+    },
+    {
+      "file": "src/flight/settings/flightParameters.ts",
+      "sha256": "1b303f9490ad32a199a4587594faa8c9aa8a1416abdacae54b880b15af9a7aef",
+      "modifiedAtUtc": "2026-10-06T03:38:27.203056+00:00"
+    }
+  ]
+}

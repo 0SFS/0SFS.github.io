@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "schemaVersion": 2,
+    "package": {
+      "name": "@felipegalind0/jsbsim",
+      "version": "1.2.4-fork.11"
+    },
+    "native": {
+      "origin": "https://github.com/Felipegalind0/jsbsim",
+      "commit": "c1d57a2c3860ae9ae47f2b27b84f37912042c19c",
+      "contentSha256": "fec8d16c38fd80da1446cde2b1f5523796d737eef6bac5426a7df4b11c2e2021",
+      "dirty": false
+    },
+    "sdk": {
+      "commit": "c1d57a2c3860ae9ae47f2b27b84f37912042c19c",
+      "contentSha256": "d40290a03a3c40552b8dce8c3dfb6aeb5f19587f406d7083c461bc5ec2dfb5a4",
+      "dirty": false,
+      "path": "wasm"
+    },
+    "build": {
+      "mode": "in-tree",
+      "inputSha256": "d353cac279c53cbc55c05b5231680ae85c26ae62b8b6c68a7e388fed90e0e7bc",
+      "toolchain": {
+        "node": "v26.8.2",
+        "npm": "11.19.1",
+        "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+        "cmake": "cmake version 4.4.3",
+        "clang": "clang version 24.0.0git",
+        "platform": "darwin",
+        "arch": "arm64",
+        "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+      },
+      "options": {
+        "buildType": "Release",
+        "cxxStandard": 17,
+        "sdkTarget": "es2022"
+      }
+    }
+  },
+  "files": {
+    "index.d.ts": "5d55658e945488ad8bbfa15589b8ff455c005cfade02a4affd4c3a1f545576d2",
+    "index.js": "37b9276858fd120bd13c072787a90ab46ca0d81fd08bfc5b646f06c6f34222a8",
+    "index.js.map": "57f38ed18f4d754ed26ba969e711281c1cea220e782a2083f35707ce17e72659",
+    "licenses/README.txt": "e7ddac6ea6e8a4ceb23b8645dff37514300fec6560ef34c706c1ad89528137d4",
+    "licenses/jsbsim/AUTHORS": "ca8556894da80f81f773893a9c1009021aac2972d7bb6a39c2f981b4fd00aa9a",
+    "licenses/jsbsim/COPYING": "1e7e6bae5a5bde32f1ae5a7c37a082d1ab03cf89354f7f936ac40be9e39a6531",
+    "licenses/jsbsim/src/GeographicLib/LICENSE.txt": "90d25298be0c5d7f5219ae20009d18910150b3a4ea0ca86dda5df04cfb8d3823",
+    "licenses/jsbsim/src/simgear/xml/COPYING": "8c6b5b6de8fae20b317f4992729abc0e520bfba4c7606cd1e9eeb87418eebdec",
+    "licenses/sdk-LICENSE": "15e2d343fc930439fb82351d7c30f3d151b4c42ca3132c13ff1a60da527a1259",
+    "wasm.d.ts": "b7bbbab6f5e6b0b297dfeff117351e53d4d8598fecde7e805ea9aee7b2923353",
+    "wasm.js": "758d98989301d86ec3aa589fa851d6416b305eca58bb1e6b9579780ea339e09b",
+    "wasm.js.map": "d75a89efd5b3cf07ebfbe70d321f55c01bd8cdde1be50a15d1dcfad21a7ca763",
+    "wasm/jsbsim_wasm.mjs": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+    "wasm/jsbsim_wasm.wasm": "ad1a8a1288ba7895c24e9f8701c754f4f7266703b7ea4f7d6325e5974132b1f3"
+  },
+  "validation": {
+    "status": "passed",
+    "commands": [
+      "tsc --noEmit (frozen SDK workspace)",
+      "node --test --test-concurrency=5 test/*.test.mjs (frozen SDK workspace and resolved native fixtures)"
+    ]
+  },
+  "packageArchive": {
+    "path": "deps/felipegalind0-jsbsim-1.2.4-fork.11.tgz",
+    "sha256": "1add69a5e13980af743a788f1e8f8856338ffd01b80e95a8dbaa23f7df0dd71a",
+    "integrity": "sha512-kJNRRxbmG22N7wPTvLweMN16VBIAuch8DD2PLdYf0mwUnK9cOrm/R+UERGyIKRpb7vwReS7s150uLjOYANzXXQ=="
+  }
+}

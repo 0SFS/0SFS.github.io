@@ -1,6 +1,6 @@
 import { Quaternion, TransformNode, Vector3 } from "@babylonjs/core";
 import { DEG_TO_RAD, geodeticToEcef, type EcefCoord } from "foss-earth/cameraMath";
-import { buildWorldShiftMatrix } from "./enuFrame";
+import { buildWorldShiftFrame, buildWorldShiftMatrix } from "./enuFrame";
 import { flightAttitudeToQuaternion } from "./ecefBridge";
 import type { FlightState } from "../physics/flightState";
 
@@ -10,6 +10,8 @@ export interface FloatingOriginHandle {
   apply(state: FlightState): void;
   /** Where the origin, and so the aircraft, is: ECEF metres of the last applied state; null before one. */
   getOriginEcef(): EcefCoord | null;
+  /** Cached double-precision ECEF -> east/up/south frame for flight trails. */
+  getWorldFromEcef(): { readonly m: ArrayLike<number> } | null;
   dispose(): void;
 }
 
@@ -21,6 +23,8 @@ export function createFloatingOrigin(scene: import("@babylonjs/core").Scene, wor
 
   const aircraftRoot = new TransformNode("aircraft-root", scene);
   let originEcef: EcefCoord | null = null;
+  let worldFromEcef: ReturnType<typeof buildWorldShiftFrame> | null = null;
+  let appliedLatRad = 0, appliedLonRad = 0, appliedAltMeters = 0;
 
   return {
     worldShift,
@@ -29,6 +33,8 @@ export function createFloatingOrigin(scene: import("@babylonjs/core").Scene, wor
       const latRad = state.latDeg * DEG_TO_RAD;
       const lonRad = state.lonDeg * DEG_TO_RAD;
       originEcef = geodeticToEcef(latRad, lonRad, state.altMeters);
+      appliedLatRad = latRad; appliedLonRad = lonRad; appliedAltMeters = state.altMeters;
+      worldFromEcef = null;
       const shift = buildWorldShiftMatrix(latRad, lonRad, state.altMeters);
 
       const scale = new Vector3();
@@ -47,12 +53,18 @@ export function createFloatingOrigin(scene: import("@babylonjs/core").Scene, wor
       aircraftRoot.position = Vector3.Zero();
     },
     getOriginEcef: () => originEcef,
+    getWorldFromEcef: () => {
+      if (!originEcef) return null;
+      return worldFromEcef ??= buildWorldShiftFrame(appliedLatRad, appliedLonRad, appliedAltMeters, originEcef);
+    },
     dispose(): void {
       worldShift.position.set(0, 0, 0);
       worldShift.rotationQuaternion = Quaternion.Identity();
       worldShift.scaling.set(1, 1, 1);
       aircraftRoot.dispose();
       worldShift.dispose();
+      worldFromEcef = null;
+      originEcef = null;
     },
   };
 }

@@ -1,0 +1,1960 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-05T23:29:23.594Z",
+  "scope": "Installed SDK native force observation, actual F35 GLB, shared labeled force glyph readiness, hardware shader/pixel and disable checks. Fixed aircraft CG reference; no globe, flight performance or timing qualification.",
+  "serverStarted": false,
+  "visibleBrowserUsed": false,
+  "renderersRequested": [
+    "webgl2",
+    "webgpu"
+  ],
+  "checks": "forces-only",
+  "systemGpu": {
+    "devices": [
+      {
+        "vendorId": 4203,
+        "deviceId": 0,
+        "vendorString": "Google Inc. (Apple)",
+        "deviceString": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Version 27.0 (Build 26A428))",
+        "driverVendor": "Apple",
+        "driverVersion": "27.0"
+      }
+    ],
+    "auxAttributes": {
+      "amdSwitchable": false,
+      "canSupportThreadedTextureMailbox": false,
+      "directRenderingVersion": "",
+      "displayType": "ANGLE_METAL",
+      "glExtensions": "GL_AMD_performance_monitor GL_ANGLE_base_vertex_base_instance_shader_builtin GL_ANGLE_blob_cache GL_ANGLE_client_arrays GL_ANGLE_clip_cull_distance GL_ANGLE_compressed_texture_etc GL_ANGLE_depth_texture GL_ANGLE_framebuffer_blit GL_ANGLE_framebuffer_multisample GL_ANGLE_get_serialized_context_string GL_ANGLE_get_tex_level_parameter GL_ANGLE_instanced_arrays GL_ANGLE_memory_size GL_ANGLE_pack_reverse_row_order GL_ANGLE_polygon_mode GL_ANGLE_program_binary_readiness_query GL_ANGLE_program_cache_control GL_ANGLE_provoking_vertex GL_ANGLE_renderability_validation GL_ANGLE_request_extension GL_ANGLE_rgbx_internal_format GL_ANGLE_robust_client_memory GL_ANGLE_shader_pixel_local_storage GL_ANGLE_shader_pixel_local_storage_coherent GL_ANGLE_stencil_texturing GL_ANGLE_texture_compression_dxt3 GL_ANGLE_texture_compression_dxt5 GL_ANGLE_texture_multisample GL_ANGLE_translated_shader_source GL_APPLE_clip_distance GL_ARM_rgba8 GL_CHROMIUM_bind_generates_resource GL_CHROMIUM_bind_uniform_location GL_CHROMIUM_copy_texture GL_CHROMIUM_lose_context GL_EXT_base_instance GL_EXT_blend_func_extended GL_EXT_blend_minmax GL_EXT_clip_control GL_EXT_color_buffer_float GL_EXT_color_buffer_half_float GL_EXT_compressed_ETC1_RGB8_sub_texture GL_EXT_conservative_depth GL_EXT_debug_label GL_EXT_debug_marker GL_EXT_depth_clamp GL_EXT_discard_framebuffer GL_EXT_disjoint_timer_query GL_EXT_draw_buffers GL_EXT_draw_buffers_indexed GL_EXT_draw_elements_base_vertex GL_EXT_float_blend GL_EXT_frag_depth GL_EXT_instanced_arrays GL_EXT_map_buffer_range GL_EXT_multisampled_render_to_texture GL_EXT_occlusion_query_boolean GL_EXT_polygon_offset_clamp GL_EXT_pvrtc_sRGB GL_EXT_read_format_bgra GL_EXT_render_snorm GL_EXT_robustness GL_EXT_sRGB GL_EXT_shader_texture_lod GL_EXT_texture_compression_bptc GL_EXT_texture_compression_dxt1 GL_EXT_texture_compression_rgtc GL_EXT_texture_compression_s3tc_srgb GL_EXT_texture_filter_anisotropic GL_EXT_texture_format_BGRA8888 GL_EXT_texture_mirror_clamp_to_edge GL_EXT_texture_norm16 GL_EXT_texture_rg GL_EXT_texture_sRGB_R8 GL_EXT_texture_sRGB_RG8 GL_EXT_texture_shadow_lod GL_EXT_texture_storage GL_IMG_texture_compression_pvrtc GL_KHR_debug GL_KHR_parallel_shader_compile GL_KHR_robustness GL_KHR_texture_compression_astc_hdr GL_KHR_texture_compression_astc_ldr GL_KHR_texture_compression_astc_sliced_3d GL_MESA_framebuffer_flip_y GL_NV_fence GL_NV_framebuffer_blit GL_NV_pixel_buffer_object GL_NV_shader_noperspective_interpolation GL_OES_EGL_image GL_OES_EGL_sync GL_OES_compressed_ETC1_RGB8_texture GL_OES_depth24 GL_OES_depth32 GL_OES_depth_texture GL_OES_draw_buffers_indexed GL_OES_draw_elements_base_vertex GL_OES_element_index_uint GL_OES_fbo_render_mipmap GL_OES_get_program_binary GL_OES_mapbuffer GL_OES_packed_depth_stencil GL_OES_required_internalformat GL_OES_rgb8_rgba8 GL_OES_sample_variables GL_OES_shader_multisample_interpolation GL_OES_standard_derivatives GL_OES_surfaceless_context GL_OES_texture_3D GL_OES_texture_float GL_OES_texture_float_linear GL_OES_texture_half_float GL_OES_texture_half_float_linear GL_OES_texture_npot GL_OES_texture_stencil8 GL_OES_vertex_array_object GL_QCOM_render_shared_exponent ",
+      "glImplementationParts": "(gl=egl-angle,angle=metal)",
+      "glRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Version 27.0 (Build 26A428))",
+      "glResetNotificationStrategy": 33362,
+      "glVendor": "Google Inc. (Apple)",
+      "glVersion": "OpenGL ES 3.0 (ANGLE 2.1.28734 git hash: e12217f3e133)",
+      "glWsExtensions": "",
+      "glWsVendor": "",
+      "glWsVersion": "",
+      "inProcessGpu": false,
+      "initializationTime": 0.040935,
+      "isAsan": false,
+      "isClangCoverage": false,
+      "jpegDecodeAcceleratorSupported": false,
+      "maxMsaaSamples": "8",
+      "optimus": false,
+      "passthroughCmdDecoder": true,
+      "pixelShaderVersion": "3.00",
+      "processCrashCount": 0,
+      "sandboxed": true,
+      "skiaBackendType": "GraphiteDawnMetal",
+      "subpixelFontRendering": true,
+      "targetCpuBits": 64,
+      "vertexShaderVersion": "3.00",
+      "visibilityCallbackCallCount": 0
+    },
+    "featureStatus": {
+      "2d_canvas": "enabled",
+      "direct_rendering_display_compositor": "disabled_off_ok",
+      "gpu_compositing": "enabled",
+      "multiple_raster_threads": "enabled_on",
+      "opengl": "enabled_on",
+      "rasterization": "enabled",
+      "raw_draw": "disabled_off_ok",
+      "skia_graphite": "enabled_on",
+      "trees_in_viz": "disabled_off",
+      "video_decode": "enabled",
+      "video_encode": "enabled",
+      "webgl": "enabled",
+      "webgpu": "enabled",
+      "webnn": "disabled_off"
+    },
+    "driverBugWorkarounds": [
+      "disable_2d_canvas_auto_flush",
+      "enable_webgl_timer_query_extensions",
+      "disabled_extension_GL_KHR_blend_equation_advanced",
+      "disabled_extension_GL_KHR_blend_equation_advanced_coherent"
+    ],
+    "videoDecoding": [],
+    "videoEncoding": []
+  },
+  "chromeExit": {
+    "code": 0,
+    "signal": null
+  },
+  "runs": [
+    {
+      "renderer": "webgl2",
+      "captures": [
+        {
+          "name": "force-base",
+          "view": "forces",
+          "native": {
+            "augmentation": false,
+            "nozzlePositionNorm": 0.30000000000000004,
+            "conversion": 0,
+            "n1Pct": 79,
+            "n2Pct": 88,
+            "thrustLbf": 9509.4464735019,
+            "fuelFlowPps": 2.235906652444949,
+            "simulationTimeS": 2.999999999999992
+          },
+          "settings": {
+            "enabled": true,
+            "sampleCount": 8,
+            "maxDistanceMeters": 2000,
+            "intensity": 1
+          },
+          "smokeSettings": {
+            "enabled": false,
+            "maxParticles": 64,
+            "emissionPerSecond": 8,
+            "lifetimeSeconds": 2,
+            "maxDistanceMeters": 1000,
+            "opacity": 0.025
+          },
+          "plume": {
+            "count": 1,
+            "visible": 1,
+            "triangles": 12,
+            "shaderReady": true,
+            "positions": [
+              [
+                0.000002037061221926706,
+                1.0146543979644775,
+                -5.074954032897949
+              ]
+            ]
+          },
+          "smoke": [],
+          "glow": [
+            {
+              "name": "darkmet2-engine-thermal",
+              "emissive": [
+                0.21825997978123124,
+                0.020240565125536215,
+                0
+              ]
+            }
+          ],
+          "forceMeshes": 0,
+          "forceLabels": [],
+          "drawCalls": 149,
+          "renderRequests": 1,
+          "frames": 12,
+          "pixelDifference": null
+        },
+        {
+          "name": "native-forces-side",
+          "view": "forces",
+          "native": {
+            "augmentation": false,
+            "nozzlePositionNorm": 0.30000000000000004,
+            "conversion": 0,
+            "n1Pct": 79,
+            "n2Pct": 88,
+            "thrustLbf": 9509.4464735019,
+            "fuelFlowPps": 2.235906652444949,
+            "simulationTimeS": 2.999999999999992
+          },
+          "settings": {
+            "enabled": true,
+            "sampleCount": 8,
+            "maxDistanceMeters": 2000,
+            "intensity": 1
+          },
+          "smokeSettings": {
+            "enabled": false,
+            "maxParticles": 64,
+            "emissionPerSecond": 8,
+            "lifetimeSeconds": 2,
+            "maxDistanceMeters": 1000,
+            "opacity": 0.025
+          },
+          "plume": {
+            "count": 1,
+            "visible": 1,
+            "triangles": 12,
+            "shaderReady": true,
+            "positions": [
+              [
+                0.000002037061221926706,
+                1.0146543979644775,
+                -5.074954032897949
+              ]
+            ]
+          },
+          "smoke": [],
+          "glow": [
+            {
+              "name": "darkmet2-engine-thermal",
+              "emissive": [
+                0.21825997978123124,
+                0.020240565125536215,
+                0
+              ]
+            }
+          ],
+          "forceMeshes": 21,
+          "forceLabels": [
+            {
+              "id": "aero-0",
+              "label": "Drag",
+              "expectedWorld": [
+                -2.106986916487262e-7,
+                0.44241868393238176,
+                -1.536387578941822
+              ],
+              "actualWorld": [
+                -2.1069870115297817e-7,
+                0.4424186646938324,
+                -1.53638756275177
+              ],
+              "worldErrorMeters": 2.5144374406837753e-8
+            },
+            {
+              "id": "aero-1",
+              "label": "Side force",
+              "expectedWorld": [
+                -0.35000433753463756,
+                0.39014399836874214,
+                4.794375177592389e-8
+              ],
+              "actualWorld": [
+                -0.3500043451786041,
+                0.3901439905166626,
+                4.794375385586136e-8
+              ],
+              "worldErrorMeters": 1.0958347415179014e-8
+            },
+            {
+              "id": "aero-2",
+              "label": "Lift",
+              "expectedWorld": [
+                0,
+                9.141611067665469,
+                0.297763520857119
+              ],
+              "actualWorld": [
+                0,
+                9.141610145568848,
+                0.29776349663734436
+              ],
+              "worldErrorMeters": 9.224146445393686e-7
+            },
+            {
+              "id": "engine-0",
+              "label": "Main engine",
+              "expectedWorld": [
+                0,
+                4.511946372076636e-17,
+                -1.9993300124683033
+              ],
+              "actualWorld": [
+                0,
+                5.924608477866054e-16,
+                -1.9993300437927246
+              ],
+              "worldErrorMeters": 3.1324421279066434e-8
+            },
+            {
+              "id": "weight",
+              "label": "Weight",
+              "expectedWorld": [
+                3.364451517820758e-7,
+                -8.570670005061313,
+                -0.3149117835024655
+              ],
+              "actualWorld": [
+                0,
+                -8.57645320892334,
+                0
+              ],
+              "worldErrorMeters": 0.31496488190864497
+            },
+            {
+              "id": "applied",
+              "label": "Applied total (excludes gravity)",
+              "expectedWorld": [
+                -0.000004684938924737831,
+                8.78847714810949,
+                1.2641082594989153
+              ],
+              "actualWorld": [
+                -0.0000046849386308167595,
+                8.788476943969727,
+                1.2641081809997559
+              ],
+              "worldErrorMeters": 2.1871250721225316e-7
+            },
+            {
+              "id": "net",
+              "label": "Net force (with gravity)",
+              "expectedWorld": [
+                -0.000005735273162333417,
+                0.30359395721830484,
+                1.2523658699472788
+              ],
+              "actualWorld": [
+                -0.000005735273134632735,
+                0.3035939633846283,
+                1.2523658275604248
+              ],
+              "worldErrorMeters": 4.283303560563239e-8
+            }
+          ],
+          "drawCalls": 170,
+          "renderRequests": 2,
+          "frames": 18,
+          "pixelDifference": {
+            "changedPixels": 10837,
+            "sumRgbDifference": 1221453,
+            "maxChannelDifference": 246
+          }
+        }
+      ],
+      "failures": [
+        "Error: Native force label does not follow its arrow tip: [{\"id\":\"aero-0\",\"label\":\"Drag\",\"expectedWorld\":[-2.106986916487262e-7,0.44241868393238176,-1.536387578941822],\"actualWorld\":[-2.1069870115297817e-7,0.4424186646938324,-1.53638756275177],\"worldErrorMeters\":2.5144374406837753e-8},{\"id\":\"aero-1\",\"label\":\"Side force\",\"expectedWorld\":[-0.35000433753463756,0.39014399836874214,4.794375177592389e-8],\"actualWorld\":[-0.3500043451786041,0.3901439905166626,4.794375385586136e-8],\"worldErrorMeters\":1.0958347415179014e-8},{\"id\":\"aero-2\",\"label\":\"Lift\",\"expectedWorld\":[0,9.141611067665469,0.297763520857119],\"actualWorld\":[0,9.141610145568848,0.29776349663734436],\"worldErrorMeters\":9.224146445393686e-7},{\"id\":\"engine-0\",\"label\":\"Main engine\",\"expectedWorld\":[0,4.511946372076636e-17,-1.9993300124683033],\"actualWorld\":[0,5.924608477866054e-16,-1.9993300437927246],\"worldErrorMeters\":3.1324421279066434e-8},{\"id\":\"weight\",\"label\":\"Weight\",\"expectedWorld\":[3.364451517820758e-7,-8.570670005061313,-0.3149117835024655],\"actualWorld\":[0,-8.57645320892334,0],\"worldErrorMeters\":0.31496488190864497},{\"id\":\"applied\",\"label\":\"Applied total (excludes gravity)\",\"expectedWorld\":[-0.000004684938924737831,8.78847714810949,1.2641082594989153],\"actualWorld\":[-0.0000046849386308167595,8.788476943969727,1.2641081809997559],\"worldErrorMeters\":2.1871250721225316e-7},{\"id\":\"net\",\"label\":\"Net force (with gravity)\",\"expectedWorld\":[-0.000005735273162333417,0.30359395721830484,1.2523658699472788],\"actualWorld\":[-0.000005735273134632735,0.3035939633846283,1.2523658275604248],\"worldErrorMeters\":4.283303560563239e-8}]\n    at file:///Users/felg/gh/0sfs/scripts/validation/f35b/check-exhaust-headless.mjs:233:104"
+      ],
+      "initial": {
+        "error": null,
+        "gpu": {
+          "backend": "webgl2",
+          "vendor": "Google Inc. (Apple)",
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+          "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        },
+        "asset": {
+          "triangles": 12259,
+          "meshReady": true,
+          "rigBound": [
+            "leftElevator",
+            "rightElevator",
+            "leftFlaperon",
+            "rightFlaperon",
+            "leftRudder",
+            "rightRudder",
+            "leftWheel",
+            "noseWheel",
+            "rightWheel",
+            "leftGear",
+            "rightGear",
+            "noseGear",
+            "leftDoor",
+            "rightDoor",
+            "leftNoseDoor",
+            "rightNoseDoor",
+            "topLiftDoor",
+            "leftLiftDoor",
+            "rightLiftDoor",
+            "leftEngineDoor",
+            "rightEngineDoor",
+            "leftExhaustDoor",
+            "rightExhaustDoor",
+            "vtol",
+            "feather.001",
+            "feather.002",
+            "feather.003",
+            "feather.004",
+            "feather.005",
+            "feather.006",
+            "feather.007",
+            "feather.008",
+            "feather.009",
+            "feather.010",
+            "feather.011",
+            "feather.012",
+            "feather.013",
+            "feather.014",
+            "feather.015",
+            "feather.016"
+          ]
+        },
+        "sdkIdentity": {
+          "aircraftId": "f-35b",
+          "build": {
+            "schemaVersion": 2,
+            "package": {
+              "name": "@felipegalind0/jsbsim",
+              "version": "1.2.4-fork.11"
+            },
+            "native": {
+              "origin": "https://github.com/Felipegalind0/jsbsim",
+              "commit": "c1d57a2c3860ae9ae47f2b27b84f37912042c19c",
+              "contentSha256": "fec8d16c38fd80da1446cde2b1f5523796d737eef6bac5426a7df4b11c2e2021",
+              "dirty": false
+            },
+            "sdk": {
+              "commit": "c1d57a2c3860ae9ae47f2b27b84f37912042c19c",
+              "contentSha256": "d40290a03a3c40552b8dce8c3dfb6aeb5f19587f406d7083c461bc5ec2dfb5a4",
+              "dirty": false,
+              "path": "wasm"
+            },
+            "build": {
+              "mode": "in-tree",
+              "inputSha256": "d353cac279c53cbc55c05b5231680ae85c26ae62b8b6c68a7e388fed90e0e7bc",
+              "toolchain": {
+                "node": "v26.8.2",
+                "npm": "11.19.1",
+                "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+                "cmake": "cmake version 4.4.3",
+                "clang": "clang version 24.0.0git",
+                "platform": "darwin",
+                "arch": "arm64",
+                "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+              },
+              "options": {
+                "buildType": "Release",
+                "cxxStandard": 17,
+                "sdkTarget": "es2022"
+              }
+            }
+          },
+          "assets": {
+            "moduleUrl": "https://0sfs.test/assets/jsbsim_wasm-DAhL615P.mjs",
+            "wasmUrl": "https://0sfs.test/assets/jsbsim_wasm-BSZ8OOhS.wasm"
+          }
+        },
+        "optical": {
+          "id": "f135-visible-approximation-v1",
+          "width": 64,
+          "height": 32,
+          "colorSpace": "linear-srgb",
+          "dry": {
+            "firstRow": 0,
+            "rowCount": 16
+          },
+          "afterburner": {
+            "firstRow": 16,
+            "rowCount": 16
+          },
+          "hudAccentHex": "#ff9450",
+          "surfaceEmission": {
+            "samples": [
+              [
+                0.02,
+                0,
+                0
+              ],
+              [
+                0.03533333,
+                0,
+                0
+              ],
+              [
+                0.05066667,
+                0.00003527,
+                0
+              ],
+              [
+                0.066,
+                0.00056824,
+                0
+              ],
+              [
+                0.08133333,
+                0.00135075,
+                0
+              ],
+              [
+                0.09666667,
+                0.00238571,
+                0
+              ],
+              [
+                0.112,
+                0.00367551,
+                0
+              ],
+              [
+                0.12733333,
+                0.00522207,
+                0
+              ],
+              [
+                0.14266667,
+                0.00702687,
+                0
+              ],
+              [
+                0.158,
+                0.00909101,
+                0
+              ],
+              [
+                0.17333333,
+                0.01141524,
+                0
+              ],
+              [
+                0.18866667,
+                0.01399998,
+                0
+              ],
+              [
+                0.204,
+                0.01684537,
+                0
+              ],
+              [
+                0.21933333,
+                0.01995128,
+                0
+              ],
+              [
+                0.23466667,
+                0.02331735,
+                0
+              ],
+              [
+                0.25,
+                0.02694297,
+                0
+              ]
+            ]
+          },
+          "temporalEmission": {
+            "periodSeconds": 0.8,
+            "samples": [
+              1.020521,
+              1.01902484,
+              1.01541466,
+              1.01791022,
+              1.02024696,
+              1.01407798,
+              1.00523472,
+              1.00666866,
+              1.01861519,
+              1.02754827,
+              1.02582603,
+              1.02112685,
+              1.02147446,
+              1.02087689,
+              1.00923438,
+              0.99053833,
+              0.979479,
+              0.98097516,
+              0.98458534,
+              0.98208978,
+              0.97975304,
+              0.98592202,
+              0.99476528,
+              0.99333134,
+              0.98138481,
+              0.97245173,
+              0.97417397,
+              0.97887315,
+              0.97852554,
+              0.97912311,
+              0.99076562,
+              1.00946167
+            ]
+          },
+          "textureUrl": "https://0sfs.test/assets/f135-exhaust-lut-Be0PF3Dm.png",
+          "provenanceUrl": "https://0sfs.test/assets/f135-exhaust-lut.manifest-DRqevrja.json",
+          "decodedRgbaBytes": 8192
+        },
+        "opticalProvenance": {
+          "schemaVersion": 1,
+          "profile": {
+            "id": "f135-visible-approximation-v1",
+            "width": 64,
+            "height": 32,
+            "colorSpace": "linear-srgb",
+            "dry": {
+              "firstRow": 0,
+              "rowCount": 16
+            },
+            "afterburner": {
+              "firstRow": 16,
+              "rowCount": 16
+            },
+            "hudAccentHex": "#ff9450",
+            "surfaceEmission": {
+              "samples": [
+                [
+                  0.02,
+                  0,
+                  0
+                ],
+                [
+                  0.03533333,
+                  0,
+                  0
+                ],
+                [
+                  0.05066667,
+                  0.00003527,
+                  0
+                ],
+                [
+                  0.066,
+                  0.00056824,
+                  0
+                ],
+                [
+                  0.08133333,
+                  0.00135075,
+                  0
+                ],
+                [
+                  0.09666667,
+                  0.00238571,
+                  0
+                ],
+                [
+                  0.112,
+                  0.00367551,
+                  0
+                ],
+                [
+                  0.12733333,
+                  0.00522207,
+                  0
+                ],
+                [
+                  0.14266667,
+                  0.00702687,
+                  0
+                ],
+                [
+                  0.158,
+                  0.00909101,
+                  0
+                ],
+                [
+                  0.17333333,
+                  0.01141524,
+                  0
+                ],
+                [
+                  0.18866667,
+                  0.01399998,
+                  0
+                ],
+                [
+                  0.204,
+                  0.01684537,
+                  0
+                ],
+                [
+                  0.21933333,
+                  0.01995128,
+                  0
+                ],
+                [
+                  0.23466667,
+                  0.02331735,
+                  0
+                ],
+                [
+                  0.25,
+                  0.02694297,
+                  0
+                ]
+              ]
+            },
+            "temporalEmission": {
+              "periodSeconds": 0.8,
+              "samples": [
+                1.020521,
+                1.01902484,
+                1.01541466,
+                1.01791022,
+                1.02024696,
+                1.01407798,
+                1.00523472,
+                1.00666866,
+                1.01861519,
+                1.02754827,
+                1.02582603,
+                1.02112685,
+                1.02147446,
+                1.02087689,
+                1.00923438,
+                0.99053833,
+                0.979479,
+                0.98097516,
+                0.98458534,
+                0.98208978,
+                0.97975304,
+                0.98592202,
+                0.99476528,
+                0.99333134,
+                0.98138481,
+                0.97245173,
+                0.97417397,
+                0.97887315,
+                0.97852554,
+                0.97912311,
+                0.99076562,
+                1.00946167
+              ]
+            }
+          },
+          "assetLicense": "CC-BY-SA-4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "attribution": "CIE 2019, Colour-matching functions of CIE 1931 standard colorimetric observer, International Commission on Illumination (CIE), Vienna, AT, DOI:10.25039/CIE.DS.xvudnb9b. Adapted by 0sfs into an assumed emission RGB lookup.",
+          "rgbMeaning": "Peak-normalized linear-sRGB emission; alpha is separately assumed relative intensity. Not absolute radiance.",
+          "uvMeaning": "U axial fraction: (0.5+axial*(width-1))/width. V within selected bank: (firstRow+0.5+power*(rowCount-1))/height. Clamp axes; do not filter across banks.",
+          "orientation": "PNG first/top scanline is dry bank row 0. Use Babylon invertY=false; texture V=0 addresses that first/top row.",
+          "assumptions": [
+            "Temperatures, component energy fractions, band widths, emission intensity and axial falloff are declared visual assumptions, not measured F135 exhaust quantities.",
+            "The power axis is a normalized native engine operating observation supplied by the installation; it is not an inferred flame temperature or pilot throttle command.",
+            "A grey-soot Planck continuum and simplified Gaussian radical bands represent shared hydrocarbon emission mechanisms, not resolved molecular spectroscopy or combustion kinetics.",
+            "Each component spectrum is normalized by its integrated visible radiant energy over 360–830 nm before mixing. Soot fractions describe relative energy in this window, not soot mass fraction, molecular abundance or all-wavelength radiation.",
+            "The default is an openly assumed soot-dominated warm reference, qualitatively consistent with a documented daylight F-35B afterburner photo. Available JP-8 laboratory evidence does not determine these F135 fractions. Other fractions can produce blue or violet, so this is not a unique computed F135 color.",
+            "The dry bank contains only very faint thermal continuum; the afterburner bank must be selected only from actual native augmentation and an operating engine.",
+            "The separate hot-hardware table is a Planck-continuum color proxy with explicitly assumed 900–1400 K temperatures and 0.02–0.25 linear display emission. Native power selects the table row; it is not measured F135 wall temperature, calibrated radiance or thermal inertia. It applies only to declared nozzle-interior material bindings and never makes the dry exhaust tail brighter.",
+            "Optical depth, soot loading, excited-state populations, pressure, mixing and shock-cell spectral effects are unknown. Static shock-cell spacing and contrast are a baked visual assumption, not a pressure-derived solution. There is no absolute radiance or F135 photometric calibration.",
+            "The optional 32-sample, 0.8-second periodic emission multiplier is an artistic brightness fluctuation bounded within plus/minus 4 percent. It is not measured F135 combustion instability, vibration or acoustic physics. Playback uses native simulation time and holds on pause.",
+            "RGB is linear sRGB with negative out-of-gamut channels clipped and each spectrum normalized by its largest RGB channel. Alpha supplies a separately assumed relative envelope. Exposure and tone mapping belong to the renderer.",
+            "The HUD samples the same assumed afterburner spectrum and applies sRGB display encoding without a separate whitening or recoloring step. This display accent is not a photometric exhaust-color measurement."
+          ],
+          "opticalParameters": {
+            "dry": {
+              "assumedSootTemperatureK": [
+                900,
+                1400
+              ],
+              "axialCoolingK": 300,
+              "relativeEmission": [
+                0,
+                0.012
+              ],
+              "axialFalloff": 9
+            },
+            "afterburner": {
+              "assumedSootTemperatureK": [
+                1800,
+                2500
+              ],
+              "axialCoolingK": 900,
+              "relativeEmission": [
+                0.3,
+                1
+              ],
+              "axialFalloff": 2.6,
+              "sootEnergyFractionAtNozzle": 0.995,
+              "sootEnergyFractionAtTail": 0.985,
+              "sootMixFalloff": 2,
+              "assumedShockCells": {
+                "countAtPower": [
+                  4,
+                  7
+                ],
+                "contrast": 0.6,
+                "axialDamping": 1.8,
+                "phaseRadians": 0.15
+              },
+              "assumedBands": [
+                {
+                  "species": "CH*",
+                  "centerNm": 432,
+                  "sigmaNm": 3,
+                  "relativeEnergy": 1
+                },
+                {
+                  "species": "C2*",
+                  "centerNm": 473,
+                  "sigmaNm": 5,
+                  "relativeEnergy": 0.45
+                },
+                {
+                  "species": "C2*",
+                  "centerNm": 516,
+                  "sigmaNm": 5,
+                  "relativeEnergy": 0.015
+                },
+                {
+                  "species": "C2*",
+                  "centerNm": 573,
+                  "sigmaNm": 5,
+                  "relativeEnergy": 0.005
+                }
+              ]
+            },
+            "hudAccentSample": {
+              "mode": "afterburner",
+              "powerNorm": 1,
+              "axialFraction": 0.35,
+              "neutralDisplayMix": 0
+            }
+          },
+          "temporalParameters": {
+            "periodSeconds": 0.8,
+            "sampleCount": 32,
+            "amplitude": 0.04,
+            "harmonics": [
+              {
+                "cycles": 1,
+                "weight": 0.55,
+                "phaseRadians": 0.2
+              },
+              {
+                "cycles": 3,
+                "weight": 0.3,
+                "phaseRadians": 1.1
+              },
+              {
+                "cycles": 7,
+                "weight": 0.15,
+                "phaseRadians": 2
+              }
+            ]
+          },
+          "surfaceParameters": {
+            "sampleCount": 16,
+            "assumedTemperatureK": [
+              900,
+              1400
+            ],
+            "relativeDisplayEmission": [
+              0.02,
+              0.25
+            ]
+          },
+          "sources": [
+            {
+              "url": "https://extapps.ksc.nasa.gov/Reliability/Documents/Preferred_Practices/at9.pdf",
+              "title": "NASA Kennedy Space Center, Thermography, Technique AT-9",
+              "supports": "Page 2 explains surface thermal radiation and visible emission from sufficiently hot solids. It supports a heated-hardware glow mechanism, not F135 nozzle temperatures or display brightness."
+            },
+            {
+              "url": "https://www.dvidshub.net/image/9578175/us-marine-corps-f-35b-performs-during-luke-days-2026",
+              "title": "56th Fighter Wing, U.S. Marine Corps F-35B performs during Luke Days 2026",
+              "supports": "The caption identifies actual F-35B afterburner use; the daylight photograph shows warm visible emission. It is a qualitative representative reference, not a spectral calibration or universal hue."
+            },
+            {
+              "url": "https://ntrs.nasa.gov/citations/20140000730",
+              "title": "NASA/TM-2013-217884, Comparing a Fischer-Tropsch Alternate Fuel to JP-8 and Their 50-50 Blend",
+              "supports": "Section 4.1 describes CH* near 432 nm, C2* near 473/516/573 nm and soot-associated orange emission in jet-fuel combustor imaging. This supplies band locations and mechanisms, not F135 afterburner weights."
+            },
+            {
+              "url": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir6783.pdf",
+              "title": "NISTIR 6783, Fire Dynamics Simulator Technical Reference Guide",
+              "supports": "Section 4 treats Planck emission, absorption and continuous soot radiation; it also warns that a grey approximation can overpredict optically thin emission. The simplified continuum here is an assumption."
+            },
+            {
+              "url": "https://cie.co.at/datatable/cie-1931-colour-matching-functions-2-degree-observer",
+              "title": "CIE 2019, Colour-matching functions of CIE 1931 standard colorimetric observer",
+              "doi": "10.25039/CIE.DS.xvudnb9b",
+              "supports": "Official 1 nm observer functions used to integrate the assumed emission spectrum into XYZ."
+            }
+          ],
+          "inputs": [
+            {
+              "path": "scripts/exhaustOptics/f135-visible-approximation.json",
+              "bytes": 6260,
+              "sha256": "e78e3cc53849e7426800abbab7a8c38ccd0bee87afb7d86d01debc5621724370"
+            },
+            {
+              "path": "scripts/exhaustOptics/data/CIE_xyz_1931_2deg.csv",
+              "bytes": 24021,
+              "sha256": "fa663e3535a7e0763a745993a1f0a192eb0275ac46ad2d1befd7626841e713c1"
+            },
+            {
+              "path": "scripts/exhaustOptics/data/CIE_xyz_1931_2deg.csv_metadata.json",
+              "bytes": 3787,
+              "sha256": "03abcaecf4e63d77045ef57c4514b52c8bb1a46dd18e1f93a50044a0f4f481c8"
+            },
+            {
+              "path": "scripts/exhaustOptics/bake.mjs",
+              "bytes": 8970,
+              "sha256": "0aff8329987f1eb324e70c917d3272467f3fa4575f80b7600ed870b7bc6bad4a"
+            },
+            {
+              "path": "scripts/build-exhaust-optics.mjs",
+              "bytes": 5981,
+              "sha256": "a89f1fd44c12dc6eb65d331aba3b1ce74bf2e0879b9fcb28a35fca4257e5e365"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "f135-exhaust-lut.png",
+              "bytes": 2856,
+              "sha256": "208ae6cb513beedeb2a5e2b1f0f2ca17952ca66c2ca682733570e3f469af39a6"
+            },
+            {
+              "path": "f135ExhaustOpticalData.ts",
+              "bytes": 2159,
+              "sha256": "972aa71b408b6e49411ef667044801b8987b1f48171273acbbc76f745294c6b3"
+            }
+          ]
+        },
+        "smokeProfile": {
+          "id": "faint-aircraft-aerosol-v1",
+          "textureUrl": "https://0sfs.test/assets/engine-smoke-flipbook-LU3ukRVc.png",
+          "provenanceUrl": "https://0sfs.test/assets/engine-smoke-flipbook.manifest-B5EqNsDA.json",
+          "width": 128,
+          "height": 128,
+          "columns": 4,
+          "rows": 4,
+          "initialRadiusMeters": 0.12,
+          "finalRadiusMeters": 0.7,
+          "exitSpeedMetersPerSecond": 5,
+          "colorLinear": [
+            0.3,
+            0.3,
+            0.3
+          ],
+          "decodedRgbaBytes": 65536
+        },
+        "smokeProvenance": {
+          "schemaVersion": 1,
+          "id": "faint-aircraft-aerosol-v1",
+          "assetLicense": "AGPL-3.0-only",
+          "method": "Original deterministic procedural alpha flipbook; 16 frames, one sample per covered fragment.",
+          "orientation": "PNG first/top row is frame 0; invertY=false, no mipmaps, clamp, bilinear. Texel-centred tile UVs prevent bleed.",
+          "assumptions": [
+            "Uncalibrated faint aircraft aerosol appearance, not a measured F135 soot rate or contrail.",
+            "Radius growth and ambient-frame drift are artistic transport; no wind, buoyancy, chemistry or CFD.",
+            "Alpha blending and screen coverage affect cost. No energy saving is claimed without device measurement."
+          ],
+          "sources": [
+            {
+              "url": "https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-6-fire-vulcan-demo",
+              "purpose": "Precomputed animated smoke sprites and alpha blending method; no source imagery copied."
+            }
+          ],
+          "inputs": [
+            {
+              "path": "scripts/build-engine-smoke.mjs",
+              "sha256": "600602a5a381524ac2212c1e6a72bf70cde9fecd0545c812bb2477d13b3df774"
+            },
+            {
+              "path": "scripts/exhaustOptics/bake.mjs",
+              "sha256": "0aff8329987f1eb324e70c917d3272467f3fa4575f80b7600ed870b7bc6bad4a"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "engine-smoke-flipbook.png",
+              "width": 128,
+              "height": 128,
+              "columns": 4,
+              "rows": 4,
+              "bytes": 7900,
+              "sha256": "73c447a6b283841a81373d4d7fcb591b027fcdab1dd402d57315603285985590"
+            }
+          ]
+        }
+      },
+      "passed": false
+    },
+    {
+      "renderer": "webgpu",
+      "captures": [
+        {
+          "name": "force-base",
+          "view": "forces",
+          "native": {
+            "augmentation": false,
+            "nozzlePositionNorm": 0.30000000000000004,
+            "conversion": 0,
+            "n1Pct": 79,
+            "n2Pct": 88,
+            "thrustLbf": 9509.4464735019,
+            "fuelFlowPps": 2.235906652444949,
+            "simulationTimeS": 2.999999999999992
+          },
+          "settings": {
+            "enabled": true,
+            "sampleCount": 8,
+            "maxDistanceMeters": 2000,
+            "intensity": 1
+          },
+          "smokeSettings": {
+            "enabled": false,
+            "maxParticles": 64,
+            "emissionPerSecond": 8,
+            "lifetimeSeconds": 2,
+            "maxDistanceMeters": 1000,
+            "opacity": 0.025
+          },
+          "plume": {
+            "count": 1,
+            "visible": 1,
+            "triangles": 12,
+            "shaderReady": true,
+            "positions": [
+              [
+                0.000002037061221926706,
+                1.0146543979644775,
+                -5.074954032897949
+              ]
+            ]
+          },
+          "smoke": [],
+          "glow": [
+            {
+              "name": "darkmet2-engine-thermal",
+              "emissive": [
+                0.21825997978123124,
+                0.020240565125536215,
+                0
+              ]
+            }
+          ],
+          "forceMeshes": 0,
+          "forceLabels": [],
+          "drawCalls": 149,
+          "renderRequests": 1,
+          "frames": 9,
+          "pixelDifference": null
+        },
+        {
+          "name": "native-forces-side",
+          "view": "forces",
+          "native": {
+            "augmentation": false,
+            "nozzlePositionNorm": 0.30000000000000004,
+            "conversion": 0,
+            "n1Pct": 79,
+            "n2Pct": 88,
+            "thrustLbf": 9509.4464735019,
+            "fuelFlowPps": 2.235906652444949,
+            "simulationTimeS": 2.999999999999992
+          },
+          "settings": {
+            "enabled": true,
+            "sampleCount": 8,
+            "maxDistanceMeters": 2000,
+            "intensity": 1
+          },
+          "smokeSettings": {
+            "enabled": false,
+            "maxParticles": 64,
+            "emissionPerSecond": 8,
+            "lifetimeSeconds": 2,
+            "maxDistanceMeters": 1000,
+            "opacity": 0.025
+          },
+          "plume": {
+            "count": 1,
+            "visible": 1,
+            "triangles": 12,
+            "shaderReady": true,
+            "positions": [
+              [
+                0.000002037061221926706,
+                1.0146543979644775,
+                -5.074954032897949
+              ]
+            ]
+          },
+          "smoke": [],
+          "glow": [
+            {
+              "name": "darkmet2-engine-thermal",
+              "emissive": [
+                0.21825997978123124,
+                0.020240565125536215,
+                0
+              ]
+            }
+          ],
+          "forceMeshes": 21,
+          "forceLabels": [
+            {
+              "id": "aero-0",
+              "label": "Drag",
+              "expectedWorld": [
+                -2.106986916487262e-7,
+                0.44241868393238176,
+                -1.536387578941822
+              ],
+              "actualWorld": [
+                -2.1069870115297817e-7,
+                0.4424186646938324,
+                -1.53638756275177
+              ],
+              "worldErrorMeters": 2.5144374406837753e-8
+            },
+            {
+              "id": "aero-1",
+              "label": "Side force",
+              "expectedWorld": [
+                -0.35000433753463756,
+                0.39014399836874214,
+                4.794375177592389e-8
+              ],
+              "actualWorld": [
+                -0.3500043451786041,
+                0.3901439905166626,
+                4.794375385586136e-8
+              ],
+              "worldErrorMeters": 1.0958347415179014e-8
+            },
+            {
+              "id": "aero-2",
+              "label": "Lift",
+              "expectedWorld": [
+                0,
+                9.141611067665469,
+                0.297763520857119
+              ],
+              "actualWorld": [
+                0,
+                9.141610145568848,
+                0.29776349663734436
+              ],
+              "worldErrorMeters": 9.224146445393686e-7
+            },
+            {
+              "id": "engine-0",
+              "label": "Main engine",
+              "expectedWorld": [
+                0,
+                4.511946372076636e-17,
+                -1.9993300124683033
+              ],
+              "actualWorld": [
+                0,
+                5.924608477866054e-16,
+                -1.9993300437927246
+              ],
+              "worldErrorMeters": 3.1324421279066434e-8
+            },
+            {
+              "id": "weight",
+              "label": "Weight",
+              "expectedWorld": [
+                3.364451517820758e-7,
+                -8.570670005061313,
+                -0.3149117835024655
+              ],
+              "actualWorld": [
+                0,
+                -8.57645320892334,
+                0
+              ],
+              "worldErrorMeters": 0.31496488190864497
+            },
+            {
+              "id": "applied",
+              "label": "Applied total (excludes gravity)",
+              "expectedWorld": [
+                -0.000004684938924737831,
+                8.78847714810949,
+                1.2641082594989153
+              ],
+              "actualWorld": [
+                -0.0000046849386308167595,
+                8.788476943969727,
+                1.2641081809997559
+              ],
+              "worldErrorMeters": 2.1871250721225316e-7
+            },
+            {
+              "id": "net",
+              "label": "Net force (with gravity)",
+              "expectedWorld": [
+                -0.000005735273162333417,
+                0.30359395721830484,
+                1.2523658699472788
+              ],
+              "actualWorld": [
+                -0.000005735273134632735,
+                0.3035939633846283,
+                1.2523658275604248
+              ],
+              "worldErrorMeters": 4.283303560563239e-8
+            }
+          ],
+          "drawCalls": 170,
+          "renderRequests": 2,
+          "frames": 15,
+          "pixelDifference": {
+            "changedPixels": 10862,
+            "sumRgbDifference": 1220530,
+            "maxChannelDifference": 246
+          }
+        }
+      ],
+      "failures": [
+        "Error: Native force label does not follow its arrow tip: [{\"id\":\"aero-0\",\"label\":\"Drag\",\"expectedWorld\":[-2.106986916487262e-7,0.44241868393238176,-1.536387578941822],\"actualWorld\":[-2.1069870115297817e-7,0.4424186646938324,-1.53638756275177],\"worldErrorMeters\":2.5144374406837753e-8},{\"id\":\"aero-1\",\"label\":\"Side force\",\"expectedWorld\":[-0.35000433753463756,0.39014399836874214,4.794375177592389e-8],\"actualWorld\":[-0.3500043451786041,0.3901439905166626,4.794375385586136e-8],\"worldErrorMeters\":1.0958347415179014e-8},{\"id\":\"aero-2\",\"label\":\"Lift\",\"expectedWorld\":[0,9.141611067665469,0.297763520857119],\"actualWorld\":[0,9.141610145568848,0.29776349663734436],\"worldErrorMeters\":9.224146445393686e-7},{\"id\":\"engine-0\",\"label\":\"Main engine\",\"expectedWorld\":[0,4.511946372076636e-17,-1.9993300124683033],\"actualWorld\":[0,5.924608477866054e-16,-1.9993300437927246],\"worldErrorMeters\":3.1324421279066434e-8},{\"id\":\"weight\",\"label\":\"Weight\",\"expectedWorld\":[3.364451517820758e-7,-8.570670005061313,-0.3149117835024655],\"actualWorld\":[0,-8.57645320892334,0],\"worldErrorMeters\":0.31496488190864497},{\"id\":\"applied\",\"label\":\"Applied total (excludes gravity)\",\"expectedWorld\":[-0.000004684938924737831,8.78847714810949,1.2641082594989153],\"actualWorld\":[-0.0000046849386308167595,8.788476943969727,1.2641081809997559],\"worldErrorMeters\":2.1871250721225316e-7},{\"id\":\"net\",\"label\":\"Net force (with gravity)\",\"expectedWorld\":[-0.000005735273162333417,0.30359395721830484,1.2523658699472788],\"actualWorld\":[-0.000005735273134632735,0.3035939633846283,1.2523658275604248],\"worldErrorMeters\":4.283303560563239e-8}]\n    at file:///Users/felg/gh/0sfs/scripts/validation/f35b/check-exhaust-headless.mjs:233:104"
+      ],
+      "initial": {
+        "error": null,
+        "gpu": {
+          "backend": "webgpu",
+          "vendor": "apple",
+          "architecture": "metal-3",
+          "device": "",
+          "description": "",
+          "fallback": false
+        },
+        "asset": {
+          "triangles": 12259,
+          "meshReady": true,
+          "rigBound": [
+            "leftElevator",
+            "rightElevator",
+            "leftFlaperon",
+            "rightFlaperon",
+            "leftRudder",
+            "rightRudder",
+            "leftWheel",
+            "noseWheel",
+            "rightWheel",
+            "leftGear",
+            "rightGear",
+            "noseGear",
+            "leftDoor",
+            "rightDoor",
+            "leftNoseDoor",
+            "rightNoseDoor",
+            "topLiftDoor",
+            "leftLiftDoor",
+            "rightLiftDoor",
+            "leftEngineDoor",
+            "rightEngineDoor",
+            "leftExhaustDoor",
+            "rightExhaustDoor",
+            "vtol",
+            "feather.001",
+            "feather.002",
+            "feather.003",
+            "feather.004",
+            "feather.005",
+            "feather.006",
+            "feather.007",
+            "feather.008",
+            "feather.009",
+            "feather.010",
+            "feather.011",
+            "feather.012",
+            "feather.013",
+            "feather.014",
+            "feather.015",
+            "feather.016"
+          ]
+        },
+        "sdkIdentity": {
+          "aircraftId": "f-35b",
+          "build": {
+            "schemaVersion": 2,
+            "package": {
+              "name": "@felipegalind0/jsbsim",
+              "version": "1.2.4-fork.11"
+            },
+            "native": {
+              "origin": "https://github.com/Felipegalind0/jsbsim",
+              "commit": "c1d57a2c3860ae9ae47f2b27b84f37912042c19c",
+              "contentSha256": "fec8d16c38fd80da1446cde2b1f5523796d737eef6bac5426a7df4b11c2e2021",
+              "dirty": false
+            },
+            "sdk": {
+              "commit": "c1d57a2c3860ae9ae47f2b27b84f37912042c19c",
+              "contentSha256": "d40290a03a3c40552b8dce8c3dfb6aeb5f19587f406d7083c461bc5ec2dfb5a4",
+              "dirty": false,
+              "path": "wasm"
+            },
+            "build": {
+              "mode": "in-tree",
+              "inputSha256": "d353cac279c53cbc55c05b5231680ae85c26ae62b8b6c68a7e388fed90e0e7bc",
+              "toolchain": {
+                "node": "v26.8.2",
+                "npm": "11.19.1",
+                "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+                "cmake": "cmake version 4.4.3",
+                "clang": "clang version 24.0.0git",
+                "platform": "darwin",
+                "arch": "arm64",
+                "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+              },
+              "options": {
+                "buildType": "Release",
+                "cxxStandard": 17,
+                "sdkTarget": "es2022"
+              }
+            }
+          },
+          "assets": {
+            "moduleUrl": "https://0sfs.test/assets/jsbsim_wasm-DAhL615P.mjs",
+            "wasmUrl": "https://0sfs.test/assets/jsbsim_wasm-BSZ8OOhS.wasm"
+          }
+        },
+        "optical": {
+          "id": "f135-visible-approximation-v1",
+          "width": 64,
+          "height": 32,
+          "colorSpace": "linear-srgb",
+          "dry": {
+            "firstRow": 0,
+            "rowCount": 16
+          },
+          "afterburner": {
+            "firstRow": 16,
+            "rowCount": 16
+          },
+          "hudAccentHex": "#ff9450",
+          "surfaceEmission": {
+            "samples": [
+              [
+                0.02,
+                0,
+                0
+              ],
+              [
+                0.03533333,
+                0,
+                0
+              ],
+              [
+                0.05066667,
+                0.00003527,
+                0
+              ],
+              [
+                0.066,
+                0.00056824,
+                0
+              ],
+              [
+                0.08133333,
+                0.00135075,
+                0
+              ],
+              [
+                0.09666667,
+                0.00238571,
+                0
+              ],
+              [
+                0.112,
+                0.00367551,
+                0
+              ],
+              [
+                0.12733333,
+                0.00522207,
+                0
+              ],
+              [
+                0.14266667,
+                0.00702687,
+                0
+              ],
+              [
+                0.158,
+                0.00909101,
+                0
+              ],
+              [
+                0.17333333,
+                0.01141524,
+                0
+              ],
+              [
+                0.18866667,
+                0.01399998,
+                0
+              ],
+              [
+                0.204,
+                0.01684537,
+                0
+              ],
+              [
+                0.21933333,
+                0.01995128,
+                0
+              ],
+              [
+                0.23466667,
+                0.02331735,
+                0
+              ],
+              [
+                0.25,
+                0.02694297,
+                0
+              ]
+            ]
+          },
+          "temporalEmission": {
+            "periodSeconds": 0.8,
+            "samples": [
+              1.020521,
+              1.01902484,
+              1.01541466,
+              1.01791022,
+              1.02024696,
+              1.01407798,
+              1.00523472,
+              1.00666866,
+              1.01861519,
+              1.02754827,
+              1.02582603,
+              1.02112685,
+              1.02147446,
+              1.02087689,
+              1.00923438,
+              0.99053833,
+              0.979479,
+              0.98097516,
+              0.98458534,
+              0.98208978,
+              0.97975304,
+              0.98592202,
+              0.99476528,
+              0.99333134,
+              0.98138481,
+              0.97245173,
+              0.97417397,
+              0.97887315,
+              0.97852554,
+              0.97912311,
+              0.99076562,
+              1.00946167
+            ]
+          },
+          "textureUrl": "https://0sfs.test/assets/f135-exhaust-lut-Be0PF3Dm.png",
+          "provenanceUrl": "https://0sfs.test/assets/f135-exhaust-lut.manifest-DRqevrja.json",
+          "decodedRgbaBytes": 8192
+        },
+        "opticalProvenance": {
+          "schemaVersion": 1,
+          "profile": {
+            "id": "f135-visible-approximation-v1",
+            "width": 64,
+            "height": 32,
+            "colorSpace": "linear-srgb",
+            "dry": {
+              "firstRow": 0,
+              "rowCount": 16
+            },
+            "afterburner": {
+              "firstRow": 16,
+              "rowCount": 16
+            },
+            "hudAccentHex": "#ff9450",
+            "surfaceEmission": {
+              "samples": [
+                [
+                  0.02,
+                  0,
+                  0
+                ],
+                [
+                  0.03533333,
+                  0,
+                  0
+                ],
+                [
+                  0.05066667,
+                  0.00003527,
+                  0
+                ],
+                [
+                  0.066,
+                  0.00056824,
+                  0
+                ],
+                [
+                  0.08133333,
+                  0.00135075,
+                  0
+                ],
+                [
+                  0.09666667,
+                  0.00238571,
+                  0
+                ],
+                [
+                  0.112,
+                  0.00367551,
+                  0
+                ],
+                [
+                  0.12733333,
+                  0.00522207,
+                  0
+                ],
+                [
+                  0.14266667,
+                  0.00702687,
+                  0
+                ],
+                [
+                  0.158,
+                  0.00909101,
+                  0
+                ],
+                [
+                  0.17333333,
+                  0.01141524,
+                  0
+                ],
+                [
+                  0.18866667,
+                  0.01399998,
+                  0
+                ],
+                [
+                  0.204,
+                  0.01684537,
+                  0
+                ],
+                [
+                  0.21933333,
+                  0.01995128,
+                  0
+                ],
+                [
+                  0.23466667,
+                  0.02331735,
+                  0
+                ],
+                [
+                  0.25,
+                  0.02694297,
+                  0
+                ]
+              ]
+            },
+            "temporalEmission": {
+              "periodSeconds": 0.8,
+              "samples": [
+                1.020521,
+                1.01902484,
+                1.01541466,
+                1.01791022,
+                1.02024696,
+                1.01407798,
+                1.00523472,
+                1.00666866,
+                1.01861519,
+                1.02754827,
+                1.02582603,
+                1.02112685,
+                1.02147446,
+                1.02087689,
+                1.00923438,
+                0.99053833,
+                0.979479,
+                0.98097516,
+                0.98458534,
+                0.98208978,
+                0.97975304,
+                0.98592202,
+                0.99476528,
+                0.99333134,
+                0.98138481,
+                0.97245173,
+                0.97417397,
+                0.97887315,
+                0.97852554,
+                0.97912311,
+                0.99076562,
+                1.00946167
+              ]
+            }
+          },
+          "assetLicense": "CC-BY-SA-4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "attribution": "CIE 2019, Colour-matching functions of CIE 1931 standard colorimetric observer, International Commission on Illumination (CIE), Vienna, AT, DOI:10.25039/CIE.DS.xvudnb9b. Adapted by 0sfs into an assumed emission RGB lookup.",
+          "rgbMeaning": "Peak-normalized linear-sRGB emission; alpha is separately assumed relative intensity. Not absolute radiance.",
+          "uvMeaning": "U axial fraction: (0.5+axial*(width-1))/width. V within selected bank: (firstRow+0.5+power*(rowCount-1))/height. Clamp axes; do not filter across banks.",
+          "orientation": "PNG first/top scanline is dry bank row 0. Use Babylon invertY=false; texture V=0 addresses that first/top row.",
+          "assumptions": [
+            "Temperatures, component energy fractions, band widths, emission intensity and axial falloff are declared visual assumptions, not measured F135 exhaust quantities.",
+            "The power axis is a normalized native engine operating observation supplied by the installation; it is not an inferred flame temperature or pilot throttle command.",
+            "A grey-soot Planck continuum and simplified Gaussian radical bands represent shared hydrocarbon emission mechanisms, not resolved molecular spectroscopy or combustion kinetics.",
+            "Each component spectrum is normalized by its integrated visible radiant energy over 360–830 nm before mixing. Soot fractions describe relative energy in this window, not soot mass fraction, molecular abundance or all-wavelength radiation.",
+            "The default is an openly assumed soot-dominated warm reference, qualitatively consistent with a documented daylight F-35B afterburner photo. Available JP-8 laboratory evidence does not determine these F135 fractions. Other fractions can produce blue or violet, so this is not a unique computed F135 color.",
+            "The dry bank contains only very faint thermal continuum; the afterburner bank must be selected only from actual native augmentation and an operating engine.",
+            "The separate hot-hardware table is a Planck-continuum color proxy with explicitly assumed 900–1400 K temperatures and 0.02–0.25 linear display emission. Native power selects the table row; it is not measured F135 wall temperature, calibrated radiance or thermal inertia. It applies only to declared nozzle-interior material bindings and never makes the dry exhaust tail brighter.",
+            "Optical depth, soot loading, excited-state populations, pressure, mixing and shock-cell spectral effects are unknown. Static shock-cell spacing and contrast are a baked visual assumption, not a pressure-derived solution. There is no absolute radiance or F135 photometric calibration.",
+            "The optional 32-sample, 0.8-second periodic emission multiplier is an artistic brightness fluctuation bounded within plus/minus 4 percent. It is not measured F135 combustion instability, vibration or acoustic physics. Playback uses native simulation time and holds on pause.",
+            "RGB is linear sRGB with negative out-of-gamut channels clipped and each spectrum normalized by its largest RGB channel. Alpha supplies a separately assumed relative envelope. Exposure and tone mapping belong to the renderer.",
+            "The HUD samples the same assumed afterburner spectrum and applies sRGB display encoding without a separate whitening or recoloring step. This display accent is not a photometric exhaust-color measurement."
+          ],
+          "opticalParameters": {
+            "dry": {
+              "assumedSootTemperatureK": [
+                900,
+                1400
+              ],
+              "axialCoolingK": 300,
+              "relativeEmission": [
+                0,
+                0.012
+              ],
+              "axialFalloff": 9
+            },
+            "afterburner": {
+              "assumedSootTemperatureK": [
+                1800,
+                2500
+              ],
+              "axialCoolingK": 900,
+              "relativeEmission": [
+                0.3,
+                1
+              ],
+              "axialFalloff": 2.6,
+              "sootEnergyFractionAtNozzle": 0.995,
+              "sootEnergyFractionAtTail": 0.985,
+              "sootMixFalloff": 2,
+              "assumedShockCells": {
+                "countAtPower": [
+                  4,
+                  7
+                ],
+                "contrast": 0.6,
+                "axialDamping": 1.8,
+                "phaseRadians": 0.15
+              },
+              "assumedBands": [
+                {
+                  "species": "CH*",
+                  "centerNm": 432,
+                  "sigmaNm": 3,
+                  "relativeEnergy": 1
+                },
+                {
+                  "species": "C2*",
+                  "centerNm": 473,
+                  "sigmaNm": 5,
+                  "relativeEnergy": 0.45
+                },
+                {
+                  "species": "C2*",
+                  "centerNm": 516,
+                  "sigmaNm": 5,
+                  "relativeEnergy": 0.015
+                },
+                {
+                  "species": "C2*",
+                  "centerNm": 573,
+                  "sigmaNm": 5,
+                  "relativeEnergy": 0.005
+                }
+              ]
+            },
+            "hudAccentSample": {
+              "mode": "afterburner",
+              "powerNorm": 1,
+              "axialFraction": 0.35,
+              "neutralDisplayMix": 0
+            }
+          },
+          "temporalParameters": {
+            "periodSeconds": 0.8,
+            "sampleCount": 32,
+            "amplitude": 0.04,
+            "harmonics": [
+              {
+                "cycles": 1,
+                "weight": 0.55,
+                "phaseRadians": 0.2
+              },
+              {
+                "cycles": 3,
+                "weight": 0.3,
+                "phaseRadians": 1.1
+              },
+              {
+                "cycles": 7,
+                "weight": 0.15,
+                "phaseRadians": 2
+              }
+            ]
+          },
+          "surfaceParameters": {
+            "sampleCount": 16,
+            "assumedTemperatureK": [
+              900,
+              1400
+            ],
+            "relativeDisplayEmission": [
+              0.02,
+              0.25
+            ]
+          },
+          "sources": [
+            {
+              "url": "https://extapps.ksc.nasa.gov/Reliability/Documents/Preferred_Practices/at9.pdf",
+              "title": "NASA Kennedy Space Center, Thermography, Technique AT-9",
+              "supports": "Page 2 explains surface thermal radiation and visible emission from sufficiently hot solids. It supports a heated-hardware glow mechanism, not F135 nozzle temperatures or display brightness."
+            },
+            {
+              "url": "https://www.dvidshub.net/image/9578175/us-marine-corps-f-35b-performs-during-luke-days-2026",
+              "title": "56th Fighter Wing, U.S. Marine Corps F-35B performs during Luke Days 2026",
+              "supports": "The caption identifies actual F-35B afterburner use; the daylight photograph shows warm visible emission. It is a qualitative representative reference, not a spectral calibration or universal hue."
+            },
+            {
+              "url": "https://ntrs.nasa.gov/citations/20140000730",
+              "title": "NASA/TM-2013-217884, Comparing a Fischer-Tropsch Alternate Fuel to JP-8 and Their 50-50 Blend",
+              "supports": "Section 4.1 describes CH* near 432 nm, C2* near 473/516/573 nm and soot-associated orange emission in jet-fuel combustor imaging. This supplies band locations and mechanisms, not F135 afterburner weights."
+            },
+            {
+              "url": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir6783.pdf",
+              "title": "NISTIR 6783, Fire Dynamics Simulator Technical Reference Guide",
+              "supports": "Section 4 treats Planck emission, absorption and continuous soot radiation; it also warns that a grey approximation can overpredict optically thin emission. The simplified continuum here is an assumption."
+            },
+            {
+              "url": "https://cie.co.at/datatable/cie-1931-colour-matching-functions-2-degree-observer",
+              "title": "CIE 2019, Colour-matching functions of CIE 1931 standard colorimetric observer",
+              "doi": "10.25039/CIE.DS.xvudnb9b",
+              "supports": "Official 1 nm observer functions used to integrate the assumed emission spectrum into XYZ."
+            }
+          ],
+          "inputs": [
+            {
+              "path": "scripts/exhaustOptics/f135-visible-approximation.json",
+              "bytes": 6260,
+              "sha256": "e78e3cc53849e7426800abbab7a8c38ccd0bee87afb7d86d01debc5621724370"
+            },
+            {
+              "path": "scripts/exhaustOptics/data/CIE_xyz_1931_2deg.csv",
+              "bytes": 24021,
+              "sha256": "fa663e3535a7e0763a745993a1f0a192eb0275ac46ad2d1befd7626841e713c1"
+            },
+            {
+              "path": "scripts/exhaustOptics/data/CIE_xyz_1931_2deg.csv_metadata.json",
+              "bytes": 3787,
+              "sha256": "03abcaecf4e63d77045ef57c4514b52c8bb1a46dd18e1f93a50044a0f4f481c8"
+            },
+            {
+              "path": "scripts/exhaustOptics/bake.mjs",
+              "bytes": 8970,
+              "sha256": "0aff8329987f1eb324e70c917d3272467f3fa4575f80b7600ed870b7bc6bad4a"
+            },
+            {
+              "path": "scripts/build-exhaust-optics.mjs",
+              "bytes": 5981,
+              "sha256": "a89f1fd44c12dc6eb65d331aba3b1ce74bf2e0879b9fcb28a35fca4257e5e365"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "f135-exhaust-lut.png",
+              "bytes": 2856,
+              "sha256": "208ae6cb513beedeb2a5e2b1f0f2ca17952ca66c2ca682733570e3f469af39a6"
+            },
+            {
+              "path": "f135ExhaustOpticalData.ts",
+              "bytes": 2159,
+              "sha256": "972aa71b408b6e49411ef667044801b8987b1f48171273acbbc76f745294c6b3"
+            }
+          ]
+        },
+        "smokeProfile": {
+          "id": "faint-aircraft-aerosol-v1",
+          "textureUrl": "https://0sfs.test/assets/engine-smoke-flipbook-LU3ukRVc.png",
+          "provenanceUrl": "https://0sfs.test/assets/engine-smoke-flipbook.manifest-B5EqNsDA.json",
+          "width": 128,
+          "height": 128,
+          "columns": 4,
+          "rows": 4,
+          "initialRadiusMeters": 0.12,
+          "finalRadiusMeters": 0.7,
+          "exitSpeedMetersPerSecond": 5,
+          "colorLinear": [
+            0.3,
+            0.3,
+            0.3
+          ],
+          "decodedRgbaBytes": 65536
+        },
+        "smokeProvenance": {
+          "schemaVersion": 1,
+          "id": "faint-aircraft-aerosol-v1",
+          "assetLicense": "AGPL-3.0-only",
+          "method": "Original deterministic procedural alpha flipbook; 16 frames, one sample per covered fragment.",
+          "orientation": "PNG first/top row is frame 0; invertY=false, no mipmaps, clamp, bilinear. Texel-centred tile UVs prevent bleed.",
+          "assumptions": [
+            "Uncalibrated faint aircraft aerosol appearance, not a measured F135 soot rate or contrail.",
+            "Radius growth and ambient-frame drift are artistic transport; no wind, buoyancy, chemistry or CFD.",
+            "Alpha blending and screen coverage affect cost. No energy saving is claimed without device measurement."
+          ],
+          "sources": [
+            {
+              "url": "https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-6-fire-vulcan-demo",
+              "purpose": "Precomputed animated smoke sprites and alpha blending method; no source imagery copied."
+            }
+          ],
+          "inputs": [
+            {
+              "path": "scripts/build-engine-smoke.mjs",
+              "sha256": "600602a5a381524ac2212c1e6a72bf70cde9fecd0545c812bb2477d13b3df774"
+            },
+            {
+              "path": "scripts/exhaustOptics/bake.mjs",
+              "sha256": "0aff8329987f1eb324e70c917d3272467f3fa4575f80b7600ed870b7bc6bad4a"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "engine-smoke-flipbook.png",
+              "width": 128,
+              "height": 128,
+              "columns": 4,
+              "rows": 4,
+              "bytes": 7900,
+              "sha256": "73c447a6b283841a81373d4d7fcb591b027fcdab1dd402d57315603285985590"
+            }
+          ]
+        }
+      },
+      "passed": false
+    }
+  ],
+  "network": [
+    {
+      "path": "/",
+      "bytes": 269,
+      "sha256": "ec07e9afc8c190976b313585c4c00a909ec7ec5a49da594ba70cc2f30259c1f2"
+    },
+    {
+      "path": "/assets/index-kLKK_sqf.js",
+      "bytes": 12771253,
+      "sha256": "a1718052914f9085d1b9fbf159aeb4d85fe46d385a3327b79936c61aa2506c0b"
+    },
+    {
+      "path": "/jsbsim-data/manifest.json",
+      "bytes": 1098,
+      "sha256": "448049a4e922630c251ebfa2f5245457799fed5502380cb4db6f35cf5ea45d42"
+    },
+    {
+      "path": "/assets/jsbsim_wasm-DAhL615P.mjs",
+      "bytes": 135090,
+      "sha256": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2"
+    },
+    {
+      "path": "/jsbsim-data/aircraft/F-35B-jsbsim/Engines/liftfan.xml",
+      "bytes": 3298,
+      "sha256": "9ded9a6a93eeab2dac35c779b51945b9e5cf0807591737b67262b27c5ab67287"
+    },
+    {
+      "path": "/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+      "bytes": 4769,
+      "sha256": "09b7eb9c8c9ea5ca720ae1974f4d1ef5d7fb35e6b8248415c6cfcc307c57891c"
+    },
+    {
+      "path": "/jsbsim-data/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml",
+      "bytes": 49653,
+      "sha256": "77a35afdc925c45dba63c237bf258f5706a06ea951816c946d882d0c2ec2055b"
+    },
+    {
+      "path": "/jsbsim-data/aircraft/F-35B-jsbsim/Engines/direct.xml",
+      "bytes": 114,
+      "sha256": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc"
+    },
+    {
+      "path": "/jsbsim-data/aircraft/F-35B-jsbsim/Systems/pushback.xml",
+      "bytes": 1127,
+      "sha256": "868928e9b2b12440daec283260aebb1562d05154f69438f5d95043444378a4bc"
+    },
+    {
+      "path": "/jsbsim-data/aircraft/F-35B-jsbsim/Engines/sidefan.xml",
+      "bytes": 3052,
+      "sha256": "90e1017803f4d9f46285ee09b2aed37d01cee82053e612ffabcf7a19816571ae"
+    },
+    {
+      "path": "/assets/jsbsim_wasm-BSZ8OOhS.wasm",
+      "bytes": 2209527,
+      "sha256": "ad1a8a1288ba7895c24e9f8701c754f4f7266703b7ea4f7d6325e5974132b1f3"
+    },
+    {
+      "path": "/aircraft/f-35b/F-35B_AF267.glb",
+      "bytes": 1504592,
+      "sha256": "8324d792711a8aecd74988dd9e314b3b4e6f1f3a819591ce60f34caa004d7fbd"
+    },
+    {
+      "path": "/assets/engine-smoke-flipbook.manifest-B5EqNsDA.json",
+      "bytes": 1489,
+      "sha256": "85ced3ece6cc4763b736320f5567bee9e646ccda1eb198ff7c79546109041b30"
+    },
+    {
+      "path": "/assets/f135-exhaust-lut.manifest-DRqevrja.json",
+      "bytes": 11006,
+      "sha256": "f6265447eb2f07cbe96098388bf2ae967d0c4c1039ba97ccaa23c7b1e6bdb5ea"
+    },
+    {
+      "path": "/assets/f135-exhaust-lut-Be0PF3Dm.png",
+      "bytes": 2856,
+      "sha256": "208ae6cb513beedeb2a5e2b1f0f2ca17952ca66c2ca682733570e3f469af39a6"
+    },
+    {
+      "path": "/",
+      "bytes": 269,
+      "sha256": "ec07e9afc8c190976b313585c4c00a909ec7ec5a49da594ba70cc2f30259c1f2"
+    },
+    {
+      "path": "/assets/index-kLKK_sqf.js",
+      "bytes": 12771253,
+      "sha256": "a1718052914f9085d1b9fbf159aeb4d85fe46d385a3327b79936c61aa2506c0b"
+    },
+    {
+      "path": "/jsbsim-data/manifest.json",
+      "bytes": 1098,
+      "sha256": "448049a4e922630c251ebfa2f5245457799fed5502380cb4db6f35cf5ea45d42"
+    },
+    {
+      "path": "/assets/jsbsim_wasm-DAhL615P.mjs",
+      "bytes": 135090,
+      "sha256": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2"
+    },
+    {
+      "path": "/jsbsim-data/aircraft/F-35B-jsbsim/Engines/direct.xml",
+      "bytes": 114,
+      "sha256": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc"
+    },
+    {
+      "path": "/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+      "bytes": 4769,
+      "sha256": "09b7eb9c8c9ea5ca720ae1974f4d1ef5d7fb35e6b8248415c6cfcc307c57891c"
+    },
+    {
+      "path": "/jsbsim-data/aircraft/F-35B-jsbsim/Engines/liftfan.xml",
+      "bytes": 3298,
+      "sha256": "9ded9a6a93eeab2dac35c779b51945b9e5cf0807591737b67262b27c5ab67287"
+    },
+    {
+      "path": "/jsbsim-data/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml",
+      "bytes": 49653,
+      "sha256": "77a35afdc925c45dba63c237bf258f5706a06ea951816c946d882d0c2ec2055b"
+    },
+    {
+      "path": "/jsbsim-data/aircraft/F-35B-jsbsim/Engines/sidefan.xml",
+      "bytes": 3052,
+      "sha256": "90e1017803f4d9f46285ee09b2aed37d01cee82053e612ffabcf7a19816571ae"
+    },
+    {
+      "path": "/jsbsim-data/aircraft/F-35B-jsbsim/Systems/pushback.xml",
+      "bytes": 1127,
+      "sha256": "868928e9b2b12440daec283260aebb1562d05154f69438f5d95043444378a4bc"
+    },
+    {
+      "path": "/assets/jsbsim_wasm-BSZ8OOhS.wasm",
+      "bytes": 2209527,
+      "sha256": "ad1a8a1288ba7895c24e9f8701c754f4f7266703b7ea4f7d6325e5974132b1f3"
+    },
+    {
+      "path": "/aircraft/f-35b/F-35B_AF267.glb",
+      "bytes": 1504592,
+      "sha256": "8324d792711a8aecd74988dd9e314b3b4e6f1f3a819591ce60f34caa004d7fbd"
+    },
+    {
+      "path": "/assets/engine-smoke-flipbook.manifest-B5EqNsDA.json",
+      "bytes": 1489,
+      "sha256": "85ced3ece6cc4763b736320f5567bee9e646ccda1eb198ff7c79546109041b30"
+    },
+    {
+      "path": "/assets/f135-exhaust-lut.manifest-DRqevrja.json",
+      "bytes": 11006,
+      "sha256": "f6265447eb2f07cbe96098388bf2ae967d0c4c1039ba97ccaa23c7b1e6bdb5ea"
+    },
+    {
+      "path": "/assets/f135-exhaust-lut-Be0PF3Dm.png",
+      "bytes": 2856,
+      "sha256": "208ae6cb513beedeb2a5e2b1f0f2ca17952ca66c2ca682733570e3f469af39a6"
+    }
+  ],
+  "browserErrors": [],
+  "failures": [],
+  "passed": false
+}

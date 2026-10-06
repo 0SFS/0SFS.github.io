@@ -1,15 +1,15 @@
-import { AUDIO_EVENT } from "./audioSnapshot";
-import { audioDspWasmUrl, audioWorkletUrl } from "./audioAssets";
+import { AUDIO_EVENT, AVAILABILITY } from "./audioSnapshot";
 import {
   AVAILABILITY_LABELS, TIER_INDEX, TIER_ORDER, createFallbackController,
   formatAudioStats, quantumMilliseconds, resolveRequestedTier, tierAvailability,
-  type AudioCapabilities, type FallbackController, type TierAvailability, type TierId,
+  type AudioCapabilities, type AudioQualificationContext, type FallbackController, type TierAvailability, type TierId,
 } from "./audioQuality";
 import type { AudioQualityId, AudioSettingsStore, AudioSettingsV1, SoundTierLimits } from "./audioSettings";
 import { createPortTransport, createSabTransport, isSharedMemoryAvailable, type AudioTransport } from "./audioTransport";
 import { toSnapshot, type AudioAdapter, type AudioAdapterReading } from "./jsbsimAudioAdapter";
 import { computeListenerPose, createListenerPose, type ListenerPose, type ListenerPoseInput } from "./audioPose";
-import type { AudioBankInstallBand } from "./audioBank";
+import type { AudioBankInstallation } from "./audioBank";
+import { getAudioRenderer, rendererAdmission, type AudioRendererRegistration } from "./audioRendererRegistry";
 
 /**
  * The application's single sound owner.
@@ -47,8 +47,6 @@ export interface FlightAudioStatus {
   held: boolean;
   settings: AudioSettingsV1;
   readOnlyReason: string | null;
-  /** Session-only testing override for tiers without device evidence. */
-  allowUnvalidated: boolean;
   /** Last engine telemetry sent to the core; null unless engine sound is running. */
   engine: { n1Pct: number; n2Pct: number; fuelFlowPps: number; combustion: boolean; running: boolean } | null;
   /** Core timeline counters from the worklet, refreshed at 1 Hz. */
@@ -62,11 +60,11 @@ export interface FlightAudioStatus {
     grains: number; startsPerSecond: number; irMilliseconds: number;
   } | null;
   /** Adapter diagnostics: which combustion rule ran, which properties are absent. */
-  telemetry: { combustionSource: string; missing: readonly string[] } | null;
+  telemetry: { combustionSource: string; missing: readonly string[]; profileLabel?: string; approximation?: string } | null;
 }
 
 /** What the render loop knows about the view; the facade supplies source geometry and velocity. */
-export type FlightAudioView = Pick<ListenerPoseInput, "camera" | "aircraftRoot" | "exterior" | "heightAboveGroundM">;
+export type FlightAudioView = Pick<ListenerPoseInput, "camera" | "cockpitCamera" | "aircraftRoot" | "exterior" | "heightAboveGroundM">;
 
 export interface FlightAudioOptions {
   settings: AudioSettingsStore;
@@ -76,6 +74,8 @@ export interface FlightAudioOptions {
   unlockTarget?: EventTarget | null;
   onStatusChange?: (status: FlightAudioStatus) => void;
   now?: () => number;
+  /** Explicitly identified device/build/route; absence remains unqualified. Never infer from user agent. */
+  qualificationContext?: () => AudioQualificationContext | undefined;
   /** Test seams. Production leaves all of these unset. */
   loadWasm?: () => Promise<BufferSource>;
   workletModuleUrl?: string;
@@ -98,13 +98,25 @@ function detectCapabilities(overrides?: Partial<AudioCapabilities>): AudioCapabi
   return {
     audioWorklet: typeof scope.AudioWorkletNode === "function",
     webAssembly: typeof WebAssembly === "object" && typeof WebAssembly.compile === "function",
-    // No licensed FJ33 bank exists (sound.md §4), so High is never admitted.
+    // Banks are experimental tooling; renderer capability admits procedural High.
     bankReady: false,
     // No portable per-block CPU or underrun counter is implemented here, so the
     // controller has nothing to shed on. §1 calls that out as a known gap.
     loadObservable: false,
     ...overrides,
   };
+}
+
+/** Identify the bytes actually compiled, not a caller's claimed build. A browser
+ * without a working digest can still play manually; it cannot match qualification. */
+async function dspFingerprint(bytes: BufferSource): Promise<string | undefined> {
+  if (!globalThis.crypto?.subtle) return undefined;
+  try {
+    const data = bytes instanceof ArrayBuffer ? bytes
+      : new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength).slice().buffer;
+    const hash = new Uint8Array(await crypto.subtle.digest("SHA-256", data));
+    return Array.from(hash, value => value.toString(16).padStart(2, "0")).join("");
+  } catch { return undefined; }
 }
 
 /**
@@ -135,9 +147,8 @@ export interface FlightAudioHandle {
   setEnabled(enabled: boolean): void;
   setQuality(quality: AudioQualityId): void;
   patchSettings(patch: Partial<Pick<AudioSettingsV1,
-    "masterVolume" | "engineVolume" | "airframeVolume" | "engineMuted" | "reducedDynamicRange">>): void;
-  /** Session-only: let an explicit Med/High request run without device evidence, for testing. */
-  setAllowUnvalidated(allow: boolean): void;
+    "masterVolume" | "engineVolume" | "airframeVolume" | "afterburnerVolume" | "listenerCockpitBlend"
+    | "engineMuted" | "reducedDynamicRange">>): void;
   /** Explicit re-test after a downgrade (sound.md §1, §6). */
   retest(): void;
   /**
@@ -166,10 +177,10 @@ export interface FlightAudioHandle {
   beginEpoch(): void;
   isEngineActive(): boolean;
   /**
-   * Hands a verified, context-rate Tier 3 bank to the running core. High still
-   * needs a qualified profile; a bank alone admits nothing. No bank ships today.
+   * Legacy experimental API. No production renderer implements a residual-bank
+   * contract, so installation is rejected; procedural High needs no recordings.
    */
-  installBank(bands: readonly AudioBankInstallBand[]): Promise<boolean>;
+  installBank(bank: AudioBankInstallation): Promise<boolean>;
   getStatus(): FlightAudioStatus;
   dispose(): void;
 }
@@ -189,17 +200,18 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
   let node: AudioWorkletNode | null = null;
   let transport: AudioTransport | null = null;
   let adapter: AudioAdapter | null = null;
+  let renderer: AudioRendererRegistration | null = null;
   let lastReading: AudioAdapterReading | null = null;
   let fallback: FallbackController | null = null;
   /** Compiled once and kept, so a fatal node can be replaced without refetching. */
-  let compiled: WebAssembly.Module | null = null;
+  const compiled = new Map<string, { module: WebAssembly.Module; sha256?: string }>();
+  let activeDspSha256: string | undefined;
 
   let disposed = false;
   let held = false;
   /** Every active hold, so releasing "background" cannot end a "pause". */
   const holds = new Set<AudioHoldReason>();
   let tireHeld = false;
-  let allowUnvalidated = false;
   let suspendTimer: ReturnType<typeof setTimeout> | null = null;
   let lastStats: number[] | null = null;
   let gestureLocked = false;
@@ -221,25 +233,33 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
   let previousCombustion: boolean | null = null;
   let previousRunning: boolean | null = null;
   let previousStarter: boolean | null = null;
-  /** Worklet replies to "band" messages, by band index. */
-  const bandWaiters = new Map<number, (accepted: boolean) => void>();
 
   /** Tier 0 ("Off") allocates no graph, so "enabled at Off" wants no engine. */
-  const engineWanted = (): boolean => settings.enabled && settings.requested !== "off";
+  const engineWanted = (): boolean => settings.enabled && settings.requested !== "off"
+    && adapter !== null && renderer !== null;
   const wantsGraph = (): boolean => !disposed && (engineWanted() || tireCue.enabled);
   const mode = (): FlightAudioMode => engineWanted() ? "sound" : tireCue.enabled ? "tire-only" : "off";
 
-  const availability = (): Record<TierId, TierAvailability> => ({
-    off: tierAvailability("off", capabilities),
-    low: tierAvailability("low", capabilities),
-    med: tierAvailability("med", capabilities),
-    high: tierAvailability("high", capabilities),
-  });
+  const qualificationContext = (): AudioQualificationContext | undefined => {
+    const identified = options.qualificationContext?.();
+    return identified && context && transport && adapter?.diagnostics.profile
+      && identified.engineDefinitionId === adapter.diagnostics.profile.id && identified.rendererId === renderer?.id
+      && identified.sampleRateHz === context.sampleRate && identified.transport === transport.kind
+      && activeDspSha256 !== undefined && identified.dspSha256 === activeDspSha256
+      ? identified : undefined;
+  };
+  const availability = (): Record<TierId, TierAvailability> => {
+    const identified = qualificationContext();
+    return {
+      off: tierAvailability("off", capabilities, undefined, identified),
+      low: tierAvailability("low", capabilities, undefined, identified),
+      med: tierAvailability("med", capabilities, undefined, identified),
+      high: tierAvailability("high", capabilities, undefined, identified),
+    };
+  };
 
   const requestedTier = (): TierId => {
-    if (engineWanted()) {
-      return resolveRequestedTier(settings.requested, capabilities, undefined, { allowUnvalidated }).tier;
-    }
+    if (engineWanted()) return resolveRequestedTier(settings.requested, capabilities, undefined, qualificationContext()).tier;
     // The tire cue alone runs on the cheapest audible tier with the engine gain at zero.
     return tierAvailability("low", capabilities).state === "available" ? "low" : "off";
   };
@@ -275,7 +295,6 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
     held,
     settings,
     readOnlyReason: options.settings.readOnlyReason,
-    allowUnvalidated,
     engine: lastReading && node && engineWanted()
       ? {
         n1Pct: lastReading.n1Pct, n2Pct: lastReading.n2Pct, fuelFlowPps: lastReading.fuelFlowPps,
@@ -296,7 +315,10 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
       }
       : null,
     telemetry: adapter
-      ? { combustionSource: adapter.diagnostics.combustionSource, missing: adapter.diagnostics.missing }
+      ? {
+        combustionSource: adapter.diagnostics.combustionSource, missing: adapter.diagnostics.missing,
+        profileLabel: adapter.diagnostics.profile?.label, approximation: adapter.diagnostics.profile?.approximation,
+      }
       : null,
   });
 
@@ -359,6 +381,7 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
     return {
       master: sound ? settings.masterVolume : 1,
       engine: sound && !settings.engineMuted ? settings.engineVolume : 0,
+      afterburner: settings.afterburnerVolume,
       airframe: sound ? settings.airframeVolume : 0,
       tire: tireCue.enabled ? tireCue.volume : 0,
       reducedRange: settings.reducedDynamicRange ? 1 : 0,
@@ -390,12 +413,10 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
       void current.close().catch(() => { /* Disposal stays final. */ });
     }
     fallback = null;
+    activeDspSha256 = undefined;
     lastStats = null;
     if (suspendTimer) { clearTimeout(suspendTimer); suspendTimer = null; }
-    // Installed bands lived in the worklet's memory, which has just gone.
     capabilities.bankReady = false;
-    for (const resolve of bandWaiters.values()) resolve(false);
-    bandWaiters.clear();
     refreshStats();
   };
 
@@ -437,14 +458,9 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
   const onWorkletMessage = (event: MessageEvent): void => {
     if (transport?.handleMessage(event.data)) return;
     const data = event.data as {
-      type?: string; values?: number[]; reason?: string; index?: number; accepted?: boolean;
+      type?: string; values?: number[]; reason?: string; index?: number; accepted?: boolean; requestId?: number;
     } | null;
     if (!data) return;
-    if (data.type === "band" && typeof data.index === "number") {
-      bandWaiters.get(data.index)?.(data.accepted === true);
-      bandWaiters.delete(data.index);
-      return;
-    }
     if (data.type === "failed") {
       faulted = true;
       message = `Sound could not start: ${data.reason ?? "unknown reason"}`;
@@ -518,7 +534,7 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
     const tier = requestedTier();
     if (tier === "off") {
       message = engineWanted()
-        ? resolveRequestedTier(settings.requested, capabilities, undefined, { allowUnvalidated }).reason ?? `${AVAILABILITY_LABELS.unsupported}.`
+        ? resolveRequestedTier(settings.requested, capabilities).reason ?? `${AVAILABILITY_LABELS.unsupported}.`
         : "Tire sound is unavailable in this browser.";
       notify();
       return;
@@ -545,16 +561,23 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
     void resumeContext();
 
     try {
+      // Tire-only playback uses the common output kernel with no engine source.
+      // This is not a default acoustic definition for an unknown engine.
+      const selectedRenderer = renderer ?? getAudioRenderer("procedural-jet-v1")!;
+      const binaryKey = selectedRenderer.wasmUrl.toString() + "#" + selectedRenderer.abi.id;
       const [bytes] = await Promise.all([
-        options.loadWasm
+        compiled.has(binaryKey) ? null : options.loadWasm
           ? options.loadWasm()
-          : fetch(audioDspWasmUrl.toString()).then((response) => {
+          : fetch(selectedRenderer.wasmUrl.toString()).then((response) => {
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return response.arrayBuffer();
           }),
-        current.audioWorklet.addModule(options.workletModuleUrl ?? audioWorkletUrl.toString()),
+        current.audioWorklet.addModule(options.workletModuleUrl ?? selectedRenderer.workletUrl.toString()),
       ]);
-      compiled ??= await WebAssembly.compile(bytes);
+      if (bytes) {
+        const [module, sha256] = await Promise.all([WebAssembly.compile(bytes), dspFingerprint(bytes)]);
+        compiled.set(binaryKey, { module, sha256 });
+      }
       // A mute, a disable or a dispose while these promises were in flight wins:
       // a late completion must never restart audio.
       if (disposed || generation !== mine || context !== current) {
@@ -563,24 +586,27 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
       }
 
       const shared = isSharedMemoryAvailable() ? createSabTransport() : null;
-      const worklet = new AudioWorkletNode(current, "osfs-dsp", {
+      const worklet = new AudioWorkletNode(current, selectedRenderer.processorName, {
         numberOfInputs: 0,
         numberOfOutputs: 1,
         outputChannelCount: [2],
         processorOptions: {
-          module: compiled,
+          module: compiled.get(binaryKey)!.module,
           maxBlockFrames: 128,
           seed: 0x53463530,
           sab: shared?.sharedBuffer ?? null,
-          initial: { tier: TIER_INDEX[held ? "off" : tier], gains: currentGains(), limits: options.tierLimits?.() },
+          initial: { tier: TIER_INDEX[held ? "off" : tier], gains: currentGains(), limits: options.tierLimits?.(),
+            profile: renderer && adapter?.diagnostics.profile
+              ? renderer.encodeParameters(adapter.diagnostics.profile) : undefined },
         },
       });
       node = worklet;
+      activeDspSha256 = compiled.get(binaryKey)!.sha256;
       transport = shared ?? createPortTransport(worklet.port);
       worklet.port.onmessage = onWorkletMessage;
       worklet.onprocessorerror = onProcessorError;
       worklet.connect(current.destination);
-      fallback = createFallbackController({ tier, sampleRate: current.sampleRate });
+      fallback = createFallbackController({ tier: requestedTier(), sampleRate: current.sampleRate });
       epochPending = true;
       message = null;
       sendGains();
@@ -671,11 +697,31 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
     },
 
     attachAdapter(next) {
+      const admission = next?.diagnostics.profile ? rendererAdmission(next.diagnostics.profile) : null;
+      const previousRenderer = renderer;
+      capabilities.bankReady = false;
+      node?.port.postMessage({ type: "bandClear" });
       if (adapter && adapter !== next) adapter.dispose();
-      adapter = next;
+      const accepted = next && admission?.supported && next.diagnostics.telemetryAvailable;
+      adapter = accepted ? next : null;
+      renderer = accepted && admission?.supported ? admission.renderer : null;
+      capabilities.highSynthesis = renderer?.highSynthesis;
       lastReading = null;
+      pose.valid = false;
+      pose.sourceAxisValid = false;
+      if (next && !accepted) {
+        next.dispose();
+        message = admission && !admission.supported ? admission.reason : "Engine sound requires an explicit definition and available native telemetry.";
+      }
+      if (context && previousRenderer?.id !== renderer?.id) {
+        generation += 1;
+        teardownGraph();
+      } else if (renderer && adapter?.diagnostics.profile) {
+        node?.port.postMessage({ type: "profile", values: renderer.encodeParameters(adapter.diagnostics.profile) });
+      }
       // A replaced model means a new property batch and a new timeline.
       handle.beginEpoch();
+      sync(inGesture());
       notify();
     },
 
@@ -683,6 +729,13 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
       if (disposed || held || !adapter || !transport || !node || !engineWanted()) return;
       const reading = adapter.read();
       lastReading = reading;
+      // Direction shares the listener's latest view transform. Native loss is
+      // immediate and remains unavailable until a fresh view transforms a valid
+      // axis; a later finite reading alone cannot resurrect the old direction.
+      const nativeAxisLength = reading.sourceAxis ? Math.hypot(...reading.sourceAxis) : 0;
+      if (!Number.isFinite(nativeAxisLength) || nativeAxisLength <= 1e-9) {
+        pose.sourceAxisValid = false;
+      }
       const simTime = reading.simTimeS;
       if (!Number.isFinite(simTime)) return;
 
@@ -726,15 +779,24 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
       }
       lastPublishedSimTime = simTime;
       sequence += 1;
-      transport.publish(toSnapshot(reading, {
+      const snapshot = toSnapshot(reading, {
         sequence, epoch,
         source: pose.source,
         sourceVelocity: pose.sourceVelocity,
         listenerVelocity: pose.listenerVelocity,
         exterior: pose.exterior,
         groundReflectionM: pose.groundReflectionM,
+        sourceAxis: pose.sourceAxis,
+        sourceAxisValid: pose.sourceAxisValid,
         poseValid: pose.valid,
-      }));
+      });
+      if (!adapter.diagnostics.telemetryAvailable) {
+        // Mandatory renderer input is missing. Keep observing for recovery and
+        // fade the engine contribution, while raw adapter telemetry stays raw.
+        snapshot.availability &= ~(AVAILABILITY.N1 | AVAILABILITY.N2 | AVAILABILITY.THRUST
+          | AVAILABILITY.FUEL_FLOW | AVAILABILITY.COMBUSTION | AVAILABILITY.RUNNING | AVAILABILITY.AUGMENTATION);
+      }
+      transport.publish(snapshot);
       transport.flush();
     },
 
@@ -742,7 +804,9 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
       if (disposed || !adapter || !node || !engineWanted()) return;
       computeListenerPose({
         ...view,
+        listenerCockpitBlend: settings.listenerCockpitBlend,
         sourceOffset: adapter.diagnostics.sourceOffset,
+        sourceAxis: lastReading?.sourceAxis,
         velocityWorld: lastReading?.velocity ?? ZERO_VELOCITY,
       }, pose);
     },
@@ -753,6 +817,8 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
       pose.source[0] = next.source[0];
       pose.source[1] = next.source[1];
       pose.source[2] = next.source[2];
+      pose.sourceAxis = next.sourceAxis ? [...next.sourceAxis] : undefined;
+      pose.sourceAxisValid = next.sourceAxisValid;
       pose.sourceVelocity[0] = next.sourceVelocity[0];
       pose.sourceVelocity[1] = next.sourceVelocity[1];
       pose.sourceVelocity[2] = next.sourceVelocity[2];
@@ -795,15 +861,6 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
       if (tireHeld) node?.port.postMessage({ type: "tire", watts: 0 });
     },
 
-    setAllowUnvalidated(allow) {
-      if (disposed || allow === allowUnvalidated) return;
-      allowUnvalidated = allow;
-      fallback?.retest(requestedTier(), now());
-      sendTier();
-      refreshStats();
-      notify();
-    },
-
     setHeld(nextHeld, reason) {
       if (disposed) return;
       if (nextHeld) holds.add(reason); else holds.delete(reason);
@@ -838,32 +895,17 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
       lastPublishedSimTime = null;
       lastSeenSimTime = null;
       previousCombustion = previousRunning = previousStarter = null;
+      pose.valid = false;
+      pose.sourceAxisValid = false;
       node?.port.postMessage({ type: "reset" });
     },
 
-    isEngineActive: () => !disposed && adapter !== null && node !== null && engineWanted(),
+    isEngineActive: () => !disposed && adapter !== null && node !== null && engineWanted() && adapter.diagnostics.telemetryAvailable === true,
 
-    async installBank(bands) {
-      const target = node;
-      if (disposed || !target || bands.length === 0) return false;
-      capabilities.bankReady = false;
-      target.port.postMessage({ type: "bandClear" });
-      const replies = bands.map((band) => new Promise<boolean>((resolve) => {
-        bandWaiters.set(band.index, resolve);
-        // A private copy is transferred, so the caller's samples stay intact.
-        const samples = band.samples.slice().buffer;
-        target.port.postMessage({
-          type: "band", index: band.index, frames: band.samples.length,
-          n1: band.n1, exterior: band.exterior, samples,
-        }, [samples]);
-      }));
-      const accepted = (await Promise.all(replies)).every(Boolean);
-      if (disposed || node !== target) return false;
-      if (!accepted) target.port.postMessage({ type: "bandClear" });
-      capabilities.bankReady = accepted;
-      refreshStats();
-      notify();
-      return accepted;
+    async installBank() {
+      // V2 contains full recordings, not defined residuals. Playing them over
+      // the procedural source would double-count its energy and propagation.
+      return false;
     },
 
     getStatus: status,

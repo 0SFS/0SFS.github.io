@@ -156,6 +156,27 @@ describe("flightInputManager keyboard roll", () => {
     detach();
   });
 
+  it("records a fresh paused flap press even at a travel limit, without confusing feedback or handoff with input", () => {
+    const input = createFlightInputManager({ initialPaused: true });
+    const detach = input.attach(window);
+    try {
+      const initial = input.getFlapsInputRevision();
+      input.replaceFlaps(0.4);
+      input.adoptControls({ ...input.getControls(), flaps: 0.7 });
+      input.resetControls(0.65);
+      expect(input.getFlapsInputRevision()).toBe(initial);
+      window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyR" }));
+      expect(input.getControls().flaps).toBe(0);
+      expect(input.getFlapsInputRevision()).toBeGreaterThan(initial);
+      const pressed = input.getFlapsInputRevision();
+      input.replaceFlaps(0.3);
+      expect(input.getFlapsInputRevision()).toBe(pressed);
+      window.dispatchEvent(new KeyboardEvent("keyup", { code: "KeyR" }));
+      input.setFlaps(0.3); // Explicit HUD request still counts when its value matches actual travel.
+      expect(input.getFlapsInputRevision()).toBeGreaterThan(pressed);
+    } finally { detach(); input.dispose(); }
+  });
+
   it("sends the gear lever to the physics boundary", () => {
     const input = createFlightInputManager();
     const setPropertyValue = vi.fn();
@@ -300,15 +321,17 @@ describe("flightInputManager phone handoff", () => {
     expect(input.poll(1)).toEqual({ ...centered, ...expected });
   });
 
-  it("writes auto-trim without taking the stick from a remote pilot", () => {
+  it("writes automatic trim and flap feedback without taking the stick from a remote pilot", () => {
     const onLocalInput = vi.fn();
     const input = createFlightInputManager({ onLocalInput });
     input.setRemoteOwned(true);
     input.replacePitchTrim(-0.18);
     input.replaceRollTrim(0.27);
+    input.replaceFlaps(0.4);
     expect(onLocalInput).not.toHaveBeenCalled();
     expect(input.poll(1).pitchTrim).toBeCloseTo(-0.18);
     expect(input.poll(1).rollTrim).toBeCloseTo(0.27);
+    expect(input.poll(1).flaps).toBeCloseTo(0.4);
     input.setPitchTrim(0.4);
     input.setRollTrim(-0.4);
     expect(onLocalInput).toHaveBeenCalledTimes(2);

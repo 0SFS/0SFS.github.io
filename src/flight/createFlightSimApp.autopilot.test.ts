@@ -15,6 +15,8 @@ const mocks = vi.hoisted(() => {
         if (property in mocks.properties) return mocks.properties[property];
         if (property === "fcs/throttle-cmd-norm") return 0.65;
         if (property === "gear/gear-cmd-norm") return 1;
+        // The engine runs, as a flight starts: an engine that is off holds the throttle at idle.
+        if (property.endsWith("/set-running")) return 1;
         return 0;
       }),
     },
@@ -32,6 +34,7 @@ const mocks = vi.hoisted(() => {
       isStreamingTiles: () => false,
       onTilesStreamingChange: vi.fn(() => () => {}),
       onRasterDetailFeedback: vi.fn(() => () => {}),
+      onDetailAdjusted: vi.fn(() => () => {}),
       getRasterDetailFeedback: vi.fn(() => null),
       setRasterDetailTarget: vi.fn(),
       setGoogleTerrainDetailTarget: vi.fn(),
@@ -45,14 +48,14 @@ const mocks = vi.hoisted(() => {
     },
     aircraftModel: {
       getState: () => ({ status: "ready" }), getRig: () => null,
-      setAircraft: vi.fn(), setLod: vi.fn(), refreshAutoLod: vi.fn(), dispose: vi.fn(),
+      setAircraft: vi.fn(), setLod: vi.fn(), setRenderStowedGear: vi.fn(), updateGearVisibility: vi.fn(), refreshAutoLod: vi.fn(), dispose: vi.fn(),
     },
     terrainContact: { update: vi.fn(() => true), reset: vi.fn() },
     visibleMeshCollision: { update: vi.fn(() => false), reset: vi.fn() },
     physics: {
       reset: vi.fn(), setPaused: vi.fn(), update: vi.fn(), getLatestState: () => state, getFault: () => null,
     },
-    createHud: vi.fn(() => ({ update: vi.fn(), setGearDown: vi.fn(), destroy: vi.fn() })),
+    createHud: vi.fn(() => ({ update: vi.fn(), setGearDown: vi.fn(), refreshFlaps: vi.fn(), destroy: vi.fn() })),
     createPanel: vi.fn(() => ({ update: vi.fn(), openOrSelectTab: vi.fn(), toggleTab: vi.fn(), destroy: vi.fn() })),
     createHudBar: vi.fn(() => ({ update: vi.fn(), destroy: vi.fn() })),
   };
@@ -77,7 +80,7 @@ vi.mock("./bridge/ecefBridge", () => ({ readFlightState: () => mocks.state }));
 vi.mock("./bridge/floatingOrigin", () => ({ createFloatingOrigin: () => ({ aircraftRoot: { setEnabled: vi.fn() }, apply: vi.fn(), dispose: vi.fn() }) }));
 vi.mock("./aircraft/createPlaceholderAircraft", () => ({ createPlaceholderAircraft: () => mocks.aircraft }));
 vi.mock("./aircraft/createAircraftModel", () => ({ createAircraftModel: () => mocks.aircraftModel }));
-vi.mock("./aircraft/aircraftAnimation", () => ({ applyAircraftRig: vi.fn(), readControlSurfaceState: vi.fn() }));
+vi.mock("./aircraft/aircraftAnimation", () => ({ applyAircraftRig: vi.fn(), readControlSurfaceState: vi.fn(() => ({ gearDownNorm: 1 })) }));
 vi.mock("./physics/fixedStepLoop", () => ({ FIXED_DT: 1 / 120, createFixedStepPhysicsLoop: () => mocks.physics }));
 vi.mock("./physics/terrainContact", () => ({ createTerrainContact: () => mocks.terrainContact }));
 vi.mock("./physics/visibleMeshCollision", () => ({ createVisibleMeshCollision: () => mocks.visibleMeshCollision }));

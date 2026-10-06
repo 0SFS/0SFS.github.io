@@ -1,0 +1,29 @@
+{
+  "purpose": "Offline mesh fit inspection, not aircraft loadout or performance validation",
+  "renderer": "Blender Cycles CPU, 12 samples, 5 threads",
+  "airframe": {
+    "path": "public/aircraft/f-35b/F-35B_AF267.glb",
+    "sha256": "8324d792711a8aecd74988dd9e314b3b4e6f1f3a819591ce60f34caa004d7fbd"
+  },
+  "externalTank": {
+    "path": "public/aircraft/f-35b/ExternalTank_FlightGear.glb",
+    "sha256": "59198a169e59c1baef61cd3dd980b6206d01bb3016248cbff875c808cb31cd13"
+  },
+  "bodyFramePositionsMeters": [
+    [
+      -3.25,
+      0,
+      0
+    ],
+    [
+      3.25,
+      0,
+      0
+    ]
+  ],
+  "images": [
+    "validation/evidence/aircraft/f35b/external-tanks/front-quarter.png",
+    "validation/evidence/aircraft/f35b/external-tanks/underside.png",
+    "validation/evidence/aircraft/f35b/external-tanks/side.png"
+  ]
+}

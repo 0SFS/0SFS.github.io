@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-05",
+  "capturedAfterTimingRuns": true,
+  "userReported": {
+    "concurrentMacUse": true,
+    "cooling": "fanless"
+  },
+  "topology": [
+    {
+      "osLabel": "Super",
+      "physicalCores": 4,
+      "logicalCores": 4
+    },
+    {
+      "osLabel": "Efficiency",
+      "physicalCores": 6,
+      "logicalCores": 6
+    }
+  ],
+  "unobserved": [
+    "executing core cluster and migrations",
+    "effective frequency",
+    "thermal throttling or pressure during samples"
+  ],
+  "timingQualification": "provisional; accepted aggregate-load filters do not prove isolated CPU cost",
+  "geometryQualification": "deterministic surface coverage comparisons are independent of timing qualification",
+  "nextStep": "Apply the shared core- and thermal-aware interference policy before qualifying speed rankings; defer further timing meanwhile"
+}

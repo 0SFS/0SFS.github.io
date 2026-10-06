@@ -1,0 +1,116 @@
+{
+  "schema": "0sfs-f35b-nozzle-source-geometry/1",
+  "status": "geometry-check-passed-native-and-render-integration-followup-recorded",
+  "owner": "0sfs aircraft visuals",
+  "sourceGeometryModified": false,
+  "observer": {
+    "property": "propulsion/engine[0]/nozzle-pos-norm",
+    "nativeGetter": "FGTurbine::GetNozzle",
+    "contract": "Normalized generic display position, not calibrated F135 physical exit area",
+    "availability": "Model owner noncreating PropertyBatch; finite observation injected into readControlSurfaceState",
+    "observerVerification": "Native observer, installed app suite and hardware fixture qualified; see integrationFollowup. Original geometry checks/hashes below remain historical.",
+    "inferredFromThrottle": false
+  },
+  "geometry": {
+    "parent": "vtol",
+    "petalNames": [
+      "feather.001",
+      "feather.002",
+      "feather.003",
+      "feather.004",
+      "feather.005",
+      "feather.006",
+      "feather.007",
+      "feather.008",
+      "feather.009",
+      "feather.010",
+      "feather.011",
+      "feather.012",
+      "feather.013",
+      "feather.014",
+      "feather.015",
+      "feather.016"
+    ],
+    "petalCount": 16,
+    "axis": "Each petal local +X is tangent to ring",
+    "uniformConversionScale": 0.8330574631690979,
+    "ringCenterNozzleLocalSourceUnits": [
+      9.834766387939453e-07,
+      0.287380114197731,
+      0.8079497814178467
+    ],
+    "representativeInnerFreeTipPetalLocalSourceUnits": [
+      5.149329851406037e-08,
+      -0.21494995057582855,
+      0.9693050384521484
+    ],
+    "hingeRingRadiusSourceUnits": 0.6983536332852613,
+    "closedFreeTipRadiusSourceUnits": 0.4834036827094328,
+    "openFreeTipRadiusSourceUnits": 0.6983536332852613,
+    "closedFreeTipRadiusMetres": 0.4027030456045196,
+    "openFreeTipRadiusMetres": 0.5817687061395423,
+    "anglesRadians": {
+      "native0": 0,
+      "native1": -0.2182253497604993
+    },
+    "openingTravelDegrees": 12.50339152404284,
+    "geometrySchedule": "Linear interpolation from authored tapered rest at0 to approximately axis-parallel inner edge at1",
+    "wholeNozzleScaling": false,
+    "pivotTranslation": false,
+    "pitchYawInheritance": "Preserved vtol parent",
+    "extraVisualTimer": false
+  },
+  "checks": {
+    "command": "npx vitest run src/flight/aircraft/aircraftAnimation.f35b.test.ts --maxWorkers=50%",
+    "exitCode": 0,
+    "filesPassed": 1,
+    "testsPassed": 11,
+    "log": "actual-glb-rig.log",
+    "covers": [
+      "All16 actual mesh inner free-tip radii increase through partial/open positions and restore on closure",
+      "Tangential hinge points and local position/scale retained",
+      "Independent0/.4/1 nozzle pitch/yaw parent states",
+      "No added display-time actuator during pause",
+      "Clamping and unavailable-observation pose preservation",
+      "Custom non-F35 asset binding data",
+      "Native observation injection without missing SDK property reads/throttle inference"
+    ]
+  },
+  "sources": [
+    {
+      "url": "https://www.codeonemagazine.com/article.html?item_id=137",
+      "supports": "Three-bearing swivel duct vectoring is separate from terminal variable-area nozzle geometry; no numeric F135 aperture schedule"
+    },
+    {
+      "url": "https://www.moog.com/content/dam/moog/literature/Aircraft/acc/Moog-ACC-Engine-Controls-Datasheet-1.pdf",
+      "supports": "OEM identifies F35B3BSD and convergent nozzle actuation; not current geometric limits/schedule"
+    }
+  ],
+  "limits": [
+    "No calibrated F135 throat/exit schedule or linkage model",
+    "Authored closed pose and inferred axis-parallel open limit are geometric display bounds",
+    "Source has no nozzle animation keyframes",
+    "Generic native turbine display schedule is not verified F135 real hardware behavior",
+    "No screenshot/render/browser/GPU/device or listening qualification in this focused check"
+  ],
+  "hashes": [
+    {
+      "file": "public/aircraft/f-35b/F-35B_AF267.glb",
+      "sha256": "8324d792711a8aecd74988dd9e314b3b4e6f1f3a819591ce60f34caa004d7fbd"
+    },
+    {
+      "file": "src/flight/aircraft/aircraftAnimation.ts",
+      "sha256": "8e1580fb8c2bf9480d6801a4c967cea1dd019e61659c6a419bae03710ba2cf21"
+    },
+    {
+      "file": "src/flight/aircraft/aircraftAnimation.f35b.test.ts",
+      "sha256": "2f22bc5deff3bccb61f440c3321b1a8dd3a0c058b78ee86d3fd4490ddbb4b4ff"
+    }
+  ],
+  "originalStatus": "actual-glb-rig-checks-passed-native-sdk-and-app-integration-pending",
+  "integrationFollowup": {
+    "receipt": "../final-acceptance-2026-10-05/acceptance.json",
+    "sdk": "@felipegalind0/jsbsim@1.2.4-fork.11",
+    "calibratedF135Schedule": false
+  }
+}

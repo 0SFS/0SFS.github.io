@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-05",
+  "inputs": [
+    {
+      "path": "scripts/validation/f35b/check-exhaust-headless.mjs",
+      "bytes": 20260,
+      "sha256": "7f6abffe263ea916ee5f9f41bf9cf0d17098010c34770abdc5fa8837e2c080b3"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineExhaust.ts",
+      "bytes": 19840,
+      "sha256": "7272aed9124342360a9aef7d61c73e2677365f6c56ec2ebd6b03e3fcbe917f2a"
+    },
+    {
+      "path": "src/flight/aircraft/createAircraftEngineVisuals.ts",
+      "bytes": 6220,
+      "sha256": "726036037f541e7f101d86e0c0c69b2a89d29ead034e8ca0083dde9a1eb1a86b"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135ExhaustOpticalData.ts",
+      "bytes": 1087,
+      "sha256": "f6a8822f8ae2ba4a3457b534769e45b54c81f7dca758462ad5da93bddc83bb22"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json",
+      "bytes": 8809,
+      "sha256": "7d697a0f2b21f02a62ec65c8134b1c200559e69d65e71bd623b42cd2272fe079"
+    }
+  ],
+  "retained": [
+    {
+      "path": "acceptance.json",
+      "bytes": 62611,
+      "sha256": "424d0b861fffd1855d900791807e8ecb367d0c94f3a0863da96d5489188a7ba4"
+    },
+    {
+      "path": "gpu-check.log",
+      "bytes": 145,
+      "sha256": "6f8f733c7b92588a33ec13471d1d205a933628c087abe41ac28341b824253550"
+    },
+    {
+      "path": "webgl2-afterburner-disabled.png",
+      "bytes": 20425,
+      "sha256": "288f28ba12e0d1f7223d6880fc0441388f124796efac39281ff96a60733da054"
+    },
+    {
+      "path": "webgl2-afterburner-front-disabled.png",
+      "bytes": 22924,
+      "sha256": "0e686fe17654298dfa8ae3e5ae0e76a33b409b6f4bf3e94bc6070b1decf1c558"
+    },
+    {
+      "path": "webgl2-afterburner-front.png",
+      "bytes": 22924,
+      "sha256": "0e686fe17654298dfa8ae3e5ae0e76a33b409b6f4bf3e94bc6070b1decf1c558"
+    },
+    {
+      "path": "webgl2-afterburner-rear.png",
+      "bytes": 25844,
+      "sha256": "8ef30757de84d9c6d53db3e9fe390e723b8ea72bb9ecbcf236dd71c13b672484"
+    },
+    {
+      "path": "webgl2-afterburner-side.png",
+      "bytes": 35065,
+      "sha256": "86aa76a39a2e40a3ae94895e679353110af3fba45623845451359abe8d48f30b"
+    },
+    {
+      "path": "webgl2-converted-dry-side.png",
+      "bytes": 33472,
+      "sha256": "704d5ee8f0f60f39db814bcbd2fbb7ee03809ef6032dfe1f576c38cfcf0ae189"
+    },
+    {
+      "path": "webgl2-dry-rear.png",
+      "bytes": 21158,
+      "sha256": "8a3082f8a83a5dd04098ad4b603285cf68c0c8ad3de0083b16f4d21cfb59ba01"
+    },
+    {
+      "path": "webgpu-afterburner-disabled.png",
+      "bytes": 20361,
+      "sha256": "322ce28fc612382b7e5300f3e5e6d849effd5c62b33c9d61df7acc8c4ffad010"
+    },
+    {
+      "path": "webgpu-afterburner-front-disabled.png",
+      "bytes": 22964,
+      "sha256": "15bc0d8584e8375e6090bc62b75aeaf89d18bd4051c1b985d8ed24a01ca9b786"
+    },
+    {
+      "path": "webgpu-afterburner-front.png",
+      "bytes": 22964,
+      "sha256": "15bc0d8584e8375e6090bc62b75aeaf89d18bd4051c1b985d8ed24a01ca9b786"
+    },
+    {
+      "path": "webgpu-afterburner-rear.png",
+      "bytes": 25738,
+      "sha256": "b16defe9f178636e80cb57a78459c66180af4ea06467f88399afe6f6152da7de"
+    },
+    {
+      "path": "webgpu-afterburner-side.png",
+      "bytes": 35226,
+      "sha256": "a16e19dd9060ceb3d84ab7d6039ee2b8acd3086a8496d9abdd2402d67f66f91e"
+    },
+    {
+      "path": "webgpu-converted-dry-side.png",
+      "bytes": 33756,
+      "sha256": "d0a39905f110a1803b56e75ffa5e6e257cc99c8321bd9bab956450da597bbf94"
+    },
+    {
+      "path": "webgpu-dry-rear.png",
+      "bytes": 21064,
+      "sha256": "61ad34bf38efcc3a30d27143df6f93aa9fe2194e8d10279152264056c01ff23c"
+    }
+  ]
+}

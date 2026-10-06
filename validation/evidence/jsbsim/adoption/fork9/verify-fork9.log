@@ -1,0 +1,18 @@
+
+> osfs@0.0.0 verify:jsbsim
+> node scripts/verify-jsbsim-artifact.mjs
+
+{
+  "package": {
+    "name": "@felipegalind0/jsbsim",
+    "version": "1.2.4-fork.9"
+  },
+  "mode": "in-tree",
+  "inputSha256": "c5fa3a29dcc6f5138718cb5b74c7df3975b8affeee6c4b582eecf96dc95af581",
+  "verifiedFiles": 14,
+  "packageArchive": {
+    "path": "deps/felipegalind0-jsbsim-1.2.4-fork.9.tgz",
+    "sha256": "2d529297e0a9e8b634b6a2435a3739e22ffbb67264b789f2b8f2f37462d9ae0e",
+    "integrity": "sha512-mp0i90QiTTpnVJG8b+bPK6/ItDDqz1i5ZwNmuzXAVqrGfJPIStBuWO76KGRLL92NlaTKohoi++7+3oaaNghEKA=="
+  }
+}

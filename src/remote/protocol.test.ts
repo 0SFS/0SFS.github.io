@@ -28,15 +28,19 @@ const accepted: RemoteMessage[] = [
   { ...envelope, type: "action", id: 4, lease: 3, action: "setPaused", value: false },
   { ...envelope, type: "action", id: 5, lease: 3, action: "setViewMode", value: "first" },
   { ...envelope, type: "action", id: 6, lease: 3, action: "setViewMode", value: "third" },
+  { ...envelope, type: "action", id: 7, lease: 3, action: "shutdownEngine" },
   { ...envelope, type: "ack", id: 2, ok: false, message: "Center controls to take over.", status },
   frame,
   { ...frame, seq: 124, camera: { yaw: -1, pitch: 0.25 } },
   { ...frame, seq: 125, camera: { yaw: 0, pitch: 0, zoom: 1.5 } },
   { ...frame, seq: 126, camera: { yaw: 0.012, pitch: 0 },
     trace: { at: 1234.5, by: 0, gated: 1, buf: 0, cam: [[1230.1, 1231.2, 12, 0, 2]], ctl: [[1229.9, 1230.4]], drop: [0, 0, 0] } },
+  { ...frame, seq: 127, starter: 1 },
   { ...envelope, type: "heartbeat", lease: 9,
     status: { ...status, engine: { phase: "RUNNING", n1: 72.4, n2: 88.1, thrustLbf: 1180, fuelFlowPph: 412 } } },
   { ...envelope, type: "heartbeat", lease: 10, status: { ...status, engine: { phase: "OFF" } } },
+  { ...envelope, type: "heartbeat", lease: 12,
+    status: { ...status, engine: { phase: "MOTORING", n2: 12.5, state: "starting", start: 0.21, blocked: "No fuel on board" } } },
   { ...envelope, type: "heartbeat", lease: 7 },
   { ...envelope, type: "heartbeat", lease: 11, trace: 1 },
   { ...envelope, type: "heartbeat", lease: 8, status, appliedSeq: 123, receiveToApplyMs: 3.1 },
@@ -45,6 +49,32 @@ const accepted: RemoteMessage[] = [
 ];
 
 describe("phone protocol parsing", () => {
+  it("validates per-row blade counts without requiring them from older hosts", () => {
+    const rotorBlades = { outer: 28, inner: 40, outerEstimated: false, innerEstimated: true };
+    expect(isEngineStatus({ phase: "RUNNING", rotorBlades })).toBe(true);
+    expect(isEngineStatus({ phase: "RUNNING", rotorBlades: { ...rotorBlades, outer: 2, inner: null } })).toBe(true);
+    expect(isEngineStatus({ phase: "RUNNING" })).toBe(true);
+    for (const invalid of [null, [], {}, { ...rotorBlades, outer: 0 }, { ...rotorBlades, outer: 129 },
+      { ...rotorBlades, outer: 1.5 }, { ...rotorBlades, outer: "28" }, { ...rotorBlades, inner: 0 },
+      { ...rotorBlades, inner: 129 }, { ...rotorBlades, inner: NaN }, { ...rotorBlades, inner: 4.1 },
+      { ...rotorBlades, inner: undefined }, { ...rotorBlades, outerEstimated: 1 }, { ...rotorBlades, innerEstimated: "yes" }]) {
+      expect(isEngineStatus({ phase: "RUNNING", rotorBlades: invalid }), JSON.stringify(invalid)).toBe(false);
+    }
+    expect(isEngineStatus({ phase: "RUNNING", rotorBlades: { ...rotorBlades, outer: 1, inner: 128 } })).toBe(true);
+  });
+
+  it("carries explicit engine type, native limits, simulation time and bounded orb budgets", () => {
+    const orbs = { fps: 30, turnsPerSecond: 2, pixelRatio: 2, renderer: "auto" };
+    expect(isEngineStatus({ phase: "RUNNING", kind: "piston", simTimeS: 12.125, rpm: 1350, maxRpm: 2700, orbs })).toBe(true);
+    expect(isEngineStatus({ phase: "RUNNING", kind: "turbine", maxN1: 100, maxN2: 110 })).toBe(true);
+    for (const invalid of [{ kind: "jet" }, { simTimeS: -1 }, { simTimeS: Infinity }, { maxN1: 0 },
+      { maxN2: -100 }, { maxRpm: NaN }, { orbs: { ...orbs, fps: 61 } },
+      { orbs: { ...orbs, turnsPerSecond: 4.1 } }, { orbs: { ...orbs, pixelRatio: 0.5 } },
+      { orbs: { ...orbs, renderer: "canvas2d" } }]) {
+      expect(isEngineStatus({ phase: "RUNNING", ...invalid })).toBe(false);
+    }
+  });
+
   it.each(accepted)("accepts $type as JSON or decoded PeerJS data", (message) => {
     expect(parseMessage(message)).toEqual(message);
     expect(parseMessage(JSON.stringify(message))).toEqual(message);
@@ -107,6 +137,7 @@ describe("phone protocol parsing", () => {
       { ...action, action: "setViewMode", value: "cockpit" },
       { ...action, action: "setViewMode", value: true },
       { ...action, action: "reset" },
+      { ...action, action: "shutdownEngine", value: true },
     ];
     for (const value of invalid) expect(parseMessage(value), JSON.stringify(value)).toBeNull();
     expect(parseMessage({ ...envelope, type: "welcome", streamId: 65534, status })).not.toBeNull();
@@ -154,6 +185,9 @@ describe("phone protocol parsing", () => {
     for (const engine of [{ phase: "" }, { phase: "running" }, { phase: "A".repeat(17) }, { phase: "OFF!" },
       { phase: 1 }, { phase: "OFF", n1: "72" }, { phase: "OFF", n2: NaN }, { phase: "OFF", thrustLbf: Infinity },
       { phase: "OFF", fuelFlowPph: null }, { phase: "OFF", rpm: "2400" }, { phase: "OFF", fuelFlowGph: -Infinity },
+      { phase: "OFF", state: "off" }, { phase: "OFF", state: 1 }, { phase: "OFF", start: 1.01 }, { phase: "OFF", start: -0.1 },
+      { phase: "OFF", start: NaN }, { phase: "OFF", blocked: "" }, { phase: "OFF", blocked: "<b>No fuel</b>" },
+      { phase: "OFF", blocked: "a".repeat(61) }, { phase: "OFF", blocked: 0 },
       {}, null, []]) {
       expect(isEngineStatus(engine), JSON.stringify(engine)).toBe(false);
       expect(parseMessage({ ...envelope, type: "status", message: "Phone controls", status: { ...status, engine } })).toBeNull();
@@ -161,6 +195,11 @@ describe("phone protocol parsing", () => {
     expect(isEngineStatus({ phase: "WINDMILLING" })).toBe(true);
     expect(isEngineStatus({ phase: "OFF", n1: -0.4 })).toBe(true);
     expect(isEngineStatus({ phase: "RUNNING", rpm: 2400, thrustLbf: 310, fuelFlowPph: 60, fuelFlowGph: 9.2 })).toBe(true);
+    expect(isEngineStatus({ phase: "OFF", state: "stopped", start: 0 })).toBe(true);
+  });
+
+  it("drops a starter flag that is anything but 1 without costing the frame its controls", () => {
+    for (const starter of [0, true, "1", 2, null]) expect(parseMessage({ ...frame, starter })).toEqual(frame);
   });
 
   it("enforces UTF-8 bytes, including the exact 2 KiB boundary", () => {

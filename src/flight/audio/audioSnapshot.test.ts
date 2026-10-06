@@ -29,6 +29,7 @@ describe("audio snapshot ABI", () => {
     expect(AUDIO_SNAPSHOT_SLOT.version).toBe(0);
     expect(AUDIO_SNAPSHOT_SLOT.simTimeS).toBe(3);
     expect(header).toContain("kSnapshotSize,");
+    expect(header).toContain(`constexpr int kSnapshotVersion = ${AUDIO_SNAPSHOT_VERSION};`);
   });
 
   it("agrees on the bounded queue and batch sizes", () => {
@@ -60,11 +61,33 @@ describe("audio snapshot ABI", () => {
 });
 
 describe("writeAudioSnapshot", () => {
+  it("normalizes a valid exhaust axis and clears its bit for missing or invalid orientation", () => {
+    const target = new Float64Array(AUDIO_SNAPSHOT_SIZE);
+    const write = (sourceAxis?: readonly [number, number, number]) => {
+      writeAudioSnapshot(target, 0, {
+        sequence: 1, epoch: 1, simTimeS: 0, availability: AVAILABILITY.SOURCE_AXIS | AVAILABILITY.N1,
+        sourceAxis,
+      });
+    };
+    write([0, -3, -4]);
+    expect(target[AUDIO_SNAPSHOT_SLOT.sourceAxisY]).toBeCloseTo(-0.6);
+    expect(target[AUDIO_SNAPSHOT_SLOT.sourceAxisZ]).toBeCloseTo(-0.8);
+    expect(target[AUDIO_SNAPSHOT_SLOT.availability] & AVAILABILITY.SOURCE_AXIS).not.toBe(0);
+    for (const axis of [undefined, [0, 0, 0], [0, Number.NaN, -1], [0, 0, Number.POSITIVE_INFINITY]] as const) {
+      write(axis);
+      expect(target[AUDIO_SNAPSHOT_SLOT.availability]).toBe(AVAILABILITY.N1);
+      expect(target[AUDIO_SNAPSHOT_SLOT.sourceAxisX]).toBe(0);
+      expect(target[AUDIO_SNAPSHOT_SLOT.sourceAxisY]).toBe(0);
+      expect(target[AUDIO_SNAPSHOT_SLOT.sourceAxisZ]).toBe(0);
+    }
+  });
+
   it("refuses non-finite input instead of writing NaN into the core", () => {
     const target = new Float64Array(AUDIO_SNAPSHOT_SIZE * 2).fill(-1);
     writeAudioSnapshot(target, AUDIO_SNAPSHOT_SIZE, {
       sequence: Number.NaN, epoch: 2, simTimeS: Number.POSITIVE_INFINITY, availability: 0,
       n1Pct: Number.NaN, source: [1, Number.NaN, 3],
+      augmentation: true,
     });
     const at = (field: keyof typeof AUDIO_SNAPSHOT_SLOT): number =>
       target[AUDIO_SNAPSHOT_SIZE + AUDIO_SNAPSHOT_SLOT[field]];
@@ -79,6 +102,7 @@ describe("writeAudioSnapshot", () => {
     // An unwritten field defaults, and the neighbouring snapshot is untouched.
     expect(at("soundSpeedMps")).toBe(343);
     expect(at("groundReflectionM")).toBe(-1);
+    expect(at("augmentation")).toBe(1);
     expect(target[0]).toBe(-1);
   });
 });

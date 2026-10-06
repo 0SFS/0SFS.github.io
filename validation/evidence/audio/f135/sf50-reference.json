@@ -1,0 +1,103 @@
+{
+  "schema": "0sfs-engine-profile-reference/1",
+  "scope": "Short offline WASM output identity; no device/timing/acoustic qualification",
+  "passed": true,
+  "cases": [
+    {
+      "sampleRate": 44100,
+      "tier": 1,
+      "exterior": 0,
+      "frames": 35280,
+      "referenceWasmSha256": "9cfbc9ce8e02690c63cccbd68d13978a53d48af99ec7bc7fbd3218f473d43924",
+      "currentWasmSha256": "e6816679136929aafc41d638f29d82dd0794437f52d7bc3535d84fbb70b1a259",
+      "referenceOutputSha256": "4856405677877bc2e10ece508a4cc10522abf77da67d580d8b5a57a52e8f2c3c",
+      "currentOutputSha256": "4856405677877bc2e10ece508a4cc10522abf77da67d580d8b5a57a52e8f2c3c",
+      "differences": 0,
+      "maxAbsoluteDifference": 0
+    },
+    {
+      "sampleRate": 44100,
+      "tier": 1,
+      "exterior": 1,
+      "frames": 35280,
+      "referenceWasmSha256": "9cfbc9ce8e02690c63cccbd68d13978a53d48af99ec7bc7fbd3218f473d43924",
+      "currentWasmSha256": "e6816679136929aafc41d638f29d82dd0794437f52d7bc3535d84fbb70b1a259",
+      "referenceOutputSha256": "6be5fc85c2cf7c6a29e629fc22d7fae0ddf74574fe04029e606813c689b027e7",
+      "currentOutputSha256": "6be5fc85c2cf7c6a29e629fc22d7fae0ddf74574fe04029e606813c689b027e7",
+      "differences": 0,
+      "maxAbsoluteDifference": 0
+    },
+    {
+      "sampleRate": 44100,
+      "tier": 2,
+      "exterior": 0,
+      "frames": 35280,
+      "referenceWasmSha256": "9cfbc9ce8e02690c63cccbd68d13978a53d48af99ec7bc7fbd3218f473d43924",
+      "currentWasmSha256": "e6816679136929aafc41d638f29d82dd0794437f52d7bc3535d84fbb70b1a259",
+      "referenceOutputSha256": "76098a2fb75545c22de090a859bc433e5902bf4d61cc796066bf5502b94354d0",
+      "currentOutputSha256": "76098a2fb75545c22de090a859bc433e5902bf4d61cc796066bf5502b94354d0",
+      "differences": 0,
+      "maxAbsoluteDifference": 0
+    },
+    {
+      "sampleRate": 44100,
+      "tier": 2,
+      "exterior": 1,
+      "frames": 35280,
+      "referenceWasmSha256": "9cfbc9ce8e02690c63cccbd68d13978a53d48af99ec7bc7fbd3218f473d43924",
+      "currentWasmSha256": "e6816679136929aafc41d638f29d82dd0794437f52d7bc3535d84fbb70b1a259",
+      "referenceOutputSha256": "9d0a2f369502dde1da64499e79848f5c553c8cb65e4ad5d5467cc4a06d3834dd",
+      "currentOutputSha256": "9d0a2f369502dde1da64499e79848f5c553c8cb65e4ad5d5467cc4a06d3834dd",
+      "differences": 0,
+      "maxAbsoluteDifference": 0
+    },
+    {
+      "sampleRate": 48000,
+      "tier": 1,
+      "exterior": 0,
+      "frames": 38400,
+      "referenceWasmSha256": "9cfbc9ce8e02690c63cccbd68d13978a53d48af99ec7bc7fbd3218f473d43924",
+      "currentWasmSha256": "e6816679136929aafc41d638f29d82dd0794437f52d7bc3535d84fbb70b1a259",
+      "referenceOutputSha256": "b8d3e927b5cc2c0059c3f72ec1c51e4b9f4961b5a246bf7ac0bf7717114e44fb",
+      "currentOutputSha256": "b8d3e927b5cc2c0059c3f72ec1c51e4b9f4961b5a246bf7ac0bf7717114e44fb",
+      "differences": 0,
+      "maxAbsoluteDifference": 0
+    },
+    {
+      "sampleRate": 48000,
+      "tier": 1,
+      "exterior": 1,
+      "frames": 38400,
+      "referenceWasmSha256": "9cfbc9ce8e02690c63cccbd68d13978a53d48af99ec7bc7fbd3218f473d43924",
+      "currentWasmSha256": "e6816679136929aafc41d638f29d82dd0794437f52d7bc3535d84fbb70b1a259",
+      "referenceOutputSha256": "996e477a14e93b260cb7707ec89e5b4a1ab8d0e296f23c400d3dc76f9db1bffd",
+      "currentOutputSha256": "996e477a14e93b260cb7707ec89e5b4a1ab8d0e296f23c400d3dc76f9db1bffd",
+      "differences": 0,
+      "maxAbsoluteDifference": 0
+    },
+    {
+      "sampleRate": 48000,
+      "tier": 2,
+      "exterior": 0,
+      "frames": 38400,
+      "referenceWasmSha256": "9cfbc9ce8e02690c63cccbd68d13978a53d48af99ec7bc7fbd3218f473d43924",
+      "currentWasmSha256": "e6816679136929aafc41d638f29d82dd0794437f52d7bc3535d84fbb70b1a259",
+      "referenceOutputSha256": "5d92208fa14bb14a1dc5168cd4d46a740615fd90be9edaac51b64a3a2d545ed2",
+      "currentOutputSha256": "5d92208fa14bb14a1dc5168cd4d46a740615fd90be9edaac51b64a3a2d545ed2",
+      "differences": 0,
+      "maxAbsoluteDifference": 0
+    },
+    {
+      "sampleRate": 48000,
+      "tier": 2,
+      "exterior": 1,
+      "frames": 38400,
+      "referenceWasmSha256": "9cfbc9ce8e02690c63cccbd68d13978a53d48af99ec7bc7fbd3218f473d43924",
+      "currentWasmSha256": "e6816679136929aafc41d638f29d82dd0794437f52d7bc3535d84fbb70b1a259",
+      "referenceOutputSha256": "5458f653f1044595d24302ccf81a3e3446fc1b76d3403c4c234decac10fc6c38",
+      "currentOutputSha256": "5458f653f1044595d24302ccf81a3e3446fc1b76d3403c4c234decac10fc6c38",
+      "differences": 0,
+      "maxAbsoluteDifference": 0
+    }
+  ]
+}

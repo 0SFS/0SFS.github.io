@@ -1,6 +1,24 @@
 import { Matrix, Vector3 } from "@babylonjs/core";
 import { geodeticToEcef } from "foss-earth/cameraMath";
 
+/** Flight trails need the ECEF frame before Babylon rounds it for rendering. */
+export function buildWorldShiftFrame(latRad: number, lonRad: number, altMeters: number,
+  reference = geodeticToEcef(latRad, lonRad, altMeters)): { readonly m: Float64Array } {
+  const sinLat = Math.sin(latRad), cosLat = Math.cos(latRad);
+  const sinLon = Math.sin(lonRad), cosLon = Math.cos(lonRad);
+  // ECEF -> east/up/south, in Babylon's column-major convention.
+  const m = new Float64Array([
+    -sinLon, cosLat * cosLon, sinLat * cosLon, 0,
+    cosLon, cosLat * sinLon, sinLat * sinLon, 0,
+    0, sinLat, -cosLat, 0,
+    0, 0, 0, 1,
+  ]);
+  m[12] = -(m[0] * reference.x + m[4] * reference.y + m[8] * reference.z);
+  m[13] = -(m[1] * reference.x + m[5] * reference.y + m[9] * reference.z);
+  m[14] = -(m[2] * reference.x + m[6] * reference.y + m[10] * reference.z);
+  return { m };
+}
+
 /**
  * Maps local ENU (X=east, Y=north, Z=up) into Babylon's right-handed Y-up frame
  * (X=east, Y=up, Z=south). Negating north preserves handedness.

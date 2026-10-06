@@ -31,12 +31,12 @@ export interface TierBudget {
 export const TIER_BUDGETS: Record<TierId, TierBudget> = {
   off: { oscillators: 0, noiseSources: 0, biquads: 0, grains: 0, irMilliseconds: 0,
     coldBytes: 0, residentMiB: 0, loadingPeakMiB: 0, quantumP95Ms: 0 },
-  low: { oscillators: 5, noiseSources: 5, biquads: 8, grains: 0, irMilliseconds: 0,
+  low: { oscillators: 5, noiseSources: 6, biquads: 9, grains: 0, irMilliseconds: 0,
     coldBytes: 160 * 1024, residentMiB: 8, loadingPeakMiB: 12, quantumP95Ms: 0.12 },
-  med: { oscillators: 13, noiseSources: 6, biquads: 16, grains: 0, irMilliseconds: 20,
+  med: { oscillators: 13, noiseSources: 7, biquads: 16, grains: 0, irMilliseconds: 20,
     coldBytes: 256 * 1024, residentMiB: 12, loadingPeakMiB: 20, quantumP95Ms: 0.25 },
-  high: { oscillators: 13, noiseSources: 6, biquads: 16, grains: 12, irMilliseconds: 40,
-    coldBytes: 1792 * 1024, residentMiB: 32, loadingPeakMiB: 64, quantumP95Ms: 0.45 },
+  high: { oscillators: 13, noiseSources: 9, biquads: 16, grains: 0, irMilliseconds: 40,
+    coldBytes: 256 * 1024, residentMiB: 32, loadingPeakMiB: 64, quantumP95Ms: 0.45 },
 };
 
 /** `Q = 1000 * frames / sampleRate`; read the real block length, never assume 128. */
@@ -67,16 +67,22 @@ export const AVAILABILITY_LABELS = {
  * DELIBERATELY EMPTY. sound.md §5 requires named devices, recorded OS/browser
  * builds, a real output route and a validated dropout detector before any entry
  * here. None of that has been run, so Med and High report "Not yet validated"
- * rather than silently admitting themselves. Perf owns filling this in; a
- * user-agent string must never produce an entry.
+ * and Auto never picks them; they run only when chosen. Perf owns filling this
+ * in; a user-agent string must never produce an entry.
  */
-export interface QualifiedProfile {
+export interface AudioQualificationContext {
   device: string;
   browserBuild: string;
   osBuild: string;
   outputRoute: string;
   sampleRateHz: number;
   transport: "port" | "sab";
+  engineDefinitionId: string;
+  rendererId: string;
+  dspSha256: string;
+}
+
+export interface QualifiedProfile extends AudioQualificationContext {
   tier: TierId;
   evidence: string;
 }
@@ -86,7 +92,9 @@ export const QUALIFIED_PROFILES: readonly QualifiedProfile[] = [];
 export interface AudioCapabilities {
   audioWorklet: boolean;
   webAssembly: boolean;
-  /** True only when the licensed Tier 3 bank is present and decoded. */
+  /** Explicit renderer support, never inferred from a selected quality or an installed bank. */
+  highSynthesis?: "procedural";
+  /** Retained for experimental bank tooling; does not admit procedural High. */
   bankReady: boolean;
   /** False when no portable per-block timing or underrun counter exists. */
   loadObservable: boolean;
@@ -94,11 +102,13 @@ export interface AudioCapabilities {
 
 /**
  * Admission. Low needs only the two hard capabilities; Med and High also need a
- * qualified profile, and in High's case a cleared bank as well.
+ * matching qualified profile. High also needs an explicitly capable renderer.
+ * Auto takes only an available tier; an explicit choice runs an unvalidated one.
  */
 export function tierAvailability(
   tier: TierId, capabilities: AudioCapabilities,
   profiles: readonly QualifiedProfile[] = QUALIFIED_PROFILES,
+  context?: AudioQualificationContext,
 ): TierAvailability {
   if (tier === "off") return { state: "available" };
   if (!capabilities.audioWorklet) {
@@ -108,63 +118,62 @@ export function tierAvailability(
     return { state: "unsupported", reason: "This browser cannot run WebAssembly." };
   }
   if (tier === "low") return { state: "available" };
-  if (tier === "high" && !capabilities.bankReady) {
+  if (tier === "high" && capabilities.highSynthesis !== "procedural") {
     return {
-      state: "pack-unavailable",
-      reason: "High needs a licensed FJ33 sample bank. None is cleared for redistribution yet.",
+      state: "unsupported",
+      reason: "The selected engine renderer does not implement procedural High.",
     };
   }
-  const qualified = profiles.some((profile) => profile.tier === tier);
+  // The caller must identify the actual route and exact implementation. A user
+  // agent, an unrelated device record or an absent context cannot certify it.
+  const qualified = context !== undefined && profiles.some((profile) => profile.tier === tier
+    && profile.device === context.device && profile.browserBuild === context.browserBuild
+    && profile.osBuild === context.osBuild && profile.outputRoute === context.outputRoute
+    && profile.sampleRateHz === context.sampleRateHz && profile.transport === context.transport
+    && profile.engineDefinitionId === context.engineDefinitionId && profile.rendererId === context.rendererId
+    && profile.dspSha256 === context.dspSha256 && profile.evidence.trim().length > 0);
   if (!qualified) {
     return {
       state: "unvalidated",
       reason: `${tier === "med" ? "Med" : "High"} has no device qualification evidence yet, `
-        + "so it stays off by default. Low is unaffected.",
+        + "so Auto does not pick it. It runs when chosen.",
     };
   }
   return { state: "available" };
 }
 
-export interface TierResolveOptions {
-  /**
-   * Session-only testing override: run an explicitly requested tier that has no
-   * device evidence yet. Qualification itself needs this, since a tier cannot be
-   * measured without running it. Auto never uses it, and a missing bank or a
-   * missing capability still blocks.
-   */
-  allowUnvalidated?: boolean;
-}
-
-/** Auto starts at Low and only climbs to a tier that is actually available. */
+/**
+ * What runs for a request. Auto starts at Low and only climbs to a tier that is
+ * actually available. An explicit choice also runs a tier that lacks only
+ * device evidence: that gap is in the evidence, not in this device, and the
+ * owner decided on 2026-10-02 that choosing Med runs Med (sound.md §1). A
+ * missing renderer or browser capability still falls back.
+ */
 export function resolveRequestedTier(
   requested: AudioQualityId, capabilities: AudioCapabilities,
   profiles: readonly QualifiedProfile[] = QUALIFIED_PROFILES,
-  options: TierResolveOptions = {},
+  context?: AudioQualificationContext,
 ): { tier: TierId; reason: string | null } {
   if (requested === "off") return { tier: "off", reason: null };
   if (requested === "auto") {
     let best: TierId = "off";
     for (const tier of TIER_ORDER) {
       if (tier === "off") continue;
-      if (tierAvailability(tier, capabilities, profiles).state === "available") best = tier;
+      if (tierAvailability(tier, capabilities, profiles, context).state === "available") best = tier;
     }
     return {
       tier: best,
       reason: best === "off" ? "No audible tier is available on this device." : null,
     };
   }
-  const availability = tierAvailability(requested, capabilities, profiles);
+  const runnable = (state: TierAvailability["state"]): boolean => state === "available" || state === "unvalidated";
+  const availability = tierAvailability(requested, capabilities, profiles, context);
   if (availability.state === "available") return { tier: requested, reason: null };
-  if (availability.state === "unvalidated" && options.allowUnvalidated) {
-    return {
-      tier: requested,
-      reason: `${requested === "med" ? "Med" : "High"} is running without device evidence, for testing this session.`,
-    };
-  }
+  if (availability.state === "unvalidated") return { tier: requested, reason: availability.reason };
   // Fall back to the best tier below the request rather than to silence.
   for (let index = TIER_INDEX[requested] - 1; index >= 1; index -= 1) {
     const candidate = TIER_ORDER[index];
-    if (tierAvailability(candidate, capabilities, profiles).state === "available") {
+    if (runnable(tierAvailability(candidate, capabilities, profiles, context).state)) {
       return { tier: candidate, reason: availability.reason };
     }
   }

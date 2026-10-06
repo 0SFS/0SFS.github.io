@@ -1,0 +1,245 @@
+{
+  "date": "2026-10-05",
+  "owner": "0sfs",
+  "status": "implemented-software-verified",
+  "scope": [
+    "SF50/FJ33 conventional procedural High",
+    "F-35B/F135 conventional procedural High",
+    "approximate cockpit transfer",
+    "native main-nozzle direction"
+  ],
+  "snapshot": {
+    "version": 3,
+    "float64Fields": 33
+  },
+  "profileParameters": 31,
+  "defaultQuality": "med",
+  "autoMaximumWithoutQualification": "low",
+  "recordingAssets": 0,
+  "sources": [
+    {
+      "file": "src/flight/audio/dsp/audio-dsp.wasm",
+      "bytes": 50836,
+      "sha256": "7a876882d8cf38ec043e97b7d84fc58c7b12faec730db4087059b6eb66458339"
+    },
+    {
+      "file": "src/flight/audio/dsp/audio-dsp.provenance.json",
+      "bytes": 2618,
+      "sha256": "ae0202c578cfc59ca135735294d1d21516c318288973c3b6373d5b562aab9596"
+    },
+    {
+      "file": "src/flight/audio/engineAcousticDefinitions.ts",
+      "bytes": 8282,
+      "sha256": "e719589758864c3ff05b3dbdda8f6d71f860b871bb8f986656a68cf7be279178"
+    },
+    {
+      "file": "src/flight/audio/aircraftAudioProfiles.ts",
+      "bytes": 3769,
+      "sha256": "8a143aeea3e7934bb389d56fe17e801eb8a13a39b8846029ff92ef090b21db1d"
+    },
+    {
+      "file": "src/flight/audio/audioRendererRegistry.ts",
+      "bytes": 3010,
+      "sha256": "4d061c8a9ecfc0b044dfc32919868e8aac1e9bb359a02e98a78947775330c699"
+    },
+    {
+      "file": "src/flight/audio/worklet/dspProcessor.js",
+      "bytes": 10860,
+      "sha256": "81184bf22365a8a74c6d7e5dfe0dfc2225e65d3047d1fa1b1d6c646c342a22d5"
+    },
+    {
+      "file": "src/flight/audio/audioSnapshot.ts",
+      "bytes": 8002,
+      "sha256": "1e86e46af64c84d94d9a3ca5a3afca386fd07d85dd62b68ec0e9602cf20c39b6"
+    },
+    {
+      "file": "src/flight/audio/audioPose.ts",
+      "bytes": 8347,
+      "sha256": "6514d80f40c32ab904ca31316014288f669407db93cbed28784b6f662978d60a"
+    },
+    {
+      "file": "src/flight/audio/jsbsimAudioAdapter.ts",
+      "bytes": 16614,
+      "sha256": "4f4bc727ab2dfe91a513151626f12836b9eb2c009cd5b17bd769a224c609ab9e"
+    },
+    {
+      "file": "src/flight/audio/createFlightAudio.ts",
+      "bytes": 38132,
+      "sha256": "39751b4d10fdfc55a5d18ebcea0b1f54d0b046dc0289707c9fd62b1875364a38"
+    },
+    {
+      "file": "src/flight/audio/audioQuality.ts",
+      "bytes": 15077,
+      "sha256": "96756248c0c8f4b6a2e796e9adee07de15ba019df5c89fd97c0bb0b2db5038df"
+    },
+    {
+      "file": "src/flight/audio/audioBank.ts",
+      "bytes": 17434,
+      "sha256": "94f3bdec84f3d126f9dc9a6f9c712a56076e2b93e8f59d01ccd4231a101a0c18"
+    },
+    {
+      "file": "src/flight/audio/audioSettings.ts",
+      "bytes": 11280,
+      "sha256": "ff8ac6b87d00110c3509f8d0120b3706f79d57f98718286cd2b989c8e99cd3b4"
+    },
+    {
+      "file": "src/flight/hud/SoundSettingsPanel.tsx",
+      "bytes": 9817,
+      "sha256": "d4635a030b7066b216c5daa8d12f3dbbe537cfdcd537746ad5ef9e8f63e88adb"
+    },
+    {
+      "file": "src/flight/settings/flightParameters.ts",
+      "bytes": 63879,
+      "sha256": "fd19b1002819d62c9b75bb5a2d672bd43e6ec5c1eb9c098b825664aa78041d41"
+    },
+    {
+      "file": "src/flight/audio/highAudio.test.ts",
+      "bytes": 12476,
+      "sha256": "b0db7e46ac5cef2f2c440444392e30980bb08f21d663ad893900c84799b1687a"
+    },
+    {
+      "file": "src/flight/audio/acousticProfiles.test.ts",
+      "bytes": 12149,
+      "sha256": "123539d2bcb678f19138f26954fe1e0dec51a6f003c63c937b6e8539276e9fdc"
+    },
+    {
+      "file": "src/flight/audio/f35bAudio.integration.test.ts",
+      "bytes": 9423,
+      "sha256": "8b26d9a6db57c8ed6155821199a810952854e8e33d1b1ff4cdaf65e959f42725"
+    },
+    {
+      "file": "src/flight/audio/jsbsimAudioAdapter.integration.test.ts",
+      "bytes": 19128,
+      "sha256": "f19de8a06f465db88a0885a96f49cf48e534919617d559948007d8e50d990372"
+    },
+    {
+      "file": "src/flight/audio/dspCore.test.ts",
+      "bytes": 23876,
+      "sha256": "e8df6ed75bf568b9d20d29521090f56c5c688a9e0db976509e341bf4a05ee216"
+    },
+    {
+      "file": "src/flight/audio/createFlightAudio.test.ts",
+      "bytes": 30272,
+      "sha256": "66ea173044d8a62b72d66c99ba523c1f36883ebf93685149bc55b67afb7839ed"
+    },
+    {
+      "file": "src/flight/audio/audioPose.test.ts",
+      "bytes": 10853,
+      "sha256": "3d423842cfdef9e49c7bfbffaf7022d2c7ed6a9d8d8d914dc44535e90bc64478"
+    },
+    {
+      "file": "src/flight/audio/audioSnapshot.test.ts",
+      "bytes": 5424,
+      "sha256": "9c85a2ff2a091c404de765b16653017de103e1bdd6e800926ea865f89062a390"
+    }
+  ],
+  "jsbsim": {
+    "version": "1.2.4-fork.11",
+    "archive": {
+      "file": "deps/felipegalind0-jsbsim-1.2.4-fork.11.tgz",
+      "bytes": 668125,
+      "sha256": "1add69a5e13980af743a788f1e8f8856338ffd01b80e95a8dbaa23f7df0dd71a"
+    }
+  },
+  "checks": [
+    {
+      "command": "TMPDIR=<dated repository build folder>/tmp EM_FROZEN_CACHE=1 npm run build:audio",
+      "exitCode": 0,
+      "compiler": "emcc 6.0.9",
+      "log": "build-audio-final.log"
+    },
+    {
+      "command": "npx tsc -b",
+      "exitCode": 0,
+      "log": "typecheck-final.log"
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "log": "lint.log"
+    },
+    {
+      "command": "npx vitest related --run src/flight/audio/audioSnapshot.ts src/flight/audio/audioPose.ts src/flight/audio/jsbsimAudioAdapter.ts src/flight/audio/audioQuality.ts src/flight/audio/audioRendererRegistry.ts src/flight/audio/createFlightAudio.ts src/flight/audio/audioBank.ts src/flight/audio/audioSettings.ts src/flight/audio/engineAcousticDefinitions.ts src/flight/audio/worklet/dspProcessor.js src/flight/audio/dsp/audio-dsp.wasm src/flight/audio/highAudio.test.ts src/flight/audio/dspCore.test.ts src/flight/audio/acousticProfiles.test.ts src/flight/audio/f35bAudio.integration.test.ts src/flight/hud/SoundSettingsPanel.tsx src/flight/settings/flightParameters.ts benchmarks/audio/renderSweep.test.mjs --maxWorkers=50%",
+      "exitCode": 0,
+      "filesPassed": 59,
+      "testsPassed": 704,
+      "log": "related-tests.log"
+    },
+    {
+      "command": "VITEST_MAX_WORKERS=5 npm run ci",
+      "exitCode": 0,
+      "filesPassed": 148,
+      "testsPassed": 1536,
+      "includes": [
+        "lint",
+        "all tests",
+        "incremental typecheck",
+        "production build",
+        "installed/emitted JSBSim and DSP verification"
+      ],
+      "log": "ci.log"
+    }
+  ],
+  "preservedReference": {
+    "report": "../f135/sf50-reference.json",
+    "checkedBy": "src/flight/audio/acousticProfiles.test.ts",
+    "vectorsPassed": 8,
+    "comparison": "exact Low/Med SF50 sample hashes"
+  },
+  "rejectedExperiment": "rejected-waveform.json",
+  "notPerformed": [
+    "device qualification",
+    "physical playback/listening",
+    "acoustic calibration",
+    "performance benchmark",
+    "browser/GPU test"
+  ],
+  "remainingScope": [
+    "measured engine spectra and directivity calibration",
+    "measured cabin transfer",
+    "level-matched listening review",
+    "crackle/nonlinear waveform model",
+    "independent LiftFan/roll-post/impingement sources",
+    "licensed residual contract if useful"
+  ],
+  "limitations": [
+    "Spectral parameters and gains are uncalibrated.",
+    "Main-nozzle conversion is not complete STOVL sound.",
+    "Finite-history Doppler crossfades preserve pitch but approximate propagation age and can cause level dips or tonal interference.",
+    "No complete app-build attestation exists; freeze app/worklet/setup revisions before populating real qualification records."
+  ],
+  "logs": [
+    {
+      "file": "validation/evidence/audio/procedural-high-2026-10-05/build-audio-final.log",
+      "bytes": 233,
+      "sha256": "37ddd3b2457749467428df314f80ee98068ac46102ecaacabbad3c5861fe9a05"
+    },
+    {
+      "file": "validation/evidence/audio/procedural-high-2026-10-05/typecheck-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "validation/evidence/audio/procedural-high-2026-10-05/lint.log",
+      "bytes": 109,
+      "sha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e"
+    },
+    {
+      "file": "validation/evidence/audio/procedural-high-2026-10-05/related-tests.log",
+      "bytes": 5128,
+      "sha256": "a0a72adff1d6349c9d99bbc88b6718c5f3ab9e03702a8de68fba5359e619ecdc"
+    },
+    {
+      "file": "validation/evidence/audio/procedural-high-2026-10-05/admission-ui-tests.log",
+      "bytes": 571,
+      "sha256": "f9262556b0db09f95b7c09cba41f880b9e84355952cf87ac50906c96d7b29a83"
+    },
+    {
+      "file": "validation/evidence/audio/procedural-high-2026-10-05/ci.log",
+      "bytes": 65381,
+      "sha256": "3df3f5dbf3a13ecd295427493660bbf9a77b4fa4b12d803116370d8f4ddde2ad"
+    }
+  ],
+  "dspCommit": "7de21ba4",
+  "commitScope": "DSP source, WASM and provenance only; app integration, documentation and evidence remain in the combined working tree."
+}

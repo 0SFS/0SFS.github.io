@@ -1,0 +1,10 @@
+
+> osfs@0.0.0 build:audio
+> node scripts/build-audio-wasm.mjs
+
+{
+  "wrote": "src/flight/audio/dsp/audio-dsp.wasm",
+  "bytes": 47901,
+  "sha256": "b51feb881229cf8ba3aec0bacf929e93ded81a61d5c161caa0b26555f24549af",
+  "emcc": "6.0.9"
+}

@@ -1,0 +1,130 @@
+{
+  "schema": 1,
+  "acquiredDate": "2026-10-05",
+  "purpose": "Retained unmodified experimental FDM source candidate; separately modified runtime copy is public/jsbsim-data/aircraft/F-35B-jsbsim/.",
+  "source": {
+    "archiveUrl": "https://fgaddon.b-cdn.net/Aircraft-trunk/F-35B.zip",
+    "cataloguePackageId": "F-35B-yasim",
+    "variantId": "F-35B-jsbsim",
+    "fgaddonRevision": "15340",
+    "archiveBytes": 10618616,
+    "archiveSha256": "caf3c591c838148ccdeec8fc61a23fd09f17574aeb36e0071e84a132dd25ebd6",
+    "archiveMd5": "7d8225e9c41f456d7fbb705064bb0274"
+  },
+  "authors": {
+    "package": [
+      "Petar Jedvaj",
+      "Detlef Faber",
+      "F-GTUX",
+      "Stuart Cassie",
+      "Gary Brown"
+    ],
+    "fdmHeader": "F-GTUX from Erik Hofman F-16 and aeromatic",
+    "creditsSource": "F-35B-jsbsim-set.xml"
+  },
+  "licence": {
+    "packageFile": "License.txt",
+    "packageTextVersion": "GPL version 3",
+    "fdmHeaderName": "GPL (General Public License)",
+    "preservation": "Original source bytes, copyright and licence notices retained; no or-later clause inferred."
+  },
+  "dependencyClosure": [
+    "F-35B-jsbsim.xml",
+    "Engines/F135-PW-600.xml",
+    "Engines/direct.xml",
+    "Engines/liftfan.xml",
+    "Engines/sidefan.xml",
+    "Systems/pushback.xml"
+  ],
+  "relatedReadmeOrCreditFiles": {
+    "readmeFilesInArchive": [],
+    "aircraftCreditsRetainedIn": [
+      "F-35B-jsbsim-set.xml",
+      "F-35B-jsbsim.xml"
+    ],
+    "notes": "Archive has no README, AUTHORS, CREDITS, or other text documentation apart from License.txt; credits are in the XML headers."
+  },
+  "sourceWiringFinding": "JSBSim entry point includes fan-yasim.nas although fan-jsbsim.nas is present.",
+  "files": [
+    {
+      "path": "F-35B-jsbsim.xml",
+      "archivePath": "F-35B/F-35B-jsbsim.xml",
+      "bytes": 37491,
+      "sha256": "0f1cbe9f4d0232c3cbd36a64f1cfe046af947834a68e6053ddaa3eb7aa389e7d",
+      "role": "aircraft FDM",
+      "modified": false
+    },
+    {
+      "path": "Engines/F135-PW-600.xml",
+      "archivePath": "F-35B/Engines/F135-PW-600.xml",
+      "bytes": 3615,
+      "sha256": "77e5494173485bc24f8e3754a9ba31dd93f5aebc651285eb477184aff8169c6e",
+      "role": "main engine",
+      "modified": false
+    },
+    {
+      "path": "Engines/direct.xml",
+      "archivePath": "F-35B/Engines/direct.xml",
+      "bytes": 114,
+      "sha256": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc",
+      "role": "direct thruster",
+      "modified": false
+    },
+    {
+      "path": "Engines/liftfan.xml",
+      "archivePath": "F-35B/Engines/liftfan.xml",
+      "bytes": 2168,
+      "sha256": "926c3ebefdf753f8cf2797b02d662a665a46dbd4257858deff4ce0945ccd46a2",
+      "role": "lift-fan turbine surrogate",
+      "modified": false
+    },
+    {
+      "path": "Engines/sidefan.xml",
+      "archivePath": "F-35B/Engines/sidefan.xml",
+      "bytes": 2236,
+      "sha256": "e0ad665eb77db712e4f106c32009760dcf2a6ecb0cd9aab069562d2a6fdb6122",
+      "role": "roll-post turbine surrogate",
+      "modified": false
+    },
+    {
+      "path": "Systems/pushback.xml",
+      "archivePath": "F-35B/Systems/pushback.xml",
+      "bytes": 1127,
+      "sha256": "868928e9b2b12440daec283260aebb1562d05154f69438f5d95043444378a4bc",
+      "role": "referenced system",
+      "modified": false
+    },
+    {
+      "path": "F-35B-jsbsim-set.xml",
+      "archivePath": "F-35B/F-35B-jsbsim-set.xml",
+      "bytes": 17386,
+      "sha256": "cef40528e6443aa3b9a7a3b202d02b07102e0e7dc968c5aeb5bb10660e8ec6ab",
+      "role": "FlightGear entry point and aircraft credits",
+      "modified": false
+    },
+    {
+      "path": "Nasal/fan-jsbsim.nas",
+      "archivePath": "F-35B/Nasal/fan-jsbsim.nas",
+      "bytes": 1383,
+      "sha256": "566a91ed044c3f097145f599a23d4b82231a2753738a4e6bd77572c2054f42b4",
+      "role": "JSBSim STOVL mixer",
+      "modified": false
+    },
+    {
+      "path": "Nasal/fan-yasim.nas",
+      "archivePath": "F-35B/Nasal/fan-yasim.nas",
+      "bytes": 699,
+      "sha256": "7e331e465e980be103c8afe04f88e0d1cee758d48764839eea4da95191f73037",
+      "role": "Nasal mixer actually included by JSBSim entry point",
+      "modified": false
+    },
+    {
+      "path": "License.txt",
+      "archivePath": "F-35B/License.txt",
+      "bytes": 35147,
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "role": "package licence",
+      "modified": false
+    }
+  ]
+}

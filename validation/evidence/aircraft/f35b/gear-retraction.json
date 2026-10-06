@@ -1,0 +1,202 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-05",
+  "change": "Both main legs rotate positively about their retained local glTF X axes instead of opposite local Z axes. Nose gear, doors, controls, STOVL, original source and distributed GLB are unchanged.",
+  "factCheck": {
+    "directPrimaryStatement": {
+      "variant": "F-35A",
+      "publisher": "United States Air Force Accident Investigation Board",
+      "title": "19 May 2020 Eglin AFB F-35A accident report",
+      "url": "https://www.afjag.af.mil/Portals/77/AIB-Reports/2020/19MAY20%20Eglin%20AFB%20F35A%20AIB%20Report.pdf",
+      "section": "Main landing gear (MLG)",
+      "quote": "retracts forward into a well at the forward edge of the wing",
+      "access": "Primary-source text available in indexed search excerpt; direct PDF requests returned403."
+    },
+    "applicationToF35B": "B-specific visual evidence: the official USMC photograph identifies an F-35B retracting its gear. Its main wheels are visibly forward and above their fully extended positions relative to their strut attachments, supporting forward/upward folding. Direction is a visual interpretation of the photograph; exact trajectory and travel limits are not supplied by its caption.",
+    "bGeometryFrame": {
+      "publisher": "F-35 Lightning II Pax River Integrated Test Force / DVIDS",
+      "url": "https://www.dvidshub.net/video/506908/american-lightning-f-35b-lightning-ii-conducts-operations-aboard-uss-america-lha-6",
+      "timestampSeconds": 344,
+      "videoDate": "2016-11-19",
+      "frame": "gear-source-b-344s.png",
+      "credit": "U.S. Navy video edited by PO1 Demetrius Kennon; DVIDS declares public domain subject to its published restrictions.",
+      "observation": "B main gear is extended in this underside view. It supports visual geometry comparison, not a forward-retraction claim."
+    },
+    "otherReviewedBClips": [
+      "https://www.dvidshub.net/video/789872/stopping-mid-air-f-35b-lightning-iis-conduct-vertical-landings",
+      "https://www.dvidshub.net/video/506972/f-35b-lightning-ii-free-sm-content",
+      "https://www.dvidshub.net/video/786600/f-35b-lightning-ii",
+      "https://www.dvidshub.net/video/490303/f-35b-lightning-ii-tested-aboard-uss-america"
+    ],
+    "oemBroll": {
+      "catalogue": "https://www.lockheedmartin.com/f35/mediakit.html",
+      "publishedLink": "https://vimeo.com/675656640/bef9e6a7e4",
+      "access": "Published manufacturer page read successfully; embedded player returned401 and could not be reviewed."
+    },
+    "bRetractionPhotograph": {
+      "publisher": "U.S. Marine Corps / Marine Corps Air Station Yuma / DVIDS",
+      "url": "https://www.dvidshub.net/image/997094/simultaneous-launch-four-f-35b-lightning-ii-aircraft",
+      "imageUrl": "https://d1ldvf68ux039x.cloudfront.net/thumbs/photos/1308/997094/2000w_q95.jpg",
+      "title": "Simultaneous Launch of Four F-35B Lightning II Aircraft",
+      "date": "2013-08-15",
+      "virin": "130815-M-TE786-001",
+      "credit": "U.S. Marine Corps photo by Cpl. William Waterstreet. DVIDS declares public domain subject to its published restrictions.",
+      "retainedImage": "gear-source-b-retracting.jpg",
+      "sha256": "23f6f2addf4e80a2733e1be02e1da01fbee55359460a5ef5fb9566b03377d5d0",
+      "captionScope": "Official caption explicitly identifies an F-35B retracting its landing gear shortly after takeoff.",
+      "visualObservation": "Both main wheels are ahead of their strut attachments in the pictured intermediate pose, with the legs lifting toward their forward bays.",
+      "inference": "The retraction direction is forward and upward. A still image does not qualify exact timing, axes, wheel swivel, or full-cycle motion."
+    },
+    "userVideoReference": {
+      "url": "https://www.youtube.com/watch?v=vsKwBzt7rDY&t=315s",
+      "timestampSeconds": 315,
+      "suppliedBy": "pilot",
+      "suppliedObservation": "All three landing-gear legs retract forward.",
+      "inspectionScope": "Pilot-supplied corroboration; this session could not fetch the YouTube video through its web reader. The independent primary photo and actual-model checks are retained separately."
+    }
+  },
+  "geometry": {
+    "asset": "public/aircraft/f-35b/F-35B_AF267.glb",
+    "sha256": "8324d792711a8aecd74988dd9e314b3b4e6f1f3a819591ce60f34caa004d7fbd",
+    "frame": "Standard glTF: -Z nose, +Y up. Origin below source-FDM assumed longitudinal CG.",
+    "hingeAxisLocal": [
+      1,
+      0,
+      0
+    ],
+    "sign": 1,
+    "quarterTurnEndPoseAssumption": true,
+    "wheelCenters": [
+      {
+        "gearDownNorm": 1,
+        "wheelCentersMeters": {
+          "leftWheel": [
+            -2.1492886131679194,
+            0.5079363928917507,
+            0.7735666220437006
+          ],
+          "rightWheel": [
+            2.149287424508616,
+            0.5079364901464435,
+            0.7735682105559069
+          ],
+          "noseWheel": [
+            0.0000014568008469192807,
+            0.36343404460573203,
+            -5.466116677804479
+          ]
+        }
+      },
+      {
+        "gearDownNorm": 0.75,
+        "wheelCentersMeters": {
+          "leftWheel": [
+            -2.1492883497803468,
+            0.6254574443374971,
+            0.06544979394312113
+          ],
+          "rightWheel": [
+            2.1492876878961704,
+            0.6254575334925726,
+            0.06545143125913719
+          ],
+          "noseWheel": [
+            0.0000016548645096896328,
+            0.5527629325935661,
+            -6.000577463168195
+          ]
+        }
+      },
+      {
+        "gearDownNorm": 0.5,
+        "wheelCentersMeters": {
+          "leftWheel": [
+            -2.1492881392400287,
+            1.0700339291330145,
+            -0.49810357666516347
+          ],
+          "rightWheel": [
+            2.1492878984364743,
+            1.070033987647629,
+            -0.49810190050873243
+          ],
+          "noseWheel": [
+            0.0000017937377362464262,
+            0.9764552217113122,
+            -6.3773779579869965
+          ]
+        }
+      },
+      {
+        "gearDownNorm": 0.25,
+        "wheelCentersMeters": {
+          "leftWheel": [
+            -2.1492880337953553,
+            1.731338257984274,
+            -0.7772401980661533
+          ],
+          "rightWheel": [
+            2.14928800388114,
+            1.7313382709214225,
+            -0.7772385026714692
+          ],
+          "noseWheel": [
+            0.0000018389572816598237,
+            1.5293660146027144,
+            -6.503010089612198
+          ]
+        }
+      },
+      {
+        "gearDownNorm": 0,
+        "wheelCentersMeters": {
+          "leftWheel": [
+            -2.149288029777873,
+            1.817777936775973,
+            -0.7874415871597867
+          ],
+          "rightWheel": [
+            2.1492880078986225,
+            1.8177779437556505,
+            -0.7874398910620173
+          ],
+          "noseWheel": [
+            0.0000018372829186964422,
+            1.598002350029667,
+            -6.498989466391587
+          ]
+        }
+      }
+    ],
+    "method": "Affine transforms of the serialized GLB nodes using the same retained rest-quaternion/local-X binding. Independent retained measurements; production regression test separately evaluates actual Babylon transforms."
+  },
+  "regression": {
+    "command": "npx vitest run src/flight/aircraft/aircraftAnimation.f35b.test.ts --maxWorkers=50%",
+    "passed": 5,
+    "failed": 0,
+    "log": "gear-retraction-tests.log",
+    "actualModelAssertions": [
+      "Both main-wheel centers move forward and up through four physical positions.",
+      "Main-wheel lateral coordinates stay at their authored positions.",
+      "Each retained spanwise hinge stays fixed.",
+      "Gear returns to its authored extended pose.",
+      "A held camera frame does not advance gear motion.",
+      "The nose-wheel fully retracted center is forward and above its extended center; its pre-existing forward binding is retained."
+    ]
+  },
+  "limitations": [
+    "The B-specific primary still confirms an intermediate retraction pose, not a complete gear cycle or exact mechanical trajectory.",
+    "The source has no authored gear animation or verified travel limits.",
+    "Secondary wheel/strut swivel and exact hydraulic sequencing have not been calibrated."
+  ],
+  "files": [
+    {
+      "path": "src/flight/aircraft/aircraftAnimation.ts",
+      "sha256": "b092ea338e7a84183f90f6c985198931080374abba0d5b4f7a0332874c33ec27"
+    },
+    {
+      "path": "src/flight/aircraft/aircraftAnimation.f35b.test.ts",
+      "sha256": "703b618e5e402716e6b90e0f4fb4d7db5a2b43320d7ee4b190d7303249a4996c"
+    }
+  ]
+}

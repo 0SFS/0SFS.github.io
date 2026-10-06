@@ -1,0 +1,45 @@
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+(node:86291) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86294) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86292) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86293) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86299) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86302) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ benchmarks/audio/renderSweep.test.mjs (4 tests | 1 failed) 1267ms
+     × reads the wire format from snapshot.h 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  benchmarks/audio/renderSweep.test.mjs > offline sweep renderer > reads the wire format from snapshot.h
+AssertionError: expected 30 to be 29 // Object.is equality
+
+- Expected
++ Received
+
+- 29
++ 30
+
+ ❯ benchmarks/audio/renderSweep.test.mjs:26:30
+     24|   it("reads the wire format from snapshot.h", () => {
+     25|     const abi = readAbi();
+     26|     expect(abi.snapshotSize).toBe(29);
+       |                              ^
+     27|     expect(abi.slot.n1Pct).toBe(5);
+     28|     expect(abi.batchLength).toBe(2 + 8 * 29 + 32 * 4);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 16 passed (17)
+      Tests  1 failed | 146 passed | 1 skipped (148)
+   Start at  15:25:35
+   Duration  4.32s (transform 325ms, setup 0ms, import 2.88s, tests 8.06s, environment 729ms)
+

@@ -1,0 +1,840 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-05T23:16:26.099Z",
+  "scope": "Installed fork.11 native telemetry + F-35B GLB; dry hot hardware, AB/front occlusion and converted inhibit; default smoke shaders/pixels/draw budget, pause and double-precision ECEF frame reprojection. No timing benchmark or physics/real-optics calibration.",
+  "exhaustSmokeQualified": true,
+  "forceLabelsQualified": true,
+  "combinedRunPassed": false,
+  "forceLabelsFollowup": {
+    "report": "forces-only-report.json",
+    "log": "forces-only.log",
+    "passed": true,
+    "originalCombinedReportUnmodified": true,
+    "ownerFix": "FOSS Earth paints/uploads the initial formatted DynamicTexture label while hidden before waiting for mesh/material readiness.",
+    "nativeStateUnchanged": true,
+    "chromeExit": {
+      "code": 0,
+      "signal": null
+    },
+    "browserErrors": [],
+    "failures": [],
+    "renderers": [
+      {
+        "renderer": "webgl2",
+        "gpu": {
+          "backend": "webgl2",
+          "vendor": "Google Inc. (Apple)",
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+          "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        },
+        "budget": {
+          "enabledGlyphMeshes": 21,
+          "addedDraws": 21,
+          "labels": true
+        },
+        "onDifference": {
+          "changedPixels": 24888,
+          "sumRgbDifference": 2944940,
+          "maxChannelDifference": 246
+        },
+        "offDifference": {
+          "changedPixels": 24888,
+          "sumRgbDifference": 2944940,
+          "maxChannelDifference": 246
+        }
+      },
+      {
+        "renderer": "webgpu",
+        "gpu": {
+          "backend": "webgpu",
+          "vendor": "apple",
+          "architecture": "metal-3",
+          "device": "",
+          "description": "",
+          "fallback": false
+        },
+        "budget": {
+          "enabledGlyphMeshes": 21,
+          "addedDraws": 21,
+          "labels": true
+        },
+        "onDifference": {
+          "changedPixels": 24918,
+          "sumRgbDifference": 2943863,
+          "maxChannelDifference": 246
+        },
+        "offDifference": {
+          "changedPixels": 24918,
+          "sumRgbDifference": 2943863,
+          "maxChannelDifference": 246
+        }
+      }
+    ],
+    "ownerSource": {
+      "file": "foss-earth/src/diagnostics/createVectorDebugDrawing.ts",
+      "sha256": "d79defacdb5776e366a831d42b7a99fad3554ab6f3b79657fb5a728e4139a82b"
+    },
+    "ownerChecks": {
+      "passed": true,
+      "focusedCases": 8,
+      "focusedLog": "owner-label-focused.log",
+      "typecheckLog": "owner-label-typecheck.log",
+      "lintLog": "owner-label-lint.log",
+      "readinessReceipt": "owner-label-readiness.json"
+    },
+    "qualificationScope": "Native cached forces, real text texture readiness, shader compilation, displayed pixels and on/off cleanup. This run does not qualify billboard label placement; a later owner placement correction is separately tracked by root.",
+    "labelPlacementQualification": false
+  },
+  "chromeExit": {
+    "code": 0,
+    "signal": null
+  },
+  "browserErrors": [],
+  "failures": [],
+  "renderers": [
+    {
+      "renderer": "webgl2",
+      "gpu": {
+        "backend": "webgl2",
+        "vendor": "Google Inc. (Apple)",
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      },
+      "sdkIdentity": {
+        "aircraftId": "f-35b",
+        "build": {
+          "schemaVersion": 2,
+          "package": {
+            "name": "@felipegalind0/jsbsim",
+            "version": "1.2.4-fork.11"
+          },
+          "native": {
+            "origin": "https://github.com/Felipegalind0/jsbsim",
+            "commit": "c1d57a2c3860ae9ae47f2b27b84f37912042c19c",
+            "contentSha256": "fec8d16c38fd80da1446cde2b1f5523796d737eef6bac5426a7df4b11c2e2021",
+            "dirty": false
+          },
+          "sdk": {
+            "commit": "c1d57a2c3860ae9ae47f2b27b84f37912042c19c",
+            "contentSha256": "d40290a03a3c40552b8dce8c3dfb6aeb5f19587f406d7083c461bc5ec2dfb5a4",
+            "dirty": false,
+            "path": "wasm"
+          },
+          "build": {
+            "mode": "in-tree",
+            "inputSha256": "d353cac279c53cbc55c05b5231680ae85c26ae62b8b6c68a7e388fed90e0e7bc",
+            "toolchain": {
+              "node": "v26.8.2",
+              "npm": "11.19.1",
+              "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+              "cmake": "cmake version 4.4.3",
+              "clang": "clang version 24.0.0git",
+              "platform": "darwin",
+              "arch": "arm64",
+              "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+            },
+            "options": {
+              "buildType": "Release",
+              "cxxStandard": 17,
+              "sdkTarget": "es2022"
+            }
+          }
+        },
+        "assets": {
+          "moduleUrl": "https://0sfs.test/assets/jsbsim_wasm-DAhL615P.mjs",
+          "wasmUrl": "https://0sfs.test/assets/jsbsim_wasm-BSZ8OOhS.wasm"
+        }
+      },
+      "actualGlb": {
+        "triangles": 12259,
+        "meshReady": true,
+        "rigBound": [
+          "leftElevator",
+          "rightElevator",
+          "leftFlaperon",
+          "rightFlaperon",
+          "leftRudder",
+          "rightRudder",
+          "leftWheel",
+          "noseWheel",
+          "rightWheel",
+          "leftGear",
+          "rightGear",
+          "noseGear",
+          "leftDoor",
+          "rightDoor",
+          "leftNoseDoor",
+          "rightNoseDoor",
+          "topLiftDoor",
+          "leftLiftDoor",
+          "rightLiftDoor",
+          "leftEngineDoor",
+          "rightEngineDoor",
+          "leftExhaustDoor",
+          "rightExhaustDoor",
+          "vtol",
+          "feather.001",
+          "feather.002",
+          "feather.003",
+          "feather.004",
+          "feather.005",
+          "feather.006",
+          "feather.007",
+          "feather.008",
+          "feather.009",
+          "feather.010",
+          "feather.011",
+          "feather.012",
+          "feather.013",
+          "feather.014",
+          "feather.015",
+          "feather.016"
+        ]
+      },
+      "dryGlow": {
+        "clones": [
+          {
+            "name": "darkmet2-engine-thermal",
+            "emissive": [
+              0.21825997978123124,
+              0.020240565125536215,
+              0
+            ]
+          }
+        ],
+        "difference": {
+          "changedPixels": 2520,
+          "sumRgbDifference": 341172,
+          "maxChannelDifference": 120
+        },
+        "releasedOnDisable": true
+      },
+      "nativeAfterburner": {
+        "augmentation": true,
+        "nozzlePositionNorm": 1,
+        "conversion": 0,
+        "n1Pct": 100,
+        "n2Pct": 100,
+        "thrustLbf": 34566.090693940016,
+        "fuelFlowPps": 16.32287616102723,
+        "simulationTimeS": 14.999999999999789,
+        "augmentationDuringConversion": 0
+      },
+      "convertedNative": {
+        "augmentation": false,
+        "nozzlePositionNorm": 0.01000000000000012,
+        "conversion": 1,
+        "n1Pct": 99.3,
+        "n2Pct": 99.6,
+        "thrustLbf": 12539.029054188684,
+        "fuelFlowPps": 6.888936171017515,
+        "simulationTimeS": 18.999999999999563,
+        "augmentationDuringConversion": 0
+      },
+      "frontOcclusionDifference": {
+        "changedPixels": 0,
+        "sumRgbDifference": 0,
+        "maxChannelDifference": 0
+      },
+      "afterburnerDifference": {
+        "changedPixels": 5362,
+        "sumRgbDifference": 1278589,
+        "maxChannelDifference": 245
+      },
+      "plumeBudget": {
+        "draws": 1,
+        "triangles": 12,
+        "samples": 8,
+        "maxSamples": 32,
+        "lutRgbaBytes": 8192
+      },
+      "smokeBudget": {
+        "draws": 1,
+        "quadTriangles": 2,
+        "liveInstances": 11,
+        "maxParticles": 64,
+        "settings": {
+          "enabled": true,
+          "maxParticles": 64,
+          "emissionPerSecond": 8,
+          "lifetimeSeconds": 2,
+          "maxDistanceMeters": 1000,
+          "opacity": 0.025
+        },
+        "textureEncodedBytes": 7900,
+        "textureEncodedSha256": "73c447a6b283841a81373d4d7fcb591b027fcdab1dd402d57315603285985590",
+        "textureDecodedRgbaBytes": 65536
+      },
+      "smokeDifference": {
+        "changedPixels": 15,
+        "sumRgbDifference": 3288,
+        "maxChannelDifference": 3
+      },
+      "smokePaused": true,
+      "nativeClockPaused": true,
+      "noPausedRenderRequests": true,
+      "frameProjection": {
+        "native": {
+          "augmentation": false,
+          "nozzlePositionNorm": 0.30000000000000004,
+          "conversion": 0,
+          "n1Pct": 79,
+          "n2Pct": 88,
+          "thrustLbf": 9250.705954397714,
+          "fuelFlowPps": 2.4059572938779437,
+          "simulationTimeS": 24.49999999999925
+        },
+        "rotationRadians": 0.23,
+        "translationMeters": [
+          2,
+          1,
+          -3
+        ],
+        "maxProjectionErrorMeters": 2.5995358399200086e-7,
+        "instances": 11
+      },
+      "exhaustSmokeQualified": true
+    },
+    {
+      "renderer": "webgpu",
+      "gpu": {
+        "backend": "webgpu",
+        "vendor": "apple",
+        "architecture": "metal-3",
+        "device": "",
+        "description": "",
+        "fallback": false
+      },
+      "sdkIdentity": {
+        "aircraftId": "f-35b",
+        "build": {
+          "schemaVersion": 2,
+          "package": {
+            "name": "@felipegalind0/jsbsim",
+            "version": "1.2.4-fork.11"
+          },
+          "native": {
+            "origin": "https://github.com/Felipegalind0/jsbsim",
+            "commit": "c1d57a2c3860ae9ae47f2b27b84f37912042c19c",
+            "contentSha256": "fec8d16c38fd80da1446cde2b1f5523796d737eef6bac5426a7df4b11c2e2021",
+            "dirty": false
+          },
+          "sdk": {
+            "commit": "c1d57a2c3860ae9ae47f2b27b84f37912042c19c",
+            "contentSha256": "d40290a03a3c40552b8dce8c3dfb6aeb5f19587f406d7083c461bc5ec2dfb5a4",
+            "dirty": false,
+            "path": "wasm"
+          },
+          "build": {
+            "mode": "in-tree",
+            "inputSha256": "d353cac279c53cbc55c05b5231680ae85c26ae62b8b6c68a7e388fed90e0e7bc",
+            "toolchain": {
+              "node": "v26.8.2",
+              "npm": "11.19.1",
+              "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+              "cmake": "cmake version 4.4.3",
+              "clang": "clang version 24.0.0git",
+              "platform": "darwin",
+              "arch": "arm64",
+              "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+            },
+            "options": {
+              "buildType": "Release",
+              "cxxStandard": 17,
+              "sdkTarget": "es2022"
+            }
+          }
+        },
+        "assets": {
+          "moduleUrl": "https://0sfs.test/assets/jsbsim_wasm-DAhL615P.mjs",
+          "wasmUrl": "https://0sfs.test/assets/jsbsim_wasm-BSZ8OOhS.wasm"
+        }
+      },
+      "actualGlb": {
+        "triangles": 12259,
+        "meshReady": true,
+        "rigBound": [
+          "leftElevator",
+          "rightElevator",
+          "leftFlaperon",
+          "rightFlaperon",
+          "leftRudder",
+          "rightRudder",
+          "leftWheel",
+          "noseWheel",
+          "rightWheel",
+          "leftGear",
+          "rightGear",
+          "noseGear",
+          "leftDoor",
+          "rightDoor",
+          "leftNoseDoor",
+          "rightNoseDoor",
+          "topLiftDoor",
+          "leftLiftDoor",
+          "rightLiftDoor",
+          "leftEngineDoor",
+          "rightEngineDoor",
+          "leftExhaustDoor",
+          "rightExhaustDoor",
+          "vtol",
+          "feather.001",
+          "feather.002",
+          "feather.003",
+          "feather.004",
+          "feather.005",
+          "feather.006",
+          "feather.007",
+          "feather.008",
+          "feather.009",
+          "feather.010",
+          "feather.011",
+          "feather.012",
+          "feather.013",
+          "feather.014",
+          "feather.015",
+          "feather.016"
+        ]
+      },
+      "dryGlow": {
+        "clones": [
+          {
+            "name": "darkmet2-engine-thermal",
+            "emissive": [
+              0.21825997978123124,
+              0.020240565125536215,
+              0
+            ]
+          }
+        ],
+        "difference": {
+          "changedPixels": 2520,
+          "sumRgbDifference": 341216,
+          "maxChannelDifference": 120
+        },
+        "releasedOnDisable": true
+      },
+      "nativeAfterburner": {
+        "augmentation": true,
+        "nozzlePositionNorm": 1,
+        "conversion": 0,
+        "n1Pct": 100,
+        "n2Pct": 100,
+        "thrustLbf": 34566.090693940016,
+        "fuelFlowPps": 16.32287616102723,
+        "simulationTimeS": 14.999999999999789,
+        "augmentationDuringConversion": 0
+      },
+      "convertedNative": {
+        "augmentation": false,
+        "nozzlePositionNorm": 0.01000000000000012,
+        "conversion": 1,
+        "n1Pct": 99.3,
+        "n2Pct": 99.6,
+        "thrustLbf": 12539.029054188684,
+        "fuelFlowPps": 6.888936171017515,
+        "simulationTimeS": 18.999999999999563,
+        "augmentationDuringConversion": 0
+      },
+      "frontOcclusionDifference": {
+        "changedPixels": 0,
+        "sumRgbDifference": 0,
+        "maxChannelDifference": 0
+      },
+      "afterburnerDifference": {
+        "changedPixels": 5362,
+        "sumRgbDifference": 1278618,
+        "maxChannelDifference": 245
+      },
+      "plumeBudget": {
+        "draws": 1,
+        "triangles": 12,
+        "samples": 8,
+        "maxSamples": 32,
+        "lutRgbaBytes": 8192
+      },
+      "smokeBudget": {
+        "draws": 1,
+        "quadTriangles": 2,
+        "liveInstances": 11,
+        "maxParticles": 64,
+        "settings": {
+          "enabled": true,
+          "maxParticles": 64,
+          "emissionPerSecond": 8,
+          "lifetimeSeconds": 2,
+          "maxDistanceMeters": 1000,
+          "opacity": 0.025
+        },
+        "textureEncodedBytes": 7900,
+        "textureEncodedSha256": "73c447a6b283841a81373d4d7fcb591b027fcdab1dd402d57315603285985590",
+        "textureDecodedRgbaBytes": 65536
+      },
+      "smokeDifference": {
+        "changedPixels": 15,
+        "sumRgbDifference": 3288,
+        "maxChannelDifference": 3
+      },
+      "smokePaused": true,
+      "nativeClockPaused": true,
+      "noPausedRenderRequests": true,
+      "frameProjection": {
+        "native": {
+          "augmentation": false,
+          "nozzlePositionNorm": 0.30000000000000004,
+          "conversion": 0,
+          "n1Pct": 79,
+          "n2Pct": 88,
+          "thrustLbf": 9250.705954397714,
+          "fuelFlowPps": 2.4059572938779437,
+          "simulationTimeS": 24.49999999999925
+        },
+        "rotationRadians": 0.23,
+        "translationMeters": [
+          2,
+          1,
+          -3
+        ],
+        "maxProjectionErrorMeters": 2.5995358399200086e-7,
+        "instances": 11
+      },
+      "exhaustSmokeQualified": true
+    }
+  ],
+  "history": [
+    {
+      "report": "attempt-1-report.json",
+      "log": "attempt-1.log",
+      "reason": "Cached thinInstanceGetWorldMatrices snapshot gave a false projection error."
+    },
+    {
+      "report": "attempt-2-report.json",
+      "log": "attempt-2.log",
+      "reason": "Vertex-buffer getData is discarded after GPU upload; harness readout threw."
+    },
+    {
+      "report": "attempt-3-report.json",
+      "log": "attempt-3.log",
+      "reason": "Exhaust/smoke completed; real force-label readiness cycle timed out."
+    }
+  ],
+  "capabilityValidation": {
+    "profileField": "requiredReadOnlyModelProperties",
+    "requiredNativeProperty": "propulsion/engine[0]/body-force-z-lbs",
+    "focusedTests": 17,
+    "focusedFiles": 2,
+    "passed": true,
+    "log": "native-capabilities-focused.log"
+  },
+  "limitations": [
+    "Fixed aircraft reference is intentionally independent of native aircraft trajectory for close visual framing.",
+    "Smoke is an artistic sparse aerosol with exposed default settings, not CFD, soot calibration or a contrail.",
+    "GPU projection uses the actual retained instance matrix array; generic Babylon world-matrix getter caches its first snapshot.",
+    "No server or external requests were used; both hardware GPU adapters are recorded in original reports."
+  ],
+  "allRequestedGpuChecksQualified": true,
+  "exhaustSmokeCombinedRunDisposition": "Failed only at subsequent force-label readiness. Completed exhaust/smoke results independently qualified and retained; no rewriting of failed original report.",
+  "forceAnchorFollowup": {
+    "qualified": true,
+    "status": "Complete: final actual hardware force-only capture passes native direction + label-tip assertions on both backends.",
+    "report": "forces-final-report.json",
+    "log": "forces-final.log",
+    "fixture": "forces-final-fixture.txt",
+    "screenshotPrefix": "final-",
+    "failedOrientationReport": "force-anchor-orientation-failed-report.json",
+    "failedOrientationLog": "force-anchor-orientation-failed.log",
+    "ownerFinalReceipt": "owner-label-final.json",
+    "ownerFocusedCases": 12,
+    "ownerLogs": [
+      "owner-direction-focused.log",
+      "owner-direction-typecheck.log",
+      "owner-direction-lint.log",
+      "owner-direction-build.log"
+    ],
+    "ownerSource": {
+      "file": "foss-earth/src/diagnostics/createVectorDebugDrawing.ts",
+      "sha256": "7420a3114b32ab1e1edf5cbc2b6c232e9c0a18aee13e694cb6acd8437e82f5ed"
+    },
+    "harness": {
+      "file": "scripts/validation/f35b/check-exhaust-headless.mjs",
+      "sha256": "1f47fbd439ab6387fe77039f3895acb8c9f2f5a48900b4ffd1f594f230e9334d"
+    },
+    "nativeStateUnchanged": true,
+    "chromeExit": {
+      "code": 0,
+      "signal": null
+    },
+    "browserErrors": [],
+    "failures": [],
+    "renderers": [
+      {
+        "renderer": "webgl2",
+        "gpu": {
+          "backend": "webgl2",
+          "vendor": "Google Inc. (Apple)",
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+          "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        },
+        "budget": {
+          "enabledGlyphMeshes": 21,
+          "addedDraws": 21,
+          "labels": true,
+          "maxLabelWorldErrorMeters": 9.224146445393686e-7
+        },
+        "labels": [
+          {
+            "id": "aero-0",
+            "label": "Drag",
+            "expectedWorld": [
+              -2.106986916487262e-7,
+              0.44241868393238176,
+              -1.536387578941822
+            ],
+            "actualWorld": [
+              -2.1069870115297817e-7,
+              0.4424186646938324,
+              -1.53638756275177
+            ],
+            "worldErrorMeters": 2.5144374406837753e-8
+          },
+          {
+            "id": "aero-1",
+            "label": "Side force",
+            "expectedWorld": [
+              -0.35000433753463756,
+              0.39014399836874214,
+              4.794375177592389e-8
+            ],
+            "actualWorld": [
+              -0.3500043451786041,
+              0.3901439905166626,
+              4.794375385586136e-8
+            ],
+            "worldErrorMeters": 1.0958347415179014e-8
+          },
+          {
+            "id": "aero-2",
+            "label": "Lift",
+            "expectedWorld": [
+              0,
+              9.141611067665469,
+              0.297763520857119
+            ],
+            "actualWorld": [
+              0,
+              9.141610145568848,
+              0.29776349663734436
+            ],
+            "worldErrorMeters": 9.224146445393686e-7
+          },
+          {
+            "id": "engine-0",
+            "label": "Main engine",
+            "expectedWorld": [
+              0,
+              4.511946372076636e-17,
+              -1.9993300124683033
+            ],
+            "actualWorld": [
+              0,
+              5.924608477866054e-16,
+              -1.9993300437927246
+            ],
+            "worldErrorMeters": 3.1324421279066434e-8
+          },
+          {
+            "id": "weight",
+            "label": "Weight",
+            "expectedWorld": [
+              3.364451517820758e-7,
+              -8.570670005061313,
+              -0.3149117835024655
+            ],
+            "actualWorld": [
+              3.364451401921542e-7,
+              -8.570669174194336,
+              -0.31491178274154663
+            ],
+            "worldErrorMeters": 8.308673254270908e-7
+          },
+          {
+            "id": "applied",
+            "label": "Applied total (excludes gravity)",
+            "expectedWorld": [
+              -0.000004684938924737831,
+              8.78847714810949,
+              1.2641082594989153
+            ],
+            "actualWorld": [
+              -0.0000046849386308167595,
+              8.788476943969727,
+              1.2641081809997559
+            ],
+            "worldErrorMeters": 2.1871250721225316e-7
+          },
+          {
+            "id": "net",
+            "label": "Net force (with gravity)",
+            "expectedWorld": [
+              -0.000005735273162333417,
+              0.30359395721830484,
+              1.2523658699472788
+            ],
+            "actualWorld": [
+              -0.000005735273134632735,
+              0.3035939633846283,
+              1.2523658275604248
+            ],
+            "worldErrorMeters": 4.283303560563239e-8
+          }
+        ],
+        "onDifference": {
+          "changedPixels": 10834,
+          "sumRgbDifference": 1221636,
+          "maxChannelDifference": 246
+        },
+        "offDifference": {
+          "changedPixels": 10834,
+          "sumRgbDifference": 1221636,
+          "maxChannelDifference": 246
+        }
+      },
+      {
+        "renderer": "webgpu",
+        "gpu": {
+          "backend": "webgpu",
+          "vendor": "apple",
+          "architecture": "metal-3",
+          "device": "",
+          "description": "",
+          "fallback": false
+        },
+        "budget": {
+          "enabledGlyphMeshes": 21,
+          "addedDraws": 21,
+          "labels": true,
+          "maxLabelWorldErrorMeters": 9.224146445393686e-7
+        },
+        "labels": [
+          {
+            "id": "aero-0",
+            "label": "Drag",
+            "expectedWorld": [
+              -2.106986916487262e-7,
+              0.44241868393238176,
+              -1.536387578941822
+            ],
+            "actualWorld": [
+              -2.1069870115297817e-7,
+              0.4424186646938324,
+              -1.53638756275177
+            ],
+            "worldErrorMeters": 2.5144374406837753e-8
+          },
+          {
+            "id": "aero-1",
+            "label": "Side force",
+            "expectedWorld": [
+              -0.35000433753463756,
+              0.39014399836874214,
+              4.794375177592389e-8
+            ],
+            "actualWorld": [
+              -0.3500043451786041,
+              0.3901439905166626,
+              4.794375385586136e-8
+            ],
+            "worldErrorMeters": 1.0958347415179014e-8
+          },
+          {
+            "id": "aero-2",
+            "label": "Lift",
+            "expectedWorld": [
+              0,
+              9.141611067665469,
+              0.297763520857119
+            ],
+            "actualWorld": [
+              0,
+              9.141610145568848,
+              0.29776349663734436
+            ],
+            "worldErrorMeters": 9.224146445393686e-7
+          },
+          {
+            "id": "engine-0",
+            "label": "Main engine",
+            "expectedWorld": [
+              0,
+              4.511946372076636e-17,
+              -1.9993300124683033
+            ],
+            "actualWorld": [
+              0,
+              5.924608477866054e-16,
+              -1.9993300437927246
+            ],
+            "worldErrorMeters": 3.1324421279066434e-8
+          },
+          {
+            "id": "weight",
+            "label": "Weight",
+            "expectedWorld": [
+              3.364451517820758e-7,
+              -8.570670005061313,
+              -0.3149117835024655
+            ],
+            "actualWorld": [
+              3.364451401921542e-7,
+              -8.570669174194336,
+              -0.31491178274154663
+            ],
+            "worldErrorMeters": 8.308673254270908e-7
+          },
+          {
+            "id": "applied",
+            "label": "Applied total (excludes gravity)",
+            "expectedWorld": [
+              -0.000004684938924737831,
+              8.78847714810949,
+              1.2641082594989153
+            ],
+            "actualWorld": [
+              -0.0000046849386308167595,
+              8.788476943969727,
+              1.2641081809997559
+            ],
+            "worldErrorMeters": 2.1871250721225316e-7
+          },
+          {
+            "id": "net",
+            "label": "Net force (with gravity)",
+            "expectedWorld": [
+              -0.000005735273162333417,
+              0.30359395721830484,
+              1.2523658699472788
+            ],
+            "actualWorld": [
+              -0.000005735273134632735,
+              0.3035939633846283,
+              1.2523658275604248
+            ],
+            "worldErrorMeters": 4.283303560563239e-8
+          }
+        ],
+        "onDifference": {
+          "changedPixels": 10866,
+          "sumRgbDifference": 1221394,
+          "maxChannelDifference": 246
+        },
+        "offDifference": {
+          "changedPixels": 10866,
+          "sumRgbDifference": 1221394,
+          "maxChannelDifference": 246
+        }
+      }
+    ],
+    "visualInspection": "WebGPU screenshot inspected: Weight label lies below aircraft on downward native force tip; Main engine label follows forward native thrust tip; pulled-back framing includes opposite force endpoints."
+  },
+  "finalGpuScope": "Completed exhaust/smoke hardware checks retained from original combined run; force readiness + corrected native direction/label placement separately qualified by final force-only run. Original failed reports remain unmodified."
+}

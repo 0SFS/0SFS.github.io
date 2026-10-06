@@ -1,0 +1,404 @@
+{
+  "schema": 1,
+  "date": "2026-10-05",
+  "owner": "0sfs aircraft setup and control law",
+  "kind": "Installed-SDK F-35B yaw-control regression; not performance or transition qualification",
+  "sdkArtifact": {
+    "schemaVersion": 1,
+    "identity": {
+      "schemaVersion": 2,
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.7"
+      },
+      "native": {
+        "origin": "https://github.com/Felipegalind0/jsbsim",
+        "commit": "fea688020fb683c0696aa8339dbed9cdb238a39d",
+        "contentSha256": "688091cc93ad332d8e55ca376393dea3d544a80de0711a4781e10c7e1539ec35",
+        "dirty": false
+      },
+      "sdk": {
+        "commit": "fea688020fb683c0696aa8339dbed9cdb238a39d",
+        "contentSha256": "b5d8ff6d2cc76d2b96c92aef1a3228bf6cfebe5dd8ddc4e571c6b713f3d5a93d",
+        "dirty": false,
+        "path": "wasm"
+      },
+      "build": {
+        "mode": "in-tree",
+        "inputSha256": "733a60a62ef3061dc254f6d4a3c8f3cf7f162a213b444e423e4ac3d6b18553f0",
+        "toolchain": {
+          "node": "v26.8.2",
+          "npm": "11.19.1",
+          "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+          "cmake": "cmake version 4.4.3",
+          "clang": "clang version 24.0.0git",
+          "platform": "darwin",
+          "arch": "arm64",
+          "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+        },
+        "options": {
+          "buildType": "Release",
+          "cxxStandard": 17,
+          "sdkTarget": "es2022"
+        }
+      }
+    },
+    "files": {
+      "index.d.ts": "4021db027f6d90aa0ada9f8581b128dac9cdf97e06e710e91cabd2f156f8e27a",
+      "index.js": "8876d3467c6ebb32a9fe38d42a03fb8e0ee491d6353580347ba47d71af8036f3",
+      "index.js.map": "7bce5725a434ae51f8cb3e9823c956b7c40fba613eb1e3149b9fc9fad3f03029",
+      "licenses/README.txt": "4a7e892a7ea73b245c8e8918e3f7c47af46ea5dc58303b866d8747d2580e8fde",
+      "licenses/jsbsim/AUTHORS": "ca8556894da80f81f773893a9c1009021aac2972d7bb6a39c2f981b4fd00aa9a",
+      "licenses/jsbsim/COPYING": "1e7e6bae5a5bde32f1ae5a7c37a082d1ab03cf89354f7f936ac40be9e39a6531",
+      "licenses/jsbsim/src/GeographicLib/LICENSE.txt": "90d25298be0c5d7f5219ae20009d18910150b3a4ea0ca86dda5df04cfb8d3823",
+      "licenses/jsbsim/src/simgear/xml/COPYING": "8c6b5b6de8fae20b317f4992729abc0e520bfba4c7606cd1e9eeb87418eebdec",
+      "licenses/sdk-LICENSE": "15e2d343fc930439fb82351d7c30f3d151b4c42ca3132c13ff1a60da527a1259",
+      "wasm.d.ts": "b7bbbab6f5e6b0b297dfeff117351e53d4d8598fecde7e805ea9aee7b2923353",
+      "wasm.js": "758d98989301d86ec3aa589fa851d6416b305eca58bb1e6b9579780ea339e09b",
+      "wasm.js.map": "d75a89efd5b3cf07ebfbe70d321f55c01bd8cdde1be50a15d1dcfad21a7ca763",
+      "wasm/jsbsim_wasm.mjs": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+      "wasm/jsbsim_wasm.wasm": "6eae23db0fc26d4e02daa27eb95fba12932265164e4bb194cb3e183d04882806"
+    },
+    "validation": {
+      "status": "passed",
+      "commands": [
+        "tsc --noEmit (frozen SDK workspace)",
+        "node --test test/*.test.mjs (frozen SDK workspace and resolved native fixtures)"
+      ]
+    },
+    "packageArchive": {
+      "path": "deps/felipegalind0-jsbsim-1.2.4-fork.7.tgz",
+      "sha256": "58afaf9fa575ec61838ba794b7b4a0919b8eaf516c7261e571700e8367b5217b",
+      "integrity": "sha512-lYi/DfCul0C9UjITvOzUvYXk862s0WRNTBL4vE7QlJRb++9DiU4nOemAxxIboCZU3aWTGEiVt0I3NF6I3Wnn7g=="
+    }
+  },
+  "diagnosis": {
+    "source": "F-16/Aeromatic-derived trial yaw feedback in retained FlightGear XML",
+    "rateNormalization": 100,
+    "pidKp": 0.1055,
+    "effectiveRateProportionalGain": 10.55,
+    "actuatorTraverseSeconds": 0.35,
+    "rudderFilterLagSeconds": 0.1,
+    "observedDefect": "At high dynamic pressure, a small yaw-rate disturbance or released rudder pulse causes repeated actuator saturation and yaw reversals while pilot command properties are zero.",
+    "correction": "Native aircraft FCS scales pilot command, trim and yaw feedback together by min(1,300/max(1,aero/qbar-psf)). No app yaw command or pose workaround.",
+    "tuningReferencePsf": 300,
+    "tuningStatus": "Experimental development tuning, not real F-35 handling data"
+  },
+  "configuration": {
+    "seconds": 24,
+    "fixedStepSeconds": 0.008333333333333333,
+    "initialAltitudeFt": 5000,
+    "initialFuelLb": 5000,
+    "initialPitchDeg": 1.92,
+    "initialPitchTrimNorm": -0.059,
+    "throttleNorm": 0.48,
+    "terrainElevationFt": -100000,
+    "convertedFixture": "At full conversion:0kt/1000ft/98%throttle/zero pitch trim. Partial conversion160kt is deliberately untrimmed; floor exclusion isolates yaw from ground forces."
+  },
+  "comparison": [
+    {
+      "id": "conventional-450-release",
+      "configuration": {
+        "id": "conventional-450-release",
+        "speed": 450,
+        "conversion": 0,
+        "disturbance": "release",
+        "throttle": 0.48
+      },
+      "before": {
+        "early": {
+          "rRms": 0.8051476055078219,
+          "rPeak": 1.2337780493162906,
+          "betaRms": 0.12486678518779303,
+          "schedulerSaturatedFraction": 0.9482470784641068,
+          "rateZeroCrossings": 10
+        },
+        "late": {
+          "rRms": 0.2084298704392432,
+          "rPeak": 0.37207096738252715,
+          "betaRms": 0.0294613706382739,
+          "schedulerSaturatedFraction": 0.795,
+          "rateZeroCrossings": 11
+        }
+      },
+      "after": {
+        "early": {
+          "rRms": 0.0011966301661253539,
+          "rPeak": 0.0040706583944566084,
+          "betaRms": 0.0028332106846934153,
+          "schedulerSaturatedFraction": 0,
+          "rateZeroCrossings": 0
+        },
+        "late": {
+          "rRms": 0.0003012347660689064,
+          "rPeak": 0.0003786330801230353,
+          "betaRms": 0.001307260474093883,
+          "schedulerSaturatedFraction": 0,
+          "rateZeroCrossings": 0
+        }
+      },
+      "pilotCommandsAfterRelease": {
+        "sampleCount": 2628,
+        "fromSeconds": 2.1,
+        "rudderCmdMaxAbs": 0,
+        "aileronCmdMaxAbs": 0,
+        "elevatorCmdMaxAbs": 0
+      }
+    },
+    {
+      "id": "conventional-600-release",
+      "configuration": {
+        "id": "conventional-600-release",
+        "speed": 600,
+        "conversion": 0,
+        "disturbance": "release",
+        "throttle": 0.48
+      },
+      "before": {
+        "early": {
+          "rRms": 1.4634010289777033,
+          "rPeak": 2.3553816578991364,
+          "betaRms": 0.22700124018232143,
+          "schedulerSaturatedFraction": 0.9699499165275459,
+          "rateZeroCrossings": 10
+        },
+        "late": {
+          "rRms": 0.15485662009779383,
+          "rPeak": 0.3220413619691042,
+          "betaRms": 0.02113004625293767,
+          "schedulerSaturatedFraction": 0.6166666666666667,
+          "rateZeroCrossings": 12
+        }
+      },
+      "after": {
+        "early": {
+          "rRms": 0.000994934900956029,
+          "rPeak": 0.004047428386065889,
+          "betaRms": 0.0014680211419479756,
+          "schedulerSaturatedFraction": 0,
+          "rateZeroCrossings": 0
+        },
+        "late": {
+          "rRms": 0.00038601042932511826,
+          "rPeak": 0.0004329746332129812,
+          "betaRms": 0.0015049906154933998,
+          "schedulerSaturatedFraction": 0,
+          "rateZeroCrossings": 0
+        }
+      },
+      "pilotCommandsAfterRelease": {
+        "sampleCount": 2628,
+        "fromSeconds": 2.1,
+        "rudderCmdMaxAbs": 0,
+        "aileronCmdMaxAbs": 0,
+        "elevatorCmdMaxAbs": 0
+      }
+    }
+  ],
+  "neutralStart": {
+    "description": "Perfect neutral starts with the constant-gain comparator remain quiet; these records do not establish spontaneous oscillation from an ideal initial state.",
+    "results": [
+      {
+        "id": "conventional-450-neutral",
+        "early": {
+          "rRms": 0.000006561171888584362,
+          "rPeak": 0.000009081734305017699,
+          "betaRms": 0.0000272426799963906,
+          "schedulerSaturatedFraction": 0,
+          "rateZeroCrossings": 0
+        },
+        "late": {
+          "rRms": 0.000007174234268769935,
+          "rPeak": 0.000009394583660607443,
+          "betaRms": 0.000032086603893097574,
+          "schedulerSaturatedFraction": 0,
+          "rateZeroCrossings": 0
+        }
+      },
+      {
+        "id": "conventional-600-neutral",
+        "early": {
+          "rRms": 0.000010753167091917873,
+          "rPeak": 0.000022594216124475586,
+          "betaRms": 0.000038043662557294275,
+          "schedulerSaturatedFraction": 0,
+          "rateZeroCrossings": 0
+        },
+        "late": {
+          "rRms": 0.0000162924501254717,
+          "rPeak": 0.000018644249303040824,
+          "betaRms": 0.00007188404120608881,
+          "schedulerSaturatedFraction": 0,
+          "rateZeroCrossings": 0
+        }
+      }
+    ]
+  },
+  "tests": {
+    "legacyBaseline": {
+      "command": "npx vitest run src/flight/jsbsim/f35bYaw.integration.test.ts --maxWorkers=50%",
+      "log": "legacy-yaw-regression-failures.log",
+      "files": 1,
+      "tests": 11,
+      "failed": 5,
+      "passed": 6,
+      "note": "Four conventional450/600kt failures reproduce hunting. One partial-conversion failure was ground-contact contamination in a falling untrimmed fixture; final fixture explicitly excludes contacts."
+    },
+    "combinedInitial": {
+      "command": "npx vitest run src/flight/jsbsim/f35bYaw.integration.test.ts src/flight/jsbsim/f35b.integration.test.ts --maxWorkers=50%",
+      "log": "combined-initial-native-tests.log",
+      "files": 2,
+      "tests": 29,
+      "failed": 3,
+      "passed": 26,
+      "note": "All11 damping cases and all12 existing F35 cases passed. Three new mode assertions only distinguished native-0 from+0; corrected to exact absolute-zero checks and reran the failing file."
+    },
+    "finalYawAndMode": {
+      "command": "npx vitest run src/flight/jsbsim/f35bYaw.integration.test.ts --maxWorkers=50%",
+      "log": "final-native-yaw-mode-tests.log",
+      "result": "passed",
+      "files": 1,
+      "tests": 17
+    },
+    "assertions": {
+      "damping": "160/300/450/600 kt: initial rate disturbance 0.05 rad/s or half-second pilot rudder pulse 0.5 norm; peak yaw rate <0.15 rad/s, final 5 s yaw RMS <0.005 rad/s and scheduler saturation <1%; conventional beta peak <0.1 rad.",
+      "conversion": "Same yaw envelope checked at partial conversion at 160 kt and full zero-speed conversion with contacts excluded.",
+      "nativeModes": "Auto resolves to FBW; Manual removes rate/attitude feedback and resets integrators; explicit FBW resumes bounded damping; pilot command properties stay zero during feedback.",
+      "manualControls": "Direct stick plus pitch/roll/yaw trim and pilot trailing-edge flap input reach their physical actuator values.",
+      "persistence": "Manual preserved across free relocation, both runway preset initializations, snapshot restore and conversion actuation."
+    }
+  },
+  "comparator": {
+    "description": "Only the yaw schedule function is replaced with constant 1 in SDK MEMFS; current public and original source files remain untouched.",
+    "command": "node scripts/validation/f35b/inspect-yaw.mjs --cases conventional-450-release,conventional-600-release --yaw-schedule constant",
+    "report": "constant-report.json",
+    "aircraft": "constant-gain-aircraft.xml",
+    "sourceSha256": "2c180e214926d87a9a27e1c662b1e1b49f801a8d66281df2959d33f473be0411",
+    "runtimeSha256": "240b8650c8e572d0e871d459db2a58e9b7b81457ad2ae7d8c6486cf198fcc9ef"
+  },
+  "runtimeSourceManifest": "runtime-source-manifest.json",
+  "originalSourcePreservation": {
+    "manifest": "planes/Lockheed_Martin_F-35B/tests/flightgear-jsbsim/manifest.json",
+    "verifiedFileCount": 10,
+    "byteAndSha256Checks": "passed"
+  },
+  "code": [
+    {
+      "path": "src/flight/jsbsim/f35bYaw.integration.test.ts",
+      "bytes": 9881,
+      "sha256": "029528f3f4e977c3e5aa751dde7e459c25c7eb8c2d9343aa5009471b3685105b"
+    },
+    {
+      "path": "src/flight/jsbsim/f35b.integration.test.ts",
+      "bytes": 10208,
+      "sha256": "bb5d9dc0dfb9ce4628f10eb64a49a2b8fd24d67cce77b9881e8b64a58cdab4e8"
+    },
+    {
+      "path": "src/flight/jsbsim/fdmProfiles.ts",
+      "bytes": 6471,
+      "sha256": "4ffbab4ea084be26dd68f96440cfb089af46b0375749cf96b5eacfe0274b31a9"
+    },
+    {
+      "path": "src/flight/jsbsim/bootstrapC172.ts",
+      "bytes": 5197,
+      "sha256": "8e81b502c15b4523c10fb676dfb050dad19f4a2a133fcc1fc0c53867e2768028"
+    },
+    {
+      "path": "src/flight/jsbsim/resetFlightLocation.ts",
+      "bytes": 7271,
+      "sha256": "01de87a4a7e08a5219109dc64bb53532660e7cc3a17ecd4dd5eaf3d3bdc4a22c"
+    },
+    {
+      "path": "src/flight/physics/safeFlightState.ts",
+      "bytes": 7360,
+      "sha256": "45896a32aa83a76ca485ac9bc83b648eb89a8b16c6c934406a4e3a203764995a"
+    },
+    {
+      "path": "src/flight/input/applyFlightControls.ts",
+      "bytes": 2462,
+      "sha256": "fad97e9f2de39d6d6afb70f57ce623f9cc88f23a38ed8b64dc7e8249bb25c551"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "scheduled-report.json",
+      "bytes": 89198,
+      "sha256": "815247d3f45503aaf69e51d878baa7e9e4dab7277c3a19a640e8badc57c12556"
+    },
+    {
+      "path": "constant-report.json",
+      "bytes": 19630,
+      "sha256": "b56b9a7570189e02d9ae2c4f4ef6ed7cfffa4bddd13d4a74ab13539ee121eaab"
+    },
+    {
+      "path": "neutral-report.json",
+      "bytes": 19622,
+      "sha256": "d3b5a7a2fceef1558cf1d78fd55b1e0f9a56ecb7661109493c1aeebf4892da8f"
+    },
+    {
+      "path": "constant-conventional-450-release.csv",
+      "bytes": 606203,
+      "sha256": "630d7f31a7b6fc5ab8b4357079a0a856340228df91c126b6d49a1c7d7a4cbdb9"
+    },
+    {
+      "path": "constant-conventional-600-release.csv",
+      "bytes": 607604,
+      "sha256": "74564c8e609c3eacd2db1eb7a5007597825f75eec9faa923dedf6c90c57e92d8"
+    },
+    {
+      "path": "scheduled-conventional-450-release.csv",
+      "bytes": 646038,
+      "sha256": "e2b522c4d62e725f6b06948d89418154e49d5a587d0f0ccad5de3b0cf11a986f"
+    },
+    {
+      "path": "scheduled-conventional-600-release.csv",
+      "bytes": 647580,
+      "sha256": "fb34264b2a3a8da8a8b25ef2fdeb4096def48c586e67e359ba47b9805b1b7ad2"
+    },
+    {
+      "path": "legacy-yaw-regression-failures.log",
+      "bytes": 4892,
+      "sha256": "15bddd5dd75e3721909ffa41171dfecf3e11577d20d0fa5de291e71a379b8025"
+    },
+    {
+      "path": "combined-initial-native-tests.log",
+      "bytes": 2935,
+      "sha256": "025d5ba1804df00123a5e71dcec1985637b3eb74242cc8d2a8a5f7df236b93e8"
+    },
+    {
+      "path": "final-native-yaw-mode-tests.log",
+      "bytes": 388,
+      "sha256": "3fbc9ded61ca57591010ce89292b3aba5d34f86ddc8e7564c075879117ec7761"
+    },
+    {
+      "path": "runtime-source-manifest.json",
+      "bytes": 5180,
+      "sha256": "927984341e814aadf7a71d381f0b3a35b3a122080d4923ac3b746f57da0e6c87"
+    },
+    {
+      "path": "scheduled-runtime-aircraft.xml",
+      "bytes": 48736,
+      "sha256": "240b8650c8e572d0e871d459db2a58e9b7b81457ad2ae7d8c6486cf198fcc9ef"
+    },
+    {
+      "path": "constant-gain-aircraft.xml",
+      "bytes": 48565,
+      "sha256": "2c180e214926d87a9a27e1c662b1e1b49f801a8d66281df2959d33f473be0411"
+    }
+  ],
+  "reproduction": {
+    "path": "scripts/validation/f35b/inspect-yaw.mjs",
+    "currentSha256": "02072b5f422d9d5c960352143352f5ef12706948a413b9e2435264559dc32cc5",
+    "note": "Current reproduction tool; the earlier scheduled report predates added neutral cases and additional CSV command/mode columns. Report case configurations and captured runtime hashes are authoritative."
+  },
+  "limitations": [
+    "Pilot speed/altitude/assist conditions were not supplied; this demonstrates a native aircraft-law defect consistent with disturbance-driven hunting, not proof of the exact pilot scenario.",
+    "24 s, 120 Hz development envelopes are regression limits, not validated F-35 handling specifications.",
+    "Exactly neutral constant-gain starts remain quiet; zero pilot commands do not imply zero native feedback or zero physical disturbances.",
+    "High-speed fixtures climb because they use one untrimmed development start across speeds; no level-flight trim or flight-envelope qualification is claimed.",
+    "Partial-conversion and bank/deceleration diagnostic fixtures lose altitude with terrain forces excluded; they do not establish a safe transition or maneuver procedure.",
+    "Manual bypasses the aircraft native stabilization law; host auto-trim and autopilot settings remain separate.",
+    "Original aerodynamic coefficients, mass/CG/inertia assumptions and coupled LiftSystem approximation remain uncalibrated.",
+    "No ground-contact, browser, sound device or supersonic qualification is part of this record."
+  ]
+}

@@ -1,21 +1,22 @@
 import { TIER_BUDGETS } from "./audioQuality";
 
 /**
- * Tier 3 sample bank: the manifest gate, integrity checks and download cache.
+ * Experimental V2 bank helpers: integrity, cache and bounded PCM preparation.
  *
- * NO BANK SHIPS WITH THIS CODE. sound.md §4 keeps High unavailable until a bank
- * with explicit, recorded redistribution rights exists, and excludes the
- * Recordist SF50 library outright. This module is the gate such a bank must
- * pass; it contains no audio and admits nothing on its own.
+ * No bank ships or is admitted by a production renderer. High is procedural.
+ * V2 describes full recordings, not source-separated residuals; these helpers
+ * do not establish the missing residual/propagation contract or acoustic rights.
  *
  * Band payloads are raw little-endian float32 mono PCM. That avoids a decoder
- * dependency and decode-time peaks; whether a compressed format is worth its
- * decode cost is an open Release/DSP question, not settled here.
+ * dependency. A future compressed format requires its own schema and explicit
+ * decode/resource accounting; V2 must never masquerade as an Opus loader.
  */
 
-export const AUDIO_BANK_MANIFEST_VERSION = 1;
+export const AUDIO_BANK_MANIFEST_VERSION = 2;
 /** Mirrors kMaxBands in dsp/granular.h: three operating bands per view, two views. */
 export const AUDIO_BANK_MAX_BANDS = 6;
+/** Historical experimental pack ceiling, separate from the procedural code budget. */
+export const AUDIO_BANK_MAX_DOWNLOAD_BYTES = 1536 * 1024;
 const MAX_BANDS_PER_VIEW = 3;
 /** osfs_audio_band_alloc's own ceiling. */
 const MAX_BAND_FRAMES = 60 * 96_000;
@@ -43,16 +44,18 @@ export interface AudioBankLicense {
   evidence: string;
 }
 
-export interface AudioBankManifestV1 {
-  version: 1;
+export interface AudioBankManifestV2 {
+  version: 2;
   id: string;
   revision: string;
+  engineDefinitionId: string;
+  rendererId: string;
   license: AudioBankLicense;
   bands: AudioBankBand[];
 }
 
 export type AudioBankManifestCheck =
-  | { ok: true; manifest: AudioBankManifestV1; totalBytes: number }
+  | { ok: true; manifest: AudioBankManifestV2; totalBytes: number }
   | { ok: false; reason: string };
 
 export class AudioBankError extends Error {}
@@ -70,6 +73,7 @@ export function validateAudioBankManifest(value: unknown): AudioBankManifestChec
     return fail(`Unsupported bank manifest version ${String(manifest.version)}.`);
   }
   if (!text(manifest.id) || !text(manifest.revision)) return fail("The manifest needs an id and a revision.");
+  if (!text(manifest.engineDefinitionId) || !text(manifest.rendererId)) return fail("The bank needs an engine acoustic definition and renderer target.");
 
   const license = manifest.license as Partial<AudioBankLicense> | undefined;
   if (!license || !integer(license.manifestVersion, 1, Number.MAX_SAFE_INTEGER) || !text(license.spdx)
@@ -77,7 +81,7 @@ export function validateAudioBankManifest(value: unknown): AudioBankManifestChec
     return fail("The bank's licence record is incomplete.");
   }
   if (license.redistribution !== true) {
-    return fail("The bank has no recorded redistribution right, so High stays unavailable (sound.md §4).");
+    return fail("The experimental bank has no recorded redistribution right (sound.md §4).");
   }
   if (/recordist/i.test(`${license.source} ${license.rightsHolder}`)) {
     return fail("Recordist recordings are excluded from embedding and redistribution (sound.md §4).");
@@ -88,9 +92,13 @@ export function validateAudioBankManifest(value: unknown): AudioBankManifestChec
     return fail(`A bank has between 1 and ${AUDIO_BANK_MAX_BANDS} bands.`);
   }
   const perView = { cockpit: 0, exterior: 0 };
-  let totalBytes = 0;
-  const counted = new Set<string>();
+  let totalBytes: number;
+  try { totalBytes = new TextEncoder().encode(JSON.stringify(manifest)).byteLength; }
+  catch { return fail("The manifest must be JSON serializable."); }
+  const counted = new Map<string, { frames: number; sampleRateHz: number }>();
+  const operatingPoints = new Set<string>();
   for (const [index, entry] of bands.entries()) {
+    if (!entry || typeof entry !== "object" || Array.isArray(entry)) return fail(`Band ${index} must be an object.`);
     const band = entry as Partial<AudioBankBand>;
     if (!text(band.file) || typeof band.sha256 !== "string" || !SHA256.test(band.sha256)) {
       return fail(`Band ${index} needs a file name and a lowercase hex SHA-256.`);
@@ -105,19 +113,29 @@ export function validateAudioBankManifest(value: unknown): AudioBankManifestChec
       return fail(`Band ${index} needs an N1 operating point between 0 and 1.`);
     }
     if (band.view !== "cockpit" && band.view !== "exterior") return fail(`Band ${index} needs a view.`);
+    if (band.frames! < Math.ceil(band.sampleRateHz! * 0.06)) return fail(`Band ${index} cannot hold a 60 ms grain.`);
+    const operatingPoint = `${band.view}/${band.n1}`;
+    if (operatingPoints.has(operatingPoint)) return fail(`Band ${index} repeats an operating point in the same view.`);
+    operatingPoints.add(operatingPoint);
     perView[band.view] += 1;
     // A payload shared by two slots downloads once, so it counts once.
-    if (!counted.has(band.sha256)) {
-      counted.add(band.sha256);
+    const duplicate = counted.get(band.sha256);
+    if (duplicate && (duplicate.frames !== band.frames || duplicate.sampleRateHz !== band.sampleRateHz)) {
+      return fail(`Band ${index} gives conflicting PCM metadata for a shared payload.`);
+    }
+    if (!duplicate) {
+      counted.set(band.sha256, { frames: band.frames!, sampleRateHz: band.sampleRateHz! });
       totalBytes += band.bytes;
     }
   }
   if (perView.cockpit > MAX_BANDS_PER_VIEW || perView.exterior > MAX_BANDS_PER_VIEW) {
     return fail(`At most ${MAX_BANDS_PER_VIEW} bands per view.`);
   }
-  const budget = TIER_BUDGETS.high.coldBytes;
-  if (totalBytes > budget) return fail(`The bank is ${totalBytes} bytes, over the ${budget}-byte High download budget.`);
-  return { ok: true, manifest: manifest as unknown as AudioBankManifestV1, totalBytes };
+  if (perView.cockpit === 0 || perView.exterior === 0) return fail("An experimental V2 bank must cover both cockpit and exterior views.");
+  if (totalBytes > AUDIO_BANK_MAX_DOWNLOAD_BYTES) {
+    return fail(`The bank including its manifest is ${totalBytes} bytes, over the ${AUDIO_BANK_MAX_DOWNLOAD_BYTES}-byte experimental pack budget.`);
+  }
+  return { ok: true, manifest: manifest as unknown as AudioBankManifestV2, totalBytes };
 }
 
 /* ------------------------------------------------------------------ cache */
@@ -130,7 +148,7 @@ export interface AudioBankStore {
 }
 
 export interface LoadedAudioBank {
-  manifest: AudioBankManifestV1;
+  manifest: AudioBankManifestV2;
   bands: { band: AudioBankBand; samples: Float32Array }[];
   cacheHits: number;
   downloadedBytes: number;
@@ -149,7 +167,7 @@ export async function sha256Hex(bytes: ArrayBuffer): Promise<string> {
   return Array.from(hash, (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
-export const bankCacheKey = (manifest: AudioBankManifestV1, band: AudioBankBand): string =>
+export const bankCacheKey = (manifest: AudioBankManifestV2, band: AudioBankBand): string =>
   `v${manifest.license.manifestVersion}/${band.sha256}`;
 
 /**
@@ -184,7 +202,7 @@ export async function loadAudioBank(manifestValue: unknown, options: AudioBankLo
     } else {
       bytes = await options.fetchBand(band);
       if (!await verified(bytes, band)) {
-        throw new AudioBankError(`Band ${band.file} failed its integrity check, so High stays unavailable.`);
+        throw new AudioBankError(`Band ${band.file} failed its integrity check; the experimental bank is rejected.`);
       }
       downloadedBytes += bytes.byteLength;
       try { await store?.put(key, bytes); } catch { cacheWriteFailures += 1; }
@@ -200,10 +218,17 @@ export async function loadAudioBank(manifestValue: unknown, options: AudioBankLo
     } catch { /* Best effort: stale entries can never verify under a new key anyway. */ }
   }
 
+  const bands = manifest.bands.map((band) => ({ band, samples: new Float32Array(payloads.get(band.sha256)!) }));
+  const checked = new Set<ArrayBufferLike>();
+  for (const { band, samples } of bands) {
+    if (checked.has(samples.buffer)) continue;
+    if (!samples.every(Number.isFinite)) throw new AudioBankError(`Band ${band.file} contains non-finite PCM.`);
+    checked.add(samples.buffer);
+  }
   return {
     manifest, cacheHits, downloadedBytes, cacheWriteFailures,
     // Slots that share a payload share one sample buffer: no duplicate decoded bank.
-    bands: manifest.bands.map((band) => ({ band, samples: new Float32Array(payloads.get(band.sha256)!) })),
+    bands,
   };
 }
 
@@ -222,23 +247,78 @@ export interface AudioBankInstallBand {
   n1: number;
   exterior: 0 | 1;
 }
+export interface AudioBankInstallation {
+  readonly engineDefinitionId: string;
+  readonly rendererId: string;
+  readonly bands: readonly AudioBankInstallBand[];
+}
 
 export type AudioBankResampler = (samples: Float32Array, fromRate: number, toRate: number) => Promise<Float32Array>;
+
+/** Conservative accounting before resampling allocates anything. Includes retained
+ * input, prepared PCM, future per-slot WASM copies and peak transfer/offline scratch.
+ * This is a bound for the experiment, not a measured browser-memory result. */
+export function preflightBankForContext(bank: LoadedAudioBank, contextRate: number): void {
+  if (!Number.isInteger(contextRate) || contextRate < 8_000 || contextRate > 96_000) {
+    throw new AudioBankError("Unsupported experimental bank context rate.");
+  }
+  const check = validateAudioBankManifest(bank.manifest);
+  if (!check.ok) throw new AudioBankError(check.reason);
+  if (bank.bands.length !== bank.manifest.bands.length) throw new AudioBankError("The loaded bank is incomplete.");
+  const inputs = new Set<ArrayBufferLike>();
+  const prepared = new Set<string>();
+  let inputBytes = 0, preparedBytes = 0, installedBytes = 0, largestPreparedBytes = 0;
+  for (const [index, { band, samples }] of bank.bands.entries()) {
+    const declared = bank.manifest.bands[index];
+    if (JSON.stringify(band) !== JSON.stringify(declared) || samples.length !== band.frames) {
+      throw new AudioBankError("Loaded PCM does not match the experimental manifest.");
+    }
+    if (!inputs.has(samples.buffer)) {
+      inputs.add(samples.buffer);
+      inputBytes += samples.buffer.byteLength;
+    }
+    const frames = Math.max(1, Math.round(samples.length * contextRate / band.sampleRateHz));
+    if (frames > MAX_BAND_FRAMES) throw new AudioBankError("Resampled band exceeds the per-band allocation cap.");
+    const bytes = frames * Float32Array.BYTES_PER_ELEMENT;
+    installedBytes += bytes;
+    largestPreparedBytes = Math.max(largestPreparedBytes, bytes);
+    if (band.sampleRateHz !== contextRate && !prepared.has(band.sha256)) {
+      prepared.add(band.sha256);
+      preparedBytes += bytes;
+    }
+  }
+  const resident = TIER_BUDGETS.med.residentMiB * 1024 ** 2 + inputBytes + preparedBytes + installedBytes;
+  const peak = resident + installedBytes + 3 * largestPreparedBytes;
+  if (resident > TIER_BUDGETS.high.residentMiB * 1024 ** 2 || peak > TIER_BUDGETS.high.loadingPeakMiB * 1024 ** 2) {
+    throw new AudioBankError("Decoded experimental bank exceeds the resident or loading-peak memory budget.");
+  }
+}
 
 /** sound.md §3: resample to the ACTUAL context rate before activation, never after. */
 export async function prepareBankForContext(
   bank: LoadedAudioBank, contextRate: number, resample: AudioBankResampler,
-): Promise<AudioBankInstallBand[]> {
+): Promise<AudioBankInstallation> {
+  preflightBankForContext(bank, contextRate);
   const prepared: AudioBankInstallBand[] = [];
+  const payloads = new Map<string, Float32Array>();
   for (const [index, { band, samples }] of bank.bands.entries()) {
+    let converted = payloads.get(band.sha256);
+    if (!converted) {
+      converted = band.sampleRateHz === contextRate ? samples : await resample(samples, band.sampleRateHz, contextRate);
+      const expectedFrames = Math.max(1, Math.round(samples.length * contextRate / band.sampleRateHz));
+      if (converted.length !== expectedFrames || !converted.every(Number.isFinite)) {
+        throw new AudioBankError("Resampler returned invalid experimental bank PCM.");
+      }
+      payloads.set(band.sha256, converted);
+    }
     prepared.push({
       index,
-      samples: band.sampleRateHz === contextRate ? samples : await resample(samples, band.sampleRateHz, contextRate),
+      samples: converted,
       n1: band.n1,
       exterior: band.view === "exterior" ? 1 : 0,
     });
   }
-  return prepared;
+  return { engineDefinitionId: bank.manifest.engineDefinitionId, rendererId: bank.manifest.rendererId, bands: prepared };
 }
 
 /** The browser's own offline renderer does the resampling, so no hand-rolled filter decides the timbre. */

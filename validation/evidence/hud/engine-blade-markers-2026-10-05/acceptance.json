@@ -1,0 +1,244 @@
+{
+  "schema": "0sfs-engine-blade-markers/1",
+  "date": "2026-10-05",
+  "owner": "0sfs",
+  "scope": "One equal-size marker per representative rotor blade, on desktop and phone. No sound/DSP change. No timing or acoustic qualification.",
+  "counts": {
+    "f135": {
+      "outer": 22,
+      "inner": 36,
+      "outerEstimated": true,
+      "innerEstimated": true,
+      "basis": "NASA Rotor67 transonic fan / Rotor37 core-compressor inlet row analogues, NOT confirmed F135 counts"
+    },
+    "fj33": {
+      "outer": 16,
+      "inner": 30,
+      "outerEstimated": false,
+      "innerEstimated": true,
+      "basis": "Williams FJ33-5A IPC72-00-31 P/N79408 fan; NASA centrifugal impeller15full+15splitter rim analogue for unknown FJ33 core count"
+    },
+    "c172": {
+      "outer": 2,
+      "inner": null,
+      "outerEstimated": false,
+      "innerEstimated": false,
+      "basis": "Installed prop_75in2f.xml numblades2"
+    }
+  },
+  "sourceNotes": "docs/proposals/flight-settings.md#engine-shaft-indicators",
+  "rendering": {
+    "uniformBytes": 48,
+    "drawsPerChangedFrame": 1,
+    "shaderWork": "nearest angular sector for each of at most two rings; no per-blade loop/mesh/DOM node",
+    "missingCounts": "no GPU backend",
+    "rate": "min(requested rev/s, configured frames/s / (4 * largest blade count)), shared by both shafts; actual stalls may still strobe"
+  },
+  "checks": [
+    {
+      "command": "npx vitest run src/flight/hud/engineSpoolRenderer.test.ts --maxWorkers=50%",
+      "status": "passed",
+      "files": 1,
+      "tests": 18,
+      "log": "renderer-tests.log"
+    },
+    {
+      "command": "npx tsc -b",
+      "status": "passed",
+      "log": "typecheck.log"
+    },
+    {
+      "command": "npm run lint",
+      "status": "passed",
+      "log": "lint.log"
+    },
+    {
+      "command": "npx vitest related --run src/flight/aircraft/engineRotorDefinitions.ts src/flight/hud/engineSpoolRenderer.ts src/flight/hud/engineSpoolMotion.ts src/flight/hud/engineMonitor.ts src/flight/hud/engineMonitorModel.ts src/flight/hud/engineSummary.ts src/flight/jsbsim/fdmProfiles.ts src/flight/createFlightSimApp.ts src/flight/settings/flightParameters.ts src/flight/remote/engineStatus.ts src/remote/PhoneEngine.tsx src/remote/engineSummaryFromStatus.ts src/remote/protocol.ts --maxWorkers=50%",
+      "status": "passed",
+      "files": 73,
+      "tests": 886,
+      "log": "related-tests.log"
+    },
+    {
+      "command": "node scripts/validation/audio/check-engine-orbs.mjs",
+      "status": "passed",
+      "cases": 9,
+      "log": "gpu-report.json",
+      "screenshot": "blade-markers.png",
+      "acceptance": "GPU pixel-island counts equal profile counts on WebGPU/WebGL2/WebGL1; per-ring area spread<15% at400CSSpx; native68px layout visually inspected. First attempt read WebGPU texture after presentation and found blank; same-task readback fixed the harness, with no shader change.",
+      "initialLog": "initial-harness-report.json"
+    },
+    {
+      "command": "VITEST_MAX_WORKERS=5 npm run ci",
+      "status": "one unrelated concurrently added Aircraft mesh-inspector test failed; 1682 passed and one expected failure",
+      "filesPassed": 159,
+      "filesFailed": 1,
+      "testsPassed": 1682,
+      "testsFailed": 1,
+      "expectedFailures": 1,
+      "log": "ci.log",
+      "cause": "New test clicked Aircraft after mountAircraftSelection had already opened it, closing the panel before querying its controls. Owning concurrent session removed redundant click."
+    },
+    {
+      "command": "npx vitest run src/flight/createFlightSimApp.test.ts --maxWorkers=50%",
+      "status": "reproduced same unrelated fixture failure before its correction",
+      "testsPassed": 50,
+      "testsFailed": 1,
+      "log": "ci-failure-followup.log"
+    },
+    {
+      "command": "npm run build",
+      "status": "passed",
+      "includes": [
+        "typecheck",
+        "production build",
+        "JSBSim/audio/exhaust artifact verification"
+      ],
+      "log": "build.log"
+    },
+    {
+      "command": "npx vitest run src/flight/createFlightSimApp.test.ts --maxWorkers=50%",
+      "status": "passed after the owning concurrent session removed the redundant Aircraft-tab click",
+      "files": 1,
+      "tests": 51,
+      "log": "ci-fixture-fixed.log"
+    }
+  ],
+  "sources": [
+    {
+      "file": "src/flight/aircraft/engineRotorDefinitions.ts",
+      "sha256": "93b40fb2f81d5cf8d50daee1c2f71cb09dd942f6c9369599aebbaf0ebcdedcfc"
+    },
+    {
+      "file": "src/flight/hud/engineSpoolRenderer.ts",
+      "sha256": "3db247034d23c91f6c9f55b844d8324f1a4ee94f1f637106c6fefa74f281eac0"
+    },
+    {
+      "file": "src/flight/hud/engineSpoolRenderer.test.ts",
+      "sha256": "14ec6a6ad745f1b5dbe0fc5fe145bf835e0b1c9d31aa9de52360f6da6a78e901"
+    },
+    {
+      "file": "src/flight/hud/engineSpoolMotion.ts",
+      "sha256": "e1c1541d80c04c595684e21fde91ec18f05ee033eadc5aec7e1d54a2384cadd7"
+    },
+    {
+      "file": "src/flight/hud/engineSpoolMotion.test.ts",
+      "sha256": "689ea0a41681b5e3bba30c6e2c8b921aeb5b9bfbf4a3373465e0f02592b9437a"
+    },
+    {
+      "file": "src/flight/hud/engineMonitor.ts",
+      "sha256": "fe07a6a7303dd3f2d583e04297a41f0abd3512e648ccaac45eb815a6d70caf01"
+    },
+    {
+      "file": "src/flight/hud/engineMonitorModel.ts",
+      "sha256": "fb6dd8a4e7e2d228775e53d9fc45be506fb0e942b15094b1c95776ab6b9e3448"
+    },
+    {
+      "file": "src/flight/hud/engineSummary.ts",
+      "sha256": "25f614f99c8167724328fbf94be80fb0a2c885cc40868cb2bf3d273a06ee68cc"
+    },
+    {
+      "file": "src/flight/hud/engineMonitor.test.ts",
+      "sha256": "ceaabae3138a0cb433cb2940e2af55e639ea5658a85515a5adffbfdd848404d9"
+    },
+    {
+      "file": "src/flight/hud/engineMonitorModel.test.ts",
+      "sha256": "1f95bb6bc7306487725ff477578ce23b0d7db5bed6195c696e5c458fb977166e"
+    },
+    {
+      "file": "src/flight/jsbsim/fdmProfiles.ts",
+      "sha256": "de36aff491c6c4c14156edd4ab0e531778024fc97fccf401f2804eba9ef5822e"
+    },
+    {
+      "file": "src/flight/createFlightSimApp.ts",
+      "sha256": "d2ec028bf062282e762f773aeac33fba9ab69be6b2bfc7c816988da067f160c6"
+    },
+    {
+      "file": "src/flight/createFlightSimApp.phone.test.ts",
+      "sha256": "8a8217f77e276bee5c86361a81e12bf90edfa41c4862021c41e4f21be1286663"
+    },
+    {
+      "file": "src/flight/settings/flightParameters.ts",
+      "sha256": "1b303f9490ad32a199a4587594faa8c9aa8a1416abdacae54b880b15af9a7aef"
+    },
+    {
+      "file": "src/flight/remote/engineStatus.ts",
+      "sha256": "633790799c7555ec010c3a245aadcd55f8412490d7f9c1a67d65e03c5297aef2"
+    },
+    {
+      "file": "src/remote/protocol.ts",
+      "sha256": "71e70a01e62934790495c653909a63ff0a6a9a9cf93c99240f8b85a2576dd8b3"
+    },
+    {
+      "file": "src/remote/protocol.test.ts",
+      "sha256": "9862ada89507425f3d69a393ee4dd3ce2ad6be97f8dc68f9c7c61734713b7a07"
+    },
+    {
+      "file": "src/remote/engineSummaryFromStatus.ts",
+      "sha256": "0728e07ec4aca32d467f43dabc27043a8bbb6dd0ddf5c94140dacce07a05caca"
+    },
+    {
+      "file": "src/remote/PhoneEngine.tsx",
+      "sha256": "780a234b992ddd8695a4d71a422520ba7188a12675e7ce42783644917d7554c1"
+    },
+    {
+      "file": "src/remote/PhoneEngine.test.tsx",
+      "sha256": "125aa1852bc21b325af4fd9bd22ff6e5df886d34172b52c67e4e2c881aa05874"
+    },
+    {
+      "file": "scripts/validation/audio/check-engine-orbs.mjs",
+      "sha256": "e3a936ccc461abd9fa52b26af52720909a174081005291f2bb711ceb1115e215"
+    }
+  ],
+  "evidence": [
+    {
+      "file": "typecheck.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "lint.log",
+      "sha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e"
+    },
+    {
+      "file": "related-tests.log",
+      "sha256": "19928a84899166bf3ed876d11b6f2a9df33b556951282d2655dbf67e3801dbce"
+    },
+    {
+      "file": "ci.log",
+      "sha256": "176354452203b6fea55c41eac5d4d3c337f6c022d71b215262b85c062775da90"
+    },
+    {
+      "file": "ci-failure-followup.log",
+      "sha256": "714553370d66e067f69f89c8c460b3c709de7daa7425fcd32799cc8138df0b82"
+    },
+    {
+      "file": "build.log",
+      "sha256": "c2691f2f747e465b84076a60b5e2dd7bac893cd0addd33932072e9258ca32fe1"
+    },
+    {
+      "file": "renderer-tests.log",
+      "sha256": "71953b486be218ff3282e89497ba9cef0962a32e6fdb0e30e7cf4a97ce28100e"
+    },
+    {
+      "file": "initial-harness-report.json",
+      "sha256": "080a35e774c4c29fa5a79f062cd35dcc18892d855ff6829b429607896e9b12e4"
+    },
+    {
+      "file": "gpu-report.json",
+      "sha256": "3238df94e74fe45eadf89f4e71f64a008e4d43a395b11294a09eaa2189b21771"
+    },
+    {
+      "file": "blade-markers.png",
+      "sha256": "2e240ca5b5f42a5a71771636ea230a1782d330bb244b92dcc64b5a5a64084f3e"
+    },
+    {
+      "file": "ci-fixture-fixed.log",
+      "sha256": "7b1bbeb1070a44260463f4e9c6526dd2466579745d17156d9c272f37598b86dc"
+    }
+  ],
+  "status": "Complete: blade checks, typecheck/lint/build and all known test failures resolved. Full CI executed once; its single fixture failure was resolved and that file passed on targeted rerun.",
+  "correctedExternalFixture": {
+    "file": "src/flight/createFlightSimApp.test.ts",
+    "sha256": "40f4988426e97fa9640232b1de125c2a157fa500e1f300b2585b27dd16d41964"
+  }
+}

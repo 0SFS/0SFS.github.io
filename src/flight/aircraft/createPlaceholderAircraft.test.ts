@@ -2,6 +2,7 @@ import { NullEngine, Scene, TransformNode, Vector3 } from "@babylonjs/core";
 import { describe, expect, it } from "vitest";
 import { flightAttitudeToQuaternion } from "../bridge/ecefBridge";
 import { createPlaceholderAircraft } from "./createPlaceholderAircraft";
+import { getAircraftDefinition } from "./aircraftCatalog";
 
 describe("aircraft chase camera", () => {
   it.each([0, Math.PI / 2, Math.PI, 3 * Math.PI / 2])("keeps both cameras facing heading %s with east on the correct side", (heading) => {
@@ -43,6 +44,43 @@ describe("aircraft chase camera", () => {
     aircraft.zoomChaseCamera(2);
     expect(camera.position.equals(localPosition)).toBe(true);
     expect(scene.activeCamera).toBe(aircraft.firstPersonCamera);
+    aircraft.dispose(); scene.dispose(); engine.dispose();
+  });
+
+  it("places the F-35B pilot eye in its supplied cockpit and keeps the interior visible", () => {
+    const engine = new NullEngine();
+    const scene = new Scene(engine);
+    const origin = new TransformNode("origin", scene);
+    const definition = getAircraftDefinition("f-35b");
+    const aircraft = createPlaceholderAircraft(scene, origin, undefined, {
+      cockpitOffset: definition.cockpitOffset, showModelInCockpit: definition.cockpitMesh,
+    });
+    aircraft.setModelLoaded(true);
+    aircraft.setViewMode("first");
+    expect(aircraft.firstPersonCamera.position).toEqual(Vector3.Zero());
+    expect(aircraft.cockpit.position).toEqual(new Vector3(
+      definition.cockpitOffset!.x, definition.cockpitOffset!.y, definition.cockpitOffset!.z,
+    ));
+    expect(aircraft.modelRoot.isEnabled()).toBe(true);
+    expect(aircraft.firstPersonCamera.minZ).toBeCloseTo(0.05);
+    aircraft.setNearClipMeters(0.12);
+    expect(aircraft.firstPersonCamera.minZ).toBe(0.12);
+    expect(aircraft.thirdPersonCamera.minZ).toBe(0.12);
+    aircraft.dispose(); scene.dispose(); engine.dispose();
+  });
+
+  it("retains the existing pilot eye and hides exterior-only models in cockpit view", () => {
+    const engine = new NullEngine();
+    const scene = new Scene(engine);
+    const origin = new TransformNode("origin", scene);
+    const aircraft = createPlaceholderAircraft(scene, origin);
+    const eye = aircraft.cockpit.position.add(aircraft.firstPersonCamera.position);
+    expect(eye.x).toBe(0);
+    expect(eye.y).toBeCloseTo(1.3);
+    expect(eye.z).toBeCloseTo(2.4);
+    aircraft.setModelLoaded(true);
+    aircraft.setViewMode("first");
+    expect(aircraft.modelRoot.isEnabled()).toBe(false);
     aircraft.dispose(); scene.dispose(); engine.dispose();
   });
 });

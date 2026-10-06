@@ -1,5 +1,6 @@
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
 import type { FrameProfiler } from "foss-earth/perf";
+import { createThrottleLever, type ThrottleLeverEngine } from "./throttleLever";
 import {
   ATTITUDE_HALF_SHARE,
   createAttitudeRenderer,
@@ -16,6 +17,13 @@ export interface FlightHudOptions {
   onRollAutoTrimChange(enabled: boolean): void;
   onAutopilotEngageChange(engaged: boolean): void;
   onFlapsChange(value: number): void;
+  flapAutomation?: {
+    getEnabled(): boolean;
+    onEnabledChange(enabled: boolean): void;
+    getPositionNorm(): number;
+    /** Some automatic schedules reflex the flaps slightly above neutral. */
+    minPositionNorm?: number;
+  };
   onRudderChange(value: number): void;
   onStickChange(aileron: number, elevator: number): void;
   /** The globe's WebGPU device, so the attitude indicator draws on the GPU; null on WebGL. */
@@ -28,6 +36,26 @@ export interface FlightHudOptions {
   pitchAutoTrim?: boolean;
   rollAutoTrim?: boolean;
   autopilotEngaged?: boolean;
+  /** Observed engine state, independent of throttle command and audio settings. */
+  afterburner?: {
+    getActive(): boolean | null;
+    accentColor: string;
+  };
+  /**
+   * Starting and stopping the engine from the throttle lever. Absent, the
+   * lever is a plain throttle.
+   */
+  engine?: {
+    getReading(): ThrottleLeverEngine | null;
+    onStartHold(held: boolean): void;
+    onShutdown(): void;
+  };
+  /** Present only when the active aircraft has a powered lift conversion lever. */
+  vtolConversion?: {
+    getCommandNorm(): number;
+    getPositionNorm?(): number;
+    onCommandChange(value: number): void;
+  };
 }
 
 export interface FlightHudControls {
@@ -79,6 +107,9 @@ export interface FlightHudHandle {
   ): void;
   /** Repaint just the gear button, for when the key moves it between frames. */
   setGearDown(down: boolean): void;
+  /** Synchronize a registry edit while the simulation is paused or stopped. */
+  refreshVtolConversion(): void;
+  refreshFlaps(): void;
   setAttitudeRenderer(preference: AttitudeRendererPreference): void;
   destroy(): void;
 }
@@ -133,15 +164,16 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
           </span>
         </label>
         <div class="flight-hud__attitude" role="button" tabindex="0" aria-label="Attitude indicator and pitch roll control. Drag to steer."></div>
-        <label class="flight-hud__lever flight-hud__lever--flaps">
+        <div class="flight-hud__lever flight-hud__lever--flaps">
           <span class="flight-hud__lever-meta">
             <span>FLAPS</span>
+            ${options.flapAutomation ? '<button type="button" class="flight-hud__auto-button" data-control="auto-flaps" aria-label="Automatic flaps" aria-pressed="false">AUTO</button>' : ""}
             <output data-output="flaps">0%</output>
           </span>
           <span class="flight-hud__lever-track">
             <input data-control="flaps" type="range" min="0" max="1" step="0.01" value="0" aria-label="Flaps" />
           </span>
-        </label>
+        </div>
       </div>
       <div class="flight-hud__tapes">
         <div class="flight-hud__tape">
@@ -189,11 +221,13 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
         </div>
         <div class="flight-hud__engine" data-slot="engine"></div>
         <div class="flight-hud__throttle">
-          <label class="flight-hud__slider-control">
-            <span>THR</span>
-            <output data-output="throttle">10%</output>
-            <input data-control="throttle" type="range" min="0" max="1" step="0.01" value="0.1" aria-label="Throttle" />
-          </label>
+          <div class="flight-hud__slider-control flight-hud__slider-control--throttle"></div>
+          ${options.vtolConversion ? `
+          <label class="flight-hud__slider-control flight-hud__slider-control--vtol">
+            <span>VTOL</span>
+            <output data-output="vtol-conversion">0%</output>
+            <input data-control="vtol-conversion" type="range" min="0" max="1" step="0.01" value="0" aria-label="VTOL conversion" aria-orientation="vertical" />
+          </label>` : ""}
         </div>
       </div>
     </div>
@@ -205,14 +239,16 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   const altEl = root.querySelector<HTMLElement>('[data-metric="alt"]');
   const hdgEl = root.querySelector<HTMLElement>('[data-metric="hdg"]');
   const vsEl = root.querySelector<HTMLElement>('[data-metric="vs"]');
-  const throttleInput = root.querySelector<HTMLInputElement>('[data-control="throttle"]');
+  const throttleControl = root.querySelector<HTMLElement>(".flight-hud__slider-control--throttle");
   const pitchTrimInput = root.querySelector<HTMLInputElement>('[data-control="pitch-trim"]');
   const rollTrimInput = root.querySelector<HTMLInputElement>('[data-control="roll-trim"]');
   const pitchAutoTrimButton = root.querySelector<HTMLButtonElement>('[data-control="auto-pitch-trim"]');
   const rollAutoTrimButton = root.querySelector<HTMLButtonElement>('[data-control="auto-roll-trim"]');
   const flapsInput = root.querySelector<HTMLInputElement>('[data-control="flaps"]');
+  const autoFlapsButton = root.querySelector<HTMLButtonElement>('[data-control="auto-flaps"]');
   const rudderInput = root.querySelector<HTMLInputElement>('[data-control="rudder"]');
-  const throttleOutput = root.querySelector<HTMLOutputElement>('[data-output="throttle"]');
+  const vtolInput = root.querySelector<HTMLInputElement>('[data-control="vtol-conversion"]');
+  const vtolOutput = root.querySelector<HTMLOutputElement>('[data-output="vtol-conversion"]');
   const pitchTrimOutput = root.querySelector<HTMLOutputElement>('[data-output="pitch-trim"]');
   const rollTrimOutput = root.querySelector<HTMLOutputElement>('[data-output="roll-trim"]');
   const flapsOutput = root.querySelector<HTMLOutputElement>('[data-output="flaps"]');
@@ -222,10 +258,70 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
 
   if (!pad || !gearButton || !apButton || !pitchAutoTrimButton || !rollAutoTrimButton
     || !iasEl || !altEl || !hdgEl || !vsEl
-    || !throttleInput || !pitchTrimInput || !rollTrimInput || !flapsInput || !rudderInput
-    || !throttleOutput || !pitchTrimOutput || !rollTrimOutput || !flapsOutput || !rudderOutput) {
+    || !throttleControl || !pitchTrimInput || !rollTrimInput || !flapsInput || !rudderInput
+    || !pitchTrimOutput || !rollTrimOutput || !flapsOutput || !rudderOutput) {
     throw new Error("Flight HUD markup failed to initialize.");
   }
+
+  if (options.afterburner) {
+    throttleControl.style.setProperty("--afterburner-accent", options.afterburner.accentColor);
+  }
+  // The phone mounts this same lever; see throttleLever.ts.
+  const throttle = createThrottleLever(throttleControl, {
+    onThrottleChange: options.onThrottleChange,
+    onStartHold: options.engine?.onStartHold,
+    onShutdown: options.engine?.onShutdown,
+  });
+  let masterAp: FlightHudMasterAp = {
+    ...FLIGHT_HUD_MASTER_OFF,
+    engaged: options.autopilotEngaged === true,
+  };
+  let flapsDragging = false;
+  let flapsKeyboardEditing = false;
+  let flapCommand = 0;
+  const refreshFlaps = (): void => {
+    const automation = options.flapAutomation;
+    const enabled = automation?.getEnabled() === true;
+    if (enabled) flapsKeyboardEditing = false;
+    autoFlapsButton?.setAttribute("aria-pressed", String(enabled));
+    autoFlapsButton?.classList.toggle("is-on", enabled && !masterAp.ownsFlaps);
+    if (autoFlapsButton) {
+      autoFlapsButton.title = masterAp.ownsFlaps
+        ? `Flaps are owned by Autopilot. Automatic flap assist is ${enabled ? "requested" : "off"}; move the slider to take over manually.`
+        : enabled ? "Automatic flaps on. Move the slider to take over manually."
+          : "Automatic flaps off. Click to resume automatic control.";
+      autoFlapsButton.setAttribute("aria-label", autoFlapsButton.title);
+    }
+    const actual = automation?.getPositionNorm();
+    const known = actual !== undefined && Number.isFinite(actual);
+    const editingCommand = flapsDragging || (flapsKeyboardEditing && !enabled);
+    const displayed = known && !editingCommand ? actual : flapCommand;
+    flapsInput.min = String(enabled ? automation?.minPositionNorm ?? 0 : 0);
+    if (!flapsDragging) flapsInput.value = String(displayed);
+    flapsOutput.value = known ? `${Math.round(actual * 100)}%` : `${Math.round(flapCommand * 100)}%`;
+    flapsInput.setAttribute("aria-valuetext", `${Math.round(displayed * 100)}% ${known && !editingCommand ? "actual" : "commanded"}${masterAp.ownsFlaps ? ", autopilot owns flaps" : enabled ? ", automatic flaps" : ""}`);
+  };
+  const onAutoFlapsClick = (): void => {
+    flapsKeyboardEditing = false;
+    if (options.flapAutomation) options.flapAutomation.onEnabledChange(!options.flapAutomation.getEnabled());
+    refreshFlaps();
+  };
+  autoFlapsButton?.addEventListener("click", onAutoFlapsClick);
+  const onFlapsPointerDown = (): void => { flapsDragging = true; flapsKeyboardEditing = false; };
+  const onFlapsPointerUp = (): void => { flapsDragging = false; refreshFlaps(); };
+  const onFlapsBlur = (): void => { flapsDragging = false; flapsKeyboardEditing = false; refreshFlaps(); };
+  const onFlapsKeyDown = (event: KeyboardEvent): void => {
+    if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End", "PageUp", "PageDown"].includes(event.key)) {
+      flapsKeyboardEditing = true;
+    }
+  };
+  flapsInput.addEventListener("pointerdown", onFlapsPointerDown);
+  flapsInput.addEventListener("pointerup", onFlapsPointerUp);
+  flapsInput.addEventListener("pointercancel", onFlapsPointerUp);
+  flapsInput.addEventListener("lostpointercapture", onFlapsPointerUp);
+  flapsInput.addEventListener("blur", onFlapsBlur);
+  flapsInput.addEventListener("keydown", onFlapsKeyDown);
+  refreshFlaps();
 
   const attitude = createAttitudeRenderer(pad, {
     device: options.gpuDevice ?? null,
@@ -237,10 +333,6 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   let gearDown = true;
   let pitchAutoTrim = options.pitchAutoTrim === true;
   let rollAutoTrim = options.rollAutoTrim === true;
-  let masterAp: FlightHudMasterAp = {
-    ...FLIGHT_HUD_MASTER_OFF,
-    engaged: options.autopilotEngaged === true,
-  };
   const renderGearButton = (): void => {
     gearButton.setAttribute("aria-pressed", String(gearDown));
     gearButton.classList.toggle("is-down", gearDown);
@@ -293,11 +385,40 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   renderMasterApButton();
   renderAutoTrimButtons();
 
+  const refreshVtolConversion = (): void => {
+    const lever = options.vtolConversion;
+    if (!lever || !vtolInput || !vtolOutput) return;
+    const value = lever.getCommandNorm();
+    const command = Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
+    const percent = Math.round(command * 100);
+    const physical = lever.getPositionNorm?.();
+    const actual = physical !== undefined && Number.isFinite(physical)
+      ? `; ${Math.round(Math.min(1, Math.max(0, physical)) * 100)}% actual conversion` : "";
+    vtolInput.value = String(command);
+    vtolOutput.value = `${percent}%`;
+    vtolInput.setAttribute("aria-valuetext", `${percent}% commanded${actual}`);
+    vtolInput.title = `0% conventional flight; 100% vertical lift. ${percent}% commanded${actual}.`;
+  };
+  const onVtolInput = (): void => {
+    if (!options.vtolConversion || !vtolInput) return;
+    options.vtolConversion.onCommandChange(Number(vtolInput.value));
+    refreshVtolConversion();
+  };
+  vtolInput?.addEventListener("input", onVtolInput);
+  refreshVtolConversion();
+
   let rudderDragging = false;
-  const onThrottleInput = (): void => options.onThrottleChange(Number(throttleInput.value));
   const onPitchTrimInput = (): void => options.onPitchTrimChange(Number(pitchTrimInput.value));
   const onRollTrimInput = (): void => options.onRollTrimChange(Number(rollTrimInput.value));
-  const onFlapsInput = (): void => options.onFlapsChange(Number(flapsInput.value));
+  const onFlapsInput = (): void => {
+    const command = Math.min(1, Math.max(0, Number(flapsInput.value)));
+    flapCommand = command;
+    if (!flapsDragging && document.activeElement === flapsInput) flapsKeyboardEditing = true;
+    options.flapAutomation?.onEnabledChange(false);
+    options.onFlapsChange(command);
+    flapCommand = command; // Synchronous setting observers may refresh the HUD during takeover.
+    refreshFlaps();
+  };
   const onRudderInput = (): void => options.onRudderChange(Number(rudderInput.value));
   const releaseRudder = (): void => {
     if (!rudderDragging) return;
@@ -309,7 +430,6 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   const onRudderPointerDown = (): void => { rudderDragging = true; };
   const onRudderPointerUp = (): void => releaseRudder();
   const onRudderBlur = (): void => releaseRudder();
-  throttleInput.addEventListener("input", onThrottleInput);
   pitchTrimInput.addEventListener("input", onPitchTrimInput);
   rollTrimInput.addEventListener("input", onRollTrimInput);
   flapsInput.addEventListener("input", onFlapsInput);
@@ -441,10 +561,13 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
     renderMasterApButton();
     renderGearButton();
     renderAutoTrimButtons();
+    refreshFlaps();
   };
 
   return {
     setGearDown,
+    refreshVtolConversion,
+    refreshFlaps,
     setAttitudeRenderer: preference => attitude.setPreference(preference),
     update(
       state: FlightState,
@@ -456,6 +579,7 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
       setGearDown(nextGearDown);
       setAutoTrim(nextAutoTrim);
       setMasterAp(nextMasterAp);
+      refreshVtolConversion();
       const localStick = capturedPointer !== null || stickKeys.size > 0;
       const { x: displayX, y: displayY } = localStick
         ? clampStickSquare(stickX, stickY)
@@ -474,15 +598,18 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
       // it sideways.
       const vsFpm = Math.round(state.verticalSpeedFps * 60);
       vsEl.textContent = `${vsFpm < 0 ? "-" : "+"}${Math.abs(vsFpm).toString().padStart(4, " ")}`;
-      throttleInput.value = String(state.throttleNorm);
       pitchTrimInput.value = String(controls.pitchTrim);
       rollTrimInput.value = String(controls.rollTrim);
-      flapsInput.value = String(controls.flaps);
+      if (!flapsKeyboardEditing) flapCommand = controls.flaps;
+      refreshFlaps();
       if (!rudderDragging) rudderInput.value = String(controls.rudder);
-      throttleOutput.value = `${Math.round(state.throttleNorm * 100)}%`;
+      throttle.update({
+        throttle: state.throttleNorm,
+        engine: options.engine?.getReading() ?? null,
+        afterburner: options.afterburner?.getActive() ?? null,
+      });
       pitchTrimOutput.value = `${Math.round(controls.pitchTrim * 100)}%`;
       rollTrimOutput.value = `${Math.round(controls.rollTrim * 100)}%`;
-      flapsOutput.value = `${Math.round(controls.flaps * 100)}%`;
       rudderOutput.value = `${Math.round((rudderDragging ? Number(rudderInput.value) : controls.rudder) * 100)}%`;
     },
     destroy(): void {
@@ -493,10 +620,18 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
       pitchAutoTrimButton.removeEventListener("click", onPitchAutoTrimClick);
       rollAutoTrimButton.removeEventListener("click", onRollAutoTrimClick);
       apButton.removeEventListener("click", onAutopilotClick);
-      throttleInput.removeEventListener("input", onThrottleInput);
+      throttle.destroy();
+      vtolInput?.removeEventListener("input", onVtolInput);
       pitchTrimInput.removeEventListener("input", onPitchTrimInput);
       rollTrimInput.removeEventListener("input", onRollTrimInput);
       flapsInput.removeEventListener("input", onFlapsInput);
+      autoFlapsButton?.removeEventListener("click", onAutoFlapsClick);
+      flapsInput.removeEventListener("pointerdown", onFlapsPointerDown);
+      flapsInput.removeEventListener("pointerup", onFlapsPointerUp);
+      flapsInput.removeEventListener("pointercancel", onFlapsPointerUp);
+      flapsInput.removeEventListener("lostpointercapture", onFlapsPointerUp);
+      flapsInput.removeEventListener("blur", onFlapsBlur);
+      flapsInput.removeEventListener("keydown", onFlapsKeyDown);
       rudderInput.removeEventListener("input", onRudderInput);
       rudderInput.removeEventListener("pointerdown", onRudderPointerDown);
       rudderInput.removeEventListener("pointerup", onRudderPointerUp);

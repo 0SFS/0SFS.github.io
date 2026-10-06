@@ -1,0 +1,287 @@
+
+> @felipegalind0/jsbsim@1.2.4-fork.11 build
+> node scripts/build.mjs
+
+
+added 53 packages in 393ms
+Generated 90 method bindings.
+Detected 2 enum type map(s) and 1 flag map(s).
+- generated/FGFDMExecBindings.cpp
+- src/generated/fgfdmexec-api.ts
+- src/generated/jsbsim-api.ts
+emcmake: cmake -S /Users/felg/gh/Felipegalind0/jsbsim/wasm/build/sources/repository/fec8d16c38fd80da1446cde2b1f5523796d737eef6bac5426a7df4b11c2e2021 -B /Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/d353cac279c5-JfEqGI/wasm -DBUILD_WASM_MODULE=ON -DBUILD_DOCS=OFF -DBUILD_PYTHON_MODULE=OFF -DBUILD_JULIA_PACKAGE=OFF -DBUILD_MATLAB_SFUNCTION=OFF -DBUILD_SHARED_LIBS=OFF -DSYSTEM_EXPAT=OFF -DJSBSIM_WASM_BINDINGS=/Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/d353cac279c5-JfEqGI/sdk/generated/FGFDMExecBindings.cpp -DJSBSIM_BINDINGS_MANIFEST=/Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/d353cac279c5-JfEqGI/sdk/generated/bindings-manifest.json -DJSBSIM_WASM_EXTENSION_DIR=/Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/d353cac279c5-JfEqGI/sdk/bindings -DJSBSIM_BUILD_INPUT_SHA256=d353cac279c53cbc55c05b5231680ae85c26ae62b8b6c68a7e388fed90e0e7bc -DJSBSIM_NATIVE_CONTENT_SHA256=fec8d16c38fd80da1446cde2b1f5523796d737eef6bac5426a7df4b11c2e2021 -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/opt/homebrew/Cellar/emscripten/6.0.9_1/libexec/cmake/Modules/Platform/Emscripten.cmake -DCMAKE_CROSSCOMPILING_EMULATOR=/opt/homebrew/opt/node/bin/node in directory /Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/d353cac279c5-JfEqGI/sdk
+-- Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE) 
+-- Could NOT find CxxTest (missing: CXXTEST_INCLUDE_DIR) 
+CMake Warning at CMakeLists.txt:176 (message):
+  -- Could NOT find LSB_Release (missing: LSB_RELEASE_EXECUTABLE)
+
+
+-- Configuring done (0.4s)
+-- Generating done (0.1s)
+-- Build files have been written to: /Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/d353cac279c5-JfEqGI/wasm
+[  1%] Building CXX object src/math/CMakeFiles/Math.dir/FGColumnVector3.cpp.o
+[  2%] Building CXX object src/GeographicLib/CMakeFiles/GeographicLib.dir/Geodesic.cpp.o
+[  3%] Building CXX object src/models/CMakeFiles/Models.dir/FGAerodynamics.cpp.o
+[  4%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGGroundCallback.cpp.o
+[  5%] Building CXX object src/initialization/CMakeFiles/Init.dir/FGInitialCondition.cpp.o
+[  7%] Building CXX object src/GeographicLib/CMakeFiles/GeographicLib.dir/GeodesicLine.cpp.o
+[  7%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGPropertyManager.cpp.o
+[  8%] Building CXX object src/math/CMakeFiles/Math.dir/FGFunction.cpp.o
+[  8%] Building CXX object src/GeographicLib/CMakeFiles/GeographicLib.dir/Math.cpp.o
+[  9%] Building CXX object src/models/CMakeFiles/Models.dir/FGAircraft.cpp.o
+[ 10%] Building CXX object src/initialization/CMakeFiles/Init.dir/FGTrim.cpp.o
+[ 11%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGScript.cpp.o
+[ 11%] Built target GeographicLib
+[ 12%] Building CXX object src/models/atmosphere/CMakeFiles/Atmosphere.dir/FGMSIS.cpp.o
+[ 12%] Building CXX object src/models/CMakeFiles/Models.dir/FGAtmosphere.cpp.o
+[ 14%] Building CXX object src/models/atmosphere/CMakeFiles/Atmosphere.dir/FGMars.cpp.o
+[ 14%] Building CXX object src/initialization/CMakeFiles/Init.dir/FGTrimAxis.cpp.o
+[ 15%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGXMLElement.cpp.o
+[ 16%] Building CXX object src/models/CMakeFiles/Models.dir/FGAuxiliary.cpp.o
+[ 17%] Building CXX object src/models/atmosphere/CMakeFiles/Atmosphere.dir/FGStandardAtmosphere.cpp.o
+[ 18%] Building CXX object src/initialization/CMakeFiles/Init.dir/FGLinearization.cpp.o
+[ 18%] Building CXX object src/math/CMakeFiles/Math.dir/FGLocation.cpp.o
+[ 20%] Building CXX object src/models/CMakeFiles/Models.dir/FGFCS.cpp.o
+[ 21%] Building CXX object src/math/CMakeFiles/Math.dir/FGMatrix33.cpp.o
+[ 21%] Building CXX object src/models/atmosphere/CMakeFiles/Atmosphere.dir/FGWinds.cpp.o
+[ 22%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGXMLParse.cpp.o
+[ 22%] Built target Init
+[ 23%] Building CXX object src/models/CMakeFiles/Models.dir/FGSurface.cpp.o
+[ 24%] Building CXX object src/math/CMakeFiles/Math.dir/FGPropertyValue.cpp.o
+[ 24%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGfdmSocket.cpp.o
+[ 24%] Building CXX object src/models/CMakeFiles/Models.dir/FGGroundReactions.cpp.o
+[ 25%] Building C object src/models/atmosphere/CMakeFiles/Atmosphere.dir/MSIS/nrlmsise-00.c.o
+[ 27%] Building CXX object src/models/CMakeFiles/Models.dir/FGInertial.cpp.o
+[ 28%] Building C object src/models/atmosphere/CMakeFiles/Atmosphere.dir/MSIS/nrlmsise-00_data.c.o
+[ 28%] Built target Atmosphere
+[ 28%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGElectric.cpp.o
+[ 29%] Building CXX object src/math/CMakeFiles/Math.dir/FGQuaternion.cpp.o
+[ 30%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGXMLFileRead.cpp.o
+[ 31%] Building CXX object src/models/CMakeFiles/Models.dir/FGLGear.cpp.o
+[ 32%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGDeadBand.cpp.o
+[ 32%] Building CXX object src/math/CMakeFiles/Math.dir/FGRealValue.cpp.o
+[ 34%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGOutputType.cpp.o
+[ 35%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGEngine.cpp.o
+[ 36%] Building CXX object src/math/CMakeFiles/Math.dir/FGTable.cpp.o
+[ 36%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGFCSComponent.cpp.o
+[ 37%] Building CXX object src/models/CMakeFiles/Models.dir/FGMassBalance.cpp.o
+[ 38%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGForce.cpp.o
+[ 40%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGOutputFG.cpp.o
+[ 41%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGFilter.cpp.o
+[ 42%] Building CXX object src/math/CMakeFiles/Math.dir/FGCondition.cpp.o
+[ 43%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGNozzle.cpp.o
+[ 43%] Building CXX object src/models/CMakeFiles/Models.dir/FGModel.cpp.o
+[ 43%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGOutputSocket.cpp.o
+[ 44%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGGain.cpp.o
+[ 45%] Building CXX object src/math/CMakeFiles/Math.dir/FGRungeKutta.cpp.o
+[ 45%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGPiston.cpp.o
+[ 47%] Building CXX object src/models/CMakeFiles/Models.dir/FGOutput.cpp.o
+[ 48%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGOutputFile.cpp.o
+[ 48%] Building CXX object src/math/CMakeFiles/Math.dir/FGModelFunctions.cpp.o
+[ 49%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGKinemat.cpp.o
+[ 50%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGOutputTextFile.cpp.o
+[ 51%] Building CXX object src/models/CMakeFiles/Models.dir/FGPropagate.cpp.o
+[ 52%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGPropeller.cpp.o
+[ 54%] Building CXX object src/math/CMakeFiles/Math.dir/FGTemplateFunc.cpp.o
+[ 54%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGSummer.cpp.o
+[ 55%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGRocket.cpp.o
+[ 56%] Building CXX object src/math/CMakeFiles/Math.dir/FGStateSpace.cpp.o
+[ 57%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGSwitch.cpp.o
+[ 58%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGPropertyReader.cpp.o
+[ 60%] Building CXX object src/models/CMakeFiles/Models.dir/FGPropulsion.cpp.o
+[ 61%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGTank.cpp.o
+[ 61%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGModelLoader.cpp.o
+[ 62%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGFCSFunction.cpp.o
+[ 62%] Built target Math
+[ 63%] Building CXX object src/simgear/props/CMakeFiles/Properties.dir/props.cxx.o
+[ 63%] Building CXX object src/models/CMakeFiles/Models.dir/FGInput.cpp.o
+[ 64%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGInputType.cpp.o
+[ 65%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGSensor.cpp.o
+[ 65%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGThruster.cpp.o
+[ 67%] Building CXX object src/models/CMakeFiles/Models.dir/FGExternalReactions.cpp.o
+[ 67%] Built target Properties
+[ 68%] Building CXX object src/simgear/magvar/CMakeFiles/Magvar.dir/coremag.cxx.o
+[ 69%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGInputSocket.cpp.o
+[ 69%] Built target Magvar
+[ 69%] Building CXX object src/simgear/misc/CMakeFiles/Misc.dir/sg_path.cxx.o
+[ 70%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGTurbine.cpp.o
+[ 70%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGPID.cpp.o
+[ 71%] Building CXX object src/models/CMakeFiles/Models.dir/FGExternalForce.cpp.o
+[ 72%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGUDPInputSocket.cpp.o
+[ 74%] Building CXX object src/simgear/misc/CMakeFiles/Misc.dir/strutils.cxx.o
+[ 75%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGActuator.cpp.o
+[ 76%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGTurboProp.cpp.o
+[ 76%] Building CXX object src/models/CMakeFiles/Models.dir/FGBuoyantForces.cpp.o
+[ 76%] Built target Misc
+[ 77%] Building CXX object src/simgear/xml/CMakeFiles/Xml.dir/easyxml.cxx.o
+[ 77%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/string_utilities.cpp.o
+[ 78%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGAccelerometer.cpp.o
+[ 78%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGTransmission.cpp.o
+[ 80%] Building CXX object src/models/CMakeFiles/Models.dir/FGGasCell.cpp.o
+[ 80%] Building C object src/simgear/xml/CMakeFiles/Xml.dir/xmlparse.c.o
+[ 80%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGGyro.cpp.o
+[ 81%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGRotor.cpp.o
+[ 82%] Building CXX object src/input_output/CMakeFiles/InputOutput.dir/FGLog.cpp.o
+[ 83%] Building C object src/simgear/xml/CMakeFiles/Xml.dir/xmltok.c.o
+[ 84%] Building CXX object src/models/CMakeFiles/Models.dir/FGAccelerations.cpp.o
+[ 85%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGMagnetometer.cpp.o
+[ 87%] Building C object src/simgear/xml/CMakeFiles/Xml.dir/xmlrole.c.o
+[ 87%] Built target InputOutput
+[ 88%] Building CXX object src/simgear/io/iostreams/CMakeFiles/IOStreams.dir/sgstream.cxx.o
+[ 89%] Building CXX object src/models/propulsion/CMakeFiles/Propulsion.dir/FGBrushLessDCMotor.cpp.o
+[ 89%] Built target Xml
+[ 90%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGAngles.cpp.o
+[ 90%] Built target Models
+[ 91%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGWaypoint.cpp.o
+[ 91%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGDistributor.cpp.o
+[ 91%] Built target IOStreams
+[ 92%] Building CXX object src/models/flight_control/CMakeFiles/FlightControl.dir/FGLinearActuator.cpp.o
+[ 92%] Built target Propulsion
+[ 92%] Built target FlightControl
+[ 95%] Building CXX object src/CMakeFiles/libJSBSim.dir/FGFDMExec.cpp.o
+[ 95%] Building CXX object src/CMakeFiles/libJSBSim.dir/FGJSBBase.cpp.o
+[ 96%] Linking CXX static library libJSBSim.a
+[ 96%] Built target libJSBSim
+[100%] Building CXX object wasm/CMakeFiles/jsbsim_wasm.dir/Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/d353cac279c5-JfEqGI/sdk/bindings/PropertyBatchBindings.cpp.o
+[100%] Building CXX object wasm/CMakeFiles/jsbsim_wasm.dir/Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/d353cac279c5-JfEqGI/sdk/bindings/GearContactBindings.cpp.o
+[100%] Building CXX object wasm/CMakeFiles/jsbsim_wasm.dir/Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/d353cac279c5-JfEqGI/sdk/generated/FGFDMExecBindings.cpp.o
+[100%] Linking CXX executable ../jsbsim_wasm.mjs
+em++: warning: WASM_BIGINT is deprecated (no longer needed. Should only ever be implicitly disabled by -sWASM=0). Please open a bug if you have a continuing need for this setting [-Wdeprecated]
+[100%] Built target jsbsim_wasm
+CLI Building entry: src/index.ts, src/wasm.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/d353cac279c5-JfEqGI/sdk/tsup.config.ts
+CLI Target: es2022
+ESM Build start
+ESM dist/wasm.js      368.00 B
+ESM dist/index.js     40.16 KB
+ESM dist/index.js.map 88.58 KB
+ESM dist/wasm.js.map  751.00 B
+ESM ⚡️ Build success in 7ms
+DTS Build start
+DTS ⚡️ Build success in 492ms
+DTS dist/index.d.ts 43.63 KB
+DTS dist/wasm.d.ts  487.00 B
+▶ PropertyBatch
+  ✔ reads the same values as getPropertyValue, including tied getters, while the sim runs (22.610333ms)
+  ✔ reports missing paths as NaN, and creates them only when asked (0.228917ms)
+  ✔ writes all slots, or one slot, into the property tree (0.278666ms)
+  ✔ copies into a caller array, stays valid after wasm memory growth, and refuses use after dispose (11.686708ms)
+✔ PropertyBatch (111.894416ms)
+▶ GearContactReader
+  ✔ matches JSBSim's own gear properties and sums to its total gear force (66.741792ms)
+  ✔ never changes the simulation it reads (60.691167ms)
+✔ GearContactReader (127.748333ms)
+✔ reads indexed transformed thruster forces and separate resolved aerodynamic forces without mutation (116.804166ms)
+▶ real WASM lifetime and diagnostics
+  ✔ deletes the owned executive once after its children, across repeated lifecycles (153.238125ms)
+  ✔ invalidates native views on successful and failed model replacements (45.935125ms)
+  ✔ invalidates views through the public script-loading entry point (15.304083ms)
+  ✔ preserves native exception handling when invalid propulsion rejects a load (26.464917ms)
+  ✔ frees a real executive when initialization fails after allocation (7.072166ms)
+  ✔ reports attempt-specific native errors and preserves plain WASM logs (19.239583ms)
+✔ real WASM lifetime and diagnostics (268.167167ms)
+▶ SDK-owned native lifetime
+  ✔ disposes views before the executive and deletes exactly once (1.401959ms)
+  ✔ does not delete explicitly disposed children twice (0.229542ms)
+  ✔ invalidates model-bound views before any replacement attempt (0.23975ms)
+  ✔ supports the legacy module destructor only when delete is absent (0.168167ms)
+  ✔ preserves destructor failures without a second deletion attempt (0.16325ms)
+  ✔ stops delivering SDK logs after disposal (0.920083ms)
+  ✔ frees the executive when path configuration fails during create (0.181292ms)
+✔ SDK-owned native lifetime (3.944708ms)
+▶ diagnostic model loads
+  ✔ retains both native log streams, model paths, and numeric exception cause (0.527667ms)
+  ✔ preserves the boolean API and distinguishes a false result from an exception (0.260584ms)
+  ✔ bounds attempt logs and excludes earlier output (1.393167ms)
+  ✔ supports explicit paths and restores capture state after success (0.18225ms)
+✔ diagnostic model loads (2.684833ms)
+▶ partial native child construction
+  ✔ releases a batch allocation when path registration throws (0.104666ms)
+  ✔ releases a reader allocation when native field inspection throws (0.066333ms)
+  ✔ retains both initialization and cleanup failures (0.209916ms)
+✔ partial native child construction (0.453833ms)
+▶ persistence boundaries
+  ✔ rejects equal and nested normalized roots before loading a runtime (0.212ms)
+  ✔ does not confuse sibling prefixes with nested directories (0.355959ms)
+  ✔ rejects persistence when IndexedDB or its backend is unavailable (0.201875ms)
+  ✔ retains both executive initialization and cleanup failures (0.115292ms)
+✔ persistence boundaries (0.99125ms)
+▶ resolved native source contract
+  ✔ preserves byte and executable-mode identity while ignoring time metadata (5.78575ms)
+  ✔ rejects traversal and external-link archive entries before writing their targets (2.75475ms)
+  ✔ refuses uncaptured filesystem symlinks (0.649709ms)
+  ✔ captures one repository and derives the SDK from that exact snapshot (359.3985ms)
+  ✔ requires explicit dirty capture and couples both identities to engine or SDK edits (370.628958ms)
+  ✔ captures new source files while excluding ignored build products (125.64675ms)
+  ✔ rejects SDKs outside the enclosing repository's wasm directory and nested repositories (66.927916ms)
+  ✔ rejects a nested repository elsewhere in the captured source tree (123.510584ms)
+  ✔ refuses contaminated content-addressed source caches (233.05525ms)
+  ✔ captures exact local inputs and refuses concurrent identity changes (8.947625ms)
+✔ resolved native source contract (1298.344833ms)
+▶ build consumers reject inconsistent resolved identities
+  ✔ accepts a coherent descriptor and rejects native/SDK identity or manifest substitution (4.816167ms)
+  ✔ recomputes the recipe and refuses stale options, malformed manifests and old source modes (1.79125ms)
+  ✔ refuses a separately valid SDK identity, unrelated root or substituted subtree (2.39825ms)
+  ✔ includes the identity schema and SDK location in the build recipe digest (0.407708ms)
+  ✔ requires a CMake cache rooted at this snapshot with WASM enabled and the same recipe (0.698875ms)
+  ✔ requires matching binding source, recipe and all generated C++/TypeScript bytes (3.266375ms)
+✔ build consumers reject inconsistent resolved identities (13.615167ms)
+✔ accepts only reviewed Emscripten distribution banners and preserves actual compiler identity (0.391625ms)
+✔ reuses identical immutable output bytes and refuses replacement (1.057041ms)
+✔ rejects mutated frozen authored inputs, unknown files and generated identity before rechecking (5.692958ms)
+✔ refuses ambient flags or include paths that would escape the recorded build recipe (0.2335ms)
+✔ reads live boolean augmentation without writable commands, including spool lag, cutoff, reset and reload (134.008125ms)
+ℹ tests 52
+ℹ suites 9
+ℹ pass 52
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1398.299125
+{
+  "schemaVersion": 1,
+  "artifactSha256": "a31d25498f34c6f5f17d6d0c8f7de4a84f0502b5d1546012809bbd4986e76c69",
+  "artifactRoot": "/Users/felg/gh/Felipegalind0/jsbsim/wasm/build/artifacts/a31d25498f34c6f5f17d6d0c8f7de4a84f0502b5d1546012809bbd4986e76c69",
+  "descriptor": "/Users/felg/gh/Felipegalind0/jsbsim/wasm/build/attempts/d353cac279c5-JfEqGI/descriptor.json",
+  "identity": {
+    "schemaVersion": 2,
+    "package": {
+      "name": "@felipegalind0/jsbsim",
+      "version": "1.2.4-fork.11"
+    },
+    "native": {
+      "origin": "https://github.com/Felipegalind0/jsbsim",
+      "commit": "c1d57a2c3860ae9ae47f2b27b84f37912042c19c",
+      "contentSha256": "fec8d16c38fd80da1446cde2b1f5523796d737eef6bac5426a7df4b11c2e2021",
+      "dirty": false
+    },
+    "sdk": {
+      "commit": "c1d57a2c3860ae9ae47f2b27b84f37912042c19c",
+      "contentSha256": "d40290a03a3c40552b8dce8c3dfb6aeb5f19587f406d7083c461bc5ec2dfb5a4",
+      "dirty": false,
+      "path": "wasm"
+    },
+    "build": {
+      "mode": "in-tree",
+      "inputSha256": "d353cac279c53cbc55c05b5231680ae85c26ae62b8b6c68a7e388fed90e0e7bc",
+      "toolchain": {
+        "node": "v26.8.2",
+        "npm": "11.19.1",
+        "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+        "cmake": "cmake version 4.4.3",
+        "clang": "clang version 24.0.0git",
+        "platform": "darwin",
+        "arch": "arm64",
+        "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+      },
+      "options": {
+        "buildType": "Release",
+        "cxxStandard": 17,
+        "sdkTarget": "es2022"
+      }
+    }
+  }
+}

@@ -118,6 +118,10 @@
 
 .flight-hud__throttle {
   grid-area: throttle;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 6px;
   align-self: end;
   padding: 8px 6px;
   border-radius: 8px;
@@ -140,6 +144,11 @@
   background: transparent;
 }
 
+.flight-hud__slider-control--throttle[data-afterburner="active"] {
+  --flight-panel-accent: var(--afterburner-accent);
+  --ctl-accent: var(--afterburner-accent);
+}
+
 .flight-hud__auto-trims {
   grid-column: 1;
   grid-row: 1;
@@ -147,6 +156,21 @@
   align-self: end;
   width: var(--flight-auto-trim-size);
   height: var(--flight-auto-trim-size);
+}
+
+.flight-hud__auto-button {
+  width: max-content;
+  padding: 2px 3px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.flight-hud__auto-button.is-on {
+  color: var(--flight-panel-accent);
 }
 
 .flight-hud__slider-control--roll-trim {
@@ -167,7 +191,8 @@
   min-width: var(--flight-auto-trim-size);
 }
 
-.flight-hud__throttle .flight-hud__slider-control input[type="range"] {
+.flight-hud__throttle .flight-hud__slider-control input[type="range"],
+.flight-hud__throttle .flight-throttle {
   height: 140px;
 }
 
@@ -733,7 +758,8 @@
     font-size: 7px;
   }
 
-  .flight-hud__throttle .flight-hud__slider-control input[type="range"] {
+  .flight-hud__throttle .flight-hud__slider-control input[type="range"],
+  .flight-hud__throttle .flight-throttle {
     height: 100px;
   }
 

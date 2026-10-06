@@ -1,0 +1,658 @@
+
+> osfs@0.0.0 ci
+> npm run lint && npm run test && npm run build
+
+
+> osfs@0.0.0 lint
+> eslint . --cache --cache-strategy content --cache-location node_modules/.cache/eslint/
+
+
+> osfs@0.0.0 test
+> vitest run --passWithNoTests
+
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+ ❯ src/flight/audio/highAudio.test.ts (17 tests | 17 failed) 11ms
+     × renders { id: 'fj33-reference', engineClass: 'turbofan', manufacturerFamily: 'Williams FJ33/FJ44', rendererId: 'procedural-jet-v1', telemetry: { id: 'jsbsim-turbine-v1', required: [ 'n1Pct', 'n2Pct', 'thrustLbf', 'fuelFlowPps' ], commandScope: { selectionPath: 'propulsion/active_engine', allEnginesValue: -1 }, combustion: { rule: 'fuel-flow-or-running', minimumFuelFlowPps: 0.0001 }, paths: { n1Pct: 'propulsion/engine[{engineIndex}]/n1', n2Pct: 'propulsion/engine[{engineIndex}]/n2', thrustLbf: 'propulsion/engine[{engineIndex}]/thrust-lbs', fuelFlowPps: 'propulsion/engine[{engineIndex}]/fuel-flow-rate-pps', running: 'propulsion/engine[{engineIndex}]/set-running', augmentation: 'propulsion/engine[{engineIndex}]/augmentation', starter: 'propulsion/starter_cmd', cutoff: 'propulsion/cutoff_cmd', throttleNorm: 'fcs/throttle-cmd-norm[{engineIndex}]' } }, label: 'Williams FJ33 procedural sound', approximation: 'Synthetic engine tones; acoustic calibration pending.', parameters: { idleN1Pct: 24.3, idleN1SpanPct: 75.7, thrustReferenceLbf: 1846, fuelReferencePps: 0.25, n1ReferenceHz: 2500, n2ReferenceHz: 6000, fanMix: 0.7674418604651163, fanToneGain: 0.3, coreToneGain: 0.3, fanNoiseBaseGain: 0.1, fanNoisePowerGain: 0.55, bypassCenterHz: 900, bypassPowerHz: 1800, bypassGain: 0.28, jetBaseHz: 800, jetPowerHz: 5200, jetGain: 0.42, combustorHz: 90, combustorHighHz: 400, combustorGain: 0.55, outputGain: 0.9, afterburnerJetGain: +0, afterburnerJetHz: 6000, highFineMixGain: 0.16, highFineMixHz: 4200, highShockGain: +0, highShockHz: 1500, highRearMixDirectivity: 0.25, highShockDirectivity: +0, highCockpitGain: 0.12589254117941673, highCockpitHz: 1400 } } without a bank at both output rates and differs from Med 4ms
+     × renders { id: 'f135-approximation', engineClass: 'turbofan', manufacturerFamily: 'Pratt & Whitney F135', rendererId: 'procedural-jet-v1', telemetry: { id: 'jsbsim-turbine-v1', required: [ 'n1Pct', 'n2Pct', 'thrustLbf', 'fuelFlowPps' ], commandScope: { selectionPath: 'propulsion/active_engine', allEnginesValue: -1 }, combustion: { rule: 'fuel-flow-or-running', minimumFuelFlowPps: 0.0001 }, paths: { n1Pct: 'propulsion/engine[{engineIndex}]/n1', n2Pct: 'propulsion/engine[{engineIndex}]/n2', thrustLbf: 'propulsion/engine[{engineIndex}]/thrust-lbs', fuelFlowPps: 'propulsion/engine[{engineIndex}]/fuel-flow-rate-pps', running: 'propulsion/engine[{engineIndex}]/set-running', augmentation: 'propulsion/engine[{engineIndex}]/augmentation', starter: 'propulsion/starter_cmd', cutoff: 'propulsion/cutoff_cmd', throttleNorm: 'fcs/throttle-cmd-norm[{engineIndex}]' } }, label: 'Approximate F135 procedural sound', approximation: 'One main-engine source with exhaust-dominant broadband roar and native afterburner state. Timbre and loudness are uncalibrated; separate lift-fan sound is not modeled.', parameters: { idleN1Pct: 30, idleN1SpanPct: 70, thrustReferenceLbf: 28000, fuelReferencePps: 8, n1ReferenceHz: 1800, n2ReferenceHz: 3800, fanMix: 0.18, fanToneGain: 0.1, coreToneGain: 0.07, fanNoiseBaseGain: 0.04, fanNoisePowerGain: 0.2, bypassCenterHz: 450, bypassPowerHz: 1000, bypassGain: 0.08, jetBaseHz: 180, jetPowerHz: 2200, jetGain: 2.4, combustorHz: 90, combustorHighHz: 550, combustorGain: 0.85, outputGain: 1.1, afterburnerJetGain: 2.5, afterburnerJetHz: 4200, highFineMixGain: 0.85, highFineMixHz: 2600, highShockGain: 0.8, highShockHz: 1600, highRearMixDirectivity: 0.65, highShockDirectivity: 0.65, highCockpitGain: 0.1, highCockpitHz: 1000 } } without a bank at both output rates and differs from Med 0ms
+     × is silent with { id: 'fj33-reference', engineClass: 'turbofan', manufacturerFamily: 'Williams FJ33/FJ44', rendererId: 'procedural-jet-v1', telemetry: { id: 'jsbsim-turbine-v1', required: [ 'n1Pct', 'n2Pct', 'thrustLbf', 'fuelFlowPps' ], commandScope: { selectionPath: 'propulsion/active_engine', allEnginesValue: -1 }, combustion: { rule: 'fuel-flow-or-running', minimumFuelFlowPps: 0.0001 }, paths: { n1Pct: 'propulsion/engine[{engineIndex}]/n1', n2Pct: 'propulsion/engine[{engineIndex}]/n2', thrustLbf: 'propulsion/engine[{engineIndex}]/thrust-lbs', fuelFlowPps: 'propulsion/engine[{engineIndex}]/fuel-flow-rate-pps', running: 'propulsion/engine[{engineIndex}]/set-running', augmentation: 'propulsion/engine[{engineIndex}]/augmentation', starter: 'propulsion/starter_cmd', cutoff: 'propulsion/cutoff_cmd', throttleNorm: 'fcs/throttle-cmd-norm[{engineIndex}]' } }, label: 'Williams FJ33 procedural sound', approximation: 'Synthetic engine tones; acoustic calibration pending.', parameters: { idleN1Pct: 24.3, idleN1SpanPct: 75.7, thrustReferenceLbf: 1846, fuelReferencePps: 0.25, n1ReferenceHz: 2500, n2ReferenceHz: 6000, fanMix: 0.7674418604651163, fanToneGain: 0.3, coreToneGain: 0.3, fanNoiseBaseGain: 0.1, fanNoisePowerGain: 0.55, bypassCenterHz: 900, bypassPowerHz: 1800, bypassGain: 0.28, jetBaseHz: 800, jetPowerHz: 5200, jetGain: 0.42, combustorHz: 90, combustorHighHz: 400, combustorGain: 0.55, outputGain: 0.9, afterburnerJetGain: +0, afterburnerJetHz: 6000, highFineMixGain: 0.16, highFineMixHz: 4200, highShockGain: +0, highShockHz: 1500, highRearMixDirectivity: 0.25, highShockDirectivity: +0, highCockpitGain: 0.12589254117941673, highCockpitHz: 1400 } } stopped even when legacy synthetic bank storage is loaded 0ms
+     × is silent with { id: 'f135-approximation', engineClass: 'turbofan', manufacturerFamily: 'Pratt & Whitney F135', rendererId: 'procedural-jet-v1', telemetry: { id: 'jsbsim-turbine-v1', required: [ 'n1Pct', 'n2Pct', 'thrustLbf', 'fuelFlowPps' ], commandScope: { selectionPath: 'propulsion/active_engine', allEnginesValue: -1 }, combustion: { rule: 'fuel-flow-or-running', minimumFuelFlowPps: 0.0001 }, paths: { n1Pct: 'propulsion/engine[{engineIndex}]/n1', n2Pct: 'propulsion/engine[{engineIndex}]/n2', thrustLbf: 'propulsion/engine[{engineIndex}]/thrust-lbs', fuelFlowPps: 'propulsion/engine[{engineIndex}]/fuel-flow-rate-pps', running: 'propulsion/engine[{engineIndex}]/set-running', augmentation: 'propulsion/engine[{engineIndex}]/augmentation', starter: 'propulsion/starter_cmd', cutoff: 'propulsion/cutoff_cmd', throttleNorm: 'fcs/throttle-cmd-norm[{engineIndex}]' } }, label: 'Approximate F135 procedural sound', approximation: 'One main-engine source with exhaust-dominant broadband roar and native afterburner state. Timbre and loudness are uncalibrated; separate lift-fan sound is not modeled.', parameters: { idleN1Pct: 30, idleN1SpanPct: 70, thrustReferenceLbf: 28000, fuelReferencePps: 8, n1ReferenceHz: 1800, n2ReferenceHz: 3800, fanMix: 0.18, fanToneGain: 0.1, coreToneGain: 0.07, fanNoiseBaseGain: 0.04, fanNoisePowerGain: 0.2, bypassCenterHz: 450, bypassPowerHz: 1000, bypassGain: 0.08, jetBaseHz: 180, jetPowerHz: 2200, jetGain: 2.4, combustorHz: 90, combustorHighHz: 550, combustorGain: 0.85, outputGain: 1.1, afterburnerJetGain: 2.5, afterburnerJetHz: 4200, highFineMixGain: 0.85, highFineMixHz: 2600, highShockGain: 0.8, highShockHz: 1600, highRearMixDirectivity: 0.65, highShockDirectivity: 0.65, highCockpitGain: 0.1, highCockpitHz: 1000 } } stopped even when legacy synthetic bank storage is loaded 0ms
+     × noise cap zero removes actual broadband output at tier 1 0ms
+     × noise cap zero removes actual broadband output at tier 2 0ms
+     × noise cap zero removes actual broadband output at tier 3 0ms
+     × uses downstream direction for F135 exhaust and stays neutral without an axis 0ms
+     × makes the FJ33 fan stronger toward the inlet, with its own directional data 0ms
+     × has a dry F135 shock-shaped component but creates no speculative FJ33 shock 0ms
+     × uses native augmentation, and missing augmentation returns the dry High sound 1ms
+     × steepens pressure slopes below output-compressor onset (44100 Hz) 1ms
+     × steepens pressure slopes below output-compressor onset (48000 Hz) 2ms
+     × gives isolated dry shock noise a steeper low-side power rise than its high-side decay 0ms
+     × retains recession pitch beyond finite delay storage (44100 Hz) 0ms
+     × retains recession pitch beyond finite delay storage (48000 Hz) 0ms
+     × keeps a bounded, continuous handover when radial motion reverses 0ms
+ ❯ src/flight/audio/acousticProfiles.test.ts (12 tests | 11 failed) 131ms
+     × matches the native setup field order and retains exact FJ33 defaults 5ms
+     × refuses invalid setup atomically without changing the active voice 1ms
+     × makes F135 exhaust dominant with more broadband power than the SF50 reference 0ms
+     × morphs the existing exhaust on native augmentation, with above-dry headroom and no added sources 0ms
+     × scales only added augmentation gain at 0/50/100 percent without changing its filter morph 0ms
+     × leaves every dry-engine sample unchanged by the afterburner-only control 0ms
+     × clamps afterburner gain and sanitizes non-finite values 0ms
+     × smooths a live afterburner gain change without resetting the active voice 0ms
+     × permits engine-only gain above unity with an eightfold ceiling and the existing limiter 0ms
+     × scales an unsaturated source by the master control at 1/2/8 times unity 0ms
+     × caps master gain at eight and retains finite limited output for a loud augmented source 0ms
+(node:81623) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81622) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81624) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81625) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81627) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81629) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81631) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81682) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ benchmarks/audio/renderSweep.test.mjs (4 tests | 1 failed) 1730ms
+     × reads the wire format from snapshot.h 6ms
+(node:81714) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81717) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81716) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81724) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81725) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/flight/audio/f35bAudio.integration.test.ts > F-35B procedural sound (real JSBSim and shipped DSP, no physical route qualification) > renders finite non-silent main-engine audio at 44100 Hz, tier 1
+BJS - [18:20:59]: Babylon.js v8.56.2 - Null engine
+
+stdout | src/flight/audio/f35bAudio.integration.test.ts > F-35B procedural sound (real JSBSim and shipped DSP, no physical route qualification) > renders finite non-silent main-engine audio at 44100 Hz, tier 2
+BJS - [18:20:59]: Babylon.js v8.56.2 - Null engine
+
+stdout | src/flight/audio/f35bAudio.integration.test.ts > F-35B procedural sound (real JSBSim and shipped DSP, no physical route qualification) > renders finite non-silent main-engine audio at 44100 Hz, tier 3
+BJS - [18:20:59]: Babylon.js v8.56.2 - Null engine
+
+stdout | src/flight/audio/f35bAudio.integration.test.ts > F-35B procedural sound (real JSBSim and shipped DSP, no physical route qualification) > renders finite non-silent main-engine audio at 48000 Hz, tier 1
+BJS - [18:20:59]: Babylon.js v8.56.2 - Null engine
+
+stdout | src/flight/audio/f35bAudio.integration.test.ts > F-35B procedural sound (real JSBSim and shipped DSP, no physical route qualification) > renders finite non-silent main-engine audio at 48000 Hz, tier 2
+BJS - [18:20:59]: Babylon.js v8.56.2 - Null engine
+
+stdout | src/flight/audio/f35bAudio.integration.test.ts > F-35B procedural sound (real JSBSim and shipped DSP, no physical route qualification) > renders finite non-silent main-engine audio at 48000 Hz, tier 3
+BJS - [18:20:59]: Babylon.js v8.56.2 - Null engine
+
+ ❯ src/flight/audio/jsbsimAudioAdapter.integration.test.ts (24 tests | 2 failed) 624ms
+     × feeds native FJ33 telemetry into procedural High at 44100 Hz without a bank 86ms
+     × feeds native FJ33 telemetry into procedural High at 48000 Hz without a bank 18ms
+stdout | src/flight/audio/f35bAudio.integration.test.ts > F-35B procedural sound (real JSBSim and shipped DSP, no physical route qualification) > responds to main-engine power without saturating at the SF50 reference thrust
+BJS - [18:20:59]: Babylon.js v8.56.2 - Null engine
+
+ ❯ src/flight/audio/f35bAudio.integration.test.ts (10 tests | 7 failed) 700ms
+     × renders finite non-silent main-engine audio at 44100 Hz, tier 1 94ms
+     × renders finite non-silent main-engine audio at 44100 Hz, tier 2 43ms
+     × renders finite non-silent main-engine audio at 44100 Hz, tier 3 46ms
+     × renders finite non-silent main-engine audio at 48000 Hz, tier 1 48ms
+     × renders finite non-silent main-engine audio at 48000 Hz, tier 2 29ms
+     × renders finite non-silent main-engine audio at 48000 Hz, tier 3 53ms
+     × responds to main-engine power without saturating at the SF50 reference thrust 59ms
+(node:82233) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82395) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82007) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/flight/createFlightSimApp.ground.test.ts > queues wheel-model changes until pause, applies audio immediately, and restores them in a new flight
+[jsbsim] Runtime build identified { identity: undefined }
+
+stdout | src/flight/createFlightSimApp.ground.test.ts > keeps Debug experiment choices only through the explicit Ground handling action
+[jsbsim] Runtime build identified { identity: undefined }
+
+stdout | src/flight/createFlightSimApp.ground.test.ts > drives gamepad haptics from accepted wheel cues and cancels them on pause
+[jsbsim] Runtime build identified { identity: undefined }
+
+ ❯ src/flight/createFlightSimApp.ground.test.ts (3 tests | 3 failed) 74ms
+   × queues wheel-model changes until pause, applies audio immediately, and restores them in a new flight 58ms
+   × keeps Debug experiment choices only through the explicit Ground handling action 11ms
+   × drives gamepad haptics from accepted wheel cues and cancels them on pause 5ms
+(node:82401) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82397) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82398) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82402) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82434) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82437) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82441) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82450) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82469) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82470) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82471) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82473) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82488) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82490) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82502) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82494) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82501) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82511) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82518) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82775) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82723) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83191) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83193) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83196) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83197) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83198) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/flight/audio/dspProcessor.test.ts (4 tests | 2 failed) 19ms
+     × applies F135 setup before the first quantum and restores FJ33 on replacement 9ms
+     × stops output rather than retaining the old engine after an invalid replacement 4ms
+(node:83209) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83221) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83220) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83229) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83232) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83278) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 43 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  benchmarks/audio/renderSweep.test.mjs > offline sweep renderer > reads the wire format from snapshot.h
+AssertionError: expected 3 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 3
+
+ ❯ benchmarks/audio/renderSweep.test.mjs:29:25
+     27|     expect(abi.slot.n1Pct).toBe(5);
+     28|     expect(abi.batchLength).toBe(2 + 8 * 33 + 32 * 4);
+     29|     expect(abi.version).toBe(2);
+       |                         ^
+     30|   });
+     31|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/43]⎯
+
+ FAIL  src/flight/createFlightSimApp.ground.test.ts > queues wheel-model changes until pause, applies audio immediately, and restores them in a new flight
+ FAIL  src/flight/createFlightSimApp.ground.test.ts > keeps Debug experiment choices only through the explicit Ground handling action
+ FAIL  src/flight/createFlightSimApp.ground.test.ts > drives gamepad haptics from accepted wheel cues and cancels them on pause
+TypeError: runtime.onDetailAdjusted is not a function
+ ❯ connectMapDetailLog ../foss-earth/src/shell/mapDetailLog.ts:6:18
+      4| /** Connect every automatic map-detail decision to the host's visible …
+      5| export function connectMapDetailLog(runtime: Pick<BabylonRuntime, "onD…
+      6|   return runtime.onDetailAdjusted(decision => {
+       |                  ^
+      7|     const levels = Math.round(Math.abs(decision.to - decision.from) * …
+      8|     const why = decision.reason === "settings" ? "automatic-adjustment…
+ ❯ src/flight/createFlightSimApp.ts:384:33
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/43]⎯
+
+ FAIL  src/flight/audio/acousticProfiles.test.ts > shared engine acoustic setup (actual shipped WASM) > matches the native setup field order and retains exact FJ33 defaults
+AssertionError: expected [ 24.3, 75.7, 1846, 0.25, 2500, …(27) ] to deeply equal [ 24.3, 75.7, 1846, 0.25, 2500, …(26) ]
+
+- Expected
++ Received
+
+@@ -26,8 +26,9 @@
+    4200,
+    0,
+    1500,
+    0.25,
+    0,
++   0.05,
+    0.12589254117941673,
+    1400,
+  ]
+
+ ❯ src/flight/audio/acousticProfiles.test.ts:42:27
+     40|     const core = await createDspHarness();
+     41|     const defaults = new Float64Array(core.exports.memory.buffer, core…
+     42|     expect([...defaults]).toEqual(acousticProfileValues());
+       |                           ^
+     43|     expect(acousticProfileValues(getAircraftAudioProfile("cirrus-visio…
+     44|     expect(FJ33_ACOUSTICS.fanMix).toBe(3.3 / (1 + 3.3));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/43]⎯
+
+ FAIL  src/flight/audio/acousticProfiles.test.ts > shared engine acoustic setup (actual shipped WASM) > refuses invalid setup atomically without changing the active voice
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/acousticProfiles.test.ts:14:8
+ ❯ src/flight/audio/acousticProfiles.test.ts:48:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/43]⎯
+
+ FAIL  src/flight/audio/acousticProfiles.test.ts > shared engine acoustic setup (actual shipped WASM) > makes F135 exhaust dominant with more broadband power than the SF50 reference
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/acousticProfiles.test.ts:14:8
+ ❯ src/flight/audio/acousticProfiles.test.ts:60:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/43]⎯
+
+ FAIL  src/flight/audio/acousticProfiles.test.ts > shared engine acoustic setup (actual shipped WASM) > morphs the existing exhaust on native augmentation, with above-dry headroom and no added sources
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/acousticProfiles.test.ts:14:8
+ ❯ src/flight/audio/acousticProfiles.test.ts:69:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/43]⎯
+
+ FAIL  src/flight/audio/acousticProfiles.test.ts > shared engine acoustic setup (actual shipped WASM) > scales only added augmentation gain at 0/50/100 percent without changing its filter morph
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/acousticProfiles.test.ts:14:8
+ ❯ src/flight/audio/acousticProfiles.test.ts:94:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/43]⎯
+
+ FAIL  src/flight/audio/acousticProfiles.test.ts > shared engine acoustic setup (actual shipped WASM) > leaves every dry-engine sample unchanged by the afterburner-only control
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/acousticProfiles.test.ts:14:8
+ ❯ src/flight/audio/acousticProfiles.test.ts:114:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/43]⎯
+
+ FAIL  src/flight/audio/acousticProfiles.test.ts > shared engine acoustic setup (actual shipped WASM) > clamps afterburner gain and sanitizes non-finite values
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/acousticProfiles.test.ts:14:8
+ ❯ src/flight/audio/acousticProfiles.test.ts:123:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/43]⎯
+
+ FAIL  src/flight/audio/acousticProfiles.test.ts > shared engine acoustic setup (actual shipped WASM) > smooths a live afterburner gain change without resetting the active voice
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/acousticProfiles.test.ts:14:8
+ ❯ src/flight/audio/acousticProfiles.test.ts:136:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/43]⎯
+
+ FAIL  src/flight/audio/acousticProfiles.test.ts > shared engine acoustic setup (actual shipped WASM) > permits engine-only gain above unity with an eightfold ceiling and the existing limiter
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/acousticProfiles.test.ts:14:8
+ ❯ src/flight/audio/acousticProfiles.test.ts:161:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/43]⎯
+
+ FAIL  src/flight/audio/acousticProfiles.test.ts > shared engine acoustic setup (actual shipped WASM) > scales an unsaturated source by the master control at 1/2/8 times unity
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/acousticProfiles.test.ts:14:8
+ ❯ src/flight/audio/acousticProfiles.test.ts:179:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/43]⎯
+
+ FAIL  src/flight/audio/acousticProfiles.test.ts > shared engine acoustic setup (actual shipped WASM) > caps master gain at eight and retains finite limited output for a loud augmented source
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/acousticProfiles.test.ts:14:8
+ ❯ src/flight/audio/acousticProfiles.test.ts:192:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/43]⎯
+
+ FAIL  src/flight/audio/dspProcessor.test.ts > real worklet setup wrapper with actual WASM (Node, no device qualification) > applies F135 setup before the first quantum and restores FJ33 on replacement
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/flight/audio/dspProcessor.test.ts:36:29
+     34|     const fighter = acousticProfileValues(getAircraftAudioProfile("f-3…
+     35|     const { processor, messages } = await create(fighter);
+     36|     expect(processor.ready).toBe(true);
+       |                             ^
+     37|     expect(messages).toContainEqual({ type: "ready", sampleRate: 48_00…
+     38|     const setup = () => [...new Float64Array(processor.exports.memory.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/43]⎯
+
+ FAIL  src/flight/audio/dspProcessor.test.ts > real worklet setup wrapper with actual WASM (Node, no device qualification) > stops output rather than retaining the old engine after an invalid replacement
+AssertionError: expected [ Array(2) ] to deep equally contain { type: 'failed', …(1) }
+
+- Expected:
+{
+  "reason": "Invalid acoustic profile",
+  "type": "failed",
+}
+
++ Received:
+[
+  {
+    "reason": "Acoustic profile ABI mismatch",
+    "type": "failed",
+  },
+  {
+    "reason": "Acoustic profile ABI mismatch",
+    "type": "failed",
+  },
+]
+
+ ❯ src/flight/audio/dspProcessor.test.ts:65:22
+     63|     processor.onMessage({ data: { type: "profile", values: invalid } }…
+     64|     expect(processor.ready).toBe(false);
+     65|     expect(messages).toContainEqual({ type: "failed", reason: "Invalid…
+       |                      ^
+     66|     const output = [[new Float32Array(128).fill(1), new Float32Array(1…
+     67|     expect(processor.process([], output)).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/43]⎯
+
+ FAIL  src/flight/audio/f35bAudio.integration.test.ts > F-35B procedural sound (real JSBSim and shipped DSP, no physical route qualification) > renders finite non-silent main-engine audio at 44100 Hz, tier 1
+ FAIL  src/flight/audio/f35bAudio.integration.test.ts > F-35B procedural sound (real JSBSim and shipped DSP, no physical route qualification) > renders finite non-silent main-engine audio at 44100 Hz, tier 2
+ FAIL  src/flight/audio/f35bAudio.integration.test.ts > F-35B procedural sound (real JSBSim and shipped DSP, no physical route qualification) > renders finite non-silent main-engine audio at 44100 Hz, tier 3
+ FAIL  src/flight/audio/f35bAudio.integration.test.ts > F-35B procedural sound (real JSBSim and shipped DSP, no physical route qualification) > renders finite non-silent main-engine audio at 48000 Hz, tier 1
+ FAIL  src/flight/audio/f35bAudio.integration.test.ts > F-35B procedural sound (real JSBSim and shipped DSP, no physical route qualification) > renders finite non-silent main-engine audio at 48000 Hz, tier 2
+ FAIL  src/flight/audio/f35bAudio.integration.test.ts > F-35B procedural sound (real JSBSim and shipped DSP, no physical route qualification) > renders finite non-silent main-engine audio at 48000 Hz, tier 3
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ renderEngine src/flight/audio/f35bAudio.integration.test.ts:64:8
+ ❯ src/flight/audio/f35bAudio.integration.test.ts:130:33
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/43]⎯
+
+ FAIL  src/flight/audio/f35bAudio.integration.test.ts > F-35B procedural sound (real JSBSim and shipped DSP, no physical route qualification) > responds to main-engine power without saturating at the SF50 reference thrust
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ renderEngine src/flight/audio/f35bAudio.integration.test.ts:64:8
+ ❯ src/flight/audio/f35bAudio.integration.test.ts:142:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/43]⎯
+
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > renders { id: 'fj33-reference', engineClass: 'turbofan', manufacturerFamily: 'Williams FJ33/FJ44', rendererId: 'procedural-jet-v1', telemetry: { id: 'jsbsim-turbine-v1', required: [ 'n1Pct', 'n2Pct', 'thrustLbf', 'fuelFlowPps' ], commandScope: { selectionPath: 'propulsion/active_engine', allEnginesValue: -1 }, combustion: { rule: 'fuel-flow-or-running', minimumFuelFlowPps: 0.0001 }, paths: { n1Pct: 'propulsion/engine[{engineIndex}]/n1', n2Pct: 'propulsion/engine[{engineIndex}]/n2', thrustLbf: 'propulsion/engine[{engineIndex}]/thrust-lbs', fuelFlowPps: 'propulsion/engine[{engineIndex}]/fuel-flow-rate-pps', running: 'propulsion/engine[{engineIndex}]/set-running', augmentation: 'propulsion/engine[{engineIndex}]/augmentation', starter: 'propulsion/starter_cmd', cutoff: 'propulsion/cutoff_cmd', throttleNorm: 'fcs/throttle-cmd-norm[{engineIndex}]' } }, label: 'Williams FJ33 procedural sound', approximation: 'Synthetic engine tones; acoustic calibration pending.', parameters: { idleN1Pct: 24.3, idleN1SpanPct: 75.7, thrustReferenceLbf: 1846, fuelReferencePps: 0.25, n1ReferenceHz: 2500, n2ReferenceHz: 6000, fanMix: 0.7674418604651163, fanToneGain: 0.3, coreToneGain: 0.3, fanNoiseBaseGain: 0.1, fanNoisePowerGain: 0.55, bypassCenterHz: 900, bypassPowerHz: 1800, bypassGain: 0.28, jetBaseHz: 800, jetPowerHz: 5200, jetGain: 0.42, combustorHz: 90, combustorHighHz: 400, combustorGain: 0.55, outputGain: 0.9, afterburnerJetGain: +0, afterburnerJetHz: 6000, highFineMixGain: 0.16, highFineMixHz: 4200, highShockGain: +0, highShockHz: 1500, highRearMixDirectivity: 0.25, highShockDirectivity: +0, highCockpitGain: 0.12589254117941673, highCockpitHz: 1400 } } without a bank at both output rates and differs from Med
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > renders { id: 'f135-approximation', engineClass: 'turbofan', manufacturerFamily: 'Pratt & Whitney F135', rendererId: 'procedural-jet-v1', telemetry: { id: 'jsbsim-turbine-v1', required: [ 'n1Pct', 'n2Pct', 'thrustLbf', 'fuelFlowPps' ], commandScope: { selectionPath: 'propulsion/active_engine', allEnginesValue: -1 }, combustion: { rule: 'fuel-flow-or-running', minimumFuelFlowPps: 0.0001 }, paths: { n1Pct: 'propulsion/engine[{engineIndex}]/n1', n2Pct: 'propulsion/engine[{engineIndex}]/n2', thrustLbf: 'propulsion/engine[{engineIndex}]/thrust-lbs', fuelFlowPps: 'propulsion/engine[{engineIndex}]/fuel-flow-rate-pps', running: 'propulsion/engine[{engineIndex}]/set-running', augmentation: 'propulsion/engine[{engineIndex}]/augmentation', starter: 'propulsion/starter_cmd', cutoff: 'propulsion/cutoff_cmd', throttleNorm: 'fcs/throttle-cmd-norm[{engineIndex}]' } }, label: 'Approximate F135 procedural sound', approximation: 'One main-engine source with exhaust-dominant broadband roar and native afterburner state. Timbre and loudness are uncalibrated; separate lift-fan sound is not modeled.', parameters: { idleN1Pct: 30, idleN1SpanPct: 70, thrustReferenceLbf: 28000, fuelReferencePps: 8, n1ReferenceHz: 1800, n2ReferenceHz: 3800, fanMix: 0.18, fanToneGain: 0.1, coreToneGain: 0.07, fanNoiseBaseGain: 0.04, fanNoisePowerGain: 0.2, bypassCenterHz: 450, bypassPowerHz: 1000, bypassGain: 0.08, jetBaseHz: 180, jetPowerHz: 2200, jetGain: 2.4, combustorHz: 90, combustorHighHz: 550, combustorGain: 0.85, outputGain: 1.1, afterburnerJetGain: 2.5, afterburnerJetHz: 4200, highFineMixGain: 0.85, highFineMixHz: 2600, highShockGain: 0.8, highShockHz: 1600, highRearMixDirectivity: 0.65, highShockDirectivity: 0.65, highCockpitGain: 0.1, highCockpitHz: 1000 } } without a bank at both output rates and differs from Med
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/highAudio.test.ts:18:8
+ ❯ src/flight/audio/highAudio.test.ts:42:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/43]⎯
+
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > is silent with { id: 'fj33-reference', engineClass: 'turbofan', manufacturerFamily: 'Williams FJ33/FJ44', rendererId: 'procedural-jet-v1', telemetry: { id: 'jsbsim-turbine-v1', required: [ 'n1Pct', 'n2Pct', 'thrustLbf', 'fuelFlowPps' ], commandScope: { selectionPath: 'propulsion/active_engine', allEnginesValue: -1 }, combustion: { rule: 'fuel-flow-or-running', minimumFuelFlowPps: 0.0001 }, paths: { n1Pct: 'propulsion/engine[{engineIndex}]/n1', n2Pct: 'propulsion/engine[{engineIndex}]/n2', thrustLbf: 'propulsion/engine[{engineIndex}]/thrust-lbs', fuelFlowPps: 'propulsion/engine[{engineIndex}]/fuel-flow-rate-pps', running: 'propulsion/engine[{engineIndex}]/set-running', augmentation: 'propulsion/engine[{engineIndex}]/augmentation', starter: 'propulsion/starter_cmd', cutoff: 'propulsion/cutoff_cmd', throttleNorm: 'fcs/throttle-cmd-norm[{engineIndex}]' } }, label: 'Williams FJ33 procedural sound', approximation: 'Synthetic engine tones; acoustic calibration pending.', parameters: { idleN1Pct: 24.3, idleN1SpanPct: 75.7, thrustReferenceLbf: 1846, fuelReferencePps: 0.25, n1ReferenceHz: 2500, n2ReferenceHz: 6000, fanMix: 0.7674418604651163, fanToneGain: 0.3, coreToneGain: 0.3, fanNoiseBaseGain: 0.1, fanNoisePowerGain: 0.55, bypassCenterHz: 900, bypassPowerHz: 1800, bypassGain: 0.28, jetBaseHz: 800, jetPowerHz: 5200, jetGain: 0.42, combustorHz: 90, combustorHighHz: 400, combustorGain: 0.55, outputGain: 0.9, afterburnerJetGain: +0, afterburnerJetHz: 6000, highFineMixGain: 0.16, highFineMixHz: 4200, highShockGain: +0, highShockHz: 1500, highRearMixDirectivity: 0.25, highShockDirectivity: +0, highCockpitGain: 0.12589254117941673, highCockpitHz: 1400 } } stopped even when legacy synthetic bank storage is loaded
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > is silent with { id: 'f135-approximation', engineClass: 'turbofan', manufacturerFamily: 'Pratt & Whitney F135', rendererId: 'procedural-jet-v1', telemetry: { id: 'jsbsim-turbine-v1', required: [ 'n1Pct', 'n2Pct', 'thrustLbf', 'fuelFlowPps' ], commandScope: { selectionPath: 'propulsion/active_engine', allEnginesValue: -1 }, combustion: { rule: 'fuel-flow-or-running', minimumFuelFlowPps: 0.0001 }, paths: { n1Pct: 'propulsion/engine[{engineIndex}]/n1', n2Pct: 'propulsion/engine[{engineIndex}]/n2', thrustLbf: 'propulsion/engine[{engineIndex}]/thrust-lbs', fuelFlowPps: 'propulsion/engine[{engineIndex}]/fuel-flow-rate-pps', running: 'propulsion/engine[{engineIndex}]/set-running', augmentation: 'propulsion/engine[{engineIndex}]/augmentation', starter: 'propulsion/starter_cmd', cutoff: 'propulsion/cutoff_cmd', throttleNorm: 'fcs/throttle-cmd-norm[{engineIndex}]' } }, label: 'Approximate F135 procedural sound', approximation: 'One main-engine source with exhaust-dominant broadband roar and native afterburner state. Timbre and loudness are uncalibrated; separate lift-fan sound is not modeled.', parameters: { idleN1Pct: 30, idleN1SpanPct: 70, thrustReferenceLbf: 28000, fuelReferencePps: 8, n1ReferenceHz: 1800, n2ReferenceHz: 3800, fanMix: 0.18, fanToneGain: 0.1, coreToneGain: 0.07, fanNoiseBaseGain: 0.04, fanNoisePowerGain: 0.2, bypassCenterHz: 450, bypassPowerHz: 1000, bypassGain: 0.08, jetBaseHz: 180, jetPowerHz: 2200, jetGain: 2.4, combustorHz: 90, combustorHighHz: 550, combustorGain: 0.85, outputGain: 1.1, afterburnerJetGain: 2.5, afterburnerJetHz: 4200, highFineMixGain: 0.85, highFineMixHz: 2600, highShockGain: 0.8, highShockHz: 1600, highRearMixDirectivity: 0.65, highShockDirectivity: 0.65, highCockpitGain: 0.1, highCockpitHz: 1000 } } stopped even when legacy synthetic bank storage is loaded
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/highAudio.test.ts:18:8
+ ❯ src/flight/audio/highAudio.test.ts:56:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/43]⎯
+
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > noise cap zero removes actual broadband output at tier 1
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > noise cap zero removes actual broadband output at tier 2
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > noise cap zero removes actual broadband output at tier 3
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/highAudio.test.ts:18:8
+ ❯ src/flight/audio/highAudio.test.ts:69:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/43]⎯
+
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > uses downstream direction for F135 exhaust and stays neutral without an axis
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/highAudio.test.ts:18:8
+ ❯ src/flight/audio/highAudio.test.ts:78:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/43]⎯
+
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > makes the FJ33 fan stronger toward the inlet, with its own directional data
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/highAudio.test.ts:18:8
+ ❯ src/flight/audio/highAudio.test.ts:90:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/43]⎯
+
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > has a dry F135 shock-shaped component but creates no speculative FJ33 shock
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/highAudio.test.ts:18:8
+ ❯ src/flight/audio/highAudio.test.ts:97:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[23/43]⎯
+
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > uses native augmentation, and missing augmentation returns the dry High sound
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/highAudio.test.ts:18:8
+ ❯ src/flight/audio/highAudio.test.ts:108:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[24/43]⎯
+
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > steepens pressure slopes below output-compressor onset (44100 Hz)
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > steepens pressure slopes below output-compressor onset (48000 Hz)
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/highAudio.test.ts:18:8
+ ❯ src/flight/audio/highAudio.test.ts:122:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[25/43]⎯
+
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > gives isolated dry shock noise a steeper low-side power rise than its high-side decay
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/highAudio.test.ts:18:8
+ ❯ src/flight/audio/highAudio.test.ts:145:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[26/43]⎯
+
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > retains recession pitch beyond finite delay storage (44100 Hz)
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > retains recession pitch beyond finite delay storage (48000 Hz)
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/highAudio.test.ts:18:8
+ ❯ src/flight/audio/highAudio.test.ts:161:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[27/43]⎯
+
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > keeps a bounded, continuous handover when radial motion reverses
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ render src/flight/audio/highAudio.test.ts:18:8
+ ❯ src/flight/audio/highAudio.test.ts:176:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[28/43]⎯
+
+ FAIL  src/flight/audio/jsbsimAudioAdapter.integration.test.ts > JSBSim audio adapter on the real SF50 model > feeds native FJ33 telemetry into procedural High at 44100 Hz without a bank
+ FAIL  src/flight/audio/jsbsimAudioAdapter.integration.test.ts > JSBSim audio adapter on the real SF50 model > feeds native FJ33 telemetry into procedural High at 48000 Hz without a bank
+Error: Acoustic profile ABI mismatch
+ ❯ Object.setProfile src/flight/audio/dspHarness.ts:108:70
+    106|     setProfile(profile) {
+    107|       const values = acousticProfileValues(profile);
+    108|       if (values.length !== exports.osfs_audio_profile_size()) throw n…
+       |                                                                      ^
+    109|       new Float64Array(exports.memory.buffer, exports.osfs_audio_profi…
+    110|       if (!exports.osfs_audio_commit_profile()) throw new Error("Inval…
+ ❯ src/flight/audio/jsbsimAudioAdapter.integration.test.ts:64:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[29/43]⎯
+
+
+ Test Files  7 failed | 141 passed (148)
+      Tests  43 failed | 1492 passed (1535)
+   Start at  18:20:49
+   Duration  26.25s (transform 4.34s, setup 0ms, import 39.69s, tests 43.31s, environment 19.79s)
+

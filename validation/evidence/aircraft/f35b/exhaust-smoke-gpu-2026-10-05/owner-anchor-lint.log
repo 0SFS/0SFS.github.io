@@ -1,0 +1,4 @@
+
+> foss-earth@0.0.0 lint
+> eslint . --cache --cache-strategy content --cache-location node_modules/.cache/eslint/
+

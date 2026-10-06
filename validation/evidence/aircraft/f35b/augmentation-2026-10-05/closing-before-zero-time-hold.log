@@ -1,0 +1,39 @@
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+(node:46044) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/flight/jsbsim/f35b.integration.test.ts (19 tests | 3 failed | 16 skipped) 94ms
+     × keeps partial closing conversion inhibited through RunIC 52ms
+     × keeps partial closing conversion inhibited through snapshot restore 19ms
+     × keeps partial closing conversion inhibited through relocation 22ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/flight/jsbsim/f35b.integration.test.ts > F-35B augmentation transition interlock > keeps partial closing conversion inhibited through RunIC
+ FAIL  src/flight/jsbsim/f35b.integration.test.ts > F-35B augmentation transition interlock > keeps partial closing conversion inhibited through snapshot restore
+ FAIL  src/flight/jsbsim/f35b.integration.test.ts > F-35B augmentation transition interlock > keeps partial closing conversion inhibited through relocation
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ src/flight/jsbsim/f35b.integration.test.ts:80:71
+     78|     // The app's recovery operations restore the saved physical positi…
+     79|     expect(sdk.getPropertyValue("fcs/stovl-pos-norm")).toBeCloseTo(ope…
+     80|     expect(sdk.getPropertyValue("propulsion/engine[0]/augmentation")).…
+       |                                                                       ^
+     81|   });
+     82|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 16 skipped (19)
+   Start at  17:00:46
+   Duration  726ms (transform 75ms, setup 0ms, import 346ms, tests 94ms, environment 192ms)
+

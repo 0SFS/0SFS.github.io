@@ -1,0 +1,39 @@
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+ ❯ src/flight/audio/highAudio.test.ts (17 tests | 2 failed) 781ms
+     × steepens pressure slopes below output-compressor onset (44100 Hz) 29ms
+     × steepens pressure slopes below output-compressor onset (48000 Hz) 30ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > steepens pressure slopes below output-compressor onset (44100 Hz)
+AssertionError: expected -0.30017843380626924 to be greater than 0.02
+ ❯ src/flight/audio/highAudio.test.ts:139:69
+    137|       return third / gradient.length / Math.pow(second / gradient.leng…
+    138|     };
+    139|     expect(derivativeSkewness(a.tail) - derivativeSkewness(b.tail)).to…
+       |                                                                     ^
+    140|   });
+    141|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > steepens pressure slopes below output-compressor onset (48000 Hz)
+AssertionError: expected -0.2605083306127714 to be greater than 0.02
+ ❯ src/flight/audio/highAudio.test.ts:139:69
+    137|       return third / gradient.length / Math.pow(second / gradient.leng…
+    138|     };
+    139|     expect(derivativeSkewness(a.tail) - derivativeSkewness(b.tail)).to…
+       |                                                                     ^
+    140|   });
+    141|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 15 passed (17)
+   Start at  18:15:56
+   Duration  910ms (transform 24ms, setup 0ms, import 32ms, tests 781ms, environment 0ms)
+

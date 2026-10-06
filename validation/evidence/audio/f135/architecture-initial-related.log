@@ -1,0 +1,355 @@
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+(node:32213) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32214) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32211) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32212) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32210) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32229) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32231) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32230) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/flight/createFlightSimApp.test.ts > boots an F-35B with a VTOL lever beside THR and routes its registry command to the FDM
+[jsbsim] Runtime build identified { identity: undefined }
+
+stderr | src/flight/createFlightSimApp.test.ts > boots an F-35B with a VTOL lever beside THR and routes its registry command to the FDM
+[sim] Engine sound telemetry is unavailable; the tire cue still plays {
+  reason: 'Engine sound source main-exhaust lacks required native telemetry propulsion/engine[0]/n1'
+}
+
+stdout | src/flight/createFlightSimApp.test.ts > boots an F-35B with a VTOL lever beside THR and routes its registry command to the FDM
+[hud] Attitude indicator draws with Canvas 2D { preference: 'auto', renderer: 'webgl2' }
+
+stdout | src/flight/createFlightSimApp.test.ts > shows and persists the F-35B control law, applies it while paused and restores it after relocation
+[jsbsim] Runtime build identified { identity: undefined }
+
+stderr | src/flight/createFlightSimApp.test.ts > shows and persists the F-35B control law, applies it while paused and restores it after relocation
+[sim] Engine sound telemetry is unavailable; the tire cue still plays {
+  reason: 'Engine sound source main-exhaust lacks required native telemetry propulsion/engine[0]/n1'
+}
+
+ ❯ src/flight/createFlightSimApp.test.ts (31 tests | 2 failed) 1599ms
+   × boots an F-35B with a VTOL lever beside THR and routes its registry command to the FDM 58ms
+   × shows and persists the F-35B control law, applies it while paused and restores it after relocation 34ms
+(node:32232) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32233) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32234) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32241) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32242) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32243) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32246) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32247) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32249) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32250) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32252) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32255) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32258) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32256) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/flight/audio/audioBank.test.ts (12 tests | 1 failed) 30ms
+     × enforces the band cap, hash format, PCM length, views and download budget 3ms
+(node:32259) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32276) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32279) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32277) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32292) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32297) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32299) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/flight/audio/createFlightAudio.test.ts (20 tests | 16 failed) 12298ms
+     × configures F135 separately and transports native engine telemetry 1009ms
+     × creates and resumes the context inside the enabling gesture, then boots the core 1ms
+     × runs Med the moment it is chosen, with no further step, and still calls it unvalidated 1001ms
+     × keeps Auto at Low while no device has qualified a higher tier 1001ms
+     × waits for a gesture instead of autoplaying a restored preference 2ms
+     × lets a disable that lands while the core is loading win over the late completion 101ms
+     × counts holds per reason, and a release opens a new epoch 1002ms
+     × plays the tire cue alone, and switching engine sound off keeps it 55ms
+     × publishes 60 Hz snapshots from 120 Hz steps, never decimates a light-off, and rebases on a rewind 1002ms
+     × drops to Off on a processor fault and restarts only when the pilot switches sound again 1002ms
+     × installs a bank into the running core, yet a bank alone does not admit High 1002ms
+     × clears a partially accepted bank 1002ms
+     × drops a tier on a counted underrun and keeps the downgrade until re-test 1002ms
+     × drops the default Med to Low on a counted underrun, and Low keeps playing until re-test 1003ms
+     × keeps the context running through a brief hold and suspends only when the hold persists 1003ms
+     × disposes the telemetry reader before closing the context, exactly once 1001ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 19 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/flight/createFlightSimApp.test.ts > boots an F-35B with a VTOL lever beside THR and routes its registry command to the FDM
+AssertionError: expected "vi.fn()" to be called with arguments: [ Anything, ObjectContaining{…} ]
+
+Received:
+
+  1st vi.fn() call:
+
+  [
+-   Anything,
+-   ObjectContaining {
++   {
++     "getPropertyValue": [Function Mock],
++     "setPropertyValue": [Function Mock],
++   },
++   {
+      "gearHeightMetres": 1.267,
+-     "profile": ObjectContaining {
++     "source": {
++       "definition": {
++         "approximation": "One main-engine source with exhaust-dominant broadband roar and native afterburner state. Timbre and loudness are uncalibrated; separate lift-fan sound is not modeled.",
++         "engineClass": "turbofan",
+          "id": "f135-approximation",
++         "label": "Approximate F135 procedural sound",
++         "manufacturerFamily": "Pratt & Whitney F135",
++         "parameters": {
++           "afterburnerJetGain": 2.5,
++           "afterburnerJetHz": 4200,
++           "bypassCenterHz": 450,
++           "bypassGain": 0.08,
++           "bypassPowerHz": 1000,
++           "combustorGain": 0.85,
++           "combustorHighHz": 550,
++           "combustorHz": 90,
++           "coreToneGain": 0.07,
++           "fanMix": 0.18,
++           "fanNoiseBaseGain": 0.04,
++           "fanNoisePowerGain": 0.2,
++           "fanToneGain": 0.1,
++           "fuelReferencePps": 8,
++           "idleN1Pct": 30,
++           "idleN1SpanPct": 70,
++           "jetBaseHz": 180,
++           "jetGain": 2.4,
++           "jetPowerHz": 2200,
++           "n1ReferenceHz": 1800,
++           "n2ReferenceHz": 3800,
++           "outputGain": 1.1,
++           "thrustReferenceLbf": 28000,
++         },
++         "rendererId": "procedural-jet-v1",
++         "telemetry": {
++           "combustion": {
++             "minimumFuelFlowPps": 0.0001,
++             "rule": "fuel-flow-or-running",
++           },
++           "commandScope": {
++             "allEnginesValue": -1,
++             "selectionPath": "propulsion/active_engine",
++           },
++           "id": "jsbsim-turbine-v1",
++           "paths": {
++             "augmentation": "propulsion/engine[{engineIndex}]/augmentation",
++             "cutoff": "propulsion/cutoff_cmd",
++             "fuelFlowPps": "propulsion/engine[{engineIndex}]/fuel-flow-rate-pps",
++             "n1Pct": "propulsion/engine[{engineIndex}]/n1",
++             "n2Pct": "propulsion/engine[{engineIndex}]/n2",
++             "running": "propulsion/engine[{engineIndex}]/set-running",
++             "starter": "propulsion/starter_cmd",
++             "throttleNorm": "fcs/throttle-cmd-norm[{engineIndex}]",
++             "thrustLbf": "propulsion/engine[{engineIndex}]/thrust-lbs",
++           },
++           "required": [
++             "n1Pct",
++             "n2Pct",
++             "thrustLbf",
++             "fuelFlowPps",
++           ],
++         },
++       },
++       "installation": {
++         "engineDefinitionId": "f135-approximation",
++         "engineIndex": 0,
++         "id": "main-exhaust",
++         "position": {
++           "kind": "native-engine",
++         },
++       },
+      },
+    },
+  ]
+
+
+Number of calls: 1
+
+ ❯ src/flight/createFlightSimApp.test.ts:606:38
+    604|       aircraftId: "f-35b", bootstrap: expect.objectContaining({ airspe…
+    605|     }));
+    606|     expect(createJsbsimAudioAdapter).toHaveBeenCalledWith(expect.anyth…
+       |                                      ^
+    607|       gearHeightMetres: 1.267, profile: expect.objectContaining({ id: …
+    608|     }));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/19]⎯
+
+ FAIL  src/flight/createFlightSimApp.test.ts > shows and persists the F-35B control law, applies it while paused and restores it after relocation
+TypeError: Cannot read properties of null (reading 'value')
+ ❯ src/flight/createFlightSimApp.test.ts:674:17
+    672|     expect(section.textContent).toContain("Autopilot and input assists…
+    673|     const mode = section.querySelector<HTMLSelectElement>('[data-param…
+    674|     expect(mode.value).toBe("manual");
+       |                 ^
+    675|     expect(Array.from(mode.options, option => option.textContent)).toE…
+    676|     await act(async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/19]⎯
+
+ FAIL  src/flight/audio/audioBank.test.ts > bank manifest gate > enforces the band cap, hash format, PCM length, views and download budget
+AssertionError: version: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/flight/audio/audioBank.test.ts:89:93
+     87|       ["version", { ...manifest, version: 2 }],
+     88|     ];
+     89|     for (const [name, value] of variants) expect(validateAudioBankMani…
+       |                                                                                             ^
+     90|   });
+     91| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/19]⎯
+
+ FAIL  src/flight/audio/createFlightAudio.test.ts > flight audio lifecycle (synthetic fakes) > configures F135 separately and transports native engine telemetry
+ FAIL  src/flight/audio/createFlightAudio.test.ts > flight audio lifecycle (synthetic fakes) > runs Med the moment it is chosen, with no further step, and still calls it unvalidated
+ FAIL  src/flight/audio/createFlightAudio.test.ts > flight audio lifecycle (synthetic fakes) > keeps Auto at Low while no device has qualified a higher tier
+ FAIL  src/flight/audio/createFlightAudio.test.ts > flight audio lifecycle (synthetic fakes) > counts holds per reason, and a release opens a new epoch
+ FAIL  src/flight/audio/createFlightAudio.test.ts > flight audio lifecycle (synthetic fakes) > publishes 60 Hz snapshots from 120 Hz steps, never decimates a light-off, and rebases on a rewind
+ FAIL  src/flight/audio/createFlightAudio.test.ts > flight audio lifecycle (synthetic fakes) > drops to Off on a processor fault and restarts only when the pilot switches sound again
+ FAIL  src/flight/audio/createFlightAudio.test.ts > flight audio lifecycle (synthetic fakes) > installs a bank into the running core, yet a bank alone does not admit High
+ FAIL  src/flight/audio/createFlightAudio.test.ts > flight audio lifecycle (synthetic fakes) > clears a partially accepted bank
+ FAIL  src/flight/audio/createFlightAudio.test.ts > flight audio lifecycle (synthetic fakes) > drops a tier on a counted underrun and keeps the downgrade until re-test
+ FAIL  src/flight/audio/createFlightAudio.test.ts > flight audio lifecycle (synthetic fakes) > drops the default Med to Low on a counted underrun, and Low keeps playing until re-test
+ FAIL  src/flight/audio/createFlightAudio.test.ts > flight audio lifecycle (synthetic fakes) > keeps the context running through a brief hold and suspends only when the hold persists
+ FAIL  src/flight/audio/createFlightAudio.test.ts > flight audio lifecycle (synthetic fakes) > disposes the telemetry reader before closing the context, exactly once
+AssertionError: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ src/flight/audio/createFlightAudio.test.ts:97:60
+     95|
+     96| async function booted(count = 1): Promise<FakeWorkletNode> {
+     97|   await vi.waitFor(() => expect(FakeWorkletNode.instances).toHaveLengt…
+       |                                                            ^
+     98|   return FakeWorkletNode.instances[count - 1];
+     99| }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/19]⎯
+
+ FAIL  src/flight/audio/createFlightAudio.test.ts > flight audio lifecycle (synthetic fakes) > creates and resumes the context inside the enabling gesture, then boots the core
+AssertionError: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ src/flight/audio/createFlightAudio.test.ts:144:40
+    142|     audio.setEnabled(true);
+    143|     // Synchronous: by the time the click handler returns, the context…
+    144|     expect(FakeAudioContext.instances).toHaveLength(1);
+       |                                        ^
+    145|     expect(FakeAudioContext.instances[0].resume).toHaveBeenCalledOnce(…
+    146|     const node = await booted();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/19]⎯
+
+ FAIL  src/flight/audio/createFlightAudio.test.ts > flight audio lifecycle (synthetic fakes) > waits for a gesture instead of autoplaying a restored preference
+AssertionError: expected { enabled: true, …(17) } to match object { gestureLocked: true, …(1) }
+(29 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "effective": "off",
+-   "gestureLocked": true,
++   "gestureLocked": false,
+  }
+
+ ❯ src/flight/audio/createFlightAudio.test.ts:182:31
+    180|     const { audio } = create({ stored: { enabled: true }, unlockTarget…
+    181|     expect(FakeAudioContext.instances).toHaveLength(0);
+    182|     expect(audio.getStatus()).toMatchObject({ gestureLocked: true, eff…
+       |                               ^
+    183|     target.dispatchEvent(new Event("pointerdown"));
+    184|     expect(FakeAudioContext.instances).toHaveLength(1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/19]⎯
+
+ FAIL  src/flight/audio/createFlightAudio.test.ts > flight audio lifecycle (synthetic fakes) > lets a disable that lands while the core is loading win over the late completion
+TypeError: Cannot read properties of undefined (reading 'close')
+ ❯ src/flight/audio/createFlightAudio.test.ts:197:42
+    195|     await new Promise(resolve => setTimeout(resolve, 100));
+    196|     expect(FakeWorkletNode.instances).toHaveLength(0);
+    197|     expect(FakeAudioContext.instances[0].close).toHaveBeenCalled();
+       |                                          ^
+    198|     expect(audio.getStatus().effective).toBe("off");
+    199|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/19]⎯
+
+ FAIL  src/flight/audio/createFlightAudio.test.ts > flight audio lifecycle (synthetic fakes) > plays the tire cue alone, and switching engine sound off keeps it
+AssertionError: expected { type: 'gains', master: 1, …(4) } to match object { master: 0.7, engine: 0.8, tire: 0.4 }
+(3 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "engine": 0.8,
+-   "master": 0.7,
++   "engine": 0,
++   "master": 1,
+    "tire": 0.4,
+  }
+
+ ❯ src/flight/audio/createFlightAudio.test.ts:228:37
+    226|
+    227|     audio.setEnabled(true);
+    228|     expect(node.port.last("gains")).toMatchObject({ master: 0.7, engin…
+       |                                     ^
+    229|     audio.setEnabled(false);
+    230|     expect(node.disconnect).not.toHaveBeenCalled();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/19]⎯
+
+
+ Test Files  3 failed | 58 passed (61)
+      Tests  19 failed | 607 passed (626)
+   Start at  15:57:41
+   Duration  16.97s (transform 1.13s, setup 0ms, import 13.51s, tests 34.28s, environment 6.16s)
+

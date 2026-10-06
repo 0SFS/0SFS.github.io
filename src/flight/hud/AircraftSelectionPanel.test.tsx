@@ -48,9 +48,10 @@ describe("aircraft selection panel", () => {
     const radios = Array.from(gallery.querySelectorAll<HTMLInputElement>('input[type="radio"]'));
     expect(radios.map(radio => [radio.name, radio.value])).toEqual([
       ["flight-aircraft", "cessna-172"], ["flight-aircraft", "cirrus-vision-jet"],
+      ["flight-aircraft", "f-35b"],
     ]);
     expect(radios.map(radio => document.getElementById(radio.getAttribute("aria-labelledby")!)?.textContent))
-      .toEqual(["Cessna 172 Skyhawk", "Cirrus Vision Jet"]);
+      .toEqual(["Cessna 172 Skyhawk", "Cirrus Vision Jet", "Lockheed Martin F-35B Lightning II"]);
     expect(gallery.querySelectorAll("select")).toHaveLength(0);
     expect(controls.querySelectorAll("select")).toHaveLength(2);
     const scroll = vi.fn();
@@ -126,6 +127,42 @@ describe("aircraft selection panel", () => {
     expect(t.onSelectionChange).toHaveBeenCalledWith({
       aircraftId: "cirrus-vision-jet-g2", generationId: "g2", lodId: "hd",
     });
+  });
+
+  it("stages the experimental F-35B with its exterior and attribution before applying", async () => {
+    const selection = normalizeAircraftSelection({ aircraftId: "f-35b", lodId: "auto" });
+    const t = await mount(activeSnapshot(), selection);
+    expect(t.host.querySelector<HTMLInputElement>('input[value="f-35b"]')!.checked).toBe(true);
+    expect(t.host.querySelector(".flight-panel__generation-field")).toBeNull();
+    expect(t.host.textContent).toContain("Experimental F-16/Aeromatic-derived");
+    expect(t.host.textContent).toContain("AF267");
+    expect(t.host.textContent).toContain("CC BY 4.0");
+    const source = t.host.querySelector<HTMLAnchorElement>('a[href*="5d54a6af45974ad386ae74d42b33374a"]');
+    expect(source?.textContent).toBe("Source");
+    const levels = t.host.querySelector<HTMLSelectElement>(".flight-panel__model-controls select")!;
+    expect(levels.disabled).toBe(false);
+    expect(Array.from(levels.options).map(option => option.value)).toEqual(["auto", "hd"]);
+    expect(t.host.textContent).not.toContain("No mesh exists for this airframe");
+    expect(t.onApply).not.toHaveBeenCalled();
+    const apply = t.host.querySelector<HTMLButtonElement>(".flight-panel__aircraft-controls > button")!;
+    expect(apply.textContent).toBe("Apply & fly Lockheed Martin F-35B Lightning II");
+    await act(async () => apply.click());
+    expect(t.onApply).toHaveBeenCalledWith(selection);
+  });
+
+  it("shows the F-35B's active mesh state and preserves its credit while another aircraft is staged", async () => {
+    const snapshot = activeSnapshot({
+      aircraftId: "f-35b", generationId: "f-35b", modelActiveLodId: "hd", modelTriangles: 12259,
+    });
+    const active = await mount(snapshot);
+    expect(active.host.querySelector('[aria-label="Current model for Lockheed Martin F-35B Lightning II"]')?.textContent)
+      .toContain("Mesh loaded");
+    expect(active.host.textContent).toContain("Auto selected HD — source model");
+    const staged = await mount(snapshot, normalizeAircraftSelection({ aircraftId: "cessna-172", lodId: "auto" }));
+    const credit = Array.from(staged.host.querySelectorAll("p"))
+      .find(p => p.textContent?.startsWith("Currently flying Lockheed Martin F-35B Lightning II: AF267"));
+    expect(credit?.textContent).toContain("CC BY 4.0");
+    expect(credit?.querySelector("a")?.getAttribute("href")).toContain("5d54a6af45974ad386ae74d42b33374a");
   });
 
   it("presents Apply errors and clears them when the staged generation is edited", async () => {

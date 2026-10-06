@@ -1,0 +1,4 @@
+manually calling optimizeDeps is deprecated. This is done automatically and does not need to be called manually.
+Optimizing dependencies:
+  @babylonjs/core, @babylonjs/core/Behaviors/Cameras/geospatialClippingBehavior, @babylonjs/loaders/glTF, 3d-tiles-renderer/babylonjs, 3d-tiles-renderer/core/plugins, jsqr, lucide-react, peerjs, qrcode, react, react-dom, react-dom/client, react/jsx-dev-runtime, react/jsx-runtime
+{"entries":["index.html"],"optimizedDependencyCount":14,"unwantedDependencies":[],"serverStarted":false}

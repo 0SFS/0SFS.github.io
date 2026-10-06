@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   AUDIO_BANK_MAX_BANDS, bankCacheKey, clearAudioBankDownloads, loadAudioBank, prepareBankForContext,
-  sha256Hex, validateAudioBankManifest, type AudioBankBand, type AudioBankManifestV1, type AudioBankStore,
+  sha256Hex, validateAudioBankManifest, type AudioBankBand, type AudioBankManifestV2, type AudioBankStore,
 } from "./audioBank";
 
 /**
@@ -18,20 +18,20 @@ function noise(seed: number, frames = 4_800): Float32Array {
   return samples;
 }
 
-async function fixture(options: { bands?: number; manifestVersion?: number; sharePayload?: boolean } = {}) {
+async function fixture(options: { bands?: number; manifestVersion?: number; sharePayload?: boolean; frames?: number; sampleRateHz?: number } = {}) {
   const payloads = new Map<string, ArrayBuffer>();
   const bands: AudioBankBand[] = [];
   for (let i = 0; i < (options.bands ?? 2); i += 1) {
     const file = options.sharePayload ? "shared.f32" : `band-${i}.f32`;
-    const bytes = noise(options.sharePayload ? 7 : i + 1).buffer as ArrayBuffer;
+    const bytes = noise(options.sharePayload ? 7 : i + 1, options.frames).buffer as ArrayBuffer;
     payloads.set(file, bytes);
     bands.push({
       file, sha256: await sha256Hex(bytes), bytes: bytes.byteLength, frames: bytes.byteLength / 4,
-      sampleRateHz: 48_000, n1: 0.3 + 0.2 * i, view: i % 2 ? "exterior" : "cockpit",
+      sampleRateHz: options.sampleRateHz ?? 48_000, n1: 0.3 + 0.2 * i, view: i % 2 ? "exterior" : "cockpit",
     });
   }
-  const manifest: AudioBankManifestV1 = {
-    version: 1, id: "synthetic-fixture", revision: "1",
+  const manifest: AudioBankManifestV2 = {
+    version: 2, id: "synthetic-fixture", revision: "1", engineDefinitionId: "fj33-reference", rendererId: "procedural-jet-v1",
     license: {
       manifestVersion: options.manifestVersion ?? 1, spdx: "AGPL-3.0-only", rightsHolder: "0sfs test fixture",
       source: "generated in audioBank.test.ts", redistribution: true, evidence: "synthetic, no recording",
@@ -56,7 +56,8 @@ function memoryStore(): AudioBankStore & { data: Map<string, ArrayBuffer> } {
 describe("bank manifest gate", () => {
   it("accepts a complete manifest and totals its download", async () => {
     const { manifest } = await fixture();
-    expect(validateAudioBankManifest(manifest)).toMatchObject({ ok: true, totalBytes: 2 * 4_800 * 4 });
+    expect(validateAudioBankManifest(manifest)).toMatchObject({ ok: true,
+      totalBytes: 2 * 4_800 * 4 + new TextEncoder().encode(JSON.stringify(manifest)).byteLength });
   });
 
   it("admits nothing without an explicit redistribution right", async () => {
@@ -84,9 +85,20 @@ describe("bank manifest gate", () => {
       ["per-view", { ...manifest, bands: [0, 1, 2, 3].map((i) => ({ ...band, sha256: String(i).repeat(64) })) }],
       ["budget", { ...manifest, bands: [{ ...band, frames: 600_000, bytes: 2_400_000 }] }],
       ["licence", { ...manifest, license: { ...manifest.license, evidence: "" } }],
-      ["version", { ...manifest, version: 2 }],
+      ["version", { ...manifest, version: 1 }],
+      ["definition", { ...manifest, engineDefinitionId: "" }],
+      ["renderer", { ...manifest, rendererId: undefined }],
+      ["missing-view", { ...manifest, bands: [band] }],
+      ["grain-window", { ...manifest, bands: [{ ...band, frames: 1, bytes: 4 }, manifest.bands[1]] }],
+      ["duplicate-operating-point", { ...manifest, bands: [...manifest.bands, band] }],
     ];
     for (const [name, value] of variants) expect(validateAudioBankManifest(value).ok, name).toBe(false);
+  });
+
+  it("reserves the code budget and counts the manifest as part of the experimental pack", async () => {
+    const { manifest } = await fixture({ frames: 196_608, sharePayload: false });
+    // Exactly 1.5 MiB of PCM leaves no room for the manifest; the old 1.75 MiB check admitted it.
+    expect(validateAudioBankManifest(manifest)).toMatchObject({ ok: false, reason: expect.stringMatching(/manifest.*budget/) });
   });
 });
 
@@ -162,11 +174,31 @@ describe("bank loader and cache", () => {
     const { manifest, fetchBand } = await fixture();
     manifest.bands[1] = { ...manifest.bands[1], sampleRateHz: 44_100 };
     const loaded = await loadAudioBank(manifest, { store: null, fetchBand });
-    const resample = vi.fn(async (samples: Float32Array) => samples.slice(0, 10));
+    const resample = vi.fn(async (samples: Float32Array, fromRate: number, toRate: number) =>
+      new Float32Array(Math.round(samples.length * toRate / fromRate)));
     const prepared = await prepareBankForContext(loaded, 48_000, resample);
+    expect(prepared).toMatchObject({ engineDefinitionId: manifest.engineDefinitionId, rendererId: manifest.rendererId });
     expect(resample).toHaveBeenCalledOnce();
     expect(resample).toHaveBeenCalledWith(expect.any(Float32Array), 44_100, 48_000);
-    expect(prepared.map(({ index, exterior }) => [index, exterior])).toEqual([[0, 0], [1, 1]]);
-    expect(prepared[1].samples).toHaveLength(10);
+    expect(prepared.bands.map(({ index, exterior }) => [index, exterior])).toEqual([[0, 0], [1, 1]]);
+    expect(prepared.bands[1].samples).toHaveLength(Math.round(4_800 * 48_000 / 44_100));
+  });
+
+  it("rejects decoded allocation peaks before starting any resampler", async () => {
+    const { manifest, fetchBand } = await fixture({ sharePayload: true, frames: 300_000, sampleRateHz: 8_000 });
+    const loaded = await loadAudioBank(manifest, { store: null, fetchBand });
+    const resample = vi.fn(async () => new Float32Array());
+    await expect(prepareBankForContext(loaded, 96_000, resample)).rejects.toThrow(/memory budget/);
+    expect(resample).not.toHaveBeenCalled();
+  });
+
+  it("resamples a shared payload once and rejects wrong output lengths", async () => {
+    const { manifest, fetchBand } = await fixture({ sharePayload: true, sampleRateHz: 24_000 });
+    const loaded = await loadAudioBank(manifest, { store: null, fetchBand });
+    const resample = vi.fn(async () => new Float32Array(9_600));
+    const prepared = await prepareBankForContext(loaded, 48_000, resample);
+    expect(resample).toHaveBeenCalledOnce();
+    expect(prepared.bands[0].samples).toBe(prepared.bands[1].samples);
+    await expect(prepareBankForContext(loaded, 48_000, async () => new Float32Array(10))).rejects.toThrow(/invalid.*PCM/);
   });
 });

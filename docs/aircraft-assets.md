@@ -192,6 +192,36 @@ camera moved.
 The model asks for those frames itself (`requestRender`); a download's progress
 asks for none.
 
+### Inspecting the mesh
+
+Aircraft → Mesh inspector has **Show polygon edges**, saved as
+`osfs.aircraft.wireframe` and off by default. It overlays orange triangle edges
+on the selected meshes without replacing their materials. Expand the mesh tree
+to select individual parts or groups; **Select all** and **Deselect all** act on
+the whole loaded model. Deselecting removes the highlight and leaves the surface
+visible. The displayed edges are the triangles in the exported model, including
+diagonals introduced when the source polygons were triangulated.
+
+The tree follows the currently loaded aircraft model, not terrain or diagnostic
+effects. A replacement model or level of detail starts with all its meshes
+selected. Loading progress never rebuilds the tree. Animated transforms and
+visibility, including fully stowed landing gear, also apply to the highlights.
+An unavailable model leaves the tree empty.
+
+FOSS Earth's `createMeshInspector` (`foss-earth/diagnostics`) owns the shared
+geometry inspection and `MeshInspectorPanel` (`foss-earth/shell`) owns the tree.
+0sfs passes ready model roots and clears them before disposal. The overlay shares
+the source geometry buffers and uses Babylon's cached triangle line indices,
+with one extra draw per selected mesh. Disabling it releases overlay resources
+and removes its frame observer; selection changes while disabled request no
+frames. The tree is updated by events, independently of flight telemetry.
+
+The shared [GPU compatibility check](../../foss-earth/validation/evidence/mesh-inspector/2026-10-05/README.md)
+passed 23 checks per backend on WebGPU, WebGL 2 and WebGL 1, including continuous
+front edges, occlusion, animated hierarchy, selection and cleanup. It uses
+synthetic meshes with orthographic and near/far perspective views; it is not a
+frame-rate benchmark of an aircraft model.
+
 `createPlaceholderAircraft.ts` keeps the cameras and chase-orbit behaviour and
 exposes a `modelRoot` slot. The placeholder blocks stand in only when there is
 no mesh to show — the airframe has none, or it failed to load — not while a
@@ -417,6 +447,25 @@ console.
    auto-switch distances, and a `credit` on every level. Mark any level
    `optIn` that `Auto` should never load.
 3. Check the parked stance and adjust `modelOffset.y` if needed.
+4. Give the Fuel tab its top view: add the family to `TOP_VIEW_SOURCES` in
+   `scripts/build-aircraft-top-views.mjs`, run it, and name and size each
+   JSBSim tank in `fuelTankLayouts.ts`.
+
+### Top views
+
+The Fuel tab draws each family from above, with every tank where the flight
+model puts it. `scripts/build-aircraft-top-views.mjs` traces that outline from
+the exterior model itself: it projects every triangle onto the ground plane,
+rasterizes at one inch, closes gaps up to eight inches (between flaps, ailerons
+and their wing), fills holes, and traces and simplifies the edge into
+`src/flight/aircraft/generated/aircraftTopViews.ts`. Because each model's origin
+sits below its flight model's CG, the outline lands in JSBSim's structural
+frame by reading that CG from the aircraft's XML: x aft is CG x plus glTF z,
+and y right is CG y plus glTF x, in inches. Run the script again after a model
+or its alignment changes; a test fails until it is. Another test requires every
+internal tank's JSBSim position to fall inside the traced outline, which is
+also a check that the model is aligned to its flight model. An outline traced
+from someone else's model carries their credit, which the tab shows beside it.
 
 Adding a level by **someone else** needs three more things: its licence must
 allow redistribution and be named in the `credit` alongside a link back; it

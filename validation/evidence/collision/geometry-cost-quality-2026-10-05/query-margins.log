@@ -1,0 +1,93 @@
+{
+  "output": "/Users/felg/gh/0sfs/build/validation/collision/query-margins/2026-10-05_154844",
+  "results": [
+    {
+      "caseIndex": 27,
+      "candidateId": "hulls-64",
+      "exactFraction": 0.500235915184021,
+      "supportErrorMeters": 0,
+      "childZeroMarginHits": 1,
+      "margins": [
+        {
+          "marginMeters": 0,
+          "fraction": null,
+          "confirmedFraction": null
+        },
+        {
+          "marginMeters": 0.0001,
+          "fraction": 0.4802039861679077,
+          "confirmedFraction": 0.500235915184021
+        },
+        {
+          "marginMeters": 0.0005,
+          "fraction": 0.40047815442085266,
+          "confirmedFraction": 0.500235915184021
+        },
+        {
+          "marginMeters": 0.001,
+          "fraction": 0.017690658569335938,
+          "confirmedFraction": 0.500235915184021
+        },
+        {
+          "marginMeters": 0.002,
+          "fraction": 0.662334144115448,
+          "confirmedFraction": 0.500235915184021
+        },
+        {
+          "marginMeters": 0.003,
+          "fraction": 0.46233609318733215,
+          "confirmedFraction": 0.500235915184021
+        },
+        {
+          "marginMeters": 0.005,
+          "fraction": 0.06230568513274193,
+          "confirmedFraction": 0.500235915184021
+        }
+      ]
+    },
+    {
+      "caseIndex": 108,
+      "candidateId": "hulls-16",
+      "exactFraction": 0.49928349256515503,
+      "supportErrorMeters": 0,
+      "childZeroMarginHits": 1,
+      "margins": [
+        {
+          "marginMeters": 0,
+          "fraction": null,
+          "confirmedFraction": null
+        },
+        {
+          "marginMeters": 0.0001,
+          "fraction": 0.4794231653213501,
+          "confirmedFraction": 0.49928349256515503
+        },
+        {
+          "marginMeters": 0.0005,
+          "fraction": 0.3994349539279938,
+          "confirmedFraction": 0.49928349256515503
+        },
+        {
+          "marginMeters": 0.001,
+          "fraction": 0.29953449964523315,
+          "confirmedFraction": 0.49928349256515503
+        },
+        {
+          "marginMeters": 0.002,
+          "fraction": 0.09978035092353821,
+          "confirmedFraction": 0.49928349256515503
+        },
+        {
+          "marginMeters": 0.003,
+          "fraction": null,
+          "confirmedFraction": null
+        },
+        {
+          "marginMeters": 0.005,
+          "fraction": null,
+          "confirmedFraction": null
+        }
+      ]
+    }
+  ]
+}

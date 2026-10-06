@@ -18,7 +18,7 @@ const inTreeIdentity = (): Extract<JsbsimBuildIdentity, { schemaVersion: 2 }> =>
   return {
     ...source,
     schemaVersion: 2,
-    package: { name: "@felipegalind0/jsbsim", version: "1.2.4-fork.7" },
+    package: { name: "@felipegalind0/jsbsim", version: "1.2.4-fork.11" },
     sdk: { ...source.sdk, commit: source.native.commit, path: "wasm" },
     build: { ...source.build, mode: "in-tree" },
   };
@@ -34,6 +34,10 @@ describe("JSBSim build identity", () => {
     ["1.2.4-fork.5", "@felipegalind0/jsbsim"],
     ["1.2.4-fork.6", "@felipegalind0/jsbsim"],
     ["1.2.4-fork.7", "@felipegalind0/jsbsim"],
+    ["1.2.4-fork.8", "@felipegalind0/jsbsim"],
+    ["1.2.4-fork.9", "@felipegalind0/jsbsim"],
+    ["1.2.4-fork.10", "@felipegalind0/jsbsim"],
+    ["1.2.4-fork.11", "@felipegalind0/jsbsim"],
   ])("accepts only an explicitly supported in-tree package version: %s", (version, name) => {
     const source = inTreeIdentity();
     source.package.version = version;
@@ -65,7 +69,7 @@ describe("JSBSim build identity", () => {
     // renamed package claiming an older version must be rejected.
     (source: ReturnType<typeof inTreeIdentity>) => { source.package.version = "1.2.4-fork.4"; },
     (source: ReturnType<typeof inTreeIdentity>) => { source.package.name = "@felipegalind0/jsbsim-wasm"; },
-    (source: ReturnType<typeof inTreeIdentity>) => { source.package.version = "1.2.4-fork.8"; },
+    (source: ReturnType<typeof inTreeIdentity>) => { source.package.version = "1.2.4-fork.12"; },
     (source: ReturnType<typeof inTreeIdentity>) => { Reflect.set(source, "schemaVersion", 1); },
   ])("rejects an inconsistent in-tree identity %#", mutate => {
     const source = inTreeIdentity();

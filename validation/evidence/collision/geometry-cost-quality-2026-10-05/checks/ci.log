@@ -1,0 +1,236 @@
+
+> osfs@0.0.0 ci
+> npm run lint && npm run test && npm run build
+
+
+> osfs@0.0.0 lint
+> eslint . --cache --cache-strategy content --cache-location node_modules/.cache/eslint/
+
+
+> osfs@0.0.0 test
+> vitest run --passWithNoTests
+
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+(node:27187) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27190) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27188) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27189) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27186) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/flight/createFlightSimApp.test.ts > boots an F-35B with a VTOL lever beside THR and routes its registry command to the FDM
+[jsbsim] Runtime build identified { identity: undefined }
+
+stderr | src/flight/createFlightSimApp.test.ts > boots an F-35B with a VTOL lever beside THR and routes its registry command to the FDM
+[sim] Engine sound telemetry is unavailable; the tire cue still plays { reason: 'sdk.createPropertyBatch is not a function' }
+
+stdout | src/flight/createFlightSimApp.test.ts > boots an F-35B with a VTOL lever beside THR and routes its registry command to the FDM
+[hud] Attitude indicator draws with Canvas 2D { preference: 'auto', renderer: 'webgl2' }
+
+stdout | src/flight/createFlightSimApp.test.ts > shows and persists the F-35B control law, applies it while paused and restores it after relocation
+[jsbsim] Runtime build identified { identity: undefined }
+
+stderr | src/flight/createFlightSimApp.test.ts > shows and persists the F-35B control law, applies it while paused and restores it after relocation
+[sim] Engine sound telemetry is unavailable; the tire cue still plays { reason: 'sdk.createPropertyBatch is not a function' }
+
+(node:27198) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/flight/createFlightSimApp.test.ts (31 tests | 2 failed) 1467ms
+   × boots an F-35B with a VTOL lever beside THR and routes its registry command to the FDM 43ms
+   × shows and persists the F-35B control law, applies it while paused and restores it after relocation 39ms
+(node:27204) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27206) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27211) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27212) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27218) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27219) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27221) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27225) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27515) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27890) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27891) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27894) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27893) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27905) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27906) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27908) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27909) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27911) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27912) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27913) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27927) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27944) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27939) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27947) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27950) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27951) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27954) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27955) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27957) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27960) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27970) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27979) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27996) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:28008) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:28011) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/flight/createFlightSimApp.test.ts > boots an F-35B with a VTOL lever beside THR and routes its registry command to the FDM
+AssertionError: expected "vi.fn()" to be called with arguments: [ Anything, ObjectContaining{…} ]
+
+Received:
+
+  1st vi.fn() call:
+
+  [
+-   Anything,
+-   ObjectContaining {
++   {
++     "getPropertyValue": [Function Mock],
++     "setPropertyValue": [Function Mock],
++   },
++   {
+      "gearHeightMetres": 1.267,
+-     "profile": ObjectContaining {
++     "source": {
++       "definition": {
++         "approximation": "One main-engine source with exhaust-dominant broadband roar and native afterburner state. Timbre and loudness are uncalibrated; separate lift-fan sound is not modeled.",
++         "engineClass": "turbofan",
+          "id": "f135-approximation",
++         "label": "Approximate F135 procedural sound",
++         "manufacturerFamily": "Pratt & Whitney F135",
++         "parameters": {
++           "afterburnerJetGain": 2.5,
++           "afterburnerJetHz": 4200,
++           "bypassCenterHz": 450,
++           "bypassGain": 0.08,
++           "bypassPowerHz": 1000,
++           "combustorGain": 0.85,
++           "combustorHighHz": 550,
++           "combustorHz": 90,
++           "coreToneGain": 0.07,
++           "fanMix": 0.18,
++           "fanNoiseBaseGain": 0.04,
++           "fanNoisePowerGain": 0.2,
++           "fanToneGain": 0.1,
++           "fuelReferencePps": 8,
++           "idleN1Pct": 30,
++           "idleN1SpanPct": 70,
++           "jetBaseHz": 180,
++           "jetGain": 2.4,
++           "jetPowerHz": 2200,
++           "n1ReferenceHz": 1800,
++           "n2ReferenceHz": 3800,
++           "outputGain": 1.1,
++           "thrustReferenceLbf": 28000,
++         },
++         "rendererId": "procedural-jet-v1",
++         "telemetry": {
++           "commandScope": {
++             "allEnginesValue": -1,
++             "selectionPath": "propulsion/active_engine",
++           },
++           "id": "jsbsim-turbine-v1",
++           "paths": {
++             "augmentation": "propulsion/engine[{engineIndex}]/augmentation",
++             "cutoff": "propulsion/cutoff_cmd",
++             "fuelFlowPps": "propulsion/engine[{engineIndex}]/fuel-flow-rate-pps",
++             "n1Pct": "propulsion/engine[{engineIndex}]/n1",
++             "n2Pct": "propulsion/engine[{engineIndex}]/n2",
++             "running": "propulsion/engine[{engineIndex}]/set-running",
++             "starter": "propulsion/starter_cmd",
++             "throttleNorm": "fcs/throttle-cmd-norm[{engineIndex}]",
++             "thrustLbf": "propulsion/engine[{engineIndex}]/thrust-lbs",
++           },
++           "required": [
++             "n1Pct",
++             "n2Pct",
++             "thrustLbf",
++             "fuelFlowPps",
++           ],
++         },
++       },
++       "installation": {
++         "engineDefinitionId": "f135-approximation",
++         "engineIndex": 0,
++         "id": "main-exhaust",
++         "position": {
++           "kind": "native-engine",
++         },
++       },
+      },
+    },
+  ]
+
+
+Number of calls: 1
+
+ ❯ src/flight/createFlightSimApp.test.ts:606:38
+    604|       aircraftId: "f-35b", bootstrap: expect.objectContaining({ airspe…
+    605|     }));
+    606|     expect(createJsbsimAudioAdapter).toHaveBeenCalledWith(expect.anyth…
+       |                                      ^
+    607|       gearHeightMetres: 1.267, profile: expect.objectContaining({ id: …
+    608|     }));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/flight/createFlightSimApp.test.ts > shows and persists the F-35B control law, applies it while paused and restores it after relocation
+TypeError: Cannot read properties of null (reading 'value')
+ ❯ src/flight/createFlightSimApp.test.ts:674:17
+    672|     expect(section.textContent).toContain("Autopilot and input assists…
+    673|     const mode = section.querySelector<HTMLSelectElement>('[data-param…
+    674|     expect(mode.value).toBe("manual");
+       |                 ^
+    675|     expect(Array.from(mode.options, option => option.textContent)).toE…
+    676|     await act(async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 131 passed (132)
+      Tests  2 failed | 1291 passed (1293)
+   Start at  15:50:12
+   Duration  15.11s (transform 2.12s, setup 0ms, import 19.16s, tests 27.29s, environment 11.15s)
+

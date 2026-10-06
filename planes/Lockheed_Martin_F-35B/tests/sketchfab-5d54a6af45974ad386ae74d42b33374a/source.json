@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "model": {
+    "uid": "5d54a6af45974ad386ae74d42b33374a",
+    "name": "Lockheed Martin F-35B Lightning II",
+    "pageUrl": "https://sketchfab.com/3d-models/lockheed-martin-f-35b-lightning-ii-5d54a6af45974ad386ae74d42b33374a",
+    "author": {
+      "name": "AF267",
+      "profileUrl": "https://sketchfab.com/jsong.js.us"
+    },
+    "description": "The Lockheed Martin F-35B Lightning II is the V/STOL variant of the F-35 stealth fighter. This model appears in GeoFS."
+  },
+  "license": {
+    "name": "Creative Commons Attribution 4.0 International",
+    "spdxIdentifier": "CC-BY-4.0",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "urlAsPublishedByApi": "http://creativecommons.org/licenses/by/4.0/"
+  },
+  "publicMetadata": {
+    "apiUrl": "https://api.sketchfab.com/v3/models/5d54a6af45974ad386ae74d42b33374a",
+    "checkedOn": "2026-10-05",
+    "createdAt": "2025-02-19T15:10:31.060232",
+    "publishedAt": "2025-02-19T15:15:53.224417",
+    "updatedAt": "2025-02-19T15:41:08.563408",
+    "vertexCount": 7524,
+    "faceCount": 12259,
+    "textureCount": 4,
+    "materialCount": 18,
+    "animationCount": 0,
+    "isDownloadable": true
+  },
+  "acquisition": {
+    "method": "user-provided original archive",
+    "receivedOn": "2026-10-05",
+    "archive": {
+      "path": "lockheed-martin-f-35b-lightning-ii.zip",
+      "bytes": 3629352,
+      "sha256": "cf911903184c5b313e06afdcf9a5b1691ae64b64aa7e5068cc9214894e926859"
+    },
+    "manifestPath": "archive-manifest.json"
+  },
+  "processing": {
+    "originalSourceFilesModified": false,
+    "converted": true,
+    "playable": true,
+    "runtimeModel": "public/aircraft/f-35b/F-35B_AF267.glb",
+    "exportProvenance": "public/aircraft/f-35b/F-35B_AF267.provenance.json",
+    "qualification": "validation/evidence/aircraft/f35b/playable-headless.json",
+    "flightModelStatus": "experimental, performance uncalibrated"
+  },
+  "provenanceNotes": [
+    "The original archive and extracted Blender source and textures are retained unchanged.",
+    "The publisher's GeoFS statement describes the visual model; it does not establish the origin or availability of a flight dynamics model."
+  ]
+}

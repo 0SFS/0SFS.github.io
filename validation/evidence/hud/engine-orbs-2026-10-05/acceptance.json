@@ -1,0 +1,214 @@
+{
+  "schema": "0sfs-engine-orb-acceptance/1",
+  "date": "2026-10-05",
+  "owner": "0sfs",
+  "status": "passed software and untimed GPU presentation checks",
+  "scope": "Engine startup sound correction and aircraft-specific rotating HUD/phone shaft indicators. No listening, acoustic calibration, frame timing, or device-performance qualification.",
+  "scale": "Turbines use N1/N2 percent divided by max(native MaxN1, native MaxN2), not physical RPM. C172 uses rated 2700 RPM from installed eng_io320.xml. Numeric overspeed remains visible.",
+  "rendering": {
+    "defaultFps": 30,
+    "maxVisualTurnsPerSimSecond": 2,
+    "maxPixelRatio": 2,
+    "drawCallsPerChangedFrame": 1,
+    "uniformBytes": 48,
+    "desktopLoop": "existing HUD updates, no independent RAF",
+    "phoneLoop": "interpolates only received simulation time for at most one 50ms heartbeat",
+    "fallback": [
+      "shared WebGPU",
+      "WebGL2",
+      "WebGL1",
+      "numeric-only"
+    ],
+    "stoppedOrHiddenGpuDraws": 0,
+    "legacyPhone": "numeric-only without orbs capability"
+  },
+  "checks": [
+    {
+      "command": "npx tsc -b",
+      "status": "passed",
+      "log": "typecheck-phone-final.log"
+    },
+    {
+      "command": "npm run lint",
+      "status": "passed",
+      "log": "lint-final.log"
+    },
+    {
+      "command": "npx vitest related --run src/flight/hud/engineSpoolMotion.ts src/flight/hud/engineSpoolRenderer.ts src/flight/hud/engineSummary.ts src/flight/hud/engineMonitor.ts src/flight/hud/engineMonitorModel.ts src/remote/PhoneEngine.tsx src/remote/PhoneController.tsx src/remote/protocol.ts src/remote/engineSummaryFromStatus.ts src/flight/remote/engineStatus.ts src/flight/jsbsim/fdmProfiles.ts src/flight/settings/flightParameters.ts src/flight/createFlightSimApp.ts src/flight/audio/startupAudio.test.ts src/flight/audio/acousticProfiles.test.ts src/flight/audio/f35bAudio.integration.test.ts src/flight/audio/jsbsimAudioAdapter.ts src/flight/audio/engineAcousticDefinitions.ts --maxWorkers=50%",
+      "status": "passed",
+      "files": 81,
+      "tests": 953,
+      "log": "related-tests.log"
+    },
+    {
+      "command": "npx vitest run src/flight/hud/engineMonitorModel.integration.test.ts --maxWorkers=50%",
+      "reason": "final native catalog-pollution fixture edit during earlier related run",
+      "status": "passed",
+      "files": 1,
+      "tests": 4,
+      "log": "model-fixture-final.log"
+    },
+    {
+      "command": "npx vitest related --run src/remote/PhoneEngine.tsx --maxWorkers=50%",
+      "reason": "remove phone settings-catalog import and disable legacy-host animation",
+      "status": "passed",
+      "files": 4,
+      "tests": 43,
+      "log": "phone-final.log"
+    },
+    {
+      "command": "node scripts/validation/audio/check-engine-orbs.mjs",
+      "status": "passed",
+      "cases": 6,
+      "log": "gpu-report.json",
+      "visualReview": "All three requested backends show two colored turbine rings and one C172 RPM ring, with markers on the circles. No N1/N2 is visible on the C172.",
+      "screenshot": "engine-orbs.png"
+    },
+    {
+      "command": "VITEST_MAX_WORKERS=5 npm run ci",
+      "status": "passed",
+      "files": 160,
+      "tests": 1658,
+      "includes": [
+        "lint",
+        "tests",
+        "typecheck",
+        "production build",
+        "JSBSim/audio/exhaust artifact verification"
+      ],
+      "log": "ci.log"
+    }
+  ],
+  "audioAcceptance": "../../audio/startup-envelope-2026-10-05/acceptance.json",
+  "dspCommit": "5ad00228",
+  "dspSha256": "0aea1d9488f7208a8d8aa28ab1e8ed9d6f741787f4b1242cbca92ac87bbc91a1",
+  "commitScope": "DSP source, WASM and provenance committed together; UI/integration/docs remain in the existing combined aircraft working tree.",
+  "sources": [
+    {
+      "file": "src/flight/hud/engineSpoolRenderer.ts",
+      "sha256": "545bed498f8a13c8ceccee1bcd9a61a13180a6b57323fcf17b5637553230bfa5"
+    },
+    {
+      "file": "src/flight/hud/engineSpoolRenderer.test.ts",
+      "sha256": "36901d6d7f2d0ee0997d0f84c942b5b6b7403b097faf8ce3c7c861e1576d61ab"
+    },
+    {
+      "file": "src/flight/hud/engineSpoolMotion.ts",
+      "sha256": "2e25f7e064b34ea84fd8cac09ca19a94672425d7b70ae3ad078b3c2c7cc8aa08"
+    },
+    {
+      "file": "src/flight/hud/engineSpoolMotion.test.ts",
+      "sha256": "7a0e1ac3f37e863def77d86787af77e44e0c537e293b39f5fce652bfd8f0dc99"
+    },
+    {
+      "file": "src/flight/hud/engineSummary.ts",
+      "sha256": "c5e82f24f43a1ac3d0c0c1ee9f55efdecc1246a258fdc0f8c24072579b6f77dd"
+    },
+    {
+      "file": "src/flight/hud/engineMonitor.ts",
+      "sha256": "7454265725c2be24c602a65a0b4ccf1aa1cb9145a32eef4853de1bcee3656ea8"
+    },
+    {
+      "file": "src/flight/hud/engineMonitor.css",
+      "sha256": "0096dd1e165a5cf1b6b0e3ae1f1b464ebdb4a10ab80efd6d6d05b80e0395c42d"
+    },
+    {
+      "file": "src/flight/hud/engineMonitorModel.ts",
+      "sha256": "b9b5acb3fe1927eda7aef414631024818c70f27fdc1a5f4fd187b2c1142c1078"
+    },
+    {
+      "file": "src/flight/hud/engineMonitor.test.ts",
+      "sha256": "e7677193e1082da09e52d381b56500a1df9170f5ea941c08c8cb280e0b37d4c8"
+    },
+    {
+      "file": "src/flight/hud/engineMonitorModel.test.ts",
+      "sha256": "e7e973bfdb90e6bba5f0f55661c89bef0c5e925a8e87e32cd6e2b44088f3d255"
+    },
+    {
+      "file": "src/flight/hud/engineMonitorModel.integration.test.ts",
+      "sha256": "cb52c92caba0fd5e2c3168deeef2ea0ce5046c6efda2a3f5ed90dcbbd51063ab"
+    },
+    {
+      "file": "src/flight/jsbsim/fdmProfiles.ts",
+      "sha256": "ebfac94348f485c728612eec9ddb315bcc0a8e00460457319c814399262bb8de"
+    },
+    {
+      "file": "src/flight/settings/flightParameters.ts",
+      "sha256": "4ac69e72b8208721bfa85539aa29e950521703047d8ec1ae55f19d74d7e7e696"
+    },
+    {
+      "file": "src/flight/createFlightSimApp.ts",
+      "sha256": "27b08d21345eaec598021b84cd970f7dd227d9ca694eee913c85c65baf6d19da"
+    },
+    {
+      "file": "src/flight/createFlightSimApp.phone.test.ts",
+      "sha256": "65169d3d206f5cdb6ba5f39f6ffbc6e51b99155f917d1c2ba7cc6d08d35a1f54"
+    },
+    {
+      "file": "src/flight/remote/engineStatus.ts",
+      "sha256": "15663b5f60d596495908b4276d1f80e4d9a7b56b86d259fcee365f089afcf411"
+    },
+    {
+      "file": "src/remote/engineSummaryFromStatus.ts",
+      "sha256": "659236aa0980bfe87ce38f760d3debd248a07434ddde15461e4c7088346a8d17"
+    },
+    {
+      "file": "src/remote/PhoneEngine.tsx",
+      "sha256": "1c0bd2f9dde18018928f091444de5ef7230e472f5eb214abcc537b53fa5d2f85"
+    },
+    {
+      "file": "src/remote/PhoneEngine.test.tsx",
+      "sha256": "dbcd916565c9e4a09e160a8ce6acb177126d94cbf2c1f0cd8c84bb4b084b933f"
+    },
+    {
+      "file": "src/remote/PhoneController.tsx",
+      "sha256": "5aa49da36fba11c0b7b33d4ba00f031ee6e17776cc53e893b2f00edff6f6755e"
+    },
+    {
+      "file": "src/remote/protocol.ts",
+      "sha256": "0e5c74c0420daaefe6671c39c48c3f963b37381f7ba5b2e19f1e35534ef43c62"
+    },
+    {
+      "file": "src/remote/protocol.test.ts",
+      "sha256": "4b16b1e5eb9cf641290676d371b23c79f2c5ec629adba44b32ab53564aadd74a"
+    },
+    {
+      "file": "scripts/validation/audio/check-engine-orbs.mjs",
+      "sha256": "962f43b0446835aeabdfbd49d5b17ecfab97070a3122de2eae1db5d390bad322"
+    }
+  ],
+  "evidence": [
+    {
+      "file": "ci.log",
+      "sha256": "8bbf9d7f3a3c9aa30a00315fcc7d694729cbda1870dcc64885487d2d92d332e5"
+    },
+    {
+      "file": "related-tests.log",
+      "sha256": "3361f9b3b7cc41618036a63ecf6f0ed7c2ea72c477e94cca0f11e4c0bf5e34f5"
+    },
+    {
+      "file": "model-fixture-final.log",
+      "sha256": "f32c9b252d387edabc9f428cf66ffa31ba45dac84c6ab8fb6103029229961138"
+    },
+    {
+      "file": "phone-final.log",
+      "sha256": "3b48c1ea584ff16b747455f4d29808b94b97ed4259117f7c08d4e8cb63310d45"
+    },
+    {
+      "file": "typecheck-phone-final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "lint-final.log",
+      "sha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e"
+    },
+    {
+      "file": "gpu-report.json",
+      "sha256": "0c0794878b06871be5c96f04d620b436cea3483f7071f4a195535c104485f161"
+    },
+    {
+      "file": "engine-orbs.png",
+      "sha256": "6af2c0c34e81680a5219d225a60bb852e1dafb1030428656cc4900b74a9076dd"
+    }
+  ]
+}

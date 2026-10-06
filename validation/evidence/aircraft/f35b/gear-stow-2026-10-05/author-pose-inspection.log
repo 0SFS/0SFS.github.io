@@ -1,0 +1,86 @@
+{
+  "output": "/Users/felg/gh/0sfs/build/validation/f35b-gear-stow/2026-10-05_223241",
+  "fullyRetracted": [
+    {
+      "name": "leftWheel",
+      "center": [
+        -1.4673161506652832,
+        2.126612901687622,
+        -0.770382821559906
+      ],
+      "bounds": {
+        "min": [
+          -1.9312016433627024,
+          1.7464583319944746,
+          -1.2634361297336083
+        ],
+        "max": [
+          -1.0034308291354401,
+          2.5067673267474775,
+          -0.2773294688829413
+        ]
+      },
+      "above": 0,
+      "below": 0,
+      "inside": 624,
+      "insufficientIntersections": 0,
+      "worstAboveMeters": 0,
+      "worstBelowMeters": 0,
+      "examples": []
+    },
+    {
+      "name": "noseWheel",
+      "center": [
+        0.0000017980627262659254,
+        1.9796756505966187,
+        -6.396125793457031
+      ],
+      "bounds": {
+        "min": [
+          -0.22228228687499288,
+          1.6174669339604273,
+          -6.758334603704382
+        ],
+        "max": [
+          0.11945092109281522,
+          2.34188436723281,
+          -6.033916983209683
+        ]
+      },
+      "above": 0,
+      "below": 0,
+      "inside": 624,
+      "insufficientIntersections": 0,
+      "worstAboveMeters": 0,
+      "worstBelowMeters": 0,
+      "examples": []
+    },
+    {
+      "name": "rightWheel",
+      "center": [
+        1.467315673828125,
+        2.1266136169433594,
+        -0.7703819274902344
+      ],
+      "bounds": {
+        "min": [
+          1.0034302128906312,
+          1.746459283782872,
+          -1.2634352756245002
+        ],
+        "max": [
+          1.9312009635980107,
+          2.5067680947371387,
+          -0.2773285348526895
+        ]
+      },
+      "above": 0,
+      "below": 0,
+      "inside": 624,
+      "insufficientIntersections": 0,
+      "worstAboveMeters": 0,
+      "worstBelowMeters": 0,
+      "examples": []
+    }
+  ]
+}

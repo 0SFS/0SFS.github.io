@@ -1,0 +1,572 @@
+{
+  "schema": 1,
+  "kind": "Aircraft FCS yaw development diagnostic, not performance calibration",
+  "seconds": 24,
+  "timestep": 0.008333333333333333,
+  "controlLaw": "auto",
+  "yawSchedule": "constant",
+  "runtimeHashes": {
+    "aircraft/F-35B-jsbsim/F-35B-jsbsim.xml": "240b8650c8e572d0e871d459db2a58e9b7b81457ad2ae7d8c6486cf198fcc9ef",
+    "aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml": "09b7eb9c8c9ea5ca720ae1974f4d1ef5d7fb35e6b8248415c6cfcc307c57891c",
+    "aircraft/F-35B-jsbsim/Engines/direct.xml": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc",
+    "aircraft/F-35B-jsbsim/Engines/liftfan.xml": "4878bb23bb5e5fb86a76ca4dc68e33b1a1386e25157acaf34c32726fbdb184ea",
+    "aircraft/F-35B-jsbsim/Engines/sidefan.xml": "e811bd3bb7417a349422f57909d268e5b0c56a386b9e58cd2ada74a98c1e5a79",
+    "aircraft/F-35B-jsbsim/Systems/pushback.xml": "868928e9b2b12440daec283260aebb1562d05154f69438f5d95043444378a4bc"
+  },
+  "packageHashes": {
+    "aircraft/F-35B-jsbsim/F-35B-jsbsim.xml": "2c180e214926d87a9a27e1c662b1e1b49f801a8d66281df2959d33f473be0411",
+    "aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml": "09b7eb9c8c9ea5ca720ae1974f4d1ef5d7fb35e6b8248415c6cfcc307c57891c",
+    "aircraft/F-35B-jsbsim/Engines/direct.xml": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc",
+    "aircraft/F-35B-jsbsim/Engines/liftfan.xml": "4878bb23bb5e5fb86a76ca4dc68e33b1a1386e25157acaf34c32726fbdb184ea",
+    "aircraft/F-35B-jsbsim/Engines/sidefan.xml": "e811bd3bb7417a349422f57909d268e5b0c56a386b9e58cd2ada74a98c1e5a79",
+    "aircraft/F-35B-jsbsim/Systems/pushback.xml": "868928e9b2b12440daec283260aebb1562d05154f69438f5d95043444378a4bc"
+  },
+  "artifact": {
+    "schemaVersion": 1,
+    "identity": {
+      "schemaVersion": 2,
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.7"
+      },
+      "native": {
+        "origin": "https://github.com/Felipegalind0/jsbsim",
+        "commit": "fea688020fb683c0696aa8339dbed9cdb238a39d",
+        "contentSha256": "688091cc93ad332d8e55ca376393dea3d544a80de0711a4781e10c7e1539ec35",
+        "dirty": false
+      },
+      "sdk": {
+        "commit": "fea688020fb683c0696aa8339dbed9cdb238a39d",
+        "contentSha256": "b5d8ff6d2cc76d2b96c92aef1a3228bf6cfebe5dd8ddc4e571c6b713f3d5a93d",
+        "dirty": false,
+        "path": "wasm"
+      },
+      "build": {
+        "mode": "in-tree",
+        "inputSha256": "733a60a62ef3061dc254f6d4a3c8f3cf7f162a213b444e423e4ac3d6b18553f0",
+        "toolchain": {
+          "node": "v26.8.2",
+          "npm": "11.19.1",
+          "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+          "cmake": "cmake version 4.4.3",
+          "clang": "clang version 24.0.0git",
+          "platform": "darwin",
+          "arch": "arm64",
+          "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+        },
+        "options": {
+          "buildType": "Release",
+          "cxxStandard": 17,
+          "sdkTarget": "es2022"
+        }
+      }
+    },
+    "files": {
+      "index.d.ts": "4021db027f6d90aa0ada9f8581b128dac9cdf97e06e710e91cabd2f156f8e27a",
+      "index.js": "8876d3467c6ebb32a9fe38d42a03fb8e0ee491d6353580347ba47d71af8036f3",
+      "index.js.map": "7bce5725a434ae51f8cb3e9823c956b7c40fba613eb1e3149b9fc9fad3f03029",
+      "licenses/README.txt": "4a7e892a7ea73b245c8e8918e3f7c47af46ea5dc58303b866d8747d2580e8fde",
+      "licenses/jsbsim/AUTHORS": "ca8556894da80f81f773893a9c1009021aac2972d7bb6a39c2f981b4fd00aa9a",
+      "licenses/jsbsim/COPYING": "1e7e6bae5a5bde32f1ae5a7c37a082d1ab03cf89354f7f936ac40be9e39a6531",
+      "licenses/jsbsim/src/GeographicLib/LICENSE.txt": "90d25298be0c5d7f5219ae20009d18910150b3a4ea0ca86dda5df04cfb8d3823",
+      "licenses/jsbsim/src/simgear/xml/COPYING": "8c6b5b6de8fae20b317f4992729abc0e520bfba4c7606cd1e9eeb87418eebdec",
+      "licenses/sdk-LICENSE": "15e2d343fc930439fb82351d7c30f3d151b4c42ca3132c13ff1a60da527a1259",
+      "wasm.d.ts": "b7bbbab6f5e6b0b297dfeff117351e53d4d8598fecde7e805ea9aee7b2923353",
+      "wasm.js": "758d98989301d86ec3aa589fa851d6416b305eca58bb1e6b9579780ea339e09b",
+      "wasm.js.map": "d75a89efd5b3cf07ebfbe70d321f55c01bd8cdde1be50a15d1dcfad21a7ca763",
+      "wasm/jsbsim_wasm.mjs": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+      "wasm/jsbsim_wasm.wasm": "6eae23db0fc26d4e02daa27eb95fba12932265164e4bb194cb3e183d04882806"
+    },
+    "validation": {
+      "status": "passed",
+      "commands": [
+        "tsc --noEmit (frozen SDK workspace)",
+        "node --test test/*.test.mjs (frozen SDK workspace and resolved native fixtures)"
+      ]
+    },
+    "packageArchive": {
+      "path": "deps/felipegalind0-jsbsim-1.2.4-fork.7.tgz",
+      "sha256": "58afaf9fa575ec61838ba794b7b4a0919b8eaf516c7261e571700e8367b5217b",
+      "integrity": "sha512-lYi/DfCul0C9UjITvOzUvYXk862s0WRNTBL4vE7QlJRb++9DiU4nOemAxxIboCZU3aWTGEiVt0I3NF6I3Wnn7g=="
+    }
+  },
+  "results": [
+    {
+      "configuration": {
+        "id": "conventional-450-release",
+        "speed": 450,
+        "conversion": 0,
+        "disturbance": "release",
+        "throttle": 0.48
+      },
+      "finite": true,
+      "early": {
+        "rRms": 0.8051476055078219,
+        "rPeak": 1.2337780493162906,
+        "betaRms": 0.12486678518779303,
+        "schedulerSaturatedFraction": 0.9482470784641068,
+        "rateZeroCrossings": 10
+      },
+      "late": {
+        "rRms": 0.2084298704392432,
+        "rPeak": 0.37207096738252715,
+        "betaRms": 0.0294613706382739,
+        "schedulerSaturatedFraction": 0.795,
+        "rateZeroCrossings": 11
+      },
+      "final": {
+        "time": 23.99999999999928,
+        "r": 0.11534177836975461,
+        "beta": -0.02301535094298093,
+        "scheduler": 1,
+        "rudderPosition": 1,
+        "rudderRad": 0.35059647108660497,
+        "qbar": 197.89673606897384,
+        "speed": 243.444161670539,
+        "roll": 0.03595739549297302,
+        "pitch": 0.46503194910311435,
+        "altitude": 9578.736041266471,
+        "nozzleYaw": 0,
+        "mode": 0,
+        "fbwEnabled": 1,
+        "yawGain": 1,
+        "rudderCmd": 0,
+        "aileronCmd": 0,
+        "elevatorCmd": 0
+      },
+      "bySecond": [
+        {
+          "time": 0,
+          "rRms": 3.2937526583863655e-7,
+          "rPeak": 6.245646776033437e-7,
+          "betaRms": 9.862384442613688e-7,
+          "schedulerSaturatedFraction": 0,
+          "rateZeroCrossings": 0
+        },
+        {
+          "time": 1,
+          "rRms": 0.05538866319844593,
+          "rPeak": 0.121127189471711,
+          "betaRms": 0.007245491194392842,
+          "schedulerSaturatedFraction": 0.15,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 2,
+          "rRms": 0.5766129981425462,
+          "rPeak": 1.0781393945503335,
+          "betaRms": 0.08824243661112395,
+          "schedulerSaturatedFraction": 0.9083333333333333,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 3,
+          "rRms": 0.8602997366122119,
+          "rPeak": 1.2337780493162906,
+          "betaRms": 0.12808539016250328,
+          "schedulerSaturatedFraction": 0.95,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 4,
+          "rRms": 0.8605818289277023,
+          "rPeak": 1.2285094460735049,
+          "betaRms": 0.13494039933410956,
+          "schedulerSaturatedFraction": 0.9495798319327731,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 5,
+          "rRms": 0.8203548423196508,
+          "rPeak": 1.1532074109766044,
+          "betaRms": 0.12854588634458602,
+          "schedulerSaturatedFraction": 0.95,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 6,
+          "rRms": 0.7637565364310771,
+          "rPeak": 1.085387699845224,
+          "betaRms": 0.12027334453985809,
+          "schedulerSaturatedFraction": 0.9416666666666667,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 7,
+          "rRms": 0.7106757240361888,
+          "rPeak": 0.9984248099154603,
+          "betaRms": 0.1112469295979363,
+          "schedulerSaturatedFraction": 0.95,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 8,
+          "rRms": 0.662484852161373,
+          "rPeak": 0.9394949129153548,
+          "betaRms": 0.10537603596197624,
+          "schedulerSaturatedFraction": 0.9333333333333333,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 9,
+          "rRms": 0.6139713365691419,
+          "rPeak": 0.8679523845576169,
+          "betaRms": 0.0969926341837608,
+          "schedulerSaturatedFraction": 0.9333333333333333,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 10,
+          "rRms": 0.5712677306084215,
+          "rPeak": 0.814322952128506,
+          "betaRms": 0.09142822930187154,
+          "schedulerSaturatedFraction": 0.9333333333333333,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 11,
+          "rRms": 0.5285307694769479,
+          "rPeak": 0.752830086711025,
+          "betaRms": 0.08445369720455657,
+          "schedulerSaturatedFraction": 0.9338842975206612,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 12,
+          "rRms": 0.49062579936562034,
+          "rPeak": 0.7034087765342747,
+          "betaRms": 0.07902161287276963,
+          "schedulerSaturatedFraction": 0.9166666666666666,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 13,
+          "rRms": 0.4448012412786477,
+          "rPeak": 0.6512979705807181,
+          "betaRms": 0.0725098718174599,
+          "schedulerSaturatedFraction": 0.9083333333333333,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 14,
+          "rRms": 0.38744439736335,
+          "rPeak": 0.564709965974349,
+          "betaRms": 0.06208513233474548,
+          "schedulerSaturatedFraction": 0.8916666666666667,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 15,
+          "rRms": 0.356457447966135,
+          "rPeak": 0.5188122374669024,
+          "betaRms": 0.05712534838151901,
+          "schedulerSaturatedFraction": 0.8416666666666667,
+          "rateZeroCrossings": 3
+        },
+        {
+          "time": 16,
+          "rRms": 0.33722779412242815,
+          "rPeak": 0.4909072811491161,
+          "betaRms": 0.05276363402036401,
+          "schedulerSaturatedFraction": 0.8833333333333333,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 17,
+          "rRms": 0.31260884429717006,
+          "rPeak": 0.45302826924899847,
+          "betaRms": 0.046421398899200696,
+          "schedulerSaturatedFraction": 0.875,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 18,
+          "rRms": 0.29328230799986227,
+          "rPeak": 0.4142010010571861,
+          "betaRms": 0.04289280452450691,
+          "schedulerSaturatedFraction": 0.8583333333333333,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 19,
+          "rRms": 0.26249915254688055,
+          "rPeak": 0.37207096738252715,
+          "betaRms": 0.035370576953148415,
+          "schedulerSaturatedFraction": 0.85,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 20,
+          "rRms": 0.22499979661172478,
+          "rPeak": 0.32221626053940966,
+          "betaRms": 0.033343499684878646,
+          "schedulerSaturatedFraction": 0.8333333333333334,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 21,
+          "rRms": 0.1918677378283959,
+          "rPeak": 0.29491421212485086,
+          "betaRms": 0.030620247861141883,
+          "schedulerSaturatedFraction": 0.725,
+          "rateZeroCrossings": 3
+        },
+        {
+          "time": 22,
+          "rRms": 0.18303020227934338,
+          "rPeak": 0.26082365285999587,
+          "betaRms": 0.02505559540636977,
+          "schedulerSaturatedFraction": 0.7916666666666666,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 23,
+          "rRms": 0.16544200533010756,
+          "rPeak": 0.23844675331253032,
+          "betaRms": 0.020288239794254693,
+          "schedulerSaturatedFraction": 0.775,
+          "rateZeroCrossings": 2
+        }
+      ]
+    },
+    {
+      "configuration": {
+        "id": "conventional-600-release",
+        "speed": 600,
+        "conversion": 0,
+        "disturbance": "release",
+        "throttle": 0.48
+      },
+      "finite": true,
+      "early": {
+        "rRms": 1.4634010289777033,
+        "rPeak": 2.3553816578991364,
+        "betaRms": 0.22700124018232143,
+        "schedulerSaturatedFraction": 0.9699499165275459,
+        "rateZeroCrossings": 10
+      },
+      "late": {
+        "rRms": 0.15485662009779383,
+        "rPeak": 0.3220413619691042,
+        "betaRms": 0.02113004625293767,
+        "schedulerSaturatedFraction": 0.6166666666666667,
+        "rateZeroCrossings": 12
+      },
+      "final": {
+        "time": 23.99999999999928,
+        "r": -0.011243413655101482,
+        "beta": 0.003469572666655111,
+        "scheduler": -0.13364875203672177,
+        "rudderPosition": -0.13364875203672177,
+        "rudderRad": -0.07520003477605236,
+        "qbar": 143.01257465593162,
+        "speed": 207.1230388406099,
+        "roll": 0.06158393962672147,
+        "pitch": 0.8465325188033429,
+        "altitude": 13381.439821705222,
+        "nozzleYaw": 0,
+        "mode": 0,
+        "fbwEnabled": 1,
+        "yawGain": 1,
+        "rudderCmd": 0,
+        "aileronCmd": 0,
+        "elevatorCmd": 0
+      },
+      "bySecond": [
+        {
+          "time": 0,
+          "rRms": 4.872647222433327e-7,
+          "rPeak": 0.000001046715582220478,
+          "betaRms": 0.0000014588367116508391,
+          "schedulerSaturatedFraction": 0,
+          "rateZeroCrossings": 0
+        },
+        {
+          "time": 1,
+          "rRms": 0.10821104315109417,
+          "rPeak": 0.2776997525550775,
+          "betaRms": 0.009033165119063638,
+          "schedulerSaturatedFraction": 0.2,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 2,
+          "rRms": 1.1181788317797188,
+          "rPeak": 2.098127977646849,
+          "betaRms": 0.14645959459506475,
+          "schedulerSaturatedFraction": 0.95,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 3,
+          "rRms": 1.6777437516432503,
+          "rPeak": 2.3553816578991364,
+          "betaRms": 0.23384181590379294,
+          "schedulerSaturatedFraction": 0.9666666666666667,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 4,
+          "rRms": 1.647130788321296,
+          "rPeak": 2.3504569594560563,
+          "betaRms": 0.25686614298876054,
+          "schedulerSaturatedFraction": 0.9747899159663865,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 5,
+          "rRms": 1.4861131701855763,
+          "rPeak": 2.1397069145234604,
+          "betaRms": 0.2393930239144383,
+          "schedulerSaturatedFraction": 0.975,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 6,
+          "rRms": 1.2885610176485904,
+          "rPeak": 1.8745235669561398,
+          "betaRms": 0.21153414296658624,
+          "schedulerSaturatedFraction": 0.9666666666666667,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 7,
+          "rRms": 1.1470351147343698,
+          "rPeak": 1.6520601408854092,
+          "betaRms": 0.18721728954887473,
+          "schedulerSaturatedFraction": 0.9666666666666667,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 8,
+          "rRms": 0.9977081559219185,
+          "rPeak": 1.456955247774318,
+          "betaRms": 0.16558133463502067,
+          "schedulerSaturatedFraction": 0.9583333333333334,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 9,
+          "rRms": 0.86303429788199,
+          "rPeak": 1.243005778066374,
+          "betaRms": 0.14040432042022694,
+          "schedulerSaturatedFraction": 0.95,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 10,
+          "rRms": 0.7730863129432812,
+          "rPeak": 1.1198961969578585,
+          "betaRms": 0.12728419151653916,
+          "schedulerSaturatedFraction": 0.95,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 11,
+          "rRms": 0.672347340729229,
+          "rPeak": 0.972561618326867,
+          "betaRms": 0.1101925976131583,
+          "schedulerSaturatedFraction": 0.9338842975206612,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 12,
+          "rRms": 0.6027663250206723,
+          "rPeak": 0.8700740682078392,
+          "betaRms": 0.09872750152724429,
+          "schedulerSaturatedFraction": 0.9333333333333333,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 13,
+          "rRms": 0.5299346220319231,
+          "rPeak": 0.7655046213909474,
+          "betaRms": 0.08677176984246478,
+          "schedulerSaturatedFraction": 0.9333333333333333,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 14,
+          "rRms": 0.4471010691576555,
+          "rPeak": 0.6559085434253343,
+          "betaRms": 0.07351223633567383,
+          "schedulerSaturatedFraction": 0.9083333333333333,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 15,
+          "rRms": 0.38501179091902815,
+          "rPeak": 0.5636066161299401,
+          "betaRms": 0.0622730397517596,
+          "schedulerSaturatedFraction": 0.9,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 16,
+          "rRms": 0.34046781801188597,
+          "rPeak": 0.5039285628553546,
+          "betaRms": 0.05507807880077767,
+          "schedulerSaturatedFraction": 0.875,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 17,
+          "rRms": 0.29112042124126536,
+          "rPeak": 0.4334128332070143,
+          "betaRms": 0.0463504553978632,
+          "schedulerSaturatedFraction": 0.825,
+          "rateZeroCrossings": 3
+        },
+        {
+          "time": 18,
+          "rRms": 0.2523473968725366,
+          "rPeak": 0.37394718725503767,
+          "betaRms": 0.03790087179626998,
+          "schedulerSaturatedFraction": 0.8416666666666667,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 19,
+          "rRms": 0.2232629951670989,
+          "rPeak": 0.3220413619691042,
+          "betaRms": 0.030593762341705865,
+          "schedulerSaturatedFraction": 0.825,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 20,
+          "rRms": 0.18485346555449791,
+          "rPeak": 0.2705157337655786,
+          "betaRms": 0.024776926581381854,
+          "schedulerSaturatedFraction": 0.8,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 21,
+          "rRms": 0.13460078944538575,
+          "rPeak": 0.21117206842560704,
+          "betaRms": 0.0205808258604628,
+          "schedulerSaturatedFraction": 0.6333333333333333,
+          "rateZeroCrossings": 3
+        },
+        {
+          "time": 22,
+          "rRms": 0.11888038997552355,
+          "rPeak": 0.1762362081844076,
+          "betaRms": 0.01394392836468761,
+          "schedulerSaturatedFraction": 0.675,
+          "rateZeroCrossings": 2
+        },
+        {
+          "time": 23,
+          "rRms": 0.06029739266350231,
+          "rPeak": 0.10973069398641093,
+          "betaRms": 0.008032207472309628,
+          "schedulerSaturatedFraction": 0.15,
+          "rateZeroCrossings": 3
+        }
+      ]
+    }
+  ],
+  "retainedMetadata": "Scratch output directory omitted; measurements, source hashes and installed SDK identity unchanged."
+}

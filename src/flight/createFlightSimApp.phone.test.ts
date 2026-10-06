@@ -10,7 +10,7 @@ const mocks = vi.hoisted(() => {
   const phoneControls = { elevator: -0.4, aileron: 0.6, rudder: 0.5, throttle: 0.83, pitchTrim: -0.2, rollTrim: 0.15, flaps: 1 / 3, brake: 1 };
   const phone = {
     subscribe: vi.fn(() => vi.fn()), getSnapshot: () => snapshot,
-    beforeStep: vi.fn(), takeControl: vi.fn(), cancelHandoff: vi.fn(), reset: vi.fn(),
+    beforeStep: vi.fn(), takeControl: vi.fn(), cancelHandoff: vi.fn(), reset: vi.fn(), isStarterHeld: vi.fn(() => false),
     takeCameraAim: vi.fn(() => null as { yaw: number; pitch: number; zoom?: number } | null),
     isCameraActive: vi.fn(() => false),
     hasPendingCameraAim: vi.fn(() => false),
@@ -23,7 +23,9 @@ const mocks = vi.hoisted(() => {
     resetLocation: vi.fn(() => state),
     sdk: {
       setPropertyValue: vi.fn(), run: vi.fn(),
-      getPropertyValue: vi.fn((property: string) => property === "fcs/throttle-cmd-norm" ? 0.65 : property === "gear/gear-cmd-norm" ? 1 : 0),
+      // The engine runs, as a flight starts: an engine that is off holds the throttle at idle.
+      getPropertyValue: vi.fn((property: string) => property === "fcs/throttle-cmd-norm" ? 0.65 : property === "gear/gear-cmd-norm" ? 1
+        : property.endsWith("/set-running") ? 1 : 0),
     }, disposeSdk: vi.fn(),
     runtime: {
       renderer: { mode: "webgl2" }, status: { mode: "fallback" }, scene: {},
@@ -35,6 +37,7 @@ const mocks = vi.hoisted(() => {
       isStreamingTiles: () => false,
       onTilesStreamingChange: vi.fn(() => () => {}),
       onRasterDetailFeedback: vi.fn(() => () => {}),
+      onDetailAdjusted: vi.fn(() => () => {}),
       getRasterDetailFeedback: vi.fn(() => null),
       setRasterDetailTarget: vi.fn(),
       setGoogleTerrainDetailTarget: vi.fn(),
@@ -45,13 +48,13 @@ const mocks = vi.hoisted(() => {
       orbitChaseCamera: vi.fn(), zoomChaseCamera: vi.fn(), modelRoot: {}, setModelLoaded: vi.fn(), getChaseDistanceMeters: () => 14,
       thirdPersonCamera: { position: { y: 2.2, length: () => Math.hypot(2.2, 14) } },
     },
-    aircraftModel: { getState: () => ({ status: "ready" }), getRig: () => null, setAircraft: vi.fn(), setLod: vi.fn(), refreshAutoLod: vi.fn(), dispose: vi.fn() },
+    aircraftModel: { getState: () => ({ status: "ready" }), getRig: () => null, setAircraft: vi.fn(), setLod: vi.fn(), setRenderStowedGear: vi.fn(), updateGearVisibility: vi.fn(), refreshAutoLod: vi.fn(), dispose: vi.fn() },
     terrainContact: { update: vi.fn(() => true), reset: vi.fn() },
     visibleMeshCollision: { update: vi.fn(() => false), reset: vi.fn() },
     physics: {
       reset: vi.fn(), setPaused: vi.fn(), update: vi.fn(), getLatestState: () => state, getFault: () => null,
     },
-    createHud: vi.fn(() => ({ update: vi.fn(), destroy: vi.fn() })),
+    createHud: vi.fn(() => ({ update: vi.fn(), refreshFlaps: vi.fn(), destroy: vi.fn() })),
     createPanel: vi.fn(() => ({ update: vi.fn(), openOrSelectTab: vi.fn(), toggleTab: vi.fn(), destroy: vi.fn() })),
     createHudBar: vi.fn(() => ({ update: vi.fn(), destroy: vi.fn() })),
   };
@@ -75,7 +78,7 @@ vi.mock("./bridge/ecefBridge", () => ({ readFlightState: () => mocks.state }));
 vi.mock("./bridge/floatingOrigin", () => ({ createFloatingOrigin: () => ({ aircraftRoot: { setEnabled: vi.fn() }, apply: vi.fn(), dispose: vi.fn() }) }));
 vi.mock("./aircraft/createPlaceholderAircraft", () => ({ createPlaceholderAircraft: () => mocks.aircraft }));
 vi.mock("./aircraft/createAircraftModel", () => ({ createAircraftModel: () => mocks.aircraftModel }));
-vi.mock("./aircraft/aircraftAnimation", () => ({ applyAircraftRig: vi.fn(), readControlSurfaceState: vi.fn() }));
+vi.mock("./aircraft/aircraftAnimation", () => ({ applyAircraftRig: vi.fn(), readControlSurfaceState: vi.fn(() => ({ gearDownNorm: 1 })) }));
 vi.mock("./physics/fixedStepLoop", () => ({ FIXED_DT: 1 / 120, createFixedStepPhysicsLoop: () => mocks.physics }));
 vi.mock("./physics/terrainContact", () => ({ createTerrainContact: () => mocks.terrainContact }));
 vi.mock("./physics/visibleMeshCollision", () => ({ createVisibleMeshCollision: () => mocks.visibleMeshCollision }));
@@ -87,7 +90,7 @@ vi.mock("./jsbsim/resetFlightLocation", () => ({ resetFlightLocation: mocks.rese
 vi.mock("./remote/createPhoneControlSession", () => ({ createPhoneControlSession: mocks.createPhoneSession }));
 vi.mock("./hud/createPhonePairingPanel", () => ({ createPhonePairingPanel: mocks.createPairingPanel }));
 
-import { resetAppSettings } from "foss-earth/settings";
+import { getAppSettings, resetAppSettings } from "foss-earth/settings";
 import { createFlightSimApp } from "./createFlightSimApp";
 
 let app: Awaited<ReturnType<typeof createFlightSimApp>> | null = null;
@@ -145,6 +148,26 @@ function grant() {
 }
 
 describe("0SFS phone integration", () => {
+  it("keeps Auto flaps through unchanged phone packets as actual travel changes, then yields to fresh phone input", async () => {
+    const previousRead = mocks.sdk.getPropertyValue.getMockImplementation()!;
+    let actual = 0;
+    mocks.sdk.getPropertyValue.mockImplementation(property => property === "fcs/flap-pos-deg" ? actual * 30 : previousRead(property));
+    try {
+      await mount(); grant();
+      for (const position of [0.4, 0.6]) {
+        actual = position; tick(1 / 60);
+        expect(getAppSettings().get("osfs.assist.autoFlaps")).toBe(true);
+        expect(mocks.snapshot.owner).toBe("phone");
+      }
+      mocks.phone.beforeStep.mockImplementation(() => ({ ...mocks.phoneControls, flaps: 0.8 }));
+      tick(1 / 60);
+      expect(getAppSettings().get("osfs.assist.autoFlaps")).toBe(false);
+      expect(mocks.sdk.setPropertyValue).toHaveBeenCalledWith("fcs/flap-cmd-norm", 0.8);
+      expect(mocks.snapshot.owner).toBe("phone");
+      expect(mocks.phone.takeControl).not.toHaveBeenCalled();
+    } finally { mocks.sdk.getPropertyValue.mockImplementation(previousRead); }
+  });
+
   it("makes the phone session only when the Remote Control tab asks, once, and leaves flight unchanged", async () => {
     await mount(false);
     expect(mocks.createPhoneSession).not.toHaveBeenCalled();
@@ -184,6 +207,7 @@ describe("0SFS phone integration", () => {
 
   it("selects fresh phone controls directly at the SDK boundary and keeps their applied settings for takeover", async () => {
     await mount();
+    getAppSettings().set("osfs.assist.autoFlaps", false);
     grant();
     tick(1 / 60);
     expect(mocks.sdk.setPropertyValue).toHaveBeenCalledWith("fcs/elevator-cmd-norm", -0.4);
@@ -284,11 +308,19 @@ describe("0SFS phone integration", () => {
     tick(1 / 60);
     // The mocked model publishes nothing readable, so the phase is still a
     // label and every number is absent rather than a zero the phone would show.
-    expect(options.getStatus().engine).toEqual({ phase: expect.stringMatching(/^[A-Z][A-Z ]*$/) });
+    // What the throttle lever needs comes with it: the engine runs, so the
+    // phone's lever offers the shutdown hold rather than a start.
+    expect(options.getStatus().engine).toEqual({
+      phase: expect.stringMatching(/^[A-Z][A-Z ]*$/), state: "running", start: 1,
+      kind: "piston", maxRpm: 2700,
+      rotorBlades: { outer: 2, inner: null, outerEstimated: false, innerEstimated: false },
+      orbs: { fps: 30, turnsPerSecond: 2, pixelRatio: 2, renderer: "auto" },
+    });
   });
 
   it("adopts reset state and clears a held local key before a general reposition", async () => {
     await mount();
+    getAppSettings().set("osfs.assist.autoFlaps", false);
     grant(); tick(1 / 60);
     window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyW" }));
     tick(0.1);

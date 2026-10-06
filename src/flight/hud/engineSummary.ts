@@ -1,9 +1,10 @@
 import "./engineMonitor.css";
-import type { EnginePhase, EnginePhaseReading, EngineSample } from "./engineMonitorModel";
+import type { EngineKind, EnginePhase, EnginePhaseReading, EngineSample } from "./engineMonitorModel";
+import type { EngineRotorBladeCounts } from "../aircraft/engineRotorDefinitions";
 
 /**
- * The engine monitor's compact face — fuel flow, the N1 ring around the N2
- * core with thrust, and the phase — as a piece of DOM with no model behind it.
+ * The engine monitor's compact face — fuel flow, turbine N1/N2 and thrust or
+ * one piston RPM ring, and the phase — as a piece of DOM with no model behind it.
  * The desktop HUD feeds it from JSBSim through the monitor; the phone
  * controller feeds it from a status frame. One widget, one stylesheet, so the
  * two screens cannot drift into showing the engine two different ways.
@@ -13,6 +14,12 @@ export type FuelFlowUnit = "lb/h" | "gal/h";
 
 /** What the summary draws. `null` is "the model does not publish this", never zero. */
 export interface EngineSummaryView {
+  kind?: EngineKind | null;
+  rotorBlades?: EngineRotorBladeCounts;
+  simTimeS?: number | null;
+  maxN1Pct?: number | null;
+  maxN2Pct?: number | null;
+  maxRpm?: number | null;
   /** Drives the phase colour. Null for a label this build does not know, which stays neutral. */
   phase: EnginePhase | null;
   label: string;
@@ -27,10 +34,12 @@ export interface EngineSummaryView {
 export interface EngineSummary {
   /** Fuel flow over the spool ring over the phase. */
   diagram: HTMLElement;
-  /** The piston engine's RPM and thrust line, beside the diagram. */
+  /** Additional values when an engine type is not known. */
   values: HTMLElement;
   /** The fuel flow readout. The host decides what a tap on it does. */
   flow: HTMLElement;
+  /** Ring host for the GPU orb renderer; numeric DOM remains independent of it. */
+  spools: HTMLElement;
   render(view: EngineSummaryView, flowUnit: FuelFlowUnit): void;
 }
 
@@ -41,6 +50,12 @@ const LB_PER_US_GAL = 6.7;
 
 export function engineSummaryView(sample: EngineSample, phase: EnginePhaseReading): EngineSummaryView {
   return {
+    kind: sample.kind,
+    rotorBlades: sample.rotorBlades,
+    simTimeS: sample.simTimeS,
+    maxN1Pct: sample.maxN1Pct,
+    maxN2Pct: sample.maxN2Pct,
+    maxRpm: sample.maxRpm,
     phase: phase.phase,
     label: phase.label,
     n1Pct: sample.n1Pct,
@@ -50,6 +65,44 @@ export function engineSummaryView(sample: EngineSample, phase: EnginePhaseReadin
     fuelFlowPph: sample.fuelFlowPps === null ? null : sample.fuelFlowPps * SECONDS_PER_HOUR,
     fuelFlowGph: sample.fuelFlowGph,
   };
+}
+
+function summaryKind(view: EngineSummaryView): EngineKind | null {
+  return view.kind ?? (view.rpm !== null ? "piston"
+    : view.n1Pct !== null || view.n2Pct !== null ? "turbine" : null);
+}
+
+/** One visible marker per blade in a representative rotating row, never a stage total. */
+export function engineRotorDescription(view: EngineSummaryView): string {
+  const blades = view.rotorBlades;
+  if (!blades) return "Blade counts unavailable; numeric readouts only.";
+  const count = (value: number, estimated: boolean): string => `${value}${estimated ? " (estimated)" : ""}`;
+  if (summaryKind(view) === "piston") {
+    return `One marker per propeller blade: ${count(blades.outer, blades.outerEstimated)}.`;
+  }
+  return `One marker per blade: N1 fan row ${count(blades.outer, blades.outerEstimated)}`
+    + (blades.inner === null ? "." : `; N2 core compressor rotor ${count(blades.inner, blades.innerEstimated)}.`)
+    + " Each count represents a single rotor, not all stages.";
+}
+
+/**
+ * A shared maximum for both turbine percentages preserves their displayed
+ * ratio. JSBSim's percentages do not provide physical shaft RPM, so the
+ * visualization describes the model's percent speed, not true N1:N2 RPM.
+ * Without a valid native limit the ring stays still rather than inventing it.
+ */
+export function engineRotorSpeeds(view: EngineSummaryView): { outer: number; inner: number | null } {
+  const ratio = (value: number | null, maximum: number | null | undefined): number =>
+    value !== null && Number.isFinite(value) && maximum != null && Number.isFinite(maximum) && maximum > 0
+      ? Math.min(1, Math.max(0, value / maximum)) : 0;
+  const kind = summaryKind(view);
+  if (kind === "piston") return { outer: ratio(view.rpm, view.maxRpm), inner: null };
+  if (kind !== "turbine") return { outer: 0, inner: null };
+  const { maxN1Pct, maxN2Pct } = view;
+  const maximum = maxN1Pct != null && Number.isFinite(maxN1Pct) && maxN1Pct > 0
+    && maxN2Pct != null && Number.isFinite(maxN2Pct) && maxN2Pct > 0
+    ? Math.max(maxN1Pct, maxN2Pct) : null;
+  return { outer: ratio(view.n1Pct, maximum), inner: ratio(view.n2Pct, maximum) };
 }
 
 function element<K extends keyof HTMLElementTagNameMap>(
@@ -159,6 +212,11 @@ export function createEngineSummary(): EngineSummary {
   const n1Readout = element("span", "flight-engine__spool-n1");
   n1Readout.append(n1Label, n1Value, n1Unit);
   n1Ring.append(thrustReadout, n2Core, n1Readout);
+  const rpmCore = element("span", "flight-engine__rpm");
+  const rpmValue = element("span", "flight-engine__spool-value", "—");
+  rpmCore.append(rpmValue, element("span", "flight-engine__spool-label", "RPM"));
+  rpmCore.hidden = true;
+  n1Ring.append(rpmCore);
   spools.append(n1Ring);
   const diagram = element("span", "flight-engine__diagram");
   const flow = element("span", "flight-engine__flow");
@@ -205,19 +263,33 @@ export function createEngineSummary(): EngineSummary {
     diagram,
     values,
     flow,
+    spools,
     render(view, unit) {
       phaseChip.textContent = view.label;
       if (view.phase === null) delete phaseChip.dataset.phase;
       else phaseChip.dataset.phase = view.phase;
-      const turbine = view.n1Pct !== null && view.n2Pct !== null;
-      spools.hidden = !turbine;
+      const kind = summaryKind(view);
+      const turbine = kind === "turbine";
+      const piston = kind === "piston";
+      spools.hidden = kind === null;
+      spools.dataset.kind = kind ?? "unknown";
+      n1Readout.hidden = !turbine;
+      n2Core.hidden = !turbine;
+      thrustReadout.hidden = !turbine;
+      rpmCore.hidden = !piston;
       if (turbine) {
-        n1Value.textContent = formatSpoolPct(view.n1Pct!);
-        n2Value.textContent = formatSpoolPct(view.n2Pct!);
+        n1Value.textContent = view.n1Pct === null ? "—" : formatSpoolPct(view.n1Pct);
+        n2Value.textContent = view.n2Pct === null ? "—" : formatSpoolPct(view.n2Pct);
         thrustValue.textContent = view.thrustLbf === null ? "0000" : formatThrustLbf(view.thrustLbf);
-        spools.title = `N1 ${formatSpoolPct(view.n1Pct!)}% · N2 ${formatSpoolPct(view.n2Pct!)}%`
-          + (view.thrustLbf === null ? "" : ` · thrust ${Math.round(view.thrustLbf)} lbf`);
+        spools.title = `N1 ${n1Value.textContent}% · N2 ${n2Value.textContent}%`
+          + (view.thrustLbf === null ? "" : ` · thrust ${Math.round(view.thrustLbf)} lbf`)
+          + " · Orb motion: scaled model percent speed, not physical shaft RPM. " + engineRotorDescription(view);
         packSpoolRingOnce();
+      } else if (piston) {
+        rpmValue.textContent = view.rpm === null ? "—" : Math.round(view.rpm).toString();
+        spools.title = `${rpmValue.textContent} RPM · Orb motion: scaled shaft speed`
+          + (view.maxRpm != null && view.maxRpm > 0 ? `, maximum ${view.maxRpm} RPM.` : ", maximum unavailable.")
+          + " " + engineRotorDescription(view);
       }
       const hasFlow = view.fuelFlowPph !== null || view.fuelFlowGph !== null;
       flow.hidden = !hasFlow;
@@ -233,8 +305,7 @@ export function createEngineSummary(): EngineSummary {
         }
       }
       const parts: string[] = [];
-      if (!turbine && view.rpm !== null) parts.push(`RPM ${view.rpm.toFixed(0)}`);
-      if (!turbine && view.thrustLbf !== null) parts.push(`THR ${Math.round(view.thrustLbf)} lbf`);
+      if (kind === null && view.thrustLbf !== null) parts.push(`THR ${Math.round(view.thrustLbf)} lbf`);
       values.hidden = parts.length === 0;
       values.textContent = parts.join("  ");
     },

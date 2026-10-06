@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   createTransitionLog, deriveEnginePhase, discoverReadableProperties, discreteEngineState, formatRowValue,
   formatValue, tankRows, type EngineSample,
+  readEngineSample, enginePropertyApplies,
 } from "./engineMonitorModel";
 
 const sample = (overrides: Partial<EngineSample> = {}): EngineSample => ({
@@ -11,6 +12,27 @@ const sample = (overrides: Partial<EngineSample> = {}): EngineSample => ({
 });
 
 describe("engine catalog discovery", () => {
+  it("uses aircraft engine type even if unrelated consumers create turbine nodes on a piston model", () => {
+    const values: Record<string, number> = {
+      "propulsion/engine/n1": 87, "propulsion/engine/n2": 92,
+      "propulsion/engine/engine-rpm": 1350, "propulsion/engine/MaxN1": 100,
+      "propulsion/engine/MaxN2": 110, "propulsion/engine/set-running": 1,
+    };
+    const reader = { getPropertyValue: (path: string) => values[path] ?? 0 };
+    const available = new Set(Object.keys(values));
+    const rotorBlades = { outer: 2, inner: null, outerEstimated: false, innerEstimated: false };
+    const piston = readEngineSample(reader, available, { kind: "piston", maxRpm: 2700, rotorBlades });
+    expect(piston).toMatchObject({ kind: "piston", rpm: 1350, maxRpm: 2700, n1Pct: null, n2Pct: null,
+      maxN1Pct: null, maxN2Pct: null, rotorBlades });
+    expect(deriveEnginePhase(piston)).toMatchObject({ phase: "running", derived: false });
+    expect(enginePropertyApplies("propulsion/engine/n1", { kind: "piston" })).toBe(false);
+    expect(enginePropertyApplies("propulsion/engine/engine-rpm", { kind: "piston" })).toBe(true);
+    expect(readEngineSample(reader, available, { kind: "turbine" })).toMatchObject({
+      kind: "turbine", rpm: null, n1Pct: 87, n2Pct: 92, maxN1Pct: 100, maxN2Pct: 110,
+    });
+    expect(readEngineSample(reader, available, { kind: "turbine" }).rotorBlades).toBeUndefined();
+  });
+
   it("lists every readable property under the queried prefixes and skips write-only ones", () => {
     const catalog: Record<string, string> = {
       propulsion: "propulsion/engine/n1 (RW)\npropulsion/set-running (W)\npropulsion/tank/contents-lbs (RW)\n",

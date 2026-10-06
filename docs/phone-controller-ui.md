@@ -25,6 +25,8 @@ rule that re-solves a solved problem.
 | [`src/remote/PhoneViewSwitch.tsx`](../src/remote/PhoneViewSwitch.tsx), [`PhoneIcons.tsx`](../src/remote/PhoneIcons.tsx) | The cockpit/chase switch, and its icons, drawn for this page |
 | [`src/remote/PhoneEngine.tsx`](../src/remote/PhoneEngine.tsx) | The desktop's engine widget, fed from the status frame |
 | [`src/flight/hud/engineSummary.ts`](../src/flight/hud/engineSummary.ts) | That widget's DOM and drawing, shared with the desktop engine monitor |
+| [`src/remote/PhoneThrottle.tsx`](../src/remote/PhoneThrottle.tsx) | The desktop's throttle lever, fed from this phone's throttle and the status frame |
+| [`src/flight/hud/throttleLever.ts`](../src/flight/hud/throttleLever.ts) | That lever's DOM, drawing and gestures, engine start and shutdown included, shared with the desktop HUD |
 | [`src/remote/useFullscreenOffer.ts`](../src/remote/useFullscreenOffer.ts), [`PhoneFullscreenPrompt.tsx`](../src/remote/PhoneFullscreenPrompt.tsx) | The fullscreen popup and the ⛶ button |
 | [`src/remote/fullscreenMessage.tsx`](../src/remote/fullscreenMessage.tsx) | The iPhone notice's words, and nothing else |
 | [`src/remote/phonePopup.css`](../src/remote/phonePopup.css) | The popup card, shared with the flight page's iPhone notice |
@@ -202,8 +204,8 @@ in pixels moved, so the pad's shape never changes what it means.
 
 ### The engine
 
-The phone shows **the desktop HUD's own engine widget** — fuel flow, the N1 ring
-around the N2 core with thrust, and the phase — not a phone rendition of it.
+The phone shows **the desktop HUD's own engine widget** — fuel flow, turbine
+N1/N2 and thrust or a piston RPM ring, and the phase.
 [`engineSummary.ts`](../src/flight/hud/engineSummary.ts) is that widget as DOM
 with no model behind it: the desktop monitor feeds it from JSBSim, and
 [`PhoneEngine`](../src/remote/PhoneEngine.tsx) feeds it from the `engine` field of
@@ -218,6 +220,32 @@ label the phone does not know still prints, uncoloured. Tapping the fuel flow
 switches pounds and gallons per hour, as clicking it does on the desktop. There
 is no Engine tab on the phone, so the rest of the widget is a readout.
 
+Both surfaces show the C172 as one RPM circle and the jets as N1 outside N2.
+The aircraft's engine type decides which gauges exist; stray turbine property
+nodes cannot turn the C172 into an N1/N2 display. Their orbiting dots share the
+same GPU renderer: WebGPU when available, then WebGL2 and WebGL1 in Auto.
+The status frame carries the desktop's renderer preference, frame-rate and
+resolution budgets, visual speed, native maximum percentages or piston RPM,
+and simulation time. Turbine motion is explicitly **scaled model percent
+speed**, because the models do not publish physical shaft RPM; the larger of
+MaxN1 and MaxN2 is the shared display maximum. The C172 uses the 2700 RPM
+`maxrpm` in its engine XML. Missing limits leave the dots still.
+
+Each rotor now shows one equal-size marker per blade, with no secondary small
+dots. The status carries each rotor's blade count and whether it is estimated;
+tooltips use those same flags on both screens. Missing counts allocate no orb
+backend. Counts and their source limits are documented under
+[Engine shaft indicators](proposals/flight-settings.md#engine-shaft-indicators).
+Both shafts share a reduced visual speed limit when necessary to allow four
+configured frames per blade pitch; this keeps a dense repeated pattern readable
+without changing the numeric instrument readings.
+
+The phone interpolates only simulation time it has already received, with at
+most one heartbeat (50 ms) of display delay. That short animation ends when it
+catches up, and pause, hidden-page state, zero speed or disabled dots keep it
+from scheduling a continuing animation. A lost connection cannot leave dots
+spinning on predicted time. The desktop uses its existing update loop.
+
 It sits just above the throttle it answers to, and it is both wider than the
 throttle and taller than yaw. Given a grid cell of its own it made both sliders
 that thick, so it sits over the group's top-right corner instead and **notches
@@ -227,6 +255,31 @@ that shape because a swipe is measured in pixels moved, not as a position within
 a rectangle. The widget's box is fixed (`--phone-engine-width`,
 `--phone-engine-height`) because the pieces around it are laid out against it.
 A host that sends no engine leaves the throttle its whole column.
+
+### The throttle lever
+
+The throttle is **the desktop HUD's own lever** too, behaviour as well as look:
+[`throttleLever.ts`](../src/flight/hud/throttleLever.ts) builds it and handles every
+gesture, the HUD mounts it in its throttle box, and
+[`PhoneThrottle`](../src/remote/PhoneThrottle.tsx) mounts the same code in the
+phone's. A change to how the lever behaves lands on both screens at once.
+
+It also starts and stops the engine. Engine off, it rests at idle, reads OFF and
+will not move; pressing and holding it anywhere holds the starter, a ring round
+the handle fills as the engine spools, and it can be dragged up meanwhile. Letting
+go before the engine runs abandons the start and the lever drops back to idle.
+Engine running, holding the handle at idle without moving fills a red ring, and
+when the ring closes the engine shuts down; moving first cancels it. Space or
+Enter held on the focused lever does the same as holding the pointer on it.
+
+The engine itself is the computer's, so only the intents cross over: the phone
+puts `starter: 1` on its control frames while it holds the lever and sends a
+`shutdownEngine` action when the ring closes; the status frame's engine `state`,
+`start` and `blocked` tell its lever what to draw. The desktop's
+[`engineControl.ts`](../src/flight/jsbsim/engineControl.ts) turns both screens'
+intents into JSBSim's starter, cutoff and magneto commands, and holds the
+throttle at idle while the engine is off. A host that sends no `state` gets a
+plain throttle.
 
 ### Fullscreen
 

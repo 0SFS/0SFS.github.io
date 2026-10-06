@@ -10,7 +10,7 @@
 // WebAssembly.Module arrives by postMessage and is instantiated synchronously.
 
 /** Kept in sync with ../audioSnapshot.ts by audioSnapshot.test.ts. */
-const SNAPSHOT_SIZE = 30;
+const SNAPSHOT_SIZE = 33;
 const EVENT_SIZE = 4;
 const EVENT_CAPACITY = 32;
 const BATCH_SNAPSHOTS = 8;
@@ -116,6 +116,10 @@ class OsfsDspProcessor extends AudioWorkletProcessor {
   applyGains(gains) {
     const airframe = typeof gains.airframe === "number" ? gains.airframe : gains.engine;
     this.exports.osfs_audio_set_gains(gains.master, gains.engine, gains.tire, airframe, gains.reducedRange);
+    // A separate runtime control keeps native augmentation and engine setup
+    // intact. The core smooths this gain without restarting the voice.
+    this.exports.osfs_audio_set_afterburner_volume(
+      typeof gains.afterburner === "number" ? gains.afterburner : 1);
   }
 
   /** Setup only: fixed size, no allocation or memory growth in the DSP. */
@@ -145,7 +149,13 @@ class OsfsDspProcessor extends AudioWorkletProcessor {
         if (this.exports) this.applyGains(message); else this.pendingGains = message;
         return;
       case "profile":
-        if (this.exports) this.applyProfile(message.values); else this.pendingProfile = message.values;
+        if (this.exports) {
+          try { this.applyProfile(message.values); } catch (error) {
+            this.failure = String((error && error.message) || error);
+            this.ready = false;
+            this.port.postMessage({ type: "failed", reason: this.failure });
+          }
+        } else this.pendingProfile = message.values;
         return;
       case "tier":
         if (this.exports) this.exports.osfs_audio_set_tier(message.tier);
@@ -184,7 +194,7 @@ class OsfsDspProcessor extends AudioWorkletProcessor {
           new Float32Array(this.exports.memory.buffer, pointer, message.frames)
             .set(new Float32Array(message.samples));
         }
-        this.port.postMessage({ type: "band", index: message.index, accepted: Boolean(pointer) });
+        this.port.postMessage({ type: "band", requestId: message.requestId, index: message.index, accepted: Boolean(pointer) });
         return;
       }
       case "bandClear":

@@ -1,0 +1,34 @@
+{
+  "archive": {
+    "path": "lockheed-martin-f-35b-lightning-ii.zip",
+    "bytes": 3629352,
+    "sha256": "cf911903184c5b313e06afdcf9a5b1691ae64b64aa7e5068cc9214894e926859"
+  },
+  "files": [
+    {
+      "path": "source/f35-full.blend",
+      "bytes": 2733724,
+      "sha256": "a0a24011e0c9905e5e1da01b08f5ca78df3aaa5d97d08b312ec26744a19a69e6"
+    },
+    {
+      "path": "textures/cp-warning.png",
+      "bytes": 5771,
+      "sha256": "cbfb0f5f386cf958262607b66ecb434c2b30a736308101652971b67a6e423639"
+    },
+    {
+      "path": "textures/texture_0.jpg",
+      "bytes": 371796,
+      "sha256": "18ded4aa10413bc3a156df114abbd35c35ee1b929e49afbf76681cf4d85091d8"
+    },
+    {
+      "path": "textures/panel.jpg",
+      "bytes": 404623,
+      "sha256": "14869704df01c424d23613acfdc9687542bc2abcf5e8a695bf1015fc12c62bc3"
+    },
+    {
+      "path": "textures/f35-specular.png",
+      "bytes": 112818,
+      "sha256": "bee501a84a88b0fd9b60e1f203562854aa852f98f95177e3ca9d596664225073"
+    }
+  ]
+}

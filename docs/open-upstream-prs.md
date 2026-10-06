@@ -226,10 +226,16 @@ silently retained as the final design.
 - [ ] Rebase the public stack so #1508 sits on the repaired #1505 rather than
       carrying a fix-up commit, when a publication operation is authorized.
       The stage 2 report names the exact commits it should carry.
-- [ ] Recheck the app's reset, bootstrap and restore sequences on a later
-      identified integration candidate. `InitRunning()` and the existing #1505
-      tests were rechecked as part of the #1505 repair; the installed fork.7
-      package still contains the defect.
+- [x] Rechecked the app's reset, bootstrap and restore sequences on the
+      identified fork.8 integration on 2026-10-05 with the local off-engine
+      repairs. Full app CI passed 1,312 tests across 133 files, typecheck,
+      lint, production build and emitted artifact verification.
+      `InitRunning()` and the existing #1505 tests were rechecked as part of
+      the #1505 repair. The previous fork.7 package
+      contains the defect and remains available for rollback. Current
+      downstream checks are recorded in the
+      [fork.8 adoption record](../validation/evidence/jsbsim/adoption/fork8-adoption.json);
+      installation does not update the published PR stack.
 
 ### #1505: Sean's trim-phase comment (2026-09-14)
 

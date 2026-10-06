@@ -193,7 +193,13 @@ is a pinch ratio bounded to `[0.5, 2]` per frame. The desktop sums the frames it
 the total once per rendered frame, so a dropped frame costs that frame's movement and nothing more. The status frame carries the desktop's engine reading the same way, in an
 optional `engine` field — a `phase` label plus `n1`, `n2`, `rpm`, `thrustLbf`, `fuelFlowPph` and
 `fuelFlowGph`, everything the HUD's engine widget draws, each absent rather than zero when the flight
-model does not publish it. Local pointer processing clamps to these ranges; network validation rejects invalid values rather than repairing malformed input. Frame size is at most **2 KiB UTF-8 JSON**. Unknown message types, invalid sessions, and unsafe/noninteger/negative counters are rejected.
+model does not publish it. Three more fields carry engine start and shutdown, all additive on v1. The
+status's `engine.state` (`running`, `starting` or `stopped`), with `start` (the start's progress, 0 to 1)
+and an optional short `blocked` reason, is what the phone's throttle lever draws and offers; a host that
+sends no `state` gets a plain throttle. A control frame carries `starter: 1` while the phone holds that
+lever to start the engine — a held control like the brake, so the starter lets go with the frames — and
+the `shutdownEngine` action, with no value, asks the desktop to shut it down once the ring at idle
+closes. Local pointer processing clamps to these ranges; network validation rejects invalid values rather than repairing malformed input. Frame size is at most **2 KiB UTF-8 JSON**. Unknown message types, invalid sessions, and unsafe/noninteger/negative counters are rejected.
 
 Sequence starts at zero for each new epoch and increases for every transmitted snapshot. Keep only frames newer than the last accepted sequence; reset the counter with a new epoch before exhausting safe integer range. Old epochs, duplicates, and reordered frames cannot alter controls or refresh freshness.
 

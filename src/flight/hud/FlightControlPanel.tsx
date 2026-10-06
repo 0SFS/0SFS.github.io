@@ -1,6 +1,7 @@
 import "foss-earth/windowing.css";
 
-import { createParameterSection, WindowOverlay, type PanelSection, type WindowOverlayHandle } from "foss-earth/shell";
+import { createParameterSection, MeshInspectorPanel, WindowOverlay, type PanelSection, type WindowOverlayHandle } from "foss-earth/shell";
+import type { MeshInspectorHandle } from "foss-earth/diagnostics";
 import type { SettingsRegistry } from "foss-earth/settings";
 import {
   type GeodeticLocation,
@@ -11,6 +12,7 @@ import {
   Bug,
   CloudSun,
   Fan,
+  Fuel,
   Gauge,
   Navigation,
   ScrollText,
@@ -34,6 +36,7 @@ import {
   type AircraftLodId,
 } from "../aircraft/aircraftCatalog";
 import type { AircraftModelStatus } from "../aircraft/createAircraftModel";
+import { getFdmProfile } from "../jsbsim/fdmProfiles";
 import { AircraftSelectionPanel } from "./AircraftSelectionPanel";
 import { AIRCRAFT_SELECTION_PARAMETER_IDS } from "../aircraft/aircraftSelectionSetting";
 import { GamepadBindingsPanel, type GamepadBindingsMount } from "./GamepadBindingsPanel";
@@ -57,6 +60,7 @@ import {
   type GroundInteractionPanelState,
 } from "./GroundInteractionSettingsPanel";
 import { AutopilotPanel, type AutopilotPanelState } from "./AutopilotPanel";
+import { FuelPanel, type FuelPanelState } from "./FuelPanel";
 import { SoundSettingsPanel, type SoundAction } from "./SoundSettingsPanel";
 import { AUDIO_PARAMETER_IDS } from "../audio/audioSettings";
 import { FrameBudgetPanel } from "./FrameBudgetPanel";
@@ -69,11 +73,12 @@ import { AUTOPILOT_PARAMETER_IDS, type AutopilotSettingsV1 } from "../autopilot/
 import { GROUND_PARAMETER_IDS } from "../settings/groundInteractionSettings";
 import type { FlightRecorder } from "../diagnostics/flightRecorder";
 
-export type FlightPanelTab = "weather" | "aircraft" | "autopilot" | "controls" | "remote" | "sound" | "engine" | "logging" | "debug";
+export type FlightPanelTab = "weather" | "aircraft" | "fuel" | "autopilot" | "controls" | "remote" | "sound" | "engine" | "logging" | "debug";
 
 const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "weather", label: "Weather" },
   { id: "aircraft", label: "Aircraft" },
+  { id: "fuel", label: "Fuel" },
   { id: "autopilot", label: "Autopilot" },
   { id: "controls", label: "Controls" },
   { id: "remote", label: "Remote Control" },
@@ -86,6 +91,7 @@ const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
 const TAB_ICONS = {
   weather: CloudSun,
   aircraft: Plane,
+  fuel: Fuel,
   autopilot: Navigation,
   controls: Gauge,
   remote: Smartphone,
@@ -104,6 +110,8 @@ export interface FlightControlPanelSnapshot {
   flightState: FlightState;
   fps: number;
   paused: boolean;
+  /** The flight the next session resumes, or null when none is saved. */
+  savedFlight: { savedAtMs: number; latDeg: number; lonDeg: number } | null;
   viewMode: FlightViewMode;
   runtimeStatus: BabylonRuntimeStatus;
   rendererMode: RendererMode;
@@ -124,6 +132,7 @@ export interface FlightControlPanelSnapshot {
   wheelSpinStates: readonly WheelSpinState[];
   groundInteraction: GroundInteractionPanelState;
   autopilot: AutopilotPanelState;
+  fuel: FuelPanelState;
   logging: LoggingPanelState;
 }
 
@@ -135,6 +144,8 @@ export interface FlightControlPanelOptions {
   settings: SettingsRegistry;
   /** The flight's own parameters in it. */
   parameters: FlightParameterStore;
+  /** The current aircraft hierarchy; the controller updates independently of flight telemetry. */
+  meshInspector?: MeshInspectorHandle;
   /** The shared Map tab's contents, from `createMapSourcePanel`. */
   mapTab: HTMLElement;
   /** The shared Renderer tab's contents, from `createRendererPanel`. */
@@ -149,6 +160,8 @@ export interface FlightControlPanelOptions {
   locationSearchProvider?: LocationSearchProvider;
   onWeatherChange(weather: FlightWeatherState): void;
   onPausedChange(paused: boolean): void;
+  /** Discards the saved flight and starts again at the start position. */
+  onNewFlight(): void;
   onViewModeChange(mode: FlightViewMode): void;
   /** Commit a staged aircraft and presentation choice; return a visible error if it fails. */
   onAircraftApply(selection: AircraftSelection): string | null;
@@ -160,6 +173,9 @@ export interface FlightControlPanelOptions {
   onGroundInteractionAction(action: GroundInteractionAction): void;
   onAutopilotSettingsChange(settings: AutopilotSettingsV1): void;
   onAutopilotEngageChange(engaged: boolean): void;
+  /** New contents in pounds, by JSBSim tank number; tanks not listed keep theirs. */
+  onFuelChange(contentsLbs: ReadonlyMap<number, number>): void;
+  onFuelAttachmentChange?(index: number, attached: boolean): void;
   /** Hosts the live engine-detail readings inside the Engine tab. */
   attachEngineDetails(host: HTMLElement): () => void;
   /** Hosts the Input method section, shared with FOSS Earth, in the Controls tab. */
@@ -277,13 +293,14 @@ function WeatherPanel({
  * section's own controls (`children`, when it has any), a control for each
  * main-level parameter they do not cover, and Show all parameters.
  */
-function ParameterSection({ settings, tab, section, covers, children }: {
+function ParameterSection({ settings, tab, section, covers, children, afterControls = false }: {
   settings: SettingsRegistry;
   tab: string;
   section: string;
   /** Parameters `children` already edit, which the section should not draw again. */
   covers?: readonly string[];
   children?: ReactNode;
+  afterControls?: boolean;
 }) {
   const host = useRef<HTMLDivElement>(null);
   const [main] = useState(() => document.createElement("div"));
@@ -294,12 +311,13 @@ function ParameterSection({ settings, tab, section, covers, children }: {
     const handle = createParameterSection(settings, {
       tab,
       section,
-      main: hasMain ? main : undefined,
+      main: hasMain && !afterControls ? main : undefined,
+      footer: hasMain && afterControls ? main : undefined,
       covers: coverKey === "" ? undefined : coverKey.split(" "),
     });
     host.current?.append(handle.element);
     return () => handle.destroy();
-  }, [settings, tab, section, main, coverKey, hasMain]);
+  }, [settings, tab, section, main, coverKey, hasMain, afterControls]);
   return <>
     <div className="flight-panel__parameter-section" ref={host} />
     {children !== undefined && createPortal(children, main)}
@@ -314,8 +332,10 @@ interface AircraftPanelProps extends FlightControlPanelProps {
 
 function AircraftPanel({
   settings,
+  meshInspector,
   snapshot,
   onPausedChange,
+  onNewFlight,
   onViewModeChange,
   onAircraftApply,
   onGroundInteractionAction,
@@ -340,6 +360,9 @@ function AircraftPanel({
           onApply={onAircraftApply}
         />
       </ParameterSection>
+      <ParameterSection settings={settings} tab="aircraft" section="mesh-inspector" afterControls>
+        <MeshInspectorPanel inspector={meshInspector ?? null} />
+      </ParameterSection>
       <ParameterSection settings={settings} tab="aircraft" section="camera">
         <div className="flight-panel__segmented" role="group" aria-label="Camera view">
           {(["first", "third"] as const).map((mode) => (
@@ -363,13 +386,30 @@ function AircraftPanel({
         <span><kbd>W/S</kbd> Pitch</span><span><kbd>A/D</kbd> Roll</span>
         <span><kbd>Q/E</kbd> Rudder</span><span><kbd>⇧/⌃</kbd> Throttle</span>
       </div>
+      {getFdmProfile(snapshot.aircraftId).controlLaw &&
+        <ParameterSection settings={settings} tab="aircraft" section="flight-controls">
+          <p className="flight-panel__hint">Auto uses this aircraft's standard control law. Fly-by-wire stabilizes pitch, roll and yaw, including hover. Manual uses direct stick, rudder and trim through the actuators. Autopilot and input assists have separate settings.</p>
+        </ParameterSection>}
       <ParameterSection settings={settings} tab="aircraft" section="assists" />
       <ParameterSection settings={settings} tab="aircraft" section="ground" covers={GROUND_PARAMETER_IDS}>
         <GroundInteractionSettingsPanel state={snapshot.groundInteraction} onAction={onGroundInteractionAction} />
       </ParameterSection>
-      <ParameterSection settings={settings} tab="aircraft" section="start" />
+      <ParameterSection settings={settings} tab="aircraft" section="start">
+        <p className="flight-panel__hint">{describeSavedFlight(snapshot.savedFlight)}</p>
+        <button className="flight-panel__command" type="button" onClick={onNewFlight}
+          title="Discard the saved flight and start again at the start position">
+          Start a new flight
+        </button>
+      </ParameterSection>
     </div>
   );
+}
+
+function describeSavedFlight(flight: FlightControlPanelSnapshot["savedFlight"]): string {
+  if (!flight) return "No flight saved. The next session starts at the start position.";
+  const latitude = `${Math.abs(flight.latDeg).toFixed(4)}°${flight.latDeg >= 0 ? "N" : "S"}`;
+  const longitude = `${Math.abs(flight.lonDeg).toFixed(4)}°${flight.lonDeg >= 0 ? "E" : "W"}`;
+  return `Last saved ${new Date(flight.savedAtMs).toLocaleTimeString()}, at ${latitude} ${longitude}.`;
 }
 
 function formatDetail(detail: Record<string, unknown>): string {
@@ -691,8 +731,8 @@ function KeyboardStickSettingsPanel({ parameters }: { parameters: FlightParamete
   );
 }
 
-function DebugPanel({ snapshot, onCollisionDebugChange, onWheelSpinModeChange, onTireSoundChange }: Pick<FlightControlPanelProps,
-  "snapshot" | "onCollisionDebugChange" | "onWheelSpinModeChange" | "onTireSoundChange">) {
+function DebugPanel({ snapshot, settings, onCollisionDebugChange, onWheelSpinModeChange, onTireSoundChange }: Pick<FlightControlPanelProps,
+  "snapshot" | "settings" | "onCollisionDebugChange" | "onWheelSpinModeChange" | "onTireSoundChange">) {
   return (
     <div className="flight-panel__content">
       <div className="flight-panel__metrics">
@@ -701,6 +741,16 @@ function DebugPanel({ snapshot, onCollisionDebugChange, onWheelSpinModeChange, o
         <Metric label="Map runtime" value={snapshot.runtimeStatus.mode} />
         <Metric label="Camera" value={snapshot.viewMode} />
       </div>
+      <ParameterSection settings={settings} tab="debug" section="aircraft-visuals" />
+      <ParameterSection settings={settings} tab="debug" section="forces">
+        <p className="flight-panel__hint">
+          Native forces at their observed application points: green lift, red drag, purple side force,
+          amber propulsion, blue weight, white applied total and yellow net including gravity.
+          Labels show actual kN even when arrow lengths are capped. Arrows point in the force direction;
+          an upward thrust arrow shows the force on the aircraft, opposite the exhaust.
+          Aerodynamic coefficients and individual parts are not inferred.
+        </p>
+      </ParameterSection>
       <fieldset className="flight-panel__fieldset">
         <legend>Collision geometry</legend>
         <label className="flight-panel__field flight-panel__field--inline">
@@ -835,6 +885,8 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
               aircraftSelection={aircraftSelection}
               onAircraftSelectionChange={onAircraftSelectionChange}
               onAircraftFamilyChange={setSelectedAircraftFamily} />
+              : tabId === "fuel" ? <FuelPanel state={props.snapshot.fuel} onChange={props.onFuelChange}
+                onAttachmentChange={props.onFuelAttachmentChange} />
               : tabId === "autopilot" ? <ParameterSection settings={props.settings} tab="autopilot" section="package"
                 covers={AUTOPILOT_PARAMETER_IDS}>
                 <AutopilotPanel
@@ -843,6 +895,10 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
                   onEngageChange={props.onAutopilotEngageChange} />
               </ParameterSection>
               : tabId === "controls" ? <div className="flight-panel__content">
+                {getFdmProfile(props.snapshot.aircraftId).stovl &&
+                  <ParameterSection settings={props.settings} tab="controls" section="stovl">
+                    <p className="flight-panel__hint">Use the VTOL lever beside THR: 0% conventional flight; 100% lift fan and downward nozzle. Conversion takes time. Experimental STOVL handling.</p>
+                  </ParameterSection>}
                 <InputMethodSettings attach={props.attachInputMethod} />
                 {props.gamepadBindings
                   ? <GamepadBindingsPanel mount={props.gamepadBindings} />
@@ -871,7 +927,7 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
                 <ParameterSection settings={props.settings} tab="engine" section="engine" />
               </>
               : tabId === "logging" ? <LoggingPanel state={props.snapshot.logging} onAction={props.onLoggingAction} />
-              : <DebugPanel snapshot={props.snapshot} onCollisionDebugChange={props.onCollisionDebugChange}
+              : <DebugPanel snapshot={props.snapshot} settings={props.settings} onCollisionDebugChange={props.onCollisionDebugChange}
                 onWheelSpinModeChange={props.onWheelSpinModeChange} onTireSoundChange={props.onTireSoundChange} />}
         </>;
       }}

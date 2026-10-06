@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-05",
+  "acceptedAtUtc": "2026-10-05T22:52:53Z",
+  "scope": "Native force observation and vector drawing integrity. No aircraft performance, hover balance, browser or device qualification.",
+  "owners": {
+    "nativeObservation": "JSBSim",
+    "aircraftAdapter": "0sfs",
+    "vectorDrawing": "FOSS Earth"
+  },
+  "sdkIdentity": {
+    "schemaVersion": 2,
+    "package": {
+      "name": "@felipegalind0/jsbsim",
+      "version": "1.2.4-fork.10"
+    },
+    "native": {
+      "origin": "https://github.com/Felipegalind0/jsbsim",
+      "commit": "c8228c4db04fa4b3054feb1c98734a309043082b",
+      "contentSha256": "eb84d677701a155535b7422c6509a10da35616556e9d72f1dc0bbfc3651a4d73",
+      "dirty": false
+    },
+    "sdk": {
+      "commit": "c8228c4db04fa4b3054feb1c98734a309043082b",
+      "contentSha256": "0d9ce8ef3631487dc1a0b6228286ac294ed84c795b09374067f1e1a1218bf09a",
+      "dirty": false,
+      "path": "wasm"
+    },
+    "build": {
+      "mode": "in-tree",
+      "inputSha256": "09b502fda6ce0031076ba38cbfa1e9c73d5c263ea9a0c19c34a8a901ef63f4b7",
+      "toolchain": {
+        "node": "v26.8.2",
+        "npm": "11.19.1",
+        "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+        "cmake": "cmake version 4.4.3",
+        "clang": "clang version 24.0.0git",
+        "platform": "darwin",
+        "arch": "arm64",
+        "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+      },
+      "options": {
+        "buildType": "Release",
+        "cxxStandard": 17,
+        "sdkTarget": "es2022"
+      }
+    }
+  },
+  "installedWasmSha256": "5c76a456367d0870b4880fbeab7c0c812eee692b4261a7ea21ffc5f248596cdc",
+  "installedLoaderSha256": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+  "sourceSha256": {
+    "src/flight/diagnostics/aircraftForces.ts": "110a1962d328c167b3ff1280eb97e6f470563059e8f7edc854772ee8dfd982e7",
+    "src/flight/diagnostics/aircraftForces.test.ts": "20e2bd3079d4dd9367befa8ce7604f00cf6d6edd30d1dbec587a4eb8c1b3a046",
+    "src/flight/diagnostics/aircraftForces.integration.test.ts": "e867bf2200069aae773389fe68b8edcdeaaef89d4ffc2e0bb5f239a76251ede3",
+    "src/flight/diagnostics/createForcesDebugOverlay.ts": "0d4313601af15198a0dae0987d56af0344cbb5878a3316d983b161e8dcf767d5",
+    "src/flight/diagnostics/createForcesDebugOverlay.test.ts": "a5a9ca4e8fa7f6ab80124714c9d189079f9600ef5825002934d7a972001cf8c2",
+    "../foss-earth/src/diagnostics/createVectorDebugDrawing.ts": "69d696038069e3a7f57b0af151c02fb2efcbe6d91fd83678f939d37f9af31133",
+    "../foss-earth/src/diagnostics/createVectorDebugDrawing.test.ts": "7069c7ed51646b516b0b72128911826efaf763fa9f62db96b169f898721b30ef",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml": "77a35afdc925c45dba63c237bf258f5706a06ea951816c946d882d0c2ec2055b",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml": "09b7eb9c8c9ea5ca720ae1974f4d1ef5d7fb35e6b8248415c6cfcc307c57891c",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/liftfan.xml": "9ded9a6a93eeab2dac35c779b51945b9e5cf0807591737b67262b27c5ab67287",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/sidefan.xml": "90e1017803f4d9f46285ee09b2aed37d01cee82053e612ffabcf7a19816571ae"
+  },
+  "checks": {
+    "ownerFocused": {
+      "passed": true,
+      "files": 1,
+      "tests": 7,
+      "log": "owner-focused.log"
+    },
+    "ownerTypecheck": {
+      "passed": true,
+      "log": "owner-typecheck.log"
+    },
+    "ownerLint": {
+      "passed": true,
+      "log": "owner-lint.log"
+    },
+    "consumerFocused": {
+      "passed": true,
+      "files": 3,
+      "tests": 12,
+      "log": "consumer-focused.log"
+    },
+    "consumerIncremental": {
+      "pendingFinalParentChecks": true,
+      "concurrentTypecheckFailure": "New smoke particle unit used an unsupported symbol field; reported to owner.",
+      "concurrentLintFailure": "savedFlight.test.ts:166 unused _dropped; reported to owner."
+    },
+    "fullCi": "Pending parent final coordinated CI; not run for this receipt.",
+    "browserLoadedAssetsVerified": false
+  },
+  "assertions": [
+    "Each engine's resolved cached force sums to native propulsion aggregate for C172 and F35.",
+    "Native resolved-RP plus CG aero split reconstructs native aero total.",
+    "Net uses same-read native applied total plus native weight, preserving both raw sources.",
+    "Reads do not advance or command physics; native engine acting points use current CG.",
+    "All converted F35 force carriers observe upward native body forces at their observed anchors.",
+    "Disabled overlays perform no native reads and release batch, meshes, materials and labels.",
+    "Arrows follow transformed/rebased parents; capped labels retain actual kN magnitudes.",
+    "Paused unchanged updates request no frames; scheduled synchronous changes suppress duplicate frames.",
+    "Replacement glyphs prepare hidden and swap only when their full replacement is ready."
+  ],
+  "limitations": [
+    "Moment arcs not implemented.",
+    "No coefficient-term or per-part force attribution.",
+    "CG aggregate fallback labels are display anchors, not physical application points."
+  ],
+  "logSha256": {
+    "owner-focused.log": "9c0192e88140b281e21697615f8e58783cac5bf4fc515cdca58ee8be1acfda4a",
+    "owner-typecheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "owner-lint.log": "d8d26621c0569c296fc680b25fe14f8b1f9b684c3446c56df2bf932172384034",
+    "consumer-focused.log": "0ea0dfe4a3810df947a37bb298a8b191b847d8242cd6b59d11ab2156aa649b6c"
+  }
+}

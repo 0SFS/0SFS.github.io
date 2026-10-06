@@ -1,4 +1,4 @@
-# SF50 sound: implementation ledger and validation report
+# Aircraft sound: implementation ledger and validation report
 
 Task IDs follow [sound-implementation-prompt.md](../sound-implementation-prompt.md); budgets and gates
 come from [sound.md](../sound.md). This file records *what was done and what was checked*, not what
@@ -14,14 +14,18 @@ the plan hopes for. Status words are used strictly:
 
 | Tier | Implemented | Software-verified | Qualified | In the app today |
 | --- | --- | --- | --- | --- |
-| **Off (Tier 0)** | yes | yes | no | Default. No AudioContext, fetch or compile until a gesture asks for sound. |
+| **Off (Tier 0)** | yes | yes | no | Until sound is enabled. No AudioContext, fetch or compile until a gesture asks for sound. |
 | **Low (Tier 1)** | yes | yes | **no** | What Auto resolves to. Also carries the tire cue on its own. |
-| **Med (Tier 2)** | yes | yes | **no** | Selectable, labelled **"Not yet validated"**, and runs as Low with that reason shown. A session-only testing switch runs it as Med. |
-| **High (Tier 3)** | runtime, bank gate and cache | with synthetic fixtures only | **no** | Disabled: **"Audio pack unavailable"**. No licensed bank exists. |
+| **Med (Tier 2)** | yes | yes | **no** | **The default** since 2026-10-03 (§15). Runs as soon as it is chosen, labelled **"Not yet validated"**. |
+| **High (Tier 3)** | procedural FJ33 and F135 | actual WASM and native telemetry at 44.1/48 kHz | **no** | Selectable, **"Not yet validated"**. No recording pack required (§17). |
 | **X** | no | no | no | Not started. Stays separate research (§4). |
 
 The previous tire cue's private AudioContext is gone. The cue now plays through the same worklet, WASM
 core, limiter and holds as the engine.
+
+Sections 3–16 retain their dated implementation evidence. The procedural High
+delivery in §17 supersedes their recording-bank gate, noise-count defect and
+pinned-delay assumption; their old artifact hashes identify historical builds.
 
 ## 2. Baselines captured before the audio work
 
@@ -146,11 +150,9 @@ core, limiter and holds as the engine.
   - Master and engine volume, engine mute, reduced dynamic range.
   - Telemetry diagnostics and the §6 stats line.
   - Airframe wind volume.
-  - Choosing Med shows **"Run Med anyway (testing)"**, which switches to "Testing unvalidated Med" with a
-    **"Stop testing unvalidated quality"** button. A separate checkbox came first, but with Auto selected it
-    did nothing, and the pilot could not get Med to run:
-    - Runs an explicit Med request without device evidence.
-    - Never saved; Auto ignores it; a missing bank still blocks High.
+  - Choosing Med runs Med at once (since 2026-10-03, §15). Before that it ran as Low, and a
+    **"Run Med anyway (testing)"** button ran it for the session; once Med had proved itself the owner
+    did not want the extra step.
   - Live engine telemetry (burning / windmilling / stopped, N1, N2, fuel flow) and the core timeline counters.
 - **Lifecycle:**
   - The context is created and resumed synchronously inside the gesture.
@@ -203,7 +205,8 @@ core, limiter and holds as the engine.
   - Refuses a probe frequency that would hide a repeated quantum.
   - **Validated on synthetic captures only**; each device still needs its own induced-overload capture.
 - **Headless worklet check:** `benchmarks/audio/run-worklet-headless.mjs` plus `workletHeadless.entry.ts`
-  load the real worklet and WASM in headless Chromium through a file URL. **Not run**: see §5.5.
+  load the real worklet and WASM in headless Chromium through a file URL. **First run on 2026-10-03: it
+  stalls at `audioWorklet.addModule()` and renders nothing**; see §5.5 and §15.
 - **Fallback controller** (`audioQuality.ts`):
   - Two consecutive over-budget 2 s windows shed one stage.
   - A render longer than Q, or a counted underrun, drops a tier at once.
@@ -232,9 +235,8 @@ core, limiter and holds as the engine.
   Doppler magnitude and direction, and the camera-zoom behaviour, are in
   `cameraZoomAudio.integration.test.ts` (§13). **This line previously claimed `dspCore.test.ts` held the
   Doppler evidence. It did not; no such test existed.**
-- Resource results are **proxies only** (§5.3). Med cannot become effective in normal use: Auto never picks it
-  without a qualified profile, and an explicit Med request runs Low with the reason shown. Only the
-  session testing switch runs it.
+- Resource results are **proxies only** (§5.3). Since 2026-10-03 Med is the default and runs when chosen
+  (§15). Auto still never picks it without a qualified profile.
 
 ### SND-06: High (runtime implemented; software-verified with synthetic fixtures; never enabled)
 
@@ -272,9 +274,9 @@ This file, the status block at the top of sound.md, and the reviewer summary in 
    - Enabling the tire cue without engine sound runs the shared graph at Low, with engine gain 0 and master gain 1.
    - This preserves the pre-migration behaviour: the tire cue never needed a master switch.
    - Low still computes its 4 partials at zero gain in this mode.
-3. **Engine sound is Vision Jet only.** The C172 gets no turbofan; it keeps the tire cue.
-4. **Med is selectable but runs as Low** while unvalidated, with the reason shown, unless the session
-   testing switch is on. High's option is disabled.
+3. **Engine sound uses supported turbine profiles.** The Vision Jet has its reference voice; the F-35B has an approximate main-engine voice (§16). The C172 keeps the tire cue.
+4. **Med is the default and runs when chosen** (owner decision, 2026-10-02; §15), labelled "Not yet
+   validated". Until then it ran as Low unless a session testing switch was on. High's option is disabled.
 5. **Doppler is first-order** via the delay line, and the velocity-derived ratio is what drives it. It also
    culls partials that would alias. In the app both cameras are rigidly attached, so Doppler is 1 there and
    the tap holds still however the pilot zooms; flybys are exercised offline. The tap is seated from the
@@ -286,10 +288,8 @@ This file, the status block at the top of sound.md, and the reviewer summary in 
    decode cost is open (Release/DSP).
 9. **Mix balance is barely tuned.** The only listening so far is one pilot session, which led to the wind
    retune in §3. Relative gains (combustor, fan, jet, airframe, tire) are otherwise unreviewed starting points.
-10. **Testing switch for unvalidated tiers.**
-    - Session-only, off by default, never persisted.
-    - A tier cannot be qualified without running it, so Perf needs this.
-    - It does not admit Med in normal use.
+10. **Testing switch for unvalidated tiers: removed on 2026-10-03** (§15). An explicit choice now runs a
+    tier whose only gap is device evidence, which is also how Perf runs a tier it is qualifying.
 11. **Holds are split.** Terrain and contact holds are tire-only; engine holds are pause and loading. Context
     suspension waits 1.5 s.
 12. **Re-anchors do not fade.** See §3, SND-02.
@@ -384,7 +384,7 @@ at Low and 0.045–0.046 ms at Med.
 
 | Item | Why | Command when unblocked |
 | --- | --- | --- |
-| Headless worklet load check | The Playwright node module is not installed in this project (browser binaries are cached, the module is not). Installing packages was outside this assignment. | `npm install --prefix build/tools/playwright --no-audit --no-fund playwright`, then `node benchmarks/audio/run-worklet-headless.mjs` |
+| Headless worklet load check | **Run on 2026-10-03, and it does not get past loading the worklet** (§15): `audioWorklet.addModule()` never settled under Playwright 1.55, in Chrome for Testing 153's headless shell or the installed Chrome 154. The cause is not established. | Playwright is still not installed in this project: `npm install --prefix build/tools/playwright --no-audit --no-fund playwright`, or `PLAYWRIGHT_MODULE=<another copy's index.mjs>`, then `node benchmarks/audio/run-worklet-headless.mjs` |
 | Real-time runs, soak, 3 × 240 s per device | Needs the named devices and a physical route | §5 protocol |
 | Dropout detection on a real capture | Needs loopback/OS capture per device, plus its induced-overload positive control | `detectDropouts()` from `benchmarks/audio/dropoutDetector.mjs` |
 | Listening review | No reviewers or level-matched sessions yet | — |
@@ -397,7 +397,7 @@ at Low and 0.045–0.046 ms at Med.
 | Low/Med qualification on iPhone SE (2nd gen), Pixel 6a, MacBook Air M1 | Perf | Run §5 (real time, soak, 3 × 240 s, both rates, both bridges where applicable). Add `QUALIFIED_PROFILES` entries only from those records. |
 | Per-callback DSP timing inside AudioWorklet | Perf / DSP | Choose a calibrated clock or browser/OS traces (§5.4). Until then the app shows DSP p95 `n/a` and cannot shed on timing. |
 | Validated dropout detector on each route | Perf | Loopback capture plus an induced-overload positive control per device, kept apart from qualification results |
-| Headless worklet check | Perf | Provide Playwright (above) and record the browser build |
+| Headless worklet check | Perf | Find why `addModule()` never settles under Playwright (§15), then record the browser build |
 | Licensed Tier 3 bank | Release | Own or commissioned recordings with explicit redistribution rights; manifest per `audioBank.ts`; no Recordist material |
 | High realism review over Med | DSP | Level-matched review across idle, acceleration, cruise and shutdown, once a bank exists |
 | FJ33 blade counts, shaft RPM, bypass calibration, buzz-saw onset | FDM | Evidence required before any frequency or gain stops being a placeholder |
@@ -476,7 +476,7 @@ One in-browser session by the project owner on the development machine. This is 
 | Report | Finding | Action |
 | --- | --- | --- |
 | Loud static in a 300 kt dive | Airframe wind noise: white noise above 250 Hz, up to about 16 dB louder than the idle engine and unfiltered in chase view. | Retuned to a speed-shaped roar, about 18 dB quieter at 250 kt, with its own "Airframe wind volume". Tests check the spectrum. |
-| No difference between Low and Med | Med never ran: an explicit Med request with no device evidence falls back to Low. | First a session checkbox. It did nothing with Auto selected and the pilot still could not run Med, so it became a **"Run Med anyway (testing)"** button that appears when Med is chosen. **Not yet re-heard by the pilot.** |
+| No difference between Low and Med | Med never ran: an explicit Med request with no device evidence falls back to Low. | First a session checkbox. It did nothing with Auto selected and the pilot still could not run Med, so it became a **"Run Med anyway (testing)"** button that appears when Med is chosen. **Re-heard on 2026-10-02: the owner reported that Med "works very well"**, and Med became the default (§15). |
 | Sound cut in and out after a crash; engine sound stopped when slow | **Audio:** terrain/contact holds paused all audio and every release reset the core; telemetry re-anchors faded up from silence. **JSBSim:** an engine that is off windmills with airspeed, so its tones only appear when moving fast. | Holds split (terrain/contact holds only the tire cue), context suspension waits 1.5 s, re-anchors no longer fade. Engine monitor added. **Whether and why the engine stopped in that crash is not known.** |
 | After the crash the aircraft kept rolling | No ground friction or rotational damping after an impact. | Flight-model work outside sound. Not investigated. |
 | "I need to see what the engine is actually doing" | — | Engine monitor on the flight display; Sound moved to its own tab. |
@@ -495,9 +495,9 @@ Per the [JSBSim contribution policy](../jsbsim-upstream-contribution-policy.md),
 
 In a suggested order:
 
-1. **Pilot re-test of this session's fixes:**
+1. **Pilot re-test of this session's fixes.** Med: done on 2026-10-02, "works very well" (§15). Not yet
+   reported on separately:
    - wind level
-   - Med through the testing button
    - sound after a crash with the new holds
    - the engine monitor's phase and transitions log during a crash
    - and, from the 2026-09-16 session, the camera-zoom pitch bend at Med (§13): scroll in and out in chase
@@ -507,7 +507,7 @@ In a suggested order:
 2. **Crash and ground-contact physics.** No friction or rotational damping after an impact (flight model).
 3. **If the engine stops in a crash, find out why.** The transitions log shows `running`, `cutoff`, `fuel on board`, `seized` and `stalled` changes with sim time.
 4. **Flight recorder engine channels.** Add running, cutoff, starter and qbar so a saved CSV explains engine state. Not done: the recorder's columns feed pilot-evaluation tooling, so check those consumers first.
-5. **Qualification** (§6): named devices, per-callback timing, the dropout detector on real routes, and the headless worklet check (needs Playwright).
+5. **Qualification** (§6): named devices, per-callback timing, the dropout detector on real routes, and the headless worklet check, which stalls at `addModule()` (§15).
 6. **Listening review and FDM evidence** (§6): mix balance, cockpit treatment, FJ33 shaft orders, starvation and relight traces.
 7. **JSBSim turbine property exposure** (§10).
 8. **Engine state after a reset (engine defect).** Found 2026-09-14. When a location is applied with the engine shut off, fork.7 brings the SF50 out of RunIC at N2 81 % and 344.7 lb/h. The adapter reads that as combustion for a few steps, then the spool winds down. The cause is JSBSim PRs #1505/#1508, not the audio code. Do not mask it here; see [the open PR review](jsbsim-open-pr-review-2026-09-14.md).
@@ -515,6 +515,13 @@ In a suggested order:
    - `build/benchmarks/audio/sweep.jsonl` (5.2 MB) is generated and gitignored with the rest of `build/`. Regenerate it with `node benchmarks/audio/generate-sweep.mjs`; its hash is in `benchmarks/audio/sweep.jsonl.sha256`.
    - A licensed Tier 3 bank.
    - Tier X.
+   - Whether turning sound off should silence the tire cue. The catalogue describes `osfs.sound.enabled` as
+     silencing "the engine and tyres", and `audioSettings.ts` comments the field the same way. But with the
+     tire cue on, the graph keeps running in tire-only mode (§4.2; `createFlightAudio.test.ts`, "plays the
+     tire cue alone, and switching engine sound off keeps it"). The description or the behaviour should
+     change. Noticed on 2026-10-03; neither was changed.
+   - How long Med stays the default. It is "for now" (§15), and that section says whom a later change of
+     default would move.
 
 ## 12. Notes worth retaining
 
@@ -544,7 +551,9 @@ In a suggested order:
 **Behaviour to keep**
 
 - Pause and loading hold all sound; terrain and contact holds silence only the tire cue.
-- Engine sound is Vision Jet only; the C172 gets the tire cue alone. Tire sound and its volume live in Aircraft → Ground handling.
+- Engine sound supports the Vision Jet and an approximate F-35B main-engine profile (§16); the C172 gets the tire cue alone. Tire sound and its volume live in Aircraft → Ground handling.
+- Med is the default, for now, and choosing a tier runs it when only device evidence is missing. Auto picks only
+  qualified tiers (§15).
 - Nothing is qualified. Offline timings are proxies, and `QUALIFIED_PROFILES` stays empty until real device records exist.
 
 **Environment**
@@ -629,3 +638,456 @@ order, keeping the N1 and N2 fundamentals (at least two partials).
 - Half-rate synthesis is still not wired up, so the internal sample rate is not a setting.
 
 Nothing here is qualified: lowering a limit reduces work by construction, but no timing was measured.
+
+## 15. Med by default, 2026-10-03 (implemented, software-verified, not qualified)
+
+The owner, on 2026-10-02: *"I have tested Mid and it works very well, i do not like that i have to click a
+btn after i select it from the dropdown and make mid the default for now too."* That is the first
+re-hearing of Med since §13's fixes, through the testing button, by one listener on the development
+machine. It is listening feedback, not a qualification run.
+
+**Decision (owner).** Device qualification gates Auto and any claim about a device, not an explicit choice.
+[sound.md §1](../sound.md) records it.
+
+**What changed.**
+
+- `audioQuality.ts`: an explicit request for a tier whose only gap is device evidence ("Not yet validated")
+  runs that tier. A missing capability or bank still falls back, now to the best tier below that can run,
+  so High without its bank lands on Med rather than Low. Auto is unchanged: Low until a profile qualifies
+  something higher.
+- `osfs.sound.quality` defaults to Med, with the reason in the catalogue. Sound itself still starts off and
+  waits for a gesture (`osfs.sound.enabled`). Who the new default reaches:
+  - A browser with no saved quality gets Med. The settings registry saves a value set in the Sound tab only
+    when it differs from the default, so leaving the quality alone saved nothing.
+  - A quality chosen in the Sound tab is kept.
+  - The exception: **a browser that still holds the quality migrated from a sound record of before the
+    registry (2026-09-25) keeps it**, Auto unless the pilot had changed it, so Med has to be picked there
+    once. That record (`osfs.audio.settings.v1`, written from 2026-09-14) was moved into the registry
+    field by field, and the registry keeps a migrated value as the pilot's own even when it equals the
+    default. It held that Auto only until the Sound tab next saved: a save writes all eight sound settings
+    and drops those equal to their defaults. So a browser that saved any sound setting while Auto was the
+    default now gets Med, and one that has saved none since its migration stays on Auto.
+  - Med picked while it is the default is not saved, since it equals the default. Those pilots will follow
+    the default when it next moves.
+- The session testing switch is gone: `setAllowUnvalidated` and its status field, the Sound tab's "Run Med
+  anyway (testing)" and "Stop testing unvalidated quality" buttons and their action, and the engine
+  monitor's "unvalidated allowed" note.
+- The Sound tab still labels Med "Not yet validated", and says under the dropdown that Auto does not pick it
+  and that it runs when chosen.
+- A counted underrun still drops Med to Low, and Low stays until Re-test.
+- The DSP core and the worklet are untouched; the WASM hash is unchanged.
+
+**Evidence.**
+
+- `createFlightAudio.test.ts` (synthetic Web Audio fakes, the real WASM module): Med boots as the default, at
+  tier 2 from the worklet's first quantum; choosing Med runs it with nothing else to press; Auto stays at
+  Low; a counted underrun drops the default Med to Low, Low keeps playing, and Re-test restores Med.
+- `audioQuality.test.ts` covers the rule. `SoundSettingsPanel.test.tsx` covers that the dropdown sends the
+  choice at once and that no testing button is drawn. `audioSettings.test.ts` covers the default.
+  `flightParameters.test.ts` covers the old-record migration; its fixture now carries Low, because a
+  migrated Med could no longer be told from the default.
+- `npx tsc -b` and `npm run lint` clean. Full run: 1,209 tests pass in 125 files
+  (`npx vitest run --maxWorkers=50%`), and `npm run build` exits 0 with both `--dist` verifications.
+- Who the default reaches, above, was checked on 2026-10-04 by a throwaway test outside the suite, over the
+  real registry and the real sound settings store: `build/checks/sound-med-default/default-reach.check.test.ts`,
+  run with the config beside it. Its four cases pass. The save "while Auto was the default" is stood in for
+  by a host default of Auto, which is what the registry compares a written value with.
+
+**Headless worklet check: first run, and it stalls.** It was run for the first time, with Med added to its
+cases, using Playwright 1.55 from FOSS Earth's `build/tools/` through `PLAYWRIGHT_MODULE`. The first case
+never got past `audioWorklet.addModule()`. Short probes then found `addModule()` on an `OfflineAudioContext`
+never settling:
+
+- from the harness's file:// page, with a blob URL;
+- from an https page served by request interception, with the worklet at an intercepted URL, a request
+  Playwright never reported;
+- with a blob URL on such an https page, on a fresh page each time, in Chrome for Testing 153's headless
+  shell and in the installed Chrome 154.
+
+In one probe a blob and a `data:` URL did load on an offline context, but only after an earlier attempt had
+been pending for five seconds; on that same page a real-time `AudioContext` then left all three kinds of
+URL pending. The cause is not established, so nothing follows about the worklet itself; the owner's flights
+are the browser evidence that it loads, in their Chrome. Every launch closed cleanly and left no Chrome
+code-sign clone. The harness now covers Med, names the step a stalled case reached, and fails after 30 s
+instead of hanging, so `browser.close()` still runs. That matters with the installed Chrome it uses by
+default, because a run stopped by hand strands that browser's 1.4 GB clone.
+
+What the next attempt should know:
+
+- **The Playwright used is much older than the browsers it drove.** 1.55.0 is built for Chromium 140
+  (revision 1187 in its `browsers.json`); the headless shell was 153.0.8010.12 and the installed Chrome
+  154.0.8037.95. Whether that gap is the cause was not tested.
+- Not tried:
+  - a Playwright of the browser's age, or the Chromium 140 that 1.55 expects;
+  - Chrome with no Playwright at all, through `scripts/headless-chrome.mjs`, which this repository's other
+    headless checks use;
+  - a page served over HTTP by the check itself.
+- The Chrome for Testing in Playwright's cache (revision 1208) does not launch: the download is incomplete.
+  The headless shell beside it (revision 1243) does.
+- The probes and their logs are in `build/checks/sound-med-default/`
+  ([build scratch](../build-scratch.md)). `probe-addmodule-3.mjs` was written and not run; it asks
+  whether the first `addModule()` on a page, the time since the page loaded, or the request interception
+  decides.
+
+**Also.** The finished camera-zoom prompt moved to `docs/old/`, where finished prompts go.
+
+**Still open.**
+
+- Nothing is qualified, and whether Med holds up on the §5 reference devices, the iPhone SE above all, is
+  still §6's question.
+- On a device that cannot keep up with Med, the only automatic way down is a counted underrun, and the app
+  reads one only where the browser provides a counter (Chromium's `playbackStats`). Elsewhere a struggling
+  device keeps Med until the pilot chooses Low, or until a processor fault turns sound off.
+
+## 16. F-35B procedural main-engine sound, 2026-10-05 (implemented, software-verified)
+
+**Owner: 0SFS.** The F-35B now attaches an explicit approximate F135 audio profile
+to the existing sound owner. The app's previous SF50-only guard is replaced by
+supported aircraft profiles. The C172 still has the tire cue alone. Sound enable,
+Med default, Auto admission, tier limits, mute, holds, reset epochs and other
+existing controls keep their existing behavior.
+
+The initial adapter-only implementation mapped the F135 trial model's main thrust and fuel to
+the unchanged procedural core's reference inputs. The 28,000 lbf dry-thrust
+reference comes from the installed trial FDM; 8 lbm/s fuel reference is artistic
+tuning. Raw adapter telemetry, shaft percentages and the engine monitor remain
+native. SF50 inputs use an exact identity mapping. The adapter observes engine
+zero and locates one sound source at its installed nozzle force point, about
+4.464 m aft of the source CG and 1.267 m above the visual ground origin. Fan and
+roll-post force surrogates do not create extra sound engines.
+
+That initial implementation's Sound tab said **Approximate F135 procedural sound** and **separate lift-fan
+sound is not modeled**. Generic synthetic tones, fan/core mix and cabin treatment
+were not F135 acoustic measurements. There was no separate afterburner layer or
+calibrated SPL. No recorded assets or third-party licence are added. No DSP
+source or binary changed, so no WASM rebuild was needed.
+
+**Checks.** The new `f35bAudio.integration.test.ts` uses the installed JSBSim
+aircraft and shipped DSP: Low and Med at 44.1/48 kHz produce finite, nonzero
+engine-only samples; main-engine power changes output; main-only telemetry,
+source location and native shutdown observation pass. Its seven cases pass.
+The four other targeted files pass 44 cases: existing real-SF50 adapter checks,
+facade lifecycle and profile normalization/status, snapshot ABI, and the Sound
+panel's approximation note. Retained test logs and code/runtime/WASM hashes are
+linked from
+[`f35b-audio-acceptance.json`](../../validation/evidence/aircraft/f35b/f35b-audio-acceptance.json).
+
+**Transition limit.** Native turbine shutdown decreases fuel flow gradually at
+10,000 lbm/h per second. The F135's larger flow takes several seconds to reach
+zero after cutoff; the current fuel-flow combustion proxy follows that residual
+state even while thrust is zero and `running` is false. The real-SDK test records
+this behavior rather than replacing the native signal. This is not validated
+combustion timing or shutdown acoustics.
+
+**Still unqualified.** No listening review, browser worklet/device run, timing
+benchmark, physical output route, F135 spectrum or acoustic calibration was
+performed for that initial implementation. Existing device and acoustic gates remain open.
+
+### 16.1 Shared-core F135 acoustic setup and native augmentation
+
+**Owner: 0sfs for synthesis; JSBSim for engine observation.** The adapter-only
+normalization above is superseded. A fixed-size acoustic setup ABI configures
+the existing voice at worklet creation and aircraft replacement. Snapshot ABI
+2 carries native main-engine thrust/fuel units plus optional native
+augmentation with its own availability bit. F135 idle N1/dry thrust come from
+the installed trial model; tone references, fan/core weights, noise curves and
+source gains are explicitly artistic. Published F-35B ground-run studies
+support broadband mixing/shock noise with power/angle-dependent spectra, not
+the numeric rotor tones or calibrated loudness. Sources and current tuning
+are in [sound.md §7](../sound.md#7-f-35b-main-engine-approximation-2026-10-05).
+
+Afterburner morphs the existing exhaust-noise gain/filter using read-only
+`propulsion/engine[0]/augmentation`; it never derives active state from the
+throttle command. Above-dry native thrust retains acoustic headroom while that
+observer is active. Missing augmentation is unavailable and fades out. No
+second engine voice, noise stream/band, oscillator, allocation or higher tier
+budget is introduced. Lift-fan acoustics remain unimplemented. SDK observation
+is software-verified on the installed `1.2.4-fork.8` package: the eight real
+F-35B SDK/DSP cases pass, including genuine augmentation through dry,
+afterburning, converted and cutoff states. This does not qualify acoustics or
+an output device.
+
+**Exact SF50 reference.** The original 43,478-byte WASM was retained before the
+change (sha256 `9cfbc9ce8e02690c63cccbd68d13978a53d48af99ec7bc7fbd3218f473d43924`).
+Eight deterministic 0.8 s vectors compare actual old/new WASM at 44.1/48 kHz,
+Low/Med and cockpit/exterior, including power, combustion, airframe and tire
+changes. All 589,440 stereo Float32 samples match exactly. The checked-in
+[reference report](../../validation/evidence/audio/f135/sf50-reference.json)
+retains individual output hashes; `acousticProfiles.test.ts` checks those hashes
+against the shipped artifact. The reference renderer defaults to a dated
+`build/` directory and accepts explicit legacy WASM/header paths.
+
+**Build/checks.** `npm run build:audio` with pinned emcc 6.0.9 produced 47,680
+bytes, sha256 `e6816679136929aafc41d638f29d82dd0794437f52d7bc3535d84fbb70b1a259`,
+with updated source/export provenance. The first focused run passed 146 tests
+and skipped native augmentation; one old benchmark snapshot-size assertion
+still expected ABI 1. After correcting it, the affected DSP/profile/worklet/
+snapshot/benchmark subset passed 46/46. Actual WASM checks prove broadband
+power response, augmentation-only changes, above-dry headroom, availability
+gating, finite limited output and unchanged memory/cap ceilings. The plain-JS
+worklet wrapper is exercised with actual WASM in Node, not an audio device.
+No timing benchmark, browser/GPU run or physical listening qualification ran.
+The required DSP/API source, WASM and provenance were committed together as
+`18bc053d`. Profile integration remains part of the combined aircraft change.
+[Acceptance metadata](../../validation/evidence/audio/f135/acoustic-profile-acceptance.json)
+retains hashes, corrected-check logs and current SDK observation status.
+
+**Existing cap defect.** `TurbofanVoice` does not currently consult
+`caps_.noiseBands` when processing its sources. Statistics report the requested
+cap; the partial count and bypass tier switch are enforced. Full-tier default
+SF50 output includes wind and configuration streams, so correcting this
+count/gating was kept separate from exact reference preservation. This change
+adds no band and does not qualify noise-cap enforcement. DSP owns that
+follow-up and resource-accounting correction.
+
+### 16.2 Engine definitions, aircraft installations and renderer admission
+
+**Owner: 0sfs.** `engineAcousticDefinitions.ts` holds engine identity, distinct
+manufacturer family, broad engine-class metadata, native schema, renderer ID
+and setup parameters. `aircraftAudioProfiles.ts` declares source IDs, engine
+indices and native source-position policy; it is the only audio module that
+imports aircraft IDs. `audioRendererRegistry.ts` selects the actual WASM,
+worklet/processor, compatible dynamics ABI, encoder, admitted schema/classes
+and source capacity. No algorithm is selected just from engine class.
+
+Williams FJ33/FJ44 and P&W F135 remain separate engine definitions and product
+families. They explicitly select the current approximate procedural renderer,
+which is not acoustic proof of interchangeability. The evidence decision and
+OEM/NASA sources are in [sound.md §2](../sound.md#engine-identity-installation-and-renderer-contract).
+F-35B measurements identify shock-associated sound before afterburner, so our
+augmentation-controlled exhaust morph is not described as a physical shock
+component. Neither engine's current 23 parameters has acoustic calibration.
+
+The native adapter reads the declared engine index and schema, rejects missing
+or nonfinite required input at setup, preserves raw units and reports optional
+observers unavailable. Global starter/cutoff getters are selection-scoped;
+ambiguous all-engine commands on the F-35B model no longer masquerade as
+main-engine commands. Runtime required-input loss silences the engine snapshot
+while continuing reads for recovery. Source geometry comes from the selected
+native engine and CG. No native type/count descriptor is exposed, so this is
+declared-class/catalog compatibility, not native type verification.
+
+The current renderer admits **one** engine source. Missing definitions,
+unsupported classes/schema/ABI, invalid parameters and multiple installations
+are explicitly rejected without a source-zero/FJ33 fallback. Another engine
+renderer can select its own binary and encoder; a different dynamics payload
+requires a supported bridge first. Piston, turboprop, turboshaft, independent
+LiftFan and multiple-engine synthesis remain unimplemented. Future multiple
+voices must also separate airframe sound, currently inside the one turbofan
+voice, and obey whole-aircraft source budgets.
+
+High manifest V2 carries engine-definition and renderer identity through
+validation, loading, resampling and installation. Engine replacement clears
+samples. Overlapping installs resolve cancelled promises, and generation/index
+ACK correlation prevents late replies from making another bank ready. Tests
+use original synthetic noise only; no bank is shipped or qualified.
+
+**Checks.** Architecture admission, bank, actual-WASM worklet and facade
+regressions pass (20 architecture/bank/worklet cases and 25 lifecycle cases).
+The eight real F-35B audio cases and indexed-source native adapter cases pass
+against installed fork.8. The completed combined `npm run ci` passes **133
+files / 1,312 tests**, lint, incremental typecheck, production build and
+installed/emitted SDK/DSP verification. New checks cover unsupported ABI,
+invalid native setup bounds, nonzero source indices, explicit unsupported
+multi-source admission, engine/binary bank identity, stale ACKs, engine
+replacement, telemetry recovery, and invalid worklet replacement stopping
+output rather than retaining another engine's sound. Logs/hashes are retained
+in [current acceptance metadata](../../validation/evidence/audio/f135/acoustic-profile-acceptance.json).
+The shipped DSP hash remains the committed `18bc053d` artifact; this setup
+pass adds no DSP source, source bands or resource budget. No browser/device
+run, benchmark, listening review or acoustic qualification was performed.
+
+### 16.3 Pilot sound controls, 2026-10-05 follow-up
+
+**Owner: 0sfs. Software checks passed.** Pilot feedback requested quieter
+afterburner roar, more base-engine gain, and a sound viewpoint independent of
+visual camera choice. The existing Sound section now has three live,
+persistent controls in its paragraph layout:
+
+- Engine volume accepts 0–8 (0–800%), with the default 0.8 and old saved values
+  unchanged. Boost also scales that engine's afterburner component.
+- Afterburner volume accepts 0–1, default 0.5. It scales the extra afterburner
+  roar; 1 preserves its previous gain. Zero does not erase augmented spectral
+  colour or the native above-dry thrust response.
+- Sound position accepts 0–1 from Camera to Cockpit, default Cockpit. It
+  interpolates acoustic geometry/motion and cabin/exterior treatment;
+  intermediate positions are artistic.
+
+The added parameters use the existing settings record and registry, with
+clamped parsed values, invalid-patch preservation, legacy-record defaults,
+named bounds/units/default reasons and one Sound home. Settings/UI regressions
+cover saved boost above 100%, older-record migration, bounds, registry reload,
+one slider per setting, endpoint/intermediate labels and independent live
+patch actions. The actual-WASM checks cover 0/50/100% afterburner gain,
+10 ms live smoothing without resetting the voice, unchanged dry output,
+engine boost through the existing limiter, and all retained SF50 reference
+hashes. An initial related run passed 546 tests and caught one stale inactive
+cockpit-parent transform. Conditional parent refresh fixed it; all ten pose
+tests then passed, including one root computation per movement and no view
+notifications for unchanged transforms.
+
+Final `npm run ci` passed **133 files / 1,337 tests**, lint, incremental
+typecheck, production build and installed/emitted artifact verification.
+The rebuilt DSP, provenance and source are committed as `83cd3f97`.
+[Acceptance metadata and retained logs](../../validation/evidence/audio/sound-controls-2026-10-05/acceptance.json)
+record the exact sources and artifact. The real dev dependency optimizer also
+passes with `index.html` as its only entry, without scanning retained HTML or
+starting a server.
+The §16.1/16.2 acceptance report and its hashes remain evidence for the earlier
+artifact and architecture pass. This follow-up claims no device, listening or
+acoustic qualification.
+
+### 16.4 Master volume headroom, 2026-10-05
+
+The pilot requested the previous master maximum as the new reference:
+Master now defaults to **2 (200%)** and ranges from **0 to 8 (800%)**.
+The parser, registry, visible slider and native gain clamp all agree. Existing
+saved values keep their numerical gain; engine, afterburner and airframe
+defaults/ranges are unchanged. These are amplitude multipliers before the
+existing output dynamics, not guaranteed perceived-loudness ratios.
+
+Actual-WASM tests verify 1/2/8 ratios below the dynamics threshold, the ceiling,
+finite limited loud output and retained SF50 reference hashes. Settings and UI
+tests cover saved boosts, old records, default, bounds and live gain transport.
+Related checks pass **44 files / 497 tests**; final `npm run ci` passes **133
+files / 1,341 tests**, lint, incremental typecheck, production build and emitted
+artifact verification. DSP/WASM/provenance commit: `bb1d0743`.
+[Retained evidence](../../validation/evidence/audio/master-volume-2026-10-05/acceptance.json)
+records exact hashes and logs. No device or acoustic qualification was run.
+
+## 17. Procedural High for both aircraft, 2026-10-05
+
+**Owner: 0sfs. Implemented and software-verified; not acoustically calibrated or
+device-qualified.** The revised [proposal](../proposals/high-aircraft-sound.md)
+and [sound spec](../sound.md) cover the SF50/FJ33 and F-35B/F135. Choosing High
+runs its procedural source model with no recording, manifest or decoder. Med
+remains the default; the retained eight Low/Med SF50 reference renders still
+match exactly. Auto still stops at Low because the qualification registry is
+empty.
+
+**Delivered source model.** High separates low-frequency and fine-scale jet
+mixing, fan/core machinery and combustion, with engine-specific directional
+weights and cockpit gain/cutoff. F135 additionally has a dry-allowed broadband
+shock-associated surrogate; FJ33 declares that component's gain zero. The shock
+filter approximates laboratory spectral tendencies, not a measured F135 fit.
+Native augmentation remains authoritative. High's generated cabin IR is wet
+only toward the cockpit viewpoint; it no longer colours exterior sound with a
+cabin response. All numeric spectral and installation parameters remain
+uncalibrated. Main-nozzle vectoring is supported, but independent LiftFan,
+roll-post and impingement sound are not implemented.
+
+**Telemetry and admission.** Snapshot ABI 3 carries 33 Float64 fields, including
+an independently available normalized exhaust axis. Native thruster pitch/yaw
+are converted from JSBSim body coordinates through the aircraft and listener
+frames. Missing/nonfinite direction falls back to the neutral source; aircraft
+replacement and epoch resets invalidate prior geometry. Valid direction updates
+share the listener's view cadence; loss of native direction clears availability
+on the next accepted physics publication. The profile setup has 31 parameters.
+Manual High requires an explicitly capable renderer. Qualification matches
+engine/renderer identity, device, browser/OS, output route, sample rate,
+transport and the hash of the actual compiled WASM. Future real qualification
+records must additionally freeze the surrounding app, worklet and setup values;
+this is not complete application-build attestation.
+
+**Red-team defects corrected.** Legacy grain storage never enters production
+High, so loading synthetic test data cannot make a stopped engine audible.
+Noise limits now remove actual source processing: Low/Med/High admit at most
+5/6/8 engine-plus-airframe streams, plus the independent tire stream. FJ33 skips
+the unsupported shock stream. Live cap edits and changes between audible tiers
+fade down for up to 25 ms, apply the latest limits, and fade up for 25 ms using
+one engine. Off retains its immediate hold/stop behavior. IR duration is bounded
+by both requested milliseconds and the tier's tap ceiling, including 96 kHz;
+IR handover clears the partition buffers. Historical saved explicit limits
+keep their numeric values; new defaults correct the old undercount.
+
+The finite-history Doppler path now hands over between moving taps before a
+read head pins at its storage limit. A 540 Hz source receding at 50 m/s remains
+within 2 Hz of the expected 471.30 Hz in repeated far-range windows at both
+output rates. This retains pitch, not full retarded-time propagation: handovers
+can briefly dip broadband level or produce interference between periodic taps.
+The legacy bank helpers also reject nonfinite PCM, account for manifest bytes
+and preflight aggregate decoded/resampled storage, but their production install
+entry point remains disabled pending a defined licensed residual contract.
+
+**A rejected experiment stays rejected.** A bounded derivative-based waveshaper
+failed its intended positive derivative-skewness change below compression at
+both sample rates. It and its parameter were removed rather than relabelled as
+crackle. The [failed diagnostic](../../validation/evidence/audio/procedural-high-2026-10-05/rejected-waveform.json)
+retains the hypothesis, values, experimental WASM hash and log. The delivered
+High renderer adds no crackle or nonlinear waveform model.
+
+**Checks and artifact.** Pinned emcc 6.0.9 produced a 50,836-byte WASM, SHA-256
+`7a876882d8cf38ec043e97b7d84fc58c7b12faec730db4087059b6eb66458339`.
+Related checks passed **59 files / 704 tests**; incremental typecheck and lint
+passed. The final `VITEST_MAX_WORKERS=5 npm run ci` passed **148 files / 1,536
+tests**, production build, and installed/emitted JSBSim and audio artifact
+verification. Native integration used `@felipegalind0/jsbsim 1.2.4-fork.11`.
+Actual-WASM coverage includes both aircraft/rates, no-bank High, standstill,
+native dry/augmentation/conversion/cutoff, direction and missing-axis behavior,
+spectral trends, noise-cap enforcement, live cap/tier transitions, bounded IR,
+far/reversing Doppler, and retained Low/Med reference hashes. Lifecycle, both
+transports, settings and admission regressions also pass.
+
+[Acceptance metadata and retained logs](../../validation/evidence/audio/procedural-high-2026-10-05/acceptance.json)
+identify the exact source, worklet, setup and artifact. The DSP source, WASM and
+provenance are committed together as `7de21ba4`; application integration and
+these records remain in the combined aircraft working tree. No server,
+browser/GPU check, performance
+benchmark, physical listening review or acoustic calibration was run. The
+provisional resource/timing budgets are not performance measurements. The next
+fidelity gates are legally usable matched-geometry reference spectra, separate
+cockpit evidence, level-matched listening, and independent crackle/STOVL work;
+physical device qualification remains a separate requested run.
+
+## 18. Continuous startup sound, 2026-10-05
+
+**Owner: 0sfs. Software checks passed; no listening, acoustic, device or timing
+qualification.** Pilot testing found combustion-like static as soon as the
+F135 started rotating, including N2 near 0.1%, in Low, Med and High. The native
+combustion observer was correctly false. The source was the shared fan wake:
+it switched to its full idle baseline whenever N1 exceeded 0.01%, while the
+fan tone also switched on a nonzero floor. Native N1 turns alongside N2 during
+starter motoring, so the same defect affected both engine profiles.
+
+All audible tiers now fade fan machinery continuously from standstill. Below
+the profile's idle N1, fan tones scale by `r=clamp01(N1/idleN1)` and fan/wake
+noise by `r²`. The existing N2 tone gain already scales by `(N2/100)²`. This
+preserves a rising motor-like tone while suppressing the premature broadband
+bed. These are uncalibrated synthesis envelopes, not physical noise laws or a
+new ignition threshold. Native fuel flow/running still controls combustion;
+fuelled Start remains audible before `set-running` latches. The change adds
+no voice, filter, allocation, resource control or setup-ABI field. At and above
+idle the new multipliers equal one.
+
+The new actual-WASM tests failed on the old artifact in all three tiers, then
+passed after rebuilding. They cover both aircraft near standstill, continuous
+wake reduction across 0.01/0.1/1% shaft speeds, and F135 core whine at
+44.1/48 kHz. The native fork.11 F135 cold-start test confirms zero fuel/thrust
+during initial rotation and motoring, genuine fuelled lightoff before running,
+and replays initial rotation, motoring, lightoff and running through every
+audible tier. Final focused checks pass **3 files / 31 tests**. The broader
+related run passed 220/221 tests; its only failure was a concurrent engine-HUD
+phone-status fixture awaiting the root task's update, outside audio.
+
+The old SF50 fixture itself begins by smoothing from zero through sub-idle
+speed, so its original whole-render hashes intentionally change. The retained
+[before/after comparison](../../validation/evidence/audio/startup-envelope-2026-10-05/sf50-reference.json)
+records eight configurations and transient difference windows. Every Low/Med
+stereo reference at 44.1/48 kHz, cockpit/exterior, remains **bit-identical over
+0.4–0.8 s**; tests still check those old settled hashes and also freeze the
+corrected whole-render hashes. Earlier sections' whole-render identity claims
+describe their historical artifacts, not this startup correction.
+
+Pinned emcc 6.0.9 produced **50,902 bytes**, SHA-256
+`0aea1d9488f7208a8d8aa28ab1e8ed9d6f741787f4b1242cbca92ac87bbc91a1`.
+DSP source, WASM and provenance are committed together as **`5ad00228`**.
+[Acceptance metadata and logs](../../validation/evidence/audio/startup-envelope-2026-10-05/acceptance.json)
+retain the regression failures, final focused checks and source identities.
+Combined instrument/audio checks subsequently passed **81 files / 953 related
+tests**, incremental typecheck and lint. The updated phone-status fixture is
+resolved. Final `VITEST_MAX_WORKERS=5 npm run ci` passed **160 files / 1,658
+tests**, production build and installed/emitted artifact verification. The
+[combined acceptance record](../../validation/evidence/hud/engine-orbs-2026-10-05/acceptance.json)
+retains those logs and the final phone/native-catalog follow-up checks.
+The instrument's WebGPU, WebGL2 and WebGL1 shader/presentation check passed
+separately in headless Chrome; it does not qualify audio or graphics timing.

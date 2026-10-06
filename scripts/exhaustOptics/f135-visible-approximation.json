@@ -1,0 +1,91 @@
+{
+  "id": "f135-visible-approximation-v1",
+  "width": 64,
+  "rowsPerMode": 16,
+  "wavelengthRangeNm": [360, 830],
+  "wavelengthStepNm": 1,
+  "temporalEmission": {
+    "periodSeconds": 0.8,
+    "sampleCount": 32,
+    "amplitude": 0.04,
+    "harmonics": [
+      {"cycles": 1, "weight": 0.55, "phaseRadians": 0.2},
+      {"cycles": 3, "weight": 0.3, "phaseRadians": 1.1},
+      {"cycles": 7, "weight": 0.15, "phaseRadians": 2}
+    ]
+  },
+  "dry": {
+    "assumedSootTemperatureK": [900, 1400],
+    "axialCoolingK": 300,
+    "relativeEmission": [0, 0.012],
+    "axialFalloff": 9
+  },
+  "surfaceEmission": {
+    "sampleCount": 16,
+    "assumedTemperatureK": [900, 1400],
+    "relativeDisplayEmission": [0.02, 0.25]
+  },
+  "afterburner": {
+    "assumedSootTemperatureK": [1800, 2500],
+    "axialCoolingK": 900,
+    "relativeEmission": [0.3, 1],
+    "axialFalloff": 2.6,
+    "sootEnergyFractionAtNozzle": 0.995,
+    "sootEnergyFractionAtTail": 0.985,
+    "sootMixFalloff": 2,
+    "assumedShockCells": {
+      "countAtPower": [4, 7],
+      "contrast": 0.6,
+      "axialDamping": 1.8,
+      "phaseRadians": 0.15
+    },
+    "assumedBands": [
+      {"species": "CH*", "centerNm": 432, "sigmaNm": 3, "relativeEnergy": 1},
+      {"species": "C2*", "centerNm": 473, "sigmaNm": 5, "relativeEnergy": 0.45},
+      {"species": "C2*", "centerNm": 516, "sigmaNm": 5, "relativeEnergy": 0.015},
+      {"species": "C2*", "centerNm": 573, "sigmaNm": 5, "relativeEnergy": 0.005}
+    ]
+  },
+  "hudAccentSample": {"mode": "afterburner", "powerNorm": 1, "axialFraction": 0.35, "neutralDisplayMix": 0},
+  "assumptions": [
+    "Temperatures, component energy fractions, band widths, emission intensity and axial falloff are declared visual assumptions, not measured F135 exhaust quantities.",
+    "The power axis is a normalized native engine operating observation supplied by the installation; it is not an inferred flame temperature or pilot throttle command.",
+    "A grey-soot Planck continuum and simplified Gaussian radical bands represent shared hydrocarbon emission mechanisms, not resolved molecular spectroscopy or combustion kinetics.",
+    "Each component spectrum is normalized by its integrated visible radiant energy over 360–830 nm before mixing. Soot fractions describe relative energy in this window, not soot mass fraction, molecular abundance or all-wavelength radiation.",
+    "The default is an openly assumed soot-dominated warm reference, qualitatively consistent with a documented daylight F-35B afterburner photo. Available JP-8 laboratory evidence does not determine these F135 fractions. Other fractions can produce blue or violet, so this is not a unique computed F135 color.",
+    "The dry bank contains only very faint thermal continuum; the afterburner bank must be selected only from actual native augmentation and an operating engine.",
+    "The separate hot-hardware table is a Planck-continuum color proxy with explicitly assumed 900–1400 K temperatures and 0.02–0.25 linear display emission. Native power selects the table row; it is not measured F135 wall temperature, calibrated radiance or thermal inertia. It applies only to declared nozzle-interior material bindings and never makes the dry exhaust tail brighter.",
+    "Optical depth, soot loading, excited-state populations, pressure, mixing and shock-cell spectral effects are unknown. Static shock-cell spacing and contrast are a baked visual assumption, not a pressure-derived solution. There is no absolute radiance or F135 photometric calibration.",
+    "The optional 32-sample, 0.8-second periodic emission multiplier is an artistic brightness fluctuation bounded within plus/minus 4 percent. It is not measured F135 combustion instability, vibration or acoustic physics. Playback uses native simulation time and holds on pause.",
+    "RGB is linear sRGB with negative out-of-gamut channels clipped and each spectrum normalized by its largest RGB channel. Alpha supplies a separately assumed relative envelope. Exposure and tone mapping belong to the renderer.",
+    "The HUD samples the same assumed afterburner spectrum and applies sRGB display encoding without a separate whitening or recoloring step. This display accent is not a photometric exhaust-color measurement."
+  ],
+  "sources": [
+    {
+      "url": "https://extapps.ksc.nasa.gov/Reliability/Documents/Preferred_Practices/at9.pdf",
+      "title": "NASA Kennedy Space Center, Thermography, Technique AT-9",
+      "supports": "Page 2 explains surface thermal radiation and visible emission from sufficiently hot solids. It supports a heated-hardware glow mechanism, not F135 nozzle temperatures or display brightness."
+    },
+    {
+      "url": "https://www.dvidshub.net/image/9578175/us-marine-corps-f-35b-performs-during-luke-days-2026",
+      "title": "56th Fighter Wing, U.S. Marine Corps F-35B performs during Luke Days 2026",
+      "supports": "The caption identifies actual F-35B afterburner use; the daylight photograph shows warm visible emission. It is a qualitative representative reference, not a spectral calibration or universal hue."
+    },
+    {
+      "url": "https://ntrs.nasa.gov/citations/20140000730",
+      "title": "NASA/TM-2013-217884, Comparing a Fischer-Tropsch Alternate Fuel to JP-8 and Their 50-50 Blend",
+      "supports": "Section 4.1 describes CH* near 432 nm, C2* near 473/516/573 nm and soot-associated orange emission in jet-fuel combustor imaging. This supplies band locations and mechanisms, not F135 afterburner weights."
+    },
+    {
+      "url": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir6783.pdf",
+      "title": "NISTIR 6783, Fire Dynamics Simulator Technical Reference Guide",
+      "supports": "Section 4 treats Planck emission, absorption and continuous soot radiation; it also warns that a grey approximation can overpredict optically thin emission. The simplified continuum here is an assumption."
+    },
+    {
+      "url": "https://cie.co.at/datatable/cie-1931-colour-matching-functions-2-degree-observer",
+      "title": "CIE 2019, Colour-matching functions of CIE 1931 standard colorimetric observer",
+      "doi": "10.25039/CIE.DS.xvudnb9b",
+      "supports": "Official 1 nm observer functions used to integrate the assumed emission spectrum into XYZ."
+    }
+  ]
+}

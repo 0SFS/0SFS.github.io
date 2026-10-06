@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.21.0",
+    "quickhull3d": "^3.1.2"
+  }
+}

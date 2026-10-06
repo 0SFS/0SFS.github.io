@@ -4,6 +4,7 @@ import { createTerrainContact } from '../physics/terrainContact';
 import { createFixedStepPhysicsLoop, FIXED_DT } from '../physics/fixedStepLoop';
 import { getFdmProfile } from '../jsbsim/fdmProfiles';
 import { createJsbsimAudioAdapter } from '../audio/jsbsimAudioAdapter';
+import { getAircraftAudioInstallation, resolveAircraftAudioInstallation } from '../audio/aircraftAudioProfiles';
 import { deriveEnginePhase, discoverReadableProperties, readEngineSample } from '../hud/engineMonitorModel';
 import { Sf50LandingPilot } from './sf50LandingPilot';
 import { Sf50PitchController } from './sf50PilotController';
@@ -29,7 +30,9 @@ export function runSf50Rollout(sdk: JSBSimSdk, surfaceMode: RolloutSurface) {
 
   const available = new Set(discoverReadableProperties(sdk));
   const profile = getFdmProfile('cirrus-vision-jet-g2');
-  const audio = createJsbsimAudioAdapter(sdk, { gearHeightMetres: profile.stance.staticMeters });
+  const audioInstallation = resolveAircraftAudioInstallation(getAircraftAudioInstallation('cirrus-vision-jet-g2'));
+  if (!audioInstallation.supported) throw new Error(audioInstallation.reason);
+  const audio = createJsbsimAudioAdapter(sdk, { gearHeightMetres: profile.stance.staticMeters, source: audioInstallation.source });
   let height = 0, revision = 0, step = 0, resetCount = 0, runIcCount = 0;
   let touchdownStep: number | null = null;
   let stoppedStep: number | null = null;

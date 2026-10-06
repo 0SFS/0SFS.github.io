@@ -1,0 +1,241 @@
+{
+  "date": "2026-10-05",
+  "timingQualification": "provisional pending core and thermal attribution",
+  "files": [
+    {
+      "file": "baseline-fixtures.json.gz",
+      "bytes": 822351,
+      "sha256": "7012ebeb58f34afd84c99324fc7fdb2172649c3749a993643b2ec29021e7e5ba"
+    },
+    {
+      "file": "baseline-provenance.json",
+      "bytes": 37748,
+      "sha256": "414e21ae74821d6d9f53e170e23a022966a17acda14520137d4f8cd3883666b2"
+    },
+    {
+      "file": "baseline-results.json.gz",
+      "bytes": 486866,
+      "sha256": "e03f11917feb984201e612f771f9f69a9815169e24f3429465f402a3f61d63d2"
+    },
+    {
+      "file": "baseline-run.log",
+      "bytes": 13709,
+      "sha256": "584d7971c5ac0fdfbcfeb361d95159c390614bd6a5f00b75621e2c0b64926b0e"
+    },
+    {
+      "file": "baseline-summary.json",
+      "bytes": 571421,
+      "sha256": "a027628d23e945bec29d2d3b4524483c2802896277c417a7fd66bcb92c978cbb"
+    },
+    {
+      "file": "c172-coacd-compact.json",
+      "bytes": 166584,
+      "sha256": "42fd9b29b79ef210f528859d7c111e0e8a7b5c0405330eddd6ad4d1ae3a03e68"
+    },
+    {
+      "file": "c172-coacd.json",
+      "bytes": 628015,
+      "sha256": "d23859e889b295cb7cc517ebff76da217e258ac1725fba826b99f3f0c03b930a"
+    },
+    {
+      "file": "checks/build.log",
+      "bytes": 1967,
+      "sha256": "be67324fc8cb3bd3b6037c4955b5b2596103cd39568ff1eb7e8a63c15793f828"
+    },
+    {
+      "file": "checks/ci.log",
+      "bytes": 13656,
+      "sha256": "a4b8f475e7f81b2d56c155e0e159c9ba80998ab642dd89883077332f59836530"
+    },
+    {
+      "file": "checks/lint.log",
+      "bytes": 109,
+      "sha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e"
+    },
+    {
+      "file": "checks/numerical-syntax.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "checks/python-syntax.log",
+      "bytes": 26,
+      "sha256": "14c9b7956f870802d5f0aaae4bfc9a24150287dfd85011b3751860e5ca787370"
+    },
+    {
+      "file": "checks/related-tests.log",
+      "bytes": 182,
+      "sha256": "0fa7365489cdd2f791f74b8bb2a890a71c9f4a2d1ce9dc072d926494b3450a3a"
+    },
+    {
+      "file": "checks/typecheck.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "checks/unrelated-app-tests.log",
+      "bytes": 6227,
+      "sha256": "e8649e72b16e631ec82d9eafc260bc818ec7ba376577ea5c3cb278a8d629a15c"
+    },
+    {
+      "file": "coacd-generation/c172-compact-worker-provenance.json",
+      "bytes": 881,
+      "sha256": "a7fe93aea5c34160bd95628d2a067f0b54042c4b9a0a3c0a4439a5e47200269d"
+    },
+    {
+      "file": "coacd-generation/c172-compact.log",
+      "bytes": 19617,
+      "sha256": "caa5c1aa66bf9af9b521a08de1e6ceb8d896badc594abe602b9d4759efdce70c"
+    },
+    {
+      "file": "coacd-generation/c172-worker-provenance.json",
+      "bytes": 881,
+      "sha256": "f593e8eabb8133f346dc1ecf3bbe98ec410870a94e46f13d6e2044dbdb97e438"
+    },
+    {
+      "file": "coacd-generation/c172.log",
+      "bytes": 19477,
+      "sha256": "491ece17068b8859f8dd9ff8553b76f7f296fb1f30dbc3249b4eede652228af9"
+    },
+    {
+      "file": "coacd-generation/sf50-compact-worker-provenance.json",
+      "bytes": 881,
+      "sha256": "94fa02cec3c83ee11569b63a5d3c7c6bb5cd3649cbc027cfeb3c85aec258c78b"
+    },
+    {
+      "file": "coacd-generation/sf50-compact.log",
+      "bytes": 21802,
+      "sha256": "d1dc511a8a1d95bc728fdf8a19a4f4d39e1c18b25d459338f6f32f62e282beff"
+    },
+    {
+      "file": "coacd-generation/sf50-worker-provenance.json",
+      "bytes": 881,
+      "sha256": "de56d07051e69800089653b0c85532c25919ea4a86a599d870df79ef78e8cea2"
+    },
+    {
+      "file": "coacd-generation/sf50.log",
+      "bytes": 21662,
+      "sha256": "25a319053d363ab60cabf1fe64ca62c4e683582d5a3a8e46813ed7a8664b790f"
+    },
+    {
+      "file": "cpu-topology.log",
+      "bytes": 189,
+      "sha256": "7e644eb0b9d6c78d6a761f3c1d51644bbedcda7901d07362f525ee3c1ca4c73c"
+    },
+    {
+      "file": "followup-fixtures.json.gz",
+      "bytes": 1044810,
+      "sha256": "407968cfb7144e0d7f2cd7d37ce37f21ecdea5447fb38c6506cb1a93bad6f2ae"
+    },
+    {
+      "file": "followup-provenance.json",
+      "bytes": 41518,
+      "sha256": "b37bb9595fd9ad65a4eb163d6eb018e67078e7b9ca8ce0bc5d1416ffbe1ef570"
+    },
+    {
+      "file": "followup-results.json.gz",
+      "bytes": 209132,
+      "sha256": "a681b10e68b42875d8ad786e88edde8d4cc96a6d9f08cfd38e12ecd50837f9da"
+    },
+    {
+      "file": "followup-run.log",
+      "bytes": 12013,
+      "sha256": "29de10d4178e96972730218c58579962c505fbdc441068a9580e7582505b77c4"
+    },
+    {
+      "file": "followup-summary.json",
+      "bytes": 617051,
+      "sha256": "b31aa824b5180d6a7ac93210369ffccb167c0573a703fe0f33a62dcf1bfd11ce"
+    },
+    {
+      "file": "hardware-notes.json",
+      "bytes": 852,
+      "sha256": "ca8037842e1858b1e3f0c650f869c020de3ed98af23c40d591d86b46ed95c982"
+    },
+    {
+      "file": "query-margins.json",
+      "bytes": 29206,
+      "sha256": "ca1f77afaa163af20fc3a36d4621e31f6b3bb401eb314650341371c63b294c57"
+    },
+    {
+      "file": "query-margins.log",
+      "bytes": 2451,
+      "sha256": "1c34140f271aa5a74857aa3178ed8f10bf09d09b63aaa639eeab5cbd74b4940a"
+    },
+    {
+      "file": "README.md",
+      "bytes": 7505,
+      "sha256": "0bacdb1a78fa2ea7b85f84d20b50925fc850bb4774130cf831479d14c0831f98"
+    },
+    {
+      "file": "sf50-coacd-compact.json",
+      "bytes": 166448,
+      "sha256": "06abfebc8956fc1d9c4e89340b5802c3d12993cf827a581c6cb2a13198d199df"
+    },
+    {
+      "file": "sf50-coacd.json",
+      "bytes": 734841,
+      "sha256": "a5f172d5379c5101a26cf9b6eef615c46f7753cd57f05de22203b1de52b1a60a"
+    },
+    {
+      "file": "source-baseline/aircraftGeometry.mjs",
+      "bytes": 13800,
+      "sha256": "baf36ff8d24c94c80e15d93b8597685eb648833dacbdedaaf471bf5033839ca2"
+    },
+    {
+      "file": "source-baseline/proxies.mjs",
+      "bytes": 17984,
+      "sha256": "b33571b89b738769b5c357d7049f5ede985f69db2753af46bae0679ad08b251e"
+    },
+    {
+      "file": "source-baseline/queries.mjs",
+      "bytes": 16857,
+      "sha256": "d4e8be5de5603ae067494488c86d76ce60d675f3437f97a01c5fc85b1f3d3b11"
+    },
+    {
+      "file": "source-baseline/run.mjs",
+      "bytes": 13026,
+      "sha256": "e4c8b9fa38f164a484301125159362a64dfa7f7332df0e691b50ac4a3460eed6"
+    },
+    {
+      "file": "source-followup/aircraftGeometry.mjs",
+      "bytes": 13800,
+      "sha256": "baf36ff8d24c94c80e15d93b8597685eb648833dacbdedaaf471bf5033839ca2"
+    },
+    {
+      "file": "source-followup/check-query-margins.mjs",
+      "bytes": 8926,
+      "sha256": "7c10db7abaff5a64f76b87c450dcde9cf0f251beff7909978193f2367772ef8a"
+    },
+    {
+      "file": "source-followup/prepare-followup.mjs",
+      "bytes": 14989,
+      "sha256": "065fe669396ea6981968c157f33e863742feeeeef7a363ab2e2fd774f8e37246"
+    },
+    {
+      "file": "source-followup/proxies.mjs",
+      "bytes": 17984,
+      "sha256": "b33571b89b738769b5c357d7049f5ede985f69db2753af46bae0679ad08b251e"
+    },
+    {
+      "file": "source-followup/queries.mjs",
+      "bytes": 18028,
+      "sha256": "5c0118b2e5679b66294754e635068b8fd41c7de72366db4912686d6d4bf8cc3d"
+    },
+    {
+      "file": "source-followup/run.mjs",
+      "bytes": 13051,
+      "sha256": "2e8ecb948b7bf4ed5d2e5ecfad7908285b8931aa13ea4cb26ca2b0d240b7bde2"
+    },
+    {
+      "file": "tool-package-lock.json",
+      "bytes": 6571,
+      "sha256": "c68930a585c4bd136ec4374706f44d58b0865a18fa770b6b24b87d427e225a0d"
+    },
+    {
+      "file": "tool-package.json",
+      "bytes": 100,
+      "sha256": "c24d2102df4cbfff2ab821ad15431806a3f83d2228f8e8e821ef9294cbfbf391"
+    }
+  ]
+}

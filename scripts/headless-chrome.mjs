@@ -22,6 +22,8 @@ export async function openHeadlessChrome(profileDirectory, explicitBinary = proc
   ], { stdio: ["ignore", "ignore", "pipe", "pipe", "pipe"] });
   const pending = new Map();
   const listeners = new Set();
+  let resolveExit;
+  const exitPromise = new Promise(resolve => { resolveExit = resolve; });
   let nextId = 1, buffer = "", stderr = "", closed = false;
   child.stderr.on("data", bytes => { stderr = (stderr + bytes).slice(-16000); });
   const rejectAll = error => {
@@ -29,8 +31,9 @@ export async function openHeadlessChrome(profileDirectory, explicitBinary = proc
     pending.clear();
   };
   child.on("error", rejectAll);
-  child.on("exit", code => {
+  child.on("exit", (code, signal) => {
     closed = true;
+    resolveExit({ code, signal });
     rejectAll(new Error("Headless Chrome exited (" + code + "): " + stderr));
   });
   child.stdio[4].on("data", bytes => {
@@ -62,6 +65,15 @@ export async function openHeadlessChrome(profileDirectory, explicitBinary = proc
   return {
     send,
     onEvent(listener) { listeners.add(listener); return () => listeners.delete(listener); },
+    /** Observe normal shutdown without sending a signal if the timeout expires. */
+    async waitForExit(timeoutMs = 10000) {
+      let timer;
+      try {
+        return await Promise.race([exitPromise, new Promise((_, reject) => {
+          timer = setTimeout(() => reject(new Error("Chrome did not exit after Browser.close")), timeoutMs);
+        })]);
+      } finally { clearTimeout(timer); }
+    },
     async close() {
       if (closed) return;
       const exited = new Promise(resolve => child.once("exit", resolve));

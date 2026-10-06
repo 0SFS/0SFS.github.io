@@ -48,9 +48,13 @@ export interface AircraftModelState {
 export interface AircraftModelOptions {
   aircraftId: AircraftId;
   lodId: AircraftLodId;
+  /** Debug override: draw wheel/arm geometry even with the native gear fully stowed. */
+  renderStowedGear?: boolean;
   /** Chase distance drives "auto" level selection. */
   getChaseDistanceMeters?(): number;
   onStateChange?(state: AircraftModelState): void;
+  /** The loaded model's hierarchy for inspection; cleared before those nodes are disposed. */
+  onMeshRootsChange?(roots: readonly TransformNode[]): void;
   /**
    * Asked once each time what the model shows changes: a mesh shown, or one
    * taken away. Nothing else here needs a frame - a download's progress is
@@ -72,6 +76,10 @@ export interface AircraftModelHandle {
   setLod(id: AircraftLodId): void;
   /** Re-evaluate "auto" against the current chase distance. Cheap to call. */
   refreshAutoLod(): void;
+  /** Apply a live debug override using the most recent physical gear observation. */
+  setRenderStowedGear(enabled: boolean): void;
+  /** Cache physical travel, including during loading. Unknown observations preserve the last state. */
+  updateGearVisibility(actualGearDownNorm: number, withinScheduledFrame?: boolean): void;
   dispose(): void;
 }
 
@@ -87,6 +95,7 @@ interface LoadedModel {
   triangles: number;
   container: AssetContainer;
   holder: TransformNode;
+  stowedGearMeshes: { mesh: AbstractMesh; originalVisibility: boolean }[];
 }
 
 /**
@@ -122,6 +131,8 @@ export function createAircraftModel(
   let rig: AircraftRig | null = null;
   let pending: { key: string; controller: AbortController } | null = null;
   let disposed = false;
+  let renderStowedGear = options.renderStowedGear ?? false;
+  let actualGearDownNorm: number | null = null;
   let state: AircraftModelState = {
     aircraftId: options.aircraftId,
     lodId: options.lodId,
@@ -144,6 +155,7 @@ export function createAircraftModel(
 
   /** Takes the shown mesh away. The caller asks for the frame. */
   const clearShown = (): void => {
+    if (shown) options.onMeshRootsChange?.([]);
     if (rig) disposeAircraftRig(rig);
     rig = null;
     if (shown) disposeModel(shown);
@@ -153,6 +165,19 @@ export function createAircraftModel(
   const cancelPending = (): void => {
     pending?.controller.abort();
     pending = null;
+  };
+
+  /** Hide only selected geometry; changing a parent would also hide any bay door beneath it. */
+  const applyGearVisibility = (model: LoadedModel): boolean => {
+    const hidden = !renderStowedGear && actualGearDownNorm === 0;
+    let changed = false;
+    for (const { mesh, originalVisibility } of model.stowedGearMeshes) {
+      const visible = !hidden && originalVisibility;
+      if (mesh.isVisible === visible) continue;
+      mesh.isVisible = visible;
+      changed = true;
+    }
+    return changed;
   };
 
   const load = (key: string, lodId: AircraftLodMeshId, path: string, triangles: number, chosen: boolean): void => {
@@ -179,7 +204,13 @@ export function createAircraftModel(
         const holder = new TransformNode(`aircraft-model-${lodId}`, scene);
         holder.parent = root;
         holder.setEnabled(false);
-        loaded = { key, lodId, triangles, container, holder };
+        const stowedGearNames = new Set(definition.stowedGearNodeNames ?? []);
+        loaded = {
+          key, lodId, triangles, container, holder,
+          stowedGearMeshes: container.meshes
+            .filter(mesh => stowedGearNames.has(mesh.name) || stowedGearNames.has(mesh.name.replace(/_primitive\d+$/, "")))
+            .map(mesh => ({ mesh, originalVisibility: mesh.isVisible })),
+        };
         for (const node of container.rootNodes) node.parent = holder;
         container.addAllToScene();
         // The aircraft is never a pick or collision target; the sim raycasts
@@ -196,11 +227,16 @@ export function createAircraftModel(
         shown = loaded;
         root.rotationQuaternion = Quaternion.RotationYawPitchRoll(definition.modelYawRad, 0, 0);
         root.position.set(definition.modelOffset.x, definition.modelOffset.y, definition.modelOffset.z);
+        // Cached physics/debug state is applied before reveal; a loaded model
+        // never flashes extended geometry while the native gear is stowed.
+        applyGearVisibility(loaded);
         loaded.holder.setEnabled(true);
         rig = bindAircraftRig(container.transformNodes.concat(container.meshes), {
           scene,
           propellerBlades: definition.propellerBlades,
+          aircraftId: definition.id,
         });
+        options.onMeshRootsChange?.(container.rootNodes.filter((node): node is TransformNode => node instanceof TransformNode));
         pending = null;
         publish({ activeLodId: lodId, status: "ready", triangles, error: null, download: null });
         requestRender();
@@ -273,6 +309,16 @@ export function createAircraftModel(
     refreshAutoLod(): void {
       if (state.lodId !== "auto") return;
       apply(false);
+    },
+    setRenderStowedGear(enabled): void {
+      if (disposed || enabled === renderStowedGear) return;
+      renderStowedGear = enabled;
+      if (shown && applyGearVisibility(shown)) requestRender();
+    },
+    updateGearVisibility(position, withinScheduledFrame = false): void {
+      if (disposed || !Number.isFinite(position) || position < 0 || position > 1 || position === actualGearDownNorm) return;
+      actualGearDownNorm = position;
+      if (shown && applyGearVisibility(shown) && !withinScheduledFrame) requestRender();
     },
     dispose(): void {
       disposed = true;

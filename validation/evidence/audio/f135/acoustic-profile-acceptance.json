@@ -1,0 +1,288 @@
+{
+  "schema": "0sfs-f135-acoustic-profile-acceptance/2",
+  "status": "software-checks-passed-native-augmentation-and-modular-setup-verified-acoustic-device-qualification-open",
+  "dspApiCommit": "18bc053d",
+  "scope": {
+    "owner": "0sfs",
+    "engineSources": 1,
+    "engineIndex": 0,
+    "snapshotVersion": 2,
+    "nativeThrustUnits": "lbf",
+    "nativeFuelFlowUnits": "lbm/s",
+    "newOscillators": 0,
+    "newNoiseStreams": 0,
+    "newSourceBands": 0,
+    "newTierBudgets": false,
+    "deviceQualified": false,
+    "acousticallyCalibrated": false,
+    "separateLiftFanSound": false
+  },
+  "nativeAugmentation": {
+    "property": "propulsion/engine[0]/augmentation",
+    "readOnly": true,
+    "type": "boolean 0/1",
+    "availability": "catalog-and-non-creating-property-batch",
+    "missing": "unavailable; smoothed to zero",
+    "throttleInference": false,
+    "installedSdkTest": "passed: eight real F-35B SDK/DSP cases, including dry/afterburning/converted/cutoff observer states",
+    "installedSdk": {
+      "version": "1.2.4-fork.8",
+      "archive": "deps/felipegalind0-jsbsim-1.2.4-fork.8.tgz",
+      "archiveSha256": "c0ce83394de7608c2663e5364aa6f4b810771a6547fa4dad5d27e7b8a300a213"
+    }
+  },
+  "checks": {
+    "compiler": "emcc 6.0.9",
+    "build": "passed",
+    "sf50Reference": {
+      "cases": 8,
+      "stereoFloat32Samples": 589440,
+      "differingSamples": 0,
+      "report": "sf50-reference.json"
+    },
+    "initialFocused": {
+      "passed": 146,
+      "skipped": 1,
+      "failed": 1,
+      "failure": "renderSweep.test.mjs stale snapshot-size expectation (29 versus new30)",
+      "log": "initial-focused-audio-tests.log"
+    },
+    "afterCorrection": {
+      "passed": 46,
+      "failed": 0,
+      "files": 5,
+      "log": "final-dsp-tests.log"
+    },
+    "testsCover": [
+      "stronger broadband F135 output",
+      "native augmentation-only exhaust morph",
+      "above-dry native thrust headroom",
+      "missing augmentation does not activate exhaust morph",
+      "unchanged active cap and memory ceilings",
+      "invalid setup rejected atomically",
+      "actual plain-JS wrapper boot/profile replacement with actual WASM in Node",
+      "exact legacy SF50 output hashes",
+      "Renderer selection independent of engine class and aircraft identity",
+      "Unsupported ABI/schema/class, unknown or malformed setup and multiple-source admission reject explicitly",
+      "Declared nonzero native engine index and native source location",
+      "Definition-bound bank manifest through resampling and rejection before cross-engine sample transfer",
+      "Overlapping bank cancellation, stale ACK correlation and engine-replacement sample clearing",
+      "Required native telemetry loss and recovery without a latched unavailable state",
+      "Invalid actual-WASM runtime replacement stops output rather than retaining old engine setup",
+      "Installed native augmentation observer through dry/afterburning/converted/cutoff states"
+    ],
+    "architecture": {
+      "initialRelated": {
+        "passed": 607,
+        "failed": 19,
+        "files": 61,
+        "log": "architecture-initial-related.log",
+        "failure": "Fixture migration: missing explicit source diagnostics, old bank-version rejection fixture and app expectations; corrected before final CI"
+      },
+      "fixedSubset": {
+        "passed": 44,
+        "failed": 1,
+        "files": 4,
+        "log": "architecture-fixed-partial.log",
+        "failure": "Restored startup fixture incorrectly declared an active user gesture; corrected"
+      },
+      "finalLifecycle": {
+        "passed": 25,
+        "failed": 0,
+        "files": 1,
+        "log": "lifecycle-final.log"
+      },
+      "combinedFinal": {
+        "command": "npm run ci",
+        "exitCode": 0,
+        "passed": 1312,
+        "failed": 0,
+        "skipped": 0,
+        "files": 133,
+        "lint": "passed",
+        "incrementalTypecheck": "passed",
+        "productionBuild": "passed",
+        "installedAndEmittedArtifacts": "passed",
+        "log": "combined-final-ci.log"
+      },
+      "realF135AudioCases": {
+        "passed": 8,
+        "failed": 0,
+        "skipped": 0,
+        "installedSdk": "1.2.4-fork.8"
+      }
+    }
+  },
+  "sources": [
+    {
+      "url": "https://doi.org/10.2514/1.J057992",
+      "supports": "F-35B static ground-run spectrum contains mixing and broadband shock-associated noise with power/angle dependence",
+      "doesNotProvide": [
+        "rotor speed or blade orders",
+        "implemented synthetic tone references",
+        "implemented gain/filter calibration",
+        "cockpit transfer",
+        "calibrated free-flight recording"
+      ]
+    },
+    {
+      "url": "https://pubmed.ncbi.nlm.nih.gov/30424662/",
+      "supports": "F-35B BBSAN peaks vary by location and engine condition; spectral level/width differ from laboratory trends; F35B broadband shock-associated component is present at 75% ETR before afterburner"
+    },
+    {
+      "url": "https://www.williams-int.com/wp-content/uploads/2026/01/Fanjet-Family-Specsheets-IND-11262018-01222026.pdf",
+      "supports": "Williams FJ33/FJ44 product-family identity; no renderer calibration"
+    },
+    {
+      "url": "https://filecache.mediaroom.com/mr5mr_prattwhitney/177487/download/F135-engine-S16208.pdf",
+      "supports": "Distinct Pratt & Whitney F135 family and F119 lineage; no renderer calibration"
+    },
+    {
+      "url": "https://software.nasa.gov/software/LAR-18567-1",
+      "supports": "Component acoustics, propulsion installation and propagation are separable modeling concerns; architectural inference only"
+    },
+    {
+      "url": "https://ntrs.nasa.gov/citations/20150000884",
+      "supports": "Fan geometry/operating/directivity data inform acoustic prediction; no validation of current 23 parameters"
+    }
+  ],
+  "limitations": [
+    "All synthesis gains, shaft reference frequencies, fan/core mix and filter targets are artistic tuning, not measured SPL/BPF",
+    "Native fuel-flow shutdown residual remains visible; combustion timing is not repaired by audio",
+    "Existing noiseBands control is reported but not fully enforced by TurbofanVoice; separate DSP follow-up",
+    "No browser/device route, listening review, timing benchmark or performance qualification ran",
+    "Sharing broad turbofan hardware class and one prototype renderer does not establish the same OEM family or validated acoustic equivalence",
+    "No calibrated shock-noise component; augmentation morph is artistic and is not a gate for all physical shock noise",
+    "Current renderer supports only one source and turbine dynamics; unsupported engine families/multiple sources do not receive a fallback",
+    "Schema fuel-flow combustion threshold retains SF50 trace-led behavior; F135 start/abort/relight acoustics remain unvalidated"
+  ],
+  "hashes": [
+    {
+      "file": "src/flight/audio/aircraftAudioProfiles.ts",
+      "sha256": "8a143aeea3e7934bb389d56fe17e801eb8a13a39b8846029ff92ef090b21db1d"
+    },
+    {
+      "file": "src/flight/audio/audioSnapshot.ts",
+      "sha256": "2ea65748e13a544ac7126772bb3147f0332532bcd5d5d8e34d63118b5a884f79"
+    },
+    {
+      "file": "src/flight/audio/jsbsimAudioAdapter.ts",
+      "sha256": "9a76fd829e0219f565573b111df8f0c3d29f09cc00c2e16700ab0c326a16822b"
+    },
+    {
+      "file": "src/flight/audio/createFlightAudio.ts",
+      "sha256": "163f89e5d1104b8208fa71386039b2f51cd9dc0636ce2863792892ccd6da9fa1"
+    },
+    {
+      "file": "src/flight/audio/dsp/acoustic_profile.h",
+      "sha256": "97ab350833b94d939a023529089f688c602038ea2d46f2aca0cb160a3ec525d8"
+    },
+    {
+      "file": "src/flight/audio/dsp/turbofan.h",
+      "sha256": "67ce211744fa18281912bf84f964f37f6ff9b0ffdc49cafb497b63c47f09eabe"
+    },
+    {
+      "file": "src/flight/audio/dsp/core.cpp",
+      "sha256": "39ddfc6d2ef1bd570d182da49c95f14d57ed1271c3e145f9600ee20f21375b57"
+    },
+    {
+      "file": "src/flight/audio/dsp/snapshot.h",
+      "sha256": "181bcd199b2aefceac83fe4dd29e35b523b9db281558835130ae5740b6437cf3"
+    },
+    {
+      "file": "src/flight/audio/worklet/dspProcessor.js",
+      "sha256": "52177c4f6e680b0c0b772bec32659b7867d1a651403906fb12f390fec901604b"
+    },
+    {
+      "file": "src/flight/audio/dsp/audio-dsp.wasm",
+      "sha256": "e6816679136929aafc41d638f29d82dd0794437f52d7bc3535d84fbb70b1a259"
+    },
+    {
+      "file": "src/flight/audio/dsp/audio-dsp.provenance.json",
+      "sha256": "be147f150277e4587ad96b396ae1d6bedf97e487b6cddbb47db5bf2ef1053b0a"
+    },
+    {
+      "file": "src/flight/audio/engineAcousticDefinitions.ts",
+      "sha256": "a46d3fe7ca40efc6d5a53f83449da202b08f42309331a223b6a402e2c5f2b5ac"
+    },
+    {
+      "file": "src/flight/audio/audioRendererRegistry.ts",
+      "sha256": "25f983138a9a80f779c78499b08659702876621727ba76c174b332279b01474d"
+    },
+    {
+      "file": "src/flight/audio/audioBank.ts",
+      "sha256": "afda6ff5608c713c11d682af83ca9b70f943c87b5fc2b31014ff9ce4382c27b3"
+    },
+    {
+      "file": "src/flight/audio/audioArchitecture.test.ts",
+      "sha256": "b40d7260ddee6e13ae15afdffebb69c5d535c215fd1d7391fad234d8bd32f0c7"
+    },
+    {
+      "file": "src/flight/audio/createFlightAudio.test.ts",
+      "sha256": "050ff67677f0a7d787c2ffd07b61cb669747fe1abdca002a695f6f12e915bb70"
+    },
+    {
+      "file": "src/flight/audio/dspProcessor.test.ts",
+      "sha256": "273bb851405c619e6a2032d6240f4506905e7323762b585e72c3eb873af0774f"
+    },
+    {
+      "file": "src/flight/audio/acousticProfiles.test.ts",
+      "sha256": "80e625db3808a943954c24cefe5508195467c37a57f0937097d5b7e92e965e33"
+    },
+    {
+      "file": "src/flight/audio/f35bAudio.integration.test.ts",
+      "sha256": "ddc2fafabfcdbbbfcd6a0756c435a02dd700aa38809097f9866bfef45fa61462"
+    },
+    {
+      "file": "src/flight/audio/jsbsimAudioAdapter.integration.test.ts",
+      "sha256": "c94b6532471ff1364690eb9c5fb7f03505c515c8b395e86a931495696f72850b"
+    }
+  ],
+  "architecture": {
+    "engineDefinition": "Open engine identity, manufacturer family, hardware class, native schema, explicit renderer ID and parameters",
+    "installation": "Aircraft registry declares source IDs, native engine indices and geometry policy; only audio module importing AircraftId",
+    "renderer": "Registry selects binary/worklet/processor, supported dynamics ABI, encoder, telemetry/class admission and capacity",
+    "selectionFromEngineClass": false,
+    "manufacturerFamilies": [
+      "Williams FJ33/FJ44",
+      "Pratt & Whitney F135"
+    ],
+    "currentRendererId": "procedural-jet-v1",
+    "rendererAcousticStatus": "approximate-unvalidated",
+    "implicitReferenceEngineFallback": false,
+    "maxEngineSources": 1,
+    "multipleSourceBehavior": "Explicit unsupported admission; no source silently dropped",
+    "nativeEngineTypeVerification": false,
+    "requiredTelemetry": "Catalog present and initially finite; constructor rejection with owned batch release otherwise",
+    "runtimeTelemetryLoss": "Engine snapshot muted; native reads continue and publication recovers",
+    "commands": "Global starter/cutoff require selected-engine scope; ambiguous all-engine commands on multiengine F35B are unavailable",
+    "sourcePosition": "Declared native engine structural location relative to native CG plus aircraft stance",
+    "bankManifestVersion": 2,
+    "bankIdentity": "Validated engine definition + renderer identity retained through loading/resampling/install",
+    "bankReplacement": "Clear samples and cancel pending promises; ACK generation+index prevents stale admission",
+    "futureBoundaries": [
+      "Separate piston/turboprop/turboshaft renderers and telemetry bridges",
+      "Independent LiftFan acoustics",
+      "Multiple-source synthesis/mixing with whole-aircraft budgets",
+      "Airframe synthesis once per aircraft rather than once per engine"
+    ]
+  },
+  "retainedLogHashes": [
+    {
+      "file": "architecture-initial-related.log",
+      "sha256": "be31ce7d7784a66ae0ce4462c51f4ddd76a38e1fd24e3edd60df90d99ae5d060"
+    },
+    {
+      "file": "architecture-fixed-partial.log",
+      "sha256": "ee17abd97070b19b71d584b084b36e84358c81741054a2ce6b848a651b4c98ff"
+    },
+    {
+      "file": "lifecycle-final.log",
+      "sha256": "31e714c310f355e544f44325aaa525bb1fbd70a988624a6a190625d28416e738"
+    },
+    {
+      "file": "combined-final-ci.log",
+      "sha256": "63a9e3c55b358e5991ee797b3bc67534b0bf12896d17dbaf51464e744973a875"
+    }
+  ]
+}

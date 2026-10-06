@@ -156,7 +156,7 @@ fixed as part of this follow-up:
   Handoff: [flaps-reset-on-bumps-prompt.md](../flaps-reset-on-bumps-prompt.md).
 - With engine sound set to "mid," zooming in and out of the aircraft made the
   sound "bug out." The type of artifact and effective audio tier are unknown.
-  Handoff: [engine-sound-zoom-prompt.md](../engine-sound-zoom-prompt.md).
+  Handoff: [engine-sound-zoom-prompt.md](../old/engine-sound-zoom-prompt.md).
   **Closed out later the same day.** Med's propagation delay line read its length
   from the camera distance, so a wheel-notch zoom was heard as speed and bent the
   whole engine by up to two octaves; the tap now moves only with the modelled

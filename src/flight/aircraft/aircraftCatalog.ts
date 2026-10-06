@@ -1,5 +1,6 @@
 import { getFdmProfile } from "../jsbsim/fdmProfiles";
 import { SF50_VARIANTS } from "./sf50Variants";
+import { getEngineExhaustOpticalProfile } from "./engineExhaustProfiles";
 import {
   AIRCRAFT_FAMILY_IDS,
   AIRCRAFT_IDS,
@@ -99,6 +100,28 @@ export interface AircraftLodDefinition {
   optIn?: boolean;
 }
 
+export interface AircraftExhaustInstallation {
+  id: string;
+  engineIndex: number;
+  opticalProfileId: string;
+  attachmentNode: string;
+  /** Scope thermal glow to matching materials under this nozzle only. */
+  hotSurfaceMaterialNames?: readonly string[];
+  /** Optional artistic aerosol appearance; independent of the optical plume. */
+  smokeProfileId?: string;
+  /** Position/direction in the authored attachment's local coordinates. */
+  exitPosition: readonly [number, number, number];
+  direction: readonly [number, number, number];
+  /** Display geometry in metres; not a performance model of the plume. */
+  closedRadiusMeters: number;
+  openRadiusMeters: number;
+  lengthMeters: number;
+  /** Native observation and scale for the optical table's power coordinate. */
+  powerProperty: string;
+  powerFullScale: number;
+  fuelFlowProperty: string;
+}
+
 export interface AircraftDefinition {
   id: AircraftId;
   familyId: AircraftFamilyId;
@@ -112,6 +135,21 @@ export interface AircraftDefinition {
    * sit near the ground plane.
    */
   modelOffset: { x: number; y: number; z: number };
+  /** Pilot eye in the sim's body axes, relative to the aircraft reference point. */
+  cockpitOffset?: { x: number; y: number; z: number };
+  /** The exterior asset includes an interior that can be drawn in cockpit view. */
+  cockpitMesh?: boolean;
+  /** Native nozzle-position observer driving the model's optional petal rig. */
+  nozzlePositionEngineIndex?: number;
+  /** Authored wheel/arm geometry hidden at native gear position zero; doors stay visible. */
+  stowedGearNodeNames?: readonly string[];
+  exhaustSources?: readonly AircraftExhaustInstallation[];
+  /** Engines whose native augmentation state lights the throttle indicator. */
+  afterburner?: {
+    engineIndices: readonly number[];
+    /** Representative plume hue for the HUD, not a fixed physical flame color. */
+    accentColor: string;
+  };
   /**
    * Blades on the propeller, or 0 for a jet. Sets how fast the blades can turn
    * before they alias and have to be swapped for a blurred disc: the image
@@ -129,6 +167,13 @@ const PROCEDURAL: AircraftModelCredit = {
 const THUMBNAIL_CREDIT: AircraftModelCredit = {
   artist: PROCEDURAL.artist,
   note: "Static render of the existing procedural LOD3 aircraft mesh.",
+};
+
+const F35B_CREDIT: AircraftModelCredit = {
+  artist: "AF267",
+  note: "Sketchfab model, converted from the author's Blender source.",
+  licence: "CC BY 4.0",
+  sourceUrl: "https://sketchfab.com/3d-models/lockheed-martin-f-35b-lightning-ii-5d54a6af45974ad386ae74d42b33374a",
 };
 
 const SF50_FAMILY_VARIANTS: readonly AircraftFamilyVariantDefinition[] = [
@@ -159,6 +204,18 @@ export const AIRCRAFT_FAMILIES: readonly AircraftFamilyDefinition[] = [
     variants: SF50_FAMILY_VARIANTS,
     variantLabel: "Generation",
     developmentNote: "G1, G2 and G3 have separate runtime packages. G2+ is currently mapped to the G2 runtime while separate physics/package support is not yet implemented. Choosing a generation does not provide calibrated generation-specific performance, a new cabin or complete generation-specific avionics.",
+  },
+  {
+    id: "f-35b",
+    label: "Lockheed Martin F-35B Lightning II",
+    summary: "STOVL fighter. Experimental flight model and AF267 exterior model.",
+    thumbnail: {
+      path: "aircraft/thumbnails/f-35b.png",
+      credit: { ...F35B_CREDIT, note: "Static render of AF267's F-35B model." },
+    },
+    defaultAircraftId: "f-35b",
+    variants: [{ id: "f-35b", aircraftId: "f-35b", label: "F-35B" }],
+    developmentNote: "Experimental F-16/Aeromatic-derived JSBSim flight model. F-35B performance and STOVL behavior are not validated.",
   },
 ];
 
@@ -199,6 +256,11 @@ const C172_LODS: readonly AircraftLodDefinition[] = [
   { id: "lod0", label: "LOD0 — silhouette", triangles: 130, path: "aircraft/cessna-172/Cessna_172_LOD0.glb", autoFromMeters: 320, credit: PROCEDURAL },
 ];
 
+// This is the F-35B's only exterior mesh, so Auto must be able to select it.
+const F35B_LODS: readonly AircraftLodDefinition[] = [
+  { id: "hd", label: "HD — source model", triangles: 12259, path: "aircraft/f-35b/F-35B_AF267.glb", autoFromMeters: 0, credit: F35B_CREDIT },
+];
+
 export const AIRCRAFT_CATALOG: readonly AircraftDefinition[] = [
   {
     id: "cessna-172",
@@ -220,6 +282,40 @@ export const AIRCRAFT_CATALOG: readonly AircraftDefinition[] = [
     propellerBlades: 0,
     lods: CIRRUS_LODS,
   })),
+  {
+    id: "f-35b",
+    familyId: "f-35b",
+    label: "Lockheed Martin F-35B Lightning II",
+    summary: "STOVL fighter. Experimental flight model and AF267 exterior model.",
+    modelYawRad: Math.PI,
+    modelOffset: { x: 0, y: modelOffsetY("f-35b"), z: 0 },
+    // Geometry fit inside AF267's canopy, behind its panel; not a published
+    // pilot-eye datum. The exported mesh's coordinates are ground-relative.
+    cockpitOffset: { x: 0, y: 3.18098 + modelOffsetY("f-35b"), z: 6.30018 },
+    cockpitMesh: true,
+    nozzlePositionEngineIndex: 0,
+    stowedGearNodeNames: [
+      "leftGear", "leftPiston", "leftStrutT", "leftSuspension", "leftStrutB", "leftWheel",
+      "rightGear", "rightPiston", "rightStrutT", "rightSuspension", "rightStrutB", "rightWheel",
+      "noseGear", "nosePiston", "noseStrutT", "noseSuspension", "noseStrutB", "noseWheel",
+    ],
+    afterburner: {
+      engineIndices: [0],
+      accentColor: getEngineExhaustOpticalProfile("f135-visible-approximation-v1")!.hudAccentHex,
+    },
+    exhaustSources: [{
+      id: "main-exhaust", engineIndex: 0, opticalProfileId: "f135-visible-approximation-v1",
+      attachmentNode: "vtol", exitPosition: [0, 0.28737974, 1.79], direction: [0, 0, 1],
+      hotSurfaceMaterialNames: ["darkmet2"],
+      smokeProfileId: "faint-aircraft-aerosol-v1",
+      // Radii measured from the authored petal tips; length is a visual approximation.
+      closedRadiusMeters: 0.402703, openRadiusMeters: 0.581769, lengthMeters: 6,
+      powerProperty: "propulsion/engine[0]/n2", powerFullScale: 100,
+      fuelFlowProperty: "propulsion/engine[0]/fuel-flow-rate-pps",
+    }],
+    propellerBlades: 0,
+    lods: F35B_LODS,
+  },
 ];
 
 export function getAircraftDefinition(id: AircraftId): AircraftDefinition {

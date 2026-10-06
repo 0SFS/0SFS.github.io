@@ -1,6 +1,6 @@
 import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import { describe, expect, it, vi } from "vitest";
-import { bootstrapC172p } from "./bootstrapC172";
+import { bootstrapAircraft, bootstrapC172p } from "./bootstrapC172";
 import { FIXED_DT } from "../physics/fixedStepLoop";
 
 describe("bootstrapC172p", () => {
@@ -50,4 +50,36 @@ describe("bootstrapC172p", () => {
     await expect(bootstrapC172p(sdk)).rejects.toThrow("missing setDt");
     expect(sdk.setPropertyValue).not.toHaveBeenCalled();
   });
+});
+
+describe("native model capabilities", () => {
+  function sdkWithCatalog(catalog: string[]) {
+    return {
+      configurePaths: vi.fn(), loadModel: vi.fn(() => true),
+      setDt: vi.fn(), getDeltaT: vi.fn(() => FIXED_DT),
+      getPropertyCatalog: vi.fn(() => catalog),
+      runIc: vi.fn(() => true), setPropertyValue: vi.fn(),
+    };
+  }
+
+  it.each([
+    { catalog: [] },
+    { catalog: ["propulsion/engine/body-force-z-lbs (RW)"] },
+    { catalog: ["propulsion/engine[1]/body-force-z-lbs (R)"] },
+  ])("rejects absent or writable substitutes before evaluating the aircraft: $catalog", async ({ catalog }) => {
+    const sdk = sdkWithCatalog(catalog);
+    await expect(bootstrapAircraft(sdk as unknown as JSBSimSdk, "f-35b"))
+      .rejects.toThrow("Install a compatible JSBSim SDK and matching aircraft data");
+    expect(sdk.setDt).not.toHaveBeenCalled();
+    expect(sdk.setPropertyValue).not.toHaveBeenCalled();
+    expect(sdk.runIc).not.toHaveBeenCalled();
+  });
+
+  it.each(["propulsion/engine/body-force-z-lbs", "propulsion/engine[0]/body-force-z-lbs"])(
+    "accepts the native read-only engine-zero spelling %s", async path => {
+      const sdk = sdkWithCatalog([`${path} (R)`]);
+      await bootstrapAircraft(sdk as unknown as JSBSimSdk, "f-35b");
+      expect(sdk.runIc).toHaveBeenCalledTimes(2);
+    },
+  );
 });

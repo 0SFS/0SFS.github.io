@@ -67,12 +67,26 @@ export async function bootstrapAircraft(
   sdk.configurePaths({
     rootDir: "/runtime",
     aircraftPath: "aircraft",
-    enginePath: "engine",
-    systemsPath: "systems",
+    enginePath: profile.dataPaths?.enginePath ?? "engine",
+    systemsPath: profile.dataPaths?.systemsPath ?? "systems",
   });
 
   if (!sdk.loadModel(profile.model)) {
     throw new Error(`JSBSim failed to load the ${aircraftId} aircraft model (${profile.model}).`);
+  }
+
+  if (profile.requiredReadOnlyModelProperties?.length) {
+    // A model expression can create an absent native property as an ordinary
+    // writable zero. Only a getter-only catalog entry proves the native tie exists.
+    const normalize = (path: string): string => path.replace(/\[0\]/g, "");
+    const readOnly = new Set(sdk.getPropertyCatalog().flatMap(entry => {
+      const match = /^(.*?)\s+\(R\)$/.exec(entry.trim());
+      return match ? [normalize(match[1])] : [];
+    }));
+    const missing = profile.requiredReadOnlyModelProperties.filter(path => !readOnly.has(normalize(path)));
+    if (missing.length) {
+      throw new Error(`JSBSim cannot initialize ${aircraftId}: required native read-only model properties are unavailable: ${missing.join(", ")}. Install a compatible JSBSim SDK and matching aircraft data.`);
+    }
   }
 
   applyFixedDeltaT(sdk, FIXED_DT);
@@ -80,21 +94,30 @@ export async function bootstrapAircraft(
   sdk.setPropertyValue("ic/long-gc-deg", opts.lonDeg);
   sdk.setPropertyValue("ic/h-sl-ft", opts.altFt);
   sdk.setPropertyValue("ic/psi-true-deg", opts.headingDeg);
-  sdk.setPropertyValue("ic/theta-deg", 0);
+  sdk.setPropertyValue("ic/theta-deg", profile.initialPitchDeg ?? 0);
   sdk.setPropertyValue("ic/phi-deg", 0);
-  sdk.setPropertyValue("ic/vc-kts", opts.airspeedKts);
+  sdk.setPropertyValue("ic/vc-kts", options.airspeedKts ?? profile.initialAirspeedKts ?? opts.airspeedKts);
+  if (profile.initialPitchDeg !== undefined) {
+    sdk.setPropertyValue("ic/gamma-deg", 0);
+    sdk.setPropertyValue("ic/alpha-deg", profile.initialPitchDeg);
+  }
   // Commands and physical actuator positions must agree before RunIC, which
   // already evaluates the FCS and ground contacts. These are not IC properties.
   sdk.setPropertyValue("gear/gear-cmd-norm", profile.initialGearDown ? 1 : 0);
   sdk.setPropertyValue("gear/gear-pos-norm", profile.initialGearDown ? 1 : 0);
   sdk.setPropertyValue("fcs/flap-cmd-norm", 0);
   sdk.setPropertyValue(profile.flapPosition.property, 0);
+  const restoreAircraftControls = (): void => {
+    for (const [property, value] of Object.entries(profile.initialProperties ?? {})) sdk.setPropertyValue(property, value);
+  };
+  restoreAircraftControls();
 
   if (!sdk.runIc()) {
     throw new Error(`JSBSim RunIC failed for ${aircraftId} initial conditions.`);
   }
 
   sdk.setPropertyValue("fcs/throttle-cmd-norm", throttleNorm);
+  restoreAircraftControls();
   if (opts.engineRunning) sdk.setPropertyValue("propulsion/set-running", -1);
   else sdk.setPropertyValue("propulsion/engine/set-running", 0);
   if (isPiston) {
@@ -105,6 +128,7 @@ export async function bootstrapAircraft(
   // the requested command and evaluate normal zero-time FCS/propulsion before
   // exposing the first sample; native JSBSim owns the turbine state update.
   sdk.setPropertyValue("fcs/throttle-cmd-norm", throttleNorm);
+  restoreAircraftControls();
   if (!sdk.runIc()) {
     throw new Error(`JSBSim RunIC failed for ${aircraftId} engine initial conditions.`);
   }

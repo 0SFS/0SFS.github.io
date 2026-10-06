@@ -1,0 +1,3 @@
+# Runtime/source manifests identify exact bytes, including source line endings.
+*.xml -text
+License.txt -text

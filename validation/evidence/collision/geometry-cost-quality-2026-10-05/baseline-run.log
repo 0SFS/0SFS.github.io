@@ -1,0 +1,118 @@
+aircraft-collision: output build/validation/collision/cost-quality/2026-10-05_022000
+aircraft-collision: c172/ground-dense complete (41 candidates)
+aircraft-collision: c172/pole complete (41 candidates)
+aircraft-collision: c172/corner complete (41 candidates)
+aircraft-collision: c172/wall complete (41 candidates)
+aircraft-collision: c172/far-miss complete (41 candidates)
+aircraft-collision: c172/pole-outside complete (41 candidates)
+aircraft-collision: c172/corner-outside complete (41 candidates)
+aircraft-collision: c172/wall-outside complete (41 candidates)
+aircraft-collision: sf50/ground-dense complete (41 candidates)
+aircraft-collision: sf50/pole complete (41 candidates)
+aircraft-collision: sf50/corner complete (41 candidates)
+aircraft-collision: sf50/wall complete (41 candidates)
+aircraft-collision: sf50/far-miss complete (41 candidates)
+aircraft-collision: sf50/pole-outside complete (41 candidates)
+aircraft-collision: sf50/corner-outside complete (41 candidates)
+aircraft-collision: sf50/wall-outside complete (41 candidates)
+┌─────────┬──────────┬──────────────────┬───────────────────┬──────────────┬────────┬───────┬───────┐
+│ (index) │ aircraft │ workload         │ candidate         │ microseconds │ missed │ extra │ early │
+├─────────┼──────────┼──────────────────┼───────────────────┼──────────────┼────────┼───────┼───────┤
+│ 0       │ 'c172'   │ 'ground-dense'   │ 'exact-triangles' │ '141.02'     │ 0      │ 0     │ 0     │
+│ 1       │ 'c172'   │ 'ground-dense'   │ 'legacy-5'        │ '0.83'       │ 64     │ 3     │ 15    │
+│ 2       │ 'c172'   │ 'ground-dense'   │ 'points-24'       │ '4.09'       │ 3      │ 0     │ 0     │
+│ 3       │ 'c172'   │ 'ground-dense'   │ 'hulls-16'        │ '73.70'      │ 0      │ 0     │ 0     │
+│ 4       │ 'c172'   │ 'ground-dense'   │ 'obb-16'          │ '96.09'      │ 0      │ 32    │ 96    │
+│ 5       │ 'c172'   │ 'ground-dense'   │ 'capsules-16'     │ '367.97'     │ 0      │ 32    │ 96    │
+│ 6       │ 'c172'   │ 'pole'           │ 'exact-triangles' │ '1.61'       │ 0      │ 0     │ 0     │
+│ 7       │ 'c172'   │ 'pole'           │ 'legacy-5'        │ '0.71'       │ 128    │ 0     │ 0     │
+│ 8       │ 'c172'   │ 'pole'           │ 'points-24'       │ '3.24'       │ 110    │ 0     │ 0     │
+│ 9       │ 'c172'   │ 'pole'           │ 'hulls-16'        │ '1.68'       │ 0      │ 0     │ 65    │
+│ 10      │ 'c172'   │ 'pole'           │ 'obb-16'          │ '1.94'       │ 0      │ 0     │ 128   │
+│ 11      │ 'c172'   │ 'pole'           │ 'capsules-16'     │ '5.03'       │ 0      │ 0     │ 128   │
+│ 12      │ 'c172'   │ 'corner'         │ 'exact-triangles' │ '2.02'       │ 0      │ 0     │ 0     │
+│ 13      │ 'c172'   │ 'corner'         │ 'legacy-5'        │ '0.74'       │ 86     │ 0     │ 0     │
+│ 14      │ 'c172'   │ 'corner'         │ 'points-24'       │ '3.40'       │ 86     │ 0     │ 0     │
+│ 15      │ 'c172'   │ 'corner'         │ 'hulls-16'        │ '1.78'       │ 0      │ 4     │ 66    │
+│ 16      │ 'c172'   │ 'corner'         │ 'obb-16'          │ '2.19'       │ 0      │ 16    │ 85    │
+│ 17      │ 'c172'   │ 'corner'         │ 'capsules-16'     │ '7.65'       │ 0      │ 30    │ 85    │
+│ 18      │ 'c172'   │ 'wall'           │ 'exact-triangles' │ '339.84'     │ 0      │ 0     │ 0     │
+│ 19      │ 'c172'   │ 'wall'           │ 'legacy-5'        │ '0.75'       │ 72     │ 0     │ 28    │
+│ 20      │ 'c172'   │ 'wall'           │ 'points-24'       │ '3.48'       │ 5      │ 0     │ 0     │
+│ 21      │ 'c172'   │ 'wall'           │ 'hulls-16'        │ '8.55'       │ 0      │ 0     │ 0     │
+│ 22      │ 'c172'   │ 'wall'           │ 'obb-16'          │ '4.43'       │ 0      │ 0     │ 124   │
+│ 23      │ 'c172'   │ 'wall'           │ 'capsules-16'     │ '4.85'       │ 0      │ 0     │ 124   │
+│ 24      │ 'c172'   │ 'far-miss'       │ 'exact-triangles' │ '0.23'       │ 0      │ 0     │ 0     │
+│ 25      │ 'c172'   │ 'far-miss'       │ 'legacy-5'        │ '0.74'       │ 0      │ 0     │ 0     │
+│ 26      │ 'c172'   │ 'far-miss'       │ 'points-24'       │ '3.39'       │ 0      │ 0     │ 0     │
+│ 27      │ 'c172'   │ 'far-miss'       │ 'hulls-16'        │ '0.23'       │ 0      │ 0     │ 0     │
+│ 28      │ 'c172'   │ 'far-miss'       │ 'obb-16'          │ '0.24'       │ 0      │ 0     │ 0     │
+│ 29      │ 'c172'   │ 'far-miss'       │ 'capsules-16'     │ '0.24'       │ 0      │ 0     │ 0     │
+│ 30      │ 'c172'   │ 'pole-outside'   │ 'exact-triangles' │ '1.85'       │ 0      │ 0     │ 0     │
+│ 31      │ 'c172'   │ 'pole-outside'   │ 'legacy-5'        │ '0.74'       │ 125    │ 0     │ 0     │
+│ 32      │ 'c172'   │ 'pole-outside'   │ 'points-24'       │ '3.34'       │ 106    │ 0     │ 0     │
+│ 33      │ 'c172'   │ 'pole-outside'   │ 'hulls-16'        │ '1.36'       │ 0      │ 0     │ 65    │
+│ 34      │ 'c172'   │ 'pole-outside'   │ 'obb-16'          │ '1.45'       │ 0      │ 0     │ 128   │
+│ 35      │ 'c172'   │ 'pole-outside'   │ 'capsules-16'     │ '2.13'       │ 0      │ 0     │ 128   │
+│ 36      │ 'c172'   │ 'corner-outside' │ 'exact-triangles' │ '2.45'       │ 0      │ 0     │ 0     │
+│ 37      │ 'c172'   │ 'corner-outside' │ 'legacy-5'        │ '0.75'       │ 86     │ 0     │ 0     │
+│ 38      │ 'c172'   │ 'corner-outside' │ 'points-24'       │ '3.37'       │ 85     │ 0     │ 0     │
+│ 39      │ 'c172'   │ 'corner-outside' │ 'hulls-16'        │ '1.78'       │ 0      │ 12    │ 67    │
+│ 40      │ 'c172'   │ 'corner-outside' │ 'obb-16'          │ '2.09'       │ 0      │ 30    │ 86    │
+│ 41      │ 'c172'   │ 'corner-outside' │ 'capsules-16'     │ '4.31'       │ 0      │ 39    │ 86    │
+│ 42      │ 'c172'   │ 'wall-outside'   │ 'exact-triangles' │ '327.34'     │ 0      │ 0     │ 0     │
+│ 43      │ 'c172'   │ 'wall-outside'   │ 'legacy-5'        │ '1.19'       │ 0      │ 0     │ 46    │
+│ 44      │ 'c172'   │ 'wall-outside'   │ 'points-24'       │ '5.50'       │ 0      │ 0     │ 0     │
+│ 45      │ 'c172'   │ 'wall-outside'   │ 'hulls-16'        │ '8.18'       │ 0      │ 0     │ 1     │
+│ 46      │ 'c172'   │ 'wall-outside'   │ 'obb-16'          │ '7.27'       │ 0      │ 0     │ 128   │
+│ 47      │ 'c172'   │ 'wall-outside'   │ 'capsules-16'     │ '9.65'       │ 0      │ 0     │ 128   │
+│ 48      │ 'sf50'   │ 'ground-dense'   │ 'exact-triangles' │ '236.72'     │ 0      │ 0     │ 0     │
+│ 49      │ 'sf50'   │ 'ground-dense'   │ 'legacy-6'        │ '1.05'       │ 45     │ 1     │ 24    │
+│ 50      │ 'sf50'   │ 'ground-dense'   │ 'points-24'       │ '4.04'       │ 6      │ 0     │ 0     │
+│ 51      │ 'sf50'   │ 'ground-dense'   │ 'hulls-16'        │ '97.27'      │ 0      │ 0     │ 0     │
+│ 52      │ 'sf50'   │ 'ground-dense'   │ 'obb-16'          │ '90.23'      │ 0      │ 28    │ 96    │
+│ 53      │ 'sf50'   │ 'ground-dense'   │ 'capsules-16'     │ '332.03'     │ 0      │ 32    │ 96    │
+│ 54      │ 'sf50'   │ 'pole'           │ 'exact-triangles' │ '2.81'       │ 0      │ 0     │ 0     │
+│ 55      │ 'sf50'   │ 'pole'           │ 'legacy-6'        │ '0.86'       │ 126    │ 0     │ 0     │
+│ 56      │ 'sf50'   │ 'pole'           │ 'points-24'       │ '3.29'       │ 120    │ 0     │ 0     │
+│ 57      │ 'sf50'   │ 'pole'           │ 'hulls-16'        │ '2.57'       │ 0      │ 2     │ 81    │
+│ 58      │ 'sf50'   │ 'pole'           │ 'obb-16'          │ '2.33'       │ 0      │ 2     │ 124   │
+│ 59      │ 'sf50'   │ 'pole'           │ 'capsules-16'     │ '4.71'       │ 0      │ 2     │ 124   │
+│ 60      │ 'sf50'   │ 'corner'         │ 'exact-triangles' │ '2.86'       │ 0      │ 0     │ 0     │
+│ 61      │ 'sf50'   │ 'corner'         │ 'legacy-6'        │ '0.91'       │ 89     │ 0     │ 1     │
+│ 62      │ 'sf50'   │ 'corner'         │ 'points-24'       │ '3.46'       │ 88     │ 0     │ 0     │
+│ 63      │ 'sf50'   │ 'corner'         │ 'hulls-16'        │ '2.13'       │ 0      │ 3     │ 66    │
+│ 64      │ 'sf50'   │ 'corner'         │ 'obb-16'          │ '2.09'       │ 0      │ 8     │ 87    │
+│ 65      │ 'sf50'   │ 'corner'         │ 'capsules-16'     │ '7.62'       │ 0      │ 23    │ 87    │
+│ 66      │ 'sf50'   │ 'wall'           │ 'exact-triangles' │ '614.06'     │ 0      │ 0     │ 0     │
+│ 67      │ 'sf50'   │ 'wall'           │ 'legacy-6'        │ '0.93'       │ 53     │ 0     │ 34    │
+│ 68      │ 'sf50'   │ 'wall'           │ 'points-24'       │ '3.52'       │ 10     │ 0     │ 0     │
+│ 69      │ 'sf50'   │ 'wall'           │ 'hulls-16'        │ '9.10'       │ 0      │ 0     │ 1     │
+│ 70      │ 'sf50'   │ 'wall'           │ 'obb-16'          │ '5.31'       │ 0      │ 0     │ 124   │
+│ 71      │ 'sf50'   │ 'wall'           │ 'capsules-16'     │ '5.44'       │ 0      │ 0     │ 124   │
+│ 72      │ 'sf50'   │ 'far-miss'       │ 'exact-triangles' │ '0.24'       │ 0      │ 0     │ 0     │
+│ 73      │ 'sf50'   │ 'far-miss'       │ 'legacy-6'        │ '0.89'       │ 0      │ 0     │ 0     │
+│ 74      │ 'sf50'   │ 'far-miss'       │ 'points-24'       │ '3.42'       │ 0      │ 0     │ 0     │
+│ 75      │ 'sf50'   │ 'far-miss'       │ 'hulls-16'        │ '0.24'       │ 0      │ 0     │ 0     │
+│ 76      │ 'sf50'   │ 'far-miss'       │ 'obb-16'          │ '0.24'       │ 0      │ 0     │ 0     │
+│ 77      │ 'sf50'   │ 'far-miss'       │ 'capsules-16'     │ '0.24'       │ 0      │ 0     │ 0     │
+│ 78      │ 'sf50'   │ 'pole-outside'   │ 'exact-triangles' │ '3.54'       │ 0      │ 0     │ 0     │
+│ 79      │ 'sf50'   │ 'pole-outside'   │ 'legacy-6'        │ '0.90'       │ 123    │ 0     │ 0     │
+│ 80      │ 'sf50'   │ 'pole-outside'   │ 'points-24'       │ '3.41'       │ 107    │ 0     │ 0     │
+│ 81      │ 'sf50'   │ 'pole-outside'   │ 'hulls-16'        │ '2.30'       │ 0      │ 0     │ 85    │
+│ 82      │ 'sf50'   │ 'pole-outside'   │ 'obb-16'          │ '1.67'       │ 0      │ 0     │ 128   │
+│ 83      │ 'sf50'   │ 'pole-outside'   │ 'capsules-16'     │ '3.52'       │ 0      │ 0     │ 128   │
+│ 84      │ 'sf50'   │ 'corner-outside' │ 'exact-triangles' │ '3.44'       │ 0      │ 0     │ 0     │
+│ 85      │ 'sf50'   │ 'corner-outside' │ 'legacy-6'        │ '0.91'       │ 87     │ 0     │ 1     │
+│ 86      │ 'sf50'   │ 'corner-outside' │ 'points-24'       │ '3.42'       │ 83     │ 0     │ 0     │
+│ 87      │ 'sf50'   │ 'corner-outside' │ 'hulls-16'        │ '2.05'       │ 0      │ 7     │ 69    │
+│ 88      │ 'sf50'   │ 'corner-outside' │ 'obb-16'          │ '2.08'       │ 0      │ 17    │ 90    │
+│ 89      │ 'sf50'   │ 'corner-outside' │ 'capsules-16'     │ '4.14'       │ 0      │ 28    │ 90    │
+│ 90      │ 'sf50'   │ 'wall-outside'   │ 'exact-triangles' │ '596.87'     │ 0      │ 0     │ 0     │
+│ 91      │ 'sf50'   │ 'wall-outside'   │ 'legacy-6'        │ '1.43'       │ 0      │ 0     │ 37    │
+│ 92      │ 'sf50'   │ 'wall-outside'   │ 'points-24'       │ '5.52'       │ 0      │ 0     │ 0     │
+│ 93      │ 'sf50'   │ 'wall-outside'   │ 'hulls-16'        │ '8.68'       │ 0      │ 0     │ 1     │
+│ 94      │ 'sf50'   │ 'wall-outside'   │ 'obb-16'          │ '7.27'       │ 0      │ 0     │ 128   │
+│ 95      │ 'sf50'   │ 'wall-outside'   │ 'capsules-16'     │ '9.77'       │ 0      │ 0     │ 128   │
+└─────────┴──────────┴──────────────────┴───────────────────┴──────────────┴────────┴───────┴───────┘
+aircraft-collision: retained raw results build/validation/collision/cost-quality/2026-10-05_022000/results.json

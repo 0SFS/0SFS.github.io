@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "inspectedDate": "2026-10-05",
+  "originalSourceRecord": {
+    "package": "F-35B-yasim",
+    "variant": "F-35B-jsbsim",
+    "aero": "F-35B-jsbsim",
+    "zip": "https://fgaddon.b-cdn.net/Aircraft-trunk/F-35B.zip",
+    "revision": "15340",
+    "md5": "7d8225e9c41f456d7fbb705064bb0274",
+    "files": [
+      "Engines/F135-PW-600.xml",
+      "Engines/direct.xml",
+      "Engines/liftfan.xml",
+      "Engines/sidefan.xml",
+      "F-35B-jsbsim.xml",
+      "Systems/pushback.xml"
+    ]
+  },
+  "archiveBytes": 10618616,
+  "archiveSha256": "caf3c591c838148ccdeec8fc61a23fd09f17574aeb36e0071e84a132dd25ebd6",
+  "mirror": {
+    "repository": "https://github.com/FGMEMBERS/F-35B",
+    "commit": "2726b3bdf3c7c54ea09a5d4a248e86a739604ca7",
+    "commitDate": "2025-07-10",
+    "isOfficialArchiveIdentity": false
+  },
+  "licenseEvidence": {
+    "packageFile": "F-35B/License.txt",
+    "packageText": "GPL version 3",
+    "fdmHeaderLicenseName": "GPL (General Public License)"
+  },
+  "sourceWiringFinding": {
+    "variantFile": "F-35B/F-35B-jsbsim-set.xml",
+    "nasalInclude": "Aircraft/F-35B/Nasal/fan-yasim.nas",
+    "jsbsimMixerPresent": "F-35B/Nasal/fan-jsbsim.nas",
+    "nasalExecutedByPriorSmoke": false
+  }
+}

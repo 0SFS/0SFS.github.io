@@ -4,6 +4,9 @@ import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 /** The camera has its own tests; here only what the controller hands it matters. */
 const scanner = vi.hoisted(() => ({ props: null as null | { onScan(url: string): void; onClose(): void } }))
+vi.mock('../flight/hud/engineSpoolRenderer', () => ({
+  createEngineSpoolRenderer: () => ({ draw() {}, configure() {}, destroy() {}, ready: Promise.resolve() }),
+}))
 vi.mock('./PhoneQrScanner', async () => {
   const { createElement } = await import('react')
   return { PhoneQrScanner: (props: { onScan(url: string): void; onClose(): void }) => {
@@ -25,6 +28,8 @@ const setPaused = vi.fn(() => true)
 const setHapticsEnabled = vi.fn()
 const setViewMode = vi.fn(() => true)
 const requestControl = vi.fn(() => true)
+const setStarterHeld = vi.fn()
+const shutdownEngine = vi.fn(() => true)
 
 function mount({ engine, status, snapshot, onPair }: {
   engine?: EngineStatus
@@ -45,7 +50,7 @@ function mount({ engine, status, snapshot, onPair }: {
   const client: PhoneControllerClient = {
     log: createConnectionLog('phone', () => 0), subscribe: () => () => {}, getSnapshot: () => state,
     updateControls, nudgeCamera, cancelTransientControls: vi.fn(), requestControl,
-    setPaused, setViewMode, setGearDown: () => true, releaseControl: () => true,
+    setPaused, setViewMode, setGearDown: () => true, setStarterHeld, shutdownEngine, releaseControl: () => true,
     setHapticsEnabled, destroy: vi.fn(),
   }
   act(() => root.render(<PhoneController client={client} onPair={onPair} />))
@@ -87,6 +92,8 @@ beforeEach(() => {
   setHapticsEnabled.mockClear()
   setViewMode.mockClear()
   requestControl.mockClear()
+  setStarterHeld.mockClear()
+  shutdownEngine.mockClear()
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
     { x: 0, y: 0, left: 0, top: 0, right: 200, bottom: 200, width: 200, height: 200, toJSON: () => ({}) })
   Object.defineProperties(HTMLElement.prototype, {
@@ -133,6 +140,42 @@ describe('phone controller screen', () => {
     remount()
     expect(container.querySelector('.phone-engine')).toBeNull()
     expect(container.querySelector('.phone-yaw-throttle--engine')).toBeNull()
+  })
+
+  it('draws the desktop throttle lever, and holding it while the engine is off holds the starter', () => {
+    mount({ engine: { phase: 'OFF', state: 'stopped', start: 0 }, snapshot: { controls: { ...NEUTRAL_CONTROLS, throttle: 0.4 } } })
+    const lever = container.querySelector<HTMLElement>('.phone-yaw-throttle > .flight-hud__slider-control--throttle.phone-throttle')!
+    const slider = lever.querySelector<HTMLElement>('[data-control="throttle"][role="slider"]')!
+    expect(lever.dataset.engine).toBe('stopped')
+    expect(lever.querySelector('output')!.value).toBe('OFF')
+    // Engine off, the throttle this phone sends rests at idle with the lever.
+    expect(updateControls).toHaveBeenCalledWith({ throttle: 0 })
+    pointer(slider, 'pointerdown', { clientY: 100 })
+    expect(setStarterHeld).toHaveBeenLastCalledWith(true)
+    expect(lever.dataset.hold).toBe('start')
+    pointer(slider, 'pointerup', { clientY: 100 })
+    expect(setStarterHeld).toHaveBeenLastCalledWith(false)
+  })
+
+  it('rings the lever at idle and asks the computer to shut the engine down when the ring closes', () => {
+    vi.useFakeTimers()
+    try {
+      mount({ engine: { phase: 'RUNNING', state: 'running', start: 1 } })
+      const slider = container.querySelector<HTMLElement>('.phone-throttle [data-control="throttle"]')!
+      pointer(slider, 'pointerdown', { clientY: 100 })
+      act(() => { vi.advanceTimersByTime(1500) })
+      expect(shutdownEngine).toHaveBeenCalledOnce()
+      expect(setStarterHeld).not.toHaveBeenCalled()
+    } finally { vi.useRealTimers() }
+  })
+
+  it('is a plain throttle for a host that cannot start or stop the engine', () => {
+    mount({ engine: { phase: 'RUNNING' } })
+    const lever = container.querySelector<HTMLElement>('.phone-throttle')!
+    expect(lever.dataset.engine).toBeUndefined()
+    const slider = lever.querySelector<HTMLElement>('[data-control="throttle"]')!
+    act(() => { slider.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageUp', bubbles: true })) })
+    expect(updateControls).toHaveBeenLastCalledWith({ throttle: 0.1 })
   })
 
   it('puts nothing above the controls: no banner for a delayed connection, just the link chip', () => {

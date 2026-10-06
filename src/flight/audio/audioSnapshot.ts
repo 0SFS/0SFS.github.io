@@ -7,7 +7,7 @@
  * mantissa, and one uniform element type keeps the transport a single copy.
  */
 
-export const AUDIO_SNAPSHOT_VERSION = 2;
+export const AUDIO_SNAPSHOT_VERSION = 3;
 
 /**
  * Slot order. Renaming, reordering or inserting a field is a breaking ABI
@@ -55,6 +55,8 @@ export const AUDIO_SNAPSHOT_FIELDS = [
   "groundReflectionM",
   /** Native turbine augmentation observer, 0/1; unavailable if its bit is clear. */
   "augmentation",
+  /** Unit exhaust-flow axis in the listener frame; opposite the native thrust. */
+  "sourceAxisX", "sourceAxisY", "sourceAxisZ",
 ] as const;
 
 export type AudioSnapshotField = typeof AUDIO_SNAPSHOT_FIELDS[number];
@@ -78,6 +80,7 @@ export const AVAILABILITY = Object.freeze({
   CONFIG: 1 << 8,
   POSE: 1 << 9,
   AUGMENTATION: 1 << 10,
+  SOURCE_AXIS: 1 << 11,
 });
 
 /**
@@ -147,6 +150,7 @@ export interface AudioSnapshotInit {
   exterior?: number;
   groundReflectionM?: number;
   augmentation?: boolean;
+  sourceAxis?: readonly [number, number, number];
 }
 
 /** Non-finite input is refused rather than written: a NaN target de-tunes the core. */
@@ -189,6 +193,18 @@ export function writeAudioSnapshot(target: Float64Array, offset: number, init: A
   target[offset + s.exterior] = finite(init.exterior, 0);
   target[offset + s.groundReflectionM] = finite(init.groundReflectionM, -1);
   target[offset + s.augmentation] = init.augmentation ? 1 : 0;
+  const axis = init.sourceAxis;
+  const axisLength = axis ? Math.hypot(...axis) : 0;
+  if (axis && Number.isFinite(axisLength) && axisLength > 1e-9) {
+    target[offset + s.sourceAxisX] = axis[0] / axisLength;
+    target[offset + s.sourceAxisY] = axis[1] / axisLength;
+    target[offset + s.sourceAxisZ] = axis[2] / axisLength;
+  } else {
+    target[offset + s.sourceAxisX] = 0;
+    target[offset + s.sourceAxisY] = 0;
+    target[offset + s.sourceAxisZ] = 0;
+    target[offset + s.availability] &= ~AVAILABILITY.SOURCE_AXIS;
+  }
 }
 
 export function readAudioSnapshotField(

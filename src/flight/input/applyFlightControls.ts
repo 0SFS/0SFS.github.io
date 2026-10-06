@@ -1,5 +1,6 @@
 import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import type { ControlSurfaceState } from "./flightInputManager";
+import { CONTROL_LAW_MODE_VALUES, type FlightControlLawMode } from "../jsbsim/fdmProfiles";
 
 /**
  * The sole normalized control-to-physics boundary, shared by every input owner.
@@ -15,7 +16,18 @@ export function applyFlightControls(
   controls: ControlSurfaceState,
   gearDownNorm = 1,
   rudderSign: 1 | -1 = -1,
+  stovl?: { commandProperty: string; commandNorm: number },
+  controlLaw?: { commandProperty: string; mode: FlightControlLawMode },
+  automaticFlaps?: { commandProperty: string; enabled: boolean },
 ): void {
+  if (stovl && (!Number.isFinite(stovl.commandNorm) || stovl.commandNorm < 0 || stovl.commandNorm > 1)) {
+    throw new RangeError("STOVL conversion must be between 0 and 1.");
+  }
+  if (controlLaw && !Object.hasOwn(CONTROL_LAW_MODE_VALUES, controlLaw.mode)) {
+    throw new RangeError("Unknown aircraft control law.");
+  }
+  if (controlLaw) sdk.setPropertyValue(controlLaw.commandProperty, CONTROL_LAW_MODE_VALUES[controlLaw.mode]);
+  if (automaticFlaps) sdk.setPropertyValue(automaticFlaps.commandProperty, Number(automaticFlaps.enabled));
   sdk.setPropertyValue("fcs/elevator-cmd-norm", controls.elevator);
   sdk.setPropertyValue("fcs/aileron-cmd-norm", controls.aileron);
   // Controls use positive yaw-right. Each FDM profile declares whether its
@@ -31,4 +43,5 @@ export function applyFlightControls(
   // The SF50 FCS drives its physical actuator from this lever. The fixed-gear
   // C172 ignores it; presentation reads the resulting physical position.
   sdk.setPropertyValue("gear/gear-cmd-norm", gearDownNorm);
+  if (stovl) sdk.setPropertyValue(stovl.commandProperty, stovl.commandNorm);
 }

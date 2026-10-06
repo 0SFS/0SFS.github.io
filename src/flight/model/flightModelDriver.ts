@@ -1,4 +1,4 @@
-
+import { CONTROL_LAW_MODE_VALUES, type FlightControlLawMode } from "../jsbsim/fdmProfiles";
 export interface FlightWheelObservation {
   readonly index: number;
   readonly weightOnWheels: boolean;
@@ -55,6 +55,8 @@ export interface FlightModelDefinition {
   fixedDtSec: number;
   rudderSign: 1 | -1;
   flapPosition: { property: string; fullTravel: number };
+  stovl?: { commandProperty: string; positionProperty: string };
+  controlLaw?: { commandProperty: string; enabledProperty: string };
 }
 
 export interface FlightControlCommand {
@@ -66,6 +68,10 @@ export interface FlightControlCommand {
   gearDown: boolean;
   leftBrakeNorm: number;
   rightBrakeNorm: number;
+  /** Conversion lever, when the aircraft supplies a STOVL actuator. */
+  stovlNorm?: number;
+  /** Native aircraft stabilization, separate from external pilot assists. */
+  controlLawMode?: FlightControlLawMode;
 }
 
 export interface FlightInitialConditions {
@@ -187,7 +193,9 @@ export class FlightModelDriver {
 
   private constructor(backend: FlightDynamicsBackend, definition: FlightModelDefinition) {
     this.#backend = backend;
-    this.#definition = { ...definition, flapPosition: { ...definition.flapPosition } };
+    this.#definition = { ...definition, flapPosition: { ...definition.flapPosition },
+      stovl: definition.stovl ? { ...definition.stovl } : undefined,
+      controlLaw: definition.controlLaw ? { ...definition.controlLaw } : undefined };
     this.#catalog = new Set(backend.queryPropertyCatalog("").split(/\r?\n/)
       .map(line => canonical(line.trim().split(/\s+/)[0] ?? "")).filter(Boolean));
     this.#fuelPaths = [...this.#catalog].filter(path => /^propulsion\/tank(?:\[\d+\])?\/contents-lbs$/.test(path))
@@ -196,6 +204,14 @@ export class FlightModelDriver {
     for (const path of [...Object.values(observedPaths), ...Object.values(controlPaths), "gear/gear-cmd-norm",
       "gear/gear-pos-norm", "atmosphere/T-R", definition.flapPosition.property]) this.#requireProperty(path);
     if (!this.#wowPaths.length) throw new Error("The model exposes no wheel contact observations.");
+    if (definition.stovl) {
+      this.#requireProperty(definition.stovl.commandProperty);
+      this.#requireProperty(definition.stovl.positionProperty);
+    }
+    if (definition.controlLaw) {
+      this.#requireProperty(definition.controlLaw.commandProperty);
+      this.#requireProperty(definition.controlLaw.enabledProperty);
+    }
   }
 
   get fixedDtSec(): number { return this.#definition.fixedDtSec; }
@@ -352,6 +368,15 @@ export class FlightModelDriver {
       windNorthFps: "atmosphere/wind-north-fps",
       windEastFps: "atmosphere/wind-east-fps",
       windDownFps: "atmosphere/wind-down-fps",
+      stovlCommandNorm: this.#definition.stovl?.commandProperty ?? "fcs/stovl-cmd-norm",
+      stovlPositionNorm: this.#definition.stovl?.positionProperty ?? "fcs/stovl-pos-norm",
+      controlLawMode: this.#definition.controlLaw?.commandProperty ?? "fcs/control-law-mode",
+      flyByWireEnabled: this.#definition.controlLaw?.enabledProperty ?? "fcs/fbw-enabled",
+      nozzlePitchRad: "propulsion/engine/pitch-angle-rad",
+      nozzleYawRad: "propulsion/engine/yaw-angle-rad",
+      liftFanThrustLb: "propulsion/engine[1]/thrust-lbs",
+      rightRollPostThrustLb: "propulsion/engine[2]/thrust-lbs",
+      leftRollPostThrustLb: "propulsion/engine[3]/thrust-lbs",
     };
     return Object.freeze(Object.fromEntries(Object.entries(properties).map(([name, property]) => [
       name, this.#readOptionalProperty(property),
@@ -398,11 +423,22 @@ export class FlightModelDriver {
       bounded(command[key], ["elevatorNorm", "aileronNorm", "rudderNorm"].includes(key) ? -1 : 0, 1, key);
     }
     if (typeof command.gearDown !== "boolean") throw new TypeError("gearDown must be boolean.");
+    bounded(command.stovlNorm ?? 0, 0, 1, "STOVL conversion");
+    if (!this.#definition.stovl && command.stovlNorm) throw new Error("The aircraft has no STOVL actuator.");
+    const mode = command.controlLawMode ?? "auto";
+    if (!Object.hasOwn(CONTROL_LAW_MODE_VALUES, mode)) throw new RangeError("Unknown aircraft control law.");
+    if (!this.#definition.controlLaw && mode !== "auto") throw new Error("The aircraft has no selectable control law.");
   }
   #writeControls(command: FlightControlCommand): void {
+    if (this.#definition.controlLaw) {
+      this.#backend.setPropertyValue(this.#definition.controlLaw.commandProperty, CONTROL_LAW_MODE_VALUES[command.controlLawMode ?? "auto"]);
+    }
     for (const [key, path] of Object.entries(controlPaths) as [keyof typeof controlPaths, string][]) {
       this.#backend.setPropertyValue(path, command[key] * (key === "rudderNorm" ? this.#definition.rudderSign : 1));
     }
     this.#backend.setPropertyValue("gear/gear-cmd-norm", command.gearDown ? 1 : 0);
+    if (this.#definition.stovl) {
+      this.#backend.setPropertyValue(this.#definition.stovl.commandProperty, command.stovlNorm ?? 0);
+    }
   }
 }

@@ -1,0 +1,440 @@
+{
+  "schema": "0sfs-audio-abi-recovery/1",
+  "capturedUtc": "2026-10-05T23:29:19.662Z",
+  "owner": "0sfs",
+  "diagnosis": "First app CI observed obsolete32parameter WASM after external High code removed rejected waveform-steepening parameter. Current C++ and TypeScript both31parameters; external owner rebuilt before recovery checks.",
+  "action": "Reused completed external owner build/related/CI evidence after current native/source/provenance verification; no redundant rebuild, test suite, native edit or sound redesign by recovery agent.",
+  "referenceArtifact": {
+    "artifact": "audio-dsp.wasm",
+    "license": "AGPL-3.0-only",
+    "bytes": 50836,
+    "sha256": "7a876882d8cf38ec043e97b7d84fc58c7b12faec730db4087059b6eb66458339",
+    "toolchain": {
+      "compiler": "emcc",
+      "version": "6.0.9",
+      "flags": [
+        "-O3",
+        "-std=c++17",
+        "--no-entry",
+        "-sSTANDALONE_WASM=1",
+        "-sALLOW_MEMORY_GROWTH=1",
+        "-sINITIAL_MEMORY=2097152",
+        "-sSTACK_SIZE=131072",
+        "-sMALLOC=emmalloc",
+        "-sERROR_ON_UNDEFINED_SYMBOLS=1",
+        "-sFILESYSTEM=0",
+        "-fno-exceptions",
+        "-fno-rtti",
+        "-fno-fast-math"
+      ]
+    },
+    "sources": 7,
+    "imports": [
+      "env.emscripten_notify_memory_growth"
+    ]
+  },
+  "nativeProfileParameters": 31,
+  "nativeSnapshotVersion": 3,
+  "nativeSnapshotFields": 33,
+  "artifactAndDspSourcesUnchangedBetweenRecoveryAudits": true,
+  "sourceIdentity": [
+    {
+      "file": "acoustic_profile.h",
+      "sha256": "1c88eabc0d1c47d68a096d5593b657c2495bf980e509785f0d5433162bb2c52b"
+    },
+    {
+      "file": "convolver.h",
+      "sha256": "5565dd79ad94832a24693171c04fb3aaafa8402afd967406c60e1f232e382dba"
+    },
+    {
+      "file": "core.cpp",
+      "sha256": "98b455384d8d77f67a8cacefa661381dd990dd1bfe3693e04df23452982b4fe2"
+    },
+    {
+      "file": "granular.h",
+      "sha256": "940b492d5ce19be0db016bcb756f2b9c561ca532cb8206b08927dce8d82b88f5"
+    },
+    {
+      "file": "primitives.h",
+      "sha256": "c2280ccf199af4f05fc02d74a4c4336b270a92034ebd937a35b72e127cdec93a"
+    },
+    {
+      "file": "snapshot.h",
+      "sha256": "0cbebb4abcf67432fc190914bbba5091e978dd722101e600e1f0ae66f770f129"
+    },
+    {
+      "file": "turbofan.h",
+      "sha256": "6075f78e69a44fa008651b4abb69c6419377a6a544d98df1b52b632ce9aa6d65"
+    }
+  ],
+  "sourcesBeforeFullCi": [
+    {
+      "file": "src/flight/audio/acousticProfiles.test.ts",
+      "sha256": "123539d2bcb678f19138f26954fe1e0dec51a6f003c63c937b6e8539276e9fdc",
+      "modifiedUtc": "2026-10-05T23:08:26.135Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/aircraftAudioProfiles.ts",
+      "sha256": "8a143aeea3e7934bb389d56fe17e801eb8a13a39b8846029ff92ef090b21db1d",
+      "modifiedUtc": "2026-10-05T20:48:38.086Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/audioArchitecture.test.ts",
+      "sha256": "b40d7260ddee6e13ae15afdffebb69c5d535c215fd1d7391fad234d8bd32f0c7",
+      "modifiedUtc": "2026-10-05T21:01:12.162Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/audioAssets.ts",
+      "sha256": "f85fd241dc1223245dd81641a8ace03d29b02956cc576605fe60643042e2788b",
+      "modifiedUtc": "2026-09-14T08:15:38.018Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/audioBank.test.ts",
+      "sha256": "4815fd43ca384758d8c9d0c007d4d720221c0da443aab228394c106b62323ba1",
+      "modifiedUtc": "2026-10-05T23:09:27.939Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/audioBank.ts",
+      "sha256": "94f3bdec84f3d126f9dc9a6f9c712a56076e2b93e8f59d01ccd4231a101a0c18",
+      "modifiedUtc": "2026-10-05T23:11:14.138Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/audioPose.test.ts",
+      "sha256": "3d423842cfdef9e49c7bfbffaf7022d2c7ed6a9d8d8d914dc44535e90bc64478",
+      "modifiedUtc": "2026-10-05T23:07:01.027Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/audioPose.ts",
+      "sha256": "6514d80f40c32ab904ca31316014288f669407db93cbed28784b6f662978d60a",
+      "modifiedUtc": "2026-10-05T23:06:05.813Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/audioQuality.test.ts",
+      "sha256": "aca9a5b26e4c240a276e4b1dbf8c090a93642052fb09fc2072f50d17f1c15fff",
+      "modifiedUtc": "2026-10-05T23:07:35.388Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/audioQuality.ts",
+      "sha256": "96756248c0c8f4b6a2e796e9adee07de15ba019df5c89fd97c0bb0b2db5038df",
+      "modifiedUtc": "2026-10-05T23:11:14.121Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/audioRendererRegistry.ts",
+      "sha256": "4d061c8a9ecfc0b044dfc32919868e8aac1e9bb359a02e98a78947775330c699",
+      "modifiedUtc": "2026-10-05T23:05:12.306Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/audioSettings.test.ts",
+      "sha256": "024447054b2960e451fb1be68b6792e6a40ac5a4b5f6e5a1c9bd1fbfb6f5861d",
+      "modifiedUtc": "2026-10-05T23:07:02.987Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/audioSettings.ts",
+      "sha256": "ff8ac6b87d00110c3509f8d0120b3706f79d57f98718286cd2b989c8e99cd3b4",
+      "modifiedUtc": "2026-10-05T23:07:02.942Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/audioSnapshot.test.ts",
+      "sha256": "9c85a2ff2a091c404de765b16653017de103e1bdd6e800926ea865f89062a390",
+      "modifiedUtc": "2026-10-05T23:07:01.008Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/audioSnapshot.ts",
+      "sha256": "1e86e46af64c84d94d9a3ca5a3afca386fd07d85dd62b68ec0e9602cf20c39b6",
+      "modifiedUtc": "2026-10-05T23:05:33.794Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/audioTransport.test.ts",
+      "sha256": "362f65cb7d0b6b6e82b9da7acde292deff4e9f6abf0fdb09e2abc393e7570e18",
+      "modifiedUtc": "2026-09-14T09:02:02.982Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/audioTransport.ts",
+      "sha256": "ec08443ca348eb2d2bfac909b3a843d0635c94b047315a636d06874e9d016ee3",
+      "modifiedUtc": "2026-09-14T09:01:35.474Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/cameraZoomAudio.integration.test.ts",
+      "sha256": "3d030b4341794097fa71a674d5d1cbe1679986d9af1fdd05a01a72ff1ca7fc5d",
+      "modifiedUtc": "2026-09-16T23:32:27.184Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/createFlightAudio.test.ts",
+      "sha256": "66ea173044d8a62b72d66c99ba523c1f36883ebf93685149bc55b67afb7839ed",
+      "modifiedUtc": "2026-10-05T23:15:48.379Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/createFlightAudio.ts",
+      "sha256": "39751b4d10fdfc55a5d18ebcea0b1f54d0b046dc0289707c9fd62b1875364a38",
+      "modifiedUtc": "2026-10-05T23:16:17.778Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/createTireAudio.test.ts",
+      "sha256": "bd78168cfee65f010861bda6c00455af7bdd75812b2f95ccf4fad8f5c4349c2e",
+      "modifiedUtc": "2026-09-14T09:39:23.071Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/createTireAudio.ts",
+      "sha256": "bf2020f443eb29b093b8f21b4e723c7e8ee3cb65861c5f0462856a2bc9ffceec",
+      "modifiedUtc": "2026-09-14T09:39:23.068Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/dsp/acoustic_profile.h",
+      "sha256": "1c88eabc0d1c47d68a096d5593b657c2495bf980e509785f0d5433162bb2c52b",
+      "modifiedUtc": "2026-10-05T23:18:36.532Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/dsp/audio-dsp.provenance.json",
+      "sha256": "ae0202c578cfc59ca135735294d1d21516c318288973c3b6373d5b562aab9596",
+      "modifiedUtc": "2026-10-05T23:24:35.160Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/dsp/audio-dsp.wasm",
+      "sha256": "7a876882d8cf38ec043e97b7d84fc58c7b12faec730db4087059b6eb66458339",
+      "modifiedUtc": "2026-10-05T23:24:35.150Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/dsp/convolver.h",
+      "sha256": "5565dd79ad94832a24693171c04fb3aaafa8402afd967406c60e1f232e382dba",
+      "modifiedUtc": "2026-09-14T08:06:10.453Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/dsp/core.cpp",
+      "sha256": "98b455384d8d77f67a8cacefa661381dd990dd1bfe3693e04df23452982b4fe2",
+      "modifiedUtc": "2026-10-05T23:24:26.214Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/dsp/granular.h",
+      "sha256": "940b492d5ce19be0db016bcb756f2b9c561ca532cb8206b08927dce8d82b88f5",
+      "modifiedUtc": "2026-09-14T08:29:02.270Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/dsp/primitives.h",
+      "sha256": "c2280ccf199af4f05fc02d74a4c4336b270a92034ebd937a35b72e127cdec93a",
+      "modifiedUtc": "2026-10-05T23:11:21.649Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/dsp/snapshot.h",
+      "sha256": "0cbebb4abcf67432fc190914bbba5091e978dd722101e600e1f0ae66f770f129",
+      "modifiedUtc": "2026-10-05T23:05:33.214Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/dsp/turbofan.h",
+      "sha256": "6075f78e69a44fa008651b4abb69c6419377a6a544d98df1b52b632ce9aa6d65",
+      "modifiedUtc": "2026-10-05T23:18:36.553Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/dspCore.test.ts",
+      "sha256": "e8df6ed75bf568b9d20d29521090f56c5c688a9e0db976509e341bf4a05ee216",
+      "modifiedUtc": "2026-10-05T23:23:38.110Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/dspHarness.ts",
+      "sha256": "17cde5857b2eaf02458aaa49ca682ff5b4f7c45c205b1e349c6c2bef07a3b883",
+      "modifiedUtc": "2026-10-05T21:17:52.542Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/dspProcessor.test.ts",
+      "sha256": "ba84a20edf08ee4a3c79418da52c91c44fd181351a7f4d1e4fd94da936c6078b",
+      "modifiedUtc": "2026-10-05T21:16:07.969Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/engineAcousticDefinitions.ts",
+      "sha256": "e719589758864c3ff05b3dbdda8f6d71f860b871bb8f986656a68cf7be279178",
+      "modifiedUtc": "2026-10-05T23:18:36.510Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/f35bAudio.integration.test.ts",
+      "sha256": "8b26d9a6db57c8ed6155821199a810952854e8e33d1b1ff4cdaf65e959f42725",
+      "modifiedUtc": "2026-10-05T23:07:31.630Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/highAudio.test.ts",
+      "sha256": "b0db7e46ac5cef2f2c440444392e30980bb08f21d663ad893900c84799b1687a",
+      "modifiedUtc": "2026-10-05T23:24:07.988Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/jsbsimAudioAdapter.integration.test.ts",
+      "sha256": "f19de8a06f465db88a0885a96f49cf48e534919617d559948007d8e50d990372",
+      "modifiedUtc": "2026-10-05T23:08:10.425Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/jsbsimAudioAdapter.ts",
+      "sha256": "4f4bc727ab2dfe91a513151626f12836b9eb2c009cd5b17bd769a224c609ab9e",
+      "modifiedUtc": "2026-10-05T23:07:00.988Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/legacyTireAudioGraph.test.ts",
+      "sha256": "27a49a857dcb24e2f984b0e4ecfc9e88b4f4b36377bbfaa02d7b2b05e38844aa",
+      "modifiedUtc": "2026-09-14T08:54:16.743Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/legacyTireAudioGraph.ts",
+      "sha256": "0a01bacd4aea09f757d5abf6e7c36dd0adde55d9bb44921b661636d23b28f7e2",
+      "modifiedUtc": "2026-09-14T08:53:38.615Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/simulationResetAudio.integration.test.ts",
+      "sha256": "9030aadc0537cc20cac241f1db7e7b3306816653a6e631c89afc88e0f4e6b96b",
+      "modifiedUtc": "2026-10-05T20:52:20.713Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/audio/worklet/dspProcessor.js",
+      "sha256": "81184bf22365a8a74c6d7e5dfe0dfc2225e65d3047d1fa1b1d6c646c342a22d5",
+      "modifiedUtc": "2026-10-05T23:05:33.812Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/createFlightSimApp.ts",
+      "sha256": "7b41ea2680724307ca2146aed02d2eb9ac7968df0b51972ab41b4bff8e80d375",
+      "modifiedUtc": "2026-10-05T23:06:13.379Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/createFlightSimApp.test.ts",
+      "sha256": "cdbad7e5ed84b2ed93bd3e224679257db9e7a0ed444427430b65bf18eee8c964",
+      "modifiedUtc": "2026-10-05T23:16:20.808Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/createFlightSimApp.phone.test.ts",
+      "sha256": "adf5e74cae4208b8205ae3f018589e173adebd7bc72d3b872ae690f348942c21",
+      "modifiedUtc": "2026-10-05T23:10:55.353Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/createFlightSimApp.autopilot.test.ts",
+      "sha256": "8cfae59251749b41965696c17847702be45f73cadbda42dc4d2e9235fce546c7",
+      "modifiedUtc": "2026-10-05T23:08:36.491Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/createFlightSimApp.ground.test.ts",
+      "sha256": "b022e6ba1e6d95780e0294207f8a5194a127f35665cf20d716756a20b95a638d",
+      "modifiedUtc": "2026-10-05T23:21:47.826Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/input/flightInputManager.ts",
+      "sha256": "2a2fe22392451d6e7d78fbcd962db3d98df314d9c0701b79234dd7d49711f809",
+      "modifiedUtc": "2026-10-05T23:01:47.513Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "src/flight/hud/flightHud.ts",
+      "sha256": "008257748d0624d07d5c0970b350f44d62ecc5d7517bc9a6b62f1233fbacaa6a",
+      "modifiedUtc": "2026-10-05T23:08:36.450Z",
+      "predatesFullCiStart": true
+    },
+    {
+      "file": "benchmarks/audio/renderSweep.test.mjs",
+      "sha256": "31d802116f50ea419f4c020f5d3c9bda541c526dda03870f395c28104798d33b",
+      "modifiedUtc": "2026-10-05T23:23:23.018Z",
+      "predatesFullCiStart": true
+    }
+  ],
+  "checks": {
+    "related": {
+      "files": 59,
+      "passed": 704,
+      "failed": 0,
+      "startedLocal": "2026-10-05 18:24:44 America/Chicago"
+    },
+    "ci": {
+      "command": "npm run ci",
+      "files": 148,
+      "passed": 1536,
+      "failed": 0,
+      "startedUtc": "2026-10-05T23:26:22Z",
+      "lintPassed": true,
+      "typecheckPassed": true,
+      "productionBuildPassed": true,
+      "installedAndEmittedArtifactVerificationPassed": true
+    },
+    "currentArtifact": {
+      "verifyAudioArtifactPassed": true,
+      "profileCountMatchesTypeScript": true,
+      "sourceInventoryMatchesProvenance": true
+    }
+  },
+  "limitations": [
+    "This is software/ABI verification, not acoustic calibration, device qualification, physical listening or real-time performance evidence.",
+    "Logs were produced by another concurrent owner session and retained byte-for-byte; this recovery agent did not execute their build/related/full-CI commands or independently observe their process exit code. Successful test/build/verifier stages are recorded in the retained logs.",
+    "Current source hashes were captured after the completed CI; original modification times predate its start and native source inventory matches the exact artifact provenance, but these times are supporting evidence rather than complete application-build attestation.",
+    "The original obsolete-artifact CI failure remains in the dated scratch run and was not erased."
+  ],
+  "records": [
+    {
+      "file": "build-audio.log",
+      "original": "build/validation/high-aircraft-audio/2026-10-05_180533/build-audio-final.log",
+      "bytes": 233,
+      "sha256": "37ddd3b2457749467428df314f80ee98068ac46102ecaacabbad3c5861fe9a05"
+    },
+    {
+      "file": "related-tests.log",
+      "original": "build/validation/high-aircraft-audio/2026-10-05_180533/related-tests.log",
+      "bytes": 5128,
+      "sha256": "a0a72adff1d6349c9d99bbc88b6718c5f3ab9e03702a8de68fba5359e619ecdc"
+    },
+    {
+      "file": "final-ci.log",
+      "original": "build/validation/high-aircraft-audio/2026-10-05_180533/ci.log",
+      "bytes": 65381,
+      "sha256": "3df3f5dbf3a13ecd295427493660bbf9a77b4fa4b12d803116370d8f4ddde2ad"
+    },
+    {
+      "file": "artifact-audit-before.json",
+      "original": "build/checks/f35b-final-20261005T231926Z/audio-recovery/current-artifact-audit.json",
+      "bytes": 6576,
+      "sha256": "7995e0fcfdb982e45aa032fab36b7a3e263efb7e1ae45138a16e579e8ce87e10"
+    },
+    {
+      "file": "audio-dsp.provenance.json",
+      "original": "src/flight/audio/dsp/audio-dsp.provenance.json",
+      "bytes": 2618,
+      "sha256": "ae0202c578cfc59ca135735294d1d21516c318288973c3b6373d5b562aab9596"
+    }
+  ]
+}

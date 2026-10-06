@@ -1,0 +1,56 @@
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+ ❯ src/flight/audio/startupAudio.test.ts (8 tests | 5 failed) 372ms
+     × has no static floor at near-zero shaft speed in tier 1 29ms
+     × has no static floor at near-zero shaft speed in tier 2 32ms
+     × has no static floor at near-zero shaft speed in tier 3 32ms
+     × keeps a rising pre-lightoff core whine at 44100 Hz in every tier 98ms
+     × keeps a rising pre-lightoff core whine at 48000 Hz in every tier 103ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/flight/audio/startupAudio.test.ts > turbine startup, actual shipped WASM > has no static floor at near-zero shaft speed in tier 1
+AssertionError: expected 0.015321715734899044 to be less than 0.00001
+ ❯ src/flight/audio/startupAudio.test.ts:42:52
+     40|         noise.push(rms(difference(all.samples, tones.samples)));
+     41|         expect(all.samples.every(Number.isFinite)).toBe(true);
+     42|         if (pct === 0.1) expect(peak(all.samples)).toBeLessThan(1e-5);
+       |                                                    ^
+     43|       }
+     44|       // All three points used to receive the full idle wake. Each dec…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/flight/audio/startupAudio.test.ts > turbine startup, actual shipped WASM > has no static floor at near-zero shaft speed in tier 2
+ FAIL  src/flight/audio/startupAudio.test.ts > turbine startup, actual shipped WASM > has no static floor at near-zero shaft speed in tier 3
+AssertionError: expected 0.01853092759847641 to be less than 0.00001
+ ❯ src/flight/audio/startupAudio.test.ts:42:52
+     40|         noise.push(rms(difference(all.samples, tones.samples)));
+     41|         expect(all.samples.every(Number.isFinite)).toBe(true);
+     42|         if (pct === 0.1) expect(peak(all.samples)).toBeLessThan(1e-5);
+       |                                                    ^
+     43|       }
+     44|       // All three points used to receive the full idle wake. Each dec…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  src/flight/audio/startupAudio.test.ts > turbine startup, actual shipped WASM > keeps a rising pre-lightoff core whine at 44100 Hz in every tier
+ FAIL  src/flight/audio/startupAudio.test.ts > turbine startup, actual shipped WASM > keeps a rising pre-lightoff core whine at 48000 Hz in every tier
+AssertionError: expected 180 to be close to 190, received difference is 10, but expected 0.5
+ ❯ src/flight/audio/startupAudio.test.ts:58:89
+     56|         const tones = await render(F135_DEFINITION, tier, state, { sam…
+     57|         const wanted = 3800 * n2Pct / 100;
+     58|         expect(dominantFrequency(all.samples, sampleRate, wanted - 20,…
+       |                                                                                         ^
+     59|         expect(rms(tones.samples)).toBeGreaterThan(rms(difference(all.…
+     60|       }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 3 passed (8)
+   Start at  22:06:59
+   Duration  510ms (transform 23ms, setup 0ms, import 30ms, tests 372ms, environment 0ms)
+

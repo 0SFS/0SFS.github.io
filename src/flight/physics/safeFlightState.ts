@@ -1,5 +1,6 @@
 import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import type { FlightState } from "./flightState";
+import { fuelTankContentsPath, fuelTankIndices } from "../jsbsim/fuelTanks";
 
 /**
  * Which envelope checks a state fails, as readable strings.
@@ -28,8 +29,27 @@ export function validFlightState(state: FlightState): boolean {
 const controls = ["fcs/throttle-cmd-norm", "fcs/mixture-cmd-norm", "fcs/elevator-cmd-norm",
   "fcs/aileron-cmd-norm", "fcs/rudder-cmd-norm", "fcs/pitch-trim-cmd-norm", "fcs/roll-trim-cmd-norm", "gear/gear-cmd-norm", "gear/gear-pos-norm",
   "fcs/flap-cmd-norm", "fcs/left-brake-cmd-norm", "fcs/right-brake-cmd-norm",
-  "propulsion/tank[0]/contents-lbs", "propulsion/tank[1]/contents-lbs",
   "atmosphere/wind-north-fps", "atmosphere/wind-east-fps", "atmosphere/wind-down-fps"];
+const optionalAircraftControls = ["fcs/stovl-cmd-norm", "fcs/stovl-pos-norm", "fcs/control-law-mode"];
+const modelControls = new WeakMap<JSBSimSdk, readonly string[]>();
+
+function controlsForModel(sdk: JSBSimSdk): readonly string[] {
+  const cached = modelControls.get(sdk);
+  if (cached) return cached;
+  // One SDK owns one aircraft for its lifetime. Discover optional controls once;
+  // aircraft without them must never acquire invented properties.
+  const catalog = new Set(typeof sdk.queryPropertyCatalog === "function"
+    ? sdk.queryPropertyCatalog("fcs/").split(/\r?\n/).map(line => line.trim().split(/\s+/)[0])
+    : []);
+  // Every tank, however many the aircraft has: the Fuel tab can fill any of them.
+  const paths = [...controls, ...optionalAircraftControls.filter(path => catalog.has(path)),
+    ...(sdk.queryPropertyCatalog?.("stores/external-tank") ?? "").split(/\r?\n/)
+      .map(line => line.trim().split(/\s+/)[0]!)
+      .filter(path => /^stores\/external-tank(?:\[\d+\])?\/attached$/.test(path)),
+    ...fuelTankIndices(sdk).map(fuelTankContentsPath)];
+  modelControls.set(sdk, paths);
+  return paths;
+}
 // propulsion/magneto_cmd is write-only: reading it returns zero even when the
 // engine has ignition. Replaying that zero would kill a restored running engine.
 const initialProperties: Record<string, string> = {
@@ -42,7 +62,7 @@ const initialProperties: Record<string, string> = {
 export function captureSimulation(sdk: JSBSimSdk) {
   const timing = sdk as JSBSimSdk & { getSimTime?: () => number };
   return { initial: Object.fromEntries(Object.entries(initialProperties).map(([ic, property]) => [ic, sdk.getPropertyValue(property)])),
-    controls: Object.fromEntries(controls.map(property => [property, sdk.getPropertyValue(property)])),
+    controls: Object.fromEntries(controlsForModel(sdk).map(property => [property, sdk.getPropertyValue(property)])),
     running: sdk.getPropertyValue("propulsion/engine/set-running") > 0.5,
     // Contact recovery rebuilds model state at zero integration time, but it is
     // still part of the current flight. Preserve the public simulation clock so

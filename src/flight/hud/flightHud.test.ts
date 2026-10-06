@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createFlightHud, type FlightHudControls } from "./flightHud";
+import { createFlightHud, type FlightHudControls, type FlightHudOptions } from "./flightHud";
 import type { FlightState } from "../physics/flightState";
 
 const STATE: FlightState = {
@@ -16,14 +16,14 @@ const CONTROLS: FlightHudControls = {
 const AUTO_OFF = { pitch: false, roll: false };
 
 // jsdom ships no 2D canvas, and the attitude indicator insists on one. These
-// tests are about the gear button, so a stub that records nothing is enough.
+// tests are about flight controls, so a stub that records nothing is enough.
 function stubCanvas(): void {
   vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(
     new Proxy({}, { get: () => () => undefined }) as unknown as CanvasRenderingContext2D,
   );
 }
 
-function mount() {
+function mount(overrides: Partial<FlightHudOptions> = {}) {
   stubCanvas();
   const host = document.createElement("div");
   document.body.append(host);
@@ -42,6 +42,7 @@ function mount() {
     onFlapsChange: vi.fn(),
     onRudderChange: vi.fn(),
     onStickChange: vi.fn(),
+    ...overrides,
   });
   const gear = host.querySelector<HTMLButtonElement>('[data-control="gear"]')!;
   const ap = host.querySelector<HTMLButtonElement>('[data-control="autopilot"]')!;
@@ -56,6 +57,200 @@ function mount() {
 }
 
 afterEach(() => { document.body.replaceChildren(); vi.restoreAllMocks(); });
+
+describe("flight HUD automatic flaps", () => {
+  it("retains a focused manual keyboard edit while paused and keeps the output on actual travel", () => {
+    let enabled = true;
+    const onFlapsChange = vi.fn();
+    const t = mount({ onFlapsChange, flapAutomation: {
+      getEnabled: () => enabled, onEnabledChange: value => { enabled = value; }, getPositionNorm: () => 0,
+    } });
+    const slider = t.host.querySelector<HTMLInputElement>('[data-control="flaps"]')!;
+    const output = t.host.querySelector<HTMLOutputElement>('[data-output="flaps"]')!;
+    try {
+      slider.focus();
+      for (const value of [0.01, 0.02]) {
+        slider.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+        slider.value = String(value); // jsdom does not implement a range input's default key action.
+        slider.dispatchEvent(new Event("input"));
+        t.hud.update(STATE, CONTROLS, true, AUTO_OFF);
+        expect(slider.value).toBe(String(value));
+        expect(output.value).toBe("0%");
+        expect(slider.getAttribute("aria-valuetext")).toContain("commanded");
+      }
+      expect(onFlapsChange.mock.calls.map(([value]) => value)).toEqual([0.01, 0.02]);
+      expect(enabled).toBe(false);
+      slider.blur();
+      expect(slider.value).toBe("0");
+      expect(slider.getAttribute("aria-valuetext")).toContain("actual");
+    } finally { t.hud.destroy(); }
+  });
+
+  it("shows requested Auto separately from autopilot flap ownership", () => {
+    const t = mount({ flapAutomation: {
+      getEnabled: () => true, onEnabledChange: vi.fn(), getPositionNorm: () => 0.5,
+    } });
+    const button = t.host.querySelector<HTMLButtonElement>('[data-control="auto-flaps"]')!;
+    try {
+      const ap = { engaged: true, canEngage: true, ownsPitch: false, ownsRoll: false, ownsGear: false, ownsFlaps: true };
+      t.hud.update(STATE, CONTROLS, true, AUTO_OFF, ap);
+      expect(button.getAttribute("aria-pressed")).toBe("true");
+      expect(button.classList.contains("is-on")).toBe(false);
+      expect(button.getAttribute("aria-label")).toContain("owned by Autopilot");
+      expect(button.title).toContain("requested");
+      t.hud.update(STATE, CONTROLS, true, AUTO_OFF, { ...ap, ownsFlaps: false });
+      expect(button.classList.contains("is-on")).toBe(true);
+      expect(button.title).toContain("Automatic flaps on");
+    } finally { t.hud.destroy(); }
+  });
+
+  it("follows physical flap travel, including automatic reflex, and hands the slider to the pilot", () => {
+    let enabled = true;
+    let actual = 0.6;
+    const onFlapsChange = vi.fn();
+    const t = mount({ onFlapsChange, flapAutomation: {
+      getEnabled: () => enabled,
+      onEnabledChange: value => { enabled = value; },
+      getPositionNorm: () => actual,
+      minPositionNorm: -0.1,
+    } });
+    const slider = t.host.querySelector<HTMLInputElement>('[data-control="flaps"]')!;
+    const output = t.host.querySelector<HTMLOutputElement>('[data-output="flaps"]')!;
+    const button = t.host.querySelector<HTMLButtonElement>('[data-control="auto-flaps"]')!;
+    try {
+      t.hud.update(STATE, CONTROLS, true, AUTO_OFF);
+      expect(slider.value).toBe("0.6");
+      expect(output.value).toBe("60%");
+      expect(button.getAttribute("aria-pressed")).toBe("true");
+      actual = -0.1;
+      t.hud.refreshFlaps();
+      expect(slider.value).toBe("-0.1");
+      expect(output.value).toBe("-10%");
+      slider.dispatchEvent(new Event("pointerdown"));
+      slider.value = "0.4";
+      slider.dispatchEvent(new Event("input"));
+      expect(enabled).toBe(false);
+      expect(onFlapsChange).toHaveBeenLastCalledWith(0.4);
+      actual = 0.2;
+      t.hud.update(STATE, { ...CONTROLS, flaps: 0.4 }, true, AUTO_OFF);
+      expect(slider.value).toBe("0.4"); // The moving actuator does not fight a drag.
+      expect(output.value).toBe("20%");
+      slider.dispatchEvent(new Event("pointerup"));
+      expect(slider.value).toBe("0.2");
+      button.click();
+      expect(enabled).toBe(true);
+      expect(button.getAttribute("aria-pressed")).toBe("true");
+    } finally { t.hud.destroy(); }
+  });
+});
+
+describe("flight HUD observed afterburner", () => {
+  it.each(["#9ab8ff", "#ff9a62"])("uses aircraft accent %s only while an engine reports augmentation", accentColor => {
+    let active: boolean | null = false;
+    const t = mount({ afterburner: { getActive: () => active, accentColor } });
+    const input = t.host.querySelector<HTMLInputElement>('[data-control="throttle"]')!;
+    const output = t.host.querySelector<HTMLOutputElement>('[data-output="throttle"]')!;
+    const lever = input.closest<HTMLElement>(".flight-hud__slider-control")!;
+    try {
+      t.hud.update({ ...STATE, throttleNorm: 1 }, CONTROLS, true, AUTO_OFF);
+      expect(output.value).toBe("100%");
+      expect(lever.dataset.afterburner).toBe("inactive");
+      active = true;
+      t.hud.update(STATE, CONTROLS, true, AUTO_OFF);
+      expect(output.value).toBe("50🔥");
+      expect(lever.dataset.afterburner).toBe("active");
+      expect(lever.style.getPropertyValue("--afterburner-accent")).toBe(accentColor);
+      expect(input.getAttribute("aria-valuetext")).toBe("50%, afterburner active");
+      expect(output.getAttribute("aria-label")).toBe("50%, afterburner active");
+      expect(t.host.querySelectorAll('[data-afterburner="active"]')).toHaveLength(1);
+      for (const next of [false, null]) {
+        active = next;
+        t.hud.update(STATE, CONTROLS, true, AUTO_OFF);
+        expect(output.value).toBe("50%");
+        expect(lever.dataset.afterburner).toBe("inactive");
+        expect(input.getAttribute("aria-valuetext")).toBe("50%");
+      }
+    } finally { t.hud.destroy(); }
+  });
+
+  it("keeps the ordinary percentage for aircraft without afterburner", () => {
+    const t = mount();
+    try {
+      t.hud.update({ ...STATE, throttleNorm: 1 }, CONTROLS, true, AUTO_OFF);
+      expect(t.host.querySelector<HTMLOutputElement>('[data-output="throttle"]')!.value).toBe("100%");
+      expect(t.host.querySelector('[data-afterburner="active"]')).toBeNull();
+    } finally { t.hud.destroy(); }
+  });
+});
+
+describe("flight HUD VTOL conversion lever", () => {
+  it("leaves aircraft without powered lift with their existing throttle control", () => {
+    const t = mount();
+    expect(t.host.querySelector('[data-control="vtol-conversion"]')).toBeNull();
+    expect(t.host.querySelector('[data-control="throttle"]')).not.toBeNull();
+    t.hud.refreshVtolConversion();
+    t.hud.destroy();
+  });
+
+  it("places a native accessible vertical lever directly beside THR", () => {
+    const t = mount({ vtolConversion: {
+      getCommandNorm: () => 0.75, getPositionNorm: () => 0.4, onCommandChange: vi.fn(),
+    } });
+    const input = t.host.querySelector<HTMLInputElement>('[data-control="vtol-conversion"]')!;
+    const lever = input.closest("label")!;
+    expect(lever.previousElementSibling?.querySelector('[data-control="throttle"]')).not.toBeNull();
+    expect(lever.parentElement?.className).toBe("flight-hud__throttle");
+    expect(lever.querySelector("span")?.textContent).toBe("VTOL");
+    expect(input.type).toBe("range");
+    expect([input.min, input.max, input.step]).toEqual(["0", "1", "0.01"]);
+    expect(input.getAttribute("aria-label")).toBe("VTOL conversion");
+    expect(input.getAttribute("aria-orientation")).toBe("vertical");
+    expect(input.getAttribute("aria-valuetext")).toBe("75% commanded; 40% actual conversion");
+    expect(input.value).toBe("0.75");
+    expect(lever.querySelector("output")?.value).toBe("75%");
+    t.hud.destroy();
+  });
+
+  it("uses native input events for pointer and keyboard edits and immediately follows its command owner", () => {
+    let command = 0;
+    const onCommandChange = vi.fn((value: number) => { command = value; });
+    const t = mount({ vtolConversion: { getCommandNorm: () => command, onCommandChange } });
+    const input = t.host.querySelector<HTMLInputElement>('[data-control="vtol-conversion"]')!;
+    const output = t.host.querySelector<HTMLOutputElement>('[data-output="vtol-conversion"]')!;
+    input.value = "0.5";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(onCommandChange).toHaveBeenLastCalledWith(0.5);
+    expect(output.value).toBe("50%");
+    // Native range keyboard steps emit the same input event as pointer edits.
+    input.value = "0.51";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(onCommandChange).toHaveBeenLastCalledWith(0.51);
+    expect(output.value).toBe("51%");
+    t.hud.destroy();
+    input.value = "1";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(onCommandChange).toHaveBeenCalledTimes(2);
+  });
+
+  it("synchronizes registry and physical-position changes without replacing the command with actuator travel", () => {
+    let command = 0.8;
+    let position = 0.2;
+    const onCommandChange = vi.fn();
+    const t = mount({ vtolConversion: {
+      getCommandNorm: () => command, getPositionNorm: () => position, onCommandChange,
+    } });
+    const input = t.host.querySelector<HTMLInputElement>('[data-control="vtol-conversion"]')!;
+    command = 0.3;
+    t.hud.refreshVtolConversion();
+    expect(input.value).toBe("0.3");
+    position = 0.25;
+    t.hud.update(STATE, CONTROLS, true, AUTO_OFF);
+    expect(input.value).toBe("0.3");
+    expect(input.getAttribute("aria-valuetext")).toBe("30% commanded; 25% actual conversion");
+    expect(onCommandChange).not.toHaveBeenCalled();
+    t.hud.destroy();
+  });
+});
 
 describe("flight HUD gear button", () => {
   it("starts down, and asks for the opposite of where it is", () => {

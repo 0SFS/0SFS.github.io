@@ -12,11 +12,16 @@ export interface WorkletCheckInput {
   tireWatts: number;
 }
 
+/** The step a check has reached, so the runner can say where one stalled. */
+const reach = (step: string) => { (window as unknown as { workletCheckStep: string }).workletCheckStep = step; };
+
 export async function runWorkletCheck(input: WorkletCheckInput) {
+  reach("compile");
   const bytes = Uint8Array.from(atob(input.wasmBase64), (char) => char.charCodeAt(0));
   const module = await WebAssembly.compile(bytes);
   const context = new OfflineAudioContext(2, Math.round(input.sampleRate * input.seconds), input.sampleRate);
   const url = URL.createObjectURL(new Blob([input.workletSource], { type: "text/javascript" }));
+  reach("addModule");
   await context.audioWorklet.addModule(url);
   const messages: string[] = [];
   const node = new AudioWorkletNode(context, "osfs-dsp", {
@@ -31,7 +36,9 @@ export async function runWorkletCheck(input: WorkletCheckInput) {
   node.port.onmessage = (event) => messages.push(String((event.data as { type?: string })?.type));
   node.onprocessorerror = () => messages.push("processorerror");
   node.connect(context.destination);
+  reach("startRendering");
   const rendered = await context.startRendering();
+  reach("analyse");
   let peak = 0;
   let nonFinite = 0;
   let energy = 0;

@@ -5,6 +5,7 @@ import { JSBSimSdk } from "@felipegalind0/jsbsim";
 import { wasmBinaryUrl, wasmModuleUrl } from "@felipegalind0/jsbsim/wasm";
 import { afterEach, describe, expect, it } from "vitest";
 import { bootstrapAircraft } from "../jsbsim/bootstrapC172";
+import type { AircraftId } from "../aircraft/aircraftIds";
 import { resolveAircraftDataFiles } from "../jsbsim/hydrateJsbsimData";
 import { deriveEnginePhase, discoverReadableProperties, ENGINE_PATHS, readEngineSample } from "./engineMonitorModel";
 
@@ -16,16 +17,19 @@ import { deriveEnginePhase, discoverReadableProperties, ENGINE_PATHS, readEngine
 const instances: JSBSimSdk[] = [];
 afterEach(() => { for (const sdk of instances.splice(0)) sdk.destroy(); });
 
-async function bootSf50(): Promise<JSBSimSdk> {
+async function bootAircraft(
+  aircraftId: AircraftId = "cirrus-vision-jet", preLoadProperties: Record<string, number> = {},
+): Promise<JSBSimSdk> {
   const sdk = await JSBSimSdk.create({
     moduleUrl: wasmModuleUrl, wasmUrl: wasmBinaryUrl, persistence: { enabled: false }, log: { console: false },
   });
   instances.push(sdk);
+  for (const [path, value] of Object.entries(preLoadProperties)) sdk.setPropertyValue(path, value);
   const manifest: unknown = JSON.parse(readFileSync("public/jsbsim-data/manifest.json", "utf8"));
-  for (const path of resolveAircraftDataFiles(manifest, "cirrus-vision-jet")) {
+  for (const path of resolveAircraftDataFiles(manifest, aircraftId)) {
     sdk.writeDataFile(path, readFileSync(`public/jsbsim-data/${path}`, "utf8"));
   }
-  await bootstrapAircraft(sdk, "cirrus-vision-jet", {});
+  await bootstrapAircraft(sdk, aircraftId, {});
   return sdk;
 }
 
@@ -37,7 +41,7 @@ function run(sdk: JSBSimSdk, seconds: number): void {
 
 describe("engine monitor phase on the real SF50 model", () => {
   it("finds every property its summary and phase rules read, and none that are write-only", async () => {
-    const sdk = await bootSf50();
+    const sdk = await bootAircraft();
     const available = new Set(discoverReadableProperties(sdk));
     for (const [key, path] of Object.entries(ENGINE_PATHS)) {
       // Crankshaft speed belongs to piston engines only.
@@ -47,7 +51,7 @@ describe("engine monitor phase on the real SF50 model", () => {
   });
 
   it("follows a cold start: windmilling, motoring, starting while running is false, then running", async () => {
-    const sdk = await bootSf50();
+    const sdk = await bootAircraft();
     const available = new Set(discoverReadableProperties(sdk));
     const phase = () => deriveEnginePhase(readEngineSample(sdk, available)).phase;
     expect(phase()).toBe("running");
@@ -75,7 +79,7 @@ describe("engine monitor phase on the real SF50 model", () => {
   }, 60_000);
 
   it("lets a stopped engine's spools settle toward airspeed, as JSBSim's Off() does", async () => {
-    const sdk = await bootSf50();
+    const sdk = await bootAircraft();
     const available = new Set(discoverReadableProperties(sdk));
     sdk.setPropertyValue("propulsion/cutoff_cmd", 1);
     sdk.setPropertyValue("propulsion/engine[0]/set-running", 0);
@@ -85,5 +89,24 @@ describe("engine monitor phase on the real SF50 model", () => {
     const target = sample.qbarPsf! / 10;
     expect(sample.n1Pct!).toBeGreaterThan(target * 0.5);
     expect(sample.n1Pct!).toBeLessThan(target * 2 + 1);
+  }, 60_000);
+});
+
+describe("engine monitor on the real C172 model", () => {
+  it("keeps C172's shaft RPM authoritative after unrelated reads create N1/N2 property nodes", async () => {
+    // The native property tree can retain nodes other app consumers touched;
+    // reproduce that before model load, which builds JSBSim's cached catalog.
+    const sdk = await bootAircraft("cessna-172", {
+      "propulsion/engine/n1": 0, "propulsion/engine/n2": 0,
+    });
+    const available = new Set(discoverReadableProperties(sdk));
+    expect(available.has(ENGINE_PATHS.n1)).toBe(true);
+    expect(available.has(ENGINE_PATHS.n2)).toBe(true);
+    const sample = readEngineSample(sdk, available, { kind: "piston", maxRpm: 2700 });
+    expect(sample.rpm).toBeGreaterThan(0);
+    expect(sample.n1Pct).toBeNull();
+    expect(sample.n2Pct).toBeNull();
+    expect(sample.maxRpm).toBe(2700);
+    expect(deriveEnginePhase(sample)).toMatchObject({ phase: "running", derived: false });
   }, 60_000);
 });

@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "date": "2026-10-05",
+  "status": "Experimental playable prototype; aircraft performance uncalibrated",
+  "model": "F-35B-jsbsim",
+  "aircraftId": "f-35b",
+  "source": {
+    "archiveUrl": "https://fgaddon.b-cdn.net/Aircraft-trunk/F-35B.zip",
+    "cataloguePackageId": "F-35B-yasim",
+    "variantId": "F-35B-jsbsim",
+    "fgaddonRevision": "15340",
+    "archiveBytes": 10618616,
+    "archiveSha256": "caf3c591c838148ccdeec8fc61a23fd09f17574aeb36e0071e84a132dd25ebd6",
+    "archiveMd5": "7d8225e9c41f456d7fbb705064bb0274"
+  },
+  "authors": {
+    "package": [
+      "Petar Jedvaj",
+      "Detlef Faber",
+      "F-GTUX",
+      "Stuart Cassie",
+      "Gary Brown"
+    ],
+    "fdmHeader": "F-GTUX from Erik Hofman F-16 and aeromatic",
+    "creditsSource": "F-35B-jsbsim-set.xml"
+  },
+  "license": {
+    "packageFile": "License.txt",
+    "packageTextVersion": "GPL version 3",
+    "fdmHeaderName": "GPL (General Public License)",
+    "preservation": "Original source bytes, copyright and licence notices retained; no or-later clause inferred."
+  },
+  "unmodifiedSource": "planes/Lockheed_Martin_F-35B/tests/flightgear-jsbsim/",
+  "modificationNotice": "NOTICE.md",
+  "files": [
+    {
+      "path": "F-35B-jsbsim.xml",
+      "sourceArchivePath": "F-35B/F-35B-jsbsim.xml",
+      "sourceBytes": 37491,
+      "sourceSha256": "0f1cbe9f4d0232c3cbd36a64f1cfe046af947834a68e6053ddaa3eb7aa389e7d",
+      "bytes": 48736,
+      "sha256": "240b8650c8e572d0e871d459db2a58e9b7b81457ad2ae7d8c6486cf198fcc9ef",
+      "modified": true,
+      "changes": [
+        "Explicit FlightGear external defaults and model-specific control defaults.",
+        "Development internal fuel2500lb/tank, total5000lb; source capacity/empty mass/CG/inertias/aero unchanged.",
+        "Provisional inspected fan/nozzle force points.",
+        "Fixed-step experimental STOVL FCS allocation, attitude damping, vector nozzle orientation and2.5s actuator.",
+        "Fan-door aerodynamic mixture position and conversion augmentation cap.",
+        "Experimental dynamic-pressure yaw gain schedule suppresses disturbance-driven rudder hunting at high speed; pilot command properties unchanged.",
+        "Native Auto/Manual/FBW selection; Manual bypasses stabilization, resets integrators and uses direct stick/trim/flap commands while preserving conversion."
+      ]
+    },
+    {
+      "path": "Engines/F135-PW-600.xml",
+      "sourceArchivePath": "F-35B/Engines/F135-PW-600.xml",
+      "sourceBytes": 3615,
+      "sourceSha256": "77e5494173485bc24f8e3754a9ba31dd93f5aebc651285eb477184aff8169c6e",
+      "bytes": 4769,
+      "sha256": "09b7eb9c8c9ea5ca720ae1974f4d1ef5d7fb35e6b8248415c6cfcc307c57891c",
+      "modified": true,
+      "changes": [
+        "Native automatic augmentation in conventional flight.",
+        "Progressive dry-thrust reduction to18klbf full-conversion reference before source bleed.",
+        "Conversion-dependent approximate main fuel accounting for auxiliary power."
+      ]
+    },
+    {
+      "path": "Engines/direct.xml",
+      "sourceArchivePath": "F-35B/Engines/direct.xml",
+      "sourceBytes": 114,
+      "sourceSha256": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc",
+      "bytes": 114,
+      "sha256": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc",
+      "modified": false,
+      "changes": []
+    },
+    {
+      "path": "Engines/liftfan.xml",
+      "sourceArchivePath": "F-35B/Engines/liftfan.xml",
+      "sourceBytes": 2168,
+      "sourceSha256": "926c3ebefdf753f8cf2797b02d662a665a46dbd4257858deff4ce0945ccd46a2",
+      "bytes": 2488,
+      "sha256": "4878bb23bb5e5fb86a76ca4dc68e33b1a1386e25157acaf34c32726fbdb184ea",
+      "modified": true,
+      "changes": [
+        "Zero separate TSFC/idle fuel flow/bleed for force surrogate.",
+        "Idle and military thrust gated by physical conversion to remove closed-inlet force."
+      ]
+    },
+    {
+      "path": "Engines/sidefan.xml",
+      "sourceArchivePath": "F-35B/Engines/sidefan.xml",
+      "sourceBytes": 2236,
+      "sourceSha256": "e0ad665eb77db712e4f106c32009760dcf2a6ecb0cd9aab069562d2a6fdb6122",
+      "bytes": 2556,
+      "sha256": "e811bd3bb7417a349422f57909d268e5b0c56a386b9e58cd2ada74a98c1e5a79",
+      "modified": true,
+      "changes": [
+        "Zero separate TSFC/idle fuel flow/bleed for force surrogate.",
+        "Idle and military thrust gated by physical conversion to remove closed-door force."
+      ]
+    },
+    {
+      "path": "Systems/pushback.xml",
+      "sourceArchivePath": "F-35B/Systems/pushback.xml",
+      "sourceBytes": 1127,
+      "sourceSha256": "868928e9b2b12440daec283260aebb1562d05154f69438f5d95043444378a4bc",
+      "bytes": 1127,
+      "sha256": "868928e9b2b12440daec283260aebb1562d05154f69438f5d95043444378a4bc",
+      "modified": false,
+      "changes": []
+    },
+    {
+      "path": "License.txt",
+      "sourceArchivePath": "F-35B/License.txt",
+      "sourceBytes": 35147,
+      "sourceSha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "bytes": 35147,
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "modified": false,
+      "changes": []
+    }
+  ]
+}

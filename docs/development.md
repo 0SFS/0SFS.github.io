@@ -105,6 +105,18 @@ behavior, engine bootstrap sequencing, controller profiles through gamepad-tools
 evaluation (`src/flight/input/gamepadProfiles.test.ts`), and real JSBSim/WASM C172 propulsion.
 `npm run test:watch` reruns on change.
 
+### Looking at one component in Chrome, without a server
+
+A panel or control can be seen and driven in headless Chrome without starting the dev server.
+Write an entry that imports the component and its stylesheets and mounts it into a page, build it
+with Vite's API as a library in `iife` format into a folder under `build/`, write an `index.html`
+beside it that loads the bundle with a plain `<script>`, and open it as a `file://` URL through
+`openHeadlessChrome` from `scripts/headless-chrome.mjs`. Chrome refuses module scripts from
+`file://`, which is why the bundle has to be `iife`. The Chrome DevTools Protocol then takes the
+screenshots (`Page.captureScreenshot`) and real pointer input (`Input.dispatchMouseEvent`). Close
+Chrome with `chrome.close()` in a `finally`. The throttle lever and the Fuel tab were checked this
+way, including holding and dragging them.
+
 ### Testing on a real phone
 
 ```sh

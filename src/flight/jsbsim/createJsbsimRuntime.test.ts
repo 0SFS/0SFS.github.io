@@ -9,11 +9,15 @@ vi.mock("./hydrateJsbsimData", () => ({ downloadJsbsimData: vi.fn() }));
 import { createJsbsimRuntime } from "./createJsbsimRuntime";
 import { buildIdentity, JSBSimSdk } from "@felipegalind0/jsbsim";
 import { downloadJsbsimData } from "./hydrateJsbsimData";
+import { AIRCRAFT_IDS } from "../aircraft/aircraftIds";
+import { getFdmProfile } from "./fdmProfiles";
 
 const createMockSdk = () => ({
   configurePaths: vi.fn(), loadModel: vi.fn(() => true), runIc: vi.fn(() => true),
   setPropertyValue: vi.fn(), getPropertyValue: vi.fn(), setDt: vi.fn(),
   getDeltaT: vi.fn(() => 1 / 120), writeDataFile: vi.fn(),
+  getPropertyCatalog: vi.fn(() => AIRCRAFT_IDS.flatMap(id =>
+    (getFdmProfile(id).requiredReadOnlyModelProperties ?? []).map(path => `${path} (R)`))),
   on: vi.fn(), off: vi.fn(), destroy: vi.fn(), delete: vi.fn(), setRunMode: vi.fn(),
 });
 
@@ -36,12 +40,13 @@ describe("createJsbsimRuntime", () => {
     expect(sdk.delete).not.toHaveBeenCalled();
   });
 
-  it.each(["cessna-172", "cirrus-vision-jet", "cirrus-vision-jet-g2", "cirrus-vision-jet-g3"] as const)(
+  it.each(AIRCRAFT_IDS)(
     "loads only the selected %s package", async aircraftId => {
       const sdk = createMockSdk();
       vi.mocked(JSBSimSdk.create).mockResolvedValue(sdk as never);
       const runtime = await createJsbsimRuntime({ aircraftId });
       expect(downloadJsbsimData).toHaveBeenCalledWith(undefined, undefined, aircraftId);
+      expect(sdk.loadModel).toHaveBeenCalledWith(getFdmProfile(aircraftId).model);
       expect(runtime.identity.aircraftId).toBe(aircraftId);
       runtime.dispose();
     },
@@ -74,5 +79,15 @@ describe("createJsbsimRuntime", () => {
     expect(sdk.off).toHaveBeenCalledTimes(2);
     expect(sdk.destroy).toHaveBeenCalledOnce();
     expect(sdk.delete).not.toHaveBeenCalled();
+  });
+
+  it("releases the SDK when aircraft data requires an unavailable native observation", async () => {
+    const sdk = createMockSdk();
+    sdk.getPropertyCatalog.mockReturnValue(["propulsion/engine/body-force-z-lbs (RW)"]);
+    vi.mocked(JSBSimSdk.create).mockResolvedValue(sdk as never);
+    await expect(createJsbsimRuntime({ aircraftId: "f-35b" })).rejects.toThrow("required native read-only");
+    expect(sdk.runIc).not.toHaveBeenCalled();
+    expect(sdk.off).toHaveBeenCalledTimes(2);
+    expect(sdk.destroy).toHaveBeenCalledOnce();
   });
 });

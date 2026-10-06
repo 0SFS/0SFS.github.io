@@ -111,6 +111,9 @@ export default defineConfig({
     dedupe: ['@babylonjs/core', '@babylonjs/loaders', '3d-tiles-renderer', 'react', 'react-dom'],
   },
   optimizeDeps: {
+    // /fly/ and /rc/ share this entry. Other HTML files are retained research
+    // or scratch checkouts, not additional application entry points.
+    entries: ['index.html'],
     exclude: ['@felipegalind0/jsbsim'],
   },
   assetsInclude: ['**/*.wasm'],
@@ -121,9 +124,11 @@ export default defineConfig({
   },
   plugins: [react(), copyIndexToPagesPaths(), lanOriginPlugin()],
   test: {
+    maxWorkers: '50%',
     // `build/` holds gitignored validation sandboxes, some of which symlink to
-    // sibling packages. Collecting those runs another package's tests under
+    // sibling packages. App-managed worktrees hold other checkouts too.
+    // Collecting those runs another package's tests under
     // this config and fails on environment it never opted into.
-    exclude: [...configDefaults.exclude, 'build/**'],
+    exclude: [...configDefaults.exclude, 'build/**', '.delta/**'],
   },
 })

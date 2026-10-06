@@ -36,6 +36,10 @@ export interface AudioSettingsV1 {
   requested: AudioQualityId;
   masterVolume: number;
   engineVolume: number;
+  /** Scales only the additional native-afterburner contribution; 1 is the original level. */
+  afterburnerVolume: number;
+  /** Acoustic viewpoint: 0 follows the camera, 1 stays in the cockpit. */
+  listenerCockpitBlend: number;
   /** Airframe wind and gear/flap turbulence, independent of engine volume and mute. */
   airframeVolume: number;
   // Tire volume keeps its existing home, ground-interaction `tireAudioVolume`:
@@ -54,8 +58,8 @@ export type AudioSettingsParse =
 const isQuality = (value: unknown): value is AudioQualityId =>
   typeof value === "string" && (AUDIO_QUALITY_IDS as readonly string[]).includes(value);
 
-const unit = (value: unknown, fallback: number): number =>
-  typeof value === "number" && Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : fallback;
+const boundedLevel = (value: unknown, fallback: number, maximum = 1): number =>
+  typeof value === "number" && Number.isFinite(value) ? Math.min(maximum, Math.max(0, value)) : fallback;
 
 export function parseAudioSettings(value: unknown): AudioSettingsParse {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
@@ -78,10 +82,13 @@ export function parseAudioSettings(value: unknown): AudioSettingsParse {
   if (isQuality(input.requested)) settings.requested = input.requested;
   else if (input.requested !== undefined) migrated = true;
 
-  settings.masterVolume = unit(input.masterVolume, DEFAULT_AUDIO_SETTINGS.masterVolume);
-  settings.engineVolume = unit(input.engineVolume, DEFAULT_AUDIO_SETTINGS.engineVolume);
-  settings.airframeVolume = unit(input.airframeVolume, DEFAULT_AUDIO_SETTINGS.airframeVolume);
+  settings.masterVolume = boundedLevel(input.masterVolume, DEFAULT_AUDIO_SETTINGS.masterVolume, 8);
+  settings.engineVolume = boundedLevel(input.engineVolume, DEFAULT_AUDIO_SETTINGS.engineVolume, 8);
+  settings.afterburnerVolume = boundedLevel(input.afterburnerVolume, DEFAULT_AUDIO_SETTINGS.afterburnerVolume);
+  settings.listenerCockpitBlend = boundedLevel(input.listenerCockpitBlend, DEFAULT_AUDIO_SETTINGS.listenerCockpitBlend);
+  settings.airframeVolume = boundedLevel(input.airframeVolume, DEFAULT_AUDIO_SETTINGS.airframeVolume);
   if (input.masterVolume !== settings.masterVolume || input.engineVolume !== settings.engineVolume
+    || input.afterburnerVolume !== settings.afterburnerVolume || input.listenerCockpitBlend !== settings.listenerCockpitBlend
     || input.airframeVolume !== settings.airframeVolume) migrated = true;
 
   settings.engineMuted = input.engineMuted === true;
@@ -112,7 +119,7 @@ export function patchAudioSettings(
   if ("downgradedFrom" in input && input.downgradedFrom !== null && !isQuality(input.downgradedFrom)) {
     next.downgradedFrom = settings.downgradedFrom;
   }
-  for (const key of ["masterVolume", "engineVolume", "airframeVolume"] as const) {
+  for (const key of ["masterVolume", "engineVolume", "afterburnerVolume", "listenerCockpitBlend", "airframeVolume"] as const) {
     const value = input[key];
     if (key in input && !(typeof value === "number" && Number.isFinite(value))) next[key] = settings[key];
   }
@@ -125,6 +132,8 @@ const PARAMETER_IDS = {
   requested: "osfs.sound.quality",
   masterVolume: "osfs.sound.masterVolume",
   engineVolume: "osfs.sound.engineVolume",
+  afterburnerVolume: "osfs.sound.afterburnerVolume",
+  listenerCockpitBlend: "osfs.sound.listenerCockpitBlend",
   airframeVolume: "osfs.sound.airframeVolume",
   engineMuted: "osfs.sound.engineMuted",
   reducedDynamicRange: "osfs.sound.reducedDynamicRange",
@@ -142,6 +151,8 @@ export function readAudioSettings(parameters: FlightParameters): AudioSettingsV1
     requested: parameters.get(PARAMETER_IDS.requested),
     masterVolume: parameters.get(PARAMETER_IDS.masterVolume),
     engineVolume: parameters.get(PARAMETER_IDS.engineVolume),
+    afterburnerVolume: parameters.get(PARAMETER_IDS.afterburnerVolume),
+    listenerCockpitBlend: parameters.get(PARAMETER_IDS.listenerCockpitBlend),
     airframeVolume: parameters.get(PARAMETER_IDS.airframeVolume),
     engineMuted: parameters.get(PARAMETER_IDS.engineMuted),
     reducedDynamicRange: parameters.get(PARAMETER_IDS.reducedDynamicRange),
@@ -214,8 +225,7 @@ export interface SoundTierLimits {
 export const SOUND_TIER_LIMIT_IDS: readonly FlightParameterId[] = [
   "osfs.sound.low.partials", "osfs.sound.low.noiseBands",
   "osfs.sound.med.partials", "osfs.sound.med.noiseBands", "osfs.sound.med.irMs",
-  "osfs.sound.high.partials", "osfs.sound.high.noiseBands", "osfs.sound.high.grains",
-  "osfs.sound.high.grainStarts", "osfs.sound.high.irMs",
+  "osfs.sound.high.partials", "osfs.sound.high.noiseBands", "osfs.sound.high.irMs",
 ];
 
 export function readSoundTierLimits(parameters: FlightParameters): SoundTierLimits[] {
@@ -230,7 +240,7 @@ export function readSoundTierLimits(parameters: FlightParameters): SoundTierLimi
     },
     {
       tier: 3, partials: parameters.get("osfs.sound.high.partials"), noiseBands: parameters.get("osfs.sound.high.noiseBands"),
-      grains: parameters.get("osfs.sound.high.grains"), startsPerSecond: parameters.get("osfs.sound.high.grainStarts"),
+      grains: 0, startsPerSecond: 0,
       irMilliseconds: parameters.get("osfs.sound.high.irMs"),
     },
   ];

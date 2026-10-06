@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-05",
+  "purpose": "Repair native stopped-turbine phantom thrust during zero-time initialization while preserving prior immutable packages.",
+  "source": {
+    "repository": "https://github.com/Felipegalind0/jsbsim",
+    "branch": "master",
+    "commit": "c1d57a2c3860ae9ae47f2b27b84f37912042c19c",
+    "dirty": false,
+    "previousPackageCommit": "c8228c4db04fa4b3054feb1c98734a309043082b",
+    "scope": "FGTurbine::Trim returns zero immediately when Running=false; stopped spool/fuel state retained, running idle and ordinary trim unchanged; native/WASM regressions and wrapper version metadata.",
+    "upstreamPublicationForThisWork": false
+  },
+  "identity": {
+    "package": "@felipegalind0/jsbsim@1.2.4-fork.11",
+    "previousPackage": "@felipegalind0/jsbsim@1.2.4-fork.10",
+    "repositoryContentSha256": "fec8d16c38fd80da1446cde2b1f5523796d737eef6bac5426a7df4b11c2e2021",
+    "sdkSubtreeSha256": "d40290a03a3c40552b8dce8c3dfb6aeb5f19587f406d7083c461bc5ec2dfb5a4",
+    "buildInputSha256": "d353cac279c53cbc55c05b5231680ae85c26ae62b8b6c68a7e388fed90e0e7bc",
+    "tarballSha256": "1add69a5e13980af743a788f1e8f8856338ffd01b80e95a8dbaa23f7df0dd71a",
+    "tarballIntegrity": "sha512-kJNRRxbmG22N7wPTvLweMN16VBIAuch8DD2PLdYf0mwUnK9cOrm/R+UERGyIKRpb7vwReS7s150uLjOYANzXXQ==",
+    "installedLoaderSha256": "784e82c9cae536589f408a74abdda475fd72c56b18bb99129f66281ab3d53dc2",
+    "installedWasmSha256": "ad1a8a1288ba7895c24e9f8701c754f4f7266703b7ea4f7d6325e5974132b1f3",
+    "record": "fork11/verified-installed-artifact.json"
+  },
+  "checks": {
+    "nativeStoppedThrust": {
+      "status": "passed",
+      "target": "TestTurbineAugmentation",
+      "methods": 8,
+      "log": "fork11/native-stopped-thrust.log",
+      "scope": "New method covers cold/hot-stopped RunIC for augmentation methods 0/1/2, repeated zero-time calls, retained spool/fuel, running idle and existing augmentation/nozzle contracts."
+    },
+    "nativeRelatedTrim": {
+      "status": "passed",
+      "targets": [
+        "TestTurbineTrimSpool",
+        "TestTurbineTrimFuelFlow"
+      ],
+      "log": "fork11/native-related-initial.log",
+      "note": "Those two targets passed on final C++ source. The initial new stopped-thrust fixture in the same log needed an accepted step before cutoff; only its failed file was rerun and passes in native-stopped-thrust.log."
+    },
+    "sdkBuildValidation": {
+      "status": "passed",
+      "tests": 52,
+      "suites": 9,
+      "log": "fork11/sdk-build-validation.log",
+      "commands": [
+        "tsc --noEmit (frozen SDK workspace)",
+        "node --test --test-concurrency=5 test/*.test.mjs (frozen SDK workspace and resolved native fixtures)"
+      ],
+      "sourceDateEpoch": 1791240983,
+      "scope": "One clean frozen-source build, locked toolchain, 5 compile jobs and 5 Node test workers."
+    },
+    "releasePacking": {
+      "status": "passed",
+      "log": "fork11/sdk-release-pack.log",
+      "releaseEligible": true
+    },
+    "installedArtifactIdentity": {
+      "status": "passed",
+      "verifiedFiles": 14,
+      "log": "fork11/verify-fork11.log"
+    },
+    "installedRegressions": {
+      "status": "passed after a fixture correction and narrow failed-file rerun",
+      "uniqueTests": 132,
+      "files": 6,
+      "initial": {
+        "passed": 131,
+        "failed": 1,
+        "log": "fork11/installed-regressions-initial.log"
+      },
+      "rerun": {
+        "tests": 17,
+        "passed": 17,
+        "log": "fork11/installed-yaw-final.log"
+      },
+      "fixtureCorrection": "Old Manual control-law test assumed Manual implicitly disabled automatic flaps. New separate default Auto-flaps control requires that pilot-flaps test to explicitly select Auto off.",
+      "scope": "50 F35 allocation/control/conversion/reset/reload/augmentation cases, 17 yaw/mode cases, native audio/forces and identity/artifact tests."
+    },
+    "negativeComparator": {
+      "status": "reproduced on immutable fork10",
+      "log": "fork11/fork10-stopped-thrust-failure.log",
+      "finding": "After accepted main-only cutoff, RunIC returned 14999.211862 lb main dry thrust while Running=false. New installed fork11 case passes zero for all force carriers."
+    },
+    "fullApplicationCi": {
+      "status": "passed",
+      "tests": 1536,
+      "files": 148,
+      "command": "npm run ci",
+      "log": "../../aircraft/f35b/final-acceptance-2026-10-05/app-ci.log",
+      "followupBuild": "../../aircraft/f35b/final-acceptance-2026-10-05/final-build.log",
+      "note": "Reused completed concurrent-session CI after source/artifact audit; final consumer build also includes shared force-direction correction."
+    },
+    "browserLoadedAssets": {
+      "status": "passed for standalone aircraft fixtures",
+      "receipt": "../../aircraft/f35b/exhaust-smoke-gpu-2026-10-05/acceptance.json",
+      "scope": "Installed fork.11 instantiated on hardware WebGL2 and WebGPU; not full-globe browser qualification."
+    }
+  },
+  "preservation": {
+    "previousArtifact": "deps/felipegalind0-jsbsim-1.2.4-fork.10.tgz retained; fork9/fork8 archives retained too",
+    "rollbackDeclaration": "validation/evidence/jsbsim/rollback/fork10/",
+    "earlierRecords": "Unchanged"
+  },
+  "limitations": [
+    "Legacy trim-to-run startup initializes Cutoff=false as before; cutoff tests leave Trim through an accepted step before stopping. This release repairs already-stopped zero-time force rather than changing startup command semantics.",
+    "F35 lift allocation remains approximate geometry/capacity accounting, not shaft/clutch/bleed-flow calibration.",
+    "No upstream submission/push or package publication.",
+    "SDK full build tests establish software contracts, not aircraft performance, optics or acoustics."
+  ],
+  "evidence": [
+    {
+      "path": "fork11/native-stopped-thrust.log",
+      "bytes": 244,
+      "sha256": "3fdc0b438618370061aa4e38714e3695e99c885b78ec29fdaaa57e698ca4f1f2"
+    },
+    {
+      "path": "fork11/native-related-initial.log",
+      "bytes": 4177,
+      "sha256": "6acae4f05e4af4853e7d0639a872be3d141135b9458688f3df53fec0acddbf87"
+    },
+    {
+      "path": "fork11/sdk-build-validation.log",
+      "bytes": 20178,
+      "sha256": "219048abf8d8ec9f9481550d03e62303723f477845ed4a45ccc06bb696516783"
+    },
+    {
+      "path": "fork11/sdk-release-pack.log",
+      "bytes": 1890,
+      "sha256": "7017874f46f3b2d2b4440b1e8c2ec4ed5faeebd1b74858752b44f9f8752c8f35"
+    },
+    {
+      "path": "fork11/verify-fork11.log",
+      "bytes": 574,
+      "sha256": "0938cff6c032e23523460b1a86729bb92a87f0b6699431035610a4ce03a1a2c0"
+    },
+    {
+      "path": "fork11/installed-regressions-initial.log",
+      "bytes": 1981,
+      "sha256": "962fe67a9b21f71569bd3129fe1f03d0272e2fd714e5f2440b101db3e9e68ff7"
+    },
+    {
+      "path": "fork11/installed-yaw-final.log",
+      "bytes": 388,
+      "sha256": "d62524e258d9d53655ad8e8cb6d3505affe1e25cb5ff2698b39e443421cada5e"
+    },
+    {
+      "path": "fork11/fork10-stopped-thrust-failure.log",
+      "bytes": 1607,
+      "sha256": "8c840a39585ddc85f01d86d657d067a49c66b5a37dd215b25e5b8bfc9b090962"
+    },
+    {
+      "path": "fork11/verified-installed-artifact.json",
+      "bytes": 3170,
+      "sha256": "ba55bc9d166697442d839e94b62fba8275c3b3fd5952933dc748eafa02deb179"
+    }
+  ],
+  "finalAcceptance": "../../aircraft/f35b/final-acceptance-2026-10-05/acceptance.json"
+}
