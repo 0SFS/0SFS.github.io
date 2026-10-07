@@ -315,6 +315,7 @@
         <property value="0">fcs/stovl-augmentation-inhibit</property>
         <property value="0">fcs/control-law-mode</property>
         <property value="1">fcs/fbw-enabled</property>
+        <property value="1">fcs/roll-stick-gain</property>
         <property value="1">fcs/flaps-auto-enabled</property>
         <property>fcs/alpha-norm</property>
         <property>fcs/canopy-engage</property>
@@ -422,6 +423,16 @@
 
   <channel name="Roll">
 
+            <!-- 0SFS roll stick gain, 2026-10-06. The pilot's stick enters
+                 the aileron channel through this host-written gain under
+                 either law; 1 is the source gradient. The host writes 1 while
+                 its autopilot owns roll. The hover roll posts read
+                 fcs/aileron-cmd-norm unscaled. -->
+            <pure_gain name="fcs/roll-stick-cmd-norm">
+                <input>fcs/aileron-cmd-norm</input>
+                <gain>fcs/roll-stick-gain</gain>
+            </pure_gain>
+
             <!-- Calculate the normalized roll-rate -->
             <pure_gain name="roll rate norm">
                 <input>velocities/p-aero-rad_sec</input>
@@ -433,7 +444,7 @@
               - commanded roll-rate.
               -->
             <summer name="roll trim error">
-                <input>fcs/aileron-cmd-norm</input>
+                <input>fcs/roll-stick-cmd-norm</input>
                 <input>-fcs/roll-rate-norm</input>
       <input>fcs/roll-trim-cmd-norm</input>
       <clipto>
@@ -485,7 +496,7 @@
  </summer>
  
             <summer name="roll manual command">
-              <input>fcs/aileron-cmd-norm</input><input>fcs/roll-trim-cmd-norm</input>
+              <input>fcs/roll-stick-cmd-norm</input><input>fcs/roll-trim-cmd-norm</input>
               <clipto><min>-1</min><max>1</max></clipto>
             </summer>
             <switch name="roll actuator command">
