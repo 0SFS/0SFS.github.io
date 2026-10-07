@@ -258,4 +258,16 @@ describe("flight HUD position readout", () => {
     expect(status.textContent).toBe("44.9778°N 93.2650°W —ft AGL h000°");
     hud.destroy();
   });
+
+  it("measures above sea level from the geoid over Google 3D Tiles, which are drawn at ellipsoid heights", () => {
+    registerFlightSettings(getAppSettings());
+    const { container, hud } = createTestHud();
+    const status = container.querySelector<HTMLButtonElement>("#flightShellStatus")!;
+
+    hud.update(STATE, { ...STATUS, mode: "google-tiles" }, 60, false, 100);
+
+    // FOSS Earth's sea level grid is on its way, so no ellipsoid height is passed off as one above sea level.
+    expect(status.querySelector('[data-position-part="altitude"]')?.textContent).toBe("—ft ASL");
+    hud.destroy();
+  });
 });

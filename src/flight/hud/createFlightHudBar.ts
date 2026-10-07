@@ -2,7 +2,7 @@ import type { HudInputMode, InputSensitivitySettings } from "foss-earth/input";
 import "foss-earth/shell.css";
 import "foss-earth/input-mode.css";
 
-import { attachFullscreenButton, attachRendererActivity, createInputModeHud, createHudBar, createMapSourceHud, createPositionReadout, getRendererLabel, type HudBarHandle, type MapDetailController, type RenderActivitySource, type TileStreamingSource, type MapDownloadSource } from "foss-earth/shell";
+import { attachFullscreenButton, attachRendererActivity, createInputModeHud, createHudBar, createMapSourceHud, createPositionReadout, getRendererLabel, surfaceHeightDatum, type HudBarHandle, type MapDetailController, type RenderActivitySource, type TileStreamingSource, type MapDownloadSource } from "foss-earth/shell";
 import type { BabylonRuntimeStatus, RendererMode } from "foss-earth/runtime";
 import { getAppSettings } from "foss-earth/settings";
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
@@ -135,7 +135,11 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
       mapSource.update(runtimeStatus);
       const heading = String(Math.round(headingDegFromRad(state.headingRad))).padStart(3, "0");
       fpsButton.textContent = fps === null ? "FPS —" : `FPS ${Math.round(fps)}`;
-      position.update({ latDeg: state.latDeg, lonDeg: state.lonDeg, altitudeMeters: state.altMeters, groundHeightMeters, rest: `h${heading}°` });
+      // Over Google 3D Tiles the aircraft flies at ellipsoid heights; the readout takes sea level's away.
+      position.update({
+        latDeg: state.latDeg, lonDeg: state.lonDeg, altitudeMeters: state.altMeters, groundHeightMeters,
+        heightDatum: surfaceHeightDatum(runtimeStatus.mode), rest: `h${heading}°`,
+      });
     },
     destroy(): void {
       logButton?.removeEventListener("click", onLogClick);
