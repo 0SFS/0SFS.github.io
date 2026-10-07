@@ -232,7 +232,7 @@ describe("flight HUD position readout", () => {
   // 1000 ft above sea level, over ground 100 m up.
   const STATE = { latDeg: 44.9778, lonDeg: -93.265, altMeters: 304.8, headingRad: 0 } as never;
 
-  it("marks latitude and longitude with their icons and gives the altitude in feet", () => {
+  it("gives the altitude in feet, and marks latitude and longitude as Interface says", () => {
     registerFlightSettings(getAppSettings());
     const { container, hud } = createTestHud();
     const status = container.querySelector<HTMLButtonElement>("#flightShellStatus")!;
@@ -240,7 +240,12 @@ describe("flight HUD position readout", () => {
     hud.update(STATE, STATUS, 60, false, 100);
 
     expect(status.textContent).toBe("44.9778°N 93.2650°W 1000ft ASL h000°");
+    expect(status.querySelector("svg")).toBeNull();
+
+    getAppSettings().set("interface.position.coordinateLabels", "icons");
     expect(status.querySelectorAll("svg.hud-position__icon")).toHaveLength(2);
+    getAppSettings().set("interface.position.coordinateLabels", "words");
+    expect(status.textContent).toBe("lat 44.9778°N lon 93.2650°W 1000ft ASL h000°");
     hud.destroy();
   });
 
