@@ -721,13 +721,29 @@ This choice controls the aircraft's native law. Autopilot and the visible input
 and auto-trim assists remain independently configured. The prototype laws are
 experimental; these modes do not reproduce a real F-35 cockpit control selector.
 
-Beside it, **Roll stick gain** (`osfs.aircraft.rollStickGain`, ratio 0.1–1,
-default 1) scales the pilot's roll stick into the F-35B's ailerons under either
-law, through native `fcs/roll-stick-gain`. The default is the flight model's own
-gradient, which under fly-by-wire reaches full aileron by 55–80% stick between
-200 and 450 kt. Below 1, small inputs roll more gently; under Manual it also
-limits full-stick aileron. The gain applies only while the pilot owns roll, so
-the autopilot's command passes unscaled, and the hover roll posts keep the
-unscaled stick. Roll auto-trim weighs the scaled stick. Other aircraft take the
-stick unscaled. [F-35B FDM](f35b-fdm.md#aircraft-control-law) records the
-measurement.
+Beside it, **Full-stick roll rate** (`osfs.aircraft.fullStickRollRate`,
+15–165°/s, default 30°/s) is the roll rate the F-35B's fly-by-wire asks for at
+full stick, through native `fcs/full-stick-roll-rate-deg_sec`; half stick asks
+for half. The jet flies it within 11% between 200 and 600 kt, until the
+ailerons run out near 150°/s at 200 kt, and holds bank with the stick centred.
+The default was chosen in flight. At 300 kt the earlier stick gains of 0.05,
+0.1 and 0.5 flew about 16, 33 and 165°/s at full stick, which set the bounds.
+It applies only while the pilot owns roll; the autopilot flies the source
+gradient. Manual and the hover roll posts take the unscaled stick, and other
+aircraft have no such law. Auto roll trim waits while the fly-by-wire holds
+bank, because there roll trim commands a roll rate.
+[F-35B FDM](f35b-fdm.md#aircraft-control-law) describes the law.
+
+Below it, **Roll trim range** (`osfs.aircraft.rollTrimRange`, 0.05–1, default
+1) is how far full roll trim reaches as a share of what full stick asks for:
+at 1, 100% trim asks what holding A or D, or a controller's stick full over,
+asks; at 0.2, a fifth of it. It applies to every aircraft at the one
+control-to-physics boundary (`applyFlightControls`), since each takes roll trim
+in its stick's units: of full aileron on the Cessna, the Vision Jets and the
+F-35B under Manual, and of the full-stick roll rate under the F-35B's
+fly-by-wire. Until 2026-10-07 the fly-by-wire took trim unscaled, so full trim
+asked for 637°/s against 30°/s at full stick, and a few percent of trim
+outrolled the stick. The trim wheel's position, which the HUD, the keys, a
+controller and the phone move, is not scaled; a resumed flight's trim is read
+back over the range, so it does not shrink at each reload. Pitch trim keeps its
+range.

@@ -167,47 +167,127 @@ describe("F-35B native lift allocation, not LiftSystem calibration", () => {
   );
 });
 
-describe("F-35B roll stick gain", () => {
-  function applyRoll(sdk: JSBSimSdk, aileron: number, gain: number, mode: FlightControlLawMode = "auto", conversion = 0, base = neutral) {
+describe("F-35B roll-rate law", () => {
+  const SOURCE_RATE = profile.fullStickRollRate!.sourceDegPerSec;
+  const DEG = 180 / Math.PI;
+
+  function applyRoll(sdk: JSBSimSdk, aileron: number, degPerSec: number,
+    { mode = "auto" as FlightControlLawMode, conversion = 0, base = neutral } = {}) {
     applyFlightControls(sdk, { ...base, aileron }, 0, profile.rudderSign,
       { commandProperty: profile.stovl!.commandProperty, commandNorm: conversion },
       { commandProperty: profile.controlLaw!.commandProperty, mode }, undefined,
-      { property: profile.rollStickGainProperty!, gain });
+      { property: profile.fullStickRollRate!.property, degPerSec });
   }
 
-  async function rollAfterOneSecond(stick: number, gain: number, mode: FlightControlLawMode) {
-    const sdk = await createF35({ airspeedKts: 300, altFt: 10_000 });
-    applyRoll(sdk, 0, gain, mode);
-    advance(sdk, 0.5);
-    applyRoll(sdk, stick, gain, mode);
-    advance(sdk, 1);
-    return { rateRad: sdk.getPropertyValue("velocities/p-rad_sec"), aileron: sdk.getPropertyValue("fcs/aileron-pos-norm") };
+  function hold(sdk: JSBSimSdk, seconds: number, aileron: number, degPerSec: number, mode?: FlightControlLawMode) {
+    for (let step = 0; step < seconds / FIXED_DT; step++) {
+      applyRoll(sdk, aileron, degPerSec, { mode });
+      expect(sdk.run()).toBe(true);
+    }
   }
 
-  it("at the source gradient, fly-by-wire reaches full aileron before full stick at 300 kt", async () => {
-    expect((await rollAfterOneSecond(0.75, 1, "fly-by-wire")).aileron).toBe(1);
-    expect((await rollAfterOneSecond(0.5, 1, "fly-by-wire")).aileron).toBeLessThan(0.8);
+  it("starts from the source gradient, full stick asking for 1/0.09 rad/s", async () => {
+    const sdk = await createF35();
+    expect(sdk.getPropertyValue(profile.fullStickRollRate!.property)).toBeCloseTo(SOURCE_RATE, 9);
   });
 
-  it.each(["fly-by-wire", "manual"] as const)("under %s, a gain flies the stick as the smaller deflection it scales to", async mode => {
-    const scaled = await rollAfterOneSecond(0.8, 0.5, mode);
-    const reference = await rollAfterOneSecond(0.4, 1, mode);
-    expect(scaled.rateRad).toBeGreaterThan(0.1);
-    expect(scaled.rateRad).toBeCloseTo(reference.rateRad, 9);
-    expect(scaled.aileron).toBeCloseTo(reference.aileron, 9);
+  it.each([[200, 10_000], [300, 10_000], [450, 10_000], [600, 10_000], [300, 30_000]].flatMap(([airspeedKts, altFt]) =>
+    [30, 90].map(commandDegPerSec => ({ airspeedKts, altFt, commandDegPerSec }))))(
+    "flies $commandDegPerSec°/s within 11% at $airspeedKts kt and $altFt ft", async ({ airspeedKts, altFt, commandDegPerSec }) => {
+      const sdk = await createF35({ airspeedKts, altFt });
+      hold(sdk, 0.5, 0, 165);
+      // Half stick of a 2·command setting, so the setting scales the stick linearly.
+      hold(sdk, 2, 0.5, 2 * commandDegPerSec);
+      const rateDegPerSec = sdk.getPropertyValue("velocities/p-rad_sec") * DEG;
+      // Feedforward is one constant; the residual follows Mach, from +10% at 200 kt to -10% at 600 kt.
+      expect(rateDegPerSec / commandDegPerSec).toBeGreaterThan(0.89);
+      expect(rateDegPerSec / commandDegPerSec).toBeLessThan(1.11);
+    });
+
+  it("stops and holds bank with the stick centred, where the source loop rolled back", async () => {
+    const sdk = await createF35({ airspeedKts: 300, altFt: 10_000 });
+    hold(sdk, 0.5, 0, 30);
+    for (let step = 0; step < 5 / FIXED_DT && sdk.getPropertyValue("attitude/phi-deg") < 30; step++) {
+      applyRoll(sdk, 1, 30);
+      expect(sdk.run()).toBe(true);
+    }
+    hold(sdk, 3, 0, 30);
+    const settled = sdk.getPropertyValue("attitude/phi-deg");
+    expect(settled).toBeGreaterThan(30);
+    expect(settled).toBeLessThan(40);
+    for (let step = 0; step < 5 / FIXED_DT; step++) {
+      applyRoll(sdk, 0, 30);
+      expect(sdk.run()).toBe(true);
+      expect(Math.abs(sdk.getPropertyValue("velocities/p-rad_sec") * DEG)).toBeLessThan(0.5);
+    }
+  });
+
+  it("leaves Manual on the direct stick", async () => {
+    const rates = [];
+    for (const degPerSec of [30, SOURCE_RATE]) {
+      const sdk = await createF35({ airspeedKts: 300, altFt: 10_000 });
+      hold(sdk, 0.5, 0, degPerSec, "manual");
+      hold(sdk, 1, 0.3, degPerSec, "manual");
+      rates.push(sdk.getPropertyValue("velocities/p-rad_sec"));
+    }
+    expect(rates[0]).toBeGreaterThan(0.5);
+    expect(rates[1]).toBe(rates[0]);
   });
 
   it("leaves the hover roll posts on the unscaled stick", async () => {
     const posts = [];
-    for (const gain of [1, 0.25]) {
+    for (const degPerSec of [SOURCE_RATE, 30]) {
       const { sdk, controls } = await createHover();
-      applyRoll(sdk, 0.3, gain, "auto", 1, controls);
+      applyRoll(sdk, 0.3, degPerSec, { conversion: 1, base: controls });
       expect(sdk.run()).toBe(true);
-      expect(sdk.getPropertyValue("fcs/roll-stick-cmd-norm")).toBeCloseTo(0.3 * gain, 12);
       posts.push(sdk.getPropertyValue("fcs/stovl-roll-control"));
     }
     expect(posts[0]).not.toBe(0);
     expect(posts[1]).toBe(posts[0]);
+  });
+
+  /**
+   * Roll trim entered the law unscaled, as 1/0.09 rad/s at full trim, 637°/s,
+   * where full stick asks for 30°/s: a few percent of trim outrolled the
+   * stick. It is in the stick's units now, and osfs.aircraft.rollTrimRange
+   * takes a share of that.
+   */
+  it("asks of full roll trim what full stick asks, and of a smaller range its share", async () => {
+    const rates: number[] = [];
+    for (const range of [1, 0.2]) {
+      const sdk = await createF35({ airspeedKts: 300, altFt: 10_000 });
+      for (let step = 0; step < 2.5 / FIXED_DT; step++) {
+        applyFlightControls(sdk, { ...neutral, rollTrim: 1 }, 0, profile.rudderSign,
+          { commandProperty: profile.stovl!.commandProperty, commandNorm: 0 },
+          { commandProperty: profile.controlLaw!.commandProperty, mode: "auto" }, undefined,
+          { property: profile.fullStickRollRate!.property, degPerSec: 30 }, range);
+        expect(sdk.run()).toBe(true);
+      }
+      rates.push(sdk.getPropertyValue("velocities/p-rad_sec") * DEG);
+    }
+    expect(rates[0] / 30).toBeGreaterThan(0.89);
+    expect(rates[0] / 30).toBeLessThan(1.11);
+    expect(rates[1] / 6).toBeGreaterThan(0.8);
+    expect(rates[1] / 6).toBeLessThan(1.2);
+  });
+
+  it("keeps the bank-holding integrator at zero on the ground", async () => {
+    const sdk = await createF35();
+    resetFlightLocation(sdk, {
+      latDeg: 35, lonDeg: -110, altMeters: 300,
+      flightPreset: { mode: "departure", headingDeg: 90, groundElevationMeters: 300, flightPathDeg: 0 },
+    }, 300, aircraftId);
+    // A roll trim is a roll-rate command the parked jet cannot follow; in the air the integrator would chase it.
+    const parked = { ...neutral, throttle: 0, brake: 1, rollTrim: 1 };
+    for (let step = 0; step < 2 / FIXED_DT; step++) {
+      applyFlightControls(sdk, parked, 1, profile.rudderSign,
+        { commandProperty: profile.stovl!.commandProperty, commandNorm: 0 }, undefined, undefined,
+        { property: profile.fullStickRollRate!.property, degPerSec: 30 });
+      expect(sdk.run()).toBe(true);
+    }
+    expect(sdk.getPropertyValue("gear/unit[1]/WOW")).toBe(1);
+    expect(sdk.getPropertyValue("fcs/roll-trim-error")).toBeGreaterThan(0.01);
+    expect(sdk.getPropertyValue("fcs/roll-i")).toBe(0);
   });
 });
 
@@ -353,10 +433,13 @@ describe("experimental F-35B installed-SDK contracts, not aircraft calibration",
         ...common, pitchAccelRad: sdk.getPropertyValue("accelerations/qdot-rad_sec2"),
         pitchRateRad: sdk.getPropertyValue("velocities/q-rad_sec"), elevator: controls.elevator, pitchTrim: controls.pitchTrim,
       }, tuning);
-      const rolled = stepRollAutoTrim(roll, {
-        ...common, rollAccelRad: sdk.getPropertyValue("accelerations/pdot-rad_sec2"),
-        rollRateRad: sdk.getPropertyValue("velocities/p-rad_sec"), aileron: controls.aileron, rollTrim: controls.rollTrim,
-      }, tuning);
+      // The fly-by-wire holds bank itself, so the app's roll trim assist waits, as here.
+      const rolled = sdk.getPropertyValue(profile.controlLaw!.enabledProperty) > 0.5
+        ? { state: roll, rollTrim: controls.rollTrim }
+        : stepRollAutoTrim(roll, {
+          ...common, rollAccelRad: sdk.getPropertyValue("accelerations/pdot-rad_sec2"),
+          rollRateRad: sdk.getPropertyValue("velocities/p-rad_sec"), aileron: controls.aileron, rollTrim: controls.rollTrim,
+        }, tuning);
       pitch = pitched.state; roll = rolled.state;
       input.replacePitchTrim(pitched.pitchTrim); input.replaceRollTrim(rolled.rollTrim);
       apply(sdk, { ...controls, pitchTrim: pitched.pitchTrim, rollTrim: rolled.rollTrim });

@@ -33,8 +33,11 @@ export interface FdmProfile {
     enabledProperty: string;
     automaticMode: Exclude<FlightControlLawMode, "auto">;
   };
-  /** Native gain on the pilot's roll stick into the aileron channel; absent aircraft take the stick unscaled. */
-  rollStickGainProperty?: string;
+  /**
+   * A fly-by-wire roll-rate command: the native property holding the rate full
+   * stick asks for, deg/s, and the source model's own, which an autopilot flies.
+   */
+  fullStickRollRate?: { property: string; sourceDegPerSec: number };
   engine: "piston" | "turbine";
   /** Rated piston RPM for its instrument scale; turbine limits are read from the native engine. */
   maxEngineRpm?: number;
@@ -229,7 +232,8 @@ export const FDM_PROFILES: Record<AircraftId, FdmProfile> = {
     controlLaw: {
       commandProperty: "fcs/control-law-mode", enabledProperty: "fcs/fbw-enabled", automaticMode: "fly-by-wire",
     },
-    rollStickGainProperty: "fcs/roll-stick-gain",
+    // The source normalizes roll rate as 0.09 per rad/s, so full stick asked for 1/0.09 rad/s.
+    fullStickRollRate: { property: "fcs/full-stick-roll-rate-deg_sec", sourceDegPerSec: 180 / Math.PI / 0.09 },
     engine: "turbine",
     rotorBlades: F135_ROTOR_BLADES,
     // F135-PW-600.xml: idlen2 60. The lift fan and roll posts share it and light with it.

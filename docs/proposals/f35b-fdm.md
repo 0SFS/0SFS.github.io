@@ -677,16 +677,39 @@ configured. The setting shows the observed active law and survives relocation,
 runway presets and snapshot recovery. This is a simulator option, not a claim
 about a real F-35 cockpit selector.
 
-Aircraft → Flight controls → Roll stick gain scales the pilot's roll stick into
-the aileron channel through native `fcs/roll-stick-gain`, under either law. The
-source FBW roll loop balances the stick against 0.09 × roll rate in rad/s, so
-full stick asks for about 640°/s. Measured on 2026-10-06 at 10,000 ft with the
-clean aircraft, it reaches full aileron by about 55% stick at 200 kt, 70% at
-300 kt and 80% at 450 kt, and the rest of the travel adds nothing. The gain
-defaults to 1, the source gradient. The host writes 1 while its autopilot owns
-roll, and the hover roll posts read the unscaled stick. Integration tests check
-the 300 kt saturation, that the gain flies the stick as the smaller deflection
-it scales to under both laws, and that the posts are unchanged.
+Aircraft → Flight controls → Full-stick roll rate sets, in °/s, the roll rate
+the fly-by-wire asks for at full stick, through native
+`fcs/full-stick-roll-rate-deg_sec`. The source loop balanced the stick against
+0.09 × roll rate in rad/s, so full stick asked for about 637°/s. Its integrator
+trigger was inverted, holding above 5 kt and running only when parked, so in
+flight the loop was proportional. Measured on 2026-10-07 with the clean
+aircraft, it settled at 43–62% of its command between 200 and 600 kt and reached
+full aileron by 55–80% stick. With the stick centred it rolled back toward level
+at 2–9°/s.
+
+The law now adds feedforward of the aileron for the commanded rate,
+p = a·vt / 165 ft, faded out by conversion. The integrator only holds bank: it
+runs with the stick centred and roll rate under 10°/s, holds while the stick is
+deflected, a roll is stopping or the command is saturated, and resets in Manual,
+on the ground and with any conversion. Proportional and derivative gains are
+unchanged. The jet flies the setting within 11% between 200 and 600 kt at
+10,000 ft and at 300 kt at 30,000 ft, from +10% at 200 kt to −10% at 600 kt,
+following Mach, until the ailerons run out near 150°/s at 200 kt. With the stick
+centred it holds roll rate under 0.5°/s. Bank still drifts slowly in a turn,
+since the law holds roll rate, not bank angle. Stopping overshoot grows with
+roll rate, as aileron rate and roll acceleration allow: about 3–9° from 30°/s,
+and up to 55° from 160°/s at 200 kt.
+
+The autopilot flies the source gradient; in the tuning runs it held a 30° bank
+within 0.3° from 200 to 600 kt. Roll auto-trim waits under fly-by-wire, where
+roll trim is a rate command and the integrator holds bank. That command is in
+the stick's units, `fcs/roll-trim-rate-cmd-norm`, scaled like the stick by the
+full-stick roll rate, so full trim asks what full stick asks, and the host's
+Roll trim range takes a share of it; until 2026-10-07 trim entered unscaled, as
+637°/s at full trim. Manual and the hover
+roll posts read the unscaled stick. Integration tests check tracking, hands-off
+hold, Manual, the posts and the ground reset. Pitch and yaw keep the same
+inverted trigger. These are simulator tuning choices, not F-35 control-law data.
 
 The 2026-10-05 yaw regression reproduced conventional-flight actuator hunting
 at 450/600 kt after yaw disturbances or rudder release, with zero subsequent

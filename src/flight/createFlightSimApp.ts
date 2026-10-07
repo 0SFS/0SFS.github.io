@@ -548,9 +548,13 @@ export async function createFlightSimApp(
       yawRateRad: jsbsim.sdk.getPropertyValue("velocities/r-rad_sec"),
     }),
   });
-  // Keep the aircraft's initialized trim when the input owner takes over.
+  // Keep the aircraft's initialized trim when the input owner takes over. The
+  // aircraft holds roll trim scaled by osfs.aircraft.rollTrimRange: the wheel's
+  // position is the command over the range, or a resumed flight's trim would
+  // shrink by the range at every reload.
   inputManager.replacePitchTrim(jsbsim.sdk.getPropertyValue("fcs/pitch-trim-cmd-norm"));
-  inputManager.replaceRollTrim(jsbsim.sdk.getPropertyValue("fcs/roll-trim-cmd-norm"));
+  const heldRollTrim = jsbsim.sdk.getPropertyValue("fcs/roll-trim-cmd-norm") / parameters.get("osfs.aircraft.rollTrimRange");
+  inputManager.replaceRollTrim(Number.isFinite(heldRollTrim) ? Math.max(-1, Math.min(1, heldRollTrim)) : 0);
   // A resumed flight's flap lever starts where it was left.
   if (resumeFlight) {
     const flaps = jsbsim.sdk.getPropertyValue("fcs/flap-cmd-norm");
@@ -2158,9 +2162,15 @@ export async function createFlightSimApp(
       const trimTuning = readAutoTrimTuning(parameters);
       const commanded = { ...ap.controls };
       const profile = getFdmProfile(aircraftId);
-      // The pilot's roll gain shapes the stick only; an autopilot command passes unscaled.
-      const rollStickGain = profile.rollStickGainProperty && ap.owners.roll === "pilot"
-        ? parameters.get("osfs.aircraft.rollStickGain") : 1;
+      // The pilot's roll rate shapes the stick only; an autopilot flies the source gradient.
+      const fullStickRollRate = profile.fullStickRollRate && {
+        property: profile.fullStickRollRate.property,
+        degPerSec: ap.owners.roll === "pilot"
+          ? parameters.get("osfs.aircraft.fullStickRollRate") : profile.fullStickRollRate.sourceDegPerSec,
+      };
+      // A fly-by-wire roll-rate law holds bank itself, and there roll trim commands a roll rate.
+      const lawHoldsBank = !!fullStickRollRate && !!profile.controlLaw
+        && jsbsim.sdk.getPropertyValue(profile.controlLaw.enabledProperty) > 0.5;
       // An engine that is off holds the throttle at idle until the lever is held to start it.
       const engine = engineControl.step(phoneSession?.getSnapshot().owner === "phone"
         ? phoneSession.isStarterHeld() || (localStartHeld && phoneSession.isBlending()) : localStartHeld);
@@ -2185,13 +2195,15 @@ export async function createFlightSimApp(
         commanded.pitchTrim = pitched.pitchTrim;
         inputManager.replacePitchTrim(pitched.pitchTrim);
       }
-      if (!engineTest && ap.owners.roll === "pilot") {
+      if (lawHoldsBank) {
+        // Waiting: the assist adopts the wheel again if the law lets go.
+        if (rollAutoTrim.trim !== null) rollAutoTrim = createAutoTrimState(rollAutoTrim.enabled);
+      } else if (!engineTest && ap.owners.roll === "pilot") {
         const rolled = stepRollAutoTrim(rollAutoTrim, {
           dt: FIXED_DT,
           rollAccelRad: jsbsim.sdk.getPropertyValue("accelerations/pdot-rad_sec2"),
           rollRateRad: jsbsim.sdk.getPropertyValue("velocities/p-rad_sec"),
-          // The trim weighs the stick's power on the ailerons, which the gain scales.
-          aileron: selected.aileron * rollStickGain,
+          aileron: selected.aileron,
           rollTrim: commanded.rollTrim,
           qbarPsf,
           vtFps,
@@ -2228,7 +2240,8 @@ export async function createFlightSimApp(
           commandProperty: profile.automaticFlaps.commandProperty,
           enabled: autoFlapsEnabled,
         } : undefined,
-        profile.rollStickGainProperty ? { property: profile.rollStickGainProperty, gain: rollStickGain } : undefined,
+        fullStickRollRate,
+        parameters.get("osfs.aircraft.rollTrimRange"),
       );
       appliedControls = { ...commanded };
       return contact;

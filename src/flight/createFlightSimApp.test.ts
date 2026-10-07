@@ -684,7 +684,8 @@ it("applies presentation changes once after staging and retains per-family draft
     expect(selectionControl<HTMLSelectElement>(t.root, generationSelector).value).toBe("g3");
     expect(selectionControl<HTMLSelectElement>(t.root, lodSelector).value).toBe("hd");
     expect(mocks.aircraftModel.setLod).toHaveBeenCalledTimes(1);
-    expect(t.setItem).toHaveBeenCalledOnce();
+    // Switching tabs saves FOSS Earth's workspace; the settings record is written once.
+    expect(t.setItem.mock.calls.filter(([key]) => key === SETTINGS_STORAGE_KEY)).toHaveLength(1);
     await act(async () => selectionControl<HTMLButtonElement>(t.root, ".flight-panel__command--secondary").click());
     expect(selectionControl<HTMLInputElement>(t.root, 'input[name="flight-aircraft"][value="cessna-172"]').checked).toBe(true);
     expect(selectionControl<HTMLSelectElement>(t.root, lodSelector).value).toBe("lod2");

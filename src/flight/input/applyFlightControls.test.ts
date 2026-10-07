@@ -33,6 +33,21 @@ describe("applyFlightControls", () => {
     ]);
   });
 
+  it("asks of full roll trim a share of full stick, the roll trim range, and refuses a range outside (0, 1]", () => {
+    const setPropertyValue = vi.fn();
+    const sdk = { setPropertyValue } as unknown as JSBSimSdk;
+    const controls = { elevator: 0, aileron: 0, rudder: 0, throttle: 0, pitchTrim: 0.5, rollTrim: 0.5, flaps: 0, brake: 0 };
+    applyFlightControls(sdk, controls, 1, -1, undefined, undefined, undefined, undefined, 0.2);
+    expect(setPropertyValue).toHaveBeenCalledWith("fcs/roll-trim-cmd-norm", 0.1);
+    // Pitch trim keeps its own range.
+    expect(setPropertyValue).toHaveBeenCalledWith("fcs/pitch-trim-cmd-norm", 0.5);
+    for (const range of [0, -0.5, 1.5, Number.NaN]) {
+      setPropertyValue.mockClear();
+      expect(() => applyFlightControls(sdk, controls, 1, -1, undefined, undefined, undefined, undefined, range)).toThrow(RangeError);
+      expect(setPropertyValue).not.toHaveBeenCalled();
+    }
+  });
+
   it("defaults the gear lever to down, and writes it up when told to", () => {
     const setPropertyValue = vi.fn();
     const controls = {
@@ -57,18 +72,18 @@ describe("applyFlightControls", () => {
     expect(setPropertyValue).not.toHaveBeenCalled();
   });
 
-  it("writes the roll stick gain beside an unscaled aileron command, and refuses one outside (0, 1]", () => {
+  it("writes the full-stick roll rate beside an unscaled aileron command, and refuses one that is not a positive rate", () => {
     const setPropertyValue = vi.fn();
     const controls = { elevator: 0, aileron: 0.6, rudder: 0, throttle: 0.8,
       pitchTrim: 0, rollTrim: 0, flaps: 0, brake: 0 };
     const sdk = { setPropertyValue } as unknown as JSBSimSdk;
-    applyFlightControls(sdk, controls, 0, 1, undefined, undefined, undefined, { property: "fcs/roll-stick-gain", gain: 0.4 });
-    expect(setPropertyValue).toHaveBeenCalledWith("fcs/roll-stick-gain", 0.4);
+    applyFlightControls(sdk, controls, 0, 1, undefined, undefined, undefined, { property: "fcs/full-stick-roll-rate-deg_sec", degPerSec: 30 });
+    expect(setPropertyValue).toHaveBeenCalledWith("fcs/full-stick-roll-rate-deg_sec", 30);
     expect(setPropertyValue).toHaveBeenCalledWith("fcs/aileron-cmd-norm", 0.6);
     setPropertyValue.mockClear();
-    for (const gain of [0, -0.5, 1.5, NaN]) {
+    for (const degPerSec of [0, -30, NaN, Infinity]) {
       expect(() => applyFlightControls(sdk, controls, 0, 1, undefined, undefined, undefined,
-        { property: "fcs/roll-stick-gain", gain })).toThrow(RangeError);
+        { property: "fcs/full-stick-roll-rate-deg_sec", degPerSec })).toThrow(RangeError);
     }
     expect(setPropertyValue).not.toHaveBeenCalled();
   });
