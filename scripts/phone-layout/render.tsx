@@ -109,7 +109,7 @@ const PHONE_PAGES: {
   homeScreen?: boolean
 }[] = [
   { name: 'flying', failed: false, prefs: { 'osfs.fullscreen-prompt-dismissed': '1' } },
-  // The computer is flying: the take-control popup is up.
+  // The computer is flying: Take control is a chip in the grid.
   { name: 'control', failed: false, owner: 'local', prefs: { 'osfs.fullscreen-prompt-dismissed': '1' } },
   { name: 'grid-top', failed: false, prefs: { 'osfs.fullscreen-prompt-dismissed': '1', 'osfs.phone-grid-position': 'top' } },
   { name: 'offer', failed: false, prefs: {} },

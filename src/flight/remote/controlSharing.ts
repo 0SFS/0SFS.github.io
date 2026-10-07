@@ -43,6 +43,12 @@ export interface ControlSharing {
   /** With `auto`, one device at a time: how long this computer's flight controls rest before control goes back to the phone. */
   returnIdleMs: number;
   priority: BlendPriority;
+  /**
+   * How long a flying phone's last command stands once its input stops
+   * arriving, past the stale limit. Then its stick, rudder, brake and starter
+   * let go and control comes back here, to go back to the phone as `handover` says.
+   */
+  holdMs: number;
 }
 
 const PARAMETER_IDS = {
@@ -50,6 +56,7 @@ const PARAMETER_IDS = {
   handover: "osfs.remote.handover",
   returnIdle: "osfs.remote.returnIdle",
   priority: "osfs.remote.blendPriority",
+  hold: "osfs.remote.holdLast",
 } as const satisfies Record<string, FlightParameterId>;
 
 export const CONTROL_SHARING_PARAMETER_IDS: readonly FlightParameterId[] = Object.values(PARAMETER_IDS);
@@ -60,6 +67,7 @@ export function readControlSharing(parameters: FlightParameters): ControlSharing
     handover: parameters.get(PARAMETER_IDS.handover),
     returnIdleMs: parameters.get(PARAMETER_IDS.returnIdle) * 1000,
     priority: parameters.get(PARAMETER_IDS.priority),
+    holdMs: parameters.get(PARAMETER_IDS.hold) * 1000,
   };
 }
 

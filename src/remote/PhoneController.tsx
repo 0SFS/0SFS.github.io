@@ -1,7 +1,6 @@
 import { useCallback, useState, useSyncExternalStore } from "react";
 import type { InputTiming, PhoneControllerClient } from "./phoneControllerClient";
 import { PhoneBrake, PhoneCameraPad, PhoneStick } from "./PhoneStick";
-import { PhoneControlPrompt } from "./PhoneControlPrompt";
 import { PhoneQrScanner } from "./PhoneQrScanner";
 import { PhoneEngine } from "./PhoneEngine";
 import { PhoneThrottle } from "./PhoneThrottle";
@@ -64,21 +63,19 @@ export function PhoneController({ client, onPair }: { client: PhoneControllerCli
   // An absent `gearDown` means the host predates gear support; do not offer it.
   const gearKnown = status?.gearDown !== undefined;
   /**
-   * The link chip is the connection's whole status line. It used to be backed
-   * by a notice banner for every message the client emits, which cost a row of
-   * screen to say "delayed" — so the chip says it, at a width that does not
-   * change between its labels, and the full sentence goes to assistive tech.
+   * The link chip says who flies, at a width that does not change between its
+   * labels, and the client's full sentence goes to assistive tech. A link gone
+   * quiet is the 🌐 chip's to show, as how long: who flies has not changed,
+   * because the computer holds this phone's last command meanwhile.
    */
-  const link = ended ? "OFFLINE" : !connected ? "PAIRING" : !state.hostFresh ? "DELAYED" : owner;
+  const link = ended ? "OFFLINE" : !connected ? "PAIRING" : owner;
   // A host with no engine reading sends none; the throttle then keeps the whole column.
   const engine = status?.engine;
   const paused = status?.paused === true;
-  // Anything short of flying from this phone puts the take-control popup up.
   const flying = connected && status?.owner === "phone";
-  return <main className={`phone-app${flying ? "" : " phone-app--needs-control"}`}>
+  const scan = ended && onPair ? () => setScanning(true) : undefined;
+  return <main className="phone-app">
     <PhoneFullscreenPrompt offer={fullscreen} />
-    {!flying && <PhoneControlPrompt state={state} onTakeControl={() => client.requestControl()}
-      onScan={onPair && (() => setScanning(true))} />}
     {scanning && onPair && <PhoneQrScanner onScan={onPair} onClose={() => setScanning(false)} />}
     <section className={`phone-controls phone-controls--grid-${gridPosition}`} aria-label="Aircraft controls">
       <div className="phone-cluster" aria-label="Attitude, trim and flaps">
@@ -150,20 +147,26 @@ export function PhoneController({ client, onPair }: { client: PhoneControllerCli
           <span className="phone-link__dot" aria-hidden="true" />{link}
           <span className="phone-sr-only" role="status">{state.message}</span>
         </span>
-        {/* Only while flying: taking control is the popup's job, not the grid's. */}
-        {flying && <>
+        {/* Pause and Release while flying; otherwise, where they were, the way
+            to fly — never a popup over the controls. Control the computer
+            offers back is asked for by itself, so this is for whoever would
+            rather not wait, and for control that only comes back when taken. */}
+        {flying ? <>
           {/* The flight page's own pause glyphs, lit while paused the way its bar lights. */}
           <button type="button" className="phone-pause" disabled={locked} aria-pressed={paused}
             aria-label={paused ? "Resume simulation" : "Pause simulation"} title={paused ? "Resume simulation" : "Pause simulation"}
             onClick={() => client.setPaused(!paused)}>{paused ? "▶" : "Ⅱ"}</button>
           <button type="button" disabled={locked} onClick={() => client.releaseControl()}>Release</button>
-        </>}
+        </> : connected ? <button type="button" className="phone-primary" disabled={!state.canFly} title={state.message}
+          onClick={() => client.requestControl()}>{state.requestingControl ? "Taking control…" : "Take control"}</button>
+          : scan && <button type="button" className="phone-primary" onClick={scan}>Scan QR code</button>}
         <button type="button" className="phone-haptics" aria-pressed={state.hapticsEnabled} disabled={!state.hapticsSupported}
           title={state.hapticsSupported ? "Touchdown pulses while you fly" : "Unavailable on this device"}
           onClick={() => client.setHapticsEnabled(!state.hapticsEnabled)}>Haptics</button>
-        <ConnectionDiagnosticsPanel log={client.log} transport={state.diagnostics} rttMs={state.rttMs}
+        <ConnectionDiagnosticsPanel log={client.log} transport={state.diagnostics} rttMs={state.rttMs} lostMs={state.lostMs}
           receiveToApplyMs={state.receiveToApplyMs} appliedSeq={state.appliedSeq} signalingAvailable={state.signalingAvailable}
-          recovery={ended ? "On the computer, open the Remote Control tab and create a new QR, then scan it." : undefined} />
+          recovery={ended ? "On the computer, open the Remote Control tab and create a new QR, then scan it." : undefined}
+          onScan={scan} />
         <PhoneFullscreenButton offer={fullscreen} />
         <PhoneSettings gridPosition={gridPosition} onGridPositionChange={moveGrid} yaw={yaw} onYawChange={changeYaw} />
         {/* Last in the grid. A chip like the rest, held rather than tapped. */}

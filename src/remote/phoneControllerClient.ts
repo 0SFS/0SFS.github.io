@@ -24,6 +24,12 @@ export interface PhoneControllerSnapshot {
   canControl: boolean
   requestingControl: boolean
   hostFresh: boolean
+  /**
+   * How long the computer has gone unheard once that is past the stale limit,
+   * in whole tenths of a second, for the 🌐 chip; null while it is heard.
+   * The controls stay live meanwhile: the computer holds the last command.
+   */
+  lostMs: number | null
   signalingAvailable: boolean
   pendingActions: number
   rttMs: number | null
@@ -71,6 +77,9 @@ export const PHONE_HAPTICS_PREFERENCE_KEY = 'osfs.phone-haptics'
 const MIN_PULSE_INTERVAL_MS = 45
 /** Between automatic requests for control the computer offers back, so a refusal is not repeated at heartbeat rate. */
 export const ASK_BACK_INTERVAL_MS = 500
+/** A longer gap between control-timer ticks is this phone too busy to listen, not the computer going quiet. */
+const BUSY_GAP_MS = 6 * CONTROL_INTERVAL_MS
+const LOST_MESSAGE = 'Connection lost · Waiting for the computer'
 /**
  * The controls the screen draws a number for. Each of these has to reach the
  * snapshot, because its slider is React-controlled: a value that only moves in
@@ -128,7 +137,7 @@ export function createPhoneControllerClient(
   let snapshot: PhoneControllerSnapshot = {
     phase: 'connecting', message: 'Connecting to pairing service…', status: null,
     controls: { ...NEUTRAL_CONTROLS }, canFly: false, canControl: false,
-    requestingControl: false, hostFresh: false, signalingAvailable: true,
+    requestingControl: false, hostFresh: false, lostMs: null, signalingAvailable: true,
     pendingActions: 0, rttMs: null, diagnostics: null, appliedSeq: null, receiveToApplyMs: null,
     hapticsSupported: false, hapticsEnabled: false,
   }
@@ -183,6 +192,13 @@ export function createPhoneControllerClient(
   let requestId: number | null = null
   let handoffEpoch: number | null = null
   let lastHeartbeatAt = -Infinity
+  // The last heartbeat of any epoch, for how long the link has been lost.
+  // Both move on by this phone's own stalls (see the control timer).
+  let heardAt = -Infinity
+  let frameTickAt = now()
+  // When the computer went quiet, and what the status said before it did.
+  let quietFrom = -Infinity
+  let messageBeforeLoss = ''
   let lastControlAt = -Infinity
   let pingId = 0
   let outstandingPing: { id: number; sentAt: number } | null = null
@@ -207,6 +223,8 @@ export function createPhoneControllerClient(
   let lastPulseAt = -Infinity
   let vibratingUntil = -Infinity
   let lastAskedBackAt = -Infinity
+  // Centred frames a hidden page still owes the computer (see `hide`).
+  let lettingGo = 0
   // Blending: the first frame to carry this pilot's latest lever move. The
   // levers follow the computer's only once it has applied that frame, so a
   // status from before the move cannot drag a lever back under the finger.
@@ -236,14 +254,33 @@ export function createPhoneControllerClient(
     } catch { /* Optional: control continues without vibration. */ }
   }
 
+  /** How long the computer has gone unheard, in tenths, once past the stale limit; null while heard. */
+  function lostFor(phase: PhoneControllerSnapshot['phase']): number | null {
+    const quiet = now() - heardAt
+    return phase === 'ready' && Number.isFinite(quiet) && quiet >= STALE_MS ? Math.floor(quiet / 100) * 100 : null
+  }
+
   function emit(patch: Partial<PhoneControllerSnapshot> = {}): void {
     if (destroyed) return
     const next = { ...snapshot, ...patch }
     next.hostFresh = now() - lastHeartbeatAt < STALE_MS
+    next.lostMs = lostFor(next.phase)
     next.requestingControl = requestId !== null
     next.pendingActions = pending.size
     next.canFly = next.phase === 'ready' && next.hostFresh && !suspended && requestId === null && next.status?.owner === 'local'
-    next.canControl = next.phase === 'ready' && next.hostFresh && !suspended && requestId === null && next.status?.owner === 'phone' && authorityEpoch === epoch
+    // Not waiting on a fresh computer: through a lost link the computer holds
+    // this phone's last command, and the pilot keeps flying for when it is back.
+    next.canControl = next.phase === 'ready' && !suspended && requestId === null && next.status?.owner === 'phone' && authorityEpoch === epoch
+    if (next.lostMs !== null && snapshot.lostMs === null) {
+      quietFrom = heardAt
+      messageBeforeLoss = next.message
+      next.message = LOST_MESSAGE
+      stopVibration()
+    } else if (next.lostMs === null && snapshot.lostMs !== null) {
+      // Heard again: the timeline keeps how long it was, for a report.
+      if (heardAt > quietFrom) log.record('channel', 'host-silent', `Nothing from the computer for ${((heardAt - quietFrom) / 1000).toFixed(1)} s`, 'warn')
+      if (next.message === LOST_MESSAGE) next.message = messageBeforeLoss
+    }
     snapshot = next
     for (const listener of listeners) listener()
   }
@@ -290,7 +327,7 @@ export function createPhoneControllerClient(
 
   /** `by` is for the opt-in trace only: 0 an input event, 1 the control timer, 2 anything else. */
   function sendControls(by: ControlTrace['by'] = 2): void {
-    if (finished || !session || !transport?.nativeOpen || lease < 0 || suspended) return
+    if (finished || !session || !transport?.nativeOpen || lease < 0 || (suspended && lettingGo === 0)) return
     if (handoffEpoch !== epoch && !(snapshot.status?.owner === 'phone' && authorityEpoch === epoch)) return
     const time = now()
     // An interval plus immediate contacts/releases can never exceed 120 frames/s.
@@ -316,6 +353,7 @@ export function createPhoneControllerClient(
     if (sent && gesture) camera = { ...NEUTRAL_CAMERA_AIM }
     if (sent && total) { aimSent = { ...aimTotal }; aimStamp = stamp; aimMovedAt = null }
     if (sent && trace) { traceCam = []; traceCtl = []; traceGated = 0; traceDrop = [0, 0, 0] }
+    if (sent && suspended) lettingGo--
   }
 
   /** Blending: the levers go where the computer has them. True when one moved. */
@@ -486,7 +524,7 @@ export function createPhoneControllerClient(
       advanceEpoch(message.epoch, true)
       handoffEpoch = epoch
       lease = Math.max(lease, message.lease)
-      lastHeartbeatAt = now()
+      lastHeartbeatAt = heardAt = now()
       adoptControls(message.controls)
       if (!transport?.sendReliable({ ...envelope(), type: 'handoffAck', requestId })) {
         fail('Could not finish taking control. Scan a new QR.'); return
@@ -547,7 +585,7 @@ export function createPhoneControllerClient(
       advanceEpoch(message.epoch, true)
       if (message.lease <= lease) return
       lease = message.lease
-      lastHeartbeatAt = now()
+      lastHeartbeatAt = heardAt = now()
       traceRequested = message.trace === 1
       sendMode = message.controlSend === 'batch' ? 'batch' : 'timer'
       if (message.status) updateStatus(message.status, false)
@@ -570,21 +608,31 @@ export function createPhoneControllerClient(
   }
 
   function hide(): void {
-    // A centred last frame, then silence. Hiding is not Release: the computer
-    // notices the silence within its stale limit, pauses, and keeps this
-    // phone's claim, so it can hand control back when the page returns.
+    // A centred last frame, then silence. Hiding is not Release, and it gives
+    // nothing up: the computer holds that centred frame through its hold, so a
+    // page back within it flies on in the same epoch; after it, control comes
+    // back to the computer, which hands it back once this phone is heard again.
+    // A handoff in progress is abandoned, though, and a grant or status
+    // arriving later cannot finish it.
     cancelTransientControls()
-    blockedAuthorityEpoch = Math.max(blockedAuthorityEpoch, epoch)
-    authorityEpoch = -1
+    if (requestId !== null) {
+      blockedAuthorityEpoch = Math.max(blockedAuthorityEpoch, epoch)
+      authorityEpoch = -1
+    }
     stopVibration()
     clearPending()
     suspended = true
+    // Whatever the computer heard last, it holds. So the centred frame goes
+    // twice more as the frame timer allows — past the rate cap that may have
+    // held back the one just now, and past a packet the link drops — or a
+    // hidden phone could leave a deflected stick, brake or starter held.
+    lettingGo = 2
     releaseWakeLock()
     emit()
   }
   function visibilityChange(): void {
     if (doc?.hidden) hide()
-    else { suspended = false; emit(); if (snapshot.phase === 'ready') void acquireWakeLock(); askBack() }
+    else { suspended = false; lettingGo = 0; emit(); if (snapshot.phase === 'ready') void acquireWakeLock(); askBack() }
   }
 
   /**
@@ -605,11 +653,22 @@ export function createPhoneControllerClient(
   win?.addEventListener('orientationchange', cancelTransientControls)
   const frameTimer = setInterval(() => {
     if (finished || destroyed) return
-    const fresh = now() - lastHeartbeatAt < STALE_MS
-    if (fresh !== snapshot.hostFresh) {
+    const time = now()
+    const gap = time - frameTickAt
+    frameTickAt = time
+    // This phone too busy to run its own timer — a long render, a throttled
+    // tab — is not the computer going quiet: the heartbeats are waiting in the
+    // queue behind it.
+    if (gap > BUSY_GAP_MS) {
+      heardAt = Math.min(time, heardAt + gap - CONTROL_INTERVAL_MS)
+      lastHeartbeatAt = Math.min(time, lastHeartbeatAt + gap - CONTROL_INTERVAL_MS)
+    }
+    // A link going quiet leaves the controls alone: the computer holds their
+    // last command, and what the pilot does meanwhile is sent for when it is back.
+    const fresh = time - lastHeartbeatAt < STALE_MS
+    if (fresh !== snapshot.hostFresh || lostFor(snapshot.phase) !== snapshot.lostMs) {
       if (!fresh) stopVibration()
-      cancelTransientControls()
-      emit({ message: fresh ? snapshot.message : 'Connection delayed · Waiting for the computer' })
+      emit()
       askBack()
     }
     // Batch sending keeps the stream alive from here only while no input is:

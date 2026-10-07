@@ -51,8 +51,8 @@ const PAGES = ["flying", "control", "grid-top", "offer", "home-screen", "setting
   "unpaired", "scanner"];
 /** Only these phone pages are held to the phone's layout rules. */
 const CHECKED = new Set(["flying", "control", "grid-top", "failed"]);
-/** The computer is flying on these, so the take-control popup must be up — and on no others. */
-const CONTROL_POPUP = new Set(["control"]);
+/** The computer is flying on these, so Take control must be a chip in the grid — and on no others. */
+const TAKE_CONTROL = new Set(["control"]);
 /** Settings → Button grid → Top puts the chip grid above the controls instead of below. */
 const GRID_TOP = new Set(["grid-top"]);
 /** Pages that render with the Connection details sheet open. */
@@ -122,16 +122,17 @@ const MEASURE = `(() => {
     throttle: box('.phone-throttle'),
     engine: box('.phone-engine'),
     grid: box('.phone-actions'),
-    controlPopup: Boolean(document.querySelector('.phone-popup--control')),
-    // What a finger lands on: the popup over the stick, a chip in the grid.
-    stickCovered: (() => {
+    // What a finger lands on: the stick itself, never something over it, and
+    // Take control, where it is offered, as a chip in the grid.
+    stickReachable: (() => {
       const stick = document.querySelector('.phone-cluster__pad > .phone-stick');
       if (!stick) return false;
       const r = stick.getBoundingClientRect();
-      return Boolean(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)?.closest('.phone-popup--control'));
+      const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+      return Boolean(hit && stick.contains(hit));
     })(),
-    gridReachable: (() => {
-      const chip = document.querySelector('.phone-actions > .phone-settings');
+    takeControl: (() => {
+      const chip = [...document.querySelectorAll('.phone-actions > button')].find(button => button.textContent === 'Take control');
       if (!chip) return false;
       const r = chip.getBoundingClientRect();
       const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
@@ -167,7 +168,7 @@ async function sheetScrolls(chrome, sessionId) {
 }
 
 /** Each rule returns a failure message, or null when it holds. */
-function check(m, { gridTop, controlPopup }) {
+function check(m, { gridTop, takeControl, sheetOpen }) {
   const failures = [];
   const share = Math.round((m.controlsHeight / m.appHeight) * 100);
   const chromeShare = Math.round((m.chromeHeight / m.appHeight) * 100);
@@ -176,15 +177,12 @@ function check(m, { gridTop, controlPopup }) {
   if (m.overflowX) failures.push("horizontal overflow");
   if (chromeShare > MAX_CHROME_SHARE) failures.push(`chrome takes ${chromeShare}% of the page (want <= ${MAX_CHROME_SHARE}%)`);
   if (share < MIN_CONTROLS_SHARE) failures.push(`controls take ${share}% of the page (want >= ${MIN_CONTROLS_SHARE}%)`);
-  // Not flying from this phone: a popup to take control over the flight
-  // controls, which cannot be used without it — and not over the chip grid,
-  // which can, and which says why control is unavailable.
-  if (controlPopup && !m.controlPopup) failures.push("no take-control popup while the computer is flying");
-  if (!controlPopup && m.controlPopup) failures.push("a take-control popup while the phone is flying");
-  if (m.controlPopup) {
-    if (!m.stickCovered) failures.push("the take-control popup does not cover the flight controls");
-    if (!m.gridReachable) failures.push("the take-control popup blocks the chip grid");
-  }
+  // Nothing pops up over the flight controls, flying or not: Take control is a
+  // chip where Pause and Release go. A popup that went up on every blink of the
+  // link is what this replaced. An open sheet covers everything on purpose.
+  if (!sheetOpen && !m.stickReachable) failures.push("something covers the pitch/roll stick");
+  if (takeControl && !m.takeControl) failures.push("no reachable Take control chip in the grid while the computer is flying");
+  if (!takeControl && m.takeControl) failures.push("a Take control chip while the phone is flying");
   if (!m.stick) return { share, failures: [...failures, "no pitch/roll stick"] };
   if (Math.abs(m.stick.w - m.stick.h) > 2) {
     failures.push(`stick is ${m.stick.w}x${m.stick.h}; PhoneStick ignores everything past square`);
@@ -273,7 +271,7 @@ try {
       const label = `${page} ${size.name} ${size.width}x${size.height}`;
       if (CHECKED.has(page)) {
         const measured = JSON.parse(await evaluate(chrome, sessionId, MEASURE));
-        const { share, failures } = check(measured, { gridTop: GRID_TOP.has(page), controlPopup: CONTROL_POPUP.has(page) });
+        const { share, failures } = check(measured, { gridTop: GRID_TOP.has(page), takeControl: TAKE_CONTROL.has(page), sheetOpen: SHEET_OPEN.has(page) });
         const stick = measured.stick ? `${measured.stick.w}x${measured.stick.h}` : "none";
         const camera = measured.camera ? `${measured.camera.w}x${measured.camera.h}` : "none";
         console.log(`${failures.length ? "FAIL" : "ok  "} ${label.padEnd(30)} `

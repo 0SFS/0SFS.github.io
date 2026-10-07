@@ -67,6 +67,9 @@ export interface PhoneControlTraceSink {
 interface PendingHandoff {
   id: number; baseline: ControlSurfaceState; paused: boolean; deadline: number; ack: boolean; frame: ControlFrame | null;
 }
+/** A longer gap between this session's own wake-ups, which come every heartbeat, is this computer too busy to listen. */
+const BUSY_GAP_MS = 2 * HEARTBEAT_MS;
+const seconds = (ms: number) => `${(ms / 1000).toFixed(1)} s`;
 
 /** The desktop, not PeerJS Cloud, authenticates the invitation and owns flight authority. */
 export function createPhoneControlSession(options: PhoneControlSessionOptions) {
@@ -92,7 +95,10 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
   let leaseCounter = 0;
   const leases = new Map<number, { time: number; epoch: number }>();
   let pending: PendingHandoff | null = null;
-  let latest: { frame: ControlFrame; receivedAt: number } | null = null;
+  /** The newest accepted frame. `heardAt` is on the listening clock; `receivedAt` is wall time, for timings. */
+  let latest: { frame: ControlFrame; receivedAt: number; heardAt: number } | null = null;
+  /** When a flying phone went quiet, on the listening clock, while its last command is held. */
+  let quietSince: number | null = null;
   let lastSeq = -1;
   let localReady = false;
   let remoteReady = false;
@@ -122,6 +128,22 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
   let grantedBlend = false;
   const sharing = (): ControlSharing => options.getSharing?.() ?? DEFAULT_CONTROL_SHARING;
   const letGo = () => { claim = false; resumeOnReturn = false; };
+  let wokeAt = now();
+  let busyMs = 0;
+  /**
+   * This computer's clock, less the time it was too busy to listen: a long
+   * task, a shader compiling as the engine lights. Leases, freshness and the
+   * hold run on it. While this computer is stalled nothing from the phone can
+   * reach it and no newer lease can reach the phone, so its own stall is never
+   * the phone's silence, and the frames queued behind it are as fresh as the
+   * leases they carry.
+   */
+  const listening = (): number => {
+    const time = now();
+    if (time - wokeAt > BUSY_GAP_MS) busyMs += time - wokeAt - HEARTBEAT_MS;
+    wokeAt = time;
+    return time - busyMs;
+  };
 
   const returning = (owner = snapshot.owner) => {
     const { handover } = sharing();
@@ -193,9 +215,17 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
   };
   const freshLease = (id: number) => {
     const lease = leases.get(id);
-    return Boolean(lease && lease.epoch === epoch && now() - lease.time <= STALE_MS);
+    return Boolean(lease && lease.epoch === epoch && listening() - lease.time <= STALE_MS);
   };
-  const freshInput = () => Boolean(latest && now() - latest.receivedAt <= STALE_MS && freshLease(latest.frame.lease));
+  /** How long the phone has gone unheard, on the listening clock. */
+  const silence = () => (latest ? listening() - latest.heardAt : Infinity);
+  const freshInput = () => Boolean(latest && silence() <= STALE_MS && freshLease(latest.frame.lease));
+  /**
+   * The phone's last command still stands: fresh, or held through a silence
+   * no longer than `ControlSharing.holdMs` past the stale limit. A starter, a
+   * stick or a brake the pilot is holding is then still held.
+   */
+  const holding = () => silence() <= STALE_MS + sharing().holdMs;
   const tuning = (): PhoneCameraTuning => options.getCameraTuning?.() ?? DEFAULT_PHONE_CAMERA_TUNING;
   /**
    * Trackpad movement that has arrived but not yet been drawn. Frames can land
@@ -209,11 +239,11 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
    */
   const aim = createPhoneCameraReceiver(tuning);
   const newEpoch = () => {
-    epoch += 1; latest = null; lastSeq = -1; leases.clear(); actions.clear(); pending = null; pendingStatus = null; feedback = null; aim.reset();
+    epoch += 1; latest = null; quietSince = null; lastSeq = -1; leases.clear(); actions.clear(); pending = null; pendingStatus = null; feedback = null; aim.reset();
     maxActionId = -1; lastAppliedSeq = undefined; receiveToApplyMs = undefined; frameTimes.length = 0;
   };
   const issueLease = () => {
-    const time = now();
+    const time = listening();
     for (const [id, lease] of leases) if (time - lease.time > STALE_MS) leases.delete(id);
     const id = ++leaseCounter;
     leases.set(id, { time, epoch });
@@ -367,7 +397,7 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     report("accepted");
     frameTimes.push(receivedAt);
     lastSeq = message.seq;
-    latest = { frame: message, receivedAt };
+    latest = { frame: message, receivedAt, heardAt: listening() };
     if (snapshot.owner === "phone" && aim.receive(message, receivedAt)) options.onCameraAim?.();
     if (pending) { pending.frame = message; maybeGrant(); }
   };
@@ -488,15 +518,41 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     return ttlMs > 0 ? { feedback: { v: HAPTIC_FEEDBACK_VERSION, id: queued.id, pulseMs: queued.pulseMs, ttlMs } } : {};
   };
 
+  /**
+   * A flying phone gone quiet keeps flying on its last command, which the
+   * Remote Control tab says, and heard again within the hold it flies on as
+   * if nothing happened. Past the hold, control comes back here without a
+   * pause — stick, rudder, brake and starter let go, the levers stay — and
+   * goes back to the phone as any loss's does, once it is heard from again.
+   */
+  const watchSilence = () => {
+    if (snapshot.owner !== "phone" || !latest) return;
+    const quiet = silence();
+    if (!holding()) {
+      log.record("channel", "phone-silent", `No phone input for ${seconds(quiet)}; control came back to this computer`, "warn");
+      const back = claim && (sharing().handover === "auto" || sharing().handover === "phone");
+      revoke(`Phone signal lost · Desktop controls${back ? " · Back to the phone when it is heard" : ""}`, false);
+    } else if (quiet > STALE_MS && quietSince === null) {
+      quietSince = latest.heardAt;
+      publish({ message: `${flyingMessage()} · Phone signal lost · Holding its last command` });
+    } else if (quiet <= STALE_MS && quietSince !== null) {
+      log.record("channel", "phone-silent", `No phone input for ${seconds(latest.heardAt - quietSince)}; its last command held`, "warn");
+      quietSince = null;
+      publish({ message: flyingMessage() });
+    }
+  };
+
   const timer = setInterval(() => {
     if (disposed) return;
+    // Every heartbeat wakes the listening clock, so a late one is this computer's stall.
+    listening();
     if (snapshot.phase === "invitation" && snapshot.expiresAt !== null && now() >= snapshot.expiresAt) {
       generation += 1;
       closeAll(); publish({ phase: "expired", invitationUrl: null, expiresAt: null, message: "QR expired. Create a new QR." }); return;
     }
     if (pending && (now() >= pending.deadline || handoffChanged())) revoke("Control transfer canceled. Tap Fly again.", false);
     if (snapshot.owner === "phone" && !isPageVisible()) revoke("Desktop hidden · Simulation paused", true);
-    if (snapshot.owner === "phone" && !freshInput()) revoke("Phone input lost · Simulation paused", true);
+    watchSilence();
     if (snapshot.owner === "phone" && sharing().handover === "computer") revoke("Control latched to the computer", false);
     // Sharing changed under a flying phone: take control back, so the hand-back
     // grants it again under the new sharing, with this computer's controls set to match.
@@ -577,16 +633,19 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     beforeStep(localControls: ControlSurfaceState): ControlSurfaceState | false {
       if (snapshot.owner !== "phone") return localControls;
       if (!isPageVisible()) { revoke("Desktop hidden · Simulation paused", true); return false; }
-      if (!freshInput()) { revoke("Phone input lost · Simulation paused", true); return false; }
-      if (latest!.frame.seq !== lastAppliedSeq) receiveToApplyMs = now() - latest!.receivedAt;
-      lastAppliedSeq = latest!.frame.seq;
-      return { ...latest!.frame.controls };
+      const { frame, receivedAt } = latest!;
+      // Past the hold: let go, as the watchdog does within a heartbeat when it hands control back here.
+      if (!holding()) return neutralize(frame.controls);
+      if (frame.seq !== lastAppliedSeq) receiveToApplyMs = now() - receivedAt;
+      lastAppliedSeq = frame.seq;
+      return { ...frame.controls };
     },
     /**
      * Whether the phone, flying, is holding its throttle lever to start the
-     * engine. Only fresh frames count, so the starter lets go with the phone.
+     * engine. Its last command counts through a silence as long as the hold, so
+     * a start rides out a stall; past that the starter lets go with the phone.
      */
-    isStarterHeld: () => snapshot.owner === "phone" && freshInput() && latest!.frame.starter === 1,
+    isStarterHeld: () => snapshot.owner === "phone" && holding() && latest!.frame.starter === 1,
     /** The phone flies together with this computer, whose own controls stay live. */
     isBlending: blending,
     /** The gesture movement to draw this frame, if any is owed. */

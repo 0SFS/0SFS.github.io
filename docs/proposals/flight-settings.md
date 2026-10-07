@@ -402,11 +402,16 @@ These are engineering gains; they appear only under **Show all parameters**.
 | `osfs.remote.blendPriority` | choice | Phone (`phone`); also `computer` |
 | `osfs.remote.handover` | choice | Automatically (`auto`); also `stay`, `phone`, `computer` |
 | `osfs.remote.returnIdle` | s | 1 |
+| `osfs.remote.holdLast` | s | 2, from 0 to 10 |
 
 How control passes between a paired phone and this computer, or how the two
 blend. Before these existed, one device flew at a time and every hand-back
 needed the phone's pilot to tap Take control, which is now **Only when taken**.
-Spec: [Phone controller](phone-controller.md) → *Sharing the controls*.
+**Hold the phone's last command** is how long a flying phone's last frame
+stands once its input stops arriving, past the 250 ms stale limit; before it
+existed, any silence that long paused the flight and took control away.
+Spec: [Phone controller](phone-controller.md) → *Sharing the controls* and
+*Losing the phone*.
 
 ### Aircraft → Ground handling
 

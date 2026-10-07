@@ -3,6 +3,7 @@ import { createPhoneControlSession } from '../flight/remote/createPhoneControlSe
 import { ASK_BACK_INTERVAL_MS, createPhoneControllerClient, type PhoneControllerClient } from './phoneControllerClient'
 import { parsePairingUrl } from './pairing'
 import { DEFAULT_PHONE_CAMERA_TUNING } from '../flight/remote/phoneCameraTuning'
+import { DEFAULT_CONTROL_SHARING } from '../flight/remote/controlSharing'
 import { NEUTRAL_CONTROLS, type AircraftStatus, type ControlFrame, type RemoteMessage } from './protocol'
 import type { createPeerEndpoint, SessionTransport } from './peerTransport'
 
@@ -186,8 +187,11 @@ describe('phone controller', () => {
     h.client.setStarterHeld(true)
     await advance(20)
     expect(h.host.isStarterHeld()).toBe(true)
-    // Frames stop arriving: the starter goes with them.
+    // Frames stop arriving: the computer holds the starter through the hold,
+    // so a start rides out a dropped link, and then lets go with the phone.
     h.phoneLink.dropNative = true
+    await advance(2000)
+    expect(h.host.isStarterHeld()).toBe(true)
     await advance(300)
     expect(h.host.isStarterHeld()).toBe(false)
   })
@@ -380,8 +384,8 @@ describe('phone controller', () => {
     expect(h.phoneLink.last('controls').controls).toMatchObject({ throttle: .91, elevator: 0 })
   })
 
-  it.each(['stay', 'auto'] as const)('rejects malformed/replayed heartbeats, disables stale input, and never regains authority from old epochs (%s)', async (handover) => {
-    const h = await setup({}, { getSharing: () => ({ handover, returnIdleMs: 1000 }) })
+  it.each(['stay', 'auto'] as const)('rejects malformed/replayed heartbeats, flies on through a lost link, and never regains authority from old epochs (%s)', async (handover) => {
+    const h = await setup({}, { getSharing: () => ({ ...DEFAULT_CONTROL_SHARING, handover }) })
     await advance(50)
     await h.fly()
     const old = h.hostLink.last('handoff')
@@ -392,17 +396,22 @@ describe('phone controller', () => {
     h.phoneLink.receiveNative({ ...heartbeat, session: 'wrong-session' })
     h.phoneLink.receiveNative({ ...old, type: 'heartbeat', lease: old.lease })
     await advance(30)
-    expect(h.client.getSnapshot().hostFresh).toBe(false)
+    // None of those is the computer heard from, and the pilot flies on: the
+    // computer holds the last command it had.
+    expect(h.client.getSnapshot()).toMatchObject({ hostFresh: false, lostMs: expect.any(Number), canControl: true })
+    expect(h.client.getSnapshot().lostMs).toBeGreaterThanOrEqual(200)
+    expect(h.state).toMatchObject({ owner: 'phone', paused: false })
+    // Past the hold, control comes back to the computer, without a pause.
+    await advance(2300)
+    expect(h.state).toMatchObject({ owner: 'local', paused: false })
     expect(h.client.getSnapshot().canControl).toBe(false)
-    await advance(80)
-    expect(h.state).toMatchObject({ owner: 'local', paused: true })
     h.phoneLink.receiveReliable({ ...old, type: 'granted', status: { ...h.state, owner: 'phone' } })
     expect(h.client.getSnapshot().canControl).toBe(false)
     h.hostLink.dropNative = false
     await advance(60)
     if (handover === 'stay') {
-      expect(h.client.getSnapshot().canFly).toBe(true)
-      expect(h.state.paused).toBe(true)
+      expect(h.client.getSnapshot()).toMatchObject({ canFly: true, canControl: false, lostMs: null })
+      expect(h.state.paused).toBe(false)
     } else {
       // Back through a fresh handoff in a newer epoch, never the replayed grant.
       expect(h.state).toMatchObject({ owner: 'phone', paused: false })
@@ -441,35 +450,87 @@ describe('phone controller', () => {
     expect(h.client.getSnapshot()).toMatchObject({ requestingControl: false, canControl: true })
   })
 
-  it('does not restore hidden-phone authority from a late status', async () => {
-    // Only when taken: nothing comes back by itself, so what is left is the
-    // late status, and the pause the silence caused.
-    const h = await setup({}, { getSharing: () => ({ handover: 'stay', returnIdleMs: 1000 }) })
+  it('counts how long the computer goes unheard, never this phone\'s own stall, and keeps the length in the timeline', async () => {
+    const h = await setup()
     await advance(50)
     await h.fly()
-    h.win.dispatchEvent(new Event('pagehide'))
-    h.doc.dispatchEvent(new Event('visibilitychange'))
-    // A reliable status already in flight still describes the old phone epoch.
-    h.host.syncStatus()
-    await flush()
-    expect(h.client.getSnapshot().canControl).toBe(false)
-    h.client.updateControls({ aileron: 1 })
-    await advance(350)
-    expect(h.state).toMatchObject({ owner: 'local', paused: true })
-    expect(h.client.getSnapshot()).toMatchObject({ canFly: true, canControl: false })
-    await h.fly()
-    expect(h.state.paused).toBe(true)
+    h.hostLink.dropNative = true
+    await advance(1300)
+    expect(h.client.getSnapshot()).toMatchObject({ hostFresh: false, canControl: true, message: 'Connection lost · Waiting for the computer' })
+    expect(h.client.getSnapshot().lostMs).toBeGreaterThanOrEqual(1200)
+    h.hostLink.dropNative = false
+    await advance(60)
+    expect(h.client.getSnapshot()).toMatchObject({ hostFresh: true, lostMs: null, message: 'Phone controls' })
+    expect(h.client.log.entries().at(-1)).toMatchObject({ code: 'host-silent', detail: expect.stringMatching(/^Nothing from the computer for 1\.\d s$/) })
+    // Two seconds in which this phone ran nothing: the heartbeats waited in
+    // its own queue, so nothing was lost and nothing is shown.
+    vi.setSystemTime(Date.now() + 2000)
+    await advance(20)
+    expect(h.client.getSnapshot()).toMatchObject({ lostMs: null, canControl: true })
   })
 
-  it('hiding is not Release: the computer pauses on the silence and hands control back when the page returns', async () => {
+  it('flies on in the same epoch when the page comes back within the hold', async () => {
+    // Only when taken, too: hiding gives nothing up, so nothing has to be taken back.
+    const h = await setup({}, { getSharing: () => ({ ...DEFAULT_CONTROL_SHARING, handover: 'stay' }) })
+    await advance(50)
+    await h.fly()
+    const { epoch } = h.hostLink.last('granted')
+    h.client.updateControls({ aileron: .7 })
+    Object.defineProperty(h.doc, 'hidden', { value: true, writable: true })
+    h.doc.dispatchEvent(new Event('visibilitychange'))
+    expect(h.client.getSnapshot().canControl).toBe(false)
+    await advance(1000)
+    // The computer holds the centred frame hiding sent; nothing changed hands.
+    expect(h.state).toMatchObject({ owner: 'phone', paused: false })
+    expect(h.host.beforeStep(h.state.controls)).toMatchObject({ aileron: 0 })
+    Object.defineProperty(h.doc, 'hidden', { value: false, writable: true })
+    h.doc.dispatchEvent(new Event('visibilitychange'))
+    expect(h.client.getSnapshot().canControl).toBe(true)
+    h.client.updateControls({ aileron: .5 })
+    await advance(20)
+    expect(h.host.beforeStep(h.state.controls)).toMatchObject({ aileron: .5 })
+    expect(h.hostLink.last('heartbeat').epoch).toBe(epoch)
+    expect(h.phoneLink.reliable.filter(message => message.type === 'action' && message.action === 'requestControl')).toHaveLength(1)
+  })
+
+  it('abandons a handoff the page hid during, so a late grant or status cannot finish it', async () => {
+    const h = await setup()
+    await advance(50)
+    h.hostLink.holdGranted = true
+    expect(h.client.requestControl()).toBe(true)
+    await flush()
+    expect(h.state.owner).toBe('phone')
+    Object.defineProperty(h.doc, 'hidden', { value: true, writable: true })
+    h.doc.dispatchEvent(new Event('visibilitychange'))
+    h.hostLink.holdGranted = false
+    h.hostLink.flushHeld()
+    // A reliable status in flight says the phone flies; it never did.
+    h.host.syncStatus()
+    await flush()
+    Object.defineProperty(h.doc, 'hidden', { value: false, writable: true })
+    h.doc.dispatchEvent(new Event('visibilitychange'))
+    expect(h.client.getSnapshot()).toMatchObject({ canControl: false, status: { owner: 'phone' } })
+    h.client.updateControls({ aileron: 1 })
+    // Unheard, the computer takes control back past the hold, and hands it
+    // back through a fresh handoff, never the abandoned one.
+    const abandoned = h.hostLink.last('granted').epoch
+    await advance(2600)
+    expect(h.state).toMatchObject({ owner: 'phone', paused: false })
+    expect(h.hostLink.last('granted').epoch).toBeGreaterThan(abandoned)
+    expect(h.client.getSnapshot().canControl).toBe(true)
+  })
+
+  it('hiding is not Release: hidden past the hold, the computer takes control without a pause and hands it back when the page returns', async () => {
     const h = await setup()
     await advance(50)
     await h.fly()
     Object.defineProperty(h.doc, 'hidden', { value: true, writable: true })
     h.doc.dispatchEvent(new Event('visibilitychange'))
     await advance(350)
+    expect(h.state).toMatchObject({ owner: 'phone', paused: false })
+    await advance(2000)
     expect(h.phoneLink.reliable.some(message => message.type === 'action' && message.action === 'releaseControl')).toBe(false)
-    expect(h.state).toMatchObject({ owner: 'local', paused: true })
+    expect(h.state).toMatchObject({ owner: 'local', paused: false })
     // Offered back, but a hidden page asks for nothing.
     expect(h.client.getSnapshot()).toMatchObject({ canFly: false, requestingControl: false, status: { handBack: 'now' } })
     Object.defineProperty(h.doc, 'hidden', { value: false, writable: true })
@@ -494,7 +555,7 @@ describe('phone controller', () => {
   })
 
   it('blending: the levers follow where the computer has them, but never drag back a move it has not applied', async () => {
-    const h = await setup({}, { getSharing: () => ({ mode: 'blend', handover: 'auto', returnIdleMs: 1000, priority: 'phone' }) })
+    const h = await setup({}, { getSharing: () => ({ ...DEFAULT_CONTROL_SHARING, mode: 'blend', priority: 'phone' }) })
     await advance(50)
     await h.fly()
     // The computer's pilot moves the throttle; the blend applies it.
@@ -526,7 +587,7 @@ describe('phone controller', () => {
   })
 
   it('asks again no faster than its interval while the computer keeps refusing', async () => {
-    const h = await setup({}, { getSharing: () => ({ handover: 'computer', returnIdleMs: 1000 }) })
+    const h = await setup({}, { getSharing: () => ({ ...DEFAULT_CONTROL_SHARING, handover: 'computer' }) })
     await advance(50)
     const askedAt: number[] = []
     const send = h.phoneLink.sendReliable.bind(h.phoneLink)
@@ -589,8 +650,8 @@ describe('phone controller', () => {
     expect(h.host.beforeStep(h.state.controls)).toMatchObject({ rudder: 0 })
   })
 
-  it('pauses on page hide, preserves pause on return, survives signaling-only loss, and tears down after closure', async () => {
-    const h = await setup({}, { getSharing: () => ({ handover: 'stay', returnIdleMs: 1000 }) })
+  it('lets go on page hide without pausing, flies on when the page returns, survives signaling-only loss, and tears down after closure', async () => {
+    const h = await setup({}, { getSharing: () => ({ ...DEFAULT_CONTROL_SHARING, handover: 'stay' }) })
     await advance(50)
     await h.fly()
     h.signal(false)
@@ -600,11 +661,12 @@ describe('phone controller', () => {
     h.win.dispatchEvent(new Event('pagehide'))
     expect(h.client.getSnapshot().canControl).toBe(false)
     await advance(300)
-    expect(h.state).toMatchObject({ owner: 'local', paused: true })
+    // The last frame was centred: the computer holds no rudder and no brake.
+    expect(h.state).toMatchObject({ owner: 'phone', paused: false })
+    expect(h.host.beforeStep(h.state.controls)).toMatchObject({ rudder: 0, brake: 0 })
     h.doc.dispatchEvent(new Event('visibilitychange'))
     await advance(50)
-    expect(h.client.getSnapshot().canFly).toBe(true)
-    expect(h.client.getSnapshot().canControl).toBe(false)
+    expect(h.client.getSnapshot()).toMatchObject({ canFly: false, canControl: true })
     h.phoneLink.close()
     expect(h.client.getSnapshot().phase).toBe('disconnected')
     expect(h.endpointDestroy).toHaveBeenCalledTimes(1)

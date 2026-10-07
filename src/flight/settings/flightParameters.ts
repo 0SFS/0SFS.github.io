@@ -730,6 +730,20 @@ export const OSFS_PARAMETERS = [
     appliesLive: true,
     source: "src/flight/remote/createPhoneControlSession.ts",
   },
+  {
+    id: "osfs.remote.holdLast",
+    label: "Hold the phone's last command",
+    description: "When the phone's input stops arriving, how long its last command stands — a held starter, stick or brake stays held — before they let go and control comes back here. This computer stalling does not count.",
+    unit: "s",
+    kind: "number",
+    step: 0.1,
+    bounds: within(0, 10),
+    default: 2,
+    defaultReason: "Rides out a Wi-Fi stall or a busy phone, so an engine start or a turn carries on through it; short enough that a phone that is really gone does not fly a deflected stick for long.",
+    home: main(REMOTE_CONTROL),
+    appliesLive: true,
+    source: "src/flight/remote/createPhoneControlSession.ts",
+  },
 
   // Remote Control → Phone camera trackpad: an A/B of how a phone's swipe
   // reaches the view. The costs quoted are from docs/phone-controller.md.

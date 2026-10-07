@@ -82,8 +82,9 @@ swap: the camera pad takes the engine monitor's slot, and the engine widget sits
 just above the throttle instead.
 
 **Nothing sits above or below the controls.** Everything that is not a flight
-surface — IAS, ALT and HDG, the gear, the link chip, pause and release (only
-while flying), haptics, 🌐 connection details, ⛶ fullscreen, ⚙ settings and the
+surface — IAS, ALT and HDG, the gear, the link chip, pause and release while
+flying (Take control in their place otherwise, or Scan QR code once the session
+has ended), haptics, 🌐 connection details, ⛶ fullscreen, ⚙ settings and the
 brake, in that order — is one chip grid at the density FOSS Earth's
 `.hud-bar` uses, because they are menu items and readouts and the screen is
 worth more to the controls. It sits under the controls by default; **⚙ Settings
@@ -93,11 +94,14 @@ wider than the glyph chips; a full-width bar was more brake than anyone needs.
 
 There used to be an instrument row at the top, a status banner, a fullscreen
 banner and a footer. Each cost a row of screen to say something a chip can say.
-In particular there is no banner for a connection that has gone quiet: the link
-chip reads `DELAYED` with its light out, at the same width as every other label
-it shows so the grid never reflows under a thumb, and the client's full sentence
-goes to a live region for assistive tech. A session that has ended opens
-Connection details itself, with the cause and what to do about it.
+In particular there is no banner for a connection that has gone quiet. The 🌐
+chip lights and counts how long the computer has gone unheard, in place of the
+round trip and at the same width, so the grid never reflows under a thumb. The
+link chip's light goes out, but it still says who flies, because the computer
+holds this phone's last command meanwhile and the controls stay live. The
+client's full sentence goes to a live region for assistive tech. A session that
+has ended opens Connection details itself, with the cause, what to do about it
+and Scan QR code.
 
 Yaw is one row — `YAW`, the track, the value — rather than the HUD's heading
 row over the track, which made the box nearly twice the height the track needs.
@@ -132,18 +136,17 @@ release the controller always did, up to 1.5s of sweep, each frame of it sent as
 an ordinary rudder update so the aircraft yaws back the way the thumb does. The
 animation lives on this screen, not in the client or the protocol: the host
 knows only that the rudder moved. Whatever centres the transient controls — a
-stale link, a blur, handing the aircraft back — still overrides both choices.
+blur, hiding the page, handing the aircraft back — still overrides both choices.
+A link gone quiet no longer does: the computer holds the last command.
 
-**Taking control is a popup, not a chip.** Whenever the phone is not flying —
-still connecting, the computer flying, or the session over — every flight control
-is disabled, so the only useful thing on that screen is taking control, and
-[`PhoneControlPrompt`](../src/remote/PhoneControlPrompt.tsx) puts it in front:
-**Take control**, greyed out with the client's reason under it when it cannot be
-taken ("Center controls to take over."), or the way back when the session has
-ended. It dims the flight controls and **not the chip grid**, which is raised
-above the dimming: Connection details, Settings, fullscreen and haptics need no
-control, and a popup that covered 🌐 would leave no way to find out why Take
-control is unavailable. The fullscreen question, asked once, sits above both.
+**Taking control is a chip, not a popup.** Whenever the phone is not flying,
+**Take control** sits in the grid where Pause and Release go, greyed out while it
+cannot be taken, with the client's reason as its title and in the live region.
+It was a popup over the flight controls for a while, and it went up on every
+blink of the link. On a real desk the user called that bad UX and could not start
+an engine through it. Control the computer offers back is asked for by itself, so
+the chip is for whoever would rather not wait, and for control that comes back
+only when taken. A session that has ended puts **Scan QR code** in the same place.
 
 **Landscape** is how a controller is actually held and the one orientation where
 the HUD's arrangement fits as-is: cluster left, yaw over the camera pad with the
@@ -429,7 +432,8 @@ A controller launched from its Home Screen icon has no invitation — the QR
 link's hash is cleared as soon as the page reads it, and iOS sends a link from
 the Camera app to Safari, never to an installed app. So the page reads the QR
 itself. [`PhoneUnpaired`](../src/remote/PhoneUnpaired.tsx) offers **Scan QR
-code**, and so does the take-control popup of a session that has ended.
+code**, and so does a session that has ended, in its chip grid and under the
+cause in Connection details.
 
 The way onto this page from the simulator is the flight panel's **Remote
 Control** tab, which pairs a phone from a computer and has **Switch to RC
@@ -499,9 +503,9 @@ the throttle with their right edges aligned, right of yaw, and notched into the
 camera pad — with the throttle narrower than the widget and yaw shorter than it,
 so the widget can never again thicken the sliders.
 
-The take-control popup must be up on the `control` page, where the computer is
-flying, and on no other; where it is up, a finger on the stick must land on the
-popup and a finger on a grid chip must land on the chip.
+Nothing may cover the pitch/roll stick on a page without an open sheet: a finger
+on it lands on it. On the `control` page, where the computer is flying, **Take
+control** must be a chip in the grid that a finger reaches, and on no other page.
 
 The run renders `flying`, `control`, `grid-top` and `failed` and holds each to the rules;
 `offer` (the fullscreen popup), `home-screen` (its iPhone notice), `settings`

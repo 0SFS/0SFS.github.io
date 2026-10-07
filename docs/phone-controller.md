@@ -7,12 +7,12 @@ to install and nothing to configure — both ends are just web pages.
 
 1. On the computer, open [flight mode](https://0sfs.github.io/fly/), then ⚙ → **Remote Control**.
 2. Scan the QR code with your phone camera.
-3. On the phone, tap **Take control** in the popup to take control.
+3. On the phone, tap **Take control** in the chip grid to take control.
 
 A controller added to the Home Screen opens without an invitation, because the Camera app sends a
 scanned link to the browser rather than to the installed app. It pairs by reading the QR itself:
-tap **Scan QR code** and point the phone at the computer. The same button is on the popup of a
-session that has ended. The browser opens the camera only on a secure page, so this works on the
+tap **Scan QR code** and point the phone at the computer. A session that has ended offers the same
+button in the chip grid and under its cause in **Connection details**. The browser opens the camera only on a secure page, so this works on the
 deployed site and under `npm run dev:lan`, not over plain HTTP. A QR for this same page pairs in
 place, without the invitation ever reaching the address bar; a QR for another copy of the site
 loads that copy, as the Camera app would, so the phone runs the code the computer runs.
@@ -23,8 +23,8 @@ the tab leads with that button and makes no QR until asked. The icon still opens
 time; an icon made from `/rc/` is named *0SFS RC* and always opens the controller.
 
 **Take control** preserves the simulator's current pause state; if the flight is paused, tap **▶** (Resume)
-in the grid separately. The one exception is a pause that losing control caused, which lifts when control
-comes back (see [Who flies](#who-flies)). The touch controller provides pitch/roll, rudder, throttle, trim, flaps, brake, pause,
+in the grid separately. The one exception is the pause that hiding the desktop tab caused, which lifts
+when control comes back (see [Who flies](#who-flies)). The touch controller provides pitch/roll, rudder, throttle, trim, flaps, brake, pause,
 camera view, and release.
 
 The controls sit where the desktop flight HUD puts them, so muscle memory carries between
@@ -47,9 +47,9 @@ invalidates the invitation or ends the session.
 
 Once the phone has taken control, it keeps its claim to the controls until its pilot taps **Release**.
 Control can still be taken from it for a while: by flight input on the computer, by the desktop tab
-being hidden, or by phone input that stops arriving — the phone's screen locking, the controller going
-to the background, a dropped connection. The last two pause the flight. What happens next is
-Remote Control → **Who flies** → **Control changes hands**:
+being hidden (which pauses the flight), or by phone input that stops arriving for longer than
+**Hold the phone's last command** (see [When the link drops](#when-the-link-drops)). What happens next
+is Remote Control → **Who flies** → **Control changes hands**:
 
 | Choice | Flight input on the computer | Control goes back to the phone |
 | --- | --- | --- |
@@ -62,11 +62,31 @@ In every mode **Take control** in the Remote Control tab takes control here on p
 is waiting to go back, the button reads **Keep control here** — and the phone then waits for its pilot
 to tap **Take control**. A phone disconnection pauses the flight and ends the session.
 
-The computer never resumes the flight by itself. When control goes back after a pause that losing it
-caused, the computer tells the phone that the pause is the phone's to lift, and the phone lifts it once
-it has heard that it is flying, so nothing flies under a phone that does not know it has the controls.
-A pause anyone chose in the meantime stays. A phone page loaded before this behaviour existed asks for
-nothing and keeps the pause; reload it.
+The computer never resumes the flight by itself. When control goes back after the pause that hiding
+the desktop tab caused, the computer tells the phone that the pause is the phone's to lift, and the
+phone lifts it once it has heard that it is flying, so nothing flies under a phone that does not know
+it has the controls. A pause anyone chose in the meantime stays. A phone page loaded before this
+behaviour existed asks for nothing and keeps the pause; reload it.
+
+### When the link drops
+
+Wi-Fi, a busy phone or a busy computer can hold up the link for a moment. Nothing pops up and nothing
+pauses:
+
+- The computer keeps flying the phone's last command — stick, rudder, brake, throttle, and a starter
+  held to start the engine — for **Hold the phone's last command** (2 s by default, up to 10 s), in
+  Remote Control → **Who flies**. Heard again within that, the phone flies on as if nothing happened.
+- The phone's controls stay live, and its **🌐** chip lights up and counts how long the computer has
+  gone unheard, in place of the round trip.
+- Past the hold, the stick, rudder, brake and starter let go, the levers stay where they are, and the
+  computer takes control without pausing. It goes back to the phone by itself once the phone is heard
+  again, as **Control changes hands** says.
+- The computer stalling — compiling shaders as an engine lights, say — does not count as the phone's
+  silence, and the phone stalling does not count on its 🌐 chip.
+
+Both ends keep each loss and how long it lasted in their **Connection details** timeline. Hiding the
+controller — locking the phone, switching apps — sends a centred frame first, so the computer holds
+nothing deflected, and a page back within the hold flies on.
 
 **Sharing the controls**, in the same section, decides whether one device flies at a time, as above,
 or both. With **Blend both**, a phone that has taken control flies together with the computer, whose
@@ -85,7 +105,8 @@ keys, gamepad and HUD stay live:
 ## When pairing fails: read the connection details
 
 Both ends keep a timeline of the whole attempt, and both show it. On the phone it is the
-**🌐** chip in the controller's grid, which shows the round trip and opens **Connection details**; on the computer it is **Connection
+**🌐** chip in the controller's grid, which shows the round trip — or, lit, how long the computer has
+gone unheard — and opens **Connection details**; on the computer it is **Connection
 details** inside the Remote Control tab. Either one opens itself when something fails, shows the
 cause at the top, and has a **Copy diagnostics** button that produces a plain-text report suitable for
 a bug report.
@@ -213,8 +234,8 @@ rules `npm run check:phone-layout` enforces.
 - **An installed controller could not pair.** The invitation arrives in the QR link's hash and is
   cleared as soon as the page reads it, and iOS opens a link from the Camera app in Safari, never
   in a Home Screen app — so the installed controller opened at *Scan a new QR to connect* with no
-  way to take one. The controller now reads the QR itself: **Scan QR code** on that page, and on
-  the popup of a session that has ended, opens the camera in the page. **Not yet confirmed on a
+  way to take one. The controller now reads the QR itself: **Scan QR code** on that page, and in
+  the chip grid of a session that has ended, opens the camera in the page. **Not yet confirmed on a
   device.**
 
 Each page tints the browser bars its own background (`theme-color`, set per route by the same boot

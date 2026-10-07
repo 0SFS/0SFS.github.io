@@ -44,7 +44,7 @@ function mount({ engine, status, snapshot, onPair }: {
   }
   const state: PhoneControllerSnapshot = {
     phase: 'ready', message: 'Phone controls', status: aircraft, controls: { ...NEUTRAL_CONTROLS },
-    canFly: false, canControl: true, requestingControl: false, hostFresh: true, signalingAvailable: true,
+    canFly: false, canControl: true, requestingControl: false, hostFresh: true, lostMs: null, signalingAvailable: true,
     pendingActions: 0, rttMs: 20, diagnostics: null, appliedSeq: 1, receiveToApplyMs: 2,
     hapticsSupported: true, hapticsEnabled: false, ...snapshot,
   }
@@ -179,16 +179,26 @@ describe('phone controller screen', () => {
     expect(updateControls).toHaveBeenLastCalledWith({ throttle: 0.1 })
   })
 
-  it('puts nothing above the controls: no banner for a delayed connection, just the link chip', () => {
-    mount({ snapshot: { hostFresh: false, message: 'Connection delayed · Waiting for the computer' } })
+  it('puts nothing above the controls for a lost link: the 🌐 chip counts how long, and the controls stay live', () => {
+    mount({ snapshot: { hostFresh: false, lostMs: 1200, message: 'Connection lost · Waiting for the computer' } })
     // jsdom offers no fullscreen, so no popup either: the controls are the page.
     expect([...container.querySelector('main')!.children].map(child => child.className))
       .toEqual(['phone-controls phone-controls--grid-bottom'])
     const link = container.querySelector('.phone-link')!
     expect(link.classList.contains('phone-link--live')).toBe(false)
-    expect(link.firstChild?.nextSibling?.textContent).toBe('DELAYED')
+    // Who flies has not changed: the computer holds this phone's last command.
+    expect(link.firstChild?.nextSibling?.textContent).toBe('PHONE')
     // Still said, to assistive tech.
-    expect(link.querySelector('[role="status"]')?.textContent).toBe('Connection delayed · Waiting for the computer')
+    expect(link.querySelector('[role="status"]')?.textContent).toBe('Connection lost · Waiting for the computer')
+    expect(text('.phone-diagnostics .phone-sheet__chip')).toBe('🌐 1.2s')
+    expect(container.querySelector('.phone-diagnostics__lost')).not.toBeNull()
+    expect(text('.phone-diagnostics .phone-sheet__title')).toBe('Connection details · lost for 1.2 s')
+    expect(button('Release')?.disabled).toBe(false)
+    expect(container.querySelector<HTMLInputElement>('input[aria-label="Pitch trim"]')?.disabled).toBe(false)
+    // Heard again, the round trip is back.
+    remount()
+    expect(text('.phone-diagnostics .phone-sheet__chip')).toBe('🌐 20ms')
+    expect(container.querySelector('.phone-diagnostics__lost')).toBeNull()
   })
 
   it('names who flies on the link chip: this phone, the computer, or both blended', () => {
@@ -213,56 +223,36 @@ describe('phone controller screen', () => {
     expect(text('.phone-diagnostics .phone-sheet__chip')).toBe('🌐 20ms')
   })
 
-  it('offers Take control in a popup, not the grid, whenever the phone is not flying', () => {
+  it('offers Take control as a chip where Pause and Release go, never a popup, whenever the phone is not flying', () => {
     mount({ status: { owner: 'local' }, snapshot: { canFly: true, canControl: false, message: 'Connected · Desktop controls' } })
-    const popup = container.querySelector('.phone-popup--control')!
-    expect(popup.querySelector('.phone-popup__title')?.textContent).toBe('The computer is flying')
-    // A routine status adds nothing to the title, so it is not repeated.
-    expect(popup.querySelector('.phone-popup__detail')).toBeNull()
-    expect(container.querySelector('main')?.classList.contains('phone-app--needs-control')).toBe(true)
-    act(() => { button('Take control')!.click() })
+    expect([...container.querySelector('main')!.children].map(child => child.className))
+      .toEqual(['phone-controls phone-controls--grid-bottom'])
+    expect(container.querySelector('[role="dialog"]')).toBeNull()
+    const take = button('Take control')!
+    expect(take.parentElement).toBe(grid())
+    act(() => { take.click() })
     expect(requestControl).toHaveBeenCalledOnce()
-    // The grid has nothing to take control with, and nothing that needs it.
-    expect(grid().querySelector('.phone-primary')).toBeNull()
     expect(button('Pause simulation')).toBeUndefined()
     expect(button('Release')).toBeUndefined()
-
-    // Why it cannot be taken is said where the button is.
+    // Why it cannot be taken goes with the chip, and to assistive tech.
     remount({ status: { owner: 'local' }, snapshot: { canFly: true, canControl: false, message: 'Center controls to take over.' } })
-    expect(text('.phone-popup--control .phone-popup__detail')).toBe('Center controls to take over.')
+    expect(button('Take control')?.title).toBe('Center controls to take over.')
     remount({ status: { owner: 'local' }, snapshot: { canFly: false, canControl: false, requestingControl: true, message: 'Taking control…' } })
     expect(button('Taking control…')?.disabled).toBe(true)
 
-    // Connecting, and over: no button to press, and the way back for the latter.
+    // Connecting, and over: nothing to take control with.
     remount({ status: { owner: 'local' }, snapshot: { phase: 'connecting', canFly: false, canControl: false, message: 'Opening direct control channel…' } })
-    expect(text('.phone-popup__title')).toBe('Connecting to the computer')
-    expect(button('Take control')?.disabled).toBe(true)
-    remount({ snapshot: { phase: 'disconnected', canFly: false, canControl: false, message: 'The computer ended the session.' } })
-    expect(text('.phone-popup__title')).toBe('Disconnected')
     expect(button('Take control')).toBeUndefined()
-    expect(container.querySelector('.phone-popup--control')?.textContent).toContain('create a new QR')
+    expect(container.querySelector('.phone-link')?.firstChild?.nextSibling?.textContent).toBe('PAIRING')
+    remount({ snapshot: { phase: 'disconnected', canFly: false, canControl: false, message: 'The computer ended the session.' } })
+    expect(button('Take control')).toBeUndefined()
+    expect(container.querySelector('.phone-link')?.firstChild?.nextSibling?.textContent).toBe('OFFLINE')
 
-    // Flying: no popup at all, and pause and release are back in the grid.
+    // Flying: pause and release in its place.
     remount()
-    expect(container.querySelector('.phone-popup--control')).toBeNull()
+    expect(button('Take control')).toBeUndefined()
     expect(button('Pause simulation')).toBeDefined()
-  })
-
-  it('says when control is coming back by itself, beside why it left', () => {
-    mount({ status: { owner: 'local', handBack: 'idle' }, snapshot: { canFly: true, canControl: false, message: 'Desktop controls · Back to the phone when these controls rest' } })
-    const details = () => [...container.querySelectorAll('.phone-popup--control .phone-popup__detail')].map(node => node.textContent)
-    expect(details()).toEqual([
-      'Desktop controls · Back to the phone when these controls rest',
-      'Control comes back to this phone once the computer’s controls rest.',
-    ])
-    // Still a button for whoever would rather not wait.
-    expect(button('Take control')?.disabled).toBe(false)
-    remount({ status: { owner: 'local', handBack: 'now' }, snapshot: { canFly: true, canControl: false, message: 'Phone input lost · Simulation paused' } })
-    expect(details()).toEqual(['Phone input lost · Simulation paused', 'Control is coming back to this phone.'])
-    // Asked for: the title says so, and the offer needs no second line.
-    remount({ status: { owner: 'local', handBack: 'now' }, snapshot: { canFly: false, canControl: false, requestingControl: true, message: 'Taking control…' } })
-    expect(text('.phone-popup__title')).toBe('Taking control…')
-    expect(details()).toEqual([])
+    expect(container.querySelector('[role="dialog"]')).toBeNull()
   })
 
   it('offers the page\'s own QR scanner as the way back from an ended session', () => {
@@ -274,6 +264,8 @@ describe('phone controller screen', () => {
     const onPair = vi.fn()
     remount({ snapshot: ended, onPair })
     expect(container.querySelector('.phone-scanner')).toBeNull()
+    // A chip in the grid, where Take control was.
+    expect(button('Scan QR code')?.parentElement).toBe(grid())
     act(() => { button('Scan QR code')!.click() })
     expect(container.querySelector('.phone-scanner')).not.toBeNull()
     act(() => { scanner.props!.onScan('https://0sfs.github.io/rc/#v=1&peer=d&join=s') })
@@ -281,9 +273,10 @@ describe('phone controller screen', () => {
 
     act(() => { scanner.props!.onClose() })
     expect(container.querySelector('.phone-scanner')).toBeNull()
-    // A session in progress has no Scan button: its popup is for taking control.
+    // A session in progress has no Scan button: that chip is for taking control.
     remount({ status: { owner: 'local' }, snapshot: { canFly: true, canControl: false }, onPair })
     expect(button('Scan QR code')).toBeUndefined()
+    expect(button('Take control')).toBeDefined()
   })
 
   it('pauses with the flight page glyphs and toggles haptics from the grid', () => {

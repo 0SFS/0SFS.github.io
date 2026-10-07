@@ -7,11 +7,21 @@ interface Props {
   /** Live channel measurements, absent until the control channel is open. */
   transport: TransportDiagnostics | null
   rttMs: number | null
+  /** How long the computer has gone unheard, once that counts as lost; the chip shows it in place of the round trip. */
+  lostMs?: number | null
   receiveToApplyMs: number | null
   appliedSeq: number | null
   signalingAvailable: boolean
   /** What to do about a failure, shown under its cause. */
   recovery?: string
+  /** Opens the page's QR scanner, offered under the recovery. */
+  onScan?(): void
+}
+
+/** At most four characters, as the round trip's `20ms` is, so the chip never changes width. */
+function lostFor(ms: number): string {
+  const seconds = ms / 1000
+  return seconds < 10 ? `${seconds.toFixed(1)}s` : `${Math.min(999, Math.floor(seconds))}s`
 }
 
 function tally(counts: { host: number; srflx: number; prflx: number; relay: number; mdns: number }): string {
@@ -38,7 +48,7 @@ function Line({ event }: { event: DiagnosticEvent }) {
  * candidates each side offered, which path was chosen, and the timeline that
  * produced the outcome. Open by default once something has gone wrong.
  */
-export function ConnectionDiagnosticsPanel({ log, transport, rttMs, receiveToApplyMs, appliedSeq, signalingAvailable, recovery }: Props) {
+export function ConnectionDiagnosticsPanel({ log, transport, rttMs, lostMs = null, receiveToApplyMs, appliedSeq, signalingAvailable, recovery, onScan }: Props) {
   useSyncExternalStore(log.subscribe, log.version, log.version)
   const [copied, setCopied] = useState<string | null>(null)
   const facts = log.facts()
@@ -60,13 +70,18 @@ export function ConnectionDiagnosticsPanel({ log, transport, rttMs, receiveToApp
 
   return <details className="phone-sheet phone-diagnostics" open={facts.failure !== null}>
     {/* Closed, it is one chip in the controller's grid: a globe and the round
-        trip. Open, the same summary heads a full-screen sheet in words. */}
+        trip — or, lit, how long the computer has gone unheard. Open, the same
+        summary heads a full-screen sheet in words. */}
     <summary>
-      <span className="phone-sheet__chip" aria-hidden="true">🌐 {rttMs === null ? '—' : `${Math.round(rttMs)}ms`}</span>
-      <span className="phone-sheet__title">Connection details{rttMs === null ? '' : ` · ${Math.round(rttMs)} ms round trip`}</span>
+      <span className={`phone-sheet__chip${lostMs === null ? '' : ' phone-diagnostics__lost'}`} aria-hidden="true">
+        🌐 <span className="phone-diagnostics__reading">{lostMs !== null ? lostFor(lostMs) : rttMs === null ? '—' : `${Math.round(rttMs)}ms`}</span>
+      </span>
+      <span className="phone-sheet__title">Connection details{lostMs !== null ? ` · lost for ${(lostMs / 1000).toFixed(1)} s`
+        : rttMs === null ? '' : ` · ${Math.round(rttMs)} ms round trip`}</span>
     </summary>
     {facts.failure && <p className="phone-diagnostics__cause"><strong>{facts.failure.code}</strong> {facts.failure.detail}
-      {recovery && <small>{recovery}</small>}</p>}
+      {recovery && <small>{recovery}</small>}
+      {onScan && <button type="button" onClick={onScan}>Scan QR code</button>}</p>}
     <dl>
       <Row term="Connection" value={path} />
       <Row term="Pairing service" value={facts.signaling.registered

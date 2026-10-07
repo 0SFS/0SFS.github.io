@@ -73,19 +73,10 @@ button { touch-action: manipulation; }
   -webkit-user-select: none;
 }
 
-/* Take control: a popup whenever the phone is not flying. It dims the flight
-   controls, which are disabled without control, and leaves the chip grid above
-   the dimming — Connection details, Settings, fullscreen and haptics need no
-   control, and one of them is how you find out why Take control is greyed out.
-   Below the fullscreen question, which is asked once and covers everything. */
-.phone-popup--control { z-index: 25; }
-.phone-app--needs-control .phone-actions { position: relative; z-index: 26; }
-.phone-popup__actions .phone-popup__wide { flex: 1; min-height: 48px; font-size: 14px; }
-
 /* ---- Status chips, in the chip grid. ---- */
 
-/* One width for every label it can show, so a connection that goes DELAYED
-   and back never reflows the grid under a thumb. */
+/* One width for every label it can show, so control that changes hands
+   never reflows the grid under a thumb. */
 .phone-link {
   position: relative;
   display: inline-flex;
@@ -498,6 +489,16 @@ button { touch-action: manipulation; }
 .phone-diagnostics__cause { margin: 8px 0 0; padding: 8px 9px; border: 1px solid rgba(214, 106, 106, 0.6); border-radius: 8px; color: #e8a9a9; user-select: text; -webkit-user-select: text; }
 .phone-diagnostics__cause strong { display: block; font-size: 10px; color: #f0b4b4; }
 .phone-diagnostics__cause small { display: block; margin-top: 6px; color: var(--phone-text); }
+.phone-diagnostics__cause button {
+  display: block; min-height: 44px; margin-top: 9px; padding: 7px 14px;
+  border: 1px solid rgba(232, 182, 71, 0.55); border-radius: 8px; color: var(--ctl-accent); background: transparent; font-weight: 700;
+}
+/* The round trip and the time lost share one width — "120ms", "1.2s" — so the
+   chip never reflows the grid while the link drops and returns under a thumb. */
+.phone-diagnostics__reading { display: inline-block; min-width: 5ch; text-align: right; }
+/* Lit while the computer is unheard: the count is how long. */
+.phone-diagnostics__lost { color: var(--ctl-accent); }
+.phone-diagnostics:not([open]):has(.phone-diagnostics__lost) { border-color: var(--ctl-accent); background: rgba(232, 182, 71, 0.16); }
 .phone-diagnostics__actions { display: flex; align-items: center; gap: 9px; margin: 9px 0; }
 .phone-diagnostics__actions button { min-height: 36px; padding: 7px 11px; border: 1px solid var(--ctl-line); border-radius: 8px; color: var(--phone-text); background: transparent; }
 .phone-diagnostics dl { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 9px 0; }

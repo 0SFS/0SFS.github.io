@@ -21,7 +21,7 @@ Both interfaces remain static files deployed to GitHub Pages. Use **free PeerJS 
 | Primary network | Phone and computer on a reachable home LAN, with Internet access for page loading and signaling. |
 | Transport | Direct WebRTC, 60 Hz full control snapshots, no retransmission of controls. |
 | Controller | Touch pitch/roll, rudder, throttle, trim, flaps, brake, pause, and camera view. |
-| Lost input | Pause and return control to the desktop. Control goes back to the phone as [Sharing the controls](#sharing-the-controls) sets, and only the phone lifts the pause. |
+| Lost input | Hold the phone's last command for `osfs.remote.holdLast` (2 s); then let go of the transient controls and return control to the desktop, without a pause. Control goes back to the phone as [Sharing the controls](#sharing-the-controls) sets. See [Losing the phone](#losing-the-phone). |
 | Infrastructure | Existing GitHub Pages + PeerJS Cloud + public STUN. No application backend or paid service. |
 | Relay policy | Explicit STUN-only configuration in v1; no TURN relay or HTTP/WebSocket control fallback. Failed direct connections receive a clear error. |
 | Later work | Tilt steering, relay connectivity, automatic transport reconnection, multiple phones, video streaming, and autopilot integration. |
@@ -52,7 +52,7 @@ The controller displays connection progress, then the aircraft's current setting
 
 Fly requests ownership. If the aircraft is already paused, ownership can transfer while it stays paused; the phone then offers **Resume**. There is no second desktop approval dialog.
 
-The phone shows airspeed in knots, altitude in feet, heading, throttle percentage, simulation pause state, and current control owner. Connection details and measured RTT are available in a small expandable diagnostics area. The default UI uses plain statuses such as **Connected**, **Connecting…**, and **Connection lost · Simulation paused**.
+The phone shows airspeed in knots, altitude in feet, heading, throttle percentage, simulation pause state, and current control owner. Connection details and measured RTT are available in a small expandable diagnostics area. The default UI uses plain statuses such as **Connected**, **Connecting…**, and **Connection lost · Waiting for the computer**.
 
 | Phone input | Behavior |
 | --- | --- |
@@ -228,12 +228,11 @@ Reliable actions use unique IDs, explicit states such as `setPaused(true)` and `
 
 The host heartbeat carries a monotonically increasing lease ID. The desktop records each ID's issue time; the phone echoes the newest received ID in controls and authority-sensitive actions.
 
-For an arriving control frame, validate its lease and record the local receive time only after all validation passes. Before applying phone controls and advancing physics, require both:
-
-- The most recent accepted frame arrived within 250 ms of desktop monotonic time.
-- Its echoed host heartbeat was issued within 250 ms and belongs to this session/epoch.
+For an arriving control frame, validate its lease and record the local receive time only after all validation passes. A frame is accepted only if its echoed host heartbeat was issued within 250 ms and belongs to this session/epoch. The newest accepted frame is the phone's command: fresh while it arrived within 250 ms, then held for the silence [Losing the phone](#losing-the-phone) allows.
 
 A receive-time watchdog alone cannot detect a continuously delayed stream. Echoed heartbeats reject such traffic using only the desktop's clock. Do not subtract phone and desktop timestamps to decide freshness. Keep only the small live heartbeat window. A paired phone may request control using a current lease before it has sent any control frames; Resume while phone-owned additionally requires fresh accepted controls.
+
+Freshness is measured on the desktop's **listening clock**: its monotonic clock less the time its main thread was too busy to listen. The session wakes every 50 ms heartbeat; a longer gap than two heartbeats between its own wake-ups is a stall, and all of it but one heartbeat is taken off. While the desktop is stalled nothing from the phone can reach it and no newer lease can reach the phone, so a stall of any length is neither silence from the phone nor ages its leases, and frames queued behind it are as fresh as the leases they carry. Deadlines — the handoff, the invitation — stay on the monotonic clock.
 
 ## Authority, handoff, and simulation integration
 
@@ -260,18 +259,16 @@ Desktop Take control preserves the existing pause state. Phone Release control a
 
 ### Loss and lifecycle
 
-A watchdog runs separately from render callbacks, with the same check immediately before every physics step. On stale input, expired lease, lost control channel, or lost reliable channel while phone-owned:
+A watchdog runs separately from render callbacks, with the same check immediately before every physics step.
 
-1. Revoke phone authority and invalidate the epoch.
-2. Clear transient surfaces/brake, retain persistent settings, and synchronize local state.
-3. Pause through [the existing pause path](../../src/flight/createFlightSimApp.ts#L203).
-4. Show the reason on both devices where communication remains available.
+- **Stale input or an expired lease** while phone-owned: hold the phone's last command, as [Losing the phone](#losing-the-phone) says. Past the hold, revoke phone authority and invalidate the epoch; clear transient surfaces, brake and starter, retain persistent settings, and synchronize local state; do not pause. Show the reason on both devices where communication remains available.
+- **A lost control or reliable channel**: revoke the same way, pause through [the existing pause path](../../src/flight/createFlightSimApp.ts#L203), and end the session.
 
-If detected inside the physics callback, return `false` as well as setting pause; otherwise [the current loop](../../src/flight/physics/fixedStepLoop.ts#L35) could still execute one step. During a main-thread stall timers cannot run, so check freshness before any subsequent physics advancement.
+Inside the physics callback, past the hold, the step takes the last command with its transient controls let go, and the watchdog revokes within a heartbeat. A hidden desktop tab returns `false` as well as setting pause; otherwise [the current loop](../../src/flight/physics/fixedStepLoop.ts#L35) could still execute one step. A main-thread stall is not phone silence (the listening clock, above), so the first step after one applies what the phone last sent, and the frames queued behind the stall follow.
 
-If channels remain healthy after an input timeout, remain paired and permit a fresh Fly handoff after recovery. Never reactivate an old epoch because packets return: authority comes back only through a new handoff, and the flight resumes only when the phone that received it says so ([Sharing the controls](#sharing-the-controls)). If either channel closes, require re-pairing. Signaling-only disconnection does not revoke a healthy direct session; attempt bounded signaling reconnection without recreating/destroying the healthy peer connection.
+Within the hold, packets that return continue the same epoch. Past it, if channels remain healthy, remain paired and permit a fresh Fly handoff after recovery; never reactivate an old epoch because packets return. Authority comes back only through a new handoff ([Sharing the controls](#sharing-the-controls)). If either channel closes, require re-pairing. Signaling-only disconnection does not revoke a healthy direct session; attempt bounded signaling reconnection without recreating/destroying the healthy peer connection.
 
-Phone hide/page exit sends a final centred frame and then nothing; the receiver watchdog pauses within the stale limit. Hiding is not Release, so the phone's claim stands. Pointer up/cancel/lost capture releases affected controls. Rotation cancels gestures before resizing. Desktop hiding while phone-owned explicitly pauses and revokes ownership. Returning either tab to the foreground resumes flight only through the hand-back, which the phone completes.
+Phone hide/page exit sends a centred frame, then twice more as the frame timer and rate cap allow, then nothing. The desktop holds whatever it heard last, so one frame lost to the cap or the link must not leave a deflected stick, brake or starter held. Hiding is not Release and gives up no authority. A page back within the hold flies on in the same epoch. After the hold, the desktop has taken control back without a pause, and hands it back as after any loss. A handoff in progress when the page hides is abandoned for good. Pointer up/cancel/lost capture releases affected controls. Rotation cancels gestures before resizing. Desktop hiding while phone-owned explicitly pauses and revokes ownership. Returning the desktop tab to the foreground resumes flight only through the hand-back, which the phone completes.
 
 Reset/reposition invalidates input and returns ownership to desktop before using the existing reset flow. Resynchronize the paired phone; departure presets retain their existing paused behavior. Teardown closes both channels and PeerJS, cancels timers/listeners/wake locks, and invalidates async callbacks.
 
@@ -293,7 +290,7 @@ input.
 
 **The claim.** A phone that is granted control holds a claim to it until its pilot taps Release, Take
 control is pressed in the Remote Control tab, or the session ends. Losing control otherwise — a hidden
-desktop tab, stale phone input, local flight input, a reset — leaves the claim standing.
+desktop tab, phone input stale past the hold, local flight input, a reset — leaves the claim standing.
 
 **Control changes hands** (`osfs.remote.handover`) decides what a standing claim does:
 
@@ -310,7 +307,8 @@ while it could tap Take control sends the ordinary `requestControl`, at most eve
 ordinary centred handoff follows. The offer is advice, never authority: a malformed value is dropped
 on its own, and the request is checked exactly as a tap's is.
 
-**Resuming.** If the loss paused a running flight, the `granted` message carries `resume: true`. The
+**Resuming.** If losing control paused a running flight, the `granted` message carries `resume: true`.
+Only a hidden desktop tab pauses now; a phone that goes quiet does not ([Losing the phone](#losing-the-phone)). The
 desktop never resumes by itself; the phone sends `setPaused(false)` once the grant reaches it, so a
 flight cannot run under a phone that has not heard it is flying. A pause anyone chose in between clears
 the mark. A grant that never reaches the phone leaves the flight paused, and the handoff's own timeout
@@ -339,6 +337,40 @@ next touch can jump a lever the computer moved. An older desktop never offers; a
 only when its pilot taps. Because a newer phone no longer sends Release when hidden, an older desktop
 pauses on the silence instead, within the stale limit.
 
+## Losing the phone
+
+Added 2026-10-06. Until then, 250 ms without phone input revoked control and paused the flight. The phone
+locked its controls and let go of everything, starter included, as soon as it had not heard the desktop
+for as long. Control came back only through a fresh handoff, while a popup covered the phone's controls.
+On a real desk the link drops for a moment often: Wi-Fi power saving, a busy phone, the desktop's own
+main thread compiling shaders as an engine lights. An engine start, which needs the starter held for many
+seconds, could not survive one, and the user reported that they could not start the engine at all.
+
+**Holding.** The desktop applies the newest accepted frame — stick, rudder, brake, levers and `starter` —
+through a silence of up to `osfs.remote.holdLast` (default 2 s, 0 to 10 s) past the 250 ms stale limit.
+Owner and epoch stay as they are, and the Remote Control tab says the command is held. Frames that arrive
+on a stale lease are still rejected; one heard within the hold continues the same epoch at once. Past the
+hold the watchdog revokes without a pause: stick, rudder, brake and starter let go, the levers stay, and
+the claim stands, so control goes back to the phone once it is heard, as `handover` says. The hold is read
+at every step, so shortening it under a silence lets go at once. Both ends record each silence and its
+length in their connection timeline.
+
+**This computer's stalls** are not silence. Silence and lease age are measured on the listening clock
+(see [Freshness](#freshness-independent-of-device-clocks)), so a stall of the desktop's main thread, of any
+length, neither starts the hold nor ages a lease.
+
+**The phone.** Its controls stay live while the desktop is unheard, and what the pilot does is sent for when
+the link is back. The 🌐 chip shows how long the desktop has gone unheard in place of the round trip,
+counting up in tenths of a second and lit. The phone's own stalls are taken off that count: a gap of more
+than six control intervals between its control timer's ticks, less one interval. There is no popup. Take control is a chip where Pause and Release go
+while flying, and a session that has ended offers Scan QR code there and under its cause in Connection
+details.
+
+**Compatibility.** Nothing on the wire changed. An older phone still locks its controls and lets go of
+everything 250 ms after it last heard the desktop, and gives up its authority on hiding: hidden within the
+hold, it cannot fly again until the desktop takes control back past the hold and hands it back. An older
+desktop still pauses on 250 ms of silence.
+
 ## Errors and operating limits
 
 | Condition | Required behavior |
@@ -348,8 +380,8 @@ pauses on the silence instead, within the stale limit.
 | Invitation expired/consumed | Require a new desktop QR. If the peer itself is unreachable, show a combined expired/unavailable message rather than claiming a precise cause. |
 | Unsupported protocol | Tell the user to reload both devices; do not accept controls. |
 | Phone already paired | Reject the new connection without interrupting the current phone. |
-| Poor connection | Show stale/lagging status; freshness rules determine whether flight must pause. |
-| Stale controls | Pause only if phone-owned; remain paused until the hand-back, which only the phone completes, or explicit recovery. |
+| Poor connection | The phone's 🌐 chip counts how long the desktop has gone unheard. The desktop holds the last command through a short loss, and takes control back without a pause after a long one. |
+| Stale controls | Held for `osfs.remote.holdLast` if phone-owned; then let go, and control is the desktop's until the hand-back. |
 | Unavailable browser API | Explain that phone control is unsupported; preserve local flight. |
 
 V1 introduces no paid infrastructure. Free services can change or become unavailable. A TURN solution can be specified later if connection success requires it; do not embed paid relay credentials in public static assets or claim all networks are supported.
@@ -381,7 +413,7 @@ Implementation is complete only after these checks pass:
 3. **Pairing:** Expired/reused/wrong invitations, second phone, malformed links, and version mismatch cannot control the aircraft. The secret stays out of signaling metadata, requests to static hosting, logs, and persistent storage.
 4. **Authority:** Pairing does not alter flight. Both handoffs preserve non-default throttle/trim/flaps. Idle gamepad cannot overwrite phone controls. Deliberate desktop takeover works without network acknowledgements. Old epochs cannot regain control.
 5. **Protocol and queues:** Reject malformed/oversized/nonfinite/out-of-range input; discard duplicate/reordered frames and expired leases. Saturated output coalesces rather than replaying old motion. Lost releases recover through snapshots; duplicate actions apply once.
-6. **Lifecycle:** Screen lock, backgrounding, tab exit, channel loss, desktop hide, reset, and an injected main-thread stall cannot advance physics with expired phone input. Test watchdog behavior while rendering is idle and that the pre-step failure path aborts advancement.
+6. **Lifecycle:** Screen lock, backgrounding, tab exit, channel loss, desktop hide and reset cannot advance physics with phone input held past the hold, and an injected main-thread stall is not phone silence. Test watchdog behavior while rendering is idle and that the pre-step check lets go past the hold.
 7. **Controls:** Simultaneous touch works; pitch/roll/yaw directions match the actual C172 response. Pointer cancellation, lost capture, rotation, and leaving the page release controls. Pause and resume preserve authority/freshness rules.
 8. **Failure isolation:** Block signaling and direct connectivity separately. Errors are actionable, attempts are bounded, and local simulation remains usable. A healthy peer session survives signaling-only loss.
 9. **Cleanup and regression:** Repeated pair/disconnect/destroy cycles leave no live connections/timers/listeners or late SDK writes. Existing keyboard/gamepad, pause, reset, collision, and JSBSim tests pass with lint and production build.
@@ -393,7 +425,7 @@ First implementation milestone is the bounded PeerJS/native-channel compatibilit
 
 ## Review focus
 
-The main product choices to review are: **touch controls before tilt; explicit Fly/Resume; pause on lost phone input; direct-only networking initially; and a new QR after transport closure.** Architecture and acceptance criteria above use those defaults consistently.
+The main product choices to review are: **touch controls before tilt; explicit Fly/Resume; a held last command, then a hand-back without a pause, on lost phone input; direct-only networking initially; and a new QR after transport closure.** Architecture and acceptance criteria above use those defaults consistently.
 
 ## Implementation notes
 
