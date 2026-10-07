@@ -80,6 +80,8 @@ export const ASK_BACK_INTERVAL_MS = 500
  * stick motion must never wait on a render.
  */
 const RENDERED_CONTROLS = ['throttle', 'pitchTrim', 'rollTrim', 'flaps', 'rudder'] as const
+/** The controls that stay where they are put, which blending with the computer shares. */
+const LEVERS = ['throttle', 'pitchTrim', 'rollTrim', 'flaps'] as const
 
 interface ClientOptions {
   endpointFactory?: typeof createPeerEndpoint
@@ -205,6 +207,10 @@ export function createPhoneControllerClient(
   let lastPulseAt = -Infinity
   let vibratingUntil = -Infinity
   let lastAskedBackAt = -Infinity
+  // Blending: the first frame to carry this pilot's latest lever move. The
+  // levers follow the computer's only once it has applied that frame, so a
+  // status from before the move cannot drag a lever back under the finger.
+  let leverMoveSeq = -1
   snapshot = { ...snapshot, hapticsSupported: vibrate !== null, hapticsEnabled }
 
   function stopVibration(): void {
@@ -266,6 +272,7 @@ export function createPhoneControllerClient(
     if (nextEpoch <= epoch) return
     epoch = nextEpoch
     sequence = 0
+    leverMoveSeq = -1
     lease = -1
     authorityEpoch = -1
     lastHeartbeatAt = -Infinity
@@ -309,6 +316,13 @@ export function createPhoneControllerClient(
     if (sent && gesture) camera = { ...NEUTRAL_CAMERA_AIM }
     if (sent && total) { aimSent = { ...aimTotal }; aimStamp = stamp; aimMovedAt = null }
     if (sent && trace) { traceCam = []; traceCtl = []; traceGated = 0; traceDrop = [0, 0, 0] }
+  }
+
+  /** Blending: the levers go where the computer has them. True when one moved. */
+  function followLevers(from: ControlSurfaceState): boolean {
+    if (LEVERS.every(key => controls[key] === from[key])) return false
+    controls = { ...controls, throttle: from.throttle, pitchTrim: from.pitchTrim, rollTrim: from.rollTrim, flaps: from.flaps }
+    return true
   }
 
   function cancelTransientControls(): void {
@@ -538,9 +552,12 @@ export function createPhoneControllerClient(
       sendMode = message.controlSend === 'batch' ? 'batch' : 'timer'
       if (message.status) updateStatus(message.status, false)
       if (message.feedback) applyFeedback(message.feedback)
+      const followed = message.status?.blend !== undefined && ownsControl()
+        && (message.appliedSeq ?? -1) >= leverMoveSeq && followLevers(message.status.controls)
       emit({
         appliedSeq: message.appliedSeq ?? snapshot.appliedSeq,
         receiveToApplyMs: message.receiveToApplyMs ?? snapshot.receiveToApplyMs,
+        ...(followed ? { controls: { ...controls } } : {}),
       })
       askBack()
     } else if (message.epoch === epoch && message.type === 'ping') {
@@ -673,6 +690,7 @@ export function createPhoneControllerClient(
       if (!snapshot.canControl || finished) return
       const next = { ...controls, ...partial }
       if (!isControls(next)) return
+      if (LEVERS.some(key => next[key] !== controls[key])) leverMoveSeq = sequence
       controls = next
       if (traceRequested && input) traceInput(traceCtl, [input.at, now()])
       if (RENDERED_CONTROLS.some(key => partial[key] !== undefined)) emit({ controls: { ...controls } })

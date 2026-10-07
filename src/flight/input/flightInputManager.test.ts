@@ -486,6 +486,31 @@ describe("flightInputManager phone handoff", () => {
     expect(setPropertyValue).not.toHaveBeenCalled();
   });
 
+  it("takes a blending phone's levers without taking control, and a resting hardware throttle waits to move again", () => {
+    const pad = connectPad();
+    const onLocalInput = vi.fn();
+    const input = createFlightInputManager({ onLocalInput });
+    cleanups.push(input.attach(window));
+    input.adoptControls(transferred);
+    pad.axes[3] = -0.8;
+    expect(input.poll(1).throttle).toBeCloseTo(0.9);
+    onLocalInput.mockClear();
+
+    input.adoptLevers({ throttle: 0.3, pitchTrim: 0.25, rollTrim: -0.15, flaps: 2 / 3 });
+    expect(onLocalInput).not.toHaveBeenCalled();
+    // The lever has not moved: the phone's throttle stands.
+    expect(input.poll(1)).toMatchObject({ throttle: 0.3, pitchTrim: 0.25, rollTrim: -0.15, flaps: 2 / 3 });
+    expect(input.poll(1).throttle).toBe(0.3);
+    // Moved again, it takes over from where it is.
+    pad.axes[3] = -0.2;
+    expect(input.poll(1).throttle).toBeCloseTo(0.6);
+    expect(onLocalInput).toHaveBeenCalledTimes(1);
+    // Keys carry on from the adopted throttle.
+    input.adoptLevers({ throttle: 0.5, pitchTrim: 0.25, rollTrim: -0.15, flaps: 2 / 3 });
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "ControlLeft" }));
+    expect(input.poll(0.2).throttle).toBeLessThan(0.5);
+  });
+
   it("resets adopted state without reapplying a previously activated resting gamepad throttle", () => {
     const pad = connectPad();
     const input = createFlightInputManager();

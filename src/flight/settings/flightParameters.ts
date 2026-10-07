@@ -667,6 +667,38 @@ export const OSFS_PARAMETERS = [
   // Remote Control → Who flies: how control passes between a paired phone and
   // this computer. Spec: docs/proposals/phone-controller.md → Sharing the controls.
   {
+    id: "osfs.remote.sharing",
+    label: "Sharing the controls",
+    description: "Whether one device flies at a time, or a phone that has taken control flies together with this computer.",
+    unit: "none",
+    kind: "choice",
+    choices: [
+      { id: "exclusive", label: "One device at a time", description: "Only the device with control moves the aircraft. Control changes hands says when it passes." },
+      { id: "blend", label: "Blend both", description: "Both devices fly at once. Where both move a control, Blend priority wins and the other has what it leaves free; a lever goes where it was last moved." },
+    ],
+    default: "exclusive",
+    defaultReason: "One pilot at a time, as the controller was designed; blending is for two pilots who mean to share.",
+    home: main(REMOTE_CONTROL),
+    appliesLive: true,
+    source: "src/flight/remote/createPhoneControlSession.ts",
+  },
+  {
+    id: "osfs.remote.blendPriority",
+    label: "Blend priority",
+    description: "With Blend both: whose input wins where both devices move the same control. Full deflection on that device is all of the control.",
+    unit: "none",
+    kind: "choice",
+    choices: [
+      { id: "phone", label: "Phone", description: "The phone's input wins; this computer's fills in around it." },
+      { id: "computer", label: "This computer", description: "This computer's input wins, as an instructor's would; the phone's fills in around it." },
+    ],
+    default: "phone",
+    defaultReason: "The phone is the remote being flown; this computer's input fills in around it.",
+    home: main(REMOTE_CONTROL),
+    appliesLive: true,
+    source: "src/flight/remote/controlBlend.ts",
+  },
+  {
     id: "osfs.remote.handover",
     label: "Control changes hands",
     description: "Which device flies when both the phone and this computer could. Take control in this tab always takes it here on purpose.",

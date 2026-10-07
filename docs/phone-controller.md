@@ -68,6 +68,20 @@ it has heard that it is flying, so nothing flies under a phone that does not kno
 A pause anyone chose in the meantime stays. A phone page loaded before this behaviour existed asks for
 nothing and keeps the pause; reload it.
 
+**Sharing the controls**, in the same section, decides whether one device flies at a time, as above,
+or both. With **Blend both**, a phone that has taken control flies together with the computer, whose
+keys, gamepad and HUD stay live:
+
+- Pitch, roll, rudder and brake mix. The device chosen by **Blend priority** gets its input, and the
+  other gets whatever authority that leaves free, so a full deflection on the priority device is all of
+  the control and a centred one hands the whole control to the other.
+- Throttle, trim and flaps go where they were last moved, by either pilot, and the priority device's
+  move wins if both move one at once. The levers on both screens follow; a hardware lever resting
+  somewhere else waits until it is moved again.
+- Flight input on the computer never takes control from a blending phone. **Control changes hands**
+  then only decides whether the phone joins again by itself after a loss; **Latched to this computer**
+  keeps it out. The phone's link chip reads **BLEND**.
+
 ## When pairing fails: read the connection details
 
 Both ends keep a timeline of the whole attempt, and both show it. On the phone it is the

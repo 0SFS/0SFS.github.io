@@ -28,7 +28,12 @@ export interface PhoneControlSessionOptions {
   isPageVisible?(): boolean;
   /** Who flies when both devices could; read at every decision. Defaults to the catalogue's defaults. */
   getSharing?(): ControlSharing;
-  onOwnershipChange(owner: "local" | "phone", controls: ControlSurfaceState): void;
+  /**
+   * `blend`: the phone joins or leaves a blend with this computer, whose own
+   * controls stay live throughout, so only the levers in `controls` change
+   * hands (`ControlSharing.mode`).
+   */
+  onOwnershipChange(owner: "local" | "phone", controls: ControlSurfaceState, blend: boolean): void;
   setPaused(paused: boolean): void;
   setViewMode(mode: "first" | "third"): void;
   /** Absent hosts simply never advertise `gearDown`, so no phone offers the control. */
@@ -113,6 +118,8 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
   let resumeOnReturn = false;
   /** When flight input here last happened; the return waits for these controls to rest. */
   let lastLocalInputAt = -Infinity;
+  /** The phone was granted control to fly together with this computer. */
+  let grantedBlend = false;
   const sharing = (): ControlSharing => options.getSharing?.() ?? DEFAULT_CONTROL_SHARING;
   const letGo = () => { claim = false; resumeOnReturn = false; };
 
@@ -135,16 +142,23 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     const { handover, returnIdleMs } = sharing();
     if (handover === "stay" || handover === "computer") return undefined;
     // Never offer what the request would refuse: the same rest and centring.
-    if (handover === "auto" && (options.hasActiveLocalInput() || !isCentered(current.controls)
+    if (localInputBlocks() && handover === "auto" && (options.hasActiveLocalInput() || !isCentered(current.controls)
       || now() - lastLocalInputAt < returnIdleMs)) return "idle";
     return "now";
   };
-  /** Flight input here keeps the phone waiting, except when control is latched to it. */
-  const localInputBlocks = () => sharing().handover !== "phone";
+  /**
+   * Flight input here keeps the phone waiting, except when control is latched
+   * to it, or when the two blend and nothing needs to wait.
+   */
+  const localInputBlocks = () => sharing().mode !== "blend" && sharing().handover !== "phone";
+  const blending = () => snapshot.owner === "phone" && grantedBlend;
   const status = (): AircraftStatus => {
     const current = options.getStatus();
     const back = handBack(current);
-    return { ...current, owner: snapshot.owner, ...(back ? { handBack: back } : {}) };
+    return {
+      ...current, owner: snapshot.owner, ...(back ? { handBack: back } : {}),
+      ...(blending() ? { blend: sharing().priority } : {}),
+    };
   };
   const send = (message: RemoteMessage) => {
     const sent = active?.sendReliable(message) ?? false;
@@ -220,7 +234,7 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     snapshot = { ...snapshot, owner: "local" };
     // Only taken back by hand: the phone waits for its pilot to ask again.
     if (sharing().handover === "stay") letGo();
-    if (wasPhone) options.onOwnershipChange("local", controls);
+    if (wasPhone) options.onOwnershipChange("local", controls, grantedBlend);
     if (pause && wasPhone) {
       if (claim && !options.getStatus().paused) resumeOnReturn = true;
       options.setPaused(true);
@@ -263,8 +277,9 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     const { id, baseline } = pending;
     pending = null;
     claim = true;
+    grantedBlend = sharing().mode === "blend";
     snapshot = { ...snapshot, owner: "phone" };
-    options.onOwnershipChange("phone", baseline);
+    options.onOwnershipChange("phone", baseline, grantedBlend);
     // Handing control back resumes the flight that taking it away paused, and
     // only that: a pause anyone chose in between cleared this. The phone lifts
     // it once the grant reaches it, so nothing flies under a phone that does
@@ -274,8 +289,9 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     const result: RemoteMessage = { ...envelope(), type: "granted", requestId: id, status: status(), ...(resume ? { resume: true as const } : {}) };
     actions.set(id, result);
     send(result);
-    publish({ message: options.getStatus().paused ? "Phone controls · Simulation paused" : "Phone controls" });
+    publish({ message: `${flyingMessage()}${options.getStatus().paused ? " · Simulation paused" : ""}` });
   };
+  const flyingMessage = () => grantedBlend ? "Phone and computer blended" : "Phone controls";
   const handoffChanged = () => {
     if (!pending) return false;
     const current = options.getStatus();
@@ -482,6 +498,9 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     if (snapshot.owner === "phone" && !isPageVisible()) revoke("Desktop hidden · Simulation paused", true);
     if (snapshot.owner === "phone" && !freshInput()) revoke("Phone input lost · Simulation paused", true);
     if (snapshot.owner === "phone" && sharing().handover === "computer") revoke("Control latched to the computer", false);
+    // Sharing changed under a flying phone: take control back, so the hand-back
+    // grants it again under the new sharing, with this computer's controls set to match.
+    if (snapshot.owner === "phone" && (sharing().mode === "blend") !== grantedBlend) revoke("Sharing changed", false);
     // Someone resumed in between: a pause chosen after that is theirs to keep.
     if (resumeOnReturn && !options.getStatus().paused) resumeOnReturn = false;
     if (returning() !== snapshot.returning) publish();
@@ -546,14 +565,14 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     noteLocalInput() {
       lastLocalInputAt = now();
       const { handover } = sharing();
-      if (handover === "phone") return;
+      if (handover === "phone" || blending()) return;
       revoke(handover === "auto" && claim ? "Desktop controls · Back to the phone when these controls rest" : "Desktop controls", false);
     },
     cancelHandoff(message = "Flight settings changed. Tap Fly again.") { if (pending) revoke(message, false); },
     reset() { revoke("Aircraft reset · Desktop controls", false, true); },
     syncStatus() {
       if (resumeOnReturn && !options.getStatus().paused) resumeOnReturn = false;
-      if (active) publishStatus(snapshot.owner === "phone" ? "Phone controls" : "Phone paired · Desktop controls");
+      if (active) publishStatus(snapshot.owner === "phone" ? flyingMessage() : "Phone paired · Desktop controls");
     },
     beforeStep(localControls: ControlSurfaceState): ControlSurfaceState | false {
       if (snapshot.owner !== "phone") return localControls;
@@ -568,6 +587,8 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
      * engine. Only fresh frames count, so the starter lets go with the phone.
      */
     isStarterHeld: () => snapshot.owner === "phone" && freshInput() && latest!.frame.starter === 1,
+    /** The phone flies together with this computer, whose own controls stay live. */
+    isBlending: blending,
     /** The gesture movement to draw this frame, if any is owed. */
     takeCameraAim(): CameraAim | null {
       const movement = aim.take(now());

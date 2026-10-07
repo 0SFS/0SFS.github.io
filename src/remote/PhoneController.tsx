@@ -48,7 +48,7 @@ export function PhoneController({ client, onPair }: { client: PhoneControllerCli
   const ended = state.phase === "error" || state.phase === "disconnected";
   const connected = state.phase === "ready";
   const locked = !state.canControl;
-  const owner = status?.owner === "phone" ? "PHONE" : "DESKTOP";
+  const owner = status?.owner === "phone" ? (status.blend ? "BLEND" : "PHONE") : "DESKTOP";
   const percent = (value: number) => `${Math.round(value * 100)}%`;
   // Fixed-width values keep a chip from resizing as its number grows.
   const pad = (value: string, width: number) => value.padStart(width, " ");

@@ -316,10 +316,28 @@ flight cannot run under a phone that has not heard it is flying. A pause anyone 
 the mark. A grant that never reaches the phone leaves the flight paused, and the handoff's own timeout
 returns control to the desktop.
 
-**Compatibility.** Both fields are additive on v1. An older phone ignores them: it shows Take control
-and keeps the pause, as before. An older desktop never offers; a newer phone then asks only when its
-pilot taps. Because a newer phone no longer sends Release when hidden, an older desktop pauses on the
-silence instead, within the stale limit.
+**Blending.** With `osfs.remote.sharing` set to `blend`, a phone granted control flies together with the
+desktop, whose input manager stays live (`setRemoteOwned(false)`). `src/flight/remote/controlBlend.ts`
+mixes each physics step. Elevator, aileron, rudder and brake are `p + (1 − |p|) · s`, where `p` is the
+input of the device that `osfs.remote.blendPriority` names and `s` the other's: continuous, never past
+full travel, and a full deflection on the priority device is all of the control. Throttle, trims and
+flaps take the value of whichever side moved last, the priority's on a simultaneous move. The desktop's
+levers are set to the result with `adoptLevers`, which makes an absolute hardware lever resting elsewhere
+wait for movement past the takeover deadband, as automatic flaps already did. Statuses then carry
+`blend`, the priority, with the levers where the pilots put them, before automation, and the phone moves
+its levers to them once the heartbeat's `appliedSeq` has reached the first frame of its own latest lever
+move, so a status from before the move never drags a lever back under the finger. Automation that writes
+a desktop lever — trim assist, an engine holding idle — reaches the result as a desktop move; flaps count
+only the pilot's own flap input, by revision, because automatic flaps write the actual travel back every
+frame. Local flight input never revokes a blending phone, so `handover` only decides rejoining: `auto` and
+`phone` rejoin as soon as the tab is visible. Changing the sharing under a flying phone revokes it without
+a pause, and the hand-back grants it again under the new sharing.
+
+**Compatibility.** `handBack`, `resume` and `blend` are additive on v1. An older phone ignores all three:
+it shows Take control, keeps the pause, and keeps its levers where it put them, so while blending its
+next touch can jump a lever the computer moved. An older desktop never offers; a newer phone then asks
+only when its pilot taps. Because a newer phone no longer sends Release when hidden, an older desktop
+pauses on the silence instead, within the stale limit.
 
 ## Errors and operating limits
 

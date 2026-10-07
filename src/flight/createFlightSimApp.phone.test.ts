@@ -11,7 +11,7 @@ const mocks = vi.hoisted(() => {
   const engineVisualValues = new Map<string, number>();
   const phone = {
     subscribe: vi.fn(() => vi.fn()), getSnapshot: () => snapshot,
-    beforeStep: vi.fn(), takeControl: vi.fn(), noteLocalInput: vi.fn(), cancelHandoff: vi.fn(), reset: vi.fn(), isStarterHeld: vi.fn(() => false),
+    beforeStep: vi.fn(), takeControl: vi.fn(), noteLocalInput: vi.fn(), isBlending: vi.fn(() => false), cancelHandoff: vi.fn(), reset: vi.fn(), isStarterHeld: vi.fn(() => false),
     takeCameraAim: vi.fn(() => null as { yaw: number; pitch: number; zoom?: number } | null),
     isCameraActive: vi.fn(() => false),
     hasPendingCameraAim: vi.fn(() => false),
@@ -130,8 +130,9 @@ beforeEach(() => {
     mocks.snapshot.owner = "local";
     options.onOwnershipChange("local", controls);
   });
-  // Flight input here takes control, as the default Automatically does.
-  mocks.phone.noteLocalInput.mockImplementation(() => mocks.phone.takeControl());
+  // Flight input here takes control, as the default Automatically does, unless the two blend.
+  mocks.phone.isBlending.mockImplementation(() => false);
+  mocks.phone.noteLocalInput.mockImplementation(() => { if (!mocks.phone.isBlending()) mocks.phone.takeControl(); });
   mocks.phone.reset.mockImplementation(() => mocks.phone.takeControl());
 });
 
@@ -241,6 +242,34 @@ describe("0SFS phone integration", () => {
     expect(options.getStatus().controls.throttle).toBe(0.83);
     expect(options.getStatus().controls.pitchTrim).toBe(-0.2);
     expect(options.getStatus().controls.flaps).toBe(1 / 3);
+  });
+
+  it("blends this computer's keys with a blending phone's frame at the SDK boundary, and its levers follow", async () => {
+    await mount();
+    getAppSettings().set("osfs.assist.autoFlaps", false);
+    const last = (property: string) => mocks.sdk.setPropertyValue.mock.calls.filter(([name]) => name === property).at(-1)?.[1];
+    // A key held here before the phone joins keeps counting after it does.
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyD" }));
+    mocks.snapshot.owner = "phone";
+    mocks.phone.isBlending.mockImplementation(() => true);
+    options.onOwnershipChange("phone", { ...mocks.phoneControls, elevator: 0, aileron: 0, rudder: 0, brake: 0 }, true);
+    mocks.phone.takeControl.mockClear();
+    tick(0.1);
+    // The phone's 0.6 has priority; the keys' 0.8 gets the 0.4 it leaves free.
+    expect(last("fcs/aileron-cmd-norm")).toBeCloseTo(0.6 + 0.4 * 0.8);
+    window.dispatchEvent(new KeyboardEvent("keyup", { code: "KeyD" }));
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyW" }));
+    expect(mocks.phone.takeControl).not.toHaveBeenCalled();
+    tick(0.1);
+    // Against the phone's -0.4 nose-down: -0.4 + 0.6 × 0.8.
+    expect(last("fcs/elevator-cmd-norm")).toBeCloseTo(0.08);
+    window.dispatchEvent(new KeyboardEvent("keyup", { code: "KeyW" }));
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "ShiftLeft" }));
+    tick(0.1);
+    // A lever goes where it was last moved: the keys moved the throttle, the phone did not.
+    expect(last("fcs/throttle-cmd-norm")).toBeCloseTo(0.83 + 0.5 * 0.1);
+    expect(options.getStatus().controls.throttle).toBeCloseTo(0.88);
+    window.dispatchEvent(new KeyboardEvent("keyup", { code: "ShiftLeft" }));
   });
 
   it("aborts the current physics step when the freshness guard revokes ownership", async () => {

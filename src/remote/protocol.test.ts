@@ -25,6 +25,7 @@ const accepted: RemoteMessage[] = [
   { ...envelope, type: "granted", requestId: 7, status: { ...status, owner: "phone", paused: true }, resume: true },
   { ...envelope, type: "status", status: { ...status, handBack: "now" }, message: "Desktop hidden · Simulation paused" },
   { ...envelope, type: "heartbeat", lease: 13, status: { ...status, handBack: "idle" } },
+  { ...envelope, type: "heartbeat", lease: 14, status: { ...status, owner: "phone", blend: "computer" } },
   { ...envelope, type: "action", id: 1, lease: 2, action: "requestControl" },
   { ...envelope, type: "action", id: 2, lease: 3, action: "releaseControl" },
   { ...envelope, type: "action", id: 3, lease: 3, action: "setPaused", value: true },
@@ -223,6 +224,10 @@ describe("phone protocol parsing", () => {
     for (const handBack of ["later", true, 1, null, ""]) {
       const parsed = parseMessage({ ...envelope, type: "status", message: "Desktop controls", status: { ...status, handBack } });
       expect(parsed, JSON.stringify(handBack)).toEqual({ ...envelope, type: "status", message: "Desktop controls", status });
+    }
+    for (const blend of ["desktop", true, 0, null]) {
+      const parsed = parseMessage({ ...envelope, type: "status", message: "Phone controls", status: { ...status, blend } });
+      expect(parsed, JSON.stringify(blend)).toEqual({ ...envelope, type: "status", message: "Phone controls", status });
     }
     const granted = { ...envelope, type: "granted", requestId: 6, status: { ...status, owner: "phone" } } as const;
     for (const resume of [false, 1, "true", null]) expect(parseMessage({ ...granted, resume })).toEqual(granted);

@@ -153,6 +153,7 @@ import {
   type PhoneCameraTuning,
 } from "./remote/phoneCameraTuning";
 import { CONTROL_SHARING_PARAMETER_IDS, readControlSharing, type ControlSharing } from "./remote/controlSharing";
+import { createControlBlend, type ControlBlend } from "./remote/controlBlend";
 import type { MountPhonePairing } from "./hud/RemoteControlTab";
 import { createFlightInputManager } from "./input/flightInputManager";
 import {
@@ -521,6 +522,8 @@ export async function createFlightSimApp(
 
   let phoneSession: PhoneControlSession | null = null;
   let phonePairing: Promise<MountPhonePairing> | null = null;
+  /** A phone flying together with this computer (Remote Control → Sharing the controls: Blend both). */
+  let controlBlend: ControlBlend | null = null;
   const pausedAtStart = startupPause.isPaused();
   startupPause.dispose();
   const inputManager = createFlightInputManager({
@@ -1785,7 +1788,9 @@ export async function createFlightSimApp(
         return {
           owner: phoneSession?.getSnapshot().owner ?? "local",
           paused: inputManager.isPaused(), viewMode: aircraft?.getViewMode() ?? "third",
-          controls: phoneSession?.getSnapshot().owner === "phone" ? { ...appliedControls } : inputManager.getControls(),
+          // Blending, the levers are where the pilots put them, before automation: what both sets of levers show.
+          controls: phoneSession?.getSnapshot().owner === "phone"
+            ? { ...appliedControls, ...controlBlend?.levers() } : inputManager.getControls(),
           airspeedKts: state.airspeedKts, altitudeFt: state.altMeters / 0.3048,
           headingDeg: (state.headingRad * 180 / Math.PI + 360) % 360,
           // Presence of this field is what tells the phone it may offer a G button.
@@ -1798,9 +1803,13 @@ export async function createFlightSimApp(
       hasActiveLocalInput: () => inputManager.hasActiveFlightInput() || localStartHeld || flightHud.isPilotHolding(),
       isPageVisible: () => !document.hidden,
       getSharing: () => controlSharing,
-      onOwnershipChange: (owner, controls) => {
-        inputManager.adoptControls(controls);
-        inputManager.setRemoteOwned(owner === "phone");
+      onOwnershipChange: (owner, controls, blend) => {
+        // Blending, this computer's controls stay live and mix with the phone's,
+        // so a phone joining or leaving changes only where the levers are.
+        if (blend) inputManager.adoptLevers(controls);
+        else inputManager.adoptControls(controls);
+        inputManager.setRemoteOwned(owner === "phone" && !blend);
+        controlBlend = owner === "phone" && blend ? createControlBlend(controls, inputManager.getFlapsInputRevision()) : null;
         lastLocalFlapsRevision = inputManager.getFlapsInputRevision();
         lastRemoteFlaps = owner === "phone" ? controls.flaps : null;
         appliedControls = { ...controls };
@@ -2116,8 +2125,12 @@ export async function createFlightSimApp(
       frameProfiler.add("flight/physics/collision", collisionStarted);
       // Terrain/collision work can consume the remaining input lease. Check
       // authority immediately before allowing this step to advance physics.
-      const selected = phoneSession?.beforeStep(controls) ?? controls;
-      if (selected === false || inputManager.isPaused()) return false;
+      const fromPhone = phoneSession?.beforeStep(controls) ?? controls;
+      if (fromPhone === false || inputManager.isPaused()) return false;
+      const selected = controlBlend && phoneSession?.isBlending()
+        ? controlBlend.step(fromPhone, controls, inputManager.getFlapsInputRevision(), controlSharing.priority) : fromPhone;
+      // This computer's levers continue from where the two pilots left them.
+      if (controlBlend && phoneSession?.isBlending()) inputManager.adoptLevers(selected);
       if (collisionReset) { resetWheelSpin("reset"); return "reset"; }
       if (phoneSession?.getSnapshot().owner === "phone") noticeRemoteFlaps(selected.flaps);
       else noticeLocalFlaps();
@@ -2129,7 +2142,7 @@ export async function createFlightSimApp(
       const commanded = { ...ap.controls };
       // An engine that is off holds the throttle at idle until the lever is held to start it.
       const engine = engineControl.step(phoneSession?.getSnapshot().owner === "phone"
-        ? phoneSession.isStarterHeld() : localStartHeld);
+        ? phoneSession.isStarterHeld() || (localStartHeld && phoneSession.isBlending()) : localStartHeld);
       if (engine.state === "stopped") {
         commanded.throttle = 0;
         inputManager.replaceThrottle(0);

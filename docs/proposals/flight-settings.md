@@ -398,13 +398,15 @@ These are engineering gains; they appear only under **Show all parameters**.
 
 | Parameter | Unit | Default |
 | --- | --- | --- |
+| `osfs.remote.sharing` | choice | One device at a time (`exclusive`); also `blend` |
+| `osfs.remote.blendPriority` | choice | Phone (`phone`); also `computer` |
 | `osfs.remote.handover` | choice | Automatically (`auto`); also `stay`, `phone`, `computer` |
 | `osfs.remote.returnIdle` | s | 1 |
 
-How control passes between a paired phone and this computer. Before these
-existed, every hand-back needed the phone's pilot to tap Take control, which is
-now **Only when taken**. Spec: [Phone controller](phone-controller.md) →
-*Sharing the controls*.
+How control passes between a paired phone and this computer, or how the two
+blend. Before these existed, one device flew at a time and every hand-back
+needed the phone's pilot to tap Take control, which is now **Only when taken**.
+Spec: [Phone controller](phone-controller.md) → *Sharing the controls*.
 
 ### Aircraft → Ground handling
 

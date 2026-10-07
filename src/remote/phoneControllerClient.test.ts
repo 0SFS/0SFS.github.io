@@ -493,6 +493,38 @@ describe('phone controller', () => {
     expect(h.phoneLink.reliable.filter(message => message.type === 'action' && message.action === 'requestControl')).toHaveLength(2)
   })
 
+  it('blending: the levers follow where the computer has them, but never drag back a move it has not applied', async () => {
+    const h = await setup({}, { getSharing: () => ({ mode: 'blend', handover: 'auto', returnIdleMs: 1000, priority: 'phone' }) })
+    await advance(50)
+    await h.fly()
+    // The computer's pilot moves the throttle; the blend applies it.
+    h.state.controls = { ...h.state.controls, throttle: .9 }
+    h.host.beforeStep(h.state.controls)
+    await advance(100)
+    expect(h.client.getSnapshot().controls.throttle).toBe(.9)
+    // This phone moves it before the computer has applied that frame: a status
+    // from before the move leaves the lever under the finger alone.
+    h.client.updateControls({ throttle: .2 })
+    await advance(100)
+    expect(h.client.getSnapshot().controls.throttle).toBe(.2)
+    // Applied, the levers agree again.
+    h.state.controls = { ...h.state.controls, throttle: .2 }
+    h.host.beforeStep(h.state.controls)
+    await advance(100)
+    expect(h.client.getSnapshot().controls.throttle).toBe(.2)
+    expect(h.phoneLink.last('controls').controls.throttle).toBe(.2)
+  })
+
+  it('one device at a time, the levers stay where this phone put them', async () => {
+    const h = await setup()
+    await advance(50)
+    await h.fly()
+    h.state.controls = { ...h.state.controls, throttle: .9 }
+    h.host.beforeStep(h.state.controls)
+    await advance(100)
+    expect(h.client.getSnapshot().controls.throttle).toBe(.67)
+  })
+
   it('asks again no faster than its interval while the computer keeps refusing', async () => {
     const h = await setup({}, { getSharing: () => ({ handover: 'computer', returnIdleMs: 1000 }) })
     await advance(50)

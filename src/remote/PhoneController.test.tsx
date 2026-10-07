@@ -191,6 +191,16 @@ describe('phone controller screen', () => {
     expect(link.querySelector('[role="status"]')?.textContent).toBe('Connection delayed · Waiting for the computer')
   })
 
+  it('names who flies on the link chip: this phone, the computer, or both blended', () => {
+    const chip = () => container.querySelector('.phone-link')!.firstChild?.nextSibling?.textContent
+    mount()
+    expect(chip()).toBe('PHONE')
+    remount({ status: { owner: 'phone', blend: 'computer' } })
+    expect(chip()).toBe('BLEND')
+    remount({ status: { owner: 'local' }, snapshot: { canFly: true, canControl: false } })
+    expect(chip()).toBe('DESKTOP')
+  })
+
   it('lays the grid out instruments first, then the buttons, with the brake last', () => {
     mount()
     const describe = (child: Element) => child.querySelector('.flight-hud__label')?.textContent

@@ -133,6 +133,13 @@ export interface FlightInputManager {
   replacePitchTrim(value: number): void;
   /** Tracks automatic actuator feedback without counting it as pilot input. */
   replaceFlaps(value: number): void;
+  /**
+   * Another pilot set these levers — a phone blending with this computer.
+   * Take them without counting them as input here. A hardware lever resting
+   * somewhere else waits for fresh movement before it applies again, as a
+   * flap lever does under automatic flaps.
+   */
+  adoptLevers(levers: Pick<ControlSurfaceState, "throttle" | "pitchTrim" | "rollTrim" | "flaps">): void;
   replaceRollTrim(value: number): void;
   setFlaps(value: number): void;
   setRudder(value: number): void;
@@ -224,6 +231,29 @@ export function createFlightInputManager(options: {
     aileronAxis = createKeyboardAxisState(aileron);
     elevatorAxis = createKeyboardAxisState(elevator);
     rudderAxis = createKeyboardAxisState(rudder);
+  };
+
+  /**
+   * A stationary absolute lever bound to `actionId` waits for movement past
+   * the takeover deadband before it applies again; on the legacy path, so
+   * does gamepad axis `legacyAxis`.
+   */
+  const rearmAbsoluteLever = (actionId: string, legacyAxis?: number): void => {
+    let rebaseline = false;
+    for (const [id, entry] of bindingIntentValues) if (entry.actionId === actionId) {
+      bindingBaselines.set(id, entry.value);
+      armedBindingSources.delete(id);
+      bindingIntentValues.delete(id);
+      rebaseline = true;
+    }
+    if (rebaseline) refreshGamepadBindingControls();
+    if (legacyAxis === undefined || !enabledAxes.delete(legacyAxis) || !gamepadBaseline) return;
+    const pad = readGamepad(selectedGamepadSlot);
+    if (!pad || !sameGamepad(pad, gamepadBaseline)) return;
+    gamepadBaseline = {
+      ...gamepadBaseline,
+      axes: gamepadBaseline.axes.map((value, index) => index === legacyAxis ? pad.axes[index] ?? value : value),
+    };
   };
 
   const captureGamepadBaseline = (pad = readGamepad(selectedGamepadSlot)): void => {
@@ -860,14 +890,26 @@ export function createFlightInputManager(options: {
       smoothed.flaps = Math.min(1, Math.max(0, value));
       // Auto owns flap position. A stationary absolute hardware lever must
       // wait for fresh movement, using the existing takeover deadband.
-      let rebaseline = false;
-      for (const [id, entry] of bindingIntentValues) if (entry.actionId === "flight.flaps") {
-        bindingBaselines.set(id, entry.value);
-        armedBindingSources.delete(id);
-        bindingIntentValues.delete(id);
-        rebaseline = true;
+      rearmAbsoluteLever("flight.flaps");
+    },
+    adoptLevers(levers): void {
+      if (levers.throttle !== throttleTarget || levers.throttle !== smoothed.throttle) {
+        throttleTarget = Math.min(1, Math.max(0, levers.throttle));
+        smoothed.throttle = throttleTarget;
+        rearmAbsoluteLever("flight.throttle", 3);
       }
-      if (rebaseline) refreshGamepadBindingControls();
+      if (levers.pitchTrim !== smoothed.pitchTrim) {
+        smoothed.pitchTrim = Math.min(1, Math.max(-1, levers.pitchTrim));
+        rearmAbsoluteLever("flight.pitchTrim");
+      }
+      if (levers.rollTrim !== smoothed.rollTrim) {
+        smoothed.rollTrim = Math.min(1, Math.max(-1, levers.rollTrim));
+        rearmAbsoluteLever("flight.rollTrim");
+      }
+      if (levers.flaps !== smoothed.flaps) {
+        smoothed.flaps = Math.min(1, Math.max(0, levers.flaps));
+        rearmAbsoluteLever("flight.flaps");
+      }
     },
     setRudder(value: number): void {
       const clamped = Math.min(1, Math.max(-1, value));

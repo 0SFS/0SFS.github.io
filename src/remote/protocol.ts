@@ -95,6 +95,14 @@ export interface AircraftStatus {
    * `gearDown`: an older phone ignores it and shows Take control as before.
    */
   handBack?: HandBack;
+  /**
+   * This phone flies together with the computer, whose own controls stay live,
+   * and whose input wins where both move a control. The phone's levers then
+   * follow `controls`, where the levers are, once the computer has applied the
+   * phone's own latest move (`appliedSeq`). Additive on v1: an older phone
+   * keeps its levers where it put them.
+   */
+  blend?: "phone" | "computer";
 }
 export type HandBack = "now" | "idle";
 /**
@@ -304,6 +312,7 @@ function status(value: unknown): value is AircraftStatus {
   // An offer, never authority: a malformed one is dropped on its own, and the
   // phone then simply waits to be asked, as it would from an older computer.
   if (valid && value.handBack !== undefined && value.handBack !== "now" && value.handBack !== "idle") delete value.handBack;
+  if (valid && value.blend !== undefined && value.blend !== "phone" && value.blend !== "computer") delete value.blend;
   return valid;
 }
 
