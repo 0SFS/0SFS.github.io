@@ -315,7 +315,7 @@
         <property value="0">fcs/stovl-augmentation-inhibit</property>
         <property value="0">fcs/control-law-mode</property>
         <property value="1">fcs/fbw-enabled</property>
-        <property value="1">fcs/roll-stick-gain</property>
+        <property value="636.6197723675814">fcs/full-stick-roll-rate-deg_sec</property>
         <property value="1">fcs/flaps-auto-enabled</property>
         <property>fcs/alpha-norm</property>
         <property>fcs/canopy-engage</property>
@@ -423,15 +423,19 @@
 
   <channel name="Roll">
 
-            <!-- 0SFS roll stick gain, 2026-10-06. The pilot's stick enters
-                 the aileron channel through this host-written gain under
-                 either law; 1 is the source gradient. The host writes 1 while
-                 its autopilot owns roll. The hover roll posts read
-                 fcs/aileron-cmd-norm unscaled. -->
-            <pure_gain name="fcs/roll-stick-cmd-norm">
-                <input>fcs/aileron-cmd-norm</input>
-                <gain>fcs/roll-stick-gain</gain>
-            </pure_gain>
+            <!-- 0SFS roll-rate command, 2026-10-07. Under fly-by-wire the
+                 stick commands a roll rate: full stick asks for the
+                 host-written fcs/full-stick-roll-rate-deg_sec. Its default,
+                 636.62, is the source gradient of 1/0.09 rad/s, which the
+                 host writes while its autopilot owns roll. Manual and the
+                 hover roll posts read fcs/aileron-cmd-norm unscaled. -->
+            <fcs_function name="fcs/roll-stick-cmd-norm">
+              <function><product>
+                <property>fcs/aileron-cmd-norm</property>
+                <toradians><property>fcs/full-stick-roll-rate-deg_sec</property></toradians>
+                <value>0.09</value>
+              </product></function>
+            </fcs_function>
 
             <!-- Calculate the normalized roll-rate -->
             <pure_gain name="roll rate norm">
@@ -458,23 +462,49 @@
  <gain>3.00</gain>
  </pure_gain>
 
-            <!--
-              - Make sure the integrator is only active when the aircraft
-              - has gained some speed. This will prevent bad behaviour when the
-              - aircraft has been parked for a while.
-              -->
+            <!-- 0SFS roll integrator, 2026-10-07. The source trigger held
+                 this integrator above 5 kt and ran it only when parked, so
+                 the loop was proportional and settled at 43-62% of its
+                 commanded rate. Feedforward below now supplies the aileron
+                 for the commanded rate, and this integrator holds bank. It
+                 runs with the stick centred and the roll rate below
+                 10 deg/s; it holds while the stick is deflected, while a
+                 roll is stopping and while the command is saturated in the
+                 error's direction; it resets in Manual, on the ground and
+                 with any conversion. -->
+            <fcs_function name="fcs/roll-stick-abs">
+              <function><abs><property>fcs/aileron-cmd-norm</property></abs></function>
+            </fcs_function>
+            <fcs_function name="fcs/roll-rate-abs-deg_sec">
+              <function><abs><todegrees><property>velocities/p-aero-rad_sec</property></todegrees></abs></function>
+            </fcs_function>
             <switch name="aileron trigger">
-                <default value="1"/>
-                <test value="-1">fcs/fbw-enabled eq 0</test>
-                <test value="0">
-                    velocities/vc-kts lt 5.0
+                <default value="0"/>
+                <test logic="OR" value="-1">
+                    fcs/fbw-enabled eq 0
+                    fcs/stovl-pos-norm gt 0
+                    gear/unit[0]/WOW eq 1
+                    gear/unit[1]/WOW eq 1
+                    gear/unit[2]/WOW eq 1
+                </test>
+                <test logic="OR" value="1">
+                    fcs/roll-stick-abs gt 0.02
+                    fcs/roll-rate-abs-deg_sec gt 10
+                    <test logic="AND">
+                        fcs/roll-command ge 1
+                        fcs/roll-trim-error gt 0
+                    </test>
+                    <test logic="AND">
+                        fcs/roll-command le -1
+                        fcs/roll-trim-error lt 0
+                    </test>
                 </test>
             </switch>
 
  <integrator name="roll i">
  <input>fcs/roll-trim-error</input>
  <trigger>fcs/aileron-trigger</trigger>
- <c1>0.0005</c1>
+ <c1>10</c1>
  </integrator>
 
  <lead_lag_filter name="roll d">
@@ -485,7 +515,28 @@
  <c4>1</c4>
  </lead_lag_filter>
 
+            <!-- 0SFS roll feedforward, 2026-10-07: the aileron that holds the
+                 commanded rate, p = a vt / 165 ft. Under Manual at
+                 10,000 ft the clean aircraft gives 150-175 ft between 200
+                 and 450 kt; 165 tracks closest in closed loop. Conversion
+                 fades it out. -->
+            <fcs_function name="fcs/roll-feedforward">
+              <function><product>
+                <quotient>
+                  <sum><property>fcs/roll-stick-cmd-norm</property><property>fcs/roll-trim-cmd-norm</property></sum>
+                  <value>0.09</value>
+                </quotient>
+                <quotient>
+                  <value>165</value>
+                  <max><property>velocities/vt-fps</property><value>200</value></max>
+                </quotient>
+                <difference><value>1</value><property>fcs/stovl-pos-norm</property></difference>
+              </product></function>
+              <clipto><min>-1</min><max>1</max></clipto>
+            </fcs_function>
+
  <summer name="roll command">
+ <input>fcs/roll-feedforward</input>
  <input>fcs/roll-p</input>
  <input>fcs/roll-i</input>
  <input>fcs/roll-d</input>
@@ -496,7 +547,7 @@
  </summer>
  
             <summer name="roll manual command">
-              <input>fcs/roll-stick-cmd-norm</input><input>fcs/roll-trim-cmd-norm</input>
+              <input>fcs/aileron-cmd-norm</input><input>fcs/roll-trim-cmd-norm</input>
               <clipto><min>-1</min><max>1</max></clipto>
             </summer>
             <switch name="roll actuator command">

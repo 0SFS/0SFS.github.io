@@ -38,8 +38,8 @@
       "sourceArchivePath": "F-35B/F-35B-jsbsim.xml",
       "sourceBytes": 37491,
       "sourceSha256": "0f1cbe9f4d0232c3cbd36a64f1cfe046af947834a68e6053ddaa3eb7aa389e7d",
-      "bytes": 53731,
-      "sha256": "7a8573a6d755681ee89065bf63b56462298dab840799246b565f864b3c5946c1",
+      "bytes": 56526,
+      "sha256": "b4ef55a9763defa52a04e431057c9f477faa3f0da1ec794dbc728e933ec5c920",
       "modified": true,
       "changes": [
         "Explicit FlightGear external defaults and model-specific control defaults.",
@@ -54,7 +54,7 @@
         "Lift allocation uses current main upward native body force and current CG arms; auxiliaries are immediate zero-fuel force carriers, removing duplicate conversion gating and independent turbine lag.",
         "Two 6550 lb internal tanks total the published 13100 lb internal capacity; retained external capacity is 2991 lb per detachable store.",
         "External stores initially attach empty; native attachment gates fuel, feed priority, provisional 300 lb tank/pylon dry mass and 1 square foot equivalent drag area per store, applied natively in the wind frame at each store location for asymmetric force/moment response. Fuel and dry mass align to visible assemblies at structural x368.52, y+/-127.952756, z-15.36 inches.",
-        "Pilot roll stick enters the FBW roll error and Manual roll command through native fcs/roll-stick-gain (default 1, the source gradient); the host writes 1 while its autopilot owns roll, and hover roll posts read the unscaled stick."
+        "FBW roll is a tracked roll-rate command: full stick asks for native fcs/full-stick-roll-rate-deg_sec (default 636.62, the source gradient), with feedforward p = a vt / 165 ft faded out by conversion. The source integrator trigger was inverted (held above 5 kt); the integrator now only holds bank, running with the stick centred and roll rate under 10 deg/s and resetting in Manual, on the ground and with any conversion. P and D gains unchanged; Manual and hover roll posts read the unscaled stick."
       ]
     },
     {

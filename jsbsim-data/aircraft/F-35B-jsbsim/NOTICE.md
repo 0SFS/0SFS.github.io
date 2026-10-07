@@ -105,11 +105,19 @@ records original paths, original hashes, current hashes, and changes.
   defaults to 1 in every control-law mode. Enabled retains the source automatic
   speed/Mach schedule; disabled uses the bounded pilot flap command. Manual
   flight controls can therefore retain automatic trailing-edge flaps.
-- 2026-10-06: route the pilot's `fcs/aileron-cmd-norm` through native
-  `fcs/roll-stick-gain` (default 1, the source gradient) into both the FBW roll
-  error and the Manual roll command. The host sets it from the pilot's
-  Roll stick gain while the pilot owns roll, and 1 otherwise. The hover roll
-  posts read the unscaled stick. Loop gains are unchanged.
+- 2026-10-07: make the FBW roll channel a roll-rate command that flies its
+  command. Full stick asks for native `fcs/full-stick-roll-rate-deg_sec`
+  (default 636.62, the source's 1/0.09 rad/s); the host writes the pilot's
+  setting while the pilot owns roll and the default otherwise. The source
+  integrator trigger was inverted, holding above 5 kt and running only when
+  parked, so the loop was proportional and settled at 43-62% of its command.
+  Feedforward now supplies the aileron for the commanded rate, p = a vt / 165 ft,
+  faded out by conversion. The integrator (gain 10) only holds bank: it runs
+  with the stick centred and roll rate under 10 deg/s, holds while the stick is
+  deflected, a roll is stopping or the command is saturated, and resets in
+  Manual, on the ground and with any conversion. Proportional and derivative
+  gains are unchanged. Manual and the hover roll posts read the unscaled
+  stick. Pitch and yaw keep the same inverted trigger.
 
 ## Qualification boundary
 
