@@ -346,7 +346,9 @@ it("keeps autopilot configuration on the Autopilot tab, and only presets and the
     expect(root.querySelector('[data-preset="osfs-low-and-slow"]')).not.toBeNull();
     expect(root.querySelector('[data-preset="sharpest"]')).not.toBeNull();
     await openTab(root, "Interface");
-    expect(sectionTitles()).toEqual([getAppSettings().getSectionTitle("interface", "log"), getAppSettings().getSectionTitle("interface", "search")]);
+    expect(sectionTitles()).toEqual(["position", "log", "search"].map(section => getAppSettings().getSectionTitle("interface", section)));
+    // The HUD bar's altitude replaces the feet tape, so it starts in feet.
+    expect(getAppSettings().get("interface.position.altitudeUnit")).toBe("ft");
     expect(root.querySelector('[data-parameter="interface.log.maxLines"]')).not.toBeNull();
     await openTab(root, "Debug");
     expect(root.textContent).not.toContain("Saved settings");

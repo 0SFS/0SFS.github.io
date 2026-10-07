@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { BabylonRuntimeStatus } from "foss-earth/runtime";
 import { getAppSettings, resetAppSettings } from "foss-earth/settings";
 import { createMapDetailController } from "foss-earth/shell";
+import { registerFlightSettings } from "../settings/registerFlightSettings";
 import { createFlightHudBar, type FlightHudBarOptions } from "./createFlightHudBar";
 
 beforeEach(() => {
@@ -223,5 +224,38 @@ describe("flight input method selector", () => {
     expect(mapChip.classList.contains("is-streaming")).toBe(false);
     expect(unsubscribe).toHaveBeenCalledOnce();
     expect(container.children).toHaveLength(0);
+  });
+});
+
+describe("flight HUD position readout", () => {
+  const STATUS = { mode: "raster-basemap", terrainSource: { id: "mapterhorn", label: "Mapterhorn Terrain" } } as BabylonRuntimeStatus;
+  // 1000 ft above sea level, over ground 100 m up.
+  const STATE = { latDeg: 44.9778, lonDeg: -93.265, altMeters: 304.8, headingRad: 0 } as never;
+
+  it("marks latitude and longitude with their icons and gives the altitude in feet", () => {
+    registerFlightSettings(getAppSettings());
+    const { container, hud } = createTestHud();
+    const status = container.querySelector<HTMLButtonElement>("#flightShellStatus")!;
+
+    hud.update(STATE, STATUS, 60, false, 100);
+
+    expect(status.textContent).toBe("44.9778°N 93.2650°W 1000ft ASL h000°");
+    expect(status.querySelectorAll("svg.hud-position__icon")).toHaveLength(2);
+    hud.destroy();
+  });
+
+  it("measures the altitude from the ground under the aircraft when Interface says so", () => {
+    registerFlightSettings(getAppSettings());
+    const { container, hud } = createTestHud();
+    const status = container.querySelector<HTMLButtonElement>("#flightShellStatus")!;
+    hud.update(STATE, STATUS, 60, false, 100);
+
+    getAppSettings().set("interface.position.altitude", "agl");
+    expect(status.textContent).toBe("44.9778°N 93.2650°W 672ft AGL h000°");
+
+    // No terrain has loaded under the aircraft.
+    hud.update(STATE, STATUS, 60, false, null);
+    expect(status.textContent).toBe("44.9778°N 93.2650°W —ft AGL h000°");
+    hud.destroy();
   });
 });

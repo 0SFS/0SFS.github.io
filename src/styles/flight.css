@@ -81,7 +81,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 5px;
-  /* Wide enough that the speed/alt/heading/VS/AoA chips, gear, and AP hold
+  /* Wide enough that the speed/heading/VS/AoA chips, gear, and AP hold
      one row; below that the row wraps, and `bottom` anchoring grows it upward. */
   max-width: min(520px, calc(100vw - 48px));
 }

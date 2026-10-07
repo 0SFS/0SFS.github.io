@@ -36,6 +36,8 @@ export function registerFlightSettings(registry: SettingsRegistry): FlightParame
     // The ground under the aircraft is its collision surface, and the cockpit
     // view does not look at it: load it in every direction, as well as the view.
     registry.setHostDefault("map.focus.mode", "both", "0sfs: the ground around the aircraft, as well as the view");
+    // The toolbar's altitude stands in for the HUD's feet tape, beside knots and feet per minute.
+    registry.setHostDefault("interface.position.altitudeUnit", "ft", "0sfs: the unit of the altitude tape it replaces");
     registry.registerPresets(FLIGHT_PRESETS);
     registry.migrateLegacy([...OSFS_LEGACY_MIGRATIONS, groundProfilesMigration(registry)]);
   }

@@ -147,10 +147,6 @@ function controlsToStickDisplay(aileron: number, elevator: number): { x: number;
   );
 }
 
-function formatAltitudeFt(altMeters: number): string {
-  return Math.round(altMeters / 0.3048).toString().padStart(5, " ");
-}
-
 export function createFlightHud(root: HTMLElement, options: FlightHudOptions): FlightHudHandle {
   root.innerHTML = `
     <div class="flight-hud" aria-label="Flight instruments">
@@ -192,13 +188,6 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
             <span class="flight-hud__unit">kt</span>
           </div>
           <span class="flight-hud__value" data-metric="ias">000</span>
-        </div>
-        <div class="flight-hud__tape">
-          <div class="flight-hud__tape-header">
-            <span class="flight-hud__label">ALT</span>
-            <span class="flight-hud__unit">ft</span>
-          </div>
-          <span class="flight-hud__value" data-metric="alt">00000</span>
         </div>
         <div class="flight-hud__tape">
           <div class="flight-hud__tape-header">
@@ -246,7 +235,6 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   // The pad takes the pointer and the keys; the renderer draws into a canvas inside it.
   const pad = root.querySelector<HTMLElement>(".flight-hud__attitude");
   const iasEl = root.querySelector<HTMLElement>('[data-metric="ias"]');
-  const altEl = root.querySelector<HTMLElement>('[data-metric="alt"]');
   const hdgEl = root.querySelector<HTMLElement>('[data-metric="hdg"]');
   const vsEl = root.querySelector<HTMLElement>('[data-metric="vs"]');
   const throttleControl = root.querySelector<HTMLElement>(".flight-hud__slider-control--throttle");
@@ -267,7 +255,7 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
   const apButton = root.querySelector<HTMLButtonElement>('[data-control="autopilot"]');
 
   if (!pad || !gearButton || !apButton || !pitchAutoTrimButton || !rollAutoTrimButton
-    || !iasEl || !altEl || !hdgEl || !vsEl
+    || !iasEl || !hdgEl || !vsEl
     || !throttleControl || !pitchTrimInput || !rollTrimInput || !flapsInput || !rudderInput
     || !pitchTrimOutput || !rollTrimOutput || !flapsOutput || !rudderOutput) {
     throw new Error("Flight HUD markup failed to initialize.");
@@ -616,7 +604,6 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
       attitude.draw(state, { x: displayX, y: displayY, active: displayActive }, attitudeView);
 
       iasEl.textContent = Math.round(state.airspeedKts).toString().padStart(3, "0");
-      altEl.textContent = formatAltitudeFt(state.altMeters);
       hdgEl.textContent = Math.round(headingDegFromRad(state.headingRad)).toString().padStart(3, "0");
 
       // Sign then magnitude, each fixed width: signing the padded number gave

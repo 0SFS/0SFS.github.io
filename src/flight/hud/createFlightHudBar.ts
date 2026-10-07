@@ -2,8 +2,9 @@ import type { HudInputMode, InputSensitivitySettings } from "foss-earth/input";
 import "foss-earth/shell.css";
 import "foss-earth/input-mode.css";
 
-import { attachFullscreenButton, attachRendererActivity, createInputModeHud, createHudBar, createMapSourceHud, getRendererLabel, type HudBarHandle, type MapDetailController, type RenderActivitySource, type TileStreamingSource, type MapDownloadSource } from "foss-earth/shell";
+import { attachFullscreenButton, attachRendererActivity, createInputModeHud, createHudBar, createMapSourceHud, createPositionReadout, getRendererLabel, type HudBarHandle, type MapDetailController, type RenderActivitySource, type TileStreamingSource, type MapDownloadSource } from "foss-earth/shell";
 import type { BabylonRuntimeStatus, RendererMode } from "foss-earth/runtime";
+import { getAppSettings } from "foss-earth/settings";
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
 import { LOADING_LIVE_ATTRIBUTE } from "../../loading/createFlightLoadingScreen";
 
@@ -32,7 +33,11 @@ export interface FlightHudBarOptions {
 }
 
 export interface FlightHudBarHandle {
-  update(state: FlightState, status: BabylonRuntimeStatus, fps: number | null, paused: boolean): void;
+  /**
+   * `groundHeightMeters` is the terrain's height under the aircraft, or null
+   * while none has loaded there: what the altitude above ground is measured from.
+   */
+  update(state: FlightState, status: BabylonRuntimeStatus, fps: number | null, paused: boolean, groundHeightMeters?: number | null): void;
   /** Draws the Input method section into the Controls tab. Returns an unmount. */
   mountInputMethod(container: HTMLElement): () => void;
   destroy(): void;
@@ -48,7 +53,7 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
       { kind: "button", id: "flightSettingsButton", title: "Open flight settings", ariaLabel: "Open flight settings", className: "settings-button", text: "⚙" },
       { kind: "button", id: "flightFullscreenButton", title: "Enter fullscreen", ariaLabel: "Enter fullscreen", className: "flight-fullscreen-button", text: "⛶" },
       { kind: "button", id: "flightLogButton", title: "Show the game log history", ariaLabel: "Show the game log history", className: "flight-log-button", text: "☰" },
-      { kind: "button", id: "flightShellStatus", appearance: "chip", className: "hud-chip-button hud-status-text", ariaLive: "polite", ariaLabel: "Aircraft position", title: "Latitude, longitude and heading. Click to show or hide the Location tab." },
+      { kind: "button", id: "flightShellStatus", appearance: "chip", className: "hud-chip-button hud-status-text", ariaLive: "polite", ariaLabel: "Aircraft position", title: "Latitude, longitude, altitude and heading. Click to show or hide the Location tab." },
       { kind: "slot", id: "flightMapSourceSlot", className: "map-source-hud-slot" },
     ],
   });
@@ -74,6 +79,8 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
     detail: { controller: options.mapDetail, name: "World detail" },
   });
   const detachRendererActivity = attachRendererActivity(rendererButton, options.renderActivity);
+  // FOSS Earth's readout: Interface → Position readout says how it is written.
+  const position = createPositionReadout(statusElement, getAppSettings());
   // The device decides what the section offers: Touch on a touchscreen, and the
   // mouse or trackpad choice where there is a pointer; a touch laptop gets both.
   const inputHud = createInputModeHud(container, pauseButton, {
@@ -123,12 +130,12 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
 
   return {
     mountInputMethod: (host) => inputHud.mountInline(host),
-    update(state, runtimeStatus, fps, nextPaused): void {
+    update(state, runtimeStatus, fps, nextPaused, groundHeightMeters = null): void {
       updatePauseState(nextPaused);
       mapSource.update(runtimeStatus);
       const heading = String(Math.round(headingDegFromRad(state.headingRad))).padStart(3, "0");
       fpsButton.textContent = fps === null ? "FPS —" : `FPS ${Math.round(fps)}`;
-      statusElement.textContent = `${Math.abs(state.latDeg).toFixed(4)}°${state.latDeg >= 0 ? "N" : "S"} ${Math.abs(state.lonDeg).toFixed(4)}°${state.lonDeg >= 0 ? "E" : "W"} h${heading}°`;
+      position.update({ latDeg: state.latDeg, lonDeg: state.lonDeg, altitudeMeters: state.altMeters, groundHeightMeters, rest: `h${heading}°` });
     },
     destroy(): void {
       logButton?.removeEventListener("click", onLogClick);
@@ -140,6 +147,7 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
       fpsButton.removeEventListener("click", options.onDebugClick);
       mapSource.destroy();
       detachRendererActivity();
+      position.destroy();
       inputHud.destroy();
       hudBar.destroy();
     },

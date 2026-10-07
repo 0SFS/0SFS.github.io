@@ -794,6 +794,9 @@ export async function createFlightSimApp(
     getArcadeGroundLaunches: arcadeGroundLaunches,
   });
   const flightSurface = createFrameSurfaceQuery(runtime.surface);
+  /** The terrain's height under the aircraft, which the HUD bar's altitude above ground is measured from; null while none has loaded there. */
+  const groundHeightUnder = (state: FlightState): number | null =>
+    runtime.surface.sample(state.latDeg, state.lonDeg)?.heightMeters ?? null;
   const terrainContact = createTerrainContact(jsbsim.sdk, flightSurface, getFdmProfile(initialAircraftId).stance);
   const visibleMeshCollision = createVisibleMeshCollision(jsbsim.sdk, flightSurface, {
     bodyProbes: getFdmProfile(initialAircraftId).bodyCollisionProbes,
@@ -1678,7 +1681,7 @@ export async function createFlightSimApp(
     skipResumeDelta = !paused;
     const state = physicsLoop.getLatestState() ?? initialState;
     controlPanel?.update(createPanelSnapshot(state));
-    hudBar?.update(state, runtime.status, measuredFps, paused);
+    hudBar?.update(state, runtime.status, measuredFps, paused, groundHeightUnder(state));
     phoneSession?.syncStatus();
   };
   const setSimulationPaused = (paused: boolean): void => inputManager.setPaused(paused);
@@ -1782,7 +1785,7 @@ export async function createFlightSimApp(
       }, hudMasterAp(), attitudeView());
       saveFlight();
       controlPanel?.update(createPanelSnapshot(state));
-      hudBar?.update(state, runtime.status, measuredFps, inputManager.isPaused());
+      hudBar?.update(state, runtime.status, measuredFps, inputManager.isPaused(), groundHeightUnder(state));
       loading.hide();
       runtime.requestRender();
     }).catch(() => {
@@ -1883,11 +1886,12 @@ export async function createFlightSimApp(
     onTerrainSourceChange: setTerrainSourcePreference,
   });
   // Settings holds what spans every tab, the presets and the saved record; the
-  // Interface tab the log and place search, which the flight uses as the globe
-  // does. The globe's toolbar and theme are not the flight's, so they stay out.
+  // Interface tab the position readout, the log and place search, which the
+  // flight uses as the globe does. The globe's toolbar and theme are not the
+  // flight's, so they stay out.
   const presetsSection = createPresetsSection(settings);
   const savedSettingsSection = createSavedSettingsSection(settings);
-  const interfaceParameterSections = (["log", "search"] as const)
+  const interfaceParameterSections = (["position", "log", "search"] as const)
     .map(section => ({ section, handle: createParameterSection(settings, { tab: "interface", section }) }));
   const settingsSections: PanelSection[] = [
     { id: "presets", title: "Presets", element: presetsSection.element },
@@ -2068,7 +2072,7 @@ export async function createFlightSimApp(
     statusOverlay?.update(state);
   };
 
-  hudBar.update(initialState, runtime.status, measuredFps, inputManager.isPaused());
+  hudBar.update(initialState, runtime.status, measuredFps, inputManager.isPaused(), groundHeightUnder(initialState));
   mapPanel.update(runtime.status);
 
   const ensureWorld = (): void => {
@@ -2363,7 +2367,7 @@ export async function createFlightSimApp(
       sectionStarted = frameProfiler.clock();
       lastPanelUpdateMs = now;
       controlPanel?.update(createPanelSnapshot(displayState));
-      hudBar?.update(displayState, runtime.status, measuredFps, inputManager.isPaused());
+      hudBar?.update(displayState, runtime.status, measuredFps, inputManager.isPaused(), sampledSurfaceHeight);
       mapPanel.update(runtime.status);
       frameProfiler.add("flight/panels", sectionStarted);
     }

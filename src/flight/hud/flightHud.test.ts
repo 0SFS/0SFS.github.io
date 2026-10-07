@@ -285,7 +285,8 @@ describe("flight HUD gear button", () => {
     const metrics = [...t.host.querySelectorAll("[data-metric]")].map(
       (element) => (element as HTMLElement).dataset.metric,
     );
-    expect(metrics).toEqual(["ias", "alt", "hdg", "vs"]);
+    // The altitude is the HUD bar's, in its position readout.
+    expect(metrics).toEqual(["ias", "hdg", "vs"]);
     t.hud.destroy();
   });
 
@@ -293,12 +294,12 @@ describe("flight HUD gear button", () => {
     const t = mount();
     const widths = new Set<number>();
     const vsWidths = new Set<number>();
-    for (const [altMeters, verticalSpeedFps] of [[30, 12.3], [3048, -12.3], [3048, 0], [152.4, -0.1]]) {
-      t.hud.update({ ...STATE, altMeters, verticalSpeedFps }, CONTROLS, true, AUTO_OFF);
-      widths.add(t.host.querySelector<HTMLElement>('[data-metric="alt"]')!.textContent!.length);
+    for (const [airspeedKts, verticalSpeedFps] of [[7, 12.3], [140, -12.3], [140, 0], [62.4, -0.1]]) {
+      t.hud.update({ ...STATE, airspeedKts, verticalSpeedFps }, CONTROLS, true, AUTO_OFF);
+      widths.add(t.host.querySelector<HTMLElement>('[data-metric="ias"]')!.textContent!.length);
       vsWidths.add(t.host.querySelector<HTMLElement>('[data-metric="vs"]')!.textContent!.length);
     }
-    expect([...widths]).toEqual([5]);
+    expect([...widths]).toEqual([3]);
     expect([...vsWidths]).toEqual([5]);
     t.hud.destroy();
   });
