@@ -1,0 +1,525 @@
+{
+  "schemaVersion": 1,
+  "inputs": [
+    {
+      "file": "validation/evidence/aircraft/f35b/dry-vtol-response-2026-10-06/numerical/report.json",
+      "sha256": "57ad29b99e2cb991a456d3ac6e0b21695e76e08afaace616f7e77a164bee8728",
+      "snapshot": "source-0-report.json.txt"
+    },
+    {
+      "file": "scripts/exhaustOptics/data/CIE_xyz_1931_2deg.csv",
+      "sha256": "fa663e3535a7e0763a745993a1f0a192eb0275ac46ad2d1befd7626841e713c1",
+      "snapshot": "source-1-CIE_xyz_1931_2deg.csv.txt"
+    },
+    {
+      "file": "scripts/validation/f35b/analyze-dry-exhaust-observer.mjs",
+      "sha256": "2d7e1cfe6f6faa15bd7d81f26bddf27dd24cc483653831aca3663ce8b62112ce",
+      "snapshot": "source-2-analyze-dry-exhaust-observer.mjs.txt"
+    }
+  ],
+  "nativeObservation": {
+    "scenario": "powered-lift",
+    "phase": "powered-lift-full-command",
+    "timeS": 117.5250000000396,
+    "phaseTimeS": 90,
+    "ambientK": 286.4991319989687,
+    "pressurePsf": 2053.2761045974676,
+    "egtC": 729.9781319989688,
+    "gasK": 1003.1281319989688,
+    "thermalValid": 1,
+    "fuelKgSec": 4.420049982197244,
+    "suppliedAbKgSec": 0,
+    "burnedAbKgSec": 0,
+    "n1Pct": 99.3,
+    "n2Pct": 99.6,
+    "nativeRunning": 1,
+    "augmentation": 0,
+    "nozzleNorm": 0.01000000000000012,
+    "nozzlePitchRad": 1.5707963267948966,
+    "nozzleYawRad": 1.829907617578383e-15,
+    "conversion": 1,
+    "throttleCmd": 1,
+    "throttlePosition": 0.99,
+    "coreK": 956.7228132202761,
+    "linerK": 664.0542773824793,
+    "visualRunning": 1,
+    "opticsValid": 1,
+    "radiusM": 0.40161378548650467,
+    "lengthM": 1.2000000000000002,
+    "throatAreaM2": 0.3837808557176592,
+    "exitAreaM2": 0.505376278459852,
+    "absorptionPerM": 0.025,
+    "effectiveVolumeM3": 0.05750901070800853,
+    "fuelPowerW": 191388164.22914067,
+    "particlePowerBoundW": 330.19711437995056,
+    "excitedPowerW": 0,
+    "totalSourcePowerBoundW": 330.19711437995056,
+    "sourceYcdM3": 0.07225058133963451,
+    "continuumYcdM3": 0.07225058133963451,
+    "excitedYcdM3": 0,
+    "sourceRcdM3": 0.3294826063418601,
+    "continuumRcdM3": 0.3294826063418601,
+    "excitedRcdM3": 0,
+    "sourceGcdM3": 0.003079668947644074,
+    "continuumGcdM3": 0.003079668947644074,
+    "excitedGcdM3": 0,
+    "sourceBcdM3": 0,
+    "continuumBcdM3": 0,
+    "excitedBcdM3": 0,
+    "rearAxisEffectivePathM": 0.1554349487816348,
+    "rearAxisRadianceYcdM2": 0.011208473948786117,
+    "rearAxisSceneYAtWhite1000": 0.000011208473948786118,
+    "rearOffsetEffectivePathM": 0.24934040931433413,
+    "rearOffsetRadianceYcdM2": 0.01795895769908881,
+    "rearOffsetSceneYAtWhite1000": 0.00001795895769908881,
+    "sideNearExitEffectivePathM": 0.27392730219705375,
+    "sideNearExitRadianceYcdM2": 0.019723793675489796,
+    "sideNearExitSceneYAtWhite1000": 0.000019723793675489795,
+    "coreEmissionYcdM2": 0.7440404138222306,
+    "linerEmissionYcdM2": 0.000019412325560617317,
+    "flowProxyKgSec": 115.83348372656143,
+    "directionX": -1.829907617578383e-15,
+    "directionY": -1,
+    "directionZ": 6.123233995736766e-17
+  },
+  "physicalEquations": {
+    "transfer": "L_lambda=B_lambda(T)*(1-exp(-kappa_lambda*length)); LTE, isothermal, no scattering or incident background",
+    "particles": "kappa_lambda = MAC_550*rho_soot*(550nm/lambda)^alpha; MAC m2/g, rho g/m3",
+    "camera": "N_e=A_pixel*t*pi/(4*fNumber^2)*integral[L_lambda*tau_optics*QE(lambda)*lambda/(h*c) d_lambda]",
+    "reflection": "L_receiver=lambda_reflectance/pi*integral L_incident*cos(theta) dOmega",
+    "temperature": "imposed native gas-bath proxy; no new station temperature or heat source"
+  },
+  "thermal": [
+    {
+      "temperatureKelvin": 500,
+      "blackbodyLuminanceCdM2": 4.697620839997254e-10,
+      "visible380to780RadianceWm2sr": 9.005850061053363e-10,
+      "nir780to1100RadianceWm2sr": 0.000015220286009650074,
+      "nirToVisibleRadiantRatio": 16900.44349669069,
+      "nirToVisiblePhotonRatio": 23546.64000573418,
+      "water930to950BlackbodyCeilingWm2sr": 1.6652305201697633e-7,
+      "grayOneMeterLuminanceCdM2": 1.1598467179706968e-11,
+      "grayOneMeterNirRadianceWm2sr": 3.7579020053219783e-7,
+      "bolometricBlackbodyExitanceWm2": 3543.984011875
+    },
+    {
+      "temperatureKelvin": 600,
+      "blackbodyLuminanceCdM2": 6.743857533211137e-7,
+      "visible380to780RadianceWm2sr": 5.143639279417392e-7,
+      "nir780to1100RadianceWm2sr": 0.0014631727341915617,
+      "nirToVisibleRadiantRatio": 2844.625477619597,
+      "nirToVisiblePhotonRatio": 3953.1096560258225,
+      "water930to950BlackbodyCeilingWm2sr": 0.00002725395717373816,
+      "grayOneMeterLuminanceCdM2": 1.6650643576337433e-8,
+      "grayOneMeterNirRadianceWm2sr": 0.000036125863524934694,
+      "bolometricBlackbodyExitanceWm2": 7348.805247024
+    },
+    {
+      "temperatureKelvin": 700,
+      "blackbodyLuminanceCdM2": 0.0001385443730079858,
+      "visible380to780RadianceWm2sr": 0.00004930226328264447,
+      "nir780to1100RadianceWm2sr": 0.03933016518475991,
+      "nirToVisibleRadiantRatio": 797.7354905450159,
+      "nirToVisiblePhotonRatio": 1105.8594029869053,
+      "water930to950BlackbodyCeilingWm2sr": 0.001040121964559059,
+      "grayOneMeterLuminanceCdM2": 0.000003420672757546667,
+      "grayOneMeterNirRadianceWm2sr": 0.0009710652383519314,
+      "bolometricBlackbodyExitanceWm2": 13614.568980019
+    },
+    {
+      "temperatureKelvin": 800,
+      "blackbodyLuminanceCdM2": 0.008090357359916065,
+      "visible380to780RadianceWm2sr": 0.0015441752510967181,
+      "nir780to1100RadianceWm2sr": 0.47495643904282986,
+      "nirToVisibleRadiantRatio": 307.5793623201136,
+      "nirToVisiblePhotonRatio": 425.4299297046213,
+      "water930to950BlackbodyCeilingWm2sr": 0.01597596026338822,
+      "grayOneMeterLuminanceCdM2": 0.00019975163493855385,
+      "grayOneMeterNirRadianceWm2sr": 0.011726716262677319,
+      "bolometricBlackbodyExitanceWm2": 23225.853620224
+    },
+    {
+      "temperatureKelvin": 900,
+      "blackbodyLuminanceCdM2": 0.20020446858158397,
+      "visible380to780RadianceWm2sr": 0.022899224486784192,
+      "nir780to1100RadianceWm2sr": 3.3550167102493873,
+      "nirToVisibleRadiantRatio": 146.51224159078683,
+      "nirToVisiblePhotonRatio": 202.27066779808675,
+      "water930to950BlackbodyCeilingWm2sr": 0.13374982998063453,
+      "grayOneMeterLuminanceCdM2": 0.004943065941600202,
+      "grayOneMeterNirRadianceWm2sr": 0.08283565772247127,
+      "bolometricBlackbodyExitanceWm2": 37203.326563058996
+    },
+    {
+      "temperatureKelvin": 1003.1281319989688,
+      "blackbodyLuminanceCdM2": 2.8914463323023414,
+      "visible380to780RadianceWm2sr": 0.21360879171497843,
+      "nir780to1100RadianceWm2sr": 16.98493510851127,
+      "nirToVisibleRadiantRatio": 79.51421368074838,
+      "nirToVisiblePhotonRatio": 109.6169274578223,
+      "water930to950BlackbodyCeilingWm2sr": 0.7679433395412248,
+      "grayOneMeterLuminanceCdM2": 0.07139006430989983,
+      "grayOneMeterNirRadianceWm2sr": 0.4193595420222044,
+      "bolometricBlackbodyExitanceWm2": 57416.58747295548
+    },
+    {
+      "temperatureKelvin": 1100,
+      "blackbodyLuminanceCdM2": 22.9659899041217,
+      "visible380to780RadianceWm2sr": 1.2025524989545309,
+      "nir780to1100RadianceWm2sr": 59.67437495957955,
+      "nirToVisibleRadiantRatio": 49.62309338798843,
+      "nirToVisiblePhotonRatio": 68.3517614332109,
+      "water930to950BlackbodyCeilingWm2sr": 2.9425105021840565,
+      "grayOneMeterLuminanceCdM2": 0.5670323110891881,
+      "grayOneMeterNirRadianceWm2sr": 1.473365567406281,
+      "bolometricBlackbodyExitanceWm2": 83019.951868579
+    },
+    {
+      "temperatureKelvin": 1200,
+      "blackbodyLuminanceCdM2": 139.34236019965255,
+      "visible380to780RadianceWm2sr": 5.397583351532054,
+      "nir780to1100RadianceWm2sr": 177.90949369704228,
+      "nirToVisibleRadiantRatio": 32.96095346939743,
+      "nirToVisiblePhotonRatio": 45.38616073908801,
+      "water930to950BlackbodyCeilingWm2sr": 9.379254542720572,
+      "grayOneMeterLuminanceCdM2": 3.440375131509186,
+      "grayOneMeterNirRadianceWm2sr": 4.392601050374766,
+      "bolometricBlackbodyExitanceWm2": 117580.883952384
+    },
+    {
+      "temperatureKelvin": 1500,
+      "blackbodyLuminanceCdM2": 7740.468826000637,
+      "visible380to780RadianceWm2sr": 153.68922461917228,
+      "nir780to1100RadianceWm2sr": 2028.2001849844305,
+      "nirToVisibleRadiantRatio": 13.196762427620566,
+      "nirToVisiblePhotonRatio": 18.212796436032956,
+      "water930to950BlackbodyCeilingWm2sr": 120.184754221466,
+      "grayOneMeterLuminanceCdM2": 191.1128562559049,
+      "grayOneMeterNirRadianceWm2sr": 50.076440991417506,
+      "bolometricBlackbodyExitanceWm2": 287062.704961875
+    },
+    {
+      "temperatureKelvin": 2363.103,
+      "blackbodyLuminanceCdM2": 3145509.6625599246,
+      "visible380to780RadianceWm2sr": 25069.097731918348,
+      "nir780to1100RadianceWm2sr": 77879.9939448557,
+      "nirToVisibleRadiantRatio": 3.106613360308446,
+      "nirToVisiblePhotonRatio": 4.402856303377922,
+      "water930to950BlackbodyCeilingWm2sr": 4999.839482283289,
+      "grayOneMeterLuminanceCdM2": 77662.91028433392,
+      "grayOneMeterNirRadianceWm2sr": 1922.8639017314051,
+      "bolometricBlackbodyExitanceWm2": 1768244.6092993037
+    }
+  ],
+  "spectralSlabs": [
+    {
+      "exponent": 0,
+      "luminanceCdM2": 0.07139006430989983,
+      "visibleRadianceWm2sr": 0.00527401985896438,
+      "nirRadianceWm2sr": 0.4193595420222044
+    },
+    {
+      "exponent": 1,
+      "luminanceCdM2": 0.06421898644979154,
+      "visibleRadianceWm2sr": 0.003967790446572609,
+      "nirRadianceWm2sr": 0.22989989760342036
+    },
+    {
+      "exponent": 1.3,
+      "luminanceCdM2": 0.06225825140585514,
+      "visibleRadianceWm2sr": 0.0036448932706734938,
+      "nirRadianceWm2sr": 0.1920618867094124
+    }
+  ],
+  "mass": {
+    "densityKgM3": 0.34148020778366506,
+    "volumeFlowM3S": 339.2099485893027,
+    "massConstraint": [
+      {
+        "massAbsorption550M2perG": 3.8,
+        "massConcentrationMgM3": 6.578947368421053,
+        "uniformSectionSootFluxKgS": 0.002231644398613834,
+        "uniformSectionEmissionIndexMgPerKgFuel": 504.8912133578328
+      },
+      {
+        "massAbsorption550M2perG": 8.6,
+        "massConcentrationMgM3": 2.906976744186047,
+        "uniformSectionSootFluxKgS": 0.0009860754319456475,
+        "uniformSectionEmissionIndexMgPerKgFuel": 223.0914663674145
+      }
+    ],
+    "qualification": "MAC bounds are measurements on other flame-generated soot. Gas flow is the existing uncalibrated proxy. Uniform area at peak opacity is an equivalent scenario; real radial loading lowers area-average flux. Neither is an F135 emission-index measurement."
+  },
+  "camera": {
+    "assumptions": {
+      "pixelPitchMeters": 0.000005,
+      "fNumber": 2.8,
+      "exposureSeconds": 0.02,
+      "quantumEfficiency": 1,
+      "lensTransmission": 1,
+      "sourceFillsPixel": true
+    },
+    "cutoffs": [
+      {
+        "cutoffNm": 650,
+        "grayOneMeterElectronsCeiling": 34.98037481842911,
+        "inverseWavelengthOneMeterElectronsCeiling": 31.103861323833147
+      },
+      {
+        "cutoffNm": 700,
+        "grayOneMeterElectronsCeiling": 146.88609424778377,
+        "inverseWavelengthOneMeterElectronsCeiling": 121.84826301250986
+      },
+      {
+        "cutoffNm": 730,
+        "grayOneMeterElectronsCeiling": 314.80141772873947,
+        "inverseWavelengthOneMeterElectronsCeiling": 251.1049390264457
+      },
+      {
+        "cutoffNm": 780,
+        "grayOneMeterElectronsCeiling": 978.3377770162681,
+        "inverseWavelengthOneMeterElectronsCeiling": 733.7088878072752
+      },
+      {
+        "cutoffNm": 1100,
+        "grayOneMeterElectronsCeiling": 108220.71890945573,
+        "inverseWavelengthOneMeterElectronsCeiling": 59223.18480266629
+      }
+    ],
+    "leakage": [
+      {
+        "nirToVisibleSensitivity": 0,
+        "nirToVisibleSignalRatio": 0
+      },
+      {
+        "nirToVisibleSensitivity": 0.0001,
+        "nirToVisibleSignalRatio": 0.010961692745782218
+      },
+      {
+        "nirToVisibleSensitivity": 0.001,
+        "nirToVisibleSignalRatio": 0.10961692745782217
+      },
+      {
+        "nirToVisibleSensitivity": 0.01,
+        "nirToVisibleSignalRatio": 1.0961692745782219
+      },
+      {
+        "nirToVisibleSensitivity": 0.1,
+        "nirToVisibleSignalRatio": 10.961692745782218
+      },
+      {
+        "nirToVisibleSensitivity": 1,
+        "nirToVisibleSignalRatio": 109.61692745782217
+      }
+    ],
+    "currentExitLuminanceCdM2": 0.018591819491510772,
+    "equivalentOpticalDepth": 0.006450698692004234,
+    "equivalentCutoffs": [
+      {
+        "cutoffNm": 650,
+        "electronsCeiling": 9.10979448829883
+      },
+      {
+        "cutoffNm": 700,
+        "electronsCeiling": 38.25293864722214
+      },
+      {
+        "cutoffNm": 730,
+        "electronsCeiling": 81.98243257882602
+      },
+      {
+        "cutoffNm": 780,
+        "electronsCeiling": 254.78446514706522
+      },
+      {
+        "cutoffNm": 1100,
+        "electronsCeiling": 28183.474698552927
+      }
+    ],
+    "qualification": "Unity-QE sharp-cutoff monochrome ceilings. No camera RGB response, noise, filter rejection, color, saturation or reference exposure is inferred. Matching CIE Y by one isothermal spectrum is an observer sensitivity scenario, not a recovered nonuniform spectrum."
+  },
+  "exposure": {
+    "rows": [
+      {
+        "exposureEV": 0,
+        "whiteReferenceCdM2": 1000,
+        "rgbLinear": [
+          0.0000847622660110216,
+          7.902969023592096e-7,
+          0
+        ],
+        "componentReinhardSrgb": [
+          0.001095035659158566,
+          0.00001021062790905338,
+          0
+        ],
+        "linearPhotopicLuminance": 0.000018591819491510772
+      },
+      {
+        "exposureEV": 4,
+        "whiteReferenceCdM2": 1000,
+        "rgbLinear": [
+          0.0013561962561763456,
+          0.000012644750437747353,
+          0
+        ],
+        "componentReinhardSrgb": [
+          0.017498324467665978,
+          0.00016336810990671654,
+          0
+        ],
+        "linearPhotopicLuminance": 0.00029746911186417235
+      },
+      {
+        "exposureEV": 8,
+        "whiteReferenceCdM2": 1000,
+        "rgbLinear": [
+          0.02169914009882153,
+          0.00020231600700395765,
+          0
+        ],
+        "componentReinhardSrgb": [
+          0.15694292138447405,
+          0.0026133940790363346,
+          0
+        ],
+        "linearPhotopicLuminance": 0.004759505789826758
+      },
+      {
+        "exposureEV": 10,
+        "whiteReferenceCdM2": 1000,
+        "rgbLinear": [
+          0.08679656039528612,
+          0.0008092640280158306,
+          0
+        ],
+        "componentReinhardSrgb": [
+          0.3130442761334708,
+          0.010447236669136032,
+          0
+        ],
+        "linearPhotopicLuminance": 0.01903802315930703
+      },
+      {
+        "exposureEV": 12,
+        "whiteReferenceCdM2": 1000,
+        "rgbLinear": [
+          0.3471862415811445,
+          0.0032370561120633225,
+          0
+        ],
+        "componentReinhardSrgb": [
+          0.5446419224050225,
+          0.04165631543367886,
+          0
+        ],
+        "linearPhotopicLuminance": 0.07615209263722812
+      }
+    ],
+    "qualification": "Component Reinhard then sRGB experiment on retained emitted RGB. This is not the live scene HDR/compositing path or a camera reconstruction; EV leaves physical radiance unchanged."
+  },
+  "receiver": {
+    "rows": [
+      {
+        "heightMeters": 1,
+        "radiusMeters": 0.40161378548650467,
+        "reflectance": 0.2,
+        "projectedSolidAngle": 0.43634002398130356,
+        "alternatives": [
+          {
+            "name": "equivalent-dry-ray-filled-aperture",
+            "incidentIlluminanceLux": 0.008112354962781907,
+            "reflectedLuminanceCdM2": 0.0005164485569771237,
+            "incidentNirIrradianceWm2": 0.04765359850561174,
+            "reflectedNirRadianceWm2sr": 0.003033722303313866
+          },
+          {
+            "name": "core-temperature-filled-aperture",
+            "incidentIlluminanceLux": 0.32480314320614395,
+            "reflectedLuminanceCdM2": 0.020677610309217033,
+            "incidentNirIrradianceWm2": 2.9790890375567654,
+            "reflectedNirRadianceWm2sr": 0.1896546984952145
+          },
+          {
+            "name": "liner-temperature-filled-aperture",
+            "incidentIlluminanceLux": 0.00000847458287482869,
+            "reflectedLuminanceCdM2": 5.395087020683644e-7,
+            "incidentNirIrradianceWm2": 0.004698120623013623,
+            "reflectedNirRadianceWm2sr": 0.00029909164815783727
+          }
+        ]
+      },
+      {
+        "heightMeters": 2,
+        "radiusMeters": 0.40161378548650467,
+        "reflectance": 0.2,
+        "projectedSolidAngle": 0.12176955924415517,
+        "alternatives": [
+          {
+            "name": "equivalent-dry-ray-filled-aperture",
+            "incidentIlluminanceLux": 0.002263917665028168,
+            "reflectedLuminanceCdM2": 0.00014412547485691786,
+            "incidentNirIrradianceWm2": 0.013298705980441783,
+            "reflectedNirRadianceWm2sr": 0.0008466219174052241
+          },
+          {
+            "name": "core-temperature-filled-aperture",
+            "incidentIlluminanceLux": 0.09064292390244508,
+            "reflectedLuminanceCdM2": 0.005770507758150659,
+            "incidentNirIrradianceWm2": 0.8313753933054867,
+            "reflectedNirRadianceWm2sr": 0.052927001363814744
+          },
+          {
+            "name": "liner-temperature-filled-aperture",
+            "incidentIlluminanceLux": 0.000002365004731929364,
+            "reflectedLuminanceCdM2": 1.5056087740891246e-7,
+            "incidentNirIrradianceWm2": 0.00131110612389011,
+            "reflectedNirRadianceWm2sr": 0.00008346760821406638
+          }
+        ]
+      },
+      {
+        "heightMeters": 3,
+        "radiusMeters": 0.40161378548650467,
+        "reflectance": 0.2,
+        "projectedSolidAngle": 0.05531084493681604,
+        "alternatives": [
+          {
+            "name": "equivalent-dry-ray-filled-aperture",
+            "incidentIlluminanceLux": 0.00102832924498823,
+            "reflectedLuminanceCdM2": 0.00006546547298633338,
+            "incidentNirIrradianceWm2": 0.006040612029067765,
+            "reflectedNirRadianceWm2sr": 0.00038455730549059945
+          },
+          {
+            "name": "core-temperature-filled-aperture",
+            "incidentIlluminanceLux": 0.04117233190058049,
+            "reflectedLuminanceCdM2": 0.0026211120562390066,
+            "incidentNirIrradianceWm2": 0.3776319447063402,
+            "reflectedNirRadianceWm2sr": 0.02404079626776774
+          },
+          {
+            "name": "liner-temperature-filled-aperture",
+            "incidentIlluminanceLux": 0.000001074245573479482,
+            "reflectedLuminanceCdM2": 6.838859724553897e-8,
+            "incidentNirIrradianceWm2": 0.0005955378993266465,
+            "reflectedNirRadianceWm2sr": 0.00003791312019055973
+          }
+        ]
+      }
+    ],
+    "qualification": "Alternative uniformly filled-aperture scenarios; no actual visibility, spectral BRDF, heat flux or deck temperature history. Not additive and not the existing point-light approximation."
+  },
+  "validation": {
+    "maxPlanckRelativeError": 6.6330152335509334e-15,
+    "maxQuadratureRelativeError": 0.000006956712899066492,
+    "passed": true
+  },
+  "limitations": [
+    "No NIR energy is converted into photopic scene RGB.",
+    "No molecular absorption/emission spectrum is fabricated; HITEMP line-by-line tables require composition, pressure and paths.",
+    "Thermal water/CO2 mid-IR bands outside silicon sensitivity cannot directly make ordinary RGB pixels.",
+    "Existing radiance and opacity remain provisional; numerical correctness does not establish F135 temperature, soot loading or footage acceptance.",
+    "No runtime changes, GPU, browser, benchmark, engine step or new heat state."
+  ]
+}

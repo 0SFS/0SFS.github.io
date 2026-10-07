@@ -1,0 +1,26 @@
+
+ RUN  v4.1.6 [checkout]
+
+ ❯ scripts/build-exhaust-optics.test.mjs (6 tests | 1 failed) 381ms
+     × matches independent non-grey particle spectra and whole-spectrum power without changing metal tables 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  scripts/build-exhaust-optics.test.mjs > dimensional offline exhaust optical bake > matches independent non-grey particle spectra and whole-spectrum power without changing metal tables
+AssertionError: expected 0.03387625375794601 to be less than 0.012
+ ❯ scripts/build-exhaust-optics.test.mjs:47:100
+     45|           absorptionAngstromExponentRange: [0, 1.3] }, [temperature, t…
+     46|         const independent = referenceParticleXyz(observer, temperature…
+     47|         for (let c = 0; c < 3; c++) expect(Math.abs(table.xyz.samples[…
+       |                                                                                                    ^
+     48|         expect(luminance(table.rgb.samples[0]) / table.xyz.samples[0][…
+     49|         expect(table.planckMeanAbsorptionRatio.samples[0] / referenceP…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  23:09:02
+   Duration  521ms (transform 25ms, setup 0ms, import 35ms, tests 381ms, environment 0ms)
+

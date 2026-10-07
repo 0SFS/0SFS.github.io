@@ -1,0 +1,41 @@
+{
+  "schema": "0sfs-f135-dry-vtol-mechanism-summary/1",
+  "recordedDate": "2026-10-06",
+  "overallStatus": "open",
+  "software": {
+    "status": "passed",
+    "record": "application/README.md",
+    "testFilesPassed": 175,
+    "testsPassed": 1893,
+    "existingExpectedFailures": 1,
+    "checks": ["lint", "incremental typecheck", "production build", "artifact verification"],
+    "runtimeInputHashesStillMatchFinalCI": true
+  },
+  "numerical": {
+    "status": "partial",
+    "spectrumRecord": "particle-spectrum/README.md",
+    "completePosedRayRecord": "runtime-source/posed-rays-complete-inputs/README.md",
+    "currentRaySamples": 32,
+    "selectedRayCriterionFraction": 0.01,
+    "selectedRayFailures": 12,
+    "maximumSelectedRelativePeakErrors": { "32": 0.0453442, "64": 0.0298577, "128": 0.00702479 },
+    "receiverRecord": "receiver/full-domain/README.md",
+    "selectedDownwardReceiverProbes": "passed declared refinement criteria",
+    "horizontalReceiverRefinementFailures": 3,
+    "wholeReceiverImages": "unqualified",
+    "rejectedSamplingPrototype": "runtime-source/interval-prototype/README.md"
+  },
+  "physical": {
+    "status": "open",
+    "leadingHypothesis": "thermal exhaust particles structured by the flow, with separate scattered/reflected and surface contributions",
+    "unknowns": ["native nozzle temperature station", "nozzle flow boundary", "F135 particle loading and scattering", "reference camera response", "near-deck impingement and surface temperature"]
+  },
+  "visual": {
+    "status": "open",
+    "liveGPUVerificationPerformed": false,
+    "carrierNearDeckMorphologyRecreated": false,
+    "reportedOversizedABResolved": false,
+    "observerImages": "conditional CPU figures only"
+  },
+  "preserved": ["rigid nozzle", "independent metal temperatures", "installed native SDK", "operational hover AB inhibit", "controls and lifecycle", "unrelated concurrent work", "failed and historical evidence"]
+}

@@ -10,6 +10,13 @@ After the finite-core change below, the user's latest report is **dry exhaust
 still shows nothing and afterburner is huge**. Appearance acceptance has failed;
 passing checks and increased numerical emission do not close that mismatch.
 
+The later [mechanism investigation](f135-dry-vtol-mechanism.md) measures the
+landing sequence's brightness bands and strobe behavior, ranks thermal emission,
+scattering, deck and camera explanations, and records the edited sequence's
+failure to show the landing patch after departure. It separates the concurrent
+non-gray particle-source correction from unfinished impingement, receiving-surface
+and observer work. No appearance acceptance is implied.
+
 ## Reference observations and their limits
 
 | Reference | What it establishes | What it does not establish |

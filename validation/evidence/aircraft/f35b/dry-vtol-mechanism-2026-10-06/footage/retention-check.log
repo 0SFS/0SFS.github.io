@@ -1,0 +1,5 @@
+Read-only retention check, 2026-10-06:
+11 provenance input byte counts and SHA-256 values match existing files.
+Runnable diagnostic and retained .txt source snapshot are byte-identical.
+All local Markdown links in the synthesis and retained README resolve.
+No runtime code, suite, browser, server or GPU was executed by this check.

@@ -1,0 +1,2443 @@
+{
+  "inputs": [
+    {
+      "file": "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json",
+      "snapshot": "source-0-f135-exhaust-lut.manifest.json.txt",
+      "sha256": "95036c421d8bf371c633caef805ed26103577c55b0bbff8b066da30b73f6e001"
+    },
+    {
+      "file": "src/flight/aircraft/engineGasOptics.ts",
+      "snapshot": "source-1-engineGasOptics.ts.txt",
+      "sha256": "a2ed5be59fcc40e2f6d984fa949d2cc5908c14696d1fac94c09591aac9f43634"
+    },
+    {
+      "file": "src/flight/aircraft/engineReactionEmission.ts",
+      "snapshot": "source-2-engineReactionEmission.ts.txt",
+      "sha256": "1d0e736b8a5b816a66d68a57c5674ce7f0af0a9a457fe4faaeaa6eccca8cec91"
+    },
+    {
+      "file": "validation/evidence/aircraft/f35b/exhaust-correction-2026-10-06/numerical/report.json",
+      "snapshot": "source-3-report.json.txt",
+      "sha256": "b007ff53e1c65c36dfbec04a8d0ee6ef4d4bbcb726dde8aa9b06761aca239a17"
+    },
+    {
+      "file": "scripts/validation/f35b/check-dry-soot-source.mjs",
+      "snapshot": "source-4-check-dry-soot-source.mjs.txt",
+      "sha256": "d27209785fb5f6fd0c75b2df4d178c4555974ce776e35819232180155528d4bc"
+    }
+  ],
+  "cases": [
+    {
+      "name": "cold",
+      "native": {
+        "scenario": "cold-cycle",
+        "phase": "initial-zero-time",
+        "timeS": 0,
+        "phaseTimeS": 0,
+        "ambientK": 286.49913199972883,
+        "pressurePsf": 2053.276104626099,
+        "egtC": 14.999999999999968,
+        "gasK": 288.1499999999999,
+        "thermalValid": 1,
+        "fuelKgSec": 0,
+        "suppliedAbKgSec": 0,
+        "burnedAbKgSec": 0,
+        "n1Pct": 0,
+        "n2Pct": 0,
+        "nativeRunning": 0,
+        "augmentation": 0,
+        "nozzleNorm": 1,
+        "nozzlePitchRad": 0,
+        "nozzleYawRad": 0,
+        "conversion": 0,
+        "throttleCmd": 0,
+        "throttlePosition": 0,
+        "coreK": 288.1499999999999,
+        "linerK": 288.1499999999999,
+        "visualRunning": 0,
+        "opticsValid": 0,
+        "radiusM": 0.565,
+        "lengthM": 1.2000000000000002,
+        "throatAreaM2": 0.6081944545000423,
+        "exitAreaM2": 1.0080083129331545,
+        "absorptionPerM": 0,
+        "effectiveVolumeM3": 0,
+        "fuelPowerW": 0,
+        "particlePowerBoundW": 0,
+        "excitedPowerW": 0,
+        "totalSourcePowerBoundW": 0,
+        "sourceYcdM3": 0,
+        "continuumYcdM3": 0,
+        "excitedYcdM3": 0,
+        "sourceRcdM3": 0,
+        "continuumRcdM3": 0,
+        "excitedRcdM3": 0,
+        "sourceGcdM3": 0,
+        "continuumGcdM3": 0,
+        "excitedGcdM3": 0,
+        "sourceBcdM3": 0,
+        "continuumBcdM3": 0,
+        "excitedBcdM3": 0,
+        "rearAxisEffectivePathM": 0.1554349487816348,
+        "rearAxisRadianceYcdM2": 0,
+        "rearAxisSceneYAtWhite1000": 0,
+        "rearOffsetEffectivePathM": 0.24934040931433413,
+        "rearOffsetRadianceYcdM2": 0,
+        "rearOffsetSceneYAtWhite1000": 0,
+        "sideNearExitEffectivePathM": 0.38536756290338053,
+        "sideNearExitRadianceYcdM2": 0,
+        "sideNearExitSceneYAtWhite1000": 0,
+        "coreEmissionYcdM2": 0,
+        "linerEmissionYcdM2": 0,
+        "flowProxyKgSec": 0,
+        "directionX": 0,
+        "directionY": 0,
+        "directionZ": 1
+      },
+      "input": {
+        "temperatureKelvin": 288.1499999999999,
+        "ambientTemperatureKelvin": 286.49913199972883,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0,
+        "afterburnerBurnedFuelFlowKgPerSecond": 0,
+        "radiusMeters": 0.565,
+        "lengthMeters": 6,
+        "flowDomain": {
+          "axialDistanceRangeMeters": [
+            -2.356656571999874,
+            6
+          ],
+          "sections": [
+            {
+              "distanceMeters": -2.356656571999874,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.29,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -2.0366565719998744,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.26,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.7566565719998741,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.15,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6866565719998743,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.015,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6866565719998743,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6066565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.3266565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.915311479119447
+            },
+            {
+              "distanceMeters": -1.3266565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.8466565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.5666565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -0.272717802865893,
+              "radiusMeters": 0.44,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 0,
+              "radiusMeters": 0.565,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 6,
+              "radiusMeters": 0.985,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            }
+          ]
+        },
+        "axialSamples": 64,
+        "radialSamples": 32,
+        "upstreamGasTemperatureKelvin": 288.1499999999999,
+        "ambientPressurePascal": 98311.39164763276
+      },
+      "before": {
+        "valid": false,
+        "temperatureK": 0,
+        "absorptionPerMeter": 0,
+        "particlePowerW": 0,
+        "chPowerW": 0,
+        "c2PowerW": 0,
+        "exteriorIntensityCd": 0,
+        "allowedPowerW": 0,
+        "wholeIntensityCd": 0
+      },
+      "after": {
+        "valid": false,
+        "temperatureK": 0,
+        "absorptionPerMeter": 0,
+        "particlePowerW": 0,
+        "chPowerW": 0,
+        "c2PowerW": 0,
+        "exteriorIntensityCd": 0,
+        "allowedPowerW": 0,
+        "wholeIntensityCd": 0
+      },
+      "rays": []
+    },
+    {
+      "name": "idle",
+      "native": {
+        "scenario": "cold-cycle",
+        "phase": "idle",
+        "timeS": 92.51666666668636,
+        "phaseTimeS": 60,
+        "ambientK": 286.4991319989687,
+        "pressurePsf": 2053.2761045974676,
+        "egtC": 376.44913199896877,
+        "gasK": 649.5991319989687,
+        "thermalValid": 1,
+        "fuelKgSec": 0.3250735484001666,
+        "suppliedAbKgSec": 0,
+        "burnedAbKgSec": 0,
+        "n1Pct": 30,
+        "n2Pct": 60,
+        "nativeRunning": 1,
+        "augmentation": 0,
+        "nozzleNorm": 1,
+        "nozzlePitchRad": 0,
+        "nozzleYawRad": 0,
+        "conversion": 0,
+        "throttleCmd": 0,
+        "throttlePosition": 0,
+        "coreK": 622.2472103832645,
+        "linerK": 460.0985412222676,
+        "visualRunning": 1,
+        "opticsValid": 1,
+        "radiusM": 0.565,
+        "lengthM": 1.2000000000000002,
+        "throatAreaM2": 0.6081944545000423,
+        "exitAreaM2": 1.0080083129331545,
+        "absorptionPerM": 0.025,
+        "effectiveVolumeM3": 0.11381921057125212,
+        "fuelPowerW": 14075684.645727213,
+        "particlePowerBoundW": 114.92355436454154,
+        "excitedPowerW": 0,
+        "totalSourcePowerBoundW": 114.92355436454154,
+        "sourceYcdM3": 2.8607605881331217e-7,
+        "continuumYcdM3": 2.8607605881331217e-7,
+        "excitedYcdM3": 0,
+        "sourceRcdM3": 0.000001345607049921506,
+        "continuumRcdM3": 0.000001345607049921506,
+        "excitedRcdM3": 0,
+        "sourceGcdM3": 0,
+        "continuumGcdM3": 0,
+        "excitedGcdM3": 0,
+        "sourceBcdM3": 0,
+        "continuumBcdM3": 0,
+        "excitedBcdM3": 0,
+        "rearAxisEffectivePathM": 0.1554349487816348,
+        "rearAxisRadianceYcdM2": 4.4379934294334006e-8,
+        "rearAxisSceneYAtWhite1000": 4.4379934294334004e-11,
+        "rearOffsetEffectivePathM": 0.24934040931433413,
+        "rearOffsetRadianceYcdM2": 7.110846367864402e-8,
+        "rearOffsetSceneYAtWhite1000": 7.110846367864402e-11,
+        "sideNearExitEffectivePathM": 0.38536756290338053,
+        "sideNearExitRadianceYcdM2": 1.097150770687366e-7,
+        "sideNearExitSceneYAtWhite1000": 1.0971507706873661e-10,
+        "coreEmissionYcdM2": 0.0000020231588853467564,
+        "linerEmissionYcdM2": 9.332386497510086e-12,
+        "flowProxyKgSec": 42.03566690614074,
+        "directionX": 0,
+        "directionY": 0,
+        "directionZ": 1
+      },
+      "input": {
+        "temperatureKelvin": 649.5991319989687,
+        "ambientTemperatureKelvin": 286.4991319989687,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0.3250735484001666,
+        "afterburnerBurnedFuelFlowKgPerSecond": 0,
+        "radiusMeters": 0.565,
+        "lengthMeters": 6,
+        "flowDomain": {
+          "axialDistanceRangeMeters": [
+            -2.356656571999874,
+            6
+          ],
+          "sections": [
+            {
+              "distanceMeters": -2.356656571999874,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.29,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -2.0366565719998744,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.26,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.7566565719998741,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.15,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6866565719998743,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.015,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6866565719998743,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6066565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.3266565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.915311479119447
+            },
+            {
+              "distanceMeters": -1.3266565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.8466565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.5666565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -0.272717802865893,
+              "radiusMeters": 0.44,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 0,
+              "radiusMeters": 0.565,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 6,
+              "radiusMeters": 0.985,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            }
+          ]
+        },
+        "axialSamples": 64,
+        "radialSamples": 32,
+        "upstreamGasTemperatureKelvin": 649.5991319989687,
+        "ambientPressurePascal": 98311.39164626188
+      },
+      "before": {
+        "valid": true,
+        "temperatureK": 649.5991319989687,
+        "absorptionPerMeter": 0.025,
+        "particlePowerW": 1463.394680768988,
+        "chPowerW": 0,
+        "c2PowerW": 0,
+        "exteriorIntensityCd": 1.2367874834994705e-7,
+        "allowedPowerW": 42227.05393718164,
+        "wholeIntensityCd": 3.232593491277168e-7
+      },
+      "after": {
+        "valid": true,
+        "temperatureK": 649.5991319989687,
+        "absorptionPerMeter": 0.025,
+        "particlePowerW": 133.44819600367643,
+        "chPowerW": 0,
+        "c2PowerW": 0,
+        "exteriorIntensityCd": 1.0578155289369377e-7,
+        "allowedPowerW": 42227.05393718164,
+        "wholeIntensityCd": 2.7655967960035793e-7
+      },
+      "rays": [
+        {
+          "distanceMeters": 0,
+          "rgbCdM2": [
+            4.1758296193072934e-7,
+            0,
+            0
+          ],
+          "luminanceCdM2": 8.88085795043978e-8,
+          "referenceConvergence": 4.27343153955041e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 8.868213822723296e-8,
+              "relativeError": 0.00142375069920564
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 8.886424511028717e-8,
+              "relativeError": 0.0006268043718299446
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 8.882538267343998e-8,
+              "relativeError": 0.00018920659620888066
+            }
+          ]
+        },
+        {
+          "distanceMeters": 0.5,
+          "rgbCdM2": [
+            3.6097001995235625e-7,
+            0,
+            0
+          ],
+          "luminanceCdM2": 7.676854095632547e-8,
+          "referenceConvergence": 6.568956856220977e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 7.687559009475433e-8,
+              "relativeError": 0.001394440184681512
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 7.682041935459149e-8,
+              "relativeError": 0.0006757767911147208
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 7.676878024850773e-8,
+              "relativeError": 0.000003117060442737271
+            }
+          ]
+        },
+        {
+          "distanceMeters": 1,
+          "rgbCdM2": [
+            2.659688298039158e-7,
+            0,
+            0
+          ],
+          "luminanceCdM2": 5.656436234400521e-8,
+          "referenceConvergence": 0.0000013288986011353216,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 5.6543313499814736e-8,
+              "relativeError": 0.00037212200965802873
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 5.6621326484553866e-8,
+              "relativeError": 0.001007067669254664
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 5.654435423076598e-8,
+              "relativeError": 0.0003537229522282732
+            }
+          ]
+        },
+        {
+          "distanceMeters": 2,
+          "rgbCdM2": [
+            1.6367390028950847e-7,
+            0,
+            0
+          ],
+          "luminanceCdM2": 3.48090030288806e-8,
+          "referenceConvergence": 0.000001155139227187959,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 3.482153394025621e-8,
+              "relativeError": 0.00035999052788753027
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 3.477664541280859e-8,
+              "relativeError": 0.0009295760652830183
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 3.481781964885121e-8,
+              "relativeError": 0.0002532856216334213
+            }
+          ]
+        },
+        {
+          "distanceMeters": 3,
+          "rgbCdM2": [
+            8.16999108230771e-8,
+            0,
+            0
+          ],
+          "luminanceCdM2": 1.7375356964485192e-8,
+          "referenceConvergence": 3.7787923405224157e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 1.740929188200441e-8,
+              "relativeError": 0.0019530486532495762
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 1.7358391520817168e-8,
+              "relativeError": 0.0009764083525133425
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 1.7365114879415116e-8,
+              "relativeError": 0.0005894604117204761
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dry99",
+      "native": {
+        "scenario": "cold-cycle",
+        "phase": "dry99-before-ab",
+        "timeS": 212.51666666663772,
+        "phaseTimeS": 120,
+        "ambientK": 286.49913199893183,
+        "pressurePsf": 2053.2761045960788,
+        "egtC": 729.9781319989319,
+        "gasK": 1003.1281319989318,
+        "thermalValid": 1,
+        "fuelKgSec": 2.902623743163389,
+        "suppliedAbKgSec": 0,
+        "burnedAbKgSec": 0,
+        "n1Pct": 99.3,
+        "n2Pct": 99.6,
+        "nativeRunning": 1,
+        "augmentation": 0,
+        "nozzleNorm": 0.01000000000000012,
+        "nozzlePitchRad": 0,
+        "nozzleYawRad": 0,
+        "conversion": 0,
+        "throttleCmd": 0.99,
+        "throttlePosition": 0.99,
+        "coreK": 956.7228132202479,
+        "linerK": 664.0706928782042,
+        "visualRunning": 1,
+        "opticsValid": 1,
+        "radiusM": 0.40161378548650467,
+        "lengthM": 1.2000000000000002,
+        "throatAreaM2": 0.3837808557176592,
+        "exitAreaM2": 0.505376278459852,
+        "absorptionPerM": 0.025,
+        "effectiveVolumeM3": 0.05750901070800853,
+        "fuelPowerW": 125683608.07897474,
+        "particlePowerBoundW": 330.1971143799019,
+        "excitedPowerW": 0,
+        "totalSourcePowerBoundW": 330.1971143799019,
+        "sourceYcdM3": 0.07225058133957177,
+        "continuumYcdM3": 0.07225058133957177,
+        "excitedYcdM3": 0,
+        "sourceRcdM3": 0.3294826063415841,
+        "continuumRcdM3": 0.3294826063415841,
+        "excitedRcdM3": 0,
+        "sourceGcdM3": 0.0030796689476384094,
+        "continuumGcdM3": 0.0030796689476384094,
+        "excitedGcdM3": 0,
+        "sourceBcdM3": 0,
+        "continuumBcdM3": 0,
+        "excitedBcdM3": 0,
+        "rearAxisEffectivePathM": 0.1554349487816348,
+        "rearAxisRadianceYcdM2": 0.011208473948776384,
+        "rearAxisSceneYAtWhite1000": 0.000011208473948776384,
+        "rearOffsetEffectivePathM": 0.24934040931433413,
+        "rearOffsetRadianceYcdM2": 0.017958957699073214,
+        "rearOffsetSceneYAtWhite1000": 0.000017958957699073213,
+        "sideNearExitEffectivePathM": 0.27392730219705375,
+        "sideNearExitRadianceYcdM2": 0.019723793675472667,
+        "sideNearExitSceneYAtWhite1000": 0.000019723793675472668,
+        "coreEmissionYcdM2": 0.7440404138216922,
+        "linerEmissionYcdM2": 0.000019428489382561538,
+        "flowProxyKgSec": 115.83348372649053,
+        "directionX": 0,
+        "directionY": 0,
+        "directionZ": 1
+      },
+      "input": {
+        "temperatureKelvin": 1003.1281319989318,
+        "ambientTemperatureKelvin": 286.49913199893183,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 2.902623743163389,
+        "afterburnerBurnedFuelFlowKgPerSecond": 0,
+        "radiusMeters": 0.40161378548650467,
+        "lengthMeters": 6,
+        "flowDomain": {
+          "axialDistanceRangeMeters": [
+            -2.345961440504734,
+            6
+          ],
+          "sections": [
+            {
+              "distanceMeters": -2.345961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.29,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -2.025961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.26,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.745961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.15,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.675961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.015,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.675961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.595961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.315961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.915311479119447
+            },
+            {
+              "distanceMeters": -1.315961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.835961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.555961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -0.295671807832921,
+              "radiusMeters": 0.3508379836433799,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 0,
+              "radiusMeters": 0.40161378548650467,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 6,
+              "radiusMeters": 0.8216137854865047,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            }
+          ]
+        },
+        "axialSamples": 64,
+        "radialSamples": 32,
+        "upstreamGasTemperatureKelvin": 1003.1281319989318,
+        "ambientPressurePascal": 98311.39164619539
+      },
+      "before": {
+        "valid": true,
+        "temperatureK": 1003.1281319989318,
+        "absorptionPerMeter": 0.025,
+        "particlePowerW": 5112.419656242062,
+        "chPowerW": 0,
+        "c2PowerW": 0,
+        "exteriorIntensityCd": 0.011378629343048037,
+        "allowedPowerW": 377050.82423692424,
+        "wholeIntensityCd": 0.05765621042385919
+      },
+      "after": {
+        "valid": true,
+        "temperatureK": 1003.1281319989318,
+        "absorptionPerMeter": 0.025,
+        "particlePowerW": 733.4977397992716,
+        "chPowerW": 0,
+        "c2PowerW": 0,
+        "exteriorIntensityCd": 0.010218591070062826,
+        "allowedPowerW": 377050.82423692424,
+        "wholeIntensityCd": 0.051799224023528136
+      },
+      "rays": [
+        {
+          "distanceMeters": 0,
+          "rgbCdM2": [
+            0.07362072453693703,
+            0.001464789601625416,
+            0
+          ],
+          "luminanceCdM2": 0.016704680493511096,
+          "referenceConvergence": 4.249098710769509e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 0.016671784968974892,
+              "relativeError": 0.0019692399713351245
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 0.016715103446517963,
+              "relativeError": 0.0006239540475447081
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 0.01670783513012611,
+              "relativeError": 0.00018884746800382438
+            }
+          ]
+        },
+        {
+          "distanceMeters": 0.5,
+          "rgbCdM2": [
+            0.05671406059878746,
+            0.0010970271682361878,
+            0
+          ],
+          "luminanceCdM2": 0.012846085131143745,
+          "referenceConvergence": 0.000001160826531020931,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 0.012842842863817342,
+              "relativeError": 0.0002523934173954974
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 0.012856327029953273,
+              "relativeError": 0.0007972778247201319
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 0.01284105707862382,
+              "relativeError": 0.0003914073796486801
+            }
+          ]
+        },
+        {
+          "distanceMeters": 1,
+          "rgbCdM2": [
+            0.0384772493019034,
+            0.0007314870828163504,
+            0
+          ],
+          "luminanceCdM2": 0.008706192789606467,
+          "referenceConvergence": 6.267935899843571e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 0.0087060278937772,
+              "relativeError": 0.00001894006177578998
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 0.008710819374592263,
+              "relativeError": 0.0005314131099095123
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 0.008705231424685596,
+              "relativeError": 0.0001104231142248494
+            }
+          ]
+        },
+        {
+          "distanceMeters": 2,
+          "rgbCdM2": [
+            0.017798391053978516,
+            0.00031259268982536777,
+            0
+          ],
+          "luminanceCdM2": 0.004008786790616197,
+          "referenceConvergence": 6.661103694060968e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 0.004012753604514608,
+              "relativeError": 0.0009895297768632242
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 0.004004873437562635,
+              "relativeError": 0.0009761938606268552
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 0.004007607817675884,
+              "relativeError": 0.00029409719246540716
+            }
+          ]
+        },
+        {
+          "distanceMeters": 3,
+          "rgbCdM2": [
+            0.00024331602038236844,
+            0,
+            0
+          ],
+          "luminanceCdM2": 0.0000517467236711774,
+          "referenceConvergence": 1.6263577667662237e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 0.000051889110323848585,
+              "relativeError": 0.0027516071080359483
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 0.00005169622033136676,
+              "relativeError": 0.0009759717374874507
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 0.00005170483817215194,
+              "relativeError": 0.000809432869443458
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ab-onset",
+      "native": {
+        "scenario": "cold-cycle",
+        "phase": "afterburner",
+        "timeS": 212.74999999997084,
+        "phaseTimeS": 0.23333333333333334,
+        "ambientK": 286.49913199893183,
+        "pressurePsf": 2053.2761045960788,
+        "egtC": 733.5491319989319,
+        "gasK": 1034.445401445685,
+        "thermalValid": 1,
+        "fuelKgSec": 3.050671252816171,
+        "suppliedAbKgSec": 0.09247819972895266,
+        "burnedAbKgSec": 0.09247819972895266,
+        "n1Pct": 100,
+        "n2Pct": 100,
+        "nativeRunning": 1,
+        "augmentation": 1,
+        "nozzleNorm": 0.19208972908473346,
+        "nozzlePitchRad": 0,
+        "nozzleYawRad": 0,
+        "conversion": 0,
+        "throttleCmd": 1,
+        "throttlePosition": 1,
+        "coreK": 956.9960710964606,
+        "linerK": 664.2769055129672,
+        "visualRunning": 1,
+        "opticsValid": 1,
+        "radiusM": 0.43119478141166534,
+        "lengthM": 6,
+        "throatAreaM2": 0.4192080577253797,
+        "exitAreaM2": 0.5837805536831635,
+        "absorptionPerM": 0.08,
+        "effectiveVolumeM3": 0.33146346805757104,
+        "fuelPowerW": 132094065.24694021,
+        "particlePowerBoundW": 6886.961865986885,
+        "excitedPowerW": 4.00430604826365,
+        "totalSourcePowerBoundW": 6890.966172035149,
+        "sourceYcdM3": 274.96975619883887,
+        "continuumYcdM3": 0.47039545596460025,
+        "excitedYcdM3": 274.4993607428743,
+        "sourceRcdM3": 56.544067162531775,
+        "continuumRcdM3": 2.0938092635932124,
+        "excitedRcdM3": 54.45025789893856,
+        "sourceGcdM3": 324.2984806366343,
+        "continuumGcdM3": 0.03530705610274505,
+        "excitedGcdM3": 324.26317358053154,
+        "sourceBcdM3": 429.5043513679195,
+        "continuumBcdM3": 0,
+        "excitedBcdM3": 429.5043513679195,
+        "rearAxisEffectivePathM": 0.777174743908174,
+        "rearAxisRadianceYcdM2": 207.19184008326903,
+        "rearAxisSceneYAtWhite1000": 0.20719184008326902,
+        "rearOffsetEffectivePathM": 1.2467020465716705,
+        "rearOffsetRadianceYcdM2": 326.26475081314834,
+        "rearOffsetSceneYAtWhite1000": 0.3262647508131483,
+        "sideNearExitEffectivePathM": 0.2941035080518042,
+        "sideNearExitRadianceYcdM2": 79.92562655186408,
+        "sideNearExitSceneYAtWhite1000": 0.07992562655186408,
+        "coreEmissionYcdM2": 0.7492619585446448,
+        "linerEmissionYcdM2": 0.000019632690644135592,
+        "flowProxyKgSec": 116.76574140587502,
+        "directionX": 0,
+        "directionY": 0,
+        "directionZ": 1
+      },
+      "input": {
+        "temperatureKelvin": 1034.445401445685,
+        "ambientTemperatureKelvin": 286.49913199893183,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 3.050671252816171,
+        "afterburnerBurnedFuelFlowKgPerSecond": 0.09247819972895266,
+        "radiusMeters": 0.43119478141166534,
+        "lengthMeters": 6,
+        "flowDomain": {
+          "axialDistanceRangeMeters": [
+            -2.3514990623284047,
+            6
+          ],
+          "sections": [
+            {
+              "distanceMeters": -2.3514990623284047,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.29,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -2.031499062328405,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.26,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.7514990623284046,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.15,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6814990623284047,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.015,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6814990623284047,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6014990623284047,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.3214990623284046,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.915311479119447
+            },
+            {
+              "distanceMeters": -1.3214990623284046,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.8414990623284047,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.5614990623284046,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -0.2929100637634616,
+              "radiusMeters": 0.3663588766513797,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 0,
+              "radiusMeters": 0.43119478141166534,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 6,
+              "radiusMeters": 0.8511947814116654,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            }
+          ]
+        },
+        "axialSamples": 64,
+        "radialSamples": 32,
+        "upstreamGasTemperatureKelvin": 1006.6991319989319,
+        "ambientPressurePascal": 98311.39164619539
+      },
+      "before": {
+        "valid": true,
+        "temperatureK": 1034.445401445685,
+        "absorptionPerMeter": 0.025,
+        "particlePowerW": 11251.710183961535,
+        "chPowerW": 3.6868339206807375,
+        "c2PowerW": 0,
+        "exteriorIntensityCd": 249.29667126668747,
+        "allowedPowerW": 396285.8825756204,
+        "wholeIntensityCd": 2225.4186298286745
+      },
+      "after": {
+        "valid": true,
+        "temperatureK": 1034.445401445685,
+        "absorptionPerMeter": 0.025,
+        "particlePowerW": 2739.8250801594604,
+        "chPowerW": 3.6868339206807375,
+        "c2PowerW": 0,
+        "exteriorIntensityCd": 238.2815250827856,
+        "allowedPowerW": 396285.8825756204,
+        "wholeIntensityCd": 2127.682633510518
+      },
+      "rays": [
+        {
+          "distanceMeters": 0,
+          "rgbCdM2": [
+            1549.9247707832453,
+            595.7762652180406,
+            111.65847563922226
+          ],
+          "luminanceCdM2": 763.7566530420341,
+          "referenceConvergence": 4.24874347813643e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 762.9507710788664,
+              "relativeError": 0.001055155408411719
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 764.2310896871529,
+              "relativeError": 0.0006211882321798387
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 763.8988019873291,
+              "relativeError": 0.00018611811069501894
+            }
+          ]
+        },
+        {
+          "distanceMeters": 0.5,
+          "rgbCdM2": [
+            499.40912226558424,
+            190.64280916661065,
+            35.18947573398634
+          ],
+          "luminanceCdM2": 245.0892111194586,
+          "referenceConvergence": 8.658516453517908e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 244.9055139690456,
+              "relativeError": 0.0007495113700598152
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 245.26152468248188,
+              "relativeError": 0.0007030646605626351
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 245.0442209927733,
+              "relativeError": 0.00018356632868425914
+            }
+          ]
+        },
+        {
+          "distanceMeters": 1,
+          "rgbCdM2": [
+            129.44377935035808,
+            49.00692802412908,
+            8.893940033612779
+          ],
+          "luminanceCdM2": 63.218516455024336,
+          "referenceConvergence": 0.0000010881254516025546,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 63.209649688669714,
+              "relativeError": 0.00014025584356965894
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 63.27538179865474,
+              "relativeError": 0.0008995045568787096
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 63.20494122351257,
+              "relativeError": 0.00021473505347793952
+            }
+          ]
+        },
+        {
+          "distanceMeters": 2,
+          "rgbCdM2": [
+            9.515303050091719,
+            3.534839620945204,
+            0.6182200001358608
+          ],
+          "luminanceCdM2": 4.596215454117786,
+          "referenceConvergence": 0.0000010584932157075272,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 4.600190007365054,
+              "relativeError": 0.0008647447638049879
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 4.591826794813955,
+              "relativeError": 0.0009548419449960434
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 4.596808617090625,
+              "relativeError": 0.0001290546491478436
+            }
+          ]
+        },
+        {
+          "distanceMeters": 3,
+          "rgbCdM2": [
+            0.17875745733201506,
+            0.05204114195840594,
+            0.003992113208369027
+          ],
+          "luminanceCdM2": 0.07552233478030625,
+          "referenceConvergence": 4.098256043858573e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 0.0756769823623991,
+              "relativeError": 0.0020477065829959075
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 0.07544864936452945,
+              "relativeError": 0.0009756771422803871
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 0.0754803431585533,
+              "relativeError": 0.0005560159372071737
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ab-sustained",
+      "native": {
+        "scenario": "cold-cycle",
+        "phase": "afterburner",
+        "timeS": 272.51666666658315,
+        "phaseTimeS": 60,
+        "ambientK": 286.49913199899083,
+        "pressurePsf": 2053.2761045982993,
+        "egtC": 733.5491319989909,
+        "gasK": 2363.1028843899676,
+        "thermalValid": 1,
+        "fuelKgSec": 9.071065908566188,
+        "suppliedAbKgSec": 6.112872855476447,
+        "burnedAbKgSec": 4.780720234907427,
+        "n1Pct": 100,
+        "n2Pct": 100,
+        "nativeRunning": 1,
+        "augmentation": 1,
+        "nozzleNorm": 1,
+        "nozzlePitchRad": 0,
+        "nozzleYawRad": 0,
+        "conversion": 0,
+        "throttleCmd": 1,
+        "throttlePosition": 1,
+        "coreK": 960.0948913476973,
+        "linerK": 1270.1751745836332,
+        "visualRunning": 1,
+        "opticsValid": 1,
+        "radiusM": 0.565,
+        "lengthM": 6,
+        "throatAreaM2": 0.6081944545000423,
+        "exitAreaM2": 1.0080083129331545,
+        "absorptionPerM": 0.08,
+        "effectiveVolumeM3": 0.5690960528562605,
+        "fuelPowerW": 392777153.840916,
+        "particlePowerBoundW": 322016.2658277257,
+        "excitedPowerW": 207.00518617149157,
+        "totalSourcePowerBoundW": 322223.2710138972,
+        "sourceYcdM3": 259870.5542658833,
+        "continuumYcdM3": 251605.50594492268,
+        "excitedYcdM3": 8265.048320960603,
+        "sourceRcdM3": 548193.0308930905,
+        "continuumRcdM3": 546553.5589052303,
+        "excitedRcdM3": 1639.4719878602773,
+        "sourceGcdM3": 196428.59624154939,
+        "continuumGcdM3": 186665.1826179324,
+        "excitedGcdM3": 9763.413623616972,
+        "sourceBcdM3": 39321.10617806266,
+        "continuumBcdM3": 26388.929547444244,
+        "excitedBcdM3": 12932.176630618418,
+        "rearAxisEffectivePathM": 0.777174743908174,
+        "rearAxisRadianceYcdM2": 195814.4745303256,
+        "rearAxisSceneYAtWhite1000": 195.81447453032558,
+        "rearOffsetEffectivePathM": 1.2467020465716705,
+        "rearOffsetRadianceYcdM2": 308348.8264430122,
+        "rearOffsetSceneYAtWhite1000": 308.34882644301223,
+        "sideNearExitEffectivePathM": 0.38536756290338053,
+        "sideNearExitRadianceYcdM2": 98617.70869749266,
+        "sideNearExitSceneYAtWhite1000": 98.61770869749266,
+        "coreEmissionYcdM2": 0.8107940364998062,
+        "linerEmissionYcdM2": 335.64770873328575,
+        "flowProxyKgSec": 116.76574140598927,
+        "directionX": 0,
+        "directionY": 0,
+        "directionZ": 1
+      },
+      "input": {
+        "temperatureKelvin": 2363.1028843899676,
+        "ambientTemperatureKelvin": 286.49913199899083,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 9.071065908566188,
+        "afterburnerBurnedFuelFlowKgPerSecond": 4.780720234907427,
+        "radiusMeters": 0.565,
+        "lengthMeters": 6,
+        "flowDomain": {
+          "axialDistanceRangeMeters": [
+            -2.356656571999874,
+            6
+          ],
+          "sections": [
+            {
+              "distanceMeters": -2.356656571999874,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.29,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -2.0366565719998744,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.26,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.7566565719998741,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.15,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6866565719998743,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.015,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6866565719998743,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6066565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.3266565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.915311479119447
+            },
+            {
+              "distanceMeters": -1.3266565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.8466565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.5666565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -0.272717802865893,
+              "radiusMeters": 0.44,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 0,
+              "radiusMeters": 0.565,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 6,
+              "radiusMeters": 0.985,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            }
+          ]
+        },
+        "axialSamples": 64,
+        "radialSamples": 32,
+        "upstreamGasTemperatureKelvin": 1006.6991319989909,
+        "ambientPressurePascal": 98311.39164630171
+      },
+      "before": {
+        "valid": true,
+        "temperatureK": 2363.1028843899676,
+        "absorptionPerMeter": 0.025,
+        "particlePowerW": 232408.7843335711,
+        "chPowerW": 190.5932595896644,
+        "c2PowerW": 0,
+        "exteriorIntensityCd": 37408.66953948159,
+        "allowedPowerW": 1178522.0548277786,
+        "wholeIntensityCd": 92452.85862693274
+      },
+      "after": {
+        "valid": true,
+        "temperatureK": 2363.1028843899676,
+        "absorptionPerMeter": 0.025,
+        "particlePowerW": 77988.89644345133,
+        "chPowerW": 190.5932595896644,
+        "c2PowerW": 0,
+        "exteriorIntensityCd": 35773.6670505254,
+        "allowedPowerW": 1178522.0548277786,
+        "wholeIntensityCd": 88459.51893448945
+      },
+      "rays": [
+        {
+          "distanceMeters": 0,
+          "rgbCdM2": [
+            54521.06996425762,
+            21609.75547723558,
+            4382.68156125601
+          ],
+          "luminanceCdM2": 27365.73827309229,
+          "referenceConvergence": 4.2604677176377746e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 27350.43497594017,
+              "relativeError": 0.0005592137511293752
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 27382.758589642668,
+              "relativeError": 0.0006219571487721424
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 27370.81973101423,
+              "relativeError": 0.00018568685672686063
+            }
+          ]
+        },
+        {
+          "distanceMeters": 0.5,
+          "rgbCdM2": [
+            48182.264913353225,
+            19012.746756928573,
+            3819.7989212627886
+          ],
+          "luminanceCdM2": 24119.763666093553,
+          "referenceConvergence": 5.376188288372257e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 24122.94837749142,
+              "relativeError": 0.0001320374213426698
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 24135.17526511163,
+              "relativeError": 0.0006389614438777086
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 24121.896844245053,
+              "relativeError": 0.00008844108843814071
+            }
+          ]
+        },
+        {
+          "distanceMeters": 1,
+          "rgbCdM2": [
+            36933.57553425346,
+            14454.800092957097,
+            2854.388348388819
+          ],
+          "luminanceCdM2": 18398.16818232217,
+          "referenceConvergence": 0.0000012449570222661785,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 18391.774102610452,
+              "relativeError": 0.0003475389315041282
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 18414.670535170266,
+              "relativeError": 0.0008969562993750809
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 18391.21591436721,
+              "relativeError": 0.0003778782695137642
+            }
+          ]
+        },
+        {
+          "distanceMeters": 2,
+          "rgbCdM2": [
+            23463.5040501339,
+            9118.774564081548,
+            1774.9835930079282
+          ],
+          "luminanceCdM2": 11639.472582136028,
+          "referenceConvergence": 8.356137211743012e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 11642.6065298306,
+              "relativeError": 0.0002692516926739598
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 11631.301161885647,
+              "relativeError": 0.0007020438591798503
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 11641.260683335362,
+              "relativeError": 0.00015362390234746409
+            }
+          ]
+        },
+        {
+          "distanceMeters": 3,
+          "rgbCdM2": [
+            13387.971909482776,
+            5077.729843403601,
+            934.3383250141997
+          ],
+          "luminanceCdM2": 6546.044348231881,
+          "referenceConvergence": 7.460555596481057e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 6554.572948568884,
+              "relativeError": 0.0013028632076572207
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 6539.687383609618,
+              "relativeError": 0.0009711154223969301
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 6544.688302556165,
+              "relativeError": 0.00020715497842329456
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ab-cutoff",
+      "native": {
+        "scenario": "cold-cycle",
+        "phase": "dry99-after-ab",
+        "timeS": 272.5249999999165,
+        "phaseTimeS": 0.008333333333333333,
+        "ambientK": 286.49913199899083,
+        "pressurePsf": 2053.2761045982993,
+        "egtC": 729.9781319989909,
+        "gasK": 1003.1281319989909,
+        "thermalValid": 1,
+        "fuelKgSec": 9.071065908566188,
+        "suppliedAbKgSec": 0,
+        "burnedAbKgSec": 0,
+        "n1Pct": 99.56061399213404,
+        "n2Pct": 99.6,
+        "nativeRunning": 1,
+        "augmentation": 0,
+        "nozzleNorm": 1,
+        "nozzlePitchRad": 0,
+        "nozzleYawRad": 0,
+        "conversion": 0,
+        "throttleCmd": 0.99,
+        "throttlePosition": 0.99,
+        "coreK": 960.0845726776033,
+        "linerK": 1269.5570747808442,
+        "visualRunning": 1,
+        "opticsValid": 1,
+        "radiusM": 0.565,
+        "lengthM": 1.2000000000000002,
+        "throatAreaM2": 0.6081944545000423,
+        "exitAreaM2": 1.0080083129331545,
+        "absorptionPerM": 0.025,
+        "effectiveVolumeM3": 0.11381921057125212,
+        "fuelPowerW": 392777153.840916,
+        "particlePowerBoundW": 653.5110659867611,
+        "excitedPowerW": 0,
+        "totalSourcePowerBoundW": 653.5110659867611,
+        "sourceYcdM3": 0.07225058133967188,
+        "continuumYcdM3": 0.07225058133967188,
+        "excitedYcdM3": 0,
+        "sourceRcdM3": 0.3294826063420246,
+        "continuumRcdM3": 0.3294826063420246,
+        "excitedRcdM3": 0,
+        "sourceGcdM3": 0.0030796689476474525,
+        "continuumGcdM3": 0.0030796689476474525,
+        "excitedGcdM3": 0,
+        "sourceBcdM3": 0,
+        "continuumBcdM3": 0,
+        "excitedBcdM3": 0,
+        "rearAxisEffectivePathM": 0.1554349487816348,
+        "rearAxisRadianceYcdM2": 0.011208473948791915,
+        "rearAxisSceneYAtWhite1000": 0.000011208473948791915,
+        "rearOffsetEffectivePathM": 0.24934040931433413,
+        "rearOffsetRadianceYcdM2": 0.0179589576990981,
+        "rearOffsetSceneYAtWhite1000": 0.0000179589576990981,
+        "sideNearExitEffectivePathM": 0.38536756290338053,
+        "sideNearExitRadianceYcdM2": 0.027709337624495588,
+        "sideNearExitSceneYAtWhite1000": 0.000027709337624495586,
+        "coreEmissionYcdM2": 0.8105811946144265,
+        "linerEmissionYcdM2": 332.5747851925912,
+        "flowProxyKgSec": 115.83348372660386,
+        "directionX": 0,
+        "directionY": 0,
+        "directionZ": 1
+      },
+      "input": {
+        "temperatureKelvin": 1003.1281319989909,
+        "ambientTemperatureKelvin": 286.49913199899083,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 9.071065908566188,
+        "afterburnerBurnedFuelFlowKgPerSecond": 0,
+        "radiusMeters": 0.565,
+        "lengthMeters": 6,
+        "flowDomain": {
+          "axialDistanceRangeMeters": [
+            -2.356656571999874,
+            6
+          ],
+          "sections": [
+            {
+              "distanceMeters": -2.356656571999874,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.29,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -2.0366565719998744,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.26,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.7566565719998741,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.15,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6866565719998743,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.015,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6866565719998743,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6066565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.3266565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.915311479119447
+            },
+            {
+              "distanceMeters": -1.3266565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.8466565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.5666565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -0.272717802865893,
+              "radiusMeters": 0.44,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 0,
+              "radiusMeters": 0.565,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 6,
+              "radiusMeters": 0.985,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            }
+          ]
+        },
+        "axialSamples": 64,
+        "radialSamples": 32,
+        "upstreamGasTemperatureKelvin": 1003.1281319989909,
+        "ambientPressurePascal": 98311.39164630171
+      },
+      "before": {
+        "valid": true,
+        "temperatureK": 1003.1281319989909,
+        "absorptionPerMeter": 0.025,
+        "particlePowerW": 7870.688889510243,
+        "chPowerW": 0,
+        "c2PowerW": 0,
+        "exteriorIntensityCd": 0.031709991338813054,
+        "allowedPowerW": 1178331.461522748,
+        "wholeIntensityCd": 0.08210959598590778
+      },
+      "after": {
+        "valid": true,
+        "temperatureK": 1003.1281319989909,
+        "absorptionPerMeter": 0.025,
+        "particlePowerW": 1114.4086008030388,
+        "chPowerW": 0,
+        "c2PowerW": 0,
+        "exteriorIntensityCd": 0.028477283139609642,
+        "allowedPowerW": 1178331.461522748,
+        "wholeIntensityCd": 0.07376156425850822
+      },
+      "rays": [
+        {
+          "distanceMeters": 0,
+          "rgbCdM2": [
+            0.10381959417111496,
+            0.002065634894559304,
+            0
+          ],
+          "luminanceCdM2": 0.023556857508434968,
+          "referenceConvergence": 4.2709336243523095e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 0.023528452358547385,
+              "relativeError": 0.001205812357501959
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 0.023571601047751425,
+              "relativeError": 0.000625870378134179
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 0.023561298644716146,
+              "relativeError": 0.000188528384127125
+            }
+          ]
+        },
+        {
+          "distanceMeters": 0.5,
+          "rgbCdM2": [
+            0.09012866999615504,
+            0.0017675931454935745,
+            0
+          ],
+          "luminanceCdM2": 0.02043202374792993,
+          "referenceConvergence": 6.320938925228938e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 0.02045445545450791,
+              "relativeError": 0.0010978700325880671
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 0.020445697367995133,
+              "relativeError": 0.0006692249497110219
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 0.02043247248069331,
+              "relativeError": 0.00002196222796710487
+            }
+          ]
+        },
+        {
+          "distanceMeters": 1,
+          "rgbCdM2": [
+            0.06689380262201898,
+            0.0012810131349468832,
+            0
+          ],
+          "luminanceCdM2": 0.01514261835733854,
+          "referenceConvergence": 0.0000013156477892330065,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 0.015137308936080127,
+              "relativeError": 0.00035062768757166025
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 0.015157575506043216,
+              "relativeError": 0.0009877518109294569
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 0.015137175040266217,
+              "relativeError": 0.00035947000339515793
+            }
+          ]
+        },
+        {
+          "distanceMeters": 2,
+          "rgbCdM2": [
+            0.041394622492311364,
+            0.0007781361234309931,
+            0
+          ],
+          "luminanceCdM2": 0.009360000170416232,
+          "referenceConvergence": 0.0000011174834447475,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 0.009363249445554505,
+              "relativeError": 0.0003471447734096665
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 0.009351498371312758,
+              "relativeError": 0.0009083118534917288
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 0.009362209039945097,
+              "relativeError": 0.00023599032998387448
+            }
+          ]
+        },
+        {
+          "distanceMeters": 3,
+          "rgbCdM2": [
+            0.021252266952331726,
+            0.00036170247588281556,
+            0
+          ],
+          "luminanceCdM2": 0.004778453565699592,
+          "referenceConvergence": 4.4762836862270903e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 0.004787116257613276,
+              "relativeError": 0.00181286514446136
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 0.0047737878072130315,
+              "relativeError": 0.0009764159936705053
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 0.004775978111967942,
+              "relativeError": 0.0005180449485623428
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "powered-lift",
+      "native": {
+        "scenario": "powered-lift",
+        "phase": "powered-lift-full-command",
+        "timeS": 117.5250000000396,
+        "phaseTimeS": 90,
+        "ambientK": 286.4991319989687,
+        "pressurePsf": 2053.2761045974676,
+        "egtC": 729.9781319989688,
+        "gasK": 1003.1281319989688,
+        "thermalValid": 1,
+        "fuelKgSec": 4.420049982197244,
+        "suppliedAbKgSec": 0,
+        "burnedAbKgSec": 0,
+        "n1Pct": 99.3,
+        "n2Pct": 99.6,
+        "nativeRunning": 1,
+        "augmentation": 0,
+        "nozzleNorm": 0.01000000000000012,
+        "nozzlePitchRad": 1.5707963267948966,
+        "nozzleYawRad": 1.829907617578383e-15,
+        "conversion": 1,
+        "throttleCmd": 1,
+        "throttlePosition": 0.99,
+        "coreK": 956.7228132202761,
+        "linerK": 664.0542773824793,
+        "visualRunning": 1,
+        "opticsValid": 1,
+        "radiusM": 0.40161378548650467,
+        "lengthM": 1.2000000000000002,
+        "throatAreaM2": 0.3837808557176592,
+        "exitAreaM2": 0.505376278459852,
+        "absorptionPerM": 0.025,
+        "effectiveVolumeM3": 0.05750901070800853,
+        "fuelPowerW": 191388164.22914067,
+        "particlePowerBoundW": 330.19711437995056,
+        "excitedPowerW": 0,
+        "totalSourcePowerBoundW": 330.19711437995056,
+        "sourceYcdM3": 0.07225058133963451,
+        "continuumYcdM3": 0.07225058133963451,
+        "excitedYcdM3": 0,
+        "sourceRcdM3": 0.3294826063418601,
+        "continuumRcdM3": 0.3294826063418601,
+        "excitedRcdM3": 0,
+        "sourceGcdM3": 0.003079668947644074,
+        "continuumGcdM3": 0.003079668947644074,
+        "excitedGcdM3": 0,
+        "sourceBcdM3": 0,
+        "continuumBcdM3": 0,
+        "excitedBcdM3": 0,
+        "rearAxisEffectivePathM": 0.1554349487816348,
+        "rearAxisRadianceYcdM2": 0.011208473948786117,
+        "rearAxisSceneYAtWhite1000": 0.000011208473948786118,
+        "rearOffsetEffectivePathM": 0.24934040931433413,
+        "rearOffsetRadianceYcdM2": 0.01795895769908881,
+        "rearOffsetSceneYAtWhite1000": 0.00001795895769908881,
+        "sideNearExitEffectivePathM": 0.27392730219705375,
+        "sideNearExitRadianceYcdM2": 0.019723793675489796,
+        "sideNearExitSceneYAtWhite1000": 0.000019723793675489795,
+        "coreEmissionYcdM2": 0.7440404138222306,
+        "linerEmissionYcdM2": 0.000019412325560617317,
+        "flowProxyKgSec": 115.83348372656143,
+        "directionX": -1.829907617578383e-15,
+        "directionY": -1,
+        "directionZ": 6.123233995736766e-17
+      },
+      "input": {
+        "temperatureKelvin": 1003.1281319989688,
+        "ambientTemperatureKelvin": 286.4991319989687,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 4.420049982197244,
+        "afterburnerBurnedFuelFlowKgPerSecond": 0,
+        "radiusMeters": 0.40161378548650467,
+        "lengthMeters": 6,
+        "flowDomain": {
+          "axialDistanceRangeMeters": [
+            -2.345961440504734,
+            6
+          ],
+          "sections": [
+            {
+              "distanceMeters": -2.345961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.29,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -2.025961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.26,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.745961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.15,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.675961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.015,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.675961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.595961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.315961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.915311479119447
+            },
+            {
+              "distanceMeters": -1.315961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.835961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.555961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -0.295671807832921,
+              "radiusMeters": 0.3508379836433799,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 0,
+              "radiusMeters": 0.40161378548650467,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 6,
+              "radiusMeters": 0.8216137854865047,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            }
+          ]
+        },
+        "axialSamples": 64,
+        "radialSamples": 32,
+        "upstreamGasTemperatureKelvin": 1003.1281319989688,
+        "ambientPressurePascal": 98311.39164626188
+      },
+      "before": {
+        "valid": true,
+        "temperatureK": 1003.1281319989688,
+        "absorptionPerMeter": 0.025,
+        "particlePowerW": 5112.419656242847,
+        "chPowerW": 0,
+        "c2PowerW": 0,
+        "exteriorIntensityCd": 0.011378629343048037,
+        "allowedPowerW": 574164.492687422,
+        "wholeIntensityCd": 0.05765621042385919
+      },
+      "after": {
+        "valid": true,
+        "temperatureK": 1003.1281319989688,
+        "absorptionPerMeter": 0.025,
+        "particlePowerW": 733.4977397994085,
+        "chPowerW": 0,
+        "c2PowerW": 0,
+        "exteriorIntensityCd": 0.010218591070062826,
+        "allowedPowerW": 574164.492687422,
+        "wholeIntensityCd": 0.051799224023528136
+      },
+      "rays": [
+        {
+          "distanceMeters": 0,
+          "rgbCdM2": [
+            0.07362072453693703,
+            0.001464789601625416,
+            0
+          ],
+          "luminanceCdM2": 0.016704680493511096,
+          "referenceConvergence": 4.249098710769509e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 0.016671784968974892,
+              "relativeError": 0.0019692399713351245
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 0.016715103446517963,
+              "relativeError": 0.0006239540475447081
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 0.01670783513012611,
+              "relativeError": 0.00018884746800382438
+            }
+          ]
+        },
+        {
+          "distanceMeters": 0.5,
+          "rgbCdM2": [
+            0.05671406059878746,
+            0.0010970271682361878,
+            0
+          ],
+          "luminanceCdM2": 0.012846085131143745,
+          "referenceConvergence": 0.000001160826531020931,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 0.012842842863817342,
+              "relativeError": 0.0002523934173954974
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 0.012856327029953273,
+              "relativeError": 0.0007972778247201319
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 0.01284105707862382,
+              "relativeError": 0.0003914073796486801
+            }
+          ]
+        },
+        {
+          "distanceMeters": 1,
+          "rgbCdM2": [
+            0.0384772493019034,
+            0.0007314870828163504,
+            0
+          ],
+          "luminanceCdM2": 0.008706192789606467,
+          "referenceConvergence": 6.267935899843571e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 0.0087060278937772,
+              "relativeError": 0.00001894006177578998
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 0.008710819374592263,
+              "relativeError": 0.0005314131099095123
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 0.008705231424685596,
+              "relativeError": 0.0001104231142248494
+            }
+          ]
+        },
+        {
+          "distanceMeters": 2,
+          "rgbCdM2": [
+            0.017798391053978516,
+            0.00031259268982536777,
+            0
+          ],
+          "luminanceCdM2": 0.004008786790616197,
+          "referenceConvergence": 6.661103694060968e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 0.004012753604514608,
+              "relativeError": 0.0009895297768632242
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 0.004004873437562635,
+              "relativeError": 0.0009761938606268552
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 0.004007607817675884,
+              "relativeError": 0.00029409719246540716
+            }
+          ]
+        },
+        {
+          "distanceMeters": 3,
+          "rgbCdM2": [
+            0.00024331602038236844,
+            0,
+            0
+          ],
+          "luminanceCdM2": 0.0000517467236711774,
+          "referenceConvergence": 1.6263577667662237e-7,
+          "budgets": [
+            {
+              "samples": 32,
+              "luminanceCdM2": 0.000051889110323848585,
+              "relativeError": 0.0027516071080359483
+            },
+            {
+              "samples": 64,
+              "luminanceCdM2": 0.00005169622033136676,
+              "relativeError": 0.0009759717374874507
+            },
+            {
+              "samples": 128,
+              "luminanceCdM2": 0.00005170483817215194,
+              "relativeError": 0.000809432869443458
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "shutdown",
+      "native": {
+        "scenario": "cold-cycle",
+        "phase": "cooling",
+        "timeS": 573.5166666663094,
+        "phaseTimeS": 180,
+        "ambientK": 286.4991319993156,
+        "pressurePsf": 2053.276104610534,
+        "egtC": 13.349131999315615,
+        "gasK": 286.4991319993156,
+        "thermalValid": 1,
+        "fuelKgSec": 0,
+        "suppliedAbKgSec": 0,
+        "burnedAbKgSec": 0,
+        "n1Pct": 2.7837606647015364e-24,
+        "n2Pct": 1.8558404431343576e-24,
+        "nativeRunning": 0,
+        "augmentation": 0,
+        "nozzleNorm": 1,
+        "nozzlePitchRad": 0,
+        "nozzleYawRad": 0,
+        "conversion": 0,
+        "throttleCmd": 0,
+        "throttlePosition": 0,
+        "coreK": 422.685020301491,
+        "linerK": 477.3936800890442,
+        "visualRunning": 0,
+        "opticsValid": 0,
+        "radiusM": 0.565,
+        "lengthM": 1.2000000000000002,
+        "throatAreaM2": 0.6081944545000423,
+        "exitAreaM2": 1.0080083129331545,
+        "absorptionPerM": 0,
+        "effectiveVolumeM3": 0,
+        "fuelPowerW": 0,
+        "particlePowerBoundW": 0,
+        "excitedPowerW": 0,
+        "totalSourcePowerBoundW": 0,
+        "sourceYcdM3": 0,
+        "continuumYcdM3": 0,
+        "excitedYcdM3": 0,
+        "sourceRcdM3": 0,
+        "continuumRcdM3": 0,
+        "excitedRcdM3": 0,
+        "sourceGcdM3": 0,
+        "continuumGcdM3": 0,
+        "excitedGcdM3": 0,
+        "sourceBcdM3": 0,
+        "continuumBcdM3": 0,
+        "excitedBcdM3": 0,
+        "rearAxisEffectivePathM": 0.1554349487816348,
+        "rearAxisRadianceYcdM2": 0,
+        "rearAxisSceneYAtWhite1000": 0,
+        "rearOffsetEffectivePathM": 0.24934040931433413,
+        "rearOffsetRadianceYcdM2": 0,
+        "rearOffsetSceneYAtWhite1000": 0,
+        "sideNearExitEffectivePathM": 0.38536756290338053,
+        "sideNearExitRadianceYcdM2": 0,
+        "sideNearExitSceneYAtWhite1000": 0,
+        "coreEmissionYcdM2": 1.6668175076864146e-13,
+        "linerEmissionYcdM2": 4.9560738023672436e-11,
+        "flowProxyKgSec": 4.0215799852329117e-50,
+        "directionX": 0,
+        "directionY": 0,
+        "directionZ": 1
+      },
+      "input": {
+        "temperatureKelvin": 286.4991319993156,
+        "ambientTemperatureKelvin": 286.4991319993156,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0,
+        "afterburnerBurnedFuelFlowKgPerSecond": 0,
+        "radiusMeters": 0.565,
+        "lengthMeters": 6,
+        "flowDomain": {
+          "axialDistanceRangeMeters": [
+            -2.356656571999874,
+            6
+          ],
+          "sections": [
+            {
+              "distanceMeters": -2.356656571999874,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.29,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -2.0366565719998744,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.26,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.7566565719998741,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.15,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6866565719998743,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.015,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6866565719998743,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6066565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.3266565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.915311479119447
+            },
+            {
+              "distanceMeters": -1.3266565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.8466565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.5666565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -0.272717802865893,
+              "radiusMeters": 0.44,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 0,
+              "radiusMeters": 0.565,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 6,
+              "radiusMeters": 0.985,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            }
+          ]
+        },
+        "axialSamples": 64,
+        "radialSamples": 32,
+        "upstreamGasTemperatureKelvin": 286.4991319993156,
+        "ambientPressurePascal": 98311.3916468875
+      },
+      "before": {
+        "valid": false,
+        "temperatureK": 0,
+        "absorptionPerMeter": 0,
+        "particlePowerW": 0,
+        "chPowerW": 0,
+        "c2PowerW": 0,
+        "exteriorIntensityCd": 0,
+        "allowedPowerW": 0,
+        "wholeIntensityCd": 0
+      },
+      "after": {
+        "valid": false,
+        "temperatureK": 0,
+        "absorptionPerMeter": 0,
+        "particlePowerW": 0,
+        "chPowerW": 0,
+        "c2PowerW": 0,
+        "exteriorIntensityCd": 0,
+        "allowedPowerW": 0,
+        "wholeIntensityCd": 0
+      },
+      "rays": []
+    }
+  ],
+  "visualization": {
+    "names": [
+      "powered-lift",
+      "ab-onset",
+      "ab-sustained"
+    ],
+    "exposures": [
+      0,
+      8,
+      10
+    ],
+    "width": 144,
+    "height": 216,
+    "fieldWidthMeters": 2,
+    "fieldLengthMeters": 3,
+    "whiteReferenceCdM2": 1000,
+    "transfer": "component Reinhard then sRGB",
+    "samplesPerRay": 128,
+    "frames": [
+      {
+        "name": "powered-lift",
+        "ev": 0,
+        "filename": "powered-lift-EV0.png"
+      },
+      {
+        "name": "powered-lift",
+        "ev": 8,
+        "filename": "powered-lift-EV8.png"
+      },
+      {
+        "name": "powered-lift",
+        "ev": 10,
+        "filename": "powered-lift-EV10.png"
+      },
+      {
+        "name": "ab-onset",
+        "ev": 0,
+        "filename": "ab-onset-EV0.png"
+      },
+      {
+        "name": "ab-onset",
+        "ev": 8,
+        "filename": "ab-onset-EV8.png"
+      },
+      {
+        "name": "ab-onset",
+        "ev": 10,
+        "filename": "ab-onset-EV10.png"
+      },
+      {
+        "name": "ab-sustained",
+        "ev": 0,
+        "filename": "ab-sustained-EV0.png"
+      },
+      {
+        "name": "ab-sustained",
+        "ev": 8,
+        "filename": "ab-sustained-EV8.png"
+      },
+      {
+        "name": "ab-sustained",
+        "ev": 10,
+        "filename": "ab-sustained-EV10.png"
+      }
+    ],
+    "qualification": "Frozen exterior source-only CPU visualization. No hardware/deck/airframe, volumetric multiple scattering, night environment, camera spectral response or live HDR composition. All cases share the same geometric downward plotting orientation; this does not depict AB in hover."
+  },
+  "validation": {
+    "passed": true,
+    "sameTemperatures": true,
+    "sameChemicalPower": true,
+    "flagOnlyInvariant": true,
+    "zeroFuelDark": true,
+    "sourcePowerBounded": true,
+    "appearanceAccepted": false
+  }
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "case": "powered-lift",
+    "finiteReceiverIncidentLumensTrapezoid": {
+      "internalGasLux": 0.023013014449696705,
+      "externalGasLux": 0.04178922654139913,
+      "gasLux": 0.06480224099109583,
+      "coreLux": 0.0055135706452916575,
+      "linerLux": 2.6796315160274643e-05,
+      "combinedLux": 0.07034260795154776
+    },
+    "wholeGasUnoccludedSourceLumensUpperBound": 0.6509282466158717,
+    "oneSidedWholeHotSurfaceLumensUpperBound": 3.7302468994069646,
+    "incidentWithinBroadSourceBounds": true,
+    "method": "Trapezoidal integral of retained 17x17 lux CSV on 6x6 m plane. Source upper bounds are 4pi Iwholegas and pi sum(Lmaterial*area). No independent spatial mesh-grid convergence claim."
+  },
+  {
+    "case": "hot-shutdown-posed-down",
+    "finiteReceiverIncidentLumensTrapezoid": {
+      "internalGasLux": 0.0,
+      "externalGasLux": 0.0,
+      "gasLux": 0.0,
+      "coreLux": 0.008162863938424634,
+      "linerLux": 4.870884931926185e-05,
+      "combinedLux": 0.008211572787743895
+    },
+    "wholeGasUnoccludedSourceLumensUpperBound": 0,
+    "oneSidedWholeHotSurfaceLumensUpperBound": 2.825029621324491,
+    "incidentWithinBroadSourceBounds": true,
+    "method": "Trapezoidal integral of retained 17x17 lux CSV on 6x6 m plane. Source upper bounds are 4pi Iwholegas and pi sum(Lmaterial*area). No independent spatial mesh-grid convergence claim."
+  }
+]

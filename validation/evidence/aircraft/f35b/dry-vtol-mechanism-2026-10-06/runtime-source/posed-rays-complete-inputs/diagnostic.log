@@ -1,0 +1,22 @@
+(node:31680) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+BJS - [23:40:29]: Babylon.js v8.56.2 - Null engine
+{
+  "out": "build/dry-vtol-mechanism-2026-10-06/posed-rays-complete-inputs-20261007T044028",
+  "images": 0,
+  "rays": 288,
+  "errors": [
+    "Runtime midpoint error exceeds 1% on selected ray: idle/rear/0.12",
+    "Runtime midpoint error exceeds 1% on selected ray: dry99/rear/0.12",
+    "Runtime midpoint error exceeds 1% on selected ray: dry99/rear/-0.35",
+    "Runtime midpoint error exceeds 1% on selected ray: ab-onset/rear/0.12",
+    "Runtime midpoint error exceeds 1% on selected ray: ab-sustained/rear/0.12",
+    "Runtime midpoint error exceeds 1% on selected ray: ab-sustained/oblique/-0.9",
+    "Runtime midpoint error exceeds 1% on selected ray: ab-cutoff/rear/0.12",
+    "Runtime midpoint error exceeds 1% on selected ray: ab-cutoff/rear/-0.9",
+    "Runtime midpoint error exceeds 1% on selected ray: ab-cutoff/oblique/-0.9",
+    "Runtime midpoint error exceeds 1% on selected ray: powered-lift/rear/0.12",
+    "Runtime midpoint error exceeds 1% on selected ray: powered-lift/rear/-0.35",
+    "Runtime midpoint error exceeds 1% on selected ray: powered-lift/oblique/-0.35"
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "schema": "0sfs-fixed32-interval-candidate-summary/1",
+  "status": "rejected-no-improvement",
+  "threshold": 0.01,
+  "selectedPeakThresholdCdM2": 1e-8,
+  "scope": "Complete current thermal/pressure/native observations, 96 exact-hardware-clipped CPU rays; fixed source data. No GPU or runtime edit.",
+  "method": "Sort conservative section AABB endpoints clipped to global box/opaque depth. Keep occupied intervals. Minimum one sample per interval; distribute remaining to largest length-proportional deficit, exactly32 source evaluations. Same physical step lengths and homogeneous-segment transfer.",
+  "all": {
+    "rays": 60,
+    "alignedFailureCount": 16,
+    "globalFailureCount": 12,
+    "maxAlignedRelativeError": 0.24167133109625072,
+    "maxGlobalRelativeError": 0.04534421523452045,
+    "maximumReferenceRefinement": 0.001024157130080159,
+    "improved": 23,
+    "worsened": 28
+  },
+  "byState": {
+    "idle": {
+      "rays": 8,
+      "alignedFailureCount": 1,
+      "globalFailureCount": 1,
+      "maxAlignedRelativeError": 0.03159730170843554,
+      "maxGlobalRelativeError": 0.016273719264752164,
+      "maximumReferenceRefinement": 0.00003108617275391038,
+      "improved": 4,
+      "worsened": 4
+    },
+    "dry99": {
+      "rays": 10,
+      "alignedFailureCount": 3,
+      "globalFailureCount": 2,
+      "maxAlignedRelativeError": 0.0460915016404559,
+      "maxGlobalRelativeError": 0.021629097805342057,
+      "maximumReferenceRefinement": 0.0005562748886355617,
+      "improved": 2,
+      "worsened": 6
+    },
+    "ab-onset": {
+      "rays": 10,
+      "alignedFailureCount": 2,
+      "globalFailureCount": 1,
+      "maxAlignedRelativeError": 0.07071932176995556,
+      "maxGlobalRelativeError": 0.03641379835504492,
+      "maximumReferenceRefinement": 0.001024157130080159,
+      "improved": 4,
+      "worsened": 4
+    },
+    "ab-sustained": {
+      "rays": 11,
+      "alignedFailureCount": 2,
+      "globalFailureCount": 2,
+      "maxAlignedRelativeError": 0.03419320933029963,
+      "maxGlobalRelativeError": 0.027096052579041192,
+      "maximumReferenceRefinement": 0.00002997722979101398,
+      "improved": 5,
+      "worsened": 4
+    },
+    "ab-cutoff": {
+      "rays": 11,
+      "alignedFailureCount": 3,
+      "globalFailureCount": 3,
+      "maxAlignedRelativeError": 0.04534421523452045,
+      "maxGlobalRelativeError": 0.04534421523452045,
+      "maximumReferenceRefinement": 0.000030843066761804705,
+      "improved": 5,
+      "worsened": 4
+    },
+    "powered-lift": {
+      "rays": 10,
+      "alignedFailureCount": 5,
+      "globalFailureCount": 3,
+      "maxAlignedRelativeError": 0.24167133109625072,
+      "maxGlobalRelativeError": 0.022031316305439214,
+      "maximumReferenceRefinement": 0.000009747583058232847,
+      "improved": 3,
+      "worsened": 6
+    }
+  },
+  "checks": {
+    "allActiveUseExactly32": true,
+    "selectedWithNoGuaranteedVacuumSkipped": 46,
+    "maximumGuaranteedVacuumFractionSkipped": 0.18363058663456988
+  },
+  "decision": "Do not adopt. Conservative section AABBs generally overlap along these rays. Boundary allocation alters where32 samples fall without reliably resolving circular/annular support or narrow source variation. This experiment does not disprove other integrators; no further candidate searched."
+}

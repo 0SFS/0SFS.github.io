@@ -4,6 +4,35 @@ to verify them against their complete source inputs. The script also checks or
 generates the existing smoke asset. Runtime has no network access or spectral
 integration.
 
+The latest particle correction is a **non-grey source spectrum**, separate from
+the observer investigation. It retains reference absorption **κ550 = 0.025/m**
+and bakes `κλ/κ550 = (550 nm/λ)^α` with **α = 1**, sensitivity **1–1.3**.
+[NIST's primary flame-soot measurements](https://www.nist.gov/publications/measured-situ-mass-absorption-spectra-nine-forms-highly-absorbing-carbonaceous-aerosol)
+support that exponent range over **500–840 nm**; they do not measure F135 soot.
+The extension to all wavelengths is a declared model hypothesis.
+`gasEmission.particleSpectrum` contains separate absolute XYZ/RGB tables and a
+dimensionless Planck-mean absorption ratio. Its bolometric source is
+`4 κ550 σ T⁴ ratio(T)`, with
+`ratio = (550 nm kT/hc)^α Γ(4+α) ζ(4+α) / (Γ(4) ζ(4))`.
+This keeps the same spectrum in visible emission and the thermal power bound.
+At 1003.128 K the ratio is 0.146953; the unweighted blackbody table and all solid
+emission tables remain unchanged. Profiles without `particleSpectrum` retain
+their historical grey behavior.
+
+The new particle table uses quarter-nanometre integration of the interpolated
+official CIE observer. Runtime still attenuates with scalar κ550. This is an
+approximation to spectral transfer, not an LTE-correct optically thick limit.
+The [spectral diagnostic](../../validation/evidence/aircraft/f35b/dry-vtol-mechanism-2026-10-06/particle-spectrum/README.md)
+quantifies its error for declared homogeneous paths. It also checks independent
+Planck integrals and interpolation. No non-grey table normalizes a cold spectrum
+to a visible peak, and the correction slightly lowers dry visible emission.
+
+The [thermal/camera diagnostic](../../validation/evidence/aircraft/f35b/dry-vtol-mechanism-2026-10-06/thermal-camera/README.md)
+instead holds the source fixed and quantifies visible/NIR photon collection,
+exposure sensitivity, opacity-implied soot mass and separate receiver hypotheses.
+It does not map infrared energy into visible scene RGB or assert an unknown
+camera's spectral response. Neither diagnostic qualifies the night-footage match.
+
 The latest [AB response checkpoint](../../docs/validation/f135-exhaust-response.md)
 adds the [conditional internal CH(A) parcel](combustion/README.md) and a
 constant-cp mean-enthalpy temperature mixture. The source-correction description

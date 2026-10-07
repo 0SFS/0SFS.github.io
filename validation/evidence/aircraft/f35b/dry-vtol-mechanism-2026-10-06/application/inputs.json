@@ -1,0 +1,27 @@
+[
+  {
+    "file": "src/flight/aircraft/createEngineExhaust.ts",
+    "snapshot": "source-0-createEngineExhaust.ts.txt",
+    "sha256": "3eabf75a15b64516c58493f1d20e4a7cb0bff43545ff297a4f7a4c3cdd5c5055"
+  },
+  {
+    "file": "src/flight/aircraft/createEngineExhaust.test.ts",
+    "snapshot": "source-1-createEngineExhaust.test.ts.txt",
+    "sha256": "003e7e0ca9da2be3a5c10d69088ebdc40d90f8c032b670578597d1d279852d57"
+  },
+  {
+    "file": "src/flight/aircraft/createEngineExhaustDomain.test.ts",
+    "snapshot": "source-2-createEngineExhaustDomain.test.ts.txt",
+    "sha256": "ec6ec49ce28929f0f4591514aa12ad33f3f03119c13972515d1d00394c053145"
+  },
+  {
+    "file": "src/flight/aircraft/engineGasOptics.ts",
+    "snapshot": "source-3-engineGasOptics.ts.txt",
+    "sha256": "a2ed5be59fcc40e2f6d984fa949d2cc5908c14696d1fac94c09591aac9f43634"
+  },
+  {
+    "file": "src/flight/aircraft/engineGasOptics.test.ts",
+    "snapshot": "source-4-engineGasOptics.test.ts.txt",
+    "sha256": "e72debd15c95547acdc5cd02dbb86fde03111b819adf5a1d0df6b80c34016154"
+  }
+]

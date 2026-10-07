@@ -49,7 +49,17 @@ try{
     const radius=Vector3.TransformNormal(Vector3.Right(),world).length(),length=Vector3.Distance(start,end),error=Vector3.Distance(axis,expected),exitError=Vector3.Distance(start,Vector3.TransformCoordinates(Vector3.Zero(),exit.computeWorldMatrix(true)));
     assert(error<2e-6&&exitError<2e-6&&handle.mesh.isEnabled(),`Dry support disabled or misdirected ${pitchDeg}/${yawDeg}`);
     checks.push({pitchDeg,yawDeg,nativeAugmentation:state.augmentation,meshEnabled:handle.mesh.isEnabled(),start:start.asArray(),end:end.asArray(),outerBoxRadiusMeters:radius,exitRadiusMeters:rig.apertureGeometry.exitRadius,lengthMeters:length,axis:axis.asArray(),nativeAxisError:error,exitError});
-    const hardware=[];for(const mesh of container.meshes){const positions=mesh.getVerticesData(VertexBuffer.PositionKind),indices=mesh.getIndices();if(!positions||!indices)continue;const matrix=mesh.computeWorldMatrix(true);for(let i=0;i<indices.length;i+=3)hardware.push(triangle([0,1,2].map(j=>Vector3.TransformCoordinates(Vector3.FromArray(positions,indices[i+j]*3),matrix).asArray()),mesh.name));}const tree=bvh(hardware);
+    const hardware=[];
+    for(const mesh of container.meshes){
+      const positions=mesh.getVerticesData(VertexBuffer.PositionKind);if(!positions?.length)continue;
+      const authoredIndices=mesh.getIndices(),indices=authoredIndices?.length?authoredIndices:Array.from({length:positions.length/3},(_,i)=>i);
+      if(positions.length%3||indices.length%3)throw new Error(`Incomplete triangle geometry: ${mesh.name}`);
+      const matrix=mesh.computeWorldMatrix(true);
+      for(let i=0;i<indices.length;i+=3)hardware.push(triangle([0,1,2].map(j=>Vector3.TransformCoordinates(Vector3.FromArray(positions,indices[i+j]*3),matrix).asArray()),mesh.name));
+    }
+    if(!hardware.length||hardware.length!==g.assets[0].triangles)throw new Error(`Full-engine triangle inventory mismatch: ${hardware.length} vs ${g.assets[0].triangles}`);
+    checks.at(-1).hardwareTriangles=hardware.length;
+    const tree=bvh(hardware);
     const center=start.add(end).scale(.5),right=Vector3.TransformNormal(Vector3.Right(),world).normalize(),up=Vector3.Cross(axis,right).normalize();
     for(const [view,position]of [['rear',center.add(axis.scale(5))],['oblique',center.add(axis.scale(4)).add(right.scale(3)).add(up.scale(1.5))],['aircraft-side',new Vector3(6,4,5)]]){
       const forward=center.subtract(position).normalize(),screenRight=Vector3.Cross(forward,Vector3.Up()).normalize(),screenUp=Vector3.Cross(screenRight,forward).normalize();let supportRays=0,unoccludedSupportRays=0,partiallyOccludedSupportRays=0;const firstDepth={4:{missedThinSupport:0,hardwareFalseHidden:0,behindHardware:0},8:{missedThinSupport:0,hardwareFalseHidden:0,behindHardware:0},16:{missedThinSupport:0,hardwareFalseHidden:0,behindHardware:0},32:{missedThinSupport:0,hardwareFalseHidden:0,behindHardware:0}};

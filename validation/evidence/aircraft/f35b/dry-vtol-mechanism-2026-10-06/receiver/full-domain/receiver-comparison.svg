@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1390" height="810" viewBox="0 0 1390 810">
+<rect width="1390" height="810" fill="#171a20"/>
+<g fill="#e6e6e6" font-family="sans-serif">
+<text x="24" y="34" font-size="21">F135 full-domain gas + visible hardware → hypothetical deck reflection</text>
+<text x="24" y="59" font-size="14">6 m × 6 m plan view · 17 × 17 receiver points · reflectance 0.2 · white 1000 cd/m² · complete opaque engine geometry</text>
+<text x="24" y="81" font-size="14">Internal and external components share full-path attenuation. Fixed exposure, sRGB, no normalization or tone mapping. Black ambient.</text>
+<text x="24" y="118" font-size="14">Powered lift: internal gas</text>
+<text x="24" y="139" font-size="13">EV +8</text>
+<rect x="24" y="150" width="248" height="248" fill="#000" stroke="#555"/>
+<image x="24" y="150" width="248" height="248" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAALElEQVR42mNgYGD4TwU8agjdDWFEwmQZwogFk20I06AxhCLvIBs2mtgGyBAAOUogCfAbB2UAAAAASUVORK5CYII=" style="image-rendering:pixelated"/>
+<text x="298" y="118" font-size="14">Powered lift: external gas</text>
+<text x="298" y="139" font-size="13">EV +8</text>
+<rect x="298" y="150" width="248" height="248" fill="#000" stroke="#555"/>
+<image x="298" y="150" width="248" height="248" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAAOklEQVR42mNgYGD4TwU8agiphjBSYggjFkyWIUxAzAylSTYEZjPIAHYoTcA1NHIJ1cKEKrEzmuwpwwBrriAe5hrogQAAAABJRU5ErkJggg==" style="image-rendering:pixelated"/>
+<text x="572" y="118" font-size="14">Powered lift: metal</text>
+<text x="572" y="139" font-size="13">EV +8</text>
+<rect x="572" y="150" width="248" height="248" fill="#000" stroke="#555"/>
+<image x="572" y="150" width="248" height="248" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAAIElEQVR42mNgYGD4TwU8asioIYPAEEYkPLCGjMYO+RgACXcf9a2LYzsAAAAASUVORK5CYII=" style="image-rendering:pixelated"/>
+<text x="846" y="118" font-size="14">Powered lift: combined</text>
+<text x="846" y="139" font-size="13">EV +8</text>
+<rect x="846" y="150" width="248" height="248" fill="#000" stroke="#555"/>
+<image x="846" y="150" width="248" height="248" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAASklEQVR42mNgYGD4TwU8agixhjBiwSQZAtPEhIQJGITdEJBGZiBmgdJM5BoCMoATSlNkCCulLmFGwiQbgm4QEzmxgy2aR5M9aRgA2W4gUqhAstMAAAAASUVORK5CYII=" style="image-rendering:pixelated"/>
+<text x="1120" y="118" font-size="14">Hot shutdown, posed down</text>
+<text x="1120" y="139" font-size="13">EV +8</text>
+<rect x="1120" y="150" width="248" height="248" fill="#000" stroke="#555"/>
+<image x="1120" y="150" width="248" height="248" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAAJElEQVR42mNgYGD4TwU8asioIYPAEEYkTJYhjFjwwLhkBEcxABAZH/qkuZpGAAAAAElFTkSuQmCC" style="image-rendering:pixelated"/>
+<text x="24" y="424" font-size="14">Powered lift: internal gas</text>
+<text x="24" y="445" font-size="13">EV +10</text>
+<rect x="24" y="456" width="248" height="248" fill="#000" stroke="#555"/>
+<image x="24" y="456" width="248" height="248" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAAW0lEQVR42mNgYGD4TwU8IgxhRMMkG4KsmYk4w7AbAtLMjISZSDEEZiNIIysSZsbvGuyuYAFiNiBmh9Is+F2D3yVs5LgEPUxYCLsCf+wwIWGSYwdbOmEczTskYQBENiB+ySjBqAAAAABJRU5ErkJggg==" style="image-rendering:pixelated"/>
+<text x="298" y="424" font-size="14">Powered lift: external gas</text>
+<text x="298" y="445" font-size="13">EV +10</text>
+<rect x="298" y="456" width="248" height="248" fill="#000" stroke="#555"/>
+<image x="298" y="456" width="248" height="248" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAAVUlEQVR42mNgYGD4TwU82A1hxIKJNoSRCEySIUxImGhD0A1gAWJWKE3AIExDYAawAzE3lEY3iChDWKEGiDNCaFZyDKHYJRSFCVVih2rphCopdmjnYgAwRyDjeC9mqQAAAABJRU5ErkJggg==" style="image-rendering:pixelated"/>
+<text x="572" y="424" font-size="14">Powered lift: metal</text>
+<text x="572" y="445" font-size="13">EV +10</text>
+<rect x="572" y="456" width="248" height="248" fill="#000" stroke="#555"/>
+<image x="572" y="456" width="248" height="248" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAANElEQVR42mNgYGD4TwU8asioIeQbwogFk2UIMxImyxAmIGYFYjYgZoHyyQoTIr0ymk6wYAA9JiAVac6CMAAAAABJRU5ErkJggg==" style="image-rendering:pixelated"/>
+<text x="846" y="424" font-size="14">Powered lift: combined</text>
+<text x="846" y="445" font-size="13">EV +10</text>
+<rect x="846" y="456" width="248" height="248" fill="#000" stroke="#555"/>
+<image x="846" y="456" width="248" height="248" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAAiklEQVR42sWU3QqAIAxGNS1Fop/r3v85a6MJo0wnKF0cRtB3+CaWUkqdDegs0Yxqic4gkvDAwCiI3oIYNICl+ZSJJBh2gKdpJRIuMBScgZWmY40SonQLbLABh76nz7dJN8HQAuw0RU24CF+egECrBHo2tQc7UptQXuX7nsS1TH6Njje22bfzy6/gAs9oIaYM9oubAAAAAElFTkSuQmCC" style="image-rendering:pixelated"/>
+<text x="1120" y="424" font-size="14">Hot shutdown, posed down</text>
+<text x="1120" y="445" font-size="13">EV +10</text>
+<rect x="1120" y="456" width="248" height="248" fill="#000" stroke="#555"/>
+<image x="1120" y="456" width="248" height="248" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAAPklEQVR42mNgYGD4TwU8asioIeQbwogFk2QITBMTEiZgEHZDmIGYBYhZoTQzOYYwoRnCRKohDGjOZxxZ6QQAVLsgKcpXPJ4AAAAASUVORK5CYII=" style="image-rendering:pixelated"/>
+<text x="24" y="750" font-size="14">Powered-lift center: internal gas 0.00691604 lux + external gas 0.03038971 lux + metal 0.00000639 lux → 0.00237536 cd/m².</text>
+<text x="24" y="772" font-size="13">Selected downward probes pass refinement criteria; whole images remain unqualified. Native horizontal grazing failures are retained.</text>
+<text x="24" y="794" font-size="13">Shutdown temperatures are observed; its downward pose is counterfactual. No source gain, deck heating, scattering or impinging-flow model.</text>
+</g></svg>

@@ -1,0 +1,348 @@
+#!/usr/bin/env node
+// 0sfs owns this aircraft-specific, offline receiver diagnostic. No scene or engine dynamics.
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { rolldown } from 'rolldown';
+import '@babylonjs/loaders/glTF/index.js';
+import { LoadAssetContainerAsync, NullEngine, Scene, Vector3, VertexBuffer } from '@babylonjs/core';
+import { newOutputDirectory } from '../../outputDirectory.mjs';
+import { triangle, bvh } from '../../f135Engine/intersections.mjs';
+import { sha256 } from '../../f135Engine/glb.mjs';
+import { encodeRgbaPng } from '../../exhaustOptics/bake.mjs';
+
+const root = fileURLToPath(new URL('../../../', import.meta.url)), args = process.argv.slice(2);
+const argument = name => args.find(a => a.startsWith(`--${name}=`))?.slice(name.length + 3);
+const bounded = (name, value, min, max, integer = true) => {
+  const n = argument(name) === undefined ? value : Number(argument(name));
+  if (!Number.isFinite(n) || n < min || n > max || integer && !Number.isInteger(n)) throw new Error(`--${name} must be ${integer ? 'an integer ' : ''}in ${min}..${max}`);
+  return n;
+};
+const settings = {
+  grid: bounded('grid', 25, 3, 65), extentMeters: bounded('extent', 6, 1, 20, false),
+  directions: bounded('directions', 2048, 128, 32768), steps: bounded('steps', 96, 16, 1024),
+  surfaceLevel: bounded('surface-level', 1, 0, 4), rho: bounded('rho', .2, 0, 1, false),
+  referenceCdM2: bounded('white', 1000, 1, 100000, false),
+  probeDirections: bounded('probe-directions', 16384, 1024, 65536), probeSteps: bounded('probe-steps', 256, 32, 2048),
+  probeSurfaceLevel: bounded('probe-surface-level', 3, 1, 5),
+};
+const out = argument('out') ? path.resolve(argument('out')) : newOutputDirectory('validation', 'engine-deck-receiver');
+if (argument('out')) {
+  if (!out.startsWith(path.join(root, 'build') + path.sep)) throw new Error('Explicit output belongs under repository build/. Retain selected completed results afterwards.');
+  await mkdir(out, { recursive: false });
+}
+const sourcePaths = ['scripts/validation/f35b/check-engine-deck-receiver.mjs', 'src/flight/aircraft/engineGasOptics.ts',
+  'src/flight/aircraft/engineReactionEmission.ts', 'src/flight/aircraft/engineGasSupport.ts', 'src/flight/aircraft/engineNozzleRig.ts',
+  'src/flight/aircraft/generated/f135EngineData.ts', 'src/flight/aircraft/aircraftCatalog.ts', 'scripts/f135Engine/intersections.mjs',
+  'scripts/f135Engine/source.mjs', 'scripts/exhaustOptics/bake.mjs', 'src/flight/aircraft/generated/f135-exhaust-lut.manifest.json'];
+const inputs = [];
+for (const [index, name] of sourcePaths.entries()) {
+  const bytes = await readFile(path.join(root, name)), snapshot = `source-${index}-${path.basename(name)}.txt`;
+  await writeFile(path.join(out, snapshot), bytes); inputs.push({ path: name, sha256: sha256(bytes), snapshot });
+}
+const entry = path.join(out, 'entry.ts');
+await writeFile(entry, `export * from ${JSON.stringify(path.join(root, 'src/flight/aircraft/engineGasOptics.ts'))};\nexport * from ${JSON.stringify(path.join(root, 'src/flight/aircraft/engineGasSupport.ts'))};\nexport {bindEngineNozzleRig} from ${JSON.stringify(path.join(root, 'src/flight/aircraft/engineNozzleRig.ts'))};\nexport {F135_ENGINE_GEOMETRY} from ${JSON.stringify(path.join(root, 'src/flight/aircraft/generated/f135EngineData.ts'))};\n`);
+const bundle = await rolldown({ input: entry, external: id => !id.startsWith('.') && !path.isAbsolute(id) });
+try { await bundle.write({ file: path.join(out, 'entry.mjs'), format: 'esm' }); } finally { await bundle.close(); }
+const { evaluateEngineGasOptics, interpolateAbsoluteEmission, bindEngineGasSupport, F135_ENGINE_GAS_SUPPORT,
+  bindEngineNozzleRig, sampleEngineGasSection, F135_ENGINE_GEOMETRY: geometry } = await import(pathToFileURL(path.join(out, 'entry.mjs')));
+inputs.push({ path: 'executed helper bundle', sha256: sha256(await readFile(path.join(out, 'entry.mjs'))), snapshot: 'entry.mjs' });
+const profile = JSON.parse(await readFile(path.join(out, inputs.find(p => p.path.endsWith('manifest.json')).snapshot), 'utf8')).profile;
+const tracePath = 'validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/trace.csv', traceBytes = await readFile(path.join(root, tracePath));
+inputs.push({ path: tracePath, sha256: sha256(traceBytes) });
+const [headers, ...rows] = traceBytes.toString().trim().split('\n').map(line => line.split(','));
+const trace = rows.map(row => Object.fromEntries(headers.map((key, i) => [key, Number.isFinite(Number(row[i])) ? Number(row[i]) : row[i]])));
+const powered = trace.filter(r => r.scenario === 'powered-lift').at(-1);
+const shutdown = trace.find(r => r.scenario === 'cold-cycle' && r.timeS > 392 && r.fuelKgSec === 0);
+const cold = trace.find(r => r.scenario === 'cold-cycle');
+if (!powered || !shutdown || !cold) throw new Error('Required retained native observations absent');
+const cases = [
+  { name: 'powered-lift', native: powered, pitch: powered.nozzlePitchRad, yaw: powered.nozzleYawRad, image: true, poseMeaning: 'Actual retained powered-lift pose and thermal observation.' },
+  { name: 'hot-shutdown-posed-down', native: shutdown, pitch: Math.PI / 2, yaw: 0, image: true, poseMeaning: 'Counterfactual fixed 90-degree pose with actual zero-fuel hot-shutdown thermal observation; not a native powered-lift shutdown trajectory.' },
+  { name: 'hot-shutdown-native-pose', native: shutdown, pitch: shutdown.nozzlePitchRad, yaw: shutdown.nozzleYawRad, image: false, poseMeaning: 'Actual horizontal native hot-shutdown pose.' },
+  { name: 'cold-posed-down', native: cold, pitch: Math.PI / 2, yaw: 0, image: false, poseMeaning: 'Counterfactual cold 90-degree pose, unchanged cold temperatures and zero fuel.' },
+];
+const add = (a, b) => a.map((v, i) => v + b[i]), sub = (a, b) => a.map((v, i) => v - b[i]), scale = (a, s) => a.map(v => v * s);
+const dot = (a, b) => a.reduce((n, v, i) => n + v * b[i], 0), cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const length = a => Math.hypot(...a), unit = a => scale(a, 1 / length(a)), luminance = a => .2126729 * a[0] + .7151522 * a[1] + .0721750 * a[2];
+const errors = [];
+function interval(origin, direction, low, high, limit = Infinity) {
+  let begin = 0, end = limit;
+  for (let c = 0; c < 3; c++) {
+    if (Math.abs(direction[c]) < 1e-14) { if (origin[c] < low[c] || origin[c] > high[c]) return null; continue; }
+    const a = (low[c] - origin[c]) / direction[c], b = (high[c] - origin[c]) / direction[c];
+    begin = Math.max(begin, Math.min(a, b)); end = Math.min(end, Math.max(a, b));
+    if (end < begin) return null;
+  }
+  return [begin, end];
+}
+// Double-sided opaque visibility: a physical metal wall blocks transport from either side.
+// Source emission is one-sided, using the authored outward winding separately below.
+function nearest(origin, direction, tree, limit = Infinity, ignored = null) {
+  if (!interval(origin, direction, tree.min, tree.max, limit)) return null;
+  let answer = null;
+  if (tree.children) {
+    for (const child of tree.children) { const hit = nearest(origin, direction, child, answer?.distance ?? limit, ignored); if (hit) answer = hit; }
+    return answer;
+  }
+  for (const t of tree.triangles) {
+    if (t === ignored) continue;
+    const h = cross(direction, t.e2), det = dot(t.e1, h);
+    if (Math.abs(det) < 1e-12) continue;
+    const inv = 1 / det, relative = sub(origin, t.points[0]), u = dot(relative, h) * inv;
+    if (u < -1e-10 || u > 1 + 1e-10) continue;
+    const q = cross(relative, t.e1), v = dot(direction, q) * inv;
+    if (v < -1e-10 || u + v > 1 + 1e-10) continue;
+    const distance = dot(t.e2, q) * inv;
+    if (distance > 1e-7 && distance < (answer?.distance ?? limit)) answer = { distance, triangle: t };
+  }
+  return answer;
+}
+function barycentricSamples(points, level, result = []) {
+  if (!level) { result.push(scale(add(add(points[0], points[1]), points[2]), 1 / 3)); return result; }
+  const [a, b, c] = points, ab = scale(add(a, b), .5), bc = scale(add(b, c), .5), ca = scale(add(c, a), .5);
+  for (const child of [[a, ab, ca], [ab, b, bc], [ca, bc, c], [ab, bc, ca]]) barycentricSamples(child, level - 1, result);
+  return result;
+}
+function bilinear(field, u, v, result) {
+  if (u < 0 || u > 1 || v < 0 || v > 1) { result.fill(0); return; }
+  const x = u * (field.width - 1), y = v * (field.height - 1), i = Math.min(field.width - 2, Math.floor(x)), j = Math.min(field.height - 2, Math.floor(y)), a = x - i, b = y - j;
+  const first = (j * field.width + i) * 4, next = first + field.width * 4, rgba = field.rgba;
+  for (let c = 0; c < 4; c++) result[c] = (1 - b) * ((1 - a) * rgba[first + c] + a * rgba[first + 4 + c]) + b * ((1 - a) * rgba[next + c] + a * rgba[next + 4 + c]);
+}
+function prepareExterior(section) {
+  const delta = sub(section.endCenter, section.startCenter), extent = length(delta), axis = scale(delta, 1 / extent), min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, -Infinity];
+  for (const [center, r] of [[section.startCenter, section.startRadius], [section.endCenter, section.endRadius]]) for (let c = 0; c < 3; c++) {
+    const envelope = r * Math.sqrt(Math.max(0, 1 - axis[c] ** 2)); min[c] = Math.min(min[c], center[c] - envelope); max[c] = Math.max(max[c], center[c] + envelope);
+  }
+  return { ...section, axis, extent, min, max };
+}
+function prepareGasDomain(support) {
+  const sections = support.sections.map(section => {
+    const min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, -Infinity];
+    for (const [center, u, radius] of [[section.startCenter, section.startU, section.startRadius], [section.endCenter, section.endU, section.endRadius]]) for (let c = 0; c < 3; c++) {
+      const envelope = radius * Math.hypot(u[c], section.radialV[c]); min[c] = Math.min(min[c], center[c] - envelope); max[c] = Math.max(max[c], center[c] + envelope);
+    }
+    return { ...section, min, max, exterior: section.startDistance >= 0 ? prepareExterior(section) : null };
+  });
+  return { ...support, sections };
+}
+function gasRay(point, direction, domain, field, limit, steps) {
+  const result = { rgb: [0, 0, 0], internal: [0, 0, 0], external: [0, 0, 0], transmittance: 1 };
+  if (!field) return result;
+  // Split at conservative section-box boundaries, then integrate their ordered union.
+  // Exact circular/annular/seal inverse mapping rejects points outside the actual gas.
+  const ranges = [];
+  for (const section of domain.sections) {
+    const range = interval(point, direction, section.min, section.max, limit);
+    if (range && range[1] > range[0]) ranges.push({ section, begin: range[0], end: range[1] });
+  }
+  if (!ranges.length) return result;
+  const breaks = [...new Set(ranges.flatMap(r => [r.begin, r.end]))].sort((a, b) => a - b), intervals = [];
+  for (let i = 1; i < breaks.length; i++) {
+    const begin = breaks[i - 1], end = breaks[i], mid = (begin + end) / 2;
+    const candidates = ranges.filter(r => mid >= r.begin && mid <= r.end).map(r => r.section);
+    if (candidates.length) intervals.push({ begin, end, candidates });
+  }
+  const totalLength = intervals.reduce((sum, range) => sum + range.end - range.begin, 0), local = [0, 0, 0, 0], axialRange = field.axialDistanceRangeMeters;
+  for (const range of intervals) {
+    const count = Math.max(1, Math.ceil(steps * (range.end - range.begin) / totalLength)), step = (range.end - range.begin) / count;
+    for (let i = 0; i < count; i++) {
+      const t = range.begin + (i + .5) * step, location = [point[0] + t * direction[0], point[1] + t * direction[1], point[2] + t * direction[2]];
+      let coordinate = null;
+      for (const section of range.candidates) {
+        if (section.exterior) {
+          const e = section.exterior, p = sub(location, e.startCenter), s = dot(p, e.axis);
+          if (s < 0 || s > e.extent) continue;
+          const radial = length(sub(p, scale(e.axis, s))) / (e.startRadius + (e.endRadius - e.startRadius) * s / e.extent);
+          if (radial <= 1) coordinate = { distanceMeters: section.startDistance + s, radialFraction: radial };
+        } else coordinate = sampleEngineGasSection(section, location, domain.nozzleSegmentCount, domain.nozzleSealHalfWidthMeters);
+        if (coordinate) break;
+      }
+      if (!coordinate) continue;
+      bilinear(field, (coordinate.distanceMeters - axialRange[0]) / (axialRange[1] - axialRange[0]), coordinate.radialFraction, local);
+      const opticalDepth = local[3] * step, factor = local[3] > 0 ? -Math.expm1(-opticalDepth) / local[3] : step;
+      for (let c = 0; c < 3; c++) {
+        const contribution = result.transmittance * local[c] * factor;
+        result.rgb[c] += contribution; (coordinate.distanceMeters < 0 ? result.internal : result.external)[c] += contribution;
+      }
+      result.transmittance *= Math.exp(-opticalDepth);
+    }
+  }
+  return result;
+}
+function radicalInverse(n) { let value = 0, f = .5; while (n) { value += (n % 2) * f; n = Math.floor(n / 2); f *= .5; } return value; }
+const rayCache = new Map();
+function hemisphere(count) {
+  if (!rayCache.has(count)) rayCache.set(count, Array.from({ length: count }, (_, i) => {
+    const u = (i + .5) / count, angle = 2 * Math.PI * radicalInverse(i), r = Math.sqrt(u);
+    return [r * Math.cos(angle), Math.sqrt(1 - u), r * Math.sin(angle)];
+  }));
+  return rayCache.get(count);
+}
+function receiveGas(point, sceneData, directions, steps) {
+  const result = { rgb: [0, 0, 0], internal: [0, 0, 0], external: [0, 0, 0] }; if (!sceneData.field) return result;
+  for (const direction of hemisphere(directions)) {
+    if (!interval(point, direction, sceneData.domain.bounds.min, sceneData.domain.bounds.max)) continue;
+    const hit = nearest(point, direction, sceneData.tree);
+    const ray = gasRay(point, direction, sceneData.domain, sceneData.field, hit?.distance ?? Infinity, steps);
+    for (const component of ['rgb', 'internal', 'external']) for (let c = 0; c < 3; c++) result[component][c] += ray[component][c] * Math.PI / directions;
+  }
+  return result;
+}
+function receiveHardware(point, data, level, steps) {
+  const channels = { core: [0, 0, 0], liner: [0, 0, 0] };
+  for (const t of data.hot) {
+    if (!data.emission[t.region].some(value => value > 0)) continue;
+    if (dot(t.normal, sub(point, t.points[0])) <= 0) continue;
+    if (!t.samples.has(level)) t.samples.set(level, barycentricSamples(t.points, level));
+    const samples = t.samples.get(level), area = t.area / samples.length;
+    for (const sample of samples) {
+      const toSource = sub(sample, point), distance = length(toSource), direction = scale(toSource, 1 / distance);
+      if (direction[1] <= 0) continue;
+      const cosineSource = -dot(t.normal, direction);
+      if (cosineSource <= 0 || nearest(point, direction, data.tree, distance - 1e-6, t)) continue;
+      const transmission = gasRay(point, direction, data.domain, data.field, distance, steps).transmittance;
+      const weight = direction[1] * cosineSource * area / distance ** 2 * transmission;
+      for (let c = 0; c < 3; c++) channels[t.region][c] += data.emission[t.region][c] * weight;
+    }
+  }
+  return channels;
+}
+function receive(point, data, directions, steps, level) {
+  const gasResult = receiveGas(point, data, directions, steps), gas = gasResult.rgb, { core, liner } = receiveHardware(point, data, level, steps), hardware = add(core, liner), combined = add(gas, hardware);
+  return { gasRgbLux: gas, internalGasRgbLux: gasResult.internal, externalGasRgbLux: gasResult.external, internalGasLux: luminance(gasResult.internal), externalGasLux: luminance(gasResult.external), coreRgbLux: core, linerRgbLux: liner, hardwareRgbLux: hardware, combinedRgbLux: combined,
+    gasLux: luminance(gas), coreLux: luminance(core), linerLux: luminance(liner), hardwareLux: luminance(hardware), combinedLux: luminance(combined),
+    reflectedRgbCdM2: scale(combined, settings.rho / Math.PI), reflectedLuminanceCdM2: luminance(combined) * settings.rho / Math.PI };
+}
+// Independent finite disk: E = pi L R²/(h²+R²). Use exactly the production area/solid-angle weights.
+function analyticDisk() {
+  const radius = .4, height = 1.176281774525723, L = 2, expected = Math.PI * L * radius ** 2 / (height ** 2 + radius ** 2), values = [];
+  for (const sectors of [64, 256, 1024]) {
+    let E = 0;
+    for (let i = 0; i < sectors; i++) {
+      const a = 2 * Math.PI * i / sectors, b = 2 * Math.PI * (i + 1) / sectors;
+      const points = [[0, height, 0], [radius * Math.cos(a), height, radius * Math.sin(a)], [radius * Math.cos(b), height, radius * Math.sin(b)]];
+      const area = length(cross(sub(points[1], points[0]), sub(points[2], points[0]))) / 2, samples = barycentricSamples(points, 4);
+      for (const p of samples) { const r2 = dot(p, p); E += L * height ** 2 / r2 ** 2 * area / samples.length; }
+    }
+    values.push({ sectors, illuminanceLux: E, relativeError: Math.abs(E / expected - 1) });
+  }
+  if (values.at(-1).relativeError > .001) errors.push('Finite-disk solid-angle check exceeds 0.1%');
+  // Cosine-weight hemisphere normalization: a uniform 2 cd/m² hemisphere gives exactly 2*pi lux.
+  return { radiusMeters: radius, heightMeters: height, luminanceCdM2: L, analyticLux: expected, values,
+    constantHemisphereLux: 2 * Math.PI, hemisphereQuadratureLux: hemisphere(2048).reduce(sum => sum + 2 * Math.PI / 2048, 0) };
+}
+const disk = analyticDisk(), imageFiles = [], records = [], engine = new NullEngine(), scene = new Scene(engine); scene.useRightHandedSystem = true;
+const deckY = -(geometry.attachment[1] + .17); // Existing held-stand flat-ground hypothesis, not a new measured height.
+let deckCenter;
+try {
+  const assetPath = `public/${geometry.assets[0].path}`, bytes = await readFile(path.join(root, assetPath)); inputs.push({ path: assetPath, sha256: sha256(bytes) });
+  const container = await LoadAssetContainerAsync(new Uint8Array(bytes), scene, { pluginExtension: '.glb' }); container.addAllToScene();
+  const nodes = container.transformNodes.concat(container.meshes), engineRoot = nodes.find(n => n.name === 'F135_Engine'); engineRoot.position.setAll(0);
+  const rig = bindEngineNozzleRig(nodes, { bearingNames: ['F135_Bearing1', 'F135_Bearing2', 'F135_Bearing3'], bearingInclinationRad: geometry.bearingTiltDegrees * Math.PI / 180, apertureMechanism: geometry.aperture });
+  const binding = bindEngineGasSupport(engineRoot, F135_ENGINE_GAS_SUPPORT);
+  for (const item of cases) {
+    const native = item.native; rig.update(item.pitch, item.yaw, native.nozzleNorm);
+    const support = binding.update(rig.apertureGeometry, 6, profile.gasEmission.spatialField.spreadingSlope), exterior = prepareExterior(support.sections.at(-1));
+    deckCenter ??= [exterior.startCenter[0], deckY, exterior.startCenter[2]];
+    const input = { temperatureKelvin: native.gasK, upstreamGasTemperatureKelvin: native.egtC + 273.15, ambientTemperatureKelvin: native.ambientK, ambientPressurePascal: native.pressurePsf * 47.88025898033584,
+      augmentation: Boolean(native.augmentation), fuelFlowKgPerSecond: native.fuelKgSec, afterburnerBurnedFuelFlowKgPerSecond: native.burnedAbKgSec,
+      radiusMeters: rig.apertureGeometry.exitRadius, lengthMeters: 6, flowDomain: support.flowDomain, axialSamples: 64, radialSamples: 32 };
+    const evaluated = evaluateEngineGasOptics(profile, input), field = native.visualRunning && evaluated.valid ? evaluated.field : null;
+    const hardware = [];
+    for (const mesh of container.meshes) {
+      const positions = mesh.getVerticesData(VertexBuffer.PositionKind); if (!positions || !mesh.isEnabled() || !mesh.isVisible) continue;
+      const authoredIndices = mesh.getIndices(), indices = authoredIndices?.length ? authoredIndices : Array.from({ length: positions.length / 3 }, (_, i) => i);
+      const matrix = mesh.computeWorldMatrix(true);
+      for (let i = 0; i < indices.length; i += 3) {
+        const submesh = mesh.subMeshes.find(s => i >= s.indexStart && i < s.indexStart + s.indexCount), material = submesh?.getMaterial() ?? mesh.material;
+        if (!material || material.disableDepthWrite || material.needAlphaBlendingForMesh(mesh)) continue;
+        const points = [0, 1, 2].map(k => Vector3.TransformCoordinates(Vector3.FromArray(positions, indices[i + k] * 3), matrix).asArray()), t = triangle(points, mesh.name);
+        t.e1 = sub(points[1], points[0]); t.e2 = sub(points[2], points[0]); const n = cross(t.e1, t.e2), twiceArea = length(n); if (twiceArea < 1e-12) continue;
+        t.normal = scale(n, 1 / twiceArea); t.area = twiceArea / 2; t.samples = new Map();
+        t.region = material.name === 'F135_CoreHot' ? 'core' : material.name === 'F135_LinerHot' ? 'liner' : null; hardware.push(t);
+      }
+    }
+    const data = { tree: bvh(hardware), hot: hardware.filter(t => t.region), exterior, domain: prepareGasDomain(support), field,
+      emission: { core: interpolateAbsoluteEmission(profile.surfaceEmission, native.coreK) ?? [0, 0, 0], liner: interpolateAbsoluteEmission(profile.surfaceEmission, native.linerK) ?? [0, 0, 0] } };
+    if (hardware.length !== geometry.assets[0].triangles || !data.hot.length) throw new Error('Opaque/hot triangle construction does not match full-engine asset');
+    console.log(JSON.stringify({ case: item.name, stage: 'probes', triangles: hardware.length, hotTriangles: data.hot.length }));
+    const probes = [];
+    for (const [x, z] of [[0, 0], [.5, 0], [1.5, 0], [0, 1.5]]) {
+      const point = add(deckCenter, [x, 0, z]);
+      const base = receive(point, data, settings.directions, settings.steps, settings.surfaceLevel);
+      const angular = receiveGas(point, data, settings.probeDirections, settings.probeSteps), angularRefined = receiveGas(point, data, settings.probeDirections * 2, settings.probeSteps);
+      const stepRefined = receiveGas(point, data, settings.probeDirections * 2, settings.probeSteps * 2);
+      const metalPath = receiveHardware(point, data, settings.probeSurfaceLevel, settings.probeSteps), metal = receiveHardware(point, data, settings.probeSurfaceLevel, settings.probeSteps * 2), metalRefined = receiveHardware(point, data, settings.probeSurfaceLevel + 1, settings.probeSteps * 2);
+      const gasY = luminance(stepRefined.rgb), metalY = luminance(add(metalRefined.core, metalRefined.liner));
+      const relative = (a, b) => Math.abs(a - b) / Math.max(Math.abs(b), 1e-12);
+      const convergence = { gasAngularRelative: relative(luminance(angular.rgb), luminance(angularRefined.rgb)), internalGasAngularRelative: relative(luminance(angular.internal), luminance(angularRefined.internal)), externalGasAngularRelative: relative(luminance(angular.external), luminance(angularRefined.external)), internalGasPathRelative: relative(luminance(angularRefined.internal), luminance(stepRefined.internal)), externalGasPathRelative: relative(luminance(angularRefined.external), luminance(stepRefined.external)), gasPathRelative: relative(luminance(angularRefined.rgb), gasY),
+        hardwareAreaRelative: relative(luminance(add(metal.core, metal.liner)), metalY), hardwarePathRelative: relative(luminance(add(metalPath.core, metalPath.liner)), luminance(add(metal.core, metal.liner))), imageGasRelative: relative(base.gasLux, gasY), imageHardwareRelative: relative(base.hardwareLux, metalY) };
+      probes.push({ offsetMeters: [x, z], positionMeters: point, imageBudget: base, reference: { gasRgbLux: stepRefined.rgb, internalGasRgbLux: stepRefined.internal, externalGasRgbLux: stepRefined.external, internalGasLux: luminance(stepRefined.internal), externalGasLux: luminance(stepRefined.external), coreRgbLux: metalRefined.core, linerRgbLux: metalRefined.liner,
+        gasLux: gasY, hardwareLux: metalY, combinedLux: gasY + metalY, reflectedLuminanceCdM2: (gasY + metalY) * settings.rho / Math.PI }, convergence });
+    }
+    const pixels = [], step = settings.extentMeters / (settings.grid - 1);
+    if (item.image) {
+      console.log(JSON.stringify({ case: item.name, stage: 'map', size: settings.grid }));
+      for (let row = 0; row < settings.grid; row++) for (let column = 0; column < settings.grid; column++) {
+        const x = (column - (settings.grid - 1) / 2) * step, z = (row - (settings.grid - 1) / 2) * step;
+        const value = receive(add(deckCenter, [x, 0, z]), data, settings.directions, settings.steps, settings.surfaceLevel); pixels.push({ xMeters: x, zMeters: z, ...value });
+      }
+      const csvHeader = ['xMeters', 'zMeters', 'gasLux', 'internalGasLux', 'externalGasLux', 'coreLux', 'linerLux', 'hardwareLux', 'combinedLux', 'reflectedLuminanceCdM2'];
+      await writeFile(path.join(out, `${item.name}.csv`), csvHeader.join(',') + '\n' + pixels.map(p => csvHeader.map(k => p[k]).join(',')).join('\n') + '\n');
+      const srgb = x => x <= .0031308 ? 12.92 * x : 1.055 * x ** (1 / 2.4) - .055;
+      for (const exposureEV of [8, 10]) for (const component of ['gas', 'internalGas', 'externalGas', 'hardware', 'combined']) {
+        const rgba = new Uint8Array(settings.grid ** 2 * 4);
+        for (const [i, pixel] of pixels.entries()) {
+          const rgb = scale(pixel[`${component}RgbLux`], settings.rho / Math.PI);
+          for (let c = 0; c < 3; c++) rgba[i * 4 + c] = Math.round(255 * Math.max(0, Math.min(1, srgb(rgb[c] * 2 ** exposureEV / settings.referenceCdM2))));
+          rgba[i * 4 + 3] = 255;
+        }
+        const name = `${item.name}-${component}-ev${exposureEV}.png`; await writeFile(path.join(out, name), encodeRgbaPng(settings.grid, settings.grid, rgba)); imageFiles.push({ name, case: item.name, component, exposureEV });
+      }
+    }
+    records.push({ name: item.name, native, poseMeaning: item.poseMeaning, pitchRad: item.pitch, yawRad: item.yaw, input, gasEligible: Boolean(field),
+      exitMeters: exterior.startCenter, exitHeightMeters: exterior.startCenter[1] - deckY, deckCenterMeters: deckCenter,
+      geometry: { opaqueTriangles: hardware.length, hotTriangles: data.hot.length, coreAreaM2: data.hot.filter(t => t.region === 'core').reduce((s, t) => s + t.area, 0), linerAreaM2: data.hot.filter(t => t.region === 'liner').reduce((s, t) => s + t.area, 0) },
+      emissionRgbCdM2: data.emission, sourceExteriorIntensityRgbCd: evaluated.exteriorIsotropicIntensityRgbCd, sourceWholeFieldIntensityRgbCd: evaluated.isotropicIntensityRgbCd, wholeFieldUnoccludedPhotopicFluxUpperBoundLumens: 4 * Math.PI * luminance(evaluated.isotropicIntensityRgbCd),
+      probes, map: pixels.length ? { csv: `${item.name}.csv`, samples: pixels.length, peakGasLux: Math.max(...pixels.map(p => p.gasLux)), peakHardwareLux: Math.max(...pixels.map(p => p.hardwareLux)), peakCombinedLux: Math.max(...pixels.map(p => p.combinedLux)), peakReflectedLuminanceCdM2: Math.max(...pixels.map(p => p.reflectedLuminanceCdM2)) } : null });
+    await writeFile(path.join(out, 'partial.json'), JSON.stringify(records, null, 2) + '\n');
+  }
+  container.dispose();
+} finally { scene.dispose(); engine.dispose(); }
+const poweredRecord = records.find(r => r.name === 'powered-lift');
+if (!poweredRecord.probes.some(p => p.reference.internalGasLux > 0)) errors.push('Full-domain powered-lift probes lost all internal gas');
+for (const record of records) for (const probe of record.probes) if (Math.abs(probe.reference.internalGasLux + probe.reference.externalGasLux - probe.reference.gasLux) > 1e-10) errors.push(`Gas component sum disagrees: ${record.name}`);
+const hot = records.find(r => r.name === 'hot-shutdown-posed-down');
+if (hot.gasEligible || hot.probes.some(p => p.reference.gasLux !== 0)) errors.push('Zero-fuel hot-shutdown retains gas source');
+if (!(hot.probes.some(p => p.reference.hardwareLux > 0))) errors.push('Zero-fuel hot-shutdown lost visible metal radiation');
+const coldRecord = records.find(r => r.name === 'cold-posed-down');
+if (coldRecord.gasEligible || coldRecord.probes.some(p => p.reference.gasLux !== 0)) errors.push('Cold source eligibility regression');
+const convergence = records.flatMap(r => r.probes.map(p => ({ case: r.name, offsetMeters: p.offsetMeters, ...p.convergence })));
+const failures = convergence.filter(p => p.gasAngularRelative > .03 || p.internalGasAngularRelative > .03 || p.externalGasAngularRelative > .03 || p.internalGasPathRelative > .01 || p.externalGasPathRelative > .01 || p.gasPathRelative > .01 || p.hardwareAreaRelative > .05 || p.hardwarePathRelative > .01);
+if (failures.length) errors.push(`${failures.length} selected probes exceed 3% angular / 1% path / 5% hardware refinement criteria`);
+const changedAfterSnapshot = [];
+for (const input of inputs.filter(p => p.path !== 'executed helper bundle')) if (sha256(await readFile(path.join(root, input.path))) !== input.sha256) changedAfterSnapshot.push(input.path);
+const report = { schema: '0sfs-f135-deck-radiation/2', status: errors.length ? 'failed' : 'passed', settings, inputs, changedAfterSnapshot,
+  receiver: { material: 'Ideal neutral Lambertian', reflectanceLinear: settings.rho, centerMeters: deckCenter, extentMeters: settings.extentMeters,
+    placement: 'Flat held-stand hypothesis: engine attachment height plus 0.17 m placement clearance. Plane is horizontal in engine-root frame; only pitched/yawed nozzle moves.',
+    opaquePlane: 'Only incident directions with positive world Y contribute. Below-plane gas is excluded even when the free-jet support crosses the receiver.' },
+  integration: { gas: 'Cosine-weighted upper-hemisphere Hammersley quadrature: E_rgb = pi/N sum L_rgb; transfer j/kappa integrated through the full existing signed-path field and truncated by nearest full-engine opaque triangle; internal s<0 and external s>=0 radiance retained separately.',
+    hardware: 'Authored one-sided hot triangle quadrature: E_rgb=sum L_rgb cos(receiver) cos(source) dA/r^2 times full-domain foreground gas transmittance, blocked by any nearer opaque triangle. Core and liner use their own native temperatures.',
+    gasAndMetalScope: 'The existing full field supplies internal and external gas emission and attenuation, including foreground attenuation of metal rays. No new source power, temperatures or dynamics. Ray integration partitions at conservative section bounds, then applies the declared exact circular/annular/seal inverse mapping.',
+    reflection: 'L_deck,rgb = rho E_rgb/pi; no double count of existing runtime PointLight; no ambient/sky/reflected-engine illumination.',
+    convergence: { gasDirections: [settings.probeDirections, 2 * settings.probeDirections], pathSteps: [settings.probeSteps, 2 * settings.probeSteps], pathBudgetMeaning: 'Total midpoint target distributed by length over the ordered union of intersected section AABBs, rounded up per interval; actual steps exceed target by at most the number of intervals.', metalSubdivisionLevels: [settings.probeSurfaceLevel, settings.probeSurfaceLevel + 1], criteria: { gasAngular: .03, gasPath: .01, hardwareArea: .05, hardwarePath: .01 }, failures } },
+  display: { projection: 'Orthographic plan-view radiance map; +x is right, +z is down. Nearest-neighbor display enlargement does not add samples.', referenceCdM2: settings.referenceCdM2, exposureEV: [8, 10], mapping: 'Linear physical RGB/reference * 2^EV, IEC sRGB encoding, clip to [0,1], black ambient background; no tone mapper, no camera/NIR model.', images: imageFiles },
+  analyticDisk: disk, cases: records, convergence, errors,
+  limits: ['Offline CPU receiver calculation; no runtime fixture, Babylon rendering, GPU validation or timing claim.',
+    'Native bath, particle loading/spectrum and grey hardware emissivity remain uncalibrated F135 hypotheses. Receiver rho=.2 is a declared ideal surface, not measured carrier deck reflectance.',
+    'Reflectance is not heating: no deck temperature, reradiation, material response, particle deposition, plume impingement/recovery or added gas energy is calculated.',
+    'The free-jet field is clipped at the plane for radiation only; it is not a solved wall jet. Source-cell thermal state below the plane is not reflected back into the gas.',
+    'Images use bounded coarse quadrature; selected-probe refinement does not prove every pixel converged. CSV/probes retain raw units independently of fixed display exposure.',
+    'Actual hot-shutdown record is horizontal; the downward comparison deliberately reposes its unchanged native temperatures, with gas off according to actual zero fuel.' ] };
+await writeFile(path.join(out, 'report.json'), JSON.stringify(report, null, 2) + '\n');
+await writeFile(path.join(out, 'acceptance.json'), JSON.stringify({ status: report.status, errors, changedAfterSnapshot, analyticDiskMaximumRefinedRelativeError: disk.values.at(-1).relativeError,
+  cases: records.map(r => ({ name: r.name, centerReference: r.probes[0].reference, map: r.map })), convergence }, null, 2) + '\n');
+console.log(JSON.stringify({ out: path.relative(root, out), status: report.status, errors, changedAfterSnapshot, cases: records.map(r => ({ name: r.name, centerReference: r.probes[0].reference, map: r.map })) }, null, 2));
+if (errors.length) process.exitCode = 1;

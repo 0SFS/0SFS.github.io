@@ -1,5 +1,11 @@
 # Previous uniform-source plume geometry audit
 
+**Correction, 2026-10-06:** the retained diagnostic silently built zero hardware
+triangles from non-indexed GLB meshes. Its hardware-occlusion/depth claims below
+are **unqualified**. Attachment and direction measurements remain valid; tracer
+results describe unobstructed support only. Original records are preserved.
+See the [occlusion erratum](../../dry-vtol-mechanism-2026-10-06/occlusion-erratum/README.md).
+
 This preserves the CPU/NullEngine audit before the new spatial renderer. The
 [report](report.json) uses the actual full engine GLB and production rigid rig at
 12 poses (pitch 0, 45, 90 and 95 degrees, yaw −10, 0 and 10 degrees), each from

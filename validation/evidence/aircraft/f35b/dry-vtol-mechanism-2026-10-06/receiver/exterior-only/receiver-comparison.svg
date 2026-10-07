@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="810" viewBox="0 0 1120 810">
+<rect width="1120" height="810" fill="#171a20"/>
+<g fill="#e6e6e6" font-family="sans-serif">
+<text x="24" y="34" font-size="21">F135 hypothetical deck reflection — physical source unchanged</text>
+<text x="24" y="59" font-size="14">6 m × 6 m plan view · 25 × 25 computed receiver points · linear reflectance 0.2 · white 1000 cd/m²</text>
+<text x="24" y="81" font-size="14">sRGB after fixed exposure; no normalization or tone mapping. Black ambient. Images are intentionally dim.</text>
+<text x="24" y="118" font-size="14">Powered lift: gas</text>
+<text x="24" y="139" font-size="13">EV +8</text>
+<rect x="24" y="150" width="248" height="248" fill="#000" stroke="#555"/>
+<image x="24" y="150" width="248" height="248" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAAT0lEQVR42mNgYGD4Twc8asmoJSPCEkYsmKqWMOLBVLEE2UAmJEyiRcRZAjKYGYhZoDQTrSwBWcAOpZmGrE9oGid0SV10yyejZdeoJSPcEgBkY28ZiRYsFAAAAABJRU5ErkJggg==" style="image-rendering:pixelated"/>
+<text x="298" y="118" font-size="14">Powered lift: metal</text>
+<text x="298" y="139" font-size="13">EV +8</text>
+<rect x="298" y="150" width="248" height="248" fill="#000" stroke="#555"/>
+<image x="298" y="150" width="248" height="248" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAAKklEQVR42mNgYGD4Twc8asmoJaOWjFoyasngt4QRCx61ZDR1jVoyxCwBAIZZbr2sQ4V0AAAAAElFTkSuQmCC" style="image-rendering:pixelated"/>
+<text x="572" y="118" font-size="14">Powered lift: combined</text>
+<text x="572" y="139" font-size="13">EV +8</text>
+<rect x="572" y="150" width="248" height="248" fill="#000" stroke="#555"/>
+<image x="572" y="150" width="248" height="248" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAAXUlEQVR42mNgYGD4Twc8asmoJSPCEkYsmKqWMOLBVLEE2UAmJEyiRcRZAjKYGYhZoDQTrSwBWcAOpZlo6RNWWvuECUe8DI2IZ8DhE6omYQYCPhlaOX60FB61hCwMAMKvbzaa3FzcAAAAAElFTkSuQmCC" style="image-rendering:pixelated"/>
+<text x="846" y="118" font-size="14">Hot shutdown, posed down</text>
+<text x="846" y="139" font-size="13">EV +8</text>
+<rect x="846" y="150" width="248" height="248" fill="#000" stroke="#555"/>
+<image x="846" y="150" width="248" height="248" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAAMklEQVR42mNgYGD4Twc8asmoJaOWjFoyasnQsIQRCVPdEkY8eGhZwkCZBaNJeNQSGmIAmFduxCU6sAAAAAAASUVORK5CYII=" style="image-rendering:pixelated"/>
+<text x="24" y="424" font-size="14">Powered lift: gas</text>
+<text x="24" y="445" font-size="13">EV +10</text>
+<rect x="24" y="456" width="248" height="248" fill="#000" stroke="#555"/>
+<image x="24" y="456" width="248" height="248" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAAhUlEQVR42u2VMQ6AIAxFW5XA4OLk/U+qJdaEEDFAoWFgeOnWlx9oCwBwKTAlHSSYoIkEM6iWYAViyfKBSJISrAGFonzBRhiuKVGxJBT45pZwXE2Z6F/yJvCNd+LgaqNEYonhBF5w4lNdlGb8JF3eBIS/C4eZE7WJV9tdKlu44S2ZN35AyQ1c2XDqK3FbYgAAAABJRU5ErkJggg==" style="image-rendering:pixelated"/>
+<text x="298" y="424" font-size="14">Powered lift: metal</text>
+<text x="298" y="445" font-size="13">EV +10</text>
+<rect x="298" y="456" width="248" height="248" fill="#000" stroke="#555"/>
+<image x="298" y="456" width="248" height="248" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAAUklEQVR42mNgYGD4Twc8asmoJaOWjFoyfC1hxIKpagnMUCYkTKJFxFkCMpgZCTNR0xKYBSxAzIqEWUiziLAimC9AhrNBaViwDa2IH82Mo5aQhQGE828HjjNhqQAAAABJRU5ErkJggg==" style="image-rendering:pixelated"/>
+<text x="572" y="424" font-size="14">Powered lift: combined</text>
+<text x="572" y="445" font-size="13">EV +10</text>
+<rect x="572" y="456" width="248" height="248" fill="#000" stroke="#555"/>
+<image x="572" y="456" width="248" height="248" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAAoElEQVR42u3VwQqAIAwGYFdZFnno1Ps/aU2aMEQjdUmHDj+DDn78jFQppY4G+ZEXEEhEBIEHKUagINVIF0kVkgJ6lkzoOTBgNM0UlI1wwB0+YQxNnQfdI76BO3jFbDSnoFE1oqmBA3a4pgnaiDWxBFnpJh0dNmJmzEJzpO9FO4lBHuGL5whIIoYlhRT/8XwvJtjHt6+VZrew4Fvyv/EfRE6MO3FDRPCyUQAAAABJRU5ErkJggg==" style="image-rendering:pixelated"/>
+<text x="846" y="424" font-size="14">Hot shutdown, posed down</text>
+<text x="846" y="445" font-size="13">EV +10</text>
+<rect x="846" y="456" width="248" height="248" fill="#000" stroke="#555"/>
+<image x="846" y="456" width="248" height="248" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAAVUlEQVR42u3TOwoAIAxEwfi7/5G1UVgkiMFgoVu8NoOYiIjUCxEhQoTIu0hQckPCRm5IVHJBxpDUy1CyQWskAlCgAR0jM4QIvsRlu7R/MW4YL/5HpAHfZW8sEKNnOgAAAABJRU5ErkJggg==" style="image-rendering:pixelated"/>
+<text x="24" y="750" font-size="14">Powered-lift center: 0.0303962 lux → 0.00193508 cd/m². Downward hot-shutdown center: 6.21286e−7 cd/m².</text>
+<text x="24" y="772" font-size="13">Shutdown temperatures are observed; downward pose is a counterfactual. No deck heating or impinging-flow model.</text>
+<text x="24" y="794" font-size="13">Coarse-map hardware differs up to 8.55% at downward probes; refined horizontal grazing values remain unqualified.</text>
+</g></svg>

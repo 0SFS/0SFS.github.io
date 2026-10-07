@@ -1,5 +1,11 @@
 # Final actual-engine plume support and depth diagnostic
 
+**Correction, 2026-10-06:** the retained diagnostic silently built zero hardware
+triangles from non-indexed GLB meshes. Its hardware-occlusion/depth claims below
+are **unqualified**. Attachment and direction measurements remain valid; tracer
+results describe unobstructed support only. Original records are preserved.
+See the [occlusion erratum](../../dry-vtol-mechanism-2026-10-06/occlusion-erratum/README.md).
+
 The [report](report.json) loads the unchanged full F135 GLB and production rigid
 nozzle rig in Babylon NullEngine, then creates the actual production plume mesh
 through an explicit CPU readiness seam. It uses actual native dry powered-lift

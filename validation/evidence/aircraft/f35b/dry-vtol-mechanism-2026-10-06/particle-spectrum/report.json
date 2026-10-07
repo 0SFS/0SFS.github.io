@@ -1,0 +1,1043 @@
+{
+  "inputs": [
+    {
+      "file": "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json",
+      "snapshot": "source-0-f135-exhaust-lut.manifest.json.txt",
+      "sha256": "95036c421d8bf371c633caef805ed26103577c55b0bbff8b066da30b73f6e001"
+    },
+    {
+      "file": "scripts/exhaustOptics/data/CIE_xyz_1931_2deg.csv",
+      "snapshot": "source-1-CIE_xyz_1931_2deg.csv.txt",
+      "sha256": "fa663e3535a7e0763a745993a1f0a192eb0275ac46ad2d1befd7626841e713c1"
+    },
+    {
+      "file": "scripts/exhaustOptics/bake.mjs",
+      "snapshot": "source-2-bake.mjs.txt",
+      "sha256": "2164fa7cf9dce2d2cf0d3bc5bb39781a211d27fadca79054d8de80e71cafe907"
+    },
+    {
+      "file": "scripts/exhaustOptics/reference.mjs",
+      "snapshot": "source-3-reference.mjs.txt",
+      "sha256": "916974d05b9e2e3e8c78aa6b601777c6faeb42fde727b06bf3b21d1be32f0e9e"
+    },
+    {
+      "file": "scripts/exhaustOptics/f135-visible-approximation.json",
+      "snapshot": "source-4-f135-visible-approximation.json.txt",
+      "sha256": "2c10421721b770a4e85cef4a49fccf77b552ccb4cb0b1dab7b64a27575e5d00b"
+    },
+    {
+      "file": "scripts/validation/f35b/analyze-particle-spectrum.mjs",
+      "snapshot": "source-5-analyze-particle-spectrum.mjs.txt",
+      "sha256": "ad61d4f9f2b7593d7df5e48f3d1f38427ee9f3da5a788d32029ab5fdabf13405"
+    }
+  ],
+  "model": "power-law-soot-v1",
+  "referenceWavelengthNm": 550,
+  "exponent": 1,
+  "interpolation": [
+    {
+      "temperatureKelvin": 150,
+      "xyz": [
+        1.6611651885599936e-47,
+        5.998771369650007e-48,
+        2.0183335796200125e-60
+      ],
+      "independentXyz": [
+        1.6611651885563704e-47,
+        5.998771369645937e-48,
+        2.0183335796177353e-60
+      ],
+      "photopicRelativeError": 6.785529512433865e-13,
+      "maxXyzRelativeError": 2.1811225148264185e-12,
+      "planckMeanAbsorptionRatio": 0.0219741461218,
+      "independentPlanckMeanRatio": 0.021974146122601724,
+      "powerRelativeError": 3.6484842989178665e-11
+    },
+    {
+      "temperatureKelvin": 300,
+      "xyz": [
+        2.051204301534805e-21,
+        7.422841139808703e-22,
+        1.5871238210381871e-27
+      ],
+      "independentXyz": [
+        2.0536200818390576e-21,
+        7.431567900933846e-22,
+        1.5896299368464206e-27
+      ],
+      "photopicRelativeError": 0.0011742826334193038,
+      "maxXyzRelativeError": 0.0015765403948073626,
+      "planckMeanAbsorptionRatio": 0.04394829224359508,
+      "independentPlanckMeanRatio": 0.043948292245203496,
+      "powerRelativeError": 3.6597890568080624e-11
+    },
+    {
+      "temperatureKelvin": 650,
+      "xyz": [
+        0.000023366097478417407,
+        0.000010010746767028617,
+        8.213207008272673e-9
+      ],
+      "independentXyz": [
+        0.000023369407610132597,
+        0.00001001216294024519,
+        8.214438349403537e-9
+      ],
+      "photopicRelativeError": 0.00014144528260522787,
+      "maxXyzRelativeError": 0.00014989961315524524,
+      "planckMeanAbsorptionRatio": 0.09522129986101312,
+      "independentPlanckMeanRatio": 0.0952212998646069,
+      "powerRelativeError": 3.774132529206952e-11
+    },
+    {
+      "temperatureKelvin": 800,
+      "xyz": [
+        0.01494194305416179,
+        0.007099941347377395,
+        0.000019698406032716872
+      ],
+      "independentXyz": [
+        0.014942033465414355,
+        0.007099984427614886,
+        0.00001969854004415301
+      ],
+      "photopicRelativeError": 0.0000060676523913899055,
+      "maxXyzRelativeError": 0.0000068031151464483945,
+      "planckMeanAbsorptionRatio": 0.11719544598259016,
+      "independentPlanckMeanRatio": 0.11719544598720903,
+      "powerRelativeError": 3.941172532966819e-11
+    },
+    {
+      "temperatureKelvin": 1003.1281319989688,
+      "xyz": [
+        4.792026758072012,
+        2.5977707338867804,
+        0.026273794131371667
+      ],
+      "independentXyz": [
+        4.79214454491457,
+        2.597835200812889,
+        0.026274572191676896
+      ],
+      "photopicRelativeError": 0.000024815633450626932,
+      "maxXyzRelativeError": 0.000029612672646138052,
+      "planckMeanAbsorptionRatio": 0.14695256100917026,
+      "independentPlanckMeanRatio": 0.14695256101491824,
+      "powerRelativeError": 3.911456446399677e-11
+    },
+    {
+      "temperatureKelvin": 1200,
+      "xyz": [
+        209.94707065356585,
+        127.2562411568485,
+        3.21852169978012
+      ],
+      "independentXyz": [
+        209.95066768176997,
+        127.25845786984212,
+        3.2185903671573284
+      ],
+      "photopicRelativeError": 0.00001741898362372308,
+      "maxXyzRelativeError": 0.000021334612167185994,
+      "planckMeanAbsorptionRatio": 0.17579316897431146,
+      "independentPlanckMeanRatio": 0.1757931689808136,
+      "powerRelativeError": 3.698739947471649e-11
+    },
+    {
+      "temperatureKelvin": 1500,
+      "xyz": [
+        10338.932250923226,
+        7197.028520240619,
+        481.4884150062576
+      ],
+      "independentXyz": [
+        10339.030859090795,
+        7197.099025784847,
+        481.4942734647852
+      ],
+      "photopicRelativeError": 0.000009796383789506491,
+      "maxXyzRelativeError": 0.000012167244452236459,
+      "planckMeanAbsorptionRatio": 0.21974146121791804,
+      "independentPlanckMeanRatio": 0.21974146122601693,
+      "powerRelativeError": 3.685641585536301e-11
+    },
+    {
+      "temperatureKelvin": 2000,
+      "xyz": [
+        537860.8948278769,
+        439656.329253163,
+        79267.79104366829
+      ],
+      "independentXyz": [
+        537864.3586411172,
+        439659.278345414,
+        79268.45402541368
+      ],
+      "photopicRelativeError": 0.000006707676594603092,
+      "maxXyzRelativeError": 0.000008363752687563572,
+      "planckMeanAbsorptionRatio": 0.2929886149567869,
+      "independentPlanckMeanRatio": 0.2929886149680224,
+      "powerRelativeError": 3.8347949191077236e-11
+    },
+    {
+      "temperatureKelvin": 2500,
+      "xyz": [
+        5978201.614644692,
+        5398143.955750791,
+        1766590.2093894437
+      ],
+      "independentXyz": [
+        5978214.949582342,
+        5398156.605120673,
+        1766595.363558286
+      ],
+      "photopicRelativeError": 0.000002343275826694104,
+      "maxXyzRelativeError": 0.0000029175718156413714,
+      "planckMeanAbsorptionRatio": 0.366235768696459,
+      "independentPlanckMeanRatio": 0.36623576871002705,
+      "powerRelativeError": 3.7047270482984263e-11
+    },
+    {
+      "temperatureKelvin": 3200,
+      "xyz": [
+        50980578.22700007,
+        49774080.060799986,
+        27361692.98389996
+      ],
+      "independentXyz": [
+        50980578.227039225,
+        49774080.06084067,
+        27361692.983884554
+      ],
+      "photopicRelativeError": 8.172962716634693e-13,
+      "maxXyzRelativeError": 8.172962716634693e-13,
+      "planckMeanAbsorptionRatio": 0.468781783931,
+      "independentPlanckMeanRatio": 0.46878178394883446,
+      "powerRelativeError": 3.8044260132922266e-11
+    }
+  ],
+  "slabs": [
+    {
+      "exponent": 1,
+      "temperatureKelvin": 800,
+      "lengthMeters": 0.1,
+      "opticalDepth550": 0.0025000000000000005,
+      "exactXyzCdM2": [
+        0.00003731491743515725,
+        0.000017730514023459398,
+        4.918162690668885e-8
+      ],
+      "scalar550XyzCdM2": [
+        0.000037308592679566147,
+        0.000017727878039384806,
+        4.9185417531916584e-8
+      ],
+      "photopicRelativeError": 0.00014866935448709661,
+      "photopicSignedRelativeError": -0.0001486693544870965,
+      "maxXyzRelativeError": 0.000169496706031723,
+      "quadratureRelativeError": 0.000004848335727378165
+    },
+    {
+      "exponent": 1,
+      "temperatureKelvin": 800,
+      "lengthMeters": 1,
+      "opticalDepth550": 0.025,
+      "exactXyzCdM2": [
+        0.00036954551947713035,
+        0.0001755600494120262,
+        4.859914698722565e-7
+      ],
+      "scalar550XyzCdM2": [
+        0.0003689217422674535,
+        0.0001753000899596191,
+        4.863643634557431e-7
+      ],
+      "photopicRelativeError": 0.0014807437869705615,
+      "photopicSignedRelativeError": -0.0014807437869706064,
+      "maxXyzRelativeError": 0.001687957712379948,
+      "quadratureRelativeError": 0.000004851883677324654
+    },
+    {
+      "exponent": 1,
+      "temperatureKelvin": 800,
+      "lengthMeters": 6,
+      "opticalDepth550": 0.15000000000000002,
+      "exactXyzCdM2": [
+        0.0021021177439452376,
+        0.0009976429345047379,
+        0.0000027316193742392563
+      ],
+      "scalar550XyzCdM2": [
+        0.0020813152257778975,
+        0.0009889759927694522,
+        0.000002743881530848753
+      ],
+      "photopicRelativeError": 0.008687418549792344,
+      "photopicSignedRelativeError": -0.00868741854979238,
+      "maxXyzRelativeError": 0.00989598143455946,
+      "quadratureRelativeError": 0.000004871184205640429
+    },
+    {
+      "exponent": 1,
+      "temperatureKelvin": 800,
+      "lengthMeters": 12,
+      "opticalDepth550": 0.30000000000000004,
+      "exactXyzCdM2": [
+        0.003948710564989131,
+        0.0018718446622175249,
+        0.00000506150168971961
+      ],
+      "scalar550XyzCdM2": [
+        0.003872719842059841,
+        0.0018401955182390148,
+        0.000005105562250815694
+      ],
+      "photopicRelativeError": 0.01690799702418475,
+      "photopicSignedRelativeError": -0.016907997024184773,
+      "maxXyzRelativeError": 0.019244439843997416,
+      "quadratureRelativeError": 0.000004893426309574886
+    },
+    {
+      "exponent": 1,
+      "temperatureKelvin": 1003.1281319989688,
+      "lengthMeters": 0.1,
+      "opticalDepth550": 0.0025000000000000005,
+      "exactXyzCdM2": [
+        0.011967242323302305,
+        0.0064872884470293015,
+        0.00006559586766858428
+      ],
+      "scalar550XyzCdM2": [
+        0.011965428529326503,
+        0.006486495354957544,
+        0.00006560490812629282
+      ],
+      "photopicRelativeError": 0.00012225324621110607,
+      "photopicSignedRelativeError": -0.00012225324621106815,
+      "maxXyzRelativeError": 0.0001515632362745604,
+      "quadratureRelativeError": 0.0000029028208605480556
+    },
+    {
+      "exponent": 1,
+      "temperatureKelvin": 1003.1281319989688,
+      "lengthMeters": 1,
+      "opticalDepth550": 0.025,
+      "exactXyzCdM2": [
+        0.11849763723852583,
+        0.06421917305974587,
+        0.0006478371470094989
+      ],
+      "scalar550XyzCdM2": [
+        0.11831876849199796,
+        0.06414096581218194,
+        0.0006487266141374463
+      ],
+      "photopicRelativeError": 0.001217817730090746,
+      "photopicSignedRelativeError": -0.0012178177300907755,
+      "maxXyzRelativeError": 0.0015094709961838157,
+      "quadratureRelativeError": 0.000002905829293274778
+    },
+    {
+      "exponent": 1,
+      "temperatureKelvin": 1003.1281319989688,
+      "lengthMeters": 6,
+      "opticalDepth550": 0.15000000000000002,
+      "exactXyzCdM2": [
+        0.6734713665433226,
+        0.36446486474931755,
+        0.0036305935422119803
+      ],
+      "scalar550XyzCdM2": [
+        0.6675091927196769,
+        0.3618587723252528,
+        0.00365986718774836
+      ],
+      "photopicRelativeError": 0.007150462708818936,
+      "photopicSignedRelativeError": -0.0071504627088189165,
+      "maxXyzRelativeError": 0.008852898756850401,
+      "quadratureRelativeError": 0.0000029221958859472204
+    },
+    {
+      "exponent": 1,
+      "temperatureKelvin": 1003.1281319989688,
+      "lengthMeters": 12,
+      "opticalDepth550": 0.30000000000000004,
+      "exactXyzCdM2": [
+        1.2638064500243444,
+        0.6828245619122246,
+        0.006704650814931214
+      ],
+      "scalar550XyzCdM2": [
+        1.2420396792305524,
+        0.6733135040049766,
+        0.006809944068899725
+      ],
+      "photopicRelativeError": 0.013928992068786575,
+      "photopicSignedRelativeError": -0.013928992068786616,
+      "maxXyzRelativeError": 0.01722318381376578,
+      "quadratureRelativeError": 0.0000029410576468749634
+    },
+    {
+      "exponent": 1,
+      "temperatureKelvin": 1500,
+      "lengthMeters": 0.1,
+      "opticalDepth550": 0.0025000000000000005,
+      "exactXyzCdM2": [
+        25.818556588424034,
+        17.97177273886484,
+        1.20199551778292
+      ],
+      "scalar550XyzCdM2": [
+        25.815313909059714,
+        17.97029233280039,
+        1.2022359046267712
+      ],
+      "photopicRelativeError": 0.0000823739586494552,
+      "photopicSignedRelativeError": -0.00008237395864940655,
+      "maxXyzRelativeError": 0.00019994981261670062,
+      "quadratureRelativeError": 9.446743439894587e-7
+    },
+    {
+      "exponent": 1,
+      "temperatureKelvin": 1500,
+      "lengthMeters": 1,
+      "opticalDepth550": 0.025,
+      "exactXyzCdM2": [
+        255.59152559407835,
+        177.84315409301527,
+        11.864524612569989
+      ],
+      "scalar550XyzCdM2": [
+        255.27177254605203,
+        177.69717591366523,
+        11.888171938319093
+      ],
+      "photopicRelativeError": 0.0008208254070532792,
+      "photopicSignedRelativeError": -0.000820825407053305,
+      "maxXyzRelativeError": 0.0019891473535037147,
+      "quadratureRelativeError": 9.466798284116569e-7
+    },
+    {
+      "exponent": 1,
+      "temperatureKelvin": 1500,
+      "lengthMeters": 6,
+      "opticalDepth550": 0.15000000000000002,
+      "exactXyzCdM2": [
+        1450.7989721248227,
+        1007.3628260898021,
+        66.29091115994738
+      ],
+      "scalar550XyzCdM2": [
+        1440.1456082418633,
+        1002.4994339821874,
+        67.06851461183692
+      ],
+      "photopicRelativeError": 0.004827845520657654,
+      "photopicSignedRelativeError": -0.004827845520657625,
+      "maxXyzRelativeError": 0.011594165405182445,
+      "quadratureRelativeError": 9.576020170415207e-7
+    },
+    {
+      "exponent": 1,
+      "temperatureKelvin": 1500,
+      "lengthMeters": 12,
+      "opticalDepth550": 0.30000000000000004,
+      "exactXyzCdM2": [
+        2718.5627607138763,
+        1883.103316629841,
+        122.00073952000756
+      ],
+      "scalar550XyzCdM2": [
+        2679.690420469153,
+        1865.3586931722548,
+        124.79492010522529
+      ],
+      "photopicRelativeError": 0.009423074825943921,
+      "photopicSignedRelativeError": -0.009423074825943956,
+      "maxXyzRelativeError": 0.02239017888598124,
+      "quadratureRelativeError": 9.702131336055967e-7
+    },
+    {
+      "exponent": 1,
+      "temperatureKelvin": 2000,
+      "lengthMeters": 0.1,
+      "opticalDepth550": 0.0025000000000000005,
+      "exactXyzCdM2": [
+        1343.1256457239722,
+        1097.8406809140754,
+        197.87917130074828
+      ],
+      "scalar550XyzCdM2": [
+        1342.9817594278252,
+        1097.7757278912193,
+        197.92386596795288
+      ],
+      "photopicRelativeError": 0.000059164343228778405,
+      "photopicSignedRelativeError": -0.00005916434322872366,
+      "maxXyzRelativeError": 0.00022581747272373996,
+      "quadratureRelativeError": 2.9441545507425545e-7
+    },
+    {
+      "exponent": 1,
+      "temperatureKelvin": 2000,
+      "lengthMeters": 1,
+      "opticalDepth550": 0.025,
+      "exactXyzCdM2": [
+        13294.110200488265,
+        10861.63496755132,
+        1952.7512290412617
+      ],
+      "scalar550XyzCdM2": [
+        13279.921190725643,
+        10855.229454269014,
+        1957.1474618821285
+      ],
+      "photopicRelativeError": 0.0005897374844064674,
+      "photopicSignedRelativeError": -0.000589737484406494,
+      "maxXyzRelativeError": 0.002246245071712208,
+      "quadratureRelativeError": 2.957269927633351e-7
+    },
+    {
+      "exponent": 1,
+      "temperatureKelvin": 2000,
+      "lengthMeters": 6,
+      "opticalDepth550": 0.15000000000000002,
+      "exactXyzCdM2": [
+        75393.10111002406,
+        61454.58058855141,
+        10896.997968000323
+      ],
+      "scalar550XyzCdM2": [
+        74920.23105363702,
+        61241.04858559269,
+        11041.476673268986
+      ],
+      "photopicRelativeError": 0.0034746311977679233,
+      "photopicSignedRelativeError": -0.003474631197767919,
+      "maxXyzRelativeError": 0.01308508902785079,
+      "quadratureRelativeError": 3.0288912653398343e-7
+    },
+    {
+      "exponent": 1,
+      "temperatureKelvin": 2000,
+      "lengthMeters": 12,
+      "opticalDepth550": 0.30000000000000004,
+      "exactXyzCdM2": [
+        141130.61832319526,
+        114731.33355208547,
+        20026.155547758775
+      ],
+      "scalar550XyzCdM2": [
+        139404.6715171106,
+        113951.70758784721,
+        20544.96371746281
+      ],
+      "photopicRelativeError": 0.00679523143417776,
+      "photopicSignedRelativeError": -0.0067952314341777065,
+      "maxXyzRelativeError": 0.02525232834862879,
+      "quadratureRelativeError": 3.1119893765856355e-7
+    },
+    {
+      "exponent": 1,
+      "temperatureKelvin": 2500,
+      "lengthMeters": 0.1,
+      "opticalDepth550": 0.0025000000000000005,
+      "exactXyzCdM2": [
+        14928.218029219117,
+        13479.130517978483,
+        4409.915056627571
+      ],
+      "scalar550XyzCdM2": [
+        14926.871375442654,
+        13478.53693974538,
+        4410.974366100491
+      ],
+      "photopicRelativeError": 0.000044036834001403586,
+      "photopicSignedRelativeError": -0.00004403683400144853,
+      "maxXyzRelativeError": 0.0002401531691186535,
+      "quadratureRelativeError": 4.589734152526766e-8
+    },
+    {
+      "exponent": 1,
+      "temperatureKelvin": 2500,
+      "lengthMeters": 1,
+      "opticalDepth550": 0.025,
+      "exactXyzCdM2": [
+        147735.478307295,
+        133339.51750632326,
+        43513.22602222921
+      ],
+      "scalar550XyzCdM2": [
+        147602.65662463792,
+        133280.96757052286,
+        43617.41441751405
+      ],
+      "photopicRelativeError": 0.0004391041522827256,
+      "photopicSignedRelativeError": -0.00043910415228276545,
+      "maxXyzRelativeError": 0.0023886880200537745,
+      "quadratureRelativeError": 4.670517565193877e-8
+    },
+    {
+      "exponent": 1,
+      "temperatureKelvin": 2500,
+      "lengthMeters": 6,
+      "opticalDepth550": 0.15000000000000002,
+      "exactXyzCdM2": [
+        837148.594953148,
+        753874.2872073437,
+        242649.90938655427
+      ],
+      "scalar550XyzCdM2": [
+        832717.6780364773,
+        751920.1915452154,
+        246072.75293203816
+      ],
+      "photopicRelativeError": 0.0025920709795887323,
+      "photopicSignedRelativeError": -0.00259207097958869,
+      "maxXyzRelativeError": 0.013909884392723611,
+      "quadratureRelativeError": 5.114097502242026e-8
+    },
+    {
+      "exponent": 1,
+      "temperatureKelvin": 2500,
+      "lengthMeters": 12,
+      "opticalDepth550": 0.30000000000000004,
+      "exactXyzCdM2": [
+        1565635.5036519116,
+        1406248.150831589,
+        445583.5555545801
+      ],
+      "scalar550XyzCdM2": [
+        1549444.4256326235,
+        1399103.898043239,
+        457869.53416151786
+      ],
+      "photopicRelativeError": 0.0050803642188793005,
+      "photopicSignedRelativeError": -0.005080364218879252,
+      "maxXyzRelativeError": 0.026832924425593575,
+      "quadratureRelativeError": 5.633841396145078e-8
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 800,
+      "lengthMeters": 0.1,
+      "opticalDepth550": 0.0025000000000000005,
+      "exactXyzCdM2": [
+        0.00003570878229267592,
+        0.000017062978168496614,
+        5.0033733652770455e-8
+      ],
+      "scalar550XyzCdM2": [
+        0.00003570114199933669,
+        0.000017059782319630664,
+        5.0039072726372666e-8
+      ],
+      "photopicRelativeError": 0.00018729724872124944,
+      "photopicSignedRelativeError": -0.00018729724872124098,
+      "maxXyzRelativeError": 0.0002139611840193938,
+      "quadratureRelativeError": 0.000004739526305190814
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 800,
+      "lengthMeters": 1,
+      "opticalDepth550": 0.025,
+      "exactXyzCdM2": [
+        0.0003537803932463954,
+        0.00016900896327284615,
+        4.942806370346567e-7
+      ],
+      "scalar550XyzCdM2": [
+        0.0003530266504677556,
+        0.0001686937020143532,
+        4.948056349971082e-7
+      ],
+      "photopicRelativeError": 0.0018653523007770517,
+      "photopicSignedRelativeError": -0.0018653523007770012,
+      "maxXyzRelativeError": 0.0021305385855988905,
+      "quadratureRelativeError": 0.000004743918618641145
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 800,
+      "lengthMeters": 6,
+      "opticalDepth550": 0.15000000000000002,
+      "exactXyzCdM2": [
+        0.0020168186683500768,
+        0.000962232194788389,
+        0.0000027742796468773037
+      ],
+      "scalar550XyzCdM2": [
+        0.001991641203383554,
+        0.0009517052812809725,
+        0.000002791503953089267
+      ],
+      "photopicRelativeError": 0.010940096958335015,
+      "photopicSignedRelativeError": -0.010940096958334977,
+      "maxXyzRelativeError": 0.012483752437257986,
+      "quadratureRelativeError": 0.000004767835211899093
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 800,
+      "lengthMeters": 12,
+      "opticalDepth550": 0.30000000000000004,
+      "exactXyzCdM2": [
+        0.003798010989829525,
+        0.0018093570347769245,
+        0.0000051324485527371255
+      ],
+      "scalar550XyzCdM2": [
+        0.003705862673312585,
+        0.001770845608085356,
+        0.000005194173671735293
+      ],
+      "photopicRelativeError": 0.021284592234343966,
+      "photopicSignedRelativeError": -0.02128459223434398,
+      "maxXyzRelativeError": 0.0242622564188726,
+      "quadratureRelativeError": 0.0000047954483921212986
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 1003.1281319989688,
+      "lengthMeters": 0.1,
+      "opticalDepth550": 0.0025000000000000005,
+      "exactXyzCdM2": [
+        0.0115088740194248,
+        0.006287432402881885,
+        0.0000676451192347544
+      ],
+      "scalar550XyzCdM2": [
+        0.011506669203338347,
+        0.006286464807246523,
+        0.00006765774201684454
+      ],
+      "photopicRelativeError": 0.00015389360447326598,
+      "photopicSignedRelativeError": -0.00015389360447326528,
+      "maxXyzRelativeError": 0.00019157530812595152,
+      "quadratureRelativeError": 0.000002812302777650505
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 1003.1281319989688,
+      "lengthMeters": 1,
+      "opticalDepth550": 0.025,
+      "exactXyzCdM2": [
+        0.11399986855806216,
+        0.062258426727535406,
+        0.0006677844351563503
+      ],
+      "scalar550XyzCdM2": [
+        0.11378237948159953,
+        0.06216298666935894,
+        0.0006690258267609997
+      ],
+      "photopicRelativeError": 0.0015329661090561254,
+      "photopicSignedRelativeError": -0.0015329661090561775,
+      "maxXyzRelativeError": 0.001907801116032499,
+      "quadratureRelativeError": 0.0000028160313319102644
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 1003.1281319989688,
+      "lengthMeters": 6,
+      "opticalDepth550": 0.15000000000000002,
+      "exactXyzCdM2": [
+        0.6491770345117142,
+        0.35388469052356825,
+        0.00373362678769556
+      ],
+      "scalar550XyzCdM2": [
+        0.6419166227091287,
+        0.35069977128365903,
+        0.0037743875736844968
+      ],
+      "photopicRelativeError": 0.008999878562695553,
+      "photopicSignedRelativeError": -0.008999878562695574,
+      "maxXyzRelativeError": 0.011184024413381182,
+      "quadratureRelativeError": 0.0000028363356244482057
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 1003.1281319989688,
+      "lengthMeters": 12,
+      "opticalDepth550": 0.30000000000000004,
+      "exactXyzCdM2": [
+        1.2209729620289829,
+        0.6641931463313492,
+        0.006876817784599162
+      ],
+      "scalar550XyzCdM2": [
+        1.1944193800747112,
+        0.6525498617579472,
+        0.007023033064474374
+      ],
+      "photopicRelativeError": 0.017529967958437025,
+      "photopicSignedRelativeError": -0.017529967958436976,
+      "maxXyzRelativeError": 0.021747886955781247,
+      "quadratureRelativeError": 0.000002859780386835805
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 1500,
+      "lengthMeters": 0.1,
+      "opticalDepth550": 0.0025000000000000005,
+      "exactXyzCdM2": [
+        25.002876994597422,
+        17.59966162517863,
+        1.2561532896304308
+      ],
+      "scalar550XyzCdM2": [
+        24.998912443364134,
+        17.597850356446287,
+        1.2564916269527842
+      ],
+      "photopicRelativeError": 0.00010291497478291253,
+      "photopicSignedRelativeError": -0.00010291497478287503,
+      "maxXyzRelativeError": 0.0002692714500405075,
+      "quadratureRelativeError": 8.855837747125463e-7
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 1500,
+      "lengthMeters": 1,
+      "opticalDepth550": 0.025,
+      "exactXyzCdM2": [
+        247.5899176108102,
+        174.19297753210313,
+        12.39140705767247
+      ],
+      "scalar550XyzCdM2": [
+        247.1988802313806,
+        174.01432612112055,
+        12.424673429554776
+      ],
+      "photopicRelativeError": 0.0010255947944265253,
+      "photopicSignedRelativeError": -0.0010255947944265431,
+      "maxXyzRelativeError": 0.002677444366720687,
+      "quadratureRelativeError": 8.880486967971115e-7
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 1500,
+      "lengthMeters": 6,
+      "opticalDepth550": 0.15000000000000002,
+      "exactXyzCdM2": [
+        1407.648579949212,
+        987.6829172718682,
+        69.00429774174086
+      ],
+      "scalar550XyzCdM2": [
+        1394.6014405619599,
+        981.7222054557087,
+        70.09525062229399
+      ],
+      "photopicRelativeError": 0.006035045976722834,
+      "photopicSignedRelativeError": -0.006035045976722886,
+      "maxXyzRelativeError": 0.015563863041616,
+      "quadratureRelativeError": 9.014929493468846e-7
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 1500,
+      "lengthMeters": 12,
+      "opticalDepth550": 0.30000000000000004,
+      "exactXyzCdM2": [
+        2642.6336448303687,
+        1848.4843959908242,
+        126.5188890593602
+      ],
+      "scalar550XyzCdM2": [
+        2594.946024387518,
+        1826.6983383250429,
+        130.4267919424152
+      ],
+      "photopicRelativeError": 0.011785902933794333,
+      "photopicSignedRelativeError": -0.011785902933794334,
+      "maxXyzRelativeError": 0.029962424321380087,
+      "quadratureRelativeError": 9.170593074911508e-7
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 2000,
+      "lengthMeters": 0.1,
+      "opticalDepth550": 0.0025000000000000005,
+      "exactXyzCdM2": [
+        1306.871133291853,
+        1081.439379980614,
+        207.90498563517198
+      ],
+      "scalar550XyzCdM2": [
+        1306.6957297765805,
+        1081.360452259918,
+        207.9682372662673
+      ],
+      "photopicRelativeError": 0.00007298395282897526,
+      "photopicSignedRelativeError": -0.00007298395282895331,
+      "maxXyzRelativeError": 0.000304140824227545,
+      "quadratureRelativeError": 2.5568219111896327e-7
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 2000,
+      "lengthMeters": 1,
+      "opticalDepth550": 0.025,
+      "exactXyzCdM2": [
+        12938.413221160532,
+        10700.69511542114,
+        2050.251895932929
+      ],
+      "scalar550XyzCdM2": [
+        12921.110945753928,
+        10692.908882766527,
+        2056.470076143715
+      ],
+      "photopicRelativeError": 0.0007276380245047655,
+      "photopicSignedRelativeError": -0.0007276380245048175,
+      "maxXyzRelativeError": 0.0030237153863410513,
+      "quadratureRelativeError": 2.5725333841221604e-7
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 2000,
+      "lengthMeters": 6,
+      "opticalDepth550": 0.15000000000000002,
+      "exactXyzCdM2": [
+        73473.54844287725,
+        60585.326662385596,
+        11398.058452584435
+      ],
+      "scalar550XyzCdM2": [
+        72895.96102434868,
+        60325.298066665295,
+        11601.816836622209
+      ],
+      "photopicRelativeError": 0.0042919401453312645,
+      "photopicSignedRelativeError": -0.004291940145331297,
+      "maxXyzRelativeError": 0.01756262720805862,
+      "quadratureRelativeError": 2.658573552105403e-7
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 2000,
+      "lengthMeters": 12,
+      "opticalDepth550": 0.30000000000000004,
+      "exactXyzCdM2": [
+        137750.37162960897,
+        113199.15898646136,
+        20858.386275592395
+      ],
+      "scalar550XyzCdM2": [
+        135638.09612717564,
+        112247.76329286328,
+        21587.5931289255
+      ],
+      "photopicRelativeError": 0.008404618038830742,
+      "photopicSignedRelativeError": -0.008404618038830747,
+      "maxXyzRelativeError": 0.033778978924520774,
+      "quadratureRelativeError": 2.7589138811848664e-7
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 2500,
+      "lengthMeters": 0.1,
+      "opticalDepth550": 0.0025000000000000005,
+      "exactXyzCdM2": [
+        14586.336057792263,
+        13327.826729522323,
+        4646.9052697062925
+      ],
+      "scalar550XyzCdM2": [
+        14584.713277438434,
+        13327.11539997162,
+        4648.409414790501
+      ],
+      "photopicRelativeError": 0.0000533717585873751,
+      "photopicSignedRelativeError": -0.000053371758587328344,
+      "maxXyzRelativeError": 0.00032358274626633035,
+      "quadratureRelativeError": 2.1407627360784558e-8
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 2500,
+      "lengthMeters": 1,
+      "opticalDepth550": 0.025,
+      "exactXyzCdM2": [
+        144379.38929068914,
+        131853.84912735177,
+        45817.406613895095
+      ],
+      "scalar550XyzCdM2": [
+        144219.26549190885,
+        131783.65303094868,
+        45965.263680829885
+      ],
+      "photopicRelativeError": 0.0005323780600086117,
+      "photopicSignedRelativeError": -0.0005323780600086092,
+      "maxXyzRelativeError": 0.0032167131240988574,
+      "quadratureRelativeError": 2.2322222488350067e-8
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 2500,
+      "lengthMeters": 6,
+      "opticalDepth550": 0.15000000000000002,
+      "exactXyzCdM2": [
+        818983.8684673564,
+        745821.4060934715,
+        254475.79668158587
+      ],
+      "scalar550XyzCdM2": [
+        813629.8806189791,
+        743472.9161695762,
+        259318.419586264
+      ],
+      "photopicRelativeError": 0.0031488636618736193,
+      "photopicSignedRelativeError": -0.0031488636618736132,
+      "maxXyzRelativeError": 0.01867442703223481,
+      "quadratureRelativeError": 2.737553250230278e-8
+    },
+    {
+      "exponent": 1.3,
+      "temperatureKelvin": 2500,
+      "lengthMeters": 12,
+      "opticalDepth550": 0.30000000000000004,
+      "exactXyzCdM2": [
+        1533543.6381817162,
+        1391996.404327584,
+        465195.0061610177
+      ],
+      "scalar550XyzCdM2": [
+        1513927.6087255087,
+        1383385.9853727277,
+        482515.85175810126
+      ],
+      "photopicRelativeError": 0.006185661779073033,
+      "photopicSignedRelativeError": -0.006185661779072982,
+      "maxXyzRelativeError": 0.035896946253626896,
+      "quadratureRelativeError": 3.336217434073163e-8
+    }
+  ],
+  "maxima": {
+    "interpolationPhotopic": 0.0011742826334193038,
+    "interpolationXyz": 0.0015765403948073626,
+    "bolometricPower": 3.941172532966819e-11,
+    "slabPhotopic": 0.021284592234343966,
+    "slabXyz": 0.035896946253626896,
+    "slabQuadrature": 0.000004893426309574886
+  },
+  "passed": true,
+  "equations": {
+    "source": "j_lambda=kappa550*(550nm/lambda)^alpha*B_lambda(T)",
+    "exactSlab": "B_lambda(T)*(1-exp(-kappa550*(550nm/lambda)^alpha*L))",
+    "scalarSlab": "B_lambda(T)*(550nm/lambda)^alpha*(1-exp(-kappa550*L))",
+    "bolometricSource": "4*kappa550*sigma*T^4*PlanckMeanAbsorptionRatio(T)",
+    "planckRatio": "(550nm*k*T/(h*c))^alpha*Gamma(4+alpha)*zeta(4+alpha)/(Gamma(4)*zeta(4))"
+  },
+  "limits": [
+    "NIST measurement spans500–840nm on other flame soot; wavelength extrapolation and F135loading remain hypotheses.",
+    "Scalar550nm attenuation is not LTE-correct in the optically thick limit. These errors cover only the declared homogeneous-slab matrix, not nonuniform actual engine rays.",
+    "VisibleXYZ and whole-spectrum source power use the same power law; spectra retain absolute amplitudes. Native temperatures and solid material tables are unchanged.",
+    "No molecular-band or cameraNIR color, no new combustion source, no GPU or appearance pass."
+  ]
+}

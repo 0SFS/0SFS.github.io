@@ -1,0 +1,303 @@
+{
+  "schema": "0sfs-posed-ray-complete-inputs/1",
+  "status": "failed-current-32-step-criterion",
+  "processExitCode": 1,
+  "command": "node scripts/validation/f35b/render-exhaust-continuity.mjs --geometry=validation/evidence/aircraft/f35b/exhaust-correction-2026-10-06/geometry/report.json --rays-only --ray-budgets=32,64,128 --out=build/dry-vtol-mechanism-2026-10-06/posed-rays-complete-inputs-20261007T044028",
+  "log": "build/dry-vtol-mechanism-2026-10-06/posed-rays-complete-inputs-20261007T044028.log",
+  "sourceSnapshotAndCurrentHashesMatch": true,
+  "executedBundleHashMatches": true,
+  "changedAfterSnapshot": [],
+  "rayEvaluations": 288,
+  "uniquePhysicalRays": 96,
+  "uniqueOpaqueHitRays": 50,
+  "allTriangleCounts": [
+    24024
+  ],
+  "budgets": [
+    {
+      "samples": 32,
+      "finiteRayCount": 60,
+      "brightRayCount": 18,
+      "maxRelativePeakError": 0.04534421523452045,
+      "maxBrightRelativePeakError": 0.03641379835504492,
+      "overOnePercent": 12,
+      "worst": {
+        "name": "ab-cutoff",
+        "view": "oblique",
+        "x": -0.9,
+        "y": 0.2,
+        "actual": {
+          "radiance": [
+            5.167331612714782e-07,
+            0,
+            0
+          ],
+          "insideRadiance": [
+            0,
+            0,
+            0
+          ],
+          "outsideRadiance": [
+            5.167331612714782e-07,
+            0,
+            0
+          ],
+          "transmittance": 0.9954251336836372
+        },
+        "reference": {
+          "radiance": [
+            5.412769393089873e-07,
+            0,
+            0
+          ],
+          "insideRadiance": [
+            0,
+            0,
+            0
+          ],
+          "outsideRadiance": [
+            5.412769393089873e-07,
+            0,
+            0
+          ],
+          "transmittance": 0.9954267455979984
+        }
+      }
+    },
+    {
+      "samples": 64,
+      "finiteRayCount": 60,
+      "brightRayCount": 18,
+      "maxRelativePeakError": 0.029857748407687915,
+      "maxBrightRelativePeakError": 0.029857748407687915,
+      "overOnePercent": 6,
+      "worst": {
+        "name": "ab-onset",
+        "view": "rear",
+        "x": 0.12,
+        "y": 0,
+        "actual": {
+          "radiance": [
+            3652.3160960726846,
+            1386.1895563739183,
+            361.99350694213337
+          ],
+          "insideRadiance": [
+            3015.932341639151,
+            1141.6234088666959,
+            316.14716749754444
+          ],
+          "outsideRadiance": [
+            636.3837544335336,
+            244.5661475072224,
+            45.84633944458889
+          ],
+          "transmittance": 0.9621394762625742
+        },
+        "reference": {
+          "radiance": [
+            3764.7222250943837,
+            1422.5849636940543,
+            406.66039779444924
+          ],
+          "insideRadiance": [
+            3182.325217038416,
+            1198.78365743347,
+            364.7112577805016
+          ],
+          "outsideRadiance": [
+            582.3970080559681,
+            223.80130626058553,
+            41.94914001394736
+          ],
+          "transmittance": 0.961684274863072
+        }
+      }
+    },
+    {
+      "samples": 128,
+      "finiteRayCount": 60,
+      "brightRayCount": 18,
+      "maxRelativePeakError": 0.0070247946068893565,
+      "maxBrightRelativePeakError": 0.0070247946068893565,
+      "overOnePercent": 0,
+      "worst": {
+        "name": "ab-onset",
+        "view": "rear",
+        "x": 0.12,
+        "y": 0,
+        "actual": {
+          "radiance": [
+            3791.168625477663,
+            1430.85254947552,
+            418.7472376090756
+          ],
+          "insideRadiance": [
+            3212.398252187663,
+            1208.446138284814,
+            377.0598943351733
+          ],
+          "outsideRadiance": [
+            578.7703732900002,
+            222.40641119070614,
+            41.68734327390239
+          ],
+          "transmittance": 0.9615788611264618
+        },
+        "reference": {
+          "radiance": [
+            3764.7222250943837,
+            1422.5849636940543,
+            406.66039779444924
+          ],
+          "insideRadiance": [
+            3182.325217038416,
+            1198.78365743347,
+            364.7112577805016
+          ],
+          "outsideRadiance": [
+            582.3970080559681,
+            223.80130626058553,
+            41.94914001394736
+          ],
+          "transmittance": 0.961684274863072
+        }
+      }
+    }
+  ],
+  "maxReferenceConvergence": 0.001024157130080159,
+  "errors": [
+    "Runtime midpoint error exceeds 1% on selected ray: idle/rear/0.12",
+    "Runtime midpoint error exceeds 1% on selected ray: dry99/rear/0.12",
+    "Runtime midpoint error exceeds 1% on selected ray: dry99/rear/-0.35",
+    "Runtime midpoint error exceeds 1% on selected ray: ab-onset/rear/0.12",
+    "Runtime midpoint error exceeds 1% on selected ray: ab-sustained/rear/0.12",
+    "Runtime midpoint error exceeds 1% on selected ray: ab-sustained/oblique/-0.9",
+    "Runtime midpoint error exceeds 1% on selected ray: ab-cutoff/rear/0.12",
+    "Runtime midpoint error exceeds 1% on selected ray: ab-cutoff/rear/-0.9",
+    "Runtime midpoint error exceeds 1% on selected ray: ab-cutoff/oblique/-0.9",
+    "Runtime midpoint error exceeds 1% on selected ray: powered-lift/rear/0.12",
+    "Runtime midpoint error exceeds 1% on selected ray: powered-lift/rear/-0.35",
+    "Runtime midpoint error exceeds 1% on selected ray: powered-lift/oblique/-0.35"
+  ],
+  "zeroBurnedFuelRaysExactlyMatchIncompleteInputRun": true,
+  "positiveBurnedFuelCases": [
+    {
+      "name": "ab-onset",
+      "input": {
+        "temperatureKelvin": 1034.445401445685,
+        "upstreamGasTemperatureKelvin": 1006.6991319989319,
+        "ambientPressurePascal": 98311.39164619539,
+        "ambientTemperatureKelvin": 286.49913199893183,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 3.050671252816171,
+        "afterburnerBurnedFuelFlowKgPerSecond": 0.09247819972895266,
+        "radiusMeters": 0.43119478141166534,
+        "lengthMeters": 6,
+        "axialSamples": 64,
+        "radialSamples": 32
+      },
+      "chemistryStatus": "surrogate-parcel",
+      "reactionParcelActivated": true,
+      "reactionInputWasClamped": false,
+      "reactionDomainResolved": true,
+      "chPowerW": 3.6868339206807375,
+      "c2PowerW": 0
+    },
+    {
+      "name": "ab-sustained",
+      "input": {
+        "temperatureKelvin": 2363.1028843899676,
+        "upstreamGasTemperatureKelvin": 1006.6991319989909,
+        "ambientPressurePascal": 98311.39164630171,
+        "ambientTemperatureKelvin": 286.49913199899083,
+        "augmentation": true,
+        "fuelFlowKgPerSecond": 9.071065908566188,
+        "afterburnerBurnedFuelFlowKgPerSecond": 4.780720234907427,
+        "radiusMeters": 0.565,
+        "lengthMeters": 6,
+        "axialSamples": 64,
+        "radialSamples": 32
+      },
+      "chemistryStatus": "surrogate-parcel",
+      "reactionParcelActivated": true,
+      "reactionInputWasClamped": false,
+      "reactionDomainResolved": true,
+      "chPowerW": 190.5932595896644,
+      "c2PowerW": 0
+    }
+  ],
+  "noNewImages": true,
+  "runtimeChanged": false,
+  "files": [
+    {
+      "path": "baseline-optics.ts.txt",
+      "bytes": 24987,
+      "sha256": "4c1f891eda1db2a041afe33c89758ef79dc31a204faa54da26e9200e027a2956"
+    },
+    {
+      "path": "diagnostic.log",
+      "bytes": 1324,
+      "sha256": "1a95822f36d2dbc8fc3efa3a338ba1fb330181a92aa8381523613cd40fa69b11"
+    },
+    {
+      "path": "entry.mjs.txt",
+      "bytes": 58859,
+      "sha256": "7826da568869e718071736d663f8f4582ade1cd5335eded7ce9166f59c43fcfa"
+    },
+    {
+      "path": "entry.ts.txt",
+      "bytes": 319,
+      "sha256": "f4a418bc6239025aa0c29f23fcb6f4271a48d02d2ae1c109973039b8123609d8",
+      "originalSha256": "c15119f7500ad15e9069f6fa2eaf0eeb6cabf01003f7573438ea8d723090ed9a",
+      "originalBytes": 355,
+      "publishedSnapshotSha256": "f4a418bc6239025aa0c29f23fcb6f4271a48d02d2ae1c109973039b8123609d8",
+      "publicationRedactionManifest": "../../publication-redactions.json"
+    },
+    {
+      "path": "lint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "report.json",
+      "bytes": 400383,
+      "sha256": "bc8d8bbfeec034ced3e8a56d858422ce4aa754049440d464674baa37321d19b5"
+    },
+    {
+      "path": "source-0-render-exhaust-continuity.mjs.txt",
+      "bytes": 19107,
+      "sha256": "02dbeaf42cb4ff90d5c29f0815ed0a00609d7d3ed9f5f79a5345c5d88db4d43c"
+    },
+    {
+      "path": "source-1-engineGasSupport.ts.txt",
+      "bytes": 17293,
+      "sha256": "55d0b3e77ad4757ed91775739247065f7d3b80f5f7027461d2a423cb6801386c"
+    },
+    {
+      "path": "source-2-engineGasOptics.ts.txt",
+      "bytes": 43241,
+      "sha256": "a2ed5be59fcc40e2f6d984fa949d2cc5908c14696d1fac94c09591aac9f43634"
+    },
+    {
+      "path": "source-3-engineReactionEmission.ts.txt",
+      "bytes": 4203,
+      "sha256": "1d0e736b8a5b816a66d68a57c5674ce7f0af0a9a457fe4faaeaa6eccca8cec91"
+    },
+    {
+      "path": "source-4-engineNozzleRig.ts.txt",
+      "bytes": 7454,
+      "sha256": "0c070c616f6b9508de3cba5ccd24818b9ad679bb938e9d86acf1287f381f0996"
+    },
+    {
+      "path": "source-5-f135EngineData.ts.txt",
+      "bytes": 2571,
+      "sha256": "08545c3e51892acb63ea27c8283445aef1a1e4d1a432768af1b492ba0fd48ddb"
+    },
+    {
+      "path": "source-6-f135-exhaust-lut.manifest.json.txt",
+      "bytes": 877860,
+      "sha256": "95036c421d8bf371c633caef805ed26103577c55b0bbff8b066da30b73f6e001"
+    }
+  ]
+}

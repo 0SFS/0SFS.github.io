@@ -1,0 +1,273 @@
+import { Matrix, Quaternion, Vector3, type TransformNode } from "@babylonjs/core";
+import { F135_ENGINE_GEOMETRY } from "./generated/f135EngineData";
+import type { EngineGasFlowDomain } from "./engineGasOptics";
+
+/** 0sfs owns this aircraft-specific gas support; it never changes rigid metal. */
+export type GasVector = readonly [number, number, number];
+export interface EngineGasRingDefinition {
+  center: GasVector;
+  radialU: GasVector;
+  radialV: GasVector;
+  radiusMeters: number;
+}
+export interface EngineGasDuctDefinition {
+  id: string;
+  attachmentNode: string;
+  start: EngineGasRingDefinition;
+  end: EngineGasRingDefinition;
+  /** Fraction along this section and the excluded solid radius, metres. */
+  innerRadiusKnots?: readonly (readonly [number, number])[];
+}
+export interface EngineGasSupportDefinition {
+  rootNode: string;
+  ducts: readonly EngineGasDuctDefinition[];
+  nozzleNode: string;
+  nozzleInletRadiusMeters: number;
+  nozzleSegmentCount: number;
+  nozzleSealHalfWidthMeters: number;
+}
+export interface EngineGasAperture {
+  throatRadius: number;
+  throatZ: number;
+  exitRadius: number;
+  exitZ: number;
+}
+export interface EngineGasSection {
+  id: string;
+  startCenter: GasVector;
+  endCenter: GasVector;
+  startU: GasVector;
+  endU: GasVector;
+  radialV: GasVector;
+  startRadius: number;
+  endRadius: number;
+  /** Signed physical centreline distance: zero is the moving nozzle exit. */
+  startDistance: number;
+  endDistance: number;
+  startAreaFactor: number;
+  endAreaFactor: number;
+  innerRadiusKnots: readonly (readonly [number, number])[];
+  /** Conservative circular support is additionally clipped against rigid seals. */
+  nozzleSealClip: boolean;
+}
+export interface EngineGasSupportSnapshot {
+  revision: number;
+  /** Coordinates are in the declared engine-root frame, in physical metres. */
+  sections: readonly EngineGasSection[];
+  flowDomain: EngineGasFlowDomain;
+  bounds: { min: GasVector; max: GasVector };
+  nozzleSegmentCount: number;
+  nozzleSealHalfWidthMeters: number;
+}
+
+const add = (a: GasVector, b: GasVector): GasVector => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+const subtract = (a: GasVector, b: GasVector): GasVector => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const scale = (a: GasVector, n: number): GasVector => [a[0] * n, a[1] * n, a[2] * n];
+const dot = (a: GasVector, b: GasVector): number => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const cross = (a: GasVector, b: GasVector): GasVector => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const mix = (a: GasVector, b: GasVector, t: number): GasVector => add(a, scale(subtract(b, a), t));
+const norm = (a: GasVector): number => Math.hypot(...a);
+const normalize = (a: GasVector): GasVector => scale(a, 1 / norm(a));
+const vector = (v: Vector3): GasVector => [v.x, v.y, v.z];
+const ring = (z: number, radius: number, angle = 0, center?: GasVector): EngineGasRingDefinition => ({
+  center: center ?? [0, 0, z], radialU: [Math.cos(angle), 0, -Math.sin(angle)], radialV: [0, 1, 0], radiusMeters: radius,
+});
+const g = F135_ENGINE_GEOMETRY, beta = g.bearingTiltDegrees * Math.PI / 180;
+
+/**
+ * These stations describe the retained original mesh, not measured engine stations.
+ * The opaque centrebody ends at −0.08 m; its finite last ring is represented by
+ * a radius discontinuity at that station, not invented glowing gas inside metal.
+ */
+export const F135_ENGINE_GAS_SUPPORT: EngineGasSupportDefinition = {
+  rootNode: "F135_Engine", nozzleNode: "F135_Nozzle", nozzleInletRadiusMeters: g.aperture.inletRadius,
+  nozzleSegmentCount: g.aperture.segmentCount, nozzleSealHalfWidthMeters: g.aperture.sealHalfWidth,
+  ducts: [
+    { id: "augmentor", attachmentNode: "F135_Engine", start: ring(-0.75, g.ductInnerRadius), end: ring(0, g.ductInnerRadius),
+      innerRadiusKnots: [[0, 0.29], [0.32 / 0.75, 0.26], [0.60 / 0.75, 0.15], [0.67 / 0.75, 0.015], [0.67 / 0.75, 0], [1, 0]] },
+    { id: "forward-duct", attachmentNode: "F135_Bearing1", start: ring(0, g.ductInnerRadius),
+      end: ring(g.forwardBearingLength, g.ductInnerRadius, beta) },
+    { id: "middle-duct", attachmentNode: "F135_Bearing2", start: ring(0, g.ductInnerRadius),
+      end: ring(0, g.ductInnerRadius, -2 * beta, [-Math.sin(beta) * g.middleBearingLength, 0, Math.cos(beta) * g.middleBearingLength]) },
+    { id: "aft-duct", attachmentNode: "F135_Bearing3", start: ring(0, g.ductInnerRadius),
+      end: ring(0, g.ductInnerRadius, beta, [Math.sin(beta) * g.aftBearingLength, 0, Math.cos(beta) * g.aftBearingLength]) },
+  ],
+};
+
+export function gasSupportInnerRadius(section: EngineGasSection, fraction: number): number {
+  const knots = section.innerRadiusKnots;
+  if (!knots.length) return 0;
+  for (let i = knots.length - 1; i >= 0; i--) {
+    if (fraction >= knots[i][0]) {
+      if (i === knots.length - 1) return knots[i][1];
+      const next = knots[i + 1], t = (fraction - knots[i][0]) / (next[0] - knots[i][0]);
+      return knots[i][1] + t * (next[1] - knots[i][1]);
+    }
+  }
+  return knots[0][1];
+}
+
+/** Forward map used by independent continuity and volume diagnostics. */
+export function engineGasSectionPoint(section: EngineGasSection, fraction: number, radialFraction: number, angle: number): GasVector {
+  const radius = section.startRadius + fraction * (section.endRadius - section.startRadius);
+  return add(mix(section.startCenter, section.endCenter, fraction), scale(add(scale(mix(section.startU, section.endU, fraction), Math.cos(angle)), scale(section.radialV, Math.sin(angle))), radius * radialFraction));
+}
+
+/** Exact inverse of the authored ruled circular bearing lofts. No straight-cylinder substitution. */
+export function sampleEngineGasSection(section: EngineGasSection, point: GasVector, segmentCount = 16, sealHalfWidth = 0.05) {
+  const p = subtract(point, section.startCenter), d = subtract(section.endCenter, section.startCenter), du = subtract(section.endU, section.startU);
+  const cross2 = (a: GasVector, b: GasVector) => dot(cross(a, b), section.radialV);
+  const a = -cross2(d, du), b = cross2(p, du) - cross2(d, section.startU), c = cross2(p, section.startU);
+  let roots: number[];
+  if (Math.abs(a) < 1e-12 * Math.max(1, Math.abs(b))) roots = Math.abs(b) > 1e-14 ? [-c / b] : [];
+  else {
+    const discriminant = b * b - 4 * a * c;
+    if (discriminant < 0) return null;
+    const q = -0.5 * (b + (b >= 0 ? 1 : -1) * Math.sqrt(discriminant));
+    roots = [q / a, q === 0 ? -b / (2 * a) : c / q];
+  }
+  for (const value of roots) {
+    // Babylon stores pose matrices as Float32; shared exported interfaces can
+    // differ by sub-micrometre roundoff despite identical authored geometry.
+    const endTolerance = 1e-6 / Math.max(norm(d), 1e-6);
+    if (value < -endTolerance || value > 1 + endTolerance) continue;
+    const fraction = Math.max(0, Math.min(1, value)), u = mix(section.startU, section.endU, fraction), relative = subtract(p, scale(d, fraction));
+    const x = dot(relative, u) / dot(u, u), y = dot(relative, section.radialV), radius = section.startRadius + fraction * (section.endRadius - section.startRadius), r = Math.hypot(x, y);
+    if (r > radius + 1e-7 || r < gasSupportInnerRadius(section, fraction) - 1e-7) continue;
+    if (section.nozzleSealClip) {
+      const half = Math.PI / segmentCount, sealRadius = (radius - sealHalfWidth * Math.sin(half)) / Math.cos(half);
+      const step = 2 * half, angle = Math.atan2(y, x) - half, wrapped = angle - step * Math.round(angle / step);
+      if (r * Math.cos(wrapped) > sealRadius + 1e-7) continue;
+    }
+    return { fraction, distanceMeters: section.startDistance + fraction * (section.endDistance - section.startDistance), radialFraction: r / radius, radiusMeters: radius };
+  }
+  return null;
+}
+
+export function sampleEngineGasSupport(support: EngineGasSupportSnapshot, point: GasVector) {
+  for (let index = 0; index < support.sections.length; index++) {
+    const sample = sampleEngineGasSection(support.sections[index], point, support.nozzleSegmentCount, support.nozzleSealHalfWidthMeters);
+    if (sample) return { sectionIndex: index, ...sample };
+  }
+  return null;
+}
+
+/** Circular loft volume minus the centrebody; conservative seal clips only reduce it. */
+export function engineGasSectionVolume(section: EngineGasSection): number {
+  // Two-point Gauss integrates each linear area-factor × quadratic radius exactly.
+  const length = section.endDistance - section.startDistance;
+  const knots = section.innerRadiusKnots.length ? section.innerRadiusKnots : [[0, 0], [1, 0]] as const;
+  let volume = 0;
+  for (let i = 0; i < knots.length - 1; i++) {
+    const [begin, innerBegin] = knots[i], [end, innerEnd] = knots[i + 1];
+    for (const u of [0.5 - 0.5 / Math.sqrt(3), 0.5 + 0.5 / Math.sqrt(3)]) {
+      const t = begin + u * (end - begin), radius = section.startRadius + t * (section.endRadius - section.startRadius), innerRadius = innerBegin + u * (innerEnd - innerBegin);
+      volume += Math.PI * (radius * radius - innerRadius * innerRadius) * (section.startAreaFactor + t * (section.endAreaFactor - section.startAreaFactor)) * length * (end - begin) / 2;
+    }
+  }
+  return volume;
+}
+
+/** Read live rigid transforms without writing any aircraft node or geometry. */
+export function bindEngineGasSupport(root: TransformNode, definition: EngineGasSupportDefinition) {
+  if (root.name !== definition.rootNode) throw new Error(`Gas support needs ${definition.rootNode}`);
+  const nodes = [root, ...root.getDescendants(false)], resolve = (name: string) => {
+    const node = nodes.find(candidate => candidate.name === name) as TransformNode | undefined;
+    if (!node) throw new Error(`Gas support is missing ${name}`);
+    return node;
+  };
+  const frames = new Map<TransformNode, { node: TransformNode; matrix: Matrix; accepted: Matrix }>();
+  const frameFor = (node: TransformNode) => {
+    let frame = frames.get(node);
+    if (!frame) {
+      frame = { node, matrix: Matrix.Identity(), accepted: Matrix.Identity() };
+      frames.set(node, frame);
+    }
+    return frame;
+  };
+  const ducts = definition.ducts.map(duct => ({ duct, frame: frameFor(resolve(duct.attachmentNode)) }));
+  const nozzle = frameFor(resolve(definition.nozzleNode));
+  const boundFrames = [...frames.values()];
+  const localMatrix = Matrix.Identity(), eulerRotation = Quaternion.Identity();
+  let revision = 0, cached: EngineGasSupportSnapshot | undefined;
+  let lastThroatRadius = Number.NaN, lastThroatZ = Number.NaN, lastExitRadius = Number.NaN, lastExitZ = Number.NaN;
+  let lastLength = Number.NaN, lastSlope = Number.NaN;
+  return {
+    root,
+    update(aperture: EngineGasAperture, exteriorLengthMeters: number, spreadingSlope: number): EngineGasSupportSnapshot {
+      if (!Number.isFinite(exteriorLengthMeters) || !(exteriorLengthMeters > 0) || !Number.isFinite(spreadingSlope) || !(spreadingSlope >= 0)) throw new Error("Gas support needs finite positive exterior length and nonnegative spreading");
+      // Native steps can change this root or an ancestor several times within
+      // one render ID. Force freshness for the scale guard before taking the
+      // relative-pose cache path; an unchanged support must not hide bad scale.
+      const rootWorld = root.computeWorldMatrix(true).m, metresPerUnit = Math.hypot(rootWorld[0], rootWorld[1], rootWorld[2]);
+      if (!Number.isFinite(metresPerUnit) || Math.abs(metresPerUnit - 1) > 1e-5) throw new Error("Authored F135 gas support requires metre-scale engine geometry");
+      let changed = !cached || aperture.throatRadius !== lastThroatRadius || aperture.throatZ !== lastThroatZ
+        || aperture.exitRadius !== lastExitRadius || aperture.exitZ !== lastExitZ
+        || exteriorLengthMeters !== lastLength || spreadingSlope !== lastSlope;
+      for (const frame of boundFrames) {
+        // Compare engine-relative matrices before allocating section geometry.
+        // Aircraft motion/rebasing cannot alter this support. Reuse the scratch
+        // matrices for the hierarchy walk, including live parent changes.
+        Matrix.IdentityToRef(frame.matrix);
+        let current = frame.node;
+        while (current !== root) {
+          const rotation = current.rotationQuaternion ?? Quaternion.FromEulerVectorToRef(current.rotation, eulerRotation);
+          Matrix.ComposeToRef(current.scaling, rotation, current.position, localMatrix);
+          frame.matrix.multiplyToRef(localMatrix, frame.matrix);
+          if (!current.parent) throw new Error("Gas support node is outside its engine root");
+          current = current.parent as TransformNode;
+        }
+        if (!frame.matrix.equals(frame.accepted)) changed = true;
+      }
+      if (!changed) return cached!;
+      const transformRing = (matrix: Matrix, value: EngineGasRingDefinition) => {
+        return { center: vector(Vector3.TransformCoordinates(Vector3.FromArray(value.center), matrix)),
+          u: normalize(vector(Vector3.TransformNormal(Vector3.FromArray(value.radialU), matrix))),
+          v: normalize(vector(Vector3.TransformNormal(Vector3.FromArray(value.radialV), matrix))), radius: value.radiusMeters };
+      };
+      const definitions = [
+        ...ducts,
+        { frame: nozzle, duct: { id: "convergent", attachmentNode: definition.nozzleNode, start: ring(0, definition.nozzleInletRadiusMeters), end: ring(aperture.throatZ, aperture.throatRadius) } },
+        { frame: nozzle, duct: { id: "divergent", attachmentNode: definition.nozzleNode, start: ring(aperture.throatZ, aperture.throatRadius), end: ring(aperture.exitZ, aperture.exitRadius) } },
+        { frame: nozzle, duct: { id: "exterior", attachmentNode: definition.nozzleNode, start: ring(aperture.exitZ, aperture.exitRadius), end: ring(aperture.exitZ + exteriorLengthMeters, aperture.exitRadius + spreadingSlope * exteriorLengthMeters) } },
+      ];
+      const sections: EngineGasSection[] = []; let distance = 0;
+      for (const { frame, duct } of definitions) {
+        const start = transformRing(frame.matrix, duct.start), end = transformRing(frame.matrix, duct.end);
+        // Physical stations and Jacobians depend only on authored local shape,
+        // never float32 pose matrices. Vectoring changes uniforms, not radiometry.
+        const d = subtract(duct.end.center, duct.start.center), length = norm(d);
+        if (dot(start.v, end.v) < 1 - 1e-6 || length <= 0) throw new Error("Gas support requires shared ring V and positive section length");
+        sections.push({ id: duct.id, startCenter: start.center, endCenter: end.center, startU: start.u, endU: end.u, radialV: start.v,
+          startRadius: start.radius, endRadius: end.radius, startDistance: distance, endDistance: distance + length,
+          startAreaFactor: dot(d, cross(duct.start.radialU, duct.start.radialV)) / length, endAreaFactor: dot(d, cross(duct.end.radialU, duct.end.radialV)) / length,
+          innerRadiusKnots: "innerRadiusKnots" in duct ? duct.innerRadiusKnots ?? [] : [], nozzleSealClip: duct.id === "convergent" || duct.id === "divergent" });
+        distance += length;
+      }
+      const exitDistance = sections.at(-1)!.startDistance;
+      for (const section of sections) { section.startDistance -= exitDistance; section.endDistance -= exitDistance; }
+      const knots: EngineGasFlowDomain["sections"][number][] = [];
+      for (const section of sections) {
+        const inner = section.innerRadiusKnots.length ? section.innerRadiusKnots : [[0, 0], [1, 0]] as const;
+        for (const [t, innerRadiusMeters] of inner) {
+          const knot = { distanceMeters: section.startDistance + t * (section.endDistance - section.startDistance), radiusMeters: section.startRadius + t * (section.endRadius - section.startRadius), innerRadiusMeters,
+            areaFactor: section.startAreaFactor + t * (section.endAreaFactor - section.startAreaFactor) };
+          const prior = knots.at(-1);
+          if (!prior || prior.distanceMeters !== knot.distanceMeters || prior.radiusMeters !== knot.radiusMeters
+            || prior.innerRadiusMeters !== knot.innerRadiusMeters || prior.areaFactor !== knot.areaFactor) knots.push(knot);
+        }
+      }
+      const min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, -Infinity];
+      for (const section of sections) for (const [center, u, radius] of [[section.startCenter, section.startU, section.startRadius], [section.endCenter, section.endU, section.endRadius]] as const) {
+        for (let i = 0; i < 3; i++) { const extent = radius * Math.hypot(u[i], section.radialV[i]); min[i] = Math.min(min[i], center[i] - extent); max[i] = Math.max(max[i], center[i] + extent); }
+      }
+      for (const frame of boundFrames) frame.accepted.copyFrom(frame.matrix);
+      lastThroatRadius = aperture.throatRadius; lastThroatZ = aperture.throatZ;
+      lastExitRadius = aperture.exitRadius; lastExitZ = aperture.exitZ;
+      lastLength = exteriorLengthMeters; lastSlope = spreadingSlope;
+      cached = { revision: ++revision, sections, flowDomain: { axialDistanceRangeMeters: [sections[0].startDistance, sections.at(-1)!.endDistance], sections: knots },
+        bounds: { min: min as unknown as GasVector, max: max as unknown as GasVector }, nozzleSegmentCount: definition.nozzleSegmentCount, nozzleSealHalfWidthMeters: definition.nozzleSealHalfWidthMeters };
+      return cached;
+    },
+  };
+}

@@ -1,0 +1,28 @@
+[
+  {
+    "case": "powered-lift",
+    "finiteReceiverIncidentLumensTrapezoid": {
+      "gasLux": 0.041821765863448324,
+      "coreLux": 0.005638190089117912,
+      "linerLux": 2.6986561095782513e-05,
+      "combinedLux": 0.04748694251366202
+    },
+    "exteriorGasUnoccludedWholeSourceLumensUpperBound": 0.12841060254299055,
+    "oneSidedWholeHotSurfaceLumensUpperBound": 3.7302468994069646,
+    "incidentWithinBroadSourceBounds": true,
+    "method": "Trapezoidal integral of retained 25x25 lux CSV on 6x6 m plane. Broad source upper bounds are 4pi Igas and pi sum(Lmaterial*area); no independent mesh-grid convergence claim."
+  },
+  {
+    "case": "hot-shutdown-posed-down",
+    "finiteReceiverIncidentLumensTrapezoid": {
+      "gasLux": 0.0,
+      "coreLux": 0.00807726934765038,
+      "linerLux": 4.878332102097824e-05,
+      "combinedLux": 0.00812605266867136
+    },
+    "exteriorGasUnoccludedWholeSourceLumensUpperBound": 0.0,
+    "oneSidedWholeHotSurfaceLumensUpperBound": 2.825029621324491,
+    "incidentWithinBroadSourceBounds": true,
+    "method": "Trapezoidal integral of retained 25x25 lux CSV on 6x6 m plane. Broad source upper bounds are 4pi Igas and pi sum(Lmaterial*area); no independent mesh-grid convergence claim."
+  }
+]

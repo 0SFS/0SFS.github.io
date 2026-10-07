@@ -1,0 +1,51 @@
+import assert from 'node:assert/strict';
+import { readFile, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { pathToFileURL } from 'node:url';
+import path from 'node:path';
+const root = process.cwd(), out = path.join(root, 'build/f135-deck-pressure-input-20261006');
+const evidence = path.join(root, 'validation/evidence/aircraft/f35b/dry-vtol-mechanism-2026-10-06/receiver/full-domain');
+const report = JSON.parse(await readFile(path.join(evidence, 'report.json'), 'utf8'));
+const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+const previousScript = await readFile(path.join(evidence, report.inputs[0].snapshot), 'utf8');
+const currentScript = await readFile(path.join(root, report.inputs[0].path), 'utf8');
+assert.equal(previousScript.split('ambientPressurePa:').length - 1, 1);
+assert.equal(currentScript, previousScript.replace('ambientPressurePa:', 'ambientPressurePascal:'));
+for (const item of report.inputs.filter(input => input.path.endsWith('engineGasOptics.ts') || input.path.endsWith('engineReactionEmission.ts') || input.path.endsWith('manifest.json'))) {
+  assert.equal(hash(await readFile(path.join(root, item.path))), item.sha256, `Current evaluator/profile changed: ${item.path}`);
+}
+const { evaluateEngineGasOptics } = await import(pathToFileURL(path.join(evidence, 'entry.mjs')));
+const profileSource = report.inputs.find(input => input.path.endsWith('f135-exhaust-lut.manifest.json'));
+const profile = JSON.parse(await readFile(path.join(evidence, profileSource.snapshot), 'utf8')).profile;
+const cases = [];
+for (const entry of report.cases) {
+  const before = entry.input;
+  assert.equal(before.afterburnerBurnedFuelFlowKgPerSecond, 0);
+  assert.equal(before.augmentation, false);
+  const after = { ...before, ambientPressurePascal: before.ambientPressurePa };
+  delete after.ambientPressurePa;
+  const previous = evaluateEngineGasOptics(profile, before), corrected = evaluateEngineGasOptics(profile, after);
+  const metadataChanges = [];
+  if (previous.reactionInputWasClamped !== corrected.reactionInputWasClamped) metadataChanges.push({ field: 'reactionInputWasClamped', before: previous.reactionInputWasClamped ?? 'absent', after: corrected.reactionInputWasClamped });
+  const physicalBefore = { ...previous }, physicalAfter = { ...corrected };
+  delete physicalBefore.reactionInputWasClamped; delete physicalAfter.reactionInputWasClamped;
+  assert.deepStrictEqual(physicalAfter, physicalBefore, `${entry.name}: physical result changed`);
+  const typedArrays = Object.entries(previous.field ?? {}).filter(([, value]) => ArrayBuffer.isView(value)).map(([name, values]) => {
+    const next = corrected.field[name];
+    assert(Buffer.from(values.buffer, values.byteOffset, values.byteLength).equals(Buffer.from(next.buffer, next.byteOffset, next.byteLength)));
+    return { name, type: values.constructor.name, values: values.length, sha256: hash(Buffer.from(values.buffer, values.byteOffset, values.byteLength)) };
+  });
+  cases.push({ name: entry.name, pressurePascal: after.ambientPressurePascal, burnedAbKgSec: before.afterburnerBurnedFuelFlowKgPerSecond,
+    valid: corrected.valid, physicalResultsExactlyEqual: true, maximumPhysicalNumericDifference: 0, fieldArrays: typedArrays, metadataChanges });
+}
+const receipt = { schema: '0sfs-receiver-pressure-input-correction/1', status: 'passed',
+  correction: 'The runnable receiver producer now passes ambientPressurePascal. The original frozen run used ambientPressurePa, which the evaluator ignored.',
+  priorRun: 'receiver/full-domain/report.json', previousScriptSha256: hash(previousScript), correctedScriptSha256: hash(currentScript),
+  onlyScriptChangeIsPropertyName: true, currentEvaluatorAndProfileExactlyMatchFrozenRun: true, cases,
+  conclusion: 'All physical output scalars, nested fields and field-array bytes are exactly equal for all four retained zero-burned-AB cases. Existing receiver integration consumes only these unchanged physical outputs and unchanged geometry/metal temperatures, so prior receiver numbers and PNGs remain applicable without rerunning expensive rays.',
+  limits: ['Positive burned-AB cases are not covered; their parcel source can depend on pressure, and the corrected key must be used.',
+    'Reaction-input metadata can now report the lookup clamp status even though zero burned fuel keeps the parcel emission inactive. This boolean diagnostic change is explicitly retained.',
+    'No receiver ray integration, native run, suite, WASM build, server or GPU run was performed. Original receiver aggregate convergence failures remain unchanged.'] };
+await writeFile(path.join(out, 'receipt.json'), JSON.stringify(receipt, null, 2) + '\n');
+await writeFile(path.join(out, 'corrected-check-engine-deck-receiver.mjs.txt'), currentScript);
+console.log(JSON.stringify(receipt, null, 2));

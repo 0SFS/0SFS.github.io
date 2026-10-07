@@ -357,6 +357,12 @@ that a photographed appearance exists. Without operating telemetry and radiometr
 calibration it cannot uniquely identify fuel staging, metal temperature or the
 exhaust spectrum. The current model is not a calibrated F135 engine deck.
 
+The subsequent [dry-glow mechanism investigation](../validation/f135-dry-vtol-mechanism.md)
+records the retained landing sequence's axial brightness bands, changing strobe,
+near-deck bright region and editorial cut. It ranks source, scattering, surface
+and camera hypotheses without treating the non-gray spectral correction as
+completion of impingement, deck or visual acceptance work.
+
 The [physical correction](../validation/f135-engine-physical-correction.md) records
 rigid geometry and native heat accounting; the later [spatial-plume report](../validation/f135-plume-spatial.md)
 records the rejected first spatial implementation. Earlier rows retain the observations and then-current
@@ -370,7 +376,7 @@ onset from one view and substantially dimmer dry exhaust. These remain physical
 and visual acceptance failures, despite passing numerical/software checks.
 
 The [source-contract correction](../validation/f135-exhaust-source-correction.md)
-now removes both unsupported operations: the native gas-bath proxy is used
+removed both unsupported operations: the native gas-bath proxy is used
 without a nozzle-Mach remapping, and no burned-fuel percentage is assigned to
 exterior chemical light. Missing reaction/species state is explicitly unavailable,
 not a prediction that real CH*/C2* emission is zero. Thermal continuum is evaluated
@@ -378,6 +384,12 @@ on one support through the actual authored curved duct and across the exit,
 with one shared source bound and optional opaque-depth clipping. These changes
 correct identified model assumptions; they do not establish visual acceptance.
 The dry free jet and deck patch remain separate open appearance constraints.
+The subsequent [AB response checkpoint](../validation/f135-exhaust-response.md)
+adds a conditional internal CH(A) parcel and temperature mixture; it does not
+restore the exterior fuel-to-light allocation. Its chemistry and spatial inputs
+remain uncalibrated. The current particle source uses a non-gray absorption
+spectrum with matching integrated power. These changes do not qualify the dry
+carrier glow or reported AB extent.
 
 | Source-contract follow-up | Evidence | Remaining discriminator |
 | --- | --- | --- |
@@ -393,6 +405,12 @@ The dry free jet and deck patch remain separate open appearance constraints.
 | Stored energy and thermal lag | 133,577 installed native steps close both local solid balances to a maximum per-step residual of 2.733e-9 J; independent cooling convergence and 108 sensitivity cases retained. [Native evidence](../../validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/native/README.md). | Effective capacities and prescribed baths are unmeasured. Local closure does not solve whole-engine conservation or calibrate temperatures. |
 | Gas and surface light attribution | Absolute Planck/CIE solids; dimensional grey gas transfer with explicitly bounded fuel-powered sources. Independent interpolation error ≤0.328%; contributions isolated; current optical sensitivities retained. [Optics evidence](../../validation/evidence/aircraft/f35b/engine-physical-correction-2026-10-06/optics/README.md). | Particle loading, CH*/C2* fractions, camera response and local receivers remain uncertain. Pink/violet test-cell and luminous powered-lift references remain valid constraints, with AB inhibited in hover. |
 
+
+The following spatial-pass rows retain historical source/sampling results. The
+[occlusion erratum](../../validation/evidence/aircraft/f35b/dry-vtol-mechanism-2026-10-06/occlusion-erratum/README.md)
+withdraws their hardware-visibility claims: the old CPU tracer loaded zero
+hardware triangles. Attachment and unblocked source calculations remain
+separate; current posed-ray errors and acceptance are in the mechanism report.
 
 | Spatial-plume follow-up | Finding / implemented correction | Remaining difference |
 | --- | --- | --- |

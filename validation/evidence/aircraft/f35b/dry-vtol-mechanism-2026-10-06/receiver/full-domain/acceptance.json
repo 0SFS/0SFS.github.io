@@ -1,0 +1,446 @@
+{
+  "status": "failed",
+  "errors": [
+    "3 selected probes exceed 3% angular / 1% path / 5% hardware refinement criteria"
+  ],
+  "changedAfterSnapshot": [],
+  "analyticDiskMaximumRefinedRelativeError": 0.000027446490602489604,
+  "cases": [
+    {
+      "name": "powered-lift",
+      "centerReference": {
+        "gasRgbLux": [
+          0.1646607708074428,
+          0.003197725765580539,
+          0
+        ],
+        "internalGasRgbLux": [
+          0.030477177988853545,
+          0.0006073759919431028,
+          0
+        ],
+        "externalGasRgbLux": [
+          0.1341835928185893,
+          0.002590349773637455,
+          0
+        ],
+        "internalGasLux": 0.006916036103570943,
+        "externalGasLux": 0.030389708156534887,
+        "coreRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "linerRgbLux": [
+          0.00003006228249510434,
+          0,
+          0
+        ],
+        "gasLux": 0.03730574426010581,
+        "hardwareLux": 0.000006393432798853076,
+        "combinedLux": 0.03731213769290466,
+        "reflectedLuminanceCdM2": 0.002375364460460482
+      },
+      "map": {
+        "csv": "powered-lift.csv",
+        "samples": 289,
+        "peakGasLux": 0.037292915878597045,
+        "peakHardwareLux": 0.005851376947738841,
+        "peakCombinedLux": 0.03729938958081024,
+        "peakReflectedLuminanceCdM2": 0.0023745528904385153
+      }
+    },
+    {
+      "name": "hot-shutdown-posed-down",
+      "centerReference": {
+        "gasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "internalGasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "externalGasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "internalGasLux": 0,
+        "externalGasLux": 0,
+        "coreRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "linerRgbLux": [
+          0.00004588802861287627,
+          0,
+          0
+        ],
+        "gasLux": 0,
+        "hardwareLux": 0.000009759140120383372,
+        "combinedLux": 0.000009759140120383372,
+        "reflectedLuminanceCdM2": 6.212861561941793e-7
+      },
+      "map": {
+        "csv": "hot-shutdown-posed-down.csv",
+        "samples": 289,
+        "peakGasLux": 0,
+        "peakHardwareLux": 0.005134020827357829,
+        "peakCombinedLux": 0.005134020827357829,
+        "peakReflectedLuminanceCdM2": 0.00032684191704429637
+      }
+    },
+    {
+      "name": "hot-shutdown-native-pose",
+      "centerReference": {
+        "gasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "internalGasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "externalGasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "internalGasLux": 0,
+        "externalGasLux": 0,
+        "coreRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "linerRgbLux": [
+          4.266626649243545e-8,
+          0,
+          0
+        ],
+        "gasLux": 0,
+        "hardwareLux": 9.073958627119074e-9,
+        "combinedLux": 9.073958627119074e-9,
+        "reflectedLuminanceCdM2": 5.776661475669397e-10
+      },
+      "map": null
+    },
+    {
+      "name": "cold-posed-down",
+      "centerReference": {
+        "gasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "internalGasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "externalGasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "internalGasLux": 0,
+        "externalGasLux": 0,
+        "coreRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "linerRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "gasLux": 0,
+        "hardwareLux": 0,
+        "combinedLux": 0,
+        "reflectedLuminanceCdM2": 0
+      },
+      "map": null
+    }
+  ],
+  "convergence": [
+    {
+      "case": "powered-lift",
+      "offsetMeters": [
+        0,
+        0
+      ],
+      "gasAngularRelative": 0.00003992998274805078,
+      "internalGasAngularRelative": 0.00021545352004886392,
+      "externalGasAngularRelative": 1.5848501399863474e-8,
+      "internalGasPathRelative": 0.000012116181171133138,
+      "externalGasPathRelative": 2.6699051943710925e-7,
+      "gasPathRelative": 0.0000020287005058167585,
+      "hardwareAreaRelative": 0.0034600109265108445,
+      "hardwarePathRelative": 8.5119483156108e-8,
+      "imageGasRelative": 0.0003438714804701004,
+      "imageHardwareRelative": 0.012554978970343052
+    },
+    {
+      "case": "powered-lift",
+      "offsetMeters": [
+        0.5,
+        0
+      ],
+      "gasAngularRelative": 0.0004558303513883633,
+      "internalGasAngularRelative": 0.0011847646580194853,
+      "externalGasAngularRelative": 0.0000012018790349179324,
+      "internalGasPathRelative": 0.000012625044696706177,
+      "externalGasPathRelative": 9.580307278872515e-7,
+      "gasPathRelative": 0.0000054540793193635585,
+      "hardwareAreaRelative": 0.00341560968834867,
+      "hardwarePathRelative": 1.1324138661359012e-7,
+      "imageGasRelative": 0.0031512814204397335,
+      "imageHardwareRelative": 0.03209149961677451
+    },
+    {
+      "case": "powered-lift",
+      "offsetMeters": [
+        1.5,
+        0
+      ],
+      "gasAngularRelative": 0.0034558599537792604,
+      "internalGasAngularRelative": 0.009548627482642916,
+      "externalGasAngularRelative": 0.000010093475030600758,
+      "internalGasPathRelative": 7.990267839379415e-7,
+      "externalGasPathRelative": 0.000001811361616687941,
+      "gasPathRelative": 8.683683009173585e-7,
+      "hardwareAreaRelative": 0.0011934789253201421,
+      "hardwarePathRelative": 8.094386175659375e-9,
+      "imageGasRelative": 0.02893061661031132,
+      "imageHardwareRelative": 0.003791285465820679
+    },
+    {
+      "case": "powered-lift",
+      "offsetMeters": [
+        0,
+        1.5
+      ],
+      "gasAngularRelative": 0.009733895756183792,
+      "internalGasAngularRelative": 0.024478107658323634,
+      "externalGasAngularRelative": 0.0000036425497591190213,
+      "internalGasPathRelative": 0.000005409082860141407,
+      "externalGasPathRelative": 0.000003037267495898571,
+      "gasPathRelative": 3.2071026132714235e-7,
+      "hardwareAreaRelative": 0.006274915754136268,
+      "hardwarePathRelative": 2.652270827186954e-7,
+      "imageGasRelative": 0.023374911527511977,
+      "imageHardwareRelative": 0.006690964904224314
+    },
+    {
+      "case": "hot-shutdown-posed-down",
+      "offsetMeters": [
+        0,
+        0
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0.003654625725346618,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 0.07798308293017861
+    },
+    {
+      "case": "hot-shutdown-posed-down",
+      "offsetMeters": [
+        0.5,
+        0
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0.004357685075250245,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 0.07912400253143814
+    },
+    {
+      "case": "hot-shutdown-posed-down",
+      "offsetMeters": [
+        1.5,
+        0
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0.0042056497970280205,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 0.08552025464970803
+    },
+    {
+      "case": "hot-shutdown-posed-down",
+      "offsetMeters": [
+        0,
+        1.5
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0.0016524907324693657,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 0.007331382045825165
+    },
+    {
+      "case": "hot-shutdown-native-pose",
+      "offsetMeters": [
+        0,
+        0
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0.7439125126931778,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 1
+    },
+    {
+      "case": "hot-shutdown-native-pose",
+      "offsetMeters": [
+        0.5,
+        0
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0.6135359961810157,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 1
+    },
+    {
+      "case": "hot-shutdown-native-pose",
+      "offsetMeters": [
+        1.5,
+        0
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0.46753143886508386,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 1
+    },
+    {
+      "case": "hot-shutdown-native-pose",
+      "offsetMeters": [
+        0,
+        1.5
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0.013807760017633198,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 0.14159811171213157
+    },
+    {
+      "case": "cold-posed-down",
+      "offsetMeters": [
+        0,
+        0
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 0
+    },
+    {
+      "case": "cold-posed-down",
+      "offsetMeters": [
+        0.5,
+        0
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 0
+    },
+    {
+      "case": "cold-posed-down",
+      "offsetMeters": [
+        1.5,
+        0
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 0
+    },
+    {
+      "case": "cold-posed-down",
+      "offsetMeters": [
+        0,
+        1.5
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 0
+    }
+  ]
+}

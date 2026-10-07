@@ -1,5 +1,13 @@
 # Posed CPU optical/depth comparisons
 
+**Correction, 2026-10-06:** the retained script silently built zero hardware
+triangles from non-indexed GLB meshes. The claimed opaque clipping, hardware
+silhouettes and visible interior/exterior attribution below are **unqualified**.
+Images and ray-error measurements describe the unblocked gas domain, not a
+hardware-clipped view. The 128-step result does not qualify the corrected opaque
+case. All original records remain unchanged. See the
+[occlusion erratum](../../dry-vtol-mechanism-2026-10-06/occlusion-erratum/README.md).
+
 These 64 PNGs compare eight retained native states, rear/oblique views, day/night backgrounds, and the previous spatial-v1 exterior-only source versus the corrected unified source. They integrate the same actual posed full-engine GLB in both versions and clip rays at the nearest opaque triangle. They are gas-only CPU projections, not historical renderer reproductions or Babylon/GPU captures. Geometry does not change between versions.
 
 `image-render-report.json` contains camera vectors, native state, flow domains, source powers, image statistics, source hashes and the initial 32-step comparison. Its `display.samples = 128` controls every image. `display.runtimeSamples = 32` records the renderer default under investigation at that time, not the PNG integration count. `ray-comparison/report.json` and `budget-summary.json` retain the subsequent 32/64/96/128 comparison. `final-ray-comparison/report.json` repeats that diagnostic with the adopted 128-step default and a failing exit status if selected-ray error exceeds 1%. The source formulas, field resolution and images were unchanged by that additional diagnostic. The final runnable script snapshot includes its `--rays-only` and `--ray-budgets=` options.

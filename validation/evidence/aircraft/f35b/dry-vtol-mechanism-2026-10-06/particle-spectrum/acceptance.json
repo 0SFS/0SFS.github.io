@@ -1,0 +1,139 @@
+{
+  "scope": "Bake-side non-gray particle emission and bolometric source correction; runtime integration/finalchecks separately owned",
+  "identities": {
+    "unweightedBlackbodyUnchanged": true,
+    "surfaceEmissionUnchanged": true
+  },
+  "commands": [
+    {
+      "command": "node scripts/build-exhaust-optics.mjs --install",
+      "log": "bake.log",
+      "passed": true
+    },
+    {
+      "command": "npx vitest run scripts/build-exhaust-optics.test.mjs --maxWorkers=50%",
+      "log": "focused.log",
+      "passed": true,
+      "files": 1,
+      "tests": 6
+    },
+    {
+      "command": "npx eslint scripts/exhaustOptics/bake.mjs scripts/exhaustOptics/reference.mjs scripts/build-exhaust-optics.test.mjs",
+      "log": "lint.log",
+      "passed": true
+    },
+    {
+      "command": "node scripts/validation/f35b/analyze-particle-spectrum.mjs",
+      "log": "diagnostic.log",
+      "passed": true
+    },
+    {
+      "command": "npx eslint scripts/validation/f35b/analyze-particle-spectrum.mjs",
+      "log": "diagnostic-lint.log",
+      "passed": true
+    }
+  ],
+  "priorFailure": "Initial new table used legacy1nm quadrature; independent150Kcheckfound3.39%relative error. Only newparticle tables now use .25nmtrapezoids. Failedlogretained; oldblackbodyandsolidtablesunchanged.",
+  "files": [
+    {
+      "name": "bake.log",
+      "bytes": 1113,
+      "sha256": "90702d4e0185f178522164eb9ba500b15944b7f7f97d5947c901dfc2b08cbc43",
+      "originalSha256": "d65ec0344030ae06e4bb1678b74c91b7852afa2ccda2cb8fdda72bacd995a96a",
+      "originalBytes": 1122,
+      "publishedSnapshotSha256": "90702d4e0185f178522164eb9ba500b15944b7f7f97d5947c901dfc2b08cbc43",
+      "publicationRedactionManifest": "../publication-redactions.json"
+    },
+    {
+      "name": "diagnostic-lint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "diagnostic.log",
+      "bytes": 924,
+      "sha256": "3d3147d27c8faa31b54cf7906a885f2a921e9e39b5b6596e6d0303f00b593db2",
+      "originalSha256": "5fcac96097652e873d1d3edfb4f2f5eea21f8329c091bdd4c5a4c754388b99da",
+      "originalBytes": 933,
+      "publishedSnapshotSha256": "3d3147d27c8faa31b54cf7906a885f2a921e9e39b5b6596e6d0303f00b593db2",
+      "publicationRedactionManifest": "../publication-redactions.json"
+    },
+    {
+      "name": "focused.log",
+      "bytes": 192,
+      "sha256": "a719ed62271303f18b7e6d036823fc64ce6526c1fd2e005e503607474c77fc9e",
+      "originalSha256": "77eefd047455111d660a65d144158f90a518b022d94dbf285e0cb61fd11aac78",
+      "originalBytes": 201,
+      "publishedSnapshotSha256": "a719ed62271303f18b7e6d036823fc64ce6526c1fd2e005e503607474c77fc9e",
+      "publicationRedactionManifest": "../publication-redactions.json"
+    },
+    {
+      "name": "initial-bake.log",
+      "bytes": 1113,
+      "sha256": "cb06e926cad990a548e4c21bca8a5d6b5e4d0ffc09b665c401795656999107af",
+      "originalSha256": "492011848a0b65bf3eaae64ca15b69f75d3fb214130eaa9eb43e5d02dd9579a5",
+      "originalBytes": 1122,
+      "publishedSnapshotSha256": "cb06e926cad990a548e4c21bca8a5d6b5e4d0ffc09b665c401795656999107af",
+      "publicationRedactionManifest": "../publication-redactions.json"
+    },
+    {
+      "name": "initial-focused-failure.log",
+      "bytes": 1363,
+      "sha256": "eb4e4ed663680bda2155b66b6aeb7077d8963256059c3d4b90ddf0a901102d65",
+      "originalSha256": "71c18257a606b4048d1714de865b55680460b56c6850be10536f649e980a640e",
+      "originalBytes": 1372,
+      "publishedSnapshotSha256": "eb4e4ed663680bda2155b66b6aeb7077d8963256059c3d4b90ddf0a901102d65",
+      "publicationRedactionManifest": "../publication-redactions.json"
+    },
+    {
+      "name": "lint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "report.json",
+      "bytes": 32276,
+      "sha256": "bb0302bd61fe9b5fa19dbd9c3d58088069308aad0a780e2099bfad7b7c2dc13b"
+    },
+    {
+      "name": "source-0-f135-exhaust-lut.manifest.json.txt",
+      "bytes": 877860,
+      "sha256": "95036c421d8bf371c633caef805ed26103577c55b0bbff8b066da30b73f6e001"
+    },
+    {
+      "name": "source-1-CIE_xyz_1931_2deg.csv.txt",
+      "bytes": 24021,
+      "sha256": "fa663e3535a7e0763a745993a1f0a192eb0275ac46ad2d1befd7626841e713c1"
+    },
+    {
+      "name": "source-2-bake.mjs.txt",
+      "bytes": 28159,
+      "sha256": "2164fa7cf9dce2d2cf0d3bc5bb39781a211d27fadca79054d8de80e71cafe907"
+    },
+    {
+      "name": "source-3-reference.mjs.txt",
+      "bytes": 3218,
+      "sha256": "916974d05b9e2e3e8c78aa6b601777c6faeb42fde727b06bf3b21d1be32f0e9e"
+    },
+    {
+      "name": "source-4-f135-visible-approximation.json.txt",
+      "bytes": 19449,
+      "sha256": "2c10421721b770a4e85cef4a49fccf77b552ccb4cb0b1dab7b64a27575e5d00b"
+    },
+    {
+      "name": "source-5-analyze-particle-spectrum.mjs.txt",
+      "bytes": 6676,
+      "sha256": "ad61d4f9f2b7593d7df5e48f3d1f38427ee9f3da5a788d32029ab5fdabf13405"
+    },
+    {
+      "name": "source-focused-test.mjs.txt",
+      "bytes": 11061,
+      "sha256": "8226b463434307046f62240573c0521dfe72b3d1c12f385d394360e0cb0b4049"
+    },
+    {
+      "name": "README.md",
+      "bytes": 4352,
+      "sha256": "7d8f914fe70a63911b1488dda3440aef077969304624fffa7759d79f85b4a26f"
+    }
+  ]
+}

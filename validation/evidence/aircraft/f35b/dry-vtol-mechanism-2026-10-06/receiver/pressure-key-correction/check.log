@@ -1,0 +1,127 @@
+(node:31691) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+{
+  "schema": "0sfs-receiver-pressure-input-correction/1",
+  "status": "passed",
+  "correction": "The runnable receiver producer now passes ambientPressurePascal. The original frozen run used ambientPressurePa, which the evaluator ignored.",
+  "priorRun": "receiver/full-domain/report.json",
+  "previousScriptSha256": "65ba1a150d57f19395ca59709d6271de07472ed8f48d869bc1d2746f3d51c082",
+  "correctedScriptSha256": "e4ef65412e4a7016e9855898002bc7cd7c3b452674ecead4085db05bccc3d2fa",
+  "onlyScriptChangeIsPropertyName": true,
+  "currentEvaluatorAndProfileExactlyMatchFrozenRun": true,
+  "cases": [
+    {
+      "name": "powered-lift",
+      "pressurePascal": 98311.39164626188,
+      "burnedAbKgSec": 0,
+      "valid": true,
+      "physicalResultsExactlyEqual": true,
+      "maximumPhysicalNumericDifference": 0,
+      "fieldArrays": [
+        {
+          "name": "rgba",
+          "type": "Float32Array",
+          "values": 8192,
+          "sha256": "0d4ac7459947e32a3fb71f35d868d2a3bfe631f3faca2a3cc904f6aa7f9994c5"
+        },
+        {
+          "name": "particleTemperatureKelvin",
+          "type": "Float64Array",
+          "values": 2048,
+          "sha256": "ed08c883bd4842be55c0be09e2a577f75b9244d3b405c8f6c66b810db184af9c"
+        },
+        {
+          "name": "particleSourceRgbCdPerM3",
+          "type": "Float64Array",
+          "values": 6144,
+          "sha256": "968a8cc20b4df6d103ca657f2ddfc0201a549e8ac551bd9699eaf47680a6b43f"
+        },
+        {
+          "name": "chSourceRgbCdPerM3",
+          "type": "Float64Array",
+          "values": 6144,
+          "sha256": "f10c951bdc893c7ca6f3b80b5cc224353398a2dfdb6f7df1eb255a40151f9e72"
+        },
+        {
+          "name": "c2SourceRgbCdPerM3",
+          "type": "Float64Array",
+          "values": 6144,
+          "sha256": "2aae7dc846aaf25f1cadf55f1666862046c6db9d65d84bdc07fa039dac405606"
+        },
+        {
+          "name": "particlePowerDensityWPerM3",
+          "type": "Float64Array",
+          "values": 2048,
+          "sha256": "ecda6a9b5f822d349c253d8d744fc2e60f7519bdadbf35aaae6b43555dd7f9f2"
+        },
+        {
+          "name": "chPowerDensityWPerM3",
+          "type": "Float64Array",
+          "values": 2048,
+          "sha256": "4fe7b59af6de3b665b67788cc2f99892ab827efae3a467342b3bb4e3bc8e5bfe"
+        },
+        {
+          "name": "c2PowerDensityWPerM3",
+          "type": "Float64Array",
+          "values": 2048,
+          "sha256": "4fe7b59af6de3b665b67788cc2f99892ab827efae3a467342b3bb4e3bc8e5bfe"
+        },
+        {
+          "name": "volumeWeightsM3",
+          "type": "Float64Array",
+          "values": 2048,
+          "sha256": "cbd23f4deb30fa8a0e4d7b6f1c7f91efae187651ac166a0b255ce7c07dcf2559"
+        },
+        {
+          "name": "exteriorVolumeWeightsM3",
+          "type": "Float64Array",
+          "values": 2048,
+          "sha256": "a6337871c1ea408b8f05c1bd457277cd44ef2a87667296499b890cbdd00dce0a"
+        }
+      ],
+      "metadataChanges": [
+        {
+          "field": "reactionInputWasClamped",
+          "before": "absent",
+          "after": false
+        }
+      ]
+    },
+    {
+      "name": "hot-shutdown-posed-down",
+      "pressurePascal": 98311.3916466744,
+      "burnedAbKgSec": 0,
+      "valid": false,
+      "physicalResultsExactlyEqual": true,
+      "maximumPhysicalNumericDifference": 0,
+      "fieldArrays": [],
+      "metadataChanges": []
+    },
+    {
+      "name": "hot-shutdown-native-pose",
+      "pressurePascal": 98311.3916466744,
+      "burnedAbKgSec": 0,
+      "valid": false,
+      "physicalResultsExactlyEqual": true,
+      "maximumPhysicalNumericDifference": 0,
+      "fieldArrays": [],
+      "metadataChanges": []
+    },
+    {
+      "name": "cold-posed-down",
+      "pressurePascal": 98311.39164763276,
+      "burnedAbKgSec": 0,
+      "valid": false,
+      "physicalResultsExactlyEqual": true,
+      "maximumPhysicalNumericDifference": 0,
+      "fieldArrays": [],
+      "metadataChanges": []
+    }
+  ],
+  "conclusion": "All physical output scalars, nested fields and field-array bytes are exactly equal for all four retained zero-burned-AB cases. Existing receiver integration consumes only these unchanged physical outputs and unchanged geometry/metal temperatures, so prior receiver numbers and PNGs remain applicable without rerunning expensive rays.",
+  "limits": [
+    "Positive burned-AB cases are not covered; their parcel source can depend on pressure, and the corrected key must be used.",
+    "Reaction-input metadata can now report the lookup clamp status even though zero burned fuel keeps the parcel emission inactive. This boolean diagnostic change is explicitly retained.",
+    "No receiver ray integration, native run, suite, WASM build, server or GPU run was performed. Original receiver aggregate convergence failures remain unchanged."
+  ]
+}

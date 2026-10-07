@@ -5,6 +5,13 @@ This is the retained first spatial implementation record. The subsequent
 unqualified Mach switch and exterior chemical allocation. Neither pass is
 visually accepted; the following numbers describe this historical version.
 
+**Evidence correction, 2026-10-06:** the CPU geometry diagnostic skipped
+non-indexed engine primitives and built zero hardware triangles. Its historical
+hardware-occlusion/depth conclusions are withdrawn. Native pose, attachment and
+independent optical calculations remain separate. The
+[erratum](../../validation/evidence/aircraft/f35b/dry-vtol-mechanism-2026-10-06/occlusion-erratum/README.md)
+preserves the original records and lists the affected claims.
+
 **Subsequent user acceptance failed:** the user still sees a large pale-blue AB
 onset apparently detached from the engine, and no luminous dry VTOL exhaust.
 The [open follow-up audit](../f135-plume-physical-followup-prompt.md#follow-up-after-testing-the-spatial-implementation)
@@ -48,12 +55,11 @@ scene luminance at white reference 1000 cd/m², before exposure. This supports a
 dim-source diagnosis; it does not prove the user's exact pixel visibility.
 
 [Actual-GLB geometry checks](../../validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/geometry-baseline/README.md)
-find no VTOL-specific disable or complete hardware occlusion. The exit origin
-and axis follow the rigid nozzle, and rear/oblique/world-side views retain
-unobstructed positive tracer paths through the support. Coarse midpoint sampling
-can still miss thin regions, while first-interaction depth can integrate light
-behind an opaque surface. Those approximations are separate from radiance.
-The tracer includes engine hardware, not ground or airframe geometry.
+find no VTOL-specific disable, and the exit origin and axis follow the rigid
+nozzle. The subsequent indexing audit established that the tracer included no
+hardware triangles, so its positive paths do not establish hardware visibility.
+Coarse midpoint sampling can still miss thin support regions; that unoccluded
+sampling result is separate from both radiance and hardware-depth qualification.
 
 The native gas observation is an imposed enthalpy-mixture proxy based on legacy
 EGT and added AB energy. It has no qualified static/total station definition,
@@ -179,9 +185,10 @@ These checks establish the implementation of the declared approximation; they
 do not validate its unmeasured physical inputs.
 
 The [final geometry record](../../validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/geometry/README.md)
-covers 12 nozzle poses and 36 views. All retain positive unoccluded support.
-At 32 ray samples two very thin tracer paths are missed, with no whole-view
-loss. This does not establish visibility through ground or airframe geometry.
+covers 12 nozzle poses and 36 views, but the missing triangle list makes its
+hardware-visibility conclusions unqualified. In the unblocked support, 32 ray
+samples miss two very thin tracer paths without losing an entire view. This
+establishes no visibility through engine, ground or airframe geometry.
 
 Twenty-four retained CPU images compare the previous and new gas fields from
 rear/oblique views with fixed day/night backgrounds, exposure 1 and white

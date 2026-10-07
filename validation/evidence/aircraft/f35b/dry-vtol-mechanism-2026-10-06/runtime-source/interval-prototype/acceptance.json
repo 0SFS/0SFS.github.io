@@ -1,0 +1,97 @@
+{
+  "schema": "0sfs-negative-integration-experiment/1",
+  "implemented": false,
+  "status": "rejected-no-improvement",
+  "exitCode": 1,
+  "thresholdChanged": false,
+  "runtimeDefaultChanged": false,
+  "sourceReportSha256": "c3d6e487659eac9d5237c5c7fd411f0d5fd0902578432d4514e376374a9297ae",
+  "reportNormalization": "Only snapshot paths were normalized to identical already-retained complete-input snapshots; numerical rows are unchanged.",
+  "sharedInputs": [
+    {
+      "originalSnapshot": "source-1-render-exhaust-continuity.mjs.txt",
+      "retainedSnapshot": "../posed-rays-complete-inputs/source-0-render-exhaust-continuity.mjs.txt",
+      "sha256": "02dbeaf42cb4ff90d5c29f0815ed0a00609d7d3ed9f5f79a5345c5d88db4d43c"
+    },
+    {
+      "originalSnapshot": "source-2-engineGasSupport.ts.txt",
+      "retainedSnapshot": "../posed-rays-complete-inputs/source-1-engineGasSupport.ts.txt",
+      "sha256": "55d0b3e77ad4757ed91775739247065f7d3b80f5f7027461d2a423cb6801386c"
+    },
+    {
+      "originalSnapshot": "source-3-engineGasOptics.ts.txt",
+      "retainedSnapshot": "../posed-rays-complete-inputs/source-2-engineGasOptics.ts.txt",
+      "sha256": "a2ed5be59fcc40e2f6d984fa949d2cc5908c14696d1fac94c09591aac9f43634"
+    },
+    {
+      "originalSnapshot": "source-4-engineReactionEmission.ts.txt",
+      "retainedSnapshot": "../posed-rays-complete-inputs/source-3-engineReactionEmission.ts.txt",
+      "sha256": "1d0e736b8a5b816a66d68a57c5674ce7f0af0a9a457fe4faaeaa6eccca8cec91"
+    },
+    {
+      "originalSnapshot": "source-5-engineNozzleRig.ts.txt",
+      "retainedSnapshot": "../posed-rays-complete-inputs/source-4-engineNozzleRig.ts.txt",
+      "sha256": "0c070c616f6b9508de3cba5ccd24818b9ad679bb938e9d86acf1287f381f0996"
+    },
+    {
+      "originalSnapshot": "source-6-f135EngineData.ts.txt",
+      "retainedSnapshot": "../posed-rays-complete-inputs/source-5-f135EngineData.ts.txt",
+      "sha256": "08545c3e51892acb63ea27c8283445aef1a1e4d1a432768af1b492ba0fd48ddb"
+    },
+    {
+      "originalSnapshot": "source-7-f135-exhaust-lut.manifest.json.txt",
+      "retainedSnapshot": "../posed-rays-complete-inputs/source-6-f135-exhaust-lut.manifest.json.txt",
+      "sha256": "95036c421d8bf371c633caef805ed26103577c55b0bbff8b066da30b73f6e001"
+    }
+  ],
+  "command": "node build/validation/interval-quadrature-prototype/2026-10-06_234229/prototype.mjs --geometry=validation/evidence/aircraft/f35b/exhaust-correction-2026-10-06/geometry/report.json --rays-only --ray-budgets=32 --out=build/validation/interval-quadrature-prototype/2026-10-06_234229/run",
+  "files": [
+    {
+      "name": "README.md",
+      "bytes": 2999,
+      "sha256": "3cd6b9f50210a3d0a66114ea4bc50bce4244a542d0ffb429bb6308149de02d3c"
+    },
+    {
+      "name": "diagnostic.log",
+      "bytes": 1716,
+      "sha256": "0680d12285bcfe3a72bdb9dd0ce2c3b4fc1d48da8c92b2385ca9db4ac96b723b"
+    },
+    {
+      "name": "entry.mjs.txt",
+      "bytes": 58859,
+      "sha256": "7826da568869e718071736d663f8f4582ade1cd5335eded7ce9166f59c43fcfa"
+    },
+    {
+      "name": "entry.ts.txt",
+      "bytes": 319,
+      "sha256": "f4a418bc6239025aa0c29f23fcb6f4271a48d02d2ae1c109973039b8123609d8",
+      "originalSha256": "c15119f7500ad15e9069f6fa2eaf0eeb6cabf01003f7573438ea8d723090ed9a",
+      "originalBytes": 355,
+      "publishedSnapshotSha256": "f4a418bc6239025aa0c29f23fcb6f4271a48d02d2ae1c109973039b8123609d8",
+      "publicationRedactionManifest": "../../publication-redactions.json"
+    },
+    {
+      "name": "report.json",
+      "bytes": 216734,
+      "sha256": "b2eae8c22e0dd50a05e1381804471ec05d73b7522713cf59a9d063bc55df1fb8",
+      "originalSha256": "755eee4d4783dd2ce6a3e9e5fe0992c11495d2d8f7037d0a703399301be9cb6a",
+      "originalBytes": 216566,
+      "publishedSnapshotSha256": "b2eae8c22e0dd50a05e1381804471ec05d73b7522713cf59a9d063bc55df1fb8",
+      "publicationRedactionManifest": "../../publication-redactions.json"
+    },
+    {
+      "name": "source-0-prototype.mjs.txt",
+      "bytes": 22767,
+      "sha256": "84c4521e2fd82c1f4ef5831dc7cfa9db54708c3f003474dfdf10730ab8046048",
+      "originalSha256": "9d1480533eef172af89079eeef8d40c0cdc072977c1236d0c4a4ea4036eae7a0",
+      "originalBytes": 22812,
+      "publishedSnapshotSha256": "84c4521e2fd82c1f4ef5831dc7cfa9db54708c3f003474dfdf10730ab8046048",
+      "publicationRedactionManifest": "../../publication-redactions.json"
+    },
+    {
+      "name": "summary.json",
+      "bytes": 3279,
+      "sha256": "2adcdad160f08b527eca66fac03978497ab0b9c8f400630ba3bef09e045b2f14"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "out": "[checkout]/build/validation/particle-spectrum/2026-10-06_231049",
+  "passed": true,
+  "maxima": {
+    "interpolationPhotopic": 0.0011742826334193038,
+    "interpolationXyz": 0.0015765403948073626,
+    "bolometricPower": 3.941172532966819e-11,
+    "slabPhotopic": 0.021284592234343966,
+    "slabXyz": 0.035896946253626896,
+    "slabQuadrature": 0.000004893426309574886
+  },
+  "powerAt1003K": {
+    "temperatureKelvin": 1003.1281319989688,
+    "xyz": [
+      4.792026758072012,
+      2.5977707338867804,
+      0.026273794131371667
+    ],
+    "independentXyz": [
+      4.79214454491457,
+      2.597835200812889,
+      0.026274572191676896
+    ],
+    "photopicRelativeError": 0.000024815633450626932,
+    "maxXyzRelativeError": 0.000029612672646138052,
+    "planckMeanAbsorptionRatio": 0.14695256100917026,
+    "independentPlanckMeanRatio": 0.14695256101491824,
+    "powerRelativeError": 3.911456446399677e-11
+  }
+}

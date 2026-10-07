@@ -1,0 +1,78 @@
+{
+  "accessedDate": "2026-10-06",
+  "sources": [
+    {
+      "title": "HITEMP high-temperature molecular spectroscopic database",
+      "url": "https://hitran.org/hitemp/",
+      "type": "official database",
+      "supports": "H2O high-temperature lines; database intended for temperature-dependent molecular absorption and emission. No F135 composition or pressure."
+    },
+    {
+      "title": "Rothman et al. 2010 HITEMP",
+      "url": "https://lweb.cfa.harvard.edu/atmosphere/publications/2010-HITEMP-JQSRT-111.pdf",
+      "doi": "10.1016/j.jqsrt.2010.05.001",
+      "type": "primary paper full text inspected",
+      "supports": "LTE line strengths require partition functions and temperature scaling. Hot bands missing from room-temperature lists can underestimate radiance. Weak near-IR/visible H2O transitions are included; spectral completeness is consequential."
+    },
+    {
+      "title": "Cattaneo and Hernberg 2005 Detection of high-temperature water vapor at940nm",
+      "url": "https://opg.optica.org/ao/abstract.cfm?uri=ao-44-31-6593",
+      "doi": "10.1364/AO.44.006593",
+      "type": "primary paper publisher abstract inspected",
+      "supports": "Heated-cell H2O line-strength measurements420–970K near940nm agree withHITRAN2004. This supports existence and calculability, not integrated F135 radiance or visible color."
+    },
+    {
+      "title": "Claus1981 Spectral Flame Radiance From a Tubular-Can Combustor",
+      "url": "https://ntrs.nasa.gov/api/citations/19810010595/downloads/19810010595.pdf",
+      "report": "NASA-TP1722",
+      "type": "primary report full text inspected",
+      "supports": "JT8D combustor1.55–5.5um gas-band and soot continuum measurements; identifies water1.38/1.87/2.7/6.3um andCO2 bands. Not nozzle temperature orF135 loading."
+    },
+    {
+      "title": "Zangmeister etal.2018 Measured In-situ Mass Absorption Spectra forNineForms",
+      "url": "https://www.nist.gov/publications/measured-situ-mass-absorption-spectra-nine-forms-highly-absorbing-carbonaceous-aerosol",
+      "doi": "10.1016/j.carbon.2018.04.057",
+      "type": "primary authors official abstract inspected",
+      "supports": "Flame-soot MAC5503.8–8.6m2/g; exponent1.0–1.3; measured500–840nm. Used as cross-source sensitivity, notF135 calibration; NIR extension past840nm is explicit extrapolation."
+    },
+    {
+      "title": "You etal.2016 wavelength-dependent absorption",
+      "url": "https://www.nist.gov/publications/measured-wavelength-dependent-absorption-enhancement-internally-mixed-black-carbon",
+      "doi": "10.1021/acs.est.6b01473",
+      "type": "primary authors official abstract inspected",
+      "supports": "Pure laboratoryBC MAC5507.89±.25m2/g andAAE1.03±.09 over550–840nm. Mixingchangesproperties; no universalgraycoefficient."
+    },
+    {
+      "title": "Yu etal.2011 Direct Measurement ofAircraftEngineSoot",
+      "url": "https://digitalcommons.unl.edu/nasapub/205/",
+      "doi": "10.1080/02786826.2011.592873",
+      "type": "primary author repository abstract inspected",
+      "supports": "V2527idleEI225±35mg/kgfuel. Scalecomparisononly, noF135 drypower attribution."
+    },
+    {
+      "title": "HamamatsuS16008-66",
+      "url": "https://www.hamamatsu.com/us/en/product/optical-sensors/photodiodes/si-photodiodes/S16008-66.html",
+      "type": "manufacturer specification",
+      "supports": "Anexample silicon detector spans380–1100nm. Not the footagecamera oritsQE."
+    },
+    {
+      "title": "BaslerCamerasforFluorescenceMicroscopy",
+      "url": "https://www.baslerweb.com/en/learning/cameras-fluorescence-microscopy/",
+      "type": "manufacturer optical guidance",
+      "supports": "Colorcamera IRcut may block above approximately650–700nm. Motivates cutoff sensitivity, not a claim about the footage."
+    },
+    {
+      "title": "AxisLightingforNetworkVideo",
+      "url": "https://whitepapers.axis.com/en-us/lighting-for-network-video",
+      "type": "manufacturer imaging explanation",
+      "supports": "Silicon camera NIR can contaminate allRGBchannels; actualday/nightmode often outputsgrayscale withIRcut removed. NIR isnot intrinsically red/orange andnightdoesnotidentify filterstate."
+    },
+    {
+      "title": "NAVSEA2025 Carderock F35B JSKaga deckthermaltesting",
+      "url": "https://www.navsea.navy.mil/Media/News/Article-View/Article/4053212/carderock-team-provides-critical-technical-support-for-f-35b-sea-trials-on-js-k/",
+      "type": "primary agency account",
+      "supports": "Heating/cooling anddeckthermalload are real; no measuredvisibleincandescence, spectralresponse, ornumericaltemperaturesgiven."
+    }
+  ],
+  "unverifiedLead": "NASA19930021842 flame-color850/1005nm indexedexcerpt couldnotbe fullyread; excludedfromconclusions."
+}

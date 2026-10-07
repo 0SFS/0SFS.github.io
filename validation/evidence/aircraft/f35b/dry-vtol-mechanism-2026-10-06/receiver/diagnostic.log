@@ -1,0 +1,133 @@
+(node:27937) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+BJS - [23:19:44]: Babylon.js v8.56.2 - Null engine
+{"case":"powered-lift","stage":"probes","triangles":24024,"hotTriangles":3056}
+{"case":"powered-lift","stage":"map","size":25}
+{"case":"hot-shutdown-posed-down","stage":"probes","triangles":24024,"hotTriangles":3056}
+{"case":"hot-shutdown-posed-down","stage":"map","size":25}
+{"case":"hot-shutdown-native-pose","stage":"probes","triangles":24024,"hotTriangles":3056}
+{"case":"cold-posed-down","stage":"probes","triangles":24024,"hotTriangles":3056}
+{
+  "out": "build/f135-deck-receiver-20261006",
+  "status": "failed",
+  "errors": [
+    "3 selected probes exceed 3% angular / 1% path / 5% hardware refinement criteria"
+  ],
+  "changedAfterSnapshot": [],
+  "cases": [
+    {
+      "name": "powered-lift",
+      "centerReference": {
+        "gasRgbLux": [
+          0.13418362053738542,
+          0.0025903501497697885,
+          0
+        ],
+        "coreRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "linerRgbLux": [
+          0.000030306468471504903,
+          0,
+          0
+        ],
+        "gasLux": 0.030389714320563508,
+        "hardwareLux": 0.000006445364538593515,
+        "combinedLux": 0.030396159685102103,
+        "reflectedLuminanceCdM2": 0.0019350796259578354
+      },
+      "map": {
+        "csv": "powered-lift.csv",
+        "samples": 625,
+        "peakGasLux": 0.03038973549037479,
+        "peakHardwareLux": 0.005922900417024507,
+        "peakCombinedLux": 0.03039626291636453,
+        "peakReflectedLuminanceCdM2": 0.0019350861978641141
+      }
+    },
+    {
+      "name": "hot-shutdown-posed-down",
+      "centerReference": {
+        "gasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "coreRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "linerRgbLux": [
+          0.00004588802861287627,
+          0,
+          0
+        ],
+        "gasLux": 0,
+        "hardwareLux": 0.000009759140120383372,
+        "combinedLux": 0.000009759140120383372,
+        "reflectedLuminanceCdM2": 6.212861561941793e-7
+      },
+      "map": {
+        "csv": "hot-shutdown-posed-down.csv",
+        "samples": 625,
+        "peakGasLux": 0,
+        "peakHardwareLux": 0.005134020827357829,
+        "peakCombinedLux": 0.005134020827357829,
+        "peakReflectedLuminanceCdM2": 0.00032684191704429637
+      }
+    },
+    {
+      "name": "hot-shutdown-native-pose",
+      "centerReference": {
+        "gasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "coreRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "linerRgbLux": [
+          4.266626649243545e-8,
+          0,
+          0
+        ],
+        "gasLux": 0,
+        "hardwareLux": 9.073958627119074e-9,
+        "combinedLux": 9.073958627119074e-9,
+        "reflectedLuminanceCdM2": 5.776661475669397e-10
+      },
+      "map": null
+    },
+    {
+      "name": "cold-posed-down",
+      "centerReference": {
+        "gasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "coreRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "linerRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "gasLux": 0,
+        "hardwareLux": 0,
+        "combinedLux": 0,
+        "reflectedLuminanceCdM2": 0
+      },
+      "map": null
+    }
+  ]
+}

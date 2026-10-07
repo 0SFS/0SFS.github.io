@@ -22,7 +22,7 @@
     },
     {
       "path": "scripts/exhaustOptics/bake.mjs",
-      "sha256": "694c20b075267b29e5d6a64f27e3daf134a07701cce5310b2894aef1c57854cd"
+      "sha256": "2164fa7cf9dce2d2cf0d3bc5bb39781a211d27fadca79054d8de80e71cafe907"
     }
   ],
   "outputs": [

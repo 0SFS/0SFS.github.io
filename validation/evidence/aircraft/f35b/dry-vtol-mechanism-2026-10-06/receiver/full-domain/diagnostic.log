@@ -1,0 +1,181 @@
+(node:29748) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+BJS - [23:29:14]: Babylon.js v8.56.2 - Null engine
+{"case":"powered-lift","stage":"probes","triangles":24024,"hotTriangles":3056}
+{"case":"powered-lift","stage":"map","size":17}
+{"case":"hot-shutdown-posed-down","stage":"probes","triangles":24024,"hotTriangles":3056}
+{"case":"hot-shutdown-posed-down","stage":"map","size":17}
+{"case":"hot-shutdown-native-pose","stage":"probes","triangles":24024,"hotTriangles":3056}
+{"case":"cold-posed-down","stage":"probes","triangles":24024,"hotTriangles":3056}
+{
+  "out": "build/f135-deck-receiver-full-20261006",
+  "status": "failed",
+  "errors": [
+    "3 selected probes exceed 3% angular / 1% path / 5% hardware refinement criteria"
+  ],
+  "changedAfterSnapshot": [],
+  "cases": [
+    {
+      "name": "powered-lift",
+      "centerReference": {
+        "gasRgbLux": [
+          0.1646607708074428,
+          0.003197725765580539,
+          0
+        ],
+        "internalGasRgbLux": [
+          0.030477177988853545,
+          0.0006073759919431028,
+          0
+        ],
+        "externalGasRgbLux": [
+          0.1341835928185893,
+          0.002590349773637455,
+          0
+        ],
+        "internalGasLux": 0.006916036103570943,
+        "externalGasLux": 0.030389708156534887,
+        "coreRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "linerRgbLux": [
+          0.00003006228249510434,
+          0,
+          0
+        ],
+        "gasLux": 0.03730574426010581,
+        "hardwareLux": 0.000006393432798853076,
+        "combinedLux": 0.03731213769290466,
+        "reflectedLuminanceCdM2": 0.002375364460460482
+      },
+      "map": {
+        "csv": "powered-lift.csv",
+        "samples": 289,
+        "peakGasLux": 0.037292915878597045,
+        "peakHardwareLux": 0.005851376947738841,
+        "peakCombinedLux": 0.03729938958081024,
+        "peakReflectedLuminanceCdM2": 0.0023745528904385153
+      }
+    },
+    {
+      "name": "hot-shutdown-posed-down",
+      "centerReference": {
+        "gasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "internalGasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "externalGasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "internalGasLux": 0,
+        "externalGasLux": 0,
+        "coreRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "linerRgbLux": [
+          0.00004588802861287627,
+          0,
+          0
+        ],
+        "gasLux": 0,
+        "hardwareLux": 0.000009759140120383372,
+        "combinedLux": 0.000009759140120383372,
+        "reflectedLuminanceCdM2": 6.212861561941793e-7
+      },
+      "map": {
+        "csv": "hot-shutdown-posed-down.csv",
+        "samples": 289,
+        "peakGasLux": 0,
+        "peakHardwareLux": 0.005134020827357829,
+        "peakCombinedLux": 0.005134020827357829,
+        "peakReflectedLuminanceCdM2": 0.00032684191704429637
+      }
+    },
+    {
+      "name": "hot-shutdown-native-pose",
+      "centerReference": {
+        "gasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "internalGasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "externalGasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "internalGasLux": 0,
+        "externalGasLux": 0,
+        "coreRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "linerRgbLux": [
+          4.266626649243545e-8,
+          0,
+          0
+        ],
+        "gasLux": 0,
+        "hardwareLux": 9.073958627119074e-9,
+        "combinedLux": 9.073958627119074e-9,
+        "reflectedLuminanceCdM2": 5.776661475669397e-10
+      },
+      "map": null
+    },
+    {
+      "name": "cold-posed-down",
+      "centerReference": {
+        "gasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "internalGasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "externalGasRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "internalGasLux": 0,
+        "externalGasLux": 0,
+        "coreRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "linerRgbLux": [
+          0,
+          0,
+          0
+        ],
+        "gasLux": 0,
+        "hardwareLux": 0,
+        "combinedLux": 0,
+        "reflectedLuminanceCdM2": 0
+      },
+      "map": null
+    }
+  ]
+}

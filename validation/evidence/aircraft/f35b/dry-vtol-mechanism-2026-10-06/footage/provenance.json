@@ -1,0 +1,97 @@
+{
+  "sourceUrl": "https://www.youtube.com/watch?v=rIroDPghWF4",
+  "credit": "Navy Lookout; description credits Royal Navy video by LPhot Dan Shepherd",
+  "retainedPriorRecord": "../../engine-review-2026-10-06/research.json",
+  "extendedRequestSeconds": [
+    161,
+    169
+  ],
+  "videoFormat": "YouTube format 399, 1920 × 1080, 25 fps, AV1, yuv420p, BT.709",
+  "frameMethod": "Original retained 156–163 s clip: decode from local 5.8 s (nominal 161.8 s) at 25 fps. landing-NNN nominal time = 161.8 + (NNN − 1) / 25 s. Extended clip: local 1 s plus 2 fps output; approximate frame times only. No retouching, grading or rescaling.",
+  "extendedFindings": "Landing close-up cuts to the nose at about 162.96 s; later cuts to daylight. No uninterrupted observation of the empty landing spot, therefore no surface-persistence result.",
+  "inputs": [
+    {
+      "path": "build/checks/f35b-dry-glow/2026-10-06_114321/vtol-156-163.mp4",
+      "sha256": "54b96e630c42f063d4b368a4e4a36f6cb2238dbb6c6ef77838276079130ff9b8",
+      "bytes": 1454456
+    },
+    {
+      "path": "build/dry-vtol-mechanism-review-2026-10-06/landing-161-169.mp4",
+      "sha256": "e81e2247b42341399114ec6d7ceabdfbee463d1abaebb9c46f3066ef7d6f1f77",
+      "bytes": 2032163
+    },
+    {
+      "path": "scripts/validation/f35b/analyze-dry-vtol-footage.mjs",
+      "sha256": "3d443398423bd86f106fa6436def1dd0e1d056cf7bf623afa00989a7d2e575b5",
+      "bytes": 6555
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/dry-vtol-mechanism-2026-10-06/footage/extended-003.png",
+      "sha256": "8dc308c704ccc878cb27ae313bb6738d17086659070112fddc451274645093b6",
+      "bytes": 361326
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/dry-vtol-mechanism-2026-10-06/footage/extended-005.png",
+      "sha256": "92b75015648a702bd6d92d487048dcb08cf80e3fd90a38214432b2d82d19daab",
+      "bytes": 776965
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/dry-vtol-mechanism-2026-10-06/footage/landing-010.png",
+      "sha256": "2f4db605772205bed11df65871daaee19e1f2d1abb363dbf910f81f943c93cc1",
+      "bytes": 353645
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/dry-vtol-mechanism-2026-10-06/footage/landing-015.png",
+      "sha256": "4f8acab53a3e4c07bfc07e553ff73efa0c1c9112c1991be2f1fd099b43465561",
+      "bytes": 338327
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/dry-vtol-mechanism-2026-10-06/footage/landing-020.png",
+      "sha256": "a9fc837fbf13e115200173ac34d3488ae77e8bd2608df241e434e66fcb7c54db",
+      "bytes": 467894
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/dry-vtol-mechanism-2026-10-06/footage/landing-025.png",
+      "sha256": "1da5f0e41925f00ec9bd65e07accd5d08166c0af2e070c88efaa06be8fd4fb10",
+      "bytes": 545204
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/dry-vtol-mechanism-2026-10-06/footage/landing-028.png",
+      "sha256": "baeec9d04546889df6f6180e4dc730e22df71c015c2b95e0aef8131ad7858dcd",
+      "bytes": 509798
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/dry-vtol-mechanism-2026-10-06/footage/landing-030.png",
+      "sha256": "10280e85fe1513ef625a0b32dcdddcbb77ed53364e9316a30dc4b0ef81863bae",
+      "bytes": 340765
+    }
+  ],
+  "privacy": "Downloader logs containing signed media URLs are not retained here. Public source URL and content hashes suffice.",
+  "mediaRetention": "Redistribution rights not established. PNGs are ignored local reference files. This record, hashes, derived numerical measurements and source snapshots are retained in Git.",
+  "primaryMechanismSources": [
+    {
+      "url": "https://ntrs.nasa.gov/citations/20020088423",
+      "supports": "Experimental supersonic impinging-jet topology; not F135 conditions or optical emission."
+    },
+    {
+      "url": "https://www.nasa.gov/wp-content/uploads/2023/03/equations-tables-charts-compressibleflow-report-1135.pdf",
+      "supports": "Compressible flow and normal-shock relations; illustrative gamma/Mach inputs are separately declared."
+    },
+    {
+      "url": "https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=925024",
+      "supports": "Distinguishes molecular IR, soot continuum and heated-solid radiation; not F135 concentration or temperature."
+    },
+    {
+      "url": "https://softwareservices.flir.com/FG-P5G-51S4/latest/40-Installation/InfraredFilters-FG.htm",
+      "supports": "Example camera IR-cut specification; not identification of the source-video camera."
+    },
+    {
+      "url": "https://www.gov.uk/government/news/qec-ship-air-certification",
+      "supports": "Thermal metallic deck protection from aircraft efflux; not proof of incandescence."
+    },
+    {
+      "url": "https://www.navsea.navy.mil/Media/News/Article/4053212/carderock-team-provides-critical-technical-support-for-f-35b-sea-trials-on-js-k/",
+      "supports": "Actual landing heat loads and below-deck monitoring; no reported visible incandescence."
+    }
+  ]
+}

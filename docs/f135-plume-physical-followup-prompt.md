@@ -1,6 +1,10 @@
 # Follow-up: spatial F135 exhaust emission and powered-lift visibility
 
 Latest checkpoint: [afterburner response and rendering work](validation/f135-exhaust-response.md).
+The subsequent [dry powered-lift mechanism investigation](validation/f135-dry-vtol-mechanism.md)
+retains frame diagnostics, observer bounds and the non-gray particle correction.
+Continue from its current implementation and acceptance limits; the carrier
+appearance and near-deck interaction remain open.
 An internal conditional CH(A) parcel and unresolved hot/cold temperature mixture
 now drive AB emission; the user reports better appearance and usable performance,
 with a smaller remaining audio lead. Dry powered-lift appearance remains open.

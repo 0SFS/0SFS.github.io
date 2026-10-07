@@ -1,0 +1,66 @@
+{
+  "scope": "Offline aircraft thermal/source/observer diagnostic only; no runtimechanges orappearance acceptance",
+  "commands": [
+    {
+      "command": "node scripts/validation/f35b/analyze-dry-exhaust-observer.mjs",
+      "log": "diagnostic.log",
+      "passed": true
+    },
+    {
+      "command": "npx eslint scripts/validation/f35b/analyze-dry-exhaust-observer.mjs",
+      "log": "lint.log",
+      "passed": true
+    }
+  ],
+  "files": [
+    {
+      "name": "diagnostic.log",
+      "bytes": 10208,
+      "sha256": "30fe6342f5ea84bc38d3c8a04a2129affed8a7a71386a47312ad8dd1cb1013d1",
+      "originalSha256": "4fccafed9ce32272ff063f1eae71e1c62a1295d1affc2742d3b4224685ea3800",
+      "originalBytes": 10217,
+      "publishedSnapshotSha256": "30fe6342f5ea84bc38d3c8a04a2129affed8a7a71386a47312ad8dd1cb1013d1",
+      "publicationRedactionManifest": "../publication-redactions.json"
+    },
+    {
+      "name": "lint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "report.json",
+      "bytes": 19876,
+      "sha256": "8707c0db05e27ac28bdba72fd37e878248fbcf8cf70657d30cc6304466b0f85b"
+    },
+    {
+      "name": "source-0-report.json.txt",
+      "bytes": 26450,
+      "sha256": "57ad29b99e2cb991a456d3ac6e0b21695e76e08afaace616f7e77a164bee8728"
+    },
+    {
+      "name": "source-1-CIE_xyz_1931_2deg.csv.txt",
+      "bytes": 24021,
+      "sha256": "fa663e3535a7e0763a745993a1f0a192eb0275ac46ad2d1befd7626841e713c1"
+    },
+    {
+      "name": "source-2-analyze-dry-exhaust-observer.mjs.txt",
+      "bytes": 12457,
+      "sha256": "2d7e1cfe6f6faa15bd7d81f26bddf27dd24cc483653831aca3663ce8b62112ce"
+    },
+    {
+      "name": "sources.json",
+      "bytes": 4756,
+      "sha256": "ac7810b551fc6605e99ad16fe49042de07bd19a6f14dbdeec8e3a2f7add16c34"
+    },
+    {
+      "name": "spectrum.csv",
+      "bytes": 68960,
+      "sha256": "8c647ad299ff57d4669fa3234e6c81fd133196a02bfd59a743f97907617f594e"
+    },
+    {
+      "name": "README.md",
+      "bytes": 8335,
+      "sha256": "472129d846dff25cf73aee0fdc732bd745a3b61c68543f8abd29d5ee5f0a0f9d"
+    }
+  ]
+}

@@ -188,9 +188,14 @@ The listed straightened-domain rays compare 64×32 with 64×64, reaching at most
 independent higher-resolution axial convergence result or a guarantee for every
 posed view.
 
-The separate [posed hardware/depth CPU projections](../../validation/evidence/aircraft/f35b/exhaust-correction-2026-10-06/posed-optics/README.md)
+The separate [posed CPU projections](../../validation/evidence/aircraft/f35b/exhaust-correction-2026-10-06/posed-optics/README.md)
 retain 64 gas-only images and a [final ray-budget comparison](../../validation/evidence/aircraft/f35b/exhaust-correction-2026-10-06/posed-optics/final-ray-comparison/report.json)
-against 4096 uniform steps.
+against 4096 uniform steps. **A subsequent audit found that their script skipped
+non-indexed primitives and constructed zero hardware triangles.** Their claimed
+opaque clipping and visible interior/exterior attribution are unqualified;
+the numbers below describe the unblocked source domain only. They do not qualify
+the ray budget after actual hardware clipping. Original records are preserved in
+the [occlusion erratum](../../validation/evidence/aircraft/f35b/dry-vtol-mechanism-2026-10-06/occlusion-erratum/README.md).
 On the selected finite rays, 32 steps reach **18.51%** relative peak-channel
 error; the adopted 128 steps stay below **0.761%**. The 2048/4096 reference
 disagreement stays below **0.107%**. These are finite sampled-ray bounds, not a

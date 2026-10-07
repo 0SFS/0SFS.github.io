@@ -1,0 +1,37 @@
+{
+  "mode": "--install",
+  "success": true,
+  "artifacts": [
+    {
+      "name": "f135-exhaust-lut.png",
+      "bytes": 471,
+      "sha256": "d9d460fbfbfe3ec0d099659646a176fa892e2afa81713f92469d0c75f4c47189"
+    },
+    {
+      "name": "f135-exhaust-spatial.png",
+      "bytes": 24424,
+      "sha256": "27110d47433281963a653695116feb79cf80e314a6553c3c9c753f2f6a6a530e"
+    },
+    {
+      "name": "f135ExhaustOpticalData.ts",
+      "bytes": 768344,
+      "sha256": "e2bff31a5cd578f7d0d72d0b32c7b933d8544ec6084dc66fcf8eeff9fed1d607"
+    },
+    {
+      "name": "f135-exhaust-lut.manifest.json",
+      "bytes": 877899,
+      "sha256": "df421888ca01541556e29356d09a10b71fa0fa662ad8bc1a376ed38d0c7ef440"
+    },
+    {
+      "name": "engine-smoke-flipbook.png",
+      "bytes": 7900,
+      "sha256": "73c447a6b283841a81373d4d7fcb591b027fcdab1dd402d57315603285985590"
+    },
+    {
+      "name": "engine-smoke-flipbook.manifest.json",
+      "bytes": 1489,
+      "sha256": "10f09f508d0999efc845f109e362121842a16786eb9d3ef5e60a39532444ba55"
+    }
+  ],
+  "outputDirectory": "[checkout]/build/exhaust-optics/2026-10-06_230858"
+}

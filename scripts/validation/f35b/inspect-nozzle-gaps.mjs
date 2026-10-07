@@ -195,7 +195,9 @@ try {
       const matrix = petal.node.computeWorldMatrix(true).multiply(localInverse);
       const raw = petal.node.getVerticesData(VertexBuffer.PositionKind), points = [];
       for (let index = 0; index < raw.length; index += 3) points.push(Vector3.TransformCoordinates(Vector3.FromArray(raw, index), matrix).asArray());
-      const indices = petal.node.getIndices();
+      const authoredIndices = petal.node.getIndices();
+      const indices = authoredIndices?.length ? authoredIndices : Array.from({ length: points.length }, (_, index) => index);
+      if (!indices.length || indices.length % 3) throw new Error(`Missing or incomplete petal triangles: ${petal.node.name}`);
       for (let index = 0; index < indices.length; index += 3) triangles.push([points[indices[index]], points[indices[index + 1]], points[indices[index + 2]]]);
     }
     for (const offset of stations) report.sections.push({

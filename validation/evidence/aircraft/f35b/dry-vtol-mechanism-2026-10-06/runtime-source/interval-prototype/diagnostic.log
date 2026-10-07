@@ -1,0 +1,26 @@
+(node:31848) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+BJS - [23:42:42]: Babylon.js v8.56.2 - Null engine
+{
+  "out": "build/validation/interval-quadrature-prototype/2026-10-06_234229/run",
+  "images": 0,
+  "rays": 96,
+  "errors": [
+    "Experimental aligned32 error exceeds 1% on selected ray: idle/rear/0.12",
+    "Experimental aligned32 error exceeds 1% on selected ray: dry99/rear/0.12",
+    "Experimental aligned32 error exceeds 1% on selected ray: dry99/rear/0.22",
+    "Experimental aligned32 error exceeds 1% on selected ray: dry99/rear/-0.35",
+    "Experimental aligned32 error exceeds 1% on selected ray: ab-onset/rear/0",
+    "Experimental aligned32 error exceeds 1% on selected ray: ab-onset/rear/0.12",
+    "Experimental aligned32 error exceeds 1% on selected ray: ab-sustained/rear/0.12",
+    "Experimental aligned32 error exceeds 1% on selected ray: ab-sustained/oblique/-0.9",
+    "Experimental aligned32 error exceeds 1% on selected ray: ab-cutoff/rear/0.12",
+    "Experimental aligned32 error exceeds 1% on selected ray: ab-cutoff/rear/-0.9",
+    "Experimental aligned32 error exceeds 1% on selected ray: ab-cutoff/oblique/-0.9",
+    "Experimental aligned32 error exceeds 1% on selected ray: powered-lift/rear/0",
+    "Experimental aligned32 error exceeds 1% on selected ray: powered-lift/rear/0.12",
+    "Experimental aligned32 error exceeds 1% on selected ray: powered-lift/rear/0.22",
+    "Experimental aligned32 error exceeds 1% on selected ray: powered-lift/rear/-0.35",
+    "Experimental aligned32 error exceeds 1% on selected ray: powered-lift/oblique/-0.35"
+  ]
+}

@@ -1,0 +1,299 @@
+{
+  "out": "[checkout]/build/validation/dry-exhaust-observer/2026-10-06_230156",
+  "validation": {
+    "maxPlanckRelativeError": 6.6330152335509334e-15,
+    "maxQuadratureRelativeError": 0.000006956712899066492,
+    "passed": true
+  },
+  "dry": {
+    "temperatureKelvin": 1003.1281319989688,
+    "blackbodyLuminanceCdM2": 2.8914463323023414,
+    "visible380to780RadianceWm2sr": 0.21360879171497843,
+    "nir780to1100RadianceWm2sr": 16.98493510851127,
+    "nirToVisibleRadiantRatio": 79.51421368074838,
+    "nirToVisiblePhotonRatio": 109.6169274578223,
+    "water930to950BlackbodyCeilingWm2sr": 0.7679433395412248,
+    "grayOneMeterLuminanceCdM2": 0.07139006430989983,
+    "grayOneMeterNirRadianceWm2sr": 0.4193595420222044,
+    "bolometricBlackbodyExitanceWm2": 57416.58747295548
+  },
+  "camera": {
+    "assumptions": {
+      "pixelPitchMeters": 0.000005,
+      "fNumber": 2.8,
+      "exposureSeconds": 0.02,
+      "quantumEfficiency": 1,
+      "lensTransmission": 1,
+      "sourceFillsPixel": true
+    },
+    "cutoffs": [
+      {
+        "cutoffNm": 650,
+        "grayOneMeterElectronsCeiling": 34.98037481842911,
+        "inverseWavelengthOneMeterElectronsCeiling": 31.103861323833147
+      },
+      {
+        "cutoffNm": 700,
+        "grayOneMeterElectronsCeiling": 146.88609424778377,
+        "inverseWavelengthOneMeterElectronsCeiling": 121.84826301250986
+      },
+      {
+        "cutoffNm": 730,
+        "grayOneMeterElectronsCeiling": 314.80141772873947,
+        "inverseWavelengthOneMeterElectronsCeiling": 251.1049390264457
+      },
+      {
+        "cutoffNm": 780,
+        "grayOneMeterElectronsCeiling": 978.3377770162681,
+        "inverseWavelengthOneMeterElectronsCeiling": 733.7088878072752
+      },
+      {
+        "cutoffNm": 1100,
+        "grayOneMeterElectronsCeiling": 108220.71890945573,
+        "inverseWavelengthOneMeterElectronsCeiling": 59223.18480266629
+      }
+    ],
+    "leakage": [
+      {
+        "nirToVisibleSensitivity": 0,
+        "nirToVisibleSignalRatio": 0
+      },
+      {
+        "nirToVisibleSensitivity": 0.0001,
+        "nirToVisibleSignalRatio": 0.010961692745782218
+      },
+      {
+        "nirToVisibleSensitivity": 0.001,
+        "nirToVisibleSignalRatio": 0.10961692745782217
+      },
+      {
+        "nirToVisibleSensitivity": 0.01,
+        "nirToVisibleSignalRatio": 1.0961692745782219
+      },
+      {
+        "nirToVisibleSensitivity": 0.1,
+        "nirToVisibleSignalRatio": 10.961692745782218
+      },
+      {
+        "nirToVisibleSensitivity": 1,
+        "nirToVisibleSignalRatio": 109.61692745782217
+      }
+    ],
+    "currentExitLuminanceCdM2": 0.018591819491510772,
+    "equivalentOpticalDepth": 0.006450698692004234,
+    "equivalentCutoffs": [
+      {
+        "cutoffNm": 650,
+        "electronsCeiling": 9.10979448829883
+      },
+      {
+        "cutoffNm": 700,
+        "electronsCeiling": 38.25293864722214
+      },
+      {
+        "cutoffNm": 730,
+        "electronsCeiling": 81.98243257882602
+      },
+      {
+        "cutoffNm": 780,
+        "electronsCeiling": 254.78446514706522
+      },
+      {
+        "cutoffNm": 1100,
+        "electronsCeiling": 28183.474698552927
+      }
+    ],
+    "qualification": "Unity-QE sharp-cutoff monochrome ceilings. No camera RGB response, noise, filter rejection, color, saturation or reference exposure is inferred. Matching CIE Y by one isothermal spectrum is an observer sensitivity scenario, not a recovered nonuniform spectrum."
+  },
+  "mass": {
+    "densityKgM3": 0.34148020778366506,
+    "volumeFlowM3S": 339.2099485893027,
+    "massConstraint": [
+      {
+        "massAbsorption550M2perG": 3.8,
+        "massConcentrationMgM3": 6.578947368421053,
+        "uniformSectionSootFluxKgS": 0.002231644398613834,
+        "uniformSectionEmissionIndexMgPerKgFuel": 504.8912133578328
+      },
+      {
+        "massAbsorption550M2perG": 8.6,
+        "massConcentrationMgM3": 2.906976744186047,
+        "uniformSectionSootFluxKgS": 0.0009860754319456475,
+        "uniformSectionEmissionIndexMgPerKgFuel": 223.0914663674145
+      }
+    ],
+    "qualification": "MAC bounds are measurements on other flame-generated soot. Gas flow is the existing uncalibrated proxy. Uniform area at peak opacity is an equivalent scenario; real radial loading lowers area-average flux. Neither is an F135 emission-index measurement."
+  },
+  "exposure": {
+    "rows": [
+      {
+        "exposureEV": 0,
+        "whiteReferenceCdM2": 1000,
+        "rgbLinear": [
+          0.0000847622660110216,
+          7.902969023592096e-7,
+          0
+        ],
+        "componentReinhardSrgb": [
+          0.001095035659158566,
+          0.00001021062790905338,
+          0
+        ],
+        "linearPhotopicLuminance": 0.000018591819491510772
+      },
+      {
+        "exposureEV": 4,
+        "whiteReferenceCdM2": 1000,
+        "rgbLinear": [
+          0.0013561962561763456,
+          0.000012644750437747353,
+          0
+        ],
+        "componentReinhardSrgb": [
+          0.017498324467665978,
+          0.00016336810990671654,
+          0
+        ],
+        "linearPhotopicLuminance": 0.00029746911186417235
+      },
+      {
+        "exposureEV": 8,
+        "whiteReferenceCdM2": 1000,
+        "rgbLinear": [
+          0.02169914009882153,
+          0.00020231600700395765,
+          0
+        ],
+        "componentReinhardSrgb": [
+          0.15694292138447405,
+          0.0026133940790363346,
+          0
+        ],
+        "linearPhotopicLuminance": 0.004759505789826758
+      },
+      {
+        "exposureEV": 10,
+        "whiteReferenceCdM2": 1000,
+        "rgbLinear": [
+          0.08679656039528612,
+          0.0008092640280158306,
+          0
+        ],
+        "componentReinhardSrgb": [
+          0.3130442761334708,
+          0.010447236669136032,
+          0
+        ],
+        "linearPhotopicLuminance": 0.01903802315930703
+      },
+      {
+        "exposureEV": 12,
+        "whiteReferenceCdM2": 1000,
+        "rgbLinear": [
+          0.3471862415811445,
+          0.0032370561120633225,
+          0
+        ],
+        "componentReinhardSrgb": [
+          0.5446419224050225,
+          0.04165631543367886,
+          0
+        ],
+        "linearPhotopicLuminance": 0.07615209263722812
+      }
+    ],
+    "qualification": "Component Reinhard then sRGB experiment on retained emitted RGB. This is not the live scene HDR/compositing path or a camera reconstruction; EV leaves physical radiance unchanged."
+  },
+  "receiver": {
+    "rows": [
+      {
+        "heightMeters": 1,
+        "radiusMeters": 0.40161378548650467,
+        "reflectance": 0.2,
+        "projectedSolidAngle": 0.43634002398130356,
+        "alternatives": [
+          {
+            "name": "equivalent-dry-ray-filled-aperture",
+            "incidentIlluminanceLux": 0.008112354962781907,
+            "reflectedLuminanceCdM2": 0.0005164485569771237,
+            "incidentNirIrradianceWm2": 0.04765359850561174,
+            "reflectedNirRadianceWm2sr": 0.003033722303313866
+          },
+          {
+            "name": "core-temperature-filled-aperture",
+            "incidentIlluminanceLux": 0.32480314320614395,
+            "reflectedLuminanceCdM2": 0.020677610309217033,
+            "incidentNirIrradianceWm2": 2.9790890375567654,
+            "reflectedNirRadianceWm2sr": 0.1896546984952145
+          },
+          {
+            "name": "liner-temperature-filled-aperture",
+            "incidentIlluminanceLux": 0.00000847458287482869,
+            "reflectedLuminanceCdM2": 5.395087020683644e-7,
+            "incidentNirIrradianceWm2": 0.004698120623013623,
+            "reflectedNirRadianceWm2sr": 0.00029909164815783727
+          }
+        ]
+      },
+      {
+        "heightMeters": 2,
+        "radiusMeters": 0.40161378548650467,
+        "reflectance": 0.2,
+        "projectedSolidAngle": 0.12176955924415517,
+        "alternatives": [
+          {
+            "name": "equivalent-dry-ray-filled-aperture",
+            "incidentIlluminanceLux": 0.002263917665028168,
+            "reflectedLuminanceCdM2": 0.00014412547485691786,
+            "incidentNirIrradianceWm2": 0.013298705980441783,
+            "reflectedNirRadianceWm2sr": 0.0008466219174052241
+          },
+          {
+            "name": "core-temperature-filled-aperture",
+            "incidentIlluminanceLux": 0.09064292390244508,
+            "reflectedLuminanceCdM2": 0.005770507758150659,
+            "incidentNirIrradianceWm2": 0.8313753933054867,
+            "reflectedNirRadianceWm2sr": 0.052927001363814744
+          },
+          {
+            "name": "liner-temperature-filled-aperture",
+            "incidentIlluminanceLux": 0.000002365004731929364,
+            "reflectedLuminanceCdM2": 1.5056087740891246e-7,
+            "incidentNirIrradianceWm2": 0.00131110612389011,
+            "reflectedNirRadianceWm2sr": 0.00008346760821406638
+          }
+        ]
+      },
+      {
+        "heightMeters": 3,
+        "radiusMeters": 0.40161378548650467,
+        "reflectance": 0.2,
+        "projectedSolidAngle": 0.05531084493681604,
+        "alternatives": [
+          {
+            "name": "equivalent-dry-ray-filled-aperture",
+            "incidentIlluminanceLux": 0.00102832924498823,
+            "reflectedLuminanceCdM2": 0.00006546547298633338,
+            "incidentNirIrradianceWm2": 0.006040612029067765,
+            "reflectedNirRadianceWm2sr": 0.00038455730549059945
+          },
+          {
+            "name": "core-temperature-filled-aperture",
+            "incidentIlluminanceLux": 0.04117233190058049,
+            "reflectedLuminanceCdM2": 0.0026211120562390066,
+            "incidentNirIrradianceWm2": 0.3776319447063402,
+            "reflectedNirRadianceWm2sr": 0.02404079626776774
+          },
+          {
+            "name": "liner-temperature-filled-aperture",
+            "incidentIlluminanceLux": 0.000001074245573479482,
+            "reflectedLuminanceCdM2": 6.838859724553897e-8,
+            "incidentNirIrradianceWm2": 0.0005955378993266465,
+            "reflectedNirRadianceWm2sr": 0.00003791312019055973
+          }
+        ]
+      }
+    ],
+    "qualification": "Alternative uniformly filled-aperture scenarios; no actual visibility, spectral BRDF, heat flux or deck temperature history. Not additive and not the existing point-light approximation."
+  }
+}

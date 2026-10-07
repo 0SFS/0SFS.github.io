@@ -1,0 +1,3188 @@
+{
+  "schema": "0sfs-f135-deck-radiation/2",
+  "status": "failed",
+  "settings": {
+    "grid": 17,
+    "extentMeters": 6,
+    "directions": 2048,
+    "steps": 96,
+    "surfaceLevel": 1,
+    "rho": 0.2,
+    "referenceCdM2": 1000,
+    "probeDirections": 32768,
+    "probeSteps": 256,
+    "probeSurfaceLevel": 3
+  },
+  "inputs": [
+    {
+      "path": "scripts/validation/f35b/check-engine-deck-receiver.mjs",
+      "sha256": "65ba1a150d57f19395ca59709d6271de07472ed8f48d869bc1d2746f3d51c082",
+      "snapshot": "source-0-check-engine-deck-receiver.mjs.txt"
+    },
+    {
+      "path": "src/flight/aircraft/engineGasOptics.ts",
+      "sha256": "a2ed5be59fcc40e2f6d984fa949d2cc5908c14696d1fac94c09591aac9f43634",
+      "snapshot": "source-1-engineGasOptics.ts.txt"
+    },
+    {
+      "path": "src/flight/aircraft/engineReactionEmission.ts",
+      "sha256": "1d0e736b8a5b816a66d68a57c5674ce7f0af0a9a457fe4faaeaa6eccca8cec91",
+      "snapshot": "source-2-engineReactionEmission.ts.txt"
+    },
+    {
+      "path": "src/flight/aircraft/engineGasSupport.ts",
+      "sha256": "55d0b3e77ad4757ed91775739247065f7d3b80f5f7027461d2a423cb6801386c",
+      "snapshot": "source-3-engineGasSupport.ts.txt"
+    },
+    {
+      "path": "src/flight/aircraft/engineNozzleRig.ts",
+      "sha256": "0c070c616f6b9508de3cba5ccd24818b9ad679bb938e9d86acf1287f381f0996",
+      "snapshot": "source-4-engineNozzleRig.ts.txt"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135EngineData.ts",
+      "sha256": "08545c3e51892acb63ea27c8283445aef1a1e4d1a432768af1b492ba0fd48ddb",
+      "snapshot": "source-5-f135EngineData.ts.txt"
+    },
+    {
+      "path": "src/flight/aircraft/aircraftCatalog.ts",
+      "sha256": "02ee14e05616a5dffbdceb07fc662bb7cd1728d87c9cd2d47932b0170c7cc3ec",
+      "snapshot": "source-6-aircraftCatalog.ts.txt"
+    },
+    {
+      "path": "scripts/f135Engine/intersections.mjs",
+      "sha256": "8342512a2a769646203e93d5c7304bfa022bc3df2dade6cba6c39b8c82cd1e4c",
+      "snapshot": "source-7-intersections.mjs.txt"
+    },
+    {
+      "path": "scripts/f135Engine/source.mjs",
+      "sha256": "6a57b46fcdbd2abf90c617ab59cc16944428e77b4fd3787deed890f7eb36d3cb",
+      "snapshot": "source-8-source.mjs.txt"
+    },
+    {
+      "path": "scripts/exhaustOptics/bake.mjs",
+      "sha256": "2164fa7cf9dce2d2cf0d3bc5bb39781a211d27fadca79054d8de80e71cafe907",
+      "snapshot": "source-9-bake.mjs.txt"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json",
+      "sha256": "95036c421d8bf371c633caef805ed26103577c55b0bbff8b066da30b73f6e001",
+      "snapshot": "source-10-f135-exhaust-lut.manifest.json.txt"
+    },
+    {
+      "path": "executed helper bundle",
+      "sha256": "7826da568869e718071736d663f8f4582ade1cd5335eded7ce9166f59c43fcfa",
+      "snapshot": "entry.mjs"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/trace.csv",
+      "sha256": "6c11afe6f6f9abdef19ee4a3265b7c35087b956a37bc03b2c046da70bcf957e2"
+    },
+    {
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-full.glb",
+      "sha256": "0fc8083a3a4d5d5d76946ea3602d4a23ebc508e58301145e489c59c1801ff71f"
+    }
+  ],
+  "changedAfterSnapshot": [],
+  "receiver": {
+    "material": "Ideal neutral Lambertian",
+    "reflectanceLinear": 0.2,
+    "centerMeters": [
+      -2.041297264554487e-8,
+      -2.3516544699999997,
+      0.6194112405007969
+    ],
+    "extentMeters": 6,
+    "placement": "Flat held-stand hypothesis: engine attachment height plus 0.17 m placement clearance. Plane is horizontal in engine-root frame; only pitched/yawed nozzle moves.",
+    "opaquePlane": "Only incident directions with positive world Y contribute. Below-plane gas is excluded even when the free-jet support crosses the receiver."
+  },
+  "integration": {
+    "gas": "Cosine-weighted upper-hemisphere Hammersley quadrature: E_rgb = pi/N sum L_rgb; transfer j/kappa integrated through the full existing signed-path field and truncated by nearest full-engine opaque triangle; internal s<0 and external s>=0 radiance retained separately.",
+    "hardware": "Authored one-sided hot triangle quadrature: E_rgb=sum L_rgb cos(receiver) cos(source) dA/r^2 times full-domain foreground gas transmittance, blocked by any nearer opaque triangle. Core and liner use their own native temperatures.",
+    "gasAndMetalScope": "The existing full field supplies internal and external gas emission and attenuation, including foreground attenuation of metal rays. No new source power, temperatures or dynamics. Ray integration partitions at conservative section bounds, then applies the declared exact circular/annular/seal inverse mapping.",
+    "reflection": "L_deck,rgb = rho E_rgb/pi; no double count of existing runtime PointLight; no ambient/sky/reflected-engine illumination.",
+    "convergence": {
+      "gasDirections": [
+        32768,
+        65536
+      ],
+      "pathSteps": [
+        256,
+        512
+      ],
+      "pathBudgetMeaning": "Total midpoint target distributed by length over the ordered union of intersected section AABBs, rounded up per interval; actual steps exceed target by at most the number of intervals.",
+      "metalSubdivisionLevels": [
+        3,
+        4
+      ],
+      "criteria": {
+        "gasAngular": 0.03,
+        "gasPath": 0.01,
+        "hardwareArea": 0.05,
+        "hardwarePath": 0.01
+      },
+      "failures": [
+        {
+          "case": "hot-shutdown-native-pose",
+          "offsetMeters": [
+            0,
+            0
+          ],
+          "gasAngularRelative": 0,
+          "internalGasAngularRelative": 0,
+          "externalGasAngularRelative": 0,
+          "internalGasPathRelative": 0,
+          "externalGasPathRelative": 0,
+          "gasPathRelative": 0,
+          "hardwareAreaRelative": 0.7439125126931778,
+          "hardwarePathRelative": 0,
+          "imageGasRelative": 0,
+          "imageHardwareRelative": 1
+        },
+        {
+          "case": "hot-shutdown-native-pose",
+          "offsetMeters": [
+            0.5,
+            0
+          ],
+          "gasAngularRelative": 0,
+          "internalGasAngularRelative": 0,
+          "externalGasAngularRelative": 0,
+          "internalGasPathRelative": 0,
+          "externalGasPathRelative": 0,
+          "gasPathRelative": 0,
+          "hardwareAreaRelative": 0.6135359961810157,
+          "hardwarePathRelative": 0,
+          "imageGasRelative": 0,
+          "imageHardwareRelative": 1
+        },
+        {
+          "case": "hot-shutdown-native-pose",
+          "offsetMeters": [
+            1.5,
+            0
+          ],
+          "gasAngularRelative": 0,
+          "internalGasAngularRelative": 0,
+          "externalGasAngularRelative": 0,
+          "internalGasPathRelative": 0,
+          "externalGasPathRelative": 0,
+          "gasPathRelative": 0,
+          "hardwareAreaRelative": 0.46753143886508386,
+          "hardwarePathRelative": 0,
+          "imageGasRelative": 0,
+          "imageHardwareRelative": 1
+        }
+      ]
+    }
+  },
+  "display": {
+    "projection": "Orthographic plan-view radiance map; +x is right, +z is down. Nearest-neighbor display enlargement does not add samples.",
+    "referenceCdM2": 1000,
+    "exposureEV": [
+      8,
+      10
+    ],
+    "mapping": "Linear physical RGB/reference * 2^EV, IEC sRGB encoding, clip to [0,1], black ambient background; no tone mapper, no camera/NIR model.",
+    "images": [
+      {
+        "name": "powered-lift-gas-ev8.png",
+        "case": "powered-lift",
+        "component": "gas",
+        "exposureEV": 8
+      },
+      {
+        "name": "powered-lift-internalGas-ev8.png",
+        "case": "powered-lift",
+        "component": "internalGas",
+        "exposureEV": 8
+      },
+      {
+        "name": "powered-lift-externalGas-ev8.png",
+        "case": "powered-lift",
+        "component": "externalGas",
+        "exposureEV": 8
+      },
+      {
+        "name": "powered-lift-hardware-ev8.png",
+        "case": "powered-lift",
+        "component": "hardware",
+        "exposureEV": 8
+      },
+      {
+        "name": "powered-lift-combined-ev8.png",
+        "case": "powered-lift",
+        "component": "combined",
+        "exposureEV": 8
+      },
+      {
+        "name": "powered-lift-gas-ev10.png",
+        "case": "powered-lift",
+        "component": "gas",
+        "exposureEV": 10
+      },
+      {
+        "name": "powered-lift-internalGas-ev10.png",
+        "case": "powered-lift",
+        "component": "internalGas",
+        "exposureEV": 10
+      },
+      {
+        "name": "powered-lift-externalGas-ev10.png",
+        "case": "powered-lift",
+        "component": "externalGas",
+        "exposureEV": 10
+      },
+      {
+        "name": "powered-lift-hardware-ev10.png",
+        "case": "powered-lift",
+        "component": "hardware",
+        "exposureEV": 10
+      },
+      {
+        "name": "powered-lift-combined-ev10.png",
+        "case": "powered-lift",
+        "component": "combined",
+        "exposureEV": 10
+      },
+      {
+        "name": "hot-shutdown-posed-down-gas-ev8.png",
+        "case": "hot-shutdown-posed-down",
+        "component": "gas",
+        "exposureEV": 8
+      },
+      {
+        "name": "hot-shutdown-posed-down-internalGas-ev8.png",
+        "case": "hot-shutdown-posed-down",
+        "component": "internalGas",
+        "exposureEV": 8
+      },
+      {
+        "name": "hot-shutdown-posed-down-externalGas-ev8.png",
+        "case": "hot-shutdown-posed-down",
+        "component": "externalGas",
+        "exposureEV": 8
+      },
+      {
+        "name": "hot-shutdown-posed-down-hardware-ev8.png",
+        "case": "hot-shutdown-posed-down",
+        "component": "hardware",
+        "exposureEV": 8
+      },
+      {
+        "name": "hot-shutdown-posed-down-combined-ev8.png",
+        "case": "hot-shutdown-posed-down",
+        "component": "combined",
+        "exposureEV": 8
+      },
+      {
+        "name": "hot-shutdown-posed-down-gas-ev10.png",
+        "case": "hot-shutdown-posed-down",
+        "component": "gas",
+        "exposureEV": 10
+      },
+      {
+        "name": "hot-shutdown-posed-down-internalGas-ev10.png",
+        "case": "hot-shutdown-posed-down",
+        "component": "internalGas",
+        "exposureEV": 10
+      },
+      {
+        "name": "hot-shutdown-posed-down-externalGas-ev10.png",
+        "case": "hot-shutdown-posed-down",
+        "component": "externalGas",
+        "exposureEV": 10
+      },
+      {
+        "name": "hot-shutdown-posed-down-hardware-ev10.png",
+        "case": "hot-shutdown-posed-down",
+        "component": "hardware",
+        "exposureEV": 10
+      },
+      {
+        "name": "hot-shutdown-posed-down-combined-ev10.png",
+        "case": "hot-shutdown-posed-down",
+        "component": "combined",
+        "exposureEV": 10
+      }
+    ]
+  },
+  "analyticDisk": {
+    "radiusMeters": 0.4,
+    "heightMeters": 1.176281774525723,
+    "luminanceCdM2": 2,
+    "analyticLux": 0.6512596344619975,
+    "values": [
+      {
+        "sectors": 64,
+        "illuminanceLux": 0.650343865297608,
+        "relativeError": 0.0014061506593234796
+      },
+      {
+        "sectors": 256,
+        "illuminanceLux": 0.6512225745128408,
+        "relativeError": 0.000056905030184073446
+      },
+      {
+        "sectors": 1024,
+        "illuminanceLux": 0.6512775092534345,
+        "relativeError": 0.000027446490602489604
+      }
+    ],
+    "constantHemisphereLux": 6.283185307179586,
+    "hemisphereQuadratureLux": 6.283185307179777
+  },
+  "cases": [
+    {
+      "name": "powered-lift",
+      "native": {
+        "scenario": "powered-lift",
+        "phase": "after-hold",
+        "timeS": 117.5250000000396,
+        "phaseTimeS": 0,
+        "ambientK": 286.4991319989687,
+        "pressurePsf": 2053.2761045974676,
+        "egtC": 729.9781319989688,
+        "gasK": 1003.1281319989688,
+        "thermalValid": 1,
+        "fuelKgSec": 4.420049982197244,
+        "suppliedAbKgSec": 0,
+        "burnedAbKgSec": 0,
+        "n1Pct": 99.3,
+        "n2Pct": 99.6,
+        "nativeRunning": 1,
+        "augmentation": 0,
+        "nozzleNorm": 0.01000000000000012,
+        "nozzlePitchRad": 1.5707963267948966,
+        "nozzleYawRad": 1.829907617578383e-15,
+        "conversion": 1,
+        "throttleCmd": 1,
+        "throttlePosition": 0.99,
+        "coreK": 956.7228132202761,
+        "linerK": 664.0542773824793,
+        "visualRunning": 1,
+        "opticsValid": 1,
+        "radiusM": 0.40161378548650467,
+        "lengthM": 1.2000000000000002,
+        "throatAreaM2": 0.3837808557176592,
+        "exitAreaM2": 0.505376278459852,
+        "absorptionPerM": 0.025,
+        "effectiveVolumeM3": 0.05750901070800853,
+        "fuelPowerW": 191388164.22914067,
+        "particlePowerBoundW": 330.19711437995056,
+        "excitedPowerW": 0,
+        "totalSourcePowerBoundW": 330.19711437995056,
+        "sourceYcdM3": 0.07225058133963451,
+        "continuumYcdM3": 0.07225058133963451,
+        "excitedYcdM3": 0,
+        "sourceRcdM3": 0.3294826063418601,
+        "continuumRcdM3": 0.3294826063418601,
+        "excitedRcdM3": 0,
+        "sourceGcdM3": 0.003079668947644074,
+        "continuumGcdM3": 0.003079668947644074,
+        "excitedGcdM3": 0,
+        "sourceBcdM3": 0,
+        "continuumBcdM3": 0,
+        "excitedBcdM3": 0,
+        "rearAxisEffectivePathM": 0.1554349487816348,
+        "rearAxisRadianceYcdM2": 0.011208473948786117,
+        "rearAxisSceneYAtWhite1000": 0.000011208473948786118,
+        "rearOffsetEffectivePathM": 0.24934040931433413,
+        "rearOffsetRadianceYcdM2": 0.01795895769908881,
+        "rearOffsetSceneYAtWhite1000": 0.00001795895769908881,
+        "sideNearExitEffectivePathM": 0.27392730219705375,
+        "sideNearExitRadianceYcdM2": 0.019723793675489796,
+        "sideNearExitSceneYAtWhite1000": 0.000019723793675489795,
+        "coreEmissionYcdM2": 0.7440404138222306,
+        "linerEmissionYcdM2": 0.000019412325560617317,
+        "flowProxyKgSec": 115.83348372656143,
+        "directionX": -1.829907617578383e-15,
+        "directionY": -1,
+        "directionZ": 6.123233995736766e-17
+      },
+      "poseMeaning": "Actual retained powered-lift pose and thermal observation.",
+      "pitchRad": 1.5707963267948966,
+      "yawRad": 1.829907617578383e-15,
+      "input": {
+        "temperatureKelvin": 1003.1281319989688,
+        "upstreamGasTemperatureKelvin": 1003.1281319989688,
+        "ambientTemperatureKelvin": 286.4991319989687,
+        "ambientPressurePa": 98311.39164626188,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 4.420049982197244,
+        "afterburnerBurnedFuelFlowKgPerSecond": 0,
+        "radiusMeters": 0.40161378548650467,
+        "lengthMeters": 6,
+        "flowDomain": {
+          "axialDistanceRangeMeters": [
+            -2.345961440504734,
+            6
+          ],
+          "sections": [
+            {
+              "distanceMeters": -2.345961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.29,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -2.025961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.26,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.745961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.15,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.675961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.015,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.675961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.595961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.315961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.915311479119447
+            },
+            {
+              "distanceMeters": -1.315961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.835961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.555961440504734,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -0.295671807832921,
+              "radiusMeters": 0.3508379836433799,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 0,
+              "radiusMeters": 0.40161378548650467,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 6,
+              "radiusMeters": 0.8216137854865047,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            }
+          ]
+        },
+        "axialSamples": 64,
+        "radialSamples": 32
+      },
+      "gasEligible": true,
+      "exitMeters": [
+        -2.041297264554487e-8,
+        -1.175372730196659,
+        0.6194112405007969
+      ],
+      "exitHeightMeters": 1.1762817398033407,
+      "deckCenterMeters": [
+        -2.041297264554487e-8,
+        -2.3516544699999997,
+        0.6194112405007969
+      ],
+      "geometry": {
+        "opaqueTriangles": 24024,
+        "hotTriangles": 3056,
+        "coreAreaM2": 1.595058080243904,
+        "linerAreaM2": 9.261320366540865
+      },
+      "emissionRgbCdM2": {
+        "core": [
+          3.499719726351038,
+          0,
+          0
+        ],
+        "liner": [
+          0.00009130915127289424,
+          0,
+          0
+        ]
+      },
+      "sourceExteriorIntensityRgbCd": [
+        0.045206327984252,
+        0.0008451770116917748,
+        0
+      ],
+      "sourceWholeFieldIntensityRgbCd": [
+        0.228445297219251,
+        0.004495686614049559,
+        0
+      ],
+      "wholeFieldUnoccludedPhotopicFluxUpperBoundLumens": 0.6509282466158717,
+      "probes": [
+        {
+          "offsetMeters": [
+            0,
+            0
+          ],
+          "positionMeters": [
+            -2.041297264554487e-8,
+            -2.3516544699999997,
+            0.6194112405007969
+          ],
+          "imageBudget": {
+            "gasRgbLux": [
+              0.16460423034817034,
+              0.0031966018676634882,
+              0
+            ],
+            "internalGasRgbLux": [
+              0.030421045314580602,
+              0.0006062655921518846,
+              0
+            ],
+            "externalGasRgbLux": [
+              0.13418318503358972,
+              0.002590336275511602,
+              0
+            ],
+            "internalGasLux": 0.006903304100094991,
+            "externalGasLux": 0.030389611778502055,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0.000030439713819630887,
+              0,
+              0
+            ],
+            "hardwareRgbLux": [
+              0.000030439713819630887,
+              0,
+              0
+            ],
+            "combinedRgbLux": [
+              0.16463467006198998,
+              0.0031966018676634882,
+              0
+            ],
+            "gasLux": 0.037292915878597045,
+            "coreLux": 0,
+            "linerLux": 0.000006473702213190978,
+            "hardwareLux": 0.000006473702213190978,
+            "combinedLux": 0.03729938958081024,
+            "reflectedRgbCdM2": [
+              0.010480968617867592,
+              0.00020350199533417153,
+              0
+            ],
+            "reflectedLuminanceCdM2": 0.0023745528904385153
+          },
+          "reference": {
+            "gasRgbLux": [
+              0.1646607708074428,
+              0.003197725765580539,
+              0
+            ],
+            "internalGasRgbLux": [
+              0.030477177988853545,
+              0.0006073759919431028,
+              0
+            ],
+            "externalGasRgbLux": [
+              0.1341835928185893,
+              0.002590349773637455,
+              0
+            ],
+            "internalGasLux": 0.006916036103570943,
+            "externalGasLux": 0.030389708156534887,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0.00003006228249510434,
+              0,
+              0
+            ],
+            "gasLux": 0.03730574426010581,
+            "hardwareLux": 0.000006393432798853076,
+            "combinedLux": 0.03731213769290466,
+            "reflectedLuminanceCdM2": 0.002375364460460482
+          },
+          "convergence": {
+            "gasAngularRelative": 0.00003992998274805078,
+            "internalGasAngularRelative": 0.00021545352004886392,
+            "externalGasAngularRelative": 1.5848501399863474e-8,
+            "internalGasPathRelative": 0.000012116181171133138,
+            "externalGasPathRelative": 2.6699051943710925e-7,
+            "gasPathRelative": 0.0000020287005058167585,
+            "hardwareAreaRelative": 0.0034600109265108445,
+            "hardwarePathRelative": 8.5119483156108e-8,
+            "imageGasRelative": 0.0003438714804701004,
+            "imageHardwareRelative": 0.012554978970343052
+          }
+        },
+        {
+          "offsetMeters": [
+            0.5,
+            0
+          ],
+          "positionMeters": [
+            0.49999997958702735,
+            -2.3516544699999997,
+            0.6194112405007969
+          ],
+          "imageBudget": {
+            "gasRgbLux": [
+              0.06042941774113848,
+              0.001166357773097337,
+              0
+            ],
+            "internalGasRgbLux": [
+              0.023366879432351474,
+              0.0004656415314543436,
+              0
+            ],
+            "externalGasRgbLux": [
+              0.037062538308787016,
+              0.0007007162416429918,
+              0
+            ],
+            "internalGasLux": 0.0053025065784594845,
+            "externalGasLux": 0.008383316265277546,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0.000023787290347787152,
+              0,
+              0
+            ],
+            "hardwareRgbLux": [
+              0.000023787290347787152,
+              0,
+              0
+            ],
+            "combinedRgbLux": [
+              0.06045320503148627,
+              0.001166357773097337,
+              0
+            ],
+            "gasLux": 0.013685822843737032,
+            "coreLux": 0,
+            "linerLux": 0.000005058912021405902,
+            "hardwareLux": 0.000005058912021405902,
+            "combinedLux": 0.013690881755758437,
+            "reflectedRgbCdM2": [
+              0.0038485705626035514,
+              0.00007425264200083858,
+              0
+            ],
+            "reflectedLuminanceCdM2": 0.000871588602686241
+          },
+          "reference": {
+            "gasRgbLux": [
+              0.06023957695775627,
+              0.0011626964431519597,
+              0
+            ],
+            "internalGasRgbLux": [
+              0.023168380088013987,
+              0.0004616790560924552,
+              0
+            ],
+            "externalGasRgbLux": [
+              0.03707119686974207,
+              0.000701017387059515,
+              0
+            ],
+            "internalGasLux": 0.0052574573742786325,
+            "externalGasLux": 0.008385373071352831,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0.000023047656488421423,
+              0,
+              0
+            ],
+            "gasLux": 0.013642830445631504,
+            "hardwareLux": 0.000004901611943596401,
+            "combinedLux": 0.0136477320575751,
+            "reflectedLuminanceCdM2": 0.0008688416075827203
+          },
+          "convergence": {
+            "gasAngularRelative": 0.0004558303513883633,
+            "internalGasAngularRelative": 0.0011847646580194853,
+            "externalGasAngularRelative": 0.0000012018790349179324,
+            "internalGasPathRelative": 0.000012625044696706177,
+            "externalGasPathRelative": 9.580307278872515e-7,
+            "gasPathRelative": 0.0000054540793193635585,
+            "hardwareAreaRelative": 0.00341560968834867,
+            "hardwarePathRelative": 1.1324138661359012e-7,
+            "imageGasRelative": 0.0031512814204397335,
+            "imageHardwareRelative": 0.03209149961677451
+          }
+        },
+        {
+          "offsetMeters": [
+            1.5,
+            0
+          ],
+          "positionMeters": [
+            1.4999999795870274,
+            -2.3516544699999997,
+            0.6194112405007969
+          ],
+          "imageBudget": {
+            "gasRgbLux": [
+              0.008371627684205362,
+              0.00016358829138585267,
+              0
+            ],
+            "internalGasRgbLux": [
+              0.002839223271504925,
+              0.00005656856313878691,
+              0
+            ],
+            "externalGasRgbLux": [
+              0.005532404412700442,
+              0.00010701972824706576,
+              0
+            ],
+            "internalGasLux": 0.0006442809792779821,
+            "externalGasLux": 0.0012531278845210909,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0.000004849576549082826,
+              0,
+              0
+            ],
+            "hardwareRgbLux": [
+              0.000004849576549082826,
+              0,
+              0
+            ],
+            "combinedRgbLux": [
+              0.008376477260754444,
+              0.00016358829138585267,
+              0
+            ],
+            "gasLux": 0.0018974088637990722,
+            "coreLux": 0,
+            "linerLux": 0.000001031373508465437,
+            "hardwareLux": 0.000001031373508465437,
+            "combinedLux": 0.0018984402373075375,
+            "reflectedRgbCdM2": [
+              0.0005332631046983716,
+              0.00001041435408240631,
+              0
+            ],
+            "reflectedLuminanceCdM2": 0.00012085845917281818
+          },
+          "reference": {
+            "gasRgbLux": [
+              0.00862136329102988,
+              0.00016836576445408908,
+              0
+            ],
+            "internalGasRgbLux": [
+              0.003110582292768036,
+              0.00006196758433562047,
+              0
+            ],
+            "externalGasRgbLux": [
+              0.005510780998261826,
+              0.00010639818011846823,
+              0
+            ],
+            "internalGasLux": 0.0007058528111579317,
+            "externalGasLux": 0.0012480846687529564,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0.000004831259863779676,
+              0,
+              0
+            ],
+            "gasLux": 0.001953937479910892,
+            "hardwareLux": 0.0000010274780458836286,
+            "combinedLux": 0.0019549649579567755,
+            "reflectedLuminanceCdM2": 0.0001244569346521041
+          },
+          "convergence": {
+            "gasAngularRelative": 0.0034558599537792604,
+            "internalGasAngularRelative": 0.009548627482642916,
+            "externalGasAngularRelative": 0.000010093475030600758,
+            "internalGasPathRelative": 7.990267839379415e-7,
+            "externalGasPathRelative": 0.000001811361616687941,
+            "gasPathRelative": 8.683683009173585e-7,
+            "hardwareAreaRelative": 0.0011934789253201421,
+            "hardwarePathRelative": 8.094386175659375e-9,
+            "imageGasRelative": 0.02893061661031132,
+            "imageHardwareRelative": 0.003791285465820679
+          }
+        },
+        {
+          "offsetMeters": [
+            0,
+            1.5
+          ],
+          "positionMeters": [
+            -2.041297264554487e-8,
+            -2.3516544699999997,
+            2.119411240500797
+          ],
+          "imageBudget": {
+            "gasRgbLux": [
+              0.008926531733095185,
+              0.00017463440197284356,
+              0
+            ],
+            "internalGasRgbLux": [
+              0.0033927738441112483,
+              0.00006759929642525186,
+              0
+            ],
+            "externalGasRgbLux": [
+              0.005533757888983944,
+              0.00010703510554759168,
+              0
+            ],
+            "internalGasLux": 0.000769894838028258,
+            "externalGasLux": 0.0012534267293576858,
+            "coreRgbLux": [
+              0.005391801259454133,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0.000004227211728826221,
+              0,
+              0
+            ],
+            "hardwareRgbLux": [
+              0.00539602847118296,
+              0,
+              0
+            ],
+            "combinedRgbLux": [
+              0.014322560204278145,
+              0.00017463440197284356,
+              0
+            ],
+            "gasLux": 0.0020233215673859423,
+            "coreLux": 0.001146690010071763,
+            "linerLux": 8.99013377283486e-7,
+            "hardwareLux": 0.0011475890234490464,
+            "combinedLux": 0.003170910590834989,
+            "reflectedRgbCdM2": [
+              0.0009118025016968532,
+              0.000011117571323150036,
+              0
+            ],
+            "reflectedLuminanceCdM2": 0.00020186643785353238
+          },
+          "reference": {
+            "gasRgbLux": [
+              0.00914050402750731,
+              0.00017871860901138073,
+              0
+            ],
+            "internalGasRgbLux": [
+              0.003629687421841543,
+              0.00007231977018592728,
+              0
+            ],
+            "externalGasRgbLux": [
+              0.0055108166056657805,
+              0.0001063988388254536,
+              0
+            ],
+            "internalGasLux": 0.0008236557928485245,
+            "externalGasLux": 0.0012480927125585665,
+            "coreRgbLux": [
+              0.00542817587607735,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0.000004200434345186234,
+              0,
+              0
+            ],
+            "gasLux": 0.002071748505407088,
+            "hardwareLux": 0.001155319223828861,
+            "combinedLux": 0.003227067729235949,
+            "reflectedLuminanceCdM2": 0.00020544151232009577
+          },
+          "convergence": {
+            "gasAngularRelative": 0.009733895756183792,
+            "internalGasAngularRelative": 0.024478107658323634,
+            "externalGasAngularRelative": 0.0000036425497591190213,
+            "internalGasPathRelative": 0.000005409082860141407,
+            "externalGasPathRelative": 0.000003037267495898571,
+            "gasPathRelative": 3.2071026132714235e-7,
+            "hardwareAreaRelative": 0.006274915754136268,
+            "hardwarePathRelative": 2.652270827186954e-7,
+            "imageGasRelative": 0.023374911527511977,
+            "imageHardwareRelative": 0.006690964904224314
+          }
+        }
+      ],
+      "map": {
+        "csv": "powered-lift.csv",
+        "samples": 289,
+        "peakGasLux": 0.037292915878597045,
+        "peakHardwareLux": 0.005851376947738841,
+        "peakCombinedLux": 0.03729938958081024,
+        "peakReflectedLuminanceCdM2": 0.0023745528904385153
+      }
+    },
+    {
+      "name": "hot-shutdown-posed-down",
+      "native": {
+        "scenario": "cold-cycle",
+        "phase": "cooling",
+        "timeS": 394.9999999998051,
+        "phaseTimeS": 1.4833333333333334,
+        "ambientK": 286.49913199919746,
+        "pressurePsf": 2053.276104606083,
+        "egtC": 711.8497986658638,
+        "gasK": 984.9997986658638,
+        "thermalValid": 1,
+        "fuelKgSec": 0,
+        "suppliedAbKgSec": 0,
+        "burnedAbKgSec": 0,
+        "n1Pct": 28.61367901520636,
+        "n2Pct": 28.70012517537307,
+        "nativeRunning": 0,
+        "augmentation": 0,
+        "nozzleNorm": 1,
+        "nozzlePitchRad": 0,
+        "nozzleYawRad": 0,
+        "conversion": 0,
+        "throttleCmd": 0,
+        "throttlePosition": 0,
+        "coreK": 945.962211560159,
+        "linerK": 660.3664718127261,
+        "visualRunning": 0,
+        "opticsValid": 0,
+        "radiusM": 0.565,
+        "lengthM": 1.2000000000000002,
+        "throatAreaM2": 0.6081944545000423,
+        "exitAreaM2": 1.0080083129331545,
+        "absorptionPerM": 0,
+        "effectiveVolumeM3": 0,
+        "fuelPowerW": 0,
+        "particlePowerBoundW": 0,
+        "excitedPowerW": 0,
+        "totalSourcePowerBoundW": 0,
+        "sourceYcdM3": 0,
+        "continuumYcdM3": 0,
+        "excitedYcdM3": 0,
+        "sourceRcdM3": 0,
+        "continuumRcdM3": 0,
+        "excitedRcdM3": 0,
+        "sourceGcdM3": 0,
+        "continuumGcdM3": 0,
+        "excitedGcdM3": 0,
+        "sourceBcdM3": 0,
+        "continuumBcdM3": 0,
+        "excitedBcdM3": 0,
+        "rearAxisEffectivePathM": 0.1554349487816348,
+        "rearAxisRadianceYcdM2": 0,
+        "rearAxisSceneYAtWhite1000": 0,
+        "rearOffsetEffectivePathM": 0.24934040931433413,
+        "rearOffsetRadianceYcdM2": 0,
+        "rearOffsetSceneYAtWhite1000": 0,
+        "sideNearExitEffectivePathM": 0.38536756290338053,
+        "sideNearExitRadianceYcdM2": 0,
+        "sideNearExitSceneYAtWhite1000": 0,
+        "coreEmissionYcdM2": 0.5634765132034396,
+        "linerEmissionYcdM2": 0.000016072455891661127,
+        "flowProxyKgSec": 9.617961251046571,
+        "directionX": 0,
+        "directionY": 0,
+        "directionZ": 1
+      },
+      "poseMeaning": "Counterfactual fixed 90-degree pose with actual zero-fuel hot-shutdown thermal observation; not a native powered-lift shutdown trajectory.",
+      "pitchRad": 1.5707963267948966,
+      "yawRad": 0,
+      "input": {
+        "temperatureKelvin": 984.9997986658638,
+        "upstreamGasTemperatureKelvin": 984.9997986658638,
+        "ambientTemperatureKelvin": 286.49913199919746,
+        "ambientPressurePa": 98311.3916466744,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0,
+        "afterburnerBurnedFuelFlowKgPerSecond": 0,
+        "radiusMeters": 0.565,
+        "lengthMeters": 6,
+        "flowDomain": {
+          "axialDistanceRangeMeters": [
+            -2.356656571999874,
+            6
+          ],
+          "sections": [
+            {
+              "distanceMeters": -2.356656571999874,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.29,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -2.0366565719998744,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.26,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.7566565719998741,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.15,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6866565719998743,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.015,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6866565719998743,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6066565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.3266565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.915311479119447
+            },
+            {
+              "distanceMeters": -1.3266565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.8466565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.5666565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -0.272717802865893,
+              "radiusMeters": 0.44,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 0,
+              "radiusMeters": 0.565,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 6,
+              "radiusMeters": 0.985,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            }
+          ]
+        },
+        "axialSamples": 64,
+        "radialSamples": 32
+      },
+      "gasEligible": false,
+      "exitMeters": [
+        -2.041297264554487e-8,
+        -1.1860678616917992,
+        0.6194112407011236
+      ],
+      "exitHeightMeters": 1.1655866083082005,
+      "deckCenterMeters": [
+        -2.041297264554487e-8,
+        -2.3516544699999997,
+        0.6194112405007969
+      ],
+      "geometry": {
+        "opaqueTriangles": 24024,
+        "hotTriangles": 3056,
+        "coreAreaM2": 1.595058080243904,
+        "linerAreaM2": 9.261320355912318
+      },
+      "emissionRgbCdM2": {
+        "core": [
+          2.6504069294611456,
+          0,
+          0
+        ],
+        "liner": [
+          0.00007559951030884819,
+          0,
+          0
+        ]
+      },
+      "sourceExteriorIntensityRgbCd": [
+        0,
+        0,
+        0
+      ],
+      "sourceWholeFieldIntensityRgbCd": [
+        0,
+        0,
+        0
+      ],
+      "wholeFieldUnoccludedPhotopicFluxUpperBoundLumens": 0,
+      "probes": [
+        {
+          "offsetMeters": [
+            0,
+            0
+          ],
+          "positionMeters": [
+            -2.041297264554487e-8,
+            -2.3516544699999997,
+            0.6194112405007969
+          ],
+          "imageBudget": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0.0000494665185536966,
+              0,
+              0
+            ],
+            "hardwareRgbLux": [
+              0.0000494665185536966,
+              0,
+              0
+            ],
+            "combinedRgbLux": [
+              0.0000494665185536966,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "coreLux": 0,
+            "linerLux": 0.000010520187953718462,
+            "hardwareLux": 0.000010520187953718462,
+            "combinedLux": 0.000010520187953718462,
+            "reflectedRgbCdM2": [
+              0.000003149136378147107,
+              0,
+              0
+            ],
+            "reflectedLuminanceCdM2": 6.697359660360419e-7
+          },
+          "reference": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0.00004588802861287627,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "hardwareLux": 0.000009759140120383372,
+            "combinedLux": 0.000009759140120383372,
+            "reflectedLuminanceCdM2": 6.212861561941793e-7
+          },
+          "convergence": {
+            "gasAngularRelative": 0,
+            "internalGasAngularRelative": 0,
+            "externalGasAngularRelative": 0,
+            "internalGasPathRelative": 0,
+            "externalGasPathRelative": 0,
+            "gasPathRelative": 0,
+            "hardwareAreaRelative": 0.003654625725346618,
+            "hardwarePathRelative": 0,
+            "imageGasRelative": 0,
+            "imageHardwareRelative": 0.07798308293017861
+          }
+        },
+        {
+          "offsetMeters": [
+            0.5,
+            0
+          ],
+          "positionMeters": [
+            0.49999997958702735,
+            -2.3516544699999997,
+            0.6194112405007969
+          ],
+          "imageBudget": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0.00003915771613967346,
+              0,
+              0
+            ],
+            "hardwareRgbLux": [
+              0.00003915771613967346,
+              0,
+              0
+            ],
+            "combinedRgbLux": [
+              0.00003915771613967346,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "coreLux": 0,
+            "linerLux": 0.00000832778504880116,
+            "hardwareLux": 0.00000832778504880116,
+            "combinedLux": 0.00000832778504880116,
+            "reflectedRgbCdM2": [
+              0.0000024928576335273282,
+              0,
+              0
+            ],
+            "reflectedLuminanceCdM2": 5.301632622093942e-7
+          },
+          "reference": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0.00003628657693445446,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "hardwareLux": 0.00000771717154772354,
+            "combinedLux": 0.00000771717154772354,
+            "reflectedLuminanceCdM2": 4.912903994033337e-7
+          },
+          "convergence": {
+            "gasAngularRelative": 0,
+            "internalGasAngularRelative": 0,
+            "externalGasAngularRelative": 0,
+            "internalGasPathRelative": 0,
+            "externalGasPathRelative": 0,
+            "gasPathRelative": 0,
+            "hardwareAreaRelative": 0.004357685075250245,
+            "hardwarePathRelative": 0,
+            "imageGasRelative": 0,
+            "imageHardwareRelative": 0.07912400253143814
+          }
+        },
+        {
+          "offsetMeters": [
+            1.5,
+            0
+          ],
+          "positionMeters": [
+            1.4999999795870274,
+            -2.3516544699999997,
+            0.6194112405007969
+          ],
+          "imageBudget": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0.000009248897828640654,
+              0,
+              0
+            ],
+            "hardwareRgbLux": [
+              0.000009248897828640654,
+              0,
+              0
+            ],
+            "combinedRgbLux": [
+              0.000009248897828640654,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "coreLux": 0,
+            "linerLux": 0.0000019669899230207107,
+            "hardwareLux": 0.0000019669899230207107,
+            "combinedLux": 0.0000019669899230207107,
+            "reflectedRgbCdM2": [
+              5.88803123032023e-7,
+              0,
+              0
+            ],
+            "reflectedLuminanceCdM2": 1.2522246770427715e-7
+          },
+          "reference": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0.000008520244361193635,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "hardwareLux": 0.0000018120250770036977,
+            "combinedLux": 0.0000018120250770036977,
+            "reflectedLuminanceCdM2": 1.1535709920464432e-7
+          },
+          "convergence": {
+            "gasAngularRelative": 0,
+            "internalGasAngularRelative": 0,
+            "externalGasAngularRelative": 0,
+            "internalGasPathRelative": 0,
+            "externalGasPathRelative": 0,
+            "gasPathRelative": 0,
+            "hardwareAreaRelative": 0.0042056497970280205,
+            "hardwarePathRelative": 0,
+            "imageGasRelative": 0,
+            "imageHardwareRelative": 0.08552025464970803
+          }
+        },
+        {
+          "offsetMeters": [
+            0,
+            1.5
+          ],
+          "positionMeters": [
+            -2.041297264554487e-8,
+            -2.3516544699999997,
+            2.119411240500797
+          ],
+          "imageBudget": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0.024132726641273496,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0.000007729558636457544,
+              0,
+              0
+            ],
+            "hardwareRgbLux": [
+              0.024140456199909954,
+              0,
+              0
+            ],
+            "combinedRgbLux": [
+              0.024140456199909954,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "coreLux": 0.005132376959706894,
+            "linerLux": 0.0000016438676509354717,
+            "hardwareLux": 0.005134020827357829,
+            "combinedLux": 0.005134020827357829,
+            "reflectedRgbCdM2": [
+              0.0015368291730836242,
+              0,
+              0
+            ],
+            "reflectedLuminanceCdM2": 0.00032684191704429637
+          },
+          "reference": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0.024311428199694674,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0.000007318019624575945,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "hardwareLux": 0.005171938282826661,
+            "combinedLux": 0.005171938282826661,
+            "reflectedLuminanceCdM2": 0.00032925581723122885
+          },
+          "convergence": {
+            "gasAngularRelative": 0,
+            "internalGasAngularRelative": 0,
+            "externalGasAngularRelative": 0,
+            "internalGasPathRelative": 0,
+            "externalGasPathRelative": 0,
+            "gasPathRelative": 0,
+            "hardwareAreaRelative": 0.0016524907324693657,
+            "hardwarePathRelative": 0,
+            "imageGasRelative": 0,
+            "imageHardwareRelative": 0.007331382045825165
+          }
+        }
+      ],
+      "map": {
+        "csv": "hot-shutdown-posed-down.csv",
+        "samples": 289,
+        "peakGasLux": 0,
+        "peakHardwareLux": 0.005134020827357829,
+        "peakCombinedLux": 0.005134020827357829,
+        "peakReflectedLuminanceCdM2": 0.00032684191704429637
+      }
+    },
+    {
+      "name": "hot-shutdown-native-pose",
+      "native": {
+        "scenario": "cold-cycle",
+        "phase": "cooling",
+        "timeS": 394.9999999998051,
+        "phaseTimeS": 1.4833333333333334,
+        "ambientK": 286.49913199919746,
+        "pressurePsf": 2053.276104606083,
+        "egtC": 711.8497986658638,
+        "gasK": 984.9997986658638,
+        "thermalValid": 1,
+        "fuelKgSec": 0,
+        "suppliedAbKgSec": 0,
+        "burnedAbKgSec": 0,
+        "n1Pct": 28.61367901520636,
+        "n2Pct": 28.70012517537307,
+        "nativeRunning": 0,
+        "augmentation": 0,
+        "nozzleNorm": 1,
+        "nozzlePitchRad": 0,
+        "nozzleYawRad": 0,
+        "conversion": 0,
+        "throttleCmd": 0,
+        "throttlePosition": 0,
+        "coreK": 945.962211560159,
+        "linerK": 660.3664718127261,
+        "visualRunning": 0,
+        "opticsValid": 0,
+        "radiusM": 0.565,
+        "lengthM": 1.2000000000000002,
+        "throatAreaM2": 0.6081944545000423,
+        "exitAreaM2": 1.0080083129331545,
+        "absorptionPerM": 0,
+        "effectiveVolumeM3": 0,
+        "fuelPowerW": 0,
+        "particlePowerBoundW": 0,
+        "excitedPowerW": 0,
+        "totalSourcePowerBoundW": 0,
+        "sourceYcdM3": 0,
+        "continuumYcdM3": 0,
+        "excitedYcdM3": 0,
+        "sourceRcdM3": 0,
+        "continuumRcdM3": 0,
+        "excitedRcdM3": 0,
+        "sourceGcdM3": 0,
+        "continuumGcdM3": 0,
+        "excitedGcdM3": 0,
+        "sourceBcdM3": 0,
+        "continuumBcdM3": 0,
+        "excitedBcdM3": 0,
+        "rearAxisEffectivePathM": 0.1554349487816348,
+        "rearAxisRadianceYcdM2": 0,
+        "rearAxisSceneYAtWhite1000": 0,
+        "rearOffsetEffectivePathM": 0.24934040931433413,
+        "rearOffsetRadianceYcdM2": 0,
+        "rearOffsetSceneYAtWhite1000": 0,
+        "sideNearExitEffectivePathM": 0.38536756290338053,
+        "sideNearExitRadianceYcdM2": 0,
+        "sideNearExitSceneYAtWhite1000": 0,
+        "coreEmissionYcdM2": 0.5634765132034396,
+        "linerEmissionYcdM2": 0.000016072455891661127,
+        "flowProxyKgSec": 9.617961251046571,
+        "directionX": 0,
+        "directionY": 0,
+        "directionZ": 1
+      },
+      "poseMeaning": "Actual horizontal native hot-shutdown pose.",
+      "pitchRad": 0,
+      "yawRad": 0,
+      "input": {
+        "temperatureKelvin": 984.9997986658638,
+        "upstreamGasTemperatureKelvin": 984.9997986658638,
+        "ambientTemperatureKelvin": 286.49913199919746,
+        "ambientPressurePa": 98311.3916466744,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0,
+        "afterburnerBurnedFuelFlowKgPerSecond": 0,
+        "radiusMeters": 0.565,
+        "lengthMeters": 6,
+        "flowDomain": {
+          "axialDistanceRangeMeters": [
+            -2.356656571999874,
+            6
+          ],
+          "sections": [
+            {
+              "distanceMeters": -2.356656571999874,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.29,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -2.0366565719998744,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.26,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.7566565719998741,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.15,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6866565719998743,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.015,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6866565719998743,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6066565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.3266565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.915311479119447
+            },
+            {
+              "distanceMeters": -1.3266565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.8466565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.5666565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -0.272717802865893,
+              "radiusMeters": 0.44,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 0,
+              "radiusMeters": 0.565,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 6,
+              "radiusMeters": 0.985,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            }
+          ]
+        },
+        "axialSamples": 64,
+        "radialSamples": 32
+      },
+      "gasEligible": false,
+      "exitMeters": [
+        -1.7416823538951576e-10,
+        0,
+        1.6066565000775377
+      ],
+      "exitHeightMeters": 2.3516544699999997,
+      "deckCenterMeters": [
+        -2.041297264554487e-8,
+        -2.3516544699999997,
+        0.6194112405007969
+      ],
+      "geometry": {
+        "opaqueTriangles": 24024,
+        "hotTriangles": 3056,
+        "coreAreaM2": 1.595058080243904,
+        "linerAreaM2": 9.261320103559708
+      },
+      "emissionRgbCdM2": {
+        "core": [
+          2.6504069294611456,
+          0,
+          0
+        ],
+        "liner": [
+          0.00007559951030884819,
+          0,
+          0
+        ]
+      },
+      "sourceExteriorIntensityRgbCd": [
+        0,
+        0,
+        0
+      ],
+      "sourceWholeFieldIntensityRgbCd": [
+        0,
+        0,
+        0
+      ],
+      "wholeFieldUnoccludedPhotopicFluxUpperBoundLumens": 0,
+      "probes": [
+        {
+          "offsetMeters": [
+            0,
+            0
+          ],
+          "positionMeters": [
+            -2.041297264554487e-8,
+            -2.3516544699999997,
+            0.6194112405007969
+          ],
+          "imageBudget": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "hardwareRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "combinedRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "coreLux": 0,
+            "linerLux": 0,
+            "hardwareLux": 0,
+            "combinedLux": 0,
+            "reflectedRgbCdM2": [
+              0,
+              0,
+              0
+            ],
+            "reflectedLuminanceCdM2": 0
+          },
+          "reference": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              4.266626649243545e-8,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "hardwareLux": 9.073958627119074e-9,
+            "combinedLux": 9.073958627119074e-9,
+            "reflectedLuminanceCdM2": 5.776661475669397e-10
+          },
+          "convergence": {
+            "gasAngularRelative": 0,
+            "internalGasAngularRelative": 0,
+            "externalGasAngularRelative": 0,
+            "internalGasPathRelative": 0,
+            "externalGasPathRelative": 0,
+            "gasPathRelative": 0,
+            "hardwareAreaRelative": 0.7439125126931778,
+            "hardwarePathRelative": 0,
+            "imageGasRelative": 0,
+            "imageHardwareRelative": 1
+          }
+        },
+        {
+          "offsetMeters": [
+            0.5,
+            0
+          ],
+          "positionMeters": [
+            0.49999997958702735,
+            -2.3516544699999997,
+            0.6194112405007969
+          ],
+          "imageBudget": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "hardwareRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "combinedRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "coreLux": 0,
+            "linerLux": 0,
+            "hardwareLux": 0,
+            "combinedLux": 0,
+            "reflectedRgbCdM2": [
+              0,
+              0,
+              0
+            ],
+            "reflectedLuminanceCdM2": 0
+          },
+          "reference": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              4.498978605378123e-8,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "hardwareLux": 9.56810827043721e-9,
+            "combinedLux": 9.56810827043721e-9,
+            "reflectedLuminanceCdM2": 6.09124690911411e-10
+          },
+          "convergence": {
+            "gasAngularRelative": 0,
+            "internalGasAngularRelative": 0,
+            "externalGasAngularRelative": 0,
+            "internalGasPathRelative": 0,
+            "externalGasPathRelative": 0,
+            "gasPathRelative": 0,
+            "hardwareAreaRelative": 0.6135359961810157,
+            "hardwarePathRelative": 0,
+            "imageGasRelative": 0,
+            "imageHardwareRelative": 1
+          }
+        },
+        {
+          "offsetMeters": [
+            1.5,
+            0
+          ],
+          "positionMeters": [
+            1.4999999795870274,
+            -2.3516544699999997,
+            0.6194112405007969
+          ],
+          "imageBudget": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "hardwareRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "combinedRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "coreLux": 0,
+            "linerLux": 0,
+            "hardwareLux": 0,
+            "combinedLux": 0,
+            "reflectedRgbCdM2": [
+              0,
+              0,
+              0
+            ],
+            "reflectedLuminanceCdM2": 0
+          },
+          "reference": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              1.613793522383104e-8,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "hardwareLux": 3.4321014840642967e-9,
+            "combinedLux": 3.4321014840642967e-9,
+            "reflectedLuminanceCdM2": 2.1849436655274508e-10
+          },
+          "convergence": {
+            "gasAngularRelative": 0,
+            "internalGasAngularRelative": 0,
+            "externalGasAngularRelative": 0,
+            "internalGasPathRelative": 0,
+            "externalGasPathRelative": 0,
+            "gasPathRelative": 0,
+            "hardwareAreaRelative": 0.46753143886508386,
+            "hardwarePathRelative": 0,
+            "imageGasRelative": 0,
+            "imageHardwareRelative": 1
+          }
+        },
+        {
+          "offsetMeters": [
+            0,
+            1.5
+          ],
+          "positionMeters": [
+            -2.041297264554487e-8,
+            -2.3516544699999997,
+            2.119411240500797
+          ],
+          "imageBudget": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0.000002745288745989398,
+              0,
+              0
+            ],
+            "hardwareRgbLux": [
+              0.000002745288745989398,
+              0,
+              0
+            ],
+            "combinedRgbLux": [
+              0.000002745288745989398,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "coreLux": 0,
+            "linerLux": 5.838485189469286e-7,
+            "hardwareLux": 5.838485189469286e-7,
+            "combinedLux": 5.838485189469286e-7,
+            "reflectedRgbCdM2": [
+              1.7477050965550534e-7,
+              0,
+              0
+            ],
+            "reflectedLuminanceCdM2": 3.716895112291432e-8
+          },
+          "reference": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0.0000024047768806065237,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "hardwareLux": 5.114308730515432e-7,
+            "combinedLux": 5.114308730515432e-7,
+            "reflectedLuminanceCdM2": 3.2558700598382684e-8
+          },
+          "convergence": {
+            "gasAngularRelative": 0,
+            "internalGasAngularRelative": 0,
+            "externalGasAngularRelative": 0,
+            "internalGasPathRelative": 0,
+            "externalGasPathRelative": 0,
+            "gasPathRelative": 0,
+            "hardwareAreaRelative": 0.013807760017633198,
+            "hardwarePathRelative": 0,
+            "imageGasRelative": 0,
+            "imageHardwareRelative": 0.14159811171213157
+          }
+        }
+      ],
+      "map": null
+    },
+    {
+      "name": "cold-posed-down",
+      "native": {
+        "scenario": "cold-cycle",
+        "phase": "initial-zero-time",
+        "timeS": 0,
+        "phaseTimeS": 0,
+        "ambientK": 286.49913199972883,
+        "pressurePsf": 2053.276104626099,
+        "egtC": 14.999999999999968,
+        "gasK": 288.1499999999999,
+        "thermalValid": 1,
+        "fuelKgSec": 0,
+        "suppliedAbKgSec": 0,
+        "burnedAbKgSec": 0,
+        "n1Pct": 0,
+        "n2Pct": 0,
+        "nativeRunning": 0,
+        "augmentation": 0,
+        "nozzleNorm": 1,
+        "nozzlePitchRad": 0,
+        "nozzleYawRad": 0,
+        "conversion": 0,
+        "throttleCmd": 0,
+        "throttlePosition": 0,
+        "coreK": 288.1499999999999,
+        "linerK": 288.1499999999999,
+        "visualRunning": 0,
+        "opticsValid": 0,
+        "radiusM": 0.565,
+        "lengthM": 1.2000000000000002,
+        "throatAreaM2": 0.6081944545000423,
+        "exitAreaM2": 1.0080083129331545,
+        "absorptionPerM": 0,
+        "effectiveVolumeM3": 0,
+        "fuelPowerW": 0,
+        "particlePowerBoundW": 0,
+        "excitedPowerW": 0,
+        "totalSourcePowerBoundW": 0,
+        "sourceYcdM3": 0,
+        "continuumYcdM3": 0,
+        "excitedYcdM3": 0,
+        "sourceRcdM3": 0,
+        "continuumRcdM3": 0,
+        "excitedRcdM3": 0,
+        "sourceGcdM3": 0,
+        "continuumGcdM3": 0,
+        "excitedGcdM3": 0,
+        "sourceBcdM3": 0,
+        "continuumBcdM3": 0,
+        "excitedBcdM3": 0,
+        "rearAxisEffectivePathM": 0.1554349487816348,
+        "rearAxisRadianceYcdM2": 0,
+        "rearAxisSceneYAtWhite1000": 0,
+        "rearOffsetEffectivePathM": 0.24934040931433413,
+        "rearOffsetRadianceYcdM2": 0,
+        "rearOffsetSceneYAtWhite1000": 0,
+        "sideNearExitEffectivePathM": 0.38536756290338053,
+        "sideNearExitRadianceYcdM2": 0,
+        "sideNearExitSceneYAtWhite1000": 0,
+        "coreEmissionYcdM2": 0,
+        "linerEmissionYcdM2": 0,
+        "flowProxyKgSec": 0,
+        "directionX": 0,
+        "directionY": 0,
+        "directionZ": 1
+      },
+      "poseMeaning": "Counterfactual cold 90-degree pose, unchanged cold temperatures and zero fuel.",
+      "pitchRad": 1.5707963267948966,
+      "yawRad": 0,
+      "input": {
+        "temperatureKelvin": 288.1499999999999,
+        "upstreamGasTemperatureKelvin": 288.1499999999999,
+        "ambientTemperatureKelvin": 286.49913199972883,
+        "ambientPressurePa": 98311.39164763276,
+        "augmentation": false,
+        "fuelFlowKgPerSecond": 0,
+        "afterburnerBurnedFuelFlowKgPerSecond": 0,
+        "radiusMeters": 0.565,
+        "lengthMeters": 6,
+        "flowDomain": {
+          "axialDistanceRangeMeters": [
+            -2.356656571999874,
+            6
+          ],
+          "sections": [
+            {
+              "distanceMeters": -2.356656571999874,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.29,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -2.0366565719998744,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.26,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.7566565719998741,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.15,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6866565719998743,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0.015,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6866565719998743,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.6066565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -1.3266565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.915311479119447
+            },
+            {
+              "distanceMeters": -1.3266565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.8466565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 0.9153114791194472
+            },
+            {
+              "distanceMeters": -0.5666565719998742,
+              "radiusMeters": 0.5,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": -0.272717802865893,
+              "radiusMeters": 0.44,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 0,
+              "radiusMeters": 0.565,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            },
+            {
+              "distanceMeters": 6,
+              "radiusMeters": 0.985,
+              "innerRadiusMeters": 0,
+              "areaFactor": 1
+            }
+          ]
+        },
+        "axialSamples": 64,
+        "radialSamples": 32
+      },
+      "gasEligible": false,
+      "exitMeters": [
+        -2.041297264554487e-8,
+        -1.1860678616917992,
+        0.6194112407011236
+      ],
+      "exitHeightMeters": 1.1655866083082005,
+      "deckCenterMeters": [
+        -2.041297264554487e-8,
+        -2.3516544699999997,
+        0.6194112405007969
+      ],
+      "geometry": {
+        "opaqueTriangles": 24024,
+        "hotTriangles": 3056,
+        "coreAreaM2": 1.595058080243904,
+        "linerAreaM2": 9.261320355912318
+      },
+      "emissionRgbCdM2": {
+        "core": [
+          0,
+          0,
+          0
+        ],
+        "liner": [
+          0,
+          0,
+          0
+        ]
+      },
+      "sourceExteriorIntensityRgbCd": [
+        0,
+        0,
+        0
+      ],
+      "sourceWholeFieldIntensityRgbCd": [
+        0,
+        0,
+        0
+      ],
+      "wholeFieldUnoccludedPhotopicFluxUpperBoundLumens": 0,
+      "probes": [
+        {
+          "offsetMeters": [
+            0,
+            0
+          ],
+          "positionMeters": [
+            -2.041297264554487e-8,
+            -2.3516544699999997,
+            0.6194112405007969
+          ],
+          "imageBudget": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "hardwareRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "combinedRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "coreLux": 0,
+            "linerLux": 0,
+            "hardwareLux": 0,
+            "combinedLux": 0,
+            "reflectedRgbCdM2": [
+              0,
+              0,
+              0
+            ],
+            "reflectedLuminanceCdM2": 0
+          },
+          "reference": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "hardwareLux": 0,
+            "combinedLux": 0,
+            "reflectedLuminanceCdM2": 0
+          },
+          "convergence": {
+            "gasAngularRelative": 0,
+            "internalGasAngularRelative": 0,
+            "externalGasAngularRelative": 0,
+            "internalGasPathRelative": 0,
+            "externalGasPathRelative": 0,
+            "gasPathRelative": 0,
+            "hardwareAreaRelative": 0,
+            "hardwarePathRelative": 0,
+            "imageGasRelative": 0,
+            "imageHardwareRelative": 0
+          }
+        },
+        {
+          "offsetMeters": [
+            0.5,
+            0
+          ],
+          "positionMeters": [
+            0.49999997958702735,
+            -2.3516544699999997,
+            0.6194112405007969
+          ],
+          "imageBudget": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "hardwareRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "combinedRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "coreLux": 0,
+            "linerLux": 0,
+            "hardwareLux": 0,
+            "combinedLux": 0,
+            "reflectedRgbCdM2": [
+              0,
+              0,
+              0
+            ],
+            "reflectedLuminanceCdM2": 0
+          },
+          "reference": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "hardwareLux": 0,
+            "combinedLux": 0,
+            "reflectedLuminanceCdM2": 0
+          },
+          "convergence": {
+            "gasAngularRelative": 0,
+            "internalGasAngularRelative": 0,
+            "externalGasAngularRelative": 0,
+            "internalGasPathRelative": 0,
+            "externalGasPathRelative": 0,
+            "gasPathRelative": 0,
+            "hardwareAreaRelative": 0,
+            "hardwarePathRelative": 0,
+            "imageGasRelative": 0,
+            "imageHardwareRelative": 0
+          }
+        },
+        {
+          "offsetMeters": [
+            1.5,
+            0
+          ],
+          "positionMeters": [
+            1.4999999795870274,
+            -2.3516544699999997,
+            0.6194112405007969
+          ],
+          "imageBudget": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "hardwareRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "combinedRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "coreLux": 0,
+            "linerLux": 0,
+            "hardwareLux": 0,
+            "combinedLux": 0,
+            "reflectedRgbCdM2": [
+              0,
+              0,
+              0
+            ],
+            "reflectedLuminanceCdM2": 0
+          },
+          "reference": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "hardwareLux": 0,
+            "combinedLux": 0,
+            "reflectedLuminanceCdM2": 0
+          },
+          "convergence": {
+            "gasAngularRelative": 0,
+            "internalGasAngularRelative": 0,
+            "externalGasAngularRelative": 0,
+            "internalGasPathRelative": 0,
+            "externalGasPathRelative": 0,
+            "gasPathRelative": 0,
+            "hardwareAreaRelative": 0,
+            "hardwarePathRelative": 0,
+            "imageGasRelative": 0,
+            "imageHardwareRelative": 0
+          }
+        },
+        {
+          "offsetMeters": [
+            0,
+            1.5
+          ],
+          "positionMeters": [
+            -2.041297264554487e-8,
+            -2.3516544699999997,
+            2.119411240500797
+          ],
+          "imageBudget": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "hardwareRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "combinedRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "coreLux": 0,
+            "linerLux": 0,
+            "hardwareLux": 0,
+            "combinedLux": 0,
+            "reflectedRgbCdM2": [
+              0,
+              0,
+              0
+            ],
+            "reflectedLuminanceCdM2": 0
+          },
+          "reference": {
+            "gasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "externalGasRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "internalGasLux": 0,
+            "externalGasLux": 0,
+            "coreRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "linerRgbLux": [
+              0,
+              0,
+              0
+            ],
+            "gasLux": 0,
+            "hardwareLux": 0,
+            "combinedLux": 0,
+            "reflectedLuminanceCdM2": 0
+          },
+          "convergence": {
+            "gasAngularRelative": 0,
+            "internalGasAngularRelative": 0,
+            "externalGasAngularRelative": 0,
+            "internalGasPathRelative": 0,
+            "externalGasPathRelative": 0,
+            "gasPathRelative": 0,
+            "hardwareAreaRelative": 0,
+            "hardwarePathRelative": 0,
+            "imageGasRelative": 0,
+            "imageHardwareRelative": 0
+          }
+        }
+      ],
+      "map": null
+    }
+  ],
+  "convergence": [
+    {
+      "case": "powered-lift",
+      "offsetMeters": [
+        0,
+        0
+      ],
+      "gasAngularRelative": 0.00003992998274805078,
+      "internalGasAngularRelative": 0.00021545352004886392,
+      "externalGasAngularRelative": 1.5848501399863474e-8,
+      "internalGasPathRelative": 0.000012116181171133138,
+      "externalGasPathRelative": 2.6699051943710925e-7,
+      "gasPathRelative": 0.0000020287005058167585,
+      "hardwareAreaRelative": 0.0034600109265108445,
+      "hardwarePathRelative": 8.5119483156108e-8,
+      "imageGasRelative": 0.0003438714804701004,
+      "imageHardwareRelative": 0.012554978970343052
+    },
+    {
+      "case": "powered-lift",
+      "offsetMeters": [
+        0.5,
+        0
+      ],
+      "gasAngularRelative": 0.0004558303513883633,
+      "internalGasAngularRelative": 0.0011847646580194853,
+      "externalGasAngularRelative": 0.0000012018790349179324,
+      "internalGasPathRelative": 0.000012625044696706177,
+      "externalGasPathRelative": 9.580307278872515e-7,
+      "gasPathRelative": 0.0000054540793193635585,
+      "hardwareAreaRelative": 0.00341560968834867,
+      "hardwarePathRelative": 1.1324138661359012e-7,
+      "imageGasRelative": 0.0031512814204397335,
+      "imageHardwareRelative": 0.03209149961677451
+    },
+    {
+      "case": "powered-lift",
+      "offsetMeters": [
+        1.5,
+        0
+      ],
+      "gasAngularRelative": 0.0034558599537792604,
+      "internalGasAngularRelative": 0.009548627482642916,
+      "externalGasAngularRelative": 0.000010093475030600758,
+      "internalGasPathRelative": 7.990267839379415e-7,
+      "externalGasPathRelative": 0.000001811361616687941,
+      "gasPathRelative": 8.683683009173585e-7,
+      "hardwareAreaRelative": 0.0011934789253201421,
+      "hardwarePathRelative": 8.094386175659375e-9,
+      "imageGasRelative": 0.02893061661031132,
+      "imageHardwareRelative": 0.003791285465820679
+    },
+    {
+      "case": "powered-lift",
+      "offsetMeters": [
+        0,
+        1.5
+      ],
+      "gasAngularRelative": 0.009733895756183792,
+      "internalGasAngularRelative": 0.024478107658323634,
+      "externalGasAngularRelative": 0.0000036425497591190213,
+      "internalGasPathRelative": 0.000005409082860141407,
+      "externalGasPathRelative": 0.000003037267495898571,
+      "gasPathRelative": 3.2071026132714235e-7,
+      "hardwareAreaRelative": 0.006274915754136268,
+      "hardwarePathRelative": 2.652270827186954e-7,
+      "imageGasRelative": 0.023374911527511977,
+      "imageHardwareRelative": 0.006690964904224314
+    },
+    {
+      "case": "hot-shutdown-posed-down",
+      "offsetMeters": [
+        0,
+        0
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0.003654625725346618,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 0.07798308293017861
+    },
+    {
+      "case": "hot-shutdown-posed-down",
+      "offsetMeters": [
+        0.5,
+        0
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0.004357685075250245,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 0.07912400253143814
+    },
+    {
+      "case": "hot-shutdown-posed-down",
+      "offsetMeters": [
+        1.5,
+        0
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0.0042056497970280205,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 0.08552025464970803
+    },
+    {
+      "case": "hot-shutdown-posed-down",
+      "offsetMeters": [
+        0,
+        1.5
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0.0016524907324693657,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 0.007331382045825165
+    },
+    {
+      "case": "hot-shutdown-native-pose",
+      "offsetMeters": [
+        0,
+        0
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0.7439125126931778,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 1
+    },
+    {
+      "case": "hot-shutdown-native-pose",
+      "offsetMeters": [
+        0.5,
+        0
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0.6135359961810157,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 1
+    },
+    {
+      "case": "hot-shutdown-native-pose",
+      "offsetMeters": [
+        1.5,
+        0
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0.46753143886508386,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 1
+    },
+    {
+      "case": "hot-shutdown-native-pose",
+      "offsetMeters": [
+        0,
+        1.5
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0.013807760017633198,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 0.14159811171213157
+    },
+    {
+      "case": "cold-posed-down",
+      "offsetMeters": [
+        0,
+        0
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 0
+    },
+    {
+      "case": "cold-posed-down",
+      "offsetMeters": [
+        0.5,
+        0
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 0
+    },
+    {
+      "case": "cold-posed-down",
+      "offsetMeters": [
+        1.5,
+        0
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 0
+    },
+    {
+      "case": "cold-posed-down",
+      "offsetMeters": [
+        0,
+        1.5
+      ],
+      "gasAngularRelative": 0,
+      "internalGasAngularRelative": 0,
+      "externalGasAngularRelative": 0,
+      "internalGasPathRelative": 0,
+      "externalGasPathRelative": 0,
+      "gasPathRelative": 0,
+      "hardwareAreaRelative": 0,
+      "hardwarePathRelative": 0,
+      "imageGasRelative": 0,
+      "imageHardwareRelative": 0
+    }
+  ],
+  "errors": [
+    "3 selected probes exceed 3% angular / 1% path / 5% hardware refinement criteria"
+  ],
+  "limits": [
+    "Offline CPU receiver calculation; no runtime fixture, Babylon rendering, GPU validation or timing claim.",
+    "Native bath, particle loading/spectrum and grey hardware emissivity remain uncalibrated F135 hypotheses. Receiver rho=.2 is a declared ideal surface, not measured carrier deck reflectance.",
+    "Reflectance is not heating: no deck temperature, reradiation, material response, particle deposition, plume impingement/recovery or added gas energy is calculated.",
+    "The free-jet field is clipped at the plane for radiation only; it is not a solved wall jet. Source-cell thermal state below the plane is not reflected back into the gas.",
+    "Images use bounded coarse quadrature; selected-probe refinement does not prove every pixel converged. CSV/probes retain raw units independently of fixed display exposure.",
+    "Actual hot-shutdown record is horizontal; the downward comparison deliberately reposes its unchanged native temperatures, with gas off according to actual zero fuel."
+  ]
+}

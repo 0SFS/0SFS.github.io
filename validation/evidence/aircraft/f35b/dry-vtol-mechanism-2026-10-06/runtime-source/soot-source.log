@@ -1,0 +1,110 @@
+{
+  "outputDirectory": "build/validation/dry-soot-source/2026-10-06_231335",
+  "cases": [
+    {
+      "name": "cold",
+      "valid": false,
+      "temperatureK": 0,
+      "absorptionPerMeter": 0,
+      "particlePowerW": 0,
+      "chPowerW": 0,
+      "c2PowerW": 0,
+      "exteriorIntensityCd": 0,
+      "allowedPowerW": 0,
+      "wholeIntensityCd": 0
+    },
+    {
+      "name": "idle",
+      "valid": true,
+      "temperatureK": 649.5991319989687,
+      "absorptionPerMeter": 0.025,
+      "particlePowerW": 133.44819600367643,
+      "chPowerW": 0,
+      "c2PowerW": 0,
+      "exteriorIntensityCd": 1.0578155289369377e-7,
+      "allowedPowerW": 42227.05393718164,
+      "wholeIntensityCd": 2.7655967960035793e-7
+    },
+    {
+      "name": "dry99",
+      "valid": true,
+      "temperatureK": 1003.1281319989318,
+      "absorptionPerMeter": 0.025,
+      "particlePowerW": 733.4977397992716,
+      "chPowerW": 0,
+      "c2PowerW": 0,
+      "exteriorIntensityCd": 0.010218591070062826,
+      "allowedPowerW": 377050.82423692424,
+      "wholeIntensityCd": 0.051799224023528136
+    },
+    {
+      "name": "ab-onset",
+      "valid": true,
+      "temperatureK": 1034.445401445685,
+      "absorptionPerMeter": 0.025,
+      "particlePowerW": 2739.8250801594604,
+      "chPowerW": 3.6868339206807375,
+      "c2PowerW": 0,
+      "exteriorIntensityCd": 238.2815250827856,
+      "allowedPowerW": 396285.8825756204,
+      "wholeIntensityCd": 2127.682633510518
+    },
+    {
+      "name": "ab-sustained",
+      "valid": true,
+      "temperatureK": 2363.1028843899676,
+      "absorptionPerMeter": 0.025,
+      "particlePowerW": 77988.89644345133,
+      "chPowerW": 190.5932595896644,
+      "c2PowerW": 0,
+      "exteriorIntensityCd": 35773.6670505254,
+      "allowedPowerW": 1178522.0548277786,
+      "wholeIntensityCd": 88459.51893448945
+    },
+    {
+      "name": "ab-cutoff",
+      "valid": true,
+      "temperatureK": 1003.1281319989909,
+      "absorptionPerMeter": 0.025,
+      "particlePowerW": 1114.4086008030388,
+      "chPowerW": 0,
+      "c2PowerW": 0,
+      "exteriorIntensityCd": 0.028477283139609642,
+      "allowedPowerW": 1178331.461522748,
+      "wholeIntensityCd": 0.07376156425850822
+    },
+    {
+      "name": "powered-lift",
+      "valid": true,
+      "temperatureK": 1003.1281319989688,
+      "absorptionPerMeter": 0.025,
+      "particlePowerW": 733.4977397994085,
+      "chPowerW": 0,
+      "c2PowerW": 0,
+      "exteriorIntensityCd": 0.010218591070062826,
+      "allowedPowerW": 574164.492687422,
+      "wholeIntensityCd": 0.051799224023528136
+    },
+    {
+      "name": "shutdown",
+      "valid": false,
+      "temperatureK": 0,
+      "absorptionPerMeter": 0,
+      "particlePowerW": 0,
+      "chPowerW": 0,
+      "c2PowerW": 0,
+      "exteriorIntensityCd": 0,
+      "allowedPowerW": 0,
+      "wholeIntensityCd": 0
+    }
+  ],
+  "validation": {
+    "passed": true,
+    "sameTemperatures": true,
+    "sameChemicalPower": true,
+    "flagOnlyInvariant": true,
+    "zeroFuelDark": true,
+    "sourcePowerBounded": true,
+    "appearanceAccepted": false
+  }
+}

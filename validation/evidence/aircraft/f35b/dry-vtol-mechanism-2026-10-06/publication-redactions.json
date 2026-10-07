@@ -1,0 +1,229 @@
+{
+  "schema": "0sfs-publication-redactions/1",
+  "recordedDate": "2026-10-07",
+  "scope": "This evidence directory only; no runtime, formulas, numerical observations or acceptance thresholds changed.",
+  "publishedCheckoutPlaceholder": "[checkout]",
+  "replacementMeaning": "Exact machine-specific absolute task-checkout prefix replaced; original prefix is intentionally omitted from public metadata.",
+  "originalRetention": "Original bytes for every listed file were copied to the local ignored build archive and verified before mutation; those originals are not distributed.",
+  "identityPolicy": "Executed source and bundle hashes retain their original values. Redacted snapshot references add publishedSnapshotSha256. Retained-file inventories use published bytes/SHA256 and preserve originalBytes/originalSha256.",
+  "checkoutPathFiles": 18,
+  "checkoutPrefixReplacements": 31,
+  "files": [
+    {
+      "path": "README.md",
+      "changeKind": "publication-provenance",
+      "originalBytes": 3560,
+      "originalSha256": "a3ac6237eba5c25bb2d96833c94abc463178ea0e17f8d2d31ac85acedc77ed1e",
+      "publishedBytes": 4822,
+      "publishedSha256": "56f36c1274f4fa58c7675b54c6339296f2c8d879743308a49958b7a79c5e7fa3",
+      "checkoutPrefixReplacements": 0
+    },
+    {
+      "path": "application/ci-final.log",
+      "changeKind": "checkout-path-redaction",
+      "originalBytes": 88289,
+      "originalSha256": "9f0127d1ed2d00e92b2d41e6cf0f46ebb0142193581f6c68bd45b781d4f2b0ac",
+      "publishedBytes": 88271,
+      "publishedSha256": "7067b0ba6f681e4ee37780ecc91fa96ac273f6b093d840674c35cc69479ecca6",
+      "checkoutPrefixReplacements": 2
+    },
+    {
+      "path": "application/ci.log",
+      "changeKind": "checkout-path-redaction",
+      "originalBytes": 89007,
+      "originalSha256": "493c81a051fd410f5f19154c178937e2b610b12e305f0800b043ccca5a87d808",
+      "publishedBytes": 88989,
+      "publishedSha256": "886bb93d6091210565c9c2e6cd4f02a28eeceb3d3e646270eed43f676c4c6438",
+      "checkoutPrefixReplacements": 2
+    },
+    {
+      "path": "application/domain-followup.log",
+      "changeKind": "checkout-path-redaction",
+      "originalBytes": 384,
+      "originalSha256": "f9669cf8f3f3e98f79ff3fea8ba285465c8f75158683e94749858ca39af04819",
+      "publishedBytes": 375,
+      "publishedSha256": "4a159a44fc4ea7eb9b3f46c4fb55f0f550f1438a04271d4007dd4618e985319b",
+      "checkoutPrefixReplacements": 1
+    },
+    {
+      "path": "application/light-range-followup.log",
+      "changeKind": "checkout-path-redaction",
+      "originalBytes": 15665,
+      "originalSha256": "c3ec260f7d1e3b2b9247ded9efe89e2d1a1b14eb291e92824bba95914f8cecd8",
+      "publishedBytes": 15656,
+      "publishedSha256": "fc8b04119d4342da040304240d80fac5aae49862f3b8ba8238c42b03ccda8cf4",
+      "checkoutPrefixReplacements": 1
+    },
+    {
+      "path": "application/related.log",
+      "changeKind": "checkout-path-redaction",
+      "originalBytes": 26946,
+      "originalSha256": "0ac1609a7de1d30a9324e5a2489518f3b5f42c92907265f6ef61c300ad044b3a",
+      "publishedBytes": 26937,
+      "publishedSha256": "a50679b7baf83d62415a71e239aaae152c2ffb2ffadfe1d6e8e7a485a9c1b799",
+      "checkoutPrefixReplacements": 1
+    },
+    {
+      "path": "footage/analysis.log",
+      "changeKind": "checkout-path-redaction",
+      "originalBytes": 141,
+      "originalSha256": "86860aaf0609f388f084e6fce894f24f9190119a1b1805a783ad782e0ec2f9b7",
+      "publishedBytes": 132,
+      "publishedSha256": "f8648d572bf371d9e3c25ba0a36f7f049618f736aee3c1c76a022831f867b3b2",
+      "checkoutPrefixReplacements": 1
+    },
+    {
+      "path": "particle-spectrum/acceptance.json",
+      "changeKind": "publication-provenance",
+      "originalBytes": 3821,
+      "originalSha256": "55b9ca06a9b19e657037a54d2c0710685f01552ff5a56bb0e87d55be1ef97a47",
+      "publishedBytes": 5289,
+      "publishedSha256": "8811f62e2401dfcba0b4c37365cb230cf705262d585869e4c5fd3af7bd7b626b",
+      "checkoutPrefixReplacements": 0
+    },
+    {
+      "path": "particle-spectrum/bake.log",
+      "changeKind": "checkout-path-redaction",
+      "originalBytes": 1122,
+      "originalSha256": "d65ec0344030ae06e4bb1678b74c91b7852afa2ccda2cb8fdda72bacd995a96a",
+      "publishedBytes": 1113,
+      "publishedSha256": "90702d4e0185f178522164eb9ba500b15944b7f7f97d5947c901dfc2b08cbc43",
+      "checkoutPrefixReplacements": 1
+    },
+    {
+      "path": "particle-spectrum/diagnostic.log",
+      "changeKind": "checkout-path-redaction",
+      "originalBytes": 933,
+      "originalSha256": "5fcac96097652e873d1d3edfb4f2f5eea21f8329c091bdd4c5a4c754388b99da",
+      "publishedBytes": 924,
+      "publishedSha256": "3d3147d27c8faa31b54cf7906a885f2a921e9e39b5b6596e6d0303f00b593db2",
+      "checkoutPrefixReplacements": 1
+    },
+    {
+      "path": "particle-spectrum/focused.log",
+      "changeKind": "checkout-path-redaction",
+      "originalBytes": 201,
+      "originalSha256": "77eefd047455111d660a65d144158f90a518b022d94dbf285e0cb61fd11aac78",
+      "publishedBytes": 192,
+      "publishedSha256": "a719ed62271303f18b7e6d036823fc64ce6526c1fd2e005e503607474c77fc9e",
+      "checkoutPrefixReplacements": 1
+    },
+    {
+      "path": "particle-spectrum/initial-bake.log",
+      "changeKind": "checkout-path-redaction",
+      "originalBytes": 1122,
+      "originalSha256": "492011848a0b65bf3eaae64ca15b69f75d3fb214130eaa9eb43e5d02dd9579a5",
+      "publishedBytes": 1113,
+      "publishedSha256": "cb06e926cad990a548e4c21bca8a5d6b5e4d0ffc09b665c401795656999107af",
+      "checkoutPrefixReplacements": 1
+    },
+    {
+      "path": "particle-spectrum/initial-focused-failure.log",
+      "changeKind": "checkout-path-redaction",
+      "originalBytes": 1372,
+      "originalSha256": "71c18257a606b4048d1714de865b55680460b56c6850be10536f649e980a640e",
+      "publishedBytes": 1363,
+      "publishedSha256": "eb4e4ed663680bda2155b66b6aeb7077d8963256059c3d4b90ddf0a901102d65",
+      "checkoutPrefixReplacements": 1
+    },
+    {
+      "path": "runtime-source/ci.log",
+      "changeKind": "checkout-path-redaction",
+      "originalBytes": 89007,
+      "originalSha256": "493c81a051fd410f5f19154c178937e2b610b12e305f0800b043ccca5a87d808",
+      "publishedBytes": 88989,
+      "publishedSha256": "886bb93d6091210565c9c2e6cd4f02a28eeceb3d3e646270eed43f676c4c6438",
+      "checkoutPrefixReplacements": 2
+    },
+    {
+      "path": "runtime-source/domain-followup.log",
+      "changeKind": "checkout-path-redaction",
+      "originalBytes": 384,
+      "originalSha256": "f9669cf8f3f3e98f79ff3fea8ba285465c8f75158683e94749858ca39af04819",
+      "publishedBytes": 375,
+      "publishedSha256": "4a159a44fc4ea7eb9b3f46c4fb55f0f550f1438a04271d4007dd4618e985319b",
+      "checkoutPrefixReplacements": 1
+    },
+    {
+      "path": "runtime-source/interval-prototype/acceptance.json",
+      "changeKind": "publication-provenance",
+      "originalBytes": 3624,
+      "originalSha256": "df5baeb98eca5cc951540a83bac65da317b92fe106f3c4b0239c01a7e3eb3158",
+      "publishedBytes": 4517,
+      "publishedSha256": "597ede6908d2a7b1874e7ac8885aa400327437061ce53df44139bfaebd8c788a",
+      "checkoutPrefixReplacements": 0
+    },
+    {
+      "path": "runtime-source/interval-prototype/entry.ts.txt",
+      "changeKind": "checkout-path-redaction",
+      "originalBytes": 355,
+      "originalSha256": "c15119f7500ad15e9069f6fa2eaf0eeb6cabf01003f7573438ea8d723090ed9a",
+      "publishedBytes": 319,
+      "publishedSha256": "f4a418bc6239025aa0c29f23fcb6f4271a48d02d2ae1c109973039b8123609d8",
+      "checkoutPrefixReplacements": 4
+    },
+    {
+      "path": "runtime-source/interval-prototype/report.json",
+      "changeKind": "publication-provenance",
+      "originalBytes": 216566,
+      "originalSha256": "755eee4d4783dd2ce6a3e9e5fe0992c11495d2d8f7037d0a703399301be9cb6a",
+      "publishedBytes": 216734,
+      "publishedSha256": "b2eae8c22e0dd50a05e1381804471ec05d73b7522713cf59a9d063bc55df1fb8",
+      "checkoutPrefixReplacements": 0
+    },
+    {
+      "path": "runtime-source/interval-prototype/source-0-prototype.mjs.txt",
+      "changeKind": "checkout-path-redaction",
+      "originalBytes": 22812,
+      "originalSha256": "9d1480533eef172af89079eeef8d40c0cdc072977c1236d0c4a4ea4036eae7a0",
+      "publishedBytes": 22767,
+      "publishedSha256": "84c4521e2fd82c1f4ef5831dc7cfa9db54708c3f003474dfdf10730ab8046048",
+      "checkoutPrefixReplacements": 5
+    },
+    {
+      "path": "runtime-source/posed-rays-complete-inputs/acceptance.json",
+      "changeKind": "publication-provenance",
+      "originalBytes": 9270,
+      "originalSha256": "5c8029e4b62b9e0a32d4b33578aa09fc5c940ac482745ef44fc903ef556f2a81",
+      "publishedBytes": 9566,
+      "publishedSha256": "959e341bec03f1a8f4bc9f27c4f784e028d9d576e79d65c2b25ec207ef4b0a6f",
+      "checkoutPrefixReplacements": 0
+    },
+    {
+      "path": "runtime-source/posed-rays-complete-inputs/entry.ts.txt",
+      "changeKind": "checkout-path-redaction",
+      "originalBytes": 355,
+      "originalSha256": "c15119f7500ad15e9069f6fa2eaf0eeb6cabf01003f7573438ea8d723090ed9a",
+      "publishedBytes": 319,
+      "publishedSha256": "f4a418bc6239025aa0c29f23fcb6f4271a48d02d2ae1c109973039b8123609d8",
+      "checkoutPrefixReplacements": 4
+    },
+    {
+      "path": "runtime-source/related.log",
+      "changeKind": "checkout-path-redaction",
+      "originalBytes": 26946,
+      "originalSha256": "0ac1609a7de1d30a9324e5a2489518f3b5f42c92907265f6ef61c300ad044b3a",
+      "publishedBytes": 26937,
+      "publishedSha256": "a50679b7baf83d62415a71e239aaae152c2ffb2ffadfe1d6e8e7a485a9c1b799",
+      "checkoutPrefixReplacements": 1
+    },
+    {
+      "path": "thermal-camera/acceptance.json",
+      "changeKind": "publication-provenance",
+      "originalBytes": 1835,
+      "originalSha256": "82f5a3c8e77eb7e16ae5c5a9130495a2cf132747bbd2a0a903a9c98a2a7787d0",
+      "publishedBytes": 2130,
+      "publishedSha256": "a97f5794e20cd49603002e501b27a4ae668d1d824058d683c9ed692a0f3cea60",
+      "checkoutPrefixReplacements": 0
+    },
+    {
+      "path": "thermal-camera/diagnostic.log",
+      "changeKind": "checkout-path-redaction",
+      "originalBytes": 10217,
+      "originalSha256": "4fccafed9ce32272ff063f1eae71e1c62a1295d1affc2742d3b4224685ea3800",
+      "publishedBytes": 10208,
+      "publishedSha256": "30fe6342f5ea84bc38d3c8a04a2129affed8a7a71386a47312ad8dd1cb1013d1",
+      "checkoutPrefixReplacements": 1
+    }
+  ]
+}
