@@ -437,6 +437,19 @@
               </product></function>
             </fcs_function>
 
+            <!-- 0SFS roll trim, 2026-10-07: under fly-by-wire roll trim
+                 commands a roll rate in the stick's units, so 100% trim asks
+                 what full stick asks. It entered unscaled, as 1/0.09 rad/s,
+                 637 deg/s, against 30 deg/s at full stick. Manual and the
+                 hover roll posts take it as they take the stick. -->
+            <fcs_function name="fcs/roll-trim-rate-cmd-norm">
+              <function><product>
+                <property>fcs/roll-trim-cmd-norm</property>
+                <toradians><property>fcs/full-stick-roll-rate-deg_sec</property></toradians>
+                <value>0.09</value>
+              </product></function>
+            </fcs_function>
+
             <!-- Calculate the normalized roll-rate -->
             <pure_gain name="roll rate norm">
                 <input>velocities/p-aero-rad_sec</input>
@@ -450,7 +463,7 @@
             <summer name="roll trim error">
                 <input>fcs/roll-stick-cmd-norm</input>
                 <input>-fcs/roll-rate-norm</input>
-      <input>fcs/roll-trim-cmd-norm</input>
+      <input>fcs/roll-trim-rate-cmd-norm</input>
       <clipto>
         <min> -1 </min>
         <max>  1 </max>
@@ -523,7 +536,7 @@
             <fcs_function name="fcs/roll-feedforward">
               <function><product>
                 <quotient>
-                  <sum><property>fcs/roll-stick-cmd-norm</property><property>fcs/roll-trim-cmd-norm</property></sum>
+                  <sum><property>fcs/roll-stick-cmd-norm</property><property>fcs/roll-trim-rate-cmd-norm</property></sum>
                   <value>0.09</value>
                 </quotient>
                 <quotient>

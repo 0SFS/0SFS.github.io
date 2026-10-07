@@ -118,6 +118,12 @@ records original paths, original hashes, current hashes, and changes.
   Manual, on the ground and with any conversion. Proportional and derivative
   gains are unchanged. Manual and the hover roll posts read the unscaled
   stick. Pitch and yaw keep the same inverted trigger.
+- 2026-10-07: FBW roll trim enters the rate error and the feedforward as native
+  `fcs/roll-trim-rate-cmd-norm`, scaled like the stick by
+  `fcs/full-stick-roll-rate-deg_sec`, so full trim asks what full stick asks.
+  It entered unscaled, as the source's 1/0.09 rad/s, 637 deg/s against 30 deg/s
+  at full stick. Manual and the hover roll posts take trim as they take the
+  stick.
 
 ## Qualification boundary
 
