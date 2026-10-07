@@ -659,6 +659,17 @@ configured. The setting shows the observed active law and survives relocation,
 runway presets and snapshot recovery. This is a simulator option, not a claim
 about a real F-35 cockpit selector.
 
+Aircraft → Flight controls → Roll stick gain scales the pilot's roll stick into
+the aileron channel through native `fcs/roll-stick-gain`, under either law. The
+source FBW roll loop balances the stick against 0.09 × roll rate in rad/s, so
+full stick asks for about 640°/s. Measured on 2026-10-06 at 10,000 ft with the
+clean aircraft, it reaches full aileron by about 55% stick at 200 kt, 70% at
+300 kt and 80% at 450 kt, and the rest of the travel adds nothing. The gain
+defaults to 1, the source gradient. The host writes 1 while its autopilot owns
+roll, and the hover roll posts read the unscaled stick. Integration tests check
+the 300 kt saturation, that the gain flies the stick as the smaller deflection
+it scales to under both laws, and that the posts are unchanged.
+
 The 2026-10-05 yaw regression reproduced conventional-flight actuator hunting
 at 450/600 kt after yaw disturbances or rudder release, with zero subsequent
 pilot yaw command. The source's constant feedback gain fought the rudder's

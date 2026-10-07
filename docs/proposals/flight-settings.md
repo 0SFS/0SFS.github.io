@@ -708,3 +708,14 @@ selector or acquire synthetic FCS properties.
 This choice controls the aircraft's native law. Autopilot and the visible input
 and auto-trim assists remain independently configured. The prototype laws are
 experimental; these modes do not reproduce a real F-35 cockpit control selector.
+
+Beside it, **Roll stick gain** (`osfs.aircraft.rollStickGain`, ratio 0.1–1,
+default 1) scales the pilot's roll stick into the F-35B's ailerons under either
+law, through native `fcs/roll-stick-gain`. The default is the flight model's own
+gradient, which under fly-by-wire reaches full aileron by 55–80% stick between
+200 and 450 kt. Below 1, small inputs roll more gently; under Manual it also
+limits full-stick aileron. The gain applies only while the pilot owns roll, so
+the autopilot's command passes unscaled, and the hover roll posts keep the
+unscaled stick. Roll auto-trim weighs the scaled stick. Other aircraft take the
+stick unscaled. [F-35B FDM](f35b-fdm.md#aircraft-control-law) records the
+measurement.

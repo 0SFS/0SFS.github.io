@@ -1396,6 +1396,20 @@ export const OSFS_PARAMETERS = [
     appliesLive: true,
     source: "src/flight/input/applyFlightControls.ts",
   },
+  {
+    id: "osfs.aircraft.rollStickGain",
+    label: "Roll stick gain",
+    description: "F-35B only: scales the pilot's roll stick into the ailerons under either control law, so 0.5 halves the roll a small input asks for. Under Manual, values below 1 also limit full-stick aileron. The autopilot and the hover roll posts keep the unscaled command.",
+    unit: "ratio",
+    kind: "number",
+    step: 0.05,
+    bounds: within(0.1, 1),
+    default: 1,
+    defaultReason: "The flight model's own gradient. Under fly-by-wire it reaches full aileron by 55–80% stick between 200 and 450 kt, so the rest of the travel adds nothing.",
+    home: main(FLIGHT_CONTROLS),
+    appliesLive: true,
+    source: "src/flight/input/applyFlightControls.ts",
+  },
 
   // Controls → Gamepad.
   {

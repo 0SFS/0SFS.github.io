@@ -5,7 +5,7 @@ import { JSBSimSdk } from "@felipegalind0/jsbsim";
 import { wasmBinaryUrl, wasmModuleUrl } from "@felipegalind0/jsbsim/wasm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { bootstrapAircraft, type C172BootstrapOptions } from "./bootstrapC172";
-import { getFdmProfile } from "./fdmProfiles";
+import { getFdmProfile, type FlightControlLawMode } from "./fdmProfiles";
 import { setExternalFuelTankAttached } from "./externalFuelTanks";
 import { resolveAircraftDataFiles } from "./hydrateJsbsimData";
 import { resetFlightLocation } from "./resetFlightLocation";
@@ -165,6 +165,50 @@ describe("F-35B native lift allocation, not LiftSystem calibration", () => {
       expect(validFlightState(readFlightState(sdk))).toBe(true);
     },
   );
+});
+
+describe("F-35B roll stick gain", () => {
+  function applyRoll(sdk: JSBSimSdk, aileron: number, gain: number, mode: FlightControlLawMode = "auto", conversion = 0, base = neutral) {
+    applyFlightControls(sdk, { ...base, aileron }, 0, profile.rudderSign,
+      { commandProperty: profile.stovl!.commandProperty, commandNorm: conversion },
+      { commandProperty: profile.controlLaw!.commandProperty, mode }, undefined,
+      { property: profile.rollStickGainProperty!, gain });
+  }
+
+  async function rollAfterOneSecond(stick: number, gain: number, mode: FlightControlLawMode) {
+    const sdk = await createF35({ airspeedKts: 300, altFt: 10_000 });
+    applyRoll(sdk, 0, gain, mode);
+    advance(sdk, 0.5);
+    applyRoll(sdk, stick, gain, mode);
+    advance(sdk, 1);
+    return { rateRad: sdk.getPropertyValue("velocities/p-rad_sec"), aileron: sdk.getPropertyValue("fcs/aileron-pos-norm") };
+  }
+
+  it("at the source gradient, fly-by-wire reaches full aileron before full stick at 300 kt", async () => {
+    expect((await rollAfterOneSecond(0.75, 1, "fly-by-wire")).aileron).toBe(1);
+    expect((await rollAfterOneSecond(0.5, 1, "fly-by-wire")).aileron).toBeLessThan(0.8);
+  });
+
+  it.each(["fly-by-wire", "manual"] as const)("under %s, a gain flies the stick as the smaller deflection it scales to", async mode => {
+    const scaled = await rollAfterOneSecond(0.8, 0.5, mode);
+    const reference = await rollAfterOneSecond(0.4, 1, mode);
+    expect(scaled.rateRad).toBeGreaterThan(0.1);
+    expect(scaled.rateRad).toBeCloseTo(reference.rateRad, 9);
+    expect(scaled.aileron).toBeCloseTo(reference.aileron, 9);
+  });
+
+  it("leaves the hover roll posts on the unscaled stick", async () => {
+    const posts = [];
+    for (const gain of [1, 0.25]) {
+      const { sdk, controls } = await createHover();
+      applyRoll(sdk, 0.3, gain, "auto", 1, controls);
+      expect(sdk.run()).toBe(true);
+      expect(sdk.getPropertyValue("fcs/roll-stick-cmd-norm")).toBeCloseTo(0.3 * gain, 12);
+      posts.push(sdk.getPropertyValue("fcs/stovl-roll-control"));
+    }
+    expect(posts[0]).not.toBe(0);
+    expect(posts[1]).toBe(posts[0]);
+  });
 });
 
 describe("F-35B augmentation transition interlock", () => {

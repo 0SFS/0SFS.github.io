@@ -105,6 +105,11 @@ records original paths, original hashes, current hashes, and changes.
   defaults to 1 in every control-law mode. Enabled retains the source automatic
   speed/Mach schedule; disabled uses the bounded pilot flap command. Manual
   flight controls can therefore retain automatic trailing-edge flaps.
+- 2026-10-06: route the pilot's `fcs/aileron-cmd-norm` through native
+  `fcs/roll-stick-gain` (default 1, the source gradient) into both the FBW roll
+  error and the Manual roll command. The host sets it from the pilot's
+  Roll stick gain while the pilot owns roll, and 1 otherwise. The hover roll
+  posts read the unscaled stick. Loop gains are unchanged.
 
 ## Qualification boundary
 

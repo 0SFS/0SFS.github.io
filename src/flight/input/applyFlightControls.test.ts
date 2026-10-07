@@ -56,4 +56,20 @@ describe("applyFlightControls", () => {
       { commandProperty: "fcs/stovl-cmd-norm", commandNorm: NaN })).toThrow(RangeError);
     expect(setPropertyValue).not.toHaveBeenCalled();
   });
+
+  it("writes the roll stick gain beside an unscaled aileron command, and refuses one outside (0, 1]", () => {
+    const setPropertyValue = vi.fn();
+    const controls = { elevator: 0, aileron: 0.6, rudder: 0, throttle: 0.8,
+      pitchTrim: 0, rollTrim: 0, flaps: 0, brake: 0 };
+    const sdk = { setPropertyValue } as unknown as JSBSimSdk;
+    applyFlightControls(sdk, controls, 0, 1, undefined, undefined, undefined, { property: "fcs/roll-stick-gain", gain: 0.4 });
+    expect(setPropertyValue).toHaveBeenCalledWith("fcs/roll-stick-gain", 0.4);
+    expect(setPropertyValue).toHaveBeenCalledWith("fcs/aileron-cmd-norm", 0.6);
+    setPropertyValue.mockClear();
+    for (const gain of [0, -0.5, 1.5, NaN]) {
+      expect(() => applyFlightControls(sdk, controls, 0, 1, undefined, undefined, undefined,
+        { property: "fcs/roll-stick-gain", gain })).toThrow(RangeError);
+    }
+    expect(setPropertyValue).not.toHaveBeenCalled();
+  });
 });
