@@ -1071,6 +1071,10 @@ export async function createFlightSimApp(
     maxArrowMeters: parameters.get("osfs.forces.maxArrowMeters"),
     labels: parameters.get("osfs.forces.labels"),
     labelRefreshHz: parameters.get("osfs.forces.labelRefreshHz"),
+    controlSurfaces: parameters.get("osfs.forces.controlSurfaces"),
+    newtonMetersPerDegree: parameters.get("osfs.forces.newtonMetersPerDegree"),
+    arcRadiusMeters: parameters.get("osfs.forces.arcRadiusMeters"),
+    maxArcDegrees: parameters.get("osfs.forces.maxArcDegrees"),
   });
   const syncForcesDebugOverlay = (): void => {
     const settings = readForcesSettings();
@@ -1078,13 +1082,15 @@ export async function createFlightSimApp(
       forcesDebugOverlay = createForcesDebugOverlay(runtime.scene, aircraft.root, jsbsim.sdk, {
         settings,
         engineLabels: getFdmProfile(initialAircraftId).forceEngineLabels,
+        controlSurfaces: getFdmProfile(initialAircraftId).forceControlSurfaces,
         requestRender: () => runtime.requestRender(),
         onUnavailable: message => flightLog.warn("forces", message),
       });
     } else forcesDebugOverlay?.setSettings(settings);
   };
   for (const id of ["osfs.forces.enabled", "osfs.forces.newtonsPerMeter", "osfs.forces.maxArrowMeters",
-    "osfs.forces.labels", "osfs.forces.labelRefreshHz"] as const) {
+    "osfs.forces.labels", "osfs.forces.labelRefreshHz", "osfs.forces.controlSurfaces", "osfs.forces.newtonMetersPerDegree",
+    "osfs.forces.arcRadiusMeters", "osfs.forces.maxArcDegrees"] as const) {
     stopWatching.push(parameters.watch(id, syncForcesDebugOverlay));
   }
   const syncCollisionDebugOverlay = (): void => {

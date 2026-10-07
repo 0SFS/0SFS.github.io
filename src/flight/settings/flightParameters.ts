@@ -157,6 +157,34 @@ export const OSFS_PARAMETERS = [
     defaultReason: "Readable numbers with bounded text and texture upload work; paused native time holds their values.",
     home: main(FORCES), appliesLive: true, source: "src/flight/diagnostics/createForcesDebugOverlay.ts",
   },
+  {
+    id: "osfs.forces.controlSurfaces", label: "Control surfaces",
+    description: "Draw each control surface's own native aerodynamic terms: their force at the aerodynamic reference point, where JSBSim applies them, and their moment as an arc. JSBSim has no surface positions, so nothing is drawn at the surfaces themselves.",
+    unit: "none", kind: "boolean", default: true,
+    defaultReason: "What the pilot's controls are doing is what a forces view is most often opened to see.",
+    home: main(FORCES), appliesLive: true, source: "src/flight/diagnostics/createForcesDebugOverlay.ts",
+  },
+  {
+    id: "osfs.forces.newtonMetersPerDegree", label: "Arc moment scale",
+    description: "Moment represented by one degree of arc. Each arc turns about its moment's axis by the right-hand rule. Smaller values magnify moments without changing the simulation.",
+    unit: { id: "N·m/deg", text: "N·m/°" }, kind: "number", step: 10, bounds: within(10, 100000), default: 2000,
+    defaultReason: "An F-35B elevator moment of 200 kN·m, seen at 300 knots, sweeps 100°; lower this for smaller aircraft.",
+    home: main(FORCES), appliesLive: true, source: "src/flight/diagnostics/createForcesDebugOverlay.ts",
+  },
+  {
+    id: "osfs.forces.arcRadiusMeters", label: "Moment arc radius",
+    description: "Radius of every moment arc around the point its moment is taken about.",
+    unit: "m", kind: "number", step: 0.5, bounds: within(0.5, 20), default: 3,
+    defaultReason: "Clear of the arrows that start at the same reference point and CG.",
+    home: main(FORCES), appliesLive: true, source: "src/flight/diagnostics/createForcesDebugOverlay.ts",
+  },
+  {
+    id: "osfs.forces.maxArcDegrees", label: "Maximum arc sweep",
+    description: "Caps displayed arcs at this sweep. Labels retain the actual moment and mark capped arcs.",
+    unit: "deg", kind: "number", step: 5, bounds: within(30, 330), default: 300,
+    defaultReason: "Short of a full turn, so the arrowhead's sense stays readable when a moment spikes.",
+    home: main(FORCES), appliesLive: true, source: "src/flight/diagnostics/createForcesDebugOverlay.ts",
+  },
   // Aircraft: which aircraft flies, and which of its models is drawn.
   {
     id: "osfs.aircraft.id",

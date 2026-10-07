@@ -158,17 +158,20 @@ flight's own views are listed here.
 **An aero forces overlay, like KSP's.** Debug → Forces now draws native lift,
 drag and side force at the resolved aerodynamic reference point, a separate
 CG aerodynamic contribution, each engine's actual body-force vector at its
-acting point, weight, applied total and net force including gravity. Its
-scale, arrow length cap, labels and label refresh are settings.
-[Aircraft forces](docs/aircraft-forces.md) records the exact sources, coordinate
-conversions and missing-observation fallbacks. Moment arcs remain to be built.
+acting point, weight, applied total and net force including gravity, the
+aerodynamic moment about CG as an arc, and each control surface's own terms,
+force and moment, at the reference point. Its scales, caps, labels and label
+refresh are settings. [Aircraft forces](docs/aircraft-forces.md) records the exact
+sources, coordinate conversions and missing-observation fallbacks. Arcs for
+propulsion, ground contact and net moments, and a table of every coefficient
+term, remain to be built.
 
-JSBSim has no parts, so KSP's arrow on each part would be invented here. The
-next useful split is per term. The SF50 package names 24 aerodynamic terms under
-`aero/coefficient/*`, among them `CLalpha`, `CLflap`, `CD0`, `CDi` and
-`CDgear`. A future table beside the arrows would give each term's share this step. Where the
-model has a term per surface, as the jet does for each ruddervator, that term
-can be drawn at the surface.
+JSBSim has no parts, so KSP's arrow on each part would be invented here; the
+control surfaces are drawn from their own terms at the reference point, where
+JSBSim applies them. The rest of the split per term is a table. The SF50 package
+names 24 aerodynamic terms under `aero/coefficient/*`, among them `CLalpha`,
+`CLflap`, `CD0`, `CDi` and `CDgear`. A table beside the arrows would give each
+term's share this step.
 
 **A JSBSim property browser.** It would let you:
 

@@ -1,11 +1,17 @@
 import { describe, expect, it, vi } from "vitest";
 import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import {
-  bodyForceToDisplay, createAircraftForceReader, POUND_FORCE_TO_NEWTONS,
-  structuralPointToDisplay, windForceToBody, type ForceVector,
+  bodyForceToDisplay, createAircraftForceReader, POUND_FOOT_TO_NEWTON_METERS, POUND_FORCE_TO_NEWTONS,
+  structuralPointToDisplay, windForceToBody, type ControlSurfaceTerms, type ForceVector,
 } from "./aircraftForces";
 
-function fixture() {
+const SURFACES: readonly ControlSurfaceTerms[] = [
+  { id: "elevator", label: "Elevator", terms: { drag: "aero/coefficient/CDde", lift: "aero/coefficient/CLde", pitch: "aero/coefficient/Cmde" } },
+  { id: "rudder", label: "Rudder", terms: { side: "aero/coefficient/CYdr", roll: "aero/coefficient/Cldr", yaw: "aero/coefficient/Cndr" } },
+  { id: "ailerons", label: "Ailerons", terms: { roll: "aero/coefficient/Clda" } },
+];
+
+function fixture(controlSurfaces: readonly ControlSurfaceTerms[] = []) {
   const values = new Map<string, number>([
     ["simulation/sim-time-sec", 42], ["aero/alpha-rad", 0], ["aero/beta-rad", 0],
   ]);
@@ -15,6 +21,10 @@ function fixture() {
   triple(["aero/rp-body-x-ft", "aero/rp-body-y-ft", "aero/rp-body-z-ft"], [2, 3, -4]);
   force("aero-rp", [-100, 20, -1000]); force("aero-cg", [3, 4, 5]); force("aero", [-97, 24, -995]);
   force("prop", [2000, 0, -700]); force("weight", [0, 0, 1500]); force("total", [1903, 24, -1695]);
+  triple(["moments/l-aero-lbsft", "moments/m-aero-lbsft", "moments/n-aero-lbsft"], [10, -2000, 30]);
+  for (const [name, value] of [["CDde", 4], ["CLde", -60], ["Cmde", 900], ["CYdr", 25], ["Cldr", 7], ["Cndr", -150], ["Clda", -1200]] as const) {
+    values.set(`aero/coefficient/${name}`, value);
+  }
   for (const index of [0, 1]) {
     const base = `propulsion/engine[${index}]/`;
     triple(["x-position", "y-position", "z-position"].map(path => base + path), index === 0 ? [500, 2, -10] : [100, 22, 10]);
@@ -30,7 +40,7 @@ function fixture() {
   });
   const queryPropertyCatalog = vi.fn(() => "propulsion/engine/thrust-lbs (R)\npropulsion/engine[0]/x-position (RW)\npropulsion/engine[1]/thrust-lbs (R)");
   const sdk = { createPropertyBatch, queryPropertyCatalog } as unknown as JSBSimSdk;
-  const reader = createAircraftForceReader(sdk, { 0: "Main engine", 1: "Lift fan" });
+  const reader = createAircraftForceReader(sdk, { 0: "Main engine", 1: "Lift fan" }, controlSurfaces);
   return { values, force, triple, batch, createPropertyBatch, queryPropertyCatalog, reader };
 }
 
@@ -110,6 +120,57 @@ describe("native aircraft force observations", () => {
       t.values.delete("forces/fbz-weight-lbs");
       expect(t.reader.read().forces.map(force => force.id)).not.toContain("net");
       expect(t.reader.read().unavailable).toContain("Net force (with gravity)");
+    } finally { t.reader.dispose(); }
+  });
+
+  it("reads the native aerodynamic moment about CG in N·m", () => {
+    const t = fixture();
+    try {
+      expect(t.reader.read().moments).toEqual([expect.objectContaining({ id: "aero-moment", anchorMeters: [0, 0, 0],
+        bodyNewtonMeters: [10, -2000, 30].map(value => value * POUND_FOOT_TO_NEWTON_METERS) })]);
+      t.values.delete("moments/m-aero-lbsft");
+      expect(t.reader.read().moments).toEqual([]);
+      expect(t.reader.read().unavailable).toContain("Aero moment about CG");
+    } finally { t.reader.dispose(); }
+  });
+
+  it("draws each surface's own terms at the reference point: wind-frame forces into body axes, body moments as they are", () => {
+    const t = fixture(SURFACES);
+    try {
+      t.values.set("aero/alpha-rad", 0.3); t.values.set("aero/beta-rad", 0.1);
+      const snapshot = t.reader.read();
+      expect(snapshot.unavailable).toEqual([]);
+      const rp = snapshot.forces.find(force => force.id === "aero-0")!.anchorMeters;
+      // JSBSim reports drag aft and lift up; its wind axes point forward and down.
+      expect(snapshot.forces.find(force => force.id === "surface-elevator")).toEqual({
+        id: "surface-elevator", label: "Elevator", color: expect.any(String), anchorMeters: rp,
+        bodyNewtons: windForceToBody([-4, 0, 60], 0.3, 0.1).map(value => value * POUND_FORCE_TO_NEWTONS),
+      });
+      expect(snapshot.moments.find(moment => moment.id === "surface-elevator-moment")).toEqual(expect.objectContaining({
+        anchorMeters: rp, bodyNewtonMeters: [0, 900, 0].map(value => value * POUND_FOOT_TO_NEWTON_METERS) }));
+      expect(snapshot.forces.find(force => force.id === "surface-rudder")!.bodyNewtons).toEqual(
+        windForceToBody([-0, 25, -0], 0.3, 0.1).map(value => value * POUND_FORCE_TO_NEWTONS));
+      expect(snapshot.moments.find(moment => moment.id === "surface-rudder-moment")!.bodyNewtonMeters).toEqual(
+        [7, 0, -150].map(value => value * POUND_FOOT_TO_NEWTON_METERS));
+      // A surface the model gives only a moment has no force to draw.
+      expect(snapshot.forces.map(force => force.id)).not.toContain("surface-ailerons");
+      expect(snapshot.moments.find(moment => moment.id === "surface-ailerons-moment")!.bodyNewtonMeters[0]).toBeCloseTo(-1200 * POUND_FOOT_TO_NEWTON_METERS, 9);
+      expect(new Set([...snapshot.forces, ...snapshot.moments].filter(item => item.id.startsWith("surface-elevator")).map(item => item.color)).size).toBe(1);
+      expect(t.createPropertyBatch).toHaveBeenCalledOnce();
+    } finally { t.reader.dispose(); }
+  });
+
+  it("skips a surface whose term or reference point is unavailable rather than drawing part of it", () => {
+    const t = fixture(SURFACES);
+    try {
+      t.values.delete("aero/coefficient/Cndr");
+      let snapshot = t.reader.read();
+      expect(snapshot.unavailable).toEqual(["Rudder"]);
+      expect([...snapshot.forces, ...snapshot.moments].map(item => item.id).filter(id => id.includes("rudder"))).toEqual([]);
+      t.values.delete("aero/rp-body-z-ft");
+      snapshot = t.reader.read();
+      expect(snapshot.unavailable).toEqual(expect.arrayContaining(["Elevator", "Rudder", "Ailerons"]));
+      expect([...snapshot.forces, ...snapshot.moments].map(item => item.id).filter(id => id.startsWith("surface-"))).toEqual([]);
     } finally { t.reader.dispose(); }
   });
 

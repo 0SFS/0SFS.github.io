@@ -3,6 +3,7 @@ import { C172_ROTOR_BLADES, FJ33_ROTOR_BLADES, F135_ROTOR_BLADES, type EngineRot
 import type { AutomaticFlaps } from "../input/autoFlaps";
 import { getSf50Variant, type Sf50VariantId } from "../aircraft/sf50Variants";
 import { BODY_COLLISION_PROBES, SF50_BODY_COLLISION_PROBES, type BodyCollisionProbe } from "../physics/collisionGeometry";
+import type { ControlSurfaceTerms } from "../diagnostics/aircraftForces";
 
 export interface RunwayConfiguration {
   airspeedKts: number;
@@ -48,6 +49,13 @@ export interface FdmProfile {
   startSpeed: { property: string; runningAt: number };
   /** Optional diagnostic names; native engine indices and force data remain authoritative. */
   forceEngineLabels?: Readonly<Record<number, string>>;
+  /**
+   * Each control surface's own aerodynamic terms in the model, for Debug → Forces.
+   * Only increments that vanish with the surface centred belong here, never a
+   * whole-wing table or a derivative the surface schedules. fdmProfiles.test.ts
+   * holds every term, and every surface-dependent term left out, to the model file.
+   */
+  forceControlSurfaces: readonly ControlSurfaceTerms[];
   /** Sign applied to the normalized yaw command at the physics boundary. */
   rudderSign: 1 | -1;
   stance: {
@@ -96,6 +104,22 @@ const SF50_STATI = {
   rollArmMeters: 5.9,
 };
 
+const coefficient = (name: string): string => `aero/coefficient/${name}`;
+
+/** The SF50 models keep each ruddervator and aileron in its own terms. */
+const SF50_CONTROL_SURFACES: readonly ControlSurfaceTerms[] = [
+  ...(["left", "right"] as const).map(side => ({
+    id: `${side}-ruddervator`, label: `${side === "left" ? "Left" : "Right"} ruddervator`,
+    terms: { side: coefficient(`CY${side}-ruddervator`), lift: coefficient(`CL${side}-ruddervator`),
+      pitch: coefficient(`Cm${side}-ruddervator`), yaw: coefficient(`Cn${side}-ruddervator`) },
+  })),
+  ...(["left", "right"] as const).map(side => ({
+    id: `${side}-aileron`, label: `${side === "left" ? "Left" : "Right"} aileron`,
+    terms: { roll: coefficient(`Cl${side}-aileron`) },
+  })),
+  { id: "flaps", label: "Flaps", terms: { drag: coefficient("CDflap"), lift: coefficient("CLflap") } },
+];
+
 function createSf50Profile(variantId: Sf50VariantId): FdmProfile {
   const variant = getSf50Variant(variantId);
   return {
@@ -115,6 +139,7 @@ function createSf50Profile(variantId: Sf50VariantId): FdmProfile {
     },
     initialThrottleNorm: 0.35,
     initialGearDown: false,
+    forceControlSurfaces: SF50_CONTROL_SURFACES,
     flapPosition: { property: "fcs/flap-pos-norm", fullTravel: 1 },
     automaticFlaps: {
       kind: "assist",
@@ -153,6 +178,17 @@ export const FDM_PROFILES: Record<AircraftId, FdmProfile> = {
     },
     initialThrottleNorm: 0.65,
     initialGearDown: true,
+    // One aileron position drives both ailerons' terms.
+    forceControlSurfaces: [
+      { id: "elevator", label: "Elevator",
+        terms: { drag: coefficient("CDDe"), lift: coefficient("CLDe"), pitch: coefficient("Cmde") } },
+      { id: "ailerons", label: "Ailerons",
+        terms: { side: coefficient("CYda"), roll: coefficient("ClDa"), yaw: coefficient("Cnda") } },
+      { id: "rudder", label: "Rudder",
+        terms: { side: coefficient("CYdr"), roll: coefficient("Cldr"), yaw: coefficient("Cndr") } },
+      { id: "flaps", label: "Flaps",
+        terms: { drag: coefficient("CDDf"), lift: coefficient("CLDf"), pitch: coefficient("Cmdf") } },
+    ],
     flapPosition: { property: "fcs/flap-pos-deg", fullTravel: 30 },
     automaticFlaps: {
       kind: "assist",
@@ -174,6 +210,16 @@ export const FDM_PROFILES: Record<AircraftId, FdmProfile> = {
     model: "F-35B-jsbsim",
     requiredReadOnlyModelProperties: ["propulsion/engine[0]/body-force-z-lbs"],
     forceEngineLabels: { 0: "Main engine", 1: "Lift fan", 2: "Right roll post", 3: "Left roll post" },
+    // One aileron position drives both ailerons' terms, and one rudder both fins'.
+    // The model gives neither a force, only moments.
+    forceControlSurfaces: [
+      { id: "elevator", label: "Elevator",
+        terms: { drag: coefficient("CDde"), lift: coefficient("CLde"), pitch: coefficient("Cmde") } },
+      { id: "ailerons", label: "Ailerons", terms: { roll: coefficient("Clda"), yaw: coefficient("Cnda") } },
+      { id: "rudders", label: "Rudders", terms: { roll: coefficient("Cldr"), yaw: coefficient("Cndr") } },
+      { id: "flaps", label: "Trailing-edge flaps", terms: { drag: coefficient("CDflap"), lift: coefficient("dCLflap") } },
+      { id: "speedbrake", label: "Speed brake", terms: { drag: coefficient("CDsb"), lift: coefficient("dCLsb") } },
+    ],
     dataPaths: {
       enginePath: "aircraft/F-35B-jsbsim/Engines",
       systemsPath: "aircraft/F-35B-jsbsim/Systems",
