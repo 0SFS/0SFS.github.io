@@ -73,6 +73,23 @@ describe("attitude renderer", () => {
     renderer.destroy();
   });
 
+  it("draws again when the camera it is drawn from turns, though the aircraft holds still", async () => {
+    const t = stubCanvas();
+    const renderer = createAttitudeRenderer(t.host);
+    await renderer.ready;
+    const ahead = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+    const east = [0, -1, 0, 1, 0, 0, 0, 0, 1];
+    renderer.draw(LEVEL, CENTRED, ahead);
+    renderer.draw(LEVEL, CENTRED, [...ahead]);
+    expect(t.frames()).toBe(1);
+    renderer.draw(LEVEL, CENTRED, east);
+    expect(t.frames()).toBe(2);
+    // Back to the aircraft's own frame.
+    renderer.draw(LEVEL, CENTRED, null);
+    expect(t.frames()).toBe(3);
+    renderer.destroy();
+  });
+
   it("falls back to Canvas 2D, and draws the frame it was holding, when WebGPU cannot build", async () => {
     vi.spyOn(console, "warn").mockImplementation(() => {});
     const t = stubCanvas();

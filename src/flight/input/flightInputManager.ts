@@ -1,5 +1,6 @@
 import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import type { ActionIntentFrame } from "@felipegalind0/gamepad-tools/core";
+import { controlTakesEveryKey, controlTakesKey } from "@felipegalind0/gamepad-tools/browser";
 import { applyFlightControls } from "./applyFlightControls";
 import type { GamepadResponseController } from "@felipegalind0/gamepad-tools/core";
 import { flightParameterDefaults, type FlightParameterStore } from "../settings/flightParameters";
@@ -602,8 +603,12 @@ export function createFlightInputManager(options: {
   return {
     attach(target: Window): () => void {
       const onKeyDown = (event: KeyboardEvent): void => {
-        if (event.target instanceof Element && event.target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) {
-          keysDown.clear();
+        // The focused control keeps the keys it uses, and the rest fly: a trim
+        // slider just dragged keeps its arrows and still lets W, A, S and D
+        // through, as the throttle lever always did. Typing into a text field
+        // lets go of every held key.
+        if (controlTakesKey(event.target, event.key)) {
+          if (controlTakesEveryKey(event.target)) keysDown.clear();
           return;
         }
         if (bindingCaptureActive || gamepadToolsActive) {
@@ -645,6 +650,11 @@ export function createFlightInputManager(options: {
       const onBlur = (): void => {
         keysDown.clear();
       };
+      // Focus moving to a slider or a button keeps the keys held: their keyups
+      // still arrive. Only a text field, which takes every key, lets go.
+      const onFocusIn = (event: FocusEvent): void => {
+        if (controlTakesEveryKey(event.target)) keysDown.clear();
+      };
 
       // Capture, so a flight key is marked handled before any bubbling window
       // listener sees it. VS Code's built-in browser registers one before the
@@ -654,13 +664,13 @@ export function createFlightInputManager(options: {
       target.addEventListener("keydown", onKeyDown, { capture: true });
       target.addEventListener("keyup", onKeyUp);
       target.addEventListener("blur", onBlur);
-      target.addEventListener("focusin", onBlur);
+      target.addEventListener("focusin", onFocusIn);
 
       return () => {
         target.removeEventListener("keydown", onKeyDown, { capture: true });
         target.removeEventListener("keyup", onKeyUp);
         target.removeEventListener("blur", onBlur);
-        target.removeEventListener("focusin", onBlur);
+        target.removeEventListener("focusin", onFocusIn);
         keysDown.clear();
       };
     },

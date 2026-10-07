@@ -182,6 +182,18 @@ backend. These same choices travel to the phone. Off or zero frame rate releases
 the orb renderer and retains the numeric gauges. Missing blade metadata also
 allocates no orb graphics backend.
 
+Renderer → Instruments also owns **Attitude indicator view**
+(`osfs.renderer.attitudeView`, Camera or Aircraft, default Camera, added
+2026-10-07). Camera draws the ball from the 3D camera's frame
+(`cameraAttitudeView.ts`): its view direction is the centre and its up is up,
+so the ball turns as the camera orbits, and the aircraft symbol moves to where
+the nose points and turns as the wings lie, pinned dimmed to the frame's edge
+when the nose points out of it. From the cockpit camera that is the aircraft's
+own instrument. Aircraft keeps the nose at the centre and the wings level, as
+the instrument always drew. The velocity markers follow the same frame. The
+stick the instrument also is moves the aircraft alike in both, and the phone's
+attitude indicator, which has no world camera, keeps the aircraft's frame.
+
 The FPS value is a ceiling, not a requested browser refresh rate. At the default,
 the shaft canvas follows each client's `requestAnimationFrame` cadence (for
 example 60, 120, 144 or 240 Hz) without the former 30 FPS throttle. Lower ceilings

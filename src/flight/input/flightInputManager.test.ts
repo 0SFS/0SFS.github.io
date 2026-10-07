@@ -2,6 +2,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { JSBSimSdk } from "@felipegalind0/jsbsim";
+import { createBrowserInputSource } from "@felipegalind0/gamepad-tools/browser";
 import { createFlightInputManager } from "./flightInputManager";
 import type { ControlSurfaceState, FlightInputManager } from "./flightInputManager";
 
@@ -235,6 +236,58 @@ describe("flightInputManager keyboard roll", () => {
     expect(input.isPaused()).toBe(false);
     detach();
     search.remove();
+  });
+
+  /**
+   * On 2026-10-07 W, A, S and D stopped flying once the roll or pitch trim
+   * slider had been dragged, and kept flying after the throttle lever had:
+   * the trims are range inputs, which the keys skipped like text fields,
+   * and the lever is not one. A slider keeps only its own keys now.
+   */
+  it("keeps flying with the flight keys while a trim slider has focus, and leaves the slider its arrows", () => {
+    const input = createFlightInputManager();
+    const detach = input.attach(window);
+    const trim = document.createElement("input");
+    trim.type = "range";
+    document.body.append(trim);
+    try {
+      window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyW", key: "w" }));
+      // Dragging the slider gives it focus; the held key stays held.
+      trim.focus();
+      expect(input.poll(1).elevator).toBe(1);
+      const roll = new KeyboardEvent("keydown", { code: "KeyA", key: "a", bubbles: true, cancelable: true });
+      trim.dispatchEvent(roll);
+      expect(roll.defaultPrevented).toBe(true);
+      expect(input.poll(1).aileron).toBeLessThan(0);
+      const arrow = new KeyboardEvent("keydown", { code: "ArrowLeft", key: "ArrowLeft", bubbles: true, cancelable: true });
+      trim.dispatchEvent(arrow);
+      expect(arrow.defaultPrevented).toBe(false);
+      trim.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyP", key: "p", bubbles: true, cancelable: true }));
+      expect(input.isPaused()).toBe(true);
+    } finally {
+      detach();
+      trim.remove();
+    }
+  });
+
+  /** The flight's bindings read the keyboard through gamepad-tools' source, which asks the same rule. */
+  it("hands the bindings a flight key pressed on a focused slider, and none typed into a text field", () => {
+    const source = createBrowserInputSource({ target: window });
+    const trim = Object.assign(document.createElement("input"), { type: "range" });
+    const search = document.createElement("input");
+    document.body.append(trim, search);
+    const pressed = () => [...source.getFrame().keyboard.pressedCodes];
+    try {
+      trim.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyD", key: "d", bubbles: true }));
+      trim.dispatchEvent(new KeyboardEvent("keydown", { code: "ArrowRight", key: "ArrowRight", bubbles: true }));
+      expect(pressed()).toEqual(["KeyD"]);
+      search.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyS", key: "s", bubbles: true }));
+      expect(pressed()).toEqual(["KeyD"]);
+    } finally {
+      source.dispose();
+      trim.remove();
+      search.remove();
+    }
   });
 });
 

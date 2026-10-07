@@ -7,6 +7,7 @@ import {
   type AttitudeRendererPreference,
   type AttitudeRendererStatus,
 } from "./attitudeRenderer";
+import type { AttitudeView } from "./attitudeIndicator";
 
 export interface FlightHudOptions {
   onGearChange(down: boolean): void;
@@ -96,7 +97,9 @@ export interface FlightHudHandle {
   /**
    * `gearDown`, auto-trim, and master AP are passed separately rather than
    * added to `FlightHudControls` because they are latching switches, not
-   * smoothed axes.
+   * smoothed axes. `attitudeView` is the frame the attitude indicator is
+   * drawn from, the 3D camera's (cameraAttitudeView.ts), or null for the
+   * aircraft's.
    */
   update(
     state: FlightState,
@@ -104,6 +107,7 @@ export interface FlightHudHandle {
     gearDown: boolean,
     autoTrim: FlightHudAutoTrim,
     masterAp?: FlightHudMasterAp,
+    attitudeView?: AttitudeView | null,
   ): void;
   /** Repaint just the gear button, for when the key moves it between frames. */
   setGearDown(down: boolean): void;
@@ -169,7 +173,7 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
             <input data-control="pitch-trim" type="range" min="-1" max="1" step="0.01" value="0" aria-label="Pitch trim" />
           </span>
         </label>
-        <div class="flight-hud__attitude" role="button" tabindex="0" aria-label="Attitude indicator and pitch roll control. Drag to steer."></div>
+        <div class="flight-hud__attitude" role="button" tabindex="0" data-takes-keys="ArrowLeft ArrowRight ArrowUp ArrowDown" aria-label="Attitude indicator and pitch roll control. Drag to steer."></div>
         <div class="flight-hud__lever flight-hud__lever--flaps">
           <span class="flight-hud__lever-meta">
             <span>FLAPS</span>
@@ -597,6 +601,7 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
       nextGearDown: boolean,
       nextAutoTrim: FlightHudAutoTrim,
       nextMasterAp = FLIGHT_HUD_MASTER_OFF,
+      attitudeView: AttitudeView | null = null,
     ): void {
       setGearDown(nextGearDown);
       setAutoTrim(nextAutoTrim);
@@ -608,7 +613,7 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
         : controlsToStickDisplay(controls.aileron, controls.elevator);
       const displayActive = localStick || stickActive
         || Math.hypot(controls.aileron, controls.elevator) > 0.001;
-      attitude.draw(state, { x: displayX, y: displayY, active: displayActive });
+      attitude.draw(state, { x: displayX, y: displayY, active: displayActive }, attitudeView);
 
       iasEl.textContent = Math.round(state.airspeedKts).toString().padStart(3, "0");
       altEl.textContent = formatAltitudeFt(state.altMeters);

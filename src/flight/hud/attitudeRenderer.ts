@@ -4,6 +4,7 @@ import {
   createAttitudeProjection,
   type AttitudeProjection,
   type AttitudeState,
+  type AttitudeView,
 } from "./attitudeIndicator";
 import { createCanvasAttitudePainter, type AttitudeStick } from "./attitudeCanvas";
 import { createWebGpuAttitude, type WebGpuAttitude } from "./attitudeWebGpu";
@@ -42,7 +43,8 @@ export interface AttitudeRenderer {
   /** Which backend draws, once the current choice is settled. */
   readonly ready: Promise<AttitudeBackend>;
   readonly status: AttitudeRendererStatus;
-  draw(state: AttitudeState, stick: AttitudeStick): void;
+  /** Draws the instrument from `view`, such as the 3D camera's, or from the aircraft's when it is null. */
+  draw(state: AttitudeState, stick: AttitudeStick, view?: AttitudeView | null): void;
   setPreference(preference: AttitudeRendererPreference): void;
   destroy(): void;
 }
@@ -91,11 +93,12 @@ export function createAttitudeRenderer(host: HTMLElement, options: AttitudeRende
   let backend: Backend | null = null;
   let projection: AttitudeProjection | null = null;
   /** The last frame asked for, redrawn when a new backend takes over, even while the sim is paused. */
-  let last: [AttitudeState, AttitudeStick] | null = null;
+  let last: [AttitudeState, AttitudeStick, AttitudeView | null] | null = null;
   let destroyed = false;
   /** Bumped on every change of backend, so a setup that finishes late knows it was superseded. */
   let generation = 0;
-  const drawn = new Float64Array(11).fill(Number.NaN);
+  /** What the last frame drew from: size, attitude, velocity, stick, then whether a view was given and its nine numbers. */
+  const drawn = new Float64Array(21).fill(Number.NaN);
 
   const publish = (next: AttitudeRendererStatus): void => {
     status = next;
@@ -121,9 +124,9 @@ export function createAttitudeRenderer(host: HTMLElement, options: AttitudeRende
     return { kind: "canvas2d", ctx, paint: createCanvasAttitudePainter(target.ownerDocument) };
   };
 
-  const draw = (state: AttitudeState, stick: AttitudeStick): void => {
+  const draw = (state: AttitudeState, stick: AttitudeStick, view: AttitudeView | null = null): void => {
     if (destroyed) return;
-    last = [state, stick];
+    last = [state, stick, view];
     if (!backend || !canvas) return;
     const pixelRatio = Math.min(3, Math.max(1, globalThis.devicePixelRatio || 1));
     const backing = Math.max(1, Math.round(cssSize * pixelRatio));
@@ -144,6 +147,9 @@ export function createAttitudeRenderer(host: HTMLElement, options: AttitudeRende
     note(8, stick.x);
     note(9, stick.y);
     note(10, stick.active ? 1 : 0);
+    // A camera that orbits turns the ball while the aircraft holds still.
+    note(11, view ? 1 : 0);
+    for (let index = 0; index < 9; index++) note(12 + index, view?.[index] ?? 0);
     if (!changed) return;
 
     const started = profiler?.clock() ?? 0;
@@ -153,11 +159,11 @@ export function createAttitudeRenderer(host: HTMLElement, options: AttitudeRende
     }
     if (projection?.size !== cssSize) projection = createAttitudeProjection(cssSize, cssSize * ATTITUDE_HALF_SHARE);
     if (backend.kind === "webgpu") {
-      backend.gpu.render(computeAttitudeScene(state, projection, { lines: false }), state, stick, backing / cssSize);
+      backend.gpu.render(computeAttitudeScene(state, projection, { lines: false, view }), stick, backing / cssSize);
     } else {
       backend.ctx.setTransform(backing / cssSize, 0, 0, backing / cssSize, 0, 0);
       backend.ctx.clearRect(0, 0, cssSize, cssSize);
-      backend.paint(backend.ctx, computeAttitudeScene(state, projection), stick);
+      backend.paint(backend.ctx, computeAttitudeScene(state, projection, { view }), stick);
     }
     profiler?.add(PROFILE_SECTION, started);
   };

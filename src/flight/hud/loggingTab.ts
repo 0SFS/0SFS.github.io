@@ -1,3 +1,4 @@
+import { controlTakesKey } from "@felipegalind0/gamepad-tools/browser";
 import type { FlightRecorder } from "../diagnostics/flightRecorder";
 
 /** The Logging tab's behaviour outside its component: saving, the M hotkey and closing. */
@@ -22,11 +23,6 @@ export function downloadCsv(fileName: string, csv: string): void {
   setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
-function isTypingTarget(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false;
-  return target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
-}
-
 /** M marks the current sample while recording, including when another tab is selected. */
 export function bindRecorderMarkHotkey(
   recorder: Pick<FlightRecorder, "isRecording" | "mark">,
@@ -34,7 +30,7 @@ export function bindRecorderMarkHotkey(
 ): () => void {
   const onKeyDown = (event: KeyboardEvent): void => {
     if (event.code !== "KeyM" || event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
-    if (isTypingTarget(event.target)) return;
+    if (controlTakesKey(event.target, event.key)) return;
     if (!recorder.isRecording()) return;
     event.preventDefault();
     recorder.mark();

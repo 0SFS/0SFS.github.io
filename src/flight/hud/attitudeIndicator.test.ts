@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   angleForRadius,
+  bodyToLocal,
   colourAtElevation,
   computeAttitudeScene,
   createAttitudeProjection,
@@ -179,5 +180,59 @@ describe("attitude colourmap", () => {
     const brightness = ([r, g, b]: number[]): number => r + g + b;
     expect(brightness(colourAtElevation(80))).toBeLessThan(brightness(colourAtElevation(10)));
     expect(brightness(colourAtElevation(-80))).toBeLessThan(brightness(colourAtElevation(-10)));
+  });
+});
+
+/**
+ * Drawn from the 3D camera, the ball turns with the view as the camera orbits,
+ * and the aircraft symbol shows the nose and the wings against it: the
+ * default since 2026-10-07 (Renderer → Instruments → Attitude indicator view).
+ */
+describe("attitude indicator drawn from the camera", () => {
+  /** A level camera looking along `headingDeg`. */
+  const camera = (headingDeg: number) => bodyToLocal(0, 0, headingDeg * DEG);
+
+  it("is the aircraft's own instrument when drawn from the aircraft's frame", () => {
+    const flying = state({ rollRad: 25 * DEG, pitchRad: 8 * DEG, headingRad: 40 * DEG });
+    const own = computeAttitudeScene(flying, projection);
+    expect(own.symbol).toEqual({ x: CENTRE, y: CENTRE, angle: 0, pinned: false });
+    expect(own.view).toEqual(bodyToLocal(25 * DEG, 8 * DEG, 40 * DEG));
+    const same = computeAttitudeScene(flying, projection, { view: own.view });
+    expect(same.symbol!.x).toBeCloseTo(CENTRE, 6);
+    expect(same.symbol!.y).toBeCloseTo(CENTRE, 6);
+    expect(same.symbol!.angle).toBeCloseTo(0, 6);
+    expect(same.horizon).toEqual(own.horizon);
+  });
+
+  it("keeps the camera's horizon level and turns the wings as the aircraft banks", () => {
+    const banked = computeAttitudeScene(state({ rollRad: 30 * DEG }), projection, { view: camera(0) });
+    // The horizon runs straight across, at the centre.
+    for (const line of banked.horizon) for (let index = 1; index < line.length; index += 2) expect(line[index]).toBeCloseTo(CENTRE, 6);
+    // The nose straight ahead; the right wing down, turned clockwise on screen.
+    expect(banked.symbol!.x).toBeCloseTo(CENTRE, 6);
+    expect(banked.symbol!.y).toBeCloseTo(CENTRE, 6);
+    expect(banked.symbol!.angle / DEG).toBeCloseTo(30, 1);
+    expect(banked.up[1]).toBeCloseTo(0, 6);
+  });
+
+  it("moves the symbol to where the nose points: left of a camera that looks east, as the aircraft heads north", () => {
+    const aside = computeAttitudeScene(state(), projection, { view: camera(90) });
+    expect(aside.symbol!.x).toBeLessThan(CENTRE - 80);
+    expect(aside.symbol!.y).toBeCloseTo(CENTRE, 6);
+    // Pitched up 20° under a level camera ahead, the nose is above the centre.
+    const climbing = computeAttitudeScene(state({ pitchRad: 20 * DEG }), projection, { view: camera(0) });
+    expect(climbing.symbol!.y).toBeLessThan(CENTRE - 20);
+  });
+
+  it("pins the symbol to the edge, dimmed, where the nose points out of the frame, and hides it straight behind", () => {
+    const behindAside = computeAttitudeScene(state(), projection, { view: camera(130) });
+    expect(behindAside.symbol!.pinned).toBe(true);
+    expect(Math.max(Math.abs(behindAside.symbol!.x - CENTRE), Math.abs(behindAside.symbol!.y - CENTRE))).toBeLessThanOrEqual(96);
+    expect(computeAttitudeScene(state(), projection, { view: camera(180) }).symbol).toBeNull();
+  });
+
+  it("draws the velocity markers against the camera's view too", () => {
+    const prograde = computeAttitudeScene(state(), projection, { view: camera(90) }).markers.find(item => item.kind === "prograde")!;
+    expect(prograde.x).toBeLessThan(CENTRE - 80);
   });
 });

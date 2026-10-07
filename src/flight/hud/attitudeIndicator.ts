@@ -13,6 +13,11 @@ import type { FlightState } from "../physics/flightState";
  * angle from the nose: quickly near the middle, where pitch is read, and more
  * slowly outwards, so the middle of each edge is 90° from the nose and the
  * corners reach most of the way behind.
+ *
+ * It can be drawn from another frame than the aircraft's, the 3D camera's: its
+ * view direction is then the centre and its up is up, the ball turns as the
+ * camera orbits, and the aircraft symbol moves to where the nose points and
+ * turns as the wings lie, so it reads against the view on screen.
  */
 
 export type Vec3 = [number, number, number];
@@ -68,6 +73,13 @@ export function bodyToLocal(rollRad: number, pitchRad: number, headingRad: numbe
   ];
 }
 
+/**
+ * A frame the instrument is drawn from: its forward, right and down directions
+ * in local north/east/down, the columns of a row-major 3×3, as `bodyToLocal`
+ * gives the aircraft's.
+ */
+export type AttitudeView = readonly number[];
+
 export interface ScreenPoint {
   x: number;
   y: number;
@@ -86,8 +98,7 @@ interface View {
   up: Vec3;
 }
 
-function createView(state: AttitudeState, projection: AttitudeProjection): View {
-  const m = bodyToLocal(state.rollRad, state.pitchRad, state.headingRad);
+function createView(m: AttitudeView, projection: AttitudeProjection): View {
   const centre = projection.size / 2;
   const local = (north: number, east: number, down: number): ScreenPoint => {
     // Body axes: x out the nose, y out the right wing, z down through the floor.
@@ -120,6 +131,16 @@ export interface AttitudeMarker {
   pinned: boolean;
 }
 
+/** Where the aircraft symbol is drawn: its nose, and the turn of its wings on screen. */
+export interface AttitudeSymbol {
+  x: number;
+  y: number;
+  /** Radians clockwise on screen; 0 with the wings level across the frame. */
+  angle: number;
+  /** Beyond the frame, and drawn pinned to its edge. */
+  pinned: boolean;
+}
+
 export interface AttitudeLabel {
   text: string;
   x: number;
@@ -131,6 +152,10 @@ export interface AttitudeLabel {
 
 export interface AttitudeScene {
   projection: AttitudeProjection;
+  /** The frame it is drawn from: the aircraft's, or the camera's. */
+  view: AttitudeView;
+  /** The aircraft symbol; null while the nose points straight away from the view, where no edge is nearer. */
+  symbol: AttitudeSymbol | null;
   /** Local up in body axes; the sky and ground colours follow from it. */
   up: Vec3;
   horizon: number[][];
@@ -206,7 +231,7 @@ function tangentAngle(before: ScreenPoint, after: ScreenPoint): number {
   return Math.atan2(after.y - before.y, after.x - before.x);
 }
 
-function candidateLabels(view: View, state: AttitudeState, projection: AttitudeProjection): AttitudeLabel[] {
+function candidateLabels(view: View, headingRad: number, projection: AttitudeProjection): AttitudeLabel[] {
   const labels: AttitudeLabel[] = [];
   const fontPx = labelFontPx(projection);
   const nudge = 0.5 * DEG;
@@ -227,7 +252,7 @@ function candidateLabels(view: View, state: AttitudeState, projection: AttitudeP
       kind: deg in CARDINALS ? "cardinal" : "heading",
     });
   }
-  // Pitch numbers sit on their ring either side of the nose's heading, like
+  // Pitch numbers sit on their ring either side of the view's heading, like
   // the ends of a pitch ladder, and turn with the ring.
   const aside = 40 * attitudeArtScale(projection) / projection.a;
   for (let deg = -80; deg <= 80; deg += 10) {
@@ -235,7 +260,7 @@ function candidateLabels(view: View, state: AttitudeState, projection: AttitudeP
     const elevation = deg * DEG;
     const spread = Math.min(Math.PI / 2, aside / Math.cos(elevation));
     for (const side of [-1, 1]) {
-      const azimuth = state.headingRad + side * spread;
+      const azimuth = headingRad + side * spread;
       const at = view.sphere(elevation, azimuth);
       if (!(at.angle <= EDGE_ANGLE * 1.6)) continue;
       labels.push({
@@ -304,7 +329,7 @@ function boxesOverlap(first: Box, second: Box): boolean {
  * nearest the nose, so where the rings crowd towards the edges it is the outer
  * numbers that go. This runs every frame, so it allocates as little as it can.
  */
-function placeLabels(candidates: AttitudeLabel[], projection: AttitudeProjection): AttitudeLabel[] {
+function placeLabels(candidates: AttitudeLabel[], projection: AttitudeProjection, symbol: AttitudeSymbol | null): AttitudeLabel[] {
   const centre = projection.size / 2;
   const fontPx = labelFontPx(projection);
   const scale = attitudeArtScale(projection);
@@ -314,8 +339,10 @@ function placeLabels(candidates: AttitudeLabel[], projection: AttitudeProjection
     ranks.set(label, (label.kind === "pitch" ? 1e6 : 0) + Math.hypot(label.x - centre, label.y - centre));
   }
   candidates.sort((left, right) => ranks.get(left)! - ranks.get(right)!);
-  // The aircraft symbol, as drawn: wings from -25 to 25, the chevron down to 10.
-  const taken: Box[] = [makeBox(centre, centre + 3.5 * scale, 0, 25.5 * scale, 6 * scale)];
+  // The aircraft symbol, as drawn: wings from -25 to 25, the chevron down to 10, turned with it.
+  const taken: Box[] = symbol
+    ? [makeBox(symbol.x - 3.5 * scale * Math.sin(symbol.angle), symbol.y + 3.5 * scale * Math.cos(symbol.angle), symbol.angle, 25.5 * scale, 6 * scale)]
+    : [];
   const placed: AttitudeLabel[] = [];
   for (const label of candidates) {
     const box = makeBox(label.x, label.y, label.angle, label.text.length * fontPx * 0.31 + 1.5, fontPx * 0.5 + 0.5);
@@ -402,22 +429,56 @@ function traceGrid(view: View, projection: AttitudeProjection, scene: AttitudeSc
   }
 }
 
+/** How near the nose a point is taken to read the wings' turn, radians along the wing. */
+const WING_STEP = 0.05;
+
+/**
+ * The aircraft symbol in a view other than the aircraft's: on the nose's
+ * direction, turned as the wings lie there, and pinned to the frame's edge,
+ * dimmed, where the nose points out of it.
+ */
+function aircraftSymbol(view: View, aircraft: AttitudeView, projection: AttitudeProjection): AttitudeSymbol | null {
+  const nose: Vec3 = [aircraft[0], aircraft[3], aircraft[6]];
+  const wing: Vec3 = [aircraft[1], aircraft[4], aircraft[7]];
+  const at = view.local(nose[0], nose[1], nose[2]);
+  if (!(at.angle <= TRACE_LIMIT)) return null;
+  const along = view.local(nose[0] + wing[0] * WING_STEP, nose[1] + wing[1] * WING_STEP, nose[2] + wing[2] * WING_STEP);
+  const angle = Math.atan2(along.y - at.y, along.x - at.x);
+  const centre = projection.size / 2;
+  const reach = projection.half - 9 * attitudeArtScale(projection);
+  let dx = at.x - centre;
+  let dy = at.y - centre;
+  const extent = Math.max(Math.abs(dx), Math.abs(dy));
+  if (extent > reach) {
+    dx *= reach / extent;
+    dy *= reach / extent;
+  }
+  return { x: centre + dx, y: centre + dy, angle, pinned: extent > projection.half + 1 };
+}
+
 export interface AttitudeSceneOptions {
   /**
    * Trace the grid as polylines. The WebGPU renderer draws the grid per pixel
    * and leaves this off, skipping the few thousand projections it costs.
    */
   lines?: boolean;
+  /** The frame to draw from, such as the 3D camera's; the aircraft's when absent. */
+  view?: AttitudeView | null;
 }
 
 export function computeAttitudeScene(
   state: AttitudeState,
   projection: AttitudeProjection,
-  { lines = true }: AttitudeSceneOptions = {},
+  { lines = true, view: from = null }: AttitudeSceneOptions = {},
 ): AttitudeScene {
-  const view = createView(state, projection);
+  const aircraft = bodyToLocal(state.rollRad, state.pitchRad, state.headingRad);
+  const frame = from ?? aircraft;
+  const view = createView(frame, projection);
+  const centre = projection.size / 2;
   const scene: AttitudeScene = {
     projection,
+    view: frame,
+    symbol: from ? aircraftSymbol(view, aircraft, projection) : { x: centre, y: centre, angle: 0, pinned: false },
     up: view.up,
     horizon: [],
     skyRings: [],
@@ -429,7 +490,9 @@ export function computeAttitudeScene(
     markers: [],
   };
   if (lines) traceGrid(view, projection, scene);
-  scene.labels = placeLabels(candidateLabels(view, state, projection), projection);
+  // The view's own heading: its forward direction's, which is the nose's in the aircraft's.
+  const headingRad = from ? Math.atan2(frame[3], frame[0]) : state.headingRad;
+  scene.labels = placeLabels(candidateLabels(view, headingRad, projection), projection, scene.symbol);
   scene.markers = velocityMarkers(view, state, projection);
   return scene;
 }

@@ -5,11 +5,9 @@ import {
   SKY_STOPS,
   allAttitudeLabels,
   attitudeArtScale,
-  bodyToLocal,
   labelFontPx,
   type AttitudeMarkerKind,
   type AttitudeScene,
-  type AttitudeState,
   type Rgb,
 } from "./attitudeIndicator";
 import {
@@ -277,7 +275,7 @@ function letterAtlas(doc: Document, fontPx: number, scale: number, pixelRatio: n
 }
 
 export interface WebGpuAttitude {
-  render(scene: AttitudeScene, state: AttitudeState, stick: AttitudeStick, pixelRatio: number): void;
+  render(scene: AttitudeScene, stick: AttitudeStick, pixelRatio: number): void;
   destroy(): void;
 }
 
@@ -424,14 +422,15 @@ export async function createWebGpuAttitude(
   };
 
   return {
-    render(scene, state, stick, pixelRatio) {
+    render(scene, stick, pixelRatio) {
       if (lost) return;
       const { projection } = scene;
       const centre = projection.size / 2;
       const scale = attitudeArtScale(projection);
       const lettering = ensureAtlas(labelFontPx(projection), scale, pixelRatio);
 
-      const m = bodyToLocal(state.rollRad, state.pitchRad, state.headingRad);
+      // The frame the ball is drawn from: the aircraft's, or the camera's.
+      const m = scene.view;
       frameData.set([m[0], m[1], m[2], 0, m[3], m[4], m[5], 0, m[6], m[7], m[8], 0]);
       frameData.set([projection.size, pixelRatio, centre, projection.half], 12);
       frameData.set([projection.a, projection.b, scale, attitudeFrameCorner(projection)], 16);
@@ -458,7 +457,7 @@ export async function createWebGpuAttitude(
         count++;
       };
       for (const label of scene.labels) place(`label:${label.kind}:${label.text}`, label.x, label.y, label.angle, 1);
-      place("symbol", centre, centre, 0, 1);
+      if (scene.symbol) place("symbol", scene.symbol.x, scene.symbol.y, scene.symbol.angle, scene.symbol.pinned ? PINNED_ALPHA : 1);
       for (const marker of scene.markers) place(`marker:${marker.kind}`, marker.x, marker.y, 0, marker.pinned ? PINNED_ALPHA : 1);
       if (stickShown(stick)) {
         place("white", centre, centre, 0, STICK_CROSSHAIR_ALPHA, projection.half, 0.5);

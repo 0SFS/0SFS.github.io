@@ -152,6 +152,8 @@ export interface FlightControlPanelOptions {
   rendererTab: HTMLElement;
   /** The shared Settings tab: presets and the saved record. */
   settingsSections: readonly PanelSection[];
+  /** The shared About tab, from `createAboutPanel`: which version runs, and what it is built from. */
+  aboutTab?: HTMLElement;
   /** The shared Interface tab: the log and place search. */
   interfaceSections: readonly PanelSection[];
   initialWeather: FlightWeatherState;
@@ -865,6 +867,7 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
       rendererTab={props.rendererTab}
       settingsSections={props.settingsSections}
       interfaceSections={props.interfaceSections}
+      aboutTab={props.aboutTab}
       getViewState={() => props.snapshot.flightState}
       setViewState={props.onLocationApply}
       locationSearchProvider={props.locationSearchProvider}

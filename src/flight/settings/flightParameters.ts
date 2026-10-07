@@ -514,6 +514,22 @@ export const OSFS_PARAMETERS = [
     appliesLive: true,
     source: "src/flight/hud/attitudeRenderer.ts",
   },
+  {
+    id: "osfs.renderer.attitudeView",
+    label: "Attitude indicator view",
+    description: "Where the attitude indicator looks from. Camera: the ball turns with the 3D view as the camera orbits, and the aircraft symbol moves to where the nose points and turns as the wings lie. Aircraft: the nose stays at the centre and the wings level, as on a cockpit instrument. The stick it also is moves the aircraft the same way in both.",
+    unit: "none",
+    kind: "choice",
+    choices: [
+      { id: "camera", label: "Camera", description: "The ball turns with the 3D view; the aircraft symbol shows the nose and the wings against it." },
+      { id: "aircraft", label: "Aircraft", description: "The nose at the centre and the wings level, as the instrument always drew." },
+    ],
+    default: "camera",
+    defaultReason: "The ball then agrees with the view on screen, so the aircraft symbol reads against what the pilot sees.",
+    home: main(INSTRUMENTS),
+    appliesLive: true,
+    source: "src/flight/hud/attitudeIndicator.ts",
+  },
 
   {
     id: "osfs.renderer.engineOrbs",

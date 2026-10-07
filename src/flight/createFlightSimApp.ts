@@ -35,7 +35,7 @@ import { createVisibleMeshCollision } from "./physics/visibleMeshCollision";
 import { loadInputModePreference, loadInputSensitivityPreference } from "foss-earth/input";
 import "../styles/flight.css";
 import "@felipegalind0/gamepad-tools/styles.css";
-import { createBrowserInputSource } from "@felipegalind0/gamepad-tools/browser";
+import { controlTakesKey, createBrowserInputSource } from "@felipegalind0/gamepad-tools/browser";
 import {
   BindingRuntime,
   createProfileStore,
@@ -168,10 +168,13 @@ import { createJsbsimRuntime } from "./jsbsim/createJsbsimRuntime";
 import { CONTROL_LAW_MODE_VALUES, getFdmProfile } from "./jsbsim/fdmProfiles";
 import { createAircraftEngineVisuals } from "./aircraft/createAircraftEngineVisuals";
 import { createFixedStepPhysicsLoop, FIXED_DT } from "./physics/fixedStepLoop";
+import { cameraAttitudeView } from "./hud/cameraAttitudeView";
+import type { AttitudeView } from "./hud/attitudeIndicator";
 import { createFlightLoadingScreen, type FlightLoadingScreen } from "../loading/createFlightLoadingScreen";
 import {
   connectMapDetailLog,
   connectMapDetailRuntime,
+  createAboutPanel,
   createGameLog,
   createMapDetailController,
   createMapSourcePanel,
@@ -948,6 +951,11 @@ export async function createFlightSimApp(
     flightHud.setAttitudeRenderer(preference);
     runtime.requestRender();
   }));
+  /** Renderer → Instruments → Attitude indicator view: the 3D camera's frame, or null for the aircraft's. */
+  const attitudeView = (): AttitudeView | null => (
+    parameters.get("osfs.renderer.attitudeView") === "camera" ? cameraAttitudeView(runtime.scene.activeCamera) : null
+  );
+  stopWatching.push(parameters.watch("osfs.renderer.attitudeView", () => runtime.requestRender()));
   if (vtolProfile) stopWatching.push(parameters.watch("osfs.aircraft.stovlConversion", () => {
     flightHud.refreshVtolConversion();
     runtime.requestRender();
@@ -1412,7 +1420,7 @@ export async function createFlightSimApp(
 
   const onViewKeyDown = (event: KeyboardEvent): void => {
     if (event.code !== "KeyV" || event.repeat) return;
-    if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
+    if (controlTakesKey(event.target, event.key)) return;
     if (inputManager.isBindingCaptureActive() || inputManager.isGamepadToolsActive()) {
       event.preventDefault();
       return;
@@ -1767,7 +1775,7 @@ export async function createFlightSimApp(
       syncNativeAutoFlaps();
       flightHud.update(state, inputManager.getControls(), inputManager.getGearDownNorm() > 0, {
         pitch: pitchAutoTrim.enabled, roll: rollAutoTrim.enabled,
-      }, hudMasterAp());
+      }, hudMasterAp(), attitudeView());
       saveFlight();
       controlPanel?.update(createPanelSnapshot(state));
       hudBar?.update(state, runtime.status, measuredFps, inputManager.isPaused());
@@ -1881,6 +1889,8 @@ export async function createFlightSimApp(
     { id: "presets", title: "Presets", element: presetsSection.element },
     { id: "saved-settings", title: "Saved settings", element: savedSettingsSection.element },
   ];
+  // Which version runs, and everything it is built from, read from the page itself.
+  const about = createAboutPanel({ site: __REPOSITORY_SLUG__ || undefined });
   const interfaceSections: PanelSection[] = interfaceParameterSections.map(({ section, handle }) => ({
     id: section, title: settings.getSectionTitle("interface", section), element: handle.element,
   }));
@@ -1891,6 +1901,7 @@ export async function createFlightSimApp(
     mapTab: mapPanel.element,
     rendererTab: rendererPanel.element,
     settingsSections,
+    aboutTab: about.element,
     interfaceSections,
     initialWeather: weather,
     gamepadBindings,
@@ -2331,6 +2342,7 @@ export async function createFlightSimApp(
       lastApResult.engaged ? lastApResult.gearDownNorm > 0 : inputManager.getGearDownNorm() > 0,
       { pitch: pitchAutoTrim.enabled, roll: rollAutoTrim.enabled },
       hudMasterAp(),
+      attitudeView(),
     );
     frameProfiler.add("flight/hud", sectionStarted);
     const now = performance.now();
@@ -2415,6 +2427,7 @@ export async function createFlightSimApp(
       controlPanel?.destroy();
       presetsSection.destroy();
       savedSettingsSection.destroy();
+      about.dispose();
       for (const { handle } of interfaceParameterSections) handle.destroy();
       mapPanel.destroy();
       detailRequirements?.releaseAll();
@@ -2472,7 +2485,7 @@ export async function createFlightSimApp(
     lastLocalFlapsRevision = inputManager.getFlapsInputRevision();
     flightHud.update(state, inputManager.getControls(), inputManager.getGearDownNorm() > 0, {
       pitch: pitchAutoTrim.enabled, roll: rollAutoTrim.enabled,
-    }, hudMasterAp());
+    }, hudMasterAp(), attitudeView());
     terrainContact.reset();
     visibleMeshCollision.reset();
     physicsLoop.reset();

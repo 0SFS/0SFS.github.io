@@ -85,6 +85,8 @@ export function createThrottleLever(box: HTMLElement, options: ThrottleLeverOpti
   slider.setAttribute("aria-orientation", "vertical");
   slider.setAttribute("aria-valuemin", "0");
   slider.setAttribute("aria-valuemax", "100");
+  // A slider's keys, and Space and Enter, which hold it as the pointer does. The flight's keys pass.
+  slider.setAttribute("data-takes-keys", "ArrowUp ArrowDown ArrowLeft ArrowRight PageUp PageDown Home End Space Enter");
   slider.tabIndex = 0;
   slider.innerHTML = `
     <span class="flight-throttle__track"><span class="flight-throttle__fill"></span></span>

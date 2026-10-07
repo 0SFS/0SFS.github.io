@@ -177,6 +177,8 @@ vi.mock("./hud/flightHud", async importOriginal => {
   return { ...actual, createFlightHud: (root: HTMLElement, options: import("./hud/flightHud").FlightHudOptions) =>
     mocks.useRealFlightHud ? actual.createFlightHud(root, options) : mocks.flightHud };
 });
+// The scene's cameras here are stand-ins, with no view to draw the attitude indicator from.
+vi.mock("./hud/cameraAttitudeView", () => ({ cameraAttitudeView: vi.fn(() => null) }));
 vi.mock("./jsbsim/resetFlightLocation", () => ({ resetFlightLocation: mocks.resetLocation }));
 // The mocked simulator cannot be captured or reinitialised; these two stand in for it.
 vi.mock("./jsbsim/savedFlight", async importOriginal => {
@@ -192,6 +194,7 @@ vi.mock("./hud/createFlightHudBar", () => ({
 
 import type { FrameProfileSession } from "foss-earth/perf";
 import { getAppSettings, resetAppSettings, SETTINGS_STORAGE_KEY } from "foss-earth/settings";
+import { cameraAttitudeView } from "./hud/cameraAttitudeView";
 import { setMapSourcePreference } from "foss-earth/runtime";
 import { createFlightSimApp } from "./createFlightSimApp";
 import { createAircraftModel } from "./aircraft/createAircraftModel";
@@ -728,6 +731,23 @@ it.each([
   } finally { await act(async () => t.app.destroy()); }
 });
 
+
+it("draws the attitude indicator from the 3D camera by default, and from the aircraft when asked", async () => {
+  const t = await mountAircraftSelection([]);
+  const frame = [0, -1, 0, 1, 0, 0, 0, 0, 1];
+  vi.mocked(cameraAttitudeView).mockReturnValue(frame);
+  try {
+    const tick = mocks.runtime.setSimTick.mock.calls.at(-1)![0] as (dt: number) => void;
+    tick(1 / 60);
+    expect(mocks.flightHud.update.mock.calls.at(-1)![5]).toBe(frame);
+    getAppSettings().set("osfs.renderer.attitudeView", "aircraft");
+    tick(1 / 60);
+    expect(mocks.flightHud.update.mock.calls.at(-1)![5]).toBeNull();
+  } finally {
+    vi.mocked(cameraAttitudeView).mockReturnValue(null);
+    await act(async () => t.app.destroy());
+  }
+});
 
 it("supplies the true cockpit camera to audio even while chase is the active view", async () => {
   const t = await mountAircraftSelection([["osfs.aircraft", "f-35b"]]);
@@ -1615,7 +1635,7 @@ describe("pause while loading and resumed flights", () => {
       expect(nativeWrites.at(-1)![1]).toBe(Number(enabled));
       expect(getAppSettings().get("osfs.assist.autoFlaps")).toBe(enabled);
       expect(mocks.flightHud.update).toHaveBeenLastCalledWith(
-        expect.anything(), expect.objectContaining({ flaps: enabled ? 0.6 : 0.25 }), true, expect.anything(), expect.anything(),
+        expect.anything(), expect.objectContaining({ flaps: enabled ? 0.6 : 0.25 }), true, expect.anything(), expect.anything(), null,
       );
       const tick = mocks.runtime.setSimTick.mock.calls.at(-1)![0] as (dt: number) => void;
       tick(1 / 60);

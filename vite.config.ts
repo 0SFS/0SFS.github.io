@@ -4,6 +4,7 @@ import { execSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import type { Plugin } from 'vite'
+import { builtFrom } from 'foss-earth/vite'
 import { findLanAddress } from './scripts/dev-lan.mjs'
 import { pageHtmlFor } from './scripts/pages-html.mjs'
 
@@ -95,6 +96,24 @@ function lanOriginPlugin(): Plugin {
   }
 }
 
+/**
+ * The engine comes as a packed tarball, whose package.json names no commit;
+ * its build metadata records the fork's, which About shows with the rest of
+ * what the app is built from.
+ */
+function jsbsimBuild({ name, dir }: { name: string; dir: string }) {
+  if (name !== '@felipegalind0/jsbsim') return undefined
+  try {
+    const { identity } = JSON.parse(readFileSync(path.join(dir, 'dist/build-metadata.json'), 'utf8'))
+    const native = identity?.native
+    if (typeof native?.commit !== 'string') return undefined
+    return { commit: native.commit, dirty: native.dirty === true, ...(typeof native.origin === 'string' ? { repository: native.origin.replace(/\.git$/, '') } : {}) }
+  } catch {
+    // No metadata: About gives the package's version alone.
+    return undefined
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   base,
@@ -122,7 +141,8 @@ export default defineConfig({
     __SOURCE_VERSION__: JSON.stringify(sourceVersion),
     __REPOSITORY_SLUG__: JSON.stringify(getRepositorySlug()),
   },
-  plugins: [react(), copyIndexToPagesPaths(), lanOriginPlugin()],
+  // Each page says what it is built from, for the About tab, which /fly/ and /rc/ copy with it.
+  plugins: [react(), copyIndexToPagesPaths(), lanOriginPlugin(), builtFrom({ describe: jsbsimBuild })],
   test: {
     maxWorkers: '50%',
     // `build/` holds gitignored validation sandboxes, some of which symlink to

@@ -121,6 +121,10 @@ Rules only. Details live in the linked docs; update those, not this file.
   nothing floats in a screen corner.
 - A dropdown is as wide as its own text, its longest option, and never stretched
   to its row, column or panel.
+- A control uses an input or passes it on to the world behind it: swipes and
+  pinches no control uses move the camera, and a focused control keeps only the
+  keys it uses (`controlTakesKey`). Never a key binding's own list of elements to
+  ignore.
 - Spec and reasons, shared with FOSS Earth:
   [../foss-earth/docs/ui-layout.md](../foss-earth/docs/ui-layout.md).
 

@@ -132,7 +132,7 @@ export function aircraftSymbolReach(scale: number): { x: number; up: number; dow
   return { x: 24 * scale + 2.5, up: 2.6 * scale + 1, down: 8 * scale + 2.5 };
 }
 
-/** The fixed aircraft symbol about the nose: wings, a chevron under it, and the nose itself as a dot. */
+/** The aircraft symbol about the nose: wings, a chevron under it, and the nose itself as a dot. */
 export function drawAircraftSymbolGlyph(ctx: CanvasRenderingContext2D, scale: number): void {
   outlined(ctx, SYMBOL, 2.5 * scale, () => {
     ctx.moveTo(-24 * scale, 0);
@@ -327,10 +327,14 @@ export function createCanvasAttitudePainter(doc: Document): CanvasAttitudePainte
       drawLabelGlyph(ctx, label.text, label.kind, fontPx);
       ctx.restore();
     }
-    ctx.save();
-    ctx.translate(centre, centre);
-    drawAircraftSymbolGlyph(ctx, scale);
-    ctx.restore();
+    if (scene.symbol) {
+      ctx.save();
+      ctx.translate(scene.symbol.x, scene.symbol.y);
+      ctx.rotate(scene.symbol.angle);
+      ctx.globalAlpha = scene.symbol.pinned ? PINNED_ALPHA : 1;
+      drawAircraftSymbolGlyph(ctx, scale);
+      ctx.restore();
+    }
     for (const marker of scene.markers) {
       ctx.save();
       ctx.translate(marker.x, marker.y);
