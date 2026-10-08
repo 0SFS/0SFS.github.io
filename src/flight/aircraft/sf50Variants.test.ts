@@ -64,7 +64,10 @@ describe("SF50 generation package contracts", () => {
       files: string[];
       aircraft: Record<string, string[]>;
     };
-    expect(Object.keys(manifest.aircraft).sort()).toEqual([...AIRCRAFT_IDS].sort());
+    // One package per aircraft, and one per engine model that declares its own.
+    const engineModelPackages = AIRCRAFT_IDS.flatMap(id => (getFdmProfile(id).engineModels ?? [])
+      .flatMap(model => model.profile?.dataPackage ?? []));
+    expect(Object.keys(manifest.aircraft).sort()).toEqual([...AIRCRAFT_IDS, ...engineModelPackages].sort());
     expect(manifest.files).toEqual(manifest.aircraft["cessna-172"]);
     for (const variant of SF50_VARIANTS) {
       const modelPath = `aircraft/${variant.model}/${variant.model}.xml`;

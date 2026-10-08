@@ -1,0 +1,19 @@
+
+ RUN  v4.1.6 .
+
+ ✓ build/validation/f135-empirical-engine-model/2026-10-08_125117/response.ab.test.ts (1 test) 1414ms
+   ✓ measures each engine model's throttle response  1413ms
+ ✓ build/validation/f135-empirical-engine-model/2026-10-08_125117/empirical.f35b.integration.test.ts (66 tests) 3375ms
+     ✓ flies the app bootstrap, terrain relocation and adopted trim for 60 s (auto trim=false)  347ms
+     ✓ flies the app bootstrap, terrain relocation and adopted trim for 60 s (auto trim=true)  333ms
+
+ Test Files  2 passed (2)
+      Tests  67 passed (67)
+   Start at  12:51:17
+   Duration  4.84s (transform 666ms, setup 0ms, import 1.90s, tests 4.79s, environment 721ms)
+
+JSON report written to ./build/validation/f135-empirical-engine-model/2026-10-08_125117/vitest.json
+(node:84979) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:84978) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)

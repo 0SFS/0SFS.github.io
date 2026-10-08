@@ -35,3 +35,14 @@ describe("F-35B flight data hydration", () => {
     expect(fetch).toHaveBeenCalledTimes(packageFiles.length + 1);
   });
 });
+
+describe("F-35B empirical engine package", () => {
+  it("holds the empirical model's own files and only the F-35B thruster and pushback it shares", () => {
+    const files = resolveAircraftDataFiles(manifest, "f-35b-empirical-engine");
+    expect(files.filter(file => !file.startsWith("aircraft/F-35B-jsbsim-empirical/"))).toEqual([
+      "aircraft/F-35B-jsbsim/Engines/direct.xml", "aircraft/F-35B-jsbsim/Systems/pushback.xml",
+    ]);
+    expect(files).toContain("aircraft/F-35B-jsbsim-empirical/F-35B-jsbsim-empirical.xml");
+    for (const file of files) expect(readFileSync(path.join(dataRoot, file), "utf8").length, file).toBeGreaterThan(0);
+  });
+});

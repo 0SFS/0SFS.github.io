@@ -133,6 +133,11 @@ describe("formatting", () => {
     expect(formatRowValue({ label: "Metal", path: "p", unit: "°C", offset: -273.15 }, Number.NaN))
       .toBe("n/a");
     expect(formatRowValue({ label: "Cutoff", path: "p", flag: true }, 1)).toBe("on");
+    const algorithm = { label: "Algorithm used", path: "p", labels: ["component", "reduced"] };
+    expect(formatRowValue(algorithm, 1)).toBe("reduced");
+    expect(formatRowValue(algorithm, 7)).toBe("7");
+    expect(formatRowValue({ label: "Energy residual", path: "p", exponential: true, digits: 1 }, 1.234e-7)).toBe("1.2e-7");
+    expect(formatRowValue({ label: "Memory", path: "p", unit: "KiB", scale: 1 / 1024, digits: 1 }, 23347)).toBe("22.8 KiB");
   });
 
   it("labels whatever tanks the catalog lists", () => {

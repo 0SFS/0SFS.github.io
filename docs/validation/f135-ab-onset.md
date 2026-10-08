@@ -42,7 +42,10 @@ and [log](../../validation/evidence/aircraft/f35b/engine-plant/ab-onset/cpu-diag
 retain the run; every criterion passes except visible onset, which remains
 untested. No browser, GPU, sound device or perception test was run.
 
-The rest of this page is the 2026-10-07 record of the empirical engine.
+The rest of this page is the 2026-10-07 record of the empirical engine. That
+engine is still selectable, unchanged, in Engine → Simulation → Engine model,
+so the two can be flown one after the other; it keeps this defect
+([comparison](engine-plant-report.md#comparing-with-the-empirical-engine)).
 
 ## Reproduced native discrepancy
 

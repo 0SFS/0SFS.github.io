@@ -325,12 +325,18 @@ export interface EngineRow {
   offset?: number;
   digits?: number;
   flag?: boolean;
+  /** Names of an enumeration's values, by value. */
+  labels?: readonly string[];
+  /** Scientific notation, with `digits` after the point: for residuals near zero. */
+  exponential?: boolean;
 }
 
 export function formatRowValue(row: EngineRow, value: number): string {
   if (!Number.isFinite(value)) return "n/a";
   if (row.flag) return value > 0.5 ? "on" : "off";
-  const text = (value * (row.scale ?? 1) + (row.offset ?? 0)).toFixed(row.digits ?? 2);
+  if (row.labels) return row.labels[Math.round(value)] ?? String(value);
+  const scaled = value * (row.scale ?? 1) + (row.offset ?? 0);
+  const text = row.exponential ? scaled.toExponential(row.digits ?? 1) : scaled.toFixed(row.digits ?? 2);
   return row.unit ? `${text} ${row.unit}` : text;
 }
 
@@ -445,6 +451,32 @@ export const ENGINE_SECTIONS: readonly { id: string; title: string; rows: readon
       { label: "Starter (piston)", path: "propulsion/engine/starter-norm", digits: 2 },
       { label: "Seized", path: "propulsion/engine/seized", flag: true },
       { label: "Stalled", path: "propulsion/engine/stalled", flag: true },
+    ],
+  },
+  {
+    id: "plant", title: "Engine plant numerics", rows: [
+      ...([
+        { label: "Algorithm used", path: "numerics/algorithm", labels: ["component", "reduced"],
+          description: "What produced the last accepted step: the chosen algorithm, or the component reference it fell back to." },
+        { label: "Fallback", path: "numerics/fallback-reason",
+          labels: ["none", "iteration cap", "out of domain", "non-finite value", "memory budget", "no steady point"],
+          description: "Why the last step fell back to the component reference, or why a zero-time call could not find a steady point." },
+        { label: "Converged", path: "numerics/converged", flag: true },
+        { label: "Failed step", path: "numerics/failure", flag: true,
+          description: "The engine could not close a step within its caps and kept its last accepted state." },
+        { label: "Iterations", path: "numerics/iterations", digits: 0 },
+        { label: "Residual evaluations", path: "numerics/residual-evaluations", digits: 0 },
+        { label: "Substeps", path: "numerics/substeps", digits: 0 },
+        { label: "Largest residual", path: "numerics/max-residual", exponential: true, digits: 1 },
+        { label: "Nozzle back-off", path: "numerics/nozzle-backoff", digits: 3 },
+        { label: "Domain clamps", path: "numerics/domain-clamps", digits: 0 },
+        { label: "Resident memory", path: "numerics/resident-bytes", unit: "KiB", scale: 1 / 1024, digits: 1 },
+        { label: "Energy residual", path: "ledger/energy-relative", exponential: true, digits: 1,
+          description: "Energy the last step's account leaves unexplained, over the energy that step moved." },
+        { label: "Mass residual", path: "ledger/mass-relative", exponential: true, digits: 1,
+          description: "Mass the last step's account leaves unexplained, over the mass that step moved." },
+      ] satisfies EngineRow[]).map(row => ({ ...row, path: "propulsion/engine/plant/" + row.path,
+        validityProperties: ["propulsion/engine/plant/numerics/valid"] })),
     ],
   },
   {

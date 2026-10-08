@@ -1,0 +1,171 @@
+{
+  "schema": 1,
+  "question": "Is the empirical engine model the F-35B as it flew before the coupled engine plant, and how do the two respond?",
+  "beforePlantCommit": "d92a928ad32a7c8c25ba915e9e86f2fdc438f40c",
+  "sdk": {
+    "identity": {
+      "schemaVersion": 2,
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.20"
+      },
+      "native": {
+        "origin": "https://github.com/Felipegalind0/jsbsim",
+        "commit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+        "contentSha256": "84397f74ef0e98da0c3b18811a65126ee3772fbeb14a58eeb035e2397d04abd6",
+        "dirty": false
+      },
+      "sdk": {
+        "commit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+        "contentSha256": "ed3068909a15a4df385107708e25234f658d90bee62e397a6fc09e25f12721cc",
+        "dirty": false,
+        "path": "wasm"
+      },
+      "build": {
+        "mode": "in-tree",
+        "inputSha256": "b474b47fdf138aca59837b3d974941270a6c75e39c641c8b98cc970d3a6cba31",
+        "toolchain": {
+          "node": "v26.8.2",
+          "npm": "11.19.1",
+          "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+          "cmake": "cmake version 4.4.3",
+          "clang": "clang version 24.0.0git",
+          "platform": "darwin",
+          "arch": "arm64",
+          "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+        },
+        "options": {
+          "buildType": "Release",
+          "cxxStandard": 17,
+          "sdkTarget": "es2022"
+        }
+      }
+    },
+    "packageArchive": {
+      "path": "deps/felipegalind0-jsbsim-1.2.4-fork.20.tgz",
+      "sha256": "37532356738b7a551daf53b997bc7726898a78ba75d399019d77ad3ea1094419",
+      "integrity": "sha512-u+CgqqdtXa8WUMZipNMioSQjS94DkAe/q1dwOLYeVVpCAhUh5DWXg/sUVD1jnBw+P5cMFy+RXMGKqgdxzBh7Ow=="
+    }
+  },
+  "files": [
+    {
+      "was": "public/jsbsim-data/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml",
+      "is": "public/jsbsim-data/aircraft/F-35B-jsbsim-empirical/F-35B-jsbsim-empirical.xml",
+      "sha256": "7d81cf7930ac9ecb008fa5c8a72259aa198824cc31acb26a4537e140d055be17",
+      "identical": true
+    },
+    {
+      "was": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+      "is": "public/jsbsim-data/aircraft/F-35B-jsbsim-empirical/Engines/F135-PW-600.xml",
+      "sha256": "04cea10d3c135cb79247bbf7794a81359070e2bdc9afc9782502b538444eac16",
+      "identical": true
+    },
+    {
+      "was": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/liftfan.xml",
+      "is": "public/jsbsim-data/aircraft/F-35B-jsbsim-empirical/Engines/liftfan.xml",
+      "sha256": "9ded9a6a93eeab2dac35c779b51945b9e5cf0807591737b67262b27c5ab67287",
+      "identical": true
+    },
+    {
+      "was": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/sidefan.xml",
+      "is": "public/jsbsim-data/aircraft/F-35B-jsbsim-empirical/Engines/sidefan.xml",
+      "sha256": "90e1017803f4d9f46285ee09b2aed37d01cee82053e612ffabcf7a19816571ae",
+      "identical": true
+    }
+  ],
+  "suite": {
+    "source": "d92a928a:src/flight/jsbsim/f35b.integration.test.ts",
+    "sha256": "cc3026828b30f4a0af7b179549862a8b3d5b517fb5cdae8409d6e8dccd2d59e4",
+    "changes": [
+      [
+        "const profile = getFdmProfile(aircraftId);",
+        "const profile = getFdmProfile(aircraftId, \"empirical\");"
+      ],
+      [
+        "resolveAircraftDataFiles(manifest, aircraftId)",
+        "resolveAircraftDataFiles(manifest, profile.dataPackage!)"
+      ],
+      [
+        "await bootstrapAircraft(sdk, aircraftId, options);",
+        "await bootstrapAircraft(sdk, aircraftId, { ...options, engineModel: \"empirical\" });"
+      ],
+      [
+        "await bootstrapAircraft(sdk, aircraftId);",
+        "await bootstrapAircraft(sdk, aircraftId, { engineModel: \"empirical\" });"
+      ],
+      [
+        "await bootstrapAircraft(sdk, aircraftId, { throttleNorm: 1 });",
+        "await bootstrapAircraft(sdk, aircraftId, { throttleNorm: 1, engineModel: \"empirical\" });"
+      ],
+      [
+        "\"/runtime/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml\"",
+        "\"/runtime/aircraft/F-35B-jsbsim-empirical/Engines/F135-PW-600.xml\""
+      ]
+    ]
+  },
+  "tests": {
+    "total": 67,
+    "passed": 67,
+    "failed": 0
+  },
+  "response": {
+    "conditions": "Sea-level ISA static stand (hold-down), throttle 0 for 30 s, then 0.99 for 15 s, 1 for 10 s and 0 for 15 s; 120 Hz; simulation time, not wall-clock.",
+    "byEngineModel": {
+      "plant": {
+        "idleLbf": 1816,
+        "idleToMil": {
+          "fromLbf": 1816,
+          "toLbf": 26988,
+          "t10S": 0.5916666666666667,
+          "t50S": 1.375,
+          "t90S": 4.45,
+          "firstReheatBurnS": null
+        },
+        "milToMax": {
+          "fromLbf": 26988,
+          "toLbf": 40992,
+          "t10S": 1.2833333333333332,
+          "t50S": 1.5166666666666666,
+          "t90S": 2.3916666666666666,
+          "firstReheatBurnS": 1.25
+        },
+        "maxToIdle": {
+          "fromLbf": 40992,
+          "toLbf": 1825,
+          "t10S": 0.1,
+          "t50S": 0.2833333333333333,
+          "t90S": 1.175,
+          "firstReheatBurnS": 0.008333333333333333
+        }
+      },
+      "empirical": {
+        "idleLbf": 1325,
+        "idleToMil": {
+          "fromLbf": 1325,
+          "toLbf": 26646,
+          "t10S": 1.2833333333333332,
+          "t50S": 2.125,
+          "t90S": 2.55,
+          "firstReheatBurnS": null
+        },
+        "milToMax": {
+          "fromLbf": 26646,
+          "toLbf": 43000,
+          "t10S": 0.008333333333333333,
+          "t50S": 0.008333333333333333,
+          "t90S": 0.008333333333333333,
+          "firstReheatBurnS": 0.008333333333333333
+        },
+        "maxToIdle": {
+          "fromLbf": 43000,
+          "toLbf": 1325,
+          "t10S": 0.008333333333333333,
+          "t50S": 0.06666666666666667,
+          "t90S": 0.3833333333333333,
+          "firstReheatBurnS": null
+        }
+      }
+    }
+  },
+  "passed": true
+}

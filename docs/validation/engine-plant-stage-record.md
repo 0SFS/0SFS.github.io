@@ -31,7 +31,7 @@ only its own files and hunks.
 | 3 Lifecycle integration | done | `FGTurbine` adapter: set-running at the FCS throttle, zero-time steady/refresh, reset, supply and debit, staged state record with commit; app snapshot restore of the exact plant state |
 | 4 F135 and LiftSystem | done | [Ledger](f135-engine-plant.md); one engine with LiftSystem outlets as external forces; hover reheat inhibit; app tests |
 | 5 Reduction and budgets | done | Reduced algorithm (tabulated gas, Jacobian reuse, component fallback) against the component reference on five held-out trajectories ([evidence](../../validation/evidence/aircraft/f35b/engine-plant/algorithms/report.json)); work and bytes bounded by the iteration, substep and memory caps; local linear model deferred (below) |
-| 6 SDK and consumers | done, one gap | Audio, optics/onset harness, forces overlay, fuel tanks, engine control, snapshots, Engine → Simulation settings. Gap: the Engine tab does not yet show the plant's numerics (algorithm used, fallbacks, iterations, bytes) |
+| 6 SDK and consumers | done | Audio, optics/onset harness, forces overlay, fuel tanks, engine control, snapshots, Engine → Simulation settings and engine model, the monitor's plant numerics. Engine → Simulation was not drawn until the fix below |
 | 7 Package and checks | done | fork.20 adoption; 90 native, 52 SDK, 63 identity, 238 integration tests; final `npm run ci` in the report |
 | 8 Report | done | [Report](engine-plant-report.md); upstream drafts in [the contribution plan](../proposals/jsbsim-turbine-plant-upstream.md) |
 
@@ -87,9 +87,23 @@ F135 configuration errors found the same way, fixed in 0sfs data:
   from 20,000 ft.
 - **Start time** was 9.5 s against the app's 15–40 s expectation.
 
+## Found in the running app
+
+- **Engine → Simulation was not on screen.** Its settings were registered, but
+  the Engine tab draws named sections and did not draw it, and they were
+  "all"-level, shown only under Show all parameters. The tab now opens with the
+  section for an aircraft with an engine-model choice; a panel test checks it.
+- **Nothing said which engine was flying, or let one compare.** The section now
+  names the engine model flying and its JSBSim version. `osfs.engine.model`
+  chooses between the plant and the F-35B's pre-plant empirical engine, kept as
+  its own data package (`F-35B-jsbsim-empirical`) and loaded on reload. The
+  pre-plant suite passes against it; responses are compared in the
+  [report](engine-plant-report.md#comparing-with-the-empirical-engine).
+- The monitor's **Engine plant numerics** rows show the plant's per-step
+  numerics, closing the stage 6 gap.
+
 ## Unresolved
 
-- Engine-tab diagnostics of the plant's numerics.
 - The local linear algorithm is deferred. The reduced algorithm already halves
   the residual work, with a 1e-6 error. A local linear model would need event
   handling through start, ignition, choking and conversion before it could be

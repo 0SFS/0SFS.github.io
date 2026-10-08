@@ -3,7 +3,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { AeroAxis } from "../diagnostics/aircraftForces";
-import { FDM_PROFILES } from "./fdmProfiles";
+import { FDM_PROFILES, getFdmProfile, resolveEngineModel } from "./fdmProfiles";
 
 const AXIS_NAMES: Readonly<Record<AeroAxis, string>> = {
   drag: "DRAG", side: "SIDE", lift: "LIFT", roll: "ROLL", pitch: "PITCH", yaw: "YAW",
@@ -94,5 +94,29 @@ describe.each(models)("$model control-surface terms for Debug → Forces", profi
     const dependent = [...functions].filter(([, term]) => term.surfacePositions.size > 0).map(([name]) => name);
     expect(dependent.filter(name => !included.has(name) && !excluded.has(name))).toEqual([]);
     for (const name of excluded) expect(functions.get(name)?.surfacePositions.size, name).toBeGreaterThan(0);
+  });
+});
+
+describe("engine models", () => {
+  it("offers the F-35B its coupled plant first, then its earlier empirical engine", () => {
+    expect(FDM_PROFILES["f-35b"].engineModels?.map(model => model.id)).toEqual(["plant", "empirical"]);
+    expect(resolveEngineModel("f-35b")?.id).toBe("plant");
+    expect(resolveEngineModel("f-35b", "empirical")?.id).toBe("empirical");
+    for (const id of ["cessna-172", "cirrus-vision-jet", "cirrus-vision-jet-g2", "cirrus-vision-jet-g3"] as const) {
+      expect(resolveEngineModel(id, "empirical"), id).toBeNull();
+      expect(getFdmProfile(id, "plant"), id).toBe(FDM_PROFILES[id]);
+    }
+  });
+
+  it("changes only the model, its package, its engines' and forces' names, and the force carriers' throttles", () => {
+    const plant = getFdmProfile("f-35b", "plant");
+    const empirical = getFdmProfile("f-35b", "empirical");
+    expect(plant).toBe(FDM_PROFILES["f-35b"]);
+    expect(getFdmProfile("f-35b", "empirical")).toBe(empirical);
+    expect(Object.keys(empirical).filter(key => empirical[key as keyof typeof empirical] !== plant[key as keyof typeof plant]).sort())
+      .toEqual(["dataPackage", "forceEngineLabels", "forceExternalForces", "initialProperties", "model"]);
+    expect(empirical).toMatchObject({ model: "F-35B-jsbsim-empirical", dataPackage: "f-35b-empirical-engine" });
+    expect(empirical.forceExternalForces?.map(force => force.name)).toEqual(["external-tank-0-drag", "external-tank-1-drag", "pushback"]);
+    expect(empirical.initialProperties).toEqual({ ...plant.initialProperties, "fcs/throttle1": 0, "fcs/throttle2": 0, "fcs/throttle3": 0 });
   });
 });

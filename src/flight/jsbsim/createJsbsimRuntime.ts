@@ -4,9 +4,12 @@ import { bootstrapAircraft, type C172BootstrapOptions } from "./bootstrapC172";
 import { type AircraftId, isAircraftId } from "../aircraft/aircraftIds";
 import { downloadJsbsimData, type JsbsimLoadProgress } from "./hydrateJsbsimData";
 import { readJsbsimBuildIdentity, type JsbsimBuildIdentity } from "./jsbsimBuildIdentity";
+import { getFdmProfile, resolveEngineModel, type EngineModelId } from "./fdmProfiles";
 
 export interface JsbsimRuntimeIdentity {
   aircraftId: AircraftId;
+  /** The engine model flying, for an aircraft that offers a choice. */
+  engineModel: EngineModelId | null;
   build: JsbsimBuildIdentity;
   assets: { moduleUrl: string; wasmUrl: string };
 }
@@ -21,7 +24,9 @@ declare global {
 export interface JsbsimRuntimeOptions {
   dataBaseUrl?: string;
   aircraftId?: AircraftId;
-  bootstrap?: C172BootstrapOptions;
+  /** For an aircraft that offers a choice; default its first. */
+  engineModel?: EngineModelId;
+  bootstrap?: Omit<C172BootstrapOptions, "engineModel">;
   onProgress?: (progress: JsbsimLoadProgress) => void;
   onLog?: (stream: "stdout" | "stderr", message: string) => void;
 }
@@ -31,8 +36,10 @@ export interface JsbsimRuntime { sdk: JSBSimSdk; identity: JsbsimRuntimeIdentity
 export async function createJsbsimRuntime(options: JsbsimRuntimeOptions = {}): Promise<JsbsimRuntime> {
   const aircraftId = options.aircraftId ?? "cessna-172";
   if (!isAircraftId(aircraftId)) throw new Error("Unsupported aircraft: " + aircraftId);
+  const engineModel = resolveEngineModel(aircraftId, options.engineModel)?.id ?? null;
   const identity: JsbsimRuntimeIdentity = {
     aircraftId,
+    engineModel,
     build: readJsbsimBuildIdentity(buildIdentity),
     assets: { moduleUrl: wasmModuleUrl.toString(), wasmUrl: wasmBinaryUrl.toString() },
   };
@@ -41,7 +48,8 @@ export async function createJsbsimRuntime(options: JsbsimRuntimeOptions = {}): P
     moduleUrl: wasmModuleUrl, wasmUrl: wasmBinaryUrl,
     persistence: { enabled: false }, log: { console: false, stripAnsi: true },
   });
-  const dataPromise = downloadJsbsimData(options.dataBaseUrl, options.onProgress, aircraftId);
+  const dataPromise = downloadJsbsimData(options.dataBaseUrl, options.onProgress,
+    getFdmProfile(aircraftId, engineModel ?? undefined).dataPackage ?? aircraftId);
   let sdk: JSBSimSdk;
   let files: Awaited<typeof dataPromise>;
   try {
@@ -67,7 +75,7 @@ export async function createJsbsimRuntime(options: JsbsimRuntimeOptions = {}): P
   try {
     options.onProgress?.({ message: "Preparing flight physics", progress: null });
     for (const file of files) sdk.writeDataFile(file.path, file.contents);
-    await bootstrapAircraft(sdk, aircraftId, options.bootstrap);
+    await bootstrapAircraft(sdk, aircraftId, { ...options.bootstrap, engineModel: engineModel ?? undefined });
     if (typeof window !== "undefined") window.osfsJsbsimBuild = identity;
     return { sdk, identity, dispose };
   } catch (error) {

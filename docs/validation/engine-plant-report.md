@@ -23,6 +23,7 @@ invariant against the same engine's own dry counterfactual.
 | Physical fidelity | A calibration to public ratings with declared hypotheses; not an F135 identification |
 | Runtime cost | Bounded and counted, not timed |
 | Sound and appearance | Source causality passed; listening and display untested |
+| Comparison | The pre-plant engine is selectable and passes its own suite unchanged |
 | Upstream readiness | Drafts written, nothing posted |
 
 ## Implemented system
@@ -49,11 +50,24 @@ invariant against the same engine's own dry counterfactual.
   - the forces overlay draws the external forces;
   - fuel-tank drag, engine start and stop, and the test stand use the plant;
   - snapshots, relocation and saved flights restore the plant's exact state;
-  - **Engine → Simulation** holds the algorithm, iteration cap, substep cap,
-    tolerance and reduced-model memory, applied live.
-- **Not done:** the Engine tab does not yet display the plant's numerics
-  (algorithm used per step, fallbacks, iterations, resident bytes). The local
-  linear algorithm is deferred with reasons in the stage record.
+  - **Engine → Simulation**, at the top of the F-35B's Engine tab, names the
+    engine model flying and holds the algorithm, iteration cap, substep cap,
+    tolerance and reduced-model memory, applied live;
+  - the engine monitor's **Engine plant numerics** shows each step's algorithm,
+    fallback, iterations, residuals, memory and energy and mass account.
+- **Engine model choice.** Engine → Simulation can also fly the F-35B's
+  empirical engine, the aircraft unchanged from before the plant, for
+  comparison. It applies on reload, and a saved flight resumes under either
+  ([below](#comparing-with-the-empirical-engine)).
+- **Not done:** the local linear algorithm is deferred with reasons in the
+  stage record.
+
+The first version of this report said Engine → Simulation held these settings.
+It did not show them: the settings were registered, but the Engine tab draws
+its sections by name and did not draw this one, and they were set to appear
+only under Show all parameters. A user found it in the running app. The tab
+now draws the section, its settings are main-level, and a panel test checks
+both. The monitor's numerics rows were the gap listed here before.
 
 Preserved behaviour, each checked by existing or new tests:
 
@@ -75,6 +89,31 @@ Preserved behaviour, each checked by existing or new tests:
 | Reduced against component ([evidence](../../validation/evidence/aircraft/f35b/engine-plant/algorithms/report.json)) | Five held-out trajectories: worst 1.3e-6 of full scale in force, spool and fuel; 0.0014 K in station and metal temperatures; every event in the same step |
 | Lifecycle | Zero-time converted initialization dry at 0–300 kt; snapshot restore exact, foreign record refused; RunIC on a stopped engine changes no spool state |
 | Full CI | See [Checks](#checks) |
+
+## Comparing with the empirical engine
+
+Engine → Simulation → Engine model switches the F-35B between the coupled plant
+and its earlier empirical engine. The empirical files are byte-identical to the
+F-35B package at 0sfs `d92a928a`, the last commit before the plant, and that
+commit's own F-35B integration suite passes against them on fork.20: 66 of 66
+tests. The only changes to the suite load the empirical model, its package and
+its F135 path ([evidence](../../validation/evidence/aircraft/f35b/engine-plant/empirical-model/report.json),
+`scripts/validation/f35b/check-f135-empirical-engine-model.mjs`).
+
+At a fixed throttle the two give nearly the same thrust; both are fitted to the
+same ratings. They differ in transients. On a sea-level static stand, in
+simulation time from each command:
+
+| Step | Coupled plant | Empirical |
+| --- | --- | --- |
+| Idle thrust | 1,816 lbf | 1,325 lbf |
+| Idle to intermediate, 10 / 50 / 90 % | 0.59 / 1.38 / 4.45 s | 1.28 / 2.12 / 2.55 s |
+| Intermediate to maximum | Reheat first burns at 1.25 s; 90 % at 2.39 s; 40,992 lbf | All of it in one 1/120 s step; 43,000 lbf |
+| Maximum to idle, 10 / 50 / 90 % | 0.10 / 0.28 / 1.18 s | 0.01 / 0.07 / 0.38 s |
+
+The empirical engine keeps its recorded defect: 4.1333 s of full reheat thrust
+with no reheat fuel burned after a cold start. Its lift fan and roll posts are
+force carriers that share out the main engine's upward force at once.
 
 ## Physical fidelity
 
@@ -157,6 +196,13 @@ Nothing is pushed or posted.
     4/4 in 6.0 s;
   - the production build, which CI skips after a test failure, then passed on
     its own, with the installed and emitted SDK and audio artifact checks.
+
+After the Engine → Simulation and engine-model fix, on the working tree:
+`tsc -b` and lint clean; HEAD with only this change typechecks on its own;
+related Vitest 1,012 tests; one `npm run ci`, 2,064 passed plus the same
+expected failure, with the same 5 s timeout in
+`scripts/build-f135-engine.test.mjs` (4/4 alone in 7.2 s); the production build
+then passed on its own and ships both F-35B data packages.
 
 Leftover sandboxes from interrupted native Python test runs remain in the
 JSBSim build directory (`build/turbine-plant-20261008/tests/tmp*`, seven

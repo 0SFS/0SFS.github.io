@@ -1,8 +1,11 @@
 import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import type { AircraftId } from "../aircraft/aircraftIds";
 
-/** The same aircraft dependency selection is used by the browser and FDM tests. */
-export function resolveAircraftDataFiles(manifest: unknown, aircraftId: AircraftId): string[] {
+/**
+ * The same aircraft dependency selection is used by the browser and FDM tests.
+ * A package is an aircraft id, or a profile's own `dataPackage`.
+ */
+export function resolveAircraftDataFiles(manifest: unknown, aircraftId: AircraftId | (string & {})): string[] {
   const aircraft = manifest && typeof manifest === "object" && "aircraft" in manifest
     ? manifest.aircraft : null;
   const files = aircraft && typeof aircraft === "object" && aircraftId in aircraft
@@ -22,7 +25,7 @@ const DEFAULT_DATA_BASE_URL = `${import.meta.env.BASE_URL}jsbsim-data`;
 export async function downloadJsbsimData(
   baseUrl = DEFAULT_DATA_BASE_URL,
   onProgress?: (progress: JsbsimLoadProgress) => void,
-  aircraftId: AircraftId = "cessna-172",
+  aircraftId: AircraftId | (string & {}) = "cessna-172",
 ): Promise<Array<{ path: string; contents: string }>> {
   const key = `${baseUrl}|${aircraftId}`;
   const existing = cache.get(key);
@@ -54,7 +57,7 @@ export async function downloadJsbsimData(
 export async function hydrateJsbsimData(
   sdk: JSBSimSdk,
   baseUrl = DEFAULT_DATA_BASE_URL,
-  aircraftId: AircraftId = "cessna-172",
+  aircraftId: AircraftId | (string & {}) = "cessna-172",
 ): Promise<void> {
   for (const file of await downloadJsbsimData(baseUrl, undefined, aircraftId)) sdk.writeDataFile(file.path, file.contents);
 }

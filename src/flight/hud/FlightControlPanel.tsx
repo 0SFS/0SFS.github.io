@@ -24,7 +24,7 @@ import {
   Volume2,
   Weight,
 } from "lucide-react";
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import type { BabylonRuntimeStatus, RendererMode } from "foss-earth/runtime";
 import type { FlightViewMode } from "../aircraft/createPlaceholderAircraft";
@@ -39,7 +39,8 @@ import {
   type AircraftLodId,
 } from "../aircraft/aircraftCatalog";
 import type { AircraftModelStatus } from "../aircraft/createAircraftModel";
-import { getFdmProfile } from "../jsbsim/fdmProfiles";
+import { getFdmProfile, resolveEngineModel, type EngineModelId } from "../jsbsim/fdmProfiles";
+import { JSBSIM_PACKAGE_VERSION } from "../jsbsim/jsbsimBuildIdentity";
 import { AircraftSelectionPanel } from "./AircraftSelectionPanel";
 import { AIRCRAFT_SELECTION_PARAMETER_IDS } from "../aircraft/aircraftSelectionSetting";
 import { GamepadBindingsPanel, type GamepadBindingsMount } from "./GamepadBindingsPanel";
@@ -189,6 +190,10 @@ export interface FlightControlPanelOptions {
   onFuelAttachmentChange?(index: number, attached: boolean): void;
   /** Hosts the live engine-detail readings inside the Engine tab. */
   attachEngineDetails(host: HTMLElement): () => void;
+  /** The engine model this flight loaded, on an aircraft that offers a choice. */
+  engineModel?: EngineModelId | null;
+  /** Saves the flight and loads it again, so a newly chosen engine model flies. */
+  onReloadFlight?(): void;
   /** Hosts the Input method section, shared with FOSS Earth, in the Controls tab. */
   attachInputMethod(host: HTMLElement): () => void;
   onLoggingAction(action: LoggingAction): void;
@@ -233,6 +238,32 @@ export function InputMethodSettings({ attach }: { attach: (host: HTMLElement) =>
       <div ref={ref} />
     </fieldset>
   );
+}
+
+/**
+ * Engine → Simulation: which engine model is flying, and, once another is
+ * chosen, that it flies after a reload.
+ */
+function EngineModelStatus({ aircraftId, running, parameters, onReload }: {
+  aircraftId: AircraftId;
+  running: EngineModelId | null | undefined;
+  parameters: FlightParameterStore;
+  onReload?: () => void;
+}) {
+  const watch = useCallback((onChange: () => void) => parameters.watch("osfs.engine.model", onChange), [parameters]);
+  const chosen = useSyncExternalStore(watch, () => parameters.get("osfs.engine.model"));
+  const flying = running ? resolveEngineModel(aircraftId, running) : null;
+  const next = resolveEngineModel(aircraftId, chosen);
+  if (!flying) return null;
+  return <>
+    <p className="flight-panel__hint">
+      <strong>Flying: {flying.label}</strong>, JSBSim {JSBSIM_PACKAGE_VERSION}. {flying.summary}
+    </p>
+    {next && next.id !== flying.id && <p className="flight-panel__hint" role="status">
+      {next.label} flies after the flight reloads.{" "}
+      {onReload && <button type="button" className="flight-panel__command" onClick={onReload}>Reload now</button>}
+    </p>}
+  </>;
 }
 
 function EngineDetailsHost({ attach }: { attach: (host: HTMLElement) => () => void }) {
@@ -951,6 +982,14 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
                   </fieldset>}
               </div>
               : tabId === "engine" ? <>
+                {getFdmProfile(props.snapshot.aircraftId).engineModels &&
+                  <fieldset className="flight-panel__fieldset">
+                    <legend>{props.settings.getSectionTitle("engine", "simulation")}</legend>
+                    <ParameterSection settings={props.settings} tab="engine" section="simulation">
+                      <EngineModelStatus aircraftId={props.snapshot.aircraftId} running={props.engineModel}
+                        parameters={props.parameters} onReload={props.onReloadFlight} />
+                    </ParameterSection>
+                  </fieldset>}
                 <EngineDetailsHost attach={props.attachEngineDetails} />
                 <ParameterSection settings={props.settings} tab="engine" section="engine" />
                 <ParameterSection settings={props.settings} tab="engine" section="history" />

@@ -2,7 +2,7 @@ import type { JSBSimSdk } from "@felipegalind0/jsbsim";
 import type { AircraftId } from "../aircraft/aircraftIds";
 import { FIXED_DT } from "../physics/fixedStepLoop";
 import { flightParameterDefaults } from "../settings/flightParameters";
-import { getFdmProfile } from "./fdmProfiles";
+import { getFdmProfile, type EngineModelId } from "./fdmProfiles";
 
 export interface C172BootstrapOptions {
   /** Geodetic latitude in degrees. Default: osfs.start.latitude's. */
@@ -21,6 +21,8 @@ export interface C172BootstrapOptions {
   holdDown?: boolean;
   /** Throttle command, 0..1. Default: the aircraft profile's. */
   throttleNorm?: number;
+  /** For an aircraft that offers a choice; default its first. Its data package must be loaded. */
+  engineModel?: EngineModelId;
 }
 
 type JsbsimTimingApi = JSBSimSdk & {
@@ -29,7 +31,7 @@ type JsbsimTimingApi = JSBSimSdk & {
 };
 
 const catalogue = flightParameterDefaults();
-const DEFAULT_OPTIONS: Required<Omit<C172BootstrapOptions, "throttleNorm" | "holdDown">> = {
+const DEFAULT_OPTIONS: Required<Omit<C172BootstrapOptions, "throttleNorm" | "holdDown" | "engineModel">> = {
   latDeg: catalogue.get("osfs.start.latitude"),
   lonDeg: catalogue.get("osfs.start.longitude"),
   // Temporary initial state; flight placement adds the loaded ground height.
@@ -62,7 +64,7 @@ export async function bootstrapAircraft(
   options: C172BootstrapOptions = {},
 ): Promise<void> {
   const opts = { ...DEFAULT_OPTIONS, ...options };
-  const profile = getFdmProfile(aircraftId);
+  const profile = getFdmProfile(aircraftId, options.engineModel);
   const throttleNorm = options.throttleNorm ?? profile.initialThrottleNorm;
   const isPiston = profile.engine === "piston";
 

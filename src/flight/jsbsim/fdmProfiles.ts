@@ -17,12 +17,33 @@ export const CONTROL_LAW_MODE_VALUES: Readonly<Record<FlightControlLawMode, numb
   auto: 0, manual: 1, "fly-by-wire": 2,
 };
 
+/** How an engine is simulated: JSBSim's coupled engine plant, or its empirical tables. */
+export const ENGINE_MODEL_IDS = ["plant", "empirical"] as const;
+export type EngineModelId = (typeof ENGINE_MODEL_IDS)[number];
+
+/** One way an aircraft's engine can be simulated, and the profile fields that change with it. */
+export interface FdmEngineModel {
+  id: EngineModelId;
+  label: string;
+  /** What someone flying one model after the other should know about this one. */
+  summary: string;
+  profile?: Partial<Pick<FdmProfile,
+    "model" | "dataPackage" | "forceEngineLabels" | "forceExternalForces" | "initialProperties">>;
+}
+
 export interface FdmProfile {
   sf50VariantId?: Sf50VariantId;
   /** Published operating envelope metadata, not an artificial physics clamp. */
   maxOperatingAltitudeFt?: number;
   /** JSBSim model name: `aircraft/<model>/<model>.xml` in MEMFS. */
   model: string;
+  /** Its files in public/jsbsim-data/manifest.json. Default: the aircraft id. */
+  dataPackage?: string;
+  /**
+   * Engine models the aircraft can fly with, chosen in Engine → Simulation. The
+   * first is the one the rest of this profile describes. Absent: no choice.
+   */
+  engineModels?: readonly FdmEngineModel[];
   /** Model-local dependency directories, relative to the SDK data root. */
   dataPaths?: { enginePath: string; systemsPath: string };
   /** Optional pilot conversion command and the physical conversion position. */
@@ -165,6 +186,44 @@ function createSf50Profile(variantId: Sf50VariantId): FdmProfile {
   };
 }
 
+// The F-35B's external stores' drag and pushback, under either engine model.
+const F35B_STORE_AND_PUSHBACK_FORCES: readonly ExternalForceTerms[] = [
+  { name: "external-tank-0-drag", label: "Right store drag", frame: "wind", magnitude: "stores/external-tank[0]/drag-lbs" },
+  { name: "external-tank-1-drag", label: "Left store drag", frame: "wind", magnitude: "stores/external-tank[1]/drag-lbs" },
+  { name: "pushback", label: "Pushback", frame: "body" },
+];
+
+const F35B_INITIAL_PROPERTIES: Readonly<Record<string, number>> = {
+  "fcs/stovl-cmd-norm": 0,
+  "fcs/stovl-pos-norm": 0,
+  // A new flight clears the FCS zero-time conversion interlock latch.
+  "fcs/stovl-augmentation-inhibit": 0,
+  "fcs/mixture-cmd-norm": 1,
+  "fcs/pitch-trim-cmd-norm": -0.059,
+  "fcs/roll-trim-cmd-norm": 0,
+  "propulsion/engine[0]/pitch-angle-rad": 0,
+  "propulsion/engine[0]/yaw-angle-rad": 0,
+};
+
+const F35B_ENGINE_MODELS: readonly FdmEngineModel[] = [
+  {
+    id: "plant", label: "Coupled engine plant",
+    summary: "JSBSim's coupled engine plant: fuel, ignition, combustion, gas path, shafts, nozzle, metal temperatures and the lift fan advance together. Reheat thrust exists only while reheat fuel burns.",
+  },
+  {
+    id: "empirical", label: "Empirical tables (before the plant)",
+    summary: "The F-35B as it flew before the plant, unchanged: JSBSim's table-driven turbine, with the lift fan and roll posts as force carriers sharing the main engine's upward force. After a cold start it gives reheat thrust for about 4 s before any reheat fuel burns.",
+    profile: {
+      model: "F-35B-jsbsim-empirical",
+      dataPackage: "f-35b-empirical-engine",
+      forceEngineLabels: { 0: "Main engine", 1: "Lift fan", 2: "Right roll post", 3: "Left roll post" },
+      forceExternalForces: F35B_STORE_AND_PUSHBACK_FORCES,
+      // The force carriers' throttles, which the model's FCS holds at full.
+      initialProperties: { ...F35B_INITIAL_PROPERTIES, "fcs/throttle1": 0, "fcs/throttle2": 0, "fcs/throttle3": 0 },
+    },
+  },
+];
+
 export const FDM_PROFILES: Record<AircraftId, FdmProfile> = {
   "cessna-172": {
     model: "c172p",
@@ -213,6 +272,7 @@ export const FDM_PROFILES: Record<AircraftId, FdmProfile> = {
   "cirrus-vision-jet-g3": createSf50Profile("g3"),
   "f-35b": {
     model: "F-35B-jsbsim",
+    engineModels: F35B_ENGINE_MODELS,
     requiredReadOnlyModelProperties: ["propulsion/engine[0]/body-force-z-lbs"],
     forceEngineLabels: { 0: "Main engine" },
     // Every external force of the model: the F135 plant's LiftSystem outlets and
@@ -223,9 +283,7 @@ export const FDM_PROFILES: Record<AircraftId, FdmProfile> = {
       { name: "roll-post-left", label: "Left roll post", frame: "body", magnitude: "propulsion/roll-post-left-force-lbs" },
       { name: "engine-ram-drag", label: "Engine inlet ram drag", frame: "wind", magnitude: "propulsion/engine-ram-drag-lbs" },
       { name: "lift-fan-ram-drag", label: "Lift-fan inlet ram drag", frame: "wind", magnitude: "propulsion/lift-fan-ram-drag-lbs" },
-      { name: "external-tank-0-drag", label: "Right store drag", frame: "wind", magnitude: "stores/external-tank[0]/drag-lbs" },
-      { name: "external-tank-1-drag", label: "Left store drag", frame: "wind", magnitude: "stores/external-tank[1]/drag-lbs" },
-      { name: "pushback", label: "Pushback", frame: "body" },
+      ...F35B_STORE_AND_PUSHBACK_FORCES,
     ],
     // One aileron position drives both ailerons' terms, and one rudder both fins'.
     // The model gives neither a force, only moments.
@@ -269,17 +327,7 @@ export const FDM_PROFILES: Record<AircraftId, FdmProfile> = {
     initialAirspeedKts: 300,
     initialPitchDeg: 1.92,
     initialGearDown: false,
-    initialProperties: {
-      "fcs/stovl-cmd-norm": 0,
-      "fcs/stovl-pos-norm": 0,
-      // A new flight clears the FCS zero-time conversion interlock latch.
-      "fcs/stovl-augmentation-inhibit": 0,
-      "fcs/mixture-cmd-norm": 1,
-      "fcs/pitch-trim-cmd-norm": -0.059,
-      "fcs/roll-trim-cmd-norm": 0,
-      "propulsion/engine[0]/pitch-angle-rad": 0,
-      "propulsion/engine[0]/yaw-angle-rad": 0,
-    },
+    initialProperties: F35B_INITIAL_PROPERTIES,
     flapPosition: { property: "fcs/flap-pos-norm", fullTravel: 1, minNorm: -0.1 },
     runwayPresets: {
       departure: { airspeedKts: 0, throttleNorm: 0, flapsNorm: 0, pitchDeg: 1.18 },
@@ -290,6 +338,24 @@ export const FDM_PROFILES: Record<AircraftId, FdmProfile> = {
   },
 };
 
-export function getFdmProfile(aircraftId: AircraftId): FdmProfile {
-  return FDM_PROFILES[aircraftId];
+/**
+ * The engine model an aircraft flies with: the one asked for when the aircraft
+ * offers it, otherwise its first. Null for an aircraft with no choice.
+ */
+export function resolveEngineModel(aircraftId: AircraftId, requested?: EngineModelId): FdmEngineModel | null {
+  const offered = FDM_PROFILES[aircraftId].engineModels;
+  return offered?.find(model => model.id === requested) ?? offered?.[0] ?? null;
+}
+
+const engineModelProfiles = new Map<string, FdmProfile>();
+
+/** The aircraft's profile, with the fields its engine model changes. */
+export function getFdmProfile(aircraftId: AircraftId, engineModel?: EngineModelId): FdmProfile {
+  const base = FDM_PROFILES[aircraftId];
+  const chosen = resolveEngineModel(aircraftId, engineModel);
+  if (!chosen?.profile) return base;
+  const key = aircraftId + "|" + chosen.id;
+  let profile = engineModelProfiles.get(key);
+  if (!profile) engineModelProfiles.set(key, profile = { ...base, ...chosen.profile });
+  return profile;
 }

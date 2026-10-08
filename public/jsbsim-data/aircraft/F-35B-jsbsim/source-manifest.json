@@ -65,7 +65,7 @@
       "sourceBytes": 3615,
       "sourceSha256": "77e5494173485bc24f8e3754a9ba31dd93f5aebc651285eb477184aff8169c6e",
       "bytes": 7734,
-      "sha256": "697daf5915cd779bb50f33eb300a42482d045fab7e5c79e8ff9de90fa0d5e466",
+      "sha256": "2aa795c549dcf2e410c7b7a233c9c32af94e2cf6a2c439637edfc5e599fe2101",
       "modified": true,
       "changes": [
         "Native automatic augmentation in conventional flight (augmethod 1), retained.",

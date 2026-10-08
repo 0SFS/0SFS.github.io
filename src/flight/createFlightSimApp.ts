@@ -168,7 +168,7 @@ import { KEYBOARD_STICK_PARAMETER_IDS, readKeyboardStickSettings } from "./input
 import { createGamepadPollingController } from "./input/gamepadPolling";
 import type { OrbitInvertSettings } from "foss-earth/input";
 import { createJsbsimRuntime } from "./jsbsim/createJsbsimRuntime";
-import { CONTROL_LAW_MODE_VALUES, getFdmProfile } from "./jsbsim/fdmProfiles";
+import { CONTROL_LAW_MODE_VALUES, getFdmProfile, resolveEngineModel } from "./jsbsim/fdmProfiles";
 import { createAircraftEngineVisuals } from "./aircraft/createAircraftEngineVisuals";
 import { createFixedStepPhysicsLoop, FIXED_DT } from "./physics/fixedStepLoop";
 import { ALERT_PILOT, readPilotG, stepPilot, type GVisionSettings, type PassOutSettings } from "./physics/gForce";
@@ -313,6 +313,8 @@ export async function createFlightSimApp(
   });
   const initialAircraftSelection = readAircraftSelection(parameters);
   const initialAircraftId: AircraftId = initialAircraftSelection.aircraftId;
+  // Engine → Simulation: the engine model this flight loads, where the aircraft offers a choice.
+  const engineModel = resolveEngineModel(initialAircraftId, parameters.get("osfs.engine.model"))?.id ?? null;
   // World detail's saved range, default and HUD rail belong to the shared
   // detail controller, created with the renderer. The flight keeps its low-
   // spawn hold: the osfs.flight.* parameters, and a marker on the Google track.
@@ -436,6 +438,7 @@ export async function createFlightSimApp(
   const jsbsimPromise = createJsbsimRuntime({
     dataBaseUrl: options.dataBaseUrl,
     aircraftId: initialAircraftId,
+    engineModel: engineModel ?? undefined,
     bootstrap: benchBootstrap ?? {
       ...spawn,
       headingDeg: resumeFlight?.headingDeg ?? parameters.get("osfs.start.heading"),
@@ -1179,9 +1182,9 @@ export async function createFlightSimApp(
     if (!forcesDebugOverlay && aircraft && settings.enabled) {
       forcesDebugOverlay = createForcesDebugOverlay(runtime.scene, aircraft.root, jsbsim.sdk, {
         settings,
-        engineLabels: getFdmProfile(initialAircraftId).forceEngineLabels,
+        engineLabels: getFdmProfile(initialAircraftId, engineModel ?? undefined).forceEngineLabels,
         controlSurfaces: getFdmProfile(initialAircraftId).forceControlSurfaces,
-        externalForces: getFdmProfile(initialAircraftId).forceExternalForces,
+        externalForces: getFdmProfile(initialAircraftId, engineModel ?? undefined).forceExternalForces,
         requestRender: () => runtime.requestRender(),
         onUnavailable: message => flightLog.warn("forces", message),
       });
@@ -2092,6 +2095,11 @@ export async function createFlightSimApp(
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
     },
     attachEngineDetails: (host) => engineMonitor.attachDetails(host),
+    engineModel,
+    onReloadFlight: () => {
+      saveFlight();
+      window.location.reload();
+    },
     // The HUD bar is built later in this same synchronous setup, and the tab
     // only renders once opened, so the bar exists by the time this runs.
     attachInputMethod: (host) => hudBar?.mountInputMethod(host) ?? (() => {}),
