@@ -21,7 +21,7 @@ struct EngineInput {
   double n2 = 0.0;          // 0..1
   double thrustNorm = 0.0;  // native thrust / profile dry thrust (up to 2 with AB)
   double fuelNorm = 0.0;    // clamp01(native lbm/s / profile fuel reference)
-  double augmentation = 0.0; // smoothed native active/inactive observer, never throttle
+  double afterburnerFraction = 0.0; // smoothed native burned AB / total fuel, never throttle
   double afterburnerVolume = 1.0; // independent, already-smoothed pilot gain
   double combustion = 0.0;  // 0..1, crossfaded at light-off/flameout
   double kias = 0.0;
@@ -217,16 +217,19 @@ class TurbofanVoice {
     double jetHz = profile_.at(kProfileJetBaseHz) + profile_.at(kProfileJetPowerHz) * t;
     double jetGain = profile_.at(kProfileJetGain) * jetPower;
     // Augmentation morphs the SAME exhaust noise/filter. No extra voice, noise
-    // source or oscillator is created. The engine's native boolean permits
-    // this contribution; native above-dry thrust then supplies its headroom.
+    // source or oscillator is created. The actually burned fuel fraction
+    // drives its rise, without waiting for metal to heat. The pilot gain
+    // controls all deliberate AB colour as well as added amplitude. Native
+    // thrust/fuel/shaft changes remain independent physical inputs.
     // Keep the legacy zero-augmentation arithmetic path exact.
-    const bool augmenting = in.augmentation > 0.0 && profile_.at(kProfileAfterburnerJetGain) > 0.0;
+    const double audibleAB = clamp01(in.afterburnerFraction) * in.afterburnerVolume;
+    const bool augmenting = audibleAB > 0.0 && profile_.at(kProfileAfterburnerJetGain) > 0.0;
     if (augmenting) {
-      const double a = clamp01(in.augmentation);
+      const double a = audibleAB;
       jetHz += (profile_.at(kProfileAfterburnerJetHz) - jetHz) * a;
       const double addedGain = profile_.at(kProfileAfterburnerJetGain) * a
           * (1.0 + std::fmax(0.0, in.thrustNorm - 1.0));
-      jetGain += addedGain * in.afterburnerVolume;
+      jetGain += addedGain;
     }
     double coreNoise = 0.0;
     if (jetOn) {
@@ -247,11 +250,11 @@ class TurbofanVoice {
       }
     }
     if (fineOn) {
-      const double a = clamp01(in.augmentation);
+      const double a = audibleAB;
       const double hz = profile_.at(kProfileHighFineMixHz) * (0.55 + 0.45 * t) * (1.0 + 0.25 * a);
       fineMix_.bandpass(sampleRate_, hz, 0.6);
       coreNoise += fineMix_.process(rngFineMix_.uniform()) * profile_.at(kProfileHighFineMixGain)
-          * jetPower * clamp01(in.combustion) * (1.0 + 0.5 * a * in.afterburnerVolume)
+          * jetPower * clamp01(in.combustion) * (1.0 + 0.5 * a)
           * (1.0 + rearStrength * mu * 0.25);
     }
     if (shockOn) {
@@ -269,7 +272,7 @@ class TurbofanVoice {
       const double shockSample = shockLow_.process(shock_.process(rngShock_.uniform()), sampleRate_, hz);
       coreNoise += shockSample * profile_.at(kProfileHighShockGain)
           * t * t * clamp01(in.combustion)
-          * (1.0 + 0.5 * clamp01(in.augmentation) * in.afterburnerVolume)
+          * (1.0 + 0.5 * audibleAB)
           * (1.0 - strength * mu * mu);
     }
 

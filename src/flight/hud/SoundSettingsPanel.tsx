@@ -107,14 +107,6 @@ export function SoundSettingsPanel({ state, onAction }: {
           onChange={event => onAction({ type: "settings", patch: { engineVolume: Number(event.target.value) } })} />
       </label>
       <label className="flight-panel__field">
-        <span>Afterburner volume · {percent(settings.afterburnerVolume * 100)}</span>
-        <input type="range" aria-label="Afterburner volume" min={0} max={1} step={0.05} value={settings.afterburnerVolume}
-          onChange={event => onAction({ type: "settings", patch: { afterburnerVolume: Number(event.target.value) } })} />
-      </label>
-      <p className="flight-panel__hint">
-        Scales the extra afterburner roar; 100% keeps its original level. Engine volume also scales it.
-      </p>
-      <label className="flight-panel__field">
         <span>Sound position · {positionLabel(settings.listenerCockpitBlend)}</span>
         <input type="range" aria-label="Sound position" aria-valuetext={positionLabel(settings.listenerCockpitBlend)}
           min={0} max={1} step={0.01} value={settings.listenerCockpitBlend}

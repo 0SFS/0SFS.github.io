@@ -101,32 +101,27 @@ describe("sound settings panel", () => {
     expect(panel.onAction).toHaveBeenCalledWith({ type: "settings", patch: { airframeVolume: 0.25 } });
   });
 
-  it("shows one quieter afterburner slider and one continuous Camera–Cockpit slider, defaulting to Cockpit", async () => {
+  it("leaves afterburner volume in its own tab and shows one continuous Camera–Cockpit slider", async () => {
     const panel = await mount(status("med"));
     const afterburner = panel.host.querySelectorAll<HTMLInputElement>('input[aria-label="Afterburner volume"]');
     const position = panel.host.querySelectorAll<HTMLInputElement>('input[aria-label="Sound position"]');
-    expect(afterburner).toHaveLength(1);
+    expect(afterburner).toHaveLength(0);
     expect(position).toHaveLength(1);
-    expect(afterburner[0].value).toBe("0.5");
     expect(position[0].value).toBe("1");
     expect(position[0].type).toBe("range");
     expect(position[0].getAttribute("aria-valuetext")).toBe("Cockpit");
     expect(panel.host.textContent).toContain("Camera ↔ Cockpit");
-    expect(panel.host.textContent).toContain("100% keeps its original level");
     expect(panel.host.textContent).toContain("Listen from Camera, Cockpit, or a position between them");
   });
 
-  it("sends independent live afterburner and listener blend patches", async () => {
+  it("sends a live listener blend patch", async () => {
     const panel = await mount(status("med"));
-    for (const [label, value] of [["Afterburner volume", "0.25"], ["Sound position", "0.4"]]) {
-      const slider = panel.host.querySelector<HTMLInputElement>(`input[aria-label="${label}"]`)!;
-      await act(async () => {
-        Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(slider, value);
-        slider.dispatchEvent(new Event("input", { bubbles: true }));
-      });
-    }
+    const slider = panel.host.querySelector<HTMLInputElement>('input[aria-label="Sound position"]')!;
+    await act(async () => {
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(slider, "0.4");
+      slider.dispatchEvent(new Event("input", { bubbles: true }));
+    });
     expect(panel.onAction.mock.calls).toEqual([
-      [{ type: "settings", patch: { afterburnerVolume: 0.25 } }],
       [{ type: "settings", patch: { listenerCockpitBlend: 0.4 } }],
     ]);
   });
@@ -154,6 +149,9 @@ describe("sound settings panel", () => {
       slider.dispatchEvent(new Event("input", { bubbles: true }));
     });
     expect(panel.onAction.mock.calls).toEqual([[{ type: "settings", patch: { [field]: 8 } }]]);
-    expect(panel.host.querySelector<HTMLInputElement>('input[aria-label="Afterburner volume"]')!.value).toBe("0.5");
+    expect(panel.host.querySelector('input[aria-label="Afterburner volume"]')).toBeNull();
+    const otherVolume = field === "masterVolume" ? "Engine volume" : "Master volume";
+    const otherDefault = field === "masterVolume" ? DEFAULT_AUDIO_SETTINGS.engineVolume : DEFAULT_AUDIO_SETTINGS.masterVolume;
+    expect(panel.host.querySelector<HTMLInputElement>(`input[aria-label="${otherVolume}"]`)!.value).toBe(String(otherDefault));
   });
 });

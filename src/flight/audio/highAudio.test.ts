@@ -9,6 +9,14 @@ const full = Object.values(AVAILABILITY).reduce((bits, bit) => bits | bit, 0);
 const engines = [FJ33_DEFINITION, F135_DEFINITION] as const;
 const parameters = (engine: EngineAcousticDefinition): EngineAcousticProfile => engine.parameters as EngineAcousticProfile;
 
+/** Bit-exact stereo check reporting the first mismatch, not every sample. */
+function expectSameOutput(actual: { left: Float32Array; right: Float32Array }, expected: typeof actual): void {
+  for (const channel of ["left", "right"] as const) {
+    expect(actual[channel].length).toBe(expected[channel].length);
+    expect(actual[channel].findIndex((sample, index) => sample !== expected[channel][index])).toBe(-1);
+  }
+}
+
 async function render(engine: EngineAcousticDefinition, options: {
   sampleRate?: number; tier?: number; seconds?: number;
   at?: (time: number) => Partial<AudioSnapshotInit>;
@@ -114,12 +122,48 @@ describe("procedural High, actual WASM behavior rather than qualification", () =
     }
   });
 
-  it("uses native augmentation, and missing augmentation returns the dry High sound", async () => {
+  it("uses native burned augmentation fuel, and missing augmentation returns the dry High sound", async () => {
     const dry = await render(F135_DEFINITION);
-    const augmented = await render(F135_DEFINITION, { at: () => ({ augmentation: true }) });
-    const missing = await render(F135_DEFINITION, { at: () => ({ augmentation: true, availability: full & ~AVAILABILITY.AUGMENTATION }) });
+    const burning = { augmentation: true, afterburnerBurnedFuelFlowKgSec: 8 * 0.45359237 };
+    const augmented = await render(F135_DEFINITION, { at: () => burning });
+    const missing = await render(F135_DEFINITION, { at: () => ({ ...burning, availability: full & ~AVAILABILITY.AUGMENTATION }) });
     expect(missing.tail).toEqual(dry.tail);
     expect(rms(difference(augmented.tail, dry.tail))).toBeGreaterThan(1e-4);
+  });
+
+  it.each([TIER.low, TIER.med, TIER.high])("has no flag-only AB response, and zero gain removes all deliberate AB morphs at tier %i", async tier => {
+    const dry = await render(F135_DEFINITION, { tier });
+    const at = () => ({ augmentation: true, afterburnerBurnedFuelFlowKgSec: 8 * 0.45359237 });
+    const unburned = await render(F135_DEFINITION, { tier,
+      at: () => ({ ...at(), afterburnerBurnedFuelFlowKgSec: 0 }) });
+    expectSameOutput(unburned.output, dry.output);
+    for (const availability of [full & ~AVAILABILITY.AFTERBURNER_BURNED_FUEL, full & ~AVAILABILITY.FUEL_FLOW]) {
+      const unavailable = await render(F135_DEFINITION, { tier, at: () => ({ ...at(), availability }) });
+      // Missing total fuel also removes the independent combustor source, so
+      // compare to the same physical-input availability without augmentation.
+      const reference = await render(F135_DEFINITION, { tier, at: () => ({ availability }) });
+      expectSameOutput(unavailable.output, reference.output);
+    }
+    const muted = await render(F135_DEFINITION, { tier, at,
+      configure: core => core.exports.osfs_audio_set_afterburner_volume(0) });
+    expectSameOutput(muted.output, dry.output);
+  });
+
+  it.each([44_100, 48_000])("starts intentional AB sound from burn onset, not earlier selection at %i Hz", async sampleRate => {
+    const source = (time: number) => ({ augmentation: time >= 0.2,
+      afterburnerBurnedFuelFlowKgSec: time < 0.6 ? 0 : Math.min(1, (time - 0.6) * 2) });
+    const burning = await render(F135_DEFINITION, { sampleRate, seconds: 1.5, at: source });
+    const reference = await render(F135_DEFINITION, { sampleRate, seconds: 1.5 });
+    // Timestamp interpolation can begin at the bracket before the first
+    // positive sample; choose a window safely before that bracket. No metal
+    // temperature or cold-start fade participates in this source response.
+    const before = Math.round(0.58 * sampleRate);
+    expect(burning.output.left.subarray(0, before))
+      .toHaveLength(reference.output.left.subarray(0, before).length);
+    expect(burning.output.left.subarray(0, before)
+      .findIndex((sample, index) => sample !== reference.output.left[index])).toBe(-1);
+    expect(rms(difference(burning.output.left.subarray(sampleRate), reference.output.left.subarray(sampleRate))))
+      .toBeGreaterThan(1e-4);
   });
 
   it("fades a live noise-cap edit before switching work, while valid telemetry continues", async () => {

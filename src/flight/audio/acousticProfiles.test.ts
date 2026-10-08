@@ -68,9 +68,10 @@ describe("shared engine acoustic setup (actual shipped WASM)", () => {
 
   it("morphs the existing exhaust on native augmentation, with above-dry headroom and no added sources", async () => {
     const dry = await render(f135);
-    const augmented = await render(f135, { augmentation: true });
-    const headroom = await render(f135, { augmentation: true, thrustLbf: 40_000 });
-    const unavailable = await render(f135, { augmentation: true, availability: full & ~AVAILABILITY.AUGMENTATION });
+    const burning = { augmentation: true, afterburnerBurnedFuelFlowKgSec: 8 * 0.45359237 };
+    const augmented = await render(f135, burning);
+    const headroom = await render(f135, { ...burning, thrustLbf: 40_000 });
+    const unavailable = await render(f135, { ...burning, availability: full & ~AVAILABILITY.AUGMENTATION });
     expect(unavailable.tail).toEqual(dry.tail);
     const added = difference(augmented.tail, dry.tail);
     expect(rms(added)).toBeGreaterThan(rms(dry.tail) * 0.5);
@@ -99,8 +100,9 @@ describe("shared engine acoustic setup (actual shipped WASM)", () => {
     }
   });
 
-  it("scales only added augmentation gain at 0/50/100 percent without changing its filter morph", async () => {
-    const overrides = { augmentation: true, thrustLbf: 40_000, source: [0, 0, -100] as [number, number, number] };
+  it("controls added augmentation amplitude and spectral colour at 0/50/100 percent", async () => {
+    const overrides = { augmentation: true, afterburnerBurnedFuelFlowKgSec: 8 * 0.45359237,
+      thrustLbf: 40_000, source: [0, 0, -100] as [number, number, number] };
     const zero = await render(f135, overrides, core => core.exports.osfs_audio_set_afterburner_volume(0));
     const half = await render(f135, overrides, core => core.exports.osfs_audio_set_afterburner_volume(0.5));
     const fullVolume = await render(f135, overrides, core => core.exports.osfs_audio_set_afterburner_volume(1));
@@ -109,14 +111,17 @@ describe("shared engine acoustic setup (actual shipped WASM)", () => {
     const halfAdded = difference(half.tail, zero.tail);
     const fullAdded = difference(fullVolume.tail, zero.tail);
     expect(rms(fullAdded)).toBeGreaterThan(1e-5);
-    expect(rms(halfAdded) / rms(fullAdded)).toBeCloseTo(0.5, 5);
+    expect(rms(halfAdded)).toBeGreaterThan(0);
+    expect(rms(halfAdded)).toBeLessThan(rms(fullAdded));
     expect(rms(fullVolume.tail)).toBeGreaterThan(rms(half.tail));
     expect(rms(half.tail)).toBeGreaterThan(rms(zero.tail));
     const dry = await render(f135, { ...overrides, augmentation: false });
     expect(rms(zero.tail)).toBeGreaterThan(0);
-    // Muting added AB energy does not pretend the native engine is dry:
-    // its augmented filter still differs from the dry filter.
-    expect(rms(difference(zero.tail, dry.tail))).toBeGreaterThan(1e-5);
+    // Hold physical telemetry fixed: zero now removes deliberate AB colour.
+    // Different native thrust/fuel/shaft inputs can still change engine sound.
+    for (const channel of ["left", "right"] as const) {
+      expect(zero.output[channel].findIndex((sample, index) => sample !== dry.output[channel][index])).toBe(-1);
+    }
     expect(zero.core.exports.memory.buffer.byteLength).toBe(fullVolume.core.exports.memory.buffer.byteLength);
   });
 
@@ -129,7 +134,8 @@ describe("shared engine acoustic setup (actual shipped WASM)", () => {
   });
 
   it("clamps afterburner gain and sanitizes non-finite values", async () => {
-    const overrides = { augmentation: true, source: [0, 0, -100] as [number, number, number] };
+    const overrides = { augmentation: true, afterburnerBurnedFuelFlowKgSec: 8 * 0.45359237,
+      source: [0, 0, -100] as [number, number, number] };
     const zero = await render(f135, overrides, core => core.exports.osfs_audio_set_afterburner_volume(0));
     const one = await render(f135, overrides, core => core.exports.osfs_audio_set_afterburner_volume(1));
     for (const volume of [-1, Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
@@ -142,7 +148,8 @@ describe("shared engine acoustic setup (actual shipped WASM)", () => {
   });
 
   it("smooths a live afterburner gain change without resetting the active voice", async () => {
-    const overrides = { augmentation: true, thrustLbf: 40_000, source: [0, 0, -100] as [number, number, number] };
+    const overrides = { augmentation: true, afterburnerBurnedFuelFlowKgSec: 8 * 0.45359237,
+      thrustLbf: 40_000, source: [0, 0, -100] as [number, number, number] };
     const reference = await render(f135, overrides);
     let applied = false;
     const sameGain = await render(f135, overrides, undefined, (core, time) => {
@@ -198,7 +205,8 @@ describe("shared engine acoustic setup (actual shipped WASM)", () => {
   });
 
   it("caps master gain at eight and retains finite limited output for a loud augmented source", async () => {
-    const loudSource = { augmentation: true, thrustLbf: 40_000, source: [0, 0, -1] as [number, number, number] };
+    const loudSource = { augmentation: true, afterburnerBurnedFuelFlowKgSec: 8 * 0.45359237,
+      thrustLbf: 40_000, source: [0, 0, -1] as [number, number, number] };
     const ceiling = await render(f135, loudSource, core => core.exports.osfs_audio_set_gains(8, 1, 0, 0, 0));
     const capped = await render(f135, loudSource, core => core.exports.osfs_audio_set_gains(99, 1, 0, 0, 0));
     expect(capped.output).toEqual(ceiling.output);

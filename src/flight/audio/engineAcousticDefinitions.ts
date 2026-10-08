@@ -1,5 +1,5 @@
 /** Native semantic fields; a schema selects paths without aircraft-specific code. */
-export type EngineTelemetryField = "n1Pct" | "n2Pct" | "thrustLbf" | "fuelFlowPps" | "running" | "augmentation" | "starter" | "cutoff" | "throttleNorm";
+export type EngineTelemetryField = "n1Pct" | "n2Pct" | "thrustLbf" | "fuelFlowPps" | "running" | "augmentation" | "starter" | "cutoff" | "throttleNorm" | "thermalValid" | "afterburnerBurnedFuelFlowKgSec";
 export interface NativeEngineTelemetrySchema {
   readonly id: string;
   readonly required: readonly EngineTelemetryField[];
@@ -21,6 +21,17 @@ export const JSBSIM_TURBINE_TELEMETRY: NativeEngineTelemetrySchema = Object.free
     running: "propulsion/engine[{engineIndex}]/set-running", augmentation: "propulsion/engine[{engineIndex}]/augmentation",
     starter: "propulsion/starter_cmd", cutoff: "propulsion/cutoff_cmd",
     throttleNorm: "fcs/throttle-cmd-norm[{engineIndex}]",
+  }),
+});
+
+/** Native combustion partition, rather than selection alone, drives reheat sound. */
+export const JSBSIM_THERMAL_TURBINE_TELEMETRY: NativeEngineTelemetrySchema = Object.freeze({
+  ...JSBSIM_TURBINE_TELEMETRY,
+  id: "jsbsim-thermal-turbine-v1",
+  paths: Object.freeze({
+    ...JSBSIM_TURBINE_TELEMETRY.paths,
+    thermalValid: "propulsion/engine[{engineIndex}]/thermal/valid",
+    afterburnerBurnedFuelFlowKgSec: "propulsion/engine[{engineIndex}]/thermal/afterburner-burned-fuel-flow-kg-sec",
   }),
 });
 
@@ -82,9 +93,9 @@ export const FJ33_DEFINITION: EngineAcousticDefinition = Object.freeze({
 export const F135_DEFINITION: EngineAcousticDefinition = Object.freeze({
   id: "f135-approximation",
   engineClass: "turbofan", manufacturerFamily: "Pratt & Whitney F135", rendererId: "procedural-jet-v1",
-  telemetry: JSBSIM_TURBINE_TELEMETRY,
+  telemetry: JSBSIM_THERMAL_TURBINE_TELEMETRY,
   label: "Approximate F135 procedural sound",
-  approximation: "One main-engine source with exhaust-dominant broadband roar and native afterburner state. Timbre and loudness are uncalibrated; separate lift-fan sound is not modeled.",
+  approximation: "One main-engine source with exhaust-dominant broadband roar and native burned afterburner fuel. Timbre, fuel-fraction shaping and loudness are uncalibrated; separate lift-fan sound is not modeled.",
   parameters: Object.freeze({
     // Idle and dry thrust come from the installed trial FDM. Everything else
     // is an artistic starting point. F-35B measurements show angle/power-

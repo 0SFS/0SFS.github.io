@@ -46,6 +46,8 @@ const START = { tab: "aircraft", section: "start" } as const;
 const REMOTE_CONTROL = { tab: "remote", section: "control" } as const;
 const PHONE_CAMERA = { tab: "remote", section: "camera" } as const;
 const SOUND = { tab: "sound", section: "sound" } as const;
+const AFTERBURNER_APPEARANCE = { tab: "afterburner", section: "appearance" } as const;
+const AFTERBURNER_SOUND = { tab: "afterburner", section: "sound" } as const;
 const ENGINE = { tab: "engine", section: "engine" } as const;
 const ENGINE_HISTORY = { tab: "engine", section: "history" } as const;
 const ENGINE_TEST = { tab: "engine", section: "test" } as const;
@@ -71,6 +73,8 @@ export const FLIGHT_SECTION_TITLES: readonly (readonly [tab: string, section: st
   ["remote", "control", "Who flies"],
   ["remote", "camera", "Phone camera trackpad"],
   ["sound", "sound", "Sound"],
+  ["afterburner", "appearance", "Exhaust appearance"],
+  ["afterburner", "sound", "Afterburner sound"],
   ["engine", "engine", "Engine"],
   ["engine", "history", "History sampling"],
   ["engine", "test", "Test stand conditions"],
@@ -408,6 +412,14 @@ export const OSFS_PARAMETERS = [
     unit: { id: "cd/m²", text: "cd/m²" }, kind: "number", step: 1, bounds: within(1, 100000), default: 1000,
     defaultReason: "Use the same provisional luminance reference as hot hardware; the scene is not radiometrically calibrated.",
     home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineExhaust.ts",
+  },
+  {
+    id: "osfs.exhaust.dryIntensity",
+    label: "Dry exhaust brightness",
+    description: "Display multiplier on luminous gas and its nearby light with afterburner off. One preserves the current physical model's output, whose F135 temperature and particle loading remain uncalibrated. Metal glow and afterburner emission are unchanged.",
+    unit: "ratio", kind: "number", step: 0.01, bounds: within(0.5, 3), default: 1,
+    defaultReason: "Preserve the current model prediction without changing temperature, fuel, spectrum or physical emitted power.",
+    home: main(AFTERBURNER_APPEARANCE), appliesLive: true, source: "src/flight/aircraft/createEngineExhaust.ts",
   },
   {
     id: "osfs.exhaust.surfaceReferenceNits",
@@ -1223,8 +1235,8 @@ export const OSFS_PARAMETERS = [
     "Twice the previous master maximum, chosen by the pilot after testing all volume sliders at maximum.", 8),
   soundVolume("engineVolume", "Engine volume", "Scales the engine and its afterburner sound, independently of the airframe, up to eight times its original level.", 0.8,
     "The original level is preserved; extra headroom is available for a quiet engine.", 8),
-  soundVolume("afterburnerVolume", "Afterburner volume", "Scales the extra afterburner roar; one keeps its original level. Native afterburner spectrum and thrust response remain.", 0.5,
-    "Half the previous added afterburner contribution after pilot feedback that it was too loud."),
+  soundVolume("afterburnerVolume", "Afterburner volume", "Scales the combustion-driven afterburner roar and its spectrum changes. Zero removes those additions; native thrust, shaft speed and fuel can still change the underlying engine sound.", 0.5,
+    "Retain the pilot's preferred 50% control value; the combustion-driven sound contribution remains uncalibrated."),
   soundVolume("airframeVolume", "Airframe volume", "Scales wind and gear and flap turbulence, independently of the engine.", 0.6),
   {
     id: "osfs.sound.listenerCockpitBlend",
@@ -1795,7 +1807,7 @@ function soundVolume<Field extends string>(field: Field, label: string, descript
     bounds: within(0, maximum),
     default: value,
     defaultReason,
-    home: main(SOUND),
+    home: main(field === "afterburnerVolume" ? AFTERBURNER_SOUND : SOUND),
     appliesLive: true,
     source: "src/flight/audio/createFlightAudio.ts",
   };

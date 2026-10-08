@@ -23,10 +23,11 @@ function missingRequired(value, node, at = "$") {
 describe("offline sweep renderer", () => {
   it("reads the wire format from snapshot.h", () => {
     const abi = readAbi();
-    expect(abi.snapshotSize).toBe(33);
+    expect(abi.snapshotSize).toBe(34);
     expect(abi.slot.n1Pct).toBe(5);
-    expect(abi.batchLength).toBe(2 + 8 * 33 + 32 * 4);
-    expect(abi.version).toBe(3);
+    expect(abi.slot.afterburnerBurnedFuelFlowKgSec).toBe(33);
+    expect(abi.batchLength).toBe(2 + 8 * 34 + 32 * 4);
+    expect(abi.version).toBe(4);
   });
 
   it("generates the 240 s, 60 Hz sweep deterministically", () => {

@@ -292,15 +292,15 @@ Every audible shipping tier needs p95/max/dropout evidence on **at least two nam
 
 **Settings:** **Off, Low, Med, High**, plus Auto starting at Low and selecting only a qualified tier. The default is Med, for now (owner decision, 2026-10-02), and choosing a tier runs it at once, with no separate testing step. Show requested/effective quality separately after fallback, independent volumes, reduced dynamic range and actual per-tier resource controls. Procedural High downloads no recordings. Disable with **“Unsupported on this device”** only for a concrete missing capability or failed qualification, with its reason. Use **“Not yet validated”** for absent device evidence; **“Audio pack unavailable”** applies only to a future optional recorded extension. Autoplay lock displays **“Enable sound.”** Downgrades persist until explicit re-test; never unexpectedly restore louder sound.
 
-**Pilot controls, 2026-10-05 follow-up.** Sound has continuous, saved controls
-for engine boost, added afterburner roar and acoustic viewpoint. Each has its
-one home in the existing Sound section and applies live:
+**Pilot controls, 2026-10-07 follow-up.** Continuous, saved controls apply live.
+Master, engine boost and acoustic viewpoint live in Sound; afterburner volume
+has its single home in the Afterburner tab:
 
 | Parameter | Bounds / default | Meaning |
 | --- | --- | --- |
 | `osfs.sound.masterVolume` | 0–8 / 2 | Mix amplitude gain before output processing, shown as 0–800%. The default is 200% of the previous master maximum; saved gains keep their numerical value. |
 | `osfs.sound.engineVolume` | 0–8 / 0.8 | Engine amplitude gain, shown as 0–800%. The default and existing saved values stay unchanged; the extra headroom also scales its afterburner component. |
-| `osfs.sound.afterburnerVolume` | 0–1 / 0.5 | Relative gain of the extra afterburner roar. 100% retains the previous extra-roar gain; 50% is the quieter default. This does not replace native augmentation state. At zero, augmented spectral colour and native above-dry thrust response remain. |
+| `osfs.sound.afterburnerVolume` | 0–1 / 0.5 | Mix of deliberate afterburner amplitude and spectral changes, driven by native actually burned reheat fuel. Zero removes those changes at fixed shaft/thrust/fuel inputs; native engine changes still affect the base sound. The gain and fuel-fraction shaping are uncalibrated. |
 | `osfs.sound.listenerCockpitBlend` | 0–1 / 1 | Camera at 0, Cockpit at 1; intermediate values interpolate the acoustic viewpoint and cabin/exterior treatment. Cockpit keeps sound at the pilot when the visual camera moves outside the aircraft. |
 
 Eight-times engine amplitude offers about 18 dB of gain headroom before output
@@ -353,8 +353,9 @@ references and augmentation shaping. The FJ33 setup preserves the exact
 original values and arithmetic. Profile setup neither adds a voice nor changes
 the existing oscillator, grain, convolution or memory ceilings.
 
-Snapshot ABI 2 transports **native main-engine units**: N1/N2 percentages,
-thrust in lbf and fuel flow in lbm/s. Normalization belongs to the configured
+Snapshot ABI 4 transports **native main-engine units**: N1/N2 percentages,
+thrust in lbf, total fuel flow in lbm/s and burned afterburner fuel in kg/s.
+Normalization belongs to the configured
 core, so the transport, adapter readings and engine monitor all retain the same
 physical values. The source remains engine zero's installed nozzle point,
 about `[0, 1.267, -4.46433628]` metres in the aircraft visual frame. This is a
@@ -370,7 +371,7 @@ and roll-post force surrogates do not create extra sound engines.
 | Fan share of source mix | 0.18 | Artistic exhaust-dominant balance, not bypass mass-flow ratio. |
 | Dry exhaust low-pass | `180 + 2200 × normalizedDryThrust` Hz | Artistic broadband shaping. |
 | Augmented exhaust low-pass | 4,200 Hz | Artistic target, crossfaded from the dry filter. |
-| Augmented exhaust gain | Native active state enables additional gain; above-dry native thrust retains headroom | Artistic acoustic response to an actual engine observer. |
+| Augmented exhaust gain | Valid native burned AB / total fuel permits and weights additional gain; above-dry native thrust retains headroom | Artistic acoustic response to a native combustion observer. |
 
 Published F-35B ground-run measurements identify large/fine turbulent mixing
 and broadband shock-associated noise, with spectral shape varying by engine
@@ -382,22 +383,50 @@ transfer, source gain or a calibrated recording for this implementation.
 The current single-source filters do not reproduce their full directional
 spectral decomposition or jet crackle.
 The measured broadband shock-associated component is already present at
-75% engine-thrust request, before afterburner. The augmentation-controlled
+75% engine-thrust request, before afterburner. The reheat-controlled
 filter/gain change below is an artistic exhaust response, not a physical
 shock-noise model or a gate for all shock-associated sound.
 [F-35B broadband shock-associated noise study](https://doi.org/10.1121/1.5055392).
 
-The optional, read-only native property
-`propulsion/engine[0]/augmentation` supplies active/inactive augmentation.
-Availability comes from the catalog and property batch. A missing property
-fades augmentation out; full throttle never substitutes for it. Native active
-state morphs the **existing exhaust noise source and filter**, with smooth gain
-and frequency changes. There is no extra oscillator, noise stream or voice.
+The F135 adapter reads optional native
+`propulsion/engine[0]/thermal/afterburner-burned-fuel-flow-kg-sec`, with
+`thermal/valid` and the read-only `augmentation` observer. Availability comes
+from the catalog, the property batch and a valid thermal state. Missing,
+negative or nonfinite burned fuel, invalid thermal state, missing total fuel,
+or unavailable/inactive augmentation fades deliberate reheat sound out;
+neither full throttle nor the active flag substitutes for combustion.
+The source target is the actually burned AB fuel divided by total native fuel,
+both in kg/s and bounded to 0–1. This continuous fraction is an **uncalibrated
+acoustic proxy**, not a measured sound-power law, heat-release fluctuation or
+F135 ignition schedule. At fixed other inputs, selection with zero burned
+fuel adds no reheat sound. The existing 10 ms dezippering and 33.3 ms telemetry
+buffer apply; no cold-start or visual-delay timer is added.
+
+Burned reheat fuel morphs the **existing exhaust noise source and filter**.
+The pilot's afterburner volume multiplies every intentional reheat amplitude
+and frequency change, including High fine-scale mixing and shock gain. Zero
+therefore returns the same samples as dry at identical physical inputs. It
+does not hold real native thrust, total fuel or shaft speed fixed. The current
+native model immediately switches its augmented thrust table before fuel
+settles, so a residual early base-source change can still occur; the native
+thrust/fuel closure remains an engine-model issue. There is no extra
+oscillator, noise stream or voice. Snapshot ABI 4 adds one Float64 observation;
+the worklet wrapper and WASM core share the new 34-field layout.
 The physical FDM inhibits augmentation during deployed conversion; audio
 observes that result without copying its command mask. Eight real F-35B
 SDK/DSP cases pass on installed `1.2.4-fork.8`, including dry, afterburning,
 converted and cutoff observer states. This is software verification, not
 acoustic or device qualification.
+
+The light and added acoustic energy should refer to combustion in the
+augmentor between turbine and nozzle. A cold metal liner can glow later than
+the flame; its thermal inertia does not justify combustion sound before fuel
+burns. This is a causal inference from the source mechanism, not a measured
+F135 light/sound-onset tolerance. Propagation, cockpit transfer, output latency,
+camera exposure and visibility thresholds remain separate observations.
+[NASA Glenn afterburner description](https://www.nasa.gov/special-projects-laboratory-turbojet-enhancements/).
+No matched F135 cold/warm onset recording or listening qualification is
+retained, and this audio correction does not establish visual acceptance.
 
 The existing distance law, Doppler delay, cockpit colour, mute, holds, gains,
 reset epochs, sample-peak limiter and Auto/device gates apply. No recording,

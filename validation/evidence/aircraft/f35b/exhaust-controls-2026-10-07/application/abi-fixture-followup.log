@@ -1,0 +1,8 @@
+
+ RUN  v4.1.6 <0sfs-root>
+
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  21:20:27
+   Duration  1.32s (transform 16ms, setup 0ms, import 24ms, tests 1.15s, environment 0ms)

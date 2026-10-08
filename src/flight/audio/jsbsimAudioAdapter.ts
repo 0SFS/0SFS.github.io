@@ -66,6 +66,8 @@ export interface AudioAdapterReading {
   soundSpeedMps: number;
   /** Genuine native observer; availability is separate from an inactive value. */
   augmentation: boolean;
+  /** Native actually burned reheat fuel; unavailable/invalid thermal state is NaN. */
+  afterburnerBurnedFuelFlowKgSec?: number;
   /** Native thruster's exhaust axis in the aircraft visual frame; NaNs mean unavailable. */
   sourceAxis?: [number, number, number];
 }
@@ -233,6 +235,7 @@ export function createJsbsimAudioAdapter(sdk: JSBSimSdk, options: AudioAdapterOp
   }, schema.combustion.minimumFuelFlowPps);
   const diagnostics: AudioAdapterDiagnostics = {
     missing: fields.filter(field => !has[field] && field !== "augmentation"
+      && field !== "thermalValid" && field !== "afterburnerBurnedFuelFlowKgSec"
       && field !== "nozzlePitchRad" && field !== "nozzleYawRad").map(field => paths[field]!),
     combustionSource: combustionProbe.source, sourceOffset, profile: definition,
     sourceId: installation.id, engineIndex, telemetryAvailable: requiredAvailable(),
@@ -243,6 +246,7 @@ export function createJsbsimAudioAdapter(sdk: JSBSimSdk, options: AudioAdapterOp
     combustion: false, running: false, starter: false, cutoff: false,
     kias: Number.NaN, gearNorm: Number.NaN, flapNorm: Number.NaN,
     velocity: [Number.NaN, Number.NaN, Number.NaN], soundSpeedMps: Number.NaN, augmentation: false,
+    afterburnerBurnedFuelFlowKgSec: Number.NaN,
     sourceAxis: [Number.NaN, Number.NaN, Number.NaN],
   };
   let disposed = false;
@@ -260,6 +264,10 @@ export function createJsbsimAudioAdapter(sdk: JSBSimSdk, options: AudioAdapterOp
       availability |= bit("fuelFlowPps", AVAILABILITY.FUEL_FLOW);
       availability |= bit("running", AVAILABILITY.RUNNING);
       availability |= bit("augmentation", AVAILABILITY.AUGMENTATION);
+      const burnedFuel = at("afterburnerBurnedFuelFlowKgSec");
+      const thermalValid = available("thermalValid") && at("thermalValid") > 0.5;
+      const burnedFuelAvailable = thermalValid && Number.isFinite(burnedFuel) && burnedFuel >= 0;
+      if (burnedFuelAvailable) availability |= AVAILABILITY.AFTERBURNER_BURNED_FUEL;
       availability |= bit("kias", AVAILABILITY.AIRSPEED);
       const commandsAvailable = commandScoped() && available("starter") && available("cutoff")
         && at("starter") >= 0 && at("cutoff") >= 0;
@@ -289,6 +297,7 @@ export function createJsbsimAudioAdapter(sdk: JSBSimSdk, options: AudioAdapterOp
       reading.starter = commandsAvailable && at("starter") > 0.5;
       reading.cutoff = commandsAvailable && at("cutoff") > 0.5;
       reading.augmentation = at("augmentation") > 0.5;
+      reading.afterburnerBurnedFuelFlowKgSec = burnedFuelAvailable ? burnedFuel : Number.NaN;
       // Native thrust points (cos(p)cos(y), cos(p)sin(y), -sin(p)) in
       // body forward/right/down. Exhaust is its opposite, then mapped to
       // visual left/up/forward. A vertical nozzle therefore points down.
@@ -348,6 +357,7 @@ export function toSnapshot(
     starter: reading.starter,
     cutoff: reading.cutoff,
     augmentation: reading.augmentation,
+    afterburnerBurnedFuelFlowKgSec: reading.afterburnerBurnedFuelFlowKgSec,
     kias: reading.kias,
     gearNorm: reading.gearNorm,
     flapNorm: reading.flapNorm,

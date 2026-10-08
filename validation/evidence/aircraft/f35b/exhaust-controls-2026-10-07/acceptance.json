@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-07",
+  "owner": "0sfs",
+  "baselineCommit": "4c793c33a2c44927a20a58f786c8e9c0aaf51722",
+  "testedWorkingTree": "Combined working tree with existing/concurrent changes preserved; source hashes are snapshots, not release qualification.",
+  "userObservation": {
+    "dryNightGlow": "User clearly sees faint red dry exhaust and considers its appearance satisfactory",
+    "capture": "User report only; no synchronized frame/audio/native capture",
+    "ABAudioVisualTiming": "User still reports audible onset before visible flame, especially cold"
+  },
+  "dryDisplay": {
+    "parameter": "osfs.exhaust.dryIntensity",
+    "range": [
+      0.5,
+      3
+    ],
+    "default": 1,
+    "mode": "Native augmentation off",
+    "physicalSourceChanged": false,
+    "temperatureSpectrumAttenuationMetalChanged": false,
+    "fieldUploadOnDisplayEdit": false,
+    "nearbyLightUsesSameDisplayMultiplier": true
+  },
+  "audio": {
+    "snapshotVersion": 4,
+    "snapshotFieldCount": 34,
+    "nativeBurnedFlowUnit": "kg/s",
+    "nativeTotalFuelUnit": "lbm/s",
+    "kgPerLbm": 0.45359237,
+    "ABTarget": "valid native actually burned AB fuel / native total fuel, bounded 0..1, gated by native augmentation",
+    "zeroGainScope": "All deliberate AB amplitude/spectrum changes; base thrust/fuel/shaft inputs remain",
+    "savedZeroAppliesBeforeFirstSample": true,
+    "liveDezipperSeconds": 0.01,
+    "acousticShaping": "uncalibrated",
+    "wasm": {
+      "bytes": 50977,
+      "sha256": "100eefa8f3eaec2e3f3cfee12086732871f7aa0cb96f157b87f61e7ec0b6b677"
+    }
+  },
+  "checks": {
+    "incrementalTypecheck": "pass",
+    "initialLint": "pass",
+    "related": {
+      "passedTests": 877,
+      "failedTests": 7,
+      "passedFiles": 63,
+      "failedFiles": 4
+    },
+    "focusedFollowup": {
+      "passedTests": 64,
+      "passedFiles": 4
+    },
+    "singleFinalCI": {
+      "passedTests": 2016,
+      "expectedFailTests": 1,
+      "failedTests": 1,
+      "passedFiles": 185,
+      "failedFiles": 1,
+      "failure": "stale offline-tool ABI assertion; build skipped in this command"
+    },
+    "ABIFixtureFollowup": {
+      "passedTests": 4,
+      "passedFiles": 1
+    },
+    "lintFollowup": "pass",
+    "productionBuildAndArtifactVerification": "pass",
+    "fullSuiteRepeated": false
+  },
+  "acceptance": {
+    "dryVisual": "User-reported satisfactory faint night appearance",
+    "F135AbsolutePhysicalCalibration": "open",
+    "ABSourceCausality": "software checked",
+    "ABRenderedPerceivedSynchronization": "unverified",
+    "nativeImmediateWetThrustDiscrepancy": "open",
+    "deckInteraction": "open",
+    "GPUAndPhysicalAudioDevice": "not run",
+    "performance": "not measured",
+    "deployment": "held; not performed"
+  },
+  "primarySources": [
+    "https://ntrs.nasa.gov/citations/19790004874",
+    "https://ntrs.nasa.gov/api/citations/20140000730/downloads/20140000730.pdf",
+    "https://ntrs.nasa.gov/citations/19930087619"
+  ],
+  "sourceSha256": {
+    "benchmarks/audio/renderSweep.test.mjs": "0f7c4477fee10aa4cbf392de11f2ca2110009b60448b22db9be068d82aca54f4",
+    "src/flight/aircraft/createEngineExhaust.test.ts": "b5521fb3db5d7a98b4f0b7e76bdddeaffad744de29958820c4dc93b380f4274f",
+    "src/flight/aircraft/createEngineExhaust.ts": "9f249fbcd150da68ba9c1320f72a3208704253b6886f81206c15d426ab2d8f38",
+    "src/flight/aircraft/createEngineExhaustDomain.test.ts": "e39dd69c64b3f06c5194f15cc708b99e909b410a3ed085bc83322af1dc228698",
+    "src/flight/audio/acousticProfiles.test.ts": "0622307f5033d3e5d8c6a658108145d91e656e0cc09978c4390bc33df422bb81",
+    "src/flight/audio/audioRendererRegistry.ts": "8415c23a955b9b35ca484b2c7c6e302150cee6f356a4a0ad7f46d62ef26e54b1",
+    "src/flight/audio/audioSnapshot.test.ts": "9a06b0d4f433f6b15ed57b0b8de93dccc193dcee6647d7ed22419c5ca2bac74f",
+    "src/flight/audio/audioSnapshot.ts": "c391a4e1da1e4a13f8889facefed9e685b950995f116f491b8a9f5116289f5af",
+    "src/flight/audio/createFlightAudio.ts": "78fd4af7475bf86720be2a9281cb74a23690a12414503798349bbec6939fdbad",
+    "src/flight/audio/dsp/acoustic_profile.h": "1c88eabc0d1c47d68a096d5593b657c2495bf980e509785f0d5433162bb2c52b",
+    "src/flight/audio/dsp/audio-dsp.provenance.json": "00e9897c19ab58489171f92e443d005160756f1a00a86a44c35a368e52228fb9",
+    "src/flight/audio/dsp/audio-dsp.wasm": "100eefa8f3eaec2e3f3cfee12086732871f7aa0cb96f157b87f61e7ec0b6b677",
+    "src/flight/audio/dsp/convolver.h": "5565dd79ad94832a24693171c04fb3aaafa8402afd967406c60e1f232e382dba",
+    "src/flight/audio/dsp/core.cpp": "f61bbb2421f55bfaa2e7ff06cbba1ee074e8e5ca59744587b3b8cae9c878b6e9",
+    "src/flight/audio/dsp/granular.h": "940b492d5ce19be0db016bcb756f2b9c561ca532cb8206b08927dce8d82b88f5",
+    "src/flight/audio/dsp/primitives.h": "c2280ccf199af4f05fc02d74a4c4336b270a92034ebd937a35b72e127cdec93a",
+    "src/flight/audio/dsp/snapshot.h": "a1f00c21c714d6fea0e63585cab72bd0c720e2f2d18afebd13913e020ed16e97",
+    "src/flight/audio/dsp/turbofan.h": "dc92d7418f817adb045cd6f697e0999705f152042f38ab1aecf33115f21f2fbf",
+    "src/flight/audio/engineAcousticDefinitions.ts": "562121e77002891fa8f7d8d22a5551905c8554862bec06495ea77073d2553548",
+    "src/flight/audio/f35bAudio.integration.test.ts": "7c9334f06b22317cbacb0d9d8bae04d85c2ead0cd74d55a56f28148b8e3c2888",
+    "src/flight/audio/highAudio.test.ts": "e1c9b6ab3543dcb598437ea6cdebfdaf1f43853f84c35a69b36ddcca470651e8",
+    "src/flight/audio/jsbsimAudioAdapter.ts": "c31a7c18a7b8ac725e0ed2dafd440b901266487d22d641a68192a303f749ffba",
+    "src/flight/audio/worklet/dspProcessor.js": "3aad09c3262207026796b5600f9b9ba545b561ae5b269ad00b58c38293d326dc",
+    "src/flight/createFlightSimApp.ts": "a09a7edf1dd2785bd25de3c779272b6230206b4f384b7dc5bacbb43589200cd9",
+    "src/flight/hud/FlightControlPanel.afterburner.test.tsx": "d61a095b0d930143e01a386ea6fcfef458da32d19e38fb72c8ec66dcaca1217a",
+    "src/flight/hud/FlightControlPanel.tsx": "daed630c3f99c5242a25851f74f70fb0b19afa8ca6af1df78670281dcbdf50e8",
+    "src/flight/hud/SoundSettingsPanel.test.tsx": "93e9c4b36541421b2f9a73ec2e69e2c7a9e738d593e37d91fe7141d5d5d40ced",
+    "src/flight/hud/SoundSettingsPanel.tsx": "f1a0e94a7ac0cb6227426a610bdd1f279431591173f33031603a88ee0580c160",
+    "src/flight/settings/flightParameters.test.ts": "ad3dd707c105edf4803a38f1031bf6429e3ec1423af912877a32568170bad2a2",
+    "src/flight/settings/flightParameters.ts": "f4b8ba2ce34d457875117d57b4b5a8a1b2377c217180f4e5fe4613a7a8112e53"
+  },
+  "logs": {
+    "typecheck.log": {
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redacted": true,
+      "trailingWhitespaceNormalized": true
+    },
+    "lint.log": {
+      "retainedSha256": "d25f8980fad0b5aaf42d5c11aa2c6d95a921e64717b121d7b1064755cbdf9c30",
+      "originalSha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e",
+      "redacted": true,
+      "trailingWhitespaceNormalized": true
+    },
+    "failure-followup.log": {
+      "retainedSha256": "84c57a2af42a38e2ffa6752c5893e7f643e5b4005c11bdbb5cd3e97507eaf1fb",
+      "originalSha256": "6ff228010ea9881bc145c268a7ea27de1e0c544dc26465f580f043e8d458b6d1",
+      "redacted": true,
+      "trailingWhitespaceNormalized": true
+    },
+    "ci.log": {
+      "retainedSha256": "4730b6ad978e6430862f5e2f54001ec82063bcdf09d1474f94e6b19cf5d9d16e",
+      "originalSha256": "0ea286eff25e273fb9bb64bc7dfa4474a8fb9ebbad18e8a6bdd8ebbb9c9f2b18",
+      "redacted": true,
+      "trailingWhitespaceNormalized": true
+    },
+    "abi-fixture-followup.log": {
+      "retainedSha256": "17ac0546ab5268ffa852ccf449bf04f7f923af5538f519ff0c40c212b9c686fd",
+      "originalSha256": "8f9960fcbb6109cbb40e5efadc31b744e44dbb4ad0af85840540eeb12a1d55e2",
+      "redacted": true,
+      "trailingWhitespaceNormalized": true
+    },
+    "lint-followup.log": {
+      "retainedSha256": "d25f8980fad0b5aaf42d5c11aa2c6d95a921e64717b121d7b1064755cbdf9c30",
+      "originalSha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e",
+      "redacted": true,
+      "trailingWhitespaceNormalized": true
+    },
+    "build.log": {
+      "retainedSha256": "f422109415dd65dcd26de707993bd02aae4785f3674ef08e8a627af7c5bdb47d",
+      "originalSha256": "200af1d9857bf11e52d560f97fcdb4aec1c5d78549883a39bc0c6f9cf0e1de5f",
+      "redacted": true,
+      "trailingWhitespaceNormalized": true
+    },
+    "related-failures-summary.log": {
+      "retainedSha256": "31418dd54fb664a57f0098d24eac0c8c1ec630a1e660abd21d02ce778e658ae6",
+      "originalFullLogSha256": "af4681f4303096d2a5ba36ebacdc56b967361a7a42db884930238bd0d866e777",
+      "kind": "failure-summary-not-full-waveform-diff",
+      "redacted": true,
+      "trailingWhitespaceNormalized": true
+    },
+    "build-audio-local-cache.log": {
+      "retainedSha256": "492c79403ad6d82ae892096971ca125c902254f99a51d29f6fb4f0f4f57d064c",
+      "originalSha256": "492c79403ad6d82ae892096971ca125c902254f99a51d29f6fb4f0f4f57d064c",
+      "redacted": true,
+      "trailingWhitespaceNormalized": true
+    },
+    "build-audio-initial-gain.log": {
+      "retainedSha256": "8c31a67d1bdfa4a3447aafee920eaa3a571406fdb6ec4a24e1f55dee742e5bde",
+      "originalSha256": "8c31a67d1bdfa4a3447aafee920eaa3a571406fdb6ec4a24e1f55dee742e5bde",
+      "redacted": true,
+      "trailingWhitespaceNormalized": true
+    },
+    "build-audio.log": {
+      "retainedSha256": "7da139bfa6f127166a3d9f61515fa4c21cac63a0f3d9f6297e6a6c7ff4b5fea8",
+      "originalSha256": "2c76385a1bb2c6651d14253fa2996af567b3940732b0a8bbf66975499c1a630c",
+      "redacted": true,
+      "trailingWhitespaceNormalized": true
+    }
+  }
+}

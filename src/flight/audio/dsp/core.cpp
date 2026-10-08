@@ -591,6 +591,10 @@ OSFS_EXPORT void osfs_audio_set_gains(double master, double engine, double tire,
 /** Live AB-only gain: no profile transaction, physical-state change or voice reset. */
 OSFS_EXPORT void osfs_audio_set_afterburner_volume(double volume) {
   gAfterburnerVolume = clamp01(sanitize(volume));
+  // Setup has no previous audible gain to preserve. A saved zero must not
+  // leak reheat while smoothing from the core's default one on its first
+  // rendered samples. Live edits still use the existing 10 ms dezipper.
+  if (gStats[kStatFrames] == 0.0) gAfterburnerVolumeSmooth.reset(gAfterburnerVolume);
 }
 
 OSFS_EXPORT void osfs_audio_set_epoch(int epoch, double simTimeS, double audioFrame) {
@@ -777,8 +781,17 @@ OSFS_EXPORT void osfs_audio_process(double blockStartFrame, int frames) {
             0.0, gEngine.thrustCeiling()) : 0.0);
     in.fuelNorm = gFuel.process(
         (availability & kAvailFuelFlow) ? clamp01(interpolated[kFuelFlowPps] / gEngine.fuelReference()) : 0.0);
-    in.augmentation = gAugmentation.process(
-        (availability & kAvailAugmentation) ? clamp01(interpolated[kAugmentation]) : 0.0);
+    // Reheat selection is permission, not evidence of combustion. Use the
+    // native actually burned share of total fuel as a continuous acoustic
+    // proxy, shared with the optical source. Its amplitude law is uncalibrated.
+    // Missing/invalid thermal observations never fall back to the boolean.
+    const bool haveBurnedFuel = (availability & kAvailAfterburnerBurnedFuel)
+        && (availability & kAvailFuelFlow) && (availability & kAvailAugmentation)
+        && interpolated[kAugmentation] > 0.5 && interpolated[kFuelFlowPps] > 0.0;
+    const double burnedFraction = haveBurnedFuel ? clamp01(
+        interpolated[kAfterburnerBurnedFuelFlowKgSec]
+        / (interpolated[kFuelFlowPps] * 0.45359237)) : 0.0;
+    in.afterburnerFraction = gAugmentation.process(burnedFraction);
     in.afterburnerVolume = gAfterburnerVolumeSmooth.process(gAfterburnerVolume);
     in.kias = gKias.process((availability & kAvailAirspeed) ? std::fmax(0.0, interpolated[kKias]) : 0.0);
     in.gear = gGear.process((availability & kAvailConfig) ? clamp01(interpolated[kGearNorm]) : 0.0);

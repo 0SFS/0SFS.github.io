@@ -446,19 +446,45 @@ The same Sound section holds continuous, live, persistent listening controls:
 | --- | --- | --- |
 | `osfs.sound.masterVolume` | mix amplitude ratio, shown as % | 0–8 / 2 (0–800%, default 200% of the previous master maximum) |
 | `osfs.sound.engineVolume` | amplitude ratio, shown as % | 0–8 / 0.8 (0–800%, default 80%) |
-| `osfs.sound.afterburnerVolume` | extra-roar gain ratio, shown as % | 0–1 / 0.5 (default 50%; 100% is the previous extra-roar gain) |
 | `osfs.sound.listenerCockpitBlend` | acoustic-viewpoint blend | 0–1 / 1 (Camera 0, Cockpit 1; default Cockpit) |
 
 Master gain uses the old maximum of 1 as its reference; its default is now 2
 and maximum 8. Existing saved values keep their level until changed or reset.
 Engine boost preserves existing saved gains and also scales the engine's
-afterburner component; the separate afterburner control can reduce its extra
-roar. A zero extra-roar gain retains native augmented spectrum and thrust
-response. Camera–Cockpit positions blend listener geometry, motion and
+afterburner component. The separate afterburner control now lives in the
+Afterburner tab described below. Camera–Cockpit positions blend listener geometry, motion and
 cabin/exterior treatment; intermediate viewpoints are artistic. The visual
 camera remains independently controlled. These settings have no second home
 under Camera or Controls. Integrated software checks for this 2026-10-05 follow-up
 pass; see the [sound ledger](../validation/audio-implementation-ledger.md#163-pilot-sound-controls-2026-10-05-follow-up).
+
+### Afterburner
+
+Aircraft metadata enables this tab only for aircraft equipped with an
+afterburner. It has two sections, with the shared registry's paragraph-grid
+controls and persistent, live values:
+
+| Section / parameter | Unit | Bounds / default |
+| --- | --- | --- |
+| Exhaust appearance / `osfs.exhaust.dryIntensity` | display multiplier | 0.5–3 / 1× |
+| Afterburner sound / `osfs.sound.afterburnerVolume` | AB contribution gain, shown as % | 0–1 / 0.5 |
+
+Dry exhaust brightness multiplies gas emission and its approximate nearby
+scene light only with native augmentation off. One preserves the current
+physical model's output; it is not a measured F135 brightness calibration.
+The physical field, spectrum, fuel, gas temperature, metal temperatures and
+metal glow are unchanged. A slider edit reuses the source texture and changes
+the rendering gain; no new per-pixel samples or physical-field bake is added.
+At nonunit gain, selecting AB switches back to the unmodified AB display gain.
+This is an explicit presentation adjustment, not an engine transition model.
+
+The afterburner sound slider retains its ID and saved values when moving from
+Sound. Zero now removes all deliberate AB gain and spectrum morphs. Native
+thrust, shaft speed and total fuel still affect underlying engine sound, so it
+does not force wet operation to sound identical to dry operation. The AB
+component follows valid native actually burned AB fuel instead of the selection
+flag alone. Its continuous burned-fuel fraction is an uncalibrated acoustic
+proxy. [Causality and remaining acceptance](../validation/f135-exhaust-controls.md).
 
 ## Presets
 

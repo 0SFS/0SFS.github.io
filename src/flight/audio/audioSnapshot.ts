@@ -7,7 +7,7 @@
  * mantissa, and one uniform element type keeps the transport a single copy.
  */
 
-export const AUDIO_SNAPSHOT_VERSION = 3;
+export const AUDIO_SNAPSHOT_VERSION = 4;
 
 /**
  * Slot order. Renaming, reordering or inserting a field is a breaking ABI
@@ -57,6 +57,8 @@ export const AUDIO_SNAPSHOT_FIELDS = [
   "augmentation",
   /** Unit exhaust-flow axis in the listener frame; opposite the native thrust. */
   "sourceAxisX", "sourceAxisY", "sourceAxisZ",
+  /** Native actually burned reheat fuel, kg/s; requires valid thermal state. */
+  "afterburnerBurnedFuelFlowKgSec",
 ] as const;
 
 export type AudioSnapshotField = typeof AUDIO_SNAPSHOT_FIELDS[number];
@@ -81,6 +83,7 @@ export const AVAILABILITY = Object.freeze({
   POSE: 1 << 9,
   AUGMENTATION: 1 << 10,
   SOURCE_AXIS: 1 << 11,
+  AFTERBURNER_BURNED_FUEL: 1 << 12,
 });
 
 /**
@@ -150,6 +153,7 @@ export interface AudioSnapshotInit {
   exterior?: number;
   groundReflectionM?: number;
   augmentation?: boolean;
+  afterburnerBurnedFuelFlowKgSec?: number;
   sourceAxis?: readonly [number, number, number];
 }
 
@@ -193,6 +197,13 @@ export function writeAudioSnapshot(target: Float64Array, offset: number, init: A
   target[offset + s.exterior] = finite(init.exterior, 0);
   target[offset + s.groundReflectionM] = finite(init.groundReflectionM, -1);
   target[offset + s.augmentation] = init.augmentation ? 1 : 0;
+  const burnedFuel = init.afterburnerBurnedFuelFlowKgSec;
+  if (typeof burnedFuel === "number" && Number.isFinite(burnedFuel) && burnedFuel >= 0) {
+    target[offset + s.afterburnerBurnedFuelFlowKgSec] = burnedFuel;
+  } else {
+    target[offset + s.afterburnerBurnedFuelFlowKgSec] = 0;
+    target[offset + s.availability] &= ~AVAILABILITY.AFTERBURNER_BURNED_FUEL;
+  }
   const axis = init.sourceAxis;
   const axisLength = axis ? Math.hypot(...axis) : 0;
   if (axis && Number.isFinite(axisLength) && axisLength > 1e-9) {

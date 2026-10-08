@@ -794,7 +794,8 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
         // Mandatory renderer input is missing. Keep observing for recovery and
         // fade the engine contribution, while raw adapter telemetry stays raw.
         snapshot.availability &= ~(AVAILABILITY.N1 | AVAILABILITY.N2 | AVAILABILITY.THRUST
-          | AVAILABILITY.FUEL_FLOW | AVAILABILITY.COMBUSTION | AVAILABILITY.RUNNING | AVAILABILITY.AUGMENTATION);
+          | AVAILABILITY.FUEL_FLOW | AVAILABILITY.COMBUSTION | AVAILABILITY.RUNNING
+          | AVAILABILITY.AUGMENTATION | AVAILABILITY.AFTERBURNER_BURNED_FUEL);
       }
       transport.publish(snapshot);
       transport.flush();

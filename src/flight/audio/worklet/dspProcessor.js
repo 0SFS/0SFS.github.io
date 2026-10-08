@@ -10,7 +10,7 @@
 // WebAssembly.Module arrives by postMessage and is instantiated synchronously.
 
 /** Kept in sync with ../audioSnapshot.ts by audioSnapshot.test.ts. */
-const SNAPSHOT_SIZE = 33;
+const SNAPSHOT_SIZE = 34;
 const EVENT_SIZE = 4;
 const EVENT_CAPACITY = 32;
 const BATCH_SNAPSHOTS = 8;

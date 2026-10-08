@@ -311,6 +311,24 @@ describe("shared engine exhaust renderer", () => {
     expect(t.scene.lights).toHaveLength(0);
   });
 
+  it("keeps independent metal glow unchanged when dry gas presentation changes", async () => {
+    const t = thermalFixture();
+    const state = { ...running, metalTemperatureKelvin: 1200 };
+    t.handle.update(state);
+    await t.handle.ready;
+    const metal = t.emission();
+    const gasGain = materialData(t.material).floats.intensity;
+    t.handle.update(state, { ...settings, dryIntensity: 3 });
+    expect(t.emission()).toEqual(metal);
+    expect(materialData(t.material).floats.intensity).toBe(gasGain * 3);
+    t.requestRender.mockClear();
+    t.handle.update(state, { ...settings, dryIntensity: 3 });
+    expect(t.requestRender).not.toHaveBeenCalled();
+    t.handle.update({ ...state, augmentation: true });
+    expect(t.emission()).toEqual(metal);
+    expect(materialData(t.material).floats.intensity).toBe(gasGain);
+  });
+
   it("isolates the four contributions without changing state or reconfiguring PBR shaders", async () => {
     const t = thermalFixture();
     await t.handle.ready;

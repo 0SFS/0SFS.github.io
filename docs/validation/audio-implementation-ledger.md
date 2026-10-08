@@ -1091,3 +1091,80 @@ tests**, production build and installed/emitted artifact verification. The
 retains those logs and the final phone/native-catalog follow-up checks.
 The instrument's WebGPU, WebGL2 and WebGL1 shader/presentation check passed
 separately in headless Chrome; it does not qualify audio or graphics timing.
+
+## 19. Combustion-coupled F135 reheat sound, 2026-10-07
+
+**Owner: 0sfs. Software checks completed; no device, listening, timing or
+acoustic qualification.** Local pilot testing found a
+clear afterburner change with its volume at zero and sound announcing reheat
+before visible combustion, especially from cold. The previous control muted
+only added gain: the main exhaust and High fine-scale noise still changed
+frequency directly from the native augmentation flag. That flag selected full
+native augmented thrust while fuel and heat were still rising. The historical
+§16.3 behavior and checks remain records of that artifact; this revision
+supersedes the intentional unmuted spectral morph.
+
+The F135-only schema now observes native actually burned afterburner fuel and
+thermal validity. Snapshot ABI 4 adds one Float64 field (34 in total); both
+transports, the worklet and DSP retain their existing bounded queues. A valid,
+active native augmentation observer permits the source, while its continuous
+target is burned reheat fuel divided by total current fuel in matching SI
+units. Missing/invalid thermal state or fuel has no flag-only fallback.
+Existing sample smoothing applies; there is no startup fade or timer matched
+to visual appearance. The fuel-fraction response, filters and gains remain
+explicitly uncalibrated acoustic approximations, not predicted SPL.
+
+Afterburner volume now scales all deliberate reheat amplitude and spectral
+changes in Low, Med and High. Zero gives dry-equivalent output when all other
+native inputs are identical. Shaft, total-fuel and thrust changes remain
+audible independently. In particular, the current native augmented thrust
+table can still change the base jet/shock proxy before burned fuel rises;
+0sfs does not conceal that engine-model discrepancy by overriding thrust.
+The setting retains its key, range and default and moves to its one home in
+the Afterburner tab.
+
+The added acoustic source and optical reaction source now consume the same
+native combustion observation. That establishes a shared cause, not matched
+perceptual thresholds or real F135 onset latency. NASA places the afterburner
+combustion between turbine and nozzle; delayed metal incandescence is a
+different phenomenon from the flame. See [sound spec](../sound.md#7-f-35b-main-engine-approximation-2026-10-05)
+for the primary reference and remaining qualifications. No browser/server,
+GPU run, performance benchmark or physical listening review is part of this
+revision.
+
+The combined [F135 exhaust controls record](f135-exhaust-controls.md) tracks
+the dry emission control, Afterburner tab and separate physical/visual status.
+Pinned emcc 6.0.9 produced **50,977 bytes**, SHA-256
+`100eefa8f3eaec2e3f3cfee12086732871f7aa0cb96f157b87f61e7ec0b6b677`,
+with source/export provenance. The initial compile was refused when Homebrew's
+shared cache lock was outside the sandbox; copying that cache into dated
+repository scratch and using local `EM_CACHE`/`TMPDIR` completed the build.
+No system cache or dependency source was changed.
+
+The first related run caught a real initial-gain leak: a saved zero still
+smoothed from the core's default one on the first rendered samples. Setup now
+seeds its smoother before any frame has been processed; live changes retain
+10 ms dezippering. Exact whole-render mute tests remain, with failures reported
+as a sample index instead of a large waveform diff. The native onset fixture
+also required correction: warm `runIc` at full throttle seeds an already-wet
+steady state, so it cannot demonstrate a selected-but-unburned interval.
+
+The four failed files then passed **64 tests**, including the real cold native
+fixture and exact saved-zero output. The single final CI run had **2,016 passes,
+one existing expected failure and one stale offline-tool ABI assertion** in
+186 files. The ABI fixture's four tests passed after updating version/field
+expectations. Incremental typecheck/lint and the production build with all
+installed/emitted artifact verifiers passed; the full suite was not repeated.
+[Retained acceptance and logs](../../validation/evidence/aircraft/f35b/exhaust-controls-2026-10-07/acceptance.json)
+separate those outcomes. Dry visual feedback does not qualify AB audiovisual
+latency, absolute F135 optics, acoustic shaping or device performance.
+The revised fixture evolves an actual cold engine with the existing starter
+control. The earlier 50,946-byte artifact is not the delivered correction.
+
+Actual-WASM regressions cover flag-on/zero-burn silence of deliberate reheat,
+missing observations, gain-zero dry equivalence across all audible tiers,
+continuous burn onset at both output rates, live gain dezippering, finite
+limited output and retained SF50 reference hashes. Native adapter regressions
+cover the thermal observer, selected-before-burning startup, unavailable and
+invalid thermal data, conversion inhibit and cutoff. Combined check results
+will be recorded after they finish.

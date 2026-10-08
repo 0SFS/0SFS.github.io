@@ -12,6 +12,7 @@ import {
   Bug,
   CloudSun,
   Fan,
+  Flame,
   Fuel,
   Gauge,
   Navigation,
@@ -28,6 +29,7 @@ import type { BabylonRuntimeStatus, RendererMode } from "foss-earth/runtime";
 import type { FlightViewMode } from "../aircraft/createPlaceholderAircraft";
 import {
   AIRCRAFT_FAMILIES,
+  getAircraftDefinition,
   getAircraftFamilyForAircraft,
   normalizeAircraftSelection,
   type AircraftFamilyId,
@@ -73,7 +75,7 @@ import { AUTOPILOT_PARAMETER_IDS, type AutopilotSettingsV1 } from "../autopilot/
 import { GROUND_PARAMETER_IDS } from "../settings/groundInteractionSettings";
 import type { FlightRecorder } from "../diagnostics/flightRecorder";
 
-export type FlightPanelTab = "weather" | "aircraft" | "fuel" | "autopilot" | "controls" | "remote" | "sound" | "engine" | "logging" | "debug";
+export type FlightPanelTab = "weather" | "aircraft" | "fuel" | "autopilot" | "controls" | "remote" | "sound" | "afterburner" | "engine" | "logging" | "debug";
 
 const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "weather", label: "Weather" },
@@ -83,6 +85,7 @@ const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "controls", label: "Controls" },
   { id: "remote", label: "Remote Control" },
   { id: "sound", label: "Sound" },
+  { id: "afterburner", label: "Afterburner" },
   { id: "engine", label: "Engine" },
   { id: "logging", label: "Logging" },
   { id: "debug", label: "Debug" },
@@ -96,10 +99,13 @@ const TAB_ICONS = {
   controls: Gauge,
   remote: Smartphone,
   sound: Volume2,
+  afterburner: Flame,
   engine: Fan,
   logging: ScrollText,
   debug: Bug,
 } satisfies Record<FlightPanelTab, typeof Plane>;
+
+const SOUND_PANEL_PARAMETER_IDS = AUDIO_PARAMETER_IDS.filter(id => id !== "osfs.sound.afterburnerVolume");
 
 export interface FlightWeatherState {
   windDirectionDeg: number;
@@ -871,7 +877,8 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
       getViewState={() => props.snapshot.flightState}
       setViewState={props.onLocationApply}
       locationSearchProvider={props.locationSearchProvider}
-      additionalTabs={TAB_DEFINITIONS}
+      additionalTabs={TAB_DEFINITIONS.filter(tab => tab.id !== "afterburner"
+        || getAircraftDefinition(props.snapshot.aircraftId).afterburner !== undefined)}
       onBeforeCloseTab={(tabId) => {
         if (tabId !== "logging") return;
         if (!allowCloseLoggingTab(props.flightRecorder)) return false;
@@ -923,9 +930,13 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
                 cameraTuning={<ParameterSection settings={props.settings} tab="remote" section="camera">
                   <PhoneCameraTuningPanel parameters={props.parameters} />
                 </ParameterSection>} />
-              : tabId === "sound" ? <ParameterSection settings={props.settings} tab="sound" section="sound" covers={AUDIO_PARAMETER_IDS}>
+              : tabId === "sound" ? <ParameterSection settings={props.settings} tab="sound" section="sound" covers={SOUND_PANEL_PARAMETER_IDS}>
                 <SoundSettingsPanel state={props.snapshot.sound} onAction={props.onSoundAction} />
               </ParameterSection>
+              : tabId === "afterburner" ? <div className="flight-panel__content">
+                <ParameterSection settings={props.settings} tab="afterburner" section="appearance" />
+                <ParameterSection settings={props.settings} tab="afterburner" section="sound" />
+              </div>
               : tabId === "engine" ? <>
                 <EngineDetailsHost attach={props.attachEngineDetails} />
                 <ParameterSection settings={props.settings} tab="engine" section="engine" />

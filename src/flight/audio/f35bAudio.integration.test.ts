@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { FreeCamera, NullEngine, Scene, TransformNode, Vector3 } from "@babylonjs/core";
 import { JSBSimSdk } from "@felipegalind0/jsbsim";
 import { wasmBinaryUrl, wasmModuleUrl } from "@felipegalind0/jsbsim/wasm";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { bootstrapAircraft } from "../jsbsim/bootstrapC172";
 import { createEngineControl } from "../jsbsim/engineControl";
 import { getFdmProfile } from "../jsbsim/fdmProfiles";
@@ -155,6 +155,9 @@ describe("F-35B procedural sound (real JSBSim and shipped DSP, no physical route
     const reading = adapter.read();
     expect(reading.availability & AVAILABILITY.N1).toBe(AVAILABILITY.N1);
     expect(reading.thrustLbf).toBe(sdk.getPropertyValue("propulsion/engine[0]/thrust-lbs"));
+    expect(reading.availability & AVAILABILITY.AFTERBURNER_BURNED_FUEL).toBe(AVAILABILITY.AFTERBURNER_BURNED_FUEL);
+    expect(reading.afterburnerBurnedFuelFlowKgSec)
+      .toBe(sdk.getPropertyValue("propulsion/engine[0]/thermal/afterburner-burned-fuel-flow-kg-sec"));
     expect(reading.fuelFlowPps).toBe(sdk.getPropertyValue("propulsion/engine[0]/fuel-flow-rate-pps"));
     const auxiliaryThrust = [1, 2, 3].reduce((sum, index) => sum + sdk.getPropertyValue(`propulsion/engine[${index}]/thrust-lbs`), 0);
     expect(auxiliaryThrust).toBeGreaterThan(1000);
@@ -211,6 +214,7 @@ describe("F-35B procedural sound (real JSBSim and shipped DSP, no physical route
     sdk.setPropertyValue("fcs/throttle-cmd-norm", 0.98);
     run(sdk, 0.1);
     expect(adapter.read().augmentation).toBe(false);
+    expect(adapter.read().afterburnerBurnedFuelFlowKgSec).toBe(0);
     sdk.setPropertyValue("fcs/throttle-cmd-norm", 1);
     sdk.setPropertyValue("fcs/stovl-cmd-norm", 1);
     run(sdk, 3);
@@ -230,5 +234,55 @@ describe("F-35B procedural sound (real JSBSim and shipped DSP, no physical route
     reading = adapter.read();
     expect(reading.augmentation).toBe(false);
     expect(reading.fuelFlowPps).toBe(sdk.getPropertyValue("propulsion/engine[0]/fuel-flow-rate-pps"));
+  });
+
+  it("distinguishes selected reheat from native fuel actually burning during lightoff", async () => {
+    // Cold evolution, rather than runIc's warm already-afterburning seed.
+    const { sdk, adapter } = await boot(1, false);
+    const control = createEngineControl(sdk, getFdmProfile("f-35b"));
+    let selectedWithoutBurn = false;
+    let burned = false;
+    for (let step = 0; step < 60 * 120; step++) {
+      control.step(true);
+      expect(sdk.run()).toBe(true);
+      const reading = adapter.read();
+      expect(reading.afterburnerBurnedFuelFlowKgSec)
+        .toBe(sdk.getPropertyValue("propulsion/engine[0]/thermal/afterburner-burned-fuel-flow-kg-sec"));
+      if (reading.augmentation && reading.afterburnerBurnedFuelFlowKgSec === 0) selectedWithoutBurn = true;
+      if (reading.augmentation && reading.afterburnerBurnedFuelFlowKgSec! > 0) burned = true;
+      if (selectedWithoutBurn && burned) break;
+    }
+    expect(selectedWithoutBurn).toBe(true);
+    expect(burned).toBe(true);
+  });
+
+  it.each(["missing", "invalid-thermal", "negative", "non-finite"])("reports %s reheat combustion telemetry unavailable without a flag fallback", async failure => {
+    const { sdk } = await boot(1);
+    run(sdk, 3);
+    const create = sdk.createPropertyBatch.bind(sdk);
+    if (failure !== "missing") vi.spyOn(sdk, "createPropertyBatch").mockImplementation((paths, options) => {
+      const batch = create(paths, options);
+      const read = batch.read.bind(batch);
+      const slot = paths.findIndex(path => path.endsWith(failure === "invalid-thermal"
+        ? "/thermal/valid" : "/thermal/afterburner-burned-fuel-flow-kg-sec"));
+      vi.spyOn(batch, "read").mockImplementation(target => {
+        const values = read(target);
+        if (slot >= 0) values[slot] = failure === "invalid-thermal" ? 0 : failure === "negative" ? -1 : Number.NaN;
+        return values;
+      });
+      return batch;
+    });
+    const definition = failure === "missing" ? { ...source.definition, telemetry: {
+      ...source.definition.telemetry, paths: { ...source.definition.telemetry.paths,
+        afterburnerBurnedFuelFlowKgSec: "propulsion/engine[{engineIndex}]/thermal/missing-burned-flow" },
+    } } : source.definition;
+    const adapter = createJsbsimAudioAdapter(sdk, { gearHeightMetres: stance, source: { ...source, definition } });
+    adapters.push(adapter);
+    const reading = adapter.read();
+    expect(reading.augmentation).toBe(true);
+    expect(adapter.diagnostics.telemetryAvailable).toBe(true);
+    expect(reading.availability & AVAILABILITY.AFTERBURNER_BURNED_FUEL).toBe(0);
+    expect(Number.isNaN(reading.afterburnerBurnedFuelFlowKgSec)).toBe(true);
+    vi.restoreAllMocks();
   });
 });

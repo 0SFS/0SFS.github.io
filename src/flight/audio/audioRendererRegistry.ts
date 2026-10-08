@@ -20,8 +20,8 @@ export interface AudioRendererRegistration {
 
 const PROCEDURAL_JET: AudioRendererRegistration = Object.freeze({
   id: "procedural-jet-v1", wasmUrl: audioDspWasmUrl, workletUrl: audioWorkletUrl,
-  processorName: "osfs-dsp", abi: { id: "osfs-audio-dynamics-v3", snapshotVersion: AUDIO_SNAPSHOT_VERSION },
-  maxEngineSources: 1, telemetrySchemaIds: ["jsbsim-turbine-v1"], engineClasses: ["turbofan"] as const,
+  processorName: "osfs-dsp", abi: { id: "osfs-audio-dynamics-v4", snapshotVersion: AUDIO_SNAPSHOT_VERSION },
+  maxEngineSources: 1, telemetrySchemaIds: ["jsbsim-turbine-v1", "jsbsim-thermal-turbine-v1"], engineClasses: ["turbofan"] as const,
   acousticStatus: "approximate-unvalidated", highSynthesis: "procedural", encodeParameters: acousticProfileValues,
 });
 export const AUDIO_RENDERERS: Readonly<Record<string, AudioRendererRegistration>> = {
@@ -35,7 +35,7 @@ export function rendererAdmission(definition: EngineAcousticDefinition,
   { supported: true; renderer: AudioRendererRegistration } | { supported: false; reason: string } {
   const renderer = Object.hasOwn(renderers, definition.rendererId) ? renderers[definition.rendererId] : undefined;
   if (!renderer) return { supported: false, reason: `Audio renderer ${definition.rendererId} is not implemented.` };
-  if (renderer.abi.id !== "osfs-audio-dynamics-v3" || renderer.abi.snapshotVersion !== AUDIO_SNAPSHOT_VERSION) {
+  if (renderer.abi.id !== "osfs-audio-dynamics-v4" || renderer.abi.snapshotVersion !== AUDIO_SNAPSHOT_VERSION) {
     return { supported: false, reason: `Audio renderer ${renderer.id} requires an unsupported dynamics ABI.` };
   }
   if (!renderer.engineClasses.includes(definition.engineClass)) return { supported: false, reason: `Renderer ${renderer.id} does not implement ${definition.engineClass} engines.` };

@@ -1,0 +1,54 @@
+
+> osfs@0.0.0 build:audio
+> node scripts/build-audio-wasm.mjs
+
+Traceback (most recent call last):
+  File "/opt/homebrew/Cellar/emscripten/6.0.9_1/libexec/emcc.py", line 630, in <module>
+    sys.exit(main(sys.argv))
+             ~~~~^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/contextlib.py", line 85, in inner
+    return func(*args, **kwds)
+  File "/opt/homebrew/Cellar/emscripten/6.0.9_1/libexec/emcc.py", line 377, in main
+    return link.run(linker_args)
+           ~~~~~~~~^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/emscripten/6.0.9_1/libexec/tools/link.py", line 3171, in run
+    js_info = get_js_sym_info()
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/contextlib.py", line 85, in inner
+    return func(*args, **kwds)
+  File "/opt/homebrew/Cellar/emscripten/6.0.9_1/libexec/tools/link.py", line 244, in get_js_sym_info
+    file_content = emscripten.get_cached_file('symbol_lists', f'{content_hash}.json', generate_json, cache_limit=500)
+  File "/opt/homebrew/Cellar/emscripten/6.0.9_1/libexec/tools/emscripten.py", line 317, in get_cached_file
+    with filelock.FileLock(cache_file + '.lock'):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/emscripten/6.0.9_1/libexec/tools/filelock.py", line 330, in __enter__
+    self.acquire()
+    ~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/emscripten/6.0.9_1/libexec/tools/filelock.py", line 278, in acquire
+    self._acquire()
+    ~~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/emscripten/6.0.9_1/libexec/tools/filelock.py", line 391, in _acquire
+    fd = os.open(self._lock_file, open_mode)
+PermissionError: [Errno 1] Operation not permitted: '/opt/homebrew/Cellar/emscripten/6.0.9_1/libexec/cache/symbol_lists/7fc84cb44499470662141c225127a4276b105d63.json.lock'
+node:internal/errors:999
+  const err = new Error(message);
+              ^
+
+Error: Command failed: emcc -O3 -std=c++17 --no-entry -sSTANDALONE_WASM=1 -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=2097152 -sSTACK_SIZE=131072 -sMALLOC=emmalloc -sERROR_ON_UNDEFINED_SYMBOLS=1 -sFILESYSTEM=0 -fno-exceptions -fno-rtti -fno-fast-math -o <0sfs-root>/src/flight/audio/dsp/audio-dsp.wasm <0sfs-root>/src/flight/audio/dsp/core.cpp
+    at genericNodeError (node:internal/errors:999:15)
+    at wrappedFn (node:internal/errors:544:14)
+    at checkExecSyncError (node:child_process:942:11)
+    at execFileSync (node:child_process:978:15)
+    at main (file://<0sfs-root>/scripts/build-audio-wasm.mjs:103:3)
+    at file://<0sfs-root>/scripts/build-audio-wasm.mjs:149:9
+    at ModuleJob.run (node:internal/modules/esm/module_job:569:25)
+    at async node:internal/modules/esm/loader:650:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  status: 1,
+  signal: null,
+  output: [ null, null, null ],
+  pid: 75397,
+  stdout: null,
+  stderr: null
+}
+
+Node.js v26.9.0

@@ -125,7 +125,7 @@ describe("flight parameter catalogue", () => {
     expect(settings.matchingPreset({ tab: "remote", section: "camera", prefix: "osfs.camera.phone." })?.id).toBe("osfs-phone-camera-original");
   });
 
-  it("persists live afterburner and viewpoint controls with one Sound home and fraction bounds", () => {
+  it("persists live afterburner and viewpoint controls at their single homes with fraction bounds", () => {
     const storage = new Map<string, string>();
     vi.stubGlobal("localStorage", {
       getItem: (key: string) => storage.get(key) ?? null,
@@ -141,7 +141,7 @@ describe("flight parameter catalogue", () => {
     settings.set("osfs.sound.engineVolume", 4);
     for (const [id, value] of [["osfs.sound.afterburnerVolume", 0.2], ["osfs.sound.listenerCockpitBlend", 0.65]] as const) {
       const inspected = settings.inspect(id);
-      expect(inspected.spec.home).toMatchObject({ tab: "sound", section: "sound" });
+      expect(inspected.spec.home).toMatchObject({ tab: id === "osfs.sound.afterburnerVolume" ? "afterburner" : "sound", section: "sound" });
       expect(inspected.spec).toMatchObject({ unit: "fraction", kind: "number", appliesLive: true });
       expect(inspected.bounds).toMatchObject({ min: 0, max: 1 });
       expect(validateValue(inspected.spec, -0.01, inspected.bounds, inspected.choices)).not.toBeNull();
@@ -155,5 +155,23 @@ describe("flight parameter catalogue", () => {
     expect(reloaded.get("osfs.sound.engineVolume")).toBe(4);
     expect(reloaded.get("osfs.sound.afterburnerVolume")).toBe(0.2);
     expect(reloaded.get("osfs.sound.listenerCockpitBlend")).toBe(0.65);
+  });
+
+  it("preserves the dry physical-model display by default and saves the bounded dry-only adjustment", () => {
+    const saved = new Map<string, string>();
+    const storage = { getItem: (key: string) => saved.get(key) ?? null,
+      setItem: (key: string, value: string) => { saved.set(key, value); } };
+    const settings = createSettingsRegistry({ storage });
+    settings.register(OSFS_PARAMETERS);
+    const id = "osfs.exhaust.dryIntensity";
+    expect(settings.get(id)).toBe(1);
+    expect(settings.inspect(id).spec.home).toMatchObject({ tab: "afterburner", section: "appearance" });
+    expect(settings.set(id, 0.49).ok).toBe(false);
+    expect(settings.set(id, 3.01).ok).toBe(false);
+    expect(settings.set(id, 0.5).ok).toBe(true);
+    expect(settings.set(id, 3).ok).toBe(true);
+    const reloaded = createSettingsRegistry({ storage });
+    reloaded.register(OSFS_PARAMETERS);
+    expect(reloaded.get(id)).toBe(3);
   });
 });

@@ -842,6 +842,7 @@ export async function createFlightSimApp(
     depthResolutionScale: parameters.get("osfs.exhaust.depthResolutionScale"),
     maxDistanceMeters: parameters.get("osfs.exhaust.maxDistanceMeters"),
     intensity: parameters.get("osfs.exhaust.intensity"),
+    dryIntensity: parameters.get("osfs.exhaust.dryIntensity"),
     contributionView: parameters.get("osfs.exhaust.contributionView"),
     gasReferenceNits: parameters.get("osfs.exhaust.gasReferenceNits"),
     surfaceReferenceNits: parameters.get("osfs.exhaust.surfaceReferenceNits"),
@@ -857,7 +858,7 @@ export async function createFlightSimApp(
   });
   stopWatching.push(() => engineVisuals.dispose());
   for (const id of ["osfs.exhaust.enabled", "osfs.exhaust.sampleCount", "osfs.exhaust.maxDistanceMeters", "osfs.exhaust.intensity", "osfs.exhaust.surfaceReferenceNits",
-    "osfs.exhaust.axialFieldSamples", "osfs.exhaust.radialFieldSamples",
+    "osfs.exhaust.dryIntensity", "osfs.exhaust.axialFieldSamples", "osfs.exhaust.radialFieldSamples",
     "osfs.exhaust.depthOcclusionEnabled", "osfs.exhaust.depthResolutionScale",
     "osfs.exhaust.contributionView", "osfs.exhaust.gasReferenceNits",
     "osfs.exhaust.light.enabled", "osfs.exhaust.light.gain", "osfs.exhaust.light.rangeMeters"] as const) {

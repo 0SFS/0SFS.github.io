@@ -1,0 +1,22 @@
+Summary of the first related run. Large waveform diffs omitted; every failing test and final counts retained.
+
+ FAIL  src/flight/audio/acousticProfiles.test.ts > shared engine acoustic setup (actual shipped WASM) > controls added augmentation amplitude and spectral colour at 0/50/100 percent
+AssertionError: expected { Object (left, right) } to deeply equal { Object (left, right) }
+ FAIL  src/flight/audio/f35bAudio.integration.test.ts > F-35B procedural sound (real JSBSim and shipped DSP, no physical route qualification) > distinguishes selected reheat from native fuel actually burning during lightoff
+AssertionError: expected false to be true // Object.is equality
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > has no flag-only AB response, and zero gain removes all deliberate AB morphs at tier 1
+AssertionError: expected { Object (left, right) } to deeply equal { Object (left, right) }
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > has no flag-only AB response, and zero gain removes all deliberate AB morphs at tier 2
+AssertionError: expected { …(2) } to deeply equal { …(2) }
+ FAIL  src/flight/audio/highAudio.test.ts > procedural High, actual WASM behavior rather than qualification > has no flag-only AB response, and zero gain removes all deliberate AB morphs at tier 3
+AssertionError: expected { …(2) } to deeply equal { …(2) }
+ FAIL  src/flight/hud/SoundSettingsPanel.test.tsx > sound settings panel > offers Master volume up to 800% and sends its value independently
+ FAIL  src/flight/hud/SoundSettingsPanel.test.tsx > sound settings panel > offers Engine volume up to 800% and sends its value independently
+ FAIL  src/flight/hud/SoundSettingsPanel.test.tsx > sound settings panel > offers Engine volume up to 800% and sends its value independently
+TypeError: Cannot read properties of null (reading 'value')
+
+
+ Test Files  4 failed | 63 passed (67)
+      Tests  7 failed | 877 passed (884)
+   Start at  21:14:25
+   Duration  33.83s (transform 2.39s, setup 0ms, import 32.69s, tests 78.05s, environment 9.95s)

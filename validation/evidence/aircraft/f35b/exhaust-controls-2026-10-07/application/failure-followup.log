@@ -1,0 +1,12 @@
+
+ RUN  v4.1.6 <0sfs-root>
+
+(node:83105) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83104) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  4 passed (4)
+      Tests  64 passed (64)
+   Start at  21:18:15
+   Duration  2.21s (transform 302ms, setup 0ms, import 1.28s, tests 3.90s, environment 668ms)

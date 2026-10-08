@@ -61,6 +61,19 @@ describe("audio snapshot ABI", () => {
 });
 
 describe("writeAudioSnapshot", () => {
+  it("preserves available zero burned fuel, but refuses unavailable or invalid fuel", () => {
+    const target = new Float64Array(AUDIO_SNAPSHOT_SIZE);
+    for (const value of [0, 0.003, undefined, -1, Number.NaN, Number.POSITIVE_INFINITY]) {
+      writeAudioSnapshot(target, 0, { sequence: 1, epoch: 1, simTimeS: 0,
+        availability: AVAILABILITY.N1 | AVAILABILITY.AFTERBURNER_BURNED_FUEL,
+        afterburnerBurnedFuelFlowKgSec: value });
+      const valid = typeof value === "number" && Number.isFinite(value) && value >= 0;
+      expect(target[AUDIO_SNAPSHOT_SLOT.afterburnerBurnedFuelFlowKgSec]).toBe(valid ? value : 0);
+      expect(target[AUDIO_SNAPSHOT_SLOT.availability]).toBe(AVAILABILITY.N1
+        | (valid ? AVAILABILITY.AFTERBURNER_BURNED_FUEL : 0));
+    }
+  });
+
   it("normalizes a valid exhaust axis and clears its bit for missing or invalid orientation", () => {
     const target = new Float64Array(AUDIO_SNAPSHOT_SIZE);
     const write = (sourceAxis?: readonly [number, number, number]) => {

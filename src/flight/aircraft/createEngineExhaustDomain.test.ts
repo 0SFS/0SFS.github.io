@@ -42,6 +42,20 @@ it("renders one shared interior/exterior field, updates posed support without re
     expect(light.intensity).toBeCloseTo(Math.max(...evaluated.exteriorIsotropicIntensityRgbCd) / settings.gasReferenceNits, 12);
     expect(light.intensity).toBeLessThan(Math.max(...evaluated.isotropicIntensityRgbCd) / settings.gasReferenceNits);
     const upload = vi.spyOn(field, "update");
+    const baselineLight = light.intensity;
+    const baselineGain = material.serialize().floats.intensity;
+    for (const multiplier of [0.5, 1, 3]) {
+      handle.update(state, { ...settings, dryIntensity: multiplier });
+      expect(material.serialize().floats.intensity).toBeCloseTo(baselineGain * multiplier, 12);
+      expect(light.intensity).toBeCloseTo(baselineLight * multiplier, 12);
+      expect(field.getInternalTexture()!._bufferView).toEqual(evaluated.field!.rgba);
+      expect(upload).not.toHaveBeenCalled();
+    }
+    // AB has its own modeled output; adjusting dry presentation cannot boost it.
+    handle.update({ ...state, augmentation: true }, { ...settings, dryIntensity: 3 });
+    expect(material.serialize().floats.intensity).toBe(baselineGain);
+    expect(light.intensity).toBeCloseTo(baselineLight, 12);
+    expect(upload).not.toHaveBeenCalled();
     support = { ...support, revision: 2, bounds: { min: [-0.82, -1.82, -1], max: [0.82, 0.82, 6] } };
     handle.update(state);
     expect(handle.mesh.position.y).toBe(-0.5);
