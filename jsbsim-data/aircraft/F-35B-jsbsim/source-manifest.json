@@ -38,8 +38,8 @@
       "sourceArchivePath": "F-35B/F-35B-jsbsim.xml",
       "sourceBytes": 37491,
       "sourceSha256": "0f1cbe9f4d0232c3cbd36a64f1cfe046af947834a68e6053ddaa3eb7aa389e7d",
-      "bytes": 57259,
-      "sha256": "7d81cf7930ac9ecb008fa5c8a72259aa198824cc31acb26a4537e140d055be17",
+      "bytes": 58331,
+      "sha256": "f04735c23e22eb78a9c77cded49be6e46975695b28140e3bfead8adb3a50b2f1",
       "modified": true,
       "changes": [
         "Explicit FlightGear external defaults and model-specific control defaults.",
@@ -55,7 +55,8 @@
         "Two 6550 lb internal tanks total the published 13100 lb internal capacity; retained external capacity is 2991 lb per detachable store.",
         "External stores initially attach empty; native attachment gates fuel, feed priority, provisional 300 lb tank/pylon dry mass and 1 square foot equivalent drag area per store, applied natively in the wind frame at each store location for asymmetric force/moment response. Fuel and dry mass align to visible assemblies at structural x368.52, y+/-127.952756, z-15.36 inches.",
         "FBW roll is a tracked roll-rate command: full stick asks for native fcs/full-stick-roll-rate-deg_sec (default 636.62, the source gradient), with feedforward p = a vt / 165 ft faded out by conversion. The source integrator trigger was inverted (held above 5 kt); the integrator now only holds bank, running with the stick centred and roll rate under 10 deg/s and resetting in Manual, on the ground and with any conversion. P and D gains unchanged; Manual and hover roll posts read the unscaled stick.",
-        "FBW roll trim enters the rate command and feedforward as native fcs/roll-trim-rate-cmd-norm, scaled like the stick by fcs/full-stick-roll-rate-deg_sec, so full trim asks what full stick asks; it entered unscaled. Manual and hover roll posts take trim as they take the stick."
+        "FBW roll trim enters the rate command and feedforward as native fcs/roll-trim-rate-cmd-norm, scaled like the stick by fcs/full-stick-roll-rate-deg_sec, so full trim asks what full stick asks; it entered unscaled. Manual and hover roll posts take trim as they take the stick.",
+        "2026-10-08: the lift fan and roll posts are outlets of the coupled F135 plant: the liftfan and sidefan force-carrier engines 1-3 and their throttle channels are removed; native FCS commands the clutch, lift-fan nozzle, thrust split and roll posts; plant outlet thrusts are BODY external forces at the fan and post stations, and each inlet's ram drag a WIND-frame force."
       ]
     },
     {
@@ -63,13 +64,12 @@
       "sourceArchivePath": "F-35B/Engines/F135-PW-600.xml",
       "sourceBytes": 3615,
       "sourceSha256": "77e5494173485bc24f8e3754a9ba31dd93f5aebc651285eb477184aff8169c6e",
-      "bytes": 4769,
-      "sha256": "09b7eb9c8c9ea5ca720ae1974f4d1ef5d7fb35e6b8248415c6cfcc307c57891c",
+      "bytes": 7734,
+      "sha256": "2aa795c549dcf2e410c7b7a233c9c32af94e2cf6a2c439637edfc5e599fe2101",
       "modified": true,
       "changes": [
-        "Native automatic augmentation in conventional flight.",
-        "Progressive dry-thrust reduction to18klbf full-conversion reference before source bleed.",
-        "Conversion-dependent approximate main fuel accounting for auxiliary power."
+        "Native automatic augmentation in conventional flight (augmethod 1), retained.",
+        "2026-10-08: replaced by a coupled turbine plant (<plant>, JSBSim SDK 1.2.4-fork.20 or newer): fuel, combustion, gas path, shafts, nozzle, metal temperatures and the LiftSystem (shaft-driven lift fan, roll posts) in one transient, calibrated to the published 27,000/41,000 lbf ratings and the 40,650 lbf hover split; the empirical tables, TSFC schedule and thermal observer are removed. Provenance: docs/validation/f135-engine-plant.md."
       ]
     },
     {
@@ -81,34 +81,6 @@
       "sha256": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc",
       "modified": false,
       "changes": []
-    },
-    {
-      "path": "Engines/liftfan.xml",
-      "sourceArchivePath": "F-35B/Engines/liftfan.xml",
-      "sourceBytes": 2168,
-      "sourceSha256": "926c3ebefdf753f8cf2797b02d662a665a46dbd4257858deff4ce0945ccd46a2",
-      "bytes": 3298,
-      "sha256": "9ded9a6a93eeab2dac35c779b51945b9e5cf0807591737b67262b27c5ab67287",
-      "modified": true,
-      "changes": [
-        "Zero separate TSFC/idle fuel flow/bleed for force surrogate.",
-        "Actual main upward native force supplies fan power; current main/fan CG arms and existing pitch allocation determine desired force, capped by retained source atmospheric capacity.",
-        "Zero independent idle force; immediate carrier setting removes fictitious auxiliary spool lag."
-      ]
-    },
-    {
-      "path": "Engines/sidefan.xml",
-      "sourceArchivePath": "F-35B/Engines/sidefan.xml",
-      "sourceBytes": 2236,
-      "sourceSha256": "e0ad665eb77db712e4f106c32009760dcf2a6ecb0cd9aab069562d2a6fdb6122",
-      "bytes": 3052,
-      "sha256": "90e1017803f4d9f46285ee09b2aed37d01cee82053e612ffabcf7a19816571ae",
-      "modified": true,
-      "changes": [
-        "Zero separate TSFC/idle fuel flow/bleed for force surrogate.",
-        "Actual main upward native force and retained 1950/18000 rating ratio supply each roll post; existing differential allocation is capped by retained source atmospheric capacity.",
-        "Zero independent idle force; immediate carrier setting removes fictitious auxiliary spool lag."
-      ]
     },
     {
       "path": "Systems/pushback.xml",

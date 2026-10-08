@@ -33,8 +33,14 @@
       "aircraft/F-35B-jsbsim/F-35B-jsbsim.xml",
       "aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
       "aircraft/F-35B-jsbsim/Engines/direct.xml",
-      "aircraft/F-35B-jsbsim/Engines/liftfan.xml",
-      "aircraft/F-35B-jsbsim/Engines/sidefan.xml",
+      "aircraft/F-35B-jsbsim/Systems/pushback.xml"
+    ],
+    "f-35b-empirical-engine": [
+      "aircraft/F-35B-jsbsim-empirical/F-35B-jsbsim-empirical.xml",
+      "aircraft/F-35B-jsbsim-empirical/Engines/F135-PW-600.xml",
+      "aircraft/F-35B-jsbsim-empirical/Engines/liftfan.xml",
+      "aircraft/F-35B-jsbsim-empirical/Engines/sidefan.xml",
+      "aircraft/F-35B-jsbsim/Engines/direct.xml",
       "aircraft/F-35B-jsbsim/Systems/pushback.xml"
     ]
   }

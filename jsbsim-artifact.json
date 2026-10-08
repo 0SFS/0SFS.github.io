@@ -4,23 +4,23 @@
     "schemaVersion": 2,
     "package": {
       "name": "@felipegalind0/jsbsim",
-      "version": "1.2.4-fork.16"
+      "version": "1.2.4-fork.20"
     },
     "native": {
       "origin": "https://github.com/Felipegalind0/jsbsim",
-      "commit": "97fe6ddf1c8a7d9e10dad46a88e60e79e69fae28",
-      "contentSha256": "a360665b71ec7e70f1ed3c0636b8a150c63b40108b2e87b62a76ca89370a124b",
+      "commit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+      "contentSha256": "84397f74ef0e98da0c3b18811a65126ee3772fbeb14a58eeb035e2397d04abd6",
       "dirty": false
     },
     "sdk": {
-      "commit": "97fe6ddf1c8a7d9e10dad46a88e60e79e69fae28",
-      "contentSha256": "9f5a9dc1ee239ffbbd2ecd1c60a596d6d791a031494e4e326f76dfffce12353a",
+      "commit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+      "contentSha256": "ed3068909a15a4df385107708e25234f658d90bee62e397a6fc09e25f12721cc",
       "dirty": false,
       "path": "wasm"
     },
     "build": {
       "mode": "in-tree",
-      "inputSha256": "b2206897753d2c4a62d646a544d022426acc9b5cec34efcd39a43f880d4e756c",
+      "inputSha256": "b474b47fdf138aca59837b3d974941270a6c75e39c641c8b98cc970d3a6cba31",
       "toolchain": {
         "node": "v26.8.2",
         "npm": "11.19.1",
@@ -39,10 +39,10 @@
     }
   },
   "files": {
-    "index.d.ts": "b4ec3f5dd4ff2583a81a4ed5ee28a0031730e78a4f3520e533c8deb3c5f3006b",
-    "index.js": "a3c840d269684809f0263710a7e8f1ad67e0c7698322472d8d21aeb5b7b4678f",
-    "index.js.map": "019562edab7ce784ff8fbd0dce92f56ceed6ad85f1b6f1acffe618aecb638d41",
-    "licenses/README.txt": "4a42a0f62e7d630a0861561209143f0d90809518c1ec95f0e513d6c175ee09ce",
+    "index.d.ts": "fd745410fe50ca5b0f32dee9625f366af91823e1a992339023404c223f563454",
+    "index.js": "8a5b335c0401c7a87dbcf8cd12e0f61b5d6936046e2ff91e77a0e84165b3147b",
+    "index.js.map": "844c4dccbc274e9dda9fed728a5303ee72e7ebebff506ffde61df31d33914a9a",
+    "licenses/README.txt": "79e2b41a55a83d33bd762143e5ecdffabd0ab93e3cc216e9b890dad9259d2c13",
     "licenses/jsbsim/AUTHORS": "ca8556894da80f81f773893a9c1009021aac2972d7bb6a39c2f981b4fd00aa9a",
     "licenses/jsbsim/COPYING": "1e7e6bae5a5bde32f1ae5a7c37a082d1ab03cf89354f7f936ac40be9e39a6531",
     "licenses/jsbsim/src/GeographicLib/LICENSE.txt": "90d25298be0c5d7f5219ae20009d18910150b3a4ea0ca86dda5df04cfb8d3823",
@@ -51,8 +51,8 @@
     "wasm.d.ts": "b7bbbab6f5e6b0b297dfeff117351e53d4d8598fecde7e805ea9aee7b2923353",
     "wasm.js": "758d98989301d86ec3aa589fa851d6416b305eca58bb1e6b9579780ea339e09b",
     "wasm.js.map": "d75a89efd5b3cf07ebfbe70d321f55c01bd8cdde1be50a15d1dcfad21a7ca763",
-    "wasm/jsbsim_wasm.mjs": "da4278fc1c03249e2b5da838425d8e46c80e792a51b6892a8e8910c44605e806",
-    "wasm/jsbsim_wasm.wasm": "80cf2596dd4d13bc39c8058fc791d73188059d82001b9de0ba0b7cce16c98a86"
+    "wasm/jsbsim_wasm.mjs": "3437b7bafddf799caff11bcb1447d697a8d3a195ed5da72b0fb573403d8ddc61",
+    "wasm/jsbsim_wasm.wasm": "9fba1627c1d64aaf59f31cd1d7748368a75bc034fe4a87de85cd5106b5869c91"
   },
   "validation": {
     "status": "passed",
@@ -62,13 +62,13 @@
     ]
   },
   "packageArchive": {
-    "path": "deps/felipegalind0-jsbsim-1.2.4-fork.16.tgz",
-    "sha256": "98ee9387c57b871a3851aac83b5eb3a4f858d618e12a2fb9b59eaa0c59dbf61b",
-    "integrity": "sha512-nxw9q31sDAit/27ckXz0eUmsZYDY5bZtLVjTIHXCIXHT2Xnjtj/UebiSlRGNnbjdcNQPZbox0WcSQSAxcDxKfg=="
+    "path": "deps/felipegalind0-jsbsim-1.2.4-fork.20.tgz",
+    "sha256": "37532356738b7a551daf53b997bc7726898a78ba75d399019d77ad3ea1094419",
+    "integrity": "sha512-u+CgqqdtXa8WUMZipNMioSQjS94DkAe/q1dwOLYeVVpCAhUh5DWXg/sUVD1jnBw+P5cMFy+RXMGKqgdxzBh7Ow=="
   },
   "emitted": {
-    "assets/jsbsim_wasm-DEcFVCFi.mjs": "da4278fc1c03249e2b5da838425d8e46c80e792a51b6892a8e8910c44605e806",
-    "assets/jsbsim_wasm-BBtJaPVV.wasm": "80cf2596dd4d13bc39c8058fc791d73188059d82001b9de0ba0b7cce16c98a86"
+    "assets/jsbsim_wasm-DLJo4X8N.mjs": "3437b7bafddf799caff11bcb1447d697a8d3a195ed5da72b0fb573403d8ddc61",
+    "assets/jsbsim_wasm-BREi-NID.wasm": "9fba1627c1d64aaf59f31cd1d7748368a75bc034fe4a87de85cd5106b5869c91"
   },
   "browserLoadedAssetsVerified": false
 }
