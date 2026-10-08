@@ -105,6 +105,29 @@ behavior, engine bootstrap sequencing, controller profiles through gamepad-tools
 evaluation (`src/flight/input/gamepadProfiles.test.ts`), and real JSBSim/WASM C172 propulsion.
 `npm run test:watch` reruns on change.
 
+### Committing one piece of work from a shared working tree
+
+Several sessions often leave uncommitted work in the same files. To commit one piece without the
+others, and without touching the working tree:
+
+1. Write `git diff -U0 -- <file>` to a log under `build/` and pick out your hunks. Where another
+   session's lines sit next to yours, one hunk holds both, and only some of its added lines are
+   yours.
+2. Build HEAD's copy of the file plus your lines under `build/`. Stage it with
+   `git hash-object -w <copy>` and `git update-index --cacheinfo <mode>,<hash>,<path>`. The index
+   gets your change and the working tree keeps everyone's.
+3. Confirm the split: `git diff --cached` shows nothing of anyone else's, and `git diff` no longer
+   shows any of your lines.
+4. Check the commit on its own. `npm run ci` checks the working tree, which is not the commit.
+   - Export the index with `git ls-files -z -- src public/jsbsim-data scripts 'tsconfig*.json'
+     vite.config.ts package.json index.html | git checkout-index -z --stdin --prefix=<folder under build/>/`.
+   - Give the export a `node_modules` folder of links to each entry of the real one, except
+     `.tmp`, `.cache`, `.vite` and `.vite-temp`, so its typecheck and Vite caches are its own.
+   - In the export, `vite.config.ts` allows `../foss-earth`, which there points into `build/`: give
+     the export's copy FOSS Earth's absolute path.
+   - Link `public/aircraft` into the export, which the F135 tests read.
+   - Run `npx tsc -b` and `npx vitest related --run` there.
+
 ### Looking at one component in Chrome, without a server
 
 A panel or control can be seen and driven in headless Chrome without starting the dev server.
