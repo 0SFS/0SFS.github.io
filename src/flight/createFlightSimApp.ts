@@ -67,6 +67,8 @@ import { applyAircraftRig, readControlSurfaceState } from "./aircraft/aircraftAn
 import { flightLog } from "./diagnostics/flightLog";
 import { createFlightRecorder } from "./diagnostics/flightRecorder";
 import { createEvaluationInstruments } from "./hud/evaluationInstruments";
+import { createGMeter } from "./hud/gMeter";
+import { createGVisionOverlay } from "./hud/gVisionOverlay";
 import type { LoggingAction, LoggingPanelState } from "./hud/LoggingPanel";
 import { bindRecorderMarkHotkey, downloadCsv } from "./hud/loggingTab";
 import { createEngineMonitor } from "./hud/engineMonitor";
@@ -168,6 +170,7 @@ import { createJsbsimRuntime } from "./jsbsim/createJsbsimRuntime";
 import { CONTROL_LAW_MODE_VALUES, getFdmProfile } from "./jsbsim/fdmProfiles";
 import { createAircraftEngineVisuals } from "./aircraft/createAircraftEngineVisuals";
 import { createFixedStepPhysicsLoop, FIXED_DT } from "./physics/fixedStepLoop";
+import { ALERT_PILOT, readPilotG, stepPilot, type GVisionSettings, type PassOutSettings } from "./physics/gForce";
 import { cameraAttitudeView } from "./hud/cameraAttitudeView";
 import type { AttitudeView } from "./hud/attitudeIndicator";
 import { createFlightLoadingScreen, type FlightLoadingScreen } from "../loading/createFlightLoadingScreen";
@@ -357,6 +360,7 @@ export async function createFlightSimApp(
   rootElement.innerHTML = `
     <div class="flight-app">
       <canvas class="flight-app__canvas" aria-label="Flight simulator viewport"></canvas>
+      <div class="flight-g-vision-root"></div>
       <div class="flight-hud-root"></div>
       <div class="flight-status-root"></div>
       <div class="flight-shell-root"></div>
@@ -365,11 +369,12 @@ export async function createFlightSimApp(
   `;
 
   const canvas = rootElement.querySelector<HTMLCanvasElement>(".flight-app__canvas");
+  const gVisionRoot = rootElement.querySelector<HTMLElement>(".flight-g-vision-root");
   const hudRoot = rootElement.querySelector<HTMLElement>(".flight-hud-root");
   const statusRoot = rootElement.querySelector<HTMLElement>(".flight-status-root");
   const shellRoot = rootElement.querySelector<HTMLElement>(".flight-shell-root");
   const panelRoot = rootElement.querySelector<HTMLElement>(".flight-panel-root");
-  if (!canvas || !hudRoot || !statusRoot || !shellRoot || !panelRoot) {
+  if (!canvas || !gVisionRoot || !hudRoot || !statusRoot || !shellRoot || !panelRoot) {
     throw new Error("Flight sim shell failed to mount.");
   }
 
@@ -782,8 +787,10 @@ export async function createFlightSimApp(
     tireAudio.update(0);
   };
   let externalTankStepSeconds = 0;
+  let gVisionStepSeconds = 0;
   const physicsLoop = createFixedStepPhysicsLoop(jsbsim.sdk, () => {
     externalTankStepSeconds += FIXED_DT;
+    gVisionStepSeconds += FIXED_DT;
     // Ahead of the wheel guard: engine sound must not depend on a wheel experiment.
     flightAudio.publishStep();
     if (engineTest || wheelSpinMode === "off") return;
@@ -1036,6 +1043,76 @@ export async function createFlightSimApp(
   const evaluationInstruments = createEvaluationInstruments(
     hudRoot.querySelector<HTMLElement>(".flight-hud__eval") ?? hudRoot,
   );
+  // G-forces: the load at the pilot's seat is read once a frame, for the
+  // indicator, for the vignettes it closes over the view and for the pilot
+  // passing out. All of it is DOM, so none of it asks the globe for a frame.
+  const gMeter = createGMeter(hudRoot.querySelector<HTMLElement>(".flight-hud__g") ?? hudRoot, {
+    onToggleTab: () => controlPanel?.toggleTab("gforces"),
+  });
+  const gVisionOverlay = createGVisionOverlay(gVisionRoot);
+  const readGVisionSettings = (): GVisionSettings => ({
+    blackout: parameters.get("osfs.gForce.blackoutRange"),
+    redout: parameters.get("osfs.gForce.redoutRange"),
+    onsetSeconds: parameters.get("osfs.gForce.onsetTime"),
+    recoverySeconds: parameters.get("osfs.gForce.recoveryTime"),
+  });
+  const readPassOutSettings = (): PassOutSettings | null => parameters.get("osfs.gForce.passOut") ? {
+    meanSeconds: parameters.get("osfs.gForce.unconsciousTime"),
+    spreadSeconds: parameters.get("osfs.gForce.unconsciousSpread"),
+  } : null;
+  let gIndicatorShown = parameters.get("osfs.gForce.indicator");
+  let gVisionEnabled = parameters.get("osfs.gForce.vision");
+  let gVisionSettings = readGVisionSettings();
+  let passOutSettings = readPassOutSettings();
+  let pilot = ALERT_PILOT;
+  const pilotOut = (): boolean => pilot.secondsOut > 0;
+  const showGVision = (): void => {
+    // A pilot who is out sees nothing, in every view and at any strength.
+    if (pilotOut()) { gVisionOverlay.show(1, 0); return; }
+    const drawn = gVisionEnabled
+      && (parameters.get("osfs.gForce.visionViews") === "all" || aircraft?.getViewMode() === "first");
+    const strength = drawn ? parameters.get("osfs.gForce.visionStrength") : 0;
+    gVisionOverlay.show(pilot.vision.blackout * strength, pilot.vision.redout * strength);
+  };
+  const clearGVision = (): void => {
+    pilot = ALERT_PILOT;
+    gVisionStepSeconds = 0;
+    showGVision();
+  };
+  const coverGVision = (): void => gVisionOverlay.cover(parameters.get("osfs.gForce.visionLayer") === "everything");
+  gMeter.setVisible(gIndicatorShown);
+  coverGVision();
+  stopWatching.push(
+    parameters.watch("osfs.gForce.indicator", shown => {
+      gIndicatorShown = shown;
+      gMeter.setVisible(shown);
+      if (shown) gMeter.update(readPilotG(jsbsim.sdk));
+    }),
+    // Off forgets the load so far: sight is clear when it is turned on again.
+    // The load is still followed while passing out is on, to pass out by.
+    parameters.watch("osfs.gForce.vision", enabled => {
+      gVisionEnabled = enabled;
+      if (!enabled && !passOutSettings) clearGVision();
+      else showGVision();
+    }),
+    parameters.watch("osfs.gForce.passOut", () => {
+      passOutSettings = readPassOutSettings();
+      if (passOutSettings) return;
+      // Off wakes a pilot who is out, with their sight coming back from black.
+      if (pilotOut()) flightLog.info("pilot", "Pilot came to: passing out was turned off");
+      pilot = { vision: pilot.vision, secondsOut: 0 };
+      if (gVisionEnabled) showGVision();
+      else clearGVision();
+    }),
+    parameters.watch("osfs.gForce.visionLayer", coverGVision),
+  );
+  for (const id of ["osfs.gForce.unconsciousTime", "osfs.gForce.unconsciousSpread"] as const) {
+    stopWatching.push(parameters.watch(id, () => { passOutSettings = readPassOutSettings(); }));
+  }
+  for (const id of ["osfs.gForce.blackoutRange", "osfs.gForce.redoutRange", "osfs.gForce.onsetTime",
+    "osfs.gForce.recoveryTime", "osfs.gForce.visionStrength", "osfs.gForce.visionViews"] as const) {
+    stopWatching.push(parameters.watch(id, () => { gVisionSettings = readGVisionSettings(); showGVision(); }));
+  }
   const engineMonitor = createEngineMonitor(
     hudRoot.querySelector<HTMLElement>(".flight-hud__engine") ?? hudRoot,
     {
@@ -1717,6 +1794,7 @@ export async function createFlightSimApp(
     // including when destination terrain preparation fails or is cancelled.
     externalTankVisuals?.resetDetached();
     externalTankStepSeconds = 0;
+    clearGVision();
     floatingOrigin?.aircraftRoot.setEnabled(false);
     phoneSession?.reset();
     inputManager.adoptControls(inputManager.getControls());
@@ -2153,10 +2231,12 @@ export async function createFlightSimApp(
       // authority immediately before allowing this step to advance physics.
       const fromPhone = phoneSession?.beforeStep(controls) ?? controls;
       if (fromPhone === false || inputManager.isPaused()) return false;
-      const selected = controlBlend && phoneSession?.isBlending()
+      const blended = controlBlend && phoneSession?.isBlending()
         ? controlBlend.step(fromPhone, controls, inputManager.getFlapsInputRevision(), controlSharing.priority) : fromPhone;
       // This computer's levers continue from where the two pilots left them.
-      if (controlBlend && phoneSession?.isBlending()) inputManager.adoptLevers(selected);
+      if (controlBlend && phoneSession?.isBlending()) inputManager.adoptLevers(blended);
+      // A pilot who has passed out lets go of the stick, the pedals and the brakes.
+      const selected = pilotOut() ? { ...blended, elevator: 0, aileron: 0, rudder: 0, brake: 0 } : blended;
       if (collisionReset) { resetWheelSpin("reset"); return "reset"; }
       if (phoneSession?.getSnapshot().owner === "phone") noticeRemoteFlaps(selected.flaps);
       else noticeLocalFlaps();
@@ -2356,7 +2436,7 @@ export async function createFlightSimApp(
     }
     flightHud.update(
       displayState,
-      phoneOwned || lastApResult.engaged ? appliedControls : controls,
+      phoneOwned || lastApResult.engaged || pilotOut() ? appliedControls : controls,
       lastApResult.engaged ? lastApResult.gearDownNorm > 0 : inputManager.getGearDownNorm() > 0,
       { pitch: pitchAutoTrim.enabled, roll: rollAutoTrim.enabled },
       hudMasterAp(),
@@ -2375,6 +2455,24 @@ export async function createFlightSimApp(
     sectionStarted = frameProfiler.clock();
     flightRecorder.sample(jsbsim.sdk);
     evaluationInstruments.update(jsbsim.sdk);
+    if (gIndicatorShown || gVisionEnabled || passOutSettings) {
+      const pilotG = readPilotG(jsbsim.sdk);
+      if (gIndicatorShown) gMeter.update(pilotG);
+      if (gVisionEnabled || passOutSettings) {
+        const wasOut = pilotOut();
+        pilot = stepPilot(pilot, pilotG, gVisionStepSeconds, gVisionSettings, passOutSettings);
+        if (!wasOut && pilotOut()) {
+          flightLog.info("pilot", "Pilot passed out", {
+            loadG: Number(pilotG.toFixed(1)), secondsOut: Number(pilot.secondsOut.toFixed(1)),
+          });
+        } else if (wasOut && !pilotOut()) {
+          flightLog.info("pilot", "Pilot came to", { loadG: Number(pilotG.toFixed(1)) });
+        }
+      }
+    }
+    gVisionStepSeconds = 0;
+    // Every frame: a change of camera view changes what is drawn without a step.
+    showGVision();
     engineMonitor.update(jsbsim.sdk, feedbackHeld || worldLoading);
     frameProfiler.add("flight/instruments", sectionStarted);
     phoneCameraTrace?.renderFrame({
@@ -2453,6 +2551,8 @@ export async function createFlightSimApp(
       mapDetail?.dispose();
       rendererPanel.destroy();
       evaluationInstruments.destroy();
+      gMeter.destroy();
+      gVisionOverlay.destroy();
       engineMonitor.destroy();
       flightHud.destroy();
       collisionDebugOverlay?.dispose();

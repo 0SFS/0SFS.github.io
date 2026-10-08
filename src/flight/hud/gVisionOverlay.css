@@ -1,0 +1,46 @@
+/* Over the 3D view and, by document order, under the HUD, the status and the panels. */
+.flight-g-vision {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/*
+ * Over the panels (20), the log (25), the toolbar (30) and the window menus
+ * (40) too. A dialog (100) and a parameter's help (10000) stay above it: they
+ * ask something of the person, not of the pilot.
+ */
+.flight-g-vision--over-everything {
+  z-index: 50;
+}
+
+/*
+ * One vignette. `--closed` runs from 0, clear, to 1, the whole view. The clear
+ * middle is an ellipse through the view's corners at 100%, so the corners go
+ * first, then the sides, then the centre. Its edge starts at the corners and
+ * ends one feather behind the centre, which leaves the view solid at 1. The
+ * stops between follow a smoothstep, so neither end of the feather shows a line.
+ */
+.flight-g-vision__layer {
+  --closed: 0;
+  --feather: 70%;
+  --edge: calc((1 - var(--closed)) * (100% + var(--feather)) - var(--feather));
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse farthest-corner at center,
+    rgb(var(--tint) / 0) var(--edge),
+    rgb(var(--tint) / 0.16) calc(var(--edge) + var(--feather) * 0.25),
+    rgb(var(--tint) / 0.5) calc(var(--edge) + var(--feather) * 0.5),
+    rgb(var(--tint) / 0.84) calc(var(--edge) + var(--feather) * 0.75),
+    rgb(var(--tint)) calc(var(--edge) + var(--feather))
+  );
+}
+
+.flight-g-vision__layer--blackout {
+  --tint: 0 0 0;
+}
+
+.flight-g-vision__layer--redout {
+  --tint: 138 6 6;
+}

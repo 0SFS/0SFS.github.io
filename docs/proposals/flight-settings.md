@@ -790,3 +790,123 @@ outrolled the stick. The trim wheel's position, which the HUD, the keys, a
 controller and the phone move, is not scaled; a resumed flight's trim is read
 back over the range, so it does not shrink at each reload. Pitch trim keeps its
 range.
+
+## G-forces (2026-10-07)
+
+The flight panel has a **G-forces** tab. It holds the G indicator's switch, the
+settings of the vignettes a load closes over the view, and an opt-in for the
+pilot passing out. The owner is 0sfs: there is no load without an aircraft.
+
+**G indicator.** A chip labelled G in the instrument row, after AoA, shows the
+load at the pilot's seat to a tenth of a g: 1 in level flight, more in a pull,
+negative in a push. It is JSBSim's `accelerations/n-pilot-z-norm` with its sign
+turned, since body Z points down: the acceleration at the aircraft's `EYEPOINT`
+without gravity, which is what an accelerometer under the seat reads. At the
+centre of gravity `accelerations/Nz` differs from it by the aircraft's rotation
+(`src/flight/physics/gForce.ts`). The chip is the tab's button: a click shows
+the tab, or closes it when it is showing.
+
+**Vision.** A load that stays on takes the pilot's sight. A black vignette
+closes from the corners of the view inward under positive load, and a red one
+under negative load. Each has a range on one track: it starts at one end and
+covers the view at the other. Sight follows the load as a first-order lag, so a
+brief pull costs nothing and a touchdown's jolt is not seen; the onset and
+recovery times are the time to come within 5% of where it settles, three time
+constants. The lag runs on simulated time, so it holds while the flight is
+paused, and a move made in the Location tab arrives with clear sight.
+
+| Parameter | Unit | Bounds / default |
+| --- | --- | --- |
+| `osfs.gForce.indicator` | switch | On |
+| `osfs.gForce.vision` | switch | On |
+| `osfs.gForce.blackoutRange` | range, g | 1.5 to 15 / 5 to 9 |
+| `osfs.gForce.redoutRange` | range, g | −10 to −0.5 / −3 to −2 |
+| `osfs.gForce.onsetTime` | s | 0 to 20 / 5 |
+| `osfs.gForce.recoveryTime` | s | 0 to 20 / 2 |
+| `osfs.gForce.visionStrength` | fraction, shown as % | 0 to 1 / 1 |
+| `osfs.gForce.visionViews` | choice | Every view (`all`); also `cockpit` |
+| `osfs.gForce.visionLayer` | choice | Everything (`everything`); also `view`, the 3D view only |
+
+The four thresholds and times are **chosen, not measured**. They spread the
+black vignette over the loads a fighter holds, for a pilot in a G-suit who is
+straining; a relaxed pilot without one loses sight at lower loads. No source
+was read for them, and each parameter's reason says so. Check them against the
+aeromedical literature before citing them as a pilot's tolerance.
+
+The vignettes are two DOM layers that take no input
+(`src/flight/hud/gVisionOverlay.ts`). By default they lie over everything the
+flight shows: the HUD, the status, the log, the panels, the toolbar and the
+window menus, since a pilot whose sight has gone has lost the instruments too.
+Vignette covers set to the 3D view only puts them under all of that, which
+stays readable. A dialog and a parameter's help stay above them either way:
+those ask something of the person, not of the pilot. The stylesheet draws each
+from one custom property, how far it has closed, in steps of a thousandth: a
+change costs one style write and no frame of the globe, and a settled vignette
+costs nothing. Vignette strength scales how far a vignette may close. With
+every switch off the load is not read.
+
+**Passing out.** Off by default. When it is on, a pilot whose sight goes
+completely black loses consciousness. That takes a load at or above the top of
+the blackout range, held for about three onset times from clear sight, since
+sight comes within a ten-thousandth of black only then. While the pilot is out:
+
+- the screen is black in every view and at any vignette strength, even with
+  Dim vision under load off;
+- the pilot lets go of the stick, the pedals and the brakes, which go to zero
+  before the autopilot and the assists see them;
+- the throttle, the trim and the flaps stay where they were, and an engaged
+  autopilot flies on;
+- the HUD's stick shows the released controls.
+
+Each time out is drawn from a normal distribution with the mean and the spread
+(its standard deviation) below. Draws below zero are drawn again, so the
+distribution is cut off at zero. The time counts down in simulated time, so it
+holds while the flight is paused. Coming to, sight returns from black over the
+recovery time. If the load is still at the top of the range, the pilot passes
+out again at once. Turning passing out off wakes the pilot, and so does a move
+made in the Location tab. The log records each loss of consciousness, with the
+load and the time drawn, and the pilot coming to.
+
+| Parameter | Unit | Bounds / default |
+| --- | --- | --- |
+| `osfs.gForce.passOut` | switch | Off |
+| `osfs.gForce.unconsciousTime` | s | 1 to 120 / 11.9 |
+| `osfs.gForce.unconsciousSpread` | s | 0 to 60 / 4 |
+
+The mean is **measured**. Whinnery and Whinnery reviewed 501 losses of
+consciousness induced on a centrifuge in healthy subjects. They found 11.9 s of
+absolute incapacitation (unconsciousness), followed by 16 s of relative
+incapacitation (confusion and disorientation), 28 s in all (Arch Neurol
+1990;47(7):764–76, doi:10.1001/archneur.1990.00530070058012). The source read
+was the PubMed abstract. The confusion is not modelled: the pilot has full
+control on coming to, and setting the mean to 28 s flies the whole incapacitation
+without them. The spread is **chosen, not measured**: the paper's spread was not
+read. A secondary summary that could not be opened gives a range of 2 to 38 s for
+the unconscious period. Four seconds keeps most times between 4 and 20 s.
+
+What it does not do:
+
+- there is no greying of colour before the tunnel;
+- there is no loss of consciousness without warning at a rapid onset, before
+  sight has gone;
+- a negative load never puts the pilot out;
+- the vignettes never change how the aircraft flies or what the controls do;
+  only passing out does, by letting go of them;
+- the phone controller shows none of it, and a phone flying the aircraft has
+  its stick released while the pilot is out, like the keyboard and a gamepad.
+
+Checks: unit tests cover the model, including the distribution of times out
+over 20,000 seeded draws, the chip and the overlay. A native integration test
+flies the Cessna 172 through a pull and a push and reads the load from JSBSim.
+Two app tests carry the load through to the screen and the controls:
+
+- one follows a held 9 g from the flight model to the chip, the vignette, each
+  setting and the tab;
+- one checks both layers, then flies the pilot out at 9 g with a key held.
+  It checks that the aileron command is zero while the pilot is out, that the
+  screen stays black, and that the pilot comes to after the time drawn and flies
+  again.
+
+The stylesheet was drawn in headless Chrome at ten amounts of closing and
+looked at, before the layer setting was added. The layer setting was checked
+only in jsdom. None of it has been flown by a person.

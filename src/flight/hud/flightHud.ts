@@ -204,6 +204,7 @@ export function createFlightHud(root: HTMLElement, options: FlightHudOptions): F
           <span class="flight-hud__value" data-metric="vs">+0000</span>
         </div>
         <div class="flight-hud__aoa" data-slot="aoa"></div>
+        <div class="flight-hud__g" data-slot="g"></div>
         <button class="flight-hud__gear" data-control="gear" type="button" aria-pressed="true">G</button>
         <button class="flight-hud__ap" data-control="autopilot" type="button" aria-pressed="false">AP</button>
       </div>

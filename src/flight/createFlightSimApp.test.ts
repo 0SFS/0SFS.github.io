@@ -1699,3 +1699,182 @@ describe("pause while loading and resumed flights", () => {
     } finally { await act(async () => t.app.destroy()); }
   });
 });
+
+describe("G-forces", () => {
+  it("shows the load at the pilot's seat, closes a vignette under one that stays on, and keeps its settings in the G-forces tab", async () => {
+    mocks.useRealFlightHud = true;
+    const canvas = vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(
+      new Proxy({}, { get: () => () => undefined }) as unknown as CanvasRenderingContext2D,
+    );
+    const t = await mountAircraftSelection();
+    try {
+      const runtime = await vi.mocked(createJsbsimRuntime).mock.results.at(-1)!.value;
+      const read = vi.mocked(runtime.sdk.getPropertyValue).getMockImplementation()!;
+      // Body Z points down: level flight reads -1.
+      let bodyZ = -1;
+      vi.mocked(runtime.sdk.getPropertyValue).mockImplementation((property: string) =>
+        property === "accelerations/n-pilot-z-norm" ? bodyZ : read(property));
+      const tick = mocks.runtime.setSimTick.mock.calls.at(-1)![0] as (dt: number) => void;
+      const afterStep = vi.mocked(createFixedStepPhysicsLoop).mock.calls.at(-1)![1]!;
+      const fly = (seconds: number): void => {
+        for (let step = 0; step < seconds * 120; step += 1) afterStep(mocks.state);
+        tick(1 / 60);
+      };
+      const chip = t.root.querySelector<HTMLButtonElement>(".flight-hud__tapes .flight-g-meter")!;
+      const shown = chip.querySelector<HTMLElement>('[data-value="g"]')!;
+      const black = t.root.querySelector<HTMLElement>(".flight-g-vision__layer--blackout")!;
+      const red = t.root.querySelector<HTMLElement>(".flight-g-vision__layer--redout")!;
+      const closed = (layer: HTMLElement): number => Number(layer.style.getPropertyValue("--closed"));
+      // Over the 3D view, under the instruments that follow it unless it is raised over everything, as by default.
+      const layers = [...t.root.querySelector(".flight-app")!.children].map(child => child.className);
+      expect(layers.slice(0, 3)).toEqual([
+        "flight-app__canvas", "flight-g-vision-root flight-g-vision flight-g-vision--over-everything", "flight-hud-root",
+      ]);
+      mocks.runtime.requestRender.mockClear();
+
+      fly(1);
+      expect(shown.textContent).toBe(" 1.0");
+      expect(black.hidden).toBe(true);
+      expect(red.hidden).toBe(true);
+
+      // 9 g held for the onset time closes the black vignette to within 5%.
+      bodyZ = -9;
+      fly(5);
+      expect(shown.textContent).toBe(" 9.0");
+      expect(black.hidden).toBe(false);
+      expect(closed(black)).toBeCloseTo(0.95, 2);
+      expect(red.hidden).toBe(true);
+      // A frame in which no simulated time passed, as while paused, leaves sight where it was.
+      tick(1 / 60);
+      expect(closed(black)).toBeCloseTo(0.95, 2);
+
+      await act(async () => { getAppSettings().set("osfs.gForce.visionStrength", 0.5); });
+      expect(closed(black)).toBeCloseTo(0.475, 2);
+      // The test's camera is the chase view.
+      await act(async () => { getAppSettings().set("osfs.gForce.visionViews", "cockpit"); });
+      expect(black.hidden).toBe(true);
+      await act(async () => { getAppSettings().set("osfs.gForce.visionViews", "all"); });
+      expect(black.hidden).toBe(false);
+
+      // A push: the red closes while the black clears.
+      bodyZ = 3;
+      fly(5);
+      expect(shown.textContent).toBe("-3.0");
+      expect(red.hidden).toBe(false);
+      expect(closed(red)).toBeCloseTo(0.475, 2);
+      expect(black.hidden).toBe(true);
+
+      // Off draws nothing, and forgets the load so far.
+      await act(async () => { getAppSettings().set("osfs.gForce.vision", false); });
+      expect(red.hidden).toBe(true);
+      fly(5);
+      expect(red.hidden).toBe(true);
+      await act(async () => { getAppSettings().set("osfs.gForce.vision", true); });
+      expect(red.hidden).toBe(true);
+
+      await act(async () => { getAppSettings().set("osfs.gForce.indicator", false); });
+      expect(chip.hidden).toBe(true);
+      bodyZ = -2;
+      fly(1);
+      await act(async () => { getAppSettings().set("osfs.gForce.indicator", true); });
+      expect(chip.hidden).toBe(false);
+      expect(shown.textContent).toBe(" 2.0");
+      // The indicator and the vignettes are DOM: neither asks the globe for a frame.
+      expect(mocks.runtime.requestRender).not.toHaveBeenCalled();
+
+      // The chip is the tab's button.
+      const tabs = (): string[] => Array.from(t.root.querySelectorAll(".foss-earth-tab-button"), tab => tab.textContent ?? "");
+      expect(tabs()).not.toContain("G-forces");
+      await act(async () => chip.click());
+      expect(tabs()).toContain("G-forces");
+      for (const id of ["indicator", "vision", "blackoutRange", "redoutRange", "onsetTime", "recoveryTime", "visionStrength",
+        "visionViews", "visionLayer", "passOut", "unconsciousTime", "unconsciousSpread"]) {
+        expect(t.root.querySelector(`[data-parameter="osfs.gForce.${id}"]`), id).not.toBeNull();
+      }
+      await act(async () => chip.click());
+      expect(tabs()).not.toContain("G-forces");
+    } finally { await act(async () => t.app.destroy()); canvas.mockRestore(); }
+  });
+
+  it("covers everything or the 3D view alone, and passes the pilot out only when the person opts in", async () => {
+    mocks.useRealFlightHud = true;
+    const canvas = vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(
+      new Proxy({}, { get: () => () => undefined }) as unknown as CanvasRenderingContext2D,
+    );
+    const t = await mountAircraftSelection();
+    try {
+      const runtime = await vi.mocked(createJsbsimRuntime).mock.results.at(-1)!.value;
+      const read = vi.mocked(runtime.sdk.getPropertyValue).getMockImplementation()!;
+      let bodyZ = -1;
+      vi.mocked(runtime.sdk.getPropertyValue).mockImplementation((property: string) =>
+        property === "accelerations/n-pilot-z-norm" ? bodyZ : read(property));
+      const tick = mocks.runtime.setSimTick.mock.calls.at(-1)![0] as (dt: number) => void;
+      const afterStep = vi.mocked(createFixedStepPhysicsLoop).mock.calls.at(-1)![1]!;
+      // Each frame applies the controls first, then follows the load over the time it stepped.
+      // A tenth of a second a frame lets a held key move the stick.
+      const fly = (seconds: number): void => {
+        for (let step = 0; step < Math.round(seconds * 120); step += 1) afterStep(mocks.state);
+        tick(0.1);
+      };
+      const set = (id: string, value: unknown) => act(async () => { getAppSettings().set(id as never, value as never); });
+      const host = t.root.querySelector<HTMLElement>(".flight-g-vision-root")!;
+      const black = t.root.querySelector<HTMLElement>(".flight-g-vision__layer--blackout")!;
+      const closed = (): number => black.hidden ? 0 : Number(black.style.getPropertyValue("--closed"));
+      const aileron = (): number | undefined => vi.mocked(runtime.sdk.setPropertyValue).mock.calls
+        .filter(([property]) => property === "fcs/aileron-cmd-norm").at(-1)?.[1];
+
+      const overEverything = (): boolean => host.classList.contains("flight-g-vision--over-everything");
+      expect(overEverything()).toBe(true);
+      await set("osfs.gForce.visionLayer", "view");
+      expect(overEverything()).toBe(false);
+      await set("osfs.gForce.visionLayer", "everything");
+      expect(overEverything()).toBe(true);
+
+      // Opted out, as by default: sight closes completely and the pilot flies on.
+      window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyD" }));
+      bodyZ = -9;
+      fly(20);
+      fly(0.5);
+      expect(closed()).toBe(1);
+      expect(aileron()).toBeGreaterThan(0.05);
+
+      // Opted in, the black closed: the pilot passes out at the end of this frame and lets go from the next.
+      await set("osfs.gForce.passOut", true);
+      await set("osfs.gForce.unconsciousTime", 10);
+      await set("osfs.gForce.unconsciousSpread", 0);
+      fly(0.5);
+      bodyZ = -1;
+      fly(0.5);
+      expect(aileron()).toBe(0);
+      // Out, the screen is black whatever the vignette's strength and views.
+      await set("osfs.gForce.visionStrength", 0.5);
+      await set("osfs.gForce.visionViews", "cockpit");
+      expect(closed()).toBe(1);
+      await set("osfs.gForce.visionStrength", 1);
+      await set("osfs.gForce.visionViews", "all");
+      fly(9);
+      expect(aileron()).toBe(0);
+      expect(closed()).toBe(1);
+
+      // Ten simulated seconds out: the pilot comes to with sight returning from black, and flies again.
+      fly(1);
+      const returning = closed();
+      expect(returning).toBeGreaterThan(0);
+      expect(returning).toBeLessThan(1);
+      fly(0.5);
+      expect(aileron()).toBeGreaterThan(0.05);
+      expect(closed()).toBeLessThan(returning);
+
+      // Out again, then opted out: the pilot comes to at once, still seeing black, and flies on.
+      bodyZ = -9;
+      fly(20);
+      fly(0.5);
+      expect(aileron()).toBe(0);
+      await set("osfs.gForce.passOut", false);
+      expect(closed()).toBe(1);
+      fly(0.5);
+      expect(aileron()).toBeGreaterThan(0.05);
+      window.dispatchEvent(new KeyboardEvent("keyup", { code: "KeyD" }));
+    } finally { await act(async () => t.app.destroy()); canvas.mockRestore(); }
+  });
+});

@@ -22,6 +22,7 @@ import {
   Play,
   Plane,
   Volume2,
+  Weight,
 } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
@@ -75,7 +76,7 @@ import { AUTOPILOT_PARAMETER_IDS, type AutopilotSettingsV1 } from "../autopilot/
 import { GROUND_PARAMETER_IDS } from "../settings/groundInteractionSettings";
 import type { FlightRecorder } from "../diagnostics/flightRecorder";
 
-export type FlightPanelTab = "weather" | "aircraft" | "fuel" | "autopilot" | "controls" | "remote" | "sound" | "exhaust" | "engine" | "logging" | "debug";
+export type FlightPanelTab = "weather" | "aircraft" | "fuel" | "autopilot" | "controls" | "remote" | "sound" | "exhaust" | "engine" | "gforces" | "logging" | "debug";
 
 const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "weather", label: "Weather" },
@@ -87,6 +88,7 @@ const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "sound", label: "Sound" },
   { id: "exhaust", label: "Exhaust" },
   { id: "engine", label: "Engine" },
+  { id: "gforces", label: "G-forces" },
   { id: "logging", label: "Logging" },
   { id: "debug", label: "Debug" },
 ];
@@ -101,6 +103,7 @@ const TAB_ICONS = {
   sound: Volume2,
   exhaust: Flame,
   engine: Fan,
+  gforces: Weight,
   logging: ScrollText,
   debug: Bug,
 } satisfies Record<FlightPanelTab, typeof Plane>;
@@ -953,6 +956,23 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
                 <ParameterSection settings={props.settings} tab="engine" section="history" />
                 <ParameterSection settings={props.settings} tab="engine" section="test" />
               </>
+              : tabId === "gforces" ? <div className="flight-panel__content">
+                <ParameterSection settings={props.settings} tab="gforces" section="indicator" />
+                <ParameterSection settings={props.settings} tab="gforces" section="vision">
+                  <p className="flight-panel__hint">
+                    A load that stays on takes the pilot's sight: black from the edges inward in a pull, red in a push.
+                    Each vignette starts at one end of its range and covers the view at the other, and follows the load
+                    over the onset and recovery times. The aircraft flies the same.
+                  </p>
+                </ParameterSection>
+                <ParameterSection settings={props.settings} tab="gforces" section="pass-out">
+                  <p className="flight-panel__hint">
+                    A pilot whose sight goes completely black loses consciousness: a load at or above the top of the
+                    blackout range, held for about three onset times. While out, the screen is black in every view and the
+                    stick, pedals and brakes are let go. Each time out is drawn at random around the mean.
+                  </p>
+                </ParameterSection>
+              </div>
               : tabId === "logging" ? <LoggingPanel state={props.snapshot.logging} onAction={props.onLoggingAction} />
               : <DebugPanel snapshot={props.snapshot} settings={props.settings} onCollisionDebugChange={props.onCollisionDebugChange}
                 onWheelSpinModeChange={props.onWheelSpinModeChange} onTireSoundChange={props.onTireSoundChange} />}

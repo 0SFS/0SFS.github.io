@@ -1,0 +1,22 @@
+/* The G chip is a tape in the left instrument row, and a button: it toggles the G-forces tab. */
+.flight-g-meter {
+  min-width: 40px;
+  color: inherit;
+  font-family: inherit;
+  appearance: none;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.flight-g-meter[hidden] {
+  display: none;
+}
+
+.flight-g-meter:hover {
+  border-color: var(--ctl-line-strong);
+}
+
+.flight-g-meter:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ctl-focus);
+}

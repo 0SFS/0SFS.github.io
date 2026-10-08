@@ -86,7 +86,8 @@
   max-width: min(520px, calc(100vw - 48px));
 }
 
-.flight-hud__aoa {
+.flight-hud__aoa,
+.flight-hud__g {
   display: contents;
 }
 

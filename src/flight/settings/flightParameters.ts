@@ -32,6 +32,7 @@ const NEWTON_SECONDS = { id: "N·s", text: "N·s" } as const;
 const JOULES = { id: "J", text: "J" } as const;
 const RADIANS_PER_SECOND_SQUARED = { id: "rad/s²", text: "rad/s²" } as const;
 const KNOTS = { id: "kt", text: "kt" } as const;
+const G_UNIT = { id: "g", text: "g" } as const;
 
 const MAP_DETAIL = { tab: "map", section: "detail" } as const;
 const MODEL = { tab: "aircraft", section: "model" } as const;
@@ -60,6 +61,9 @@ const KEYBOARD = { tab: "controls", section: "keyboard" } as const;
 const ORBIT = { tab: "controls", section: "orbit" } as const;
 const FEEDBACK = { tab: "controls", section: "feedback" } as const;
 const STOVL = { tab: "controls", section: "stovl" } as const;
+const G_INDICATOR = { tab: "gforces", section: "indicator" } as const;
+const G_VISION = { tab: "gforces", section: "vision" } as const;
+const G_PASS_OUT = { tab: "gforces", section: "pass-out" } as const;
 
 /** Section titles for the sections 0sfs adds, by tab and section id. */
 export const FLIGHT_SECTION_TITLES: readonly (readonly [tab: string, section: string, title: string])[] = [
@@ -81,6 +85,9 @@ export const FLIGHT_SECTION_TITLES: readonly (readonly [tab: string, section: st
   ["aircraft", "assists", "Assists"],
   ["aircraft", "flight-controls", "Flight controls"],
   ["aircraft", "ground", "Ground handling"],
+  ["gforces", "indicator", "Indicator"],
+  ["gforces", "vision", "Vision"],
+  ["gforces", "pass-out", "Passing out"],
   ["autopilot", "package", "Autopilot"],
   ["controls", "gamepad", "Gamepad"],
   ["controls", "keyboard", "Keyboard response"],
@@ -303,6 +310,114 @@ export const OSFS_PARAMETERS = [
     unit: { id: "tanks", text: "tanks" }, kind: "number", step: 1, bounds: within(0, 2), default: 2,
     defaultReason: "One released tank per station shows both separations and bounds retained geometry and update work.",
     home: main(EXTERNAL_TANKS), appliesLive: true, source: "src/flight/aircraft/createExternalTankVisuals.ts",
+  },
+
+  // G-forces: the load on the pilot, and what it does to their sight.
+  {
+    id: "osfs.gForce.indicator",
+    label: "G indicator",
+    description: "Show the load at the pilot's seat in the instrument row, in g: 1 in level flight, more in a pull, negative in a push. It is read at the aircraft's eyepoint, where the pilot sits, not at the centre of gravity. Click it to show or hide this tab.",
+    unit: "none", kind: "boolean", default: true,
+    defaultReason: "The load is what the wings and the pilot are being asked to bear, and nothing else on the HUD shows it.",
+    home: main(G_INDICATOR), appliesLive: true, source: "src/flight/hud/gMeter.ts",
+  },
+  {
+    id: "osfs.gForce.vision",
+    label: "Dim vision under load",
+    description: "Close a black vignette over the view while a positive load stays on, and a red one under a negative load. Off draws nothing; a pilot who passes out still sees black.",
+    unit: "none", kind: "boolean", default: true,
+    defaultReason: "A load the aircraft can hold and the pilot cannot is otherwise only a number.",
+    home: main(G_VISION), appliesLive: true, source: "src/flight/hud/gVisionOverlay.ts",
+  },
+  {
+    id: "osfs.gForce.blackoutRange",
+    label: "Blackout",
+    description: "The loads between which sight is lost to a pull: the black vignette starts at the lower one and covers the view at the higher, once the load has stayed on for the onset time.",
+    unit: G_UNIT, kind: "range", step: 0.1, bounds: within(1.5, 15), default: { min: 5, max: 9 },
+    defaultReason: "Chosen, not measured: it spreads the vignette over the loads a fighter holds, for a pilot in a G-suit who is straining. A relaxed pilot without one loses sight at lower loads; lower both ends to fly as one.",
+    home: main(G_VISION), appliesLive: true, source: "src/flight/physics/gForce.ts",
+  },
+  {
+    id: "osfs.gForce.redoutRange",
+    label: "Redout",
+    description: "The negative loads between which sight is lost to a push: the red vignette starts at the one nearer zero and covers the view at the other.",
+    unit: G_UNIT, kind: "range", step: 0.1, bounds: within(-10, -0.5), default: { min: -3, max: -2 },
+    defaultReason: "Chosen, not measured: people bear far less negative load than positive, and no G-suit helps with it.",
+    home: main(G_VISION), appliesLive: true, source: "src/flight/physics/gForce.ts",
+  },
+  {
+    id: "osfs.gForce.onsetTime",
+    label: "Onset time",
+    description: "How long sight takes to follow a load that stays on, to within 5% of where it settles, in simulated seconds. Zero follows the load at once.",
+    unit: "s", kind: "number", step: 0.1, bounds: within(0, 20), default: 5,
+    defaultReason: "Chosen, not measured: the eyes keep working for a few seconds after their blood supply falls, so a brief pull costs nothing and a touchdown's jolt is not seen.",
+    home: main(G_VISION), appliesLive: true, source: "src/flight/physics/gForce.ts",
+  },
+  {
+    id: "osfs.gForce.recoveryTime",
+    label: "Recovery time",
+    description: "How long sight takes to come back once the load is off, to within 5%, in simulated seconds. Zero clears it at once.",
+    unit: "s", kind: "number", step: 0.1, bounds: within(0, 20), default: 2,
+    defaultReason: "Chosen, not measured: sight returns faster than it goes once the load is off.",
+    home: main(G_VISION), appliesLive: true, source: "src/flight/physics/gForce.ts",
+  },
+  {
+    id: "osfs.gForce.visionStrength",
+    label: "Vignette strength",
+    description: "How far a vignette may close: at 100% the whole view goes black or red, and at 50% it stops half way, with the middle of the view left clear.",
+    unit: "fraction", kind: "number", step: 0.05, bounds: within(0, 1), default: 1,
+    defaultReason: "Sight lost to a load is lost entirely.",
+    home: main(G_VISION), appliesLive: true, source: "src/flight/hud/gVisionOverlay.ts",
+  },
+  {
+    id: "osfs.gForce.visionViews",
+    label: "Dim vision in",
+    description: "Which camera views the vignettes are drawn over. The load is the pilot's in both; the chase view only shows it.",
+    unit: "none", kind: "choice",
+    choices: [
+      { id: "all", label: "Every view", description: "The cockpit and the chase view alike." },
+      { id: "cockpit", label: "Cockpit only", description: "The chase view stays clear, as a camera outside the aircraft would see it." },
+    ],
+    default: "all",
+    defaultReason: "A flight starts in the chase view, where the vignette is the only sign of what the pilot can bear.",
+    home: main(G_VISION), appliesLive: true, source: "src/flight/createFlightSimApp.ts",
+  },
+  {
+    id: "osfs.gForce.visionLayer",
+    label: "Vignette covers",
+    description: "What the vignettes are drawn over: everything on the screen, or the 3D view alone, with the instruments, panels and toolbar left readable above it. A dialog that asks a question stays above it either way.",
+    unit: "none", kind: "choice",
+    choices: [
+      { id: "everything", label: "Everything", description: "The 3D view, the instruments, the panels and the toolbar." },
+      { id: "view", label: "3D view only", description: "The instruments, panels and toolbar stay clear." },
+    ],
+    default: "everything",
+    defaultReason: "A pilot whose sight has gone has lost the instruments with it.",
+    home: main(G_VISION), appliesLive: true, source: "src/flight/hud/gVisionOverlay.ts",
+  },
+  {
+    id: "osfs.gForce.passOut",
+    label: "Pass out",
+    description: "Lose consciousness when the black vignette closes completely: the screen goes black and the pilot lets go of the stick, pedals and brakes for a time drawn at random around the mean time out. The throttle, trim and flaps stay where they were, and an engaged autopilot flies on. Coming to, sight returns over the recovery time.",
+    unit: "none", kind: "boolean", default: false,
+    defaultReason: "Opt in: it takes the aircraft out of the person's hands.",
+    home: main(G_PASS_OUT), appliesLive: true, source: "src/flight/physics/gForce.ts",
+  },
+  {
+    id: "osfs.gForce.unconsciousTime",
+    label: "Mean time out",
+    description: "The average time the pilot stays unconscious, in simulated seconds. Each time is drawn from a bell curve around it, never below zero.",
+    unit: "s", kind: "number", step: 0.1, bounds: within(1, 120), default: 11.9,
+    defaultReason: "Measured: 11.9 s of unconsciousness on average over 501 losses of consciousness on a centrifuge (Whinnery and Whinnery, Arch Neurol 1990;47:764–76). A further 16 s of confusion followed, which is not modelled; add it to fly that long without the pilot.",
+    home: main(G_PASS_OUT), appliesLive: true, source: "src/flight/physics/gForce.ts",
+  },
+  {
+    id: "osfs.gForce.unconsciousSpread",
+    label: "Time out spread",
+    description: "The standard deviation of the time out, in seconds: about two times in three fall within this much of the mean. Zero makes every time the mean.",
+    unit: "s", kind: "number", step: 0.1, bounds: within(0, 60), default: 4,
+    defaultReason: "Chosen, not measured: the study's spread was not read. Four seconds keeps most times between 4 and 20 s.",
+    home: main(G_PASS_OUT), appliesLive: true, source: "src/flight/physics/gForce.ts",
   },
 
   // Exhaust → Gas and luminance. Shared across engines with an optical profile.
