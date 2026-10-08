@@ -8,6 +8,22 @@ const appMocks = vi.hoisted(() => ({
   createFlightSimApp: vi.fn(async () => ({ destroy: vi.fn() })),
   createPhoneControllerApp: vi.fn(async () => ({ destroy: vi.fn() })),
   createInfoPage: vi.fn(),
+  showReportOnly: vi.fn(),
+  diagnosticsDestroy: vi.fn(),
+  diagnosticLog: [] as string[],
+  startDiagnostics: vi.fn((options: { log: import("foss-earth/shell").GameLog }) => ({
+    log: { ...options.log, print: (entry: import("foss-earth/shell").GameLogEntry) => {
+      appMocks.diagnosticLog.push(entry.text);
+      return options.log.print(entry);
+    } },
+    destroy: appMocks.diagnosticsDestroy,
+  })),
+}));
+
+vi.mock("foss-earth/diagnostics", async importOriginal => ({
+  ...await importOriginal<typeof import("foss-earth/diagnostics")>(),
+  startAppDiagnostics: appMocks.startDiagnostics,
+  showReportOnly: appMocks.showReportOnly,
 }));
 
 vi.mock("./flight/createFlightSimApp", () => ({
@@ -25,12 +41,29 @@ vi.mock("./info/createInfoPage", () => ({
 beforeEach(() => {
   vi.resetModules();
   vi.clearAllMocks();
+  appMocks.diagnosticLog.length = 0;
   document.body.innerHTML = '<div id="root"></div>';
 });
 
 afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 describe("application route", () => {
+  it("opens the retained report without starting the flight or replacing its trail", async () => {
+    window.history.replaceState(null, "", "/fly/?report");
+
+    await import("./main");
+
+    expect(appMocks.showReportOnly).toHaveBeenCalledWith(document.getElementById("root"), {
+      settings: expect.objectContaining({ get: expect.any(Function) }),
+      identity: expect.objectContaining({ source: expect.any(String) }),
+    });
+    expect(appMocks.startDiagnostics).not.toHaveBeenCalled();
+    expect(appMocks.createFlightSimApp).not.toHaveBeenCalled();
+    expect(appMocks.createPhoneControllerApp).not.toHaveBeenCalled();
+    expect(appMocks.createInfoPage).not.toHaveBeenCalled();
+    expect(document.getElementById("app-log")).toBeNull();
+  });
+
   it("loads only 0SFS when mode=flight", async () => {
     window.history.replaceState(null, "", "/?mode=flight&mapSource=google&key=test-key");
 
@@ -42,7 +75,10 @@ describe("application route", () => {
     expect(appMocks.createFlightSimApp).toHaveBeenCalledWith(document.getElementById("root"), {
       loadingScreen: expect.objectContaining({ show: expect.any(Function), setPhase: expect.any(Function) }),
       log: expect.objectContaining({ print: expect.any(Function) }),
+      diagnostics: expect.objectContaining({ log: expect.objectContaining({ print: expect.any(Function) }), destroy: appMocks.diagnosticsDestroy }),
     });
+    expect(appMocks.startDiagnostics).toHaveBeenCalledOnce();
+    expect(appMocks.diagnosticLog).toContain("Application: Downloading application code");
     expect(document.getElementById("app-log")!.textContent).toContain("Application ready");
     // The route keeps the query; FOSS Earth's registry saves the key and takes it off the address bar.
     expect(`${window.location.pathname}${window.location.search}`).toBe("/fly/?mapSource=google");
@@ -138,6 +174,7 @@ describe("application route", () => {
     await vi.waitFor(() => expect(document.querySelector('#app-log [data-tone="error"]')).not.toBeNull());
     expect(document.getElementById("app-log")!.hidden).toBe(false);
     expect(document.querySelector('#app-log [data-tone="error"] button')!.textContent).toBe("Reload and try again");
+    expect(appMocks.diagnosticsDestroy).toHaveBeenCalledOnce();
   });
 
   it("keeps the original generic error behavior when a non-flight route fails", async () => {

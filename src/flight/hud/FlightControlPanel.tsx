@@ -147,7 +147,7 @@ export interface FlightControlPanelSnapshot {
 }
 
 /** Every tab the panel can show: the flight's own, and the shared globe tabs. */
-export type FlightOverlayTab = "location" | "map" | "renderer" | FlightPanelTab;
+export type FlightOverlayTab = "location" | "map" | "renderer" | "bug-report" | FlightPanelTab;
 
 export interface FlightControlPanelOptions {
   /** The app's settings registry, whose sections the tabs draw. */
@@ -164,6 +164,9 @@ export interface FlightControlPanelOptions {
   settingsSections: readonly PanelSection[];
   /** The shared About tab, from `createAboutPanel`: which version runs, and what it is built from. */
   aboutTab?: HTMLElement;
+  /** The shared Bug report tab, separate from the activity-trail settings. */
+  bugReportTab?: HTMLElement;
+  onBugReportShow?(): void;
   /** The shared Interface tab: the log and place search. */
   interfaceSections: readonly PanelSection[];
   initialWeather: FlightWeatherState;
@@ -908,6 +911,8 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
       settingsSections={props.settingsSections}
       interfaceSections={props.interfaceSections}
       aboutTab={props.aboutTab}
+      bugReportTab={props.bugReportTab}
+      onBugReportShow={props.onBugReportShow}
       getViewState={() => props.snapshot.flightState}
       setViewState={props.onLocationApply}
       locationSearchProvider={props.locationSearchProvider}

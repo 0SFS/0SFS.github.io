@@ -3,7 +3,7 @@ import { act } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 type HudBarClicks = Pick<import("./hud/createFlightHudBar").FlightHudBarOptions,
-  "onDebugClick" | "onMapClick" | "onRendererClick" | "onStatusClick" | "onPausedChange">;
+  "onDebugClick" | "onMapClick" | "onRendererClick" | "onStatusClick" | "onPausedChange" | "onBugReportClick">;
 
 const mocks = vi.hoisted(() => {
   const state = { latDeg: 1, lonDeg: 2, altMeters: 1000, headingRad: 0,
@@ -23,7 +23,8 @@ const mocks = vi.hoisted(() => {
     unregisterFocusPoint: vi.fn(),
     unsubscribeDetailLog: vi.fn(),
     runtime: {
-      renderer: { mode: "webgl2" }, status: { mode: "fallback" }, scene: {},
+      renderer: { requested: "webgl2", mode: "webgl2", engine: { getInfo: () => ({ vendor: "Test GPU", renderer: "Test renderer", version: "WebGL 2" }) } }, status: { mode: "fallback" }, scene: {},
+      onDeviceLost: vi.fn(() => mocks.stopDeviceLost), onDeviceRestored: vi.fn(() => mocks.stopDeviceRestored),
       engine: { getFps: () => 60 }, geospatialCamera: null,
       prepareTerrain: vi.fn(async (request: { altitudeMeters?: number }) => ({ groundHeightMeters: 250, altitudeMeters: request.altitudeMeters ?? 1774 })),
       surface: { sample: vi.fn(() => null) },
@@ -91,6 +92,7 @@ const mocks = vi.hoisted(() => {
     visibleMeshCollision: { reset: vi.fn(), update: vi.fn(() => false) },
     physics: { reset: vi.fn(), setPaused: vi.fn(), update: vi.fn((_delta, applyInputs) => { applyInputs(); return state; }), getLatestState: () => state, getFault: () => null },
     hudBarOptions: null as HudBarClicks | null,
+    stopDeviceLost: vi.fn(), stopDeviceRestored: vi.fn(),
   };
 });
 vi.mock("foss-earth/runtime", () => ({
@@ -103,7 +105,7 @@ vi.mock("foss-earth/runtime", () => ({
   },
   RASTER_BASE_MAP_SOURCES: [], TERRAIN_SOURCES: [], resolveTerrainSource: vi.fn(), resolveRasterBaseMapSource: vi.fn(), resolveMapRuntimeConfig: () => ({}), applyRendererChoice: vi.fn(), setMapSourcePreference: vi.fn(), setTerrainSourcePreference: vi.fn(),
 }));
-const shellCapture = vi.hoisted(() => ({ mapPanel: null as null | {
+const shellCapture = vi.hoisted(() => ({ diagnosticsSource: null as null | Parameters<typeof import("foss-earth/shell").createDiagnosticsSection>[0], mapPanel: null as null | {
   onMapSourceChange(sourceId: string): void;
   detail?: import("foss-earth/shell").MapDetailController;
 } }));
@@ -115,9 +117,17 @@ vi.mock("foss-earth/shell", async importOriginal => {
       shellCapture.mapPanel = options;
       return actual.createMapSourcePanel(options);
     },
+    createDiagnosticsSection: (...args: Parameters<typeof actual.createDiagnosticsSection>) => {
+      shellCapture.diagnosticsSource = args[0];
+      return actual.createDiagnosticsSection(...args);
+    },
   };
 });
 vi.mock("./jsbsim/createJsbsimRuntime", () => ({ createJsbsimRuntime: vi.fn(async (options: { aircraftId?: string } = {}) => ({
+  identity: { aircraftId: options.aircraftId ?? "cessna-172", engineModel: null, build: {
+    package: { name: "@felipegalind0/jsbsim", version: "1.2.4-fork.20" },
+    native: { commit: "a".repeat(40), dirty: false }, sdk: { commit: "a".repeat(40), dirty: false },
+  }, assets: { moduleUrl: "https://private.example.test/module.js?key=private-asset-key", wasmUrl: "https://private.example.test/module.wasm" } },
   sdk: {
     createPropertyBatch: vi.fn((paths: readonly string[]) => ({
       read: vi.fn((target = new Float64Array(paths.length)) => {
@@ -151,10 +161,10 @@ vi.mock("./audio/jsbsimAudioAdapter", async importOriginal => {
   return { ...actual, createJsbsimAudioAdapter: vi.fn(actual.createJsbsimAudioAdapter) };
 });
 vi.mock("./aircraft/createAircraftModel", () => ({ createAircraftModel: vi.fn(() => mocks.aircraftModel) }));
-vi.mock("foss-earth/diagnostics", async importOriginal => ({
-  ...await importOriginal<typeof import("foss-earth/diagnostics")>(),
-  createMeshInspector: vi.fn(() => mocks.meshInspector),
-}));
+vi.mock("foss-earth/diagnostics", async importOriginal => {
+  const actual = await importOriginal<typeof import("foss-earth/diagnostics")>();
+  return { ...actual, createMeshInspector: vi.fn(() => mocks.meshInspector), startAppDiagnostics: vi.fn(actual.startAppDiagnostics), issueReporterFromBuild: vi.fn(actual.issueReporterFromBuild) };
+});
 vi.mock("./aircraft/createExternalTankVisuals", () => ({ createExternalTankVisuals: vi.fn(() => mocks.externalTanks) }));
 vi.mock("./jsbsim/externalFuelTanks", () => ({
   readExternalFuelTanks: (_sdk: unknown, aircraftId: string) => aircraftId === "f-35b"
@@ -194,6 +204,8 @@ vi.mock("./hud/createFlightHudBar", () => ({
 
 import type { FrameProfileSession } from "foss-earth/perf";
 import { getAppSettings, resetAppSettings, SETTINGS_STORAGE_KEY } from "foss-earth/settings";
+import { issueReporterFromBuild, startAppDiagnostics } from "foss-earth/diagnostics";
+import { flightLog } from "./diagnostics/flightLog";
 import { cameraAttitudeView } from "./hud/cameraAttitudeView";
 import { setMapSourcePreference } from "foss-earth/runtime";
 import { createFlightSimApp } from "./createFlightSimApp";
@@ -223,6 +235,59 @@ async function openTab(root: HTMLElement, label: string): Promise<void> {
   const item = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')).find(button => button.textContent === label)!;
   await act(async () => item.click());
 }
+
+it("homes bug reporting in its own tab, captures flight context, and releases its listeners", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  vi.stubGlobal("localStorage", { getItem: () => null, setItem: vi.fn() });
+  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
+  vi.mocked(issueReporterFromBuild).mockReturnValueOnce({ repository: "0SFS/0SFS.github.io" });
+  const root = document.createElement("div"); document.body.append(root);
+  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
+  await act(async () => { app = await createFlightSimApp(root); });
+  const diagnostics = vi.mocked(startAppDiagnostics).mock.results.at(-1)!.value as ReturnType<typeof startAppDiagnostics>;
+  const disposeDiagnostics = vi.spyOn(diagnostics, "destroy");
+  try {
+    await openTab(root, "Settings");
+    const section = root.querySelector('[data-settings-section="settings/diagnostics"]')!;
+    expect(section.querySelector('[data-parameter="diagnostics.trail"]')).not.toBeNull();
+    expect(section.textContent).toContain("Copy report");
+    expect(section.textContent).not.toContain("Report bug");
+    expect(root.querySelector('[aria-label="Activity report to attach"]')).toBeNull();
+
+    flightLog.info("report-check", "Flaps changed", { latDeg: 44.123456, secret: "private-detail" });
+    await act(async () => mocks.hudBarOptions!.onBugReportClick());
+    const reportField = root.querySelector<HTMLTextAreaElement>('[aria-label="Activity report to attach"]')!;
+    expect(reportField.value).toContain("report-check: Flaps changed");
+    expect(Array.from(root.querySelectorAll(".foss-earth-tab-button"), tab => tab.textContent)).toContain("Bug report");
+    const title = root.querySelector<HTMLInputElement>('input[name="title"]')!;
+    title.value = "A flight bug";
+    await act(async () => title.dispatchEvent(new Event("input", { bubbles: true })));
+    await act(async () => mocks.hudBarOptions!.onBugReportClick());
+    expect(root.querySelector('[aria-label="Activity report to attach"]')).toBeNull();
+    await openTab(root, "Bug report");
+    expect(root.querySelector('input[name="title"]')).toBe(title);
+    expect(title.value).toBe("A flight bug");
+    expect(root.querySelector('[aria-label="Activity report to attach"]')).toBe(reportField);
+    const report = await shellCapture.diagnosticsSource!.report();
+    expect(report).toContain("Renderer: webgl2 (asked for webgl2)");
+    expect(report).toContain("GPU: Test GPU, Test renderer, WebGL 2");
+    expect(report).toContain("Aircraft: cessna-172;");
+    expect(report).toContain("Flight: running; view third; physics fault none.");
+    expect(report).toContain(`JSBSim: @felipegalind0/jsbsim 1.2.4-fork.20; native ${"a".repeat(40)}; SDK ${"a".repeat(40)}.`);
+    expect(report).toContain("report-check: Flaps changed");
+    expect(report).not.toContain("private-detail");
+    expect(report).not.toContain("44.123456");
+    expect(report).not.toContain("private-asset-key");
+    expect(report).toContain("osfs.start.resume");
+    expect(report).toContain("osfs.start.latitude = omitted from public reports");
+  } finally { await act(async () => app.destroy()); }
+  expect(disposeDiagnostics).toHaveBeenCalledOnce();
+  expect(mocks.stopDeviceLost).toHaveBeenCalledOnce();
+  expect(mocks.stopDeviceRestored).toHaveBeenCalledOnce();
+  const steps = diagnostics.trail.steps().length;
+  flightLog.info("report-check", "After teardown");
+  expect(diagnostics.trail.steps()).toHaveLength(steps);
+});
 
 it("logs automatic map detail changes with their frame-time reason and disconnects on teardown", async () => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
@@ -323,7 +388,7 @@ it("defaults to passive impacts and applies the persistent arcade override to bo
   } finally { await act(async () => app.destroy()); }
 });
 
-it("keeps autopilot configuration on the Autopilot tab, and only presets and the saved record in Settings", async () => {
+it("keeps autopilot configuration on the Autopilot tab, and shared preferences and diagnostics in Settings", async () => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
   vi.stubGlobal("localStorage", { getItem: () => null, setItem: vi.fn() });
   Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
@@ -341,12 +406,14 @@ it("keeps autopilot configuration on the Autopilot tab, and only presets and the
 
     const sectionTitles = () => [...root.querySelectorAll(".foss-earth-panel-section__title")].map(title => title.textContent);
     await openTab(root, "Settings");
-    expect(sectionTitles()).toEqual(["Presets", "Saved settings"]);
+    expect(sectionTitles()).toEqual(["Presets", "Saved settings", "Diagnostics"]);
     // The flight's presets are listed beside FOSS Earth's.
     expect(root.querySelector('[data-preset="osfs-low-and-slow"]')).not.toBeNull();
     expect(root.querySelector('[data-preset="sharpest"]')).not.toBeNull();
     await openTab(root, "Interface");
-    expect(sectionTitles()).toEqual(["position", "log", "search"].map(section => getAppSettings().getSectionTitle("interface", section)));
+    expect(sectionTitles()).toEqual(["toolbar", "position", "log", "search"].map(section => getAppSettings().getSectionTitle("interface", section)));
+    expect(root.querySelector('[data-parameter="interface.toolbar.bugReport"]')).not.toBeNull();
+    expect(root.querySelector('[data-parameter="interface.toolbar.renderer"]')).toBeNull();
     // The HUD bar's altitude replaces the feet tape, so it starts in feet.
     expect(getAppSettings().get("interface.position.altitudeUnit")).toBe("ft");
     expect(root.querySelector('[data-parameter="interface.log.maxLines"]')).not.toBeNull();
@@ -646,19 +713,20 @@ it("stages all Vision Jet generations and applies a complete package once", asyn
     await changeSelect(t.root, lodSelector, "hd");
     await act(async () => selectionControl<HTMLButtonElement>(t.root, applySelector).click());
     // One write of the whole choice, before the reload that activates it.
-    expect(t.setItem).toHaveBeenCalledOnce();
+    expect(t.setItem.mock.calls.filter(([key]) => key === SETTINGS_STORAGE_KEY)).toHaveLength(1);
     expect(savedSettings(t.storage)).toMatchObject({
       "osfs.aircraft.id": "cirrus-vision-jet-g2", "osfs.aircraft.generation": "g2+",
       "osfs.aircraft.lod": "hd",
     });
     expect(t.reload).toHaveBeenCalledOnce();
-    expect(t.setItem.mock.invocationCallOrder.at(-1)).toBeLessThan(t.reload.mock.invocationCallOrder[0]);
+    const settingsWrite = t.setItem.mock.calls.findIndex(([key]) => key === SETTINGS_STORAGE_KEY);
+    expect(t.setItem.mock.invocationCallOrder[settingsWrite]).toBeLessThan(t.reload.mock.invocationCallOrder[0]);
     expect(mocks.aircraftModel.setAircraft).not.toHaveBeenCalled();
     expect(mocks.aircraftModel.setLod).not.toHaveBeenCalled();
     expect(createJsbsimRuntime).toHaveBeenCalledTimes(1);
     await act(async () => selectionControl<HTMLButtonElement>(t.root, applySelector).click());
     expect(t.reload).toHaveBeenCalledOnce();
-    expect(t.setItem).toHaveBeenCalledOnce();
+    expect(t.setItem.mock.calls.filter(([key]) => key === SETTINGS_STORAGE_KEY)).toHaveLength(1);
   } finally { await act(async () => t.app.destroy()); }
 });
 
@@ -700,14 +768,14 @@ it("takes back an aircraft choice that could not be saved, and does not reload",
   try {
     await act(async () => selectionControl<HTMLInputElement>(t.root, 'input[name="flight-aircraft"][value="cirrus-vision-jet"]').click());
     await changeSelect(t.root, generationSelector, "g2+");
-    const beforeApply = [...t.storage.entries()];
+    const beforeApply = t.storage.get(SETTINGS_STORAGE_KEY);
     t.setItem.mockImplementation((key: string, value: string) => {
       if (key === SETTINGS_STORAGE_KEY) throw new Error("storage unavailable");
       t.storage.set(key, value);
     });
     await act(async () => selectionControl<HTMLButtonElement>(t.root, applySelector).click());
     expect(t.root.querySelector('[role="alert"]')?.textContent).toContain("Could not save your aircraft choice");
-    expect([...t.storage.entries()]).toEqual(beforeApply);
+    expect(t.storage.get(SETTINGS_STORAGE_KEY)).toBe(beforeApply);
     expect(getAppSettings().get("osfs.aircraft.id")).toBe("cessna-172");
     expect(getAppSettings().get("osfs.aircraft.lod")).toBe("lod2");
     expect(t.reload).not.toHaveBeenCalled();

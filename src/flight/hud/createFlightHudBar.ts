@@ -2,9 +2,9 @@ import type { HudInputMode, InputSensitivitySettings } from "foss-earth/input";
 import "foss-earth/shell.css";
 import "foss-earth/input-mode.css";
 
-import { attachFullscreenButton, attachRendererActivity, createInputModeHud, createHudBar, createMapSourceHud, createPositionReadout, getRendererLabel, surfaceHeightDatum, type HudBarHandle, type MapDetailController, type RenderActivitySource, type TileStreamingSource, type MapDownloadSource } from "foss-earth/shell";
+import { attachFullscreenButton, attachRendererActivity, createInputModeHud, createHudBar, createMapSourceHud, createPositionReadout, fitHudBar, getRendererLabel, surfaceHeightDatum, type HudBarFitItem, type HudBarHandle, type MapDetailController, type RenderActivitySource, type TileStreamingSource, type MapDownloadSource } from "foss-earth/shell";
 import type { BabylonRuntimeStatus, RendererMode } from "foss-earth/runtime";
-import { getAppSettings } from "foss-earth/settings";
+import { getAppSettings, TOOLBAR_EDIT_PRIORITIES_ID, TOOLBAR_PRIORITIES, toolbarPriorityParameterId, type ToolbarItemId } from "foss-earth/settings";
 import { headingDegFromRad, type FlightState } from "../physics/flightState";
 import { LOADING_LIVE_ATTRIBUTE } from "../../loading/createFlightLoadingScreen";
 
@@ -18,6 +18,8 @@ export interface FlightHudBarOptions {
   /** The shared detail controller behind the rail beside the basemap and the Map tab's Detail group. */
   mapDetail: MapDetailController;
   onSettingsClick(): void;
+  /** Toggles the shared Bug report tab. */
+  onBugReportClick(): void;
   /** The FPS chip toggles the Debug tab. */
   onDebugClick(): void;
   /** The input-method button toggles the Controls tab, the settings' one home. */
@@ -53,6 +55,7 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
       { kind: "button", id: "flightSettingsButton", title: "Open flight settings", ariaLabel: "Open flight settings", className: "settings-button", text: "⚙" },
       { kind: "button", id: "flightFullscreenButton", title: "Enter fullscreen", ariaLabel: "Enter fullscreen", className: "flight-fullscreen-button", text: "⛶" },
       { kind: "button", id: "flightLogButton", title: "Show the game log history", ariaLabel: "Show the game log history", className: "flight-log-button", text: "☰" },
+      { kind: "button", id: "flightBugReportButton", title: "Show or hide Bug report", ariaLabel: "Show or hide Bug report", text: "🐞" },
       { kind: "button", id: "flightShellStatus", appearance: "chip", className: "hud-chip-button hud-status-text", ariaLive: "polite", ariaLabel: "Aircraft position", title: "Latitude, longitude, altitude and heading. Click to show or hide the Location tab." },
       { kind: "slot", id: "flightMapSourceSlot", className: "map-source-hud-slot" },
     ],
@@ -64,7 +67,8 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
   const mapSourceSlot = hudBar.getElement("flightMapSourceSlot");
   const settingsButton = hudBar.getElement<HTMLButtonElement>("flightSettingsButton");
   const statusElement = hudBar.getElement<HTMLButtonElement>("flightShellStatus");
-  if (!pauseButton || !fpsButton || !rendererButton || !mapSourceSlot || !settingsButton || !statusElement) {
+  const bugReportButton = hudBar.getElement<HTMLButtonElement>("flightBugReportButton");
+  if (!pauseButton || !fpsButton || !rendererButton || !mapSourceSlot || !settingsButton || !statusElement || !bugReportButton) {
     hudBar.destroy();
     throw new Error("Flight HUD bar failed to mount.");
   }
@@ -126,7 +130,42 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
   statusElement.addEventListener("click", options.onStatusClick);
   settingsButton.addEventListener("click", options.onSettingsClick);
   fpsButton.addEventListener("click", options.onDebugClick);
+  bugReportButton.addEventListener("click", options.onBugReportClick);
   mapSource.update(options.runtimeStatus);
+
+  const settings = getAppSettings();
+  const visibilityId = "interface.toolbar.bugReport";
+  const priorityId = toolbarPriorityParameterId("bugReport");
+  const defaultPriority = (item: ToolbarItemId): number => TOOLBAR_PRIORITIES.find(([id]) => id === item)![2];
+  const applyBugVisibility = (): void => {
+    bugReportButton.toggleAttribute("data-hud-choice-hidden", settings.get(visibilityId) === "off");
+  };
+  applyBugVisibility();
+  const fit = fitHudBar(hudBar.element, mapSourceSlot, () => {
+    const existing: HudBarFitItem[] = [
+      { element: pauseButton, priority: defaultPriority("north"), keepVisible: true, essential: true },
+      { element: fpsButton, priority: defaultPriority("fps"), keepVisible: true },
+      { element: rendererButton, priority: defaultPriority("renderer"), keepVisible: true },
+      { element: settingsButton, priority: defaultPriority("settings"), keepVisible: true },
+      { element: statusElement, priority: defaultPriority("position"), keepVisible: true },
+    ];
+    const input = hudBar.element.querySelector<HTMLElement>(".input-mode-control");
+    if (input) existing.push({ element: input, priority: defaultPriority("inputMode"), keepVisible: true });
+    if (fullscreenButton) existing.push({ element: fullscreenButton, priority: defaultPriority("fullscreen"), keepVisible: true });
+    if (logButton) existing.push({ element: logButton, priority: defaultPriority("settings"), keepVisible: true });
+    const visibility = settings.get(visibilityId);
+    if (visibility !== "off") existing.push({
+      element: bugReportButton,
+      priority: settings.get(TOOLBAR_EDIT_PRIORITIES_ID) === true ? settings.get<number>(priorityId) : defaultPriority("bugReport"),
+      keepVisible: visibility === "on",
+    });
+    return existing;
+  });
+  const stopWatchingToolbar = settings.subscribe(changed => {
+    if (![visibilityId, priorityId, TOOLBAR_EDIT_PRIORITIES_ID].some(id => changed.has(id))) return;
+    applyBugVisibility();
+    fit.update();
+  });
 
   return {
     mountInputMethod: (host) => inputHud.mountInline(host),
@@ -142,6 +181,8 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
       });
     },
     destroy(): void {
+      stopWatchingToolbar();
+      fit.destroy();
       logButton?.removeEventListener("click", onLogClick);
       detachFullscreen();
       pauseButton.removeEventListener("click", onPauseClick);
@@ -149,6 +190,7 @@ export function createFlightHudBar(container: HTMLElement, options: FlightHudBar
       statusElement.removeEventListener("click", options.onStatusClick);
       settingsButton.removeEventListener("click", options.onSettingsClick);
       fpsButton.removeEventListener("click", options.onDebugClick);
+      bugReportButton.removeEventListener("click", options.onBugReportClick);
       mapSource.destroy();
       detachRendererActivity();
       position.destroy();

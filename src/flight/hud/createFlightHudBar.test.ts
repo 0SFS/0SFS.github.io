@@ -37,6 +37,7 @@ function createTestHud(overrides: Partial<FlightHudBarOptions> = {}) {
     onPausedChange: vi.fn(),
     mapDetail: createMapDetailController({ storage: null }),
     onSettingsClick: vi.fn(), onDebugClick: vi.fn(), onInputMethodClick: vi.fn(),
+    onBugReportClick: vi.fn(),
     onRendererClick: vi.fn(), onMapClick: vi.fn(), onStatusClick: vi.fn(),
     onInputModeChange: vi.fn(), onInputSensitivityChange: vi.fn(),
     ...overrides,
@@ -114,6 +115,7 @@ describe("flight input method selector", () => {
       onPausedChange: vi.fn(),
       mapDetail,
       onSettingsClick,
+      onBugReportClick: vi.fn(),
       onDebugClick,
       onInputMethodClick,
       onRendererClick,
@@ -224,6 +226,62 @@ describe("flight input method selector", () => {
     expect(mapChip.classList.contains("is-streaming")).toBe(false);
     expect(unsubscribe).toHaveBeenCalledOnce();
     expect(container.children).toHaveLength(0);
+  });
+});
+
+describe("flight bug-report shortcut", () => {
+  it("uses measured room beside the map credit, honors its toolbar choices, and disconnects on teardown", () => {
+    let barWidth = 800;
+    let creditWidth = 120;
+    const frames: FrameRequestCallback[] = [];
+    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => { frames.push(callback); return frames.length; });
+    vi.stubGlobal("cancelAnimationFrame", vi.fn());
+    vi.stubGlobal("ResizeObserver", class {
+      observe = vi.fn(); unobserve = vi.fn(); disconnect = vi.fn();
+    });
+    const rect = (width: number): DOMRect => ({ width, height: 28, top: 0, left: 0, right: width, bottom: 28, x: 0, y: 0, toJSON() {} });
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
+      if (this.classList.contains("hud-bar")) return rect(barWidth);
+      if (this.id === "flightMapSourceSlot") return rect(Math.min(creditWidth, Number.parseFloat(this.style.maxWidth) || creditWidth));
+      return rect(this.id === "flightShellStatus" ? 140 : 40);
+    });
+    const flush = (): void => { for (const callback of frames.splice(0)) callback(0); };
+    const resize = (): void => { window.dispatchEvent(new Event("resize")); flush(); };
+    const onBugReportClick = vi.fn();
+    const { container, hud } = createTestHud({ onBugReportClick, onLogToggle: () => false });
+    const button = container.querySelector<HTMLButtonElement>("#flightBugReportButton")!;
+    const pause = container.querySelector<HTMLButtonElement>("#flightPauseButton")!;
+    const settingsButton = container.querySelector<HTMLButtonElement>("#flightSettingsButton")!;
+    const settings = getAppSettings();
+    expect(settings.get("interface.toolbar.bugReport")).toBe("auto");
+    expect(button.hasAttribute("data-hud-overflow-hidden")).toBe(false);
+    button.click();
+    expect(onBugReportClick).toHaveBeenCalledOnce();
+
+    barWidth = 400; resize();
+    expect(button.hasAttribute("data-hud-overflow-hidden")).toBe(true);
+    expect(pause.hasAttribute("data-hud-overflow-hidden")).toBe(false);
+    barWidth = 800; resize();
+    expect(button.hasAttribute("data-hud-overflow-hidden")).toBe(false);
+    // A long credit consumes room at the same viewport width.
+    creditWidth = 500; resize();
+    expect(button.hasAttribute("data-hud-overflow-hidden")).toBe(true);
+
+    settings.set("interface.toolbar.bugReport", "on"); flush();
+    expect(button.hasAttribute("data-hud-overflow-hidden")).toBe(false);
+    settings.set("interface.toolbar.bugReport", "off"); flush();
+    expect(button.hasAttribute("data-hud-choice-hidden")).toBe(true);
+    creditWidth = 120;
+    settings.setMany({ "interface.toolbar.bugReport": "auto", "interface.toolbar.editPriorities": true, "interface.toolbar.priority.bugReport": 1 }); flush();
+    expect(button.hasAttribute("data-hud-choice-hidden")).toBe(false);
+    expect(Number(button.style.order)).toBeLessThan(Number(settingsButton.style.order));
+    settings.set("interface.toolbar.editPriorities", false); flush();
+    expect(Number(button.style.order)).toBeGreaterThan(Number(settingsButton.style.order));
+
+    hud.destroy();
+    button.click();
+    expect(onBugReportClick).toHaveBeenCalledOnce();
+    expect(container.childElementCount).toBe(0);
   });
 });
 

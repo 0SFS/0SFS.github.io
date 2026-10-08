@@ -2,8 +2,15 @@ import "foss-earth/shell.css";
 import { Vector3, type WebGPUEngine } from "@babylonjs/core";
 import { bindFrameProfileSettings, FRAME_PROFILING_IDS } from "foss-earth/perf";
 import { setActiveFrameProfile } from "./diagnostics/frameProfile";
-import { getAppSettings } from "foss-earth/settings";
-import { createMeshInspector } from "foss-earth/diagnostics";
+import { getAppSettings, TOOLBAR_EDIT_PRIORITIES_ID } from "foss-earth/settings";
+import {
+  createMeshInspector,
+  getAppIdentity,
+  issueReporterFromBuild,
+  reportSecrets,
+  startAppDiagnostics,
+  type AppDiagnostics,
+} from "foss-earth/diagnostics";
 import { describeAttitudeRendererStatus } from "./hud/attitudeRenderer";
 import { AIRCRAFT_FOCUS_POINT, registerFlightSettings } from "./settings/registerFlightSettings";
 import { flightParameterSpec, type FlightParameterStore } from "./settings/flightParameters";
@@ -179,6 +186,8 @@ import {
   connectMapDetailLog,
   connectMapDetailRuntime,
   createAboutPanel,
+  createBugReportPanel,
+  createDiagnosticsSection,
   createGameLog,
   createMapDetailController,
   createMapSourcePanel,
@@ -199,6 +208,8 @@ export interface FlightSimAppOptions {
   loadingScreen?: FlightLoadingScreen;
   /** Shared with the page's first-paint log; created here when absent. */
   log?: GameLog;
+  /** Captures loading before the flight module starts; reused rather than started again. */
+  diagnostics?: AppDiagnostics;
   googleApiKey?: string | null;
   baseMap?: string | RasterBaseMapSource | null;
   preferGoogleTiles?: boolean;
@@ -267,14 +278,28 @@ export async function createFlightSimApp(
   rootElement: HTMLElement,
   options: FlightSimAppOptions = {},
 ): Promise<FlightSimAppHandle> {
-  const log = options.log ?? createGameLog();
   // One registry for the page: FOSS Earth's parameters and the flight's.
   const settings = getAppSettings();
   const parameters = registerFlightSettings(settings);
+  const diagnostics = options.diagnostics ?? startAppDiagnostics({
+    log: options.log ?? createGameLog(), settings, identity: getAppIdentity(),
+  });
+  const log = diagnostics.log;
   const engineTest = isEngineTestStandRequested(window.location.search);
   const engineInitialState = engineTestStandInitialState(window.location.search);
   const benchBootstrap = engineTest ? engineTestStandBootstrapOptions(engineInitialState) : null;
   const stopWatching: (() => void)[] = [];
+  // The physics log is structured and has its own UI. Only its message joins
+  // the visit's trail; property snapshots and coordinates stay out of it.
+  let lastFlightEventId = flightLog.entries()[0]?.id ?? 0;
+  stopWatching.push(flightLog.subscribe(entries => {
+    for (const entry of entries.filter(entry => entry.id > lastFlightEventId).reverse()) {
+      const text = `${entry.source}: ${entry.message}`;
+      if (entry.level === "info") diagnostics.trail.step(text);
+      else diagnostics.trail.trouble(text);
+      lastFlightEventId = entry.id;
+    }
+  }));
   const startLocation = () => ({ latDeg: parameters.get("osfs.start.latitude"), lonDeg: parameters.get("osfs.start.longitude") });
   const startHeightMeters = parameters.get("osfs.start.heightAboveGround");
   const loading = options.loadingScreen ?? createFlightLoadingScreen(log);
@@ -394,6 +419,7 @@ export async function createFlightSimApp(
   }).then(runtime => {
     if (bootstrapFailed) { runtime.destroy(); throw new Error("Startup cancelled."); }
     bootResources.runtime = runtime;
+    diagnostics.attachRuntime(runtime);
     // The controller is the one writer of the renderer's detail target. The
     // flight's old World detail is imported into it once.
     mapDetail = createMapDetailController({ googleRecommendation: "device-hints" });
@@ -484,6 +510,8 @@ export async function createFlightSimApp(
     bootResources.runtime?.destroy();
     bootResources.jsbsim?.dispose();
     loading.fail("Flight could not load. Check your connection and try again.");
+    for (const stop of stopWatching.splice(0)) stop();
+    if (!options.diagnostics) diagnostics.destroy();
     throw error;
   }
   if (runtime.geospatialCamera) {
@@ -1979,17 +2007,43 @@ export async function createFlightSimApp(
   // flight's, so they stay out.
   const presetsSection = createPresetsSection(settings);
   const savedSettingsSection = createSavedSettingsSection(settings);
+  diagnostics.addState(() => `Aircraft: ${aircraftId}; generation ${aircraftGenerationId ?? "default"}; LOD ${aircraftLodId}; model ${modelState.status}; active LOD ${modelState.activeLodId ?? "none"}; ${modelState.triangles} triangles.`);
+  diagnostics.addState(() => `Flight: ${worldLoading ? "loading" : inputManager.isPaused() ? "paused" : "running"}; view ${aircraft?.getViewMode() ?? "third"}; physics fault ${physicsLoop.getFault() ?? "none"}.`);
+  diagnostics.addState(() => {
+    const build = jsbsim.identity?.build;
+    return build ? `JSBSim: ${build.package.name} ${build.package.version}; native ${build.native.commit}${build.native.dirty ? "-dirty" : ""}; SDK ${build.sdk.commit}${build.sdk.dirty ? "-dirty" : ""}.` : "JSBSim: build identity unavailable.";
+  });
+  const diagnosticsSource = {
+    report: () => diagnostics.report({ allSettings: true }),
+    previous: () => diagnostics.previous(),
+    reportSecrets: () => reportSecrets(settings),
+  };
+  const diagnosticsSection = createDiagnosticsSection(diagnosticsSource);
+  const bugReportPanel = createBugReportPanel(diagnosticsSource, { issueReporter: issueReporterFromBuild() });
+  const diagnosticsParameters = createParameterSection(settings, { tab: "settings", section: "diagnostics", footer: diagnosticsSection.element });
   const interfaceParameterSections = (["position", "log", "search"] as const)
     .map(section => ({ section, handle: createParameterSection(settings, { tab: "interface", section }) }));
+  // The flight retains its existing controls. The bug shortcut alone follows
+  // the shared Auto fit choice, with its priority in the same Toolbar home.
+  const toolbarParameters = createParameterSection(settings, {
+    tab: "interface", section: "toolbar", showAll: false,
+    covers: settings.list({ tab: "interface", section: "toolbar" })
+      .filter(spec => spec.id !== "interface.toolbar.bugReport" && spec.id !== TOOLBAR_EDIT_PRIORITIES_ID)
+      .map(spec => spec.id),
+  });
   const settingsSections: PanelSection[] = [
     { id: "presets", title: "Presets", element: presetsSection.element },
     { id: "saved-settings", title: "Saved settings", element: savedSettingsSection.element },
+    { id: "diagnostics", title: settings.getSectionTitle("settings", "diagnostics"), element: diagnosticsParameters.element, defaultOpen: false },
   ];
   // Which version runs, and everything it is built from, read from the page itself.
   const about = createAboutPanel({ site: __REPOSITORY_SLUG__ || undefined });
-  const interfaceSections: PanelSection[] = interfaceParameterSections.map(({ section, handle }) => ({
-    id: section, title: settings.getSectionTitle("interface", section), element: handle.element,
-  }));
+  const interfaceSections: PanelSection[] = [
+    { id: "toolbar", title: settings.getSectionTitle("interface", "toolbar"), element: toolbarParameters.element },
+    ...interfaceParameterSections.map(({ section, handle }) => ({
+      id: section, title: settings.getSectionTitle("interface", section), element: handle.element,
+    })),
+  ];
   controlPanel = createFlightControlPanel(panelRoot, createPanelSnapshot(), {
     settings,
     parameters,
@@ -1998,6 +2052,8 @@ export async function createFlightSimApp(
     rendererTab: rendererPanel.element,
     settingsSections,
     aboutTab: about.element,
+    bugReportTab: bugReportPanel.element,
+    onBugReportShow: () => bugReportPanel.show(),
     interfaceSections,
     initialWeather: weather,
     gamepadBindings,
@@ -2119,6 +2175,7 @@ export async function createFlightSimApp(
     onPausedChange: setSimulationPaused,
     mapDetail: mapDetail!,
     onSettingsClick: () => panelRoot.querySelector<HTMLButtonElement>('[aria-label="Open right panel"]')?.click(),
+    onBugReportClick: () => controlPanel?.toggleTab("bug-report"),
     onDebugClick: () => controlPanel?.toggleTab("debug"),
     onInputMethodClick: () => controlPanel?.toggleTab("controls"),
     onRendererClick: () => controlPanel?.toggleTab("renderer"),
@@ -2557,8 +2614,13 @@ export async function createFlightSimApp(
       controlPanel?.destroy();
       presetsSection.destroy();
       savedSettingsSection.destroy();
+      diagnosticsParameters.destroy();
+      diagnosticsSection.destroy();
+      bugReportPanel.destroy();
+      diagnostics.destroy();
       about.dispose();
       for (const { handle } of interfaceParameterSections) handle.destroy();
+      toolbarParameters.destroy();
       mapPanel.destroy();
       detailRequirements?.releaseAll();
       disconnectMapDetail();

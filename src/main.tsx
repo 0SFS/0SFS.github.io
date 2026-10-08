@@ -1,5 +1,7 @@
 import "foss-earth/shell.css";
 import { createGameLog, trackViewportInsets, type GameLog } from "foss-earth/shell";
+import { getAppIdentity, showReportOnly, startAppDiagnostics, wantsReportOnly, type AppDiagnostics } from "foss-earth/diagnostics";
+import { getAppSettings } from "foss-earth/settings";
 import { appRouteFrom, canonicalAppLocation, FOSS_EARTH_URL, type AppRoute } from "./appRoute";
 import { offerFullscreen } from "./fullscreen/fullscreen";
 import { createFlightLoadingScreen, type FlightLoadingScreen } from "./loading/createFlightLoadingScreen";
@@ -27,7 +29,7 @@ function clearBootShell(): void {
   document.getElementById("info-first-paint")?.remove();
 }
 
-async function bootApp(rootElement: HTMLElement, loading: FlightLoadingScreen | null, log: GameLog | null): Promise<void> {
+async function bootApp(rootElement: HTMLElement, loading: FlightLoadingScreen | null, log: GameLog | null, diagnostics: AppDiagnostics | null): Promise<void> {
   const route = appRoute();
 
   if (route === "remote") {
@@ -40,7 +42,7 @@ async function bootApp(rootElement: HTMLElement, loading: FlightLoadingScreen | 
   if (route === "flight") {
     const { createFlightSimApp } = await import("./flight/createFlightSimApp");
     loading?.setPhase("app", { state: "ready" });
-    await createFlightSimApp(rootElement, { loadingScreen: loading ?? undefined, log: log ?? undefined });
+    await createFlightSimApp(rootElement, { loadingScreen: loading ?? undefined, log: log ?? undefined, diagnostics: diagnostics ?? undefined });
     document.getElementById("info-first-paint")?.remove();
     return;
   }
@@ -67,17 +69,30 @@ canonicalizeLocation();
 // (Firefox Android's URL bar, Chrome's dynamic toolbar).
 trackViewportInsets();
 
-const log = isFlightMode() ? createGameLog() : null;
-const loading = log ? createFlightLoadingScreen(log) : null;
-loading?.setPhase("app", { state: "loading", detail: "Downloading application code" });
-if (log) offerFullscreen(log);
-
-void bootApp(rootElement, loading, log).catch((error: unknown) => {
-  console.error("Failed to bootstrap application.", error);
-  if (loading) {
-    loading.fail("The application could not initialize. Check your connection and reload to try again.");
+function startPage(rootElement: HTMLElement): void {
+  if (isFlightMode() && wantsReportOnly(window.location.search)) {
+    clearBootShell();
+    showReportOnly(rootElement, { settings: getAppSettings(), identity: getAppIdentity() });
     return;
   }
-  clearBootShell();
-  rootElement.innerHTML = '<div class="boot-error">Failed to initialize the application.</div>';
-});
+  const diagnostics = isFlightMode() ? startAppDiagnostics({
+    log: createGameLog(), settings: getAppSettings(), identity: getAppIdentity(),
+  }) : null;
+  const log = diagnostics?.log ?? null;
+  const loading = log ? createFlightLoadingScreen(log) : null;
+  loading?.setPhase("app", { state: "loading", detail: "Downloading application code" });
+  if (log) offerFullscreen(log);
+
+  void bootApp(rootElement, loading, log, diagnostics).catch((error: unknown) => {
+    console.error("Failed to bootstrap application.", error);
+    if (loading) {
+      loading.fail("The application could not initialize. Check your connection and reload to try again.");
+      diagnostics?.destroy();
+      return;
+    }
+    clearBootShell();
+    rootElement.innerHTML = '<div class="boot-error">Failed to initialize the application.</div>';
+  });
+}
+
+startPage(rootElement);

@@ -10,6 +10,7 @@ const mocks = vi.hoisted(() => {
     wheelStates: [] as WheelSpinState[],
     runtime: {
       renderer: { mode: "webgl2" }, status: { mode: "fallback" }, scene: {},
+      onDeviceLost: vi.fn(() => () => {}), onDeviceRestored: vi.fn(() => () => {}),
       engine: { getFps: () => 60 }, geospatialCamera: null,
       prepareTerrain: vi.fn(async (request: { altitudeMeters?: number }) => ({ groundHeightMeters: 250, altitudeMeters: request.altitudeMeters ?? 1774 })),
       surface: { sample: vi.fn(() => null) },
