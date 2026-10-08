@@ -1,9 +1,8 @@
 /**
- * Experimental A/B settings for how the phone's camera trackpad reaches the
- * view. Every default is the behaviour that shipped before these existed, so
- * nothing changes until a pilot picks something else. The investigation behind
- * each option, with the delay it costs, is `docs/phone-controller.md`
- * → *Camera trackpad tuning*.
+ * How the phone's camera trackpad reaches the view. The defaults are the
+ * Phone camera: recommended preset, which trades the playout buffer's delay
+ * for smooth movement; drawing on arrival is the opt-in for the lowest delay.
+ * Each option and what it costs: `docs/phone-controller.md` → *Camera trackpad*.
  */
 import {
   flightParameterDefaults,

@@ -1,0 +1,32 @@
+[  1%] Built target GeographicLib
+[  5%] Built target Init
+[ 16%] Built target Math
+[ 49%] Built target Models
+[ 50%] Built target InputOutput
+[ 56%] Built target Atmosphere
+[ 56%] Built target Magvar
+[ 56%] Built target Properties
+[ 72%] Built target Propulsion
+[ 87%] Built target FlightControl
+[ 92%] Built target Misc
+[ 92%] Built target Xml
+[ 94%] Built target IOStreams
+[ 98%] Built target libJSBSim
+[100%] Linking CXX executable JSBSim
+[100%] Built target JSBSim
+[  1%] Built target GeographicLib
+[  5%] Built target Init
+[ 16%] Built target Math
+[ 32%] Built target InputOutput
+[ 50%] Built target Models
+[ 55%] Built target Atmosphere
+[ 55%] Built target Properties
+[ 55%] Built target Magvar
+[ 71%] Built target Propulsion
+[ 73%] Built target Misc
+[ 87%] Built target FlightControl
+[ 91%] Built target Xml
+[ 92%] Built target IOStreams
+[ 96%] Built target libJSBSim
+[ 98%] Linking CXX executable FGTurbineTemperatureTest1
+[100%] Built target FGTurbineTemperatureTest1

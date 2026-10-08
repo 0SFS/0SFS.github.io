@@ -4,9 +4,13 @@ Every pull request we have open against a project we do not own, what each one
 is waiting on, and the replies we owe. Six are open on `JSBSim-Team/jsbsim`.
 
 Live PR comments, reviews, review threads, heads and check runs were refreshed
-on **2026-09-26**, including the turbine discussion that day and discussions
-#984/#1501. All six published heads are unchanged from the previous snapshot.
-This refresh assessed review status; it did not run tests or requalify the code.
+on **2026-10-07**. All six published heads, review decisions and unresolved
+thread counts are unchanged from the September 26 snapshot; no newer human
+review activity was found on these PRs. Comments, reviews and thread pagination
+were checked complete. The [retained status snapshot](../validation/evidence/jsbsim/open-pr-review-2026-10-07/status.json)
+contains metadata only. This refresh did not run tests, requalify the code,
+post replies or change published branches. Discussions #984/#1501 were last
+refreshed on September 26.
 
 This is the living tracker. The
 [2026-09-14 review](validation/jsbsim-open-pr-review-2026-09-14.md) remains the

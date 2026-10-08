@@ -2,7 +2,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { FlightAudioStatus } from "../audio/createFlightAudio";
 import type { FlightRecorderPropertyReader } from "../diagnostics/flightRecorder";
-import { flightParameterDefaults } from "../settings/flightParameters";
+import { createParameterControl } from "foss-earth/shell";
+import { createSettingsRegistry } from "foss-earth/settings";
+import { flightParameterDefaults, OSFS_PARAMETERS } from "../settings/flightParameters";
 import { closestUprightRingAngle, createEngineMonitor, type EngineMonitorOptions } from "./engineMonitor";
 import { createEngineSummary, engineRotorSpeeds, type EngineSummaryView } from "./engineSummary";
 import { createEngineSpoolRenderer } from "./engineSpoolRenderer";
@@ -70,6 +72,7 @@ describe("engine monitor", () => {
   let root: HTMLElement;
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(document, "hidden", "get").mockReturnValue(false);
     orbRenderer.getMotionStatus.mockReturnValue({ fps: null, maxTurnsPerSecond: null, limited: false });
   });
   afterEach(() => { root?.remove(); vi.unstubAllGlobals(); vi.restoreAllMocks(); });
@@ -104,6 +107,10 @@ describe("engine monitor", () => {
   };
   const showDetails = (monitor: ReturnType<typeof createEngineMonitor>) => monitor.attachDetails(root);
   const text = (selector: string) => root.querySelector(selector)?.textContent?.trim();
+  const help = (label: string) => {
+    const button = root.querySelector<HTMLButtonElement>(`button[aria-label="${label}"]`)!;
+    return { button, content: document.getElementById(button.getAttribute("aria-controls")!)! };
+  };
   const rows = () => Object.fromEntries([...root.querySelectorAll(".flight-engine__pair")]
     .map((pair) => [
       pair.querySelector(".flight-engine__label")?.textContent,
@@ -127,9 +134,9 @@ describe("engine monitor", () => {
     expect(root.querySelector(".flight-engine__plots")).toBeNull();
     const detach = showDetails(monitor);
     const plot = root.querySelector<HTMLElement>(`[data-property="${metal}"]`)!;
-    const path = plot.querySelector("path")!;
-    expect(plot.querySelector("figcaption")?.textContent).toBe("Engine 1 · Nozzle metal temperature (°C)");
-    expect(plot.querySelector(".flight-engine__plot-range")?.textContent).toContain("Latest 727 °C");
+    const path = plot.closest("figure")!.querySelector("path")!;
+    expect(plot.closest("figure")?.querySelector("figcaption")?.textContent).toBe("Engine 1 · Nozzle metal temperature");
+    expect(plot.querySelector(".flight-engine__value")?.textContent).toBe("727 °C");
     expect(root.querySelector(`[data-property="${gas}"]`)?.textContent).toContain("1527 °C");
     expect(root.querySelector('[data-property="propulsion/engine/nozzle-pos-norm"]')?.textContent).toContain("30.0 %");
     const initialPath = path.getAttribute("d");
@@ -140,7 +147,7 @@ describe("engine monitor", () => {
     expect(path.getAttribute("d")).toBe(initialPath);
     showDetails(monitor);
     expect(path.getAttribute("d")).not.toBe(initialPath);
-    expect(plot.querySelector(".flight-engine__plot-range")?.textContent).toContain("Latest 827 °C");
+    expect(plot.querySelector(".flight-engine__value")?.textContent).toBe("827 °C");
     monitor.destroy();
   });
 
@@ -155,16 +162,18 @@ describe("engine monitor", () => {
     const plots = root.querySelector(".flight-engine__plots")!;
     const observer = new MutationObserver(() => {});
     observer.observe(plots, { subtree: true, attributes: true, childList: true, characterData: true });
+    monitor.update(reader, true);
+    observer.takeRecords(); // Entering hold changes the explicit current-sample label once.
     for (let i = 0; i < 10; i++) monitor.update(reader, true);
     expect(observer.takeRecords()).toEqual([]);
-    expect(root.querySelector('[data-section="history"]')?.textContent).toContain("1 samples");
+    expect(root.querySelector('[data-section="live"]')?.textContent).toContain("1 samples");
     const clear = [...root.querySelectorAll<HTMLButtonElement>("button")].find(button => button.textContent === "Clear history")!;
     clear.click();
-    expect(root.querySelector('[data-section="history"]')?.textContent).toContain("0 samples");
+    expect(root.querySelector('[data-section="live"]')?.textContent).toContain("0 samples");
     for (let i = 0; i < 5; i++) monitor.update(reader, true);
     expect(plots.querySelector("path")?.getAttribute("d")).toBe("");
     parameters.set("osfs.engineMonitor.historyHz", 0);
-    expect(root.querySelector('[data-section="history"]')?.textContent).toContain("History capture is off.");
+    expect(root.querySelector('[data-section="live"]')?.textContent).toContain("Recording off");
     reader.values["simulation/sim-time-sec"] = 20;
     monitor.update(reader, false);
     expect(plots.querySelector("path")?.getAttribute("d")).toBe("");
@@ -179,9 +188,16 @@ describe("engine monitor", () => {
     monitor.update(fakeReader(sf50Values()));
     showDetails(monitor);
     expect(onChange).not.toHaveBeenCalled();
-    const button = root.querySelector<HTMLButtonElement>('[data-section="test-stand"] button')!;
+    const section = root.querySelector('[data-section="test-stand"]')!;
+    const button = [...section.querySelectorAll<HTMLButtonElement>("button")]
+      .find(button => button.textContent === (active ? "Return to flight" : "Open engine test stand"))!;
     expect(button.textContent).toBe(active ? "Return to flight" : "Open engine test stand");
-    expect(root.querySelector('[data-section="test-stand"]')?.textContent).toContain("hold-down prevents aircraft motion");
+    const standHelp = help("Engine test stand help");
+    expect(standHelp.content.hidden).toBe(true);
+    standHelp.button.click();
+    expect(standHelp.content.hidden).toBe(false);
+    expect(standHelp.content.textContent).toContain("hold-down prevents aircraft motion");
+    standHelp.button.click();
     button.click();
     expect(onChange).toHaveBeenCalledExactlyOnceWith(!active);
     monitor.destroy();
@@ -197,19 +213,25 @@ describe("engine monitor", () => {
     monitor.update(fakeReader(sf50Values(), WRITE_ONLY));
     showDetails(monitor);
     const section = root.querySelector('[data-section="test-stand"]')!;
-    expect(section.textContent).toContain("not a cold-start experiment");
+    const standHelp = help("Engine test stand help");
+    expect(standHelp.content.hidden).toBe(true);
+    standHelp.button.click();
+    expect(standHelp.content.textContent).toContain("not a cold-start experiment");
+    standHelp.button.click();
     const select = section.querySelector<HTMLSelectElement>("select")!;
     expect(select.value).toBe("running");
     select.value = "cold";
     select.dispatchEvent(new Event("change"));
     expect(onStart).not.toHaveBeenCalled();
-    const buttons = section.querySelectorAll<HTMLButtonElement>("button");
-    buttons[0].click();
+    const buttons = [...section.querySelectorAll<HTMLButtonElement>("button")];
+    const reinitialize = buttons.find(button => button.textContent === "Reinitialize engine")!;
+    const returnToFlight = buttons.find(button => button.textContent === "Return to flight")!;
+    reinitialize.click();
     expect(onStart).toHaveBeenCalledExactlyOnceWith("cold");
-    buttons[1].click();
+    returnToFlight.click();
     expect(onChange).toHaveBeenCalledExactlyOnceWith(false);
     monitor.destroy();
-    buttons[0].click();
+    reinitialize.click();
     expect(onStart).toHaveBeenCalledTimes(1);
   });
 
@@ -250,13 +272,14 @@ describe("engine monitor", () => {
       "propulsion/engine/fuel-flow-rate-pps": 0,
     }, { ...WRITE_ONLY, "propulsion/engine/egt-degc": "R" });
     monitor.update(reader);
-    const section = root.querySelector('[data-section="temperatures"]');
-    expect(section?.querySelector("summary")?.textContent).toBe("Temperatures and oil");
-    const label = [...section!.querySelectorAll<HTMLElement>(".flight-engine__label")]
-      .find(node => node.textContent === "EGT (exhaust gas)")!;
-    expect(label.title).toContain("propulsion/engine/egt-degc");
-    expect(label.title).toContain("Modeled exhaust-gas temperature");
-    expect(label.title).toContain("not a nozzle-metal or afterburner-exit measurement");
+    const section = root.querySelector('[data-section="live"]');
+    expect(section?.querySelector("summary")?.textContent).toBe("Live data");
+    const exhaustHelp = help("Details for Engine 1 · EGT (exhaust gas)");
+    expect(exhaustHelp.content.hidden).toBe(true);
+    exhaustHelp.button.click();
+    expect(exhaustHelp.content.textContent).toContain("propulsion/engine/egt-degc");
+    expect(exhaustHelp.content.textContent).toContain("Modeled exhaust-gas temperature");
+    expect(exhaustHelp.content.textContent).toContain("not a nozzle-metal or afterburner-exit measurement");
     expect(rows()["EGT (exhaust gas)"]).toBe("720 °C");
     const summary = text(".flight-engine__summary");
     reader.values["propulsion/engine/egt-degc"] = 660.6;
@@ -365,7 +388,11 @@ describe("engine monitor", () => {
       outerBlades: 2, innerBlades: 0,
     }));
     expect(root.querySelector<HTMLElement>(".flight-engine__spools")?.title).toContain("One marker per propeller blade: 2.");
-    expect(root.querySelector(".flight-engine__details")?.textContent).toContain("One marker per propeller blade: 2.");
+    const shaftHelp = help("Shaft indicator help");
+    expect(shaftHelp.content.hidden).toBe(true);
+    shaftHelp.button.click();
+    expect(shaftHelp.content.hidden).toBe(false);
+    expect(shaftHelp.content.textContent).toContain("One marker per propeller blade: 2.");
     monitor.destroy();
   });
 
@@ -375,7 +402,8 @@ describe("engine monitor", () => {
     const rotorBlades = { outer: 28, inner: 40, outerEstimated: false, innerEstimated: true };
     const monitor = mount({ parameters, definition: { kind: "turbine", rotorBlades } });
     showDetails(monitor);
-    monitor.update(fakeReader(sf50Values()));
+    const reader = fakeReader(sf50Values());
+    monitor.update(reader);
     expect(createEngineSpoolRenderer).toHaveBeenCalledWith(expect.any(HTMLElement), expect.objectContaining({
       outerBlades: 28, innerBlades: 40,
     }));
@@ -385,12 +413,15 @@ describe("engine monitor", () => {
     }));
     const description = "One marker per blade: N1 fan row 28; N2 core compressor rotor 40 (estimated).";
     expect(root.querySelector<HTMLElement>(".flight-engine__spools")?.title).toContain(description);
-    expect(root.querySelector(".flight-engine__details")?.textContent).toContain(description);
-    expect(root.querySelector(".flight-engine__details")?.textContent).toContain("Requested maximum: 2.00 rev/s");
+    const shaftHelp = help("Shaft indicator help");
+    expect(shaftHelp.content.hidden).toBe(true);
+    shaftHelp.button.click();
+    expect(shaftHelp.content.textContent).toContain(description);
+    expect(shaftHelp.content.textContent).toContain("Requested maximum: 2.00 rev/s");
     orbRenderer.getMotionStatus.mockReturnValue({ fps: 6, maxTurnsPerSecond: 1.35, limited: true });
-    monitor.update(fakeReader(sf50Values()));
-    expect(root.querySelector(".flight-engine__details")?.textContent).toContain("full-scale display speed 1.35 rev/s");
-    expect(root.querySelector(".flight-engine__details")?.textContent).toContain("Limited to 0.45 pattern pitch per drawn frame");
+    monitor.update(reader);
+    expect(shaftHelp.content.textContent).toContain("full-scale display speed 1.35 rev/s");
+    expect(shaftHelp.content.textContent).toContain("Limited to 0.45 pattern pitch per drawn frame");
     parameters.set("osfs.engineMonitor.orbMaxPatternStep", 0.4);
     expect(orbRenderer.configure).toHaveBeenLastCalledWith(expect.objectContaining({ maxPatternStep: 0.4 }));
     monitor.destroy();
@@ -505,7 +536,7 @@ describe("engine monitor", () => {
     monitor.update(reader);
     showDetails(monitor);
     const observer = new MutationObserver(() => {});
-    observer.observe(root, { subtree: true, childList: true, attributes: true, characterData: true });
+    observer.observe(root.querySelector(".flight-engine__summary")!, { subtree: true, childList: true, attributes: true, characterData: true });
     clock.set(100);
     reader.values["simulation/sim-time-sec"] = 0.1;
     monitor.update(reader);
@@ -654,6 +685,50 @@ describe("engine monitor", () => {
     expect(root.querySelector(".flight-engine__details")).toBeNull();
   });
 
+  it("closes click help when Live data is collapsed or its host detaches", () => {
+    root = document.createElement("div");
+    const monitor = mount();
+    monitor.update(fakeReader(sf50Values(), WRITE_ONLY));
+    let detach = showDetails(monitor);
+    const phaseHelp = help("Engine phase help");
+    phaseHelp.button.click();
+    expect(phaseHelp.content.hidden).toBe(false);
+    const live = root.querySelector<HTMLDetailsElement>('[data-engine-top-section="live"]')!;
+    live.open = false; live.dispatchEvent(new Event("toggle"));
+    expect(phaseHelp.content.hidden).toBe(true);
+    expect(phaseHelp.button.getAttribute("aria-expanded")).toBe("false");
+    live.open = true; live.dispatchEvent(new Event("toggle"));
+    phaseHelp.button.click();
+    expect(phaseHelp.content.hidden).toBe(false);
+    detach();
+    expect(phaseHelp.content.hidden).toBe(true);
+    detach = showDetails(monitor);
+    phaseHelp.button.click();
+    expect(phaseHelp.content.hidden).toBe(false);
+    const id = phaseHelp.content.id;
+    detach(); monitor.destroy();
+    expect(document.getElementById(id)).toBeNull();
+  });
+
+  it("closes a shared setting's help when Settings collapses without a pointer event", () => {
+    root = document.createElement("div");
+    const settings = createSettingsRegistry({ storage: null }); settings.register(OSFS_PARAMETERS);
+    const control = createParameterControl(settings, "osfs.engineMonitor.historyHz");
+    const monitor = mount();
+    monitor.update(fakeReader(sf50Values(), WRITE_ONLY));
+    monitor.attachDetails(root, control.element);
+    const section = root.querySelector<HTMLDetailsElement>('[data-engine-top-section="settings"]')!;
+    section.open = true; section.dispatchEvent(new Event("toggle"));
+    const button = control.element.querySelector<HTMLButtonElement>('button[aria-label="Explain Engine history sampling ceiling"]')!;
+    button.focus(); button.click();
+    const content = document.getElementById(button.getAttribute("aria-controls")!)!;
+    expect(content.hidden).toBe(false);
+    section.open = false; section.dispatchEvent(new Event("toggle"));
+    expect(content.hidden).toBe(true);
+    expect(button.getAttribute("aria-expanded")).toBe("false");
+    monitor.destroy(); control.destroy();
+  });
+
   it("shows the curated rows the model publishes, and lists every readable property", () => {
     root = document.createElement("div");
     const values = sf50Values();
@@ -674,9 +749,10 @@ describe("engine monitor", () => {
     expect(root.querySelector("table")).toBeNull();
     expect(root.querySelector(".flight-engine__grid")).not.toBeNull();
     const readable = Object.keys(values).filter((path) => path !== "propulsion/set-running").length;
-    expect(root.querySelector('details[data-section="all"] > summary')?.textContent)
-      .toBe(`All engine properties (${readable})`);
-    expect(root.querySelector('details[data-section="all"] [title="propulsion/set-running"]')).toBeNull();
+    expect(root.querySelectorAll('[data-variable]')).toHaveLength(readable);
+    expect(root.querySelector('details[data-section="all"]')).toBeNull();
+    expect(root.querySelector('[data-property="propulsion/set-running"]')).toBeNull();
+    expect(root.querySelector('input[aria-label="Find native engine property"]')).not.toBeNull();
   });
 
   it("logs a shutdown with its simulation time and explains the windmilling that follows", () => {
@@ -693,7 +769,11 @@ describe("engine monitor", () => {
     const log = [...root.querySelectorAll(".flight-engine__log li")].map((item) => item.textContent ?? "");
     expect(log.some((line) => /^t=14\.25s\s+running: 1 → 0$/.test(line))).toBe(true);
     expect(text(".flight-engine__phase")).toBe("WINDMILLING");
-    expect(text(".flight-engine__detail")).toMatch(/qbar\/10 ≈ 4\.8%/);
+    const phaseHelp = help("Engine phase help");
+    expect(phaseHelp.content.hidden).toBe(true);
+    phaseHelp.button.click();
+    expect(phaseHelp.content.textContent).toMatch(/qbar\/10 ≈ 4\.8%/);
+    monitor.destroy();
   });
 
   it("shows what the audio core hears, including when it hears nothing", () => {

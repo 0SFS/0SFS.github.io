@@ -11,6 +11,8 @@ interface Props {
   lostMs?: number | null
   receiveToApplyMs: number | null
   appliedSeq: number | null
+  /** Control frames this phone sent over the last second; the chip beside this one shows it too. */
+  sendHz?: number | null
   signalingAvailable: boolean
   /** What to do about a failure, shown under its cause. */
   recovery?: string
@@ -48,7 +50,7 @@ function Line({ event }: { event: DiagnosticEvent }) {
  * candidates each side offered, which path was chosen, and the timeline that
  * produced the outcome. Open by default once something has gone wrong.
  */
-export function ConnectionDiagnosticsPanel({ log, transport, rttMs, lostMs = null, receiveToApplyMs, appliedSeq, signalingAvailable, recovery, onScan }: Props) {
+export function ConnectionDiagnosticsPanel({ log, transport, rttMs, lostMs = null, receiveToApplyMs, appliedSeq, sendHz = null, signalingAvailable, recovery, onScan }: Props) {
   useSyncExternalStore(log.subscribe, log.version, log.version)
   const [copied, setCopied] = useState<string | null>(null)
   const facts = log.facts()
@@ -103,6 +105,7 @@ export function ConnectionDiagnosticsPanel({ log, transport, rttMs, lostMs = nul
       <Row term="Session channel" value={facts.channels.reliableOpenMs === null ? 'never opened' : `open after ${facts.channels.reliableOpenMs} ms`} />
       <Row term="Control channel" value={facts.channels.controlOpenMs === null ? 'never opened' : `open after ${facts.channels.controlOpenMs} ms`} />
       <Row term="Round trip" value={rttMs === null ? '—' : `${rttMs.toFixed(1)} ms`} />
+      <Row term="Control frames sent" value={sendHz === null ? '—' : `${sendHz} a second`} />
       <Row term="Buffered controls" value={`${transport?.bufferedAmount ?? 0} bytes`} />
       <Row term="Receive to physics" value={receiveToApplyMs === null ? '—' : `${receiveToApplyMs.toFixed(1)} ms`} />
       <Row term="Latest applied frame" value={appliedSeq === null ? '—' : String(appliedSeq)} />

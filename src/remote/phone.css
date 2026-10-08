@@ -95,6 +95,20 @@ button { touch-action: manipulation; }
 .phone-link--live { color: var(--ctl-accent); border-color: rgba(232, 182, 71, 0.4); }
 .phone-link--live > .phone-link__dot { border-color: var(--ctl-accent); background: var(--ctl-accent); }
 
+/* The send rate, right of the 🌐 chip and drawn like it. One width from "—"
+   to "120Hz", so a finger starting to move never reflows the grid. */
+.phone-rate {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border: 1px solid var(--ctl-line); border-radius: 8px;
+  color: var(--ctl-muted); font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.phone-rate__reading { min-width: 5ch; text-align: right; }
+
 /* Read aloud, never drawn: the client's full status sentence. On screen there
    is no banner for it — the link chip says the part that matters. */
 .phone-sr-only {

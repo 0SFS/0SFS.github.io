@@ -1,0 +1,829 @@
+{
+  "schema": "0sfs-powered-lift-optical-retention-summary/1",
+  "analyticalStatus": "Derived from retained replay records, without another engine/optics execution.",
+  "results": [
+    {
+      "run": "before",
+      "name": "idle-entry",
+      "sdk": "1.2.4-fork.20",
+      "nativeSource": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+      "trace": {
+        "path": "build/validation/f135-powered-lift/2026-10-08_162611/idle-entry.csv.gz",
+        "sha256": "5850ae8d883b353cb232d58b0c163ddbd76dc85ff2a9a35f295006a197d6517c",
+        "rows": 9601,
+        "columns": 777,
+        "firstTimeSeconds": 0,
+        "lastTimeSeconds": 80.00000000000973,
+        "allNativeStepsRetainedAtInput": true
+      },
+      "replay": {
+        "file": "1-idle-entry.ndjson.gz",
+        "sha256": "661d25d5ec4af8e63bb5032493fef491d032ff1fd03b98c155f85fc4356989bd",
+        "samples": 648,
+        "sampleSeconds": 0.125,
+        "extremaAndEventRowsIncluded": true,
+        "settledStartSeconds": 20,
+        "invalidSamples": 648,
+        "cappedSamples": 0
+      },
+      "sourceSummary": {
+        "statisticsBasis": "Regular cadence rows only; peak also considers explicitly included native extrema and event rows.",
+        "exteriorIntensityYCd": {
+          "whole": null,
+          "tail": null
+        },
+        "peak": null,
+        "peakToTailMeanRatio": null
+      },
+      "peak": null,
+      "minimumValidSource": null,
+      "allZeroReheatBurn": true,
+      "maximumChW": 0,
+      "maximumC2W": 0,
+      "reactionInputClampedSamples": 0,
+      "tailWindow": {
+        "definition": "All retained replay samples with elapsedSeconds >=20; channel extrema include selected event/extrema samples. Source means use the original report cadence convention.",
+        "firstElapsedSeconds": 20.00833333333284,
+        "lastElapsedSeconds": 80.00000000000973,
+        "channels": {
+          "gas": {
+            "min": 975.5470678005194,
+            "max": 976.3351891443126,
+            "start": 975.5470678005194,
+            "end": 976.3351891443126,
+            "endMinusStart": 0.7881213437932502
+          },
+          "upstream": {
+            "min": 1039.349909324504,
+            "max": 1039.530516462658,
+            "start": 1039.5303930445293,
+            "end": 1039.349909324504,
+            "endMinusStart": -0.18048372002522228
+          },
+          "ambient": {
+            "min": 278.2463743263404,
+            "max": 278.2463743266355,
+            "start": 278.246374326606,
+            "end": 278.2463743263921,
+            "endMinusStart": -2.1390178517322056e-10
+          },
+          "liner": {
+            "min": 601.9899444699284,
+            "max": 772.4736616873261,
+            "start": 601.9899444699284,
+            "end": 772.4736616873261,
+            "endMinusStart": 170.4837172173976
+          },
+          "core": {
+            "min": 1010.1440933918809,
+            "max": 1012.1575922402981,
+            "start": 1010.1440933918809,
+            "end": 1012.0827646998985,
+            "endMinusStart": 1.9386713080175468
+          },
+          "particleMin": null,
+          "particleMax": null,
+          "legacyFuelPps": {
+            "min": 0,
+            "max": 0,
+            "start": 0,
+            "end": 0,
+            "endMinusStart": 0
+          },
+          "coreBurnedKgSec": {
+            "min": 2.598514174417164,
+            "max": 2.599113404225695,
+            "start": 2.599112120248416,
+            "end": 2.598514174417164,
+            "endMinusStart": -0.0005979458312519448
+          }
+        }
+      }
+    },
+    {
+      "run": "before",
+      "name": "free-full",
+      "sdk": "1.2.4-fork.20",
+      "nativeSource": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+      "trace": {
+        "path": "build/validation/f135-powered-lift/2026-10-08_162611/free-full.csv.gz",
+        "sha256": "87b0a6b2c9bc765a641a7c8d73a937f294871168a5f6f1866a8ee989710572f7",
+        "rows": 9601,
+        "columns": 777,
+        "firstTimeSeconds": 0,
+        "lastTimeSeconds": 80.00000000000973,
+        "allNativeStepsRetainedAtInput": true
+      },
+      "replay": {
+        "file": "2-free-full.ndjson.gz",
+        "sha256": "a07460f250693c1cdb1a5afe6b14dc1e9fdf9872c1b17bdcae58fab6f2830652",
+        "samples": 646,
+        "sampleSeconds": 0.125,
+        "extremaAndEventRowsIncluded": true,
+        "settledStartSeconds": 20,
+        "invalidSamples": 1,
+        "cappedSamples": 0
+      },
+      "sourceSummary": {
+        "statisticsBasis": "Regular cadence rows only; peak also considers explicitly included native extrema and event rows.",
+        "exteriorIntensityYCd": {
+          "whole": {
+            "min": 0.009969461761096782,
+            "max": 0.015013798052456558,
+            "mean": 0.011163546334568902,
+            "peakToPeak": 0.0050443362913597765,
+            "rmsRipple": 0.0014021180765935067,
+            "endMinusStart": -0.0047637524455187725
+          },
+          "tail": {
+            "min": 0.009969461761096782,
+            "max": 0.011935842571700068,
+            "mean": 0.010443843957184461,
+            "peakToPeak": 0.001966380810603286,
+            "rmsRipple": 0.0004954669915504243,
+            "endMinusStart": -0.001966380810603286
+          }
+        },
+        "peak": {
+          "nativeRow": 75,
+          "elapsedSeconds": 0.6250000000000002,
+          "exteriorIntensityYCd": 0.015013798052456558,
+          "gasKelvin": 994.9485098830862
+        },
+        "peakToTailMeanRatio": 1.437573953996925
+      },
+      "peak": {
+        "nativeRow": 75,
+        "elapsedSeconds": 0.6250000000000002,
+        "exteriorIntensityYCd": 0.015013798052456558,
+        "gasKelvin": 994.9485098830862,
+        "upstreamKelvin": 1059.397822815072,
+        "linerKelvin": 793.2318551572135,
+        "coreKelvin": 1032.376020629947
+      },
+      "minimumValidSource": {
+        "nativeRow": 1,
+        "elapsedSeconds": 0.008333333333333333,
+        "exteriorIntensityYCd": 0.0057847861239046835,
+        "gasKelvin": 956.5941303892408,
+        "upstreamKelvin": 1059.5338010553273,
+        "linerKelvin": 793.2809901277012,
+        "coreKelvin": 1032.4272418754672
+      },
+      "allZeroReheatBurn": true,
+      "maximumChW": 0,
+      "maximumC2W": 0,
+      "reactionInputClampedSamples": 0,
+      "tailWindow": {
+        "definition": "All retained replay samples with elapsedSeconds >=20; channel extrema include selected event/extrema samples. Source means use the original report cadence convention.",
+        "firstElapsedSeconds": 20.00833333333284,
+        "lastElapsedSeconds": 80.00000000000973,
+        "channels": {
+          "gas": {
+            "min": 976.8482203588743,
+            "max": 984.1189437549625,
+            "start": 984.1189437549625,
+            "end": 977.4349528703441,
+            "endMinusStart": -6.683990884618424
+          },
+          "upstream": {
+            "min": 1040.610267352199,
+            "max": 1048.451319391879,
+            "start": 1048.451319391879,
+            "end": 1040.8749971747204,
+            "endMinusStart": -7.576322217158577
+          },
+          "ambient": {
+            "min": 281.0443290175114,
+            "max": 285.0550152779767,
+            "start": 285.0550152779767,
+            "end": 281.0443290175114,
+            "endMinusStart": -4.010686260465263
+          },
+          "liner": {
+            "min": 779.778337764499,
+            "max": 789.2911830732703,
+            "start": 789.2911830732703,
+            "end": 779.778337764499,
+            "endMinusStart": -9.512845308771261
+          },
+          "core": {
+            "min": 1014.386797808533,
+            "max": 1022.8811871363087,
+            "start": 1022.8811871363087,
+            "end": 1014.386797808533,
+            "endMinusStart": -8.494389327775707
+          },
+          "particleMin": {
+            "min": 281.0443290175114,
+            "max": 285.0550152779767,
+            "start": 285.0550152779767,
+            "end": 281.0443290175114,
+            "endMinusStart": -4.010686260465263
+          },
+          "particleMax": {
+            "min": 976.8482203588744,
+            "max": 984.1189437549626,
+            "start": 984.1189437549626,
+            "end": 977.4349528703442,
+            "endMinusStart": -6.683990884618424
+          },
+          "legacyFuelPps": {
+            "min": 6.029722597867345,
+            "max": 6.481350054721568,
+            "start": 6.481350054721568,
+            "end": 6.029722597867345,
+            "endMinusStart": -0.45162745685422223
+          },
+          "coreBurnedKgSec": {
+            "min": 2.7210608777633345,
+            "max": 2.926163921465227,
+            "start": 2.926163921465227,
+            "end": 2.7210608777633345,
+            "endMinusStart": -0.20510304370189258
+          }
+        }
+      }
+    },
+    {
+      "run": "after",
+      "name": "idle-entry",
+      "sdk": "1.2.4-fork.21",
+      "nativeSource": "34eeae66e5c886eec59eaefb516c0848cb504756",
+      "trace": {
+        "path": "build/validation/f135-powered-lift/2026-10-08_171654/idle-entry.csv.gz",
+        "sha256": "b98324f63bf1255cbaaaf0ee543b25b53d6d5a686f67aba299897fb4d424b371",
+        "rows": 9601,
+        "columns": 844,
+        "firstTimeSeconds": 0,
+        "lastTimeSeconds": 80.00000000000973,
+        "allNativeStepsRetainedAtInput": true
+      },
+      "replay": {
+        "file": "1-idle-entry.ndjson.gz",
+        "sha256": "6d62cbcf23bfcc6b025d38af15bb21b68dedcac75895807add719db0d4b90fb8",
+        "samples": 648,
+        "sampleSeconds": 0.125,
+        "extremaAndEventRowsIncluded": true,
+        "settledStartSeconds": 20,
+        "invalidSamples": 0,
+        "cappedSamples": 0
+      },
+      "sourceSummary": {
+        "statisticsBasis": "Regular cadence rows only; peak also considers explicitly included native extrema and event rows.",
+        "exteriorIntensityYCd": {
+          "whole": {
+            "min": 2.2166053463147176e-16,
+            "max": 0.009498876177603024,
+            "mean": 0.008604463291108783,
+            "peakToPeak": 0.009498876177602802,
+            "rmsRipple": 0.00241340117847055,
+            "endMinusStart": 0.009498876177602802
+          },
+          "tail": {
+            "min": 0.009313328408144491,
+            "max": 0.009498876177603024,
+            "mean": 0.009452904447859012,
+            "peakToPeak": 0.0001855477694585328,
+            "rmsRipple": 0.0000487636631639834,
+            "endMinusStart": 0.0001855477694585328
+          }
+        },
+        "peak": {
+          "nativeRow": 9600,
+          "elapsedSeconds": 80.00000000000973,
+          "exteriorIntensityYCd": 0.009498876177603024,
+          "gasKelvin": 976.3351891443126
+        },
+        "peakToTailMeanRatio": 1.0048632385948242
+      },
+      "peak": {
+        "nativeRow": 9600,
+        "elapsedSeconds": 80.00000000000973,
+        "exteriorIntensityYCd": 0.009498876177603024,
+        "gasKelvin": 976.3351891443126,
+        "upstreamKelvin": 1039.349909324504,
+        "linerKelvin": 772.4736616873261,
+        "coreKelvin": 1012.0827646998985
+      },
+      "minimumValidSource": {
+        "nativeRow": 0,
+        "elapsedSeconds": 0,
+        "exteriorIntensityYCd": 2.2166053463147176e-16,
+        "gasKelvin": 410.2250399337152,
+        "upstreamKelvin": 552.2244830091281,
+        "linerKelvin": 338.45147279329274,
+        "coreKelvin": 542.0341808712651
+      },
+      "allZeroReheatBurn": true,
+      "maximumChW": 0,
+      "maximumC2W": 0,
+      "reactionInputClampedSamples": 20,
+      "tailWindow": {
+        "definition": "All retained replay samples with elapsedSeconds >=20; channel extrema include selected event/extrema samples. Source means use the original report cadence convention.",
+        "firstElapsedSeconds": 20.00833333333284,
+        "lastElapsedSeconds": 80.00000000000973,
+        "channels": {
+          "gas": {
+            "min": 975.5470678005194,
+            "max": 976.3351891443126,
+            "start": 975.5470678005194,
+            "end": 976.3351891443126,
+            "endMinusStart": 0.7881213437932502
+          },
+          "upstream": {
+            "min": 1039.349909324504,
+            "max": 1039.530516462658,
+            "start": 1039.5303930445293,
+            "end": 1039.349909324504,
+            "endMinusStart": -0.18048372002522228
+          },
+          "ambient": {
+            "min": 278.2463743263404,
+            "max": 278.2463743266355,
+            "start": 278.246374326606,
+            "end": 278.2463743263921,
+            "endMinusStart": -2.1390178517322056e-10
+          },
+          "liner": {
+            "min": 601.9899444699284,
+            "max": 772.4736616873261,
+            "start": 601.9899444699284,
+            "end": 772.4736616873261,
+            "endMinusStart": 170.4837172173976
+          },
+          "core": {
+            "min": 1010.1440933918809,
+            "max": 1012.1575922402981,
+            "start": 1010.1440933918809,
+            "end": 1012.0827646998985,
+            "endMinusStart": 1.9386713080175468
+          },
+          "particleMin": {
+            "min": 278.2463743263404,
+            "max": 278.2463743266355,
+            "start": 278.246374326606,
+            "end": 278.2463743263921,
+            "endMinusStart": -2.1390178517322056e-10
+          },
+          "particleMax": {
+            "min": 975.5470678005194,
+            "max": 976.3351891443126,
+            "start": 975.5470678005194,
+            "end": 976.3351891443126,
+            "endMinusStart": 0.7881213437932502
+          },
+          "legacyFuelPps": {
+            "min": 5.759903846068958,
+            "max": 5.761224135566118,
+            "start": 5.761221708088047,
+            "end": 5.759903846068958,
+            "endMinusStart": -0.001317862019088345
+          },
+          "coreBurnedKgSec": {
+            "min": 2.598514174417164,
+            "max": 2.599113404225695,
+            "start": 2.599112120248416,
+            "end": 2.598514174417164,
+            "endMinusStart": -0.0005979458312519448
+          }
+        }
+      }
+    },
+    {
+      "run": "after",
+      "name": "steady-hot",
+      "sdk": "1.2.4-fork.21",
+      "nativeSource": "34eeae66e5c886eec59eaefb516c0848cb504756",
+      "trace": {
+        "path": "build/validation/f135-powered-lift/2026-10-08_171654/steady-hot.csv.gz",
+        "sha256": "2f21e60d004cf8ac12f55c712828bee07873e3579947d861d4c90ed188e439f9",
+        "rows": 9601,
+        "columns": 844,
+        "firstTimeSeconds": 0,
+        "lastTimeSeconds": 80.00000000000973,
+        "allNativeStepsRetainedAtInput": true
+      },
+      "replay": {
+        "file": "2-steady-hot.ndjson.gz",
+        "sha256": "50e0f2aefb91c353a6e0d828da041d2d83ed949ac6454205183355453c1f64f0",
+        "samples": 652,
+        "sampleSeconds": 0.125,
+        "extremaAndEventRowsIncluded": true,
+        "settledStartSeconds": 20,
+        "invalidSamples": 0,
+        "cappedSamples": 0
+      },
+      "sourceSummary": {
+        "statisticsBasis": "Regular cadence rows only; peak also considers explicitly included native extrema and event rows.",
+        "exteriorIntensityYCd": {
+          "whole": {
+            "min": 0.0339139275086903,
+            "max": 0.034833707402393575,
+            "mean": 0.03482374919917047,
+            "peakToPeak": 0.0009197798937032736,
+            "rmsRipple": 0.00004652605745336925,
+            "endMinusStart": -6.0683924066329276e-9
+          },
+          "tail": {
+            "min": 0.034833241638248524,
+            "max": 0.034833707402393575,
+            "mean": 0.03483357686075387,
+            "peakToPeak": 4.6576414505089536e-7,
+            "rmsRipple": 7.157931002460395e-8,
+            "endMinusStart": 3.8278542249109426e-7
+          }
+        },
+        "peak": {
+          "nativeRow": 3279,
+          "elapsedSeconds": 27.32499999999909,
+          "exteriorIntensityYCd": 0.03483372606038087,
+          "gasKelvin": 1040.2630116779237
+        },
+        "peakToTailMeanRatio": 1.0000042832129354
+      },
+      "peak": {
+        "nativeRow": 3279,
+        "elapsedSeconds": 27.32499999999909,
+        "exteriorIntensityYCd": 0.03483372606038087,
+        "gasKelvin": 1040.2630116779237,
+        "upstreamKelvin": 1105.6250291010058,
+        "linerKelvin": 822.7797230636013,
+        "coreKelvin": 1071.1391376257584
+      },
+      "minimumValidSource": {
+        "nativeRow": 1,
+        "elapsedSeconds": 0.008333333333333333,
+        "exteriorIntensityYCd": 0.011214984637420697,
+        "gasKelvin": 990.9312266361843,
+        "upstreamKelvin": 1105.632703583117,
+        "linerKelvin": 822.7897595043152,
+        "coreKelvin": 1071.1419510277933
+      },
+      "allZeroReheatBurn": true,
+      "maximumChW": 0,
+      "maximumC2W": 0,
+      "reactionInputClampedSamples": 0,
+      "tailWindow": {
+        "definition": "All retained replay samples with elapsedSeconds >=20; channel extrema include selected event/extrema samples. Source means use the original report cadence convention.",
+        "firstElapsedSeconds": 20.00833333333284,
+        "lastElapsedSeconds": 80.00000000000973,
+        "channels": {
+          "gas": {
+            "min": 1040.2622837628064,
+            "max": 1040.2630116779237,
+            "start": 1040.2622837628064,
+            "end": 1040.2628829753733,
+            "endMinusStart": 0.000599212566839924
+          },
+          "upstream": {
+            "min": 1105.6245104130567,
+            "max": 1105.6250409839138,
+            "start": 1105.6245104130567,
+            "end": 1105.6250150080389,
+            "endMinusStart": 0.0005045949822033435
+          },
+          "ambient": {
+            "min": 318.1499999984943,
+            "max": 318.1499999987526,
+            "start": 318.1499999987452,
+            "end": 318.14999999853126,
+            "endMinusStart": -2.1395862859208137e-10
+          },
+          "liner": {
+            "min": 822.7667237146064,
+            "max": 822.802944727391,
+            "start": 822.7667237146064,
+            "end": 822.802944727391,
+            "endMinusStart": 0.03622101278460832
+          },
+          "core": {
+            "min": 1071.1375172195892,
+            "max": 1071.1393101546257,
+            "start": 1071.1375172195892,
+            "end": 1071.139308369375,
+            "endMinusStart": 0.0017911497857312497
+          },
+          "particleMin": {
+            "min": 318.1499999984943,
+            "max": 318.1499999987526,
+            "start": 318.1499999987452,
+            "end": 318.14999999853126,
+            "endMinusStart": -2.1395862859208137e-10
+          },
+          "particleMax": {
+            "min": 1040.2622837628064,
+            "max": 1040.2630116779237,
+            "start": 1040.2622837628064,
+            "end": 1040.2628829753733,
+            "endMinusStart": 0.000599212566839924
+          },
+          "legacyFuelPps": {
+            "min": 5.414306675129511,
+            "max": 5.414315268448219,
+            "start": 5.414315268448219,
+            "end": 5.414308424707926,
+            "endMinusStart": -0.000006843740293582812
+          },
+          "coreBurnedKgSec": {
+            "min": 2.4435188577268567,
+            "max": 2.443522721036501,
+            "start": 2.443522721036501,
+            "end": 2.4435195844805873,
+            "endMinusStart": -0.0000031365559136631305
+          }
+        }
+      }
+    },
+    {
+      "run": "after",
+      "name": "free-full",
+      "sdk": "1.2.4-fork.20",
+      "nativeSource": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+      "trace": {
+        "path": "build/validation/f135-powered-lift/2026-10-08_162611/free-full.csv.gz",
+        "sha256": "87b0a6b2c9bc765a641a7c8d73a937f294871168a5f6f1866a8ee989710572f7",
+        "rows": 9601,
+        "columns": 777,
+        "firstTimeSeconds": 0,
+        "lastTimeSeconds": 80.00000000000973,
+        "allNativeStepsRetainedAtInput": true
+      },
+      "replay": {
+        "file": "3-free-full.ndjson.gz",
+        "sha256": "a07460f250693c1cdb1a5afe6b14dc1e9fdf9872c1b17bdcae58fab6f2830652",
+        "samples": 646,
+        "sampleSeconds": 0.125,
+        "extremaAndEventRowsIncluded": true,
+        "settledStartSeconds": 20,
+        "invalidSamples": 1,
+        "cappedSamples": 0
+      },
+      "sourceSummary": {
+        "statisticsBasis": "Regular cadence rows only; peak also considers explicitly included native extrema and event rows.",
+        "exteriorIntensityYCd": {
+          "whole": {
+            "min": 0.009969461761096782,
+            "max": 0.015013798052456558,
+            "mean": 0.011163546334568902,
+            "peakToPeak": 0.0050443362913597765,
+            "rmsRipple": 0.0014021180765935067,
+            "endMinusStart": -0.0047637524455187725
+          },
+          "tail": {
+            "min": 0.009969461761096782,
+            "max": 0.011935842571700068,
+            "mean": 0.010443843957184461,
+            "peakToPeak": 0.001966380810603286,
+            "rmsRipple": 0.0004954669915504243,
+            "endMinusStart": -0.001966380810603286
+          }
+        },
+        "peak": {
+          "nativeRow": 75,
+          "elapsedSeconds": 0.6250000000000002,
+          "exteriorIntensityYCd": 0.015013798052456558,
+          "gasKelvin": 994.9485098830862
+        },
+        "peakToTailMeanRatio": 1.437573953996925
+      },
+      "peak": {
+        "nativeRow": 75,
+        "elapsedSeconds": 0.6250000000000002,
+        "exteriorIntensityYCd": 0.015013798052456558,
+        "gasKelvin": 994.9485098830862,
+        "upstreamKelvin": 1059.397822815072,
+        "linerKelvin": 793.2318551572135,
+        "coreKelvin": 1032.376020629947
+      },
+      "minimumValidSource": {
+        "nativeRow": 1,
+        "elapsedSeconds": 0.008333333333333333,
+        "exteriorIntensityYCd": 0.0057847861239046835,
+        "gasKelvin": 956.5941303892408,
+        "upstreamKelvin": 1059.5338010553273,
+        "linerKelvin": 793.2809901277012,
+        "coreKelvin": 1032.4272418754672
+      },
+      "allZeroReheatBurn": true,
+      "maximumChW": 0,
+      "maximumC2W": 0,
+      "reactionInputClampedSamples": 0,
+      "tailWindow": {
+        "definition": "All retained replay samples with elapsedSeconds >=20; channel extrema include selected event/extrema samples. Source means use the original report cadence convention.",
+        "firstElapsedSeconds": 20.00833333333284,
+        "lastElapsedSeconds": 80.00000000000973,
+        "channels": {
+          "gas": {
+            "min": 976.8482203588743,
+            "max": 984.1189437549625,
+            "start": 984.1189437549625,
+            "end": 977.4349528703441,
+            "endMinusStart": -6.683990884618424
+          },
+          "upstream": {
+            "min": 1040.610267352199,
+            "max": 1048.451319391879,
+            "start": 1048.451319391879,
+            "end": 1040.8749971747204,
+            "endMinusStart": -7.576322217158577
+          },
+          "ambient": {
+            "min": 281.0443290175114,
+            "max": 285.0550152779767,
+            "start": 285.0550152779767,
+            "end": 281.0443290175114,
+            "endMinusStart": -4.010686260465263
+          },
+          "liner": {
+            "min": 779.778337764499,
+            "max": 789.2911830732703,
+            "start": 789.2911830732703,
+            "end": 779.778337764499,
+            "endMinusStart": -9.512845308771261
+          },
+          "core": {
+            "min": 1014.386797808533,
+            "max": 1022.8811871363087,
+            "start": 1022.8811871363087,
+            "end": 1014.386797808533,
+            "endMinusStart": -8.494389327775707
+          },
+          "particleMin": {
+            "min": 281.0443290175114,
+            "max": 285.0550152779767,
+            "start": 285.0550152779767,
+            "end": 281.0443290175114,
+            "endMinusStart": -4.010686260465263
+          },
+          "particleMax": {
+            "min": 976.8482203588744,
+            "max": 984.1189437549626,
+            "start": 984.1189437549626,
+            "end": 977.4349528703442,
+            "endMinusStart": -6.683990884618424
+          },
+          "legacyFuelPps": {
+            "min": 6.029722597867345,
+            "max": 6.481350054721568,
+            "start": 6.481350054721568,
+            "end": 6.029722597867345,
+            "endMinusStart": -0.45162745685422223
+          },
+          "coreBurnedKgSec": {
+            "min": 2.7210608777633345,
+            "max": 2.926163921465227,
+            "start": 2.926163921465227,
+            "end": 2.7210608777633345,
+            "endMinusStart": -0.20510304370189258
+          }
+        }
+      }
+    },
+    {
+      "run": "per-step",
+      "name": "idle-entry",
+      "sdk": "1.2.4-fork.21",
+      "nativeSource": "34eeae66e5c886eec59eaefb516c0848cb504756",
+      "trace": {
+        "path": "build/validation/f135-powered-lift/2026-10-08_171654/idle-entry.csv.gz",
+        "sha256": "b98324f63bf1255cbaaaf0ee543b25b53d6d5a686f67aba299897fb4d424b371",
+        "rows": 9601,
+        "columns": 844,
+        "firstTimeSeconds": 0,
+        "lastTimeSeconds": 80.00000000000973,
+        "allNativeStepsRetainedAtInput": true
+      },
+      "replay": {
+        "file": "1-idle-entry.ndjson.gz",
+        "sha256": "ed6fdfaaba987be371756bf1da1c9ac9ea50e588cfd1c0abc4ff14f8c856771e",
+        "samples": 9601,
+        "sampleSeconds": 0,
+        "extremaAndEventRowsIncluded": true,
+        "settledStartSeconds": 20,
+        "invalidSamples": 0,
+        "cappedSamples": 0
+      },
+      "sourceSummary": {
+        "statisticsBasis": "Regular cadence rows only; peak also considers explicitly included native extrema and event rows.",
+        "exteriorIntensityYCd": {
+          "whole": {
+            "min": 2.2166053463147176e-16,
+            "max": 0.009498876177603024,
+            "mean": 0.008609997610771475,
+            "peakToPeak": 0.009498876177602802,
+            "rmsRipple": 0.002404091587020339,
+            "endMinusStart": 0.009498876177602802
+          },
+          "tail": {
+            "min": 0.009311860335416618,
+            "max": 0.009498876177603024,
+            "mean": 0.009452722651022127,
+            "peakToPeak": 0.00018701584218640613,
+            "rmsRipple": 0.00004893968151786821,
+            "endMinusStart": 0.00018701584218640613
+          }
+        },
+        "peak": {
+          "nativeRow": 9600,
+          "elapsedSeconds": 80.00000000000973,
+          "exteriorIntensityYCd": 0.009498876177603024,
+          "gasKelvin": 976.3351891443126
+        },
+        "peakToTailMeanRatio": 1.0048825643451949
+      },
+      "peak": {
+        "nativeRow": 9600,
+        "elapsedSeconds": 80.00000000000973,
+        "exteriorIntensityYCd": 0.009498876177603024,
+        "gasKelvin": 976.3351891443126,
+        "upstreamKelvin": 1039.349909324504,
+        "linerKelvin": 772.4736616873261,
+        "coreKelvin": 1012.0827646998985
+      },
+      "minimumValidSource": {
+        "nativeRow": 0,
+        "elapsedSeconds": 0,
+        "exteriorIntensityYCd": 2.2166053463147176e-16,
+        "gasKelvin": 410.2250399337152,
+        "upstreamKelvin": 552.2244830091281,
+        "linerKelvin": 338.45147279329274,
+        "coreKelvin": 542.0341808712651
+      },
+      "allZeroReheatBurn": true,
+      "maximumChW": 0,
+      "maximumC2W": 0,
+      "reactionInputClampedSamples": 268,
+      "tailWindow": {
+        "definition": "All retained replay samples with elapsedSeconds >=20; channel extrema include selected event/extrema samples. Source means use the original report cadence convention.",
+        "firstElapsedSeconds": 20.00833333333284,
+        "lastElapsedSeconds": 80.00000000000973,
+        "channels": {
+          "gas": {
+            "min": 975.5470678005194,
+            "max": 976.3351891443126,
+            "start": 975.5470678005194,
+            "end": 976.3351891443126,
+            "endMinusStart": 0.7881213437932502
+          },
+          "upstream": {
+            "min": 1039.349909324504,
+            "max": 1039.5305206514101,
+            "start": 1039.5303930445293,
+            "end": 1039.349909324504,
+            "endMinusStart": -0.18048372002522228
+          },
+          "ambient": {
+            "min": 278.2463743263404,
+            "max": 278.2463743266355,
+            "start": 278.246374326606,
+            "end": 278.2463743263921,
+            "endMinusStart": -2.1390178517322056e-10
+          },
+          "liner": {
+            "min": 601.9899444699284,
+            "max": 772.4736616873261,
+            "start": 601.9899444699284,
+            "end": 772.4736616873261,
+            "endMinusStart": 170.4837172173976
+          },
+          "core": {
+            "min": 1010.1440933918809,
+            "max": 1012.1575952511928,
+            "start": 1010.1440933918809,
+            "end": 1012.0827646998985,
+            "endMinusStart": 1.9386713080175468
+          },
+          "particleMin": {
+            "min": 278.2463743263404,
+            "max": 278.2463743266355,
+            "start": 278.246374326606,
+            "end": 278.2463743263921,
+            "endMinusStart": -2.1390178517322056e-10
+          },
+          "particleMax": {
+            "min": 975.5470678005194,
+            "max": 976.3351891443126,
+            "start": 975.5470678005194,
+            "end": 976.3351891443126,
+            "endMinusStart": 0.7881213437932502
+          },
+          "legacyFuelPps": {
+            "min": 5.759903846068958,
+            "max": 5.761224231938519,
+            "start": 5.761221708088047,
+            "end": 5.759903846068958,
+            "endMinusStart": -0.001317862019088345
+          },
+          "coreBurnedKgSec": {
+            "min": 2.598514174417164,
+            "max": 2.5991134268462375,
+            "start": 2.599112120248416,
+            "end": 2.598514174417164,
+            "endMinusStart": -0.0005979458312519448
+          }
+        }
+      }
+    }
+  ]
+}

@@ -36,6 +36,19 @@ benchmarks. See the
 [collision measurements](docs/validation/collision-geometry-cost-quality.md);
 filtered rounds reduce interference but do not prove isolation.
 
+**Every F-35B test fixture starts the F135 from its design point.** Starting the
+coupled plant takes 304 of the bootstrap's 318 ms, as much work as 3,450 steps.
+The F-35B, F135 and engine test files take two thirds of the suite's test time,
+and `f35b.integration.test.ts` alone takes 35 s. At 5,000 ft, starting the
+plant after a RunIC with the engine stopped took 10.5 ms and ended at the same
+operating point. Compare other conditions, 0 kt among them, then make the start
+fast in JSBSim's plant rather than in the app. Until then, tests could restore a
+started state captured once for each condition, and the long file could be
+split. The measurements are in
+[validation/evidence/ci/2026-10-08](validation/evidence/ci/2026-10-08/README.md),
+and FOSS Earth's [CI/CD](../foss-earth/docs/ci-cd.md#what-makes-the-tests-slow)
+explains why this matters.
+
 **Frame rate drops close to the ground on approach.** Noticeable enough to
 interfere with landing. Needs profiling before any fix — the plausible causes
 pull in different directions:

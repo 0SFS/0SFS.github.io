@@ -1,0 +1,74 @@
+{
+  "recordedDate": "2026-10-07",
+  "kind": "User local observation plus read-only implementation audit; no independent live capture",
+  "observation": {
+    "url": "http://localhost:5173/fly/",
+    "settings": {
+      "renderer.ambientFillMultiplier": 0.02,
+      "renderer.exposureEV": 8.8
+    },
+    "mode": "dry; exact throttle, conversion and nozzle pose unrecorded",
+    "dryExhaust": "User saw red exterior emission and described it as the appearance sought",
+    "aircraftAndGround": "User reported solid-white appearance",
+    "unrecorded": [
+      "native state",
+      "map provider",
+      "camera pose",
+      "other display/source settings",
+      "browser/GPU/backend",
+      "time since engine start"
+    ],
+    "runtimeEditsSincePrecedingExhaustCorrection": false
+  },
+  "arithmetic": {
+    "exposureMultiplier": 445.7218884076158,
+    "fillTimesExposure": 8.914437768152316,
+    "meaning": "Linear fill contribution scaling relative to unit fill at zero EV, before material response; not a pixel measurement"
+  },
+  "verifiedCode": {
+    "sunSky": "Fixed hemispheric lights and clear color on the inspected runtime path; no physical solar lighting",
+    "raster": "Unlit, emissive, unaffected by fill reduction",
+    "display": "Shared exposure; tone mapping disabled; material image-processing gamma and saturation",
+    "plume": "Source computed independently of ambient fill; shared image-processing path; provisional luminance white reference"
+  },
+  "sources": [
+    {
+      "repository": "foss-earth",
+      "file": "src/engine/babylon/createBabylonRuntime.ts",
+      "sha256": "b2cd3b23bf5d59ead487e26b143ead68c66b6bdbb006c958877bf2835264836a"
+    },
+    {
+      "repository": "foss-earth",
+      "file": "src/engine/babylon/createRasterTilesRuntime.ts",
+      "sha256": "9b68b8f6d7cbb7e872fcbbd546a87d4f75094b7397913d5290fcfcb2693f9be3"
+    },
+    {
+      "repository": "foss-earth",
+      "file": "src/settings/catalogue/renderer.ts",
+      "sha256": "4989d5b36aca3b0198492e67a8bb6cd3ba66c12e1987631c6ad7c2c3ed61c805"
+    },
+    {
+      "repository": "0sfs",
+      "file": "src/flight/aircraft/createEngineExhaust.ts",
+      "sha256": "3eabf75a15b64516c58493f1d20e4a7cb0bff43545ff297a4f7a4c3cdd5c5055"
+    }
+  ],
+  "checkoutHeads": {
+    "0sfs": "0ca09b43fdbc68151bd11a10c670e089bb93001f",
+    "foss-earth": "cc4e74837f69fc189628f67cd300ddbc3f1456ef"
+  },
+  "hypotheses": {
+    "sceneDisplayContributesToDryInvisibility": "Supported by user observation and code audit",
+    "sceneDisplayExplainsAllWhitePixels": "Plausible; individual live contributions unmeasured",
+    "exhaustPhysicalModelAlreadyCorrect": "Not established by visibility",
+    "ABSoundLightTimingFixed": "Not established; source/telemetry mismatch remains separate"
+  },
+  "next": "FOSS Earth docs/sky-lighting-implementation-prompt.md: freeze emitters, qualify environmental/display contract and compare again",
+  "acceptance": {
+    "drySourceVisibility": "User-observed at stated controls; complete reference agreement unqualified",
+    "sceneAppearance": "Rejected at stated controls",
+    "exhaustPhysicalCalibration": "Open",
+    "GPUAndPerformance": "No run; unqualified",
+    "deployment": "Held"
+  }
+}

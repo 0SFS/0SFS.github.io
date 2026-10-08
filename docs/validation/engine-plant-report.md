@@ -28,14 +28,17 @@ invariant against the same engine's own dry counterfactual.
 
 ## Implemented system
 
-- **JSBSim** (`master` `ea6956b4`, local, not pushed). An optional `<plant>`
+- **JSBSim** (`master` `34eeae66`, local, not pushed). An optional `<plant>`
   inside `<turbine_engine>`; empirical turbines are unchanged. It has a
   component reference algorithm and a reduced one (tabulated gas properties,
   Jacobian reuse, component fallback), with hard caps on iterations, substeps
   and memory. A staged, validated state record supports capture and restore.
   The contract is in `doc/turbine-plant-model.md`.
-- **SDK.** `1.2.4-fork.20`, built once from that commit and installed
-  immutably ([adoption](../../validation/evidence/jsbsim/adoption/fork20-adoption.json)).
+- **SDK.** `1.2.4-fork.21`, built once from that commit and installed
+  immutably ([adoption](../../validation/evidence/jsbsim/adoption/fork21/adoption.json)).
+  The [fork.20 implementation adoption](../../validation/evidence/jsbsim/adoption/fork20-adoption.json)
+  and its original checks remain historical receipts. Fork.21 changes native
+  fuel-flow and numerical observations, with no controller/physical tuning.
   fork.17, 18 and 19 are retained and refused, each for a native defect that
   the app tests found.
 - **F-35B data.** The F135 is a `<plant>`. The `liftfan` and `sidefan` engines
@@ -50,12 +53,12 @@ invariant against the same engine's own dry counterfactual.
   - the forces overlay draws the external forces;
   - fuel-tank drag, engine start and stop, and the test stand use the plant;
   - snapshots, relocation and saved flights restore the plant's exact state;
-  - **Engine → Simulation**, at the top of the F-35B's Engine tab, names the
+  - **Engine → Settings → Simulation**, on the F-35B's Engine tab, names the
     engine model flying and holds the algorithm, iteration cap, substep cap,
     tolerance and reduced-model memory, applied live;
-  - the engine monitor's **Engine plant numerics** shows each step's algorithm,
-    fallback, iterations, residuals, memory and energy and mass account.
-- **Engine model choice.** Engine → Simulation can also fly the F-35B's
+  - the engine monitor's **Live data → Numerics** observations show each step's
+    algorithm, fallback, iterations, residuals, memory and energy and mass account.
+- **Engine model choice.** Engine → Settings → Simulation can also fly the F-35B's
   empirical engine, the aircraft unchanged from before the plant, for
   comparison. It applies on reload, and a saved flight resumes under either
   ([below](#comparing-with-the-empirical-engine)).
@@ -68,6 +71,12 @@ its sections by name and did not draw this one, and they were set to appear
 only under Show all parameters. A user found it in the running app. The tab
 now draws the section, its settings are main-level, and a panel test checks
 both. The monitor's numerics rows were the gap listed here before.
+
+The October 8 Engine-tab redesign keeps those controls under **Settings →
+Simulation** and puts the actual numerical observations in **Live data**,
+alongside the engine's other variables. [The monitor design](../engine-monitor.md)
+describes the registry, plot grouping, layout persistence and recording budget.
+This changes presentation, not engine dynamics or the native solver settings.
 
 Preserved behaviour, each checked by existing or new tests:
 
@@ -92,7 +101,7 @@ Preserved behaviour, each checked by existing or new tests:
 
 ## Comparing with the empirical engine
 
-Engine → Simulation → Engine model switches the F-35B between the coupled plant
+Engine → Settings → Simulation → Engine model switches the F-35B between the coupled plant
 and its earlier empirical engine. The empirical files are byte-identical to the
 F-35B package at 0sfs `d92a928a`, the last commit before the plant, and that
 commit's own F-35B integration suite passes against them on fork.20: 66 of 66
@@ -208,3 +217,35 @@ Leftover sandboxes from interrupted native Python test runs remain in the
 JSBSim build directory (`build/turbine-plant-20261008/tests/tmp*`, seven
 folders, 2026-10-08 01:34–01:35). They were not deleted; build folders are
 deleted only with the user's agreement.
+
+## Sustained powered-lift follow-up, 2026-10-08
+
+The [powered-lift record](f135-powered-lift-stability-2026-10-08.md) preserves
+the original fork.20 observations and installed fork.21 receipts. The reported
+full-conversion 92–107% cycle remains unreproduced under explicit held/free
+fixtures; no user session was captured. Fixed-condition 80 s trajectories,
+both algorithms, command .98/.99/1, perturbations and timestep refinement
+remain separate from changing free-flight conditions and partial-conversion failures.
+
+Fork.21 corrects accepted fuel-flow PPS under frozen/trim fuel and phase-specific
+fallback/work publication, and adds raw mass closure and commanded-throat
+observations. It does not tune the physical/controller model. Independent mass
+and energy gates pass. The fixed clean 37,000 lb lift ledger is +5,010 lbf net
+sea-level ISA, −706 lbf at 5,000 ft ISA and −4,253 lbf hot sea level: available
+lift depends on load, atmosphere, geometry and the unqualified physical limiter.
+No duplicate/missing lift force was found.
+
+The exact optical replay is retained separately from physical qualification.
+Frozen-source validity is fixed, but metal thermal equilibrium and real dry
+brightness remain unqualified. User AB synchronization acceptance is preserved;
+no new device acceptance is claimed. The complete app CI run had one concurrent
+Engine-help failure; the failing file passed its targeted rerun, and production
+build passed. Read the new record for all check limitations rather than extending
+the earlier fork.20 full-CI claim to the current dirty tree.
+
+The rotating-frame free-hover isolation in that record holds 20% clean fuel at
+5,000 ft ISA with normal FCS and .95567056 throttle. Its 60 s observation meets
+the predeclared engineering hover gates (altitude span 0.02395 ft), while mass
+and energy close independently. This is a declared numerical fixture, not the
+user's captured flight or real F135 qualification. Matching gravitational force
+alone is separately retained and does not supply the required corotation balance.

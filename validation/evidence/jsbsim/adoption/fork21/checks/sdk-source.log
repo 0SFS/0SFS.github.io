@@ -1,0 +1,36 @@
+
+> @felipegalind0/jsbsim@1.2.4-fork.21 test:source
+> node --test test/source-contract.test.mjs
+
+▶ resolved native source contract
+  ✔ preserves byte and executable-mode identity while ignoring time metadata (5.291208ms)
+  ✔ rejects traversal and external-link archive entries before writing their targets (1.514667ms)
+  ✔ refuses uncaptured filesystem symlinks (0.362208ms)
+  ✔ captures one repository and derives the SDK from that exact snapshot (247.067ms)
+  ✔ requires explicit dirty capture and couples both identities to engine or SDK edits (362.63175ms)
+  ✔ captures new source files while excluding ignored build products (142.13625ms)
+  ✔ rejects SDKs outside the enclosing repository's wasm directory and nested repositories (62.710291ms)
+  ✔ rejects a nested repository elsewhere in the captured source tree (109.108834ms)
+  ✔ refuses contaminated content-addressed source caches (202.780709ms)
+  ✔ captures exact local inputs and refuses concurrent identity changes (5.117834ms)
+✔ resolved native source contract (1139.526667ms)
+▶ build consumers reject inconsistent resolved identities
+  ✔ accepts a coherent descriptor and rejects native/SDK identity or manifest substitution (2.104291ms)
+  ✔ recomputes the recipe and refuses stale options, malformed manifests and old source modes (1.13775ms)
+  ✔ refuses a separately valid SDK identity, unrelated root or substituted subtree (1.487584ms)
+  ✔ includes the identity schema and SDK location in the build recipe digest (0.252875ms)
+  ✔ requires a CMake cache rooted at this snapshot with WASM enabled and the same recipe (0.4685ms)
+  ✔ requires matching binding source, recipe and all generated C++/TypeScript bytes (1.906834ms)
+✔ build consumers reject inconsistent resolved identities (7.514292ms)
+✔ accepts only reviewed Emscripten distribution banners and preserves actual compiler identity (0.39525ms)
+✔ reuses identical immutable output bytes and refuses replacement (0.898834ms)
+✔ rejects mutated frozen authored inputs, unknown files and generated identity before rechecking (4.036458ms)
+✔ refuses ambient flags or include paths that would escape the recorded build recipe (0.197083ms)
+ℹ tests 20
+ℹ suites 2
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1215.838083

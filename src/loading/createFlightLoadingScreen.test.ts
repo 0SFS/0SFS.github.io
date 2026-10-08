@@ -124,13 +124,13 @@ describe("flight loading log", () => {
     expect(error.dataset.tone).toBe("error");
     expect(document.querySelector("#app-log img")).toBeNull();
     expect(error.textContent).toContain("Terrain failed <img src=x>");
-    const button = error.querySelector("button")!;
+    const button = error.querySelector(".game-log__actions button")!;
     expect(button.textContent).toBe("Try again");
     expect(document.activeElement).toBe(button);
 
     button.click();
     expect(retry).toHaveBeenCalledOnce();
-    expect(error.querySelector("button")).toBeNull();
+    expect(error.querySelector(".game-log__actions button")).toBeNull();
     expect(newestLine().textContent).toContain("Trying again");
   });
 

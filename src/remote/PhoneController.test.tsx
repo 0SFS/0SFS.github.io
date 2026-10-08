@@ -17,8 +17,9 @@ vi.mock('./PhoneQrScanner', async () => {
 })
 import { PhoneController } from './PhoneController'
 import { createConnectionLog } from './connectionDiagnostics'
-import { NEUTRAL_CONTROLS, type AircraftStatus, type EngineStatus } from './protocol'
+import { NEUTRAL_CONTROLS, type AircraftStatus, type EngineStatus, type PhoneControllerSettings } from './protocol'
 import type { PhoneControllerClient, PhoneControllerSnapshot } from './phoneControllerClient'
+import { DEFAULT_PHONE_SETTINGS } from './phoneSettingsStore'
 
 let root: Root
 let container: HTMLDivElement
@@ -27,6 +28,13 @@ const nudgeCamera = vi.fn()
 const updateControls = vi.fn()
 const setPaused = vi.fn(() => true)
 const setHapticsEnabled = vi.fn()
+/** The client keeps the settings; this one keeps them the way it does, for the screen to follow. */
+const updateSettings = vi.fn((patch: Partial<PhoneControllerSettings>) => {
+  state = { ...state, settings: { ...state.settings, ...patch } }
+  for (const listener of listeners) listener()
+})
+let state: PhoneControllerSnapshot
+const listeners = new Set<() => void>()
 const setViewMode = vi.fn(() => true)
 const requestControl = vi.fn(() => true)
 const setStarterHeld = vi.fn()
@@ -42,17 +50,19 @@ function mount({ engine, status, snapshot, onPair }: {
     owner: 'phone', paused: false, viewMode: 'third', controls: NEUTRAL_CONTROLS,
     airspeedKts: 148, altitudeFt: 4250, headingDeg: 271, gearDown: true, ...(engine ? { engine } : {}), ...status,
   }
-  const state: PhoneControllerSnapshot = {
+  state = {
     phase: 'ready', message: 'Phone controls', status: aircraft, controls: { ...NEUTRAL_CONTROLS },
     canFly: false, canControl: true, requestingControl: false, hostFresh: true, lostMs: null, signalingAvailable: true,
-    pendingActions: 0, rttMs: 20, diagnostics: null, appliedSeq: 1, receiveToApplyMs: 2,
-    hapticsSupported: true, hapticsEnabled: false, ...snapshot,
+    pendingActions: 0, rttMs: 20, sendHz: 120, diagnostics: null, appliedSeq: 1, receiveToApplyMs: 2,
+    hapticsSupported: true, hapticsEnabled: false, settings: { ...DEFAULT_PHONE_SETTINGS }, ...snapshot,
   }
   const client: PhoneControllerClient = {
-    log: createConnectionLog('phone', () => 0), subscribe: () => () => {}, getSnapshot: () => state,
+    log: createConnectionLog('phone', () => 0),
+    subscribe: listener => { listeners.add(listener); return () => { listeners.delete(listener) } },
+    getSnapshot: () => state,
     updateControls, nudgeCamera, cancelTransientControls: vi.fn(), requestControl,
     setPaused, setViewMode, setGearDown: () => true, setStarterHeld, shutdownEngine, releaseControl: () => true,
-    setHapticsEnabled, destroy: vi.fn(),
+    setHapticsEnabled, updateSettings, destroy: vi.fn(),
   }
   act(() => root.render(<PhoneController client={client} onPair={onPair} />))
 }
@@ -91,6 +101,8 @@ beforeEach(() => {
   updateControls.mockClear()
   setPaused.mockClear()
   setHapticsEnabled.mockClear()
+  updateSettings.mockClear()
+  listeners.clear()
   setViewMode.mockClear()
   requestControl.mockClear()
   setStarterHeld.mockClear()
@@ -217,10 +229,20 @@ describe('phone controller screen', () => {
       ?? (child.matches('.phone-sheet') ? child.className : child.getAttribute('aria-label') ?? child.textContent)
     expect([...grid().children].map(describe)).toEqual([
       'IAS', 'ALT', 'HDG', 'G', expect.stringContaining('PHONE'), 'Pause simulation', 'Release',
-      'Haptics', 'phone-sheet phone-diagnostics', 'phone-sheet phone-settings',
+      'Haptics', 'phone-sheet phone-diagnostics', '120Hz120 control frames a second', 'phone-sheet phone-settings',
       expect.stringContaining('brake'),
     ])
     expect(text('.phone-diagnostics .phone-sheet__chip')).toBe('🌐 20ms')
+  })
+
+  it('shows how often this phone sends right of the round trip, at one width', () => {
+    mount({ snapshot: { sendHz: 60 } })
+    const rate = container.querySelector('.phone-diagnostics + .phone-rate')!
+    expect(rate.querySelector('.phone-rate__reading')?.textContent).toBe('60Hz')
+    expect(rate.querySelector('.phone-sr-only')?.textContent).toBe('60 control frames a second')
+    expect(text('.phone-diagnostics dl')).toContain('Control frames sent60 a second')
+    remount({ snapshot: { phase: 'connecting', sendHz: null } })
+    expect(text('.phone-rate__reading')).toBe('—')
   })
 
   it('offers Take control as a chip where Pause and Release go, never a popup, whenever the phone is not flying', () => {
@@ -315,16 +337,18 @@ describe('phone controller screen', () => {
     expect(setViewMode).toHaveBeenLastCalledWith('third')
   })
 
-  it('moves the grid above the controls from Settings, and keeps it there', () => {
+  it('moves the grid above the controls from Settings, through the client that keeps the settings', () => {
     mount()
     const top = container.querySelector<HTMLInputElement>('.phone-settings input[value="top"]')!
     act(() => { top.click() })
+    expect(updateSettings).toHaveBeenLastCalledWith({ grid: 'top' })
     expect(container.querySelector('.phone-controls')?.className).toBe('phone-controls phone-controls--grid-top')
-    expect(storage.get('osfs.phone-grid-position')).toBe('top')
-    remount()
+    // Wherever the client says it is: the computer may have changed it.
+    remount({ snapshot: { settings: { ...DEFAULT_PHONE_SETTINGS, grid: 'top' } } })
     expect(container.querySelector('.phone-controls')?.className).toBe('phone-controls phone-controls--grid-top')
     act(() => { container.querySelector<HTMLInputElement>('.phone-settings input[value="bottom"]')!.click() })
-    expect(storage.has('osfs.phone-grid-position')).toBe(false)
+    expect(updateSettings).toHaveBeenLastCalledWith({ grid: 'bottom' })
+    expect(storage.size).toBe(0)
   })
 
   it('draws the yaw slider where the rudder is, and returns it to centre on release', () => {
@@ -340,7 +364,7 @@ describe('phone controller screen', () => {
   it('keeps the yaw where the finger left it when Settings says so, and remembers that', () => {
     mount({ snapshot: { controls: { ...NEUTRAL_CONTROLS, rudder: .5 } } })
     act(() => { container.querySelector<HTMLInputElement>('.phone-settings input[value="hold"]')!.click() })
-    expect(storage.get('osfs.phone-yaw-release')).toBe('hold')
+    expect(updateSettings).toHaveBeenLastCalledWith({ yawRelease: 'hold', yawReturnMs: 0 })
     // No return time to set: there is no return.
     expect(container.querySelector('.phone-settings__slider')).toBeNull()
     updateControls.mockClear()
@@ -352,12 +376,12 @@ describe('phone controller screen', () => {
     expect(updateControls).not.toHaveBeenCalled()
     expect(yawTrack().getAttribute('aria-label')).toBe('Yaw rudder. Holds where you leave it.')
 
-    // The choice survives the page, and centring again returns the parked rudder.
-    remount({ snapshot: { controls: { ...NEUTRAL_CONTROLS, rudder: .5 } } })
+    // The client's choice is the screen's, and centring again returns the parked rudder.
+    remount({ snapshot: { controls: { ...NEUTRAL_CONTROLS, rudder: .5 }, settings: { ...DEFAULT_PHONE_SETTINGS, yawRelease: 'hold' } } })
     expect(container.querySelector<HTMLInputElement>('.phone-settings input[value="hold"]')!.checked).toBe(true)
     act(() => { container.querySelector<HTMLInputElement>('.phone-settings input[value="center"]')!.click() })
     expect(updateControls).toHaveBeenLastCalledWith({ rudder: 0 })
-    expect(storage.has('osfs.phone-yaw-release')).toBe(false)
+    expect(updateSettings).toHaveBeenLastCalledWith({ yawRelease: 'center', yawReturnMs: 0 })
   })
 
   it('sweeps the yaw home over the return time Settings sets', () => {
@@ -367,7 +391,7 @@ describe('phone controller screen', () => {
     expect(text('.phone-settings__slider output')).toBe('Instant')
     drag(time, '500')
     expect(text('.phone-settings__slider output')).toBe('0.50s')
-    expect(storage.get('osfs.phone-yaw-return-ms')).toBe('500')
+    expect(updateSettings).toHaveBeenLastCalledWith({ yawRelease: 'center', yawReturnMs: 500 })
 
     updateControls.mockClear()
     pointer(yawTrack(), 'pointerup')

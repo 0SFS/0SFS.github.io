@@ -4,11 +4,12 @@ import { createJoinSecret, createPairingUrl, createSessionId, INVITATION_TTL_MS 
 import { DEFAULT_CONTROL_SHARING, type ControlSharing } from "./controlSharing";
 import { createPhoneCameraReceiver } from "./phoneCameraPlayout";
 import { DEFAULT_PHONE_CAMERA_TUNING, type PhoneCameraTuning } from "./phoneCameraTuning";
+import { mergePairedPhoneSettings } from "./phoneControllerSettings";
 import {
   HANDOFF_MS, HAPTIC_FEEDBACK_TTL_MS, HAPTIC_FEEDBACK_VERSION, HEARTBEAT_MS, MAX_HAPTIC_PULSE_MS, STALE_MS,
   PROTOCOL_MISMATCH_MESSAGE, isCentered, isProtocolVersionMismatch, neutralize, parseMessage,
   type ActionMessage, type AircraftStatus, type CameraAim, type ControlFrame, type ControlSurfaceState,
-  type HandBack, type HapticFeedbackFrame, type RemoteMessage,
+  type HandBack, type HapticFeedbackFrame, type PhoneControllerSettings, type PhoneSettingsMessage, type RemoteMessage,
 } from "../../remote/protocol";
 
 export interface PhoneSessionSnapshot {
@@ -47,8 +48,14 @@ export interface PhoneControlSessionOptions {
    * from the pointer event, and this is the phone's equivalent.
    */
   onCameraAim?(): void;
-  /** The A/B camera settings, read as each frame arrives and each view is drawn. Defaults to the original behaviour. */
+  /** The camera trackpad settings, read as each frame arrives and each view is drawn. Defaults to the catalogue's defaults. */
   getCameraTuning?(): PhoneCameraTuning;
+  /**
+   * The phone controller's own settings, kept here with this computer's. A
+   * phone that sends its own is answered with these, and sent them again on
+   * `syncPhoneSettings`. Absent, a phone keeps its own.
+   */
+  phoneSettings?: { get(): PhoneControllerSettings; set(settings: PhoneControllerSettings): void };
   /**
    * The opt-in camera trace. Present, the heartbeat asks the phone for its
    * timings, and every control frame that reaches this session is reported
@@ -113,6 +120,9 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
   // One latest-value haptic slot; never a queue of impacts.
   let feedback: { id: number; pulseMs: number; queuedAt: number; epoch: number } | null = null;
   let feedbackId = 0;
+  /** The newest settings message this session's phone sent, or null if it never sent one; and the last answer sent. */
+  let phoneSettingsRev: number | null = null;
+  let phoneSettingsSent = "";
   /**
    * The phone flew and has not let go: only its Release, Take control here, or
    * the end of the session ends this. While it stands, control that a hidden
@@ -329,6 +339,19 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
       || current.paused !== pending.paused
       || (["throttle", "pitchTrim", "rollTrim", "flaps"] as const).some(key => current.controls[key] !== pending!.baseline[key]);
   };
+  /** A phone's own settings: kept here, as `PhoneSettingsMessage` says, and answered with what this computer then holds. */
+  const receivePhoneSettings = (message: PhoneSettingsMessage) => {
+    if (!options.phoneSettings || (phoneSettingsRev !== null && message.rev <= phoneSettingsRev)) return;
+    phoneSettingsRev = message.rev;
+    options.phoneSettings.set(message.initial ? mergePairedPhoneSettings(options.phoneSettings.get(), message.settings) : message.settings);
+    syncPhoneSettings();
+  };
+  const syncPhoneSettings = () => {
+    if (phoneSettingsRev === null || !options.phoneSettings || !active || !localReady || !remoteReady) return;
+    const settings = options.phoneSettings.get();
+    const key = JSON.stringify([settings, phoneSettingsRev]);
+    if (key !== phoneSettingsSent && send({ ...envelope(), type: "settings", settings, rev: phoneSettingsRev })) phoneSettingsSent = key;
+  };
   const handleAction = (message: ActionMessage) => {
     if (actions.has(message.id)) { send(actions.get(message.id)!); return; }
     if (pending?.id === message.id || message.id <= maxActionId) return;
@@ -452,6 +475,7 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
           }
           // Consume the invitation before any asynchronous native channel setup.
           active = transport; secret = null; session = createSessionId(); maxActionId = -1;
+          phoneSettingsRev = null; phoneSettingsSent = "";
           clearTimeout(helloTimer);
           newEpoch();
           publish({ phase: "authenticating", invitationUrl: null, expiresAt: null, message: "Connecting phone controls…" });
@@ -483,7 +507,11 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
           });
           return;
         }
-        if (!("session" in message) || message.session !== session || message.epoch !== epoch) return;
+        if (!("session" in message) || message.session !== session) return;
+        // Not authority, so not bound to an epoch: a change made on the phone
+        // just as control changed hands still counts.
+        if (message.type === "settings") { if (localReady && remoteReady) receivePhoneSettings(message); return; }
+        if (message.epoch !== epoch) return;
         if (message.type === "ready") {
           remoteReady = true;
           if (localReady) {
@@ -658,6 +686,8 @@ export function createPhoneControlSession(options: PhoneControlSessionOptions) {
     /** Whether a gesture is still in progress, so auto-recenter can wait for it. */
     isCameraActive: () => snapshot.owner === "phone" && (now() - aim.lastMovementAt() <= STALE_MS || aim.pending()),
     onHidden() { revoke("Desktop hidden · Simulation paused", true); },
+    /** The phone controller's settings changed here: tell a phone that keeps them here. */
+    syncPhoneSettings,
     /**
      * Presentation only. Replaces any unsent pulse; 0 asks the phone to stop.
      * Ignored unless the phone currently owns control of this epoch.

@@ -4,7 +4,8 @@ import { ASK_BACK_INTERVAL_MS, createPhoneControllerClient, type PhoneController
 import { parsePairingUrl } from './pairing'
 import { DEFAULT_PHONE_CAMERA_TUNING } from '../flight/remote/phoneCameraTuning'
 import { DEFAULT_CONTROL_SHARING } from '../flight/remote/controlSharing'
-import { NEUTRAL_CONTROLS, type AircraftStatus, type ControlFrame, type RemoteMessage } from './protocol'
+import { DEFAULT_PHONE_CONTROLLER_SETTINGS } from '../flight/remote/phoneControllerSettings'
+import { NEUTRAL_CONTROLS, type AircraftStatus, type ControlFrame, type PhoneControllerSettings, type RemoteMessage } from './protocol'
 import type { createPeerEndpoint, SessionTransport } from './peerTransport'
 
 type Envelope = { v: 1; session: string; epoch: number }
@@ -276,7 +277,7 @@ describe('phone controller', () => {
   })
 
   it('sends once per touch frame when the computer asks, carrying the running total', async () => {
-    const tuning = { ...DEFAULT_PHONE_CAMERA_TUNING }
+    const tuning = { ...DEFAULT_PHONE_CAMERA_TUNING, send: 'timer' as const }
     const h = await setup({ postTask: task => { setTimeout(task, 0) } }, { getCameraTuning: () => tuning })
     await advance(50)
     await h.fly()
@@ -809,5 +810,78 @@ describe('phone haptics', () => {
     expect(h.client.getSnapshot().hostFresh).toBe(false)
     expect(vibrate.mock.calls.every(([ms]) => ms <= 60)).toBe(true)
     expect(vibrate).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('phone controller settings', () => {
+  const storage = (entries: Record<string, string> = {}) => {
+    const map = new Map(Object.entries(entries))
+    return { map, getItem: (key: string) => map.get(key) ?? null, setItem: (key: string, value: string) => { map.set(key, value) } }
+  }
+  /** What the computer's registry holds. */
+  const computer = (initial: Partial<PhoneControllerSettings> = {}) => {
+    let held: PhoneControllerSettings = { ...DEFAULT_PHONE_CONTROLLER_SETTINGS, ...initial }
+    return { get: () => ({ ...held }), set: vi.fn((next: PhoneControllerSettings) => { held = { ...next } }), held: () => held,
+      change(patch: Partial<PhoneControllerSettings>) { held = { ...held, ...patch } } }
+  }
+
+  it("brings a phone's own choices to a computer that has none, and an imported setup to the phone", async () => {
+    const prefs = storage({ 'osfs.phone-grid-position': 'top', 'osfs.phone-yaw-return-ms': '500' })
+    const held = computer({ yawReturnMs: 300 })
+    const h = await setup({ storage: prefs }, { phoneSettings: held })
+    await flush()
+    expect(held.held()).toEqual({ ...DEFAULT_PHONE_CONTROLLER_SETTINGS, grid: 'top', yawReturnMs: 300 })
+    expect(h.client.getSnapshot().settings).toEqual(held.held())
+    // Kept on the phone for when it is not paired.
+    expect(prefs.map.get('osfs.phone-yaw-return-ms')).toBe('300')
+  })
+
+  it('keeps a change on either side on both, and a slider dragged on the phone never jumps back', async () => {
+    const prefs = storage()
+    const held = computer()
+    const h = await setup({ storage: prefs }, { phoneSettings: held })
+    await flush()
+    h.client.updateSettings({ grid: 'top' })
+    await flush()
+    expect(held.held().grid).toBe('top')
+    expect(prefs.map.get('osfs.phone-grid-position')).toBe('top')
+
+    // The answers to the first steps of a drag arrive after the later steps.
+    const drawn: number[] = []
+    h.client.subscribe(() => drawn.push(h.client.getSnapshot().settings.yawReturnMs))
+    for (const ms of [100, 200, 300]) h.client.updateSettings({ yawReturnMs: ms })
+    await flush()
+    expect(drawn).toEqual([100, 200, 300])
+    expect(held.held().yawReturnMs).toBe(300)
+
+    // Changed on the computer: the phone follows, and keeps it.
+    held.change({ yawRelease: 'hold' })
+    h.host.syncPhoneSettings()
+    await flush()
+    expect(h.client.getSnapshot().settings.yawRelease).toBe('hold')
+    expect(prefs.map.get('osfs.phone-yaw-release')).toBe('hold')
+  })
+
+  it('keeps its own settings with a computer that does not keep them', async () => {
+    const prefs = storage({ 'osfs.phone-grid-position': 'top' })
+    const h = await setup({ storage: prefs })
+    await flush()
+    h.client.updateSettings({ yawRelease: 'hold' })
+    await flush()
+    expect(h.client.getSnapshot().settings).toMatchObject({ grid: 'top', yawRelease: 'hold' })
+    expect(h.hostLink.reliable.some(message => message.type === 'settings')).toBe(false)
+  })
+
+  it('counts the control frames it sends a second, for the chip beside the round trip', async () => {
+    const h = await setup()
+    expect(h.client.getSnapshot().sendHz).toBeNull()
+    await advance(1000)
+    // Paired, but the computer flies: nothing to send.
+    expect(h.client.getSnapshot().sendHz).toBe(0)
+    await h.fly()
+    await advance(2000)
+    // With no finger moving, the 60 Hz timer, whose 16.7 ms a timer runs as 16.
+    expect(h.client.getSnapshot().sendHz).toBeGreaterThanOrEqual(58)
+    expect(h.client.getSnapshot().sendHz).toBeLessThanOrEqual(63)
   })
 })

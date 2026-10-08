@@ -1,0 +1,44 @@
+{
+  "schema": "0sfs-f135-retained-archive-verification/1",
+  "verifiedAt": "2026-10-08",
+  "runtime": {
+    "node": "v26.9.0",
+    "zlib": "1.2.12",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "packingScript": {
+    "path": "scripts/validation/f35b/pack-powered-lift-trace.mjs",
+    "sha256": "3e5c96c86ad98d44f58590122268a61f367f4a83407dcbe3b5c3473a08c10df8"
+  },
+  "indexSha256": "13b46a3b1800b8597e7f842ebe5622ebfbfb1293274753cd3dced4a8cef36ddf",
+  "completeReports": 19,
+  "executedHelperSnapshots": 19,
+  "capturedRunnerSnapshots": 5,
+  "exactInputSnapshots": 9,
+  "retainedTraces": 24,
+  "exactGzipRoundTrips": 24,
+  "decodedCsvRows": 268824,
+  "originalGzipBytes": 607454004,
+  "retainedTraceDataBytes": 223794420,
+  "observedPayloadBeforeReceipt": {
+    "files": 103,
+    "bytes": 233611313
+  },
+  "incompleteScratchRunsExcluded": [
+    "2026-10-08_162709"
+  ],
+  "acceptedPhaseTraces": 14,
+  "acceptedSteps": 163200,
+  "acceptedFallbackSteps": 0,
+  "failedRows": 0,
+  "checks": [
+    "Every archived payload SHA-256 and size matches its manifest.",
+    "Every restored CSV.gz SHA-256 and size matches its original report.",
+    "Every restored decoded CSV SHA-256 matches its manifest.",
+    "Every complete report is byte-identical to its original.",
+    "Every executed/helper/input snapshot gzip and decoded hash matches its retained provenance.",
+    "Every fork.21 accepted integration and publication step uses its selected algorithm; no accepted fallback or failed row.",
+    "Final helper restored old schema 1 column-major gzip and all current schema 2 archives."
+  ]
+}

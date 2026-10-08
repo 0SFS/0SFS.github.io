@@ -6,12 +6,15 @@ type HudBarClicks = Pick<import("./hud/createFlightHudBar").FlightHudBarOptions,
   "onDebugClick" | "onMapClick" | "onRendererClick" | "onStatusClick" | "onPausedChange" | "onBugReportClick">;
 
 const mocks = vi.hoisted(() => {
+  /** The runtime's sky as the flight sees it: off until a test turns it on. */
+  const sky = { environment: null as { whiteLuminance: number; illumination: { observer: { latDeg: number; lonDeg: number } } } | null, listener: null as (() => void) | null };
   const state = { latDeg: 1, lonDeg: 2, altMeters: 1000, headingRad: 0,
     northVelocityFps: 100, eastVelocityFps: 20, verticalSpeedFps: 5,
     rollRad: 0, pitchRad: 0, airspeedKts: 120, throttleNorm: 0.65 };
   const meshSnapshot = { roots: [], enabled: false, error: null };
   return {
     state,
+    sky,
     meshInspector: {
       setRoots: vi.fn(), setEnabled: vi.fn(), setSelected: vi.fn(), selectAll: vi.fn(), dispose: vi.fn(),
       getSnapshot: () => meshSnapshot, subscribe: () => () => {},
@@ -29,6 +32,12 @@ const mocks = vi.hoisted(() => {
       prepareTerrain: vi.fn(async (request: { altitudeMeters?: number }) => ({ groundHeightMeters: 250, altitudeMeters: request.altitudeMeters ?? 1774 })),
       surface: { sample: vi.fn(() => null) },
       getWorldRoot: () => mocks.worldRoot, setSimViewState: vi.fn(), setSimTick: vi.fn(),
+      sky: {
+        getEnvironment: () => sky.environment,
+        subscribe: (listener: () => void) => { sky.listener = listener; return () => { sky.listener = null; }; },
+        setGroundLights: vi.fn(),
+        setGroundLightReceiver: vi.fn(),
+      },
       registerFocusPoint: vi.fn<(point: { id: string; label: string; getPosition: () => unknown }) => () => void>(() => mocks.unregisterFocusPoint),
       googleTerrainDetail: {
         defaultErrorTarget: 20,
@@ -43,9 +52,9 @@ const mocks = vi.hoisted(() => {
       }),
       isStreamingTiles: () => false,
       onTilesStreamingChange: vi.fn(() => () => {}),
-      onRasterDetailFeedback: vi.fn(() => () => {}),
+      onRasterDetailFeedback: vi.fn<import("foss-earth/runtime").BabylonRuntime["onRasterDetailFeedback"]>(() => () => {}),
       onDetailAdjusted: vi.fn<import("foss-earth/runtime").BabylonRuntime["onDetailAdjusted"]>(() => mocks.unsubscribeDetailLog),
-      getRasterDetailFeedback: vi.fn(() => null),
+      getRasterDetailFeedback: vi.fn<import("foss-earth/runtime").BabylonRuntime["getRasterDetailFeedback"]>(() => null),
       setRasterDetailTarget: vi.fn(),
       setGoogleTerrainDetailTarget: vi.fn((errorTarget: number | null) => {
         mocks.runtime.googleTerrainDetail.errorTarget = errorTarget ?? mocks.runtime.googleTerrainDetail.defaultErrorTarget;
@@ -161,6 +170,7 @@ vi.mock("./audio/jsbsimAudioAdapter", async importOriginal => {
   return { ...actual, createJsbsimAudioAdapter: vi.fn(actual.createJsbsimAudioAdapter) };
 });
 vi.mock("./aircraft/createAircraftModel", () => ({ createAircraftModel: vi.fn(() => mocks.aircraftModel) }));
+vi.mock("./aircraft/createAircraftLights", () => ({ createAircraftLights: vi.fn(() => ({ refresh: vi.fn(), dispose: vi.fn() })) }));
 vi.mock("foss-earth/diagnostics", async importOriginal => {
   const actual = await importOriginal<typeof import("foss-earth/diagnostics")>();
   return { ...actual, createMeshInspector: vi.fn(() => mocks.meshInspector), startAppDiagnostics: vi.fn(actual.startAppDiagnostics), issueReporterFromBuild: vi.fn(actual.issueReporterFromBuild) };
@@ -223,7 +233,7 @@ import { createFlightAudio } from "./audio/createFlightAudio";
 import { captureSavedFlight, restoreSavedFlight, SAVED_FLIGHT_STORAGE_KEY, type SavedFlight } from "./jsbsim/savedFlight";
 
 // Each test is a fresh page: the app registry reads the stubbed storage again.
-afterEach(() => { mocks.useRealFlightHud = false; mocks.engineVisualValues.clear(); mocks.externalTankAttached.set(2, true); mocks.externalTankAttached.set(3, true); mocks.physics.getFault = () => null; vi.clearAllMocks(); vi.unstubAllGlobals(); document.body.replaceChildren(); resetAppSettings(); });
+afterEach(() => { mocks.sky.environment = null; mocks.sky.listener = null; mocks.useRealFlightHud = false; mocks.engineVisualValues.clear(); mocks.externalTankAttached.set(2, true); mocks.externalTankAttached.set(3, true); mocks.physics.getFault = () => null; vi.clearAllMocks(); vi.unstubAllGlobals(); document.body.replaceChildren(); resetAppSettings(); });
 
 const savedSettings = (storage: Map<string, string>): Record<string, unknown> =>
   (JSON.parse(storage.get(SETTINGS_STORAGE_KEY) ?? "{\"values\":{}}") as { values: Record<string, unknown> }).values;
@@ -307,6 +317,104 @@ it("logs automatic map detail changes with their frame-time reason and disconnec
     expect(document.body.textContent).toContain("Map detail returned 0.5 levels toward what you asked for: automatic-adjustment settings changed.");
   } finally { await act(async () => app.destroy()); }
   expect(mocks.unsubscribeDetailLog).toHaveBeenCalledOnce();
+});
+
+it("logs what limits 2D imagery once delivery settles, says it in the Map tab, and stops with the flight", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  vi.stubGlobal("localStorage", { getItem: () => null, setItem: vi.fn() });
+  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
+  type Feedback = ReturnType<import("foss-earth/runtime").BabylonRuntime["getRasterDetailFeedback"]>;
+  let feedback: Feedback = null;
+  const listeners = new Set<() => void>();
+  mocks.runtime.status = { mode: "raster-basemap", rasterBaseMap: { id: "usgs-imagery" }, terrainSource: { id: "mapterhorn" } } as never;
+  mocks.runtime.getRasterDetailFeedback.mockImplementation(() => feedback);
+  mocks.runtime.onRasterDetailFeedback.mockImplementation(listener => { listeners.add(listener); return () => { listeners.delete(listener); }; });
+  const root = document.createElement("div"); document.body.append(root);
+  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
+  await act(async () => { app = await createFlightSimApp(root); });
+  /** FOSS Earth reports delivery to each subscriber: the detail controller and the log. */
+  const report = (next: Feedback) => act(async () => { feedback = next; for (const listener of [...listeners]) listener(); });
+  const logged = () => Array.from(document.querySelectorAll(".game-log__text"), line => line.textContent ?? "").filter(text => text.startsWith("2D imagery"));
+  const ready = { support: "ready", pending: false, effectiveTarget: null, source: { id: "usgs-imagery", version: "1", label: "USGS Imagery" } } as const;
+  const tables = { cause: "page-tables", parameter: "map.imagery.pageTablePatches", configured: 16, effective: 16, needed: 20, patches: 4 } as const;
+  const limited = "2D imagery is limited by the page tables: 16 available, 20 needed by visible patches.";
+  try {
+    // Nothing while imagery still loads; one line once it settles, however its counts move after.
+    await report({ ...ready, pending: true, limits: ["backend", "loading"], constraints: [tables] });
+    expect(logged()).toEqual([]);
+    await report({ ...ready, limits: ["backend"], constraints: [tables] });
+    await report({ ...ready, limits: ["backend"], constraints: [{ ...tables, patches: 6 }] });
+    expect(logged()).toEqual([`${limited} 4 patches draw one coarser page instead.`]);
+    // The Map tab says the same beside the detail setting, with the current counts.
+    await act(async () => mocks.hudBarOptions!.onMapClick());
+    expect(root.querySelector(".map-detail-panel__status")?.textContent).toContain(`${limited} 6 patches draw one coarser page instead.`);
+    await report({ ...ready, limits: [], constraints: [] });
+    // Newest first, as the log lists them.
+    expect(logged()).toEqual(["2D imagery is no longer limited by the page tables.", `${limited} 4 patches draw one coarser page instead.`]);
+  } finally {
+    await act(async () => app.destroy());
+    mocks.runtime.status = { mode: "fallback" } as never;
+    mocks.runtime.getRasterDetailFeedback.mockImplementation(() => null);
+    mocks.runtime.onRasterDetailFeedback.mockImplementation(() => () => {});
+  }
+  expect(listeners.size).toBe(0);
+});
+
+it("flies under the sky's dome by default, offers the Sky and Date and time tabs, and shows the engine's glow against the sky's white", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  vi.stubGlobal("localStorage", { getItem: () => null, setItem: vi.fn() });
+  Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [] });
+  const root = document.createElement("div"); document.body.append(root);
+  let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
+  await act(async () => { app = await createFlightSimApp(root); });
+  const settings = getAppSettings();
+  const references = (): (string | null)[] => ["osfs.exhaust.gasReferenceNits", "osfs.exhaust.surfaceReferenceNits"].map(id => settings.inspect(id).note);
+  try {
+    // The flight's own default, which a pilot's saved choice still overrides.
+    expect(settings.inspect("sky.model")).toMatchObject({ value: "dome", provenance: "host-default" });
+    // The aircraft's underside is lit by the ground below it as drawn, measured from the aircraft.
+    expect(settings.inspect("sky.groundLight.mode")).toMatchObject({ value: "rendered", provenance: "host-default" });
+    const receiver = mocks.runtime.sky.setGroundLightReceiver.mock.calls.at(-1)![0] as (() => unknown) | null;
+    expect(receiver).toBeTypeOf("function");
+    // Imagery lit as at the aircraft is the flight's own choice to offer; per point stays the default on this device.
+    expect(settings.inspect("sky.surface.lighting").value).toBe("daylight");
+    expect(settings.inspect("sky.surface.lighting").choices.map(choice => choice.id)).toEqual(["daylight", "photograph", "viewpoint"]);
+    // Its lights, on its own node, against the sky's white.
+    const { createAircraftLights } = await import("./aircraft/createAircraftLights");
+    expect(vi.mocked(createAircraftLights)).toHaveBeenCalledWith(expect.objectContaining({ parent: mocks.aircraft.modelRoot, aircraftId: expect.any(String) }));
+    // Until the sky has been computed there is no exposure: the emitters keep their own references.
+    expect(references()).toEqual([null, null]);
+    // Night, with the meter at the dark end of its range: white is 2.4 cd/m².
+    mocks.sky.environment = { whiteLuminance: 2.4, illumination: { observer: { latDeg: 44.98, lonDeg: -93.27 } } };
+    await act(async () => mocks.sky.listener!());
+    for (const note of references()) expect(note).toContain("the sky's exposure shows 2.4 cd/m² as white");
+    // Noon: the same emitter against 41,500 cd/m².
+    mocks.sky.environment = { ...mocks.sky.environment, whiteLuminance: 41_532 };
+    await act(async () => mocks.sky.listener!());
+    for (const note of references()) expect(note).toContain("41,500 cd/m² as white");
+    // The sky turned off: their own references again.
+    mocks.sky.environment = null;
+    await act(async () => mocks.sky.listener!());
+    expect(references()).toEqual([null, null]);
+    await openTab(root, "Sky");
+    expect(root.querySelector('[data-settings-section="sky/exposure"] [data-parameter="renderer.exposureEV"]')).not.toBeNull();
+    expect(root.querySelector('[data-settings-section="sky/atmosphere"] [data-parameter="sky.model"]')).not.toBeNull();
+    expect(root.querySelector('[data-parameter="renderer.ambientFillMultiplier"]')).toBeNull();
+    // The Sky tab says where the Sun is and links to the dials that set the time.
+    expect(root.textContent).toContain("the Sun is");
+    const dateTime = [...root.querySelectorAll("button")].find(button => button.textContent === "Date and time")!;
+    await act(async () => dateTime.click());
+    expect(root.querySelector('[data-settings-section="time/instant"]')).not.toBeNull();
+    expect(root.querySelectorAll(".foss-earth-dial")).toHaveLength(2);
+    // On again, for the end of the flight below.
+    mocks.sky.environment = { whiteLuminance: 2.4, illumination: { observer: { latDeg: 44.98, lonDeg: -93.27 } } };
+    await act(async () => mocks.sky.listener!());
+    expect(references()[0]).not.toBeNull();
+  } finally { await act(async () => app.destroy()); }
+  expect(mocks.sky.listener).toBeNull();
+  expect(mocks.runtime.sky.setGroundLightReceiver).toHaveBeenLastCalledWith(null);
+  // The notes go with the flight that set them.
+  expect(references()).toEqual([null, null]);
 });
 
 it("runs wheel feedback only when selected, exposes A/B while paused, and mutes on off", async () => {
@@ -453,10 +561,15 @@ describe("0SFS render demand", () => {
     let app!: Awaited<ReturnType<typeof createFlightSimApp>>;
     await act(async () => { app = await createFlightSimApp(root); });
     try {
+      // The aircraft's flashing lights keep the flight's time: running with it, and held while it is paused.
+      const { createAircraftLights } = await import("./aircraft/createAircraftLights");
+      const lightsRunning = (vi.mocked(createAircraftLights).mock.calls.at(-1)![0] as { isRunning(): boolean }).isRunning;
+      expect(lightsRunning()).toBe(mocks.runtime.setSimRunning.mock.calls.at(-1)![0]);
       window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyP" }));
       window.dispatchEvent(new KeyboardEvent("keyup", { code: "KeyP" }));
       expect(mocks.runtime.setSimRunning).toHaveBeenLastCalledWith(false);
       expect(mocks.physics.setPaused).toHaveBeenLastCalledWith(true);
+      expect(lightsRunning()).toBe(false);
       const canvas = root.querySelector("canvas")!;
       mocks.runtime.requestRender.mockClear();
       canvas.dispatchEvent(new MouseEvent("click", { button: 0 }));

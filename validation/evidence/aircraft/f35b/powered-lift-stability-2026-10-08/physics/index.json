@@ -1,0 +1,1023 @@
+{
+  "schema": "0sfs-f135-powered-lift-retained-evidence/1",
+  "date": "2026-10-08",
+  "packingScript": {
+    "path": "scripts/validation/f35b/pack-powered-lift-trace.mjs",
+    "sha256": "3e5c96c86ad98d44f58590122268a61f367f4a83407dcbe3b5c3473a08c10df8"
+  },
+  "runtime": {
+    "node": "v26.9.0",
+    "zlib": "1.2.12"
+  },
+  "runs": [
+    {
+      "name": "2026-10-08_162550",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_162550",
+      "report": {
+        "file": "2026-10-08_162550/report.json",
+        "sha256": "4ef73cd9ee1d3e8270722b63f07d1140b3fc350bc91026212673adb46bb4a4ef",
+        "bytes": 93889
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.20"
+      },
+      "nativeCommit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+      "hz": 120,
+      "algorithm": "reduced",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_162550/helpers.mjs",
+        "sha256": "9409a6cf6812df1df699ce910d4064bbd1fb120ccf1d73942251326b0939faa7",
+        "retained": "2026-10-08_162550/helpers.mjs.gz",
+        "retainedSha256": "165a83e5f0d80038eac21da4e13a8df31e9ea7b61c2fb952e98b3398e7d6b722",
+        "originalBytes": 675663,
+        "retainedBytes": 177195,
+        "reportExpectedSha256": null
+      },
+      "runnerSnapshot": null,
+      "runnerSnapshotLimitation": "Executed runner bytes were not captured for this original run; the original report hash is retained, without substituting current source.",
+      "traces": [],
+      "unretainedCases": [
+        "steady-1"
+      ]
+    },
+    {
+      "name": "2026-10-08_162611",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_162611",
+      "report": {
+        "file": "2026-10-08_162611/report.json",
+        "sha256": "d5f6ff0d0e0eca4ad501b4b635b4c1b500cffbc9b6da35c550287aaf4a5b51e4",
+        "bytes": 272138
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.20"
+      },
+      "nativeCommit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+      "hz": 120,
+      "algorithm": "reduced",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_162611/helpers.mjs",
+        "sha256": "9409a6cf6812df1df699ce910d4064bbd1fb120ccf1d73942251326b0939faa7",
+        "retained": "2026-10-08_162611/helpers.mjs.gz",
+        "retainedSha256": "165a83e5f0d80038eac21da4e13a8df31e9ea7b61c2fb952e98b3398e7d6b722",
+        "originalBytes": 675663,
+        "retainedBytes": 177195,
+        "reportExpectedSha256": null
+      },
+      "runnerSnapshot": null,
+      "runnerSnapshotLimitation": "Executed runner bytes were not captured for this original run; the original report hash is retained, without substituting current source.",
+      "traces": [
+        {
+          "name": "idle-entry",
+          "manifest": "2026-10-08_162611/idle-entry.json",
+          "originalGzipSha256": "5850ae8d883b353cb232d58b0c163ddbd76dc85ff2a9a35f295006a197d6517c",
+          "rows": 9601,
+          "channels": 777,
+          "originalGzipBytes": 19624365,
+          "dataBytes": 7477761
+        },
+        {
+          "name": "free-full",
+          "manifest": "2026-10-08_162611/free-full.json",
+          "originalGzipSha256": "87b0a6b2c9bc765a641a7c8d73a937f294871168a5f6f1866a8ee989710572f7",
+          "rows": 9601,
+          "channels": 777,
+          "originalGzipBytes": 28311474,
+          "dataBytes": 9608374
+        }
+      ],
+      "unretainedCases": [
+        "steady-sea-level"
+      ]
+    },
+    {
+      "name": "2026-10-08_162728",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_162728",
+      "report": {
+        "file": "2026-10-08_162728/report.json",
+        "sha256": "089fd1e12de6e808badbc10567bb9e08313b85fa252b65155f515d6ed0f76f67",
+        "bytes": 360068
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.20"
+      },
+      "nativeCommit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+      "hz": 120,
+      "algorithm": "reduced",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_162728/helpers.mjs",
+        "sha256": "ae06201881fe895f40977009af2e8b332fb8d89187d3ca10407a4c37ac11b869",
+        "retained": "2026-10-08_162728/helpers.mjs.gz",
+        "retainedSha256": "a6f16bed2d9149b9840f96548bc38a522fe0f3abf7e7f6097056679123ca1aa9",
+        "originalBytes": 677551,
+        "retainedBytes": 177644,
+        "reportExpectedSha256": null
+      },
+      "runnerSnapshot": null,
+      "runnerSnapshotLimitation": "Executed runner bytes were not captured for this original run; the original report hash is retained, without substituting current source.",
+      "traces": [
+        {
+          "name": "idle-entry-hot",
+          "manifest": "2026-10-08_162728/idle-entry-hot.json",
+          "originalGzipSha256": "3fa6f40653e7a7f7e94311e3d6230bf07aab47e8a1b3ffcff80257c023daadc4",
+          "rows": 9601,
+          "channels": 777,
+          "originalGzipBytes": 20032107,
+          "dataBytes": 6999257
+        },
+        {
+          "name": "steady-cold",
+          "manifest": "2026-10-08_162728/steady-cold.json",
+          "originalGzipSha256": "7c9f130d63e081c28945b6a7bec8c4d17f27630bf4c0161bd240318e47947148",
+          "rows": 9601,
+          "channels": 777,
+          "originalGzipBytes": 19537375,
+          "dataBytes": 7256423
+        }
+      ],
+      "unretainedCases": [
+        "idle-entry-sea-level",
+        "steady-hot"
+      ]
+    },
+    {
+      "name": "2026-10-08_162817",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_162817",
+      "report": {
+        "file": "2026-10-08_162817/report.json",
+        "sha256": "01d0755272c3a2350438aa52630fd7d002ac995e19c627b7dffa1c5272baf901",
+        "bytes": 274296
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.20"
+      },
+      "nativeCommit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+      "hz": 120,
+      "algorithm": "reduced",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_162817/helpers.mjs",
+        "sha256": "ae06201881fe895f40977009af2e8b332fb8d89187d3ca10407a4c37ac11b869",
+        "retained": "2026-10-08_162817/helpers.mjs.gz",
+        "retainedSha256": "a6f16bed2d9149b9840f96548bc38a522fe0f3abf7e7f6097056679123ca1aa9",
+        "originalBytes": 677551,
+        "retainedBytes": 177644,
+        "reportExpectedSha256": null
+      },
+      "runnerSnapshot": null,
+      "runnerSnapshotLimitation": "Executed runner bytes were not captured for this original run; the original report hash is retained, without substituting current source.",
+      "traces": [],
+      "unretainedCases": [
+        "free-entry-60kt",
+        "free-entry-idle",
+        "free-attached"
+      ]
+    },
+    {
+      "name": "2026-10-08_163304",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_163304",
+      "report": {
+        "file": "2026-10-08_163304/report.json",
+        "sha256": "b6edb11b2e2b4f8fec46080d5394bfcf83fb96ee49742e0e72137f6e126bfca8",
+        "bytes": 361431
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.20"
+      },
+      "nativeCommit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+      "hz": 120,
+      "algorithm": "component",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_163304/helpers.mjs",
+        "sha256": "dc3d212048dd8b9a990a161967034caff49a960b75584762c8c20286a7337aa1",
+        "retained": "2026-10-08_163304/helpers.mjs.gz",
+        "retainedSha256": "f998906e8cf27b9c0ec11b8f9acff4caa4c19823e4c5f3af0824b63b2d12e668",
+        "originalBytes": 677726,
+        "retainedBytes": 177691,
+        "reportExpectedSha256": null
+      },
+      "runnerSnapshot": null,
+      "runnerSnapshotLimitation": "Executed runner bytes were not captured for this original run; the original report hash is retained, without substituting current source.",
+      "traces": [],
+      "unretainedCases": [
+        "steady-0.98",
+        "steady-0.99",
+        "perturb--0.01",
+        "perturb-0.01"
+      ]
+    },
+    {
+      "name": "2026-10-08_163351",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_163351",
+      "report": {
+        "file": "2026-10-08_163351/report.json",
+        "sha256": "3d6972918151566f4ff34bb5a2afec41c0926dcf5ad567a35ee085eb09d1325c",
+        "bytes": 363957
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.20"
+      },
+      "nativeCommit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+      "hz": 120,
+      "algorithm": "reduced",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_163351/helpers.mjs",
+        "sha256": "dc3d212048dd8b9a990a161967034caff49a960b75584762c8c20286a7337aa1",
+        "retained": "2026-10-08_163351/helpers.mjs.gz",
+        "retainedSha256": "f998906e8cf27b9c0ec11b8f9acff4caa4c19823e4c5f3af0824b63b2d12e668",
+        "originalBytes": 677726,
+        "retainedBytes": 177691,
+        "reportExpectedSha256": null
+      },
+      "runnerSnapshot": null,
+      "runnerSnapshotLimitation": "Executed runner bytes were not captured for this original run; the original report hash is retained, without substituting current source.",
+      "traces": [],
+      "unretainedCases": [
+        "free-hot-low-fuel",
+        "free-hot-20-fuel",
+        "ground-20-fuel",
+        "ground-entry"
+      ]
+    },
+    {
+      "name": "2026-10-08_163404",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_163404",
+      "report": {
+        "file": "2026-10-08_163404/report.json",
+        "sha256": "21ad76fd3119b5d176dedcdc87e737352f3bbb03fcc55f0c410230ddf142c835",
+        "bytes": 628652
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.20"
+      },
+      "nativeCommit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+      "hz": 120,
+      "algorithm": "reduced",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_163404/helpers.mjs",
+        "sha256": "dc3d212048dd8b9a990a161967034caff49a960b75584762c8c20286a7337aa1",
+        "retained": "2026-10-08_163404/helpers.mjs.gz",
+        "retainedSha256": "f998906e8cf27b9c0ec11b8f9acff4caa4c19823e4c5f3af0824b63b2d12e668",
+        "originalBytes": 677726,
+        "retainedBytes": 177691,
+        "reportExpectedSha256": null
+      },
+      "runnerSnapshot": null,
+      "runnerSnapshotLimitation": "Executed runner bytes were not captured for this original run; the original report hash is retained, without substituting current source.",
+      "traces": [],
+      "unretainedCases": [
+        "conversion-0",
+        "conversion-0.01",
+        "conversion-0.1",
+        "conversion-0.25",
+        "conversion-0.5",
+        "conversion-0.75",
+        "held-wind-60kt"
+      ]
+    },
+    {
+      "name": "2026-10-08_163546",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_163546",
+      "report": {
+        "file": "2026-10-08_163546/report.json",
+        "sha256": "cf236e3eb5e4075ad104355327239b4ed22f854f4e54000f0f14dfca581f0d9b",
+        "bytes": 280373
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.20"
+      },
+      "nativeCommit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+      "hz": 120,
+      "algorithm": "reduced",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_163546/helpers.mjs",
+        "sha256": "dc3d212048dd8b9a990a161967034caff49a960b75584762c8c20286a7337aa1",
+        "retained": "2026-10-08_163546/helpers.mjs.gz",
+        "retainedSha256": "f998906e8cf27b9c0ec11b8f9acff4caa4c19823e4c5f3af0824b63b2d12e668",
+        "originalBytes": 677726,
+        "retainedBytes": 177691,
+        "reportExpectedSha256": null
+      },
+      "runnerSnapshot": null,
+      "runnerSnapshotLimitation": "Executed runner bytes were not captured for this original run; the original report hash is retained, without substituting current source.",
+      "traces": [
+        {
+          "name": "steady-hot",
+          "manifest": "2026-10-08_163546/steady-hot.json",
+          "originalGzipSha256": "e4d7e627388f64bdcaf404b2d8d8b7154315b24050ab83e07e8b8e8a9b6d185b",
+          "rows": 9601,
+          "channels": 686,
+          "originalGzipBytes": 9623933,
+          "dataBytes": 3639152
+        }
+      ],
+      "unretainedCases": [
+        "steady-1",
+        "steady-sea-level",
+        "free-full"
+      ]
+    },
+    {
+      "name": "2026-10-08_163643",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_163643",
+      "report": {
+        "file": "2026-10-08_163643/report.json",
+        "sha256": "51fa1139cd3ab7413d7bdf73df998751d4445698174ccb3cf6464edef02bbae6",
+        "bytes": 182546
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.20"
+      },
+      "nativeCommit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+      "hz": 60,
+      "algorithm": "reduced",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_163643/helpers.mjs",
+        "sha256": "dc3d212048dd8b9a990a161967034caff49a960b75584762c8c20286a7337aa1",
+        "retained": "2026-10-08_163643/helpers.mjs.gz",
+        "retainedSha256": "f998906e8cf27b9c0ec11b8f9acff4caa4c19823e4c5f3af0824b63b2d12e668",
+        "originalBytes": 677726,
+        "retainedBytes": 177691,
+        "reportExpectedSha256": null
+      },
+      "runnerSnapshot": null,
+      "runnerSnapshotLimitation": "Executed runner bytes were not captured for this original run; the original report hash is retained, without substituting current source.",
+      "traces": [
+        {
+          "name": "idle-entry",
+          "manifest": "2026-10-08_163643/idle-entry.json",
+          "originalGzipSha256": "488dc978d4207f94d8b1383b768193d5216602d6fc613c87ad1bcfe95e1f104e",
+          "rows": 4801,
+          "channels": 777,
+          "originalGzipBytes": 10242841,
+          "dataBytes": 3985251
+        },
+        {
+          "name": "steady-hot",
+          "manifest": "2026-10-08_163643/steady-hot.json",
+          "originalGzipSha256": "9ae067d18b12b2cba8aa12fd3e3a313f57224d5920092963d3a9bc789375ca25",
+          "rows": 4801,
+          "channels": 777,
+          "originalGzipBytes": 10327524,
+          "dataBytes": 4022261
+        }
+      ],
+      "unretainedCases": [],
+      "interpretationLimitation": "Historical refinement run: setDt after bootstrap left cached flight-control delta time at 1/120 s. Retained for provenance; use corrected 174336/174401/174544 runs for step-size comparison."
+    },
+    {
+      "name": "2026-10-08_163949",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_163949",
+      "report": {
+        "file": "2026-10-08_163949/report.json",
+        "sha256": "aae36feba5118e5e2eb511dfccf6aef150bc3199e68ee2c933eea05473a6f740",
+        "bytes": 182592
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.20"
+      },
+      "nativeCommit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+      "hz": 240,
+      "algorithm": "component",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_163949/helpers.mjs",
+        "sha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480",
+        "retained": "2026-10-08_163949/helpers.mjs.gz",
+        "retainedSha256": "0120dd1ec4dc8425c058b77c88fd4f934ed7cca2ac038f712415569a6a75c211",
+        "originalBytes": 677775,
+        "retainedBytes": 177706,
+        "reportExpectedSha256": null
+      },
+      "runnerSnapshot": null,
+      "runnerSnapshotLimitation": "Executed runner bytes were not captured for this original run; the original report hash is retained, without substituting current source.",
+      "traces": [
+        {
+          "name": "idle-entry",
+          "manifest": "2026-10-08_163949/idle-entry.json",
+          "originalGzipSha256": "868969ce4d96ff7cee99268e447fec790ac9f8357662265b1e8053490bdcd65a",
+          "rows": 19201,
+          "channels": 777,
+          "originalGzipBytes": 38122858,
+          "dataBytes": 13846169
+        },
+        {
+          "name": "steady-hot",
+          "manifest": "2026-10-08_163949/steady-hot.json",
+          "originalGzipSha256": "3eebb04c9226f62e50ae02474f140b3fb317cf2f04fde20a1e9dead5de07371c",
+          "rows": 19201,
+          "channels": 777,
+          "originalGzipBytes": 38328019,
+          "dataBytes": 13188466
+        }
+      ],
+      "unretainedCases": [],
+      "interpretationLimitation": "Historical refinement run: setDt after bootstrap left cached flight-control delta time at 1/120 s. Retained for provenance; use corrected 174336/174401/174544 runs for step-size comparison."
+    },
+    {
+      "name": "2026-10-08_164037",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_164037",
+      "report": {
+        "file": "2026-10-08_164037/report.json",
+        "sha256": "2aeb1e90890db77bac1d7fc49794e638529dec35a77778c75788adc030a8c43e",
+        "bytes": 290961
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.20"
+      },
+      "nativeCommit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+      "hz": 120,
+      "algorithm": "reduced",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_164037/helpers.mjs",
+        "sha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480",
+        "retained": "2026-10-08_164037/helpers.mjs.gz",
+        "retainedSha256": "0120dd1ec4dc8425c058b77c88fd4f934ed7cca2ac038f712415569a6a75c211",
+        "originalBytes": 677775,
+        "retainedBytes": 177706,
+        "reportExpectedSha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480"
+      },
+      "runnerSnapshot": null,
+      "runnerSnapshotLimitation": "Executed runner bytes were not captured for this original run; the original report hash is retained, without substituting current source.",
+      "traces": [
+        {
+          "name": "partial-10-60kt",
+          "manifest": "2026-10-08_164037/partial-10-60kt.json",
+          "originalGzipSha256": "45652e2b38a0c72f22350a514b4ec43bcdef53a8e6d4babe32ff039b1c31cb0d",
+          "rows": 9601,
+          "channels": 831,
+          "originalGzipBytes": 32532018,
+          "dataBytes": 12872390
+        }
+      ],
+      "unretainedCases": [
+        "held-fuel-0.2",
+        "held-fuel-0.3"
+      ]
+    },
+    {
+      "name": "2026-10-08_164500",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_164500",
+      "report": {
+        "file": "2026-10-08_164500/report.json",
+        "sha256": "73a95ea19c27a66844c49b28d0d028834785bc86accbc517cfa4a1499edd6983",
+        "bytes": 197955
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.20"
+      },
+      "nativeCommit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+      "hz": 120,
+      "algorithm": "reduced",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_164500/helpers.mjs",
+        "sha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480",
+        "retained": "2026-10-08_164500/helpers.mjs.gz",
+        "retainedSha256": "0120dd1ec4dc8425c058b77c88fd4f934ed7cca2ac038f712415569a6a75c211",
+        "originalBytes": 677775,
+        "retainedBytes": 177706,
+        "reportExpectedSha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480"
+      },
+      "runnerSnapshot": null,
+      "runnerSnapshotLimitation": "Executed runner bytes were not captured for this original run; the original report hash is retained, without substituting current source.",
+      "traces": [],
+      "unretainedCases": [
+        "held-wind-60kt",
+        "level-hover"
+      ]
+    },
+    {
+      "name": "2026-10-08_164716",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_164716",
+      "report": {
+        "file": "2026-10-08_164716/report.json",
+        "sha256": "ffd8f9807877780e4fe2a7b4404f6d0eb85654f1d75373ec848583468bf0c990",
+        "bytes": 195525
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.20"
+      },
+      "nativeCommit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+      "hz": 120,
+      "algorithm": "component",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_164716/helpers.mjs",
+        "sha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480",
+        "retained": "2026-10-08_164716/helpers.mjs.gz",
+        "retainedSha256": "0120dd1ec4dc8425c058b77c88fd4f934ed7cca2ac038f712415569a6a75c211",
+        "originalBytes": 677775,
+        "retainedBytes": 177706,
+        "reportExpectedSha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480"
+      },
+      "runnerSnapshot": null,
+      "runnerSnapshotLimitation": "Executed runner bytes were not captured for this original run; the original report hash is retained, without substituting current source.",
+      "traces": [],
+      "unretainedCases": [
+        "matched-empirical-5000ft",
+        "matched-empirical-sea-level"
+      ]
+    },
+    {
+      "name": "2026-10-08_171654",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_171654",
+      "report": {
+        "file": "2026-10-08_171654/report.json",
+        "sha256": "246c7c4825a20fbf1127ad1bfc780430ad3959607126cadf53a01f1f4e9e48da",
+        "bytes": 675891
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.21"
+      },
+      "nativeCommit": "34eeae66e5c886eec59eaefb516c0848cb504756",
+      "hz": 120,
+      "algorithm": "reduced",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_171654/helpers.mjs",
+        "sha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480",
+        "retained": "2026-10-08_171654/helpers.mjs.gz",
+        "retainedSha256": "0120dd1ec4dc8425c058b77c88fd4f934ed7cca2ac038f712415569a6a75c211",
+        "originalBytes": 677775,
+        "retainedBytes": 177706,
+        "reportExpectedSha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480"
+      },
+      "runnerSnapshot": null,
+      "runnerSnapshotLimitation": "Executed runner bytes were not captured for this original run; the original report hash is retained, without substituting current source.",
+      "traces": [
+        {
+          "name": "idle-entry",
+          "manifest": "2026-10-08_171654/idle-entry.json",
+          "originalGzipSha256": "b98324f63bf1255cbaaaf0ee543b25b53d6d5a686f67aba299897fb4d424b371",
+          "rows": 9601,
+          "channels": 844,
+          "originalGzipBytes": 22103866,
+          "dataBytes": 8581389
+        },
+        {
+          "name": "steady-1",
+          "manifest": "2026-10-08_171654/steady-1.json",
+          "originalGzipSha256": "f06c9d804951feaa405cf61b4541901a816d0c64374e81ea73f8d80a444ef048",
+          "rows": 9601,
+          "channels": 844,
+          "originalGzipBytes": 21967137,
+          "dataBytes": 8445536
+        },
+        {
+          "name": "steady-hot",
+          "manifest": "2026-10-08_171654/steady-hot.json",
+          "originalGzipSha256": "2f21e60d004cf8ac12f55c712828bee07873e3579947d861d4c90ed188e439f9",
+          "rows": 9601,
+          "channels": 844,
+          "originalGzipBytes": 22021467,
+          "dataBytes": 8075085
+        },
+        {
+          "name": "perturb--0.01",
+          "manifest": "2026-10-08_171654/perturb--0.01.json",
+          "originalGzipSha256": "7c0aff4a616a4abf59a1a4ac1ba7a94318c8a0ac2756bd652d6dde25280cd688",
+          "rows": 9601,
+          "channels": 844,
+          "originalGzipBytes": 22598120,
+          "dataBytes": 8717666
+        },
+        {
+          "name": "perturb-0.01",
+          "manifest": "2026-10-08_171654/perturb-0.01.json",
+          "originalGzipSha256": "0700361ceffc64ca1ebbb3c2b0467cee22c1521380d1337ab4947ca8f38badf2",
+          "rows": 9601,
+          "channels": 844,
+          "originalGzipBytes": 22542157,
+          "dataBytes": 8727547
+        }
+      ],
+      "unretainedCases": [
+        "steady-sea-level",
+        "level-hover"
+      ]
+    },
+    {
+      "name": "2026-10-08_171937",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_171937",
+      "report": {
+        "file": "2026-10-08_171937/report.json",
+        "sha256": "8be3baefd50ee633b9d51a67630091a65b2b89d3e094efa8aa32adea2bc9a2b3",
+        "bytes": 293892
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.21"
+      },
+      "nativeCommit": "34eeae66e5c886eec59eaefb516c0848cb504756",
+      "hz": 120,
+      "algorithm": "component",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_171937/helpers.mjs",
+        "sha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480",
+        "retained": "2026-10-08_171937/helpers.mjs.gz",
+        "retainedSha256": "0120dd1ec4dc8425c058b77c88fd4f934ed7cca2ac038f712415569a6a75c211",
+        "originalBytes": 677775,
+        "retainedBytes": 177706,
+        "reportExpectedSha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480"
+      },
+      "runnerSnapshot": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_171937/runner-source.mjs",
+        "sha256": "688d928863403a4b5d6d6945df3bc7caed983092bfa32bc05ab761b6d88839e1",
+        "retained": "2026-10-08_171937/runner-source.mjs.gz",
+        "retainedSha256": "1a56144ac5dc6a5747ddf3470b6aa836360c8b41464bd156c8ecce710002875b",
+        "originalBytes": 15173,
+        "retainedBytes": 5121,
+        "reportExpectedSha256": "688d928863403a4b5d6d6945df3bc7caed983092bfa32bc05ab761b6d88839e1"
+      },
+      "runnerSnapshotLimitation": null,
+      "traces": [
+        {
+          "name": "idle-entry",
+          "manifest": "2026-10-08_171937/idle-entry.json",
+          "originalGzipSha256": "c0bf812ede5dda901cfc99b037b25afb073b0cdb5281c38f4d8f664cb905a30a",
+          "rows": 9601,
+          "channels": 844,
+          "originalGzipBytes": 22057831,
+          "dataBytes": 8516554
+        },
+        {
+          "name": "steady-hot",
+          "manifest": "2026-10-08_171937/steady-hot.json",
+          "originalGzipSha256": "d7f52c50b5958740c9a05a8bc69750d40f99fa84ef04c80022436886b9a76287",
+          "rows": 9601,
+          "channels": 844,
+          "originalGzipBytes": 22139131,
+          "dataBytes": 8332853
+        }
+      ],
+      "unretainedCases": [
+        "steady-1"
+      ]
+    },
+    {
+      "name": "2026-10-08_172404",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_172404",
+      "report": {
+        "file": "2026-10-08_172404/report.json",
+        "sha256": "e46c8d3d57bb5f63eac92364e6f95ac1dfbd70f164857ed873ad32d91bc7cdc2",
+        "bytes": 104402
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.21"
+      },
+      "nativeCommit": "34eeae66e5c886eec59eaefb516c0848cb504756",
+      "hz": 120,
+      "algorithm": "reduced",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_172404/helpers.mjs",
+        "sha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480",
+        "retained": "2026-10-08_172404/helpers.mjs.gz",
+        "retainedSha256": "0120dd1ec4dc8425c058b77c88fd4f934ed7cca2ac038f712415569a6a75c211",
+        "originalBytes": 677775,
+        "retainedBytes": 177706,
+        "reportExpectedSha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480"
+      },
+      "runnerSnapshot": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_172404/runner-source.mjs",
+        "sha256": "21eb79e403ea6aee863b705bf8c475dee8f48585f29a1d49d5316df43c196816",
+        "retained": "2026-10-08_172404/runner-source.mjs.gz",
+        "retainedSha256": "5b431ab893a10f22269753cac9c0fa80585caa0d96aa9f087878a20575cebc3d",
+        "originalBytes": 15368,
+        "retainedBytes": 5158,
+        "reportExpectedSha256": "21eb79e403ea6aee863b705bf8c475dee8f48585f29a1d49d5316df43c196816"
+      },
+      "runnerSnapshotLimitation": null,
+      "traces": [
+        {
+          "name": "level-hover-fixed-load",
+          "manifest": "2026-10-08_172404/level-hover-fixed-load.json",
+          "originalGzipSha256": "bfa44c47c99dbe1a2ac4b1d45dbdefbf3f78db9bc4ddb2b791575a395ddba01f",
+          "rows": 9601,
+          "channels": 844,
+          "originalGzipBytes": 30495463,
+          "dataBytes": 9669407
+        }
+      ],
+      "unretainedCases": []
+    },
+    {
+      "name": "2026-10-08_174336",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_174336",
+      "report": {
+        "file": "2026-10-08_174336/report.json",
+        "sha256": "ac0734f910c9495baa782464246c46c9317be88eb5106d49d53473704a8e8a99",
+        "bytes": 198374
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.21"
+      },
+      "nativeCommit": "34eeae66e5c886eec59eaefb516c0848cb504756",
+      "hz": 60,
+      "algorithm": "reduced",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_174336/helpers.mjs",
+        "sha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480",
+        "retained": "2026-10-08_174336/helpers.mjs.gz",
+        "retainedSha256": "0120dd1ec4dc8425c058b77c88fd4f934ed7cca2ac038f712415569a6a75c211",
+        "originalBytes": 677775,
+        "retainedBytes": 177706,
+        "reportExpectedSha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480"
+      },
+      "runnerSnapshot": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_174336/runner-source.mjs",
+        "sha256": "9f4433dec2a20a8aafdccba3ef286a72791282c4a29ff296beadaaebf70fecaa",
+        "retained": "2026-10-08_174336/runner-source.mjs.gz",
+        "retainedSha256": "043d2db96382be5404ff89eef8d71e62d206621a05d37110dfa1acebc91bd1a3",
+        "originalBytes": 16146,
+        "retainedBytes": 5452,
+        "reportExpectedSha256": "9f4433dec2a20a8aafdccba3ef286a72791282c4a29ff296beadaaebf70fecaa"
+      },
+      "runnerSnapshotLimitation": null,
+      "traces": [
+        {
+          "name": "idle-entry",
+          "manifest": "2026-10-08_174336/idle-entry.json",
+          "originalGzipSha256": "93afda9ef1669acf7b51096406c2b476432ff5e5170052da594b868ecb058209",
+          "rows": 4801,
+          "channels": 844,
+          "originalGzipBytes": 11571730,
+          "dataBytes": 4579992
+        },
+        {
+          "name": "steady-hot",
+          "manifest": "2026-10-08_174336/steady-hot.json",
+          "originalGzipSha256": "e1726f2bc7651c82b26a8756953af1abe5b582e8f28147e364eba57252d091fd",
+          "rows": 4801,
+          "channels": 844,
+          "originalGzipBytes": 11674426,
+          "dataBytes": 4642088
+        }
+      ],
+      "unretainedCases": [],
+      "timeStepSetup": "setDt before bootstrap; controller delta time matches selected physics step"
+    },
+    {
+      "name": "2026-10-08_174401",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_174401",
+      "report": {
+        "file": "2026-10-08_174401/report.json",
+        "sha256": "e0783a9b83321e58b990fe550f0697ac876f7a46d972c3bc9a1696cad18e541d",
+        "bytes": 198417
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.21"
+      },
+      "nativeCommit": "34eeae66e5c886eec59eaefb516c0848cb504756",
+      "hz": 240,
+      "algorithm": "reduced",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_174401/helpers.mjs",
+        "sha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480",
+        "retained": "2026-10-08_174401/helpers.mjs.gz",
+        "retainedSha256": "0120dd1ec4dc8425c058b77c88fd4f934ed7cca2ac038f712415569a6a75c211",
+        "originalBytes": 677775,
+        "retainedBytes": 177706,
+        "reportExpectedSha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480"
+      },
+      "runnerSnapshot": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_174401/runner-source.mjs",
+        "sha256": "9f4433dec2a20a8aafdccba3ef286a72791282c4a29ff296beadaaebf70fecaa",
+        "retained": "2026-10-08_174401/runner-source.mjs.gz",
+        "retainedSha256": "043d2db96382be5404ff89eef8d71e62d206621a05d37110dfa1acebc91bd1a3",
+        "originalBytes": 16146,
+        "retainedBytes": 5452,
+        "reportExpectedSha256": "9f4433dec2a20a8aafdccba3ef286a72791282c4a29ff296beadaaebf70fecaa"
+      },
+      "runnerSnapshotLimitation": null,
+      "traces": [
+        {
+          "name": "idle-entry",
+          "manifest": "2026-10-08_174401/idle-entry.json",
+          "originalGzipSha256": "b51848631c05226b9697009bbf907e3654d3757358d885204935c13ecd8ccddf",
+          "rows": 19201,
+          "channels": 844,
+          "originalGzipBytes": 42892832,
+          "dataBytes": 16072935
+        },
+        {
+          "name": "steady-hot",
+          "manifest": "2026-10-08_174401/steady-hot.json",
+          "originalGzipSha256": "3dde1545f5298f3aeaf329bff797e339bee5e3a760f846db0ecc2d7962e2d6d0",
+          "rows": 19201,
+          "channels": 844,
+          "originalGzipBytes": 42940540,
+          "dataBytes": 15263883
+        }
+      ],
+      "unretainedCases": [],
+      "timeStepSetup": "setDt before bootstrap; controller delta time matches selected physics step"
+    },
+    {
+      "name": "2026-10-08_174544",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_174544",
+      "report": {
+        "file": "2026-10-08_174544/report.json",
+        "sha256": "be7aeaf6d7601b8b9910cf6f95a62544bb48bf02194c27341edc055b3f0a2abc",
+        "bytes": 198431
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.21"
+      },
+      "nativeCommit": "34eeae66e5c886eec59eaefb516c0848cb504756",
+      "hz": 240,
+      "algorithm": "component",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_174544/helpers.mjs",
+        "sha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480",
+        "retained": "2026-10-08_174544/helpers.mjs.gz",
+        "retainedSha256": "0120dd1ec4dc8425c058b77c88fd4f934ed7cca2ac038f712415569a6a75c211",
+        "originalBytes": 677775,
+        "retainedBytes": 177706,
+        "reportExpectedSha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480"
+      },
+      "runnerSnapshot": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_174544/runner-source.mjs",
+        "sha256": "9f4433dec2a20a8aafdccba3ef286a72791282c4a29ff296beadaaebf70fecaa",
+        "retained": "2026-10-08_174544/runner-source.mjs.gz",
+        "retainedSha256": "043d2db96382be5404ff89eef8d71e62d206621a05d37110dfa1acebc91bd1a3",
+        "originalBytes": 16146,
+        "retainedBytes": 5452,
+        "reportExpectedSha256": "9f4433dec2a20a8aafdccba3ef286a72791282c4a29ff296beadaaebf70fecaa"
+      },
+      "runnerSnapshotLimitation": null,
+      "traces": [
+        {
+          "name": "idle-entry",
+          "manifest": "2026-10-08_174544/idle-entry.json",
+          "originalGzipSha256": "1dc0bfb8d7794761cb48351dbc194c1bed1e483a0c3390e5b6d4cf70579fbd8c",
+          "rows": 19201,
+          "channels": 844,
+          "originalGzipBytes": 42809714,
+          "dataBytes": 16031338
+        },
+        {
+          "name": "steady-hot",
+          "manifest": "2026-10-08_174544/steady-hot.json",
+          "originalGzipSha256": "a88668394fbbcc16c7643502acb8ba2907c7539e935cc1c43813293a8d5444db",
+          "rows": 19201,
+          "channels": 844,
+          "originalGzipBytes": 42957076,
+          "dataBytes": 15242643
+        }
+      ],
+      "unretainedCases": [],
+      "timeStepSetup": "setDt before bootstrap; controller delta time matches selected physics step"
+    },
+    {
+      "name": "2026-10-08_175459",
+      "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_175459",
+      "report": {
+        "file": "2026-10-08_175459/report.json",
+        "sha256": "3068dbc03f46056481dfad6ef72c45544b832b6ad661e53c0c954ece3b6396a4",
+        "bytes": 104288
+      },
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.21"
+      },
+      "nativeCommit": "34eeae66e5c886eec59eaefb516c0848cb504756",
+      "hz": 120,
+      "algorithm": "reduced",
+      "executedBundle": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_175459/helpers.mjs",
+        "sha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480",
+        "retained": "2026-10-08_175459/helpers.mjs.gz",
+        "retainedSha256": "0120dd1ec4dc8425c058b77c88fd4f934ed7cca2ac038f712415569a6a75c211",
+        "originalBytes": 677775,
+        "retainedBytes": 177706,
+        "reportExpectedSha256": "7630ddaf47842448b5e75862ed6fd224797cbfb7ce842bc0bdc47a7ed49a6480"
+      },
+      "runnerSnapshot": {
+        "originalSourcePath": "build/validation/f135-powered-lift/2026-10-08_175459/runner-source.mjs",
+        "sha256": "acf9e3ea10f6d899c5b367ea191ea7b19f096594f093abb4ed932a7e148656cb",
+        "retained": "2026-10-08_175459/runner-source.mjs.gz",
+        "retainedSha256": "fd6d16f9480871929f6bd5facf971d9507031513e4f3c18885cb0520ca379e6a",
+        "originalBytes": 16460,
+        "retainedBytes": 5520,
+        "reportExpectedSha256": "acf9e3ea10f6d899c5b367ea191ea7b19f096594f093abb4ed932a7e148656cb"
+      },
+      "runnerSnapshotLimitation": null,
+      "traces": [
+        {
+          "name": "level-hover-rotating-frame",
+          "manifest": "2026-10-08_175459/level-hover-rotating-frame.json",
+          "originalGzipSha256": "8ca3039bd652c88bc6be825bb7dddce80c3c0fe7a9b519f6b0050a871619e6b0",
+          "rows": 9601,
+          "channels": 844,
+          "originalGzipBytes": 27634813,
+          "dataBytes": 11578850
+        }
+      ],
+      "unretainedCases": [],
+      "timeStepSetup": "setDt before bootstrap; controller delta time matches selected physics step"
+    }
+  ],
+  "sourceInputs": [
+    {
+      "originalSourcePath": "public/jsbsim-data/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml",
+      "sha256": "f04735c23e22eb78a9c77cded49be6e46975695b28140e3bfead8adb3a50b2f1",
+      "retained": "source/f04735c23e22eb78-F-35B-jsbsim.xml.gz",
+      "retainedSha256": "af035547bc26dd5d3557da3562235b4e6b959feddc92bad030c3fc96d90a9268",
+      "originalBytes": 58331,
+      "retainedBytes": 9683,
+      "reportExpectedSha256": "f04735c23e22eb78a9c77cded49be6e46975695b28140e3bfead8adb3a50b2f1"
+    },
+    {
+      "originalSourcePath": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+      "sha256": "2aa795c549dcf2e410c7b7a233c9c32af94e2cf6a2c439637edfc5e599fe2101",
+      "retained": "source/2aa795c549dcf2e4-F135-PW-600.xml.gz",
+      "retainedSha256": "aef9b08404b40b9d13725af705cc4810eb9e6551259b73900c2139cfd9aad593",
+      "originalBytes": 7734,
+      "retainedBytes": 2156,
+      "reportExpectedSha256": "2aa795c549dcf2e410c7b7a233c9c32af94e2cf6a2c439637edfc5e599fe2101"
+    },
+    {
+      "originalSourcePath": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/direct.xml",
+      "sha256": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc",
+      "retained": "source/7bb1ff7a6b43d69c-direct.xml.gz",
+      "retainedSha256": "d72e1bd4c8ee057e99f77aa8dd5607852e7aee3f13dbde5ef4827ce6ca13fce9",
+      "originalBytes": 114,
+      "retainedBytes": 115,
+      "reportExpectedSha256": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc"
+    },
+    {
+      "originalSourcePath": "public/jsbsim-data/aircraft/F-35B-jsbsim/Systems/pushback.xml",
+      "sha256": "868928e9b2b12440daec283260aebb1562d05154f69438f5d95043444378a4bc",
+      "retained": "source/868928e9b2b12440-pushback.xml.gz",
+      "retainedSha256": "47e4c641aeeecad871f0b55952cc0d97c8c1b2d9e6ae339ab3ea510cd9533ac8",
+      "originalBytes": 1127,
+      "retainedBytes": 409,
+      "reportExpectedSha256": "868928e9b2b12440daec283260aebb1562d05154f69438f5d95043444378a4bc"
+    },
+    {
+      "originalSourcePath": "public/jsbsim-data/aircraft/F-35B-jsbsim-empirical/F-35B-jsbsim-empirical.xml",
+      "sha256": "7d81cf7930ac9ecb008fa5c8a72259aa198824cc31acb26a4537e140d055be17",
+      "retained": "source/7d81cf7930ac9ecb-F-35B-jsbsim-empirical.xml.gz",
+      "retainedSha256": "b7d550b61a4828782ac646175c03a95007812404930104203e66550c19e33a02",
+      "originalBytes": 57259,
+      "retainedBytes": 9258,
+      "reportExpectedSha256": "7d81cf7930ac9ecb008fa5c8a72259aa198824cc31acb26a4537e140d055be17"
+    },
+    {
+      "originalSourcePath": "public/jsbsim-data/aircraft/F-35B-jsbsim-empirical/Engines/F135-PW-600.xml",
+      "sha256": "04cea10d3c135cb79247bbf7794a81359070e2bdc9afc9782502b538444eac16",
+      "retained": "source/04cea10d3c135cb7-F135-PW-600.xml.gz",
+      "retainedSha256": "477a83291389050a8b66d24a78933fd671e301a3731b2eb35fbf8d0ed13a23dc",
+      "originalBytes": 9385,
+      "retainedBytes": 2875,
+      "reportExpectedSha256": "04cea10d3c135cb79247bbf7794a81359070e2bdc9afc9782502b538444eac16"
+    },
+    {
+      "originalSourcePath": "public/jsbsim-data/aircraft/F-35B-jsbsim-empirical/Engines/liftfan.xml",
+      "sha256": "9ded9a6a93eeab2dac35c779b51945b9e5cf0807591737b67262b27c5ab67287",
+      "retained": "source/9ded9a6a93eeab2d-liftfan.xml.gz",
+      "retainedSha256": "72c96bc6fc11b3ace2765d456329087094cc68be3cc25facb9cf17edcf7bae6d",
+      "originalBytes": 3298,
+      "retainedBytes": 1172,
+      "reportExpectedSha256": "9ded9a6a93eeab2dac35c779b51945b9e5cf0807591737b67262b27c5ab67287"
+    },
+    {
+      "originalSourcePath": "public/jsbsim-data/aircraft/F-35B-jsbsim-empirical/Engines/sidefan.xml",
+      "sha256": "90e1017803f4d9f46285ee09b2aed37d01cee82053e612ffabcf7a19816571ae",
+      "retained": "source/90e1017803f4d9f4-sidefan.xml.gz",
+      "retainedSha256": "197cca65860bf36bc19c4ea59380a75a6ae298fb66452965bf677cbe8b121069",
+      "originalBytes": 3052,
+      "retainedBytes": 1128,
+      "reportExpectedSha256": "90e1017803f4d9f46285ee09b2aed37d01cee82053e612ffabcf7a19816571ae"
+    },
+    {
+      "originalSourcePath": "public/jsbsim-data/manifest.json",
+      "sha256": "35c59594902cba731702fac63bcccf64ffcad8283aabb5daea23598abf8c03be",
+      "retained": "source/35c59594902cba73-manifest.json.gz",
+      "retainedSha256": "2a1a1085e1eaf70776d7e8262a7127a9a3493fb387c17df46ea44cf32ce424ac",
+      "originalBytes": 1391,
+      "retainedBytes": 310,
+      "reportExpectedSha256": "35c59594902cba731702fac63bcccf64ffcad8283aabb5daea23598abf8c03be"
+    }
+  ],
+  "verification": {
+    "archiveRoundTrips": "exact decoded CSV and original CSV.gz SHA-256 for every retained trace",
+    "executedSnapshots": "gzip decoded SHA-256 matches retained original bytes; expected hashes checked where present"
+  },
+  "retainedTraceCount": 25,
+  "originalGzipBytes": 635088817,
+  "retainedTraceDataBytes": 235373270
+}

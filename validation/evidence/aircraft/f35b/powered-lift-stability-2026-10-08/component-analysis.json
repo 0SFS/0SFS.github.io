@@ -1,0 +1,2809 @@
+{
+  "schemaVersion": 1,
+  "analyzer": {
+    "path": "scripts/validation/f35b/analyze-powered-lift.mjs",
+    "sha256": "7a87be2ea3acb9486f39590c1ce7e122c7f90590b24e5c7ea099efb89246e2e7"
+  },
+  "methods": {
+    "coordinateFrame": "Body X forward, Y right, Z down. Local up is [sin(theta), -sin(phi)cos(theta), -cos(phi)cos(theta)] in body coordinates.",
+    "force": "Native applied total excludes gravitation. Main nozzle, all XML external reactions (including inlet drag), aerodynamic and contact forces are reconstructed once; gravity is added once. Gross outlet thrust is also recorded separately.",
+    "empiricalComparison": "The empirical model has four native force carriers. Their actual body vectors and locations are summed; there are no separate inlet-drag reactions or coupled shaft-power/airflow/energy ledger. Its thrust-lbs sum is a table force sum, not an independently solved gross-outlet quantity.",
+    "mass": "Per-tank capacities come from the hash-matched aircraft XML, quantities and attachment flags from retained observations. Fuel percentage denominator sums internal and attached external capacities.",
+    "weightAccountingResidual": "Declared weight minus authored empty weight, observed dry stores and same-sample tank fuel; the residual also contains native update ordering (one fuel step in the retained free-flight runs), not a newly inferred payload.",
+    "windBasis": "Direct aero/alpha-rad and beta-rad are used when captured. Earlier traces omitted aero/*; their native u/v/w-aero-fps define the wind basis with atan2(w,u) and atan2(v,hypot(u,w)). Force-sum residual independently checks the result.",
+    "acceleration": "Local-up projection of native ECI uidot/vidot/widot is compared with (applied+gravity)/mass, and with central finite differences of ECI velocity. Local up uses geodetic latitude and inertial longitude from recorded ECI position.",
+    "energy": "On each accepted sequence advance, reconstruct residual as sum(stored) - [sum(sources)-sum(sinks)] from13 raw exported Joule terms, and normalize with their independently summed absolute values. Native normalized residual alone never qualifies this check.",
+    "wholePlantMass": "Requires accepted-step air-in, fuel-in, out, dump and manifold-change masses. Missing integrated quantities are explicitly unavailable; end-state flow observations are not substituted for them. Tank differences independently inspect only supplied-fuel bookkeeping.",
+    "diagnostics": "Statistics cover the declared settling window with linear drift and detrended RMS. Cycle periods use detrended hysteretic rising crossings; a candidate is not proof of a controller cause. A free-flight trajectory is not a fixed-environment equilibrium."
+  },
+  "units": {
+    "forces": "lbf",
+    "moments": "lbf ft",
+    "accelerations": "ft/s²",
+    "fuel": "lb and kg",
+    "lengths": "inches",
+    "time": "seconds",
+    "metersPerFoot": 0.3048
+  },
+  "reports": [
+    {
+      "input": {
+        "path": "build/validation/f135-powered-lift/2026-10-08_171937/report.json",
+        "sha256": "8be3baefd50ee633b9d51a67630091a65b2b89d3e094efa8aa32adea2bc9a2b3",
+        "aircraftXml": {
+          "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml",
+          "sha256": "f04735c23e22eb78a9c77cded49be6e46975695b28140e3bfead8adb3a50b2f1"
+        }
+      },
+      "artifactIdentity": {
+        "schemaVersion": 2,
+        "package": {
+          "name": "@felipegalind0/jsbsim",
+          "version": "1.2.4-fork.21"
+        },
+        "native": {
+          "origin": "https://github.com/Felipegalind0/jsbsim",
+          "commit": "34eeae66e5c886eec59eaefb516c0848cb504756",
+          "contentSha256": "6a8c6adf5d0b48f4f95ad65bd512cd664adaf7ece8207cecfaa57a4934d792ca",
+          "dirty": false
+        },
+        "sdk": {
+          "commit": "34eeae66e5c886eec59eaefb516c0848cb504756",
+          "contentSha256": "7dca56e6081f6dbf07879e4bfaa6e7f9612a6a9cc3a40e37cb9f119d5246ca61",
+          "dirty": false,
+          "path": "wasm"
+        },
+        "build": {
+          "mode": "in-tree",
+          "inputSha256": "4cbf76ca72afc8977b3fb2b879891f897404f5b6d58aa00da4eaa944ad424b27",
+          "toolchain": {
+            "node": "v26.8.2",
+            "npm": "11.19.1",
+            "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+            "cmake": "cmake version 4.4.3",
+            "clang": "clang version 24.0.0git",
+            "platform": "darwin",
+            "arch": "arm64",
+            "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+          },
+          "options": {
+            "buildType": "Release",
+            "cxxStandard": 17,
+            "sdkTarget": "es2022"
+          }
+        }
+      },
+      "assumptions": "Not a captured user session. ISA/zero wind/zero speed/clean stores/profile-default tank loads unless each case explicitly overrides them. Held cases freeze fuel; free cases burn it. 20 s declared settling window, all 80 s retained. Fixed-input stability gate applies to held cases only; free trends need the force/weight/environment analysis.",
+      "installation": {
+        "engineModel": "plant",
+        "engines": [
+          {
+            "index": 0,
+            "file": "F135-PW-600"
+          }
+        ],
+        "emptyWeightLbs": 32000,
+        "tanks": [
+          {
+            "index": 0,
+            "capacityLbs": 6550,
+            "authoredContentsLbs": 2500
+          },
+          {
+            "index": 1,
+            "capacityLbs": 6550,
+            "authoredContentsLbs": 2500
+          },
+          {
+            "index": 2,
+            "capacityLbs": 2991,
+            "authoredContentsLbs": 0
+          },
+          {
+            "index": 3,
+            "capacityLbs": 2991,
+            "authoredContentsLbs": 0
+          }
+        ],
+        "externals": [
+          {
+            "name": "external-tank-0-drag",
+            "frame": "WIND",
+            "magnitude": "stores/external-tank[0]/drag-lbs"
+          },
+          {
+            "name": "external-tank-1-drag",
+            "frame": "WIND",
+            "magnitude": "stores/external-tank[1]/drag-lbs"
+          },
+          {
+            "name": "lift-fan",
+            "frame": "BODY",
+            "magnitude": "propulsion/lift-fan-force-lbs"
+          },
+          {
+            "name": "roll-post-right",
+            "frame": "BODY",
+            "magnitude": "propulsion/roll-post-right-force-lbs"
+          },
+          {
+            "name": "roll-post-left",
+            "frame": "BODY",
+            "magnitude": "propulsion/roll-post-left-force-lbs"
+          },
+          {
+            "name": "engine-ram-drag",
+            "frame": "WIND",
+            "magnitude": "propulsion/engine-ram-drag-lbs"
+          },
+          {
+            "name": "lift-fan-ram-drag",
+            "frame": "WIND",
+            "magnitude": "propulsion/lift-fan-ram-drag-lbs"
+          },
+          {
+            "name": "pushback",
+            "frame": "BODY",
+            "magnitude": "external_reactions/pushback/magnitude"
+          }
+        ]
+      },
+      "results": [
+        {
+          "name": "steady-1",
+          "sourceReport": "build/validation/f135-powered-lift/2026-10-08_171937/report.json",
+          "sourceTrace": {
+            "path": "build/validation/f135-powered-lift/2026-10-08_171937/steady-1.csv.gz",
+            "sha256": "bee39c7d75a9a561bd129763f73a619c6eb5b231fd9bc231beeaef573b031bfd"
+          },
+          "conditions": {
+            "name": "steady-1",
+            "throttle": 1,
+            "conversion": 1,
+            "altFt": 5000,
+            "appliedThrottle": 1,
+            "engineModel": "plant",
+            "algorithm": "component",
+            "hz": 120,
+            "passed": true
+          },
+          "sampleCount": 9601,
+          "window": {
+            "startSeconds": 20.00833333333284,
+            "endSeconds": 80.00000000000973,
+            "samples": 7200
+          },
+          "load": {
+            "initial": {
+              "tanks": [
+                {
+                  "index": 0,
+                  "capacityLbs": 6550,
+                  "authoredContentsLbs": 2500,
+                  "attached": true,
+                  "contentsLbs": 2500,
+                  "contentsKg": 1133.980925,
+                  "percentageOfTankCapacity": 38.16793893129771
+                },
+                {
+                  "index": 1,
+                  "capacityLbs": 6550,
+                  "authoredContentsLbs": 2500,
+                  "attached": true,
+                  "contentsLbs": 2500,
+                  "contentsKg": 1133.980925,
+                  "percentageOfTankCapacity": 38.16793893129771
+                },
+                {
+                  "index": 2,
+                  "capacityLbs": 2991,
+                  "authoredContentsLbs": 0,
+                  "attached": false,
+                  "contentsLbs": 0,
+                  "contentsKg": 0,
+                  "percentageOfTankCapacity": 0
+                },
+                {
+                  "index": 3,
+                  "capacityLbs": 2991,
+                  "authoredContentsLbs": 0,
+                  "attached": false,
+                  "contentsLbs": 0,
+                  "contentsKg": 0,
+                  "percentageOfTankCapacity": 0
+                }
+              ],
+              "capacityDenominatorLbs": 13100,
+              "fuelLbs": 5000,
+              "fuelKg": 2267.96185,
+              "fuelPercentageOfAttachedCapacity": 38.16793893129771,
+              "internalCapacityLbs": 13100,
+              "dryStoresLbs": 0,
+              "emptyWeightLbs": 32000,
+              "declaredWeightLbs": 37000,
+              "weightAccountingResidualLbs": 0,
+              "massSlugs": 1149.9951404935077,
+              "massKg": 16782.91745862083,
+              "cgInches": [
+                368.52,
+                0,
+                -15.36
+              ]
+            },
+            "final": {
+              "tanks": [
+                {
+                  "index": 0,
+                  "capacityLbs": 6550,
+                  "authoredContentsLbs": 2500,
+                  "attached": true,
+                  "contentsLbs": 2500,
+                  "contentsKg": 1133.980925,
+                  "percentageOfTankCapacity": 38.16793893129771
+                },
+                {
+                  "index": 1,
+                  "capacityLbs": 6550,
+                  "authoredContentsLbs": 2500,
+                  "attached": true,
+                  "contentsLbs": 2500,
+                  "contentsKg": 1133.980925,
+                  "percentageOfTankCapacity": 38.16793893129771
+                },
+                {
+                  "index": 2,
+                  "capacityLbs": 2991,
+                  "authoredContentsLbs": 0,
+                  "attached": false,
+                  "contentsLbs": 0,
+                  "contentsKg": 0,
+                  "percentageOfTankCapacity": 0
+                },
+                {
+                  "index": 3,
+                  "capacityLbs": 2991,
+                  "authoredContentsLbs": 0,
+                  "attached": false,
+                  "contentsLbs": 0,
+                  "contentsKg": 0,
+                  "percentageOfTankCapacity": 0
+                }
+              ],
+              "capacityDenominatorLbs": 13100,
+              "fuelLbs": 5000,
+              "fuelKg": 2267.96185,
+              "fuelPercentageOfAttachedCapacity": 38.16793893129771,
+              "internalCapacityLbs": 13100,
+              "dryStoresLbs": 0,
+              "emptyWeightLbs": 32000,
+              "declaredWeightLbs": 37000,
+              "weightAccountingResidualLbs": 0,
+              "massSlugs": 1149.9951404935077,
+              "massKg": 16782.91745862083,
+              "cgInches": [
+                368.52,
+                0,
+                -15.36
+              ]
+            },
+            "fuelUsedLbs": 0
+          },
+          "geometry": {
+            "initialMainAftArmInches": 175.76127086999998,
+            "finalMainAftArmInches": 175.76127086999998,
+            "initialFanForwardArmInches": 170.49713819,
+            "finalFanForwardArmInches": 170.49713819,
+            "initialLeverArmRatio": 1.0308751967093648,
+            "finalLeverArmRatio": 1.0308751967093648
+          },
+          "metrics": {
+            "t": {
+              "min": 20.00833333333284,
+              "max": 80.00000000000973,
+              "mean": 50.00416666666634,
+              "peakToPeak": 59.99166666667689,
+              "rmsRipple": 17.320507908632987,
+              "initial": 20.00833333333284,
+              "final": 80.00000000000973,
+              "endMinusStart": 59.99166666667689,
+              "linearDriftPerSecond": 1,
+              "detrendedRmsRipple": 0
+            },
+            "mainUpLbf": {
+              "min": 16390.80129410498,
+              "max": 16390.80353319553,
+              "mean": 16390.803254207305,
+              "peakToPeak": 0.002239090550574474,
+              "rmsRipple": 0.0003680287022620558,
+              "initial": 16390.802602998392,
+              "final": 16390.80330450994,
+              "endMinusStart": 0.000701511547958944,
+              "linearDriftPerSecond": 0.00000780600971895372,
+              "detrendedRmsRipple": 0.0003422937184956736
+            },
+            "external_tank_0_dragUpLbf": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "external_tank_1_dragUpLbf": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "lift_fanUpLbf": {
+              "min": 16896.87035816254,
+              "max": 16896.872923017596,
+              "mean": 16896.872518762804,
+              "peakToPeak": 0.0025648550545156468,
+              "rmsRipple": 0.00040286282588349195,
+              "initial": 16896.871739470018,
+              "final": 16896.872677532378,
+              "endMinusStart": 0.0009380623596371152,
+              "linearDriftPerSecond": 0.000008411204085248704,
+              "detrendedRmsRipple": 0.00037559812384933524
+            },
+            "roll_post_rightUpLbf": {
+              "min": 1508.3758791270147,
+              "max": 1508.3763142016787,
+              "mean": 1508.3762340650637,
+              "peakToPeak": 0.00043507466398295946,
+              "rmsRipple": 0.0000731094599132409,
+              "initial": 1508.3758791270147,
+              "final": 1508.3763033072116,
+              "endMinusStart": 0.0004241801968873915,
+              "linearDriftPerSecond": 0.0000035476961539961877,
+              "detrendedRmsRipple": 0.000039612482897665166
+            },
+            "roll_post_leftUpLbf": {
+              "min": 1508.3758791270202,
+              "max": 1508.3763142016992,
+              "mean": 1508.3762340650806,
+              "peakToPeak": 0.00043507467898962204,
+              "rmsRipple": 0.00007310946178638331,
+              "initial": 1508.3758791270202,
+              "final": 1508.3763033072332,
+              "endMinusStart": 0.00042418021303092246,
+              "linearDriftPerSecond": 0.000003547696232601032,
+              "detrendedRmsRipple": 0.00003961248424281172
+            },
+            "engine_ram_dragUpLbf": {
+              "min": -4.46512964134058e-25,
+              "max": -1.8266490135026855e-25,
+              "mean": -3.498062181606393e-25,
+              "peakToPeak": 2.638480627837895e-25,
+              "rmsRipple": 6.369823678459076e-26,
+              "initial": -4.4435281788211925e-25,
+              "final": -4.296835256377346e-25,
+              "endMinusStart": 1.466929224438469e-26,
+              "linearDriftPerSecond": 2.062661482945201e-28,
+              "detrendedRmsRipple": 6.359796893401813e-26
+            },
+            "lift_fan_ram_dragUpLbf": {
+              "min": -6.204925024609366e-25,
+              "max": -2.5383855197378877e-25,
+              "mean": -4.861049060481297e-25,
+              "peakToPeak": 3.6665395048714785e-25,
+              "rmsRipple": 8.851765155479575e-26,
+              "initial": -6.17490630308252e-25,
+              "final": -5.971056730770931e-25,
+              "endMinusStart": 2.0384957231158972e-26,
+              "linearDriftPerSecond": 2.8663481445816284e-28,
+              "detrendedRmsRipple": 8.837831624439269e-26
+            },
+            "pushbackUpLbf": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "propUpLbf": {
+              "min": 16390.80129410498,
+              "max": 16390.80353319553,
+              "mean": 16390.803254207305,
+              "peakToPeak": 0.002239090550574474,
+              "rmsRipple": 0.0003680287022620558,
+              "initial": 16390.802602998392,
+              "final": 16390.80330450994,
+              "endMinusStart": 0.000701511547958944,
+              "linearDriftPerSecond": 0.00000780600971895372,
+              "detrendedRmsRipple": 0.0003422937184956736
+            },
+            "externalUpLbf": {
+              "min": 19913.622729163533,
+              "max": 19913.62545296899,
+              "mean": 19913.62498689302,
+              "peakToPeak": 0.0027238054572080728,
+              "rmsRipple": 0.00046973747763766056,
+              "initial": 19913.623497724053,
+              "final": 19913.62528414682,
+              "endMinusStart": 0.0017864227665995713,
+              "linearDriftPerSecond": 0.00001550659647360243,
+              "detrendedRmsRipple": 0.0003853789550953142
+            },
+            "aeroUpLbf": {
+              "min": 7.310184326370084e-21,
+              "max": 8.022968750642514e-21,
+              "mean": 7.549784311989635e-21,
+              "peakToPeak": 7.1278442427243055e-22,
+              "rmsRipple": 2.067329935164394e-22,
+              "initial": 7.945564756473913e-21,
+              "final": 7.429168066782363e-21,
+              "endMinusStart": -5.163966896915499e-22,
+              "linearDriftPerSecond": -7.917980752944237e-24,
+              "detrendedRmsRipple": 1.5469390812142816e-22
+            },
+            "contactUpLbf": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "contactForceMagnitudeLbf": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "appliedUpLbf": {
+              "min": 36304.42402326851,
+              "max": 36304.428914747186,
+              "mean": 36304.42824110037,
+              "peakToPeak": 0.0048914786748355255,
+              "rmsRipple": 0.000821478459915068,
+              "initial": 36304.42610072244,
+              "final": 36304.42858865676,
+              "endMinusStart": 0.002487934318196494,
+              "linearDriftPerSecond": 0.000023312606188756065,
+              "detrendedRmsRipple": 0.0007153905094813048
+            },
+            "gravitationalUpLbf": {
+              "min": -37010.75769785676,
+              "max": -37010.75769045601,
+              "mean": -37010.7576939906,
+              "peakToPeak": 0.000007400747563224286,
+              "rmsRipple": 0.000002104001453043002,
+              "initial": -37010.757691255916,
+              "final": -37010.75769364047,
+              "endMinusStart": -0.0000023845568648539484,
+              "linearDriftPerSecond": 4.5242654434326587e-10,
+              "detrendedRmsRipple": 0.000002103986860100331
+            },
+            "netUpLbf": {
+              "min": -706.3336688826166,
+              "max": -706.3287807109591,
+              "mean": -706.329452890332,
+              "peakToPeak": 0.00488817165751243,
+              "rmsRipple": 0.0008210137553152555,
+              "initial": -706.3315905334748,
+              "final": -706.3291049837135,
+              "endMinusStart": 0.00248554976133164,
+              "linearDriftPerSecond": 0.000023313058615300448,
+              "detrendedRmsRipple": 0.0007148524176093599
+            },
+            "forceSumResidualLbf": {
+              "min": 0,
+              "max": 8.271806125530277e-25,
+              "mean": 2.1656047981423017e-25,
+              "peakToPeak": 8.271806125530277e-25,
+              "rmsRipple": 3.636429415376254e-25,
+              "initial": 8.271806125530277e-25,
+              "final": 8.271806125530277e-25,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": -1.239754519036728e-27,
+              "detrendedRmsRipple": 3.6300839047988376e-25
+            },
+            "externalForceSumResidualLbf": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "propulsionMomentSumResidualLbfFt": {
+              "min": 0,
+              "max": 1.8189894035458565e-12,
+              "mean": 8.109661090808611e-13,
+              "peakToPeak": 1.8189894035458565e-12,
+              "rmsRipple": 9.041419849642661e-13,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 2.6639212612198922e-17,
+              "detrendedRmsRipple": 9.041418672314977e-13
+            },
+            "pitchMainLbfFt": {
+              "min": -240072.37163124434,
+              "max": -240072.33883579427,
+              "mean": -240072.36754496826,
+              "peakToPeak": 0.032795450068078935,
+              "rmsRipple": 0.00539043270212326,
+              "initial": -240072.3580068584,
+              "final": -240072.3682817385,
+              "endMinusStart": -0.010274880100041628,
+              "linearDriftPerSecond": -0.00011433284905214608,
+              "detrendedRmsRipple": 0.0050134982477361
+            },
+            "pitchFanLbfFt": {
+              "min": 240072.3367028461,
+              "max": 240072.37314455,
+              "mean": 240072.36740086088,
+              "peakToPeak": 0.03644170387997292,
+              "rmsRipple": 0.005723913241427076,
+              "initial": 240072.35632859374,
+              "final": 240072.36965667273,
+              "endMinusStart": 0.013328078988706693,
+              "linearDriftPerSecond": 0.00011950718543670595,
+              "detrendedRmsRipple": 0.005336533768911498
+            },
+            "pitchPropExternalLbfFt": {
+              "min": -0.0064350219909101725,
+              "max": 0.0037840326549485326,
+              "mean": -0.00014410712097742362,
+              "peakToPeak": 0.010219054645858705,
+              "rmsRipple": 0.001621024862872302,
+              "initial": -0.001678264670772478,
+              "final": 0.0013749342178925872,
+              "endMinusStart": 0.003053198888665065,
+              "linearDriftPerSecond": 0.000005174336384560284,
+              "detrendedRmsRipple": 0.0016185454825549147
+            },
+            "pitchTotalLbfFt": {
+              "min": -0.0064350219909101725,
+              "max": 0.0037840326549485326,
+              "mean": -0.00014410712097742362,
+              "peakToPeak": 0.010219054645858705,
+              "rmsRipple": 0.001621024862872302,
+              "initial": -0.001678264670772478,
+              "final": 0.0013749342178925872,
+              "endMinusStart": 0.003053198888665065,
+              "linearDriftPerSecond": 0.000005174336384560284,
+              "detrendedRmsRipple": 0.0016185454825549147
+            },
+            "forceAccelerationUpFps2": {
+              "min": -0.6142057857561913,
+              "max": -0.6142015351541797,
+              "mean": -0.6142021196604529,
+              "peakToPeak": 0.000004250602011590665,
+              "rmsRipple": 7.139280214370249e-7,
+              "initial": -0.6142039784884312,
+              "final": -0.6142018171316794,
+              "endMinusStart": 0.000002161356751795296,
+              "linearDriftPerSecond": 2.027231054670721e-8,
+              "detrendedRmsRipple": 6.216134246463795e-7
+            },
+            "eciAccelerationUpFps2": {
+              "min": -0.11129858870739551,
+              "max": -0.1112985887073947,
+              "mean": -0.11129858870739968,
+              "peakToPeak": 8.049116928532385e-16,
+              "rmsRipple": 4.4324439554898684e-15,
+              "initial": -0.11129858870739477,
+              "final": -0.11129858870739537,
+              "endMinusStart": -5.967448757360216e-16,
+              "linearDriftPerSecond": -9.663437798029232e-18,
+              "detrendedRmsRipple": 4.429282651860928e-15
+            },
+            "bodyKinematicAccelerationUpFps2": {
+              "min": -1.6072077013522657e-46,
+              "max": 3.312355202504616e-24,
+              "mean": 1.5877904222807263e-24,
+              "peakToPeak": 3.312355202504616e-24,
+              "rmsRipple": 9.420977694245696e-25,
+              "initial": 3.6855079223023153e-25,
+              "final": 1.4194271943941093e-24,
+              "endMinusStart": 1.0508764021638779e-24,
+              "linearDriftPerSecond": -9.64565267180282e-28,
+              "detrendedRmsRipple": 9.419496224924878e-25
+            },
+            "verticalVelocityFps": {
+              "min": 3.4358609988509523e-13,
+              "max": 1.3189129532554117e-12,
+              "mean": 8.282498207315317e-13,
+              "peakToPeak": 9.753268533703166e-13,
+              "rmsRipple": 2.789004245821948e-13,
+              "initial": 3.4358609988509523e-13,
+              "final": 1.3144593860128087e-12,
+              "endMinusStart": 9.708732861277136e-13,
+              "linearDriftPerSecond": 1.6091345507919124e-14,
+              "detrendedRmsRipple": 1.0297002184690456e-14
+            },
+            "altitudeFt": {
+              "min": 5000.000000629574,
+              "max": 5000.000000778586,
+              "mean": 5000.000000733711,
+              "peakToPeak": 1.4901161193847656e-7,
+              "rmsRipple": 4.736255613578897e-8,
+              "initial": 5000.000000644475,
+              "final": 5000.000000752509,
+              "endMinusStart": 1.0803341865539551e-7,
+              "linearDriftPerSecond": 1.8160929606959757e-9,
+              "detrendedRmsRipple": 3.540838389753933e-8
+            },
+            "mainAftArmInches": {
+              "min": 175.76127086999998,
+              "max": 175.76127086999998,
+              "mean": 175.76127086999037,
+              "peakToPeak": 0,
+              "rmsRipple": 9.606537787476555e-12,
+              "initial": 175.76127086999998,
+              "final": 175.76127086999998,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": -1.8741768499650363e-27,
+              "detrendedRmsRipple": 9.606537787476553e-12
+            },
+            "fanForwardArmInches": {
+              "min": 170.49713819,
+              "max": 170.49713819,
+              "mean": 170.49713819000272,
+              "peakToPeak": 0,
+              "rmsRipple": 2.7284841053187847e-12,
+              "initial": 170.49713819,
+              "final": 170.49713819,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 1.0115610096354888e-27,
+              "detrendedRmsRipple": 2.7284841053187835e-12
+            },
+            "leverArmRatio": {
+              "min": 1.0308751967093648,
+              "max": 1.0308751967093648,
+              "mean": 1.0308751967094796,
+              "peakToPeak": 0,
+              "rmsRipple": 1.1479706074624119e-13,
+              "initial": 1.0308751967093648,
+              "final": 1.0308751967093648,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 1.9658367390003445e-29,
+              "detrendedRmsRipple": 1.1479706074624119e-13
+            },
+            "splitCommand": {
+              "min": 1.0308751967093643,
+              "max": 1.0308751967093646,
+              "mean": 1.0308751967094796,
+              "peakToPeak": 2.220446049250313e-16,
+              "rmsRipple": 1.1506382626753673e-13,
+              "initial": 1.0308751967093643,
+              "final": 1.0308751967093643,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 2.923201862683976e-20,
+              "detrendedRmsRipple": 1.1506382626642279e-13
+            },
+            "pitchControl": {
+              "min": -2.9144248182243204e-16,
+              "max": -1.2490025895813535e-16,
+              "mean": -2.3537566994736856e-16,
+              "peakToPeak": 1.665422228642967e-16,
+              "rmsRipple": 4.27019491231482e-17,
+              "initial": -2.9143360187725114e-16,
+              "final": -2.9144248182243204e-16,
+              "endMinusStart": -8.879945180900664e-21,
+              "linearDriftPerSecond": 1.6209513111314855e-20,
+              "detrendedRmsRipple": 4.270102615187206e-17
+            },
+            "n1Percent": {
+              "min": 98.26648808123232,
+              "max": 98.2664933024596,
+              "mean": 98.26649040530546,
+              "peakToPeak": 0.000005221227269203155,
+              "rmsRipple": 5.822308846165517e-7,
+              "initial": 98.26648812333099,
+              "final": 98.26649040507769,
+              "endMinusStart": 0.000002281746702692544,
+              "linearDriftPerSecond": -4.351195183578228e-9,
+              "detrendedRmsRipple": 5.773326019317197e-7
+            },
+            "n2Percent": {
+              "min": 106.03442148225464,
+              "max": 106.03443372445639,
+              "mean": 106.03442334808693,
+              "peakToPeak": 0.000012242201748335901,
+              "rmsRipple": 0.0000018318712194656639,
+              "initial": 106.03443172524348,
+              "final": 106.03442166666892,
+              "endMinusStart": -0.000010058574559934641,
+              "linearDriftPerSecond": -8.060742435672976e-8,
+              "detrendedRmsRipple": 0.000001185953263784067
+            },
+            "grossLbf": {
+              "min": 36304.42402326851,
+              "max": 36304.42891474718,
+              "mean": 36304.42824110037,
+              "peakToPeak": 0.004891478667559568,
+              "rmsRipple": 0.0008214784599671373,
+              "initial": 36304.42610072245,
+              "final": 36304.42858865676,
+              "endMinusStart": 0.0024879343109205365,
+              "linearDriftPerSecond": 0.000023312606193377003,
+              "detrendedRmsRipple": 0.0007153905094959208
+            },
+            "failure": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "massSlugs": {
+              "min": 1149.9951404935077,
+              "max": 1149.9951404935077,
+              "mean": 1149.995140493656,
+              "peakToPeak": 0,
+              "rmsRipple": 1.482476363889873e-10,
+              "initial": 1149.9951404935077,
+              "final": 1149.9951404935077,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 2.611095221928199e-26,
+              "detrendedRmsRipple": 1.4824763638898728e-10
+            },
+            "fuelLbs": {
+              "min": 5000,
+              "max": 5000,
+              "mean": 5000,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 5000,
+              "final": 5000,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            }
+          },
+          "cycle": {
+            "n1Percent": {
+              "method": "rising hysteretic crossing of linearly detrended signal, ±0.35 detrended RMS",
+              "cycles": 340,
+              "signalPeakToPeak": 0.000005221227269203155,
+              "stabilityGateSpan": 1,
+              "exceedsStabilityGate": false,
+              "periodSeconds": {
+                "min": 0.0416666666666643,
+                "max": 3.733333333333121,
+                "mean": 0.17313725490199072,
+                "peakToPeak": 3.691666666666457,
+                "rmsRipple": 0.2536816377232495,
+                "initial": 2.8333333333331723,
+                "final": 0.2166666666668391,
+                "endMinusStart": -2.616666666666333
+              },
+              "periodCoefficientOfVariation": 1.46520538209326,
+              "periodicCandidate": false
+            },
+            "n2Percent": null,
+            "grossLbf": {
+              "method": "rising hysteretic crossing of linearly detrended signal, ±0.35 detrended RMS",
+              "cycles": 17,
+              "signalPeakToPeak": 0.004891478667559568,
+              "stabilityGateSpan": 726.0885648220075,
+              "exceedsStabilityGate": false,
+              "periodSeconds": {
+                "min": 0.21666666666665435,
+                "max": 33.13333333333145,
+                "mean": 2.3916666666666493,
+                "peakToPeak": 32.916666666664796,
+                "rmsRipple": 7.701983871415774,
+                "initial": 33.13333333333145,
+                "final": 2.0750000000016513,
+                "endMinusStart": -31.0583333333298
+              },
+              "periodCoefficientOfVariation": 3.2203416883968625,
+              "periodicCandidate": false
+            }
+          },
+          "settling": {
+            "method": "earliest suffix whose full retained span meets spool/gross gates for at least the required observation duration",
+            "observationSeconds": 60,
+            "earliestBoundedEnvelopeSeconds": 0,
+            "earliestSettledSeconds": 0,
+            "settledByDeclaredDeadline": true,
+            "qualifiedForFixedEnvironment": true
+          },
+          "contact": {
+            "method": "Contiguous retained samples with any nonzero native contact-force magnitude; every segment is retained.",
+            "segments": [
+              {
+                "inContact": false,
+                "startSeconds": 0,
+                "endSeconds": 80.00000000000973,
+                "samples": 9601,
+                "altitudeFt": {
+                  "min": 5000,
+                  "max": 5000.000003866851,
+                  "mean": 5000.000000712809,
+                  "peakToPeak": 0.000003866851329803467,
+                  "rmsRipple": 6.447351869625027e-8,
+                  "initial": 5000,
+                  "final": 5000.000000752509,
+                  "endMinusStart": 7.525086402893066e-7,
+                  "linearDriftPerSecond": 1.9489381551877736e-9,
+                  "detrendedRmsRipple": 4.615864609097007e-8
+                },
+                "netUpLbf": {
+                  "min": -867.3974923207861,
+                  "max": -570.8688280792267,
+                  "mean": -711.2823959522051,
+                  "peakToPeak": 296.52866424155945,
+                  "rmsRipple": 21.575894838604754,
+                  "initial": -706.3290680290884,
+                  "final": -706.3291049837135,
+                  "endMinusStart": -0.00003695462510222569,
+                  "linearDriftPerSecond": 0.3494426462323417,
+                  "detrendedRmsRipple": 20.009503992374235
+                },
+                "contactUpLbf": {
+                  "min": 0,
+                  "max": 0,
+                  "mean": 0,
+                  "peakToPeak": 0,
+                  "rmsRipple": 0,
+                  "initial": 0,
+                  "final": 0,
+                  "endMinusStart": 0,
+                  "linearDriftPerSecond": 0,
+                  "detrendedRmsRipple": 0
+                },
+                "n1Percent": {
+                  "min": 98.1967443809334,
+                  "max": 98.36971423709329,
+                  "mean": 98.26649030716945,
+                  "peakToPeak": 0.17296985615989513,
+                  "rmsRipple": 0.012970435450062904,
+                  "initial": 98.26649030773432,
+                  "final": 98.26649040507769,
+                  "endMinusStart": 9.734337425015838e-8,
+                  "linearDriftPerSecond": -0.000008595448587525393,
+                  "detrendedRmsRipple": 0.01296891606736693
+                },
+                "n2Percent": {
+                  "min": 105.82931910277452,
+                  "max": 106.03810621367964,
+                  "mean": 106.02946990225176,
+                  "peakToPeak": 0.2087871109051207,
+                  "rmsRipple": 0.025459132695194044,
+                  "initial": 106.03442174202209,
+                  "final": 106.03442166666892,
+                  "endMinusStart": -7.535317081419635e-8,
+                  "linearDriftPerSecond": 0.0003516955807377518,
+                  "detrendedRmsRipple": 0.02412852690924556
+                }
+              }
+            ]
+          },
+          "conservation": {
+            "available": true,
+            "acceptedSteps": 9600,
+            "rejectedSamples": 0,
+            "unchangedSequenceSamples": 0,
+            "wholePlantEnergy": {
+              "status": "independently-recomputed-from-exported-terms",
+              "signedResidualJ": {
+                "min": -0.20073459909738967,
+                "max": 0.051866115313679684,
+                "mean": -0.004525735203022911,
+                "peakToPeak": 0.25260071441106935,
+                "rmsRipple": 0.032889675237696446,
+                "initial": 0.000013194266102800611,
+                "final": 6.223604742672251e-9,
+                "endMinusStart": -0.00001318804249805794
+              },
+              "relative": {
+                "min": 1.1014778942850724e-17,
+                "max": 1.0728705303004645e-7,
+                "mean": 1.2801956656623187e-8,
+                "peakToPeak": 1.0728705301903167e-7,
+                "rmsRipple": 1.2285960783424309e-8,
+                "initial": 7.0420670699574e-12,
+                "final": 3.3262128778410576e-15,
+                "endMinusStart": -7.0387408570795594e-12
+              },
+              "gate": 0.00001,
+              "passed": true,
+              "reconstructedMinusPublishedResidualJ": {
+                "min": -2.0833113012486137e-10,
+                "max": 2.09922745852964e-10,
+                "mean": 1.4474939765326174e-13,
+                "peakToPeak": 4.1825387597782537e-10,
+                "rmsRipple": 6.723188207890176e-11,
+                "initial": 1.4551915228366852e-11,
+                "final": -1.1672796063066926e-10,
+                "endMinusStart": -1.312798758590361e-10
+              },
+              "reconstructedAggregateMinusPublishedScaleJ": {
+                "min": 0,
+                "max": 0,
+                "mean": 0,
+                "peakToPeak": 0,
+                "rmsRipple": 0,
+                "initial": 0,
+                "final": 0,
+                "endMinusStart": 0
+              },
+              "sourceTerms": [
+                "air-in-j",
+                "fuel-sensible-j",
+                "chemical-j",
+                "starter-j"
+              ],
+              "sinkTerms": [
+                "outflow-j",
+                "accessory-j",
+                "friction-j",
+                "clutch-j",
+                "radiation-j",
+                "dump-j"
+              ],
+              "storedTerms": [
+                "rotor-stored-j",
+                "solid-stored-j",
+                "manifold-stored-j"
+              ],
+              "scaleLimitation": "The denominator sums absolute accepted-step term totals. Native scale sums absolute substep terms, so cancellation within a term can make this independent denominator smaller and its gate stricter."
+            },
+            "wholePlantMass": {
+              "status": "independently-recomputed-from-exported-terms",
+              "signedResidualKg": {
+                "min": -9.992007221626409e-16,
+                "max": 1.4432899320127035e-15,
+                "mean": 2.29076017414324e-16,
+                "peakToPeak": 2.4424906541753444e-15,
+                "rmsRipple": 3.4940068510970323e-16,
+                "initial": 1.1102230246251565e-16,
+                "final": 4.440892098500626e-16,
+                "endMinusStart": 3.3306690738754696e-16
+              },
+              "relative": {
+                "min": 0,
+                "max": 2.520932006001294e-16,
+                "mean": 5.870362618435456e-17,
+                "peakToPeak": 2.520932006001294e-16,
+                "rmsRipple": 4.335697004976438e-17,
+                "initial": 1.912468405033849e-17,
+                "final": 7.756713825123368e-17,
+                "endMinusStart": 5.844245420089519e-17
+              },
+              "gate": 0.000001,
+              "passed": true,
+              "reconstructedMinusPublishedResidualKg": {
+                "min": 0,
+                "max": 0,
+                "mean": 0,
+                "peakToPeak": 0,
+                "rmsRipple": 0,
+                "initial": 0,
+                "final": 0,
+                "endMinusStart": 0
+              },
+              "reconstructedMinusPublishedRelative": {
+                "min": 0,
+                "max": 0,
+                "mean": 0,
+                "peakToPeak": 0,
+                "rmsRipple": 0,
+                "initial": 0,
+                "final": 0,
+                "endMinusStart": 0
+              }
+            },
+            "fuelWithdrawal": {
+              "status": "excluded-frozen-fuel-fixture",
+              "tankDeltaMinusLedgerFuelInKg": null,
+              "cumulativeUsedDeltaMinusLedgerFuelInKg": null,
+              "scope": "Fuel supply bookkeeping only; it does not establish whole-engine air/outlet/manifold mass conservation."
+            }
+          },
+          "acceleration": {
+            "inertialVectorResidualFps2": null,
+            "finiteDifferenceEciMotionUpFps2": null,
+            "finiteDifferenceMinusNativeEciAccelerationFps2": null,
+            "heldDown": true,
+            "interpretation": "Native hold-down suppresses motion. Net force/mass is the unrestrained acceleration, not a measured acceleration or hover."
+          },
+          "derivedTrace": {
+            "file": "2026-10-08_171937-steady-1-force-weight.csv.gz",
+            "sha256": "58fac87f3f3fba2621c281aac35a3d6fab893e6755ada39c71d29eee36727bee",
+            "rows": 9601
+          }
+        },
+        {
+          "name": "idle-entry",
+          "sourceReport": "build/validation/f135-powered-lift/2026-10-08_171937/report.json",
+          "sourceTrace": {
+            "path": "build/validation/f135-powered-lift/2026-10-08_171937/idle-entry.csv.gz",
+            "sha256": "c0bf812ede5dda901cfc99b037b25afb073b0cdb5281c38f4d8f664cb905a30a"
+          },
+          "conditions": {
+            "name": "idle-entry",
+            "throttle": 0,
+            "conversion": 0,
+            "altFt": 5000,
+            "entry": true,
+            "appliedThrottle": 0,
+            "engineModel": "plant",
+            "algorithm": "component",
+            "hz": 120,
+            "passed": true
+          },
+          "sampleCount": 9601,
+          "window": {
+            "startSeconds": 20.00833333333284,
+            "endSeconds": 80.00000000000973,
+            "samples": 7200
+          },
+          "load": {
+            "initial": {
+              "tanks": [
+                {
+                  "index": 0,
+                  "capacityLbs": 6550,
+                  "authoredContentsLbs": 2500,
+                  "attached": true,
+                  "contentsLbs": 2500,
+                  "contentsKg": 1133.980925,
+                  "percentageOfTankCapacity": 38.16793893129771
+                },
+                {
+                  "index": 1,
+                  "capacityLbs": 6550,
+                  "authoredContentsLbs": 2500,
+                  "attached": true,
+                  "contentsLbs": 2500,
+                  "contentsKg": 1133.980925,
+                  "percentageOfTankCapacity": 38.16793893129771
+                },
+                {
+                  "index": 2,
+                  "capacityLbs": 2991,
+                  "authoredContentsLbs": 0,
+                  "attached": false,
+                  "contentsLbs": 0,
+                  "contentsKg": 0,
+                  "percentageOfTankCapacity": 0
+                },
+                {
+                  "index": 3,
+                  "capacityLbs": 2991,
+                  "authoredContentsLbs": 0,
+                  "attached": false,
+                  "contentsLbs": 0,
+                  "contentsKg": 0,
+                  "percentageOfTankCapacity": 0
+                }
+              ],
+              "capacityDenominatorLbs": 13100,
+              "fuelLbs": 5000,
+              "fuelKg": 2267.96185,
+              "fuelPercentageOfAttachedCapacity": 38.16793893129771,
+              "internalCapacityLbs": 13100,
+              "dryStoresLbs": 0,
+              "emptyWeightLbs": 32000,
+              "declaredWeightLbs": 37000,
+              "weightAccountingResidualLbs": 0,
+              "massSlugs": 1149.9951404935077,
+              "massKg": 16782.91745862083,
+              "cgInches": [
+                368.52,
+                0,
+                -15.36
+              ]
+            },
+            "final": {
+              "tanks": [
+                {
+                  "index": 0,
+                  "capacityLbs": 6550,
+                  "authoredContentsLbs": 2500,
+                  "attached": true,
+                  "contentsLbs": 2500,
+                  "contentsKg": 1133.980925,
+                  "percentageOfTankCapacity": 38.16793893129771
+                },
+                {
+                  "index": 1,
+                  "capacityLbs": 6550,
+                  "authoredContentsLbs": 2500,
+                  "attached": true,
+                  "contentsLbs": 2500,
+                  "contentsKg": 1133.980925,
+                  "percentageOfTankCapacity": 38.16793893129771
+                },
+                {
+                  "index": 2,
+                  "capacityLbs": 2991,
+                  "authoredContentsLbs": 0,
+                  "attached": false,
+                  "contentsLbs": 0,
+                  "contentsKg": 0,
+                  "percentageOfTankCapacity": 0
+                },
+                {
+                  "index": 3,
+                  "capacityLbs": 2991,
+                  "authoredContentsLbs": 0,
+                  "attached": false,
+                  "contentsLbs": 0,
+                  "contentsKg": 0,
+                  "percentageOfTankCapacity": 0
+                }
+              ],
+              "capacityDenominatorLbs": 13100,
+              "fuelLbs": 5000,
+              "fuelKg": 2267.96185,
+              "fuelPercentageOfAttachedCapacity": 38.16793893129771,
+              "internalCapacityLbs": 13100,
+              "dryStoresLbs": 0,
+              "emptyWeightLbs": 32000,
+              "declaredWeightLbs": 37000,
+              "weightAccountingResidualLbs": 0,
+              "massSlugs": 1149.9951404935077,
+              "massKg": 16782.91745862083,
+              "cgInches": [
+                368.52,
+                0,
+                -15.36
+              ]
+            },
+            "fuelUsedLbs": 0
+          },
+          "geometry": {
+            "initialMainAftArmInches": 175.76127086999998,
+            "finalMainAftArmInches": 175.76127086999998,
+            "initialFanForwardArmInches": 170.49713819,
+            "finalFanForwardArmInches": 170.49713819,
+            "initialLeverArmRatio": 1.0308751967093648,
+            "finalLeverArmRatio": 1.0308751967093648
+          },
+          "metrics": {
+            "t": {
+              "min": 20.00833333333284,
+              "max": 80.00000000000973,
+              "mean": 50.00416666666634,
+              "peakToPeak": 59.99166666667689,
+              "rmsRipple": 17.320507908632987,
+              "initial": 20.00833333333284,
+              "final": 80.00000000000973,
+              "endMinusStart": 59.99166666667689,
+              "linearDriftPerSecond": 1,
+              "detrendedRmsRipple": 0
+            },
+            "mainUpLbf": {
+              "min": 16390.531148992326,
+              "max": 16390.972870932022,
+              "mean": 16390.8593412639,
+              "peakToPeak": 0.4417219396964356,
+              "rmsRipple": 0.05750410020388046,
+              "initial": 16390.531148992326,
+              "final": 16390.810351522985,
+              "endMinusStart": 0.2792025306589494,
+              "linearDriftPerSecond": -0.002179550081909513,
+              "detrendedRmsRipple": 0.0433772982086605
+            },
+            "external_tank_0_dragUpLbf": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "external_tank_1_dragUpLbf": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "lift_fanUpLbf": {
+              "min": 16896.5518315421,
+              "max": 16897.031762824616,
+              "mean": 16896.92411184411,
+              "peakToPeak": 0.47993128251619055,
+              "rmsRipple": 0.0574734679111283,
+              "initial": 16896.5518315421,
+              "final": 16896.879108407276,
+              "endMinusStart": 0.3272768651768274,
+              "linearDriftPerSecond": -0.0019112789280779524,
+              "detrendedRmsRipple": 0.046981947518135524
+            },
+            "roll_post_rightUpLbf": {
+              "min": 1507.8971578857438,
+              "max": 1508.3652672703706,
+              "mean": 1508.2605335579183,
+              "peakToPeak": 0.46810938462681406,
+              "rmsRipple": 0.11326619539014149,
+              "initial": 1507.8971578857438,
+              "final": 1508.3652672703706,
+              "endMinusStart": 0.46810938462681406,
+              "linearDriftPerSecond": 0.00591032882774443,
+              "detrendedRmsRipple": 0.04847303543918489
+            },
+            "roll_post_leftUpLbf": {
+              "min": 1507.8971578857495,
+              "max": 1508.3652672703922,
+              "mean": 1508.2605335579378,
+              "peakToPeak": 0.4681093846427302,
+              "rmsRipple": 0.11326619539238493,
+              "initial": 1507.8971578857495,
+              "final": 1508.3652672703922,
+              "endMinusStart": 0.4681093846427302,
+              "linearDriftPerSecond": 0.005910328827822702,
+              "detrendedRmsRipple": 0.048473035441562874
+            },
+            "engine_ram_dragUpLbf": {
+              "min": -4.4656310933089815e-25,
+              "max": -1.8268031224278896e-25,
+              "mean": -3.4982649640215767e-25,
+              "peakToPeak": 2.638827970881092e-25,
+              "rmsRipple": 6.370328709828939e-26,
+              "initial": -4.444384306838227e-25,
+              "final": -4.296859319821676e-25,
+              "endMinusStart": 1.4752498701655044e-26,
+              "linearDriftPerSecond": 2.0729235902590397e-28,
+              "detrendedRmsRipple": 6.360202631003656e-26
+            },
+            "lift_fan_ram_dragUpLbf": {
+              "min": -6.204949740331218e-25,
+              "max": -2.5383931696999595e-25,
+              "mean": -4.861056907192934e-25,
+              "peakToPeak": 3.6665565706312586e-25,
+              "rmsRipple": 8.851782979004726e-26,
+              "initial": -6.174844974407422e-25,
+              "final": -5.97105792291597e-25,
+              "endMinusStart": 2.0378705149145252e-26,
+              "linearDriftPerSecond": 2.8666442993610035e-28,
+              "detrendedRmsRipple": 8.837846594390593e-26
+            },
+            "pushbackUpLbf": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "propUpLbf": {
+              "min": 16390.531148992326,
+              "max": 16390.972870932022,
+              "mean": 16390.8593412639,
+              "peakToPeak": 0.4417219396964356,
+              "rmsRipple": 0.05750410020388046,
+              "initial": 16390.531148992326,
+              "final": 16390.810351522985,
+              "endMinusStart": 0.2792025306589494,
+              "linearDriftPerSecond": -0.002179550081909513,
+              "detrendedRmsRipple": 0.0433772982086605
+            },
+            "externalUpLbf": {
+              "min": 19912.346147313594,
+              "max": 19913.609825048243,
+              "mean": 19913.445178960006,
+              "peakToPeak": 1.2636777346488088,
+              "rmsRipple": 0.21004836391635923,
+              "initial": 19912.346147313594,
+              "final": 19913.609642948042,
+              "endMinusStart": 1.2634956344481907,
+              "linearDriftPerSecond": 0.009909378727490337,
+              "detrendedRmsRipple": 0.12108501031401561
+            },
+            "aeroUpLbf": {
+              "min": 7.310184326370084e-21,
+              "max": 8.022968750642514e-21,
+              "mean": 7.549784311989635e-21,
+              "peakToPeak": 7.1278442427243055e-22,
+              "rmsRipple": 2.067329935164394e-22,
+              "initial": 7.945564756473913e-21,
+              "final": 7.429168066782363e-21,
+              "endMinusStart": -5.163966896915499e-22,
+              "linearDriftPerSecond": -7.917980752944237e-24,
+              "detrendedRmsRipple": 1.5469390812142816e-22
+            },
+            "contactUpLbf": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "contactForceMagnitudeLbf": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "appliedUpLbf": {
+              "min": 36302.87729630592,
+              "max": 36304.42011759873,
+              "mean": 36304.304520223835,
+              "peakToPeak": 1.5428212928163703,
+              "rmsRipple": 0.20205061081494052,
+              "initial": 36302.87729630592,
+              "final": 36304.41999447103,
+              "endMinusStart": 1.542698165110778,
+              "linearDriftPerSecond": 0.007729828645578756,
+              "detrendedRmsRipple": 0.15132539248077748
+            },
+            "gravitationalUpLbf": {
+              "min": -37010.75769785676,
+              "max": -37010.75769045601,
+              "mean": -37010.7576939906,
+              "peakToPeak": 0.000007400747563224286,
+              "rmsRipple": 0.000002104001453043002,
+              "initial": -37010.757691255916,
+              "final": -37010.75769364047,
+              "endMinusStart": -0.0000023845568648539484,
+              "linearDriftPerSecond": 4.5242654434326587e-10,
+              "detrendedRmsRipple": 0.000002103986860100331
+            },
+            "netUpLbf": {
+              "min": -707.8803949499998,
+              "max": -706.337576031503,
+              "mean": -706.4531737667387,
+              "peakToPeak": 1.5428189184967778,
+              "rmsRipple": 0.20205019515204414,
+              "initial": -707.8803949499998,
+              "final": -706.3376991694458,
+              "endMinusStart": 1.5426957805539132,
+              "linearDriftPerSecond": 0.0077298290980053076,
+              "detrendedRmsRipple": 0.15132483055150592
+            },
+            "forceSumResidualLbf": {
+              "min": 0,
+              "max": 8.271806125530277e-25,
+              "mean": 2.0702492553063275e-25,
+              "peakToPeak": 8.271806125530277e-25,
+              "rmsRipple": 3.583122729173855e-25,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": -1.1374435724329875e-27,
+              "detrendedRmsRipple": 3.577702496946273e-25
+            },
+            "externalForceSumResidualLbf": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "propulsionMomentSumResidualLbfFt": {
+              "min": 0,
+              "max": 1.8189894035458565e-12,
+              "mean": 7.917656653767658e-13,
+              "peakToPeak": 1.8189894035458565e-12,
+              "rmsRipple": 9.01842828070527e-13,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": -1.2070454608213976e-16,
+              "detrendedRmsRipple": 9.018404047646732e-13
+            },
+            "pitchMainLbfFt": {
+              "min": -240074.8518825587,
+              "max": -240068.3820817677,
+              "mean": -240073.18903932918,
+              "peakToPeak": 6.469800791004673,
+              "rmsRipple": 0.8422494776723984,
+              "initial": -240068.3820817677,
+              "final": -240072.4714977359,
+              "endMinusStart": -4.089415968221147,
+              "linearDriftPerSecond": 0.031923374360101404,
+              "detrendedRmsRipple": 0.6353374216716652
+            },
+            "pitchFanLbfFt": {
+              "min": 240067.81104641088,
+              "max": 240074.62995559396,
+              "mean": 240073.10044025036,
+              "peakToPeak": 6.818909183086362,
+              "rmsRipple": 0.816588483391693,
+              "initial": 240067.81104641088,
+              "final": 240072.46102715324,
+              "endMinusStart": 4.649980742367916,
+              "linearDriftPerSecond": -0.027155632293335154,
+              "detrendedRmsRipple": 0.6675239665361626
+            },
+            "pitchPropExternalLbfFt": {
+              "min": -0.5710353568138089,
+              "max": -0.005858767282916233,
+              "mean": -0.08859907709572225,
+              "peakToPeak": 0.5651765895308927,
+              "rmsRipple": 0.0987810497451402,
+              "initial": -0.5710353568138089,
+              "final": -0.010470582667039707,
+              "endMinusStart": 0.5605647741467692,
+              "linearDriftPerSecond": 0.004767742066766126,
+              "detrendedRmsRipple": 0.05420596457710656
+            },
+            "pitchTotalLbfFt": {
+              "min": -0.5710353568138089,
+              "max": -0.005858767282916233,
+              "mean": -0.08859907709572225,
+              "peakToPeak": 0.5651765895308927,
+              "rmsRipple": 0.0987810497451402,
+              "initial": -0.5710353568138089,
+              "final": -0.010470582667039707,
+              "endMinusStart": 0.5605647741467692,
+              "linearDriftPerSecond": 0.004767742066766126,
+              "detrendedRmsRipple": 0.05420596457710656
+            },
+            "forceAccelerationUpFps2": {
+              "min": -0.615550770628666,
+              "max": -0.6142091832913189,
+              "mean": -0.6143097034858533,
+              "peakToPeak": 0.0013415873373471277,
+              "rmsRipple": 0.000175696564304904,
+              "initial": -0.615550770628666,
+              "final": -0.6142092903682435,
+              "endMinusStart": 0.0013414802604225784,
+              "linearDriftPerSecond": 0.00000672161892326615,
+              "detrendedRmsRipple": 0.00013158736521840165
+            },
+            "eciAccelerationUpFps2": {
+              "min": -0.11129858870739551,
+              "max": -0.1112985887073947,
+              "mean": -0.11129858870739968,
+              "peakToPeak": 8.049116928532385e-16,
+              "rmsRipple": 4.4324439554898684e-15,
+              "initial": -0.11129858870739477,
+              "final": -0.11129858870739537,
+              "endMinusStart": -5.967448757360216e-16,
+              "linearDriftPerSecond": -9.663437798029232e-18,
+              "detrendedRmsRipple": 4.429282651860928e-15
+            },
+            "bodyKinematicAccelerationUpFps2": {
+              "min": -1.6072077013522657e-46,
+              "max": 3.312355202504616e-24,
+              "mean": 1.5877904222807263e-24,
+              "peakToPeak": 3.312355202504616e-24,
+              "rmsRipple": 9.420977694245696e-25,
+              "initial": 3.6855079223023153e-25,
+              "final": 1.4194271943941093e-24,
+              "endMinusStart": 1.0508764021638779e-24,
+              "linearDriftPerSecond": -9.64565267180282e-28,
+              "detrendedRmsRipple": 9.419496224924878e-25
+            },
+            "verticalVelocityFps": {
+              "min": 3.4358609988509523e-13,
+              "max": 1.3189129532554117e-12,
+              "mean": 8.282498207315317e-13,
+              "peakToPeak": 9.753268533703166e-13,
+              "rmsRipple": 2.789004245821948e-13,
+              "initial": 3.4358609988509523e-13,
+              "final": 1.3144593860128087e-12,
+              "endMinusStart": 9.708732861277136e-13,
+              "linearDriftPerSecond": 1.6091345507919124e-14,
+              "detrendedRmsRipple": 1.0297002184690456e-14
+            },
+            "altitudeFt": {
+              "min": 5000.000000629574,
+              "max": 5000.000000778586,
+              "mean": 5000.000000733711,
+              "peakToPeak": 1.4901161193847656e-7,
+              "rmsRipple": 4.736255613578897e-8,
+              "initial": 5000.000000644475,
+              "final": 5000.000000752509,
+              "endMinusStart": 1.0803341865539551e-7,
+              "linearDriftPerSecond": 1.8160929606959757e-9,
+              "detrendedRmsRipple": 3.540838389753933e-8
+            },
+            "mainAftArmInches": {
+              "min": 175.76127086999998,
+              "max": 175.76127086999998,
+              "mean": 175.76127086999037,
+              "peakToPeak": 0,
+              "rmsRipple": 9.606537787476555e-12,
+              "initial": 175.76127086999998,
+              "final": 175.76127086999998,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": -1.8741768499650363e-27,
+              "detrendedRmsRipple": 9.606537787476553e-12
+            },
+            "fanForwardArmInches": {
+              "min": 170.49713819,
+              "max": 170.49713819,
+              "mean": 170.49713819000272,
+              "peakToPeak": 0,
+              "rmsRipple": 2.7284841053187847e-12,
+              "initial": 170.49713819,
+              "final": 170.49713819,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 1.0115610096354888e-27,
+              "detrendedRmsRipple": 2.7284841053187835e-12
+            },
+            "leverArmRatio": {
+              "min": 1.0308751967093648,
+              "max": 1.0308751967093648,
+              "mean": 1.0308751967094796,
+              "peakToPeak": 0,
+              "rmsRipple": 1.1479706074624119e-13,
+              "initial": 1.0308751967093648,
+              "final": 1.0308751967093648,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 1.9658367390003445e-29,
+              "detrendedRmsRipple": 1.1479706074624119e-13
+            },
+            "splitCommand": {
+              "min": 1.0308751967093643,
+              "max": 1.0308751967093646,
+              "mean": 1.0308751967094796,
+              "peakToPeak": 2.220446049250313e-16,
+              "rmsRipple": 1.1506382626753673e-13,
+              "initial": 1.0308751967093643,
+              "final": 1.0308751967093643,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 2.923201862683976e-20,
+              "detrendedRmsRipple": 1.1506382626642279e-13
+            },
+            "pitchControl": {
+              "min": -2.9144248182243204e-16,
+              "max": -1.2490025895813535e-16,
+              "mean": -2.3537566994736856e-16,
+              "peakToPeak": 1.665422228642967e-16,
+              "rmsRipple": 4.27019491231482e-17,
+              "initial": -2.9143360187725114e-16,
+              "final": -2.9144248182243204e-16,
+              "endMinusStart": -8.879945180900664e-21,
+              "linearDriftPerSecond": 1.6209513111314855e-20,
+              "detrendedRmsRipple": 4.270102615187206e-17
+            },
+            "n1Percent": {
+              "min": 98.26558730968452,
+              "max": 98.26693891643757,
+              "mean": 98.26663539971635,
+              "peakToPeak": 0.001351606753047463,
+              "rmsRipple": 0.00016195869342318353,
+              "initial": 98.26558730968452,
+              "final": 98.26650910282041,
+              "endMinusStart": 0.000921793135887583,
+              "linearDriftPerSecond": -0.000005391384895031715,
+              "detrendedRmsRipple": 0.0001323272807007014
+            },
+            "n2Percent": {
+              "min": 106.03470834263499,
+              "max": 106.04502972963931,
+              "mean": 106.0373749132687,
+              "peakToPeak": 0.010321387004324833,
+              "rmsRipple": 0.002815151689262641,
+              "initial": 106.04502972963931,
+              "final": 106.03470834263499,
+              "endMinusStart": -0.010321387004324833,
+              "linearDriftPerSecond": -0.00014874199839511965,
+              "detrendedRmsRipple": 0.0011348235702603514
+            },
+            "grossLbf": {
+              "min": 36302.877296305924,
+              "max": 36304.42011759874,
+              "mean": 36304.304520223835,
+              "peakToPeak": 1.5428212928163703,
+              "rmsRipple": 0.2020506108149102,
+              "initial": 36302.877296305924,
+              "final": 36304.41999447102,
+              "endMinusStart": 1.5426981650962261,
+              "linearDriftPerSecond": 0.0077298286455755325,
+              "detrendedRmsRipple": 0.1513253924807868
+            },
+            "failure": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "massSlugs": {
+              "min": 1149.9951404935077,
+              "max": 1149.9951404935077,
+              "mean": 1149.995140493656,
+              "peakToPeak": 0,
+              "rmsRipple": 1.482476363889873e-10,
+              "initial": 1149.9951404935077,
+              "final": 1149.9951404935077,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 2.611095221928199e-26,
+              "detrendedRmsRipple": 1.4824763638898728e-10
+            },
+            "fuelLbs": {
+              "min": 5000,
+              "max": 5000,
+              "mean": 5000,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 5000,
+              "final": 5000,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            }
+          },
+          "cycle": {
+            "n1Percent": null,
+            "n2Percent": null,
+            "grossLbf": null
+          },
+          "settling": {
+            "method": "earliest suffix whose full retained span meets spool/gross gates for at least the required observation duration",
+            "observationSeconds": 60,
+            "earliestBoundedEnvelopeSeconds": 9.800000000000084,
+            "earliestSettledSeconds": 9.800000000000084,
+            "settledByDeclaredDeadline": true,
+            "qualifiedForFixedEnvironment": true
+          },
+          "contact": {
+            "method": "Contiguous retained samples with any nonzero native contact-force magnitude; every segment is retained.",
+            "segments": [
+              {
+                "inContact": false,
+                "startSeconds": 0,
+                "endSeconds": 80.00000000000973,
+                "samples": 9601,
+                "altitudeFt": {
+                  "min": 5000,
+                  "max": 5000.000003866851,
+                  "mean": 5000.000000712809,
+                  "peakToPeak": 0.000003866851329803467,
+                  "rmsRipple": 6.447351869625027e-8,
+                  "initial": 5000,
+                  "final": 5000.000000752509,
+                  "endMinusStart": 7.525086402893066e-7,
+                  "linearDriftPerSecond": 1.9489381551877736e-9,
+                  "detrendedRmsRipple": 4.615864609097007e-8
+                },
+                "netUpLbf": {
+                  "min": -37010.7576912764,
+                  "max": -706.337576031503,
+                  "mean": -2855.692847401753,
+                  "peakToPeak": 36304.420115244895,
+                  "rmsRipple": 7575.662747571582,
+                  "initial": -37010.75769045871,
+                  "final": -706.3376991694458,
+                  "endMinusStart": 36304.419991289265,
+                  "linearDriftPerSecond": 150.18546914510085,
+                  "detrendedRmsRipple": 6734.869447106641
+                },
+                "contactUpLbf": {
+                  "min": 0,
+                  "max": 0,
+                  "mean": 0,
+                  "peakToPeak": 0,
+                  "rmsRipple": 0,
+                  "initial": 0,
+                  "final": 0,
+                  "endMinusStart": 0,
+                  "linearDriftPerSecond": 0,
+                  "detrendedRmsRipple": 0
+                },
+                "n1Percent": {
+                  "min": 27.670167549083164,
+                  "max": 98.26693891643757,
+                  "mean": 95.06038018922673,
+                  "peakToPeak": 70.5967713673544,
+                  "rmsRipple": 12.561049112754095,
+                  "initial": 34.65828255895827,
+                  "final": 98.26650910282041,
+                  "endMinusStart": 63.60822654386214,
+                  "linearDriftPerSecond": 0.22633661381214887,
+                  "detrendedRmsRipple": 11.421581442578391
+                },
+                "n2Percent": {
+                  "min": 58.95989418464058,
+                  "max": 106.04535174293144,
+                  "mean": 103.9503005005697,
+                  "peakToPeak": 47.08545755829086,
+                  "rmsRipple": 8.493178419894088,
+                  "initial": 58.95989418464058,
+                  "final": 106.03470834263499,
+                  "endMinusStart": 47.0748141579944,
+                  "linearDriftPerSecond": 0.14793752151585185,
+                  "detrendedRmsRipple": 7.775562732277892
+                }
+              }
+            ]
+          },
+          "conservation": {
+            "available": true,
+            "acceptedSteps": 9600,
+            "rejectedSamples": 0,
+            "unchangedSequenceSamples": 0,
+            "wholePlantEnergy": {
+              "status": "independently-recomputed-from-exported-terms",
+              "signedResidualJ": {
+                "min": -0.10417225438709465,
+                "max": 0.24217740154290368,
+                "mean": 0.027532258759434842,
+                "peakToPeak": 0.34634965592999833,
+                "rmsRipple": 0.036441226210481806,
+                "initial": 0.000008066551160590407,
+                "final": 0.03997379448517435,
+                "endMinusStart": 0.03996572793401376
+              },
+              "relative": {
+                "min": 8.684772118363755e-18,
+                "max": 1.2940952714483331e-7,
+                "mean": 1.80558472821577e-8,
+                "peakToPeak": 1.2940952713614855e-7,
+                "rmsRipple": 1.642526865266041e-8,
+                "initial": 7.069665781895307e-11,
+                "final": 2.136389263033178e-8,
+                "endMinusStart": 2.129319597251283e-8
+              },
+              "gate": 0.00001,
+              "passed": true,
+              "reconstructedMinusPublishedResidualJ": {
+                "min": -2.041815605480224e-10,
+                "max": 2.1373125491663814e-10,
+                "mean": -6.149662260905112e-13,
+                "peakToPeak": 4.179128154646605e-10,
+                "rmsRipple": 6.530701547924652e-11,
+                "initial": 2.41229258790554e-12,
+                "final": 7.810285751475021e-11,
+                "endMinusStart": 7.569056492684467e-11
+              },
+              "reconstructedAggregateMinusPublishedScaleJ": {
+                "min": 0,
+                "max": 0,
+                "mean": 0,
+                "peakToPeak": 0,
+                "rmsRipple": 0,
+                "initial": 0,
+                "final": 0,
+                "endMinusStart": 0
+              },
+              "sourceTerms": [
+                "air-in-j",
+                "fuel-sensible-j",
+                "chemical-j",
+                "starter-j"
+              ],
+              "sinkTerms": [
+                "outflow-j",
+                "accessory-j",
+                "friction-j",
+                "clutch-j",
+                "radiation-j",
+                "dump-j"
+              ],
+              "storedTerms": [
+                "rotor-stored-j",
+                "solid-stored-j",
+                "manifold-stored-j"
+              ],
+              "scaleLimitation": "The denominator sums absolute accepted-step term totals. Native scale sums absolute substep terms, so cancellation within a term can make this independent denominator smaller and its gate stricter."
+            },
+            "wholePlantMass": {
+              "status": "independently-recomputed-from-exported-terms",
+              "signedResidualKg": {
+                "min": -1.1657341758564144e-15,
+                "max": 1.2212453270876722e-15,
+                "mean": 1.133352670971514e-18,
+                "peakToPeak": 2.3869795029440866e-15,
+                "rmsRipple": 3.377153310729047e-16,
+                "initial": 0,
+                "final": 2.7755575615628914e-16,
+                "endMinusStart": 2.7755575615628914e-16
+              },
+              "relative": {
+                "min": 0,
+                "max": 2.1348897548077903e-16,
+                "mean": 4.778517244960725e-17,
+                "peakToPeak": 2.1348897548077903e-16,
+                "rmsRipple": 3.715234653051351e-17,
+                "initial": 0,
+                "final": 4.84793404266668e-17,
+                "endMinusStart": 4.84793404266668e-17
+              },
+              "gate": 0.000001,
+              "passed": true,
+              "reconstructedMinusPublishedResidualKg": {
+                "min": 0,
+                "max": 0,
+                "mean": 0,
+                "peakToPeak": 0,
+                "rmsRipple": 0,
+                "initial": 0,
+                "final": 0,
+                "endMinusStart": 0
+              },
+              "reconstructedMinusPublishedRelative": {
+                "min": 0,
+                "max": 0,
+                "mean": 0,
+                "peakToPeak": 0,
+                "rmsRipple": 0,
+                "initial": 0,
+                "final": 0,
+                "endMinusStart": 0
+              }
+            },
+            "fuelWithdrawal": {
+              "status": "excluded-frozen-fuel-fixture",
+              "tankDeltaMinusLedgerFuelInKg": null,
+              "cumulativeUsedDeltaMinusLedgerFuelInKg": null,
+              "scope": "Fuel supply bookkeeping only; it does not establish whole-engine air/outlet/manifold mass conservation."
+            }
+          },
+          "acceleration": {
+            "inertialVectorResidualFps2": null,
+            "finiteDifferenceEciMotionUpFps2": null,
+            "finiteDifferenceMinusNativeEciAccelerationFps2": null,
+            "heldDown": true,
+            "interpretation": "Native hold-down suppresses motion. Net force/mass is the unrestrained acceleration, not a measured acceleration or hover."
+          },
+          "derivedTrace": {
+            "file": "2026-10-08_171937-idle-entry-force-weight.csv.gz",
+            "sha256": "45dc7fb8277679df9b1e2fdb23590ea53bda4932b21dfbb658c6df130ca61566",
+            "rows": 9601
+          }
+        },
+        {
+          "name": "steady-hot",
+          "sourceReport": "build/validation/f135-powered-lift/2026-10-08_171937/report.json",
+          "sourceTrace": {
+            "path": "build/validation/f135-powered-lift/2026-10-08_171937/steady-hot.csv.gz",
+            "sha256": "d7f52c50b5958740c9a05a8bc69750d40f99fa84ef04c80022436886b9a76287"
+          },
+          "conditions": {
+            "name": "steady-hot",
+            "throttle": 1,
+            "conversion": 1,
+            "altFt": 0,
+            "deltaTK": 30,
+            "appliedThrottle": 1,
+            "engineModel": "plant",
+            "algorithm": "component",
+            "hz": 120,
+            "passed": true
+          },
+          "sampleCount": 9601,
+          "window": {
+            "startSeconds": 20.00833333333284,
+            "endSeconds": 80.00000000000973,
+            "samples": 7200
+          },
+          "load": {
+            "initial": {
+              "tanks": [
+                {
+                  "index": 0,
+                  "capacityLbs": 6550,
+                  "authoredContentsLbs": 2500,
+                  "attached": true,
+                  "contentsLbs": 2500,
+                  "contentsKg": 1133.980925,
+                  "percentageOfTankCapacity": 38.16793893129771
+                },
+                {
+                  "index": 1,
+                  "capacityLbs": 6550,
+                  "authoredContentsLbs": 2500,
+                  "attached": true,
+                  "contentsLbs": 2500,
+                  "contentsKg": 1133.980925,
+                  "percentageOfTankCapacity": 38.16793893129771
+                },
+                {
+                  "index": 2,
+                  "capacityLbs": 2991,
+                  "authoredContentsLbs": 0,
+                  "attached": false,
+                  "contentsLbs": 0,
+                  "contentsKg": 0,
+                  "percentageOfTankCapacity": 0
+                },
+                {
+                  "index": 3,
+                  "capacityLbs": 2991,
+                  "authoredContentsLbs": 0,
+                  "attached": false,
+                  "contentsLbs": 0,
+                  "contentsKg": 0,
+                  "percentageOfTankCapacity": 0
+                }
+              ],
+              "capacityDenominatorLbs": 13100,
+              "fuelLbs": 5000,
+              "fuelKg": 2267.96185,
+              "fuelPercentageOfAttachedCapacity": 38.16793893129771,
+              "internalCapacityLbs": 13100,
+              "dryStoresLbs": 0,
+              "emptyWeightLbs": 32000,
+              "declaredWeightLbs": 37000,
+              "weightAccountingResidualLbs": 0,
+              "massSlugs": 1149.9951404935077,
+              "massKg": 16782.91745862083,
+              "cgInches": [
+                368.52,
+                0,
+                -15.36
+              ]
+            },
+            "final": {
+              "tanks": [
+                {
+                  "index": 0,
+                  "capacityLbs": 6550,
+                  "authoredContentsLbs": 2500,
+                  "attached": true,
+                  "contentsLbs": 2500,
+                  "contentsKg": 1133.980925,
+                  "percentageOfTankCapacity": 38.16793893129771
+                },
+                {
+                  "index": 1,
+                  "capacityLbs": 6550,
+                  "authoredContentsLbs": 2500,
+                  "attached": true,
+                  "contentsLbs": 2500,
+                  "contentsKg": 1133.980925,
+                  "percentageOfTankCapacity": 38.16793893129771
+                },
+                {
+                  "index": 2,
+                  "capacityLbs": 2991,
+                  "authoredContentsLbs": 0,
+                  "attached": false,
+                  "contentsLbs": 0,
+                  "contentsKg": 0,
+                  "percentageOfTankCapacity": 0
+                },
+                {
+                  "index": 3,
+                  "capacityLbs": 2991,
+                  "authoredContentsLbs": 0,
+                  "attached": false,
+                  "contentsLbs": 0,
+                  "contentsKg": 0,
+                  "percentageOfTankCapacity": 0
+                }
+              ],
+              "capacityDenominatorLbs": 13100,
+              "fuelLbs": 5000,
+              "fuelKg": 2267.96185,
+              "fuelPercentageOfAttachedCapacity": 38.16793893129771,
+              "internalCapacityLbs": 13100,
+              "dryStoresLbs": 0,
+              "emptyWeightLbs": 32000,
+              "declaredWeightLbs": 37000,
+              "weightAccountingResidualLbs": 0,
+              "massSlugs": 1149.9951404935077,
+              "massKg": 16782.91745862083,
+              "cgInches": [
+                368.52,
+                0,
+                -15.36
+              ]
+            },
+            "fuelUsedLbs": 0
+          },
+          "geometry": {
+            "initialMainAftArmInches": 175.76127086999998,
+            "finalMainAftArmInches": 175.76127086999998,
+            "initialFanForwardArmInches": 170.49713819,
+            "finalFanForwardArmInches": 170.49713819,
+            "initialLeverArmRatio": 1.0308751967093648,
+            "finalLeverArmRatio": 1.0308751967093648
+          },
+          "metrics": {
+            "t": {
+              "min": 20.00833333333284,
+              "max": 80.00000000000973,
+              "mean": 50.00416666666634,
+              "peakToPeak": 59.99166666667689,
+              "rmsRipple": 17.320507908632987,
+              "initial": 20.00833333333284,
+              "final": 80.00000000000973,
+              "endMinusStart": 59.99166666667689,
+              "linearDriftPerSecond": 1,
+              "detrendedRmsRipple": 0
+            },
+            "mainUpLbf": {
+              "min": 14789.587654985218,
+              "max": 14789.61945675445,
+              "mean": 14789.60000619838,
+              "peakToPeak": 0.03180176923160616,
+              "rmsRipple": 0.004101874456422539,
+              "initial": 14789.61945675445,
+              "final": 14789.598435790454,
+              "endMinusStart": -0.021020963995397324,
+              "linearDriftPerSecond": -0.00012175693118101003,
+              "detrendedRmsRipple": 0.0035182309553037027
+            },
+            "external_tank_0_dragUpLbf": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "external_tank_1_dragUpLbf": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "lift_fanUpLbf": {
+              "min": 15246.22135390595,
+              "max": 15246.251278386158,
+              "mean": 15246.23173657553,
+              "peakToPeak": 0.02992448020813754,
+              "rmsRipple": 0.0036987090696762237,
+              "initial": 15246.251278386158,
+              "final": 15246.23030752794,
+              "endMinusStart": -0.020970858218788635,
+              "linearDriftPerSecond": -0.00012062232109102574,
+              "detrendedRmsRipple": 0.0030521345911817795
+            },
+            "roll_post_rightUpLbf": {
+              "min": 1369.6489365906918,
+              "max": 1369.653793906727,
+              "mean": 1369.6493585231037,
+              "peakToPeak": 0.004857316035213444,
+              "rmsRipple": 0.0007302601538955207,
+              "initial": 1369.653793906727,
+              "final": 1369.6489604162257,
+              "endMinusStart": -0.004833490501368942,
+              "linearDriftPerSecond": -0.000028885550241997787,
+              "detrendedRmsRipple": 0.0005319467956112946
+            },
+            "roll_post_leftUpLbf": {
+              "min": 1369.6489365907278,
+              "max": 1369.6537939067323,
+              "mean": 1369.6493585231233,
+              "peakToPeak": 0.0048573160045179975,
+              "rmsRipple": 0.0007302601506638591,
+              "initial": 1369.6537939067323,
+              "final": 1369.6489604162455,
+              "endMinusStart": -0.004833490486817027,
+              "linearDriftPerSecond": -0.000028885550170563687,
+              "detrendedRmsRipple": 0.0005319467923385449
+            },
+            "engine_ram_dragUpLbf": {
+              "min": -4.182862147054506e-25,
+              "max": -1.7194001474090486e-25,
+              "mean": -3.297550296115439e-25,
+              "peakToPeak": 2.4634619996454576e-25,
+              "rmsRipple": 6.013954411945141e-26,
+              "initial": -4.182852298094967e-25,
+              "final": -4.0278985029560437e-25,
+              "endMinusStart": 1.549537951389232e-26,
+              "linearDriftPerSecond": 2.990044303124466e-28,
+              "detrendedRmsRipple": 5.991613866571256e-26
+            },
+            "lift_fan_ram_dragUpLbf": {
+              "min": -6.145680750397634e-25,
+              "max": -2.526233310685448e-25,
+              "mean": -4.844934308014934e-25,
+              "peakToPeak": 3.619447439712186e-25,
+              "rmsRipple": 8.836017457108985e-26,
+              "initial": -6.1456597392791605e-25,
+              "final": -5.918001026134553e-25,
+              "endMinusStart": 2.2765871314460712e-26,
+              "linearDriftPerSecond": 4.393091192419759e-28,
+              "detrendedRmsRipple": 8.803194136604938e-26
+            },
+            "pushbackUpLbf": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "propUpLbf": {
+              "min": 14789.587654985218,
+              "max": 14789.61945675445,
+              "mean": 14789.60000619838,
+              "peakToPeak": 0.03180176923160616,
+              "rmsRipple": 0.004101874456422539,
+              "initial": 14789.61945675445,
+              "final": 14789.598435790454,
+              "endMinusStart": -0.021020963995397324,
+              "linearDriftPerSecond": -0.00012175693118101003,
+              "detrendedRmsRipple": 0.0035182309553037027
+            },
+            "externalUpLbf": {
+              "min": 17985.520647883634,
+              "max": 17985.558866199615,
+              "mean": 17985.53045362184,
+              "peakToPeak": 0.03821831598179415,
+              "rmsRipple": 0.005031601066033659,
+              "initial": 17985.558866199615,
+              "final": 17985.52822836041,
+              "endMinusStart": -0.030637839205155615,
+              "linearDriftPerSecond": -0.00017839342150394443,
+              "detrendedRmsRipple": 0.003971113901805374
+            },
+            "aeroUpLbf": {
+              "min": 8.029829020230232e-21,
+              "max": 8.745420701882581e-21,
+              "mean": 8.318377720703381e-21,
+              "peakToPeak": 7.155916816523494e-22,
+              "rmsRipple": 2.749083804001682e-22,
+              "initial": 8.728818104897752e-21,
+              "final": 8.093620903183279e-21,
+              "endMinusStart": -6.351972017144731e-22,
+              "linearDriftPerSecond": -1.3969054470459237e-23,
+              "detrendedRmsRipple": 1.305154163456792e-22
+            },
+            "contactUpLbf": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "contactForceMagnitudeLbf": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "appliedUpLbf": {
+              "min": 32775.109408622855,
+              "max": 32775.17832295407,
+              "mean": 32775.130459820124,
+              "peakToPeak": 0.06891433121199952,
+              "rmsRipple": 0.008896092428671789,
+              "initial": 32775.17832295407,
+              "final": 32775.12666415086,
+              "endMinusStart": -0.05165880320419092,
+              "linearDriftPerSecond": -0.00030015035268374967,
+              "detrendedRmsRipple": 0.007218960503837654
+            },
+            "gravitationalUpLbf": {
+              "min": -37028.47528326082,
+              "max": -37028.47527585632,
+              "mean": -37028.47527939266,
+              "peakToPeak": 0.0000074045019573532045,
+              "rmsRipple": 0.0000021049927374603306,
+              "initial": -37028.47527665658,
+              "final": -37028.475279042286,
+              "endMinusStart": -0.0000023857064661569893,
+              "linearDriftPerSecond": 4.552362726959855e-10,
+              "detrendedRmsRipple": 0.000002104977969657343
+            },
+            "netUpLbf": {
+              "min": -4253.3658677534695,
+              "max": -4253.296953702513,
+              "mean": -4253.34481957251,
+              "peakToPeak": 0.06891405095666414,
+              "rmsRipple": 0.008896618573764177,
+              "initial": -4253.296953702513,
+              "final": -4253.3486148914235,
+              "endMinusStart": -0.051661188910657074,
+              "linearDriftPerSecond": -0.00030014989744747787,
+              "detrendedRmsRipple": 0.007219614552528131
+            },
+            "forceSumResidualLbf": {
+              "min": 0,
+              "max": 8.271806125530277e-25,
+              "mean": 2.0691003933444486e-25,
+              "peakToPeak": 8.271806125530277e-25,
+              "rmsRipple": 3.5824601700876324e-25,
+              "initial": 8.271806125530277e-25,
+              "final": 0,
+              "endMinusStart": -8.271806125530277e-25,
+              "linearDriftPerSecond": 1.986015372827708e-28,
+              "detrendedRmsRipple": 3.5822950176067395e-25
+            },
+            "externalForceSumResidualLbf": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "propulsionMomentSumResidualLbfFt": {
+              "min": 0,
+              "max": 1.8189894035458565e-12,
+              "mean": 8.109661090808611e-13,
+              "peakToPeak": 1.8189894035458565e-12,
+              "rmsRipple": 9.04141984964266e-13,
+              "initial": 0,
+              "final": 1.8189894035458565e-12,
+              "endMinusStart": 1.8189894035458565e-12,
+              "linearDriftPerSecond": 4.861866832901491e-17,
+              "detrendedRmsRipple": 9.041415928065074e-13
+            },
+            "pitchMainLbfFt": {
+              "min": -216620.1926169034,
+              "max": -216619.72682362207,
+              "mean": -216619.90772903227,
+              "peakToPeak": 0.4657932813279331,
+              "rmsRipple": 0.06007922228408704,
+              "initial": -216620.1926169034,
+              "final": -216619.8847276245,
+              "endMinusStart": 0.30788927889079787,
+              "linearDriftPerSecond": 0.0017833460801332092,
+              "detrendedRmsRipple": 0.05153072865977387
+            },
+            "pitchFanLbfFt": {
+              "min": 216619.75908768596,
+              "max": 216620.18425753905,
+              "mean": 216619.90660563982,
+              "peakToPeak": 0.42516985308611766,
+              "rmsRipple": 0.0525516092812718,
+              "initial": 216620.18425753905,
+              "final": 216619.88630159642,
+              "endMinusStart": -0.2979559426312335,
+              "linearDriftPerSecond": -0.0017138133789746236,
+              "detrendedRmsRipple": 0.043365017763895695
+            },
+            "pitchPropExternalLbfFt": {
+              "min": -0.13244524062611163,
+              "max": 0.13348552607931197,
+              "mean": -0.0011233926199687024,
+              "peakToPeak": 0.2659307667054236,
+              "rmsRipple": 0.027091045782189852,
+              "initial": -0.00835936435032636,
+              "final": 0.0015739719092380255,
+              "endMinusStart": 0.009933336259564385,
+              "linearDriftPerSecond": 0.0000695327011585853,
+              "detrendedRmsRipple": 0.027064262832036688
+            },
+            "pitchTotalLbfFt": {
+              "min": -0.13244524062611163,
+              "max": 0.13348552607931197,
+              "mean": -0.0011233926199687024,
+              "peakToPeak": 0.2659307667054236,
+              "rmsRipple": 0.027091045782189852,
+              "initial": -0.00835936435032636,
+              "final": 0.0015739719092380255,
+              "endMinusStart": 0.009933336259564385,
+              "linearDriftPerSecond": 0.0000695327011585853,
+              "detrendedRmsRipple": 0.027064262832036688
+            },
+            "forceAccelerationUpFps2": {
+              "min": -3.6985946444331796,
+              "max": -3.6985347189182534,
+              "mean": -3.6985763415897734,
+              "peakToPeak": 0.000059925514926284507,
+              "rmsRipple": 0.00000773622275477379,
+              "initial": -3.6985347189182534,
+              "final": -3.6985796418810484,
+              "endMinusStart": -0.00004492296279501318,
+              "linearDriftPerSecond": -2.6100101372493277e-7,
+              "detrendedRmsRipple": 0.000006277952226328662
+            },
+            "eciAccelerationUpFps2": {
+              "min": -0.1112720012368088,
+              "max": -0.11127200123680808,
+              "mean": -0.11127200123679312,
+              "peakToPeak": 7.216449660063518e-16,
+              "rmsRipple": 1.5373868750349567e-14,
+              "initial": -0.11127200123680811,
+              "final": -0.11127200123680868,
+              "endMinusStart": -5.689893001203927e-16,
+              "linearDriftPerSecond": -1.359946054944518e-17,
+              "detrendedRmsRipple": 1.5372064167049068e-14
+            },
+            "bodyKinematicAccelerationUpFps2": {
+              "min": -1.636165642134117e-46,
+              "max": 3.464555184434278e-24,
+              "mean": 1.62457181245703e-24,
+              "peakToPeak": 3.464555184434278e-24,
+              "rmsRipple": 9.657813804201776e-25,
+              "initial": 3.7678856719540873e-25,
+              "final": 1.445104230488512e-24,
+              "endMinusStart": 1.0683156632931032e-24,
+              "linearDriftPerSecond": -1.4590034458143608e-27,
+              "detrendedRmsRipple": 9.654507069043735e-25
+            },
+            "verticalVelocityFps": {
+              "min": 3.5013308907059355e-13,
+              "max": 1.3676622962465795e-12,
+              "mean": 8.674543195943952e-13,
+              "peakToPeak": 1.017529207175986e-12,
+              "rmsRipple": 2.918745298250276e-13,
+              "initial": 3.503280585551137e-13,
+              "final": 1.3667561802536904e-12,
+              "endMinusStart": 1.0164281216985766e-12,
+              "linearDriftPerSecond": 1.6838553826154588e-14,
+              "detrendedRmsRipple": 1.1387463041105904e-14
+            },
+            "altitudeFt": {
+              "min": 6.258487701416016e-7,
+              "max": 7.636845111846924e-7,
+              "mean": 7.05018432603942e-7,
+              "peakToPeak": 1.3783574104309082e-7,
+              "rmsRipple": 5.258488728154563e-8,
+              "initial": 6.332993507385254e-7,
+              "final": 7.413327693939209e-7,
+              "endMinusStart": 1.0803341865539551e-7,
+              "linearDriftPerSecond": 2.5586511306541852e-9,
+              "detrendedRmsRipple": 2.830480040168195e-8
+            },
+            "mainAftArmInches": {
+              "min": 175.76127086999998,
+              "max": 175.76127086999998,
+              "mean": 175.76127086999037,
+              "peakToPeak": 0,
+              "rmsRipple": 9.606537787476555e-12,
+              "initial": 175.76127086999998,
+              "final": 175.76127086999998,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": -1.8741768499650363e-27,
+              "detrendedRmsRipple": 9.606537787476553e-12
+            },
+            "fanForwardArmInches": {
+              "min": 170.49713819,
+              "max": 170.49713819,
+              "mean": 170.49713819000272,
+              "peakToPeak": 0,
+              "rmsRipple": 2.7284841053187847e-12,
+              "initial": 170.49713819,
+              "final": 170.49713819,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 1.0115610096354888e-27,
+              "detrendedRmsRipple": 2.7284841053187835e-12
+            },
+            "leverArmRatio": {
+              "min": 1.0308751967093648,
+              "max": 1.0308751967093648,
+              "mean": 1.0308751967094796,
+              "peakToPeak": 0,
+              "rmsRipple": 1.1479706074624119e-13,
+              "initial": 1.0308751967093648,
+              "final": 1.0308751967093648,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 1.9658367390003445e-29,
+              "detrendedRmsRipple": 1.1479706074624119e-13
+            },
+            "splitCommand": {
+              "min": 1.0308751967093643,
+              "max": 1.0308751967093646,
+              "mean": 1.0308751967094796,
+              "peakToPeak": 2.220446049250313e-16,
+              "rmsRipple": 1.1506382626753673e-13,
+              "initial": 1.0308751967093643,
+              "final": 1.0308751967093643,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 2.923201862683976e-20,
+              "detrendedRmsRipple": 1.1506382626642279e-13
+            },
+            "pitchControl": {
+              "min": -2.9144248182243204e-16,
+              "max": -1.2490025895813535e-16,
+              "mean": -2.3537566994736856e-16,
+              "peakToPeak": 1.665422228642967e-16,
+              "rmsRipple": 4.27019491231482e-17,
+              "initial": -2.9143360187725114e-16,
+              "final": -2.9144248182243204e-16,
+              "endMinusStart": -8.879945180900664e-21,
+              "linearDriftPerSecond": 1.6209513111314855e-20,
+              "detrendedRmsRipple": 4.270102615187206e-17
+            },
+            "n1Percent": {
+              "min": 91.74832742517405,
+              "max": 91.74846826784004,
+              "mean": 91.74833991694015,
+              "peakToPeak": 0.00014084266598501927,
+              "rmsRipple": 0.00002120602173442046,
+              "initial": 91.74846826784004,
+              "final": 91.74832803198917,
+              "endMinusStart": -0.00014023585086420098,
+              "linearDriftPerSecond": -8.520897389552021e-7,
+              "detrendedRmsRipple": 0.000015227550197998577
+            },
+            "n2Percent": {
+              "min": 106.99997786203126,
+              "max": 107.00002290060527,
+              "mean": 106.99999988268183,
+              "peakToPeak": 0.00004503857401516598,
+              "rmsRipple": 0.000004558604775721001,
+              "initial": 106.99999743321943,
+              "final": 106.99999999852491,
+              "endMinusStart": 0.0000025653054791519025,
+              "linearDriftPerSecond": 1.023999286762944e-8,
+              "detrendedRmsRipple": 0.000004555153155016231
+            },
+            "grossLbf": {
+              "min": 32775.109408622855,
+              "max": 32775.17832295407,
+              "mean": 32775.13045982012,
+              "peakToPeak": 0.06891433121199952,
+              "rmsRipple": 0.008896092428662294,
+              "initial": 32775.17832295407,
+              "final": 32775.12666415086,
+              "endMinusStart": -0.05165880320419092,
+              "linearDriftPerSecond": -0.00030015035268143246,
+              "detrendedRmsRipple": 0.007218960503854862
+            },
+            "failure": {
+              "min": 0,
+              "max": 0,
+              "mean": 0,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 0,
+              "final": 0,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            },
+            "massSlugs": {
+              "min": 1149.9951404935077,
+              "max": 1149.9951404935077,
+              "mean": 1149.995140493656,
+              "peakToPeak": 0,
+              "rmsRipple": 1.482476363889873e-10,
+              "initial": 1149.9951404935077,
+              "final": 1149.9951404935077,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 2.611095221928199e-26,
+              "detrendedRmsRipple": 1.4824763638898728e-10
+            },
+            "fuelLbs": {
+              "min": 5000,
+              "max": 5000,
+              "mean": 5000,
+              "peakToPeak": 0,
+              "rmsRipple": 0,
+              "initial": 5000,
+              "final": 5000,
+              "endMinusStart": 0,
+              "linearDriftPerSecond": 0,
+              "detrendedRmsRipple": 0
+            }
+          },
+          "cycle": {
+            "n1Percent": null,
+            "n2Percent": {
+              "method": "rising hysteretic crossing of linearly detrended signal, ±0.35 detrended RMS",
+              "cycles": 44,
+              "signalPeakToPeak": 0.00004503857401516598,
+              "stabilityGateSpan": 1,
+              "exceedsStabilityGate": false,
+              "periodSeconds": {
+                "min": 0.3083333333333158,
+                "max": 0.5499999999999687,
+                "mean": 0.3543560606060405,
+                "peakToPeak": 0.24166666666665293,
+                "rmsRipple": 0.04520885303302601,
+                "initial": 0.3499999999999801,
+                "final": 0.35833333333331296,
+                "endMinusStart": 0.00833333333333286
+              },
+              "periodCoefficientOfVariation": 0.12758030145077012,
+              "periodicCandidate": true
+            },
+            "grossLbf": {
+              "method": "rising hysteretic crossing of linearly detrended signal, ±0.35 detrended RMS",
+              "cycles": 33,
+              "signalPeakToPeak": 0.06891433121199952,
+              "stabilityGateSpan": 655.5026091964023,
+              "exceedsStabilityGate": false,
+              "periodSeconds": {
+                "min": 0.2833333333333172,
+                "max": 30.016666666670943,
+                "mean": 1.3472222222223271,
+                "peakToPeak": 29.733333333337626,
+                "rmsRipple": 5.07272434369571,
+                "initial": 0.416666666666643,
+                "final": 30.016666666670943,
+                "endMinusStart": 29.6000000000043
+              },
+              "periodCoefficientOfVariation": 3.7653211623305434,
+              "periodicCandidate": false
+            }
+          },
+          "settling": {
+            "method": "earliest suffix whose full retained span meets spool/gross gates for at least the required observation duration",
+            "observationSeconds": 60,
+            "earliestBoundedEnvelopeSeconds": 0,
+            "earliestSettledSeconds": 0,
+            "settledByDeclaredDeadline": true,
+            "qualifiedForFixedEnvironment": true
+          },
+          "contact": {
+            "method": "Contiguous retained samples with any nonzero native contact-force magnitude; every segment is retained.",
+            "segments": [
+              {
+                "inContact": false,
+                "startSeconds": 0,
+                "endSeconds": 80.00000000000973,
+                "samples": 9601,
+                "altitudeFt": {
+                  "min": 0,
+                  "max": 0.000003863126039505005,
+                  "mean": 6.891903455351035e-7,
+                  "peakToPeak": 0.000003863126039505005,
+                  "rmsRipple": 6.288858603646376e-8,
+                  "initial": 0,
+                  "final": 7.413327693939209e-7,
+                  "endMinusStart": 7.413327693939209e-7,
+                  "linearDriftPerSecond": 1.9536570973740394e-9,
+                  "detrendedRmsRipple": 4.380566483808542e-8
+                },
+                "netUpLbf": {
+                  "min": -4294.703378953902,
+                  "max": -4121.91084096222,
+                  "mean": -4251.810177055055,
+                  "peakToPeak": 172.79253799168146,
+                  "rmsRipple": 6.347628802332275,
+                  "initial": -4253.34995362912,
+                  "final": -4253.3486148914235,
+                  "endMinusStart": 0.001338737696642056,
+                  "linearDriftPerSecond": -0.10371742314382679,
+                  "detrendedRmsRipple": 5.878262279701534
+                },
+                "contactUpLbf": {
+                  "min": 0,
+                  "max": 0,
+                  "mean": 0,
+                  "peakToPeak": 0,
+                  "rmsRipple": 0,
+                  "initial": 0,
+                  "final": 0,
+                  "endMinusStart": 0,
+                  "linearDriftPerSecond": 0,
+                  "detrendedRmsRipple": 0
+                },
+                "n1Percent": {
+                  "min": 91.73627691130184,
+                  "max": 91.8479459880506,
+                  "mean": 91.75320995803833,
+                  "peakToPeak": 0.11166907674875404,
+                  "rmsRipple": 0.016419094667166803,
+                  "initial": 91.74832631290413,
+                  "final": 91.74832803198917,
+                  "endMinusStart": 0.0000017190850485349074,
+                  "linearDriftPerSecond": -0.00033399328218912606,
+                  "detrendedRmsRipple": 0.0144941414044282
+                },
+                "n2Percent": {
+                  "min": 106.99852655191695,
+                  "max": 107.00123565463397,
+                  "mean": 107.00000000064765,
+                  "peakToPeak": 0.002709102717020073,
+                  "rmsRipple": 0.00013476331038395417,
+                  "initial": 107,
+                  "final": 106.99999999852491,
+                  "endMinusStart": -1.475086719437968e-9,
+                  "linearDriftPerSecond": -1.7355409836122935e-7,
+                  "detrendedRmsRipple": 0.00013470368195474063
+                }
+              }
+            ]
+          },
+          "conservation": {
+            "available": true,
+            "acceptedSteps": 9600,
+            "rejectedSamples": 0,
+            "unchangedSequenceSamples": 0,
+            "wholePlantEnergy": {
+              "status": "independently-recomputed-from-exported-terms",
+              "signedResidualJ": {
+                "min": -0.44455101973186806,
+                "max": 0.4294679325649555,
+                "mean": 0.010387016625855408,
+                "peakToPeak": 0.8740189522968236,
+                "rmsRipple": 0.06429206229757237,
+                "initial": 0.000031360474167740904,
+                "final": 8.446826571528732e-9,
+                "endMinusStart": -0.000031352027341169375
+              },
+              "relative": {
+                "min": 2.090907414784268e-17,
+                "max": 2.3797301077306843e-7,
+                "mean": 1.8099776781759187e-8,
+                "peakToPeak": 2.3797301075215937e-7,
+                "rmsRipple": 2.9795879810986423e-8,
+                "initial": 1.6762526261877908e-11,
+                "final": 4.521682796141031e-15,
+                "endMinusStart": -1.6758004579081766e-11
+              },
+              "gate": 0.00001,
+              "passed": true,
+              "reconstructedMinusPublishedResidualJ": {
+                "min": -2.0344259610283189e-10,
+                "max": 2.106048668792937e-10,
+                "mean": 7.342807843239522e-13,
+                "peakToPeak": 4.140474629821256e-10,
+                "rmsRipple": 6.734993058335641e-11,
+                "initial": -2.9558577807620168e-12,
+                "final": -6.491518433904275e-11,
+                "endMinusStart": -6.195932655828074e-11
+              },
+              "reconstructedAggregateMinusPublishedScaleJ": {
+                "min": 0,
+                "max": 0,
+                "mean": 0,
+                "peakToPeak": 0,
+                "rmsRipple": 0,
+                "initial": 0,
+                "final": 0,
+                "endMinusStart": 0
+              },
+              "sourceTerms": [
+                "air-in-j",
+                "fuel-sensible-j",
+                "chemical-j",
+                "starter-j"
+              ],
+              "sinkTerms": [
+                "outflow-j",
+                "accessory-j",
+                "friction-j",
+                "clutch-j",
+                "radiation-j",
+                "dump-j"
+              ],
+              "storedTerms": [
+                "rotor-stored-j",
+                "solid-stored-j",
+                "manifold-stored-j"
+              ],
+              "scaleLimitation": "The denominator sums absolute accepted-step term totals. Native scale sums absolute substep terms, so cancellation within a term can make this independent denominator smaller and its gate stricter."
+            },
+            "wholePlantMass": {
+              "status": "independently-recomputed-from-exported-terms",
+              "signedResidualKg": {
+                "min": -9.992007221626409e-16,
+                "max": 1.3877787807814457e-15,
+                "mean": 2.3620573090058863e-16,
+                "peakToPeak": 2.3869795029440866e-15,
+                "rmsRipple": 3.4754473752666947e-16,
+                "initial": 4.440892098500626e-16,
+                "final": 5.551115123125783e-17,
+                "endMinusStart": -3.885780586188048e-16
+              },
+              "relative": {
+                "min": 0,
+                "max": 2.547950809803579e-16,
+                "mean": 6.245260285396055e-17,
+                "peakToPeak": 2.547950809803579e-16,
+                "rmsRipple": 4.529210863469338e-17,
+                "initial": 8.021081388063654e-17,
+                "final": 1.0191803236855391e-17,
+                "endMinusStart": -7.001901064378115e-17
+              },
+              "gate": 0.000001,
+              "passed": true,
+              "reconstructedMinusPublishedResidualKg": {
+                "min": 0,
+                "max": 0,
+                "mean": 0,
+                "peakToPeak": 0,
+                "rmsRipple": 0,
+                "initial": 0,
+                "final": 0,
+                "endMinusStart": 0
+              },
+              "reconstructedMinusPublishedRelative": {
+                "min": 0,
+                "max": 0,
+                "mean": 0,
+                "peakToPeak": 0,
+                "rmsRipple": 0,
+                "initial": 0,
+                "final": 0,
+                "endMinusStart": 0
+              }
+            },
+            "fuelWithdrawal": {
+              "status": "excluded-frozen-fuel-fixture",
+              "tankDeltaMinusLedgerFuelInKg": null,
+              "cumulativeUsedDeltaMinusLedgerFuelInKg": null,
+              "scope": "Fuel supply bookkeeping only; it does not establish whole-engine air/outlet/manifold mass conservation."
+            }
+          },
+          "acceleration": {
+            "inertialVectorResidualFps2": null,
+            "finiteDifferenceEciMotionUpFps2": null,
+            "finiteDifferenceMinusNativeEciAccelerationFps2": null,
+            "heldDown": true,
+            "interpretation": "Native hold-down suppresses motion. Net force/mass is the unrestrained acceleration, not a measured acceleration or hover."
+          },
+          "derivedTrace": {
+            "file": "2026-10-08_171937-steady-hot-force-weight.csv.gz",
+            "sha256": "af7c12cbefd8f49c9e3e68f9e07871bab96e0f165e375d7e45cd4b22c3638d5d",
+            "rows": 9601
+          }
+        }
+      ]
+    }
+  ]
+}

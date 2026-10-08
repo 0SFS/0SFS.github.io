@@ -4,8 +4,10 @@ import {
   CONTROL_INTERVAL_MS, HANDOFF_MS, MAX_CAMERA_ZOOM_STEP, MAX_HAPTIC_PULSE_MS, MAX_TRACE_EVENTS, MIN_CAMERA_ZOOM_STEP,
   NEUTRAL_CAMERA_AIM, NEUTRAL_CONTROLS, STALE_MS, isAiming,
   isCameraAim, isCentered, isControls, neutralize, parseMessage, isProtocolVersionMismatch, PROTOCOL_MISMATCH_MESSAGE,
-  type ActionName, type AircraftStatus, type CameraAim, type CameraTotal, type ControlFrame, type ControlSendMode, type ControlSurfaceState, type ControlTrace, type HapticFeedbackFrame, type RemoteMessage,
+  isPhoneControllerSettings,
+  type ActionName, type AircraftStatus, type CameraAim, type CameraTotal, type ControlFrame, type ControlSendMode, type ControlSurfaceState, type ControlTrace, type HapticFeedbackFrame, type PhoneControllerSettings, type PhoneSettingsMessage, type RemoteMessage,
 } from './protocol'
+import { loadPhoneSettings, savePhoneSettings } from './phoneSettingsStore'
 
 /**
  * When the input event behind a control change happened, for the opt-in
@@ -33,12 +35,21 @@ export interface PhoneControllerSnapshot {
   signalingAvailable: boolean
   pendingActions: number
   rttMs: number | null
+  /**
+   * Control frames this phone sent over the last second, for the Hz chip: the
+   * touch rate while a finger moves, the 60 Hz timer while none does, and 0
+   * while the computer flies. Null until paired.
+   */
+  sendHz: number | null
   diagnostics: TransportDiagnostics | null
   appliedSeq: number | null
   receiveToApplyMs: number | null
   /** navigator.vibrate exists; coarse on/off pulses only, no intensity. */
   hapticsSupported: boolean
+  /** The Haptics setting, where this phone can vibrate. */
   hapticsEnabled: boolean
+  /** This controller's own settings, as the computer last confirmed them or as this phone last kept them. */
+  settings: PhoneControllerSettings
 }
 
 export interface PhoneControllerClient {
@@ -69,10 +80,14 @@ export interface PhoneControllerClient {
   shutdownEngine(): boolean
   releaseControl(): boolean
   setHapticsEnabled(enabled: boolean): void
+  /**
+   * Changes this controller's settings: kept on this phone at once, and sent
+   * to the computer, which keeps them with its own and confirms them.
+   */
+  updateSettings(patch: Partial<PhoneControllerSettings>): void
   destroy(): void
 }
 
-export const PHONE_HAPTICS_PREFERENCE_KEY = 'osfs.phone-haptics'
 // A new pulse may replace the running one, but not faster than the host heartbeat.
 const MIN_PULSE_INTERVAL_MS = 45
 /** Between automatic requests for control the computer offers back, so a refusal is not repeated at heartbeat rate. */
@@ -138,8 +153,8 @@ export function createPhoneControllerClient(
     phase: 'connecting', message: 'Connecting to pairing service…', status: null,
     controls: { ...NEUTRAL_CONTROLS }, canFly: false, canControl: false,
     requestingControl: false, hostFresh: false, lostMs: null, signalingAvailable: true,
-    pendingActions: 0, rttMs: null, diagnostics: null, appliedSeq: null, receiveToApplyMs: null,
-    hapticsSupported: false, hapticsEnabled: false,
+    pendingActions: 0, rttMs: null, sendHz: null, diagnostics: null, appliedSeq: null, receiveToApplyMs: null,
+    hapticsSupported: false, hapticsEnabled: false, settings: loadPhoneSettings(null),
   }
   let controls = { ...NEUTRAL_CONTROLS }
   // Held like the brake, but not a flight surface, so it travels beside them.
@@ -202,6 +217,9 @@ export function createPhoneControllerClient(
   let lastControlAt = -Infinity
   let pingId = 0
   let outstandingPing: { id: number; sentAt: number } | null = null
+  // Control frames that left since `framesCountedFrom`, for `sendHz`.
+  let framesSent = 0
+  let framesCountedFrom = now()
   let localReady = false
   let hostReady = false
   let destroyed = false
@@ -216,9 +234,10 @@ export function createPhoneControllerClient(
   const storage = options.storage !== undefined ? options.storage : (() => {
     try { return win?.localStorage ?? null } catch { return null }
   })()
-  let hapticsEnabled = (() => {
-    try { return vibrate !== null && storage?.getItem(PHONE_HAPTICS_PREFERENCE_KEY) === 'on' } catch { return false }
-  })()
+  let settings = loadPhoneSettings(storage)
+  // How many times this phone has sent its settings; the computer's answers carry the newest it has taken.
+  let settingsRev = 0
+  let hapticsEnabled = vibrate !== null && settings.haptics
   let lastFeedbackId = -1
   let lastPulseAt = -Infinity
   let vibratingUntil = -Infinity
@@ -229,7 +248,7 @@ export function createPhoneControllerClient(
   // levers follow the computer's only once it has applied that frame, so a
   // status from before the move cannot drag a lever back under the finger.
   let leverMoveSeq = -1
-  snapshot = { ...snapshot, hapticsSupported: vibrate !== null, hapticsEnabled }
+  snapshot = { ...snapshot, hapticsSupported: vibrate !== null, hapticsEnabled, settings }
 
   function stopVibration(): void {
     if (!vibrate || now() >= vibratingUntil) return
@@ -349,6 +368,7 @@ export function createPhoneControllerClient(
     } } : null
     const starter = starterHeld ? { starter: 1 as const } : null
     const sent = transport.sendNative({ ...envelope(), type: 'controls', seq: sequence++, lease, controls: { ...controls }, ...gesture, ...total, ...trace, ...starter })
+    if (sent) framesSent++
     // Only a delta that left the device has been spent.
     if (sent && gesture) camera = { ...NEUTRAL_CAMERA_AIM }
     if (sent && total) { aimSent = { ...aimTotal }; aimStamp = stamp; aimMovedAt = null }
@@ -445,7 +465,37 @@ export function createPhoneControllerClient(
     if (finished || !localReady || !hostReady) return
     clearTimeout(setupTimer)
     emit({ phase: 'ready', message: 'Connected · Desktop controls' })
+    sendSettings(true)
     void acquireWakeLock()
+  }
+
+  /** `initial`: the computer keeps its own where it has any, and takes these where it still has its defaults. */
+  function sendSettings(initial: boolean): void {
+    if (finished || snapshot.phase !== 'ready' || !session) return
+    settingsRev++
+    transport?.sendReliable({ ...envelope(), type: 'settings', settings: { ...settings }, rev: settingsRev, ...(initial ? { initial: true as const } : {}) })
+  }
+
+  function keepSettings(next: PhoneControllerSettings): boolean {
+    if ((Object.keys(next) as (keyof PhoneControllerSettings)[]).every(key => next[key] === settings[key])) return false
+    settings = { ...next }
+    hapticsEnabled = vibrate !== null && settings.haptics
+    if (!hapticsEnabled) stopVibration()
+    savePhoneSettings(storage, settings)
+    emit({ settings, hapticsEnabled })
+    return true
+  }
+
+  function updateSettings(patch: Partial<PhoneControllerSettings>): void {
+    if (destroyed) return
+    const next = { ...settings, ...patch }
+    if (isPhoneControllerSettings(next) && keepSettings(next)) sendSettings(false)
+  }
+
+  /** What the computer holds, unless this phone has changed them since the change the computer last took. */
+  function adoptSettings(message: PhoneSettingsMessage): void {
+    if (message.rev < settingsRev) return
+    keepSettings(message.settings)
   }
 
   function sendAction(action: ActionName, value?: boolean | 'first' | 'third'): boolean {
@@ -499,6 +549,10 @@ export function createPhoneControllerClient(
     }
     if (message.type === 'reject') { fail(message.reason); return }
     if (message.type === 'hello') return
+    if (message.type === 'settings') {
+      if (session && message.session === session) adoptSettings(message)
+      return
+    }
     if (message.type === 'welcome') {
       if (session) return
       session = message.session
@@ -677,7 +731,14 @@ export function createPhoneControllerClient(
     sendControls(1)
   }, CONTROL_INTERVAL_MS)
   const pingTimer = setInterval(() => {
-    if (finished || destroyed || snapshot.phase !== 'ready' || !transport?.nativeOpen) return
+    if (finished || destroyed) return
+    // The rate over the time actually elapsed, which a busy phone stretches past a second.
+    const time = now()
+    const sendHz = snapshot.phase === 'ready' ? Math.round(framesSent * 1000 / Math.max(1, time - framesCountedFrom)) : null
+    framesSent = 0
+    framesCountedFrom = time
+    if (sendHz !== snapshot.sendHz) emit({ sendHz })
+    if (snapshot.phase !== 'ready' || !transport?.nativeOpen) return
     outstandingPing = { id: pingId++, sentAt: now() }
     transport.sendNative({ ...envelope(), type: 'ping', ...outstandingPing })
   }, 1000)
@@ -787,13 +848,8 @@ export function createPhoneControllerClient(
     },
     shutdownEngine: () => (snapshot.status?.engine?.state === undefined ? false : sendAction('shutdownEngine')),
     releaseControl() { cancelTransientControls(); return sendAction('releaseControl') },
-    setHapticsEnabled(enabled) {
-      if (destroyed) return
-      hapticsEnabled = enabled && vibrate !== null
-      if (!hapticsEnabled) stopVibration()
-      try { storage?.setItem(PHONE_HAPTICS_PREFERENCE_KEY, hapticsEnabled ? 'on' : 'off') } catch { /* Session-only. */ }
-      emit({ hapticsEnabled })
-    },
+    setHapticsEnabled: enabled => updateSettings({ haptics: enabled }),
+    updateSettings,
     destroy() {
       if (destroyed) return
       if (!finished) { cancelTransientControls(); sendAction('releaseControl') }

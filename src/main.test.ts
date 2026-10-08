@@ -173,7 +173,7 @@ describe("application route", () => {
 
     await vi.waitFor(() => expect(document.querySelector('#app-log [data-tone="error"]')).not.toBeNull());
     expect(document.getElementById("app-log")!.hidden).toBe(false);
-    expect(document.querySelector('#app-log [data-tone="error"] button')!.textContent).toBe("Reload and try again");
+    expect(document.querySelector('#app-log [data-tone="error"] .game-log__actions button')!.textContent).toBe("Reload and try again");
     expect(appMocks.diagnosticsDestroy).toHaveBeenCalledOnce();
   });
 

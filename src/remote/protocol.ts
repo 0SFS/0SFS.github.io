@@ -202,6 +202,43 @@ export function isControlTrace(value: unknown): value is ControlTrace {
     && Array.isArray(value.drop) && value.drop.length === 3 && value.drop.every(finite);
 }
 
+/**
+ * The phone controller's own settings. They are kept on the computer with its
+ * other settings (Remote Control → Phone controller), so one export or preset
+ * holds the whole setup; the phone keeps a copy for when it is not paired.
+ */
+export interface PhoneControllerSettings {
+  /** Where the chip grid sits: under the flight controls, or over them. */
+  grid: "bottom" | "top";
+  /** What the yaw slider does when the finger leaves it: back to centre, or stay. */
+  yawRelease: "center" | "hold";
+  /** With `center`, how long the return takes; 0 snaps back. */
+  yawReturnMs: number;
+  /** Touchdown pulses, where the phone's browser can vibrate. */
+  haptics: boolean;
+}
+export const MAX_YAW_RETURN_MS = 1500;
+export function isPhoneControllerSettings(value: unknown): value is PhoneControllerSettings {
+  return record(value) && (value.grid === "bottom" || value.grid === "top")
+    && (value.yawRelease === "center" || value.yawRelease === "hold")
+    && finite(value.yawReturnMs) && value.yawReturnMs >= 0 && value.yawReturnMs <= MAX_YAW_RETURN_MS
+    && typeof value.haptics === "boolean";
+}
+/**
+ * The phone controller's settings, both ways on the reliable channel. The
+ * phone sends its own once paired (`initial`: the computer takes them only
+ * where it still has its defaults, so an imported setup wins and a phone's
+ * existing choices are not lost) and again after each change its pilot makes.
+ * The computer answers each with what it then holds, and sends them again
+ * whenever they change there; it never sends them to a phone that has not
+ * sent its own. `rev` counts the phone's sends: the computer's answer carries
+ * the newest it has taken, and the phone ignores an answer older than its own
+ * latest change, so a slider dragged on the phone is never pulled back by an
+ * answer still in flight. Not authority, so not bound to an epoch. Additive on
+ * v1: an older peer ignores the message, and each end keeps its own.
+ */
+export type PhoneSettingsMessage = Envelope & { type: "settings"; settings: PhoneControllerSettings; rev: number; initial?: true };
+
 export interface Envelope { v: 1; session: string; epoch: number }
 export type ActionName = "requestControl" | "releaseControl" | "setPaused" | "setViewMode" | "setGearDown" | "shutdownEngine";
 export type ActionMessage = Envelope & {
@@ -239,7 +276,8 @@ export type RemoteMessage =
   | (Envelope & { type: "ack"; id: number; ok: boolean; message: string; status: AircraftStatus })
   | ControlFrame
   | (Envelope & { type: "heartbeat"; lease: number; status?: AircraftStatus; appliedSeq?: number; receiveToApplyMs?: number; feedback?: HapticFeedbackFrame; trace?: 1; controlSend?: ControlSendMode })
-  | (Envelope & { type: "ping" | "pong"; id: number; sentAt: number });
+  | (Envelope & { type: "ping" | "pong"; id: number; sentAt: number })
+  | PhoneSettingsMessage;
 
 export const NEUTRAL_CONTROLS: ControlSurfaceState = {
   elevator: 0, aileron: 0, rudder: 0, throttle: 0, pitchTrim: 0, rollTrim: 0, flaps: 0, brake: 0,
@@ -369,6 +407,9 @@ export function parseMessage(input: unknown): RemoteMessage | null {
       if (valid && value.controlSend !== undefined && value.controlSend !== "timer" && value.controlSend !== "batch") delete value.controlSend;
       break;
     case "ping": case "pong": valid = isCounter(value.id) && finite(value.sentAt) && value.sentAt >= 0; break;
+    case "settings": valid = isPhoneControllerSettings(value.settings) && isCounter(value.rev);
+      if (valid && value.initial !== undefined && value.initial !== true) delete value.initial;
+      break;
     case "action": valid = isCounter(value.id) && isCounter(value.lease) && (
       ((value.action === "requestControl" || value.action === "releaseControl" || value.action === "shutdownEngine") && value.value === undefined)
       || ((value.action === "setPaused" || value.action === "setGearDown") && typeof value.value === "boolean")

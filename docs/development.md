@@ -126,7 +126,7 @@ others, and without touching the working tree:
    - In the export, `vite.config.ts` allows `../foss-earth`, which there points into `build/`: give
      the export's copy FOSS Earth's absolute path.
    - Link `public/aircraft` into the export, which the F135 tests read.
-   - Run `npx tsc -b` and `npx vitest related --run` there.
+   - Run `npm run typecheck` and `npx vitest related --run` there.
 
 ### Looking at one component in Chrome, without a server
 

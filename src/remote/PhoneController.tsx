@@ -1,4 +1,4 @@
-import { useCallback, useState, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import type { InputTiming, PhoneControllerClient } from "./phoneControllerClient";
 import { PhoneBrake, PhoneCameraPad, PhoneStick } from "./PhoneStick";
 import { PhoneQrScanner } from "./PhoneQrScanner";
@@ -9,10 +9,7 @@ import { PhoneFullscreenButton, PhoneFullscreenPrompt } from "./PhoneFullscreenP
 import { useFullscreenOffer } from "./useFullscreenOffer";
 import { PhoneSettings } from "./PhoneSettings";
 import { PhoneYaw } from "./PhoneYaw";
-import {
-  readGridPosition, readYawSettings, writeGridPosition, writeYawSettings,
-  type GridPosition, type YawSettings,
-} from "./phoneSettingsStore";
+import type { GridPosition, YawSettings } from "./phoneSettingsStore";
 import { ConnectionDiagnosticsPanel } from "./ConnectionDiagnosticsPanel";
 import "../styles/flightControls.css";
 import "./phone.css";
@@ -32,10 +29,11 @@ export function PhoneController({ client, onPair }: { client: PhoneControllerCli
   const [scanning, setScanning] = useState(false);
   const status = state.status;
   const fullscreen = useFullscreenOffer();
-  const [gridPosition, setGridPosition] = useState(readGridPosition);
-  const moveGrid = useCallback((position: GridPosition) => { setGridPosition(position); writeGridPosition(position); }, []);
-  const [yaw, setYaw] = useState(readYawSettings);
-  const changeYaw = useCallback((settings: YawSettings) => { setYaw(settings); writeYawSettings(settings); }, []);
+  // The computer keeps these with its own settings; the client keeps this phone's copy.
+  const { grid: gridPosition, yawRelease, yawReturnMs } = state.settings;
+  const moveGrid = useCallback((grid: GridPosition) => client.updateSettings({ grid }), [client]);
+  const yaw = useMemo((): YawSettings => ({ release: yawRelease, returnMs: yawReturnMs }), [yawRelease, yawReturnMs]);
+  const changeYaw = useCallback((settings: YawSettings) => client.updateSettings({ yawRelease: settings.release, yawReturnMs: settings.returnMs }), [client]);
   const rudder = useCallback((value: number) => client.updateControls({ rudder: value }), [client]);
   const stick = useCallback((x: number, y: number, input?: InputTiming) => client.updateControls({ aileron: x, elevator: -y }, input), [client]);
   // The desktop's own drag signs: right orbits right, down lifts the camera.
@@ -164,9 +162,15 @@ export function PhoneController({ client, onPair }: { client: PhoneControllerCli
           title={state.hapticsSupported ? "Touchdown pulses while you fly" : "Unavailable on this device"}
           onClick={() => client.setHapticsEnabled(!state.hapticsEnabled)}>Haptics</button>
         <ConnectionDiagnosticsPanel log={client.log} transport={state.diagnostics} rttMs={state.rttMs} lostMs={state.lostMs}
-          receiveToApplyMs={state.receiveToApplyMs} appliedSeq={state.appliedSeq} signalingAvailable={state.signalingAvailable}
+          receiveToApplyMs={state.receiveToApplyMs} appliedSeq={state.appliedSeq} sendHz={state.sendHz} signalingAvailable={state.signalingAvailable}
           recovery={ended ? "On the computer, open the Remote Control tab and create a new QR, then scan it." : undefined}
           onScan={scan} />
+        {/* Beside the round trip, how often this phone sends: the touch rate
+            while a finger moves, the 60 Hz timer while none does. */}
+        <span className="phone-rate" title="Control frames this phone sent in the last second">
+          <span className="phone-rate__reading" aria-hidden="true">{state.sendHz === null ? "—" : `${state.sendHz}Hz`}</span>
+          <span className="phone-sr-only">{state.sendHz === null ? "Not sending" : `${state.sendHz} control frames a second`}</span>
+        </span>
         <PhoneFullscreenButton offer={fullscreen} />
         <PhoneSettings gridPosition={gridPosition} onGridPositionChange={moveGrid} yaw={yaw} onYawChange={changeYaw} />
         {/* Last in the grid. A chip like the rest, held rather than tapped. */}

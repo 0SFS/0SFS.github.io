@@ -1,7 +1,14 @@
 # Flight settings
 
+The Engine tab has **Settings** and **Live data** sections. Settings owns its
+Simulation, monitor display, history capture and test-stand controls; Live data
+shows each available observation once as a plot or compact reading. The
+[engine monitor design](../engine-monitor.md) describes variable identity,
+grouping, layout persistence and bounded recording.
+
 The Engine tab also owns live-history retention (1–600 simulated seconds,
-default 60) and capture ceiling (0–30 Hz, default 5; zero disables it), plus
+default 60) and capture ceiling (0–30 Hz, default 5; zero disables capture while
+retaining its bounded history), plus
 starting view distance (1–100 m,
 default 6), and the test camera's single-track zoom range (0.2–1,000 m bounds,
 default 1–100 m). These are declared in `flightParameters.ts`. The test stand is
@@ -109,6 +116,10 @@ renderer reads `osfs.exhaust.enabled` (default on), `sampleCount` (32, bounded
 1–100,000 cd/m²). They apply live and persist through the registry.
 The last value maps modeled metal luminance to display white; lowering it
 brightens the nozzle without changing gas/metal temperatures or the flame.
+`osfs.exhaust.gasReferenceNits` does the same for the gas. Both apply only with
+FOSS Earth's sky model off: under a sky model the sky's exposure gives white for
+the exhaust as for sunlight, and a note beside each says what that white is
+([The sky](#the-sky-2026-10-07)).
 The default is one bounded volume draw per configured engine with a baked
 optical lookup; off releases those resources. These controls do not change
 engine power or native afterburner engagement. See the
@@ -173,7 +184,7 @@ counts; visible stationary inlet guide vanes in front photographs must not
 be counted as rotating fan blades. This metadata changes the visualization
 only, never the acoustic reference frequencies or flight dynamics.
 
-Engine → Engine owns `osfs.engineMonitor.orbFps` (0–1000 frames/s, default 1000),
+Engine → Settings → Engine owns `osfs.engineMonitor.orbFps` (0–1000 frames/s, default 1000),
 `orbTurnsPerSecond` (0–4 visual rev/s ceiling at the scale maximum, default 2),
 `orbMaxPatternStep` (0.05–0.49 pattern pitches per drawn frame, default 0.45), and
 `orbPixelRatio` (1–3 drawing pixels/CSS pixel, default 2, capped by display
@@ -426,11 +437,94 @@ existed, any silence that long paused the flight and took control away.
 Spec: [Phone controller](phone-controller.md) → *Sharing the controls* and
 *Losing the phone*.
 
+### Remote Control → Phone controller
+
+| Parameter | Unit | Default |
+| --- | --- | --- |
+| `osfs.phone.gridPosition` | choice | Under the controls (`bottom`); also `top` |
+| `osfs.phone.yawRelease` | choice | Return to centre (`center`); also `hold` |
+| `osfs.phone.yawReturnMs` | ms | 0, from 0 to 1,500 |
+| `osfs.phone.haptics` | switch | Off |
+
+The phone controller's own settings. They used to live only on the phone, so
+an export from the computer left them out. Now the computer keeps them, the
+phone's ⚙ sheet and Haptics chip change them over the link, and the phone keeps
+a copy for when it is not paired. At pairing the computer's values win except
+where it still has the default; there the phone's choice is kept, so a phone
+set up before this loses nothing. Spec: [Phone controller](phone-controller.md)
+→ *Application protocol and scheduling*.
+
+### Remote Control → Phone camera trackpad (2026-10-07)
+
+The defaults are now the preset **Phone camera: recommended**: sent once per
+touch frame, lost movement recovered from the running total, and drawn on the
+phone's timeline 12 ms behind the fastest delivery. Drawn on arrival, the
+camera jumped with every uneven Wi-Fi delivery; the lowest delay is now the
+opt-in, **Draw movement → As soon as it arrives**. A fresh flight matches
+Phone camera: recommended, not Phone camera: original.
+
 ### Aircraft → Ground handling
 
 Ground interaction already follows this spec's model: presets that show their
 fields, lockable fields, named profiles, export and import. It is the pattern
 the rest should copy. Only its home changes.
+
+### Aircraft → Lights (2026-10-07)
+
+Each aircraft carries navigation, anti-collision, landing and taxi lights at
+places measured on its model
+([aircraftLights.ts](../../src/flight/aircraft/aircraftLights.ts)). Their
+brightness is their photometry in candelas, shown on the sky's scale through FOSS
+Earth's light points ([Sky](../../../foss-earth/docs/proposals/sky.md#lamps)): a
+glare at night and a faint dot by day. Nothing is brightened for looks.
+
+| Parameter | Unit, bounds | Default |
+| --- | --- | --- |
+| `osfs.lights.navigation` | switch | on |
+| `osfs.lights.antiCollision` | switch | on |
+| `osfs.lights.landing` | switch | on |
+| `osfs.lights.groundLight` | switch | on |
+| `osfs.lights.sizePx` | px, 4 to 96; under Show all parameters | 32 |
+| `osfs.lights.liftMeters` | m, 0 to 2; under Show all parameters | 0.3 |
+| `osfs.lights.referenceNits` | cd/m², 1 to 100,000; under Show all parameters | 1000 |
+
+- **Navigation lights** are red on the left wingtip, green on the right and white
+  at the tail, by the minimum intensities of 14 CFR 25.1391 and 25.1393: 40 cd
+  within 10° of dead ahead, 30 cd to 20° and 5 cd to 110° on a light's own side;
+  20 cd within 70° of dead aft; and a share of those above and below the
+  horizontal, from 0.9 within 5° to 0.05 beyond 40°. Sector edges are softened over
+  2°, so a light does not flicker on its edge. The F-35B's two fins share the tail
+  light's duty.
+- **Anti-collision lights** are white wingtip strobes at 50 flashes a minute and
+  red beacons at 45, between the strobes' flashes. 14 CFR 25.1401 asks for an
+  effective intensity of 400 cd; by the Blondel–Rey relation a flash of t seconds
+  at peak I reads as I t / (0.2 + t), so the 0.1 s strobe peaks at 1,200 cd and
+  the 0.15 s beacon at 933 cd.
+- **Landing and taxi lights** have no required intensity. Theirs are a sealed-beam
+  lamp's: 100,000 cd across a beam full to 5° from its axis and gone by 12°, and
+  30,000 cd across one full to 12° and gone by 25°, pointed 2° to 6° below the
+  nose. From in front and outside the beam the lens glows at 0.2% of the peak. The
+  F-35B's are on its nose gear leg and are lit only with the gear down; the Cessna
+  172's are in its left wing's leading edge; the Vision Jet's are placed in its
+  wing roots, not from a source.
+- **Beams on the ground** gives the lit beams to the sky as lamps, which light the
+  map's ground by the inverse square of the distance and the beam's edge. Each
+  costs every pixel of ground a few operations. Lit surfaces, the aircraft's own
+  included, get nothing from them.
+- **A frame at each flash.** While anti-collision lights are on and the flight is
+  running, a timer asks for a frame at each flash's start and end, so a still view
+  shows them flash: about three frames a second for strobes and a beacon. Their
+  clock is the flight's. Paused or loading, they hold as they are and ask for no
+  frames, so the render loop stays idle. Nothing else about the lights asks for
+  frames.
+- With the sky model off there is no exposure, and a light is shown against
+  `osfs.lights.referenceNits`, the exhaust's own reference.
+- The engine test stand has no lights.
+
+Not checked: the lights on the real models in a rendered frame, and the positions
+by eye. Positions were measured from each model's mesh in the app's right-handed
+scene; unit tests cover the photometry, the points drawn and the beams given to
+the ground.
 
 ### Sound
 
@@ -694,6 +788,49 @@ aircraft undid the flight in progress.
   starting bindings (P, and the controller's Start button) choose whether the
   flight starts paused, and a log line says which. Once the HUD exists, its
   pause button is the one control the loading hold leaves usable.
+
+### The sky (2026-10-07)
+
+The Sun, the sky and exposure are FOSS Earth's
+([Sky](../../../foss-earth/docs/proposals/sky.md)); the flight supplies its place
+and binds the aircraft's emitters to them.
+
+- 0sfs sets the host default of FOSS Earth's `sky.model` to `dome`: a flight is
+  lit by the Sun, the Moon and the sky, with the sky and its stars drawn. `dome`
+  is now FOSS Earth's own default too. A pilot's saved choice still wins.
+- 0sfs sets the host default of `sky.groundLight.mode` to `rendered`: the
+  aircraft's underside is lit by the ground below it as it is drawn, measured at
+  the aircraft, not the camera (`runtime.sky.setGroundLightReceiver`). It costs one
+  image of the ground 16 pixels across twice a second
+  ([Light from the ground](../../../foss-earth/docs/proposals/sky.md#light-from-the-ground)).
+- 0sfs adds a third choice to Sky → Ground → Map imagery, **As at the viewpoint**:
+  one factor for all imagery, the light on level ground below the aircraft. It is
+  right below a low flight and wrong for a planet seen from afar, which is why FOSS
+  Earth alone does not offer it; it saves each pixel of ground two table look-ups.
+- **A very slow device** gets two cheaper host defaults, each with its reason shown
+  beside the setting: imagery lit as at the viewpoint, and the light from the
+  ground as one colour (`uniform`), which renders nothing. A device counts as very
+  slow by what it reports of itself, never by its name: a WebGL 1 renderer, 2 GiB
+  of memory or less, or two processor threads or fewer
+  ([skyDefaults.ts](../../src/flight/settings/skyDefaults.ts)). A pilot's own
+  choice still wins, and every other device keeps the planet lit by each point's
+  own Sun.
+- The flight shows FOSS Earth's **Sky** and **Date and time** tabs. The Sky tab
+  says where the Sun is and links to Date and time, whose two dials, the time of
+  day and the day of the year, set the Sun's place
+  ([Date and time](../../../foss-earth/docs/proposals/sky.md#date-and-time)). Both
+  read solar time at the sky's viewpoint, or at the aircraft's position until the
+  sky has one, so the time dial's knob moves on as the aircraft flies east or west.
+- Under a sky model the exhaust's gas and surface references are the sky's white
+  luminance, so the exhaust is shown on the same scale as the Sun's and the sky's
+  light. With the model off they are `osfs.exhaust.gasReferenceNits` and
+  `osfs.exhaust.surfaceReferenceNits` again. No source luminance, temperature,
+  soot or hue changes.
+- `renderer.exposureEV` keeps its value and becomes compensation on top of the
+  sky's exposure. The +8.8 EV of the 2026-10-07 observation
+  ([F135 dry VTOL mechanism](../validation/f135-dry-vtol-mechanism.md)) shows a
+  sky-lit flight 446 times brighter than the meter would, so it belongs back at 0;
+  the observation itself is reproduced with the sky model off.
 
 ## TODO: custom flight instruments and world-space cues
 

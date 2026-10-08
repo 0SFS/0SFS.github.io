@@ -60,12 +60,12 @@ describe("fullscreen offer", () => {
     stubFullscreenApi();
     offerFullscreen(log);
     expect(requestFullscreen).not.toHaveBeenCalled();
-    const everyVisit = log.element.querySelectorAll(".game-log__line button")[1];
+    const everyVisit = log.element.querySelectorAll(".game-log__actions button")[1];
     expect(everyVisit.getAttribute("aria-pressed")).toBe("false");
 
     everyVisit.click();
     expect(window.localStorage.getItem("osfs.fullscreen-every-visit")).toBe("1");
-    log.element.querySelector<HTMLButtonElement>(".game-log__line button")!.click();
+    log.element.querySelector<HTMLButtonElement>(".game-log__actions button")!.click();
 
     expect(requestFullscreen).toHaveBeenCalledWith({ navigationUI: "hide" });
     await vi.waitFor(() => expect(log.element.textContent).toContain("Fullscreen. Use ⛶"));
@@ -79,7 +79,7 @@ describe("fullscreen offer", () => {
     expect(log.element.textContent).toContain("first tap");
 
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
-    log.element.querySelector(".game-log__line button")!.dispatchEvent(new Event("pointerup", { bubbles: true }));
+    log.element.querySelector(".game-log__actions button")!.dispatchEvent(new Event("pointerup", { bubbles: true }));
     expect(requestFullscreen).not.toHaveBeenCalled();
 
     document.body.dispatchEvent(new Event("pointerup", { bubbles: true }));

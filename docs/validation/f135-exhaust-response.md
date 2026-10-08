@@ -10,6 +10,27 @@ calibration remain open.** The [dry powered-lift observation ledger](f135-dry-vt
 separates night-reference evidence, current source bounds, display limitations
 and the next acceptance targets.
 
+**Current night feedback, 2026-10-07:** the user now sees the faint red dry
+exhaust clearly and considers that appearance satisfactory. AB sound at zero
+gain and the cold AB audiovisual lag remain concerns. The new
+[dry controls and combustion-coupled sound correction](f135-exhaust-controls.md)
+keep the physical dry source unchanged and record acceptance separately.
+
+**Earlier lighting test, 2026-10-07:** with ambient fill **0.02** and exposure
+**+8.8 EV**, the user sees the sought red exterior dry exhaust, while the
+aircraft/ground become white. No exhaust runtime change preceded this test.
+The [lighting observation and shared Sky handoff](f135-dry-vtol-mechanism.md#latest-lighting-observation-2026-10-07)
+supersede blanket dry nondetection, while source calibration, complete scene
+appearance and AB audiovisual timing remain unaccepted. Freeze physical sources
+for the environmental lighting comparison; deployment remains held.
+
+**Earlier local test, 2026-10-07:** the user still sees no dry VTOL luminous exhaust
+and reports a substantial AB sound lead, especially from cold. The earlier
+improvement report is retained as history, not current acceptance. The
+[post-test causal audit](f135-dry-vtol-mechanism.md#local-test-rejection-and-causal-audit-2026-10-07)
+records the source/display mismatch and the flag/thrust versus burned-fuel
+signal mismatch. Physical and visual acceptance remain open; deployment is held.
+
 The [acceptance receipt](../../validation/evidence/aircraft/f35b/exhaust-response-2026-10-06/acceptance.json)
 and [application record](../../validation/evidence/aircraft/f35b/exhaust-response-2026-10-06/application/README.md)
 retain this checkpoint's source, generated-profile metadata and check logs.

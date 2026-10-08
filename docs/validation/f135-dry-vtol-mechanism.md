@@ -4,6 +4,123 @@ Recorded 2026-10-06. The footage supports a **structured luminous jet with a dis
 
 This aircraft-specific investigation belongs to 0sfs. It extends the [observation ledger](f135-dry-vtol-observation.md) and preserves the user's later report that the finite-core version still showed no dry plume and an excessively large AB plume. The [night-climb comparison](f135-night-video-comparison.md) remains a second constraint: a useful model must accommodate both the carrier glow and the conventional-flight nondetection without inventing a hover afterburner. The present footage work changes no runtime physics, shaders or engine assets. The parallel implementation has replaced the grey particle spectrum with a non-gray soot spectrum and consistent integrated power; that correction is distinct from the proposed impingement and receiver work below.
 
+## Current night feedback and controls, 2026-10-07
+
+While the sky agent is still working, the user reports that the faint red dry
+exhaust is now clearly visible at night and satisfactory to them. They request
+a 0.5–3× dry display adjustment, report audible AB differences at zero AB gain,
+and reject the remaining AB sound lead over visible flame, especially from cold.
+This feedback accepts the reported faint dry appearance, not absolute source
+calibration, deck interaction or AB timing. The
+[controls and audio causality record](f135-exhaust-controls.md) separates those
+results and documents the current correction. The default dry multiplier is
+1× the existing model; its temperature/particle assumptions remain unchanged.
+
+## Latest lighting observation, 2026-10-07
+
+In a subsequent local test at `http://localhost:5173/fly/`, the user set
+**Ambient fill multiplier = 0.02** and **Exposure compensation = +8.8 EV**.
+They then saw the red exterior exhaust in dry mode and described it as exactly
+the appearance they had sought. The aircraft and ground became solid white.
+No exhaust runtime code had changed since the preceding correction; the build
+request had reached investigation only when this new observation arrived.
+Throttle, conversion/nozzle pose, map provider, camera, other settings and native
+state were not recorded. This is user visual feedback, not a synchronized capture
+or a complete carrier/deck comparison. The [observation and code-audit receipt](../../validation/evidence/aircraft/f35b/dry-vtol-mechanism-2026-10-06/lighting-observation-2026-10-07.json)
+keeps this new result separate from the earlier failed test.
+
+This supersedes the earlier blanket absence report: the current dry source can
+be visible at the reported display settings. It supports a scene/display
+contribution to the previous invisibility. It does not measure source radiance,
+establish a unique emitter, qualify engine station temperatures, resolve deck
+interaction or accept the remaining AB audiovisual response.
+
+The shared lighting code uses fixed hemispheric fill and a flat clear color;
+raster ground is unlit/emissive. Shared material exposure is `2 ** EV`, with tone
+mapping disabled. At +8.8 EV the multiplier is **445.72**; combining it with
+0.02 fill gives **8.914** times the original linear fill contribution, before
+material response. Emissive raster imagery does not receive the fill reduction.
+These verified code relationships explain plausible whitening pathways but are
+not a GPU measurement of the user's particular material/pixel contributions.
+The existing CPU dry-source exposure sweep is consistent with visibility at high
+exposure; no new source-temperature or brightness adjustment is justified by
+this observation.
+
+The [FOSS Earth sky/lighting implementation prompt](../../../foss-earth/docs/sky-lighting-implementation-prompt.md)
+sets the next controlled comparison: freeze physical emitters, audit light and
+display units/composition, implement coherent solar/sky/surface illumination and
+a shared Sky tab, then reassess the exhaust separately. Meaningful night
+radiometry needs that environment/display contract. Engine equations and AB
+timing can still be investigated independently; no engine replacement was
+installed during this audit. Deployment remains held and the standing browser,
+GPU and server restrictions remain in force.
+
+## Local test rejection and causal audit, 2026-10-07
+
+After testing locally, the user still sees exterior exhaust light only with AB,
+and reports that visible AB develops substantially later than its sound,
+especially from cold. This rejects the current dry powered-lift appearance and
+AB audiovisual response. The exhaust correction was committed locally as
+`9c1956344bf8edd7c8d60a570e083033b86cc94f`; it was not pushed or published before
+the user called time out. Deployment is held. The earlier software checks and
+partial numerical qualifications do not satisfy these appearance requirements.
+
+The [post-test reanalysis](../../validation/evidence/aircraft/f35b/dry-vtol-mechanism-2026-10-06/post-test-2026-10-07.json)
+reads the retained refined CPU rays and native trace, records their hashes and
+uses only native columns from the historical trace. It performs no new engine,
+GPU, browser, server or benchmark run. It establishes the following distinctions:
+
+- **Dry emission exists in the equations but is effectively invisible under the
+  stated display example.** The powered-lift boundary remains the imposed
+  **1003.13 K** bath and **0.025 m⁻¹** particle absorption at 550 nm. A transverse
+  ray at the lip gives **0.0167047 cd/m²**, with linear RGB
+  `[0.0736207, 0.00146479, 0] cd/m²`. Unit gas intensity, the default
+  **1000 cd/m²** white reference, zero exposure offset, Reinhard mapping and
+  8-bit sRGB encoding round this source alone on black to `[0, 0, 0]`. At +8 EV
+  the same source becomes `[37, 1, 0]`. This is an illustrative CPU conversion,
+  not a measurement of the live tone mapper, scene, user settings or footage
+  camera. Matched night exposure is necessary for comparison, but changing it
+  alone does not explain the observed bands and broad near-deck luminous region.
+- **The source cap is not the cause.** Whole-field particle radiation is
+  **733.50 W** against an allowed **574,164.49 W**. Increasing that ceiling cannot
+  brighten this case. No AB-only disable of the dry optical source was found.
+- **The dry physical inputs remain unqualified.** The native bath falls back to
+  `TAT_C + 363.1 + 357.1 * N2norm + 273.15`, a generic EGT schedule. It is not a
+  defined nozzle total/static temperature. F135 XML increases dry fuel demand
+  during conversion but does not close the corresponding core/bypass, lift-fan
+  shaft-work, bleed and rear-nozzle energy/flow balance. More fuel does not by
+  itself establish a hotter rear jet: shaft extraction and flow division must
+  enter that balance. The optics impose a dry particle population at that bath
+  temperature and a prescribed smooth mixing field. Neither the loading nor
+  its temperature distribution is measured for F135. The spectral correction
+  makes this assumed source more consistent; it does not validate those inputs.
+- **Sound and light consume different AB causes.** Audio adds its AB jet gain
+  from the native augmentation flag and thrust proxy; it does not consume
+  burned AB fuel. Native `FGTurbine::Run()` selects its full augmented thrust
+  table immediately while fuel approaches demand at **5000 lb/h per second**.
+  The thermal/optical path instead uses the excess current fuel actually counted
+  as burned. At the first active flag, the retained trace has **zero** burned AB
+  fuel and **1004.76 K** gas. Burned AB fuel first becomes positive **0.0833 s**
+  later; the gas proxy is **1181.77 K** at +1.0083 s and **1368.05 K** at
+  +2.0083 s. This establishes a causal signal mismatch, not the exact user's
+  device or visible-pixel latency. The current conditional internal reaction
+  source does not qualify prompt visible emission across the nozzle exit.
+
+The next physical correction must replace these source assumptions rather than
+add a dry brightness gain or an AB display/audio timer. JSBSim must provide
+station-defined rear-nozzle flow and heat-release observations, with a declared
+reduced energy/flow model and bounds where public measurements are unavailable.
+Audio, thrust and optical emission must then consume the same evolving physical
+engine state; their different acoustic and radiative responses still need
+independent validation. Dry particle production/survival, thermal distribution
+and any scattered nozzle light need separate, bounded source hypotheses.
+Compressible free-jet and impinging-flow fields must conserve energy and account
+for the observed spatial structure; a deck receiver/heating calculation is a
+separate contribution. Expensive flow, chemistry and spectra belong in offline
+tables with qualified interpolation domains. A matched night comparison and
+cold/warm AB transition observation are required before appearance acceptance.
+The standing restriction against initiating GPU testing remains in force.
+
 ## What the sequence actually shows
 
 The source is Navy Lookout's [*Back in the game — Flying the F-35 from HMS Queen Elizabeth*](https://www.youtube.com/watch?v=rIroDPghWF4), whose description credits Royal Navy footage by LPhot Dan Shepherd. The original retained references at [158 s](../../validation/evidence/aircraft/f35b/engine-review-2026-10-06/frames/vtol-158.png), [161 s](../../validation/evidence/aircraft/f35b/engine-review-2026-10-06/frames/vtol-161.png), and [162.8 s](../../validation/evidence/aircraft/f35b/engine-review-2026-10-06/frames/vtol-162p8.png) are different shots in an edited montage. They are not a continuous record of one engine transition.

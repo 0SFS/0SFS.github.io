@@ -1,0 +1,220 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-08",
+  "purpose": "Fix observed accepted-flow telemetry under frozen/trim fuel and accurate phase-specific fallback diagnostics; expose raw mass closure. Reported user full-conversion oscillation remains unreproduced.",
+  "before": {
+    "package": "1.2.4-fork.20",
+    "nativeCommit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+    "rollback": "../../rollback/fork20/README.md"
+  },
+  "artifact": {
+    "schemaVersion": 1,
+    "identity": {
+      "schemaVersion": 2,
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.21"
+      },
+      "native": {
+        "origin": "https://github.com/Felipegalind0/jsbsim",
+        "commit": "34eeae66e5c886eec59eaefb516c0848cb504756",
+        "contentSha256": "6a8c6adf5d0b48f4f95ad65bd512cd664adaf7ece8207cecfaa57a4934d792ca",
+        "dirty": false
+      },
+      "sdk": {
+        "commit": "34eeae66e5c886eec59eaefb516c0848cb504756",
+        "contentSha256": "7dca56e6081f6dbf07879e4bfaa6e7f9612a6a9cc3a40e37cb9f119d5246ca61",
+        "dirty": false,
+        "path": "wasm"
+      },
+      "build": {
+        "mode": "in-tree",
+        "inputSha256": "4cbf76ca72afc8977b3fb2b879891f897404f5b6d58aa00da4eaa944ad424b27",
+        "toolchain": {
+          "node": "v26.8.2",
+          "npm": "11.19.1",
+          "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+          "cmake": "cmake version 4.4.3",
+          "clang": "clang version 24.0.0git",
+          "platform": "darwin",
+          "arch": "arm64",
+          "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+        },
+        "options": {
+          "buildType": "Release",
+          "cxxStandard": 17,
+          "sdkTarget": "es2022"
+        }
+      }
+    },
+    "files": {
+      "index.d.ts": "a49a1d84524414e003786de4097d308bbf2185b866e27ec6aec1da4e49571cf6",
+      "index.js": "649cabfd877fa5bb02acc48969421bca525f9c8e13051b00428e897f2e261a78",
+      "index.js.map": "1db9d87ed4b15b57f2211392736211749a7d1d9e8ee55d87ac1fa9e7e17a9f21",
+      "licenses/README.txt": "7853d4b5a64cf89c10faeb1f595e4981d849f20a57ccf4e2fcb58c1f7b02ebee",
+      "licenses/jsbsim/AUTHORS": "ca8556894da80f81f773893a9c1009021aac2972d7bb6a39c2f981b4fd00aa9a",
+      "licenses/jsbsim/COPYING": "1e7e6bae5a5bde32f1ae5a7c37a082d1ab03cf89354f7f936ac40be9e39a6531",
+      "licenses/jsbsim/src/GeographicLib/LICENSE.txt": "90d25298be0c5d7f5219ae20009d18910150b3a4ea0ca86dda5df04cfb8d3823",
+      "licenses/jsbsim/src/simgear/xml/COPYING": "8c6b5b6de8fae20b317f4992729abc0e520bfba4c7606cd1e9eeb87418eebdec",
+      "licenses/sdk-LICENSE": "15e2d343fc930439fb82351d7c30f3d151b4c42ca3132c13ff1a60da527a1259",
+      "wasm.d.ts": "b7bbbab6f5e6b0b297dfeff117351e53d4d8598fecde7e805ea9aee7b2923353",
+      "wasm.js": "758d98989301d86ec3aa589fa851d6416b305eca58bb1e6b9579780ea339e09b",
+      "wasm.js.map": "d75a89efd5b3cf07ebfbe70d321f55c01bd8cdde1be50a15d1dcfad21a7ca763",
+      "wasm/jsbsim_wasm.mjs": "3437b7bafddf799caff11bcb1447d697a8d3a195ed5da72b0fb573403d8ddc61",
+      "wasm/jsbsim_wasm.wasm": "5eb6d42646533da2b900977fa89eca59e199b88372906a70134e8b4441e875d1"
+    },
+    "validation": {
+      "status": "passed",
+      "commands": [
+        "tsc --noEmit (frozen SDK workspace)",
+        "node --test --test-concurrency=5 test/*.test.mjs (frozen SDK workspace and resolved native fixtures)"
+      ]
+    },
+    "packageArchive": {
+      "path": "deps/felipegalind0-jsbsim-1.2.4-fork.21.tgz",
+      "sha256": "001d66fcbd96a828f7bbb11af137d2a655edf83c21a2757ce17c02f4c8c05cdd",
+      "integrity": "sha512-GsgqKEdphXElWR+F+v48C6t7BvE0wlguOEtiWNN1gRbOinNxFIw6DqOnN+NryH8xZjgNqxjgYjNN964mw/lKnw=="
+    }
+  },
+  "buildOutputIdentity": "f1f94bc50704da8729153125e3ada34b3f6f18676d4fda4d55fb8a8d14527fe0",
+  "unchanged": [
+    "F135 and aircraft XML, installed manifest, controller gains and limiter schedules, integration/retry equations and budgets, AB interlock, thermal/optical/audio source models"
+  ],
+  "nativeImplementation": "Local clean master commit 34eeae66; not pushed; no upstream message posted.",
+  "checks": [
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/integration-before.log",
+      "sha256": "844b177be39fcc142d22c841afd60b1eac82489902894de183f4c81739149eb6"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/final-typecheck.log",
+      "sha256": "b4453637bf1e7cfa55257df2876a2ef374a9b9fe180efbac1197d05dbda385c8"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/final-lint.log",
+      "sha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/final-lint-2.log",
+      "sha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/related.log",
+      "sha256": "37ff136476e491299d21dbf6dfbaaf4cef3be730616de4b001f2e5e8549d683c"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/related-ui-rerun.log",
+      "sha256": "a5306940188c0b3b432f3cae3c391b31892551c8aa5d2f4e10d4a320ddf5ea5b"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/final-ci.log",
+      "sha256": "0ecbf18d8c12ccdc04cdab02061faba74dda2515f76c145bcc0798defa81aba9"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/final-ci-2.log",
+      "sha256": "73fef3b66e52d3bf4964213791dd9eca56f078a0b6f89cf24b642b61c53a3090"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/ci-failure-rerun.log",
+      "sha256": "568bf28101d86830a8330832c416d21af371983644a3e949cef581b1333d63de"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/final-build.log",
+      "sha256": "0b206fcfa0fdd8b2e83bc3f82c7eb987b323976a27f38fde6c6a2cb7d6437caf"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/sdk-install.log",
+      "sha256": "5c16475d126d79cb92e16b7f0f9eabea3e74f909948a5dfe70e9dce1a581ef01"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/sdk-install-2.log",
+      "sha256": "c3913d29b2c45d66af9f6b8abad81d19a29f0a478ee8decad9d5f16ebe4d77f1"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/sdk-verify.log",
+      "sha256": "43e7c9b2a4a5d3a7aa3926ce3e50240c02233446befadcd94d6a50160041e52b"
+    },
+    {
+      "path": "validation/evidence/jsbsim/adoption/fork21/checks/diagnostics-targeted-1.log",
+      "sha256": "0f1ef462f3d6769d626b024190b58663898cb38a7ba135aa0a01ddacf511a89a"
+    },
+    {
+      "path": "validation/evidence/jsbsim/adoption/fork21/checks/mass-ledger-targeted.log",
+      "sha256": "c32efc26f1e26245f6903e3eeb3cf3651613452d4924bda41f65a35442be4bfe"
+    },
+    {
+      "path": "validation/evidence/jsbsim/adoption/fork21/checks/final-link.log",
+      "sha256": "56fc5474bd3e6280786dc2b2a5436071a0efe8a29bbc59cb76e3d4f00c3376cd"
+    },
+    {
+      "path": "validation/evidence/jsbsim/adoption/fork21/checks/final-ctest.log",
+      "sha256": "76eddfac0633ea079977f35b468592f8382088101845c132fe92cadf18fe1e88"
+    },
+    {
+      "path": "validation/evidence/jsbsim/adoption/fork21/checks/input-socket-approved.log",
+      "sha256": "8c305d45a9e2b741600ecf9885e8f0f362fc96ee842a3634b2c47821b1edbeed"
+    },
+    {
+      "path": "validation/evidence/jsbsim/adoption/fork21/checks/sdk-source.log",
+      "sha256": "14de7687c45908255de4fa22931456d9a3ee16dead85991e5dcdf20df04bf35f"
+    },
+    {
+      "path": "validation/evidence/jsbsim/adoption/fork21/checks/sdk-build.log",
+      "sha256": "1f7fbd480266b95f6ac130941aa5d04bf94ab3cbbfe3c5caed8aaedb1aa5d1e6"
+    },
+    {
+      "path": "validation/evidence/jsbsim/adoption/fork21/checks/sdk-pack.log",
+      "sha256": "a45791bd27fbcb37c592b24b7e0183997311c723c8c486e8194b7bc3167b3b02"
+    },
+    {
+      "path": "validation/evidence/jsbsim/adoption/fork21/checks/sdk-pack-2.log",
+      "sha256": "3269355594de917563b2eacd40db601f657aee609682aca4b7b19960394947ae"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/final-typecheck-2.log",
+      "sha256": "b4453637bf1e7cfa55257df2876a2ef374a9b9fe180efbac1197d05dbda385c8"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/final-lint-3.log",
+      "sha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/runner-final-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/refinement-reduced-60.log",
+      "sha256": "d373ca5b248b362da95815751cd17c7c7b7ae42cd7ffae41aa9b09c5807d8829"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/refinement-reduced-240.log",
+      "sha256": "48cade6e57562e015519255be8e67aefbfd730158cb13147bbeb18ef8ea93030"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/refinement-component-240.log",
+      "sha256": "d121849c4d1950894a5aa3e636590cab4c6ccd716ad06eaa5fdffd358d4cb198"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/rotating-hover.log",
+      "sha256": "cd809a44bf3055532fbd3e23facbfeab9696b7bc73b3a96693bdadce6e697466"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/runner-hover-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/evidence-verification.log",
+      "sha256": "0865b69eae1e7b43ca321836b2426fb92a3a2e6b05b22f7bfd1ec04fad18cae8"
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/checks/analyzer-final-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "validation": {
+    "native": "Full90-target run:89 passed, TestInputSocket failed sandbox EPERM; only that test rerun with approved local socket access passed.",
+    "sdk": "52 mandatory built-artifact cases passed;20 source identity/build contracts passed.",
+    "application": "Completed full run:194/195 files,2109passed+1expectedfail; Engine-monitor help case failed. Only failing file rerun:30/30passed. Production build and installed/dist artifact verification passed. No claim the original full CI was green. Final incremental typecheck and lint after all runner/analyzer/archive changes passed.",
+    "trajectory": "Explicit assumptions, actual installed SDK, all80s retained; no capture of user session or device/GPU validation. Corrected pre-model-load timestep cases match 2.5 s FCS conversion at60/120/240 Hz and pass independent mass/energy on86400 accepted steps. Startup errors shrink but no formal order or fully converged transient temperature is claimed. Rotating-frame frozen-load hover at20%clean fuel/5000ft ISA passes predeclared altitude/speed/attitude/contact/conservation gates at.95567056 throttle; no real-hardware qualification."
+  }
+}

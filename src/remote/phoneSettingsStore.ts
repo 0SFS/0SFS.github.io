@@ -1,5 +1,7 @@
+import { MAX_YAW_RETURN_MS, type PhoneControllerSettings } from './protocol'
+
 /** Settings → Button grid: where the chip grid sits relative to the flight controls. */
-export type GridPosition = 'bottom' | 'top'
+export type GridPosition = PhoneControllerSettings['grid']
 
 /**
  * Settings → Yaw: what the rudder does when the finger leaves its track.
@@ -10,48 +12,56 @@ export type GridPosition = 'bottom' | 'top'
  * long crosswind leg or a taxi turn wants, since a finger cannot stay on a
  * 40-pixel track for a minute while the other hand flies.
  */
-export type YawRelease = 'center' | 'hold'
+export type YawRelease = PhoneControllerSettings['yawRelease']
 /**
  * How long the return takes, as a slider rather than a snap: a rudder that
  * slams to centre is a yaw transient the aircraft feels. 0 is the instant
  * release the controller has always done, and stays the default.
  */
-export const YAW_RETURN_MS_MAX = 1500
+export const YAW_RETURN_MS_MAX = MAX_YAW_RETURN_MS
 export const YAW_RETURN_MS_STEP = 50
 export interface YawSettings { release: YawRelease; returnMs: number }
-export const DEFAULT_YAW_SETTINGS: YawSettings = { release: 'center', returnMs: 0 }
 
-const GRID_POSITION_PREFERENCE_KEY = 'osfs.phone-grid-position'
-const YAW_RELEASE_PREFERENCE_KEY = 'osfs.phone-yaw-release'
-const YAW_RETURN_MS_PREFERENCE_KEY = 'osfs.phone-yaw-return-ms'
+/**
+ * The phone's copy of its settings, for when it is not paired. Paired, the
+ * computer holds them with its own (Remote Control → Phone controller), so an
+ * export holds the whole setup, and this copy follows what it says. The same
+ * values are the defaults there; a test keeps the two in step.
+ */
+export const DEFAULT_PHONE_SETTINGS: Readonly<PhoneControllerSettings> = Object.freeze({
+  grid: 'bottom', yawRelease: 'center', yawReturnMs: 0, haptics: false,
+})
 
-export function readGridPosition(): GridPosition {
-  try { return window.localStorage.getItem(GRID_POSITION_PREFERENCE_KEY) === 'top' ? 'top' : 'bottom' } catch { return 'bottom' }
-}
+/** The keys predate the computer holding these, and are kept so a phone's choices carry over. */
+const KEYS = {
+  grid: 'osfs.phone-grid-position',
+  yawRelease: 'osfs.phone-yaw-release',
+  yawReturnMs: 'osfs.phone-yaw-return-ms',
+  haptics: 'osfs.phone-haptics',
+} as const satisfies Record<keyof PhoneControllerSettings, string>
 
-export function writeGridPosition(position: GridPosition): void {
+export type PhoneSettingsStorage = Pick<Storage, 'getItem' | 'setItem'>
+
+export function loadPhoneSettings(storage: PhoneSettingsStorage | null): PhoneControllerSettings {
+  if (!storage) return { ...DEFAULT_PHONE_SETTINGS }
   try {
-    if (position === 'top') window.localStorage.setItem(GRID_POSITION_PREFERENCE_KEY, 'top')
-    else window.localStorage.removeItem(GRID_POSITION_PREFERENCE_KEY)
-  } catch { /* Private browsing: the choice lasts for this visit only. */ }
-}
-
-export function readYawSettings(): YawSettings {
-  try {
-    const release = window.localStorage.getItem(YAW_RELEASE_PREFERENCE_KEY) === 'hold' ? 'hold' : 'center'
     // A stored time from a newer build, or one edited by hand, must never leave
     // the rudder crawling back for a minute: anything unreadable is the snap.
-    const stored = Number(window.localStorage.getItem(YAW_RETURN_MS_PREFERENCE_KEY))
-    const returnMs = Number.isFinite(stored) ? Math.min(YAW_RETURN_MS_MAX, Math.max(0, Math.round(stored))) : 0
-    return { release, returnMs }
-  } catch { return { ...DEFAULT_YAW_SETTINGS } }
+    const returnMs = Number(storage.getItem(KEYS.yawReturnMs))
+    return {
+      grid: storage.getItem(KEYS.grid) === 'top' ? 'top' : 'bottom',
+      yawRelease: storage.getItem(KEYS.yawRelease) === 'hold' ? 'hold' : 'center',
+      yawReturnMs: Number.isFinite(returnMs) ? Math.min(YAW_RETURN_MS_MAX, Math.max(0, Math.round(returnMs))) : 0,
+      haptics: storage.getItem(KEYS.haptics) === 'on',
+    }
+  } catch { return { ...DEFAULT_PHONE_SETTINGS } }
 }
 
-export function writeYawSettings(settings: YawSettings): void {
+export function savePhoneSettings(storage: PhoneSettingsStorage | null, settings: PhoneControllerSettings): void {
   try {
-    if (settings.release === 'hold') window.localStorage.setItem(YAW_RELEASE_PREFERENCE_KEY, 'hold')
-    else window.localStorage.removeItem(YAW_RELEASE_PREFERENCE_KEY)
-    if (settings.returnMs > 0) window.localStorage.setItem(YAW_RETURN_MS_PREFERENCE_KEY, String(settings.returnMs))
-    else window.localStorage.removeItem(YAW_RETURN_MS_PREFERENCE_KEY)
+    storage?.setItem(KEYS.grid, settings.grid)
+    storage?.setItem(KEYS.yawRelease, settings.yawRelease)
+    storage?.setItem(KEYS.yawReturnMs, String(settings.yawReturnMs))
+    storage?.setItem(KEYS.haptics, settings.haptics ? 'on' : 'off')
   } catch { /* Private browsing: the choice lasts for this visit only. */ }
 }

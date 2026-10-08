@@ -9,6 +9,7 @@ import type { EngineModelId } from "../jsbsim/fdmProfiles";
 import { JSBSIM_PACKAGE_VERSION } from "../jsbsim/jsbsimBuildIdentity";
 import { registerFlightSettings } from "../settings/registerFlightSettings";
 import { FlightControlPanel, type FlightControlPanelSnapshot, type FlightPanelTab } from "./FlightControlPanel";
+import { createEngineMonitor, type EngineMonitorHandle } from "./engineMonitor";
 
 // The flight's Engine tab with the registry's real controls; the shared window
 // behaviour is FOSS Earth's, tested there.
@@ -24,9 +25,11 @@ vi.mock("foss-earth/shell", async importOriginal => {
 });
 
 const roots: Root[] = [];
+const monitors: EngineMonitorHandle[] = [];
 beforeEach(() => { vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true); });
 afterEach(async () => {
   await act(async () => { for (const root of roots.splice(0)) root.unmount(); });
+  for (const monitor of monitors.splice(0)) monitor.destroy();
   document.body.replaceChildren();
   vi.unstubAllGlobals();
 });
@@ -42,11 +45,13 @@ async function mount(aircraftId: AircraftId, engineModel: EngineModelId | null) 
   const settings = createSettingsRegistry({ storage: null });
   settings.register(FOSS_EARTH_PARAMETERS);
   const parameters = registerFlightSettings(settings);
+  const monitor = createEngineMonitor(document.createElement("div"), { parameters, storage: null });
+  monitors.push(monitor);
   const onReloadFlight = vi.fn();
   // The mocked workspace renders only the Engine tab; unrelated callbacks are not consumed.
   const props = {
     settings, parameters, engineModel, onReloadFlight,
-    attachEngineDetails: () => () => {},
+    attachEngineDetails: (host: HTMLElement, content?: HTMLElement) => monitor.attachDetails(host, content),
     snapshot: { aircraftId, lodId: "auto" } as FlightControlPanelSnapshot,
     overlayApiRef: { current: null },
   } as Parameters<typeof FlightControlPanel>[0];
@@ -58,6 +63,20 @@ async function mount(aircraftId: AircraftId, engineModel: EngineModelId | null) 
 }
 
 describe("Engine tab", () => {
+  it("has exactly Settings and Live data, with all registry controls homed once inside Settings", async () => {
+    const { tab } = await mount("f-35b", "plant");
+    const top = [...tab.querySelectorAll<HTMLDetailsElement>("[data-engine-top-section]")];
+    expect(top.map(section => section.querySelector("summary")?.textContent)).toEqual(["Settings", "Live data"]);
+    expect(top.map(section => section.open)).toEqual([false, true]);
+    const controls = [...tab.querySelectorAll<HTMLElement>("[data-parameter]")];
+    expect(controls.length).toBeGreaterThan(5);
+    expect(new Set(controls.map(control => control.dataset.parameter)).size).toBe(controls.length);
+    for (const control of controls) expect(control.closest("[data-engine-top-section]")).toBe(top[0]);
+    expect(tab.querySelector('[data-parameter="osfs.engineMonitor.historyMetrics"]')).not.toBeNull();
+    expect(tab.querySelector('[data-parameter="osfs.engineMonitor.historyMemoryKiB"]')).not.toBeNull();
+    expect(tab.querySelector('[data-parameter="osfs.engineMonitor.hiddenHistory"]')).not.toBeNull();
+  });
+
   it.each(["cessna-172", "cirrus-vision-jet-g2"] as const)("has no Simulation section on %s, which has one engine model", async aircraftId => {
     const { tab, sections } = await mount(aircraftId, null);
     expect(sections()).toEqual(["engine/engine", "engine/history", "engine/test"]);
@@ -68,7 +87,8 @@ describe("Engine tab", () => {
     const { tab, sections, shown } = await mount("f-35b", "plant");
     expect(sections()).toEqual(["engine/simulation", "engine/engine", "engine/history", "engine/test"]);
     expect(tab.querySelector("legend")?.textContent).toBe("Simulation");
-    expect(tab.textContent).toContain(`Flying: Coupled engine plant, JSBSim ${JSBSIM_PACKAGE_VERSION}.`);
+    expect(tab.textContent).toContain("Flying: Coupled engine plant");
+    expect(tab.textContent).toContain(`JSBSim ${JSBSIM_PACKAGE_VERSION}`);
     expect(tab.querySelector<HTMLInputElement>('[data-parameter="osfs.engine.model"] input[value="plant"]')?.checked).toBe(true);
     for (const id of PLANT_SETTINGS) expect(shown(id)).toBe(true);
     expect([...tab.querySelectorAll("button")].some(button => button.textContent === "Reload now")).toBe(false);

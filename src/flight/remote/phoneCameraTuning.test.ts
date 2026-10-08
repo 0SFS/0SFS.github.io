@@ -7,10 +7,12 @@ import {
 
 /** The Phone camera: recommended preset's combination. */
 const RECOMMENDED: PhoneCameraTuning = { ...DEFAULT_PHONE_CAMERA_TUNING, send: "batch", source: "total", present: "playout" };
+/** How it first worked: drawn on arrival, for the lowest delay. */
+const ORIGINAL: PhoneCameraTuning = { ...DEFAULT_PHONE_CAMERA_TUNING, send: "timer", source: "delta", present: "arrival" };
 
 describe("phone camera tuning", () => {
-  it("defaults to the original behaviour and keeps only valid values", () => {
-    expect(DEFAULT_PHONE_CAMERA_TUNING).toMatchObject({ send: "timer", source: "delta", present: "arrival", chaseFrame: "attitude" });
+  it("defaults to smooth, paced drawing and keeps only valid values", () => {
+    expect(DEFAULT_PHONE_CAMERA_TUNING).toEqual({ ...RECOMMENDED, bufferMs: 12, catchUp: 2, predictMs: 0, chaseFrame: "attitude" });
     expect(normalizePhoneCameraTuning(null)).toEqual(DEFAULT_PHONE_CAMERA_TUNING);
     expect(normalizePhoneCameraTuning({ send: "sometimes", bufferMs: 13, catchUp: 2, predictMs: 160, chaseFrame: "heading" } as never))
       .toEqual({ ...DEFAULT_PHONE_CAMERA_TUNING, bufferMs: 13, chaseFrame: "heading" });
@@ -30,7 +32,7 @@ describe("phone camera tuning", () => {
   });
 
   it("names a combination so a trace can be split by it", () => {
-    expect(describePhoneCameraTuning(DEFAULT_PHONE_CAMERA_TUNING)).toBe("timer · delta · arrival · attitude");
+    expect(describePhoneCameraTuning(ORIGINAL)).toBe("timer · delta · arrival · attitude");
     expect(describePhoneCameraTuning({ ...RECOMMENDED, catchUp: 0, predictMs: 8 }))
       .toBe("batch · total · playout 12ms jump predict8 · attitude");
   });

@@ -1,0 +1,9 @@
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-plant-20261008
+    Start 42: TestTurbinePlant
+1/2 Test #42: TestTurbinePlant .................   Passed    0.85 sec
+    Start 90: FGTurbinePlantTest1
+2/2 Test #90: FGTurbinePlantTest1 ..............   Passed    8.26 sec
+
+100% tests passed out of 2
+
+Total Test time (real) =   9.11 sec

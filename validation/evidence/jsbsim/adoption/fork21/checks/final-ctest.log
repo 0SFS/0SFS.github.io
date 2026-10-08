@@ -1,0 +1,302 @@
+Test project /Users/felg/gh/Felipegalind0/jsbsim/build/turbine-plant-20261008
+      Start 43: TestAeroFuncFrame
+      Start 34: TestEngineIndexedProps
+      Start 14: CheckScripts
+      Start  4: TestModelLoading
+      Start  6: TestActuator
+ 1/90 Test  #6: TestActuator .......................   Passed    1.96 sec
+      Start  3: RunCheckCases
+ 2/90 Test  #4: TestModelLoading ...................   Passed    2.60 sec
+      Start 12: TestInputSocket
+ 3/90 Test #12: TestInputSocket ....................***Failed    0.33 sec
+test_input_socket (__main__.TestInputSocket.test_input_socket) ... ERROR
+test_no_input (__main__.TestInputSocket.test_no_input) ... ok
+test_script_input (__main__.TestInputSocket.test_script_input) ... ERROR
+
+======================================================================
+ERROR: test_input_socket (__main__.TestInputSocket.test_input_socket)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestInputSocket.py", line 121, in test_input_socket
+    asyncio.run(self.run_test(1137, lambda r, w: self.shell(root, dt, r, w)))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 205, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 128, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/base_events.py", line 720, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestInputSocket.py", line 234, in run_test
+    raise task.exception()
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestInputSocket.py", line 34, in run
+    self.reader, self.writer = await telnetlib3.open_connection(
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "localhost", port, shell=shell
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/felg/gh/Felipegalind0/jsbsim/.venv/lib/python3.14/site-packages/telnetlib3/client.py", line 682, in open_connection
+    _, protocol = await asyncio.wait_for(
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/tasks.py", line 488, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/base_events.py", line 1174, in create_connection
+    raise exceptions[0]
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/base_events.py", line 1144, in create_connection
+    sock = await self._connect_sock(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+        exceptions, addrinfo, laddr_infos)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/base_events.py", line 1043, in _connect_sock
+    await self.sock_connect(sock, address)
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/selector_events.py", line 643, in sock_connect
+    return await fut
+           ^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/selector_events.py", line 651, in _sock_connect
+    sock.connect(address)
+    ~~~~~~~~~~~~^^^^^^^^^
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_script_input (__main__.TestInputSocket.test_script_input)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestInputSocket.py", line 246, in test_script_input
+    asyncio.run(self.run_test(1138, self.sanity_check))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 205, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 128, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/base_events.py", line 720, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestInputSocket.py", line 234, in run_test
+    raise task.exception()
+  File "/Users/felg/gh/Felipegalind0/jsbsim/tests/TestInputSocket.py", line 34, in run
+    self.reader, self.writer = await telnetlib3.open_connection(
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "localhost", port, shell=shell
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/felg/gh/Felipegalind0/jsbsim/.venv/lib/python3.14/site-packages/telnetlib3/client.py", line 682, in open_connection
+    _, protocol = await asyncio.wait_for(
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/tasks.py", line 488, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/base_events.py", line 1174, in create_connection
+    raise exceptions[0]
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/base_events.py", line 1144, in create_connection
+    sock = await self._connect_sock(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+        exceptions, addrinfo, laddr_infos)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/base_events.py", line 1043, in _connect_sock
+    await self.sock_connect(sock, address)
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/selector_events.py", line 643, in sock_connect
+    return await fut
+           ^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/selector_events.py", line 651, in _sock_connect
+    sock.connect(address)
+    ~~~~~~~~~~~~^^^^^^^^^
+PermissionError: [Errno 1] Operation not permitted
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.020s
+
+FAILED (errors=2)
+Could not bind to TCP input socket, error = 1
+Could not bind to TCP input socket, error = 1
+
+      Start 13: TestInitialConditions
+ 4/90 Test  #3: RunCheckCases ......................   Passed    2.06 sec
+      Start 36: TestExternalReactions
+ 5/90 Test #13: TestInitialConditions ..............   Passed    1.87 sec
+      Start 31: TestAeroFuncOutput
+ 6/90 Test #36: TestExternalReactions ..............   Passed    1.11 sec
+      Start 19: TestPythonDefaultLoggerFiltering
+ 7/90 Test #31: TestAeroFuncOutput .................   Passed    1.42 sec
+      Start 17: TestAccelerometer
+ 8/90 Test #19: TestPythonDefaultLoggerFiltering ...   Passed    1.15 sec
+      Start 25: TestHoldDown
+ 9/90 Test #17: TestAccelerometer ..................   Passed    0.80 sec
+      Start 18: CheckDebugLvl
+10/90 Test #25: TestHoldDown .......................   Passed    0.75 sec
+      Start  8: TestPointMassInertia
+11/90 Test  #8: TestPointMassInertia ...............   Passed    0.54 sec
+      Start 10: TestFuelTanksInertia
+12/90 Test #18: CheckDebugLvl ......................   Passed    0.57 sec
+      Start 33: TestTurboProp
+13/90 Test #10: TestFuelTanksInertia ...............   Passed    0.47 sec
+      Start 15: CheckAircrafts
+14/90 Test #33: TestTurboProp ......................   Passed    0.47 sec
+      Start 37: TestTurbine
+15/90 Test #15: CheckAircrafts .....................   Passed    0.43 sec
+      Start  7: TestGustReset
+16/90 Test #37: TestTurbine ........................   Passed    0.43 sec
+      Start 11: TestFuelTankTemperature
+17/90 Test  #7: TestGustReset ......................   Passed    0.41 sec
+      Start 66: TestPQRdot
+18/90 Test #11: TestFuelTankTemperature ............   Passed    0.39 sec
+      Start 51: TestWheelSpin
+19/90 Test #51: TestWheelSpin ......................   Passed    0.36 sec
+      Start 38: TestTurbineAugmentation
+20/90 Test #66: TestPQRdot .........................   Passed    0.38 sec
+      Start 23: TestScriptOutput
+21/90 Test #23: TestScriptOutput ...................   Passed    0.33 sec
+      Start 40: TestTurbineTrimFuelFlow
+22/90 Test #38: TestTurbineAugmentation ............   Passed    0.35 sec
+      Start 60: TestLinearization
+23/90 Test #14: CheckScripts .......................   Passed    9.79 sec
+      Start  5: TestModelReload
+24/90 Test #40: TestTurbineTrimFuelFlow ............   Passed    0.33 sec
+      Start 26: CheckTrim
+25/90 Test #60: TestLinearization ..................   Passed    0.33 sec
+      Start  1: ResetOutputFiles
+26/90 Test  #5: TestModelReload ....................   Passed    0.31 sec
+      Start 21: TestCosineGust
+27/90 Test #26: CheckTrim ..........................   Passed    0.28 sec
+      Start 30: TestLGearSteer
+28/90 Test  #1: ResetOutputFiles ...................   Passed    0.29 sec
+      Start 16: CheckOutputRate
+29/90 Test #21: TestCosineGust .....................   Passed    0.30 sec
+      Start 32: TestKinematic
+30/90 Test #30: TestLGearSteer .....................   Passed    0.29 sec
+      Start 49: TestMiscellaneous
+31/90 Test #16: CheckOutputRate ....................   Passed    0.28 sec
+      Start 22: TestTurbulenceGustStop
+32/90 Test #34: TestEngineIndexedProps .............   Passed   10.59 sec
+      Start 29: TestSuspend
+33/90 Test #32: TestKinematic ......................   Passed    0.29 sec
+      Start 24: CheckSimTimeReset
+34/90 Test #49: TestMiscellaneous ..................   Passed    0.28 sec
+      Start 59: TestMagnetometer
+35/90 Test #22: TestTurbulenceGustStop .............   Passed    0.28 sec
+      Start 44: TestTemplateFunctions
+36/90 Test #43: TestAeroFuncFrame ..................   Passed   10.80 sec
+      Start 48: TestStdAtmosphere
+37/90 Test #29: TestSuspend ........................   Passed    0.29 sec
+      Start 57: TestFunctions
+38/90 Test #24: CheckSimTimeReset ..................   Passed    0.28 sec
+      Start  2: TestICOverride
+39/90 Test #59: TestMagnetometer ...................   Passed    0.27 sec
+      Start 41: TestTurbineIdleFuelFlow
+40/90 Test #44: TestTemplateFunctions ..............   Passed    0.27 sec
+      Start 27: TestChannelRate
+41/90 Test #48: TestStdAtmosphere ..................   Passed    0.28 sec
+      Start  9: CheckMomentsUpdate
+42/90 Test #57: TestFunctions ......................   Passed    0.27 sec
+      Start 35: TestForceObservations
+43/90 Test  #2: TestICOverride .....................   Passed    0.29 sec
+      Start 20: TestTurbulenceRandomSeed
+44/90 Test #27: TestChannelRate ....................   Passed    0.26 sec
+      Start 65: TestSensorRandomSeed
+45/90 Test #41: TestTurbineIdleFuelFlow ............   Passed    0.29 sec
+      Start 45: TestDensityAltitude
+46/90 Test  #9: CheckMomentsUpdate .................   Passed    0.30 sec
+      Start 61: TestLinearActuator
+47/90 Test #35: TestForceObservations ..............   Passed    0.28 sec
+      Start 28: TestWaypoint
+48/90 Test #20: TestTurbulenceRandomSeed ...........   Passed    0.30 sec
+      Start 54: TestGain
+49/90 Test #65: TestSensorRandomSeed ...............   Passed    0.27 sec
+      Start 46: TestPressureAltitude
+50/90 Test #45: TestDensityAltitude ................   Passed    0.28 sec
+      Start 52: TestIntegrators
+51/90 Test #61: TestLinearActuator .................   Passed    0.27 sec
+      Start 62: TestPlanet
+52/90 Test #28: TestWaypoint .......................   Passed    0.26 sec
+      Start 53: TestSwitch
+53/90 Test #54: TestGain ...........................   Passed    0.25 sec
+      Start 58: TestDistributor
+54/90 Test #46: TestPressureAltitude ...............   Passed    0.26 sec
+      Start 56: TestFilter
+55/90 Test #52: TestIntegrators ....................   Passed    0.26 sec
+      Start 90: FGTurbinePlantTest1
+56/90 Test #62: TestPlanet .........................   Passed    0.26 sec
+      Start 47: test_fpectl
+57/90 Test #53: TestSwitch .........................   Passed    0.25 sec
+      Start 55: TestDeadBand
+58/90 Test #58: TestDistributor ....................   Passed    0.26 sec
+      Start 63: TestLighterThanAir
+59/90 Test #56: TestFilter .........................   Passed    0.25 sec
+      Start 50: TestGndReactions
+60/90 Test #47: test_fpectl ........................   Passed    0.25 sec
+      Start 39: TestTurbineTrimSpool
+61/90 Test #55: TestDeadBand .......................   Passed    0.24 sec
+      Start 64: TestUnusableFuel
+62/90 Test #63: TestLighterThanAir .................   Passed    0.24 sec
+      Start 74: FGInitialConditionTest1
+63/90 Test #50: TestGndReactions ...................   Passed    0.25 sec
+      Start 42: TestTurbinePlant
+64/90 Test #39: TestTurbineTrimSpool ...............   Passed    0.29 sec
+      Start 89: FGTurbineTemperatureTest1
+65/90 Test #74: FGInitialConditionTest1 ............   Passed    0.15 sec
+      Start 86: FGMSISTest1
+66/90 Test #86: FGMSISTest1 ........................   Passed    0.01 sec
+      Start 88: FGAccelerationsTest1
+67/90 Test #89: FGTurbineTemperatureTest1 ..........   Passed    0.03 sec
+      Start 77: FGTableTest1
+68/90 Test #64: TestUnusableFuel ...................   Passed    0.30 sec
+      Start 83: FGAtmosphereTest1
+69/90 Test #88: FGAccelerationsTest1 ...............   Passed    0.01 sec
+      Start 85: FGExternalReactionsTest1
+70/90 Test #77: FGTableTest1 .......................   Passed    0.01 sec
+      Start 73: FGGroundCallbackTest1
+71/90 Test #83: FGAtmosphereTest1 ..................   Passed    0.01 sec
+      Start 75: FGInertialTest1
+72/90 Test #85: FGExternalReactionsTest1 ...........   Passed    0.01 sec
+      Start 84: FGAuxiliaryTest1
+73/90 Test #73: FGGroundCallbackTest1 ..............   Passed    0.01 sec
+      Start 81: FGConditionTest1
+74/90 Test #75: FGInertialTest1 ....................   Passed    0.01 sec
+      Start 80: FGParameterValueTest1
+75/90 Test #84: FGAuxiliaryTest1 ...................   Passed    0.01 sec
+      Start 87: FGLogTest1
+76/90 Test #81: FGConditionTest1 ...................   Passed    0.02 sec
+      Start 72: FGLocationTest1
+77/90 Test #80: FGParameterValueTest1 ..............   Passed    0.02 sec
+      Start 76: FGPropertyValueTest1
+78/90 Test #87: FGLogTest1 .........................   Passed    0.02 sec
+      Start 68: StringUtilitiesTest1
+79/90 Test #72: FGLocationTest1 ....................   Passed    0.02 sec
+      Start 67: FGColumnVector3Test1
+80/90 Test #76: FGPropertyValueTest1 ...............   Passed    0.01 sec
+      Start 70: FGMatrix33Test1
+81/90 Test #67: FGColumnVector3Test1 ...............   Passed    0.00 sec
+      Start 71: FGQuaternionTest1
+82/90 Test #68: StringUtilitiesTest1 ...............   Passed    0.01 sec
+      Start 82: FGPropertyManagerTest1
+83/90 Test #70: FGMatrix33Test1 ....................   Passed    0.00 sec
+      Start 69: FGJSBBaseTest1
+84/90 Test #71: FGQuaternionTest1 ..................   Passed    0.00 sec
+      Start 78: FGRealValueTest1
+85/90 Test #82: FGPropertyManagerTest1 .............   Passed    0.00 sec
+      Start 79: FGParameterTest1
+86/90 Test #69: FGJSBBaseTest1 .....................   Passed    0.00 sec
+87/90 Test #78: FGRealValueTest1 ...................   Passed    0.00 sec
+88/90 Test #79: FGParameterTest1 ...................   Passed    0.00 sec
+89/90 Test #42: TestTurbinePlant ...................   Passed    0.84 sec
+90/90 Test #90: FGTurbinePlantTest1 ................   Passed    8.52 sec
+
+99% tests passed, 1 tests failed out of 90
+
+Total Test time (real) =  20.37 sec
+
+The following tests FAILED:
+	 12 - TestInputSocket (Failed)
+Errors while running CTest

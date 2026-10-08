@@ -13,7 +13,7 @@ https://0sfs.github.io/fly/ and the phone controller is https://0sfs.github.io/r
 
 `npm run deploy` runs `deploy:gh-pages`, which is two steps:
 
-1. `npm run build` — typechecks (`tsc -b`), then builds with Vite. Vite's default base of `/` is
+1. `npm run build` — typechecks (`npm run typecheck`), then builds with Vite. Vite's default base of `/` is
    what this site needs: `0SFS.github.io` is an *organization site*, served from
    `https://0sfs.github.io/` rather than from a `/repo-name/` subpath. A project-site repository
    would have to pass its own name instead.

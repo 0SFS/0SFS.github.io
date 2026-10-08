@@ -26,19 +26,20 @@ function usePhoneCameraTuning(parameters: FlightParameterStore): PhoneCameraTuni
  * Remote Control → Phone camera trackpad: what is set now. The parameters
  * themselves follow, each taking effect on the next swipe, so two can be
  * compared without re-pairing. The two measured combinations are presets
- * (Phone camera: original and recommended, in Settings → Presets); the costs
- * they quote are from the simulated measurements in `docs/phone-controller.md`
- * → *Camera trackpad tuning*, not from this device.
+ * (Phone camera: original and recommended, in Settings → Presets), and the
+ * defaults are the recommended one. The costs the options quote are from
+ * simulated measurements, not from this device: `docs/phone-controller.md`
+ * → *Camera trackpad*.
  */
 export function PhoneCameraTuningPanel({ parameters }: PhoneCameraTuningPanelProps) {
   const tuning = usePhoneCameraTuning(parameters);
   return (
     <div className="flight-panel__fieldset">
       <p className="flight-panel__hint">
-        Experimental. Each change applies on the next swipe, with no re-pairing. A phone that loaded before this
-        update needs a fresh QR for <strong>Phone sends</strong> and <strong>Lost or late frames</strong> to do anything.
-        The measured combinations are the presets <strong>Phone camera: original</strong> and
-        <strong> Phone camera: recommended</strong>, in Settings → Presets.
+        Smooth by default: movement is drawn on the phone&apos;s timeline, a playout buffer behind it. For the lowest
+        delay, draw it <strong>As soon as it arrives</strong>; the camera then jumps whenever Wi-Fi delivers unevenly.
+        Each change applies on the next swipe, with no re-pairing. The defaults are the preset
+        <strong> Phone camera: recommended</strong>; <strong>Phone camera: original</strong> is how it first worked.
       </p>
       <p className="flight-panel__hint" role="status">Now: {describePhoneCameraTuning(tuning)}</p>
       <p className="flight-panel__hint">

@@ -122,6 +122,8 @@ import {
   type AircraftModelHandle,
   type AircraftModelState,
 } from "./aircraft/createAircraftModel";
+import { createAircraftLights, type AircraftLightSettings, type AircraftLightsHandle } from "./aircraft/createAircraftLights";
+import { applySlowDeviceSkyDefaults, offerViewpointSurfaceLighting } from "./settings/skyDefaults";
 import { flightAttitudeToQuaternion, readFlightState } from "./bridge/ecefBridge";
 import type { FlightState } from "./physics/flightState";
 import { createFloatingOrigin, type FloatingOriginHandle } from "./bridge/floatingOrigin";
@@ -163,6 +165,11 @@ import {
   type PhoneCameraTuning,
 } from "./remote/phoneCameraTuning";
 import { CONTROL_SHARING_PARAMETER_IDS, readControlSharing, type ControlSharing } from "./remote/controlSharing";
+import {
+  PHONE_CONTROLLER_PARAMETER_IDS,
+  phoneControllerSettingsValues,
+  readPhoneControllerSettings,
+} from "./remote/phoneControllerSettings";
 import { createControlBlend, type ControlBlend } from "./remote/controlBlend";
 import type { MountPhonePairing } from "./hud/RemoteControlTab";
 import { createFlightInputManager } from "./input/flightInputManager";
@@ -195,6 +202,8 @@ import {
   createPresetsSection,
   createRendererPanel,
   createSavedSettingsSection,
+  createDateTimePanel,
+  createSkyPanel,
   type GameLog,
   type GameLogLine,
   type MapDetailController,
@@ -285,6 +294,14 @@ export async function createFlightSimApp(
     log: options.log ?? createGameLog(), settings, identity: getAppIdentity(),
   });
   const log = diagnostics.log;
+  // A flight is lit by the hour it is flown at. The dome is the highest rung of
+  // the sky ladder built, and needs nothing a device may lack: no float texture,
+  // no render target and no shader of its own.
+  settings.setHostDefault("sky.model", "dome", "a flight is lit by the Sun and the sky; the dome draws on any renderer");
+  // The aircraft's underside is lit by the ground below it as it is drawn; and a
+  // low flight may light its imagery as at the aircraft, the default only on a very slow device.
+  settings.setHostDefault("sky.groundLight.mode", "rendered", "a flight lights the aircraft from the ground below it as it is drawn");
+  offerViewpointSurfaceLighting(settings);
   const engineTest = isEngineTestStandRequested(window.location.search);
   const engineInitialState = engineTestStandInitialState(window.location.search);
   const benchBootstrap = engineTest ? engineTestStandBootstrapOptions(engineInitialState) : null;
@@ -518,6 +535,8 @@ export async function createFlightSimApp(
     runtime.geospatialCamera.detachControl();
     runtime.geospatialCamera.setEnabled(false);
   }
+  // The renderer has said what it is: a very slow device lights imagery as at the aircraft, and takes the ground's light as one colour.
+  applySlowDeviceSkyDefaults(settings);
   let worldLoading = true;
   let placementAbort = startupAbort;
 
@@ -872,6 +891,23 @@ export async function createFlightSimApp(
   const vtolProfile = getFdmProfile(initialAircraftId).stovl;
   const aircraftPresentation = getAircraftDefinition(initialAircraftId);
   const afterburnerProfile = aircraftPresentation.afterburner;
+  // Under a sky model the scene has one exposure: an emitter is shown against the
+  // luminance that exposure makes white, as the Sun's and the sky's light are.
+  // With the model off there is none, and each emitter keeps its own reference.
+  const skyWhiteLuminance = (): number | null => runtime.sky.getEnvironment()?.whiteLuminance ?? null;
+  const readLightSettings = (): AircraftLightSettings => ({
+    navigation: parameters.get("osfs.lights.navigation"),
+    antiCollision: parameters.get("osfs.lights.antiCollision"),
+    landing: parameters.get("osfs.lights.landing"),
+    groundLight: parameters.get("osfs.lights.groundLight"),
+    sizePx: parameters.get("osfs.lights.sizePx"),
+    liftMeters: parameters.get("osfs.lights.liftMeters"),
+    referenceNits: parameters.get("osfs.lights.referenceNits"),
+  });
+  for (const id of ["osfs.lights.navigation", "osfs.lights.antiCollision", "osfs.lights.landing", "osfs.lights.groundLight",
+    "osfs.lights.sizePx", "osfs.lights.liftMeters", "osfs.lights.referenceNits"] as const) {
+    stopWatching.push(parameters.watch(id, () => aircraftLights?.refresh()));
+  }
   const readExhaustSettings = () => ({
     enabled: parameters.get("osfs.exhaust.enabled"),
     sampleCount: parameters.get("osfs.exhaust.sampleCount"),
@@ -883,8 +919,8 @@ export async function createFlightSimApp(
     intensity: parameters.get("osfs.exhaust.intensity"),
     dryIntensity: parameters.get("osfs.exhaust.dryIntensity"),
     contributionView: parameters.get("osfs.exhaust.contributionView"),
-    gasReferenceNits: parameters.get("osfs.exhaust.gasReferenceNits"),
-    surfaceReferenceNits: parameters.get("osfs.exhaust.surfaceReferenceNits"),
+    gasReferenceNits: skyWhiteLuminance() ?? parameters.get("osfs.exhaust.gasReferenceNits"),
+    surfaceReferenceNits: skyWhiteLuminance() ?? parameters.get("osfs.exhaust.surfaceReferenceNits"),
     lightEnabled: parameters.get("osfs.exhaust.light.enabled"),
     lightGain: parameters.get("osfs.exhaust.light.gain"),
     lightRangeMeters: parameters.get("osfs.exhaust.light.rangeMeters"),
@@ -903,6 +939,25 @@ export async function createFlightSimApp(
     "osfs.exhaust.light.enabled", "osfs.exhaust.light.gain", "osfs.exhaust.light.rangeMeters"] as const) {
     stopWatching.push(parameters.watch(id, () => engineVisuals.setSettings(readExhaustSettings())));
   }
+  // The sky's exposure moves with the hour and, metered, with the light: the emitters follow it.
+  let exhaustWhiteLuminance = skyWhiteLuminance();
+  const noteExhaustReferences = (): void => {
+    const note = exhaustWhiteLuminance === null ? null
+      : `Not used while a sky model is on: the sky's exposure shows ${Number(exhaustWhiteLuminance.toPrecision(3)).toLocaleString("en-US")} cd/m² as white, for this as for sunlight (Sky → Exposure and display).`;
+    settings.setNote("osfs.exhaust.gasReferenceNits", note);
+    settings.setNote("osfs.exhaust.surfaceReferenceNits", note);
+  };
+  noteExhaustReferences();
+  stopWatching.push(runtime.sky.subscribe(() => {
+    const white = skyWhiteLuminance();
+    if (white === exhaustWhiteLuminance) return;
+    exhaustWhiteLuminance = white;
+    noteExhaustReferences();
+    engineVisuals.setSettings(readExhaustSettings());
+  }), () => {
+    exhaustWhiteLuminance = null;
+    noteExhaustReferences();
+  });
   function readSmokeSettings() {
     return {
       enabled: parameters.get("osfs.exhaust.smoke.enabled"),
@@ -1036,6 +1091,7 @@ export async function createFlightSimApp(
   }));
   let aircraft: ReturnType<typeof createPlaceholderAircraft> | null = null;
   let aircraftModel: AircraftModelHandle | null = null;
+  let aircraftLights: AircraftLightsHandle | null = null;
   let externalTankVisuals: ReturnType<typeof createExternalTankVisuals> | null = null;
   stopWatching.push(parameters.watch("osfs.externalTanks.debrisLifetimeSeconds", seconds => {
     externalTankVisuals?.setLifetimeSeconds(seconds);
@@ -1152,9 +1208,11 @@ export async function createFlightSimApp(
   const engineMonitor = createEngineMonitor(
     hudRoot.querySelector<HTMLElement>(".flight-hud__engine") ?? hudRoot,
     {
+      layoutScope: `${initialAircraftId}:${engineModel ?? "default"}:${getFdmProfile(initialAircraftId).engine}`,
       definition: {
         kind: getFdmProfile(initialAircraftId).engine, maxRpm: getFdmProfile(initialAircraftId).maxEngineRpm,
         rotorBlades: getFdmProfile(initialAircraftId).rotorBlades,
+        primaryThermalSolid: initialAircraftId === "f-35b" ? "liner" : undefined,
       },
       gpuDevice: runtime.renderer.mode === "webgpu" ? (runtime.renderer.engine as WebGPUEngine)._device : null,
       onOrbStatus: status => settings.setNote("osfs.renderer.engineOrbs", status.backend
@@ -1333,6 +1391,11 @@ export async function createFlightSimApp(
   for (const id of CONTROL_SHARING_PARAMETER_IDS) {
     stopWatching.push(parameters.watch(id, () => { controlSharing = readControlSharing(parameters); }));
   }
+  // The phone controller's own settings (Remote Control tab): a paired phone
+  // changes them over the link, and is told when they change here.
+  for (const id of PHONE_CONTROLLER_PARAMETER_IDS) {
+    stopWatching.push(parameters.watch(id, () => phoneSession?.syncPhoneSettings()));
+  }
   let chaseFrameApplied: PhoneCameraTuning["chaseFrame"] = "attitude";
   let orbitStateYaw = orbitRestoreYaw();
   let orbitStatePitch = orbitRestorePitch();
@@ -1509,6 +1572,24 @@ export async function createFlightSimApp(
     });
     aircraftModel.updateGearVisibility(readControlSurfaceState(jsbsim.sdk, aircraftId).gearDownNorm);
     syncForcesDebugOverlay();
+    if (!engineTest) {
+      // Its lights, against the sky's exposure, and its beams on the ground; the ground's light is measured from it.
+      const lightedAircraft = aircraft;
+      aircraftLights = createAircraftLights({
+        scene: runtime.scene,
+        parent: lightedAircraft.modelRoot,
+        aircraftId,
+        modelOffset: definition.modelOffset,
+        getSettings: readLightSettings,
+        getWhiteLuminance: skyWhiteLuminance,
+        setGroundLights: lights => runtime.sky.setGroundLights(lights),
+        getGearDownNorm: () => readControlSurfaceState(jsbsim.sdk, aircraftId).gearDownNorm,
+        // Paused or loading, the render loop is idle: the flashes hold and ask for no frames.
+        isRunning: () => !inputManager.isPaused() && !worldLoading,
+        requestRender: () => runtime.requestRender(),
+      });
+      runtime.sky.setGroundLightReceiver(() => lightedAircraft.modelRoot.getAbsolutePosition());
+    }
 
     onModelState(aircraftModel.getState());
     const initialState = readFlightState(jsbsim.sdk);
@@ -1958,6 +2039,10 @@ export async function createFlightSimApp(
       // the phone is orbiting, the way a mouse drag does.
       onCameraAim: () => runtime.requestRender(),
       getCameraTuning: () => phoneCameraTuning,
+      phoneSettings: {
+        get: () => readPhoneControllerSettings(parameters),
+        set: settings => { parameters.setMany(phoneControllerSettingsValues(settings)); },
+      },
       ...(phoneCameraTrace ? { trace: phoneCameraTrace } : {}),
       // Same path the HUD's G button and the G key take, so the three stay in step.
       setGearDown: down => { inputManager.setGearDown(down); flightHud.setGearDown(down); runtime.requestRender(); },
@@ -1979,6 +2064,10 @@ export async function createFlightSimApp(
   // The renderer and basemap choices each have a tab; their HUD chips toggle it.
   // The choice is renderer.backend, which the runtime reads when it starts.
   const rendererPanel = createRendererPanel({ renderer: runtime.renderer, onChange: applyRendererChoice, settings });
+  // The sky is seen from the flight's camera; before the first frame, the Sun and its times of day are the aircraft's place's.
+  const skyPlace = () => runtime.sky.getEnvironment()?.illumination.observer ?? physicsLoop.getLatestState() ?? initialState;
+  const skyPanel = createSkyPanel({ settings, getPlace: skyPlace, openDateTime: () => controlPanel?.openOrSelectTab("time") });
+  const timePanel = createDateTimePanel({ settings, getPlace: skyPlace });
   // A switch between Google and a 2D basemap, or of elevation provider, changes
   // the ground under the aircraft, so its terrain is prepared again. One 2D
   // basemap for another changes imagery only. A switch can come from the Map
@@ -2050,6 +2139,8 @@ export async function createFlightSimApp(
     meshInspector,
     mapTab: mapPanel.element,
     rendererTab: rendererPanel.element,
+    skyTab: skyPanel.element,
+    timeTab: timePanel.element,
     settingsSections,
     aboutTab: about.element,
     bugReportTab: bugReportPanel.element,
@@ -2150,7 +2241,7 @@ export async function createFlightSimApp(
       saveFlight();
       controlPanel?.update(createPanelSnapshot(physicsLoop.getLatestState() ?? initialState));
     },
-    attachEngineDetails: (host) => engineMonitor.attachDetails(host),
+    attachEngineDetails: (host, settingsContent) => engineMonitor.attachDetails(host, settingsContent),
     engineModel,
     onReloadFlight: () => {
       saveFlight();
@@ -2626,6 +2717,8 @@ export async function createFlightSimApp(
       disconnectMapDetail();
       mapDetail?.dispose();
       rendererPanel.destroy();
+      skyPanel.destroy();
+      timePanel.destroy();
       evaluationInstruments.destroy();
       gMeter.destroy();
       gVisionOverlay.destroy();
@@ -2642,6 +2735,8 @@ export async function createFlightSimApp(
       // Before jsbsim.dispose(): the audio adapter's property batch must not outlive the SDK.
       flightAudio.dispose();
       externalTankVisuals?.dispose();
+      aircraftLights?.dispose();
+      runtime.sky.setGroundLightReceiver(null);
       aircraftModel?.dispose();
       aircraft?.dispose();
       floatingOrigin?.dispose();

@@ -78,10 +78,14 @@ Rules only. Details live in the linked docs; update those, not this file.
 ## Checks
 
 - Check what a change touches, and run the full suite once, when the work is done.
-  After an edit: `npx tsc -b`, `npx vitest related --run <changed files>` (or
+  After an edit: `npm run typecheck`, `npx vitest related --run <changed files>` (or
   `npm run test:changed`) and `npm run lint`. For finished work: `npm run ci`, once.
-- `tsc -b` and `npm run lint` are incremental. Never pass `--force` or delete
+- `npm run typecheck` and `npm run lint` are incremental. Never pass `--force` or delete
   `node_modules/.tmp` or `node_modules/.cache` to make them check everything again.
+  Don't typecheck with `tsc -b`: it checks everything on every run.
+- `vitest related` and `--changed` follow imports only. A folder that tests read from
+  disk belongs in `forceRerunTriggers`, or a change there selects no tests and passes.
+- How the checks work, what they cost and what makes them slow: [CI/CD](../foss-earth/docs/ci-cd.md).
 - Documentation-only changes need no typecheck, tests or build.
 - Keep each run's output in a log under `build/` and read it again rather than
   rerunning. To look into a failure, rerun that test file, not the suite.

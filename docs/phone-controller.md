@@ -215,6 +215,17 @@ whole technical case, including why another browser on the same phone changes no
 yaw slider returns to centre when you let go — and how long that return takes — or keeps the
 deflection until you move it again.
 
+Those settings and **Haptics** are kept on the computer too, with its own, in Remote Control →
+**Phone controller**, so an export or a preset made on the computer carries them, and either screen
+can change them. At pairing the computer's values win, except where it still has its default: there
+the phone's own choice is kept, so a phone set up before the computer kept them loses nothing. The
+phone keeps a copy for when it is not paired. A computer that predates this sends nothing, and the
+phone keeps its own.
+
+Right of the 🌐 chip, the **Hz** chip shows how many control frames the phone sent in the last
+second: the touch rate while a finger moves, the 60 Hz timer while none does, and 0 while the
+computer flies. Connection details shows the same number as **Control frames sent**.
+
 [Phone controller UI](phone-controller-ui.md) covers how the page is built: the stylesheet it shares
 with the desktop HUD, the OLED theme, the control arrangement in each orientation, and the layout
 rules `npm run check:phone-layout` enforces.
@@ -243,6 +254,22 @@ script): true black on `/rc/`, the flight page's `#04060a` on `/fly/`.
 
 There is no way to hide the iOS URL bar other than a Home Screen launch; the alternatives and why
 each fails are tabulated in [the brainstorm](brainstorm/ios-url-bar-and-scrolling.md).
+
+## Camera trackpad
+
+How a swipe reaches the view is Remote Control → **Phone camera trackpad**, on the computer. The
+defaults are the preset **Phone camera: recommended**, and they are smooth: they spend a little delay
+to hide the uneven way Wi-Fi delivers frames, which otherwise shows as a camera that jumps.
+
+| Setting | Default | The other choice |
+| --- | --- | --- |
+| **Phone sends** | Once per touch frame | On each touch and a 60 Hz timer: the original, about 10–17 ms later and less steady |
+| **Lost or late frames** | Recovered from the gesture's running total, at no delay | Their movement is lost |
+| **Draw movement** | Paced on the phone's own timeline, the **Playout buffer** (12 ms) behind the fastest delivery seen | As soon as it arrives: the lowest delay, and a jump for every uneven delivery |
+
+For the lowest delay, set **Draw movement** to **As soon as it arrives**. **Phone camera: original**
+is how the trackpad first worked: on a timer, losing lost frames, drawn on arrival. The costs quoted
+come from simulated measurements, not from a device.
 
 ## Specification
 

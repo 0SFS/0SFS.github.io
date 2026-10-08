@@ -1,0 +1,348 @@
+{
+  "recordedDate": "2026-10-07",
+  "kind": "Reanalysis of retained CPU/native evidence; no new engine or GPU run",
+  "inputs": [
+    {
+      "file": "validation/evidence/aircraft/f35b/dry-vtol-mechanism-2026-10-06/runtime-source/refined-rays/report.json",
+      "sha256": "586a7baf7aabe6926cb5603df61723be8b827fa4cb85db7a8918298ff4ecc69f"
+    },
+    {
+      "file": "validation/evidence/aircraft/f35b/plume-spatial-2026-10-06/native/trace.csv",
+      "sha256": "6c11afe6f6f9abdef19ee4a3265b7c35087b956a37bc03b2c046da70bcf957e2"
+    }
+  ],
+  "dry": {
+    "source": {
+      "valid": true,
+      "temperatureK": 1003.1281319989688,
+      "absorptionPerMeter": 0.025,
+      "particlePowerW": 733.4977397994085,
+      "chPowerW": 0,
+      "c2PowerW": 0,
+      "exteriorIntensityCd": 0.010218591070062826,
+      "allowedPowerW": 574164.492687422,
+      "wholeIntensityCd": 0.051799224023528136
+    },
+    "radianceRays": [
+      {
+        "distanceMeters": 0,
+        "luminanceCdPerM2": 0.016704680493511096,
+        "rgbCdPerM2": [
+          0.07362072453693703,
+          0.001464789601625416,
+          0
+        ],
+        "displayExamples": [
+          {
+            "exposureEV": 0,
+            "srgb255Unrounded": [
+              0.24253298360541561,
+              0.004825888752603432,
+              0.0
+            ],
+            "srgb8": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "exposureEV": 8,
+            "srgb255Unrounded": [
+              36.997759225490796,
+              1.2349662350887882,
+              0.0
+            ],
+            "srgb8": [
+              37,
+              1,
+              0
+            ]
+          },
+          {
+            "exposureEV": 10,
+            "srgb255Unrounded": [
+              74.86417889692059,
+              4.934316120648128,
+              0.0
+            ],
+            "srgb8": [
+              75,
+              5,
+              0
+            ]
+          }
+        ]
+      },
+      {
+        "distanceMeters": 0.5,
+        "luminanceCdPerM2": 0.012846085131143745,
+        "rgbCdPerM2": [
+          0.05671406059878746,
+          0.0010970271682361878,
+          0
+        ],
+        "displayExamples": [
+          {
+            "exposureEV": 0,
+            "srgb255Unrounded": [
+              0.18683954761933924,
+              0.0036142617435276185,
+              0.0
+            ],
+            "srgb8": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "exposureEV": 8,
+            "srgb255Unrounded": [
+              31.823175780207738,
+              0.924992247512324,
+              0.0
+            ],
+            "srgb8": [
+              32,
+              1,
+              0
+            ]
+          },
+          {
+            "exposureEV": 10,
+            "srgb255Unrounded": [
+              66.2487482702926,
+              3.6968552016667453,
+              0.0
+            ],
+            "srgb8": [
+              66,
+              4,
+              0
+            ]
+          }
+        ]
+      },
+      {
+        "distanceMeters": 1,
+        "luminanceCdPerM2": 0.008706192789606467,
+        "rgbCdPerM2": [
+          0.0384772493019034,
+          0.0007314870828163504,
+          0
+        ],
+        "displayExamples": [
+          {
+            "exposureEV": 0,
+            "srgb255Unrounded": [
+              0.12676226808665972,
+              0.0024099555801953706,
+              0.0
+            ],
+            "srgb8": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "exposureEV": 8,
+            "srgb255Unrounded": [
+              25.054941553124895,
+              0.6168335711378466,
+              0.0
+            ],
+            "srgb8": [
+              25,
+              1,
+              0
+            ]
+          },
+          {
+            "exposureEV": 10,
+            "srgb255Unrounded": [
+              54.7757295124684,
+              2.4659492178401456,
+              0.0
+            ],
+            "srgb8": [
+              55,
+              2,
+              0
+            ]
+          }
+        ]
+      },
+      {
+        "distanceMeters": 2,
+        "luminanceCdPerM2": 0.004008786790616197,
+        "rgbCdPerM2": [
+          0.017798391053978516,
+          0.00031259268982536777,
+          0
+        ],
+        "displayExamples": [
+          {
+            "exposureEV": 0,
+            "srgb255Unrounded": [
+              0.05863753551265013,
+              0.001029867553969588,
+              0.0
+            ],
+            "srgb8": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "exposureEV": 8,
+            "srgb255Unrounded": [
+              14.380033291747708,
+              0.2636250799682058,
+              0.0
+            ],
+            "srgb8": [
+              14,
+              0,
+              0
+            ]
+          },
+          {
+            "exposureEV": 10,
+            "srgb255Unrounded": [
+              36.302798778950944,
+              1.0542472457383634,
+              0.0
+            ],
+            "srgb8": [
+              36,
+              1,
+              0
+            ]
+          }
+        ]
+      },
+      {
+        "distanceMeters": 3,
+        "luminanceCdPerM2": 5.17467236711774e-05,
+        "rgbCdPerM2": [
+          0.00024331602038236844,
+          0,
+          0
+        ],
+        "displayExamples": [
+          {
+            "exposureEV": 0,
+            "srgb255Unrounded": [
+              0.0008016287657026301,
+              0.0,
+              0.0
+            ],
+            "srgb8": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "exposureEV": 8,
+            "srgb255Unrounded": [
+              0.20520423200631135,
+              0.0,
+              0.0
+            ],
+            "srgb8": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "exposureEV": 10,
+            "srgb255Unrounded": [
+              0.820663582878405,
+              0.0,
+              0.0
+            ],
+            "srgb8": [
+              1,
+              0,
+              0
+            ]
+          }
+        ]
+      }
+    ],
+    "displayAssumptions": {
+      "gasIntensity": 1,
+      "whiteReferenceCdPerM2": 1000,
+      "exposureEV": [
+        0,
+        8,
+        10
+      ],
+      "toneMap": "Reinhard c/(1+c), per channel",
+      "encoding": "standard sRGB, rounded to unsigned 8-bit",
+      "background": "black; source alone",
+      "limitations": "Illustrative CPU mapping, not a capture or measurement of the live shader, tone mapper, background, bloom, viewing settings or camera response."
+    }
+  },
+  "nativeAB": {
+    "samples": [
+      {
+        "timeS": 212.52499999997104,
+        "gasK": 1004.7625564094402,
+        "fuelKgSec": 2.9089236371911666,
+        "burnedAbKgSec": 0.0,
+        "augmentation": 1.0,
+        "n2Pct": 99.78307750327733,
+        "secondsFromABFlag": 0.0
+      },
+      {
+        "timeS": 212.6083333333043,
+        "gasK": 1007.6688810488931,
+        "fuelKgSec": 2.9614227540893165,
+        "burnedAbKgSec": 0.003229701002415397,
+        "augmentation": 1.0,
+        "n2Pct": 100.0,
+        "secondsFromABFlag": 0.08333333333325754
+      },
+      {
+        "timeS": 213.53333333330346,
+        "gasK": 1181.7685861295267,
+        "fuelKgSec": 3.544162951658778,
+        "burnedAbKgSec": 0.5859698985712456,
+        "augmentation": 1.0,
+        "n2Pct": 100.0,
+        "secondsFromABFlag": 1.0083333333324163
+      },
+      {
+        "timeS": 214.53333333330255,
+        "gasK": 1368.049819166824,
+        "fuelKgSec": 4.174152354436571,
+        "burnedAbKgSec": 1.2159593013493526,
+        "augmentation": 1.0,
+        "n2Pct": 100.0,
+        "secondsFromABFlag": 2.0083333333315068
+      },
+      {
+        "timeS": 217.7499999999663,
+        "gasK": 1953.9906853378407,
+        "fuelKgSec": 6.200618266704971,
+        "burnedAbKgSec": 3.2424252136177536,
+        "augmentation": 1.0,
+        "n2Pct": 100.0,
+        "secondsFromABFlag": 5.224999999995248
+      }
+    ],
+    "limitations": "Native columns only. Historical optical columns are not current source predictions. The trace is not synchronized to the user\u2019s display or sound device."
+  },
+  "acceptance": {
+    "software": "Not rerun; no runtime changes in this reanalysis",
+    "physical": "Open; source temperatures, loading and flow are unqualified F135 proxies",
+    "visual": "Rejected by the user on 2026-10-07; no dry VTOL exhaust and slow AB light relative to sound",
+    "deployment": "Held after the user requested time out; existing exhaust commit remains local"
+  }
+}

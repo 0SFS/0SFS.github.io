@@ -84,12 +84,14 @@ just above the throttle instead.
 **Nothing sits above or below the controls.** Everything that is not a flight
 surface — IAS, ALT and HDG, the gear, the link chip, pause and release while
 flying (Take control in their place otherwise, or Scan QR code once the session
-has ended), haptics, 🌐 connection details, ⛶ fullscreen, ⚙ settings and the
-brake, in that order — is one chip grid at the density FOSS Earth's
+has ended), haptics, 🌐 connection details, the send rate in Hz, ⛶ fullscreen,
+⚙ settings and the brake, in that order — is one chip grid at the density FOSS Earth's
 `.hud-bar` uses, because they are menu items and readouts and the screen is
 worth more to the controls. It sits under the controls by default; **⚙ Settings
-→ Button grid → Top** moves it above them, remembered under
-`osfs.phone-grid-position`. The brake is a `B` chip held under a thumb, a little
+→ Button grid → Top** moves it above them. The computer keeps that as
+`osfs.phone.gridPosition`, and the phone a copy under `osfs.phone-grid-position`. The Hz chip
+has one width from `—` to `120Hz`, as the 🌐 chip does, so a finger starting to move never
+reflows the grid. The brake is a `B` chip held under a thumb, a little
 wider than the glyph chips; a full-width bar was more brake than anyone needs.
 
 There used to be an instrument row at the top, a status banner, a fullscreen
@@ -457,7 +459,10 @@ secure page, which is said in the scanner rather than failing silently.
 Both are `<details>` elements that are a chip while closed and a full-screen page
 with its own scroll while open (`.phone-sheet`), so neither ever takes room from
 the controls. Their headers say what they are in words and close them. Settings
-holds two things: where the chip grid sits, and what yaw does on release.
+holds two things: where the chip grid sits, and what yaw does on release. Both,
+with Haptics, are the computer's settings as well (Remote Control → Phone
+controller), so they travel in its export; the phone sends a change at once and
+follows a change made there.
 
 ## What the check cannot see
 

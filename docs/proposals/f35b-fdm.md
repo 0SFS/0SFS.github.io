@@ -572,8 +572,8 @@ Hypotheses to test, without assuming the answer:
 #### Engine test stand and live history
 
 0sfs owns the fixture, aircraft visibility and instrument plots. JSBSim remains
-the sole owner of spool, fuel, thrust and thermal dynamics. **Engine → Engine test
-stand → Open engine test stand** reloads with `?engineTest=1`; **Return to flight**
+the sole owner of spool, fuel, thrust and thermal dynamics. **Engine → Settings →
+Engine test stand → Open engine test stand** reloads with `?engineTest=1`; **Return to flight**
 removes that flag. The stand bypasses saved-flight restoration/saving, terrain
 collision response and flight assists. **Earth remains loaded** through the
 normal map/terrain preparation path. It uses native `setHoldDown` before
@@ -586,7 +586,8 @@ loaded terrain supplies final placement/clearance. The existing **Location** tab
 moves the fixture, including runway selections, without applying arrival/departure
 flight speed or control presets. There is no separate test-stand altitude setting:
 location and altitude have their existing UI home. Camera distance/zoom remain in
-Engine → Test stand conditions. The regular THR, start/stop gesture, VTOL, pause
+Engine → Settings → Test stand conditions. The regular THR, start/stop gesture,
+VTOL, pause
 and orbit controls remain available. Reloading the stand returns to its default;
 returning to flight retains normal saved-flight behavior.
 
@@ -608,11 +609,17 @@ engine geometry they show readings without an aircraft mesh. No stock aircraft
 name is embedded in the fixture or history code. The test is static; hold-down
 does not turn an initial airspeed into a valid wind-tunnel condition.
 
-**Engine → History** provides plots and latest/min/max values for native metrics
-that exist, including separately labeled gas and metal temperatures. Clear starts
-a fresh history; CSV exports its actual samples and units. **History sampling**
+**Engine → Live data** provides plots and current/min/max values for native
+observations that exist, including separately labeled gas and metal temperatures.
+Each observation appears once, either as a plot member or a compact reading;
+activating a compact reading expands it. Compatible traces can share an axis and
+can be separated explicitly. [The engine monitor design](../engine-monitor.md)
+describes the variable registry, grouping, persistence and recording budget.
+Clear starts a fresh history; CSV exports its actual samples and units.
+**Settings → History sampling**
 sets the retained simulation-time window (default 60 s, 1–600 s) and sampling
-ceiling (default 5 Hz, 0–30 Hz). Zero disables and clears history. Paused/repeated
+ceiling (default 5 Hz, 0–30 Hz). Zero disables capture while retaining bounded
+history; Clear explicitly removes it. Paused/repeated
 simulation times add no samples, backwards time starts a new record, absent
 observations stay absent, and hidden plots do not redraw. These low-rate trends
 are not a combustion-instability or acoustic measurement.

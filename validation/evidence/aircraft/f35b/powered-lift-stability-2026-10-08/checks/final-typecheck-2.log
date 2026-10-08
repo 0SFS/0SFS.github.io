@@ -1,0 +1,4 @@
+
+> osfs@0.0.0 typecheck
+> tsc -p tsconfig.app.json --incremental --tsBuildInfoFile node_modules/.tmp/typecheck.app.tsbuildinfo && tsc -p tsconfig.node.json --incremental --tsBuildInfoFile node_modules/.tmp/typecheck.node.tsbuildinfo
+

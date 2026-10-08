@@ -12,6 +12,21 @@ afterEach(() => { vi.unstubAllGlobals(); resetAppSettings(); });
 const FOSS_EARTH_SECTIONS = new Set(["map/detail", "controls/orbit"]);
 
 describe("flight parameter catalogue", () => {
+  it("exposes bounded history metric and storage budgets independently of hidden capture", () => {
+    const settings = createSettingsRegistry({ storage: null });
+    settings.register(OSFS_PARAMETERS);
+    expect(settings.get("osfs.engineMonitor.historyMetrics")).toBe(32);
+    expect(settings.inspect("osfs.engineMonitor.historyMetrics").bounds).toMatchObject({ min: 1, max: 256 });
+    expect(settings.get("osfs.engineMonitor.historyMemoryKiB")).toBe(4096);
+    expect(settings.inspect("osfs.engineMonitor.historyMemoryKiB").bounds).toMatchObject({ min: 64, max: 65536 });
+    expect(settings.get("osfs.engineMonitor.hiddenHistory")).toBe(true);
+    for (const id of ["osfs.engineMonitor.historyMetrics", "osfs.engineMonitor.historyMemoryKiB", "osfs.engineMonitor.hiddenHistory"]) {
+      expect(settings.inspect(id).spec.home).toMatchObject({ tab: "engine", section: "history" });
+    }
+    expect(settings.set("osfs.engineMonitor.historyMetrics", 257).ok).toBe(false);
+    expect(settings.set("osfs.engineMonitor.historyMemoryKiB", 63).ok).toBe(false);
+  });
+
   it("bounds sound sources by their actual counts without unused grain controls", () => {
     const settings = createSettingsRegistry({ storage: null });
     settings.register(OSFS_PARAMETERS);
@@ -122,7 +137,7 @@ describe("flight parameter catalogue", () => {
     }
     // A fresh flight matches the presets that stand for the defaults.
     expect(settings.matchingPreset({ tab: "aircraft", section: "ground" })?.id).toBe("osfs-ground-minimal");
-    expect(settings.matchingPreset({ tab: "remote", section: "camera", prefix: "osfs.camera.phone." })?.id).toBe("osfs-phone-camera-original");
+    expect(settings.matchingPreset({ tab: "remote", section: "camera", prefix: "osfs.camera.phone." })?.id).toBe("osfs-phone-camera-recommended");
   });
 
   it("persists live afterburner and viewpoint controls at their single homes with fraction bounds", () => {

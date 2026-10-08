@@ -60,9 +60,54 @@ describe("native engine history", () => {
     expect(history.frames().map(frame => frame.time)).toEqual([9.5, 10]);
     const read = vi.fn(() => [0]);
     history.configure({ seconds: 1, hz: 0 });
-    expect(history.frames()).toEqual([]);
+    expect(history.frames().map(frame => frame.time)).toEqual([9.5, 10]);
     expect(history.observe(100, false, read)).toBe(false);
     expect(read).not.toHaveBeenCalled();
+  });
+
+  it("preallocates a fixed numeric payload, retains it when capture is off, and never allocates a hidden unbounded column", () => {
+    const history = createEngineHistory({ seconds: 2, hz: 2, columns: 1 });
+    expect(history.allocatedBytes()).toBe(5 * 17);
+    for (let i = 0; i < 30; i++) history.observe(i, false, () => [i % 2 ? null : i]);
+    expect(history.size()).toBe(3);
+    expect(history.allocatedBytes()).toBe(85);
+    const frames = history.frames();
+    history.configure({ seconds: 2, hz: 0, columns: 1 });
+    expect(history.frames()).toEqual(frames);
+    expect(history.allocatedBytes()).toBe(85);
+    expect(history.observe(30, false, () => [999])).toBe(false);
+    history.configure({ seconds: 2, hz: 2, columns: 1 });
+    expect(() => history.observe(31, false, () => [1, 2])).toThrow("allocated column");
+    expect(history.allocatedBytes()).toBe(85);
+  });
+
+  it("marks a capture interruption without inventing a gap sample or losing the resumed value", () => {
+    const history = createEngineHistory({ seconds: 60, hz: 5, columns: 1 });
+    history.observe(1, false, () => [10]);
+    history.breakBeforeNextSample();
+    history.observe(2, true, () => [20]);
+    history.observe(3, false, () => [30]);
+    expect(history.frames()).toEqual([{ time: 1, values: [10] }, { time: 3, values: [30], breakBefore: true }]);
+    expect(engineHistoryPlot(history.frames(), 0).path).toBe("M0.00,60.00M300.00,4.00");
+    const metric = discoverEngineHistoryMetrics(new Set(["propulsion/engine/thrust-lbs"]));
+    expect(engineHistoryCsv(metric, history.frames())).toContain('"Capture interruption before sample"\r\n1,10,0\r\n3,30,1');
+    history.configure({ seconds: 60, hz: 2, columns: 1 });
+    expect(history.frames()[1].breakBefore).toBe(true);
+  });
+
+  it("uses one supplied vertical axis for comparable traces without normalizing each member", () => {
+    const frames = [{ time: 0, values: [25, 50] }, { time: 1, values: [75, 100] }];
+    const n1 = engineHistoryPlot(frames, 0, false, [0, 100]);
+    const n2 = engineHistoryPlot(frames, 1, false, [0, 100]);
+    expect(n1.path).toBe("M0.00,46.00L300.00,18.00");
+    expect(n2.path).toBe("M0.00,32.00L300.00,4.00");
+    expect(n1.axisMinimum).toBe(n2.axisMinimum);
+    expect(n1.axisMaximum).toBe(n2.axisMaximum);
+    const outside = engineHistoryPlot([{ time: 0, values: [-10] }, { time: 1, values: [150] }], 0, false, [0, 100]);
+    expect(outside.minimum).toBe(-10);
+    expect(outside.maximum).toBe(150);
+    expect(outside.path).toContain("-24.00");
+    expect(engineHistoryPlot([{ time: 0, values: [Number.NaN] }], 0).latest).toBeNull();
   });
 
   it("starts a new history after native time rewinds and keeps Clear empty during pause", () => {

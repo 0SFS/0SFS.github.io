@@ -1,0 +1,9 @@
+npm error code 128
+npm error An unknown git error occurred
+npm error command git --no-replace-objects ls-remote ssh://git@github.com/deps/felipegalind0-jsbsim-1.2.4-fork.21.tgz.git
+npm error ssh: Could not resolve hostname github.com: -65563
+npm error fatal: Could not read from remote repository.
+npm error
+npm error Please make sure you have the correct access rights
+npm error and the repository exists.
+npm error A complete log of this run can be found in: /Users/felg/gh/0sfs/build/npm-cache/_logs/2026-10-08T22_12_48_848Z-debug-0.log

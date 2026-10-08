@@ -145,6 +145,10 @@ export default defineConfig({
   plugins: [react(), copyIndexToPagesPaths(), lanOriginPlugin(), builtFrom({ describe: jsbsimBuild })],
   test: {
     maxWorkers: '50%',
+    // Tests read the JSBSim data and the aircraft assets from disk, not
+    // through imports, so `vitest related` and `--changed` cannot see which
+    // tests use them and would select none. A change there runs every test.
+    forceRerunTriggers: [...configDefaults.forceRerunTriggers, '**/public/jsbsim-data/**', '**/public/aircraft/**', '**/deps/*.tgz'],
     // `build/` holds gitignored validation sandboxes, some of which symlink to
     // sibling packages. App-managed worktrees hold other checkouts too.
     // Collecting those runs another package's tests under

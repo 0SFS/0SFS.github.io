@@ -1,6 +1,6 @@
 import "foss-earth/windowing.css";
 
-import { createParameterSection, MeshInspectorPanel, WindowOverlay, type PanelSection, type WindowOverlayHandle } from "foss-earth/shell";
+import { createHelpTooltip, createParameterSection, MeshInspectorPanel, WindowOverlay, type PanelSection, type WindowOverlayHandle } from "foss-earth/shell";
 import type { MeshInspectorHandle } from "foss-earth/diagnostics";
 import type { SettingsRegistry } from "foss-earth/settings";
 import {
@@ -147,7 +147,7 @@ export interface FlightControlPanelSnapshot {
 }
 
 /** Every tab the panel can show: the flight's own, and the shared globe tabs. */
-export type FlightOverlayTab = "location" | "map" | "renderer" | "bug-report" | FlightPanelTab;
+export type FlightOverlayTab = "location" | "map" | "renderer" | "sky" | "time" | "bug-report" | FlightPanelTab;
 
 export interface FlightControlPanelOptions {
   /** The app's settings registry, whose sections the tabs draw. */
@@ -160,6 +160,10 @@ export interface FlightControlPanelOptions {
   mapTab: HTMLElement;
   /** The shared Renderer tab's contents, from `createRendererPanel`. */
   rendererTab: HTMLElement;
+  /** The shared Sky tab's contents, from `createSkyPanel`: where the Sun is, the atmosphere, the ground under it and exposure. */
+  skyTab?: HTMLElement;
+  /** The shared Date and time tab's contents, from `createDateTimePanel`: the dials that set the time the Sun is placed for. */
+  timeTab?: HTMLElement;
   /** The shared Settings tab: presets and the saved record. */
   settingsSections: readonly PanelSection[];
   /** The shared About tab, from `createAboutPanel`: which version runs, and what it is built from. */
@@ -191,8 +195,8 @@ export interface FlightControlPanelOptions {
   /** New contents in pounds, by JSBSim tank number; tanks not listed keep theirs. */
   onFuelChange(contentsLbs: ReadonlyMap<number, number>): void;
   onFuelAttachmentChange?(index: number, attached: boolean): void;
-  /** Hosts the live engine-detail readings inside the Engine tab. */
-  attachEngineDetails(host: HTMLElement): () => void;
+  /** Hosts Engine's two sections, with the registry controls inside Settings. */
+  attachEngineDetails(host: HTMLElement, settingsContent?: HTMLElement): () => void;
   /** The engine model this flight loaded, on an aircraft that offers a choice. */
   engineModel?: EngineModelId | null;
   /** Saves the flight and loads it again, so a newly chosen engine model flies. */
@@ -257,10 +261,19 @@ function EngineModelStatus({ aircraftId, running, parameters, onReload }: {
   const chosen = useSyncExternalStore(watch, () => parameters.get("osfs.engine.model"));
   const flying = running ? resolveEngineModel(aircraftId, running) : null;
   const next = resolveEngineModel(aircraftId, chosen);
+  const helpHost = useRef<HTMLSpanElement>(null);
+  const modelSummary = flying?.summary;
+  useEffect(() => {
+    if (!helpHost.current || !modelSummary) return;
+    const content = document.createElement("p"); content.textContent = modelSummary;
+    const help = createHelpTooltip({ label: "Flying engine model help", content });
+    helpHost.current.append(help.element);
+    return () => help.destroy();
+  }, [modelSummary]);
   if (!flying) return null;
   return <>
     <p className="flight-panel__hint">
-      <strong>Flying: {flying.label}</strong>, JSBSim {JSBSIM_PACKAGE_VERSION}. {flying.summary}
+      <strong>Flying: {flying.label}</strong> · JSBSim {JSBSIM_PACKAGE_VERSION} <span ref={helpHost} />
     </p>
     {next && next.id !== flying.id && <p className="flight-panel__hint" role="status">
       {next.label} flies after the flight reloads.{" "}
@@ -269,14 +282,20 @@ function EngineModelStatus({ aircraftId, running, parameters, onReload }: {
   </>;
 }
 
-function EngineDetailsHost({ attach }: { attach: (host: HTMLElement) => () => void }) {
+function EngineDetailsHost({ attach, children }: {
+  attach: (host: HTMLElement, settingsContent?: HTMLElement) => () => void;
+  children: ReactNode;
+}) {
   const ref = useRef<HTMLDivElement>(null);
+  // The monitor owns the two persisted section shells. React still owns each
+  // setting, including live applicability and the save-before-reload control.
+  const [settingsContent] = useState(() => document.createElement("div"));
   useEffect(() => {
     const host = ref.current;
     if (!host) return;
-    return attach(host);
-  }, [attach]);
-  return <div className="flight-engine-host" ref={ref} />;
+    return attach(host, settingsContent);
+  }, [attach, settingsContent]);
+  return <>{createPortal(children, settingsContent)}<div className="flight-engine-host" ref={ref} /></>;
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
@@ -908,6 +927,8 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
       overlayApiRef={props.overlayApiRef}
       mapTab={props.mapTab}
       rendererTab={props.rendererTab}
+      skyTab={props.skyTab}
+      timeTab={props.timeTab}
       settingsSections={props.settingsSections}
       interfaceSections={props.interfaceSections}
       aboutTab={props.aboutTab}
@@ -965,6 +986,7 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
               </div>
               : tabId === "remote" ? <RemoteControlTab loadPhonePairing={props.loadPhonePairing} onUseAsRemote={props.onUseAsRemote}
                 sharing={<ParameterSection settings={props.settings} tab="remote" section="control" />}
+                phoneSettings={<ParameterSection settings={props.settings} tab="remote" section="phone" />}
                 cameraTuning={<ParameterSection settings={props.settings} tab="remote" section="camera">
                   <PhoneCameraTuningPanel parameters={props.parameters} />
                 </ParameterSection>} />
@@ -986,7 +1008,7 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
                     <ParameterSection settings={props.settings} tab="exhaust" section="afterburner" />
                   </fieldset>}
               </div>
-              : tabId === "engine" ? <>
+              : tabId === "engine" ? <EngineDetailsHost attach={props.attachEngineDetails}>
                 {getFdmProfile(props.snapshot.aircraftId).engineModels &&
                   <fieldset className="flight-panel__fieldset">
                     <legend>{props.settings.getSectionTitle("engine", "simulation")}</legend>
@@ -995,11 +1017,10 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
                         parameters={props.parameters} onReload={props.onReloadFlight} />
                     </ParameterSection>
                   </fieldset>}
-                <EngineDetailsHost attach={props.attachEngineDetails} />
                 <ParameterSection settings={props.settings} tab="engine" section="engine" />
                 <ParameterSection settings={props.settings} tab="engine" section="history" />
                 <ParameterSection settings={props.settings} tab="engine" section="test" />
-              </>
+              </EngineDetailsHost>
               : tabId === "gforces" ? <div className="flight-panel__content">
                 <ParameterSection settings={props.settings} tab="gforces" section="indicator" />
                 <ParameterSection settings={props.settings} tab="gforces" section="vision">

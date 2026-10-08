@@ -102,6 +102,17 @@ F135 configuration errors found the same way, fixed in 0sfs data:
 - The monitor's **Engine plant numerics** rows show the plant's per-step
   numerics, closing the stage 6 gap.
 
+## Engine-tab redesign follow-up
+
+The October 8 variable-driven monitor keeps the Simulation controls under
+**Engine → Settings → Simulation** and the actual algorithm, iteration,
+fallback, residual, memory and accounting observations under **Live data**.
+Settings and Live data are the two top-level collapsible sections. A variable
+appears once, as a plotted trace or compact reading; native history and events
+remain separate from simulation commands. [The monitor design](../engine-monitor.md)
+documents grouping, layout persistence, recording budgets and migration.
+This follow-up does not qualify browser appearance, gesture behavior or timing.
+
 ## Unresolved
 
 - The local linear algorithm is deferred. The reduced algorithm already halves
@@ -111,9 +122,37 @@ F135 configuration errors found the same way, fixed in 0sfs data:
 - Wall-clock cost, display and sound-device acceptance: not authorized in this
   handoff.
 - Open physical items are in the [ledger](f135-engine-plant.md#limits).
-- Stage 2 leftovers, listed as limits in JSBSim's doc:
+- Stage 2 follow-up:
   - solids use an explicit step at the step-start temperature, stable only
     while the step is small against capacity over conductance, with no runtime
     guard;
   - a stopped engine has no natural convection;
-  - the nozzle back-off has no native test.
+  - nozzle back-off now has a rejected-publication regression in fork.21; see the follow-up below.
+
+## Powered-lift stability follow-up, 2026-10-08
+
+Installed fork.21 from clean local native/SDK 34eeae66 corrects frozen/trim PPS
+and integration-versus-publication fallback/work observations; raw accepted mass
+terms and commanded throat are exported. Real constrained-cap native regressions
+now cover publication fallback, rejected publication retaining state and nozzle
+back-off. This closes the earlier absence of a native nozzle-back-off test.
+Controller gains, limiter schedules, F135/FCS XML and physical forces are unchanged.
+
+The [powered-lift record](f135-powered-lift-stability-2026-10-08.md) retains
+80 s full-conversion trajectories, command .98/.99/1, both algorithms, refinement,
+perturbations, independent conservation, a dimensional lift/load ledger and exact
+optical handoff. The user-reported cycle remains unreproduced; stable fixtures are
+not a captured user session or full physical hover qualification. The known 1%
+conversion thrust loss and 10%/60 kt failure remain open. Fixed hot full conversion
+is stable with physical N2 limiting and insufficient modeled lift at 37,000 lb.
+Native checks cover 90 targets including the approved socket-only rerun; 52 SDK
+built-artifact cases pass. App CI's one Engine-help failure passes its 30-test
+targeted rerun; production build passes. The completed full CI was not green;
+no device acceptance is claimed.
+
+The rotating-frame free-hover isolation in that record holds 20% clean fuel at
+5,000 ft ISA with normal FCS and .95567056 throttle. Its 60 s observation meets
+the predeclared engineering hover gates (altitude span 0.02395 ft), while mass
+and energy close independently. This is a declared numerical fixture, not the
+user's captured flight or real F135 qualification. Matching gravitational force
+alone is separately retained and does not supply the required corotation balance.

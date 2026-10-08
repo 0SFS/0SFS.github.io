@@ -1,0 +1,228 @@
+{
+  "schema": "0sfs-ci-vitest-runs/1",
+  "source": "The summary line Vitest printed for each `npm run ci` in 0sfs, from logs kept under build/, and Vitest's per-file duration cache after the last run. Times are local (UTC-5).",
+  "runs": [
+    {
+      "started": "2026-09-28 17:47:16",
+      "testFiles": 125,
+      "failedFiles": 0,
+      "tests": 1209,
+      "failedTests": 0,
+      "wallS": 10.35,
+      "summedOverWorkers": {
+        "transformS": 3.7,
+        "importS": 25.75,
+        "testsS": 30.76,
+        "environmentS": 14.35
+      }
+    },
+    {
+      "started": "2026-10-05 19:09:21",
+      "testFiles": 153,
+      "failedFiles": 0,
+      "tests": 1569,
+      "failedTests": 0,
+      "wallS": 17.08,
+      "summedOverWorkers": {
+        "transformS": 2.33,
+        "importS": 20.75,
+        "testsS": 33.95,
+        "environmentS": 11.06
+      }
+    },
+    {
+      "started": "2026-10-05 20:30:30",
+      "testFiles": 156,
+      "failedFiles": 0,
+      "tests": 1607,
+      "failedTests": 0,
+      "wallS": 18.12,
+      "summedOverWorkers": {
+        "transformS": 2.41,
+        "importS": 21.8,
+        "testsS": 36.86,
+        "environmentS": 11.69
+      }
+    },
+    {
+      "started": "2026-10-05 22:48:57",
+      "testFiles": 160,
+      "failedFiles": 0,
+      "tests": 1684,
+      "failedTests": 0,
+      "wallS": 21.54,
+      "summedOverWorkers": {
+        "transformS": 2.93,
+        "importS": 26.49,
+        "testsS": 43.3,
+        "environmentS": 13.97
+      }
+    },
+    {
+      "started": "2026-10-07 16:51:02",
+      "testFiles": 178,
+      "failedFiles": 0,
+      "tests": 1961,
+      "failedTests": 0,
+      "wallS": 25.59,
+      "summedOverWorkers": {
+        "transformS": 3.44,
+        "importS": 39.4,
+        "testsS": 52.12,
+        "environmentS": 13.39
+      }
+    },
+    {
+      "started": "2026-10-07 17:08:15",
+      "testFiles": 178,
+      "failedFiles": 0,
+      "tests": 1962,
+      "failedTests": 0,
+      "wallS": 26.98,
+      "summedOverWorkers": {
+        "transformS": 3.58,
+        "importS": 41.66,
+        "testsS": 54.72,
+        "environmentS": 14.16
+      }
+    },
+    {
+      "started": "2026-10-07 17:19:05",
+      "testFiles": 178,
+      "failedFiles": 0,
+      "tests": 1962,
+      "failedTests": 0,
+      "wallS": 26.43,
+      "summedOverWorkers": {
+        "transformS": 3.73,
+        "importS": 41.36,
+        "testsS": 53.14,
+        "environmentS": 13.63
+      }
+    },
+    {
+      "started": "2026-10-07 18:41:14",
+      "testFiles": 178,
+      "failedFiles": 0,
+      "tests": 1962,
+      "failedTests": 0,
+      "wallS": 27.2,
+      "summedOverWorkers": {
+        "transformS": 3.49,
+        "importS": 41.64,
+        "testsS": 55.54,
+        "environmentS": 13.99
+      }
+    },
+    {
+      "started": "2026-10-07 22:08:21",
+      "testFiles": 187,
+      "failedFiles": 0,
+      "tests": 2029,
+      "failedTests": 0,
+      "wallS": 29.11,
+      "summedOverWorkers": {
+        "transformS": 3.69,
+        "importS": 45.84,
+        "testsS": 58.25,
+        "environmentS": 15.4
+      }
+    },
+    {
+      "started": "2026-10-08 12:54:15",
+      "testFiles": 190,
+      "failedFiles": 1,
+      "tests": 2066,
+      "failedTests": 1,
+      "wallS": 98.26,
+      "summedOverWorkers": {
+        "transformS": 8.97,
+        "importS": 112.1,
+        "testsS": 281.41,
+        "environmentS": 38.78
+      },
+      "failure": "scripts/build-f135-engine.test.mjs passed Vitest's 5 s timeout"
+    },
+    {
+      "started": "2026-10-08 13:38:51",
+      "testFiles": 190,
+      "failedFiles": 0,
+      "tests": 2066,
+      "failedTests": 0,
+      "wallS": 55.71,
+      "summedOverWorkers": {
+        "transformS": 3.65,
+        "importS": 41.39,
+        "testsS": 117.6,
+        "environmentS": 14.71
+      }
+    }
+  ],
+  "lastRunPerFile": {
+    "files": 191,
+    "testsMs": 117737,
+    "engineFilesTestsMs": 79067,
+    "slowest": [
+      {
+        "file": "src/flight/jsbsim/f35b.integration.test.ts",
+        "testsMs": 35038
+      },
+      {
+        "file": "src/flight/jsbsim/f35bYaw.integration.test.ts",
+        "testsMs": 12245
+      },
+      {
+        "file": "src/flight/audio/f35bAudio.integration.test.ts",
+        "testsMs": 7587
+      },
+      {
+        "file": "src/flight/audio/f135ExhaustOnset.integration.test.ts",
+        "testsMs": 6104
+      },
+      {
+        "file": "src/flight/createFlightSimApp.test.ts",
+        "testsMs": 4756
+      },
+      {
+        "file": "src/flight/audio/cameraZoomAudio.integration.test.ts",
+        "testsMs": 4109
+      },
+      {
+        "file": "scripts/build-f135-engine.test.mjs",
+        "testsMs": 4076
+      },
+      {
+        "file": "src/flight/jsbsim/fuelTanks.integration.test.ts",
+        "testsMs": 3764
+      },
+      {
+        "file": "src/flight/jsbsim/engineControl.integration.test.ts",
+        "testsMs": 3373
+      },
+      {
+        "file": "src/flight/engineTestStand.integration.test.ts",
+        "testsMs": 3172
+      },
+      {
+        "file": "src/flight/physics/rolloutEngine.integration.test.ts",
+        "testsMs": 2849
+      },
+      {
+        "file": "src/flight/aircraft/createAircraftModel.test.ts",
+        "testsMs": 2510
+      },
+      {
+        "file": "src/flight/audio/createFlightAudio.test.ts",
+        "testsMs": 1719
+      },
+      {
+        "file": "src/flight/audio/highAudio.test.ts",
+        "testsMs": 1587
+      },
+      {
+        "file": "src/flight/jsbsim/f35bEngineModels.integration.test.ts",
+        "testsMs": 1503
+      }
+    ]
+  }
+}

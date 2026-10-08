@@ -12,11 +12,11 @@ const runRoot = newOutputDirectory("tests", "sdk-artifact");
 const digest = (data, algorithm = "sha256", encoding = "hex") => createHash(algorithm).update(data).digest(encoding);
 // Retained rollback tarballs keep the name they were published under, so the
 // fixture derives the name from the version the way the identity gate does.
-const POST_RENAME_VERSIONS = new Set(["1.2.4-fork.5", "1.2.4-fork.6", "1.2.4-fork.7", "1.2.4-fork.8", "1.2.4-fork.9", "1.2.4-fork.10", "1.2.4-fork.11", "1.2.4-fork.12", "1.2.4-fork.13", "1.2.4-fork.14", "1.2.4-fork.15", "1.2.4-fork.16", "1.2.4-fork.17", "1.2.4-fork.18", "1.2.4-fork.19", "1.2.4-fork.20"]);
+const POST_RENAME_VERSIONS = new Set(["1.2.4-fork.5", "1.2.4-fork.6", "1.2.4-fork.7", "1.2.4-fork.8", "1.2.4-fork.9", "1.2.4-fork.10", "1.2.4-fork.11", "1.2.4-fork.12", "1.2.4-fork.13", "1.2.4-fork.14", "1.2.4-fork.15", "1.2.4-fork.16", "1.2.4-fork.17", "1.2.4-fork.18", "1.2.4-fork.19", "1.2.4-fork.20", "1.2.4-fork.21"]);
 const nameFor = version => POST_RENAME_VERSIONS.has(version) ? "@felipegalind0/jsbsim" : "@felipegalind0/jsbsim-wasm";
 
 async function fixture({ schemaVersion = 2, mode = schemaVersion === 2 ? "in-tree" : "pinned", dirty = false,
-  version = schemaVersion === 2 ? "1.2.4-fork.20" : "1.2.4-fork.1", missingDeclaration = false } = {}) {
+  version = schemaVersion === 2 ? "1.2.4-fork.21" : "1.2.4-fork.1", missingDeclaration = false } = {}) {
   const pkgName = nameFor(version);
   const root = await mkdtemp(path.join(runRoot, "fixture-"));
   const source = path.join(root, "package");

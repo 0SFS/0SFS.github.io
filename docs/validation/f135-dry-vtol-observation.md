@@ -92,7 +92,10 @@ study does not fill those optical inputs.
 - The audited scene used hemispheric fill without a physical day/night sky
   solution. Global exposure and fill controls were absent before this follow-up;
   explicit controls are now implemented in FOSS Earth, their owning repository,
-  under **Renderer → Lighting and exposure**. Exposure compensation is −16…16 EV,
+  under **Renderer → Lighting and exposure** (moved on 2026-10-07, ids and values
+  kept, to the Sky tab, where a physical sky now lights the flight and exposure
+  compensation applies on top of its exposure:
+  [Sky](../../../foss-earth/docs/proposals/sky.md#migration)). Exposure compensation is −16…16 EV,
   default 0; it sets shared material exposure to `2 ** EV`. Ambient fill is a
   0…4 multiplier, default 1, preserving the existing fallback/simulation/Google
   light relationships. Both apply live and request a frame when visible state

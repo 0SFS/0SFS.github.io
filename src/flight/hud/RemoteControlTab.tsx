@@ -10,6 +10,8 @@ export interface RemoteControlTabProps {
   onUseAsRemote(): void;
   /** The Who flies section: how control passes between the phone and this computer. */
   sharing?: ReactNode;
+  /** The phone controller's own settings, which the phone also changes from its ⚙ sheet. */
+  phoneSettings?: ReactNode;
   /** The trackpad's A/B settings section; absent, the tab shows none. */
   cameraTuning?: ReactNode;
 }
@@ -25,7 +27,7 @@ function isPhoneLike(): boolean {
  * second far more often, so there that comes first and no QR is made until
  * asked for.
  */
-export function RemoteControlTab({ loadPhonePairing, onUseAsRemote, sharing, cameraTuning }: RemoteControlTabProps) {
+export function RemoteControlTab({ loadPhonePairing, onUseAsRemote, sharing, phoneSettings, cameraTuning }: RemoteControlTabProps) {
   const [phone] = useState(isPhoneLike);
   const [mount, setMount] = useState<MountPhonePairing | null>(null);
   const [failed, setFailed] = useState(false);
@@ -69,8 +71,9 @@ export function RemoteControlTab({ loadPhonePairing, onUseAsRemote, sharing, cam
     <button className="flight-panel__command" type="button" onClick={onUseAsRemote}>Switch to RC mode</button>
   </fieldset>;
   const who = sharing && <Fragment key="sharing">{sharing}</Fragment>;
+  const controller = phoneSettings && <Fragment key="phone">{phoneSettings}</Fragment>;
   const tuning = cameraTuning && <Fragment key="tuning">{cameraTuning}</Fragment>;
   return <div className="flight-panel__content">
-    {phone ? [thisDevice, pairing, who, tuning] : [pairing, who, tuning, thisDevice]}
+    {phone ? [thisDevice, pairing, who, controller, tuning] : [pairing, who, controller, tuning, thisDevice]}
   </div>;
 }

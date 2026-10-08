@@ -1,0 +1,172 @@
+{
+  "schema": "0sfs-ci-jsbsim-fixture/1",
+  "measuredAt": "2026-10-08T18:56:18.188Z",
+  "commit": "3334758682d9",
+  "workingTreeChanged": true,
+  "sdkVersion": "1.2.4-fork.20",
+  "node": "v26.9.0",
+  "cpu": "Apple M5",
+  "cores": 10,
+  "loadAverageAtStart": [
+    2.509765625,
+    2.38671875,
+    2.82861328125
+  ],
+  "memoryPressureLevelAtStart": "1",
+  "physicsHz": 120,
+  "cases": {
+    "F-35B, coupled engine plant": {
+      "fixtures": [
+        {
+          "createMs": 14.246,
+          "dataMs": 1.198,
+          "bootstrapMs": 342.621
+        },
+        {
+          "createMs": 5.208,
+          "dataMs": 1.353,
+          "bootstrapMs": 318.24
+        },
+        {
+          "createMs": 4.471,
+          "dataMs": 0.528,
+          "bootstrapMs": 312.649
+        },
+        {
+          "createMs": 6.626,
+          "dataMs": 0.602,
+          "bootstrapMs": 319.861
+        }
+      ],
+      "bootstrapEngineStoppedMs": 14.359,
+      "startInBootstrapMs": 303.881,
+      "startAfterStoppedRunIcMs": 10.46,
+      "startWhileRunningMs": 2.625,
+      "endOfStart": {
+        "afterBootstrap": {
+          "propulsion/engine[0]/thrust-lbs": 8952.310308086024,
+          "propulsion/engine[0]/n1": 64.3508378431409,
+          "propulsion/engine[0]/n2": 80.72619523692555
+        },
+        "afterStoppedRunIc": {
+          "propulsion/engine[0]/thrust-lbs": 8952.310308540149,
+          "propulsion/engine[0]/n1": 64.3508378431409,
+          "propulsion/engine[0]/n2": 80.72619523711427
+        },
+        "largestRelativeDifference": 5.072715767015699e-11
+      },
+      "steps": {
+        "count": 1200,
+        "bareMs": 105.784,
+        "perStepUs": 88.15,
+        "harnessMs": 120.79,
+        "batchedMs": 95.723,
+        "startInBootstrapInSteps": 3447
+      }
+    },
+    "F-35B, empirical engine": {
+      "fixtures": [
+        {
+          "createMs": 3.776,
+          "dataMs": 0.59,
+          "bootstrapMs": 12.263
+        },
+        {
+          "createMs": 7.44,
+          "dataMs": 0.731,
+          "bootstrapMs": 11.724
+        },
+        {
+          "createMs": 5.524,
+          "dataMs": 0.577,
+          "bootstrapMs": 11.006
+        },
+        {
+          "createMs": 3.607,
+          "dataMs": 0.529,
+          "bootstrapMs": 11.148
+        }
+      ],
+      "bootstrapEngineStoppedMs": 11.321,
+      "startInBootstrapMs": -0.173,
+      "startAfterStoppedRunIcMs": 0.471,
+      "startWhileRunningMs": 0.462,
+      "endOfStart": {
+        "afterBootstrap": {
+          "propulsion/engine[0]/thrust-lbs": 5173.113848010845,
+          "propulsion/engine[0]/n1": 63.6,
+          "propulsion/engine[0]/n2": 79.2
+        },
+        "afterStoppedRunIc": {
+          "propulsion/engine[0]/thrust-lbs": 5173.113848010845,
+          "propulsion/engine[0]/n1": 63.6,
+          "propulsion/engine[0]/n2": 79.2
+        },
+        "largestRelativeDifference": 0
+      },
+      "steps": {
+        "count": 1200,
+        "bareMs": 29.596,
+        "perStepUs": 24.66,
+        "harnessMs": 48.741,
+        "batchedMs": 29.223,
+        "startInBootstrapInSteps": -7
+      }
+    },
+    "Cessna 172": {
+      "fixtures": [
+        {
+          "createMs": 3.592,
+          "dataMs": 0.384,
+          "bootstrapMs": 6.378
+        },
+        {
+          "createMs": 7.722,
+          "dataMs": 0.363,
+          "bootstrapMs": 5.141
+        },
+        {
+          "createMs": 3.462,
+          "dataMs": 0.322,
+          "bootstrapMs": 4.965
+        },
+        {
+          "createMs": 3.454,
+          "dataMs": 0.34,
+          "bootstrapMs": 5.207
+        }
+      ],
+      "bootstrapEngineStoppedMs": 5.21,
+      "startInBootstrapMs": -0.069,
+      "startAfterStoppedRunIcMs": 0.215,
+      "startWhileRunningMs": 0.192,
+      "endOfStart": {
+        "afterBootstrap": {
+          "propulsion/engine[0]/thrust-lbs": 346.00343827589813
+        },
+        "afterStoppedRunIc": {
+          "propulsion/engine[0]/thrust-lbs": 346.0034382310391
+        },
+        "largestRelativeDifference": 1.2964902140589774e-10
+      },
+      "steps": {
+        "count": 1200,
+        "bareMs": 14.921,
+        "perStepUs": 12.43,
+        "harnessMs": 33.296,
+        "batchedMs": 14.189,
+        "startInBootstrapInSteps": -6
+      }
+    }
+  },
+  "perCallUs": {
+    "getPropertyValueByName": 0.589,
+    "expectToBe": 2.712
+  },
+  "loadAverageAtEnd": [
+    2.509765625,
+    2.38671875,
+    2.82861328125
+  ],
+  "memoryPressureLevelAtEnd": "1"
+}

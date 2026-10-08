@@ -1,0 +1,23 @@
+
+> @felipegalind0/jsbsim@1.2.4-fork.21 pack:build
+> node scripts/pack-build.mjs --release
+
+file:///Users/felg/gh/Felipegalind0/jsbsim/wasm/scripts/pack-build.mjs:33
+if (result.status !== 0) throw new Error(result.stderr);
+                               ^
+
+Error: npm error code EPERM
+npm error syscall open
+npm error path /Users/felg/.npm/_cacache/tmp/***
+npm error errno -1
+npm error
+npm error Your cache folder contains root-owned files, due to a bug in previous versions of npm which has since been addressed.
+npm error
+npm error To permanently fix this problem, please run:
+npm error   sudo chown -R 501:20 "/Users/felg/.npm"
+npm error Log files were not written due to an error writing to the directory: /Users/felg/.npm/_logs
+npm error You can rerun the command with `--loglevel=verbose` to see the logs in your terminal
+
+    at file:///Users/felg/gh/Felipegalind0/jsbsim/wasm/scripts/pack-build.mjs:33:32
+
+Node.js v26.8.2

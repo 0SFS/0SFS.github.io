@@ -130,7 +130,7 @@ Use **one PeerJS peer connection with two data channels**:
 
 | Channel | Delivery | Content |
 | --- | --- | --- |
-| PeerJS `flight-session-v1` | Reliable, ordered | Hello, authentication, channel setup, ownership, pause/view actions, acknowledgements. |
+| PeerJS `flight-session-v1` | Reliable, ordered | Hello, authentication, channel setup, ownership, pause/view actions, acknowledgements, the phone controller's settings. |
 | Native `flight-controls-v1` | Unordered, zero retransmissions | Full control snapshots, host freshness heartbeat, telemetry, latency probes. |
 
 Open the PeerJS channel with `reliable: true` and `serialization: "json"`. PeerJS handles offer/answer and candidate exchange through its cloud service.
@@ -221,6 +221,8 @@ These timing values are proposed tuning defaults, not measured guarantees.
 Pointer handlers update mutable current state independently of React rendering. Send the latest complete snapshot on the scheduler; do not integrate throttle from packet rate. Native send requires an open channel. If `bufferedAmount + frameBytes` would exceed 2 KiB, retain only the newest unsent state and send it when the buffer drains. Never replay a history of stick motion or use PeerJS's send queue for the high-rate stream.
 
 Periodic complete frames repair a lost release packet. Prioritize host heartbeats over optional telemetry when coalescing outbound traffic. Throttle, flaps, trim, and brake each have a single canonical representation in the snapshot; actions must not concurrently write them.
+
+The phone controller's own settings — where its chip grid sits, what its yaw slider does on release, how long the return takes, and haptics — are kept on the desktop with its other settings, so one export holds the whole setup. They travel as `settings` on the reliable channel, both ways, additive on v1: an older peer ignores the message and each end keeps its own. Once paired, the phone sends its own with `initial: true`, and the desktop takes them only where it still has its defaults, so an imported setup reaches the phone and a phone's earlier choices are not lost. The phone sends them again after each change its pilot makes, and the desktop answers each with what it then holds, and sends them again whenever they change there; it never sends them to a phone that has not sent its own. `rev` counts the phone's sends; the answer carries the newest the desktop has taken, and the phone ignores an answer older than its own latest change, so a slider being dragged is not pulled back by an answer in flight. Settings are not authority: they need no lease and are not bound to an epoch.
 
 Reliable actions use unique IDs, explicit states such as `setPaused(true)` and `setViewMode("third")`, and desktop acknowledgements. Deduplicate within an epoch and bound the cache. Duplicate requests return the existing result. Do not automatically replay actions after epoch/session change. Cross-channel ordering is unspecified, so authority changes require the acknowledged handoff below. A delayed Resume must fail its session/epoch/freshness checks.
 

@@ -237,6 +237,21 @@ describe("phone protocol parsing", () => {
     for (const starter of [0, true, "1", 2, null]) expect(parseMessage({ ...frame, starter })).toEqual(frame);
   });
 
+  it("carries the phone controller's settings both ways, bounded, with no epoch to match", () => {
+    const settings = { grid: "top", yawRelease: "hold", yawReturnMs: 450, haptics: true };
+    const message = { v: 1, type: "settings", session: "s", epoch: 0, settings, rev: 3 };
+    expect(parseMessage(message)).toEqual(message);
+    expect(parseMessage({ ...message, initial: true })).toEqual({ ...message, initial: true });
+    // Only `true` means initial; anything else is an ordinary change.
+    expect(parseMessage({ ...message, initial: "yes" })).toEqual(message);
+    for (const bad of [
+      { ...settings, grid: "left" }, { ...settings, yawRelease: "spring" }, { ...settings, yawReturnMs: 1501 },
+      { ...settings, yawReturnMs: -1 }, { ...settings, yawReturnMs: Number.NaN }, { ...settings, haptics: "on" },
+      { grid: "top", yawRelease: "hold", yawReturnMs: 0 },
+    ]) expect(parseMessage({ ...message, settings: bad })).toBeNull();
+    for (const rev of [-1, 1.5, "3", undefined]) expect(parseMessage({ ...message, rev })).toBeNull();
+  });
+
   it("enforces UTF-8 bytes, including the exact 2 KiB boundary", () => {
     const base = JSON.stringify({ ...frame, padding: "" });
     const remaining = MAX_MESSAGE_BYTES - new TextEncoder().encode(base).byteLength;

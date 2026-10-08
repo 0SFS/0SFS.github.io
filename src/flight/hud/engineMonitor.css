@@ -326,3 +326,33 @@
 
 .flight-engine__plot-times { opacity: 0.65; }
 .flight-engine__button:disabled { opacity: 0.45; cursor: default; }
+
+/* One flow: open family markers are paragraph breaks, collapsed ones are words. */
+.flight-engine__live-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.65em;
+  max-width: 100%;
+}
+.flight-engine__family { width: max-content; max-width: 100%; }
+.flight-engine__family--open { flex-basis: 100%; text-align: left; border: 0; background: transparent; }
+.flight-engine__compact { display: inline-flex; align-items: baseline; gap: 0.25em; max-width: 100%; }
+.flight-engine__compact > button { width: max-content; max-width: 100%; }
+.flight-engine__live-grid > .flight-engine__plot { flex: 0 1 25em; min-width: 0; }
+.flight-engine__trace { margin-top: 0.45em; }
+.flight-engine__help { display: inline-flex; max-width: 100%; vertical-align: baseline; flex: none; }
+.flight-engine__status-row,
+.flight-engine__trace-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.4em; }
+.flight-engine__state-row { margin-bottom: 0.25em; }
+.flight-engine__state-row .flight-engine__detail { margin: 0; font-weight: 600; }
+.flight-engine__trace-swatch { width: 1.6em; border-top: 2px solid; align-self: center; flex: none; }
+.flight-engine__plot-range { opacity: 0.7; margin: 0.15em 0 0.35em; }
+.flight-engine__plot-options { margin-top: 0.35em; }
+.flight-engine__plot-options > summary { cursor: pointer; width: max-content; max-width: 100%; opacity: 0.7; }
+.flight-engine__plot-options select { width: max-content; max-width: 100%; }
+.flight-engine__plot-axis { font-variant-numeric: tabular-nums; margin: 0; }
+.flight-engine__validity { font-size: 0.9em; opacity: 0.75; }
+.flight-engine__details [hidden] { display: none; }
+.flight-engine__live-grid .flight-engine__label { white-space: normal; overflow-wrap: anywhere; }
+.flight-engine__plot-envelope { width: 22em; max-width: 100%; }

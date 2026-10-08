@@ -21,6 +21,8 @@ export interface EngineMonitorDefinition {
   rotorBlades?: EngineRotorBladeCounts;
   /** Configured piston maxrpm from its native engine XML; not a governor or physical clamp. */
   maxRpm?: number;
+  /** Profile metadata naming the first native solid aliased by the legacy primary thermal getters. */
+  primaryThermalSolid?: string;
 }
 
 const TURBINE_ONLY_PROPERTIES: ReadonlySet<string> = new Set([

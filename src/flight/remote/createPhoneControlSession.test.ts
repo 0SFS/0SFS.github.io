@@ -1,9 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPhoneControlSession } from './createPhoneControlSession'
 import { DEFAULT_PHONE_CAMERA_TUNING } from './phoneCameraTuning'
+import { DEFAULT_PHONE_CONTROLLER_SETTINGS } from './phoneControllerSettings'
 import { DEFAULT_CONTROL_SHARING, type ControlSharing } from './controlSharing'
 import { parsePairingUrl } from '../../remote/pairing'
-import { PROTOCOL_MISMATCH_MESSAGE, type AircraftStatus, type ControlSurfaceState, type RemoteMessage } from '../../remote/protocol'
+import { PROTOCOL_MISMATCH_MESSAGE, type AircraftStatus, type ControlSurfaceState, type PhoneControllerSettings, type RemoteMessage } from '../../remote/protocol'
 import type { createPeerEndpoint, SessionTransport } from '../../remote/peerTransport'
 
 function deferred<T>() {
@@ -126,7 +127,7 @@ afterEach(() => { for (const session of allSessions.splice(0)) session.destroy()
 
 describe('desktop phone control session', () => {
   it('draws the phone camera through the A/B settings, read live', async () => {
-    const tuning = { ...DEFAULT_PHONE_CAMERA_TUNING }
+    const tuning = { ...DEFAULT_PHONE_CAMERA_TUNING, send: 'timer' as const, source: 'delta' as const, present: 'arrival' as const }
     const h = setup({ getCameraTuning: () => tuning })
     const transport = await h.pair()
     const handoff = h.grant(transport)
@@ -151,13 +152,64 @@ describe('desktop phone control session', () => {
     expect(transport.last('heartbeat')).toMatchObject({ controlSend: 'batch' })
   })
 
+  it("keeps the phone's own settings here, answers each change, and tells only a phone that sent its own", async () => {
+    let held: PhoneControllerSettings = { ...DEFAULT_PHONE_CONTROLLER_SETTINGS, yawReturnMs: 300 }
+    const set = vi.fn((settings: PhoneControllerSettings) => { held = { ...settings } })
+    const h = setup({ phoneSettings: { get: () => ({ ...held }), set } })
+    const transport = await h.pair()
+    const sent = () => transport.reliable.filter(message => message.type === 'settings')
+    const welcome = transport.last('welcome')
+    const from = (settings: PhoneControllerSettings, rev: number, extra: object = {}, epoch = welcome.epoch) =>
+      transport.receive({ v: 1, type: 'settings', session: welcome.session, epoch, settings, rev, ...extra })
+    // A phone that predates this, or has not spoken yet, is never sent them.
+    h.session.syncPhoneSettings()
+    expect(sent()).toEqual([])
+
+    // Its first: kept only where this computer still has the default.
+    from({ grid: 'top', yawRelease: 'hold', yawReturnMs: 500, haptics: false }, 1, { initial: true })
+    const merged = { grid: 'top', yawRelease: 'hold', yawReturnMs: 300, haptics: false }
+    expect(set).toHaveBeenLastCalledWith(merged)
+    expect(transport.last('settings')).toMatchObject({ settings: merged, rev: 1 })
+
+    // A change on the phone is taken whole, and answered with its own count,
+    // whatever epoch the phone had heard of: control changing hands does not lose it.
+    h.grant(transport)
+    from({ ...merged, grid: 'bottom' }, 2)
+    expect(held.grid).toBe('bottom')
+    expect(transport.last('settings')).toMatchObject({ settings: { grid: 'bottom' }, rev: 2 })
+    // An older or repeated one is not.
+    from({ ...merged, grid: 'top' }, 2)
+    from({ ...merged, grid: 'top' }, 1)
+    expect(held.grid).toBe('bottom')
+    expect(set).toHaveBeenCalledTimes(2)
+
+    // A change here reaches the phone once, still answering the phone's latest.
+    held = { ...held, haptics: true }
+    const before = sent().length
+    h.session.syncPhoneSettings()
+    h.session.syncPhoneSettings()
+    expect(sent().length).toBe(before + 1)
+    expect(transport.last('settings')).toMatchObject({ settings: { haptics: true }, rev: 2 })
+  })
+
+  it("leaves a phone with its own settings when this computer keeps none", async () => {
+    const h = setup()
+    const transport = await h.pair()
+    const welcome = transport.last('welcome')
+    transport.receive({ v: 1, type: 'settings', session: welcome.session, epoch: welcome.epoch, settings: DEFAULT_PHONE_CONTROLLER_SETTINGS, rev: 1, initial: true })
+    h.session.syncPhoneSettings()
+    expect(transport.reliable.some(message => message.type === 'settings')).toBe(false)
+    expect(transport.close).not.toHaveBeenCalled()
+  })
+
   it('reports what became of every control frame to an opt-in trace, and only then asks the phone for timings', async () => {
     const plain = setup()
     const plainTransport = await plain.pair()
     expect('trace' in plainTransport.last('heartbeat')).toBe(false)
 
     const controlFrame = vi.fn()
-    const h = setup({ trace: { controlFrame } })
+    // Drawn on arrival, so what a frame carried is drawn whole at once.
+    const h = setup({ trace: { controlFrame }, getCameraTuning: () => ({ ...DEFAULT_PHONE_CAMERA_TUNING, present: 'arrival' }) })
     const transport = await h.pair()
     expect(transport.last('heartbeat')).toMatchObject({ trace: 1 })
     const handoff = h.grant(transport)

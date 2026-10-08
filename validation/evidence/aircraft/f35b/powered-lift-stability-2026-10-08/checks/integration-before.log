@@ -1,0 +1,34 @@
+
+ RUN  v4.1.6 /Users/felg/gh/0sfs
+
+(node:81173) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/flight/jsbsim/f35b.powered-lift.integration.test.ts (4 tests | 4 failed) 7678ms
+     × settles '.98 initialized' and holds its per-step envelope for sixty seconds 1808ms
+     × settles '.99 initialized' and holds its per-step envelope for sixty seconds 1820ms
+     × settles '1.0 initialized' and holds its per-step envelope for sixty seconds 1872ms
+     × settles '1.0 dynamically entered from idle' and holds its per-step envelope for sixty seconds 2177ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/flight/jsbsim/f35b.powered-lift.integration.test.ts > F135 sustained powered lift at the actual full lever demand > settles '.98 initialized' and holds its per-step envelope for sixty seconds
+ FAIL  src/flight/jsbsim/f35b.powered-lift.integration.test.ts > F135 sustained powered lift at the actual full lever demand > settles '.99 initialized' and holds its per-step envelope for sixty seconds
+ FAIL  src/flight/jsbsim/f35b.powered-lift.integration.test.ts > F135 sustained powered lift at the actual full lever demand > settles '1.0 initialized' and holds its per-step envelope for sixty seconds
+ FAIL  src/flight/jsbsim/f35b.powered-lift.integration.test.ts > F135 sustained powered lift at the actual full lever demand > settles '1.0 dynamically entered from idle' and holds its per-step envelope for sixty seconds
+AssertionError: expected 0 to be greater than 0
+ ❯ src/flight/jsbsim/f35b.powered-lift.integration.test.ts:75:59
+     73|       expect([0, 1].map(i => get(`propulsion/tank[${i}]/contents-lbs`)…
+     74|       // Frozen bookkeeping must not hide actual engine consumption fr…
+     75|       expect(get("propulsion/engine/fuel-flow-rate-pps")).toBeGreaterT…
+       |                                                           ^
+     76|       expect(get("propulsion/engine/fuel-flow-rate-pps") * .45359237 /…
+     77|         .toBeCloseTo(get(P + "ledger/fuel-in-kg"), 10);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  16:38:33
+   Duration  8.91s (transform 192ms, setup 0ms, import 770ms, tests 7.68s, environment 344ms)
+

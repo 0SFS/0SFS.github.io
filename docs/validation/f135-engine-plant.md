@@ -192,3 +192,36 @@ exhaust optics consume is uncertain by at least ±60 K.
 - Ten-percent conversion at 60 kt was not stable in a calibration probe;
   the integration tests cover 25, 50 and 75 %.
 - No wall-clock timing, display, GPU or sound-device check was run.
+
+## Powered-lift follow-up, 2026-10-08
+
+The [sustained stability and lift record](f135-powered-lift-stability-2026-10-08.md)
+adds explicit 80 s trajectories, .98/.99/1 commands, both algorithms, refinement,
+perturbations, full raw force/mass/energy receipts and an optical handoff. The
+reported 92–107% full-conversion cycle remains unreproduced; no captured user
+settings were available. Stable assumed fixtures do not close that report.
+
+Fork.21 fixes native frozen/trim PPS publication and fallback status accuracy,
+not physical schedules. At clean 37,000 lb and full command, applied lift is
+42,038.74 lbf sea-level ISA, 36,304.43 at 5,000 ft ISA and 32,775.13 at sea-level
+ISA+30 K. Actual native gravity is accounted once. The stable hot case has N1
+91.7483% and N2 at the authored 107% physical limit; this demonstrates a modeled
+limiter-dependent lift deficit, not F135 measured hot/high capability. The
+5,000-ft FCS split 1.030875 is fixed by the authored CG/lever arms and remains
+distinct from the 1.194 rating calibration.
+
+Internal capacity is 13,100 lb; attached tanks raise the percentage denominator
+to 19,082 lb and add 600 lb dry stores. Fuel percentages therefore cannot substitute
+for tank masses, payload/CG and atmosphere in hover comparisons. The partial 1%
+loss, 10%/60 kt failure, .07 bypass surrogate, inlet orientation and uncalibrated
+FADEC/thermal parameters remain open. Exact dry-source replay is valid after
+the PPS correction, but transient liner heating and the adapter's incomplete
+station/composition boundary still prevent an accepted steady optical/physical
+baseline for the uncaptured flight. No glow gain was changed.
+
+The rotating-frame free-hover isolation in that record holds 20% clean fuel at
+5,000 ft ISA with normal FCS and .95567056 throttle. Its 60 s observation meets
+the predeclared engineering hover gates (altitude span 0.02395 ft), while mass
+and energy close independently. This is a declared numerical fixture, not the
+user's captured flight or real F135 qualification. Matching gravitational force
+alone is separately retained and does not supply the required corotation balance.

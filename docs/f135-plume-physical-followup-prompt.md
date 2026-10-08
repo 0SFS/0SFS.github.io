@@ -1,5 +1,19 @@
 # Follow-up: spatial F135 exhaust emission and powered-lift visibility
 
+**Latest lighting test, 2026-10-07:** ambient fill **0.02** and exposure **+8.8 EV**
+reveal the red dry exhaust the user sought, but whiten the aircraft and ground.
+No exhaust runtime change preceded this test. Read the [new observation](validation/f135-dry-vtol-mechanism.md#latest-lighting-observation-2026-10-07)
+and [FOSS Earth Sky implementation prompt](../../foss-earth/docs/sky-lighting-implementation-prompt.md).
+Establish meaningful environmental lighting/display conditions before retuning
+dry emission; keep its physical validity and AB timing as separate hypotheses.
+Deployment and existing GPU/server restrictions remain held.
+
+**Earlier local test, 2026-10-07:** the user rejects the current absence of dry
+VTOL luminous exhaust and reports AB light substantially lagging its sound,
+especially from cold. Read the [post-test causal audit](validation/f135-dry-vtol-mechanism.md#local-test-rejection-and-causal-audit-2026-10-07)
+before further changes. Deployment is held after the user's time out; the
+earlier improvement report below is historical, not current visual acceptance.
+
 Latest checkpoint: [afterburner response and rendering work](validation/f135-exhaust-response.md).
 The subsequent [dry powered-lift mechanism investigation](validation/f135-dry-vtol-mechanism.md)
 retains frame diagnostics, observer bounds and the non-gray particle correction.

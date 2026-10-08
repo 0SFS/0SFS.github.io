@@ -7,8 +7,22 @@ bindings, native lifetime, generic diagnostics and SDK build tooling belong in
 `wasm/`. 0SFS owns aircraft data, initial conditions, controls and scheduling.
 FOSS Earth remains the separate terrain/rendering dependency.
 
-**Installed adoption, 2026-10-08:** clean in-tree package
-`1.2.4-fork.20` is installed and locked at `ea6956b4`. It adds JSBSim's
+**Installed follow-up, 2026-10-08:** clean in-tree package
+`1.2.4-fork.21` is installed and locked at `34eeae66`. It corrects plant
+fuel-flow PPS publication with frozen/trim fuel, separates integration and
+end-state publication diagnostics, and exposes accepted raw mass terms and
+commanded throat area. It preserves the plant equations, controller, F135/FCS
+data, retry budgets and state schema. The user-reported sustained VTOL cycle
+remains unreproduced; this adoption is not a claimed oscillation correction.
+The [adoption receipt](../validation/evidence/jsbsim/adoption/fork21/adoption.json)
+retains source/artifact identities and successful and failed checks. The
+[powered-lift record](validation/f135-powered-lift-stability-2026-10-08.md)
+qualifies the declared fixtures and their force/weight limits. SDK-only
+[fork.20 rollback declarations](../validation/evidence/jsbsim/rollback/fork20/README.md)
+are retained; XML data and saved-state schema did not change.
+
+**Prior adoption, 2026-10-08:** clean in-tree package
+`1.2.4-fork.20` was installed and locked at `ea6956b4`. It adds JSBSim's
 optional coupled turbine plant (`<plant>` inside `<turbine_engine>`; contract in
 JSBSim `doc/turbine-plant-model.md`). It models fuel, combustion, the matched
 gas path, shafts, nozzle, metal temperatures and a shaft-driven lift system in

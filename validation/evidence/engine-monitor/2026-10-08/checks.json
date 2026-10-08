@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-08",
+  "owner": "0sfs",
+  "scope": "Engine tab registry, presentation, persistence and bounded recording",
+  "typecheck": "passed",
+  "lint": "passed",
+  "focused_engine_tests": "passed in final CI; targeted model and DOM checks also passed",
+  "related": {
+    "passed": 844,
+    "failed": 4,
+    "failure_file": "src/flight/jsbsim/f35b.powered-lift.integration.test.ts"
+  },
+  "ci": {
+    "runs": 1,
+    "test_files_passed": 194,
+    "test_files_failed": 1,
+    "tests_passed": 2099,
+    "tests_expected_failure": 1,
+    "tests_failed": 4,
+    "build_skipped_after_tests": true
+  },
+  "isolated_failure_check": {
+    "tests_failed": 4,
+    "file": "src/flight/jsbsim/f35b.powered-lift.integration.test.ts",
+    "assertion": "line 75: fuel-flow-rate-pps expected positive while fuel bookkeeping is frozen; observed 0",
+    "scope_note": "Concurrent powered-lift test; no physics, engine data or SDK changes made by this UI task"
+  },
+  "standalone_production_build": "passed, including typecheck and installed/emitted artifact verification",
+  "recorder_numeric_payload_bytes_per_slot": 17,
+  "unqualified": [
+    "visual wrapping and appearance",
+    "browser gesture behavior",
+    "GPU behavior",
+    "timing and device performance"
+  ],
+  "servers_or_browser_runs_started": false,
+  "help_tooltip_followup": {
+    "date": "2026-10-08",
+    "scope": "Compact Engine presentation, shared click help, closed Plot options and help disposal on collapse/detach",
+    "typecheck": "passed",
+    "lint": "passed",
+    "initial_related": {
+      "tests_passed": 156,
+      "tests_failed": 2,
+      "failure_file": "src/flight/hud/engineMonitor.test.ts",
+      "resolution": "Updated old label.title assertions to click help and kept the shaft-help test reader identity stable"
+    },
+    "final_focused_engine_tests": {
+      "test_files_passed": 2,
+      "tests_passed": 43,
+      "tests_failed": 0
+    },
+    "ci": {
+      "runs": 1,
+      "test_files_passed": 195,
+      "test_files_failed": 0,
+      "tests_passed": 2111,
+      "tests_expected_failure": 1,
+      "tests_failed": 0,
+      "max_workers": "50%",
+      "build": "passed, including installed/emitted artifact verification"
+    },
+    "foss_earth": {
+      "scope": "Shared createHelpTooltip and parameter-control integration",
+      "typecheck": "passed",
+      "lint": "passed",
+      "initial_related": {
+        "tests_passed": 88,
+        "tests_failed": 1,
+        "resolution": "Updated the old disposal expectation for removal of the help wrapper"
+      },
+      "final_parameter_section_tests_passed": 18,
+      "final_help_tooltip_tests_passed": 5,
+      "ci": {
+        "runs": 1,
+        "test_files_passed": 160,
+        "tests_passed": 1446,
+        "tests_failed": 0,
+        "build": "passed",
+        "worker_limit_note": "The requested --maxWorkers=50% suffix was forwarded to npm build rather than Vitest, so this final test run was uncapped; no timing qualification is claimed"
+      }
+    },
+    "umn_globe_consumer": {
+      "typecheck": "passed",
+      "build": "passed"
+    },
+    "servers_or_browser_runs_started": false,
+    "visual_and_performance_qualification": "Not performed; the earlier unqualified appearance, gestures, GPU and timing categories remain unqualified"
+  }
+}

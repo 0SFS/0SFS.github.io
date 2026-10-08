@@ -3,6 +3,7 @@ import { AIRCRAFT_FAMILIES, AIRCRAFT_LOD_IDS } from "../aircraft/aircraftCatalog
 import { AIRCRAFT_IDS } from "../aircraft/aircraftIds";
 import { DEFAULT_ENGINE_GAS_AXIAL_SAMPLES, DEFAULT_ENGINE_GAS_RADIAL_SAMPLES } from "../aircraft/engineGasOptics";
 import { DEFAULT_MAX_PATTERN_STEP } from "../hud/engineSpoolMotion";
+import { MAX_YAW_RETURN_MS } from "../../remote/protocol";
 import {
   DEFAULT_GROUND_INTERACTION_SETTINGS,
   GROUND_CHOICE_LABELS,
@@ -47,6 +48,7 @@ const CAMERA = { tab: "aircraft", section: "camera" } as const;
 const START = { tab: "aircraft", section: "start" } as const;
 const REMOTE_CONTROL = { tab: "remote", section: "control" } as const;
 const PHONE_CAMERA = { tab: "remote", section: "camera" } as const;
+const PHONE_CONTROLLER = { tab: "remote", section: "phone" } as const;
 const SOUND = { tab: "sound", section: "sound" } as const;
 const AFTERBURNER = { tab: "exhaust", section: "afterburner" } as const;
 const ENGINE = { tab: "engine", section: "engine" } as const;
@@ -64,6 +66,7 @@ const KEYBOARD = { tab: "controls", section: "keyboard" } as const;
 const ORBIT = { tab: "controls", section: "orbit" } as const;
 const FEEDBACK = { tab: "controls", section: "feedback" } as const;
 const STOVL = { tab: "controls", section: "stovl" } as const;
+const LIGHTS = { tab: "aircraft", section: "lights" } as const;
 const G_INDICATOR = { tab: "gforces", section: "indicator" } as const;
 const G_VISION = { tab: "gforces", section: "vision" } as const;
 const G_PASS_OUT = { tab: "gforces", section: "pass-out" } as const;
@@ -80,6 +83,7 @@ export const FLIGHT_SECTION_TITLES: readonly (readonly [tab: string, section: st
   ["aircraft", "camera", "Camera"],
   ["aircraft", "start", "Start"],
   ["remote", "control", "Who flies"],
+  ["remote", "phone", "Phone controller"],
   ["remote", "camera", "Phone camera trackpad"],
   ["sound", "sound", "Sound"],
   ["engine", "engine", "Engine"],
@@ -89,6 +93,7 @@ export const FLIGHT_SECTION_TITLES: readonly (readonly [tab: string, section: st
   ["aircraft", "assists", "Assists"],
   ["aircraft", "flight-controls", "Flight controls"],
   ["aircraft", "ground", "Ground handling"],
+  ["aircraft", "lights", "Lights"],
   ["gforces", "indicator", "Indicator"],
   ["gforces", "vision", "Vision"],
   ["gforces", "pass-out", "Passing out"],
@@ -316,6 +321,64 @@ export const OSFS_PARAMETERS = [
     home: main(EXTERNAL_TANKS), appliesLive: true, source: "src/flight/aircraft/createExternalTankVisuals.ts",
   },
 
+  // Aircraft → Lights: navigation, anti-collision, landing and taxi lights.
+  {
+    id: "osfs.lights.navigation",
+    label: "Navigation lights",
+    description: "Red on the left wingtip, green on the right and white at the tail, each in its own sector at the intensities 14 CFR 25.1389 to 25.1395 require: a glare at night, a faint dot by day, as they are.",
+    unit: "none", kind: "boolean", default: true,
+    defaultReason: "An aircraft shows its position lights from sunset to sunrise, and many keep them on by day.",
+    home: main(LIGHTS), appliesLive: true, source: "src/flight/aircraft/aircraftLights.ts",
+  },
+  {
+    id: "osfs.lights.antiCollision",
+    label: "Anti-collision lights",
+    description: "White wingtip strobes and red beacons, flashing at 50 and 45 a minute with the 400 cd effective intensity 14 CFR 25.1401 requires. While they are on, each flash asks for a frame at its start and end.",
+    unit: "none", kind: "boolean", default: true,
+    defaultReason: "On whenever an engine runs.",
+    home: main(LIGHTS), appliesLive: true, source: "src/flight/aircraft/aircraftLights.ts",
+  },
+  {
+    id: "osfs.lights.landing",
+    label: "Landing and taxi lights",
+    description: "The landing lamp's narrow 100,000 cd beam and the taxi lamp's wide 30,000 cd one, pointed a few degrees below the nose; on a gear leg, lit only with the gear down.",
+    unit: "none", kind: "boolean", default: true,
+    defaultReason: "On for take-off and landing, which is where a flight begins.",
+    home: main(LIGHTS), appliesLive: true, source: "src/flight/aircraft/aircraftLights.ts",
+  },
+  {
+    id: "osfs.lights.groundLight",
+    label: "Beams on the ground",
+    description: "Whether the landing and taxi beams light the map's ground, by the inverse square of the distance and the beam's edge. Each lit beam costs every pixel of ground a few operations; off, the lamps still glare.",
+    unit: "none", kind: "boolean", default: true,
+    defaultReason: "A runway at night is seen by the aircraft's own beams.",
+    home: main(LIGHTS), appliesLive: true, source: "src/flight/aircraft/createAircraftLights.ts",
+  },
+  {
+    id: "osfs.lights.sizePx",
+    label: "Light glare size",
+    description: "The square each light's light is spread over, px across: a sharp core and a faint glare around it. A light's brightness is the same at any size; a larger square leaves room for a bright light's glare.",
+    unit: "px", kind: "number", step: 1, bounds: within(4, 96), default: 32,
+    defaultReason: "Room for the glare of a navigation light a few metres away at night, at a pixel's cost a frame for each light.",
+    home: all(LIGHTS), appliesLive: true, source: "src/flight/aircraft/createAircraftLights.ts",
+  },
+  {
+    id: "osfs.lights.liftMeters",
+    label: "Light lift",
+    description: "How far each light is drawn towards the camera, so the surface it is mounted on does not cut its glare in half. The airframe still hides a light behind it.",
+    unit: "m", kind: "number", step: 0.05, bounds: within(0, 2), default: 0.3,
+    defaultReason: "Clear of a wingtip's fairing, and less than any part of an airframe that should hide a light.",
+    home: all(LIGHTS), appliesLive: true, source: "src/flight/aircraft/createAircraftLights.ts",
+  },
+  {
+    id: "osfs.lights.referenceNits",
+    label: "Light reference without a sky",
+    description: "With the sky model off there is no exposure: the luminance a light's glare is shown against as white.",
+    unit: { id: "cd/m2", text: "cd/m²" }, kind: "number", step: 0.25, scale: "log2", bounds: within(1, 100_000), default: 1000,
+    defaultReason: "The exhaust's own reference, so the two agree with the sky off.",
+    home: all(LIGHTS), appliesLive: true, source: "src/flight/aircraft/createAircraftLights.ts",
+  },
+
   // G-forces: the load on the pilot, and what it does to their sight.
   {
     id: "osfs.gForce.indicator",
@@ -440,7 +503,7 @@ export const OSFS_PARAMETERS = [
   {
     id: "osfs.exhaust.contributionView",
     label: "Engine light contribution",
-    description: "Isolate a contribution on the engine for diagnosis. Thermal and fuel states continue unchanged. Scene exposure and ambient fill are in Renderer → Lighting and exposure.",
+    description: "Isolate a contribution on the engine for diagnosis. Thermal and fuel states continue unchanged. Scene exposure is in Sky → Exposure and display, and the sky model and ambient fill in Sky → Atmosphere and illumination.",
     unit: "none", kind: "choice",
     choices: [
       { id: "combined", label: "Combined", description: "All enabled engine light contributions." },
@@ -527,7 +590,7 @@ export const OSFS_PARAMETERS = [
   {
     id: "osfs.exhaust.gasReferenceNits",
     label: "Gas emission white reference",
-    description: "Gas luminance mapped to unit linear scene intensity before shared exposure and tone mapping. The physical emission calculation retains absolute units; this reference changes only display mapping.",
+    description: "With the sky model off, the gas luminance mapped to unit linear scene intensity before exposure compensation. The physical emission calculation retains absolute units; this reference changes only display mapping. A sky model's exposure takes its place, so gas, metal, sunlight and sky share one white.",
     unit: { id: "cd/m²", text: "cd/m²" }, kind: "number", step: 1, bounds: within(1, 100000), default: 1000,
     defaultReason: "Use the same provisional luminance reference as hot hardware; the scene is not radiometrically calibrated.",
     home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineExhaust.ts",
@@ -543,7 +606,7 @@ export const OSFS_PARAMETERS = [
   {
     id: "osfs.exhaust.surfaceReferenceNits",
     label: "Nozzle glow white reference",
-    description: "Metal luminance mapped to display white. Lower values brighten hot hardware without changing its temperature or the flame. Scene exposure is not physically calibrated.",
+    description: "With the sky model off, the metal luminance mapped to display white. Lower values brighten hot hardware without changing its temperature or the flame. A sky model's exposure takes its place, so gas, metal, sunlight and sky share one white.",
     unit: { id: "cd/m²", text: "cd/m²" },
     kind: "number",
     step: 1, bounds: within(1, 100000),
@@ -920,8 +983,8 @@ export const OSFS_PARAMETERS = [
     source: "src/flight/remote/createPhoneControlSession.ts",
   },
 
-  // Remote Control → Phone camera trackpad: an A/B of how a phone's swipe
-  // reaches the view. The costs quoted are from docs/phone-controller.md.
+  // Remote Control → Phone camera trackpad: how a phone's swipe reaches the
+  // view. Smooth by default; docs/phone-controller.md → Camera trackpad.
   {
     id: "osfs.camera.phone.send",
     label: "Phone sends",
@@ -932,8 +995,8 @@ export const OSFS_PARAMETERS = [
       { id: "timer", label: "On each touch, and a 60 Hz timer", description: "At most 120 a second; the original." },
       { id: "batch", label: "Once per touch frame", description: "About 10–17 ms sooner, and steadier." },
     ],
-    default: "timer",
-    defaultReason: "The original behaviour, so nothing changes until a pilot compares.",
+    default: "batch",
+    defaultReason: "Sooner and steadier than the original, which loses on both counts.",
     home: main(PHONE_CAMERA),
     appliesLive: true,
     source: "src/flight/remote/createPhoneControlSession.ts",
@@ -948,8 +1011,8 @@ export const OSFS_PARAMETERS = [
       { id: "delta", label: "Lose their movement", description: "The original." },
       { id: "total", label: "Recover it from the running total", description: "No delay." },
     ],
-    default: "delta",
-    defaultReason: "The original behaviour, so nothing changes until a pilot compares.",
+    default: "total",
+    defaultReason: "A lost frame then costs nothing, at no delay.",
     home: main(PHONE_CAMERA),
     appliesLive: true,
     source: "src/flight/remote/phoneCameraPlayout.ts",
@@ -961,11 +1024,11 @@ export const OSFS_PARAMETERS = [
     unit: "none",
     kind: "choice",
     choices: [
-      { id: "arrival", label: "As soon as it arrives", description: "The original." },
+      { id: "arrival", label: "As soon as it arrives", description: "The lowest delay, but uneven arrival over Wi-Fi shows as jumps. The original." },
       { id: "playout", label: "Paced on the phone's timeline", description: "Adds the playout buffer, and smooths stalls." },
     ],
-    default: "arrival",
-    defaultReason: "The original behaviour, so nothing changes until a pilot compares.",
+    default: "playout",
+    defaultReason: "Smooth first: drawn as it arrives, the camera jumps with every uneven delivery, which costs more than the playout buffer's delay. The lowest delay is the opt-in.",
     home: main(PHONE_CAMERA),
     appliesLive: true,
     source: "src/flight/remote/phoneCameraPlayout.ts",
@@ -1012,6 +1075,68 @@ export const OSFS_PARAMETERS = [
     home: main(PHONE_CAMERA),
     appliesLive: true,
     source: "src/flight/remote/phoneCameraPlayout.ts",
+  },
+
+  // Remote Control → Phone controller: the phone's own settings, which its ⚙
+  // sheet and Haptics chip change over the link. Kept here so that one export
+  // holds them; src/flight/remote/phoneControllerSettings.ts.
+  {
+    id: "osfs.phone.gridPosition",
+    label: "Button grid",
+    description: "Where the phone puts its instruments and buttons: under the flight controls, or over them.",
+    unit: "none",
+    kind: "choice",
+    choices: [
+      { id: "bottom", label: "Under the controls" },
+      { id: "top", label: "Over the controls" },
+    ],
+    default: "bottom",
+    defaultReason: "Where the grid has always been.",
+    home: main(PHONE_CONTROLLER),
+    appliesLive: true,
+    source: "src/remote/PhoneController.tsx",
+  },
+  {
+    id: "osfs.phone.yawRelease",
+    label: "Yaw on release",
+    description: "What the phone's yaw slider does when the finger leaves it.",
+    unit: "none",
+    kind: "choice",
+    choices: [
+      { id: "center", label: "Return to centre", description: "As a real rudder springs back." },
+      { id: "hold", label: "Keep value", description: "For a long crosswind leg or a taxi turn, which a finger cannot hold on the track." },
+    ],
+    default: "center",
+    defaultReason: "A deflection nobody is holding is how a phone flies into a slow spiral.",
+    home: main(PHONE_CONTROLLER),
+    appliesLive: true,
+    source: "src/remote/PhoneYaw.tsx",
+  },
+  {
+    id: "osfs.phone.yawReturnMs",
+    label: "Yaw return time",
+    description: "With Return to centre, how long the phone's rudder takes to get there; 0 snaps it back.",
+    unit: "ms",
+    kind: "number",
+    step: 50,
+    bounds: within(0, MAX_YAW_RETURN_MS),
+    default: 0,
+    defaultReason: "The instant release the controller has always done. A longer return eases the yaw the aircraft feels.",
+    home: main(PHONE_CONTROLLER),
+    appliesLive: true,
+    source: "src/remote/PhoneYaw.tsx",
+  },
+  {
+    id: "osfs.phone.haptics",
+    label: "Phone haptics",
+    description: "Touchdown pulses on the phone while it flies, where its browser can vibrate.",
+    unit: "none",
+    kind: "boolean",
+    default: false,
+    defaultReason: "A phone that buzzes in the hand should be one its pilot asked to.",
+    home: main(PHONE_CONTROLLER),
+    appliesLive: true,
+    source: "src/remote/phoneControllerClient.ts",
   },
 
   // Aircraft → Start.
@@ -1452,16 +1577,37 @@ export const OSFS_PARAMETERS = [
   },
   {
     id: "osfs.engineMonitor.historyHz", label: "Engine history sampling ceiling",
-    description: "Maximum samples per simulated second, limited by available model updates. Zero clears and disables history. Hidden plots do not draw; pause adds no samples.",
+    description: "Maximum samples per simulated second, limited by available model updates. Zero disables capture and retains bounded history. Current readings keep updating. Hidden plots do not draw; pause adds no samples.",
     unit: { id: "Hz", text: "Hz" }, kind: "number", step: 0.5, bounds: within(0, 30), default: 5,
     defaultReason: "Five samples per second resolve slow spool and thermal trends with a small buffer. These plots do not measure combustion or acoustic oscillations.",
     home: main(ENGINE_HISTORY), appliesLive: true, source: "src/flight/hud/engineHistory.ts",
   },
   {
+    id: "osfs.engineMonitor.historyMetrics", label: "History metric budget",
+    description: "Maximum retained engine variables. New recordings enter in registry order; admitted recordings keep their place. Lowering a budget removes buffers from the end of admission order. The live capture status counts waiting variables.",
+    unit: { id: "count", text: "metrics" }, kind: "number", step: 1, bounds: within(1, 256), default: 32,
+    defaultReason: "Thirty-two variables cover the ordinary engine traces and several diagnostics without retaining every published property.",
+    home: main(ENGINE_HISTORY), appliesLive: true, source: "src/flight/hud/engineHistory.ts",
+  },
+  {
+    id: "osfs.engineMonitor.historyMemoryKiB", label: "History storage budget",
+    description: "Upper bound on retained numeric history buffers. Each metric reserves the selected window and sampling ceiling. Lowering the budget removes whole metric buffers from the end of admission order; waiting recordings and allocated bytes are shown in Live data.",
+    unit: { id: "KiB", text: "KiB" }, kind: "number", scale: "log2", step: 1, bounds: within(64, 65536), default: 4096,
+    defaultReason: "Four MiB provides room for ordinary histories while keeping a firm bound when the window, sample ceiling or recorded catalog grows.",
+    home: main(ENGINE_HISTORY), appliesLive: true, source: "src/flight/hud/engineHistory.ts",
+  },
+  {
+    id: "osfs.engineMonitor.hiddenHistory", label: "Continue hidden history capture",
+    description: "Continue recording admitted variables when their plot, family or Engine tab is closed. Turning this off pauses hidden capture except explicitly requested solid heat balances; current readings still update and retained samples remain available.",
+    unit: "none", kind: "boolean", default: true,
+    defaultReason: "Closing a view does not silently create history gaps; disable hidden capture explicitly to reduce sampling work.",
+    home: main(ENGINE_HISTORY), appliesLive: true, source: "src/flight/hud/engineHistory.ts",
+  },
+  {
     id: "osfs.engineMonitor.thermalHistory", label: "Record solid heat balances",
-    description: "Add available native per-solid heat rates, bath temperatures and timestep energy receipts to plots and CSV. Changing the recorded columns clears the history. Display samples cannot reconstruct every fixed-step energy transfer.",
+    description: "Request available native per-solid heat rates, bath temperatures and timestep energy receipts for capture within the recording budgets. Display samples cannot reconstruct every fixed-step energy transfer.",
     unit: "none", kind: "boolean", default: false,
-    defaultReason: "Keep ordinary history compact; enable the additional series when diagnosing native heating. The live values remain in Solid heat balances.",
+    defaultReason: "Keep ordinary history compact; enable additional recordings when diagnosing native heating. Their live readings remain available independently of capture.",
     home: main(ENGINE_HISTORY), appliesLive: true, source: "src/flight/hud/engineHistory.ts",
   },
   {
