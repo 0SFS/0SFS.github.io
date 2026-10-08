@@ -1,7 +1,7 @@
 import { AUDIO_EVENT, AVAILABILITY } from "./audioSnapshot";
 import {
   AVAILABILITY_LABELS, TIER_INDEX, TIER_ORDER, createFallbackController,
-  formatAudioStats, quantumMilliseconds, resolveRequestedTier, tierAvailability,
+  formatAudioStats, qualifiedProfile, quantumMilliseconds, resolveRequestedTier, tierAvailability,
   type AudioCapabilities, type AudioQualificationContext, type FallbackController, type TierAvailability, type TierId,
 } from "./audioQuality";
 import type { AudioQualityId, AudioSettingsStore, AudioSettingsV1, SoundTierLimits } from "./audioSettings";
@@ -20,7 +20,7 @@ import { getAudioRenderer, rendererAdmission, type AudioRendererRegistration } f
  * synthesis: everything audible happens in the WASM core behind the worklet.
  *
  * Nothing here allocates an AudioContext, fetches or compiles at import. The
- * first byte moves only from a pilot gesture that asks for sound.
+ * first byte moves only from a normal pilot gesture when sound is enabled.
  */
 
 export type AudioHoldReason = "pause" | "background" | "loading" | "fault" | "reset";
@@ -40,6 +40,8 @@ export interface FlightAudioStatus {
   /** The tire cue's own line, for the ground-interaction and Debug controls. */
   tireMessage: string | null;
   availability: Record<TierId, TierAvailability>;
+  /** Exact named-device performance records, separate from ordinary tier availability. */
+  performanceQualifiedTiers?: readonly TierId[];
   /** The sound.md §6 stats line, refreshed at 1 Hz. */
   stats: string;
   transport: "port" | "sab" | null;
@@ -248,18 +250,17 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
       && activeDspSha256 !== undefined && identified.dspSha256 === activeDspSha256
       ? identified : undefined;
   };
-  const availability = (): Record<TierId, TierAvailability> => {
+  const availability = (): Record<TierId, TierAvailability> => ({
+    off: tierAvailability("off", capabilities), low: tierAvailability("low", capabilities),
+    med: tierAvailability("med", capabilities), high: tierAvailability("high", capabilities),
+  });
+  const performanceQualifiedTiers = (): readonly TierId[] => {
     const identified = qualificationContext();
-    return {
-      off: tierAvailability("off", capabilities, undefined, identified),
-      low: tierAvailability("low", capabilities, undefined, identified),
-      med: tierAvailability("med", capabilities, undefined, identified),
-      high: tierAvailability("high", capabilities, undefined, identified),
-    };
+    return identified ? TIER_ORDER.filter(tier => qualifiedProfile(tier, undefined, identified) !== undefined) : [];
   };
 
   const requestedTier = (): TierId => {
-    if (engineWanted()) return resolveRequestedTier(settings.requested, capabilities, undefined, qualificationContext()).tier;
+    if (engineWanted()) return resolveRequestedTier(settings.requested, capabilities).tier;
     // The tire cue alone runs on the cheapest audible tier with the engine gain at zero.
     return tierAvailability("low", capabilities).state === "available" ? "low" : "off";
   };
@@ -289,6 +290,7 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
     message,
     tireMessage: tireMessage(),
     availability: availability(),
+    performanceQualifiedTiers: performanceQualifiedTiers(),
     stats: statsLine,
     transport: transport?.kind ?? null,
     sampleRateHz: context?.sampleRate ?? null,
@@ -435,7 +437,7 @@ export function createFlightAudio(options: FlightAudioOptions): FlightAudioHandl
         generation += 1;
         void start();
       } else {
-        // sound.md §6: Tier 0 and "Enable sound" until audio actually runs.
+        // Browser activation: wait for any normal interaction, with no opt-in.
         gestureLocked = true;
         armUnlock();
       }

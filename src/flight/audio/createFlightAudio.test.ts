@@ -85,10 +85,14 @@ const qualificationRecords = QUALIFIED_PROFILES as QualifiedProfile[];
 const realQualificationCount = qualificationRecords.length;
 function create(options: {
   stored?: object; inGesture?: boolean; unlockTarget?: EventTarget; loadWasm?: () => Promise<BufferSource>;
+  catalogueDefaults?: boolean;
   suspendDelayMs?: number;
   qualificationContext?: () => AudioQualificationContext | undefined;
 } = {}) {
-  const store = createAudioSettingsStore(savedParameters(options.stored));
+  // Lifecycle cases usually exercise an explicit enable from a saved-off
+  // preference. Default-on activation has separate real-default cases below.
+  const store = createAudioSettingsStore(savedParameters(options.catalogueDefaults
+    ? options.stored : { enabled: false, ...options.stored }));
   const audio = createFlightAudio({
     settings: store,
     suspendDelayMs: options.suspendDelayMs,
@@ -127,7 +131,7 @@ afterEach(() => {
 });
 
 describe("flight audio lifecycle (synthetic fakes)", () => {
-  it.each([false, true])("checks qualification against the compiled bytes (matching hash: %s)", async matching => {
+  it.each([false, true])("keeps performance evidence tied to compiled bytes without gating playback (matching hash: %s)", async matching => {
     // SYNTHETIC qualification fixture, removed after this case; no device claim.
     const identified: AudioQualificationContext = {
       device: "fixture", browserBuild: "fixture", osBuild: "fixture", outputRoute: "fixture",
@@ -138,8 +142,9 @@ describe("flight audio lifecycle (synthetic fakes)", () => {
     const { audio } = create({ stored: { requested: "auto" }, qualificationContext: () => identified });
     audio.setEnabled(true);
     await booted();
-    expect(audio.getStatus().effective).toBe(matching ? "high" : "low");
-    expect(audio.getStatus().availability.high.state).toBe(matching ? "available" : "unvalidated");
+    expect(audio.getStatus().effective).toBe("high");
+    expect(audio.getStatus().availability.high.state).toBe("available");
+    expect(audio.getStatus().performanceQualifiedTiers).toEqual(matching ? ["high"] : []);
   });
 
   it("applies the saved afterburner mix at boot and live without replacing setup or native augmentation", async () => {
@@ -223,10 +228,32 @@ describe("flight audio lifecycle (synthetic fakes)", () => {
     expect(node.port.last("profile")).toEqual({ type: "profile", values: acousticProfileValues() });
   });
 
-  it("allocates nothing until sound is asked for", () => {
+  it("allocates nothing when the saved preference is off", () => {
     const { audio } = create();
     expect(FakeAudioContext.instances).toHaveLength(0);
     expect(audio.getStatus()).toMatchObject({ enabled: false, effective: "off", mode: "off" });
+  });
+
+  it.each(["pointerdown", "keydown"])("starts default-on Med at the first normal %s without an enable action", async event => {
+    const target = new EventTarget();
+    const { audio, store } = create({ catalogueDefaults: true, unlockTarget: target, inGesture: false });
+    expect(store.settings).toMatchObject({ enabled: true, requested: "med" });
+    expect(FakeAudioContext.instances).toHaveLength(0);
+    expect(audio.getStatus()).toMatchObject({ enabled: true, gestureLocked: true, effective: "off" });
+    target.dispatchEvent(new Event(event));
+    expect(FakeAudioContext.instances).toHaveLength(1);
+    expect(FakeAudioContext.instances[0].resume).toHaveBeenCalledOnce();
+    await booted();
+    expect(audio.getStatus()).toMatchObject({ enabled: true, effective: "med", gestureLocked: false, message: null });
+  });
+
+  it("does not activate a saved explicit off preference on ordinary interactions", () => {
+    const target = new EventTarget();
+    const { audio } = create({ stored: { enabled: false }, unlockTarget: target, inGesture: false });
+    target.dispatchEvent(new Event("pointerdown"));
+    target.dispatchEvent(new Event("keydown"));
+    expect(FakeAudioContext.instances).toHaveLength(0);
+    expect(audio.getStatus()).toMatchObject({ enabled: false, gestureLocked: false, effective: "off" });
   });
 
   it("creates and resumes the context inside the enabling gesture, then boots the core", async () => {
@@ -241,13 +268,13 @@ describe("flight audio lifecycle (synthetic fakes)", () => {
     // The first quantum must not wait on a port message for its tier and gains.
     expect(node.options.processorOptions.initial).toMatchObject({ tier: 2, gains: { master: 2, engine: 0.8 } });
     expect(node.options.processorOptions.initial).toMatchObject({ profile: acousticProfileValues() });
-    // Med is the default, and runs although no device has qualified it.
+    // Med is the accepted default; device performance records are separate.
     expect(node.port.last("tier")).toEqual({ type: "tier", tier: 2 });
     expect(node.port.last("gains")).toMatchObject({ master: 2, engine: 0.8, airframe: 0.6, tire: 0 });
     expect(audio.getStatus()).toMatchObject({ effective: "med", requested: "med", mode: "sound", gestureLocked: false });
   });
 
-  it("runs Med the moment it is chosen, with no further step, and still calls it unvalidated", async () => {
+  it("runs accepted Med the moment it is chosen, with no warning or further step", async () => {
     const { audio, store } = create({ stored: { requested: "low" } });
     audio.setEnabled(true);
     const node = await booted();
@@ -255,16 +282,16 @@ describe("flight audio lifecycle (synthetic fakes)", () => {
     audio.setQuality("med");
     expect(node.port.last("tier")).toEqual({ type: "tier", tier: 2 });
     expect(audio.getStatus()).toMatchObject({ requested: "med", effective: "med" });
-    expect(audio.getStatus().availability.med.state).toBe("unvalidated");
+    expect(audio.getStatus().availability.med.state).toBe("available");
     expect(store.settings.requested).toBe("med");
   });
 
-  it("keeps Auto at Low while no device has qualified a higher tier", async () => {
+  it("lets explicit Auto choose the highest supported tier", async () => {
     const { audio } = create({ stored: { requested: "auto" } });
     audio.setEnabled(true);
     const node = await booted();
-    expect(node.port.last("tier")).toEqual({ type: "tier", tier: 1 });
-    expect(audio.getStatus()).toMatchObject({ requested: "auto", effective: "low" });
+    expect(node.port.last("tier")).toEqual({ type: "tier", tier: 3 });
+    expect(audio.getStatus()).toMatchObject({ requested: "auto", effective: "high", message: null });
   });
 
   it("waits for a gesture instead of autoplaying a restored preference", async () => {
@@ -446,13 +473,13 @@ describe("flight audio lifecycle (synthetic fakes)", () => {
     audio.setEnabled(true);
     const node = await booted();
     expect(audio.getStatus()).toMatchObject({ requested: "high", effective: "high",
-      availability: { high: { state: "unvalidated" } } });
+      availability: { high: { state: "available" } } });
     expect(node.port.last("tier")).toMatchObject({ tier: 3 });
     expect(node.port.ofType("band")).toHaveLength(0);
     audio.setQuality("med");
     expect(audio.getStatus().effective).toBe("med");
     audio.setQuality("auto");
-    expect(audio.getStatus().effective).toBe("low");
+    expect(audio.getStatus().effective).toBe("high");
   });
 
   it("rejects legacy full-recording banks without changing procedural High or transferring PCM", async () => {
@@ -466,7 +493,7 @@ describe("flight audio lifecycle (synthetic fakes)", () => {
     }
     node.port.deliver({ type: "band", index: 0, requestId: 1, accepted: true });
     expect(node.port.ofType("band")).toHaveLength(0);
-    expect(audio.getStatus()).toMatchObject({ effective: "high", availability: { high: { state: "unvalidated" } } });
+    expect(audio.getStatus()).toMatchObject({ effective: "high", availability: { high: { state: "available" } } });
   });
 
   it("retains procedural High when replacing supported engines, with no recording readiness to inherit", async () => {
@@ -527,7 +554,15 @@ describe("flight audio lifecycle (synthetic fakes)", () => {
     expect(audio.getStatus().stats).toMatch(/underruns 0 .*underrun counter not validated/);
     context.playbackStats.underrunEvents = 3;
     node.port.deliver({ type: "stats", values: new Array(20).fill(0) });
-    // Low was the effective tier, so the next step down is Off: "Low eventually mutes".
+    expect(store.settings).toMatchObject({ requested: "med", downgradedFrom: "auto" });
+    expect(audio.getStatus().effective).toBe("med");
+    context.playbackStats.underrunEvents = 6;
+    node.port.deliver({ type: "stats", values: new Array(20).fill(0) });
+    expect(store.settings).toMatchObject({ requested: "low", downgradedFrom: "auto" });
+    expect(audio.getStatus().effective).toBe("low");
+    context.playbackStats.underrunEvents = 9;
+    node.port.deliver({ type: "stats", values: new Array(20).fill(0) });
+    // Continued faults drop High → Med → Low → Off; no automatic upgrade.
     expect(store.settings).toMatchObject({ requested: "off", downgradedFrom: "auto" });
     expect(audio.getStatus().message).toMatch(/dropped to off: 3 output underruns were counted/);
     expect(node.disconnect).toHaveBeenCalled();

@@ -1,12 +1,9 @@
 import type { AudioQualityId } from "./audioSettings";
 
 /**
- * Tier caps, admission rules, the shedding controller and the status line.
- *
- * The load-bearing idea here is that *unmeasured is not passing and not
- * failing*. sound.md §1 says an untested profile is "unverified", never a
- * fabricated performance failure, and §5 says a missing dropout count is
- * "unknown", never zero. Every type below keeps those three states apart.
+ * Tier caps, capability admission, the shedding controller and the status line.
+ * Listening acceptance permits normal use. Device performance evidence stays
+ * separate: an unmeasured metric is unknown, never a fabricated pass or failure.
  */
 
 export type TierId = "off" | "low" | "med" | "high";
@@ -48,14 +45,11 @@ export type TierAvailability =
   | { state: "available" }
   /** A concrete missing capability or a failed qualification run. */
   | { state: "unsupported"; reason: string }
-  /** No device evidence exists yet. Not a failure. */
-  | { state: "unvalidated"; reason: string }
   /** The licensed asset pack is absent. */
   | { state: "pack-unavailable"; reason: string };
 
 export const AVAILABILITY_LABELS = {
   unsupported: "Unsupported on this device",
-  unvalidated: "Not yet validated",
   "pack-unavailable": "Audio pack unavailable",
   locked: "Enable sound",
 } as const;
@@ -66,9 +60,9 @@ export const AVAILABILITY_LABELS = {
  *
  * DELIBERATELY EMPTY. sound.md §5 requires named devices, recorded OS/browser
  * builds, a real output route and a validated dropout detector before any entry
- * here. None of that has been run, so Med and High report "Not yet validated"
- * and Auto never picks them; they run only when chosen. Perf owns filling this
- * in; a user-agent string must never produce an entry.
+ * here. The user's listening acceptance does not fabricate these records.
+ * They are diagnostic evidence, not a gate or warning for using a sound tier.
+ * Perf owns filling this in; a user-agent string must never produce an entry.
  */
 export interface AudioQualificationContext {
   device: string;
@@ -101,14 +95,11 @@ export interface AudioCapabilities {
 }
 
 /**
- * Admission. Low needs only the two hard capabilities; Med and High also need a
- * matching qualified profile. High also needs an explicitly capable renderer.
- * Auto takes only an available tier; an explicit choice runs an unvalidated one.
+ * Admission uses concrete browser and renderer capabilities. The owner has
+ * accepted Low, Med and High by listening; performance records are separate.
  */
 export function tierAvailability(
   tier: TierId, capabilities: AudioCapabilities,
-  profiles: readonly QualifiedProfile[] = QUALIFIED_PROFILES,
-  context?: AudioQualificationContext,
 ): TierAvailability {
   if (tier === "off") return { state: "available" };
   if (!capabilities.audioWorklet) {
@@ -124,56 +115,47 @@ export function tierAvailability(
       reason: "The selected engine renderer does not implement procedural High.",
     };
   }
-  // The caller must identify the actual route and exact implementation. A user
-  // agent, an unrelated device record or an absent context cannot certify it.
-  const qualified = context !== undefined && profiles.some((profile) => profile.tier === tier
+  return { state: "available" };
+}
+
+/** Exact performance-evidence match, independent of capability admission. */
+export function qualifiedProfile(tier: TierId,
+  profiles: readonly QualifiedProfile[] = QUALIFIED_PROFILES,
+  context?: AudioQualificationContext): QualifiedProfile | undefined {
+  // An unrelated device record or absent context cannot certify this route.
+  return context === undefined ? undefined : profiles.find((profile) => profile.tier === tier
     && profile.device === context.device && profile.browserBuild === context.browserBuild
     && profile.osBuild === context.osBuild && profile.outputRoute === context.outputRoute
     && profile.sampleRateHz === context.sampleRateHz && profile.transport === context.transport
     && profile.engineDefinitionId === context.engineDefinitionId && profile.rendererId === context.rendererId
     && profile.dspSha256 === context.dspSha256 && profile.evidence.trim().length > 0);
-  if (!qualified) {
-    return {
-      state: "unvalidated",
-      reason: `${tier === "med" ? "Med" : "High"} has no device qualification evidence yet, `
-        + "so Auto does not pick it. It runs when chosen.",
-    };
-  }
-  return { state: "available" };
 }
 
 /**
- * What runs for a request. Auto starts at Low and only climbs to a tier that is
- * actually available. An explicit choice also runs a tier that lacks only
- * device evidence: that gap is in the evidence, not in this device, and the
- * owner decided on 2026-10-02 that choosing Med runs Med (sound.md §1). A
- * missing renderer or browser capability still falls back.
+ * Auto chooses the highest supported tier. User resource limits and runtime
+ * shedding/fault fallback still apply; no performance result is inferred.
  */
 export function resolveRequestedTier(
   requested: AudioQualityId, capabilities: AudioCapabilities,
-  profiles: readonly QualifiedProfile[] = QUALIFIED_PROFILES,
-  context?: AudioQualificationContext,
 ): { tier: TierId; reason: string | null } {
   if (requested === "off") return { tier: "off", reason: null };
   if (requested === "auto") {
     let best: TierId = "off";
     for (const tier of TIER_ORDER) {
       if (tier === "off") continue;
-      if (tierAvailability(tier, capabilities, profiles, context).state === "available") best = tier;
+      if (tierAvailability(tier, capabilities).state === "available") best = tier;
     }
     return {
       tier: best,
       reason: best === "off" ? "No audible tier is available on this device." : null,
     };
   }
-  const runnable = (state: TierAvailability["state"]): boolean => state === "available" || state === "unvalidated";
-  const availability = tierAvailability(requested, capabilities, profiles, context);
+  const availability = tierAvailability(requested, capabilities);
   if (availability.state === "available") return { tier: requested, reason: null };
-  if (availability.state === "unvalidated") return { tier: requested, reason: availability.reason };
   // Fall back to the best tier below the request rather than to silence.
   for (let index = TIER_INDEX[requested] - 1; index >= 1; index -= 1) {
     const candidate = TIER_ORDER[index];
-    if (runnable(tierAvailability(candidate, capabilities, profiles, context).state)) {
+    if (tierAvailability(candidate, capabilities).state === "available") {
       return { tier: candidate, reason: availability.reason };
     }
   }

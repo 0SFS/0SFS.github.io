@@ -9,6 +9,36 @@ work is preserved.
 
 ## Dry brightness and its baseline
 
+**UI/listening follow-up, 2026-10-07:** the user corrected the requested home
+to an **Exhaust** tab with **Gas and luminance**, **Smoke**, and an
+**Afterburner** section shown only on equipped aircraft. Dry brightness now
+ranges from **0.5 to 10×**, still defaulting to the unmodified 1× model. The
+dedicated Afterburner tab and 3× upper limit below describe the initial
+implementation and are superseded. Smoke/hot-gas work is assigned by a
+[separate prompt](../aircraft-smoke-hot-gas-implementation-prompt.md), with no
+new smoke or refraction implementation in this follow-up.
+
+The user accepted Low, Med and High sound in listening tests and requested
+removal of the qualification warnings. Sound defaults on, respecting a saved
+off setting and the browser's normal activation requirement. Unsupported
+capability/fault messages remain; no timed performance or acoustic calibration
+measurement is inferred from listening acceptance.
+
+The user also reported the audible-before-visible AB issue persists. Prior
+tests covered each source separately, not joint native/audio/optics onset and
+not rendered/device perception. The
+[joint onset investigation](f135-ab-onset.md) now records that separate test
+gap and the cold native thrust/fuel discrepancy. No visual timing fix is claimed.
+
+This UI/sound follow-up passed incremental typecheck/lint, 60 related test
+files (824 passes plus the native onset expected failure), and one full CI
+run: lint, 187 test files (2,027 passes plus two expected failures), production
+build and artifact verification. The joint onset harness's later scheduling
+correction has its own final targeted checks in the linked onset record.
+The [follow-up receipt](../../validation/evidence/aircraft/f35b/exhaust-ui-sound-2026-10-07/acceptance.json)
+retains these software results separately from the original implementation
+below and from the still-open perceived AB onset.
+
 Afterburner → Exhaust appearance owns **Dry exhaust brightness**,
 `osfs.exhaust.dryIntensity`, 0.5–3× with a default of 1×. The tab is present only
 on aircraft with afterburner metadata. The multiplier changes displayed gas

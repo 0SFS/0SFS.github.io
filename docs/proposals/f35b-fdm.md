@@ -391,6 +391,21 @@ remain uncalibrated. The current particle source uses a non-gray absorption
 spectrum with matching integrated power. These changes do not qualify the dry
 carrier glow or reported AB extent.
 
+The 2026-10-07 [joint onset investigation](../validation/f135-ab-onset.md)
+follows the user's persistent audible-before-visible AB report. Actual installed
+native output after a cold start selects 43,000 lbf wet thrust **4.1333 s before
+positive burned AB fuel**; settled dry operation leaves an 83.3 ms interval.
+The shipped DSP's base thrust cue changes during that interval even with the
+deliberate AB mix muted. Internal optical reaction emission starts on the first
+positive burn while the cold liner is only 483 K; the optical source does not
+wait for metal heating. These are simulation observations, not F135 timing
+measurements or a rendered/perceived synchronization pass. A joint regression
+retains the zero-burn/excess-thrust invariant as a known native failure. Correct
+the transient fuel/heat/thrust/nozzle closure in JSBSim, rather than hiding it
+with audio delays or optical brightness changes. The user now accepts the faint
+red dry night appearance, but neither that feedback nor the new display gain
+calibrates absolute emission or resolves the carrier deck interaction.
+
 | Source-contract follow-up | Evidence | Remaining discriminator |
 | --- | --- | --- |
 | Native temperature meaning and flag-only jump | The native equation is an imposed constant-cp gas bath derived from generic EGT and AB heat. No measured total/static nozzle station, pressure/area flow closure or STOVL shaft balance exists. The optical expansion is removed; frozen physical inputs give identical fields when only AB selection changes. | Calibrated engine station and particle-temperature data are still needed. See [native audit](../../validation/evidence/aircraft/f35b/exhaust-correction-2026-10-06/native/README.md). |

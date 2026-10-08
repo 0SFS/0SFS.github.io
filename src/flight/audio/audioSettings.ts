@@ -12,11 +12,12 @@ import {
  * Two rules come straight from sound.md §6 and shape everything here: a stored
  * preference must never restore louder sound than the pilot last heard, and a
  * downgrade persists until an explicit re-test. So `requested` is the pilot's
- * ask, `effective` is a runtime fact that is never stored, and `enabled`
- * defaults off because a saved preference cannot satisfy autoplay anyway.
+ * ask and `effective` is a runtime fact that is never stored. Sound defaults
+ * on, starting at the first normal interaction permitted by browser autoplay;
+ * a saved explicit off remains off.
  */
 
-/** Auto starts at Low and only moves up to a qualified tier. */
+/** Auto chooses the highest supported tier, subject to live resource fallback. */
 export type AudioQualityId = "off" | "low" | "med" | "high" | "auto";
 
 export const AUDIO_QUALITY_IDS: readonly AudioQualityId[] = ["off", "low", "med", "high", "auto"];
@@ -36,7 +37,7 @@ export interface AudioSettingsV1 {
   requested: AudioQualityId;
   masterVolume: number;
   engineVolume: number;
-  /** Scales only the additional native-afterburner contribution; 1 is the original level. */
+  /** Mixes deliberate afterburner amplitude and colour independently of base sound. */
   afterburnerVolume: number;
   /** Acoustic viewpoint: 0 follows the camera, 1 stays in the cockpit. */
   listenerCockpitBlend: number;

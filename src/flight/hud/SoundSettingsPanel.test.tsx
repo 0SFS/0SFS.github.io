@@ -43,14 +43,14 @@ async function mount(state: FlightAudioStatus) {
 }
 
 describe("sound settings panel", () => {
-  it("names F135 approximation and keeps its calibration boundary visible", async () => {
+  it("keeps engine identity without routine calibration warnings", async () => {
     const panel = await mount(status("med", { telemetry: {
       combustionSource: "fuel-flow", missing: [], profileLabel: "Approximate F135 procedural sound",
       approximation: "One main-engine source with generic turbine tones. F135 acoustics are uncalibrated; separate lift-fan sound is not modeled.",
     } }));
     expect(panel.host.textContent).toContain("Approximate F135 procedural sound");
-    expect(panel.host.textContent).toContain("One main-engine source");
-    expect(panel.host.textContent).toContain("uncalibrated");
+    expect(panel.host.textContent).not.toContain("One main-engine source");
+    expect(panel.host.textContent).not.toContain("uncalibrated");
   });
 
   it.each(["med", "high"] as const)("sends %s the moment it is chosen, and asks for nothing more", async quality => {
@@ -65,29 +65,48 @@ describe("sound settings panel", () => {
     expect(panel.onAction).toHaveBeenCalledOnce();
   });
 
-  it("keeps acoustic calibration separate from High being selectable", async () => {
+  it("shows accepted High without calibration or validation warnings", async () => {
     const panel = await mount(status("high", { effective: "high" }));
-    expect(panel.host.textContent).toContain("Acoustic calibration is pending");
+    expect(panel.host.textContent).not.toContain("Acoustic calibration is pending");
+    expect(panel.host.textContent).not.toContain("Not yet validated");
     expect(panel.host.textContent).not.toContain("FJ33 sample bank");
   });
 
-  it("shows Med running with no testing switch, and says it has no device evidence", async () => {
+  it("shows accepted Med running with no testing switch or evidence warning", async () => {
     const panel = await mount(status("med", { effective: "med" }));
     expect(panel.host.textContent).toMatch(/Requested Med · Effective Med/);
-    expect(panel.host.textContent).toMatch(/no device qualification evidence yet, so Auto does not pick it/);
+    expect(panel.host.textContent).not.toMatch(/qualification evidence|Not yet validated/);
     expect(panel.button("anyway")).toBeUndefined();
     expect(panel.button("testing")).toBeUndefined();
   });
 
-  it("keeps procedural Med and High selectable while identifying missing device evidence", async () => {
+  it("keeps accepted Low, Med and High selectable with plain quality labels", async () => {
     const panel = await mount(status("low"));
     const options = [...panel.host.querySelectorAll<HTMLOptionElement>('select[aria-label="Sound quality"] option')];
     const med = options.find((option) => option.value === "med")!;
     const high = options.find((option) => option.value === "high")!;
     expect(med.disabled).toBe(false);
-    expect(med.textContent).toBe("Med — Not yet validated");
+    expect(med.textContent).toBe("Med");
     expect(high.disabled).toBe(false);
-    expect(high.textContent).toBe("High — Not yet validated");
+    expect(high.textContent).toBe("High");
+    expect(options.find(option => option.value === "low")!.textContent).toBe("Low");
+  });
+
+  it("requires no extra enable action for default-on sound waiting for browser activation", async () => {
+    const panel = await mount(status("med", { effective: "off", gestureLocked: true }));
+    expect(panel.button("Enable sound")).toBeUndefined();
+    expect(panel.button("Turn sound off")).toBeDefined();
+  });
+
+  it("preserves concrete capability and processor-fault messages", async () => {
+    const state = status("high", { message: "Sound stopped after an audio processor fault." });
+    state.availability.high = { state: "unsupported", reason: "The selected renderer has no High sound." };
+    const panel = await mount(state);
+    const high = panel.host.querySelector<HTMLOptionElement>('option[value="high"]')!;
+    expect(high.disabled).toBe(true);
+    expect(high.textContent).toBe("High — Unsupported on this device");
+    expect(panel.host.textContent).toContain("The selected renderer has no High sound");
+    expect(panel.host.textContent).toContain("audio processor fault");
   });
 
   it("sends airframe wind volume on its own", async () => {
@@ -101,7 +120,7 @@ describe("sound settings panel", () => {
     expect(panel.onAction).toHaveBeenCalledWith({ type: "settings", patch: { airframeVolume: 0.25 } });
   });
 
-  it("leaves afterburner volume in its own tab and shows one continuous Camera–Cockpit slider", async () => {
+  it("leaves afterburner volume in Exhaust and shows one continuous Camera–Cockpit slider", async () => {
     const panel = await mount(status("med"));
     const afterburner = panel.host.querySelectorAll<HTMLInputElement>('input[aria-label="Afterburner volume"]');
     const position = panel.host.querySelectorAll<HTMLInputElement>('input[aria-label="Sound position"]');

@@ -75,7 +75,7 @@ import { AUTOPILOT_PARAMETER_IDS, type AutopilotSettingsV1 } from "../autopilot/
 import { GROUND_PARAMETER_IDS } from "../settings/groundInteractionSettings";
 import type { FlightRecorder } from "../diagnostics/flightRecorder";
 
-export type FlightPanelTab = "weather" | "aircraft" | "fuel" | "autopilot" | "controls" | "remote" | "sound" | "afterburner" | "engine" | "logging" | "debug";
+export type FlightPanelTab = "weather" | "aircraft" | "fuel" | "autopilot" | "controls" | "remote" | "sound" | "exhaust" | "engine" | "logging" | "debug";
 
 const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "weather", label: "Weather" },
@@ -85,7 +85,7 @@ const TAB_DEFINITIONS: readonly WindowTabDefinition<FlightPanelTab>[] = [
   { id: "controls", label: "Controls" },
   { id: "remote", label: "Remote Control" },
   { id: "sound", label: "Sound" },
-  { id: "afterburner", label: "Afterburner" },
+  { id: "exhaust", label: "Exhaust" },
   { id: "engine", label: "Engine" },
   { id: "logging", label: "Logging" },
   { id: "debug", label: "Debug" },
@@ -99,7 +99,7 @@ const TAB_ICONS = {
   controls: Gauge,
   remote: Smartphone,
   sound: Volume2,
-  afterburner: Flame,
+  exhaust: Flame,
   engine: Fan,
   logging: ScrollText,
   debug: Bug,
@@ -877,8 +877,7 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
       getViewState={() => props.snapshot.flightState}
       setViewState={props.onLocationApply}
       locationSearchProvider={props.locationSearchProvider}
-      additionalTabs={TAB_DEFINITIONS.filter(tab => tab.id !== "afterburner"
-        || getAircraftDefinition(props.snapshot.aircraftId).afterburner !== undefined)}
+      additionalTabs={TAB_DEFINITIONS}
       onBeforeCloseTab={(tabId) => {
         if (tabId !== "logging") return;
         if (!allowCloseLoggingTab(props.flightRecorder)) return false;
@@ -933,9 +932,20 @@ export function FlightControlPanel(props: FlightControlPanelProps) {
               : tabId === "sound" ? <ParameterSection settings={props.settings} tab="sound" section="sound" covers={SOUND_PANEL_PARAMETER_IDS}>
                 <SoundSettingsPanel state={props.snapshot.sound} onAction={props.onSoundAction} />
               </ParameterSection>
-              : tabId === "afterburner" ? <div className="flight-panel__content">
-                <ParameterSection settings={props.settings} tab="afterburner" section="appearance" />
-                <ParameterSection settings={props.settings} tab="afterburner" section="sound" />
+              : tabId === "exhaust" ? <div className="flight-panel__content">
+                <fieldset className="flight-panel__fieldset">
+                  <legend>{props.settings.getSectionTitle("exhaust", "gas")}</legend>
+                  <ParameterSection settings={props.settings} tab="exhaust" section="gas" />
+                </fieldset>
+                <fieldset className="flight-panel__fieldset">
+                  <legend>{props.settings.getSectionTitle("exhaust", "smoke")}</legend>
+                  <ParameterSection settings={props.settings} tab="exhaust" section="smoke" />
+                </fieldset>
+                {getAircraftDefinition(props.snapshot.aircraftId).afterburner &&
+                  <fieldset className="flight-panel__fieldset">
+                    <legend>{props.settings.getSectionTitle("exhaust", "afterburner")}</legend>
+                    <ParameterSection settings={props.settings} tab="exhaust" section="afterburner" />
+                  </fieldset>}
               </div>
               : tabId === "engine" ? <>
                 <EngineDetailsHost attach={props.attachEngineDetails} />

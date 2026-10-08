@@ -44,7 +44,7 @@ it("renders one shared interior/exterior field, updates posed support without re
     const upload = vi.spyOn(field, "update");
     const baselineLight = light.intensity;
     const baselineGain = material.serialize().floats.intensity;
-    for (const multiplier of [0.5, 1, 3]) {
+    for (const multiplier of [0.5, 1, 3, 10]) {
       handle.update(state, { ...settings, dryIntensity: multiplier });
       expect(material.serialize().floats.intensity).toBeCloseTo(baselineGain * multiplier, 12);
       expect(light.intensity).toBeCloseTo(baselineLight * multiplier, 12);
@@ -52,7 +52,7 @@ it("renders one shared interior/exterior field, updates posed support without re
       expect(upload).not.toHaveBeenCalled();
     }
     // AB has its own modeled output; adjusting dry presentation cannot boost it.
-    handle.update({ ...state, augmentation: true }, { ...settings, dryIntensity: 3 });
+    handle.update({ ...state, augmentation: true }, { ...settings, dryIntensity: 10 });
     expect(material.serialize().floats.intensity).toBe(baselineGain);
     expect(light.intensity).toBeCloseTo(baselineLight, 12);
     expect(upload).not.toHaveBeenCalled();

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  createFallbackController, formatAudioStats, quantumMilliseconds, resolveRequestedTier,
+  createFallbackController, formatAudioStats, qualifiedProfile, quantumMilliseconds, resolveRequestedTier,
   tierAvailability, type AudioCapabilities, type AudioQualificationContext, type FallbackAction, type QualifiedProfile,
 } from "./audioQuality";
 
@@ -28,41 +28,37 @@ describe("tier admission", () => {
     expect(tierAvailability("low", { ...CAPABLE, webAssembly: false }).state).toBe("unsupported");
   });
 
-  it("reports Med as not yet validated, never as failed, while no profile exists", () => {
-    expect(tierAvailability("med", CAPABLE).state).toBe("unvalidated");
-    expect(tierAvailability("med", CAPABLE, [fixtureProfile("high")]).state).toBe("unvalidated");
-    expect(tierAvailability("med", CAPABLE, [fixtureProfile("med")]).state).toBe("unvalidated");
-    expect(tierAvailability("med", CAPABLE, [fixtureProfile("med")], FIXTURE_CONTEXT).state).toBe("available");
+  it("admits accepted Med without requiring a performance-evidence record", () => {
+    expect(tierAvailability("med", CAPABLE)).toEqual({ state: "available" });
+    expect(qualifiedProfile("med")).toBeUndefined();
   });
 
   it("admits explicitly implemented procedural High without a bank, but no unsupported renderer", () => {
-    expect(tierAvailability("high", CAPABLE).state).toBe("unvalidated");
+    expect(tierAvailability("high", CAPABLE).state).toBe("available");
     expect(tierAvailability("high", { ...CAPABLE, highSynthesis: undefined, bankReady: true }).state).toBe("unsupported");
-    expect(tierAvailability("high", CAPABLE, [fixtureProfile("high")], FIXTURE_CONTEXT).state)
-      .toBe("available");
+    expect(qualifiedProfile("high", [fixtureProfile("high")], FIXTURE_CONTEXT)).toEqual(fixtureProfile("high"));
   });
 
   it("requires the same device, route and exact renderer artifact before qualification applies", () => {
     for (const key of Object.keys(FIXTURE_CONTEXT) as (keyof AudioQualificationContext)[]) {
       const changed = { ...FIXTURE_CONTEXT, [key]: key === "sampleRateHz" ? 44_100 : "different" } as AudioQualificationContext;
-      expect(tierAvailability("high", CAPABLE, [fixtureProfile("high")], changed).state, key).toBe("unvalidated");
-      expect(resolveRequestedTier("auto", CAPABLE, [fixtureProfile("high")], changed).tier, key).toBe("low");
+      expect(qualifiedProfile("high", [fixtureProfile("high")], changed), key).toBeUndefined();
+      expect(resolveRequestedTier("auto", CAPABLE).tier, key).toBe("high");
     }
-    expect(tierAvailability("high", CAPABLE, [{ ...fixtureProfile("high"), evidence: "" }], FIXTURE_CONTEXT).state).toBe("unvalidated");
+    expect(qualifiedProfile("high", [{ ...fixtureProfile("high"), evidence: "" }], FIXTURE_CONTEXT)).toBeUndefined();
   });
 
-  it("resolves Auto to the best available tier, which with no evidence is Low", () => {
-    expect(resolveRequestedTier("auto", CAPABLE)).toEqual({ tier: "low", reason: null });
-    expect(resolveRequestedTier("auto", CAPABLE, [fixtureProfile("med")]).tier).toBe("low");
-    expect(resolveRequestedTier("auto", CAPABLE, [fixtureProfile("med")], FIXTURE_CONTEXT).tier).toBe("med");
+  it("resolves Auto to the highest supported tier and respects missing capabilities", () => {
+    expect(resolveRequestedTier("auto", CAPABLE)).toEqual({ tier: "high", reason: null });
+    expect(resolveRequestedTier("auto", { ...CAPABLE, highSynthesis: undefined }).tier).toBe("med");
+    expect(resolveRequestedTier("auto", { ...CAPABLE, audioWorklet: false }).tier).toBe("off");
     expect(resolveRequestedTier("off", CAPABLE)).toEqual({ tier: "off", reason: null });
   });
 
-  it("runs an explicit choice that lacks only device evidence, and says so", () => {
-    expect(resolveRequestedTier("med", CAPABLE)).toMatchObject({ tier: "med", reason: expect.stringMatching(/qualification/) });
-    expect(resolveRequestedTier("high", CAPABLE).tier).toBe("high");
-    // Auto still picks only what is qualified.
-    expect(resolveRequestedTier("auto", CAPABLE).tier).toBe("low");
+  it("runs every accepted explicit tier without a qualification warning", () => {
+    for (const tier of ["low", "med", "high"] as const) {
+      expect(resolveRequestedTier(tier, CAPABLE)).toEqual({ tier, reason: null });
+    }
   });
 
   it("falls back below a request that is missing a renderer capability, and says why", () => {

@@ -1166,5 +1166,50 @@ missing observations, gain-zero dry equivalence across all audible tiers,
 continuous burn onset at both output rates, live gain dezippering, finite
 limited output and retained SF50 reference hashes. Native adapter regressions
 cover the thermal observer, selected-before-burning startup, unavailable and
-invalid thermal data, conversion inhibit and cutoff. Combined check results
-will be recorded after they finish.
+invalid thermal data, conversion inhibit and cutoff. The software outcomes
+above remain distinct from the later listening acceptance below.
+
+## 20. Listening acceptance and default-on sound, 2026-10-07
+
+**Owner: 0sfs. Low, Med and High accepted by the user after listening.** The
+user requested removal of their routine validation warnings and sound on by
+default. This is the user's listening validation of the current tiers. It
+does not create benchmark measurements, a named-device qualification record,
+calibrated F135 spectra or measured audiovisual latency.
+
+Normal tier admission now uses concrete AudioWorklet/WASM and renderer
+capabilities. Low, Med and High have plain, enabled quality choices. Their
+missing-performance-evidence messages, High calibration notice and routine
+approximation paragraph no longer appear in the Sound panel. Actual capability
+failures, processor errors, overload fallback and model telemetry faults keep
+their messages. Exact device/build/route/rate/transport/engine/renderer/DSP-hash
+qualification matching remains available as separate status metadata; an empty
+registry is still empty, rather than being populated with invented evidence.
+
+Sound defaults on at Med. The existing normal pointer/key/touch activation
+path creates/resumes its one AudioContext synchronously when browser policy
+permits; no additional enable action is needed when the saved preference is
+already on. A saved explicit Off remains Off through reload and normal
+interactions. Default activation still respects autoplay, holds, disposal and
+late asynchronous completion. No silent media workaround is introduced.
+
+Explicit Auto now selects the highest supported tier. Numeric resource caps
+and observed-load shedding are unchanged. Counted faults still step High →
+Med → Low → Off, preserve the original request for re-test and never upgrade
+automatically. Missing CPU/dropout observations remain unknown in diagnostics;
+listening acceptance does not imply universal deadline protection. The sound
+quality default remains Med, independently of Auto.
+
+The afterburner mix has its single home in Exhaust's conditional Afterburner
+section. No DSP source or WASM changes are needed for this policy/UI revision.
+Added regressions cover plain tier choices without warnings, retained genuine
+fault messages, default-on playback at the first normal pointer/key gesture,
+saved-Off preservation, exact qualification metadata without admission gating,
+Auto capability fallback and its continued fault-driven downgrade ladder.
+Incremental typecheck/lint and the coordinated related run passed (60 files,
+824 tests plus the known native onset expected failure). The single full CI
+run passed lint, 187 test files, 2,027 tests plus two expected failures, and the
+production build with installed/emitted artifact verification. The later
+validation-harness scheduling correction is checked separately in the
+[joint onset record](f135-ab-onset.md). No browser, server, GPU, audio-device or
+performance benchmark run was initiated here.

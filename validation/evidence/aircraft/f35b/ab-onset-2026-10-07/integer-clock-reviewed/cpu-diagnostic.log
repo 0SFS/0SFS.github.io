@@ -1,0 +1,82 @@
+(node:15387) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+BJS - [22:10:10]: Babylon.js v8.56.2 - Null engine
+BJS - [22:10:12]: Babylon.js v8.56.2 - Null engine
+BJS - [22:10:12]: Babylon.js v8.56.2 - Null engine
+{
+  "out": "build/ab-onset-audit-2026-10-07/integer-clock-reviewed",
+  "criteria": {
+    "deliberateAudioWaitsForNativeBurn": "passed",
+    "internalReactionSourceStartsAtFirstNativeBurn": "passed",
+    "noExteriorCHRelocation": "passed",
+    "sourceEnergyBound": "passed",
+    "unchangedDspCapsAndMemory": "passed",
+    "noReheatThrustBeforeNativeBurn": "failed-known-open",
+    "visiblyPerceivedOnset": "not-tested"
+  },
+  "scenarios": [
+    {
+      "name": "cold-first-running",
+      "selectedToBurnDelaySeconds": 4.133333333333334,
+      "audio": [
+        {
+          "tier": 1,
+          "firstDeliberateDifferenceSeconds": 6.66675,
+          "firstThrustDifferenceSeconds": 2.533354166666667
+        },
+        {
+          "tier": 2,
+          "firstDeliberateDifferenceSeconds": 6.669666666666667,
+          "firstThrustDifferenceSeconds": 2.5362708333333335
+        },
+        {
+          "tier": 3,
+          "firstDeliberateDifferenceSeconds": 6.6696875,
+          "firstThrustDifferenceSeconds": 2.5362708333333335
+        }
+      ]
+    },
+    {
+      "name": "cold-then-hot-dry",
+      "selectedToBurnDelaySeconds": 0.08333333333333333,
+      "audio": [
+        {
+          "tier": 1,
+          "firstDeliberateDifferenceSeconds": 0.10008333333333336,
+          "firstThrustDifferenceSeconds": 0.016687500000000022
+        },
+        {
+          "tier": 2,
+          "firstDeliberateDifferenceSeconds": 0.10304166666666664,
+          "firstThrustDifferenceSeconds": 0.019604166666666645
+        },
+        {
+          "tier": 3,
+          "firstDeliberateDifferenceSeconds": 0.1030625,
+          "firstThrustDifferenceSeconds": 0.019604166666666645
+        }
+      ]
+    },
+    {
+      "name": "warm-running-shortcut",
+      "selectedToBurnDelaySeconds": 0.08333333333333333,
+      "audio": [
+        {
+          "tier": 1,
+          "firstDeliberateDifferenceSeconds": 0.10008333333333336,
+          "firstThrustDifferenceSeconds": 0.016687500000000022
+        },
+        {
+          "tier": 2,
+          "firstDeliberateDifferenceSeconds": 0.10304166666666664,
+          "firstThrustDifferenceSeconds": 0.019604166666666645
+        },
+        {
+          "tier": 3,
+          "firstDeliberateDifferenceSeconds": 0.1030625,
+          "firstThrustDifferenceSeconds": 0.019604166666666645
+        }
+      ]
+    }
+  ]
+}

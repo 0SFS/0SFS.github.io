@@ -101,9 +101,10 @@ refinement, which remains a separate choice from what is loaded.
 Values are today's; all are hardcoded unless noted. Homes are sections of the
 existing tabs.
 
-Aircraft exhaust lives in Renderer → Aircraft exhaust. The shared flight-only
-renderer reads `osfs.exhaust.enabled` (default on), `sampleCount` (8, bounded
-4–32 samples/pixel), `maxDistanceMeters` (2,000, bounded 1–20,000 m),
+Aircraft exhaust lives in the Exhaust tab, in Gas and luminance and Smoke
+sections. An Afterburner section appears only on equipped aircraft. The flight-only
+renderer reads `osfs.exhaust.enabled` (default on), `sampleCount` (32, bounded
+4–128 samples/pixel), `maxDistanceMeters` (2,000, bounded 1–20,000 m),
 `intensity` (1×, bounded 0–8×), and `surfaceReferenceNits` (1,000, bounded
 1–100,000 cd/m²). They apply live and persist through the registry.
 The last value maps modeled metal luminance to display white; lowering it
@@ -452,22 +453,24 @@ Master gain uses the old maximum of 1 as its reference; its default is now 2
 and maximum 8. Existing saved values keep their level until changed or reset.
 Engine boost preserves existing saved gains and also scales the engine's
 afterburner component. The separate afterburner control now lives in the
-Afterburner tab described below. Camera–Cockpit positions blend listener geometry, motion and
+Exhaust tab's Afterburner section described below. Camera–Cockpit positions blend listener geometry, motion and
 cabin/exterior treatment; intermediate viewpoints are artistic. The visual
 camera remains independently controlled. These settings have no second home
 under Camera or Controls. Integrated software checks for this 2026-10-05 follow-up
 pass; see the [sound ledger](../validation/audio-implementation-ledger.md#163-pilot-sound-controls-2026-10-05-follow-up).
 
-### Afterburner
+### Exhaust
 
-Aircraft metadata enables this tab only for aircraft equipped with an
-afterburner. It has two sections, with the shared registry's paragraph-grid
-controls and persistent, live values:
+This tab owns gas/luminance, smoke and afterburner settings with the shared
+registry's paragraph-grid controls and persistent, live values. Aircraft
+metadata shows the Afterburner section only on equipped aircraft. All existing
+`osfs.exhaust.*` and `osfs.sound.afterburnerVolume` IDs keep their saved values;
+there is no separate Afterburner tab or duplicate Renderer exhaust section.
 
 | Section / parameter | Unit | Bounds / default |
 | --- | --- | --- |
-| Exhaust appearance / `osfs.exhaust.dryIntensity` | display multiplier | 0.5–3 / 1× |
-| Afterburner sound / `osfs.sound.afterburnerVolume` | AB contribution gain, shown as % | 0–1 / 0.5 |
+| Gas and luminance / `osfs.exhaust.dryIntensity` | display multiplier | 0.5–10 / 1× |
+| Afterburner / `osfs.sound.afterburnerVolume` | AB contribution gain, shown as % | 0–1 / 0.5 |
 
 Dry exhaust brightness multiplies gas emission and its approximate nearby
 scene light only with native augmentation off. One preserves the current
@@ -485,6 +488,20 @@ does not force wet operation to sound identical to dry operation. The AB
 component follows valid native actually burned AB fuel instead of the selection
 flag alone. Its continuous burned-fuel fraction is an uncalibrated acoustic
 proxy. [Causality and remaining acceptance](../validation/f135-exhaust-controls.md).
+
+The independent [smoke and nonluminous hot-gas implementation prompt](../aircraft-smoke-hot-gas-implementation-prompt.md)
+assigns aerosol transport and heat distortion to another agent, while freezing
+the high-temperature luminance source. The existing smoke renderer is still an
+artistic approximation; moving its controls is not that physical implementation.
+
+Sound is on by default (`osfs.sound.enabled = true`) and Med remains the
+default tier. An explicit saved off preference is respected. Normal interaction
+unlocks browser audio; browser activation is not a second opt-in switch. The
+pilot has accepted Low, Med and High in listening tests, so the normal UI no
+longer shows absent-qualification warnings. Actual unsupported capability,
+audio-context and overload failures remain reported. Auto chooses the highest
+supported tier with the existing limits/fallback behavior. This listening
+acceptance is not a measured performance qualification for every device.
 
 ## Presets
 

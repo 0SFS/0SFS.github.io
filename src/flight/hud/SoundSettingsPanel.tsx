@@ -33,10 +33,8 @@ const COMBUSTION_SOURCE_LABELS: Record<string, string> = {
 };
 
 /**
- * sound.md §6 labels, exactly: "Unsupported on this device" only for a concrete
- * missing capability, "Not yet validated" for absent device evidence, "Audio
- * pack unavailable" for missing licensed assets. An unvalidated tier stays
- * selectable and runs as soon as it is chosen; only Auto waits for evidence.
+ * Only concrete browser, renderer or asset failures belong in normal controls.
+ * Listening acceptance and performance evidence are recorded in the docs.
  */
 function qualityOption(state: FlightAudioStatus, id: AudioQualityId) {
   if (!TIERS.includes(id)) return { label: AUDIO_QUALITY_LABELS[id], disabled: false, reason: null };
@@ -44,7 +42,7 @@ function qualityOption(state: FlightAudioStatus, id: AudioQualityId) {
   if (availability.state === "available") return { label: AUDIO_QUALITY_LABELS[id], disabled: false, reason: null };
   return {
     label: `${AUDIO_QUALITY_LABELS[id]} — ${AVAILABILITY_LABELS[availability.state]}`,
-    disabled: availability.state !== "unvalidated",
+    disabled: true,
     reason: availability.reason,
   };
 }
@@ -63,7 +61,7 @@ export function SoundSettingsPanel({ state, onAction }: {
   return (
     <fieldset className="flight-panel__fieldset">
       <legend>Sound</legend>
-      {!audible && <button className="flight-panel__command" type="button"
+      {!settings.enabled && !audible && <button className="flight-panel__command" type="button"
         onClick={() => onAction({ type: "enable", enabled: true })}>Enable sound</button>}
       {settings.enabled && <button className="flight-panel__command" type="button"
         onClick={() => onAction({ type: "enable", enabled: false })}>Turn sound off</button>}
@@ -83,9 +81,6 @@ export function SoundSettingsPanel({ state, onAction }: {
         {state.held ? " · held while paused or hidden" : ""}
       </p>
       {requestedReason && <p className="flight-panel__hint">{requestedReason}</p>}
-      {settings.requested === "high" && <p className="flight-panel__hint">
-        High synthesises engine spectra and directionality. Acoustic calibration is pending.
-      </p>}
       {state.message && <p className="flight-panel__hint" role="alert">{state.message}</p>}
       {settings.downgradedFrom && <>
         <p className="flight-panel__hint">
@@ -143,7 +138,6 @@ export function SoundSettingsPanel({ state, onAction }: {
         {" "}Tire sound and its volume are under Aircraft → Ground handling. For live engine data, click
         ENGINE on the flight display. Muting sound never hides engine gauges or warnings.
       </p>
-      {state.telemetry?.approximation && <p className="flight-panel__hint">{state.telemetry.approximation}</p>}
       {state.telemetry && state.telemetry.missing.length > 0 && <p className="flight-panel__hint">
         Not published by this model, so left silent rather than guessed: {state.telemetry.missing.join(", ")}.
       </p>}

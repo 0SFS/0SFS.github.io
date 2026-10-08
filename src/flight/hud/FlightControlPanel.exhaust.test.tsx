@@ -19,7 +19,7 @@ vi.mock("foss-earth/shell", async importOriginal => {
     ...actual,
     WindowOverlay: ({ additionalTabs = [], renderAdditionalTab }: WindowOverlayProps<FlightPanelTab>) => <>
       <nav>{additionalTabs.map(tab => <button key={tab.id}>{tab.label}</button>)}</nav>
-      {additionalTabs.filter(tab => tab.id === "afterburner" || tab.id === "sound").map(tab =>
+      {additionalTabs.filter(tab => tab.id === "exhaust" || tab.id === "sound").map(tab =>
         <section key={tab.id} data-flight-tab={tab.id}>{renderAdditionalTab?.(tab.id)}</section>)}
     </>,
   };
@@ -72,23 +72,29 @@ async function mount(aircraftId: AircraftId) {
   return { host, settings, render };
 }
 
-describe("aircraft Afterburner tab", () => {
-  it.each(["cessna-172", "cirrus-vision-jet-g2"] as const)("is absent on %s", async aircraftId => {
+describe("aircraft Exhaust tab", () => {
+  it.each(["cessna-172", "cirrus-vision-jet-g2"] as const)("keeps gas and smoke on %s without an afterburner section", async aircraftId => {
     const { host } = await mount(aircraftId);
+    expect([...host.querySelectorAll("nav button")].filter(button => button.textContent === "Exhaust")).toHaveLength(1);
     expect([...host.querySelectorAll("nav button")].some(button => button.textContent === "Afterburner")).toBe(false);
-    expect(host.querySelector('[data-flight-tab="afterburner"]')).toBeNull();
+    const tab = host.querySelector('[data-flight-tab="exhaust"]')!;
+    expect([...tab.querySelectorAll<HTMLElement>("[data-settings-section]")].map(section => section.dataset.settingsSection))
+      .toEqual(["exhaust/gas", "exhaust/smoke"]);
+    expect([...tab.querySelectorAll("legend")].map(legend => legend.textContent)).toEqual(["Gas and luminance", "Smoke"]);
     expect(host.querySelector('input[aria-label="Afterburner volume"]')).toBeNull();
   });
 
   it("provides the only dry appearance and afterburner volume controls, updating their registry values live", async () => {
     const { host, settings } = await mount("f-35b");
-    expect([...host.querySelectorAll("nav button")].filter(button => button.textContent === "Afterburner")).toHaveLength(1);
-    const tab = host.querySelector('[data-flight-tab="afterburner"]')!;
+    expect([...host.querySelectorAll("nav button")].filter(button => button.textContent === "Exhaust")).toHaveLength(1);
+    expect([...host.querySelectorAll("nav button")].some(button => button.textContent === "Afterburner")).toBe(false);
+    const tab = host.querySelector('[data-flight-tab="exhaust"]')!;
     expect([...tab.querySelectorAll<HTMLElement>("[data-settings-section]")].map(section => section.dataset.settingsSection))
-      .toEqual(["afterburner/appearance", "afterburner/sound"]);
+      .toEqual(["exhaust/gas", "exhaust/smoke", "exhaust/afterburner"]);
+    expect([...tab.querySelectorAll("legend")].map(legend => legend.textContent)).toEqual(["Gas and luminance", "Smoke", "Afterburner"]);
     const dry = tab.querySelector<HTMLInputElement>('[data-parameter="osfs.exhaust.dryIntensity"] input[type="range"]')!;
     const afterburner = tab.querySelector<HTMLInputElement>('[data-parameter="osfs.sound.afterburnerVolume"] input[type="range"]')!;
-    expect([dry.min, dry.max, dry.value]).toEqual(["0.5", "3", "1"]);
+    expect([dry.min, dry.max, dry.value]).toEqual(["0.5", "10", "1"]);
     expect(afterburner.value).toBe("0.5");
     expect(host.querySelectorAll('input[type="range"][aria-label="Afterburner volume"]')).toHaveLength(1);
     expect(host.querySelector('[data-flight-tab="sound"] [data-parameter="osfs.sound.afterburnerVolume"]')).toBeNull();
@@ -102,11 +108,12 @@ describe("aircraft Afterburner tab", () => {
     expect(settings.get("osfs.sound.afterburnerVolume")).toBe(0);
   });
 
-  it("removes the tab and its controls when the active aircraft no longer has an afterburner", async () => {
+  it("removes only the afterburner section when the active aircraft no longer has an afterburner", async () => {
     const { host, render } = await mount("f-35b");
-    expect(host.querySelector('[data-flight-tab="afterburner"]')).not.toBeNull();
+    expect(host.querySelector('[data-settings-section="exhaust/afterburner"]')).not.toBeNull();
     await render("cirrus-vision-jet-g2");
-    expect(host.querySelector('[data-flight-tab="afterburner"]')).toBeNull();
+    expect(host.querySelector('[data-flight-tab="exhaust"]')).not.toBeNull();
+    expect(host.querySelector('[data-settings-section="exhaust/afterburner"]')).toBeNull();
     expect(host.querySelector('input[aria-label="Afterburner volume"]')).toBeNull();
   });
 });

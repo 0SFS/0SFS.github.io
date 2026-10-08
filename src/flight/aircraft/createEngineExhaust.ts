@@ -31,7 +31,7 @@ export interface EngineExhaustSettings {
   maxDistanceMeters: number;
   /** Artistic emission amplitude, not measured radiance/SPL, 0..8. */
   intensity: number;
-  /** Dry-only gas/light presentation multiplier, 0.5..3; omitted preserves 1. */
+  /** Dry-only gas/light presentation multiplier, 0.5..10; omitted preserves 1. */
   dryIntensity?: number;
   /** Display white reference for photometric hardware emission, in cd/m². */
   surfaceReferenceNits: number;
@@ -695,7 +695,7 @@ export function createEngineExhaust(scene: Scene, options: EngineExhaustOptions)
       fieldRevision++;
     }
     const gasReference = settings.gasReferenceNits ?? 1000;
-    const dryIntensity = Number.isFinite(settings.dryIntensity) ? Math.max(0.5, Math.min(3, settings.dryIntensity!)) : 1;
+    const dryIntensity = Number.isFinite(settings.dryIntensity) ? Math.max(0.5, Math.min(10, settings.dryIntensity!)) : 1;
     const gasGain = Number.isFinite(gasReference) && gasReference > 0 ? intensity * (augmented ? 1 : dryIntensity) / gasReference : 0;
     const sourceVisible = Boolean(hardwareVisible && (!options.flowSupport || support) && inputFinite && state!.running && gas.valid && gasGain > 0
       && (gas.absorptionPerMeter > 0 || Math.max(...gas.sourceRgbCdPerM3) > 0));

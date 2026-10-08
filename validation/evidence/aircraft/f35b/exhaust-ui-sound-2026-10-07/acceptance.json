@@ -1,0 +1,224 @@
+{
+  "date": "2026-10-07",
+  "kind": "Exhaust UI, default-on sound and joint AB onset follow-up",
+  "baseCommit": "61bf86ca",
+  "owner": "0sfs",
+  "testExecutionScope": "Combined working tree including preserved concurrent Sky, phone and G-force work. Source hashes captured after final checks, not a claim of an isolated commit build.",
+  "changes": {
+    "exhaustHome": [
+      "Gas and luminance",
+      "Smoke",
+      "Afterburner on equipped aircraft only"
+    ],
+    "dryDisplayMultiplier": {
+      "min": 0.5,
+      "max": 10,
+      "default": 1,
+      "nativeOrPhysicalEmissionChange": false
+    },
+    "sound": {
+      "defaultEnabled": true,
+      "defaultTier": "med",
+      "savedOffPreserved": true,
+      "routineQualificationWarningsRemoved": true,
+      "actualFaultsPreserved": true,
+      "auto": "Highest supported with existing limits/fallback"
+    },
+    "smokeAndNonluminousHotGas": "Prompt only; not implemented in this follow-up",
+    "dspSourceOrWasmChange": false,
+    "nativeCorrection": "None; premature wet thrust retained as known open defect"
+  },
+  "checks": [
+    {
+      "command": "npx tsc -b",
+      "exitCode": 0,
+      "phase": "initial"
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "phase": "initial"
+    },
+    {
+      "command": "npx vitest related --run --maxWorkers=50% (changed settings/exhaust/audio/UI/onset files)",
+      "exitCode": 0,
+      "filesPassed": 60,
+      "testsPassed": 824,
+      "expectedFailures": 1
+    },
+    {
+      "command": "npm run ci",
+      "exitCode": 0,
+      "fullSuiteRuns": 1,
+      "filesPassed": 187,
+      "testsPassed": 2027,
+      "expectedFailures": 2,
+      "includes": [
+        "lint",
+        "test",
+        "production build",
+        "installed and emitted artifact verification"
+      ],
+      "phase": "Before validation-only telemetry-clock correction"
+    },
+    {
+      "command": "npx vitest run --maxWorkers=50% src/flight/audio/f135ExhaustOnset.integration.test.ts",
+      "exitCode": 0,
+      "filesPassed": 1,
+      "testsPassed": 4,
+      "expectedFailures": 1,
+      "phase": "Final integer publication clock and stronger resource assertions"
+    },
+    {
+      "command": "npx tsc -b",
+      "exitCode": 0,
+      "phase": "final"
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "phase": "final"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  ],
+  "expectedFailures": [
+    "F135 zero burned AB fuel must not produce reheat-only excess thrust (new known native discrepancy)",
+    "Stowed F-35B main-leg arms clear selected skin (existing asset defect)"
+  ],
+  "onsetEvidence": "validation/evidence/aircraft/f35b/ab-onset-2026-10-07/integer-clock-reviewed/report.json",
+  "acceptance": {
+    "softwareChecks": "passed with explicitly retained expected failures",
+    "nativeThrustBeforeBurn": "failed-known-open",
+    "jointSourceAndDeliberateDspCausality": "passed CPU checks",
+    "renderedOrPerceivedAbOnset": "not tested; user reports mismatch remains",
+    "dryNightAppearance": "User accepts faint red flame qualitatively; no telemetry or radiometric capture",
+    "soundTiers": "User accepts Low/Med/High by listening; no named-device performance qualification",
+    "browserGpuSoundDevicePerformance": "not run",
+    "deployment": "held; no push/deploy in this follow-up"
+  },
+  "sourceInputs": [
+    {
+      "path": "src/flight/aircraft/createEngineExhaust.ts",
+      "sha256": "72a1aeb0d451373464ee9be9fdd89bf54ad5aa86f114969b36b5c7ad91d2befd"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineExhaustDomain.test.ts",
+      "sha256": "9a4a130efd8d0b5f8e1a0f08ab92866a8bce04ccc4364e0fbd6828d367162017"
+    },
+    {
+      "path": "src/flight/settings/flightParameters.ts",
+      "sha256": "891653022327e2169f980c4604057cb8ed8a9fb6eb7baa77be965a72d744b6dc"
+    },
+    {
+      "path": "src/flight/settings/flightParameters.test.ts",
+      "sha256": "b4a937f2b03f3939e5a52c63cce6e3a8cdef70ea31d7e1f5d913b167fb0db6a5"
+    },
+    {
+      "path": "src/flight/audio/audioQuality.ts",
+      "sha256": "5341dbc38b139aa0613a5fea18067a464dfaf000e6cace6f572e8daca08e2f9f"
+    },
+    {
+      "path": "src/flight/audio/audioQuality.test.ts",
+      "sha256": "d9dca108227346eb3020c2d009f0930044e16cb1e87d0ee7d7ee2e22305c9d36"
+    },
+    {
+      "path": "src/flight/audio/audioSettings.ts",
+      "sha256": "ac6977d13275c12ff347552b470ae6930f116ecaf44e8f1e6fafccb097f9ee46"
+    },
+    {
+      "path": "src/flight/audio/audioSettings.test.ts",
+      "sha256": "754e35d933d69f0a44fc1ec6eb121535566cc8a5bd1957060db3a402a9e88bba"
+    },
+    {
+      "path": "src/flight/audio/createFlightAudio.ts",
+      "sha256": "e0162bed6cb670738afb6a6383ef4fa2cf416d576f85ec07035f32fd11da421a"
+    },
+    {
+      "path": "src/flight/audio/createFlightAudio.test.ts",
+      "sha256": "f60866eda33dc0b9a66622d92b5d7df086fdf10bb1cf4d46331af40a87d92ba2"
+    },
+    {
+      "path": "src/flight/hud/FlightControlPanel.tsx",
+      "sha256": "ace7df0e048912ed3f3e145bc629b4af7f345392c8c7f1faa9cf151d43a2720f"
+    },
+    {
+      "path": "src/flight/hud/FlightControlPanel.exhaust.test.tsx",
+      "sha256": "839bc7b8d30ea33c9f6a9ad0f67055521f6e89de775a204e1aeebf2e362d2673"
+    },
+    {
+      "path": "src/flight/hud/SoundSettingsPanel.tsx",
+      "sha256": "5bf8e61db2233c11f18fe3300eb5f42c980efef9a85ac32f2c70dac89d6b4656"
+    },
+    {
+      "path": "src/flight/hud/SoundSettingsPanel.test.tsx",
+      "sha256": "6a342850c3ae56b0e1d0cb7ab62ec01c35c0a7e4a40f99132181215da689b154"
+    },
+    {
+      "path": "src/flight/audio/f135ExhaustOnsetHarness.ts",
+      "sha256": "56b5be21988c8d31caaeba3ba89c0f93708575c6138e804367901399562d2107"
+    },
+    {
+      "path": "src/flight/audio/f135ExhaustOnset.integration.test.ts",
+      "sha256": "fe55af63b4096130186a7aac661eccda33518fe90b1edc071f301bb5e9ebf2ad"
+    },
+    {
+      "path": "scripts/validation/f35b/check-f135-ab-onset.mjs",
+      "sha256": "53cdec0e5405844ee95052c5237ccc520ef519ba8183dab2dda2e5412dd8c3ff"
+    },
+    {
+      "path": "src/flight/audio/dsp/audio-dsp.wasm",
+      "sha256": "100eefa8f3eaec2e3f3cfee12086732871f7aa0cb96f157b87f61e7ec0b6b677"
+    },
+    {
+      "path": "src/flight/audio/dsp/audio-dsp.provenance.json",
+      "sha256": "00e9897c19ab58489171f92e443d005160756f1a00a86a44c35a368e52228fb9"
+    }
+  ],
+  "logs": [
+    {
+      "path": "validation/evidence/aircraft/f35b/exhaust-ui-sound-2026-10-07/typecheck.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redaction": "Local workspace/home paths redacted and trailing whitespace normalized; unchanged original log retained in build."
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/exhaust-ui-sound-2026-10-07/lint.log",
+      "sha256": "d25f8980fad0b5aaf42d5c11aa2c6d95a921e64717b121d7b1064755cbdf9c30",
+      "originalSha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e",
+      "redaction": "Local workspace/home paths redacted and trailing whitespace normalized; unchanged original log retained in build."
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/exhaust-ui-sound-2026-10-07/related.log",
+      "sha256": "48a2fbc67c0d8f042018eed208ea8bcf899f8d9d896caf7d694e110b4547fba0",
+      "originalSha256": "3b207dcbf29cbc1038dc82d530b38d5c5ddba45ccda4573f758b3dac0d9583eb",
+      "redaction": "Local workspace/home paths redacted and trailing whitespace normalized; unchanged original log retained in build."
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/exhaust-ui-sound-2026-10-07/ci.log",
+      "sha256": "4320c5a60d544aba346fc9cbabb953e70a2a8c9c4905f68efa8e17af631bd6ba",
+      "originalSha256": "55a07f8cb51b71eb2c268591dcca03651e22443c2f009505e777b0c137196a6a",
+      "redaction": "Local workspace/home paths redacted and trailing whitespace normalized; unchanged original log retained in build."
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/exhaust-ui-sound-2026-10-07/typecheck-final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redaction": "Local workspace/home paths redacted and trailing whitespace normalized; unchanged original log retained in build."
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/exhaust-ui-sound-2026-10-07/lint-final.log",
+      "sha256": "d25f8980fad0b5aaf42d5c11aa2c6d95a921e64717b121d7b1064755cbdf9c30",
+      "originalSha256": "258f62ec0c3ac0dbf7b97acd3cfb98cf0a2f7c116c3fb414d40ddf38345ba36e",
+      "redaction": "Local workspace/home paths redacted and trailing whitespace normalized; unchanged original log retained in build."
+    },
+    {
+      "path": "validation/evidence/aircraft/f35b/exhaust-ui-sound-2026-10-07/onset-final.log",
+      "sha256": "3d7aa441bbd1609b98e2d5f4c9595d0807a8f6ff3699f59aa21a85b1aff062d7",
+      "originalSha256": "c44185e537a41425bee146d865e5057c92fc5496658c6906182765bcef6feea8",
+      "redaction": "Local workspace/home paths redacted and trailing whitespace normalized; unchanged original log retained in build."
+    }
+  ]
+}

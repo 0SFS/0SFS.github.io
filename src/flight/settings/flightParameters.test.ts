@@ -141,7 +141,8 @@ describe("flight parameter catalogue", () => {
     settings.set("osfs.sound.engineVolume", 4);
     for (const [id, value] of [["osfs.sound.afterburnerVolume", 0.2], ["osfs.sound.listenerCockpitBlend", 0.65]] as const) {
       const inspected = settings.inspect(id);
-      expect(inspected.spec.home).toMatchObject({ tab: id === "osfs.sound.afterburnerVolume" ? "afterburner" : "sound", section: "sound" });
+      expect(inspected.spec.home).toMatchObject(id === "osfs.sound.afterburnerVolume"
+        ? { tab: "exhaust", section: "afterburner" } : { tab: "sound", section: "sound" });
       expect(inspected.spec).toMatchObject({ unit: "fraction", kind: "number", appliesLive: true });
       expect(inspected.bounds).toMatchObject({ min: 0, max: 1 });
       expect(validateValue(inspected.spec, -0.01, inspected.bounds, inspected.choices)).not.toBeNull();
@@ -165,13 +166,13 @@ describe("flight parameter catalogue", () => {
     settings.register(OSFS_PARAMETERS);
     const id = "osfs.exhaust.dryIntensity";
     expect(settings.get(id)).toBe(1);
-    expect(settings.inspect(id).spec.home).toMatchObject({ tab: "afterburner", section: "appearance" });
+    expect(settings.inspect(id).spec.home).toMatchObject({ tab: "exhaust", section: "gas" });
     expect(settings.set(id, 0.49).ok).toBe(false);
-    expect(settings.set(id, 3.01).ok).toBe(false);
+    expect(settings.set(id, 10.01).ok).toBe(false);
     expect(settings.set(id, 0.5).ok).toBe(true);
-    expect(settings.set(id, 3).ok).toBe(true);
+    expect(settings.set(id, 10).ok).toBe(true);
     const reloaded = createSettingsRegistry({ storage });
     reloaded.register(OSFS_PARAMETERS);
-    expect(reloaded.get(id)).toBe(3);
+    expect(reloaded.get(id)).toBe(10);
   });
 });

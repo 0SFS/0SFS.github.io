@@ -1,0 +1,1535 @@
+{
+  "date": "2026-10-07",
+  "kind": "untimed-CPU-native-DSP-optical-source-causality",
+  "artifact": {
+    "schemaVersion": 1,
+    "identity": {
+      "schemaVersion": 2,
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.16"
+      },
+      "native": {
+        "origin": "https://github.com/Felipegalind0/jsbsim",
+        "commit": "97fe6ddf1c8a7d9e10dad46a88e60e79e69fae28",
+        "contentSha256": "a360665b71ec7e70f1ed3c0636b8a150c63b40108b2e87b62a76ca89370a124b",
+        "dirty": false
+      },
+      "sdk": {
+        "commit": "97fe6ddf1c8a7d9e10dad46a88e60e79e69fae28",
+        "contentSha256": "9f5a9dc1ee239ffbbd2ecd1c60a596d6d791a031494e4e326f76dfffce12353a",
+        "dirty": false,
+        "path": "wasm"
+      },
+      "build": {
+        "mode": "in-tree",
+        "inputSha256": "b2206897753d2c4a62d646a544d022426acc9b5cec34efcd39a43f880d4e756c",
+        "toolchain": {
+          "node": "v26.8.2",
+          "npm": "11.19.1",
+          "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+          "cmake": "cmake version 4.4.3",
+          "clang": "clang version 24.0.0git",
+          "platform": "darwin",
+          "arch": "arm64",
+          "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+        },
+        "options": {
+          "buildType": "Release",
+          "cxxStandard": 17,
+          "sdkTarget": "es2022"
+        }
+      }
+    },
+    "files": {
+      "index.d.ts": "b4ec3f5dd4ff2583a81a4ed5ee28a0031730e78a4f3520e533c8deb3c5f3006b",
+      "index.js": "a3c840d269684809f0263710a7e8f1ad67e0c7698322472d8d21aeb5b7b4678f",
+      "index.js.map": "019562edab7ce784ff8fbd0dce92f56ceed6ad85f1b6f1acffe618aecb638d41",
+      "licenses/README.txt": "4a42a0f62e7d630a0861561209143f0d90809518c1ec95f0e513d6c175ee09ce",
+      "licenses/jsbsim/AUTHORS": "ca8556894da80f81f773893a9c1009021aac2972d7bb6a39c2f981b4fd00aa9a",
+      "licenses/jsbsim/COPYING": "1e7e6bae5a5bde32f1ae5a7c37a082d1ab03cf89354f7f936ac40be9e39a6531",
+      "licenses/jsbsim/src/GeographicLib/LICENSE.txt": "90d25298be0c5d7f5219ae20009d18910150b3a4ea0ca86dda5df04cfb8d3823",
+      "licenses/jsbsim/src/simgear/xml/COPYING": "8c6b5b6de8fae20b317f4992729abc0e520bfba4c7606cd1e9eeb87418eebdec",
+      "licenses/sdk-LICENSE": "15e2d343fc930439fb82351d7c30f3d151b4c42ca3132c13ff1a60da527a1259",
+      "wasm.d.ts": "b7bbbab6f5e6b0b297dfeff117351e53d4d8598fecde7e805ea9aee7b2923353",
+      "wasm.js": "758d98989301d86ec3aa589fa851d6416b305eca58bb1e6b9579780ea339e09b",
+      "wasm.js.map": "d75a89efd5b3cf07ebfbe70d321f55c01bd8cdde1be50a15d1dcfad21a7ca763",
+      "wasm/jsbsim_wasm.mjs": "da4278fc1c03249e2b5da838425d8e46c80e792a51b6892a8e8910c44605e806",
+      "wasm/jsbsim_wasm.wasm": "80cf2596dd4d13bc39c8058fc791d73188059d82001b9de0ba0b7cce16c98a86"
+    },
+    "validation": {
+      "status": "passed",
+      "commands": [
+        "tsc --noEmit (frozen SDK workspace)",
+        "node --test --test-concurrency=5 test/*.test.mjs (frozen SDK workspace and resolved native fixtures)"
+      ]
+    },
+    "packageArchive": {
+      "path": "deps/felipegalind0-jsbsim-1.2.4-fork.16.tgz",
+      "sha256": "98ee9387c57b871a3851aac83b5eb3a4f858d618e12a2fb9b59eaa0c59dbf61b",
+      "integrity": "sha512-nxw9q31sDAit/27ckXz0eUmsZYDY5bZtLVjTIHXCIXHT2Xnjtj/UebiSlRGNnbjdcNQPZbox0WcSQSAxcDxKfg=="
+    }
+  },
+  "sourceInputs": [
+    {
+      "path": "src/flight/aircraft/generated/f135EngineData.ts",
+      "sha256": "08545c3e51892acb63ea27c8283445aef1a1e4d1a432768af1b492ba0fd48ddb"
+    },
+    {
+      "path": "src/flight/aircraft/engineGasSupport.ts",
+      "sha256": "55d0b3e77ad4757ed91775739247065f7d3b80f5f7027461d2a423cb6801386c"
+    },
+    {
+      "path": "src/flight/aircraft/engineReactionEmission.ts",
+      "sha256": "1d0e736b8a5b816a66d68a57c5674ce7f0af0a9a457fe4faaeaa6eccca8cec91"
+    },
+    {
+      "path": "src/flight/aircraft/engineGasOptics.ts",
+      "sha256": "a2ed5be59fcc40e2f6d984fa949d2cc5908c14696d1fac94c09591aac9f43634"
+    },
+    {
+      "path": "src/flight/aircraft/engineNozzleRig.ts",
+      "sha256": "0c070c616f6b9508de3cba5ccd24818b9ad679bb938e9d86acf1287f381f0996"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135ExhaustOpticalData.ts",
+      "sha256": "92d03fe358959f1d009e8c37aa9b779347076d1b5386ce10554e4075cb9cf91f"
+    },
+    {
+      "path": "src/flight/physics/flightState.ts",
+      "sha256": "dd4537687cd4ec0eba2ba265f3322c994eb3f52c6be35a6677fd79e7198bd91c"
+    },
+    {
+      "path": "src/flight/bridge/ecefBridge.ts",
+      "sha256": "f6e39b93b3dc0add70d9852d395a4cde5a9937259616aa561d9384e68f4e59da"
+    },
+    {
+      "path": "src/flight/diagnostics/flightLog.ts",
+      "sha256": "68b9730212b9cbaff9da3caad96011017ab5328b92d525297fab4d56ba8a3d01"
+    },
+    {
+      "path": "src/flight/physics/fixedStepLoop.ts",
+      "sha256": "5283a65f82e2120c4e7209e6b9c45ab6b25c13b393f4a7fb3e0b0ebdfeca051f"
+    },
+    {
+      "path": "src/flight/aircraft/engineRotorDefinitions.ts",
+      "sha256": "93b40fb2f81d5cf8d50daee1c2f71cb09dd942f6c9369599aebbaf0ebcdedcfc"
+    },
+    {
+      "path": "src/flight/aircraft/sf50Variants.ts",
+      "sha256": "49dd49599d7ff526b58bfe8051ea9baa98e2e18c146541440f2e3b5e4155864d"
+    },
+    {
+      "path": "src/flight/physics/collisionGeometry.ts",
+      "sha256": "82ad56345d9aa5d24afd6e6cec564e62c21cdc159103cba3ba9eb84ce6384b74"
+    },
+    {
+      "path": "src/flight/jsbsim/fdmProfiles.ts",
+      "sha256": "0caf8e745952f0068f1e6509bd4ffb2d71cdd1dfb0cfd03887238cf17cc04385"
+    },
+    {
+      "path": "src/flight/aircraft/engineExhaustProfiles.ts",
+      "sha256": "d202d915b4fd227c57baf0fc643d3c497de1426598579d43df56afa0c0a08cd2"
+    },
+    {
+      "path": "src/flight/aircraft/aircraftIds.ts",
+      "sha256": "b81cd7fe4b22d656adb21a4289118083e6dbdf0a896c744dcf4edecaa1f0293d"
+    },
+    {
+      "path": "src/flight/aircraft/aircraftCatalog.ts",
+      "sha256": "02ee14e05616a5dffbdceb07fc662bb7cd1728d87c9cd2d47932b0170c7cc3ec"
+    },
+    {
+      "path": "src/flight/hud/engineSpoolMotion.ts",
+      "sha256": "36d7e91eceeef8d63ab0b9c31a4ac43bb40e5536a528d9357f7570a16a1a087e"
+    },
+    {
+      "path": "src/remote/protocol.ts",
+      "sha256": "2c9ee764a09be47a9f408631df7df543e67dbde78ececdf9fb25861a6a9f371d"
+    },
+    {
+      "path": "src/flight/settings/groundInteractionSettings.ts",
+      "sha256": "389e77b031fd8c51e430e706075c9eb28802cc4708277e7f673f2b41d18725b0"
+    },
+    {
+      "path": "src/flight/settings/flightParameters.ts",
+      "sha256": "891653022327e2169f980c4604057cb8ed8a9fb6eb7baa77be965a72d744b6dc"
+    },
+    {
+      "path": "src/flight/jsbsim/bootstrapC172.ts",
+      "sha256": "fe71b1fc1aa86e1648f075b93e33f656cc63e36d86b8b69ee560fec26a5ea927"
+    },
+    {
+      "path": "src/flight/jsbsim/engineControl.ts",
+      "sha256": "6bbfc9b7d5e684763cae2529b7a1a7fc9ebbd0488791189738ab199fd1233698"
+    },
+    {
+      "path": "src/flight/jsbsim/hydrateJsbsimData.ts",
+      "sha256": "26447db10ddd98b02f68776a11ed9ed492c9831cb3d2c89561b76eb4c78d8569"
+    },
+    {
+      "path": "src/flight/audio/engineAcousticDefinitions.ts",
+      "sha256": "562121e77002891fa8f7d8d22a5551905c8554862bec06495ea77073d2553548"
+    },
+    {
+      "path": "src/flight/audio/audioAssets.ts",
+      "sha256": "f85fd241dc1223245dd81641a8ace03d29b02956cc576605fe60643042e2788b"
+    },
+    {
+      "path": "src/flight/audio/audioSnapshot.ts",
+      "sha256": "c391a4e1da1e4a13f8889facefed9e685b950995f116f491b8a9f5116289f5af"
+    },
+    {
+      "path": "src/flight/audio/audioRendererRegistry.ts",
+      "sha256": "8415c23a955b9b35ca484b2c7c6e302150cee6f356a4a0ad7f46d62ef26e54b1"
+    },
+    {
+      "path": "src/flight/audio/aircraftAudioProfiles.ts",
+      "sha256": "8a143aeea3e7934bb389d56fe17e801eb8a13a39b8846029ff92ef090b21db1d"
+    },
+    {
+      "path": "src/flight/audio/dspHarness.ts",
+      "sha256": "17cde5857b2eaf02458aaa49ca682ff5b4f7c45c205b1e349c6c2bef07a3b883"
+    },
+    {
+      "path": "src/flight/diagnostics/flightRecorder.ts",
+      "sha256": "9781451ec42488c89b2990fe1af81db1966924fed6b77a522e42ec3d42f51e85"
+    },
+    {
+      "path": "src/flight/audio/jsbsimAudioAdapter.ts",
+      "sha256": "c31a7c18a7b8ac725e0ed2dafd440b901266487d22d641a68192a303f749ffba"
+    },
+    {
+      "path": "src/flight/audio/f135ExhaustOnsetHarness.ts",
+      "sha256": "56b5be21988c8d31caaeba3ba89c0f93708575c6138e804367901399562d2107"
+    },
+    {
+      "path": "scripts/validation/f35b/check-f135-ab-onset.mjs",
+      "sha256": "53cdec0e5405844ee95052c5237ccc520ef519ba8183dab2dda2e5412dd8c3ff"
+    },
+    {
+      "path": "src/flight/audio/f135ExhaustOnset.integration.test.ts",
+      "sha256": "fe55af63b4096130186a7aac661eccda33518fe90b1edc071f301bb5e9ebf2ad"
+    },
+    {
+      "path": "src/flight/audio/dsp/audio-dsp.wasm",
+      "sha256": "100eefa8f3eaec2e3f3cfee12086732871f7aa0cb96f157b87f61e7ec0b6b677"
+    },
+    {
+      "path": "src/flight/audio/dsp/audio-dsp.provenance.json",
+      "sha256": "00e9897c19ab58489171f92e443d005160756f1a00a86a44c35a368e52228fb9"
+    },
+    {
+      "path": "src/flight/audio/dsp/core.cpp",
+      "sha256": "f61bbb2421f55bfaa2e7ff06cbba1ee074e8e5ca59744587b3b8cae9c878b6e9"
+    },
+    {
+      "path": "src/flight/audio/dsp/turbofan.h",
+      "sha256": "dc92d7418f817adb045cd6f697e0999705f152042f38ab1aecf33115f21f2fbf"
+    },
+    {
+      "path": "src/flight/aircraft/createEngineExhaust.ts",
+      "sha256": "72a1aeb0d451373464ee9be9fdd89bf54ad5aa86f114969b36b5c7ad91d2befd"
+    },
+    {
+      "path": "src/flight/aircraft/generated/f135-exhaust-lut.manifest.json",
+      "sha256": "95036c421d8bf371c633caef805ed26103577c55b0bbff8b066da30b73f6e001"
+    },
+    {
+      "path": "public/jsbsim-data/manifest.json",
+      "sha256": "448049a4e922630c251ebfa2f5245457799fed5502380cb4db6f35cf5ea45d42"
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+      "sha256": "04cea10d3c135cb79247bbf7794a81359070e2bdc9afc9782502b538444eac16"
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml",
+      "sha256": "7d81cf7930ac9ecb008fa5c8a72259aa198824cc31acb26a4537e140d055be17"
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/direct.xml",
+      "sha256": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc"
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/liftfan.xml",
+      "sha256": "9ded9a6a93eeab2dac35c779b51945b9e5cf0807591737b67262b27c5ab67287"
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/sidefan.xml",
+      "sha256": "90e1017803f4d9f46285ee09b2aed37d01cee82053e612ffabcf7a19816571ae"
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Systems/pushback.xml",
+      "sha256": "868928e9b2b12440daec283260aebb1562d05154f69438f5d95043444378a4bc"
+    },
+    {
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-full.glb",
+      "sha256": "0fc8083a3a4d5d5d76946ea3602d4a23ebc508e58301145e489c59c1801ff71f"
+    },
+    {
+      "path": "public/aircraft/f-35b/engine/F135-PW-600-installed.glb",
+      "sha256": "4e7d837e2ab5303ab9d90a3b3321baa469e5fc204acad7e0b2f59185990aa341"
+    },
+    {
+      "path": "public/aircraft/f-35b/F-35B_AF267-airframe.glb",
+      "sha256": "76c76d6230fcf3259e2552d793f95f5421a2ab3cc35f39a5ebf01817b38d5814"
+    }
+  ],
+  "executedBundleSha256": "dcc63bba13fbf239dc75555d78063cc6cd6f42171ec697f450b553bd8fe2805b",
+  "nativeCsvSha256": "33c154d142b9a16a6c6931785109b38459e676fe5bd6dc79594139210e250961",
+  "temporalConvention": "Command at time 0; first accepted post-command native step labeled 0; fixed dt=1/120 s. DSP follows integer-tick 60 Hz telemetry, 33.3 ms buffering and dezippering; 1 m propagation in Med/High, none in Low. Test harness prefills 100 ms future timestamped telemetry to ensure interpolation brackets, not a measured scheduler/device delay.",
+  "criteria": {
+    "deliberateAudioWaitsForNativeBurn": "passed",
+    "internalReactionSourceStartsAtFirstNativeBurn": "passed",
+    "noExteriorCHRelocation": "passed",
+    "sourceEnergyBound": "passed",
+    "unchangedDspCapsAndMemory": "passed",
+    "noReheatThrustBeforeNativeBurn": "failed-known-open",
+    "visiblyPerceivedOnset": "not-tested"
+  },
+  "limitations": [
+    "Nonzero spectral source and first unequal float audio sample do not establish visible pixels or audible onset.",
+    "Dry table counterfactual is a diagnostic at identical native shaft, atmosphere and bleed; production audio never substitutes it.",
+    "Native EGT, thermal flow, fuel partition and optical particle/parcel closures remain uncalibrated F135 hypotheses.",
+    "NullEngine loads the authored gas support but draws no pixels; no GPU, browser, sound device or performance timing was tested.",
+    "Known-open native thrust invariant is intentionally not counted as numerical correctness or perceptual synchronization acceptance."
+  ],
+  "failures": [
+    {
+      "name": "cold-first-running",
+      "criterion": "No reheat-only excess thrust before actual AB combustion",
+      "status": "known-open-native-discrepancy",
+      "violatingSteps": 496,
+      "first": {
+        "timeSeconds": 2.5166666666666666,
+        "n1Pct": 67.02086692865014,
+        "n2Pct": 97.02086692865016,
+        "augmentation": true,
+        "thrustLbf": 42999.999999500724,
+        "referenceDryThrustLbf": 23455.07065752847,
+        "totalFuelKgSec": 0.4279095598166583,
+        "burnedAbKgSec": 0,
+        "upstreamKelvin": 981.7537895042623,
+        "meanGasKelvin": 981.7537895042623,
+        "linerKelvin": 374.68112156716506
+      },
+      "last": {
+        "timeSeconds": 6.641666666666667,
+        "n1Pct": 100,
+        "n2Pct": 100,
+        "augmentation": true,
+        "thrustLbf": 42999.99999950073,
+        "referenceDryThrustLbf": 27159.9999995703,
+        "totalFuelKgSec": 3.0266158462750083,
+        "burnedAbKgSec": 0,
+        "upstreamKelvin": 1008.3499999987379,
+        "meanGasKelvin": 1008.3499999987379,
+        "linerKelvin": 482.91183853873565
+      }
+    },
+    {
+      "name": "cold-then-hot-dry",
+      "criterion": "No reheat-only excess thrust before actual AB combustion",
+      "status": "known-open-native-discrepancy",
+      "violatingSteps": 10,
+      "first": {
+        "timeSeconds": 0,
+        "n1Pct": 99.4874999999963,
+        "n2Pct": 99.7874999999963,
+        "augmentation": true,
+        "thrustLbf": 42999.999999471635,
+        "referenceDryThrustLbf": 26886.23658035478,
+        "totalFuelKgSec": 2.9784232517648648,
+        "burnedAbKgSec": 0,
+        "upstreamKelvin": 1006.452906248631,
+        "meanGasKelvin": 1006.452906248631,
+        "linerKelvin": 665.663632343674
+      },
+      "last": {
+        "timeSeconds": 0.075,
+        "n1Pct": 100,
+        "n2Pct": 100,
+        "augmentation": true,
+        "thrustLbf": 42999.99999947451,
+        "referenceDryThrustLbf": 27159.999999547745,
+        "totalFuelKgSec": 3.0256724569731994,
+        "burnedAbKgSec": 0,
+        "upstreamKelvin": 1008.3499999986715,
+        "meanGasKelvin": 1008.3499999986715,
+        "linerKelvin": 665.6954391539887
+      }
+    },
+    {
+      "name": "warm-running-shortcut",
+      "criterion": "No reheat-only excess thrust before actual AB combustion",
+      "status": "known-open-native-discrepancy",
+      "violatingSteps": 10,
+      "first": {
+        "timeSeconds": 0,
+        "n1Pct": 99.48749999999646,
+        "n2Pct": 99.78749999999646,
+        "augmentation": true,
+        "thrustLbf": 42999.99999949493,
+        "referenceDryThrustLbf": 26886.23658037482,
+        "totalFuelKgSec": 2.9784232517670524,
+        "burnedAbKgSec": 0,
+        "upstreamKelvin": 1006.4529062486914,
+        "meanGasKelvin": 1006.4529062486914,
+        "linerKelvin": 665.6642137218817
+      },
+      "last": {
+        "timeSeconds": 0.075,
+        "n1Pct": 100,
+        "n2Pct": 100,
+        "augmentation": true,
+        "thrustLbf": 42999.999999492,
+        "referenceDryThrustLbf": 27159.999999562795,
+        "totalFuelKgSec": 3.025672456975387,
+        "burnedAbKgSec": 0,
+        "upstreamKelvin": 1008.3499999987158,
+        "meanGasKelvin": 1008.3499999987158,
+        "linerKelvin": 665.6960156252528
+      }
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "cold-first-running",
+      "before": {
+        "timeSeconds": -0.008333333333333333,
+        "n1Pct": 30,
+        "n2Pct": 60,
+        "augmentation": false,
+        "thrustLbf": 0,
+        "referenceDryThrustLbf": 1325.408000006999,
+        "totalFuelKgSec": 0.10451499972406376,
+        "burnedAbKgSec": 0,
+        "upstreamKelvin": 651.2499999987306,
+        "meanGasKelvin": 651.2499999987306,
+        "linerKelvin": 342.05461665991186
+      },
+      "firstSelected": {
+        "timeSeconds": 2.5166666666666666,
+        "n1Pct": 67.02086692865014,
+        "n2Pct": 97.02086692865016,
+        "augmentation": true,
+        "thrustLbf": 42999.999999500724,
+        "referenceDryThrustLbf": 23455.07065752847,
+        "totalFuelKgSec": 0.4279095598166583,
+        "burnedAbKgSec": 0,
+        "upstreamKelvin": 981.7537895042623,
+        "meanGasKelvin": 981.7537895042623,
+        "linerKelvin": 374.68112156716506
+      },
+      "firstBurned": {
+        "timeSeconds": 6.65,
+        "n1Pct": 100,
+        "n2Pct": 100,
+        "augmentation": true,
+        "thrustLbf": 42999.999999497806,
+        "referenceDryThrustLbf": 27159.999999567783,
+        "totalFuelKgSec": 3.031865757964823,
+        "burnedAbKgSec": 0.0027585759623797003,
+        "upstreamKelvin": 1008.3499999987306,
+        "meanGasKelvin": 1009.1559277765116,
+        "linerKelvin": 483.0853217679405
+      },
+      "selectedToBurnDelaySeconds": 4.133333333333334,
+      "sourceAtFirstBurn": {
+        "valid": true,
+        "reactionDomainResolved": true,
+        "chPowerW": 0.10715570995179473,
+        "particlePowerUpperBoundW": 1212.1339413998599,
+        "wholeSourcePhotopicYCd": 74.72879752742651,
+        "precedingWholeSourcePhotopicYCd": 0.08334209614564016,
+        "allowedPowerW": 393839.46911536605,
+        "totalSourcePowerUpperBoundW": 1212.2410971098116
+      },
+      "audio": [
+        {
+          "tier": 1,
+          "sampleRate": 48000,
+          "firstDeliberateDifferenceSeconds": 6.66675,
+          "firstThrustDifferenceSeconds": 2.533354166666667,
+          "preBurnThrustDifferenceRms": 0.009220698720376785,
+          "preBurnDeliberateDifferenceRms": 0,
+          "postBurnDeliberateDifferenceRms": 0.00955658412437296,
+          "deliberateDifferenceSha256": "8a85ce97d3af588609d03cff6f02e65e23080168a8988f2fdcec3e94ad412a7f",
+          "thrustDifferenceSha256": "a8f8e04b23b280c2e6930ffc647d99e1ffd60c863e8ef3b9c598e7b01bf6fca6",
+          "stats": [
+            {
+              "snapshotsIn": 450,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 2775,
+              "frames": 355200,
+              "peak": 0.843193109022206,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 1,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 4,
+              "noiseBands": 5,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 0
+            },
+            {
+              "snapshotsIn": 450,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 2775,
+              "frames": 355200,
+              "peak": 0.8039730463411233,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 1,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 4,
+              "noiseBands": 5,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 0
+            },
+            {
+              "snapshotsIn": 450,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 2775,
+              "frames": 355200,
+              "peak": 0.7921120819968988,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 1,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 4,
+              "noiseBands": 5,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 0
+            }
+          ],
+          "memoryBytes": [
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            },
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            },
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            }
+          ]
+        },
+        {
+          "tier": 2,
+          "sampleRate": 48000,
+          "firstDeliberateDifferenceSeconds": 6.669666666666667,
+          "firstThrustDifferenceSeconds": 2.5362708333333335,
+          "preBurnThrustDifferenceRms": 0.008796203532171174,
+          "preBurnDeliberateDifferenceRms": 0,
+          "postBurnDeliberateDifferenceRms": 0.008944907293877423,
+          "deliberateDifferenceSha256": "a3f57a6adcdbe7b36297a34992eb39c0e254735246e446527d04859e851f4236",
+          "thrustDifferenceSha256": "6fbd83f9245001713d4f35d0df1583c29124ea7451e11dc103f6b80f3a766da8",
+          "stats": [
+            {
+              "snapshotsIn": 450,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 2775,
+              "frames": 355200,
+              "peak": 0.8694218132970681,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 2,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 12,
+              "noiseBands": 6,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 20
+            },
+            {
+              "snapshotsIn": 450,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 2775,
+              "frames": 355200,
+              "peak": 0.8694218132970681,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 2,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 12,
+              "noiseBands": 6,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 20
+            },
+            {
+              "snapshotsIn": 450,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 2775,
+              "frames": 355200,
+              "peak": 0.8534790410586468,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 2,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 12,
+              "noiseBands": 6,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 20
+            }
+          ],
+          "memoryBytes": [
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            },
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            },
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            }
+          ]
+        },
+        {
+          "tier": 3,
+          "sampleRate": 48000,
+          "firstDeliberateDifferenceSeconds": 6.6696875,
+          "firstThrustDifferenceSeconds": 2.5362708333333335,
+          "preBurnThrustDifferenceRms": 0.00829407963569145,
+          "preBurnDeliberateDifferenceRms": 0,
+          "postBurnDeliberateDifferenceRms": 0.00825994522815787,
+          "deliberateDifferenceSha256": "dd2dabf9c7eefac8e54f0e7eb77c3230e3f3447b2f37852b147cef6dcb57ad00",
+          "thrustDifferenceSha256": "1f9aca9b3f1285bb2b0e296ef95109dc0b0c81eab014ab460e15afb1efaa73c9",
+          "stats": [
+            {
+              "snapshotsIn": 450,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 2775,
+              "frames": 355200,
+              "peak": 0.8307385715538065,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 3,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 12,
+              "noiseBands": 8,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 40
+            },
+            {
+              "snapshotsIn": 450,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 2775,
+              "frames": 355200,
+              "peak": 0.8307385715538065,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 3,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 12,
+              "noiseBands": 8,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 40
+            },
+            {
+              "snapshotsIn": 450,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 2775,
+              "frames": 355200,
+              "peak": 0.8282836836474193,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 3,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 12,
+              "noiseBands": 8,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 40
+            }
+          ],
+          "memoryBytes": [
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            },
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            },
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "cold-then-hot-dry",
+      "before": {
+        "timeSeconds": -0.008333333333333333,
+        "n1Pct": 99.3,
+        "n2Pct": 99.6,
+        "augmentation": false,
+        "thrustLbf": 26645.891618756887,
+        "referenceDryThrustLbf": 26645.891618756887,
+        "totalFuelKgSec": 2.9721233577370874,
+        "burnedAbKgSec": 0,
+        "upstreamKelvin": 1004.7789999986715,
+        "meanGasKelvin": 1004.7789999986715,
+        "linerKelvin": 665.6611056588463
+      },
+      "firstSelected": {
+        "timeSeconds": 0,
+        "n1Pct": 99.4874999999963,
+        "n2Pct": 99.7874999999963,
+        "augmentation": true,
+        "thrustLbf": 42999.999999471635,
+        "referenceDryThrustLbf": 26886.23658035478,
+        "totalFuelKgSec": 2.9784232517648648,
+        "burnedAbKgSec": 0,
+        "upstreamKelvin": 1006.452906248631,
+        "meanGasKelvin": 1006.452906248631,
+        "linerKelvin": 665.663632343674
+      },
+      "firstBurned": {
+        "timeSeconds": 0.08333333333333333,
+        "n1Pct": 100,
+        "n2Pct": 100,
+        "augmentation": true,
+        "thrustLbf": 42999.99999947451,
+        "referenceDryThrustLbf": 27159.999999547745,
+        "totalFuelKgSec": 3.0309223686630142,
+        "burnedAbKgSec": 0.0018151866631165262,
+        "upstreamKelvin": 1008.3499999986715,
+        "meanGasKelvin": 1008.8803174067014,
+        "linerKelvin": 665.6991952195149
+      },
+      "selectedToBurnDelaySeconds": 0.08333333333333333,
+      "sourceAtFirstBurn": {
+        "valid": true,
+        "reactionDomainResolved": true,
+        "chPowerW": 0.07051015387434686,
+        "particlePowerUpperBoundW": 810.0286924674625,
+        "wholeSourcePhotopicYCd": 41.502884028486626,
+        "precedingWholeSourcePhotopicYCd": 0.05964952359663251,
+        "allowedPowerW": 393716.8861994963,
+        "totalSourcePowerUpperBoundW": 810.0992026213369
+      },
+      "audio": [
+        {
+          "tier": 1,
+          "sampleRate": 48000,
+          "firstDeliberateDifferenceSeconds": 0.10008333333333336,
+          "firstThrustDifferenceSeconds": 0.016687500000000022,
+          "preBurnThrustDifferenceRms": 0.010449664760610997,
+          "preBurnDeliberateDifferenceRms": 0,
+          "postBurnDeliberateDifferenceRms": 0.008518510325796933,
+          "deliberateDifferenceSha256": "5d9c4b6ffe10d0d27a557ba067cd9c741508d272bf35ef9fac276ede2c73115f",
+          "thrustDifferenceSha256": "9b5b0d3fd90ba3f2ee30b895ebea3933772042ffa83e4af6a354cc508ac57a30",
+          "stats": [
+            {
+              "snapshotsIn": 56,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 313,
+              "frames": 40000,
+              "peak": 0.8912509381337456,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 1,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 4,
+              "noiseBands": 5,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 0
+            },
+            {
+              "snapshotsIn": 56,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 313,
+              "frames": 40000,
+              "peak": 0.8912509381337456,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 1,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 4,
+              "noiseBands": 5,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 0
+            },
+            {
+              "snapshotsIn": 56,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 313,
+              "frames": 40000,
+              "peak": 0.8912509381337456,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 1,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 4,
+              "noiseBands": 5,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 0
+            }
+          ],
+          "memoryBytes": [
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            },
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            },
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            }
+          ]
+        },
+        {
+          "tier": 2,
+          "sampleRate": 48000,
+          "firstDeliberateDifferenceSeconds": 0.10304166666666664,
+          "firstThrustDifferenceSeconds": 0.019604166666666645,
+          "preBurnThrustDifferenceRms": 0.010054194646635557,
+          "preBurnDeliberateDifferenceRms": 0,
+          "postBurnDeliberateDifferenceRms": 0.008539654231455456,
+          "deliberateDifferenceSha256": "376efa870b6357d47ffeaba11b99b91b97d0ab5bf0e2102d075d22c8f1da8393",
+          "thrustDifferenceSha256": "f49b8597856c4798f2be346f6beef2e54e20a9c19a9c94a1428941e536c37965",
+          "stats": [
+            {
+              "snapshotsIn": 56,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 313,
+              "frames": 40000,
+              "peak": 0.8291579508850737,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 2,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 12,
+              "noiseBands": 6,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 20
+            },
+            {
+              "snapshotsIn": 56,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 313,
+              "frames": 40000,
+              "peak": 0.8291579508850737,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 2,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 12,
+              "noiseBands": 6,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 20
+            },
+            {
+              "snapshotsIn": 56,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 313,
+              "frames": 40000,
+              "peak": 0.8291579508850737,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 2,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 12,
+              "noiseBands": 6,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 20
+            }
+          ],
+          "memoryBytes": [
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            },
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            },
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            }
+          ]
+        },
+        {
+          "tier": 3,
+          "sampleRate": 48000,
+          "firstDeliberateDifferenceSeconds": 0.1030625,
+          "firstThrustDifferenceSeconds": 0.019604166666666645,
+          "preBurnThrustDifferenceRms": 0.009919405222460985,
+          "preBurnDeliberateDifferenceRms": 0,
+          "postBurnDeliberateDifferenceRms": 0.007727248771477625,
+          "deliberateDifferenceSha256": "fc0cb626b09918a5fc3be4190e11c66da7897685ae36bc96cb39714f831e3fd8",
+          "thrustDifferenceSha256": "35c49458a0e2b677b67962f15c327897e2dc8506bfe3dd8e718414668cad9a8d",
+          "stats": [
+            {
+              "snapshotsIn": 56,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 313,
+              "frames": 40000,
+              "peak": 0.8912509381337456,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 3,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 12,
+              "noiseBands": 8,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 40
+            },
+            {
+              "snapshotsIn": 56,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 313,
+              "frames": 40000,
+              "peak": 0.8912509381337456,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 3,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 12,
+              "noiseBands": 8,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 40
+            },
+            {
+              "snapshotsIn": 56,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 313,
+              "frames": 40000,
+              "peak": 0.8912509381337456,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 3,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 12,
+              "noiseBands": 8,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 40
+            }
+          ],
+          "memoryBytes": [
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            },
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            },
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "warm-running-shortcut",
+      "before": {
+        "timeSeconds": -0.008333333333333333,
+        "n1Pct": 99.3,
+        "n2Pct": 99.6,
+        "augmentation": false,
+        "thrustLbf": 26645.89161877411,
+        "referenceDryThrustLbf": 26645.891618774105,
+        "totalFuelKgSec": 2.9721233577392745,
+        "burnedAbKgSec": 0,
+        "upstreamKelvin": 1004.7789999987232,
+        "meanGasKelvin": 1004.7789999987232,
+        "linerKelvin": 665.6616875827085
+      },
+      "firstSelected": {
+        "timeSeconds": 0,
+        "n1Pct": 99.48749999999646,
+        "n2Pct": 99.78749999999646,
+        "augmentation": true,
+        "thrustLbf": 42999.99999949493,
+        "referenceDryThrustLbf": 26886.23658037482,
+        "totalFuelKgSec": 2.9784232517670524,
+        "burnedAbKgSec": 0,
+        "upstreamKelvin": 1006.4529062486914,
+        "meanGasKelvin": 1006.4529062486914,
+        "linerKelvin": 665.6642137218817
+      },
+      "firstBurned": {
+        "timeSeconds": 0.08333333333333333,
+        "n1Pct": 100,
+        "n2Pct": 100,
+        "augmentation": true,
+        "thrustLbf": 42999.99999949493,
+        "referenceDryThrustLbf": 27159.99999956532,
+        "totalFuelKgSec": 3.030922368665202,
+        "burnedAbKgSec": 0.0018151866630720635,
+        "upstreamKelvin": 1008.3499999987231,
+        "meanGasKelvin": 1008.8803174067396,
+        "linerKelvin": 665.6997711480963
+      },
+      "selectedToBurnDelaySeconds": 0.08333333333333333,
+      "sourceAtFirstBurn": {
+        "valid": true,
+        "reactionDomainResolved": true,
+        "chPowerW": 0.07051015387256053,
+        "particlePowerUpperBoundW": 810.0286924667303,
+        "wholeSourcePhotopicYCd": 41.502884028486605,
+        "precedingWholeSourcePhotopicYCd": 0.05964952359663248,
+        "allowedPowerW": 393716.8861997804,
+        "totalSourcePowerUpperBoundW": 810.0992026206028
+      },
+      "audio": [
+        {
+          "tier": 1,
+          "sampleRate": 48000,
+          "firstDeliberateDifferenceSeconds": 0.10008333333333336,
+          "firstThrustDifferenceSeconds": 0.016687500000000022,
+          "preBurnThrustDifferenceRms": 0.010449664760610997,
+          "preBurnDeliberateDifferenceRms": 0,
+          "postBurnDeliberateDifferenceRms": 0.008518510325796933,
+          "deliberateDifferenceSha256": "5d9c4b6ffe10d0d27a557ba067cd9c741508d272bf35ef9fac276ede2c73115f",
+          "thrustDifferenceSha256": "9b5b0d3fd90ba3f2ee30b895ebea3933772042ffa83e4af6a354cc508ac57a30",
+          "stats": [
+            {
+              "snapshotsIn": 56,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 313,
+              "frames": 40000,
+              "peak": 0.8912509381337456,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 1,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 4,
+              "noiseBands": 5,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 0
+            },
+            {
+              "snapshotsIn": 56,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 313,
+              "frames": 40000,
+              "peak": 0.8912509381337456,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 1,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 4,
+              "noiseBands": 5,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 0
+            },
+            {
+              "snapshotsIn": 56,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 313,
+              "frames": 40000,
+              "peak": 0.8912509381337456,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 1,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 4,
+              "noiseBands": 5,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 0
+            }
+          ],
+          "memoryBytes": [
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            },
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            },
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            }
+          ]
+        },
+        {
+          "tier": 2,
+          "sampleRate": 48000,
+          "firstDeliberateDifferenceSeconds": 0.10304166666666664,
+          "firstThrustDifferenceSeconds": 0.019604166666666645,
+          "preBurnThrustDifferenceRms": 0.010054194646635557,
+          "preBurnDeliberateDifferenceRms": 0,
+          "postBurnDeliberateDifferenceRms": 0.008539654231887572,
+          "deliberateDifferenceSha256": "fcaa8686cfeb0116b595d377a909b7694b5b202502e2b2316069043a43e7b11d",
+          "thrustDifferenceSha256": "352c4d5b04c9488b1bd970ac9c7cad20a8dbd68a3097d7e8098525fa1533136c",
+          "stats": [
+            {
+              "snapshotsIn": 56,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 313,
+              "frames": 40000,
+              "peak": 0.8291579508849917,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 2,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 12,
+              "noiseBands": 6,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 20
+            },
+            {
+              "snapshotsIn": 56,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 313,
+              "frames": 40000,
+              "peak": 0.8291579508849917,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 2,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 12,
+              "noiseBands": 6,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 20
+            },
+            {
+              "snapshotsIn": 56,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 313,
+              "frames": 40000,
+              "peak": 0.8291579508849917,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 2,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 12,
+              "noiseBands": 6,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 20
+            }
+          ],
+          "memoryBytes": [
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            },
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            },
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            }
+          ]
+        },
+        {
+          "tier": 3,
+          "sampleRate": 48000,
+          "firstDeliberateDifferenceSeconds": 0.1030625,
+          "firstThrustDifferenceSeconds": 0.019604166666666645,
+          "preBurnThrustDifferenceRms": 0.009919405222775698,
+          "preBurnDeliberateDifferenceRms": 0,
+          "postBurnDeliberateDifferenceRms": 0.007727248776101397,
+          "deliberateDifferenceSha256": "e9bd14e4b570e85828412951d54cdbff28e0c9f3f1996705bb0f1b8aa075d1f8",
+          "thrustDifferenceSha256": "8ad959ef62e9b62c94a58e661d40474c9d0a2c0c441f277cb6c296aa54352399",
+          "stats": [
+            {
+              "snapshotsIn": 56,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 313,
+              "frames": 40000,
+              "peak": 0.8912509381337456,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 3,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 12,
+              "noiseBands": 8,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 40
+            },
+            {
+              "snapshotsIn": 56,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 313,
+              "frames": 40000,
+              "peak": 0.8912509381337456,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 3,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 12,
+              "noiseBands": 8,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 40
+            },
+            {
+              "snapshotsIn": 56,
+              "snapshotsDropped": 0,
+              "eventsIn": 0,
+              "eventsDropped": 0,
+              "resyncs": 0,
+              "staleFades": 0,
+              "blocks": 313,
+              "frames": 40000,
+              "peak": 0.8912509381337456,
+              "telemetryAge": 0,
+              "activeGrains": 0,
+              "grainDrops": 0,
+              "nonFinite": 0,
+              "queueDepth": 9,
+              "fade": 1,
+              "doppler": 1,
+              "distance": 1,
+              "tier": 3,
+              "shed": 0,
+              "epoch": 1,
+              "partials": 12,
+              "noiseBands": 8,
+              "grainCap": 0,
+              "grainStarts": 0,
+              "irMs": 40
+            }
+          ],
+          "memoryBytes": [
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            },
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            },
+            {
+              "beforeRender": 2097152,
+              "afterRender": 2097152
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

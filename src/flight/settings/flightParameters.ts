@@ -37,7 +37,8 @@ const MAP_DETAIL = { tab: "map", section: "detail" } as const;
 const MODEL = { tab: "aircraft", section: "model" } as const;
 const MESH_INSPECTOR = { tab: "aircraft", section: "mesh-inspector" } as const;
 const INSTRUMENTS = { tab: "renderer", section: "instruments" } as const;
-const EXHAUST = { tab: "renderer", section: "aircraft-exhaust" } as const;
+const EXHAUST = { tab: "exhaust", section: "gas" } as const;
+const EXHAUST_SMOKE = { tab: "exhaust", section: "smoke" } as const;
 const EXTERNAL_TANKS = { tab: "renderer", section: "external-tanks" } as const;
 const FORCES = { tab: "debug", section: "forces" } as const;
 const AIRCRAFT_VISUALS = { tab: "debug", section: "aircraft-visuals" } as const;
@@ -46,8 +47,7 @@ const START = { tab: "aircraft", section: "start" } as const;
 const REMOTE_CONTROL = { tab: "remote", section: "control" } as const;
 const PHONE_CAMERA = { tab: "remote", section: "camera" } as const;
 const SOUND = { tab: "sound", section: "sound" } as const;
-const AFTERBURNER_APPEARANCE = { tab: "afterburner", section: "appearance" } as const;
-const AFTERBURNER_SOUND = { tab: "afterburner", section: "sound" } as const;
+const AFTERBURNER = { tab: "exhaust", section: "afterburner" } as const;
 const ENGINE = { tab: "engine", section: "engine" } as const;
 const ENGINE_HISTORY = { tab: "engine", section: "history" } as const;
 const ENGINE_TEST = { tab: "engine", section: "test" } as const;
@@ -64,7 +64,9 @@ const STOVL = { tab: "controls", section: "stovl" } as const;
 /** Section titles for the sections 0sfs adds, by tab and section id. */
 export const FLIGHT_SECTION_TITLES: readonly (readonly [tab: string, section: string, title: string])[] = [
   ["renderer", "instruments", "Instruments"],
-  ["renderer", "aircraft-exhaust", "Aircraft exhaust"],
+  ["exhaust", "gas", "Gas and luminance"],
+  ["exhaust", "smoke", "Smoke"],
+  ["exhaust", "afterburner", "Afterburner"],
   ["renderer", "external-tanks", "Released fuel tanks"],
   ["aircraft", "model", "Aircraft"],
   ["aircraft", "mesh-inspector", "Mesh inspector"],
@@ -73,8 +75,6 @@ export const FLIGHT_SECTION_TITLES: readonly (readonly [tab: string, section: st
   ["remote", "control", "Who flies"],
   ["remote", "camera", "Phone camera trackpad"],
   ["sound", "sound", "Sound"],
-  ["afterburner", "appearance", "Exhaust appearance"],
-  ["afterburner", "sound", "Afterburner sound"],
   ["engine", "engine", "Engine"],
   ["engine", "history", "History sampling"],
   ["engine", "test", "Test stand conditions"],
@@ -305,7 +305,7 @@ export const OSFS_PARAMETERS = [
     home: main(EXTERNAL_TANKS), appliesLive: true, source: "src/flight/aircraft/createExternalTankVisuals.ts",
   },
 
-  // Renderer → Aircraft exhaust. Shared across engines with an optical profile.
+  // Exhaust → Gas and luminance. Shared across engines with an optical profile.
   {
     id: "osfs.exhaust.enabled",
     label: "Aircraft exhaust",
@@ -417,9 +417,9 @@ export const OSFS_PARAMETERS = [
     id: "osfs.exhaust.dryIntensity",
     label: "Dry exhaust brightness",
     description: "Display multiplier on luminous gas and its nearby light with afterburner off. One preserves the current physical model's output, whose F135 temperature and particle loading remain uncalibrated. Metal glow and afterburner emission are unchanged.",
-    unit: "ratio", kind: "number", step: 0.01, bounds: within(0.5, 3), default: 1,
+    unit: "ratio", kind: "number", step: 0.01, bounds: within(0.5, 10), default: 1,
     defaultReason: "Preserve the current model prediction without changing temperature, fuel, spectrum or physical emitted power.",
-    home: main(AFTERBURNER_APPEARANCE), appliesLive: true, source: "src/flight/aircraft/createEngineExhaust.ts",
+    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineExhaust.ts",
   },
   {
     id: "osfs.exhaust.surfaceReferenceNits",
@@ -464,7 +464,7 @@ export const OSFS_PARAMETERS = [
     description: "Draws sparse smoke sprites for engines with a smoke profile; off releases the particle resources.",
     unit: "none", kind: "boolean", default: true,
     defaultReason: "A faint short trail complements the nozzle glow; appearance is an approximation, not a soot-emissions measurement.",
-    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineSmoke.ts",
+    home: main(EXHAUST_SMOKE), appliesLive: true, source: "src/flight/aircraft/createEngineSmoke.ts",
   },
   {
     id: "osfs.exhaust.smoke.maxParticles",
@@ -473,7 +473,7 @@ export const OSFS_PARAMETERS = [
     unit: { id: "particles/engine", text: "particles/engine" }, kind: "number", step: 1,
     bounds: within(0, 512), default: 64,
     defaultReason: "A small fixed pool leaves room for short trails without an unbounded particle history.",
-    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineSmoke.ts",
+    home: main(EXHAUST_SMOKE), appliesLive: true, source: "src/flight/aircraft/createEngineSmoke.ts",
   },
   {
     id: "osfs.exhaust.smoke.emissionPerSecond",
@@ -481,7 +481,7 @@ export const OSFS_PARAMETERS = [
     description: "Maximum emitted smoke sprites each simulated second per running configured engine.",
     unit: "per-s", kind: "number", step: 0.1, bounds: within(0, 128), default: 8,
     defaultReason: "Sparse emission keeps translucent overlap small at the default short lifetime.",
-    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineSmoke.ts",
+    home: main(EXHAUST_SMOKE), appliesLive: true, source: "src/flight/aircraft/createEngineSmoke.ts",
   },
   {
     id: "osfs.exhaust.smoke.lifetimeSeconds",
@@ -489,7 +489,7 @@ export const OSFS_PARAMETERS = [
     description: "How long a smoke sprite remains in the world before returning to the fixed pool, in simulated seconds.",
     unit: "s", kind: "number", step: 0.1, bounds: within(0.1, 10), default: 2,
     defaultReason: "A short trail limits translucent screen coverage and keeps the main exhaust readable.",
-    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineSmoke.ts",
+    home: main(EXHAUST_SMOKE), appliesLive: true, source: "src/flight/aircraft/createEngineSmoke.ts",
   },
   {
     id: "osfs.exhaust.smoke.maxDistanceMeters",
@@ -497,7 +497,7 @@ export const OSFS_PARAMETERS = [
     description: "Maximum camera distance at which engine smoke is emitted and drawn, in metres.",
     unit: "m", kind: "number", step: 1, bounds: within(1, 20_000), default: 1_000,
     defaultReason: "The sparse default smoke is intended for nearby aircraft views.",
-    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineSmoke.ts",
+    home: main(EXHAUST_SMOKE), appliesLive: true, source: "src/flight/aircraft/createEngineSmoke.ts",
   },
   {
     id: "osfs.exhaust.smoke.opacity",
@@ -505,7 +505,7 @@ export const OSFS_PARAMETERS = [
     description: "Peak per-sprite opacity before the engine profile and lifetime fade. Higher values make overlapping sprites more apparent.",
     unit: "ratio", kind: "number", step: 0.001, bounds: within(0, 1), default: 0.025,
     defaultReason: "Modern jet exhaust is not a dense rocket smoke trail; this is a restrained visual approximation.",
-    home: main(EXHAUST), appliesLive: true, source: "src/flight/aircraft/createEngineSmoke.ts",
+    home: main(EXHAUST_SMOKE), appliesLive: true, source: "src/flight/aircraft/createEngineSmoke.ts",
   },
 
   // Renderer → Instruments.
@@ -1206,8 +1206,8 @@ export const OSFS_PARAMETERS = [
     description: "The master switch: off releases the sound engine and silences the engine and tyres.",
     unit: "none",
     kind: "boolean",
-    default: false,
-    defaultReason: "Off: a saved preference cannot satisfy the browser's autoplay rule, so sound starts from a gesture.",
+    default: true,
+    defaultReason: "Sound is on by default at the pilot's request; a normal interaction unlocks browser audio, and an explicit saved off preference is respected.",
     home: main(SOUND),
     appliesLive: true,
     source: "src/flight/audio/createFlightAudio.ts",
@@ -1215,18 +1215,18 @@ export const OSFS_PARAMETERS = [
   {
     id: "osfs.sound.quality",
     label: "Sound tier",
-    description: "Which synthesis engine runs; Auto starts at Low and moves up only to a tier qualified on this device.",
+    description: "Which synthesis engine runs; Auto chooses the highest supported tier, with live overload fallback and editable resource limits.",
     unit: "none",
     kind: "choice",
     choices: [
       { id: "off", label: "Off" },
       { id: "low", label: "Low", description: "Procedural, light." },
       { id: "med", label: "Med", description: "Procedural, with a cabin impulse response." },
-      { id: "high", label: "High", description: "Procedural engine spectra and directionality; acoustic calibration pending." },
+      { id: "high", label: "High", description: "Procedural engine spectra and directionality." },
       { id: "auto", label: "Auto" },
     ],
     default: "med",
-    defaultReason: "Med, for now: the owner flew with it and chose it. No tier is qualified on a device yet, so Auto still stays at Low.",
+    defaultReason: "Med is the pilot's chosen default; Low, Med and High have been accepted in listening tests.",
     home: main(SOUND),
     appliesLive: true,
     source: "src/flight/audio/audioQuality.ts",
@@ -1807,7 +1807,7 @@ function soundVolume<Field extends string>(field: Field, label: string, descript
     bounds: within(0, maximum),
     default: value,
     defaultReason,
-    home: main(field === "afterburnerVolume" ? AFTERBURNER_SOUND : SOUND),
+    home: main(field === "afterburnerVolume" ? AFTERBURNER : SOUND),
     appliesLive: true,
     source: "src/flight/audio/createFlightAudio.ts",
   };

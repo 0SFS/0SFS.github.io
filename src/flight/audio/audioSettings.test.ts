@@ -15,14 +15,26 @@ describe("audio settings", () => {
     expect(readSoundTierLimits(saved)[2]).toMatchObject({ grains: 0, startsPerSecond: 0 });
   });
 
-  it("starts disabled, because a saved preference cannot satisfy autoplay, and on Med", () => {
+  it("defaults on at Med while browser activation remains a runtime concern", () => {
     const store = createAudioSettingsStore(flightParameterDefaults());
     expect(store.settings).toEqual(DEFAULT_AUDIO_SETTINGS);
-    expect(store.settings.enabled).toBe(false);
+    expect(store.settings.enabled).toBe(true);
     expect(store.settings.requested).toBe("med");
     expect(store.settings.masterVolume).toBe(2);
     expect(store.settings.afterburnerVolume).toBe(0.5);
     expect(store.settings.listenerCockpitBlend).toBe(1);
+  });
+
+  it("preserves an explicitly saved off preference across parsing and reload", () => {
+    expect(parseAudioSettings({ version: 1, enabled: false })).toMatchObject({ ok: true, settings: { enabled: false } });
+    expect(migrateAudioSettings(JSON.stringify({ version: 1, enabled: false })))
+      .toMatchObject({ "osfs.sound.enabled": false });
+    const parameters = flightParameterDefaults({ "osfs.sound.enabled": false });
+    expect(createAudioSettingsStore(parameters).settings.enabled).toBe(false);
+    const liveParameters = flightParameterDefaults();
+    const store = createAudioSettingsStore(liveParameters);
+    store.update({ enabled: false });
+    expect(createAudioSettingsStore(liveParameters).settings.enabled).toBe(false);
   });
 
   it("lives in the osfs.sound parameters, with no downgrade kept as none", () => {
