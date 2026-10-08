@@ -56,7 +56,9 @@ node scripts/validation/f35b/replay-powered-lift-optics.mjs --trace=<trace.csv.g
 Scripts create dated `build/` directories. Distributed receipts live in
 [the retained evidence directory](../../validation/evidence/aircraft/f35b/powered-lift-stability-2026-10-08/README.md).
 All retained physics channels can be restored from the lossless archives there;
-no per-step downsampling is used. Earlier runner revisions were not snapshotted,
+no per-step downsampling is used. The 25 trace archives (`physics/*/*.f64-delta.br`,
+235 MB) are gitignored and kept only on the machine that recorded them; the reports,
+manifests and `physics/index.json` in the repository keep their hashes. Earlier runner revisions were not snapshotted,
 so their input hashes and executed bundles are retained without claiming that
 today's runner bytes reproduce those older receipts exactly.
 
