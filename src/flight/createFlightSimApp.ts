@@ -82,6 +82,7 @@ import { createTireAudio } from "./audio/createTireAudio";
 import { createFlightAudio } from "./audio/createFlightAudio";
 import { AUDIO_PARAMETER_IDS, createAudioSettingsStore, readSoundTierLimits, SOUND_TIER_LIMIT_IDS } from "./audio/audioSettings";
 import { createJsbsimAudioAdapter } from "./audio/jsbsimAudioAdapter";
+import { applyEnginePlantSettings, ENGINE_PLANT_PARAMETER_IDS, readEnginePlantSettings } from "./jsbsim/enginePlantSettings";
 import { getAircraftAudioInstallation, resolveAircraftAudioInstallation } from "./audio/aircraftAudioProfiles";
 import { WHEEL_SPIN_CONFIGS } from "./physics/wheelSpin";
 import { probeWheelContactCapability } from "./physics/wheelContact";
@@ -981,6 +982,10 @@ export async function createFlightSimApp(
       Number(parameters.get("osfs.assist.autoFlaps") && lastApResult.owners.flaps === "pilot"));
   };
   syncNativeAutoFlaps();
+  // Engine → Simulation, on every coupled-plant engine.
+  const syncEnginePlantSettings = (): void => { applyEnginePlantSettings(jsbsim.sdk, readEnginePlantSettings(parameters)); };
+  syncEnginePlantSettings();
+  for (const id of ENGINE_PLANT_PARAMETER_IDS) stopWatching.push(parameters.watch(id, syncEnginePlantSettings));
   stopWatching.push(parameters.watch("osfs.assist.autoFlaps", enabled => {
     if (!enabled && !takingFlapsManually && Number.isFinite(actualFlaps)) {
       inputManager.replaceFlaps(actualFlaps);
@@ -1176,6 +1181,7 @@ export async function createFlightSimApp(
         settings,
         engineLabels: getFdmProfile(initialAircraftId).forceEngineLabels,
         controlSurfaces: getFdmProfile(initialAircraftId).forceControlSurfaces,
+        externalForces: getFdmProfile(initialAircraftId).forceExternalForces,
         requestRender: () => runtime.requestRender(),
         onUnavailable: message => flightLog.warn("forces", message),
       });

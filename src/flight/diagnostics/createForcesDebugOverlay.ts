@@ -3,6 +3,7 @@ import type { Mesh, Scene, TransformNode } from "@babylonjs/core";
 import { createVectorDebugDrawing, type VectorDebugDrawingSettings } from "foss-earth/diagnostics";
 import {
   bodyForceToDisplay, createAircraftForceReader, type AircraftForcesSnapshot, type ControlSurfaceTerms,
+  type ExternalForceTerms,
 } from "./aircraftForces";
 
 export interface ForcesDebugSettings {
@@ -22,6 +23,8 @@ export interface ForcesDebugOptions {
   engineLabels?: Readonly<Record<number, string>>;
   /** The aircraft's declared control-surface terms, read only while their setting is on. */
   controlSurfaces?: readonly ControlSurfaceTerms[];
+  /** The aircraft's declared external forces, such as engine outlets applied outside the engine. */
+  externalForces?: readonly ExternalForceTerms[];
   requestRender?(): void;
   onUnavailable?(message: string): void;
   /** Production waits for all glyphs and optional labels through FOSS Earth's readiness helper. */
@@ -52,7 +55,8 @@ export function createForcesDebugOverlay(scene: Scene, parent: TransformNode, sd
   };
   function update(withinScheduledFrame = false): void {
     if (disposed || !settings.enabled) return;
-    reader ??= createAircraftForceReader(sdk, options.engineLabels, settings.controlSurfaces ? options.controlSurfaces : []);
+    reader ??= createAircraftForceReader(sdk, options.engineLabels, settings.controlSurfaces ? options.controlSurfaces : [],
+      options.externalForces);
     snapshot = reader.read();
     if (snapshot.unavailable.length) warn(`Force observations unavailable: ${snapshot.unavailable.join(", ")}`);
     drawing ??= createVectorDebugDrawing(scene, parent, {

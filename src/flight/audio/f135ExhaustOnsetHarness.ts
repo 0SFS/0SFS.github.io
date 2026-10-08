@@ -22,7 +22,17 @@ export interface F135OnsetObservation {
   reading: AudioAdapterReading;
   opticalInput: EngineGasOpticalInputs;
   linerTemperatureKelvin: number;
-  /** Evaluated native dry tables at the same N2, atmosphere and bleed. Diagnostic only. */
+  /** The engine's controller has reheat selected; reading.augmentation is reheat fuel burning. */
+  abSelected: boolean;
+  /** Heat released by burning reheat fuel, W. */
+  abHeatReleaseW: number;
+  /** Relative energy residual of the accepted step's ledger. */
+  energyRelative: number;
+  /**
+   * Thrust of the same engine at the same time in a counterfactual run that
+   * keeps the throttle at 0.99: the same N1 demand, so the same dry spool-up,
+   * without a reheat request. Diagnostic only.
+   */
   referenceDryThrustLbf: number;
 }
 
@@ -34,8 +44,26 @@ export interface F135OnsetTrace {
   firstBurned: F135OnsetObservation;
 }
 
-/** Actual installed native engine and authored flow support; NullEngine draws nothing. */
+/**
+ * Actual installed native engine and authored flow support; NullEngine draws
+ * nothing. The trace pairs every observation with the dry counterfactual.
+ */
 export async function captureF135Onset(name: F135OnsetTrace["name"]): Promise<F135OnsetTrace> {
+  const dry = await captureF135Run(name, .99);
+  const trace = await captureF135Run(name, 1);
+  const pair = (row: F135OnsetObservation, reference: F135OnsetObservation): F135OnsetObservation => {
+    if (reference.timeSeconds !== row.timeSeconds) throw new Error("Unpaired dry counterfactual");
+    return { ...row, referenceDryThrustLbf: reference.reading.thrustLbf };
+  };
+  const observations = trace.observations.map((row, i) => pair(row, dry.observations[i]));
+  const firstSelected = observations.find(row => row.abSelected);
+  const firstBurned = observations.find(row => row.reading.afterburnerBurnedFuelFlowKgSec! > 0);
+  if (!firstSelected || !firstBurned) throw new Error("Bounded native AB capture missed selection or burning");
+  if (dry.observations.some(row => row.abSelected)) throw new Error("Dry counterfactual selected reheat");
+  return { name, before: pair(trace.before, dry.before), observations, firstSelected, firstBurned };
+}
+
+async function captureF135Run(name: F135OnsetTrace["name"], command: number) {
   const sdk = await JSBSimSdk.create({ moduleUrl: wasmModuleUrl, wasmUrl: wasmBinaryUrl,
     persistence: { enabled: false }, log: { console: false } });
   const engine = new NullEngine();
@@ -74,23 +102,16 @@ export async function captureF135Onset(name: F135OnsetTrace["name"]): Promise<F1
     const rig = bindEngineNozzleRig(nodes, { bearingNames: ["F135_Bearing1", "F135_Bearing2", "F135_Bearing3"],
       bearingInclinationRad: g.bearingTiltDegrees * Math.PI / 180, apertureMechanism: g.aperture });
     const binding = bindEngineGasSupport(root, F135_ENGINE_GAS_SUPPORT);
-    const xml = readFileSync("public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml", "utf8");
-    const scalar = (tag: string): number => {
-      const value = Number(new RegExp(`<${tag}>\\s*([^<]+)\\s*</${tag}>`).exec(xml)?.[1]);
-      if (!Number.isFinite(value)) throw new Error("Missing native fixture scalar " + tag);
-      return value;
-    };
-    const milThrust = scalar("milthrust"), idleN2 = scalar("idlen2"), maxN2 = scalar("maxn2");
     const get = (property: string): number => sdk.getPropertyValue(property);
     const read = (timeSeconds: number): F135OnsetObservation => {
       const reading = { ...adapter!.read() };
       rig.update(get("fcs/nozzle-pitch-rad"), get("fcs/nozzle-yaw-rad"), get("propulsion/engine/nozzle-pos-norm"));
       const support = binding.update(rig.apertureGeometry, 6, f135ExhaustOpticalData.gasEmission.spatialField.spreadingSlope);
-      const idleThrust = milThrust * get("propulsion/engine/IdleThrust");
-      const dryIncrement = (milThrust - idleThrust) * get("propulsion/engine/MilThrust");
-      const n2Norm = (reading.n2Pct - idleN2) / (maxN2 - idleN2);
       return { timeSeconds, reading, linerTemperatureKelvin: get("propulsion/engine/thermal/metal-temperature-k"),
-        referenceDryThrustLbf: (idleThrust + dryIncrement * n2Norm ** 2) * (1 - get("propulsion/engine/bleed-factor")),
+        abSelected: get("propulsion/engine/plant/combustion/ab-selected") === 1,
+        abHeatReleaseW: get("propulsion/engine/plant/combustion/ab-heat-release-w"),
+        energyRelative: get("propulsion/engine/plant/ledger/energy-relative"),
+        referenceDryThrustLbf: Number.NaN,
         opticalInput: { temperatureKelvin: get("propulsion/engine/thermal/nozzle-gas-temperature-k"),
           upstreamGasTemperatureKelvin: get("propulsion/engine/egt-degc") + 273.15,
           ambientTemperatureKelvin: get("atmosphere/T-R") * 5 / 9,
@@ -100,12 +121,9 @@ export async function captureF135Onset(name: F135OnsetTrace["name"]): Promise<F1
           radiusMeters: rig.apertureGeometry.exitRadius, lengthMeters: 6, flowDomain: support.flowDomain } };
     };
     const before = read(-1 / 120), observations: F135OnsetObservation[] = [];
-    sdk.setPropertyValue("fcs/throttle-cmd-norm", 1);
+    sdk.setPropertyValue("fcs/throttle-cmd-norm", command);
     for (let i = 0; i <= 12 * 120; i++) { step(); observations.push(read(i / 120)); }
-    const firstSelected = observations.find(row => row.reading.augmentation);
-    const firstBurned = observations.find(row => row.reading.afterburnerBurnedFuelFlowKgSec! > 0);
-    if (!firstSelected || !firstBurned) throw new Error("Bounded native AB capture missed selection or burning");
-    return { name, before, observations, firstSelected, firstBurned };
+    return { before, observations };
   } finally { adapter?.dispose(); sdk.destroy(); engine.dispose(); }
 }
 
@@ -138,8 +156,7 @@ export async function renderF135OnsetAudio(trace: F135OnsetTrace, tier: number, 
           : trace.observations[Math.min(trace.observations.length - 1, Math.round(nativeTime * 120))];
         const reading = { ...observation.reading, simTimeS: next };
         // Counterfactual for diagnosis only: no app source rewrites native thrust.
-        if (mode === "dry-thrust-reference" && reading.augmentation)
-          reading.thrustLbf = observation.referenceDryThrustLbf;
+        if (mode === "dry-thrust-reference") reading.thrustLbf = observation.referenceDryThrustLbf;
         core.pushSnapshot(toSnapshot(reading, { sequence: sequence++, epoch: 1,
           source: [0, 0, -1], sourceVelocity: [0, 0, 0], listenerVelocity: [0, 0, 0],
           exterior: 1, groundReflectionM: -1, poseValid: true }));

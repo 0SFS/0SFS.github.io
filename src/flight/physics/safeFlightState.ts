@@ -32,10 +32,16 @@ const controls = ["fcs/throttle-cmd-norm", "fcs/mixture-cmd-norm", "fcs/elevator
   "atmosphere/wind-north-fps", "atmosphere/wind-east-fps", "atmosphere/wind-down-fps"];
 const optionalAircraftControls = ["fcs/stovl-cmd-norm", "fcs/stovl-pos-norm", "fcs/control-law-mode"];
 const modelControls = new WeakMap<JSBSimSdk, readonly string[]>();
-const modelEngineThermalState = new WeakMap<JSBSimSdk, readonly { state: string; initialized: string }[]>();
+interface EngineStateProperties {
+  thermal: readonly { state: string; initialized: string }[];
+  /** Each coupled-plant engine's staged state record: its read-write fields and its commit. */
+  plant: readonly { fields: readonly string[]; commit: string }[];
+}
+const modelEngineState = new WeakMap<JSBSimSdk, EngineStateProperties>();
 
-function engineThermalStateProperties(sdk: JSBSimSdk): readonly { state: string; initialized: string }[] {
-  const cached = modelEngineThermalState.get(sdk);
+/** One catalogue read per model finds every engine's restorable native state. */
+function engineStateProperties(sdk: JSBSimSdk): EngineStateProperties {
+  const cached = modelEngineState.get(sdk);
   if (cached) return cached;
   const catalog = new Map<string, string>();
   if (typeof sdk.queryPropertyCatalog === "function") {
@@ -44,16 +50,26 @@ function engineThermalStateProperties(sdk: JSBSimSdk): readonly { state: string;
       if (match) catalog.set(match[1], match[2]);
     }
   }
-  const properties = [...catalog].flatMap(([state, access]) => {
+  const thermal = [...catalog].flatMap(([state, access]) => {
     if (!/^propulsion\/engine(?:\[\d+\])?\/thermal\/(?:[a-z0-9-]+\/)?metal-temperature-state-k$/.test(state)
       || !access.includes("R") || !access.includes("W")) return [];
     const initialized = state.replace(/metal-temperature-state-k$/, "initialized");
     return catalog.get(initialized)?.includes("R") ? [{ state, initialized }] : [];
   });
+  const writable = [...catalog].flatMap(([path, access]) => access.includes("R") && access.includes("W") ? [path] : []);
+  const plant = writable.flatMap(commit => {
+    const prefix = /^(propulsion\/engine(?:\[\d+\])?\/plant\/state\/)commit$/.exec(commit)?.[1];
+    return prefix ? [{ fields: writable.filter(path => path.startsWith(prefix) && path !== commit), commit }] : [];
+  });
   // One SDK owns one model. Preserve the native catalogue's index spelling
-  // and never create thermal nodes for engines without this capability.
-  modelEngineThermalState.set(sdk, properties);
+  // and never create thermal or plant nodes for engines without them.
+  const properties = { thermal, plant };
+  modelEngineState.set(sdk, properties);
   return properties;
+}
+
+function engineThermalStateProperties(sdk: JSBSimSdk): EngineStateProperties["thermal"] {
+  return engineStateProperties(sdk).thermal;
 }
 
 function captureEngineThermalState(sdk: JSBSimSdk): [string, number][] {
@@ -75,11 +91,30 @@ export function restoreEngineThermalState(sdk: JSBSimSdk, snapshotControls: Read
   }
 }
 
+function captureEnginePlantState(sdk: JSBSimSdk): [string, number][] {
+  return engineStateProperties(sdk).plant.flatMap(({ fields }) =>
+    fields.map(path => [path, sdk.getPropertyValue(path)] as [string, number]));
+}
+
+/**
+ * Put each coupled-plant engine back in its captured state: spools, fuel
+ * manifolds, flames, controller and metal. The engine validates the record
+ * (schema, configuration, finite values) and keeps its present state when it
+ * rejects one, as it does for a snapshot from another engine model.
+ */
+export function restoreEnginePlantState(sdk: JSBSimSdk, snapshotControls: Readonly<Record<string, number>>): void {
+  for (const { fields, commit } of engineStateProperties(sdk).plant) {
+    if (!fields.length || !fields.every(path => Number.isFinite(snapshotControls[path]))) continue;
+    for (const path of fields) sdk.setPropertyValue(path, snapshotControls[path]!);
+    sdk.setPropertyValue(commit, 1);
+  }
+}
+
 function restoreControls(sdk: JSBSimSdk, snapshotControls: Readonly<Record<string, number>>): void {
   for (const [property, value] of Object.entries(snapshotControls)) {
-    // Native thermal state has its own capability and validation boundary;
-    // an old/foreign snapshot must not invent nodes on another engine model.
-    if (/^propulsion\/engine(?:\[\d+\])?\/thermal\//.test(property)) continue;
+    // Native thermal and plant state have their own capability and validation
+    // boundary; an old/foreign snapshot must not invent nodes on another engine model.
+    if (/^propulsion\/engine(?:\[\d+\])?\/(?:thermal|plant)\//.test(property)) continue;
     sdk.setPropertyValue(property, value);
   }
 }
@@ -118,6 +153,7 @@ export function captureSimulation(sdk: JSBSimSdk) {
     controls: Object.fromEntries([
       ...controlsForModel(sdk).map(property => [property, sdk.getPropertyValue(property)] as [string, number]),
       ...captureEngineThermalState(sdk),
+      ...captureEnginePlantState(sdk),
     ]),
     running: sdk.getPropertyValue("propulsion/engine/set-running") > 0.5,
     // Contact recovery rebuilds model state at zero integration time, but it is
@@ -152,6 +188,8 @@ export function restoreSimulation(sdk: JSBSimSdk, snapshot: SimulationSnapshot):
   // Startup evaluates full power internally; the restored commands must be
   // reflected in native engine state before returning a recovered snapshot.
   if (!sdk.runIc()) throw new Error("Flight engine reinitialization failed");
+  // A coupled plant then takes its exact captured state, not a steady point at these controls.
+  restoreEnginePlantState(sdk, snapshot.controls);
   // Preserve physical actuator positions evaluated by RunIC until stepping.
   restoreControls(sdk, snapshot.controls);
 }

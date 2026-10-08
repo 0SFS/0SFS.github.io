@@ -1,0 +1,1639 @@
+{
+  "date": "2026-10-08",
+  "kind": "untimed-CPU-reduced-vs-component-F135-plant",
+  "artifact": {
+    "schemaVersion": 1,
+    "identity": {
+      "schemaVersion": 2,
+      "package": {
+        "name": "@felipegalind0/jsbsim",
+        "version": "1.2.4-fork.20"
+      },
+      "native": {
+        "origin": "https://github.com/Felipegalind0/jsbsim",
+        "commit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+        "contentSha256": "84397f74ef0e98da0c3b18811a65126ee3772fbeb14a58eeb035e2397d04abd6",
+        "dirty": false
+      },
+      "sdk": {
+        "commit": "ea6956b4e9f9bddc04ef22863190ab1a8101e0f8",
+        "contentSha256": "ed3068909a15a4df385107708e25234f658d90bee62e397a6fc09e25f12721cc",
+        "dirty": false,
+        "path": "wasm"
+      },
+      "build": {
+        "mode": "in-tree",
+        "inputSha256": "b474b47fdf138aca59837b3d974941270a6c75e39c641c8b98cc970d3a6cba31",
+        "toolchain": {
+          "node": "v26.8.2",
+          "npm": "11.19.1",
+          "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9-git",
+          "cmake": "cmake version 4.4.3",
+          "clang": "clang version 24.0.0git",
+          "platform": "darwin",
+          "arch": "arm64",
+          "emscriptenConfigSha256": "412bf234dd0519a08a738b4128eeae4158c7723a78843bcf610dc75b01348cc3"
+        },
+        "options": {
+          "buildType": "Release",
+          "cxxStandard": 17,
+          "sdkTarget": "es2022"
+        }
+      }
+    },
+    "files": {
+      "index.d.ts": "fd745410fe50ca5b0f32dee9625f366af91823e1a992339023404c223f563454",
+      "index.js": "8a5b335c0401c7a87dbcf8cd12e0f61b5d6936046e2ff91e77a0e84165b3147b",
+      "index.js.map": "844c4dccbc274e9dda9fed728a5303ee72e7ebebff506ffde61df31d33914a9a",
+      "licenses/README.txt": "79e2b41a55a83d33bd762143e5ecdffabd0ab93e3cc216e9b890dad9259d2c13",
+      "licenses/jsbsim/AUTHORS": "ca8556894da80f81f773893a9c1009021aac2972d7bb6a39c2f981b4fd00aa9a",
+      "licenses/jsbsim/COPYING": "1e7e6bae5a5bde32f1ae5a7c37a082d1ab03cf89354f7f936ac40be9e39a6531",
+      "licenses/jsbsim/src/GeographicLib/LICENSE.txt": "90d25298be0c5d7f5219ae20009d18910150b3a4ea0ca86dda5df04cfb8d3823",
+      "licenses/jsbsim/src/simgear/xml/COPYING": "8c6b5b6de8fae20b317f4992729abc0e520bfba4c7606cd1e9eeb87418eebdec",
+      "licenses/sdk-LICENSE": "15e2d343fc930439fb82351d7c30f3d151b4c42ca3132c13ff1a60da527a1259",
+      "wasm.d.ts": "b7bbbab6f5e6b0b297dfeff117351e53d4d8598fecde7e805ea9aee7b2923353",
+      "wasm.js": "758d98989301d86ec3aa589fa851d6416b305eca58bb1e6b9579780ea339e09b",
+      "wasm.js.map": "d75a89efd5b3cf07ebfbe70d321f55c01bd8cdde1be50a15d1dcfad21a7ca763",
+      "wasm/jsbsim_wasm.mjs": "3437b7bafddf799caff11bcb1447d697a8d3a195ed5da72b0fb573403d8ddc61",
+      "wasm/jsbsim_wasm.wasm": "9fba1627c1d64aaf59f31cd1d7748368a75bc034fe4a87de85cd5106b5869c91"
+    },
+    "validation": {
+      "status": "passed",
+      "commands": [
+        "tsc --noEmit (frozen SDK workspace)",
+        "node --test --test-concurrency=5 test/*.test.mjs (frozen SDK workspace and resolved native fixtures)"
+      ]
+    },
+    "packageArchive": {
+      "path": "deps/felipegalind0-jsbsim-1.2.4-fork.20.tgz",
+      "sha256": "37532356738b7a551daf53b997bc7726898a78ba75d399019d77ad3ea1094419",
+      "integrity": "sha512-u+CgqqdtXa8WUMZipNMioSQjS94DkAe/q1dwOLYeVVpCAhUh5DWXg/sUVD1jnBw+P5cMFy+RXMGKqgdxzBh7Ow=="
+    }
+  },
+  "sourceInputs": [
+    {
+      "path": "scripts/validation/f35b/check-f135-plant-algorithms.mjs",
+      "sha256": "2cfc06e8ad8c20b236a06a1efb5aec80b443c5aeca439760fc413e27e2e7f9a4"
+    },
+    {
+      "path": "public/jsbsim-data/manifest.json",
+      "sha256": "e58a213f9e758ed68adbb4d95fcc50f07e68dc1e0edf82b3db1413e5eacc1cb0"
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml",
+      "sha256": "f04735c23e22eb78a9c77cded49be6e46975695b28140e3bfead8adb3a50b2f1"
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml",
+      "sha256": "2aa795c549dcf2e410c7b7a233c9c32af94e2cf6a2c439637edfc5e599fe2101"
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/direct.xml",
+      "sha256": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc"
+    },
+    {
+      "path": "public/jsbsim-data/aircraft/F-35B-jsbsim/Systems/pushback.xml",
+      "sha256": "868928e9b2b12440daec283260aebb1562d05154f69438f5d95043444378a4bc"
+    }
+  ],
+  "executedBundleSha256": "e5ea18f6629cc6b32b94889e5cd77252b61b1fc2d7bef9cb4569bedb8357311e",
+  "conditions": "Static scenarios held down; scenarios with an airspeed fly freely from the app trim start; F-35B clean (both stores detached); 120 Hz; app bootstrap and engine control; algorithm set after zero-time initialization (which always uses the component reference).",
+  "gates": {
+    "force": "1% of declared full scale (41,000 lbf main, 20,000 lbf lift fan, 1,950 lbf roll post)",
+    "spool": "1% (100 % scale)",
+    "fuel": "1% of 9 kg/s",
+    "temperature": "5 K at stations 4, 5, 7 and both metal solids",
+    "events": "equal counts, each within one 120 Hz step",
+    "failures": "none in either algorithm"
+  },
+  "limitations": [
+    "The component algorithm is the reference; both share the controller, state integration and ledgers, so this tests the reduced closure, not the physics.",
+    "Work is counted in Newton iterations and residual evaluations per accepted step; no wall-clock time was measured.",
+    "The scenarios are the validation set; the reduced closure (tabulated gas properties, Jacobian reuse) was not fitted to them."
+  ],
+  "passed": true,
+  "scenarios": [
+    {
+      "name": "stand-cold-start-dry-reheat-cutoff",
+      "boot": {
+        "altFt": 0,
+        "engineRunning": false
+      },
+      "script": [
+        [
+          10,
+          {
+            "throttle": 0
+          }
+        ],
+        [
+          15,
+          {
+            "throttle": 0.99
+          }
+        ],
+        [
+          15,
+          {
+            "throttle": 1
+          }
+        ],
+        [
+          10,
+          {
+            "throttle": 0.99
+          }
+        ],
+        [
+          15,
+          {
+            "throttle": 0
+          }
+        ],
+        [
+          10,
+          {
+            "cutoff": 1
+          }
+        ]
+      ],
+      "seconds": 92.55,
+      "passed": true,
+      "errors": {
+        "thrustLbf": {
+          "unit": "lbf",
+          "scale": 41000,
+          "maxAbs": 0.020129491262196098,
+          "rms": 0.0016557492365239883,
+          "maxNormalized": 4.909632015169779e-7,
+          "at": {
+            "abs": 0.020129491262196098,
+            "t": 44.141666666664804,
+            "component": 34567.482582311706,
+            "reduced": 34567.50271180297
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "liftFanLbf": {
+          "unit": "lbf",
+          "scale": 20000,
+          "maxAbs": 0,
+          "rms": 0,
+          "maxNormalized": 0,
+          "at": {
+            "abs": 0,
+            "t": 0
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "rollPostLbf": {
+          "unit": "lbf",
+          "scale": 1950,
+          "maxAbs": 0,
+          "rms": 0,
+          "maxNormalized": 0,
+          "at": {
+            "abs": 0,
+            "t": 0
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "n1Pct": {
+          "unit": "%",
+          "scale": 100,
+          "maxAbs": 0.00002895505127753495,
+          "rms": 0.0000024630566596874953,
+          "maxNormalized": 2.895505127753495e-7,
+          "at": {
+            "abs": 0.00002895505127753495,
+            "t": 31.358333333332194,
+            "component": 94.33211057237328,
+            "reduced": 94.33213952742456
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "n2Pct": {
+          "unit": "%",
+          "scale": 100,
+          "maxAbs": 0.00002502323651754068,
+          "rms": 0.0000023873765134168444,
+          "maxNormalized": 2.502323651754068e-7,
+          "at": {
+            "abs": 0.00002502323651754068,
+            "t": 55.22499999999751,
+            "component": 99.7714529285981,
+            "reduced": 99.77142790536158
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "fuelKgSec": {
+          "unit": "kg/s",
+          "scale": 9,
+          "maxAbs": 0.0000020763293737680044,
+          "rms": 1.7808673116087983e-7,
+          "maxNormalized": 2.3070326375200048e-7,
+          "at": {
+            "abs": 0.0000020763293737680044,
+            "t": 31.416666666665524,
+            "component": 2.0958475099082174,
+            "reduced": 2.0958454335788437
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "t4K": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.0006279006220211159,
+          "rms": 0.00006170178600474471,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.0006279006220211159,
+            "t": 31.391666666665525,
+            "component": 1620.3624094161678,
+            "reduced": 1620.3617815155458
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "t5K": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.0006883007864644242,
+          "rms": 0.00004699749098486826,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.0006883007864644242,
+            "t": 30.758333333332228,
+            "component": 999.9850153945767,
+            "reduced": 999.9857036953632
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "t7K": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.0006485892673708804,
+          "rms": 0.000060942001476240314,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.0006485892673708804,
+            "t": 31.34999999999886,
+            "component": 806.7394129610852,
+            "reduced": 806.7387643718179
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "linerK": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.000010687842745937814,
+          "rms": 0.000004333867766346627,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.000010687842745937814,
+            "t": 82.70000000001188,
+            "component": 499.00812406095025,
+            "reduced": 499.0081133731075
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "coreMetalK": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.000041650005641713506,
+          "rms": 0.000011675711582645549,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.000041650005641713506,
+            "t": 30.84999999999889,
+            "component": 753.8865440273886,
+            "reduced": 753.8865856773942
+          },
+          "gate": "5 K",
+          "passed": true
+        }
+      },
+      "events": {
+        "coreLit": {
+          "count": {
+            "component": 2,
+            "reduced": 2
+          },
+          "pairs": [
+            {
+              "to": true,
+              "component": 4.516666666666681,
+              "reduced": 4.516666666666681,
+              "steps": 0
+            },
+            {
+              "to": false,
+              "component": 82.62500000001182,
+              "reduced": 82.62500000001182,
+              "steps": 0
+            }
+          ],
+          "passed": true
+        },
+        "running": {
+          "count": {
+            "component": 2,
+            "reduced": 2
+          },
+          "pairs": [
+            {
+              "to": true,
+              "component": 17.549999999999645,
+              "reduced": 17.549999999999645,
+              "steps": 0
+            },
+            {
+              "to": false,
+              "component": 82.62500000001182,
+              "reduced": 82.62500000001182,
+              "steps": 0
+            }
+          ],
+          "passed": true
+        },
+        "abBurning": {
+          "count": {
+            "component": 2,
+            "reduced": 2
+          },
+          "pairs": [
+            {
+              "to": true,
+              "component": 43.79999999999816,
+              "reduced": 43.79999999999816,
+              "steps": 0
+            },
+            {
+              "to": false,
+              "component": 57.866666666664024,
+              "reduced": 57.866666666664024,
+              "steps": 0
+            }
+          ],
+          "passed": true
+        }
+      },
+      "work": {
+        "component": {
+          "steps": 11106,
+          "iterations": {
+            "mean": 2.2897532865117953,
+            "p50": 2,
+            "p99": 4,
+            "max": 6
+          },
+          "residualEvaluations": {
+            "mean": 25.13740320547452,
+            "p50": 23,
+            "p99": 38,
+            "max": 53
+          },
+          "stepsSolvedByComponent": 11106,
+          "substepped": 0,
+          "failures": 0,
+          "residentBytes": {
+            "mean": 1600,
+            "p50": 1600,
+            "p99": 1600,
+            "max": 1600
+          },
+          "worstEnergyRelative": 9.001096422144521e-7,
+          "worstMassRelative": 1.4472380174165977e-15
+        },
+        "reduced": {
+          "steps": 11106,
+          "iterations": {
+            "mean": 3.104988294615523,
+            "p50": 2,
+            "p99": 8,
+            "max": 11
+          },
+          "residualEvaluations": {
+            "mean": 11.120475418692598,
+            "p50": 10,
+            "p99": 16,
+            "max": 33
+          },
+          "stepsSolvedByComponent": 0,
+          "substepped": 0,
+          "failures": 0,
+          "residentBytes": {
+            "mean": 22784,
+            "p50": 22784,
+            "p99": 22784,
+            "max": 22784
+          },
+          "worstEnergyRelative": 0.0000037672638898313524,
+          "worstMassRelative": 1.4780323671145583e-15
+        }
+      }
+    },
+    {
+      "name": "hot-day-high-start",
+      "boot": {
+        "altFt": 6000,
+        "engineRunning": false,
+        "deltaTK": 30
+      },
+      "script": [
+        [
+          10,
+          {
+            "throttle": 0
+          }
+        ],
+        [
+          10,
+          {
+            "throttle": 0.99
+          }
+        ],
+        [
+          5,
+          {
+            "throttle": 0.3
+          }
+        ]
+      ],
+      "seconds": 49.083333333333336,
+      "passed": true,
+      "errors": {
+        "thrustLbf": {
+          "unit": "lbf",
+          "scale": 41000,
+          "maxAbs": 0.0045689695652981754,
+          "rms": 0.0007946358480751696,
+          "maxNormalized": 1.114382820804433e-7,
+          "at": {
+            "abs": 0.0045689695652981754,
+            "t": 44.54166666666478,
+            "component": 11003.274696999993,
+            "reduced": 11003.270128030428
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "liftFanLbf": {
+          "unit": "lbf",
+          "scale": 20000,
+          "maxAbs": 0,
+          "rms": 0,
+          "maxNormalized": 0,
+          "at": {
+            "abs": 0,
+            "t": 0
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "rollPostLbf": {
+          "unit": "lbf",
+          "scale": 1950,
+          "maxAbs": 0,
+          "rms": 0,
+          "maxNormalized": 0,
+          "at": {
+            "abs": 0,
+            "t": 0
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "n1Pct": {
+          "unit": "%",
+          "scale": 100,
+          "maxAbs": 0.000012269500672346112,
+          "rms": 0.000003259619372259522,
+          "maxNormalized": 1.226950067234611e-7,
+          "at": {
+            "abs": 0.000012269500672346112,
+            "t": 21.858333333332734,
+            "component": 24.060505461278037,
+            "reduced": 24.060493191777365
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "n2Pct": {
+          "unit": "%",
+          "scale": 100,
+          "maxAbs": 0.000025565981253805603,
+          "rms": 0.000004724322372190014,
+          "maxNormalized": 2.5565981253805603e-7,
+          "at": {
+            "abs": 0.000025565981253805603,
+            "t": 21.183333333332772,
+            "component": 51.49111716435582,
+            "reduced": 51.49109159837457
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "fuelKgSec": {
+          "unit": "kg/s",
+          "scale": 9,
+          "maxAbs": 5.492609227442102e-7,
+          "rms": 9.285316556679557e-8,
+          "maxNormalized": 6.102899141602336e-8,
+          "at": {
+            "abs": 5.492609227442102e-7,
+            "t": 37.59999999999851,
+            "component": 1.7371647226161613,
+            "reduced": 1.737165271877084
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "t4K": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.0007522040076537451,
+          "rms": 0.0001231876097711586,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.0007522040076537451,
+            "t": 20.841666666666125,
+            "component": 952.4247732783937,
+            "reduced": 952.424021074386
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "t5K": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.0005490193199193527,
+          "rms": 0.00009232883466049389,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.0005490193199193527,
+            "t": 36.29166666666525,
+            "component": 998.9343023189859,
+            "reduced": 998.9348513383059
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "t7K": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.0003360148791671236,
+          "rms": 0.00005508216002339847,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.0003360148791671236,
+            "t": 36.29166666666525,
+            "component": 777.5432906639686,
+            "reduced": 777.5436266788478
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "linerK": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.000005053899315043964,
+          "rms": 0.000001958415121786435,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.000005053899315043964,
+            "t": 44.99999999999809,
+            "component": 508.0686265199545,
+            "reduced": 508.06862146605516
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "coreMetalK": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.00003856451183992249,
+          "rms": 0.000011547223448462424,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.00003856451183992249,
+            "t": 21.11666666666611,
+            "component": 438.0094235345774,
+            "reduced": 438.0093849700656
+          },
+          "gate": "5 K",
+          "passed": true
+        }
+      },
+      "events": {
+        "coreLit": {
+          "count": {
+            "component": 1,
+            "reduced": 1
+          },
+          "pairs": [
+            {
+              "to": true,
+              "component": 4.816666666666696,
+              "reduced": 4.816666666666696,
+              "steps": 0
+            }
+          ],
+          "passed": true
+        },
+        "running": {
+          "count": {
+            "component": 1,
+            "reduced": 1
+          },
+          "pairs": [
+            {
+              "to": true,
+              "component": 24.083333333332607,
+              "reduced": 24.083333333332607,
+              "steps": 0
+            }
+          ],
+          "passed": true
+        },
+        "abBurning": {
+          "count": {
+            "component": 0,
+            "reduced": 0
+          },
+          "pairs": [],
+          "passed": true
+        }
+      },
+      "work": {
+        "component": {
+          "steps": 5890,
+          "iterations": {
+            "mean": 2.691850594227504,
+            "p50": 2,
+            "p99": 4,
+            "max": 6
+          },
+          "residualEvaluations": {
+            "mean": 28.199660441426147,
+            "p50": 23,
+            "p99": 38,
+            "max": 53
+          },
+          "stepsSolvedByComponent": 5890,
+          "substepped": 0,
+          "failures": 0,
+          "residentBytes": {
+            "mean": 1600,
+            "p50": 1600,
+            "p99": 1600,
+            "max": 1600
+          },
+          "worstEnergyRelative": 7.70882467000586e-7,
+          "worstMassRelative": 4.0441963455486595e-16
+        },
+        "reduced": {
+          "steps": 5890,
+          "iterations": {
+            "mean": 3.9528013582342956,
+            "p50": 4,
+            "p99": 8,
+            "max": 11
+          },
+          "residualEvaluations": {
+            "mean": 11.98862478777589,
+            "p50": 12,
+            "p99": 16,
+            "max": 49
+          },
+          "stepsSolvedByComponent": 0,
+          "substepped": 0,
+          "failures": 0,
+          "residentBytes": {
+            "mean": 22784,
+            "p50": 22784,
+            "p99": 22784,
+            "max": 22784
+          },
+          "worstEnergyRelative": 5.318409931057626e-7,
+          "worstMassRelative": 3.751751307791004e-16
+        }
+      }
+    },
+    {
+      "name": "altitude-25000ft-400kt-throttle-steps",
+      "boot": {
+        "altFt": 25000,
+        "engineRunning": true,
+        "throttleNorm": 0.6,
+        "airspeedKts": 400
+      },
+      "script": [
+        [
+          5,
+          {
+            "throttle": 0.6
+          }
+        ],
+        [
+          10,
+          {
+            "throttle": 0.99
+          }
+        ],
+        [
+          10,
+          {
+            "throttle": 1
+          }
+        ],
+        [
+          8,
+          {
+            "throttle": 0.3
+          }
+        ],
+        [
+          8,
+          {
+            "throttle": 0
+          }
+        ]
+      ],
+      "seconds": 41,
+      "passed": true,
+      "errors": {
+        "thrustLbf": {
+          "unit": "lbf",
+          "scale": 41000,
+          "maxAbs": 0.014494769522571005,
+          "rms": 0.003471038370779343,
+          "maxNormalized": 3.5353096396514647e-7,
+          "at": {
+            "abs": 0.014494769522571005,
+            "t": 15.03333333333312,
+            "component": 18606.787711824287,
+            "reduced": 18606.773217054764
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "liftFanLbf": {
+          "unit": "lbf",
+          "scale": 20000,
+          "maxAbs": 0,
+          "rms": 0,
+          "maxNormalized": 0,
+          "at": {
+            "abs": 0,
+            "t": 0
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "rollPostLbf": {
+          "unit": "lbf",
+          "scale": 1950,
+          "maxAbs": 0,
+          "rms": 0,
+          "maxNormalized": 0,
+          "at": {
+            "abs": 0,
+            "t": 0
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "n1Pct": {
+          "unit": "%",
+          "scale": 100,
+          "maxAbs": 0.000028035215720478845,
+          "rms": 0.00000552569117977488,
+          "maxNormalized": 2.8035215720478846e-7,
+          "at": {
+            "abs": 0.000028035215720478845,
+            "t": 14.2166666666665,
+            "component": 97.79909444255013,
+            "reduced": 97.79912247776585
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "n2Pct": {
+          "unit": "%",
+          "scale": 100,
+          "maxAbs": 0.000041986324220033566,
+          "rms": 0.00001532421910265825,
+          "maxNormalized": 4.1986324220033564e-7,
+          "at": {
+            "abs": 0.000041986324220033566,
+            "t": 14.783333333333134,
+            "component": 97.72604760442347,
+            "reduced": 97.72600561809925
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "fuelKgSec": {
+          "unit": "kg/s",
+          "scale": 9,
+          "maxAbs": 0.000002742553657286706,
+          "rms": 9.284199756500164e-7,
+          "maxNormalized": 3.0472818414296734e-7,
+          "at": {
+            "abs": 0.000002742553657286706,
+            "t": 14.608333333333144,
+            "component": 1.421351231205123,
+            "reduced": 1.4213484886514658
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "t4K": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.0011208526591417467,
+          "rms": 0.0003755652502309031,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.0011208526591417467,
+            "t": 14.499999999999817,
+            "component": 1619.313921352592,
+            "reduced": 1619.3128004999328
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "t5K": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.0010221180833696053,
+          "rms": 0.000347255707878485,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.0010221180833696053,
+            "t": 15.03333333333312,
+            "component": 1017.1778344055055,
+            "reduced": 1017.1768122874221
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "t7K": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.0010604210085602972,
+          "rms": 0.000324205437338769,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.0010604210085602972,
+            "t": 14.558333333333147,
+            "component": 815.9361163839361,
+            "reduced": 815.9350559629275
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "linerK": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.00020423005673819716,
+          "rms": 0.00010864107463518993,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.00020423005673819716,
+            "t": 25.074999999999218,
+            "component": 770.2134071720877,
+            "reduced": 770.213202942031
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "coreMetalK": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.0005174230167312999,
+          "rms": 0.00025295224485217155,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.0005174230167312999,
+            "t": 23.35833333333265,
+            "component": 979.2265180742125,
+            "reduced": 979.2260006511958
+          },
+          "gate": "5 K",
+          "passed": true
+        }
+      },
+      "events": {
+        "coreLit": {
+          "count": {
+            "component": 0,
+            "reduced": 0
+          },
+          "pairs": [],
+          "passed": true
+        },
+        "running": {
+          "count": {
+            "component": 0,
+            "reduced": 0
+          },
+          "pairs": [],
+          "passed": true
+        },
+        "abBurning": {
+          "count": {
+            "component": 2,
+            "reduced": 2
+          },
+          "pairs": [
+            {
+              "to": true,
+              "component": 16.849999999999685,
+              "reduced": 16.849999999999685,
+              "steps": 0
+            },
+            {
+              "to": false,
+              "component": 25.208333333332543,
+              "reduced": 25.208333333332543,
+              "steps": 0
+            }
+          ],
+          "passed": true
+        }
+      },
+      "work": {
+        "component": {
+          "steps": 4920,
+          "iterations": {
+            "mean": 2.260772357723577,
+            "p50": 2,
+            "p99": 4,
+            "max": 5
+          },
+          "residualEvaluations": {
+            "mean": 24.99878048780488,
+            "p50": 23,
+            "p99": 38,
+            "max": 44
+          },
+          "stepsSolvedByComponent": 4920,
+          "substepped": 0,
+          "failures": 0,
+          "residentBytes": {
+            "mean": 1600,
+            "p50": 1600,
+            "p99": 1600,
+            "max": 1600
+          },
+          "worstEnergyRelative": 3.147457544567067e-8,
+          "worstMassRelative": 7.018086394900523e-16
+        },
+        "reduced": {
+          "steps": 4920,
+          "iterations": {
+            "mean": 2.519918699186992,
+            "p50": 2,
+            "p99": 6,
+            "max": 10
+          },
+          "residualEvaluations": {
+            "mean": 10.532723577235773,
+            "p50": 10,
+            "p99": 14,
+            "max": 47
+          },
+          "stepsSolvedByComponent": 0,
+          "substepped": 0,
+          "failures": 0,
+          "residentBytes": {
+            "mean": 22784,
+            "p50": 22784,
+            "p99": 22784,
+            "max": 22784
+          },
+          "worstEnergyRelative": 3.37769869164075e-7,
+          "worstMassRelative": 6.192695000603986e-16
+        }
+      }
+    },
+    {
+      "name": "windmill-cutoff-and-relight-20000ft-300kt",
+      "boot": {
+        "altFt": 20000,
+        "engineRunning": true,
+        "throttleNorm": 0.5,
+        "airspeedKts": 300
+      },
+      "script": [
+        [
+          2,
+          {
+            "throttle": 0.5
+          }
+        ],
+        [
+          20,
+          {
+            "cutoff": 1,
+            "throttle": 0
+          }
+        ],
+        [
+          20,
+          {
+            "cutoff": 0,
+            "throttle": 0
+          }
+        ]
+      ],
+      "seconds": 42,
+      "passed": true,
+      "errors": {
+        "thrustLbf": {
+          "unit": "lbf",
+          "scale": 41000,
+          "maxAbs": 0.001147669079273328,
+          "rms": 0.00025390144914598007,
+          "maxNormalized": 2.7991928762764098e-8,
+          "at": {
+            "abs": 0.001147669079273328,
+            "t": 2.499999999999994,
+            "component": 3428.707841269401,
+            "reduced": 3428.70898893848
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "liftFanLbf": {
+          "unit": "lbf",
+          "scale": 20000,
+          "maxAbs": 0,
+          "rms": 0,
+          "maxNormalized": 0,
+          "at": {
+            "abs": 0,
+            "t": 0
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "rollPostLbf": {
+          "unit": "lbf",
+          "scale": 1950,
+          "maxAbs": 0,
+          "rms": 0,
+          "maxNormalized": 0,
+          "at": {
+            "abs": 0,
+            "t": 0
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "n1Pct": {
+          "unit": "%",
+          "scale": 100,
+          "maxAbs": 0.0000034915315225703125,
+          "rms": 0.000001678114309959893,
+          "maxNormalized": 3.491531522570312e-8,
+          "at": {
+            "abs": 0.0000034915315225703125,
+            "t": 13.258333333333221,
+            "component": 12.376507103440726,
+            "reduced": 12.376510594972249
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "n2Pct": {
+          "unit": "%",
+          "scale": 100,
+          "maxAbs": 0.0000036908746849917407,
+          "rms": 0.0000011706152756436598,
+          "maxNormalized": 3.690874684991741e-8,
+          "at": {
+            "abs": 0.0000036908746849917407,
+            "t": 5.766666666666743,
+            "component": 32.15395693866803,
+            "reduced": 32.153960629542716
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "fuelKgSec": {
+          "unit": "kg/s",
+          "scale": 9,
+          "maxAbs": 1.763915946639827e-8,
+          "rms": 3.579614826919377e-9,
+          "maxNormalized": 1.9599066073775853e-9,
+          "at": {
+            "abs": 1.763915946639827e-8,
+            "t": 1.4999999999999971,
+            "component": 0.43537150080289055,
+            "reduced": 0.43537151844205
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "t4K": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.0002540942955420178,
+          "rms": 0.000010370308775627863,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.0002540942955420178,
+            "t": 22.66666666666602,
+            "component": 482.3378375161709,
+            "reduced": 482.33809161046645
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "t5K": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.0002054364600212466,
+          "rms": 0.000011831921104449749,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.0002054364600212466,
+            "t": 22.66666666666602,
+            "component": 429.14517626099075,
+            "reduced": 429.1453816974508
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "t7K": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.00001564153876643104,
+          "rms": 0.000004294328988740544,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.00001564153876643104,
+            "t": 4.250000000000001,
+            "component": 288.1338262467372,
+            "reduced": 288.13381060519845
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "linerK": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.000007928438378712599,
+          "rms": 0.000005733320646607016,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.000007928438378712599,
+            "t": 35.11666666666532,
+            "component": 308.2113301695501,
+            "reduced": 308.2113222411117
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "coreMetalK": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.0000056879050021052535,
+          "rms": 0.0000033869387153559403,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.0000056879050021052535,
+            "t": 36.03333333333193,
+            "component": 440.0103588580976,
+            "reduced": 440.0103531701926
+          },
+          "gate": "5 K",
+          "passed": true
+        }
+      },
+      "events": {
+        "coreLit": {
+          "count": {
+            "component": 2,
+            "reduced": 2
+          },
+          "pairs": [
+            {
+              "to": false,
+              "component": 2.099999999999995,
+              "reduced": 2.099999999999995,
+              "steps": 0
+            },
+            {
+              "to": true,
+              "component": 22.466666666666033,
+              "reduced": 22.466666666666033,
+              "steps": 0
+            }
+          ],
+          "passed": true
+        },
+        "running": {
+          "count": {
+            "component": 1,
+            "reduced": 1
+          },
+          "pairs": [
+            {
+              "to": false,
+              "component": 2.099999999999995,
+              "reduced": 2.099999999999995,
+              "steps": 0
+            }
+          ],
+          "passed": true
+        },
+        "abBurning": {
+          "count": {
+            "component": 0,
+            "reduced": 0
+          },
+          "pairs": [],
+          "passed": true
+        }
+      },
+      "work": {
+        "component": {
+          "steps": 5040,
+          "iterations": {
+            "mean": 2.1166666666666667,
+            "p50": 2,
+            "p99": 4,
+            "max": 5
+          },
+          "residualEvaluations": {
+            "mean": 23.87857142857143,
+            "p50": 23,
+            "p99": 38,
+            "max": 44
+          },
+          "stepsSolvedByComponent": 5040,
+          "substepped": 0,
+          "failures": 0,
+          "residentBytes": {
+            "mean": 1600,
+            "p50": 1600,
+            "p99": 1600,
+            "max": 1600
+          },
+          "worstEnergyRelative": 1.452846485816797e-8,
+          "worstMassRelative": 2.2160761317922135e-16
+        },
+        "reduced": {
+          "steps": 5040,
+          "iterations": {
+            "mean": 2.3948412698412698,
+            "p50": 2,
+            "p99": 6,
+            "max": 11
+          },
+          "residualEvaluations": {
+            "mean": 10.398809523809524,
+            "p50": 10,
+            "p99": 15,
+            "max": 20
+          },
+          "stepsSolvedByComponent": 0,
+          "substepped": 0,
+          "failures": 0,
+          "residentBytes": {
+            "mean": 22784,
+            "p50": 22784,
+            "p99": 22784,
+            "max": 22784
+          },
+          "worstEnergyRelative": 1.3708204970000682e-7,
+          "worstMassRelative": 2.17522623495151e-16
+        }
+      }
+    },
+    {
+      "name": "stovl-conversion-throttle-steps-closing-cutoff",
+      "boot": {
+        "altFt": 1000,
+        "engineRunning": true,
+        "throttleNorm": 0.9
+      },
+      "script": [
+        [
+          2,
+          {
+            "throttle": 0.9
+          }
+        ],
+        [
+          6,
+          {
+            "stovl": 1
+          }
+        ],
+        [
+          6,
+          {
+            "throttle": 0.98
+          }
+        ],
+        [
+          6,
+          {
+            "throttle": 0.7
+          }
+        ],
+        [
+          6,
+          {
+            "stovl": 0,
+            "throttle": 0.9
+          }
+        ],
+        [
+          10,
+          {
+            "cutoff": 1,
+            "throttle": 0
+          }
+        ]
+      ],
+      "seconds": 36,
+      "passed": true,
+      "errors": {
+        "thrustLbf": {
+          "unit": "lbf",
+          "scale": 41000,
+          "maxAbs": 0.02595391927206947,
+          "rms": 0.006119499212971253,
+          "maxNormalized": 6.33022421269987e-7,
+          "at": {
+            "abs": 0.02595391927206947,
+            "t": 5.375000000000057,
+            "component": 12309.708607376046,
+            "reduced": 12309.682653456774
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "liftFanLbf": {
+          "unit": "lbf",
+          "scale": 20000,
+          "maxAbs": 0.02550481355865486,
+          "rms": 0.005826204367132248,
+          "maxNormalized": 0.0000012752406779327429,
+          "at": {
+            "abs": 0.02550481355865486,
+            "t": 5.433333333333393,
+            "component": 12678.436905483077,
+            "reduced": 12678.411400669518
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "rollPostLbf": {
+          "unit": "lbf",
+          "scale": 1950,
+          "maxAbs": 0.0019930113808186434,
+          "rms": 0.0004091569947832694,
+          "maxNormalized": 0.0000010220571183685352,
+          "at": {
+            "abs": 0.0019930113808186434,
+            "t": 5.366666666666723,
+            "component": 1705.1362113748817,
+            "reduced": 1705.1382043862625
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "n1Pct": {
+          "unit": "%",
+          "scale": 100,
+          "maxAbs": 0.00003402373609162623,
+          "rms": 0.000009681223021413089,
+          "maxNormalized": 3.402373609162623e-7,
+          "at": {
+            "abs": 0.00003402373609162623,
+            "t": 5.041666666666707,
+            "component": 95.37186234075276,
+            "reduced": 95.37189636448885
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "n2Pct": {
+          "unit": "%",
+          "scale": 100,
+          "maxAbs": 0.00005329446592838849,
+          "rms": 0.000014825463356120684,
+          "maxNormalized": 5.329446592838849e-7,
+          "at": {
+            "abs": 0.00005329446592838849,
+            "t": 5.800000000000078,
+            "component": 95.49188364037926,
+            "reduced": 95.49183034591333
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "fuelKgSec": {
+          "unit": "kg/s",
+          "scale": 9,
+          "maxAbs": 0.000004443199463910474,
+          "rms": 0.0000012124009905087253,
+          "maxNormalized": 4.93688829323386e-7,
+          "at": {
+            "abs": 0.000004443199463910474,
+            "t": 9.708333333333423,
+            "component": 2.774727669567154,
+            "reduced": 2.77472322636769
+          },
+          "gate": "1% of scale",
+          "passed": true
+        },
+        "t4K": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.001402716274924387,
+          "rms": 0.00039727896725958865,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.001402716274924387,
+            "t": 5.700000000000073,
+            "component": 1529.9855437618335,
+            "reduced": 1529.9841410455585
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "t5K": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.001155587287371418,
+          "rms": 0.0003044382397351124,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.001155587287371418,
+            "t": 9.64166666666676,
+            "component": 1021.2482666840807,
+            "reduced": 1021.2471110967933
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "t7K": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.0010808596103970558,
+          "rms": 0.00027593475067057917,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.0010808596103970558,
+            "t": 9.64166666666676,
+            "component": 957.4380628476547,
+            "reduced": 957.4369819880443
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "linerK": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.00006056896802419942,
+          "rms": 0.000026501051206672477,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.00006056896802419942,
+            "t": 4.416666666666676,
+            "component": 589.5212210869418,
+            "reduced": 589.5212816559098
+          },
+          "gate": "5 K",
+          "passed": true
+        },
+        "coreMetalK": {
+          "unit": "K",
+          "scale": null,
+          "maxAbs": 0.0002972077027152409,
+          "rms": 0.0001281736660532084,
+          "maxNormalized": null,
+          "at": {
+            "abs": 0.0002972077027152409,
+            "t": 10.100000000000067,
+            "component": 978.1354528838851,
+            "reduced": 978.1351556761824
+          },
+          "gate": "5 K",
+          "passed": true
+        }
+      },
+      "events": {
+        "coreLit": {
+          "count": {
+            "component": 1,
+            "reduced": 1
+          },
+          "pairs": [
+            {
+              "to": false,
+              "component": 26.241666666665818,
+              "reduced": 26.241666666665818,
+              "steps": 0
+            }
+          ],
+          "passed": true
+        },
+        "running": {
+          "count": {
+            "component": 1,
+            "reduced": 1
+          },
+          "pairs": [
+            {
+              "to": false,
+              "component": 26.241666666665818,
+              "reduced": 26.241666666665818,
+              "steps": 0
+            }
+          ],
+          "passed": true
+        },
+        "abBurning": {
+          "count": {
+            "component": 0,
+            "reduced": 0
+          },
+          "pairs": [],
+          "passed": true
+        }
+      },
+      "work": {
+        "component": {
+          "steps": 4320,
+          "iterations": {
+            "mean": 3.077777777777778,
+            "p50": 3,
+            "p99": 5,
+            "max": 7
+          },
+          "residualEvaluations": {
+            "mean": 31.480555555555554,
+            "p50": 32,
+            "p99": 47,
+            "max": 65
+          },
+          "stepsSolvedByComponent": 4320,
+          "substepped": 0,
+          "failures": 0,
+          "residentBytes": {
+            "mean": 1600,
+            "p50": 1600,
+            "p99": 1600,
+            "max": 1600
+          },
+          "worstEnergyRelative": 1.39552770814856e-7,
+          "worstMassRelative": 2.2095732749589805e-16
+        },
+        "reduced": {
+          "steps": 4320,
+          "iterations": {
+            "mean": 4.520833333333333,
+            "p50": 5,
+            "p99": 9,
+            "max": 12
+          },
+          "residualEvaluations": {
+            "mean": 12.547685185185186,
+            "p50": 13,
+            "p99": 18,
+            "max": 35
+          },
+          "stepsSolvedByComponent": 0,
+          "substepped": 0,
+          "failures": 0,
+          "residentBytes": {
+            "mean": 22784,
+            "p50": 22784,
+            "p99": 22784,
+            "max": 22784
+          },
+          "worstEnergyRelative": 3.773751890212063e-7,
+          "worstMassRelative": 2.5792965127256817e-16
+        }
+      }
+    }
+  ]
+}

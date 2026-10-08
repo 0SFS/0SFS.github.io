@@ -7,8 +7,33 @@ bindings, native lifetime, generic diagnostics and SDK build tooling belong in
 `wasm/`. 0SFS owns aircraft data, initial conditions, controls and scheduling.
 FOSS Earth remains the separate terrain/rendering dependency.
 
-**Installed adoption, 2026-10-06:** clean in-tree package
-`1.2.4-fork.16` is installed and locked at `97fe6ddf`. It adds read-only signed
+**Installed adoption, 2026-10-08:** clean in-tree package
+`1.2.4-fork.20` is installed and locked at `ea6956b4`. It adds JSBSim's
+optional coupled turbine plant (`<plant>` inside `<turbine_engine>`; contract in
+JSBSim `doc/turbine-plant-model.md`). It models fuel, combustion, the matched
+gas path, shafts, nozzle, metal temperatures and a shaft-driven lift system in
+one transient, with a component reference algorithm and a reduced one.
+Empirical turbines are unchanged. The F-35B's F135 uses it
+([ledger](validation/f135-engine-plant.md)). The lift fan and roll posts are
+now outlets of that one engine, applied as external forces. Their engines 1–3
+are gone.
+
+Ninety native tests, 52 SDK cases, 63 identity/artifact cases, all 14 installed
+files and 238 application integration tests pass. The
+[fork.20 adoption record](../validation/evidence/jsbsim/adoption/fork20-adoption.json)
+keeps hashes, logs and three rejected candidates, each retained in `deps/` and
+refused by the identity gate:
+
+- **fork.17:** `set-running` put a plant engine at full throttle until the next step.
+- **fork.18:** a steady converted point could not be solved above about 15 kt.
+- **fork.19:** reheat permission used physical rather than corrected N2.
+
+Rollback to fork.16 needs the F-35B data from before the plant migration;
+the [rollback declaration](../validation/evidence/jsbsim/rollback/fork16/README.md)
+retains it.
+
+**Prior adoption, 2026-10-06:** clean in-tree package
+`1.2.4-fork.16` was installed and locked at `97fe6ddf`. It adds read-only signed
 heat accounting for every existing turbine solid without changing the thermal
 solve, F135 coefficients, fuel, thrust, spool or nozzle schedules. Each region
 publishes imposed bath temperatures, effective capacity, gas/coolant/radiative

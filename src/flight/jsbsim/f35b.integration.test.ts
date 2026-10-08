@@ -59,8 +59,8 @@ function advance(sdk: JSBSimSdk, seconds: number) {
   expect(validFlightState(readFlightState(sdk))).toBe(true);
 }
 
-async function createHover({ conversion = 1, altFt = 1000, airspeedKts = 0, throttleNorm = 0.98 } = {}) {
-  const sdk = await createF35({ altFt, airspeedKts, throttleNorm });
+async function createHover({ conversion = 1, altFt = 1000, airspeedKts = 0, throttleNorm = 0.98, holdDown = false } = {}) {
+  const sdk = await createF35({ altFt, airspeedKts, throttleNorm, holdDown });
   const controls = { ...neutral, throttle: throttleNorm, pitchTrim: 0 };
   const initialize = () => {
     for (const property of ["ic/theta-deg", "ic/alpha-deg", "ic/gamma-deg"]) sdk.setPropertyValue(property, 0);
@@ -75,65 +75,109 @@ async function createHover({ conversion = 1, altFt = 1000, airspeedKts = 0, thro
   return { sdk, controls };
 }
 
-describe("F-35B native lift allocation, not LiftSystem calibration", () => {
+const PLANT = "propulsion/engine[0]/plant/";
+const liftSystemThrust = (sdk: JSBSimSdk) => ({
+  main: sdk.getPropertyValue(PLANT + "nozzle/gross-thrust-lbs"),
+  liftFan: sdk.getPropertyValue(PLANT + "lift-fan/gross-thrust-lbs"),
+  posts: [0, 1].map(post => sdk.getPropertyValue(PLANT + `roll-post[${post}]/gross-thrust-lbs`)),
+});
+/** The magnitude the model applies as one of its external forces. */
+const applied = (sdk: JSBSimSdk, name: string) =>
+  sdk.getPropertyValue(profile.forceExternalForces!.find(force => force.name === name)!.magnitude!);
+
+describe("F-35B LiftSystem as outlets of the coupled F135 plant, not LiftSystem calibration", () => {
   it.each([0, 0.25, 0.5, 0.75, 1].flatMap(conversion => [0, 60, 150].map(airspeedKts => ({ conversion, airspeedKts }))))(
-    "balances actual nozzle vertical force at conversion=$conversion, speed=$airspeedKts kt", async ({ conversion, airspeedKts }) => {
+    "balances lift-fan against main-nozzle vertical thrust at conversion=$conversion, speed=$airspeedKts kt", async ({ conversion, airspeedKts }) => {
       const { sdk } = await createHover({ conversion, airspeedKts, altFt: 5000 });
-      const paths = [0, 1, 2, 3].flatMap(index => [..."xyz"].map(axis => `propulsion/engine[${index}]/body-force-${axis}-lbs`));
-      const batch = sdk.createPropertyBatch(paths);
-      expect(batch.missing).toEqual([]);
-      const values = batch.read();
-      for (const [index, axis] of [..."xyz"].entries()) {
-        expect([0, 1, 2, 3].reduce((sum, engine) => sum + values[engine * 3 + index], 0))
-          .toBeCloseTo(sdk.getPropertyValue(`forces/fb${axis}-prop-lbs`), 8);
+      // One engine: the lift fan and roll posts are its outlets, never engines of their own.
+      expect(sdk.getPropertyCatalog().some(line => line.startsWith("propulsion/engine[1]/"))).toBe(false);
+      const { liftFan, posts } = liftSystemThrust(sdk);
+      // Applied at their own stations as exactly the plant's outlet observations.
+      expect(applied(sdk, "lift-fan")).toBe(liftFan);
+      expect(applied(sdk, "roll-post-left")).toBe(posts[0]);
+      expect(applied(sdk, "roll-post-right")).toBe(posts[1]);
+      if (conversion === 0) {
+        expect(liftFan).toBe(0);
+        expect(posts).toEqual([0, 0]);
+        return;
       }
+      // The engine holds the commanded split, which balances the two jets about the CG.
       const cg = sdk.getPropertyValue("inertia/cg-x-in");
       const aftArm = sdk.getPropertyValue("propulsion/engine[0]/x-position") - cg;
-      const forwardArm = cg - sdk.getPropertyValue("propulsion/engine[1]/x-position");
-      expect(-values[5]).toBeCloseTo(-values[2] * aftArm / forwardArm, 7);
-      expect(sdk.getPropertyValue("moments/m-prop-lbsft")).toBeCloseTo(0, 6);
-      for (const engine of [1, 2, 3]) {
-        expect(sdk.getPropertyValue(`propulsion/engine[${engine}]/fuel-flow-rate-pps`)).toBe(0);
-        if (conversion === 0) expect(sdk.getPropertyValue(`propulsion/engine[${engine}]/thrust-lbs`)).toBe(0);
-      }
-      batch.dispose();
+      const forwardArm = cg - sdk.getPropertyValue("external_reactions/lift-fan/location-x-in");
+      const mainVertical = -sdk.getPropertyValue("propulsion/engine[0]/body-force-z-lbs");
+      expect(liftFan * forwardArm / (mainVertical * aftArm * (1 + sdk.getPropertyValue("fcs/stovl-pitch-control"))))
+        .toBeCloseTo(1, 3);
+      expect(posts[0]).toBeCloseTo(posts[1], 6);
     },
   );
 
-  it("follows the main engine's current force while its actual spool changes", async () => {
+  it("drives the lift fan from the main engine's LP spool as power changes", async () => {
     const { sdk, controls } = await createHover({ conversion: 0.5, altFt: 5000, throttleNorm: 0.6 });
     expect(sdk.run()).toBe(true); // Leave zero-time Trim before changing demand.
-    const before = sdk.getPropertyValue("propulsion/engine[0]/n2");
+    const before = { n2: sdk.getPropertyValue("propulsion/engine[0]/n2"), ...liftSystemThrust(sdk) };
     apply(sdk, { ...controls, throttle: 0.98 }, 0.5);
-    for (let step = 0; step < 30; step++) {
+    advance(sdk, 0.25);
+    // A real spool: a quarter second later it is still accelerating.
+    const early = sdk.getPropertyValue("propulsion/engine[0]/n2");
+    expect(early).toBeGreaterThan(before.n2);
+    const splitError = () => {
+      const { main, liftFan } = liftSystemThrust(sdk);
+      return Math.abs(liftFan / main / sdk.getPropertyValue("fcs/lift-split-cmd") - 1);
+    };
+    let worstSplit = 0;
+    for (let step = 0; step < 4 / FIXED_DT; step++) {
       expect(sdk.run()).toBe(true);
-      const cg = sdk.getPropertyValue("inertia/cg-x-in");
-      const ratio = (sdk.getPropertyValue("propulsion/engine[0]/x-position") - cg)
-        / (cg - sdk.getPropertyValue("propulsion/engine[1]/x-position"));
-      const desired = -sdk.getPropertyValue("propulsion/engine[0]/body-force-z-lbs") * ratio
-        * (1 + sdk.getPropertyValue("fcs/stovl-pitch-control"));
-      expect(sdk.getPropertyValue("propulsion/engine[1]/thrust-lbs")).toBeCloseTo(desired, 7);
+      // The engaged clutch turns the fan with the LP spool through its gear.
+      expect(Math.abs(sdk.getPropertyValue(PLANT + "lift-fan/speed-percent") - sdk.getPropertyValue("propulsion/engine[0]/n1")))
+        .toBeLessThan(1);
+      if (step * FIXED_DT > 2) worstSplit = Math.max(worstSplit, splitError());
     }
-    expect(sdk.getPropertyValue("propulsion/engine[0]/n2")).toBeGreaterThan(before);
-    expect(sdk.getPropertyValue("propulsion/engine[0]/n2")).toBeLessThan(99.2);
+    expect(sdk.getPropertyValue("propulsion/engine[0]/n2")).toBeGreaterThan(early);
+    expect(liftSystemThrust(sdk).liftFan).toBeGreaterThan(before.liftFan * 1.3);
+    // While the vanes shed the fan's load the N1 governor overshoots, and the
+    // split is held to 3.7 % at worst after 2 s (measured); once settled, to 1 %.
+    expect(worstSplit).toBeLessThan(0.05);
+    advance(sdk, 4);
+    expect(splitError()).toBeLessThan(0.01);
   });
 
-  it("limits auxiliary force to actual idle power and removes it after main-only cutoff, including RunIC and reload", async () => {
-    const { sdk } = await createHover({ altFt: 5000, throttleNorm: 0 });
-    for (const engine of [0, 1, 2, 3]) expect(sdk.getPropertyValue(`propulsion/engine[${engine}]/thrust-lbs`)).toBeLessThan(2000);
+  it("has no lift power of its own: idle gives little, and cutoff takes it away with the spool, through RunIC and reload", async () => {
+    // Held, so no ram air drives the open fan: what it gives is the engine's.
+    const { sdk } = await createHover({ altFt: 5000, throttleNorm: 0, holdDown: true });
+    const idle = liftSystemThrust(sdk);
+    expect(idle.main + idle.liftFan + idle.posts[0] + idle.posts[1]).toBeLessThan(6000);
     apply(sdk, { ...neutral, pitchTrim: 0, throttle: 0.98 }, 1);
     advance(sdk, 5);
-    expect(sdk.getPropertyValue("propulsion/engine[1]/thrust-lbs")).toBeGreaterThan(1000);
+    const powered = liftSystemThrust(sdk).liftFan;
+    expect(powered).toBeGreaterThan(10000);
     sdk.setPropertyValue("propulsion/active_engine", 0);
     sdk.setPropertyValue("propulsion/cutoff_cmd", 1);
-    expect(sdk.run()).toBe(true);
-    for (const engine of [0, 1, 2, 3]) expect(sdk.getPropertyValue(`propulsion/engine[${engine}]/thrust-lbs`)).toBe(0);
+    advance(sdk, 0.5);
+    expect(sdk.getPropertyValue(PLANT + "fuel/core-burned-kg-sec")).toBe(0);
+    let previous = liftSystemThrust(sdk).liftFan;
+    expect(previous).toBeLessThan(powered);
+    for (let step = 0; step < 10 / FIXED_DT; step++) {
+      expect(sdk.run()).toBe(true);
+      // Nothing burns and the rotors only give up energy: the fan runs down on what the spools had.
+      expect(sdk.getPropertyValue(PLANT + "ledger/chemical-j")).toBe(0);
+      expect(sdk.getPropertyValue(PLANT + "ledger/rotor-stored-j")).toBeLessThanOrEqual(0);
+      const now = liftSystemThrust(sdk).liftFan;
+      expect(now).toBeLessThanOrEqual(previous);
+      previous = now;
+    }
+    expect(previous).toBeLessThan(0.1 * powered);
+    // A zero-time call on a stopped engine re-reads its state; it never adds power.
+    const spools = () => ["lp", "hp", "lift-fan"].map(shaft => sdk.getPropertyValue(PLANT + `shaft/${shaft}-rad-sec`));
+    const before = spools();
     expect(sdk.runIc()).toBe(true);
-    for (const engine of [0, 1, 2, 3]) expect(sdk.getPropertyValue(`propulsion/engine[${engine}]/thrust-lbs`)).toBe(0);
+    expect(spools()).toEqual(before);
+    expect(liftSystemThrust(sdk).liftFan).toBeCloseTo(previous, 6);
     await bootstrapAircraft(sdk, aircraftId);
     expect(sdk.getPropertyValue("fcs/stovl-pos-norm")).toBe(0);
-    expect(sdk.getPropertyValue("propulsion/engine[0]/thrust-lbs")).toBeGreaterThan(1000);
-    for (const engine of [1, 2, 3]) expect(sdk.getPropertyValue(`propulsion/engine[${engine}]/thrust-lbs`)).toBe(0);
+    const reloaded = liftSystemThrust(sdk);
+    expect(reloaded.main).toBeGreaterThan(1000);
+    expect([reloaded.liftFan, ...reloaded.posts]).toEqual([0, 0, 0]);
   });
 
   it("enters full conversion from the 60 kt development fixture without a pitch departure", async () => {
@@ -157,8 +201,10 @@ describe("F-35B native lift allocation, not LiftSystem calibration", () => {
         expect(sdk.run()).toBe(true);
         expect(Math.abs(sdk.getPropertyValue("attitude/theta-rad"))).toBeLessThan(0.25);
         expect(Math.abs(sdk.getPropertyValue("attitude/phi-rad"))).toBeLessThan(0.65);
-        expect(sdk.getPropertyValue("propulsion/engine[1]/thrust-lbs")).toBeLessThan(20000);
-        for (const engine of [2, 3]) expect(sdk.getPropertyValue(`propulsion/engine[${engine}]/thrust-lbs`)).toBeLessThan(1950);
+        // Within the published LiftSystem ratings.
+        const { liftFan, posts } = liftSystemThrust(sdk);
+        expect(liftFan).toBeLessThan(20000);
+        for (const thrust of posts) expect(thrust).toBeLessThan(1950);
       }
       const rate = axis === "aileron" ? "p" : axis === "elevator" ? "q" : "r";
       expect(Math.abs(sdk.getPropertyValue(`velocities/${rate}-rad_sec`))).toBeLessThan(0.03);
@@ -292,58 +338,88 @@ describe("F-35B roll-rate law", () => {
 });
 
 describe("F-35B augmentation transition interlock", () => {
-  it.each([0.0001, 0.001])("inhibits actual afterburner for positive conversion %s", async conversion => {
+  // The inhibit acts on the engine's control: on the step conversion becomes
+  // positive, reheat is deselected and its metering shut. Fuel already in the
+  // spray manifold still burns until the flame blows out, which the plant
+  // computes (0.34 s from full reheat at this condition); burning never grows
+  // while inhibited and is out within this bound.
+  const AUGMENTATION = "propulsion/engine[0]/augmentation"; // reheat fuel actually burning
+  const SELECTED = PLANT + "combustion/ab-selected";
+  const METERED = PLANT + "fuel/ab-command-kg-sec";
+  const BURNED = PLANT + "fuel/ab-burned-kg-sec";
+  const BURNOUT_S = 0.5;
+
+  /** One step under the inhibit: reheat deselected with its metering shut, and its burning not growing. */
+  function stepInhibited(sdk: JSBSimSdk, context: Record<string, number>) {
+    const before = sdk.getPropertyValue(BURNED);
+    expect(sdk.run()).toBe(true);
+    expect({ ...context, throttle: sdk.getPropertyValue("fcs/throttle-pos-norm"), selected: sdk.getPropertyValue(SELECTED),
+      metered: sdk.getPropertyValue(METERED) }).toMatchObject({ selected: 0, metered: 0 });
+    expect(sdk.getPropertyValue(BURNED)).toBeLessThanOrEqual(before);
+  }
+
+  it.each([0.0001, 0.001])("deselects reheat at once for positive conversion %s, and its burning ends with the manifold", async conversion => {
     const sdk = await createF35({ throttleNorm: 1 });
     advance(sdk, 0.1);
-    expect(sdk.getPropertyValue("propulsion/engine[0]/augmentation")).toBe(1);
+    expect(sdk.getPropertyValue(AUGMENTATION)).toBe(1);
     apply(sdk, { ...neutral, throttle: 1 }, conversion);
-    expect(sdk.run()).toBe(true);
-    expect(sdk.getPropertyValue("fcs/stovl-pos-norm")).toBeCloseTo(conversion, 9);
-    expect({ conversion, throttle: sdk.getPropertyValue("fcs/throttle-pos-norm"),
-      augmentation: sdk.getPropertyValue("propulsion/engine[0]/augmentation") })
-      .toMatchObject({ augmentation: 0 });
+    for (let step = 0; step < BURNOUT_S / FIXED_DT; step++) {
+      stepInhibited(sdk, { conversion, step });
+      expect(sdk.getPropertyValue("fcs/stovl-pos-norm")).toBeCloseTo(conversion, 9);
+    }
+    expect(sdk.getPropertyValue(AUGMENTATION)).toBe(0);
   });
 
   it("checks every full-throttle step through entry, exit and reentry", async () => {
     const sdk = await createF35({ throttleNorm: 1 });
     advance(sdk, 0.1);
-    expect(sdk.getPropertyValue("propulsion/engine[0]/augmentation")).toBe(1);
+    expect(sdk.getPropertyValue(AUGMENTATION)).toBe(1);
     for (const command of [1, 0, 1]) {
       apply(sdk, { ...neutral, throttle: 1 }, command);
+      let inhibited = 0;
       for (let step = 0; step < 360; step++) {
-        expect(sdk.run()).toBe(true);
-        const position = sdk.getPropertyValue("fcs/stovl-pos-norm");
-        const augmentation = sdk.getPropertyValue("propulsion/engine[0]/augmentation");
-        if (command > 0 || position > 0) {
-          expect({ command, step, position, throttle: sdk.getPropertyValue("fcs/throttle-pos-norm"), augmentation })
-            .toMatchObject({ augmentation: 0 });
-        }
+        // The FCS samples the request and the pre-step position.
+        if (command > 0 || sdk.getPropertyValue("fcs/stovl-pos-norm") > 0) {
+          stepInhibited(sdk, { command, step });
+          inhibited++;
+          if (inhibited * FIXED_DT >= BURNOUT_S) expect({ command, step, augmentation: sdk.getPropertyValue(AUGMENTATION) }).toMatchObject({ augmentation: 0 });
+        } else expect(sdk.run()).toBe(true);
       }
       expect(sdk.getPropertyValue("fcs/stovl-pos-norm")).toBe(command);
-      expect(sdk.getPropertyValue("propulsion/engine[0]/augmentation")).toBe(command === 0 ? 1 : 0);
+      // Closed again, reheat relights within the rest of the 3 s.
+      expect(sdk.getPropertyValue(SELECTED)).toBe(command === 0 ? 1 : 0);
+      expect(sdk.getPropertyValue(AUGMENTATION)).toBe(command === 0 ? 1 : 0);
     }
   });
 
   it.each(["RunIC", "snapshot restore", "relocation"] as const)("keeps partial closing conversion inhibited through %s", async operation => {
     const sdk = await createF35({ throttleNorm: 1 });
     // Reach the closing boundary through accepted native steps, so the
-    // snapshot contains consistent engine and actuator state.
+    // snapshot contains consistent engine and actuator state, with reheat out.
     apply(sdk, { ...neutral, throttle: 1 }, 0.0105);
-    advance(sdk, 0.1);
+    advance(sdk, BURNOUT_S);
     apply(sdk, { ...neutral, throttle: 1 }, 0);
     for (let step = 0; step < 3; step++) expect(sdk.run()).toBe(true);
     expect(sdk.getPropertyValue("fcs/stovl-pos-norm")).toBeCloseTo(0.0005, 10);
-    expect(sdk.getPropertyValue("propulsion/engine[0]/augmentation")).toBe(0);
+    expect([sdk.getPropertyValue(SELECTED), sdk.getPropertyValue(AUGMENTATION)]).toEqual([0, 0]);
     if (operation === "RunIC") expect(sdk.runIc()).toBe(true);
     else if (operation === "snapshot restore") restoreSimulation(sdk, captureSimulation(sdk));
     else resetFlightLocation(sdk, { latDeg: 36, lonDeg: -111, altMeters: 2000 }, 0, aircraftId);
     // Raw RunIC evaluates zero-time kinematics at its commanded endpoint.
     // The app's recovery operations restore the saved physical position.
     expect(sdk.getPropertyValue("fcs/stovl-pos-norm")).toBeCloseTo(operation === "RunIC" ? 0 : 0.0005, 10);
-    expect(sdk.getPropertyValue("propulsion/engine[0]/augmentation")).toBe(0);
+    // No zero-time evaluation selects or lights reheat.
+    expect([sdk.getPropertyValue(SELECTED), sdk.getPropertyValue(AUGMENTATION)]).toEqual([0, 0]);
     for (let step = 0; step < 2; step++) expect(sdk.run()).toBe(true);
     expect(sdk.getPropertyValue("fcs/stovl-pos-norm")).toBe(0);
-    expect(sdk.getPropertyValue("propulsion/engine[0]/augmentation")).toBe(1);
+    // Released, reheat is selected at once and burns once it has lit.
+    expect(sdk.getPropertyValue(SELECTED)).toBe(1);
+    let burning = false;
+    for (let step = 0; step < 2 / FIXED_DT && !burning; step++) {
+      expect(sdk.run()).toBe(true);
+      burning = sdk.getPropertyValue(AUGMENTATION) === 1;
+    }
+    expect(burning).toBe(true);
   });
 
   it("reads the native main-nozzle schedule without creating or commanding it", async () => {
@@ -352,18 +428,25 @@ describe("F-35B augmentation transition interlock", () => {
     expect(sdk.getPropertyCatalog().some(line => /^propulsion\/engine(?:\[0\])?\/nozzle-pos-norm \(R\)$/.test(line))).toBe(true);
     const batch = sdk.createPropertyBatch([path]);
     expect(batch.missing).toEqual([]);
-    expect(batch.read()[0]).toBe(1); // Reset's generic open display position.
+    // The plant's own throat position, from its initialization onwards.
+    const plantPosition = () => sdk.getPropertyValue(PLANT + "nozzle/position-norm");
+    expect(batch.read()[0]).toBe(plantPosition());
     advance(sdk, 2);
     const dryPosition = batch.read()[0];
+    expect(dryPosition).toBe(plantPosition());
     expect(dryPosition).toBeGreaterThanOrEqual(0);
     expect(dryPosition).toBeLessThan(0.5);
     sdk.setPropertyValue(path, 1);
     expect(batch.read()[0]).toBe(dryPosition);
     sdk.resetToInitialConditions(2);
+    // Until the next evaluation, reset's generic open position; the plant says it has no evaluation.
     expect(batch.read()[0]).toBe(1);
+    expect(sdk.getPropertyValue(PLANT + "numerics/valid")).toBe(0);
+    expect(sdk.runIc()).toBe(true);
+    expect(batch.read()[0]).toBe(plantPosition());
     await bootstrapAircraft(sdk, aircraftId, { throttleNorm: 1 });
     expect(() => batch.read()).toThrow(/disposed/);
-    expect(sdk.getPropertyValue(path)).toBe(1);
+    expect(sdk.getPropertyValue(path)).toBe(plantPosition());
   });
 
   it("reloads at full throttle and evaluates a fully converted initialization as dry", async () => {
@@ -373,16 +456,19 @@ describe("F-35B augmentation transition interlock", () => {
       expect(sdk.getPropertyValue("fcs/stovl-pos-norm")).toBe(0);
       expect({ reload, inhibit: sdk.getPropertyValue("fcs/stovl-augmentation-inhibit"),
         command: sdk.getPropertyValue("fcs/stovl-cmd-norm"), position: sdk.getPropertyValue("fcs/stovl-pos-norm"),
-        augmentation: sdk.getPropertyValue("propulsion/engine[0]/augmentation") }).toMatchObject({ augmentation: 1 });
+        augmentation: sdk.getPropertyValue(AUGMENTATION) }).toMatchObject({ augmentation: 1 });
       sdk.setPropertyValue("fcs/stovl-pos-norm", 1);
       apply(sdk, { ...neutral, throttle: 1 }, 1);
       expect(sdk.runIc()).toBe(true);
       sdk.setPropertyValue("propulsion/set-running", -1);
       apply(sdk, { ...neutral, throttle: 1 }, 1);
       expect(sdk.runIc()).toBe(true);
-      expect(sdk.getPropertyValue("propulsion/engine[0]/augmentation")).toBe(0);
-      advance(sdk, 0.1);
-      expect(sdk.getPropertyValue("propulsion/engine[0]/augmentation")).toBe(0);
+      // A converted operating point is solved dry at once, at 300 kt as at rest.
+      expect(sdk.getPropertyValue(PLANT + "numerics/fallback-reason")).toBe(0);
+      expect([sdk.getPropertyValue(SELECTED), sdk.getPropertyValue(AUGMENTATION)]).toEqual([0, 0]);
+      expect(sdk.getPropertyValue(PLANT + "lift-fan/gross-thrust-lbs")).toBeGreaterThan(10000);
+      for (let step = 0; step < 0.1 / FIXED_DT; step++) stepInhibited(sdk, { reload, step });
+      expect(sdk.getPropertyValue(AUGMENTATION)).toBe(0);
     }
   });
 });
@@ -455,7 +541,8 @@ describe("experimental F-35B installed-SDK contracts, not aircraft calibration",
     input.dispose();
     expect(maxExcursion).toBeLessThan(200); // Development start envelope, not a performance specification.
     expect(sdk.getPropertyValue("propulsion/engine[0]/thrust-lbs")).toBeGreaterThan(1000);
-    for (const engine of [1, 2, 3]) expect(sdk.getPropertyValue(`propulsion/engine[${engine}]/thrust-lbs`)).toBe(0);
+    const { liftFan, posts } = liftSystemThrust(sdk);
+    expect([liftFan, ...posts]).toEqual([0, 0, 0]);
     expect(sdk.getPropertyValue("gear/gear-pos-norm")).toBe(0);
   });
 
@@ -468,6 +555,40 @@ describe("experimental F-35B installed-SDK contracts, not aircraft calibration",
     if (axis === "aileron") expect(after.rollRad - before.rollRad).toBeGreaterThan(0.01);
     if (axis === "elevator") expect(after.pitchRad - before.pitchRad).toBeLessThan(-0.01);
     if (axis === "rudder") expect(Math.atan2(Math.sin(after.headingRad - before.headingRad), Math.cos(after.headingRad - before.headingRad))).toBeGreaterThan(0.01);
+  });
+
+  it.each([[0.99, 27000], [1, 41000]])("gives the published F135 rating at sea-level static, throttle %s: %s lbf", async (throttleNorm, ratingLbf) => {
+    // The plant's calibration targets (docs/validation/f135-engine-plant.md), solved steady.
+    const sdk = await createF35({ altFt: 0, airspeedKts: 0, throttleNorm, holdDown: true });
+    expect(sdk.getPropertyValue(PLANT + "numerics/fallback-reason")).toBe(0);
+    expect(sdk.getPropertyValue(PLANT + "nozzle/gross-thrust-lbs")).toBeCloseTo(ratingLbf, -1);
+    expect(sdk.getPropertyValue("propulsion/engine[0]/augmentation")).toBe(throttleNorm === 1 ? 1 : 0);
+  });
+
+  it("restores the engine's exact transient state through snapshot restore, and rejects a foreign one", async () => {
+    const sdk = await createF35({ throttleNorm: 0.48 });
+    apply(sdk, { ...neutral, throttle: 1 });
+    advance(sdk, 0.5); // Mid spool-up, reheat not yet lit.
+    const snapshot = captureSimulation(sdk);
+    const fields = Object.keys(snapshot.controls).filter(path => path.includes("/plant/state/"));
+    expect(fields.length).toBeGreaterThan(40);
+    const n2 = sdk.getPropertyValue("propulsion/engine[0]/n2");
+    advance(sdk, 1);
+    expect(sdk.getPropertyValue("propulsion/engine[0]/n2")).not.toBe(n2);
+    restoreSimulation(sdk, snapshot);
+    expect(sdk.getPropertyValue(PLANT + "state/commit")).toBe(1);
+    for (const path of fields) expect({ path, value: sdk.getPropertyValue(path) }).toEqual({ path, value: snapshot.controls[path] });
+    expect(sdk.getPropertyValue("propulsion/engine[0]/n2")).toBe(n2);
+    advance(sdk, 0.25);
+    // A record from another engine configuration is refused; the engine keeps
+    // the steady point the restore initialized, not a mixture of the two.
+    const digest = fields.find(path => path.endsWith("/plant/state/config-digest"))!;
+    const foreign = { ...snapshot, controls: { ...snapshot.controls, [digest]: 12345 } };
+    restoreSimulation(sdk, foreign);
+    expect(sdk.getPropertyValue(PLANT + "state/commit")).toBe(-1);
+    expect(sdk.getPropertyValue(PLANT + "numerics/valid")).toBe(1);
+    expect(sdk.getPropertyValue("propulsion/engine[0]/n2")).not.toBe(n2);
+    advance(sdk, 0.25);
   });
 
   it.each(["relocation", "snapshot restore"] as const)("slews physical conversion and preserves it through %s", async operation => {
@@ -487,7 +608,8 @@ describe("experimental F-35B installed-SDK contracts, not aircraft calibration",
 
   it("produces balanced physical vertical thrust and finite attitude for 60 s without pose overrides", async () => {
     const { sdk } = await createHover();
-    expect(sdk.getPropertyValue("forces/fbz-prop-lbs")).toBeLessThan(-35000);
+    // The main nozzle is propulsion; the lift fan and roll posts are its outlets applied as external forces.
+    expect(sdk.getPropertyValue("forces/fbz-prop-lbs") + sdk.getPropertyValue("forces/fbz-external-lbs")).toBeLessThan(-35000);
     expect(Math.abs(sdk.getPropertyValue("forces/fbx-prop-lbs"))).toBeLessThan(1);
     expect(sdk.getPropertyValue("fcs/nozzle-pitch-rad")).toBeCloseTo(Math.PI / 2, 8);
     for (let second = 0; second < 60; second++) {
@@ -497,20 +619,27 @@ describe("experimental F-35B installed-SDK contracts, not aircraft calibration",
       expect(Math.abs(state.rollRad)).toBeLessThan(0.1);
       expect(state.altMeters).toBeGreaterThan(200);
     }
-    for (const engine of [1, 2, 3]) expect(sdk.getPropertyValue(`propulsion/engine[${engine}]/fuel-flow-rate-pps`)).toBe(0);
     expect(sdk.getPropertyValue("propulsion/tank[0]/contents-lbs") + sdk.getPropertyValue("propulsion/tank[1]/contents-lbs")).toBeLessThan(5000);
   });
 
-  it("removes auxiliary force when physical conversion closes despite turbine spool lag", async () => {
+  it("removes lift-fan and roll-post thrust when physical conversion closes despite turbine spool lag", async () => {
     const { sdk, controls } = await createHover();
-    const initialFanThrust = sdk.getPropertyValue("propulsion/engine[1]/thrust-lbs");
+    const initialFanThrust = liftSystemThrust(sdk).liftFan;
     apply(sdk, controls, 0);
     advance(sdk, 1.25);
     expect(sdk.getPropertyValue(profile.stovl!.positionProperty)).toBeCloseTo(0.5, 8);
-    expect(sdk.getPropertyValue("propulsion/engine[1]/thrust-lbs")).toBeLessThan(initialFanThrust);
+    expect(liftSystemThrust(sdk).liftFan).toBeLessThan(initialFanThrust);
     advance(sdk, 1.25);
     expect(sdk.getPropertyValue(profile.stovl!.positionProperty)).toBeCloseTo(0, 8);
-    for (const engine of [1, 2, 3]) expect(sdk.getPropertyValue(`propulsion/engine[${engine}]/thrust-lbs`)).toBeCloseTo(0, 8);
+    // The actuator closes to within its integration round-off, about 1e-9,
+    // and the outlets keep that fraction of their thrust.
+    const { liftFan, posts } = liftSystemThrust(sdk);
+    for (const thrust of [liftFan, ...posts]) expect(Math.abs(thrust)).toBeLessThan(1e-6 * initialFanThrust);
+    // The LP spool takes the fan's load back without running away.
+    for (let step = 0; step < 2 / FIXED_DT; step++) {
+      expect(sdk.run()).toBe(true);
+      expect(sdk.getPropertyValue("propulsion/engine[0]/n1")).toBeLessThan(106);
+    }
     expect(sdk.getPropertyValue("fcs/nozzle-pitch-rad")).toBeCloseTo(0, 8);
   });
 

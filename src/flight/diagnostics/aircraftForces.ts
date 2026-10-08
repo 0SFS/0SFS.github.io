@@ -20,6 +20,21 @@ export interface ControlSurfaceTerms {
   terms: Readonly<Partial<Record<AeroAxis, string>>>;
 }
 
+/**
+ * One of the model's `<external_reactions>` forces. JSBSim publishes its unit
+ * direction and location but not its frame, and publishes its magnitude only
+ * under the name of the `<function>` that computes it, so the profile names
+ * both as the model declares them.
+ */
+export interface ExternalForceTerms {
+  /** The `<force name>`: direction and location under `external_reactions/<name>/`. */
+  name: string;
+  label: string;
+  frame: "body" | "wind";
+  /** The force's `<function name>`; without one, `external_reactions/<name>/magnitude`. */
+  magnitude?: string;
+}
+
 export interface AircraftForce {
   id: string;
   label: string;
@@ -81,7 +96,7 @@ const SURFACE_COLORS = ["#ff8f3f", "#3fd7e0", "#ff5fd2", "#a6e22e", "#8c9eff", "
 
 /** Loaded-model observer. Recreate after native loadModel; RunIC/relocation retain it. */
 export function createAircraftForceReader(sdk: JSBSimSdk, engineLabels: Readonly<Record<number, string>> = {},
-  controlSurfaces: readonly ControlSurfaceTerms[] = []) {
+  controlSurfaces: readonly ControlSurfaceTerms[] = [], externalForces: readonly ExternalForceTerms[] = []) {
   const paths: string[] = [];
   const slot = (path: string) => {
     const existing = paths.indexOf(path);
@@ -105,6 +120,11 @@ export function createAircraftForceReader(sdk: JSBSimSdk, engineLabels: Readonly
     color: SURFACE_COLORS[index % SURFACE_COLORS.length],
     slots: Object.fromEntries(Object.entries(surface.terms).map(([axis, path]) => [axis, slot(path)])) as Partial<Record<AeroAxis, number>>,
   }));
+  const externals = externalForces.map(force => {
+    const base = `external_reactions/${force.name}/`;
+    return { ...force, magnitude: slot(force.magnitude ?? base + "magnitude"), direction: triple(["x", "y", "z"].map(axis => base + axis)),
+      acting: triple(["x", "y", "z"].map(axis => base + `location-${axis}-in`)) };
+  });
   const indices = new Set<number>();
   for (const match of sdk.queryPropertyCatalog("propulsion/engine").matchAll(/propulsion\/engine(?:\[(\d+)\])?\/(?:thrust-lbs|x-position)(?:\s|$)/g)) {
     indices.add(match[1] === undefined ? 0 : Number(match[1]));
@@ -170,6 +190,18 @@ export function createAircraftForceReader(sdk: JSBSimSdk, engineLabels: Readonly
         forces.push({ id: `engine-${engine.index}`, label, color: "#ffc15a",
           bodyNewtons: toNewtons(vector), anchorMeters: structuralPointToDisplay(acting, cgInches) });
         componentCount++;
+      }
+      for (const force of externals) {
+        const magnitude = values[force.magnitude], direction = readTriple(force.direction), acting = readTriple(force.acting);
+        const wind = force.frame === "wind";
+        if (!Number.isFinite(magnitude) || !direction || !acting || !cgInches || (wind && !windAngles)) {
+          unavailable.push(force.label); continue;
+        }
+        // As FGExternalForce: magnitude times the declared unit direction, in its frame.
+        const own: ForceVector = [magnitude * direction[0], magnitude * direction[1], magnitude * direction[2]];
+        forces.push({ id: `external-${force.name}`, label: force.label, color: "#ffc15a",
+          bodyNewtons: toNewtons(wind ? windForceToBody(own, values[alpha], values[beta]) : own),
+          anchorMeters: structuralPointToDisplay(acting, cgInches) });
       }
       if (componentCount < engines.length || engines.length === 0) {
         addForce(forces, unavailable, "propulsion", "Propulsion total (CG display anchor)", "#ffc15a", propulsion, origin);

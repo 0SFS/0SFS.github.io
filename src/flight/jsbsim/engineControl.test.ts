@@ -22,8 +22,10 @@ describe("engine start speeds", () => {
   it.each(AIRCRAFT_IDS)("%s fills its start ring toward the speed JSBSim calls it running at", aircraftId => {
     const profile = getFdmProfile(aircraftId);
     const engine = firstEngine(aircraftId);
-    // FGTurbine runs at idle N2; FGPiston runs above 80% of idle RPM with spark and fuel.
-    const expected = profile.engine === "turbine" ? number(engine, "idlen2") : 0.8 * number(engine, "idlerpm");
+    // FGTurbine runs at idle N2 (a coupled plant's idle is corrected, in fraction);
+    // FGPiston runs above 80% of idle RPM with spark and fuel.
+    const expected = profile.engine !== "turbine" ? 0.8 * number(engine, "idlerpm")
+      : engine.includes("<plant") ? 100 * number(engine, "idle-corrected-n2") : number(engine, "idlen2");
     expect(profile.startSpeed.runningAt).toBeCloseTo(expected, 6);
     expect(profile.startSpeed.property).toBe(profile.engine === "turbine" ? "propulsion/engine[0]/n2" : "propulsion/engine[0]/engine-rpm");
   });

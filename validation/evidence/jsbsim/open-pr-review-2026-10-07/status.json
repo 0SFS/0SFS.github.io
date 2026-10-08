@@ -1,0 +1,158 @@
+{
+  "checkedOn": "2026-10-07",
+  "repository": "JSBSim-Team/jsbsim",
+  "method": "Read-only GitHub CLI PR list with status-check rollups, plus GraphQL comments, reviews and review threads. Pagination checked complete.",
+  "scope": "The six open authored PRs; no new tests, benchmarks, builds, author replies or publication.",
+  "pullRequests": [
+    {
+      "number": 1502,
+      "title": "Add an optional wheel rotational degree of freedom to BOGEY contacts",
+      "url": "https://github.com/JSBSim-Team/jsbsim/pull/1502",
+      "state": "OPEN",
+      "isDraft": false,
+      "updatedAt": "2026-09-20T11:56:59Z",
+      "headRefOid": "499c38326bb6f39b6360bd82d74c5c00e64faeaf",
+      "headRefName": "feature/wheel-spin-dof",
+      "baseRefName": "master",
+      "reviewDecision": "CHANGES_REQUESTED",
+      "mergeable": "MERGEABLE",
+      "unresolvedReviewThreads": 17,
+      "reviewStates": [
+        "CHANGES_REQUESTED",
+        "COMMENTED",
+        "COMMENTED",
+        "COMMENTED",
+        "COMMENTED",
+        "COMMENTED",
+        "COMMENTED",
+        "COMMENTED",
+        "COMMENTED",
+        "COMMENTED",
+        "COMMENTED",
+        "COMMENTED",
+        "CHANGES_REQUESTED"
+      ],
+      "latestNonCodecovIssueCommentUrl": "https://github.com/JSBSim-Team/jsbsim/pull/1502#issuecomment-5744732853",
+      "checks": {
+        "successful": 27,
+        "skipped": 5,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    {
+      "number": 1505,
+      "title": "Keep turbine spool state consistent during zero-time trim",
+      "url": "https://github.com/JSBSim-Team/jsbsim/pull/1505",
+      "state": "OPEN",
+      "isDraft": false,
+      "updatedAt": "2026-09-26T20:18:33Z",
+      "headRefOid": "07eba55fcd6fed530f6f404e857765c3224541fb",
+      "headRefName": "fix/turbine-trim-spool",
+      "baseRefName": "master",
+      "reviewDecision": null,
+      "mergeable": "MERGEABLE",
+      "unresolvedReviewThreads": 0,
+      "reviewStates": [],
+      "latestNonCodecovIssueCommentUrl": "https://github.com/JSBSim-Team/jsbsim/pull/1505#issuecomment-5849528886",
+      "checks": {
+        "successful": 27,
+        "skipped": 5,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    {
+      "number": 1506,
+      "title": "Unbind model properties before replacing their owners",
+      "url": "https://github.com/JSBSim-Team/jsbsim/pull/1506",
+      "state": "OPEN",
+      "isDraft": false,
+      "updatedAt": "2026-09-19T21:18:20Z",
+      "headRefOid": "a25956a26957edfac752308264fe802434dbbac7",
+      "headRefName": "fix/model-reload-lifetime",
+      "baseRefName": "master",
+      "reviewDecision": "CHANGES_REQUESTED",
+      "mergeable": "MERGEABLE",
+      "unresolvedReviewThreads": 6,
+      "reviewStates": [
+        "CHANGES_REQUESTED"
+      ],
+      "latestNonCodecovIssueCommentUrl": null,
+      "checks": {
+        "successful": 27,
+        "skipped": 5,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    {
+      "number": 1507,
+      "title": "Add an optional WebAssembly build and TypeScript package",
+      "url": "https://github.com/JSBSim-Team/jsbsim/pull/1507",
+      "state": "OPEN",
+      "isDraft": false,
+      "updatedAt": "2026-09-15T15:13:41Z",
+      "headRefOid": "3d01786ef63554ad62c257c7a6d612d52fbd5468",
+      "headRefName": "feature/wasm-package",
+      "baseRefName": "master",
+      "reviewDecision": null,
+      "mergeable": "MERGEABLE",
+      "unresolvedReviewThreads": 0,
+      "reviewStates": [],
+      "latestNonCodecovIssueCommentUrl": null,
+      "checks": {
+        "successful": 29,
+        "skipped": 5,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    {
+      "number": 1508,
+      "title": "Establish steady turbine fuel flow during zero-time trim",
+      "url": "https://github.com/JSBSim-Team/jsbsim/pull/1508",
+      "state": "OPEN",
+      "isDraft": false,
+      "updatedAt": "2026-09-15T08:17:04Z",
+      "headRefOid": "7511df10cda909c32dfc378dfde204eb44dc5a48",
+      "headRefName": "fix/turbine-trim-fuel-flow",
+      "baseRefName": "master",
+      "reviewDecision": null,
+      "mergeable": "MERGEABLE",
+      "unresolvedReviewThreads": 0,
+      "reviewStates": [],
+      "latestNonCodecovIssueCommentUrl": "https://github.com/JSBSim-Team/jsbsim/pull/1508#issuecomment-5664642920",
+      "checks": {
+        "successful": 27,
+        "skipped": 5,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    {
+      "number": 1511,
+      "title": "Publish the fuel tank temperature as a property",
+      "url": "https://github.com/JSBSim-Team/jsbsim/pull/1511",
+      "state": "OPEN",
+      "isDraft": false,
+      "updatedAt": "2026-09-19T10:26:50Z",
+      "headRefOid": "2a2383ae92183b5d5bf1e283c95d060b3ef21386",
+      "headRefName": "feature/tank-temperature-property",
+      "baseRefName": "master",
+      "reviewDecision": "CHANGES_REQUESTED",
+      "mergeable": "MERGEABLE",
+      "unresolvedReviewThreads": 2,
+      "reviewStates": [
+        "CHANGES_REQUESTED"
+      ],
+      "latestNonCodecovIssueCommentUrl": "https://github.com/JSBSim-Team/jsbsim/pull/1511#issuecomment-5734915804",
+      "checks": {
+        "successful": 27,
+        "skipped": 5,
+        "pending": 0,
+        "failed": 0
+      }
+    }
+  ]
+}

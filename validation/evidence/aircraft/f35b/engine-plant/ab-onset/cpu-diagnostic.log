@@ -1,0 +1,87 @@
+{
+  "out": "build/validation/f135-ab-onset/2026-10-08_092715",
+  "criteria": {
+    "deliberateAudioWaitsForNativeBurn": "passed",
+    "internalReactionSourceStartsAtFirstNativeBurn": "passed",
+    "noExteriorCHRelocation": "passed",
+    "sourceEnergyBound": "passed",
+    "unchangedDspCapsAndMemory": "passed",
+    "noReheatThrustBeforeNativeBurn": "passed",
+    "reheatHeatOnlyFromBurnedFuelAndClosedLedger": "passed",
+    "visiblyPerceivedOnset": "not-tested"
+  },
+  "scenarios": [
+    {
+      "name": "cold-first-running",
+      "selectedToBurnDelaySeconds": 1.3583333333333334,
+      "selectedWithoutBurnSeconds": 1.3583333333333334,
+      "wetThrustWithoutBurnSeconds": 0,
+      "worstEnergyRelative": 1.246867025509694e-7,
+      "audio": [
+        {
+          "tier": 1,
+          "firstDeliberateDifferenceSeconds": 4.05,
+          "firstThrustDifferenceSeconds": 2.6833541666666667
+        },
+        {
+          "tier": 2,
+          "firstDeliberateDifferenceSeconds": 4.0529166666666665,
+          "firstThrustDifferenceSeconds": 2.6863958333333335
+        },
+        {
+          "tier": 3,
+          "firstDeliberateDifferenceSeconds": 4.0529166666666665,
+          "firstThrustDifferenceSeconds": 2.6863333333333332
+        }
+      ]
+    },
+    {
+      "name": "cold-then-hot-dry",
+      "selectedToBurnDelaySeconds": 1.2416666666666667,
+      "selectedWithoutBurnSeconds": 1.2416666666666667,
+      "wetThrustWithoutBurnSeconds": 0,
+      "worstEnergyRelative": 1.1224424458519577e-7,
+      "audio": [
+        {
+          "tier": 1,
+          "firstDeliberateDifferenceSeconds": 1.2833333333333334,
+          "firstThrustDifferenceSeconds": 0.016770833333333346
+        },
+        {
+          "tier": 2,
+          "firstDeliberateDifferenceSeconds": 1.28625,
+          "firstThrustDifferenceSeconds": 0.01977083333333335
+        },
+        {
+          "tier": 3,
+          "firstDeliberateDifferenceSeconds": 1.28625,
+          "firstThrustDifferenceSeconds": 0.019708333333333328
+        }
+      ]
+    },
+    {
+      "name": "warm-running-shortcut",
+      "selectedToBurnDelaySeconds": 1.2416666666666667,
+      "selectedWithoutBurnSeconds": 1.2416666666666667,
+      "wetThrustWithoutBurnSeconds": 0,
+      "worstEnergyRelative": 6.75697452900408e-8,
+      "audio": [
+        {
+          "tier": 1,
+          "firstDeliberateDifferenceSeconds": 1.2833333333333334,
+          "firstThrustDifferenceSeconds": 0.01691666666666669
+        },
+        {
+          "tier": 2,
+          "firstDeliberateDifferenceSeconds": 1.28625,
+          "firstThrustDifferenceSeconds": 0.019791666666666652
+        },
+        {
+          "tier": 3,
+          "firstDeliberateDifferenceSeconds": 1.28625,
+          "firstThrustDifferenceSeconds": 0.01977083333333335
+        }
+      ]
+    }
+  ]
+}

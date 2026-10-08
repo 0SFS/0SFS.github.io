@@ -374,9 +374,10 @@ export class FlightModelDriver {
       flyByWireEnabled: this.#definition.controlLaw?.enabledProperty ?? "fcs/fbw-enabled",
       nozzlePitchRad: "propulsion/engine/pitch-angle-rad",
       nozzleYawRad: "propulsion/engine/yaw-angle-rad",
-      liftFanThrustLb: "propulsion/engine[1]/thrust-lbs",
-      rightRollPostThrustLb: "propulsion/engine[2]/thrust-lbs",
-      leftRollPostThrustLb: "propulsion/engine[3]/thrust-lbs",
+      // LiftSystem outlets of a coupled engine plant (the F-35B's F135).
+      liftFanThrustLb: "propulsion/engine[0]/plant/lift-fan/gross-thrust-lbs",
+      rightRollPostThrustLb: "propulsion/engine[0]/plant/roll-post[1]/gross-thrust-lbs",
+      leftRollPostThrustLb: "propulsion/engine[0]/plant/roll-post[0]/gross-thrust-lbs",
     };
     return Object.freeze(Object.fromEntries(Object.entries(properties).map(([name, property]) => [
       name, this.#readOptionalProperty(property),

@@ -47,15 +47,16 @@ for (const file of new Set([...sourceFiles.map(file => path.relative(root, file)
 }
 const luminance = rgb => .2126729 * rgb[0] + .7151522 * rgb[1] + .072175 * rgb[2];
 const observation = row => ({ timeSeconds: row.timeSeconds, n1Pct: row.reading.n1Pct, n2Pct: row.reading.n2Pct,
-  augmentation: row.reading.augmentation, thrustLbf: row.reading.thrustLbf, referenceDryThrustLbf: row.referenceDryThrustLbf,
+  abSelected: row.abSelected, augmentation: row.reading.augmentation, abHeatReleaseW: row.abHeatReleaseW,
+  energyRelative: row.energyRelative, thrustLbf: row.reading.thrustLbf, referenceDryThrustLbf: row.referenceDryThrustLbf,
   totalFuelKgSec: row.reading.fuelFlowPps * .45359237, burnedAbKgSec: row.reading.afterburnerBurnedFuelFlowKgSec,
   upstreamKelvin: row.opticalInput.upstreamGasTemperatureKelvin, meanGasKelvin: row.opticalInput.temperatureKelvin,
   linerKelvin: row.linerTemperatureKelvin });
 const scenarios = [], nativeRows = [], failures = [];
 for (const name of ['cold-first-running', 'cold-then-hot-dry', 'warm-running-shortcut']) {
   const trace = await helpers.captureF135Onset(name);
-  if (name !== 'cold-first-running') assert.ok(Math.abs(trace.before.referenceDryThrustLbf - trace.before.reading.thrustLbf) < 1e-6,
-    'Native dry table diagnostic must reproduce the current dry state before use');
+  assert.equal(trace.before.referenceDryThrustLbf, trace.before.reading.thrustLbf,
+    'The dry counterfactual must reproduce the state before the command');
   const beforeBurn = trace.observations[Math.round(trace.firstBurned.timeSeconds * 120) - 1];
   const source = helpers.evaluateF135OnsetSource(trace.firstBurned);
   const priorSource = helpers.evaluateF135OnsetSource(beforeBurn);
@@ -63,11 +64,17 @@ for (const name of ['cold-first-running', 'cold-then-hot-dry', 'warm-running-sho
   assert.ok(source.valid && source.reactionDomainResolved && source.chPowerW > 0);
   assert.ok(source.totalSourcePowerUpperBoundW <= source.allowedPowerW);
   assert.equal(source.field.exteriorVolumeWeightsM3.reduce((sum, weight, i) => sum + weight * source.field.chPowerDensityWPerM3[i], 0), 0);
-  const preBurnWetThrust = trace.observations.filter(row => row.reading.augmentation
-    && row.reading.afterburnerBurnedFuelFlowKgSec === 0 && row.reading.thrustLbf > row.referenceDryThrustLbf + 1);
+  const preBurnWetThrust = trace.observations.filter(row => row.reading.afterburnerBurnedFuelFlowKgSec === 0
+    && row.reading.thrustLbf > row.referenceDryThrustLbf + 1);
   if (preBurnWetThrust.length) failures.push({ name, criterion: 'No reheat-only excess thrust before actual AB combustion',
-    status: 'known-open-native-discrepancy', violatingSteps: preBurnWetThrust.length,
+    status: 'failed', violatingSteps: preBurnWetThrust.length,
     first: observation(preBurnWetThrust[0]), last: observation(preBurnWetThrust.at(-1)) });
+  const heatWithoutBurn = trace.observations.filter(row => (row.abHeatReleaseW > 0) !== (row.reading.afterburnerBurnedFuelFlowKgSec > 0)
+    || row.reading.augmentation !== (row.reading.afterburnerBurnedFuelFlowKgSec > 0) || !(row.energyRelative < 1e-5));
+  if (heatWithoutBurn.length) failures.push({ name, criterion: 'Reheat heat only from burned reheat fuel; closed step energy ledger',
+    status: 'failed', violatingSteps: heatWithoutBurn.length, first: observation(heatWithoutBurn[0]) });
+  const selectedWithoutBurnSeconds = trace.observations.filter(row => row.abSelected
+    && row.reading.afterburnerBurnedFuelFlowKgSec === 0).length / 120;
   const audio = [];
   for (const tier of [1, 2, 3]) {
     const rendered = await helpers.renderF135OnsetAudio(trace, tier);
@@ -89,6 +96,8 @@ for (const name of ['cold-first-running', 'cold-then-hot-dry', 'warm-running-sho
   }
   scenarios.push({ name, before: observation(trace.before), firstSelected: observation(trace.firstSelected),
     firstBurned: observation(trace.firstBurned), selectedToBurnDelaySeconds: trace.firstBurned.timeSeconds - trace.firstSelected.timeSeconds,
+    selectedWithoutBurnSeconds, wetThrustWithoutBurnSeconds: preBurnWetThrust.length / 120,
+    worstEnergyRelative: Math.max(...trace.observations.map(row => row.energyRelative)),
     sourceAtFirstBurn: { valid: source.valid, reactionDomainResolved: source.reactionDomainResolved, chPowerW: source.chPowerW,
       particlePowerUpperBoundW: source.particlePowerUpperBoundW, wholeSourcePhotopicYCd: luminance(source.isotropicIntensityRgbCd),
       precedingWholeSourcePhotopicYCd: luminance(priorSource.isotropicIntensityRgbCd), allowedPowerW: source.allowedPowerW,
@@ -97,22 +106,27 @@ for (const name of ['cold-first-running', 'cold-then-hot-dry', 'warm-running-sho
 }
 const columns = Object.keys(nativeRows[0]);
 await writeFile(path.join(out, 'native.csv'), [columns.join(','), ...nativeRows.map(row => columns.map(column => row[column]).join(','))].join('\n') + '\n');
-const report = { date: '2026-10-07', kind: 'untimed-CPU-native-DSP-optical-source-causality', artifact,
+const failed = criterion => failures.some(failure => failure.criterion === criterion) ? 'failed' : 'passed';
+const report = { date: '2026-10-08', kind: 'untimed-CPU-native-DSP-optical-source-causality', artifact,
   sourceInputs: inputs, executedBundleSha256: sha256(await readFile(path.join(out, 'helpers.mjs'))),
   nativeCsvSha256: sha256(await readFile(path.join(out, 'native.csv'))),
   temporalConvention: 'Command at time 0; first accepted post-command native step labeled 0; fixed dt=1/120 s. DSP follows integer-tick 60 Hz telemetry, 33.3 ms buffering and dezippering; 1 m propagation in Med/High, none in Low. Test harness prefills 100 ms future timestamped telemetry to ensure interpolation brackets, not a measured scheduler/device delay.',
   criteria: { deliberateAudioWaitsForNativeBurn: 'passed', internalReactionSourceStartsAtFirstNativeBurn: 'passed',
     noExteriorCHRelocation: 'passed', sourceEnergyBound: 'passed', unchangedDspCapsAndMemory: 'passed',
-    noReheatThrustBeforeNativeBurn: 'failed-known-open',
+    noReheatThrustBeforeNativeBurn: failed('No reheat-only excess thrust before actual AB combustion'),
+    reheatHeatOnlyFromBurnedFuelAndClosedLedger: failed('Reheat heat only from burned reheat fuel; closed step energy ledger'),
     visiblyPerceivedOnset: 'not-tested' },
   limitations: ['Nonzero spectral source and first unequal float audio sample do not establish visible pixels or audible onset.',
-    'Dry table counterfactual is a diagnostic at identical native shaft, atmosphere and bleed; production audio never substitutes it.',
+    'Dry counterfactual is the same native engine run with the throttle held at 0.99 (same N1 demand, no reheat request); production audio never substitutes it.',
+    'propulsion/engine/augmentation is reheat fuel burning for the coupled plant; selection is plant/combustion/ab-selected.',
     'Native EGT, thermal flow, fuel partition and optical particle/parcel closures remain uncalibrated F135 hypotheses.',
     'NullEngine loads the authored gas support but draws no pixels; no GPU, browser, sound device or performance timing was tested.',
-    'Known-open native thrust invariant is intentionally not counted as numerical correctness or perceptual synchronization acceptance.'],
+    'The thrust and energy invariants are numerical/causal checks of the coupled plant, not perceptual synchronization acceptance.'],
   failures, scenarios };
 await writeFile(path.join(out, 'report.json'), JSON.stringify(report, null, 2) + '\n');
 console.log(JSON.stringify({ out: path.relative(root, out), criteria: report.criteria,
   scenarios: scenarios.map(row => ({ name: row.name, selectedToBurnDelaySeconds: row.selectedToBurnDelaySeconds,
+    selectedWithoutBurnSeconds: row.selectedWithoutBurnSeconds, wetThrustWithoutBurnSeconds: row.wetThrustWithoutBurnSeconds,
+    worstEnergyRelative: row.worstEnergyRelative,
     audio: row.audio.map(({ tier, firstDeliberateDifferenceSeconds, firstThrustDifferenceSeconds }) =>
       ({ tier, firstDeliberateDifferenceSeconds, firstThrustDifferenceSeconds })) })) }, null, 2));

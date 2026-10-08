@@ -1034,7 +1034,10 @@ it("keeps native force observation opt-in and wires live Debug settings to the a
     await act(async () => { getAppSettings().set("osfs.forces.enabled", true); });
     expect(createForcesDebugOverlay).toHaveBeenCalledOnce();
     expect(vi.mocked(createForcesDebugOverlay).mock.calls[0][1]).toBe(mocks.aircraft.root);
-    expect(vi.mocked(createForcesDebugOverlay).mock.calls[0][3].engineLabels).toMatchObject({ 0: "Main engine", 1: "Lift fan" });
+    // One engine; the lift fan and roll posts are its outlets, drawn as the model's external forces.
+    expect(vi.mocked(createForcesDebugOverlay).mock.calls[0][3].engineLabels).toEqual({ 0: "Main engine" });
+    expect(vi.mocked(createForcesDebugOverlay).mock.calls[0][3].externalForces?.map(force => force.name))
+      .toEqual(expect.arrayContaining(["lift-fan", "roll-post-right", "roll-post-left"]));
     await act(async () => { getAppSettings().set("osfs.forces.newtonsPerMeter", 12_000); });
     expect(mocks.forcesOverlay.setSettings).toHaveBeenLastCalledWith(expect.objectContaining({ enabled: true, newtonsPerMeter: 12_000 }));
     const tick = mocks.runtime.setSimTick.mock.calls.at(-1)?.[0] as (dt: number) => void;

@@ -30,7 +30,8 @@ async function createAircraft(aircraftId: AircraftId) {
 describe("installed SDK aircraft force observers", () => {
   it.each(["cessna-172", "f-35b"] as const)("reads cached native force closure for %s without mutating or advancing physics", async aircraftId => {
     const sdk = await createAircraft(aircraftId);
-    const reader = createAircraftForceReader(sdk, getFdmProfile(aircraftId).forceEngineLabels);
+    const profile = getFdmProfile(aircraftId);
+    const reader = createAircraftForceReader(sdk, profile.forceEngineLabels, [], profile.forceExternalForces);
     try {
       const time = sdk.getPropertyValue("simulation/sim-time-sec");
       const snapshot = reader.read();
@@ -38,12 +39,17 @@ describe("installed SDK aircraft force observers", () => {
       expect(snapshot.simulationTimeSeconds).toBe(time);
       expect(sdk.getPropertyValue("simulation/sim-time-sec")).toBe(time);
       const engineForces = snapshot.forces.filter(force => force.id.startsWith("engine-"));
-      expect(engineForces).toHaveLength(aircraftId === "f-35b" ? 4 : 1);
+      // The F-35B's lift fan and roll posts are outlets of its one engine, applied as external forces.
+      expect(engineForces).toHaveLength(1);
+      const externalForces = snapshot.forces.filter(force => force.id.startsWith("external-"));
+      expect(externalForces).toHaveLength(profile.forceExternalForces?.length ?? 0);
       const aeroForces = snapshot.forces.filter(force => /^aero-[012]$/.test(force.id) || force.id === "aero-cg");
       for (let index = 0; index < 3; index++) {
         const axis = ["x", "y", "z"][index];
         expect(engineForces.reduce((sum, force) => sum + force.bodyNewtons[index], 0)).toBeCloseTo(
           sdk.getPropertyValue(`forces/fb${axis}-prop-lbs`) * POUND_FORCE_TO_NEWTONS, 6);
+        if (externalForces.length) expect(externalForces.reduce((sum, force) => sum + force.bodyNewtons[index], 0)).toBeCloseTo(
+          sdk.getPropertyValue(`forces/fb${axis}-external-lbs`) * POUND_FORCE_TO_NEWTONS, 6);
         expect(aeroForces.reduce((sum, force) => sum + force.bodyNewtons[index], 0)).toBeCloseTo(
           sdk.getPropertyValue(`forces/fb${axis}-aero-lbs`) * POUND_FORCE_TO_NEWTONS, 6);
         expect(snapshot.forces.find(force => force.id === "net")!.bodyNewtons[index]).toBeCloseTo(
@@ -53,26 +59,33 @@ describe("installed SDK aircraft force observers", () => {
     } finally { reader.dispose(); }
   });
 
-  it("observes all four converted F35 native force vectors and their current acting locations", async () => {
+  it("observes the converted F35's main nozzle and LiftSystem outlets at their current acting locations", async () => {
     const sdk = await createAircraft("f-35b");
     sdk.setPropertyValue("fcs/stovl-cmd-norm", 1);
     sdk.setPropertyValue("fcs/stovl-pos-norm", 1);
     sdk.setPropertyValue("fcs/throttle-cmd-norm", 0.98);
     for (let step = 0; step < 120; step++) expect(sdk.run()).toBe(true);
-    const reader = createAircraftForceReader(sdk, getFdmProfile("f-35b").forceEngineLabels);
+    const profile = getFdmProfile("f-35b");
+    const reader = createAircraftForceReader(sdk, profile.forceEngineLabels, [], profile.forceExternalForces);
     try {
       const snapshot = reader.read();
       expect(snapshot.unavailable).toEqual([]);
       const cg = ["x", "y", "z"].map(axis => sdk.getPropertyValue(`inertia/cg-${axis}-in`)) as [number, number, number];
-      for (let index = 0; index < 4; index++) {
-        const force = snapshot.forces.find(force => force.id === `engine-${index}`)!;
-        const acting = ["x", "y", "z"].map(axis => sdk.getPropertyValue(`propulsion/engine[${index}]/${axis}-position`)) as [number, number, number];
+      const main = snapshot.forces.find(force => force.id === "engine-0")!;
+      const mainActing = ["x", "y", "z"].map(axis => sdk.getPropertyValue(`propulsion/engine[0]/${axis}-position`)) as [number, number, number];
+      expect(main.anchorMeters).toEqual(structuralPointToDisplay(mainActing, cg));
+      expect(main.bodyNewtons[2]).toBeLessThan(0); // Actual upward thrust in body Z-down.
+      for (const name of ["lift-fan", "roll-post-right", "roll-post-left"]) {
+        const force = snapshot.forces.find(item => item.id === `external-${name}`)!;
+        const acting = ["x", "y", "z"].map(axis => sdk.getPropertyValue(`external_reactions/${name}/location-${axis}-in`)) as [number, number, number];
         expect(force.anchorMeters).toEqual(structuralPointToDisplay(acting, cg));
-        expect(force.bodyNewtons.every(Number.isFinite)).toBe(true);
-        expect(force.bodyNewtons[2]).toBeLessThan(0); // Actual upward thrust in body Z-down, including roll posts.
+        expect(force.bodyNewtons[2]).toBeLessThan(0);
+        expect(force.bodyNewtons[2]).toBeCloseTo(
+          -sdk.getPropertyValue(`propulsion/engine[0]/plant/${name === "lift-fan" ? "lift-fan" : `roll-post[${name === "roll-post-left" ? 0 : 1}]`}/gross-thrust-lbs`)
+            * POUND_FORCE_TO_NEWTONS, 6);
       }
-      expect(snapshot.forces.find(force => force.id === "engine-1")!.anchorMeters[2]).toBeGreaterThan(0);
-      expect(snapshot.forces.find(force => force.id === "engine-0")!.anchorMeters[2]).toBeLessThan(0);
+      expect(snapshot.forces.find(force => force.id === "external-lift-fan")!.anchorMeters[2]).toBeGreaterThan(0);
+      expect(main.anchorMeters[2]).toBeLessThan(0);
     } finally { reader.dispose(); }
   });
 

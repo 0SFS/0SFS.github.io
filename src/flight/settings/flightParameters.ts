@@ -52,6 +52,7 @@ const AFTERBURNER = { tab: "exhaust", section: "afterburner" } as const;
 const ENGINE = { tab: "engine", section: "engine" } as const;
 const ENGINE_HISTORY = { tab: "engine", section: "history" } as const;
 const ENGINE_TEST = { tab: "engine", section: "test" } as const;
+const ENGINE_SIMULATION = { tab: "engine", section: "simulation" } as const;
 const ASSISTS = { tab: "aircraft", section: "assists" } as const;
 const FLIGHT_CONTROLS = { tab: "aircraft", section: "flight-controls" } as const;
 const GROUND = { tab: "aircraft", section: "ground" } as const;
@@ -82,6 +83,7 @@ export const FLIGHT_SECTION_TITLES: readonly (readonly [tab: string, section: st
   ["engine", "engine", "Engine"],
   ["engine", "history", "History sampling"],
   ["engine", "test", "Test stand conditions"],
+  ["engine", "simulation", "Simulation"],
   ["aircraft", "assists", "Assists"],
   ["aircraft", "flight-controls", "Flight controls"],
   ["aircraft", "ground", "Ground handling"],
@@ -1504,6 +1506,49 @@ export const OSFS_PARAMETERS = [
     unit: { id: "px/CSSpx", text: "px/CSSpx" }, kind: "number", step: 0.1, bounds: within(1, 3), default: 2,
     defaultReason: "A two-times density cap keeps the small dots clear with a small drawing surface.",
     home: main(ENGINE), appliesLive: true, source: "src/flight/hud/engineSpoolRenderer.ts",
+  },
+
+  // Engine → Simulation: JSBSim's coupled turbine plant (the
+  // F-35B's F135). Aircraft with empirical engines ignore these.
+  {
+    id: "osfs.enginePlant.algorithm", label: "Gas path algorithm",
+    description: "How the coupled engine solves its gas path each step. Reduced uses tabulated gas properties and reuses its Jacobian, and falls back to the component reference on a step it cannot close. Component evaluates the reference on every step, at several times the work.",
+    unit: "none", kind: "choice",
+    choices: [
+      { id: "reduced", label: "Reduced", description: "Tabulated gas, Jacobian reuse, component fallback." },
+      { id: "component", label: "Component", description: "The full component reference on every step." },
+    ],
+    default: "reduced",
+    defaultReason: "It tracks the component reference within the validated tolerance at a fraction of its work.",
+    home: all(ENGINE_SIMULATION), appliesLive: true, source: "src/flight/jsbsim/enginePlantSettings.ts",
+  },
+  {
+    id: "osfs.enginePlant.iterationCap", label: "Iteration cap",
+    description: "Newton iterations one engine step may spend, every solve and the fallback included; a quarter is kept for publishing the step. A step that runs out is not accepted, and the engine retries it with a held-back nozzle and smaller substeps.",
+    unit: { id: "iterations/step", text: "iterations/step" }, kind: "number", step: 1, bounds: within(1, 32), default: 24,
+    defaultReason: "The first step of an engine at rest in moving air needs about 12 component iterations after the reduced attempt; 24 covers it with margin, and an accepted step usually takes 2 to 6.",
+    home: all(ENGINE_SIMULATION), appliesLive: true, source: "src/flight/jsbsim/enginePlantSettings.ts",
+  },
+  {
+    id: "osfs.enginePlant.subdivisionCap", label: "Substep cap",
+    description: "How many substeps a step that fails may be divided into before it is reported as failed.",
+    unit: { id: "substeps", text: "substeps" }, kind: "number", step: 1, bounds: within(1, 16), default: 4,
+    defaultReason: "Steps at 120 Hz have closed without substeps in every recorded transient; four allows halving twice.",
+    home: all(ENGINE_SIMULATION), appliesLive: true, source: "src/flight/jsbsim/enginePlantSettings.ts",
+  },
+  {
+    id: "osfs.enginePlant.tolerance", label: "Solve tolerance",
+    description: "Scaled residual every gas-path solve must reach. Smaller is more accurate and costs more iterations.",
+    unit: "none", kind: "number", scale: "log2", step: 0.5, bounds: within(1e-9, 1e-3), default: 1e-6,
+    defaultReason: "At 1e-6 the per-step energy ledger closes within 1e-5 and the reduced algorithm matches the reference.",
+    home: all(ENGINE_SIMULATION), appliesLive: true, source: "src/flight/jsbsim/enginePlantSettings.ts",
+  },
+  {
+    id: "osfs.enginePlant.closureBudgetKiB", label: "Reduced-model memory",
+    description: "Memory the reduced algorithm may use for its gas tables, per engine. Below what its tables need, the engine uses the component reference.",
+    unit: { id: "KiB", text: "KiB" }, kind: "number", scale: "log2", step: 1, bounds: within(64, 16384), default: 1024,
+    defaultReason: "The tables take 21 KiB; 1 MiB leaves room without mattering beside the rest of the app.",
+    home: all(ENGINE_SIMULATION), appliesLive: true, source: "src/flight/jsbsim/enginePlantSettings.ts",
   },
 
   // Aircraft → Ground handling: requests; what runs is resolved against what

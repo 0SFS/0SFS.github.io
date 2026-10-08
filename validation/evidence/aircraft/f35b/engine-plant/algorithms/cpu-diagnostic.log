@@ -1,0 +1,166 @@
+stand-cold-start-dry-reheat-cutoff: passed
+hot-day-high-start: passed
+altitude-25000ft-400kt-throttle-steps: passed
+windmill-cutoff-and-relight-20000ft-300kt: passed
+stovl-conversion-throttle-steps-closing-cutoff: passed
+{
+  "out": "build/validation/f135-plant-algorithms/2026-10-08_092715",
+  "passed": true,
+  "scenarios": [
+    {
+      "name": "stand-cold-start-dry-reheat-cutoff",
+      "passed": true,
+      "worst": {
+        "thrustLbf": 4.909632015169779e-7,
+        "liftFanLbf": 0,
+        "rollPostLbf": 0,
+        "n1Pct": 2.895505127753495e-7,
+        "n2Pct": 2.502323651754068e-7,
+        "fuelKgSec": 2.3070326375200048e-7,
+        "t4K": 0.0006279006220211159,
+        "t5K": 0.0006883007864644242,
+        "t7K": 0.0006485892673708804,
+        "linerK": 0.000010687842745937814,
+        "coreMetalK": 0.000041650005641713506
+      },
+      "events": {
+        "coreLit": true,
+        "running": true,
+        "abBurning": true
+      },
+      "meanIterations": {
+        "component": 2.2897532865117953,
+        "reduced": 3.104988294615523
+      },
+      "meanEvaluations": {
+        "component": 25.13740320547452,
+        "reduced": 11.120475418692598
+      },
+      "stepsSolvedByComponent": 0
+    },
+    {
+      "name": "hot-day-high-start",
+      "passed": true,
+      "worst": {
+        "thrustLbf": 1.114382820804433e-7,
+        "liftFanLbf": 0,
+        "rollPostLbf": 0,
+        "n1Pct": 1.226950067234611e-7,
+        "n2Pct": 2.5565981253805603e-7,
+        "fuelKgSec": 6.102899141602336e-8,
+        "t4K": 0.0007522040076537451,
+        "t5K": 0.0005490193199193527,
+        "t7K": 0.0003360148791671236,
+        "linerK": 0.000005053899315043964,
+        "coreMetalK": 0.00003856451183992249
+      },
+      "events": {
+        "coreLit": true,
+        "running": true,
+        "abBurning": true
+      },
+      "meanIterations": {
+        "component": 2.691850594227504,
+        "reduced": 3.9528013582342956
+      },
+      "meanEvaluations": {
+        "component": 28.199660441426147,
+        "reduced": 11.98862478777589
+      },
+      "stepsSolvedByComponent": 0
+    },
+    {
+      "name": "altitude-25000ft-400kt-throttle-steps",
+      "passed": true,
+      "worst": {
+        "thrustLbf": 3.5353096396514647e-7,
+        "liftFanLbf": 0,
+        "rollPostLbf": 0,
+        "n1Pct": 2.8035215720478846e-7,
+        "n2Pct": 4.1986324220033564e-7,
+        "fuelKgSec": 3.0472818414296734e-7,
+        "t4K": 0.0011208526591417467,
+        "t5K": 0.0010221180833696053,
+        "t7K": 0.0010604210085602972,
+        "linerK": 0.00020423005673819716,
+        "coreMetalK": 0.0005174230167312999
+      },
+      "events": {
+        "coreLit": true,
+        "running": true,
+        "abBurning": true
+      },
+      "meanIterations": {
+        "component": 2.260772357723577,
+        "reduced": 2.519918699186992
+      },
+      "meanEvaluations": {
+        "component": 24.99878048780488,
+        "reduced": 10.532723577235773
+      },
+      "stepsSolvedByComponent": 0
+    },
+    {
+      "name": "windmill-cutoff-and-relight-20000ft-300kt",
+      "passed": true,
+      "worst": {
+        "thrustLbf": 2.7991928762764098e-8,
+        "liftFanLbf": 0,
+        "rollPostLbf": 0,
+        "n1Pct": 3.491531522570312e-8,
+        "n2Pct": 3.690874684991741e-8,
+        "fuelKgSec": 1.9599066073775853e-9,
+        "t4K": 0.0002540942955420178,
+        "t5K": 0.0002054364600212466,
+        "t7K": 0.00001564153876643104,
+        "linerK": 0.000007928438378712599,
+        "coreMetalK": 0.0000056879050021052535
+      },
+      "events": {
+        "coreLit": true,
+        "running": true,
+        "abBurning": true
+      },
+      "meanIterations": {
+        "component": 2.1166666666666667,
+        "reduced": 2.3948412698412698
+      },
+      "meanEvaluations": {
+        "component": 23.87857142857143,
+        "reduced": 10.398809523809524
+      },
+      "stepsSolvedByComponent": 0
+    },
+    {
+      "name": "stovl-conversion-throttle-steps-closing-cutoff",
+      "passed": true,
+      "worst": {
+        "thrustLbf": 6.33022421269987e-7,
+        "liftFanLbf": 0.0000012752406779327429,
+        "rollPostLbf": 0.0000010220571183685352,
+        "n1Pct": 3.402373609162623e-7,
+        "n2Pct": 5.329446592838849e-7,
+        "fuelKgSec": 4.93688829323386e-7,
+        "t4K": 0.001402716274924387,
+        "t5K": 0.001155587287371418,
+        "t7K": 0.0010808596103970558,
+        "linerK": 0.00006056896802419942,
+        "coreMetalK": 0.0002972077027152409
+      },
+      "events": {
+        "coreLit": true,
+        "running": true,
+        "abBurning": true
+      },
+      "meanIterations": {
+        "component": 3.077777777777778,
+        "reduced": 4.520833333333333
+      },
+      "meanEvaluations": {
+        "component": 31.480555555555554,
+        "reduced": 12.547685185185186
+      },
+      "stepsSolvedByComponent": 0
+    }
+  ]
+}

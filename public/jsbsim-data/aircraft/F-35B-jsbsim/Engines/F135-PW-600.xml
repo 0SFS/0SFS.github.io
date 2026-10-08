@@ -1,6 +1,11 @@
 <?xml version="1.0"?>
-<!-- 0SFS modifications 2026-10-05: experimental single-engine STOVL accounting;
-     original GPL source retained in planes/Lockheed_Martin_F-35B/tests/flightgear-jsbsim. -->
+<!-- 0SFS modifications 2026-10-08: the F135-PW-600 as a coupled turbine plant
+     (JSBSim doc/turbine-plant-model.md), replacing the empirical thrust tables,
+     the thermal observer and the separate lift-fan and roll-post engines.
+     A calibrated approximation from public ratings, not a measured engine.
+     Provenance and uncertainty of every value: docs/validation/f135-engine-plant.md
+     in the 0SFS source tree. Original GPL source retained in
+     planes/Lockheed_Martin_F-35B/tests/flightgear-jsbsim. -->
 
 <!--
   File:     F135-PW-600.xml
@@ -15,159 +20,159 @@
 -->
 
 <turbine_engine name="F135-PW-600">
-  <!-- Retained development ratings: 28k/43k match the cited CTOL/CV classes,
-       not the published 27k/41k STOVL classes. Do not change independently of
-       the coupled 10k-lbf rear extraction, lift fan/roll-post forces and TSFC.
-       Audit: engine-rebuild-2026-10-06/propulsion-thermal-audit.json. -->
-  <milthrust> 28000.0 </milthrust>
-  <maxthrust> 43000.0 </maxthrust>
-  <bypassratio>     1.0 </bypassratio>
-  <tsfc>
-    <!-- Preserve the source generic temperature/spool correction. The fan and
-         bypass force surrogates draw fuel only through this main-engine estimate. -->
-    <product><value>0.886</value>
-      <sqrt><quotient><property>atmosphere/T-R</property><value>389.7</value></quotient></sqrt>
-      <sum><value>0.84</value><pow><difference><value>1</value>
-        <quotient><difference><property>propulsion/engine[#]/n2</property><value>60</value></difference><value>40</value></quotient>
-      </difference><value>2</value></pow></sum>
-      <sum><value>1</value><product><value>1.328</value><property>fcs/stovl-pos-norm</property></product></sum>
-    </product>
-  </tsfc>
-  <atsfc>           1.7 </atsfc>
-  <bleed>           0.03</bleed>
-  <idlen1>         30.0 </idlen1>
-  <idlen2>         60.0 </idlen2>
-  <maxn1>         100.0 </maxn1>
-  <maxn2>         100.0 </maxn2>
-  <augmented>         1 </augmented>
-  <augmethod>         1 </augmethod>
-  <injected>          0 </injected>
+  <!-- Published STOVL ratings, kept for reference; the plant computes thrust. -->
+  <milthrust> 27000.0 </milthrust>
+  <maxthrust> 41000.0 </maxthrust>
+  <bypassratio> 0.56 </bypassratio>
+  <augmented> 1 </augmented>
+  <augmethod> 1 </augmethod>
+  <injected> 0 </injected>
 
-  <!-- Experimental independent core-facing and cooled nozzle solids, SI throughout. These are
-       authored estimates, NOT measured F135 station temperatures or hardware
-       properties. See docs/proposals/f35b-fdm.md for the heat balance, sources
-       and uncertainty. This optional observer does not alter thrust or fuel.
-       120 kg/s is a reference exhaust flow, corrected by inlet total pressure,
-       temperature and squared core speed; 12000 J/K represents 20 kg at 600 J/kg/K.
-       The baseline gas estimate is the existing native EGT schedule. The
-       original wall is the cooled downstream liner/nozzle; the added core is
-       upstream of afterburner heat addition. No third petal state is justified. -->
-  <thermal>
-    <gas-mass-flow-kg-sec><function><product>
-      <value>120</value>
-      <pow><quotient><property>propulsion/engine[#]/n2</property><value>100</value></quotient><value>2</value></pow>
-      <quotient><property>propulsion/pt-lbs_sqft</property><value>2116.22</value></quotient>
-      <sqrt><quotient><value>288.15</value><sum><property>propulsion/tat-c</property><value>273.15</value></sum></quotient></sqrt>
-    </product></function></gas-mass-flow-kg-sec>
-    <gas-specific-heat-j-kg-k>1150</gas-specific-heat-j-kg-k>
-    <fuel-heating-value-j-kg>43300000</fuel-heating-value-j-kg>
-    <afterburner-efficiency>0.95</afterburner-efficiency>
-    <!-- NASA AIAA-2005-0549 Jet-A surrogate C12H23, FARst=0.068;
-         limits heat release by remaining oxygen, not fuel consumption. -->
-    <stoichiometric-fuel-air-ratio>0.068</stoichiometric-fuel-air-ratio>
-    <wall-heat-capacity-j-k>12000</wall-heat-capacity-j-k>
-    <gas-conductance-w-k><function><sum><value>20</value><product>
-      <value>580</value><pow><quotient><property>propulsion/engine[#]/n2</property><value>100</value></quotient><value>2</value></pow>
-    </product></sum></function></gas-conductance-w-k>
-    <coolant-conductance-w-k><function><sum><value>20</value><product>
-      <value>680</value><pow><quotient><property>propulsion/engine[#]/n2</property><value>100</value></quotient><value>2</value></pow>
-    </product></sum></function></coolant-conductance-w-k>
-    <coolant-temperature-k><function><sum>
-      <property>propulsion/tat-c</property><value>273.15</value>
-      <product><value>100</value><pow><quotient><property>propulsion/engine[#]/n2</property><value>100</value></quotient><value>2</value></pow></product>
-    </sum></function></coolant-temperature-k>
-    <radiation-area-sq-m>1</radiation-area-sq-m>
-    <emissivity>0.8</emissivity>
-    <!-- Effective grey flame exchange, distinct from the visible spectrum. -->
-    <flame-radiation-area-sq-m>1</flame-radiation-area-sq-m>
-    <flame-emissivity>0.05</flame-emissivity>
-    <!-- Core-facing turbine-exit hardware: provisional reduced thermal region,
-         NOT the main combustor or eight measured hot spots. 1800 J/K is 3 kg
-         at 600 J/kg/K, with smaller area and weaker cooling than the liner.
-         EGT bath is upstream of AB; optical spectral emissivity is separate. -->
-    <solid-region name="core">
-      <wall-heat-capacity-j-k>1800</wall-heat-capacity-j-k>
-      <gas-temperature-k><function><sum>
-        <property>propulsion/engine[#]/egt-degc</property><value>273.15</value>
-      </sum></function></gas-temperature-k>
-      <gas-conductance-w-k><function><sum><value>10</value><product>
-        <value>590</value><pow><quotient><property>propulsion/engine[#]/n2</property><value>100</value></quotient><value>2</value></pow>
-      </product></sum></function></gas-conductance-w-k>
-      <coolant-conductance-w-k><function><sum><value>5</value><product>
-        <value>30</value><pow><quotient><property>propulsion/engine[#]/n2</property><value>100</value></quotient><value>2</value></pow>
-      </product></sum></function></coolant-conductance-w-k>
-      <coolant-temperature-k><function><sum>
-        <property>propulsion/tat-c</property><value>273.15</value>
-        <product><value>100</value><pow><quotient><property>propulsion/engine[#]/n2</property><value>100</value></quotient><value>2</value></pow></product>
-      </sum></function></coolant-temperature-k>
+  <plant name="F135-PW-600">
+    <design>
+      <thrust-n>119583</thrust-n>
+      <bypass-ratio>0.56</bypass-ratio>
+      <overall-pressure-ratio>28</overall-pressure-ratio>
+      <turbine-inlet-temperature-k>1680</turbine-inlet-temperature-k>
+      <cooling-fraction>0.15</cooling-fraction>
+      <accessory-power-w>300000</accessory-power-w>
+      <bypass-pressure-loss>0.03</bypass-pressure-loss>
+      <mixer-pressure-loss>0.02</mixer-pressure-loss>
+      <mixer-static-pressure-ratio>0.97</mixer-static-pressure-ratio>
+      <augmentor-dry-pressure-loss>0.04</augmentor-dry-pressure-loss>
+      <fan><efficiency>0.87</efficiency></fan>
+      <compressor><efficiency>0.86</efficiency></compressor>
+      <hp-turbine><efficiency>0.89</efficiency><stodola-exponent>4</stodola-exponent></hp-turbine>
+      <lp-turbine><efficiency>0.91</efficiency><stodola-exponent>4</stodola-exponent></lp-turbine>
+    </design>
+    <lp-shaft>
+      <inertia-kg-m2>20</inertia-kg-m2>
+      <design-speed-rad-sec>1047</design-speed-rad-sec>
+      <coulomb-torque-n-m>10</coulomb-torque-n-m>
+      <viscous-n-m-s>0.05</viscous-n-m-s>
+    </lp-shaft>
+    <hp-shaft>
+      <inertia-kg-m2>4</inertia-kg-m2>
+      <design-speed-rad-sec>1570</design-speed-rad-sec>
+      <coulomb-torque-n-m>10</coulomb-torque-n-m>
+      <viscous-n-m-s>0.05</viscous-n-m-s>
+    </hp-shaft>
+    <starter>
+      <stall-torque-n-m>600</stall-torque-n-m>
+      <free-speed-rad-sec>800</free-speed-rad-sec>
+    </starter>
+    <core-fuel>
+      <valve-time-constant-s>0.05</valve-time-constant-s>
+      <valve-rate-limit-kg-sec2>8</valve-rate-limit-kg-sec2>
+      <max-flow-kg-sec>6</max-flow-kg-sec>
+      <manifold-prime-mass-kg>0.3</manifold-prime-mass-kg>
+      <manifold-time-constant-s>0.02</manifold-time-constant-s>
+    </core-fuel>
+    <augmentor-fuel>
+      <valve-time-constant-s>0.05</valve-time-constant-s>
+      <valve-rate-limit-kg-sec2>20</valve-rate-limit-kg-sec2>
+      <max-flow-kg-sec>20</max-flow-kg-sec>
+      <manifold-prime-mass-kg>2.0</manifold-prime-mass-kg>
+      <manifold-time-constant-s>0.03</manifold-time-constant-s>
+    </augmentor-fuel>
+    <core-combustion>
+      <ignition-delay-s>0.4</ignition-delay-s>
+      <lean-ignition-equivalence>0.2</lean-ignition-equivalence>
+      <lean-blowout-equivalence>0.06</lean-blowout-equivalence>
+      <rich-limit-equivalence>3.0</rich-limit-equivalence>
+      <half-efficiency-loading>0.006</half-efficiency-loading>
+    </core-combustion>
+    <augmentor-combustion>
+      <ignition-delay-s>0.15</ignition-delay-s>
+      <light-around-time-s>0.15</light-around-time-s>
+      <lean-ignition-equivalence>0.2</lean-ignition-equivalence>
+      <lean-blowout-equivalence>0.1</lean-blowout-equivalence>
+      <rich-limit-equivalence>1.4</rich-limit-equivalence>
+      <minimum-inlet-temperature-k>600</minimum-inlet-temperature-k>
+      <constant-efficiency>0.85</constant-efficiency>
+    </augmentor-combustion>
+    <controller>
+      <fan-speed-demand>0 0.30
+        0.99 1.0
+        1 1.0</fan-speed-demand>
+      <acceleration-limit>0 0.48
+        0.4 0.52
+        0.5 1.0
+        0.9 1.4
+        1.1 1.6</acceleration-limit>
+      <deceleration-limit>0 0.40
+        0.6 0.37
+        0.8 0.31
+        1.0 0.26
+        1.1 0.25</deceleration-limit>
+      <start-schedule>0 2.0
+        0.6 1.0</start-schedule>
+      <dry-throat-area>0.5 1.15
+        1.0 1.0</dry-throat-area>
+      <augmentor-fuel-air-ratio>0 0.02
+        1 0.03892</augmentor-fuel-air-ratio>
+      <exit-area-ratio>0 1.05
+        1 1.4</exit-area-ratio>
+      <throat-area-min-fraction>0.8</throat-area-min-fraction>
+      <throat-area-max-fraction>1.75</throat-area-max-fraction>
+      <throat-area-rate-per-sec>1.0</throat-area-rate-per-sec>
+      <idle-corrected-n2>0.60</idle-corrected-n2>
+      <lightoff-n2>0.15</lightoff-n2>
+      <augmentor-minimum-n2>0.95</augmentor-minimum-n2>
+      <augmentor-lightoff-fuel-air-ratio>0.012</augmentor-lightoff-fuel-air-ratio>
+      <max-n2>1.07</max-n2>
+      <lift-throat-area-factor>1.4285</lift-throat-area-factor>
+      <lift-split-gain-per-sec>24</lift-split-gain-per-sec>
+      <lift-split-washout-per-sec>0.5</lift-split-washout-per-sec>
+      <lift-vane-min>0.4</lift-vane-min>
+      <max-n1>1.04</max-n1>
+      <max-n1-gain-per-sec>100</max-n1-gain-per-sec>
+      <max-turbine-exit-temperature-k>1500</max-turbine-exit-temperature-k>
+    </controller>
+    <solid name="liner">
+      <heat-capacity-j-k>12000</heat-capacity-j-k>
+      <gas-station>7</gas-station>
+      <coolant>bypass</coolant>
+      <gas-conductance-w-k>600</gas-conductance-w-k>
+      <coolant-conductance-w-k>700</coolant-conductance-w-k>
+      <radiation-area-sq-m>1.0</radiation-area-sq-m>
+      <emissivity>0.8</emissivity>
+    </solid>
+    <solid name="core">
+      <heat-capacity-j-k>1800</heat-capacity-j-k>
+      <gas-station>5</gas-station>
+      <coolant>cooling</coolant>
+      <gas-conductance-w-k>600</gas-conductance-w-k>
+      <coolant-conductance-w-k>35</coolant-conductance-w-k>
       <radiation-area-sq-m>0.22</radiation-area-sq-m>
       <emissivity>0.75</emissivity>
-    </solid-region>
-  </thermal>
-
-  <function name="IdleThrust">
-   <product>
-<table>
-    <independentVar lookup="row">velocities/mach</independentVar>
-    <independentVar lookup="column">atmosphere/density-altitude</independentVar>
-    <tableData>
-         -10000     0     10000   20000   30000   40000   50000
-     0.0  0.0430  0.0488  0.0528  0.0694  0.0899  0.1183  0.1467
-     0.2  0.0500  0.0501  0.0335  0.0544  0.0797  0.1049  0.1342
-     0.4  0.0040  0.0047  0.0020  0.0272  0.0595  0.0891  0.1203
-     0.6  0.0     0.0     0.0     0.0     0.0276  0.0718  0.1073
-     0.8  0.0     0.0     0.0     0.0     0.0474  0.0868  0.0900
-     1.0  0.0     0.0     0.0     0.0     0.0     0.0552  0.0800
-    </tableData>
-   </table>
-    <difference><value>1</value><product><value>0.35714285714285715</value><property>fcs/stovl-pos-norm</property></product></difference>
-   </product>
-  </function>
-
-  <function name="MilThrust">
-   <product>
-<table>
-    <independentVar lookup="row">velocities/mach</independentVar>
-    <independentVar lookup="column">atmosphere/density-altitude</independentVar>
-    <tableData>
-          -10000       0   10000   20000   30000   40000   50000 	80000
-     0.0   1.2600  1.0000  0.7400  0.5340  0.3720  0.2410  0.1490 	0
-     0.2   1.1710  0.9340  0.6970  0.5060  0.3550  0.2310  0.1430 	0
-     0.4   1.1500  0.9210  0.6920  0.5060  0.3570  0.2330  0.1450 	0
-     0.6   1.1810  0.9510  0.7210  0.5320  0.3780  0.2480  0.1540 	0
-     0.8   1.2580  1.0200  0.7820  0.5820  0.4170  0.2750  0.1700 	0
-     1.0   1.3690  1.1200  0.8710  0.6510  0.4750  0.3150  0.1950 	0
-     1.2   1.4850  1.2300  0.9750  0.7440  0.5450  0.3640  0.2250 	0
-     1.4 	0 	0 	0 	0 	0 	0	0 	0
-    </tableData>
-   </table>
-    <difference><value>1</value><product><value>0.35714285714285715</value><property>fcs/stovl-pos-norm</property></product></difference>
-   </product>
-  </function>
-
-  <function name="AugThrust">
-   <table>
-    <independentVar lookup="row">velocities/mach</independentVar>
-    <independentVar lookup="column">atmosphere/density-altitude</independentVar>
-    <tableData>
-           -10000       0   10000   20000   30000   40000   50000	80000
-     0.0    1.1816  1.0000  0.8184  0.6627  0.5280  0.3756  0.2327 	0
-     0.2    1.1308  0.9599  0.7890  0.6406  0.5116  0.3645  0.2258 	0
-     0.4    1.1150  0.9474  0.7798  0.6340  0.5070  0.3615  0.2240 	0
-     0.6    1.1284  0.9589  0.7894  0.6420  0.5134  0.3661  0.2268 	0
-     0.8    1.1707  0.9942  0.8177  0.6647  0.5309  0.3784  0.2345 	0
-     1.0    1.2411  1.0529  0.8648  0.7017  0.5596  0.3983  0.2467 	0
-     1.2    1.3287  1.1254  0.9221  0.7462  0.5936  0.4219  0.2614 	0
-     1.4    1.4365  1.2149  0.9933  0.8021  0.6360  0.4509  0.2794 	0
-     1.6    1.5711  1.3260  1.0809  0.8700  0.6874  0.4860  0.3011 	0
-     1.8    1.7301  1.4579  1.1857  0.9512  0.7495  0.5289  0.3277 	0
-     2.0    1.8314  1.5700  1.3086  1.0474  0.8216  0.5786  0.3585 	0
-     2.2    1.9700  1.6900  1.4100  1.2400  0.9100  0.6359  0.3940 	0
-     2.4    2.0700  1.8000  1.5300  1.3400  1.0000  0.7200  0.4600 	0
-     2.6    2.2000  1.9200  1.6400  1.4400  1.1000  0.8000  0.5200 	0
-     2.8 	0 	0 	0 	0 	0 	0	0 	0
-    </tableData>
-   </table>
-  </function>
-
+    </solid>
+    <lift-system>
+      <fan-shaft>
+        <inertia-kg-m2>10</inertia-kg-m2>
+        <design-speed-rad-sec>785</design-speed-rad-sec>
+        <coulomb-torque-n-m>10</coulomb-torque-n-m>
+        <viscous-n-m-s>0.05</viscous-n-m-s>
+      </fan-shaft>
+      <gear-ratio>0.75</gear-ratio>
+      <clutch-capacity-n-m>40000</clutch-capacity-n-m>
+      <clutch-slip-speed-rad-sec>5</clutch-slip-speed-rad-sec>
+      <clutch-rate-per-sec>4.0</clutch-rate-per-sec>
+      <fan><pressure-ratio>2.3</pressure-ratio><efficiency>0.85</efficiency></fan>
+      <design-flow-kg-sec>233.16</design-flow-kg-sec>
+      <inlet-recovery>0.97</inlet-recovery>
+      <nozzle><discharge-coefficient>0.97</discharge-coefficient><velocity-coefficient>0.97</velocity-coefficient></nozzle>
+      <door-rate-per-sec>2.0</door-rate-per-sec>
+      <left-roll-post-area-sq-m>0.02511</left-roll-post-area-sq-m>
+      <right-roll-post-area-sq-m>0.02511</right-roll-post-area-sq-m>
+      <roll-post-rate-per-sec>4.0</roll-post-rate-per-sec>
+      <bypass-entry-area-factor>0.0700</bypass-entry-area-factor>
+      <bypass-entry-door-full>0.2</bypass-entry-door-full>
+      <clutch-command>fcs/lift-fan-clutch-cmd-norm</clutch-command>
+      <thrust-split-command>fcs/lift-split-cmd</thrust-split-command>
+      <door-command>fcs/lift-fan-door-cmd-norm</door-command>
+      <left-roll-post-command>fcs/roll-post-left-cmd-norm</left-roll-post-command>
+      <right-roll-post-command>fcs/roll-post-right-cmd-norm</right-roll-post-command>
+    </lift-system>
+  </plant>
 </turbine_engine>

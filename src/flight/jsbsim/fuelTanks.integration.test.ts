@@ -11,6 +11,8 @@ import { resolveAircraftDataFiles } from "./hydrateJsbsimData";
 import { resetFlightLocation } from "./resetFlightLocation";
 import { readExternalFuelTanks, setExternalFuelTankAttached } from "./externalFuelTanks";
 import { getExternalTankDefinitions } from "../aircraft/externalTankDefinitions";
+import { windForceToBody } from "../diagnostics/aircraftForces";
+import { getFdmProfile } from "./fdmProfiles";
 import { applySavedControls, captureSavedFlight, parseSavedFlight, restoreSavedFlight } from "./savedFlight";
 import { FIXED_DT } from "../physics/fixedStepLoop";
 import { captureSimulation, restoreSimulation } from "../physics/safeFlightState";
@@ -76,10 +78,15 @@ describe("fuel tanks in JSBSim", () => {
       expect(sdk.getPropertyValue(`inertia/pointmass-weight-lbs[${store}]`)).toBe(definition.dryWeightLbs);
       expect(sdk.getPropertyValue(`propulsion/tank[${definition.index}]/z-position`)).toBe(definition.locationIn.z);
     }
+    // The stores' own drag, without the engine inlets' ram drag that shares the external forces.
+    const magnitude = (force: string): string => getFdmProfile("f-35b").forceExternalForces!.find(term => term.name === force)!.magnitude!;
+    const bodyX = (force: string): number => windForceToBody([-sdk.getPropertyValue(magnitude(force)), 0, 0],
+      sdk.getPropertyValue("aero/alpha-rad"), sdk.getPropertyValue("aero/beta-rad"))[0];
+    const storeDrag = (): number => -bodyX("external-tank-0-drag") - bodyX("external-tank-1-drag");
     writeFuelTanks(sdk, new Map([[2, 1500], [3, 500]]));
     expect(sdk.runIc()).toBe(true);
     const loadedWeight = sdk.getPropertyValue("inertia/weight-lbs");
-    const loadedDrag = -sdk.getPropertyValue("forces/fbx-external-lbs");
+    const loadedDrag = storeDrag();
     expect(loadedDrag).toBeGreaterThan(0);
     expect(setExternalFuelTankAttached(sdk, "f-35b", 2, false)).toBe(true);
     expect(setExternalFuelTankAttached(sdk, "f-35b", 2, false)).toBe(false);
@@ -88,13 +95,16 @@ describe("fuel tanks in JSBSim", () => {
     expect(readFuelTanks(sdk)[2]).toMatchObject({ attached: false, capacityLbs: 2991, contentsLbs: 0 });
     expect(sdk.runIc()).toBe(true);
     expect(sdk.getPropertyValue("inertia/weight-lbs")).toBeCloseTo(loadedWeight - 1800, 6);
-    expect(-sdk.getPropertyValue("forces/fbx-external-lbs")).toBeCloseTo(loadedDrag / 2, 6);
+    expect(storeDrag()).toBeCloseTo(loadedDrag / 2, 6);
     expect(sdk.getPropertyValue("propulsion/tank[2]/priority")).toBe(0);
-    // One remaining left store applies drag at its own lateral arm about the current CG.
-    const leftArmFt = (definitions[1]!.locationIn.y - sdk.getPropertyValue("inertia/cg-y-in")) / 12;
+    // One remaining left store applies drag at its own lateral arm about the current CG;
+    // the inlets' ram drag acts on the centreline, whose arm the store's mass moves.
+    const armFt = (force: string): number =>
+      (sdk.getPropertyValue(`external_reactions/${force}/location-y-in`) - sdk.getPropertyValue("inertia/cg-y-in")) / 12;
+    expect(armFt("external-tank-1-drag")).toBeCloseTo((definitions[1]!.locationIn.y - sdk.getPropertyValue("inertia/cg-y-in")) / 12, 9);
     expect(sdk.getPropertyValue("moments/n-external-lbsft")).toBeLessThan(0);
-    expect(sdk.getPropertyValue("moments/n-external-lbsft"))
-      .toBeCloseTo(-leftArmFt * sdk.getPropertyValue("forces/fbx-external-lbs"), 6);
+    expect(sdk.getPropertyValue("moments/n-external-lbsft")).toBeCloseTo(
+      ["external-tank-1-drag", "engine-ram-drag", "lift-fan-ram-drag"].reduce((sum, force) => sum - armFt(force) * bodyX(force), 0), 6);
 
     // The native model also rejects fuel injected into a detached tank outside the host API.
     sdk.setPropertyValue("propulsion/tank[2]/contents-lbs", 1000);

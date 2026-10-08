@@ -125,6 +125,32 @@ records original paths, original hashes, current hashes, and changes.
   at full stick. Manual and the hover roll posts take trim as they take the
   stick.
 
+## 0SFS modifications, 2026-10-08
+
+- Replace the F135's empirical thrust tables, TSFC schedule and thermal
+  observer with a coupled turbine plant (JSBSim `<plant>`, SDK 1.2.4-fork.20 or
+  newer): fuel metering, ignition and combustion, the matched gas path, shafts,
+  nozzle, metal temperatures and the LiftSystem in one transient. It is
+  calibrated to the published 27,000 lbf intermediate and 41,000 lbf maximum
+  ratings and the 40,650 lbf hover split (16,750 main, 20,000 lift fan, 2 x
+  1,950 roll posts); every other value is an estimate. Provenance and
+  uncertainty: `docs/validation/f135-engine-plant.md` in the source tree. This
+  supersedes the dry-thrust reduction, the auxiliary force carriers and the
+  conversion-dependent TSFC above.
+- Remove the `liftfan` and `sidefan` engines (engines 1-3) and their throttle
+  channels. The lift fan is driven from the LP spool through a clutch, and the
+  roll posts bleed the bypass duct; their thrusts are the plant's outlet
+  observations, applied as BODY external forces at the fan centre and the post
+  stations, and each inlet's ram drag acts along the relative wind.
+- The FCS engages the clutch for any conversion, opens the lift-fan nozzle with
+  the main nozzle's vertical share, commands the thrust split that balances
+  lift-fan against main-nozzle thrust about the CG (carrying the pitch
+  command), and opens the roll posts with the vertical share, differentially
+  for roll. The engine holds the split with lift-fan guide vanes and its
+  nozzle area. The augmentation inhibit in conversion is unchanged.
+- The installed SDK's coupled solve, its energy and mass ledgers and the
+  calibration evidence are development checks, not engine qualification.
+
 ## Qualification boundary
 
 Installed-SDK tests cover actual app bootstrap, relocation, trim adoption,

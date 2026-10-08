@@ -1,0 +1,14 @@
+{
+  "source": "0SFS HEAD d92a928a bytes, the aircraft data installed with fork16 before the coupled plant migration",
+  "sha256": {
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/F135-PW-600.xml": "04cea10d3c135cb79247bbf7794a81359070e2bdc9afc9782502b538444eac16",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/direct.xml": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/liftfan.xml": "9ded9a6a93eeab2dac35c779b51945b9e5cf0807591737b67262b27c5ab67287",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/Engines/sidefan.xml": "90e1017803f4d9f46285ee09b2aed37d01cee82053e612ffabcf7a19816571ae",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/F-35B-jsbsim.xml": "7d81cf7930ac9ecb008fa5c8a72259aa198824cc31acb26a4537e140d055be17",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/NOTICE.md": "4645642c773c746e5bf74ddec335568518666b9c904408a77e0a96a3516ab807",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/Systems/pushback.xml": "868928e9b2b12440daec283260aebb1562d05154f69438f5d95043444378a4bc",
+    "public/jsbsim-data/aircraft/F-35B-jsbsim/source-manifest.json": "484da012d19f8fbed5939f720eb73f21544c1817a4fb165d0ff1b89a7db95906",
+    "public/jsbsim-data/manifest.json": "448049a4e922630c251ebfa2f5245457799fed5502380cb4db6f35cf5ea45d42"
+  }
+}

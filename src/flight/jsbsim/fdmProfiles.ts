@@ -3,7 +3,7 @@ import { C172_ROTOR_BLADES, FJ33_ROTOR_BLADES, F135_ROTOR_BLADES, type EngineRot
 import type { AutomaticFlaps } from "../input/autoFlaps";
 import { getSf50Variant, type Sf50VariantId } from "../aircraft/sf50Variants";
 import { BODY_COLLISION_PROBES, SF50_BODY_COLLISION_PROBES, type BodyCollisionProbe } from "../physics/collisionGeometry";
-import type { ControlSurfaceTerms } from "../diagnostics/aircraftForces";
+import type { ControlSurfaceTerms, ExternalForceTerms } from "../diagnostics/aircraftForces";
 
 export interface RunwayConfiguration {
   airspeedKts: number;
@@ -59,6 +59,8 @@ export interface FdmProfile {
    * holds every term, and every surface-dependent term left out, to the model file.
    */
   forceControlSurfaces: readonly ControlSurfaceTerms[];
+  /** External forces Debug → Forces draws, such as engine outlets the model applies outside the engine. */
+  forceExternalForces?: readonly ExternalForceTerms[];
   /** Sign applied to the normalized yaw command at the physics boundary. */
   rudderSign: 1 | -1;
   stance: {
@@ -212,7 +214,19 @@ export const FDM_PROFILES: Record<AircraftId, FdmProfile> = {
   "f-35b": {
     model: "F-35B-jsbsim",
     requiredReadOnlyModelProperties: ["propulsion/engine[0]/body-force-z-lbs"],
-    forceEngineLabels: { 0: "Main engine", 1: "Lift fan", 2: "Right roll post", 3: "Left roll post" },
+    forceEngineLabels: { 0: "Main engine" },
+    // Every external force of the model: the F135 plant's LiftSystem outlets and
+    // inlet ram drag, the external stores' drag, and pushback.
+    forceExternalForces: [
+      { name: "lift-fan", label: "Lift fan", frame: "body", magnitude: "propulsion/lift-fan-force-lbs" },
+      { name: "roll-post-right", label: "Right roll post", frame: "body", magnitude: "propulsion/roll-post-right-force-lbs" },
+      { name: "roll-post-left", label: "Left roll post", frame: "body", magnitude: "propulsion/roll-post-left-force-lbs" },
+      { name: "engine-ram-drag", label: "Engine inlet ram drag", frame: "wind", magnitude: "propulsion/engine-ram-drag-lbs" },
+      { name: "lift-fan-ram-drag", label: "Lift-fan inlet ram drag", frame: "wind", magnitude: "propulsion/lift-fan-ram-drag-lbs" },
+      { name: "external-tank-0-drag", label: "Right store drag", frame: "wind", magnitude: "stores/external-tank[0]/drag-lbs" },
+      { name: "external-tank-1-drag", label: "Left store drag", frame: "wind", magnitude: "stores/external-tank[1]/drag-lbs" },
+      { name: "pushback", label: "Pushback", frame: "body" },
+    ],
     // One aileron position drives both ailerons' terms, and one rudder both fins'.
     // The model gives neither a force, only moments.
     forceControlSurfaces: [
@@ -236,7 +250,7 @@ export const FDM_PROFILES: Record<AircraftId, FdmProfile> = {
     fullStickRollRate: { property: "fcs/full-stick-roll-rate-deg_sec", sourceDegPerSec: 180 / Math.PI / 0.09 },
     engine: "turbine",
     rotorBlades: F135_ROTOR_BLADES,
-    // F135-PW-600.xml: idlen2 60. The lift fan and roll posts share it and light with it.
+    // F135-PW-600.xml: the plant runs at its idle corrected N2, 0.60. The lift fan has no start of its own.
     startSpeed: { property: "propulsion/engine[0]/n2", runningAt: 60 },
     rudderSign: -1,
     // Prior FlightGear smoke settling observation, not new ground qualification.
@@ -260,9 +274,6 @@ export const FDM_PROFILES: Record<AircraftId, FdmProfile> = {
       "fcs/stovl-pos-norm": 0,
       // A new flight clears the FCS zero-time conversion interlock latch.
       "fcs/stovl-augmentation-inhibit": 0,
-      "fcs/throttle1": 0,
-      "fcs/throttle2": 0,
-      "fcs/throttle3": 0,
       "fcs/mixture-cmd-norm": 1,
       "fcs/pitch-trim-cmd-norm": -0.059,
       "fcs/roll-trim-cmd-norm": 0,

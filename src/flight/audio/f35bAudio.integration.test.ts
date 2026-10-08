@@ -99,9 +99,12 @@ describe("F-35B procedural sound (real JSBSim and shipped DSP, no physical route
       if (reading.combustion && !captured.lightoff) captured.lightoff = { ...reading };
       if (reading.running) { captured.running = { ...reading }; break; }
     }
-    expect(captured.firstRotation).toMatchObject({ running: false, combustion: false, fuelFlowPps: 0, thrustLbf: 0 });
+    // Motored air leaves the nozzle with a little momentum, but nothing burns.
+    expect(captured.firstRotation).toMatchObject({ running: false, combustion: false, fuelFlowPps: 0 });
     expect(captured.firstRotation!.n2Pct).toBeLessThan(0.1);
-    expect(captured.motoring).toMatchObject({ running: false, combustion: false, fuelFlowPps: 0, thrustLbf: 0 });
+    expect(captured.firstRotation!.thrustLbf).toBeLessThan(0.01);
+    expect(captured.motoring).toMatchObject({ running: false, combustion: false, fuelFlowPps: 0 });
+    expect(captured.motoring!.thrustLbf).toBeLessThan(0.01 * captured.running!.thrustLbf);
     expect(captured.lightoff).toMatchObject({ running: false, combustion: true });
     expect(captured.lightoff!.fuelFlowPps).toBeGreaterThan(1e-4);
     expect(captured.running).toMatchObject({ running: true, combustion: true });
@@ -159,8 +162,11 @@ describe("F-35B procedural sound (real JSBSim and shipped DSP, no physical route
     expect(reading.afterburnerBurnedFuelFlowKgSec)
       .toBe(sdk.getPropertyValue("propulsion/engine[0]/thermal/afterburner-burned-fuel-flow-kg-sec"));
     expect(reading.fuelFlowPps).toBe(sdk.getPropertyValue("propulsion/engine[0]/fuel-flow-rate-pps"));
-    const auxiliaryThrust = [1, 2, 3].reduce((sum, index) => sum + sdk.getPropertyValue(`propulsion/engine[${index}]/thrust-lbs`), 0);
-    expect(auxiliaryThrust).toBeGreaterThan(1000);
+    // The lift fan and roll posts are outlets of the same engine, not engines of their own.
+    expect(sdk.getPropertyCatalog().some(line => line.startsWith("propulsion/engine[1]/"))).toBe(false);
+    const liftSystemThrust = ["lift-fan", "roll-post[0]", "roll-post[1]"]
+      .reduce((sum, outlet) => sum + sdk.getPropertyValue(`propulsion/engine[0]/plant/${outlet}/gross-thrust-lbs`), 0);
+    expect(liftSystemThrust).toBeGreaterThan(1000);
     // Leave zero-time engine initialization before issuing a shutdown, as in
     // the SF50 shutdown fixture. Audio observes the resulting native state.
     run(sdk, 0.1);
@@ -168,15 +174,19 @@ describe("F-35B procedural sound (real JSBSim and shipped DSP, no physical route
     sdk.setPropertyValue("propulsion/cutoff_cmd", 1);
     run(sdk, 0.5);
     const cutoff = adapter.read();
-    expect(cutoff).toMatchObject({ running: false, thrustLbf: 0 });
-    // The global command getter aggregates the main engine and three lift
-    // force surrogates; it is not a main-engine cutoff observer.
-    expect(cutoff.availability & AVAILABILITY.COMMANDS).toBe(0);
-    // Native Off() seeks fuel flow down at 10,000 lbm/h/s. At F135-scale
-    // flow it takes several seconds; the audio adapter does not mask that
-    // FDM state or substitute a fabricated immediate zero.
+    // The spool runs down with the engine's own inertia; its jet thrust follows.
+    expect(cutoff.running).toBe(false);
+    expect(cutoff.thrustLbf).toBe(sdk.getPropertyValue("propulsion/engine[0]/thrust-lbs"));
+    // With one native engine, the global commands are the main engine's.
+    expect(cutoff.availability & AVAILABILITY.COMMANDS).toBe(AVAILABILITY.COMMANDS);
+    // The metering valve closes as a first-order lag (0.05 s), so its flow
+    // decays without reaching an exact zero; the audio adapter neither masks
+    // nor anticipates that state.
     run(sdk, 3);
-    expect(adapter.read()).toMatchObject({ combustion: false, fuelFlowPps: 0 });
+    const closed = adapter.read();
+    expect(closed.combustion).toBe(false);
+    expect(closed.fuelFlowPps).toBe(sdk.getPropertyValue("propulsion/engine[0]/fuel-flow-rate-pps"));
+    expect(closed.fuelFlowPps).toBeLessThan(1e-12);
   });
 
   it.each([[44_100, TIER.low], [44_100, TIER.med], [44_100, TIER.high],
@@ -211,8 +221,9 @@ describe("F-35B procedural sound (real JSBSim and shipped DSP, no physical route
     expect(reading.augmentation).toBe(true);
     expect(sdk.getPropertyValue("propulsion/engine[0]/augmentation")).toBe(1);
     expect(reading.thrustLbf).toBe(sdk.getPropertyValue("propulsion/engine[0]/thrust-lbs"));
+    // Deselected, the reheat manifold still burns out (0.34 s at this condition).
     sdk.setPropertyValue("fcs/throttle-cmd-norm", 0.98);
-    run(sdk, 0.1);
+    run(sdk, 0.5);
     expect(adapter.read().augmentation).toBe(false);
     expect(adapter.read().afterburnerBurnedFuelFlowKgSec).toBe(0);
     sdk.setPropertyValue("fcs/throttle-cmd-norm", 1);
@@ -230,7 +241,7 @@ describe("F-35B procedural sound (real JSBSim and shipped DSP, no physical route
     expect(adapter.read().augmentation).toBe(true);
     expect(adapter.read().sourceAxis![2]).toBeCloseTo(-1, 6);
     sdk.setPropertyValue("propulsion/cutoff_cmd", 1);
-    run(sdk, 0.1);
+    run(sdk, 0.5);
     reading = adapter.read();
     expect(reading.augmentation).toBe(false);
     expect(reading.fuelFlowPps).toBe(sdk.getPropertyValue("propulsion/engine[0]/fuel-flow-rate-pps"));
@@ -248,8 +259,11 @@ describe("F-35B procedural sound (real JSBSim and shipped DSP, no physical route
       const reading = adapter.read();
       expect(reading.afterburnerBurnedFuelFlowKgSec)
         .toBe(sdk.getPropertyValue("propulsion/engine[0]/thermal/afterburner-burned-fuel-flow-kg-sec"));
-      if (reading.augmentation && reading.afterburnerBurnedFuelFlowKgSec === 0) selectedWithoutBurn = true;
-      if (reading.augmentation && reading.afterburnerBurnedFuelFlowKgSec! > 0) burned = true;
+      // The plant's augmentation observer is reheat fuel burning; selection is the controller's.
+      expect(reading.augmentation).toBe(reading.afterburnerBurnedFuelFlowKgSec! > 0);
+      const selected = sdk.getPropertyValue("propulsion/engine[0]/plant/combustion/ab-selected") === 1;
+      if (selected && reading.afterburnerBurnedFuelFlowKgSec === 0) selectedWithoutBurn = true;
+      if (selected && reading.afterburnerBurnedFuelFlowKgSec! > 0) burned = true;
       if (selectedWithoutBurn && burned) break;
     }
     expect(selectedWithoutBurn).toBe(true);

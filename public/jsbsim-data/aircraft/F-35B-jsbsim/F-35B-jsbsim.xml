@@ -172,94 +172,6 @@
     </thruster>
         </engine>
 	
-        <engine file="liftfan">
-    <location unit="IN">
-      <x> 198.02286181 </x>
-      <y>   0.00 </y>
-      <z>   -15.36 </z>
-    </location>
-    <orient unit="DEG">
-      <pitch> 90.00 </pitch>
-      <roll>   0.00 </roll>
-      <yaw>   0.00 </yaw>
-    </orient>
-    <feed>0</feed>
-    <feed>1</feed>
-    <feed>2</feed>
-    <feed>3</feed>
-    <thruster file="direct">
-     <location unit="IN">
-       <x> 198.02286181 </x>
-       <y>   0.00 </y>
-       <z>   -15.36 </z>
-     </location>
-     <orient unit="DEG">
-       <pitch> 90.00 </pitch>
-       <roll>   0.00 </roll>
-       <yaw>   0.00 </yaw>
-     </orient>
-    </thruster>
-        </engine>
-
-        <engine file="sidefan">
-    <location unit="IN">
-      <x> 368.52 </x>
-      <y>  80.00 </y>
-      <z>   -15.36 </z>
-    </location>
-    <orient unit="DEG">
-      <pitch> 90.00 </pitch>
-      <roll>   0.00 </roll>
-      <yaw>   0.00 </yaw>
-    </orient>
-    <feed>0</feed>
-    <feed>1</feed>
-    <feed>2</feed>
-    <feed>3</feed>
-    <thruster file="direct">
-     <location unit="IN">
-       <x> 368.52 </x>
-       <y>  80.00 </y>
-       <z>   -15.36 </z>
-     </location>
-     <orient unit="DEG">
-       <pitch> 90.00 </pitch>
-       <roll>   0.00 </roll>
-       <yaw>   0.00 </yaw>
-     </orient>
-    </thruster>
-        </engine>
-
-        <engine file="sidefan">
-    <location unit="IN">
-      <x> 368.52 </x>
-      <y>  -80.00 </y>
-      <z>   -15.36 </z>
-    </location>
-    <orient unit="DEG">
-      <pitch> 90.00 </pitch>
-      <roll>   0.00 </roll>
-      <yaw>   0.00 </yaw>
-    </orient>
-    <feed>0</feed>
-    <feed>1</feed>
-    <feed>2</feed>
-    <feed>3</feed>
-    <thruster file="direct">
-     <location unit="IN">
-       <x> 368.52 </x>
-       <y>  -80.00 </y>
-       <z>   -15.36 </z>
-     </location>
-     <orient unit="DEG">
-       <pitch> 90.00 </pitch>
-       <roll>   0.00 </roll>
-       <yaw>   0.00 </yaw>
-     </orient>
-    </thruster>
-        </engine>
-
-	
         <!-- 13,100 lb internal fuel; two equal lumped tanks retain the source layout.
              External tank/pylon geometry, dry mass and drag remain provisional. -->
         <tank type="FUEL">    <!-- Internal tank number 0 -->
@@ -307,9 +219,6 @@
         <property value="25">/sim/model/pushback/ki</property>
         <property value="0">/sim/model/pushback/kd</property>
         <property value="0">/gear/gear/wow</property>
-        <property value="0">fcs/throttle1</property>
-        <property value="0">fcs/throttle2</property>
-        <property value="0">fcs/throttle3</property>
         <property value="0">fcs/stovl-cmd-norm</property>
         <property value="0">fcs/stovl-pos-norm</property>
         <property value="0">fcs/stovl-augmentation-inhibit</property>
@@ -1028,25 +937,57 @@
               <property>fcs/nozzle-direction-x</property></atan2></function>
             <output>propulsion/engine[0]/yaw-angle-rad</output>
           </fcs_function>
-          <!-- Auxiliary instances are immediate force carriers. Native engine
-               functions allocate actual main-engine upward body force, not a
-               second conversion/throttle ramp or independent turbine spool. -->
-          <fcs_function name="fcs/stovl-right-post-allocation">
-            <function><sum><value>1</value><property>-fcs/stovl-roll-control</property></sum></function>
-            <output>propulsion/engine[2]/roll-post-allocation</output>
+          <!-- LiftSystem commands to the coupled engine plant. The clutch
+               engages for any conversion and the lift-fan nozzle opens with
+               it. The engine holds the commanded ratio of lift-fan to
+               main-nozzle thrust by trimming its nozzle area, which balances
+               the two about the centre of gravity and carries the pitch
+               command. Roll posts open with the nozzle's vertical share and
+               carry the roll command differentially. -->
+          <switch name="fcs/lift-fan-clutch-cmd-norm">
+            <default value="0"/>
+            <test logic="OR" value="1">
+              fcs/stovl-cmd-norm gt 0
+              fcs/stovl-pos-norm gt 0
+            </test>
+          </switch>
+          <!-- Lift-fan nozzle opening for a thrust that follows the main
+               nozzle's vertical share: fan thrust rises about as
+               1 - (1 - opening)^1.7 at a given fan speed. -->
+          <fcs_function name="fcs/lift-fan-door-cmd-norm">
+            <function><difference><value>1</value>
+              <pow><max><value>0</value><difference><value>1</value><sin><property>fcs/nozzle-pitch-rad</property></sin></difference></max><value>0.6</value></pow>
+            </difference></function>
+            <clipto><min>0</min><max>1</max></clipto>
           </fcs_function>
-          <fcs_function name="fcs/stovl-left-post-allocation">
-            <function><sum><value>1</value><property>fcs/stovl-roll-control</property></sum></function>
-            <output>propulsion/engine[3]/roll-post-allocation</output>
+          <fcs_function name="fcs/lift-split-balance">
+            <function><product>
+              <sin><property>fcs/nozzle-pitch-rad</property></sin>
+              <quotient>
+                <max><value>0</value><difference><property>propulsion/engine[0]/x-position</property><property>inertia/cg-x-in</property></difference></max>
+                <max><value>1</value><difference><property>inertia/cg-x-in</property><value>198.02286181</value></difference></max>
+              </quotient>
+              <sum><value>1</value><property>fcs/stovl-pitch-control</property></sum>
+            </product></function>
+            <clipto><min>0.02</min><max>5</max></clipto>
           </fcs_function>
-          <fcs_function name="fcs/stovl-fan-command">
-            <function><value>1</value></function><output>fcs/throttle1</output>
+          <switch name="fcs/lift-split-cmd">
+            <default value="0"/>
+            <test value="fcs/lift-split-balance">fcs/stovl-pos-norm gt 0</test>
+          </switch>
+          <fcs_function name="fcs/roll-post-right-cmd-norm">
+            <function><product>
+              <value>0.93</value><sin><property>fcs/nozzle-pitch-rad</property></sin>
+              <sum><value>1</value><property>-fcs/stovl-roll-control</property></sum>
+            </product></function>
+            <clipto><min>0</min><max>1</max></clipto>
           </fcs_function>
-          <fcs_function name="fcs/stovl-right-post-command">
-            <function><value>1</value></function><output>fcs/throttle2</output>
-          </fcs_function>
-          <fcs_function name="fcs/stovl-left-post-command">
-            <function><value>1</value></function><output>fcs/throttle3</output>
+          <fcs_function name="fcs/roll-post-left-cmd-norm">
+            <function><product>
+              <value>0.93</value><sin><property>fcs/nozzle-pitch-rad</property></sin>
+              <sum><value>1</value><property>fcs/stovl-roll-control</property></sum>
+            </product></function>
+            <clipto><min>0</min><max>1</max></clipto>
           </fcs_function>
           <fcs_function name="fcs/fan-door-mixture-position">
             <function><difference><value>1</value><property>fcs/stovl-pos-norm</property></difference></function>
@@ -1067,24 +1008,6 @@
                 <input>fcs/main-throttle-command</input>
                 <gain>1</gain>
                 <output>fcs/throttle-pos-norm</output>
-            </pure_gain>
-
-            <pure_gain name="throttle-pos-norm[1]">
-                <input>fcs/throttle1</input>
-                <gain>1</gain>
-                <output>fcs/throttle-pos-norm[1]</output>
-            </pure_gain>
-	    
-            <pure_gain name="throttle-pos-norm[2]">
-                <input>fcs/throttle2</input>
-                <gain>1</gain>
-                <output>fcs/throttle-pos-norm[2]</output>
-            </pure_gain>
-	    
-            <pure_gain name="throttle-pos-norm[3]">
-                <input>fcs/throttle3</input>
-                <gain>1</gain>
-                <output>fcs/throttle-pos-norm[3]</output>
             </pure_gain>
 
         </channel>
@@ -1635,6 +1558,46 @@
           </product>
         </function>
         <location unit="IN"><x>368.52</x><y>-127.952756</y><z>-15.36</z></location>
+        <direction><x>-1</x><y>0</y><z>0</z></direction>
+      </force>
+
+      <!-- LiftSystem outlets of the coupled engine plant: the lift fan and
+           the two roll posts each push straight up at their own station. -->
+      <force name="lift-fan" frame="BODY">
+        <function name="propulsion/lift-fan-force-lbs">
+          <property>propulsion/engine[0]/plant/lift-fan/gross-thrust-lbs</property>
+        </function>
+        <location unit="IN"><x>198.02286181</x><y>0</y><z>-15.36</z></location>
+        <direction><x>0</x><y>0</y><z>-1</z></direction>
+      </force>
+      <force name="roll-post-right" frame="BODY">
+        <function name="propulsion/roll-post-right-force-lbs">
+          <property>propulsion/engine[0]/plant/roll-post[1]/gross-thrust-lbs</property>
+        </function>
+        <location unit="IN"><x>368.52</x><y>80</y><z>-15.36</z></location>
+        <direction><x>0</x><y>0</y><z>-1</z></direction>
+      </force>
+      <force name="roll-post-left" frame="BODY">
+        <function name="propulsion/roll-post-left-force-lbs">
+          <property>propulsion/engine[0]/plant/roll-post[0]/gross-thrust-lbs</property>
+        </function>
+        <location unit="IN"><x>368.52</x><y>-80</y><z>-15.36</z></location>
+        <direction><x>0</x><y>0</y><z>-1</z></direction>
+      </force>
+      <!-- Momentum of the air each inlet captures, along the relative wind.
+           The engine reports gross thrust; this is its ram drag. -->
+      <force name="engine-ram-drag" frame="WIND">
+        <function name="propulsion/engine-ram-drag-lbs">
+          <property>propulsion/engine[0]/plant/inlet-ram-drag-lbs</property>
+        </function>
+        <location unit="IN"><x>250</x><y>0</y><z>-15.36</z></location>
+        <direction><x>-1</x><y>0</y><z>0</z></direction>
+      </force>
+      <force name="lift-fan-ram-drag" frame="WIND">
+        <function name="propulsion/lift-fan-ram-drag-lbs">
+          <property>propulsion/engine[0]/plant/lift-fan/ram-drag-lbs</property>
+        </function>
+        <location unit="IN"><x>198.02286181</x><y>0</y><z>-15.36</z></location>
         <direction><x>-1</x><y>0</y><z>0</z></direction>
       </force>
 

@@ -6,6 +6,44 @@ removed the augmentation-flag-only cue. Its tests covered audio and optical
 sources separately; they did **not** establish perceived synchronization. This
 follow-up adds a joint CPU test and preserves the remaining failure explicitly.
 
+## Resolved by the coupled engine plant, 2026-10-08
+
+The F135 now runs as the coupled JSBSim turbine plant (SDK `1.2.4-fork.20`,
+native `ea6956b4`; [ledger](f135-engine-plant.md)). Reheat thrust exists only
+where reheat fuel burns, because the augmentor's heat release is the only way
+the plant raises nozzle temperature. The `it.fails` invariant below is now an
+ordinary passing test with the same 1 lbf margin. Its dry reference is the
+same engine, run with the throttle held at 0.99: the fan-speed demand is
+the same, so the dry spool-up is the same, but there is no reheat request. A
+second test asserts that reheat heat is released exactly when reheat fuel
+burns and that every step's energy ledger closes.
+
+| Native case | First reheat selection | First burned reheat fuel | Selected without burn | Wet thrust without burn | Worst step energy residual |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| First running state after a true cold start | 2.6583 s | 4.0167 s | 1.3583 s | **0 s** (was 4.1333 s) | 1.2e-7 |
+| Cold start, then 120 s settled dry operation | 0 s | 1.2417 s | 1.2417 s | **0 s** | 1.1e-7 |
+| Explicit warm running initialization, then 5 s dry | 0 s | 1.2417 s | 1.2417 s | **0 s** | 6.8e-8 |
+
+The selected-without-burn interval is now physical: after selection the
+augmentor's spray manifold fills (estimated 2 kg prime mass), the igniter
+waits its ignition delay, then the flame spreads around the ring. Its length
+rests on estimated manifold, ignition and light-around values, not F135
+data. `propulsion/engine[0]/augmentation` now reports reheat fuel burning;
+selection is `propulsion/engine[0]/plant/combustion/ab-selected`.
+
+Deliberate reheat sound still starts with the first burn in all three tiers
+(Low / Med / High: 4.05000 / 4.05292 / 4.05292 s cold, 1.28333 / 1.28625 /
+1.28625 s warm). The base jet sound now differs from the dry counterfactual
+only from selection (2.68 s cold, 0.017–0.020 s warm). At selection the
+nozzle pre-opens and the governor answers it, which leaves the thrust at or
+below dry. The [report](../../validation/evidence/aircraft/f35b/engine-plant/ab-onset/report.json),
+[120 Hz trace](../../validation/evidence/aircraft/f35b/engine-plant/ab-onset/native.csv)
+and [log](../../validation/evidence/aircraft/f35b/engine-plant/ab-onset/cpu-diagnostic.log)
+retain the run; every criterion passes except visible onset, which remains
+untested. No browser, GPU, sound device or perception test was run.
+
+The rest of this page is the 2026-10-07 record of the empirical engine.
+
 ## Reproduced native discrepancy
 
 The current installed native engine selects its full wet thrust table while

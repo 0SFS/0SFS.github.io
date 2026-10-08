@@ -9,8 +9,8 @@ describe("F135 native combustion, optical source and shipped audio onset (CPU; n
   }, 30_000);
 
   it("emits internal reaction light at the first positive native burn in cold and warm engines", () => {
-    // Qualify the dry-table diagnostic against the real dry state before use.
-    expect(traces[1].before.referenceDryThrustLbf).toBeCloseTo(traces[1].before.reading.thrustLbf, 6);
+    // Qualify the dry counterfactual against the real state before the command.
+    for (const trace of traces) expect(trace.before.referenceDryThrustLbf).toBe(trace.before.reading.thrustLbf);
     for (const trace of traces) {
       const previous = trace.observations[Math.round(trace.firstBurned.timeSeconds * 120) - 1];
       expect(previous.reading.afterburnerBurnedFuelFlowKgSec).toBe(0);
@@ -50,19 +50,35 @@ describe("F135 native combustion, optical source and shipped audio onset (CPU; n
           snapshotsDropped: 0, resyncs: 0 });
       }
       expect(audio.memoryBytes.every(bytes => bytes.beforeRender === bytes.afterRender)).toBe(true);
-      expect(audio.firstThrustDifferenceSeconds).not.toBeNull();
-      expect(audio.preBurnThrustDifferenceRms).toBeGreaterThan(0);
+      // The reheat request changes nothing the listener hears until the engine selects reheat.
+      if (audio.firstThrustDifferenceSeconds !== null)
+        expect(audio.firstThrustDifferenceSeconds).toBeGreaterThanOrEqual(trace.firstSelected.timeSeconds - 1 / 120);
     }
   }, 30_000);
 
-  it.fails("does not publish reheat-only excess thrust while actually burned AB fuel is zero (known native discrepancy)", () => {
-    // Evaluate the native dry tables at the SAME shaft speed and atmosphere;
-    // do not compare against an old throttle state or invent an audio delay.
-    // FGTurbine currently installs the wet table immediately. This invariant
-    // intentionally fails until an engine-owned physical correction is made.
+  it("does not publish reheat-only excess thrust while actually burned AB fuel is zero", () => {
+    // Compare with the same engine at the same time without a reheat request,
+    // never with an old throttle state or a delay. The empirical engine
+    // installed its wet table at selection: 4.1333 s of wet thrust with no AB
+    // fuel burned from a cold start (docs/validation/f135-ab-onset.md).
+    for (const trace of traces) {
+      let selectedWithoutBurn = 0;
+      for (const row of trace.observations) {
+        if (row.reading.afterburnerBurnedFuelFlowKgSec !== 0) continue;
+        if (row.abSelected) selectedWithoutBurn++;
+        expect({ trace: trace.name, time: row.timeSeconds, thrust: row.reading.thrustLbf,
+          withinDry: row.reading.thrustLbf <= row.referenceDryThrustLbf + 1 }).toMatchObject({ withinDry: true });
+      }
+      // The window exists (ignition delay and light-around), so the invariant is exercised.
+      expect(selectedWithoutBurn).toBeGreaterThan(0);
+    }
+  });
+
+  it("releases reheat heat only from burned reheat fuel, and closes every step's energy ledger", () => {
     for (const trace of traces) for (const row of trace.observations) {
-      if (row.reading.augmentation && row.reading.afterburnerBurnedFuelFlowKgSec === 0)
-        expect(row.reading.thrustLbf).toBeLessThanOrEqual(row.referenceDryThrustLbf + 1);
+      expect(row.abHeatReleaseW > 0).toBe(row.reading.afterburnerBurnedFuelFlowKgSec! > 0);
+      expect(row.reading.augmentation).toBe(row.reading.afterburnerBurnedFuelFlowKgSec! > 0);
+      expect(row.energyRelative).toBeLessThan(1e-5);
     }
   });
 });

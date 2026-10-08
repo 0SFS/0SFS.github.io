@@ -1,0 +1,134 @@
+{
+  "schema": 1,
+  "date": "2026-10-05",
+  "status": "Experimental playable prototype; aircraft performance uncalibrated",
+  "model": "F-35B-jsbsim",
+  "aircraftId": "f-35b",
+  "source": {
+    "archiveUrl": "https://fgaddon.b-cdn.net/Aircraft-trunk/F-35B.zip",
+    "cataloguePackageId": "F-35B-yasim",
+    "variantId": "F-35B-jsbsim",
+    "fgaddonRevision": "15340",
+    "archiveBytes": 10618616,
+    "archiveSha256": "caf3c591c838148ccdeec8fc61a23fd09f17574aeb36e0071e84a132dd25ebd6",
+    "archiveMd5": "7d8225e9c41f456d7fbb705064bb0274"
+  },
+  "authors": {
+    "package": [
+      "Petar Jedvaj",
+      "Detlef Faber",
+      "F-GTUX",
+      "Stuart Cassie",
+      "Gary Brown"
+    ],
+    "fdmHeader": "F-GTUX from Erik Hofman F-16 and aeromatic",
+    "creditsSource": "F-35B-jsbsim-set.xml"
+  },
+  "license": {
+    "packageFile": "License.txt",
+    "packageTextVersion": "GPL version 3",
+    "fdmHeaderName": "GPL (General Public License)",
+    "preservation": "Original source bytes, copyright and licence notices retained; no or-later clause inferred."
+  },
+  "unmodifiedSource": "planes/Lockheed_Martin_F-35B/tests/flightgear-jsbsim/",
+  "modificationNotice": "NOTICE.md",
+  "files": [
+    {
+      "path": "F-35B-jsbsim.xml",
+      "sourceArchivePath": "F-35B/F-35B-jsbsim.xml",
+      "sourceBytes": 37491,
+      "sourceSha256": "0f1cbe9f4d0232c3cbd36a64f1cfe046af947834a68e6053ddaa3eb7aa389e7d",
+      "bytes": 57259,
+      "sha256": "7d81cf7930ac9ecb008fa5c8a72259aa198824cc31acb26a4537e140d055be17",
+      "modified": true,
+      "changes": [
+        "Explicit FlightGear external defaults and model-specific control defaults.",
+        "Development internal fuel 2500 lb/tank, total 5000 lb; source empty mass/CG/inertias/aero unchanged.",
+        "Provisional inspected fan/nozzle force points.",
+        "Fixed-step experimental STOVL FCS allocation, attitude damping, vector nozzle orientation and2.5s actuator.",
+        "Fan-door aerodynamic mixture position and conversion augmentation cap.",
+        "Experimental dynamic-pressure yaw gain schedule suppresses disturbance-driven rudder hunting at high speed; pilot command properties unchanged.",
+        "Native Auto/Manual/FBW selection; Manual bypasses stabilization, resets integrators and uses direct stick/trim/flap commands while preserving conversion.",
+        "Conversion augmentation interlock covers every positive request or pre-step physical position, preserves inhibition through zero-time recovery, and clears on conventional positive-time evaluation; new-flight profile clears the latch.",
+        "Trailing-edge automatic flaps default enabled, independent of manual/FBW control-law selection.",
+        "Lift allocation uses current main upward native body force and current CG arms; auxiliaries are immediate zero-fuel force carriers, removing duplicate conversion gating and independent turbine lag.",
+        "Two 6550 lb internal tanks total the published 13100 lb internal capacity; retained external capacity is 2991 lb per detachable store.",
+        "External stores initially attach empty; native attachment gates fuel, feed priority, provisional 300 lb tank/pylon dry mass and 1 square foot equivalent drag area per store, applied natively in the wind frame at each store location for asymmetric force/moment response. Fuel and dry mass align to visible assemblies at structural x368.52, y+/-127.952756, z-15.36 inches.",
+        "FBW roll is a tracked roll-rate command: full stick asks for native fcs/full-stick-roll-rate-deg_sec (default 636.62, the source gradient), with feedforward p = a vt / 165 ft faded out by conversion. The source integrator trigger was inverted (held above 5 kt); the integrator now only holds bank, running with the stick centred and roll rate under 10 deg/s and resetting in Manual, on the ground and with any conversion. P and D gains unchanged; Manual and hover roll posts read the unscaled stick.",
+        "FBW roll trim enters the rate command and feedforward as native fcs/roll-trim-rate-cmd-norm, scaled like the stick by fcs/full-stick-roll-rate-deg_sec, so full trim asks what full stick asks; it entered unscaled. Manual and hover roll posts take trim as they take the stick."
+      ]
+    },
+    {
+      "path": "Engines/F135-PW-600.xml",
+      "sourceArchivePath": "F-35B/Engines/F135-PW-600.xml",
+      "sourceBytes": 3615,
+      "sourceSha256": "77e5494173485bc24f8e3754a9ba31dd93f5aebc651285eb477184aff8169c6e",
+      "bytes": 4769,
+      "sha256": "09b7eb9c8c9ea5ca720ae1974f4d1ef5d7fb35e6b8248415c6cfcc307c57891c",
+      "modified": true,
+      "changes": [
+        "Native automatic augmentation in conventional flight.",
+        "Progressive dry-thrust reduction to18klbf full-conversion reference before source bleed.",
+        "Conversion-dependent approximate main fuel accounting for auxiliary power."
+      ]
+    },
+    {
+      "path": "Engines/direct.xml",
+      "sourceArchivePath": "F-35B/Engines/direct.xml",
+      "sourceBytes": 114,
+      "sourceSha256": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc",
+      "bytes": 114,
+      "sha256": "7bb1ff7a6b43d69c52dbfa31ff98ad0210ea33cff1623d965db55a89eb56d0fc",
+      "modified": false,
+      "changes": []
+    },
+    {
+      "path": "Engines/liftfan.xml",
+      "sourceArchivePath": "F-35B/Engines/liftfan.xml",
+      "sourceBytes": 2168,
+      "sourceSha256": "926c3ebefdf753f8cf2797b02d662a665a46dbd4257858deff4ce0945ccd46a2",
+      "bytes": 3298,
+      "sha256": "9ded9a6a93eeab2dac35c779b51945b9e5cf0807591737b67262b27c5ab67287",
+      "modified": true,
+      "changes": [
+        "Zero separate TSFC/idle fuel flow/bleed for force surrogate.",
+        "Actual main upward native force supplies fan power; current main/fan CG arms and existing pitch allocation determine desired force, capped by retained source atmospheric capacity.",
+        "Zero independent idle force; immediate carrier setting removes fictitious auxiliary spool lag."
+      ]
+    },
+    {
+      "path": "Engines/sidefan.xml",
+      "sourceArchivePath": "F-35B/Engines/sidefan.xml",
+      "sourceBytes": 2236,
+      "sourceSha256": "e0ad665eb77db712e4f106c32009760dcf2a6ecb0cd9aab069562d2a6fdb6122",
+      "bytes": 3052,
+      "sha256": "90e1017803f4d9f46285ee09b2aed37d01cee82053e612ffabcf7a19816571ae",
+      "modified": true,
+      "changes": [
+        "Zero separate TSFC/idle fuel flow/bleed for force surrogate.",
+        "Actual main upward native force and retained 1950/18000 rating ratio supply each roll post; existing differential allocation is capped by retained source atmospheric capacity.",
+        "Zero independent idle force; immediate carrier setting removes fictitious auxiliary spool lag."
+      ]
+    },
+    {
+      "path": "Systems/pushback.xml",
+      "sourceArchivePath": "F-35B/Systems/pushback.xml",
+      "sourceBytes": 1127,
+      "sourceSha256": "868928e9b2b12440daec283260aebb1562d05154f69438f5d95043444378a4bc",
+      "bytes": 1127,
+      "sha256": "868928e9b2b12440daec283260aebb1562d05154f69438f5d95043444378a4bc",
+      "modified": false,
+      "changes": []
+    },
+    {
+      "path": "License.txt",
+      "sourceArchivePath": "F-35B/License.txt",
+      "sourceBytes": 35147,
+      "sourceSha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "bytes": 35147,
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "modified": false,
+      "changes": []
+    }
+  ]
+}
