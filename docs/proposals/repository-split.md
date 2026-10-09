@@ -34,7 +34,9 @@ prototypes while they are reviewed; no new remote repository is needed now.
 
 1. A feature tab normally identifies the repository to change. Start with that
    boundary and record a concrete exception when the tab combines independent
-   owners or several tabs edit the same subsystem.
+   owners or several tabs edit the same subsystem. This is not a limit of one
+   implementation repository per tab: distinct image representations have their
+   own repositories beneath the `foss-earth/360` viewer.
 2. A feature repository publishes usable code or content, with a public
    interface, independent checks, release identity and representative examples.
    A directory move alone does not finish an extraction.
@@ -60,7 +62,11 @@ prototypes while they are reviewed; no new remote repository is needed now.
 | `foss-earth/toolbar` | Bottom HUD layout, launchers and readout presentation, populated through host callbacks/contributions |
 | `foss-earth/about` | Shared About presentation, provenance/graph schema, validation and graph viewer, consuming host-supplied metadata |
 | `foss-earth/dev` | Shared `?dev=1` activation and Dev-panel contribution helpers; hosts supply the actual panels |
-| `foss-earth/sky`, `foss-earth/weather`, `foss-earth/panorama` | Shared astronomy/lighting, environmental fields, and panorama formats/viewer/tools, with their optional panels |
+| `foss-earth/sky`, `foss-earth/weather` | Shared astronomy/lighting and environmental fields, with their optional panels |
+| `foss-earth/scenes` | Scene manifest/envelope, placements, groups/links, validation, navigation orchestration and Scenes tab |
+| `foss-earth/360` | Top-level 360-image viewer, orb/immersion presentation, active-image and image-settings tabs, and composition of representation plugins and preparation tools |
+| `foss-earth/images` | Common image contracts, color/orientation/resource interfaces, media transport/cache and coordinated resource reservations; no imports of concrete representations |
+| `foss-earth/equirectangular`, `foss-earth/cubemap`, `foss-earth/tiled-cubemap`, `foss-earth/preview-sheets` | Separate image-data structures: their schemas, math, loaders, preparation, format-specific GPU adapters and tests; tiled cubemaps support both current warps |
 | `foss-earth/dev_installer`, `foss-earth/ci` | Reusable workspace setup and common checks, consuming project-owned manifests and policy configuration |
 | `UMN-VR/UMN-VR.github.io` | Club website, navigation and published access to the independently released campus tour |
 | `UMN-VR/tour` | Campus-tour application, scene placements, campus content and import adapters, release/workspace manifests, and tour-specific panels |
@@ -468,9 +474,9 @@ flight panel. Dev is a proposed additional contribution, labeled below.
 | About | `foss-earth/about`, with dedicated app-owned content/manifest adapters | Flight supplies `0sfs/about`; campus supplies `UMN-VR/about`; globe supplies its own content directly. Each app retains release assembly and injects resolved manifest data. |
 | Bug report | `foss-earth/ui` | Form, redaction and report lifecycle consume the UI diagnostics/log contracts. Keep that management view with those contracts; hosts supply observations and reporter configuration. |
 | Dev (proposed) | `foss-earth/dev`, with host-owned panel contributions | Shared activation/registration; `0sfs/dev` supplies flight panels and globe/UMN supply their own. |
-| Scenes | `foss-earth/panorama` | Generic scene definitions, loader and tools are shared with the active panorama. |
-| Active 360 image | `foss-earth/panorama` | The tab title changes with the current image; it is an instance of the same viewer. |
-| 360 image settings | `foss-earth/panorama` | Shares camera, image loading, budgets and lifecycle with the other panorama tabs. |
+| Scenes | `foss-earth/scenes` | Dedicated scene schema/loader, placements, links and navigation composition; consumes the 360 viewer and keeps image representation implementations in their own repositories. |
+| Active 360 image | `foss-earth/360` | Dedicated top-level viewer. The title changes with the active image; representation-specific loading/rendering is supplied by separate packages. |
+| 360 image settings | `foss-earth/360`, with representation-owned controls | Viewer-wide camera/entry controls share the active-image lifecycle. Format-specific settings remain with the matching image repository and are registered here. |
 
 These are explicit exceptions, not a general license to keep unrelated code
 in the application. Renderer is a target extraction; Map provisionally remains
@@ -497,10 +503,41 @@ itself; feature panels keep their code, parameters and lifecycle in their owner.
 For UMN, move the campus application and its placements together into
 `UMN-VR/tour`, separate from club publishing. `UMN-VR/twin-cities-content` is an
 optional additional media boundary; versioned external hosting can provide the
-same delivery separation. Generic formats/viewer/preparation tools move into
-`foss-earth/panorama`; photographs, placements and campus/platform import
+same delivery separation. Scene manifest/checking code moves into
+`foss-earth/scenes`; the viewer and preparation composition move into
+`foss-earth/360`, using separately owned image representations. Photographs,
+placements and campus/platform import
 adapters remain UMN-owned. The tour consumes FOSS Earth, never 0sfs. See the
 [content delivery design](../../../UMN-VR/UMN-VR.github.io/docs/content-delivery.md).
+
+### Image repositories beneath `foss-earth/360`
+
+The owning specification is FOSS Earth's
+[image repository proposal](../../../foss-earth/docs/proposals/image-repositories.md).
+The proposed umbrella `foss-earth/panorama` is replaced by these explicit
+boundaries. A viewer tab does not own every representation it can show.
+
+| Current structure | Proposed repository | Scope |
+| --- | --- | --- |
+| Full 2:1 equirectangular image | `foss-earth/equirectangular` | Record/schema, spherical coordinate mapping, whole-image loading/sampling and preparation |
+| Whole six-face cubemap | `foss-earth/cubemap` | Face conventions, seam-aware math/filtering, six-face loading/sampling and preparation |
+| Tiled cubemap: gnomonic or equi-angular warp | `foss-earth/tiled-cubemap` | Six face quadtrees, tile addressing/selection/LOD, scheduler, GPU atlas/display table and preparation. Both current warps share the storage contract; their math remains explicit. |
+| Packed sheet of many cube previews | `foss-earth/preview-sheets` | Sheet/placement extension, packing, region decoding/loading and fallback to individual cube faces |
+
+`foss-earth/360` composes these packages and owns the viewer's public API and
+common presentation. `foss-earth/images` owns the common contracts and resource
+services below them. Representation packages never import `360`, `scenes` or
+the globe engine. Optional GPU adapters consume `foss-earth/renderer` services;
+pure representation/schema entry points do not initialize a renderer.
+`tiled-cubemap` and `preview-sheets` may consume pure cubemap conventions, without
+requiring whole-cube loading or producing a reverse cubemap dependency.
+
+Shared request/decode/upload/residency limits are reserved through one supplied
+resource broker; every format does not get another full budget, cache or draw
+loop. Preparation composition calls source and destination adapters rather
+than introducing reciprocal imports between conversion formats. JPEG/PNG are
+codecs, and preview/immersion are roles; neither creates another data-structure
+repository. New image structures receive their own owners when admitted.
 
 ## Public interfaces and dependency direction
 
@@ -540,7 +577,13 @@ flowchart TD
   App --> Exhaust[0sfs/exhaust]
   Engines -. optical profiles and assets .-> Exhaust
   Globe --> Renderer[foss-earth/renderer]
-  Globe --> World[FOSS Earth sky, weather and panorama]
+  Globe --> World[FOSS Earth sky and weather]
+  Globe --> Scenes[foss-earth/scenes]
+  Scenes --> Viewer[foss-earth/360]
+  Viewer --> Representations[Equirectangular, cubemap, tiled cubemap, preview sheets]
+  Viewer --> Images[foss-earth/images]
+  Representations --> Images
+  Viewer --> Renderer
   App --> Contact[Ground contact adapter]
   App --> Native[JSBSim SDK and accepted-step adapter]
   App --> UI[foss-earth/ui]
@@ -731,8 +774,10 @@ the UI alone is not proof that a particular commit is still reachable.
    Extract `ground-contact` after the aircraft/native/surface interfaces are
    explicit, preserving support-query and accepted-step behavior.
 6. **Shared world and campus applications:** extract `foss-earth/sky`,
-   `foss-earth/weather` and `foss-earth/panorama`, following weather's staged
-   specification. Validate globe, flight and tour consumers as applicable.
+   `foss-earth/weather`, `foss-earth/scenes` and `foss-earth/360`, with image
+   contracts and each representation extracted before viewer composition.
+   Follow weather's staged specification. Validate globe, flight and tour
+   consumers as applicable.
    Separate `UMN-VR/tour` from club publishing and decide the optional
    UMN-owned media boundary. These changes share the coordinated release plan;
    UMN never acquires a flight dependency.

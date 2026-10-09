@@ -36,9 +36,9 @@ dedicated `UMN-VR/about` repository. See the
 | Settings / `settings` | `foss-earth/ui`, with host services | **Shared with UI.** Presets, saved records, App files and Diagnostics manage one application-wide registry and its services, not another copy of feature settings. |
 | About / `about` | **`UMN-VR/about`**, consuming `foss-earth/about` | **Dedicated campus feature.** Campus tab code, project information, credits/links, authored dependency-graph metadata and manifest adapter live here. `UMN-VR/tour` supplies resolved build data; the adapter never imports the tour runtime. |
 | Bug report / `bug-report` | `foss-earth/ui`; campus identity/report destination in `UMN-VR/tour` | **Shared with UI.** The report form consumes registered diagnostic providers. Campus-specific identity is supplied as data. |
-| Scenes / `scenes` | `foss-earth/panorama`; campus content in `UMN-VR/tour` or optional `UMN-VR/twin-cities-content` | **Dedicated shared viewer feature.** Loader/panel code shares the panorama lifecycle; photographs, placements and platform imports remain UMN-owned. |
-| `360: <photograph title>` / `panorama` | `foss-earth/panorama`, with UMN-owned image content | **Shared with Scenes.** One dynamically titled view of the active image, not a repository per photograph or campus stop. |
-| 360 image settings / `panorama-settings` | `foss-earth/panorama` | **Shared with the viewer.** Camera/levelling, representation, sharpness and image budgets govern the same image lifecycle. |
+| Scenes / `scenes` | `foss-earth/scenes`; campus content in `UMN-VR/tour` or optional `UMN-VR/twin-cities-content` | **Dedicated scene feature.** Manifest validation, placements, groups/links and navigation compose the 360 viewer; photographs and platform imports remain UMN-owned. |
+| `360: <photograph title>` / `panorama` | **`foss-earth/360`**, consuming separate image-representation repositories | **Dedicated top-level viewer.** Owns the active-image tab and shared presentation. Each data structure owns its own loading/sampling code; photographs remain UMN-owned. |
+| 360 image settings / `panorama-settings` | `foss-earth/360`, with representation-owned sections | **Shared viewer controls.** Camera/entry settings share the active-view lifecycle. Data-structure-specific controls live with their representation and appear here through registration. |
 
 Location, Map, Sky and Date/time are globe-only; the two image tabs are
 panorama-only. The other seven tabs work in both contexts. **Dev and Weather
@@ -67,14 +67,38 @@ owns the detailed shared-boundary decisions and source references.
 | Settings / `settings` | `foss-earth/ui`, with host services | **Shared with UI.** Presets, saved-record validation, App files and Diagnostics manage registered state and services; they do not own every feature implementation. |
 | About / `about` | `foss-earth/about`, with globe-owned build data | **Dedicated.** Generic About presentation, provenance and dependency-graph viewer. The globe supplies its actual installed manifest. |
 | Bug report / `bug-report` | `foss-earth/ui` | **Shared with UI.** Form, report-provider contracts and diagnostic presentation share one infrastructure owner. |
-| Scenes / `scenes` | `foss-earth/panorama` | **Dedicated viewer feature.** Scene schema, loader, image resources, transitions and tools share one lifecycle. |
-| `360: <title>` / `panorama` | `foss-earth/panorama` | **Shared with Scenes.** This is the active image's view, whose title changes with content. |
-| 360 image settings / `panorama-settings` | `foss-earth/panorama` | **Shared with the viewer.** These controls govern the same camera, image resources and entry/exit lifecycle. |
+| Scenes / `scenes` | `foss-earth/scenes` | **Dedicated scene feature.** Schema, loader, placements, groups/links and navigation orchestrate the 360 viewer without owning its image formats. |
+| `360: <title>` / `panorama` | **`foss-earth/360`**, consuming separate image-representation repositories | **Dedicated top-level viewer.** This is the active image's view. Equirectangular, cubemap, tiled-cubemap and preview-sheet implementations have their own repositories. |
+| 360 image settings / `panorama-settings` | `foss-earth/360`, with representation-owned sections | **Shared viewer controls.** Common camera/entry settings live with the viewer; format settings and behavior live with their respective image repositories. |
 
 The globe/panorama availability rules match UMN's. **Dev and Weather are
 proposed shared features; there is no current shared Debug tab.** Performance
 debug and Frame budget are Renderer sections. The bottom toolbar is proposed
 as `foss-earth/toolbar`; its buttons open the existing tabs.
+
+## 360 image data structures
+
+**`foss-earth/360` is the top-level viewer repository.** The two image tabs
+compose several implementation repositories; tab ownership does not collapse
+the data structures into one package. Current records and source mappings are
+audited in [FOSS Earth's image repository proposal](../../../foss-earth/docs/proposals/image-repositories.md).
+
+| Data structure or shared responsibility | Proposed repository | Decision |
+| --- | --- | --- |
+| Whole 2:1 equirectangular image | `foss-earth/equirectangular` | Separate schema, direction/UV mapping, loading/sampling, preparation and tests. |
+| Whole six-face cubemap | `foss-earth/cubemap` | Separate face conventions, orientation/seam math, six-face loading/sampling and preparation. |
+| Six quadtrees of cubemap tiles, gnomonic warp | `foss-earth/tiled-cubemap` | Separate tile addressing/LOD, selection, scheduling, atlas/display table and preparation. |
+| Six quadtrees of cubemap tiles, equi-angular warp | `foss-earth/tiled-cubemap` | Explicit second projection variant of the same stored tile structure; shares the tile scheduler, not a second copy. |
+| One sheet packing many cube previews | `foss-earth/preview-sheets` | Separate sheet/placement extension, packing/loading and individual-face fallback. |
+| Common image contracts, cache and resource accounting | `foss-earth/images` | Shared foundation with no imports of concrete formats or the viewer. |
+| Orb/immersive presentation, active-image and settings tabs | `foss-earth/360` | Top-level composition consumes representation packages and their common contracts. |
+| Scene envelope, placements, links and Scenes tab | `foss-earth/scenes` | Scene composition consumes the viewer; the viewer does not import scene or globe implementations. |
+
+These are repository boundaries beneath existing tabs, not additional tab IDs.
+JPEG/PNG are codec choices; preview/immersion are roles. Neither is a separate
+image data structure. The packed preview sheet and runtime tile atlas are
+different structures: preview transport belongs to `preview-sheets`, and the
+tiled representation's GPU addressing belongs to `tiled-cubemap`.
 
 ## 0sfs flight tabs
 
