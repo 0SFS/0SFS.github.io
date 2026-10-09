@@ -1,5 +1,10 @@
 # FOSS Earth Relationship
 
+The [repository split specification](proposals/repository-split.md) proposes
+feature repositories, aircraft and engine packages, and shared-world
+extractions. The structure below describes the current implementation until
+each extraction lands.
+
 ## Current Structure
 
 0SFS and FOSS Earth are separate sibling repositories, and both use a third, gamepad-tools:
