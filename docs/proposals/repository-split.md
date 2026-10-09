@@ -266,7 +266,8 @@ and assets; neither depends on the flight logo package.
 
 ## Current flight tabs and target owners
 
-The complete source audit is the [flight tab inventory](tab-inventory.md):
+The [combined tab inventory](tab-inventory.md) visibly lists all three apps;
+its [flight section](tab-inventory.md#0sfs-flight-tabs) audits
 **21 current tabs, comprising twelve flight definitions and nine shared tabs**.
 Every row records a dedicated repository or an explicit reason to share one.
 The corresponding inventories live with
@@ -458,8 +459,8 @@ flight panel. Dev is a proposed additional contribution, labeled below.
 | --- | --- | --- |
 | Sky | `foss-earth/sky` | One coherent shared-world feature. |
 | Date and time | `foss-earth/sky`, with host-supplied scene clock | The existing `sky.time.*` controls and solar dials share astronomy with Sky; a second repo would divide one model. |
-| Location | `foss-earth/engine` | The globe navigation entry point shares its destination contract with camera/surface services; a panel-only repo would divide that entry point. Independently released search providers could justify a later boundary. |
-| Map | `foss-earth/engine` | Map sources, terrain/imagery loading, residency and authoritative surface queries are the globe engine's central feature and resource owner; another `map` repo would currently duplicate that boundary. |
+| Location | `foss-earth/engine` initially | Navigation and camera/surface placement remain globe responsibilities. A separate provider/result/search repository is still undecided; define that contract before choosing its boundary. |
+| Map | `foss-earth/engine` initially | Terrain/imagery, residency and surface queries share the globe's central resource lifecycle. A narrower Map extraction remains undecided and needs explicit surface-query/readiness interfaces. |
 | Renderer | `foss-earth/renderer`, with sections supplied by features | Backend, scene resources and frame scheduling move behind a globe-independent interface; aircraft instrument/external-tank sections retain their owners. |
 | Controls | `foss-earth/engine` input + gamepad-tools; `0sfs/controls` only in flight | One user-facing tab assembles the relevant input owners. Globe and UMN need no flight controls package; a shared panel-only wrapper would not own the input behavior. |
 | Interface | `foss-earth/ui` + `foss-earth/toolbar` | The tab assembles generic panel/widgets and bottom-bar settings, with readouts/services supplied by owners. An extra `interface` repo would add composition without a separate state or lifecycle. |
@@ -472,8 +473,9 @@ flight panel. Dev is a proposed additional contribution, labeled below.
 | 360 image settings | `foss-earth/panorama` | Shares camera, image loading, budgets and lifecycle with the other panorama tabs. |
 
 These are explicit exceptions, not a general license to keep unrelated code
-in the application. Renderer is now a target extraction; Map remains in
-`foss-earth/engine`. Their current resource lifecycles are coupled, so establish
+in the application. Renderer is a target extraction; Map provisionally remains
+in `foss-earth/engine`, with a narrower extraction still open for discussion.
+Their current resource lifecycles are coupled, so establish
 scene/resource/request-render interfaces before moving implementation. The globe
 consumes `foss-earth/renderer`; the renderer never imports the globe. Both owners
 must validate readiness, disposal and scheduling through those interfaces.

@@ -1,9 +1,82 @@
-# Flight tab inventory and repository decisions
+# Tab inventory across 0sfs, FOSS Earth and the UMN tour
 
-Audited from the current source on 2026-10-08. This is a repository-split
-proposal, not a record of completed extractions. Every actual tab has a row
-below; an existing section, button, dialog or website route is not counted as
-another tab.
+Audited from the current source on 2026-10-08. This coordination overview lists
+**every current tab in all three applications**, with its proposed repository
+or a reason to share one. Repository destinations are proposals, not completed
+extractions. Sections, buttons, dialogs and website routes are not counted as
+additional tabs.
+
+| Application | Current tab IDs | Jump to its table | Dependency graph |
+| --- | ---: | --- | --- |
+| 0sfs | 21 | [Flight tabs](#0sfs-flight-tabs) | [Flight graph](repository-split-graph.html) |
+| FOSS Earth | 13 | [Globe tabs](#foss-earth-tabs) | [FOSS Earth graph](../../../foss-earth/docs/proposals/repository-split-graph.html) |
+| UMN tour | 13 | [Campus tabs, including `UMN-VR/about`](#umn-tour-tabs) | [UMN graph](../../../UMN-VR/UMN-VR.github.io/docs/proposals/repository-split-graph.html) |
+
+The FOSS Earth and UMN tables below summarize their own detailed source audits,
+which remain authoritative in those repositories. This overview coordinates
+the split; it does not move shared or campus code into 0sfs.
+
+## UMN tour tabs
+
+**13 current IDs: 11 available on the globe, nine inside a panorama.** The
+campus host uses FOSS Earth's shared tab implementations and supplies its own
+scene, photographs and build identity. Its proposed About contribution has a
+dedicated `UMN-VR/about` repository. See the
+[UMN source audit and exact registration conditions](../../../UMN-VR/UMN-VR.github.io/docs/proposals/tab-inventory.md).
+
+| Exact title / ID | Proposed repository or owners | Decision and reason |
+| --- | --- | --- |
+| Location / `location` | `foss-earth/engine` initially | **Shared, provisional.** Search/coordinates feed the globe navigation and placement services. A separate provider/search boundary remains open; UMN needs no campus-specific copy of that implementation. |
+| Map / `map` | `foss-earth/engine` initially | **Shared, provisional.** Sources, terrain/imagery, residency and surface queries share one resource lifecycle. A narrower Map extraction remains undecided and needs explicit surface/readiness interfaces. |
+| Renderer / `renderer` | `foss-earth/renderer` | **Dedicated shared feature.** Device, backend, scene resources and frame scheduling remain generic globe infrastructure. |
+| Sky / `sky` | `foss-earth/sky` | **Dedicated shared feature.** The tour uses the same astronomy, atmosphere and lighting model. |
+| Date and time / `time` | `foss-earth/sky`, with a host-supplied clock | **Shared with Sky.** Both tabs operate the same astronomy/time model. |
+| Controls / `controls` | `foss-earth/engine` input/camera + gamepad-tools | **Composed tab.** Globe gestures and controller handling retain their existing owners; no flight-controls package is needed. |
+| Interface / `interface` | `foss-earth/ui` + `foss-earth/toolbar` | **Composed tab.** Generic widgets/log presentation and bottom-bar layout have separate owners; world services supply positions and search results. |
+| Settings / `settings` | `foss-earth/ui`, with host services | **Shared with UI.** Presets, saved records, App files and Diagnostics manage one application-wide registry and its services, not another copy of feature settings. |
+| About / `about` | **`UMN-VR/about`**, consuming `foss-earth/about` | **Dedicated campus feature.** Campus tab code, project information, credits/links, authored dependency-graph metadata and manifest adapter live here. `UMN-VR/tour` supplies resolved build data; the adapter never imports the tour runtime. |
+| Bug report / `bug-report` | `foss-earth/ui`; campus identity/report destination in `UMN-VR/tour` | **Shared with UI.** The report form consumes registered diagnostic providers. Campus-specific identity is supplied as data. |
+| Scenes / `scenes` | `foss-earth/panorama`; campus content in `UMN-VR/tour` or optional `UMN-VR/twin-cities-content` | **Dedicated shared viewer feature.** Loader/panel code shares the panorama lifecycle; photographs, placements and platform imports remain UMN-owned. |
+| `360: <photograph title>` / `panorama` | `foss-earth/panorama`, with UMN-owned image content | **Shared with Scenes.** One dynamically titled view of the active image, not a repository per photograph or campus stop. |
+| 360 image settings / `panorama-settings` | `foss-earth/panorama` | **Shared with the viewer.** Camera/levelling, representation, sharpness and image budgets govern the same image lifecycle. |
+
+Location, Map, Sky and Date/time are globe-only; the two image tabs are
+panorama-only. The other seven tabs work in both contexts. **Dev and Weather
+are proposed additions, not current UMN tabs.** `UMN-VR/tour` would register
+its campus Dev panels through `foss-earth/dev`; shared Weather belongs to
+`foss-earth/weather`. The club website and campus tour are separate proposed
+application repositories, not extra tab IDs.
+
+## FOSS Earth tabs
+
+**13 current IDs: 11 available on the globe, nine inside a panorama.** These
+are the same shared IDs used by the campus host, with FOSS Earth's own content
+and build identity. The
+[FOSS Earth source audit](../../../foss-earth/docs/proposals/tab-inventory.md)
+owns the detailed shared-boundary decisions and source references.
+
+| Exact title / ID | Proposed repository or owners | Decision and reason |
+| --- | --- | --- |
+| Location / `location` | `foss-earth/engine` initially | **Shared, provisional.** Navigation/placement stays with the globe; an independent provider/result/search package remains undecided. |
+| Map / `map` | `foss-earth/engine` initially | **Shared, provisional.** Terrain/imagery, streaming and surface queries are the globe's central resource owner. A narrower Map repo needs surface-query, readiness/revision and renderer-resource contracts first. |
+| Renderer / `renderer` | `foss-earth/renderer` | **Dedicated.** Owns device/scene/backend lifecycle and frame scheduling; consumes no globe implementation. |
+| Sky / `sky` | `foss-earth/sky` | **Dedicated.** Astronomy, atmosphere, stars and physical lighting, with host-supplied time/terrain interfaces. |
+| Date and time / `time` | `foss-earth/sky` | **Shared with Sky.** Its dials edit the same astronomy model and instant. |
+| Controls / `controls` | `foss-earth/engine` input/camera + gamepad-tools | **Composed tab.** World gestures and device handling are separate responsibilities with established owners. |
+| Interface / `interface` | `foss-earth/ui` + `foss-earth/toolbar` | **Composed tab.** Windows/widgets and bottom-bar layout remain separate; values and callbacks come from feature owners. |
+| Settings / `settings` | `foss-earth/ui`, with host services | **Shared with UI.** Presets, saved-record validation, App files and Diagnostics manage registered state and services; they do not own every feature implementation. |
+| About / `about` | `foss-earth/about`, with globe-owned build data | **Dedicated.** Generic About presentation, provenance and dependency-graph viewer. The globe supplies its actual installed manifest. |
+| Bug report / `bug-report` | `foss-earth/ui` | **Shared with UI.** Form, report-provider contracts and diagnostic presentation share one infrastructure owner. |
+| Scenes / `scenes` | `foss-earth/panorama` | **Dedicated viewer feature.** Scene schema, loader, image resources, transitions and tools share one lifecycle. |
+| `360: <title>` / `panorama` | `foss-earth/panorama` | **Shared with Scenes.** This is the active image's view, whose title changes with content. |
+| 360 image settings / `panorama-settings` | `foss-earth/panorama` | **Shared with the viewer.** These controls govern the same camera, image resources and entry/exit lifecycle. |
+
+The globe/panorama availability rules match UMN's. **Dev and Weather are
+proposed shared features; there is no current shared Debug tab.** Performance
+debug and Frame budget are Renderer sections. The bottom toolbar is proposed
+as `foss-earth/toolbar`; its buttons open the existing tabs.
+
+## 0sfs flight tabs
 
 The flight application registers **21 distinct tabs: twelve flight definitions
 and nine shared definitions**. The twelve are declared in
@@ -15,7 +88,7 @@ its elements and sections from
 Registration means a tab is available to open, not that every panel is visible
 at once. Saved workspace state controls which panels are open.
 
-## All 21 current tabs
+### All 21 current flight tabs
 
 “Dedicated” means the proposal includes a repository for that feature.
 “Shared” means no additional repository named after this tab; the row explains
@@ -36,8 +109,8 @@ in the FOSS Earth organization, even when their tab is first implemented here.
 | G-forces / `gforces` | `0sfs/g-forces` | **Dedicated.** Pilot-load interpretation, overlays and controls; native vehicle dynamics remain in JSBSim. |
 | Logging / `logging` | `0sfs/logging` | **Dedicated.** Flight recorder, channels, history and export. The generic status log belongs to `foss-earth/ui`, not this recorder. |
 | Debug / `debug` | `0sfs/simulator` composition; diagnostic implementations with their feature owners | **Shared.** This tab combines frame budget, forces, contacts and aircraft visuals. A separate `debug` repository would either take code away from those owners or merely wrap their sections. The host registers them; proposed developer-only tooling is covered separately below. |
-| Location / `location` | `foss-earth/engine`; flight placement callback in `0sfs/simulator` | **Shared.** This is the globe's navigation entry point: search/coordinates produce a destination that camera and surface services resolve. The flight host adds teleport/start placement. A panel-only `location` repository would split that entry point from its navigation contract; independently released search providers could justify a later boundary. |
-| Map / `map` | `foss-earth/engine` | **Shared.** Map sources, terrain/imagery selection, residency and authoritative surface queries are the globe engine's central feature and one resource owner. A second `map` repository would currently duplicate the engine boundary. Device/scene/frame services are extracted separately into Renderer. |
+| Location / `location` | `foss-earth/engine` initially; flight placement callback in `0sfs/simulator` | **Shared, provisional.** Search/coordinates feed globe navigation and surface services; flight adds teleport/start placement. A separate provider/result/search repository remains undecided in the FOSS Earth audit. |
+| Map / `map` | `foss-earth/engine` initially | **Shared, provisional.** Map sources, terrain/imagery, residency and surface queries share one globe resource owner. A narrower Map extraction remains undecided and needs explicit surface/readiness interfaces. Device/scene/frame services are extracted separately into Renderer. |
 | Renderer / `renderer` | `foss-earth/renderer`, with feature-owned section contributions | **Dedicated.** Backend, GPU resources and frame scheduling form a separate lifecycle. Aircraft instrument and external-tank controls keep their flight owners while appearing here. |
 | Sky / `sky` | `foss-earth/sky` | **Dedicated.** Shared atmosphere/astronomy/lighting and its panel. |
 | Date and time / `time` | `foss-earth/sky`; clock supplied by the host | **Shared with Sky.** Both panels operate the same `sky.time.*` astronomy model. A separate repository would divide one model between two releases; the host retains the authoritative scene/simulation clock. |
@@ -51,7 +124,7 @@ are not arguments against revisiting a boundary during this brainstorm.
 The [split specification](repository-split.md) defines contracts, migration
 order and the [proposed dependency graph](repository-split-graph.html).
 
-## Availability and exclusions
+### Flight availability and exclusions
 
 All twelve flight tabs are unconditional registrations. Aircraft-dependent
 STOVL, afterburner and Engine Simulation controls hide **sections**, not their
@@ -89,7 +162,8 @@ are outside this in-app feature-tab inventory.
 
 When a tab is added, removed or conditionally registered, update its host's
 inventory, record either a dedicated repository or an explicit exception,
-and update the graph if ownership or dependencies change. Inventory the host's
+and update this combined overview alongside the owning project's source audit.
+Update the graph if ownership or dependencies change. Inventory the host's
 supplied props and context filters as well as the shared registry: counting
 the registry alone incorrectly gives flight the panorama tabs and misses
 its twelve application contributions.
