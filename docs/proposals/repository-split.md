@@ -63,7 +63,8 @@ prototypes while they are reviewed; no new remote repository is needed now.
 | `foss-earth/sky`, `foss-earth/weather`, `foss-earth/panorama` | Shared astronomy/lighting, environmental fields, and panorama formats/viewer/tools, with their optional panels |
 | `foss-earth/dev_installer`, `foss-earth/ci` | Reusable workspace setup and common checks, consuming project-owned manifests and policy configuration |
 | `UMN-VR/UMN-VR.github.io` | Club website, navigation and published access to the independently released campus tour |
-| `UMN-VR/tour` | Campus-tour application, scene placements, campus content and import adapters, release/workspace/graph manifests, and tour-specific panels |
+| `UMN-VR/tour` | Campus-tour application, scene placements, campus content and import adapters, release/workspace manifests, and tour-specific panels |
+| `UMN-VR/about` | Campus About tab composition, project information, links/credits, authored graph metadata and release-manifest adapter, consuming `foss-earth/about` |
 | `UMN-VR/twin-cities-content` | Optional versioned campus-media package when media delivery requires an independent release; external versioned hosting can provide the same boundary |
 
 The library/site split makes FOSS Earth's dependency explicit: flight and tour
@@ -195,9 +196,13 @@ repository's calling workflow, and keep required check identities stable.
 schema, validator and viewer. It consumes `foss-earth/ui`; the UI
 does not import About or any application. `0sfs/about` supplies flight-specific
 content and adapts the simulator build manifest to that shared presentation.
-The globe site and UMN tour supply their own content and manifests without
-importing `0sfs/about`. Release assembly supplies the graph; About does not
-import every dependency to discover its identity.
+`UMN-VR/about` likewise owns the campus About tab's composition, content,
+authored graph metadata and release-manifest adapter. The tour supplies its
+resolved build manifest to that package; About never imports the tour runtime.
+The globe site supplies its own content and manifest directly to the shared
+viewer. Neither globe nor tour imports `0sfs/about`. Release assembly supplies
+the installed dependency graph; About does not import every dependency to
+discover its identity.
 
 There are three separately owned prototype data files, each at
 `docs/proposals/repository-split-graph.json` in the existing flight, FOSS Earth
@@ -240,8 +245,9 @@ layout is presentation; it must not change the underlying dependency records.
 The prototype data and architecture explanations remain with their applications
 until their own documentation destinations are established. Shared production
 graph code belongs in `foss-earth/about`; flight About content and its adapter
-belong in `0sfs/about`. Each application remains the owner of the manifest/data
-describing its build.
+belong in `0sfs/about`, and campus About content, authored graph metadata and
+its adapter belong in `UMN-VR/about`. Release assembly and exact pins stay with
+each application, which supplies the resolved manifest as data.
 
 ## Dev panels and flight branding
 
@@ -458,7 +464,7 @@ flight panel. Dev is a proposed additional contribution, labeled below.
 | Controls | `foss-earth/engine` input + gamepad-tools; `0sfs/controls` only in flight | One user-facing tab assembles the relevant input owners. Globe and UMN need no flight controls package; a shared panel-only wrapper would not own the input behavior. |
 | Interface | `foss-earth/ui` + `foss-earth/toolbar` | The tab assembles generic panel/widgets and bottom-bar settings, with readouts/services supplied by owners. An extra `interface` repo would add composition without a separate state or lifecycle. |
 | Settings | `foss-earth/ui` | This is the settings registry's management view: presets, saved records and import/export use the same registry/migrations as feature panels. Globe/UMN also provide App files and Diagnostics sections; flight provides Diagnostics without App files. |
-| About | `foss-earth/about`, with host-owned content/manifest adapters | Flight supplies `0sfs/about`; globe and UMN hosts supply their own content. |
+| About | `foss-earth/about`, with dedicated app-owned content/manifest adapters | Flight supplies `0sfs/about`; campus supplies `UMN-VR/about`; globe supplies its own content directly. Each app retains release assembly and injects resolved manifest data. |
 | Bug report | `foss-earth/ui` | Form, redaction and report lifecycle consume the UI diagnostics/log contracts. Keep that management view with those contracts; hosts supply observations and reporter configuration. |
 | Dev (proposed) | `foss-earth/dev`, with host-owned panel contributions | Shared activation/registration; `0sfs/dev` supplies flight panels and globe/UMN supply their own. |
 | Scenes | `foss-earth/panorama` | Generic scene definitions, loader and tools are shared with the active panorama. |
@@ -543,11 +549,12 @@ flowchart TD
   App --> FlightAbout[0sfs/about]
   FlightAbout --> About[foss-earth/about]
   EarthSite --> About
-  Tour --> About
+  Tour --> CampusAbout[UMN-VR/about]
+  CampusAbout --> About
   About --> UI
   App -. flight build manifest .-> FlightAbout
   EarthSite -. globe build manifest .-> About
-  Tour -. tour build manifest .-> About
+  Tour -. tour build manifest .-> CampusAbout
   App --> FlightDev[0sfs/dev]
   FlightDev --> Dev[foss-earth/dev]
   EarthSite --> Dev
@@ -702,8 +709,9 @@ the UI alone is not proof that a particular commit is still reachable.
    catalogs from host registry construction and toolbar contributions.
    Validate globe, flight and tour consumers before they depend on external panels.
    Extract `foss-earth/about` and `foss-earth/dev` against that foundation.
-   Each host owns its manifests and panel/content contributions; `0sfs/about`
-   and `0sfs/dev` supply flight-specific adapters. Use the three host-owned
+   Each host owns its release manifests; `0sfs/about` and `UMN-VR/about` own
+   their domain-specific About contributions, while `0sfs/dev` supplies flight
+   developer adapters. Use the three host-owned
    JSON graph prototypes and shared viewer to establish graph semantics.
 4. **Aircraft and engine contracts:** define manifests, compatibility and asset
    resolution; extract `aircraft`, then F135/FJ33/IO320 and F-35B/SF-50/C172
