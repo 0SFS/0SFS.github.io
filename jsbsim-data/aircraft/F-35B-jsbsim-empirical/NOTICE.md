@@ -4,8 +4,12 @@ The F-35B as it flew before its F135 became JSBSim's coupled engine plant, kept
 so the two engine models can be flown one after the other. Choose it in
 **Engine → Simulation → Engine model**.
 
-These four files are byte-identical to the F-35B package at 0sfs commit
-`d92a928a`, the last before the plant:
+The three engine files are byte-identical to the F-35B package at 0sfs commit
+`d92a928a`, the last before the plant. The aircraft XML matches that snapshot
+except for the 2026-10-12 primary-surface actuators, which are the same radian
+rate limit as the current model (`fcs/primary-surface-rate-limit-rad_sec`,
+60 deg/s, an explicit assumption). The aircraft hash below is the pre-actuator
+snapshot:
 
 | File here | Was | SHA-256 |
 | --- | --- | --- |

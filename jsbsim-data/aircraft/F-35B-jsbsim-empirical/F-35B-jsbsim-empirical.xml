@@ -316,6 +316,12 @@
         <property value="0">fcs/control-law-mode</property>
         <property value="1">fcs/fbw-enabled</property>
         <property value="636.6197723675814">fcs/full-stick-roll-rate-deg_sec</property>
+        <!-- Unloaded rate of the horizontal tails and rudders.
+             60 deg/s is an explicit assumption, not a published F-35 actuator
+             rating. No servo lag and no hinge-moment relief. The flaperon
+             channel keeps the inherited kinematic: the roll-rate law hunts
+             against this rate. -->
+        <property value="1.0471975511965976">fcs/primary-surface-rate-limit-rad_sec</property>
         <property value="1">fcs/flaps-auto-enabled</property>
         <property>fcs/alpha-norm</property>
         <property>fcs/canopy-engage</property>
@@ -717,29 +723,35 @@
               <default value="fcs/g-load-command"/>
               <test value="fcs/pitch-manual-command">fcs/fbw-enabled eq 0</test>
             </switch>
-            <kinematic name="elevator position">
-                <input>fcs/pitch-actuator-command</input>
-                <traverse>
-                    <setting>
-                        <position>-1</position>
-                        <time>0.35</time>
-                    </setting>
-                    <setting>
-                        <position>1</position>
-                        <time>0.35</time>
-                    </setting>
-                </traverse>
-                <output>fcs/elevator-pos-norm</output>
-            </kinematic>
-
- <aerosurface_scale name="elevator-pos-rad">
- <input>fcs/elevator-pos-norm</input>
- <range>
- <min>-0.79</min>
- <max>0.79</max>
- </range>
-  <output>fcs/elevator-pos-rad</output>
- </aerosurface_scale>
+            <aerosurface_scale name="elevator command rad">
+              <input>fcs/pitch-actuator-command</input>
+              <range>
+                <min>-0.79</min>
+                <max>0.79</max>
+              </range>
+              <output>fcs/elevator-cmd-rad</output>
+            </aerosurface_scale>
+            <actuator name="elevator position">
+              <input>fcs/elevator-cmd-rad</input>
+              <rate_limit>fcs/primary-surface-rate-limit-rad_sec</rate_limit>
+              <clipto>
+                <min>-0.79</min>
+                <max>0.79</max>
+              </clipto>
+              <output>fcs/elevator-pos-rad</output>
+            </actuator>
+            <aerosurface_scale name="elevator pos norm">
+              <input>fcs/elevator-pos-rad</input>
+              <domain>
+                <min>-0.79</min>
+                <max>0.79</max>
+              </domain>
+              <range>
+                <min>-1</min>
+                <max>1</max>
+              </range>
+              <output>fcs/elevator-pos-norm</output>
+            </aerosurface_scale>
 
  </channel>
 
@@ -818,38 +830,34 @@
               <test value="fcs/yaw-manual-command">fcs/fbw-enabled eq 0</test>
             </switch>
 
-            <kinematic name="rudder position">
-                <input>fcs/yaw-scheduler</input>
-                <traverse>
-                    <setting>
-                        <position>-1</position>
-                        <time>0.35</time>
-                    </setting>
-                    <setting>
-                        <position>1</position>
-                        <time>0.35</time>
-                    </setting>
-                </traverse>
-                <output>fcs/rudder-position</output>
-            </kinematic>
-
-<lag_filter name="rudder pos norm">
-<input>-fcs/rudder-position</input>
-<c1>10</c1>
-<clipto>
-<min>-1</min>
-<max>1</max>
-</clipto>
-<output>fcs/rudder-pos-norm</output>
-</lag_filter>
-
-            <aerosurface_scale name="Rudder Control">
-                <input>-fcs/rudder-pos-norm</input>
-                <range>
-                    <min>-0.524</min>
-                    <max>0.524</max>
-                </range>
-                <output>fcs/rudder-pos-rad</output>
+            <aerosurface_scale name="rudder command rad">
+              <input>fcs/yaw-scheduler</input>
+              <range>
+                <min>-0.524</min>
+                <max>0.524</max>
+              </range>
+              <output>fcs/rudder-cmd-rad</output>
+            </aerosurface_scale>
+            <actuator name="rudder position">
+              <input>fcs/rudder-cmd-rad</input>
+              <rate_limit>fcs/primary-surface-rate-limit-rad_sec</rate_limit>
+              <clipto>
+                <min>-0.524</min>
+                <max>0.524</max>
+              </clipto>
+              <output>fcs/rudder-pos-rad</output>
+            </actuator>
+            <aerosurface_scale name="rudder pos norm">
+              <input>fcs/rudder-pos-rad</input>
+              <domain>
+                <min>-0.524</min>
+                <max>0.524</max>
+              </domain>
+              <range>
+                <min>-1</min>
+                <max>1</max>
+              </range>
+              <output>fcs/rudder-pos-norm</output>
             </aerosurface_scale>
 
 <lag_filter name="rudder-cmd-norm-filtered">

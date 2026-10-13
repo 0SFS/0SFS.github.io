@@ -151,6 +151,18 @@ records original paths, original hashes, current hashes, and changes.
 - The installed SDK's coupled solve, its energy and mass ledgers and the
   calibration evidence are development checks, not engine qualification.
 
+## 0SFS modifications, 2026-10-12
+
+- The horizontal tails and rudders are JSBSim actuators on the radian position
+  the aerodynamics and the exterior read. The inherited kinematic traversed its
+  normalized command in 0.35 s, about 259 deg/s at the tail and 172 deg/s at
+  the rudder. `fcs/primary-surface-rate-limit-rad_sec` is 60 deg/s, an explicit
+  assumption, not a published F-35 actuator rating. There is no servo lag and
+  no hinge-moment relief. Moment per radian is unchanged. A zero-time trim
+  evaluation still jumps each actuator to its command; a normal step slews.
+  The flaperon channel keeps the inherited kinematic. At this rate the
+  roll-rate law hunts and the roll grows.
+
 ## Qualification boundary
 
 Installed-SDK tests cover actual app bootstrap, relocation, trim adoption,
