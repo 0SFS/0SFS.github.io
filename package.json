@@ -1,0 +1,20 @@
+{
+  "name": "@0sfs/landing",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "AGPL-3.0-only",
+  "description": "The 0SFS landing page and the site build that serves the flight at /fly/ and the phone controller at /rc/.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/0SFS/0SFS.github.io.git"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/serve.mjs",
+    "check": "node scripts/check-landing-page.mjs",
+    "test": "node --test scripts/*.test.mjs",
+    "deploy": "node scripts/deploy.mjs"
+  },
+  "devDependencies": {}
+}
