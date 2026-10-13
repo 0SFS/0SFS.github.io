@@ -1,0 +1,178 @@
+<?xml version="1.0"?>
+<!-- 0SFS modifications 2026-10-08: the F135-PW-600 as a coupled turbine plant
+     (JSBSim doc/turbine-plant-model.md), replacing the empirical thrust tables,
+     the thermal observer and the separate lift-fan and roll-post engines.
+     A calibrated approximation from public ratings, not a measured engine.
+     Provenance and uncertainty of every value: docs/validation/f135-engine-plant.md
+     in the 0SFS source tree. Original GPL source retained in
+     planes/Lockheed_Martin_F-35B/tests/flightgear-jsbsim. -->
+
+<!--
+  File:     F135-PW-600.xml
+  Author:   Aero-Matic v 0.81
+
+  Inputs:
+    name:           F135-PW-600
+    type:           turbine
+    thrust:         43000 lb
+    augmented?      yes
+    injected?       no
+-->
+
+<turbine_engine name="F135-PW-600">
+  <!-- Published STOVL ratings, kept for reference; the plant computes thrust. -->
+  <milthrust> 27000.0 </milthrust>
+  <maxthrust> 41000.0 </maxthrust>
+  <bypassratio> 0.56 </bypassratio>
+  <augmented> 1 </augmented>
+  <augmethod> 1 </augmethod>
+  <injected> 0 </injected>
+
+  <plant name="F135-PW-600">
+    <design>
+      <thrust-n>119583</thrust-n>
+      <bypass-ratio>0.56</bypass-ratio>
+      <overall-pressure-ratio>28</overall-pressure-ratio>
+      <turbine-inlet-temperature-k>1680</turbine-inlet-temperature-k>
+      <cooling-fraction>0.15</cooling-fraction>
+      <accessory-power-w>300000</accessory-power-w>
+      <bypass-pressure-loss>0.03</bypass-pressure-loss>
+      <mixer-pressure-loss>0.02</mixer-pressure-loss>
+      <mixer-static-pressure-ratio>0.97</mixer-static-pressure-ratio>
+      <augmentor-dry-pressure-loss>0.04</augmentor-dry-pressure-loss>
+      <fan><efficiency>0.87</efficiency></fan>
+      <compressor><efficiency>0.86</efficiency></compressor>
+      <hp-turbine><efficiency>0.89</efficiency><stodola-exponent>4</stodola-exponent></hp-turbine>
+      <lp-turbine><efficiency>0.91</efficiency><stodola-exponent>4</stodola-exponent></lp-turbine>
+    </design>
+    <lp-shaft>
+      <inertia-kg-m2>20</inertia-kg-m2>
+      <design-speed-rad-sec>1047</design-speed-rad-sec>
+      <coulomb-torque-n-m>10</coulomb-torque-n-m>
+      <viscous-n-m-s>0.05</viscous-n-m-s>
+    </lp-shaft>
+    <hp-shaft>
+      <inertia-kg-m2>4</inertia-kg-m2>
+      <design-speed-rad-sec>1570</design-speed-rad-sec>
+      <coulomb-torque-n-m>10</coulomb-torque-n-m>
+      <viscous-n-m-s>0.05</viscous-n-m-s>
+    </hp-shaft>
+    <starter>
+      <stall-torque-n-m>600</stall-torque-n-m>
+      <free-speed-rad-sec>800</free-speed-rad-sec>
+    </starter>
+    <core-fuel>
+      <valve-time-constant-s>0.05</valve-time-constant-s>
+      <valve-rate-limit-kg-sec2>8</valve-rate-limit-kg-sec2>
+      <max-flow-kg-sec>6</max-flow-kg-sec>
+      <manifold-prime-mass-kg>0.3</manifold-prime-mass-kg>
+      <manifold-time-constant-s>0.02</manifold-time-constant-s>
+    </core-fuel>
+    <augmentor-fuel>
+      <valve-time-constant-s>0.05</valve-time-constant-s>
+      <valve-rate-limit-kg-sec2>20</valve-rate-limit-kg-sec2>
+      <max-flow-kg-sec>20</max-flow-kg-sec>
+      <manifold-prime-mass-kg>2.0</manifold-prime-mass-kg>
+      <manifold-time-constant-s>0.03</manifold-time-constant-s>
+    </augmentor-fuel>
+    <core-combustion>
+      <ignition-delay-s>0.4</ignition-delay-s>
+      <lean-ignition-equivalence>0.2</lean-ignition-equivalence>
+      <lean-blowout-equivalence>0.06</lean-blowout-equivalence>
+      <rich-limit-equivalence>3.0</rich-limit-equivalence>
+      <half-efficiency-loading>0.006</half-efficiency-loading>
+    </core-combustion>
+    <augmentor-combustion>
+      <ignition-delay-s>0.15</ignition-delay-s>
+      <light-around-time-s>0.15</light-around-time-s>
+      <lean-ignition-equivalence>0.2</lean-ignition-equivalence>
+      <lean-blowout-equivalence>0.1</lean-blowout-equivalence>
+      <rich-limit-equivalence>1.4</rich-limit-equivalence>
+      <minimum-inlet-temperature-k>600</minimum-inlet-temperature-k>
+      <constant-efficiency>0.85</constant-efficiency>
+    </augmentor-combustion>
+    <controller>
+      <fan-speed-demand>0 0.30
+        0.99 1.0
+        1 1.0</fan-speed-demand>
+      <acceleration-limit>0 0.48
+        0.4 0.52
+        0.5 1.0
+        0.9 1.4
+        1.1 1.6</acceleration-limit>
+      <deceleration-limit>0 0.40
+        0.6 0.37
+        0.8 0.31
+        1.0 0.26
+        1.1 0.25</deceleration-limit>
+      <start-schedule>0 2.0
+        0.6 1.0</start-schedule>
+      <dry-throat-area>0.5 1.15
+        1.0 1.0</dry-throat-area>
+      <augmentor-fuel-air-ratio>0 0.02
+        1 0.03892</augmentor-fuel-air-ratio>
+      <exit-area-ratio>0 1.05
+        1 1.4</exit-area-ratio>
+      <throat-area-min-fraction>0.8</throat-area-min-fraction>
+      <throat-area-max-fraction>1.75</throat-area-max-fraction>
+      <throat-area-rate-per-sec>1.0</throat-area-rate-per-sec>
+      <idle-corrected-n2>0.60</idle-corrected-n2>
+      <lightoff-n2>0.15</lightoff-n2>
+      <augmentor-minimum-n2>0.95</augmentor-minimum-n2>
+      <augmentor-lightoff-fuel-air-ratio>0.012</augmentor-lightoff-fuel-air-ratio>
+      <max-n2>1.07</max-n2>
+      <lift-throat-area-factor>1.4285</lift-throat-area-factor>
+      <lift-split-gain-per-sec>24</lift-split-gain-per-sec>
+      <lift-split-washout-per-sec>0.5</lift-split-washout-per-sec>
+      <lift-vane-min>0.4</lift-vane-min>
+      <max-n1>1.04</max-n1>
+      <max-n1-gain-per-sec>100</max-n1-gain-per-sec>
+      <max-turbine-exit-temperature-k>1500</max-turbine-exit-temperature-k>
+    </controller>
+    <solid name="liner">
+      <heat-capacity-j-k>12000</heat-capacity-j-k>
+      <gas-station>7</gas-station>
+      <coolant>bypass</coolant>
+      <gas-conductance-w-k>600</gas-conductance-w-k>
+      <coolant-conductance-w-k>700</coolant-conductance-w-k>
+      <radiation-area-sq-m>1.0</radiation-area-sq-m>
+      <emissivity>0.8</emissivity>
+    </solid>
+    <solid name="core">
+      <heat-capacity-j-k>1800</heat-capacity-j-k>
+      <gas-station>5</gas-station>
+      <coolant>cooling</coolant>
+      <gas-conductance-w-k>600</gas-conductance-w-k>
+      <coolant-conductance-w-k>35</coolant-conductance-w-k>
+      <radiation-area-sq-m>0.22</radiation-area-sq-m>
+      <emissivity>0.75</emissivity>
+    </solid>
+    <lift-system>
+      <fan-shaft>
+        <inertia-kg-m2>10</inertia-kg-m2>
+        <design-speed-rad-sec>785</design-speed-rad-sec>
+        <coulomb-torque-n-m>10</coulomb-torque-n-m>
+        <viscous-n-m-s>0.05</viscous-n-m-s>
+      </fan-shaft>
+      <gear-ratio>0.75</gear-ratio>
+      <clutch-capacity-n-m>40000</clutch-capacity-n-m>
+      <clutch-slip-speed-rad-sec>5</clutch-slip-speed-rad-sec>
+      <clutch-rate-per-sec>4.0</clutch-rate-per-sec>
+      <fan><pressure-ratio>2.3</pressure-ratio><efficiency>0.85</efficiency></fan>
+      <design-flow-kg-sec>233.16</design-flow-kg-sec>
+      <inlet-recovery>0.97</inlet-recovery>
+      <nozzle><discharge-coefficient>0.97</discharge-coefficient><velocity-coefficient>0.97</velocity-coefficient></nozzle>
+      <door-rate-per-sec>2.0</door-rate-per-sec>
+      <left-roll-post-area-sq-m>0.02511</left-roll-post-area-sq-m>
+      <right-roll-post-area-sq-m>0.02511</right-roll-post-area-sq-m>
+      <roll-post-rate-per-sec>4.0</roll-post-rate-per-sec>
+      <bypass-entry-area-factor>0.0700</bypass-entry-area-factor>
+      <bypass-entry-door-full>0.2</bypass-entry-door-full>
+      <clutch-command>fcs/lift-fan-clutch-cmd-norm</clutch-command>
+      <thrust-split-command>fcs/lift-split-cmd</thrust-split-command>
+      <door-command>fcs/lift-fan-door-cmd-norm</door-command>
+      <left-roll-post-command>fcs/roll-post-left-cmd-norm</left-roll-post-command>
+      <right-roll-post-command>fcs/roll-post-right-cmd-norm</right-roll-post-command>
+    </lift-system>
+  </plant>
+</turbine_engine>

@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#080e14" />
+    <!-- Home Screen launches have no browser bars; iPhone Safari has no page fullscreen. -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="0SFS" />
+    <title>0SFS — Open Source Flight Simulator</title>
+    <!-- Search and link previews for the home page; /fly/ and /rc/ carry their own. See docs/search-visibility.md. -->
+    <meta name="description" content="0SFS is a free, open-source flight simulator that runs in a browser tab, with JSBSim flight physics over real-world scenery. Nothing to install, no account." />
+    <link rel="canonical" href="https://0sfs.github.io/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="0SFS" />
+    <meta property="og:title" content="0SFS — Open Source Flight Simulator" />
+    <meta property="og:description" content="A free, open-source flight simulator in the browser, with JSBSim flight physics over real-world scenery. Nothing to install, no account." />
+    <meta property="og:url" content="https://0sfs.github.io/" />
+    <meta property="og:image" content="https://0sfs.github.io/preview.jpg" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="720" />
+    <meta property="og:image:alt" content="A Cessna 172 in the chase view over Minneapolis, with the flight instruments" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "0SFS",
+        "alternateName": ["OSFS", "Open Source Flight Simulator"],
+        "url": "https://0sfs.github.io/"
+      }
+    </script>
+    <script>
+      // Links from before /fly/ and /rc/ existed open them here with ?mode=,
+      // phone pairing links among them: send each where it lives now.
+      (function () {
+        var params = new URLSearchParams(location.search);
+        var mode = params.get("mode");
+        if (mode === "globe") {
+          location.replace("https://foss-earth.github.io/");
+          return;
+        }
+        var segment = mode === "remote" ? "rc" : mode === "flight" ? "fly" : null;
+        if (!segment) return;
+        params.delete("mode");
+        var next = new URL(segment + "/", location.href);
+        next.search = params.toString();
+        location.replace(next.pathname + next.search + location.hash);
+      })();
+    </script>
+    <style>
+      html { color-scheme: dark; }
+      html, body { margin: 0; background: #080e14; overscroll-behavior: none; }
+    </style>
+    <link rel="stylesheet" href="landing.css" />
+  </head>
+  <body>
+    <div id="root">
+      <div class="info-page">
+        <a class="info-page__skip" href="#info-main">Skip to content</a>
+        <header class="info-page__hero">
+          <h1><span class="info-page__mark">0SFS</span> Open Source Flight Simulator</h1>
+          <p class="info-page__lede">A real-world browser flight simulator built to be explored, extended, and shared. Nothing to install, no account, no sign-up. It runs in a browser tab.</p>
+          <p class="info-page__actions">
+            <a class="info-page__start" href="fly/">Start flying</a>
+            <a class="info-page__secondary" href="https://github.com/0SFS">Source on GitHub</a>
+          </p>
+          <noscript><p>0SFS needs JavaScript enabled.</p></noscript>
+        </header>
+        <main id="info-main" class="info-page__main">
+          <section aria-labelledby="info-what">
+            <h2 id="info-what">What it is</h2>
+            <p>0SFS puts streamed real-world scenery beneath your wings and JSBSim in charge of flight physics. Bank over a city you recognize. Follow the streets below. Change the wind, line up an approach, and switch to the chase camera to take it all in.</p>
+            <ul class="info-page__features">
+              <li><strong>Fly over the real world in 3D.</strong> Google Photorealistic 3D Tiles brings detailed cityscapes and terrain into the scene. Free raster basemaps are available too, so you can get flying without a Google API key.</li>
+              <li><strong>Physics powered by JSBSim.</strong> Flight dynamics run in WebAssembly at 120 Hz, with aircraft, engine, propeller, fuel, and control simulation.</li>
+              <li><strong>Explore from the cockpit or chase camera.</strong> Switch views, orbit around the aircraft, and zoom out to see where you're headed.</li>
+              <li><strong>Set up your next flight.</strong> Reposition through the location panel, use airport presets, and adjust wind direction and speed.</li>
+              <li><strong>Fly with your phone.</strong> Pair a phone over a QR code and use it as a touch controller.</li>
+            </ul>
+          </section>
+          <section aria-labelledby="info-aircraft">
+            <h2 id="info-aircraft">Aircraft</h2>
+            <!-- The flight's aircraft families, in its catalogue's order. The site build checks them against the flight build. -->
+            <div class="info-page__aircraft">
+              <article>
+                <img src="aircraft/thumbnails/cessna-172.png" alt="" width="640" height="360" />
+                <h3>Cessna 172 Skyhawk</h3>
+                <p>High-wing trainer. Flight model and visuals both available.</p>
+              </article>
+              <article>
+                <img src="aircraft/thumbnails/cirrus-vision-jet.png" alt="" width="640" height="360" />
+                <h3>Cirrus Vision Jet</h3>
+                <p>Single-engine personal jet. G1, G2, G2+ and G3 variants.</p>
+                <p class="info-page__note">G1, G2 and G3 have separate runtime packages. G2+ is currently mapped to the G2 runtime while separate physics/package support is not yet implemented. Choosing a generation does not provide calibrated generation-specific performance, a new cabin or complete generation-specific avionics.</p>
+              </article>
+              <article>
+                <img src="aircraft/thumbnails/f-35b.png" alt="" width="640" height="360" />
+                <h3>Lockheed Martin F-35B Lightning II</h3>
+                <p>STOVL fighter. Experimental flight model and AF267 exterior model.</p>
+                <p class="info-page__note">Experimental F-16/Aeromatic-derived JSBSim flight model. F-35B performance and STOVL behavior are not validated.</p>
+              </article>
+            </div>
+            <p>The Cessna 172 Skyhawk is the default aircraft. The Vision Jet family can be chosen in the flight panel's Aircraft tab. More aircraft are part of where the project is headed.</p>
+          </section>
+          <section aria-labelledby="info-controls">
+            <h2 id="info-controls">Controls</h2>
+            <table>
+              <caption class="info-page__caption">Default keyboard</caption>
+              <thead><tr><th scope="col">Input</th><th scope="col">Action</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">W / S</th><td>Pitch</td></tr>
+                <tr><th scope="row">A / D</th><td>Roll</td></tr>
+                <tr><th scope="row">Q / E</th><td>Yaw / rudder</td></tr>
+                <tr><th scope="row">Shift / Control</th><td>Increase / decrease throttle</td></tr>
+                <tr><th scope="row">F / R</th><td>Extend / retract flaps</td></tr>
+                <tr><th scope="row">G</th><td>Raise / lower the landing gear</td></tr>
+                <tr><th scope="row">B</th><td>Brake</td></tr>
+                <tr><th scope="row">P</th><td>Pause</td></tr>
+                <tr><th scope="row">V</th><td>Toggle first- and third-person camera</td></tr>
+              </tbody>
+            </table>
+            <p>Throttle and pitch trim are also vertical sliders in the lower-right corner, and the gear has a G button in the instrument row above the attitude indicator. The Controls tab in the flight panel rebinds both the keyboard and a controller.</p>
+          </section>
+          <section aria-labelledby="info-phone">
+            <h2 id="info-phone">Phone controller</h2>
+            <p>On the computer, open the simulator, then ⚙ → <strong>Remote Control</strong>. Scan the QR with your phone camera. Both ends are web pages — there is no app to install. The QR expires after two minutes and admits one phone.</p>
+            <p><a href="https://github.com/0SFS/rc/blob/main/docs/phone-controller.md">How pairing works, and what to do when it fails</a></p>
+          </section>
+          <section aria-labelledby="info-docs">
+            <h2 id="info-docs">Documentation</h2>
+            <ul>
+              <li><a href="https://github.com/0SFS/fly/blob/main/docs/development.md">Development</a></li>
+              <li><a href="https://github.com/0SFS/0SFS.github.io/blob/main/docs/deploying.md">Deploying to GitHub Pages</a></li>
+              <li><a href="https://github.com/0SFS/fly/blob/main/docs/jsbsim.md">How JSBSim runs in the browser</a></li>
+              <li><a href="https://github.com/0SFS/sound/blob/main/docs/sound.md">Sound</a></li>
+              <li><a href="https://github.com/0SFS/fly/blob/main/docs/foss-earth-relationship.md">FOSS Earth relationship</a></li>
+              <li><a href="https://github.com/0SFS/rc/blob/main/docs/phone-controller.md">Phone controller</a></li>
+            </ul>
+          </section>
+        </main>
+        <footer class="info-page__footer">
+          <p>0SFS is <a href="https://github.com/0SFS/fly/blob/main/LICENSE">AGPL-3.0-only</a> free software. <a href="https://github.com/0SFS">Repository</a>.</p>
+          <p>Credits and licences: <a href="https://github.com/0SFS/fly/blob/main/NOTICE">NOTICE</a>, <a href="https://github.com/0SFS/fly/blob/main/THIRD_PARTY_LICENSES.md">third-party licences</a>, <a href="https://github.com/0SFS/fly/blob/main/ASSET_LICENSES.md">asset licences</a>.</p>
+        </footer>
+      </div>
+    </div>
+    <script>
+      // Start flying keeps the address's settings, such as ?renderer=webgl2.
+      (function () {
+        var start = document.querySelector(".info-page__start");
+        var params = new URLSearchParams(location.search);
+        params.delete("mode");
+        var next = new URL("fly/", location.href);
+        next.search = params.toString();
+        start.setAttribute("href", next.pathname + next.search + location.hash);
+      })();
+    </script>
+  </body>
+</html>
