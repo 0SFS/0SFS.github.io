@@ -15,30 +15,33 @@ Check out fly, the repositories it links and the FOSS Earth checkout beside this
 ```sh
 cd fly
 npm install
-npm run build
 cd ../0sfs.github.io
-npm run build
-npm run check
 npm run deploy
 ```
 
-A minute or so later the site serves the new build.
+A minute or so later the site serves the new build. `npm run deploy` refuses to start while this
+repository has uncommitted changes. Then it runs these steps, in order:
 
-1. `npm run build` in fly typechecks and builds the flight into `fly/dist/`, for the site's root.
+1. It records the commit of each checkout fly is built from in `fly/deployed-from.json`, and commits
+   and pushes it in fly when one moved, so new code in FOSS Earth or another linked checkout is a new
+   version of the flight (FOSS Earth About's record; see
+   [CONTRIBUTING](https://github.com/foss-earth/.github/blob/main/CONTRIBUTING.md#versions)). It stops
+   if fly's branch lacks commits its remote has.
+2. `npm run build` in fly typechecks and builds the flight into `fly/dist/`, for the site's root.
    `0SFS.github.io` is an *organization site*, served from `https://0sfs.github.io/` rather than
    from a `/repo-name/` subpath.
-2. `npm run build` here makes `dist/`: fly's build without fly's own root page, then the landing
+3. `npm run build` here makes `dist/`: fly's build without fly's own root page, then the landing
    page and `public/`. It stops if a file would be in both, if the landing page links a file the site
    lacks, or if its aircraft are not the flight's: the same families, in the flight's order, with its
    names, summaries and notes. It leaves out dotfiles, as the old `gh-pages` deploy did. It ends by
    naming the fly commit the flight was built from.
-3. `npm run check` opens `dist/` in headless Chrome: the landing page, Start flying, the flight up to
+4. `npm run check` opens `dist/` in headless Chrome: the landing page, Start flying, the flight up to
    a loaded aircraft, and `/rc/`. It needs Chrome, and fly's checkout for its Chrome helpers. Its
    screenshots and report go in `build/validation/landing/`.
-4. `npm run deploy` replaces everything on `gh-pages` with `dist/`, commits it as
-   `Deploy the site at <this commit> with the flight at <fly commit>`, and pushes. It refuses to run
-   while this repository has uncommitted changes, or when the flight was built from a fly checkout
-   with uncommitted or unpushed changes: the site publishes a fly commit anyone can look up.
+5. It replaces everything on `gh-pages` with `dist/`, commits it as
+   `Deploy the site at <this commit> with the flight at <fly commit>`, and pushes. It refuses when
+   the flight was built from a fly checkout with uncommitted or unpushed changes: the site publishes
+   a fly commit anyone can look up.
 
 The deploy is manual and runs from your machine. There is no GitHub Actions workflow, so pushing to
 `main`, here or in fly, does **not** republish the site.
