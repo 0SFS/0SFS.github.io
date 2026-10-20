@@ -127,7 +127,8 @@ try {
   const info = await attachSession("info");
   await chrome.send("Emulation.setDeviceMetricsOverride", { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false }, info.sessionId);
   await chrome.send("Page.navigate", { url: "https://0sfs.test/?renderer=webgl2" }, info.sessionId);
-  await waitForExpression(chrome, info.sessionId, "Boolean(document.querySelector('.info-page'))", 15000);
+  // Parsed to the end, so the script after the page has written Start flying's address.
+  await waitForExpression(chrome, info.sessionId, "document.readyState !== 'loading' && Boolean(document.querySelector('.info-page'))", 15000);
   const startHref = await evaluate(chrome, info.sessionId, "document.querySelector('.info-page__start')?.getAttribute('href')");
   assert.equal(startHref, "/fly/?renderer=webgl2", "Start flying dropped existing query parameters");
   const desktopShot = await chrome.send("Page.captureScreenshot", { format: "png", captureBeyondViewport: false }, info.sessionId);
