@@ -79,6 +79,24 @@ well: its path should start with `/assets/` and requesting it should also return
 no SPA fallback, so those copies are what make a hard refresh work. Hard-refresh in the browser —
 Pages caches aggressively and a normal reload will happily serve you the previous build.
 
+The flight and the phone controller isolate their pages, so the threaded sky can share memory with
+its workers. Pages cannot send the headers that do it, so a first visit registers the app's service
+worker, `/foss-earth-sw.js`, and reloads once to be answered by it. The worker then answers every page
+of the site, the landing page too; the landing page loads nothing from other sites, so it is not
+affected. A phone's first visit from a QR also reloads once, and the invitation survives it. Check that
+the flight starts with the script and that the worker may isolate:
+
+```sh
+curl -s https://0sfs.github.io/fly/ | grep -o '<script data-foss-earth-isolation="[a-z-]*"'
+curl -s https://0sfs.github.io/foss-earth-sw.js | grep -o '"isolation":"[a-z-]*"'
+```
+
+Both say `enforce`. In <https://0sfs.github.io/fly/?set.native.core.sky=threaded> the console's
+`crossOriginIsolated` is then `true`. A hard refresh skips the worker, so the page reloads once more.
+`FOSS_EARTH_ISOLATION=off npm run deploy` builds the flight without it. FOSS Earth's
+[deploying guide](https://github.com/foss-earth/docs/blob/main/docs/deploying.md#cross-origin-isolation)
+covers the rest.
+
 Before treating a release as done, open the deployed site and check the landing page, the flight on
 `/fly/`, JSBSim loading, and phone pairing on `/rc/`. The preview does not exercise the HTTPS-only
 parts of pairing. See the
