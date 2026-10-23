@@ -10,38 +10,52 @@ https://0sfs.github.io/ is this repository's built site, published on its `gh-pa
 ## Deploying
 
 Check out fly, the repositories it links and the FOSS Earth checkout beside this one, as
-[fly's development guide](https://github.com/0SFS/fly/blob/main/docs/development.md) describes. Then:
+[fly's development guide](https://github.com/0SFS/fly/blob/main/docs/development.md) describes, and
+run `npm install` in fly. Then deploy the part that changed:
 
-```sh
-cd fly
-npm install
-cd ../0sfs.github.io
-npm run deploy
-```
+| Changed | Run | Publishes |
+| --- | --- | --- |
+| The landing page or `public/` | `npm run deploy:landing` here | this checkout's landing page, with the flight `gh-pages` has |
+| The flight or the phone controller | `npm run deploy` in fly, or `npm run deploy:flight` here | a new fly build, with the landing page `gh-pages` has |
+| Both, such as a new aircraft | `npm run deploy` here | both |
 
-A minute or so later the site serves the new build. `npm run deploy` refuses to start while this
-repository has uncommitted changes. Then it runs these steps, in order:
+The part a deploy does not publish stays as it is on `gh-pages`. A landing page change needs no fly
+build and no clean fly checkout, and a new flight leaves out landing page edits that are not deployed.
+`/fly/` and `/rc/` are always published together: they are one build that loads one bundle, and a
+flight and a phone controller from different builds may not pair. fly's `npm run deploy` runs this
+repository's script, so it needs this checkout beside fly as `0sfs.github.io`.
 
-1. It records the commit of each checkout fly is built from in `fly/deployed-from.json`, and commits
-   and pushes it in fly when one moved, so new code in FOSS Earth or another linked checkout is a new
-   version of the flight (FOSS Earth About's record; see
+A minute or so after a deploy, the site serves it. A deploy runs these steps, in order:
+
+1. When it publishes the landing page, it refuses to start while this repository has uncommitted
+   changes.
+2. When it publishes the flight, it records the commit of each checkout fly is built from in
+   `fly/deployed-from.json`, and commits and pushes it in fly when one moved, so new code in FOSS
+   Earth or another linked checkout is a new version of the flight (FOSS Earth About's record; see
    [CONTRIBUTING](https://github.com/foss-earth/.github/blob/main/CONTRIBUTING.md#versions)). It stops
-   if fly's branch lacks commits its remote has.
-2. `npm run build` in fly typechecks and builds the flight into `fly/dist/`, for the site's root.
-   `0SFS.github.io` is an *organization site*, served from `https://0sfs.github.io/` rather than
-   from a `/repo-name/` subpath.
-3. `npm run build` here makes `dist/`: fly's build without fly's own root page, then the landing
-   page and `public/`. It stops if a file would be in both, if the landing page links a file the site
-   lacks, or if its aircraft are not the flight's: the same families, in the flight's order, with its
-   names, summaries and notes. It leaves out dotfiles, as the old `gh-pages` deploy did. It ends by
-   naming the fly commit the flight was built from.
-4. `npm run check` opens `dist/` in headless Chrome: the landing page, Start flying, the flight up to
+   if fly's branch lacks commits its remote has. Then `npm run build` in fly typechecks and builds the
+   flight into `fly/dist/`, for the site's root. `0SFS.github.io` is an *organization site*, served
+   from `https://0sfs.github.io/` rather than from a `/repo-name/` subpath.
+3. It checks out `gh-pages` in a git worktree under `build/gh-pages` and takes the part it keeps from
+   there. The landing page's files are the ones `.landing.json` on `gh-pages` lists; the flight is
+   everything else.
+4. It builds `dist/` as `npm run build` here does: the flight, from fly's build or `gh-pages`, without
+   fly's own root page, then the landing page and `public/`, from this checkout or `gh-pages`. It
+   stops if a file would be in both, if the landing page links a file the site lacks, or if its
+   aircraft are not the flight's: the same families, in the flight's order, with its names, summaries
+   and notes. It leaves out dotfiles, as the old `gh-pages` deploy did. It refuses a flight built from
+   a fly checkout with uncommitted or unpushed changes: the site publishes a fly commit anyone can
+   look up.
+5. `npm run check` opens `dist/` in headless Chrome: the landing page, Start flying, the flight up to
    a loaded aircraft, and `/rc/`. It needs Chrome, and fly's checkout for its Chrome helpers. Its
    screenshots and report go in `build/validation/landing/`.
-5. It replaces everything on `gh-pages` with `dist/`, commits it as
-   `Deploy the site at <this commit> with the flight at <fly commit>`, and pushes. It refuses when
-   the flight was built from a fly checkout with uncommitted or unpushed changes: the site publishes
-   a fly commit anyone can look up.
+6. It replaces everything on `gh-pages` with `dist/` and `.landing.json`, which records the landing
+   page's commit and files, and pushes it as one commit:
+   - `Deploy the site at <this commit> with the flight at <fly commit>`
+   - `Deploy the landing page at <this commit>, keeping the flight at <fly commit>`
+   - `Deploy the flight at <fly commit>, keeping the landing page at <its commit>`
+
+   It says so and pushes nothing when `gh-pages` already has the site.
 
 The deploy is manual and runs from your machine. There is no GitHub Actions workflow, so pushing to
 `main`, here or in fly, does **not** republish the site.
@@ -103,6 +117,10 @@ parts of pairing. See the
 [release checklist](https://github.com/0SFS/docs/blob/main/release/RELEASE_CHECKLIST.md).
 
 ## Troubleshooting
+
+**A deploy of one part says the landing page's aircraft are not the flight's.** The aircraft changed in
+the other part too, so each part fails against the other as it is published. Deploy both with
+`npm run deploy` here.
 
 **`npm run build` here says the flight build is not for the site's root.** fly was built for a
 subpath. Its build uses `/` unless it runs in GitHub Actions for a repository not named

@@ -10,11 +10,13 @@ const SITE_URL = "https://0sfs.github.io/";
 const siteRoot = fileURLToPath(new URL("../", import.meta.url));
 
 /**
- * @param {{ site?: string, fly?: string, out?: string, base?: string }} [options]
- *   site: this repository; fly: fly's dist/; out: where the site goes; base:
+ * @param {{ site?: string, landing?: [string, string][], fly?: string, out?: string, base?: string }} [options]
+ *   site: this repository; landing: the landing page's files, `[source, path on
+ *   the site]`, by default site's (landingFiles); fly: fly's dist/, or any
+ *   flight without the landing page's files; out: where the site goes; base:
  *   the path the site is served from, which fly's build must have been made for.
  */
-export async function buildSite({ site = siteRoot, fly = path.join(site, "..", "fly", "dist"), out = path.join(site, "dist"), base = "/" } = {}) {
+export async function buildSite({ site = siteRoot, landing, fly = path.join(site, "..", "fly", "dist"), out = path.join(site, "dist"), base = "/" } = {}) {
   if (!/^\/(?:[\w.-]+\/)*$/.test(base)) throw new Error(`The base ${base} is not a path that starts and ends with /.`);
   const flightPage = await readFile(path.join(fly, "fly", "index.html"), "utf8").catch(() => null);
   if (flightPage === null || !existsSync(path.join(fly, "rc", "index.html"))) {
@@ -37,20 +39,28 @@ export async function buildSite({ site = siteRoot, fly = path.join(site, "..", "
     },
   });
 
-  const own = [
+  landing ??= await landingFiles(site);
+  for (const [from, to] of landing) {
+    if (existsSync(path.join(out, to))) throw new Error(`The flight build also has ${to}; the site cannot serve both.`);
+    await cp(from, path.join(out, to), { recursive: true });
+  }
+
+  const landingPage = await readFile(path.join(out, "index.html"), "utf8");
+  checkReferences(landingPage, out);
+  checkAircraft(landingPage, await flightScripts(out));
+  return { out, flight: flightBuiltFrom(flightPage), landing: landing.map(([, to]) => to) };
+}
+
+/**
+ * The landing page's files in a checkout of this repository, `[source, path on
+ * the site]`: index.html, landing.css, and public/'s files at the site's root.
+ */
+export async function landingFiles(site = siteRoot) {
+  return [
     ["index.html", "index.html"],
     ["landing.css", "landing.css"],
     ...(await readdir(path.join(site, "public"))).filter((name) => !name.startsWith(".")).map((name) => [path.join("public", name), name]),
-  ];
-  for (const [from, to] of own) {
-    if (existsSync(path.join(out, to))) throw new Error(`The flight build also has ${to}; the site cannot serve both.`);
-    await cp(path.join(site, from), path.join(out, to), { recursive: true });
-  }
-
-  const landing = await readFile(path.join(out, "index.html"), "utf8");
-  checkReferences(landing, out);
-  checkAircraft(landing, await flightScripts(out));
-  return { out, flight: flightBuiltFrom(flightPage) };
+  ].map(([from, to]) => [path.join(site, from), to]);
 }
 
 /**

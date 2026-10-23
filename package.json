@@ -14,7 +14,9 @@
     "preview": "node scripts/serve.mjs",
     "check": "node scripts/check-landing-page.mjs",
     "test": "node --test scripts/*.test.mjs",
-    "deploy": "node scripts/deploy.mjs"
+    "deploy": "node scripts/deploy.mjs",
+    "deploy:landing": "node scripts/deploy.mjs landing",
+    "deploy:flight": "node scripts/deploy.mjs flight"
   },
   "devDependencies": {}
 }

@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { mkdir, readdir, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, readdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { after, before, describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 import { runInNewContext } from "node:vm";
-import { buildSite, checkAircraft, checkReferences, flightBuiltFrom } from "./build.mjs";
+import { buildSite, checkAircraft, checkReferences, flightBuiltFrom, landingFiles } from "./build.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const scratch = path.join(root, "build", "test", `build-${process.pid}`);
@@ -80,7 +80,7 @@ after(async () => {
 describe("buildSite", () => {
   it("serves the landing page at / and fly's build everywhere else, without dotfiles", async () => {
     const { site, fly, out } = await fixture("assembles");
-    const { flight } = await buildSite({ site, fly, out });
+    const { flight, landing } = await buildSite({ site, fly, out });
     assert.deepEqual(filesUnder(out), [
       "aircraft/thumbnails/jet.png",
       "aircraft/thumbnails/trainer.png",
@@ -97,6 +97,31 @@ describe("buildSite", () => {
     ]);
     assert.equal(readFileSync(path.join(out, "index.html"), "utf8"), readFileSync(path.join(site, "index.html"), "utf8"));
     assert.deepEqual(flight, { commit: "0123456789abcdef", dirty: false, unpushed: true });
+    assert.deepEqual(landing, ["index.html", "landing.css", "preview.jpg", "robots.txt"]);
+  });
+
+  it("rebuilds a published site with either part from elsewhere", async () => {
+    const { site, fly, out } = await fixture("published");
+    const published = path.join(scratch, "published", "gh-pages");
+    await buildSite({ site, fly, out: published });
+    await write(path.join(published, ".landing.json"), "{}");
+    await write(path.join(site, "landing.css"), ".info-page { color: red }");
+
+    // The flight as published, with this checkout's landing page.
+    const names = await landingFiles(site);
+    const flight = path.join(scratch, "published", "flight");
+    await cp(published, flight, { recursive: true });
+    for (const [, name] of names) await rm(path.join(flight, name));
+    await buildSite({ site, fly: flight, out });
+    assert.deepEqual(filesUnder(out), filesUnder(published).filter((name) => name !== ".landing.json"));
+    assert.equal(readFileSync(path.join(out, "landing.css"), "utf8"), ".info-page { color: red }");
+
+    // The landing page as published, with fly's build.
+    await write(path.join(fly, "assets", "added.js"), "");
+    const { landing } = await buildSite({ landing: names.map(([, name]) => [path.join(published, name), name]), fly, out });
+    assert.deepEqual(landing, names.map(([, name]) => name));
+    assert.equal(readFileSync(path.join(out, "landing.css"), "utf8"), ".info-page {}");
+    assert.equal(existsSync(path.join(out, "assets", "added.js")), true);
   });
 
   it("starts from an empty dist/ each time", async () => {

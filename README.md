@@ -13,7 +13,8 @@ flight it publishes is a fly build, named by its commit.
 - `scripts/build.mjs` makes `dist/` from fly's `dist/` and this repository, and checks it.
 - `scripts/serve.mjs` previews `dist/` at http://127.0.0.1:4175/.
 - `scripts/check-landing-page.mjs` checks the built site in headless Chrome.
-- `scripts/deploy.mjs` builds fly and this site, checks them, and publishes `dist/` to `gh-pages`.
+- `scripts/deploy.mjs` builds and checks the site and publishes it to `gh-pages`: the landing page,
+  the flight, or both, keeping the part it does not publish as it is there.
 
 ## Building and previewing the whole site
 
