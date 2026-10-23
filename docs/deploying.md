@@ -25,6 +25,14 @@ build and no clean fly checkout, and a new flight leaves out landing page edits 
 flight and a phone controller from different builds may not pair. fly's `npm run deploy` runs this
 repository's script, so it needs this checkout beside fly as `0sfs.github.io`.
 
+A deploy also keeps a part `gh-pages` already has, without building it. The flight is kept when the
+published flight page was built from fly's commit and the checkouts it names, none of which has moved
+or has changes not committed, with no `VITE_` setting and the same `FOSS_EARTH_ISOLATION` (FOSS
+Earth About's `rebuildReason`). The landing page is kept when `index.html`, `landing.css` and
+`public/` have not changed since the commit `.landing.json` names. So `npm run deploy` here builds
+and publishes only what changed and says why, and publishes nothing when nothing did. Add `--force`,
+as in `npm run deploy -- --force`, to build and publish the part, or both, anyway.
+
 A minute or so after a deploy, the site serves it. A deploy runs these steps, in order:
 
 1. When it publishes the landing page, it refuses to start while this repository has uncommitted
@@ -33,24 +41,27 @@ A minute or so after a deploy, the site serves it. A deploy runs these steps, in
    `fly/deployed-from.json`, and commits and pushes it in fly when one moved, so new code in FOSS
    Earth or another linked checkout is a new version of the flight (FOSS Earth About's record; see
    [CONTRIBUTING](https://github.com/foss-earth/.github/blob/main/CONTRIBUTING.md#versions)). It stops
-   if fly's branch lacks commits its remote has. Then `npm run build` in fly typechecks and builds the
-   flight into `fly/dist/`, for the site's root. `0SFS.github.io` is an *organization site*, served
-   from `https://0sfs.github.io/` rather than from a `/repo-name/` subpath.
-3. It checks out `gh-pages` in a git worktree under `build/gh-pages` and takes the part it keeps from
+   if fly's branch lacks commits its remote has. Then, unless `gh-pages` has that flight, `npm run build`
+   in fly typechecks and builds the flight into `fly/dist/`, for the site's root. `0SFS.github.io` is
+   an *organization site*, served from `https://0sfs.github.io/` rather than from a `/repo-name/`
+   subpath.
+3. It keeps the parts `gh-pages` already has, as above, and stops there when that is both.
+4. It checks out `gh-pages` in a git worktree under `build/gh-pages` and takes the part it keeps from
    there. The landing page's files are the ones `.landing.json` on `gh-pages` lists; the flight is
    everything else.
-4. It builds `dist/` as `npm run build` here does: the flight, from fly's build or `gh-pages`, without
+5. It builds `dist/` as `npm run build` here does: the flight, from fly's build or `gh-pages`, without
    fly's own root page, then the landing page and `public/`, from this checkout or `gh-pages`. It
    stops if a file would be in both, if the landing page links a file the site lacks, or if its
    aircraft are not the flight's: the same families, in the flight's order, with its names, summaries
    and notes. It leaves out dotfiles, as the old `gh-pages` deploy did. It refuses a flight built from
    a fly checkout with uncommitted or unpushed changes: the site publishes a fly commit anyone can
    look up.
-5. `npm run check` opens `dist/` in headless Chrome: the landing page, Start flying, the flight up to
+6. `npm run check` opens `dist/` in headless Chrome: the landing page, Start flying, the flight up to
    a loaded aircraft, and `/rc/`. It needs Chrome, and fly's checkout for its Chrome helpers. Its
    screenshots and report go in `build/validation/landing/`.
-6. It replaces everything on `gh-pages` with `dist/` and `.landing.json`, which records the landing
-   page's commit and files, and pushes it as one commit:
+7. It replaces everything on `gh-pages` with `dist/`, `.landing.json`, which records the landing
+   page's commit and files, and an empty `.nojekyll`, so Pages serves the files without running
+   Jekyll over them first. It pushes that as one commit:
    - `Deploy the site at <this commit> with the flight at <fly commit>`
    - `Deploy the landing page at <this commit>, keeping the flight at <fly commit>`
    - `Deploy the flight at <fly commit>, keeping the landing page at <its commit>`

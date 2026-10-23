@@ -2,10 +2,14 @@
 // GitHub Pages serves at https://0sfs.github.io/: the landing page and the
 // flight together, or one of them, keeping the other as gh-pages has it.
 // Everything else on the branch is replaced. Only a flight built from a clean,
-// pushed fly commit is published, and the deploy names that commit. See
-// docs/deploying.md.
+// pushed fly commit is published, and the deploy names that commit. A part
+// gh-pages already has as it is here is kept, not built again: the flight when
+// it was built from what fly would build now (About's rebuildReason), the
+// landing page when its files have not changed since the commit .landing.json
+// names. See docs/deploying.md.
 //
-// Usage: node scripts/deploy.mjs [landing|flight]
+// Usage: node scripts/deploy.mjs [landing|flight] [--force]
+//   --force builds and publishes the part, or both, even when gh-pages has it.
 import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { cp, readdir, readFile, rm, writeFile } from "node:fs/promises";
@@ -13,9 +17,12 @@ import { createRequire } from "node:module";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { buildSite, landingFiles } from "./build.mjs";
 
-const part = process.argv[2];
-if (process.argv.length > 3 || (part !== undefined && part !== "landing" && part !== "flight")) {
-  throw new Error("Usage: node scripts/deploy.mjs [landing|flight]");
+const args = process.argv.slice(2);
+const force = args.includes("--force");
+const parts = args.filter((arg) => arg !== "--force");
+let part = parts[0];
+if (parts.length > 1 || (part !== undefined && part !== "landing" && part !== "flight")) {
+  throw new Error("Usage: node scripts/deploy.mjs [landing|flight] [--force]");
 }
 const root = fileURLToPath(new URL("../", import.meta.url));
 const pages = `${root}build/gh-pages`;
@@ -23,17 +30,56 @@ const record = `${pages}/.landing.json`;
 const flyRoot = `${root}../fly`;
 const git = (cwd, ...args) => execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "inherit"] }).trim();
 
+/** A file as gh-pages has it, or null. */
+const publishedFile = (name) => {
+  try {
+    return execFileSync("git", ["show", `origin/gh-pages:${name}`], { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "ignore"] });
+  } catch {
+    return null;
+  }
+};
+
 if (part !== "flight" && git(root, "status", "--porcelain")) throw new Error("This repository has uncommitted changes: commit them, then deploy.");
-if (part !== "landing") {
+git(root, "fetch", "--no-tags", "origin", "gh-pages");
+let flightChanged = part !== "landing";
+let landingChanged = part !== "flight";
+if (flightChanged) {
   // What the flight is built from, in fly's deployed-from.json, so new code in a
   // checkout fly is built from is a new version of the flight (FOSS Earth About's
   // record, from the FOSS Earth checkout fly links).
-  const { recordBuildInputs } = await import(pathToFileURL(createRequire(`${flyRoot}/package.json`).resolve("foss-earth/vite")).href);
-  recordBuildInputs({ root: flyRoot });
-  execFileSync("npm", ["run", "build"], { cwd: flyRoot, stdio: "inherit" });
+  const { rebuildReason, recordBuildInputs } = await import(pathToFileURL(createRequire(`${flyRoot}/package.json`).resolve("foss-earth/vite")).href);
+  const inputs = recordBuildInputs({ root: flyRoot });
+  const why = force ? "asked to with --force" : rebuildReason({ root: flyRoot, page: publishedFile("fly/index.html"), inputs });
+  if (why) {
+    console.log(`Building the flight: ${why}.`);
+    execFileSync("npm", ["run", "build"], { cwd: flyRoot, stdio: "inherit" });
+  } else {
+    console.log("gh-pages has the flight as fly would build it now: keeping it.");
+    flightChanged = false;
+  }
 }
+if (landingChanged && !force) {
+  // The landing page's sources, unchanged since the commit gh-pages' landing page is from.
+  // A folder, so a file gone from public/ is a change too (landingFiles).
+  const since = JSON.parse(publishedFile(".landing.json") ?? "{}").commit;
+  let unchanged = false;
+  try {
+    if (since) execFileSync("git", ["diff", "--quiet", since, "HEAD", "--", "index.html", "landing.css", "public"], { cwd: root, stdio: "ignore" });
+    unchanged = Boolean(since);
+  } catch {
+    // Changed, or from a commit this checkout does not have.
+  }
+  if (unchanged) {
+    console.log(`gh-pages has the landing page as it is here, from ${since.slice(0, 7)}: keeping it.`);
+    landingChanged = false;
+  }
+}
+if (!flightChanged && !landingChanged) {
+  console.log("gh-pages already has this site: nothing to build or publish.");
+  process.exit(0);
+}
+part = flightChanged && landingChanged ? undefined : flightChanged ? "flight" : "landing";
 
-git(root, "fetch", "origin", "gh-pages");
 if (existsSync(pages)) git(root, "worktree", "remove", "--force", pages);
 git(root, "worktree", "add", "--detach", pages, "origin/gh-pages");
 // The landing page's files on gh-pages, as the last deploy recorded them.
@@ -58,6 +104,8 @@ for (const name of await readdir(pages)) if (name !== ".git") await rm(`${pages}
 await cp(out, pages, { recursive: true });
 const site = part === "flight" ? published.commit : git(root, "rev-parse", "HEAD");
 await writeFile(record, `${JSON.stringify({ commit: site, files: landing }, null, 2)}\n`);
+// No Jekyll: Pages serves the files as they are, without a build over them first.
+await writeFile(`${pages}/.nojekyll`, "");
 
 git(pages, "add", "--all");
 const siteShort = site?.slice(0, 7);
