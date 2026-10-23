@@ -62,6 +62,55 @@
      <weight unit="LBS">300</weight>
      <location unit="IN"><x>368.52</x><y>-127.952756</y><z>-15.36</z></location>
    </pointmass>
+
+   <!-- Weapon stations 1-11, hung mass only. A mesh fit to AF267 on 2026-10-22,
+        not a station drawing. Stations 1-5 are the pilot's right, +Y.
+        Pointmasses 0 and 1 remain the external tanks. Empty weight is 0;
+        the weapon-stores channel copies the hung mass. -->
+   <pointmass name="Station 1 store">
+     <weight unit="LBS">0</weight>
+     <location unit="IN"><x>374.43</x><y>210</y><z>-15.36</z></location>
+   </pointmass>
+   <pointmass name="Station 2 store">
+     <weight unit="LBS">0</weight>
+     <location unit="IN"><x>371.91</x><y>175</y><z>-15.36</z></location>
+   </pointmass>
+   <pointmass name="Station 3 store">
+     <weight unit="LBS">0</weight>
+     <location unit="IN"><x>368.52</x><y>127.952756</y><z>-15.36</z></location>
+   </pointmass>
+   <pointmass name="Station 4 store">
+     <weight unit="LBS">0</weight>
+     <location unit="IN"><x>352.77</x><y>23.62</y><z>-31.11</z></location>
+   </pointmass>
+   <pointmass name="Station 5 store">
+     <weight unit="LBS">0</weight>
+     <location unit="IN"><x>352.77</x><y>45.28</y><z>-31.11</z></location>
+   </pointmass>
+   <pointmass name="Station 6 store">
+     <weight unit="LBS">0</weight>
+     <location unit="IN"><x>368.52</x><y>0</y><z>-44.89</z></location>
+   </pointmass>
+   <pointmass name="Station 7 store">
+     <weight unit="LBS">0</weight>
+     <location unit="IN"><x>352.77</x><y>-45.28</y><z>-31.11</z></location>
+   </pointmass>
+   <pointmass name="Station 8 store">
+     <weight unit="LBS">0</weight>
+     <location unit="IN"><x>352.77</x><y>-23.62</y><z>-31.11</z></location>
+   </pointmass>
+   <pointmass name="Station 9 store">
+     <weight unit="LBS">0</weight>
+     <location unit="IN"><x>368.52</x><y>-127.952756</y><z>-15.36</z></location>
+   </pointmass>
+   <pointmass name="Station 10 store">
+     <weight unit="LBS">0</weight>
+     <location unit="IN"><x>371.91</x><y>-175</y><z>-15.36</z></location>
+   </pointmass>
+   <pointmass name="Station 11 store">
+     <weight unit="LBS">0</weight>
+     <location unit="IN"><x>374.43</x><y>-210</y><z>-15.36</z></location>
+   </pointmass>
  </mass_balance>
 
  <ground_reactions>
@@ -223,6 +272,7 @@
         <property value="0">fcs/stovl-pos-norm</property>
         <property value="0">fcs/stovl-augmentation-inhibit</property>
         <property value="0">fcs/control-law-mode</property>
+        <property value="0">fcs/brake-cmd-norm</property>
         <property value="1">fcs/fbw-enabled</property>
         <property value="636.6197723675814">fcs/full-stick-roll-rate-deg_sec</property>
         <!-- Unloaded rate of the horizontal tails and rudders.
@@ -263,6 +313,137 @@
             <default value="300"/><test value="0">stores/external-tank[1]/attached lt 0.5</test>
             <output>inertia/pointmass-weight-lbs[1]</output>
           </switch>
+        </channel>
+
+        <!-- Hung weapons. The host writes occupied, store-id, mass and drag area.
+             This channel copies mass onto the station pointmass so a step cannot
+             leave the mass model behind. Drag force is qbar times area times
+             occupied, the same shape as the external tanks. 1.5 s is the
+             unpublished door-slew stand-in, fixed in this kinematic so the
+             physics step does not write it. It is not a measured door time. -->
+        <property value="0">stores/master-arm</property>
+        <property value="0">stores/gun/rounds</property>
+        <property value="0">stores/station[1]/occupied</property>
+        <property value="0">stores/station[1]/store-id</property>
+        <property value="0">stores/station[1]/mass-lbs</property>
+        <property value="0">stores/station[1]/drag-area-ft2</property>
+        <property value="0">stores/station[2]/occupied</property>
+        <property value="0">stores/station[2]/store-id</property>
+        <property value="0">stores/station[2]/mass-lbs</property>
+        <property value="0">stores/station[2]/drag-area-ft2</property>
+        <property value="0">stores/station[3]/occupied</property>
+        <property value="0">stores/station[3]/store-id</property>
+        <property value="0">stores/station[3]/mass-lbs</property>
+        <property value="0">stores/station[3]/drag-area-ft2</property>
+        <property value="0">stores/station[4]/occupied</property>
+        <property value="0">stores/station[4]/store-id</property>
+        <property value="0">stores/station[4]/mass-lbs</property>
+        <property value="0">stores/station[4]/drag-area-ft2</property>
+        <property value="0">stores/station[5]/occupied</property>
+        <property value="0">stores/station[5]/store-id</property>
+        <property value="0">stores/station[5]/mass-lbs</property>
+        <property value="0">stores/station[5]/drag-area-ft2</property>
+        <property value="0">stores/station[6]/occupied</property>
+        <property value="0">stores/station[6]/store-id</property>
+        <property value="0">stores/station[6]/mass-lbs</property>
+        <property value="0">stores/station[6]/drag-area-ft2</property>
+        <property value="0">stores/station[7]/occupied</property>
+        <property value="0">stores/station[7]/store-id</property>
+        <property value="0">stores/station[7]/mass-lbs</property>
+        <property value="0">stores/station[7]/drag-area-ft2</property>
+        <property value="0">stores/station[8]/occupied</property>
+        <property value="0">stores/station[8]/store-id</property>
+        <property value="0">stores/station[8]/mass-lbs</property>
+        <property value="0">stores/station[8]/drag-area-ft2</property>
+        <property value="0">stores/station[9]/occupied</property>
+        <property value="0">stores/station[9]/store-id</property>
+        <property value="0">stores/station[9]/mass-lbs</property>
+        <property value="0">stores/station[9]/drag-area-ft2</property>
+        <property value="0">stores/station[10]/occupied</property>
+        <property value="0">stores/station[10]/store-id</property>
+        <property value="0">stores/station[10]/mass-lbs</property>
+        <property value="0">stores/station[10]/drag-area-ft2</property>
+        <property value="0">stores/station[11]/occupied</property>
+        <property value="0">stores/station[11]/store-id</property>
+        <property value="0">stores/station[11]/mass-lbs</property>
+        <property value="0">stores/station[11]/drag-area-ft2</property>
+        <property value="0">stores/bay[0]/door-cmd-norm</property>
+        <property value="0">stores/bay[0]/door-pos-norm</property>
+        <property value="0">stores/bay[1]/door-cmd-norm</property>
+        <property value="0">stores/bay[1]/door-pos-norm</property>
+
+        <channel name="Weapon stores">
+          <switch name="stores/station[1]/carried-weight-lbs">
+            <default value="stores/station[1]/mass-lbs"/>
+            <test value="0">stores/station[1]/occupied lt 0.5</test>
+            <output>inertia/pointmass-weight-lbs[2]</output>
+          </switch>
+          <switch name="stores/station[2]/carried-weight-lbs">
+            <default value="stores/station[2]/mass-lbs"/>
+            <test value="0">stores/station[2]/occupied lt 0.5</test>
+            <output>inertia/pointmass-weight-lbs[3]</output>
+          </switch>
+          <switch name="stores/station[3]/carried-weight-lbs">
+            <default value="stores/station[3]/mass-lbs"/>
+            <test value="0">stores/station[3]/occupied lt 0.5</test>
+            <output>inertia/pointmass-weight-lbs[4]</output>
+          </switch>
+          <switch name="stores/station[4]/carried-weight-lbs">
+            <default value="stores/station[4]/mass-lbs"/>
+            <test value="0">stores/station[4]/occupied lt 0.5</test>
+            <output>inertia/pointmass-weight-lbs[5]</output>
+          </switch>
+          <switch name="stores/station[5]/carried-weight-lbs">
+            <default value="stores/station[5]/mass-lbs"/>
+            <test value="0">stores/station[5]/occupied lt 0.5</test>
+            <output>inertia/pointmass-weight-lbs[6]</output>
+          </switch>
+          <switch name="stores/station[6]/carried-weight-lbs">
+            <default value="stores/station[6]/mass-lbs"/>
+            <test value="0">stores/station[6]/occupied lt 0.5</test>
+            <output>inertia/pointmass-weight-lbs[7]</output>
+          </switch>
+          <switch name="stores/station[7]/carried-weight-lbs">
+            <default value="stores/station[7]/mass-lbs"/>
+            <test value="0">stores/station[7]/occupied lt 0.5</test>
+            <output>inertia/pointmass-weight-lbs[8]</output>
+          </switch>
+          <switch name="stores/station[8]/carried-weight-lbs">
+            <default value="stores/station[8]/mass-lbs"/>
+            <test value="0">stores/station[8]/occupied lt 0.5</test>
+            <output>inertia/pointmass-weight-lbs[9]</output>
+          </switch>
+          <switch name="stores/station[9]/carried-weight-lbs">
+            <default value="stores/station[9]/mass-lbs"/>
+            <test value="0">stores/station[9]/occupied lt 0.5</test>
+            <output>inertia/pointmass-weight-lbs[10]</output>
+          </switch>
+          <switch name="stores/station[10]/carried-weight-lbs">
+            <default value="stores/station[10]/mass-lbs"/>
+            <test value="0">stores/station[10]/occupied lt 0.5</test>
+            <output>inertia/pointmass-weight-lbs[11]</output>
+          </switch>
+          <switch name="stores/station[11]/carried-weight-lbs">
+            <default value="stores/station[11]/mass-lbs"/>
+            <test value="0">stores/station[11]/occupied lt 0.5</test>
+            <output>inertia/pointmass-weight-lbs[12]</output>
+          </switch>
+          <kinematic name="stores/bay[0]/door-position">
+            <input>stores/bay[0]/door-cmd-norm</input>
+            <traverse>
+              <setting><position>0</position><time>0</time></setting>
+              <setting><position>1</position><time>1.5</time></setting>
+            </traverse>
+            <output>stores/bay[0]/door-pos-norm</output>
+          </kinematic>
+          <kinematic name="stores/bay[1]/door-position">
+            <input>stores/bay[1]/door-cmd-norm</input>
+            <traverse>
+              <setting><position>0</position><time>0</time></setting>
+              <setting><position>1</position><time>1.5</time></setting>
+            </traverse>
+            <output>stores/bay[1]/door-pos-norm</output>
+          </kinematic>
         </channel>
 
         <!-- 0SFS control-law selection, 2026-10-05. Auto (0) resolves to
@@ -1150,6 +1331,45 @@
 
         </channel>
 
+        <!-- 0SFS differential wheel braking, 2026-10-22. Native rudder is
+             negative for yaw-right. With either main wheel loaded, yaw applies
+             the inside brake and releases the outside brake, including at full
+             symmetric brake. With no main-wheel contact, preserve that brake
+             command equally on both wheels. This is a simulator control mix,
+             not a claim about the aircraft's production brake-control law. -->
+        <channel name="Differential wheel braking">
+            <switch name="ground-braking-yaw">
+                <default value="0"/>
+                <test logic="OR" value="-fcs/rudder-cmd-norm">
+                    gear/unit[1]/WOW eq 1
+                    gear/unit[2]/WOW eq 1
+                </test>
+                <clipto><min>-1</min><max>1</max></clipto>
+            </switch>
+            <fcs_function name="ground-braking-common">
+                <function><product>
+                    <property>fcs/brake-cmd-norm</property>
+                    <difference><value>1</value><abs><property>fcs/ground-braking-yaw</property></abs></difference>
+                </product></function>
+            </fcs_function>
+            <fcs_function name="left-brake-command">
+                <function><sum>
+                    <property>fcs/ground-braking-common</property>
+                    <max><value>0</value><product><value>-1</value><property>fcs/ground-braking-yaw</property></product></max>
+                </sum></function>
+                <clipto><min>0</min><max>1</max></clipto>
+                <output>fcs/left-brake-cmd-norm</output>
+            </fcs_function>
+            <fcs_function name="right-brake-command">
+                <function><sum>
+                    <property>fcs/ground-braking-common</property>
+                    <max><value>0</value><property>fcs/ground-braking-yaw</property></max>
+                </sum></function>
+                <clipto><min>0</min><max>1</max></clipto>
+                <output>fcs/right-brake-cmd-norm</output>
+            </fcs_function>
+        </channel>
+
     </flight_control>
 
  <aerodynamics>
@@ -1606,6 +1826,129 @@
           <property>propulsion/engine[0]/plant/lift-fan/ram-drag-lbs</property>
         </function>
         <location unit="IN"><x>198.02286181</x><y>0</y><z>-15.36</z></location>
+        <direction><x>-1</x><y>0</y><z>0</z></direction>
+      </force>
+
+      <!-- Per-store drag area. Missiles use a Cd=1 disk. Bombs use the tanks' 1 ft² placeholder. The gun pod uses its 27 by 32 in face. -->
+      <force name="station-1-drag" frame="WIND">
+        <function name="stores/station[1]/drag-lbs">
+          <product>
+            <property>aero/qbar-psf</property>
+            <property>stores/station[1]/drag-area-ft2</property>
+            <property>stores/station[1]/occupied</property>
+          </product>
+        </function>
+        <location unit="IN"><x>374.43</x><y>210</y><z>-15.36</z></location>
+        <direction><x>-1</x><y>0</y><z>0</z></direction>
+      </force>
+      <force name="station-2-drag" frame="WIND">
+        <function name="stores/station[2]/drag-lbs">
+          <product>
+            <property>aero/qbar-psf</property>
+            <property>stores/station[2]/drag-area-ft2</property>
+            <property>stores/station[2]/occupied</property>
+          </product>
+        </function>
+        <location unit="IN"><x>371.91</x><y>175</y><z>-15.36</z></location>
+        <direction><x>-1</x><y>0</y><z>0</z></direction>
+      </force>
+      <force name="station-3-drag" frame="WIND">
+        <function name="stores/station[3]/drag-lbs">
+          <product>
+            <property>aero/qbar-psf</property>
+            <property>stores/station[3]/drag-area-ft2</property>
+            <property>stores/station[3]/occupied</property>
+          </product>
+        </function>
+        <location unit="IN"><x>368.52</x><y>127.952756</y><z>-15.36</z></location>
+        <direction><x>-1</x><y>0</y><z>0</z></direction>
+      </force>
+      <force name="station-4-drag" frame="WIND">
+        <function name="stores/station[4]/drag-lbs">
+          <product>
+            <property>aero/qbar-psf</property>
+            <property>stores/station[4]/drag-area-ft2</property>
+            <property>stores/station[4]/occupied</property>
+          </product>
+        </function>
+        <location unit="IN"><x>352.77</x><y>23.62</y><z>-31.11</z></location>
+        <direction><x>-1</x><y>0</y><z>0</z></direction>
+      </force>
+      <force name="station-5-drag" frame="WIND">
+        <function name="stores/station[5]/drag-lbs">
+          <product>
+            <property>aero/qbar-psf</property>
+            <property>stores/station[5]/drag-area-ft2</property>
+            <property>stores/station[5]/occupied</property>
+          </product>
+        </function>
+        <location unit="IN"><x>352.77</x><y>45.28</y><z>-31.11</z></location>
+        <direction><x>-1</x><y>0</y><z>0</z></direction>
+      </force>
+      <force name="station-6-drag" frame="WIND">
+        <function name="stores/station[6]/drag-lbs">
+          <product>
+            <property>aero/qbar-psf</property>
+            <property>stores/station[6]/drag-area-ft2</property>
+            <property>stores/station[6]/occupied</property>
+          </product>
+        </function>
+        <location unit="IN"><x>368.52</x><y>0</y><z>-44.89</z></location>
+        <direction><x>-1</x><y>0</y><z>0</z></direction>
+      </force>
+      <force name="station-7-drag" frame="WIND">
+        <function name="stores/station[7]/drag-lbs">
+          <product>
+            <property>aero/qbar-psf</property>
+            <property>stores/station[7]/drag-area-ft2</property>
+            <property>stores/station[7]/occupied</property>
+          </product>
+        </function>
+        <location unit="IN"><x>352.77</x><y>-45.28</y><z>-31.11</z></location>
+        <direction><x>-1</x><y>0</y><z>0</z></direction>
+      </force>
+      <force name="station-8-drag" frame="WIND">
+        <function name="stores/station[8]/drag-lbs">
+          <product>
+            <property>aero/qbar-psf</property>
+            <property>stores/station[8]/drag-area-ft2</property>
+            <property>stores/station[8]/occupied</property>
+          </product>
+        </function>
+        <location unit="IN"><x>352.77</x><y>-23.62</y><z>-31.11</z></location>
+        <direction><x>-1</x><y>0</y><z>0</z></direction>
+      </force>
+      <force name="station-9-drag" frame="WIND">
+        <function name="stores/station[9]/drag-lbs">
+          <product>
+            <property>aero/qbar-psf</property>
+            <property>stores/station[9]/drag-area-ft2</property>
+            <property>stores/station[9]/occupied</property>
+          </product>
+        </function>
+        <location unit="IN"><x>368.52</x><y>-127.952756</y><z>-15.36</z></location>
+        <direction><x>-1</x><y>0</y><z>0</z></direction>
+      </force>
+      <force name="station-10-drag" frame="WIND">
+        <function name="stores/station[10]/drag-lbs">
+          <product>
+            <property>aero/qbar-psf</property>
+            <property>stores/station[10]/drag-area-ft2</property>
+            <property>stores/station[10]/occupied</property>
+          </product>
+        </function>
+        <location unit="IN"><x>371.91</x><y>-175</y><z>-15.36</z></location>
+        <direction><x>-1</x><y>0</y><z>0</z></direction>
+      </force>
+      <force name="station-11-drag" frame="WIND">
+        <function name="stores/station[11]/drag-lbs">
+          <product>
+            <property>aero/qbar-psf</property>
+            <property>stores/station[11]/drag-area-ft2</property>
+            <property>stores/station[11]/occupied</property>
+          </product>
+        </function>
+        <location unit="IN"><x>374.43</x><y>-210</y><z>-15.36</z></location>
         <direction><x>-1</x><y>0</y><z>0</z></direction>
       </force>
 

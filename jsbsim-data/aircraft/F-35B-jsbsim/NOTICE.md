@@ -163,6 +163,26 @@ records original paths, original hashes, current hashes, and changes.
   The flaperon channel keeps the inherited kinematic. At this rate the
   roll-rate law hunts and the roll grows.
 
+## 0SFS modifications, 2026-10-22
+
+- Add eleven initially empty weapon-station pointmasses alongside the existing
+  external-tank pointmasses. Host-written station inputs set hung mass and drag
+  area; native channels copy occupied-store mass to the pointmasses and apply
+  per-station drag as dynamic pressure times drag area. Station coordinates are
+  a mesh fit to AF267, not a station drawing. Add master-arm and gun-round
+  properties and two bay-door kinematics with an assumed 1.5 s travel, not a
+  measured door time. Weapon release and firing are not implemented. The
+  empirical engine-model package has no weapon stations. See
+  `public/aircraft/f-35b/Stores.NOTICE.md` for procedural mesh assumptions.
+- Add differential wheel braking while either main wheel has weight on wheels.
+  The host's `fcs/brake-cmd-norm` is the symmetric pilot brake command. Yaw
+  applies the inside main brake and releases the outside brake proportionally:
+  for right yaw `y` from 0 to 1 and pilot brake `b`, left brake is `b*(1-y)`
+  and right brake is `b*(1-y)+y`; left yaw mirrors these. Centered yaw restores
+  equal brakes, and airborne yaw leaves both brakes at the pilot command.
+  This is an explicit simulator input mapping, not a production F-35 brake
+  control specification. It is shared by both engine model choices.
+
 ## Qualification boundary
 
 Installed-SDK tests cover actual app bootstrap, relocation, trim adoption,

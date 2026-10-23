@@ -6,10 +6,12 @@ so the two engine models can be flown one after the other. Choose it in
 
 The three engine files are byte-identical to the F-35B package at 0sfs commit
 `d92a928a`, the last before the plant. The aircraft XML matches that snapshot
-except for the 2026-10-12 primary-surface actuators, which are the same radian
-rate limit as the current model (`fcs/primary-surface-rate-limit-rad_sec`,
-60 deg/s, an explicit assumption). The aircraft hash below is the pre-actuator
-snapshot:
+except for the 2026-10-12 primary-surface actuators and 2026-10-22 differential
+ground braking, shared with the current model. The actuators use the same radian
+rate limit (`fcs/primary-surface-rate-limit-rad_sec`, 60 deg/s, an explicit
+assumption). Ground yaw applies the inside main brake and releases the outside
+brake, gated by native main-wheel weight on wheels, as described in the current
+model's `NOTICE.md`. The aircraft hash below is the original snapshot:
 
 | File here | Was | SHA-256 |
 | --- | --- | --- |

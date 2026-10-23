@@ -314,6 +314,7 @@
         <property value="0">fcs/stovl-pos-norm</property>
         <property value="0">fcs/stovl-augmentation-inhibit</property>
         <property value="0">fcs/control-law-mode</property>
+        <property value="0">fcs/brake-cmd-norm</property>
         <property value="1">fcs/fbw-enabled</property>
         <property value="636.6197723675814">fcs/full-stick-roll-rate-deg_sec</property>
         <!-- Unloaded rate of the horizontal tails and rudders.
@@ -1225,6 +1226,45 @@
                 <output>fcs/steer-pos-deg</output>
             </scheduled_gain>
 
+        </channel>
+
+        <!-- 0SFS differential wheel braking, 2026-10-22. Native rudder is
+             negative for yaw-right. With either main wheel loaded, yaw applies
+             the inside brake and releases the outside brake, including at full
+             symmetric brake. With no main-wheel contact, preserve that brake
+             command equally on both wheels. This is a simulator control mix,
+             not a claim about the aircraft's production brake-control law. -->
+        <channel name="Differential wheel braking">
+            <switch name="ground-braking-yaw">
+                <default value="0"/>
+                <test logic="OR" value="-fcs/rudder-cmd-norm">
+                    gear/unit[1]/WOW eq 1
+                    gear/unit[2]/WOW eq 1
+                </test>
+                <clipto><min>-1</min><max>1</max></clipto>
+            </switch>
+            <fcs_function name="ground-braking-common">
+                <function><product>
+                    <property>fcs/brake-cmd-norm</property>
+                    <difference><value>1</value><abs><property>fcs/ground-braking-yaw</property></abs></difference>
+                </product></function>
+            </fcs_function>
+            <fcs_function name="left-brake-command">
+                <function><sum>
+                    <property>fcs/ground-braking-common</property>
+                    <max><value>0</value><product><value>-1</value><property>fcs/ground-braking-yaw</property></product></max>
+                </sum></function>
+                <clipto><min>0</min><max>1</max></clipto>
+                <output>fcs/left-brake-cmd-norm</output>
+            </fcs_function>
+            <fcs_function name="right-brake-command">
+                <function><sum>
+                    <property>fcs/ground-braking-common</property>
+                    <max><value>0</value><property>fcs/ground-braking-yaw</property></max>
+                </sum></function>
+                <clipto><min>0</min><max>1</max></clipto>
+                <output>fcs/right-brake-cmd-norm</output>
+            </fcs_function>
         </channel>
 
     </flight_control>

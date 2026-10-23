@@ -57,6 +57,8 @@
       html, body { margin: 0; background: #080e14; overscroll-behavior: none; }
     </style>
     <link rel="stylesheet" href="landing.css" />
+    <!-- Registers the flight's worker while this page is read, so Start flying loads it isolated, for its shared memory, without the first visit's reload. -->
+    <script src="foss-earth-isolate.js" async></script>
   </head>
   <body>
     <div id="root">
