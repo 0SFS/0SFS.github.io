@@ -8,7 +8,8 @@ source hashes, asset hashes, resource inventory, engineering references and limi
 
 The full export includes external casing, flanges, plumbing, accessories and
 mounts. The installed export omits those meshes, while retaining the same swivel,
-nozzle, liner, hot annulus, centerbody and intake/fan. No image, texture or mesh
+nozzle, liner, hot annulus, centerbody and intake/fan, and the casing's aft band
+(`F135_AftCasing`), which shows through the airframe's engine-door cut. No image, texture or mesh
 from the user reference or TurboSquid previews is present in either runtime file.
 Those images are qualitative research references with unresolved variant/rights.
 
@@ -27,5 +28,11 @@ engine drawing, thermal map, control schedule or photometric reconstruction.
 `../F-35B_AF267-airframe.glb` remains a derivative of AF267's CC BY 4.0 model;
 its source credit is in `../NOTICE.md`. The generation removes the rejected
 `vtol` subtree and the separately identified 124-triangle static engine tube in
-`extras`, leaving its other components intact. All retained vertex/image byte
-slices are copied unchanged. The original runtime/source GLB is preserved.
+`extras`, leaving its other components intact. In their place it adds an
+original 0sfs aft closeout to the `extras` livery and dark-metal primitives
+(`scripts/f135Engine/closeout.mjs`): a painted flange, a dark recess and a
+bulkhead. They are shaped by a margin to the nozzle swept through every pitch,
+yaw and aperture, not by a drawing, and are an approximation. The manifest's
+airframe variant records them. All retained vertex/image byte slices are
+copied unchanged, and the closeout is appended after them. The original
+runtime/source GLB is preserved.

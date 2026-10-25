@@ -64,6 +64,7 @@
    </pointmass>
 
    <!-- Weapon stations 1-11, hung mass only. A mesh fit to AF267 on 2026-10-22,
+        bay waterlines refitted inside the door fit's opening on 2026-10-24;
         not a station drawing. Stations 1-5 are the pilot's right, +Y.
         Pointmasses 0 and 1 remain the external tanks. Empty weight is 0;
         the weapon-stores channel copies the hung mass. -->
@@ -81,11 +82,11 @@
    </pointmass>
    <pointmass name="Station 4 store">
      <weight unit="LBS">0</weight>
-     <location unit="IN"><x>352.77</x><y>23.62</y><z>-31.11</z></location>
+     <location unit="IN"><x>352.77</x><y>23.62</y><z>-11.03</z></location>
    </pointmass>
    <pointmass name="Station 5 store">
      <weight unit="LBS">0</weight>
-     <location unit="IN"><x>352.77</x><y>45.28</y><z>-31.11</z></location>
+     <location unit="IN"><x>352.77</x><y>45.28</y><z>-11.82</z></location>
    </pointmass>
    <pointmass name="Station 6 store">
      <weight unit="LBS">0</weight>
@@ -93,11 +94,11 @@
    </pointmass>
    <pointmass name="Station 7 store">
      <weight unit="LBS">0</weight>
-     <location unit="IN"><x>352.77</x><y>-45.28</y><z>-31.11</z></location>
+     <location unit="IN"><x>352.77</x><y>-45.28</y><z>-11.82</z></location>
    </pointmass>
    <pointmass name="Station 8 store">
      <weight unit="LBS">0</weight>
-     <location unit="IN"><x>352.77</x><y>-23.62</y><z>-31.11</z></location>
+     <location unit="IN"><x>352.77</x><y>-23.62</y><z>-11.03</z></location>
    </pointmass>
    <pointmass name="Station 9 store">
      <weight unit="LBS">0</weight>
@@ -1871,7 +1872,7 @@
             <property>stores/station[4]/occupied</property>
           </product>
         </function>
-        <location unit="IN"><x>352.77</x><y>23.62</y><z>-31.11</z></location>
+        <location unit="IN"><x>352.77</x><y>23.62</y><z>-11.03</z></location>
         <direction><x>-1</x><y>0</y><z>0</z></direction>
       </force>
       <force name="station-5-drag" frame="WIND">
@@ -1882,7 +1883,7 @@
             <property>stores/station[5]/occupied</property>
           </product>
         </function>
-        <location unit="IN"><x>352.77</x><y>45.28</y><z>-31.11</z></location>
+        <location unit="IN"><x>352.77</x><y>45.28</y><z>-11.82</z></location>
         <direction><x>-1</x><y>0</y><z>0</z></direction>
       </force>
       <force name="station-6-drag" frame="WIND">
@@ -1904,7 +1905,7 @@
             <property>stores/station[7]/occupied</property>
           </product>
         </function>
-        <location unit="IN"><x>352.77</x><y>-45.28</y><z>-31.11</z></location>
+        <location unit="IN"><x>352.77</x><y>-45.28</y><z>-11.82</z></location>
         <direction><x>-1</x><y>0</y><z>0</z></direction>
       </force>
       <force name="station-8-drag" frame="WIND">
@@ -1915,7 +1916,7 @@
             <property>stores/station[8]/occupied</property>
           </product>
         </function>
-        <location unit="IN"><x>352.77</x><y>-23.62</y><z>-31.11</z></location>
+        <location unit="IN"><x>352.77</x><y>-23.62</y><z>-11.03</z></location>
         <direction><x>-1</x><y>0</y><z>0</z></direction>
       </force>
       <force name="station-9-drag" frame="WIND">

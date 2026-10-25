@@ -15,6 +15,31 @@ the trial FDM's longitudinal CG; and exported glTF materials with embedded
 textures, including the exporter's metallic-texture channel conversion.
 Authored geometry, part names, moving-part pivots and hierarchy are preserved.
 
+The flight loads `F-35B_AF267-airframe.glb`, which the F135 repository's
+`scripts/build-f135-engine.mjs` generates from `F-35B_AF267.glb` so that the
+0sfs F135 takes the place of AF267's nozzle. The generation removes the `vtol`
+nozzle subtree and AF267's static engine tube in `extras`, and adds a 0sfs aft
+closeout to `extras` (F135's `scripts/f135Engine/closeout.mjs`): a painted flange from
+the fuselage's aft edge in to the nozzle, a dark recess behind it and a dark
+bulkhead round the engine. The closeout is shaped to clear the swivelling nozzle
+in every pose. It is an approximation, not a drawing of the real aircraft
+([proposal](../../../docs/proposals/f35b-aft-fuselage-closeout.md)). The engine
+`manifest.json` records the removed parts and the closeout. The other retained
+bytes are copied unchanged. The generated file is an adaptation of this CC BY 4.0
+model and carries the same attribution.
+
+0sfs also changes the loaded airframe in memory. When the airframe loads with
+weapon stations, `@0sfs/stores` does the following:
+
+- Cuts four weapon-bay door footprints out of the lower `fuselage` livery skin.
+- Blends the skin around them onto fitted hinge rails.
+- Hangs the clipped skin as four moving door leaves, with generated inner faces.
+- Adds a generated stand-in bay lining behind the openings.
+
+The model files are not changed. These are adaptations of this CC BY 4.0
+model and carry the same attribution.
+[Stores.NOTICE.md](Stores.NOTICE.md) records the fit and its limits.
+
 The source's proportions produce a 15.396 m length after span scaling, about
 1.3% shorter than the published 51.2 ft length. The longitudinal CG alignment
 uses the trial FDM's assumption that structural x=0 is the nose datum and its

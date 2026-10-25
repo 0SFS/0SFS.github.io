@@ -4,11 +4,11 @@
   "sourceInputs": [
     {
       "path": "../F135/scripts/build-f135-engine.mjs",
-      "sha256": "263e27f80b0e8008369e4de7034aae1d1c6f2e43da92a3125177073c809dbc8a"
+      "sha256": "b4f991dad4f968a58aa1aebfe43a0466d02c3728857e571fb69d86364c778ad4"
     },
     {
       "path": "../F135/scripts/f135Engine/source.mjs",
-      "sha256": "6a57b46fcdbd2abf90c617ab59cc16944428e77b4fd3787deed890f7eb36d3cb"
+      "sha256": "388fb0bad8b8d82e90a4d5d7cfd084174f729ba15906dcbc91e81bd8148c7961"
     },
     {
       "path": "../F135/scripts/f135Engine/profile.json",
@@ -16,11 +16,19 @@
     },
     {
       "path": "../F135/scripts/f135Engine/glb.mjs",
-      "sha256": "cb9d81855febdd817579c76f6a944359fc352786b46b049007a90b00a56fff10"
+      "sha256": "eadc49f9412d4e733817c65a17de4fb851e0b43c8c6360b7a7f1eccd640fcb2d"
     },
     {
       "path": "../F135/scripts/f135Engine/mechanism.mjs",
       "sha256": "8b5b7870f02a7b2d49ab862a0f2fa573983f11e1152c0f5df85443c1f2b26e76"
+    },
+    {
+      "path": "../F135/scripts/f135Engine/closeout.mjs",
+      "sha256": "4903a4f19a69abcfd1fa28083ee488015ec0143e9da054ac46d762fa0952d254"
+    },
+    {
+      "path": "../F135/scripts/f135Engine/intersections.mjs",
+      "sha256": "8342512a2a769646203e93d5c7304bfa022bc3df2dade6cba6c39b8c82cd1e4c"
     },
     {
       "path": "public/aircraft/f-35b/F-35B_AF267.glb",
@@ -135,8 +143,8 @@
     {
       "variant": "full",
       "path": "public/aircraft/f-35b/engine/F135-PW-600-full.glb",
-      "triangles": 24024,
-      "meshes": 150,
+      "triangles": 24408,
+      "meshes": 151,
       "standOnlyMeshes": [
         "F135_ExternalCasing",
         "F135_CasingFlanges",
@@ -145,18 +153,18 @@
         "F135_MountsAndDriveHousing"
       ],
       "morphMeshes": [],
-      "bytes": 1864272,
-      "sha256": "0fc8083a3a4d5d5d76946ea3602d4a23ebc508e58301145e489c59c1801ff71f"
+      "bytes": 1892588,
+      "sha256": "1cd94e8e3c482db4683f534332755143b373187b2162dd855c28bc05b9d6a2a2"
     },
     {
       "variant": "installed",
       "path": "public/aircraft/f-35b/engine/F135-PW-600-installed.glb",
-      "triangles": 12592,
-      "meshes": 145,
+      "triangles": 12976,
+      "meshes": 146,
       "standOnlyMeshes": [],
       "morphMeshes": [],
-      "bytes": 1037840,
-      "sha256": "4e7d837e2ab5303ab9d90a3b3321baa469e5fc204acad7e0b2f59185990aa341"
+      "bytes": 1066152,
+      "sha256": "659939a06418c56eb4d7ef40262c53c996face367776e74f10086fe1053ff5e2"
     },
     {
       "variant": "airframe",
@@ -182,10 +190,34 @@
       ],
       "removedExtrasEngineTriangles": 124,
       "retainedViewsIdentical": 434,
-      "triangles": 11467,
+      "closeoutViews": 8,
+      "closeout": {
+        "node": "extras",
+        "triangles": {
+          "shroud": 60,
+          "recess": 560,
+          "bulkhead": 144
+        },
+        "stations": [
+          2.4182,
+          2.62,
+          2.84,
+          2.96,
+          3.08,
+          3.2,
+          3.32,
+          3.44,
+          3.56,
+          3.65,
+          3.7159
+        ],
+        "margin": 0.015,
+        "approximation": true
+      },
+      "triangles": 12231,
       "meshes": 85,
-      "bytes": 1444788,
-      "sha256": "76c76d6230fcf3259e2552d793f95f5421a2ab3cc35f39a5ebf01817b38d5814"
+      "bytes": 1466196,
+      "sha256": "d27fa6a637e7678cea6e8a2bab0661ca0493404f04796af92b870f7c178d540c"
     }
   ],
   "textureCount": 0,

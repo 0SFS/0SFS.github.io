@@ -183,6 +183,15 @@ records original paths, original hashes, current hashes, and changes.
   This is an explicit simulator input mapping, not a production F-35 brake
   control specification. It is shared by both engine model choices.
 
+## 0SFS modifications, 2026-10-24
+
+- Raise the four weapon-bay station pointmasses and their drag-force
+  locations from `z=-31.11` in, below the closed belly, to the store mesh fit's
+  centre lines inside the bay-door fit's opening: stations 4 and 8 at
+  `z=-11.03` in, stations 5 and 7 at `z=-11.82` in. Their `x` and `y`, and
+  every other station, are unchanged. This is a mesh fit to AF267, not a
+  station drawing; see `public/aircraft/f-35b/Stores.NOTICE.md`.
+
 ## Qualification boundary
 
 Installed-SDK tests cover actual app bootstrap, relocation, trim adoption,
