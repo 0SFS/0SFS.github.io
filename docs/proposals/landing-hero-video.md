@@ -1,6 +1,6 @@
 # Scripted F-35B landing-page video
 
-The world feature card uses a real five-second 0SFS flight, replacing the old
+The video widget uses two real five-second 0SFS flight recordings, replacing the old
 instrument-covered C172 screenshot. Capture and encoding run from source;
 there is no hand-flown recording or generated scenery. The old `public/preview.jpg`
 remains available, but the page and its social preview now use the new footage.
@@ -14,7 +14,7 @@ remains available, but the page and its social preview now use the new footage.
 - Heading 270°, with a smooth 2° → 45° pitch command over 1.5 seconds, reaching
   approximately 45° nose-up by three seconds. Real control inputs fly the aircraft;
   the report checks measured pitch at three seconds (within 3°).
-- Google Photorealistic 3D Tiles, the physical sky, and WebGPU.
+- Google Photorealistic 3D Tiles or USGS Imagery Topo, the physical sky, and WebGPU.
 - Initial lighting: 25 October 2026, 17:14 **solar** time at the aircraft (18:10:58 CDT, 23:10:58 UTC). Tune this interactively below.
 - Start at 90% throttle; command 100% at 0.2 s (frame 6). The real engine spools up and lights its augmentor naturally; it starts dry.
 - No external fuel tanks: fresh flight defaults remove their fuel, dry mass and drag before initial conditions. Capture checks both tanks stay absent throughout.
@@ -38,8 +38,9 @@ Saved times use UTC; `scene.timeZone` still records Minneapolis.
 
 Then run `npm run capture:hero` and `npm run check:hero -- --install` to regenerate
 and install the chosen lighting. The existing video stays installed until checks pass.
-The video contains no provider HUD. The landing card supplies a clickable Google
-3D Tiles attribution link beside the video; retain that attribution when embedding.
+The videos contain no provider HUD. The landing card supplies the selected
+provider’s attribution link beside its map selector; retain that attribution
+when embedding.
 
 The scene, controls, physics steps and output timestamps are repeatable. Exact
 pixels and file sizes can vary with streamed tile detail, application changes,
@@ -52,7 +53,8 @@ Use the existing sibling `0sfs/fly` checkout with its development dependencies
 installed, the shared `foss-earth/browser-testing` checkout, and installed Google
 Chrome. On macOS the script finds the normal Chrome application; elsewhere set
 `CHROME_BIN` to the browser executable. It needs working WebGPU, VP9/H.264
-WebCodecs encoders and access to the configured Google scenery.
+WebCodecs encoders and access to the configured scenery. Only Google capture
+requires a Google key; the USGS capture does not read or inject one.
 
 The key lookup checks `GOOGLE_3D_TILES_KEY`, then `FOSS_EARTH_GOOGLE_KEY`, in the
 environment, followed by the documented ignored `.env.local` files in FOSS Earth
@@ -69,6 +71,10 @@ npm run capture:hero -- --preview
 # Record, check real decoding/seeking/playback, then install only checked assets.
 npm run capture:hero
 npm run check:hero -- --install
+
+# Capture and install the USGS version with the same controls, lighting and orbit.
+npm run capture:hero -- --scenario=scripts/hero-scenario-usgs.json
+npm run check:hero -- --dir=build/hero/f35-westbound-umn-usgs --install
 
 # Build and preview the landing page with the existing sibling fly/dist/.
 npm run dev
@@ -115,21 +121,36 @@ places metadata before media for fast startup. The installed provenance JSON
 records exact sizes, hashes and measured flight checks.
 
 Application panels, provider HUD, compass and detail slider are hidden for capture.
-The bottom-left **?** opens an anchored tooltip containing the clickable Google
-3D Tiles attribution, aircraft, location and capture date outside encoded pixels.
+The bottom-left **?** opens an anchored tooltip containing the current provider
+link, aircraft, location and capture date outside encoded pixels. The map selector
+at bottom right has a separate attribution-link icon, matching FOSS Earth’s HUD:
+Google’s legal notices for Google 3D Tiles, USGS’s credit page for USGS Imagery Topo.
 
 ## Playback and local review
 
-The landing page uses a lightweight native video element with a JPEG poster,
-WebM first and MP4 fallback. It loops silently in view, pauses offscreen or when
+The landing page uses one native video element with a matching JPEG poster,
+WebM first and MP4 fallback. Only the selected basemap’s sources enter the player.
+It loops silently in view, pauses offscreen or when
 the tab is hidden, and offers a keyboard-accessible pause/play button. Reduced
 motion or data-saving settings start with the still poster; the visitor can
 explicitly play it. With JavaScript disabled the poster remains visible.
 
-Review the hero at laptop, wide and phone widths. Check that the aircraft stays
-unobstructed, the **?** exposes the complete Google credit, playback is inline and
-silent, and the left play/pause and right Fly controls work. Under reduced motion it should stay still until
-played. No simulator or 3D-engine code is loaded by this page.
+The two inert source templates in `index.html` hold the versioned URLs and
+provider links. `public/landing-video.js` selects the URL override
+`set.map.source.basemap`, then the saved `map.source.basemap` in FOSS Earth’s
+settings record, then Google. A choice preserves the record’s other values and
+presets and carries through to the Fly URL. Unavailable storage still permits
+switching and Fly. A paused comparison keeps its time; an unplayed reduced-motion
+preview switches posters without downloading a video. Both scenarios are explicit
+JSON files; keep their time, flight, camera and encoding settings aligned when tuning.
+
+Review at laptop, wide and phone widths. Check that the aircraft stays
+unobstructed, provider links match the selected scenery, playback is inline and
+silent, and the left play/pause controls work. Fly is centered above the bottom
+controls, like the 360 viewer’s Return to map button. The entire background and
+the visible Fly label are one native link to `/fly/`; the independent controls
+sit above it. Under reduced motion it should stay still until played. No simulator
+or 3D-engine code is loaded by this page.
 
 Nothing in this workflow commits, pushes or deploys the page.
 

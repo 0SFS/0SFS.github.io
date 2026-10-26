@@ -6,6 +6,7 @@ import { after, before, describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 import { runInNewContext } from "node:vm";
 import { buildSite, checkAircraft, checkReferences, flightBuiltFrom, landingFiles } from "./build.mjs";
+import { flightHref } from "../public/landing-links.js";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const scratch = path.join(root, "build", "test", `build-${process.pid}`);
@@ -194,6 +195,7 @@ describe("checkReferences", () => {
       <meta property="og:image" content="https://0sfs.github.io/preview.jpg" />`, out);
     assert.throws(() => checkReferences(`<a href="/rc/"></a>`, out), /\/rc\//);
     assert.throws(() => checkReferences(`<meta content="https://0sfs.github.io/card.png" />`, out), /card\.png/);
+    assert.throws(() => checkReferences(`<template data-poster="media/usgs-poster.jpg"></template>`, out), /usgs-poster\.jpg/);
   });
 });
 
@@ -250,7 +252,7 @@ describe("flightBuiltFrom", () => {
 });
 
 describe("the landing page", () => {
-  const [redirect, start] = [...LANDING.matchAll(/<script>\s*([\s\S]*?)<\/script>/g)].map(([, code]) => code);
+  const [redirect] = [...LANDING.matchAll(/<script>\s*([\s\S]*?)<\/script>/g)].map(([, code]) => code);
 
   /** Runs the head's redirect at `href`; returns where it sent the browser, if anywhere. */
   function redirectFrom(href) {
@@ -260,18 +262,9 @@ describe("the landing page", () => {
     return to;
   }
 
-  /** Runs the Start link's script at `href`; returns the link it made. */
-  function startFrom(href) {
-    const url = new URL(href);
-    let link;
-    const document = { querySelector: (selector) => (selector === ".info-page__start" ? { setAttribute: (name, value) => { if (name === "href") link = value; } } : null) };
-    runInNewContext(start, { document, location: { href, search: url.search, hash: url.hash }, URL, URLSearchParams });
-    return link;
-  }
-
-  it("has its two inline scripts", () => {
+  it("keeps legacy redirects inline and loads the standalone preview module", () => {
     assert.match(redirect, /location\.replace/);
-    assert.match(start, /info-page__start/);
+    assert.match(LANDING, /<script type="module" src="landing-video\.js"><\/script>/);
   });
 
   for (const [href, to] of [
@@ -288,15 +281,19 @@ describe("the landing page", () => {
   }
 
   for (const [href, link] of [
-    ["https://0sfs.github.io/", "/fly/"],
-    ["https://0sfs.github.io/?renderer=webgl2", "/fly/?renderer=webgl2"],
-    ["https://0sfs.github.io/?mode=unknown&renderer=webgl2#view", "/fly/?renderer=webgl2#view"],
-    ["https://example.test/fork/?renderer=webgl2", "/fork/fly/?renderer=webgl2"],
+    ["https://0sfs.github.io/", "/fly/?set.map.source.basemap=google"],
+    ["https://0sfs.github.io/?renderer=webgl2", "/fly/?renderer=webgl2&set.map.source.basemap=google"],
+    ["https://0sfs.github.io/?mode=unknown&renderer=webgl2#view", "/fly/?renderer=webgl2&set.map.source.basemap=google#view"],
+    ["https://example.test/fork/?renderer=webgl2", "/fork/fly/?renderer=webgl2&set.map.source.basemap=google"],
   ]) {
     it(`at ${href}, starts the flight at ${link}`, () => {
-      assert.equal(startFrom(href), link);
+      assert.equal(flightHref(href, "google"), link);
     });
   }
+
+  it("replaces a URL basemap override with the newly selected map", () => {
+    assert.equal(flightHref('https://0sfs.github.io/?set.map.source.basemap=google#view', 'usgs-imagery-topo'), '/fly/?set.map.source.basemap=usgs-imagery-topo#view');
+  });
 
   it("links documents that are in the 0SFS checkouts beside this one", () => {
     const org = path.join(root, "..");

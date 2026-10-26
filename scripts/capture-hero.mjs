@@ -26,7 +26,9 @@ const tuning = process.argv.includes('--tune');
 const preview = process.argv.includes('--preview');
 const address = new URL(argument('url', 'https://127.0.0.1:7470/fly/'));
 if (!['127.0.0.1', 'localhost'].includes(address.hostname) || address.protocol !== 'https:') throw new Error('Capture requires a local HTTPS development server.');
-if (config.scene.scenery !== 'google') throw new Error('This capture requires Google Photorealistic 3D Tiles.');
+if (!['google', 'usgs-imagery-topo'].includes(config.scene.scenery)) throw new Error('Choose Google 3D Tiles or USGS Imagery Topo scenery.');
+const googleScenery = config.scene.scenery === 'google';
+const sceneryName = googleScenery ? 'Google 3D Tiles' : 'USGS Imagery Topo';
 const { fps, durationSeconds, throttleAtSeconds } = config.timeline;
 if (![fps, fps * durationSeconds, fps * throttleAtSeconds].every(Number.isInteger) || durationSeconds <= 0 || fps < 1 || fps > 60 || durationSeconds > 15 || throttleAtSeconds < 0 || throttleAtSeconds >= durationSeconds) throw new Error('Use a bounded timeline with exact frame-aligned events.');
 const bounded = (value, min, max) => Number.isFinite(value) && value >= min && value <= max;
@@ -65,8 +67,8 @@ async function googleKey() {
   }
   throw new Error('No Google key found in the documented environment variables or local .env.local files.');
 }
-const key = await googleKey();
-const sanitize = value => String(value).split(key).join('[redacted]').replace(/([?&](?:key|gkey)=)[^&\s"']+/gi, '$1[redacted]');
+const key = googleScenery ? await googleKey() : null;
+const sanitize = value => (key ? String(value).split(key).join('[redacted]') : String(value)).replace(/([?&](?:key|gkey)=)[^&\s"']+/gi, '$1[redacted]');
 let server, serverLog, chrome, detach;
 let probeStatus = 'not probed';
 const profile = path.join(output, 'chrome-profile');
@@ -148,10 +150,10 @@ try {
   await chrome.send('Page.enable', {}, sessionId);
   await chrome.send('Emulation.setDeviceMetricsOverride', { width: config.video.width, height: config.video.height, deviceScaleFactor: 1, mobile: false }, sessionId);
   await chrome.send('Fetch.enable', { patterns: [{ urlPattern: '*src/flight/createFlightSimApp.ts*', requestStage: 'Response' }] }, sessionId);
-  await chrome.send('Page.addScriptToEvaluateOnNewDocument', { source: `if(location.origin===${JSON.stringify(address.origin)}) localStorage.setItem('foss-earth.settings.v1', JSON.stringify({version:1,values:{'map.source.googleKey':${JSON.stringify(key)}}}));` }, sessionId);
+  if (key) await chrome.send('Page.addScriptToEvaluateOnNewDocument', { source: `if(location.origin===${JSON.stringify(address.origin)}) localStorage.setItem('foss-earth.settings.v1', JSON.stringify({version:1,values:{'map.source.googleKey':${JSON.stringify(key)}}}));` }, sessionId);
   const date = new Date(config.scene.dateTime);
   const settings = {
-    'renderer.mode': 'webgpu', 'map.source.basemap': 'google',
+    'renderer.mode': 'webgpu', 'map.source.basemap': config.scene.scenery,
     'osfs.aircraft.id': 'f-35b', 'osfs.start.resume': false,
     'osfs.start.latitude': config.scene.latitude, 'osfs.start.longitude': config.scene.longitude,
     'osfs.start.heightAboveGround': config.scene.heightAboveGroundMeters, 'osfs.start.heading': config.scene.headingDegrees,
@@ -165,15 +167,16 @@ try {
   };
   for (const [id, value] of Object.entries(settings)) address.searchParams.set(`set.${id}`, String(value));
   address.searchParams.set('renderer', 'webgpu');
-  console.log(`Loading F-35B, Google 3D Tiles, ${config.scene.dateTime}.`);
+  console.log(`Loading F-35B, ${sceneryName}, ${config.scene.dateTime}.`);
   await chrome.send('Page.navigate', { url: address.href }, sessionId);
   await waitForExpression(chrome, sessionId, 'window.__osfsHero?.status().ready === true || window.__osfsCaptureError', 90000);
   const captureError = await run('window.__osfsCaptureError ?? null');
   if (captureError) throw new Error(captureError);
   if (!instrumented) throw new Error('The development application was not instrumented.');
   const initial = await run(`window.__osfsHero.prepare(${JSON.stringify({...config, tuning})})`);
-  if (initial.mode !== 'google-tiles') throw new Error('Google 3D Tiles did not activate; refusing a substitute capture.');
-  console.log('Aircraft ready; waiting for Google scenery to settle.');
+  const expectedMode = googleScenery ? 'google-tiles' : 'raster-basemap';
+  if (initial.mode !== expectedMode || (!googleScenery && initial.basemap !== config.scene.scenery)) throw new Error(`${sceneryName} did not activate; refusing a substitute capture.`);
+  console.log(`Aircraft ready; waiting for ${sceneryName} scenery to settle.`);
   await waitForExpression(chrome, sessionId, '!window.__osfsHero.status().streaming', 60000);
   if (tuning) {
     const before = await run('window.__osfsHero.status()');
@@ -204,7 +207,7 @@ try {
     } finally { lines.close(); process.removeListener('SIGINT', stop); }
   } else {
   await run(`(() => {
-    if (!document.querySelector('.map-source-hud')) throw new Error('Google source credit is missing.');
+    if (!document.querySelector('.map-source-hud')) throw new Error('Map source credit is missing.');
     const style = document.createElement('style');
     style.textContent = 'body * { visibility: hidden !important; } canvas.flight-app__canvas { visibility: visible !important; }';
     document.head.appendChild(style);
@@ -255,6 +258,7 @@ try {
     report.telemetry = telemetry;
     report.checks = {
       frames, durationSeconds: frames / fps,
+      scenery: telemetry.every(sample => sample.mode === expectedMode && (googleScenery || sample.basemap === config.scene.scenery)),
       skyTime: Math.abs(start.sky.renderedUtcMs - Date.parse(config.scene.dateTime)) < 1000,
       cameraOrbitStartDegrees: telemetry[0].cameraYawDegrees,
       cameraOrbitEndDegrees: telemetry.at(-1).cameraYawDegrees,
@@ -275,7 +279,7 @@ try {
       frameClock: Math.abs(telemetry.at(-1).time - start.time - (frames - 1) / fps) < .00001,
     };
     console.log(JSON.stringify({ files: report.files, checks: report.checks }, null, 2));
-    if (!report.checks.afterburnerDelayed || !report.checks.spoolingBeforeLight || !report.checks.noExternalTanks || !report.checks.skyTime || !report.checks.cameraOrbit || !report.checks.climbPitchReached || !report.checks.throttleStep || !report.checks.dryBeforeCue || !report.checks.afterburnerLit || !report.checks.climbing || !report.checks.westbound || !report.checks.frameClock || errors.length) process.exitCode = 1;
+    if (!report.checks.scenery || !report.checks.afterburnerDelayed || !report.checks.spoolingBeforeLight || !report.checks.noExternalTanks || !report.checks.skyTime || !report.checks.cameraOrbit || !report.checks.climbPitchReached || !report.checks.throttleStep || !report.checks.dryBeforeCue || !report.checks.afterburnerLit || !report.checks.climbing || !report.checks.westbound || !report.checks.frameClock || errors.length) process.exitCode = 1;
   }
   await writeFile(path.join(output, 'capture.json'), JSON.stringify(report, null, 2));
   }

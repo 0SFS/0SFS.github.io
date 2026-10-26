@@ -84,7 +84,7 @@ export function flightBuiltFrom(flightPage) {
 /** Every file the landing page links on this site is in it. */
 export function checkReferences(landing, out) {
   const references = [
-    ...[...landing.matchAll(/\s(?:src|href)="([^"]+)"/g)].map(([, value]) => value),
+    ...[...landing.matchAll(/\s(?:src|href|data-poster)="([^"]+)"/g)].map(([, value]) => value),
     ...[...landing.matchAll(/\scontent="([^"]+)"/g)].map(([, value]) => value).filter((value) => value.startsWith(SITE_URL)),
   ];
   const missing = [];

@@ -60,6 +60,7 @@
     <!-- Registers the flight's worker while this page is read, so Fly loads it isolated, for its shared memory, without the first visit's reload. -->
     <script src="foss-earth-isolate.js" async></script>
     <script type="module" src="landing-help.js"></script>
+    <script type="module" src="landing-video.js"></script>
   </head>
   <body>
     <div id="root">
@@ -72,22 +73,39 @@
                 <source src="media/f35-westbound-umn.webm?v=051e58646741" type="video/webm" />
                 <source src="media/f35-westbound-umn.mp4?v=6ecd633c4d9c" type="video/mp4" />
               </video>
+              <template data-preview-map="google" data-label="Google 3D Tiles" data-poster="media/f35-westbound-umn-poster.jpg?v=01c516de0e0b" data-credit="https://www.google.com/help/legalnotices_maps/">
+                <source src="media/f35-westbound-umn.webm?v=051e58646741" type="video/webm" />
+                <source src="media/f35-westbound-umn.mp4?v=6ecd633c4d9c" type="video/mp4" />
+              </template>
+              <template data-preview-map="usgs-imagery-topo" data-label="USGS Imagery Topo" data-poster="media/f35-westbound-umn-usgs-poster.jpg?v=5a272aa71796" data-credit="https://www.usgs.gov/information-policies-and-instructions/acknowledging-or-crediting-usgs">
+                <source src="media/f35-westbound-umn-usgs.webm?v=4387fb9a2b70" type="video/webm" />
+                <source src="media/f35-westbound-umn-usgs.mp4?v=79bfd5aa249f" type="video/mp4" />
+              </template>
               <h1 id="video-title" class="feature__video-heading">
                 <span class="feature__video-wordmark">0SFS</span>
                 <span class="feature__video-name">Open Source Flight Simulator</span>
               </h1>
+              <a class="info-page__start" href="fly/"><span class="feature__fly">Fly <span aria-hidden="true">↗</span></span></a>
               <div class="feature__world-controls">
                 <div class="feature__world-controls-left">
                   <button class="feature__video-toggle" type="button" aria-label="Play flight preview" title="Play flight preview" hidden><span aria-hidden="true">▶</span></button>
                   <button type="button" class="info-page__help-button" hidden data-help="world-help" aria-label="About 0SFS and this flight preview">?</button>
                 </div>
-                <a class="info-page__start" href="fly/">Fly <span aria-hidden="true">↗</span></a>
+                <div class="feature__map" role="group" aria-label="Preview map source" hidden>
+                  <select class="feature__map-select" aria-label="Preview basemap">
+                    <option value="google">Google 3D Tiles</option>
+                    <option value="usgs-imagery-topo">USGS Imagery Topo</option>
+                  </select>
+                  <a class="feature__map-credit" href="https://www.google.com/help/legalnotices_maps/" target="_blank" rel="noopener noreferrer" aria-label="Google 3D Tiles attribution, opens in a new tab" title="Google 3D Tiles attribution">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5" /><path d="M14 4h6v6" /><path d="M20 4 10 14" /></svg>
+                  </a>
+                </div>
               </div>
               <div id="world-help" class="info-page__help-tooltip" hidden>
                 <h2>0SFS — Open Source Flight Simulator</h2>
                 <p>Fly over real-world terrain with WebGPU graphics, JSBSim flight dynamics and a sky built on physics. Pair your phone and take the controls.</p>
                 <p>Explore familiar places from a whole new angle. Stream scenery with FOSS Earth. Switch between first-person and chase views.</p>
-                <p><span>Captured in 0SFS · <a class="feature__attribution" href="https://www.google.com/help/legalnotices_maps/" target="_blank" rel="noopener">Google 3D Tiles ↗</a></span><br /><span>F-35B · Minneapolis · 25 Oct 2026, 18:10 CDT</span></p>
+                <p><span>Captured in 0SFS · <a class="feature__attribution" data-preview-credit href="https://www.google.com/help/legalnotices_maps/" target="_blank" rel="noopener">Google 3D Tiles ↗</a></span><br /><span>F-35B · Minneapolis · 25 Oct 2026, 18:10 CDT</span></p>
                 <p><a href="https://github.com/0SFS/fly">Explore the source <span aria-hidden="true">↗</span></a></p>
               </div>
             </article>
@@ -226,53 +244,5 @@
         </footer>
       </div>
     </div>
-    <script>
-      // Start flying keeps the address's settings, such as ?renderer=webgl2.
-      (function () {
-        var start = document.querySelector(".info-page__start");
-        var params = new URLSearchParams(location.search);
-        params.delete("mode");
-        var next = new URL("fly/", location.href);
-        next.search = params.toString();
-        start.setAttribute("href", next.pathname + next.search + location.hash);
-      })();
-      (function () {
-        var video = document.querySelector(".feature__scenery");
-        if (!video) return;
-        var toggle = document.querySelector(".feature__video-toggle");
-        var motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-        var wantsPlayback = !motion.matches && !navigator.connection?.saveData;
-        var inView = true;
-        video.muted = true;
-        toggle.hidden = false;
-        function showState() {
-          var action = video.paused ? "Play" : "Pause";
-          toggle.setAttribute("aria-label", action + " flight preview");
-          toggle.title = action + " flight preview";
-          toggle.firstElementChild.textContent = video.paused ? "▶" : "⏸";
-        }
-        function updatePlayback() {
-          if (wantsPlayback && inView && !document.hidden) video.play().catch(showState);
-          else video.pause();
-          showState();
-        }
-        video.addEventListener("playing", showState);
-        video.addEventListener("pause", showState);
-        toggle.addEventListener("click", function () {
-          wantsPlayback = video.paused;
-          updatePlayback();
-        });
-        motion.addEventListener("change", function () {
-          wantsPlayback = !motion.matches && !navigator.connection?.saveData;
-          updatePlayback();
-        });
-        document.addEventListener("visibilitychange", updatePlayback);
-        if ("IntersectionObserver" in window) new IntersectionObserver(function (entries) {
-          inView = entries[0].isIntersecting;
-          updatePlayback();
-        }).observe(video);
-        updatePlayback();
-      })();
-    </script>
   </body>
 </html>

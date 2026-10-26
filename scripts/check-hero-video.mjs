@@ -18,6 +18,7 @@ const profile = path.join(output, 'chrome-profile');
 await mkdir(output, { recursive: true });
 const capture = JSON.parse(await readFile(path.join(directory, 'capture.json'), 'utf8'));
 if (!capture.checks?.afterburnerDelayed || !capture.checks?.spoolingBeforeLight || !capture.checks?.noExternalTanks || !capture.checks?.skyTime || !capture.checks?.cameraOrbit || !capture.checks?.climbPitchReached || !capture.checks?.throttleStep || !capture.checks?.frameClock || !capture.checks?.dryBeforeCue || !capture.checks?.afterburnerLit || !capture.checks?.climbing || !capture.checks?.westbound || capture.errors.length) throw new Error('Capture telemetry did not pass. Record a fresh clip before checking or installing.');
+if (capture.config.scene.scenery === 'usgs-imagery-topo' && !capture.checks.scenery) throw new Error('The USGS capture did not verify its scenery provider.');
 const browserRoot = path.resolve(argument('browser-testing', path.join(root, '../../foss-earth/browser-testing')));
 const { openHeadlessChrome, evaluate } = await import(pathToFileURL(path.join(browserRoot, 'src/headlessChrome.mjs')));
 let chrome;

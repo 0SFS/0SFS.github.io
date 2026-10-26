@@ -86,7 +86,14 @@ illustration is preserved.
 The grid starts at the top of the page, without the navigation bar, introduction
 or Multiplayer Early preview badge. The video widget shows **0SFS** and
 **Open Source Flight Simulator** at the top left, play/pause and **?** at bottom
-left, and **Fly** at bottom right. All explanatory
-copy, capture details, source link and Google attribution are in its anchored
+left, and **Fly** centered above the bottom controls, matching the 360 viewer’s
+Return to map placement. A compact bottom-right map selector switches between
+Google 3D Tiles and USGS Imagery Topo recordings of the same scripted flight.
+Only the selected video loads; the choice persists in the shared basemap setting
+and carries through to Fly. A separate external-link icon opens the selected
+provider’s attribution page, as in FOSS Earth. The video background shares one
+native Fly link with the centered label; all other controls remain independently
+clickable above it. Explanatory
+copy, capture details, source link and a second provider link are in its anchored
 tooltip. Every landing-page **?** uses the shared explanation behavior, without
 centered popups or a dimming backdrop. See the supplementary-copy policy.

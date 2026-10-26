@@ -5,10 +5,11 @@ site build that serves [fly](https://github.com/0SFS/fly)'s simulator at `/fly/`
 at `/rc/`, and the site's `robots.txt`, sitemap and preview image. It holds no simulator code: the
 flight it publishes is a fly build, named by its commit.
 
-- `index.html` and `landing.css` are the landing page, static HTML with two small inline scripts:
-  one sends links from before `/fly/` and `/rc/` existed (`?mode=flight`, `?mode=remote`) to them, and
-  one keeps the address's settings, such as `?renderer=webgl2`, on the Start flying link and
-  controls the silent flight preview, respecting reduced motion and data-saving preferences.
+- `index.html` and `landing.css` are the static landing page. Its inline script
+  redirects old `?mode=flight` / `?mode=remote` links to `/fly/` / `/rc/`.
+  `public/landing-video.js` controls playback and switches between Google 3D Tiles
+  and USGS Imagery Topo recordings, respecting reduced motion and data saving.
+  It preserves URL settings and carries the selected basemap through to Fly.
 - `public/` is copied to the site's root as it is. `images/` holds artwork the page does not use
   yet, so it is not published.
 - `scripts/build.mjs` makes `dist/` from fly's `dist/` and this repository, and checks it.
@@ -24,8 +25,10 @@ physical sky and astronomy, systems, sound and the two-pilot multiplayer preview
 larger multiplayer sessions are explicitly planned. The copy's evidence and limits are recorded in the
 [25 October comparison](https://github.com/0SFS/research/blob/main/browser-flight-sim-positioning-2026-10-25.md)
 and the [feature-grid design and local review](docs/proposals/landing-feature-grid.md).
-The grid opens directly with a video card: play/pause and **?** on the left, Fly on
-the right. Descriptions, capture details and credits open in compact anchored **?**
+The grid opens directly with a video card: play/pause and **?** at bottom left,
+Fly centered above the controls, and a basemap selector with its attribution link
+at bottom right. The entire video background is the Fly link; its other controls
+remain independent. Descriptions, capture details and artwork credits open in compact anchored **?**
 tooltips, as do aircraft qualifications. The site copies the standalone helper from
 the adjacent `~/gh/foss-earth/ui/dist/` build (run `npm run build` there if missing).
 Essential status, including the F-35B's Experimental badge, stays visible.

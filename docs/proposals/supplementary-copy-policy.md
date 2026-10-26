@@ -35,8 +35,13 @@ Models built in this project’s own code need no third-party model credit; exte
 content shown on their screens still needs its own attribution.
 
 The video widget is deliberately image-first: play/pause and **?** at the
-bottom left, **Fly** at the bottom right. Its description, capture date/location,
-source link and Google notices belong inside its tooltip. The top-left title
+bottom left, **Fly** centered above the controls, and the preview basemap selector
+at the bottom right. The video background and visible Fly label share one native
+link; playback, help, basemap and provider attribution are independent controls
+above that link. As explicitly requested, the selector retains FOSS Earth’s
+separate external-link icon to the current provider’s attribution page.
+Its description, capture date/location, source link and a second provider link
+belong inside its tooltip. The top-left title
 shows **0SFS** and **Open Source Flight Simulator** over a subtle gradient for
 contrast. There is no caption bar or permanent descriptive paragraph.
 

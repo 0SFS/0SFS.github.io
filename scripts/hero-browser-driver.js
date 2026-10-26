@@ -18,6 +18,7 @@ const hero = window.__osfsHero = {
       externalTanks: readExternalFuelTanks(jsbsim.sdk, aircraftId).map(tank => ({ index: tank.index, attached: tank.attached, contentsLbs: jsbsim.sdk.getPropertyValue(`propulsion/tank[${tank.index}]/contents-lbs`) })),
       aircraftId,
       mode: runtime.status.mode,
+      basemap: runtime.status.rasterBaseMap?.id ?? null,
       streaming: runtime.isStreamingTiles(),
       tiles: runtime.getTileMetrics(),
       fault: physicsLoop.getFault(),
