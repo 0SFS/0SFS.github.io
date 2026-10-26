@@ -29,7 +29,472 @@
       "heightMeters": 4,
       "orbitDegrees": 12,
       "fieldOfViewDegrees": 55,
-      "orbitEndDegrees": -8
+      "orbitEndDegrees": -8,
+      "mode": "manual",
+      "keyframes": [
+        {
+          "timeSeconds": 0,
+          "yawDegrees": -20.65859432245693,
+          "pitchDegrees": 11.181195593418087,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 0.8333333333333334,
+          "yawDegrees": -17.79380534680281,
+          "pitchDegrees": 21.49443590577291,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 1.1666666666666667,
+          "yawDegrees": -17.79380534680281,
+          "pitchDegrees": 21.49443590577291,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 1.2,
+          "yawDegrees": -17.79380534680281,
+          "pitchDegrees": 21.49443590577291,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 1.5333333333333334,
+          "yawDegrees": -17.79380534680281,
+          "pitchDegrees": 21.49443590577291,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 1.5666666666666667,
+          "yawDegrees": -17.79380534680281,
+          "pitchDegrees": 21.49443590577291,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3,
+          "yawDegrees": -17.79380534680281,
+          "pitchDegrees": 21.49443590577291,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.033333333333333,
+          "yawDegrees": -17.793941312463605,
+          "pitchDegrees": 21.493946429394043,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.066666666666667,
+          "yawDegrees": -17.79486527869013,
+          "pitchDegrees": 21.490620150978568,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.1,
+          "yawDegrees": -17.797290112508268,
+          "pitchDegrees": 21.481890749233255,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.1333333333333333,
+          "yawDegrees": -17.80184933992587,
+          "pitchDegrees": 21.4654775305299,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.1666666666666665,
+          "yawDegrees": -17.80910003106063,
+          "pitchDegrees": 21.439375042444752,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.2,
+          "yawDegrees": -17.819525685268065,
+          "pitchDegrees": 21.401842687297986,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.2333333333333334,
+          "yawDegrees": -17.833539116269407,
+          "pitchDegrees": 21.35139433569316,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.2666666666666666,
+          "yawDegrees": -17.85148533727955,
+          "pitchDegrees": 21.286787940056655,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.3,
+          "yawDegrees": -17.87364444613497,
+          "pitchDegrees": 21.20701514817713,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.3333333333333335,
+          "yawDegrees": -17.900234510421676,
+          "pitchDegrees": 21.111290916744995,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.3666666666666667,
+          "yawDegrees": -17.931414452603107,
+          "pitchDegrees": 20.99904312489184,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.4,
+          "yawDegrees": -17.96728693514809,
+          "pitchDegrees": 20.86990218772991,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.433333333333333,
+          "yawDegrees": -18.007901245658747,
+          "pitchDegrees": 20.723690669891543,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.466666666666667,
+          "yawDegrees": -18.053256181998442,
+          "pitchDegrees": 20.56041289906863,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.5,
+          "yawDegrees": -18.10330293741971,
+          "pitchDegrees": 20.380244579552077,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.533333333333333,
+          "yawDegrees": -18.15794798569216,
+          "pitchDegrees": 20.183522405771246,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.566666666666667,
+          "yawDegrees": -18.217055966230447,
+          "pitchDegrees": 19.970733675833415,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.6,
+          "yawDegrees": -18.280452569222163,
+          "pitchDegrees": 19.74250590506324,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.6333333333333333,
+          "yawDegrees": -18.347927420755788,
+          "pitchDegrees": 19.499596439542195,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.6666666666666665,
+          "yawDegrees": -18.41923696794861,
+          "pitchDegrees": 19.24288206964803,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.7,
+          "yawDegrees": -18.494107364074665,
+          "pitchDegrees": 18.973348643594232,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.7333333333333334,
+          "yawDegrees": -18.572237353692657,
+          "pitchDegrees": 18.692080680969468,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.7666666666666666,
+          "yawDegrees": -18.653301157773882,
+          "pitchDegrees": 18.400250986277058,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.8,
+          "yawDegrees": -18.736951358830176,
+          "pitchDegrees": 18.0991102624744,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.8333333333333335,
+          "yawDegrees": -18.822821786041825,
+          "pitchDegrees": 17.78997672451246,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.8666666666666667,
+          "yawDegrees": -18.91053040038551,
+          "pitchDegrees": 17.474225712875185,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.9,
+          "yawDegrees": -18.99968217976223,
+          "pitchDegrees": 17.153279307118993,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.933333333333333,
+          "yawDegrees": -19.089872004125226,
+          "pitchDegrees": 16.828595939412214,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 3.966666666666667,
+          "yawDegrees": -19.180687540607916,
+          "pitchDegrees": 16.501660008074534,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4,
+          "yawDegrees": -19.271712128651824,
+          "pitchDegrees": 16.173971491116465,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.033333333333333,
+          "yawDegrees": -19.362527665134515,
+          "pitchDegrees": 15.847035559778782,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.066666666666666,
+          "yawDegrees": -19.45271748949751,
+          "pitchDegrees": 15.522352192072002,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.1,
+          "yawDegrees": -19.541869268874226,
+          "pitchDegrees": 15.201405786315814,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.133333333333334,
+          "yawDegrees": -19.629577883217916,
+          "pitchDegrees": 14.885654774678539,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.166666666666667,
+          "yawDegrees": -19.715448310429565,
+          "pitchDegrees": 14.576521236716596,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.2,
+          "yawDegrees": -19.79909851148586,
+          "pitchDegrees": 14.275380512913937,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.233333333333333,
+          "yawDegrees": -19.880162315567084,
+          "pitchDegrees": 13.98355081822153,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.266666666666667,
+          "yawDegrees": -19.958292305185076,
+          "pitchDegrees": 13.702282855596764,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.3,
+          "yawDegrees": -20.03316270131113,
+          "pitchDegrees": 13.432749429542966,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.333333333333333,
+          "yawDegrees": -20.104472248503953,
+          "pitchDegrees": 13.176035059648802,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.366666666666666,
+          "yawDegrees": -20.171947100037578,
+          "pitchDegrees": 12.933125594127752,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.4,
+          "yawDegrees": -20.235343703029294,
+          "pitchDegrees": 12.704897823357582,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.433333333333334,
+          "yawDegrees": -20.29445168356758,
+          "pitchDegrees": 12.49210909341975,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.466666666666667,
+          "yawDegrees": -20.349096731840035,
+          "pitchDegrees": 12.295386919638918,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.5,
+          "yawDegrees": -20.3991434872613,
+          "pitchDegrees": 12.115218600122365,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.533333333333333,
+          "yawDegrees": -20.444498423600997,
+          "pitchDegrees": 11.951940829299454,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.566666666666666,
+          "yawDegrees": -20.485112734111652,
+          "pitchDegrees": 11.805729311461091,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.6,
+          "yawDegrees": -20.520985216656637,
+          "pitchDegrees": 11.676588374299145,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.633333333333334,
+          "yawDegrees": -20.552165158838065,
+          "pitchDegrees": 11.56434058244601,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.666666666666667,
+          "yawDegrees": -20.578755223124773,
+          "pitchDegrees": 11.468616351013862,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.7,
+          "yawDegrees": -20.600914331980192,
+          "pitchDegrees": 11.38884355913434,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.733333333333333,
+          "yawDegrees": -20.618860552990334,
+          "pitchDegrees": 11.324237163497832,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.766666666666667,
+          "yawDegrees": -20.632873983991676,
+          "pitchDegrees": 11.27378881189301,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.8,
+          "yawDegrees": -20.64329963819911,
+          "pitchDegrees": 11.236256456746245,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.833333333333333,
+          "yawDegrees": -20.65055032933387,
+          "pitchDegrees": 11.210153968661102,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.866666666666666,
+          "yawDegrees": -20.65510955675147,
+          "pitchDegrees": 11.193740749957753,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.9,
+          "yawDegrees": -20.657534390569616,
+          "pitchDegrees": 11.185011348212416,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.933333333333334,
+          "yawDegrees": -20.658458356796135,
+          "pitchDegrees": 11.18168506979695,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.966666666666667,
+          "yawDegrees": -20.65859432245693,
+          "pitchDegrees": 11.181195593418087,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        }
+      ]
     },
     "video": {
       "width": 960,
@@ -39,31 +504,34 @@
       "posterQuality": 82
     }
   },
-  "capturedAt": "2026-10-26T01:49:52.846Z",
+  "capturedAt": "2026-10-26T22:18:57.335Z",
   "source": "real development simulator; browser-only instrumentation",
   "provenance": {
     "flight": {
-      "commit": "3cae916ac7c50bcc4582571f22c703f756e3c27e",
-      "dirty": true
+      "commit": "4ef209be8056fa047d343718e3456edca8efa680",
+      "dirty": false
     },
     "website": {
-      "commit": "a14293c2dc8dd57521d7577f50065ff4342d2142",
-      "dirty": true
+      "commit": "b74b079fd5821735013ccb0f3f1bff530741d0db",
+      "dirty": false
     },
     "scripts": {
-      "capture-hero.mjs": "19b26c03a04148a12bd3d248f267290a713ae21e32cfd0f303fb1e86cdd16738",
-      "hero-browser-driver.js": "a4abfa363ed81ebf78efcbb5b09fd05987106de986e472dbbf2e799e2727a7c0",
+      "capture-hero.mjs": "069e226310fa64af63f517f47942b57a9cfd72ddeb9a6b663f329615a736c185",
+      "hero-browser-driver.js": "c3c26407d426643c171be17f9f4d811ff9900384d42212aedb9ec1f5e00ce1b8",
+      "hero-camera.js": "51044288f24bb6b6fab368c54b9eac7e8b5b79a24f7f7e7861459e093742143a",
+      "hero-instrument.mjs": "e4c4da33a0bd49d81af9354dda252cc1566eaab8102e560eaa3f18a25aca0ed6",
       "hero-browser-encoder.js": "bce7f2ee5c5b37e459f9f5d44d7e0df7c7ce3df2e8bf0b542fd790922b62b35c",
       "hero-muxers.mjs": "be54ca1f7673b51de13d694c8c7fcc6b305e8b9a9493a95519536391ca8e8e99"
     },
-    "flightSourceSha256": "8fc59cb689f978da36e976a5caeea305cc315323997cae120ef429ca04e99675"
+    "flightSourceSha256": "ea51bcd357cdb5307a9468f06bfcbe71a18d5d2c904f0d9cce6c4f080bfc3640"
   },
   "checks": {
     "frames": 150,
     "durationSeconds": 5,
+    "scenery": true,
     "skyTime": true,
-    "cameraOrbitStartDegrees": 11.999999999999998,
-    "cameraOrbitEndDegrees": -7.866666666666646,
+    "cameraOrbitStartDegrees": -20.65859432245693,
+    "cameraOrbitEndDegrees": -20.65859432245691,
     "cameraOrbit": true,
     "noExternalTanks": true,
     "throttleCueFrame": 6,
@@ -76,6 +544,7 @@
     "pitchAtThreeSecondsDegrees": 42.7268517792806,
     "climbPitchReached": true,
     "climbing": true,
+    "headingHeld": true,
     "westbound": true,
     "simulatedSeconds": 4.966666666666654,
     "frameClock": true
@@ -84,14 +553,14 @@
     {
       "filename": "f35-westbound-umn.webm",
       "codec": "vp9",
-      "bytes": 239344,
-      "sha256": "051e586467413814e58a37c1b07b2267f77dc8f473e4e69595b69f1485d32dfe"
+      "bytes": 274311,
+      "sha256": "2775ed309f5e5d3a3401c1663f15dfc307b544192fd186691a7df1abc21ce8ca"
     },
     {
       "filename": "f35-westbound-umn.mp4",
       "codec": "h264",
-      "bytes": 402198,
-      "sha256": "6ecd633c4d9c02f0175ce702e7cbd848cbe9d4df11fcf6624a2918b17bf87d4c"
+      "bytes": 423296,
+      "sha256": "b07965dda6ec61c9d1a1a33d5ce463865a8aa023baddfd3e3f93c6cb4c0a4004"
     }
   ],
   "decode": [
@@ -106,8 +575,8 @@
         2,
         4.9
       ],
-      "advancedTo": 0.060605,
-      "variance": 4576.646400528098
+      "advancedTo": 0.1232,
+      "variance": 5505.878705608902
     },
     {
       "file": "f35-westbound-umn.mp4",
@@ -120,8 +589,8 @@
         2,
         4.9
       ],
-      "advancedTo": 0.067613,
-      "variance": 4623.949454355654
+      "advancedTo": 0.0751,
+      "variance": 5536.798159155955
     }
   ]
 }

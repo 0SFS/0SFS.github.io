@@ -1,10 +1,12 @@
 {
-  "commit": "6e42455755cfc4a3d1ecb62213141f69e8678ead",
+  "commit": "1e0b66ded01d758b91b09ae40202e828a25442ad",
   "dirty": false,
   "files": [
     "index.html",
     "landing.css",
     "landing-help.js",
+    "landing-links.js",
+    "landing-video.js",
     "media",
     "preview.jpg",
     "robots.txt",

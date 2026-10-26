@@ -18,7 +18,7 @@
 .info-page [hidden], .info-page__help-tooltip[hidden] { display: none !important; }
 .info-page a { color: var(--info-accent); text-underline-offset: 4px; }
 .info-page a:hover { color: #ffda83; }
-.info-page a:focus-visible, .info-page summary:focus-visible, .info-page button:focus-visible { outline: 3px solid #8bdfff; outline-offset: 5px; }
+.info-page a:focus-visible, .info-page summary:focus-visible, .info-page button:focus-visible, .info-page select:focus-visible { outline: 3px solid #8bdfff; outline-offset: 5px; }
 .info-page__main { padding-top: max(24px, env(safe-area-inset-top, 0px)); }
 .info-page__main:focus { outline: none; }
 .info-page h1, .info-page h2, .info-page h3, .info-page p { margin: 0; }
@@ -28,8 +28,11 @@
 .info-page__skip:focus { transform: none; }
 .info-page__eyebrow, .feature__label { font: 500 11px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: 1.3px; text-transform: uppercase; }
 .info-page__eyebrow { color: var(--info-muted); margin-bottom: 14px !important; }
-.info-page a.info-page__start { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 40px; padding: 8px 17px; border: 1px solid #f0ce78; border-radius: 12px; color: #10140d; background: var(--info-accent); font-size: 14px; font-weight: 650; text-decoration: none; box-shadow: 0 2px 12px #0003; }
-.info-page a.info-page__start:hover { color: #10140d; background: #f7cc6d; }
+.info-page a.info-page__start { position: absolute; z-index: 1; inset: 0; border-radius: inherit; color: #10140d; text-decoration: none; }
+.feature__fly { position: absolute; left: 50%; bottom: 76px; transform: translateX(-50%); display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 12px 24px; border: 1px solid #f0ce78; border-radius: 12px; background: var(--info-accent); font-size: 16px; font-weight: 650; box-shadow: 0 2px 12px #0003; }
+.info-page__start:hover .feature__fly { background: #f7cc6d; }
+.info-page a.info-page__start:focus-visible { outline-offset: -5px; }
+.info-page__start:focus-visible .feature__fly { outline: 3px solid #8bdfff; outline-offset: 4px; }
 .info-page__features { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 14px; scroll-margin-top: 20px; }
 .feature { position: relative; min-width: 0; overflow: hidden; padding: 25px; border: 1px solid var(--info-line); border-radius: var(--info-radius); background: var(--info-panel); }
 .feature__label { position: relative; z-index: 1; color: #b2bdc8; font-size: 10px; letter-spacing: 1.2px; }
@@ -42,9 +45,15 @@
 .feature__video-heading { position: absolute; z-index: 1; top: clamp(22px, 2.4vw, 36px); left: clamp(22px, 2.4vw, 36px); right: 22px; color: #fff; text-shadow: 0 2px 14px #0006; pointer-events: none; }
 .feature__video-wordmark { display: block; font-size: clamp(40px, 4.2vw, 64px); font-weight: 750; line-height: 1; letter-spacing: -2.5px; }
 .feature__video-name { display: block; margin-top: 8px; font-size: clamp(13px, 1.2vw, 17px); font-weight: 500; line-height: 1.4; letter-spacing: .1px; }
-.feature__world-controls { position: absolute; z-index: 1; inset: auto 16px 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; pointer-events: none; }
-.feature__world-controls-left { display: flex; align-items: center; gap: 8px; }
-.feature__world-controls button, .feature__world-controls a { pointer-events: auto; }
+.feature__world-controls { position: absolute; z-index: 2; inset: auto 16px 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; pointer-events: none; }
+.feature__world-controls-left { display: flex; flex: none; align-items: center; gap: 8px; }
+.feature__world-controls button, .feature__world-controls a, .feature__world-controls select { pointer-events: auto; }
+.feature__map { display: inline-flex; align-items: stretch; min-width: 0; max-width: calc(100% - 104px); min-height: 40px; border: 1px solid #ffffff60; border-radius: 12px; color: #fff; background: #101820e6; box-shadow: 0 2px 12px #0003; }
+.feature__map-select { min-width: 0; max-width: 100%; padding: 0 3px 0 10px; border: 0; border-radius: 11px 0 0 11px; color: inherit; background: transparent; font: 500 12px/1.3 system-ui, sans-serif; cursor: pointer; }
+.feature__map-select option { color: #fff; background: #101820; }
+.info-page a.feature__map-credit { display: flex; flex: none; align-items: center; padding: 0 9px; border-left: 1px solid #ffffff24; border-radius: 0 11px 11px 0; color: #93c5fd; }
+.feature__map-credit svg { width: 15px; height: 15px; }
+.feature__map-select:hover, .info-page a.feature__map-credit:hover { background: #ffffff1f; }
 .feature__video-toggle { width: 40px; height: 40px; padding: 0; border: 1px solid #ffffff60; border-radius: 50%; color: #fff; background: #101820cc; font: 14px/1 system-ui, sans-serif; cursor: pointer; box-shadow: 0 2px 12px #0003; }
 .feature__video-toggle:hover { border-color: #e8b647; color: #e8b647; background: #101820; }
 .feature__world-controls .info-page__help-button { width: 40px; height: 40px; color: #fff; border-color: #ffffff60; background: #101820cc; box-shadow: 0 2px 12px #0003; }
@@ -85,6 +94,17 @@
 .feature__sky-limb { position: absolute; inset: 52px -5% auto; height: 80px; border-top: 1px solid #e0ad91; border-radius: 50%; background: linear-gradient(#34465c, #111e31 30%); box-shadow: 0 -3px 12px #fac19070; }
 .feature--sky h2 { margin-bottom: 12px; }
 .feature--sky h2 > span { color: #c6cbed; }
+/* The orbital sunset fills the card: the label and heading on the black sky above the Earth's edge, the text and link on the night side below. The illustration stays beneath, hidden.
+   The picture's band of air runs from 39% to 49% of its height. On tall cards it falls below the heading as it is; on wide ones --sky-edge moves the picture up to put the band there. The paragraph keeps the band and the flare's ghosts below it (17cqw) clear. */
+.feature--sky[data-sky-art="sunset"] { --sky-edge: 100cqw; container-type: inline-size; display: flex; flex-direction: column; background: #000; }
+.feature--sky[data-sky-art="sunset"] .feature__sky-art { display: none; }
+.feature--sky[data-sky-art="sunset"] h2 { margin-block: 12px 0; }
+.feature--sky[data-sky-art="sunset"] > p:not(.feature__label) { margin-top: auto; padding-top: calc(17cqw + 20px); }
+.feature--sky[data-sky-art="sunset"] .feature__link { position: relative; align-self: flex-start; }
+.feature--sky[data-sky-art="sunset"] .feature__help-row { position: absolute; right: 25px; bottom: 25px; z-index: 1; margin: 0; padding: 0; }
+.feature__photo { position: absolute; inset: 0; }
+.feature__photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; }
+.feature--sky[data-sky-art="sunset"] .feature__photo img { object-position: 50% min(0px, calc(var(--sky-edge) - 39cqw)); }
 .feature--systems h2 { margin-block: 18px 14px; }
 .feature__system-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 19px; }
 .feature__system-tags > span { padding: 4px 9px; border: 1px solid #48525b; border-radius: 6px; color: #bdc8d0; font: 10px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
@@ -176,6 +196,7 @@
   .feature--gpu h2 { font-size: 40px; }
   .feature__gpu-mark { width: 50px; height: 50px; }
   .feature--sky, .feature--systems, .feature--sound, .feature--multiplayer { grid-column: span 6; min-height: 290px; }
+  .feature--sky[data-sky-art="sunset"] { --sky-edge: 121px; }
   .feature__badge { font-size: 8px; }
   .info-page__roadmap { gap: 28px; padding: 28px; }
   .info-page__roadmap-items { gap: 20px; }
@@ -200,12 +221,16 @@
 }
 @media (max-width: 480px) {
   .info-page { padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px)); }
-  .info-page a.info-page__start { padding-inline: 17px; gap: 17px; }
+  .feature__world-controls { inset: auto 12px 12px; gap: 8px; }
+  .feature__map { max-width: calc(100% - 96px); }
+  .feature__map-select { padding-left: 7px; font-size: 11px; }
+  .info-page a.feature__map-credit { padding-inline: 7px; }
   .info-page__features { grid-template-columns: 1fr; }
   .feature { padding: 25px; border-radius: 18px; }
   .feature--world { min-height: 0; aspect-ratio: 1; padding: 0; }
   .feature--gpu, .feature--physics, .feature--native, .feature--phone, .feature--sky, .feature--systems, .feature--sound, .feature--multiplayer { grid-column: 1; min-height: 235px; }
   .feature h2 { font-size: 32px; }
+  .feature--sky[data-sky-art="sunset"] { --sky-edge: 131px; }
   .feature--gpu h2 { font-size: 46px; padding-top: 55px; }
   .feature__gpu-mark { top: 35px; right: 40px; width: 65px; height: 65px; }
   .feature__threads { max-width: 270px; }
