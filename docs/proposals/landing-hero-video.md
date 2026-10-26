@@ -41,16 +41,19 @@ instrumented development session; it adds no editor to the production flight.
 - **Duration** changes the scene length, from just over three seconds through
   fifteen seconds, in one-frame increments. Shortening trims later camera points.
   It does not stretch the throttle cue or the climb commands.
-- **Manual** lets you frame the paused aircraft. Use the simulator's normal
+- **Camera** has three choices: **Scripted**, **User replay**, **User record**.
+  Scripted uses the original orbit. User replay follows your saved path and
+  leaves it unchanged, including when using camera gestures. User record lets
+  you frame the paused aircraft. Use the simulator's normal
   camera gestures: right-drag and wheel in Mouse mode; two-finger scroll and
   pinch in Trackpad mode; drag and pinch on a touchscreen. The existing input
   method control chooses Mouse or Trackpad.
-- Frame your starting shot, then press **Record camera**. It restarts at zero
-  and records your orbit and zoom while the aircraft follows its script. Pause
-  stops recording. Play and the position slider replay that camera take. Adjust
-  the camera while paused to replace/add a point at that frame; Record camera
-  starts a fresh take. **Scripted** switches back to the original orbit without
-  deleting your manual points.
+- In **User record**, frame your shot and press **Play** to record from the
+  current position while the aircraft follows its script. **Pause** stops
+  recording. Scrub while paused to edit a camera point at that frame. Recording
+  replaces samples only where you record; switching modes never deletes the
+  take. **Restart** returns to zero, paused. Choose **User replay** to review
+  the take with Play or the position slider without writing camera points.
 - **Start** edits latitude, longitude, height above prepared ground and heading.
   Every valid keystroke or number-input step updates the aircraft immediately
   and pauses at **0.00 s**. No Apply action or blur is needed. The fields remain
@@ -72,12 +75,14 @@ started. Saved times use UTC; `scene.timeZone` still records Minneapolis. A stal
 solar-time annotation is removed after changing location or lighting.
 
 `npm run tune:hero` opens the same editor using the scenario's saved camera mode
-(the original scenarios default to Scripted). `--manual-camera` selects Manual
-and implies tuning, so it also works with `capture:hero`. Use
+(unrecorded scenarios default to Scripted). `--manual-camera` selects User replay
+when a saved take exists, or User record for an empty take. It implies tuning,
+so it also works with `capture:hero`. Use
 `--scenario=scripts/hero-scenario-usgs.json` to tune the USGS variant. For a
 disposable experiment, copy a scenario into `build/hero/` and pass that path.
 
-Manual takes are stored in `camera.keyframes`: ordered samples of time, yaw,
+User takes keep the existing `camera.mode: "manual"` format and are stored in
+`camera.keyframes`: ordered samples of time, yaw,
 pitch, distance and field of view. Capture interpolates them with short-angle yaw
 wrapping and holds the first/last pose outside the recorded interval. Each output
 frame is checked against the selected camera path. Flight controls and fixed

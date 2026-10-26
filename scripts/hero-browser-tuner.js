@@ -21,6 +21,8 @@ Object.assign(hero, {
     this.frameIndex = 0;
     this.playing = false;
     this.recordingCamera = false;
+    this.cameraMode = this.config.camera.mode === 'manual'
+      ? (this.config.camera.keyframes?.length ? 'user-replay' : 'user-record') : 'scripted';
     this.busy = false;
     this.startFlight = captureSavedFlight(jsbsim.sdk, aircraftId, true);
     this.startClock = this.status().time;
@@ -59,12 +61,8 @@ Object.assign(hero, {
       requestAnimationFrame(animate);
     };
     requestAnimationFrame(animate);
-    // Reuse the app's mouse/trackpad/touch gestures; changes while paused create a keyframe.
-    const cameraChanged = () => {
-      if (this.config.camera.mode !== 'manual' || this.busy) return;
-      if (!this.playing || this.recordingCamera) this.storeCameraPoint();
-      this.updateTab();
-    };
+    // Only User record may change the take; ordinary pointer movement is not a camera edit.
+    const cameraChanged = () => this.cameraChanged();
     for (const event of ['pointermove', 'pointerup', 'wheel', 'touchmove', 'touchend', 'gesturechange', 'gestureend']) {
       const target = window;
       target.addEventListener(event, cameraChanged);
@@ -77,6 +75,34 @@ Object.assign(hero, {
     this.recordingCamera = false;
     this.lastPlayAt = 0;
     this.updateTab();
+  },
+  async playPreview() {
+    if (this.busy || this.preparingStart || this.startError || this.invalidStart) return;
+    if (this.playing) return this.pausePreview();
+    if (this.frameIndex >= Math.round(this.config.timeline.durationSeconds * this.config.timeline.fps) - 1) await this.seekPreview(0);
+    this.recordingCamera = this.cameraMode === 'user-record';
+    if (this.recordingCamera) this.storeCameraPoint();
+    this.playing = true;
+    this.updateTab();
+  },
+  setCameraMode(mode) {
+    if (!['scripted', 'user-replay', 'user-record'].includes(mode)) throw new Error('Invalid camera mode.');
+    this.pausePreview();
+    this.cameraMode = mode;
+    // Keep the existing on-disk format: both user modes capture the same saved path.
+    this.config.camera.mode = mode === 'scripted' ? 'scripted' : 'manual';
+    this.applyCamera(heroCamera.cameraAt(this.config.camera, this.frameIndex / this.config.timeline.fps, this.config.timeline.durationSeconds));
+    this.updateTab();
+  },
+  cameraChanged() {
+    if (this.busy) return;
+    const camera = this.readCamera();
+    const saved = heroCamera.cameraAt(this.config.camera, this.frameIndex / this.config.timeline.fps, this.config.timeline.durationSeconds);
+    if (Object.keys(camera).every(key => Math.abs(camera[key] - saved[key]) < 1e-8)) return;
+    if (this.cameraMode === 'user-record') {
+      this.storeCameraPoint();
+      this.updateTab();
+    } else this.applyCamera(saved);
   },
   resetPreview() {
     // Restore the same dry engine, fuel, velocities, attitude and clock, then replay scripted inputs.
@@ -126,18 +152,6 @@ Object.assign(hero, {
     this.config.camera.keyframes = heroCamera.putCameraPoint(this.config.camera.keyframes ?? [], {
       timeSeconds: this.frameIndex / this.config.timeline.fps, ...this.readCamera(),
     });
-  },
-  async recordCamera() {
-    if (this.busy || this.preparingStart || this.startError || this.invalidStart) return;
-    const camera = this.readCamera();
-    await this.seekPreview(0);
-    this.config.camera.mode = 'manual';
-    this.config.camera.keyframes = [];
-    this.applyCamera(camera);
-    this.storeCameraPoint();
-    this.recordingCamera = true;
-    this.playing = true;
-    this.updateTab();
   },
   exportScenario() {
     const result = structuredClone(this.config);
@@ -219,20 +233,14 @@ Object.assign(hero, {
       style.textContent = `.hero-tuner{padding:6px;font-size:13px}.hero-tuner fieldset{display:flex;flex-wrap:wrap;align-items:center;gap:6px;border:1px solid #ffffff26;border-radius:9px;padding:8px;margin:0 0 6px;min-width:0}.hero-tuner legend{padding:0 4px}.hero-tuner label{display:inline-flex;align-items:center;gap:5px;flex-wrap:wrap}.hero-tuner input[type=number]{width:8.5ch;min-width:0}.hero-tuner input[data-start=latitude],.hero-tuner input[data-start=longitude]{width:11ch}.hero-tuner input,.hero-tuner button{font:inherit;color:inherit;accent-color:#efb45d}.hero-tuner input[type=number]{background:#ffffff0b;border:1px solid #ffffff35;border-radius:5px;padding:5px}.hero-tuner button{border:1px solid #ffffff35;border-radius:7px;background:#ffffff0c;padding:6px 9px;cursor:pointer}.hero-tuner button:disabled{opacity:.5;cursor:wait}.hero-tuner .hero-slider{width:100%}.hero-tuner .hero-slider input{flex:1;min-width:60px}.hero-tuner output{font-variant-numeric:tabular-nums}.hero-tuner .hero-message{margin:6px 0;overflow-wrap:anywhere}.hero-tuner :focus-visible{outline:2px solid #efb45d;outline-offset:2px}`;
       document.head.append(style);
     }
-    this.tabElement.innerHTML = `<fieldset><legend>Preview</legend><button type="button" data-play aria-label="Play preview">▶</button><button type="button" data-restart aria-label="Restart preview">↤</button><output data-clock></output><label class="hero-slider">Position <input data-position type="range" min="0" step="1" value="0" aria-label="Preview position" /></label><label class="hero-slider">Duration <input data-duration type="range" min="${Math.max(3 * this.config.timeline.fps + 1, Math.ceil(this.config.timeline.pitchRampSeconds * this.config.timeline.fps))}" max="${15 * this.config.timeline.fps}" step="1" aria-label="Scene duration" /><output data-duration-label></output></label></fieldset><fieldset><legend>Camera</legend><span data-mode-host></span><button type="button" data-record>● Record camera</button><output data-take></output></fieldset><fieldset><legend>Start</legend><label>Latitude <input type="number" data-start="latitude" min="-85" max="85" step="0.000001" required /></label><label>Longitude <input type="number" data-start="longitude" min="-180" max="180" step="0.000001" required /></label><label>Height <input type="number" data-start="heightAboveGroundMeters" min="100" max="10000" step="0.1" required />m AGL</label><label>Heading <input type="number" data-start="headingDegrees" min="0" max="360" step="0.1" required />°</label></fieldset><fieldset><legend>Scenario</legend><button type="button" data-save>Save scenario</button><button type="button" data-time>Lighting…</button><span data-help></span></fieldset><p class="hero-message" role="status" aria-live="polite"></p>`;
+    this.tabElement.innerHTML = `<fieldset><legend>Preview</legend><button type="button" data-play aria-label="Play preview">▶</button><button type="button" data-restart aria-label="Restart preview">↤</button><output data-clock></output><label class="hero-slider">Position <input data-position type="range" min="0" step="1" value="0" aria-label="Preview position" /></label><label class="hero-slider">Duration <input data-duration type="range" min="${Math.max(3 * this.config.timeline.fps + 1, Math.ceil(this.config.timeline.pitchRampSeconds * this.config.timeline.fps))}" max="${15 * this.config.timeline.fps}" step="1" aria-label="Scene duration" /><output data-duration-label></output></label></fieldset><fieldset><legend>Camera</legend><span data-mode-host></span><output data-take></output></fieldset><fieldset><legend>Start</legend><label>Latitude <input type="number" data-start="latitude" min="-85" max="85" step="0.000001" required /></label><label>Longitude <input type="number" data-start="longitude" min="-180" max="180" step="0.000001" required /></label><label>Height <input type="number" data-start="heightAboveGroundMeters" min="100" max="10000" step="0.1" required />m AGL</label><label>Heading <input type="number" data-start="headingDegrees" min="0" max="360" step="0.1" required />°</label></fieldset><fieldset><legend>Scenario</legend><button type="button" data-save>Save scenario</button><button type="button" data-time>Lighting…</button><span data-help></span></fieldset><p class="hero-message" role="status" aria-live="polite"></p>`;
     const query = selector => this.tabElement.querySelector(selector);
     this.message = query('.hero-message');
     this.message.textContent = 'Paused. Aircraft inputs stay scripted.';
     const guarded = action => async event => {
       try { await action(event); } catch (error) { this.message.textContent = error.message; }
     };
-    query('[data-play]').onclick = guarded(async () => {
-      if (this.playing) this.pausePreview();
-      else {
-        if (this.frameIndex >= Math.round(this.config.timeline.durationSeconds * this.config.timeline.fps) - 1) await this.seekPreview(0);
-        this.playing = true; this.updateTab();
-      }
-    });
+    query('[data-play]').onclick = guarded(() => this.playPreview());
     query('[data-restart]').onclick = guarded(() => this.seekPreview(0));
     query('[data-position]').oninput = guarded(event => this.seekPreview(Number(event.target.value)));
     query('[data-duration]').oninput = guarded(async event => {
@@ -244,19 +252,13 @@ Object.assign(hero, {
       this.updateTab();
     });
     const choices = ui.publicUi.createChoiceGroup('hero-camera-mode', 'Camera movement', [
-      { id: 'scripted', label: 'Scripted' }, { id: 'manual', label: 'Manual' },
+      { id: 'scripted', label: 'Scripted' }, { id: 'user-replay', label: 'User replay' }, { id: 'user-record', label: 'User record' },
     ], document, { hideHeading: true });
     query('[data-mode-host]').replaceWith(choices);
     for (const input of choices.querySelectorAll('input')) {
       input.dataset.mode = input.value;
-      input.onchange = () => {
-        this.pausePreview(); this.config.camera.mode = input.value;
-        if (input.value === 'manual' && !this.config.camera.keyframes?.length) this.storeCameraPoint();
-        this.applyCamera(heroCamera.cameraAt(this.config.camera, this.frameIndex / this.config.timeline.fps, this.config.timeline.durationSeconds));
-        this.updateTab();
-      };
+      input.onchange = () => this.setCameraMode(input.value);
     }
-    query('[data-record]').onclick = guarded(() => this.recordCamera());
     const editStart = () => {
       const scene = {};
       for (const input of this.tabElement.querySelectorAll('[data-start]')) {
@@ -282,7 +284,7 @@ Object.assign(hero, {
     };
     query('[data-time]').onclick = () => controlPanel.openOrSelectTab('time');
     const content = document.createElement('p');
-    content.textContent = 'Right-drag in Mouse mode to orbit; scroll to zoom. In Trackpad mode, two-finger scroll orbits and pinch zooms. Touch: drag and pinch. Manual lets you frame the paused scene; Record camera restarts the scripted flight and records your gestures. Play replays the saved path. Scrub to adjust a camera keyframe. Save scenario writes the source JSON for the next capture. Duration changes trim the camera path. Start fields move the aircraft live and pause at 0 s. Terrain refreshes in the background; Play waits until it is ready. Height is above prepared terrain. Lighting opens the existing date/time tab.';
+    content.textContent = 'Right-drag in Mouse mode to orbit; scroll to zoom. In Trackpad mode, two-finger scroll orbits and pinch zooms. Touch: drag and pinch. Scripted uses the original orbit. User replay follows your saved camera path without changing it. User record lets you frame the paused scene; Play records from the current position and Pause stops. Scrub while paused to edit a point. Restart returns to zero without deleting the take. Switching modes preserves camera points. Save scenario writes the source JSON for the next capture. Duration changes trim the camera path. Start fields move the aircraft live and pause at 0 s. Terrain refreshes in the background; Play waits until it is ready. Height is above prepared terrain. Lighting opens the existing date/time tab.';
     const help = ui.publicUi.createHelpTooltip({ label: 'Video editor help', content });
     query('[data-help]').append(help.element);
     stopWatching.push(() => help.destroy());
@@ -302,12 +304,11 @@ Object.assign(hero, {
     query('[data-play]').textContent = this.playing ? 'Ⅱ' : '▶';
     query('[data-play]').setAttribute('aria-label', this.playing ? 'Pause preview' : 'Play preview');
     query('[data-take]').textContent = this.recordingCamera ? 'Recording' : `${this.config.camera.keyframes?.length ?? 0} camera points`;
-    ui.publicUi.checkChoice(this.tabElement, 'hero-camera-mode', this.config.camera.mode ?? 'scripted');
+    ui.publicUi.checkChoice(this.tabElement, 'hero-camera-mode', this.cameraMode);
     const blocked = this.preparingStart || this.startError || this.invalidStart;
     for (const control of this.tabElement.querySelectorAll('input, button')) control.disabled = this.busy;
     for (const input of this.tabElement.querySelectorAll('[data-start]')) input.disabled = false;
     for (const control of this.tabElement.querySelectorAll('[data-play], [data-restart], [data-position], [data-duration]')) control.disabled = (this.busy && !this.seeking) || !!blocked;
     query('[data-save]').disabled = this.busy || this.invalidStart;
-    query('[data-record]').disabled = this.busy || !!blocked || this.config.camera.mode !== 'manual';
   },
 });

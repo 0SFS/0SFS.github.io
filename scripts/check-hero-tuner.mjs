@@ -20,6 +20,12 @@ export async function checkTuner({ run, chrome, sessionId, output, scenarioPath,
   };
   await until('document.querySelector(".hero-tuner")?.isConnected');
   const start = await state();
+  const savedTake = await run('structuredClone(window.__osfsHero.config.camera.keyframes ?? [])');
+  assert.deepEqual(await run('[...document.querySelectorAll("[data-mode]")].map(input=>input.dataset.mode)'), ['scripted', 'user-replay', 'user-record']);
+  for (const mode of ['user-record', 'scripted', 'user-replay']) {
+    await click(`[data-mode="${mode}"]`);
+    assert.deepEqual(await run('window.__osfsHero.config.camera.keyframes ?? []'), savedTake, 'Switching modes changed the saved take.');
+  }
   assert.equal(start.paused, true);
   assert.equal(start.afterburner, 0);
   assert.ok(Math.abs(start.state.throttleNorm - .9) < 1e-6);
@@ -37,10 +43,11 @@ export async function checkTuner({ run, chrome, sessionId, output, scenarioPath,
   report.rewind = { first, repeated, start, rewound };
   assert.ok(Math.abs(repeated.state.pitchRad - first.state.pitchRad) < .002, 'Replayed pitch drifted.');
   assert.ok(Math.abs(repeated.n2 - first.n2) < .05, 'Replayed engine spool drifted.');
-  await click('[data-mode="manual"]');
+  await click('[data-mode="user-record"]');
   await seek(0);
   // The trusted right-drag is the real app gesture, outside the Video tab.
-  await run('window.__osfsHero.recordCamera()');
+  await click('[data-play]');
+  assert.equal(await run('window.__osfsHero.recordingCamera'), true);
   const bounds = await run('(() => { const r=document.querySelector("canvas.flight-app__canvas").getBoundingClientRect(); return {x:r.x+r.width*.6,y:r.y+r.height*.7}; })()');
   await chrome.send('Input.dispatchMouseEvent', { type: 'mousePressed', x: bounds.x, y: bounds.y, button: 'right', buttons: 2, clickCount: 1 }, sessionId);
   for (let i = 1; i <= 8; i++) {
@@ -56,10 +63,16 @@ export async function checkTuner({ run, chrome, sessionId, output, scenarioPath,
   const beforePause = await state();
   await new Promise(resolve => setTimeout(resolve, 120));
   assert.equal((await state()).time, beforePause.time);
+  // Replay and even camera gestures in replay must leave the recorded take untouched.
+  await click('[data-mode="user-replay"]');
+  await run('window.__osfsHero.applyCamera({...window.__osfsHero.readCamera(),yawDegrees:50});window.dispatchEvent(new Event("pointermove"))');
+  assert.deepEqual(await run('window.__osfsHero.config.camera'), take);
   await seek(0);
   await click('[data-play]');
+  assert.equal(await run('window.__osfsHero.recordingCamera'), false);
   await until('window.__osfsHero.frameIndex > 12');
   await click('[data-play]');
+  assert.deepEqual(await run('window.__osfsHero.config.camera'), take, 'Replay changed the recorded path.');
   report.cameraTake = take;
   // Duration is a frame-aligned range; changing it stops playback and trims the path.
   await run('(() => { const input=document.querySelector(".hero-tuner [data-duration]"); input.value=120; input.dispatchEvent(new Event("input",{bubbles:true})); })()');
@@ -182,7 +195,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     instructions: 'Use the isolated window opened by tune:hero. The Video tab controls the preview; the aircraft inputs stay scripted. Return to this Test tab to record your feedback.',
     steps: [
       { id: 'timeline', text: 'Play, pause, restart and scrub backwards/forwards. Does the plane resume the scripted climb, starting dry at 90% throttle?' },
-      { id: 'camera', text: 'Choose Manual, frame the plane, then Record camera and orbit/zoom. Pause, scrub and Play: does the path replay as you intended?' },
+      { id: 'camera', text: 'Choose User record, frame the plane, then Play and orbit/zoom. Pause, choose User replay and restart/play. Does the path replay unchanged? Switch through all three modes: is your take preserved?' },
       { id: 'start', text: 'Edit starting latitude, longitude, height and heading without leaving the field. Does the plane move immediately and remain paused at 0 s, with the fields editable while terrain loads?' },
       { id: 'save', text: 'Change duration, save the scenario and reopen it. Does the composition persist? Finish here and download your feedback.' },
     ], sources: ['diagnostics', 'flight'],

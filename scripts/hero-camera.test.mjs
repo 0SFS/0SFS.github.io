@@ -5,16 +5,16 @@ import { runInNewContext } from 'node:vm';
 import { cameraAt, putCameraPoint, validateCamera } from './hero-camera.js';
 import { instrumentFlight, instrumentVideoTab } from './hero-instrument.mjs';
 
-const scenario = JSON.parse(readFileSync(new URL('./hero-scenario.json', import.meta.url)));
+const cameraDefaults = { distanceMeters: 24, heightMeters: 4, orbitDegrees: 12, orbitEndDegrees: -8, fieldOfViewDegrees: 55 };
 const point = (timeSeconds, yawDegrees, distanceMeters = 24) => ({ timeSeconds, yawDegrees, distanceMeters, pitchDegrees: 10, fieldOfViewDegrees: 55 });
 
 describe('hero camera paths', () => {
   it('preserves the original scripted orbit and holds an unrecorded manual camera', () => {
-    assert.equal(cameraAt(scenario.camera, 2.5, 5).yawDegrees, 2);
-    assert.equal(cameraAt({ ...scenario.camera, mode: 'manual' }, 2.5, 5).yawDegrees, 12);
+    assert.equal(cameraAt(cameraDefaults, 2.5, 5).yawDegrees, 2);
+    assert.equal(cameraAt({ ...cameraDefaults, mode: 'manual' }, 2.5, 5).yawDegrees, 12);
   });
   it('interpolates all camera controls across the short route at the angle boundary', () => {
-    const camera = { ...scenario.camera, mode: 'manual', keyframes: [point(1, 170, 20), { ...point(3, -170, 40), pitchDegrees: 30, fieldOfViewDegrees: 75 }] };
+    const camera = { ...cameraDefaults, mode: 'manual', keyframes: [point(1, 170, 20), { ...point(3, -170, 40), pitchDegrees: 30, fieldOfViewDegrees: 75 }] };
     const middle = cameraAt(camera, 2, 5);
     assert.equal(middle.yawDegrees, 180);
     assert.equal(middle.pitchDegrees, 20);
@@ -30,12 +30,12 @@ describe('hero camera paths', () => {
     assert.equal(original.length, 2);
   });
   it('rejects invalid, oversized, unordered or out-of-scene camera paths', () => {
-    validateCamera(scenario.camera, 5);
-    validateCamera({ ...scenario.camera, mode: 'manual', keyframes: [point(0, 170), point(5, -170)] }, 5);
+    validateCamera(cameraDefaults, 5);
+    validateCamera({ ...cameraDefaults, mode: 'manual', keyframes: [point(0, 170), point(5, -170)] }, 5);
     for (const keyframes of [[point(2, 1), point(1, 2)], [point(1, 1), point(1, 2)], [point(6, 1)], [point(1, NaN)], [point(1, 0, 501)], Array.from({ length: 902 }, (_, index) => point(index / 200, 0))]) {
-      assert.throws(() => validateCamera({ ...scenario.camera, keyframes }, 5));
+      assert.throws(() => validateCamera({ ...cameraDefaults, keyframes }, 5));
     }
-    assert.throws(() => validateCamera({ ...scenario.camera, mode: 'pilot' }, 5));
+    assert.throws(() => validateCamera({ ...cameraDefaults, mode: 'pilot' }, 5));
   });
 });
 
@@ -84,4 +84,42 @@ it('keeps the latest scrub request even when it arrives while the previous previ
   await seeking;
   assert.equal(hero.busy, false);
   assert.equal(holds, 0);
+});
+
+it('preserves a saved take across mode changes and records from the playhead without clearing later samples', async () => {
+  const hero = {};
+  runInNewContext(readFileSync(new URL('./hero-browser-tuner.js', import.meta.url), 'utf8'), {
+    hero, heroCamera: { cameraAt, putCameraPoint }, structuredClone,
+  });
+  let camera = point(0, 10);
+  const original = [point(0, 10), point(4, 30)];
+  Object.assign(hero, {
+    config: { camera: { ...cameraDefaults, mode: 'manual', keyframes: structuredClone(original) }, timeline: { fps: 30, durationSeconds: 5 } },
+    frameIndex: 30, cameraMode: 'user-replay', updateTab() {},
+    readCamera: () => ({ yawDegrees: camera.yawDegrees, pitchDegrees: camera.pitchDegrees,
+      distanceMeters: camera.distanceMeters, fieldOfViewDegrees: camera.fieldOfViewDegrees }),
+    applyCamera(value) { camera = value; },
+  });
+  for (const mode of ['scripted', 'user-record', 'user-replay']) {
+    hero.setCameraMode(mode);
+    assert.deepEqual(hero.config.camera.keyframes, original);
+    assert.equal(hero.playing, false);
+  }
+  camera = { ...camera, yawDegrees: 90 };
+  hero.cameraChanged();
+  assert.equal(camera.yawDegrees, 15, 'Replay should restore the saved camera instead of editing it.');
+  assert.deepEqual(hero.config.camera.keyframes, original);
+  await hero.playPreview();
+  assert.equal(hero.recordingCamera, false);
+  hero.setCameraMode('user-record');
+  camera = { ...camera, yawDegrees: 20 };
+  hero.cameraChanged();
+  assert.equal(hero.config.camera.keyframes.find(value => value.timeSeconds === 1).yawDegrees, 20);
+  await hero.playPreview();
+  assert.equal(hero.recordingCamera, true);
+  assert.equal(hero.frameIndex, 30, 'Recording should start at the current position.');
+  assert.deepEqual(hero.config.camera.keyframes.at(-1), original.at(-1), 'Unrecorded later samples must survive.');
+  hero.pausePreview();
+  assert.equal(hero.cameraMode, 'user-record', 'Pausing must keep the selected mode.');
+  assert.equal(hero.recordingCamera, false);
 });
