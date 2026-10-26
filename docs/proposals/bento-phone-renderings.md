@@ -5,7 +5,9 @@ Artwork for two bento cards: **05 / Phone controller** gets one phone and
 0SFS screen on a large Android phone built in code. The images
 are baked to transparent WebP, so the page needs no 3D engine. They are wired
 into `index.html` and `landing.css`, with content-hash media URLs and a Google
-notices link on the multiplayer card. The images and rendering pipeline are unchanged.
+notices link behind the multiplayer card's bottom-right **?**. The phone model
+was built in this project's own code and needs no third-party model credit.
+The images and rendering pipeline are unchanged.
 
 Task: [delegate-smartphone-renderings.md](delegate-smartphone-renderings.md).
 
@@ -65,8 +67,10 @@ If an image should carry meaning instead, these alt texts describe it accurately
 - Right: "A phone turned to the right, showing the same Vision Jet with the F-35B on its right wing, flying into the sunset."
 
 The multiplayer screens show Google Photorealistic 3D Tiles, and each screen keeps
-its own "3D Tiles" credit. The card could also link Google's notices, as the
-world card's caption does (`Google 3D Tiles ↗`).
+its own "3D Tiles" credit. The card links Google's notices (`Google 3D Tiles ↗`)
+inside a native popover, opened by a bottom-right **?** named "Multiplayer artwork
+credits". The model itself needs no external credit. Follow the
+[supplementary-copy policy](supplementary-copy-policy.md) when integrating artwork.
 
 ## Reproduce
 

@@ -1,6 +1,6 @@
 # Supplementary copy behind “?” policy and implementation handoff
 
-Defines the shared policy and concrete handoff for placing supplementary copy behind compact **?** controls, starting with the 0SFS landing-page aircraft cards (`0sfs.github.io`).
+Defines the shared policy and concrete handoff for placing supplementary copy behind compact **?** controls, including the 0SFS landing-page aircraft and promotional artwork cards (`0sfs.github.io`).
 
 ## Purpose and context
 
@@ -32,7 +32,7 @@ The primary surface must remain uncluttered, legible, and focused on decision-ma
 Detailed technical context is kept behind a compact **?** trigger:
 1. **Extended descriptions:** Variant and generation breakdowns (e.g. G1, G2, G2+, G3).
 2. **Implementation mappings:** Runtime packaging notes (e.g. G2+ mapped to G2 runtime pending dedicated physics).
-3. **Provenance & author credits:** Source links, model authorship, and asset origin.
+3. **Provenance & author credits:** Source links, provider/model attribution, creator names, asset origin, licence links and modification notices. On promotional artwork cards, place these inside an accessible **?** at the bottom right, preserving all credit text and working links. Apply this automatically when integrating new artwork, including in rendering handoffs; do not add permanent credit paragraphs to the card. Models built in this project's own code need no third-party model credit; external content shown on their screens still has its own attribution.
 4. **Technical caveats & qualifications:** Engineering approximations, uncalibrated performance warnings, or STOVL flight dynamics caveats.
 5. **Secondary explanations:** Supplementary background details that support understanding but are not required for the initial high-level decision.
 
@@ -43,7 +43,7 @@ Detailed technical context is kept behind a compact **?** trigger:
 ### Trigger control
 - **Element & semantics:** A native `<button>` element with `type="button"` and `popovertarget="..."` (or accessible disclosure trigger).
 - **Labeling:** Visual label is a compact `?`. Accessible name is explicit and unique per card via `aria-label` (e.g. `aria-label="Cirrus Vision Jet details and technical notes"`).
-- **Placement:** Trailing element within the card's title header row, keeping the component name first and help last.
+- **Placement:** Trailing element within an aircraft card's title header row, keeping the component name first and help last. For promotional artwork cards, use the bottom-right corner, reserving enough space so the control never overlaps the image or primary copy.
 
 ### Keyboard & pointer interaction
 - **Activation:** Opens via left click, tap, Space key, or Enter key.

@@ -86,13 +86,14 @@
 .feature__threads > span { padding: 4px 0; border: 1px solid #756a97; border-radius: 5px; background: #ffffff06; }
 .feature__threads > i { grid-column: 1 / -1; height: 12px; margin-inline: 15%; border-inline: 1px solid #756a97; border-bottom: 1px solid #756a97; }
 .feature__threads > b { grid-column: 1 / -1; justify-self: center; margin-top: -1px; padding: 3px 10px; border: 1px solid #756a97; border-radius: 5px; font-size: 9px; font-weight: 400; }
-.feature--phone { background: radial-gradient(ellipse at 90% 100%, #213b34 0%, #15221f 65%); }
+.feature--phone { display: flex; flex-direction: column; background: radial-gradient(ellipse at 90% 100%, #213b34 0%, #15221f 65%); }
 .feature--phone h2 { margin-block: 16px 12px; }
 .feature--phone h2 > span { color: #b2d2bc; }
 .feature__remote-art { position: relative; width: min(100%, 400px); aspect-ratio: 1000 / 665.56; margin: 16px auto 10px; }
 .feature__remote-art img { position: absolute; display: block; height: auto; }
 .feature__remote-laptop { left: 0; top: 0; width: 80%; }
 .feature__remote-phone { left: 48%; top: 51.09%; width: 52%; }
+.feature__help-row { display: flex; justify-content: flex-end; margin-top: auto; padding-top: 12px; }
 .feature--sky, .feature--systems, .feature--sound, .feature--multiplayer { grid-column: span 3; min-height: 330px; }
 .feature--sky { background: linear-gradient(145deg, #22293d, #1b2331); }
 .feature__sky-art { position: relative; height: 64px; overflow: hidden; margin-block: 16px 9px; border-radius: 8px; background: radial-gradient(circle at 15% 23%, #d4e0fa 0 1px, transparent 1.5px), radial-gradient(circle at 29% 44%, #d4e0fa 0 .7px, transparent 1.2px), radial-gradient(circle at 40% 15%, #d4e0fa 0 .7px, transparent 1.2px), linear-gradient(180deg, #101c34, #3c496c 60%, #c68b70); }
@@ -108,12 +109,11 @@
 .feature--sound h2 { margin-bottom: 12px; }
 .feature--sound h2 > span { color: #e2c98d; }
 .feature__link { display: inline-flex; align-items: center; gap: 10px; min-height: 36px; margin-top: 8px; font-size: 12px; text-decoration: none; }
-.feature--multiplayer { container: multiplayer / inline-size; background: radial-gradient(ellipse at 100% 10%, #1d3b4a, #121c25 75%); }
+.feature--multiplayer { display: flex; flex-direction: column; container: multiplayer / inline-size; background: radial-gradient(ellipse at 100% 10%, #1d3b4a, #121c25 75%); }
 .feature__badge { display: inline-block; padding: 2px 6px; border: 1px solid #667985; border-radius: 5px; color: #d1dce2; font: 500 9px/1.6 ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: .4px; text-transform: uppercase; vertical-align: 1px; }
 .feature__label > .feature__badge { margin-left: 5px; }
 .feature__multiplayer-art { display: flex; align-items: flex-start; gap: clamp(8px, 3%, 24px); width: min(100%, 664px); margin: 18px auto 10px; }
 .feature__multiplayer-art img { display: block; flex: 1 1 0; min-width: 0; max-width: 320px; height: auto; aspect-ratio: 640 / 504; }
-.feature__media-credit { display: inline-block; margin-top: 12px; font: 10px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
 .feature--multiplayer h2 { margin-block: 5px 14px; }
 .feature--multiplayer h2 > span { color: #a3cbdc; }
 .info-page__scenery-note { display: flex; align-items: baseline; gap: 10px; margin: 16px 4px 0; color: var(--info-muted); font-size: 12px; }
@@ -133,9 +133,10 @@
 .info-page__aircraft-header .feature__badge { margin-top: 8px; }
 .info-page__help-button { flex: 0 0 36px; width: 36px; height: 36px; padding: 0; border: 1px solid #53616b; border-radius: 50%; color: #d7e0e6; background: #ffffff06; font: 16px/1 system-ui, sans-serif; cursor: pointer; }
 .info-page__help-button:hover { color: var(--info-accent); border-color: var(--info-accent); }
-.info-page__aircraft-help { width: min(380px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; margin: auto; padding: 24px; border: 1px solid #53616b; border-radius: 16px; color: #e4e8eb; background: #121b24; box-shadow: 0 18px 80px #0009; font: 14px/1.6 system-ui, sans-serif; }
-.info-page__aircraft-help::backdrop { background: #0005; }
-.info-page__aircraft-help h4 { margin: 0 0 12px; font-size: 18px; line-height: 1.35; }
+.info-page__aircraft-help, .info-page__help-popover { width: min(380px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; margin: auto; padding: 24px; border: 1px solid #53616b; border-radius: 16px; color: #e4e8eb; background: #121b24; box-shadow: 0 18px 80px #0009; font: 14px/1.6 system-ui, sans-serif; }
+.info-page__aircraft-help::backdrop, .info-page__help-popover::backdrop { background: #0005; }
+.info-page__aircraft-help h4, .info-page__help-popover h4 { margin: 0 0 12px; font-size: 18px; line-height: 1.35; }
+.info-page__help-popover p + p { margin-top: 10px; }
 .info-page__aircraft p { margin-top: 10px; color: #c3cdd5; font-size: 13px; }
 .info-page__aircraft p.info-page__note { color: #a5b1bd; font-size: 12px; }
 .info-page__fleet-note { margin: 14px 4px 0 !important; color: var(--info-muted); font-size: 12px; }

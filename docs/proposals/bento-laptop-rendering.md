@@ -7,7 +7,8 @@ phone artwork (`public/media/bento-remote-phone.webp`), which is unchanged. The
 laptop is a pre-made CC BY 4.0 model, lit by the phone artwork's studio and
 baked to a transparent WebP, so the page needs no 3D engine. The composition is
 wired into `index.html` and `landing.css` using the [suggested markup](#suggested-markup),
-with visible Google and model credits. The installed phone artwork is unchanged.
+with Google and model credits behind the card's bottom-right **?**. The installed
+phone artwork is unchanged.
 
 ## Outputs
 
@@ -105,18 +106,21 @@ before the images load, so the layout doesn't shift:
 
 **Credits.** The laptop's screen shows Google Photorealistic 3D Tiles. The screen
 keeps the app's "3D Tiles" credit with Google's logo in its bottom right corner,
-but at card size that is only a few pixels wide. The card needs a visible credit
-line, as the multiplayer card has. The model's CC BY 4.0 licence also needs a
-credit that links the source and the licence and says the model was changed.
-For example:
+but at card size that is only a few pixels wide. Keep its Google notices link
+and the laptop model's source, author, licence and modification notice inside
+the card's bottom-right **?**, following the supplementary-copy policy:
 
 ```html
-<p class="feature__media-credit"><a href="https://www.google.com/help/legalnotices_maps/" target="_blank" rel="noopener">Google 3D Tiles <span aria-hidden="true">↗</span></a><br />Laptop: <a href="https://sketchfab.com/3d-models/macbook-air-m2-786fa23d402a4f90ae36c4168997f9cc" target="_blank" rel="noopener">“MacBook Air M2”</a> by <a href="https://sketchfab.com/rtql8d" target="_blank" rel="noopener">rtql8d</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>, modified</p>
+<div class="feature__help-row"><button type="button" class="info-page__help-button" popovertarget="remote-art-credits" aria-label="Phone controller artwork credits">?</button></div>
+<div id="remote-art-credits" class="info-page__help-popover" popover aria-labelledby="remote-art-credits-title">
+  <h4 id="remote-art-credits-title">Artwork credits</h4>
+  <p><a href="https://www.google.com/help/legalnotices_maps/" target="_blank" rel="noopener">Google 3D Tiles <span aria-hidden="true">↗</span></a></p>
+  <p>Laptop: <a href="https://sketchfab.com/3d-models/macbook-air-m2-786fa23d402a4f90ae36c4168997f9cc" target="_blank" rel="noopener">“MacBook Air M2”</a> by <a href="https://sketchfab.com/rtql8d" target="_blank" rel="noopener">rtql8d</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>, modified</p>
+</div>
 ```
 
-The licence accepts attribution "in any reasonable manner", so the model credit
-could instead go on a site credits page linked from the footer. The footer's
-current links cover only the simulator repository's own notices.
+The phone was built in this project's own code and needs no external model
+credit. Keep all four external links above intact inside the help popover.
 
 If the art should carry meaning instead, drop `aria-hidden`, keep `alt=""` on
 the phone and give the laptop this alt text: "A MacBook Air showing an F-35B
@@ -128,8 +132,9 @@ controller."
 Integrated on 26 October 2026 using the composition above. Both images retain
 their intrinsic dimensions, lazy loading, asynchronous decoding and SHA-256
 cache versions. The unused `.feature__phone-art` rule is removed. Google notices,
-the model, its creator and CC BY 4.0 are linked visibly below the card copy;
-the credit states that the model is modified.
+the model, its creator and CC BY 4.0 are linked inside the native help popover;
+the credit states that the model is modified. The only credit control on the
+card's primary surface is the bottom-right **?**.
 
 The card was inspected in the shared screenshot workflow at 320, 390, 600,
 1100, 1101, 1280 and 1700 px viewports. Art boxes span 198.75–400 CSS px.
@@ -143,6 +148,12 @@ Local review: `build/bento-laptop-integration-review.html`; screenshot list:
 `build/bento-laptop-integration-shots.mjs`. The review includes the custom
 three-step Test link and a downloadable plan. Its Test tab's Start/Finish flow
 was checked and produces valid downloadable feedback JSON.
+
+The credits follow-up is reviewed in `build/bento-credit-help-review.html`,
+using `build/bento-credit-help-shots.mjs`. Both cards' credits are hidden by
+default. Enter/Space opening, keyboard access to links, Escape/focus return,
+outside dismissal and touch opening passed. The popovers fit at 320 px, and
+the buttons stay at the cards' bottom-right corners. Build and all 59 tests pass.
 
 ## Reproduce
 
@@ -342,7 +353,7 @@ The changes are all made at render time:
 
 ## Limitations
 
-- **Small credit:** at card size the screen's "3D Tiles" credit is a few pixels wide, so the card should carry the visible credit link (above).
+- **Small credit:** at card size the screen's "3D Tiles" credit is a few pixels wide; the card's bottom-right **?** opens the full Google notices and model attribution links.
 - **Separate sessions:** the installed phone artwork comes from a different session than the laptop. The same-session candidate exists only in `build/`.
 - **Emulated devices:** both devices are desktop Chrome with device emulation, on one Mac. The laptop is a 1470 × 919 viewport at 2×, not a MacBook Air's own display. The flight, the pairing, the phone's control and both screens are real.
 - **Altitude readout:** with Google 3D Tiles, fly's status bar shows "— ft ASL". That is the app's current behaviour.
