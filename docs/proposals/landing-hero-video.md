@@ -89,6 +89,13 @@ frame is checked against the selected camera path. Flight controls and fixed
 physics timing are verified independently. A slow rendering frame slows the
 interactive preview instead of skipping simulation or camera samples.
 
+The installed take preserves the recorded opening and holds its climb view until
+3 s. Its final two seconds ease back to the opening yaw, pitch, distance and field
+of view, with a matching pose on the last encoded frame. This replaces the abrupt
+underside swing and keeps the aircraft's viewing angle consistent at the loop cut.
+The aircraft still finishes its scripted climb; scenery and engine state reset
+when the video loops.
+
 Then run `npm run capture:hero` and `npm run check:hero -- --install` to regenerate
 and install the chosen lighting. The existing video stays installed until checks pass.
 The videos contain no provider HUD. The landing card supplies the selected
