@@ -48,7 +48,8 @@ npm run check:hero -- --install
 
 The tuning window keeps the aircraft inputs scripted. Its Video tab has a playback
 timeline, scene duration, starting coordinates/height/heading, and a camera take
-that the capture script reproduces. Save scenario, then enter `quit` in the terminal
+that the capture script reproduces. Start fields update the plane live, paused at
+0 s, while terrain refreshes in the background. Save scenario, then enter `quit` in the terminal
 before capturing. Omitting `--manual-camera` keeps the saved camera mode. Use
 `--scenario=scripts/hero-scenario-usgs.json` for the USGS version. The
 [capture guide](docs/proposals/landing-hero-video.md#tune-the-camera-start-and-sunset)

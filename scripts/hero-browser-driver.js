@@ -109,4 +109,9 @@ const heroPaused = inputManager.isPaused.bind(inputManager);
 inputManager.isPaused = () => hero.config?.tuning ? !hero.stepping : heroPaused();
 // World streaming and sky workers keep rendering, but wall-clock frames cannot
 // advance flight physics. Only frame(index) advances the real fixed-step loop.
-runtime.setSimTick(() => landingCaptureTick(0));
+runtime.setSimTick(() => {
+  landingCaptureTick(0);
+  // Terrain preparation may use an overhead camera to select tiles. Keep the
+  // editor's visible view on the frozen aircraft while those tiles are prepared.
+  if (hero.preparingStart) aircraft.setViewMode('third');
+});

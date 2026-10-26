@@ -7,8 +7,6 @@ function replaceOnce(source, pattern, replacement, label) {
 export function instrumentFlight(source, driver, clearance) {
   source = replaceOnce(source, /runtime\.setSimTick\(\(deltaSeconds\)\s*=>\s*\{/g, 'const landingCaptureTick = (deltaSeconds) => {', 'tick');
   source = replaceOnce(source, /\n\s*\}\);\s*\n\s*const revealAircraft\s*=/g, `\n};\n${driver}\nconst revealAircraft =`, 'capture');
-  source = replaceOnce(source, /altitudeMeters: preview\.altMeters,/g,
-    '...(window.__osfsHero?.spawnRequest ? { altitudeAboveGroundMeters: window.__osfsHero.spawnRequest } : { altitudeMeters: preview.altMeters }),', 'relocation height');
   return replaceOnce(source, /clearanceMeters:\s*benchmarkRoute\s*\?\s*0\s*:\s*(?:1000|1e\+?3)\b/g, `clearanceMeters: benchmarkRoute ? 0 : ${clearance}`, 'spawn-clearance');
 }
 

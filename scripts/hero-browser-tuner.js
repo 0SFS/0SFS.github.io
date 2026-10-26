@@ -28,6 +28,11 @@ Object.assign(hero, {
     if (!this.startFlight) throw new Error('Cannot capture the starting flight state.');
     this.startGround = { groundHeightMeters: this.startFlight.simulation.initial['ic/terrain-elevation-ft'] * .3048,
       altitudeMeters: this.startFlight.altMeters };
+    this.startTemplate = structuredClone(this.startFlight);
+    this.preparedStartKey = heroStart.startGroundKey(this.config.scene);
+    this.preparedStartGround = this.startGround;
+    this.startRevision = 0;
+    stopWatching.push(() => this.cancelStart?.());
     this.tabElement = document.createElement('div');
     this.tabElement.className = 'hero-tuner';
     this.mountTab = host => { if (host) host.append(this.tabElement); };
@@ -91,7 +96,7 @@ Object.assign(hero, {
     this.frame(0);
   },
   async seekPreview(index) {
-    if (this.busy && !this.seeking) return;
+    if ((this.busy && !this.seeking) || this.preparingStart || this.startError || this.invalidStart) return;
     this.pendingSeek = Math.min(Math.round(this.config.timeline.durationSeconds * this.config.timeline.fps) - 1, Math.max(0, Math.round(index)));
     this.pausePreview();
     if (this.seeking) return;
@@ -123,7 +128,7 @@ Object.assign(hero, {
     });
   },
   async recordCamera() {
-    if (this.busy) return;
+    if (this.busy || this.preparingStart || this.startError || this.invalidStart) return;
     const camera = this.readCamera();
     await this.seekPreview(0);
     this.config.camera.mode = 'manual';
@@ -143,35 +148,70 @@ Object.assign(hero, {
     result.scene.dateTime = dateTime;
     return result;
   },
-  async applyStart(scene) {
-    if (this.busy) return;
+  showStart(scene, ground) {
+    const camera = this.frameIndex === 0 ? this.readCamera() : null;
+    Object.assign(this.config.scene, scene);
+    delete this.config.scene.solarTime;
+    this.startGround = ground;
+    this.startFlight = heroStart.flightAtStart(this.startTemplate, this.config.scene, ground);
+    this.resetPreview();
+    if (camera) this.applyCamera(camera);
+  },
+  applyStart(scene) {
+    this.cancelStart?.();
+    this.cancelStart = null;
+    const revision = ++this.startRevision;
+    const key = heroStart.startGroundKey(scene);
+    this.preparingStart = key !== this.preparedStartKey;
+    this.startError = null;
     this.pausePreview();
-    this.busy = true;
-    runtime.beginContinuous();
+    // Editing a start always wins over an in-flight scrub request.
+    this.pendingSeek = this.seeking ? 0 : null;
+    this.invalidStart = false;
+    const sample = runtime.surface.sample(scene.latitude, scene.longitude);
+    const groundHeightMeters = key === this.preparedStartKey ? this.preparedStartGround.groundHeightMeters
+      : sample?.heightMeters ?? this.startGround.groundHeightMeters;
+    const ground = key === this.preparedStartKey ? this.preparedStartGround
+      : { groundHeightMeters, altitudeMeters: groundHeightMeters + scene.heightAboveGroundMeters };
+    // This is synchronous: each valid input visibly moves the aircraft at t=0.
+    this.showStart(scene, ground);
+    this.message.textContent = this.preparingStart ? 'Start at 0.00 s · Preparing terrain…' : 'Start at 0.00 s';
     this.updateTab();
-    try {
-      this.resetPreview();
-      this.spawnRequest = scene.heightAboveGroundMeters;
-      teleportToLocation({ latDeg: scene.latitude, lonDeg: scene.longitude,
-        headingDeg: scene.headingDegrees, airspeedKts: this.config.scene.airspeedKnots }, scene.heightAboveGroundMeters);
-      const deadline = performance.now() + 90000;
-      while (worldLoading) {
-        if (performance.now() > deadline) throw new Error('Starting location did not finish preparing.');
-        await new Promise(resolve => setTimeout(resolve, 50));
-      }
-      if (physicsLoop.getFault()) throw new Error(physicsLoop.getFault());
-      Object.assign(this.config.scene, scene);
-      delete this.config.scene.solarTime; // The old solar label belongs to the old location.
-      this.startFlight = captureSavedFlight(jsbsim.sdk, aircraftId, true);
-      this.startClock = this.status().time;
-      this.startSpools = { n1: this.status().n1, n2: this.status().n2 };
-      this.startGround = { groundHeightMeters: this.startFlight.simulation.initial['ic/terrain-elevation-ft'] * .3048,
-        altitudeMeters: this.startFlight.altMeters };
-      this.resetPreview();
-      for (const input of this.tabElement.querySelectorAll('[data-start]')) input.value = this.config.scene[input.dataset.start];
-      await this.waitForPreview();
-      this.message.textContent = 'Start applied. Preview paused at 0 s.';
-    } finally { runtime.endContinuous(); this.spawnRequest = null; this.busy = false; this.updateTab(); }
+    if (!this.preparingStart) return this.startReady = Promise.resolve(true);
+    const abort = new AbortController();
+    return this.startReady = new Promise(resolve => {
+      // Only terrain work is debounced. Pose editing and camera movement remain live.
+      const timer = setTimeout(async () => {
+        runtime.beginContinuous();
+        try {
+          const prepared = await prepareFlightTerrain(runtime, {
+            latDeg: scene.latitude, lonDeg: scene.longitude,
+            altitudeAboveGroundMeters: scene.heightAboveGroundMeters,
+            clearanceMeters: scene.heightAboveGroundMeters, radiusMeters: 1000, signal: abort.signal,
+          }, parameters.get('osfs.flight.allowCoarserThisSession'));
+          if (abort.signal.aborted || revision !== this.startRevision || disposed) return;
+          this.showStart(scene, prepared);
+          this.preparedStartKey = key;
+          this.preparedStartGround = prepared;
+          await this.waitForPreview();
+          if (abort.signal.aborted || revision !== this.startRevision || disposed) return;
+          this.preparingStart = false;
+          aircraft.setViewMode('third');
+          this.message.textContent = 'Start at 0.00 s';
+          this.updateTab();
+          resolve(true);
+        } catch (error) {
+          if (!abort.signal.aborted && revision === this.startRevision && !disposed) {
+            this.preparingStart = false;
+            this.startError = error.message;
+            this.message.textContent = error.message;
+            this.updateTab();
+          }
+          resolve(false);
+        } finally { runtime.endContinuous(); }
+      }, 160);
+      this.cancelStart = () => { clearTimeout(timer); abort.abort(); resolve(false); };
+    });
   },
   buildTab() {
     if (!document.querySelector('#hero-tuner-style')) {
@@ -179,7 +219,7 @@ Object.assign(hero, {
       style.textContent = `.hero-tuner{padding:6px;font-size:13px}.hero-tuner fieldset{display:flex;flex-wrap:wrap;align-items:center;gap:6px;border:1px solid #ffffff26;border-radius:9px;padding:8px;margin:0 0 6px;min-width:0}.hero-tuner legend{padding:0 4px}.hero-tuner label{display:inline-flex;align-items:center;gap:5px;flex-wrap:wrap}.hero-tuner input[type=number]{width:8.5ch;min-width:0}.hero-tuner input[data-start=latitude],.hero-tuner input[data-start=longitude]{width:11ch}.hero-tuner input,.hero-tuner button{font:inherit;color:inherit;accent-color:#efb45d}.hero-tuner input[type=number]{background:#ffffff0b;border:1px solid #ffffff35;border-radius:5px;padding:5px}.hero-tuner button{border:1px solid #ffffff35;border-radius:7px;background:#ffffff0c;padding:6px 9px;cursor:pointer}.hero-tuner button:disabled{opacity:.5;cursor:wait}.hero-tuner .hero-slider{width:100%}.hero-tuner .hero-slider input{flex:1;min-width:60px}.hero-tuner output{font-variant-numeric:tabular-nums}.hero-tuner .hero-message{margin:6px 0;overflow-wrap:anywhere}.hero-tuner :focus-visible{outline:2px solid #efb45d;outline-offset:2px}`;
       document.head.append(style);
     }
-    this.tabElement.innerHTML = `<fieldset><legend>Preview</legend><button type="button" data-play aria-label="Play preview">▶</button><button type="button" data-restart aria-label="Restart preview">↤</button><output data-clock></output><label class="hero-slider">Position <input data-position type="range" min="0" step="1" value="0" aria-label="Preview position" /></label><label class="hero-slider">Duration <input data-duration type="range" min="${Math.max(3 * this.config.timeline.fps + 1, Math.ceil(this.config.timeline.pitchRampSeconds * this.config.timeline.fps))}" max="${15 * this.config.timeline.fps}" step="1" aria-label="Scene duration" /><output data-duration-label></output></label></fieldset><fieldset><legend>Camera</legend><span data-mode-host></span><button type="button" data-record>● Record camera</button><output data-take></output></fieldset><fieldset><legend>Start</legend><label>Latitude <input type="number" data-start="latitude" min="-85" max="85" step="0.000001" required /></label><label>Longitude <input type="number" data-start="longitude" min="-180" max="180" step="0.000001" required /></label><label>Height <input type="number" data-start="heightAboveGroundMeters" min="100" max="10000" step="1" required />m AGL</label><label>Heading <input type="number" data-start="headingDegrees" min="0" max="360" step="1" required />°</label><button type="button" data-apply>Apply &amp; restart</button></fieldset><fieldset><legend>Scenario</legend><button type="button" data-save>Save scenario</button><button type="button" data-time>Lighting…</button><span data-help></span></fieldset><p class="hero-message" role="status" aria-live="polite"></p>`;
+    this.tabElement.innerHTML = `<fieldset><legend>Preview</legend><button type="button" data-play aria-label="Play preview">▶</button><button type="button" data-restart aria-label="Restart preview">↤</button><output data-clock></output><label class="hero-slider">Position <input data-position type="range" min="0" step="1" value="0" aria-label="Preview position" /></label><label class="hero-slider">Duration <input data-duration type="range" min="${Math.max(3 * this.config.timeline.fps + 1, Math.ceil(this.config.timeline.pitchRampSeconds * this.config.timeline.fps))}" max="${15 * this.config.timeline.fps}" step="1" aria-label="Scene duration" /><output data-duration-label></output></label></fieldset><fieldset><legend>Camera</legend><span data-mode-host></span><button type="button" data-record>● Record camera</button><output data-take></output></fieldset><fieldset><legend>Start</legend><label>Latitude <input type="number" data-start="latitude" min="-85" max="85" step="0.000001" required /></label><label>Longitude <input type="number" data-start="longitude" min="-180" max="180" step="0.000001" required /></label><label>Height <input type="number" data-start="heightAboveGroundMeters" min="100" max="10000" step="0.1" required />m AGL</label><label>Heading <input type="number" data-start="headingDegrees" min="0" max="360" step="0.1" required />°</label></fieldset><fieldset><legend>Scenario</legend><button type="button" data-save>Save scenario</button><button type="button" data-time>Lighting…</button><span data-help></span></fieldset><p class="hero-message" role="status" aria-live="polite"></p>`;
     const query = selector => this.tabElement.querySelector(selector);
     this.message = query('.hero-message');
     this.message.textContent = 'Paused. Aircraft inputs stay scripted.';
@@ -217,21 +257,32 @@ Object.assign(hero, {
       };
     }
     query('[data-record]').onclick = guarded(() => this.recordCamera());
-    query('[data-apply]').onclick = guarded(() => {
+    const editStart = () => {
       const scene = {};
       for (const input of this.tabElement.querySelectorAll('[data-start]')) {
-        if (!input.reportValidity()) return;
+        if (!input.checkValidity()) {
+          this.pausePreview();
+          this.cancelStart?.();
+          this.preparingStart = false;
+          this.invalidStart = true;
+          this.pendingSeek = this.seeking ? 0 : null;
+          if (this.frameIndex !== 0) this.resetPreview();
+          this.message.textContent = 'Enter valid starting coordinates, height and heading.';
+          this.updateTab();
+          return;
+        }
         scene[input.dataset.start] = input.valueAsNumber;
       }
-      return this.applyStart(scene);
-    });
+      this.applyStart(scene);
+    };
+    for (const input of this.tabElement.querySelectorAll('[data-start]')) input.oninput = guarded(editStart);
     query('[data-save]').onclick = () => {
       this.pausePreview(); this.message.textContent = 'Saving…';
       window.osfsHeroSave(JSON.stringify(this.exportScenario()));
     };
     query('[data-time]').onclick = () => controlPanel.openOrSelectTab('time');
     const content = document.createElement('p');
-    content.textContent = 'Right-drag in Mouse mode to orbit; scroll to zoom. In Trackpad mode, two-finger scroll orbits and pinch zooms. Touch: drag and pinch. Manual lets you frame the paused scene; Record camera restarts the scripted flight and records your gestures. Play replays the saved path. Scrub to adjust a camera keyframe. Save scenario writes the source JSON for the next capture. Duration changes trim the camera path. Start height is above prepared terrain. Lighting opens the existing date/time tab.';
+    content.textContent = 'Right-drag in Mouse mode to orbit; scroll to zoom. In Trackpad mode, two-finger scroll orbits and pinch zooms. Touch: drag and pinch. Manual lets you frame the paused scene; Record camera restarts the scripted flight and records your gestures. Play replays the saved path. Scrub to adjust a camera keyframe. Save scenario writes the source JSON for the next capture. Duration changes trim the camera path. Start fields move the aircraft live and pause at 0 s. Terrain refreshes in the background; Play waits until it is ready. Height is above prepared terrain. Lighting opens the existing date/time tab.';
     const help = ui.publicUi.createHelpTooltip({ label: 'Video editor help', content });
     query('[data-help]').append(help.element);
     stopWatching.push(() => help.destroy());
@@ -252,8 +303,11 @@ Object.assign(hero, {
     query('[data-play]').setAttribute('aria-label', this.playing ? 'Pause preview' : 'Play preview');
     query('[data-take]').textContent = this.recordingCamera ? 'Recording' : `${this.config.camera.keyframes?.length ?? 0} camera points`;
     ui.publicUi.checkChoice(this.tabElement, 'hero-camera-mode', this.config.camera.mode ?? 'scripted');
+    const blocked = this.preparingStart || this.startError || this.invalidStart;
     for (const control of this.tabElement.querySelectorAll('input, button')) control.disabled = this.busy;
-    query('[data-position]').disabled = this.busy && !this.seeking;
-    query('[data-record]').disabled = this.busy || this.config.camera.mode !== 'manual';
+    for (const input of this.tabElement.querySelectorAll('[data-start]')) input.disabled = false;
+    for (const control of this.tabElement.querySelectorAll('[data-play], [data-restart], [data-position], [data-duration]')) control.disabled = (this.busy && !this.seeking) || !!blocked;
+    query('[data-save]').disabled = this.busy || this.invalidStart;
+    query('[data-record]').disabled = this.busy || !!blocked || this.config.camera.mode !== 'manual';
   },
 });

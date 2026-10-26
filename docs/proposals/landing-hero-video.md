@@ -52,8 +52,13 @@ instrumented development session; it adds no editor to the production flight.
   starts a fresh take. **Scripted** switches back to the original orbit without
   deleting your manual points.
 - **Start** edits latitude, longitude, height above prepared ground and heading.
-  **Apply & restart** prepares terrain at that location and respawns paused at
-  zero. These are starting values, not the aircraft's current position during playback.
+  Every valid keystroke or number-input step updates the aircraft immediately
+  and pauses at **0.00 s**. No Apply action or blur is needed. The fields remain
+  editable while terrain refreshes in the background; the latest edit wins.
+  Nearby displayed terrain supplies the immediate height preview, followed by
+  the prepared ground when ready. Play waits for preparation. Heading-only edits
+  reuse prepared ground. Incomplete/invalid values hold the last valid pose at
+  zero until corrected. These fields always set the flight's starting values.
 - **Save scenario** writes the scene, duration, camera path and current fixed sky
   time to the selected JSON. It keeps the scripted aircraft inputs and video
   encoding settings. Saving refuses to overwrite a scenario changed externally
@@ -211,7 +216,9 @@ npm run check:hero-tuner -- --scenario=scripts/hero-scenario.json
 
 The check covers dry-engine rewind, repeated scripted flight, a trusted mouse
 camera gesture, recording/replay, pause, duration, relocation/heading/AGL and
-scenario save. It also verifies the real Test tab and downloadable feedback JSON.
+scenario save. It verifies live input events, native arrow-key stepping, retained
+input focus, editable fields during preparation, invalid drafts and the t=0 lock.
+It also verifies the real Test tab and downloadable feedback JSON.
 Reports and review markup are under `build/hero/editor-check/`. To use that
 checklist in your own tuning window after running the check:
 

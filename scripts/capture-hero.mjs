@@ -128,7 +128,9 @@ try {
   const { openHeadlessChrome, evaluate, waitForExpression } = await import(helperURL);
   chrome = await openHeadlessChrome(profile, process.env.CHROME_BIN ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', ['--ignore-certificate-errors', '--enable-unsafe-webgpu']);
   const cameraSource = await readFile(new URL('./hero-camera.js', import.meta.url), 'utf8');
+  const startSource = tuning ? await readFile(new URL('./hero-start.js', import.meta.url), 'utf8') : '';
   const driver = `const heroCamera = (() => { ${cameraSource.replaceAll('export function ', 'function ')}; return { cameraAt, putCameraPoint }; })();\n`
+    + (tuning ? `const heroStart = (() => { ${startSource.replaceAll('export function ', 'function ')}; return { startGroundKey, flightAtStart }; })();\n` : '')
     + await readFile(new URL('./hero-browser-driver.js', import.meta.url), 'utf8')
     + (tuning ? '\n' + await readFile(new URL('./hero-browser-tuner.js', import.meta.url), 'utf8') : '');
   let instrumented = false;

@@ -65,8 +65,45 @@ export async function checkTuner({ run, chrome, sessionId, output, scenarioPath,
   await run('(() => { const input=document.querySelector(".hero-tuner [data-duration]"); input.value=120; input.dispatchEvent(new Event("input",{bubbles:true})); })()');
   await until('!window.__osfsHero.busy && window.__osfsHero.config.timeline.durationSeconds === 4');
   assert.equal(await run('document.querySelector("[data-position]").max'), '119');
-  // Starting heading may point anywhere, and preparation must use the requested AGL.
-  await run('window.__osfsHero.applyStart({latitude:44.9747,longitude:-93.2377,heightAboveGroundMeters:200,headingDegrees:250})');
+  // Every input event must move the real FDM immediately, while editing stays at t=0.
+  await click('[data-play]');
+  await until('window.__osfsHero.frameIndex > 2');
+  report.liveEdits = [];
+  for (const [field, value] of [['latitude', 44.9747], ['longitude', -93.2377], ['headingDegrees', 250], ['heightAboveGroundMeters', 200]]) {
+    const edit = await run(`(() => {
+      const hero=window.__osfsHero;
+      const input=document.querySelector('[data-start="${field}"]');
+      input.focus();input.value=${value};input.dispatchEvent(new Event('input',{bubbles:true}));
+      return {frame:hero.frameIndex,playing:hero.playing,status:hero.status(),focused:document.activeElement===input,
+        fieldsEnabled:[...document.querySelectorAll('[data-start]')].every(field=>!field.disabled),inert:!!input.closest('[inert]')};
+    })()`);
+    assert.equal(edit.frame, 0);
+    assert.equal(edit.playing, false);
+    assert.equal(edit.status.time, start.time);
+    assert.equal(edit.focused, true);
+    assert.equal(edit.fieldsEnabled, true);
+    assert.equal(edit.inert, false);
+    const actual = field === 'latitude' ? edit.status.state.latDeg : field === 'longitude' ? edit.status.state.lonDeg
+      : field === 'headingDegrees' ? edit.status.state.headingRad * 180 / Math.PI
+        : await run('window.__osfsHero.startFlight.aboveGroundMeters');
+    assert.ok(Math.abs(actual - value) < 1e-5, `${field} did not update synchronously: ${actual}`);
+    report.liveEdits.push({ field, value, actual, frame: edit.frame, time: edit.status.time });
+  }
+  assert.equal(await run('document.querySelector("[data-apply]")'), null);
+  await run(`(() => { const input=document.querySelector('[data-start="headingDegrees"]');input.focus();input.value='';input.dispatchEvent(new Event('input',{bubbles:true})); })()`);
+  assert.equal(await run('window.__osfsHero.invalidStart'), true);
+  assert.equal((await state()).time, start.time);
+  await run(`(() => { const input=document.querySelector('[data-start="headingDegrees"]');input.value=250;input.dispatchEvent(new Event('input',{bubbles:true})); })()`);
+  assert.equal(await run('window.__osfsHero.invalidStart'), false);
+  // Real native number-input stepping must also be live, with no blur or Apply action.
+  await chrome.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'ArrowUp', code: 'ArrowUp', windowsVirtualKeyCode: 38 }, sessionId);
+  await chrome.send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'ArrowUp', code: 'ArrowUp', windowsVirtualKeyCode: 38 }, sessionId);
+  assert.ok(Math.abs((await state()).state.headingRad * 180 / Math.PI - 250.1) < .001);
+  await chrome.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'ArrowDown', code: 'ArrowDown', windowsVirtualKeyCode: 40 }, sessionId);
+  await chrome.send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'ArrowDown', code: 'ArrowDown', windowsVirtualKeyCode: 40 }, sessionId);
+  assert.equal(await run('window.__osfsHero.frameIndex'), 0);
+  await run('window.__osfsHero.startReady');
+  await until('!window.__osfsHero.preparingStart && !window.__osfsHero.startError');
   const relocated = await state();
   assert.ok(Math.abs(relocated.state.latDeg - 44.9747) < 1e-5);
   assert.ok(Math.abs(relocated.state.lonDeg + 93.2377) < 1e-5);
@@ -146,7 +183,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     steps: [
       { id: 'timeline', text: 'Play, pause, restart and scrub backwards/forwards. Does the plane resume the scripted climb, starting dry at 90% throttle?' },
       { id: 'camera', text: 'Choose Manual, frame the plane, then Record camera and orbit/zoom. Pause, scrub and Play: does the path replay as you intended?' },
-      { id: 'start', text: 'Change starting latitude, longitude, height above ground and heading. Apply & restart: does it spawn correctly, paused at the start?' },
+      { id: 'start', text: 'Edit starting latitude, longitude, height and heading without leaving the field. Does the plane move immediately and remain paused at 0 s, with the fields editable while terrain loads?' },
       { id: 'save', text: 'Change duration, save the scenario and reopen it. Does the composition persist? Finish here and download your feedback.' },
     ], sources: ['diagnostics', 'flight'],
   };
