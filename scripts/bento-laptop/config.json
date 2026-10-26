@@ -1,0 +1,182 @@
+{
+  "$comment": "Inputs for the bento laptop artwork: a MacBook Air showing the live 0SFS flight that a paired phone controls. capture.mjs reads `server`, `laptop`, `phone`, `flight`, `camera`, `pairing` and `captures`; render.mjs reads `model`, `render` and `preview`. Distances are millimetres unless named otherwise, angles degrees, colours sRGB hex. See docs/proposals/bento-laptop-rendering.md.",
+  "server": {
+    "port": 7491,
+    "readyTimeoutMs": 60000
+  },
+  "laptop": {
+    "$comment": "A 13-inch MacBook Air (M2 to M4) at macOS's default 'looks like 1470 x 956' scaling with the browser in full screen: the page gets the 16:10 area below the camera housing band, 1470 x 919 points at 2 pixels a point. The capture keeps that exact shape; render.mjs fits the screen to it.",
+    "label": "13-inch MacBook Air, Chrome in full screen at the default scaled resolution",
+    "viewport": { "width": 1470, "height": 919 },
+    "deviceScaleFactor": 2
+  },
+  "phone": {
+    "$comment": "The emulated phone that pairs as the controller. Same device and viewport as scripts/bento-phones/config.json, so a same-session phone capture fits the installed phone artwork's screen.",
+    "userAgentModel": "SM-N986U",
+    "viewport": { "width": 883, "height": 412 },
+    "captureScale": 2
+  },
+  "flight": {
+    "$comment": "Position, heading, airspeed, scenery and sky time come from `scenario` (the hero's tuned sunset); `throttle` is the hero's throttle before its climb cue. A fresh flight (osfs.start.resume=false) starts the F-35B without external tanks. `settings` are extra set.<id> URL parameters, as the hero capture uses.",
+    "scenario": "scripts/hero-scenario.json",
+    "aircraft": "f-35b",
+    "throttle": 0.9,
+    "settings": {
+      "renderer.mode": "webgpu",
+      "sky.model": "dome",
+      "osfs.sound.enabled": false
+    }
+  },
+  "camera": {
+    "$comment": "The in-app chase camera, straight behind the aircraft where it starts: closer and lower than the hero's 24 m and 4 m, so the F-35B reads on a laptop screen a few hundred CSS pixels wide.",
+    "distanceMeters": 14,
+    "heightMeters": 2.6,
+    "fieldOfViewDegrees": 55
+  },
+  "pairing": {
+    "$comment": "The laptop pauses itself as soon as the flight is up, so it waits over the University of Minnesota while the scenery loads, then pairs the phone through its own Remote Control link. The phone takes control and must show the laptop's heading and airspeed; the laptop's panels close and the scenery settles. The phone resumes the flight; once the laptop's frame rate readout has a reading from the flight (within `fpsTimeoutMs`) and `captureDelayMs` more, both screens are captured, the laptop's no more than `captureWindowMs` after the phone's, holding the stick at `captureStick` (fractions of the pad's radius, +x right, +y down) if set; up to `captureAttempts` tries. Then the phone rolls right at `roll` until the laptop's heading has turned `minHeadingChangeDegrees` right (within `rollTimeoutMs`), rolls back left as long, and pauses the flight.",
+    "fpsTimeoutMs": 8000,
+    "captureDelayMs": 250,
+    "captureWindowMs": 2500,
+    "captureAttempts": 4,
+    "captureStick": null,
+    "roll": 0.3,
+    "rollTimeoutMs": 15000,
+    "minHeadingChangeDegrees": 2
+  },
+  "settle": {
+    "minMs": 6000,
+    "quietMs": 2500,
+    "maxMs": 60000
+  },
+  "captures": {
+    "laptop": "laptop-screen.png",
+    "phone": "phone-screen.png"
+  },
+  "model": {
+    "$comment": "Pre-made model: 'MacBook Air M2' by rtql8d, CC-BY-4.0, Sketchfab's own glTF export. Sketchfab downloads need an account, so model.mjs fetches the unmodified export from the pinned commits of two public repositories that redistribute it with its license.txt, and checks every file's SHA-256. The export is never edited: render.mjs recolours it, opens the lid and replaces the screen at render time.",
+    "title": "MacBook Air M2",
+    "author": "rtql8d",
+    "authorUrl": "https://sketchfab.com/rtql8d",
+    "source": "https://sketchfab.com/3d-models/macbook-air-m2-786fa23d402a4f90ae36c4168997f9cc",
+    "license": "CC-BY-4.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by/4.0/",
+    "dir": "build/bento-laptop/model/macbook-air-m2",
+    "mirrors": [
+      "https://raw.githubusercontent.com/axelzwaans/axel-portfolio/3cdbf72cf24ce960d4b18d34e702e478ccb7177f/public/macbook_air_m2/",
+      "https://raw.githubusercontent.com/Anastasia-front/portfolio/25ddf96e4a1b83f781ba1ee5c1950eb4dc744456/public/images/3d/macBook/"
+    ],
+    "files": {
+      "license.txt": "184e85152e185e02161a8ba5133d9a9599c602720c23a6c1ea1f75ff2ebb96f6",
+      "scene.gltf": "2013f8acdade47978a92a6204af6669e79fff6f6f3df6c41272fb78d3a48af5a",
+      "scene.bin": "a386c7f222beb13844b753683d019d774c538fda1ade2760ee2a468477582428",
+      "textures/Aluminum_-_Anodized_Glossy_Grey_keyboard.jpg_baseColor.jpeg": "4ad5c1eef6722f47f96be6c0af30d422d911506b6c6decd2d84111ba2ab2a867",
+      "textures/Glass_-_Heavy_Color_baseColor.jpeg": "564d161231c46c149bbb072175a596fa89301165cb9a93dd575ce65c3b6785c6"
+    },
+    "$geometry": "In the export's own axes: +x to the user's right, +y from the front edge toward the hinge, +z up; one unit is 100 mm. Body 304 x 215 mm; the lid stands at 90 degrees.",
+    "unitMillimetres": 100,
+    "lid": {
+      "$comment": "Parts that turn with the lid (by material name) and the hinge axis, parallel to x through (y, z) in model millimetres. The export's lid stands at 90 degrees; `openDegrees` is the angle between deck and lid.",
+      "materials": ["Aluminum_-_Anodized_Glossy_Grey", "Glass_-_Heavy_Color", "Plastic_-_Translucent_Matte_Gray", "Acrylic_Clear"],
+      "hinge": { "y": 108.2, "z": -6.0 },
+      "modelOpenDegrees": 90,
+      "openDegrees": 105
+    },
+    "screen": {
+      "$comment": "The display, on the glass mesh's front face. The export's wallpaper is replaced by Apple's published panel: 2560 x 1664 pixels at 224 ppi (290.29 x 188.69 mm), centred, its lower edge where the export's display ends. The capture fills the panel's width; whatever height its shape leaves at the top is the black camera-housing band a full-screen app leaves, about 7.2 mm. The rest of the glass is black bezel.",
+      "material": "Glass_-_Heavy_Color",
+      "widthMm": 290.29,
+      "heightMm": 188.69,
+      "centerXMm": 0,
+      "bottomZMm": 11.14,
+      "frontYMm": 108.172,
+      "uv": {
+        "$comment": "How the export maps the glass's front face (every triangle alike), in model units: x = xPerV v + xAtV0 across the display and z = zPerU u + zAtU0 up it. The texture is transposed: u runs down the display.",
+        "xPerV": 4.0177,
+        "xAtV0": -1.51169,
+        "zPerU": -4.10348,
+        "zAtU0": 4.09874
+      },
+      "textureSize": 4096,
+      "glassColor": "#030405",
+      "glassRoughness": 0.06
+    },
+    "deck": {
+      "$comment": "The deck's baked texture shows black keys on Midnight aluminium. Pixels within `tolerance` of `sourceColor` (the Midnight case) and joined to the texture's border through such pixels, plus `caseEdgePx` of anti-aliasing around them, become `color` with the aluminium's finish (the material's metallic and roughness); the rest, the keys (whose shaded sides come close to the case colour) and their legends, keep their colour and get `keys`' satin plastic finish. `trackpad` is the trackpad's own UV island (u0, v0, u1, v1) in the same texture: it gets `tint` and a darker `edgePx` outline, like the hairline gap around a real one.",
+      "material": "Aluminum_-_Anodized_Glossy_Grey_keyboard.jpg",
+      "texture": "textures/Aluminum_-_Anodized_Glossy_Grey_keyboard.jpg_baseColor.jpeg",
+      "keys": { "metallic": 0, "roughness": 0.55 },
+      "sourceColor": "#29313c",
+      "tolerance": [8, 18],
+      "caseEdgePx": 1,
+      "color": "#d4d6d8",
+      "trackpad": { "uv": [0.3867, 0.5439, 0.5306, 0.7743], "tint": 0.965, "edge": 0.62, "edgePx": 3 }
+    },
+    "materials": {
+      "$comment": "PBR overrides by the export's material names. The silver finish replaces the export's Midnight one.",
+      "Aluminum_-_Anodized_Glossy_Grey": { "color": "#d4d6d8", "metallic": 0.5, "roughness": 0.38 },
+      "Aluminum_-_Anodized_Glossy_Grey_keyboard.jpg": { "metallic": 0.5, "roughness": 0.38 },
+      "Plastic_-_Translucent_Matte_Gray": { "color": "#c8cacc", "metallic": 0.85, "roughness": 0.4 },
+      "Acrylic_Clear": { "hidden": true, "$why": "The logo on the back of the lid: out of sight from the front, and the artwork needs no logo." },
+      "Bronze_-_Polished": { "color": "#2a2c2e", "metallic": 0.5, "roughness": 0.5 },
+      "Steel_-_Satin": { "color": "#3a3c3e", "metallic": 0.6, "roughness": 0.5 },
+      "Rubber_-_Soft": { "color": "#1c1d1e", "metallic": 0, "roughness": 0.9 }
+    }
+  },
+  "render": {
+    "$comment": "Output `width` pixels, the laptop spanning it minus `padding.x` on each side; padding leaves room for the shadow. Rendered at `renderSize`, cropped and downscaled. The camera orbits `target` (model millimetres after `position`): alpha -90 and beta 90 look straight at the screen, as for the phones. `yawDegrees` turns the laptop about the vertical axis; positive turns its screen toward the viewer's right, showing the left side.",
+    "output": "bento-remote-laptop",
+    "width": 720,
+    "padding": { "x": 16, "top": 10, "bottom": 30 },
+    "renderSize": [3200, 2000],
+    "camera": { "fovDegrees": 30, "target": [0, 60, 0], "alphaDegrees": -90, "betaDegrees": 70, "radius": 780 },
+    "yawDegrees": 24,
+    "lights": {
+      "$comment": "The phones' studio (scripts/bento-phones/config.json renders.lights), unchanged, so both devices share one light.",
+      "exposure": 1.0,
+      "environment": {
+        "size": 128,
+        "intensity": 1.0,
+        "zenith": "#3a4246",
+        "horizon": "#1a1e20",
+        "ground": "#0b0d0d",
+        "softboxes": [
+          { "direction": [0.0, 1.0, -0.35], "sizeDegrees": [110, 34], "intensity": 3.0, "color": "#ffffff", "softness": 0.45 },
+          { "direction": [-1.0, 0.2, 0.35], "sizeDegrees": [16, 80], "intensity": 4.0, "color": "#ffffff", "softness": 0.35 },
+          { "direction": [1.0, 0.1, 0.15], "sizeDegrees": [16, 80], "intensity": 2.4, "color": "#dce8ff", "softness": 0.35 },
+          { "direction": [0.0, -1.0, 0.35], "sizeDegrees": [130, 36], "intensity": 1.6, "color": "#d6ebe2", "softness": 0.6 },
+          { "direction": [-0.4, 0.35, -1.0], "sizeDegrees": [40, 26], "intensity": 0.3, "color": "#ffffff", "softness": 0.7 },
+          { "direction": [0.0, -0.8, -1.0], "sizeDegrees": [140, 10], "intensity": 1.0, "color": "#ffffff", "softness": 0.5 }
+        ]
+      },
+      "key": { "direction": [-0.35, -0.8, 0.45], "intensity": 1.2 },
+      "screenEmission": 1.0,
+      "screenGlare": 0.6
+    },
+    "screenReflection": {
+      "$comment": "A soft reflector card only the display glass reflects: the shared studio has nothing where this screen's mirror direction points, so without it the glass shows no reflection at all. A softbox as in `lights.environment.softboxes`, plus `rollDegrees` about its own axis. Intensity 0 turns it off.",
+      "direction": [0.536, 0.134, -0.834],
+      "sizeDegrees": [24, 40],
+      "rollDegrees": 0,
+      "intensity": 1.8,
+      "color": "#ffffff",
+      "softness": 0.8
+    },
+    "shadow": { "color": "#000000", "opacity": 0.45, "blur": 16, "offset": [0, 12] },
+    "webpQuality": 84,
+    "protect": {
+      "$comment": "Parts of the capture the phone must not cover, as [x0, y0, x1, y1] fractions of the capture. render.mjs adds the scenery attribution from the box captures.json records, and reports how much of each the phone covers in the preview layout.",
+      "aircraft": [0.23, 0.21, 0.77, 0.54]
+    }
+  },
+  "preview": {
+    "$comment": "Cards for build/bento-laptop/preview.png: the laptop with the installed phone artwork (and the same-session phone candidate) on the remote card's gradient at each art width. `layout` places each image's top left corner and width in fractions of the art box's width; the box is as high as the lower image reaches. render.mjs turns the layout into the suggested card CSS (render.json `layout.css`), which the preview uses, and its box is `min(100%, ` the largest width `px)` wide.",
+    "widths": [300, 360, 400],
+    "background": "radial-gradient(ellipse at 90% 100%, #213b34 0%, #15221f 65%)",
+    "phone": "public/media/bento-remote-phone.webp",
+    "layout": {
+      "laptop": { "left": 0, "top": 0, "width": 0.8 },
+      "phone": { "left": 0.48, "top": 0.34, "width": 0.52 }
+    }
+  }
+}

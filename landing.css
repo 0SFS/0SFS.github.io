@@ -89,7 +89,10 @@
 .feature--phone { background: radial-gradient(ellipse at 90% 100%, #213b34 0%, #15221f 65%); }
 .feature--phone h2 { margin-block: 16px 12px; }
 .feature--phone h2 > span { color: #b2d2bc; }
-.feature__phone-art { display: block; width: min(100%, 400px); height: auto; aspect-ratio: 840 / 518; margin: 16px auto 10px; }
+.feature__remote-art { position: relative; width: min(100%, 400px); aspect-ratio: 1000 / 665.56; margin: 16px auto 10px; }
+.feature__remote-art img { position: absolute; display: block; height: auto; }
+.feature__remote-laptop { left: 0; top: 0; width: 80%; }
+.feature__remote-phone { left: 48%; top: 51.09%; width: 52%; }
 .feature--sky, .feature--systems, .feature--sound, .feature--multiplayer { grid-column: span 3; min-height: 330px; }
 .feature--sky { background: linear-gradient(145deg, #22293d, #1b2331); }
 .feature__sky-art { position: relative; height: 64px; overflow: hidden; margin-block: 16px 9px; border-radius: 8px; background: radial-gradient(circle at 15% 23%, #d4e0fa 0 1px, transparent 1.5px), radial-gradient(circle at 29% 44%, #d4e0fa 0 .7px, transparent 1.2px), radial-gradient(circle at 40% 15%, #d4e0fa 0 .7px, transparent 1.2px), linear-gradient(180deg, #101c34, #3c496c 60%, #c68b70); }
