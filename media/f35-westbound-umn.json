@@ -1,0 +1,127 @@
+{
+  "config": {
+    "name": "f35-westbound-umn",
+    "description": "F-35B climbing west from the Mississippi at the University of Minnesota",
+    "scene": {
+      "latitude": 44.974516,
+      "longitude": -93.2375,
+      "heightAboveGroundMeters": 180,
+      "headingDegrees": 270,
+      "airspeedKnots": 300,
+      "dateTime": "2026-10-25T23:10:58.000Z",
+      "timeZone": "America/Chicago",
+      "scenery": "google",
+      "solarTime": "2026-10-25T17:14:00"
+    },
+    "timeline": {
+      "durationSeconds": 5,
+      "fps": 30,
+      "physicsHz": 60,
+      "throttleBefore": 0.9,
+      "throttleAfter": 1,
+      "throttleAtSeconds": 0.2,
+      "initialPitchDegrees": 2,
+      "climbPitchDegrees": 45,
+      "pitchRampSeconds": 1.5
+    },
+    "camera": {
+      "distanceMeters": 24,
+      "heightMeters": 4,
+      "orbitDegrees": 12,
+      "fieldOfViewDegrees": 55,
+      "orbitEndDegrees": -8
+    },
+    "video": {
+      "width": 960,
+      "height": 540,
+      "vp9BitsPerSecond": 500000,
+      "h264BitsPerSecond": 700000,
+      "posterQuality": 82
+    }
+  },
+  "capturedAt": "2026-10-26T01:49:52.846Z",
+  "source": "real development simulator; browser-only instrumentation",
+  "provenance": {
+    "flight": {
+      "commit": "3cae916ac7c50bcc4582571f22c703f756e3c27e",
+      "dirty": true
+    },
+    "website": {
+      "commit": "a14293c2dc8dd57521d7577f50065ff4342d2142",
+      "dirty": true
+    },
+    "scripts": {
+      "capture-hero.mjs": "19b26c03a04148a12bd3d248f267290a713ae21e32cfd0f303fb1e86cdd16738",
+      "hero-browser-driver.js": "a4abfa363ed81ebf78efcbb5b09fd05987106de986e472dbbf2e799e2727a7c0",
+      "hero-browser-encoder.js": "bce7f2ee5c5b37e459f9f5d44d7e0df7c7ce3df2e8bf0b542fd790922b62b35c",
+      "hero-muxers.mjs": "be54ca1f7673b51de13d694c8c7fcc6b305e8b9a9493a95519536391ca8e8e99"
+    },
+    "flightSourceSha256": "8fc59cb689f978da36e976a5caeea305cc315323997cae120ef429ca04e99675"
+  },
+  "checks": {
+    "frames": 150,
+    "durationSeconds": 5,
+    "skyTime": true,
+    "cameraOrbitStartDegrees": 11.999999999999998,
+    "cameraOrbitEndDegrees": -7.866666666666646,
+    "cameraOrbit": true,
+    "noExternalTanks": true,
+    "throttleCueFrame": 6,
+    "throttleStep": true,
+    "dryBeforeCue": true,
+    "afterburnerLit": true,
+    "afterburnerDelayed": true,
+    "spoolingBeforeLight": true,
+    "afterburnerFirstLitSeconds": 1.3666666666666667,
+    "pitchAtThreeSecondsDegrees": 42.7268517792806,
+    "climbPitchReached": true,
+    "climbing": true,
+    "westbound": true,
+    "simulatedSeconds": 4.966666666666654,
+    "frameClock": true
+  },
+  "files": [
+    {
+      "filename": "f35-westbound-umn.webm",
+      "codec": "vp9",
+      "bytes": 239344,
+      "sha256": "051e586467413814e58a37c1b07b2267f77dc8f473e4e69595b69f1485d32dfe"
+    },
+    {
+      "filename": "f35-westbound-umn.mp4",
+      "codec": "h264",
+      "bytes": 402198,
+      "sha256": "6ecd633c4d9c02f0175ce702e7cbd848cbe9d4df11fcf6624a2918b17bf87d4c"
+    }
+  ],
+  "decode": [
+    {
+      "file": "f35-westbound-umn.webm",
+      "passed": true,
+      "duration": 5,
+      "width": 960,
+      "height": 540,
+      "seeks": [
+        0,
+        2,
+        4.9
+      ],
+      "advancedTo": 0.060605,
+      "variance": 4576.646400528098
+    },
+    {
+      "file": "f35-westbound-umn.mp4",
+      "passed": true,
+      "duration": 5,
+      "width": 960,
+      "height": 540,
+      "seeks": [
+        0,
+        2,
+        4.9
+      ],
+      "advancedTo": 0.067613,
+      "variance": 4623.949454355654
+    }
+  ]
+}

@@ -15,51 +15,39 @@
   -webkit-font-smoothing: antialiased;
 }
 .info-page *, .info-page *::before, .info-page *::after { box-sizing: border-box; }
+.info-page [hidden], .info-page__help-tooltip[hidden] { display: none !important; }
 .info-page a { color: var(--info-accent); text-underline-offset: 4px; }
 .info-page a:hover { color: #ffda83; }
-.info-page a:focus-visible, .info-page summary:focus-visible { outline: 3px solid #8bdfff; outline-offset: 5px; }
+.info-page a:focus-visible, .info-page summary:focus-visible, .info-page button:focus-visible { outline: 3px solid #8bdfff; outline-offset: 5px; }
+.info-page__main { padding-top: max(24px, env(safe-area-inset-top, 0px)); }
 .info-page__main:focus { outline: none; }
 .info-page h1, .info-page h2, .info-page h3, .info-page p { margin: 0; }
 .info-page h1, .info-page h2, .info-page h3 { text-wrap: balance; }
-.info-page__nav, .info-page__main, .info-page__footer { width: min(100%, 1600px); margin-inline: auto; }
+.info-page__main, .info-page__footer { width: min(100%, 1600px); margin-inline: auto; }
 .info-page__skip { position: absolute; inset: 12px auto auto 12px; z-index: 5; padding: 10px 16px; border-radius: 8px; background: var(--info-panel); transform: translateY(-200%); }
 .info-page__skip:focus { transform: none; }
-.info-page__nav { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-block: calc(25px + env(safe-area-inset-top, 0px)) 22px; border-bottom: 1px solid var(--info-line); }
-.info-page a.info-page__brand { display: inline-flex; align-items: center; gap: 16px; color: var(--info-ink); text-decoration: none; }
-.info-page__wordmark { font-size: 32px; font-weight: 800; line-height: 1; letter-spacing: -2px; }
-.info-page__wordmark > span { color: var(--info-accent); font-size: 29px; margin-left: 3px; }
-.info-page__brand-description { padding-left: 16px; border-left: 1px solid #43505b; color: var(--info-muted); font-size: 11px; line-height: 1.4; }
-.info-page__nav nav { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 24px; }
-.info-page__nav nav a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: #c5cdd3; font-size: 13px; text-decoration: none; }
-.info-page__nav nav a:hover { color: #fff; }
-.info-page__nav nav a:last-child { color: var(--info-accent); }
-.info-page__hero { display: grid; grid-template-columns: 1.2fr 1fr; align-items: end; gap: 36px; padding-block: 45px 40px; }
 .info-page__eyebrow, .feature__label { font: 500 11px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: 1.3px; text-transform: uppercase; }
 .info-page__eyebrow { color: var(--info-muted); margin-bottom: 14px !important; }
-.info-page__status-dot { display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: var(--info-accent); vertical-align: 1px; }
-.info-page h1 { font-size: clamp(44px, 4.7vw, 76px); font-weight: 650; letter-spacing: -3.2px; line-height: 1.03; }
-.info-page h1 > span { color: var(--info-accent); }
-.info-page__intro { max-width: 510px; justify-self: end; }
-.info-page__lede { color: #c0cbd3; font-size: clamp(15px, 1.3vw, 19px); line-height: 1.55; }
-.info-page__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; margin-top: 21px !important; }
-.info-page__start, .info-page__secondary { display: inline-flex; align-items: center; justify-content: center; gap: 22px; min-height: 48px; border-radius: 9px; font-size: 14px; font-weight: 650; text-decoration: none; }
-.info-page a.info-page__start { padding: 11px 22px; color: #10140d; background: var(--info-accent); }
+.info-page a.info-page__start { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 40px; padding: 8px 17px; border: 1px solid #f0ce78; border-radius: 12px; color: #10140d; background: var(--info-accent); font-size: 14px; font-weight: 650; text-decoration: none; box-shadow: 0 2px 12px #0003; }
 .info-page a.info-page__start:hover { color: #10140d; background: #f7cc6d; }
-.info-page a.info-page__secondary { color: var(--info-ink); gap: 8px; }
-.info-page__micro { margin-top: 12px !important; color: var(--info-muted); font-size: 12px; }
 .info-page__features { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 14px; scroll-margin-top: 20px; }
 .feature { position: relative; min-width: 0; overflow: hidden; padding: 25px; border: 1px solid var(--info-line); border-radius: var(--info-radius); background: var(--info-panel); }
 .feature__label { position: relative; z-index: 1; color: #b2bdc8; font-size: 10px; letter-spacing: 1.2px; }
 .feature h2 { position: relative; font-size: clamp(24px, 2.2vw, 34px); font-weight: 600; line-height: 1.13; letter-spacing: -1.1px; }
 .feature h2 > span { color: #aab8c6; }
 .feature > p:not(.feature__label, .feature__rate) { position: relative; color: #b9c5ce; font-size: 13px; line-height: 1.6; }
-.feature--world { grid-column: span 6; grid-row: span 2; min-height: 500px; padding: 0; background: #151b1f; }
-.feature__scenery { position: absolute; bottom: 43px; width: 100%; height: auto; }
-.feature--world::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, #080e14f0 0%, #080e14b5 27%, transparent 58%, transparent 83%, #080e14 100%); pointer-events: none; }
-.feature__world-copy { position: relative; z-index: 1; padding: 30px; }
-.feature__world-copy h2 { margin-block: 18px 14px; font-size: clamp(34px, 3.6vw, 54px); letter-spacing: -1.7px; }
-.feature__world-copy > p:last-child { max-width: 34ch; color: #d3dce1; font-size: 14px; line-height: 1.6; }
-.feature__world-caption { position: absolute; z-index: 1; inset: auto 20px 15px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; font: 10px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: #e4e8eb; }
+.feature--world { grid-column: span 6; grid-row: span 2; min-height: 560px; padding: 0; background: #151b1f; }
+.feature__scenery { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+.feature--world::after { content: ""; position: absolute; inset: 0 0 auto; height: 200px; background: linear-gradient(#080e1480, transparent); pointer-events: none; }
+.feature__video-heading { position: absolute; z-index: 1; top: clamp(22px, 2.4vw, 36px); left: clamp(22px, 2.4vw, 36px); right: 22px; color: #fff; text-shadow: 0 2px 14px #0006; pointer-events: none; }
+.feature__video-wordmark { display: block; font-size: clamp(40px, 4.2vw, 64px); font-weight: 750; line-height: 1; letter-spacing: -2.5px; }
+.feature__video-name { display: block; margin-top: 8px; font-size: clamp(13px, 1.2vw, 17px); font-weight: 500; line-height: 1.4; letter-spacing: .1px; }
+.feature__world-controls { position: absolute; z-index: 1; inset: auto 16px 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; pointer-events: none; }
+.feature__world-controls-left { display: flex; align-items: center; gap: 8px; }
+.feature__world-controls button, .feature__world-controls a { pointer-events: auto; }
+.feature__video-toggle { width: 40px; height: 40px; padding: 0; border: 1px solid #ffffff60; border-radius: 50%; color: #fff; background: #101820cc; font: 14px/1 system-ui, sans-serif; cursor: pointer; box-shadow: 0 2px 12px #0003; }
+.feature__video-toggle:hover { border-color: #e8b647; color: #e8b647; background: #101820; }
+.feature__world-controls .info-page__help-button { width: 40px; height: 40px; color: #fff; border-color: #ffffff60; background: #101820cc; box-shadow: 0 2px 12px #0003; }
 .feature--gpu, .feature--physics, .feature--native, .feature--phone { grid-column: span 3; min-height: 245px; }
 .feature--gpu { display: flex; flex-direction: column; background: radial-gradient(ellipse at 80% 70%, #19465d 0%, #102230 60%); }
 .feature__gpu-mark { position: absolute; inset: 39px 35px auto auto; width: 61px; height: 61px; transform: rotate(-25deg) skew(12deg); }
@@ -82,17 +70,14 @@
 .feature__threads > span { padding: 4px 0; border: 1px solid #756a97; border-radius: 5px; background: #ffffff06; }
 .feature__threads > i { grid-column: 1 / -1; height: 12px; margin-inline: 15%; border-inline: 1px solid #756a97; border-bottom: 1px solid #756a97; }
 .feature__threads > b { grid-column: 1 / -1; justify-self: center; margin-top: -1px; padding: 3px 10px; border: 1px solid #756a97; border-radius: 5px; font-size: 9px; font-weight: 400; }
-.feature--phone { background: radial-gradient(ellipse at 90% 100%, #213b34 0%, #15221f 65%); }
+.feature--phone { display: flex; flex-direction: column; background: radial-gradient(ellipse at 90% 100%, #213b34 0%, #15221f 65%); }
 .feature--phone h2 { margin-block: 16px 12px; }
 .feature--phone h2 > span { color: #b2d2bc; }
-.feature__phone { position: relative; display: flex; align-items: center; justify-content: space-between; width: min(100%, 250px); height: 72px; margin-block: 15px; padding: 9px 15px; border: 2px solid #82998c; border-radius: 16px; background: #0d1715; box-shadow: 0 8px 20px #0003; }
-.feature__phone::before { content: ""; position: absolute; top: 25px; left: 4px; width: 3px; height: 20px; border-radius: 3px; background: #668173; }
-.feature__phone-stick { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #53685d; border-radius: 50%; background: #1d2b25; }
-.feature__phone-stick > i { width: 17px; height: 17px; border-radius: 50%; background: #e8b647; transform: translate(5px, -4px); box-shadow: 0 0 0 5px #e8b64719; }
-.feature__phone-center { color: #b8c8bd; font: 650 13px/1.6 ui-monospace, "SF Mono", Menlo, Consolas, monospace; text-align: center; }
-.feature__phone-center > span { display: block; font-size: 6px; font-weight: 400; letter-spacing: 1px; }
-.feature__phone-throttle { width: 4px; height: 41px; margin-right: 9px; border-radius: 4px; background: #53685d; }
-.feature__phone-throttle > i { position: relative; display: block; left: -6px; top: 10px; width: 16px; height: 8px; border-radius: 3px; background: #e8b647; }
+.feature__remote-art { position: relative; width: min(100%, 400px); aspect-ratio: 1000 / 665.56; margin: 16px auto 10px; }
+.feature__remote-art img { position: absolute; display: block; height: auto; }
+.feature__remote-laptop { left: 0; top: 0; width: 80%; }
+.feature__remote-phone { left: 48%; top: 51.09%; width: 52%; }
+.feature__help-row { display: flex; justify-content: flex-end; margin-top: auto; padding-top: 12px; }
 .feature--sky, .feature--systems, .feature--sound, .feature--multiplayer { grid-column: span 3; min-height: 330px; }
 .feature--sky { background: linear-gradient(145deg, #22293d, #1b2331); }
 .feature__sky-art { position: relative; height: 64px; overflow: hidden; margin-block: 16px 9px; border-radius: 8px; background: radial-gradient(circle at 15% 23%, #d4e0fa 0 1px, transparent 1.5px), radial-gradient(circle at 29% 44%, #d4e0fa 0 .7px, transparent 1.2px), radial-gradient(circle at 40% 15%, #d4e0fa 0 .7px, transparent 1.2px), linear-gradient(180deg, #101c34, #3c496c 60%, #c68b70); }
@@ -108,12 +93,11 @@
 .feature--sound h2 { margin-bottom: 12px; }
 .feature--sound h2 > span { color: #e2c98d; }
 .feature__link { display: inline-flex; align-items: center; gap: 10px; min-height: 36px; margin-top: 8px; font-size: 12px; text-decoration: none; }
-.feature--multiplayer { background: radial-gradient(ellipse at 100% 10%, #1d3b4a, #121c25 75%); }
+.feature--multiplayer { display: flex; flex-direction: column; container: multiplayer / inline-size; background: radial-gradient(ellipse at 100% 10%, #1d3b4a, #121c25 75%); }
 .feature__badge { display: inline-block; padding: 2px 6px; border: 1px solid #667985; border-radius: 5px; color: #d1dce2; font: 500 9px/1.6 ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: .4px; text-transform: uppercase; vertical-align: 1px; }
 .feature__label > .feature__badge { margin-left: 5px; }
-.feature__formation { display: flex; justify-content: flex-end; align-items: center; height: 48px; gap: 25px; padding-right: 15px; color: #b8d7e6; font-size: 41px; line-height: 1; }
-.feature__formation span:first-child { opacity: .5; transform: translateY(8px); }
-.feature__formation span:last-child { transform: translateY(-5px); }
+.feature__multiplayer-art { display: flex; align-items: flex-start; gap: clamp(8px, 3%, 24px); width: min(100%, 664px); margin: 18px auto 10px; }
+.feature__multiplayer-art img { display: block; flex: 1 1 0; min-width: 0; max-width: 320px; height: auto; aspect-ratio: 640 / 504; }
 .feature--multiplayer h2 { margin-block: 5px 14px; }
 .feature--multiplayer h2 > span { color: #a3cbdc; }
 .info-page__scenery-note { display: flex; align-items: baseline; gap: 10px; margin: 16px 4px 0; color: var(--info-muted); font-size: 12px; }
@@ -128,6 +112,19 @@
 .info-page__aircraft article { min-width: 0; overflow: hidden; padding: 0 24px 24px; border: 1px solid var(--info-line); border-radius: var(--info-radius); background: linear-gradient(160deg, #1d2936, #111922 65%); }
 .info-page__aircraft img { display: block; width: calc(100% + 48px); height: auto; margin-inline: -24px; aspect-ratio: 16 / 9; object-fit: contain; }
 .info-page__aircraft h3 { margin-top: 5px; font-size: 18px; font-weight: 600; letter-spacing: -.4px; line-height: 1.35; }
+.info-page__aircraft-header { display: flex; align-items: start; justify-content: space-between; gap: 14px; margin-top: 5px; }
+.info-page__aircraft-header h3 { margin-top: 0; }
+.info-page__aircraft-header .feature__badge { margin-top: 8px; }
+.info-page__help-button { flex: 0 0 36px; width: 36px; height: 36px; padding: 0; border: 1px solid #53616b; border-radius: 50%; color: #d7e0e6; background: #ffffff06; font: 16px/1 system-ui, sans-serif; cursor: pointer; }
+.info-page__help-button:hover { color: var(--info-accent); border-color: var(--info-accent); }
+.foss-earth-help-tooltip { display: inline-flex; flex: 0 0 auto; }
+.info-page__help-tooltip { position: fixed; inset: auto; z-index: 10; width: 340px; max-width: calc(100vw - 16px); max-height: calc(100dvh - 16px); overflow: auto; overflow-wrap: break-word; margin: 0; padding: 14px 16px; border: 1px solid #53616b; border-radius: 10px; color: #e4e8eb; background: #121b24; box-shadow: 0 5px 20px #0005; font: 13px/1.55 system-ui, sans-serif; pointer-events: auto; }
+.info-page__help-tooltip::backdrop { background: transparent; pointer-events: none; }
+.info-page .info-page__help-tooltip h2, .info-page__help-tooltip h4 { margin: 0 0 8px; font-size: 14px; font-weight: 600; line-height: 1.4; letter-spacing: 0; }
+.info-page__help-tooltip p + p { margin-top: 8px; }
+.info-page__help-tooltip a { color: #e8b647; text-underline-offset: 3px; }
+.info-page__help-tooltip a:focus-visible { outline: 3px solid #8bdfff; outline-offset: 3px; }
+.info-page__help-tooltip p.info-page__note { color: #a5b1bd; font-size: 12px; }
 .info-page__aircraft p { margin-top: 10px; color: #c3cdd5; font-size: 13px; }
 .info-page__aircraft p.info-page__note { color: #a5b1bd; font-size: 12px; }
 .info-page__fleet-note { margin: 14px 4px 0 !important; color: var(--info-muted); font-size: 12px; }
@@ -164,23 +161,18 @@
 .info-page__footer strong { margin-right: 8px; color: #dbe4e9; font-size: 16px; }
 .info-page__footer a { color: #bcc6ce; }
 @media (min-width: 1700px) {
-  .info-page__hero { padding-block: 55px 48px; }
-  .feature--world { min-height: 570px; }
+  .feature--world { min-height: 630px; }
   .feature--gpu, .feature--physics, .feature--native, .feature--phone { min-height: 278px; }
   .feature { padding: 30px; }
   .feature--world { padding: 0; }
-  .feature__world-copy { padding: 35px; }
 }
 @media (max-width: 1100px) {
   .info-page { padding-inline: max(20px, env(safe-area-inset-left, 0px)) max(20px, env(safe-area-inset-right, 0px)); }
-  .info-page__hero { gap: 28px; }
-  .info-page h1 { letter-spacing: -2.4px; }
   .feature { padding: 21px; }
   .feature--world { grid-column: span 8; min-height: 450px; padding: 0; }
   .feature--gpu, .feature--physics { grid-column: span 4; min-height: 218px; }
   .feature--native, .feature--phone { grid-column: span 6; min-height: 250px; }
   .feature h2 { font-size: 29px; }
-  .feature__world-copy h2 { font-size: 48px; }
   .feature--gpu h2 { font-size: 40px; }
   .feature__gpu-mark { width: 50px; height: 50px; }
   .feature--sky, .feature--systems, .feature--sound, .feature--multiplayer { grid-column: span 6; min-height: 290px; }
@@ -191,18 +183,8 @@
   .info-page__guide-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 760px) {
-  .info-page__nav { gap: 16px; padding-block: calc(18px + env(safe-area-inset-top, 0px)) 15px; }
-  .info-page__brand-description { display: none; }
-  .info-page__nav nav { gap: 4px 16px; }
-  .info-page__nav nav a { font-size: 12px; }
-  .info-page__nav nav a:nth-child(3) { display: none; }
-  .info-page__hero { grid-template-columns: 1fr; gap: 24px; padding-block: 34px 30px; }
-  .info-page h1 { font-size: clamp(44px, 8vw, 60px); }
-  .info-page__intro { max-width: 570px; justify-self: start; }
-  .info-page__lede { max-width: 48ch; font-size: 16px; }
-  .info-page__actions { margin-top: 18px !important; }
   .info-page__features { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-  .feature--world { grid-column: 1 / -1; grid-row: auto; min-height: 440px; }
+  .feature--world { grid-column: 1 / -1; grid-row: auto; min-height: 0; aspect-ratio: 16 / 10; }
   .feature--gpu, .feature--physics, .feature--native, .feature--phone, .feature--sky, .feature--systems, .feature--sound, .feature--multiplayer { grid-column: span 1; min-height: 255px; }
   .info-page__section-heading { align-items: start; flex-direction: column; gap: 12px; }
   .info-page__fleet, .info-page__getting-started { margin-top: 42px; }
@@ -210,6 +192,7 @@
   .info-page__aircraft article { display: grid; grid-template-columns: 38% 1fr; column-gap: 20px; align-content: start; padding: 20px; }
   .info-page__aircraft img { grid-column: 1; grid-row: 1 / span 3; align-self: center; width: 100%; margin: 0; }
   .info-page__aircraft h3, .info-page__aircraft p { grid-column: 2; }
+  .info-page__aircraft-header { grid-column: 2; align-self: center; margin-top: 0; }
   .info-page__aircraft h3 { margin-top: 0; }
   .info-page__roadmap { grid-template-columns: 1fr; margin-top: 40px; }
   .info-page__roadmap-items { gap: 25px; }
@@ -217,27 +200,15 @@
 }
 @media (max-width: 480px) {
   .info-page { padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px)); }
-  .info-page__nav nav { gap: 4px 14px; }
-  .info-page__nav nav a:first-child { display: none; }
-  .info-page__wordmark { font-size: 29px; }
-  .info-page h1 { font-size: 46px; letter-spacing: -2.6px; }
-  .info-page__hero { padding-top: 28px; }
-  .info-page__actions { gap: 10px 16px; }
-  .info-page__start, .info-page__secondary { font-size: 13px; }
   .info-page a.info-page__start { padding-inline: 17px; gap: 17px; }
   .info-page__features { grid-template-columns: 1fr; }
   .feature { padding: 25px; border-radius: 18px; }
-  .feature--world { min-height: 420px; padding: 0; }
-  .feature__world-copy { padding: 25px; }
-  .feature__world-copy h2 { font-size: 42px; }
-  .feature__world-copy > p:last-child { font-size: 13px; max-width: 29ch; }
-  .feature__world-caption { inset-inline: 16px; font-size: 9px; }
+  .feature--world { min-height: 0; aspect-ratio: 1; padding: 0; }
   .feature--gpu, .feature--physics, .feature--native, .feature--phone, .feature--sky, .feature--systems, .feature--sound, .feature--multiplayer { grid-column: 1; min-height: 235px; }
   .feature h2 { font-size: 32px; }
   .feature--gpu h2 { font-size: 46px; padding-top: 55px; }
   .feature__gpu-mark { top: 35px; right: 40px; width: 65px; height: 65px; }
   .feature__threads { max-width: 270px; }
-  .feature__phone { width: 250px; }
   .info-page__scenery-note { font-size: 11px; }
   .info-page__aircraft article { display: block; padding: 0 22px 22px; }
   .info-page__aircraft img { width: calc(100% + 44px); margin-inline: -22px; }
@@ -250,14 +221,16 @@
   .info-page__footer { font-size: 10px; }
 }
 @media (max-width: 359px) {
-  .info-page h1 { font-size: 39px; }
-  .info-page__secondary { min-height: 36px; }
-  .feature__world-copy h2 { font-size: 35px; }
-  .feature__world-copy > p:last-child { max-width: 25ch; }
   .feature { padding: 21px; }
   .feature--world { padding: 0; }
-  .feature__world-copy { padding: 21px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .info-page, .info-page * { scroll-behavior: auto; transition: none !important; animation: none !important; }
+}
+
+.feature__attribution { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+
+@container multiplayer (max-width: 180px) {
+  .feature__multiplayer-art { flex-direction: column; align-items: center; gap: 4px; }
+  .feature__multiplayer-art img { flex: none; width: min(100%, 320px); }
 }
