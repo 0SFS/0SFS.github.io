@@ -94,6 +94,17 @@
 .feature__sky-limb { position: absolute; inset: 52px -5% auto; height: 80px; border-top: 1px solid #e0ad91; border-radius: 50%; background: linear-gradient(#34465c, #111e31 30%); box-shadow: 0 -3px 12px #fac19070; }
 .feature--sky h2 { margin-bottom: 12px; }
 .feature--sky h2 > span { color: #c6cbed; }
+/* The orbital sunset fills the card: the label and heading on the black sky above the Earth's edge, the text and link on the night side below. The illustration stays beneath, hidden.
+   The picture's band of air runs from 39% to 49% of its height. On tall cards it falls below the heading as it is; on wide ones --sky-edge moves the picture up to put the band there. The paragraph keeps the band and the flare's ghosts below it (17cqw) clear. */
+.feature--sky[data-sky-art="sunset"] { --sky-edge: 100cqw; container-type: inline-size; display: flex; flex-direction: column; background: #000; }
+.feature--sky[data-sky-art="sunset"] .feature__sky-art { display: none; }
+.feature--sky[data-sky-art="sunset"] h2 { margin-block: 12px 0; }
+.feature--sky[data-sky-art="sunset"] > p:not(.feature__label) { margin-top: auto; padding-top: calc(17cqw + 20px); }
+.feature--sky[data-sky-art="sunset"] .feature__link { position: relative; align-self: flex-start; }
+.feature--sky[data-sky-art="sunset"] .feature__help-row { position: absolute; right: 25px; bottom: 25px; z-index: 1; margin: 0; padding: 0; }
+.feature__photo { position: absolute; inset: 0; }
+.feature__photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; }
+.feature--sky[data-sky-art="sunset"] .feature__photo img { object-position: 50% min(0px, calc(var(--sky-edge) - 39cqw)); }
 .feature--systems h2 { margin-block: 18px 14px; }
 .feature__system-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 19px; }
 .feature__system-tags > span { padding: 4px 9px; border: 1px solid #48525b; border-radius: 6px; color: #bdc8d0; font: 10px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
@@ -185,6 +196,7 @@
   .feature--gpu h2 { font-size: 40px; }
   .feature__gpu-mark { width: 50px; height: 50px; }
   .feature--sky, .feature--systems, .feature--sound, .feature--multiplayer { grid-column: span 6; min-height: 290px; }
+  .feature--sky[data-sky-art="sunset"] { --sky-edge: 121px; }
   .feature__badge { font-size: 8px; }
   .info-page__roadmap { gap: 28px; padding: 28px; }
   .info-page__roadmap-items { gap: 20px; }
@@ -218,6 +230,7 @@
   .feature--world { min-height: 0; aspect-ratio: 1; padding: 0; }
   .feature--gpu, .feature--physics, .feature--native, .feature--phone, .feature--sky, .feature--systems, .feature--sound, .feature--multiplayer { grid-column: 1; min-height: 235px; }
   .feature h2 { font-size: 32px; }
+  .feature--sky[data-sky-art="sunset"] { --sky-edge: 131px; }
   .feature--gpu h2 { font-size: 46px; padding-top: 55px; }
   .feature__gpu-mark { top: 35px; right: 40px; width: 65px; height: 65px; }
   .feature__threads { max-width: 270px; }
