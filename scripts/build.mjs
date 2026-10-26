@@ -108,8 +108,17 @@ const decode = (text) => text.replace(/&(amp|lt|gt|quot|#39);/g, (_, name) => ({
  * that lists the families has them in order.
  */
 export function checkAircraft(landing, scripts) {
-  const cards = [...landing.matchAll(/<article>\s*<img src="([^"]+)"[^>]*>\s*<h3>([^<]*)<\/h3>\s*<p>([^<]*)<\/p>(?:\s*<p class="info-page__note">([^<]*)<\/p>)?\s*<\/article>/g)]
-    .map(([, thumbnail, label, summary, note]) => ({ thumbnail, label: decode(label), summary: decode(summary), note: note === undefined ? undefined : decode(note) }));
+  // Notes can live in an on-demand help container. Read within each aircraft
+  // article, ignoring the landing page's unrelated feature and roadmap cards.
+  const cards = [...landing.matchAll(/<article\b[^>]*>([\s\S]*?)<\/article>/g)].flatMap(([, body]) => {
+    const thumbnail = /<img\b[^>]*\bsrc="(aircraft\/thumbnails\/[^\"]+)"/.exec(body)?.[1];
+    if (!thumbnail) return [];
+    const label = /<h3\b[^>]*>([^<]*)<\/h3>/.exec(body)?.[1];
+    const summary = /<p>([^<]*)<\/p>/.exec(body)?.[1];
+    const note = /<p class="info-page__note">([^<]*)<\/p>/.exec(body)?.[1];
+    if (!label?.trim() || !summary?.trim()) throw new Error(`The landing page omits the aircraft name or summary (${thumbnail}).`);
+    return [{ thumbnail, label: decode(label), summary: decode(summary), note: note === undefined ? undefined : decode(note) }];
+  });
   if (cards.length === 0) throw new Error("The landing page lists no aircraft.");
   const shipped = new Set(scripts.flatMap(({ code }) => code.match(/aircraft\/thumbnails\/[\w.-]+\.png/g) ?? []));
   const listed = new Set(cards.map((card) => card.thumbnail));

@@ -16,6 +16,7 @@ const contentTypes = new Map([
   [".glb", "model/gltf-binary"], [".gltf", "model/gltf+json"], [".bin", "application/octet-stream"],
   [".woff", "font/woff"], [".woff2", "font/woff2"], [".ktx2", "image/ktx2"],
   [".mp3", "audio/mpeg"], [".ogg", "audio/ogg"], [".wav", "audio/wav"],
+  [".webm", "video/webm"], [".mp4", "video/mp4"],
 ]);
 
 export async function startSiteServer({ root, port = 4175, host = "127.0.0.1" }) {
@@ -70,9 +71,27 @@ export async function startSiteServer({ root, port = 4175, host = "127.0.0.1" })
         return;
       }
       response.setHeader("Content-Type", contentTypes.get(path.extname(filename).toLowerCase()) ?? "application/octet-stream");
-      response.setHeader("Content-Length", info.size);
-      response.writeHead(200);
-      response.end(request.method === "HEAD" ? undefined : await readFile(actual));
+      // Browsers need byte ranges to seek and replay locally served videos.
+      response.setHeader("Accept-Ranges", "bytes");
+      let start = 0, end = info.size - 1, status = 200;
+      const range = request.method === "GET" && /^bytes=(\d*)-(\d*)$/.exec(request.headers.range ?? "");
+      if (range && (range[1] || range[2])) {
+        const suffix = range[1] === "";
+        const first = Number(suffix ? range[2] : range[1]);
+        const last = range[2] && !suffix ? Number(range[2]) : info.size - 1;
+        start = suffix ? Math.max(0, info.size - first) : first;
+        end = suffix ? info.size - 1 : Math.min(last, info.size - 1);
+        if (!Number.isSafeInteger(first) || !Number.isSafeInteger(last) || (suffix && first === 0) || start >= info.size || end < start) {
+          response.writeHead(416, { "Content-Range": `bytes */${info.size}`, "Content-Length": 0 });
+          response.end();
+          return;
+        }
+        status = 206;
+        response.setHeader("Content-Range", `bytes ${start}-${end}/${info.size}`);
+      }
+      response.setHeader("Content-Length", status === 206 ? end - start + 1 : info.size);
+      response.writeHead(status);
+      response.end(request.method === "HEAD" ? undefined : (await readFile(actual)).subarray(start, end + 1));
     } catch {
       if (!response.headersSent) response.writeHead(500);
       response.end("Unable to serve file");

@@ -1,0 +1,40 @@
+{
+  "name": "f35-westbound-umn",
+  "description": "F-35B climbing west from the Mississippi at the University of Minnesota",
+  "scene": {
+    "latitude": 44.974516,
+    "longitude": -93.2375,
+    "heightAboveGroundMeters": 180,
+    "headingDegrees": 270,
+    "airspeedKnots": 300,
+    "dateTime": "2026-10-25T23:10:58.000Z",
+    "timeZone": "America/Chicago",
+    "scenery": "google",
+    "solarTime": "2026-10-25T17:14:00"
+  },
+  "timeline": {
+    "durationSeconds": 5,
+    "fps": 30,
+    "physicsHz": 60,
+    "throttleBefore": 0.9,
+    "throttleAfter": 1,
+    "throttleAtSeconds": 0.2,
+    "initialPitchDegrees": 2,
+    "climbPitchDegrees": 45,
+    "pitchRampSeconds": 1.5
+  },
+  "camera": {
+    "distanceMeters": 24,
+    "heightMeters": 4,
+    "orbitDegrees": 12,
+    "fieldOfViewDegrees": 55,
+    "orbitEndDegrees": -8
+  },
+  "video": {
+    "width": 960,
+    "height": 540,
+    "vp9BitsPerSecond": 500000,
+    "h264BitsPerSecond": 700000,
+    "posterQuality": 82
+  }
+}

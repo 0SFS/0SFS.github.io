@@ -13,17 +13,17 @@
     <meta name="apple-mobile-web-app-title" content="0SFS" />
     <title>0SFS — Open Source Flight Simulator</title>
     <!-- Search and link previews for the home page; /fly/ and /rc/ carry their own. See docs/search-visibility.md. -->
-    <meta name="description" content="0SFS is a free, open-source flight simulator that runs in a browser tab, with JSBSim flight physics over real-world scenery. Nothing to install, no account." />
+    <meta name="description" content="Serious flight. One browser tab. Fly 0SFS: an open-source flight simulator with WebGPU, JSBSim physics, a physical sky, real-world scenery and phone controls." />
     <link rel="canonical" href="https://0sfs.github.io/" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="0SFS" />
     <meta property="og:title" content="0SFS — Open Source Flight Simulator" />
-    <meta property="og:description" content="A free, open-source flight simulator in the browser, with JSBSim flight physics over real-world scenery. Nothing to install, no account." />
+    <meta property="og:description" content="WebGPU graphics. JSBSim flight dynamics. A physical sky over real-world terrain. Fly, inspect and extend an open-source flight simulator — right in your browser." />
     <meta property="og:url" content="https://0sfs.github.io/" />
-    <meta property="og:image" content="https://0sfs.github.io/preview.jpg" />
-    <meta property="og:image:width" content="1280" />
-    <meta property="og:image:height" content="720" />
-    <meta property="og:image:alt" content="A Cessna 172 in the chase view over Minneapolis, with the flight instruments" />
+    <meta property="og:image" content="https://0sfs.github.io/media/f35-westbound-umn-poster.jpg?v=01c516de0e0b" />
+    <meta property="og:image:width" content="960" />
+    <meta property="og:image:height" content="540" />
+    <meta property="og:image:alt" content="An F-35B flying west over the Mississippi beside the University of Minnesota at sunset in 0SFS" />
     <meta name="twitter:card" content="summary_large_image" />
     <script type="application/ld+json">
       {
@@ -64,53 +64,111 @@
     <div id="root">
       <div class="info-page">
         <a class="info-page__skip" href="#info-main">Skip to content</a>
-        <header class="info-page__hero">
-          <h1><span class="info-page__mark">0SFS</span> Open Source Flight Simulator</h1>
-          <p class="info-page__lede">A real-world browser flight simulator built to be explored, extended, and shared. Nothing to install, no account, no sign-up. It runs in a browser tab.</p>
-          <p class="info-page__actions">
-            <a class="info-page__start" href="fly/">Start flying</a>
-            <a class="info-page__secondary" href="https://github.com/0SFS">Source on GitHub</a>
-          </p>
-          <noscript><p>0SFS needs JavaScript enabled.</p></noscript>
+        <header class="info-page__nav">
+          <a class="info-page__brand" href="./" aria-label="0SFS home"><span class="info-page__wordmark">0SFS<span aria-hidden="true">↗</span></span><span class="info-page__brand-description">Open Source<br />Flight Simulator</span></a>
+          <nav aria-label="Main navigation"><a href="#features">Features</a><a href="#info-aircraft">Aircraft</a><a href="#roadmap">What’s next</a><a href="https://github.com/0SFS">GitHub <span aria-hidden="true">↗</span></a></nav>
         </header>
-        <main id="info-main" class="info-page__main">
-          <section aria-labelledby="info-what">
-            <h2 id="info-what">What it is</h2>
-            <p>0SFS puts streamed real-world scenery beneath your wings and JSBSim in charge of flight physics. Bank over a city you recognize. Follow the streets below. Change the wind, line up an approach, and switch to the chase camera to take it all in.</p>
-            <ul class="info-page__features">
-              <li><strong>Fly over the real world in 3D.</strong> Google Photorealistic 3D Tiles brings detailed cityscapes and terrain into the scene. Free raster basemaps are available too, so you can get flying without a Google API key.</li>
-              <li><strong>Physics powered by JSBSim.</strong> Flight dynamics run in WebAssembly at 120 Hz, with aircraft, engine, propeller, fuel, and control simulation.</li>
-              <li><strong>Explore from the cockpit or chase camera.</strong> Switch views, orbit around the aircraft, and zoom out to see where you're headed.</li>
-              <li><strong>Set up your next flight.</strong> Reposition through the location panel, use airport presets, and adjust wind direction and speed.</li>
-              <li><strong>Fly with your phone.</strong> Pair a phone over a QR code and use it as a touch controller.</li>
-            </ul>
+        <main id="info-main" class="info-page__main" tabindex="-1">
+          <section class="info-page__hero" aria-labelledby="info-title">
+            <div><p class="info-page__eyebrow"><span class="info-page__status-dot" aria-hidden="true"></span> Free to fly. Open to build.</p><h1 id="info-title">Serious flight.<br /><span>One browser tab.</span></h1></div>
+            <div class="info-page__intro">
+              <p class="info-page__lede">Fly over real-world terrain with WebGPU graphics, JSBSim flight dynamics and a sky built on physics. Pair your phone and take the controls.</p>
+              <p class="info-page__actions"><a class="info-page__start" href="fly/">Start flying <span aria-hidden="true">↗</span></a><a class="info-page__secondary" href="https://github.com/0SFS/fly">Explore the source <span aria-hidden="true">↗</span></a></p>
+              <p class="info-page__micro">No install. No account. Just your browser.</p>
+              <noscript><p>Enable JavaScript to fly. You can still explore this page.</p></noscript>
+            </div>
           </section>
-          <section aria-labelledby="info-aircraft">
-            <h2 id="info-aircraft">Aircraft</h2>
+          <section id="features" class="info-page__features" aria-label="Inside the simulator">
+            <article class="feature feature--world">
+              <div class="feature__world-copy"><p class="feature__label">01 / A real-world globe</p><h2>The world.<br />Under your wings.</h2><p>Explore familiar places from a whole new angle. Stream scenery with FOSS Earth. Switch between first-person and chase views.</p></div>
+              <video class="feature__scenery" width="960" height="540" poster="media/f35-westbound-umn-poster.jpg?v=01c516de0e0b" preload="none" muted loop playsinline aria-label="F-35B climbing west over the Mississippi beside UMN at sunset, with Google 3D Tiles, captured in 0SFS">
+                <source src="media/f35-westbound-umn.webm?v=051e58646741" type="video/webm" />
+                <source src="media/f35-westbound-umn.mp4?v=6ecd633c4d9c" type="video/mp4" />
+              </video>
+              <div class="feature__world-caption"><div><span>Captured in 0SFS · <a class="feature__attribution" href="https://www.google.com/help/legalnotices_maps/" target="_blank" rel="noopener">Google 3D Tiles ↗</a></span><span>F-35B · Minneapolis · 25 Oct 2026, 18:10 CDT</span></div><button class="feature__video-toggle" type="button" aria-label="Play flight preview" title="Play flight preview" hidden><span aria-hidden="true">▶</span></button></div>
+            </article>
+            <article class="feature feature--gpu">
+              <p class="feature__label">02 / Graphics</p><div class="feature__gpu-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+              <h2>WebGPU.</h2><p>Modern graphics through Babylon.js.<br />WebGL fallbacks keep more browsers flying.</p>
+            </article>
+            <article class="feature feature--physics">
+              <p class="feature__label">03 / Flight dynamics</p><h2>JSBSim.<br /><span>Built for flight.</span></h2><p>Aircraft, propulsion, fuel and controls, simulated in C++ WebAssembly.</p>
+              <p class="feature__rate"><strong>120<span> Hz</span></strong><span>selectable physics rate<br />60 Hz by default</span></p>
+            </article>
+            <article class="feature feature--native">
+              <p class="feature__label">04 / Parallel computation</p><h2>Rust. WASM.<br /><span>Shared memory.</span></h2>
+              <div class="feature__threads" aria-hidden="true"><span>Worker</span><span>Worker</span><span>Worker</span><i></i><b>Shared WebAssembly.Memory</b></div>
+              <p>Rust cores power world computation, with optional shared-memory sky threads on supported browsers.</p>
+            </article>
+            <article class="feature feature--phone">
+              <p class="feature__label">05 / Phone controller</p><h2>Your phone.<br /><span>Your flight controls.</span></h2>
+              <img class="feature__phone-art" src="media/bento-remote-phone.webp?v=9837eb6033e3" width="840" height="518" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+              <p>Scan a QR code. Fly with your phone.<br />Both screens are web pages.</p>
+            </article>
+            <article class="feature feature--sky">
+              <p class="feature__label">06 / Sky &amp; astronomy</p>
+              <div class="feature__sky-art" aria-hidden="true"><span class="feature__sky-sun"></span><span class="feature__sky-limb"></span></div>
+              <h2>A sky built<br /><span>on physics.</span></h2><p>Atmospheric scattering, sunlight, moonlight and stars. A sky that follows your place and time.</p><a class="feature__link" href="https://github.com/foss-earth/sky/blob/main/README.md">Explore the sky model <span aria-hidden="true">↗</span></a>
+            </article>
+            <article class="feature feature--systems">
+              <p class="feature__label">07 / Aircraft systems</p><h2>More than<br />a moving model.</h2><p>Manage fuel, trim, flaps and landing gear. Set the wind. Feel G-force effects. Ground contact connects the flight model to the terrain.</p>
+              <div class="feature__system-tags" aria-label="Simulated systems"><span>Fuel</span><span>Engines</span><span>Ground contact</span><span>G-forces</span></div>
+            </article>
+            <article class="feature feature--sound">
+              <p class="feature__label">08 / Sound</p>
+              <svg class="feature__wave" viewBox="0 0 360 64" fill="none" aria-hidden="true"><path d="M0 32h34l5-7 6 14 6-24 7 35 6-27 6 17 6-8h18l5-16 6 33 7-43 7 53 6-41 6 22 6-8h17l5-10 6 20 6-34 7 47 6-34 6 20 6-9h19l5-18 6 39 7-56 7 64 6-44 6 24 6-9h21l5-9 6 19 6-29 7 36 6-24 6 13h41" stroke="currentColor" stroke-width="2" /></svg>
+              <h2>Hear the<br /><span>engine respond.</span></h2><p>Engine-driven sound. Wind over the airframe. Tires on the runway. Hear the aircraft respond as you fly.</p><a class="feature__link" href="https://github.com/0SFS/sound/blob/main/docs/sound.md">Inside the sound engine <span aria-hidden="true">↗</span></a>
+            </article>
+            <article class="feature feature--multiplayer">
+              <p class="feature__label">09 / Multiplayer <span class="feature__badge">Early preview</span></p><div class="feature__multiplayer-art" aria-hidden="true">
+                <img src="media/bento-multiplayer-left.webp?v=455c5972c82a" width="640" height="504" alt="" loading="lazy" decoding="async" />
+                <img src="media/bento-multiplayer-right.webp?v=a0fb9656f8db" width="640" height="504" alt="" loading="lazy" decoding="async" />
+              </div>
+              <h2>Two pilots.<br /><span>One shared sky.</span></h2><p>Host a flight, share an invitation, and fly together. A two-pilot preview with direct WebRTC aircraft channels.</p><a class="feature__media-credit" href="https://www.google.com/help/legalnotices_maps/" target="_blank" rel="noopener">Google 3D Tiles <span aria-hidden="true">↗</span></a>
+            </article>
+          </section>
+          <div class="info-page__scenery-note"><span class="info-page__note-mark" aria-hidden="true">↳</span><p><strong>Your choice of scenery.</strong> Free raster basemaps and streamed elevation work without a Google key. Google Photorealistic 3D Tiles needs your own API key; coverage, billing and provider terms apply.</p></div>
+          <section class="info-page__fleet" aria-labelledby="info-aircraft">
+            <div class="info-page__section-heading"><div><p class="info-page__eyebrow">Choose your aircraft</p><h2 id="info-aircraft">Three ways to spread your wings.</h2></div><p>From a high-wing trainer to an experimental fighter.<br />Choose in the simulator’s Aircraft tab.</p></div>
             <!-- The flight's aircraft families, in its catalogue's order. The site build checks them against the flight build. -->
             <div class="info-page__aircraft">
               <article>
-                <img src="aircraft/thumbnails/cessna-172.png" alt="" width="640" height="360" />
-                <h3>Cessna 172 Skyhawk</h3>
-                <p>High-wing trainer. Flight model and visuals both available.</p>
+                <img src="aircraft/thumbnails/cessna-172.png" alt="" width="640" height="360" loading="lazy" />
+                <div class="info-page__aircraft-header"><div><h3 id="aircraft-c172-title">Cessna 172 Skyhawk</h3></div><button type="button" class="info-page__help-button" popovertarget="aircraft-c172-help" aria-label="Cessna 172 Skyhawk details">?</button></div>
+                <div id="aircraft-c172-help" class="info-page__aircraft-help" popover aria-labelledby="aircraft-c172-title">
+                  <h4>Cessna 172 Skyhawk</h4><p>High-wing trainer. Flight model and visuals both available.</p>
+                </div>
               </article>
               <article>
-                <img src="aircraft/thumbnails/cirrus-vision-jet.png" alt="" width="640" height="360" />
-                <h3>Cirrus Vision Jet</h3>
-                <p>Single-engine personal jet. G1, G2, G2+ and G3 variants.</p>
-                <p class="info-page__note">G1, G2 and G3 have separate runtime packages. G2+ is currently mapped to the G2 runtime while separate physics/package support is not yet implemented. Choosing a generation does not provide calibrated generation-specific performance, a new cabin or complete generation-specific avionics.</p>
+                <img src="aircraft/thumbnails/cirrus-vision-jet.png" alt="" width="640" height="360" loading="lazy" />
+                <div class="info-page__aircraft-header"><div><h3 id="aircraft-vision-title">Cirrus Vision Jet</h3></div><button type="button" class="info-page__help-button" popovertarget="aircraft-vision-help" aria-label="Cirrus Vision Jet details">?</button></div>
+                <div id="aircraft-vision-help" class="info-page__aircraft-help" popover aria-labelledby="aircraft-vision-title">
+                  <h4>Cirrus Vision Jet</h4><p>Single-engine personal jet. G1, G2, G2+ and G3 variants.</p>
+                  <p class="info-page__note">G1, G2 and G3 have separate runtime packages. G2+ is currently mapped to the G2 runtime while separate physics/package support is not yet implemented. Choosing a generation does not provide calibrated generation-specific performance, a new cabin or complete generation-specific avionics.</p>
+                </div>
               </article>
               <article>
-                <img src="aircraft/thumbnails/f-35b.png" alt="" width="640" height="360" />
-                <h3>Lockheed Martin F-35B Lightning II</h3>
-                <p>STOVL fighter. Experimental flight model and AF267 exterior model.</p>
-                <p class="info-page__note">Experimental F-16/Aeromatic-derived JSBSim flight model. F-35B performance and STOVL behavior are not validated.</p>
+                <img src="aircraft/thumbnails/f-35b.png" alt="" width="640" height="360" loading="lazy" />
+                <div class="info-page__aircraft-header"><div><h3 id="aircraft-f35-title">Lockheed Martin F-35B Lightning II</h3><span class="feature__badge">Experimental</span></div><button type="button" class="info-page__help-button" popovertarget="aircraft-f35-help" aria-label="Lockheed Martin F-35B Lightning II details">?</button></div>
+                <div id="aircraft-f35-help" class="info-page__aircraft-help" popover aria-labelledby="aircraft-f35-title">
+                  <h4>Lockheed Martin F-35B Lightning II</h4><p>STOVL fighter. Experimental flight model and AF267 exterior model.</p>
+                  <p class="info-page__note">Experimental F-16/Aeromatic-derived JSBSim flight model. F-35B performance and STOVL behavior are not validated.</p>
+                </div>
               </article>
             </div>
-            <p>The Cessna 172 Skyhawk is the default aircraft. The Vision Jet family can be chosen in the flight panel's Aircraft tab. More aircraft are part of where the project is headed.</p>
+            <p class="info-page__fleet-note">Your first flight starts in the Cessna 172. Open ? for aircraft details and current limits.</p>
           </section>
-          <section aria-labelledby="info-controls">
-            <h2 id="info-controls">Controls</h2>
+          <section id="roadmap" class="info-page__roadmap" aria-labelledby="info-next">
+            <div><p class="info-page__eyebrow">On the horizon / Planned</p><h2 id="info-next">The next chapter<br />is open, too.</h2><p>Built in the open. Shaped by what comes next.</p><a href="https://github.com/0SFS/docs/tree/main/proposals">Explore the proposals <span aria-hidden="true">↗</span></a></div>
+            <div class="info-page__roadmap-items">
+              <article><span class="feature__badge">Planned</span><h3>ArduPilot Plane SITL</h3><p>An optional local bridge to ArduPlane, with Circle / LOITER after a manual climb as the first target. The bridge is not connected today.</p><a href="https://github.com/0SFS/autopilot/blob/main/docs/proposals/ardupilot-sitl.md">Read the proposal <span aria-hidden="true">↗</span></a></article>
+              <article><span class="feature__badge">Planned</span><h3>A bigger shared sky</h3><p>Beyond the two-pilot preview: four-pilot sessions, shared weather and time, voice, and server hosting.</p><a href="https://github.com/0SFS/fly/blob/main/README.md#multiplayer-local-preview">Current multiplayer scope <span aria-hidden="true">↗</span></a></article>
+            </div>
+          </section>
+          <section class="info-page__getting-started" aria-labelledby="info-ready">
+            <div class="info-page__section-heading"><div><p class="info-page__eyebrow">Clear for takeoff</p><h2 id="info-ready">A few things before you fly.</h2></div><p>Pick an airport. Set the wind. Make it your flight.</p></div>
+            <div class="info-page__guide-grid">
+            <details class="info-page__guide"><summary>Keyboard &amp; controller <span aria-hidden="true">+</span></summary><div class="info-page__guide-content">
             <table>
               <caption class="info-page__caption">Default keyboard</caption>
               <thead><tr><th scope="col">Input</th><th scope="col">Action</th></tr></thead>
@@ -126,28 +184,27 @@
                 <tr><th scope="row">V</th><td>Toggle first- and third-person camera</td></tr>
               </tbody>
             </table>
-            <p>Throttle and pitch trim are also vertical sliders in the lower-right corner, and the gear has a G button in the instrument row above the attitude indicator. The Controls tab in the flight panel rebinds both the keyboard and a controller.</p>
-          </section>
-          <section aria-labelledby="info-phone">
-            <h2 id="info-phone">Phone controller</h2>
-            <p>On the computer, open the simulator, then ⚙ → <strong>Remote Control</strong>. Scan the QR with your phone camera. Both ends are web pages — there is no app to install. The QR expires after two minutes and admits one phone.</p>
-            <p><a href="https://github.com/0SFS/rc/blob/main/docs/phone-controller.md">How pairing works, and what to do when it fails</a></p>
-          </section>
-          <section aria-labelledby="info-docs">
-            <h2 id="info-docs">Documentation</h2>
-            <ul>
+            <p>Use the on-screen sliders for throttle and pitch trim. Rebind the keyboard or a controller in the Controls tab.</p></div></details>
+            <details class="info-page__guide"><summary>Pair your phone <span aria-hidden="true">+</span></summary><div class="info-page__guide-content"><p>On the computer, open the simulator, then <strong>+ → Remote Control</strong>. Scan the QR with your phone camera. The QR expires after two minutes and admits one phone.</p><a href="https://github.com/0SFS/rc/blob/main/docs/phone-controller.md">Pairing guide &amp; troubleshooting <span aria-hidden="true">↗</span></a></div></details>
+            <details class="info-page__guide"><summary>Explore the documentation <span aria-hidden="true">+</span></summary><div class="info-page__guide-content"><ul>
               <li><a href="https://github.com/0SFS/fly/blob/main/docs/development.md">Development</a></li>
               <li><a href="https://github.com/0SFS/0SFS.github.io/blob/main/docs/deploying.md">Deploying to GitHub Pages</a></li>
               <li><a href="https://github.com/0SFS/fly/blob/main/docs/jsbsim.md">How JSBSim runs in the browser</a></li>
               <li><a href="https://github.com/0SFS/sound/blob/main/docs/sound.md">Sound</a></li>
               <li><a href="https://github.com/0SFS/fly/blob/main/docs/foss-earth-relationship.md">FOSS Earth relationship</a></li>
               <li><a href="https://github.com/0SFS/rc/blob/main/docs/phone-controller.md">Phone controller</a></li>
-            </ul>
+              <li><a href="https://github.com/foss-earth/sky/blob/main/sky-WASM/README.md">Rust WASM and shared-memory sky computation</a></li>
+              <li><a href="https://github.com/0SFS/research/blob/main/browser-flight-sim-positioning-2026-10-25.md">Browser flight simulator comparison</a></li>
+            </ul></div></details>
+            </div>
+          </section>
+          <section class="info-page__open" aria-labelledby="info-open">
+            <div><p class="info-page__eyebrow">AGPL-3.0-only / Free software</p><h2 id="info-open">Fly it. Read it. Build on it.</h2><p>The simulator is open source. Inspect the flight model, improve an aircraft, or help build what comes next. Scenery and third-party assets carry their own licences.</p></div><a href="https://github.com/0SFS">Make it yours on GitHub <span aria-hidden="true">↗</span></a>
           </section>
         </main>
         <footer class="info-page__footer">
-          <p>0SFS is <a href="https://github.com/0SFS/fly/blob/main/LICENSE">AGPL-3.0-only</a> free software. <a href="https://github.com/0SFS">Repository</a>.</p>
-          <p>Credits and licences: <a href="https://github.com/0SFS/fly/blob/main/NOTICE">NOTICE</a>, <a href="https://github.com/0SFS/fly/blob/main/THIRD_PARTY_LICENSES.md">third-party licences</a>, <a href="https://github.com/0SFS/fly/blob/main/ASSET_LICENSES.md">asset licences</a>.</p>
+          <p><strong>0SFS</strong> Open Source Flight Simulator · <a href="https://github.com/0SFS/fly/blob/main/LICENSE">AGPL-3.0-only</a></p>
+          <p>Credits &amp; licences: <a href="https://github.com/0SFS/fly/blob/main/NOTICE">NOTICE</a> · <a href="https://github.com/0SFS/fly/blob/main/THIRD_PARTY_LICENSES.md">Third-party</a> · <a href="https://github.com/0SFS/fly/blob/main/ASSET_LICENSES.md">Assets</a></p>
         </footer>
       </div>
     </div>
@@ -160,6 +217,43 @@
         var next = new URL("fly/", location.href);
         next.search = params.toString();
         start.setAttribute("href", next.pathname + next.search + location.hash);
+      })();
+      (function () {
+        var video = document.querySelector(".feature__scenery");
+        if (!video) return;
+        var toggle = document.querySelector(".feature__video-toggle");
+        var motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+        var wantsPlayback = !motion.matches && !navigator.connection?.saveData;
+        var inView = true;
+        video.muted = true;
+        toggle.hidden = false;
+        function showState() {
+          var action = video.paused ? "Play" : "Pause";
+          toggle.setAttribute("aria-label", action + " flight preview");
+          toggle.title = action + " flight preview";
+          toggle.firstElementChild.textContent = video.paused ? "▶" : "⏸";
+        }
+        function updatePlayback() {
+          if (wantsPlayback && inView && !document.hidden) video.play().catch(showState);
+          else video.pause();
+          showState();
+        }
+        video.addEventListener("playing", showState);
+        video.addEventListener("pause", showState);
+        toggle.addEventListener("click", function () {
+          wantsPlayback = video.paused;
+          updatePlayback();
+        });
+        motion.addEventListener("change", function () {
+          wantsPlayback = !motion.matches && !navigator.connection?.saveData;
+          updatePlayback();
+        });
+        document.addEventListener("visibilitychange", updatePlayback);
+        if ("IntersectionObserver" in window) new IntersectionObserver(function (entries) {
+          inView = entries[0].isIntersecting;
+          updatePlayback();
+        }).observe(video);
+        updatePlayback();
       })();
     </script>
   </body>

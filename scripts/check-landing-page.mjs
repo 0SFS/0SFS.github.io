@@ -58,8 +58,9 @@ if (outArg) await mkdir(out);
 const mime = {
   ".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript", ".wasm": "application/wasm",
   ".css": "text/css", ".json": "application/json", ".xml": "text/xml", ".png": "image/png",
-  ".jpg": "image/jpeg", ".svg": "image/svg+xml", ".woff2": "font/woff2", ".glb": "model/gltf-binary",
+  ".jpg": "image/jpeg", ".webp": "image/webp", ".svg": "image/svg+xml", ".woff2": "font/woff2", ".glb": "model/gltf-binary",
   ".webmanifest": "application/manifest+json",
+  ".webm": "video/webm", ".mp4": "video/mp4",
 };
 const chrome = await openHeadlessChrome(path.join(out, "chrome-profile"));
 const failures = [];
@@ -126,11 +127,39 @@ const report = { schemaVersion: 1, generatedAt: new Date().toISOString(), dist, 
 try {
   const info = await attachSession("info");
   await chrome.send("Emulation.setDeviceMetricsOverride", { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false }, info.sessionId);
+  await chrome.send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] }, info.sessionId);
   await chrome.send("Page.navigate", { url: "https://0sfs.test/?renderer=webgl2" }, info.sessionId);
   // Parsed to the end, so the script after the page has written Start flying's address.
   await waitForExpression(chrome, info.sessionId, "document.readyState !== 'loading' && Boolean(document.querySelector('.info-page'))", 15000);
   const startHref = await evaluate(chrome, info.sessionId, "document.querySelector('.info-page__start')?.getAttribute('href')");
   assert.equal(startHref, "/fly/?renderer=webgl2", "Start flying dropped existing query parameters");
+  const stillPreview = await evaluate(chrome, info.sessionId, `(() => {
+    const video = document.querySelector('.feature__scenery');
+    return { paused: video.paused, readyState: video.readyState, time: video.currentTime,
+      action: document.querySelector('.feature__video-toggle').getAttribute('aria-label') };
+  })()`);
+  assert.equal(stillPreview.paused, true, "Reduced motion started the video");
+  assert.equal(stillPreview.time, 0);
+  assert.equal(stillPreview.action, "Play flight preview");
+  assert.equal(info.current.loaded.filter(asset => /\.(webm|mp4)$/.test(asset.path)).length, 0, "Reduced motion downloaded a video without being played");
+  await chrome.send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "no-preference" }] }, info.sessionId);
+  await waitForExpression(chrome, info.sessionId, "document.querySelector('.feature__scenery').currentTime > .05", 15000);
+  const movingPreview = await evaluate(chrome, info.sessionId, `(() => {
+    const video = document.querySelector('.feature__scenery');
+    return { duration: video.duration, width: video.videoWidth, height: video.videoHeight,
+      muted: video.muted, inline: video.playsInline, loop: video.loop,
+      action: document.querySelector('.feature__video-toggle').getAttribute('aria-label') };
+  })()`);
+  assert.equal(movingPreview.duration, 5);
+  assert.equal(movingPreview.width, 960);
+  assert.equal(movingPreview.height, 540);
+  assert.equal(movingPreview.muted && movingPreview.inline && movingPreview.loop, true);
+  assert.equal(movingPreview.action, "Pause flight preview");
+  await evaluate(chrome, info.sessionId, "document.querySelector('.feature__video-toggle').click()");
+  assert.equal(await evaluate(chrome, info.sessionId, "document.querySelector('.feature__scenery').paused"), true, "Pause button did not pause");
+  await evaluate(chrome, info.sessionId, "document.querySelector('.feature__video-toggle').click()");
+  await waitForExpression(chrome, info.sessionId, "!document.querySelector('.feature__scenery').paused", 5000);
+  report.checks.hero = { reducedMotion: stillPreview, playback: movingPreview, pauseAndResume: true };
   const desktopShot = await chrome.send("Page.captureScreenshot", { format: "png", captureBeyondViewport: false }, info.sessionId);
   await writeFile(path.join(out, "info-desktop.png"), Buffer.from(desktopShot.data, "base64"));
   await chrome.send("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 2, mobile: true }, info.sessionId);

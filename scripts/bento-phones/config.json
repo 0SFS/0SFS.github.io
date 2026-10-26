@@ -1,0 +1,136 @@
+{
+  "$comment": "Inputs for the bento phone artwork. capture.mjs reads `server`, `phone` and `captures`; render.mjs reads `phone`, `model` and `renders`. Distances are millimetres, angles degrees. See docs/proposals/bento-phone-renderings.md.",
+  "server": { "port": 7487, "readyTimeoutMs": 60000 },
+  "phone": {
+    "label": "Generic large Android phone modelled on the Samsung Galaxy Note 20 Ultra 5G",
+    "userAgentModel": "SM-N986U",
+    "viewport": { "width": 883, "height": 412 },
+    "captureScale": 2
+  },
+  "captures": {
+    "remote": {
+      "$comment": "A desktop flight paired with the phone controller through the app's own QR link. The phone takes control and holds the stick at `stick` (fractions of the pad's radius, +x right, +y down) while the screenshot is taken.",
+      "file": "remote.png",
+      "desktop": { "width": 1280, "height": 720 },
+      "flight": {
+        "aircraft": "f-35b",
+        "scenery": "default",
+        "latitude": 44.974516,
+        "longitude": -93.2375,
+        "headingDegrees": 270,
+        "airspeedKnots": 300,
+        "throttle": 0.86,
+        "dateTime": "2026-10-25T17:16:00-05:00"
+      },
+      "takeControl": true,
+      "stick": [0.28, -0.22],
+      "settleMs": 3500
+    },
+    "multiplayer": {
+      "$comment": "Two phones in one real serverless session: the host pauses, hosts, and the guest joins with the invitation; the app places the guest 50 m east of the host on the same heading, so flying south puts the guest abeam on the host's left. Both fly together for `flyTogetherMs` and pause. Each phone turns its own chase camera with one-finger swipes across the sky (`swipes`, CSS pixels; finger left swings the camera toward the aircraft's right).",
+      "host": {
+        "file": "flight-host.png",
+        "flight": {
+          "aircraft": "f-35b",
+          "scenery": "google",
+          "latitude": 44.974516,
+          "longitude": -93.2375,
+          "headingDegrees": 180,
+          "airspeedKnots": 230,
+          "throttle": 0.72,
+          "dateTime": "2026-10-25T17:16:00-05:00"
+        },
+        "camera": { "distanceMeters": 10.2, "heightMeters": 2.5, "swipes": [[-167, -7]] }
+      },
+      "guest": { "file": "flight-guest.png", "aircraft": "cirrus-vision-jet", "camera": { "distanceMeters": 8.3, "heightMeters": 2.1, "swipes": [[225, 2]] } },
+      "$flyTogether": "After joining, both pilots resume for this long and pause again, so each reports its new position.",
+      "flyTogetherMs": 600,
+      "settle": { "minMs": 6000, "quietMs": 2500, "maxMs": 45000 }
+    }
+  },
+  "model": {
+    "$comment": "A generic phone built in code (scene.js). Body and screen follow the Note 20 Ultra's published 164.8 x 77.2 x 8.1 mm body and 6.9-inch 19.3:9 display; the edge, frame and key shapes are approximations. Colours are sRGB hex.",
+    "length": 164.8,
+    "width": 77.2,
+    "thickness": 8.1,
+    "cornerRadius": 7.2,
+    "frameInset": 0.55,
+    "frameCrown": 6,
+    "edgeHeight": 0.95,
+    "glassBevel": 1.25,
+    "backBevel": 2.0,
+    "screen": { "length": 158.6, "width": 74.0, "cornerRadius": 4.6 },
+    "punchHole": { "diameter": 3.2, "fromTopEdge": 5.5 },
+    "$buttons": "Keys on the portrait right side; `from` is measured from the phone's top end.",
+    "buttons": [
+      { "from": 52, "length": 22, "depth": 0.55, "height": 2.4 },
+      { "from": 80, "length": 12, "depth": 0.55, "height": 2.4 }
+    ],
+    "materials": {
+      "frame": { "color": "#b3b9b6", "metallic": 1, "roughness": 0.22 },
+      "button": { "color": "#b9bfbc", "metallic": 1, "roughness": 0.3 },
+      "glass": { "color": "#040606", "metallic": 0, "roughness": 0.05 },
+      "back": { "color": "#2b302e", "metallic": 0, "roughness": 0.4 },
+      "hole": { "color": "#010202", "metallic": 0, "roughness": 0.35 },
+      "lens": { "color": "#0a0f17", "metallic": 0.6, "roughness": 0.12 },
+      "screenGlassRoughness": 0.05
+    }
+  },
+  "renders": {
+    "$comment": "render.mjs renders each entry at `renderSize`, adds the shadow, crops to the phones plus `padding` (output pixels) and scales to `width`; the height follows. Each phone's `top` says which end holds the punch-hole camera. Camera angles are Babylon ArcRotateCamera alpha/beta; phone rotations are Euler degrees.",
+    "remote": {
+      "output": "bento-remote-phone",
+      "width": 840,
+      "padding": { "x": 22, "top": 14, "bottom": 40 },
+      "renderSize": [2400, 1500],
+      "camera": { "fovDegrees": 30, "target": [0, 0, 0], "alphaDegrees": -90, "betaDegrees": 74, "radius": 420 },
+      "phones": [
+        { "screen": "remote.png", "top": "left", "position": [0, 0, 0], "rotationDegrees": [8, -22, 0] }
+      ]
+    },
+    "$multiplayer": "Two images of one scene: the phones stand back to back like rival players, the left screen turned left and the right screen turned right, both still facing the camera. Each image crops to its own phone, so keep the two cameras identical and the pair lines up when placed side by side.",
+    "multiplayer-left": {
+      "output": "bento-multiplayer-left",
+      "width": 640,
+      "padding": { "x": 22, "top": 14, "bottom": 40 },
+      "renderSize": [4000, 1625],
+      "camera": { "fovDegrees": 30, "target": [0, 0, 0], "alphaDegrees": -90, "betaDegrees": 76, "radius": 380 },
+      "phones": [
+        { "screen": "flight-host.png", "top": "left", "position": [-86, 0, 0], "rotationDegrees": [6, 32, 0] }
+      ]
+    },
+    "multiplayer-right": {
+      "output": "bento-multiplayer-right",
+      "width": 640,
+      "padding": { "x": 22, "top": 14, "bottom": 40 },
+      "renderSize": [4000, 1625],
+      "camera": { "fovDegrees": 30, "target": [0, 0, 0], "alphaDegrees": -90, "betaDegrees": 76, "radius": 380 },
+      "phones": [
+        { "screen": "flight-guest.png", "top": "left", "position": [86, 0, 0], "rotationDegrees": [6, -32, 0] }
+      ]
+    },
+    "lights": {
+      "exposure": 1.0,
+      "environment": {
+        "size": 128,
+        "intensity": 1.0,
+        "zenith": "#3a4246",
+        "horizon": "#1a1e20",
+        "ground": "#0b0d0d",
+        "softboxes": [
+          { "direction": [0.0, 1.0, -0.35], "sizeDegrees": [110, 34], "intensity": 3.0, "color": "#ffffff", "softness": 0.45 },
+          { "direction": [-1.0, 0.2, 0.35], "sizeDegrees": [16, 80], "intensity": 4.0, "color": "#ffffff", "softness": 0.35 },
+          { "direction": [1.0, 0.1, 0.15], "sizeDegrees": [16, 80], "intensity": 2.4, "color": "#dce8ff", "softness": 0.35 },
+          { "direction": [0.0, -1.0, 0.35], "sizeDegrees": [130, 36], "intensity": 1.6, "color": "#d6ebe2", "softness": 0.6 },
+          { "direction": [-0.4, 0.35, -1.0], "sizeDegrees": [40, 26], "intensity": 0.3, "color": "#ffffff", "softness": 0.7 },
+          { "direction": [0.0, -0.8, -1.0], "sizeDegrees": [140, 10], "intensity": 1.0, "color": "#ffffff", "softness": 0.5 }
+        ]
+      },
+      "key": { "direction": [-0.35, -0.8, 0.45], "intensity": 1.2 },
+      "screenEmission": 1.0,
+      "screenGlare": 0.6
+    },
+    "shadow": { "color": "#000000", "opacity": 0.45, "blur": 16, "offset": [0, 14] },
+    "webpQuality": 84
+  }
+}

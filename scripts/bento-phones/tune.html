@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bento phones · camera framing</title>
+<style>
+  :root { color-scheme: dark; --bg: #0b0d0d; --card: #151a1b; --line: #263033; --text: #e6ecea; --muted: #8b9894; --accent: #6fd3a8; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 20px 24px 32px; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, sans-serif; }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  p { margin: 0; color: var(--muted); }
+  .phones { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 16px; margin: 16px 0; }
+  .phone { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+  .phone h2 { font-size: 14px; margin: 0 0 8px; font-weight: 600; }
+  .screen { position: relative; aspect-ratio: 883 / 412; background: #000; border-radius: 8px; overflow: hidden; touch-action: none; cursor: grab; user-select: none; }
+  .screen:active { cursor: grabbing; }
+  .screen img { display: block; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+  .screen .wait { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); }
+  .readout { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 8px 0; font-variant-numeric: tabular-nums; }
+  .readout b { font-weight: 600; }
+  .framing { font: 12px/1.4 ui-monospace, monospace; color: var(--muted); word-break: break-all; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+  button { font: inherit; color: var(--text); background: #20282a; border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+  button:hover:not(:disabled) { border-color: var(--muted); }
+  button:disabled { opacity: 0.45; cursor: default; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #062018; font-weight: 600; }
+  .status { margin-left: 4px; }
+  .status.problem { color: #ff8f7a; }
+  pre { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 10px; max-height: 180px; overflow: auto; font-size: 12px; color: var(--muted); margin: 16px 0 0; white-space: pre-wrap; }
+  .renders { display: none; margin-top: 16px; background: #101414; border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .renders.shown { display: block; }
+  .renders .pair { display: flex; justify-content: center; align-items: flex-end; gap: 0; }
+  .renders img { width: min(46%, 640px); height: auto; }
+</style>
+</head>
+<body>
+<h1>Bento phones · camera framing</h1>
+<p>Drag a screen to orbit that phone's chase camera, as a finger on the phone does. Scroll over it, or use Closer and Farther, to pinch the camera in or out. Capture &amp; render takes both screens as they are, saves the framings to config.json and renders the pair.</p>
+
+<div class="phones">
+  <section class="phone" data-phone="host">
+    <h2 data-label>Left phone</h2>
+    <div class="screen"><img alt="The left phone's live screen"><div class="wait">Starting…</div></div>
+    <div class="readout" data-readout></div>
+    <div class="framing" data-framing></div>
+    <div class="row">
+      <button data-zoom="0.9">Closer</button>
+      <button data-zoom="1.1111">Farther</button>
+      <button data-reset>Reset to config</button>
+    </div>
+  </section>
+  <section class="phone" data-phone="guest">
+    <h2 data-label>Right phone</h2>
+    <div class="screen"><img alt="The right phone's live screen"><div class="wait">Starting…</div></div>
+    <div class="readout" data-readout></div>
+    <div class="framing" data-framing></div>
+    <div class="row">
+      <button data-zoom="0.9">Closer</button>
+      <button data-zoom="1.1111">Farther</button>
+      <button data-reset>Reset to config</button>
+    </div>
+  </section>
+</div>
+
+<div class="row">
+  <button class="primary" id="capture" disabled>Capture &amp; render</button>
+  <button id="done">Done</button>
+  <span class="status" id="status">Starting the session…</span>
+</div>
+
+<section class="renders" id="renders">
+  <p>The rendered pair, as the landing page places it:</p>
+  <div class="pair"><img alt="Rendered left phone"><img alt="Rendered right phone"></div>
+</section>
+
+<pre id="log"></pre>
+
+<script>
+  let current = { phase: 'starting' };
+  const post = (path, data = {}) => fetch(path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data) }).catch(() => {});
+  const status = document.getElementById('status');
+  const logBox = document.getElementById('log');
+
+  for (const panel of document.querySelectorAll('.phone')) {
+    const phone = panel.dataset.phone;
+    const screen = panel.querySelector('.screen');
+    // Gestures batch into one request per 50 ms, as fingers move faster than the phone can be driven.
+    let pending = { dx: 0, dy: 0, zoom: 1 }, timer = null;
+    const flush = () => {
+      timer = null;
+      const { dx, dy, zoom } = pending;
+      pending = { dx: 0, dy: 0, zoom: 1 };
+      if (dx || dy) post('/orbit', { phone, dx, dy });
+      if (zoom !== 1) post('/zoom', { phone, factor: zoom });
+    };
+    const later = () => { timer ??= setTimeout(flush, 50); };
+    let drag = null;
+    screen.addEventListener('pointerdown', event => {
+      if (current.phase !== 'ready') return;
+      drag = { id: event.pointerId, x: event.clientX, y: event.clientY };
+      screen.setPointerCapture(event.pointerId);
+    });
+    screen.addEventListener('pointermove', event => {
+      if (!drag || event.pointerId !== drag.id) return;
+      // The screen shows the phone's whole viewport, so a pixel here is this many of the phone's CSS pixels.
+      const scale = (current.viewport?.width ?? 883) / screen.clientWidth;
+      pending.dx += (event.clientX - drag.x) * scale;
+      pending.dy += (event.clientY - drag.y) * scale;
+      drag.x = event.clientX;
+      drag.y = event.clientY;
+      later();
+    });
+    for (const name of ['pointerup', 'pointercancel']) screen.addEventListener(name, () => { drag = null; });
+    screen.addEventListener('wheel', event => {
+      event.preventDefault();
+      if (current.phase !== 'ready') return;
+      const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? 400 : 1;
+      pending.zoom *= Math.exp(Math.max(-1, Math.min(1, event.deltaY * unit * 0.0015)));
+      later();
+    }, { passive: false });
+    for (const button of panel.querySelectorAll('[data-zoom]')) button.addEventListener('click', () => post('/zoom', { phone, factor: Number(button.dataset.zoom) }));
+    panel.querySelector('[data-reset]').addEventListener('click', () => post('/reset', { phone }));
+  }
+  document.getElementById('capture').addEventListener('click', () => post('/capture'));
+  document.getElementById('done').addEventListener('click', () => { post('/done'); status.textContent = 'Stopping…'; });
+
+  const events = new EventSource('/events');
+  events.addEventListener('frame', event => {
+    const { phone, data } = JSON.parse(event.data);
+    const panel = document.querySelector(`.phone[data-phone="${phone}"]`);
+    panel.querySelector('.screen img').src = `data:image/jpeg;base64,${data}`;
+    panel.querySelector('.wait')?.remove();
+  });
+  events.addEventListener('log', event => {
+    logBox.textContent += `${JSON.parse(event.data)}\n`;
+    logBox.scrollTop = logBox.scrollHeight;
+  });
+  events.addEventListener('state', event => {
+    current = JSON.parse(event.data);
+    const busy = current.phase !== 'ready';
+    for (const button of document.querySelectorAll('button:not(#done)')) button.disabled = busy;
+    status.className = `status${current.problem ? ' problem' : ''}`;
+    status.textContent = current.problem ?? {
+      starting: 'Starting the session: loading both flights, joining them and waiting for scenery…',
+      ready: 'Ready.', capturing: 'Capturing both screens…', rendering: 'Rendering the pair…', stopping: 'Stopping…',
+    }[current.phase] ?? current.phase;
+    for (const [phone, view] of Object.entries(current.phones ?? {})) {
+      const panel = document.querySelector(`.phone[data-phone="${phone}"]`);
+      panel.querySelector('[data-label]').textContent = current.label[phone];
+      panel.querySelector('[data-readout]').innerHTML =
+        `<span>Distance <b>${view.radius.toFixed(1)} m</b></span><span>Above <b>${view.pitchDegrees.toFixed(1)}°</b></span>` +
+        `<span>Turned <b>${view.yawDegrees.toFixed(1)}°</b></span>${view.moving ? '<span>moving…</span>' : ''}`;
+      panel.querySelector('[data-framing]').textContent = `config camera: ${JSON.stringify(view.framing)}`;
+    }
+    const renders = document.getElementById('renders');
+    if (current.renders) {
+      const images = renders.querySelectorAll('img');
+      current.renders.forEach((src, index) => { if (!images[index].src.endsWith(src)) images[index].src = src; });
+      renders.classList.add('shown');
+    }
+  });
+  events.addEventListener('error', () => {
+    if (current.phase === 'stopping' || status.textContent === 'Stopping…') { status.textContent = 'Stopped. You can close this tab.'; events.close(); }
+  });
+</script>
+</body>
+</html>

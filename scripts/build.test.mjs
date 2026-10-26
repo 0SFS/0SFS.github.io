@@ -205,6 +205,18 @@ describe("checkAircraft", () => {
     const escaped = [{ name: "catalogue.js", code: CATALOGUE.replace('"Jet"', '"Jet \\"J\\""') }];
     checkAircraft(CARDS.replace("<h3>Jet</h3>", "<h3>Jet &quot;J&quot;</h3>"), escaped);
   });
+
+  it("checks the same catalogue text inside help wrappers and ignores unrelated cards", () => {
+    const wrapped = CARDS.replaceAll('<h3>', '<div><h3 id="title">')
+      .replaceAll('</h3>', '</h3><button type="button">?</button></div><div popover>')
+      .replaceAll('</article>', '</div></article>');
+    checkAircraft('<article class="feature"><h3>The world</h3><p>Scenery.</p></article>' + wrapped, scripts);
+    assert.throws(() => checkAircraft(wrapped.replace('Experimental.', 'Validated.'), scripts), /does not say "Validated\."/);
+  });
+
+  it("refuses an aircraft whose help loses its summary", () => {
+    assert.throws(() => checkAircraft(CARDS.replace('<p>High wing.</p>', ''), scripts), /omits the aircraft name or summary/);
+  });
 });
 
 describe("flightBuiltFrom", () => {
