@@ -66,13 +66,16 @@
       <div class="info-page">
         <a class="info-page__skip" href="#info-main">Skip to content</a>
         <main id="info-main" class="info-page__main" tabindex="-1">
-          <h1 class="info-page__sr-only">0SFS — Open Source Flight Simulator</h1>
           <section id="features" class="info-page__features" aria-label="Inside the simulator">
-            <article class="feature feature--world">
+            <article class="feature feature--world" aria-labelledby="video-title">
               <video class="feature__scenery" width="960" height="540" poster="media/f35-westbound-umn-poster.jpg?v=01c516de0e0b" preload="none" muted loop playsinline aria-label="F-35B climbing west over the Mississippi beside UMN at sunset, with Google 3D Tiles, captured in 0SFS">
                 <source src="media/f35-westbound-umn.webm?v=051e58646741" type="video/webm" />
                 <source src="media/f35-westbound-umn.mp4?v=6ecd633c4d9c" type="video/mp4" />
               </video>
+              <h1 id="video-title" class="feature__video-heading">
+                <span class="feature__video-wordmark">0SFS</span>
+                <span class="feature__video-name">Open Source Flight Simulator</span>
+              </h1>
               <div class="feature__world-controls">
                 <div class="feature__world-controls-left">
                   <button class="feature__video-toggle" type="button" aria-label="Play flight preview" title="Play flight preview" hidden><span aria-hidden="true">▶</span></button>

@@ -34,10 +34,11 @@ integrating new artwork and in rendering handoffs without a separate request.
 Models built in this project’s own code need no third-party model credit; external
 content shown on their screens still needs its own attribution.
 
-The main flight card is deliberately image-first: play/pause and **?** at the
+The video widget is deliberately image-first: play/pause and **?** at the
 bottom left, **Fly** at the bottom right. Its description, capture date/location,
-source link and Google notices belong inside its tooltip. There is no title,
-caption bar or permanent paragraph over the video.
+source link and Google notices belong inside its tooltip. The top-left title
+shows **0SFS** and **Open Source Flight Simulator** over a subtle gradient for
+contrast. There is no caption bar or permanent descriptive paragraph.
 
 ## Landing implementation
 

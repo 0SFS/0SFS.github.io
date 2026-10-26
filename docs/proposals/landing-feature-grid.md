@@ -84,8 +84,9 @@ illustration is preserved.
 ## Simplified feature-first opening
 
 The grid starts at the top of the page, without the navigation bar, introduction
-or Multiplayer Early preview badge. The main card is an unobstructed video:
-play/pause and **?** at bottom left, **Fly** at bottom right. All explanatory
+or Multiplayer Early preview badge. The video widget shows **0SFS** and
+**Open Source Flight Simulator** at the top left, play/pause and **?** at bottom
+left, and **Fly** at bottom right. All explanatory
 copy, capture details, source link and Google attribution are in its anchored
 tooltip. Every landing-page **?** uses the shared explanation behavior, without
 centered popups or a dimming backdrop. See the supplementary-copy policy.
