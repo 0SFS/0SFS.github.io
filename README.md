@@ -15,7 +15,8 @@ flight it publishes is a fly build, named by its commit.
 - `scripts/serve.mjs` previews `dist/` at http://127.0.0.1:4175/.
 - `scripts/check-landing-page.mjs` checks the built site in headless Chrome.
 - `scripts/deploy.mjs` builds and checks the site and publishes it to `gh-pages`: the landing page,
-  the flight, or both, keeping the part it does not publish as it is there.
+  the flight, or both, keeping the part it does not publish as it is there. `npm run deploy` here
+  publishes only the landing page; publishing both requires `npm run deploy:all`.
 
 The landing page uses a responsive feature grid across the available laptop width. It introduces
 the scenery, WebGPU rendering, JSBSim physics, Rust world-computation cores, phone controls,
@@ -41,6 +42,21 @@ npm run tune:hero # paused start; adjust Sky time, then enter save and quit
 npm run capture:hero
 npm run check:hero -- --install
 ```
+
+## Deploying separately
+
+```sh
+# Publish /, preserving the deployed /fly/ and /rc/ and their assets.
+cd ~/gh/0sfs/0sfs.github.io && npm run deploy
+
+# Publish /fly/ and /rc/, preserving the deployed landing page.
+cd ~/gh/0sfs/fly && npm run deploy
+```
+
+Here, `npm run deploy:landing` is an alias for `npm run deploy`, and `npm run deploy:flight`
+publishes the flight. Use `npm run deploy:all` here to publish both parts together.
+`--force` only affects the selected part or parts. See [Deploying](docs/deploying.md) for checks
+and confirmation behavior.
 
 ## Building and previewing the whole site
 

@@ -21,6 +21,7 @@
     "deploy": "node scripts/deploy.mjs",
     "deploy:landing": "node scripts/deploy.mjs landing",
     "deploy:flight": "node scripts/deploy.mjs flight",
+    "deploy:all": "node scripts/deploy.mjs all",
     "tune:hero": "node scripts/capture-hero.mjs --tune"
   },
   "devDependencies": {}

@@ -9,15 +9,19 @@ https://0sfs.github.io/ is this repository's built site, published on its `gh-pa
 
 ## Deploying
 
-Check out fly, the repositories it links and the FOSS Earth checkout beside this one, as
-[fly's development guide](https://github.com/0SFS/fly/blob/main/docs/development.md) describes, and
-run `npm install` in fly. Then deploy the part that changed:
+`npm run deploy` in this repository publishes only the landing page. It takes the flight from
+`gh-pages`, preserving the deployed `/fly/`, `/rc/` and their assets. Select the part to publish:
 
 | Changed | Run | Publishes |
 | --- | --- | --- |
-| The landing page or `public/` | `npm run deploy:landing` here | this checkout's landing page, with the flight `gh-pages` has |
+| The landing page or `public/` | `npm run deploy` here (`deploy:landing` is an alias) | this checkout's landing page, with the flight `gh-pages` has |
 | The flight or the phone controller | `npm run deploy` in fly, or `npm run deploy:flight` here | a new fly build, with the landing page `gh-pages` has |
-| Both, such as a new aircraft | `npm run deploy` here | both |
+| Both, such as a new aircraft | `npm run deploy:all` here | both |
+
+For flight deployments, check out fly, the repositories it links and the FOSS Earth checkout beside
+this one, as [fly's development guide](https://github.com/0SFS/fly/blob/main/docs/development.md)
+describes, and run `npm install` in fly. Landing-only deploys do not inspect or build the local
+flight; their browser check still uses Chrome helpers from the adjacent fly checkout.
 
 The part a deploy does not publish stays as it is on `gh-pages`. A landing page change needs no fly
 build and no clean fly checkout, and a new flight leaves out landing page edits that are not deployed.
@@ -29,14 +33,16 @@ A deploy also keeps a part `gh-pages` already has, without building it. The flig
 published flight page was built from fly's commit and the checkouts it names, none of which has moved
 or has changes not committed, with no `VITE_` setting and the same `FOSS_EARTH_ISOLATION` (FOSS
 Earth About's `rebuildReason`). The landing page is kept when `index.html`, `landing.css` and
-`public/` have not changed since the commit `.landing.json` names. So `npm run deploy` here builds
-and publishes only what changed and says why, and publishes nothing when nothing did. Add `--force`,
-as in `npm run deploy -- --force`, to build and publish the part, or both, anyway.
+`public/` have not changed since the commit `.landing.json` names, and neither this checkout's landing
+page files nor the published landing page have uncommitted changes. A deploy compares only the selected
+parts with `gh-pages` and publishes nothing when they are unchanged. Add `--force`, as in
+`npm run deploy -- --force`, to build and publish the selected part anyway; this still preserves the
+deployed flight. `npm run deploy:all -- --force` rebuilds and publishes both parts.
 
 A minute or so after a deploy, the site serves it. A deploy runs these steps, in order:
 
-1. When it publishes the landing page, it refuses to start while this repository has uncommitted
-   changes.
+1. When it publishes the landing page, it warns if this repository has uncommitted changes. The
+   deployment uses the local landing page files, including new files in `public/`.
 2. When it publishes the flight, it records the commit of each checkout fly is built from in
    `fly/deployed-from.json`, and commits and pushes it in fly when one moved, so new code in FOSS
    Earth or another linked checkout is a new version of the flight (FOSS Earth About's record; see
@@ -45,7 +51,7 @@ A minute or so after a deploy, the site serves it. A deploy runs these steps, in
    in fly typechecks and builds the flight into `fly/dist/`, for the site's root. `0SFS.github.io` is
    an *organization site*, served from `https://0sfs.github.io/` rather than from a `/repo-name/`
    subpath.
-3. It keeps the parts `gh-pages` already has, as above, and stops there when that is both.
+3. It keeps the parts `gh-pages` already has, as above, and stops when every selected part is unchanged.
 4. It checks out `gh-pages` in a git worktree under `build/gh-pages` and takes the part it keeps from
    there. The landing page's files are the ones `.landing.json` on `gh-pages` lists; the flight is
    everything else.
@@ -53,15 +59,21 @@ A minute or so after a deploy, the site serves it. A deploy runs these steps, in
    fly's own root page, then the landing page and `public/`, from this checkout or `gh-pages`. It
    stops if a file would be in both, if the landing page links a file the site lacks, or if its
    aircraft are not the flight's: the same families, in the flight's order, with its names, summaries
-   and notes. It leaves out dotfiles, as the old `gh-pages` deploy did. It refuses a flight built from
-   a fly checkout with uncommitted or unpushed changes: the site publishes a fly commit anyone can
-   look up.
+   and notes. It leaves out dotfiles, as the old `gh-pages` deploy did. When publishing a new flight,
+   it warns if that flight was built from a fly checkout with uncommitted or unpushed changes: the
+   recorded fly commit may not reproduce that build. Keeping an already-deployed flight does not
+   repeat that warning. A missing fly commit or a failed build or check still stops deployment.
 6. `npm run check` opens `dist/` in headless Chrome: the landing page, Start flying, the flight up to
    a loaded aircraft, and `/rc/`. It needs Chrome, and fly's checkout for its Chrome helpers. Its
    screenshots and report go in `build/validation/landing/`.
-7. It replaces everything on `gh-pages` with `dist/`, `.landing.json`, which records the landing
-   page's commit and files, and an empty `.nojekyll`, so Pages serves the files without running
-   Jekyll over them first. It pushes that as one commit:
+7. If there were warnings about uncommitted or unpushed changes, it asks once:
+   `Publish to gh-pages despite the warnings above? [y/N]`. Type `y` or `yes` to publish. Enter,
+   any other answer, Ctrl-C, closed input or a noninteractive run cancels and removes the deployment
+   worktree without pushing `gh-pages`. `--force` does not skip confirmation. This prompt confirms
+   the Pages publication; step 2 may already have committed and pushed fly's build-input record.
+8. It replaces everything on `gh-pages` with `dist/`, `.landing.json`, which records the landing
+   page's commit, files and whether they include uncommitted changes, and an empty `.nojekyll`, so
+   Pages serves the files without running Jekyll over them first. It pushes that as one commit:
    - `Deploy the site at <this commit> with the flight at <fly commit>`
    - `Deploy the landing page at <this commit>, keeping the flight at <fly commit>`
    - `Deploy the flight at <fly commit>, keeping the landing page at <its commit>`
@@ -118,7 +130,7 @@ curl -s https://0sfs.github.io/foss-earth-sw.js | grep -o '"isolation":"[a-z-]*"
 
 Both say `enforce`. In <https://0sfs.github.io/fly/?set.native.core.sky=threaded> the console's
 `crossOriginIsolated` is then `true`. A hard refresh skips the worker, so the page reloads once more.
-`FOSS_EARTH_ISOLATION=off npm run deploy` builds the flight without it. FOSS Earth's
+`FOSS_EARTH_ISOLATION=off npm run deploy:flight` here builds the flight without it. FOSS Earth's
 [deploying guide](https://github.com/foss-earth/docs/blob/main/docs/deploying.md#cross-origin-isolation)
 covers the rest.
 
@@ -131,7 +143,7 @@ parts of pairing. See the
 
 **A deploy of one part says the landing page's aircraft are not the flight's.** The aircraft changed in
 the other part too, so each part fails against the other as it is published. Deploy both with
-`npm run deploy` here.
+`npm run deploy:all` here.
 
 **`npm run build` here says the flight build is not for the site's root.** fly was built for a
 subpath. Its build uses `/` unless it runs in GitHub Actions for a repository not named

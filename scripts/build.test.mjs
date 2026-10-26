@@ -123,6 +123,7 @@ describe("buildSite", () => {
     await buildSite({ site, fly, out: published });
     await write(path.join(published, ".landing.json"), "{}");
     await write(path.join(site, "landing.css"), ".info-page { color: red }");
+    await write(path.join(fly, "assets", "index-abc.js"), "local flight changed");
 
     // The flight as published, with this checkout's landing page.
     const names = await landingFiles(site);
@@ -132,6 +133,11 @@ describe("buildSite", () => {
     await buildSite({ site, fly: flight, out });
     assert.deepEqual(filesUnder(out), filesUnder(published).filter((name) => name !== ".landing.json"));
     assert.equal(readFileSync(path.join(out, "landing.css"), "utf8"), ".info-page { color: red }");
+    const landingPaths = new Set(names.map(([, name]) => name));
+    for (const name of filesUnder(published)) {
+      if (name === ".landing.json" || landingPaths.has(name)) continue;
+      assert.deepEqual(readFileSync(path.join(out, name)), readFileSync(path.join(published, name)), `${name} stays as published`);
+    }
 
     // The landing page as published, with fly's build.
     await write(path.join(fly, "assets", "added.js"), "");
