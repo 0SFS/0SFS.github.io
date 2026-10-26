@@ -2,7 +2,8 @@
 
 The video widget uses two real five-second 0SFS flight recordings, replacing the old
 instrument-covered C172 screenshot. Capture and encoding run from source;
-there is no hand-flown recording or generated scenery. The old `public/preview.jpg`
+the aircraft inputs stay scripted, and scenery comes from the simulator. Camera
+movement can use the original orbit or a saved manual take. The old `public/preview.jpg`
 remains available, but the page and its social preview now use the new footage.
 
 ## Scene and timing
@@ -21,20 +22,62 @@ remains available, but the page and its social preview now use the new footage.
 - 150 frames at 30 fps, normal 60 Hz physics, five-second silent 960 × 540 video.
 - Chase distance 24 m, height 4 m, FOV 55°, with a gentle 12° → −8° counterclockwise camera orbit, viewed from above.
 
-## Tune the sunset while paused
+## Tune the camera, start and sunset
 
 ```sh
 cd ~/gh/0sfs/0sfs.github.io
-npm run tune:hero
+npm run tune:hero -- --manual-camera
 ```
 
-This opens an isolated **visible Chrome window**, at the exact capture spawn,
-with the flight paused and its physics clock frozen. The simulator UI stays
-available: use the Sky tab to adjust its fixed date/time. Alternatively, enter
-an ISO date/time in the terminal, for example `2026-10-25T17:35:00-05:00`.
-Enter `save` to write the current sky time into `scripts/hero-scenario.json`;
-enter `quit` (or Ctrl+C) to close the browser and any server the script started.
-Saved times use UTC; `scene.timeZone` still records Minneapolis.
+This opens an isolated **visible Chrome window** at the capture spawn, paused
+at frame zero, with a **Video** tab. The new tab exists only in this script's
+instrumented development session; it adds no editor to the production flight.
+
+- **Play / Pause**, **Restart** and the **Position** slider preview the scripted
+  flight frame by frame. Seeking backwards restores the starting flight and dry
+  engine, then replays the same controls. Dragging the slider coalesces pending
+  seeks to its latest position. The last position is the last encoded frame,
+  one frame before the duration boundary.
+- **Duration** changes the scene length, from just over three seconds through
+  fifteen seconds, in one-frame increments. Shortening trims later camera points.
+  It does not stretch the throttle cue or the climb commands.
+- **Manual** lets you frame the paused aircraft. Use the simulator's normal
+  camera gestures: right-drag and wheel in Mouse mode; two-finger scroll and
+  pinch in Trackpad mode; drag and pinch on a touchscreen. The existing input
+  method control chooses Mouse or Trackpad.
+- Frame your starting shot, then press **Record camera**. It restarts at zero
+  and records your orbit and zoom while the aircraft follows its script. Pause
+  stops recording. Play and the position slider replay that camera take. Adjust
+  the camera while paused to replace/add a point at that frame; Record camera
+  starts a fresh take. **Scripted** switches back to the original orbit without
+  deleting your manual points.
+- **Start** edits latitude, longitude, height above prepared ground and heading.
+  **Apply & restart** prepares terrain at that location and respawns paused at
+  zero. These are starting values, not the aircraft's current position during playback.
+- **Save scenario** writes the scene, duration, camera path and current fixed sky
+  time to the selected JSON. It keeps the scripted aircraft inputs and video
+  encoding settings. Saving refuses to overwrite a scenario changed externally
+  since the editor opened. The installed landing videos stay untouched.
+
+**Lighting…** opens the existing Date and time tab; Sky remains available too.
+Alternatively, enter an ISO date/time in the terminal, for example
+`2026-10-25T17:35:00-05:00`. Terminal `save` saves the complete scenario, just like
+the tab's button. Enter `quit` (or Ctrl+C) to close Chrome and any server the script
+started. Saved times use UTC; `scene.timeZone` still records Minneapolis. A stale
+solar-time annotation is removed after changing location or lighting.
+
+`npm run tune:hero` opens the same editor using the scenario's saved camera mode
+(the original scenarios default to Scripted). `--manual-camera` selects Manual
+and implies tuning, so it also works with `capture:hero`. Use
+`--scenario=scripts/hero-scenario-usgs.json` to tune the USGS variant. For a
+disposable experiment, copy a scenario into `build/hero/` and pass that path.
+
+Manual takes are stored in `camera.keyframes`: ordered samples of time, yaw,
+pitch, distance and field of view. Capture interpolates them with short-angle yaw
+wrapping and holds the first/last pose outside the recorded interval. Each output
+frame is checked against the selected camera path. Flight controls and fixed
+physics timing are verified independently. A slow rendering frame slows the
+interactive preview instead of skipping simulation or camera samples.
 
 Then run `npm run capture:hero` and `npm run check:hero -- --install` to regenerate
 and install the chosen lighting. The existing video stays installed until checks pass.
@@ -42,7 +85,7 @@ The videos contain no provider HUD. The landing card supplies the selected
 provider’s attribution link beside its map selector; retain that attribution
 when embedding.
 
-The scene, controls, physics steps and output timestamps are repeatable. Exact
+The scene, saved camera path, controls, physics steps and output timestamps are repeatable. Exact
 pixels and file sizes can vary with streamed tile detail, application changes,
 the browser's native codecs and GPU. This is a tunable scripted capture, not a
 claim of bit-identical renders across machines.
@@ -109,7 +152,7 @@ only on explicit capture steps; tile streaming and sky rendering may finish
 between steps without advancing the aircraft.
 
 The check command opens each file in Chrome, verifies its recorded SHA-256,
-decodes frames at 0, 2 and 4.9 s, checks dimensions and duration, and verifies
+decodes frames at the start, 40% and 0.1 s before the end, checks dimensions and duration, and verifies
 that playback advances. It saves contact sheets and a report in `decode-check/`.
 `--install` copies both passed video files, the poster and compact provenance
 JSON to `public/media/`. It refuses a capture with failed flight/timing checks.
@@ -156,3 +199,33 @@ Nothing in this workflow commits, pushes or deploys the page.
 
 The capture checks the sky renderer’s actual UTC instant and measured camera yaw.
 The installer versions video/poster URLs by content hash to prevent stale cached media.
+
+## Check the editor and collect feedback
+
+```sh
+# Short real-simulator check; uses an ignored copy, never the source scenarios.
+npm run check:hero-tuner
+# Or exercise the same editor with Google scenery (requires the local key).
+npm run check:hero-tuner -- --scenario=scripts/hero-scenario.json
+```
+
+The check covers dry-engine rewind, repeated scripted flight, a trusted mouse
+camera gesture, recording/replay, pause, duration, relocation/heading/AGL and
+scenario save. It also verifies the real Test tab and downloadable feedback JSON.
+Reports and review markup are under `build/hero/editor-check/`. To use that
+checklist in your own tuning window after running the check:
+
+```sh
+npm run tune:hero -- --manual-camera --test-plan=build/hero/editor-check/test-plan.json
+```
+
+The Video tab opens first. The Test tab remains available in the same workspace:
+Start, try the controls, record Pass/Fail/Skip and notes, then Finish → Download
+feedback. `test-link.txt` contains the equivalent checklist link; launching with
+`--test-plan` ensures the checklist and instrumented editor share one window.
+
+Rewinding crosses exhaust-light on/off boundaries. The exhaust renderer keeps
+that light's buffer alive while disabled and releases it with its owner; disposing
+it during a rewind invalidated WebGPU material bindings and left a blank view.
+The editor check verifies the rendered relocated scene and rejects graphics
+validation errors as well as checking the flight state.

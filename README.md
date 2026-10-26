@@ -41,10 +41,18 @@ timing and verification. Regenerate and install the checked assets locally with:
 
 ```sh
 cd ~/gh/0sfs/0sfs.github.io
-npm run tune:hero # paused start; adjust Sky time, then enter save and quit
+npm run tune:hero -- --manual-camera # Video tab: frame/record the camera, set the start, scrub, save
 npm run capture:hero
 npm run check:hero -- --install
 ```
+
+The tuning window keeps the aircraft inputs scripted. Its Video tab has a playback
+timeline, scene duration, starting coordinates/height/heading, and a camera take
+that the capture script reproduces. Save scenario, then enter `quit` in the terminal
+before capturing. Omitting `--manual-camera` keeps the saved camera mode. Use
+`--scenario=scripts/hero-scenario-usgs.json` for the USGS version. The
+[capture guide](docs/proposals/landing-hero-video.md#tune-the-camera-start-and-sunset)
+describes the gestures, saved path and editor checks.
 
 ## Deploying separately
 
