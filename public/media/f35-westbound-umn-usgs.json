@@ -29,7 +29,66 @@
       "heightMeters": 4,
       "orbitDegrees": 12,
       "fieldOfViewDegrees": 55,
-      "orbitEndDegrees": -8
+      "orbitEndDegrees": -8,
+      "mode": "manual",
+      "keyframes": [
+        {
+          "timeSeconds": 0,
+          "yawDegrees": -20.65859432245693,
+          "pitchDegrees": 11.181195593418087,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 0.8333333333333334,
+          "yawDegrees": -17.79380534680281,
+          "pitchDegrees": 21.49443590577291,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 1.1666666666666667,
+          "yawDegrees": -17.79380534680281,
+          "pitchDegrees": 21.49443590577291,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 1.2,
+          "yawDegrees": -17.79380534680281,
+          "pitchDegrees": 21.49443590577291,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 1.5333333333333334,
+          "yawDegrees": -17.79380534680281,
+          "pitchDegrees": 21.49443590577291,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 1.5666666666666667,
+          "yawDegrees": -17.79380534680281,
+          "pitchDegrees": 21.49443590577291,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.6,
+          "yawDegrees": -17.79380534680281,
+          "pitchDegrees": 21.49443590577291,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        },
+        {
+          "timeSeconds": 4.966666666666667,
+          "yawDegrees": -18.36676314193363,
+          "pitchDegrees": -59.99999999999999,
+          "distanceMeters": 24,
+          "fieldOfViewDegrees": 55
+        }
+      ]
     },
     "video": {
       "width": 960,
@@ -39,20 +98,22 @@
       "posterQuality": 82
     }
   },
-  "capturedAt": "2026-10-26T19:40:32.527Z",
+  "capturedAt": "2026-10-26T21:43:53.873Z",
   "source": "real development simulator; browser-only instrumentation",
   "provenance": {
     "flight": {
-      "commit": "a2bb950b5e4b7ea5135a81c3c3405a9c2a9ab3e9",
+      "commit": "4ef209be8056fa047d343718e3456edca8efa680",
       "dirty": false
     },
     "website": {
-      "commit": "6e42455755cfc4a3d1ecb62213141f69e8678ead",
+      "commit": "e21e3d2493983f2cb09161d4cef4cb3e9522f3a4",
       "dirty": true
     },
     "scripts": {
-      "capture-hero.mjs": "7f1458b3238601d87f1ee5c32761fafe1ce6d73a947aed8bd1bf0b82c2cbc0bb",
-      "hero-browser-driver.js": "b4de69f7dbc91a59678175f25e199fb53ac86d4973012057cbd40e69be555834",
+      "capture-hero.mjs": "069e226310fa64af63f517f47942b57a9cfd72ddeb9a6b663f329615a736c185",
+      "hero-browser-driver.js": "c3c26407d426643c171be17f9f4d811ff9900384d42212aedb9ec1f5e00ce1b8",
+      "hero-camera.js": "51044288f24bb6b6fab368c54b9eac7e8b5b79a24f7f7e7861459e093742143a",
+      "hero-instrument.mjs": "e4c4da33a0bd49d81af9354dda252cc1566eaab8102e560eaa3f18a25aca0ed6",
       "hero-browser-encoder.js": "bce7f2ee5c5b37e459f9f5d44d7e0df7c7ce3df2e8bf0b542fd790922b62b35c",
       "hero-muxers.mjs": "be54ca1f7673b51de13d694c8c7fcc6b305e8b9a9493a95519536391ca8e8e99"
     },
@@ -63,8 +124,8 @@
     "durationSeconds": 5,
     "scenery": true,
     "skyTime": true,
-    "cameraOrbitStartDegrees": 11.999999999999998,
-    "cameraOrbitEndDegrees": -7.866666666666646,
+    "cameraOrbitStartDegrees": -20.65859432245693,
+    "cameraOrbitEndDegrees": -18.366763141933642,
     "cameraOrbit": true,
     "noExternalTanks": true,
     "throttleCueFrame": 6,
@@ -77,6 +138,7 @@
     "pitchAtThreeSecondsDegrees": 42.71457027149298,
     "climbPitchReached": true,
     "climbing": true,
+    "headingHeld": true,
     "westbound": true,
     "simulatedSeconds": 4.966666666666654,
     "frameClock": true
@@ -85,14 +147,14 @@
     {
       "filename": "f35-westbound-umn-usgs.webm",
       "codec": "vp9",
-      "bytes": 238937,
-      "sha256": "4387fb9a2b7002598029a8a521444eee13534d70522d117ba7cf01d6f348bd82"
+      "bytes": 286501,
+      "sha256": "96ddaeaf4b14ee4a07ec290c7a6726f78bbad73f46131fa582300739b346a929"
     },
     {
       "filename": "f35-westbound-umn-usgs.mp4",
       "codec": "h264",
-      "bytes": 402575,
-      "sha256": "79bfd5aa249fbdf040149ef8874c6adf0201afbb063c9b4f41da7562c1b0e0fe"
+      "bytes": 434059,
+      "sha256": "f82b38ac6db324ba186d397f602e56cab820a15ceafc5dbbb6f8116dc665758d"
     }
   ],
   "decode": [
@@ -107,8 +169,8 @@
         2,
         4.9
       ],
-      "advancedTo": 0.069958,
-      "variance": 3418.0438547035337
+      "advancedTo": 0.068364,
+      "variance": 3577.2491350038035
     },
     {
       "file": "f35-westbound-umn-usgs.mp4",
@@ -121,8 +183,8 @@
         2,
         4.9
       ],
-      "advancedTo": 0.067018,
-      "variance": 3425.4030084007463
+      "advancedTo": 0.048429,
+      "variance": 3561.037974216437
     }
   ]
 }

@@ -183,6 +183,8 @@ Google’s legal notices for Google 3D Tiles, USGS’s credit page for USGS Imag
 
 The landing page uses one native video element with a matching JPEG poster,
 WebM first and MP4 fallback. Only the selected basemap’s sources enter the player.
+If WebM fails during decoding, it retries that map's MP4 while preserving the
+playback choice and comparison position.
 It loops silently in view, pauses offscreen or when
 the tab is hidden, and offers a keyboard-accessible pause/play button. Reduced
 motion or data-saving settings start with the still poster; the visitor can

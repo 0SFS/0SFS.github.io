@@ -87,6 +87,16 @@ video.addEventListener("loadeddata", () => {
   seekTo = 0;
   if (time > 0 && Number.isFinite(video.duration)) video.currentTime = Math.min(time, Math.max(0, video.duration - .01));
 });
+video.addEventListener("error", () => {
+  // A decoder may reject WebM after selecting it; source fallback only covers
+  // selection failures. Retry the same map's MP4 and retain the comparison frame.
+  const fallback = video.querySelector('source[type="video/mp4"]');
+  if (!fallback || video.currentSrc === fallback.src) return;
+  seekTo = seekTo || video.currentTime;
+  video.replaceChildren(fallback.cloneNode(true));
+  sourcesChanged = true;
+  updatePlayback();
+});
 video.addEventListener("playing", showState);
 video.addEventListener("pause", showState);
 toggle.addEventListener("click", () => {

@@ -227,10 +227,20 @@ try {
   await waitForExpression(chrome, info.sessionId, "document.querySelector('video').readyState >= 2 && !document.querySelector('video').seeking && Math.abs(document.querySelector('video').currentTime-2)<.05", 5000);
   assert.equal(await evaluate(chrome, info.sessionId, "document.querySelector('video').paused"), true, 'Map switching lost the paused state');
   assert.equal(await evaluate(chrome, info.sessionId, "document.querySelector('.feature__map-credit').href"), 'https://www.google.com/help/legalnotices_maps/');
+  // Runtime decode failures do not trigger native <source> fallback. Exercise
+  // recovery at a paused comparison point even on browsers that accept VP9.
+  await evaluate(chrome, info.sessionId, "document.querySelector('video').dispatchEvent(new Event('error'))");
+  await waitForExpression(chrome, info.sessionId, "document.querySelector('video').currentSrc.includes('.mp4') && document.querySelector('video').readyState >= 2 && !document.querySelector('video').seeking && Math.abs(document.querySelector('video').currentTime-2)<.05", 5000);
+  assert.equal(await evaluate(chrome, info.sessionId, "document.querySelector('video').paused"), true, 'Decode recovery lost the paused state');
+  for (const map of ['usgs-imagery-topo', 'google']) {
+    await evaluate(chrome, info.sessionId, `(() => {const select=document.querySelector('.feature__map-select'); select.value=${JSON.stringify(map)}; select.dispatchEvent(new Event('change'));})()`);
+    await waitForExpression(chrome, info.sessionId, "document.querySelector('video').readyState >= 2 && !document.querySelector('video').seeking && Math.abs(document.querySelector('video').currentTime-2)<.05", 5000);
+    assert.equal(await evaluate(chrome, info.sessionId, "document.querySelector('video').paused"), true);
+  }
   await evaluate(chrome, info.sessionId, "document.querySelector('.feature__video-toggle').click()");
   await waitForExpression(chrome, info.sessionId, "!document.querySelector('.feature__scenery').paused", 5000);
   report.checks.hero = { reducedMotion: stillPreview, playback: movingPreview, pauseAndResume: true,
-    basemap: { persisted:true, preservesOtherSettings:true, loadsOnlySelectedVideo:true, attribution:true, pausedComparison:true } };
+    basemap: { persisted:true, preservesOtherSettings:true, loadsOnlySelectedVideo:true, attribution:true, pausedComparison:true, decodeFallback:true, repeatedSwitches:true } };
   report.checks.videoLinks = await evaluate(chrome, info.sessionId, `(() => {
     const card=document.querySelector('.feature--world').getBoundingClientRect();
     const link=document.querySelector('.info-page__start');
