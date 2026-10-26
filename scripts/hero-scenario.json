@@ -28,7 +28,66 @@
     "heightMeters": 4,
     "orbitDegrees": 12,
     "fieldOfViewDegrees": 55,
-    "orbitEndDegrees": -8
+    "orbitEndDegrees": -8,
+    "mode": "manual",
+    "keyframes": [
+      {
+        "timeSeconds": 0,
+        "yawDegrees": -20.65859432245693,
+        "pitchDegrees": 11.181195593418087,
+        "distanceMeters": 24,
+        "fieldOfViewDegrees": 55
+      },
+      {
+        "timeSeconds": 0.8333333333333334,
+        "yawDegrees": -17.79380534680281,
+        "pitchDegrees": 21.49443590577291,
+        "distanceMeters": 24,
+        "fieldOfViewDegrees": 55
+      },
+      {
+        "timeSeconds": 1.1666666666666667,
+        "yawDegrees": -17.79380534680281,
+        "pitchDegrees": 21.49443590577291,
+        "distanceMeters": 24,
+        "fieldOfViewDegrees": 55
+      },
+      {
+        "timeSeconds": 1.2,
+        "yawDegrees": -17.79380534680281,
+        "pitchDegrees": 21.49443590577291,
+        "distanceMeters": 24,
+        "fieldOfViewDegrees": 55
+      },
+      {
+        "timeSeconds": 1.5333333333333334,
+        "yawDegrees": -17.79380534680281,
+        "pitchDegrees": 21.49443590577291,
+        "distanceMeters": 24,
+        "fieldOfViewDegrees": 55
+      },
+      {
+        "timeSeconds": 1.5666666666666667,
+        "yawDegrees": -17.79380534680281,
+        "pitchDegrees": 21.49443590577291,
+        "distanceMeters": 24,
+        "fieldOfViewDegrees": 55
+      },
+      {
+        "timeSeconds": 4.6,
+        "yawDegrees": -17.79380534680281,
+        "pitchDegrees": 21.49443590577291,
+        "distanceMeters": 24,
+        "fieldOfViewDegrees": 55
+      },
+      {
+        "timeSeconds": 4.966666666666667,
+        "yawDegrees": -18.36676314193363,
+        "pitchDegrees": -59.99999999999999,
+        "distanceMeters": 24,
+        "fieldOfViewDegrees": 55
+      }
+    ]
   },
   "video": {
     "width": 960,
