@@ -23,8 +23,11 @@ physical sky and astronomy, systems, sound and the two-pilot multiplayer preview
 larger multiplayer sessions are explicitly planned. The copy's evidence and limits are recorded in the
 [25 October comparison](https://github.com/0SFS/research/blob/main/browser-flight-sim-positioning-2026-10-25.md)
 and the [feature-grid design and local review](docs/proposals/landing-feature-grid.md).
-Aircraft descriptions and technical qualifications open through compact native **?**
-help controls. Essential status, including the F-35B's Experimental badge, stays visible.
+The grid opens directly with a video card: play/pause and **?** on the left, Fly on
+the right. Descriptions, capture details and credits open in compact anchored **?**
+tooltips, as do aircraft qualifications. The site copies the standalone helper from
+the adjacent `~/gh/foss-earth/ui/dist/` build (run `npm run build` there if missing).
+Essential status, including the F-35B's Experimental badge, stays visible.
 The [supplementary-copy policy](docs/proposals/supplementary-copy-policy.md) explains the split.
 
 The world card plays a five-second real F-35B flight over Google Photorealistic 3D Tiles

@@ -111,8 +111,8 @@ and the laptop model's source, author, licence and modification notice inside
 the card's bottom-right **?**, following the supplementary-copy policy:
 
 ```html
-<div class="feature__help-row"><button type="button" class="info-page__help-button" popovertarget="remote-art-credits" aria-label="Phone controller artwork credits">?</button></div>
-<div id="remote-art-credits" class="info-page__help-popover" popover aria-labelledby="remote-art-credits-title">
+<div class="feature__help-row"><button type="button" class="info-page__help-button" hidden data-help="remote-art-credits" aria-label="Phone controller artwork credits">?</button></div>
+<div id="remote-art-credits" class="info-page__help-tooltip" hidden aria-labelledby="remote-art-credits-title">
   <h4 id="remote-art-credits-title">Artwork credits</h4>
   <p><a href="https://www.google.com/help/legalnotices_maps/" target="_blank" rel="noopener">Google 3D Tiles <span aria-hidden="true">↗</span></a></p>
   <p>Laptop: <a href="https://sketchfab.com/3d-models/macbook-air-m2-786fa23d402a4f90ae36c4168997f9cc" target="_blank" rel="noopener">“MacBook Air M2”</a> by <a href="https://sketchfab.com/rtql8d" target="_blank" rel="noopener">rtql8d</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>, modified</p>
@@ -120,7 +120,7 @@ the card's bottom-right **?**, following the supplementary-copy policy:
 ```
 
 The phone was built in this project's own code and needs no external model
-credit. Keep all four external links above intact inside the help popover.
+credit. Keep all four external links above intact inside the help tooltip.
 
 If the art should carry meaning instead, drop `aria-hidden`, keep `alt=""` on
 the phone and give the laptop this alt text: "A MacBook Air showing an F-35B
@@ -132,7 +132,7 @@ controller."
 Integrated on 26 October 2026 using the composition above. Both images retain
 their intrinsic dimensions, lazy loading, asynchronous decoding and SHA-256
 cache versions. The unused `.feature__phone-art` rule is removed. Google notices,
-the model, its creator and CC BY 4.0 are linked inside the native help popover;
+the model, its creator and CC BY 4.0 are linked inside the anchored help tooltip;
 the credit states that the model is modified. The only credit control on the
 card's primary surface is the bottom-right **?**.
 
@@ -149,11 +149,12 @@ Local review: `build/bento-laptop-integration-review.html`; screenshot list:
 three-step Test link and a downloadable plan. Its Test tab's Start/Finish flow
 was checked and produces valid downloadable feedback JSON.
 
-The credits follow-up is reviewed in `build/bento-credit-help-review.html`,
-using `build/bento-credit-help-shots.mjs`. Both cards' credits are hidden by
-default. Enter/Space opening, keyboard access to links, Escape/focus return,
-outside dismissal and touch opening passed. The popovers fit at 320 px, and
-the buttons stay at the cards' bottom-right corners. Build and all 59 tests pass.
+The current tooltip and simplified-opening review is in
+`build/landing-simplify-review.html`, using `build/landing-simplify-shots.mjs`.
+Both cards’ credits are hidden by default and open beside their buttons, with
+no centering or dimming. Enter/Space, Tab to links, Escape/focus return, outside
+dismissal and touch opening passed. Tooltips fit at 320 px, and the buttons stay
+at the cards’ bottom-right corners. Build, all 61 tests and the browser checks pass.
 
 ## Reproduce
 

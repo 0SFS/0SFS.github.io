@@ -68,7 +68,7 @@ If an image should carry meaning instead, these alt texts describe it accurately
 
 The multiplayer screens show Google Photorealistic 3D Tiles, and each screen keeps
 its own "3D Tiles" credit. The card links Google's notices (`Google 3D Tiles ↗`)
-inside a native popover, opened by a bottom-right **?** named "Multiplayer artwork
+inside an anchored tooltip, opened by a bottom-right **?** named "Multiplayer artwork
 credits". The model itself needs no external credit. Follow the
 [supplementary-copy policy](supplementary-copy-policy.md) when integrating artwork.
 

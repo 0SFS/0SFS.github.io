@@ -62,7 +62,7 @@ at 0.200 s; the real engine lights its augmentor at approximately 1.367 s. Fresh
 flights have no external tanks, and the camera orbits counterclockwise viewed
 from above. The guide documents the native ignition delay and tuning.
 
-Aircraft summaries and notes now live in native popovers behind compact **?**
+Aircraft summaries and notes now live in anchored tooltips behind compact **?**
 buttons. The Experimental badge stays visible for the F-35B. Exact catalogue text,
 family ordering and thumbnail validation remain checked, including nested help
 markup. The [supplementary-copy policy](supplementary-copy-policy.md) explains what
@@ -80,3 +80,12 @@ and the built-site browser check. Video review covers 320, 390, 600, 834, 1280, 
 and 1920 CSS pixels without horizontal overflow. The real phone artwork is integrated;
 the physical-sky screenshot remains a separate handoff, and the original sky
 illustration is preserved.
+
+## Simplified feature-first opening
+
+The grid starts at the top of the page, without the navigation bar, introduction
+or Multiplayer Early preview badge. The main card is an unobstructed video:
+play/pause and **?** at bottom left, **Fly** at bottom right. All explanatory
+copy, capture details, source link and Google attribution are in its anchored
+tooltip. Every landing-page **?** uses the shared explanation behavior, without
+centered popups or a dimming backdrop. See the supplementary-copy policy.

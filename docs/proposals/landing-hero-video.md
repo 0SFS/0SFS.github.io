@@ -115,8 +115,8 @@ places metadata before media for fast startup. The installed provenance JSON
 records exact sizes, hashes and measured flight checks.
 
 Application panels, provider HUD, compass and detail slider are hidden for capture.
-The landing caption supplies a clickable Google 3D Tiles attribution link outside
-encoded pixels, alongside the aircraft and location.
+The bottom-left **?** opens an anchored tooltip containing the clickable Google
+3D Tiles attribution, aircraft, location and capture date outside encoded pixels.
 
 ## Playback and local review
 
@@ -127,8 +127,8 @@ motion or data-saving settings start with the still poster; the visitor can
 explicitly play it. With JavaScript disabled the poster remains visible.
 
 Review the hero at laptop, wide and phone widths. Check that the aircraft stays
-clear of the copy, Google credit stays visible, playback is inline and silent,
-and the button pauses/resumes. Under reduced motion it should stay still until
+unobstructed, the **?** exposes the complete Google credit, playback is inline and
+silent, and the left play/pause and right Fly controls work. Under reduced motion it should stay still until
 played. No simulator or 3D-engine code is loaded by this page.
 
 Nothing in this workflow commits, pushes or deploys the page.

@@ -57,35 +57,36 @@
       html, body { margin: 0; background: #080e14; overscroll-behavior: none; }
     </style>
     <link rel="stylesheet" href="landing.css" />
-    <!-- Registers the flight's worker while this page is read, so Start flying loads it isolated, for its shared memory, without the first visit's reload. -->
+    <!-- Registers the flight's worker while this page is read, so Fly loads it isolated, for its shared memory, without the first visit's reload. -->
     <script src="foss-earth-isolate.js" async></script>
+    <script type="module" src="landing-help.js"></script>
   </head>
   <body>
     <div id="root">
       <div class="info-page">
         <a class="info-page__skip" href="#info-main">Skip to content</a>
-        <header class="info-page__nav">
-          <a class="info-page__brand" href="./" aria-label="0SFS home"><span class="info-page__wordmark">0SFS<span aria-hidden="true">↗</span></span><span class="info-page__brand-description">Open Source<br />Flight Simulator</span></a>
-          <nav aria-label="Main navigation"><a href="#features">Features</a><a href="#info-aircraft">Aircraft</a><a href="#roadmap">What’s next</a><a href="https://github.com/0SFS">GitHub <span aria-hidden="true">↗</span></a></nav>
-        </header>
         <main id="info-main" class="info-page__main" tabindex="-1">
-          <section class="info-page__hero" aria-labelledby="info-title">
-            <div><p class="info-page__eyebrow"><span class="info-page__status-dot" aria-hidden="true"></span> Free to fly. Open to build.</p><h1 id="info-title">Serious flight.<br /><span>One browser tab.</span></h1></div>
-            <div class="info-page__intro">
-              <p class="info-page__lede">Fly over real-world terrain with WebGPU graphics, JSBSim flight dynamics and a sky built on physics. Pair your phone and take the controls.</p>
-              <p class="info-page__actions"><a class="info-page__start" href="fly/">Start flying <span aria-hidden="true">↗</span></a><a class="info-page__secondary" href="https://github.com/0SFS/fly">Explore the source <span aria-hidden="true">↗</span></a></p>
-              <p class="info-page__micro">No install. No account. Just your browser.</p>
-              <noscript><p>Enable JavaScript to fly. You can still explore this page.</p></noscript>
-            </div>
-          </section>
+          <h1 class="info-page__sr-only">0SFS — Open Source Flight Simulator</h1>
           <section id="features" class="info-page__features" aria-label="Inside the simulator">
             <article class="feature feature--world">
-              <div class="feature__world-copy"><p class="feature__label">01 / A real-world globe</p><h2>The world.<br />Under your wings.</h2><p>Explore familiar places from a whole new angle. Stream scenery with FOSS Earth. Switch between first-person and chase views.</p></div>
               <video class="feature__scenery" width="960" height="540" poster="media/f35-westbound-umn-poster.jpg?v=01c516de0e0b" preload="none" muted loop playsinline aria-label="F-35B climbing west over the Mississippi beside UMN at sunset, with Google 3D Tiles, captured in 0SFS">
                 <source src="media/f35-westbound-umn.webm?v=051e58646741" type="video/webm" />
                 <source src="media/f35-westbound-umn.mp4?v=6ecd633c4d9c" type="video/mp4" />
               </video>
-              <div class="feature__world-caption"><div><span>Captured in 0SFS · <a class="feature__attribution" href="https://www.google.com/help/legalnotices_maps/" target="_blank" rel="noopener">Google 3D Tiles ↗</a></span><span>F-35B · Minneapolis · 25 Oct 2026, 18:10 CDT</span></div><button class="feature__video-toggle" type="button" aria-label="Play flight preview" title="Play flight preview" hidden><span aria-hidden="true">▶</span></button></div>
+              <div class="feature__world-controls">
+                <div class="feature__world-controls-left">
+                  <button class="feature__video-toggle" type="button" aria-label="Play flight preview" title="Play flight preview" hidden><span aria-hidden="true">▶</span></button>
+                  <button type="button" class="info-page__help-button" hidden data-help="world-help" aria-label="About 0SFS and this flight preview">?</button>
+                </div>
+                <a class="info-page__start" href="fly/">Fly <span aria-hidden="true">↗</span></a>
+              </div>
+              <div id="world-help" class="info-page__help-tooltip" hidden>
+                <h2>0SFS — Open Source Flight Simulator</h2>
+                <p>Fly over real-world terrain with WebGPU graphics, JSBSim flight dynamics and a sky built on physics. Pair your phone and take the controls.</p>
+                <p>Explore familiar places from a whole new angle. Stream scenery with FOSS Earth. Switch between first-person and chase views.</p>
+                <p><span>Captured in 0SFS · <a class="feature__attribution" href="https://www.google.com/help/legalnotices_maps/" target="_blank" rel="noopener">Google 3D Tiles ↗</a></span><br /><span>F-35B · Minneapolis · 25 Oct 2026, 18:10 CDT</span></p>
+                <p><a href="https://github.com/0SFS/fly">Explore the source <span aria-hidden="true">↗</span></a></p>
+              </div>
             </article>
             <article class="feature feature--gpu">
               <p class="feature__label">02 / Graphics</p><div class="feature__gpu-mark" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -107,8 +108,8 @@
                 <img class="feature__remote-phone" src="media/bento-remote-phone.webp?v=9837eb6033e3" width="840" height="518" alt="" loading="lazy" decoding="async" />
               </div>
               <p>Scan a QR code. Fly with your phone.<br />Both screens are web pages.</p>
-              <div class="feature__help-row"><button type="button" class="info-page__help-button" popovertarget="remote-art-credits" aria-label="Phone controller artwork credits">?</button></div>
-              <div id="remote-art-credits" class="info-page__help-popover" popover aria-labelledby="remote-art-credits-title">
+              <div class="feature__help-row"><button type="button" class="info-page__help-button" hidden data-help="remote-art-credits" aria-label="Phone controller artwork credits">?</button></div>
+              <div id="remote-art-credits" class="info-page__help-tooltip" hidden aria-labelledby="remote-art-credits-title">
                 <h4 id="remote-art-credits-title">Artwork credits</h4>
                 <p><a href="https://www.google.com/help/legalnotices_maps/" target="_blank" rel="noopener">Google 3D Tiles <span aria-hidden="true">↗</span></a></p>
                 <p>Laptop: <a href="https://sketchfab.com/3d-models/macbook-air-m2-786fa23d402a4f90ae36c4168997f9cc" target="_blank" rel="noopener">“MacBook Air M2”</a> by <a href="https://sketchfab.com/rtql8d" target="_blank" rel="noopener">rtql8d</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>, modified</p>
@@ -129,13 +130,13 @@
               <h2>Hear the<br /><span>engine respond.</span></h2><p>Engine-driven sound. Wind over the airframe. Tires on the runway. Hear the aircraft respond as you fly.</p><a class="feature__link" href="https://github.com/0SFS/sound/blob/main/docs/sound.md">Inside the sound engine <span aria-hidden="true">↗</span></a>
             </article>
             <article class="feature feature--multiplayer">
-              <p class="feature__label">09 / Multiplayer <span class="feature__badge">Early preview</span></p><div class="feature__multiplayer-art" aria-hidden="true">
+              <p class="feature__label">09 / Multiplayer</p><div class="feature__multiplayer-art" aria-hidden="true">
                 <img src="media/bento-multiplayer-left.webp?v=455c5972c82a" width="640" height="504" alt="" loading="lazy" decoding="async" />
                 <img src="media/bento-multiplayer-right.webp?v=a0fb9656f8db" width="640" height="504" alt="" loading="lazy" decoding="async" />
               </div>
-              <h2>Two pilots.<br /><span>One shared sky.</span></h2><p>Host a flight, share an invitation, and fly together. A two-pilot preview with direct WebRTC aircraft channels.</p>
-              <div class="feature__help-row"><button type="button" class="info-page__help-button" popovertarget="multiplayer-art-credits" aria-label="Multiplayer artwork credits">?</button></div>
-              <div id="multiplayer-art-credits" class="info-page__help-popover" popover aria-labelledby="multiplayer-art-credits-title">
+              <h2>Two pilots.<br /><span>One shared sky.</span></h2><p>Host a flight, share an invitation, and fly together. Two pilots connected through direct WebRTC aircraft channels.</p>
+              <div class="feature__help-row"><button type="button" class="info-page__help-button" hidden data-help="multiplayer-art-credits" aria-label="Multiplayer artwork credits">?</button></div>
+              <div id="multiplayer-art-credits" class="info-page__help-tooltip" hidden aria-labelledby="multiplayer-art-credits-title">
                 <h4 id="multiplayer-art-credits-title">Artwork credits</h4>
                 <p><a href="https://www.google.com/help/legalnotices_maps/" target="_blank" rel="noopener">Google 3D Tiles <span aria-hidden="true">↗</span></a></p>
               </div>
@@ -148,23 +149,23 @@
             <div class="info-page__aircraft">
               <article>
                 <img src="aircraft/thumbnails/cessna-172.png" alt="" width="640" height="360" loading="lazy" />
-                <div class="info-page__aircraft-header"><div><h3 id="aircraft-c172-title">Cessna 172 Skyhawk</h3></div><button type="button" class="info-page__help-button" popovertarget="aircraft-c172-help" aria-label="Cessna 172 Skyhawk details">?</button></div>
-                <div id="aircraft-c172-help" class="info-page__aircraft-help" popover aria-labelledby="aircraft-c172-title">
+                <div class="info-page__aircraft-header"><div><h3 id="aircraft-c172-title">Cessna 172 Skyhawk</h3></div><button type="button" class="info-page__help-button" hidden data-help="aircraft-c172-help" aria-label="Cessna 172 Skyhawk details">?</button></div>
+                <div id="aircraft-c172-help" class="info-page__help-tooltip" hidden aria-labelledby="aircraft-c172-title">
                   <h4>Cessna 172 Skyhawk</h4><p>High-wing trainer. Flight model and visuals both available.</p>
                 </div>
               </article>
               <article>
                 <img src="aircraft/thumbnails/cirrus-vision-jet.png" alt="" width="640" height="360" loading="lazy" />
-                <div class="info-page__aircraft-header"><div><h3 id="aircraft-vision-title">Cirrus Vision Jet</h3></div><button type="button" class="info-page__help-button" popovertarget="aircraft-vision-help" aria-label="Cirrus Vision Jet details">?</button></div>
-                <div id="aircraft-vision-help" class="info-page__aircraft-help" popover aria-labelledby="aircraft-vision-title">
+                <div class="info-page__aircraft-header"><div><h3 id="aircraft-vision-title">Cirrus Vision Jet</h3></div><button type="button" class="info-page__help-button" hidden data-help="aircraft-vision-help" aria-label="Cirrus Vision Jet details">?</button></div>
+                <div id="aircraft-vision-help" class="info-page__help-tooltip" hidden aria-labelledby="aircraft-vision-title">
                   <h4>Cirrus Vision Jet</h4><p>Single-engine personal jet. G1, G2, G2+ and G3 variants.</p>
                   <p class="info-page__note">G1, G2 and G3 have separate runtime packages. G2+ is currently mapped to the G2 runtime while separate physics/package support is not yet implemented. Choosing a generation does not provide calibrated generation-specific performance, a new cabin or complete generation-specific avionics.</p>
                 </div>
               </article>
               <article>
                 <img src="aircraft/thumbnails/f-35b.png" alt="" width="640" height="360" loading="lazy" />
-                <div class="info-page__aircraft-header"><div><h3 id="aircraft-f35-title">Lockheed Martin F-35B Lightning II</h3><span class="feature__badge">Experimental</span></div><button type="button" class="info-page__help-button" popovertarget="aircraft-f35-help" aria-label="Lockheed Martin F-35B Lightning II details">?</button></div>
-                <div id="aircraft-f35-help" class="info-page__aircraft-help" popover aria-labelledby="aircraft-f35-title">
+                <div class="info-page__aircraft-header"><div><h3 id="aircraft-f35-title">Lockheed Martin F-35B Lightning II</h3><span class="feature__badge">Experimental</span></div><button type="button" class="info-page__help-button" hidden data-help="aircraft-f35-help" aria-label="Lockheed Martin F-35B Lightning II details">?</button></div>
+                <div id="aircraft-f35-help" class="info-page__help-tooltip" hidden aria-labelledby="aircraft-f35-title">
                   <h4>Lockheed Martin F-35B Lightning II</h4><p>STOVL fighter. Experimental flight model and AF267 exterior model.</p>
                   <p class="info-page__note">Experimental F-16/Aeromatic-derived JSBSim flight model. F-35B performance and STOVL behavior are not validated.</p>
                 </div>

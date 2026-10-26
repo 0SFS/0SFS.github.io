@@ -129,10 +129,37 @@ try {
   await chrome.send("Emulation.setDeviceMetricsOverride", { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false }, info.sessionId);
   await chrome.send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] }, info.sessionId);
   await chrome.send("Page.navigate", { url: "https://0sfs.test/?renderer=webgl2" }, info.sessionId);
-  // Parsed to the end, so the script after the page has written Start flying's address.
+  // Parsed to the end, so the script after the page has written Fly's address.
   await waitForExpression(chrome, info.sessionId, "document.readyState !== 'loading' && Boolean(document.querySelector('.info-page'))", 15000);
   const startHref = await evaluate(chrome, info.sessionId, "document.querySelector('.info-page__start')?.getAttribute('href')");
-  assert.equal(startHref, "/fly/?renderer=webgl2", "Start flying dropped existing query parameters");
+  assert.equal(startHref, "/fly/?renderer=webgl2", "Fly dropped existing query parameters");
+  await waitForExpression(chrome, info.sessionId, "document.querySelectorAll('button[data-help][aria-expanded]').length === 6", 5000);
+  report.checks.help = await evaluate(chrome, info.sessionId, `(() => {
+    const buttons = [...document.querySelectorAll('button[data-help]')];
+    if (document.querySelector('.info-page__nav,.info-page__hero')) throw Error('Removed introduction remains');
+    const results = buttons.map(button => {
+      const content = document.getElementById(button.getAttribute('aria-controls'));
+      if (!content.hidden) throw Error('Help starts open');
+      button.scrollIntoView({block:'center'});
+      button.click();
+      const box = content.getBoundingClientRect();
+      if (content.getAttribute('role') !== 'tooltip' || box.left < 0 || box.right > innerWidth || box.top < 0 || box.bottom > innerHeight) throw Error('Tooltip clipped');
+      if (getComputedStyle(content,'::backdrop').backgroundColor !== 'rgba(0, 0, 0, 0)') throw Error('Tooltip dims the page');
+      if (getComputedStyle(content).pointerEvents !== 'auto') throw Error('Tooltip cannot receive pointer input');
+      const heading = content.querySelector('h2,h4');
+      if (heading && parseFloat(getComputedStyle(heading).fontSize) > 14) throw Error('Tooltip heading is not compact');
+      const links = content.querySelectorAll('a');
+      (links[0] ?? button).focus();
+      document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
+      if (!content.hidden || document.activeElement !== button) throw Error('Escape/focus return failed');
+      button.click();
+      document.body.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}));
+      if (!content.hidden) throw Error('Outside dismissal failed');
+      return {id:content.id, links:links.length, anchored:true};
+    });
+    window.scrollTo(0,0);
+    return results;
+  })()`);
   const stillPreview = await evaluate(chrome, info.sessionId, `(() => {
     const video = document.querySelector('.feature__scenery');
     return { paused: video.paused, readyState: video.readyState, time: video.currentTime,

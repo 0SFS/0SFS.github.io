@@ -78,6 +78,23 @@ after(async () => {
 });
 
 describe("buildSite", () => {
+  it("includes shared help in the landing file set and in a clean build", async () => {
+    const { site, fly, out } = await fixture("shared-help");
+    const helper = path.join(scratch, "shared-help", "ui", "helpTooltip.js");
+    await write(helper, "export function createHelpTooltip() {}\n");
+    await write(path.join(site, "public", "landing-help.js"), 'import { createHelpTooltip } from "./landing-help-core.js";');
+    const landing = await landingFiles(site, helper);
+    assert.ok(landing.some(([from, to]) => from === helper && to === "landing-help-core.js"));
+    await buildSite({ site, fly, out, landing });
+    assert.equal(readFileSync(path.join(out, "landing-help-core.js"), "utf8"), readFileSync(helper, "utf8"));
+  });
+
+  it("explains how to build a missing shared tooltip dependency", async () => {
+    const { site } = await fixture("missing-shared-help");
+    await write(path.join(site, "public", "landing-help.js"));
+    await assert.rejects(landingFiles(site, path.join(scratch, "missing-help.js")), /run npm run build in foss-earth\/ui first/);
+  });
+
   it("serves the landing page at / and fly's build everywhere else, without dotfiles", async () => {
     const { site, fly, out } = await fixture("assembles");
     const { flight, landing } = await buildSite({ site, fly, out });

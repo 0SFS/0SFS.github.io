@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 
 const SITE_URL = "https://0sfs.github.io/";
 const siteRoot = fileURLToPath(new URL("../", import.meta.url));
+const sharedHelp = fileURLToPath(new URL("../../../foss-earth/ui/dist/shell/helpTooltip.js", import.meta.url));
 
 /**
  * @param {{ site?: string, landing?: [string, string][], fly?: string, out?: string, base?: string }} [options]
@@ -53,14 +54,20 @@ export async function buildSite({ site = siteRoot, landing, fly = path.join(site
 
 /**
  * The landing page's files in a checkout of this repository, `[source, path on
- * the site]`: index.html, landing.css, and public/'s files at the site's root.
+ * the site]`: index.html, landing.css, public/'s files at the site's root,
+ * and the shared UI's standalone tooltip module when the page uses it.
  */
-export async function landingFiles(site = siteRoot) {
-  return [
+export async function landingFiles(site = siteRoot, helpTooltip = sharedHelp) {
+  const files = [
     ["index.html", "index.html"],
     ["landing.css", "landing.css"],
     ...(await readdir(path.join(site, "public"))).filter((name) => !name.startsWith(".")).map((name) => [path.join("public", name), name]),
   ].map(([from, to]) => [path.join(site, from), to]);
+  if (existsSync(path.join(site, "public", "landing-help.js"))) {
+    if (!existsSync(helpTooltip)) throw new Error(`No shared tooltip build at ${helpTooltip}: run npm run build in foss-earth/ui first.`);
+    files.push([helpTooltip, "landing-help-core.js"]);
+  }
+  return files;
 }
 
 /**
