@@ -1,0 +1,1 @@
+import{n as e,t}from"./attitudeRenderer-g4HZC21U.js";var n={halfShare:t,mount(t){let n=e(t,{preference:`canvas2d`});return{draw:(e,t)=>n.draw(e,t,e.view??null),destroy:()=>n.destroy()}}};export{n as phoneAttitudeRenderer};
