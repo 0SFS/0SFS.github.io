@@ -105,6 +105,16 @@
 .feature__photo { position: absolute; inset: 0; }
 .feature__photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; }
 .feature--sky[data-sky-art="sunset"] .feature__photo img { object-position: 50% min(0px, calc(var(--sky-edge) - 39cqw)); }
+/* Square like its picture, which has only 20% black sky above the glow. The picture
+   fills the card from grid row 3, just under the heading at whatever size it renders;
+   pulling it up by 20% of the card's width puts the glow's top there and crops the
+   sea at the bottom. The card grows past square only if its row or copy need it. */
+.feature--night { grid-column: span 3; place-self: stretch; display: grid; grid-template-rows: auto auto 1fr auto; aspect-ratio: 1; min-height: min-content; background: #040404; }
+.feature--night h2 { margin-top: 12px; }
+.feature--night h2 > span { color: #e2c98d; }
+.feature--night .feature__photo { grid-row: 3; margin-top: calc(14px - 20%); }
+.feature--night > p:not(.feature__label) { grid-row: 4; margin-right: 52px; }
+.feature--night .feature__help-row { position: absolute; right: 25px; bottom: 25px; z-index: 1; margin: 0; padding: 0; }
 .feature--systems h2 { margin-block: 18px 14px; }
 .feature__system-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 19px; }
 .feature__system-tags > span { padding: 4px 9px; border: 1px solid #48525b; border-radius: 6px; color: #bdc8d0; font: 10px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
@@ -113,7 +123,10 @@
 .feature--sound h2 { margin-bottom: 12px; }
 .feature--sound h2 > span { color: #e2c98d; }
 .feature__link { display: inline-flex; align-items: center; gap: 10px; min-height: 36px; margin-top: 8px; font-size: 12px; text-decoration: none; }
-.feature--multiplayer { display: flex; flex-direction: column; container: multiplayer / inline-size; background: radial-gradient(ellipse at 100% 10%, #1d3b4a, #121c25 75%); }
+.feature--multiplayer { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: auto auto 1fr auto; column-gap: 40px; align-content: center; container: multiplayer / inline-size; background: radial-gradient(ellipse at 100% 10%, #1d3b4a, #121c25 75%); }
+.feature--multiplayer .feature__label { grid-column: 1 / -1; }
+.feature--multiplayer .feature__multiplayer-art { grid-column: 1; grid-row: 2 / span 3; align-self: center; }
+.feature--multiplayer h2, .feature--multiplayer > p:not(.feature__label), .feature--multiplayer .feature__help-row { grid-column: 2; }
 .feature__badge { display: inline-block; padding: 2px 6px; border: 1px solid #667985; border-radius: 5px; color: #d1dce2; font: 500 9px/1.6 ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: .4px; text-transform: uppercase; vertical-align: 1px; }
 .feature__label > .feature__badge { margin-left: 5px; }
 .feature__multiplayer-art { display: flex; align-items: flex-start; gap: clamp(8px, 3%, 24px); width: min(100%, 664px); margin: 18px auto 10px; }
@@ -195,7 +208,9 @@
   .feature h2 { font-size: 29px; }
   .feature--gpu h2 { font-size: 40px; }
   .feature__gpu-mark { width: 50px; height: 50px; }
-  .feature--sky, .feature--systems, .feature--sound, .feature--multiplayer { grid-column: span 6; min-height: 290px; }
+  .feature--sky, .feature--systems, .feature--sound { grid-column: span 6; min-height: 290px; }
+  .feature--night { grid-column: span 6; }
+  .feature--multiplayer { grid-column: 1 / -1; min-height: 290px; }
   .feature--sky[data-sky-art="sunset"] { --sky-edge: 121px; }
   .feature__badge { font-size: 8px; }
   .info-page__roadmap { gap: 28px; padding: 28px; }
@@ -206,7 +221,9 @@
 @media (max-width: 760px) {
   .info-page__features { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .feature--world { grid-column: 1 / -1; grid-row: auto; min-height: 0; aspect-ratio: 16 / 10; }
-  .feature--gpu, .feature--physics, .feature--native, .feature--phone, .feature--sky, .feature--systems, .feature--sound, .feature--multiplayer { grid-column: span 1; min-height: 255px; }
+  .feature--gpu, .feature--physics, .feature--native, .feature--phone, .feature--sky, .feature--systems, .feature--sound { grid-column: span 1; min-height: 255px; }
+  .feature--night { grid-column: span 1; }
+  .feature--multiplayer { display: flex; flex-direction: column; grid-column: 1 / -1; min-height: 255px; }
   .info-page__section-heading { align-items: start; flex-direction: column; gap: 12px; }
   .info-page__fleet, .info-page__getting-started { margin-top: 42px; }
   .info-page__aircraft { grid-template-columns: 1fr; gap: 12px; }

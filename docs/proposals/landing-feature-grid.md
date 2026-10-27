@@ -97,3 +97,78 @@ clickable above it. Explanatory
 copy, capture details, source link and a second provider link are in its anchored
 tooltip. Every landing-page **?** uses the shared explanation behavior, without
 centered popups or a dimming backdrop. See the supplementary-copy policy.
+
+## Night lighting card
+
+Added locally on 26 October 2026 from [the night-lighting brief](delegate-night-lighting-card.md).
+The desktop board keeps the existing world/graphics/physics/computation/phone arrangement.
+Its next row is Sky, Night lighting, Systems and Sound, each spanning three columns.
+Multiplayer fills a new row, with its artwork beside the heading and paragraph; at 760px and below
+it stacks those parts. This fills every row without widening Sky or the other three-column
+cards. The intermediate layout pairs Sky with Night lighting and Systems with Sound;
+the phone layout remains one column. Labels now run through 10 / Multiplayer.
+
+The heading is **Night falls. / Cities light up.** The paragraph reads:
+“City lights switch on when the Sun drops about 5° below the horizon.” This matches the
+default lamp threshold in `foss-earth/sky/src/settings.ts` and its runtime daylight switch.
+The VIIRS Day/Night Band tile source is verified in `sky/src/nightLights.ts`; the capture
+scenario is `foss-earth/app/scripts/capture-scenes/scenarios/night-lights-orbit.json`.
+The bottom-right **?** credits FOSS Earth, Google 3D Tiles and NASA GIBS (VIIRS Day/Night
+Band), using the Sky card's attribution links and the existing tooltip helper.
+
+The published 1200 × 1200 pictures are unchanged. Their SHA-256 URL prefixes are
+`115b79430e66` (WebP) and `90056abc925e` (JPEG). Inspection and 60-pixel row measurements
+put the edge's glow at about 21–31% of the picture height, the named inland cities at
+31–62%, and Vitória's coastal lights near 87%. The first version put the paragraph on the
+dark lower right, clear of those city centres; the square revision below replaces that layout.
+The Sky card's markup and styling are unchanged.
+
+Local verification:
+
+- `npm run build` and `npm run check` pass; the browser check expects eight help buttons.
+- `npm test`: 73 passed.
+- Whole-grid and new-card screenshots at 1800, 1440, 1200, 1000, 800, 600, 420 and 360px.
+  Additional checks cover both sides of the 480, 760 and 1100px breakpoints.
+  Geometry checks find no grid holes, horizontal overflow or clipped card copy; all eight
+  named city centres remain visible and clear of the paragraph. Desktop and phone credit
+  tooltips open beside their buttons, with keyboard opening, Escape/focus return and
+  outside dismissal covered by the browser checks.
+- [Local review and feedback checklist](../../build/night-card/review.html),
+  [individual screenshots](../../build/night-card/shots/index.html), and contact sheets
+  for the [card](../../build/night-card/shots/night-contact.png) and
+  [complete grid](../../build/night-card/shots/grid-contact.png) are ignored local artifacts.
+  Start `cd ~/gh/0sfs/0sfs.github.io && npm run dev`, then use the review page's checklist
+  link. It opens the simulator's existing Test tab; Start → Finish creates valid
+  downloadable feedback JSON. The checklist covers visibility, layout and credits.
+
+### Square revision
+
+The first version was taller than wide on a phone and a full-screen laptop (0.80 of square at
+1470–1512px). Where text rendered larger than tested, it also put the heading's second line
+over the glow. The cause was the picture's offset and the paragraph's padding: both were
+fixed `px`/`cqw` values tuned to one heading height. That version was deployed to gh-pages
+with the 26 October site deployment.
+
+The card is now square (`aspect-ratio: 1`) and stretches with its row, like its
+neighbours. It is a grid of label, heading, flexible space and paragraph. The picture
+is absolutely positioned in the grid area from the line under the heading to the
+card's bottom padding edge. It is pulled up by 20% of the card's width, so the glow's
+top always sits 14px under the heading, whatever size the heading renders at. The
+picture covers that area, so it reaches the bottom when a taller row stretches the card.
+The paragraph sits at the bottom left, as on the Sky card, beside the bottom-right **?**.
+Because only the top 20% of the picture is black sky, the bottom 10–28% (the sea and the
+coast) is cropped. A full-frame square would need a recapture with the horizon about
+40% down, as in the Sky picture.
+
+The card is square at 412 × 883 and 883 × 412 (Galaxy Note 20, portrait and landscape),
+1512, 1728 and 2560px. It is 343 × 347 at 1470px. Between 1100 and about 1440px, and at
+481–760px, longer neighbouring copy makes the row taller than the card is wide.
+With 30% larger text, the glow still sits 14px under the heading and the card stays square.
+`npm run build`, `npm test` (73 passed) and `npm run check` pass.
+Screenshots are in [build/night-square/after/](../../build/night-square/after/index.html),
+with the first version in [build/night-square/before/](../../build/night-square/before/index.html).
+
+The source changes remain uncommitted on `main`, whose push remote is
+`https://github.com/0SFS/0SFS.github.io.git`. After reviewing and committing only the intended
+source paths, the source push command is `git -C ~/gh/0sfs/0sfs.github.io push origin main`;
+run it only if explicitly requested. The square revision is not committed, pushed or deployed.
