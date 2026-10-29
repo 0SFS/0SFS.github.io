@@ -1,0 +1,326 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/dji-mini2",
+  "kind": "aircraft",
+  "name": "DJI Mini 2",
+  "summary": "249 g camera drone. 4:3 stills, gimbal \u221290\u00b0 to +20\u00b0.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/DJI-Mini2",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "dependencies": [
+    "0SFS/DJI-Quadcopter",
+    "0SFS/DJI-FC7303"
+  ],
+  "jsbsimFiles": [
+    "aircraft/dji-mini-2/dji-mini-2.xml"
+  ],
+  "quad": {
+    "cameraId": "0sfs/dji-fc7303",
+    "gimbalMinDeg": -90,
+    "gimbalMaxDeg": 20,
+    "gimbalRollMinDeg": -35,
+    "gimbalRollMaxDeg": 35,
+    "gimbalYawMinDeg": -20,
+    "gimbalYawMaxDeg": 20,
+    "modes": {
+      "normal": {
+        "speedMps": 10,
+        "tiltMaxDeg": 25,
+        "yawRateDeg": 60,
+        "climbMps": 3,
+        "descentMps": 3
+      },
+      "sport": {
+        "speedMps": 16,
+        "tiltMaxDeg": 40,
+        "yawRateDeg": 130,
+        "climbMps": 5,
+        "descentMps": 3.5
+      }
+    },
+    "propeller": {
+      "radiusM": 0.0597,
+      "blades": 2,
+      "chordM": 0.011,
+      "pitchM": 0.06604,
+      "zeroLiftDeg": -1.5,
+      "liftSlope": 5.5,
+      "profileDrag": 0.035,
+      "inertiaKgM2": 8e-07,
+      "timeConstantS": 0.025,
+      "maxRpm": 13300,
+      "idleRpm": 3100
+    },
+    "rotors": [
+      {
+        "position": "front-left",
+        "hubM": [
+          -0.0648,
+          -0.0877,
+          0.027
+        ],
+        "spin": 1
+      },
+      {
+        "position": "front-right",
+        "hubM": [
+          -0.0648,
+          0.0877,
+          0.027
+        ],
+        "spin": -1
+      },
+      {
+        "position": "rear-left",
+        "hubM": [
+          0.0604,
+          -0.0844,
+          0.005
+        ],
+        "spin": -1
+      },
+      {
+        "position": "rear-right",
+        "hubM": [
+          0.0604,
+          0.0844,
+          0.005
+        ],
+        "spin": 1
+      }
+    ],
+    "cgM": [
+      -0.0022,
+      0,
+      -0.005
+    ],
+    "control": {
+      "kv": 2.5,
+      "kvi": 2,
+      "viLimitH": 8,
+      "viLimitV": 4,
+      "shapeGain": 2,
+      "accelMaxH": 6,
+      "accelMaxV": 4,
+      "jerkMax": 30,
+      "kAtt": 7,
+      "rateMaxDeg": 250,
+      "kPsi": 3,
+      "yawLeadDeg": 30,
+      "kRate": 18,
+      "kRi": 5,
+      "riLimit": 10
+    }
+  },
+  "aircraft": {
+    "family": {
+      "id": "dji-quadcopter",
+      "label": "DJI",
+      "summary": "Camera quadcopters. Stills and spherical capture load when a variant is applied.",
+      "thumbnail": {
+        "path": "",
+        "credit": {
+          "artist": "0SFS",
+          "note": "Procedural airframe drawn after the drone feature loads."
+        }
+      },
+      "defaultAircraftId": "dji-mini-2",
+      "variantLabel": "Aircraft",
+      "variants": [
+        {
+          "id": "mini-2",
+          "aircraftId": "dji-mini-2",
+          "label": "Mini 2"
+        }
+      ]
+    },
+    "definitions": [
+      {
+        "id": "dji-mini-2",
+        "familyId": "dji-quadcopter",
+        "label": "DJI Mini 2",
+        "summary": "249 g camera drone. 4:3 stills, gimbal \u221290\u00b0 to +20\u00b0.",
+        "modelYawRad": 0,
+        "modelOffset": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "cockpitOffset": {
+          "x": 0,
+          "y": -0.02,
+          "z": 0.05
+        },
+        "procedural": "drone",
+        "propellerBlades": 0,
+        "lods": [
+          {
+            "id": "hd",
+            "label": "HD",
+            "triangles": 109470,
+            "path": "3d_model/HD/dji-mini2.glb",
+            "autoFromMeters": 0,
+            "credit": {
+              "artist": "DJI",
+              "note": "Official DJI 3D model."
+            }
+          },
+          {
+            "id": "lod0",
+            "label": "Procedural",
+            "triangles": 156,
+            "path": "",
+            "autoFromMeters": 15,
+            "credit": {
+              "artist": "0SFS",
+              "note": "Boxes parented by the drone feature after it loads."
+            }
+          }
+        ],
+        "camera": {
+          "chaseDistanceMeters": 0.8,
+          "chaseHeightMeters": 0.24,
+          "chaseZoomLimits": {
+            "min": 0.25,
+            "max": 500
+          },
+          "nearClipMeters": 0.01,
+          "follow": "momentum"
+        },
+        "rotors": [
+          {
+            "node": "drone-rotor-0",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "radiusMeters": 0.0597,
+            "blades": 2,
+            "direction": -1
+          },
+          {
+            "node": "drone-rotor-1",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "radiusMeters": 0.0597,
+            "blades": 2,
+            "direction": 1
+          },
+          {
+            "node": "drone-rotor-2",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "radiusMeters": 0.0597,
+            "blades": 2,
+            "direction": 1
+          },
+          {
+            "node": "drone-rotor-3",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "radiusMeters": 0.0597,
+            "blades": 2,
+            "direction": -1
+          }
+        ],
+        "gimbal": {
+          "baseNode": "drone-model-gimbal-base",
+          "pitchNode": "drone-model-gimbal-pitch",
+          "yawNode": "drone-model-gimbal-yaw",
+          "rollNode": "drone-model-gimbal-roll"
+        },
+        "controls": {
+          "vertical": "climb-rate",
+          "keyboard": {
+            "pitch": "ws",
+            "roll": "qe",
+            "yaw": "ad",
+            "power": "shift-ctrl"
+          }
+        }
+      }
+    ],
+    "fdmProfiles": {
+      "dji-mini-2": {
+        "model": "dji-mini-2",
+        "dataSource": {
+          "kind": "mod",
+          "modId": "0sfs/dji-mini2"
+        },
+        "kinematic": "drone-pgps",
+        "requiresPhysicsHz": 120,
+        "engine": "none",
+        "rudderSign": 1,
+        "stance": {
+          "staticMeters": 0.04,
+          "staticPitchRad": 0,
+          "pitchArmMeters": 0.08,
+          "rollArmMeters": 0.08
+        },
+        "gauges": {
+          "primary": "multirotor/armed",
+          "secondary": null,
+          "label": "ARM"
+        },
+        "startSpeed": {
+          "property": "multirotor/armed",
+          "runningAt": 1
+        },
+        "initialThrottleNorm": 0.5,
+        "initialAirspeedKts": 0,
+        "initialPitchDeg": 0,
+        "initialGearDown": true,
+        "flapPosition": {
+          "property": "fcs/flap-pos-norm",
+          "fullTravel": 1
+        },
+        "automaticFlaps": {
+          "kind": "native",
+          "commandProperty": "fcs/flaps-auto-enabled"
+        },
+        "forceControlSurfaces": [],
+        "runwayPresets": {
+          "departure": {
+            "airspeedKts": 0,
+            "throttleNorm": 0.5,
+            "flapsNorm": 0,
+            "pitchDeg": 0
+          },
+          "arrival": {
+            "airspeedKts": 0,
+            "throttleNorm": 0.5,
+            "flapsNorm": 0,
+            "pitchDeg": 0
+          }
+        },
+        "initialProperties": {
+          "multirotor/force-x-lbs": 0,
+          "multirotor/force-y-lbs": 0,
+          "multirotor/force-z-lbs": 0,
+          "multirotor/moment-l-ftlbf": 0,
+          "multirotor/moment-m-ftlbf": 0,
+          "multirotor/moment-n-ftlbf": 0,
+          "multirotor/armed": 0,
+          "fcs/flap-pos-norm": 0,
+          "fcs/flaps-auto-enabled": 0
+        }
+      }
+    }
+  }
+}

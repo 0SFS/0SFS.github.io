@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "0sfs/dji-fc7303",
-  "kind": "plugin",
+  "kind": "component",
   "name": "DJI FC7303",
   "summary": "FC7303 sensor, lens and still-image profile.",
   "execution": "declarative",

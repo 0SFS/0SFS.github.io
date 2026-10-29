@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/dji-quadcopter",
+  "kind": "component",
+  "name": "DJI Quadcopter",
+  "summary": "Shared DJI camera-drone gallery family.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/DJI-Quadcopter",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "dependencies": [
+    "0SFS/Quadcopter"
+  ],
+  "dji": {
+    "gimbalRollDeg": 0,
+    "familyId": "dji-quadcopter",
+    "familyLabel": "DJI",
+    "familySummary": "Camera quadcopters. Stills and spherical capture load when a variant is applied."
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/camera-preview",
+  "kind": "plugin",
+  "name": "Camera preview",
+  "summary": "Optional live sensor preview for the Camera tab.",
+  "execution": "js",
+  "provenance": {
+    "repository": "https://github.com/0SFS/camera-preview",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": ["0SFS contributors"]
+  },
+  "js": { "path": "preview.js" },
+  "cameraPreview": { "apiVersion": 1 }
+}

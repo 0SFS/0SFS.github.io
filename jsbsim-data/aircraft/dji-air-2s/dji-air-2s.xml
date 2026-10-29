@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<fdm_config name="dji-air-2s" version="2.0" release="BETA">
+  <fileheader>
+    <author>0SFS</author>
+    <filecreationdate>2026-10-27</filecreationdate>
+    <description>rotor force and moment come from @0sfs/multirotor</description>
+  </fileheader>
+  <metrics>
+    <wingarea unit="FT2">1</wingarea>
+    <wingspan unit="FT">1</wingspan>
+    <chord unit="FT">1</chord>
+    <htailarea unit="FT2">0.1</htailarea>
+    <htailarm unit="FT">0</htailarm>
+    <vtailarea unit="FT2">0.1</vtailarea>
+    <vtailarm unit="FT">0</vtailarm>
+    <location name="AERORP" unit="M"><x>0.003</x><y>0</y><z>-0.005</z></location>
+    <location name="EYEPOINT" unit="M"><x>0.05</x><y>0</y><z>0.02</z></location>
+    <location name="VRP" unit="M"><x>0</x><y>0</y><z>0</z></location>
+  </metrics>
+  <mass_balance>
+    <ixx unit="SLUG*FT2">0.0012118</ixx>
+    <iyy unit="SLUG*FT2">0.0016566</iyy>
+    <izz unit="SLUG*FT2">0.0026545</izz>
+    <emptywt unit="LBS">1.311750</emptywt>
+    <location name="CG" unit="M"><x>0.003</x><y>0</y><z>-0.005</z></location>
+  </mass_balance>
+  <ground_reactions>
+    <contact type="STRUCTURE" name="FL_FOOT">
+      <location unit="M"><x>-0.0876</x><y>-0.1279</y><z>-0.0397</z></location>
+      <static_friction>0.8</static_friction>
+      <dynamic_friction>0.6</dynamic_friction>
+      <spring_coeff unit="LBS/FT">1.83</spring_coeff>
+      <damping_coeff unit="LBS/FT/SEC">0.14</damping_coeff>
+      <damping_coeff_rebound unit="LBS/FT/SEC">0.7</damping_coeff_rebound>
+      <max_steer unit="DEG">0</max_steer>
+      <brake_group>NONE</brake_group>
+      <retractable>0</retractable>
+    </contact>
+    <contact type="STRUCTURE" name="FR_FOOT">
+      <location unit="M"><x>-0.0876</x><y>0.1279</y><z>-0.0397</z></location>
+      <static_friction>0.8</static_friction>
+      <dynamic_friction>0.6</dynamic_friction>
+      <spring_coeff unit="LBS/FT">1.83</spring_coeff>
+      <damping_coeff unit="LBS/FT/SEC">0.14</damping_coeff>
+      <damping_coeff_rebound unit="LBS/FT/SEC">0.7</damping_coeff_rebound>
+      <max_steer unit="DEG">0</max_steer>
+      <brake_group>NONE</brake_group>
+      <retractable>0</retractable>
+    </contact>
+    <contact type="STRUCTURE" name="RL_FOOT">
+      <location unit="M"><x>0.0294</x><y>-0.0153</y><z>-0.0334</z></location>
+      <static_friction>0.8</static_friction>
+      <dynamic_friction>0.6</dynamic_friction>
+      <spring_coeff unit="LBS/FT">8.41</spring_coeff>
+      <damping_coeff unit="LBS/FT/SEC">0.495</damping_coeff>
+      <damping_coeff_rebound unit="LBS/FT/SEC">0.7</damping_coeff_rebound>
+      <max_steer unit="DEG">0</max_steer>
+      <brake_group>NONE</brake_group>
+      <retractable>0</retractable>
+    </contact>
+    <contact type="STRUCTURE" name="RR_FOOT">
+      <location unit="M"><x>0.0294</x><y>0.0153</y><z>-0.0334</z></location>
+      <static_friction>0.8</static_friction>
+      <dynamic_friction>0.6</dynamic_friction>
+      <spring_coeff unit="LBS/FT">8.41</spring_coeff>
+      <damping_coeff unit="LBS/FT/SEC">0.495</damping_coeff>
+      <damping_coeff_rebound unit="LBS/FT/SEC">0.7</damping_coeff_rebound>
+      <max_steer unit="DEG">0</max_steer>
+      <brake_group>NONE</brake_group>
+      <retractable>0</retractable>
+    </contact>
+  </ground_reactions>
+  <external_reactions>
+    <force name="multirotor-force-x" frame="BODY">
+      <function><property>multirotor/force-x-lbs</property></function>
+      <direction><x>1</x><y>0</y><z>0</z></direction>
+      <location unit="M"><x>0.003</x><y>0</y><z>-0.005</z></location>
+    </force>
+    <force name="multirotor-force-y" frame="BODY">
+      <function><property>multirotor/force-y-lbs</property></function>
+      <direction><x>0</x><y>1</y><z>0</z></direction>
+      <location unit="M"><x>0.003</x><y>0</y><z>-0.005</z></location>
+    </force>
+    <force name="multirotor-force-z" frame="BODY">
+      <function><property>multirotor/force-z-lbs</property></function>
+      <direction><x>0</x><y>0</y><z>1</z></direction>
+      <location unit="M"><x>0.003</x><y>0</y><z>-0.005</z></location>
+    </force>
+    <moment name="multirotor-moment-l" frame="BODY">
+      <function><property>multirotor/moment-l-ftlbf</property></function>
+      <direction><x>1</x><y>0</y><z>0</z></direction>
+    </moment>
+    <moment name="multirotor-moment-m" frame="BODY">
+      <function><property>multirotor/moment-m-ftlbf</property></function>
+      <direction><x>0</x><y>1</y><z>0</z></direction>
+    </moment>
+    <moment name="multirotor-moment-n" frame="BODY">
+      <function><property>multirotor/moment-n-ftlbf</property></function>
+      <direction><x>0</x><y>0</y><z>1</z></direction>
+    </moment>
+  </external_reactions>
+  <aerodynamics>
+    <axis name="X"><function name="aero/force/X"><product><property>atmosphere/rho-slugs_ft3</property><property>velocities/vt-fps</property><property>velocities/u-aero-fps</property><value>-0.045746575</value></product></function></axis>
+    <axis name="Y"><function name="aero/force/Y"><product><property>atmosphere/rho-slugs_ft3</property><property>velocities/vt-fps</property><property>velocities/v-aero-fps</property><value>-0.05381950</value></product></function></axis>
+    <axis name="Z"><function name="aero/force/Z"><product><property>atmosphere/rho-slugs_ft3</property><property>velocities/vt-fps</property><property>velocities/w-aero-fps</property><value>-0.11840290</value></product></function></axis>
+    <axis name="ROLL"><function name="aero/moment/Roll"><product><property>aero/qbar-psf</property><property>metrics/Sw-sqft</property><property>metrics/bw-ft</property><value>0</value></product></function></axis>
+    <axis name="PITCH"><function name="aero/moment/Pitch"><product><property>aero/qbar-psf</property><property>metrics/Sw-sqft</property><property>metrics/cbarw-ft</property><value>0</value></product></function></axis>
+    <axis name="YAW"><function name="aero/moment/Yaw"><product><property>aero/qbar-psf</property><property>metrics/Sw-sqft</property><property>metrics/bw-ft</property><value>0</value></product></function></axis>
+  </aerodynamics>
+</fdm_config>

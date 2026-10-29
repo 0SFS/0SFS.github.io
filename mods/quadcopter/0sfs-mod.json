@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/quadcopter",
+  "kind": "component",
+  "name": "Quadcopter",
+  "summary": "Shared quadcopter contract: stick commands, position hold, the rotor wrench properties, and the spherical-grid overlap.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/Quadcopter",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "dependencies": [
+    "0SFS/rotating-prop",
+    "0SFS/camera-gimbal",
+    "0SFS/multirotor"
+  ],
+  "quadcopter": {
+    "kinematic": "drone-pgps",
+    "gains": {
+      "kPos": 0.6,
+      "deadzone": 0.03
+    },
+    "gridOverlap": 0.7,
+    "physicsHz": 120,
+    "gimbalSlewDeg": 180,
+    "positionHoldMps": 4.8,
+    "properties": {
+      "fx": "multirotor/force-x-lbs",
+      "fy": "multirotor/force-y-lbs",
+      "fz": "multirotor/force-z-lbs",
+      "l": "multirotor/moment-l-ftlbf",
+      "m": "multirotor/moment-m-ftlbf",
+      "n": "multirotor/moment-n-ftlbf",
+      "armed": "multirotor/armed"
+    }
+  }
+}

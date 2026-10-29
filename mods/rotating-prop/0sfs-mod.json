@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "0sfs/rotating-prop",
-  "kind": "plugin",
+  "kind": "component",
   "name": "Rotating Prop",
   "summary": "Shared rotating prop presentation component.",
   "execution": "declarative",

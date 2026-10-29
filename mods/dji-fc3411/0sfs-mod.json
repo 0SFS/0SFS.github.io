@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "0sfs/dji-fc3411",
-  "kind": "plugin",
+  "kind": "component",
   "name": "DJI FC3411",
   "summary": "FC3411 sensor, lens and still-image profile.",
   "execution": "declarative",

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "0sfs/camera-gimbal",
-  "kind": "plugin",
+  "kind": "component",
   "name": "Camera Gimbal",
   "summary": "Shared camera gimbal presentation component.",
   "execution": "declarative",

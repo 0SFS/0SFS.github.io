@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "0sfs/drone-camera",
-  "kind": "plugin",
+  "kind": "component",
   "name": "Drone camera",
   "summary": "Shared WebGPU stills, JPEG metadata, optical flow and spherical capture.",
   "execution": "declarative",

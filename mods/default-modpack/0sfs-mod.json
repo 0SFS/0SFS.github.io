@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "0sfs/default-modpack",
+  "kind": "modpack",
+  "name": "Default modpack",
+  "summary": "The aircraft, engines, components, payloads and plugins every flight starts with.",
+  "execution": "declarative",
+  "provenance": {
+    "repository": "https://github.com/0SFS/default-modpack",
+    "owner": "0SFS",
+    "license": "AGPL-3.0-only",
+    "authors": [
+      "0SFS contributors"
+    ]
+  },
+  "dependencies": [
+    "0SFS/C172",
+    "0SFS/SF-50",
+    "0SFS/F-35B",
+    "0SFS/DJI-Mini2",
+    "0SFS/DJI-Air-2S",
+    "0SFS/camera-preview"
+  ]
+}
