@@ -128,7 +128,7 @@ curl -s https://0sfs.github.io/fly/ | grep -o '<script data-foss-earth-isolation
 curl -s https://0sfs.github.io/foss-earth-sw.js | grep -o '"isolation":"[a-z-]*"'
 ```
 
-Both say `enforce`. In <https://0sfs.github.io/fly/?set.native.core.sky=threaded> the console's
+Both say `enforce`. In <https://0sfs.github.io/fly/?set.wasm.core.sky=threaded> the console's
 `crossOriginIsolated` is then `true`. A hard refresh skips the worker, so the page reloads once more.
 `FOSS_EARTH_ISOLATION=off npm run deploy:flight` here builds the flight without it. FOSS Earth's
 [deploying guide](https://github.com/foss-earth/docs/blob/main/docs/deploying.md#cross-origin-isolation)

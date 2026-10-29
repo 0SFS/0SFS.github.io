@@ -57,7 +57,7 @@
 .feature__video-toggle { width: 40px; height: 40px; padding: 0; border: 1px solid #ffffff60; border-radius: 50%; color: #fff; background: #101820cc; font: 14px/1 system-ui, sans-serif; cursor: pointer; box-shadow: 0 2px 12px #0003; }
 .feature__video-toggle:hover { border-color: #e8b647; color: #e8b647; background: #101820; }
 .feature__world-controls .info-page__help-button { width: 40px; height: 40px; color: #fff; border-color: #ffffff60; background: #101820cc; box-shadow: 0 2px 12px #0003; }
-.feature--gpu, .feature--physics, .feature--native, .feature--phone { grid-column: span 3; min-height: 245px; }
+.feature--gpu, .feature--physics, .feature--wasm, .feature--phone { grid-column: span 3; min-height: 245px; }
 .feature--gpu { display: flex; flex-direction: column; background: radial-gradient(ellipse at 80% 70%, #19465d 0%, #102230 60%); }
 .feature__gpu-mark { position: absolute; inset: 39px 35px auto auto; width: 61px; height: 61px; transform: rotate(-25deg) skew(12deg); }
 .feature__gpu-mark span { position: absolute; inset: 0; border: 1px solid #5cc8ed; border-radius: 9px; background: #194b62; }
@@ -71,10 +71,10 @@
 .feature__rate { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 17px; margin-top: 16px !important; color: #bfc4b7; font-size: 10px; line-height: 1.45; }
 .feature__rate strong { color: #f2cf76; font-size: 40px; font-weight: 550; line-height: 1; letter-spacing: -2px; }
 .feature__rate strong > span { font-size: 17px; letter-spacing: -.3px; }
-.feature--native { background: linear-gradient(140deg, #221f33, #141c29); }
-.feature--native h2 { margin-block: 16px 18px; }
-.feature--native h2 > span { color: #c1b5ee; }
-.feature--native h2, .feature--phone h2 { font-size: clamp(25px, 2vw, 31px); }
+.feature--wasm { background: linear-gradient(140deg, #221f33, #141c29); }
+.feature--wasm h2 { margin-block: 16px 18px; }
+.feature--wasm h2 > span { color: #c1b5ee; }
+.feature--wasm h2, .feature--phone h2 { font-size: clamp(25px, 2vw, 31px); }
 .feature__threads { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 9px; padding-bottom: 12px; text-align: center; font: 9px/1.6 ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: #d2c8ed; }
 .feature__threads > span { padding: 4px 0; border: 1px solid #756a97; border-radius: 5px; background: #ffffff06; }
 .feature__threads > i { grid-column: 1 / -1; height: 12px; margin-inline: 15%; border-inline: 1px solid #756a97; border-bottom: 1px solid #756a97; }
@@ -195,7 +195,7 @@
 .info-page__footer a { color: #bcc6ce; }
 @media (min-width: 1700px) {
   .feature--world { min-height: 630px; }
-  .feature--gpu, .feature--physics, .feature--native, .feature--phone { min-height: 278px; }
+  .feature--gpu, .feature--physics, .feature--wasm, .feature--phone { min-height: 278px; }
   .feature { padding: 30px; }
   .feature--world { padding: 0; }
 }
@@ -204,7 +204,7 @@
   .feature { padding: 21px; }
   .feature--world { grid-column: span 8; min-height: 450px; padding: 0; }
   .feature--gpu, .feature--physics { grid-column: span 4; min-height: 218px; }
-  .feature--native, .feature--phone { grid-column: span 6; min-height: 250px; }
+  .feature--wasm, .feature--phone { grid-column: span 6; min-height: 250px; }
   .feature h2 { font-size: 29px; }
   .feature--gpu h2 { font-size: 40px; }
   .feature__gpu-mark { width: 50px; height: 50px; }
@@ -221,7 +221,7 @@
 @media (max-width: 760px) {
   .info-page__features { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .feature--world { grid-column: 1 / -1; grid-row: auto; min-height: 0; aspect-ratio: 16 / 10; }
-  .feature--gpu, .feature--physics, .feature--native, .feature--phone, .feature--sky, .feature--systems, .feature--sound { grid-column: span 1; min-height: 255px; }
+  .feature--gpu, .feature--physics, .feature--wasm, .feature--phone, .feature--sky, .feature--systems, .feature--sound { grid-column: span 1; min-height: 255px; }
   .feature--night { grid-column: span 1; }
   .feature--multiplayer { display: flex; flex-direction: column; grid-column: 1 / -1; min-height: 255px; }
   .info-page__section-heading { align-items: start; flex-direction: column; gap: 12px; }
@@ -245,7 +245,7 @@
   .info-page__features { grid-template-columns: 1fr; }
   .feature { padding: 25px; border-radius: 18px; }
   .feature--world { min-height: 0; aspect-ratio: 1; padding: 0; }
-  .feature--gpu, .feature--physics, .feature--native, .feature--phone, .feature--sky, .feature--systems, .feature--sound, .feature--multiplayer { grid-column: 1; min-height: 235px; }
+  .feature--gpu, .feature--physics, .feature--wasm, .feature--phone, .feature--sky, .feature--systems, .feature--sound, .feature--multiplayer { grid-column: 1; min-height: 235px; }
   .feature h2 { font-size: 32px; }
   .feature--sky[data-sky-art="sunset"] { --sky-edge: 131px; }
   .feature--gpu h2 { font-size: 46px; padding-top: 55px; }
